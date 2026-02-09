@@ -9,23 +9,21 @@
  * @module db/pii-middleware
  */
 
-import { encryptPII, decryptPII, hashPII } from "@/lib/security";
-import {
-  logDecryptAccess,
-  logBulkDecryptAccess,
-} from "@/lib/security";
-import { Prisma } from "@prisma/client";
+import { encryptPII, decryptPII, hashPII } from '@/lib/security';
+import { logDecryptAccess, logBulkDecryptAccess } from '@/lib/security';
+import { logger } from '@/lib/logger';
+import { Prisma } from '@prisma/client';
 
 /**
  * Map of models to their PII fields that need encryption/decryption
  */
 export const PII_FIELD_MAP: Record<string, string[]> = {
-  User: ["email"],
-  Profile: ["name"],
-  GoogleAccount: ["email", "displayName"],
-  CoppaConsent: ["parentEmail"],
-  StudyKit: ["originalText"],
-  HtmlSnippet: ["html"],
+  User: ['email'],
+  Profile: ['name'],
+  GoogleAccount: ['email', 'displayName'],
+  CoppaConsent: ['parentEmail'],
+  StudyKit: ['originalText'],
+  HtmlSnippet: ['html'],
 };
 
 /**
@@ -52,19 +50,12 @@ export async function encryptPIIFields(
 
   // Encrypt direct PII fields
   for (const field of piiFields) {
-    if (
-      field in data &&
-      data[field] != null &&
-      typeof data[field] === "string"
-    ) {
+    if (field in data && data[field] != null && typeof data[field] === 'string') {
       const plaintext = data[field] as string;
       encryptedData[field] = await encryptPII(plaintext);
 
       // Compute emailHash for email fields
-      if (
-        field === "email" &&
-        (model === "User" || model === "GoogleAccount")
-      ) {
+      if (field === 'email' && (model === 'User' || model === 'GoogleAccount')) {
         encryptedData.emailHash = await hashPII(plaintext);
       }
     }
@@ -72,11 +63,11 @@ export async function encryptPIIFields(
 
   // Handle nested creates/updates
   for (const [key, value] of Object.entries(data)) {
-    if (value && typeof value === "object" && !Array.isArray(value)) {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
       const nestedValue = value as Record<string, unknown>;
 
       // Handle nested create
-      if ("create" in nestedValue && typeof nestedValue.create === "object") {
+      if ('create' in nestedValue && typeof nestedValue.create === 'object') {
         const createData = nestedValue.create as Record<string, unknown>;
         // Try to determine the model name from the relation field
         // For now, we'll process all known models
@@ -92,7 +83,7 @@ export async function encryptPIIFields(
       }
 
       // Handle nested update
-      if ("update" in nestedValue && typeof nestedValue.update === "object") {
+      if ('update' in nestedValue && typeof nestedValue.update === 'object') {
         const updateData = nestedValue.update as Record<string, unknown>;
         for (const [nestedModel, fields] of Object.entries(PII_FIELD_MAP)) {
           if (fields.some((f) => f in updateData)) {
@@ -113,11 +104,11 @@ export async function encryptPIIFields(
 /**
  * Recursively decrypt PII fields in result object(s)
  * Logs all decryption operations to ComplianceAuditEntry table (F-08).
+ *
+ * FAULT-TOLERANT: Individual field decryption failures are caught and logged.
+ * Failed fields get a placeholder value instead of crashing the entire query.
  */
-export async function decryptPIIFields(
-  model: string,
-  result: unknown,
-): Promise<unknown> {
+export async function decryptPIIFields(model: string, result: unknown): Promise<unknown> {
   if (!result || !hasPIIFields(model)) {
     return result;
   }
@@ -127,16 +118,15 @@ export async function decryptPIIFields(
   // Handle array of results
   if (Array.isArray(result)) {
     const decryptedResults = await Promise.all(
-      result.map((item) => decryptPIIFields(model, item)),
+      result.map((item) => decryptSingleRecord(model, piiFields, item)),
     );
 
     // Log bulk decryption (fire-and-forget)
     if (result.length > 0) {
       for (const field of piiFields) {
-        // Count how many records had this field
         const fieldCount = result.filter(
           (item) =>
-            typeof item === "object" &&
+            typeof item === 'object' &&
             item !== null &&
             field in item &&
             (item as Record<string, unknown>)[field] != null,
@@ -152,33 +142,48 @@ export async function decryptPIIFields(
   }
 
   // Handle single result
-  if (typeof result === "object") {
-    const data = result as Record<string, unknown>;
-    const decryptedData = { ...data };
+  return decryptSingleRecord(model, piiFields, result);
+}
 
-    for (const field of piiFields) {
-      if (
-        field in data &&
-        data[field] != null &&
-        typeof data[field] === "string"
-      ) {
-        decryptedData[field] = await decryptPII(data[field] as string);
+/**
+ * Decrypt PII fields in a single record with per-field error handling.
+ * Never throws - logs errors and returns placeholder for failed fields.
+ */
+async function decryptSingleRecord(
+  model: string,
+  piiFields: string[],
+  record: unknown,
+): Promise<unknown> {
+  if (!record || typeof record !== 'object') {
+    return record;
+  }
 
-        // Log decryption access (fire-and-forget)
+  const data = record as Record<string, unknown>;
+  const decryptedData = { ...data };
+
+  for (const field of piiFields) {
+    if (field in data && data[field] != null && typeof data[field] === 'string') {
+      try {
+        decryptedData[field] = await decryptPII(data[field] as string, {
+          throwOnError: false,
+        });
+
         logDecryptAccess({
           model,
           field,
-          context: {
-            operation: "decrypt",
-          },
+          context: { operation: 'decrypt' },
         });
+      } catch (error) {
+        // Per-field catch: log and use placeholder, never crash the query
+        logger.error(`[PII-Middleware] Decrypt failed for ${model}.${field}`, {
+          error: String(error),
+        });
+        decryptedData[field] = '[decryption-failed]';
       }
     }
-
-    return decryptedData;
   }
 
-  return result;
+  return decryptedData;
 }
 
 /**
@@ -192,16 +197,13 @@ export async function decryptPIIFields(
  */
 export function createPIIMiddleware() {
   return Prisma.defineExtension({
-    name: "pii-encryption-middleware",
+    name: 'pii-encryption-middleware',
     query: {
       $allModels: {
         // Intercept create operations
         async create({ model, operation: _operation, args, query }) {
           if (hasPIIFields(model) && args.data) {
-            args.data = await encryptPIIFields(
-              model,
-              args.data as Record<string, unknown>,
-            );
+            args.data = await encryptPIIFields(model, args.data as Record<string, unknown>);
           }
           const result = await query(args);
           return decryptPIIFields(model, result);
@@ -210,10 +212,7 @@ export function createPIIMiddleware() {
         // Intercept update operations
         async update({ model, operation: _operation, args, query }) {
           if (hasPIIFields(model) && args.data) {
-            args.data = await encryptPIIFields(
-              model,
-              args.data as Record<string, unknown>,
-            );
+            args.data = await encryptPIIFields(model, args.data as Record<string, unknown>);
           }
           const result = await query(args);
           return decryptPIIFields(model, result);
@@ -222,10 +221,7 @@ export function createPIIMiddleware() {
         // Intercept updateMany operations
         async updateMany({ model, operation: _operation, args, query }) {
           if (hasPIIFields(model) && args.data) {
-            args.data = await encryptPIIFields(
-              model,
-              args.data as Record<string, unknown>,
-            );
+            args.data = await encryptPIIFields(model, args.data as Record<string, unknown>);
           }
           return query(args);
         },
@@ -234,16 +230,10 @@ export function createPIIMiddleware() {
         async upsert({ model, operation: _operation, args, query }) {
           if (hasPIIFields(model)) {
             if (args.create) {
-              args.create = await encryptPIIFields(
-                model,
-                args.create as Record<string, unknown>,
-              );
+              args.create = await encryptPIIFields(model, args.create as Record<string, unknown>);
             }
             if (args.update) {
-              args.update = await encryptPIIFields(
-                model,
-                args.update as Record<string, unknown>,
-              );
+              args.update = await encryptPIIFields(model, args.update as Record<string, unknown>);
             }
           }
           const result = await query(args);

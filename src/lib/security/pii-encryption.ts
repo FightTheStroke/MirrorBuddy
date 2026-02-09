@@ -7,21 +7,15 @@
  * @module security/pii-encryption
  */
 
-import {
-  createCipheriv,
-  createDecipheriv,
-  createHash,
-  randomBytes,
-  scrypt,
-} from "crypto";
-import { promisify } from "util";
-import { logger } from "@/lib/logger";
-import { getSecret } from "@/lib/security/azure-key-vault";
+import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
+import { logger } from '@/lib/logger';
+import { getSecret } from '@/lib/security/azure-key-vault';
 
 const scryptAsync = promisify(scrypt);
 
 // AES-256-GCM configuration
-const ALGORITHM = "aes-256-gcm";
+const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12; // 96 bits recommended for GCM
 const AUTH_TAG_LENGTH = 16; // 128 bits
 const SALT_LENGTH = 16;
@@ -30,6 +24,11 @@ const KEY_LENGTH = 32; // 256 bits
 // Cached PII encryption key (fetched from Azure Key Vault or environment)
 let PII_KEY: string | undefined;
 let keyPromise: Promise<string> | null = null;
+
+/**
+ * Placeholder returned when decryption fails in non-throwing mode
+ */
+export const DECRYPTION_FAILED_PLACEHOLDER = '[decryption-failed]';
 
 /**
  * Reset cached encryption key (test use only)
@@ -51,11 +50,11 @@ async function getPIIKey(): Promise<string> {
   }
 
   if (!keyPromise) {
-    keyPromise = getSecret("PII_ENCRYPTION_KEY")
-      .catch(() => getSecret("ENCRYPTION_KEY"))
+    keyPromise = getSecret('PII_ENCRYPTION_KEY')
+      .catch(() => getSecret('ENCRYPTION_KEY'))
       .catch(() => {
         // Final fallback to empty string (will be caught by isConfigured check)
-        return "";
+        return '';
       })
       .then((key) => {
         PII_KEY = key;
@@ -85,7 +84,7 @@ export async function isPIIEncryptionConfigured(): Promise<boolean> {
 async function deriveKey(salt: Buffer): Promise<Buffer> {
   const key = await getPIIKey();
   if (!key) {
-    throw new Error("PII_ENCRYPTION_KEY or ENCRYPTION_KEY not configured");
+    throw new Error('PII_ENCRYPTION_KEY or ENCRYPTION_KEY not configured');
   }
   return (await scryptAsync(key, salt, KEY_LENGTH)) as Buffer;
 }
@@ -103,13 +102,11 @@ export async function encryptPII(plaintext: string): Promise<string> {
   // In production, encryption is mandatory
   const isConfigured = await isPIIEncryptionConfigured();
   if (!isConfigured) {
-    if (process.env.NODE_ENV === "production") {
-      logger.error(
-        "[PII-Encryption] PII_ENCRYPTION_KEY not set in production!",
-      );
-      throw new Error("PII encryption key not configured");
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[PII-Encryption] PII_ENCRYPTION_KEY not set in production!');
+      throw new Error('PII encryption key not configured');
     }
-    logger.warn("[PII-Encryption] Using unencrypted storage (dev mode)");
+    logger.warn('[PII-Encryption] Using unencrypted storage (dev mode)');
     return plaintext;
   }
 
@@ -123,10 +120,7 @@ export async function encryptPII(plaintext: string): Promise<string> {
       authTagLength: AUTH_TAG_LENGTH,
     });
 
-    const encrypted = Buffer.concat([
-      cipher.update(plaintext, "utf8"),
-      cipher.final(),
-    ]);
+    const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
 
     const authTag = cipher.getAuthTag();
 
@@ -134,12 +128,12 @@ export async function encryptPII(plaintext: string): Promise<string> {
     const combined = Buffer.concat([salt, iv, authTag, encrypted]);
 
     // Use 'pii:v1:' prefix to distinguish from token encryption
-    return `pii:v1:${combined.toString("base64")}`;
+    return `pii:v1:${combined.toString('base64')}`;
   } catch (error) {
-    logger.error("[PII-Encryption] Failed to encrypt PII", {
+    logger.error('[PII-Encryption] Failed to encrypt PII', {
       error: String(error),
     });
-    throw new Error("PII encryption failed");
+    throw new Error('PII encryption failed');
   }
 }
 
@@ -147,20 +141,26 @@ export async function encryptPII(plaintext: string): Promise<string> {
  * Decrypt a PII value
  *
  * @param encrypted - The encrypted string (or plaintext if unencrypted in dev)
+ * @param options - Optional configuration
+ * @param options.throwOnError - If false, returns placeholder on failure instead
+ *   of throwing (default: true)
  * @returns Decrypted plaintext
  */
-export async function decryptPII(encrypted: string): Promise<string> {
+export async function decryptPII(
+  encrypted: string,
+  options?: { throwOnError?: boolean },
+): Promise<string> {
+  const throwOnError = options?.throwOnError ?? true;
   if (!encrypted) return encrypted;
 
   // Check if this is encrypted PII data
-  if (encrypted.startsWith("pii:")) {
+  if (encrypted.startsWith('pii:')) {
     // Check version - only v1 is supported
-    if (!encrypted.startsWith("pii:v1:")) {
-      const version = encrypted.match(/^pii:(v\d+):/)?.[1] || "unknown";
+    if (!encrypted.startsWith('pii:v1:')) {
+      const version = encrypted.match(/^pii:(v\d+):/)?.[1] || 'unknown';
       logger.error(`[PII-Encryption] Unsupported PII version: ${version}`);
-      throw new Error(
-        `PII decryption failed - unsupported version: ${version}`,
-      );
+      if (!throwOnError) return DECRYPTION_FAILED_PLACEHOLDER;
+      throw new Error(`PII decryption failed - unsupported version: ${version}`);
     }
   } else {
     // Not encrypted (legacy unencrypted or dev mode)
@@ -169,18 +169,19 @@ export async function decryptPII(encrypted: string): Promise<string> {
 
   const isConfigured = await isPIIEncryptionConfigured();
   if (!isConfigured) {
-    if (process.env.NODE_ENV === "production") {
-      logger.error("[PII-Encryption] Cannot decrypt: key not configured");
-      throw new Error("PII encryption key not configured");
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[PII-Encryption] Cannot decrypt: key not configured');
+      if (!throwOnError) return DECRYPTION_FAILED_PLACEHOLDER;
+      throw new Error('PII encryption key not configured');
     }
     // In dev, if we see encrypted data but have no key, that's an error
-    throw new Error("Encrypted PII found but no encryption key available");
+    throw new Error('Encrypted PII found but no encryption key available');
   }
 
   try {
     // Remove version prefix
     const data = encrypted.slice(7); // Remove 'pii:v1:'
-    const combined = Buffer.from(data, "base64");
+    const combined = Buffer.from(data, 'base64');
 
     // Extract components
     const salt = combined.subarray(0, SALT_LENGTH);
@@ -189,9 +190,7 @@ export async function decryptPII(encrypted: string): Promise<string> {
       SALT_LENGTH + IV_LENGTH,
       SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH,
     );
-    const ciphertext = combined.subarray(
-      SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH,
-    );
+    const ciphertext = combined.subarray(SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH);
 
     const key = await deriveKey(salt);
 
@@ -200,17 +199,15 @@ export async function decryptPII(encrypted: string): Promise<string> {
     });
     decipher.setAuthTag(authTag);
 
-    const decrypted = Buffer.concat([
-      decipher.update(ciphertext),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
 
-    return decrypted.toString("utf8");
+    return decrypted.toString('utf8');
   } catch (error) {
-    logger.error("[PII-Encryption] Failed to decrypt PII", {
+    logger.error('[PII-Encryption] Failed to decrypt PII', {
       error: String(error),
     });
-    throw new Error("PII decryption failed - data may be corrupted");
+    if (!throwOnError) return DECRYPTION_FAILED_PLACEHOLDER;
+    throw new Error('PII decryption failed - data may be corrupted');
   }
 }
 
@@ -225,7 +222,7 @@ export async function decryptPII(encrypted: string): Promise<string> {
  */
 export async function hashPII(plaintext: string): Promise<string> {
   // SHA-256 is deterministic - same input always produces same hash
-  const hash = createHash("sha256");
-  hash.update(plaintext, "utf8");
-  return hash.digest("hex");
+  const hash = createHash('sha256');
+  hash.update(plaintext, 'utf8');
+  return hash.digest('hex');
 }
