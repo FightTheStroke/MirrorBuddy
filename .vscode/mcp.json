@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "codegraph": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/codegraph-mcp", "--project", "."],
+      "env": {}
+    }
+  }
+}

@@ -128,77 +128,20 @@ When executing a task from a plan:
 - Proxy/CSP: `src/proxy.ts`
 - Accessibility profiles: `src/lib/accessibility/`
 
-## Domain Rules (from .claude/rules/)
+## Domain Rules
 
-### Cookies & Auth
+Detailed domain rules auto-load from `.github/instructions/` based on file path.
+Key one-liners for quick reference:
 
-- NEVER hardcode cookie names — import from `src/lib/auth/cookie-constants.ts`
-- NEVER read auth cookies with `cookieStore.get()` — use `validateAuth()`
-- CSRF check BEFORE auth: `requireCSRF(request)` before `validateAuth()`
-
-### i18n
-
-- ALL UI text in 5 locales (it/en/fr/de/es). No hardcoded strings.
-- JSON files MUST wrap content: `{ "namespace": { ...content... } }`
-- camelCase keys only. Italian first, then `i18n-sync-namespaces.ts --add-missing`
-
-### E2E Testing
-
-- NEVER import `test`/`expect` from `@playwright/test` — use fixtures
-- MANDATORY: mock `/api/tos` in ALL tests (returns `{accepted:true}`)
-- All fixtures chain from `base-fixtures.ts`
-
-### Proxy
-
-- ONLY ONE proxy at `src/proxy.ts`. NEVER create root `proxy.ts`
-- Proxy skips i18n for: `/api/*`, `/admin/*`, `/_next/*`, static files
-
-### Admin (pipe() migration — Plan 113+)
-
-Admin routes use composable middleware instead of inline auth:
-
-```typescript
-// CORRECT — pipe() with middleware composition
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-
-// GET (read-only): withSentry + withAdmin
-export const GET = pipe(
-  withSentry("/api/admin/..."),
-  withAdmin,
-)(async (ctx) => {
-  // ctx.userId and ctx.isAdmin available, no manual auth check
-  return NextResponse.json(data);
-});
-
-// POST/PUT/DELETE (mutations): withSentry + withCSRF + withAdmin
-export const POST = pipe(
-  withSentry("/api/admin/..."),
-  withCSRF,
-  withAdmin,
-)(async (ctx) => {
-  // auditService.log() still mandatory after mutations
-  return NextResponse.json(data);
-});
-```
-
-**WRONG patterns** (remove these during migration):
-
-- `const auth = await validateAdminAuth()` — handled by `withAdmin`
-- `if (!auth.authenticated)` — handled by `withAdmin`
-- `requireCSRF(request)` — handled by `withCSRF`
-- `try { ... } catch (error) { ... }` — handled by `withSentry`
-- `request.nextUrl` — use `ctx.req.nextUrl`
-- `request` parameter — use `ctx.req`
-
-### Tiers
-
-- Trial (null userId) | Base (free registered) | Pro (9.99/mo)
-- NEVER hardcode tier logic — use `tierService` / `useTierFeatures()`
-
-### Compliance
-
-- EU AI Act + GDPR + COPPA + WCAG 2.1 AA mandatory
-- No PII in logs or vector DB. Parameterized queries only.
+- **Cookies**: Import from `src/lib/auth/cookie-constants.ts`, never hardcode
+- **Auth**: `validateAuth()` / `validateAdminAuth()`, never `cookieStore.get()`
+- **CSRF**: `withCSRF` BEFORE `withAdmin` in pipe() for mutations
+- **i18n**: 5 locales, wrapper key convention `{ "ns": {...} }`, camelCase keys
+- **E2E**: Fixtures only (never `@playwright/test`), mandatory `/api/tos` mock
+- **Proxy**: ONE proxy at `src/proxy.ts` only (never root)
+- **Admin**: `pipe(withSentry, withCSRF, withAdmin)` + `auditService.log()`
+- **Tiers**: `tierService` / `useTierFeatures()`, never hardcode limits
+- **Compliance**: EU AI Act + GDPR + COPPA, no PII in logs/vector DB
 
 ## Documentation Format
 
@@ -238,6 +181,51 @@ Status: Accepted | Date: {DD Mon YYYY} | Plan: {plan_id or "none"}
 - Fixed: {bug fix}
 ```
 
+## Extended Customization
+
+### Path-Specific Instructions (`.github/instructions/`)
+
+Domain rules auto-loaded by file path:
+
+| File                            | Applies To                        |
+| ------------------------------- | --------------------------------- |
+| `tier.instructions.md`          | `src/lib/tier/**`                 |
+| `i18n.instructions.md`          | `messages/**`, i18n-related files |
+| `cookies.instructions.md`       | `src/lib/auth/**`, API routes     |
+| `e2e.instructions.md`           | `e2e/**`                          |
+| `accessibility.instructions.md` | Components, a11y lib              |
+| `proxy.instructions.md`         | `src/proxy.ts`, providers         |
+| `compliance.instructions.md`    | Compliance docs, safety lib       |
+| `admin.instructions.md`         | Admin API routes, admin pages     |
+| `testing.instructions.md`       | All test files                    |
+
+### Custom Agents (`.github/agents/`)
+
+| Agent                | Use When                              |
+| -------------------- | ------------------------------------- |
+| `code-reviewer`      | Security + quality code review        |
+| `tdd-executor`       | Feature development with TDD workflow |
+| `a11y-auditor`       | Accessibility audit (7 DSA profiles)  |
+| `compliance-checker` | Regulatory compliance verification    |
+
+### Prompt Commands (`.github/prompts/`)
+
+| Command         | Action                                |
+| --------------- | ------------------------------------- |
+| `/ci-check`     | Run CI summary (lint+typecheck+build) |
+| `/health-check` | Full project health triage            |
+| `/commit`       | Conventional commit helper            |
+| `/tdd`          | Start TDD workflow for a feature      |
+| `/review`       | Comprehensive code review             |
+| `/localize`     | Sync i18n keys across 5 locales       |
+
+### Skills (`.github/skills/`)
+
+| Skill             | Auto-Activated When                      |
+| ----------------- | ---------------------------------------- |
+| `ci-verification` | Running checks, validating builds        |
+| `release-gate`    | Preparing releases, deployment readiness |
+
 ## ADR References
 
 Key decisions in `docs/adr/`:
@@ -245,7 +233,13 @@ Key decisions in `docs/adr/`:
 - **0015**: No localStorage for user data
 - **0028**: PostgreSQL + pgvector
 - **0033**: RAG semantic search
+- **0059**: E2E test fixture requirements
+- **0060**: Accessibility (7 DSA profiles)
 - **0065**: Tier system (Trial/Base/Pro)
+- **0066**: Proxy architecture
 - **0075**: Session-based auth
+- **0082**: i18n namespace structure
+- **0091**: camelCase i18n keys
+- **0104**: Wrapper key convention (CRITICAL)
 
 Check `docs/adr/` before making architectural decisions.
