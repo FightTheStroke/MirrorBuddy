@@ -11,7 +11,7 @@
 **Release Date**: January 2026
 **Model Type**: Conversational AI with Embedded Knowledge Bases
 
-**Primary Provider**: Azure OpenAI GPT-4o (Turbo)
+**Primary Provider**: Azure OpenAI GPT-5 family (GPT-5-mini primary, GPT-5.2-edu/chat for advanced tiers)
 **Fallback Provider**: Ollama (open-source)
 
 **Capabilities**:
@@ -95,7 +95,7 @@
 
 ## 5. Training Data & Knowledge
 
-**Underlying Model**: Azure OpenAI GPT-4o trained on diverse web and academic corpus (cutoff: April 2024)
+**Underlying Model**: Azure OpenAI GPT-5-mini (primary), GPT-5.2-edu (education tier), GPT-5.2-chat (pro tier) — trained on diverse web and academic corpus
 
 **MirrorBuddy Enhancement**:
 

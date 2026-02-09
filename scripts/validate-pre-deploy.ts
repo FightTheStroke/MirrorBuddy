@@ -198,6 +198,9 @@ function validateOptionalEnvVars(): void {
     // GPT-5 deployment names
     { name: 'AZURE_OPENAI_GPT5_NANO_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT5_MINI_DEPLOYMENT', category: 'AI Models' },
+    { name: 'AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT', category: 'AI Models' },
+    { name: 'AZURE_OPENAI_GPT52_EDU_DEPLOYMENT', category: 'AI Models' },
+    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI', category: 'AI Models' },
   ];
 
   for (const envVar of optional) {

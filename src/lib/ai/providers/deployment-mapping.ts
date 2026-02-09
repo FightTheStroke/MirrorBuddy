@@ -32,7 +32,7 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
 
   // Realtime models (voice)
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-4o-realtime',
-  'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_MINI_DEPLOYMENT || 'gpt-realtime-mini',
+  'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
 };
 
 /**

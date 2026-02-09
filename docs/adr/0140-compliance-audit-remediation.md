@@ -108,7 +108,7 @@ Implement a 3-wave remediation plan addressing all 22 audit findings:
 ```typescript
 auditTrailService.log({
   timestamp: new Date(),
-  action: "CONTENT_FILTERED",
+  action: 'CONTENT_FILTERED',
   // ... logged to console only
 });
 ```
@@ -172,7 +172,7 @@ import { AIDisclosureBadge } from "@/components/ui/ai-disclosure-badge";
 
 **Badge Design**:
 
-- Tooltip on hover: "Powered by Anthropic Claude Opus 4 / Azure OpenAI GPT-4"
+- Tooltip on hover: "Powered by Anthropic Claude Opus 4 / Azure OpenAI GPT-5"
 - Links to /ai-transparency page
 - Respects `prefers-reduced-motion` for tooltip animation
 
