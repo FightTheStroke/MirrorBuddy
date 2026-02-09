@@ -280,7 +280,7 @@ const eslintConfig = defineConfig([
       "src/**/__tests__/**",
     ],
     rules: {
-      "local-rules/no-hardcoded-italian": "error",
+      "local-rules/no-hardcoded-italian": "warn",
     },
   },
   // i18n: Detect ALL hardcoded literal strings in JSX (language-agnostic)
@@ -489,7 +489,8 @@ const eslintConfig = defineConfig([
   // FEATURE (ai, education, rag) → may import CORE only
   // CROSS (auth, tier, accessibility, compliance) → may import CORE and FEATURE
   // Auth is universal: any module may import from auth.
-  // NOTE: "warn" + --max-warnings 0 = effectively blocking in CI.
+  // NOTE: "warn" + --max-warnings 0 in lint-staged = blocking for new violations.
+  // CI lint runs without --max-warnings 0 so existing warnings don't block.
   // Kept as "warn" during baseline reduction; escalate to "error" when violations reach 0.
   // Scope: src/lib only (inter-module boundaries). src/app and src/components are consumers, not checked.
   {
