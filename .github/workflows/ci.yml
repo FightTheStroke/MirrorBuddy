@@ -547,6 +547,7 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           TOKEN_ENCRYPTION_KEY: ${{ secrets.TOKEN_ENCRYPTION_KEY }}
+          PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
           IP_HASH_SALT: ${{ secrets.IP_HASH_SALT }}
           # Azure AI
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
