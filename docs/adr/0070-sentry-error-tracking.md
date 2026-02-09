@@ -36,6 +36,8 @@ Integrate **Sentry** for client-side and server-side error tracking.
 - `sentry.server.config.ts` - API route errors
 - `sentry.edge.config.ts` - Edge runtime errors
 
+**Environment gating**: Sentry is enabled only in production (`NODE_ENV === 'production'`) to avoid noise from local development and CI.
+
 **Features enabled**:
 
 - Source maps upload via webpack plugin
@@ -54,7 +56,7 @@ Integrate **Sentry** for client-side and server-side error tracking.
 Added to `src/proxy.ts`:
 
 ```typescript
-const sentryDomains = "*.ingest.us.sentry.io *.ingest.de.sentry.io";
+const sentryDomains = '*.ingest.us.sentry.io *.ingest.de.sentry.io';
 ```
 
 Supports both US and EU Sentry regions.
@@ -66,7 +68,7 @@ The tunnel route `/monitoring` **must** be in `PUBLIC_ROUTES` in `src/proxy.ts`:
 ```typescript
 const PUBLIC_ROUTES = [
   // ... other routes
-  "/monitoring", // Sentry tunnel route (ADR 0070)
+  '/monitoring', // Sentry tunnel route (ADR 0070)
 ];
 ```
 
@@ -85,14 +87,23 @@ The route:
 - Forwards to Sentry's ingest endpoint
 - Silently fails if Sentry is down (doesn't break the app)
 
+### Enable Logic (Updated Plan 141)
+
+**Previous approach (broken)**: Used `NEXT_PUBLIC_VERCEL_ENV` for client and `VERCEL_ENV` for server/edge. This had a critical flaw: `NEXT_PUBLIC_VERCEL_ENV` is **not** auto-set by Vercel, causing client Sentry to be 100% disabled in production.
+
+**Anti-pattern removed**: Code had triple-blocking (enabled flag + beforeSend null-return + console.log) which made debugging impossible and violated defensive programming principles.
+
+**Current approach**: Single gate using `NODE_ENV === 'production'`. This variable is reliably set by Node.js in all runtimes (client/server/edge). For debugging in non-production environments, use `SENTRY_FORCE_ENABLE=true`.
+
 ### Environment Variables
 
-| Variable                 | Purpose                    | Required |
-| ------------------------ | -------------------------- | -------- |
-| `NEXT_PUBLIC_SENTRY_DSN` | Client/server error ingest | Yes      |
-| `SENTRY_AUTH_TOKEN`      | Source maps upload         | CI only  |
-| `SENTRY_ORG`             | Organization ID            | CI only  |
-| `SENTRY_PROJECT`         | Project ID                 | CI only  |
+| Variable                 | Purpose                                       | Required |
+| ------------------------ | --------------------------------------------- | -------- |
+| `NEXT_PUBLIC_SENTRY_DSN` | Client/server error ingest                    | Yes      |
+| `SENTRY_AUTH_TOKEN`      | Source maps upload                            | CI only  |
+| `SENTRY_ORG`             | Organization ID                               | CI only  |
+| `SENTRY_PROJECT`         | Project ID                                    | CI only  |
+| `SENTRY_FORCE_ENABLE`    | Debug escape hatch (enable in non-production) | No       |
 
 ### Privacy Compliance
 
