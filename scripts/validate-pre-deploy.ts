@@ -110,6 +110,7 @@ function validateCriticalEnvVars(): void {
     { name: 'ADMIN_PASSWORD', sensitive: true },
     { name: 'CRON_SECRET', sensitive: true },
     { name: 'TOKEN_ENCRYPTION_KEY', sensitive: true },
+    { name: 'PII_ENCRYPTION_KEY', sensitive: true },
     { name: 'IP_HASH_SALT', sensitive: true },
     // Azure AI
     { name: 'AZURE_OPENAI_API_KEY', sensitive: true },
