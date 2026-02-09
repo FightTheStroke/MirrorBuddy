@@ -60,7 +60,7 @@ export function ConfigErrorView({ error, onSwitchToChat, onClose }: ConfigErrorV
               <pre className="text-xs bg-slate-900 p-3 rounded-lg overflow-x-auto">
                 {`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
               </pre>
             </div>
