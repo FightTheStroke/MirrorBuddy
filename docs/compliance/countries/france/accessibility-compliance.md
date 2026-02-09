@@ -1,18 +1,25 @@
+# Conformité Accessibilité RGAA 4.1 — France
+
 # France RGAA 4.1 Accessibility Compliance
 
-**Jurisdiction**: French Republic (EU Member State)
-**Legislation**: RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) + EU Directive 2016/2102
+> **Langue / Language**: Document rédigé en anglais pour usage interne. Une traduction professionnelle en français est requise avant soumission à la DINUM.
+> Document written in English for internal use. Professional French translation required before submission to DINUM.
+
+**Juridiction / Jurisdiction**: République Française (État Membre UE)
+**Législation / Legislation**: RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) + Directive UE 2016/2102
 **Effective**: RGAA 4.1 (2021-09-20)
-**Enforcing Authority**: DINUM (Direction Interministérielle du Numérique) + Défenseur des droits
+**Autorité / Enforcing Authority**: DINUM (Direction Interministérielle du Numérique) + Défenseur des droits
 **Implementation Status**: CRITICAL for French public sector and educational institutions
 
 ---
 
-## Executive Summary
+## Résumé / Executive Summary
 
-French RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. RGAA 4.1 is the official French implementation of EU Directive 2016/2102.
+Le RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) exige que les sites web du secteur public et les plateformes éducatives soient conformes aux normes d'accessibilité WCAG 2.1 Niveau AA. Le RGAA 4.1 est la mise en œuvre officielle française de la Directive UE 2016/2102.
 
-**MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
+French RGAA 4.1 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. RGAA 4.1 is the official French implementation of EU Directive 2016/2102.
+
+**Statut MirrorBuddy / MirrorBuddy Status**: ✅ **CONFORME / COMPLIANT** - WCAG 2.1 AA vérifié avec 7 profils DSA
 
 ---
 
@@ -176,6 +183,34 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
+
+### Known Limitations
+
+While MirrorBuddy targets WCAG 2.1 AA and RGAA 4.1 compliance, the following limitations are known:
+
+1. **Voice synthesis quality**: TTS voices may not perfectly pronounce all French regional accents or specialized academic terminology
+2. **PDF export formatting**: Complex mathematical notation in exported PDFs may require manual review for screen reader compatibility
+3. **Third-party content**: Embedded educational videos from external sources may not always include French captions
+4. **Experimental features**: Beta features (Google Drive integration) may have temporary accessibility gaps during development
+
+### Feedback Contact
+
+**For accessibility issues or feedback:**
+
+- **Email**: roberdan@fightthestroke.org
+- **Subject line**: [Accessibilité MirrorBuddy]
+- **In-app**: Use "Signaler un problème" button in accessibility panel
+- **Response time**: 5 business days for acknowledgment, 30 days for remediation plan
+
+**For Défenseur des droits inquiries:**
+
+- Phone: +33 9 69 39 00 00
+- Website: https://www.defenseurdesdroits.fr
+
+**For DINUM/RGAA inquiries:**
+
+- Email: roberdan@fightthestroke.org
+- Include reference to RGAA 4.1 in subject line
 
 ---
 

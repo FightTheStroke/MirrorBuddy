@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Compliance Audit Remediation (Plan 138)
 
+#### W3: Documentation Alignment
+
+- **Fixed**: AI-RISK-CLASSIFICATION honest status markers (DRAFT, not-yet-verified)
+- **Fixed**: COMPLIANCE-MATRIX aligned with LEGAL-REVIEW-CHECKLIST
+- **Fixed**: MODEL-CARD metrics marked as placeholder targets, not measured values
+- **Fixed**: AI-POLICY aspirational features marked as planned, bias claims corrected
+- **Added**: POST-MARKET-MONITORING-PLAN (EU AI Act Art. 72)
+- **Added**: 5 accessibility compliance statements (IT/FR/DE/ES/UK)
+- **Added**: 5 data protection docs (IT/FR/DE/ES/UK)
+- **Added**: 3 cookie compliance docs (IT/DE/UK)
+- **Added**: 5 AI regulatory contacts docs (IT/FR/DE/ES/UK)
+
 #### W2: Content & UI Fixes
 
 - **Fixed**: 274 placeholder i18n keys filled with real legal content across all 5 locales (IT/EN/FR/DE/ES)

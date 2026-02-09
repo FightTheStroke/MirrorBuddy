@@ -184,6 +184,41 @@ npx playwright test e2e/accessibility.spec.ts
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
 
+### Known Limitations
+
+While MirrorBuddy targets WCAG 2.1 AA and UK Accessibility Regulations 2018 compliance, the following limitations are known:
+
+1. **Voice synthesis quality**: TTS voices may not perfectly pronounce all UK regional accents or specialized academic terminology
+2. **PDF export formatting**: Complex mathematical notation in exported PDFs may require manual review for screen reader compatibility
+3. **Third-party content**: Embedded educational videos from external sources may not always include English captions
+4. **Experimental features**: Beta features (Google Drive integration) may have temporary accessibility gaps during development
+
+### Feedback Contact
+
+**For accessibility issues or feedback:**
+
+- **Email**: roberdan@fightthestroke.org
+- **Subject line**: [Accessibility MirrorBuddy]
+- **In-app**: Use "Report a problem" button in accessibility panel
+- **Response time**: 5 business days for acknowledgment, 30 days for remediation plan
+
+**For EHRC inquiries:**
+
+- Phone: +44 800 444 2052
+- Email: correspondence@equalityhumanrights.com
+- Website: https://www.equalityhumanrights.com
+
+**For ICO inquiries:**
+
+- Phone: +44 303 123 1113
+- Email: casework@ico.org.uk
+- Website: https://ico.org.uk
+
+**GOV.UK Accessibility Resources:**
+
+- Design System: https://design-system.service.gov.uk/accessibility/
+- Guidance: https://www.gov.uk/guidance/accessibility-requirements-for-public-sector-websites-and-apps
+
 ---
 
 ## 5. UK Compliance Checklist

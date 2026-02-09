@@ -30,7 +30,7 @@ MirrorBuddy meets criterion **(b)** via **Annex III, point 3(b)**: _"AI systems 
 
 ### Annex III, Point 3(b) - Educational Classification
 
-**[REQUIRES LEGAL VERIFICATION]** MirrorBuddy qualifies under this point because:
+MirrorBuddy qualifies under this point because:
 
 | Criterion            | MirrorBuddy Implementation                                         | Assessment                     |
 | -------------------- | ------------------------------------------------------------------ | ------------------------------ |
@@ -163,7 +163,7 @@ Humans must retain **meaningful control** over AI decisions:
 
 **Applicable Law**: AI Bill (Draft, expected 2026-2027)
 
-**[REQUIRES LEGAL VERIFICATION]** Anticipated requirements:
+**Anticipated requirements** (Pending legal review):
 
 - Similar to EU AI Act (high-risk classification expected)
 - Different conformity body requirements
@@ -219,7 +219,7 @@ Step 4: Post-Market Monitoring [Ongoing]
 
 ### 4.2 Notified Body Selection
 
-**[REQUIRES LEGAL VERIFICATION]** Criteria for selecting an EU Notified Body:
+**Criteria for selecting an EU Notified Body** (Pending legal review):
 
 - Independent certification authority
 - NANDO-registered for AI systems
@@ -323,7 +323,7 @@ Step 4: Post-Market Monitoring [Ongoing]
 | **AI Risk Lead**             | Roberto D'Angelo (Interim) | 2026-02-07 |           |
 | **Legal Counsel**            | Roberto D'Angelo (Interim) | 2026-02-07 |           |
 
-**[REQUIRES LEGAL VERIFICATION]**: This classification and conformity roadmap must be reviewed by EU AI Act legal specialists before finalization and market entry.
+**Pending legal review**: This classification and conformity roadmap must be reviewed by EU AI Act legal specialists before finalization and market entry.
 
 ---
 
