@@ -8,23 +8,17 @@
  * Generates credentials and sends welcome email.
  */
 
-import { NextResponse } from "next/server";
-import {
-  pipe,
-  withSentry,
-  withCSRF,
-  withAdmin,
-  ApiError,
-} from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { hashPassword, generateRandomPassword } from "@/lib/auth/server";
-import { hashPII } from "@/lib/security";
-import { sendEmail } from "@/lib/email";
-import { getApprovalTemplate } from "@/lib/email/templates/invite-templates";
-import { logger } from "@/lib/logger";
-import type { Prisma } from "@prisma/client";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, ApiError } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { hashPassword, generateRandomPassword } from '@/lib/auth/server';
+import { hashPII } from '@/lib/security';
+import { sendEmail } from '@/lib/email';
+import { getApprovalTemplate } from '@/lib/email/templates/invite-templates';
+import { logger } from '@/lib/logger';
+import type { Prisma } from '@prisma/client';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
 
 interface DirectInviteBody {
   email: string;
@@ -35,19 +29,19 @@ interface DirectInviteBody {
  * Generate a username from email using CSPRNG
  */
 function generateUsername(email: string): string {
-  const local = email.split("@")[0];
-  const clean = local.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+  const local = email.split('@')[0];
+  const clean = local.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
   const array = new Uint8Array(4);
   crypto.getRandomValues(array);
   const suffix = Array.from(array)
-    .map((b) => b.toString(36).padStart(2, "0"))
-    .join("")
+    .map((b) => b.toString(36).padStart(2, '0'))
+    .join('')
     .substring(0, 4);
   return `${clean}${suffix}`;
 }
 
 export const POST = pipe(
-  withSentry("/api/invites/direct"),
+  withSentry('/api/invites/direct'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -55,45 +49,61 @@ export const POST = pipe(
   const body: DirectInviteBody = await ctx.req.json();
 
   // Validate email with safe linear-time check (no nested quantifiers)
-  const rawEmail = body.email?.trim().toLowerCase() || "";
+  const rawEmail = body.email?.trim().toLowerCase() || '';
   if (
     !rawEmail ||
     rawEmail.length > 254 ||
-    !rawEmail.includes("@") ||
-    rawEmail.indexOf("@") === 0 ||
-    rawEmail.indexOf("@") !== rawEmail.lastIndexOf("@") ||
-    !rawEmail.substring(rawEmail.indexOf("@") + 1).includes(".")
+    !rawEmail.includes('@') ||
+    rawEmail.indexOf('@') === 0 ||
+    rawEmail.indexOf('@') !== rawEmail.lastIndexOf('@') ||
+    !rawEmail.substring(rawEmail.indexOf('@') + 1).includes('.')
   ) {
-    return NextResponse.json(
-      { error: "Invalid email format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
   }
 
   const email = rawEmail;
 
   // Check for existing user by emailHash (PII-encrypted) or legacy plain email
-  const emailHash = await hashPII(email);
-  const existingUser = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { emailHash },
-        { email }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
-        { googleAccount: { emailHash } },
-        { googleAccount: { email } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat
-      ],
-    },
-  });
+  let emailHash: string;
+  try {
+    emailHash = await hashPII(email);
+  } catch (err) {
+    logger.error('hashPII failed', { error: String(err) });
+    throw new ApiError('Email processing failed', 500);
+  }
+
+  let existingUser;
+  try {
+    existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { emailHash },
+          { email }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
+          { googleAccount: { emailHash } },
+          { googleAccount: { email } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat
+        ],
+      },
+    });
+  } catch (err) {
+    logger.error('Duplicate check query failed', { error: String(err), email });
+    throw new ApiError('User lookup failed', 500);
+  }
 
   if (existingUser) {
-    throw new ApiError("A user with this email already exists", 409);
+    throw new ApiError('A user with this email already exists', 409);
   }
 
   // Generate credentials
   const username = generateUsername(email);
   const temporaryPassword = generateRandomPassword(12);
-  const passwordHash = await hashPassword(temporaryPassword);
-  const displayName = body.name?.trim() || email.split("@")[0];
+  let passwordHash: string;
+  try {
+    passwordHash = await hashPassword(temporaryPassword);
+  } catch (err) {
+    logger.error('hashPassword failed', { error: String(err) });
+    throw new ApiError('Password generation failed', 500);
+  }
+  const displayName = body.name?.trim() || email.split('@')[0];
 
   // Create user + invite record in transaction
   let user: { id: string };
@@ -103,6 +113,7 @@ export const POST = pipe(
         data: {
           username,
           email,
+          emailHash,
           passwordHash,
           mustChangePassword: true,
           profile: {
@@ -120,8 +131,8 @@ export const POST = pipe(
         where: { email },
         update: {
           name: displayName,
-          motivation: "Invito diretto admin",
-          status: "APPROVED",
+          motivation: 'Invito diretto admin',
+          status: 'APPROVED',
           reviewedAt: new Date(),
           reviewedBy: adminUserId,
           generatedUsername: username,
@@ -131,8 +142,8 @@ export const POST = pipe(
         create: {
           name: displayName,
           email,
-          motivation: "Invito diretto admin",
-          status: "APPROVED",
+          motivation: 'Invito diretto admin',
+          status: 'APPROVED',
           reviewedAt: new Date(),
           reviewedBy: adminUserId,
           generatedUsername: username,
@@ -147,20 +158,18 @@ export const POST = pipe(
     const msg = err instanceof Error ? err.message : String(err);
 
     // Prisma unique constraint violation
-    if (msg.includes("Unique constraint") || msg.includes("P2002")) {
-      throw new ApiError(
-        `User creation failed: duplicate username or email`,
-        409,
-      );
+    if (msg.includes('Unique constraint') || msg.includes('P2002')) {
+      throw new ApiError(`User creation failed: duplicate username or email`, 409);
     }
 
     // Prisma foreign key constraint
-    if (msg.includes("Foreign key") || msg.includes("P2003")) {
-      throw new ApiError("User creation failed: invalid reference", 422);
+    if (msg.includes('Foreign key') || msg.includes('P2003')) {
+      throw new ApiError('User creation failed: invalid reference', 422);
     }
 
-    // Re-throw unknown DB errors (withSentry will capture to Sentry)
-    throw err;
+    // Convert unknown DB errors to ApiError with logging
+    logger.error('User creation transaction failed', { error: String(err), email });
+    throw new ApiError('User creation failed', 500);
   }
 
   // Send welcome email (non-blocking — user was created successfully)
@@ -179,7 +188,7 @@ export const POST = pipe(
     text: template.text,
   });
 
-  logger.info("Direct invite created", {
+  logger.info('Direct invite created', {
     userId: user.id,
     username,
     email,

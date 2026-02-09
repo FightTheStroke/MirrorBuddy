@@ -8,18 +8,19 @@
  * - Rejection with optional reason
  */
 
-import { prisma } from "@/lib/db";
-import { sendEmail, isEmailConfigured } from "@/lib/email";
-import { hashPassword, generateRandomPassword } from "@/lib/auth/server";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { sendEmail, isEmailConfigured } from '@/lib/email';
+import { hashPassword, generateRandomPassword } from '@/lib/auth/server';
+import { logger } from '@/lib/logger';
+import { hashPII } from '@/lib/security';
 import {
   getAdminNotificationTemplate,
   getRequestReceivedTemplate,
   getApprovalTemplate,
   getRejectionTemplate,
-} from "@/lib/email/templates/invite-templates";
+} from '@/lib/email/templates/invite-templates';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
 
 export interface CreateInviteRequestResult {
   success: boolean;
@@ -56,7 +57,7 @@ export async function notifyAdminNewRequest(requestId: string): Promise<void> {
     });
 
     if (!request) {
-      logger.warn("Invite request not found for notification", { requestId });
+      logger.warn('Invite request not found for notification', { requestId });
       return;
     }
 
@@ -99,18 +100,16 @@ export async function notifyAdminNewRequest(requestId: string): Promise<void> {
       text: template.text,
     });
 
-    logger.info("Admin notified of new beta request", { requestId });
+    logger.info('Admin notified of new beta request', { requestId });
   } catch (error) {
-    logger.error("Failed to notify admin", { requestId }, error as Error);
+    logger.error('Failed to notify admin', { requestId }, error as Error);
   }
 }
 
 /**
  * Send confirmation to user after request submission
  */
-export async function sendRequestConfirmation(
-  requestId: string,
-): Promise<void> {
+export async function sendRequestConfirmation(requestId: string): Promise<void> {
   try {
     if (!isEmailConfigured()) {
       return;
@@ -134,12 +133,12 @@ export async function sendRequestConfirmation(
       text: template.text,
     });
 
-    logger.info("Request confirmation sent", {
+    logger.info('Request confirmation sent', {
       requestId,
       email: request.email,
     });
   } catch (error) {
-    logger.error("Failed to send confirmation", { requestId }, error as Error);
+    logger.error('Failed to send confirmation', { requestId }, error as Error);
   }
 }
 
@@ -148,15 +147,15 @@ export async function sendRequestConfirmation(
  * lgtm[js/insecure-randomness] - crypto.getRandomValues IS cryptographically secure (CSPRNG)
  */
 function generateUsername(email: string): string {
-  const local = email.split("@")[0];
+  const local = email.split('@')[0];
   // Clean up: remove dots, plus signs, etc.
-  const clean = local.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+  const clean = local.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
   // Add random suffix using CSPRNG (crypto.getRandomValues) for uniqueness
   const array = new Uint8Array(4);
   crypto.getRandomValues(array);
   const suffix = Array.from(array)
-    .map((b) => b.toString(36).padStart(2, "0"))
-    .join("")
+    .map((b) => b.toString(36).padStart(2, '0'))
+    .join('')
     .substring(0, 4);
   return `${clean}${suffix}`;
 }
@@ -174,11 +173,11 @@ export async function approveInviteRequest(
     });
 
     if (!request) {
-      return { success: false, error: "Richiesta non trovata" };
+      return { success: false, error: 'Richiesta non trovata' };
     }
 
-    if (request.status !== "PENDING") {
-      return { success: false, error: "Richiesta già processata" };
+    if (request.status !== 'PENDING') {
+      return { success: false, error: 'Richiesta già processata' };
     }
 
     // Generate credentials using CSPRNG (crypto.getRandomValues)
@@ -186,6 +185,7 @@ export async function approveInviteRequest(
     // Note: generateUsername and generateRandomPassword both use crypto.getRandomValues (CSPRNG)
     const temporaryPassword = generateRandomPassword(12);
     const passwordHash = await hashPassword(temporaryPassword);
+    const emailHash = await hashPII(request.email);
 
     // Create user and update invite in transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -194,6 +194,7 @@ export async function approveInviteRequest(
         data: {
           username,
           email: request.email,
+          emailHash,
           passwordHash,
           mustChangePassword: true,
           profile: {
@@ -211,7 +212,7 @@ export async function approveInviteRequest(
       await tx.inviteRequest.update({
         where: { id: requestId },
         data: {
-          status: "APPROVED",
+          status: 'APPROVED',
           reviewedAt: new Date(),
           reviewedBy: adminUserId,
           generatedUsername: username,
@@ -238,7 +239,7 @@ export async function approveInviteRequest(
       text: template.text,
     });
 
-    logger.info("Invite approved", {
+    logger.info('Invite approved', {
       requestId,
       userId: result.id,
       username,
@@ -247,13 +248,10 @@ export async function approveInviteRequest(
 
     return { success: true, userId: result.id, username };
   } catch (error) {
-    logger.error("Failed to approve invite", { requestId }, error as Error);
+    logger.error('Failed to approve invite', { requestId }, error as Error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Errore durante l'approvazione",
+      error: error instanceof Error ? error.message : "Errore durante l'approvazione",
     };
   }
 }
@@ -272,18 +270,18 @@ export async function rejectInviteRequest(
     });
 
     if (!request) {
-      return { success: false, error: "Richiesta non trovata" };
+      return { success: false, error: 'Richiesta non trovata' };
     }
 
-    if (request.status !== "PENDING") {
-      return { success: false, error: "Richiesta già processata" };
+    if (request.status !== 'PENDING') {
+      return { success: false, error: 'Richiesta già processata' };
     }
 
     // Update status
     await prisma.inviteRequest.update({
       where: { id: requestId },
       data: {
-        status: "REJECTED",
+        status: 'REJECTED',
         reviewedAt: new Date(),
         reviewedBy: adminUserId,
         rejectionReason: reason || null,
@@ -304,7 +302,7 @@ export async function rejectInviteRequest(
       text: template.text,
     });
 
-    logger.info("Invite rejected", {
+    logger.info('Invite rejected', {
       requestId,
       adminUserId,
       hasReason: !!reason,
@@ -312,11 +310,10 @@ export async function rejectInviteRequest(
 
     return { success: true };
   } catch (error) {
-    logger.error("Failed to reject invite", { requestId }, error as Error);
+    logger.error('Failed to reject invite', { requestId }, error as Error);
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "Errore durante il rifiuto",
+      error: error instanceof Error ? error.message : 'Errore durante il rifiuto',
     };
   }
 }
@@ -326,8 +323,8 @@ export async function rejectInviteRequest(
  */
 export async function getPendingInvites() {
   return prisma.inviteRequest.findMany({
-    where: { status: "PENDING" },
-    orderBy: { createdAt: "asc" },
+    where: { status: 'PENDING' },
+    orderBy: { createdAt: 'asc' },
   });
 }
 
@@ -335,7 +332,7 @@ export async function getPendingInvites() {
  * Get all invites with optional status filter
  */
 export async function getInvites(
-  status?: "PENDING" | "APPROVED" | "REJECTED",
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED',
   isDirect?: boolean,
   reviewedBy?: string,
 ) {
@@ -345,7 +342,7 @@ export async function getInvites(
       ...(isDirect === undefined ? {} : { isDirect }),
       ...(reviewedBy ? { reviewedBy } : {}),
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   });
 }
 
@@ -373,19 +370,19 @@ export async function bulkApproveInvites(
 
     results.forEach((result, idx) => {
       const requestId = chunk[idx];
-      if (result.status === "fulfilled" && result.value.success) {
+      if (result.status === 'fulfilled' && result.value.success) {
         processed++;
       } else {
         const error =
-          result.status === "rejected"
+          result.status === 'rejected'
             ? String(result.reason)
-            : result.value.error || "Unknown error";
+            : result.value.error || 'Unknown error';
         errors.push({ requestId, error });
       }
     });
   }
 
-  logger.info("Bulk approve completed", {
+  logger.info('Bulk approve completed', {
     total: ids.length,
     processed,
     failed: errors.length,
@@ -422,19 +419,19 @@ export async function bulkRejectInvites(
 
     results.forEach((result, idx) => {
       const requestId = chunk[idx];
-      if (result.status === "fulfilled" && result.value.success) {
+      if (result.status === 'fulfilled' && result.value.success) {
         processed++;
       } else {
         const error =
-          result.status === "rejected"
+          result.status === 'rejected'
             ? String(result.reason)
-            : result.value.error || "Unknown error";
+            : result.value.error || 'Unknown error';
         errors.push({ requestId, error });
       }
     });
   }
 
-  logger.info("Bulk reject completed", {
+  logger.info('Bulk reject completed', {
     total: ids.length,
     processed,
     failed: errors.length,
