@@ -12,6 +12,7 @@ This policy is drafted in compliance with:
 - **Law 132/2025** (Provisions for the Implementation of the AI Act): Implements European regulations into Italian law, establishing supplier responsibilities and user rights
 - **GDPR** (EU Regulation 2016/679): Personal data protection and privacy rights
 - **Italian Privacy Code** (Legislative Decree 196/2003): National implementation of data protection
+- **ADR 0136** (Compliance Absolute Charter): Internal architectural decision record establishing MirrorBuddy's compliance-first development principles
 
 ## 3. Guiding Principles
 
@@ -19,7 +20,7 @@ MirrorBuddy adheres to the following principles in the deployment of AI systems:
 
 - **Transparency**: Users are always informed when interacting with AI
 - **Human Oversight**: Teachers maintain full pedagogical and decision-making control
-- **Non-Discrimination**: Systems are tested for bias and disparities in outcomes
+- **Non-Discrimination**: Manual bias auditing via quarterly reports (see BIAS-AUDIT-REPORT.md); automated detection planned
 - **Security**: Technical and procedural measures protect against harmful uses
 - **Autonomy**: No decisions with legal effects are made by automated systems
 
@@ -67,13 +68,13 @@ Special measures protect minor students:
 
 We identify and mitigate specific risks:
 
-| Risk                                    | Probability | Mitigation                                   |
-| --------------------------------------- | ----------- | -------------------------------------------- |
-| Generation of inappropriate content     | Low         | Content filtering + human review             |
-| Dependency on AI                        | Medium      | Budget limits + parental controls            |
-| Bias against students with disabilities | Low         | Bimonthly bias testing + diverse datasets    |
-| Privacy breach of sensitive data        | Low         | Encryption at-rest/transit + GDPR compliance |
-| AI malfunction during assessment        | Medium      | Fallback to Ollama provider + manual mode    |
+| Risk                                    | Probability | Mitigation                                                   |
+| --------------------------------------- | ----------- | ------------------------------------------------------------ |
+| Generation of inappropriate content     | Low         | Content filtering + human review                             |
+| Dependency on AI                        | Medium      | Budget limits + parental controls                            |
+| Bias against students with disabilities | Low         | Manual bias auditing quarterly (automated detection planned) |
+| Privacy breach of sensitive data        | Low         | Encryption at-rest/transit + GDPR compliance                 |
+| AI malfunction during assessment        | Medium      | Fallback to Ollama provider + manual mode                    |
 
 ## 9. User Rights
 
@@ -125,7 +126,7 @@ Full document: [The Professors' Constitution](./PROFESSORS-CONSTITUTION.md)
 
 These principles are technically enforced through:
 
-- **Anti-Influence Module**: Detects and redirects requests for opinions or AI preference patterns
+- **Anti-Influence Module**: Planned (design phase). Will detect and redirect requests for opinions or AI preference patterns
 - **Dependency Detection System**: Monitors usage patterns and alerts parents when thresholds are exceeded
 - **STEM Safety Guardrails**: Subject-specific blocklists for chemistry, physics, and biology
 - **Human First Prompts**: Periodic encouragement to talk to parents, teachers, and friends

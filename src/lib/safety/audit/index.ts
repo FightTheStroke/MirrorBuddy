@@ -33,32 +33,8 @@ export type {
 
 export { DEFAULT_COMPLIANCE_CONFIG } from "./compliance-audit-types";
 
-// ========== Audit Trail Service (F-07) ==========
-export {
-  recordSafetyEvent,
-  recordContentFiltered,
-  recordGuardrailTriggered,
-  recordPromptInjectionAttempt,
-  recordSafetyConfigChange,
-  getAuditEntries,
-  getAuditStatistics,
-} from "./audit-trail-service";
-
-// ========== Compliance Audit Service (F-07 - L.132 Art.4) ==========
-export {
-  recordComplianceEvent,
-  recordComplianceContentFiltered,
-  recordComplianceCrisisDetected,
-  recordComplianceJailbreakAttempt,
-  recordComplianceGuardrailTriggered,
-  getComplianceEntries,
-  getComplianceStatistics,
-  exportComplianceAudit,
-} from "./compliance-audit-service";
-
-// ========== Knowledge Base Auditor (F-08) ==========
-export {
-  auditKnowledgeBase,
-  auditAllMaestri,
-  formatAuditSummary,
-} from "./knowledge-auditor";
+// ========== Server-Only Functions ==========
+// Import from '@/lib/safety/audit/server' for:
+// - recordSafetyEvent, recordContentFiltered, etc.
+// - recordComplianceEvent, getComplianceEntries, etc.
+// - auditKnowledgeBase, auditAllMaestri, etc.

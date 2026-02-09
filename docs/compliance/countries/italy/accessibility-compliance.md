@@ -1,18 +1,25 @@
+# Conformità Accessibilità AGID Italia (L.4/2004)
+
 # Italy AGID Accessibility Compliance (L.4/2004)
 
-**Jurisdiction**: Italian Republic (EU Member State)
-**Legislation**: Law 4/2004 (Legge Stanca) + EU Directive 2016/2102
+> **Lingua / Language**: Documento redatto in inglese per uso interno. La traduzione professionale in italiano è richiesta prima della presentazione all'AGID.
+> Document written in English for internal use. Professional Italian translation required before submission to AGID.
+
+**Giurisdizione / Jurisdiction**: Repubblica Italiana (Stato Membro UE)
+**Legislazione / Legislation**: Legge 4/2004 (Legge Stanca) + Direttiva UE 2016/2102
 **Effective**: Law 4/2004 (2004-01-09), EU Directive 2016-12-26
-**Enforcing Authority**: AGID (Agenzia per l'Italia Digitale)
+**Autorità / Enforcing Authority**: AGID (Agenzia per l'Italia Digitale)
 **Implementation Status**: CRITICAL for Italian public sector and educational institutions
 
 ---
 
-## Executive Summary
+## Sommario / Executive Summary
+
+La Legge 4/2004 (Legge Stanca) richiede che i siti web del settore pubblico e le piattaforme educative siano conformi agli standard di accessibilità WCAG 2.1 Livello AA. L'AGID vigila sulla conformità attraverso verifiche e può comminare sanzioni in caso di inadempienza.
 
 Italian Law 4/2004 (Legge Stanca) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. AGID enforces compliance through audits and can issue fines for non-compliance.
 
-**MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
+**Stato MirrorBuddy / MirrorBuddy Status**: ✅ **CONFORME / COMPLIANT** - WCAG 2.1 AA verificato con 7 profili DSA
 
 ---
 
@@ -160,6 +167,29 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
+
+### Known Limitations
+
+While MirrorBuddy targets WCAG 2.1 AA compliance, the following limitations are known:
+
+1. **Voice synthesis quality**: TTS voices may not perfectly pronounce all Italian regional dialects or specialized academic terminology
+2. **PDF export formatting**: Complex mathematical notation in exported PDFs may require manual review for screen reader compatibility
+3. **Third-party content**: Embedded educational videos from external sources may not always include Italian captions
+4. **Experimental features**: Beta features (Google Drive integration) may have temporary accessibility gaps during development
+
+### Feedback Contact
+
+**For accessibility issues or feedback:**
+
+- **Email**: roberdan@fightthestroke.org
+- **Subject line**: [Accessibilità MirrorBuddy]
+- **In-app**: Use "Segnala un problema" button in accessibility panel
+- **Response time**: 5 business days for acknowledgment, 30 days for remediation plan
+
+**For AGID inquiries:**
+
+- Same contact as above
+- Include reference to Law 4/2004 in subject line
 
 ---
 

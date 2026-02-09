@@ -1,18 +1,25 @@
+# Conformidad de Accesibilidad Real Decreto 1112/2018 — España
+
 # Spain Real Decreto 1112/2018 Accessibility Compliance
 
-**Jurisdiction**: Kingdom of Spain (EU Member State)
-**Legislation**: Real Decreto 1112/2018 + EU Directive 2016/2102
+> **Idioma / Language**: Documento redactado en inglés para uso interno. Se requiere traducción profesional al español antes de su presentación al OAW.
+> Document written in English for internal use. Professional Spanish translation required before submission to OAW.
+
+**Jurisdicción / Jurisdiction**: Reino de España (Estado Miembro UE)
+**Legislación / Legislation**: Real Decreto 1112/2018 + Directiva UE 2016/2102
 **Effective**: 20 September 2018
-**Enforcing Authority**: Ministerio de Asuntos Económicos y Transformación Digital + Observatorio de Accesibilidad Web (OAW)
+**Autoridad / Enforcing Authority**: Ministerio de Asuntos Económicos y Transformación Digital + Observatorio de Accesibilidad Web (OAW)
 **Implementation Status**: CRITICAL for Spanish public sector and educational institutions
 
 ---
 
-## Executive Summary
+## Resumen / Executive Summary
+
+El Real Decreto 1112/2018 exige que los sitios web del sector público y las plataformas educativas cumplan con los estándares de accesibilidad WCAG 2.1 Nivel AA. El decreto implementa la Directiva UE 2016/2102 en la legislación española.
 
 Spanish Real Decreto 1112/2018 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. The decree implements EU Directive 2016/2102 in Spanish law.
 
-**MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
+**Estado MirrorBuddy / MirrorBuddy Status**: ✅ **CONFORME / COMPLIANT** - WCAG 2.1 AA verificado con 7 perfiles DSA
 
 ---
 
@@ -171,6 +178,30 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
+
+### Known Limitations
+
+While MirrorBuddy targets WCAG 2.1 AA and RD 1112/2018 compliance, the following limitations are known:
+
+1. **Voice synthesis quality**: TTS voices may not perfectly pronounce all Spanish regional accents (Castilian, Catalan, Galician, Basque) or specialized academic terminology
+2. **PDF export formatting**: Complex mathematical notation in exported PDFs may require manual review for screen reader compatibility
+3. **Third-party content**: Embedded educational videos from external sources may not always include Spanish subtitles
+4. **Experimental features**: Beta features (Google Drive integration) may have temporary accessibility gaps during development
+
+### Feedback Contact
+
+**For accessibility issues or feedback:**
+
+- **Email**: roberdan@fightthestroke.org
+- **Subject line**: [Accesibilidad MirrorBuddy]
+- **In-app**: Use "Informar de un problema" button in accessibility panel
+- **Response time**: 5 business days for acknowledgment, 30 days for remediation plan
+
+**For OAW/Ministry inquiries:**
+
+- Email: roberdan@fightthestroke.org
+- Include reference to Real Decreto 1112/2018 in subject line
+- OAW website: https://administracionelectronica.gob.es/pae_Home/pae_Estrategias/pae_Accesibilidad.html
 
 ---
 

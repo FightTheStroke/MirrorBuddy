@@ -4,8 +4,8 @@
       "conformity": "Conformity"
     },
     "contact": {
-      "text": "Text",
-      "title": "Titolo",
+      "text": "Für Fragen zur Einhaltung der Vorschriften von MirrorBuddy kontaktieren Sie uns unter roberdan@fightthestroke.org",
+      "title": "Kontaktstelle für Compliance",
       "backButton": "Zurück zur Startseite",
       "page": {
         "subtitle": "Wir sind hier, um Ihnen zu helfen",
@@ -111,13 +111,13 @@
       }
     },
     "page": {
-      "subtitle": "Sottotitolo",
-      "title": "Titolo"
+      "subtitle": "Rechtliche Dokumentation, Datenschutz, Cookies, Barrierefreiheit und KI-Transparenz",
+      "title": "Compliance und rechtliche Dokumentation"
     },
     "sections": {
-      "documentation": "Documentation",
-      "publicDocs": "Public Docs",
-      "technicalDocs": "Technical Docs"
+      "documentation": "Dokumentation",
+      "publicDocs": "Öffentliche Dokumente",
+      "technicalDocs": "Technische Dokumentation"
     },
     "privacy": "Datenschutzerklärung",
     "terms": "Nutzungsbedingungen",
@@ -128,7 +128,8 @@
         "version": "Version {version}",
         "lastUpdated": "Zuletzt aktualisiert: {date}",
         "backHome": "Zurück zur Startseite",
-        "pageNavAriaLabel": "Barrierefreiheits-Seitennavigation"
+        "pageNavAriaLabel": "Barrierefreiheits-Seitennavigation",
+        "lastAudit": "Letzte Prüfung: 27. Januar 2026"
       },
       "compliance": {
         "heading": "WCAG 2.1 Level AA-Konformität",
@@ -151,10 +152,10 @@
         "motorDesc": "Vollständige Tastaturnavigation, Sprachsteuerung",
         "autism": "Autismus",
         "autismDesc": "Vorhersehbare Layouts, reduzierte Animationen, klare Struktur",
-        "dyscalculia": "Dyskalkulie",
-        "dyscalculiaDesc": "Visuelle Darstellung von Zahlen, Unterstützung für Berechnungen",
         "cerebralPalsy": "Zerebralparese",
-        "cerebralPalsyDesc": "Große Ziele, Tastaturnavigation, Unterstützung für assistive Technologie"
+        "cerebralPalsyDesc": "Große Ziele, Tastaturnavigation, Unterstützung für assistive Technologie",
+        "auditory": "Hörbeeinträchtigung",
+        "auditoryDesc": "Untertitel, Transkriptionen, visuelle Signale für Audio-Feedback"
       },
       "keyboard": {
         "heading": "Tastaturnavigation",
@@ -174,7 +175,9 @@
       },
       "limitations": {
         "heading": "Bekannte Einschränkungen",
-        "description": "Derzeit sind keine wesentlichen Einschränkungen bekannt. Wenn Sie auf Barrierefreiheitsprobleme stoßen, kontaktieren Sie uns bitte über das Feedback-Formular."
+        "description": "Derzeit sind keine wesentlichen Einschränkungen bekannt. Wenn Sie auf Barrierefreiheitsprobleme stoßen, kontaktieren Sie uns bitte über das Feedback-Formular.",
+        "item1": "Aufgabenseite: Einige Schaltflächen haben ein Farbkontrastverhältnis unter dem von WCAG 2.1 AA geforderten Verhältnis von 4,5:1. Geplante Korrektur: Februar 2026.",
+        "contact": "Wenn Sie weitere Barrierefreiheitsprobleme feststellen, kontaktieren Sie uns unter roberdan@fightthestroke.org"
       },
       "regulatory": {
         "heading": "Regulatorische Konformität",
@@ -363,7 +366,7 @@
         },
         "section11": {
           "intro": "Einleitung",
-          "nextReview": "Nächste Überprüfung",
+          "nextReview": "Nächste Überprüfung: 27. Juli 2026 (vierteljährlich)",
           "title": "Titel"
         },
         "section2": {
@@ -374,23 +377,23 @@
           "item2Title": "Punkt2 Titel",
           "item3Desc": "Punkt3 Beschreibung",
           "item3Title": "Punkt3 Titel",
-          "subtitle": "Untertitel",
+          "subtitle": "Risikoeinstufung von MirrorBuddy",
           "title": "Titel"
         },
         "section3": {
-          "category1": "Kategorie1",
+          "category1": "Gesprächsdaten (Nachrichten mit den Maestros), in Echtzeit analysiert, um Antworten und Ton zu personalisieren",
           "category1Label": "Kategorie1 Bezeichnung",
-          "category2": "Kategorie2",
+          "category2": "Historische Leistungen bei Karteikarten und Quizzen, verwendet zur Berechnung optimaler Wiederholungsintervalle",
           "category2Label": "Kategorie2 Bezeichnung",
-          "category3": "Kategorie3",
+          "category3": "Emotionaler Kontext der Lernsitzung, verwendet zur Generierung personalisierter Motivationsnachrichten",
           "category3Label": "Kategorie3 Bezeichnung",
-          "category4": "Kategorie4",
+          "category4": "Wiederkehrende Schwierigkeitsmuster, überwacht, um Lehrkräfte zu benachrichtigen, ohne automatische Kategorisierung der Schüler",
           "category4Label": "Kategorie4 Bezeichnung",
-          "category5": "Kategorie5",
+          "category5": "Vektor-Embeddings der hochgeladenen Dokumente, verwendet für semantische Suche ohne Speicherung des Originalinhalts in den Vektoren",
           "category5Label": "Kategorie5 Bezeichnung",
           "intro": "Einleitung",
           "outro": "Schluss",
-          "subtitle": "Untertitel",
+          "subtitle": "Beschriebene KI-Systeme",
           "title": "Titel"
         },
         "section4": {
@@ -404,7 +407,7 @@
           "protection4Title": "Schutz4 Titel",
           "protection5Desc": "Schutz5 Beschreibung",
           "protection5Title": "Schutz5 Titel",
-          "subtitle": "Untertitel",
+          "subtitle": "Implementierte Kontrollen für menschliche Aufsicht",
           "title": "Titel"
         },
         "section5": {
@@ -647,53 +650,53 @@
         "page": {
           "backHome": "Zurück zur Startseite",
           "contactEmail": "Kontakt-E-Mail",
-          "contactQuestion": "Kontaktfrage",
-          "lastUpdated": "Zuletzt aktualisiert",
-          "pageNavAriaLabel": "Seitennavigation Aria-Label",
-          "title": "Titel",
-          "version": "Version"
+          "contactQuestion": "Fragen zu Cookies? Kontaktieren Sie uns unter:",
+          "lastUpdated": "Zuletzt aktualisiert: {date}",
+          "pageNavAriaLabel": "Cookie-Richtlinien-Seitennavigation",
+          "title": "Cookie-Richtlinie",
+          "version": "Version {version}"
         },
         "sections": {
           "changes": {
-            "importantChanges": "Wichtige Änderungen",
-            "intro": "Einleitung",
-            "title": "Titel",
-            "updateDate": "Aktualisierungsdatum",
-            "updatePage": "Seite aktualisieren"
+            "importantChanges": "Wesentliche Änderungen werden über Banner in der App und bei Bedarf per E-Mail mitgeteilt.",
+            "intro": "Wir behalten uns das Recht vor, diese Cookie-Richtlinie zu aktualisieren, um Änderungen an unseren Diensten oder regulatorische Änderungen widerzuspiegeln. Änderungen treten zum Zeitpunkt der Veröffentlichung auf dieser Seite in Kraft.",
+            "title": "Änderungen an dieser Richtlinie",
+            "updateDate": "Datum der letzten Aktualisierung: siehe Datum oben auf dieser Seite.",
+            "updatePage": "Diese Seite wird jedes Mal aktualisiert, wenn die verwendeten Cookies oder deren Zwecke geändert werden."
           },
           "cookieManagement": {
-            "chromeInstructions": "Chrome-Anleitung",
-            "edgeInstructions": "Edge-Anleitung",
-            "firefoxInstructions": "Firefox-Anleitung",
-            "h3Browser": "H3 Browser",
-            "h3InApp": "H3 In-App",
-            "pBrowser": "P Browser",
-            "pInApp": "P In-App",
-            "safariInstructions": "Safari-Anleitung",
-            "title": "Titel",
-            "warningAriaLabel": "Warnungs-Aria-Label",
-            "warningText": "Warnungstext",
-            "warningTitle": "Warnungstitel"
+            "chromeInstructions": "Chrome: Einstellungen > Datenschutz und Sicherheit > Cookies und andere Websitedaten",
+            "edgeInstructions": "Edge: Einstellungen > Cookies und Websiteberechtigungen > Cookies und Websitedaten verwalten und löschen",
+            "firefoxInstructions": "Firefox: Einstellungen > Datenschutz und Sicherheit > Cookies und Website-Daten",
+            "h3Browser": "Cookie-Verwaltung über den Browser",
+            "h3InApp": "Cookie-Verwaltung in der App",
+            "pBrowser": "Sie können Cookies über Ihre Browsereinstellungen verwalten und löschen. Bitte beachten Sie, dass das Deaktivieren von essentiellen Cookies die ordnungsgemäße Funktion von MirrorBuddy beeinträchtigen kann.",
+            "pInApp": "Sie können Ihre Cookie-Einstellungen direkt in den MirrorBuddy-Einstellungen unter Datenschutz verwalten. Von dort aus können Sie die Einwilligung zu optionalen Cookies jederzeit widerrufen.",
+            "safariInstructions": "Safari: Einstellungen > Datenschutz > Website-Daten verwalten",
+            "title": "Cookie-Verwaltung",
+            "warningAriaLabel": "Warnung zur Deaktivierung von essentiellen Cookies",
+            "warningText": "Wenn Sie essentielle Cookies deaktivieren, funktionieren einige Funktionen von MirrorBuddy (wie Authentifizierung und Barrierefreiheitseinstellungen) nicht ordnungsgemäß.",
+            "warningTitle": "Achtung"
           },
           "duration": {
-            "clearCookies": "Cookies löschen",
-            "intro": "Einleitung",
+            "clearCookies": "Sie können alle Cookies jederzeit über Ihre Browsereinstellungen oder über die Datenschutzseite in den MirrorBuddy-Einstellungen löschen.",
+            "intro": "Die von MirrorBuddy verwendeten Cookies haben je nach Funktion unterschiedliche Laufzeiten:",
             "persistentCookies": "Dauerhafte Cookies",
-            "persistentCookiesDesc": "Beschreibung dauerhafter Cookies",
-            "sessionCookies": "Sitzungs-Cookies",
-            "sessionCookiesDesc": "Beschreibung Sitzungs-Cookies",
-            "title": "Titel"
+            "persistentCookiesDesc": "Verbleiben für einen vordefinierten Zeitraum (von 30 Tagen bis 1 Jahr) auf Ihrem Gerät. Dazu gehören Barrierefreiheitseinstellungen, Cookie-Einwilligung und Theme-Präferenz.",
+            "sessionCookies": "Sitzungscookies",
+            "sessionCookiesDesc": "Werden automatisch beim Schließen des Browsers gelöscht. Dazu gehören das CSRF-Token für Formularsicherheit und das Tier-Simulationscookie für Administratoren.",
+            "title": "Cookie-Dauer"
           },
           "essentialCookies": {
-            "intro": "Einleitung",
-            "note": "Hinweis",
-            "title": "Titel"
+            "intro": "Essentielle Cookies sind für die grundlegende Funktion von MirrorBuddy erforderlich. Sie sammeln keine persönlichen Daten und können nicht deaktiviert werden, ohne die Hauptfunktionen der Website zu beeinträchtigen.",
+            "note": "Hinweis: Alle essentiellen Cookies von MirrorBuddy sind HTTP-only (nicht von JavaScript zugänglich) für mehr Sicherheit, mit Ausnahme des Einwilligungs- und Theme-Cookies, die vom Client gelesen werden müssen.",
+            "title": "Essentielle Cookies (Unbedingt erforderlich)"
           },
           "links": {
-            "intro": "Einleitung",
-            "privacyPolicyDesc": "Datenschutzerklärung Beschreibung",
-            "privacyPolicyLabel": "Datenschutzerklärung Bezeichnung",
-            "termsDesc": "AGB Beschreibung",
+            "intro": "Für weitere Informationen zum Schutz Ihrer Daten konsultieren Sie bitte die folgenden Dokumente:",
+            "privacyPolicyDesc": "Vollständige Informationen darüber, wie wir Ihre persönlichen Daten sammeln, verwenden und schützen",
+            "privacyPolicyLabel": "Datenschutzerklärung",
+            "termsDesc": "Die Nutzungsbedingungen des MirrorBuddy-Dienstes",
             "termsLabel": "AGB Bezeichnung",
             "title": "Titel"
           },
@@ -733,7 +736,7 @@
           "whatAreCookies": {
             "p1": "P1",
             "p2": "P2",
-            "title": "Titel"
+            "title": "Was sind Cookies"
           },
           "whichCookies": {
             "analytics": "Analytics",
@@ -768,6 +771,26 @@
             "userIdClient": {
               "duration": "Dauer",
               "purpose": "Zweck"
+            },
+            "theme": {
+              "duration": "1 Jahr",
+              "purpose": "Speichert die Theme-Einstellung des Benutzers (Hell-/Dunkelmodus) für visuelle Barrierefreiheit"
+            },
+            "consent": {
+              "duration": "1 Jahr",
+              "purpose": "Zeichnet die Einwilligung des Benutzers für Cookies und Datenverarbeitung auf, wie nach DSGVO Art. 7 erforderlich"
+            },
+            "visitorId": {
+              "duration": "30 Tage",
+              "purpose": "Anonyme Besucherverfolgung für Trial-Nutzer. HTTP-only-Cookie für Sicherheit. Keine personenbezogenen Daten gespeichert."
+            },
+            "csrfToken": {
+              "duration": "Sitzung (verfällt beim Schließen des Browsers)",
+              "purpose": "Cross-Site Request Forgery (CSRF) Schutz-Token. HTTP-only-Cookie für Sicherheit. Erforderlich für sichere Formularübermittlungen."
+            },
+            "simulatedTier": {
+              "duration": "Sitzung (verfällt beim Schließen des Browsers)",
+              "purpose": "Admin-Test-Cookie zur Simulation verschiedener Abonnementstufen (Trial/Base/Pro). HTTP-only-Cookie. Nur von autorisierten Administratoren für Qualitätssicherung verwendet."
             }
           }
         },
@@ -917,6 +940,12 @@
             "conversations": "Unterhaltungen mit den Maestri werden 90 Tage nach Inaktivität aufbewahrt, dann 1 Jahr archiviert und dann gelöscht",
             "webVitals": "Technische Daten (Web Vitals, Fehler) werden 12 Monate zur Verbesserung aufbewahrt, dann aggregiert und gelöscht",
             "deletedAccount": "Wenn Sie Ihr Konto löschen, werden alle Daten innerhalb von 30 Tagen gelöscht (Backup: 90 Tage gesetzlich vorgeschrieben). Aggregierte Daten für die Forschung bleiben pseudonymisiert"
+          },
+          "itemLabels": {
+            "activeAccount": "Aktives Konto",
+            "conversations": "Unterhaltungen",
+            "webVitals": "Web Vitals",
+            "deletedAccount": "Gelöschtes Konto"
           }
         },
         "section10": {
@@ -1119,12 +1148,52 @@
           },
           "learnMoreHeading": "Möchten Sie mehr erfahren?",
           "learnMoreText": "für vollständige Informationen über unsere KI-Architektur, Bias-Tests und wie wir Konversationsdaten verwenden."
+        },
+        "vendorsAndProcessors": {
+          "title": "KI-Dienstleister und Auftragsverarbeiter",
+          "intro": "MirrorBuddy nutzt die folgenden zertifizierten Anbieter von Diensten der künstlichen Intelligenz zur Verarbeitung von Konversationsdaten:",
+          "vendors": {
+            "anthropic": {
+              "name": "Anthropic (Claude AI)",
+              "dataProcessed": "Text der Bildungsgespräche, Unterrichtskontext, Fragen und Antworten der Schüler",
+              "legalBasis": "Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b DSGVO) - Verarbeitung notwendig zur Erbringung des personalisierten Bildungsdienstes",
+              "dpaStatus": "Standardvertragsklauseln (SCC), genehmigt von der Europäischen Kommission für Übermittlungen außerhalb der EU",
+              "dataLocation": "Vereinigte Staaten (USA) mit SCC-Garantien gemäß DSGVO Art. 46"
+            },
+            "azureRealtimeVoice": {
+              "name": "Microsoft Azure Realtime Voice API",
+              "dataProcessed": "Sprachaudiodaten, die in Echtzeit für Text-zu-Sprache und Sprache-zu-Text übertragen werden. Audio wird ephemer verarbeitet, ohne dauerhafte Speicherung.",
+              "legalBasis": "Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b DSGVO) - Verarbeitung notwendig für Sprachinteraktionsfunktionen im Bildungsdienst",
+              "dpaStatus": "Microsoft-Auftragsverarbeitungsvertrag (DPA) mit Standardvertragsklauseln (SCC) für Übermittlungen außerhalb der EU",
+              "dataLocation": "EU (Region West Europe) mit SCC-Garantien für grenzüberschreitende Datenflüsse gemäß DSGVO Art. 46",
+              "note": "Nur Echtzeitverarbeitung. Keine Sprachaufnahmen werden auf Microsoft-Servern gespeichert. Keine personenbezogenen Daten (PII) werden aus Sprachdaten extrahiert. Audiostreams werden unmittelbar nach Verarbeitung gelöscht."
+            }
+          },
+          "note": "Alle KI-Anbieter haben Auftragsverarbeitungsverträge (DPA) gemäß DSGVO Art. 28 unterzeichnet und setzen angemessene technische und organisatorische Sicherheitsmaßnahmen gemäß DSGVO Art. 32 um.",
+          "contactForDpa": "Sie können eine Kopie unserer DPA-Vereinbarungen anfordern, indem Sie roberdan@fightthestroke.org kontaktieren"
+        },
+        "tierSystem": {
+          "title": "Servicestufen und Datenerhebung",
+          "intro": "MirrorBuddy bietet drei Servicestufen mit unterschiedlichen Zugangs- und Datenerhebungsgraden. Das Verständnis Ihrer Servicestufe hilft Ihnen zu verstehen, welche personenbezogenen Daten wir erheben und wie wir sie verwenden.",
+          "trial": {
+            "title": "Trial-Stufe (Anonymer Zugang)",
+            "description": "Trial-Nutzer können MirrorBuddy ohne Kontoerstellung nutzen. Diese Stufe bietet eingeschränkten Zugang mit minimaler Datenerhebung. Sie können bis zu 10 Chat-Nachrichten pro Monat und 5 Minuten Sprachinteraktion nutzen. Nur 3 Maestri (KI-Lehrer) sind verfügbar. Wir erheben nur ein visitor-id-Cookie (anonym, Ablauf 30 Tage) zur Verfolgung der Nutzungslimits. Keine E-Mail-, Namens- oder persönlichen Profildaten werden erhoben. Keine Anmeldung erforderlich. Keine Zahlungsinformationen erhoben."
+          },
+          "base": {
+            "title": "Base-Stufe (Kostenloses registriertes Konto)",
+            "description": "Nutzer der Base-Stufe müssen ein kostenloses registriertes Konto mit E-Mail und Name erstellen. Diese Stufe bietet vollen Zugang zu den Kernbildungsfunktionen mit unbegrenzten Chat-Nachrichten und unbegrenzter Sprachinteraktion. Zugang zu 25 Maestri (KI-Lehrer). Wir erheben und speichern: E-Mail-Adresse (für Anmeldung und Benachrichtigungen), Name (für personalisierte Begrüßungen), Gesprächsverlauf (für Fortsetzung der Lernsitzungen), Flashcard-Daten und Lernfortschritt (für Spaced-Repetition-Algorithmus), Nutzereinstellungen und Barrierefreiheitsoptionen. Keine Zahlungsinformationen für diese Stufe erhoben."
+          },
+          "pro": {
+            "title": "Pro-Stufe (Kostenpflichtiges Abonnement)",
+            "description": "Nutzer der Pro-Stufe haben ein kostenpflichtiges Abonnement für 9,99 €/Monat, abgewickelt über Stripe. Diese Stufe bietet Premium-Zugang mit allen Funktionen: unbegrenzte Chat-Nachrichten, unbegrenzte Sprachinteraktion, Zugang zu allen 26 Maestri (KI-Lehrer) einschließlich exklusiver Premium-Lehrer, vorrangiger Support und erweiterte Funktionen. Wir erheben alle Daten der Base-Stufe plus: Zahlungsinformationen, verarbeitet durch Stripe (nicht direkt von MirrorBuddy gespeichert), Rechnungsadresse und Rechnungsverlauf (für Buchführung und steuerliche Compliance), Abonnementstatus und Verlängerungsdaten. Zahlungsdaten werden von Stripe gemäß deren DSGVO-konformem Auftragsverarbeitungsvertrag (DPA) verwaltet."
+          },
+          "dataNote": "Ihre Abonnementstufe bestimmt, welche personenbezogenen Daten wir erheben. Sie können Ihre Daten jederzeit in Ihren Datenschutzeinstellungen einsehen und kontrollieren. Ein Upgrade oder Downgrade Ihrer Stufe ändert entsprechend Ihr Datenerhebungsprofil. Wenn Sie von Pro auf Base herabstufen oder Ihr Konto löschen, folgt die Aufbewahrung der Zahlungsdaten unserer Standard-Aufbewahrungsrichtlinie (Rechnungsunterlagen 7 Jahre für steuerliche Compliance aufbewahrt, dann endgültig gelöscht)."
         }
       },
       "terms": {
         "backToHome": "Zurück zur Startseite",
         "backToHomeAriaLabel": "Zurück zur Startseite Aria-Bezeichnung",
-        "lastUpdated": "Zuletzt aktualisiert",
+        "lastUpdated": "Zuletzt aktualisiert {date}",
         "pageNavAriaLabel": "Seitennavigation Aria-Bezeichnung",
         "questionsEmail": "Fragen E-Mail",
         "questionsPrefix": "Fragen Präfix",
@@ -1137,7 +1206,7 @@
           "respect": "Respekt",
           "supervised": "Überwacht"
         },
-        "version": "Version",
+        "version": "Version {version}",
         "jurisdictions": "Rechtsordnungen: Italien, Frankreich, Deutschland, Spanien, Vereinigtes Königreich",
         "sections": {
           "section1": {
@@ -1388,6 +1457,12 @@
     "technicalDocuments": "Technische Dokumentation",
     "technicalDescription": "Technische Dokumentation auf GitHub für Entwickler und Prüfer verfügbar.",
     "questionsTitle": "Fragen zur Compliance?",
-    "questionsDescription": "Bei Fragen zu unserer regulatorischen Compliance oder zur Ausübung Ihrer Rechte kontaktieren Sie uns."
+    "questionsDescription": "Bei Fragen zu unserer regulatorischen Compliance oder zur Ausübung Ihrer Rechte kontaktieren Sie uns.",
+    "aiDisclosure": {
+      "label": "AI",
+      "fullLabel": "KI-Antwort",
+      "ariaLabel": "Von künstlicher Intelligenz generierte Antwort",
+      "tooltip": "Diese Antwort wird von künstlicher Intelligenz generiert. Überprüfen Sie immer wichtige Informationen."
+    }
   }
 }

@@ -38,8 +38,8 @@ export function AccessibilityContent({ config }: AccessibilityContentProps) {
             <strong>{t("features.autism")}</strong>: {t("features.autismDesc")}
           </li>
           <li>
-            <strong>{t("features.dyscalculia")}</strong>:{" "}
-            {t("features.dyscalculiaDesc")}
+            <strong>{t("features.auditory")}</strong>:{" "}
+            {t("features.auditoryDesc")}
           </li>
           <li>
             <strong>{t("features.cerebralPalsy")}</strong>:{" "}
@@ -105,8 +105,14 @@ export function AccessibilityContent({ config }: AccessibilityContentProps) {
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
           {t("limitations.heading")}
         </h2>
-        <p className="text-slate-700 dark:text-gray-300">
+        <p className="text-slate-700 dark:text-gray-300 mb-4">
           {t("limitations.description")}
+        </p>
+        <ul className="space-y-2 text-slate-700 dark:text-gray-300 mb-4">
+          <li>• {t("limitations.item1")}</li>
+        </ul>
+        <p className="text-slate-700 dark:text-gray-300">
+          {t("limitations.contact")}
         </p>
       </section>
 

@@ -33,7 +33,7 @@ import {
   assessResponseTransparency,
   type TransparencyContext,
 } from "@/lib/ai/server";
-import { recordContentFiltered } from "@/lib/safety";
+import { recordContentFiltered } from "@/lib/safety/server";
 import { normalizeUnicode } from "@/lib/safety";
 
 // Import handlers to register them

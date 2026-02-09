@@ -77,19 +77,19 @@
 
 ## 4. Metrics
 
-**Performance Metrics** (Baseline):
+**Performance Metrics** (Placeholder targets. Actual metrics pending formal evaluation):
 
-- BLEU score (knowledge consistency): 0.87 vs. reference answers
-- Student satisfaction (post-session survey): 4.2/5.0
-- Engagement time per session: 18 min average
-- Accessibility feature usage: 42% of active sessions use 1+ profile
+- BLEU score (knowledge consistency): Target 0.87 vs. reference answers
+- Student satisfaction (post-session survey): Target 4.2/5.0
+- Engagement time per session: Target 18 min average
+- Accessibility feature usage: Target 42% of active sessions use 1+ profile
 
-**Safety Metrics**:
+**Safety Metrics** (Placeholder targets. Actual metrics pending formal evaluation):
 
-- Content policy violations (flagged/reviewed): < 0.1% of responses
-- Hallucination detection rate: Monitored via teacher review sampling
-- Crisis escalation accuracy: 94% true positive on distress signals
-- Response time (99th percentile): 2.3 seconds
+- Content policy violations (flagged/reviewed): Target < 0.1% of responses
+- Hallucination detection rate: Monitored via teacher review sampling (formal metrics pending)
+- Crisis escalation accuracy: Target 94% true positive on distress signals
+- Response time (99th percentile): Target 2.3 seconds
 
 ---
 
@@ -124,7 +124,7 @@
 - Maestros designed with diverse representation
 - Content moderation for cultural sensitivity
 - Accessibility testing across all 7 disability profiles
-- Quarterly bias testing on diverse student cohorts
+- Quarterly bias testing on diverse student cohorts (Planned. Not yet conducted)
 
 **Safety Measures** (5-Layer Defense):
 
@@ -158,6 +158,16 @@
 - Compliance measures align with EU AI Act Chapter III (transparency, human oversight)
 - Full DPIA available in `/docs/compliance/DPIA.md`
 - Risk register available in `/docs/compliance/AI-RISK-REGISTER.md`
+
+---
+
+## 8. Audit History
+
+**Planned audit schedule** (No formal audits completed yet):
+
+- Q2 2026: CE conformity assessment by EU Notified Body (planned)
+- Q3 2026: Post-market monitoring review (planned)
+- Q4 2026: Annual compliance review (planned)
 
 ---
 

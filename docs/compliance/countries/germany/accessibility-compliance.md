@@ -1,18 +1,25 @@
+# Barrierefreiheit nach BITV 2.0 — Deutschland
+
 # Germany BITV 2.0 Accessibility Compliance
 
-**Jurisdiction**: Federal Republic of Germany (EU Member State)
-**Legislation**: BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung)
+> **Sprache / Language**: Dokument in englischer Sprache für den internen Gebrauch erstellt. Eine professionelle Übersetzung ins Deutsche ist vor der Einreichung beim BFIT-Bund erforderlich.
+> Document written in English for internal use. Professional German translation required before submission to BFIT-Bund.
+
+**Zuständigkeit / Jurisdiction**: Bundesrepublik Deutschland (EU-Mitgliedstaat)
+**Gesetzgebung / Legislation**: BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung)
 **Effective**: 01 May 2019 (BITV 2.0)
-**Enforcing Authority**: BFIT-Bund (Überwachungsstelle des Bundes für Barrierefreiheit von Informationstechnik) + Schlichtungsstelle nach dem BGG
+**Behörde / Enforcing Authority**: BFIT-Bund (Überwachungsstelle des Bundes für Barrierefreiheit von Informationstechnik) + Schlichtungsstelle nach dem BGG
 **Implementation Status**: CRITICAL for German public sector and educational institutions
 
 ---
 
-## Executive Summary
+## Zusammenfassung / Executive Summary
 
-German BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. BITV 2.0 implements EU Directive 2016/2102 in German law.
+Die BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung) verpflichtet Webseiten des öffentlichen Sektors und Bildungsplattformen zur Einhaltung der Barrierefreiheitsstandards WCAG 2.1 Stufe AA. Die BITV 2.0 setzt die EU-Richtlinie 2016/2102 in deutsches Recht um.
 
-**MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
+German BITV 2.0 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. BITV 2.0 implements EU Directive 2016/2102 in German law.
+
+**MirrorBuddy Status**: ✅ **KONFORM / COMPLIANT** - WCAG 2.1 AA mit 7 DSA-Profilen verifiziert
 
 ---
 
@@ -173,6 +180,35 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
+
+### Known Limitations
+
+While MirrorBuddy targets WCAG 2.1 AA and BITV 2.0 compliance, the following limitations are known:
+
+1. **Voice synthesis quality**: TTS voices may not perfectly pronounce all German dialects or specialized academic terminology
+2. **PDF export formatting**: Complex mathematical notation in exported PDFs may require manual review for screen reader compatibility
+3. **Third-party content**: Embedded educational videos from external sources may not always include German subtitles
+4. **Experimental features**: Beta features (Google Drive integration) may have temporary accessibility gaps during development
+
+### Feedback Contact
+
+**For accessibility issues or feedback:**
+
+- **Email**: roberdan@fightthestroke.org
+- **Subject line**: [Barrierefreiheit MirrorBuddy]
+- **In-app**: Use "Problem melden" button in accessibility panel
+- **Response time**: 5 business days for acknowledgment, 30 days for remediation plan
+
+**For Schlichtungsstelle nach dem BGG inquiries:**
+
+- Phone: +49 (0)30 18 527-2805
+- Email: info@schlichtungsstelle-bgg.de
+- Website: https://www.schlichtungsstelle-bgg.de
+
+**For BFIT-Bund inquiries:**
+
+- Email: roberdan@fightthestroke.org (copy to info@bfit-bund.de if needed)
+- Include reference to BITV 2.0 in subject line
 
 ---
 

@@ -6,18 +6,20 @@ EU AI Act (2024/1689), Italian Law 132/2025, GDPR, COPPA, WCAG 2.1 AA
 
 ## Key Docs
 
-| Document         | Path                                                          |
-| ---------------- | ------------------------------------------------------------- |
-| DPIA             | `docs/compliance/DPIA.md`                                     |
-| AI Policy        | `docs/compliance/AI-POLICY.md`                                |
-| Model Card       | `docs/compliance/MODEL-CARD.md`                               |
-| Risk Management  | `docs/compliance/AI-RISK-MANAGEMENT.md`                       |
-| Country Index    | `docs/compliance/LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md`        |
-| IT Accessibility | `docs/compliance/countries/italy/accessibility-compliance.md` |
-| FR Cookies       | `docs/compliance/countries/france/cookie-compliance.md`       |
-| ES Cookies       | `docs/compliance/countries/spain/cookie-compliance.md`        |
+| Document               | Path                                                          |
+| ---------------------- | ------------------------------------------------------------- |
+| DPIA                   | `docs/compliance/DPIA.md`                                     |
+| AI Policy              | `docs/compliance/AI-POLICY.md`                                |
+| Model Card             | `docs/compliance/MODEL-CARD.md`                               |
+| Risk Management        | `docs/compliance/AI-RISK-MANAGEMENT.md`                       |
+| Post-Market Monitoring | `docs/compliance/POST-MARKET-MONITORING-PLAN.md`              |
+| Country Index          | `docs/compliance/LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md`        |
+| Country Docs (pattern) | `docs/compliance/countries/{country}/`                        |
+| IT Accessibility       | `docs/compliance/countries/italy/accessibility-compliance.md` |
+| FR Cookies             | `docs/compliance/countries/france/cookie-compliance.md`       |
+| ES Cookies             | `docs/compliance/countries/spain/cookie-compliance.md`        |
 
-## Public Pages: `/ai-transparency`, `/privacy`, `/terms`
+## Public Pages: `/ai-transparency`, `/privacy`, `/terms`, `/accessibility`
 
 ## Admin Tools: `/admin/safety`, `/admin/risk-register`, `GET /api/compliance/audit-log`
 
