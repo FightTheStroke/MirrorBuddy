@@ -5,25 +5,19 @@
  * nested operations, and error scenarios.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import * as piiEncryption from "@/lib/security";
-import { Prisma } from "@prisma/client";
-import { createPIIMiddleware } from "../pii-middleware";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import * as piiEncryption from '@/lib/security';
+import { Prisma } from '@prisma/client';
+import { createPIIMiddleware } from '../pii-middleware';
 
 // Mock the encryption module (combined barrel mock)
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return {
     ...actual,
-    encryptPII: vi.fn((text: string) =>
-      Promise.resolve(`pii:v1:encrypted_${text}`),
-    ),
+    encryptPII: vi.fn((text: string) => Promise.resolve(`pii:v1:encrypted_${text}`)),
     decryptPII: vi.fn((text: string) =>
-      Promise.resolve(
-        text.startsWith("pii:v1:")
-          ? text.replace("pii:v1:encrypted_", "")
-          : text,
-      ),
+      Promise.resolve(text.startsWith('pii:v1:') ? text.replace('pii:v1:encrypted_', '') : text),
     ),
     hashPII: vi.fn((text: string) => Promise.resolve(`hash_${text}`)),
     isPIIEncryptionConfigured: vi.fn(() => true),
@@ -33,103 +27,103 @@ vi.mock("@/lib/security", async (importOriginal) => {
 });
 
 // Mock Prisma.defineExtension to return the config directly for testing
-vi.spyOn(Prisma, "defineExtension").mockImplementation((config: any) => config);
+vi.spyOn(Prisma, 'defineExtension').mockImplementation((config: any) => config);
 
-describe("PII Decryption on Read", () => {
+describe('PII Decryption on Read', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("decrypts User.email on findUnique", async () => {
+  it('decrypts User.email on findUnique', async () => {
     const mockQuery = vi.fn(() =>
       Promise.resolve({
-        id: "user1",
-        email: "pii:v1:encrypted_user@example.com",
-        username: "testuser",
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        username: 'testuser',
       }),
     );
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "findUnique",
-      args: { where: { id: "user1" } },
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' } },
       query: mockQuery,
     };
 
     const result = await middleware.query.$allModels.findUnique(context);
 
-    expect(piiEncryption.decryptPII).toHaveBeenCalledWith(
-      "pii:v1:encrypted_user@example.com",
-    );
-    expect(result.email).toBe("user@example.com");
+    expect(piiEncryption.decryptPII).toHaveBeenCalledWith('pii:v1:encrypted_user@example.com', {
+      throwOnError: false,
+    });
+    expect(result.email).toBe('user@example.com');
   });
 
-  it("decrypts Profile.name on findFirst", async () => {
+  it('decrypts Profile.name on findFirst', async () => {
     const mockQuery = vi.fn(() =>
       Promise.resolve({
-        id: "profile1",
-        name: "pii:v1:encrypted_John Doe",
-        userId: "user1",
+        id: 'profile1',
+        name: 'pii:v1:encrypted_John Doe',
+        userId: 'user1',
       }),
     );
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "Profile",
-      operation: "findFirst",
-      args: { where: { userId: "user1" } },
+      model: 'Profile',
+      operation: 'findFirst',
+      args: { where: { userId: 'user1' } },
       query: mockQuery,
     };
 
     const result = await middleware.query.$allModels.findFirst(context);
 
-    expect(piiEncryption.decryptPII).toHaveBeenCalledWith(
-      "pii:v1:encrypted_John Doe",
-    );
-    expect(result.name).toBe("John Doe");
+    expect(piiEncryption.decryptPII).toHaveBeenCalledWith('pii:v1:encrypted_John Doe', {
+      throwOnError: false,
+    });
+    expect(result.name).toBe('John Doe');
   });
 
-  it("decrypts GoogleAccount fields on findMany", async () => {
+  it('decrypts GoogleAccount fields on findMany', async () => {
     const mockQuery = vi.fn(() =>
       Promise.resolve([
         {
-          id: "ga1",
-          email: "pii:v1:encrypted_google@example.com",
-          displayName: "pii:v1:encrypted_Google User",
-          googleId: "123",
+          id: 'ga1',
+          email: 'pii:v1:encrypted_google@example.com',
+          displayName: 'pii:v1:encrypted_Google User',
+          googleId: '123',
         },
       ]),
     );
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "GoogleAccount",
-      operation: "findMany",
+      model: 'GoogleAccount',
+      operation: 'findMany',
       args: {},
       query: mockQuery,
     };
 
     const results = await middleware.query.$allModels.findMany(context);
 
-    expect(piiEncryption.decryptPII).toHaveBeenCalledWith(
-      "pii:v1:encrypted_google@example.com",
-    );
-    expect(piiEncryption.decryptPII).toHaveBeenCalledWith(
-      "pii:v1:encrypted_Google User",
-    );
-    expect(results[0].email).toBe("google@example.com");
-    expect(results[0].displayName).toBe("Google User");
+    expect(piiEncryption.decryptPII).toHaveBeenCalledWith('pii:v1:encrypted_google@example.com', {
+      throwOnError: false,
+    });
+    expect(piiEncryption.decryptPII).toHaveBeenCalledWith('pii:v1:encrypted_Google User', {
+      throwOnError: false,
+    });
+    expect(results[0].email).toBe('google@example.com');
+    expect(results[0].displayName).toBe('Google User');
   });
 
-  it("handles null results from queries gracefully", async () => {
+  it('handles null results from queries gracefully', async () => {
     const mockQuery = vi.fn(() => Promise.resolve(null));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "findUnique",
-      args: { where: { id: "nonexistent" } },
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'nonexistent' } },
       query: mockQuery,
     };
 
@@ -139,13 +133,13 @@ describe("PII Decryption on Read", () => {
     expect(piiEncryption.decryptPII).not.toHaveBeenCalled();
   });
 
-  it("handles empty array from findMany gracefully", async () => {
+  it('handles empty array from findMany gracefully', async () => {
     const mockQuery = vi.fn(() => Promise.resolve([]));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "findMany",
+      model: 'User',
+      operation: 'findMany',
       args: {},
       query: mockQuery,
     };
@@ -157,27 +151,25 @@ describe("PII Decryption on Read", () => {
   });
 });
 
-describe("Nested Operations", () => {
+describe('Nested Operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("encrypts nested create data", async () => {
-    const mockQuery = vi.fn((args) =>
-      Promise.resolve({ id: "user1", ...args.data }),
-    );
+  it('encrypts nested create data', async () => {
+    const mockQuery = vi.fn((args) => Promise.resolve({ id: 'user1', ...args.data }));
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "create",
+      model: 'User',
+      operation: 'create',
       args: {
         data: {
-          username: "testuser",
-          email: "user@example.com",
+          username: 'testuser',
+          email: 'user@example.com',
           profile: {
             create: {
-              name: "John Doe",
+              name: 'John Doe',
             },
           },
         },
@@ -187,59 +179,52 @@ describe("Nested Operations", () => {
 
     await middleware.query.$allModels.create(context);
 
-    expect(piiEncryption.encryptPII).toHaveBeenCalledWith("user@example.com");
-    expect(piiEncryption.encryptPII).toHaveBeenCalledWith("John Doe");
+    expect(piiEncryption.encryptPII).toHaveBeenCalledWith('user@example.com');
+    expect(piiEncryption.encryptPII).toHaveBeenCalledWith('John Doe');
   });
 });
 
-describe("Error Handling", () => {
+describe('Error Handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("propagates encryption errors", async () => {
-    vi.mocked(piiEncryption.encryptPII).mockRejectedValueOnce(
-      new Error("Encryption failed"),
-    );
+  it('propagates encryption errors', async () => {
+    vi.mocked(piiEncryption.encryptPII).mockRejectedValueOnce(new Error('Encryption failed'));
 
     const mockQuery = vi.fn();
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "create",
-      args: { data: { email: "user@example.com" } },
+      model: 'User',
+      operation: 'create',
+      args: { data: { email: 'user@example.com' } },
       query: mockQuery,
     };
 
-    await expect(middleware.query.$allModels.create(context)).rejects.toThrow(
-      "Encryption failed",
-    );
+    await expect(middleware.query.$allModels.create(context)).rejects.toThrow('Encryption failed');
     expect(mockQuery).not.toHaveBeenCalled();
   });
 
-  it("propagates decryption errors", async () => {
-    vi.mocked(piiEncryption.decryptPII).mockRejectedValueOnce(
-      new Error("Decryption failed"),
-    );
+  it('catches decryption errors and returns placeholder', async () => {
+    vi.mocked(piiEncryption.decryptPII).mockRejectedValueOnce(new Error('Decryption failed'));
 
     const mockQuery = vi.fn(() =>
       Promise.resolve({
-        id: "user1",
-        email: "pii:v1:encrypted_user@example.com",
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
       }),
     );
 
     const middleware = createPIIMiddleware() as any;
     const context = {
-      model: "User",
-      operation: "findUnique",
-      args: { where: { id: "user1" } },
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' } },
       query: mockQuery,
     };
 
-    await expect(
-      middleware.query.$allModels.findUnique(context),
-    ).rejects.toThrow("Decryption failed");
+    const result = await middleware.query.$allModels.findUnique(context);
+    expect(result.email).toBe('[decryption-failed]');
   });
 });
