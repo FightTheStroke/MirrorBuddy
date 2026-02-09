@@ -23,9 +23,9 @@ MirrorBuddy's webcam feature currently captures **single frames** (JPEG snapshot
 
 The Azure OpenAI Realtime API now supports image input on GA models:
 
-- **`gpt-realtime`** (v2025-08-28) — supports `input_image` content type
+- **`gpt-realtime`** (v2025-08-28) — supports `input_image` content type (MirrorBuddy current deployment)
 - **`gpt-realtime-mini`** (v2025-10-06, v2025-12-15) — supports `input_image`
-- **`gpt-4o-realtime-preview`** (v2024-12-17) — does NOT support images (deprecated 2026-03-24)
+- **`gpt-4o-realtime-preview`** (v2024-12-17) — does NOT support images (deprecated 2026-03-24, migration complete)
 
 Images are sent via the WebRTC data channel as `conversation.item.create` events with base64-encoded data URIs. No video codec or video track is needed — the API accepts discrete image frames.
 
@@ -187,13 +187,13 @@ Based on real-world testing (~$0.067 per 640x360 image at $5/M image tokens):
 
 ### Deprecation Warnings
 
-| Model                        | Version    | Deprecation Date | Action Needed                         |
-| ---------------------------- | ---------- | ---------------- | ------------------------------------- |
-| gpt-4o-realtime-preview      | 2024-12-17 | 2026-03-24       | Already migrated to gpt-realtime      |
-| gpt-4o-mini-realtime-preview | 2024-12-17 | 2026-03-24       | Already migrated to gpt-realtime-mini |
-| gpt-5-chat                   | 2025-08-07 | 2026-03-01       | Upgrade to v2025-10-03                |
-| gpt-5-chat                   | 2025-10-03 | 2026-03-01       | Monitor for newer version             |
-| gpt-5.2-chat                 | 2025-12-11 | 2026-04-01       | Monitor, still Preview                |
+| Model                        | Version    | Deprecation Date | Action Needed                 | Status   |
+| ---------------------------- | ---------- | ---------------- | ----------------------------- | -------- |
+| gpt-4o-realtime-preview      | 2024-12-17 | 2026-03-24       | Migrated to gpt-realtime      | Complete |
+| gpt-4o-mini-realtime-preview | 2024-12-17 | 2026-03-24       | Migrated to gpt-realtime-mini | Complete |
+| gpt-5-chat                   | 2025-08-07 | 2026-03-01       | Upgrade to v2025-10-03        |
+| gpt-5-chat                   | 2025-10-03 | 2026-03-01       | Monitor for newer version     |
+| gpt-5.2-chat                 | 2025-12-11 | 2026-04-01       | Monitor, still Preview        |
 
 ### Current Deployments (Verified)
 

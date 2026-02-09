@@ -951,7 +951,7 @@ graph TB
         T3[5 min voice]
         T4[3 random Professors]
         T5[10 tool uses]
-        T6[gpt-4o-mini]
+        T6[gpt-5-nano]
     end
 
     subgraph Base_Tier["Base Tier"]
@@ -1021,7 +1021,7 @@ graph LR
     end
 
     subgraph Trial_Models["Trial Models"]
-        TM[gpt-4o-mini]
+        TM[gpt-5-nano]
     end
 
     subgraph Base_Models["Base Models"]

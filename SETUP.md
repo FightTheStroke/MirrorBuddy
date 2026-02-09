@@ -35,7 +35,7 @@ Open http://localhost:3000
 
 1. [Azure Portal](https://portal.azure.com) → Create Azure OpenAI resource
 2. Deploy models:
-   - `gpt-4o-mini` (chat, cost-effective default)
+   - `gpt-5-mini` (chat, cost-effective default)
    - `gpt-realtime` (voice, premium)
    - `gpt-realtime-mini` (voice, cheaper default)
    - `text-embedding-3-small` (RAG semantic search, recommended)
@@ -45,8 +45,8 @@ Open http://localhost:3000
 # Chat
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini
-AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
 # Voice
@@ -146,8 +146,8 @@ See `.env.example` for all options. Key variables:
 # Azure OpenAI (Chat + Voice)
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini
-AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
+AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
@@ -216,4 +216,4 @@ CMD ["npm", "start"]
 
 ---
 
-**See also:** [FEATURES.md](FEATURES.md) | [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+**See also:** [FEATURES.md](docs-archive/FEATURES.md) | [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)

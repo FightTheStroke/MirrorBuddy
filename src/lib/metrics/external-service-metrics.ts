@@ -16,14 +16,14 @@
  * @see https://brave.com/search/api/
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /** Quota limits configuration */
 export const EXTERNAL_SERVICE_QUOTAS = {
   // Azure OpenAI quotas (typical S0 tier, adjust per actual subscription)
   AZURE_OPENAI: {
-    CHAT_TPM: 120000, // 120K tokens/minute for gpt-4o
+    CHAT_TPM: 120000, // 120K tokens/minute for gpt-5-mini
     CHAT_RPM: 720, // 720 requests/minute
     EMBEDDING_TPM: 350000, // 350K tokens/minute
     REALTIME_SESSIONS_CONCURRENT: 100, // concurrent sessions
@@ -54,7 +54,7 @@ export interface ExternalServiceUsage {
   currentValue: number;
   limit: number;
   usagePercent: number;
-  status: "ok" | "warning" | "critical" | "exceeded";
+  status: 'ok' | 'warning' | 'critical' | 'exceeded';
   period: string;
 }
 
@@ -72,17 +72,15 @@ interface ApiCallRecord {
  * Record an external API call for metrics tracking.
  * Call this from API routes after each external service call.
  */
-export async function recordExternalApiCall(
-  record: ApiCallRecord,
-): Promise<void> {
+export async function recordExternalApiCall(record: ApiCallRecord): Promise<void> {
   try {
     const eventId = `ext_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     await prisma.telemetryEvent.create({
       data: {
         eventId,
         timestamp: new Date(),
-        sessionId: "system", // External API calls are system-level, not user-session bound
-        category: "external_api",
+        sessionId: 'system', // External API calls are system-level, not user-session bound
+        category: 'external_api',
         action: record.action,
         label: record.service,
         value: record.tokens || 1,
@@ -95,7 +93,7 @@ export async function recordExternalApiCall(
     });
   } catch (error) {
     // Non-critical, log and continue
-    logger.warn("Failed to record external API call", {
+    logger.warn('Failed to record external API call', {
       error: String(error),
       service: record.service,
     });
@@ -113,8 +111,8 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
   // Query telemetry for Azure OpenAI calls
   const azureEvents = await prisma.telemetryEvent.findMany({
     where: {
-      category: "external_api",
-      label: "azure_openai",
+      category: 'external_api',
+      label: 'azure_openai',
       timestamp: { gte: minuteAgo },
     },
     select: { action: true, value: true },
@@ -123,54 +121,50 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
   // Aggregate by action
   type AzureEvent = { action: string; value: number | null };
   const chatTokens = azureEvents
-    .filter((e: AzureEvent) => e.action === "chat_completion")
+    .filter((e: AzureEvent) => e.action === 'chat_completion')
     .reduce((sum: number, e: AzureEvent) => sum + (e.value || 0), 0);
-  const chatRequests = azureEvents.filter(
-    (e: AzureEvent) => e.action === "chat_completion",
-  ).length;
+  const chatRequests = azureEvents.filter((e: AzureEvent) => e.action === 'chat_completion').length;
   const embeddingTokens = azureEvents
-    .filter((e: AzureEvent) => e.action === "embedding")
+    .filter((e: AzureEvent) => e.action === 'embedding')
     .reduce((sum: number, e: AzureEvent) => sum + (e.value || 0), 0);
-  const ttsRequests = azureEvents.filter(
-    (e: AzureEvent) => e.action === "tts",
-  ).length;
+  const ttsRequests = azureEvents.filter((e: AzureEvent) => e.action === 'tts').length;
 
   const quotas = EXTERNAL_SERVICE_QUOTAS.AZURE_OPENAI;
 
   metrics.push(
     createUsageMetric(
-      "Azure OpenAI",
-      "Chat Tokens/min",
+      'Azure OpenAI',
+      'Chat Tokens/min',
       chatTokens,
       quotas.CHAT_TPM,
-      "1m",
+      '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
     createUsageMetric(
-      "Azure OpenAI",
-      "Chat Requests/min",
+      'Azure OpenAI',
+      'Chat Requests/min',
       chatRequests,
       quotas.CHAT_RPM,
-      "1m",
+      '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
     createUsageMetric(
-      "Azure OpenAI",
-      "Embedding Tokens/min",
+      'Azure OpenAI',
+      'Embedding Tokens/min',
       embeddingTokens,
       quotas.EMBEDDING_TPM,
-      "1m",
+      '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
     createUsageMetric(
-      "Azure OpenAI",
-      "TTS Requests/min",
+      'Azure OpenAI',
+      'TTS Requests/min',
       ttsRequests,
       quotas.TTS_RPM,
-      "1m",
+      '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
@@ -191,8 +185,8 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
   // Minute-level metrics
   const driveMinuteEvents = await prisma.telemetryEvent.count({
     where: {
-      category: "external_api",
-      label: "google_drive",
+      category: 'external_api',
+      label: 'google_drive',
       timestamp: { gte: minuteAgo },
     },
   });
@@ -200,8 +194,8 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
   // Daily aggregate
   const driveDayEvents = await prisma.telemetryEvent.count({
     where: {
-      category: "external_api",
-      label: "google_drive",
+      category: 'external_api',
+      label: 'google_drive',
       timestamp: { gte: dayAgo },
     },
   });
@@ -210,20 +204,20 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
 
   metrics.push(
     createUsageMetric(
-      "Google Drive",
-      "Queries/min",
+      'Google Drive',
+      'Queries/min',
       driveMinuteEvents,
       quotas.QUERIES_PER_MINUTE,
-      "1m",
+      '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
     createUsageMetric(
-      "Google Drive",
-      "Queries/day",
+      'Google Drive',
+      'Queries/day',
       driveDayEvents,
       quotas.DAILY_QUERIES,
-      "24h",
+      '24h',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
@@ -242,8 +236,8 @@ export async function getBraveSearchUsage(): Promise<ExternalServiceUsage[]> {
 
   const searchEvents = await prisma.telemetryEvent.count({
     where: {
-      category: "external_api",
-      label: "brave_search",
+      category: 'external_api',
+      label: 'brave_search',
       timestamp: { gte: monthStart },
     },
   });
@@ -252,11 +246,11 @@ export async function getBraveSearchUsage(): Promise<ExternalServiceUsage[]> {
 
   return [
     createUsageMetric(
-      "Brave Search",
-      "Queries/month",
+      'Brave Search',
+      'Queries/month',
       searchEvents,
       quotas.MONTHLY_QUERIES,
-      "month",
+      'month',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
     ),
@@ -266,9 +260,7 @@ export async function getBraveSearchUsage(): Promise<ExternalServiceUsage[]> {
 /**
  * Get all external service usage metrics.
  */
-export async function getAllExternalServiceUsage(): Promise<
-  ExternalServiceUsage[]
-> {
+export async function getAllExternalServiceUsage(): Promise<ExternalServiceUsage[]> {
   const [azure, drive, brave] = await Promise.all([
     getAzureOpenAIUsage(),
     getGoogleDriveUsage(),
@@ -283,7 +275,7 @@ export async function getAllExternalServiceUsage(): Promise<
  */
 export async function getServiceAlerts(): Promise<ExternalServiceUsage[]> {
   const all = await getAllExternalServiceUsage();
-  return all.filter((m) => m.status !== "ok");
+  return all.filter((m) => m.status !== 'ok');
 }
 
 /**
@@ -293,37 +285,33 @@ export async function generateExternalServiceMetrics(): Promise<string> {
   const usage = await getAllExternalServiceUsage();
   const lines: string[] = [];
 
-  lines.push(
-    "# HELP mirrorbuddy_external_service_usage External service API usage",
-  );
-  lines.push("# TYPE mirrorbuddy_external_service_usage gauge");
+  lines.push('# HELP mirrorbuddy_external_service_usage External service API usage');
+  lines.push('# TYPE mirrorbuddy_external_service_usage gauge');
 
   for (const metric of usage) {
     const labels = `service="${metric.service}",metric="${metric.metric}",period="${metric.period}"`;
-    lines.push(
-      `mirrorbuddy_external_service_usage{${labels}} ${metric.usagePercent}`,
-    );
+    lines.push(`mirrorbuddy_external_service_usage{${labels}} ${metric.usagePercent}`);
   }
 
   lines.push(
-    "# HELP mirrorbuddy_external_service_status External service status (0=ok,1=warning,2=critical,3=exceeded)",
+    '# HELP mirrorbuddy_external_service_status External service status (0=ok,1=warning,2=critical,3=exceeded)',
   );
-  lines.push("# TYPE mirrorbuddy_external_service_status gauge");
+  lines.push('# TYPE mirrorbuddy_external_service_status gauge');
 
   for (const metric of usage) {
     const statusValue =
-      metric.status === "ok"
+      metric.status === 'ok'
         ? 0
-        : metric.status === "warning"
+        : metric.status === 'warning'
           ? 1
-          : metric.status === "critical"
+          : metric.status === 'critical'
             ? 2
             : 3;
     const labels = `service="${metric.service}",metric="${metric.metric}"`;
     lines.push(`mirrorbuddy_external_service_status{${labels}} ${statusValue}`);
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /** Helper to create usage metric with status */
@@ -338,18 +326,18 @@ function createUsageMetric(
 ): ExternalServiceUsage {
   const usagePercent = limit > 0 ? current / limit : 0;
 
-  let status: ExternalServiceUsage["status"] = "ok";
+  let status: ExternalServiceUsage['status'] = 'ok';
   if (usagePercent >= 1) {
-    status = "exceeded";
+    status = 'exceeded';
   } else if (usagePercent >= criticalThreshold) {
-    status = "critical";
+    status = 'critical';
   } else if (usagePercent >= warnThreshold) {
-    status = "warning";
+    status = 'warning';
   }
 
   // Log warnings/criticals
-  if (status === "critical" || status === "exceeded") {
-    logger.error("External service quota alert", {
+  if (status === 'critical' || status === 'exceeded') {
+    logger.error('External service quota alert', {
       service,
       metric,
       current,
@@ -357,8 +345,8 @@ function createUsageMetric(
       usagePercent: Math.round(usagePercent * 100),
       status,
     });
-  } else if (status === "warning") {
-    logger.warn("External service quota warning", {
+  } else if (status === 'warning') {
+    logger.warn('External service quota warning', {
       service,
       metric,
       current,

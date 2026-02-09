@@ -4,8 +4,14 @@ import asyncio
 from azure.identity import ClientSecretCredential, AzureCliCredential
 from .config import get_settings
 from .models import (
-    CostByService, DailyCost, CostSummary, CostForecast,
-    CostDrilldown, ServiceDrilldown, MeterDetail, ModelUsage
+    CostByService,
+    DailyCost,
+    CostSummary,
+    CostForecast,
+    CostDrilldown,
+    ServiceDrilldown,
+    MeterDetail,
+    ModelUsage,
 )
 
 
@@ -186,7 +192,9 @@ class AzureCostService:
         today = date.today()
         days_elapsed = today.day
         days_in_month = end_of_month.day
-        estimated_total = (current_cost / days_elapsed) * days_in_month if days_elapsed > 0 else 0
+        estimated_total = (
+            (current_cost / days_elapsed) * days_in_month if days_elapsed > 0 else 0
+        )
 
         forecast = CostForecast(
             subscription_id=self.subscription_id,
@@ -300,17 +308,24 @@ class AzureCostService:
         self._cache.set(cache_key, result)
         return result
 
-    def _parse_ai_models(self, ai_meters: list[tuple[str, str, float]]) -> list[ModelUsage]:
+    def _parse_ai_models(
+        self, ai_meters: list[tuple[str, str, float]]
+    ) -> list[ModelUsage]:
         """Parse AI meter names to identify specific models and usage types."""
         models = []
         total_ai = sum(m[2] for m in ai_meters)
         if total_ai == 0:
             return models
 
-        # Model name patterns
+        # Model name patterns (matched against Azure billing meter names)
+        # Order matters: more specific patterns first to avoid false positives
         model_mapping = {
-            "gpt rt aud": ("gpt-4o-realtime", "audio"),
-            "gpt rt txt": ("gpt-4o-realtime", "text"),
+            "gpt rt aud": ("gpt-realtime", "audio"),
+            "gpt rt txt": ("gpt-realtime", "text"),
+            "gpt-5.2": ("gpt-5.2", "text"),
+            "gpt-5-nano": ("gpt-5-nano", "text"),
+            "gpt-5-mini": ("gpt-5-mini", "text"),
+            "gpt-5": ("gpt-5", "text"),
             "gpt-4o-mini": ("gpt-4o-mini", "text"),
             "gpt-4o": ("gpt-4o", "text"),
             "gpt-35": ("gpt-3.5-turbo", "text"),
@@ -360,7 +375,10 @@ class AzureCostService:
         return models
 
     def _generate_insights(
-        self, services: list[ServiceDrilldown], ai_models: list[ModelUsage], total: float
+        self,
+        services: list[ServiceDrilldown],
+        ai_models: list[ModelUsage],
+        total: float,
     ) -> list[str]:
         """Generate actionable cost insights."""
         insights = []
@@ -383,7 +401,11 @@ class AzureCostService:
 
             # Voice vs text
             voice_cost = sum(m.cost for m in ai_models if "audio" in m.model_type)
-            text_cost = sum(m.cost for m in ai_models if "text" in m.model_type and "audio" not in m.model_type)
+            text_cost = sum(
+                m.cost
+                for m in ai_models
+                if "text" in m.model_type and "audio" not in m.model_type
+            )
 
             if voice_cost > 0:
                 voice_pct = (voice_cost / total_ai) * 100
@@ -392,16 +414,20 @@ class AzureCostService:
                 )
                 if voice_pct > 80:
                     insights.append(
-                        "Consider gpt-4o-realtime-mini for 80-90% voice cost savings"
+                        "Consider gpt-realtime-mini for 80-90% voice cost savings"
                     )
 
             if text_cost > 0:
                 text_pct = (text_cost / total_ai) * 100
-                insights.append(f"Text API: ${text_cost:.2f} ({text_pct:.0f}% of AI costs)")
+                insights.append(
+                    f"Text API: ${text_cost:.2f} ({text_pct:.0f}% of AI costs)"
+                )
 
             # Cache effectiveness
             cached_cost = sum(m.cost for m in ai_models if "cached" in m.model_type)
             if cached_cost > 0:
-                insights.append(f"Prompt caching active: ${cached_cost:.2f} in cached requests")
+                insights.append(
+                    f"Prompt caching active: ${cached_cost:.2f} in cached requests"
+                )
 
         return insights

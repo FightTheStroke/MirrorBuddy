@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/toast";
-import { Save, X } from "lucide-react";
-import { csrfFetch } from "@/lib/auth";
-import { clientLogger } from "@/lib/logger/client";
-import { BasicInfoSection } from "./basic-info-section";
-import { LimitsSection } from "./limits-section";
-import { FeaturesSection } from "./features-section";
-import { ToolsSection } from "./tools-section";
-import { MaestriSection } from "./maestri-section";
-import { CoachesSection } from "./coaches-section";
-import { BuddiesSection } from "./buddies-section";
-import { ModelsSection } from "./models-section";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/components/ui/toast';
+import { Save, X } from 'lucide-react';
+import { csrfFetch } from '@/lib/auth';
+import { clientLogger } from '@/lib/logger/client';
+import { BasicInfoSection } from './basic-info-section';
+import { LimitsSection } from './limits-section';
+import { FeaturesSection } from './features-section';
+import { ToolsSection } from './tools-section';
+import { MaestriSection } from './maestri-section';
+import { CoachesSection } from './coaches-section';
+import { BuddiesSection } from './buddies-section';
+import { ModelsSection } from './models-section';
 
 interface TierFormData {
   id?: string;
@@ -57,12 +57,12 @@ interface TierFormProps {
 
 export function TierForm({ tier }: TierFormProps) {
   const router = useRouter();
-  const t = useTranslations("admin.tiers.form");
+  const t = useTranslations('admin.tiers.form');
   const isEditing = !!tier?.id;
 
   const [formData, setFormData] = useState<TierFormData>({
-    code: tier?.code || "",
-    name: tier?.name || "",
+    code: tier?.code || '',
+    name: tier?.name || '',
     description: tier?.description || null,
     monthlyPriceEur: tier?.monthlyPriceEur || null,
     sortOrder: tier?.sortOrder || 0,
@@ -73,18 +73,18 @@ export function TierForm({ tier }: TierFormProps) {
     docsLimitTotal: tier?.docsLimitTotal || 1,
     videoVisionSecondsPerSession: tier?.videoVisionSecondsPerSession || 0,
     videoVisionMinutesMonthly: tier?.videoVisionMinutesMonthly || 0,
-    chatModel: tier?.chatModel || "gpt-4o-mini",
-    realtimeModel: tier?.realtimeModel || "gpt-realtime-mini",
-    pdfModel: tier?.pdfModel || "gpt-4o-mini",
-    mindmapModel: tier?.mindmapModel || "gpt-4o-mini",
-    quizModel: tier?.quizModel || "gpt-4o-mini",
-    flashcardsModel: tier?.flashcardsModel || "gpt-4o-mini",
-    summaryModel: tier?.summaryModel || "gpt-4o-mini",
-    formulaModel: tier?.formulaModel || "gpt-4o-mini",
-    chartModel: tier?.chartModel || "gpt-4o-mini",
-    homeworkModel: tier?.homeworkModel || "gpt-4o-mini",
-    webcamModel: tier?.webcamModel || "gpt-4o-mini",
-    demoModel: tier?.demoModel || "gpt-4o-mini",
+    chatModel: tier?.chatModel || 'gpt-5-mini',
+    realtimeModel: tier?.realtimeModel || 'gpt-realtime-mini',
+    pdfModel: tier?.pdfModel || 'gpt-5-mini',
+    mindmapModel: tier?.mindmapModel || 'gpt-5-mini',
+    quizModel: tier?.quizModel || 'gpt-5-mini',
+    flashcardsModel: tier?.flashcardsModel || 'gpt-5-mini',
+    summaryModel: tier?.summaryModel || 'gpt-5-mini',
+    formulaModel: tier?.formulaModel || 'gpt-5-mini',
+    chartModel: tier?.chartModel || 'gpt-5-mini',
+    homeworkModel: tier?.homeworkModel || 'gpt-5-mini',
+    webcamModel: tier?.webcamModel || 'gpt-5-mini',
+    demoModel: tier?.demoModel || 'gpt-5-mini',
     features: tier?.features || {},
     availableMaestri: tier?.availableMaestri || [],
     availableCoaches: tier?.availableCoaches || [],
@@ -99,17 +99,15 @@ export function TierForm({ tier }: TierFormProps) {
     e.preventDefault();
 
     if (!formData.code || !formData.name) {
-      toast.error(t("error"), t("requiredFields"));
+      toast.error(t('error'), t('requiredFields'));
       return;
     }
 
     setIsSaving(true);
 
     try {
-      const url = isEditing
-        ? `/api/admin/tiers/${tier.id}`
-        : "/api/admin/tiers";
-      const method = isEditing ? "PUT" : "POST";
+      const url = isEditing ? `/api/admin/tiers/${tier.id}` : '/api/admin/tiers';
+      const method = isEditing ? 'PUT' : 'POST';
 
       const response = await csrfFetch(url, {
         method,
@@ -118,29 +116,23 @@ export function TierForm({ tier }: TierFormProps) {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || t("saveFailed"));
+        throw new Error(error.error || t('saveFailed'));
       }
 
-      toast.success(
-        t("success"),
-        isEditing ? t("successUpdate") : t("successCreate"),
-      );
+      toast.success(t('success'), isEditing ? t('successUpdate') : t('successCreate'));
 
-      router.push("/admin/tiers");
+      router.push('/admin/tiers');
       router.refresh();
     } catch (error) {
-      clientLogger.error("Error saving tier", { component: "TierForm" }, error);
-      toast.error(
-        t("error"),
-        error instanceof Error ? error.message : t("saveFailed"),
-      );
+      clientLogger.error('Error saving tier', { component: 'TierForm' }, error);
+      toast.error(t('error'), error instanceof Error ? error.message : t('saveFailed'));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
-    router.push("/admin/tiers");
+    router.push('/admin/tiers');
   };
 
   const updateFormData = (data: Partial<TierFormData>) => {
@@ -229,18 +221,13 @@ export function TierForm({ tier }: TierFormProps) {
 
       {/* Form Actions */}
       <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={handleCancel}
-          disabled={isSaving}
-        >
+        <Button type="button" variant="ghost" onClick={handleCancel} disabled={isSaving}>
           <X className="w-4 h-4 mr-2" />
-          {t("cancel")}
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={isSaving}>
           <Save className="w-4 h-4 mr-2" />
-          {isSaving ? t("saving") : isEditing ? t("update") : t("create")}
+          {isSaving ? t('saving') : isEditing ? t('update') : t('create')}
         </Button>
       </div>
     </form>

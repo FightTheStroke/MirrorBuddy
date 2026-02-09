@@ -6,15 +6,11 @@
  * @module learning-path/__tests__/final-quiz-generator.test
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  generateFinalQuiz,
-  evaluateQuizResults,
-  type TopicSummary,
-} from "../final-quiz-generator";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { generateFinalQuiz, evaluateQuizResults, type TopicSummary } from '../final-quiz-generator';
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -30,8 +26,8 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock AI provider
-vi.mock("@/lib/ai/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+vi.mock('@/lib/ai/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/ai/server')>();
   return {
     ...actual,
     chatCompletion: vi.fn(),
@@ -39,13 +35,13 @@ vi.mock("@/lib/ai/server", async (importOriginal) => {
 });
 
 // Mock tier service (ADR 0073)
-vi.mock("@/lib/tier/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+vi.mock('@/lib/tier/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tier/server')>();
   return {
     ...actual,
     tierService: {
       getFeatureAIConfigForUser: vi.fn(() =>
-        Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 2000 }),
+        Promise.resolve({ model: 'gpt-5-mini', temperature: 0.7, maxTokens: 2000 }),
       ),
     },
   };
@@ -53,26 +49,26 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
 
 // Mock deployment mapping
 
-import { chatCompletion } from "@/lib/ai/server";
+import { chatCompletion } from '@/lib/ai/server';
 
 const mockChatCompletion = vi.mocked(chatCompletion);
 
-describe("final-quiz-generator", () => {
+describe('final-quiz-generator', () => {
   const mockTopics: TopicSummary[] = [
     {
-      title: "Le Origini di Roma",
-      keyConcepts: ["Romolo", "Remo", "Fondazione"],
-      difficulty: "basic",
+      title: 'Le Origini di Roma',
+      keyConcepts: ['Romolo', 'Remo', 'Fondazione'],
+      difficulty: 'basic',
     },
     {
-      title: "La Repubblica",
-      keyConcepts: ["Senato", "Consoli", "Patrizi"],
-      difficulty: "intermediate",
+      title: 'La Repubblica',
+      keyConcepts: ['Senato', 'Consoli', 'Patrizi'],
+      difficulty: 'intermediate',
     },
     {
       title: "L'Impero",
-      keyConcepts: ["Augusto", "Pax Romana", "Espansione"],
-      difficulty: "advanced",
+      keyConcepts: ['Augusto', 'Pax Romana', 'Espansione'],
+      difficulty: 'advanced',
     },
   ];
 
@@ -83,68 +79,68 @@ describe("final-quiz-generator", () => {
   // ============================================================================
   // generateFinalQuiz - [F-13]
   // ============================================================================
-  describe("generateFinalQuiz", () => {
-    it("should generate quiz covering all topics [F-13]", async () => {
+  describe('generateFinalQuiz', () => {
+    it('should generate quiz covering all topics [F-13]', async () => {
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          topic: "Storia Romana",
+          topic: 'Storia Romana',
           questions: [
             {
-              question: "Chi fondò Roma?",
-              options: ["Romolo", "Cesare", "Augusto", "Nerone"],
+              question: 'Chi fondò Roma?',
+              options: ['Romolo', 'Cesare', 'Augusto', 'Nerone'],
               correctIndex: 0,
-              explanation: "Romolo fondò Roma nel 753 a.C.",
+              explanation: 'Romolo fondò Roma nel 753 a.C.',
             },
             {
-              question: "Chi erano i Patrizi?",
-              options: ["Schiavi", "Nobili", "Mercanti", "Soldati"],
+              question: 'Chi erano i Patrizi?',
+              options: ['Schiavi', 'Nobili', 'Mercanti', 'Soldati'],
               correctIndex: 1,
-              explanation: "I Patrizi erano la classe nobiliare romana.",
+              explanation: 'I Patrizi erano la classe nobiliare romana.',
             },
           ],
         }),
-        provider: "azure" as const,
-        model: "gpt-4o",
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
-      const result = await generateFinalQuiz("Storia Romana", mockTopics, {
+      const result = await generateFinalQuiz('Storia Romana', mockTopics, {
         totalQuestions: 10,
       });
 
       expect(mockChatCompletion).toHaveBeenCalled();
-      expect(result.topic).toBe("Storia Romana");
+      expect(result.topic).toBe('Storia Romana');
       expect(result.questions).toHaveLength(2);
       expect(result.questions[0].options).toHaveLength(4);
     });
 
-    it("should return empty quiz for no topics [F-13]", async () => {
-      const result = await generateFinalQuiz("Empty Path", []);
+    it('should return empty quiz for no topics [F-13]', async () => {
+      const result = await generateFinalQuiz('Empty Path', []);
 
       expect(mockChatCompletion).not.toHaveBeenCalled();
       expect(result.questions).toHaveLength(0);
     });
 
-    it("should throw on invalid JSON response [F-13]", async () => {
+    it('should throw on invalid JSON response [F-13]', async () => {
       mockChatCompletion.mockResolvedValue({
-        content: "Not valid JSON",
-        provider: "azure" as const,
-        model: "gpt-4o",
+        content: 'Not valid JSON',
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
-      await expect(generateFinalQuiz("Test", mockTopics)).rejects.toThrow(
-        "Failed to parse final quiz JSON",
+      await expect(generateFinalQuiz('Test', mockTopics)).rejects.toThrow(
+        'Failed to parse final quiz JSON',
       );
     });
 
-    it("should handle JSON with markdown fences [F-13]", async () => {
+    it('should handle JSON with markdown fences [F-13]', async () => {
       mockChatCompletion.mockResolvedValue({
         content:
           '```json\n{"topic": "Test", "questions": [{"question": "Q?", "options": ["A","B","C","D"], "correctIndex": 0}]}\n```',
-        provider: "azure" as const,
-        model: "gpt-4o",
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
-      const result = await generateFinalQuiz("Test", mockTopics);
+      const result = await generateFinalQuiz('Test', mockTopics);
 
       expect(result.questions).toHaveLength(1);
     });
@@ -153,19 +149,19 @@ describe("final-quiz-generator", () => {
   // ============================================================================
   // evaluateQuizResults - [F-13]
   // ============================================================================
-  describe("evaluateQuizResults", () => {
+  describe('evaluateQuizResults', () => {
     const mockQuiz = {
-      topic: "Test Quiz",
+      topic: 'Test Quiz',
       questions: [
-        { question: "Q1?", options: ["A", "B", "C", "D"], correctIndex: 0 },
-        { question: "Q2?", options: ["A", "B", "C", "D"], correctIndex: 1 },
-        { question: "Q3?", options: ["A", "B", "C", "D"], correctIndex: 2 },
-        { question: "Q4?", options: ["A", "B", "C", "D"], correctIndex: 3 },
-        { question: "Q5?", options: ["A", "B", "C", "D"], correctIndex: 0 },
+        { question: 'Q1?', options: ['A', 'B', 'C', 'D'], correctIndex: 0 },
+        { question: 'Q2?', options: ['A', 'B', 'C', 'D'], correctIndex: 1 },
+        { question: 'Q3?', options: ['A', 'B', 'C', 'D'], correctIndex: 2 },
+        { question: 'Q4?', options: ['A', 'B', 'C', 'D'], correctIndex: 3 },
+        { question: 'Q5?', options: ['A', 'B', 'C', 'D'], correctIndex: 0 },
       ],
     };
 
-    it("should calculate 100% score for all correct [F-13]", () => {
+    it('should calculate 100% score for all correct [F-13]', () => {
       const answers = [0, 1, 2, 3, 0];
       const result = evaluateQuizResults(mockQuiz, answers);
 
@@ -175,7 +171,7 @@ describe("final-quiz-generator", () => {
       expect(result.totalCount).toBe(5);
     });
 
-    it("should calculate 0% score for all wrong [F-13]", () => {
+    it('should calculate 0% score for all wrong [F-13]', () => {
       const answers = [1, 2, 3, 0, 1];
       const result = evaluateQuizResults(mockQuiz, answers);
 
@@ -184,7 +180,7 @@ describe("final-quiz-generator", () => {
       expect(result.correctCount).toBe(0);
     });
 
-    it("should pass with 70% or higher [F-13]", () => {
+    it('should pass with 70% or higher [F-13]', () => {
       // 4 out of 5 = 80%
       const answers = [0, 1, 2, 3, 1]; // Last one wrong
       const result = evaluateQuizResults(mockQuiz, answers);
@@ -193,7 +189,7 @@ describe("final-quiz-generator", () => {
       expect(result.passed).toBe(true);
     });
 
-    it("should fail with less than 70% [F-13]", () => {
+    it('should fail with less than 70% [F-13]', () => {
       // 3 out of 5 = 60%
       const answers = [0, 1, 2, 0, 1]; // Two wrong
       const result = evaluateQuizResults(mockQuiz, answers);
@@ -202,8 +198,8 @@ describe("final-quiz-generator", () => {
       expect(result.passed).toBe(false);
     });
 
-    it("should handle empty quiz [F-13]", () => {
-      const emptyQuiz = { topic: "Empty", questions: [] };
+    it('should handle empty quiz [F-13]', () => {
+      const emptyQuiz = { topic: 'Empty', questions: [] };
       const result = evaluateQuizResults(emptyQuiz, []);
 
       expect(result.score).toBe(100);

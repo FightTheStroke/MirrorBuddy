@@ -67,7 +67,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT  # e.g., text-embedding-ada-002
 ```
 AZURE_OPENAI_REALTIME_ENDPOINT     # Same as ENDPOINT or dedicated
 AZURE_OPENAI_REALTIME_API_KEY      # [SENSITIVE] Can be same as API_KEY
-AZURE_OPENAI_REALTIME_DEPLOYMENT   # e.g., gpt-4o-realtime
+AZURE_OPENAI_REALTIME_DEPLOYMENT   # e.g., gpt-realtime
 AZURE_OPENAI_TTS_DEPLOYMENT        # e.g., tts-deployment
 ```
 

@@ -460,14 +460,18 @@
       "confirmRemove": "Sei sicuro di voler rimuovere questo utente dalla protezione?"
     },
     "sentry": {
-      "noUnresolvedErrors": "No Unresolved Errors",
-      "notConfigured": "Not Configured",
-      "unresolved": "Unresolved",
+      "noUnresolvedErrors": "Nessun errore non risolto",
+      "notConfigured": "Non configurato",
+      "unresolved": "non risolti",
       "title": "Errori Sentry",
       "noErrors": "Nessun errore recente",
       "loading": "Caricamento...",
       "error": "Errore nel caricamento",
-      "refresh": "Aggiorna"
+      "refresh": "Aggiorna",
+      "events": "eventi",
+      "users": "utenti",
+      "lastSeen": "Ultimo",
+      "unhandled": "Non gestito"
     },
     "invite": {
       "title": "Invito Diretto",

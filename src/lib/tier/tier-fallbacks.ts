@@ -5,8 +5,13 @@
  * Used by TierService as a graceful degradation strategy.
  */
 
-import type { TierDefinition } from "./types";
-import { TierCode } from "./types";
+import type { TierDefinition } from './types';
+import { TierCode } from './types';
+
+// Model defaults from env vars (change in .env to migrate without code changes)
+const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
+const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || 'gpt-5.2-edu';
+const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
 
 /**
  * Create inline fallback tier when database is unavailable
@@ -19,29 +24,29 @@ export function createFallbackTier(code: TierCode): TierDefinition {
 
   if (code === TierCode.TRIAL) {
     return {
-      id: "fallback-trial",
-      code: "trial",
-      name: "Trial",
-      description: "Trial tier for anonymous users",
+      id: 'fallback-trial',
+      code: 'trial',
+      name: 'Trial',
+      description: 'Trial tier for anonymous users',
       chatLimitDaily: 10,
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
-      // Per-feature models (ADR 0073) - cost-effective for trial
-      chatModel: "gpt-4o-mini",
-      realtimeModel: "gpt-realtime-mini",
-      pdfModel: "gpt-4o-mini",
-      mindmapModel: "gpt-4o-mini",
-      quizModel: "gpt-4o-mini",
-      flashcardsModel: "gpt-4o-mini",
-      summaryModel: "gpt-4o-mini",
-      formulaModel: "gpt-4o-mini",
-      chartModel: "gpt-4o-mini",
-      homeworkModel: "gpt-4o-mini",
-      webcamModel: "gpt-4o-mini",
-      demoModel: "gpt-4o-mini",
+      // Per-feature models (ADR 0073) - env-driven defaults
+      chatModel: CHAT_MODEL,
+      realtimeModel: 'gpt-realtime-mini',
+      pdfModel: CHAT_MODEL,
+      mindmapModel: CHAT_MODEL,
+      quizModel: CHAT_MODEL,
+      flashcardsModel: CHAT_MODEL,
+      summaryModel: CHAT_MODEL,
+      formulaModel: CHAT_MODEL,
+      chartModel: CHAT_MODEL,
+      homeworkModel: CHAT_MODEL,
+      webcamModel: CHAT_MODEL,
+      demoModel: DEMO_MODEL,
       featureConfigs: null, // No overrides, use DEFAULT_FEATURE_CONFIGS
       features: {
         chat: true,
@@ -49,7 +54,7 @@ export function createFallbackTier(code: TierCode): TierDefinition {
         flashcards: true,
         quizzes: false,
         mindMaps: false,
-        tools: ["pdf", "webcam"],
+        tools: ['pdf', 'webcam'],
         maestriLimit: 3,
         coachesAvailable: [],
         buddiesAvailable: [],
@@ -57,7 +62,7 @@ export function createFallbackTier(code: TierCode): TierDefinition {
       availableMaestri: [],
       availableCoaches: [],
       availableBuddies: [],
-      availableTools: ["pdf", "webcam"],
+      availableTools: ['pdf', 'webcam'],
       stripePriceId: null,
       monthlyPriceEur: null,
       sortOrder: 0,
@@ -69,29 +74,29 @@ export function createFallbackTier(code: TierCode): TierDefinition {
 
   // Base tier fallback
   return {
-    id: "fallback-base",
-    code: "base",
-    name: "Base",
-    description: "Base tier for registered users",
+    id: 'fallback-base',
+    code: 'base',
+    name: 'Base',
+    description: 'Base tier for registered users',
     chatLimitDaily: 30,
     voiceMinutesDaily: 15,
     toolsLimitDaily: 30,
     docsLimitTotal: 5,
     videoVisionSecondsPerSession: 0,
     videoVisionMinutesMonthly: 0,
-    // Per-feature models (ADR 0073) - education-optimized for registered users
-    chatModel: "gpt-5.2-edu",
-    realtimeModel: "gpt-realtime",
-    pdfModel: "gpt-5-mini",
-    mindmapModel: "gpt-5-mini",
-    quizModel: "gpt-5.2-edu",
-    flashcardsModel: "gpt-5-mini",
-    summaryModel: "gpt-5-mini",
-    formulaModel: "gpt-5.2-edu",
-    chartModel: "gpt-5-mini",
-    homeworkModel: "gpt-5.2-edu",
-    webcamModel: "gpt-5.2-edu",
-    demoModel: "gpt-4o-mini",
+    // Per-feature models (ADR 0073) - env-driven defaults
+    chatModel: CHAT_MODEL_EDU,
+    realtimeModel: 'gpt-realtime',
+    pdfModel: CHAT_MODEL,
+    mindmapModel: CHAT_MODEL,
+    quizModel: CHAT_MODEL_EDU,
+    flashcardsModel: CHAT_MODEL,
+    summaryModel: CHAT_MODEL,
+    formulaModel: CHAT_MODEL_EDU,
+    chartModel: CHAT_MODEL,
+    homeworkModel: CHAT_MODEL_EDU,
+    webcamModel: CHAT_MODEL_EDU,
+    demoModel: DEMO_MODEL,
     featureConfigs: null, // No overrides, use DEFAULT_FEATURE_CONFIGS
     features: {
       chat: true,
@@ -99,7 +104,7 @@ export function createFallbackTier(code: TierCode): TierDefinition {
       flashcards: true,
       quizzes: true,
       mindMaps: true,
-      tools: ["pdf", "webcam", "homework", "formula"],
+      tools: ['pdf', 'webcam', 'homework', 'formula'],
       maestriLimit: 10,
       coachesAvailable: [],
       buddiesAvailable: [],

@@ -89,7 +89,7 @@ ANNUAL PROJECTION:
 **Usage-Based Pricing (as of 21 Jan 2026)**:
 
 ```
-MODEL: gpt-4o
+MODEL: gpt-5-mini
 - Input:  €0.003 per 1K tokens
 - Output: €0.006 per 1K tokens
 

@@ -3,10 +3,10 @@
 // Fallback extraction using AI when regex-based extraction has low confidence
 // ============================================================================
 
-import { logger } from "@/lib/logger";
-import { chatCompletion } from "@/lib/ai/server";
-import type { ToolParameterSchema } from "./tool-parameter-schemas";
-import type { ExtractedParameters } from "./voice-parameter-extractor";
+import { logger } from '@/lib/logger';
+import { chatCompletion } from '@/lib/ai/server';
+import type { ToolParameterSchema } from './tool-parameter-schemas';
+import type { ExtractedParameters } from './voice-parameter-extractor';
 
 /**
  * Extract tool parameters using AI when regex extraction fails
@@ -38,7 +38,7 @@ export async function extractParametersWithAI(
   schema: ToolParameterSchema,
 ): Promise<ExtractedParameters> {
   try {
-    logger.debug("[AI Extractor] Starting AI-based parameter extraction", {
+    logger.debug('[AI Extractor] Starting AI-based parameter extraction', {
       toolName,
       transcript: transcript.substring(0, 100),
     });
@@ -50,7 +50,7 @@ export async function extractParametersWithAI(
     const response = await chatCompletion(
       [
         {
-          role: "user",
+          role: 'user',
           content: transcript,
         },
       ],
@@ -58,7 +58,7 @@ export async function extractParametersWithAI(
       {
         temperature: 0.1, // Low temperature for consistent structured output
         maxTokens: 500,
-        model: "gpt-4o-mini", // Fast, cost-effective model for extraction
+        model: process.env.DEFAULT_EXTRACTOR_MODEL || 'gpt-5-nano',
       },
     );
 
@@ -67,7 +67,7 @@ export async function extractParametersWithAI(
     try {
       extractedParams = JSON.parse(response.content.trim());
     } catch (parseError) {
-      logger.warn("[AI Extractor] Failed to parse AI response as JSON", {
+      logger.warn('[AI Extractor] Failed to parse AI response as JSON', {
         toolName,
         response: response.content,
         error: parseError,
@@ -76,14 +76,14 @@ export async function extractParametersWithAI(
         toolName,
         parameters: {},
         confidence: 0.3,
-        error: "AI response was not valid JSON",
+        error: 'AI response was not valid JSON',
       };
     }
 
     // Calculate confidence based on parameters extracted
     const confidence = calculateAIConfidence(extractedParams, schema);
 
-    logger.info("[AI Extractor] Successfully extracted parameters", {
+    logger.info('[AI Extractor] Successfully extracted parameters', {
       toolName,
       parametersCount: Object.keys(extractedParams).length,
       confidence,
@@ -95,7 +95,7 @@ export async function extractParametersWithAI(
       confidence,
     };
   } catch (error) {
-    logger.error("[AI Extractor] AI extraction failed", {
+    logger.error('[AI Extractor] AI extraction failed', {
       toolName,
       transcript,
       error: error instanceof Error ? error.message : String(error),
@@ -119,25 +119,18 @@ export async function extractParametersWithAI(
  * 2. Use the schema's extraction hints
  * 3. Return only valid JSON (no markdown, no explanation)
  */
-function buildExtractionPrompt(
-  toolName: string,
-  schema: ToolParameterSchema,
-): string {
+function buildExtractionPrompt(toolName: string, schema: ToolParameterSchema): string {
   // Build parameter list with types and descriptions
   const parameterDescriptions = schema.parameters
     .map((param) => {
-      const required = param.required ? "(required)" : "(optional)";
-      const enumInfo = param.enumValues
-        ? ` - valid values: ${param.enumValues.join(", ")}`
-        : "";
+      const required = param.required ? '(required)' : '(optional)';
+      const enumInfo = param.enumValues ? ` - valid values: ${param.enumValues.join(', ')}` : '';
       const defaultInfo =
-        param.defaultValue !== undefined
-          ? ` - default: ${param.defaultValue}`
-          : "";
+        param.defaultValue !== undefined ? ` - default: ${param.defaultValue}` : '';
 
       return `- ${param.name} (${param.type}) ${required}: ${param.description}${enumInfo}${defaultInfo}`;
     })
-    .join("\n");
+    .join('\n');
 
   return `You are a parameter extraction assistant for the MirrorBuddy educational platform.
 
@@ -188,19 +181,13 @@ function calculateAIConfidence(
   let extractedOptional = 0;
 
   for (const param of requiredParams) {
-    if (
-      extractedParams[param.name] !== undefined &&
-      extractedParams[param.name] !== null
-    ) {
+    if (extractedParams[param.name] !== undefined && extractedParams[param.name] !== null) {
       extractedRequired++;
     }
   }
 
   for (const param of optionalParams) {
-    if (
-      extractedParams[param.name] !== undefined &&
-      extractedParams[param.name] !== null
-    ) {
+    if (extractedParams[param.name] !== undefined && extractedParams[param.name] !== null) {
       extractedOptional++;
     }
   }

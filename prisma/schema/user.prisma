@@ -151,7 +151,7 @@ model Settings {
 
   // AI Provider
   provider               String @default("azure")
-  model                  String @default("gpt-4o")
+  model                  String @default("gpt-5-mini")
   budgetLimit            Float  @default(50.0)
   totalSpent             Float  @default(0.0)
   adaptiveDifficultyMode String @default("balanced")

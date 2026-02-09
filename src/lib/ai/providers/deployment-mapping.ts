@@ -9,7 +9,7 @@
  * Use `az cognitiveservices account deployment list` to verify.
  */
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 /**
  * Mapping from tier model names to Azure deployment names
@@ -18,27 +18,21 @@ import { logger } from "@/lib/logger";
  * Values: Actual Azure deployment names from env vars or direct names
  */
 const DEPLOYMENT_MAP: Record<string, string | undefined> = {
-  // GPT-4 family (legacy, still supported)
-  "gpt-4o": process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || "gpt-4o",
-  "gpt-4o-mini":
-    process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "gpt4o-mini-deployment",
-  "gpt-4-turbo":
-    process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || "gpt-4-turbo",
+  // GPT-4 family (legacy — retiring 2026-03-31, kept for backward compatibility)
+  'gpt-4o': process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || 'gpt-4o',
+  'gpt-4o-mini': process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || 'gpt4o-mini-deployment',
+  'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || 'gpt-4-turbo',
 
   // GPT-5 family (new models)
-  "gpt-5-nano": process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || "gpt-5-nano",
-  "gpt-5-mini":
-    process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || "gpt-5-edu-mini",
-  "gpt-5-chat": process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || "gpt-5-chat",
-  "gpt-5.2-chat":
-    process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || "gpt-5.2-chat",
-  "gpt-5.2-edu": process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || "gpt-5.2-edu",
+  'gpt-5-nano': process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || 'gpt-5-nano',
+  'gpt-5-mini': process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || 'gpt-5-edu-mini',
+  'gpt-5-chat': process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || 'gpt-5-chat',
+  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || 'gpt-5-chat',
+  'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || 'gpt-5.2-edu',
 
   // Realtime models (voice)
-  "gpt-realtime":
-    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || "gpt-4o-realtime",
-  "gpt-realtime-mini":
-    process.env.AZURE_OPENAI_REALTIME_MINI_DEPLOYMENT || "gpt-realtime-mini",
+  'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-4o-realtime',
+  'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_MINI_DEPLOYMENT || 'gpt-realtime-mini',
 };
 
 /**
@@ -51,7 +45,7 @@ export function getDeploymentForModel(tierModel: string): string {
   const deployment = DEPLOYMENT_MAP[tierModel];
 
   if (deployment) {
-    logger.debug("Model mapped to deployment", {
+    logger.debug('Model mapped to deployment', {
       tierModel,
       deployment,
     });
@@ -59,7 +53,7 @@ export function getDeploymentForModel(tierModel: string): string {
   }
 
   // If no mapping, assume the tier model name IS the deployment name
-  logger.debug("No mapping for model, using as-is", { tierModel });
+  logger.debug('No mapping for model, using as-is', { tierModel });
   return tierModel;
 }
 

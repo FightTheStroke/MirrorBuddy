@@ -11,8 +11,8 @@ import type {
   TierLimits,
   FeatureAIConfig,
   TierFeatureConfigs,
-} from "./types";
-import { DEFAULT_FEATURE_CONFIGS, type FeatureType } from "./types";
+} from './types';
+import { DEFAULT_FEATURE_CONFIGS, type FeatureType } from './types';
 
 /**
  * Validate subscription status and dates
@@ -26,7 +26,7 @@ export function isSubscriptionValid(subscription: UserSubscription): boolean {
   const now = new Date();
 
   // Check status
-  const validStatuses = ["ACTIVE", "TRIAL"];
+  const validStatuses = ['ACTIVE', 'TRIAL'];
   if (!validStatuses.includes(subscription.status)) {
     return false;
   }
@@ -63,16 +63,13 @@ export function extractTierLimits(tier: TierDefinition): TierLimits {
  * Get AI model from tier based on type (legacy)
  * @deprecated Use getModelForFeature for per-feature selection
  */
-export function getModelFromTier(
-  tier: TierDefinition,
-  type: "chat" | "vision" | "tts",
-): string {
-  if (type === "tts") {
+export function getModelFromTier(tier: TierDefinition, type: 'chat' | 'vision' | 'tts'): string {
+  if (type === 'tts') {
     return tier.realtimeModel;
   }
 
   // For chat and vision, use chatModel
-  // Vision capabilities are included in chat models (gpt-4o, gpt-4o-mini)
+  // Vision capabilities are included in chat models (gpt-5-mini, gpt-5.2-edu, gpt-5.2-chat)
   return tier.chatModel;
 }
 
@@ -80,18 +77,18 @@ export function getModelFromTier(
  * Feature type for per-feature model selection (ADR 0073)
  */
 export type FeatureModelType =
-  | "chat"
-  | "realtime"
-  | "pdf"
-  | "mindmap"
-  | "quiz"
-  | "flashcards"
-  | "summary"
-  | "formula"
-  | "chart"
-  | "homework"
-  | "webcam"
-  | "demo";
+  | 'chat'
+  | 'realtime'
+  | 'pdf'
+  | 'mindmap'
+  | 'quiz'
+  | 'flashcards'
+  | 'summary'
+  | 'formula'
+  | 'chart'
+  | 'homework'
+  | 'webcam'
+  | 'demo';
 
 /**
  * Get AI model for a specific feature (ADR 0073)
@@ -100,10 +97,7 @@ export type FeatureModelType =
  * @param feature - Feature type (chat, mindmap, quiz, etc.)
  * @returns Model name for the feature
  */
-export function getModelForFeature(
-  tier: TierDefinition,
-  feature: FeatureModelType,
-): string {
+export function getModelForFeature(tier: TierDefinition, feature: FeatureModelType): string {
   const modelMap: Record<FeatureModelType, string> = {
     chat: tier.chatModel,
     realtime: tier.realtimeModel,
@@ -134,10 +128,7 @@ export function getModelForFeature(
  * @param feature - Feature type
  * @returns Complete FeatureAIConfig with model, temperature, maxTokens
  */
-export function getFeatureAIConfig(
-  tier: TierDefinition,
-  feature: FeatureType,
-): FeatureAIConfig {
+export function getFeatureAIConfig(tier: TierDefinition, feature: FeatureType): FeatureAIConfig {
   // Get base model from tier's per-feature model columns
   const model = getModelForFeature(tier, feature as FeatureModelType);
 
@@ -145,9 +136,7 @@ export function getFeatureAIConfig(
   const defaults = DEFAULT_FEATURE_CONFIGS[feature];
 
   // Check for tier-specific overrides in featureConfigs JSON
-  const overrides = (tier.featureConfigs as TierFeatureConfigs | null)?.[
-    feature
-  ];
+  const overrides = (tier.featureConfigs as TierFeatureConfigs | null)?.[feature];
 
   return {
     model: overrides?.model ?? model,

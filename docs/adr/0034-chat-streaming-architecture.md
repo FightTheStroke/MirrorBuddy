@@ -1,14 +1,17 @@
 # ADR 0034: Chat Streaming Architecture
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-01-11
 
 ## Context
 
 MirrorBuddy's chat with Maestri (AI tutors) previously used a non-streaming approach:
+
 1. User sends message
 2. Full request sent to Azure OpenAI
 3. Wait 3-8 seconds for complete response
@@ -16,17 +19,18 @@ MirrorBuddy's chat with Maestri (AI tutors) previously used a non-streaming appr
 
 This created UX problems:
 
-| Issue | Impact |
-|-------|--------|
-| Long wait times | Students unsure if app is working |
+| Issue                | Impact                                |
+| -------------------- | ------------------------------------- |
+| Long wait times      | Students unsure if app is working     |
 | No progress feedback | Anxiety, especially for ADHD students |
-| Perceived slowness | Even fast responses feel slow |
-| All-or-nothing | No benefit during generation |
+| Perceived slowness   | Even fast responses feel slow         |
+| All-or-nothing       | No benefit during generation          |
 
 ### Verification
 
 Azure OpenAI deployment verified to support streaming:
-- Model: `gpt-4o-mini`
+
+- Model: `gpt-5-mini`
 - Capability: `chatCompletion: true`
 - API version: `2024-08-01-preview`
 - Endpoint supports `stream: true` parameter
@@ -34,29 +38,35 @@ Azure OpenAI deployment verified to support streaming:
 ### Options Considered
 
 #### Option 1: Vercel AI SDK
+
 Use Vercel's AI SDK for streaming abstraction.
 
 **Pros:**
+
 - Mature library with React hooks
 - Handles SSE parsing automatically
 - Good TypeScript support
 
 **Cons:**
+
 - Additional dependency
 - Abstracts away control
 - May conflict with existing patterns
 - Not needed for our simple use case
 
 #### Option 2: Native SSE (Chosen)
+
 Implement streaming using native fetch and ReadableStream.
 
 **Pros:**
+
 - No new dependencies
 - Full control over implementation
 - Consistent with existing tool streaming (ADR 0005)
 - Simpler debugging
 
 **Cons:**
+
 - More code to maintain
 - Need to handle edge cases manually
 
@@ -143,13 +153,13 @@ GET /api/chat/stream → { streaming: true }
 
 ### Chunk Types
 
-| Type | Payload | Purpose |
-|------|---------|---------|
-| `content` | `{ content: string }` | Text delta |
-| `usage` | `{ usage: TokenUsage }` | Token counts |
-| `error` | `{ error: string }` | Error occurred |
-| `filtered` | `{ filtered: true }` | Content blocked |
-| `[DONE]` | (none) | Stream complete |
+| Type       | Payload                 | Purpose         |
+| ---------- | ----------------------- | --------------- |
+| `content`  | `{ content: string }`   | Text delta      |
+| `usage`    | `{ usage: TokenUsage }` | Token counts    |
+| `error`    | `{ error: string }`     | Error occurred  |
+| `filtered` | `{ filtered: true }`    | Content blocked |
+| `[DONE]`   | (none)                  | Stream complete |
 
 ### Client Implementation
 
@@ -163,11 +173,8 @@ if (streamingEnabled) {
     characterId,
     onChunk: (chunk, accumulated) => {
       // Update message in place
-      setMessages(prev =>
-        prev.map(m => m.id === streamingMsgId
-          ? { ...m, content: accumulated }
-          : m
-        )
+      setMessages((prev) =>
+        prev.map((m) => (m.id === streamingMsgId ? { ...m, content: accumulated } : m)),
       );
     },
     onComplete: (fullResponse) => {
@@ -217,7 +224,7 @@ if (streamingEnabled && !messageRequiresTool(input)) {
 ```typescript
 onComplete: (fullResponse) => {
   if (ttsEnabled) {
-    triggerTTS(fullResponse);  // After stream ends
+    triggerTTS(fullResponse); // After stream ends
   }
 };
 ```
@@ -225,6 +232,7 @@ onComplete: (fullResponse) => {
 ## Consequences
 
 ### Positive
+
 - Immediate visual feedback (first token in ~100ms)
 - Reduced perceived latency
 - Better UX for anxious/ADHD students
@@ -232,36 +240,39 @@ onComplete: (fullResponse) => {
 - Graceful fallback if streaming unavailable
 
 ### Negative
+
 - Two endpoints to maintain (`/api/chat`, `/api/chat/stream`)
 - Slightly more complex client code
 - No tool call support in streaming mode
 
 ### Performance
 
-| Metric | Before (Non-streaming) | After (Streaming) |
-|--------|------------------------|-------------------|
-| First visible content | 3-8s | ~100-200ms |
-| Perceived responsiveness | Low | High |
-| Memory usage | Full response buffered | Incremental |
-| Network requests | 1 | 1 (same) |
+| Metric                   | Before (Non-streaming) | After (Streaming) |
+| ------------------------ | ---------------------- | ----------------- |
+| First visible content    | 3-8s                   | ~100-200ms        |
+| Perceived responsiveness | Low                    | High              |
+| Memory usage             | Full response buffered | Incremental       |
+| Network requests         | 1                      | 1 (same)          |
 
 ### Rollback
 
 If issues arise:
+
 1. Set `ENABLE_CHAT_STREAMING=false` in env
 2. Client auto-detects and uses `/api/chat` fallback
 3. No code changes required
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/lib/ai/providers/azure-streaming.ts` | Azure SSE client |
-| `src/app/api/chat/stream/route.ts` | Streaming endpoint |
-| `src/lib/hooks/use-streaming-chat.ts` | React hook |
-| `src/components/.../streaming-handler.ts` | UI integration |
+| File                                      | Purpose            |
+| ----------------------------------------- | ------------------ |
+| `src/lib/ai/providers/azure-streaming.ts` | Azure SSE client   |
+| `src/app/api/chat/stream/route.ts`        | Streaming endpoint |
+| `src/lib/hooks/use-streaming-chat.ts`     | React hook         |
+| `src/components/.../streaming-handler.ts` | UI integration     |
 
 ## References
+
 - ADR 0005: Real-time SSE Architecture (tool streaming)
 - Azure OpenAI Streaming Documentation
 - MDN: ReadableStream API

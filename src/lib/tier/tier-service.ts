@@ -15,8 +15,8 @@
  * - Subscription validity: status=ACTIVE/TRIAL + startDate <= now < endDate (or null endDate)
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import type {
   TierDefinition,
   UserSubscription,
@@ -26,10 +26,10 @@ import type {
   FeatureType,
   UserFeatureConfig,
   UserFeatureConfigInput,
-} from "./types";
-import { TierCode } from "./types";
-import { createFallbackTier } from "./tier-fallbacks";
-import { transformTier } from "./tier-transformer";
+} from './types';
+import { TierCode } from './types';
+import { createFallbackTier } from './tier-fallbacks';
+import { transformTier } from './tier-transformer';
 import {
   isSubscriptionValid,
   extractTierLimits,
@@ -37,12 +37,9 @@ import {
   getModelForFeature,
   getFeatureAIConfig,
   type FeatureModelType,
-} from "./tier-helpers";
-import {
-  getTierMemoryLimits,
-  type TierMemoryLimits,
-} from "@/lib/conversation/tier-memory-config";
-import type { TierName } from "@/types/tier-types";
+} from './tier-helpers';
+import { getTierMemoryLimits, type TierMemoryLimits } from '@/lib/conversation/tier-memory-config';
+import type { TierName } from '@/types/tier-types';
 
 export class TierService {
   // Cache for tier feature configs (rarely change)
@@ -58,7 +55,7 @@ export class TierService {
   invalidateCache(): void {
     this.featureCache.clear();
     this.memoryConfigCache.clear();
-    logger.info("All tier caches invalidated");
+    logger.info('All tier caches invalidated');
   }
 
   /**
@@ -69,7 +66,7 @@ export class TierService {
    */
   invalidateTierCache(tierId: string): void {
     this.featureCache.delete(tierId);
-    logger.info("Tier cache invalidated", { tierId });
+    logger.info('Tier cache invalidated', { tierId });
   }
 
   /**
@@ -79,10 +76,7 @@ export class TierService {
    * @param featureKey - Feature identifier (e.g., "chat", "voice", "quizzes")
    * @returns true if feature is enabled for user's tier, false otherwise
    */
-  async checkFeatureAccess(
-    userId: string | null,
-    featureKey: string,
-  ): Promise<boolean> {
+  async checkFeatureAccess(userId: string | null, featureKey: string): Promise<boolean> {
     try {
       // Get user's effective tier
       const tier = await this.getEffectiveTier(userId);
@@ -98,14 +92,11 @@ export class TierService {
       if (userId) {
         const subscription = await this.getUserSubscription(userId);
         if (subscription?.overrideFeatures) {
-          const overrides = subscription.overrideFeatures as Record<
-            string,
-            unknown
-          >;
+          const overrides = subscription.overrideFeatures as Record<string, unknown>;
           // Check if this specific feature has an override
           if (featureKey in overrides) {
             const overrideValue = overrides[featureKey];
-            if (typeof overrideValue === "boolean") {
+            if (typeof overrideValue === 'boolean') {
               return overrideValue;
             }
             return Boolean(overrideValue);
@@ -121,14 +112,14 @@ export class TierService {
       const featureValue = features[featureKey];
 
       // Handle boolean values
-      if (typeof featureValue === "boolean") {
+      if (typeof featureValue === 'boolean') {
         return featureValue;
       }
 
       // Handle truthy values (arrays, objects, etc.)
       return Boolean(featureValue);
     } catch (error) {
-      logger.error("Error checking feature access, denying access", {
+      logger.error('Error checking feature access, denying access', {
         userId,
         featureKey,
         error: String(error),
@@ -168,7 +159,7 @@ export class TierService {
       }
 
       // Invalid/expired subscription → Fallback to Base tier
-      logger.warn("Invalid subscription, falling back to Base tier", {
+      logger.warn('Invalid subscription, falling back to Base tier', {
         userId,
         subscriptionId: subscription.id,
         status: subscription.status,
@@ -177,7 +168,7 @@ export class TierService {
 
       return await this.getTierByCode(TierCode.BASE);
     } catch (error) {
-      logger.error("Error fetching effective tier, using fallback", {
+      logger.error('Error fetching effective tier, using fallback', {
         userId,
         error: String(error),
       });
@@ -192,16 +183,12 @@ export class TierService {
    * Apply subscription overrides to a tier definition
    * Merges overrideFeatures and overrideLimits into the tier
    */
-  private applyOverrides(
-    tier: TierDefinition,
-    subscription: UserSubscription,
-  ): TierDefinition {
+  private applyOverrides(tier: TierDefinition, subscription: UserSubscription): TierDefinition {
     const hasFeatureOverrides =
       subscription.overrideFeatures &&
       Object.keys(subscription.overrideFeatures as object).length > 0;
     const hasLimitOverrides =
-      subscription.overrideLimits &&
-      Object.keys(subscription.overrideLimits as object).length > 0;
+      subscription.overrideLimits && Object.keys(subscription.overrideLimits as object).length > 0;
 
     // No overrides, return tier as-is
     if (!hasFeatureOverrides && !hasLimitOverrides) {
@@ -221,10 +208,7 @@ export class TierService {
 
     // Merge limit overrides
     if (hasLimitOverrides) {
-      const limitOverrides = subscription.overrideLimits as Record<
-        string,
-        number
-      >;
+      const limitOverrides = subscription.overrideLimits as Record<string, number>;
       if (limitOverrides.chatLimitDaily !== undefined) {
         mergedTier.chatLimitDaily = limitOverrides.chatLimitDaily;
       }
@@ -238,12 +222,10 @@ export class TierService {
         mergedTier.docsLimitTotal = limitOverrides.docsLimitTotal;
       }
       if (limitOverrides.videoVisionSecondsPerSession !== undefined) {
-        mergedTier.videoVisionSecondsPerSession =
-          limitOverrides.videoVisionSecondsPerSession;
+        mergedTier.videoVisionSecondsPerSession = limitOverrides.videoVisionSecondsPerSession;
       }
       if (limitOverrides.videoVisionMinutesMonthly !== undefined) {
-        mergedTier.videoVisionMinutesMonthly =
-          limitOverrides.videoVisionMinutesMonthly;
+        mergedTier.videoVisionMinutesMonthly = limitOverrides.videoVisionMinutesMonthly;
       }
     }
 
@@ -264,12 +246,12 @@ export class TierService {
       }
 
       // Fallback: tier not in database, create inline
-      logger.warn("Tier not found in database, using inline fallback", {
+      logger.warn('Tier not found in database, using inline fallback', {
         code,
       });
       return createFallbackTier(code);
     } catch (error) {
-      logger.error("Error fetching tier by code, using inline fallback", {
+      logger.error('Error fetching tier by code, using inline fallback', {
         code,
         error: String(error),
       });
@@ -280,9 +262,7 @@ export class TierService {
   /**
    * Get user subscription with tier included
    */
-  private async getUserSubscription(
-    userId: string,
-  ): Promise<UserSubscription | null> {
+  private async getUserSubscription(userId: string): Promise<UserSubscription | null> {
     try {
       const subscription = await prisma.userSubscription.findUnique({
         where: { userId },
@@ -298,7 +278,7 @@ export class TierService {
         tier: subscription.tier ? transformTier(subscription.tier) : undefined,
       } as UserSubscription;
     } catch (error) {
-      logger.error("Error fetching user subscription", {
+      logger.error('Error fetching user subscription', {
         userId,
         error: String(error),
       });
@@ -333,7 +313,7 @@ export class TierService {
 
       return baseLimits;
     } catch (error) {
-      logger.error("Error fetching limits for user, using fallback", {
+      logger.error('Error fetching limits for user, using fallback', {
         userId,
         error: String(error),
       });
@@ -380,13 +360,13 @@ export class TierService {
       // Always return a fresh deep copy to prevent mutation issues
       return structuredClone(cachedConfig);
     } catch (error) {
-      logger.error("Error fetching memory config for user, using fallback", {
+      logger.error('Error fetching memory config for user, using fallback', {
         userId,
         error: String(error),
       });
 
       // Error fallback: return Trial tier memory config (fresh copy)
-      return getTierMemoryLimits("trial");
+      return getTierMemoryLimits('trial');
     }
   }
 
@@ -395,18 +375,15 @@ export class TierService {
    *
    * @param userId - User ID (null for anonymous users)
    * @param type - Model type: 'chat', 'vision', or 'tts'
-   * @returns Model name string (e.g., "gpt-4o", "gpt-4o-mini", "gpt-realtime")
+   * @returns Model name string (e.g., "gpt-5.2-edu", "gpt-5-mini", "gpt-realtime")
    * @deprecated Use getModelForUserFeature for per-feature selection (ADR 0073)
    */
-  async getAIModelForUser(
-    userId: string | null,
-    type: "chat" | "vision" | "tts",
-  ): Promise<string> {
+  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision' | 'tts'): Promise<string> {
     try {
       const tier = await this.getEffectiveTier(userId);
       return getModelFromTier(tier, type);
     } catch (error) {
-      logger.error("Error fetching AI model for user, using fallback", {
+      logger.error('Error fetching AI model for user, using fallback', {
         userId,
         type,
         error: String(error),
@@ -430,15 +407,12 @@ export class TierService {
    * @param feature - Feature type (chat, mindmap, quiz, etc.)
    * @returns Model name string configured for this feature in user's tier
    */
-  async getModelForUserFeature(
-    userId: string | null,
-    feature: FeatureModelType,
-  ): Promise<string> {
+  async getModelForUserFeature(userId: string | null, feature: FeatureModelType): Promise<string> {
     try {
       const tier = await this.getEffectiveTier(userId);
       return getModelForFeature(tier, feature);
     } catch (error) {
-      logger.error("Error fetching model for feature, using fallback", {
+      logger.error('Error fetching model for feature, using fallback', {
         userId,
         feature,
         error: String(error),
@@ -485,7 +459,7 @@ export class TierService {
       // Check if override is expired
       if (userOverride.expiresAt && new Date() > userOverride.expiresAt) {
         // Override expired, clean it up asynchronously
-        this.deleteUserFeatureConfig(userId, feature, "system").catch(() => {});
+        this.deleteUserFeatureConfig(userId, feature, 'system').catch(() => {});
         return tierConfig;
       }
 
@@ -496,7 +470,7 @@ export class TierService {
         maxTokens: userOverride.maxTokens ?? tierConfig.maxTokens,
       };
     } catch (error) {
-      logger.error("Error fetching AI config for feature, using fallback", {
+      logger.error('Error fetching AI config for feature, using fallback', {
         userId,
         feature,
         error: String(error),
@@ -536,7 +510,7 @@ export class TierService {
         temperature: config.temperature ? Number(config.temperature) : null,
       };
     } catch (error) {
-      logger.error("Error fetching user feature config", {
+      logger.error('Error fetching user feature config', {
         userId,
         feature,
         error: String(error),
@@ -555,7 +529,7 @@ export class TierService {
     try {
       const configs = await prisma.userFeatureConfig.findMany({
         where: { userId },
-        orderBy: { feature: "asc" },
+        orderBy: { feature: 'asc' },
       });
 
       return configs.map((config) => ({
@@ -564,7 +538,7 @@ export class TierService {
         temperature: config.temperature ? Number(config.temperature) : null,
       }));
     } catch (error) {
-      logger.error("Error fetching user feature configs", {
+      logger.error('Error fetching user feature configs', {
         userId,
         error: String(error),
       });
@@ -617,7 +591,7 @@ export class TierService {
         data: {
           userId,
           adminId,
-          action: "USER_FEATURE_CONFIG_SET",
+          action: 'USER_FEATURE_CONFIG_SET',
           changes: {
             feature: input.feature,
             model: input.model,
@@ -631,7 +605,7 @@ export class TierService {
         },
       });
 
-      logger.info("User feature config set", {
+      logger.info('User feature config set', {
         userId,
         feature: input.feature,
         adminId,
@@ -643,7 +617,7 @@ export class TierService {
         temperature: config.temperature ? Number(config.temperature) : null,
       };
     } catch (error) {
-      logger.error("Error setting user feature config", {
+      logger.error('Error setting user feature config', {
         userId,
         feature: input.feature,
         error: String(error),
@@ -676,19 +650,19 @@ export class TierService {
         data: {
           userId,
           adminId,
-          action: "USER_FEATURE_CONFIG_DELETE",
+          action: 'USER_FEATURE_CONFIG_DELETE',
           changes: { feature },
           notes: null,
         },
       });
 
-      logger.info("User feature config deleted", {
+      logger.info('User feature config deleted', {
         userId,
         feature,
         adminId,
       });
     } catch (error) {
-      logger.error("Error deleting user feature config", {
+      logger.error('Error deleting user feature config', {
         userId,
         feature,
         error: String(error),
@@ -704,10 +678,7 @@ export class TierService {
    * @param feature - Feature type
    * @returns true if enabled, false if disabled by user override or tier
    */
-  async isFeatureEnabledForUser(
-    userId: string | null,
-    feature: FeatureType,
-  ): Promise<boolean> {
+  async isFeatureEnabledForUser(userId: string | null, feature: FeatureType): Promise<boolean> {
     try {
       // Check user-level override first
       if (userId) {
@@ -725,7 +696,7 @@ export class TierService {
       // Fall back to tier feature check
       return await this.checkFeatureAccess(userId, feature);
     } catch (error) {
-      logger.error("Error checking if feature enabled", {
+      logger.error('Error checking if feature enabled', {
         userId,
         feature,
         error: String(error),

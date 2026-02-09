@@ -406,7 +406,7 @@ describe('providers', () => {
         expect(result).toEqual({
           content: 'Hello! How can I help you?',
           provider: 'azure',
-          model: 'gpt-4o',
+          model: 'gpt-5-mini',
           usage: {
             prompt_tokens: 10,
             completion_tokens: 8,
@@ -616,7 +616,7 @@ describe('providers', () => {
         chat: {
           available: true,
           provider: 'azure',
-          model: 'gpt-4o',
+          model: 'gpt-5-mini',
         },
         voice: {
           available: true,

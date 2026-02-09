@@ -363,11 +363,10 @@ git add -A && git commit -m "ops(resend): upgrade to Pro plan"
 
 ### Current Quotas
 
-| Deployment                | Model       | TPM Quota | RPM Quota | Baseline Cost             | Notes                     |
-| ------------------------- | ----------- | --------- | --------- | ------------------------- | ------------------------- |
-| **gpt4o-mini-deployment** | gpt-4o-mini | 100K      | 1,000     | $0.15/$0.60 per 1M tokens | Primary chat model        |
-| **gpt-4o**                | gpt-4o      | 1K        | 6         | $15/$60 per 1M tokens     | Premium model (low quota) |
-| **gpt-5-mini**            | gpt-5-mini  | 1K        | 1         | High cost                 | Experimental (not used)   |
+| Deployment             | Model      | TPM Quota | RPM Quota | Baseline Cost             | Notes                    |
+| ---------------------- | ---------- | --------- | --------- | ------------------------- | ------------------------ |
+| **gpt-5-mini**         | gpt-5-mini | 100K      | 1,000     | $0.15/$0.60 per 1M tokens | Primary chat model       |
+| **gpt-5-mini-premium** | gpt-5-mini | 1K        | 6         | $15/$60 per 1M tokens     | Premium tier (low quota) |
 
 **Total Allocated Capacity**: 102K TPM (gpt4o-mini)
 
@@ -622,10 +621,10 @@ Questions? Check #mirrorbuddy-ops
 
 - [SLI-SLO.md](./SLI-SLO.md) - Service level objectives
 - [RUNBOOK.md](./RUNBOOK.md) - Incident response
-- [VERCEL-PLUS-LIMITS.md](./VERCEL-PLUS-LIMITS.md) - Vercel detailed limits
+- [VERCEL-PLUS-LIMITS.md](../../docs-archive/operations/VERCEL-PLUS-LIMITS.md) - Vercel detailed limits
 - [SERVICE-AUDIT-RESEND.md](./SERVICE-AUDIT-RESEND.md) - Resend audit
 - [azure-openai-limits-audit.md](./azure-openai-limits-audit.md) - Azure audit
-- [ADR 0037: Deferred Production Items](../adr/0037-deferred-production-items.md) - Known limitations
+- [ADR 0039: Deferred Production Items](../adr/archive/0039-deferred-production-items.md) - Known limitations
 - [ADR 0047: Grafana Cloud Observability](../adr/0047-grafana-cloud-observability.md) - Monitoring
 
 ---

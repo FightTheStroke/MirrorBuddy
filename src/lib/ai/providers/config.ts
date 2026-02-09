@@ -3,7 +3,7 @@
  * @brief Provider configuration functions
  */
 
-import type { ProviderConfig, AIProvider } from "./types";
+import type { ProviderConfig, AIProvider } from './types';
 
 /**
  * Check if Azure OpenAI is configured
@@ -23,12 +23,11 @@ export function getAzureConfig(modelOverride?: string): ProviderConfig {
   const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT!.trim();
   const azureApiKey = process.env.AZURE_OPENAI_API_KEY!.trim();
   return {
-    provider: "azure",
-    endpoint: azureEndpoint.replace(/\/$/, ""),
+    provider: 'azure',
+    endpoint: azureEndpoint.replace(/\/$/, ''),
     apiKey: azureApiKey,
     model:
-      modelOverride?.trim() ||
-      (process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "gpt-4o").trim(),
+      modelOverride?.trim() || (process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || 'gpt-5-mini').trim(),
   };
 }
 
@@ -36,11 +35,11 @@ export function getAzureConfig(modelOverride?: string): ProviderConfig {
  * Get Ollama configuration
  */
 export function getOllamaConfig(): ProviderConfig {
-  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
+  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
   return {
-    provider: "ollama",
+    provider: 'ollama',
     endpoint: ollamaUrl,
-    model: process.env.OLLAMA_MODEL || "llama3.2",
+    model: process.env.OLLAMA_MODEL || 'llama3.2',
   };
 }
 
@@ -52,16 +51,16 @@ export function getOllamaConfig(): ProviderConfig {
  * @param modelOverride - Optional Azure deployment name for tier-based routing
  */
 export function getActiveProvider(
-  preference?: AIProvider | "auto",
+  preference?: AIProvider | 'auto',
   modelOverride?: string,
 ): ProviderConfig | null {
   // If explicit preference for ollama, use ollama
-  if (preference === "ollama") {
+  if (preference === 'ollama') {
     return getOllamaConfig();
   }
 
   // If explicit preference for azure AND azure is configured
-  if (preference === "azure" && isAzureConfigured()) {
+  if (preference === 'azure' && isAzureConfigured()) {
     return getAzureConfig(modelOverride);
   }
 
@@ -85,8 +84,8 @@ export function getRealtimeProvider(): ProviderConfig | null {
 
   if (endpoint && apiKey && deployment) {
     return {
-      provider: "azure",
-      endpoint: endpoint.replace(/\/$/, ""),
+      provider: 'azure',
+      endpoint: endpoint.replace(/\/$/, ''),
       apiKey,
       model: deployment,
     };
@@ -99,11 +98,11 @@ export function getRealtimeProvider(): ProviderConfig | null {
  * Check if Ollama is running and accessible
  */
 export async function isOllamaAvailable(): Promise<boolean> {
-  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
+  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
 
   try {
     const response = await fetch(`${ollamaUrl}/api/tags`, {
-      method: "GET",
+      method: 'GET',
       signal: AbortSignal.timeout(2000),
     });
     return response.ok;
@@ -116,11 +115,11 @@ export async function isOllamaAvailable(): Promise<boolean> {
  * Check if a specific Ollama model is available
  */
 export async function isOllamaModelAvailable(model: string): Promise<boolean> {
-  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
+  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
 
   try {
     const response = await fetch(`${ollamaUrl}/api/tags`, {
-      method: "GET",
+      method: 'GET',
       signal: AbortSignal.timeout(2000),
     });
     if (!response.ok) return false;
@@ -128,10 +127,7 @@ export async function isOllamaModelAvailable(model: string): Promise<boolean> {
     const data = await response.json();
     const models = data.models || [];
     // Check if the requested model exists (handle name:tag format)
-    return models.some(
-      (m: { name: string }) =>
-        m.name === model || m.name.startsWith(`${model}:`),
-    );
+    return models.some((m: { name: string }) => m.name === model || m.name.startsWith(`${model}:`));
   } catch {
     return false;
   }

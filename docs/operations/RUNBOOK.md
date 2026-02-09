@@ -461,7 +461,7 @@ curl -H "Cookie: [session]" https://[domain]/api/admin/service-limits | jq
 **Azure OpenAI TPM**:
 
 - Query telemetry for spike source
-- Batch requests, use gpt-4o-mini
+- Batch requests, use gpt-5-mini
 - Request limit increase via Azure Support
 
 **Redis Commands**:
@@ -545,7 +545,7 @@ for: 5m
 labels:
   severity: warning
 annotations:
-  summary: "High unresolved error count in Sentry"
+  summary: 'High unresolved error count in Sentry'
 ```
 
 ### Investigation Workflow
@@ -569,8 +569,7 @@ connect-src: 'self' ... https://*.ingest.us.sentry.io https://*.ingest.de.sentry
 - [RUNBOOK-PROCEDURES.md](./RUNBOOK-PROCEDURES.md) - Maintenance & recovery
 - [SLI-SLO.md](./SLI-SLO.md) - Service level definitions
 - [ALERT-TESTING-GUIDE.md](./ALERT-TESTING-GUIDE.md) - Testing service limit alerts
-- [I18N-RUNBOOK.md](./I18N-RUNBOOK.md) - i18n-specific incidents & troubleshooting
-- [ADR 0037](../adr/0037-deferred-production-items.md) - Known limitations
+- [ADR 0039](../adr/archive/0039-deferred-production-items.md) - Known limitations
 - [ADR 0047](../adr/0047-grafana-cloud-observability.md) - Grafana Cloud architecture
 - [ADR 0070](../adr/0070-sentry-error-tracking.md) - Sentry integration
 

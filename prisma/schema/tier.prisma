@@ -40,20 +40,20 @@ model TierDefinition {
 
   // Per-feature model selection (ADR 0072)
   // Main conversation and voice
-  chatModel           String   @default("gpt-4o-mini")
+  chatModel           String   @default("gpt-5-mini")
   realtimeModel       String   @default("gpt-realtime-mini")
 
   // Tool-specific models
-  pdfModel            String   @default("gpt-4o-mini")
-  mindmapModel        String   @default("gpt-4o-mini")
-  quizModel           String   @default("gpt-4o-mini")
-  flashcardsModel     String   @default("gpt-4o-mini")
-  summaryModel        String   @default("gpt-4o-mini")
-  formulaModel        String   @default("gpt-4o-mini")
-  chartModel          String   @default("gpt-4o-mini")
-  homeworkModel       String   @default("gpt-4o-mini")
-  webcamModel         String   @default("gpt-4o-mini")
-  demoModel           String   @default("gpt-4o-mini")
+  pdfModel            String   @default("gpt-5-mini")
+  mindmapModel        String   @default("gpt-5-mini")
+  quizModel           String   @default("gpt-5-mini")
+  flashcardsModel     String   @default("gpt-5-mini")
+  summaryModel        String   @default("gpt-5-mini")
+  formulaModel        String   @default("gpt-5-mini")
+  chartModel          String   @default("gpt-5-mini")
+  homeworkModel       String   @default("gpt-5-mini")
+  webcamModel         String   @default("gpt-5-mini")
+  demoModel           String   @default("gpt-5-nano")
 
   // Per-feature AI config overrides (ADR 0073)
   // JSON: { "quiz": { "temperature": 0.8, "maxTokens": 2500 }, ... }

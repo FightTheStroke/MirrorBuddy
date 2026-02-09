@@ -37,6 +37,7 @@ Browser (48kHz) → WebSocket Proxy (port 3001) → Azure OpenAI Realtime API
 ```
 
 **Key files:**
+
 - `src/server/realtime-proxy.ts` - WebSocket proxy
 - `src/lib/hooks/use-voice-session.ts` - Main voice hook
 - `src/app/test-voice/page.tsx` - Test/debug page
@@ -52,21 +53,21 @@ Browser (48kHz) → WebSocket Proxy (port 3001) → Azure OpenAI Realtime API
 
 ### The Two APIs
 
-| Aspect | Preview API | GA API |
-|--------|-------------|--------|
-| **Deployment** | `gpt-4o-realtime-preview` | `gpt-realtime` |
-| **URL Path** | `/openai/realtime` | `/openai/v1/realtime` |
-| **API Version param** | `api-version=2025-04-01-preview` | NO param |
-| **Model param** | `deployment=...` | `model=...` |
+| Aspect                | Preview API (deprecated)         | GA API                |
+| --------------------- | -------------------------------- | --------------------- |
+| **Deployment**        | `gpt-4o-realtime-preview`        | `gpt-realtime`        |
+| **URL Path**          | `/openai/realtime`               | `/openai/v1/realtime` |
+| **API Version param** | `api-version=2025-04-01-preview` | NO param              |
+| **Model param**       | `deployment=...`                 | `model=...`           |
 
 ### Event Names - THE CRITICAL DIFFERENCE
 
-| Event | Preview API | GA API |
-|-------|-------------|--------|
-| Audio chunk | `response.audio.delta` | `response.output_audio.delta` |
-| Audio completed | `response.audio.done` | `response.output_audio.done` |
-| Transcript chunk | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
-| Transcript completed | `response.audio_transcript.done` | `response.output_audio_transcript.done` |
+| Event                | Preview API                       | GA API                                   |
+| -------------------- | --------------------------------- | ---------------------------------------- |
+| Audio chunk          | `response.audio.delta`            | `response.output_audio.delta`            |
+| Audio completed      | `response.audio.done`             | `response.output_audio.done`             |
+| Transcript chunk     | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
+| Transcript completed | `response.audio_transcript.done`  | `response.output_audio_transcript.done`  |
 
 ### How to Handle Both (SOLUTION)
 
@@ -75,18 +76,18 @@ In your message handler, use switch with BOTH cases:
 ```typescript
 switch (event.type) {
   // Handle BOTH formats!
-  case 'response.output_audio.delta':  // GA API
-  case 'response.audio.delta':         // Preview API
+  case 'response.output_audio.delta': // GA API
+  case 'response.audio.delta': // Preview API
     playAudio(event.delta);
     break;
 
-  case 'response.output_audio.done':   // GA API
-  case 'response.audio.done':          // Preview API
+  case 'response.output_audio.done': // GA API
+  case 'response.audio.done': // Preview API
     console.log('Audio complete');
     break;
 
-  case 'response.output_audio_transcript.delta':  // GA API
-  case 'response.audio_transcript.delta':         // Preview API
+  case 'response.output_audio_transcript.delta': // GA API
+  case 'response.audio_transcript.delta': // Preview API
     showStreamingText(event.delta);
     break;
 }
@@ -95,6 +96,7 @@ switch (event.type) {
 ### How to Know Which You're Using
 
 Check your Azure deployment name:
+
 - Contains `4o` or `preview`? → **Preview API**
 - Otherwise → **GA API**
 
@@ -113,8 +115,8 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
 
 ## session.update Format
 
-> ⚠️ **UNCERTAINTY NOTE**: We're using Preview API (`gpt-4o-realtime-preview`).
-> The format below is what WORKS in our code. The exact requirements may differ for GA API.
+> Note: MirrorBuddy has migrated to GA API (`gpt-realtime`).
+> The format below reflects our current production configuration.
 
 ### What Works (Preview API - VERIFIED)
 
@@ -150,15 +152,16 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
 > Those models are only available via the separate `/audio/transcriptions` endpoint.
 > Using them gives: `Invalid value: 'gpt-4o-transcribe'. Supported values are: 'whisper-1'`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `model` | string | Must be `whisper-1` |
+| Parameter  | Type   | Description                         |
+| ---------- | ------ | ----------------------------------- |
+| `model`    | string | Must be `whisper-1`                 |
 | `language` | string | ISO-639-1 code (it, en, es, fr, de) |
-| `prompt` | string | Keyword list to improve accuracy |
+| `prompt`   | string | Keyword list to improve accuracy    |
 
 **Prompt format for whisper-1**: comma-separated keywords, NOT sentences.
+
 ```typescript
-prompt: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia...'
+prompt: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia...';
 ```
 
 **Audio flow note**: The model receives raw audio directly and understands it correctly.
@@ -168,14 +171,13 @@ The transcription shown in chat is generated separately by Whisper and may have 
 
 These fields appear in Azure docs but we DON'T include them and it works:
 
-| Field | Status | Note |
-|-------|--------|------|
-| `session.type: 'realtime'` | Not used | Works without it for Preview API |
-| `modalities: ['text', 'audio']` | Not used | Azure may use default |
-| `output_audio_format` | Not used | Defaults to pcm16 |
+| Field                           | Status   | Note                        |
+| ------------------------------- | -------- | --------------------------- |
+| `session.type: 'realtime'`      | Not used | Works without it for GA API |
+| `modalities: ['text', 'audio']` | Not used | Azure may use default       |
+| `output_audio_format`           | Not used | Defaults to pcm16           |
 
-> **HONESTY**: We're not 100% certain these are optional. They may be required for GA API.
-> Our code works with Preview API without them. If you switch to GA, verify.
+> Note: Our code works with GA API without these fields. They may be optional or have sensible defaults.
 
 ### Implementation Reference
 
@@ -226,8 +228,8 @@ backendWs.send(data);
 clientWs.on('message', (data: Buffer) => {
   const msg = data.toString('utf-8');
   try {
-    JSON.parse(msg);  // Is it JSON?
-    backendWs.send(msg);  // Send as TEXT
+    JSON.parse(msg); // Is it JSON?
+    backendWs.send(msg); // Send as TEXT
   } catch {
     backendWs.send(data); // Non-JSON (raw audio) → binary OK
   }
@@ -240,10 +242,10 @@ clientWs.on('message', (data: Buffer) => {
 
 ### Technical Specifications
 
-| Direction | Sample Rate | Format | Encoding |
-|-----------|-------------|--------|----------|
-| Input (browser → Azure) | 24000 Hz | PCM16 signed | base64 |
-| Output (Azure → browser) | 24000 Hz | PCM16 signed | base64 |
+| Direction                | Sample Rate | Format       | Encoding |
+| ------------------------ | ----------- | ------------ | -------- |
+| Input (browser → Azure)  | 24000 Hz    | PCM16 signed | base64   |
+| Output (Azure → browser) | 24000 Hz    | PCM16 signed | base64   |
 
 ### Audio Input Message
 
@@ -287,7 +289,7 @@ Azure requires EXACTLY 24000 Hz.
 function resample(inputData: Float32Array, fromRate: number, toRate: number): Float32Array {
   if (fromRate === toRate) return inputData;
 
-  const ratio = fromRate / toRate;  // 48000/24000 = 2
+  const ratio = fromRate / toRate; // 48000/24000 = 2
   const outputLength = Math.floor(inputData.length / ratio);
   const output = new Float32Array(outputLength);
 
@@ -298,8 +300,7 @@ function resample(inputData: Float32Array, fromRate: number, toRate: number): Fl
     const fraction = srcIndex - srcIndexFloor;
 
     // Linear interpolation between two samples
-    output[i] = inputData[srcIndexFloor] * (1 - fraction) +
-                inputData[srcIndexCeil] * fraction;
+    output[i] = inputData[srcIndexFloor] * (1 - fraction) + inputData[srcIndexCeil] * fraction;
   }
 
   return output;
@@ -319,6 +320,7 @@ function resample(inputData: Float32Array, fromRate: number, toRate: number): Fl
 
 Azure sends audio as base64 PCM16 in chunks.
 You must:
+
 1. Decode base64
 2. Convert PCM16 → Float32
 3. Play with Web Audio API at 24kHz
@@ -362,28 +364,33 @@ function playAudioChunk(base64Audio: string) {
 ### 1. Audio not playing but WebSocket works?
 
 **Check which API you're using (Preview vs GA)**
+
 - Verify you handle BOTH event types
 - File: `src/lib/hooks/use-voice-session.ts:627-671`
 
 ### 2. session.update fails?
 
 **Check the format (Preview uses different structure than GA)**
+
 - For Preview: flat structure, no `type: 'realtime'` needed
 - File: `src/app/test-voice/page.tsx` for manual testing
 
 ### 3. Proxy doesn't connect to Azure?
 
 **Check env vars:**
+
 ```bash
 AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 ```
+
 - File: `src/server/realtime-proxy.ts:31-84`
 
 ### 4. Audio distorted or too fast/slow?
 
 **AudioContext playback MUST be 24kHz:**
+
 ```typescript
 // ❌ WRONG - uses system default
 const ctx = new AudioContext();
@@ -395,11 +402,13 @@ const ctx = new AudioContext({ sampleRate: 24000 });
 ### 5. Audio sent but Azure doesn't respond?
 
 **Possible causes:**
+
 1. Wrong sample rate (must be 24kHz)
 2. VAD threshold too high
 3. Audio too quiet
 
 **Debug:**
+
 ```typescript
 console.log(audioContext.sampleRate); // Must be 24000 after resample
 ```
@@ -417,7 +426,7 @@ Bypass the app to test Azure directly:
 brew install websocat
 
 # Connect directly to Azure (replace with your values)
-websocat "wss://YOUR-RESOURCE.openai.azure.com/openai/realtime?api-version=2025-04-01-preview&deployment=gpt-4o-realtime-preview&api-key=YOUR_KEY"
+websocat "wss://YOUR-RESOURCE.openai.azure.com/openai/v1/realtime?model=gpt-realtime&api-key=YOUR_KEY"
 
 # Send session.update
 {"type":"session.update","session":{"voice":"alloy","instructions":"Test"}}
@@ -441,6 +450,7 @@ Logs appear in console when running `npm run dev`:
 ### 3. Test page
 
 Go to `/test-voice` for interactive debug:
+
 - Isolated microphone test
 - Manual WebSocket connection
 - All message logging
@@ -496,7 +506,7 @@ useEffect(() => {
 ws.onmessage = async (event) => {
   const data = JSON.parse(event.data);
   if (handleServerEventRef.current) {
-    handleServerEventRef.current(data);  // ✅ ALWAYS THE LATEST VERSION!
+    handleServerEventRef.current(data); // ✅ ALWAYS THE LATEST VERSION!
   }
 };
 ```
@@ -518,7 +528,7 @@ In some browsers/contexts, `ws.onmessage` receives data as `Blob` instead of `st
 ```typescript
 // ❌ WRONG - only works if data is string
 ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);  // ERROR if event.data is Blob!
+  const data = JSON.parse(event.data); // ERROR if event.data is Blob!
 };
 
 // ✅ CORRECT - handles both cases
@@ -526,7 +536,7 @@ ws.onmessage = async (event) => {
   let msgText: string;
 
   if (event.data instanceof Blob) {
-    msgText = await event.data.text();  // Convert Blob → string
+    msgText = await event.data.text(); // Convert Blob → string
   } else if (typeof event.data === 'string') {
     msgText = event.data;
   } else {
@@ -561,15 +571,15 @@ ws.onmessage = (event) => {
 
 ```typescript
 // Enumerate devices (requires permission)
-await navigator.mediaDevices.getUserMedia({ audio: true });  // Request permission
+await navigator.mediaDevices.getUserMedia({ audio: true }); // Request permission
 const devices = await navigator.mediaDevices.enumerateDevices();
-const microphones = devices.filter(d => d.kind === 'audioinput');
+const microphones = devices.filter((d) => d.kind === 'audioinput');
 
 // Use specific device
 const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
-    deviceId: { ideal: selectedMicrophoneId }  // 'ideal' falls back if unavailable
-  }
+    deviceId: { ideal: selectedMicrophoneId }, // 'ideal' falls back if unavailable
+  },
 });
 ```
 
@@ -577,12 +587,12 @@ const stream = await navigator.mediaDevices.getUserMedia({
 
 ```typescript
 // Enumerate output devices
-const speakers = devices.filter(d => d.kind === 'audiooutput');
+const speakers = devices.filter((d) => d.kind === 'audiooutput');
 
 // Option 1: AudioContext with sinkId (Chrome 110+)
 const ctx = new AudioContext({
   sampleRate: 24000,
-  sinkId: selectedSpeakerId  // May not be supported
+  sinkId: selectedSpeakerId, // May not be supported
 });
 
 // Option 2: setSinkId (more compatible)
@@ -596,7 +606,7 @@ if ('setSinkId' in audioContext) {
 ```typescript
 useEffect(() => {
   const handleDeviceChange = () => {
-    enumerateDevices();  // Re-enumerate when user plugs/unplugs
+    enumerateDevices(); // Re-enumerate when user plugs/unplugs
   };
 
   navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
@@ -676,10 +686,10 @@ The `far_field` mode tells Azure to apply acoustic echo cancellation algorithms,
 
 ### Optimized Parameters
 
-| Parameter | Previous | Optimized | Effect |
-|-----------|----------|-----------|--------|
-| `threshold` | 0.5 | 0.4 | More sensitive to soft voices |
-| `silence_duration_ms` | 500 | 400 | Faster turn-taking |
+| Parameter             | Previous | Optimized | Effect                        |
+| --------------------- | -------- | --------- | ----------------------------- |
+| `threshold`           | 0.5      | 0.4       | More sensitive to soft voices |
+| `silence_duration_ms` | 500      | 400       | Faster turn-taking            |
 
 ### Configuration
 
@@ -704,31 +714,32 @@ turn_detection: {
 
 ### Supported Browsers
 
-| Browser | Windows | macOS | Linux | Note |
-|---------|---------|-------|-------|------|
-| Chrome 110+ | ✅ | ✅ | ✅ | Full support including setSinkId |
-| Edge 110+ | ✅ | ✅ | ✅ | Full support like Chrome |
-| Firefox | ⚠️ | ⚠️ | ⚠️ | Works, but NO speaker output selection |
-| Safari 14.1+ | ⚠️ | ⚠️ | N/A | Works, but NO speaker output selection |
-| Safari iOS | ⚠️ | N/A | N/A | Requires user gesture for AudioContext |
+| Browser      | Windows | macOS | Linux | Note                                   |
+| ------------ | ------- | ----- | ----- | -------------------------------------- |
+| Chrome 110+  | ✅      | ✅    | ✅    | Full support including setSinkId       |
+| Edge 110+    | ✅      | ✅    | ✅    | Full support like Chrome               |
+| Firefox      | ⚠️      | ⚠️    | ⚠️    | Works, but NO speaker output selection |
+| Safari 14.1+ | ⚠️      | ⚠️    | N/A   | Works, but NO speaker output selection |
+| Safari iOS   | ⚠️      | N/A   | N/A   | Requires user gesture for AudioContext |
 
 ### Feature Support Matrix
 
-| Feature | Chrome/Edge | Firefox | Safari |
-|---------|-------------|---------|--------|
-| getUserMedia (mic) | ✅ | ✅ | ✅ |
-| enumerateDevices | ✅ | ✅ | ✅ |
-| AudioContext | ✅ | ✅ | ✅ (webkitAudioContext) |
-| **setSinkId** (output device) | ✅ | ❌ | ❌ |
-| WebSocket | ✅ | ✅ | ✅ |
-| ScriptProcessorNode | ✅ | ✅ | ✅ |
+| Feature                       | Chrome/Edge | Firefox | Safari                  |
+| ----------------------------- | ----------- | ------- | ----------------------- |
+| getUserMedia (mic)            | ✅          | ✅      | ✅                      |
+| enumerateDevices              | ✅          | ✅      | ✅                      |
+| AudioContext                  | ✅          | ✅      | ✅ (webkitAudioContext) |
+| **setSinkId** (output device) | ✅          | ❌      | ❌                      |
+| WebSocket                     | ✅          | ✅      | ✅                      |
+| ScriptProcessorNode           | ✅          | ✅      | ✅                      |
 
 ### Fallbacks Implemented
 
 #### 1. webkitAudioContext (Safari)
 
 ```typescript
-const AudioContextClass = window.AudioContext ||
+const AudioContextClass =
+  window.AudioContext ||
   (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 ```
 
@@ -766,7 +777,7 @@ z-[70]: Tool Preview Modal (above everything)
 # Azure OpenAI Realtime (for voice)
 AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key-here
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 
 # WebSocket proxy port
 WS_PROXY_PORT=3001
@@ -791,19 +802,19 @@ WS_PROXY_PORT=3001
 
 ## Problem History
 
-| Date | Problem | Solution |
-|------|---------|----------|
-| 2025-12-28 | session.update rejected | Added `type: 'realtime'` (GA API) |
-| 2025-12-28 | voice not recognized | Moved to `audio.output.voice` (GA API) |
-| 2025-12-28 | Proxy sends binary | Buffer → string conversion |
-| 2025-12-28 | Audio not detected | Resampling 48k→24k |
-| 2025-12-28 | No output sound | Implemented 24kHz playback |
-| 2025-12-29 | **Audio received but not played** | Preview API uses `response.audio.delta` not `response.output_audio.delta` |
-| 2025-12-29 | **VoiceSession doesn't work but test page does** | Stale closure bug - fixed with useRef pattern |
-| 2025-12-29 | **ws.onmessage doesn't receive events** | WebSocket sends Blob, code expected String |
-| 2025-12-30 | session.update format confusion | Clarified: current code uses Preview API flat format |
-| 2026-01-01 | **Only first word plays in onboarding** | Chunk scheduling bug - chunks 4+ never scheduled (see below) |
-| 2026-01-04 | **gpt-4o-transcribe not working** | Only `whisper-1` supported in Realtime API. Added prompt with keywords. |
+| Date       | Problem                                          | Solution                                                                  |
+| ---------- | ------------------------------------------------ | ------------------------------------------------------------------------- |
+| 2025-12-28 | session.update rejected                          | Added `type: 'realtime'` (GA API)                                         |
+| 2025-12-28 | voice not recognized                             | Moved to `audio.output.voice` (GA API)                                    |
+| 2025-12-28 | Proxy sends binary                               | Buffer → string conversion                                                |
+| 2025-12-28 | Audio not detected                               | Resampling 48k→24k                                                        |
+| 2025-12-28 | No output sound                                  | Implemented 24kHz playback                                                |
+| 2025-12-29 | **Audio received but not played**                | Preview API uses `response.audio.delta` not `response.output_audio.delta` |
+| 2025-12-29 | **VoiceSession doesn't work but test page does** | Stale closure bug - fixed with useRef pattern                             |
+| 2025-12-29 | **ws.onmessage doesn't receive events**          | WebSocket sends Blob, code expected String                                |
+| 2025-12-30 | session.update format confusion                  | Clarified: current code uses Preview API flat format                      |
+| 2026-01-01 | **Only first word plays in onboarding**          | Chunk scheduling bug - chunks 4+ never scheduled (see below)              |
+| 2026-01-04 | **gpt-4o-transcribe not working**                | Only `whisper-1` supported in Realtime API. Added prompt with keywords.   |
 
 ---
 
@@ -817,6 +828,7 @@ WS_PROXY_PORT=3001
 ### The Problem
 
 The audio playback uses a buffering system:
+
 1. Wait for MIN_BUFFER_CHUNKS (3) before starting playback
 2. Once buffer ready, schedule all chunks with `scheduleQueuedChunks()`
 3. New chunks arrive and get pushed to queue...
@@ -825,7 +837,7 @@ The audio playback uses a buffering system:
 ```typescript
 // ❌ WRONG - chunks 4+ never played
 if (!isPlayingRef.current) {
-  playNextChunk();  // Only called when NOT playing
+  playNextChunk(); // Only called when NOT playing
 }
 // After buffer fills, isPlayingRef = true, so this never runs!
 ```
@@ -848,11 +860,13 @@ if (!isPlayingRef.current) {
 ### How to Identify This Bug
 
 **Symptoms:**
+
 - First word/syllable plays, then silence
 - Server logs show ALL `response.audio.delta` events received
 - Client receives audio but doesn't play it all
 
 **Debug steps:**
+
 1. Check server logs for `response.audio.delta` events - if all arrive, it's client-side
 2. Add logging in `scheduleQueuedChunks()` to see if chunks are processed
 3. Check if `audioQueueRef.current.length` grows but never decreases
@@ -867,11 +881,7 @@ if (!isPlayingRef.current) {
 
 > **HONESTY SECTION**: These are things we're NOT 100% certain about.
 
-1. **GA API vs Preview API requirements**: We're using Preview API. If you switch to GA API (`gpt-realtime` without `4o`), you may need:
-   - `session.type: 'realtime'`
-   - `modalities: ['text', 'audio']`
-   - `voice` in `audio.output.voice` instead of flat
-   - **We have NOT tested GA API recently.**
+1. **Preview API deprecation**: The Preview API (`gpt-4o-realtime-preview`) is deprecated as of 2026-03-24. MirrorBuddy has migrated to GA API (`gpt-realtime`). Legacy Preview API references remain in this documentation for troubleshooting older deployments.
 
 2. **ScriptProcessorNode deprecation**: We use ScriptProcessorNode which is deprecated. AudioWorklet would be better but requires more work. Current implementation works in all browsers.
 
@@ -914,4 +924,4 @@ if (!isPlayingRef.current) {
 
 ---
 
-*Document created after 2+ days of debugging. DON'T REPEAT OUR MISTAKES!*
+_Document created after 2+ days of debugging. DON'T REPEAT OUR MISTAKES!_

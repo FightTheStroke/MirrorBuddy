@@ -2,10 +2,10 @@
 // SETTINGS STORE - User preferences and configuration
 // ============================================================================
 
-import { create } from "zustand";
-import { logger } from "@/lib/logger";
-import type { Theme, AIProvider } from "@/types";
-import { csrfFetch } from "@/lib/auth";
+import { create } from 'zustand';
+import { logger } from '@/lib/logger';
+import type { Theme, AIProvider } from '@/types';
+import { csrfFetch } from '@/lib/auth';
 import {
   type TeachingStyle,
   type LearningDifference,
@@ -13,7 +13,7 @@ import {
   type ProviderPreference,
   type AppearanceSettings,
   type AdaptiveDifficultyMode,
-} from "./settings-types";
+} from './settings-types';
 
 export type {
   TeachingStyle,
@@ -68,20 +68,20 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>()((set, get) => ({
-  theme: "system",
-  provider: "azure", // #89: Changed from 'openai' - only azure/ollama supported
-  model: "gpt-4o",
+  theme: 'system',
+  provider: 'azure', // #89: Changed from 'openai' - only azure/ollama supported
+  model: 'gpt-5-mini',
   budgetLimit: 50,
   totalSpent: 0,
   studentProfile: {
-    name: "",
+    name: '',
     age: 14,
     schoolYear: 1,
-    schoolLevel: "superiore",
-    gradeLevel: "",
+    schoolLevel: 'superiore',
+    gradeLevel: '',
     learningGoals: [],
-    teachingStyle: "balanced",
-    fontSize: "medium",
+    teachingStyle: 'balanced',
+    fontSize: 'medium',
     highContrast: false,
     dyslexiaFont: false,
     voiceEnabled: true,
@@ -94,15 +94,15 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     crossMaestroEnabled: true, // Enabled by default
   },
   appearance: {
-    theme: "system",
-    accentColor: "blue",
-    language: "it",
+    theme: 'system',
+    accentColor: 'blue',
+    language: 'it',
   },
-  preferredProvider: "auto",
-  preferredMicrophoneId: "", // Empty = system default
-  preferredOutputId: "", // Empty = system default (speakers)
-  preferredCameraId: "", // Empty = system default
-  adaptiveDifficultyMode: "balanced",
+  preferredProvider: 'auto',
+  preferredMicrophoneId: '', // Empty = system default
+  preferredOutputId: '', // Empty = system default (speakers)
+  preferredCameraId: '', // Empty = system default
+  adaptiveDifficultyMode: 'balanced',
   // Voice settings defaults
   voiceVadThreshold: 0.4, // Balanced sensitivity
   voiceSilenceDuration: 400, // Fast turn-taking
@@ -129,14 +129,11 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       appearance: { ...state.appearance, ...appearance },
       pendingSync: true,
     })),
-  setPreferredProvider: (preferredProvider) =>
-    set({ preferredProvider, pendingSync: true }),
+  setPreferredProvider: (preferredProvider) => set({ preferredProvider, pendingSync: true }),
   setPreferredMicrophone: (preferredMicrophoneId) =>
     set({ preferredMicrophoneId, pendingSync: true }),
-  setPreferredOutput: (preferredOutputId) =>
-    set({ preferredOutputId, pendingSync: true }),
-  setPreferredCamera: (preferredCameraId) =>
-    set({ preferredCameraId, pendingSync: true }),
+  setPreferredOutput: (preferredOutputId) => set({ preferredOutputId, pendingSync: true }),
+  setPreferredCamera: (preferredCameraId) => set({ preferredCameraId, pendingSync: true }),
   setAdaptiveDifficultyMode: (adaptiveDifficultyMode) =>
     set({ adaptiveDifficultyMode, pendingSync: true }),
   // Voice settings setters with validation
@@ -150,8 +147,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       voiceSilenceDuration: Math.max(300, Math.min(800, duration)),
       pendingSync: true,
     }),
-  setVoiceBargeInEnabled: (enabled) =>
-    set({ voiceBargeInEnabled: enabled, pendingSync: true }),
+  setVoiceBargeInEnabled: (enabled) => set({ voiceBargeInEnabled: enabled, pendingSync: true }),
 
   syncToServer: async () => {
     const state = get();
@@ -159,8 +155,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
     try {
       // Sync settings - #88: Added totalSpent to persist budget tracking
-      await csrfFetch("/api/user/settings", {
-        method: "PUT",
+      await csrfFetch('/api/user/settings', {
+        method: 'PUT',
         body: JSON.stringify({
           theme: state.theme,
           provider: state.provider,
@@ -174,8 +170,8 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
       });
 
       // Sync profile
-      await csrfFetch("/api/user/profile", {
-        method: "PUT",
+      await csrfFetch('/api/user/profile', {
+        method: 'PUT',
         body: JSON.stringify({
           name: state.studentProfile.name,
           age: state.studentProfile.age,
@@ -200,15 +196,15 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({ lastSyncedAt: new Date(), pendingSync: false });
     } catch (error) {
-      logger.error("Settings sync failed", { error: String(error) });
+      logger.error('Settings sync failed', { error: String(error) });
     }
   },
 
   loadFromServer: async () => {
     try {
       const [settingsRes, profileRes] = await Promise.all([
-        fetch("/api/user/settings"),
-        fetch("/api/user/profile"),
+        fetch('/api/user/settings'),
+        fetch('/api/user/profile'),
       ]);
 
       if (settingsRes.ok) {
@@ -219,8 +215,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
           model: settings.model ?? state.model,
           budgetLimit: settings.budgetLimit ?? state.budgetLimit,
           totalSpent: settings.totalSpent ?? state.totalSpent, // #88: Load from server
-          adaptiveDifficultyMode:
-            settings.adaptiveDifficultyMode ?? state.adaptiveDifficultyMode,
+          adaptiveDifficultyMode: settings.adaptiveDifficultyMode ?? state.adaptiveDifficultyMode,
           appearance: {
             ...state.appearance,
             language: settings.language ?? state.appearance.language,
@@ -239,29 +234,20 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
               name: profile.name ?? state.studentProfile.name,
               age: profile.age ?? state.studentProfile.age,
               schoolYear: profile.schoolYear ?? state.studentProfile.schoolYear,
-              schoolLevel:
-                profile.schoolLevel ?? state.studentProfile.schoolLevel,
+              schoolLevel: profile.schoolLevel ?? state.studentProfile.schoolLevel,
               gradeLevel: profile.gradeLevel ?? state.studentProfile.gradeLevel,
-              learningGoals:
-                profile.learningGoals ?? state.studentProfile.learningGoals,
+              learningGoals: profile.learningGoals ?? state.studentProfile.learningGoals,
               // Character preferences
-              preferredCoach:
-                profile.preferredCoach ?? state.studentProfile.preferredCoach,
-              preferredBuddy:
-                profile.preferredBuddy ?? state.studentProfile.preferredBuddy,
+              preferredCoach: profile.preferredCoach ?? state.studentProfile.preferredCoach,
+              preferredBuddy: profile.preferredBuddy ?? state.studentProfile.preferredBuddy,
               crossMaestroEnabled:
-                profile.crossMaestroEnabled ??
-                state.studentProfile.crossMaestroEnabled,
+                profile.crossMaestroEnabled ?? state.studentProfile.crossMaestroEnabled,
               fontSize: accessibility.fontSize ?? state.studentProfile.fontSize,
-              highContrast:
-                accessibility.highContrast ?? state.studentProfile.highContrast,
-              dyslexiaFont:
-                accessibility.dyslexiaFont ?? state.studentProfile.dyslexiaFont,
-              voiceEnabled:
-                accessibility.voiceEnabled ?? state.studentProfile.voiceEnabled,
+              highContrast: accessibility.highContrast ?? state.studentProfile.highContrast,
+              dyslexiaFont: accessibility.dyslexiaFont ?? state.studentProfile.dyslexiaFont,
+              voiceEnabled: accessibility.voiceEnabled ?? state.studentProfile.voiceEnabled,
               simplifiedLanguage:
-                accessibility.simplifiedLanguage ??
-                state.studentProfile.simplifiedLanguage,
+                accessibility.simplifiedLanguage ?? state.studentProfile.simplifiedLanguage,
               adhdMode: accessibility.adhdMode ?? state.studentProfile.adhdMode,
             },
           }));
@@ -270,7 +256,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({ lastSyncedAt: new Date(), pendingSync: false });
     } catch (error) {
-      logger.error("Settings load failed", { error: String(error) });
+      logger.error('Settings load failed', { error: String(error) });
     }
   },
 }));

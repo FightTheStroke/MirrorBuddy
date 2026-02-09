@@ -4,7 +4,7 @@
  * Tracks and enforces cost budgets per V1Plan FASE 6.2.
  *
  * PRICING SOURCE: docs/busplan/VoiceCostAnalysis-2026-01-02.md
- * - Text (GPT-4o-mini): $0.15/1M input + $0.60/1M output ≈ €0.002/1K average
+ * - Text (gpt-5-mini): ~$0.30/1M input + $1.20/1M output ≈ €0.002/1K average
  * - Voice (gpt-realtime-mini): ~€0.04/min
  * - Voice (gpt-realtime): ~€0.30/min
  *
@@ -14,15 +14,15 @@
  * COST CALCULATION: Based on REAL token counts from API, not estimates.
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 /**
  * Pricing constants (EUR) - SOURCE: V1Plan.md + VoiceCostAnalysis-2026-01-02.md
  * Last updated: January 2026 (Azure OpenAI pricing)
  */
 const PRICING = {
-  // GPT-4o-mini: $0.15/1M input + $0.60/1M output ≈ $0.002/1K average ≈ €0.002/1K
+  // gpt-5-mini: ~$0.30/1M input + $1.20/1M output ≈ €0.002/1K average
   TEXT_PER_1K_TOKENS: 0.002,
   // gpt-realtime-mini: ~$0.03-0.05/min ≈ €0.04/min (conservative estimate)
   VOICE_REALTIME_PER_MIN: 0.04,
@@ -65,7 +65,7 @@ export interface UsageData {
   videoVisionFrames: number; // Video vision frames sent via data channel (ADR 0122)
 }
 
-export type CostStatus = "ok" | "warning" | "exceeded";
+export type CostStatus = 'ok' | 'warning' | 'exceeded';
 
 /**
  * Calculate cost breakdown from REAL usage data.
@@ -85,8 +85,7 @@ export function calculateCost(usage: Partial<UsageData>): CostBreakdown {
   const voiceCost = voiceMinutes * PRICING.VOICE_REALTIME_PER_MIN;
 
   // Embeddings cost: based on REAL token counts from embedding API
-  const embeddingsCost =
-    (embeddingTokens / 1000) * PRICING.EMBEDDINGS_PER_1K_TOKENS;
+  const embeddingsCost = (embeddingTokens / 1000) * PRICING.EMBEDDINGS_PER_1K_TOKENS;
 
   // Video vision cost: per-frame cost for webcam capture (ADR 0122)
   const videoVisionCost = videoVisionFrames * PRICING.VIDEO_VISION_PER_FRAME;
@@ -107,28 +106,24 @@ export function checkSessionCost(
   cost: number,
   hasVoice: boolean,
 ): { status: CostStatus; message?: string } {
-  const warnThreshold = hasVoice
-    ? THRESHOLDS.SESSION_VOICE_WARN
-    : THRESHOLDS.SESSION_TEXT_WARN;
-  const limitThreshold = hasVoice
-    ? THRESHOLDS.SESSION_VOICE_LIMIT
-    : THRESHOLDS.SESSION_TEXT_LIMIT;
+  const warnThreshold = hasVoice ? THRESHOLDS.SESSION_VOICE_WARN : THRESHOLDS.SESSION_TEXT_WARN;
+  const limitThreshold = hasVoice ? THRESHOLDS.SESSION_VOICE_LIMIT : THRESHOLDS.SESSION_TEXT_LIMIT;
 
   if (cost >= limitThreshold) {
     return {
-      status: "exceeded",
+      status: 'exceeded',
       message: `Session cost €${cost.toFixed(2)} exceeds limit €${limitThreshold.toFixed(2)}`,
     };
   }
 
   if (cost >= warnThreshold) {
     return {
-      status: "warning",
+      status: 'warning',
       message: `Session cost €${cost.toFixed(2)} approaching limit`,
     };
   }
 
-  return { status: "ok" };
+  return { status: 'ok' };
 }
 
 /**
@@ -159,15 +154,15 @@ export async function checkUserDailyBudget(
   const remaining = Math.max(0, THRESHOLDS.DAILY_USER_LIMIT - spent);
 
   if (spent >= THRESHOLDS.DAILY_USER_LIMIT) {
-    logger.warn("User daily budget exceeded", { userId, spent });
-    return { status: "exceeded", spent, remaining: 0 };
+    logger.warn('User daily budget exceeded', { userId, spent });
+    return { status: 'exceeded', spent, remaining: 0 };
   }
 
   if (spent >= THRESHOLDS.DAILY_USER_LIMIT * 0.8) {
-    return { status: "warning", spent, remaining };
+    return { status: 'warning', spent, remaining };
   }
 
-  return { status: "ok", spent, remaining };
+  return { status: 'ok', spent, remaining };
 }
 
 /**
@@ -185,7 +180,7 @@ export async function getCostStats(
   const metrics = await prisma.sessionMetrics.findMany({
     where: { createdAt: { gte: from, lte: to } },
     select: { costEur: true },
-    orderBy: { costEur: "asc" },
+    orderBy: { costEur: 'asc' },
   });
 
   if (metrics.length === 0) {

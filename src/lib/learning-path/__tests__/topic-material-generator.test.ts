@@ -6,17 +6,17 @@
  * @module learning-path/__tests__/topic-material-generator.test
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   generateTopicFlashcards,
   generateTopicQuiz,
   generateTopicMindmap,
   generateTopicMaterials,
   type TopicContext,
-} from "../topic-material-generator";
+} from '../topic-material-generator';
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -32,8 +32,8 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock AI provider
-vi.mock("@/lib/ai/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+vi.mock('@/lib/ai/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/ai/server')>();
   return {
     ...actual,
     chatCompletion: vi.fn(),
@@ -41,13 +41,13 @@ vi.mock("@/lib/ai/server", async (importOriginal) => {
 });
 
 // Mock tier service (ADR 0073)
-vi.mock("@/lib/tier/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+vi.mock('@/lib/tier/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tier/server')>();
   return {
     ...actual,
     tierService: {
       getFeatureAIConfigForUser: vi.fn(() =>
-        Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 1500 }),
+        Promise.resolve({ model: 'gpt-5-mini', temperature: 0.7, maxTokens: 1500 }),
       ),
     },
   };
@@ -55,23 +55,17 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
 
 // Mock deployment mapping
 
-import { chatCompletion } from "@/lib/ai/server";
+import { chatCompletion } from '@/lib/ai/server';
 
 const mockChatCompletion = vi.mocked(chatCompletion);
 
-describe("topic-material-generator", () => {
+describe('topic-material-generator', () => {
   const mockTopic: TopicContext = {
-    title: "La Rivoluzione Francese",
-    description: "Eventi e cause della Rivoluzione Francese del 1789",
-    keyConcepts: [
-      "Bastiglia",
-      "Luigi XVI",
-      "Terzo Stato",
-      "Dichiarazione dei Diritti",
-    ],
-    textExcerpt:
-      "La Rivoluzione Francese iniziò nel 1789 con la presa della Bastiglia...",
-    difficulty: "intermediate",
+    title: 'La Rivoluzione Francese',
+    description: 'Eventi e cause della Rivoluzione Francese del 1789',
+    keyConcepts: ['Bastiglia', 'Luigi XVI', 'Terzo Stato', 'Dichiarazione dei Diritti'],
+    textExcerpt: 'La Rivoluzione Francese iniziò nel 1789 con la presa della Bastiglia...',
+    difficulty: 'intermediate',
   };
 
   beforeEach(() => {
@@ -81,51 +75,50 @@ describe("topic-material-generator", () => {
   // ============================================================================
   // generateTopicFlashcards - [F-12]
   // ============================================================================
-  describe("generateTopicFlashcards", () => {
-    it("should generate flashcards from AI response [F-12]", async () => {
+  describe('generateTopicFlashcards', () => {
+    it('should generate flashcards from AI response [F-12]', async () => {
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          topic: "La Rivoluzione Francese",
+          topic: 'La Rivoluzione Francese',
           cards: [
-            { front: "Quando iniziò la Rivoluzione?", back: "1789" },
-            { front: "Chi era il re di Francia?", back: "Luigi XVI" },
+            { front: 'Quando iniziò la Rivoluzione?', back: '1789' },
+            { front: 'Chi era il re di Francia?', back: 'Luigi XVI' },
           ],
         }),
-        provider: "azure" as const,
-        model: "gpt-4o",
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
       const result = await generateTopicFlashcards(mockTopic, 2);
 
-      expect(result.topic).toBe("La Rivoluzione Francese");
+      expect(result.topic).toBe('La Rivoluzione Francese');
       expect(result.cards).toHaveLength(2);
-      expect(result.cards[0].front).toBe("Quando iniziò la Rivoluzione?");
-      expect(result.cards[0].back).toBe("1789");
+      expect(result.cards[0].front).toBe('Quando iniziò la Rivoluzione?');
+      expect(result.cards[0].back).toBe('1789');
     });
 
-    it("should handle JSON with markdown fences", async () => {
+    it('should handle JSON with markdown fences', async () => {
       mockChatCompletion.mockResolvedValue({
-        content:
-          '```json\n{"topic": "Test", "cards": [{"front": "Q?", "back": "A"}]}\n```',
-        provider: "azure" as const,
-        model: "gpt-4o",
+        content: '```json\n{"topic": "Test", "cards": [{"front": "Q?", "back": "A"}]}\n```',
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
       const result = await generateTopicFlashcards(mockTopic);
 
-      expect(result.topic).toBe("Test");
+      expect(result.topic).toBe('Test');
       expect(result.cards).toHaveLength(1);
     });
 
-    it("should throw on invalid JSON response", async () => {
+    it('should throw on invalid JSON response', async () => {
       mockChatCompletion.mockResolvedValue({
-        content: "Not valid JSON",
-        provider: "azure" as const,
-        model: "gpt-4o",
+        content: 'Not valid JSON',
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
       await expect(generateTopicFlashcards(mockTopic)).rejects.toThrow(
-        "Failed to parse flashcards JSON",
+        'Failed to parse flashcards JSON',
       );
     });
   });
@@ -133,113 +126,108 @@ describe("topic-material-generator", () => {
   // ============================================================================
   // generateTopicQuiz - [F-12]
   // ============================================================================
-  describe("generateTopicQuiz", () => {
-    it("should generate quiz from AI response [F-12]", async () => {
+  describe('generateTopicQuiz', () => {
+    it('should generate quiz from AI response [F-12]', async () => {
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          topic: "La Rivoluzione Francese",
+          topic: 'La Rivoluzione Francese',
           questions: [
             {
-              question: "In che anno iniziò la Rivoluzione?",
-              options: ["1788", "1789", "1790", "1791"],
+              question: 'In che anno iniziò la Rivoluzione?',
+              options: ['1788', '1789', '1790', '1791'],
               correctIndex: 1,
-              explanation:
-                "La Rivoluzione iniziò nel 1789 con la presa della Bastiglia",
+              explanation: 'La Rivoluzione iniziò nel 1789 con la presa della Bastiglia',
             },
           ],
         }),
-        provider: "azure" as const,
-        model: "gpt-4o",
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
       const result = await generateTopicQuiz(mockTopic, 1);
 
-      expect(result.topic).toBe("La Rivoluzione Francese");
+      expect(result.topic).toBe('La Rivoluzione Francese');
       expect(result.questions).toHaveLength(1);
       expect(result.questions[0].correctIndex).toBe(1);
       expect(result.questions[0].options).toHaveLength(4);
     });
 
-    it("should throw on invalid JSON response", async () => {
+    it('should throw on invalid JSON response', async () => {
       mockChatCompletion.mockResolvedValue({
-        content: "Invalid response",
-        provider: "azure" as const,
-        model: "gpt-4o",
+        content: 'Invalid response',
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
-      await expect(generateTopicQuiz(mockTopic)).rejects.toThrow(
-        "Failed to parse quiz JSON",
-      );
+      await expect(generateTopicQuiz(mockTopic)).rejects.toThrow('Failed to parse quiz JSON');
     });
   });
 
   // ============================================================================
   // generateTopicMindmap - [F-12]
   // ============================================================================
-  describe("generateTopicMindmap", () => {
-    it("should generate mindmap from AI response [F-12]", async () => {
+  describe('generateTopicMindmap', () => {
+    it('should generate mindmap from AI response [F-12]', async () => {
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          title: "La Rivoluzione Francese",
+          title: 'La Rivoluzione Francese',
           nodes: [
-            { id: "1", label: "Cause" },
-            { id: "1a", label: "Crisi economica", parentId: "1" },
-            { id: "2", label: "Eventi" },
-            { id: "2a", label: "Bastiglia", parentId: "2" },
+            { id: '1', label: 'Cause' },
+            { id: '1a', label: 'Crisi economica', parentId: '1' },
+            { id: '2', label: 'Eventi' },
+            { id: '2a', label: 'Bastiglia', parentId: '2' },
           ],
         }),
-        provider: "azure" as const,
-        model: "gpt-4o",
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
       const result = await generateTopicMindmap(mockTopic);
 
-      expect(result.title).toBe("La Rivoluzione Francese");
+      expect(result.title).toBe('La Rivoluzione Francese');
       expect(result.nodes).toHaveLength(4);
-      expect(result.nodes[1].parentId).toBe("1");
+      expect(result.nodes[1].parentId).toBe('1');
     });
 
-    it("should throw on invalid JSON response", async () => {
+    it('should throw on invalid JSON response', async () => {
       mockChatCompletion.mockResolvedValue({
-        content: "Not a mindmap",
-        provider: "azure" as const,
-        model: "gpt-4o",
+        content: 'Not a mindmap',
+        provider: 'azure' as const,
+        model: 'gpt-5-mini',
       });
 
-      await expect(generateTopicMindmap(mockTopic)).rejects.toThrow(
-        "Failed to parse mindmap JSON",
-      );
+      await expect(generateTopicMindmap(mockTopic)).rejects.toThrow('Failed to parse mindmap JSON');
     });
   });
 
   // ============================================================================
   // generateTopicMaterials - [F-12]
   // ============================================================================
-  describe("generateTopicMaterials", () => {
-    it("should generate flashcards and quiz in parallel [F-12]", async () => {
+  describe('generateTopicMaterials', () => {
+    it('should generate flashcards and quiz in parallel [F-12]', async () => {
       // First call is for flashcards, second is for quiz
       mockChatCompletion
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
-            cards: [{ front: "Q?", back: "A" }],
+            topic: 'Test',
+            cards: [{ front: 'Q?', back: 'A' }],
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         })
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
+            topic: 'Test',
             questions: [
               {
-                question: "Q?",
-                options: ["A", "B", "C", "D"],
+                question: 'Q?',
+                options: ['A', 'B', 'C', 'D'],
                 correctIndex: 0,
               },
             ],
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         });
 
       const result = await generateTopicMaterials(mockTopic);
@@ -249,37 +237,37 @@ describe("topic-material-generator", () => {
       expect(result.mindmap).toBeUndefined();
     });
 
-    it("should include mindmap when requested [F-12]", async () => {
+    it('should include mindmap when requested [F-12]', async () => {
       mockChatCompletion
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
-            cards: [{ front: "Q?", back: "A" }],
+            topic: 'Test',
+            cards: [{ front: 'Q?', back: 'A' }],
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         })
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
+            topic: 'Test',
             questions: [
               {
-                question: "Q?",
-                options: ["A", "B", "C", "D"],
+                question: 'Q?',
+                options: ['A', 'B', 'C', 'D'],
                 correctIndex: 0,
               },
             ],
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         })
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            title: "Test",
-            nodes: [{ id: "1", label: "Node 1" }],
+            title: 'Test',
+            nodes: [{ id: '1', label: 'Node 1' }],
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         });
 
       const result = await generateTopicMaterials(mockTopic, {
@@ -292,31 +280,31 @@ describe("topic-material-generator", () => {
       expect(result.mindmap?.nodes).toHaveLength(1);
     });
 
-    it("should respect custom counts [F-12]", async () => {
+    it('should respect custom counts [F-12]', async () => {
       mockChatCompletion
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
+            topic: 'Test',
             cards: Array(10)
               .fill(null)
               .map((_, i) => ({ front: `Q${i}?`, back: `A${i}` })),
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         })
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            topic: "Test",
+            topic: 'Test',
             questions: Array(5)
               .fill(null)
               .map((_, i) => ({
                 question: `Q${i}?`,
-                options: ["A", "B", "C", "D"],
+                options: ['A', 'B', 'C', 'D'],
                 correctIndex: 0,
               })),
           }),
-          provider: "azure" as const,
-          model: "gpt-4o",
+          provider: 'azure' as const,
+          model: 'gpt-5-mini',
         });
 
       const result = await generateTopicMaterials(mockTopic, {

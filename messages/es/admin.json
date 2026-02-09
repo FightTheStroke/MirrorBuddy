@@ -463,7 +463,11 @@
       "noErrors": "Sin errores recientes",
       "loading": "Cargando...",
       "error": "Error al cargar",
-      "refresh": "Actualizar"
+      "refresh": "Actualizar",
+      "events": "eventos",
+      "users": "usuarios",
+      "lastSeen": "Último",
+      "unhandled": "No gestionado"
     },
     "invite": {
       "title": "Invitación directa",

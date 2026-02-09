@@ -11,7 +11,7 @@
 | ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD)          |
 | Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms) |
 | Audio Format | PCM16, 24kHz, mono, base64-encoded                              |
-| Model        | `gpt-4o-realtime-preview` (Preview API)                         |
+| Model        | `gpt-realtime` (GA API)                                         |
 
 ## Architecture
 
@@ -37,21 +37,18 @@ Cost guards (ADR 0050) enforce soft cap (30 min warning) and hard cap (60 min au
 
 ```typescript
 // Start cost tracking
-import {
-  startVoiceSession,
-  updateVoiceDuration,
-} from "@/lib/metrics/voice-cost-guards";
+import { startVoiceSession, updateVoiceDuration } from '@/lib/metrics/voice-cost-guards';
 startVoiceSession(sessionId, userId);
 const check = updateVoiceDuration(sessionId, currentMinutes);
 if (!check.allowed) switchToTextMode(check.message);
 
 // Adaptive VAD per accessibility profile
-import { getAdaptiveVadConfig } from "@/lib/hooks/voice-session/adaptive-vad";
-const vadConfig = getAdaptiveVadConfig("dyslexia");
+import { getAdaptiveVadConfig } from '@/lib/hooks/voice-session/adaptive-vad';
+const vadConfig = getAdaptiveVadConfig('dyslexia');
 // { threshold: 0.55, silence_duration_ms: 1500, prefix_padding_ms: 400 }
 
 // Voice session store
-import { useVoiceSessionStore } from "@/lib/stores/voice-session-store";
+import { useVoiceSessionStore } from '@/lib/stores/voice-session-store';
 const { isConnected, isSpeaking, isListening } = useVoiceSessionStore();
 ```
 

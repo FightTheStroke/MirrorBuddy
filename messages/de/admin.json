@@ -463,7 +463,11 @@
       "noErrors": "Keine aktuellen Fehler",
       "loading": "Laden...",
       "error": "Fehler beim Laden",
-      "refresh": "Aktualisieren"
+      "refresh": "Aktualisieren",
+      "events": "Ereignisse",
+      "users": "Benutzer",
+      "lastSeen": "Zuletzt",
+      "unhandled": "Unbehandelt"
     },
     "invite": {
       "title": "Direkte Einladung",

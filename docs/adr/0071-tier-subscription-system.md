@@ -48,7 +48,7 @@ model TierDefinition {
   docsLimitTotal      Int      @default(1)          // Document uploads
 
   // AI Model assignments
-  chatModel           String   @default("gpt-4o-mini")          // Chat model
+  chatModel           String   @default("gpt-5-mini")          // Chat model
   realtimeModel       String   @default("gpt-realtime-mini")    // Voice model
 
   // Feature access (JSON flags)
@@ -193,19 +193,13 @@ class TierService {
   async getEffectiveTier(userId: string | null): Promise<TierDefinition>;
 
   // Check if user can access feature
-  async checkFeatureAccess(
-    userId: string | null,
-    featureKey: string,
-  ): Promise<boolean>;
+  async checkFeatureAccess(userId: string | null, featureKey: string): Promise<boolean>;
 
   // Get consumption limits for user
   async getLimitsForUser(userId: string | null): Promise<TierLimits>;
 
   // Get appropriate AI model based on tier
-  async getAIModelForUser(
-    userId: string | null,
-    type: "chat" | "vision" | "tts",
-  ): Promise<string>;
+  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision' | 'tts'): Promise<string>;
 
   // Cache invalidation (called after admin tier updates)
   invalidateCache(): void;
@@ -265,7 +259,7 @@ Per-user overrides stored in `UserSubscription.overrideLimits` and `overrideFeat
   "voiceMinutesDaily": 60,
   "toolsLimitDaily": 100,
   "docsLimitTotal": 50,
-  "chatModel": "gpt-4o",
+  "chatModel": "gpt-5-mini",
   "realtimeModel": "gpt-realtime",
   "features": { "chat": true, "voice": true, "quizzes": true },
   "availableMaestri": ["leonardo", "galileo", "curie"],

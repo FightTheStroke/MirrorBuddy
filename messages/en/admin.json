@@ -463,7 +463,11 @@
       "noErrors": "No recent errors",
       "loading": "Loading...",
       "error": "Error loading",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "events": "events",
+      "users": "users",
+      "lastSeen": "Last seen",
+      "unhandled": "Unhandled"
     },
     "invite": {
       "title": "Direct Invite",

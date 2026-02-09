@@ -201,15 +201,15 @@ Prevents release of stale documentation that could confuse users, mislead custom
 
 ### Checks Performed
 
-| Check                | Code Source                      | Doc Source | Purpose                                   |
-| -------------------- | -------------------------------- | ---------- | ----------------------------------------- |
-| Trial chat limit     | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 daily chats documented          |
-| Trial voice limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 5 minutes documented               |
-| Trial tools limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 tool uses documented            |
-| Trial maestri limit  | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 3 maestri documented               |
-| Health status values | `src/app/api/health/route.ts`    | README.md  | Verify healthy/degraded/unhealthy exist   |
-| Voice model name     | `src/lib/tier/tier-fallbacks.ts` | Code only  | Detect deprecated gpt-4o-realtime-preview |
-| Metrics push cadence | `vercel.json` + code             | Docs/Ops   | Verify 5-minute push schedule documented  |
+| Check                | Code Source                      | Doc Source | Purpose                                  |
+| -------------------- | -------------------------------- | ---------- | ---------------------------------------- |
+| Trial chat limit     | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 daily chats documented         |
+| Trial voice limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 5 minutes documented              |
+| Trial tools limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 tool uses documented           |
+| Trial maestri limit  | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 3 maestri documented              |
+| Health status values | `src/app/api/health/route.ts`    | README.md  | Verify healthy/degraded/unhealthy exist  |
+| Voice model name     | `src/lib/tier/tier-fallbacks.ts` | Code only  | Detect deprecated realtime model names   |
+| Metrics push cadence | `vercel.json` + code             | Docs/Ops   | Verify 5-minute push schedule documented |
 
 ### Exit Codes
 
@@ -248,7 +248,7 @@ When a mismatch is detected:
 
 1. **README mismatch**: Update README.md trial limits table to match code values
 2. **Health status mismatch**: Add missing status values to README or code
-3. **Voice model mismatch**: Fix deprecated model name in tier-fallbacks.ts
+3. **Voice model mismatch**: Replace deprecated realtime model names (gpt-4o-realtime-preview → gpt-realtime)
 4. **Metrics cadence mismatch**: Update vercel.json schedule or operations docs
 5. Re-run script until all checks PASS
 6. Commit fixes: `git add README.md docs/ && git commit -m "docs: fix doc-code mismatches"`
@@ -265,13 +265,13 @@ This check is automatically included in the release flow:
 
 ### Common Fixes
 
-| Mismatch                        | Fix                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------- |
-| Trial chat 10 → 15 in README    | Update README table: `\| Chat messages \| 10 /month \|`                    |
-| Trial voice 5 → 3 in README     | Update README table: `\| Voice time \| 5 min /month \|`                    |
-| Missing health status in README | Add "healthy, degraded, unhealthy" to health endpoint docs                 |
-| Deprecated model name found     | Replace `gpt-4o-realtime-preview` with `gpt-realtime` in tier-fallbacks.ts |
-| Metrics cadence wrong schedule  | Update vercel.json cron: `"schedule": "*/5 * * * *"`                       |
+| Mismatch                        | Fix                                                                                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Trial chat 10 → 15 in README    | Update README table: `\| Chat messages \| 10 /month \|`                                                                                                 |
+| Trial voice 5 → 3 in README     | Update README table: `\| Voice time \| 5 min /month \|`                                                                                                 |
+| Missing health status in README | Add "healthy, degraded, unhealthy" to health endpoint docs                                                                                              |
+| Deprecated model name found     | Replace deprecated realtime model names (gpt-4o-realtime-preview → gpt-realtime, gpt-4o-mini-realtime-preview → gpt-realtime-mini) in tier-fallbacks.ts |
+| Metrics cadence wrong schedule  | Update vercel.json cron: `"schedule": "*/5 * * * *"`                                                                                                    |
 
 ### References
 

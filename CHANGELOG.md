@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **AI Models Migration to GPT-5 Family** (9 Febbraio 2026):
+  - Migrated all Azure OpenAI models from GPT-4o family to GPT-5 family due to GPT-4o retirement (Standard: 2026-03-31, Provisioned: 2026-10-01)
+  - Model mapping: `gpt-4o-mini` → `gpt-5-mini` (chat, pdf, mindmap, flashcards, summary, chart), `gpt-4o-mini` → `gpt-5-nano` (demo, parameter extraction), `gpt-4o` → `gpt-5.2-edu` (education features: quiz, formula, homework, webcam for Base tier)
+  - Added `gpt-5.2-chat` deployment for Pro tier with enhanced conversational capabilities
+  - Model names now environment-driven via `DEFAULT_CHAT_MODEL`, `DEFAULT_CHAT_MODEL_EDU`, `DEFAULT_CHAT_MODEL_PRO`, `DEFAULT_DEMO_MODEL`, `DEFAULT_EXTRACTOR_MODEL` in Docker Compose and deployment configs
+  - Database migration `20260209120000_migrate_gpt4o_to_gpt5` updates all existing conversation and tool output records
 - Cookie documentation: all 9 cookies now disclosed with security attributes (was 4/9)
 - Tier system (Trial/Base/Pro) documented in compliance text
 - ~274 placeholder i18n keys replaced with real legal text (5 locales)

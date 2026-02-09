@@ -79,7 +79,7 @@
 
 4. Test connection:
    ```bash
-   curl https://your-resource.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-08-01-preview \
+   curl https://your-resource.openai.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2024-08-01-preview \
      -H "api-key: your-key" \
      -H "Content-Type: application/json" \
      -d '{"messages":[{"role":"user","content":"test"}]}'
@@ -100,13 +100,13 @@
 2. Match `.env.local` to deployment names:
 
    ```bash
-    AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini        # For chat
+    AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini        # For chat
     AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime  # For voice
    ```
 
 3. **IMPORTANT:** Use deployment name, NOT model name:
-   - ✅ Correct: `gpt-4o` (your deployment name)
-   - ❌ Wrong: `gpt-4o-2024-08-06` (model ID)
+   - ✅ Correct: `gpt-5-mini` (your deployment name)
+   - ❌ Wrong: `gpt-5-mini-2025-08-07` (model ID)
 
 ---
 
@@ -120,7 +120,7 @@
 
 **Background:** Azure has TWO versions with DIFFERENT event names:
 
-| Aspect           | Preview API                       | GA API                                   |
+| Aspect           | Preview API (deprecated)          | GA API                                   |
 | ---------------- | --------------------------------- | ---------------------------------------- |
 | Deployment       | `gpt-4o-realtime-preview`         | `gpt-realtime`                           |
 | URL Path         | `/openai/realtime`                | `/openai/v1/realtime`                    |
@@ -457,7 +457,7 @@
 
 ```typescript
 // Automatic detection in src/lib/rag/pgvector-utils.ts
-if (DATABASE_URL.startsWith("postgresql://")) {
+if (DATABASE_URL.startsWith('postgresql://')) {
   // Check if pgvector extension exists
   // If available: Use native vector search (fast)
   // If not available: Fall back to JSON vectors + JS similarity (slower)
@@ -989,8 +989,8 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 
    ```typescript
    navigator.mediaDevices.enumerateDevices().then((devices) => {
-     const mics = devices.filter((d) => d.kind === "audioinput");
-     console.log("Microphones:", mics);
+     const mics = devices.filter((d) => d.kind === 'audioinput');
+     console.log('Microphones:', mics);
    });
    ```
 
@@ -1024,7 +1024,7 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
    ```typescript
    // CORRECT - forces 24kHz
    const audioContext = new AudioContext({ sampleRate: 24000 });
-   console.log("Sample rate:", audioContext.sampleRate); // Must be 24000
+   console.log('Sample rate:', audioContext.sampleRate); // Must be 24000
 
    // WRONG - uses browser default (often 48kHz)
    const audioContext = new AudioContext();
@@ -1055,7 +1055,7 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
    ```typescript
    // MediaRecorder setup (line ~400-420)
    const mediaRecorder = new MediaRecorder(stream, {
-     mimeType: "audio/webm;codecs=opus", // Browser captures here
+     mimeType: 'audio/webm;codecs=opus', // Browser captures here
    });
 
    // Then resampled to 24kHz PCM16 for Azure
@@ -1132,9 +1132,9 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 
    ```bash
    # Look at your deployment name in .env.local
-   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime  # GA API
+   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime  # GA API (recommended)
    # or
-   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview  # Preview API
+   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview  # Preview API (deprecated)
    ```
 
 2. **Event name differences** (see [Azure OpenAI Issues](#preview-vs-ga-api-critical) above):
@@ -1148,8 +1148,8 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 
    ```typescript
    switch (event.type) {
-     case "response.output_audio.delta": // GA API
-     case "response.audio.delta": // Preview API
+     case 'response.output_audio.delta': // GA API
+     case 'response.audio.delta': // Preview API
        playAudio(event.delta);
        break;
    }
@@ -1257,8 +1257,8 @@ Our test-voice page includes device selection:
    ```typescript
    // List all devices in console
    navigator.mediaDevices.enumerateDevices().then((devices) => {
-     console.log(devices.filter((d) => d.kind === "audioinput")); // Mics
-     console.log(devices.filter((d) => d.kind === "audiooutput")); // Speakers
+     console.log(devices.filter((d) => d.kind === 'audioinput')); // Mics
+     console.log(devices.filter((d) => d.kind === 'audiooutput')); // Speakers
    });
    ```
 
@@ -1673,11 +1673,11 @@ npm run dev
 
    ```typescript
    // ✅ Correct
-   import { Button } from "@/components/ui/button";
+   import { Button } from '@/components/ui/button';
 
    // ❌ Wrong
-   import { Button } from "components/ui/button";
-   import { Button } from "src/components/ui/button";
+   import { Button } from 'components/ui/button';
+   import { Button } from 'src/components/ui/button';
    ```
 
 #### Problem: "Type 'X' is not assignable to type 'Y'"
@@ -1701,14 +1701,14 @@ npm run dev
 
    // ✅ Better: Type guard
    function isUser(data: unknown): data is User {
-     return typeof data === "object" && data !== null && "id" in data;
+     return typeof data === 'object' && data !== null && 'id' in data;
    }
    if (isUser(data)) {
      // data is User here
    }
 
    // ✅ Best: Zod schema validation
-   import { z } from "zod";
+   import { z } from 'zod';
    const UserSchema = z.object({ id: z.string(), name: z.string() });
    const user = UserSchema.parse(data);
    ```
@@ -1761,7 +1761,7 @@ npm run dev
 3. **Use optional chaining if property might not exist:**
    ```typescript
    // Instead of: user.profile.avatarUrl
-   const avatar = user.profile?.avatarUrl ?? "/default-avatar.png";
+   const avatar = user.profile?.avatarUrl ?? '/default-avatar.png';
    ```
 
 ---
@@ -2549,7 +2549,7 @@ Below is every environment variable MirrorBuddy uses. See [`.env.example`](.env.
 # Chat functionality
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
 # Voice functionality (if using voice features)
@@ -2585,7 +2585,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 **Cost Optimization (mini model for non-critical features):**
 
 ```bash
-AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-4o-mini-realtime
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 ```
 
 **Azure Cost Tracking (for Settings page cost display):**
@@ -2657,7 +2657,7 @@ npm run dev
 # .env.local
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
@@ -2690,14 +2690,14 @@ DATABASE_URL="file:./prisma/dev.db"
 # Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
 # Voice (with cost optimization)
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
-AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-4o-mini-realtime
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
 # RAG
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
@@ -2775,7 +2775,7 @@ npm run dev
 **Test Azure OpenAI:**
 
 ```bash
-curl https://your-resource.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview \
+curl https://your-resource.openai.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2024-08-01-preview \
   -H "api-key: your-api-key" \
   -H "Content-Type: application/json" \
   -d '{
@@ -2886,16 +2886,16 @@ psql $DATABASE_URL -c "SELECT 1"
 
    ```typescript
    await page.goto(currentUrl, {
-     waitUntil: "domcontentloaded",
+     waitUntil: 'domcontentloaded',
      timeout: 300000, // 5 minutes in CI
    });
-   await page.waitForLoadState("networkidle", { timeout: 300000 });
+   await page.waitForLoadState('networkidle', { timeout: 300000 });
    ```
 
 2. Use locale-aware navigation helper with retry and long timeouts for transient errors:
 
    ```typescript
-   await localePage.goto("/welcome"); // handles retries + long load-state waits
+   await localePage.goto('/welcome'); // handles retries + long load-state waits
    ```
 
 ---
@@ -2914,7 +2914,7 @@ psql $DATABASE_URL -c "SELECT 1"
    ```typescript
    const { panel } = await openA11yPanel(page);
    await expect(panel).toBeVisible({ timeout: 30000 });
-   await expect(panel).toHaveAttribute("aria-modal", "true");
+   await expect(panel).toHaveAttribute('aria-modal', 'true');
    ```
 
 3. For close button tests, ensure stability before click:
@@ -2939,7 +2939,7 @@ psql $DATABASE_URL -c "SELECT 1"
 
    ```typescript
    await expect(sections.first()).toBeVisible({ timeout: 30000 });
-   const labelledBy = await section.getAttribute("aria-labelledby");
+   const labelledBy = await section.getAttribute('aria-labelledby');
    await expect(page.locator(`#${labelledBy}`)).toBeAttached();
    ```
 
@@ -2972,10 +2972,10 @@ localStorage: [
 
 ```typescript
 // Correct
-await page.fill("input#username", "user@example.com");
+await page.fill('input#username', 'user@example.com');
 
 // Wrong - will fail
-await page.fill('input[type="email"]', "user@example.com");
+await page.fill('input[type="email"]', 'user@example.com');
 ```
 
 ### CI vs Local Test Classification
@@ -3425,7 +3425,7 @@ ollama pull llama3.2
 
 **Production:** Depends on usage
 
-- Chat (gpt-4o): ~$0.01 per conversation
+- Chat (gpt-5-mini): ~$0.01 per conversation
 - Voice (gpt-realtime-mini): ~$0.03-0.05 per minute
 - Voice (gpt-realtime): ~$0.30 per minute
 
