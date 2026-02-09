@@ -215,6 +215,17 @@ src/app/admin/compliance/
 | `src/lib/compliance/bias-audit-service.ts`   | Quarterly fairness testing         |
 | `src/app/admin/compliance/page.tsx`          | Compliance monitoring dashboard    |
 
+## Post-Audit Update (Feb 2026)
+
+A 7-agent compliance audit (Plan 138) identified 22 issues across the framework established by this ADR. All issues were remediated in a 3-wave plan:
+
+- **22 issues found**: undisclosed AI vendors, missing audit trail persistence, incomplete cookie docs, placeholder i18n keys, false claims in compliance docs
+- **Key architectural change**: Safety audit trail migrated from console.log to PostgreSQL (`ComplianceAuditEntry` model) with buffer flush and retry
+- **Documentation honesty policy**: All compliance docs now reflect actual implementation state — aspirational features marked as "Planned", not claimed as implemented
+- **Country coverage**: 23 country-specific compliance docs created (IT/FR/DE/ES/UK)
+
+Full details: **ADR 0140** (Compliance Audit Remediation)
+
 ## Related ADRs
 
 - **ADR 0004** - Safety Guardrails (foundation for compliance)
@@ -223,6 +234,7 @@ src/app/admin/compliance/
 - **ADR 0056** - Trial Mode Architecture (compliance for anonymous users)
 - **ADR 0057** - Invite System (beta access controls)
 - **ADR 0058** - Observability and KPIs (monitoring infrastructure)
+- **ADR 0140** - Compliance Audit Remediation (7-agent audit findings and remediation plan)
 
 ## References
 

@@ -114,23 +114,27 @@
 
 ## Deployment & Infrastructure
 
-| #    | Decision                                                  | Impact                                 |
-| ---- | --------------------------------------------------------- | -------------------------------------- |
-| 0044 | Performance Optimizations                                 | Bundle splitting, lazy loading         |
-| 0046 | Production Hardening (Plan 46)                            | Pre-production checklist               |
-| 0052 | Vercel Deployment Configuration                           | CI-controlled deployments              |
-| 0053 | Supabase Migration                                        | Managed PostgreSQL hosting             |
-| 0054 | Upstash Redis for Distributed Rate Limiting               | Serverless Redis                       |
-| 0063 | Supabase SSL Certificate Requirements                     | SSL certificate chain handling         |
-| 0067 | Database Performance Optimization for Serverless          | Connection pooling, query optimization |
-| 0073 | Staging System on Vercel                                  | Preview deployments                    |
-| 0078 | Vercel Runtime Constraints                                | Edge function limits                   |
-| 0079 | Web Vitals Analytics and Legal Documentation Architecture | Performance monitoring                 |
-| 0105 | Prisma Race Condition Prevention                          | Transaction-based updates              |
-| 0107 | Composable API Handler Pipeline                           | Standard API route handler chain       |
-| 0113 | Composable API Handler Pattern (pipe middleware)          | withCSRF/withAdmin/withSentry pipeline |
-| 0114 | Query Raw Elimination                                     | Prisma typed queries only              |
-| 0116 | Documentation AI-Ready Architecture                       | 3-tier docs, 96% token reduction       |
+| #    | Decision                                                  | Impact                                  |
+| ---- | --------------------------------------------------------- | --------------------------------------- |
+| 0044 | Performance Optimizations                                 | Bundle splitting, lazy loading          |
+| 0046 | Production Hardening (Plan 46)                            | Pre-production checklist                |
+| 0052 | Vercel Deployment Configuration                           | CI-controlled deployments               |
+| 0053 | Supabase Migration                                        | Managed PostgreSQL hosting              |
+| 0054 | Upstash Redis for Distributed Rate Limiting               | Serverless Redis                        |
+| 0063 | Supabase SSL Certificate Requirements                     | SSL certificate chain handling          |
+| 0067 | Database Performance Optimization for Serverless          | Connection pooling, query optimization  |
+| 0073 | Staging System on Vercel                                  | Preview deployments                     |
+| 0078 | Vercel Runtime Constraints                                | Edge function limits                    |
+| 0079 | Web Vitals Analytics and Legal Documentation Architecture | Performance monitoring                  |
+| 0105 | Prisma Race Condition Prevention                          | Transaction-based updates               |
+| 0107 | Composable API Handler Pipeline                           | Standard API route handler chain        |
+| 0113 | Composable API Handler Pattern (pipe middleware)          | withCSRF/withAdmin/withSentry pipeline  |
+| 0114 | Query Raw Elimination                                     | Prisma typed queries only               |
+| 0116 | Documentation AI-Ready Architecture                       | 3-tier docs, 96% token reduction        |
+| 0137 | Schema Drift Detection                                    | Detect Prisma schema vs DB mismatches   |
+| 0138 | Vercel Environment Variable Sync                          | Sync env vars across preview/prod       |
+| 0139 | Tool Naming Normalization                                 | Consistent tool naming conventions      |
+| 0140 | Compliance Audit Remediation                              | 22-issue remediation from 7-agent audit |
 
 ## Features & Tools
 
@@ -192,6 +196,6 @@
 
 ---
 
-**Total Active ADRs**: 114
+**Total Active ADRs**: 118
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-07
+**Last Updated**: 2026-02-09
