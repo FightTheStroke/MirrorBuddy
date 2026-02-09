@@ -21,8 +21,10 @@ import { SafetyEscalations } from "./components/safety-escalations";
 import { SafetyStatistics } from "./components/safety-statistics";
 import { cn } from "@/lib/utils";
 import type { SafetyDashboardResponse } from "@/app/api/admin/safety/route";
+import { useTranslations } from "next-intl";
 
 export default function AdminSafetyPage() {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +88,7 @@ export default function AdminSafetyPage() {
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading safety dashboard...</p>
+          <p className="text-muted-foreground">{t("loadingSafetyDashboard")}</p>
         </div>
       </div>
     );
@@ -96,7 +98,7 @@ export default function AdminSafetyPage() {
     <div className="max-w-7xl mx-auto">
       <PageHeader
         icon={Shield}
-        title="AI Safety Dashboard"
+        title={t("aiSafetyDashboard")}
         rightContent={
           <Button
             variant="outline"
@@ -107,7 +109,7 @@ export default function AdminSafetyPage() {
             <RefreshCw
               className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")}
             />
-            Refresh
+            {t("refresh")}
           </Button>
         }
       />
@@ -131,7 +133,7 @@ export default function AdminSafetyPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>{t("quickActions")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-3">
@@ -141,7 +143,7 @@ export default function AdminSafetyPage() {
                   className="gap-2"
                 >
                   <Download className="h-4 w-4" />
-                  Export Audit Log (JSON)
+                  {t("exportAuditLogJson")}
                 </Button>
               </div>
             </CardContent>

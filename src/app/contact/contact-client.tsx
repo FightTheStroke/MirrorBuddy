@@ -13,13 +13,13 @@ export function ContactClient() {
       {/* Navigation */}
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700"
-        aria-label="Navigazione pagina"
+        aria-label={t("navigazionePagina")}
       >
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors"
-            aria-label="Torna alla home page di MirrorBuddy"
+            aria-label={t("tornaAllaHomePageDiMirrorbuddy")}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             {t("backButton")}

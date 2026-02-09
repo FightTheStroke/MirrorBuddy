@@ -81,7 +81,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
 
   return (
     <aside className="w-56 flex-shrink-0 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 overflow-y-auto">
-      <nav aria-label="Filtri materiali">
+      <nav aria-label={t("filtriMateriali")}>
         {/* All Materials */}
         <button
           onClick={() =>

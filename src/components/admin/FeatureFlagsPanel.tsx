@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth";
 import type { FeatureFlag, KnownFeatureFlag } from "@/lib/feature-flags/types";
+import { useTranslations } from "next-intl";
 
 interface DegradationState {
   level: "none" | "partial" | "severe";
@@ -29,6 +30,7 @@ interface FeatureFlagsPanelProps {
 }
 
 export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
+  const t = useTranslations("admin");
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [globalKillSwitch, setGlobalKillSwitch] = useState(false);
   const [degradationState, setDegradationState] = useState<DegradationState>({
@@ -142,7 +144,7 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
       <Card className={globalKillSwitch ? "border-red-500" : ""}>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center justify-between">
-            <span>System Status</span>
+            <span>{t("systemStatus")}</span>
             <StatusBadge
               status={
                 globalKillSwitch
@@ -193,7 +195,7 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
       {/* Feature Flags List */}
       <Card>
         <CardHeader>
-          <CardTitle>Feature Flags ({flags.length})</CardTitle>
+          <CardTitle>{t("featureFlags")}{flags.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -233,6 +235,7 @@ function FeatureFlagRow({
   isUpdating,
   globalDisabled,
 }: FeatureFlagRowProps) {
+  const t = useTranslations("admin");
   const isDisabled =
     flag.killSwitch || globalDisabled || flag.status === "disabled";
 
@@ -263,7 +266,7 @@ function FeatureFlagRow({
       <div className="flex items-center gap-2">
         {flag.enabledPercentage < 100 && (
           <span className="text-xs text-muted-foreground">
-            {flag.enabledPercentage}% rollout
+            {flag.enabledPercentage}{t("rollout")}
           </span>
         )}
 

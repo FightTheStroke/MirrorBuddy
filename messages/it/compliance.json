@@ -34,7 +34,23 @@
           "sectorPlaceholder": "Seleziona un settore",
           "employeeCountPlaceholder": "Seleziona una fascia",
           "submitButton": "Invia Richiesta Enterprise"
-        }
+        },
+        "tornaAllaHome": "Torna alla Home",
+        "nome": "Nome *",
+        "ilTuoNomeCompleto": "Il tuo nome completo",
+        "email": "Email *",
+        "ruolo": "Ruolo *",
+        "esDirectorManagerCto": "es. Director, Manager, CTO",
+        "nomeAzienda": "Nome Azienda *",
+        "nomeDellaVostraAzienda": "Nome della vostra azienda",
+        "settore": "Settore *",
+        "selezionaUnSettore": "Seleziona un settore",
+        "nDipendenti": "N° Dipendenti *",
+        "selezionaUnaFascia": "Seleziona una fascia",
+        "temiDiInteresse": "Temi di interesse *",
+        "messaggio": "Messaggio",
+        "condividiITuoiRequisitiSpecifici": "Condividi i tuoi requisiti specifici...",
+        "inviaRichiestaEnterprise": "Invia Richiesta Enterprise"
       },
       "form": {
         "emailInvalid": "L'email non è valida",
@@ -95,7 +111,11 @@
         "submitButtonDefault": "Invia richiesta",
         "submitButtonLoading": "Invio in corso...",
         "successMessage": "La tua richiesta è stata inviata con successo. Ti contatteremo presto.",
-        "successTitle": "Richiesta inviata"
+        "successTitle": "Richiesta inviata",
+        "nome1": "Nome *",
+        "nome": "Nome",
+        "email1": "Email *",
+        "email": "Email"
       },
       "schools": {
         "title": "Contatto Scuole - MirrorBuddy",
@@ -108,7 +128,9 @@
       "layout": {
         "title": "Contattaci - MirrorBuddy",
         "description": "Contatta il team MirrorBuddy"
-      }
+      },
+      "navigazionePagina": "Navigazione pagina",
+      "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy"
     },
     "page": {
       "subtitle": "Documentazione legale, privacy, cookie, accessibilità e trasparenza sull'IA",
@@ -191,7 +213,12 @@
         "authorityLabel": "Autorità di Supervisione",
         "responseTime": "Tempo di risposta",
         "responseTimeValue": "5 giorni lavorativi"
-      }
+      },
+      "tab": "Tab",
+      "enter": "Enter",
+      "esc": "Esc",
+      "space": "Space",
+      "wcag21LevelAa": "• WCAG 2.1 Level AA"
     },
     "aiTransparency": {
       "contact": {
@@ -475,8 +502,13 @@
           "formValue": "Usa il modulo di contatto su www.mirrorbuddy.com/contact per inviarci feedback sulla trasparenza dell'IA. Rispondiamo a tutte le richieste entro 5 giorni lavorativi.",
           "intro": "Hai domande sul nostro utilizzo dell'IA? Puoi contattarci nei seguenti modi:",
           "title": "9. Contatta Noi - Domande sulla Trasparenza dell'IA"
-        }
-      }
+        },
+        "importante": "Importante:",
+        "mirrorbuddyUtilizza": "MirrorBuddy utilizza Azure OpenAI (GPT-4),",
+        "azureOpenaiGpt4": "Azure Openai Gpt4"
+      },
+      "navigazionePagina": "Navigazione pagina",
+      "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy"
     },
     "privacyTitle": "Informativa sulla Privacy",
     "termsTitle": "Termini e Condizioni",
@@ -893,7 +925,18 @@
           "point2": "Non utilizziamo cookie di tracciamento pubblicitario, profilazione commerciale o marketing di terze parti",
           "point3": "Le analytics vengono raccolte lato server (Vercel Analytics) senza installare cookie nel tuo browser",
           "point4": "Puoi gestire i cookie tramite le impostazioni del browser o dalla sezione Privacy di MirrorBuddy"
-        }
+        },
+        "notaTecnica": "Nota tecnica:",
+        "privacyPolicy": "Privacy Policy",
+        "chrome": "Chrome -",
+        "firefox": "Firefox -",
+        "safari": "Safari -",
+        "edge": "Edge -",
+        "supabase": "Supabase -",
+        "azureOpenai": "Azure OpenAI -",
+        "resend": "Resend -",
+        "upstash": "Upstash -",
+        "sentry": "Sentry -"
       },
       "privacy": {
         "page": {
@@ -911,8 +954,20 @@
             "noDataSale": "Non vendiamo mai i tuoi dati a terzi",
             "deleteAnytime": "Puoi eliminare il tuo account e i tuoi dati in qualsiasi momento",
             "europeanData": "I tuoi dati sono protetti da leggi europee sulla privacy (GDPR)",
-            "optionalAnalytics": "Gli analytics opzionali ci aiutano a capire come usi l'app, ma puoi rifiutare"
-          }
+            "optionalAnalytics": "Gli analytics opzionali ci aiutano a capire come usi l'app, ma puoi rifiutare",
+            "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
+            "lastUpdated": "24 Gennaio 2026",
+            "pageNavigation": "Page Navigation",
+            "backToHome": "Back To Home",
+            "title": "Title",
+            "version": "Version",
+            "k24Gennaio2026": "K24 Gennaio2026",
+            "tldrHeading": "Tldr Heading",
+            "questionText": "Question Text",
+            "questionAriaLabel": "Question Aria Label"
+          },
+          "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
+          "k24Gennaio2026": "24 Gennaio 2026"
         },
         "section1": {
           "title": "Chi siamo e come funziona questa policy",
@@ -1039,7 +1094,13 @@
             "conversations": "Le conversazioni con i maestri vengono conservate per 90 giorni inattività, poi archiviate per 1 anno, poi eliminate",
             "webVitals": "I dati tecnici (Web Vitals, errori) vengono conservati per 12 mesi per miglioramento, poi aggregati ed eliminati",
             "deletedAccount": "Quando elimini il tuo account, tutti i dati vengono cancellati entro 30 giorni (backup: 90 giorni per legge). I dati aggregati per ricerca rimangono pseudonimizzati"
-          }
+          },
+          "accountAttivo": "Account attivo",
+          "accountCancellato": "Account cancellato",
+          "conversazioni": "Conversazioni",
+          "resend": "Resend",
+          "supabase": "Supabase",
+          "webVitals": "Web Vitals"
         },
         "section10": {
           "title": "I Tuoi Diritti sulla Privacy",
@@ -1104,7 +1165,8 @@
             "euServers": "I dati rimangono su server europei",
             "improvement": "Aiuta a migliorare l'affidabilità globale"
           },
-          "noTracking": "MirrorBuddy non utilizza tracciamento pubblicitario o profilazione commerciale."
+          "noTracking": "MirrorBuddy non utilizza tracciamento pubblicitario o profilazione commerciale.",
+          "sentryTitle": "Sentry (Monitoraggio Errori e Performance):"
         },
         "section12": {
           "title": "Google Drive e Integrazioni",
@@ -1184,7 +1246,9 @@
             }
           },
           "closing": "Apprezziamo la tua fiducia nella protezione della tua privacy e rimaniamo a tua disposizione per qualsiasi domanda.",
-          "contactEmailAriaLabel": "Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
+          "contactEmailAriaLabel": "Invia email a info@fightthestroke.org per domande sulla Privacy Policy",
+          "vercelAnalytics": "Vercel Analytics",
+          "sentryTitle": "Sentry (Monitoraggio Errori e Performance):"
         },
         "section16": {
           "title": "16. Sistemi di Intelligenza Artificiale e Diritti dell'Utente",
@@ -1240,7 +1304,10 @@
             "retention": "Conserviamo i log delle decisioni di IA per 90 giorni per revisione e miglioramento, poi li eliminiamo"
           },
           "learnMoreHeading": "Vuoi Sapere di Più?",
-          "learnMoreText": "per informazioni complete sulla nostra architettura di IA, bias testing, e come usiamo i dati conversazionali."
+          "learnMoreText": "per informazioni complete sulla nostra architettura di IA, bias testing, e come usiamo i dati conversazionali.",
+          "aiPolicyCompleta": "AI Policy completa",
+          "leggiLaNostra": "Leggi la nostra",
+          "nonElaboriamoConAi": "Non elaboriamo con AI"
         },
         "tierSystem": {
           "title": "Livelli di Servizio e Raccolta Dati",
@@ -1648,7 +1715,16 @@
           "Feedback da almeno 50 utenti su accuracy o bias"
         ],
         "contact": "Per domande su questa carta modello, contattare: roberdan@fightthestroke.org"
-      }
+      },
+      "website": "Website:",
+      "contextWindow": "Context Window:",
+      "latency": "Latency:",
+      "knowledgeCutoff": "Knowledge Cutoff:",
+      "reviewFrequency": "Review Frequency:",
+      "nextReview": "Next Review:",
+      "triggerEvents": "Trigger Events:",
+      "contact": "Contact:",
+      "compliance": "Compliance"
     },
     "pageTitle": "Conformità e Documentazione Legale",
     "pageDescription": "MirrorBuddy è conforme a GDPR, AI Act UE, Legge 132/2025, COPPA e WCAG 2.1 AA. Qui trovi tutta la documentazione.",
@@ -1663,6 +1739,12 @@
       "fullLabel": "Risposta AI",
       "ariaLabel": "Risposta generata da intelligenza artificiale",
       "tooltip": "Questa risposta è generata da un'intelligenza artificiale. Verifica sempre le informazioni importanti."
-    }
+    },
+    "nonElaboriamoConAi": "Non elaboriamo con AI:",
+    "leggiLaNostra": "Leggi la nostra",
+    "aiPolicyCompleta": "AI Policy completa",
+    "vercelAnalytics": "Vercel Analytics:",
+    "supabase": "Supabase:",
+    "resend": "Resend:"
   }
 }

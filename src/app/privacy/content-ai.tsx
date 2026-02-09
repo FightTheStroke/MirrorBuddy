@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContentAI() {
+  const t = useTranslations("compliance");
   const s16 = useTranslations("compliance.legal.privacy.section16");
 
   return (
@@ -33,7 +34,7 @@ export function PrivacyContentAI() {
         </li>
       </ul>
       <p>
-        <strong>Non elaboriamo con AI:</strong> {s16("notProcessed")}
+        <strong>{t("nonElaboriamoConAi")}</strong> {s16("notProcessed")}
       </p>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
@@ -99,12 +100,12 @@ export function PrivacyContentAI() {
         {s16("learnMoreHeading")}
       </h3>
       <p>
-        Leggi la nostra{" "}
+        {t("leggiLaNostra")}{" "}
         <Link
           href="/ai-policy"
           className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
         >
-          AI Policy completa
+          {t("aiPolicyCompleta")}
         </Link>{" "}
         {s16("learnMoreText")}
       </p>

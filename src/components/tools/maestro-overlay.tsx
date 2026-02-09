@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export type MaestroStatus = "idle" | "thinking" | "building" | "speaking";
 
@@ -43,6 +44,7 @@ export function MaestroOverlay({
   onExpand,
   className,
 }: MaestroOverlayProps) {
+  const t = useTranslations("tools");
   // Use lazy initializer to set initial position based on window size
   const [position, setPosition] = useState(() => {
     if (typeof window !== "undefined") {
@@ -256,7 +258,7 @@ export function MaestroOverlay({
               onClick={onExpand}
             >
               <MessageSquare className="w-3 h-3 mr-1" />
-              Espandi chat
+              {t("espandiChat")}
             </Button>
           </div>
         )}

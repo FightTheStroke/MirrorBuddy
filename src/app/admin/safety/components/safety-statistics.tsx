@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,12 +9,14 @@ import {
 } from "@/components/ui/card";
 import { ZapOff, Shield } from "lucide-react";
 import type { SafetyDashboardResponse } from "@/app/api/admin/safety/route";
+import { useTranslations } from "next-intl";
 
 interface SafetyStatisticsProps {
   statistics: SafetyDashboardResponse["statistics"];
 }
 
 export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
+  const t = useTranslations("admin");
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       {/* Mitigation Effectiveness */}
@@ -20,16 +24,16 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ZapOff className="h-5 w-5" />
-            Mitigation Effectiveness
+            {t("mitigationEffectiveness")}
           </CardTitle>
-          <CardDescription>Outcomes of detected safety events</CardDescription>
+          <CardDescription>{t("outcomesOfDetectedSafetyEvents")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-sm text-muted-foreground">Blocked</span>
+                <span className="text-sm text-muted-foreground">{t("blocked")}</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.blockedCount}
@@ -38,7 +42,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span className="text-sm text-muted-foreground">Modified</span>
+                <span className="text-sm text-muted-foreground">{t("modified")}</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.modifiedCount}
@@ -47,7 +51,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-sm text-muted-foreground">Escalated</span>
+                <span className="text-sm text-muted-foreground">{t("escalated")}</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.escalatedCount}
@@ -56,7 +60,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span className="text-sm text-muted-foreground">Monitored</span>
+                <span className="text-sm text-muted-foreground">{t("monitored")}</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.monitoredCount}
@@ -65,7 +69,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-sm text-muted-foreground">Allowed</span>
+                <span className="text-sm text-muted-foreground">{t("allowed")}</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.allowedCount}
@@ -80,17 +84,17 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Regulatory Framework Impact
+            {t("regulatoryFrameworkImpact")}
           </CardTitle>
           <CardDescription>
-            Compliance coverage across regulations
+            {t("complianceCoverageAcrossRegulations")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
-                EU AI Act
+                {t("euAiAct")}
               </span>
               <span className="font-mono font-bold">
                 {statistics.regulatoryImpact.aiActEvents}
@@ -114,7 +118,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-muted-foreground">
-                Italian L.132 Art.4
+                {t("italianL132Art4")}
               </span>
               <span className="font-mono font-bold">
                 {statistics.regulatoryImpact.italianL132Art4Events}

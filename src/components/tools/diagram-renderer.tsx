@@ -7,6 +7,7 @@ import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import type { DiagramRequest } from "@/types";
+import { useTranslations } from "next-intl";
 
 // Mermaid type for ref - avoids static import that bundles the library
 type MermaidAPI = {
@@ -69,6 +70,7 @@ interface DiagramRendererProps {
 }
 
 export function DiagramRenderer({ request, className }: DiagramRendererProps) {
+  const t = useTranslations("tools");
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const containerRef = useRef<HTMLDivElement>(null);
@@ -159,7 +161,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       <div className="p-4">
         {error ? (
           <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
-            <strong>Diagram Error:</strong> {error}
+            <strong>{t("diagramError")}</strong> {error}
           </div>
         ) : (
           <div
@@ -176,7 +178,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       {/* Source code toggle */}
       <details className="border-t border-slate-200 dark:border-slate-700">
         <summary className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50">
-          View source
+          {t("viewSource")}
         </summary>
         <pre className="p-4 text-xs text-slate-600 dark:text-slate-400 overflow-x-auto bg-slate-100 dark:bg-slate-900/50">
           {request.code}

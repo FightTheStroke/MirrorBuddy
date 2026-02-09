@@ -56,7 +56,7 @@ export function WebcamControls({
                     }
                     ${countdown !== null ? "opacity-50 cursor-not-allowed" : ""}
                   `}
-                  aria-label={`Timer ${opt.label}`}
+                  aria-label={t("timerOption", { label: opt.label })}
                 >
                   <span className="text-xl">{opt.icon}</span>
                   <span className="text-xs font-medium mt-1">{opt.label}</span>

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * PDFImage Component
  * Accessible image component with ALT text for PDF generation
@@ -7,6 +9,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
 import { mergeStyles, toReactPdfStyle, type StyleInput } from '../utils/style-utils';
+import { useTranslations } from "next-intl";
 
 interface PDFImageProps {
   src: string;
@@ -110,6 +113,7 @@ export function PDFImage({
   height,
   style,
 }: PDFImageProps) {
+  const t = useTranslations("tools");
   const styles = createImageStyles(profile);
 
   // Determine container style based on profile
@@ -141,7 +145,7 @@ export function PDFImage({
 
       {/* ALT text - always visible for accessibility */}
       <View style={styles.altTextContainer}>
-        <Text style={styles.altLabel}>Descrizione immagine:</Text>
+        <Text style={styles.altLabel}>{t("descrizioneImmagine")}</Text>
         <Text style={styles.altText}>{alt}</Text>
       </View>
 

@@ -169,7 +169,7 @@ export function AnalyticsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Analytics Dashboard
+            {t("analyticsDashboard")}
           </h2>
           <p className="text-sm text-slate-500">{t("description")}</p>
         </div>

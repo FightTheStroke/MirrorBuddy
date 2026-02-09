@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { sanitize } from "@/lib/sanitize";
 import type { CalculatorData, CalculatorStep } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface CalculatorRendererProps {
   data: CalculatorData;
@@ -15,6 +16,7 @@ export function CalculatorRenderer({
   data,
   className,
 }: CalculatorRendererProps) {
+  const t = useTranslations("tools");
   const [expandedSteps, setExpandedSteps] = useState(true);
 
   return (
@@ -67,7 +69,7 @@ export function CalculatorRenderer({
             }
           >
             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Passaggi di calcolo ({data.steps.length})
+              {t("passaggiDiCalcolo")}{data.steps.length})
             </span>
             <svg
               className={cn(

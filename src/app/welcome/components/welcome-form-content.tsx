@@ -60,7 +60,7 @@ export function WelcomeFormContent({
               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/30 shadow-lg">
                 <Image
                   src="/avatars/melissa.webp"
-                  alt="Melissa - Coach"
+                  alt={t("melissaCoach")}
                   width={96}
                   height={96}
                   className="object-cover w-full h-full"

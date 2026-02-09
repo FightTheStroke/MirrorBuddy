@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 interface TierInfo {
   name: string;
 }
@@ -9,6 +12,7 @@ interface UserInfoCardProps {
 }
 
 export function UserInfoCard({ username, email, tier }: UserInfoCardProps) {
+  const t = useTranslations("admin");
   return (
     <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4">
       <p className="text-sm font-medium text-slate-900 dark:text-white">
@@ -20,7 +24,7 @@ export function UserInfoCard({ username, email, tier }: UserInfoCardProps) {
       {tier && (
         <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Current Tier
+            {t("currentTier")}
           </p>
           <p className="text-sm font-medium text-slate-900 dark:text-white">
             {tier.name}

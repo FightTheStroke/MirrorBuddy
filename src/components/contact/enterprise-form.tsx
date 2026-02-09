@@ -131,7 +131,7 @@ export function EnterpriseForm() {
           {t("successDescription")}
         </p>
         <Button onClick={() => (window.location.href = "/")}>
-          Torna alla Home
+          {t("tornaAllaHome")}
         </Button>
       </div>
     );
@@ -154,7 +154,7 @@ export function EnterpriseForm() {
           htmlFor="name"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Nome *
+          {t("nome")}
         </label>
         <Input
           type="text"
@@ -164,7 +164,7 @@ export function EnterpriseForm() {
             setFormData((prev) => ({ ...prev, name: e.target.value }))
           }
           disabled={formState === "submitting"}
-          placeholder="Il tuo nome completo"
+          placeholder={t("ilTuoNomeCompleto")}
           className={errors.name ? "border-red-500" : ""}
         />
         {errors.name && (
@@ -180,7 +180,7 @@ export function EnterpriseForm() {
           htmlFor="email"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Email *
+          {t("email")}
         </label>
         <Input
           type="email"
@@ -206,7 +206,7 @@ export function EnterpriseForm() {
           htmlFor="role"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Ruolo *
+          {t("ruolo")}
         </label>
         <Input
           type="text"
@@ -216,7 +216,7 @@ export function EnterpriseForm() {
             setFormData((prev) => ({ ...prev, role: e.target.value }))
           }
           disabled={formState === "submitting"}
-          placeholder="es. Director, Manager, CTO"
+          placeholder={t("esDirectorManagerCto")}
           className={errors.role ? "border-red-500" : ""}
         />
         {errors.role && (
@@ -232,7 +232,7 @@ export function EnterpriseForm() {
           htmlFor="company"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Nome Azienda *
+          {t("nomeAzienda")}
         </label>
         <Input
           type="text"
@@ -242,7 +242,7 @@ export function EnterpriseForm() {
             setFormData((prev) => ({ ...prev, company: e.target.value }))
           }
           disabled={formState === "submitting"}
-          placeholder="Nome della vostra azienda"
+          placeholder={t("nomeDellaVostraAzienda")}
           className={errors.company ? "border-red-500" : ""}
         />
         {errors.company && (
@@ -258,7 +258,7 @@ export function EnterpriseForm() {
           htmlFor="sector"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Settore *
+          {t("settore")}
         </label>
         <select
           id="sector"
@@ -273,7 +273,7 @@ export function EnterpriseForm() {
               : "border-slate-300 dark:border-slate-600"
           }`}
         >
-          <option value="">Seleziona un settore</option>
+          <option value="">{t("selezionaUnSettore")}</option>
           {SECTORS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -293,7 +293,7 @@ export function EnterpriseForm() {
           htmlFor="employeeCount"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          N° Dipendenti *
+          {t("nDipendenti")}
         </label>
         <select
           id="employeeCount"
@@ -308,7 +308,7 @@ export function EnterpriseForm() {
               : "border-slate-300 dark:border-slate-600"
           }`}
         >
-          <option value="">Seleziona una fascia</option>
+          <option value="">{t("selezionaUnaFascia")}</option>
           {EMPLOYEE_COUNTS.map((c) => (
             <option key={c.value} value={c.value}>
               {c.label}
@@ -328,7 +328,7 @@ export function EnterpriseForm() {
           id="topics-label"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3"
         >
-          Temi di interesse *
+          {t("temiDiInteresse")}
         </div>
         <div className="space-y-2" role="group" aria-labelledby="topics-label">
           {TOPICS.map((topic) => (
@@ -369,7 +369,7 @@ export function EnterpriseForm() {
           htmlFor="message"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          Messaggio
+          {t("messaggio")}
         </label>
         <textarea
           id="message"
@@ -379,7 +379,7 @@ export function EnterpriseForm() {
           }
           disabled={formState === "submitting"}
           rows={4}
-          placeholder="Condividi i tuoi requisiti specifici..."
+          placeholder={t("condividiITuoiRequisitiSpecifici")}
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 resize-none"
         />
       </div>
@@ -397,7 +397,7 @@ export function EnterpriseForm() {
         ) : (
           <>
             <Send className="w-4 h-4" />
-            Invia Richiesta Enterprise
+            {t("inviaRichiestaEnterprise")}
           </>
         )}
       </Button>

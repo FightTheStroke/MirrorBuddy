@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MessageLoadingProps {
   maestro: Maestro;
@@ -12,6 +13,7 @@ interface MessageLoadingProps {
 }
 
 export function MessageLoading({ maestro, highContrast }: MessageLoadingProps) {
+  const t = useTranslations("chat");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -50,7 +52,7 @@ export function MessageLoading({ maestro, highContrast }: MessageLoadingProps) {
             highContrast ? "text-gray-400" : "text-slate-500",
           )}
         >
-          {maestro.displayName} sta pensando...
+          {maestro.displayName} {t("staPensando")}
         </span>
       </div>
     </motion.div>

@@ -1,20 +1,24 @@
+"use client";
+
 import { Bot, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { DetailedProviderStatus } from '../types';
+import { useTranslations } from "next-intl";
 
 interface ProviderStatusCardProps {
   providerStatus: DetailedProviderStatus | null;
 }
 
 export function ProviderStatusCard({ providerStatus }: ProviderStatusCardProps) {
+  const t = useTranslations("settings");
   if (providerStatus === null) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-blue-500" />
-            Provider AI Attivo
+            {t("providerAiAttivo1")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -29,7 +33,7 @@ export function ProviderStatusCard({ providerStatus }: ProviderStatusCardProps) 
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-blue-500" />
-          Provider AI Attivo
+          {t("providerAiAttivo")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

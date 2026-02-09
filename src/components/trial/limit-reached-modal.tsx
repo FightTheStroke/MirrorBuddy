@@ -7,6 +7,7 @@ import {
   trackBetaCtaShown,
   trackBetaCtaClicked,
 } from "@/lib/telemetry/trial-events";
+import { useTranslations } from "next-intl";
 
 interface LimitReachedModalProps {
   isOpen: boolean;
@@ -57,6 +58,7 @@ export function LimitReachedModal({
   visitorId,
   onRequestBeta,
 }: LimitReachedModalProps) {
+  const t = useTranslations("auth");
   const hasTrackedRef = useRef(false);
 
   useEffect(() => {
@@ -106,20 +108,20 @@ export function LimitReachedModal({
           {/* Features preview */}
           <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-2">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-              Con MirrorBuddy Beta avrai:
+              {t("conMirrorbuddyBetaAvrai")}
             </p>
             <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                Chat illimitate con i Maestri
+                {t("chatIllimitateConIMaestri")}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                Tutti i 17 Maestri e 5 Coach
+                {t("tuttiI17MaestriE5Coach")}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                Strumenti completi (quiz, flashcard, mappe)
+                {t("strumentiCompletiQuizFlashcardMappe")}
               </li>
             </ul>
           </div>
@@ -130,7 +132,7 @@ export function LimitReachedModal({
             size="lg"
             className="w-full gap-2"
           >
-            Richiedi accesso Beta
+            {t("richiediAccessoBeta")}
             <ArrowRight className="w-4 h-4" />
           </Button>
 
@@ -139,7 +141,7 @@ export function LimitReachedModal({
             onClick={onClose}
             className="w-full text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           >
-            Continua con la prova limitata
+            {t("continuaConLaProvaLimitata")}
           </button>
         </div>
       </div>

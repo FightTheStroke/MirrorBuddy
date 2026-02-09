@@ -79,14 +79,14 @@ export function SearchControls({
           </span>
           {hasActiveFilters && (
             <Button variant="outline" size="sm" onClick={onClearFilters} className="ml-2">
-              Resetta filtri
+              {t("resettaFiltri")}
             </Button>
           )}
         </div>
 
         <Select value={sortBy} onValueChange={(v) => onSortChange(v as SortBy)}>
-          <SelectTrigger className="w-[160px] h-11" aria-label="Ordina per">
-            <SelectValue placeholder="Ordina per" />
+          <SelectTrigger className="w-[160px] h-11" aria-label={t("ordinaPer1")}>
+            <SelectValue placeholder={t("ordinaPer")} />
           </SelectTrigger>
           <SelectContent>
             {SORT_OPTIONS.map((opt) => (
@@ -106,7 +106,7 @@ export function SearchControls({
               viewMode === 'grid' && 'bg-slate-100 dark:bg-slate-700',
             )}
             onClick={() => onViewModeChange('grid')}
-            aria-label="Vista griglia"
+            aria-label={t("vistaGriglia")}
             aria-pressed={viewMode === 'grid'}
           >
             <Grid className="w-5 h-5" />
@@ -119,7 +119,7 @@ export function SearchControls({
               viewMode === 'list' && 'bg-slate-100 dark:bg-slate-700',
             )}
             onClick={() => onViewModeChange('list')}
-            aria-label="Vista lista"
+            aria-label={t("vistaLista")}
             aria-pressed={viewMode === 'list'}
           >
             <List className="w-5 h-5" />

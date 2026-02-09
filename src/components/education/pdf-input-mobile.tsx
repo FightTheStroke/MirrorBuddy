@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Upload, Camera, AlertCircle, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getValidationError } from "./pdf-input-mobile-helpers";
+import { useTranslations } from "next-intl";
 
 interface PdfInputMobileProps {
   onUpload: (file: File) => void;
@@ -20,6 +21,7 @@ export function PdfInputMobile({
   onError,
   className,
 }: PdfInputMobileProps) {
+  const t = useTranslations("education");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -88,10 +90,10 @@ export function PdfInputMobile({
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          Upload Document
+          {t("uploadDocument")}
         </h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-          Choose a PDF or image to get started
+          {t("chooseAPdfOrImageToGetStarted")}
         </p>
       </div>
 
@@ -115,7 +117,7 @@ export function PdfInputMobile({
         >
           <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-green-700 dark:text-green-300">
-            File uploaded successfully!
+            {t("fileUploadedSuccessfully")}
           </p>
         </div>
       )}
@@ -125,7 +127,7 @@ export function PdfInputMobile({
         <div className="mb-6 space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Uploading...
+              {t("uploading")}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               {Math.round(uploadProgress)}%
@@ -153,7 +155,7 @@ export function PdfInputMobile({
           type="button"
           onClick={handleFilePickerClick}
           disabled={isUploading}
-          aria-label="Choose a file from your device"
+          aria-label={t("chooseAFileFromYourDevice")}
           className={cn(
             "w-full",
             "min-h-[44px] min-w-[44px] h-auto",
@@ -171,7 +173,7 @@ export function PdfInputMobile({
           )}
         >
           <Upload className="w-5 h-5" />
-          <span>Choose File</span>
+          <span>{t("chooseFile")}</span>
         </button>
 
         {/* Camera Capture Button */}
@@ -179,7 +181,7 @@ export function PdfInputMobile({
           type="button"
           onClick={handleCameraClick}
           disabled={isUploading}
-          aria-label="Capture document with camera"
+          aria-label={t("captureDocumentWithCamera")}
           className={cn(
             "w-full",
             "min-h-[44px] min-w-[44px] h-auto",
@@ -197,7 +199,7 @@ export function PdfInputMobile({
           )}
         >
           <Camera className="w-5 h-5" />
-          <span>Scan Document</span>
+          <span>{t("scanDocument")}</span>
         </button>
       </div>
 
@@ -223,7 +225,7 @@ export function PdfInputMobile({
 
       {/* Helper Text */}
       <p className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
-        Accepted formats: PDF, JPEG, PNG, WebP • Max 50MB
+        {t("acceptedFormatsPdfJpegPngWebpMax50mb")}
       </p>
     </div>
   );

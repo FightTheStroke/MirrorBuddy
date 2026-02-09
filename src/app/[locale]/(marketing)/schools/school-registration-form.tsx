@@ -60,10 +60,10 @@ export function SchoolRegistrationForm() {
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-8 text-center dark:border-green-800 dark:bg-green-900/20">
         <h2 className="text-2xl font-bold text-green-800 dark:text-green-300">
-          Registration Received
+          {t("registrationReceived")}
         </h2>
         <p className="mt-2 text-green-700 dark:text-green-400">
-          We will contact you within 24 hours to set up your school pilot.
+          {t("weWillContactYouWithin24HoursToSetUpYourSchoolPilo")}
         </p>
       </div>
     );
@@ -80,7 +80,7 @@ export function SchoolRegistrationForm() {
             htmlFor="schoolName"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            School Name *
+            {t("schoolName")}
           </label>
           <input
             id="schoolName"
@@ -97,7 +97,7 @@ export function SchoolRegistrationForm() {
             htmlFor="contactName"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Contact Person *
+            {t("contactPerson")}
           </label>
           <input
             id="contactName"
@@ -114,7 +114,7 @@ export function SchoolRegistrationForm() {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Email *
+            {t("email")}
           </label>
           <input
             id="email"
@@ -131,7 +131,7 @@ export function SchoolRegistrationForm() {
             htmlFor="vatNumber"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            VAT / Tax ID
+            {t("vatTaxId")}
           </label>
           <input
             id="vatNumber"
@@ -147,7 +147,7 @@ export function SchoolRegistrationForm() {
             htmlFor="tier"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Preferred Plan
+            {t("preferredPlan")}
           </label>
           <select
             id="tier"
@@ -156,9 +156,9 @@ export function SchoolRegistrationForm() {
             onChange={handleChange}
             className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           >
-            <option value="base">Base (Free)</option>
-            <option value="pro">Pro</option>
-            <option value="school">School (Custom)</option>
+            <option value="base">{t("baseFree")}</option>
+            <option value="pro">{t("pro")}</option>
+            <option value="school">{t("schoolCustom")}</option>
           </select>
         </div>
         <div>
@@ -166,7 +166,7 @@ export function SchoolRegistrationForm() {
             htmlFor="studentCount"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Estimated Students
+            {t("estimatedStudents")}
           </label>
           <input
             id="studentCount"
@@ -182,7 +182,7 @@ export function SchoolRegistrationForm() {
 
       {status === "error" && (
         <p className="text-sm text-red-600 dark:text-red-400">
-          Something went wrong. Please try again.
+          {t("somethingWentWrongPleaseTryAgain")}
         </p>
       )}
 

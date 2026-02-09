@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { Upload, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface UploadAreaProps {
   file: File | null;
@@ -20,6 +21,7 @@ export function UploadArea({
   onDrop,
   onRemove,
 }: UploadAreaProps) {
+  const t = useTranslations("education");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -39,7 +41,7 @@ export function UploadArea({
         onChange={onFileSelect}
         className="hidden"
         disabled={isDisabled}
-        aria-label="Carica file PDF"
+        aria-label={t("caricaFilePdf")}
       />
 
       {file ? (
@@ -56,9 +58,9 @@ export function UploadArea({
               variant="ghost"
               size="sm"
               onClick={onRemove}
-              aria-label="Rimuovi file"
+              aria-label={t("rimuoviFile")}
             >
-              Rimuovi
+              {t("rimuovi")}
             </Button>
           )}
         </div>
@@ -71,10 +73,10 @@ export function UploadArea({
               onClick={() => fileInputRef.current?.click()}
               disabled={isDisabled}
             >
-              Seleziona PDF
+              {t("selezionaPdf")}
             </Button>
             <p className="mt-2 text-sm text-slate-500">
-              oppure trascina qui il file (max 10MB)
+              {t("oppureTrascinaQuiIlFileMax10mb")}
             </p>
           </div>
         </div>

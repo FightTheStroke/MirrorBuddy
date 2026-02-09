@@ -48,17 +48,17 @@ export function TrialLimitsBanner({
       >
         <span className="flex items-center gap-1">
           <MessageCircle className="w-4 h-4" />
-          {limits.dailyChats} chats
+          {limits.dailyChats} {t("chats")}
         </span>
         <span className="text-purple-300 dark:text-purple-600">•</span>
         <span className="flex items-center gap-1">
           <Mic className="w-4 h-4" />
-          {limits.dailyVoiceMinutes} min
+          {limits.dailyVoiceMinutes} {t("min")}
         </span>
         <span className="text-purple-300 dark:text-purple-600">•</span>
         <span className="flex items-center gap-1">
           <Users className="w-4 h-4" />
-          {limits.maestriCount} maestri
+          {limits.maestriCount} {t("maestri")}
         </span>
       </div>
     );

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Example Flashcard App
  * Complete example showing how to use flashcard components
@@ -12,8 +14,10 @@ import {
   FlashcardStats,
   FlashcardBrowser,
 } from './example-flashcard-components';
+import { useTranslations } from "next-intl";
 
 export function ExampleApp() {
+  const t = useTranslations("education");
   const [cards, setCards] = useState<Flashcard[]>([
     {
       id: '1',
@@ -52,7 +56,7 @@ export function ExampleApp() {
                 view === 'session' ? 'bg-blue-600 text-white' : 'text-gray-700'
               }`}
             >
-              Study
+              {t("study")}
             </button>
             <button
               onClick={() => setView('browse')}
@@ -60,7 +64,7 @@ export function ExampleApp() {
                 view === 'browse' ? 'bg-blue-600 text-white' : 'text-gray-700'
               }`}
             >
-              Browse
+              {t("browse")}
             </button>
             <button
               onClick={() => setView('stats')}
@@ -68,7 +72,7 @@ export function ExampleApp() {
                 view === 'stats' ? 'bg-blue-600 text-white' : 'text-gray-700'
               }`}
             >
-              Stats
+              {t("stats")}
             </button>
           </div>
         </div>

@@ -96,7 +96,7 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold">Speed Game</h3>
+        <h3 className="text-xl font-bold">{t("speedGame")}</h3>
         <div className="text-2xl font-bold text-primary">{timeLeft}s</div>
       </div>
 

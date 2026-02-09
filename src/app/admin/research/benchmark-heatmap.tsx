@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 interface ExperimentRow {
   id: string;
@@ -41,6 +42,7 @@ function scoreColor(score: number | null): string {
 export default function BenchmarkHeatmap({
   experiments,
 }: BenchmarkHeatmapProps) {
+  const t = useTranslations("admin");
   const completed = useMemo(
     () => experiments.filter((e) => e.scores.scaffolding !== null),
     [experiments],
@@ -49,7 +51,7 @@ export default function BenchmarkHeatmap({
   if (completed.length === 0) {
     return (
       <div className="rounded-lg border p-6 text-center text-sm text-muted-foreground">
-        No completed experiments yet. Run a simulation to see benchmark scores.
+        {t("noCompletedExperimentsYetRunASimulationToSeeBenchm")}
       </div>
     );
   }
@@ -59,14 +61,14 @@ export default function BenchmarkHeatmap({
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b bg-muted/50">
-            <th className="px-3 py-2 text-left font-medium">Experiment</th>
-            <th className="px-3 py-2 text-left font-medium">Maestro</th>
+            <th className="px-3 py-2 text-left font-medium">{t("experiment")}</th>
+            <th className="px-3 py-2 text-left font-medium">{t("maestro")}</th>
             {DIMENSIONS.map((d) => (
               <th key={d.key} className="px-3 py-2 text-center font-medium">
                 {d.label}
               </th>
             ))}
-            <th className="px-3 py-2 text-center font-medium">Avg</th>
+            <th className="px-3 py-2 text-center font-medium">{t("avg")}</th>
           </tr>
         </thead>
         <tbody>

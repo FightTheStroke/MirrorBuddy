@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Shield, Bot, Lock, AlertTriangle, Github, Brain } from "lucide-react";
 import { InlineConsent } from "@/components/consent/inline-consent";
+import { useTranslations } from "next-intl";
 
 const GITHUB_REPO_URL = "https://github.com/robdll/mirrorbuddy";
 
@@ -56,6 +57,7 @@ const LEGAL_LINKS = [
  * - Copyright notice
  */
 export function WelcomeFooter() {
+  const t = useTranslations("welcome");
   const currentYear = new Date().getFullYear();
 
   return (
@@ -65,14 +67,14 @@ export function WelcomeFooter() {
       transition={{ delay: 0.5 }}
       className="w-full mt-12 border-t border-gray-200 dark:border-gray-800"
       role="contentinfo"
-      aria-label="Footer con informazioni legali e consenso cookie"
+      aria-label={t("ariaLabelFooterConInformazioniLegaliEConsensoCooki")}
     >
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* AI Disclaimer */}
         <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-700">
           <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" />
           <span className="text-sm text-blue-900 dark:text-blue-100">
-            Creato con AI - le risposte possono contenere errori
+            {t("creatoConAiLeRispostePossonoContenereErrori")}
           </span>
         </div>
 
@@ -102,7 +104,7 @@ export function WelcomeFooter() {
         {/* Legal Links */}
         <nav
           className="flex flex-wrap items-center justify-center gap-4 mb-6"
-          aria-label="Link legali"
+          aria-label={t("linkLegali")}
         >
           {LEGAL_LINKS.map((link, index) => (
             <Link
@@ -122,21 +124,21 @@ export function WelcomeFooter() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-            aria-label="Vedi il codice sorgente su GitHub"
+            aria-label={t("vediIlCodiceSorgenteSuGithub")}
           >
             <Github className="w-5 h-5" aria-hidden="true" />
-            <span className="text-sm font-medium">Open Source</span>
+            <span className="text-sm font-medium">{t("openSource")}</span>
           </a>
         </div>
 
         {/* Copyright */}
         <p className="text-center text-xs text-gray-500 dark:text-gray-500">
-          © {currentYear} MirrorBuddy. Progetto open source su GitHub.
+          © {currentYear} {t("mirrorbuddyProgettoOpenSourceSuGithub")}
         </p>
 
         {/* Made in Europe - intentionally not localized */}
         <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-2">
-          Made with <span className="text-red-500">♥</span> in Europe
+          {t("madeWith")} <span className="text-red-500">♥</span> {t("inEurope")}
         </p>
       </div>
     </motion.footer>

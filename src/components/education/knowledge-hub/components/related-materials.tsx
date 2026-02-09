@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Link2, ArrowRight, GitFork, Layers, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface RelatedMaterial {
   id: string;
@@ -49,6 +50,7 @@ export function RelatedMaterials({
   onNavigate,
   className,
 }: RelatedMaterialsProps) {
+  const t = useTranslations("education");
   const [edges, setEdges] = useState<MaterialEdge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +109,7 @@ export function RelatedMaterials({
       >
         <Link2 className="h-4 w-4" />
         <span>
-          {totalCount} materiali correlati
+          {totalCount} {t("materialiCorrelati")}
         </span>
         <ChevronDown
           className={cn(
@@ -143,7 +145,7 @@ export function RelatedMaterials({
                   ))}
                   {remaining > 0 && (
                     <span className="text-xs text-muted-foreground px-2">
-                      +{remaining} altri
+                      +{remaining} {t("altri")}
                     </span>
                   )}
                 </div>

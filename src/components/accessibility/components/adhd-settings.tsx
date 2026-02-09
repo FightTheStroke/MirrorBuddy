@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file adhd-settings.tsx
  * @brief ADHD settings component
@@ -7,8 +9,10 @@ import { Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { Toggle } from "./toggle";
+import { useTranslations } from "next-intl";
 
 export function ADHDSettings() {
+  const t = useTranslations("settings");
   const { settings, updateSettings, adhdConfig, updateADHDConfig, adhdStats } =
     useAccessibilityStore();
 
@@ -52,7 +56,7 @@ export function ADHDSettings() {
               : "text-slate-900 dark:text-white",
           )}
         >
-          Timer Sessione
+          {t("timerSessione")}
         </h4>
 
         <div className="grid grid-cols-2 gap-4">
@@ -61,7 +65,7 @@ export function ADHDSettings() {
               htmlFor="adhd-work-duration"
               className="text-sm text-slate-500 dark:text-slate-400"
             >
-              Lavoro (min)
+              {t("lavoroMin")}
             </label>
             <input
               type="number"
@@ -88,7 +92,7 @@ export function ADHDSettings() {
               htmlFor="adhd-break-duration"
               className="text-sm text-slate-500 dark:text-slate-400"
             >
-              Pausa (min)
+              {t("pausaMin")}
             </label>
             <input
               type="number"
@@ -128,19 +132,19 @@ export function ADHDSettings() {
               : "text-slate-900 dark:text-white",
           )}
         >
-          Le tue statistiche
+          {t("leTueStatistiche")}
         </h4>
 
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-slate-500 dark:text-slate-400">
-              Sessioni totali:
+              {t("sessioniTotali")}
             </span>
             <span className="ml-2 font-medium">{adhdStats.totalSessions}</span>
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400">
-              Completate:
+              {t("completate")}
             </span>
             <span className="ml-2 font-medium">
               {adhdStats.completedSessions}
@@ -148,15 +152,15 @@ export function ADHDSettings() {
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400">
-              Serie attuale:
+              {t("serieAttuale")}
             </span>
             <span className="ml-2 font-medium">
-              {adhdStats.currentStreak} giorni
+              {adhdStats.currentStreak} {t("giorni")}
             </span>
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400">
-              XP totali:
+              {t("xpTotali")}
             </span>
             <span className="ml-2 font-medium">{adhdStats.totalXPEarned}</span>
           </div>

@@ -9,6 +9,7 @@ import type { ScheduledSession, DayOfWeek } from '@/lib/scheduler/types';
 import { maestri } from '@/data/maestri';
 import { DAYS_OF_WEEK, SUBJECTS } from './weekly-schedule/constants';
 import { SessionForm } from './weekly-schedule/session-form';
+import { useTranslations } from "next-intl";
 
 interface WeeklyScheduleProps {
   sessions: ScheduledSession[];
@@ -34,6 +35,7 @@ export function WeeklySchedule({
   onDeleteSession,
   isLoading,
 }: WeeklyScheduleProps) {
+  const t = useTranslations("education");
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<SessionFormData>({
@@ -104,7 +106,7 @@ export function WeeklySchedule({
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="w-5 h-5 text-blue-500" />
-          Piano di Studio Settimanale
+          {t("pianoDiStudioSettimanale")}
         </CardTitle>
         <Button
           size="sm"
@@ -121,7 +123,7 @@ export function WeeklySchedule({
           disabled={isLoading}
         >
           <Plus className="w-4 h-4 mr-1" />
-          Aggiungi
+          {t("aggiungi")}
         </Button>
       </CardHeader>
 
@@ -161,13 +163,13 @@ export function WeeklySchedule({
                     isToday ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300'
                   )}>
                     {day.label}
-                    {isToday && <span className="ml-2 text-xs">(oggi)</span>}
+                    {isToday && <span className="ml-2 text-xs">({t("today")})</span>}
                   </span>
                 </div>
 
                 {daySessions.length === 0 ? (
                   <p className="text-sm text-slate-400 dark:text-slate-500 italic">
-                    Nessuna sessione programmata
+                    {t("nessunaSessioneProgrammata1")}
                   </p>
                 ) : (
                   <div className="space-y-2">
@@ -198,21 +200,21 @@ export function WeeklySchedule({
                             </span>
                           )}
                           <span className="text-xs text-slate-400 dark:text-slate-500">
-                            {session.duration} min
+                            {session.duration} {t("min")}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleEdit(session)}
                             className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                            aria-label="Modifica"
+                            aria-label={t("modifica")}
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(session.id)}
                             className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500"
-                            aria-label="Elimina"
+                            aria-label={t("elimina")}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -230,8 +232,8 @@ export function WeeklySchedule({
         {sessions.length === 0 && !showForm && (
           <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Nessuna sessione programmata.</p>
-            <p className="text-sm mt-1">Clicca &quot;Aggiungi&quot; per creare il tuo piano di studio!</p>
+            <p>{t("nessunaSessioneProgrammata")}</p>
+            <p className="text-sm mt-1">{t("cliccaQuotAggiungiQuotPerCreareIlTuoPianoDiStudio")}</p>
           </div>
         )}
       </CardContent>

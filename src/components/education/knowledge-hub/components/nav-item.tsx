@@ -2,6 +2,7 @@
 
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 export interface NavItemProps {
   icon: React.ReactNode;
@@ -26,6 +27,7 @@ export function NavItem({
   onClick,
   onExpand,
 }: NavItemProps) {
+  const t = useTranslations('education');
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -60,7 +62,7 @@ export function NavItem({
             onExpand?.();
           }}
           className="p-0.5 -ml-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-accent-themed"
-          aria-label={isExpanded ? 'Chiudi cartella' : 'Apri cartella'}
+          aria-label={isExpanded ? t("chiudiCartella") : t("apriCartella")}
         >
           <ChevronRight
             className={cn(

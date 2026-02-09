@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface CallButtonProps {
   onClick: () => void;
@@ -11,6 +12,7 @@ interface CallButtonProps {
 }
 
 export function CallButton({ onClick, className }: CallButtonProps) {
+  const t = useTranslations("common");
   return (
     <motion.button
       initial={{ opacity: 0, scale: 0.9 }}
@@ -33,8 +35,8 @@ export function CallButton({ onClick, className }: CallButtonProps) {
         />
       </div>
       <div className="text-left">
-        <div className="font-semibold">Chiama Melissa</div>
-        <div className="text-sm text-pink-100">Completa con la voce</div>
+        <div className="font-semibold">{t("chiamaMelissa")}</div>
+        <div className="text-sm text-pink-100">{t("completaConLaVoce")}</div>
       </div>
       <Phone className="w-6 h-6 ml-2" />
     </motion.button>

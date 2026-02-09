@@ -62,7 +62,7 @@ export function MaestroSelectionStep({
       <p className="text-slate-600 dark:text-slate-400 mb-4">
         {selectedSubject && availableMaestri.length > 0 ? (
           <>
-            Scegli il Professore per{" "}
+            {t("scegliIlProfessorePer")}{" "}
             <span className="font-semibold text-accent-themed">
               {getSubjectLabel(selectedSubject)}
             </span>

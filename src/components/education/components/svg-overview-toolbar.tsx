@@ -2,6 +2,7 @@
 
 import { Download, RefreshCw, Sun, Moon, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface SVGOverviewToolbarProps {
   title: string;
@@ -22,6 +23,7 @@ export function SVGOverviewToolbar({
   onExportSVG,
   onExportPNG,
 }: SVGOverviewToolbarProps) {
+  const t = useTranslations("education");
   return (
     <div
       className={cn(
@@ -48,7 +50,7 @@ export function SVGOverviewToolbar({
               ? 'hover:bg-slate-700 text-slate-400'
               : 'hover:bg-slate-200 text-slate-600'
           )}
-          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          aria-label={theme === 'dark' ? t("switchToLightTheme") : t("switchToDarkTheme")}
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
@@ -61,7 +63,7 @@ export function SVGOverviewToolbar({
               ? 'hover:bg-slate-700 text-slate-400'
               : 'hover:bg-slate-200 text-slate-600'
           )}
-          aria-label={`Switch to ${currentLayout === 'radial' ? 'tree' : 'radial'} layout`}
+          aria-label={t("switchToLayout", { layout: currentLayout === 'radial' ? 'tree' : 'radial' })}
         >
           <RefreshCw className="w-4 h-4" />
         </button>
@@ -74,7 +76,7 @@ export function SVGOverviewToolbar({
               ? 'hover:bg-slate-700 text-slate-400'
               : 'hover:bg-slate-200 text-slate-600'
           )}
-          aria-label="Export as SVG"
+          aria-label={t("exportAsSvg")}
         >
           <Download className="w-4 h-4" />
         </button>
@@ -87,7 +89,7 @@ export function SVGOverviewToolbar({
               ? 'hover:bg-slate-700 text-slate-400'
               : 'hover:bg-slate-200 text-slate-600'
           )}
-          aria-label="Export as PNG"
+          aria-label={t("exportAsPng")}
         >
           <Share2 className="w-4 h-4" />
         </button>

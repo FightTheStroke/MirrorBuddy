@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file conversation-input.tsx
  * @brief Conversation input component
@@ -7,6 +9,7 @@ import { Paperclip, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Character } from '../types';
+import { useTranslations } from "next-intl";
 
 interface ConversationInputProps {
   input: string;
@@ -45,6 +48,7 @@ export function ConversationInput({
   fileInputRef,
   cameraInputRef,
 }: ConversationInputProps) {
+  const t = useTranslations("education");
   return (
     <footer
       className={cn(
@@ -61,7 +65,7 @@ export function ConversationInput({
           size="sm"
           onClick={onToggleAttachPanel}
           className={cn(showAttachPanel && 'bg-slate-100 dark:bg-slate-800')}
-          aria-label="Allega file"
+          aria-label={t("allegaFile")}
         >
           <Paperclip className="w-5 h-5" />
         </Button>
@@ -72,7 +76,7 @@ export function ConversationInput({
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Scrivi un messaggio o allega un compito..."
+            placeholder={t("placeholderScriviUnMessaggioOAllegaUnCompito")}
             rows={1}
             className={cn(
               'w-full resize-none rounded-xl px-4 py-3 pr-12 focus:outline-none focus:ring-2',
@@ -83,7 +87,7 @@ export function ConversationInput({
             )}
             style={{ lineHeight: lineSpacing }}
             disabled={isLoading}
-            aria-label="Messaggio"
+            aria-label={t("messaggio")}
           />
         </div>
 
@@ -94,7 +98,7 @@ export function ConversationInput({
             backgroundColor:
               input.trim() || attachmentsCount > 0 ? character.color : undefined,
           }}
-          aria-label="Invia messaggio"
+          aria-label={t("inviaMessaggio")}
         >
           <Send className="w-5 h-5" />
         </Button>

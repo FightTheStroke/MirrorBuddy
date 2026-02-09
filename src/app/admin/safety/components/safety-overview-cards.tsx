@@ -1,3 +1,5 @@
+"use client";
+
 import {
   AlertTriangle,
   Shield,
@@ -9,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SafetyDashboardResponse } from "@/app/api/admin/safety/route";
+import { useTranslations } from "next-intl";
 
 interface SafetyOverviewCardsProps {
   data: SafetyDashboardResponse;
@@ -31,6 +34,7 @@ function OverviewCard({
   trend,
   subtext,
 }: OverviewCardProps) {
+  const t = useTranslations("admin");
   const colorClasses = {
     red: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
     amber:
@@ -65,19 +69,19 @@ function OverviewCard({
             {trend === "up" && (
               <>
                 <TrendingUp className="h-4 w-4" />
-                <span>Increasing</span>
+                <span>{t("increasing")}</span>
               </>
             )}
             {trend === "down" && (
               <>
                 <TrendingDown className="h-4 w-4" />
-                <span>Decreasing</span>
+                <span>{t("decreasing")}</span>
               </>
             )}
             {trend === "stable" && (
               <>
                 <Minus className="h-4 w-4" />
-                <span>Stable</span>
+                <span>{t("stable")}</span>
               </>
             )}
           </div>
@@ -89,10 +93,11 @@ function OverviewCard({
 }
 
 export function SafetyOverviewCards({ data }: SafetyOverviewCardsProps) {
+  const t = useTranslations("admin");
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <OverviewCard
-        title="Total Safety Events"
+        title={t("totalSafetyEvents")}
         value={data.overview.totalEvents}
         icon={Shield}
         color="blue"
@@ -106,21 +111,21 @@ export function SafetyOverviewCards({ data }: SafetyOverviewCardsProps) {
         }
       />
       <OverviewCard
-        title="Critical Events"
+        title={t("criticalEvents")}
         value={data.overview.criticalCount}
         icon={AlertTriangle}
         color={data.overview.criticalCount > 0 ? "red" : "green"}
         subtext="Require immediate attention"
       />
       <OverviewCard
-        title="Unresolved Escalations"
+        title={t("unresolvedEscalations")}
         value={data.overview.unresolvedEscalations}
         icon={Zap}
         color={data.overview.unresolvedEscalations > 0 ? "amber" : "green"}
         subtext="Pending admin action"
       />
       <OverviewCard
-        title="Compliance Coverage"
+        title={t("complianceCoverage")}
         value={data.statistics.regulatoryImpact.aiActEvents > 0 ? "100%" : "0%"}
         icon={CheckCircle}
         color="green"

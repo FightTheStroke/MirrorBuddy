@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Accessibility } from "lucide-react";
 import type { A11yStatsData } from "@/app/api/dashboard/a11y-stats/route";
+import { useTranslations } from "next-intl";
 
 // Profile display names
 const PROFILE_LABELS: Record<string, string> = {
@@ -41,6 +42,7 @@ interface A11yStatsWidgetProps {
 }
 
 export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
+  const t = useTranslations("admin");
   if (!data) return null;
 
   const totalProfiles = Object.values(data.byProfile).reduce(
@@ -53,10 +55,10 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Accessibility className="h-5 w-5 text-violet-500" />
-          Accessibility Usage
+          {t("accessibilityUsage")}
         </CardTitle>
         <CardDescription>
-          Profile activations and accessibility feature usage
+          {t("profileActivationsAndAccessibilityFeatureUsage")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -66,19 +68,19 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
             <p className="text-2xl font-bold text-violet-600">
               {data.summary.totalActivations}
             </p>
-            <p className="text-xs text-muted-foreground">Profile Activations</p>
+            <p className="text-xs text-muted-foreground">{t("profileActivations")}</p>
           </div>
           <div className="text-center p-3 bg-muted rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {data.summary.uniqueSessions}
             </p>
-            <p className="text-xs text-muted-foreground">Unique Sessions</p>
+            <p className="text-xs text-muted-foreground">{t("uniqueSessions")}</p>
           </div>
           <div className="text-center p-3 bg-muted rounded-lg">
             <p className="text-2xl font-bold text-foreground">
               {data.summary.resetCount}
             </p>
-            <p className="text-xs text-muted-foreground">Resets</p>
+            <p className="text-xs text-muted-foreground">{t("resets")}</p>
           </div>
         </div>
 
@@ -86,7 +88,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {totalProfiles > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Profile Distribution
+              {t("profileDistribution")}
             </p>
             <div className="flex h-4 rounded-full overflow-hidden bg-muted">
               {Object.entries(data.byProfile).map(([profile, count]) => {
@@ -129,7 +131,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {Object.keys(data.byToggle).length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Most Used Toggles
+              {t("mostUsedToggles")}
             </p>
             {Object.entries(data.byToggle)
               .sort((a, b) => b[1] - a[1])
@@ -151,7 +153,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
           Object.keys(data.byToggle).length === 0 &&
           data.summary.resetCount === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No accessibility events recorded yet
+              {t("noAccessibilityEventsRecordedYet")}
             </p>
           )}
       </CardContent>

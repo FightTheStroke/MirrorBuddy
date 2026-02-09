@@ -10,6 +10,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface TrialOnboardingProps {
   onComplete: () => void;
@@ -43,6 +44,7 @@ const STEPS = [
  * Explains trial limits.
  */
 export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
+  const t = useTranslations("auth");
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleNext = () => {
@@ -97,7 +99,7 @@ export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
             <Button onClick={handleNext} size="lg" className="w-full gap-2">
               {currentStep < STEPS.length - 1 ? (
                 <>
-                  Avanti
+                  {t("avanti")}
                   <ArrowRight className="w-4 h-4" />
                 </>
               ) : (
@@ -112,7 +114,7 @@ export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
               onClick={onComplete}
               className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
             >
-              Salta introduzione
+              {t("saltaIntroduzione")}
             </button>
           )}
         </div>
@@ -120,7 +122,7 @@ export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
         {/* Footer */}
         <div className="px-8 pb-6 space-y-3">
           <p className="text-xs text-center text-slate-400">
-            Nessuna carta di credito richiesta. Prova gratuita.
+            {t("nessunaCartaDiCreditoRichiestaProvaGratuita")}
           </p>
           <div className="flex justify-center">
             <Link href="/invite/request">
@@ -130,7 +132,7 @@ export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
                 className="text-xs text-purple-600 dark:text-purple-400"
               >
                 <UserPlus className="w-3 h-3 mr-1" />
-                Vuoi l&apos;accesso completo? Richiedi la beta
+                {t("vuoiLAposAccessoCompletoRichiediLaBeta")}
               </Button>
             </Link>
           </div>

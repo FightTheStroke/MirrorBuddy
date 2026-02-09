@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Volume2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -22,6 +23,7 @@ export function MessageBubble({
   ttsEnabled,
   speak,
 }: MessageBubbleProps) {
+  const t = useTranslations("chat");
   const isUser = message.role === "user";
   const isVoice = message.isVoice;
 
@@ -53,7 +55,7 @@ export function MessageBubble({
       >
         {isVoice && (
           <span className="text-xs opacity-60 mb-1 flex items-center gap-1">
-            <Volume2 className="w-3 h-3" /> Trascrizione vocale
+            <Volume2 className="w-3 h-3" /> {t("trascrizioneVocale")}
           </span>
         )}
         <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">
@@ -70,7 +72,7 @@ export function MessageBubble({
             <button
               onClick={() => speak(message.content)}
               className="text-xs opacity-60 hover:opacity-100 ml-auto"
-              title="Leggi ad alta voce"
+              title={t("leggiAdAltaVoce")}
             >
               <Volume2 className="w-3 h-3" />
             </button>

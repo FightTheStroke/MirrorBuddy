@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 /**
  * Skeleton components for lazy-loaded welcome page sections.
  * These provide visual placeholders during code-split loading.
@@ -28,10 +31,11 @@ function SkeletonText({ className = "" }: { className?: string }) {
 }
 
 export function MaestriShowcaseSkeleton() {
+  const t = useTranslations("welcome");
   return (
     <section
       className="w-full max-w-6xl mx-auto px-4 mb-16 mt-8"
-      aria-label="Loading professors..."
+      aria-label={t("loadingProfessors")}
     >
       <div className="text-center mb-8">
         <SkeletonText className="h-8 w-48 mx-auto mb-3" />
@@ -54,10 +58,11 @@ export function MaestriShowcaseSkeleton() {
 }
 
 export function AccessibilitySkeleton() {
+  const t = useTranslations("welcome");
   return (
     <section
       className="w-full max-w-4xl mx-auto px-4 mb-12"
-      aria-label="Loading accessibility profiles..."
+      aria-label={t("loadingAccessibilityProfiles")}
     >
       <div className="text-center mb-8">
         <SkeletonText className="h-7 w-56 mx-auto mb-3" />
@@ -80,10 +85,11 @@ export function AccessibilitySkeleton() {
 }
 
 export function SupportSkeleton() {
+  const t = useTranslations("welcome");
   return (
     <section
       className="w-full max-w-6xl mx-auto px-4 mb-12"
-      aria-label="Loading support..."
+      aria-label={t("loadingSupport")}
     >
       <div className="text-center mb-8">
         <SkeletonText className="h-7 w-40 mx-auto mb-3" />
@@ -107,10 +113,11 @@ export function SupportSkeleton() {
 }
 
 export function FeaturesSkeleton() {
+  const t = useTranslations("welcome");
   return (
     <section
       className="w-full max-w-4xl mx-auto px-4 mb-12"
-      aria-label="Loading features..."
+      aria-label={t("loadingFeatures")}
     >
       <div className="text-center mb-8">
         <SkeletonText className="h-7 w-64 mx-auto mb-3" />
@@ -133,10 +140,11 @@ export function FeaturesSkeleton() {
 }
 
 export function ComplianceSkeleton() {
+  const t = useTranslations("welcome");
   return (
     <section
       className="w-full max-w-4xl mx-auto px-4 mb-12"
-      aria-label="Loading compliance..."
+      aria-label={t("loadingCompliance")}
     >
       <div className="text-center mb-8">
         <SkeletonText className="h-7 w-48 mx-auto mb-3" />

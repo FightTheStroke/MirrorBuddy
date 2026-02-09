@@ -46,7 +46,7 @@ export function CameraPreview({
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
             <Video className="w-12 h-12 text-slate-600" />
             <span className="text-sm text-slate-500">
-              Clicca &quot;Testa&quot; per vedere l&apos;anteprima
+              {t("cliccaQuotTestaQuotPerVedereLAposAnteprima")}
             </span>
           </div>
         )}
@@ -65,7 +65,7 @@ export function CameraPreview({
           onChange={(e) => onCamChange(e.target.value)}
           className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
         >
-          <option value="">Predefinito di sistema</option>
+          <option value="">{t("predefinitoDiSistema")}</option>
           {availableCameras.map((cam) => (
             <option key={cam.deviceId} value={cam.deviceId}>
               {cam.label || `Webcam ${cam.deviceId.slice(0, 8)}...`}
@@ -76,19 +76,19 @@ export function CameraPreview({
           onClick={onRefresh}
           variant="outline"
           size="sm"
-          title="Aggiorna dispositivi"
+          title={t("aggiornaDispositivi")}
         >
           <RefreshCw className="w-4 h-4" />
         </Button>
         {!camTestActive ? (
           <Button onClick={onStartTest} variant="default" size="sm">
             <Video className="w-4 h-4 mr-1" />
-            Testa
+            {t("testa")}
           </Button>
         ) : (
           <Button onClick={onStopTest} variant="destructive" size="sm">
             <XCircle className="w-4 h-4 mr-1" />
-            Stop
+            {t("stop")}
           </Button>
         )}
       </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface BudgetExhaustedBannerProps {
   reason: "global_cap" | "abuse_detected";
@@ -19,6 +20,7 @@ export function BudgetExhaustedBanner({
   reason,
   onRetry,
 }: BudgetExhaustedBannerProps) {
+  const t = useTranslations("auth");
   const isAbuseDetected = reason === "abuse_detected";
 
   return (
@@ -58,20 +60,20 @@ export function BudgetExhaustedBanner({
           {!isAbuseDetected && onRetry && (
             <Button onClick={onRetry} variant="outline" className="gap-2">
               <RefreshCw className="w-4 h-4" />
-              Riprova
+              {t("riprova")}
             </Button>
           )}
 
           <div className="flex justify-center gap-4 text-sm">
             <Link href="/privacy" className="text-blue-400 hover:text-blue-300">
-              Privacy
+              {t("privacy")}
             </Link>
             <span className="text-slate-600">|</span>
             <a
               href="mailto:info@fightthestroke.org"
               className="text-blue-400 hover:text-blue-300"
             >
-              Contattaci
+              {t("contattaci")}
             </a>
           </div>
         </div>

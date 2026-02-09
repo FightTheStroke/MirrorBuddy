@@ -88,7 +88,7 @@ export function SessionGradeDisplay({
     };
 
     generateGrade();
-  }, [onRequestGrade, questionsAsked, sessionDuration, gradeCurrentSession]);
+  }, [onRequestGrade, questionsAsked, sessionDuration, gradeCurrentSession, t]);
 
   // Handle Escape key to close modal
   useEffect(() => {

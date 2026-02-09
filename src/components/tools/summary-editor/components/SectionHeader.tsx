@@ -69,7 +69,7 @@ export function SectionHeader({
       {!readOnly && <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />}
       <button
         className="p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
-        aria-label={isExpanded ? 'Comprimi sezione' : 'Espandi sezione'}
+        aria-label={isExpanded ? t("comprimiSezione") : t("espandiSezione")}
       >
         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
@@ -85,7 +85,7 @@ export function SectionHeader({
           onBlur={onSaveEdit}
           onClick={(e) => e.stopPropagation()}
           className="flex-1 px-2 py-1 font-semibold rounded border border-primary bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
-          aria-label="Titolo della sezione"
+          aria-label={t("titoloDellaSezione")}
         />
       ) : (
         <span

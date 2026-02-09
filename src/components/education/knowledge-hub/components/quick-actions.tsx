@@ -8,6 +8,7 @@
 
 import { Plus, Upload, FolderPlus, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 export interface QuickActionsProps {
   /** Callback to create new material */
@@ -70,11 +71,12 @@ export function QuickActions({
   compact = false,
   className,
 }: QuickActionsProps) {
+  const t = useTranslations("education");
   return (
     <div
       className={cn('flex items-center gap-2', className)}
       role="toolbar"
-      aria-label="Azioni rapide"
+      aria-label={t("azioniRapide")}
     >
       {onCreateMaterial && (
         <ActionButton

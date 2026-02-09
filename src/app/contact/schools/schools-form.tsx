@@ -159,9 +159,9 @@ export function SchoolsContactForm() {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            placeholder="Nome *"
+            placeholder={t("nome1")}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Nome"
+            aria-label={t("nome")}
           />
           <input
             id="email"
@@ -169,9 +169,9 @@ export function SchoolsContactForm() {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            placeholder="Email *"
+            placeholder={t("email1")}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Email"
+            aria-label={t("email")}
           />
         </div>
 

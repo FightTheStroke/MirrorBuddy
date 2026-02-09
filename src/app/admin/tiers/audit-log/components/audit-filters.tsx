@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -7,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 interface AuditFiltersProps {
   actionFilter: string;
@@ -31,6 +34,7 @@ export function AuditFilters({
   setEndDate,
   onPageReset,
 }: AuditFiltersProps) {
+  const t = useTranslations("admin");
   const hasFilters = actionFilter || userSearch || startDate || endDate;
 
   const handleActionChange = (value: string) => {
@@ -69,27 +73,27 @@ export function AuditFilters({
             htmlFor="audit-action-filter"
             className="block text-sm font-medium mb-2"
           >
-            Action Type
+            {t("actionType")}
           </label>
           <Select value={actionFilter} onValueChange={handleActionChange}>
             <SelectTrigger id="audit-action-filter">
-              <SelectValue placeholder="All actions" />
+              <SelectValue placeholder={t("allActions1")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All actions</SelectItem>
-              <SelectItem value="TIER_CREATE">Tier Created</SelectItem>
-              <SelectItem value="TIER_UPDATE">Tier Updated</SelectItem>
-              <SelectItem value="TIER_DELETE">Tier Deleted</SelectItem>
+              <SelectItem value="">{t("allActions")}</SelectItem>
+              <SelectItem value="TIER_CREATE">{t("tierCreated")}</SelectItem>
+              <SelectItem value="TIER_UPDATE">{t("tierUpdated")}</SelectItem>
+              <SelectItem value="TIER_DELETE">{t("tierDeleted")}</SelectItem>
               <SelectItem value="SUBSCRIPTION_CREATE">
-                Subscription Created
+                {t("subscriptionCreated")}
               </SelectItem>
               <SelectItem value="SUBSCRIPTION_UPDATE">
-                Subscription Updated
+                {t("subscriptionUpdated")}
               </SelectItem>
               <SelectItem value="SUBSCRIPTION_DELETE">
-                Subscription Deleted
+                {t("subscriptionDeleted")}
               </SelectItem>
-              <SelectItem value="TIER_CHANGE">Tier Changed</SelectItem>
+              <SelectItem value="TIER_CHANGE">{t("tierChanged")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -99,12 +103,12 @@ export function AuditFilters({
             htmlFor="audit-user-search"
             className="block text-sm font-medium mb-2"
           >
-            User ID
+            {t("userId")}
           </label>
           <Input
             type="text"
             id="audit-user-search"
-            placeholder="Search by user ID"
+            placeholder={t("searchByUserId")}
             value={userSearch}
             onChange={(e) => handleUserSearchChange(e.target.value)}
           />
@@ -115,7 +119,7 @@ export function AuditFilters({
             htmlFor="audit-start-date"
             className="block text-sm font-medium mb-2"
           >
-            Start Date
+            {t("startDate")}
           </label>
           <Input
             type="date"
@@ -130,7 +134,7 @@ export function AuditFilters({
             htmlFor="audit-end-date"
             className="block text-sm font-medium mb-2"
           >
-            End Date
+            {t("endDate")}
           </label>
           <Input
             type="date"
@@ -144,7 +148,7 @@ export function AuditFilters({
       {hasFilters && (
         <div className="mt-4">
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            Clear Filters
+            {t("clearFilters")}
           </Button>
         </div>
       )}

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { DailyChart } from "./daily-chart";
 import type { VoiceMetricsData } from "../types";
+import { useTranslations } from "next-intl";
 
 function formatNumber(n: number): string {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -38,15 +39,16 @@ function MetricBox({
 }
 
 export function VoiceMetricsCard({ data }: { data: VoiceMetricsData | null }) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Mic className="h-4 w-4 text-green-500" />
-          Voice Metrics
+          {t("voiceMetrics")}
         </CardTitle>
         <CardDescription className="text-xs">
-          Voice and TTS usage statistics
+          {t("voiceAndTtsUsageStatistics")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

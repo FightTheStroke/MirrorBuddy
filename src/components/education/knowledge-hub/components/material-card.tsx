@@ -13,6 +13,7 @@ import type { MaterialCardProps } from './material-card/types';
 import { TYPE_ICONS, TYPE_COLORS, TYPE_LABELS } from './material-card/constants';
 import { formatDate } from './material-card/utils';
 import { MaterialMenu } from './material-card/components/material-menu';
+import { useTranslations } from "next-intl";
 
 export function MaterialCard({
   material,
@@ -33,6 +34,7 @@ export function MaterialCard({
   compact = false,
   className,
 }: MaterialCardProps) {
+  const t = useTranslations("education");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -146,7 +148,7 @@ export function MaterialCard({
             'cursor-grab transition-opacity'
           )}
           onKeyDown={handleDragKeyDown}
-          aria-label="Trascina per riordinare. Usa frecce su/giù per spostare."
+          aria-label={t("trascinaPerRiordinareUsaFrecceSuGiuPerSpostare")}
           tabIndex={0}
         >
           <GripVertical className="w-4 h-4" />
@@ -165,7 +167,7 @@ export function MaterialCard({
               : 'border-slate-300 dark:border-slate-600 hover:border-accent-themed',
             compact ? 'w-5 h-5' : 'w-6 h-6'
           )}
-          aria-label={isSelected ? 'Deseleziona' : 'Seleziona'}
+          aria-label={isSelected ? t("deseleziona") : t("seleziona")}
           aria-pressed={isSelected}
         >
           {isSelected && <Check className="w-full h-full" />}
@@ -260,7 +262,7 @@ export function MaterialCard({
                 'hover:bg-slate-100 dark:hover:bg-slate-700',
                 'focus:outline-none focus:ring-2 focus:ring-accent-themed'
               )}
-              aria-label="Altre azioni"
+              aria-label={t("altreAzioni")}
               aria-expanded={isMenuOpen}
               aria-haspopup="menu"
             >

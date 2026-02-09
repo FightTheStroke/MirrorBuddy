@@ -34,7 +34,7 @@ export function KnowledgeHubHeader({
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
-          Knowledge Hub
+          {t("knowledgeHub")}
         </h1>
 
         {/* View Switcher */}

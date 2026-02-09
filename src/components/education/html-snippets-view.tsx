@@ -70,10 +70,10 @@ export function HTMLSnippetsView() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <Code className="w-8 h-8 text-purple-500" />
-            Demo Interattive
+            {t("demoInterattive")}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Esempi HTML creati dai Professori
+            {t("esempiHtmlCreatiDaiProfessori")}
           </p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function HTMLSnippetsView() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cerca demo..."
+            placeholder={t("cercaDemo")}
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
@@ -99,7 +99,7 @@ export function HTMLSnippetsView() {
             size="sm"
             onClick={() => setSelectedSubject(null)}
           >
-            Tutti
+            {t("tutti")}
           </Button>
           {subjects.map((subject) => (
             <Button

@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface MobileVoiceOverlayProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function MobileVoiceOverlay({
   isVisible,
   onClose,
 }: MobileVoiceOverlayProps) {
+  const t = useTranslations("chat");
   const shouldReduceMotion = useReducedMotion();
 
   // Close on Escape key
@@ -113,7 +115,7 @@ export function MobileVoiceOverlay({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                aria-label="Close voice panel"
+                aria-label={t("closeVoicePanel")}
                 className="flex-shrink-0"
               >
                 <X className="w-5 h-5" />

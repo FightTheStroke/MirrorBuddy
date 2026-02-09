@@ -8,6 +8,7 @@
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { getDaysRemainingInSeason } from '@/lib/gamification/seasons';
 import { useEffect, useState } from 'react';
+import { useTranslations } from "next-intl";
 
 interface SeasonBannerProps {
   variant?: 'full' | 'compact';
@@ -15,6 +16,7 @@ interface SeasonBannerProps {
 }
 
 export function SeasonBanner({ variant = 'full', className = '' }: SeasonBannerProps) {
+  const t = useTranslations("achievements");
   const currentSeason = useProgressStore((state) => state.currentSeason);
   const seasonLevel = useProgressStore((state) => state.seasonLevel);
   const [daysRemaining, setDaysRemaining] = useState(getDaysRemainingInSeason());
@@ -51,15 +53,15 @@ export function SeasonBanner({ variant = 'full', className = '' }: SeasonBannerP
           {currentSeason.icon}
         </span>
         <div>
-          <h3 className="text-base sm:text-lg font-semibold">Stagione {currentSeason.name}</h3>
+          <h3 className="text-base sm:text-lg font-semibold">{t("stagione")} {currentSeason.name}</h3>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            {daysRemaining} {daysRemaining === 1 ? 'giorno' : 'giorni'} rimanenti
+            {daysRemaining} {daysRemaining === 1 ? 'giorno' : 'giorni'} {t("rimanenti")}
           </p>
         </div>
       </div>
       <div className="text-left sm:text-right w-full sm:w-auto flex sm:block items-center justify-between">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">
-          Livello Stagionale
+          {t("livelloStagionale")}
         </p>
         <p className="text-xl sm:text-2xl font-bold">{seasonLevel}</p>
       </div>

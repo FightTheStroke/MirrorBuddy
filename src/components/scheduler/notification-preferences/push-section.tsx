@@ -5,6 +5,7 @@ import {
   getPushCapabilityMessage,
   type PushCapabilityStatus,
 } from '@/lib/push/vapid';
+import { useTranslations } from "next-intl";
 
 interface PushSectionProps {
   pushCapability: PushCapabilityStatus | null;
@@ -21,6 +22,7 @@ export function PushSection({
   enabled,
   onToggle,
 }: PushSectionProps) {
+  const t = useTranslations("education");
   if (!pushCapability || pushCapability === 'unsupported') {
     return null;
   }
@@ -31,9 +33,9 @@ export function PushSection({
         <div className="flex items-center gap-3">
           <Smartphone className="w-5 h-5 text-slate-500" />
           <div>
-            <p className="font-medium text-slate-900 dark:text-white">Notifiche Push</p>
+            <p className="font-medium text-slate-900 dark:text-white">{t("notifichePush")}</p>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Ricevi notifiche anche con l&apos;app chiusa
+              {t("riceviNotificheAncheConLAposAppChiusa")}
             </p>
           </div>
         </div>
@@ -63,7 +65,7 @@ export function PushSection({
                 {getPushCapabilityMessage('ios_needs_install')}
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                Tocca l&apos;icona condividi <span className="font-mono">⬆</span> poi &quot;Aggiungi alla schermata Home&quot;.
+                {t("toccaLAposIconaCondividiPoiQuotAggiungiAllaScherma")}
               </p>
             </div>
           </div>
@@ -83,7 +85,7 @@ export function PushSection({
 
       {pushCapability === 'supported' && pushSubscribed && (
         <p className="mt-2 text-xs text-green-600 dark:text-green-400">
-          ✓ Notifiche push attive su questo dispositivo
+          {t("notifichePushAttiveSuQuestoDispositivo")}
         </p>
       )}
     </div>

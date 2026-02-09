@@ -26,8 +26,10 @@ import { useSpeakerTest } from './audio-settings/hooks/use-speaker-test';
 import { MicrophoneSelector } from './audio-settings/components/microphone-selector';
 import { OutputSelector } from './audio-settings/components/output-selector';
 import { CameraPreview } from './audio-settings/components/camera-preview';
+import { useTranslations } from "next-intl";
 
 export function AudioSettings() {
+  const t = useTranslations("settings");
   const {
     preferredMicrophoneId,
     preferredOutputId,
@@ -100,7 +102,7 @@ export function AudioSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Volume2 className="w-5 h-5 text-amber-500" />
-            Dispositivi Audio
+            {t("dispositiviAudio")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -143,7 +145,7 @@ export function AudioSettings() {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Video className="w-5 h-5 text-blue-500" />
-            Webcam
+            {t("webcam")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -163,13 +165,13 @@ export function AudioSettings() {
       {/* Info about Continuity */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Nota per utenti Mac</CardTitle>
+          <CardTitle className="text-sm">{t("notaPerUtentiMac")}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Se hai attivo <strong>Continuity Camera</strong>, macOS potrebbe selezionare automaticamente
-            la webcam dell&apos;iPhone invece di quella integrata. Usa i menu sopra per scegliere il
-            dispositivo corretto.
+            {t("seHaiAttivo")} <strong>{t("continuityCamera")}</strong>{t("macOsPotrebbeSelezionare")}
+            {t("laWebcamDellAposIphoneInveceDiQuellaIntegrataUsaIM")}
+
           </p>
         </CardContent>
       </Card>

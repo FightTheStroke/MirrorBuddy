@@ -57,7 +57,11 @@
         "close": "[TRANSLATE] Chiudi",
         "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
       },
-      "selectCamera": "[TRANSLATE] Seleziona fotocamera"
+      "selectCamera": "[TRANSLATE] Seleziona fotocamera",
+      "continuity": "Continuity",
+      "closeCamera": "Close camera",
+      "fotoCatturata": "Foto catturata",
+      "timerOption": "Timer {label}"
     },
     "homework": {
       "label": "Aide aux Devoirs",
@@ -81,7 +85,11 @@
         "success": {
           "default": "Default",
           "withZaino": "With Zaino"
-        }
+        },
+        "letterUs": "Letter (US)",
+        "a": "A",
+        "A4": "A4",
+        "Letter": "Letter"
       },
       "list": {
         "empty": {
@@ -108,7 +116,10 @@
           "description": "Descrizione",
           "title": "Titolo"
         },
-        "status": "Stato"
+        "status": "Stato",
+        "riprova": "Riprova",
+        "materiali": "materiali",
+        "pages": "pagine"
       },
       "view": {
         "title": "Voir le kit",
@@ -197,7 +208,14 @@
       "addKeyPoint": "[TRANSLATE] Aggiungi punto",
       "deleteKeyPoint": "[TRANSLATE] Elimina punto",
       "deleteSection": "[TRANSLATE] Elimina sezione",
-      "editTitle": "[TRANSLATE] Modifica titolo"
+      "editTitle": "[TRANSLATE] Modifica titolo",
+      "mappa": "Mappa",
+      "flashcard": "Flashcard",
+      "contenutoDellaSezione": "Contenuto della sezione",
+      "puntoChiave": "Punto chiave",
+      "titoloDellaSezione": "Titolo della sezione",
+      "comprimiSezione": "Comprimi sezione",
+      "espandiSezione": "Espandi sezione"
     },
     "diagram": {
       "label": "Diagramme",
@@ -237,13 +255,15 @@
         "instructions": "Tapez les mots aussi vite que possible ! Vous avez 60 secondes.",
         "startButton": "Commencer le Jeu",
         "scoreLabel": "Score",
-        "wordsLabel": "Mots"
+        "wordsLabel": "Mots",
+        "speedGame": "Speed Game"
       },
       "lessonSelector": {
         "title": "Leçons - Niveau {level}",
         "completed": "terminées",
         "completedBadge": "Terminée",
-        "inProgress": "En cours"
+        "inProgress": "En cours",
+        "target": "Target:  WPM"
       },
       "stickyKeys": {
         "activated": "Touches rémanentes activées",
@@ -264,7 +284,11 @@
         "tip": "Appuyez rapidement sur Maj 5 fois pour activer les touches rémanentes sous Windows"
       },
       "progressTracker": {
-        "noBadges": "Aucun badge pour le moment"
+        "noBadges": "Aucun badge pour le moment",
+        "progresso": "Progresso",
+        "streak": "Streak",
+        "giorniConsecutiviDiPratica": "Giorni consecutivi di pratica",
+        "punti": "Punti"
       },
       "visualImpairment": {
         "wcagCompliance": "Conformité WCAG 2.1 AA :",
@@ -362,7 +386,18 @@
       "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
       "continue": "[TRANSLATE] Continua",
       "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare",
+      "completato": "Completato!",
+      "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
+      "continua": "Continua",
+      "carta": "Carta  di",
+      "riviste": "riviste",
+      "domanda": "Domanda",
+      "toccaPerGirare": "Tocca per girare",
+      "risposta": "Risposta",
+      "scorriSinistraPerDifficileDestraPerFacile": "Scorri sinistra per difficile, destra per facile",
+      "premiOScorriPerValutare": "Premi o scorri per valutare",
+      "di": "Di"
     },
     "loading": {
       "cancelled": "Cancelled",
@@ -483,7 +518,9 @@
       "capabilityHomework": "Importer des documents pour l'assistant aux devoirs",
       "capabilityDocuments": "Accéder à vos documents sans avoir à les télécharger",
       "privacyNotice": "MirrorBuddy accède aux fichiers uniquement avec votre autorisation. Nous ne stockons pas vos fichiers Drive.",
-      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive",
+      "googleDrive": "Google Drive",
+      "privacy": "Privacy:"
     },
     "astuccio": {
       "title": "Trousse",
@@ -540,7 +577,8 @@
       "study_tip": {
         "description": "Descrizione",
         "title": "Titolo"
-      }
+      },
+      "astuccio": "Astuccio"
     },
     "zaino": {
       "print": {
@@ -570,6 +608,57 @@
     },
     "pomodoro": {
       "iniziaFocus": "[TRANSLATE] Inizia Focus"
-    }
+    },
+    "passaggiDiCalcolo": "Passaggi di calcolo ()",
+    "label1": "Label",
+    "label": "Label",
+    "value": "Value",
+    "loadingPyodide": "Loading Pyodide...",
+    "running": "Running",
+    "output": "Output",
+    "ricarica": "Ricarica",
+    "demoInterattiva": "Demo interattiva",
+    "diagramError": "Diagram Error:",
+    "viewSource": "View source",
+    "feedbackDelMaestro": "Feedback del Maestro",
+    "risolto": "Risolto",
+    "haiAffrontatoQuestoPunto": "Hai affrontato questo punto",
+    "espandiChat": "Espandi chat",
+    "nuovaSezione": "Nuova sezione",
+    "parole": "parole",
+    "punti": "punti",
+    "nessunaSezioneNelRiassunto": "Nessuna sezione nel riassunto",
+    "toolCanvas": "Tool Canvas",
+    "inAttesaChe": "In attesa che  inizi a costruire...",
+    "mostra": "Mostra",
+    "staCostruendo": "Sta costruendo...",
+    "eventiRicevuti": "Eventi ricevuti:",
+    "chunks": "Chunks:",
+    "nascondiPip": "Nascondi PiP",
+    "home": "Home",
+    "waitingToExecute": "Waiting to execute...",
+    "pending": "Pending",
+    "complete": "Complete",
+    "error": "Error",
+    "toolResults": "Tool results",
+    "tempoDiLetturaStimato": "Tempo di lettura stimato:  minuti",
+    "generatoDaMirrorbuddy": "- Generato da MirrorBuddy",
+    "descrizioneImmagine": "Descrizione immagine:",
+    "script": "Script",
+    "mermaid": "Mermaid",
+    "button": "Button",
+    "iniziACostruire": "Inizi A Costruire",
+    "minuti": "Minuti",
+    "riassunto": "Riassunto",
+    "esciDaFullscreen": "Esci da fullscreen",
+    "fullscreen": "Fullscreen",
+    "comprimiSezione": "Comprimi sezione",
+    "espandiSezione": "Espandi sezione",
+    "riduci": "Riduci",
+    "espandi": "Espandi",
+    "dataFor": "Dati per {title}",
+    "toolResult": "Risultato strumento: {name}",
+    "timerOption": "Timer {label}",
+    "chartDefault": "grafico"
   }
 }

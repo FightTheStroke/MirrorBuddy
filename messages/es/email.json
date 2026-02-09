@@ -1,0 +1,48 @@
+{
+  "email": {
+    "unsubscribe": {
+      "pageNavigation": "Page navigation",
+      "backToHome": "Back To Home",
+      "title": "Title",
+      "description": "Description",
+      "loading": "Loading",
+      "invalidToken": "Invalid Token",
+      "invalidTokenDescription": "Invalid Token Description",
+      "errorTitle": "Error Title",
+      "errorMessage": "Error Message",
+      "categories.productUpdates.label": "Categories.product Updates.label",
+      "categories.productUpdates.description": "Categories.product Updates.description",
+      "categories.educationalNewsletter.label": "Categories.educational Newsletter.label",
+      "categories.educationalNewsletter.description": "Categories.educational Newsletter.description",
+      "categories.announcements.label": "Categories.announcements.label",
+      "categories.announcements.description": "Categories.announcements.description",
+      "saveButton": "Save Button",
+      "saving": "Saving",
+      "successTitle": "Success Title",
+      "successMessage": "Success Message",
+      "footer.privacy": "Footer.privacy",
+      "footer.contact": "Footer.contact",
+      "footer.resubscribe": "Footer.resubscribe",
+      "token": "Token",
+      "categories": {
+        "productUpdates": {
+          "label": "Aggiornamenti prodotto",
+          "description": "Novità, funzionalità e miglioramenti della piattaforma"
+        },
+        "educationalNewsletter": {
+          "label": "Newsletter educativa",
+          "description": "Contenuti didattici, risorse e consigli per l'apprendimento"
+        },
+        "announcements": {
+          "label": "Annunci importanti",
+          "description": "Comunicazioni critiche sul servizio e sulla sicurezza"
+        }
+      },
+      "footer": {
+        "privacy": "Rispettiamo la tua privacy e i tuoi dati secondo GDPR.",
+        "contact": "Hai domande? Contattaci all'indirizzo",
+        "resubscribe": "Puoi modificare queste preferenze in qualsiasi momento usando il link nelle nostre email."
+      }
+    }
+  }
+}

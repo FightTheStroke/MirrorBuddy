@@ -7,6 +7,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface QuizCompletionScreenProps {
   correctCount: number;
@@ -19,6 +20,7 @@ export function QuizCompletionScreen({
   totalQuestions,
   onClose,
 }: QuizCompletionScreenProps) {
+  const t = useTranslations("education");
   const score = Math.round((correctCount / totalQuestions) * 100);
 
   return (
@@ -31,7 +33,7 @@ export function QuizCompletionScreen({
         >
           <div className="text-4xl font-bold text-primary">{score}%</div>
           <p className="text-base sm:text-lg text-muted-foreground">
-            {correctCount} of {totalQuestions} correct
+            {correctCount} {t("of")} {totalQuestions} {t("correct")}
           </p>
           <div className="flex flex-col xs:flex-row gap-2 justify-center pt-4">
             <Button
@@ -39,10 +41,10 @@ export function QuizCompletionScreen({
               onClick={onClose}
               className="w-full xs:w-auto"
             >
-              Back
+              {t("back")}
             </Button>
             <Button onClick={onClose} className="w-full xs:w-auto">
-              Close
+              {t("close")}
             </Button>
           </div>
         </motion.div>

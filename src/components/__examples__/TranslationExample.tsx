@@ -85,7 +85,7 @@ export function TranslationExampleNested() {
 
   return (
     <nav>
-      {t("breadcrumbs.home")} {t("breadcrumbs.separator")} Products
+      {t("breadcrumbs.home")} {t("breadcrumbs.separator")} {t("products")}
     </nav>
   );
 }

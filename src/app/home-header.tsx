@@ -87,7 +87,7 @@ export function HomeHeader({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 text-sm">
-            <span className="font-bold text-slate-900 dark:text-white">Lv.{seasonLevel}</span>
+            <span className="font-bold text-slate-900 dark:text-white">{t("lv")}{seasonLevel}</span>
             <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
               {seasonName}
             </span>
@@ -110,7 +110,7 @@ export function HomeHeader({
       <div className="flex md:hidden items-center gap-2 text-sm">
         {/* Streak indicator */}
         {streak.current > 0 && (
-          <div className="flex items-center gap-1" title="Streak">
+          <div className="flex items-center gap-1" title={t("streak1")}>
             <Flame className="w-4 h-4 text-orange-500" />
             <span className="font-semibold text-orange-500 text-xs">{streak.current}</span>
           </div>
@@ -141,7 +141,7 @@ export function HomeHeader({
 
       {/* Desktop Stats - Full version for medium screens and up */}
       <div className="hidden md:flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-1.5" title="Streak">
+        <div className="flex items-center gap-1.5" title={t("streak")}>
           <Flame
             className={cn('w-4 h-4', streak.current > 0 ? 'text-orange-500' : 'text-slate-400')}
           />
@@ -175,7 +175,7 @@ export function HomeHeader({
         {/* Streak bonus badge */}
         {streak.current >= 3 && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
-            <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}% MB
+            <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}{t("mb")}
           </div>
         )}
 
@@ -195,7 +195,7 @@ export function HomeHeader({
           <div className="flex items-center gap-1">
             <TierBadge tier={userTier} showIcon={userTier === 'pro'} />
             {isSimulatedTier && (
-              <span className="text-[10px] text-amber-500 font-medium">(SIM)</span>
+              <span className="text-[10px] text-amber-500 font-medium">{t("sim")}</span>
             )}
           </div>
         )}

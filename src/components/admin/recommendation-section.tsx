@@ -1,6 +1,9 @@
+"use client";
+
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ServiceRecommendation } from "@/lib/admin/service-recommendations";
+import { useTranslations } from "next-intl";
 
 interface RecommendationSectionProps {
   recommendation: ServiceRecommendation;
@@ -12,6 +15,7 @@ interface RecommendationSectionProps {
  * F-28: Actionable recommendations per servizio
  */
 export function RecommendationSection({ recommendation }: RecommendationSectionProps) {
+  const t = useTranslations("admin");
   return (
     <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
       <div className="space-y-3">
@@ -28,7 +32,7 @@ export function RecommendationSection({ recommendation }: RecommendationSectionP
             </p>
             <div className="flex items-center gap-2 text-xs">
               <span className="font-medium text-slate-700 dark:text-slate-300">
-                Price:
+                {t("price")}
               </span>
               <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
                 {recommendation.price}

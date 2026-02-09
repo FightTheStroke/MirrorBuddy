@@ -16,6 +16,7 @@ import { ThumbnailPreview } from './thumbnail-preview';
 import { StarRating } from './star-rating';
 import { formatDate } from './utils';
 import type { ArchiveItemViewProps, ArchiveItem } from './types';
+import { useTranslations } from "next-intl";
 
 // Memoized card component to prevent re-renders when other cards change
 interface GridCardProps {
@@ -35,6 +36,7 @@ const GridCard = memo(function GridCard({
   onBookmark,
   onRate,
 }: GridCardProps) {
+  const t = useTranslations("education");
   const Icon = TOOL_ICONS[item.toolType];
   const label = TOOL_LABELS[item.toolType];
 
@@ -73,7 +75,7 @@ const GridCard = memo(function GridCard({
               size="icon"
               className="h-7 w-7 bg-white/90 dark:bg-slate-900/90 shadow-sm"
               onClick={handleBookmarkClick}
-              aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+              aria-label={item.isBookmarked ? t("rimuoviDaiPreferiti") : t("aggiungiAiPreferiti")}
             >
               {item.isBookmarked ? (
                 <BookmarkCheck className="w-3.5 h-3.5 text-primary" />
@@ -86,7 +88,7 @@ const GridCard = memo(function GridCard({
               size="icon"
               className="h-7 w-7 bg-white/90 dark:bg-slate-900/90 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={handleDeleteClick}
-              aria-label="Elimina"
+              aria-label={t("elimina")}
             >
               <Trash2 className="w-3.5 h-3.5 text-destructive" />
             </Button>

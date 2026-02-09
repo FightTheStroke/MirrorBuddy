@@ -108,7 +108,7 @@ export function TeacherDiary({
               <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                 <Calendar className="h-4 w-4" />
                 <span className="font-medium">{date}</span>
-                <span className="text-xs">({dateEntries.length} osservazioni)</span>
+                <span className="text-xs">({dateEntries.length} {t("osservazioni")}</span>
               </div>
 
               {/* Entries for this date */}

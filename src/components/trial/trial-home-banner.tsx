@@ -10,6 +10,7 @@ import {
   trackBetaCtaShown,
   trackBetaCtaClicked,
 } from "@/lib/telemetry/trial-events";
+import { useTranslations } from "next-intl";
 
 interface TrialHomeBannerProps {
   chatsRemaining: number;
@@ -29,6 +30,7 @@ export function TrialHomeBanner({
   visitorId,
   className,
 }: TrialHomeBannerProps) {
+  const t = useTranslations("auth");
   const router = useRouter();
   const hasTrackedRef = useRef(false);
 
@@ -128,11 +130,11 @@ export function TrialHomeBanner({
             {/* Trial limits summary */}
             <div className="mt-3 flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
               <span className="flex items-center gap-1">
-                <Users className="w-3.5 h-3.5" />3 Maestri
+                <Users className="w-3.5 h-3.5" />{t("k3Maestri")}
               </span>
               <span className="flex items-center gap-1">
                 <Wrench className="w-3.5 h-3.5" />
-                Strumenti base
+                {t("strumentiBase")}
               </span>
             </div>
           </div>
@@ -149,7 +151,7 @@ export function TrialHomeBanner({
               : "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700",
           )}
         >
-          Richiedi accesso
+          {t("richiediAccesso")}
           <ArrowRight className="w-3.5 h-3.5 ml-1" />
         </Button>
       </div>

@@ -25,6 +25,7 @@ import {
   SolutionDisplay,
   Solution,
 } from "./homework-assistant-mobile/solution-display";
+import { useTranslations } from "next-intl";
 
 interface AnalysisPayload {
   file: File;
@@ -43,6 +44,7 @@ export function HomeworkAssistantMobile({
   onError,
   className,
 }: HomeworkAssistantMobileProps) {
+  const t = useTranslations("education");
   const [selectedSubject, setSelectedSubject] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [solution, setSolution] = useState<Solution | null>(null);
@@ -131,10 +133,10 @@ export function HomeworkAssistantMobile({
       <div className="mb-6">
         <h2 className="text-xl xs:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Zap className="w-6 h-6 text-amber-500" />
-          Homework Assistant
+          {t("homeworkAssistant")}
         </h2>
         <p className="text-sm xs:text-base text-slate-600 dark:text-slate-400 mt-2">
-          Capture or upload your homework to get step-by-step solutions
+          {t("captureOrUploadYourHomeworkToGetStepByStepSolution")}
         </p>
       </div>
 

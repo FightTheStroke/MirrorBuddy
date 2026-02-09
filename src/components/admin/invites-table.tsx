@@ -135,6 +135,7 @@ function InviteRow({
   showCheckbox,
   formatDate,
 }: InviteRowProps) {
+  const t = useTranslations('admin');
   return (
     <div className={cn('transition-colors', isSelected && 'bg-indigo-50 dark:bg-indigo-900/20')}>
       <div className="grid grid-cols-[auto_1fr_auto] gap-4 px-4 py-3 items-center">
@@ -144,7 +145,7 @@ function InviteRow({
             <Checkbox
               checked={isSelected}
               onCheckedChange={onToggleSelect}
-              aria-label={`Seleziona ${invite.name}`}
+              aria-label={t("selezionaInvite", { name: invite.name })}
             />
           ) : (
             <div className="w-5" /> // Spacer

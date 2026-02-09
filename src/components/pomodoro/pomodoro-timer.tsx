@@ -18,6 +18,7 @@ import { usePomodoroTimer, PomodoroPhase } from '@/lib/hooks/use-pomodoro-timer'
 import { PomodoroSettings } from './components/pomodoro-settings';
 import { PomodoroStats } from './components/pomodoro-stats';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface PomodoroTimerProps {
   onPomodoroComplete?: (totalPomodoros: number, totalFocusTime: number) => void;
@@ -33,6 +34,7 @@ const PHASE_CONFIG: Record<PomodoroPhase, { label: string; color: string; icon: 
 };
 
 export function PomodoroTimer({ onPomodoroComplete, compact = false, className }: PomodoroTimerProps) {
+  const t = useTranslations("education");
   const [showSettings, setShowSettings] = useState(false);
   const timer = usePomodoroTimer(undefined, onPomodoroComplete);
 
@@ -87,7 +89,7 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
             {phaseConfig.label}
           </div>
           <div className="text-xs text-white/50">
-            {timer.completedPomodoros} pomodori
+            {timer.completedPomodoros} {t("pomodori")}
           </div>
         </div>
 
@@ -131,7 +133,7 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Timer className="w-5 h-5 text-purple-400" />
-          <h3 className="font-semibold text-white">Pomodoro Timer</h3>
+          <h3 className="font-semibold text-white">{t("pomodoroTimer")}</h3>
         </div>
         <Button
           variant="ghost"
@@ -231,7 +233,7 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
                   className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  Inizia Focus
+                  {t("iniziaFocus")}
                 </Button>
               ) : (
                 <>
@@ -250,7 +252,7 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
                       className="bg-amber-500 hover:bg-amber-600 min-w-[120px]"
                     >
                       <Pause className="w-4 h-4 mr-2" />
-                      Pausa
+                      {t("pausa")}
                     </Button>
                   ) : (
                     <Button
@@ -258,7 +260,7 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
                       className="bg-green-500 hover:bg-green-600 min-w-[120px]"
                     >
                       <Play className="w-4 h-4 mr-2" />
-                      Riprendi
+                      {t("riprendi")}
                     </Button>
                   )}
 

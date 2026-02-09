@@ -15,6 +15,7 @@ import {
   saveConsent,
   sendMessageToMaestro,
 } from './parent-professor-chat-utils';
+import { useTranslations } from "next-intl";
 
 interface Message {
   id: string;
@@ -47,6 +48,7 @@ export function ParentProfessorChat({
   studentName,
   onClose,
 }: ParentProfessorChatProps) {
+  const t = useTranslations("settings");
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -201,7 +203,7 @@ export function ParentProfessorChat({
                   <div>
                     <CardTitle className="text-lg">{maestroName}</CardTitle>
                     <p className="text-sm text-slate-500">
-                      Conversazione su {studentName}
+                      {t("conversazioneSu")} {studentName}
                     </p>
                   </div>
                 </div>

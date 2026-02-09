@@ -39,7 +39,7 @@ export function MarketingHero() {
             <div className="aspect-video overflow-hidden rounded-2xl border-2 border-gray-200 bg-gray-100 shadow-2xl dark:border-gray-700 dark:bg-gray-800">
               <Image
                 src="/images/hero-demo.webp"
-                alt="MirrorBuddy voice AI demo"
+                alt={t("mirrorbuddyVoiceAiDemo")}
                 width={640}
                 height={360}
                 className="h-full w-full object-cover"

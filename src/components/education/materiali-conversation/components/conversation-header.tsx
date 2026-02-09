@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file conversation-header.tsx
  * @brief Conversation header component
@@ -8,6 +10,7 @@ import { Mic, MicOff, RotateCcw, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Character } from '../types';
+import { useTranslations } from "next-intl";
 
 interface ConversationHeaderProps {
   character: Character;
@@ -26,6 +29,7 @@ export function ConversationHeader({
   onClearConversation,
   highContrast,
 }: ConversationHeaderProps) {
+  const t = useTranslations("education");
   return (
     <header
       className={cn(
@@ -43,7 +47,7 @@ export function ConversationHeader({
             onSwitchCharacter && 'cursor-pointer'
           )}
           disabled={!onSwitchCharacter}
-          aria-label={onSwitchCharacter ? 'Cambia personaggio' : undefined}
+          aria-label={onSwitchCharacter ? t("cambiaPersonaggio") : undefined}
         >
           <div
             className="w-12 h-12 rounded-full overflow-hidden transition-transform group-hover:scale-105"
@@ -96,7 +100,7 @@ export function ConversationHeader({
           className={cn(
             isVoiceMode && 'bg-accent-themed text-white hover:opacity-90'
           )}
-          aria-label={isVoiceMode ? 'Disattiva voce' : 'Attiva voce'}
+          aria-label={isVoiceMode ? t("disattivaVoce") : t("attivaVoce")}
         >
           {isVoiceMode ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
         </Button>
@@ -105,7 +109,7 @@ export function ConversationHeader({
           variant="ghost"
           size="sm"
           onClick={onClearConversation}
-          aria-label="Nuova conversazione"
+          aria-label={t("nuovaConversazione")}
         >
           <RotateCcw className="w-4 h-4" />
         </Button>

@@ -15,6 +15,7 @@ import { useGooglePicker, type GooglePickerDocument } from './use-google-picker'
 import type { DriveFileUI } from '@/lib/google';
 import { DropZone, SelectedFileDisplay } from './unified-file-picker/index';
 import type { SelectedFile, UnifiedFilePickerProps } from './unified-file-picker/types';
+import { useTranslations } from "next-intl";
 
 export function UnifiedFilePicker({
   userId,
@@ -28,6 +29,7 @@ export function UnifiedFilePicker({
   disabled = false,
   useNativePicker = true,
 }: UnifiedFilePickerProps) {
+  const t = useTranslations("common");
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -147,7 +149,7 @@ export function UnifiedFilePicker({
           <DialogHeader className="px-6 py-4 border-b">
             <DialogTitle className="flex items-center gap-2">
               <Cloud className="w-5 h-5" />
-              Seleziona da Google Drive
+              {t("selezionaDaGoogleDrive")}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">

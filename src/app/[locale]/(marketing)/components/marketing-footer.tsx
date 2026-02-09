@@ -20,7 +20,7 @@ export function MarketingFooter() {
               className="h-7 w-auto"
             />
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-              AI-powered inclusive education platform.
+              {t("aiPoweredInclusiveEducationPlatform")}
             </p>
           </div>
           <div>

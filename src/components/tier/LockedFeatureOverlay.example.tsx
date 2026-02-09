@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * MIRRORBUDDY - LockedFeatureOverlay Usage Examples
  *
@@ -12,6 +14,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Video } from "lucide-react";
 import type { TierName } from "@/types/tier-types";
+import { useTranslations } from "next-intl";
 
 /**
  * Example: Wrapped Webcam Feature Button
@@ -24,11 +27,12 @@ export function WebcamFeatureButtonExample({
 }: {
   userTier: TierName;
 }) {
+  const t = useTranslations("pricing");
   return (
     <LockedFeatureOverlay tier={userTier} feature="webcam">
       <Button className="w-full gap-2" variant="outline">
         <Video className="w-4 h-4" />
-        Open Webcam
+        {t("openWebcam")}
       </Button>
     </LockedFeatureOverlay>
   );
@@ -40,20 +44,21 @@ export function WebcamFeatureButtonExample({
  * Shows how to wrap a card containing webcam controls.
  */
 export function WebcamFeatureCardExample({ userTier }: { userTier: TierName }) {
+  const t = useTranslations("pricing");
   return (
     <LockedFeatureOverlay tier={userTier} feature="webcam">
       <Card className="p-6 space-y-4">
         <div className="flex items-center gap-3">
           <Video className="w-6 h-6 text-blue-500" />
           <div>
-            <h3 className="font-semibold text-lg">Webcam Capture</h3>
+            <h3 className="font-semibold text-lg">{t("webcamCapture1")}</h3>
             <p className="text-sm text-slate-500">
-              Take photos with your camera for homework and assignments
+              {t("takePhotosWithYourCameraForHomeworkAndAssignments")}
             </p>
           </div>
         </div>
         <Button className="w-full" variant="outline">
-          Open Camera
+          {t("openCamera1")}
         </Button>
       </Card>
     </LockedFeatureOverlay>
@@ -71,26 +76,27 @@ export function ToolGridWithLockedFeatureExample({
 }: {
   userTier: TierName;
 }) {
+  const t = useTranslations("pricing");
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* Unlocked feature - no overlay needed */}
       <Card className="p-4">
-        <h3 className="font-semibold mb-2">PDF Upload</h3>
-        <p className="text-sm text-slate-500 mb-3">Available on all tiers</p>
+        <h3 className="font-semibold mb-2">{t("pdfUpload")}</h3>
+        <p className="text-sm text-slate-500 mb-3">{t("availableOnAllTiers")}</p>
         <Button variant="outline" className="w-full">
-          Upload PDF
+          {t("uploadPdf")}
         </Button>
       </Card>
 
       {/* Locked feature - wrapped with overlay */}
       <LockedFeatureOverlay tier={userTier} feature="webcam">
         <Card className="p-4">
-          <h3 className="font-semibold mb-2">Webcam Capture</h3>
+          <h3 className="font-semibold mb-2">{t("webcamCapture")}</h3>
           <p className="text-sm text-slate-500 mb-3">
-            Capture images with your camera
+            {t("captureImagesWithYourCamera")}
           </p>
           <Button variant="outline" className="w-full">
-            Open Camera
+            {t("openCamera")}
           </Button>
         </Card>
       </LockedFeatureOverlay>
@@ -98,12 +104,12 @@ export function ToolGridWithLockedFeatureExample({
       {/* Another locked feature example */}
       <LockedFeatureOverlay tier={userTier} feature="parent_dashboard">
         <Card className="p-4">
-          <h3 className="font-semibold mb-2">Parent Dashboard</h3>
+          <h3 className="font-semibold mb-2">{t("parentDashboard")}</h3>
           <p className="text-sm text-slate-500 mb-3">
-            Monitor student progress
+            {t("monitorStudentProgress")}
           </p>
           <Button variant="outline" className="w-full">
-            View Dashboard
+            {t("viewDashboard")}
           </Button>
         </Card>
       </LockedFeatureOverlay>
@@ -122,18 +128,19 @@ export function ChatFeatureButtonsExample({
 }: {
   userTier: TierName;
 }) {
+  const t = useTranslations("pricing");
   return (
     <div className="flex gap-2">
       {/* Standard features available to all tiers */}
       <Button variant="ghost" size="sm">
-        Attach File
+        {t("attachFile")}
       </Button>
 
       {/* Pro-only feature wrapped with overlay */}
       <LockedFeatureOverlay tier={userTier} feature="webcam">
         <Button variant="ghost" size="sm" className="gap-1">
           <Video className="w-4 h-4" />
-          Take Photo
+          {t("takePhoto")}
         </Button>
       </LockedFeatureOverlay>
     </div>

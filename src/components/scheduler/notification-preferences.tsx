@@ -16,6 +16,7 @@ import {
   unsubscribeFromPush,
   isPushSubscribed,
 } from "@/lib/push/subscription";
+import { useTranslations } from "next-intl";
 
 interface NotificationPreferencesProps {
   preferences: NotificationPrefsType;
@@ -42,6 +43,7 @@ export function NotificationPreferences({
   onUpdate,
   isLoading,
 }: NotificationPreferencesProps) {
+  const t = useTranslations("education");
   const [saving, setSaving] = useState(false);
   const prefs = { ...DEFAULT_NOTIFICATION_PREFERENCES, ...preferences };
 
@@ -107,7 +109,7 @@ export function NotificationPreferences({
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <Bell className="w-5 h-5 text-amber-500" />
-          Preferenze Notifiche
+          {t("preferenzeNotifiche")}
         </CardTitle>
       </CardHeader>
 
@@ -157,10 +159,10 @@ export function NotificationPreferences({
             <Moon className="w-5 h-5 text-slate-500" />
             <div>
               <p className="font-medium text-slate-900 dark:text-white">
-                Ore di silenzio
+                {t("oreDiSilenzio")}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Niente notifiche in questi orari
+                {t("nienteNotificheInQuestiOrari")}
               </p>
             </div>
           </div>
@@ -170,7 +172,7 @@ export function NotificationPreferences({
                 htmlFor="quiet-hours-start"
                 className="text-xs text-slate-500 dark:text-slate-400"
               >
-                Dalle
+                {t("dalle")}
               </label>
               <select
                 id="quiet-hours-start"
@@ -193,7 +195,7 @@ export function NotificationPreferences({
                 htmlFor="quiet-hours-end"
                 className="text-xs text-slate-500 dark:text-slate-400"
               >
-                Alle
+                {t("alle")}
               </label>
               <select
                 id="quiet-hours-end"
@@ -222,15 +224,15 @@ export function NotificationPreferences({
             <Clock className="w-5 h-5 text-slate-500" />
             <div>
               <p className="font-medium text-slate-900 dark:text-white">
-                Avviso streak
+                {t("avvisoStreak")}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Ricevi un avviso se non hai studiato
+                {t("riceviUnAvvisoSeNonHaiStudiato")}
               </p>
             </div>
           </div>
           <label htmlFor="streak-warning-time" className="sr-only">
-            Orario avviso streak
+            {t("orarioAvvisoStreak")}
           </label>
           <select
             id="streak-warning-time"

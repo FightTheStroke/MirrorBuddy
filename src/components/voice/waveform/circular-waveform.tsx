@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { CircularWaveformProps } from './types';
+import { useTranslations } from "next-intl";
 
 export function CircularWaveform({
   level,
@@ -13,6 +14,7 @@ export function CircularWaveform({
   image,
   className,
 }: CircularWaveformProps) {
+  const t = useTranslations("voice");
   const innerSize = Math.round(size * 0.7);
 
   return (
@@ -76,7 +78,7 @@ export function CircularWaveform({
         {image ? (
           <Image
             src={image}
-            alt="Avatar"
+            alt={t("avatar")}
             width={innerSize}
             height={innerSize}
             className="w-full h-full object-cover"

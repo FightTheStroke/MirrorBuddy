@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { DashboardTab } from "./dashboard-tabs";
+import { useTranslations } from "next-intl";
 
 const TAB_CONFIG = [
   { value: "panoramica" as const, label: "Panoramica", icon: LayoutDashboard },
@@ -46,6 +47,7 @@ export function ParentMobileNav({
   activeTab,
   onTabChange,
 }: ParentMobileNavProps) {
+  const t = useTranslations("settings");
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
@@ -93,7 +95,7 @@ export function ParentMobileNav({
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border"
-      aria-label="Parent dashboard navigation"
+      aria-label={t("parentDashboardNavigation")}
       data-open={isOpen}
     >
       {/* Bottom navigation bar */}
@@ -104,7 +106,7 @@ export function ParentMobileNav({
           variant="ghost"
           size="lg"
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Menu"
+          aria-label={t("menu")}
           aria-expanded={isOpen}
           className="h-11 w-11 p-0 flex items-center justify-center hover:bg-accent"
         >

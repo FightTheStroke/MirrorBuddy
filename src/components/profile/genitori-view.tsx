@@ -64,6 +64,7 @@ import {
 } from "./parent-dashboard/index";
 
 export function GenitoriView() {
+  const t = useTranslations("settings");
   const tProfile = useTranslations("settings.profile");
   const [pageState, setPageState] = useState<PageState>("loading");
   const [insights, setInsights] = useState<StudentInsights | null>(null);
@@ -251,7 +252,7 @@ export function GenitoriView() {
       <div className="container mx-auto px-4 max-w-7xl">
         <PageHeader
           icon={Users}
-          title="Area Genitori"
+          title={t("areaGenitori")}
           rightContent={
             pageState === "ready" && (
               <div className="flex items-center gap-2">
@@ -271,7 +272,7 @@ export function GenitoriView() {
                   disabled={isExporting}
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Report
+                  {t("report")}
                 </Button>
               </div>
             )
@@ -392,7 +393,7 @@ export function GenitoriView() {
                       : "text-amber-700 dark:text-amber-300",
                   )}
                 >
-                  <strong>Nota:</strong>{" "}
+                  <strong>{t("nota1")}</strong>{" "}
                   {tProfile("confidenceNote", {
                     score: String(Math.round(meta.confidenceScore * 100)),
                   })}
@@ -480,7 +481,7 @@ export function GenitoriView() {
                             : "text-blue-700 dark:text-blue-300",
                         )}
                       >
-                        <strong>Nota:</strong> {tProfile("settingsNote")}
+                        <strong>{t("nota")}</strong> {tProfile("settingsNote")}
                       </p>
                     </div>
                   </div>
@@ -509,8 +510,7 @@ export function GenitoriView() {
                     highContrast ? "text-yellow-200" : "text-muted-foreground",
                   )}
                 >
-                  <strong>Disclaimer AI:</strong> Le osservazioni sono generate
-                  da AI e non sostituiscono valutazioni professionali.
+                  <strong>{t("disclaimerAi")}</strong> {t("leOsservazioniSonoGenerate")}
                 </p>
               </div>
             </div>

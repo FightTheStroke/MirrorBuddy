@@ -154,7 +154,7 @@ export default async function TierAnalyticsPage() {
       {/* Footer Note */}
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
         <p className="text-sm text-muted-foreground">
-          <strong>Note:</strong> {t("note")}
+          <strong>{t("note")}</strong> {t("note")}
         </p>
       </div>
     </div>

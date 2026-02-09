@@ -40,6 +40,7 @@ interface SettingsPageMobileProps {
 }
 
 export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
+  const t = useTranslations("settings");
   const tSettings = useTranslations("settings");
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -187,8 +188,7 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
       content: (
         <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
           <p className="text-sm text-amber-800 dark:text-amber-200">
-            <strong>Dashboard Genitori</strong> - Area dedicata ai genitori per
-            monitorare i progressi.
+            <strong>{t("dashboardGenitori")}</strong> {t("areaDedicataGenitori")}
           </p>
         </div>
       ),
@@ -219,7 +219,7 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
           size="icon"
           onClick={onBack}
           className="min-w-[44px] min-h-[44px] -ml-2"
-          aria-label="Indietro"
+          aria-label={t("indietro")}
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>

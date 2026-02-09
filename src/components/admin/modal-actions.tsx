@@ -1,5 +1,8 @@
+"use client";
+
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface ModalActionsProps {
   loading: boolean;
@@ -12,6 +15,7 @@ export function ModalActions({
   onCancel,
   onSubmit,
 }: ModalActionsProps) {
+  const t = useTranslations("admin");
   return (
     <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row mt-6">
       <Button
@@ -21,7 +25,7 @@ export function ModalActions({
         className="flex-1 min-h-11 min-w-11"
         disabled={loading}
       >
-        Cancel
+        {t("cancel")}
       </Button>
       <Button
         type="submit"
@@ -32,7 +36,7 @@ export function ModalActions({
         {loading ? (
           <>
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            Saving...
+            {t("saving")}
           </>
         ) : (
           "Save Overrides"

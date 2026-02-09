@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import type { InfraMetrics } from "@/lib/admin/infra-panel-types";
 import { VercelCard } from "./components";
 import { SupabaseCard, RedisCard } from "./service-cards";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ function NotConfiguredCard({
   envVars: { name: string; optional?: boolean }[];
   isError?: boolean;
 }) {
+  const t = useTranslations("admin");
   return (
     <div className="space-y-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
       <div className="flex items-start gap-2">
@@ -40,7 +42,7 @@ function NotConfiguredCard({
           {!isError && (
             <>
               <p className="mt-1 text-sm text-yellow-800 dark:text-yellow-200">
-                Required environment variables:
+                {t("requiredEnvironmentVariables")}
               </p>
               <ul className="mt-2 space-y-1 text-sm">
                 {envVars.map((envVar) => (
@@ -51,7 +53,7 @@ function NotConfiguredCard({
                     • {envVar.name}
                     {envVar.optional && (
                       <span className="ml-2 text-xs text-yellow-700 dark:text-yellow-300">
-                        (optional)
+                        {t("optional")}
                       </span>
                     )}
                   </li>
@@ -61,7 +63,7 @@ function NotConfiguredCard({
           )}
           {isError && (
             <p className="mt-1 text-sm text-yellow-800 dark:text-yellow-200">
-              Database connection failed. Check logs for details.
+              {t("databaseConnectionFailedCheckLogsForDetails")}
             </p>
           )}
         </div>
@@ -71,6 +73,7 @@ function NotConfiguredCard({
 }
 
 export default function InfrastructurePage() {
+  const t = useTranslations("admin");
   const [metrics, setMetrics] = useState<InfraMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,13 +116,13 @@ export default function InfrastructurePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Infrastructure</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("infrastructure")}</h1>
           <p className="text-muted-foreground">
-            Real-time monitoring of external services
+            {t("realTimeMonitoringOfExternalServices")}
           </p>
           {lastUpdate && (
             <p className="text-sm text-muted-foreground mt-1">
-              Last updated: {lastUpdate.toLocaleTimeString()}
+              {t("lastUpdated")} {lastUpdate.toLocaleTimeString()}
             </p>
           )}
         </div>
@@ -127,7 +130,7 @@ export default function InfrastructurePage() {
           <RefreshCw
             className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 
@@ -173,7 +176,7 @@ export default function InfrastructurePage() {
           {/* Supabase */}
           <Card>
             <CardHeader>
-              <CardTitle>Supabase</CardTitle>
+              <CardTitle>{t("supabase1")}</CardTitle>
             </CardHeader>
             <CardContent>
               {metrics.supabase ? (
@@ -191,7 +194,7 @@ export default function InfrastructurePage() {
           {/* Redis */}
           <Card>
             <CardHeader>
-              <CardTitle>Redis</CardTitle>
+              <CardTitle>{t("redis1")}</CardTitle>
             </CardHeader>
             <CardContent>
               {metrics.redis ? (
@@ -214,12 +217,12 @@ export default function InfrastructurePage() {
       {metrics && (
         <Card>
           <CardHeader>
-            <CardTitle>Service Health Summary</CardTitle>
+            <CardTitle>{t("serviceHealthSummary")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <span>Vercel:</span>
+                <span>{t("vercel")}</span>
                 <span
                   className={
                     metrics.vercel?.status === "healthy"
@@ -231,7 +234,7 @@ export default function InfrastructurePage() {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Supabase:</span>
+                <span>{t("supabase")}</span>
                 <span
                   className={
                     metrics.supabase?.status === "healthy"
@@ -243,7 +246,7 @@ export default function InfrastructurePage() {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Redis:</span>
+                <span>{t("redis")}</span>
                 <span
                   className={
                     metrics.redis?.status === "healthy"

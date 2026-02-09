@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface LimitFieldProps {
   label: string;
@@ -9,6 +12,7 @@ interface LimitFieldProps {
 
 export const LimitField = React.forwardRef<HTMLInputElement, LimitFieldProps>(
   ({ label, defaultValue, value, onChange }, ref) => {
+    const t = useTranslations("admin");
     return (
       <div>
         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
@@ -28,7 +32,7 @@ export const LimitField = React.forwardRef<HTMLInputElement, LimitFieldProps>(
           />
           {defaultValue !== undefined && (
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Default: {defaultValue}
+              {t("default")} {defaultValue}
             </p>
           )}
         </div>

@@ -54,7 +54,7 @@ export function SettingsTogglesSection({
               fontSize: `${14 * fontSizeMultiplier}px`,
             }}
           >
-            Testo grande
+            {t("testoGrande1")}
           </span>
         </div>
         <div
@@ -74,7 +74,7 @@ export function SettingsTogglesSection({
             checked={settings.largeText}
             onChange={(e) => updateSettings({ largeText: e.target.checked })}
             className="sr-only"
-            aria-label="Testo grande"
+            aria-label={t("testoGrande")}
           />
           <span
             className={cn(
@@ -108,7 +108,7 @@ export function SettingsTogglesSection({
               fontSize: `${14 * fontSizeMultiplier}px`,
             }}
           >
-            Alto contrasto
+            {t("altoContrasto1")}
           </span>
         </div>
         <div
@@ -124,7 +124,7 @@ export function SettingsTogglesSection({
             checked={settings.highContrast}
             onChange={(e) => updateSettings({ highContrast: e.target.checked })}
             className="sr-only"
-            aria-label="Alto contrasto"
+            aria-label={t("altoContrasto")}
           />
           <span
             className={cn(
@@ -158,7 +158,7 @@ export function SettingsTogglesSection({
               fontSize: `${14 * fontSizeMultiplier}px`,
             }}
           >
-            Font OpenDyslexic
+            {t("fontOpendyslexic1")}
           </span>
         </div>
         <div
@@ -178,7 +178,7 @@ export function SettingsTogglesSection({
             checked={settings.dyslexiaFont}
             onChange={(e) => updateSettings({ dyslexiaFont: e.target.checked })}
             className="sr-only"
-            aria-label="Font OpenDyslexic"
+            aria-label={t("fontOpendyslexic")}
           />
           <span
             className={cn(

@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { MaterialCard } from '../components/material-card';
 import { toMaterial, getCalendarDays, WEEKDAYS, MONTHS, type CalendarDay } from './calendar-utils';
 import type { KnowledgeHubMaterial } from './explorer-view';
+import { useTranslations } from "next-intl";
 
 export interface CalendarViewProps {
   materials: KnowledgeHubMaterial[];
@@ -34,6 +35,7 @@ export function CalendarView({
   onToggleMaterialSelection,
   className,
 }: CalendarViewProps) {
+  const t = useTranslations("education");
   const [currentDate, setCurrentDate] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
@@ -79,18 +81,18 @@ export function CalendarView({
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div className="flex items-center justify-center sm:justify-start gap-2">
-              <Button variant="ghost" size="icon" onClick={goToPrevMonth} aria-label="Mese precedente">
+              <Button variant="ghost" size="icon" onClick={goToPrevMonth} aria-label={t("mesePrecedente")}>
                 <ChevronLeft className="w-5 h-5" />
               </Button>
               <h2 className="text-lg font-semibold min-w-[140px] text-center">
                 {MONTHS[currentDate.month]} {currentDate.year}
               </h2>
-              <Button variant="ghost" size="icon" onClick={goToNextMonth} aria-label="Mese successivo">
+              <Button variant="ghost" size="icon" onClick={goToNextMonth} aria-label={t("meseSuccessivo")}>
                 <ChevronRight className="w-5 h-5" />
               </Button>
             </div>
             <Button variant="outline" size="sm" onClick={goToToday}>
-              Oggi
+              {t("oggi")}
             </Button>
           </div>
 

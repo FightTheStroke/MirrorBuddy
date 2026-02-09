@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from "next-intl";
 
 interface PomodoroStatsProps {
   completedPomodoros: number;
@@ -13,6 +14,7 @@ export function PomodoroStats({
   totalFocusTime,
   pomodorosUntilLongBreak: _pomodorosUntilLongBreak,
 }: PomodoroStatsProps) {
+  const t = useTranslations("education");
   if (completedPomodoros === 0) {
     return null;
   }
@@ -24,11 +26,11 @@ export function PomodoroStats({
       className="mt-6 pt-4 border-t border-white/10 text-center"
     >
       <p className="text-sm text-white/50">
-        Oggi:{' '}
-        <span className="text-white font-medium">{completedPomodoros} pomodori</span>
+        {t("oggi")}{' '}
+        <span className="text-white font-medium">{completedPomodoros} {t("pomodori")}</span>
         {' '}·{' '}
         <span className="text-white font-medium">
-          {Math.floor(totalFocusTime / 60)} min di focus
+          {Math.floor(totalFocusTime / 60)} {t("minDiFocus")}
         </span>
       </p>
     </motion.div>

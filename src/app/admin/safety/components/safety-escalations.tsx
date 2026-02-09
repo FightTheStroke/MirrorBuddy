@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,12 +9,14 @@ import {
 } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 import type { SafetyDashboardResponse } from "@/app/api/admin/safety/route";
+import { useTranslations } from "next-intl";
 
 interface SafetyEscalationsProps {
   escalations: SafetyDashboardResponse["escalations"];
 }
 
 export function SafetyEscalations({ escalations }: SafetyEscalationsProps) {
+  const t = useTranslations("admin");
   if (escalations.length === 0) return null;
 
   return (
@@ -20,10 +24,10 @@ export function SafetyEscalations({ escalations }: SafetyEscalationsProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
           <AlertTriangle className="h-5 w-5" />
-          Active Escalations
+          {t("activeEscalations")}
         </CardTitle>
         <CardDescription className="text-amber-800 dark:text-amber-200">
-          Events requiring human intervention
+          {t("eventsRequiringHumanIntervention")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -44,12 +48,12 @@ export function SafetyEscalations({ escalations }: SafetyEscalationsProps) {
               <div className="flex items-center gap-3">
                 {!escalation.resolved && (
                   <span className="px-2 py-1 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-800/50 dark:text-amber-200">
-                    Unresolved
+                    {t("unresolved")}
                   </span>
                 )}
                 {escalation.resolved && (
                   <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/50 dark:text-green-200">
-                    Resolved
+                    {t("resolved")}
                   </span>
                 )}
               </div>

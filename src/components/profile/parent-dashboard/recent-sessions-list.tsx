@@ -4,6 +4,7 @@ import { Calendar, Clock, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StudySessionSummary } from "@/types";
 import { SUBJECT_NAMES } from "@/data/maestri";
+import { useTranslations } from "next-intl";
 
 interface RecentSessionsListProps {
   sessions: StudySessionSummary[];
@@ -44,11 +45,12 @@ export function RecentSessionsList({
   highContrast = false,
   className,
 }: RecentSessionsListProps) {
+  const t = useTranslations("settings");
   if (sessions.length === 0) {
     return (
       <section
         className={cn("space-y-3", className)}
-        aria-label="Sessioni recenti"
+        aria-label={t("sessioniRecenti3")}
       >
         <h2
           className={cn(
@@ -56,7 +58,7 @@ export function RecentSessionsList({
             highContrast ? "text-yellow-400" : "text-slate-900 dark:text-white",
           )}
         >
-          Sessioni recenti
+          {t("sessioniRecenti2")}
         </h2>
         <p
           className={cn(
@@ -66,7 +68,7 @@ export function RecentSessionsList({
               : "text-slate-500 dark:text-slate-400",
           )}
         >
-          Nessuna sessione di studio ancora
+          {t("nessunaSessioneDiStudioAncora")}
         </p>
       </section>
     );
@@ -75,7 +77,7 @@ export function RecentSessionsList({
   return (
     <section
       className={cn("space-y-3", className)}
-      aria-label="Sessioni recenti"
+      aria-label={t("sessioniRecenti1")}
     >
       <h2
         className={cn(
@@ -83,7 +85,7 @@ export function RecentSessionsList({
           highContrast ? "text-yellow-400" : "text-slate-900 dark:text-white",
         )}
       >
-        Sessioni recenti
+        {t("sessioniRecenti")}
       </h2>
       <ul
         className={cn(

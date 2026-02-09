@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { ToolCall } from '@/types';
 import { toolIcons, toolNames, FUNCTION_NAME_TO_TOOL_TYPE } from './tool-display-constants';
 import { ToolContent } from './tool-content-renderers';
+import { useTranslations } from "next-intl";
 
 interface ToolResultDisplayProps {
   toolCall: ToolCall;
@@ -20,6 +21,7 @@ interface ToolResultDisplayProps {
 }
 
 export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen = false, onToggleFullscreen }: ToolResultDisplayProps) {
+  const t = useTranslations("tools");
   // Map function name to tool type for display
   const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type;
   const icon = toolIcons[toolCall.type] || toolIcons[toolType] || <Loader2 className="w-4 h-4" />;
@@ -36,7 +38,7 @@ export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen
         className
       )}
       role="region"
-      aria-label={`Tool result: ${name}`}
+      aria-label={t("toolResult", { name })}
     >
       {/* Status header */}
       <div className={cn(
@@ -57,7 +59,7 @@ export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen
               'text-slate-400 hover:text-slate-200',
               isFullscreen && 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             )}
-            title={isFullscreen ? 'Riduci' : 'Espandi'}
+            title={isFullscreen ? t("riduci") : t("espandi")}
           >
             {isFullscreen ? (
               <Minimize2 className="w-4 h-4" />
@@ -78,7 +80,7 @@ export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen
             exit={{ opacity: 0 }}
             className="h-20 flex items-center justify-center bg-slate-800/50 rounded-xl border border-slate-700"
           >
-            <span className="text-sm text-slate-400">Waiting to execute...</span>
+            <span className="text-sm text-slate-400">{t("waitingToExecute")}</span>
           </motion.div>
         )}
 
@@ -117,32 +119,33 @@ export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen
 }
 
 function StatusBadge({ status }: { status: ToolCall['status'] }) {
+  const t = useTranslations("tools");
   switch (status) {
     case 'pending':
       return (
         <span className="px-2 py-0.5 text-xs rounded-full bg-slate-700 text-slate-400">
-          Pending
+          {t("pending")}
         </span>
       );
     case 'running':
       return (
         <span className="px-2 py-0.5 text-xs rounded-full bg-blue-900/50 text-blue-400 flex items-center gap-1">
           <Loader2 className="w-3 h-3 animate-spin" />
-          Running
+          {t("running")}
         </span>
       );
     case 'completed':
       return (
         <span className="px-2 py-0.5 text-xs rounded-full bg-green-900/50 text-green-400 flex items-center gap-1">
           <CheckCircle className="w-3 h-3" />
-          Complete
+          {t("complete")}
         </span>
       );
     case 'error':
       return (
         <span className="px-2 py-0.5 text-xs rounded-full bg-red-900/50 text-red-400 flex items-center gap-1">
           <XCircle className="w-3 h-3" />
-          Error
+          {t("error")}
         </span>
       );
   }
@@ -158,10 +161,11 @@ interface ToolResultsListProps {
 }
 
 export function ToolResultsList({ toolCalls, className, sessionId }: ToolResultsListProps) {
+  const t = useTranslations("tools");
   if (toolCalls.length === 0) return null;
 
   return (
-    <div className={cn('space-y-4', className)} role="list" aria-label="Tool results">
+    <div className={cn('space-y-4', className)} role="list" aria-label={t("toolResults")}>
       <AnimatePresence>
         {toolCalls.map((toolCall) => (
           <ToolResultDisplay key={toolCall.id} toolCall={toolCall} sessionId={sessionId} />

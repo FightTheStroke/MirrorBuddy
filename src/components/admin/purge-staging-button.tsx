@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2, Loader2, AlertTriangle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth";
+import { useTranslations } from "next-intl";
 
 interface StagingDataCounts {
   users: number;
@@ -31,6 +32,7 @@ interface StagingDataCounts {
 }
 
 export function PurgeStagingButton() {
+  const t = useTranslations("admin");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingCounts, setLoadingCounts] = useState(false);
@@ -97,18 +99,18 @@ export function PurgeStagingButton() {
       <DialogTrigger asChild>
         <Button variant="destructive" size="sm">
           <Trash2 className="h-4 w-4 mr-2" />
-          Purge Staging Data
+          {t("purgeStagingData1")}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
-            Purge Staging Data
+            {t("purgeStagingData")}
           </DialogTitle>
           <DialogDescription>
-            This will permanently delete all records marked as test data
-            (isTestData=true). This action cannot be undone.
+            {t("thisWillPermanentlyDeleteAllRecordsMarkedAsTestDat")}
+
           </DialogDescription>
         </DialogHeader>
 
@@ -120,30 +122,30 @@ export function PurgeStagingButton() {
           <div className="space-y-4">
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
               <p className="font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                Records to be deleted:
+                {t("recordsToBeDeleted")}
               </p>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>Users: {counts.users}</div>
-                <div>Conversations: {counts.conversations}</div>
-                <div>Messages: {counts.messages}</div>
-                <div>Flashcard Progress: {counts.flashcardProgress}</div>
-                <div>Quiz Results: {counts.quizResults}</div>
-                <div>Materials: {counts.materials}</div>
-                <div>Session Metrics: {counts.sessionMetrics}</div>
-                <div>User Activity: {counts.userActivity}</div>
-                <div>Telemetry Events: {counts.telemetryEvents}</div>
-                <div>Study Sessions: {counts.studySessions}</div>
-                <div>Funnel Events: {counts.funnelEvents}</div>
+                <div>{t("usersLabel")} {counts.users}</div>
+                <div>{t("conversations")} {counts.conversations}</div>
+                <div>{t("messages")} {counts.messages}</div>
+                <div>{t("flashcardProgress")} {counts.flashcardProgress}</div>
+                <div>{t("quizResults")} {counts.quizResults}</div>
+                <div>{t("materials")} {counts.materials}</div>
+                <div>{t("sessionMetrics")} {counts.sessionMetrics}</div>
+                <div>{t("userActivity")} {counts.userActivity}</div>
+                <div>{t("telemetryEvents")} {counts.telemetryEvents}</div>
+                <div>{t("studySessions")} {counts.studySessions}</div>
+                <div>{t("funnelEvents")} {counts.funnelEvents}</div>
               </div>
               <div className="mt-3 pt-3 border-t border-amber-300 dark:border-amber-700 font-bold text-amber-900 dark:text-amber-100">
-                Total: {counts.total} records
+                {t("total")} {counts.total} {t("records1")}
               </div>
             </div>
 
             {counts.total === 0 && (
               <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  No staging data found. Database is clean.
+                  {t("noStagingDataFoundDatabaseIsClean")}
                 </p>
               </div>
             )}
@@ -153,7 +155,7 @@ export function PurgeStagingButton() {
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline" disabled={loading}>
-              Cancel
+              {t("cancel")}
             </Button>
           </DialogClose>
           <Button
@@ -164,12 +166,12 @@ export function PurgeStagingButton() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Purging...
+                {t("purging")}
               </>
             ) : (
               <>
                 <Trash2 className="h-4 w-4 mr-2" />
-                Delete {counts?.total || 0} Records
+                {t("delete")} {counts?.total || 0} {t("records")}
               </>
             )}
           </Button>

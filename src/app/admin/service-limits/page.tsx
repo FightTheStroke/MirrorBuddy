@@ -28,8 +28,10 @@ import {
   getRecommendation,
   getServiceKey,
 } from "@/lib/admin/service-recommendations";
+import { useTranslations } from "next-intl";
 
 export default function ServiceLimitsPage() {
+  const t = useTranslations("admin");
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +81,7 @@ export default function ServiceLimitsPage() {
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
           <p className="text-slate-600 dark:text-slate-400">
-            Loading service limits...
+            {t("loadingServiceLimits")}
           </p>
         </div>
       </div>
@@ -91,10 +93,10 @@ export default function ServiceLimitsPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-          Service Limits Monitor
+          {t("serviceLimitsMonitor")}
         </h1>
         <p className="text-slate-600 dark:text-slate-400">
-          Real-time monitoring of external service quotas and usage limits
+          {t("realTimeMonitoringOfExternalServiceQuotasAndUsageL")}
         </p>
       </div>
 
@@ -112,7 +114,7 @@ export default function ServiceLimitsPage() {
         </div>
         <div className="flex items-center gap-2">
           <p className="text-xs text-slate-400 dark:text-slate-500">
-            Auto-refresh: 30s
+            {t("autoRefresh30s")}
           </p>
           <Button
             variant="outline"
@@ -123,7 +125,7 @@ export default function ServiceLimitsPage() {
             <RefreshCw
               className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            {t("refresh")}
           </Button>
         </div>
       </div>
@@ -239,7 +241,7 @@ export default function ServiceLimitsPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-slate-500 dark:text-slate-400">
-              No service limits data available
+              {t("noServiceLimitsDataAvailable")}
             </p>
           </CardContent>
         </Card>

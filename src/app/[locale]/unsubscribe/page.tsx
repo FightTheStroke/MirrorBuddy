@@ -104,7 +104,7 @@ export default function UnsubscribePage() {
       {/* Navigation */}
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700"
-        aria-label="Page navigation"
+        aria-label={t("pageNavigation")}
       >
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Link

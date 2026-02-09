@@ -23,6 +23,7 @@ import { useWebcamAnalysis } from "./webcam-analysis-mobile/use-webcam-analysis"
 import { CameraPreview } from "./webcam-analysis-mobile/camera-preview";
 import { CameraError } from "./webcam-analysis-mobile/camera-error";
 import { AnalysisResults } from "./webcam-analysis-mobile/analysis-results";
+import { useTranslations } from "next-intl";
 
 export interface WebcamAnalysisMobileProps {
   onAnalyze?: (imageData: string) => void;
@@ -35,6 +36,7 @@ export function WebcamAnalysisMobile({
   onError: _onError,
   className,
 }: WebcamAnalysisMobileProps) {
+  const t = useTranslations("education");
   const { isPhone } = useDeviceType();
   const {
     videoRef,
@@ -76,7 +78,7 @@ export function WebcamAnalysisMobile({
         <h2 className="text-lg xs:text-xl font-bold text-white dark:text-white flex items-center gap-2">
           <Zap className="w-5 h-5 text-amber-400" />
           <span className={isPhone ? "text-sm" : "text-base"}>
-            Webcam Analysis
+            {t("webcamAnalysis")}
           </span>
         </h2>
       </div>
@@ -111,7 +113,7 @@ export function WebcamAnalysisMobile({
       {/* Empty State */}
       {!capturedImage && !error && (
         <div className="text-center text-slate-400 dark:text-slate-500 text-xs xs:text-sm py-2">
-          <p>Position subject in frame and tap capture</p>
+          <p>{t("positionSubjectInFrame")}</p>
         </div>
       )}
     </div>

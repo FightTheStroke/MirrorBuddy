@@ -76,7 +76,7 @@ export function LoginClient() {
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <LogoBrain
-                alt="MirrorBuddy Logo"
+                alt={t("mirrorbuddyLogo")}
                 size={64}
                 priority
                 wrapperClassName="bg-blue-100 dark:bg-blue-900/30 rounded-full p-2"
@@ -111,7 +111,7 @@ export function LoginClient() {
                   htmlFor="email"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Email *
+                  {t("email")}
                 </label>
                 <input
                   id="email"
@@ -132,7 +132,7 @@ export function LoginClient() {
                   htmlFor="password"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Password *
+                  {t("password")}
                 </label>
                 <div className="relative">
                   <input

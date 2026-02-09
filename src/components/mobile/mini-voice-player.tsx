@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Phone, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface MiniVoicePlayerProps {
   characterName: string;
@@ -40,6 +41,7 @@ export function MiniVoicePlayer({
   onEndCall,
   className,
 }: MiniVoicePlayerProps) {
+  const t = useTranslations("common");
   // Determine voice status text
   const statusText = isSpeaking
     ? "Speaking..."
@@ -91,7 +93,7 @@ export function MiniVoicePlayer({
       <button
         onClick={onExpand}
         className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
-        aria-label="Expand voice panel"
+        aria-label={t("expandVoicePanel")}
       >
         <ChevronUp className="w-5 h-5" />
       </button>
@@ -100,7 +102,7 @@ export function MiniVoicePlayer({
       <button
         onClick={onEndCall}
         className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-destructive"
-        aria-label="End voice call"
+        aria-label={t("endVoiceCall")}
       >
         <Phone className="w-5 h-5" />
       </button>

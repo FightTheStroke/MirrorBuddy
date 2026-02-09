@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface ToolLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export function ToolLayout({
   backRoute = '/',
   className,
 }: ToolLayoutProps) {
+  const t = useTranslations("tools");
   const router = useRouter();
 
   return (
@@ -46,7 +48,7 @@ export function ToolLayout({
             onClick={() => router.push('/')}
             className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           >
-            Home
+            {t("home")}
           </Button>
         </div>
       </header>

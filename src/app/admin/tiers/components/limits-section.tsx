@@ -92,7 +92,7 @@ export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
             {label}
           </label>
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Max: {limit.max}
+            {t("max")} {limit.max}
           </span>
         </div>
 

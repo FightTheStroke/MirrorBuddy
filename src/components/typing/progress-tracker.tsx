@@ -13,7 +13,7 @@ export function ProgressTracker() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Progresso</h3>
+      <h3 className="text-lg font-semibold">{t("progresso")}</h3>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard label="WPM Migliore" value={stats.bestWPM} suffix=" WPM" />
@@ -32,19 +32,19 @@ export function ProgressTracker() {
 
       <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
         <div className="flex items-center justify-between mb-2">
-          <span className="font-semibold">Streak</span>
+          <span className="font-semibold">{t("streak")}</span>
           <span className="text-2xl font-bold text-primary">
             {stats.streakDays}
           </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          Giorni consecutivi di pratica
+          {t("giorniConsecutiviDiPratica")}
         </p>
       </div>
 
       <div className="p-4 bg-card border border-border rounded-lg">
         <div className="flex items-center justify-between mb-2">
-          <span className="font-semibold">Punti</span>
+          <span className="font-semibold">{t("punti")}</span>
           <span className="text-2xl font-bold text-primary">
             {stats.points}
           </span>

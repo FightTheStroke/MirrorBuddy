@@ -6,6 +6,7 @@ import { EvaluationCard } from "@/components/chat/evaluation-card";
 import { ToolResultDisplay } from "@/components/tools";
 import { MessageBubble } from "./message-bubble";
 import type { ChatMessage, ToolCall, Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MaestroSessionMessagesProps {
   messages: ChatMessage[];
@@ -32,12 +33,13 @@ export function MaestroSessionMessages({
   fullscreenToolId,
   onToggleToolFullscreen,
 }: MaestroSessionMessagesProps) {
+  const t = useTranslations("chat");
   return (
     <div
       className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50 min-w-0"
       role="log"
       aria-live="polite"
-      aria-label="Messaggi della conversazione"
+      aria-label={t("messaggiDellaConversazione")}
     >
       {messages.map((message) =>
         message.type === "evaluation" && message.evaluation ? (

@@ -5,6 +5,7 @@ import { X, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
+import { useTranslations } from "next-intl";
 
 interface User {
   id: string;
@@ -45,6 +46,7 @@ export function BulkTierChangeModal({
   users,
   availableTiers,
 }: BulkTierChangeModalProps) {
+  const t = useTranslations("admin");
   const [selectedTierId, setSelectedTierId] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -168,10 +170,10 @@ export function BulkTierChangeModal({
               id="bulk-tier-change-title"
               className="text-lg font-semibold text-slate-900 dark:text-white"
             >
-              Bulk Tier Change
+              {t("bulkTierChange")}
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              {users.length} users selected
+              {users.length} {t("usersSelected")}
             </p>
           </div>
           <button
@@ -186,7 +188,7 @@ export function BulkTierChangeModal({
         {/* User List */}
         <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 max-h-48 overflow-y-auto">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
-            Selected Users
+            {t("selectedUsers")}
           </p>
           <div className="space-y-1">
             {users.slice(0, 10).map((user) => (
@@ -199,7 +201,7 @@ export function BulkTierChangeModal({
             ))}
             {users.length > 10 && (
               <p className="text-xs text-slate-500 dark:text-slate-400 italic">
-                ... and {users.length - 10} more
+                {t("and")} {users.length - 10} {t("more")}
               </p>
             )}
           </div>
@@ -212,14 +214,14 @@ export function BulkTierChangeModal({
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-medium text-slate-900 dark:text-white">
-                  {summary.successful} successful
+                  {summary.successful} {t("successful")}
                 </span>
               </div>
               {summary.failed > 0 && (
                 <div className="flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-red-600" />
                   <span className="text-sm font-medium text-slate-900 dark:text-white">
-                    {summary.failed} failed
+                    {summary.failed} {t("failed")}
                   </span>
                 </div>
               )}
@@ -229,7 +231,7 @@ export function BulkTierChangeModal({
             {results && results.some((r) => !r.success) && (
               <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-600">
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
-                  Failed Operations
+                  {t("failedOperations")}
                 </p>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   {results
@@ -269,7 +271,7 @@ export function BulkTierChangeModal({
                   htmlFor="bulk-tier-select"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  New Tier *
+                  {t("newTier1")}
                 </label>
                 <select
                   ref={selectRef}
@@ -278,9 +280,9 @@ export function BulkTierChangeModal({
                   onChange={(e) => setSelectedTierId(e.target.value)}
                   required
                   className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                  aria-label="New Tier"
+                  aria-label={t("newTier")}
                 >
-                  <option value="">Select a tier...</option>
+                  <option value="">{t("selectATier")}</option>
                   {availableTiers.map((tier) => (
                     <option key={tier.id} value={tier.id}>
                       {tier.name}
@@ -295,13 +297,13 @@ export function BulkTierChangeModal({
                   htmlFor="bulk-tier-notes"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Notes (optional)
+                  {t("notesOptional")}
                 </label>
                 <textarea
                   id="bulk-tier-notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Reason for bulk change..."
+                  placeholder={t("reasonForBulkChange")}
                   rows={3}
                   className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
                 />
@@ -317,7 +319,7 @@ export function BulkTierChangeModal({
                 className="flex-1 min-h-11 min-w-11"
                 disabled={loading}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 type="submit"
@@ -327,7 +329,7 @@ export function BulkTierChangeModal({
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
+                    {t("processing")}
                   </>
                 ) : (
                   `Change Tier for ${users.length} Users`
@@ -341,7 +343,7 @@ export function BulkTierChangeModal({
         {summary && (
           <div className="flex justify-end mt-6">
             <Button onClick={handleClose} disabled={loading}>
-              Close
+              {t("close")}
             </Button>
           </div>
         )}

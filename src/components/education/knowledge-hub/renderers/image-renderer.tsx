@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { Image as ImageIcon, Download, ZoomIn, ZoomOut, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
+import { useTranslations } from "next-intl";
 
 interface ImageData {
   title?: string;
@@ -31,6 +32,7 @@ interface ImageData {
  * Render an image for Knowledge Hub.
  */
 export function ImageRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education");
   const imageData = data as ImageData;
   const [isZoomed, setIsZoomed] = useState(false);
 
@@ -42,7 +44,7 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
     return (
       <div className={cn("p-4 text-center text-slate-500", className)}>
         <ImageIcon className="w-12 h-12 mx-auto mb-2 text-slate-300" />
-        Nessuna immagine disponibile
+        {t("nessunaImmagineDisponibile")}
       </div>
     );
   }
@@ -70,7 +72,7 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
             <button
               onClick={() => setIsZoomed(true)}
               className="p-2 rounded-full bg-white/90 hover:bg-white shadow-lg"
-              aria-label="Ingrandisci"
+              aria-label={t("ingrandisci")}
             >
               <ZoomIn className="w-5 h-5" />
             </button>
@@ -78,7 +80,7 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
               href={url}
               download
               className="p-2 rounded-full bg-white/90 hover:bg-white shadow-lg"
-              aria-label="Scarica"
+              aria-label={t("scarica")}
             >
               <Download className="w-5 h-5" />
             </a>
@@ -113,7 +115,7 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
           <button
             onClick={() => setIsZoomed(false)}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
-            aria-label="Chiudi"
+            aria-label={t("chiudi")}
           >
             <X className="w-6 h-6" />
           </button>
@@ -122,7 +124,7 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
             className="absolute bottom-4 left-1/2 -translate-x-1/2 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center gap-2"
           >
             <ZoomOut className="w-5 h-5" />
-            Riduci
+            {t("riduci")}
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

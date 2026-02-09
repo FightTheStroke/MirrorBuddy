@@ -29,6 +29,7 @@ import {
 import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { ExportDropdown } from "@/components/admin/export-dropdown";
 import type { EmailTemplate } from "@/lib/email/template-service";
+import { useTranslations } from "next-intl";
 
 type CategoryTab =
   | "all"
@@ -46,6 +47,7 @@ const CATEGORIES: CategoryTab[] = [
 ];
 
 export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
+  const t = useTranslations("admin");
   const router = useRouter();
   const [category, setCategory] = useState<CategoryTab>("all");
   const [search, setSearch] = useState("");
@@ -131,11 +133,11 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Search templates by name or subject..."
+              placeholder={t("searchTemplatesByNameOrSubject")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full"
-              aria-label="Search templates"
+              aria-label={t("searchTemplates")}
             />
           </div>
           <div className="flex gap-2">
@@ -153,7 +155,7 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
             <Button asChild size="sm">
               <Link href="/admin/communications/templates/new">
                 <Plus className="h-4 w-4 mr-2" />
-                Create Template
+                {t("createTemplate")}
               </Link>
             </Button>
           </div>
@@ -163,12 +165,12 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead className="hidden md:table-cell">Category</TableHead>
-                <TableHead className="hidden lg:table-cell">Status</TableHead>
-                <TableHead className="hidden lg:table-cell">Updated</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t("name")}</TableHead>
+                <TableHead>{t("subject")}</TableHead>
+                <TableHead className="hidden md:table-cell">{t("category")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t("status")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t("updated")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -201,7 +203,7 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
                         asChild
                         variant="ghost"
                         size="sm"
-                        aria-label="Edit template"
+                        aria-label={t("editTemplate")}
                       >
                         <Link
                           href={`/admin/communications/templates/${template.id}/edit`}
@@ -213,7 +215,7 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(template.id)}
-                        aria-label="Delete template"
+                        aria-label={t("deleteTemplate")}
                       >
                         <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                       </Button>
@@ -227,7 +229,7 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
 
         {filteredTemplates.length === 0 && (
           <TableEmpty>
-            No templates found. {search && "Try adjusting your search."}
+            {t("noTemplatesFound")} {search && "Try adjusting your search."}
           </TableEmpty>
         )}
       </Tabs>
@@ -235,10 +237,10 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>{t("confirmDelete")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this email template? This action
-              cannot be undone.
+              {t("areYouSureYouWantToDeleteThisEmailTemplateThisActi")}
+              {t("cannotBeUndone")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -250,7 +252,7 @@ export function TemplatesTable({ templates }: { templates: EmailTemplate[] }) {
               }}
               disabled={isDeleting}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               variant="destructive"

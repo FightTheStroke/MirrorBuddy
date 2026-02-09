@@ -25,7 +25,7 @@ export function MaestroSelectionPanel({
   return (
     <>
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-        Vuoi studiare{" "}
+        {t("vuoiStudiare")}{" "}
         <span className="font-semibold text-blue-600">
           {getSubjectLabel(selectedSubject)}
         </span>{" "}
@@ -66,10 +66,10 @@ export function MaestroSelectionPanel({
           </div>
           <div className="flex-1">
             <p className="font-semibold text-slate-700 dark:text-slate-200">
-              Continua senza Maestro
+              {t("continuaSenzaMaestro")}
             </p>
             <p className="text-sm text-slate-500">
-              Usa i suggerimenti maieutici per risolvere da solo
+              {t("usaISuggerimentiMaieuticiPerRisolvereDaSolo")}
             </p>
           </div>
           <ArrowRight className="h-5 w-5 text-slate-400" />
@@ -78,7 +78,7 @@ export function MaestroSelectionPanel({
 
       <Button variant="outline" onClick={onBack} className="w-full">
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Torna alla selezione materia
+        {t("tornaAllaSelezioneMateria")}
       </Button>
     </>
   );

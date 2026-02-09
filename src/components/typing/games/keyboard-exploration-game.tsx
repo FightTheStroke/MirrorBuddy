@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { KEYBOARD_LAYOUTS } from "@/lib/typing/keyboard-layouts";
 import { cn } from "@/lib/utils";
 import type { KeyboardLayout } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 const MAX_ROUNDS = 10;
 
@@ -27,6 +28,7 @@ export function KeyboardExplorationGame({
   layout,
   onGameEnd,
 }: KeyboardExplorationGameProps) {
+  const t = useTranslations("education");
   const [targetKey, setTargetKey] = useState<{
     key: string;
     color: string;
@@ -94,10 +96,10 @@ export function KeyboardExplorationGame({
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <h3 className="text-xl font-bold">Keyboard Exploration</h3>
+      <h3 className="text-xl font-bold">{t("keyboardExploration")}</h3>
 
       <p className="text-sm text-muted-foreground">
-        Trova e premi il tasto colorato. Scopri il layout della tastiera!
+        {t("trovaEPremiIlTastoColoratoScopriIlLayoutDellaTasti")}
       </p>
 
       {!isPlaying ? (
@@ -105,17 +107,17 @@ export function KeyboardExplorationGame({
           onClick={startGame}
           className="w-full py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90"
         >
-          Inizia Gioco
+          {t("iniziaGioco")}
         </button>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-              <div className="text-sm text-muted-foreground">Punti</div>
+              <div className="text-sm text-muted-foreground">{t("punti")}</div>
               <div className="text-2xl font-bold">{score}</div>
             </div>
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-              <div className="text-sm text-muted-foreground">Round</div>
+              <div className="text-sm text-muted-foreground">{t("round")}</div>
               <div className="text-2xl font-bold">
                 {round + 1}/{MAX_ROUNDS}
               </div>
@@ -125,7 +127,7 @@ export function KeyboardExplorationGame({
           {targetKey && (
             <div className="p-8 bg-muted/30 border border-border rounded-lg text-center">
               <p className="text-sm text-muted-foreground mb-2">
-                Premi il tasto colorato:
+                {t("premiIlTastoColorato")}
               </p>
               <div
                 className={cn(
@@ -140,8 +142,8 @@ export function KeyboardExplorationGame({
 
           <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
             <p className="text-sm">
-              <strong>Indizio:</strong> Guarda la tastiera qui sotto per trovare
-              il tasto colorato.
+              <strong>{t("indizio")}</strong> {t("guardaLaTastiera")}
+              {t("ilTastoColorato")}
             </p>
           </div>
         </div>

@@ -38,6 +38,7 @@ import { StudyKitHeader } from "./StudyKitViewer/Header";
 
 import { MindmapRenderer } from "@/components/education/knowledge-hub/renderers/mindmap-renderer";
 import { Quiz } from "@/components/education/quiz";
+import { useTranslations } from "next-intl";
 
 interface StudyKitViewerProps {
   studyKit: StudyKit;
@@ -52,6 +53,7 @@ export function StudyKitViewer({
   onGeneratePath,
   className,
 }: StudyKitViewerProps) {
+  const t = useTranslations("education");
   const [activeTab, setActiveTab] = useState("summary");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isGeneratingPath, setIsGeneratingPath] = useState(false);
@@ -176,7 +178,7 @@ export function StudyKitViewer({
         <TabsList className="no-print grid w-full grid-cols-4">
           <TabsTrigger value="summary" className="gap-2">
             <FileText className="w-4 h-4" />
-            <span className="hidden sm:inline">Riassunto</span>
+            <span className="hidden sm:inline">{t("riassunto")}</span>
           </TabsTrigger>
           <TabsTrigger
             value="mindmap"
@@ -184,15 +186,15 @@ export function StudyKitViewer({
             disabled={!studyKit.mindmap}
           >
             <MapIcon className="w-4 h-4" />
-            <span className="hidden sm:inline">Mappa</span>
+            <span className="hidden sm:inline">{t("mappa")}</span>
           </TabsTrigger>
           <TabsTrigger value="demo" className="gap-2" disabled={!studyKit.demo}>
             <FlaskConical className="w-4 h-4" />
-            <span className="hidden sm:inline">Demo</span>
+            <span className="hidden sm:inline">{t("demo")}</span>
           </TabsTrigger>
           <TabsTrigger value="quiz" className="gap-2" disabled={!studyKit.quiz}>
             <ClipboardList className="w-4 h-4" />
-            <span className="hidden sm:inline">Quiz</span>
+            <span className="hidden sm:inline">{t("quizLabel")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -207,7 +209,7 @@ export function StudyKitViewer({
               />
             ) : (
               <p className="text-slate-500 text-center py-8">
-                Riassunto non disponibile
+                {t("riassuntoNonDisponibile")}
               </p>
             )}
           </div>
@@ -221,7 +223,7 @@ export function StudyKitViewer({
           ) : (
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
               <p className="text-slate-500 text-center py-8">
-                Mappa mentale non disponibile
+                {t("mappaMentaleNonDisponibile")}
               </p>
             </div>
           )}
@@ -237,7 +239,7 @@ export function StudyKitViewer({
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                      Demo Interattiva
+                      {t("demoInterattiva")}
                     </h3>
                     <span className="text-sm text-slate-500">
                       {studyKit.demo &&
@@ -261,14 +263,14 @@ export function StudyKitViewer({
                   size="lg"
                 >
                   <PlayCircle className="w-5 h-5" />
-                  Avvia Demo Interattiva
+                  {t("avviaDemoInterattiva")}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
               <p className="text-slate-500 text-center py-8">
-                Demo interattiva non disponibile
+                {t("demoInterattivaNonDisponibile")}
               </p>
             </div>
           )}
@@ -284,7 +286,7 @@ export function StudyKitViewer({
           ) : (
             <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
               <p className="text-slate-500 text-center py-8">
-                Quiz non disponibile
+                {t("quizNonDisponibile")}
               </p>
             </div>
           )}

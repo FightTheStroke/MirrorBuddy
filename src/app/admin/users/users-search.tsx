@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface UsersSearchProps {
   value: string;
@@ -8,12 +9,13 @@ interface UsersSearchProps {
 }
 
 export function UsersSearch({ value, onChange }: UsersSearchProps) {
+  const t = useTranslations("admin");
   return (
     <div className="relative mb-4">
       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <input
         type="text"
-        placeholder="Cerca per email o username..."
+        placeholder={t("cercaPerEmailOUsername")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="w-full pl-10 pr-10 py-3 border border-border rounded-lg min-h-11

@@ -113,7 +113,7 @@ export function FeaturesSection({ formData, onChange }: FeaturesSectionProps) {
 
       <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          <strong>Note:</strong> {t("featuresNote")}
+          <strong>{t("note")}</strong> {t("featuresNote")}
         </p>
       </div>
     </div>

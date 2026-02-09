@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -61,6 +62,7 @@ export function MaestroSessionHeaderProposal1({
   onClearChat,
   onClose,
 }: MaestroSessionHeaderProposal1Props) {
+  const t = useTranslations("chat");
   const getStatusText = () => {
     if (!isVoiceActive) return maestro.specialty;
     if (configError) return configError;
@@ -112,7 +114,7 @@ export function MaestroSessionHeaderProposal1({
             {maestro.displayName}
           </h2>
           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20 hidden sm:inline">
-            Professore
+            {t("professore")}
           </span>
         </div>
         <p

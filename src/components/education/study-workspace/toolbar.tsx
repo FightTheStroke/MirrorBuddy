@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { Button } from "@/components/ui/button";
 import type { ViewMode } from "./types";
+import { useTranslations } from "next-intl";
 
 interface StudyWorkspaceToolbarProps {
   viewMode: ViewMode;
@@ -22,6 +23,7 @@ export function StudyWorkspaceToolbar({
   setViewMode,
   isToolActive,
 }: StudyWorkspaceToolbarProps) {
+  const t = useTranslations("education");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -56,7 +58,7 @@ export function StudyWorkspaceToolbar({
             )}
           >
             <PanelLeftClose className="w-4 h-4" />
-            <span className="hidden sm:inline">Chat</span>
+            <span className="hidden sm:inline">{t("chat")}</span>
           </Button>
           <Button
             variant="ghost"
@@ -71,7 +73,7 @@ export function StudyWorkspaceToolbar({
             )}
           >
             <PanelLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Split</span>
+            <span className="hidden sm:inline">{t("split")}</span>
           </Button>
           <Button
             variant="ghost"
@@ -87,7 +89,7 @@ export function StudyWorkspaceToolbar({
             )}
           >
             <Maximize2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Canvas</span>
+            <span className="hidden sm:inline">{t("canvas")}</span>
           </Button>
         </div>
 
@@ -104,7 +106,7 @@ export function StudyWorkspaceToolbar({
             )}
           >
             <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
-            Strumento in costruzione
+            {t("strumentoInCostruzione")}
           </motion.div>
         )}
       </div>

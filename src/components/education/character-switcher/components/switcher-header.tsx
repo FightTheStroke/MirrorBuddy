@@ -1,9 +1,12 @@
+"use client";
+
 import { Search, X, Heart, Users, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { ROLE_INFO } from "../constants";
 import type { CharacterRole } from "../types";
+import { useTranslations } from "next-intl";
 
 const ICON_MAP = {
   Heart,
@@ -26,6 +29,7 @@ export function SwitcherHeader({
   onRoleChange,
   onClose,
 }: SwitcherHeaderProps) {
+  const t = useTranslations("education");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -46,9 +50,9 @@ export function SwitcherHeader({
               : "text-slate-900 dark:text-white",
           )}
         >
-          Scegli con chi studiare
+          {t("scegliConChiStudiare")}
         </h2>
-        <Button variant="ghost" size="sm" onClick={onClose} aria-label="Chiudi">
+        <Button variant="ghost" size="sm" onClick={onClose} aria-label={t("chiudi")}>
           <X className="w-5 h-5" />
         </Button>
       </div>
@@ -64,7 +68,7 @@ export function SwitcherHeader({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Cerca..."
+          placeholder={t("cerca")}
           className={cn(
             "w-full pl-9 pr-4 py-2 rounded-lg text-sm",
             settings.highContrast
@@ -88,7 +92,7 @@ export function SwitcherHeader({
                 : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
           )}
         >
-          Tutti
+          {t("tutti")}
         </button>
         {Object.entries(ROLE_INFO).map(([role, info]) => {
           const Icon = ICON_MAP[info.iconName];

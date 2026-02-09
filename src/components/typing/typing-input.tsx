@@ -7,6 +7,7 @@ import {
   type KeyMappingResult,
 } from "@/lib/typing/key-mapping-engine";
 import type { TypingLesson } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface TypingInputProps {
   lesson: TypingLesson;
@@ -25,6 +26,7 @@ export function TypingInput({
   onError,
   disabled = false,
 }: TypingInputProps) {
+  const t = useTranslations("education");
   const inputRef = useRef<HTMLInputElement>(null);
   const engineRef = useRef<ReturnType<typeof createKeyMappingEngine> | null>(
     null,
@@ -117,7 +119,7 @@ export function TypingInput({
       }}
       role="textbox"
       tabIndex={0}
-      aria-label="Typing input area"
+      aria-label={t("typingInputArea")}
     >
       <input
         ref={inputRef}

@@ -69,7 +69,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
             {t("profileTitle", { studentName: insights.studentName })}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Ultimo aggiornamento:{" "}
+            {t("ultimoAggiornamento")}{" "}
             {insights.lastUpdated.toLocaleDateString("it-IT")}
           </p>
         </div>
@@ -94,7 +94,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                 )}
               />
               <span className={settings.highContrast ? "text-yellow-400" : ""}>
-                Punti di Forza
+                {t("puntiDiForza")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -125,7 +125,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                 )}
               />
               <span className={settings.highContrast ? "text-yellow-400" : ""}>
-                Aree di Crescita
+                {t("areeDiCrescita")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -155,7 +155,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
               )}
             />
             <span className={settings.highContrast ? "text-yellow-400" : ""}>
-              Strategie Suggerite
+              {t("strategieSuggerite")}
             </span>
           </CardTitle>
         </CardHeader>
@@ -180,7 +180,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
               )}
             />
             <span className={settings.highContrast ? "text-yellow-400" : ""}>
-              Stile di Apprendimento
+              {t("stileDiApprendimento")}
             </span>
           </CardTitle>
         </CardHeader>
@@ -189,7 +189,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
 
           <div className="mt-6">
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
-              Cosa lo motiva:
+              {t("cosaLoMotiva")}
             </p>
             <div className="flex flex-wrap gap-2">
               {insights.learningStyle.motivators.map((motivator, idx) => (

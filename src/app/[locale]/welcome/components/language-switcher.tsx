@@ -7,6 +7,7 @@ import { Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 /**
  * Language Switcher Component
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
  * - Mobile responsive
  */
 export function LanguageSwitcher() {
+  const t = useTranslations("welcome");
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -88,7 +90,7 @@ export function LanguageSwitcher() {
         }}
         aria-haspopup="true"
         aria-expanded={isOpen}
-        aria-label="Select language"
+        aria-label={t("selectLanguage")}
         className={cn(
           "flex items-center gap-2 px-4 py-2 rounded-lg",
           "bg-white dark:bg-gray-800",

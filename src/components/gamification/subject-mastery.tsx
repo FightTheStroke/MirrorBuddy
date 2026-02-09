@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { subjectNames, subjectColors } from '@/data';
 import { cn } from '@/lib/utils';
 import type { SubjectMastery, MasteryTier } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface SubjectMasteryListProps {
   masteries: SubjectMastery[];
@@ -30,6 +31,7 @@ const tierColors: Record<MasteryTier, string> = {
 };
 
 export function SubjectMasteryList({ masteries, className }: SubjectMasteryListProps) {
+  const t = useTranslations("achievements");
   // Memoize sorted masteries to avoid re-sorting on every render
   const sortedMasteries = useMemo(
     () => [...masteries].sort((a, b) => b.percentage - a.percentage),
@@ -41,7 +43,7 @@ export function SubjectMasteryList({ masteries, className }: SubjectMasteryListP
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Star className="w-5 h-5 text-amber-500" />
-          Padronanza Materie
+          {t("padronanzaMaterie")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -63,6 +65,7 @@ interface SubjectMasteryItemProps {
 }
 
 function SubjectMasteryItem({ mastery, index }: SubjectMasteryItemProps) {
+  const t = useTranslations("achievements");
   const color = subjectColors[mastery.subject];
 
   return (
@@ -107,7 +110,7 @@ function SubjectMasteryItem({ mastery, index }: SubjectMasteryItemProps) {
 
       {/* Stats */}
       <div className="flex justify-between text-xs text-slate-500">
-        <span>{mastery.topicsCompleted}/{mastery.totalTopics} argomenti</span>
+        <span>{mastery.topicsCompleted}/{mastery.totalTopics} {t("argomenti")}</span>
         <span className="font-medium" style={{ color }}>
           {mastery.percentage}%
         </span>

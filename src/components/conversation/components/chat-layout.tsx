@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { MessageBubble, CharacterAvatar } from "./index";
@@ -5,6 +7,7 @@ import type {
   ActiveCharacter,
   FlowMessage,
 } from "@/lib/stores/conversation-flow-store";
+import { useTranslations } from "next-intl";
 
 interface ChatLayoutProps {
   messages: FlowMessage[];
@@ -19,12 +22,13 @@ export function ChatLayout({
   isLoading,
   messagesEndRef,
 }: ChatLayoutProps) {
+  const t = useTranslations("chat");
   return (
     <div
       className="flex-1 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       role="log"
       aria-live="polite"
-      aria-label="Messaggi della conversazione"
+      aria-label={t("messaggiDellaConversazione")}
       style={{
         scrollBehavior: "smooth",
         WebkitOverflowScrolling: "touch",

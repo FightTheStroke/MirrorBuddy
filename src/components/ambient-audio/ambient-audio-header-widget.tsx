@@ -109,7 +109,7 @@ export function AmbientAudioHeaderWidget() {
             ? "text-purple-500 bg-purple-500/10 hover:bg-purple-500/20"
             : "text-slate-500 hover:text-purple-500 hover:bg-purple-500/10",
         )}
-        title="Audio Ambientale"
+        title={t("audioAmbientale")}
       >
         <Headphones className="w-4 h-4" />
         {isPlaying && (

@@ -57,7 +57,11 @@
         "close": "[TRANSLATE] Chiudi",
         "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
       },
-      "selectCamera": "[TRANSLATE] Seleziona fotocamera"
+      "selectCamera": "[TRANSLATE] Seleziona fotocamera",
+      "continuity": "Continuity",
+      "closeCamera": "Close camera",
+      "fotoCatturata": "Foto catturata",
+      "timerOption": "Timer {label}"
     },
     "homework": {
       "label": "Compiti",
@@ -81,7 +85,11 @@
         "success": {
           "default": "Predeterminado",
           "withZaino": "Con mochila"
-        }
+        },
+        "letterUs": "Letter (US)",
+        "a": "A",
+        "A4": "A4",
+        "Letter": "Letter"
       },
       "list": {
         "empty": {
@@ -108,7 +116,10 @@
           "description": "Procesando kit...",
           "title": "Procesando"
         },
-        "status": "Estado"
+        "status": "Estado",
+        "riprova": "Riprova",
+        "materiali": "materiali",
+        "pages": "pagine"
       },
       "view": {
         "title": "Ver Kit",
@@ -197,7 +208,14 @@
       "addKeyPoint": "[TRANSLATE] Aggiungi punto",
       "deleteKeyPoint": "[TRANSLATE] Elimina punto",
       "deleteSection": "[TRANSLATE] Elimina sezione",
-      "editTitle": "[TRANSLATE] Modifica titolo"
+      "editTitle": "[TRANSLATE] Modifica titolo",
+      "mappa": "Mappa",
+      "flashcard": "Flashcard",
+      "contenutoDellaSezione": "Contenuto della sezione",
+      "puntoChiave": "Punto chiave",
+      "titoloDellaSezione": "Titolo della sezione",
+      "comprimiSezione": "Comprimi sezione",
+      "espandiSezione": "Espandi sezione"
     },
     "diagram": {
       "label": "Diagramma",
@@ -237,13 +255,15 @@
         "instructions": "¡Escribe las palabras lo más rápido que puedas! Tienes 60 segundos.",
         "startButton": "Comenzar Juego",
         "scoreLabel": "Puntuación",
-        "wordsLabel": "Palabras"
+        "wordsLabel": "Palabras",
+        "speedGame": "Speed Game"
       },
       "lessonSelector": {
         "title": "Lecciones - Nivel {level}",
         "completed": "completadas",
         "completedBadge": "Completada",
-        "inProgress": "En curso"
+        "inProgress": "En curso",
+        "target": "Target:  WPM"
       },
       "stickyKeys": {
         "activated": "Teclas persistentes activadas",
@@ -264,7 +284,11 @@
         "tip": "Presiona Mayús 5 veces rápidamente para activar las teclas persistentes en Windows"
       },
       "progressTracker": {
-        "noBadges": "Aún no hay insignias"
+        "noBadges": "Aún no hay insignias",
+        "progresso": "Progresso",
+        "streak": "Streak",
+        "giorniConsecutiviDiPratica": "Giorni consecutivi di pratica",
+        "punti": "Punti"
       },
       "visualImpairment": {
         "wcagCompliance": "Cumplimiento WCAG 2.1 AA:",
@@ -362,7 +386,18 @@
       "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
       "continue": "[TRANSLATE] Continua",
       "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare",
+      "completato": "Completato!",
+      "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
+      "continua": "Continua",
+      "carta": "Carta  di",
+      "riviste": "riviste",
+      "domanda": "Domanda",
+      "toccaPerGirare": "Tocca per girare",
+      "risposta": "Risposta",
+      "scorriSinistraPerDifficileDestraPerFacile": "Scorri sinistra per difficile, destra per facile",
+      "premiOScorriPerValutare": "Premi o scorri per valutare",
+      "di": "Di"
     },
     "loading": {
       "cancelled": "Cancelado",
@@ -483,7 +518,9 @@
       "capabilityHomework": "Importar documentos para el asistente de tareas",
       "capabilityDocuments": "Acceder a tus documentos sin tener que descargarlos",
       "privacyNotice": "MirrorBuddy accede a los archivos solo con tu autorización. No almacenamos tus archivos de Drive.",
-      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive",
+      "googleDrive": "Google Drive",
+      "privacy": "Privacy:"
     },
     "astuccio": {
       "title": "Estuche de herramientas",
@@ -540,7 +577,8 @@
       "study_tip": {
         "description": "Consejos de estudio personalizados",
         "title": "Consejo de estudio"
-      }
+      },
+      "astuccio": "Astuccio"
     },
     "zaino": {
       "print": {
@@ -570,6 +608,57 @@
     },
     "pomodoro": {
       "iniziaFocus": "[TRANSLATE] Inizia Focus"
-    }
+    },
+    "passaggiDiCalcolo": "Passaggi di calcolo ()",
+    "label1": "Label",
+    "label": "Label",
+    "value": "Value",
+    "loadingPyodide": "Loading Pyodide...",
+    "running": "Running",
+    "output": "Output",
+    "ricarica": "Ricarica",
+    "demoInterattiva": "Demo interattiva",
+    "diagramError": "Diagram Error:",
+    "viewSource": "View source",
+    "feedbackDelMaestro": "Feedback del Maestro",
+    "risolto": "Risolto",
+    "haiAffrontatoQuestoPunto": "Hai affrontato questo punto",
+    "espandiChat": "Espandi chat",
+    "nuovaSezione": "Nuova sezione",
+    "parole": "parole",
+    "punti": "punti",
+    "nessunaSezioneNelRiassunto": "Nessuna sezione nel riassunto",
+    "toolCanvas": "Tool Canvas",
+    "inAttesaChe": "In attesa che  inizi a costruire...",
+    "mostra": "Mostra",
+    "staCostruendo": "Sta costruendo...",
+    "eventiRicevuti": "Eventi ricevuti:",
+    "chunks": "Chunks:",
+    "nascondiPip": "Nascondi PiP",
+    "home": "Home",
+    "waitingToExecute": "Waiting to execute...",
+    "pending": "Pending",
+    "complete": "Complete",
+    "error": "Error",
+    "toolResults": "Tool results",
+    "tempoDiLetturaStimato": "Tempo di lettura stimato:  minuti",
+    "generatoDaMirrorbuddy": "- Generato da MirrorBuddy",
+    "descrizioneImmagine": "Descrizione immagine:",
+    "script": "Script",
+    "mermaid": "Mermaid",
+    "button": "Button",
+    "iniziACostruire": "Inizi A Costruire",
+    "minuti": "Minuti",
+    "riassunto": "Riassunto",
+    "esciDaFullscreen": "Esci da fullscreen",
+    "fullscreen": "Fullscreen",
+    "comprimiSezione": "Comprimi sezione",
+    "espandiSezione": "Espandi sezione",
+    "riduci": "Riduci",
+    "espandi": "Espandi",
+    "dataFor": "Dati per {title}",
+    "toolResult": "Risultato strumento: {name}",
+    "timerOption": "Timer {label}",
+    "chartDefault": "grafico"
   }
 }

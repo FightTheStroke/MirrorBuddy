@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -114,7 +115,8 @@ const ToastIcon = ({ type }: { type: ToastType }) => {
 };
 
 // Individual toast component
-function ToastItem({ toast: t, onRemove }: { toast: Toast; onRemove: () => void }) {
+function ToastItem({ toast: toastItem, onRemove }: { toast: Toast; onRemove: () => void }) {
+  const t = useTranslations("common");
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
@@ -122,34 +124,34 @@ function ToastItem({ toast: t, onRemove }: { toast: Toast; onRemove: () => void 
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       className={cn(
         'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border bg-white p-4 shadow-lg dark:bg-gray-900',
-        t.type === 'success' && 'border-green-200 dark:border-green-800',
-        t.type === 'error' && 'border-red-200 dark:border-red-800',
-        t.type === 'warning' && 'border-yellow-200 dark:border-yellow-800',
-        t.type === 'info' && 'border-blue-200 dark:border-blue-800'
+        toastItem.type === 'success' && 'border-green-200 dark:border-green-800',
+        toastItem.type === 'error' && 'border-red-200 dark:border-red-800',
+        toastItem.type === 'warning' && 'border-yellow-200 dark:border-yellow-800',
+        toastItem.type === 'info' && 'border-blue-200 dark:border-blue-800'
       )}
     >
-      <ToastIcon type={t.type} />
+      <ToastIcon type={toastItem.type} />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{t.title}</p>
-        {t.message && (
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{t.message}</p>
+        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{toastItem.title}</p>
+        {toastItem.message && (
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{toastItem.message}</p>
         )}
-        {t.action && (
+        {toastItem.action && (
           <button
             onClick={() => {
-              t.action!.onClick();
+              toastItem.action!.onClick();
               onRemove();
             }}
             className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
           >
-            {t.action.label}
+            {toastItem.action.label}
           </button>
         )}
       </div>
       <button
         onClick={onRemove}
         className="flex-shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-800"
-        aria-label="Chiudi notifica"
+        aria-label={t("chiudiNotifica")}
       >
         <X className="h-4 w-4" />
       </button>
@@ -159,6 +161,7 @@ function ToastItem({ toast: t, onRemove }: { toast: Toast; onRemove: () => void 
 
 // Toast container component - must be mounted in layout
 export function ToastContainer() {
+  const t = useTranslations("common");
   // Initialize state lazily to avoid setState in useEffect
   const [toasts, setToasts] = useState<Toast[]>(() => {
     initToastState();
@@ -180,13 +183,13 @@ export function ToastContainer() {
   return (
     <div
       aria-live="polite"
-      aria-label="Notifiche"
+      aria-label={t("notifiche")}
       role="status"
       className="pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:max-w-sm"
     >
       <AnimatePresence mode="popLayout">
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onRemove={() => handleRemove(t.id)} />
+        {toasts.map((toastItem) => (
+          <ToastItem key={toastItem.id} toast={toastItem} onRemove={() => handleRemove(toastItem.id)} />
         ))}
       </AnimatePresence>
     </div>

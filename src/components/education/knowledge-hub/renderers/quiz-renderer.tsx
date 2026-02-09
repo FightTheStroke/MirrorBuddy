@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
+import { useTranslations } from "next-intl";
 
 interface QuizOption {
   id: string;
@@ -94,6 +95,7 @@ function normalizeQuizData(data: unknown): QuizData {
  * Render a quiz for review in Knowledge Hub.
  */
 export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
+  const t = useTranslations("education");
   // Normalize data from either format
   const quizData = useMemo(() => normalizeQuizData(data), [data]);
   const [showAnswers, setShowAnswers] = useState(
@@ -106,7 +108,7 @@ export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
   if (questions.length === 0) {
     return (
       <div className={cn("p-4 text-center text-slate-500", className)}>
-        Nessuna domanda disponibile
+        {t("nessunaDomandaDisponibile")}
       </div>
     );
   }

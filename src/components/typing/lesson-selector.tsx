@@ -126,7 +126,7 @@ function LessonCard({ lesson, isCurrent, onSelect }: LessonCardProps) {
               d="M13 10V3L4 14h7v7l9-11h-7z"
             />
           </svg>
-          <span>Target: {lesson.targetWPM || "N/A"} WPM</span>
+          <span>{t("target")} {lesson.targetWPM || "N/A"} WPM</span>
         </div>
       </div>
     </button>

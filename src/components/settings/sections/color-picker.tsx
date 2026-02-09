@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface BorderColor {
   name: string;
@@ -23,10 +24,11 @@ export function ColorPicker({
   onSelect,
   characterName,
 }: ColorPickerProps) {
+  const t = useTranslations("settings");
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-        Colore bordo {characterName}
+        {t("coloreBordo")} {characterName}
       </h4>
       <div className="flex flex-wrap gap-2">
         {colors.map((color) => (
@@ -53,9 +55,9 @@ export function ColorPicker({
             'w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-all duration-200 hover:scale-110 flex items-center justify-center',
             !selectedValue && 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
           )}
-          title="Predefinito"
+          title={t("predefinito")}
         >
-          <span className="text-xs text-slate-500">Auto</span>
+          <span className="text-xs text-slate-500">{t("auto")}</span>
         </button>
       </div>
     </div>
@@ -75,10 +77,11 @@ export function ColorPreview({
   coachAvatar,
   buddyAvatar,
 }: ColorPreviewProps) {
+  const t = useTranslations("settings");
   return (
     <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
       <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-        Anteprima
+        {t("anteprima")}
       </h4>
       <div className="flex items-center gap-6">
         <div className="text-center">
@@ -88,14 +91,14 @@ export function ColorPreview({
           >
             <Image
               src={coachAvatar}
-              alt="Coach"
+              alt={t("coach1")}
               width={64}
               height={64}
               className="object-cover w-full h-full"
               unoptimized
             />
           </div>
-          <span className="text-xs text-slate-500 mt-1 block">Coach</span>
+          <span className="text-xs text-slate-500 mt-1 block">{t("coach")}</span>
         </div>
         <div className="text-center">
           <div
@@ -104,14 +107,14 @@ export function ColorPreview({
           >
             <Image
               src={buddyAvatar}
-              alt="Buddy"
+              alt={t("buddy1")}
               width={64}
               height={64}
               className="object-cover w-full h-full"
               unoptimized
             />
           </div>
-          <span className="text-xs text-slate-500 mt-1 block">Buddy</span>
+          <span className="text-xs text-slate-500 mt-1 block">{t("buddy")}</span>
         </div>
       </div>
     </div>

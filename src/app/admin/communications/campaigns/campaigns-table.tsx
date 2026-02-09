@@ -18,6 +18,7 @@ import {
 import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { ExportDropdown } from "@/components/admin/export-dropdown";
 import type { EmailCampaign } from "@/lib/email/campaign-service";
+import { useTranslations } from "next-intl";
 
 type StatusTab = "all" | "DRAFT" | "SENDING" | "SENT" | "FAILED";
 
@@ -31,6 +32,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
+  const t = useTranslations("admin");
   const [status, setStatus] = useState<StatusTab>("all");
   const [search, setSearch] = useState("");
 
@@ -81,11 +83,11 @@ export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Search campaigns by name..."
+              placeholder={t("searchCampaignsByName")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full"
-              aria-label="Search campaigns"
+              aria-label={t("searchCampaigns")}
             />
           </div>
           <div className="flex gap-2">
@@ -103,7 +105,7 @@ export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
             <Button asChild size="sm">
               <Link href="/admin/communications/campaigns/new">
                 <Plus className="h-4 w-4 mr-2" />
-                Create Campaign
+                {t("createCampaign")}
               </Link>
             </Button>
           </div>
@@ -113,16 +115,16 @@ export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Status</TableHead>
+                <TableHead>{t("name")}</TableHead>
+                <TableHead className="hidden md:table-cell">{t("status")}</TableHead>
                 <TableHead className="hidden lg:table-cell">
-                  Sent / Total
+                  {t("sentTotal")}
                 </TableHead>
                 <TableHead className="hidden lg:table-cell">
-                  Open Rate
+                  {t("openRate")}
                 </TableHead>
-                <TableHead className="hidden xl:table-cell">Created</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="hidden xl:table-cell">{t("created")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -159,12 +161,12 @@ export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
                       asChild
                       variant="ghost"
                       size="sm"
-                      aria-label="View campaign details"
+                      aria-label={t("viewCampaignDetails")}
                     >
                       <Link
                         href={`/admin/communications/campaigns/${campaign.id}`}
                       >
-                        View
+                        {t("view")}
                       </Link>
                     </Button>
                   </TableCell>
@@ -176,7 +178,7 @@ export function CampaignsTable({ campaigns }: { campaigns: EmailCampaign[] }) {
 
         {filteredCampaigns.length === 0 && (
           <TableEmpty>
-            No campaigns found. {search && "Try adjusting your search."}
+            {t("noCampaignsFound")} {search && "Try adjusting your search."}
           </TableEmpty>
         )}
       </Tabs>

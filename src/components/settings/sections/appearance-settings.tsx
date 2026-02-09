@@ -106,7 +106,7 @@ export function AppearanceSettings({
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Tema</CardTitle>
+          <CardTitle>{t("tema")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">

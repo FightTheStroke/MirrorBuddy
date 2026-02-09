@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { subjectIcons } from "@/data";
 import { QuoteRotator } from "./quote-rotator";
 import { TierBadge } from "@/components/tier";
+import { useTranslations } from "next-intl";
 import type { Maestro } from "@/types";
 import type { TierName } from "@/types/tier-types";
 
@@ -28,6 +29,7 @@ export function MaestroCard({
   index,
   tier,
 }: MaestroCardProps) {
+  const t = useTranslations("common");
   return (
     <button
       onClick={() => onSelect(maestro)}
@@ -43,7 +45,7 @@ export function MaestroCard({
         ["--tw-ring-color" as string]: maestro.color,
         ["--tw-ring-offset-color" as string]: "var(--background)",
       }}
-      aria-label={`Studia con ${maestro.displayName}`}
+      aria-label={t("studiaConMaestro", { name: maestro.displayName })}
     >
       <div className="flex items-start gap-3">
         {/* Avatar - compact 56x56 */}

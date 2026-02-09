@@ -76,7 +76,7 @@ export function SectionContent({
               onBlur={onSaveEdit}
               rows={3}
               className="w-full px-3 py-2 rounded-md border border-primary bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              aria-label="Contenuto della sezione"
+              aria-label={t("contenutoDellaSezione")}
             />
           ) : (
             // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Paragraph used for semantic structure, made interactive for inline editing UX
@@ -120,7 +120,7 @@ export function SectionContent({
                       onKeyDown={onKeyDown}
                       onBlur={onSaveEdit}
                       className="flex-1 px-2 py-1 rounded border border-primary bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                      aria-label="Punto chiave"
+                      aria-label={t("puntoChiave")}
                     />
                   ) : (
                     <span

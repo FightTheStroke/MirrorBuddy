@@ -92,7 +92,7 @@ export default function StudentAnalyticsPage() {
                   {t("upgradeToPro")}
                 </p>
                 <Button variant="default" asChild>
-                  <Link href="/settings/subscription">Upgrade to Pro</Link>
+                  <Link href="/settings/subscription">{t("upgradeToPro")}</Link>
                 </Button>
               </div>
             </div>

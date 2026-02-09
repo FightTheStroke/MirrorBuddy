@@ -1,11 +1,15 @@
+"use client";
+
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useProgressStore } from '@/lib/stores';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';
 import type { Subject } from '@/types';
+import { useTranslations } from "next-intl";
 
 export function HistoryTab() {
+  const t = useTranslations("education");
   const { sessionHistory } = useProgressStore();
 
   const groupedSessions = useMemo(() => {
@@ -53,10 +57,10 @@ export function HistoryTab() {
         <CardContent className="p-8 text-center">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-            Nessuna sessione registrata
+            {t("nessunaSessioneRegistrata")}
           </h3>
           <p className="text-sm text-slate-500 mt-2">
-            Inizia una sessione di studio per vedere la tua cronologia!
+            {t("iniziaUnaSessioneDiStudioPerVedereLaTuaCronologia")}
           </p>
         </CardContent>
       </Card>
@@ -89,7 +93,7 @@ export function HistoryTab() {
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-slate-900 dark:text-white">
-                        {session.durationMinutes || 0} min
+                        {session.durationMinutes || 0} {t("min")}
                       </p>
                       <p className="text-sm text-slate-500">
                         +{session.xpEarned || 0} XP

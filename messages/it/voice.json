@@ -157,6 +157,16 @@
       "flashcardLabel": "Flashcard",
       "searchTitle": "Cerca sul web",
       "searchLabel": "Cerca"
-    }
+    },
+    "connessioneDiretta": "Connessione diretta",
+    "webrtcDirect": "WebRTC Direct",
+    "connessionePeerToPeer": "Connessione peer-to-peer",
+    "min": "min",
+    "durata": "Durata",
+    "domande": "Domande",
+    "puntiDiForza": "Punti di forza",
+    "daMigliorare": "Da migliorare",
+    "envLocal": ".env.local:",
+    "avatar": "Avatar"
   }
 }

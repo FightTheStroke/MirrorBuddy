@@ -2,6 +2,7 @@
 
 import { Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from "next-intl";
 
 interface UploadFormProps {
   title: string;
@@ -22,18 +23,19 @@ export function UploadForm({
   onSubjectChange,
   onSubmit,
 }: UploadFormProps) {
+  const t = useTranslations("education");
   return (
     <div className="space-y-4">
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          Titolo *
+          {t("titolo")}
         </label>
         <input
           id="title"
           type="text"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
-          placeholder="Es: Rivoluzione Francese"
+          placeholder={t("esRivoluzioneFrancese")}
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
           required
           aria-required="true"
@@ -42,14 +44,14 @@ export function UploadForm({
 
       <div>
         <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          Materia (opzionale)
+          {t("materiaOpzionale")}
         </label>
         <input
           id="subject"
           type="text"
           value={subject}
           onChange={(e) => onSubjectChange(e.target.value)}
-          placeholder="Es: Storia"
+          placeholder={t("esStoria")}
           className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
@@ -65,7 +67,7 @@ export function UploadForm({
         size="lg"
       >
         <Upload className="w-4 h-4 mr-2" />
-        Genera Study Kit
+        {t("generaStudyKit")}
       </Button>
     </div>
   );

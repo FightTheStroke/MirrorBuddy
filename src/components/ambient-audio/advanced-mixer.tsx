@@ -137,7 +137,7 @@ export function AdvancedMixer({
 
           <div className="space-y-1">
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Binaural Beats
+              {t("binauralBeats")}
             </p>
             <div className="grid grid-cols-3 gap-1">
               {binauralModesData.map((m) => (

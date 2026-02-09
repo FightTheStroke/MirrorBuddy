@@ -61,7 +61,7 @@ export function ResetStatsButton() {
           className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
         >
           <Trash2 className="w-4 h-4" />
-          Reset Statistics
+          {t("resetStatistics")}
         </button>
       ) : (
         <div className="p-6 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg space-y-4">
@@ -75,15 +75,15 @@ export function ResetStatsButton() {
                 {t("willDeleteAllStats")}
               </p>
               <ul className="text-sm text-red-800 dark:text-red-200 list-disc list-inside space-y-1">
-                <li>Conversazioni</li>
-                <li>Flashcards</li>
-                <li>Quiz results</li>
-                <li>Progress</li>
-                <li>Gamification data</li>
-                <li>Learnings</li>
-                <li>Calendar events</li>
-                <li>Homework sessions</li>
-                <li>Notifications</li>
+                <li>{t("conversazioni")}</li>
+                <li>{t("flashcards")}</li>
+                <li>{t("quizResults")}</li>
+                <li>{t("progress")}</li>
+                <li>{t("gamificationData")}</li>
+                <li>{t("learnings")}</li>
+                <li>{t("calendarEvents")}</li>
+                <li>{t("homeworkSessions")}</li>
+                <li>{t("notifications")}</li>
               </ul>
               <p className="text-sm font-medium text-red-900 dark:text-red-100">
                 {t("userAccountsWillRemain")}
