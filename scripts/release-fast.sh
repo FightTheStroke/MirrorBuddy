@@ -9,6 +9,15 @@
 #
 # Usage:
 #   npm run release:fast
+#
+# Multi-agent options:
+#   RELEASE_FAST_SKIP_BUILD=1  Skip build step (no lock contention)
+#   MIRRORBUDDY_PORT=3001      Isolate dev server per agent
+#   BUILD_LOCK_TIMEOUT=300     Increase lock wait (default 120s)
+#
+# Build lock: Step 5/5 acquires an exclusive lock (same as ci-summary.sh).
+# Agents in the same directory block each other. Use separate worktrees
+# or RELEASE_FAST_SKIP_BUILD=1 if build was already verified.
 # =============================================================================
 
 set -euo pipefail

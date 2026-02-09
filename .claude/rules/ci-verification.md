@@ -33,6 +33,24 @@ Drill down: `./scripts/health-check.sh --drill [ci|debt|i18n|comp|migrations]`
 
 ## NEVER use standalone: `npm run lint|typecheck|build|test:unit` or `gh run view --log` (8k-100k+ token waste each). Hook enforces this.
 
+## Multi-Agent Build Lock
+
+Modes that include a build (`default`, `--full`, `--build`, `--all`) acquire an exclusive lock via `/tmp/mirrorbuddy-build-lock-{PWD-hash}`. This prevents concurrent `next build` from corrupting `.next/`.
+
+- **Lock is per-directory**: agents in different worktrees do NOT block each other.
+- **Same directory**: agents wait up to `BUILD_LOCK_TIMEOUT` (default 120s), then fail.
+- **Stale locks** (dead PID) are auto-cleaned.
+
+| Scenario                  | Recommended mode                        |
+| ------------------------- | --------------------------------------- |
+| Development (any agent)   | `--quick` (no build lock)               |
+| Single check              | `--lint`, `--types`, `--unit` (no lock) |
+| Thor / pre-commit         | `--full` or default (acquires lock)     |
+| Multiple agents, same dir | Use separate worktrees or `--quick`     |
+
+Override timeout: `BUILD_LOCK_TIMEOUT=300 ./scripts/ci-summary.sh`
+Full help: `./scripts/ci-summary.sh --help`
+
 ## Quiet modes for scripts
 
 | Script                    | Flag             | Output                              |

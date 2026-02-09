@@ -7,18 +7,35 @@ set -euo pipefail
 #
 # Usage:
 #   ./scripts/ci-summary.sh                 # lint + typecheck + build + unsafe queries
-#   ./scripts/ci-summary.sh --quick         # lint + typecheck ONLY (~30s vs ~3min)
+#   ./scripts/ci-summary.sh --quick         # lint + typecheck ONLY (no build lock)
 #   ./scripts/ci-summary.sh --full          # + unit tests
-#   ./scripts/ci-summary.sh --lint          # lint only
-#   ./scripts/ci-summary.sh --types         # typecheck only
+#   ./scripts/ci-summary.sh --lint          # lint only (no build lock)
+#   ./scripts/ci-summary.sh --types         # typecheck only (no build lock)
 #   ./scripts/ci-summary.sh --build         # build only
-#   ./scripts/ci-summary.sh --unit          # unit tests only
-#   ./scripts/ci-summary.sh --i18n          # i18n check only
-#   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only
-#   ./scripts/ci-summary.sh --links         # markdown link check only
-#   ./scripts/ci-summary.sh --migrations    # schema drift check only
+#   ./scripts/ci-summary.sh --unit          # unit tests only (no build lock)
+#   ./scripts/ci-summary.sh --i18n          # i18n check only (no build lock)
+#   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only (no build lock)
+#   ./scripts/ci-summary.sh --links         # markdown link check only (no build lock)
+#   ./scripts/ci-summary.sh --migrations    # schema drift check only (no build lock)
 #   ./scripts/ci-summary.sh --e2e           # E2E tests (requires running app)
 #   ./scripts/ci-summary.sh --a11y          # Accessibility tests (requires running app)
+#   ./scripts/ci-summary.sh --help          # show multi-agent guidance
+#
+# MULTI-AGENT BUILD LOCK:
+#   Modes that include a build (default, --full, --build, --all) acquire an
+#   exclusive lock via mkdir on /tmp/mirrorbuddy-build-lock-{PWD-hash}.
+#   This prevents concurrent `next build` from corrupting .next/.
+#
+#   - Lock is per-directory: agents in DIFFERENT worktrees do NOT block each other.
+#   - Agents in the SAME directory wait up to BUILD_LOCK_TIMEOUT (default 120s).
+#   - After timeout the script exits with error.
+#   - Stale locks (dead PID) are auto-cleaned.
+#
+#   To avoid blocking:
+#     1. Work in separate worktrees (recommended — each gets its own lock)
+#     2. Use --quick/--lint/--types during development (no lock needed)
+#     3. Reserve --build/--full for Thor validation and pre-commit
+#     4. Override timeout: BUILD_LOCK_TIMEOUT=300 ./scripts/ci-summary.sh
 #
 # For AI agents: use --quick during development, default/--full for Thor/pre-commit.
 
@@ -292,6 +309,11 @@ run_migrations() {
 }
 
 # --- Main ---
+if [[ "$MODE" == "--help" ]]; then
+	awk '/^# ci-summary/,/^[^#]/{if(/^#/) print substr($0,3)}' "${BASH_SOURCE[0]}"
+	exit 0
+fi
+
 echo "=== CI Summary ==="
 
 case "$MODE" in
