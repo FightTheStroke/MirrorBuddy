@@ -13,23 +13,20 @@ vi.mock('@sentry/nextjs', () => ({
   dedupeIntegration: vi.fn(() => ({})),
 }));
 
-const ORIGINAL_ENV = process.env;
-
 describe('Sentry client bootstrap', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    process.env = { ...ORIGINAL_ENV };
   });
 
   afterEach(() => {
-    process.env = ORIGINAL_ENV;
+    vi.unstubAllEnvs();
   });
 
   it('enables Sentry in production when DSN is configured', async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
-    process.env.NODE_ENV = 'production';
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'false';
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'false');
 
     await import('../../instrumentation-client');
 
@@ -42,9 +39,9 @@ describe('Sentry client bootstrap', () => {
   });
 
   it('keeps Sentry disabled outside production without force flag', async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'false';
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'false');
 
     await import('../../instrumentation-client');
 
@@ -57,9 +54,9 @@ describe('Sentry client bootstrap', () => {
   });
 
   it('enables Sentry outside production when force flag is on', async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
-    process.env.NODE_ENV = 'development';
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'true';
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'true');
 
     await import('../../instrumentation-client');
 

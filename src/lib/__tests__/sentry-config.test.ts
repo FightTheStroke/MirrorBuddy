@@ -82,10 +82,7 @@ describe('sentry.client.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = {
-      message: 'Test error',
-      tags: {},
-    };
+    const mockEvent = { message: 'Test error', tags: {} } as any;
     const mockHint = { originalException: new Error('Test') };
 
     const result = beforeSend(mockEvent, mockHint);
@@ -103,11 +100,11 @@ describe('sentry.client.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'Hydration failed', tags: {} };
+    const mockEvent = { message: 'Hydration failed', tags: {} } as any;
     const mockHint = { originalException: new Error('Hydration failed') };
 
     const result = beforeSend(mockEvent, mockHint);
-    expect(result?.tags).toHaveProperty('errorType', 'hydration');
+    expect((result as any)?.tags).toHaveProperty('errorType', 'hydration');
   });
 
   it('beforeSend tags digest errors', async () => {
@@ -120,15 +117,15 @@ describe('sentry.client.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'Render error', tags: {} };
+    const mockEvent = { message: 'Render error', tags: {} } as any;
     const errorWithDigest = Object.assign(new Error('Render error'), {
       digest: 'abc123',
     });
     const mockHint = { originalException: errorWithDigest };
 
     const result = beforeSend(mockEvent, mockHint);
-    expect(result?.tags).toHaveProperty('digest', 'abc123');
-    expect(result?.tags).toHaveProperty('errorType', 'next-digest');
+    expect((result as any)?.tags).toHaveProperty('digest', 'abc123');
+    expect((result as any)?.tags).toHaveProperty('errorType', 'next-digest');
   });
 
   it('SENTRY_FORCE_ENABLE escape hatch enables in development', async () => {
@@ -205,7 +202,7 @@ describe('sentry.server.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'Server error', tags: {} };
+    const mockEvent = { message: 'Server error', tags: {} } as any;
     const mockHint = { originalException: new Error('Server error') };
 
     const result = beforeSend(mockEvent, mockHint);
@@ -223,13 +220,13 @@ describe('sentry.server.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'SSR error', tags: {} };
+    const mockEvent = { message: 'SSR error', tags: {} } as any;
     const errorWithDigest = { digest: 'ssr123' };
     const mockHint = { originalException: errorWithDigest };
 
     const result = beforeSend(mockEvent, mockHint);
-    expect(result?.tags).toHaveProperty('digest', 'ssr123');
-    expect(result?.tags).toHaveProperty('errorType', 'ssr-render');
+    expect((result as any)?.tags).toHaveProperty('digest', 'ssr123');
+    expect((result as any)?.tags).toHaveProperty('errorType', 'ssr-render');
   });
 
   it('SENTRY_FORCE_ENABLE escape hatch works', async () => {
@@ -301,7 +298,7 @@ describe('sentry.edge.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'Edge error', tags: {} };
+    const mockEvent = { message: 'Edge error', tags: {} } as any;
     const mockHint = { originalException: new Error('Edge error') };
 
     const result = beforeSend(mockEvent, mockHint);
@@ -319,11 +316,11 @@ describe('sentry.edge.config', () => {
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
     const beforeSend = initCall.beforeSend!;
 
-    const mockEvent = { message: 'Edge error', tags: {} };
+    const mockEvent = { message: 'Edge error', tags: {} } as any;
     const mockHint = { originalException: new Error('Edge error') };
 
     const result = beforeSend(mockEvent, mockHint);
-    expect(result?.tags).toHaveProperty('runtime', 'edge');
+    expect((result as any)?.tags).toHaveProperty('runtime', 'edge');
   });
 
   it('SENTRY_FORCE_ENABLE escape hatch works', async () => {
