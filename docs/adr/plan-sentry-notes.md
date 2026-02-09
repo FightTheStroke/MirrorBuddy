@@ -9,3 +9,9 @@
 - **Escape hatch**: `SENTRY_FORCE_ENABLE=true` (server) / `NEXT_PUBLIC_SENTRY_FORCE_ENABLE=true` (client) preserved for debug scenarios.
 - **Error boundaries**: Both `global-error.tsx` and `error.tsx` already call `Sentry.captureException` — no changes needed.
 - **Self-test**: Updated to use `NODE_ENV` + `Sentry.getClient()` for actual SDK state reporting.
+
+## W2: Sentry Tests
+
+- **Pattern**: Mock `@sentry/nextjs` to capture `Sentry.init()` params, use `vi.resetModules()` + `vi.stubEnv()` between tests to re-import configs with different env vars.
+- **Coverage**: 19 tests across client/server/edge — enabled flag, beforeSend enrichment, hydration/digest tagging, FORCE_ENABLE escape hatch.
+- **Key insight**: Sentry configs execute at import time — must reset modules between tests.

@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed triple-blocking anti-pattern (`enabled: false` + `beforeSend` null-return + console.log) from all three Sentry configs
 - Self-test endpoint (`/api/admin/sentry/self-test`) now uses `NODE_ENV` check and reports actual SDK state via `getClient()`
 
+### Added
+
+- Unit tests for Sentry config enable logic: 19 tests covering client/server/edge enabled flag, beforeSend enrichment, hydration/digest tagging, FORCE_ENABLE escape hatch
+
 ## [Unreleased] — Compliance Audit Remediation (Plan 138)
 
 ### Added
