@@ -1,57 +1,72 @@
-import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { createDeletedUserBackup } from "@/lib/admin/user-trash-service";
-import { executeUserDataDeletion } from "@/app/api/privacy/delete-my-data/helpers";
+import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { createDeletedUserBackup } from '@/lib/admin/user-trash-service';
+import { executeUserDataDeletion } from '@/app/api/privacy/delete-my-data/helpers';
 
 export const PATCH = pipe(
-  withSentry("/api/admin/users/[id]"),
+  withSentry('/api/admin/users/[id]'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
   const params = await ctx.params;
   const targetId = params.id;
   if (!targetId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
-  const { disabled } = (await ctx.req.json()) as { disabled?: boolean };
-  if (disabled === undefined) {
-    return NextResponse.json(
-      { error: "disabled field is required" },
-      { status: 400 },
-    );
+  const body = (await ctx.req.json()) as {
+    disabled?: boolean;
+    role?: string;
+  };
+
+  if (body.disabled === undefined && body.role === undefined) {
+    return NextResponse.json({ error: 'disabled or role field is required' }, { status: 400 });
+  }
+
+  if (body.role !== undefined && body.role !== 'USER' && body.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'role must be USER or ADMIN' }, { status: 400 });
+  }
+
+  // Prevent admin from demoting themselves
+  if (body.role === 'USER' && targetId === ctx.userId) {
+    return NextResponse.json({ error: 'Cannot remove your own admin role' }, { status: 403 });
   }
 
   const user = await prisma.user.findUnique({ where: { id: targetId } });
   if (!user) {
-    logger.warn("User not found", { userId: targetId, adminId: ctx.userId });
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    logger.warn('User not found', { userId: targetId, adminId: ctx.userId });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
+
+  const updateData: { disabled?: boolean; role?: 'USER' | 'ADMIN' } = {};
+  if (body.disabled !== undefined) updateData.disabled = body.disabled;
+  if (body.role !== undefined) updateData.role = body.role as 'USER' | 'ADMIN';
 
   const updated = await prisma.user.update({
     where: { id: targetId },
-    data: { disabled },
+    data: updateData,
   });
 
-  // Create audit log for status change
+  // Create audit log
+  const action = 'USER_STATUS_CHANGE';
   await prisma.tierAuditLog.create({
     data: {
       userId: targetId,
       adminId: ctx.userId!,
-      action: "USER_STATUS_CHANGE",
+      action,
       changes: {
-        old: { disabled: user.disabled },
-        new: { disabled },
+        old: { disabled: user.disabled, role: user.role },
+        new: updateData,
       },
     },
   });
 
-  logger.info("User status updated", {
+  logger.info('User updated', {
     userId: targetId,
     adminId: ctx.userId,
-    disabled,
+    changes: updateData,
   });
 
   return NextResponse.json({
@@ -67,14 +82,14 @@ export const PATCH = pipe(
 });
 
 export const DELETE = pipe(
-  withSentry("/api/admin/users/[id]"),
+  withSentry('/api/admin/users/[id]'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
   const params = await ctx.params;
   const targetId = params.id;
   if (!targetId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
   const body = (await ctx.req.json().catch(() => ({}))) as {
@@ -83,14 +98,14 @@ export const DELETE = pipe(
 
   const user = await prisma.user.findUnique({ where: { id: targetId } });
   if (!user) {
-    logger.warn("User not found", { userId: targetId, adminId: ctx.userId });
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    logger.warn('User not found', { userId: targetId, adminId: ctx.userId });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   await createDeletedUserBackup(targetId, ctx.userId!, body.reason);
   await executeUserDataDeletion(targetId);
 
-  logger.info("Admin deleted user with backup", {
+  logger.info('Admin deleted user with backup', {
     userId: targetId,
     adminId: ctx.userId,
   });

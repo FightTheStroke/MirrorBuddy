@@ -1,10 +1,11 @@
-"use client";
+/* eslint-disable local-rules/no-literal-strings-in-jsx -- Admin-only page */
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { TableCell } from "@/components/ui/table";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { TableCell } from '@/components/ui/table';
 import {
   Lock,
   Unlock,
@@ -12,15 +13,17 @@ import {
   RefreshCw,
   Settings,
   ExternalLink,
-} from "lucide-react";
-import { TierChangeModal } from "@/components/admin/tier-change-modal";
-import { UserLimitOverrideModal } from "@/components/admin/user-limit-override-modal";
+  Shield,
+  ShieldOff,
+} from 'lucide-react';
+import { TierChangeModal } from '@/components/admin/tier-change-modal';
+import { UserLimitOverrideModal } from '@/components/admin/user-limit-override-modal';
 
 interface User {
   id: string;
   username: string | null;
   email: string | null;
-  role: "USER" | "ADMIN";
+  role: 'USER' | 'ADMIN';
   disabled: boolean;
   createdAt: Date;
   subscription: {
@@ -52,23 +55,24 @@ interface UsersTableRowProps {
   isLoading: boolean;
   onSelect: () => void;
   onToggle: () => void;
+  onRoleToggle: () => void;
   onDelete: () => void;
   availableTiers: Tier[];
 }
 
 function getTierDisplay(user: User): {
   name: string;
-  variant: "success" | "warning" | "neutral";
+  variant: 'success' | 'warning' | 'neutral';
 } {
-  const tierName = user.subscription?.tier.name || "Base";
-  const tierCode = user.subscription?.tier.code || "BASE";
+  const tierName = user.subscription?.tier.name || 'Base';
+  const tierCode = user.subscription?.tier.code || 'BASE';
 
   // Determine variant based on tier code
-  let variant: "success" | "warning" | "neutral" = "neutral";
-  if (tierCode === "PRO") {
-    variant = "success";
-  } else if (tierCode === "TRIAL") {
-    variant = "warning";
+  let variant: 'success' | 'warning' | 'neutral' = 'neutral';
+  if (tierCode === 'PRO') {
+    variant = 'success';
+  } else if (tierCode === 'TRIAL') {
+    variant = 'warning';
   }
 
   return { name: tierName, variant };
@@ -80,6 +84,7 @@ export function UsersTableRow({
   isLoading,
   onSelect,
   onToggle,
+  onRoleToggle,
   onDelete,
   availableTiers,
 }: UsersTableRowProps) {
@@ -90,11 +95,7 @@ export function UsersTableRow({
 
   const handleRowClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    if (
-      target.tagName === "INPUT" ||
-      target.tagName === "BUTTON" ||
-      target.closest("button")
-    ) {
+    if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('button')) {
       return;
     }
     router.push(`/admin/users/${user.id}`);
@@ -102,35 +103,23 @@ export function UsersTableRow({
 
   return (
     <>
-      <tr
-        className="border-b hover:bg-accent cursor-pointer"
-        onClick={handleRowClick}
-      >
+      <tr className="border-b hover:bg-accent cursor-pointer" onClick={handleRowClick}>
         <TableCell className="px-3 py-3 w-10">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={onSelect}
-            className="rounded"
-          />
+          <input type="checkbox" checked={isSelected} onChange={onSelect} className="rounded" />
         </TableCell>
-        <TableCell className="font-medium">{user.username || "—"}</TableCell>
-        <TableCell className="text-muted-foreground">
-          {user.email || "—"}
-        </TableCell>
+        <TableCell className="font-medium">{user.username || '—'}</TableCell>
+        <TableCell className="text-muted-foreground">{user.email || '—'}</TableCell>
         <TableCell>
-          <StatusBadge variant={user.role === "ADMIN" ? "warning" : "neutral"}>
+          <StatusBadge variant={user.role === 'ADMIN' ? 'warning' : 'neutral'}>
             {user.role}
           </StatusBadge>
         </TableCell>
         <TableCell>
-          <StatusBadge variant={tierDisplay.variant}>
-            {tierDisplay.name}
-          </StatusBadge>
+          <StatusBadge variant={tierDisplay.variant}>{tierDisplay.name}</StatusBadge>
         </TableCell>
         <TableCell>
-          <StatusBadge variant={user.disabled ? "disabled" : "active"}>
-            {user.disabled ? "Disabled" : "Active"}
+          <StatusBadge variant={user.disabled ? 'disabled' : 'active'}>
+            {user.disabled ? 'Disabled' : 'Active'}
           </StatusBadge>
         </TableCell>
         <TableCell className="text-muted-foreground">
@@ -166,12 +155,23 @@ export function UsersTableRow({
               onClick={onToggle}
               disabled={isLoading}
               className="text-xs h-11 px-3"
-              aria-label={user.disabled ? "Enable user" : "Disable user"}
+              aria-label={user.disabled ? 'Enable user' : 'Disable user'}
             >
-              {user.disabled ? (
-                <Unlock className="w-3 h-3" />
+              {user.disabled ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onRoleToggle}
+              disabled={isLoading}
+              className="text-xs h-11 px-3"
+              aria-label={user.role === 'ADMIN' ? 'Demote to user' : 'Promote to admin'}
+              title={user.role === 'ADMIN' ? 'Demote to user' : 'Promote to admin'}
+            >
+              {user.role === 'ADMIN' ? (
+                <ShieldOff className="w-3 h-3" />
               ) : (
-                <Lock className="w-3 h-3" />
+                <Shield className="w-3 h-3" />
               )}
             </Button>
             <Button

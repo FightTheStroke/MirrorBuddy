@@ -1,15 +1,16 @@
-"use client";
+/* eslint-disable local-rules/no-literal-strings-in-jsx -- Admin-only page */
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { AlertCircle } from "lucide-react";
-import { useStagingDataFilter } from "@/hooks/use-staging-data-filter";
-import { useUsersFilter } from "@/hooks/use-users-filter";
-import { useUsersTrash } from "@/hooks/use-users-trash";
-import { useUserActions } from "@/hooks/use-user-actions";
-import { StagingDataToggle } from "@/components/admin/staging-data-toggle";
-import { toast } from "@/components/ui/toast";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { AlertCircle } from 'lucide-react';
+import { useStagingDataFilter } from '@/hooks/use-staging-data-filter';
+import { useUsersFilter } from '@/hooks/use-users-filter';
+import { useUsersTrash } from '@/hooks/use-users-trash';
+import { useUserActions } from '@/hooks/use-user-actions';
+import { StagingDataToggle } from '@/components/admin/staging-data-toggle';
+import { toast } from '@/components/ui/toast';
 import {
   Dialog,
   DialogContent,
@@ -17,9 +18,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableHeader,
@@ -27,20 +28,20 @@ import {
   TableRow,
   TableHead,
   TableEmpty,
-} from "@/components/ui/table";
-import { ResponsiveTable } from "@/components/admin/responsive-table";
-import { ExportDropdown } from "@/components/admin/export-dropdown";
-import { UsersBulkActions } from "./users-bulk-actions";
-import { UsersSearch } from "./users-search";
-import { UsersTrashToolbar } from "./users-trash-toolbar";
-import { UsersTableRow } from "./users-table-row";
-import { UsersTrashRow } from "./users-trash-row";
+} from '@/components/ui/table';
+import { ResponsiveTable } from '@/components/admin/responsive-table';
+import { ExportDropdown } from '@/components/admin/export-dropdown';
+import { UsersBulkActions } from './users-bulk-actions';
+import { UsersSearch } from './users-search';
+import { UsersTrashToolbar } from './users-trash-toolbar';
+import { UsersTableRow } from './users-table-row';
+import { UsersTrashRow } from './users-trash-row';
 
 interface User {
   id: string;
   username: string | null;
   email: string | null;
-  role: "USER" | "ADMIN";
+  role: 'USER' | 'ADMIN';
   disabled: boolean;
   isTestData: boolean;
   createdAt: Date;
@@ -67,19 +68,13 @@ interface Tier {
   name: string;
 }
 
-type FilterTab = "all" | "active" | "disabled" | "trash";
+type FilterTab = 'all' | 'active' | 'disabled' | 'trash';
 
-export function UsersTable({
-  users,
-  availableTiers,
-}: {
-  users: User[];
-  availableTiers: Tier[];
-}) {
-  const t = useTranslations("admin.users");
+export function UsersTable({ users, availableTiers }: { users: User[]; availableTiers: Tier[] }) {
+  const t = useTranslations('admin.users');
   const router = useRouter();
-  const [filter, setFilter] = useState<FilterTab>("all");
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<FilterTab>('all');
+  const [search, setSearch] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { showStagingData, setShowStagingData } = useStagingDataFilter();
   const { deletedBackups, error, loadTrash } = useUsersTrash();
@@ -87,7 +82,7 @@ export function UsersTable({
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (filter === "trash") void loadTrash();
+    if (filter === 'trash') void loadTrash();
   }, [filter, loadTrash]);
 
   const { filteredUsers, stagingDataCount } = useUsersFilter(
@@ -96,11 +91,7 @@ export function UsersTable({
     search,
     showStagingData,
   );
-  const {
-    isLoading: actionLoading,
-    error: actionError,
-    handleAction,
-  } = useUserActions();
+  const { isLoading: actionLoading, error: actionError, handleAction } = useUserActions();
 
   // Use action error if it exists, otherwise use trash error
   const displayError = actionError || error;
@@ -113,8 +104,8 @@ export function UsersTable({
   const confirmDelete = async () => {
     if (!userToDelete) return;
     setDeleteConfirmOpen(false);
-    await handleAction(userToDelete, "delete", undefined, loadTrash);
-    toast.success("User deleted", "User has been deleted successfully");
+    await handleAction(userToDelete, 'delete', undefined, loadTrash);
+    toast.success('User deleted', 'User has been deleted successfully');
     router.refresh();
     setUserToDelete(null);
   };
@@ -142,9 +133,7 @@ export function UsersTable({
       {displayError && (
         <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-          <p className="text-red-700 dark:text-red-300 text-sm">
-            {displayError}
-          </p>
+          <p className="text-red-700 dark:text-red-300 text-sm">{displayError}</p>
         </div>
       )}
 
@@ -166,51 +155,51 @@ export function UsersTable({
         <TabsList className="mb-4 overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none">
           <TabsTrigger
             value="all"
-            title={`${t("tabs.all")} (${users.length})`}
+            title={`${t('tabs.all')} (${users.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
             <span className="sr-only">
-              {t("tabs.all")} ({users.length})
+              {t('tabs.all')} ({users.length})
             </span>
             <span className="md:hidden">&#x1F465;</span>
             <span className="hidden md:inline">
-              {t("tabs.all")} ({users.length})
+              {t('tabs.all')} ({users.length})
             </span>
           </TabsTrigger>
           <TabsTrigger
             value="active"
-            title={t("tabs.active")}
+            title={t('tabs.active')}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">{t("tabs.active")}</span>
+            <span className="sr-only">{t('tabs.active')}</span>
             <span className="md:hidden">&#x2713;</span>
-            <span className="hidden md:inline">{t("tabs.active")}</span>
+            <span className="hidden md:inline">{t('tabs.active')}</span>
           </TabsTrigger>
           <TabsTrigger
             value="disabled"
-            title={t("tabs.disabled")}
+            title={t('tabs.disabled')}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">{t("tabs.disabled")}</span>
+            <span className="sr-only">{t('tabs.disabled')}</span>
             <span className="md:hidden">&#x1F6AB;</span>
-            <span className="hidden md:inline">{t("tabs.disabled")}</span>
+            <span className="hidden md:inline">{t('tabs.disabled')}</span>
           </TabsTrigger>
           <TabsTrigger
             value="trash"
-            title={`${t("tabs.trash")} (${deletedBackups.length})`}
+            title={`${t('tabs.trash')} (${deletedBackups.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
             <span className="sr-only">
-              {t("tabs.trash")} ({deletedBackups.length})
+              {t('tabs.trash')} ({deletedBackups.length})
             </span>
             <span className="md:hidden">&#x1F5D1;&#xFE0F;</span>
             <span className="hidden md:inline">
-              {t("tabs.trash")} ({deletedBackups.length})
+              {t('tabs.trash')} ({deletedBackups.length})
             </span>
           </TabsTrigger>
         </TabsList>
 
-        {filter !== "trash" && (
+        {filter !== 'trash' && (
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1">
               <UsersSearch value={search} onChange={setSearch} />
@@ -218,65 +207,59 @@ export function UsersTable({
             <ExportDropdown
               data={filteredUsers}
               columns={[
-                { key: "username", label: "Username" },
-                { key: "email", label: "Email" },
-                { key: "role", label: "Role" },
-                { key: "disabled", label: "Disabled" },
-                { key: "createdAt", label: "Created" },
+                { key: 'username', label: 'Username' },
+                { key: 'email', label: 'Email' },
+                { key: 'role', label: 'Role' },
+                { key: 'disabled', label: 'Disabled' },
+                { key: 'createdAt', label: 'Created' },
               ]}
               filenamePrefix="users"
             />
           </div>
         )}
-        {filter === "trash" && (
-          <UsersTrashToolbar
-            count={deletedBackups.length}
-            onEmptyComplete={loadTrash}
-          />
+        {filter === 'trash' && (
+          <UsersTrashToolbar count={deletedBackups.length} onEmptyComplete={loadTrash} />
         )}
 
         <ResponsiveTable caption="Users table">
           <Table>
             <TableHeader>
               <TableRow>
-                {filter !== "trash" && (
+                {filter !== 'trash' && (
                   <TableHead className="w-10">
                     <input
                       type="checkbox"
                       checked={
-                        selectedIds.size === filteredUsers.length &&
-                        filteredUsers.length > 0
+                        selectedIds.size === filteredUsers.length && filteredUsers.length > 0
                       }
                       onChange={toggleSelectAll}
                       className="rounded"
                     />
                   </TableHead>
                 )}
-                <TableHead>{t("table.username")}</TableHead>
-                <TableHead>{t("table.email")}</TableHead>
-                {filter !== "trash" && (
+                <TableHead>{t('table.username')}</TableHead>
+                <TableHead>{t('table.email')}</TableHead>
+                {filter !== 'trash' && (
                   <>
-                    <TableHead>{t("table.role")}</TableHead>
-                    <TableHead>{t("table.tier")}</TableHead>
-                    <TableHead>{t("table.status")}</TableHead>
+                    <TableHead>{t('table.role')}</TableHead>
+                    <TableHead>{t('table.tier')}</TableHead>
+                    <TableHead>{t('table.status')}</TableHead>
                   </>
                 )}
                 <TableHead>
-                  {filter === "trash" ? t("table.deleted") : t("table.created")}
+                  {filter === 'trash' ? t('table.deleted') : t('table.created')}
                 </TableHead>
-                <TableHead>{t("table.actions")}</TableHead>
+                <TableHead>{t('table.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filter === "trash"
+              {filter === 'trash'
                 ? deletedBackups.map((b) => (
                     <UsersTrashRow
                       key={b.userId}
                       backup={b}
                       isLoading={actionLoading === b.userId}
-                      onRestore={() =>
-                        handleAction(b.userId, "restore", undefined, loadTrash)
-                      }
+                      onRestore={() => handleAction(b.userId, 'restore', undefined, loadTrash)}
                     />
                   ))
                 : filteredUsers.map((user) => (
@@ -286,14 +269,8 @@ export function UsersTable({
                       isSelected={selectedIds.has(user.id)}
                       isLoading={actionLoading === user.id}
                       onSelect={() => toggleSelect(user.id)}
-                      onToggle={() =>
-                        handleAction(
-                          user.id,
-                          "toggle",
-                          user.disabled,
-                          loadTrash,
-                        )
-                      }
+                      onToggle={() => handleAction(user.id, 'toggle', user.disabled, loadTrash)}
+                      onRoleToggle={() => handleAction(user.id, 'roleToggle', user.role, loadTrash)}
                       onDelete={() => handleDelete(user.id)}
                       availableTiers={availableTiers}
                     />
@@ -302,11 +279,11 @@ export function UsersTable({
           </Table>
         </ResponsiveTable>
 
-        {filter !== "trash" && filteredUsers.length === 0 && (
-          <TableEmpty>{t("emptyMessage")}</TableEmpty>
+        {filter !== 'trash' && filteredUsers.length === 0 && (
+          <TableEmpty>{t('emptyMessage')}</TableEmpty>
         )}
-        {filter === "trash" && deletedBackups.length === 0 && (
-          <TableEmpty>{t("trashEmpty")}</TableEmpty>
+        {filter === 'trash' && deletedBackups.length === 0 && (
+          <TableEmpty>{t('trashEmpty')}</TableEmpty>
         )}
 
         <UsersBulkActions
@@ -323,9 +300,8 @@ export function UsersTable({
           <DialogHeader>
             <DialogTitle>Confirm Delete</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be
-              undone. The user will be moved to trash and can be restored within
-              30 days.
+              Are you sure you want to delete this user? This action cannot be undone. The user will
+              be moved to trash and can be restored within 30 days.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
