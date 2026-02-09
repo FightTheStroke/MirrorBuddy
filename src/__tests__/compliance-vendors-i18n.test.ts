@@ -26,17 +26,17 @@ describe("Compliance Vendors i18n (F-01)", () => {
       });
 
       it("should have vendorsAndProcessors section under privacy", () => {
-        expect(compliance.privacy.vendorsAndProcessors).toBeDefined();
+        expect(compliance.legal.privacy.vendorsAndProcessors).toBeDefined();
       });
 
       it("should have vendors list with Claude/Anthropic entry", () => {
-        const vendors = compliance.privacy.vendorsAndProcessors.vendors;
+        const vendors = compliance.legal.privacy.vendorsAndProcessors.vendors;
         expect(vendors).toBeDefined();
         expect(vendors.anthropic || vendors.claude).toBeDefined();
       });
 
       it("should have all required fields for Anthropic vendor", () => {
-        const vendors = compliance.privacy.vendorsAndProcessors.vendors;
+        const vendors = compliance.legal.privacy.vendorsAndProcessors.vendors;
         const anthropic = vendors.anthropic || vendors.claude;
 
         expect(anthropic).toBeDefined();
@@ -47,23 +47,25 @@ describe("Compliance Vendors i18n (F-01)", () => {
       });
 
       it("should reference GDPR Article 6.1.b in legalBasis", () => {
-        const vendors = compliance.privacy.vendorsAndProcessors.vendors;
+        const vendors = compliance.legal.privacy.vendorsAndProcessors.vendors;
         const anthropic = vendors.anthropic || vendors.claude;
 
-        expect(anthropic.legalBasis).toMatch(/6\.1\.b|6\(1\)\(b\)/i);
+        expect(anthropic.legalBasis).toMatch(
+          /6\.1\.b|6\(1\)\(b\)|Art\.?\s*6\s*Abs/i,
+        );
       });
 
       it("should mention Standard Contractual Clauses or DPA", () => {
-        const vendors = compliance.privacy.vendorsAndProcessors.vendors;
+        const vendors = compliance.legal.privacy.vendorsAndProcessors.vendors;
         const anthropic = vendors.anthropic || vendors.claude;
 
         expect(anthropic.dpaStatus).toMatch(
-          /Standard Contractual Clauses|SCC|DPA/i,
+          /Standard Contractual Clauses|SCC|DPA|CCT|Clauses Contractuelles|Standardvertragsklauseln|Cl[aá]usulas Contractuales/i,
         );
       });
 
       it("should mention USA as data location", () => {
-        const vendors = compliance.privacy.vendorsAndProcessors.vendors;
+        const vendors = compliance.legal.privacy.vendorsAndProcessors.vendors;
         const anthropic = vendors.anthropic || vendors.claude;
 
         expect(anthropic.dataLocation).toMatch(

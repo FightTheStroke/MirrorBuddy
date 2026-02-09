@@ -51,10 +51,8 @@ describe("MessageBubble - AI Disclosure", () => {
       />,
     );
 
-    // Check for the badge component or its characteristic elements
-    const badge = screen.queryByRole("button", {
-      name: /intelligenza artificiale/i,
-    });
+    // Mock returns key names - aria-label will be "ariaLabel"
+    const badge = screen.queryByRole("button", { name: /ariaLabel/i });
     expect(badge).toBeInTheDocument();
   });
 
@@ -72,9 +70,7 @@ describe("MessageBubble - AI Disclosure", () => {
     );
 
     // User messages should not have the AI badge
-    const badge = screen.queryByRole("button", {
-      name: /intelligenza artificiale/i,
-    });
+    const badge = screen.queryByRole("button", { name: /ariaLabel/i });
     expect(badge).not.toBeInTheDocument();
   });
 
@@ -91,8 +87,8 @@ describe("MessageBubble - AI Disclosure", () => {
       />,
     );
 
-    // The compact badge should have text "AI" (not "Risposta AI")
-    const compactText = screen.queryByText("AI");
+    // Mock returns key names, so compact label returns "label"
+    const compactText = screen.queryByText("label");
     expect(compactText).toBeInTheDocument();
   });
 });

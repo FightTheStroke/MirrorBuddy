@@ -51,6 +51,8 @@ export function AccessibilityClient() {
               </span>
               <span>•</span>
               <span>{t("page.lastUpdated", { date: "27 Gennaio 2026" })}</span>
+              <span>•</span>
+              <span>{t("page.lastAudit")}</span>
             </div>
           </div>
 
@@ -109,10 +111,10 @@ export function AccessibilityClient() {
               <div>
                 <strong>{t("feedback.emailLabel")}:</strong>{" "}
                 <a
-                  href="mailto:accessibilita@fightthestroke.org"
+                  href="mailto:roberdan@fightthestroke.org"
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  accessibilita@fightthestroke.org
+                  roberdan@fightthestroke.org
                 </a>
               </div>
               <div>

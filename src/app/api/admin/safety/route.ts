@@ -17,6 +17,7 @@ import {
   getRecentEscalations,
   getUnresolvedEscalations,
 } from "@/lib/safety/server";
+import { prisma } from "@/lib/db";
 
 export interface SafetyDashboardResponse {
   overview: {
@@ -35,6 +36,8 @@ export interface SafetyDashboardResponse {
     outcome: string;
     maestroId?: string;
     ageGroup: string;
+    userId?: string;
+    sessionId?: string;
   }>;
   escalations: Array<{
     id: string;
@@ -83,16 +86,35 @@ export const GET = pipe(
     const recentEscalations = getRecentEscalations(1440); // Last 24 hours
     const unresolvedEscalations = getUnresolvedEscalations();
 
-    // Format recent events for dashboard
-    const recentEvents = recentComplianceEvents.map((event) => ({
-      id: event.id,
-      timestamp: event.timestamp,
-      eventType: event.eventType,
-      severity: event.severity,
-      outcome: event.outcome,
-      maestroId: event.maestroId,
-      ageGroup: event.userContext.ageGroup,
-    }));
+    // Get recent SafetyEvent records with userId/sessionId for admin actions
+    const safetyEvents = await prisma.safetyEvent.findMany({
+      where: {
+        timestamp: {
+          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+        },
+      },
+      orderBy: { timestamp: "desc" },
+      take: 20,
+    });
+
+    // Create a map of safety events by type for quick lookup
+    const safetyEventMap = new Map(safetyEvents.map((e) => [e.type, e]));
+
+    // Format recent events for dashboard with userId/sessionId from SafetyEvent
+    const recentEvents = recentComplianceEvents.map((event) => {
+      const safetyEvent = safetyEventMap.get(event.eventType);
+      return {
+        id: event.id,
+        timestamp: event.timestamp,
+        eventType: event.eventType,
+        severity: event.severity,
+        outcome: event.outcome,
+        maestroId: event.maestroId,
+        ageGroup: event.userContext.ageGroup,
+        userId: safetyEvent?.userId || undefined,
+        sessionId: safetyEvent?.conversationId || undefined,
+      };
+    });
 
     // Format escalation events
     const escalations = recentEscalations.map((event) => ({

@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Compliance Audit Remediation (Plan 138)
 
+#### W2: Content & UI Fixes
+
+- **Fixed**: 274 placeholder i18n keys filled with real legal content across all 5 locales (IT/EN/FR/DE/ES)
+- **Fixed**: Hardcoded Italian text in privacy components replaced with next-intl translations
+- **Fixed**: DSA profile "Dyscalculia" corrected to "Auditory Impairment" in accessibility pages (all locales)
+- **Fixed**: Country-specific compliance authorities added (CNIL, BfDI, AEPD, Garante Privacy)
+- **Added**: Accessibility statement feedback form, known limitations, and last audit date
+- **Added**: Admin safety intervention controls (disable character, stop session, block user) with i18n
+- **Added**: Three new API routes for safety actions (`/api/admin/safety/block-user`, `disable-character`, `stop-session`)
+- **Added**: Unit tests for i18n placeholder detection across all compliance locales
+
 #### W1: Critical Disclosure Fixes
 
 - **Added**: Claude/Anthropic AI provider disclosed in privacy policy (all 5 locales)

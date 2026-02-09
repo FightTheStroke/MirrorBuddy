@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   Tooltip,
   TooltipContent,
@@ -14,13 +15,12 @@ interface AIDisclosureBadgeProps {
   className?: string;
 }
 
-const DISCLOSURE_MESSAGE =
-  "Questa risposta è generata da un'intelligenza artificiale. Verifica sempre le informazioni importanti.";
-
 export function AIDisclosureBadge({
   variant = "compact",
   className,
 }: AIDisclosureBadgeProps) {
+  const t = useTranslations("compliance.aiDisclosure");
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -35,7 +35,7 @@ export function AIDisclosureBadge({
               className,
             )}
             role="button"
-            aria-label="Risposta generata da intelligenza artificiale"
+            aria-label={t("ariaLabel")}
             tabIndex={0}
             onKeyDown={(e) => {
               // Support keyboard activation
@@ -52,16 +52,18 @@ export function AIDisclosureBadge({
               aria-hidden="true"
             />
             <span className="hidden sm:inline">
-              {variant === "full" ? "Risposta AI" : "AI"}
+              {variant === "full" ? t("fullLabel") : t("label")}
             </span>
-            <span className="sm:hidden">{variant === "full" ? "AI" : ""}</span>
+            <span className="sm:hidden">
+              {variant === "full" ? t("label") : ""}
+            </span>
           </div>
         </TooltipTrigger>
         <TooltipContent
           side="top"
           className="max-w-xs bg-slate-900 dark:bg-slate-950 text-white text-xs p-3 rounded-lg"
         >
-          <p>{DISCLOSURE_MESSAGE}</p>
+          <p>{t("tooltip")}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

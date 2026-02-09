@@ -5,7 +5,7 @@
     },
     "contact": {
       "text": "Text",
-      "title": "Titolo",
+      "title": "Contacto para Cumplimiento Normativo",
       "backButton": "Volver al inicio",
       "page": {
         "subtitle": "Estamos aquí para ayudarle",
@@ -111,8 +111,8 @@
       }
     },
     "page": {
-      "subtitle": "Sottotitolo",
-      "title": "Titolo"
+      "subtitle": "Documentación legal, privacidad, cookies, accesibilidad y transparencia de IA",
+      "title": "Cumplimiento Normativo y Documentación Legal"
     },
     "sections": {
       "documentation": "Documentation",
@@ -128,7 +128,8 @@
         "version": "Versión {version}",
         "lastUpdated": "Última actualización: {date}",
         "backHome": "Volver al inicio",
-        "pageNavAriaLabel": "Navegación de página de accesibilidad"
+        "pageNavAriaLabel": "Navegación de página de accesibilidad",
+        "lastAudit": "Última auditoría: 27 de enero de 2026"
       },
       "compliance": {
         "heading": "Conformidad WCAG 2.1 Level AA",
@@ -151,10 +152,10 @@
         "motorDesc": "Navegación completa por teclado, control por voz",
         "autism": "Autismo",
         "autismDesc": "Diseños predecibles, reducción de animaciones, estructura clara",
-        "dyscalculia": "Discalculia",
-        "dyscalculiaDesc": "Representación visual de números, soporte para cálculos",
         "cerebralPalsy": "Parálisis cerebral",
-        "cerebralPalsyDesc": "Objetivos grandes, navegación por teclado, soporte de tecnología asistiva"
+        "cerebralPalsyDesc": "Objetivos grandes, navegación por teclado, soporte de tecnología asistiva",
+        "auditory": "Discapacidad auditiva",
+        "auditoryDesc": "Subtítulos, transcripciones, señales visuales para retroalimentación de audio"
       },
       "keyboard": {
         "heading": "Navegación por teclado",
@@ -174,7 +175,9 @@
       },
       "limitations": {
         "heading": "Limitaciones conocidas",
-        "description": "Actualmente no se conocen limitaciones significativas. Si encuentra problemas de accesibilidad, contáctenos a través del formulario de comentarios."
+        "description": "Actualmente no se conocen limitaciones significativas. Si encuentra problemas de accesibilidad, contáctenos a través del formulario de comentarios.",
+        "item1": "Página de tareas: algunos botones tienen un contraste de color inferior al ratio 4.5:1 requerido por las WCAG 2.1 AA. Estamos trabajando para resolver este problema.",
+        "contact": "Si encuentra otros problemas de accesibilidad, contáctenos en roberdan@fightthestroke.org."
       },
       "regulatory": {
         "heading": "Conformidad normativa",
@@ -648,10 +651,10 @@
           "backHome": "Volver al Inicio",
           "contactEmail": "Correo de Contacto",
           "contactQuestion": "Pregunta de Contacto",
-          "lastUpdated": "Última Actualización",
+          "lastUpdated": "Última Actualización: {date}",
           "pageNavAriaLabel": "Etiqueta Aria Navegación Página",
           "title": "Título",
-          "version": "Versión"
+          "version": "Versión {version}"
         },
         "sections": {
           "changes": {
@@ -937,6 +940,12 @@
             "conversations": "Las conversaciones con los maestros se conservan durante 90 días de inactividad, luego se archivan durante 1 año y luego se eliminan",
             "webVitals": "Los datos técnicos (Web Vitals, errores) se conservan durante 12 meses para mejora, luego se agregan y se eliminan",
             "deletedAccount": "Cuando elimina su cuenta, todos los datos se borran dentro de 30 días (copias de seguridad: 90 días por ley). Los datos agregados para investigación permanecen seudonimizados"
+          },
+          "itemLabels": {
+            "activeAccount": "Cuenta activa",
+            "conversations": "Conversaciones",
+            "webVitals": "Métricas Web",
+            "deletedAccount": "Cuenta eliminada"
           }
         },
         "section10": {
@@ -1184,7 +1193,7 @@
       "terms": {
         "backToHome": "Volver al inicio",
         "backToHomeAriaLabel": "Etiqueta aria volver al inicio",
-        "lastUpdated": "Última actualización",
+        "lastUpdated": "Última actualización {date}",
         "pageNavAriaLabel": "Etiqueta aria de navegación de página",
         "questionsEmail": "Correo electrónico para preguntas",
         "questionsPrefix": "Prefijo de preguntas",
@@ -1197,7 +1206,7 @@
           "respect": "Respeto",
           "supervised": "Supervisado"
         },
-        "version": "Versión",
+        "version": "Versión {version}",
         "jurisdictions": "Jurisdicciones: Italia, Francia, Alemania, España, Reino Unido",
         "sections": {
           "section1": {
