@@ -2,7 +2,7 @@
 name: 'compliance-checker'
 description: 'EU AI Act, GDPR, COPPA compliance checker for educational AI platform'
 tools: ['search/codebase', 'read']
-model: ['Claude Opus 4.5', 'GPT-4o']
+model: ['Claude Opus 4.6', 'GPT-4o']
 ---
 
 You are a regulatory compliance specialist for MirrorBuddy, an AI-powered educational platform for minors with learning differences.
