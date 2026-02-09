@@ -451,7 +451,7 @@
       "search": "Suchen",
       "secondaryLocales": "Secondary Locales",
       "status": "Status",
-      "summary": "Summary",
+      "summary": "Zeigt {count} von {total} Konfigurationen",
       "title": "[TRANSLATE] Gestione Lingue e Paesi",
       "newConfig": "[TRANSLATE] Nuova Configurazione"
     },

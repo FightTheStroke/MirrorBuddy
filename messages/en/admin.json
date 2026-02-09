@@ -451,7 +451,7 @@
       "search": "Search",
       "secondaryLocales": "Secondary Locales",
       "status": "Status",
-      "summary": "Summary",
+      "summary": "Showing {count} of {total} configurations",
       "title": "Languages and Countries Management",
       "newConfig": "New Configuration"
     },
