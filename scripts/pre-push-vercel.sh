@@ -140,7 +140,7 @@ REQUIRED_VARS=(
 	"PROTECTED_USERS" "TRIAL_BUDGET_LIMIT_EUR"
 	# Public URLs
 	"NEXT_PUBLIC_SITE_URL" "NEXT_PUBLIC_APP_URL"
-	# Model defaults (optional, have code fallbacks)
+	# Model defaults - optional, have code fallbacks
 	"DEFAULT_CHAT_MODEL" "DEFAULT_CHAT_MODEL_EDU" "DEFAULT_CHAT_MODEL_PRO"
 	"DEFAULT_DEMO_MODEL" "DEFAULT_EXTRACTOR_MODEL"
 	# GPT-5 deployment names

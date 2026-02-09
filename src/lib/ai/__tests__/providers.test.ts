@@ -380,7 +380,7 @@ describe('providers', () => {
       beforeEach(() => {
         process.env.AZURE_OPENAI_ENDPOINT = 'https://my-resource.openai.azure.com';
         process.env.AZURE_OPENAI_API_KEY = 'my-api-key';
-        process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'gpt-4o';
+        process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'gpt-5-mini';
       });
 
       it('should call Azure API and return response', async () => {
@@ -414,6 +414,8 @@ describe('providers', () => {
           },
           tool_calls: undefined,
           finish_reason: 'stop',
+          contentFiltered: undefined,
+          filteredCategories: undefined,
         });
       });
 
@@ -605,7 +607,7 @@ describe('providers', () => {
     it('should return Azure status when Azure is configured', async () => {
       process.env.AZURE_OPENAI_ENDPOINT = 'https://my-resource.openai.azure.com';
       process.env.AZURE_OPENAI_API_KEY = 'my-api-key';
-      process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'gpt-4o';
+      process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'gpt-5-mini';
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://realtime.openai.azure.com';
       process.env.AZURE_OPENAI_REALTIME_API_KEY = 'realtime-key';
       process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
