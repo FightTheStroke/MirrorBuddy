@@ -220,6 +220,36 @@ function validateOptionalEnvVars(): void {
   }
 }
 
+function validateSentryClientFallback(): void {
+  const clientConfigPath = path.join(process.cwd(), 'sentry.client.config.ts');
+  if (!fs.existsSync(clientConfigPath)) {
+    addResult('Sentry', 'Client Config', 'FAIL', 'sentry.client.config.ts not found', true);
+    return;
+  }
+
+  const content = fs.readFileSync(clientConfigPath, 'utf8');
+
+  // Verify NODE_ENV fallback exists (ADR 0052 - System Environment Variables)
+  // NEXT_PUBLIC_VERCEL_ENV may not be available in client bundles for existing projects
+  if (content.includes('NODE_ENV') && content.includes('isProductionFallback')) {
+    addResult(
+      'Sentry',
+      'NODE_ENV Fallback',
+      'PASS',
+      'Client config has NODE_ENV fallback for missing NEXT_PUBLIC_VERCEL_ENV',
+      false,
+    );
+  } else {
+    addResult(
+      'Sentry',
+      'NODE_ENV Fallback',
+      'FAIL',
+      'Client config gates on NEXT_PUBLIC_VERCEL_ENV without NODE_ENV fallback (ADR 0052)',
+      true,
+    );
+  }
+}
+
 function validateVercelRegionCompliance(): void {
   const vercelConfigPath = path.join(process.cwd(), 'vercel.json');
   if (!fs.existsSync(vercelConfigPath)) {
@@ -347,6 +377,9 @@ async function main(): Promise<void> {
 
   // Validate Sentry DSN
   validateSentryDSN(process.env.NEXT_PUBLIC_SENTRY_DSN?.trim());
+
+  // Validate Sentry client NODE_ENV fallback (ADR 0052)
+  validateSentryClientFallback();
 
   // Validate Vercel token
   validateVercelToken(process.env.VERCEL_TOKEN?.trim());

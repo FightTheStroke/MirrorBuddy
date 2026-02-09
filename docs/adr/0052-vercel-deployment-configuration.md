@@ -389,6 +389,55 @@ VERCEL_GIT_COMMIT_REF="main" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "
 - Urgent hotfixes that need visual verification
 - Demo branches for stakeholders
 
+### Vercel System Environment Variables (CRITICAL)
+
+Vercel auto-injects [System Environment Variables](https://vercel.com/docs/environment-variables/system-environment-variables)
+at build and runtime. These are **not** user-configured and **do not appear** in `vercel env ls` or `vercel env pull`.
+
+| Variable                            | Value in Production | Available Client-Side |
+| ----------------------------------- | ------------------- | --------------------- |
+| `VERCEL_ENV`                        | `production`        | No                    |
+| `NEXT_PUBLIC_VERCEL_ENV`            | `production`        | Yes (bundled)         |
+| `VERCEL_GIT_COMMIT_SHA`             | commit SHA          | No                    |
+| `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` | commit SHA          | Yes (bundled)         |
+| `VERCEL_URL`                        | deployment URL      | No                    |
+| `VERCEL_GIT_COMMIT_REF`             | branch name         | No                    |
+
+**Problem discovered (2026-02-09)**: `NEXT_PUBLIC_VERCEL_ENV` was not available in client bundles,
+causing Sentry to be completely disabled in production. The client SDK gated on
+`process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'` and silently dropped all errors.
+
+**Root cause**: For Next.js projects created before the auto-expose feature, system environment
+variables may not be automatically available. Requires opt-in via:
+Vercel Dashboard > Project Settings > Environment Variables > **"Automatically expose System Environment Variables"** (must be ON).
+
+**Defense-in-depth pattern** (applied to `sentry.client.config.ts`):
+
+```typescript
+// Prefer NEXT_PUBLIC_VERCEL_ENV (auto-provided by Vercel),
+// fallback to NODE_ENV when the env var is not available in the client bundle.
+const isVercelProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
+const isProductionFallback =
+  !process.env.NEXT_PUBLIC_VERCEL_ENV && process.env.NODE_ENV === 'production';
+const isProduction = isVercelProduction || isProductionFallback;
+```
+
+**Rule**: NEVER gate production-critical behavior solely on `NEXT_PUBLIC_VERCEL_ENV`.
+Always provide a `NODE_ENV` fallback for client-side code.
+
+**Verification**:
+
+```bash
+# Check if system env vars are being exposed (will NOT show them)
+vercel env pull /tmp/check.txt --environment production --yes
+grep NEXT_PUBLIC_VERCEL_ENV /tmp/check.txt  # Empty = not exposed
+rm /tmp/check.txt
+
+# Check in deployed build (browser console)
+# If Sentry is working: "[Sentry] Production client error tracking enabled"
+# If broken: no Sentry log, or "error tracking disabled"
+```
+
 ## Consequences
 
 ### Positive
@@ -402,6 +451,7 @@ VERCEL_GIT_COMMIT_REF="main" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "
 
 - Environment variables must be synced between local and Vercel
 - Sensitive keys visible in Vercel dashboard to team members
+- System environment variables are invisible to `vercel env` commands
 
 ### Neutral
 
@@ -410,7 +460,7 @@ VERCEL_GIT_COMMIT_REF="main" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "
 
 ## Related
 
-- \*\*ADR 0078: Vercel Runtime Constraints (CSRF, Voice Transport, Health Checks)
+- **ADR 0078**: Vercel Runtime Constraints (CSRF, Voice Transport, Health Checks)
 - ADR 0028: PostgreSQL + pgvector migration
 - ADR 0038: WebRTC migration for voice
 - ADR 0047: Grafana Cloud observability

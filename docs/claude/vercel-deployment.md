@@ -57,7 +57,7 @@ cat config/supabase-chain.pem | tr '\n' '|'
 
 ```typescript
 // proxy.ts config.matcher - MUST exclude file extensions
-source: "/((?!_next/static|_next/image|favicon.ico).*)";
+source: '/((?!_next/static|_next/image|favicon.ico).*)';
 ```
 
 Wrong pattern causes all images to 307 redirect to `/it/*.png` -> 404.
@@ -78,15 +78,26 @@ Wrong pattern causes all images to 307 redirect to `/it/*.png` -> 404.
 prisma generate && npm run build && npm run seed:admin
 ```
 
+## System Environment Variables (CRITICAL)
+
+Vercel auto-injects system env vars (`VERCEL_ENV`, `NEXT_PUBLIC_VERCEL_ENV`, etc.).
+These do NOT appear in `vercel env ls` or `vercel env pull`.
+
+**Rule**: NEVER gate production logic solely on `NEXT_PUBLIC_VERCEL_ENV`.
+Always provide a `NODE_ENV` fallback (see `sentry.client.config.ts` for pattern).
+
+Check: Vercel Dashboard > Settings > Environment Variables > "Automatically expose System Environment Variables" = ON.
+
 ## Common Failures
 
-| Error            | Cause                       | Fix                          |
-| ---------------- | --------------------------- | ---------------------------- |
-| Images broken    | Proxy matcher wrong         | Fix proxy.ts matcher pattern |
-| self-signed cert | Missing SUPABASE_CA_CERT    | Add piped cert to env        |
-| sslmode conflict | sslmode in DATABASE_URL     | Use cleanConnectionString()  |
-| Prisma stale     | Cached .prisma dir          | Delete node_modules/.prisma  |
-| CSP blocking     | Missing nonce in script-src | Check buildCSPHeader()       |
+| Error            | Cause                            | Fix                              |
+| ---------------- | -------------------------------- | -------------------------------- |
+| Sentry silent    | NEXT_PUBLIC_VERCEL_ENV undefined | Add NODE_ENV fallback (ADR 0052) |
+| Images broken    | Proxy matcher wrong              | Fix proxy.ts matcher pattern     |
+| self-signed cert | Missing SUPABASE_CA_CERT         | Add piped cert to env            |
+| sslmode conflict | sslmode in DATABASE_URL          | Use cleanConnectionString()      |
+| Prisma stale     | Cached .prisma dir               | Delete node_modules/.prisma      |
+| CSP blocking     | Missing nonce in script-src      | Check buildCSPHeader()           |
 
 ## See Also
 
