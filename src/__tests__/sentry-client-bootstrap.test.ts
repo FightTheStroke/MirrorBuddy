@@ -1,7 +1,7 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-import * as Sentry from "@sentry/nextjs";
+import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
+import * as Sentry from '@sentry/nextjs';
 
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   init: vi.fn(),
   replayIntegration: vi.fn(() => ({})),
   captureConsoleIntegration: vi.fn(() => ({})),
@@ -15,7 +15,7 @@ vi.mock("@sentry/nextjs", () => ({
 
 const ORIGINAL_ENV = process.env;
 
-describe("Sentry client bootstrap", () => {
+describe('Sentry client bootstrap', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
@@ -26,13 +26,12 @@ describe("Sentry client bootstrap", () => {
     process.env = ORIGINAL_ENV;
   });
 
-  it("enables Sentry in production when DSN is configured", async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN =
-      "https://key@o1.ingest.us.sentry.io/123456";
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "production";
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = "false";
+  it('enables Sentry in production when DSN is configured', async () => {
+    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
+    process.env.NODE_ENV = 'production';
+    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'false';
 
-    await import("../../instrumentation-client");
+    await import('../../instrumentation-client');
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     expect(Sentry.init).toHaveBeenCalledWith(
@@ -42,13 +41,12 @@ describe("Sentry client bootstrap", () => {
     );
   });
 
-  it("keeps Sentry disabled outside production without force flag", async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN =
-      "https://key@o1.ingest.us.sentry.io/123456";
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "preview";
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = "false";
+  it('keeps Sentry disabled outside production without force flag', async () => {
+    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
+    process.env.NODE_ENV = 'development';
+    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'false';
 
-    await import("../../instrumentation-client");
+    await import('../../instrumentation-client');
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     expect(Sentry.init).toHaveBeenCalledWith(
@@ -58,13 +56,12 @@ describe("Sentry client bootstrap", () => {
     );
   });
 
-  it("enables Sentry outside production when force flag is on", async () => {
-    process.env.NEXT_PUBLIC_SENTRY_DSN =
-      "https://key@o1.ingest.us.sentry.io/123456";
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "preview";
-    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = "true";
+  it('enables Sentry outside production when force flag is on', async () => {
+    process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://key@o1.ingest.us.sentry.io/123456';
+    process.env.NODE_ENV = 'development';
+    process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'true';
 
-    await import("../../instrumentation-client");
+    await import('../../instrumentation-client');
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     expect(Sentry.init).toHaveBeenCalledWith(
