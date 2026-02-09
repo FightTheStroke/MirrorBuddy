@@ -27,7 +27,7 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5-nano': process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || 'gpt-5-nano',
   'gpt-5-mini': process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || 'gpt-5-edu-mini',
   'gpt-5-chat': process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || 'gpt-5-chat',
-  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || 'gpt-5-chat',
+  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || 'gpt-5.2-chat',
   'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || 'gpt-5.2-edu',
 
   // Realtime models (voice)
