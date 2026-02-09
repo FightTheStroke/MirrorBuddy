@@ -2,38 +2,36 @@
 // The config you add here will be used whenever a user loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 
-// STRICT: Only enable Sentry on Vercel production deployments by default
-// MUST use NEXT_PUBLIC_ prefix — non-prefixed env vars are NOT available in client bundles
-// NEXT_PUBLIC_VERCEL_ENV is auto-provided by Vercel for Next.js projects
-const isVercelProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+// Production detection: prefer NEXT_PUBLIC_VERCEL_ENV (auto-provided by Vercel),
+// but fallback to NODE_ENV when the env var is not available in the client bundle.
+// MUST use NEXT_PUBLIC_ prefix — non-prefixed env vars are NOT available in client bundles.
+const isVercelProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
+// Fallback: NEXT_PUBLIC_VERCEL_ENV not set (undefined) + production build = likely production.
+// Explicitly set non-production values ("preview", "development") are still respected.
+const isProductionFallback =
+  !process.env.NEXT_PUBLIC_VERCEL_ENV && process.env.NODE_ENV === 'production';
+const isProduction = isVercelProduction || isProductionFallback;
 
 // Optional debug escape hatch for Preview/local testing
-const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === "true";
+const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true';
 
 // Only initialize if DSN is present (support both public and server-side names)
-const dsn =
-  process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
 
-if (!dsn && isVercelProduction) {
-  console.warn(
-    "[Sentry] NEXT_PUBLIC_SENTRY_DSN is not set - error tracking disabled",
-  );
-  // Don't initialize Sentry if DSN is missing in production
-  // This prevents silent failures
-} else if (dsn && isVercelProduction) {
+if (!dsn && isProduction) {
+  console.warn('[Sentry] NEXT_PUBLIC_SENTRY_DSN is not set - error tracking disabled');
+} else if (dsn && isProduction) {
   console.log(
-    "[Sentry] Initialized for Vercel production - error tracking enabled",
+    `[Sentry] Production client error tracking enabled (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || 'undefined'}, NODE_ENV=${process.env.NODE_ENV})`,
   );
-} else if (dsn && !isVercelProduction && !isForceEnabled) {
+} else if (dsn && !isProduction && !isForceEnabled) {
   console.log(
-    `[Sentry] DSN present but environment is not Vercel production (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}) - error tracking disabled`,
+    `[Sentry] Non-production environment (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || 'undefined'}) - error tracking disabled`,
   );
 } else if (dsn && isForceEnabled) {
-  console.log(
-    "[Sentry] DSN present and SENTRY_FORCE_ENABLE=true - client error tracking enabled for debugging",
-  );
+  console.log('[Sentry] Force-enabled for debugging');
 }
 
 // Only initialize if DSN is present (even in dev, to avoid errors)
@@ -46,12 +44,12 @@ if (dsn) {
     tracesSampleRate: 1.0,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
-    debug: process.env.SENTRY_DEBUG === "true",
+    debug: process.env.SENTRY_DEBUG === 'true',
 
     // Distributed tracing: propagate trace context to these targets
     // This connects client traces with server traces for full request visibility
     tracePropagationTargets: [
-      "localhost",
+      'localhost',
       /^https:\/\/mirrorbuddy\.vercel\.app/,
       /^https:\/\/mirrorbuddy\.org/,
       /^https:\/\/www\.mirrorbuddy\.org/,
@@ -70,7 +68,7 @@ if (dsn) {
       }),
       // Capture console.error and console.warn
       Sentry.captureConsoleIntegration({
-        levels: ["error", "warn"],
+        levels: ['error', 'warn'],
       }),
       // Browser tracing for performance
       Sentry.browserTracingIntegration({
@@ -78,7 +76,7 @@ if (dsn) {
       }),
       // Feedback widget for user reports
       Sentry.feedbackIntegration({
-        colorScheme: "system",
+        colorScheme: 'system',
         autoInject: false,
       }),
       // HTTP client errors (fetch failures)
@@ -90,7 +88,7 @@ if (dsn) {
       }),
       // Linked errors for better stack traces
       Sentry.linkedErrorsIntegration({
-        key: "cause",
+        key: 'cause',
         limit: 5,
       }),
       // Dedupe to prevent duplicate errors
@@ -102,49 +100,40 @@ if (dsn) {
 
     // STRICT: Only send errors from Vercel production deployments by default
     // Allow SENTRY_FORCE_ENABLE escape hatch for debugging on Preview/local
-    enabled: !!dsn && (isVercelProduction || isForceEnabled),
+    enabled: !!dsn && (isProduction || isForceEnabled),
 
     // Add context before sending
     beforeSend(event, hint) {
       // DOUBLE CHECK: Block errors from non-production environments
       // unless SENTRY_FORCE_ENABLE is explicitly set for debugging
-      if (!isVercelProduction && !isForceEnabled) {
-        console.warn(
-          `[Sentry] Blocked error from non-production environment: ${process.env.NEXT_PUBLIC_VERCEL_ENV || "local"}`,
-        );
-        return null; // Drop the event
+      if (!isProduction && !isForceEnabled) {
+        return null; // Drop errors from non-production environments
       }
 
       // Capture hydration errors with special tag
       const error = hint.originalException;
       if (error && error instanceof Error) {
-        if (
-          error.message.includes("Hydration") ||
-          error.message.includes("hydrat")
-        ) {
+        if (error.message.includes('Hydration') || error.message.includes('hydrat')) {
           event.tags = {
             ...event.tags,
-            errorType: "hydration",
+            errorType: 'hydration',
           };
         }
 
         // Capture Next.js digest errors
-        if ("digest" in error) {
+        if ('digest' in error) {
           event.tags = {
             ...event.tags,
             digest: String((error as { digest?: string }).digest),
-            errorType: "next-digest",
+            errorType: 'next-digest',
           };
         }
 
         // Capture chunk load failures
-        if (
-          error.message.includes("Loading chunk") ||
-          error.message.includes("ChunkLoadError")
-        ) {
+        if (error.message.includes('Loading chunk') || error.message.includes('ChunkLoadError')) {
           event.tags = {
             ...event.tags,
-            errorType: "chunk-load",
+            errorType: 'chunk-load',
           };
         }
       }
@@ -154,7 +143,7 @@ if (dsn) {
         ...event.tags,
         userAgent: navigator.userAgent.substring(0, 100),
         viewport: `${window.innerWidth}x${window.innerHeight}`,
-        online: navigator.onLine ? "yes" : "no",
+        online: navigator.onLine ? 'yes' : 'no',
       };
 
       return event;
@@ -167,9 +156,9 @@ if (dsn) {
     },
 
     // Environment tagging
-    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
+    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || 'development',
 
     // Release tracking
-    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "local",
+    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'local',
   });
 }

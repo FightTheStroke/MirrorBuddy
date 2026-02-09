@@ -185,7 +185,7 @@
         "position": "[TRANSLATE] Posizione",
         "search": "[TRANSLATE] Cerca tier...",
         "status": "[TRANSLATE] Stato",
-        "summary": "[TRANSLATE] {count} tier totali"
+        "summary": "{current} sur {total} niveaux"
       },
       "page": {
         "backToTiers": "[TRANSLATE] Torna ai Tier",

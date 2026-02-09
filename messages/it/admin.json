@@ -226,7 +226,7 @@
         "position": "Posizione",
         "search": "Cerca tier...",
         "status": "Stato",
-        "summary": "{count} tier totali"
+        "summary": "{current} di {total} tier"
       },
       "buddiesAvailable": "Buddy Disponibili",
       "coachesAvailable": "Coach Disponibili",
