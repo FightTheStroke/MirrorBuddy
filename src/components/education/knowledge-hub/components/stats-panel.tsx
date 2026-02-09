@@ -15,6 +15,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 export interface MaterialStats {
   totalMaterials: number;
@@ -63,6 +64,7 @@ function StatCard({ icon, label, value, color = 'text-accent-themed' }: StatCard
  * Statistics panel for Knowledge Hub overview.
  */
 export function StatsPanel({ stats, className }: StatsPanelProps) {
+  const t = useTranslations("education");
   return (
     <div
       className={cn(
@@ -70,15 +72,15 @@ export function StatsPanel({ stats, className }: StatsPanelProps) {
         className
       )}
       role="region"
-      aria-label="Statistiche materiali"
+      aria-label={t("statisticheMateriali")}
     >
       {/* Header */}
       <div className="p-4 bg-gradient-to-r from-accent-themed/10 to-purple-500/10 border-b border-slate-200 dark:border-slate-700">
         <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-          Le tue statistiche
+          {t("leTueStatistiche")}
         </h3>
         <p className="text-sm text-slate-500">
-          {stats.totalMaterials} materiali totali
+          {stats.totalMaterials} {t("materialiTotali")}
         </p>
       </div>
 
@@ -116,14 +118,14 @@ export function StatsPanel({ stats, className }: StatsPanelProps) {
           <div className="flex items-center gap-2 text-sm">
             <Clock className="w-4 h-4 text-slate-400" />
             <span className="text-slate-600 dark:text-slate-400">
-              Oggi: <strong className="text-slate-900 dark:text-slate-100">{stats.recentCount}</strong>
+              {t("oggi")} <strong className="text-slate-900 dark:text-slate-100">{stats.recentCount}</strong>
             </span>
           </div>
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-slate-400" />
             <span className="text-slate-600 dark:text-slate-400">
-              Questa settimana: <strong className="text-slate-900 dark:text-slate-100">{stats.thisWeekCount}</strong>
+              {t("questaSettimana")} <strong className="text-slate-900 dark:text-slate-100">{stats.thisWeekCount}</strong>
             </span>
           </div>
         </div>

@@ -1,11 +1,15 @@
+"use client";
+
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 interface MarketingLayoutProps {
   children: React.ReactNode;
 }
 
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
+  const t = useTranslations("marketing");
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-md dark:bg-gray-900/80 dark:border-gray-800">
@@ -24,7 +28,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               href="/welcome"
               className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:from-purple-600 hover:to-pink-600"
             >
-              Sign Up
+              {t("signUp")}
             </Link>
           </div>
         </nav>

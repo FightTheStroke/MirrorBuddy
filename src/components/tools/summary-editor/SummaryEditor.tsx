@@ -24,6 +24,7 @@ import {
   useSectionOperations,
   useSaveEdit,
 } from './hooks';
+import { useTranslations } from "next-intl";
 
 export type { SummaryEditorProps } from './types';
 
@@ -35,6 +36,7 @@ export function SummaryEditor({
   readOnly = false,
   className,
 }: SummaryEditorProps) {
+  const t = useTranslations("tools");
   // Manage expanded sections
   const { expandedSections, toggleSection, setExpandedSections } =
     useExpandedSections(sections);
@@ -145,7 +147,7 @@ export function SummaryEditor({
           onClick={addSection}
         >
           <Plus className="w-4 h-4" />
-          Nuova sezione
+          {t("nuovaSezione")}
         </Button>
       )}
     </div>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { subjectIcons, subjectNames } from "@/data";
 import { QuoteRotator } from "./quote-rotator";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MaestroCardFullProps {
   maestro: Maestro;
@@ -27,6 +28,7 @@ export function MaestroCardFull({
   onClose,
   className,
 }: MaestroCardFullProps) {
+  const t = useTranslations("chat");
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -45,7 +47,7 @@ export function MaestroCardFull({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-          aria-label="Chiudi"
+          aria-label={t("chiudi")}
         >
           <X className="w-4 h-4 text-slate-500 dark:text-slate-400" />
         </button>
@@ -113,7 +115,7 @@ export function MaestroCardFull({
             style={{ backgroundColor: maestro.color }}
           >
             <Mic className="w-5 h-5" />
-            <span>Parla</span>
+            <span>{t("parla")}</span>
           </button>
         )}
         {onSelectChat && (
@@ -126,7 +128,7 @@ export function MaestroCardFull({
             }}
           >
             <MessageSquare className="w-5 h-5" />
-            <span>Scrivi</span>
+            <span>{t("scrivi")}</span>
           </button>
         )}
       </div>

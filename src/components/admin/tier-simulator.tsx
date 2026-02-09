@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { csrfFetch } from "@/lib/auth";
 import type { TierName } from "@/types/tier-types";
+import { useTranslations } from "next-intl";
 
 interface SimulationStatus {
   isSimulating: boolean;
@@ -31,6 +32,7 @@ const TIER_OPTIONS: { value: TierName; label: string; color: string }[] = [
  * Allows admins to simulate different tier levels for testing
  */
 export function TierSimulator() {
+  const t = useTranslations("admin");
   const [status, setStatus] = useState<SimulationStatus>({
     isSimulating: false,
     simulatedTier: null,
@@ -113,16 +115,16 @@ export function TierSimulator() {
           <FlaskConical className="h-4 w-4" />
           {status.isSimulating ? (
             <span className="hidden sm:inline">
-              SIM: {status.simulatedTier?.toUpperCase()}
+              {t("sim")} {status.simulatedTier?.toUpperCase()}
             </span>
           ) : (
-            <span className="hidden sm:inline">Simula Tier</span>
+            <span className="hidden sm:inline">{t("simulaTier")}</span>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel className="text-xs text-slate-500 font-normal">
-          Simula un tier per testing
+          {t("simulaUnTierPerTesting")}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {TIER_OPTIONS.map((tier) => (
@@ -149,7 +151,7 @@ export function TierSimulator() {
               className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
             >
               <X className="h-4 w-4 mr-2" />
-              Termina Simulazione
+              {t("terminaSimulazione")}
             </DropdownMenuItem>
           </>
         )}

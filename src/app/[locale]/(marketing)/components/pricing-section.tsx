@@ -43,7 +43,7 @@ export function PricingSection() {
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                     <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-bold text-white shadow">
                       <Sparkles className="h-3 w-3" aria-hidden="true" />
-                      Popular
+                      {t("popular")}
                     </span>
                   </div>
                 )}

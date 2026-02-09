@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { TopicStep } from '@/types';
 import { STEP_CONFIG } from './constants';
 import { StepContent } from './step-content';
+import { useTranslations } from "next-intl";
 
 interface StepCardProps {
   step: TopicStep;
@@ -27,6 +28,7 @@ export function StepCard({
   onComplete,
   onSelect,
 }: StepCardProps) {
+  const t = useTranslations("education");
   const config = STEP_CONFIG[step.type] || STEP_CONFIG.overview;
   const Icon = config.icon;
 
@@ -105,7 +107,7 @@ export function StepCard({
               {!step.isCompleted && (
                 <Button onClick={onComplete} className="w-full mt-4">
                   <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Completa passaggio
+                  {t("completaPassaggio")}
                 </Button>
               )}
             </div>

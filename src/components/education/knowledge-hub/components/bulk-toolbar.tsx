@@ -9,6 +9,7 @@
 
 import { Trash2, FolderInput, Tag, Archive, RotateCcw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 export interface BulkToolbarProps {
   /** Number of selected items */
@@ -77,6 +78,7 @@ export function BulkToolbar({
   isArchiveView = false,
   className,
 }: BulkToolbarProps) {
+  const t = useTranslations("education");
   if (selectedCount === 0) return null;
 
   return (
@@ -87,7 +89,7 @@ export function BulkToolbar({
         className
       )}
       role="toolbar"
-      aria-label={`Azioni per ${selectedCount} elementi selezionati`}
+      aria-label={t("azioniPerElementi", { count: selectedCount })}
     >
       {/* Selection count */}
       <div className="flex items-center gap-2">
@@ -97,7 +99,7 @@ export function BulkToolbar({
             'p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700',
             'focus:outline-none focus:ring-2 focus:ring-accent-themed'
           )}
-          aria-label="Deseleziona tutto"
+          aria-label={t("deselezionaTutto")}
         >
           <X className="w-4 h-4" />
         </button>

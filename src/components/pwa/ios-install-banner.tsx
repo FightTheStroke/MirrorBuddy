@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { X, Share, Plus } from 'lucide-react';
 import { isIOSSafariBrowser } from '@/lib/push/vapid';
+import { useTranslations } from "next-intl";
 
 const BANNER_DISMISSED_KEY = 'ios-install-banner-dismissed';
 const DISMISS_DURATION_DAYS = 7;
@@ -27,6 +28,7 @@ interface IOSInstallBannerProps {
  * - Clear step-by-step instructions
  */
 export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBannerProps) {
+  const t = useTranslations("common");
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
 
@@ -73,12 +75,12 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <Plus className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-white font-semibold">Installa MirrorBuddy</h3>
+            <h3 className="text-white font-semibold">{t("installaMirrorbuddy")}</h3>
           </div>
           <button
             onClick={handleDismiss}
             className="p-1 rounded-full hover:bg-white/20 transition-colors"
-            aria-label="Chiudi"
+            aria-label={t("chiudi")}
           >
             <X className="w-5 h-5 text-white/80" />
           </button>
@@ -87,7 +89,7 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
         {/* Content */}
         <div className="px-4 pb-4">
           <p className="text-white/90 text-sm mb-4">
-            Installa l&apos;app per ricevere notifiche e usarla offline.
+            {t("installaLAposAppPerRicevereNotificheEUsarlaOffline")}
           </p>
 
           {/* Steps */}
@@ -97,9 +99,9 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
                 <span className="text-white font-bold">1</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-white text-sm">Tocca</span>
+                <span className="text-white text-sm">{t("tocca")}</span>
                 <Share className="w-5 h-5 text-white" />
-                <span className="text-white text-sm">in basso</span>
+                <span className="text-white text-sm">{t("inBasso")}</span>
               </div>
             </div>
 
@@ -108,7 +110,7 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
                 <span className="text-white font-bold">2</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-white text-sm">Seleziona &quot;Aggiungi alla schermata Home&quot;</span>
+                <span className="text-white text-sm">{t("selezionaQuotAggiungiAllaSchermataHomeQuot")}</span>
               </div>
             </div>
 
@@ -117,14 +119,14 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
                 <span className="text-white font-bold">3</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-white text-sm">Tocca &quot;Aggiungi&quot;</span>
+                <span className="text-white text-sm">{t("toccaAggiungi")}</span>
               </div>
             </div>
           </div>
 
           {/* Why install */}
           <p className="text-white/70 text-xs mt-4 text-center">
-            Dopo l&apos;installazione potrai attivare le notifiche push
+            {t("dopoLAposInstallazionePotraiAttivareLeNotifichePus")}
           </p>
         </div>
       </div>

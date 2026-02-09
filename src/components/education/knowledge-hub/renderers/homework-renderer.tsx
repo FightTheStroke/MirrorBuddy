@@ -94,7 +94,7 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
         {homeworkData.dueDate && (
           <div className="mt-2 flex items-center gap-2 text-sm text-slate-500">
             <Calendar className="w-4 h-4" />
-            Scadenza: {homeworkData.dueDate}
+            {t("scadenza")} {homeworkData.dueDate}
           </div>
         )}
       </div>
@@ -136,7 +136,7 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
       {homeworkData.notes && (
         <div className="p-4 border-t border-slate-200 dark:border-slate-700">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            <strong>Note:</strong> {homeworkData.notes}
+            <strong>{t("note")}</strong> {homeworkData.notes}
           </p>
         </div>
       )}

@@ -4,7 +4,8 @@
       "headline": "Lerne mit den Grossten Lehrern der Geschichte",
       "subtitle": "KI-gestutztes Tutoring, das sich an jeden Lernstil anpasst. Sprachgesprache mit 26 historischen Professoren.",
       "cta": "Kostenlos Starten",
-      "schoolCta": "Kontakt fur Schulen"
+      "schoolCta": "Kontakt fur Schulen",
+      "mirrorbuddyVoiceAiDemo": "MirrorBuddy voice AI demo"
     },
     "features": {
       "heading": "Warum MirrorBuddy",
@@ -50,7 +51,8 @@
           "Individuelles Branding"
         ],
         "cta": "Kontaktieren Sie uns"
-      }
+      },
+      "popular": "Popolare"
     },
     "social": {
       "heading": "Vertraut von",
@@ -103,7 +105,12 @@
       "privacy": "Datenschutz",
       "terms": "Nutzungsbedingungen",
       "cookies": "Cookie-Richtlinie",
-      "copyright": "MirrorBuddy. Alle Rechte vorbehalten."
-    }
+      "copyright": "MirrorBuddy. Alle Rechte vorbehalten.",
+      "aiPoweredInclusiveEducationPlatform": "AI-powered inclusive education platform."
+    },
+    "signUp": "Sign Up",
+    "mirrorbuddyForSchools": "MirrorBuddy for Schools",
+    "bringInclusiveAiEducationToYourInstitutionSsoAdmin": "Bring inclusive AI education to your institution. SSO, admin tools,",
+    "andDedicatedSupportIncluded": "and dedicated support included."
   }
 }

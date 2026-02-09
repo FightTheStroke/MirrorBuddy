@@ -18,6 +18,7 @@ import {
   GenericPreview,
 } from './preview-components';
 import type { ToolType } from '@/types/tools';
+import { useTranslations } from "next-intl";
 
 interface ContentPreviewProps {
   isOpen: boolean;
@@ -54,6 +55,7 @@ export function ContentPreview({
   content,
   title,
 }: ContentPreviewProps) {
+  const t = useTranslations("education");
   // Show loading for first 300ms after opening
   const delayedIsOpen = useDelayedValue(isOpen, 300);
   const isLoading = isOpen && !delayedIsOpen;
@@ -127,7 +129,7 @@ export function ContentPreview({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                aria-label="Chiudi anteprima"
+                aria-label={t("chiudiAnteprima")}
               >
                 <X className="w-5 h-5" />
               </Button>
@@ -141,10 +143,10 @@ export function ContentPreview({
             {/* Footer */}
             <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-700">
               <Button variant="outline" onClick={onClose}>
-                Chiudi
+                {t("chiudi")}
               </Button>
               <Button>
-                Apri
+                {t("apri")}
               </Button>
             </div>
           </motion.div>

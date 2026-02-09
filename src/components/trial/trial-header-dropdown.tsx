@@ -94,7 +94,7 @@ export function TrialHeaderDropdown({
         aria-haspopup="true"
       >
         <Gift className="w-3.5 h-3.5" />
-        <span>Trial</span>
+        <span>{t("trialLabel")}</span>
         <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
           <MessageCircle className="w-3 h-3" />
           {chatsRemaining}/{maxChats}
@@ -134,7 +134,7 @@ export function TrialHeaderDropdown({
                 {isLow ? "Risorse quasi esaurite!" : "Modalità Prova"}
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                Registrati per accesso illimitato
+                {t("registratiPerAccessoIllimitato")}
               </p>
             </div>
 
@@ -195,7 +195,7 @@ export function TrialHeaderDropdown({
                 onClick={() => setIsOpen(false)}
               >
                 <UserPlus className="w-4 h-4" />
-                Richiedi accesso
+                {t("richiediAccesso")}
               </Link>
               <Link
                 href="/login"

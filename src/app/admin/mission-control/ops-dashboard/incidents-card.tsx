@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Recent Incidents Card
  * Shows recent telemetry events (safety, circuit breaker, API errors)
@@ -7,18 +9,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldAlert } from "lucide-react";
 import type { RecentIncident } from "@/lib/admin/ops-dashboard-types";
+import { useTranslations } from "next-intl";
 
 interface IncidentsCardProps {
   incidents: RecentIncident[];
 }
 
 export function IncidentsCard({ incidents }: IncidentsCardProps) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldAlert className="h-5 w-5" />
-          Recent Incidents (24h)
+          {t("recentIncidents24h")}
           {incidents.length > 0 && (
             <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-normal">
               {incidents.length}
@@ -29,7 +33,7 @@ export function IncidentsCard({ incidents }: IncidentsCardProps) {
       <CardContent>
         {incidents.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No incidents in the last 24 hours
+            {t("noIncidentsInTheLast24Hours")}
           </p>
         ) : (
           <div className="space-y-2">

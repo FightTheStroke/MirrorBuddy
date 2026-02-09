@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PRESETS } from './constants';
 import type { AudioPreset } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface PresetsSectionProps {
   currentPreset: AudioPreset | null;
@@ -11,10 +12,11 @@ interface PresetsSectionProps {
 }
 
 export function PresetsSection({ currentPreset, onSelect }: PresetsSectionProps) {
+  const t = useTranslations("common");
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Preset Rapidi</CardTitle>
+        <CardTitle className="text-base">{t("presetRapidi")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">

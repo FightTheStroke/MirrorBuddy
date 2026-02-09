@@ -5,6 +5,7 @@ import { Check, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatRelativeTime, getTypeColor, getTypeIcon } from './notification-utils';
 import type { Notification } from '@/lib/stores/notification-store';
+import { useTranslations } from "next-intl";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -13,6 +14,7 @@ interface NotificationItemProps {
 }
 
 export function NotificationItem({ notification, onMarkRead, onDelete }: NotificationItemProps) {
+  const t = useTranslations("common");
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -57,7 +59,7 @@ export function NotificationItem({ notification, onMarkRead, onDelete }: Notific
               onMarkRead(notification.id);
             }}
             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-            aria-label="Segna come letto"
+            aria-label={t("segnaComeLetto")}
           >
             <Check className="h-4 w-4 text-green-600" />
           </button>
@@ -68,7 +70,7 @@ export function NotificationItem({ notification, onMarkRead, onDelete }: Notific
             onDelete(notification.id);
           }}
           className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-          aria-label="Elimina notifica"
+          aria-label={t("eliminaNotifica")}
         >
           <Trash2 className="h-4 w-4 text-red-500" />
         </button>

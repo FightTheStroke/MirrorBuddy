@@ -241,7 +241,8 @@
           "month": "Month",
           "today": "Oggi",
           "week": "Week"
-        }
+        },
+        "msg": "msg"
       },
       "history": {
         "title": "Titolo",
@@ -515,6 +516,45 @@
     "maestros": {
       "arialabelchiudiEsc": "[TRANSLATE] aria-label=\"Chiudi (Esc)\"",
       "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
-    }
+    },
+    "valutazioneSessione": "Valutazione Sessione",
+    "da": "da",
+    "min": "min",
+    "durata": "Durata",
+    "domande": "Domande",
+    "puntiDiForza": "Punti di forza",
+    "daMigliorare": "Da migliorare",
+    "salvatoNelDiarioPerIGenitori": "Salvato nel diario per i genitori",
+    "copiaMessaggio": "Copia messaggio",
+    "staPensando": "sta pensando...",
+    "closeVoicePanel": "Close voice panel",
+    "conversazioneAttiva": "Conversazione attiva",
+    "attivo": "Attivo",
+    "messaggiDellaConversazione": "Messaggi della conversazione",
+    "messaggiRecenti": "Messaggi recenti",
+    "trascrizioneApprossimativa": "Trascrizione approssimativa",
+    "terminaChiamata": "Termina chiamata",
+    "attiva": "Attiva",
+    "muto": "Muto",
+    "microfono": "Microfono",
+    "termina": "Termina",
+    "professore": "Professore",
+    "nuovaConversazione": "Nuova conversazione",
+    "chiudiEsc": "Chiudi (Esc)",
+    "chiudi": "Chiudi",
+    "parla": "Parla",
+    "scrivi": "Scrivi",
+    "professore1": "Professore",
+    "nuovaConversazione1": "Nuova conversazione",
+    "chiudi1": "Chiudi",
+    "mute": "Mute",
+    "terminaSessioneEValuta": "Termina sessione e valuta",
+    "trascrizioneVocale": "Trascrizione vocale",
+    "leggiAdAltaVoce": "Leggi ad alta voce",
+    "lv": "Lv.",
+    "citazioneMotivazionale": "Citazione motivazionale",
+    "quoteIndicators": "Quote indicators",
+    "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
+    "vaiAllaCitazione": "Vai alla citazione {index}"
   }
 }

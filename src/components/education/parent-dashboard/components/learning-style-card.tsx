@@ -113,7 +113,7 @@ export function LearningStyleCard({ style }: LearningStyleCardProps) {
               : "text-slate-900 dark:text-white",
           )}
         >
-          {style.optimalSessionDuration} min
+          {style.optimalSessionDuration} {t("min")}
         </p>
       </div>
 

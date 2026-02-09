@@ -178,7 +178,7 @@ export function SummaryTool({
                 title={t("convertToMindmap")}
               >
                 <Brain className="w-4 h-4" />
-                <span className="hidden sm:inline">Mappa</span>
+                <span className="hidden sm:inline">{t("mappa")}</span>
               </Button>
             )}
 
@@ -191,7 +191,7 @@ export function SummaryTool({
                 title={t("generateFlashcards")}
               >
                 <Layers className="w-4 h-4" />
-                <span className="hidden sm:inline">Flashcard</span>
+                <span className="hidden sm:inline">{t("flashcard")}</span>
               </Button>
             )}
           </div>

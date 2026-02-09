@@ -71,7 +71,7 @@ export function CookiesContent() {
           ]}
         />
         <p className="text-sm text-slate-600 dark:text-gray-400 mt-3">
-          <strong>Nota tecnica:</strong> {t("sections.essentialCookies.note")}
+          <strong>{t("notaTecnica")}</strong> {t("sections.essentialCookies.note")}
         </p>
       </Section>
 
@@ -106,7 +106,7 @@ export function CookiesContent() {
             href="/privacy"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
-            Privacy Policy
+            {t("privacyPolicy")}
           </Link>
           .
         </p>

@@ -97,7 +97,7 @@ export function AIProviderSettings() {
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
-                Azure OpenAI Realtime: {providerStatus.azure.realtimeModel}
+                {t("azureOpenaiRealtime")} {providerStatus.azure.realtimeModel}
               </p>
             </div>
           ) : (
@@ -112,8 +112,8 @@ export function AIProviderSettings() {
                 {t('realtimeRequirement')}
               </p>
               <p className="text-xs text-slate-500">
-                Configura: AZURE_OPENAI_REALTIME_ENDPOINT, AZURE_OPENAI_REALTIME_API_KEY,
-                AZURE_OPENAI_REALTIME_DEPLOYMENT
+                {t("configuraAzureOpenaiRealtimeEndpointAzureOpenaiRea")}
+
               </p>
             </div>
           )}

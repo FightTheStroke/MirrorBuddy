@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
+import { useTranslations } from "next-intl";
 
 interface EmbeddingStats {
   total: number;
@@ -13,6 +14,7 @@ interface EmbeddingStats {
 }
 
 export function RagPanel() {
+  const t = useTranslations("admin");
   const [stats, setStats] = useState<EmbeddingStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [reindexing, setReindexing] = useState<string | null>(null);
@@ -58,7 +60,7 @@ export function RagPanel() {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm">
           <Database className="h-4 w-4 text-indigo-500" />
-          RAG Embeddings
+          {t("ragEmbeddings")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -72,7 +74,7 @@ export function RagPanel() {
               <p className="text-2xl font-bold text-indigo-600">
                 {stats.total.toLocaleString()}
               </p>
-              <p className="text-[10px] text-slate-500">Total Embeddings</p>
+              <p className="text-[10px] text-slate-500">{t("totalEmbeddings")}</p>
             </div>
             <div className="space-y-2">
               {stats.bySourceType.map((s) => (
@@ -103,7 +105,7 @@ export function RagPanel() {
           </>
         ) : (
           <p className="text-xs text-slate-500 text-center py-4">
-            No embedding data available
+            {t("noEmbeddingDataAvailable")}
           </p>
         )}
       </CardContent>

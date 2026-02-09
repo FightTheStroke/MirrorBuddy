@@ -25,6 +25,7 @@ import { ToolHeader } from "./tool-canvas/components/tool-header";
 import { ToolRenderer } from "./tool-canvas/components/tool-renderer";
 import { MaestroPip } from "./tool-canvas/components/maestro-pip";
 import { CheckCircle, XCircle, Pause, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ToolCanvasProps {
   sessionId: string;
@@ -45,6 +46,7 @@ export function ToolCanvas({
   onCancel,
   className,
 }: ToolCanvasProps) {
+  const t = useTranslations("tools");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showPiP, setShowPiP] = useState(true);
 
@@ -162,7 +164,7 @@ export function ToolCanvas({
         className,
       )}
       role="region"
-      aria-label="Tool Canvas"
+      aria-label={t("toolCanvas")}
     >
       <ConnectionOverlay connectionState={connectionState} />
 
@@ -182,7 +184,7 @@ export function ToolCanvas({
                   <Network className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 </div>
                 <p className="text-slate-600 dark:text-slate-400">
-                  In attesa che {maestroName} inizi a costruire...
+                  {t("inAttesaChe")} {maestroName} {t("iniziACostruire")}
                 </p>
               </div>
             </motion.div>
@@ -242,7 +244,7 @@ export function ToolCanvas({
           onClick={handleShowPip}
           className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors text-sm text-slate-700 dark:text-slate-300"
         >
-          Mostra {maestroName}
+          {t("mostra")} {maestroName}
         </button>
       )}
     </div>

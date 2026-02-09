@@ -87,7 +87,7 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Email *
+                {t("email")}
               </label>
               <input
                 id="email"
@@ -108,7 +108,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Password *
+                {t("password")}
               </label>
               <div className="relative">
                 <input

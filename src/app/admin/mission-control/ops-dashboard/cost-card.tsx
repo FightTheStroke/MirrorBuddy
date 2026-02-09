@@ -10,8 +10,10 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, AlertTriangle } from "lucide-react";
 import type { CostDashboardData } from "@/lib/ops/cost-tracker";
+import { useTranslations } from "next-intl";
 
 export function CostOverviewCard() {
+  const t = useTranslations("admin");
   const [data, setData] = useState<CostDashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,7 +38,7 @@ export function CostOverviewCard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Cost Overview
+            {t("costOverview2")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -52,11 +54,11 @@ export function CostOverviewCard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            Cost Overview
+            {t("costOverview1")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Loading costs...</p>
+          <p className="text-sm text-muted-foreground">{t("loadingCosts")}</p>
         </CardContent>
       </Card>
     );
@@ -67,7 +69,7 @@ export function CostOverviewCard() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
-          Cost Overview
+          {t("costOverview")}
           {data.alerts.length > 0 && (
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
           )}
@@ -79,7 +81,7 @@ export function CostOverviewCard() {
             &euro;{data.totalMonthly.toFixed(2)}
           </span>
           <span className="text-sm text-muted-foreground">
-            / &euro;{data.totalBudget} monthly budget
+            / &euro;{data.totalBudget} {t("monthlyBudget")}
           </span>
         </div>
 

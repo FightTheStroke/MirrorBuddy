@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Star, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SessionGrade } from '@/lib/stores';
+import { useTranslations } from "next-intl";
 
 export const GRADE_LABELS: Record<number, { label: string; emoji: string; color: string }> = {
   10: { label: 'Eccezionale', emoji: '🏆', color: 'from-yellow-400 to-amber-500' },
@@ -31,6 +32,7 @@ export function GradeDisplay({
   questionsAsked,
   xpEarned,
 }: GradeDisplayProps) {
+  const t = useTranslations("voice");
   const gradeInfo = GRADE_LABELS[grade.score] || GRADE_LABELS[5];
 
   return (
@@ -69,13 +71,13 @@ export function GradeDisplay({
       >
         <div className="bg-slate-800/50 rounded-xl p-3 text-center">
           <div className="w-5 h-5 mx-auto mb-1 text-blue-400">⏱️</div>
-          <p className="text-lg font-semibold">{sessionDuration}min</p>
-          <p className="text-xs text-slate-400">Durata</p>
+          <p className="text-lg font-semibold">{sessionDuration}{t("min")}</p>
+          <p className="text-xs text-slate-400">{t("durata")}</p>
         </div>
         <div className="bg-slate-800/50 rounded-xl p-3 text-center">
           <div className="w-5 h-5 mx-auto mb-1 text-green-400">💬</div>
           <p className="text-lg font-semibold">{questionsAsked}</p>
-          <p className="text-xs text-slate-400">Domande</p>
+          <p className="text-xs text-slate-400">{t("domande")}</p>
         </div>
         <div className="bg-slate-800/50 rounded-xl p-3 text-center">
           <div className="w-5 h-5 mx-auto mb-1 text-amber-400">🏆</div>
@@ -100,7 +102,7 @@ export function GradeDisplay({
           <div className="bg-green-900/20 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <Star className="w-4 h-4 text-green-400" />
-              <h4 className="font-medium text-green-400">Punti di forza</h4>
+              <h4 className="font-medium text-green-400">{t("puntiDiForza")}</h4>
             </div>
             <ul className="space-y-1">
               {grade.strengths.map((strength, i) => (
@@ -118,7 +120,7 @@ export function GradeDisplay({
           <div className="bg-amber-900/20 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-amber-400" />
-              <h4 className="font-medium text-amber-400">Da migliorare</h4>
+              <h4 className="font-medium text-amber-400">{t("daMigliorare")}</h4>
             </div>
             <ul className="space-y-1">
               {grade.areasToImprove.map((area, i) => (

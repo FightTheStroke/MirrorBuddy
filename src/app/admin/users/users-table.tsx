@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/no-literal-strings-in-jsx -- Admin-only page */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -298,10 +297,10 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogTitle>{t("confirmDelete")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone. The user will
-              be moved to trash and can be restored within 30 days.
+              {t("areYouSureYouWantToDeleteThisUserThisActionCannotB")}
+              {t("undoneTheUserWillBeMovedToTrashAndCanBeRestoredWit")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -312,10 +311,10 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
                 setUserToDelete(null);
               }}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Delete User
+              {t("deleteUser")}
             </Button>
           </DialogFooter>
         </DialogContent>

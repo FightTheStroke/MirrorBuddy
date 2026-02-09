@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Ops Dashboard Components
  * UI components for online users and request metrics
@@ -9,18 +11,20 @@ import type {
   OnlineUsersMetric,
   RequestMetrics,
 } from "@/lib/admin/ops-dashboard-types";
+import { useTranslations } from "next-intl";
 
 interface OnlineUsersCardProps {
   metrics: OnlineUsersMetric;
 }
 
 export function OnlineUsersCard({ metrics }: OnlineUsersCardProps) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5" />
-          Online Users
+          {t("onlineUsers")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -30,7 +34,7 @@ export function OnlineUsersCard({ metrics }: OnlineUsersCardProps) {
         {metrics.byNation.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground">
-              By Nation
+              {t("byNation")}
             </h3>
             <div className="space-y-1">
               {metrics.byNation.map((item) => (
@@ -50,7 +54,7 @@ export function OnlineUsersCard({ metrics }: OnlineUsersCardProps) {
         {metrics.byTier.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground">
-              By Tier
+              {t("byTier")}
             </h3>
             <div className="space-y-1">
               {metrics.byTier.map((item) => (
@@ -67,7 +71,7 @@ export function OnlineUsersCard({ metrics }: OnlineUsersCardProps) {
         )}
 
         {metrics.byNation.length === 0 && metrics.byTier.length === 0 && (
-          <p className="text-sm text-muted-foreground">No users online</p>
+          <p className="text-sm text-muted-foreground">{t("noUsersOnline")}</p>
         )}
       </CardContent>
     </Card>
@@ -79,31 +83,32 @@ interface RequestMetricsCardProps {
 }
 
 export function RequestMetricsCard({ metrics }: RequestMetricsCardProps) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Activity className="h-5 w-5" />
-          Request Metrics
+          {t("requestMetrics")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-4">
           <div>
             <div className="text-2xl font-bold">{metrics.totalRequests}</div>
-            <p className="text-xs text-muted-foreground">Total Requests</p>
+            <p className="text-xs text-muted-foreground">{t("totalRequests")}</p>
           </div>
           <div>
             <div className="text-2xl font-bold">
-              {metrics.avgResponseTime.toFixed(0)}ms
+              {metrics.avgResponseTime.toFixed(0)}{t("ms1")}
             </div>
-            <p className="text-xs text-muted-foreground">Avg Response</p>
+            <p className="text-xs text-muted-foreground">{t("avgResponse")}</p>
           </div>
           <div>
             <div className="text-2xl font-bold">
               {metrics.errorRate.toFixed(1)}%
             </div>
-            <p className="text-xs text-muted-foreground">Error Rate</p>
+            <p className="text-xs text-muted-foreground">{t("errorRate")}</p>
           </div>
         </div>
 
@@ -111,7 +116,7 @@ export function RequestMetricsCard({ metrics }: RequestMetricsCardProps) {
         {metrics.topEndpoints.length > 0 && (
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-muted-foreground">
-              Top Endpoints
+              {t("topEndpoints")}
             </h3>
             <div className="space-y-1">
               {metrics.topEndpoints.map((endpoint) => (
@@ -125,7 +130,7 @@ export function RequestMetricsCard({ metrics }: RequestMetricsCardProps) {
                   <div className="flex gap-2">
                     <span className="font-medium">{endpoint.count}</span>
                     <span className="text-muted-foreground">
-                      ({endpoint.avgTime.toFixed(0)}ms)
+                      ({endpoint.avgTime.toFixed(0)}{t("ms")}
                     </span>
                   </div>
                 </div>
@@ -136,7 +141,7 @@ export function RequestMetricsCard({ metrics }: RequestMetricsCardProps) {
 
         {metrics.topEndpoints.length === 0 && (
           <p className="text-sm text-muted-foreground">
-            No request data available
+            {t("noRequestDataAvailable")}
           </p>
         )}
       </CardContent>

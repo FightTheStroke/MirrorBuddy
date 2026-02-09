@@ -24,6 +24,7 @@ import { HTMLPreview } from "@/components/education/html-preview";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { generateAccessibilityCSS, buildDemoCode } from "./demo-utils";
 import type { BaseRendererProps } from "./types";
+import { useTranslations } from "next-intl";
 
 interface DemoData {
   title?: string;
@@ -41,6 +42,7 @@ interface DemoData {
  * Render a demo preview for Knowledge Hub.
  */
 export function DemoRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education");
   const demoData = data as DemoData;
   const [showDemo, setShowDemo] = useState(false);
 
@@ -145,7 +147,7 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
               <button
                 onClick={() => setShowDemo(false)}
                 className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-                aria-label="Chiudi demo"
+                aria-label={t("chiudiDemo")}
               >
                 <X className="w-5 h-5" />
               </button>

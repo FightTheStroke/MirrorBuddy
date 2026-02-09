@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Flashcard UI Components
  * Flashcard session, stats, and browser components
@@ -13,6 +15,7 @@ import {
 } from './fsrs';
 import type { Flashcard, FlashcardSessionProps, StatCardProps } from './example-flashcard-types';
 import { formatInterval, formatNextReview } from './example-flashcard-helpers';
+import { useTranslations } from "next-intl";
 
 // ============================================================================
 // FLASHCARD SESSION COMPONENT
@@ -23,6 +26,7 @@ export function FlashcardSession({
   onCardUpdate,
   onSessionComplete,
 }: FlashcardSessionProps) {
+  const t = useTranslations("education");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
@@ -37,10 +41,10 @@ export function FlashcardSession({
   if (sessionCards.length === 0) {
     return (
       <div className="text-center p-8">
-        <h2 className="text-2xl font-bold mb-4">All Caught Up!</h2>
-        <p className="text-gray-600">No cards are due for review right now.</p>
+        <h2 className="text-2xl font-bold mb-4">{t("allCaughtUp")}</h2>
+        <p className="text-gray-600">{t("noCardsAreDueForReviewRightNow")}</p>
         <p className="text-sm text-gray-500 mt-2">
-          Come back later for your next review session.
+          {t("comeBackLaterForYourNextReviewSession")}
         </p>
       </div>
     );
@@ -65,8 +69,8 @@ export function FlashcardSession({
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span>Card {currentIndex + 1} of {sessionCards.length}</span>
-          <span>{Math.round(progress)}% Complete</span>
+          <span>{t("card")} {currentIndex + 1} {t("of")} {sessionCards.length}</span>
+          <span>{Math.round(progress)}{t("complete")}</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
@@ -107,7 +111,7 @@ export function FlashcardSession({
             onClick={() => setShowAnswer(true)}
             className="mx-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Show Answer
+            {t("showAnswer")}
           </button>
         )}
       </div>
@@ -118,21 +122,21 @@ export function FlashcardSession({
             onClick={() => handleQuality(1)}
             className="px-4 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium"
           >
-            Again
+            {t("again")}
             <span className="block text-xs text-red-600 mt-1">&lt; 1m</span>
           </button>
           <button
             onClick={() => handleQuality(2)}
             className="px-4 py-3 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-medium"
           >
-            Hard
+            {t("hard")}
             <span className="block text-xs text-orange-600 mt-1">&lt; 10m</span>
           </button>
           <button
             onClick={() => handleQuality(3)}
             className="px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
           >
-            Good
+            {t("good")}
             <span className="block text-xs text-green-600 mt-1">
               {formatInterval(currentCard.fsrs)}
             </span>
@@ -141,7 +145,7 @@ export function FlashcardSession({
             onClick={() => handleQuality(4)}
             className="px-4 py-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
           >
-            Easy
+            {t("easy")}
             <span className="block text-xs text-blue-600 mt-1">
               {formatInterval(currentCard.fsrs, 1.5)}
             </span>
@@ -150,6 +154,7 @@ export function FlashcardSession({
       )}
 
       <div className="mt-4 text-center text-sm text-gray-500">
+        {/* eslint-disable-next-line local-rules/no-literal-strings-in-jsx */}
         <p>Keyboard: 1 (Again) • 2 (Hard) • 3 (Good) • 4 (Easy) • Space (Show)</p>
       </div>
     </div>
@@ -233,6 +238,7 @@ function StatCard({
 // ============================================================================
 
 export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
+  const t = useTranslations("education");
   const [filter, setFilter] = useState<'all' | 'due' | 'mastered'>('all');
 
   const filteredCards = cards.filter(card => {
@@ -248,19 +254,19 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
           active={filter === 'all'}
           onClick={() => setFilter('all')}
         >
-          All Cards
+          {t("allCards")}
         </FilterButton>
         <FilterButton
           active={filter === 'due'}
           onClick={() => setFilter('due')}
         >
-          Due ({cards.filter(c => isDue(c.fsrs)).length})
+          {t("due")}{cards.filter(c => isDue(c.fsrs)).length})
         </FilterButton>
         <FilterButton
           active={filter === 'mastered'}
           onClick={() => setFilter('mastered')}
         >
-          Mastered ({cards.filter(c => c.fsrs.stability > 30).length})
+          {t("mastered")}{cards.filter(c => c.fsrs.stability > 30).length})
         </FilterButton>
       </div>
 
@@ -281,7 +287,7 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
               <div className="text-right ml-4">
                 <div className="text-sm font-medium text-gray-900">
                   {isDue(card.fsrs) ? (
-                    <span className="text-red-600">Due Now</span>
+                    <span className="text-red-600">{t("dueNow")}</span>
                   ) : (
                     <span className="text-gray-500">
                       {formatNextReview(card.fsrs.nextReview)}
@@ -289,10 +295,10 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
                   )}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  Stability: {card.fsrs.stability.toFixed(1)}d
+                  {t("stability")} {card.fsrs.stability.toFixed(1)}d
                 </div>
                 <div className="text-xs text-gray-500">
-                  Reviews: {card.fsrs.reps}
+                  {t("reviews")} {card.fsrs.reps}
                   {card.fsrs.lapses > 0 && ` • Lapses: ${card.fsrs.lapses}`}
                 </div>
               </div>
@@ -302,7 +308,7 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
 
         {filteredCards.length === 0 && (
           <div className="text-center text-gray-500 py-8">
-            No cards in this category
+            {t("noCardsInThisCategory")}
           </div>
         )}
       </div>

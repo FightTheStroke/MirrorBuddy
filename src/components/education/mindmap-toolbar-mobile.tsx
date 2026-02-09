@@ -16,6 +16,7 @@
 import { useDeviceType } from "@/hooks/use-device-type";
 import { useSafeArea } from "@/hooks/use-safe-area";
 import { ZoomIn, ZoomOut, Maximize2, Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface MindmapToolbarMobileProps {
   onZoomIn: () => void;
@@ -30,6 +31,7 @@ export function MindmapToolbarMobile({
   onFitToScreen,
   onExport,
 }: MindmapToolbarMobileProps) {
+  const t = useTranslations("education");
   const { isDesktop } = useDeviceType();
   const safeArea = useSafeArea();
 
@@ -54,7 +56,7 @@ export function MindmapToolbarMobile({
       {/* Zoom In Button - 44x44px touch target */}
       <button
         onClick={onZoomIn}
-        aria-label="Zoom in"
+        aria-label={t("zoomIn")}
         className="
           h-11 w-11 rounded-lg
           flex items-center justify-center
@@ -71,7 +73,7 @@ export function MindmapToolbarMobile({
       {/* Zoom Out Button - 44x44px touch target */}
       <button
         onClick={onZoomOut}
-        aria-label="Zoom out"
+        aria-label={t("zoomOut")}
         className="
           h-11 w-11 rounded-lg
           flex items-center justify-center
@@ -88,7 +90,7 @@ export function MindmapToolbarMobile({
       {/* Fit to Screen Button - 44x44px touch target */}
       <button
         onClick={onFitToScreen}
-        aria-label="Fit to screen"
+        aria-label={t("fitToScreen")}
         className="
           h-11 w-11 rounded-lg
           flex items-center justify-center
@@ -105,7 +107,7 @@ export function MindmapToolbarMobile({
       {/* Export Button - 44x44px touch target */}
       <button
         onClick={onExport}
-        aria-label="Export"
+        aria-label={t("export")}
         className="
           h-11 w-11 rounded-lg
           flex items-center justify-center
@@ -121,7 +123,7 @@ export function MindmapToolbarMobile({
 
       {/* Pinch-to-Zoom Hint */}
       <div className="ml-auto text-xs text-slate-500 dark:text-slate-400 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800">
-        <span>👆 Pinch to zoom</span>
+        <span>{t("pinchToZoom")}</span>
       </div>
     </div>
   );

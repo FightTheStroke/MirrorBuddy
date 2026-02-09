@@ -6,6 +6,7 @@
 import Image from 'next/image';
 import { X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import type { Attachment } from '../types';
 
 interface AttachmentPreviewProps {
@@ -19,6 +20,7 @@ export function AttachmentPreview({
   onRemove,
   highContrast,
 }: AttachmentPreviewProps) {
+  const t = useTranslations('education');
   if (attachments.length === 0) return null;
 
   return (
@@ -51,7 +53,7 @@ export function AttachmentPreview({
             <button
               onClick={() => onRemove(att.id)}
               className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
-              aria-label={`Rimuovi ${att.name}`}
+              aria-label={t("rimuoviAllegato", { name: att.name })}
             >
               <X className="w-3 h-3" />
             </button>

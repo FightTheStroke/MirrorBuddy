@@ -217,7 +217,7 @@ export function ExportPDFModal({
                     : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300",
                 )}
               >
-                Letter (US)
+                {t("letterUs")}
               </button>
             </div>
           </div>

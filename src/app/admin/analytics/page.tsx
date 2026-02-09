@@ -34,6 +34,7 @@ import type {
   ExternalServicesData,
 } from "./types";
 import type { A11yStatsData } from "@/app/api/dashboard/a11y-stats/route";
+import { useTranslations } from "next-intl";
 
 type DashboardData = {
   tokenUsage: TokenUsageData | null;
@@ -56,6 +57,7 @@ const INITIAL_DATA: DashboardData = {
 };
 
 export default function AdminAnalyticsPage() {
+  const t = useTranslations("admin");
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export default function AdminAnalyticsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-slate-500">Last 7 days</p>
+        <p className="text-xs text-slate-500">{t("last7Days")}</p>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -123,7 +125,7 @@ export default function AdminAnalyticsPage() {
             <RefreshCw
               className={`h-4 w-4 mr-1.5 ${refreshing ? "animate-spin" : ""}`}
             />
-            Refresh
+            {t("refresh")}
           </Button>
           <ResetStatsButton />
         </div>
@@ -138,35 +140,35 @@ export default function AdminAnalyticsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
-          title="Session Cost"
+          title={t("sessionCost")}
           value={`\u20AC${data.sessionMetrics?.cost.totalEur.toFixed(2) ?? "0.00"}`}
           subValue={`\u20AC${data.sessionMetrics?.cost.avgPerSession.toFixed(3) ?? "0.000"} avg`}
           icon={Euro}
           color="green"
         />
         <StatCard
-          title="Total Sessions"
+          title={t("totalSessions")}
           value={data.sessionMetrics?.summary.totalSessions ?? 0}
           subValue={`${data.sessionMetrics?.summary.avgTurnsPerSession ?? 0} avg turns`}
           icon={Activity}
           color="indigo"
         />
         <StatCard
-          title="Voice Minutes"
+          title={t("voiceMinutes")}
           value={data.sessionMetrics?.cost.voiceMinutes?.toFixed(1) ?? "0"}
           subValue={`\u20AC${((data.sessionMetrics?.cost.voiceMinutes ?? 0) * (data.sessionMetrics?.cost.pricing.voicePerMin ?? 0.04)).toFixed(2)} cost`}
           icon={Mic}
           color="green"
         />
         <StatCard
-          title="Flashcard Reviews"
+          title={t("flashcardReviews")}
           value={data.fsrsStats?.summary.totalReviews ?? 0}
           subValue={`${data.fsrsStats?.summary.accuracy ?? 0}% accuracy`}
           icon={Brain}
           color="blue"
         />
         <StatCard
-          title="Safety Refusals"
+          title={t("safetyRefusals")}
           value={data.sessionMetrics?.safety.totalRefusals ?? 0}
           subValue={`${data.sessionMetrics?.safety.refusalAccuracy ?? 100}% correct`}
           icon={ShieldAlert}
@@ -181,11 +183,10 @@ export default function AdminAnalyticsPage() {
               <ShieldAlert className="h-5 w-5 text-red-600 dark:text-red-400" />
               <div className="flex-1">
                 <p className="font-medium text-sm text-red-900 dark:text-red-100">
-                  {data.safetyEvents?.summary.unresolvedCount} Unresolved Safety
-                  Events
+                  {data.safetyEvents?.summary.unresolvedCount} {t("unresolvedSafetyEvents")}
                 </p>
                 <p className="text-xs text-red-700 dark:text-red-300">
-                  {data.safetyEvents?.summary.criticalCount ?? 0} critical
+                  {data.safetyEvents?.summary.criticalCount ?? 0} {t("critical")}
                 </p>
               </div>
             </div>

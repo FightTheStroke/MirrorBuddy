@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Solution Display Component
  *
@@ -7,6 +9,7 @@
 import { motion } from "framer-motion";
 import { TouchTarget } from "@/components/ui/touch-target";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export interface Solution {
   steps: string[];
@@ -25,6 +28,7 @@ export function SolutionDisplay({
   selectedSubject,
   onReset,
 }: SolutionDisplayProps) {
+  const t = useTranslations("education");
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -45,7 +49,7 @@ export function SolutionDisplay({
       {/* Solution Steps */}
       <div className="space-y-4">
         <h3 className="text-lg xs:text-xl font-semibold text-slate-900 dark:text-white">
-          Solution Steps
+          {t("solutionSteps")}
         </h3>
         <div className="space-y-3">
           {solution.steps.map((step, idx) => (
@@ -70,7 +74,7 @@ export function SolutionDisplay({
       {/* Answer */}
       <div className="space-y-3">
         <h3 className="text-lg xs:text-xl font-semibold text-slate-900 dark:text-white">
-          Answer
+          {t("answer")}
         </h3>
         <motion.div
           initial={{ opacity: 0 }}
@@ -87,7 +91,7 @@ export function SolutionDisplay({
       {/* Explanation */}
       <div className="space-y-3">
         <h3 className="text-lg xs:text-xl font-semibold text-slate-900 dark:text-white">
-          Explanation
+          {t("explanation")}
         </h3>
         <motion.div
           initial={{ opacity: 0 }}
@@ -120,7 +124,7 @@ export function SolutionDisplay({
               "focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950",
             )}
           >
-            <span>Solve Another</span>
+            <span>{t("solveAnother")}</span>
           </button>
         </TouchTarget>
       </div>

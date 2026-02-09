@@ -15,6 +15,7 @@ import {
 } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { useTranslations } from "next-intl";
 
 interface SystemControlsProps {
   maintenanceMode: MaintenanceModeState;
@@ -27,6 +28,7 @@ export function SystemControls({
   globalKillSwitch,
   onUpdate,
 }: SystemControlsProps) {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState(false);
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   const [maintenanceMessage, setMaintenanceMessage] = useState(
@@ -119,13 +121,13 @@ export function SystemControls({
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Maintenance Mode</CardTitle>
+          <CardTitle>{t("maintenanceMode")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold">
-                Status:{" "}
+                {t("status1")}{" "}
                 <Badge
                   className={
                     maintenanceMode.isEnabled
@@ -155,7 +157,7 @@ export function SystemControls({
       {showMaintenanceModal && (
         <Card>
           <CardHeader>
-            <CardTitle>Configure Maintenance Mode</CardTitle>
+            <CardTitle>{t("configureMaintenanceMode")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -163,14 +165,14 @@ export function SystemControls({
                 htmlFor="maintenance-message"
                 className="text-sm font-medium"
               >
-                Message
+                {t("message")}
               </label>
               <input
                 type="text"
                 id="maintenance-message"
                 value={maintenanceMessage}
                 onChange={(e) => setMaintenanceMessage(e.target.value)}
-                placeholder="e.g., System maintenance in progress..."
+                placeholder={t("eGSystemMaintenanceInProgress")}
                 className="w-full mt-1 border rounded px-3 py-2 text-sm"
               />
             </div>
@@ -179,7 +181,7 @@ export function SystemControls({
                 htmlFor="maintenance-severity"
                 className="text-sm font-medium"
               >
-                Severity
+                {t("severity")}
               </label>
               <select
                 id="maintenance-severity"
@@ -191,9 +193,9 @@ export function SystemControls({
                 }
                 className="w-full mt-1 border rounded px-3 py-2 text-sm"
               >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
+                <option value="low">{t("low")}</option>
+                <option value="medium">{t("medium")}</option>
+                <option value="high">{t("high")}</option>
               </select>
             </div>
             <div>
@@ -201,7 +203,7 @@ export function SystemControls({
                 htmlFor="maintenance-end-time"
                 className="text-sm font-medium"
               >
-                Estimated End Time (optional)
+                {t("estimatedEndTimeOptional")}
               </label>
               <input
                 type="datetime-local"
@@ -216,13 +218,13 @@ export function SystemControls({
                 onClick={() => handleMaintenanceToggle(true)}
                 disabled={loading}
               >
-                Enable Maintenance
+                {t("enableMaintenance")}
               </Button>
               <Button
                 onClick={() => setShowMaintenanceModal(false)}
                 variant="outline"
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </CardContent>
@@ -231,13 +233,13 @@ export function SystemControls({
 
       <Card className="border-red-200 bg-red-50">
         <CardHeader>
-          <CardTitle className="text-red-800">Global Kill Switch</CardTitle>
+          <CardTitle className="text-red-800">{t("globalKillSwitch")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold">
-                Status:{" "}
+                {t("status")}{" "}
                 <Badge
                   className={
                     globalKillSwitch.isEnabled
@@ -250,7 +252,7 @@ export function SystemControls({
               </p>
               {globalKillSwitch.reason && (
                 <p className="text-sm text-red-700 mt-1">
-                  Reason: {globalKillSwitch.reason}
+                  {t("reason")} {globalKillSwitch.reason}
                 </p>
               )}
             </div>

@@ -1,11 +1,15 @@
+"use client";
+
 /**
  * Content preview sub-components
  * Individual preview renderers for different content types
  */
 
 import { Brain, FileText } from 'lucide-react';
+import { useTranslations } from "next-intl";
 
 export function MindMapPreview({ content }: { content: unknown }) {
+  const t = useTranslations("education");
   const data = content as { nodes?: Array<{ id: string; label: string }> };
 
   return (
@@ -13,11 +17,11 @@ export function MindMapPreview({ content }: { content: unknown }) {
       <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-8 text-center">
         <Brain className="w-16 h-16 text-blue-500 mx-auto mb-4" />
         <p className="text-slate-600 dark:text-slate-400">
-          Anteprima Mappa Mentale
+          {t("anteprimaMappaMentale")}
         </p>
         {data?.nodes && (
           <p className="text-sm text-slate-500 mt-2">
-            {data.nodes.length} nodi
+            {data.nodes.length} {t("nodi")}
           </p>
         )}
       </div>
@@ -26,6 +30,7 @@ export function MindMapPreview({ content }: { content: unknown }) {
 }
 
 export function QuizPreview({ content }: { content: unknown }) {
+  const t = useTranslations("education");
   const data = content as { questions?: Array<{ question: string; options?: string[] }> };
   const firstQuestion = data?.questions?.[0];
 
@@ -33,7 +38,7 @@ export function QuizPreview({ content }: { content: unknown }) {
     <div className="space-y-4">
       <div className="bg-green-50 dark:bg-green-950 rounded-lg p-6 border border-green-200 dark:border-green-800">
         <h3 className="font-semibold text-green-900 dark:text-green-100 mb-4">
-          Prima Domanda
+          {t("primaDomanda")}
         </h3>
         {firstQuestion ? (
           <>
@@ -55,13 +60,13 @@ export function QuizPreview({ content }: { content: unknown }) {
           </>
         ) : (
           <p className="text-green-700 dark:text-green-300">
-            Nessuna domanda disponibile
+            {t("nessunaDomandaDisponibile")}
           </p>
         )}
       </div>
       {data?.questions && data.questions.length > 1 && (
         <p className="text-sm text-slate-500 text-center">
-          +{data.questions.length - 1} altre domande
+          +{data.questions.length - 1} {t("altreDomande")}
         </p>
       )}
     </div>
@@ -69,6 +74,7 @@ export function QuizPreview({ content }: { content: unknown }) {
 }
 
 export function SummaryPreview({ content }: { content: unknown }) {
+  const t = useTranslations("education");
   const data = content as { summary?: string; text?: string };
   const text = data?.summary || data?.text || '';
   const preview = text.substring(0, 200);
@@ -83,7 +89,7 @@ export function SummaryPreview({ content }: { content: unknown }) {
       </div>
       {text.length > 200 && (
         <p className="text-sm text-slate-500 text-center">
-          Mostra tutto ({Math.ceil(text.length / 100)} parole circa)
+          {t("mostraTutto")}{Math.ceil(text.length / 100)} {t("paroleCirca")}
         </p>
       )}
     </div>
@@ -91,6 +97,7 @@ export function SummaryPreview({ content }: { content: unknown }) {
 }
 
 export function FlashcardPreview({ content }: { content: unknown }) {
+  const t = useTranslations("education");
   const data = content as { cards?: Array<{ front: string; back: string }> };
   const firstCard = data?.cards?.[0];
 
@@ -110,18 +117,18 @@ export function FlashcardPreview({ content }: { content: unknown }) {
           </div>
           <div className="mt-4 text-center">
             <p className="text-sm text-slate-500">
-              Tocca per vedere il retro
+              {t("toccaPerVedereIlRetro")}
             </p>
           </div>
         </div>
       ) : (
         <p className="text-slate-600 dark:text-slate-400 text-center">
-          Nessuna flashcard disponibile
+          {t("nessunaFlashcardDisponibile")}
         </p>
       )}
       {data?.cards && data.cards.length > 1 && (
         <p className="text-sm text-slate-500 text-center">
-          +{data.cards.length - 1} altre flashcard
+          +{data.cards.length - 1} {t("altreFlashcard")}
         </p>
       )}
     </div>
@@ -129,11 +136,12 @@ export function FlashcardPreview({ content }: { content: unknown }) {
 }
 
 export function GenericPreview({ content }: { content: unknown }) {
+  const t = useTranslations("education");
   return (
     <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-8 text-center">
       <FileText className="w-16 h-16 text-slate-400 mx-auto mb-4" />
       <p className="text-slate-600 dark:text-slate-400">
-        Anteprima non disponibile per questo tipo di contenuto
+        {t("anteprimaNonDisponibilePerQuestoTipoDiContenuto")}
       </p>
       <pre className="mt-4 text-xs text-left overflow-auto bg-slate-100 dark:bg-slate-900 p-4 rounded">
         {JSON.stringify(content, null, 2)}

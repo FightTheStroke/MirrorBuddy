@@ -122,7 +122,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
             <button
               onClick={() => setSearchQuery("")}
               className="absolute right-1 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-              aria-label="Cancella ricerca"
+              aria-label={t("cancellaRicerca")}
               type="button"
             >
               <svg

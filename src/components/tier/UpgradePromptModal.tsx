@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { X, Sparkles, ArrowRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface UpgradePromptModalProps {
   isOpen: boolean;
@@ -76,6 +77,7 @@ export function UpgradePromptModal({
   currentTier,
   triggerReason,
 }: UpgradePromptModalProps) {
+  const t = useTranslations("pricing");
   const dialogRef = useRef<HTMLDivElement>(null);
   const modalId = "upgrade-prompt-modal";
   const titleId = `${modalId}-title`;
@@ -138,7 +140,7 @@ export function UpgradePromptModal({
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10"
-          aria-label="Close"
+          aria-label={t("close")}
         >
           <X className="w-5 h-5 text-slate-400" />
         </button>
@@ -171,37 +173,26 @@ export function UpgradePromptModal({
           {/* Comparison section */}
           <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 space-y-3">
             <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 uppercase tracking-wide">
-              What you&apos;re missing
+              {t("whatYouAposReMissing")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex items-start gap-2">
                 <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    Unlimited Messages
+                    {t("unlimitedMessages")}
                   </p>
-                  <p className="text-xs text-slate-500">No daily chat limits</p>
+                  <p className="text-xs text-slate-500">{t("noDailyChatLimits")}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">
                 <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    Unlimited Voice
+                    {t("unlimitedVoice")}
                   </p>
                   <p className="text-xs text-slate-500">
-                    Talk as long as you need
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    All Maestri
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    Access to 20+ AI tutors
+                    {t("talkAsLongAsYouNeed")}
                   </p>
                 </div>
               </div>
@@ -209,10 +200,21 @@ export function UpgradePromptModal({
                 <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    Premium Features
+                    {t("allMaestri")}
                   </p>
                   <p className="text-xs text-slate-500">
-                    PDF export, advanced tools
+                    {t("accessTo20AiTutors")}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Sparkles className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    {t("premiumFeatures")}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {t("pdfExportAdvancedTools")}
                   </p>
                 </div>
               </div>
@@ -227,13 +229,13 @@ export function UpgradePromptModal({
             onClick={onClose}
             className="w-full sm:w-auto order-2 sm:order-1"
           >
-            Maybe Later
+            {t("maybeLater")}
           </Button>
           <Button
             onClick={onUpgrade}
             className="w-full sm:w-auto gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 order-1 sm:order-2"
           >
-            Upgrade to Pro
+            {t("upgradeToPro")}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

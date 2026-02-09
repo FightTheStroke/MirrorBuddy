@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * PDFDocument Component
  * Main document wrapper for accessible PDF generation
@@ -17,6 +19,7 @@ import { PDFText } from './PDFText';
 import { PDFList } from './PDFList';
 import { PDFImage } from './PDFImage';
 import { sanitizeNumber } from '../utils/style-utils';
+import { useTranslations } from "next-intl";
 
 // Register default fonts
 Font.register({
@@ -101,6 +104,7 @@ export function PDFDocumentComponent({
   profile,
   format = 'A4',
 }: PDFDocumentProps) {
+  const t = useTranslations("tools");
   const styles = createStyles(profile, format);
   const pageSize = format === 'A4' ? 'A4' : 'LETTER';
 
@@ -126,7 +130,7 @@ export function PDFDocumentComponent({
           </PDFTitle>
           {profile.options.readingTimeEstimate && (
             <PDFText style={styles.readingInfo} profile={profile}>
-              Tempo di lettura stimato: {content.metadata.readingTime} minuti
+              {t("tempoDiLetturaStimato")} {content.metadata.readingTime} {t("minuti")}
             </PDFText>
           )}
         </View>
@@ -143,7 +147,7 @@ export function PDFDocumentComponent({
         {/* Footer with page numbers */}
         <View style={styles.footer} fixed>
           <PDFText profile={profile}>
-            {profile.nameIt} - Generato da MirrorBuddy
+            {profile.nameIt} {t("generatoDaMirrorbuddy")}
           </PDFText>
           <PDFText
             style={styles.pageNumber}

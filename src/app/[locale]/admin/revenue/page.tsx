@@ -5,6 +5,7 @@
 
 import { prisma } from "@/lib/db";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "Revenue Dashboard | Admin",
@@ -164,6 +165,7 @@ async function getRevenueMetrics(): Promise<RevenueMetrics> {
 }
 
 export default async function RevenueDashboardPage() {
+  const t = await getTranslations("admin");
   const metrics = await getRevenueMetrics();
 
   return (
@@ -173,11 +175,11 @@ export default async function RevenueDashboardPage() {
           href="/admin"
           className="text-sm text-indigo-600 hover:text-indigo-900"
         >
-          ← Back to Admin
+          {t("backToAdmin")}
         </Link>
       </div>
 
-      <h1 className="mb-6 text-3xl font-bold">Revenue Dashboard</h1>
+      <h1 className="mb-6 text-3xl font-bold">{t("revenueDashboard")}</h1>
 
       {/* Key Metrics */}
       <div className="mb-8 grid gap-6 md:grid-cols-3 lg:grid-cols-6">
@@ -196,34 +198,34 @@ export default async function RevenueDashboardPage() {
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <div className="text-sm font-medium text-gray-500">Active Subs</div>
+          <div className="text-sm font-medium text-gray-500">{t("activeSubs")}</div>
           <div className="mt-2 text-3xl font-bold">
             {metrics.activeSubscriptions}
           </div>
           <div className="mt-1 text-xs text-gray-500">
-            {metrics.proSubscriptions} Pro / {metrics.baseSubscriptions} Base
+            {metrics.proSubscriptions} {t("pro")} {metrics.baseSubscriptions} {t("base")}
           </div>
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <div className="text-sm font-medium text-gray-500">Trial Users</div>
+          <div className="text-sm font-medium text-gray-500">{t("trialUsers")}</div>
           <div className="mt-2 text-3xl font-bold text-blue-600">
             {metrics.trialUsers}
           </div>
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <div className="text-sm font-medium text-gray-500">Churn Rate</div>
+          <div className="text-sm font-medium text-gray-500">{t("churnRate")}</div>
           <div
             className={`mt-2 text-3xl font-bold ${metrics.churnRate > 5 ? "text-red-600" : "text-green-600"}`}
           >
             {metrics.churnRate}%
           </div>
-          <div className="mt-1 text-xs text-gray-500">Last 30 days</div>
+          <div className="mt-1 text-xs text-gray-500">{t("last30Days")}</div>
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <div className="text-sm font-medium text-gray-500">Avg LTV</div>
+          <div className="text-sm font-medium text-gray-500">{t("avgLtv")}</div>
           <div className="mt-2 text-3xl font-bold">
             €{metrics.avgLTV.toFixed(2)}
           </div>
@@ -233,7 +235,7 @@ export default async function RevenueDashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Monthly Trend */}
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">MRR Trend (6 months)</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("mrrTrend6Months")}</h2>
           <div className="space-y-2">
             {metrics.monthlyTrend.map((month) => (
               <div
@@ -252,7 +254,7 @@ export default async function RevenueDashboardPage() {
                     €{month.mrr.toFixed(0)}
                   </span>
                   <span className="w-16 text-right text-xs text-gray-500">
-                    {month.subscribers} subs
+                    {month.subscribers} {t("subs")}
                   </span>
                 </div>
               </div>
@@ -262,7 +264,7 @@ export default async function RevenueDashboardPage() {
 
         {/* Revenue by Country */}
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Revenue by Country</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("revenueByCountry")}</h2>
           <div className="space-y-3">
             {metrics.revenueByCountry.map((item) => (
               <div
@@ -295,7 +297,7 @@ export default async function RevenueDashboardPage() {
 
         {/* Recent Activity */}
         <div className="rounded-lg bg-white p-6 shadow lg:col-span-2">
-          <h2 className="mb-4 text-lg font-medium">Recent Activity</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("recentActivity")}</h2>
           {metrics.recentActivity.length > 0 ? (
             <div className="space-y-2">
               {metrics.recentActivity.map((activity, i) => (
@@ -318,7 +320,7 @@ export default async function RevenueDashboardPage() {
                       {activity.type}
                     </span>
                     <span className="text-sm text-gray-600">
-                      User {activity.userId.slice(0, 8)}...
+                      {t("user")} {activity.userId.slice(0, 8)}...
                     </span>
                     {activity.from && activity.to && (
                       <span className="text-xs text-gray-500">
@@ -333,7 +335,7 @@ export default async function RevenueDashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">No recent activity</p>
+            <p className="text-sm text-gray-500">{t("noRecentActivity")}</p>
           )}
         </div>
       </div>

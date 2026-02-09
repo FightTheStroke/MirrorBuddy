@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { ActiveToolState } from '@/lib/hooks/use-tool-stream';
 import { BuildingAnimation } from './building-animation';
+import { useTranslations } from "next-intl";
 
 interface MaestroPipProps {
   maestroName: string;
@@ -25,6 +26,7 @@ export function MaestroPip({
   eventsReceived,
   onHide,
 }: MaestroPipProps) {
+  const t = useTranslations("tools");
 
   return (
     <motion.div
@@ -51,7 +53,7 @@ export function MaestroPip({
             )}
             <div>
               <p className="font-medium text-white">{maestroName}</p>
-              <p className="text-xs text-slate-400">Sta costruendo...</p>
+              <p className="text-xs text-slate-400">{t("staCostruendo")}</p>
             </div>
           </div>
         </div>
@@ -77,9 +79,9 @@ export function MaestroPip({
         {/* Stats */}
         <div className="p-4 border-t border-slate-800">
           <div className="text-xs text-slate-500 space-y-1">
-            <p>Eventi ricevuti: {eventsReceived}</p>
+            <p>{t("eventiRicevuti")} {eventsReceived}</p>
             {activeTool && (
-              <p>Chunks: {activeTool.chunks.length}</p>
+              <p>{t("chunks")} {activeTool.chunks.length}</p>
             )}
           </div>
         </div>
@@ -88,7 +90,7 @@ export function MaestroPip({
         <button
           onClick={onHide}
           className="absolute top-2 right-2 p-1 rounded hover:bg-slate-800 transition-colors"
-          aria-label="Nascondi PiP"
+          aria-label={t("nascondiPip")}
         >
           <X className="w-4 h-4 text-slate-500" />
         </button>

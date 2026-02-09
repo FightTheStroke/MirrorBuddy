@@ -124,7 +124,7 @@ export default function AchievementsPage() {
         {/* Quick Stats Card */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Quick Stats</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("quickStats")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

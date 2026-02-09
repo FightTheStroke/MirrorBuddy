@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface MobileHeaderProps {
   title?: string;
@@ -17,6 +18,7 @@ export function MobileHeader({
   showAvatar = true,
   className,
 }: MobileHeaderProps) {
+  const t = useTranslations("common");
   return (
     <header
       className={cn(
@@ -32,7 +34,7 @@ export function MobileHeader({
         size="icon"
         onClick={onMenuClick}
         className="min-w-[44px] min-h-[44px]"
-        aria-label="menu"
+        aria-label={t("menu")}
       >
         <Menu className="w-5 h-5" />
       </Button>

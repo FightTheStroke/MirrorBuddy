@@ -22,6 +22,7 @@ import { QuizProgressHeader } from "./quiz-interface-mobile/quiz-progress-header
 import { AnswerOptions } from "./quiz-interface-mobile/answer-options";
 import { HintSection } from "./quiz-interface-mobile/hint-section";
 import { QuizCompletionScreen } from "./quiz-interface-mobile/quiz-completion-screen";
+import { useTranslations } from "next-intl";
 
 interface QuizInterfaceMobileProps {
   quiz: Quiz;
@@ -34,6 +35,7 @@ export function QuizInterfaceMobile({
   onComplete,
   onClose,
 }: QuizInterfaceMobileProps) {
+  const t = useTranslations("education");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -177,7 +179,7 @@ export function QuizInterfaceMobile({
                   disabled={selectedAnswer === null}
                   className="w-full xs:w-auto min-h-12 xs:min-h-10"
                 >
-                  Check Answer
+                  {t("checkAnswer")}
                 </Button>
               ) : (
                 <Button
@@ -186,7 +188,7 @@ export function QuizInterfaceMobile({
                 >
                   {currentIndex < quiz.questions.length - 1 ? (
                     <>
-                      Next
+                      {t("next")}
                       <ChevronRight className="w-4 h-4" />
                     </>
                   ) : (
@@ -199,7 +201,7 @@ export function QuizInterfaceMobile({
                 onClick={onClose}
                 className="w-full xs:w-auto min-h-12 xs:min-h-10 text-xs xs:text-sm"
               >
-                Exit
+                {t("exit")}
               </Button>
             </div>
           </motion.div>

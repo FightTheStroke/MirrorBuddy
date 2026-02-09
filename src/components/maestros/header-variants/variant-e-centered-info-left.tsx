@@ -27,6 +27,7 @@ import { AudioDeviceSelector } from "@/components/conversation/components/audio-
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface HeaderVariantProps {
   maestro: Maestro;
@@ -47,6 +48,7 @@ interface HeaderVariantProps {
 }
 
 export function HeaderVariantE(props: HeaderVariantProps) {
+  const t = useTranslations("chat");
   const {
     maestro,
     isVoiceActive,
@@ -115,7 +117,7 @@ export function HeaderVariantE(props: HeaderVariantProps) {
             size="icon"
             onClick={onClearChat}
             className="rounded-full h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
-            aria-label="Nuova conversazione"
+            aria-label={t("nuovaConversazione")}
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -127,7 +129,7 @@ export function HeaderVariantE(props: HeaderVariantProps) {
           size="icon"
           onClick={onClose}
           className="rounded-full h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
-          aria-label="Chiudi (Esc)"
+          aria-label={t("chiudiEsc")}
         >
           <X className="w-4 h-4" />
         </Button>

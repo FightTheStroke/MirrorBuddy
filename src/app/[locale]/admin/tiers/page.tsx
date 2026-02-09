@@ -4,6 +4,7 @@
 
 import { prisma } from "@/lib/db";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "Tier Management | Admin",
@@ -17,17 +18,18 @@ async function getTiers() {
 }
 
 export default async function AdminTiersPage() {
+  const t = await getTranslations("admin");
   const tiers = await getTiers();
 
   return (
     <div className="p-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Tier Management</h1>
+        <h1 className="text-3xl font-bold">{t("tierManagement")}</h1>
         <Link
           href="/admin/tiers/new"
           className="rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
         >
-          Create Tier
+          {t("createTier")}
         </Link>
       </div>
 
@@ -36,19 +38,19 @@ export default async function AdminTiersPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Code
+                {t("code")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Name
+                {t("name")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Price
+                {t("price")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Status
+                {t("status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Actions
+                {t("actions")}
               </th>
             </tr>
           </thead>
@@ -68,7 +70,7 @@ export default async function AdminTiersPage() {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                   <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
-                    Active
+                    {t("active")}
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
@@ -76,19 +78,19 @@ export default async function AdminTiersPage() {
                     href={`/admin/tiers/${tier.id}/edit`}
                     className="mr-4 text-indigo-600 hover:text-indigo-900"
                   >
-                    Edit
+                    {t("edit")}
                   </Link>
                   <Link
                     href={`/admin/tiers/${tier.id}/features`}
                     className="mr-4 text-indigo-600 hover:text-indigo-900"
                   >
-                    Features
+                    {t("features")}
                   </Link>
                   <Link
                     href={`/admin/tiers/${tier.id}/pricing`}
                     className="text-indigo-600 hover:text-indigo-900"
                   >
-                    Pricing
+                    {t("pricing")}
                   </Link>
                 </td>
               </tr>

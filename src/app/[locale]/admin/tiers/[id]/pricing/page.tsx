@@ -2,13 +2,14 @@
  * Tier Pricing & Stripe Sync
  * Task: T1-13 (F-28)
  */
-/* eslint-disable jsx-a11y/label-has-associated-control */
+ 
 
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import Stripe from "stripe";
+import { getTranslations } from "next-intl/server";
 
 // Lazy init Stripe to avoid build-time errors
 function getStripe() {
@@ -121,6 +122,7 @@ async function updatePricing(formData: FormData) {
 }
 
 export default async function TierPricingPage({ params }: Props) {
+  const t = await getTranslations("admin");
   const { id } = await params;
   const tier = await getTier(id);
 
@@ -131,31 +133,31 @@ export default async function TierPricingPage({ params }: Props) {
           href="/admin/tiers"
           className="text-sm text-indigo-600 hover:text-indigo-900"
         >
-          ← Back to Tiers
+          {t("backToTiers")}
         </Link>
       </div>
 
-      <h1 className="mb-2 text-3xl font-bold">Pricing: {tier.name}</h1>
+      <h1 className="mb-2 text-3xl font-bold">{t("pricing")} {tier.name}</h1>
       <p className="mb-6 text-gray-600">
-        Configure pricing and sync with Stripe
+        {t("configurePricingAndSyncWithStripe")}
       </p>
 
       <form action={updatePricing} className="max-w-2xl space-y-6">
         <input type="hidden" name="id" value={tier.id} />
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Current Pricing</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("currentPricing")}</h2>
 
           <div className="mb-4 rounded-md bg-gray-50 p-4">
             <div className="grid gap-2 text-sm">
               <div>
-                <span className="font-medium">Current Price:</span>{" "}
+                <span className="font-medium">{t("currentPrice")}</span>{" "}
                 {tier.monthlyPriceEur
                   ? `€${Number(tier.monthlyPriceEur).toFixed(2)}/month`
                   : "Free"}
               </div>
               <div>
-                <span className="font-medium">Stripe Price ID:</span>{" "}
+                <span className="font-medium">{t("stripePriceId")}</span>{" "}
                 <code className="rounded bg-gray-200 px-1 text-xs">
                   {tier.stripePriceId || "Not synced"}
                 </code>
@@ -166,7 +168,7 @@ export default async function TierPricingPage({ params }: Props) {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Monthly Price (EUR)
+                {t("monthlyPriceEur")}
               </label>
               <input
                 type="number"
@@ -174,37 +176,37 @@ export default async function TierPricingPage({ params }: Props) {
                 step="0.01"
                 min="0"
                 defaultValue={tier.monthlyPriceEur?.toString() || ""}
-                placeholder="0.00 for free tier"
+                placeholder={t("k000ForFreeTier")}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Currency
+                {t("currency")}
               </label>
               <select
                 name="currency"
                 defaultValue="eur"
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               >
-                <option value="eur">EUR (€)</option>
-                <option value="usd">USD ($)</option>
-                <option value="gbp">GBP (£)</option>
+                <option value="eur">{t("eur")}</option>
+                <option value="usd">{t("usd")}</option>
+                <option value="gbp">{t("gbp")}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Billing Interval
+                {t("billingInterval")}
               </label>
               <select
                 name="billingInterval"
                 defaultValue="month"
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               >
-                <option value="month">Monthly</option>
-                <option value="year">Yearly</option>
+                <option value="month">{t("monthly")}</option>
+                <option value="year">{t("yearly")}</option>
               </select>
             </div>
 
@@ -220,18 +222,18 @@ export default async function TierPricingPage({ params }: Props) {
                 htmlFor="syncToStripe"
                 className="ml-2 text-sm text-gray-700"
               >
-                Sync to Stripe (creates new price, archives old)
+                {t("syncToStripeCreatesNewPriceArchivesOld")}
               </label>
             </div>
           </div>
         </div>
 
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <h3 className="text-sm font-medium text-yellow-800">Important</h3>
+          <h3 className="text-sm font-medium text-yellow-800">{t("important")}</h3>
           <p className="mt-1 text-sm text-yellow-700">
-            Changing the price will create a new Stripe Price and archive the
-            old one. Existing subscriptions will continue at their current price
-            until renewal.
+            {t("changingThePriceWillCreateANewStripePriceAndArchiv")}
+            {t("oldOneExistingSubscriptionsWillContinueAtTheirCurr")}
+
           </p>
         </div>
 
@@ -240,13 +242,13 @@ export default async function TierPricingPage({ params }: Props) {
             href="/admin/tiers"
             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t("cancel")}
           </Link>
           <button
             type="submit"
             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
-            Update Pricing
+            {t("updatePricing")}
           </button>
         </div>
       </form>

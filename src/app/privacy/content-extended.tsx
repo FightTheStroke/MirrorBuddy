@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Section } from './section';
 
 export function PrivacyContentExtended() {
+  const t = useTranslations("compliance");
   const s10 = useTranslations('compliance.legal.privacy.section10');
   const s11 = useTranslations('compliance.legal.privacy.section11');
   const s12 = useTranslations('compliance.legal.privacy.section12');
@@ -55,7 +56,7 @@ export function PrivacyContentExtended() {
           </li>
         </ul>
         <p className="mt-4">
-          <strong>Vercel Analytics:</strong> {s11('vercelAnalytics')}
+          <strong>{t("vercelAnalytics")}</strong> {s11('vercelAnalytics')}
         </p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
@@ -76,7 +77,7 @@ export function PrivacyContentExtended() {
           </li>
         </ul>
         <p className="mt-4">
-          <strong>Sentry (Monitoraggio Errori e Performance):</strong> {s11('sentry')}
+          <strong>{s11('sentryTitle')}</strong> {s11('sentry')}
         </p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>

@@ -64,7 +64,7 @@ export function SVGDiagramContainer({
               : "border-slate-200 text-slate-400 bg-slate-50",
           )}
         >
-          Visualizzazione semplificata (Mermaid)
+          {t("visualizzazioneSemplificataMermaid")}
         </div>
       )}
     </div>

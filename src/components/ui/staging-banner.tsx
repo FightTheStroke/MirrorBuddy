@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { isStaging } from "@/lib/environment/staging-detector";
+import { useTranslations } from "next-intl";
 
 /**
  * StagingBanner component displays a warning banner when running in staging environment.
@@ -28,6 +29,7 @@ function shouldShowStagingBanner(): boolean {
 }
 
 export function StagingBanner() {
+  const t = useTranslations("common");
   const [showBanner, setShowBanner] = useState(() => shouldShowStagingBanner());
 
   if (!showBanner) return null;
@@ -41,13 +43,13 @@ export function StagingBanner() {
   return (
     <div
       role="banner"
-      aria-label="Staging environment indicator"
+      aria-label={t("stagingEnvironmentIndicator")}
       className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 px-4 py-2 text-center text-sm font-medium flex items-center justify-center gap-2"
     >
-      <span>⚠️ STAGING ENVIRONMENT - Data will be marked as test data</span>
+      <span>{t("stagingEnvironmentDataWillBeMarkedAsTestData")}</span>
       <button
         onClick={handleDismiss}
-        aria-label="Dismiss staging banner"
+        aria-label={t("dismissStagingBanner")}
         className="ml-4 px-2 py-0.5 bg-amber-600 hover:bg-amber-700 rounded text-xs text-amber-950 font-semibold transition-colors"
         type="button"
       >

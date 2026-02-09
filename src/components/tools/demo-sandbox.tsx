@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
 import { useBlobUrl } from '@/lib/tools/use-blob-url';
+import { useTranslations } from "next-intl";
 
 interface DemoSandboxProps {
   data?: {
@@ -18,6 +19,7 @@ interface DemoSandboxProps {
 }
 
 export function DemoSandbox(props: DemoSandboxProps) {
+  const t = useTranslations("tools");
   const { data } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [key, setKey] = useState(0);
@@ -51,7 +53,7 @@ export function DemoSandbox(props: DemoSandboxProps) {
         </h3>
         <Button variant="ghost" size="sm" onClick={handleRefresh}>
           <RefreshCw className="w-4 h-4 mr-1" />
-          Ricarica
+          {t("ricarica")}
         </Button>
       </div>
 
@@ -62,7 +64,7 @@ export function DemoSandbox(props: DemoSandboxProps) {
           src={blobUrl}
           sandbox={getDemoSandboxPermissions()}
           className="w-full h-full border-0"
-          title="Demo interattiva"
+          title={t("demoInterattiva")}
           allow={getDemoAllowPermissions()}
           style={{ minHeight: '400px', width: '100%', height: '100%' }}
           onLoad={() => {

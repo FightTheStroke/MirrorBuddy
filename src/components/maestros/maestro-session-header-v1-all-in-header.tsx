@@ -25,6 +25,7 @@ import { AudioVisualizer } from "./audio-visualizer";
 import { getStatusText, getMuteStatusText } from "./maestro-header-utils";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -63,6 +64,7 @@ export function MaestroSessionHeaderV1({
   onClearChat,
   onClose,
 }: MaestroSessionHeaderV1Props) {
+  const t = useTranslations("chat");
   return (
     <div
       className="flex flex-col gap-2 sm:gap-3 p-2 sm:p-4 rounded-t-2xl text-white"
@@ -108,7 +110,7 @@ export function MaestroSessionHeaderV1({
               {maestro.displayName}
             </h2>
             <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
-              Professore
+              {t("professore")}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-white/80 truncate">
@@ -194,7 +196,7 @@ export function MaestroSessionHeaderV1({
             size="icon"
             onClick={onClearChat}
             className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-            aria-label="Nuova conversazione"
+            aria-label={t("nuovaConversazione")}
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -205,7 +207,7 @@ export function MaestroSessionHeaderV1({
             size="icon"
             onClick={onClose}
             className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-            aria-label="Chiudi"
+            aria-label={t("chiudi")}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -251,12 +253,12 @@ export function MaestroSessionHeaderV1({
               {isMuted ? (
                 <>
                   <MicOff className="w-4 h-4 mr-1.5" />
-                  <span className="text-xs hidden sm:inline">Muto</span>
+                  <span className="text-xs hidden sm:inline">{t("muto")}</span>
                 </>
               ) : (
                 <>
                   <Mic className="w-4 h-4 mr-1.5" />
-                  <span className="text-xs hidden sm:inline">Microfono</span>
+                  <span className="text-xs hidden sm:inline">{t("microfono")}</span>
                 </>
               )}
             </Button>

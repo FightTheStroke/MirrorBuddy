@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { Quiz as QuizType, QuizResult } from "@/types";
 import { QuizHeader } from "./quiz/quiz-header";
 import { QuizCompletion } from "./quiz/quiz-completion";
+import { useTranslations } from "next-intl";
 
 interface QuizProps {
   quiz: QuizType;
@@ -17,6 +18,7 @@ interface QuizProps {
 }
 
 export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
+  const t = useTranslations("education");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -193,7 +195,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
                 ) : (
                   <Button variant="ghost" size="sm" onClick={handleShowHint}>
                     <Lightbulb className="w-4 h-4 mr-2" />
-                    Mostra suggerimento
+                    {t("mostraSuggerimento")}
                   </Button>
                 )}
               </div>
@@ -219,13 +221,13 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
                   onClick={handleSubmit}
                   disabled={selectedAnswer === null}
                 >
-                  Verifica
+                  {t("verifica")}
                 </Button>
               ) : (
                 <Button onClick={handleNext}>
                   {currentIndex < quiz.questions.length - 1 ? (
                     <>
-                      Prossima
+                      {t("prossima")}
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   ) : (

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import type { KeyMappingResult } from "@/lib/typing/key-mapping-engine";
+import { useTranslations } from "next-intl";
 
 export interface FeedbackConfig {
   enableAudio: boolean;
@@ -25,6 +26,7 @@ export function FeedbackSystem({
   },
   onHint,
 }: FeedbackSystemProps) {
+  const t = useTranslations("education");
   const [showHint, setShowHint] = useState(false);
 
   const handleShowHint = useCallback(() => {
@@ -52,23 +54,23 @@ export function FeedbackSystem({
         >
           <div className="flex items-center gap-4">
             {result.isBackspace ? (
-              <span className="text-muted-foreground">Backspace</span>
+              <span className="text-muted-foreground">{t("backspace")}</span>
             ) : result.correct ? (
               <span className="text-green-600 dark:text-green-400 font-semibold">
-                Correct: {result.actual}
+                {t("correct")} {result.actual}
               </span>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-red-600 dark:text-red-400">
-                  Expected: {result.expected}
+                  {t("expected")} {result.expected}
                 </span>
                 {config.enableHints && (
                   <button
                     onClick={handleShowHint}
                     className="text-sm text-primary hover:underline"
-                    aria-label="Show hint"
+                    aria-label={t("showHint")}
                   >
-                    Hint
+                    {t("hint")}
                   </button>
                 )}
               </div>
@@ -77,7 +79,7 @@ export function FeedbackSystem({
 
           {showHint && !result.correct && config.enableHints && (
             <div className="mt-2 text-sm text-muted-foreground">
-              Hint: Press{" "}
+              {t("hintPress")}{" "}
               <kbd className="px-2 py-1 bg-muted rounded">
                 {result.expected}
               </kbd>

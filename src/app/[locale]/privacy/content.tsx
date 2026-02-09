@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContent() {
+  const t = useTranslations("common");
   const s1 = useTranslations("compliance.legal.privacy.section1");
   const s2 = useTranslations("compliance.legal.privacy.section2");
   const s3 = useTranslations("compliance.legal.privacy.section3");
@@ -155,10 +156,10 @@ export function PrivacyContent() {
             <strong>Vercel</strong>: {s8("subprocessors.vercel")}
           </li>
           <li>
-            <strong>Supabase</strong>: {s8("subprocessors.supabase")}
+            <strong>{t("supabase")}</strong>: {s8("subprocessors.supabase")}
           </li>
           <li>
-            <strong>Resend</strong>: {s8("subprocessors.resend")}
+            <strong>{t("resend")}</strong>: {s8("subprocessors.resend")}
           </li>
           <li>
             <strong>Azure</strong>: {s8("subprocessors.azure")}
@@ -173,16 +174,16 @@ export function PrivacyContent() {
       <Section number={9} title={s9("title")}>
         <ul>
           <li>
-            <strong>Account attivo</strong> - {s9("items.activeAccount")}
+            <strong>{t("accountAttivo")}</strong> - {s9("items.activeAccount")}
           </li>
           <li>
-            <strong>Conversazioni</strong> - {s9("items.conversations")}
+            <strong>{t("conversazioni")}</strong> - {s9("items.conversations")}
           </li>
           <li>
-            <strong>Web Vitals</strong> - {s9("items.webVitals")}
+            <strong>{t("webVitals")}</strong> - {s9("items.webVitals")}
           </li>
           <li>
-            <strong>Account cancellato</strong> - {s9("items.deletedAccount")}
+            <strong>{t("accountCancellato")}</strong> - {s9("items.deletedAccount")}
           </li>
         </ul>
       </Section>

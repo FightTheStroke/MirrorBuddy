@@ -179,7 +179,7 @@ export function TopicDetail({
           <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
-              {topic.estimatedMinutes} min
+              {topic.estimatedMinutes} {t("min")}
             </span>
             <span>
               {completedSteps}/{topic.steps.length} {t("stepsCompleted")}

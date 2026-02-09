@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Calendar, Flame, BookOpen } from 'lucide-react';
@@ -6,6 +8,7 @@ import { Leaderboard } from '@/components/gamification';
 import { XPInfo } from '@/components/gamification';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';
 import type { Subject } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface OverviewTabProps {
   xp: number;
@@ -16,6 +19,7 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ xp, level, levelProgress, streak, masteries }: OverviewTabProps) {
+  const t = useTranslations("education");
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const streakCalendarData = useMemo(() => {
     const today = new Date();
@@ -51,7 +55,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-500" />
-            Progressione Livello
+            {t("progressioneLivello")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -61,7 +65,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
             </div>
             <div className="flex-1">
               <p className="text-sm text-slate-500 mb-1">
-                {xp.toLocaleString()} XP totali
+                {xp.toLocaleString()} {t("xpTotali")}
               </p>
               <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <motion.div
@@ -72,7 +76,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
                 />
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                {(1000 - (xp % 1000)).toLocaleString()} XP per il livello {level + 1}
+                {(1000 - (xp % 1000)).toLocaleString()} {t("xpPerIlLivello")} {level + 1}
               </p>
             </div>
           </div>
@@ -83,7 +87,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-500" />
-            Attivita Settimanale
+            {t("attivitaSettimanale")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -108,7 +112,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Flame className="w-5 h-5 text-orange-500" />
-            Calendario Streak
+            {t("calendarioStreak")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -123,8 +127,8 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
             ))}
           </div>
           <div className="flex items-center justify-between mt-4 text-sm">
-            <span className="text-slate-500">4 settimane fa</span>
-            <span className="text-slate-500">Oggi</span>
+            <span className="text-slate-500">{t("k4SettimaneFa")}</span>
+            <span className="text-slate-500">{t("oggi")}</span>
           </div>
         </CardContent>
       </Card>
@@ -133,7 +137,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BookOpen className="w-5 h-5 text-green-500" />
-            Materie Principali
+            {t("materiePrincipali")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -168,7 +172,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
 
       <Card>
         <CardHeader>
-          <CardTitle>Come Guadagnare MB</CardTitle>
+          <CardTitle>{t("comeGuadagnareMb")}</CardTitle>
         </CardHeader>
         <CardContent>
           <XPInfo />

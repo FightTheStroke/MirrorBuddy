@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 interface FeatureToggleProps {
   label: string;
   defaultValue?: boolean;
@@ -11,6 +14,7 @@ export function FeatureToggle({
   value,
   onChange,
 }: FeatureToggleProps) {
+  const t = useTranslations("admin");
   return (
     <div className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50">
       <label className="text-sm text-slate-700 dark:text-slate-300">
@@ -19,7 +23,7 @@ export function FeatureToggle({
       <div className="flex items-center gap-2">
         {defaultValue !== undefined && (
           <span className="text-xs text-slate-500 dark:text-slate-400">
-            Default: {defaultValue ? "Yes" : "No"}
+            {t("default")} {defaultValue ? "Yes" : "No"}
           </span>
         )}
         <select
@@ -30,9 +34,9 @@ export function FeatureToggle({
           }}
           className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
         >
-          <option value="default">Use Default</option>
-          <option value="true">Enabled</option>
-          <option value="false">Disabled</option>
+          <option value="default">{t("useDefault")}</option>
+          <option value="true">{t("enabled")}</option>
+          <option value="false">{t("disabled")}</option>
         </select>
       </div>
     </div>

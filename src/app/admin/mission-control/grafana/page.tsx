@@ -8,6 +8,7 @@ import type {
   GrafanaConfig,
   GrafanaPanel,
 } from "@/lib/admin/grafana-embed-types";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
@@ -19,6 +20,7 @@ interface GrafanaPageState {
 }
 
 export default function GrafanaPage() {
+  const t = useTranslations("admin");
   const [state, setState] = useState<GrafanaPageState>({
     config: null,
     panels: null,
@@ -69,7 +71,7 @@ export default function GrafanaPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <BarChart3 className="w-12 h-12 mb-4 text-gray-400 mx-auto" />
-          <p className="text-gray-600">Loading Grafana configuration...</p>
+          <p className="text-gray-600">{t("loadingGrafanaConfiguration")}</p>
         </div>
       </div>
     );
@@ -82,7 +84,7 @@ export default function GrafanaPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-900">
               <AlertCircle className="w-5 h-5" />
-              Configuration Error
+              {t("configurationError")}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-red-800">
@@ -100,20 +102,17 @@ export default function GrafanaPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-900">
               <AlertCircle className="w-5 h-5" />
-              Grafana Not Configured
+              {t("grafanaNotConfigured")}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-blue-800 space-y-4">
             <p>
-              Grafana Cloud integration is not configured. To enable Mission
-              Control dashboards:
+              {t("grafanaCloudIntegrationIsNotConfiguredToEnableMiss")}
+
             </p>
             <ol className="list-decimal list-inside space-y-2">
-              <li>
-                Set up Grafana Cloud account at
-                https://grafana.com/products/cloud/
-              </li>
-              <li>Configure environment variables in Vercel:</li>
+              <li>{t("setupGrafanaCloud")}</li>
+              <li>{t("configureEnvVars")}</li>
             </ol>
             <pre className="bg-blue-100 p-4 rounded text-xs overflow-auto">
               {`GRAFANA_CLOUD_PROMETHEUS_URL=https://...
@@ -121,9 +120,9 @@ GRAFANA_CLOUD_PROMETHEUS_USER=...
 GRAFANA_CLOUD_API_KEY=...`}
             </pre>
             <p className="text-sm">
-              For details, see:{" "}
+              {t("forDetailsSee")}{" "}
               <code className="bg-blue-100 px-2 py-1 rounded">
-                docs/operations/RUNBOOK.md
+                {t("docsOperationsRunbookMd")}
               </code>
             </p>
           </CardContent>
@@ -139,19 +138,19 @@ GRAFANA_CLOUD_API_KEY=...`}
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-yellow-900">
               <AlertCircle className="w-5 h-5" />
-              Grafana Configured but Unreachable
+              {t("grafanaConfiguredButUnreachable")}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-yellow-800 space-y-4">
             <p>
-              Grafana Cloud is configured but currently unreachable. This could
-              be due to:
+              {t("grafanaCloudIsConfiguredButCurrentlyUnreachableThi")}
+
             </p>
             <ul className="list-disc list-inside space-y-2">
-              <li>Network connectivity issues</li>
-              <li>Grafana Cloud service temporarily unavailable</li>
-              <li>Invalid credentials or expired API key</li>
-              <li>Firewall or proxy blocking requests</li>
+              <li>{t("networkConnectivityIssues")}</li>
+              <li>{t("grafanaCloudTemporarilyUnavailable")}</li>
+              <li>{t("invalidCredentialsOrExpiredApiKey")}</li>
+              <li>{t("firewallOrProxyBlockingRequests")}</li>
             </ul>
             <div className="pt-2">
               <Button
@@ -161,13 +160,13 @@ GRAFANA_CLOUD_API_KEY=...`}
                 className="gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
-                Retry Connection
+                {t("retryConnection")}
               </Button>
             </div>
             <p className="text-sm">
-              Configuration:{" "}
+              {t("configuration")}{" "}
               <code className="bg-yellow-100 px-2 py-1 rounded">
-                {state.config.orgSlug}.grafana.net
+                {state.config.orgSlug}{t("grafanaNet")}
               </code>
             </p>
           </CardContent>
@@ -181,10 +180,10 @@ GRAFANA_CLOUD_API_KEY=...`}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Grafana Dashboards
+            {t("grafanaDashboards")}
           </h1>
           <p className="text-gray-600 mt-2">
-            Real-time observability from Grafana Cloud
+            {t("realTimeObservabilityFromGrafanaCloud")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -195,7 +194,7 @@ GRAFANA_CLOUD_API_KEY=...`}
             className="gap-2"
           >
             <RefreshCw className="w-4 h-4" />
-            Refresh
+            {t("refresh")}
           </Button>
           {state.config?.dashboardUrl && (
             <Button asChild variant="outline" size="sm" className="gap-2">
@@ -205,7 +204,7 @@ GRAFANA_CLOUD_API_KEY=...`}
                 rel="noopener noreferrer"
               >
                 <ExternalLink className="w-4 h-4" />
-                Open in Grafana
+                {t("openInGrafana")}
               </a>
             </Button>
           )}
@@ -241,8 +240,8 @@ GRAFANA_CLOUD_API_KEY=...`}
 
       <div className="text-xs text-gray-500">
         <p>
-          Panels auto-refresh every 60 seconds (configurable in Grafana). Last
-          updated: {new Date().toLocaleTimeString()}
+          {t("panelsAutoRefreshEvery60SecondsConfigurableInGrafa")}
+          {t("updated")}
         </p>
       </div>
     </div>

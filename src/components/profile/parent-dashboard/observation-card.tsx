@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { MaestroObservation } from '@/types';
 import { CATEGORY_LABELS } from './constants';
+import { useTranslations } from "next-intl";
 
 interface ObservationCardProps {
   observation: MaestroObservation;
@@ -33,6 +34,7 @@ export function ObservationCard({
   showPriority = false,
   priorityLevel = 'medium',
 }: ObservationCardProps) {
+  const t = useTranslations("settings");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -71,7 +73,7 @@ export function ObservationCard({
         </div>
       </div>
       <p className="text-xs text-slate-500 mt-2">
-        Osservato da {observation.maestroName}
+        {t("osservatoDa")} {observation.maestroName}
       </p>
     </motion.div>
   );

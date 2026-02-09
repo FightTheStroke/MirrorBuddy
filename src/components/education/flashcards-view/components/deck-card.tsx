@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file deck-card.tsx
  * @brief Deck card component
@@ -9,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import { getDeckStats } from '../utils/deck-utils';
 import type { FlashcardDeck } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface DeckCardProps {
   deck: FlashcardDeck;
@@ -25,6 +28,7 @@ export function DeckCard({
   onDelete,
   onStudy,
 }: DeckCardProps) {
+  const t = useTranslations("education");
   const stats = getDeckStats(deck);
 
   return (
@@ -74,23 +78,23 @@ export function DeckCard({
         <div className="grid grid-cols-4 gap-2 mb-4 text-center">
           <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
             <p className="text-lg font-bold text-blue-600">{stats.newCards}</p>
-            <p className="text-xs text-blue-600/80">Nuove</p>
+            <p className="text-xs text-blue-600/80">{t("nuove")}</p>
           </div>
           <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20">
             <p className="text-lg font-bold text-orange-600">
               {stats.learning}
             </p>
-            <p className="text-xs text-orange-600/80">Learning</p>
+            <p className="text-xs text-orange-600/80">{t("learning")}</p>
           </div>
           <div className="p-2 rounded-lg bg-green-50 dark:bg-green-900/20">
             <p className="text-lg font-bold text-green-600">{stats.review}</p>
-            <p className="text-xs text-green-600/80">Review</p>
+            <p className="text-xs text-green-600/80">{t("review")}</p>
           </div>
           <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20">
             <p className="text-lg font-bold text-purple-600">
               {stats.dueToday}
             </p>
-            <p className="text-xs text-purple-600/80">Oggi</p>
+            <p className="text-xs text-purple-600/80">{t("oggi")}</p>
           </div>
         </div>
 
@@ -103,7 +107,7 @@ export function DeckCard({
             }}
           >
             <Play className="w-4 h-4 mr-2" />
-            Studia ({stats.dueToday} carte)
+            {t("studia")}{stats.dueToday} {t("carte")}
           </Button>
         )}
       </CardContent>

@@ -15,6 +15,7 @@ import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
 import { useBlobUrl } from '@/lib/tools/use-blob-url';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface HTMLPreviewProps {
   code: string;
@@ -35,6 +36,7 @@ export function HTMLPreview({
   onClose,
   allowSave = true,
 }: HTMLPreviewProps) {
+  const t = useTranslations("education");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -86,7 +88,7 @@ export function HTMLPreview({
         </div>
         <div className="flex items-center gap-2">
           {allowSave && (
-            <Button variant="ghost" size="icon-sm" onClick={handleSave} aria-label={saved ? 'Salvato' : 'Salva demo'}>
+            <Button variant="ghost" size="icon-sm" onClick={handleSave} aria-label={saved ? t("salvato") : t("salvaDemo")}>
               {saved ? <Check className="w-4 h-4 text-green-500" /> : <Save className="w-4 h-4" />}
             </Button>
           )}
@@ -95,13 +97,13 @@ export function HTMLPreview({
             variant="ghost"
             size="icon-sm"
             onClick={() => setIsFullscreen(!isFullscreen)}
-            aria-label={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
+            aria-label={isFullscreen ? t("esciDaSchermoIntero") : t("schermoIntero")}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </Button>
 
           {onClose && (
-            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Chiudi demo">
+            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t("chiudiDemo")}>
               <X className="w-4 h-4" />
             </Button>
           )}

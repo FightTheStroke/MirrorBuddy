@@ -80,7 +80,7 @@ export function MasterControls({
             ) : (
               <>
                 <Play className="w-4 h-4 mr-2" />
-                Play
+                {t("play")}
               </>
             )}
           </Button>

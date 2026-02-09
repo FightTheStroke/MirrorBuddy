@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { TierLimitConfig } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { useTranslations } from "next-intl";
 
 interface TierLimitsProps {
   tiers: TierLimitConfig[];
@@ -18,6 +19,7 @@ interface TierLimitsProps {
 }
 
 export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
+  const t = useTranslations("admin");
   const [editingTier, setEditingTier] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<Record<string, number>>({});
@@ -73,7 +75,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tier Limits</CardTitle>
+        <CardTitle>{t("tierLimits")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {tiers.map((tier) => (
@@ -85,7 +87,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
               </div>
               {editingTier !== tier.tierId && (
                 <Button size="sm" onClick={() => startEdit(tier)}>
-                  Edit
+                  {t("edit")}
                 </Button>
               )}
             </div>
@@ -97,7 +99,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                     htmlFor={`tier-${tier.tierId}-chat-limit`}
                     className="text-sm font-medium"
                   >
-                    Daily Chat Limit
+                    {t("dailyChatLimit")}
                   </label>
                   <input
                     type="number"
@@ -118,7 +120,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                     htmlFor={`tier-${tier.tierId}-voice-minutes`}
                     className="text-sm font-medium"
                   >
-                    Daily Voice Minutes
+                    {t("dailyVoiceMinutes")}
                   </label>
                   <input
                     type="number"
@@ -139,7 +141,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                     htmlFor={`tier-${tier.tierId}-tools-limit`}
                     className="text-sm font-medium"
                   >
-                    Daily Tools Limit
+                    {t("dailyToolsLimit")}
                   </label>
                   <input
                     type="number"
@@ -160,7 +162,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                     htmlFor={`tier-${tier.tierId}-docs-limit`}
                     className="text-sm font-medium"
                   >
-                    Total Documents
+                    {t("totalDocuments")}
                   </label>
                   <input
                     type="number"
@@ -182,39 +184,39 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                     onClick={() => handleSave(tier.tierId)}
                     disabled={loading}
                   >
-                    Save Changes
+                    {t("saveChanges")}
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => setEditingTier(null)}
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-600">Chat/day:</span>
+                  <span className="text-gray-600">{t("chatDay")}</span>
                   <span className="font-medium ml-1">
                     {tier.chatLimitDaily}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Voice mins/day:</span>
+                  <span className="text-gray-600">{t("voiceMinsDay")}</span>
                   <span className="font-medium ml-1">
                     {tier.voiceMinutesDaily}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Tools/day:</span>
+                  <span className="text-gray-600">{t("toolsDay")}</span>
                   <span className="font-medium ml-1">
                     {tier.toolsLimitDaily}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Docs total:</span>
+                  <span className="text-gray-600">{t("docsTotal")}</span>
                   <span className="font-medium ml-1">
                     {tier.docsLimitTotal}
                   </span>

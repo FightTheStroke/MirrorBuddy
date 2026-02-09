@@ -11,10 +11,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { AIEmailMetrics } from "@/lib/admin/ai-email-types";
 import { AzureOpenAICard, SentryCard, ResendCard } from "./components";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
 export default function AIEmailMonitoringPage() {
+  const t = useTranslations("admin");
   const [metrics, setMetrics] = useState<AIEmailMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,11 +65,11 @@ export default function AIEmailMonitoringPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <AlertCircle className="w-12 h-12 text-destructive" />
-        <p className="text-lg font-semibold">Failed to load metrics</p>
+        <p className="text-lg font-semibold">{t("failedToLoadMetrics")}</p>
         <p className="text-sm text-muted-foreground">{error}</p>
         <Button onClick={fetchMetrics} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          {t("retry")}
         </Button>
       </div>
     );
@@ -77,16 +79,16 @@ export default function AIEmailMonitoringPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">AI & Email Monitoring</h1>
+          <h1 className="text-3xl font-bold">{t("aiEmailMonitoring")}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Last updated: {lastRefresh.toLocaleTimeString()}
+            {t("lastUpdated")} {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
         <Button onClick={fetchMetrics} variant="outline" disabled={loading}>
           <RefreshCw
             className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 
@@ -101,12 +103,12 @@ export default function AIEmailMonitoringPage() {
       {!metrics?.azureOpenAI && !metrics?.sentry && !metrics?.resend && (
         <Card>
           <CardHeader>
-            <CardTitle>No Data Available</CardTitle>
+            <CardTitle>{t("noDataAvailable")}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Configure environment variables to enable monitoring:
-              AZURE_OPENAI_API_KEY, SENTRY_DSN, RESEND_API_KEY
+              {t("configureEnvironmentVariablesToEnableMonitoringAzu")}
+
             </p>
           </CardContent>
         </Card>

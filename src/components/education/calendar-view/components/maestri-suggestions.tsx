@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file maestri-suggestions.tsx
  * @brief Maestri suggestions card component
@@ -8,6 +10,7 @@ import { Lightbulb, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { maestri as MAESTRI } from '@/data/maestri';
+import { useTranslations } from "next-intl";
 
 interface MaestroSuggestion {
   maestroId: string;
@@ -20,6 +23,7 @@ interface MaestriSuggestionsProps {
 }
 
 export function MaestriSuggestions({ suggestions }: MaestriSuggestionsProps) {
+  const t = useTranslations("education");
   if (suggestions.length === 0) return null;
 
   const getMaestroById = (id: string) => {
@@ -31,7 +35,7 @@ export function MaestriSuggestions({ suggestions }: MaestriSuggestionsProps) {
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
           <Lightbulb className="w-5 h-5 text-amber-500" />
-          Maestri Consigliati
+          {t("maestriConsigliati")}
         </CardTitle>
       </CardHeader>
       <CardContent>

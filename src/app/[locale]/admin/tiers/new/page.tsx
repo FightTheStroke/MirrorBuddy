@@ -2,12 +2,13 @@
  * Create New Tier - Admin CRUD
  * Task: T1-11 (F-26)
  */
-/* eslint-disable jsx-a11y/label-has-associated-control */
+ 
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "Create Tier | Admin",
@@ -57,7 +58,8 @@ async function createTier(formData: FormData) {
   redirect("/admin/tiers");
 }
 
-export default function CreateTierPage() {
+export default async function CreateTierPage() {
+  const t = await getTranslations("admin");
   return (
     <div className="p-8">
       <div className="mb-6">
@@ -65,39 +67,39 @@ export default function CreateTierPage() {
           href="/admin/tiers"
           className="text-sm text-indigo-600 hover:text-indigo-900"
         >
-          ← Back to Tiers
+          {t("backToTiers")}
         </Link>
       </div>
 
-      <h1 className="mb-6 text-3xl font-bold">Create New Tier</h1>
+      <h1 className="mb-6 text-3xl font-bold">{t("createNewTier")}</h1>
 
       <form action={createTier} className="max-w-2xl space-y-6">
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Basic Information</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("basicInformation")}</h2>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Code *
+                {t("code")}
               </label>
               <input
                 type="text"
                 name="code"
                 required
-                placeholder="e.g., enterprise"
+                placeholder={t("eGEnterprise1")}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Name *
+                {t("name")}
               </label>
               <input
                 type="text"
                 name="name"
                 required
-                placeholder="e.g., Enterprise"
+                placeholder={t("eGEnterprise")}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
               />
             </div>
@@ -105,38 +107,38 @@ export default function CreateTierPage() {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700">
-              Description
+              {t("description")}
             </label>
             <textarea
               name="description"
               rows={3}
-              placeholder="Tier description for users"
+              placeholder={t("tierDescriptionForUsers")}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700">
-              Monthly Price (EUR)
+              {t("monthlyPriceEur")}
             </label>
             <input
               type="number"
               name="monthlyPriceEur"
               step="0.01"
               min="0"
-              placeholder="Leave empty for free tier"
+              placeholder={t("leaveEmptyForFreeTier")}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
             />
           </div>
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Usage Limits</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("usageLimits")}</h2>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Chat Messages / Day
+                {t("chatMessagesDay")}
               </label>
               <input
                 type="number"
@@ -149,7 +151,7 @@ export default function CreateTierPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Voice Minutes / Day
+                {t("voiceMinutesDay")}
               </label>
               <input
                 type="number"
@@ -162,7 +164,7 @@ export default function CreateTierPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Tool Uses / Day
+                {t("toolUsesDay")}
               </label>
               <input
                 type="number"
@@ -175,7 +177,7 @@ export default function CreateTierPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Documents Total
+                {t("documentsTotal")}
               </label>
               <input
                 type="number"
@@ -193,13 +195,13 @@ export default function CreateTierPage() {
             href="/admin/tiers"
             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t("cancel")}
           </Link>
           <button
             type="submit"
             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
-            Create Tier
+            {t("createTier")}
           </button>
         </div>
       </form>

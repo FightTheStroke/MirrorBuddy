@@ -50,7 +50,7 @@ export function FilterChips({
     <div className="space-y-6">
       <div>
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-          Tipo di materiale
+          {t("tipoDiMateriale")}
         </h3>
         <div className="flex flex-wrap gap-2">
           {visibleTypes.map((filter) => {
@@ -93,7 +93,7 @@ export function FilterChips({
                   showMoreTypes && 'ring-2 ring-primary',
                 )}
               >
-                Altro
+                {t("altro")}
                 {showMoreTypes ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -150,7 +150,7 @@ export function FilterChips({
 
       <div>
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
-          Periodo
+          {t("periodo")}
         </h3>
         <div className="flex flex-wrap gap-2">
           {DATE_FILTERS.map((filter) => {
@@ -214,7 +214,7 @@ export function FilterChips({
                         : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
                     )}
                   >
-                    <span>Tutte</span>
+                    <span>{t("tutte")}</span>
                   </button>
                   {subjects.map((subject) => {
                     const count = getSubjectFilterCount(subject);

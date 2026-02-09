@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { FileText, Download, ExternalLink, File } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
+import { useTranslations } from "next-intl";
 
 interface PdfData {
   title?: string;
@@ -31,6 +32,7 @@ interface PdfData {
  * Render a PDF preview for Knowledge Hub.
  */
 export function PdfRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education");
   const pdfData = data as PdfData;
 
   const title = pdfData.title || pdfData.filename || "Documento PDF";
@@ -56,7 +58,7 @@ export function PdfRenderer({ data, className }: BaseRendererProps) {
             </h3>
             {pdfData.pageCount && (
               <span className="text-sm text-slate-500">
-                {pdfData.pageCount} pagine
+                {pdfData.pageCount} {t("pagine")}
               </span>
             )}
           </div>
@@ -89,13 +91,13 @@ export function PdfRenderer({ data, className }: BaseRendererProps) {
                 className="flex-1 flex items-center justify-center gap-2 p-2 rounded-lg bg-accent-themed text-white hover:brightness-110 transition-all"
               >
                 <ExternalLink className="w-4 h-4" />
-                Apri
+                {t("apri")}
               </a>
               <a
                 href={url}
                 download
                 className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-                aria-label="Scarica PDF"
+                aria-label={t("scaricaPdf")}
               >
                 <Download className="w-5 h-5" />
               </a>

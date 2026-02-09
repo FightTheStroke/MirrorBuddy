@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { KeyboardLayout } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface FingerPlacementProps {
   currentKey: string;
@@ -77,6 +78,7 @@ export function FingerPlacement({
   showHands = true,
   size = "md",
 }: FingerPlacementProps) {
+  const t = useTranslations("education");
   const fingerInfo = KEY_FINGER_DETAILED[currentKey.toLowerCase()];
   const activeColor = fingerInfo
     ? FINGER_COLORS[fingerInfo.hand][fingerInfo.finger]
@@ -89,7 +91,7 @@ export function FingerPlacement({
         sizeClasses[size],
       )}
       role="img"
-      aria-label={`Finger placement for key ${currentKey}`}
+      aria-label={t("fingerPlacement", { key: currentKey })}
     >
       {showHands && (
         <HandsVisualization
@@ -125,6 +127,7 @@ function HandsVisualization({
   activeFinger,
   activeColor,
 }: HandsVisualizationProps) {
+  const t = useTranslations("education");
   return (
     <div className="flex gap-4 items-center">
       <HandSide
@@ -132,7 +135,7 @@ function HandsVisualization({
         activeFinger={activeFinger}
         activeColor={activeColor}
       />
-      <div className="text-muted-foreground text-sm">or</div>
+      <div className="text-muted-foreground text-sm">{t("or")}</div>
       <HandSide
         side="right"
         activeFinger={activeFinger}

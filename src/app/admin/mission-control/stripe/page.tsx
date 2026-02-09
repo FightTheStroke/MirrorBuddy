@@ -19,8 +19,10 @@ import {
   ProductsTable,
   SubscriptionsTable,
 } from "./components";
+import { useTranslations } from "next-intl";
 
 export default function StripeAdminPage() {
+  const t = useTranslations("admin");
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export default function StripeAdminPage() {
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
           <p className="text-slate-600 dark:text-slate-400">
-            Loading Stripe data...
+            {t("loadingStripeData")}
           </p>
         </div>
       </div>
@@ -74,10 +76,10 @@ export default function StripeAdminPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            Stripe Revenue Dashboard
+            {t("stripeRevenueDashboard")}
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            Monitor products, subscriptions, and revenue metrics
+            {t("monitorProductsSubscriptionsAndRevenueMetrics")}
           </p>
         </div>
         <Button
@@ -89,7 +91,7 @@ export default function StripeAdminPage() {
           <RefreshCw
             className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 
@@ -101,16 +103,16 @@ export default function StripeAdminPage() {
               <Settings className="h-6 w-6 text-slate-600 dark:text-slate-400" />
             </div>
             <CardTitle className="text-2xl">
-              Stripe Integration Not Active
+              {t("stripeIntegrationNotActive")}
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Revenue data will appear here when Stripe is connected.
+              {t("revenueDataWillAppearHereWhenStripeIsConnected")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-6">
               <h3 className="font-semibold text-slate-900 dark:text-white mb-3">
-                Setup Steps
+                {t("setupSteps")}
               </h3>
               <ol className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
                 <li className="flex items-start gap-3">
@@ -118,11 +120,11 @@ export default function StripeAdminPage() {
                     1
                   </span>
                   <span>
-                    Add{" "}
+                    {t("add")}{" "}
                     <code className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-xs">
                       STRIPE_SECRET_KEY
                     </code>{" "}
-                    environment variable
+                    {t("environmentVariable")}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -130,11 +132,11 @@ export default function StripeAdminPage() {
                     2
                   </span>
                   <span>
-                    Update{" "}
+                    {t("update")}{" "}
                     <code className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-xs">
-                      stripe-admin-service.ts
+                      {t("stripeAdminServiceTs")}
                     </code>{" "}
-                    with real API calls
+                    {t("withRealApiCalls")}
                   </span>
                 </li>
               </ol>

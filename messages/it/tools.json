@@ -57,7 +57,11 @@
         "retry": "Riprova",
         "close": "Chiudi",
         "howToEnable": "Come abilitare la fotocamera:"
-      }
+      },
+      "continuity": "Continuity",
+      "closeCamera": "Close camera",
+      "fotoCatturata": "Foto catturata",
+      "timerOption": "Timer {label}"
     },
     "webcamStandalone": {
       "label": "Scatta Foto",
@@ -88,7 +92,11 @@
         "success": {
           "default": "Predefinito",
           "withZaino": "Con Zaino"
-        }
+        },
+        "letterUs": "Letter (US)",
+        "a": "A",
+        "A4": "A4",
+        "Letter": "Letter"
       },
       "list": {
         "empty": {
@@ -115,7 +123,10 @@
           "description": "Descrizione",
           "title": "Titolo"
         },
-        "status": "Stato"
+        "status": "Stato",
+        "riprova": "Riprova",
+        "materiali": "materiali",
+        "pages": "pagine"
       },
       "view": {
         "title": "Visualizza Kit",
@@ -206,7 +217,14 @@
       "titlePlaceholder": "Inserisci un titolo",
       "unsaved": "Non salvato",
       "word": "Parola",
-      "words": "Parole"
+      "words": "Parole",
+      "mappa": "Mappa",
+      "flashcard": "Flashcard",
+      "contenutoDellaSezione": "Contenuto della sezione",
+      "puntoChiave": "Punto chiave",
+      "titoloDellaSezione": "Titolo della sezione",
+      "comprimiSezione": "Comprimi sezione",
+      "espandiSezione": "Espandi sezione"
     },
     "diagram": {
       "label": "Diagramma",
@@ -253,7 +271,8 @@
         "completed": "Completato",
         "completedBadge": "Badge completamento",
         "inProgress": "In corso",
-        "title": "Titolo"
+        "title": "Titolo",
+        "target": "Target:  WPM"
       },
       "oneHanded": {
         "hideInfo": "Nascondi informazioni",
@@ -285,13 +304,18 @@
         "title": "Titolo"
       },
       "progressTracker": {
-        "noBadges": "Nessun badge"
+        "noBadges": "Nessun badge",
+        "progresso": "Progresso",
+        "streak": "Streak",
+        "giorniConsecutiviDiPratica": "Giorni consecutivi di pratica",
+        "punti": "Punti"
       },
       "speedGame": {
         "instructions": "Istruzioni",
         "scoreLabel": "Punteggio",
         "startButton": "Inizia",
-        "wordsLabel": "Parole"
+        "wordsLabel": "Parole",
+        "speedGame": "Speed Game"
       },
       "stickyKeys": {
         "activated": "Attivato",
@@ -371,7 +395,18 @@
       "cardsReviewedCount": "Carte riviste: {count}",
       "continue": "Continua",
       "swipeHint": "Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "Premi o scorri per valutare"
+      "navigationHint": "Premi o scorri per valutare",
+      "completato": "Completato!",
+      "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
+      "continua": "Continua",
+      "carta": "Carta  di",
+      "riviste": "riviste",
+      "domanda": "Domanda",
+      "toccaPerGirare": "Tocca per girare",
+      "risposta": "Risposta",
+      "scorriSinistraPerDifficileDestraPerFacile": "Scorri sinistra per difficile, destra per facile",
+      "premiOScorriPerValutare": "Premi o scorri per valutare",
+      "di": "Di"
     },
     "loading": {
       "cancelled": "Annullato",
@@ -492,7 +527,9 @@
       "capabilityHomework": "Importare documenti per l'assistente compiti",
       "capabilityDocuments": "Accedere ai tuoi documenti senza doverli scaricare",
       "privacyNotice": "MirrorBuddy accede ai file solo con la tua autorizzazione. Non memorizziamo i tuoi file su Drive.",
-      "selezionaDaGoogleDrive": "Seleziona da Google Drive"
+      "selezionaDaGoogleDrive": "Seleziona da Google Drive",
+      "googleDrive": "Google Drive",
+      "privacy": "Privacy:"
     },
     "astuccio": {
       "title": "Astuccio",
@@ -549,7 +586,8 @@
       "study_tip": {
         "description": "Descrizione",
         "title": "Titolo"
-      }
+      },
+      "astuccio": "Astuccio"
     },
     "zaino": {
       "print": {
@@ -570,6 +608,57 @@
     },
     "pomodoro": {
       "iniziaFocus": "Inizia Focus"
-    }
+    },
+    "passaggiDiCalcolo": "Passaggi di calcolo ()",
+    "label1": "Label",
+    "label": "Label",
+    "value": "Value",
+    "loadingPyodide": "Loading Pyodide...",
+    "running": "Running",
+    "output": "Output",
+    "ricarica": "Ricarica",
+    "demoInterattiva": "Demo interattiva",
+    "diagramError": "Diagram Error:",
+    "viewSource": "View source",
+    "feedbackDelMaestro": "Feedback del Maestro",
+    "risolto": "Risolto",
+    "haiAffrontatoQuestoPunto": "Hai affrontato questo punto",
+    "espandiChat": "Espandi chat",
+    "nuovaSezione": "Nuova sezione",
+    "parole": "parole",
+    "punti": "punti",
+    "nessunaSezioneNelRiassunto": "Nessuna sezione nel riassunto",
+    "toolCanvas": "Tool Canvas",
+    "inAttesaChe": "In attesa che  inizi a costruire...",
+    "mostra": "Mostra",
+    "staCostruendo": "Sta costruendo...",
+    "eventiRicevuti": "Eventi ricevuti:",
+    "chunks": "Chunks:",
+    "nascondiPip": "Nascondi PiP",
+    "home": "Home",
+    "waitingToExecute": "Waiting to execute...",
+    "pending": "Pending",
+    "complete": "Complete",
+    "error": "Error",
+    "toolResults": "Tool results",
+    "tempoDiLetturaStimato": "Tempo di lettura stimato:  minuti",
+    "generatoDaMirrorbuddy": "- Generato da MirrorBuddy",
+    "descrizioneImmagine": "Descrizione immagine:",
+    "script": "Script",
+    "mermaid": "Mermaid",
+    "button": "Button",
+    "iniziACostruire": "Inizi A Costruire",
+    "minuti": "Minuti",
+    "riassunto": "Riassunto",
+    "esciDaFullscreen": "Esci da fullscreen",
+    "fullscreen": "Fullscreen",
+    "comprimiSezione": "Comprimi sezione",
+    "espandiSezione": "Espandi sezione",
+    "riduci": "Riduci",
+    "espandi": "Espandi",
+    "dataFor": "Dati per {title}",
+    "toolResult": "Risultato strumento: {name}",
+    "timerOption": "Timer {label}",
+    "chartDefault": "grafico"
   }
 }

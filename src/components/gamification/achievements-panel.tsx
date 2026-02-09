@@ -9,6 +9,7 @@ import { useMemo, memo } from 'react';
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { ACHIEVEMENTS, getAchievementsByCategory } from '@/lib/gamification/achievements';
 import type { Achievement } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface AchievementsPanelProps {
   filterCategory?: Achievement['category'] | 'all';
@@ -21,6 +22,7 @@ export function AchievementsPanel({
   compact = false,
   className = '',
 }: AchievementsPanelProps) {
+  const t = useTranslations("achievements");
   const achievements = useProgressStore((state) => state.achievements);
 
   const displayedAchievements = useMemo(() => {
@@ -44,9 +46,9 @@ export function AchievementsPanel({
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Achievements</h3>
+        <h3 className="text-lg font-semibold">{t("achievements")}</h3>
         <span className="text-sm text-muted-foreground">
-          {unlockedCount} / {totalCount} sbloccati
+          {unlockedCount} / {totalCount} {t("sbloccati")}
         </span>
       </div>
 
@@ -73,6 +75,7 @@ interface AchievementCardProps {
 }
 
 const AchievementCard = memo(function AchievementCard({ achievement, compact = false }: AchievementCardProps) {
+  const t = useTranslations("achievements");
   const isUnlocked = !!achievement.unlockedAt;
 
   if (compact) {
@@ -120,7 +123,7 @@ const AchievementCard = memo(function AchievementCard({ achievement, compact = f
       {isUnlocked ? (
         <div className="mt-auto flex items-center gap-1 text-xs text-green-500">
           <span>✓</span>
-          <span>Sbloccato</span>
+          <span>{t("sbloccato")}</span>
         </div>
       ) : (
         <div className="mt-auto text-xs text-muted-foreground">

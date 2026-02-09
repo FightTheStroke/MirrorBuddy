@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CharacterSelector } from "./character-selector";
 import { ColorPicker, ColorPreview } from "./color-picker";
 import { BORDER_COLORS, COACHES, BUDDIES } from "./character-settings-data";
+import { useTranslations } from "next-intl";
 
 interface CharacterSettingsProps {
   profile: {
@@ -26,6 +27,7 @@ export function CharacterSettings({
   profile,
   onUpdate,
 }: CharacterSettingsProps) {
+  const t = useTranslations("settings");
   const selectedCoach = profile.preferredCoach || "melissa";
   const selectedBuddy = profile.preferredBuddy || "mario";
   const coachData = COACHES.find((c) => c.id === selectedCoach);
@@ -37,11 +39,11 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            Il Tuo Coach di Apprendimento
+            {t("ilTuoCoachDiApprendimento")}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare
-            autonomo
+            {t("ilCoachTiAiutaASviluppareIlTuoMetodoDiStudioEDiven")}
+            {t("autonomo")}
           </p>
         </CardHeader>
         <CardContent>
@@ -69,11 +71,11 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-rose-500" />
-            Il Tuo MirrorBuddy
+            {t("ilTuoMirrorbuddy")}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Il buddy e un amico della tua eta che capisce le tue difficolta e ti
-            supporta
+            {t("ilBuddyEUnAmicoDellaTuaEtaCheCapisceLeTueDifficolt")}
+            {t("supporta")}
           </p>
         </CardHeader>
         <CardContent>
@@ -101,10 +103,10 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-violet-500" />
-            Personalizza i Colori
+            {t("personalizzaIColori")}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Scegli i colori dei bordi per riconoscere coach e buddy negli avatar
+            {t("scegliIColoriDeiBordiPerRiconoscereCoachEBuddyNegl")}
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -142,12 +144,11 @@ export function CharacterSettings({
           </div>
           <div>
             <h4 className="font-medium text-amber-900 dark:text-amber-100">
-              Il Triangolo del Supporto
+              {t("ilTriangoloDelSupporto")}
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              Il coach ti insegna il metodo, il buddy ti supporta emotivamente,
-              e i Professori ti spiegano le materie. Insieme formano il tuo team
-              di apprendimento personalizzato!
+              {t("ilCoachTiInsegnaIlMetodoIlBuddyTiSupportaEmotivame")}
+              {t("characterSettingsTeamDescription")}
             </p>
           </div>
         </div>

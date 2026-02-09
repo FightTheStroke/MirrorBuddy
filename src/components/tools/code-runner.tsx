@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Play, Square, Terminal, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CodeExecutionRequest } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface CodeRunnerProps {
   request: CodeExecutionRequest;
@@ -105,6 +106,7 @@ function runJavaScript(code: string): { output: string; error?: string } {
 }
 
 export function CodeRunner({ request, onResult, autoRun = false, className }: CodeRunnerProps) {
+  const t = useTranslations("tools");
   const [state, setState] = useState<RunState>('idle');
   const [output, setOutput] = useState('');
   const [error, setError] = useState<string | undefined>();
@@ -165,13 +167,13 @@ export function CodeRunner({ request, onResult, autoRun = false, className }: Co
           {state === 'loading' && (
             <span className="text-xs text-slate-400 flex items-center gap-1">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Loading Pyodide...
+              {t("loadingPyodide")}
             </span>
           )}
           {state === 'running' && (
             <span className="text-xs text-blue-400 flex items-center gap-1">
               <Loader2 className="w-3 h-3 animate-spin" />
-              Running...
+              {t("running")}
             </span>
           )}
           {state === 'success' && (
@@ -203,7 +205,7 @@ export function CodeRunner({ request, onResult, autoRun = false, className }: Co
       {(output || error) && (
         <div className="border-t border-slate-700">
           <div className="px-4 py-2 bg-slate-800/50 text-xs text-slate-400 uppercase tracking-wide">
-            Output
+            {t("output")}
           </div>
           <pre className={cn(
             'p-4 text-sm overflow-x-auto',

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file messages-list.tsx
  * @brief Messages list component
@@ -9,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MessageBubble } from './message-bubble';
 import type { ConversationMessage, Character } from '../types';
+import { useTranslations } from "next-intl";
 
 interface MessagesListProps {
   messages: ConversationMessage[];
@@ -29,6 +32,7 @@ export function MessagesList({
   lineSpacing,
   messagesEndRef,
 }: MessagesListProps) {
+  const t = useTranslations("education");
   return (
     <main
       className={cn(
@@ -93,7 +97,7 @@ export function MessagesList({
                 highContrast ? 'text-gray-400' : 'text-slate-500'
               )}
             >
-              {character.name} sta pensando...
+              {character.name} {t("staPensando")}
             </span>
           </div>
         </motion.div>

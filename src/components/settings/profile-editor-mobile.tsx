@@ -151,14 +151,14 @@ export function ProfileEditorMobile({
               {t("profile")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Update your profile information
+              {t("updateYourProfileInformation")}
             </p>
           </div>
 
           {/* Avatar Section */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              Avatar
+              {t("avatar1")}
             </h2>
 
             {/* Avatar Preview */}
@@ -168,14 +168,14 @@ export function ProfileEditorMobile({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={formData.avatar}
-                    alt="Avatar"
+                    alt={t("avatar")}
                     className="w-full h-full object-cover"
                     data-testid="avatar-preview"
                   />
                 ) : (
                   <div className="text-slate-400 dark:text-slate-500 text-center">
                     <div className="text-4xl mb-2">📷</div>
-                    <span className="text-xs">No photo</span>
+                    <span className="text-xs">{t("noPhoto")}</span>
                   </div>
                 )}
               </div>
@@ -202,14 +202,14 @@ export function ProfileEditorMobile({
                     onClick={capturePhoto}
                     className="flex-1 min-h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Capture
+                    {t("capture")}
                   </Button>
                   <Button
                     onClick={stopCamera}
                     variant="outline"
                     className="flex-1 min-h-12 text-base font-medium"
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 </div>
               </div>
@@ -224,13 +224,13 @@ export function ProfileEditorMobile({
                 data-testid="camera-button"
               >
                 <Camera className="w-5 h-5" />
-                Camera
+                {t("camera")}
               </Button>
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 className="min-h-12 text-base font-medium bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white"
               >
-                Upload
+                {t("upload")}
               </Button>
               <input
                 ref={fileInputRef}
@@ -254,7 +254,7 @@ export function ProfileEditorMobile({
                 htmlFor="profile-name"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Name *
+                {t("name")}
               </label>
               <input
                 type="text"
@@ -262,7 +262,7 @@ export function ProfileEditorMobile({
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="Your name"
+                placeholder={t("yourName")}
                 className={cn(
                   "w-full px-4 py-3 text-base rounded-lg border-2 transition-colors",
                   "bg-white dark:bg-slate-800",
@@ -286,14 +286,14 @@ export function ProfileEditorMobile({
                 htmlFor="profile-bio"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Bio
+                {t("bio")}
               </label>
               <textarea
                 id="profile-bio"
                 name="bio"
                 value={formData.bio || ""}
                 onChange={handleInputChange}
-                placeholder="Tell us about yourself"
+                placeholder={t("tellUsAboutYourself")}
                 rows={4}
                 className="w-full px-4 py-3 text-base rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 transition-colors"
               />
@@ -305,7 +305,7 @@ export function ProfileEditorMobile({
                 htmlFor="profile-grade-level"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                Grade Level
+                {t("gradeLevel")}
               </label>
               <select
                 id="profile-grade-level"

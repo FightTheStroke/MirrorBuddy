@@ -134,7 +134,7 @@ export function WelcomeFooter() {
 
         {/* Made in Europe - intentionally not localized */}
         <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-2">
-          Made with <span className="text-red-500">♥</span> in Europe
+          {t("madeWith")} <span className="text-red-500">♥</span> {t("inEurope")}
         </p>
       </div>
     </motion.footer>

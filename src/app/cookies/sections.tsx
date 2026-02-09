@@ -24,19 +24,19 @@ export function ManagementSection() {
       <p>{t("sections.cookieManagement.pBrowser")}</p>
       <ul>
         <li>
-          <strong>Chrome</strong> -{" "}
+          <strong>{t("chrome")}</strong> -{" "}
           {t("sections.cookieManagement.chromeInstructions")}
         </li>
         <li>
-          <strong>Firefox</strong> -{" "}
+          <strong>{t("firefox")}</strong> -{" "}
           {t("sections.cookieManagement.firefoxInstructions")}
         </li>
         <li>
-          <strong>Safari</strong> -{" "}
+          <strong>{t("safari")}</strong> -{" "}
           {t("sections.cookieManagement.safariInstructions")}
         </li>
         <li>
-          <strong>Edge</strong> -{" "}
+          <strong>{t("edge")}</strong> -{" "}
           {t("sections.cookieManagement.edgeInstructions")}
         </li>
       </ul>
@@ -75,21 +75,21 @@ export function ThirdPartySection() {
           <strong>Vercel</strong> - {t("sections.thirdParty.vendors.vercel")}
         </li>
         <li>
-          <strong>Supabase</strong> -{" "}
+          <strong>{t("supabase")}</strong> -{" "}
           {t("sections.thirdParty.vendors.supabase")}
         </li>
         <li>
-          <strong>Azure OpenAI</strong> -{" "}
+          <strong>{t("azureOpenai")}</strong> -{" "}
           {t("sections.thirdParty.vendors.azureOpenAI")}
         </li>
         <li>
-          <strong>Resend</strong> - {t("sections.thirdParty.vendors.resend")}
+          <strong>{t("resend")}</strong> - {t("sections.thirdParty.vendors.resend")}
         </li>
         <li>
-          <strong>Upstash</strong> - {t("sections.thirdParty.vendors.upstash")}
+          <strong>{t("upstash")}</strong> - {t("sections.thirdParty.vendors.upstash")}
         </li>
         <li>
-          <strong>Sentry</strong> - {t("sections.thirdParty.vendors.sentry")}
+          <strong>{t("sentry")}</strong> - {t("sections.thirdParty.vendors.sentry")}
         </li>
       </ul>
       <p className="text-sm text-slate-600 dark:text-gray-400 mt-3">
@@ -102,7 +102,7 @@ export function ThirdPartySection() {
           href="/privacy"
           className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
         >
-          Privacy Policy
+          {t("privacyPolicy")}
         </Link>
         .
       </p>

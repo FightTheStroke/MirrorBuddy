@@ -31,7 +31,9 @@
         "privacy": "Rispettiamo la tua privacy e i tuoi dati secondo GDPR.",
         "contact": "Hai domande? Contattaci all'indirizzo",
         "resubscribe": "Puoi modificare queste preferenze in qualsiasi momento usando il link nelle nostre email."
-      }
+      },
+      "pageNavigation": "Page navigation",
+      "token": "Token"
     }
   }
 }

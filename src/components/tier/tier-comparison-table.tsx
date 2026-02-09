@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface TierData {
   id: string;
@@ -122,10 +123,11 @@ export function TierComparisonTable({
   tiers,
   className = "",
 }: TierComparisonTableProps) {
+  const t = useTranslations("pricing");
   if (!tiers || tiers.length === 0) {
     return (
       <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-8 text-center">
-        <p className="text-slate-600 dark:text-slate-400">No tiers available</p>
+        <p className="text-slate-600 dark:text-slate-400">{t("noTiersAvailable")}</p>
       </div>
     );
   }
@@ -142,7 +144,7 @@ export function TierComparisonTable({
         <thead>
           <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
             <th className="px-4 py-3 text-left font-semibold text-slate-900 dark:text-slate-100">
-              Feature
+              {t("feature")}
             </th>
             {sortedTiers.map((tier) => (
               <th

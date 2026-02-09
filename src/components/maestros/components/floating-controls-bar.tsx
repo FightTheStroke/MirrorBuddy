@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -32,6 +33,7 @@ export function FloatingControlsBar({
   onToggleMute,
   onVoiceCall,
 }: FloatingControlsBarProps) {
+  const t = useTranslations("chat");
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -143,12 +145,12 @@ export function FloatingControlsBar({
               {isMuted ? (
                 <>
                   <MicOff className="w-4 h-4 mr-1.5" />
-                  <span className="text-xs hidden sm:inline">Muto</span>
+                  <span className="text-xs hidden sm:inline">{t("muto")}</span>
                 </>
               ) : (
                 <>
                   <Mic className="w-4 h-4 mr-1.5" />
-                  <span className="text-xs hidden sm:inline">Microfono</span>
+                  <span className="text-xs hidden sm:inline">{t("microfono")}</span>
                 </>
               )}
             </Button>
@@ -161,7 +163,7 @@ export function FloatingControlsBar({
             className="rounded-full px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white"
           >
             <PhoneOff className="w-4 h-4 mr-1.5" />
-            <span className="text-xs hidden sm:inline">Termina</span>
+            <span className="text-xs hidden sm:inline">{t("termina")}</span>
           </Button>
         </div>
       </div>

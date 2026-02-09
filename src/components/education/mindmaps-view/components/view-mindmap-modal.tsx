@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file view-mindmap-modal.tsx
  * @brief View mindmap modal component
@@ -25,6 +27,7 @@ import { MindmapRenderer } from "@/components/tools/markmap";
 import { subjectIcons } from "@/data";
 import type { ExportFormat } from "@/lib/tools/mindmap-export/index";
 import type { SavedMindmap } from "@/lib/hooks/use-saved-materials";
+import { useTranslations } from "next-intl";
 
 interface ViewMindmapModalProps {
   mindmap: SavedMindmap | null;
@@ -37,6 +40,7 @@ export function ViewMindmapModal({
   onClose,
   onExport,
 }: ViewMindmapModalProps) {
+  const t = useTranslations("education");
   if (!mindmap) return null;
 
   return (
@@ -66,7 +70,7 @@ export function ViewMindmapModal({
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Download className="w-4 h-4 mr-2" />
-                      Esporta
+                      {t("esporta")}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -78,7 +82,7 @@ export function ViewMindmapModal({
                       onClick={() => onExport(mindmap, "markdown")}
                     >
                       <FileText className="w-4 h-4 mr-2" />
-                      Markdown
+                      {t("markdown")}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => onExport(mindmap, "svg")}>
@@ -98,13 +102,13 @@ export function ViewMindmapModal({
                       onClick={() => onExport(mindmap, "freemind")}
                     >
                       <Network className="w-4 h-4 mr-2" />
-                      FreeMind (.mm)
+                      {t("freemindMm")}
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => onExport(mindmap, "xmind")}
                     >
                       <Network className="w-4 h-4 mr-2" />
-                      XMind
+                      {t("xmind")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -5,6 +5,7 @@ import { Code, Eye, ExternalLink, Trash2, Calendar, Tag } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import type { SavedDemo } from '@/lib/hooks/use-saved-materials';
+import { useTranslations } from "next-intl";
 
 interface SnippetCardProps {
   demo: SavedDemo;
@@ -21,6 +22,7 @@ export function SnippetCard({
   onOpenInNewTab,
   onDelete,
 }: SnippetCardProps) {
+  const t = useTranslations("education");
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -42,7 +44,7 @@ export function SnippetCard({
               onClick={() => onPreview(demo)}
             >
               <Eye className="w-4 h-4 mr-1" />
-              Anteprima
+              {t("anteprima")}
             </Button>
             <Button
               size="sm"
@@ -81,7 +83,7 @@ export function SnippetCard({
               </span>
             )}
             {maestroName && (
-              <span>di {maestroName}</span>
+              <span>{t("di")} {maestroName}</span>
             )}
           </div>
 

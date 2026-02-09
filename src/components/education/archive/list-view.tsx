@@ -14,6 +14,7 @@ import { TOOL_ICONS, TOOL_LABELS } from './constants';
 import { StarRating } from './star-rating';
 import { formatDate } from './utils';
 import type { ArchiveItemViewProps, ArchiveItem } from './types';
+import { useTranslations } from "next-intl";
 
 // Memoized row component to prevent re-renders when other rows change
 interface ListRowProps {
@@ -33,6 +34,7 @@ const ListRow = memo(function ListRow({
   onBookmark,
   onRate,
 }: ListRowProps) {
+  const t = useTranslations("education");
   const Icon = TOOL_ICONS[item.toolType];
   const label = TOOL_LABELS[item.toolType];
 
@@ -106,7 +108,7 @@ const ListRow = memo(function ListRow({
           size="icon"
           className="h-8 w-8"
           onClick={handleBookmarkClick}
-          aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+          aria-label={item.isBookmarked ? t("rimuoviDaiPreferiti") : t("aggiungiAiPreferiti")}
         >
           {item.isBookmarked ? (
             <BookmarkCheck className="w-4 h-4 text-primary" />
@@ -119,7 +121,7 @@ const ListRow = memo(function ListRow({
           size="icon"
           className="h-8 w-8"
           onClick={handleViewClick}
-          aria-label="Apri"
+          aria-label={t("apri")}
         >
           <ExternalLink className="w-4 h-4" />
         </Button>
@@ -128,7 +130,7 @@ const ListRow = memo(function ListRow({
           size="icon"
           className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
           onClick={handleDeleteClick}
-          aria-label="Elimina"
+          aria-label={t("elimina")}
         >
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Service Health Card
  * Shows external service quota usage from ops dashboard data
@@ -7,24 +9,26 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeartPulse } from "lucide-react";
 import type { ServiceHealthItem } from "@/lib/admin/ops-dashboard-types";
+import { useTranslations } from "next-intl";
 
 interface ServiceHealthCardProps {
   items: ServiceHealthItem[];
 }
 
 export function ServiceHealthCard({ items }: ServiceHealthCardProps) {
+  const t = useTranslations("admin");
   if (items.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HeartPulse className="h-5 w-5" />
-            Service Health
+            {t("serviceHealth1")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            No service data available
+            {t("noServiceDataAvailable")}
           </p>
         </CardContent>
       </Card>
@@ -44,7 +48,7 @@ export function ServiceHealthCard({ items }: ServiceHealthCardProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <HeartPulse className="h-5 w-5" />
-          Service Health
+          {t("serviceHealth")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

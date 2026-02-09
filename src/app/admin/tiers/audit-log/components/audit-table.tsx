@@ -1,5 +1,8 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { ResponsiveTable } from "@/components/admin/responsive-table";
+import { useTranslations } from "next-intl";
 
 interface TierAuditLog {
   id: string;
@@ -68,6 +71,7 @@ function formatChanges(changes: Record<string, unknown>) {
 }
 
 export function AuditTable({ logs }: AuditTableProps) {
+  const t = useTranslations("admin");
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
       <ResponsiveTable caption="Audit log table">
@@ -75,22 +79,22 @@ export function AuditTable({ logs }: AuditTableProps) {
           <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Timestamp
+                {t("timestamp")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Action
+                {t("action")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Admin ID
+                {t("adminId")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                User ID
+                {t("userId")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Changes
+                {t("changes")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Notes
+                {t("notes")}
               </th>
             </tr>
           </thead>
@@ -101,7 +105,7 @@ export function AuditTable({ logs }: AuditTableProps) {
                   colSpan={6}
                   className="px-4 py-8 text-center text-slate-500 dark:text-slate-400"
                 >
-                  No audit logs found
+                  {t("noAuditLogsFound")}
                 </td>
               </tr>
             ) : (

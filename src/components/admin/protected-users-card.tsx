@@ -32,7 +32,7 @@ export function ProtectedUsersCard() {
               {t("title")}
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
-              Utenti esclusi da cleanup test
+              {t("utentiEsclusiDaCleanupTest")}
             </p>
           </div>
         </div>

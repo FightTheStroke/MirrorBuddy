@@ -20,6 +20,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface FunnelMetrics {
   stages: Array<{
@@ -43,6 +44,7 @@ const PERIODS = [
 ] as const;
 
 export default function FunnelDashboard() {
+  const t = useTranslations("admin");
   const [metrics, setMetrics] = useState<FunnelMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,28 +152,28 @@ export default function FunnelDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          title="Total Visitors"
+          title={t("totalVisitors")}
           value={metrics?.totals.uniqueVisitors ?? 0}
           subValue="Unique visitors tracked"
           icon={Users}
           color="blue"
         />
         <KpiCard
-          title="Conversion Rate"
+          title={t("conversionRate")}
           value={`${(metrics?.totals.overallConversionRate ?? 0).toFixed(1)}%`}
           subValue="Visitor to Active"
           icon={TrendingUp}
           color="green"
         />
         <KpiCard
-          title="Active Users"
+          title={t("activeUsers")}
           value={metrics?.totals.uniqueConverted ?? 0}
           subValue="Fully converted"
           icon={UserCheck}
           color="purple"
         />
         <KpiCard
-          title="Drop-off Rate"
+          title={t("dropOffRate")}
           value={`${dropoffRate.toFixed(1)}%`}
           subValue="Did not convert"
           icon={AlertTriangle}
@@ -183,7 +185,7 @@ export default function FunnelDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Funnel Stages</CardTitle>
+            <CardTitle className="text-sm">{t("funnelStages")}</CardTitle>
           </CardHeader>
           <CardContent>
             {metrics && <FunnelChart stages={metrics.stages} showVelocity />}

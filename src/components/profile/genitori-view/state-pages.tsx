@@ -133,17 +133,18 @@ export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
 }
 
 export function DeletionPendingState() {
+  const t = useTranslations("settings.profile.genitori");
   return (
     <Card className="border-border">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
           <Trash2 className="h-5 w-5" />
-          Cancellazione Richiesta
+          {t("cancellazioneRichiesta")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground">
-          I dati verranno eliminati entro 30 giorni, come previsto dal GDPR.
+          {t("iDatiVerrannoEliminatiEntro30GiorniComePrevistoDal")}
         </p>
       </CardContent>
     </Card>

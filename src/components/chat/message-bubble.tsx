@@ -6,6 +6,7 @@ import { Copy, Check, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, Maestro } from "@/types";
 import { AIDisclosureBadge } from "./ai-disclosure-badge";
+import { useTranslations } from "next-intl";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -26,6 +27,7 @@ export function MessageBubble({
   dyslexiaFont,
   lineSpacing,
 }: MessageBubbleProps) {
+  const t = useTranslations("chat");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -85,7 +87,7 @@ export function MessageBubble({
               ? "bg-yellow-400 text-black"
               : "bg-white dark:bg-slate-700 shadow-md",
           )}
-          title="Copia messaggio"
+          title={t("copiaMessaggio")}
         >
           {copiedId === message.id ? (
             <Check className="w-3 h-3 text-green-500" />

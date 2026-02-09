@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Revenue metrics card component
  */
@@ -11,12 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { RevenueMetrics } from "@/lib/admin/business-kpi-types";
+import { useTranslations } from "next-intl";
 
 interface RevenueCardProps {
   revenue: RevenueMetrics;
 }
 
 export function RevenueCard({ revenue }: RevenueCardProps) {
+  const t = useTranslations("admin");
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("it-IT", {
       style: "currency",
@@ -33,18 +37,18 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Revenue</CardTitle>
+          <CardTitle>{t("revenue")}</CardTitle>
           <div className="flex items-center gap-2">
             {revenue.isEstimated && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                 <AlertTriangle className="h-3 w-3" />
-                Estimated
+                {t("estimated")}
               </span>
             )}
             <TrendingUp className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
-        <CardDescription>Monthly and annual recurring revenue</CardDescription>
+        <CardDescription>{t("monthlyAndAnnualRecurringRevenue")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
@@ -54,7 +58,7 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
               {formatCurrency(revenue.mrr)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              Monthly recurring
+              {t("monthlyRecurring")}
             </div>
           </div>
 
@@ -64,7 +68,7 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
               {formatCurrency(revenue.arr)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              Annual recurring
+              {t("annualRecurring")}
             </div>
           </div>
         </div>
@@ -72,12 +76,12 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
         <div className="pt-4 border-t">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-muted-foreground">
-              Growth Rate
+              {t("growthRate")}
             </div>
             {revenue.growthRate === null ? (
               <div
                 className="text-sm font-medium text-muted-foreground"
-                title="Insufficient historical data"
+                title={t("insufficientHistoricalData")}
               >
                 N/A
               </div>
@@ -100,12 +104,12 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
         <div className="pt-4 border-t">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-muted-foreground">
-              Total Revenue
+              {t("totalRevenue")}
             </div>
             {revenue.totalRevenue === null ? (
               <div
                 className="text-lg font-medium text-muted-foreground"
-                title="Requires Stripe integration"
+                title={t("requiresStripeIntegration")}
               >
                 N/A
               </div>
@@ -116,7 +120,7 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
             )}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
-            All-time revenue
+            {t("allTimeRevenue")}
           </div>
         </div>
       </CardContent>

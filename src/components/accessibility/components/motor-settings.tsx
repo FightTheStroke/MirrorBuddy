@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file motor-settings.tsx
  * @brief Motor settings component
@@ -7,8 +9,10 @@ import { Hand } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { Toggle } from "./toggle";
+import { useTranslations } from "next-intl";
 
 export function MotorSettings() {
+  const t = useTranslations("settings");
   const { settings, updateSettings } = useAccessibilityStore();
 
   return (
@@ -44,7 +48,7 @@ export function MotorSettings() {
               : "text-blue-700 dark:text-blue-300",
           )}
         >
-          Scorciatoie da tastiera
+          {t("scorciatoieDaTastiera")}
         </h4>
         <ul className="space-y-2 text-sm">
           {[

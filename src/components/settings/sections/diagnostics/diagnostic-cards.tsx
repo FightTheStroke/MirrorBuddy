@@ -116,21 +116,21 @@ export function PlatformHelpCard() {
 
         <div className="flex flex-wrap gap-2 text-xs text-slate-500">
           <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
-            Azure OpenAI
+            {t("azureOpenai")}
           </span>
           <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
-            Voce e Audio
+            {t("voceEAudio")}
           </span>
           <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
-            Flashcard e Quiz
+            {t("flashcardEQuiz")}
           </span>
           <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">
-            Accessibilita
+            {t("accessibilita")}
           </span>
         </div>
 
         <p className="text-xs text-slate-500 italic">
-          Vai nella sezione Chat e parla con il tuo Coach preferito.
+          {t("vaiNellaSezioneChatEParlaConIlTuoCoachPreferito")}
         </p>
       </CardContent>
     </Card>

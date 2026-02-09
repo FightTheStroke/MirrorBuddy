@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Star, TrendingUp, Clock, MessageSquare, Trophy, BookOpen, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SessionEvaluation } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface EvaluationCardProps {
   evaluation: SessionEvaluation;
@@ -35,6 +36,7 @@ export function EvaluationCard({
   maestroColor,
   className,
 }: EvaluationCardProps) {
+  const t = useTranslations("chat");
   // Clamp score to valid range 1-10
   const clampedScore = Math.min(10, Math.max(1, evaluation.score));
   const gradeInfo = GRADE_LABELS[clampedScore] || GRADE_LABELS[5];
@@ -58,8 +60,8 @@ export function EvaluationCard({
       >
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-lg">Valutazione Sessione</h3>
-            <p className="text-sm opacity-90">da {maestroName}</p>
+            <h3 className="font-semibold text-lg">{t("valutazioneSessione")}</h3>
+            <p className="text-sm opacity-90">{t("da")} {maestroName}</p>
           </div>
           <motion.div
             initial={{ scale: 0 }}
@@ -95,16 +97,16 @@ export function EvaluationCard({
         <div className="text-center">
           <Clock className="w-4 h-4 mx-auto mb-1 text-blue-500" />
           <p className="text-sm font-semibold text-slate-900 dark:text-white">
-            {evaluation.sessionDuration}min
+            {evaluation.sessionDuration}{t("min")}
           </p>
-          <p className="text-xs text-slate-500">Durata</p>
+          <p className="text-xs text-slate-500">{t("durata")}</p>
         </div>
         <div className="text-center">
           <MessageSquare className="w-4 h-4 mx-auto mb-1 text-green-500" />
           <p className="text-sm font-semibold text-slate-900 dark:text-white">
             {evaluation.questionsAsked}
           </p>
-          <p className="text-xs text-slate-500">Domande</p>
+          <p className="text-xs text-slate-500">{t("domande")}</p>
         </div>
         <div className="text-center">
           <Trophy className="w-4 h-4 mx-auto mb-1 text-amber-500" />
@@ -135,7 +137,7 @@ export function EvaluationCard({
             <div className="flex items-center gap-2 mb-2">
               <Star className="w-4 h-4 text-green-600 dark:text-green-400" />
               <h4 className="text-sm font-medium text-green-700 dark:text-green-400">
-                Punti di forza
+                {t("puntiDiForza")}
               </h4>
             </div>
             <ul className="space-y-1">
@@ -158,7 +160,7 @@ export function EvaluationCard({
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-amber-600 dark:text-amber-400" />
               <h4 className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                Da migliorare
+                {t("daMigliorare")}
               </h4>
             </div>
             <ul className="space-y-1">
@@ -184,7 +186,7 @@ export function EvaluationCard({
             className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"
           >
             <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>Salvato nel diario per i genitori</span>
+            <span>{t("salvatoNelDiarioPerIGenitori")}</span>
             <BookOpen className="w-4 h-4 ml-auto text-slate-400" />
           </motion.div>
         )}

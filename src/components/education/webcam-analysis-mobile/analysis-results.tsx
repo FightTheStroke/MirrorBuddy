@@ -1,8 +1,11 @@
+"use client";
+
 /**
  * Analysis results display component
  */
 
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export interface AnalysisResultsProps {
   capturedImage: string | null;
@@ -15,6 +18,7 @@ export function AnalysisResults({
   analysisResults,
   isPhone,
 }: AnalysisResultsProps) {
+  const t = useTranslations("education");
   if (!capturedImage && !analysisResults) {
     return null;
   }
@@ -28,20 +32,20 @@ export function AnalysisResults({
       )}
     >
       <h3 className="font-semibold text-slate-900 dark:text-white">
-        Analysis Results
+        {t("analysisResults")}
       </h3>
 
       {capturedImage && (
         <div className="flex flex-col gap-2">
           <p className="text-slate-600 dark:text-slate-300">
-            Image captured successfully
+            {t("imageCapturedSuccessfully")}
           </p>
           <div className="w-full max-h-20 rounded bg-slate-100 dark:bg-slate-700 overflow-hidden">
             {/* Using <img> for data URLs since next/Image requires domain config */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={capturedImage}
-              alt="Captured"
+              alt={t("captured")}
               className="w-full h-full object-cover"
             />
           </div>

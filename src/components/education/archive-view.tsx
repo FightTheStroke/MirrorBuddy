@@ -82,7 +82,7 @@ export function ArchiveView() {
       {/* Content */}
       <div
         role="tabpanel"
-        aria-label={`Materiali ${filter === "all" ? "tutti" : filter === "bookmarked" ? tArchive("emptyPreferred").toLowerCase() : TOOL_LABELS[filter]}`}
+        aria-label={tArchive("materialiAriaLabel", { filter: filter === "all" ? tArchive("tutti") : filter === "bookmarked" ? tArchive("emptyPreferred").toLowerCase() : TOOL_LABELS[filter] })}
       >
         {isLoading ? (
           <div className="flex items-center justify-center py-16">

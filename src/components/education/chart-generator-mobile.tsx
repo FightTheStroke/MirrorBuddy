@@ -43,6 +43,7 @@ import {
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface ChartDataPoint {
   id: string;
@@ -72,6 +73,7 @@ export function ChartGeneratorMobile({
   onShare,
   className,
 }: ChartGeneratorMobileProps) {
+  const t = useTranslations("education");
   const [chartType, setChartType] = useState<ChartType>("bar");
   const [dataPoints, setDataPoints] = useState<ChartDataPoint[]>([]);
   const [labelInput, setLabelInput] = useState("");
@@ -153,7 +155,7 @@ export function ChartGeneratorMobile({
       return (
         <div className="flex items-center justify-center h-64 bg-slate-50 dark:bg-slate-900 rounded-lg">
           <p className="text-slate-500 dark:text-slate-400 text-center px-4">
-            Add data points to generate a chart
+            {t("addDataPointsToGenerateAChart")}
           </p>
         </div>
       );
@@ -245,10 +247,10 @@ export function ChartGeneratorMobile({
       {/* Header */}
       <div className="mb-4 xs:mb-6">
         <h2 className="text-lg xs:text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white">
-          Chart Generator
+          {t("chartGenerator")}
         </h2>
         <p className="text-sm xs:text-base text-slate-600 dark:text-slate-400 mt-1">
-          Create custom charts from your data
+          {t("createCustomChartsFromYourData")}
         </p>
       </div>
 
@@ -262,7 +264,7 @@ export function ChartGeneratorMobile({
               id="chart-type-label"
               className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300"
             >
-              Chart Type
+              {t("chartType")}
             </div>
             <div
               className="flex gap-2 flex-wrap"
@@ -301,7 +303,7 @@ export function ChartGeneratorMobile({
               id="data-input-label"
               className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300"
             >
-              Add Data Point
+              {t("addDataPoint1")}
             </div>
 
             <input
@@ -309,8 +311,8 @@ export function ChartGeneratorMobile({
               value={labelInput}
               onChange={(e) => setLabelInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Label (e.g., January)"
-              aria-label="Label"
+              placeholder={t("labelEGJanuary")}
+              aria-label={t("label")}
               className={cn(
                 "w-full min-h-[44px] h-auto",
                 "px-3 xs:px-4 py-2 xs:py-3",
@@ -327,8 +329,8 @@ export function ChartGeneratorMobile({
               value={valueInput}
               onChange={(e) => setValueInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Value (e.g., 42)"
-              aria-label="Value"
+              placeholder={t("valueEG42")}
+              aria-label={t("value")}
               inputMode="numeric"
               className={cn(
                 "w-full min-h-[44px] h-auto",
@@ -352,7 +354,7 @@ export function ChartGeneratorMobile({
               )}
             >
               <Plus className="w-5 h-5" />
-              <span>Add Data Point</span>
+              <span>{t("addDataPoint")}</span>
             </Button>
           </div>
 
@@ -360,7 +362,7 @@ export function ChartGeneratorMobile({
           {dataPoints.length > 0 && (
             <div className="space-y-2 xs:space-y-3">
               <label className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300">
-                Data Points ({dataPoints.length})
+                {t("dataPoints")}{dataPoints.length})
               </label>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 <AnimatePresence>
@@ -394,7 +396,7 @@ export function ChartGeneratorMobile({
                           "hover:bg-red-50 dark:hover:bg-red-950 transition-colors",
                           "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950",
                         )}
-                        aria-label={`Delete ${point.label}`}
+                        aria-label={t("deletePoint", { label: point.label })}
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -433,7 +435,7 @@ export function ChartGeneratorMobile({
           {dataPoints.length > 0 && (
             <div className="flex items-center gap-2 text-xs xs:text-sm text-slate-600 dark:text-slate-400 px-2">
               <ZoomIn className="w-4 h-4" />
-              <span>Pinch to zoom chart</span>
+              <span>{t("pinchToZoomChart")}</span>
             </div>
           )}
 
@@ -451,7 +453,7 @@ export function ChartGeneratorMobile({
               )}
             >
               <Download className="w-5 h-5" />
-              <span className="hidden xs:inline">Export</span>
+              <span className="hidden xs:inline">{t("export")}</span>
             </Button>
 
             <Button
@@ -465,7 +467,7 @@ export function ChartGeneratorMobile({
               )}
             >
               <Share2 className="w-5 h-5" />
-              <span className="hidden xs:inline">Share</span>
+              <span className="hidden xs:inline">{t("share")}</span>
             </Button>
           </div>
         </div>

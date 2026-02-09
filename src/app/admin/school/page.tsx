@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { csrfFetch } from "@/lib/auth";
+import { useTranslations } from "next-intl";
 
 interface SchoolStats {
   totalStudents: number;
@@ -27,6 +28,7 @@ interface ContactRequest {
 }
 
 export default function SchoolAdminDashboard() {
+  const t = useTranslations("admin");
   const [stats, setStats] = useState<SchoolStats | null>(null);
   const [requests, setRequests] = useState<ContactRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,14 +57,14 @@ export default function SchoolAdminDashboard() {
   if (loading) {
     return (
       <div className="p-8 text-center text-gray-500">
-        Loading school dashboard...
+        {t("loadingSchoolDashboard")}
       </div>
     );
   }
 
   return (
     <div className="space-y-8 p-6">
-      <h1 className="text-2xl font-bold">School Administration</h1>
+      <h1 className="text-2xl font-bold">{t("schoolAdministration")}</h1>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Students" value={stats?.totalStudents ?? 0} />
@@ -77,31 +79,31 @@ export default function SchoolAdminDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-lg border bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-2 text-lg font-semibold">Subscription</h2>
+          <h2 className="mb-2 text-lg font-semibold">{t("subscription")}</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Plan: <span className="font-medium">{stats?.tier ?? "N/A"}</span>
+            {t("plan1")} <span className="font-medium">{stats?.tier ?? "N/A"}</span>
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            Status:{" "}
+            {t("status1")}{" "}
             <span className="font-medium">
               {stats?.subscriptionStatus ?? "N/A"}
             </span>
           </p>
         </div>
         <div className="rounded-lg border bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-2 text-lg font-semibold">Quick Actions</h2>
+          <h2 className="mb-2 text-lg font-semibold">{t("quickActions")}</h2>
           <div className="flex flex-wrap gap-2">
             <Link
               href="/admin/invites"
               className="rounded bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300"
             >
-              Bulk Invite
+              {t("bulkInvite")}
             </Link>
             <Link
               href="/admin/tiers"
               className="rounded bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300"
             >
-              Manage Tiers
+              {t("manageTiers")}
             </Link>
           </div>
         </div>
@@ -109,17 +111,17 @@ export default function SchoolAdminDashboard() {
 
       <div>
         <h2 className="mb-4 text-lg font-semibold">
-          School Registration Requests
+          {t("schoolRegistrationRequests")}
         </h2>
         <div className="overflow-x-auto rounded-lg border">
           <table className="min-w-full text-sm">
             <thead className="border-b bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th className="px-4 py-2 text-left font-medium">School</th>
-                <th className="px-4 py-2 text-left font-medium">Contact</th>
-                <th className="px-4 py-2 text-left font-medium">Plan</th>
-                <th className="px-4 py-2 text-left font-medium">Status</th>
-                <th className="px-4 py-2 text-left font-medium">Date</th>
+                <th className="px-4 py-2 text-left font-medium">{t("school")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("contact")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("plan")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("status")}</th>
+                <th className="px-4 py-2 text-left font-medium">{t("date")}</th>
               </tr>
             </thead>
             <tbody>
@@ -129,7 +131,7 @@ export default function SchoolAdminDashboard() {
                     colSpan={5}
                     className="px-4 py-8 text-center text-gray-400"
                   >
-                    No school requests yet
+                    {t("noSchoolRequestsYet")}
                   </td>
                 </tr>
               ) : (

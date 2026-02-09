@@ -14,10 +14,12 @@ import { VoiceMetricsCard, DatabaseMetricsCard } from "./components-extended";
 import { CostOverviewCard } from "./cost-card";
 import { ServiceHealthCard } from "./service-health-card";
 import { IncidentsCard } from "./incidents-card";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
 export default function OpsDashboardPage() {
+  const t = useTranslations("admin");
   const [data, setData] = useState<OpsDashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,15 +61,15 @@ export default function OpsDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Operations Dashboard
+            {t("operationsDashboard")}
           </h1>
           <p className="text-muted-foreground">
-            Real-time monitoring of system metrics and user activity
+            {t("realTimeMonitoringOfSystemMetricsAndUserActivity")}
           </p>
         </div>
         {lastUpdate && (
           <div className="text-sm text-muted-foreground">
-            Last update: {lastUpdate.toLocaleTimeString()}
+            {t("lastUpdate")} {lastUpdate.toLocaleTimeString()}
           </div>
         )}
       </div>
@@ -108,7 +110,7 @@ export default function OpsDashboardPage() {
 
       {!loading && !error && !data && (
         <Card className="p-6">
-          <p className="text-muted-foreground">No data available</p>
+          <p className="text-muted-foreground">{t("noDataAvailable")}</p>
         </Card>
       )}
     </div>

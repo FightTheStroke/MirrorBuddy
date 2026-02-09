@@ -5,6 +5,7 @@ import { X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
+import { useTranslations } from "next-intl";
 
 interface TierChangeModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ export function TierChangeModal({
   user,
   availableTiers,
 }: TierChangeModalProps) {
+  const t = useTranslations("admin");
   const [selectedTierId, setSelectedTierId] = useState("");
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -131,7 +133,7 @@ export function TierChangeModal({
             id="tier-change-title"
             className="text-lg font-semibold text-slate-900 dark:text-white"
           >
-            Change Tier
+            {t("changeTier")}
           </h2>
           <button
             onClick={handleClose}
@@ -155,7 +157,7 @@ export function TierChangeModal({
           {user.currentTier && (
             <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-600">
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Current Tier
+                {t("currentTier")}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {user.currentTier.name}
@@ -173,7 +175,7 @@ export function TierChangeModal({
                 htmlFor="tier-select"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                New Tier *
+                {t("newTier1")}
               </label>
               <select
                 ref={selectRef}
@@ -182,9 +184,9 @@ export function TierChangeModal({
                 onChange={(e) => setSelectedTierId(e.target.value)}
                 required
                 className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                aria-label="New tier"
+                aria-label={t("newTier")}
               >
-                <option value="">Select a tier...</option>
+                <option value="">{t("selectATier")}</option>
                 {availableTiers.map((tier) => (
                   <option key={tier.id} value={tier.id}>
                     {tier.name}
@@ -199,13 +201,13 @@ export function TierChangeModal({
                 htmlFor="tier-notes"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Notes (optional)
+                {t("notesOptional")}
               </label>
               <textarea
                 id="tier-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Reason for change..."
+                placeholder={t("reasonForChange")}
                 rows={3}
                 className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
               />
@@ -221,7 +223,7 @@ export function TierChangeModal({
               className="flex-1 min-h-11 min-w-11"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               type="submit"
@@ -231,7 +233,7 @@ export function TierChangeModal({
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Changing...
+                  {t("changing")}
                 </>
               ) : (
                 "Confirm"

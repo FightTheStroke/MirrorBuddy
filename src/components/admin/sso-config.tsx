@@ -9,6 +9,7 @@
 import { useState, useCallback } from "react";
 import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { useTranslations } from "next-intl";
 
 interface SSOProviderConfig {
   provider: "google" | "microsoft";
@@ -33,6 +34,7 @@ export function SSOConfigPanel({
   schoolId,
   existingConfigs = [],
 }: SSOConfigPanelProps) {
+  const t = useTranslations("admin");
   const [configs, _setConfigs] = useState<SSOProviderConfig[]>(existingConfigs);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export function SSOConfigPanel({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Single Sign-On Configuration</h2>
+        <h2 className="text-xl font-semibold">{t("singleSignOnConfiguration")}</h2>
       </div>
 
       {error && (
@@ -124,6 +126,7 @@ function SSOProviderForm({
   onSave,
   saving,
 }: SSOProviderFormProps) {
+  const t = useTranslations("admin");
   const [tenantId, setTenantId] = useState(config?.tenantId || "");
   const [domain, setDomain] = useState(config?.domain || "");
   const [clientId, setClientId] = useState(config?.clientId || "");
@@ -156,7 +159,7 @@ function SSOProviderForm({
             onChange={(e) => setEnabled(e.target.checked)}
             className="rounded border-gray-300"
           />
-          Enabled
+          {t("enabled")}
         </label>
       </div>
 
@@ -167,14 +170,14 @@ function SSOProviderForm({
               htmlFor={`${provider}-tenant`}
               className="mb-1 block text-sm font-medium"
             >
-              Azure AD Tenant ID
+              {t("azureAdTenantId")}
             </label>
             <input
               id={`${provider}-tenant`}
               type="text"
               value={tenantId}
               onChange={(e) => setTenantId(e.target.value)}
-              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              placeholder={t("xxxxxxxxXxxxXxxxXxxxXxxxxxxxxxxx")}
               className="w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
@@ -185,14 +188,14 @@ function SSOProviderForm({
             htmlFor={`${provider}-domain`}
             className="mb-1 block text-sm font-medium"
           >
-            School Domain
+            {t("schoolDomain")}
           </label>
           <input
             id={`${provider}-domain`}
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            placeholder="school.edu"
+            placeholder={t("schoolEdu")}
             required
             className="w-full rounded-md border px-3 py-2 text-sm"
           />
@@ -203,7 +206,7 @@ function SSOProviderForm({
             htmlFor={`${provider}-clientid`}
             className="mb-1 block text-sm font-medium"
           >
-            Client ID
+            {t("clientId")}
           </label>
           <input
             id={`${provider}-clientid`}
@@ -220,7 +223,7 @@ function SSOProviderForm({
             htmlFor={`${provider}-secret`}
             className="mb-1 block text-sm font-medium"
           >
-            Client Secret
+            {t("clientSecret")}
           </label>
           <input
             id={`${provider}-secret`}

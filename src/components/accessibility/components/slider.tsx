@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file slider.tsx
  * @brief Slider component for accessibility settings
@@ -5,6 +7,7 @@
 
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { useTranslations } from "next-intl";
 
 interface SliderProps {
   label: string;
@@ -25,6 +28,7 @@ export function Slider({
   step,
   unit = "",
 }: SliderProps) {
+  const t = useTranslations("settings");
   const { settings } = useAccessibilityStore();
 
   const stepValues: number[] = [];
@@ -83,7 +87,7 @@ export function Slider({
               ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30"
               : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30",
           )}
-          aria-label="Diminuisci"
+          aria-label={t("diminuisci")}
         >
           −
         </button>
@@ -108,7 +112,7 @@ export function Slider({
               ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30"
               : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30",
           )}
-          aria-label="Aumenta"
+          aria-label={t("aumenta")}
         >
           +
         </button>

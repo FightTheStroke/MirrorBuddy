@@ -40,7 +40,7 @@ export function QuizPerformance({
     return (
       <section
         className={cn("space-y-3", className)}
-        aria-label="Performance quiz"
+        aria-label={t("performanceQuiz1")}
       >
         <div className="flex items-center gap-2">
           <Target
@@ -58,7 +58,7 @@ export function QuizPerformance({
                 : "text-slate-900 dark:text-white",
             )}
           >
-            Quiz
+            {t("quiz2")}
           </h2>
         </div>
         <p
@@ -78,7 +78,7 @@ export function QuizPerformance({
   return (
     <section
       className={cn("space-y-4", className)}
-      aria-label="Performance quiz"
+      aria-label={t("performanceQuiz")}
     >
       <div className="flex items-center gap-2">
         <Target
@@ -94,7 +94,7 @@ export function QuizPerformance({
             highContrast ? "text-yellow-400" : "text-slate-900 dark:text-white",
           )}
         >
-          Quiz
+          {t("quiz1")}
         </h2>
       </div>
 
@@ -133,7 +133,7 @@ export function QuizPerformance({
                 : "text-slate-500 dark:text-slate-400",
             )}
           >
-            Quiz completati
+            {t("quizCompletati")}
           </p>
         </div>
         <div
@@ -167,7 +167,7 @@ export function QuizPerformance({
                 : "text-slate-500 dark:text-slate-400",
             )}
           >
-            Media
+            {t("media")}
           </p>
         </div>
         <div
@@ -201,7 +201,7 @@ export function QuizPerformance({
                 : "text-slate-500 dark:text-slate-400",
             )}
           >
-            Record
+            {t("record")}
           </p>
         </div>
       </div>
@@ -217,7 +217,7 @@ export function QuizPerformance({
                 : "text-slate-700 dark:text-slate-300",
             )}
           >
-            Per materia
+            {t("perMateria")}
           </h3>
           <div className="space-y-2">
             {stats.bySubject.slice(0, 5).map((subjectStat) => (
@@ -247,7 +247,7 @@ export function QuizPerformance({
                       highContrast ? "text-yellow-200" : "text-slate-400",
                     )}
                   >
-                    {subjectStat.attempts} quiz
+                    {subjectStat.attempts} {t("quiz")}
                   </span>
                   <span
                     className={cn(

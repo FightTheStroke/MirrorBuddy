@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Stripe Admin UI Components
  *
@@ -7,6 +9,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/admin/stripe-admin-service";
 import { CreditCard, TrendingUp, Users, Euro } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 /**
  * Metric card component
@@ -106,6 +109,7 @@ export function RevenueMetrics({
   totalRevenue: number;
   currency: string;
 }) {
+  const t = useTranslations("admin");
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <MetricCard
@@ -121,13 +125,13 @@ export function RevenueMetrics({
         bgColor="bg-blue-500"
       />
       <MetricCard
-        title="Active Subscriptions"
+        title={t("activeSubscriptions")}
         value={String(activeSubscriptions)}
         icon={<Users className="h-5 w-5 text-white" />}
         bgColor="bg-indigo-500"
       />
       <MetricCard
-        title="Total Revenue"
+        title={t("totalRevenue")}
         value={formatCurrency(totalRevenue, currency)}
         icon={<CreditCard className="h-5 w-5 text-white" />}
         bgColor="bg-purple-500"

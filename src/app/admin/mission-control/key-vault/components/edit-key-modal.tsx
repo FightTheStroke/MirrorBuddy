@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Edit Key Modal Component
  * Form for updating existing secrets
@@ -23,6 +25,7 @@ import {
 import { Loader2, AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
+import { useTranslations } from "next-intl";
 
 interface EditKeyModalProps {
   secret: MaskedSecretVaultEntry;
@@ -37,6 +40,7 @@ export function EditKeyModal({
   onClose,
   onSuccess,
 }: EditKeyModalProps) {
+  const t = useTranslations("admin");
   const [value, setValue] = useState("");
   const [status, setStatus] = useState(secret.status);
   const [loading, setLoading] = useState(false);
@@ -77,7 +81,7 @@ export function EditKeyModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit API Key</DialogTitle>
+          <DialogTitle>{t("editApiKey")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
@@ -94,7 +98,7 @@ export function EditKeyModal({
                 htmlFor="secret-service"
                 className="block text-sm font-medium mb-2"
               >
-                Service
+                {t("service")}
               </label>
               <Input id="secret-service" value={secret.service} disabled />
             </div>
@@ -104,21 +108,21 @@ export function EditKeyModal({
                 htmlFor="secret-key-name"
                 className="block text-sm font-medium mb-2"
               >
-                Key Name
+                {t("keyName")}
               </label>
               <Input id="secret-key-name" value={secret.keyName} disabled />
             </div>
 
             <div>
               <label htmlFor="value" className="block text-sm font-medium mb-2">
-                New Secret Value (optional)
+                {t("newSecretValueOptional")}
               </label>
               <Input
                 id="value"
                 type="password"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="Leave empty to keep current value"
+                placeholder={t("leaveEmptyToKeepCurrentValue")}
               />
             </div>
 
@@ -127,7 +131,7 @@ export function EditKeyModal({
                 htmlFor="status"
                 className="block text-sm font-medium mb-2"
               >
-                Status
+                {t("status")}
               </label>
               <Select
                 value={status}
@@ -139,9 +143,9 @@ export function EditKeyModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                  <SelectItem value="rotated">Rotated</SelectItem>
+                  <SelectItem value="active">{t("active")}</SelectItem>
+                  <SelectItem value="expired">{t("expired")}</SelectItem>
+                  <SelectItem value="rotated">{t("rotated")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -154,11 +158,11 @@ export function EditKeyModal({
               onClick={onClose}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update Secret
+              {t("updateSecret")}
             </Button>
           </DialogFooter>
         </form>

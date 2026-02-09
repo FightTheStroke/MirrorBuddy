@@ -47,7 +47,7 @@ export function ResultsSection({
         {filtered.length} {filtered.length === 1 ? "materiale" : "materiali"}
         {debouncedQuery && ` per "${debouncedQuery}"`}
         {typeFilter && typeFilter !== "all" && (
-          <span> in {TOOL_LABELS[typeFilter as ToolType] || typeFilter}</span>
+          <span> {t("in")} {TOOL_LABELS[typeFilter as ToolType] || typeFilter}</span>
         )}
       </motion.div>
 

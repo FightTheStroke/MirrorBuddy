@@ -281,7 +281,7 @@ export function EmailTemplateEditor({
         <label className="block text-sm font-medium mb-2">{t("preview")}</label>
         <div className="border rounded-lg overflow-hidden bg-white">
           <iframe
-            title="Email Preview"
+            title={t("emailPreview")}
             srcDoc={previewHtml}
             className="w-full h-96 border-0"
             sandbox="allow-same-origin"

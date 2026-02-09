@@ -29,7 +29,8 @@
       "welcome": "Benvenuto in",
       "learn": "Impara",
       "withTeachers": "con i Grandi Professori",
-      "anyAbility": "qualunque siano le tue abilità"
+      "anyAbility": "qualunque siano le tue abilità",
+      "mirrorbuddyLogo": "MirrorBuddy Logo"
     },
     "quickStart": {
       "heading": "Inizia il tuo percorso",
@@ -135,7 +136,8 @@
         "students": "Studenti",
         "organizations": "Scuole & Aziende",
         "individuals": "Studenti & Famiglie",
-        "ariaLabel": "Alterna tra studenti e organizzazioni"
+        "ariaLabel": "Alterna tra studenti e organizzazioni",
+        "switchTo": "Passa a {label}"
       },
       "footerNote": "Termini e condizioni applicabili"
     },
@@ -187,7 +189,7 @@
       "buddyLabel": "Buddy",
       "coach": "Coach - Ti insegnano il metodo di studio",
       "buddy": "Amico - Ti supportano emotivamente",
-      "scrollHint": "\u2190 Scorri per vedere tutti \u2192",
+      "scrollHint": "← Scorri per vedere tutti →",
       "introLine1": "Coach per il metodo di studio.",
       "introLine2": "Buddy per il supporto emotivo.",
       "introDisclaimer": "Non ti dicono cosa pensare. Ti aiutano a trovare il tuo modo di farlo.",
@@ -232,7 +234,7 @@
         "description": "Tutto in un unico posto"
       },
       "introLine1": "Ogni strumento ha un solo obiettivo:",
-      "introLine2": "rendere lo studio pi\u00f9 chiaro, passo dopo passo."
+      "introLine2": "rendere lo studio più chiaro, passo dopo passo."
     },
     "compliance": {
       "heading": "Conformità, privacy e trasparenza",
@@ -309,7 +311,9 @@
         "label": "Codice Aperto"
       },
       "ariaLabel": "Footer con informazioni legali e consenso cookie",
-      "legalLinksAriaLabel": "Link legali"
+      "legalLinksAriaLabel": "Link legali",
+      "madeWith": "Made with ♥ in Europe",
+      "inEurope": "In Europe"
     },
     "principles": {
       "howItWorks": "Come funziona?",
@@ -428,7 +432,8 @@
         "cerebralPalsy": "Paralisi Cerebrale",
         "visualImpairment": "Difficoltà Visive",
         "auditoryProcessing": "Difficoltà Uditive"
-      }
+      },
+      "melissaCoach": "Melissa - Coach"
     },
     "onboarding": {
       "transcript": {
@@ -624,6 +629,21 @@
       "p5": "«Bisognerà tenerlo in gabbia» disse l'ometto. «Ma perché?» domandò il babbo. «Non ha più cervello, ecco perché. Se lo lasciate andare in giro, volerà nei boschi come un uccellino, e in pochi giorni morirà di fame!» Il babbo mi rinchiuse in una gabbia, come un canarino. La gabbia era piccola, stretta, non mi potevo muovere. Le stecche mi stringevano tanto che... alla fine mi svegliai spaventato. Meno male che era stato solo un sogno!",
       "p6": "Vi assicuro che mi sono subito messo a fare i compiti.",
       "connection": "MirrorBuddy non fa i compiti al posto tuo. Ti aiuta a capire come farli."
-    }
+    },
+    "selectLanguage": "Select language",
+    "loadingProfessors": "Loading professors...",
+    "loadingAccessibilityProfiles": "Loading accessibility profiles...",
+    "loadingSupport": "Loading support...",
+    "loadingFeatures": "Loading features...",
+    "loadingCompliance": "Loading compliance...",
+    "ariaLabelFooterConInformazioniLegaliEConsensoCooki": "Footer con informazioni legali e consenso cookie",
+    "creatoConAiLeRispostePossonoContenereErrori": "Creato con AI - le risposte possono contenere errori",
+    "linkLegali": "Link legali",
+    "vediIlCodiceSorgenteSuGithub": "Vedi il codice sorgente su GitHub",
+    "openSource": "Open Source",
+    "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
+    "madeWith": "Made with ♥ in Europe",
+    "inEurope": "In Europe",
+    "switchTo": "Passa a {label}"
   }
 }

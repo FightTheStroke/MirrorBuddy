@@ -9,6 +9,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, TrendingDown, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface ChurnByStage {
   stage: string;
@@ -39,6 +40,7 @@ interface ChurnData {
 }
 
 export function ChurnMetrics() {
+  const t = useTranslations("admin");
   const [data, setData] = useState<ChurnData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +64,7 @@ export function ChurnMetrics() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingDown className="w-5 h-5" />
-            Churn Analysis
+            {t("churnAnalysis1")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -86,7 +88,7 @@ export function ChurnMetrics() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingDown className="w-5 h-5" />
-          Churn Analysis
+          {t("churnAnalysis")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -94,25 +96,25 @@ export function ChurnMetrics() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <p className="text-2xl font-bold">{data.overview.totalVisitors}</p>
-            <p className="text-xs text-muted-foreground">Total Users</p>
+            <p className="text-xs text-muted-foreground">{t("totalUsers")}</p>
           </div>
           <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
             <p className="text-2xl font-bold text-red-600">
               {data.overview.totalChurned}
             </p>
-            <p className="text-xs text-muted-foreground">Churned</p>
+            <p className="text-xs text-muted-foreground">{t("churned")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <p className="text-2xl font-bold">
               {data.overview.overallChurnRate.toFixed(1)}%
             </p>
-            <p className="text-xs text-muted-foreground">Churn Rate</p>
+            <p className="text-xs text-muted-foreground">{t("churnRate")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
             <p className="text-2xl font-bold">
               {data.overview.avgDaysToChurn.toFixed(0)}d
             </p>
-            <p className="text-xs text-muted-foreground">Avg Days to Churn</p>
+            <p className="text-xs text-muted-foreground">{t("avgDaysToChurn")}</p>
           </div>
         </div>
 
@@ -121,7 +123,7 @@ export function ChurnMetrics() {
           <div>
             <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-500" />
-              At-Risk Users ({data.atRiskUsers.length})
+              {t("atRiskUsers")}{data.atRiskUsers.length})
             </h4>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {data.atRiskUsers.slice(0, 10).map((user, idx) => (
@@ -153,7 +155,7 @@ export function ChurnMetrics() {
 
         {/* Churn by Stage */}
         <div>
-          <h4 className="text-sm font-medium mb-2">Churn by Stage</h4>
+          <h4 className="text-sm font-medium mb-2">{t("churnByStage")}</h4>
           <div className="space-y-1">
             {data.byStage
               .filter((s) => s.churned > 0)

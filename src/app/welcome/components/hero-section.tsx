@@ -49,7 +49,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
       >
         <Image
           src="/logo-mirrorbuddy-full.png"
-          alt="MirrorBuddy Logo"
+          alt={t("mirrorbuddyLogo")}
           width={280}
           height={75}
           className="mx-auto max-w-[280px] h-auto"

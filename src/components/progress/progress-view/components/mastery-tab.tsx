@@ -1,14 +1,18 @@
+"use client";
+
 import { ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';
 import type { Subject } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface MasteryTabProps {
   masteries: Record<string, { tier?: string; progress?: number; percentage?: number; topicsCompleted?: number }>;
 }
 
 export function MasteryTab({ masteries }: MasteryTabProps) {
+  const t = useTranslations("education");
   const tiers = ['beginner', 'intermediate', 'advanced', 'expert', 'master'];
   const tierLabels: Record<string, string> = {
     beginner: 'Principiante',
@@ -72,8 +76,8 @@ export function MasteryTab({ masteries }: MasteryTabProps) {
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-slate-500">
-                    <span>{data.topicsCompleted || 0} argomenti completati</span>
-                    <span>{data.progress || data.percentage || 0}% al prossimo livello</span>
+                    <span>{data.topicsCompleted || 0} {t("argomentiCompletati")}</span>
+                    <span>{data.progress || data.percentage || 0}{t("alProssimoLivello")}</span>
                   </div>
                 </div>
 

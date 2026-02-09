@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * User metrics card component
  */
@@ -11,12 +13,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { UserMetrics } from "@/lib/admin/business-kpi-types";
+import { useTranslations } from "next-intl";
 
 interface UsersCardProps {
   users: UserMetrics;
 }
 
 export function UsersCard({ users }: UsersCardProps) {
+  const t = useTranslations("admin");
   const formatNumber = (value: number) => {
     return new Intl.NumberFormat("it-IT").format(value);
   };
@@ -32,49 +36,49 @@ export function UsersCard({ users }: UsersCardProps) {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Users</CardTitle>
+          <CardTitle>{t("usersLabel")}</CardTitle>
           <div className="flex items-center gap-2">
             {users.isEstimated && (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                 <AlertTriangle className="h-3 w-3" />
-                Estimated
+                {t("estimated")}
               </span>
             )}
             <Users className="h-5 w-5 text-muted-foreground" />
           </div>
         </div>
-        <CardDescription>User base and engagement metrics</CardDescription>
+        <CardDescription>{t("userBaseAndEngagementMetrics")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="text-sm font-medium text-muted-foreground">
-              Total Users
+              {t("totalUsers")}
             </div>
             <div className="text-2xl font-bold mt-1">
               {formatNumber(users.totalUsers)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              All registered
+              {t("allRegistered")}
             </div>
           </div>
 
           <div>
             <div className="text-sm font-medium text-muted-foreground">
-              Active Users
+              {t("activeUsers")}
             </div>
             <div className="text-2xl font-bold mt-1">
               {formatNumber(users.activeUsers)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              Last 30 days
+              {t("last30Days")}
             </div>
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Active Rate</span>
+            <span className="text-muted-foreground">{t("activeRate")}</span>
             <span className="font-medium">{formatPercentage(activeRate)}</span>
           </div>
           <div className="w-full bg-secondary rounded-full h-2">
@@ -88,7 +92,7 @@ export function UsersCard({ users }: UsersCardProps) {
         <div className="pt-4 border-t grid grid-cols-2 gap-4">
           <div>
             <div className="text-sm font-medium text-muted-foreground">
-              Trial Users
+              {t("trialUsers")}
             </div>
             <div className="text-lg font-bold mt-1">
               {formatNumber(users.trialUsers)}
@@ -97,7 +101,7 @@ export function UsersCard({ users }: UsersCardProps) {
 
           <div>
             <div className="text-sm font-medium text-muted-foreground">
-              Paid Users
+              {t("paidUsers")}
             </div>
             <div className="text-lg font-bold mt-1">
               {formatNumber(users.paidUsers)}
@@ -108,12 +112,12 @@ export function UsersCard({ users }: UsersCardProps) {
         <div className="pt-4 border-t space-y-3">
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-muted-foreground">
-              Churn Rate
+              {t("churnRate")}
             </div>
             {users.churnRate === null ? (
               <div
                 className="text-sm font-medium text-muted-foreground"
-                title="Insufficient historical data"
+                title={t("insufficientHistoricalData")}
               >
                 N/A
               </div>
@@ -126,7 +130,7 @@ export function UsersCard({ users }: UsersCardProps) {
 
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-muted-foreground">
-              Trial Conversion
+              {t("trialConversion")}
             </div>
             <div className="text-sm font-medium text-green-600">
               {formatPercentage(users.trialConversionRate)}

@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 interface AchievementToastProps {
   achievement: {
@@ -25,6 +26,7 @@ export function AchievementToast({
   onClose,
   duration = 5000,
 }: AchievementToastProps) {
+  const t = useTranslations("achievements");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClose = useCallback(() => {
@@ -54,7 +56,7 @@ export function AchievementToast({
         </div>
         <div className="flex-1">
           <div className="font-bold text-sm uppercase tracking-wide mb-1">
-            Achievement Unlocked!
+            {t("achievementUnlocked")}
           </div>
           <div className="font-semibold text-lg mb-1">{achievement.name}</div>
           <div className="text-sm text-amber-50">{achievement.description}</div>
@@ -63,7 +65,7 @@ export function AchievementToast({
           <button
             onClick={handleClose}
             className="text-white/80 hover:text-white flex-shrink-0"
-            aria-label="Close notification"
+            aria-label={t("closeNotification")}
           >
             <svg
               className="w-5 h-5"

@@ -88,6 +88,14 @@
       "title": "Pagina non trovata",
       "description": "La pagina che stai cercando non esiste o è stata spostata.",
       "backHome": "Torna alla Home"
-    }
+    },
+    "erroreCritico": "Errore critico",
+    "siEVerificatoUnErroreImprevistoIlNostroTeamEStato": "Si è verificato un errore imprevisto. Il nostro team è stato",
+    "notificatoAutomaticamente": "notificato automaticamente.",
+    "riprova": "Riprova",
+    "tornaAllaHome": "Torna alla home",
+    "somethingWentWrong": "Something went wrong",
+    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
+    "retry": "Retry"
   }
 }

@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { TierName, FeatureKey } from "@/types/tier-types";
 import { TierBadge } from "./TierBadge";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface LockedFeatureOverlayProps {
   /**
@@ -58,6 +59,7 @@ export function LockedFeatureOverlay({
   onUpgrade,
   className,
 }: LockedFeatureOverlayProps) {
+  const t = useTranslations("pricing");
   // Only show overlay for non-pro tiers
   const isLocked = tier !== "pro";
 
@@ -82,7 +84,7 @@ export function LockedFeatureOverlay({
         data-testid="locked-overlay"
         className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/20 backdrop-blur-sm rounded-lg pointer-events-auto"
         role="img"
-        aria-label="Feature locked - upgrade to Pro to access"
+        aria-label={t("ariaLabelFeatureLockedUpgradeToProToAccess")}
       >
         {/* Lock icon */}
         <div
@@ -101,12 +103,12 @@ export function LockedFeatureOverlay({
           className="gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white"
           size="sm"
         >
-          Upgrade to Pro
+          {t("upgradeToPro")}
         </Button>
 
         {/* Optional: Help text */}
         <p className="text-xs text-slate-600 dark:text-slate-300 text-center px-2">
-          This feature is only available in Pro
+          {t("thisFeatureIsOnlyAvailableInPro")}
         </p>
       </div>
     </div>

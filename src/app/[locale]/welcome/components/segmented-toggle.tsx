@@ -59,7 +59,7 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
               onKeyDown={(e) => handleKeyDown(e, option.id)}
               role="tab"
               aria-selected={isActive}
-              aria-label={`Switch to ${option.label}`}
+              aria-label={t("switchTo", { label: option.label })}
               className={`relative px-6 py-2 font-semibold text-sm transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
                 isActive
                   ? "text-white shadow-md"

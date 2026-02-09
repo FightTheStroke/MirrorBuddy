@@ -9,6 +9,7 @@ import { Calendar, BookOpen, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { type FilterType, FILTER_TABS, SUBJECT_LABELS } from "./constants";
+import { useTranslations } from "next-intl";
 
 interface ArchiveFiltersProps {
   filter: FilterType;
@@ -39,13 +40,14 @@ export function ArchiveFilters({
   onClearFilters,
   hasActiveFilters,
 }: ArchiveFiltersProps) {
+  const t = useTranslations("education");
   return (
     <>
       {/* Filter Tabs */}
       <div
         className="flex flex-wrap gap-2"
         role="tablist"
-        aria-label="Filtra per tipo"
+        aria-label={t("filtraPerTipo")}
       >
         {FILTER_TABS.map(({ value, label }) => (
           <Button
@@ -78,7 +80,7 @@ export function ArchiveFilters({
       <div className="flex flex-wrap items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
           <Filter className="w-4 h-4" />
-          <span className="font-medium">Filtri:</span>
+          <span className="font-medium">{t("filtri")}</span>
         </div>
 
         {/* Subject Filter */}
@@ -87,9 +89,9 @@ export function ArchiveFilters({
             value={subjectFilter}
             onChange={(e) => onSubjectChange(e.target.value)}
             className="appearance-none pl-8 pr-8 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-            aria-label="Filtra per materia"
+            aria-label={t("filtraPerMateria")}
           >
-            <option value="all">Tutte le materie</option>
+            <option value="all">{t("tutteLeMaterie")}</option>
             {availableSubjects.map((subject) => (
               <option key={subject} value={subject}>
                 {SUBJECT_LABELS[subject] || subject}
@@ -107,7 +109,7 @@ export function ArchiveFilters({
               value={dateFrom}
               onChange={(e) => onDateFromChange(e.target.value)}
               className="pl-8 pr-3 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Data da"
+              aria-label={t("dataDa")}
             />
             <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
@@ -118,7 +120,7 @@ export function ArchiveFilters({
               value={dateTo}
               onChange={(e) => onDateToChange(e.target.value)}
               className="pl-8 pr-3 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              aria-label="Data a"
+              aria-label={t("dataA")}
             />
             <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
@@ -133,7 +135,7 @@ export function ArchiveFilters({
             className="text-xs gap-1"
           >
             <X className="w-3 h-3" />
-            Pulisci filtri
+            {t("pulisciFiltri")}
           </Button>
         )}
       </div>

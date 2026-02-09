@@ -7,6 +7,7 @@
 import { Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface MicrophoneSelectorProps {
   preferredMicrophoneId: string | null;
@@ -31,6 +32,7 @@ export function MicrophoneSelector({
   onStartTest,
   onStopTest,
 }: MicrophoneSelectorProps) {
+  const t = useTranslations("settings");
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -40,7 +42,7 @@ export function MicrophoneSelector({
             className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"
           >
             <Mic className="w-4 h-4 text-red-500" />
-            Microfono
+            {t("microfono")}
           </label>
           <select
             id="settings-microphone"
@@ -48,7 +50,7 @@ export function MicrophoneSelector({
             onChange={(e) => onMicChange(e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
           >
-            <option value="">Predefinito di sistema</option>
+            <option value="">{t("predefinitoDiSistema")}</option>
             {availableMics.map((mic) => (
               <option key={mic.deviceId} value={mic.deviceId}>
                 {mic.label || `Microfono ${mic.deviceId.slice(0, 8)}...`}
@@ -64,7 +66,7 @@ export function MicrophoneSelector({
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             <span className="text-xs text-slate-600 dark:text-slate-400">
-              Parla per testare
+              {t("parlaPerTestare")}
             </span>
             <span className="text-xs font-mono text-slate-500 ml-auto">
               {Math.round(audioLevel)}%
@@ -80,7 +82,7 @@ export function MicrophoneSelector({
           />
           {!micTestActive && (
             <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-xs">
-              Clicca &quot;Testa&quot; per vedere la waveform
+              {t("cliccaQuotTestaQuotPerVedereLaWaveform")}
             </div>
           )}
         </div>
@@ -92,19 +94,19 @@ export function MicrophoneSelector({
           onClick={onRefresh}
           variant="outline"
           size="sm"
-          title="Aggiorna dispositivi"
+          title={t("aggiornaDispositivi")}
         >
           <RefreshCw className="w-4 h-4" />
         </Button>
         {!micTestActive ? (
           <Button onClick={onStartTest} variant="default" size="sm">
             <Mic className="w-4 h-4 mr-1" />
-            Testa Mic
+            {t("testaMic")}
           </Button>
         ) : (
           <Button onClick={onStopTest} variant="destructive" size="sm">
             <XCircle className="w-4 h-4 mr-1" />
-            Stop
+            {t("stop")}
           </Button>
         )}
       </div>

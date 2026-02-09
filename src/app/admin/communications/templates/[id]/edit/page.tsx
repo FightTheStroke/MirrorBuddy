@@ -5,6 +5,7 @@ import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect, notFound } from "next/navigation";
 import { getTemplate } from "@/lib/email/template-service";
 import { EmailTemplateEditor } from "@/components/admin/email-template-editor";
+import { getTranslations } from "next-intl/server";
 
 interface EditTemplatePageProps {
   params: Promise<{ id: string }>;
@@ -13,6 +14,7 @@ interface EditTemplatePageProps {
 export default async function EditTemplatePage({
   params,
 }: EditTemplatePageProps) {
+  const t = await getTranslations("admin");
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
@@ -30,10 +32,10 @@ export default async function EditTemplatePage({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Edit Email Template
+          {t("editEmailTemplate")}
         </h1>
         <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Update the email template content and settings.
+          {t("updateTheEmailTemplateContentAndSettings")}
         </p>
       </div>
       <EmailTemplateEditor mode="edit" template={template} />

@@ -351,7 +351,7 @@ export function ConversationSidebar({
                                   )}
                                   <div className="flex items-center gap-1 mt-1 text-[10px] text-white/50">
                                     <Calendar className="w-2.5 h-2.5" />
-                                    {conv.messageCount} msg
+                                    {conv.messageCount} {t("msg")}
                                   </div>
                                 </div>
                               </div>

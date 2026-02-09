@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Key Vault Table Component
  * Displays stored credentials with masked values
@@ -16,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Eye, Pencil, Trash2, Copy, Check } from "lucide-react";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
+import { useTranslations } from "next-intl";
 
 function formatRelativeTime(date: Date): string {
   const now = new Date();
@@ -42,6 +45,7 @@ export function KeyVaultTable({
   onEdit,
   onDelete,
 }: KeyVaultTableProps) {
+  const t = useTranslations("admin");
   const [revealedSecret, setRevealedSecret] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -86,7 +90,7 @@ export function KeyVaultTable({
   if (secrets.length === 0) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        No secrets stored yet. Click &ldquo;Add Key&rdquo; to create one.
+        {t("noSecretsStoredYetClickLdquoAddKeyRdquoToCreateOne")}
       </div>
     );
   }
@@ -95,12 +99,12 @@ export function KeyVaultTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Service</TableHead>
-          <TableHead>Key Name</TableHead>
-          <TableHead>Value</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Last Used</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead>{t("service")}</TableHead>
+          <TableHead>{t("keyName")}</TableHead>
+          <TableHead>{t("value")}</TableHead>
+          <TableHead>{t("status")}</TableHead>
+          <TableHead>{t("lastUsed")}</TableHead>
+          <TableHead className="text-right">{t("actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

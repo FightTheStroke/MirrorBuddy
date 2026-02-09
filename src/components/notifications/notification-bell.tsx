@@ -6,8 +6,10 @@ import { Bell, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotificationStore } from "@/lib/stores/notification-store";
 import { NotificationItem } from "./notification-item";
+import { useTranslations } from "next-intl";
 
 export function NotificationBell() {
+  const t = useTranslations("common");
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -63,7 +65,7 @@ export function NotificationBell() {
           "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
           isOpen && "bg-gray-100 dark:bg-gray-800",
         )}
-        aria-label={`Notifiche${unreadCount > 0 ? ` (${unreadCount} non lette)` : ""}`}
+        aria-label={unreadCount > 0 ? t("notificheConNonLette", { count: unreadCount }) : t("notifiche")}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -92,10 +94,10 @@ export function NotificationBell() {
             {/* Header */}
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-3">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                Notifiche
+                {t("notifiche")}
                 {unreadCount > 0 && (
                   <span className="ml-2 text-xs font-normal text-gray-500">
-                    ({unreadCount} non lette)
+                    ({unreadCount} {t("nonLette")}
                   </span>
                 )}
               </h3>
@@ -105,13 +107,13 @@ export function NotificationBell() {
                     onClick={markAllAsRead}
                     className="text-xs text-blue-600 hover:text-blue-500 dark:text-blue-400"
                   >
-                    Segna tutte
+                    {t("segnaTutte")}
                   </button>
                 )}
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                  aria-label="Chiudi"
+                  aria-label={t("chiudi")}
                 >
                   <X className="h-4 w-4 text-gray-500" />
                 </button>
@@ -124,10 +126,10 @@ export function NotificationBell() {
                 <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                   <Bell className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-3" />
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Nessuna notifica
+                    {t("nessunaNotifica")}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                    Le tue notifiche appariranno qui
+                    {t("leTueNotificheApparirannoQui")}
                   </p>
                 </div>
               ) : (
@@ -151,7 +153,7 @@ export function NotificationBell() {
                   onClick={clearAll}
                   className="w-full text-center text-xs text-red-600 hover:text-red-500 dark:text-red-400 py-1"
                 >
-                  Cancella tutte le notifiche
+                  {t("cancellaTutteLeNotifiche")}
                 </button>
               </div>
             )}

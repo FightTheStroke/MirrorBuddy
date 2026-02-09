@@ -215,12 +215,12 @@ export function FlashcardReviewMobile({
           <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-6">
             <Check className="w-10 h-10 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">Completato!</h2>
+          <h2 className="text-2xl font-bold mb-2">{t("completato")}</h2>
           <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Hai rivisto tutte le carte di oggi.
+            {t("haiRivistoTutteLeCarteDiOggi")}
             {cardsReviewed > 0 && ` Carte riviste: ${cardsReviewed}`}
           </p>
-          <Button onClick={onComplete}>Continua</Button>
+          <Button onClick={onComplete}>{t("continua")}</Button>
         </CardContent>
       </Card>
     );
@@ -235,9 +235,9 @@ export function FlashcardReviewMobile({
       {/* Progress */}
       <div className="flex items-center justify-between w-full mb-6 text-sm text-slate-500">
         <span>
-          Carta {currentIndex + 1} di {cardsToReview.length}
+          {t("carta")} {currentIndex + 1} {t("di")} {cardsToReview.length}
         </span>
-        <span>{cardsReviewed} riviste</span>
+        <span>{cardsReviewed} {t("riviste")}</span>
       </div>
 
       {/* Card Container - 80% of viewport width on mobile */}
@@ -265,12 +265,12 @@ export function FlashcardReviewMobile({
             )}
           >
             <CardContent className="p-8 flex flex-col items-center justify-center min-h-[300px]">
-              <span className="text-xs text-slate-400 mb-4">Domanda</span>
+              <span className="text-xs text-slate-400 mb-4">{t("domanda")}</span>
               <p className="text-xl text-center font-medium">
                 {currentCard.front}
               </p>
               <span className="text-xs text-slate-400 mt-8">
-                Tocca per girare
+                {t("toccaPerGirare")}
               </span>
             </CardContent>
           </Card>
@@ -284,7 +284,7 @@ export function FlashcardReviewMobile({
             style={{ transform: "rotateY(180deg)" }}
           >
             <CardContent className="p-8 flex flex-col items-center justify-center min-h-[300px]">
-              <span className="text-xs text-slate-400 mb-4">Risposta</span>
+              <span className="text-xs text-slate-400 mb-4">{t("risposta")}</span>
               <p className="text-xl text-center font-medium">
                 {currentCard.back}
               </p>
@@ -350,7 +350,7 @@ export function FlashcardReviewMobile({
           animate={{ opacity: 1 }}
           className="w-4/5 max-w-2xl text-center text-xs text-slate-400 mt-6"
         >
-          Scorri sinistra per difficile, destra per facile
+          {t("scorriSinistraPerDifficileDestraPerFacile")}
         </motion.p>
       )}
 
@@ -361,7 +361,7 @@ export function FlashcardReviewMobile({
           animate={{ opacity: 1 }}
           className="w-4/5 max-w-2xl text-center text-sm text-slate-400 mt-6"
         >
-          Premi o scorri per valutare
+          {t("premiOScorriPerValutare")}
         </motion.p>
       )}
     </div>

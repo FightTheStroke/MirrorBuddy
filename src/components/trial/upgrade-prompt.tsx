@@ -7,6 +7,7 @@ import {
   trackBetaCtaClicked,
 } from "@/lib/telemetry/trial-events";
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 
 interface UpgradePromptProps {
   visitorId: string;
@@ -27,6 +28,7 @@ export function UpgradePrompt({
   variant = "inline",
   onRequestBeta,
 }: UpgradePromptProps) {
+  const t = useTranslations("auth");
   const hasTrackedRef = useRef(false);
 
   useEffect(() => {
@@ -49,10 +51,10 @@ export function UpgradePrompt({
             <Sparkles className="w-5 h-5" />
             <div>
               <p className="font-medium">
-                Sblocca {feature} con MirrorBuddy Beta
+                {t("sblocca1")} {feature} {t("conMirrorbuddyBeta")}
               </p>
               <p className="text-sm text-white/80">
-                Accesso completo a tutti i Maestri e strumenti
+                {t("accessoCompletoATuttiIMaestriEStrumenti")}
               </p>
             </div>
           </div>
@@ -62,7 +64,7 @@ export function UpgradePrompt({
             size="sm"
             className="shrink-0 gap-1"
           >
-            Richiedi Beta
+            {t("richiediBeta1")}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
@@ -76,14 +78,14 @@ export function UpgradePrompt({
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-amber-500" />
           <span className="text-sm font-medium text-slate-900 dark:text-white">
-            Prova gratuita
+            {t("provaGratuita")}
           </span>
         </div>
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          Vuoi continuare a usare {feature}?
+          {t("vuoiContinuareAUsare")} {feature}?
         </p>
         <Button onClick={handleClick} size="sm" className="w-full gap-1">
-          Richiedi Beta
+          {t("richiediBeta")}
           <ArrowRight className="w-3 h-3" />
         </Button>
       </div>
@@ -95,13 +97,13 @@ export function UpgradePrompt({
     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
       <Sparkles className="w-4 h-4 text-amber-500" />
       <span className="text-sm text-amber-700 dark:text-amber-300">
-        {feature} limitato in prova
+        {feature} {t("limitatoInProva")}
       </span>
       <button
         onClick={handleClick}
         className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:underline"
       >
-        Sblocca
+        {t("sblocca")}
       </button>
     </div>
   );

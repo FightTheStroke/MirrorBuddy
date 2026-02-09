@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, MessageCircle, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDeviceType } from "@/hooks/use-device-type";
+import { useTranslations } from "next-intl";
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -37,6 +38,7 @@ interface TrialBannerMobileProps {
  * ```
  */
 export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
+  const t = useTranslations("common");
   const { isPhone, isTablet } = useDeviceType();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -75,11 +77,11 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
           <Gift className="w-5 h-5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm">
-              Trial: {trialStatus.chatsRemaining}/{trialStatus.maxChats}{" "}
-              messages remaining
+              {t("trial1")} {trialStatus.chatsRemaining}/{trialStatus.maxChats}{" "}
+              {t("messagesRemaining")}
             </p>
             <p className="text-xs mt-1 opacity-90">
-              Upgrade to Base tier for unlimited access
+              {t("upgradeToBaseTierForUnlimitedAccess")}
             </p>
           </div>
         </div>
@@ -92,7 +94,7 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
             "border border-current border-opacity-20",
           )}
         >
-          Upgrade
+          {t("upgrade")}
         </Link>
       </motion.div>
     );
@@ -121,13 +123,13 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <MessageCircle className="w-4 h-4 flex-shrink-0" />
               <span className="font-semibold text-xs">
-                Trial: {trialStatus.chatsRemaining}/{trialStatus.maxChats} msgs
+                {t("trialLabel")} {trialStatus.chatsRemaining}/{trialStatus.maxChats} {t("msgs")}
               </span>
             </div>
             <button
               onClick={() => setIsExpanded(true)}
               className="p-1 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0 hover:bg-current hover:bg-opacity-10 rounded transition-colors"
-              aria-label="Expand trial banner"
+              aria-label={t("expandTrialBanner")}
             >
               <ChevronUp className="w-4 h-4" />
             </button>
@@ -157,15 +159,15 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
                 <Gift className="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm">
-                    Trial Mode: {trialStatus.chatsRemaining}/
-                    {trialStatus.maxChats} messages
+                    {t("trialMode")} {trialStatus.chatsRemaining}/
+                    {trialStatus.maxChats} {t("messages1")}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsExpanded(false)}
                 className="p-1 min-w-[36px] min-h-[36px] flex items-center justify-center flex-shrink-0 hover:bg-current hover:bg-opacity-10 rounded transition-colors"
-                aria-label="Collapse trial banner"
+                aria-label={t("collapseTrialBanner")}
               >
                 <ChevronUp className="w-4 h-4 rotate-180" />
               </button>
@@ -173,11 +175,11 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
 
             {/* Info text */}
             <p className="text-xs leading-relaxed opacity-90">
-              You&apos;re using the free trial. You have{" "}
+              {t("youAposReUsingTheFreeTrialYouHave")}
               <span className="font-semibold">
-                {trialStatus.chatsRemaining} messages
+                {trialStatus.chatsRemaining} {t("messages")}
               </span>{" "}
-              remaining this month.
+              {t("remainingThisMonth")}
             </p>
 
             {/* Upgrade link */}
@@ -190,7 +192,7 @@ export function TrialBannerMobile({ trialStatus }: TrialBannerMobileProps) {
                 "border border-current border-opacity-20",
               )}
             >
-              Upgrade to Base Tier
+              {t("upgradeToBaseTier")}
             </Link>
           </motion.div>
         )}

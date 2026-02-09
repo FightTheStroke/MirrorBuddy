@@ -50,6 +50,11 @@
       "subtitle": "Tu compañero de estudio basado en inteligencia artificial",
       "cta": "Comienza ahora",
       "secondaryCta": "Descubre más"
-    }
+    },
+    "lv": "Lv.",
+    "streak1": "Streak",
+    "streak": "Streak",
+    "mb": "+% MB",
+    "sim": "(SIM)"
   }
 }

@@ -5,6 +5,7 @@ import { FileText, Download, Brain, Layers, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SummaryRenderer } from '@/components/tools/summary-renderer';
 import type { SummaryData } from '@/types/tools';
+import { useTranslations } from "next-intl";
 
 interface SummaryModalProps {
   title: string;
@@ -23,6 +24,7 @@ export function SummaryModal({
   onConvertToMindmap,
   onGenerateFlashcards,
 }: SummaryModalProps) {
+  const t = useTranslations("education");
   return (
     <motion.div
       initial={{ scale: 0.95 }}
@@ -51,7 +53,7 @@ export function SummaryModal({
             onClick={() => onConvertToMindmap(data)}
           >
             <Brain className="w-4 h-4 mr-2" />
-            Mappa
+            {t("mappa")}
           </Button>
           <Button
             variant="outline"
@@ -59,7 +61,7 @@ export function SummaryModal({
             onClick={() => onGenerateFlashcards(data)}
           >
             <Layers className="w-4 h-4 mr-2" />
-            Flashcard
+            {t("flashcardLabel")}
           </Button>
           <button
             onClick={onClose}

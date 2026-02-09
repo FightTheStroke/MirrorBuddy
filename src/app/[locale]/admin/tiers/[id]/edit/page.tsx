@@ -2,12 +2,13 @@
  * Edit Tier - Admin CRUD
  * Task: T1-11 (F-26)
  */
-/* eslint-disable jsx-a11y/label-has-associated-control */
+ 
 
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "Edit Tier | Admin",
@@ -97,6 +98,7 @@ async function deleteTier(formData: FormData) {
 }
 
 export default async function EditTierPage({ params }: Props) {
+  const t = await getTranslations("admin");
   const { id } = await params;
   const tier = await getTier(id);
 
@@ -107,22 +109,22 @@ export default async function EditTierPage({ params }: Props) {
           href="/admin/tiers"
           className="text-sm text-indigo-600 hover:text-indigo-900"
         >
-          ← Back to Tiers
+          {t("backToTiers")}
         </Link>
       </div>
 
-      <h1 className="mb-6 text-3xl font-bold">Edit Tier: {tier.name}</h1>
+      <h1 className="mb-6 text-3xl font-bold">{t("editTier")} {tier.name}</h1>
 
       <form action={updateTier} className="max-w-2xl space-y-6">
         <input type="hidden" name="id" value={tier.id} />
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Basic Information</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("basicInformation")}</h2>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Code
+                {t("code")}
               </label>
               <input
                 type="text"
@@ -131,13 +133,13 @@ export default async function EditTierPage({ params }: Props) {
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-gray-100 px-3 py-2"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Code cannot be changed
+                {t("codeCannotBeChanged")}
               </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Name *
+                {t("name")}
               </label>
               <input
                 type="text"
@@ -151,7 +153,7 @@ export default async function EditTierPage({ params }: Props) {
 
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700">
-              Description
+              {t("description")}
             </label>
             <textarea
               name="description"
@@ -164,7 +166,7 @@ export default async function EditTierPage({ params }: Props) {
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Sort Order
+                {t("sortOrder")}
               </label>
               <input
                 type="number"
@@ -184,19 +186,19 @@ export default async function EditTierPage({ params }: Props) {
                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
               />
               <label htmlFor="isActive" className="ml-2 text-sm text-gray-700">
-                Active (visible to users)
+                {t("activeVisibleToUsers")}
               </label>
             </div>
           </div>
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Usage Limits</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("usageLimits")}</h2>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Chat Messages / Day
+                {t("chatMessagesDay")}
               </label>
               <input
                 type="number"
@@ -209,7 +211,7 @@ export default async function EditTierPage({ params }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Voice Minutes / Day
+                {t("voiceMinutesDay")}
               </label>
               <input
                 type="number"
@@ -222,7 +224,7 @@ export default async function EditTierPage({ params }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Tool Uses / Day
+                {t("toolUsesDay")}
               </label>
               <input
                 type="number"
@@ -235,7 +237,7 @@ export default async function EditTierPage({ params }: Props) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Documents Total
+                {t("documentsTotal")}
               </label>
               <input
                 type="number"
@@ -258,7 +260,7 @@ export default async function EditTierPage({ params }: Props) {
                 if (!confirm("Deactivate this tier?")) e.preventDefault();
               }}
             >
-              Deactivate Tier
+              {t("deactivateTier")}
             </button>
           </form>
 
@@ -267,13 +269,13 @@ export default async function EditTierPage({ params }: Props) {
               href="/admin/tiers"
               className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Cancel
+              {t("cancel")}
             </Link>
             <button
               type="submit"
               className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
             >
-              Save Changes
+              {t("saveChanges")}
             </button>
           </div>
         </div>

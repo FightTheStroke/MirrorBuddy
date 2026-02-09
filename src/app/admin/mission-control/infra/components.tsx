@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Infrastructure Panel Components
  * Reusable components for displaying service metrics
@@ -8,6 +10,7 @@ import type {
   ServiceStatus,
   VercelMetrics,
 } from "@/lib/admin/infra-panel-types";
+import { useTranslations } from "next-intl";
 
 /**
  * Status Badge Component
@@ -101,12 +104,13 @@ interface VercelCardProps {
 }
 
 export function VercelCard({ metrics }: VercelCardProps) {
+  const t = useTranslations("admin");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Cloud className="h-5 w-5 text-blue-600" />
-          <span className="font-medium">Status</span>
+          <span className="font-medium">{t("status")}</span>
         </div>
         <StatusBadge status={metrics.status} />
       </div>
@@ -131,7 +135,7 @@ export function VercelCard({ metrics }: VercelCardProps) {
       />
 
       <div className="space-y-2 border-t pt-4">
-        <div className="text-sm font-medium">Recent Deployments</div>
+        <div className="text-sm font-medium">{t("recentDeployments")}</div>
         {metrics.deployments.length > 0 ? (
           <div className="space-y-2">
             {metrics.deployments.slice(0, 3).map((deployment) => (
@@ -156,7 +160,7 @@ export function VercelCard({ metrics }: VercelCardProps) {
           </div>
         ) : (
           <div className="text-xs text-muted-foreground">
-            No recent deployments
+            {t("noRecentDeployments")}
           </div>
         )}
       </div>

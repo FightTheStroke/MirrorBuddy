@@ -14,6 +14,7 @@ import { AddKeyModal } from "./components/add-key-modal";
 import { EditKeyModal } from "./components/edit-key-modal";
 import { DeleteKeyModal } from "./components/delete-key-modal";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ interface StructuredError {
 }
 
 export default function KeyVaultPage() {
+  const t = useTranslations("admin");
   const [secrets, setSecrets] = useState<MaskedSecretVaultEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -84,14 +86,14 @@ export default function KeyVaultPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Key Vault</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("keyVault")}</h1>
           <p className="text-muted-foreground">
-            Secure encrypted storage for API keys and credentials
+            {t("secureEncryptedStorageForApiKeysAndCredentials")}
           </p>
         </div>
         <Button onClick={() => setShowAddModal(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Key
+          {t("addKey")}
         </Button>
       </div>
 
@@ -99,7 +101,7 @@ export default function KeyVaultPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            Stored Credentials
+            {t("storedCredentials")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -114,22 +116,22 @@ export default function KeyVaultPage() {
               <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-4 text-blue-900 border border-blue-200">
                 <AlertCircle className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Encryption Not Configured</p>
+                  <p className="font-semibold">{t("encryptionNotConfigured")}</p>
                   <p className="text-sm mt-1">{error}</p>
                 </div>
               </div>
               <div className="text-sm text-muted-foreground space-y-2">
-                <p className="font-medium">Setup instructions:</p>
+                <p className="font-medium">{t("setupInstructions")}</p>
                 <ol className="list-decimal list-inside space-y-1 ml-2">
-                  <li>Generate a secure 32-character encryption key</li>
+                  <li>{t("generateEncryptionKey")}</li>
                   <li>
-                    Add{" "}
+                    {t("add")}{" "}
                     <code className="bg-muted px-1 rounded">
                       TOKEN_ENCRYPTION_KEY
                     </code>{" "}
-                    to Vercel environment variables
+                    {t("toVercelEnvironmentVariables")}
                   </li>
-                  <li>Redeploy the application</li>
+                  <li>{t("redeployTheApplication")}</li>
                 </ol>
               </div>
             </div>
@@ -139,7 +141,7 @@ export default function KeyVaultPage() {
             <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-4 text-destructive border border-destructive/20">
               <AlertCircle className="h-5 w-5" />
               <div>
-                <p className="font-semibold">Database Connection Error</p>
+                <p className="font-semibold">{t("databaseConnectionError")}</p>
                 <p className="text-sm mt-1">{error}</p>
               </div>
             </div>

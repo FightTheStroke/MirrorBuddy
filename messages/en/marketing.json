@@ -4,7 +4,8 @@
       "headline": "Learn with History's Greatest Teachers",
       "subtitle": "AI-powered tutoring that adapts to every learning style. Voice conversations with 26 historic professors, designed for students with and without learning differences.",
       "cta": "Start Free Trial",
-      "schoolCta": "Contact for Schools"
+      "schoolCta": "Contact for Schools",
+      "mirrorbuddyVoiceAiDemo": "MirrorBuddy voice AI demo"
     },
     "features": {
       "heading": "Why MirrorBuddy",
@@ -50,7 +51,8 @@
           "Custom branding"
         ],
         "cta": "Contact Us"
-      }
+      },
+      "popular": "Popolare"
     },
     "social": {
       "heading": "Trusted By",
@@ -103,7 +105,12 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "cookies": "Cookie Policy",
-      "copyright": "MirrorBuddy. All rights reserved."
-    }
+      "copyright": "MirrorBuddy. All rights reserved.",
+      "aiPoweredInclusiveEducationPlatform": "AI-powered inclusive education platform."
+    },
+    "signUp": "Sign Up",
+    "mirrorbuddyForSchools": "MirrorBuddy for Schools",
+    "bringInclusiveAiEducationToYourInstitutionSsoAdmin": "Bring inclusive AI education to your institution. SSO, admin tools,",
+    "andDedicatedSupportIncluded": "and dedicated support included."
   }
 }

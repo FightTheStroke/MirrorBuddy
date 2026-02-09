@@ -8,6 +8,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { csrfFetch } from "@/lib/auth";
+import { useTranslations } from "next-intl";
 
 interface AuditLogEntry {
   id: string;
@@ -25,6 +26,7 @@ interface AuditLogViewerProps {
 }
 
 export function AuditLogViewer({ initialAction }: AuditLogViewerProps) {
+  const t = useTranslations("admin");
   const [entries, setEntries] = useState<AuditLogEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -59,7 +61,7 @@ export function AuditLogViewer({ initialAction }: AuditLogViewerProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <h2 className="text-xl font-semibold">Audit Log</h2>
+        <h2 className="text-xl font-semibold">{t("auditLog")}</h2>
         <select
           value={actionFilter}
           onChange={(e) => {
@@ -68,27 +70,27 @@ export function AuditLogViewer({ initialAction }: AuditLogViewerProps) {
           }}
           className="rounded-md border px-3 py-1.5 text-sm"
         >
-          <option value="">All Actions</option>
-          <option value="user.create">User Create</option>
-          <option value="user.delete">User Delete</option>
-          <option value="user.role_change">Role Change</option>
-          <option value="tier.change">Tier Change</option>
-          <option value="sso.config_create">SSO Config</option>
-          <option value="sso.directory_sync">Directory Sync</option>
-          <option value="auth.login">Login</option>
-          <option value="auth.sso_login">SSO Login</option>
+          <option value="">{t("allActions")}</option>
+          <option value="user.create">{t("userCreate")}</option>
+          <option value="user.delete">{t("userDelete")}</option>
+          <option value="user.role_change">{t("roleChange")}</option>
+          <option value="tier.change">{t("tierChange")}</option>
+          <option value="sso.config_create">{t("ssoConfig")}</option>
+          <option value="sso.directory_sync">{t("directorySync")}</option>
+          <option value="auth.login">{t("login")}</option>
+          <option value="auth.sso_login">{t("ssoLogin")}</option>
         </select>
-        <span className="text-sm text-gray-500">{total} events</span>
+        <span className="text-sm text-gray-500">{total} {t("events")}</span>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
         <table className="min-w-full text-sm">
           <thead className="border-b bg-gray-50">
             <tr>
-              <th className="px-4 py-2 text-left font-medium">Time</th>
-              <th className="px-4 py-2 text-left font-medium">Action</th>
-              <th className="px-4 py-2 text-left font-medium">Actor</th>
-              <th className="px-4 py-2 text-left font-medium">Target</th>
+              <th className="px-4 py-2 text-left font-medium">{t("time")}</th>
+              <th className="px-4 py-2 text-left font-medium">{t("action")}</th>
+              <th className="px-4 py-2 text-left font-medium">{t("actor")}</th>
+              <th className="px-4 py-2 text-left font-medium">{t("target")}</th>
               <th className="px-4 py-2 text-left font-medium">IP</th>
             </tr>
           </thead>
@@ -96,13 +98,13 @@ export function AuditLogViewer({ initialAction }: AuditLogViewerProps) {
             {loading ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
-                  Loading...
+                  {t("loading")}
                 </td>
               </tr>
             ) : entries.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
-                  No audit events found
+                  {t("noAuditEventsFound")}
                 </td>
               </tr>
             ) : (
@@ -139,17 +141,17 @@ export function AuditLogViewer({ initialAction }: AuditLogViewerProps) {
             disabled={page === 1}
             className="rounded border px-3 py-1 text-sm disabled:opacity-50"
           >
-            Previous
+            {t("previous")}
           </button>
           <span className="text-sm text-gray-500">
-            Page {page} of {totalPages}
+            {t("page")} {page} {t("of")} {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="rounded border px-3 py-1 text-sm disabled:opacity-50"
           >
-            Next
+            {t("next")}
           </button>
         </div>
       )}

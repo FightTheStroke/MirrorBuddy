@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * @file attachment-panel.tsx
  * @brief Attachment panel component
@@ -6,6 +8,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface AttachmentPanelProps {
   show: boolean;
@@ -20,6 +23,7 @@ export function AttachmentPanel({
   onFileClick,
   highContrast,
 }: AttachmentPanelProps) {
+  const t = useTranslations("education");
   return (
     <AnimatePresence>
       {show && (
@@ -45,7 +49,7 @@ export function AttachmentPanel({
               )}
             >
               <Camera className="w-6 h-6" />
-              <span className="text-xs">Fotocamera</span>
+              <span className="text-xs">{t("fotocamera")}</span>
             </button>
             <button
               onClick={onFileClick}
@@ -57,7 +61,7 @@ export function AttachmentPanel({
               )}
             >
               <FileText className="w-6 h-6" />
-              <span className="text-xs">File</span>
+              <span className="text-xs">{t("file")}</span>
             </button>
           </div>
         </motion.div>

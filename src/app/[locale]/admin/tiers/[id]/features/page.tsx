@@ -2,12 +2,13 @@
  * Tier Features & AI Model Assignment
  * Task: T1-12 (F-27)
  */
-/* eslint-disable jsx-a11y/label-has-associated-control */
+ 
 
 import { redirect, notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: 'Tier Features | Admin',
@@ -84,6 +85,7 @@ async function updateFeatures(formData: FormData) {
 }
 
 export default async function TierFeaturesPage({ params }: Props) {
+  const t = await getTranslations("admin");
   const { id } = await params;
   const [tier, models] = await Promise.all([getTier(id), getModels()]);
 
@@ -95,20 +97,20 @@ export default async function TierFeaturesPage({ params }: Props) {
     <div className="p-8">
       <div className="mb-6">
         <Link href="/admin/tiers" className="text-sm text-indigo-600 hover:text-indigo-900">
-          ← Back to Tiers
+          {t("backToTiers")}
         </Link>
       </div>
 
-      <h1 className="mb-2 text-3xl font-bold">Features: {tier.name}</h1>
+      <h1 className="mb-2 text-3xl font-bold">{t("features")} {tier.name}</h1>
       <p className="mb-6 text-gray-600">
-        Configure which features are enabled and which AI models to use
+        {t("configureWhichFeaturesAreEnabledAndWhichAiModelsTo")}
       </p>
 
       <form action={updateFeatures} className="space-y-6">
         <input type="hidden" name="id" value={tier.id} />
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Feature Flags & AI Models</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("featureFlagsAiModels")}</h2>
 
           <div className="space-y-4">
             {FEATURES.map((feature) => {
@@ -138,7 +140,7 @@ export default async function TierFeaturesPage({ params }: Props) {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-gray-500">Model:</label>
+                    <label className="text-xs text-gray-500">{t("model")}</label>
                     <select
                       name={`model_${feature.key}`}
                       defaultValue={currentModel}
@@ -152,10 +154,10 @@ export default async function TierFeaturesPage({ params }: Props) {
                         ))
                       ) : (
                         <>
-                          <option value="gpt-5-nano">GPT-5 Nano</option>
-                          <option value="gpt-5-mini">GPT-5 Mini</option>
-                          <option value="gpt-5.2-edu">GPT-5.2 Education</option>
-                          <option value="gpt-5.2-chat">GPT-5.2 Chat</option>
+                          <option value="gpt-5-nano">{t("gpt5Nano")}</option>
+                          <option value="gpt-5-mini">{t("gpt5Mini")}</option>
+                          <option value="gpt-5.2-edu">{t("gpt52Education")}</option>
+                          <option value="gpt-5.2-chat">{t("gpt52Chat")}</option>
                         </>
                       )}
                     </select>
@@ -167,18 +169,18 @@ export default async function TierFeaturesPage({ params }: Props) {
         </div>
 
         <div className="rounded-lg bg-white p-6 shadow">
-          <h2 className="mb-4 text-lg font-medium">Current Configuration</h2>
+          <h2 className="mb-4 text-lg font-medium">{t("currentConfiguration")}</h2>
           <div className="grid gap-4 text-sm md:grid-cols-3">
             <div>
-              <span className="font-medium">Chat Model:</span>{' '}
+              <span className="font-medium">{t("chatModel")}</span>{' '}
               <code className="rounded bg-gray-100 px-1">{tier.chatModel}</code>
             </div>
             <div>
-              <span className="font-medium">Realtime Model:</span>{' '}
+              <span className="font-medium">{t("realtimeModel")}</span>{' '}
               <code className="rounded bg-gray-100 px-1">{tier.realtimeModel}</code>
             </div>
             <div>
-              <span className="font-medium">Quiz Model:</span>{' '}
+              <span className="font-medium">{t("quizModel")}</span>{' '}
               <code className="rounded bg-gray-100 px-1">{tier.quizModel}</code>
             </div>
           </div>
@@ -189,13 +191,13 @@ export default async function TierFeaturesPage({ params }: Props) {
             href="/admin/tiers"
             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Cancel
+            {t("cancel")}
           </Link>
           <button
             type="submit"
             className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
           >
-            Save Features
+            {t("saveFeatures")}
           </button>
         </div>
       </form>

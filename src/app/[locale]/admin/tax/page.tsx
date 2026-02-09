@@ -7,6 +7,7 @@ import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { stripeService } from "@/lib/stripe/stripe-service";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "Tax Configuration | Admin",
@@ -132,6 +133,7 @@ async function syncToStripe(formData: FormData) {
 }
 
 export default async function TaxConfigPage() {
+  const t = await getTranslations("admin");
   const { configs, hasMigration } = await getTaxConfigs();
 
   return (
@@ -141,26 +143,26 @@ export default async function TaxConfigPage() {
           href="/admin"
           className="text-sm text-indigo-600 hover:text-indigo-900"
         >
-          ← Back to Admin
+          {t("backToAdmin")}
         </Link>
       </div>
 
-      <h1 className="mb-2 text-3xl font-bold">VAT/Tax Configuration</h1>
+      <h1 className="mb-2 text-3xl font-bold">{t("vatTaxConfiguration")}</h1>
       <p className="mb-6 text-gray-600">
-        Configure VAT rates per country for EU tax compliance
+        {t("configureVatRatesPerCountryForEuTaxCompliance")}
       </p>
 
       {!hasMigration && (
         <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
           <h3 className="text-sm font-medium text-yellow-800">
-            Database Migration Required
+            {t("databaseMigrationRequired")}
           </h3>
           <p className="mt-1 text-sm text-yellow-700">
-            Run{" "}
+            {t("run")}{" "}
             <code className="rounded bg-yellow-100 px-1">
-              npx prisma migrate dev
+              {t("npxPrismaMigrateDev")}
             </code>{" "}
-            to enable persistence.
+            {t("toEnablePersistence")}
           </p>
         </div>
       )}
@@ -170,22 +172,22 @@ export default async function TaxConfigPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Country
+                {t("country")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                VAT Rate (%)
+                {t("vatRate")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Reverse Charge
+                {t("reverseCharge")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Status
+                {t("status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Stripe
+                {t("stripe")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                Actions
+                {t("actions")}
               </th>
             </tr>
           </thead>
@@ -241,7 +243,7 @@ export default async function TaxConfigPage() {
                       disabled={!hasMigration}
                       className="text-xs text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
-                      Save
+                      {t("save")}
                     </button>
                   </form>
                 </td>
@@ -279,9 +281,9 @@ export default async function TaxConfigPage() {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   {config.stripeTaxId ? (
-                    <span className="text-xs text-green-600">✓ Synced</span>
+                    <span className="text-xs text-green-600">{t("synced")}</span>
                   ) : (
-                    <span className="text-xs text-gray-400">Not synced</span>
+                    <span className="text-xs text-gray-400">{t("notSynced")}</span>
                   )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
@@ -296,7 +298,7 @@ export default async function TaxConfigPage() {
                       disabled={!hasMigration}
                       className="text-sm text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
-                      Sync to Stripe
+                      {t("syncToStripe")}
                     </button>
                   </form>
                 </td>
@@ -307,12 +309,12 @@ export default async function TaxConfigPage() {
       </div>
 
       <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <h3 className="text-sm font-medium text-blue-800">EU VAT Compliance</h3>
+        <h3 className="text-sm font-medium text-blue-800">{t("euVatCompliance")}</h3>
         <ul className="mt-2 list-inside list-disc text-sm text-blue-700">
-          <li>Reverse Charge applies to B2B transactions with valid VAT ID</li>
-          <li>Standard rates apply to B2C and B2B without valid VAT ID</li>
+          <li>{t("reverseChargeApplies")}</li>
+          <li>{t("standardRatesApply")}</li>
           <li>
-            UK rates shown for reference (post-Brexit separate rules apply)
+            {t("ukRatesShownForReferencePostBrexitSeparateRulesApp")}
           </li>
         </ul>
       </div>

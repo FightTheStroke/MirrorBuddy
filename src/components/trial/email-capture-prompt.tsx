@@ -121,7 +121,7 @@ export function EmailCapturePrompt({
         <p className="text-sm text-indigo-800 dark:text-indigo-200">
           {t("trialVerify.verificationSent")}{" "}
           <Link href="/trial/verify" className="underline">
-            /trial/verify
+            {t("trialVerify.pageTitle")}
           </Link>{" "}
           {t("trialVerify.verificationSentSuffix")}
         </p>

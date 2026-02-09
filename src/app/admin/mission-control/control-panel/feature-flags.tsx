@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { FeatureFlagState } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { useTranslations } from "next-intl";
 
 interface FeatureFlagsProps {
   flags: FeatureFlagState[];
@@ -19,6 +20,7 @@ interface FeatureFlagsProps {
 }
 
 export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState<string | null>(null);
   const [expandedFlag, setExpandedFlag] = useState<string | null>(null);
   const [percentages, setPercentages] = useState<Record<string, number>>({});
@@ -98,7 +100,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Feature Flags</CardTitle>
+        <CardTitle>{t("featureFlags")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {flags.map((flag) => (
@@ -120,7 +122,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
                 onClick={() => handleToggle(flag.id, "enabled")}
                 disabled={loading === flag.id}
               >
-                Enable
+                {t("enable")}
               </Button>
               <Button
                 size="sm"
@@ -128,7 +130,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
                 onClick={() => handleToggle(flag.id, "disabled")}
                 disabled={loading === flag.id}
               >
-                Disable
+                {t("disable")}
               </Button>
               <Button
                 size="sm"
@@ -136,13 +138,13 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
                 onClick={() => handleToggle(flag.id, "degraded")}
                 disabled={loading === flag.id}
               >
-                Degraded
+                {t("degraded")}
               </Button>
             </div>
 
             {flag.killSwitch && (
               <div className="bg-red-50 border border-red-200 p-2 rounded text-sm text-red-700">
-                Kill switch: {flag.killSwitchReason || "No reason provided"}
+                {t("killSwitch")} {flag.killSwitchReason || "No reason provided"}
               </div>
             )}
 
@@ -152,14 +154,14 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
               }
               className="text-sm text-blue-600 hover:underline"
             >
-              {expandedFlag === flag.id ? "Hide" : "Show"} Rollout Options
+              {expandedFlag === flag.id ? "Hide" : "Show"} {t("rolloutOptions")}
             </button>
 
             {expandedFlag === flag.id && (
               <div className="bg-gray-50 p-3 rounded space-y-2">
                 <div>
                   <label className="text-sm font-medium">
-                    Enabled Percentage:{" "}
+                    {t("enabledPercentage")}{" "}
                     {percentages[flag.id] ?? flag.enabledPercentage}%
                   </label>
                   <input
@@ -182,7 +184,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
                   onClick={() => handlePercentageChange(flag.id)}
                   disabled={loading === flag.id}
                 >
-                  Save Percentage
+                  {t("savePercentage")}
                 </Button>
               </div>
             )}

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * AI/Email Monitoring Components
  * Cards for Azure OpenAI, Sentry, and Resend
@@ -11,6 +13,7 @@ import type {
   ResendMetrics,
   ServiceStatus,
 } from "@/lib/admin/ai-email-types";
+import { useTranslations } from "next-intl";
 
 interface StatusBadgeProps {
   status: ServiceStatus;
@@ -80,13 +83,14 @@ interface AzureOpenAICardProps {
 }
 
 export function AzureOpenAICard({ metrics }: AzureOpenAICardProps) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Brain className="w-5 h-5 text-blue-600" />
-            Azure OpenAI
+            {t("azureOpenai")}
           </CardTitle>
           <StatusBadge status={metrics.status} />
         </div>
@@ -100,7 +104,7 @@ export function AzureOpenAICard({ metrics }: AzureOpenAICardProps) {
 
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div>
-            <p className="text-sm text-muted-foreground">Requests/Min</p>
+            <p className="text-sm text-muted-foreground">{t("requestsMin")}</p>
             <p className="text-2xl font-bold">
               {metrics.requestsPerMinute}
               <span className="text-sm text-muted-foreground font-normal">
@@ -110,7 +114,7 @@ export function AzureOpenAICard({ metrics }: AzureOpenAICardProps) {
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Est. Cost</p>
+            <p className="text-sm text-muted-foreground">{t("estCost")}</p>
             <p className="text-2xl font-bold">
               ${metrics.estimatedCostUsd.toFixed(2)}
             </p>
@@ -118,7 +122,7 @@ export function AzureOpenAICard({ metrics }: AzureOpenAICardProps) {
         </div>
 
         <div className="pt-2 border-t">
-          <p className="text-xs text-muted-foreground">Model</p>
+          <p className="text-xs text-muted-foreground">{t("model")}</p>
           <p className="text-sm font-medium">{metrics.model}</p>
         </div>
       </CardContent>
@@ -131,6 +135,7 @@ interface SentryCardProps {
 }
 
 export function SentryCard({ metrics }: SentryCardProps) {
+  const t = useTranslations("admin");
   const hasIssues = metrics.unresolvedIssues > 0;
 
   return (
@@ -139,7 +144,7 @@ export function SentryCard({ metrics }: SentryCardProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Bug className="w-5 h-5 text-purple-600" />
-            Sentry
+            {t("sentryTitle")}
           </CardTitle>
           <StatusBadge status={metrics.status} />
         </div>
@@ -148,7 +153,7 @@ export function SentryCard({ metrics }: SentryCardProps) {
         <div
           className={`p-4 rounded-lg ${hasIssues ? "bg-red-50 border border-red-200" : "bg-green-50 border border-green-200"}`}
         >
-          <p className="text-sm text-muted-foreground">Unresolved Issues</p>
+          <p className="text-sm text-muted-foreground">{t("unresolvedIssues")}</p>
           <p
             className={`text-3xl font-bold ${hasIssues ? "text-red-600" : "text-green-600"}`}
           >
@@ -163,7 +168,7 @@ export function SentryCard({ metrics }: SentryCardProps) {
         />
 
         <div className="pt-2 border-t">
-          <p className="text-xs text-muted-foreground">Status</p>
+          <p className="text-xs text-muted-foreground">{t("status1")}</p>
           <p className="text-sm font-medium">
             {hasIssues
               ? `${metrics.unresolvedIssues} issue${metrics.unresolvedIssues > 1 ? "s" : ""} need attention`
@@ -180,6 +185,7 @@ interface ResendCardProps {
 }
 
 export function ResendCard({ metrics }: ResendCardProps) {
+  const t = useTranslations("admin");
   const bouncePercentage = (metrics.bounceRate * 100).toFixed(2);
   const highBounceRate = metrics.bounceRate > 0.05; // >5% is concerning
 
@@ -189,7 +195,7 @@ export function ResendCard({ metrics }: ResendCardProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-green-600" />
-            Resend
+            {t("resend")}
           </CardTitle>
           <StatusBadge status={metrics.status} />
         </div>
@@ -203,7 +209,7 @@ export function ResendCard({ metrics }: ResendCardProps) {
 
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div>
-            <p className="text-sm text-muted-foreground">Bounce Rate</p>
+            <p className="text-sm text-muted-foreground">{t("bounceRate")}</p>
             <p
               className={`text-2xl font-bold ${highBounceRate ? "text-red-600" : "text-green-600"}`}
             >
@@ -211,7 +217,7 @@ export function ResendCard({ metrics }: ResendCardProps) {
             </p>
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Last Sent</p>
+            <p className="text-sm text-muted-foreground">{t("lastSent")}</p>
             <p className="text-sm font-medium">
               {metrics.lastSentAt
                 ? new Date(metrics.lastSentAt).toLocaleTimeString()
@@ -221,7 +227,7 @@ export function ResendCard({ metrics }: ResendCardProps) {
         </div>
 
         <div className="pt-2 border-t">
-          <p className="text-xs text-muted-foreground">Status</p>
+          <p className="text-xs text-muted-foreground">{t("status")}</p>
           <p className="text-sm font-medium">
             {highBounceRate
               ? "High bounce rate detected"

@@ -1,8 +1,11 @@
+"use client";
+
 /**
  * ToS Filters Component
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 
 interface FiltersProps {
   versionFilter: string;
@@ -25,10 +28,11 @@ export function Filters({
   versionCounts,
   onPageReset,
 }: FiltersProps) {
+  const t = useTranslations("admin");
   return (
     <Card className="mb-6">
       <CardHeader>
-        <CardTitle>Filters</CardTitle>
+        <CardTitle>{t("filters")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -37,7 +41,7 @@ export function Filters({
               htmlFor="tos-version-filter"
               className="block text-sm font-medium mb-2"
             >
-              Version
+              {t("version1")}
             </label>
             <select
               id="tos-version-filter"
@@ -48,7 +52,7 @@ export function Filters({
                 onPageReset();
               }}
             >
-              <option value="">All versions</option>
+              <option value="">{t("allVersions")}</option>
               {Object.keys(versionCounts).map((version) => (
                 <option key={version} value={version}>
                   v{version}
@@ -62,7 +66,7 @@ export function Filters({
               htmlFor="tos-sort-by"
               className="block text-sm font-medium mb-2"
             >
-              Sort By
+              {t("sortBy")}
             </label>
             <select
               id="tos-sort-by"
@@ -70,8 +74,8 @@ export function Filters({
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <option value="acceptedAt">Accepted At</option>
-              <option value="version">Version</option>
+              <option value="acceptedAt">{t("acceptedAt")}</option>
+              <option value="version">{t("version")}</option>
             </select>
           </div>
 
@@ -80,7 +84,7 @@ export function Filters({
               htmlFor="tos-sort-order"
               className="block text-sm font-medium mb-2"
             >
-              Order
+              {t("order")}
             </label>
             <select
               id="tos-sort-order"
@@ -88,8 +92,8 @@ export function Filters({
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
             >
-              <option value="desc">Newest First</option>
-              <option value="asc">Oldest First</option>
+              <option value="desc">{t("newestFirst")}</option>
+              <option value="asc">{t("oldestFirst")}</option>
             </select>
           </div>
         </div>

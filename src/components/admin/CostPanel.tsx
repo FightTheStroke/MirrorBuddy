@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useTranslations } from "next-intl";
 
 interface CostStats {
   avgCostText24h: number;
@@ -45,6 +46,7 @@ const THRESHOLDS = {
 };
 
 export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
+  const t = useTranslations("admin");
   const [stats, setStats] = useState<CostStats | null>(null);
   const [activeSessions, setActiveSessions] = useState<VoiceSession[]>([]);
   const [limits, setLimits] = useState<VoiceLimits | null>(null);
@@ -92,7 +94,7 @@ export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
       {/* Cost Overview */}
       <Card>
         <CardHeader>
-          <CardTitle>Cost Monitoring (24h)</CardTitle>
+          <CardTitle>{t("costMonitoring24h")}</CardTitle>
         </CardHeader>
         <CardContent>
           {error ? (
@@ -112,12 +114,12 @@ export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
                 limitThreshold={THRESHOLDS.SESSION_VOICE_LIMIT}
               />
               <div className="p-3 border rounded-lg">
-                <p className="text-xs text-muted-foreground">Total (24h)</p>
+                <p className="text-xs text-muted-foreground">{t("total24h")}</p>
                 <p className="text-lg font-semibold">
                   {formatCurrency(stats.totalCost24h)}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {stats.sessionCount24h} sessions
+                  {stats.sessionCount24h} {t("sessions")}
                 </p>
               </div>
               <SpikeMetric
@@ -128,7 +130,7 @@ export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">
-              No cost data available
+              {t("noCostDataAvailable")}
             </p>
           )}
         </CardContent>
@@ -138,21 +140,21 @@ export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
       {limits && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Voice Duration Limits</CardTitle>
+            <CardTitle className="text-base">{t("voiceDurationLimits")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span>Soft cap: {limits.softCapMinutes} min</span>
+                <span>{t("softCap")} {limits.softCapMinutes} {t("min3")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span>Hard cap: {limits.hardCapMinutes} min</span>
+                <span>{t("hardCap")} {limits.hardCapMinutes} {t("min2")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>Spike cooldown: {limits.spikeCooldownMinutes} min</span>
+                <span>{t("spikeCooldown")} {limits.spikeCooldownMinutes} {t("min1")}</span>
               </div>
             </div>
           </CardContent>
@@ -164,7 +166,7 @@ export function CostPanel({ refreshInterval = 30000 }: CostPanelProps) {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">
-              Active Voice Sessions ({activeSessions.length})
+              {t("activeVoiceSessions")}{activeSessions.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -195,6 +197,7 @@ function CostMetric({
   warnThreshold,
   limitThreshold,
 }: CostMetricProps) {
+  const t = useTranslations("admin");
   const status =
     value >= limitThreshold
       ? "exceeded"
@@ -215,7 +218,7 @@ function CostMetric({
         {formatCurrency(value)}
       </p>
       <p className="text-xs text-muted-foreground">
-        Limit: {formatCurrency(limitThreshold)}
+        {t("limit")} {formatCurrency(limitThreshold)}
       </p>
     </div>
   );
@@ -232,6 +235,7 @@ function SpikeMetric({
   warnThreshold,
   limitThreshold,
 }: SpikeMetricProps) {
+  const t = useTranslations("admin");
   const status =
     spikes >= limitThreshold
       ? "exceeded"
@@ -247,7 +251,7 @@ function SpikeMetric({
 
   return (
     <div className="p-3 border rounded-lg">
-      <p className="text-xs text-muted-foreground">Spikes (7d)</p>
+      <p className="text-xs text-muted-foreground">{t("spikes7d")}</p>
       <div className="flex items-center gap-2">
         <span
           className={`px-2 py-1 rounded text-lg font-semibold ${colors[status]}`}
@@ -255,7 +259,7 @@ function SpikeMetric({
           {spikes}
         </span>
         <span className="text-xs text-muted-foreground">
-          / {limitThreshold} max
+          / {limitThreshold} {t("max")}
         </span>
       </div>
     </div>
@@ -267,6 +271,7 @@ interface VoiceSessionRowProps {
 }
 
 function VoiceSessionRow({ session }: VoiceSessionRowProps) {
+  const t = useTranslations("admin");
   const statusColors = {
     ok: "bg-green-500",
     soft_cap: "bg-yellow-500",
@@ -290,7 +295,7 @@ function VoiceSessionRow({ session }: VoiceSessionRowProps) {
         </span>
       </div>
       <div className="flex items-center gap-4 text-sm">
-        <span>{session.durationMinutes.toFixed(1)} min</span>
+        <span>{session.durationMinutes.toFixed(1)} {t("min")}</span>
         <span
           className={`px-2 py-0.5 rounded text-xs ${
             session.status === "ok"

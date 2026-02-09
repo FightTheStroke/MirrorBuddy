@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Wifi, WifiOff, Radio, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 /**
  * Props for TransportStatusIndicator
@@ -69,6 +70,7 @@ export function TransportStatusIndicator({
   compact = false,
   className,
 }: TransportStatusIndicatorProps) {
+  const t = useTranslations("voice");
   const [showTooltip, setShowTooltip] = useState(false);
 
   // Compute current transport status from props
@@ -118,7 +120,7 @@ export function TransportStatusIndicator({
           {config.label}
         </span>
         {showDetails && isConnected && !isProbing && (
-          <span className="text-xs text-slate-400">Connessione diretta</span>
+          <span className="text-xs text-slate-400">{t("connessioneDiretta")}</span>
         )}
       </div>
 
@@ -137,8 +139,8 @@ export function TransportStatusIndicator({
           )}
           role="tooltip"
         >
-          <div className="font-medium text-white mb-1">WebRTC Direct</div>
-          <div className="text-slate-400">Connessione peer-to-peer</div>
+          <div className="font-medium text-white mb-1">{t("webrtcDirect")}</div>
+          <div className="text-slate-400">{t("connessionePeerToPeer")}</div>
           {/* Arrow */}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1">
             <div className="border-8 border-transparent border-t-slate-800" />

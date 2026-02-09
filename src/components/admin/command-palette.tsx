@@ -116,7 +116,7 @@ export function CommandPalette() {
         className="max-w-lg p-0 gap-0 overflow-hidden"
         onKeyDown={handleKeyDown}
       >
-        <DialogTitle className="sr-only">Command palette</DialogTitle>
+        <DialogTitle className="sr-only">{t("commandPaletteTitle")}</DialogTitle>
         {/* Search input */}
         <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 px-4 py-3">
           <Search className="h-5 w-5 text-slate-400 shrink-0" />
@@ -127,12 +127,12 @@ export function CommandPalette() {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Search pages and actions..."
+            placeholder={t("searchPagesAndActions")}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 dark:text-white"
-            aria-label="Search admin pages and actions"
+            aria-label={t("searchAdminPagesAndActions")}
           />
           <kbd className="hidden sm:inline-flex items-center gap-1 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs text-slate-500">
-            esc
+            {t("esc1")}
           </kbd>
         </div>
 
@@ -141,11 +141,11 @@ export function CommandPalette() {
           ref={listRef}
           className="max-h-80 overflow-y-auto p-2"
           role="listbox"
-          aria-label="Search results"
+          aria-label={t("searchResults")}
         >
           {flatItems.length === 0 && (
             <p className="text-sm text-slate-500 text-center py-6">
-              No results found
+              {t("noResultsFound")}
             </p>
           )}
 
@@ -176,17 +176,17 @@ export function CommandPalette() {
             <kbd className="rounded bg-slate-100 dark:bg-slate-800 px-1">
               ↑↓
             </kbd>
-            navigate
+            {t("navigate")}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="rounded bg-slate-100 dark:bg-slate-800 px-1">↵</kbd>
-            select
+            {t("select")}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="rounded bg-slate-100 dark:bg-slate-800 px-1">
-              esc
+              {t("esc")}
             </kbd>
-            close
+            {t("close")}
           </span>
         </div>
       </DialogContent>

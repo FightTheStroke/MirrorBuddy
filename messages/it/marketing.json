@@ -4,7 +4,8 @@
       "headline": "Impara con i Grandi Maestri della Storia",
       "subtitle": "Tutoring AI che si adatta a ogni stile di apprendimento. Conversazioni vocali con 26 professori storici, progettato per studenti con e senza difficolta di apprendimento.",
       "cta": "Inizia Gratis",
-      "schoolCta": "Contatta per le Scuole"
+      "schoolCta": "Contatta per le Scuole",
+      "mirrorbuddyVoiceAiDemo": "MirrorBuddy voice AI demo"
     },
     "features": {
       "heading": "Perche MirrorBuddy",
@@ -50,7 +51,8 @@
           "Branding personalizzato"
         ],
         "cta": "Contattaci"
-      }
+      },
+      "popular": "Popolare"
     },
     "social": {
       "heading": "Scelto Da",
@@ -103,7 +105,12 @@
       "privacy": "Privacy Policy",
       "terms": "Termini di Servizio",
       "cookies": "Cookie Policy",
-      "copyright": "MirrorBuddy. Tutti i diritti riservati."
-    }
+      "copyright": "MirrorBuddy. Tutti i diritti riservati.",
+      "aiPoweredInclusiveEducationPlatform": "AI-powered inclusive education platform."
+    },
+    "signUp": "Sign Up",
+    "mirrorbuddyForSchools": "MirrorBuddy for Schools",
+    "bringInclusiveAiEducationToYourInstitutionSsoAdmin": "Bring inclusive AI education to your institution. SSO, admin tools,",
+    "andDedicatedSupportIncluded": "and dedicated support included."
   }
 }

@@ -86,7 +86,7 @@ function TierCard({
     >
       {isPro && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-sm font-semibold text-white">
-          Popular
+          {t("popular")}
         </div>
       )}
 

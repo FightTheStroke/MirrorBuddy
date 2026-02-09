@@ -9,12 +9,14 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import type { ExternalServicesData } from "../types";
+import { useTranslations } from "next-intl";
 
 export function ExternalServicesCard({
   data,
 }: {
   data: ExternalServicesData | null;
 }) {
+  const t = useTranslations("admin");
   return (
     <Card
       className={
@@ -24,22 +26,22 @@ export function ExternalServicesCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Cloud className="h-4 w-4 text-purple-500" />
-          External Services
+          {t("externalServices")}
           {data?.summary.hasAlerts && (
             <span className="ml-2 px-2 py-0.5 text-[10px] font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 rounded-full">
-              {data.summary.criticalCount + data.summary.warningCount} alerts
+              {data.summary.criticalCount + data.summary.warningCount} {t("alerts")}
             </span>
           )}
         </CardTitle>
         <CardDescription className="text-xs">
-          API usage quotas for Azure OpenAI, Google Drive, Brave Search
+          {t("apiUsageQuotasForAzureOpenaiGoogleDriveBraveSearch")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {data?.summary.alertDetails && data.summary.alertDetails.length > 0 && (
           <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg space-y-1">
             <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
-              Quota Alerts
+              {t("quotaAlerts")}
             </p>
             {data.summary.alertDetails.map((alert, i) => (
               <div
@@ -97,12 +99,11 @@ export function ExternalServicesCard({
             </div>
           ))}
         <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+          {/* eslint-disable local-rules/no-literal-strings-in-jsx */}
           <p className="text-[10px] text-slate-400">
-            Azure {data?.quotas.azureOpenAI.chatTpm.toLocaleString()} TPM &bull;
-            Drive {data?.quotas.googleDrive.queriesPerMin.toLocaleString()}/min
-            &bull; Brave{" "}
-            {data?.quotas.braveSearch.monthlyQueries.toLocaleString()}/month
+            Azure {data?.quotas.azureOpenAI.chatTpm.toLocaleString()} TPM · Drive {data?.quotas.googleDrive.queriesPerMin.toLocaleString()}/min · Brave {data?.quotas.braveSearch.monthlyQueries.toLocaleString()}{t("month")}
           </p>
+          {/* eslint-enable local-rules/no-literal-strings-in-jsx */}
         </div>
       </CardContent>
     </Card>

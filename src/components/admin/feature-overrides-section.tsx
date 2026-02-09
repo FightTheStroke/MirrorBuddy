@@ -1,4 +1,7 @@
+"use client";
+
 import { FeatureToggle } from "./feature-toggle";
+import { useTranslations } from "next-intl";
 
 interface FeatureOverrides {
   flashcards?: boolean;
@@ -22,6 +25,7 @@ export function FeatureOverridesSection({
   featureOverrides,
   onChange,
 }: FeatureOverridesSectionProps) {
+  const t = useTranslations("admin");
   const handleFeatureChange = (
     key: keyof FeatureOverrides,
     value: boolean | undefined,
@@ -32,7 +36,7 @@ export function FeatureOverridesSection({
   return (
     <div>
       <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-        Features
+        {t("features")}
       </h3>
       <div className="space-y-2">
         <FeatureToggle

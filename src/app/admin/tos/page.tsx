@@ -9,6 +9,7 @@ import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { SummaryStats } from "./components/summary-stats";
 import { Filters } from "./components/filters";
 import { AcceptancesTable } from "./components/acceptances-table";
+import { useTranslations } from "next-intl";
 
 interface TosAcceptance {
   id: string;
@@ -43,6 +44,7 @@ interface ApiResponse {
 }
 
 export default function AdminTosPage() {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +103,7 @@ export default function AdminTosPage() {
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading ToS acceptances...</p>
+          <p className="text-muted-foreground">{t("loadingTosAcceptances")}</p>
         </div>
       </div>
     );
@@ -120,7 +122,7 @@ export default function AdminTosPage() {
           <RefreshCw
             className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { DailyChart } from "./daily-chart";
 import type { TokenUsageData } from "../types";
+import { useTranslations } from "next-intl";
 
 function formatNumber(n: number): string {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -18,15 +19,16 @@ function formatNumber(n: number): string {
 }
 
 export function TokenUsageCard({ data }: { data: TokenUsageData | null }) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Coins className="h-4 w-4 text-indigo-500" />
-          Token Usage
+          {t("tokenUsage")}
         </CardTitle>
         <CardDescription className="text-xs">
-          AI API token consumption breakdown
+          {t("aiApiTokenConsumptionBreakdown")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -41,11 +43,11 @@ export function TokenUsageCard({ data }: { data: TokenUsageData | null }) {
                   {action}
                 </p>
                 <p className="text-[10px] text-slate-500">
-                  {stats.count} calls
+                  {stats.count} {t("calls")}
                 </p>
               </div>
               <p className="font-mono text-xs">
-                {formatNumber(stats.totalTokens)} tokens
+                {formatNumber(stats.totalTokens)} {t("tokens")}
               </p>
             </div>
           ))}

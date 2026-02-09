@@ -191,8 +191,8 @@ export function SuccessMetricsDashboard({
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="sr-only">
-            {achievedMilestones.length} milestones achieved,{" "}
-            {pendingMilestones.length} pending
+            {achievedMilestones.length} {t("milestonesAchieved")}{" "}
+            {pendingMilestones.length} {t("pending")}
           </div>
           {achievedMilestones.map((milestone) => (
             <MilestoneItem key={milestone.id} milestone={milestone} />

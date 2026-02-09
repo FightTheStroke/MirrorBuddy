@@ -97,7 +97,7 @@ export function AdminSidebar({
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
           <LogoBrain
-            alt="MirrorBuddy Admin"
+            alt={t("mirrorbuddyAdmin")}
             size={36}
             wrapperClassName="bg-slate-900 dark:bg-slate-100 flex items-center justify-center"
             className="object-contain"
@@ -105,7 +105,7 @@ export function AdminSidebar({
           />
           {open && (
             <span className="font-bold text-lg text-slate-900 dark:text-white">
-              Admin
+              {t("admin")}
             </span>
           )}
         </Link>

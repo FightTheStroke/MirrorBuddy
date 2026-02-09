@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export function MobileDrawer({
   children,
   className,
 }: MobileDrawerProps) {
+  const t = useTranslations("common");
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape key
@@ -72,7 +74,7 @@ export function MobileDrawer({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="Close drawer"
+            aria-label={t("closeDrawer")}
           >
             <X className="w-5 h-5" />
           </Button>

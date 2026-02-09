@@ -180,7 +180,7 @@ export function UsersBulkActions({
             onClick={() => setShowTierModal(true)}
             disabled={isLoading}
             className="hover:bg-accent"
-            aria-label="Change tier for selected users"
+            aria-label={t("changeTierForSelectedUsers")}
           >
             <RefreshCw className="w-4 h-4 mr-1" />
             {t("changeTier")}

@@ -43,7 +43,7 @@ export function TrialBudgetCard() {
             {t("configuredVia")}
           </p>
           <code className="block text-xs bg-background rounded px-2 py-1 text-muted-foreground font-mono">
-            TRIAL_BUDGET_LIMIT_EUR={budgetLimit}
+            {t("trialBudgetLimitEur")}{budgetLimit}
           </code>
         </div>
 

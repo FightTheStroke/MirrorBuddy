@@ -9,6 +9,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import type { SessionMetricsData } from "../types";
+import { useTranslations } from "next-intl";
 
 function formatNumber(n: number): string {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
@@ -17,15 +18,16 @@ function formatNumber(n: number): string {
 }
 
 export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Euro className="h-4 w-4 text-emerald-500" />
-          Session Cost Metrics (REAL)
+          {t("sessionCostMetricsReal")}
         </CardTitle>
         <CardDescription className="text-xs">
-          Actual costs from Azure OpenAI API responses
+          {t("actualCostsFromAzureOpenaiApiResponses")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -34,24 +36,24 @@ export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
             <p className="text-xl font-bold text-emerald-600">
               &euro;{data?.cost.totalEur.toFixed(2) ?? "0.00"}
             </p>
-            <p className="text-[10px] text-slate-500">Total Cost</p>
+            <p className="text-[10px] text-slate-500">{t("totalCost")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-blue-600">
               &euro;{data?.cost.p95PerSession.toFixed(3) ?? "0.000"}
             </p>
-            <p className="text-[10px] text-slate-500">P95/Session</p>
+            <p className="text-[10px] text-slate-500">{t("p95Session")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-slate-900 dark:text-white">
               {formatNumber(data?.tokens.total ?? 0)}
             </p>
-            <p className="text-[10px] text-slate-500">Total Tokens</p>
+            <p className="text-[10px] text-slate-500">{t("totalTokens")}</p>
           </div>
         </div>
         {data?.outcomes && (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-500">Outcomes</p>
+            <p className="text-xs font-medium text-slate-500">{t("outcomes")}</p>
             {Object.entries(data.outcomes).map(([outcome, count]) => (
               <div
                 key={outcome}
@@ -76,10 +78,11 @@ export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
           </div>
         )}
         <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+          {/* eslint-disable local-rules/no-literal-strings-in-jsx */}
           <p className="text-[10px] text-slate-400">
-            &euro;{data?.cost.pricing.textPer1kTokens ?? 0.002}/1K tokens &bull;
-            &euro;{data?.cost.pricing.voicePerMin ?? 0.04}/min voice
+            €{data?.cost.pricing.textPer1kTokens ?? 0.002}/1K tokens · €{data?.cost.pricing.voicePerMin ?? 0.04}{t("minVoice")}
           </p>
+          {/* eslint-enable local-rules/no-literal-strings-in-jsx */}
         </div>
       </CardContent>
     </Card>

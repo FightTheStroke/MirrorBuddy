@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Stripe Admin Table Components
  *
@@ -11,27 +13,29 @@ import type {
 } from "@/lib/admin/stripe-admin-types";
 import { formatCurrency, formatDate } from "@/lib/admin/stripe-admin-service";
 import { StatusBadge } from "./ui-components";
+import { useTranslations } from "next-intl";
 
 /**
  * Products table component
  */
 export function ProductsTable({ products }: { products: StripeProduct[] }) {
+  const t = useTranslations("admin");
   if (products.length === 0) return null;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Products & Pricing</CardTitle>
+        <CardTitle>{t("productsPricing")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700">
-                <th className="text-left py-2 px-3">Product</th>
-                <th className="text-left py-2 px-3">Status</th>
-                <th className="text-left py-2 px-3">Prices</th>
-                <th className="text-left py-2 px-3">Created</th>
+                <th className="text-left py-2 px-3">{t("product")}</th>
+                <th className="text-left py-2 px-3">{t("status1")}</th>
+                <th className="text-left py-2 px-3">{t("prices")}</th>
+                <th className="text-left py-2 px-3">{t("created1")}</th>
               </tr>
             </thead>
             <tbody>
@@ -91,22 +95,23 @@ export function SubscriptionsTable({
 }: {
   subscriptions: StripeSubscription[];
 }) {
+  const t = useTranslations("admin");
   if (subscriptions.length === 0) return null;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Active Subscriptions</CardTitle>
+        <CardTitle>{t("activeSubscriptions")}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-700">
-                <th className="text-left py-2 px-3">Customer</th>
-                <th className="text-left py-2 px-3">Status</th>
-                <th className="text-left py-2 px-3">Period</th>
-                <th className="text-left py-2 px-3">Created</th>
+                <th className="text-left py-2 px-3">{t("customer")}</th>
+                <th className="text-left py-2 px-3">{t("status")}</th>
+                <th className="text-left py-2 px-3">{t("period")}</th>
+                <th className="text-left py-2 px-3">{t("created")}</th>
               </tr>
             </thead>
             <tbody>

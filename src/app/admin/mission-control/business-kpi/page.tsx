@@ -11,10 +11,12 @@ import type { BusinessKPIResponse } from "@/lib/admin/business-kpi-types";
 import { RevenueCard } from "./revenue-card";
 import { UsersCard } from "./users-card";
 import { CountriesTable, MaestriTable } from "./tables";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
 export default function BusinessKPIPage() {
+  const t = useTranslations("admin");
   const [data, setData] = useState<BusinessKPIResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +62,7 @@ export default function BusinessKPIPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading business KPIs...</span>
+          <span>{t("loadingBusinessKpis")}</span>
         </div>
       </div>
     );
@@ -71,7 +73,7 @@ export default function BusinessKPIPage() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex items-center gap-2 text-destructive">
           <AlertCircle className="h-5 w-5" />
-          <span>Error: {error}</span>
+          <span>{t("error")} {error}</span>
         </div>
       </div>
     );
@@ -85,20 +87,20 @@ export default function BusinessKPIPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Business KPIs</h1>
+          <h1 className="text-3xl font-bold">{t("businessKpis")}</h1>
           <p className="text-muted-foreground mt-1">
-            Revenue, users, and engagement metrics
+            {t("revenueUsersAndEngagementMetrics")}
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>Last updated: {lastRefresh.toLocaleTimeString()}</span>
+          <span>{t("lastUpdated")} {lastRefresh.toLocaleTimeString()}</span>
           <button
             onClick={fetchKPIs}
             disabled={loading}
             className="flex items-center gap-2 px-3 py-1.5 rounded-md border hover:bg-accent transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-            Refresh
+            {t("refresh")}
           </button>
         </div>
       </div>
@@ -116,7 +118,7 @@ export default function BusinessKPIPage() {
       {error && (
         <div className="flex items-center gap-2 p-4 rounded-md bg-destructive/10 text-destructive text-sm">
           <AlertCircle className="h-4 w-4" />
-          <span>Failed to refresh: {error}</span>
+          <span>{t("failedToRefresh")} {error}</span>
         </div>
       )}
     </div>

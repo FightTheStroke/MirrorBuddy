@@ -1,6 +1,9 @@
+"use client";
+
 import { DollarSign, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { CostSummary, CostForecast } from '../types';
+import { useTranslations } from "next-intl";
 
 interface CostsSectionProps {
   costs: CostSummary | null;
@@ -24,28 +27,29 @@ export function CostsSection({
   costsConfigured,
   onShowConfig,
 }: CostsSectionProps) {
+  const t = useTranslations("settings");
   if (!costsConfigured) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-green-500" />
-            Costi Azure OpenAI
+            {t("costiAzureOpenai3")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
             <h4 className="font-medium text-amber-700 dark:text-amber-300 mb-2">
-              Cost Management non configurato
+              {t("costManagementNonConfigurato")}
             </h4>
             <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
-              Per visualizzare i costi Azure, configura un Service Principal con ruolo &quot;Cost Management Reader&quot;:
+              {t("perVisualizzareICostiAzureConfiguraUnServicePrinci")}
             </p>
             <button
               onClick={onShowConfig}
               className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Mostra form di configurazione
+              {t("mostraFormDiConfigurazione")}
             </button>
           </div>
         </CardContent>
@@ -59,7 +63,7 @@ export function CostsSection({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-green-500" />
-            Costi Azure OpenAI
+            {t("costiAzureOpenai2")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -77,13 +81,13 @@ export function CostsSection({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5 text-green-500" />
-            Costi Azure OpenAI
+            {t("costiAzureOpenai1")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi.
+              {t("impossibileRecuperareIDatiSuiCostiAzureVerificaLaC")}
             </p>
           </div>
         </CardContent>
@@ -96,7 +100,7 @@ export function CostsSection({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-green-500" />
-          Costi Azure OpenAI
+          {t("costiAzureOpenai")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -104,7 +108,7 @@ export function CostsSection({
           <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="w-5 h-5 text-blue-600" />
-              <span className="text-sm text-blue-600 dark:text-blue-400">Ultimi 30 giorni</span>
+              <span className="text-sm text-blue-600 dark:text-blue-400">{t("ultimi30Giorni")}</span>
             </div>
             <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
               {formatCurrency(costs.totalCost, costs.currency)}
@@ -114,7 +118,7 @@ export function CostsSection({
             <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-xl">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-green-600" />
-                <span className="text-sm text-green-600 dark:text-green-400">Stima fine mese</span>
+                <span className="text-sm text-green-600 dark:text-green-400">{t("stimaFineMese")}</span>
               </div>
               <p className="text-2xl font-bold text-green-700 dark:text-green-300">
                 {formatCurrency(forecast.estimatedTotal, forecast.currency)}

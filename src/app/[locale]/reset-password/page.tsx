@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
             {t("resetPassword.successMessage")}
           </p>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Redirecting to login...
+            {t("redirectingToLogin")}
           </p>
         </div>
       </div>
@@ -154,7 +154,7 @@ export default function ResetPasswordPage() {
                 required
                 disabled={formState === "submitting" || !token}
                 className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="Enter new password"
+                placeholder={t("enterNewPassword")}
               />
               <button
                 type="button"
@@ -212,7 +212,7 @@ export default function ResetPasswordPage() {
                   ? "border-red-500"
                   : "border-slate-300 dark:border-slate-600"
               }`}
-              placeholder="Confirm new password"
+              placeholder={t("confirmNewPassword")}
             />
             {confirmPassword && !passwordsMatch && (
               <p className="text-xs text-red-500 mt-1">

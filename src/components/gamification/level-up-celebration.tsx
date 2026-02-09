@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 
 // Pre-generate confetti positions at module load to avoid hydration issues
 // Uses seeded randomization based on index for reproducibility across SSR/client
@@ -42,6 +43,7 @@ export function LevelUpCelebration({
   coachMessage,
   onDismiss,
 }: LevelUpCelebrationProps) {
+  const t = useTranslations("achievements");
   const [isVisible, setIsVisible] = useState(false);
   const mountedRef = React.useRef(false);
 
@@ -123,10 +125,10 @@ export function LevelUpCelebration({
             id="level-up-title"
             className="text-4xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent"
           >
-            LEVEL UP!
+            {t("levelUp")}
           </h2>
           <p className="text-xl font-semibold text-white">
-            Livello {level} Raggiunto!
+            {t("livello")} {level} {t("raggiunto")}
           </p>
         </div>
 
@@ -144,7 +146,7 @@ export function LevelUpCelebration({
               <div className="flex items-center justify-center gap-2 rounded-lg bg-blue-500/20 py-2 px-4">
                 <span className="text-2xl">💎</span>
                 <span className="text-lg font-semibold text-white">
-                  +{rewards.mirrorBucks} MirrorBucks
+                  +{rewards.mirrorBucks} {t("mirrorbucks")}
                 </span>
               </div>
             )}
@@ -152,7 +154,7 @@ export function LevelUpCelebration({
             {rewards.achievements && rewards.achievements.length > 0 && (
               <div className="space-y-1">
                 <p className="text-xs uppercase tracking-wide text-white/70">
-                  Nuovi Achievement
+                  {t("nuoviAchievement")}
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {rewards.achievements.map((achievement, i) => (
@@ -170,7 +172,7 @@ export function LevelUpCelebration({
         )}
 
         {/* Dismiss hint */}
-        <p className="text-xs text-white/50">Clicca ovunque per continuare</p>
+        <p className="text-xs text-white/50">{t("cliccaOvunquePerContinuare")}</p>
       </div>
 
       <style jsx>{`
