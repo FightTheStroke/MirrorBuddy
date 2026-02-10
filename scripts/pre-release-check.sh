@@ -4,8 +4,12 @@
 # Runs all automated quality gates before release.
 # Optimized for Apple Silicon with parallel execution.
 #
+# NOTE: set -e intentionally omitted — script uses background PIDs with
+# manual exit code checks. set -e would break the wait+check pattern.
+#
 # Usage: npm run pre-release
 # =============================================================================
+set -uo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -16,11 +20,11 @@ NC='\033[0m'
 
 # Temp directory for parallel job results
 TEMP_DIR=$(mktemp -d)
-trap "rm -rf $TEMP_DIR" EXIT
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 echo ""
 echo "=========================================="
-echo " CONVERGIO EDU - PRE-RELEASE CHECKS"
+echo " MIRRORBUDDY - PRE-RELEASE CHECKS"
 echo " Parallelized for M3 Max (14 cores)"
 echo "=========================================="
 echo ""

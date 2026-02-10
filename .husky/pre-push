@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
-set -o pipefail
+set -euo pipefail
 
-# === CRITICAL GATES: Typecheck + Unit Tests ===
-# These MUST pass before pushing. Catches broken imports, type errors, and test failures
-# that would otherwise only be caught on CI (wasting time and blocking deploys).
-
-echo "Running typecheck..."
-npm run typecheck || {
-  echo "Typecheck failed. Fix type errors before pushing."
-  echo "  Run: npm run typecheck"
-  exit 1
-}
+# === CRITICAL GATES: Unit Tests + Debt + Vercel Sim ===
+# Typecheck is intentionally omitted here — pre-push-vercel.sh runs a full
+# production build which includes type checking. Avoids redundant double-check.
 
 echo "Running unit tests..."
 npm run test:unit -- --reporter=dot 2>&1 | tail -5
-if [ $? -ne 0 ]; then
+# $? after pipe captures tail's exit code; use PIPESTATUS for the test runner
+if [ "${PIPESTATUS[0]}" -ne 0 ]; then
   echo "Unit tests failed. Fix failing tests before pushing."
   echo "  Run: npm run test:unit"
   exit 1

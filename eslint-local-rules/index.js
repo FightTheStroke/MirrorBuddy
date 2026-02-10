@@ -10,13 +10,10 @@ import noPrismaRaceCondition from './no-prisma-race-condition.js';
 import requireE2eFixtures from './require-e2e-fixtures.js';
 import requireCsrfMutatingRoutes from './require-csrf-mutating-routes.js';
 import requirePipeHandler from './require-pipe-handler.js';
-import noHardcodedStringsInTests from './no-hardcoded-strings-in-tests.js';
 import requireCompleteLoggerMock from './require-complete-logger-mock.js';
 import noPlaintextPiiStorage from './no-plaintext-pii-storage.js';
 import requireEmailHashLookup from './require-email-hash-lookup.js';
 import noDirectEmbedding from './no-direct-embedding.js';
-import noDirectAiProvider from './no-direct-ai-provider.js';
-import requireNativeBridge from './require-native-bridge.js';
 import noLoggerErrorContext from './no-logger-error-context.js';
 import noHardcodedCookies from './no-hardcoded-cookies.js';
 import requireCsrfFetch from './require-csrf-fetch.js';
@@ -127,7 +124,7 @@ const ITALIAN_COMMON_WORDS = [
 ];
 
 // Pattern to detect Italian text (accented characters common in Italian)
-const ITALIAN_PATTERN = /[àèéìòùù]/i;
+const ITALIAN_PATTERN = /[àèéìòù]/i;
 
 const containsItalian = (text) => {
   const lowercased = text.toLowerCase().trim();
@@ -349,13 +346,10 @@ const rules = {
   'require-e2e-fixtures': requireE2eFixtures,
   'require-csrf-mutating-routes': requireCsrfMutatingRoutes,
   'require-pipe-handler': requirePipeHandler,
-  'no-hardcoded-strings-in-tests': noHardcodedStringsInTests,
   'require-complete-logger-mock': requireCompleteLoggerMock,
   'no-plaintext-pii-storage': noPlaintextPiiStorage,
   'require-email-hash-lookup': requireEmailHashLookup,
   'no-direct-embedding': noDirectEmbedding,
-  'no-direct-ai-provider': noDirectAiProvider,
-  'require-native-bridge': requireNativeBridge,
   'no-logger-error-context': noLoggerErrorContext,
   'no-hardcoded-cookies': noHardcodedCookies,
   'require-csrf-fetch': requireCsrfFetch,

@@ -26,7 +26,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 TEMP_DIR=$(mktemp -d)
-trap "rm -rf $TEMP_DIR" EXIT
+trap 'rm -rf "$TEMP_DIR"' EXIT
 
 echo ""
 echo "=========================================="

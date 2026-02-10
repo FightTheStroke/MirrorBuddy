@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # =============================================================================
 # SECRETS SCAN - Detect sensitive data committed to repository
 # Usage: ./scripts/secrets-scan.sh [--fix] [--json] [--strict]
@@ -8,7 +8,7 @@
 #   default  - Production-safe checks (ignores known-safe patterns)
 #   --strict - All patterns, includes warnings
 # =============================================================================
-set -o pipefail
+set -uo pipefail
 cd "$(dirname "$0")/.."
 
 FIX_MODE=false

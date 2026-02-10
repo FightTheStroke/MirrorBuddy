@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# CodeGraph auto-sync hook (migrated from .git/hooks/post-commit)
+# Runs after each commit to keep the code graph in sync.
+
+(
+  [ ! -d ".codegraph" ] && exit 0
+
+  if command -v codegraph >/dev/null 2>&1; then
+    codegraph sync --quiet 2>/dev/null &
+  elif command -v npx >/dev/null 2>&1; then
+    npx codegraph sync --quiet 2>/dev/null &
+  fi
+) &
+
+exit 0

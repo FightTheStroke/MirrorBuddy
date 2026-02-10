@@ -181,7 +181,9 @@ const eslintConfig = defineConfig([
       "no-console": [
         "error",
         {
-          allow: ["info", "debug", "time", "timeEnd", "trace", "assert"],
+          // console.info/debug removed: use logger/clientLogger (ADR 0076).
+          // time/timeEnd kept for performance profiling. assert for invariants.
+          allow: ["time", "timeEnd", "assert"],
         },
       ],
     },
@@ -273,6 +275,8 @@ const eslintConfig = defineConfig([
   },
   // i18n: Detect hardcoded Italian text in JSX - enforce translation usage
   // See ADR 0079 for i18n multi-language implementation
+  // DEPRECATION: This rule is a subset of no-literal-strings-in-jsx below.
+  // Once no-literal-strings-in-jsx is promoted to "error", remove this rule.
   {
     files: ["src/**/*.tsx"],
     ignores: [
@@ -321,7 +325,8 @@ const eslintConfig = defineConfig([
   },
   // T7-02: Block missing i18n namespace keys at build time
   // Validates that all t("key") calls reference keys that exist in message files
-  // NOTE: Set to "error" once all existing violations are fixed
+  // NOTE: 1 false positive remains (admin.stripe is a nested object, not leaf key).
+  // Escalate to "error" once the rule handles nested namespace keys correctly.
   {
     files: ["src/**/*.tsx", "src/**/*.ts"],
     ignores: [

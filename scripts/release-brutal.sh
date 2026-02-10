@@ -1,14 +1,16 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # =============================================================================
 # RELEASE BRUTAL - All checks, minimal output, issues file for AI
 # Usage: ./scripts/release-brutal.sh [--json]
 # Output: /tmp/release-brutal-issues.md (only if failures)
 # =============================================================================
-set -o pipefail
+set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # shellcheck source=lib/checks.sh
 source "$(dirname "$0")/lib/checks.sh"
+# shellcheck source=lib/build-lock.sh
+source "$(dirname "$0")/lib/build-lock.sh"
 
 JSON_MODE=false
 [ "${1:-}" = "--json" ] && JSON_MODE=true
@@ -16,7 +18,7 @@ JSON_MODE=false
 RESULTS_FILE=$(mktemp)
 ISSUES_FILE="/tmp/release-brutal-issues.md"
 rm -f "$ISSUES_FILE"
-trap "rm -f $RESULTS_FILE" EXIT
+trap 'rm -f "$RESULTS_FILE"' EXIT
 
 TOTAL_FAILED=0
 START=$(date +%s)
@@ -111,7 +113,9 @@ wait $PID_AUDIT && pass "audit" || fail "audit" "\`\`\`\n$(tail -20 /tmp/release
 # =============================================================================
 # PHASE 3: BUILD
 # =============================================================================
+acquire_build_lock
 npm run build >/tmp/release-build.log 2>&1 && pass "build" || fail "build" "\`\`\`\n$(grep -E 'Error:|error' /tmp/release-build.log | head -10)\n\`\`\`"
+release_build_lock
 
 # =============================================================================
 # PHASE 4: TESTS
@@ -146,7 +150,7 @@ rm -f "$_OUTPUT"
 # =============================================================================
 # PHASE 6: SECURITY
 # =============================================================================
-rg -q 'Content-Security-Policy' src/middleware.ts src/proxy.ts 2>/dev/null && pass "csp" || fail "csp" "Missing CSP header in middleware.ts or proxy.ts"
+rg -q 'Content-Security-Policy' src/proxy.ts 2>/dev/null && pass "csp" || fail "csp" "Missing CSP header in src/proxy.ts"
 rg -q 'csrf' src/lib/auth/ 2>/dev/null && pass "csrf" || fail "csrf" "Missing CSRF protection in src/lib/auth/"
 
 DEBUG_UNSAFE=false

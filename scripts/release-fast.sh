@@ -38,6 +38,16 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+# Cleanup dev server on any exit (set -e, SIGINT, etc.)
+SMOKE_SERVER_PID=""
+cleanup_smoke_server() {
+	if [[ -n "$SMOKE_SERVER_PID" ]]; then
+		kill "$SMOKE_SERVER_PID" 2>/dev/null || true
+		wait "$SMOKE_SERVER_PID" 2>/dev/null || true
+	fi
+}
+trap cleanup_smoke_server EXIT
+
 echo ""
 echo "=========================================="
 echo " RELEASE FAST (PR-LIKE) - MIRRORBUDDY"
@@ -61,7 +71,6 @@ echo -e "${GREEN}✓ Unit tests passed${NC}"
 
 echo ""
 echo -e "${BLUE}[4/5] E2E smoke...${NC}"
-SMOKE_SERVER_PID=""
 if ! curl -sf --max-time 3 "http://localhost:${MB_PORT}/api/health" >/dev/null 2>&1; then
 	echo -e "${YELLOW}↪ Dev server not running, starting on :${MB_PORT}...${NC}"
 	PORT="$MB_PORT" npm run dev >/dev/null 2>&1 &
@@ -81,11 +90,6 @@ if curl -sf --max-time 3 "http://localhost:${MB_PORT}/api/health" >/dev/null 2>&
 else
 	echo -e "${YELLOW}↪ Skipping E2E smoke: server unavailable${NC}"
 fi
-if [[ -n "$SMOKE_SERVER_PID" ]]; then
-	kill "$SMOKE_SERVER_PID" 2>/dev/null || true
-	wait "$SMOKE_SERVER_PID" 2>/dev/null || true
-fi
-
 echo ""
 echo -e "${BLUE}[5/5] Build (optional parity)...${NC}"
 if [ "${RELEASE_FAST_SKIP_BUILD:-0}" = "1" ]; then
