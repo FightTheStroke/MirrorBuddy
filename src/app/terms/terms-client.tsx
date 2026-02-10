@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { ArrowLeft } from "lucide-react";
-import { TermsContent } from "./content";
-import { TOS_VERSION, TOS_LAST_UPDATED } from "@/lib/tos/constants";
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
+import { TermsContent } from './content';
+import { TOS_VERSION, TOS_LAST_UPDATED } from '@/lib/tos/constants';
 
 export function TermsClient() {
-  const t = useTranslations("compliance.legal.terms");
+  const t = useTranslations('compliance.legal.terms');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
       {/* Navigation */}
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 print:border-b-2"
-        aria-label={t("pageNavAriaLabel")}
+        aria-label={t('pageNavAriaLabel')}
       >
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors print:hidden"
-            aria-label={t("backToHomeAriaLabel")}
+            aria-label={t('backToHomeAriaLabel')}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            {t("backToHome")}
+            {t('backToHome')}
           </Link>
         </div>
       </nav>
@@ -34,12 +34,12 @@ export function TermsClient() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              {t("title")}
+              {t('title')}
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-gray-400">
-              <span>{t("version", { version: TOS_VERSION })}</span>
+              <span>{t('version', { version: TOS_VERSION })}</span>
               <span>•</span>
-              <span>{t("lastUpdated", { lastUpdated: TOS_LAST_UPDATED })}</span>
+              <span>{t('lastUpdated', { date: TOS_LAST_UPDATED })}</span>
             </div>
           </div>
 
@@ -52,38 +52,38 @@ export function TermsClient() {
               id="tldr-heading"
               className="text-2xl font-bold text-slate-900 dark:text-white mb-4"
             >
-              {t("tldrHeading")}
+              {t('tldrHeading')}
             </h2>
             <ul className="space-y-2 text-slate-700 dark:text-gray-300 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldrItems.free")}</span>
+                <span>{t('tldrItems.free')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldrItems.notSchool")}</span>
+                <span>{t('tldrItems.notSchool')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldrItems.supervised")}</span>
+                <span>{t('tldrItems.supervised')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldrItems.respect")}</span>
+                <span>{t('tldrItems.respect')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldrItems.feedback")}</span>
+                <span>{t('tldrItems.feedback')}</span>
               </li>
             </ul>
           </section>
@@ -94,13 +94,13 @@ export function TermsClient() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
             <p className="text-slate-600 dark:text-gray-400 text-center">
-              {t("questionsPrefix")}{" "}
+              {t('questionsPrefix')}{' '}
               <a
                 href="mailto:info@fightthestroke.org"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
-                aria-label={`${t("questionsPrefix")} ${t("questionsEmail")}`}
+                aria-label={`${t('questionsPrefix')} ${t('questionsEmail')}`}
               >
-                {t("questionsEmail")}
+                {t('questionsEmail')}
               </a>
             </p>
           </footer>
