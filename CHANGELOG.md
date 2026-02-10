@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — SSO OIDC Security Hardening (Plan 143)
+
+### Security
+
+- Fixed emailHash lookup in SSO callback: uses `hashPII` + `findFirst` with `OR` to find PII-encrypted users (F-01)
+- Removed insecure `determineRole()` that granted ADMIN based on email substrings; new SSO users always get USER role (F-03)
+- OAuth state secret fails fast in production if `OAUTH_STATE_SECRET`/`COOKIE_SECRET` missing — no dev-secret fallback (F-05)
+
+### Added
+
+- JWKS-based ID token verification via `jose` library — replaces unsigned `decodeJWT()` (F-02)
+- `verifyIdToken()` in `oidc-utils.ts`: validates signature, issuer, audience, and nonce (F-02)
+- Nonce validation in SSO callback flow to prevent replay attacks (F-04)
+
 ## [Unreleased] — Sentry Fix All Runtimes (Plan 141)
 
 ### Fixed

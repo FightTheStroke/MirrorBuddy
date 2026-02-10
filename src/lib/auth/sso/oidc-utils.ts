@@ -5,8 +5,9 @@
 // Created for F-04: School Admin SSO Integration
 // ============================================================================
 
-import { createHash, randomBytes } from "crypto";
-import { TokenValidationError } from "./oidc-provider";
+import { createHash, randomBytes } from 'crypto';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
+import { TokenValidationError } from './oidc-provider';
 
 /**
  * PKCE (Proof Key for Code Exchange) parameters
@@ -29,12 +30,10 @@ export interface PKCEParams {
 export function generatePKCE(): PKCEParams {
   // Generate random 32-byte code verifier
   // Must be between 43-128 characters (base64url encoded)
-  const codeVerifier = randomBytes(32).toString("base64url");
+  const codeVerifier = randomBytes(32).toString('base64url');
 
   // Generate SHA256 hash of code verifier for code challenge
-  const codeChallenge = createHash("sha256")
-    .update(codeVerifier)
-    .digest("base64url");
+  const codeChallenge = createHash('sha256').update(codeVerifier).digest('base64url');
 
   return { codeVerifier, codeChallenge };
 }
@@ -46,7 +45,7 @@ export function generatePKCE(): PKCEParams {
  * @returns Random base64url-encoded state string
  */
 export function generateState(): string {
-  return randomBytes(16).toString("base64url");
+  return randomBytes(16).toString('base64url');
 }
 
 /**
@@ -56,16 +55,14 @@ export function generateState(): string {
  * @returns Random base64url-encoded nonce string
  */
 export function generateNonce(): string {
-  return randomBytes(16).toString("base64url");
+  return randomBytes(16).toString('base64url');
 }
 
 /**
  * Decode JWT payload without signature verification
  *
- * WARNING: This does NOT verify the token signature
- * Use only after signature verification or for non-security-critical data
- *
- * For production use, verify signature using provider's JWKS endpoint
+ * @deprecated Use verifyIdToken() for production ID token validation.
+ * This function does NOT verify the token signature.
  *
  * @param jwt - JSON Web Token (header.payload.signature)
  * @returns Decoded payload as JSON object
@@ -74,19 +71,17 @@ export function generateNonce(): string {
 export function decodeJWT(jwt: string): Record<string, unknown> {
   try {
     // Split JWT into parts (header.payload.signature)
-    const parts = jwt.split(".");
+    const parts = jwt.split('.');
     if (parts.length !== 3) {
-      throw new Error("Invalid JWT format - expected 3 parts");
+      throw new Error('Invalid JWT format - expected 3 parts');
     }
 
     // Decode base64url-encoded payload (part 1)
-    const payload = JSON.parse(
-      Buffer.from(parts[1], "base64url").toString("utf8"),
-    );
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
 
     return payload;
   } catch (error) {
-    throw new TokenValidationError("Failed to decode JWT", error);
+    throw new TokenValidationError('Failed to decode JWT', error);
   }
 }
 
@@ -100,7 +95,7 @@ export function decodeJWT(jwt: string): Record<string, unknown> {
  */
 export function validateJWTStructure(
   jwt: string,
-  requiredClaims: string[] = ["sub", "iss", "aud", "exp"],
+  requiredClaims: string[] = ['sub', 'iss', 'aud', 'exp'],
 ): void {
   const payload = decodeJWT(jwt);
 
@@ -115,6 +110,43 @@ export function validateJWTStructure(
   const exp = payload.exp as number;
   const now = Math.floor(Date.now() / 1000);
   if (exp <= now) {
-    throw new TokenValidationError("Token has expired");
+    throw new TokenValidationError('Token has expired');
+  }
+}
+
+/**
+ * Verify ID token using JWKS endpoint (jose library)
+ * Validates signature, issuer, audience, and optional nonce
+ *
+ * @param idToken - JWT ID token to verify
+ * @param jwksUri - Provider's JWKS endpoint URL
+ * @param expectedIssuer - Expected issuer claim(s)
+ * @param expectedAudience - Expected audience (client ID)
+ * @param expectedNonce - Optional nonce for replay prevention
+ * @returns Verified JWT payload
+ * @throws TokenValidationError on any verification failure
+ */
+export async function verifyIdToken(
+  idToken: string,
+  jwksUri: string,
+  expectedIssuer: string | string[],
+  expectedAudience: string,
+  expectedNonce?: string,
+): Promise<Record<string, unknown>> {
+  try {
+    const jwks = createRemoteJWKSet(new URL(jwksUri));
+    const { payload } = await jwtVerify(idToken, jwks, {
+      issuer: expectedIssuer,
+      audience: expectedAudience,
+    });
+
+    if (expectedNonce && payload.nonce !== expectedNonce) {
+      throw new TokenValidationError('Nonce mismatch — possible replay attack');
+    }
+
+    return payload as Record<string, unknown>;
+  } catch (error) {
+    if (error instanceof TokenValidationError) throw error;
+    throw new TokenValidationError('ID token verification failed', error);
   }
 }

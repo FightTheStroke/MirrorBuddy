@@ -7,7 +7,7 @@
  */
 
 // Re-export all client-safe exports for convenience
-export * from "./index";
+export * from './index';
 
 // Session authentication (uses next/headers, prisma)
 export {
@@ -17,17 +17,13 @@ export {
   requireAuthenticatedUser,
   type AuthResult,
   type AdminAuthResult,
-} from "./session-auth";
+} from './session-auth';
 
 // Cookie signing (uses azure key vault)
-export {
-  signCookieValue,
-  verifyCookieValue,
-  isSignedCookie,
-} from "./cookie-signing";
+export { signCookieValue, verifyCookieValue, isSignedCookie } from './cookie-signing';
 
 // Admin authorization (uses prisma)
-export { requireAdmin, isAdmin } from "./require-admin";
+export { requireAdmin, isAdmin } from './require-admin';
 
 // Password utilities (uses bcrypt)
 export {
@@ -35,29 +31,25 @@ export {
   verifyPassword,
   generateRandomPassword,
   validatePasswordStrength,
-} from "./password";
+} from './password';
 
 // SSO providers (server-side OAuth flows)
 export {
   GoogleWorkspaceProvider,
   GOOGLE_EDU_SCOPES,
   type GoogleUserInfo,
-} from "./sso/google-workspace";
+} from './sso/google-workspace';
 export {
   Microsoft365Provider,
   MICROSOFT_EDU_SCOPES,
   type MicrosoftUserInfo,
-} from "./sso/microsoft365";
+} from './sso/microsoft365';
 
 // SSO session management (uses prisma)
-export {
-  createSSOSession,
-  consumeSSOSession,
-  type SSOSessionData,
-} from "./sso/sso-session";
+export { createSSOSession, consumeSSOSession, type SSOSessionData } from './sso/sso-session';
 
 // SSO callback handling (uses prisma)
-export {
-  handleSSOCallback,
-  type SSOCallbackResult,
-} from "./sso/sso-callback-handler";
+export { handleSSOCallback, type SSOCallbackResult } from './sso/sso-callback-handler';
+
+// SSO OIDC utilities (token verification)
+export { verifyIdToken } from './sso/oidc-utils';

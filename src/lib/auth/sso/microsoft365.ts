@@ -13,38 +13,33 @@ import type {
   CallbackParams,
   CallbackResult,
   OIDCDiscoveryDocument,
-} from "./oidc-provider";
+} from './oidc-provider';
 import {
   AuthorizationError,
   CallbackError,
   UserInfoError,
   TokenValidationError,
-} from "./oidc-provider";
-import {
-  generatePKCE,
-  generateState,
-  generateNonce,
-  decodeJWT,
-} from "./oidc-utils";
+} from './oidc-provider';
+import { generatePKCE, generateState, generateNonce, verifyIdToken } from './oidc-utils';
 
 /**
  * Microsoft Azure AD OIDC discovery endpoint
  * Using 'common' tenant for multi-tenant support (personal + organizational)
  */
 const MICROSOFT_DISCOVERY_URL =
-  "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration";
+  'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration';
 
 /**
  * Microsoft 365 OAuth scopes for education integration
  */
 export const MICROSOFT_EDU_SCOPES = {
-  OPENID: "openid",
-  EMAIL: "email",
-  PROFILE: "profile",
-  OFFLINE_ACCESS: "offline_access",
-  USER_READ: "User.Read",
-  EDU_ROSTERS: "EduRoster.Read",
-  EDU_CLASSES: "EduRoster.ReadBasic",
+  OPENID: 'openid',
+  EMAIL: 'email',
+  PROFILE: 'profile',
+  OFFLINE_ACCESS: 'offline_access',
+  USER_READ: 'User.Read',
+  EDU_ROSTERS: 'EduRoster.Read',
+  EDU_CLASSES: 'EduRoster.ReadBasic',
 } as const;
 
 /**
@@ -76,19 +71,14 @@ export class Microsoft365Provider implements OIDCProvider {
     try {
       const response = await fetch(MICROSOFT_DISCOVERY_URL);
       if (!response.ok) {
-        throw new Error(
-          `Discovery endpoint returned ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`Discovery endpoint returned ${response.status}: ${response.statusText}`);
       }
 
       const doc: OIDCDiscoveryDocument = await response.json();
       this.discoveryDoc = doc;
       return doc;
     } catch (error) {
-      throw new AuthorizationError(
-        "Failed to fetch Microsoft OIDC discovery document",
-        error,
-      );
+      throw new AuthorizationError('Failed to fetch Microsoft OIDC discovery document', error);
     }
   }
 
@@ -108,13 +98,13 @@ export class Microsoft365Provider implements OIDCProvider {
       const params = new URLSearchParams({
         client_id: config.clientId,
         redirect_uri: config.redirectUri,
-        response_type: "code",
-        scope: config.scopes.join(" "),
+        response_type: 'code',
+        scope: config.scopes.join(' '),
         state,
         nonce,
         code_challenge: codeChallenge,
-        code_challenge_method: "S256",
-        response_mode: "query",
+        code_challenge_method: 'S256',
+        response_mode: 'query',
         ...config.additionalParams,
       });
 
@@ -130,10 +120,7 @@ export class Microsoft365Provider implements OIDCProvider {
       if (error instanceof AuthorizationError) {
         throw error;
       }
-      throw new AuthorizationError(
-        "Failed to generate authorization URL",
-        error,
-      );
+      throw new AuthorizationError('Failed to generate authorization URL', error);
     }
   }
 
@@ -143,42 +130,43 @@ export class Microsoft365Provider implements OIDCProvider {
    * @param config - Provider configuration for token exchange
    * @returns Access token, ID token, and user information
    */
-  async callback(
-    params: CallbackParams,
-    config: OIDCProviderConfig,
-  ): Promise<CallbackResult> {
+  async callback(params: CallbackParams, config: OIDCProviderConfig): Promise<CallbackResult> {
     try {
       const discovery = await this.getDiscoveryDocument();
 
       const tokenResponse = await fetch(discovery.token_endpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
           client_id: config.clientId,
           client_secret: config.clientSecret,
           code: params.code,
           redirect_uri: config.redirectUri,
-          grant_type: "authorization_code",
+          grant_type: 'authorization_code',
           code_verifier: params.codeVerifier,
         }),
       });
 
       if (!tokenResponse.ok) {
         const errorBody = await tokenResponse.text();
-        throw new Error(
-          `Token exchange failed: ${tokenResponse.status} ${errorBody}`,
-        );
+        throw new Error(`Token exchange failed: ${tokenResponse.status} ${errorBody}`);
       }
 
       const tokens = await tokenResponse.json();
 
       if (!tokens.id_token) {
-        throw new TokenValidationError("ID token missing from token response");
+        throw new TokenValidationError('ID token missing from token response');
       }
 
-      const idTokenPayload = this.decodeIdToken(tokens.id_token);
+      const idTokenPayload = await verifyIdToken(
+        tokens.id_token,
+        discovery.jwks_uri,
+        discovery.issuer,
+        config.clientId,
+        params.nonce,
+      );
       const userInfo = await this.getUserInfo(tokens.access_token);
 
       return {
@@ -186,33 +174,17 @@ export class Microsoft365Provider implements OIDCProvider {
         userInfo: {
           ...userInfo,
           ...idTokenPayload,
-        },
+        } as MicrosoftUserInfo,
+        verifiedClaims: idTokenPayload,
       };
     } catch (error) {
-      if (
-        error instanceof CallbackError ||
-        error instanceof TokenValidationError
-      ) {
+      if (error instanceof CallbackError || error instanceof TokenValidationError) {
         throw error;
       }
-      throw new CallbackError("Failed to process OAuth callback", error);
+      throw new CallbackError('Failed to process OAuth callback', error);
     }
   }
 
-  /**
-   * Decode ID token JWT payload
-   * @param idToken - JWT ID token from Azure AD
-   * @returns Decoded token payload with user claims
-   */
-  private decodeIdToken(idToken: string): MicrosoftUserInfo {
-    return decodeJWT(idToken) as MicrosoftUserInfo;
-  }
-
-  /**
-   * Fetch user information from Microsoft Graph UserInfo endpoint
-   * @param accessToken - Valid access token from token response
-   * @returns User profile information with standard OIDC claims
-   */
   async getUserInfo(accessToken: string): Promise<MicrosoftUserInfo> {
     try {
       const discovery = await this.getDiscoveryDocument();
@@ -224,9 +196,7 @@ export class Microsoft365Provider implements OIDCProvider {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `UserInfo endpoint returned ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`UserInfo endpoint returned ${response.status}: ${response.statusText}`);
       }
 
       return (await response.json()) as MicrosoftUserInfo;
@@ -234,7 +204,7 @@ export class Microsoft365Provider implements OIDCProvider {
       if (error instanceof UserInfoError) {
         throw error;
       }
-      throw new UserInfoError("Failed to fetch user info", error);
+      throw new UserInfoError('Failed to fetch user info', error);
     }
   }
 }
