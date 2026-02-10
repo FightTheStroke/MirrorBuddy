@@ -20,6 +20,7 @@ import {
   Palette,
   Coins,
   Receipt,
+  CreditCard,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -174,6 +175,12 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           label: 'Tax',
           href: '/admin/tax',
           icon: Receipt,
+        },
+        {
+          id: 'stripe',
+          label: 'Stripe',
+          href: '/admin/stripe',
+          icon: CreditCard,
         },
         {
           id: 'key-vault',

@@ -108,3 +108,63 @@ export type SubscriptionStatusVariant =
   | "past_due"
   | "trialing"
   | "incomplete";
+
+/**
+ * Stripe webhook event for admin monitoring
+ */
+export interface StripeWebhookEvent {
+  id: string;
+  type: string;
+  created: number;
+  livemode: boolean;
+  pendingWebhooks: number;
+  request: { id: string | null; idempotencyKey: string | null } | null;
+  data: Record<string, unknown>;
+}
+
+/**
+ * Payment settings (kill switch + configuration)
+ */
+export interface PaymentSettings {
+  paymentsEnabled: boolean;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
+/**
+ * Input for creating a new Stripe product
+ */
+export interface ProductCreateInput {
+  name: string;
+  description?: string;
+  metadata?: Record<string, string>;
+}
+
+/**
+ * Input for creating a new Stripe price
+ */
+export interface PriceCreateInput {
+  productId: string;
+  unitAmount: number;
+  currency: string;
+  interval: 'month' | 'year';
+  metadata?: Record<string, string>;
+}
+
+/**
+ * Input for subscription actions (cancel, change plan)
+ */
+export interface SubscriptionActionInput {
+  action: 'cancel' | 'change_plan';
+  cancelAtPeriodEnd?: boolean;
+  newPriceId?: string;
+}
+
+/**
+ * Input for issuing a refund
+ */
+export interface RefundInput {
+  chargeId: string;
+  amount?: number;
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
+}

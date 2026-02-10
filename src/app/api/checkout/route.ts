@@ -36,6 +36,18 @@ export const POST = pipe(
 
   const { priceId, locale } = validation.data;
 
+  // Kill switch: check if payments are enabled
+  const globalConfig = await prisma.globalConfig.findFirst({
+    where: { id: 'global' },
+    select: { paymentsEnabled: true },
+  });
+  if (!globalConfig?.paymentsEnabled) {
+    return NextResponse.json(
+      { error: 'Payments are currently disabled' },
+      { status: 503 },
+    );
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: ctx.userId },
     select: { email: true },

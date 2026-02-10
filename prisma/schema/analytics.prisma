@@ -86,6 +86,7 @@ model GlobalConfig {
   id               String   @id @default("global")
   killSwitch       Boolean  @default(false)
   killSwitchReason String?
+  paymentsEnabled  Boolean  @default(false)
   updatedAt        DateTime @updatedAt
   updatedBy        String?
 }
