@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
-import { cookies, headers } from "next/headers";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { cookies, headers } from 'next/headers';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 import {
   getOrCreateTrialSession,
   isTrialVerificationPending,
   TRIAL_LIMITS,
-} from "@/lib/trial/trial-service";
-import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/server";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
-import { checkAbuse, incrementAbuseScore } from "@/lib/trial/anti-abuse";
-import { prisma } from "@/lib/db";
+} from '@/lib/trial/trial-service';
+import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/server';
+import { VISITOR_COOKIE_NAME, TRIAL_CONSENT_COOKIE } from '@/lib/auth/server';
+import { checkAbuse, incrementAbuseScore } from '@/lib/trial/anti-abuse';
+import { prisma } from '@/lib/db';
 
-const log = logger.child({ module: "api/trial/session" });
+const log = logger.child({ module: 'api/trial/session' });
 
 /**
  * POST /api/trial/session
@@ -22,14 +22,14 @@ const log = logger.child({ module: "api/trial/session" });
  * Requires explicit consent to privacy policy (F-02: GDPR compliance).
  */
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial endpoint, visitor cookie only, no session auth to protect
-export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
+export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
   // F-02: Check GDPR consent before creating trial session
   const cookieStore = await cookies();
-  const trialConsentCookie = cookieStore.get("mirrorbuddy-trial-consent");
+  const trialConsentCookie = cookieStore.get(TRIAL_CONSENT_COOKIE);
 
   // Validate that consent was explicitly given
   if (!trialConsentCookie?.value) {
-    log.warn("[TrialSession] Consent check failed - no consent cookie", {
+    log.warn('[TrialSession] Consent check failed - no consent cookie', {
       path: ctx.req.nextUrl.pathname,
     });
     return NextResponse.json(
@@ -43,13 +43,11 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
 
   // Validate consent data format
   try {
-    const consentData = JSON.parse(
-      decodeURIComponent(trialConsentCookie.value),
-    );
+    const consentData = JSON.parse(decodeURIComponent(trialConsentCookie.value));
     if (!consentData.accepted) {
       return NextResponse.json(
         {
-          error: "Consenso privacy non valido",
+          error: 'Consenso privacy non valido',
         },
         { status: 403 },
       );
@@ -57,7 +55,7 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
   } catch {
     return NextResponse.json(
       {
-        error: "Consenso privacy non valido",
+        error: 'Consenso privacy non valido',
       },
       { status: 403 },
     );
@@ -68,9 +66,9 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
 
   // Get IP from headers
   const headersList = await headers();
-  const forwarded = headersList.get("x-forwarded-for");
-  const realIp = headersList.get("x-real-ip");
-  const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
+  const forwarded = headersList.get('x-forwarded-for');
+  const realIp = headersList.get('x-real-ip');
+  const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
 
   // Get or create visitor ID from cookie
   let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
@@ -80,11 +78,7 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
   }
 
   // Create or retrieve trial session
-  const session = await getOrCreateTrialSession(
-    ip,
-    visitorId,
-    auth.userId || undefined,
-  );
+  const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
 
   // F-03: Anti-abuse detection on session creation
   const abuseCheck = checkAbuse(ip, visitorId);
@@ -93,20 +87,18 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
     const dbAdapter = {
       session: {
         update: (args: unknown) =>
-          prisma.trialSession.update(
-            args as Parameters<typeof prisma.trialSession.update>[0],
-          ),
+          prisma.trialSession.update(args as Parameters<typeof prisma.trialSession.update>[0]),
       },
     };
     await incrementAbuseScore(session.id, abuseCheck.score, dbAdapter);
-    log.warn("[TrialSession] Abuse detected", {
+    log.warn('[TrialSession] Abuse detected', {
       sessionId: session.id.slice(0, 8),
       score: abuseCheck.score,
       reason: abuseCheck.reason,
     });
   }
 
-  log.info("[TrialSession] Session created/retrieved", {
+  log.info('[TrialSession] Session created/retrieved', {
     sessionId: session.id,
     isNew: session.chatsUsed === 0,
     abuseScore: abuseCheck.score,
@@ -121,10 +113,7 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
     maxChats: TRIAL_LIMITS.CHAT,
     // Voice limits
     voiceSecondsUsed: session.voiceSecondsUsed,
-    voiceSecondsRemaining: Math.max(
-      0,
-      TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed,
-    ),
+    voiceSecondsRemaining: Math.max(0, TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed),
     maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
     // Tool limits
     toolsUsed: session.toolsUsed,
@@ -147,10 +136,10 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
   if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
     response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 365, // 1 year
-      path: "/",
+      path: '/',
     });
   }
 
@@ -162,14 +151,14 @@ export const POST = pipe(withSentry("/api/trial/session"))(async (ctx) => {
  *
  * Retrieves the current trial session status.
  */
-export const GET = pipe(withSentry("/api/trial/session"))(async () => {
+export const GET = pipe(withSentry('/api/trial/session'))(async () => {
   // Check if user is authenticated
   const auth = await validateAuth();
 
   const headersList = await headers();
-  const forwarded = headersList.get("x-forwarded-for");
-  const realIp = headersList.get("x-real-ip");
-  const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
+  const forwarded = headersList.get('x-forwarded-for');
+  const realIp = headersList.get('x-real-ip');
+  const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
 
   const cookieStore = await cookies();
   const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
@@ -178,11 +167,7 @@ export const GET = pipe(withSentry("/api/trial/session"))(async () => {
     return NextResponse.json({ hasSession: false });
   }
 
-  const session = await getOrCreateTrialSession(
-    ip,
-    visitorId,
-    auth.userId || undefined,
-  );
+  const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
 
   return NextResponse.json({
     hasSession: true,
@@ -193,10 +178,7 @@ export const GET = pipe(withSentry("/api/trial/session"))(async () => {
     maxChats: TRIAL_LIMITS.CHAT,
     // Voice limits
     voiceSecondsUsed: session.voiceSecondsUsed,
-    voiceSecondsRemaining: Math.max(
-      0,
-      TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed,
-    ),
+    voiceSecondsRemaining: Math.max(0, TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed),
     maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
     // Tool limits
     toolsUsed: session.toolsUsed,

@@ -112,7 +112,7 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 
 | Layer             | Technology                        | Purpose                                |
 | ----------------- | --------------------------------- | -------------------------------------- |
-| **Framework**     | Next.js 16.1.1 (App Router)       | SSR, routing, API routes               |
+| **Framework**     | Next.js 16.1.5 (App Router)       | SSR, routing, API routes               |
 | **Language**      | TypeScript 5 (strict mode)        | Type safety, developer experience      |
 | **UI**            | React 19.2.3                      | Component framework                    |
 | **Styling**       | Tailwind CSS 4, Radix UI          | Utility-first + accessible components  |

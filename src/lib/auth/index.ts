@@ -7,10 +7,10 @@
  */
 
 // Client-side auth
-export { getUserIdFromCookie, isAuthenticated } from "./client-auth";
+export { getUserIdFromCookie, isAuthenticated } from './client-auth';
 
 // CSRF protection (client)
-export { csrfFetch, getCSRFToken, clearCSRFToken } from "./csrf-client";
+export { csrfFetch, getCSRFToken, clearCSRFToken } from './csrf-client';
 
 // Cookie constants (shared between client and server)
 export {
@@ -23,6 +23,7 @@ export {
   CSRF_TOKEN_COOKIE,
   CSRF_TOKEN_HEADER,
   CONSENT_COOKIE,
+  TRIAL_CONSENT_COOKIE,
   A11Y_COOKIE,
   THEME_COOKIE,
   SECURE_COOKIE_OPTIONS,
@@ -31,4 +32,4 @@ export {
   VISITOR_MAX_AGE,
   isValidVisitorId,
   validateVisitorId,
-} from "./cookie-constants";
+} from './cookie-constants';

@@ -3,9 +3,9 @@
  * Enforces trial limits for anonymous users (ADR 0056)
  */
 
-import { cookies, headers } from "next/headers";
-import { logger } from "@/lib/logger";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth";
+import { cookies, headers } from 'next/headers';
+import { logger } from '@/lib/logger';
+import { VISITOR_COOKIE_NAME, validateVisitorId } from '@/lib/auth';
 import {
   getOrCreateTrialSession,
   getTrialSessionById,
@@ -14,9 +14,9 @@ import {
   checkAndIncrementUsage,
   getTierLimitsForTrial,
   isTrialEmailVerified,
-} from "@/lib/trial/trial-service";
+} from '@/lib/trial/trial-service';
 
-const log = logger.child({ module: "api/chat/trial-handler" });
+const log = logger.child({ module: 'api/chat/trial-handler' });
 
 export interface TrialCheckResult {
   allowed: boolean;
@@ -37,14 +37,14 @@ export async function getTrialSession(
   if (isAuthenticated) return null;
 
   const cookieStore = await cookies();
-  const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+  const visitorId = validateVisitorId(cookieStore.get(VISITOR_COOKIE_NAME)?.value);
 
   if (!visitorId) return null;
 
   const headersList = await headers();
-  const forwarded = headersList.get("x-forwarded-for");
-  const realIp = headersList.get("x-real-ip");
-  const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
+  const forwarded = headersList.get('x-forwarded-for');
+  const realIp = headersList.get('x-real-ip');
+  const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
 
   const session = await getOrCreateTrialSession(ip, visitorId, userId);
   return { sessionId: session.id };
@@ -66,20 +66,21 @@ export async function checkTrialForAnonymous(
   try {
     // Get visitor ID from cookie
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const rawVisitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const visitorId = validateVisitorId(rawVisitorId);
 
-    // No visitor cookie = no trial session yet = allow first access
+    // No visitor cookie or invalid format = no trial session yet = allow first access
     // Trial session will be created on /welcome before app access
     if (!visitorId) {
-      log.debug("No visitor ID cookie - trial session not yet created");
+      log.debug('No visitor ID cookie - trial session not yet created');
       return { allowed: true };
     }
 
     // Get IP from headers
     const headersList = await headers();
-    const forwarded = headersList.get("x-forwarded-for");
-    const realIp = headersList.get("x-real-ip");
-    const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
+    const forwarded = headersList.get('x-forwarded-for');
+    const realIp = headersList.get('x-real-ip');
+    const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
 
     // Get or create trial session
     const session = await getOrCreateTrialSession(ip, visitorId, userId);
@@ -87,10 +88,10 @@ export async function checkTrialForAnonymous(
     // F-02: Atomic check and increment to prevent race condition
     // Uses Serializable transaction isolation - if limit reached, returns false
     // If allowed, increments usage atomically before returning
-    const atomicResult = await checkAndIncrementUsage(session.id, "chat");
+    const atomicResult = await checkAndIncrementUsage(session.id, 'chat');
 
     if (!atomicResult.allowed) {
-      log.info("Trial chat limit reached (atomic check)", {
+      log.info('Trial chat limit reached (atomic check)', {
         sessionId: session.id.slice(0, 8),
         reason: atomicResult.reason,
       });
@@ -112,9 +113,9 @@ export async function checkTrialForAnonymous(
       toolsRemaining: Math.max(0, limits.tools - session.toolsUsed),
     };
   } catch (error) {
-    log.warn("Trial check failed", { error: String(error) });
+    log.warn('Trial check failed', { error: String(error) });
     // SECURITY: On error, deny access (fail-closed principle)
-    return { allowed: false, reason: "Trial verification failed" };
+    return { allowed: false, reason: 'Trial verification failed' };
   }
 }
 
@@ -126,15 +127,15 @@ export async function checkTrialToolLimit(
 ): Promise<{ allowed: boolean; reason?: string }> {
   const session = await getTrialSessionById(sessionId);
   if (!session) {
-    return { allowed: false, reason: "Session not found" };
+    return { allowed: false, reason: 'Session not found' };
   }
   if (!isTrialEmailVerified(session)) {
     return {
       allowed: false,
-      reason: "Trial email verification required",
+      reason: 'Trial email verification required',
     };
   }
-  return checkTrialLimits(sessionId, "tool");
+  return checkTrialLimits(sessionId, 'tool');
 }
 
 /**
@@ -146,7 +147,7 @@ export async function checkTrialToolLimit(
 export async function incrementTrialUsage(sessionId: string): Promise<void> {
   // F-02: No-op - increment now happens atomically in checkTrialForAnonymous()
   // Kept for backward compatibility with existing callers
-  log.debug("incrementTrialUsage called (no-op since F-02 atomic fix)", {
+  log.debug('incrementTrialUsage called (no-op since F-02 atomic fix)', {
     sessionId: sessionId.slice(0, 8),
   });
 }
@@ -159,16 +160,16 @@ export async function checkAndIncrementTrialToolUsage(
   sessionId: string,
 ): Promise<{ allowed: boolean; remaining: number; reason?: string }> {
   try {
-    const result = await checkAndIncrementUsage(sessionId, "tool");
-    log.debug("Trial tool usage check+increment (atomic)", {
+    const result = await checkAndIncrementUsage(sessionId, 'tool');
+    log.debug('Trial tool usage check+increment (atomic)', {
       sessionId: sessionId.slice(0, 8),
       allowed: result.allowed,
       remaining: result.remaining,
     });
     return result;
   } catch (error) {
-    log.error("Failed atomic tool usage check", { error: String(error) });
-    return { allowed: false, remaining: 0, reason: "Tool check failed" };
+    log.error('Failed atomic tool usage check', { error: String(error) });
+    return { allowed: false, remaining: 0, reason: 'Tool check failed' };
   }
 }
 
@@ -178,15 +179,13 @@ export async function checkAndIncrementTrialToolUsage(
  * @deprecated Since F-02 fix, use checkAndIncrementTrialToolUsage() for atomic operations.
  * This function still works but doesn't prevent race conditions.
  */
-export async function incrementTrialToolUsage(
-  sessionId: string,
-): Promise<void> {
+export async function incrementTrialToolUsage(sessionId: string): Promise<void> {
   try {
-    await incrementUsage(sessionId, "tool");
-    log.debug("Trial tool usage incremented (legacy)", {
+    await incrementUsage(sessionId, 'tool');
+    log.debug('Trial tool usage incremented (legacy)', {
       sessionId: sessionId.slice(0, 8),
     });
   } catch (error) {
-    log.error("Failed to increment trial tool usage", { error: String(error) });
+    log.error('Failed to increment trial tool usage', { error: String(error) });
   }
 }

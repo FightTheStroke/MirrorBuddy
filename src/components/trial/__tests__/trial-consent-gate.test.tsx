@@ -8,35 +8,35 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { TrialConsentGate } from "../trial-consent-gate";
-import { getTranslation } from "@/test/i18n-helpers";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { TrialConsentGate } from '../trial-consent-gate';
+import { getTranslation } from '@/test/i18n-helpers';
+import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 
 // Mock the trial consent helpers
-vi.mock("@/lib/consent/trial-consent", () => ({
+vi.mock('@/lib/consent/trial-consent', () => ({
   hasTrialConsent: vi.fn(),
   setTrialConsent: vi.fn(),
 }));
 
-import { hasTrialConsent, setTrialConsent } from "@/lib/consent/trial-consent";
+import { hasTrialConsent, setTrialConsent } from '@/lib/consent/trial-consent';
 
-describe("TrialConsentGate", () => {
+describe('TrialConsentGate', () => {
   beforeEach(() => {
     // Reset mocks before each test
     vi.clearAllMocks();
     // Clear localStorage (check if available in jsdom)
-    if (typeof localStorage !== "undefined" && localStorage.clear) {
+    if (typeof localStorage !== 'undefined' && localStorage.clear) {
       localStorage.clear();
     }
     // Clear trial consent cookie (set by handleAccept)
-    document.cookie =
-      "mirrorbuddy-trial-consent=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = `${TRIAL_CONSENT_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   });
 
-  describe("when consent already given", () => {
-    it("renders children immediately", () => {
+  describe('when consent already given', () => {
+    it('renders children immediately', () => {
       // Mock consent already given
       vi.mocked(hasTrialConsent).mockReturnValue(true);
 
@@ -46,10 +46,10 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      expect(screen.getByText("Protected Content")).toBeInTheDocument();
+      expect(screen.getByText('Protected Content')).toBeInTheDocument();
     });
 
-    it("does not show consent UI", () => {
+    it('does not show consent UI', () => {
       vi.mocked(hasTrialConsent).mockReturnValue(true);
 
       render(
@@ -58,78 +58,78 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      const consentTitle = getTranslation("auth.trialConsent.title");
+      const consentTitle = getTranslation('auth.trialConsent.title');
       expect(screen.queryByText(consentTitle)).not.toBeInTheDocument();
     });
   });
 
-  describe("when no consent given", () => {
+  describe('when no consent given', () => {
     beforeEach(() => {
       vi.mocked(hasTrialConsent).mockReturnValue(false);
     });
 
-    it("shows consent UI instead of children", () => {
+    it('shows consent UI instead of children', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const consentTitle = getTranslation("auth.trialConsent.title");
-      expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
+      const consentTitle = getTranslation('auth.trialConsent.title');
+      expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
       expect(
-        screen.getByRole("heading", { name: new RegExp(consentTitle, "i") }),
+        screen.getByRole('heading', { name: new RegExp(consentTitle, 'i') }),
       ).toBeInTheDocument();
     });
 
-    it("shows privacy policy link", () => {
+    it('shows privacy policy link', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const privacyLink = screen.getByRole("link", {
+      const privacyLink = screen.getByRole('link', {
         name: /privacy/i,
       });
       expect(privacyLink).toBeInTheDocument();
-      expect(privacyLink).toHaveAttribute("href", "/privacy");
-      expect(privacyLink).toHaveAttribute("target", "_blank");
+      expect(privacyLink).toHaveAttribute('href', '/privacy');
+      expect(privacyLink).toHaveAttribute('target', '_blank');
     });
 
-    it("shows consent checkbox", () => {
+    it('shows consent checkbox', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
+      const checkbox = screen.getByRole('checkbox');
       expect(checkbox).toBeInTheDocument();
       expect(checkbox).not.toBeChecked();
     });
 
-    it("disables start button until checkbox checked", () => {
+    it('disables start button until checkbox checked', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const startButtonText = getTranslation("auth.trialConsent.startButton");
-      const startButton = screen.getByRole("button", {
-        name: new RegExp(startButtonText, "i"),
+      const startButtonText = getTranslation('auth.trialConsent.startButton');
+      const startButton = screen.getByRole('button', {
+        name: new RegExp(startButtonText, 'i'),
       });
       expect(startButton).toBeDisabled();
     });
   });
 
-  describe("consent flow", () => {
+  describe('consent flow', () => {
     beforeEach(() => {
       vi.mocked(hasTrialConsent).mockReturnValue(false);
     });
 
-    it("enables button after checking checkbox", async () => {
+    it('enables button after checking checkbox', async () => {
       const user = userEvent.setup();
 
       render(
@@ -138,10 +138,10 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
-      const startButtonText = getTranslation("auth.trialConsent.startButton");
-      const startButton = screen.getByRole("button", {
-        name: new RegExp(startButtonText, "i"),
+      const checkbox = screen.getByRole('checkbox');
+      const startButtonText = getTranslation('auth.trialConsent.startButton');
+      const startButton = screen.getByRole('button', {
+        name: new RegExp(startButtonText, 'i'),
       });
 
       expect(startButton).toBeDisabled();
@@ -151,7 +151,7 @@ describe("TrialConsentGate", () => {
       expect(startButton).toBeEnabled();
     });
 
-    it("stores consent and renders children after confirmation", async () => {
+    it('stores consent and renders children after confirmation', async () => {
       const user = userEvent.setup();
 
       // Initially no consent
@@ -168,13 +168,13 @@ describe("TrialConsentGate", () => {
       );
 
       // Check consent checkbox
-      const checkbox = screen.getByRole("checkbox");
+      const checkbox = screen.getByRole('checkbox');
       await user.click(checkbox);
 
       // Click start button
-      const startButtonText = getTranslation("auth.trialConsent.startButton");
-      const startButton = screen.getByRole("button", {
-        name: new RegExp(startButtonText, "i"),
+      const startButtonText = getTranslation('auth.trialConsent.startButton');
+      const startButton = screen.getByRole('button', {
+        name: new RegExp(startButtonText, 'i'),
       });
       await user.click(startButton);
 
@@ -190,11 +190,11 @@ describe("TrialConsentGate", () => {
 
       // Children should now be visible
       await waitFor(() => {
-        expect(screen.getByText("Protected Content")).toBeInTheDocument();
+        expect(screen.getByText('Protected Content')).toBeInTheDocument();
       });
     });
 
-    it("unchecking checkbox disables button again", async () => {
+    it('unchecking checkbox disables button again', async () => {
       const user = userEvent.setup();
 
       render(
@@ -203,10 +203,10 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
-      const startButtonText = getTranslation("auth.trialConsent.startButton");
-      const startButton = screen.getByRole("button", {
-        name: new RegExp(startButtonText, "i"),
+      const checkbox = screen.getByRole('checkbox');
+      const startButtonText = getTranslation('auth.trialConsent.startButton');
+      const startButton = screen.getByRole('button', {
+        name: new RegExp(startButtonText, 'i'),
       });
 
       // Check then uncheck
@@ -218,12 +218,12 @@ describe("TrialConsentGate", () => {
     });
   });
 
-  describe("accessibility", () => {
+  describe('accessibility', () => {
     beforeEach(() => {
       vi.mocked(hasTrialConsent).mockReturnValue(false);
     });
 
-    it("has proper keyboard navigation", async () => {
+    it('has proper keyboard navigation', async () => {
       const user = userEvent.setup();
 
       render(
@@ -232,46 +232,46 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
+      const checkbox = screen.getByRole('checkbox');
 
       // Tab to privacy link first, then to checkbox
       await user.tab(); // Privacy link
       await user.tab(); // Checkbox
 
       // Checkbox should have focus now
-      await user.keyboard(" ");
+      await user.keyboard(' ');
       expect(checkbox).toBeChecked();
     });
 
-    it("has proper aria labels on checkbox", () => {
+    it('has proper aria labels on checkbox', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
+      const checkbox = screen.getByRole('checkbox');
       expect(checkbox).toHaveAccessibleName();
     });
 
-    it("button has clear accessible name", () => {
+    it('button has clear accessible name', () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const button = screen.getByRole("button");
+      const button = screen.getByRole('button');
       expect(button).toHaveAccessibleName();
     });
   });
 
-  describe("dark mode support", () => {
+  describe('dark mode support', () => {
     beforeEach(() => {
       vi.mocked(hasTrialConsent).mockReturnValue(false);
     });
 
-    it("applies dark mode classes", () => {
+    it('applies dark mode classes', () => {
       const { container } = render(
         <TrialConsentGate>
           <div>Protected Content</div>
@@ -280,7 +280,7 @@ describe("TrialConsentGate", () => {
 
       // Check for dark: classes in the rendered output
       const html = container.innerHTML;
-      expect(html).toContain("dark:");
+      expect(html).toContain('dark:');
     });
   });
 });

@@ -3,14 +3,14 @@
  * Task: T1-15 (F-30)
  */
 
-import { prisma } from "@/lib/db";
-import { revalidatePath } from "next/cache";
-import Link from "next/link";
-import { stripeService } from "@/lib/stripe/stripe-service";
-import { getTranslations } from "next-intl/server";
+import { prisma } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
+import Link from 'next/link';
+import { stripeService } from '@/lib/stripe/stripe-service';
+import { getTranslations } from 'next-intl/server';
 
 export const metadata = {
-  title: "Tax Configuration | Admin",
+  title: 'Tax Configuration | Admin',
 };
 
 interface TaxConfigItem {
@@ -24,11 +24,11 @@ interface TaxConfigItem {
 }
 
 const EU_COUNTRIES = [
-  { code: "IT", name: "Italy", defaultRate: 22 },
-  { code: "FR", name: "France", defaultRate: 20 },
-  { code: "DE", name: "Germany", defaultRate: 19 },
-  { code: "ES", name: "Spain", defaultRate: 21 },
-  { code: "GB", name: "United Kingdom", defaultRate: 20 },
+  { code: 'IT', name: 'Italy', defaultRate: 22 },
+  { code: 'FR', name: 'France', defaultRate: 20 },
+  { code: 'DE', name: 'Germany', defaultRate: 19 },
+  { code: 'ES', name: 'Spain', defaultRate: 21 },
+  { code: 'GB', name: 'United Kingdom', defaultRate: 20 },
 ] as const;
 
 async function getTaxConfigs(): Promise<{
@@ -37,7 +37,7 @@ async function getTaxConfigs(): Promise<{
 }> {
   try {
     const dbConfigs = await prisma.taxConfig.findMany({
-      orderBy: { countryCode: "asc" },
+      orderBy: { countryCode: 'asc' },
     });
 
     const configs = EU_COUNTRIES.map((country) => {
@@ -72,12 +72,12 @@ async function getTaxConfigs(): Promise<{
 }
 
 async function updateTaxConfig(formData: FormData) {
-  "use server";
+  'use server';
 
-  const countryCode = formData.get("countryCode") as string;
-  const vatRate = parseFloat(formData.get("vatRate") as string);
-  const reverseChargeEnabled = formData.get("reverseChargeEnabled") === "on";
-  const isActive = formData.get("isActive") !== "off";
+  const countryCode = formData.get('countryCode') as string;
+  const vatRate = parseFloat(formData.get('vatRate') as string);
+  const reverseChargeEnabled = formData.get('reverseChargeEnabled') === 'on';
+  const isActive = formData.get('isActive') !== 'off';
 
   try {
     await prisma.taxConfig.upsert({
@@ -89,13 +89,13 @@ async function updateTaxConfig(formData: FormData) {
     // Migration not run yet - silently fail
   }
 
-  revalidatePath("/admin/tax");
+  revalidatePath('/admin/tax');
 }
 
 async function syncToStripe(formData: FormData) {
-  "use server";
+  'use server';
 
-  const countryCode = formData.get("countryCode") as string;
+  const countryCode = formData.get('countryCode') as string;
 
   try {
     const config = await prisma.taxConfig.findUnique({
@@ -105,11 +105,11 @@ async function syncToStripe(formData: FormData) {
 
     const stripe = stripeService.getServerClient();
     const countryNames: Record<string, string> = {
-      IT: "Italy",
-      FR: "France",
-      DE: "Germany",
-      ES: "Spain",
-      GB: "United Kingdom",
+      IT: 'Italy',
+      FR: 'France',
+      DE: 'Germany',
+      ES: 'Spain',
+      GB: 'United Kingdom',
     };
 
     const taxRate = await stripe.taxRates.create({
@@ -129,40 +129,31 @@ async function syncToStripe(formData: FormData) {
     // Stripe sync failed - will retry
   }
 
-  revalidatePath("/admin/tax");
+  revalidatePath('/admin/tax');
 }
 
 export default async function TaxConfigPage() {
-  const t = await getTranslations("admin");
+  const t = await getTranslations('admin');
   const { configs, hasMigration } = await getTaxConfigs();
 
   return (
     <div className="p-8">
       <div className="mb-6">
-        <Link
-          href="/admin"
-          className="text-sm text-indigo-600 hover:text-indigo-900"
-        >
-          {t("backToAdmin")}
+        <Link href="/admin" className="text-sm text-indigo-600 hover:text-indigo-900">
+          {t('backToAdmin')}
         </Link>
       </div>
 
-      <h1 className="mb-2 text-3xl font-bold">{t("vatTaxConfiguration")}</h1>
-      <p className="mb-6 text-gray-600">
-        {t("configureVatRatesPerCountryForEuTaxCompliance")}
-      </p>
+      <h1 className="mb-2 text-3xl font-bold">{t('vatTaxConfiguration')}</h1>
+      <p className="mb-6 text-gray-600">{t('configureVatRatesPerCountryForEuTaxCompliance')}</p>
 
       {!hasMigration && (
         <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-          <h3 className="text-sm font-medium text-yellow-800">
-            {t("databaseMigrationRequired")}
-          </h3>
+          <h3 className="text-sm font-medium text-yellow-800">{t('databaseMigrationRequired')}</h3>
           <p className="mt-1 text-sm text-yellow-700">
-            {t("run")}{" "}
-            <code className="rounded bg-yellow-100 px-1">
-              {t("npxPrismaMigrateDev")}
-            </code>{" "}
-            {t("toEnablePersistence")}
+            {t('run')}{' '}
+            <code className="rounded bg-yellow-100 px-1">{t('npxPrismaMigrateDev')}</code>{' '}
+            {t('toEnablePersistence')}
           </p>
         </div>
       )}
@@ -172,22 +163,22 @@ export default async function TaxConfigPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("country")}
+                {t('country')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("vatRate")}
+                {t('vatRate')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("reverseCharge")}
+                {t('reverseCharge')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("status")}
+                {t('status')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("stripe")}
+                {t('tax.stripe')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                {t("actions")}
+                {t('actions')}
               </th>
             </tr>
           </thead>
@@ -197,36 +188,25 @@ export default async function TaxConfigPage() {
                 <td className="whitespace-nowrap px-6 py-4">
                   <div className="flex items-center">
                     <span className="mr-2 text-xl">
-                      {config.countryCode === "IT" && "🇮🇹"}
-                      {config.countryCode === "FR" && "🇫🇷"}
-                      {config.countryCode === "DE" && "🇩🇪"}
-                      {config.countryCode === "ES" && "🇪🇸"}
-                      {config.countryCode === "GB" && "🇬🇧"}
+                      {config.countryCode === 'IT' && '🇮🇹'}
+                      {config.countryCode === 'FR' && '🇫🇷'}
+                      {config.countryCode === 'DE' && '🇩🇪'}
+                      {config.countryCode === 'ES' && '🇪🇸'}
+                      {config.countryCode === 'GB' && '🇬🇧'}
                     </span>
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {config.countryName}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {config.countryCode}
-                      </div>
+                      <div className="text-sm font-medium text-gray-900">{config.countryName}</div>
+                      <div className="text-xs text-gray-500">{config.countryCode}</div>
                     </div>
                   </div>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
-                  <form
-                    action={updateTaxConfig}
-                    className="flex items-center gap-2"
-                  >
-                    <input
-                      type="hidden"
-                      name="countryCode"
-                      value={config.countryCode}
-                    />
+                  <form action={updateTaxConfig} className="flex items-center gap-2">
+                    <input type="hidden" name="countryCode" value={config.countryCode} />
                     <input
                       type="hidden"
                       name="reverseChargeEnabled"
-                      value={config.reverseChargeEnabled ? "on" : ""}
+                      value={config.reverseChargeEnabled ? 'on' : ''}
                     />
                     <input
                       type="number"
@@ -243,22 +223,14 @@ export default async function TaxConfigPage() {
                       disabled={!hasMigration}
                       className="text-xs text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
-                      {t("save")}
+                      {t('save')}
                     </button>
                   </form>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <form action={updateTaxConfig}>
-                    <input
-                      type="hidden"
-                      name="countryCode"
-                      value={config.countryCode}
-                    />
-                    <input
-                      type="hidden"
-                      name="vatRate"
-                      value={config.vatRate}
-                    />
+                    <input type="hidden" name="countryCode" value={config.countryCode} />
+                    <input type="hidden" name="vatRate" value={config.vatRate} />
                     <label className="flex items-center">
                       <input
                         type="checkbox"
@@ -274,31 +246,27 @@ export default async function TaxConfigPage() {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${config.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${config.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}
                   >
-                    {config.isActive ? "Active" : "Inactive"}
+                    {config.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   {config.stripeTaxId ? (
-                    <span className="text-xs text-green-600">{t("synced")}</span>
+                    <span className="text-xs text-green-600">{t('synced')}</span>
                   ) : (
-                    <span className="text-xs text-gray-400">{t("notSynced")}</span>
+                    <span className="text-xs text-gray-400">{t('notSynced')}</span>
                   )}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <form action={syncToStripe}>
-                    <input
-                      type="hidden"
-                      name="countryCode"
-                      value={config.countryCode}
-                    />
+                    <input type="hidden" name="countryCode" value={config.countryCode} />
                     <button
                       type="submit"
                       disabled={!hasMigration}
                       className="text-sm text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
-                      {t("syncToStripe")}
+                      {t('syncToStripe')}
                     </button>
                   </form>
                 </td>
@@ -309,13 +277,11 @@ export default async function TaxConfigPage() {
       </div>
 
       <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <h3 className="text-sm font-medium text-blue-800">{t("euVatCompliance")}</h3>
+        <h3 className="text-sm font-medium text-blue-800">{t('euVatCompliance')}</h3>
         <ul className="mt-2 list-inside list-disc text-sm text-blue-700">
-          <li>{t("reverseChargeApplies")}</li>
-          <li>{t("standardRatesApply")}</li>
-          <li>
-            {t("ukRatesShownForReferencePostBrexitSeparateRulesApp")}
-          </li>
+          <li>{t('reverseChargeApplies')}</li>
+          <li>{t('standardRatesApply')}</li>
+          <li>{t('ukRatesShownForReferencePostBrexitSeparateRulesApp')}</li>
         </ul>
       </div>
     </div>

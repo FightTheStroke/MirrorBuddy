@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Shield, ExternalLink } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { hasTrialConsent, setTrialConsent } from "@/lib/consent/trial-consent";
+import { useState, useEffect } from 'react';
+import { Shield, ExternalLink } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { hasTrialConsent, setTrialConsent } from '@/lib/consent/trial-consent';
+import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 
 interface TrialConsentGateProps {
   children: React.ReactNode;
@@ -24,7 +25,7 @@ interface TrialConsentGateProps {
  * - WCAG 2.1 AA accessible
  */
 export function TrialConsentGate({ children }: TrialConsentGateProps) {
-  const t = useTranslations("auth.trialConsent");
+  const t = useTranslations('auth.trialConsent');
   const [consented, setConsented] = useState<boolean>(false);
   const [checkboxChecked, setCheckboxChecked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -33,10 +34,8 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
   useEffect(() => {
     const checkConsent = () => {
       // Check if trial consent cookie exists
-      const cookies = document.cookie.split("; ");
-      const trialConsentCookie = cookies.find((c) =>
-        c.startsWith("mirrorbuddy-trial-consent="),
-      );
+      const cookies = document.cookie.split('; ');
+      const trialConsentCookie = cookies.find((c) => c.startsWith(`${TRIAL_CONSENT_COOKIE}=`));
 
       if (trialConsentCookie) {
         setConsented(true);
@@ -58,10 +57,10 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
     // Also set a cookie that the server can read for API validation
     const consentData = {
       accepted: true,
-      version: "1.0",
+      version: '1.0',
       acceptedAt: new Date().toISOString(),
     };
-    document.cookie = `mirrorbuddy-trial-consent=${encodeURIComponent(
+    document.cookie = `${TRIAL_CONSENT_COOKIE}=${encodeURIComponent(
       JSON.stringify(consentData),
     )}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     setConsented(true);
@@ -96,11 +95,9 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
               id="trial-consent-title"
               className="text-xl font-bold text-slate-900 dark:text-white"
             >
-              {t("title")}
+              {t('title')}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {t("subtitle")}
-            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           </div>
         </div>
 
@@ -109,20 +106,20 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
           id="trial-consent-description"
           className="space-y-4 text-sm text-slate-600 dark:text-slate-300"
         >
-          <p>{t("description")}</p>
-          <p>{t("processingIntro")}</p>
+          <p>{t('description')}</p>
+          <p>{t('processingIntro')}</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>{t("dataConversations")}</span>
+              <span>{t('dataConversations')}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>{t("dataProgress")}</span>
+              <span>{t('dataProgress')}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>{t("dataCookies")}</span>
+              <span>{t('dataCookies')}</span>
             </li>
           </ul>
         </div>
@@ -135,7 +132,7 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline font-medium"
           >
-            {t("privacyLink")}
+            {t('privacyLink')}
             <ExternalLink className="w-4 h-4" />
           </a>
         </div>
@@ -146,13 +143,13 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
             id="trial-consent-checkbox"
             checked={checkboxChecked}
             onCheckedChange={(checked) => setCheckboxChecked(checked === true)}
-            aria-label={t("checkboxLabel")}
+            aria-label={t('checkboxLabel')}
           />
           <label
             htmlFor="trial-consent-checkbox"
             className="text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none"
           >
-            {t("checkboxLabel")}
+            {t('checkboxLabel')}
           </label>
         </div>
 
@@ -162,14 +159,14 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
           disabled={!checkboxChecked}
           className="w-full"
           size="lg"
-          aria-label={t("startButton")}
+          aria-label={t('startButton')}
         >
-          {t("startButton")}
+          {t('startButton')}
         </Button>
 
         {/* GDPR compliance note */}
         <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-          {t("gdprNote")}
+          {t('gdprNote')}
         </p>
       </div>
     </div>
