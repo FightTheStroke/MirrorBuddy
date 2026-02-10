@@ -58,16 +58,16 @@ echo ""
 echo "2️⃣  Checking Sentry Configuration Files..."
 for file in sentry.client.config.ts sentry.server.config.ts sentry.edge.config.ts; do
 	if [ -f "$file" ]; then
-		# Plan 141: NODE_ENV is the single production gate (not VERCEL_ENV)
-		if grep -q "NODE_ENV.*production" "$file"; then
-			echo "✅ $file: Uses NODE_ENV production gate"
+		# Deployment gate: VERCEL env var (not NODE_ENV which matches local builds)
+		if grep -q "process\.env\.VERCEL\|NEXT_PUBLIC_VERCEL_ENV" "$file"; then
+			echo "✅ $file: Uses Vercel deployment gate"
 		else
-			echo "❌ $file: Missing NODE_ENV production gate"
+			echo "❌ $file: Missing Vercel deployment gate"
 			FAILED=$((FAILED + 1))
 		fi
 
-		# enabled flag: must use isProduction
-		if grep -q "enabled.*isProduction" "$file"; then
+		# enabled flag: must use isVercel
+		if grep -q "enabled.*isVercel" "$file"; then
 			echo "   ✅ enabled flag set correctly"
 		else
 			echo "   ❌ enabled flag not set correctly"

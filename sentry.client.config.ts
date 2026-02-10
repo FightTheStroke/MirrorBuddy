@@ -53,10 +53,9 @@ if (dsn) {
         maskAllText: true,
         blockAllMedia: true,
       }),
-      // Capture console.error and console.warn
-      Sentry.captureConsoleIntegration({
-        levels: ['error', 'warn'],
-      }),
+      // NOTE: captureConsoleIntegration removed — the structured logger
+      // already sends errors/warnings to Sentry via captureException/captureMessage.
+      // Having both causes double-reporting (MIRRORBUDDY-F).
       // Browser tracing for performance
       Sentry.browserTracingIntegration({
         enableInp: true,
