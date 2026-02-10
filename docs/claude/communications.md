@@ -105,7 +105,7 @@ Resend webhooks deliver real-time events to `POST /api/webhooks/resend`.
 
 ### Configuration Steps
 
-1. Add `RESEND_WEBHOOK_SECRET` to `.env.local` (from Resend dashboard)
+1. Add `RESEND_WEBHOOK_SECRET` to `.env` (from Resend dashboard)
 2. Configure webhook URL in Resend: `https://mirrorbuddy.com/api/webhooks/resend`
 3. Select event types: `email.delivered`, `email.opened`, `email.bounced`, `email.complained`
 
@@ -151,7 +151,7 @@ Resend free tier enforces daily/monthly limits. System checks quota before campa
 **Quota checking**:
 
 ```typescript
-import { getResendLimits } from "@/lib/observability/resend-limits";
+import { getResendLimits } from '@/lib/observability/resend-limits';
 
 const limits = await getResendLimits();
 const available = Math.min(
@@ -251,7 +251,7 @@ Four new admin pages under `/admin/communications/*` group.
 ### Send Campaign
 
 ```typescript
-import { sendCampaign } from "@/lib/email/campaign-service";
+import { sendCampaign } from '@/lib/email/campaign-service';
 
 // Campaign must be in DRAFT status
 await sendCampaign(campaignId);
@@ -262,16 +262,16 @@ await sendCampaign(campaignId);
 ### Render Template
 
 ```typescript
-import { renderTemplate } from "@/lib/email/template-service";
+import { renderTemplate } from '@/lib/email/template-service';
 
 const rendered = await renderTemplate(templateId, {
-  name: "Mario Rossi",
-  email: "mario@example.com",
-  tier: "pro",
-  appUrl: "https://mirrorbuddy.com",
-  unsubscribeUrl: "https://mirrorbuddy.com/unsubscribe?token=abc123",
-  currentDate: "07/02/2026",
-  currentYear: "2026",
+  name: 'Mario Rossi',
+  email: 'mario@example.com',
+  tier: 'pro',
+  appUrl: 'https://mirrorbuddy.com',
+  unsubscribeUrl: 'https://mirrorbuddy.com/unsubscribe?token=abc123',
+  currentDate: '07/02/2026',
+  currentYear: '2026',
 });
 // Returns: { subject, htmlBody, textBody }
 ```
@@ -279,9 +279,9 @@ const rendered = await renderTemplate(templateId, {
 ### Check Send Permission
 
 ```typescript
-import { canSendTo } from "@/lib/email/preference-service";
+import { canSendTo } from '@/lib/email/preference-service';
 
-const allowed = await canSendTo(userId, "productUpdates");
+const allowed = await canSendTo(userId, 'productUpdates');
 if (allowed) {
   // User has opted in to this category
 }
@@ -291,7 +291,7 @@ if (allowed) {
 ### Get Campaign Stats
 
 ```typescript
-import { getCampaignStats } from "@/lib/email/stats-service";
+import { getCampaignStats } from '@/lib/email/stats-service';
 
 const stats = await getCampaignStats(campaignId);
 // Returns: { sent, delivered, opened, bounced, failed, openRate, deliveryRate, bounceRate }

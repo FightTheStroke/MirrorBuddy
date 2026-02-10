@@ -1,19 +1,23 @@
 # ADR 0054: Upstash Redis for Distributed Rate Limiting
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-01-18
 
 ## Context
 
 MirrorBuddy runs on Vercel (serverless), requiring distributed rate limiting across multiple instances. In-memory rate limiting fails in serverless due to:
+
 1. **No shared state**: Each request may hit different container instances
 2. **Rapid scaling**: Autoscaling creates/destroys instances frequently
 3. **Distributed constraints**: Must enforce limits across the entire system, not per-instance
 
 Requirements:
+
 - HTTP-native (serverless-compatible)
 - Multi-region support (global user base)
 - Sliding window algorithm
@@ -37,7 +41,7 @@ Requirements:
 ### Environment Configuration
 
 ```bash
-# .env.production
+# .env
 UPSTASH_REDIS_REST_URL=https://...redis.upstash.io
 UPSTASH_REDIS_REST_TOKEN=...
 
@@ -68,16 +72,19 @@ RATE_LIMITS = {
 ## Alternatives Considered
 
 ### Self-hosted Redis
+
 - **Pros**: Full control, no external dependency
 - **Cons**: Requires Vercel Redis integration or external service, additional ops burden
 
 ### Vercel KV
+
 - **Pros**: First-party integration, same deployment workflow
 - **Cons**: Regional limits, higher latency, less mature than Upstash
 
 ## Consequences
 
 ### Positive
+
 - **Serverless-native**: HTTP REST API, no persistent connections required
 - **Multi-region**: Upstash distributes across regions automatically
 - **Zero ops**: No infrastructure to manage
@@ -85,12 +92,14 @@ RATE_LIMITS = {
 - **Cost effective**: Pay-per-request pricing aligns with serverless model
 
 ### Negative
+
 - **External dependency**: Adds external service to architecture
 - **Network latency**: Extra HTTP roundtrip per rate-limit check (~50-100ms)
 - **Cost**: ~$0.20 per 100k requests (minimal but non-zero)
 - **Vendor lock-in**: Migration requires database rewrite
 
 ### Mitigations
+
 - Upstash is stable, trusted provider (Vercel, Supabase use it)
 - Fallback to in-memory prevents complete outage
 - Rate limit checks only on high-value endpoints (chat, voice)
@@ -102,7 +111,7 @@ RATE_LIMITS = {
 - `src/lib/rate-limit-types.ts` - Type definitions
 - `src/lib/rate-limit-persistence.ts` - Event logging
 - `.env.example` - Upstash environment variables
-- `.env.production` - Production Upstash configuration
+- `.env` - Upstash configuration (Vercel manages production vars at runtime)
 
 ## References
 

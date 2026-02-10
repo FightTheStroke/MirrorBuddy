@@ -29,11 +29,11 @@ When Redis is unavailable in production:
 
 ```typescript
 // src/lib/rate-limit.ts behavior
-if (process.env.NODE_ENV === "production" && !isRedisConfigured()) {
-  log.error("CRITICAL: Redis not configured in production");
+if (process.env.NODE_ENV === 'production' && !isRedisConfigured()) {
+  log.error('CRITICAL: Redis not configured in production');
   return {
     success: false,
-    error: "Rate limiting service unavailable",
+    error: 'Rate limiting service unavailable',
   };
 }
 ```
@@ -67,7 +67,7 @@ curl -X GET $UPSTASH_REDIS_REST_URL \
 vercel env pull --environment production
 
 # Required variables
-grep -E "UPSTASH_REDIS" .env.production
+grep -E "UPSTASH_REDIS" .env
 ```
 
 ### Step 3: Emergency Bypass (LAST RESORT)

@@ -26,7 +26,7 @@
 
 | Symptom                                | Likely Cause                  | Quick Fix                                              | Section                                           |
 | -------------------------------------- | ----------------------------- | ------------------------------------------------------ | ------------------------------------------------- |
-| "API key is invalid"                   | Wrong credentials or endpoint | Check `.env.local` matches Azure Portal                | [Azure OpenAI](#azure-openai-issues)              |
+| "API key is invalid"                   | Wrong credentials or endpoint | Check `.env` matches Azure Portal                      | [Azure OpenAI](#azure-openai-issues)              |
 | Voice button does nothing              | Missing Realtime API config   | Verify `AZURE_OPENAI_REALTIME_*` vars                  | [Voice Sessions](#voice-session-issues)           |
 | "Deployment not found"                 | Wrong deployment name         | Check Azure Portal deployment name                     | [Azure OpenAI](#azure-openai-issues)              |
 | Database connection failed             | PostgreSQL not running        | Start PostgreSQL: `brew services start postgresql`     | [Database](#database-issues)                      |
@@ -39,7 +39,7 @@
 | `npm install` fails                    | Package conflicts             | Delete `node_modules` & `package-lock.json`, reinstall | [Build & Development](#build--development-issues) |
 | Ollama connection refused              | Ollama not running            | Start: `ollama serve`                                  | [Ollama](#ollama-issues)                          |
 | "Model not found" (Ollama)             | Model not pulled              | Pull model: `ollama pull llama3.2`                     | [Ollama](#ollama-issues)                          |
-| Environment variable ignored           | Wrong file name               | Use `.env.local` (not `.env`)                          | [Environment](#environment-configuration)         |
+| Environment variable ignored           | Wrong file name               | Use `.env` (not `.env`)                                | [Environment](#environment-configuration)         |
 | AI responses are slow                  | Using Ollama without GPU      | Switch to Azure OpenAI or add GPU                      | [Ollama](#ollama-issues)                          |
 | "Page should have main landmark" (E2E) | Wall component blocking       | Update `global-setup.ts`                               | [E2E Testing](#e2e-testing-issues)                |
 | "Unable to verify first certificate"   | Missing Supabase CA cert      | Set `SUPABASE_CA_CERT`                                 | [Security](#security--encryption-issues)          |
@@ -64,7 +64,7 @@
    # Copy EXACTLY as shown
    ```
 
-2. Check `.env.local` format:
+2. Check `.env` format:
 
    ```bash
    AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
@@ -97,7 +97,7 @@
    # In Azure Portal → Your OpenAI Resource → Model deployments
    ```
 
-2. Match `.env.local` to deployment names:
+2. Match `.env` to deployment names:
 
    ```bash
     AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini        # For chat
@@ -161,7 +161,7 @@
 
 2. Verify deployment exists in Azure Portal
 
-3. Restart dev server after changing `.env.local`
+3. Restart dev server after changing `.env`
 
 #### Problem: "Invalid value: 'gpt-4o-transcribe'. Supported values are: 'whisper-1'"
 
@@ -228,7 +228,7 @@
      --sku-capacity 1
    ```
 
-2. Update `.env.local`:
+2. Update `.env`:
    ```bash
    AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
    ```
@@ -276,7 +276,7 @@
 
    ```bash
    # Should print all values
-   node -e "require('dotenv').config({path:'.env.local'}); console.log(process.env.AZURE_OPENAI_ENDPOINT)"
+   node -e "require('dotenv').config({path:'.env'}); console.log(process.env.AZURE_OPENAI_ENDPOINT)"
    ```
 
 5. **Test deployments directly:**
@@ -324,7 +324,7 @@
 2. **Verify connection string format:**
 
    ```bash
-   # .env.local
+   # .env
    # PostgreSQL (production)
    DATABASE_URL="postgresql://username:password@localhost:5432/mirrorbuddy"
 
@@ -347,7 +347,7 @@
    - Wrong port (default: 5432)
    - Database name doesn't exist (create with `createdb mirrorbuddy`)
    - Password contains special chars (URL-encode: `@` → `%40`, `#` → `%23`)
-   - Using quotes around the entire URL in `.env.local` (correct: `DATABASE_URL="postgresql://..."`)
+   - Using quotes around the entire URL in `.env` (correct: `DATABASE_URL="postgresql://..."`)
 
 #### Problem: "Error: P1001: Can't reach database server at `localhost:5432`"
 
@@ -508,7 +508,7 @@ if (DATABASE_URL.startsWith('postgresql://')) {
    }
    ```
 
-3. **Update `.env.local`:**
+3. **Update `.env`:**
 
    ```bash
    DATABASE_URL="postgresql://username:password@localhost:5432/mirrorbuddy"
@@ -553,7 +553,7 @@ npx prisma studio  # Manually export tables
    }
    ```
 
-2. Update `.env.local`:
+2. Update `.env`:
 
    ```bash
    DATABASE_URL="file:./dev.db"
@@ -691,7 +691,7 @@ git commit -m "Add column to schema"
 1. **Check query performance:**
 
    ```bash
-   # Enable query logging in .env.local
+   # Enable query logging in .env
    DATABASE_URL="postgresql://...?connection_limit=10&pool_timeout=20"
    ```
 
@@ -724,7 +724,7 @@ git commit -m "Add column to schema"
 
 4. **Connection pool settings:**
    ```bash
-   # .env.local
+   # .env
    DATABASE_URL="postgresql://user:pass@localhost:5432/mirrorbuddy?connection_limit=10"
    ```
 
@@ -1131,7 +1131,7 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 1. **Check which API version you're using:**
 
    ```bash
-   # Look at your deployment name in .env.local
+   # Look at your deployment name in .env
    AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime  # GA API (recommended)
    # or
    AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview  # Preview API (deprecated)
@@ -1309,7 +1309,7 @@ Our test-voice page includes device selection:
 5. **Verify environment variables:**
 
    ```bash
-   node -e "require('dotenv').config({path:'.env.local'}); console.log({
+   node -e "require('dotenv').config({path:'.env'}); console.log({
      endpoint: process.env.AZURE_OPENAI_REALTIME_ENDPOINT,
      deployment: process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT,
      hasKey: !!process.env.AZURE_OPENAI_REALTIME_API_KEY
@@ -1530,8 +1530,8 @@ sudo sysctl -p
 1. **Check environment variables:**
 
    ```bash
-   # Ensure .env.local exists and has required vars
-   cat .env.local
+   # Ensure .env exists and has required vars
+   cat .env
 
    # Required for production:
    DATABASE_URL="..."
@@ -1882,7 +1882,7 @@ npm run dev
    ```bash
    node -v  # >= 18
    npm -v   # >= 8
-   cat .env.local  # Has required vars
+   cat .env  # Has required vars
    ```
 
 4. **Check logs for specific errors:**
@@ -2048,7 +2048,7 @@ npm run dev
    # If fails, Ollama isn't running or listening on different port
    ```
 
-3. **Check `.env.local` configuration:**
+3. **Check `.env` configuration:**
 
    ```bash
    # Should be exactly this for local Ollama
@@ -2061,7 +2061,7 @@ npm run dev
    - ❌ `OLLAMA_URL=http://127.0.0.1:11434` (use `localhost` for consistency)
    - ❌ `OLLAMA_URL=https://localhost:11434` (should be `http`, not `https`)
 
-4. **Restart dev server after changing `.env.local`:**
+4. **Restart dev server after changing `.env`:**
 
    ```bash
    # Stop (Ctrl+C) and restart
@@ -2109,7 +2109,7 @@ npm run dev
    ollama pull llama3.2:8b      # ~4.5GB (slower, better quality)
    ```
 
-3. **Update `.env.local` to smaller model:**
+3. **Update `.env` to smaller model:**
 
    ```bash
    OLLAMA_MODEL=llama3.2:1b  # Or llama3.2
@@ -2153,11 +2153,11 @@ npm run dev
    ollama pull llama3.2:8b   # Larger, better quality
    ```
 
-3. **Verify model name matches `.env.local`:**
+3. **Verify model name matches `.env`:**
 
    ```bash
    # Check what's in config
-   cat .env.local | grep OLLAMA_MODEL
+   cat .env | grep OLLAMA_MODEL
 
    # Must match exactly what ollama list shows
    # Example: if ollama list shows "llama3.2:latest"
@@ -2261,7 +2261,7 @@ npm run dev
    # Switch to faster model
    ollama pull llama3.2:1b
 
-   # Update .env.local
+   # Update .env
    OLLAMA_MODEL=llama3.2:1b
    ```
 
@@ -2369,14 +2369,14 @@ http://localhost:3000/showcase
 
 ### Configuration & Environment
 
-#### Problem: `.env.local` changes not taking effect
+#### Problem: `.env` changes not taking effect
 
 **Cause:** Dev server caches environment variables
 
 **Solution:**
 
 ```bash
-# Always restart after changing .env.local
+# Always restart after changing .env
 # Press Ctrl+C to stop
 npm run dev
 ```
@@ -2396,7 +2396,7 @@ npm run dev
    - Look for log messages indicating provider
    - Example: "Using Ollama at http://localhost:11434"
 
-3. **Check `.env.local` priority:**
+3. **Check `.env` priority:**
 
    ```bash
    # If BOTH are configured, Azure OpenAI takes priority
@@ -2451,7 +2451,7 @@ npm run dev
 4. **Verify environment variables:**
 
    ```bash
-   cat .env.local | grep OLLAMA
+   cat .env | grep OLLAMA
    # Should show:
    # OLLAMA_URL=http://localhost:11434
    # OLLAMA_MODEL=llama3.2
@@ -2496,30 +2496,28 @@ npm run dev
 
 **Solution:**
 
-MirrorBuddy uses **`.env.local`** (NOT `.env`) for local development:
+MirrorBuddy uses **`.env`** (NOT `.env`) for local development:
 
-| File              | Purpose                                | Should I Edit?               |
-| ----------------- | -------------------------------------- | ---------------------------- |
-| `.env.example`    | Template with all variables documented | ❌ No - This is the template |
-| `.env.local`      | **Your actual config** (gitignored)    | ✅ YES - Edit this file      |
-| `.env`            | Not used in MirrorBuddy                | ❌ Don't create this         |
-| `.env.production` | Deployment-specific (optional)         | Only for custom deployments  |
+| File           | Purpose                                | Should I Edit?               |
+| -------------- | -------------------------------------- | ---------------------------- |
+| `.env.example` | Template with all variables documented | ❌ No - This is the template |
+| `.env`         | **Your actual config** (gitignored)    | ✅ YES - Edit this file      |
 
 **Setup:**
 
 1. Copy template to create your config:
 
    ```bash
-   cp .env.example .env.local
+   cp .env.example .env
    ```
 
 2. Fill in your values:
 
    ```bash
    # Open in editor
-   nano .env.local
+   nano .env
    # or
-   code .env.local
+   code .env
    ```
 
 3. **ALWAYS restart dev server after changes:**
@@ -2530,10 +2528,10 @@ MirrorBuddy uses **`.env.local`** (NOT `.env`) for local development:
 
 **Common mistakes:**
 
-- ❌ Editing `.env.example` instead of `.env.local`
-- ❌ Creating `.env` instead of `.env.local`
+- ❌ Editing `.env.example` instead of `.env`
+- ❌ Creating `.env` instead of `.env`
 - ❌ Forgetting to restart server after changes
-- ❌ Committing `.env.local` to git (it's automatically ignored)
+- ❌ Committing `.env` to git (it's automatically ignored)
 
 ---
 
@@ -2619,7 +2617,7 @@ DATABASE_URL="postgresql://user:password@host:5432/mirrorbuddy?sslmode=require"
 **SQLite + Ollama (100% free, no cloud):**
 
 ```bash
-# .env.local
+# .env
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 DATABASE_URL="file:./prisma/dev.db"
@@ -2642,8 +2640,8 @@ ollama serve
 ollama pull llama3.2
 
 # Start MirrorBuddy
-cp .env.example .env.local
-# Edit .env.local with above values
+cp .env.example .env
+# Edit .env with above values
 npm run dev
 ```
 
@@ -2654,7 +2652,7 @@ npm run dev
 **SQLite + Azure OpenAI (voice + text):**
 
 ```bash
-# .env.local
+# .env
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
@@ -2685,7 +2683,7 @@ DATABASE_URL="file:./prisma/dev.db"
 **PostgreSQL + Azure OpenAI + Cost Tracking:**
 
 ```bash
-# .env.local (or Vercel environment variables)
+# .env (or Vercel environment variables)
 
 # Azure OpenAI
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
@@ -2719,7 +2717,7 @@ GOOGLE_CLIENT_SECRET=your-web-client-secret
 **Deployment platforms:**
 
 - **Vercel:** Add variables in Project Settings → Environment Variables
-- **Docker:** Pass via `--env-file .env.local` or `-e` flags
+- **Docker:** Pass via `--env-file .env` or `-e` flags
 - **Other:** Ensure variables are available to Node.js process
 
 ---
@@ -2729,11 +2727,11 @@ GOOGLE_CLIENT_SECRET=your-web-client-secret
 #### Quick Verification
 
 ```bash
-# 1. Check .env.local exists and has values
-cat .env.local
+# 1. Check .env exists and has values
+cat .env
 
 # 2. Verify variables are loaded
-node -e "require('dotenv').config({path:'.env.local'}); console.log({
+node -e "require('dotenv').config({path:'.env'}); console.log({
   azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
   ollamaUrl: process.env.OLLAMA_URL,
   database: process.env.DATABASE_URL
@@ -2812,7 +2810,7 @@ psql $DATABASE_URL -c "SELECT 1"
 
 | Mistake                       | Symptom                | Fix                                                             |
 | ----------------------------- | ---------------------- | --------------------------------------------------------------- |
-| **Wrong file name**           | Variables ignored      | Use `.env.local`, not `.env`                                    |
+| **Wrong file name**           | Variables ignored      | Use `.env`, not `.env`                                          |
 | **Missing `https://`**        | "Invalid URL"          | Add `https://` to Azure endpoint                                |
 | **Extra `/` at end**          | "404 Not Found"        | Remove trailing slash from endpoint                             |
 | **Wrong deployment name**     | "Deployment not found" | Match Azure Portal deployment name exactly                      |
@@ -2829,7 +2827,7 @@ psql $DATABASE_URL -c "SELECT 1"
 
 **DO:**
 
-- ✅ Keep `.env.local` out of git (automatically ignored)
+- ✅ Keep `.env` out of git (automatically ignored)
 - ✅ Use different keys for dev/staging/production
 - ✅ Rotate API keys periodically
 - ✅ Use Azure RBAC to limit key permissions
@@ -2837,11 +2835,11 @@ psql $DATABASE_URL -c "SELECT 1"
 
 **DON'T:**
 
-- ❌ Commit `.env.local` to git
-- ❌ Share `.env.local` via email/Slack
+- ❌ Commit `.env` to git
+- ❌ Share `.env` via email/Slack
 - ❌ Use production keys in development
 - ❌ Hardcode keys in source code
-- ❌ Screenshot or log `.env.local` contents
+- ❌ Screenshot or log `.env` contents
 
 **If keys are compromised:**
 
@@ -2849,7 +2847,7 @@ psql $DATABASE_URL -c "SELECT 1"
    - Azure Portal → Your OpenAI Resource → Keys and Endpoint
    - Click "Regenerate Key 1" (or Key 2 if using that)
 
-2. **Update `.env.local`:**
+2. **Update `.env`:**
 
    ```bash
    AZURE_OPENAI_API_KEY=new-regenerated-key
@@ -3039,7 +3037,7 @@ openssl rand -hex 32
 # Set in Vercel
 vercel env add TOKEN_ENCRYPTION_KEY production --sensitive <<< "your-generated-key"
 
-# Or in .env.local for development
+# Or in .env for development
 TOKEN_ENCRYPTION_KEY=your-32-plus-character-key-here
 ```
 
@@ -3206,7 +3204,7 @@ Voice features disabled
 ```
 
 **Additional Context:**
-I have set AZURE_OPENAI_REALTIME_DEPLOYMENT in .env.local but button still doesn't appear
+I have set AZURE_OPENAI_REALTIME_DEPLOYMENT in .env but button still doesn't appear
 ```
 
 **Bad Example:**
@@ -3365,8 +3363,8 @@ cd MirrorBuddy
 npm install
 
 # Set up environment
-cp .env.example .env.local
-# Edit .env.local with your values
+cp .env.example .env
+# Edit .env with your values
 
 # Start dev server
 npm run dev

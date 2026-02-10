@@ -209,8 +209,8 @@ cd MirrorBuddy
 npm install
 
 # Configure environment
-cp .env.example .env.local
-# Edit .env.local with your Azure OpenAI or Ollama credentials
+cp .env.example .env
+# Edit .env with your Azure OpenAI or Ollama credentials
 
 # Initialize database
 npx prisma generate

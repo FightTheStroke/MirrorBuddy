@@ -10,8 +10,8 @@
 git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
 npm install
-cp .env.example .env.local
-# Edit .env.local with your API keys
+cp .env.example .env
+# Edit .env with your API keys
 npx prisma generate
 npx prisma migrate dev
 npm run dev
@@ -39,7 +39,7 @@ Open http://localhost:3000
    - `gpt-realtime` (voice, premium)
    - `gpt-realtime-mini` (voice, cheaper default)
    - `text-embedding-3-small` (RAG semantic search, recommended)
-3. Configure `.env.local`:
+3. Configure `.env`:
 
 ```bash
 # Chat
@@ -85,7 +85,7 @@ curl -fsSL https://ollama.com/install.sh | sh  # Linux
 ollama serve
 ollama pull llama3.2  # Recommended (~2GB)
 
-# Configure .env.local
+# Configure .env
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 ```
@@ -109,7 +109,7 @@ az login
 az ad sp create-for-rbac --name "MirrorBuddy-CostReader" \
   --role "Cost Management Reader" --scopes /subscriptions/{subscription-id}
 
-# .env.local
+# .env
 AZURE_TENANT_ID=your-tenant-id
 AZURE_CLIENT_ID=your-client-id
 AZURE_CLIENT_SECRET=your-secret
@@ -212,7 +212,7 @@ RUN npx prisma generate && npm run build
 CMD ["npm", "start"]
 ```
 
-`docker build -t mirrorbuddy . && docker run -p 3000:3000 --env-file .env.local mirrorbuddy`
+`docker build -t mirrorbuddy . && docker run -p 3000:3000 --env-file .env mirrorbuddy`
 
 ---
 

@@ -13,6 +13,7 @@ Accepted
 MirrorBuddy maintains PostgreSQL databases with pgvector for RAG embeddings and semantic search. Local PostgreSQL requires manual setup and resource overhead. Production deployment requires reliable, managed database infrastructure with automatic backups, SSL/TLS, and seamless Vercel integration.
 
 **Key requirements:**
+
 - Managed PostgreSQL with pgvector support
 - Production-grade backups and high availability
 - Connection pooling for serverless functions
@@ -28,7 +29,7 @@ Supabase provides managed PostgreSQL with pgvector pre-installed and connection 
 ### Connection Architecture
 
 ```
-# .env.local
+# .env
 DATABASE_URL=postgresql://user:pass@db.supabase.co:6543/postgres?schema=public&sslmode=require&pgbouncer=true
 DIRECT_URL=postgresql://user:pass@db.supabase.co:5432/postgres?schema=public&sslmode=require
 ```

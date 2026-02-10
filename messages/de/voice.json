@@ -166,7 +166,7 @@
     "domande": "Domande",
     "puntiDiForza": "Punti di forza",
     "daMigliorare": "Da migliorare",
-    "envLocal": ".env.local:",
+    "envLocal": ".env:",
     "avatar": "Avatar"
   }
 }

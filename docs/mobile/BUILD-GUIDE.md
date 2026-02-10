@@ -114,7 +114,7 @@ fastlane release  # Production
 
 **APNs Certificate (iOS)**: Create in Apple Developer Portal, download .p12, upload to Firebase Console (Project Settings > Cloud Messaging > iOS app)
 
-**Environment Variables** (`.env.local`):
+**Environment Variables** (`.env`):
 
 ```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key

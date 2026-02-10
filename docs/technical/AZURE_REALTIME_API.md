@@ -772,7 +772,7 @@ z-[70]: Tool Preview Modal (above everything)
 ## Environment Variables
 
 ```bash
-# .env.local
+# .env
 
 # Azure OpenAI Realtime (for voice)
 AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
