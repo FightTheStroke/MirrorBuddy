@@ -4,9 +4,10 @@
 // Created for F-04: School Admin SSO Integration
 // ============================================================================
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import type { OIDCUserInfo } from "./oidc-provider";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { hashPII } from '@/lib/security';
+import type { OIDCUserInfo } from './oidc-provider';
 
 export interface SSOCallbackResult {
   userId: string;
@@ -15,39 +16,11 @@ export interface SSOCallbackResult {
 }
 
 /**
- * Determine user role from OIDC claims
- * Maps provider-specific claims to MirrorBuddy roles
- */
-function determineRole(
-  userInfo: OIDCUserInfo,
-  provider: "google" | "microsoft",
-): "USER" | "ADMIN" {
-  const email = userInfo.email.toLowerCase();
-
-  // Check for admin indicators in provider-specific claims
-  if (provider === "google") {
-    const isAdmin =
-      userInfo["hd"] !== undefined &&
-      (email.includes("admin") || email.includes("dirigente"));
-    if (isAdmin) return "ADMIN";
-  }
-
-  if (provider === "microsoft") {
-    const roles = userInfo["roles"] as string[] | undefined;
-    if (roles?.some((r) => r.toLowerCase().includes("admin"))) {
-      return "ADMIN";
-    }
-  }
-
-  return "USER";
-}
-
-/**
  * Find school by SSO domain
  */
 async function findSchoolByDomain(
   domain: string,
-  provider: "google" | "microsoft",
+  provider: 'google' | 'microsoft',
 ): Promise<{ schoolId: string } | null> {
   const config = await prisma.schoolSSOConfig.findFirst({
     where: {
@@ -65,32 +38,34 @@ async function findSchoolByDomain(
  */
 export async function handleSSOCallback(
   userInfo: OIDCUserInfo,
-  provider: "google" | "microsoft",
+  provider: 'google' | 'microsoft',
 ): Promise<SSOCallbackResult> {
   const email = userInfo.email.toLowerCase();
-  const domain = email.split("@")[1];
-  const role = determineRole(userInfo, provider);
+  const domain = email.split('@')[1];
 
-  logger.info("[SSO] Processing callback", {
+  logger.info('[SSO] Processing callback', {
     provider,
-    email: email.slice(0, 3) + "***",
+    email: email.slice(0, 3) + '***',
     domain,
   });
 
-  // Check if user exists by email
-  const existingUser = await prisma.user.findUnique({
-    where: { email },
+  // Find user by emailHash (PII-encrypted) or plain email (legacy)
+  const emailHash = await hashPII(email);
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ emailHash }, { email }],
+    },
   });
 
   if (existingUser) {
-    logger.info("[SSO] Linked existing user", {
+    logger.info('[SSO] Linked existing user', {
       userId: existingUser.id,
       provider,
     });
     return {
       userId: existingUser.id,
       isNewUser: false,
-      redirectUrl: "/dashboard",
+      redirectUrl: '/dashboard',
     };
   }
 
@@ -102,28 +77,28 @@ export async function handleSSOCallback(
     data: {
       email,
       username: email,
-      role,
+      role: 'USER',
       profile: {
         create: {
           name:
             userInfo.name ||
-            `${userInfo.given_name || ""} ${userInfo.family_name || ""}`.trim() ||
-            email.split("@")[0],
+            `${userInfo.given_name || ''} ${userInfo.family_name || ''}`.trim() ||
+            email.split('@')[0],
         },
       },
     },
   });
 
-  logger.info("[SSO] Created new user", {
+  logger.info('[SSO] Created new user', {
     userId: newUser.id,
     provider,
     schoolId: school?.schoolId,
-    role,
+    role: 'USER',
   });
 
   return {
     userId: newUser.id,
     isNewUser: true,
-    redirectUrl: "/welcome",
+    redirectUrl: '/welcome',
   };
 }

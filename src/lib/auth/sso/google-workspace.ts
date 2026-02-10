@@ -17,29 +17,19 @@ import {
   CallbackError,
   UserInfoError,
   TokenValidationError,
-} from "./oidc-provider";
-import {
-  generatePKCE,
-  generateState,
-  generateNonce,
-  decodeJWT,
-} from "./oidc-utils";
+} from './oidc-provider';
+import { generatePKCE, generateState, generateNonce, verifyIdToken } from './oidc-utils';
 
-const GOOGLE_DISCOVERY_URL =
-  "https://accounts.google.com/.well-known/openid-configuration";
+const GOOGLE_DISCOVERY_URL = 'https://accounts.google.com/.well-known/openid-configuration';
 
 export const GOOGLE_EDU_SCOPES = {
-  OPENID: "openid",
-  EMAIL: "email",
-  PROFILE: "profile",
-  CLASSROOM_COURSES:
-    "https://www.googleapis.com/auth/classroom.courses.readonly",
-  CLASSROOM_ROSTERS:
-    "https://www.googleapis.com/auth/classroom.rosters.readonly",
-  DIRECTORY_USER:
-    "https://www.googleapis.com/auth/admin.directory.user.readonly",
-  DIRECTORY_GROUP:
-    "https://www.googleapis.com/auth/admin.directory.group.readonly",
+  OPENID: 'openid',
+  EMAIL: 'email',
+  PROFILE: 'profile',
+  CLASSROOM_COURSES: 'https://www.googleapis.com/auth/classroom.courses.readonly',
+  CLASSROOM_ROSTERS: 'https://www.googleapis.com/auth/classroom.rosters.readonly',
+  DIRECTORY_USER: 'https://www.googleapis.com/auth/admin.directory.user.readonly',
+  DIRECTORY_GROUP: 'https://www.googleapis.com/auth/admin.directory.group.readonly',
 } as const;
 
 export interface GoogleUserInfo extends OIDCUserInfo {
@@ -57,19 +47,14 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
     try {
       const response = await fetch(GOOGLE_DISCOVERY_URL);
       if (!response.ok) {
-        throw new Error(
-          `Discovery endpoint returned ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`Discovery endpoint returned ${response.status}: ${response.statusText}`);
       }
 
       const doc: OIDCDiscoveryDocument = await response.json();
       this.discoveryDoc = doc;
       return doc;
     } catch (error) {
-      throw new AuthorizationError(
-        "Failed to fetch Google OIDC discovery document",
-        error,
-      );
+      throw new AuthorizationError('Failed to fetch Google OIDC discovery document', error);
     }
   }
 
@@ -84,14 +69,14 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
       const params = new URLSearchParams({
         client_id: config.clientId,
         redirect_uri: config.redirectUri,
-        response_type: "code",
-        scope: config.scopes.join(" "),
+        response_type: 'code',
+        scope: config.scopes.join(' '),
         state,
         nonce,
         code_challenge: codeChallenge,
-        code_challenge_method: "S256",
-        access_type: "offline",
-        prompt: "consent",
+        code_challenge_method: 'S256',
+        access_type: 'offline',
+        prompt: 'consent',
         ...config.additionalParams,
       });
 
@@ -107,49 +92,47 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
       if (error instanceof AuthorizationError) {
         throw error;
       }
-      throw new AuthorizationError(
-        "Failed to generate authorization URL",
-        error,
-      );
+      throw new AuthorizationError('Failed to generate authorization URL', error);
     }
   }
 
-  async callback(
-    params: CallbackParams,
-    config: OIDCProviderConfig,
-  ): Promise<CallbackResult> {
+  async callback(params: CallbackParams, config: OIDCProviderConfig): Promise<CallbackResult> {
     try {
       const discovery = await this.getDiscoveryDocument();
 
       const tokenResponse = await fetch(discovery.token_endpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
           client_id: config.clientId,
           client_secret: config.clientSecret,
           code: params.code,
           redirect_uri: config.redirectUri,
-          grant_type: "authorization_code",
+          grant_type: 'authorization_code',
           code_verifier: params.codeVerifier,
         }),
       });
 
       if (!tokenResponse.ok) {
         const errorBody = await tokenResponse.text();
-        throw new Error(
-          `Token exchange failed: ${tokenResponse.status} ${errorBody}`,
-        );
+        throw new Error(`Token exchange failed: ${tokenResponse.status} ${errorBody}`);
       }
 
       const tokens = await tokenResponse.json();
 
       if (!tokens.id_token) {
-        throw new TokenValidationError("ID token missing from token response");
+        throw new TokenValidationError('ID token missing from token response');
       }
 
-      const idTokenPayload = this.decodeIdToken(tokens.id_token);
+      const idTokenPayload = await verifyIdToken(
+        tokens.id_token,
+        discovery.jwks_uri,
+        'https://accounts.google.com',
+        config.clientId,
+        params.nonce,
+      );
       const userInfo = await this.getUserInfo(tokens.access_token);
 
       return {
@@ -157,21 +140,15 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
         userInfo: {
           ...userInfo,
           ...idTokenPayload,
-        },
+        } as GoogleUserInfo,
+        verifiedClaims: idTokenPayload,
       };
     } catch (error) {
-      if (
-        error instanceof CallbackError ||
-        error instanceof TokenValidationError
-      ) {
+      if (error instanceof CallbackError || error instanceof TokenValidationError) {
         throw error;
       }
-      throw new CallbackError("Failed to process OAuth callback", error);
+      throw new CallbackError('Failed to process OAuth callback', error);
     }
-  }
-
-  private decodeIdToken(idToken: string): GoogleUserInfo {
-    return decodeJWT(idToken) as GoogleUserInfo;
   }
 
   async getUserInfo(accessToken: string): Promise<GoogleUserInfo> {
@@ -185,9 +162,7 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
       });
 
       if (!response.ok) {
-        throw new Error(
-          `UserInfo endpoint returned ${response.status}: ${response.statusText}`,
-        );
+        throw new Error(`UserInfo endpoint returned ${response.status}: ${response.statusText}`);
       }
 
       return (await response.json()) as GoogleUserInfo;
@@ -195,7 +170,7 @@ export class GoogleWorkspaceProvider implements OIDCProvider {
       if (error instanceof UserInfoError) {
         throw error;
       }
-      throw new UserInfoError("Failed to fetch user info", error);
+      throw new UserInfoError('Failed to fetch user info', error);
     }
   }
 }

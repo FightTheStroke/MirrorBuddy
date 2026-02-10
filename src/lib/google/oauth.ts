@@ -6,25 +6,27 @@
  * Handles authorization URL generation, token exchange, and refresh.
  */
 
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
-import { createHash, createHmac, randomBytes } from "crypto";
-import { encryptToken, decryptToken } from "@/lib/security";
-import { GOOGLE_OAUTH_ENDPOINTS, getGoogleOAuthConfig } from "./config";
-import type {
-  GoogleTokenResponse,
-  GoogleUserProfile,
-  OAuthState,
-} from "./types";
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
+import { createHash, createHmac, randomBytes } from 'crypto';
+import { encryptToken, decryptToken } from '@/lib/security';
+import { GOOGLE_OAUTH_ENDPOINTS, getGoogleOAuthConfig } from './config';
+import type { GoogleTokenResponse, GoogleUserProfile, OAuthState } from './types';
 
 // State expiry: 10 minutes
 const STATE_EXPIRY_MS = 10 * 60 * 1000;
 
-// Secret for signing state (should be in env, fallback for dev)
-const STATE_SECRET =
-  process.env.OAUTH_STATE_SECRET ||
-  process.env.COOKIE_SECRET ||
-  "dev-secret-change-in-production";
+// Secret for signing state — fail-fast in production if missing
+export function getStateSecret(): string {
+  const secret = process.env.OAUTH_STATE_SECRET || process.env.COOKIE_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('OAUTH_STATE_SECRET or COOKIE_SECRET must be set in production');
+  }
+  return 'dev-secret-change-in-production';
+}
+
+const STATE_SECRET = getStateSecret();
 
 /**
  * Generate PKCE code verifier (RFC 7636)
@@ -32,7 +34,7 @@ const STATE_SECRET =
  */
 export function generateCodeVerifier(): string {
   // 32 bytes = 43 characters in base64url (after removing padding)
-  return randomBytes(32).toString("base64url");
+  return randomBytes(32).toString('base64url');
 }
 
 /**
@@ -40,8 +42,8 @@ export function generateCodeVerifier(): string {
  * Uses SHA-256 hash of the verifier, base64url encoded
  */
 export function generateCodeChallenge(verifier: string): string {
-  const hash = createHash("sha256").update(verifier).digest();
-  return hash.toString("base64url");
+  const hash = createHash('sha256').update(verifier).digest();
+  return hash.toString('base64url');
 }
 
 /**
@@ -58,14 +60,14 @@ export function generateAuthUrl(state: OAuthState): string | null {
   const params = new URLSearchParams({
     client_id: config.clientId,
     redirect_uri: config.redirectUri,
-    response_type: "code",
-    scope: config.scopes.join(" "),
-    access_type: "offline", // Request refresh token
-    prompt: "consent", // Always show consent to get refresh token
+    response_type: 'code',
+    scope: config.scopes.join(' '),
+    access_type: 'offline', // Request refresh token
+    prompt: 'consent', // Always show consent to get refresh token
     state: encodeState(state),
     // PKCE parameters
     code_challenge: codeChallenge,
-    code_challenge_method: "S256",
+    code_challenge_method: 'S256',
   });
 
   return `${GOOGLE_OAUTH_ENDPOINTS.authorization}?${params.toString()}`;
@@ -83,15 +85,15 @@ export async function exchangeCodeForTokens(
   if (!config) return null;
 
   const response = await fetch(GOOGLE_OAUTH_ENDPOINTS.token, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({
       client_id: config.clientId,
       client_secret: config.clientSecret,
       code,
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
       redirect_uri: config.redirectUri,
       // PKCE: Include code verifier
       code_verifier: codeVerifier,
@@ -100,7 +102,7 @@ export async function exchangeCodeForTokens(
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error("[Google OAuth] Token exchange failed", { errorText });
+    logger.error('[Google OAuth] Token exchange failed', { errorText });
     return null;
   }
 
@@ -117,21 +119,21 @@ export async function refreshAccessToken(
   if (!config) return null;
 
   const response = await fetch(GOOGLE_OAUTH_ENDPOINTS.token, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({
       client_id: config.clientId,
       client_secret: config.clientSecret,
       refresh_token: refreshToken,
-      grant_type: "refresh_token",
+      grant_type: 'refresh_token',
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error("[Google OAuth] Token refresh failed", { errorText });
+    logger.error('[Google OAuth] Token refresh failed', { errorText });
     return null;
   }
 
@@ -141,9 +143,7 @@ export async function refreshAccessToken(
 /**
  * Get user profile from Google
  */
-export async function getGoogleUserProfile(
-  accessToken: string,
-): Promise<GoogleUserProfile | null> {
+export async function getGoogleUserProfile(accessToken: string): Promise<GoogleUserProfile | null> {
   const response = await fetch(GOOGLE_OAUTH_ENDPOINTS.userinfo, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -151,7 +151,7 @@ export async function getGoogleUserProfile(
   });
 
   if (!response.ok) {
-    logger.error("[Google OAuth] Failed to get user profile");
+    logger.error('[Google OAuth] Failed to get user profile');
     return null;
   }
 
@@ -162,10 +162,9 @@ export async function getGoogleUserProfile(
  * Revoke Google OAuth tokens
  */
 export async function revokeToken(token: string): Promise<boolean> {
-  const response = await fetch(
-    `${GOOGLE_OAUTH_ENDPOINTS.revoke}?token=${token}`,
-    { method: "POST" },
-  );
+  const response = await fetch(`${GOOGLE_OAUTH_ENDPOINTS.revoke}?token=${token}`, {
+    method: 'POST',
+  });
 
   return response.ok;
 }
@@ -175,9 +174,7 @@ export async function revokeToken(token: string): Promise<boolean> {
  * Automatically refreshes if expired
  * Tokens are decrypted from storage before use
  */
-export async function getValidAccessToken(
-  userId: string,
-): Promise<string | null> {
+export async function getValidAccessToken(userId: string): Promise<string | null> {
   const account = await prisma.googleAccount.findUnique({
     where: { userId },
   });
@@ -250,7 +247,7 @@ export async function saveGoogleAccount(
   tokens: GoogleTokenResponse,
   profile: GoogleUserProfile,
 ): Promise<void> {
-  const scopes = tokens.scope.split(" ");
+  const scopes = tokens.scope.split(' ');
   const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
   // Encrypt tokens before storing
@@ -304,9 +301,7 @@ export async function saveGoogleAccount(
 /**
  * Disconnect Google account
  */
-export async function disconnectGoogleAccount(
-  userId: string,
-): Promise<boolean> {
+export async function disconnectGoogleAccount(userId: string): Promise<boolean> {
   const account = await prisma.googleAccount.findUnique({
     where: { userId },
   });
@@ -324,7 +319,7 @@ export async function disconnectGoogleAccount(
     where: { userId },
     data: {
       isConnected: false,
-      accessToken: "",
+      accessToken: '',
       refreshToken: null,
     },
   });
@@ -336,7 +331,7 @@ export async function disconnectGoogleAccount(
  * Sign data with HMAC-SHA256
  */
 function signData(data: string): string {
-  return createHmac("sha256", STATE_SECRET).update(data).digest("base64url");
+  return createHmac('sha256', STATE_SECRET).update(data).digest('base64url');
 }
 
 /**
@@ -344,7 +339,7 @@ function signData(data: string): string {
  * Format: {base64url(state)}.{signature}
  */
 export function encodeState(state: OAuthState): string {
-  const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
+  const payload = Buffer.from(JSON.stringify(state)).toString('base64url');
   const signature = signData(payload);
   return `${payload}.${signature}`;
 }
@@ -355,9 +350,9 @@ export function encodeState(state: OAuthState): string {
  */
 export function decodeState(encoded: string): OAuthState | null {
   try {
-    const parts = encoded.split(".");
+    const parts = encoded.split('.');
     if (parts.length !== 2) {
-      logger.warn("[OAuth] Invalid state format - missing signature");
+      logger.warn('[OAuth] Invalid state format - missing signature');
       return null;
     }
 
@@ -366,17 +361,17 @@ export function decodeState(encoded: string): OAuthState | null {
     // Verify signature
     const expectedSignature = signData(payload);
     if (signature !== expectedSignature) {
-      logger.warn("[OAuth] Invalid state signature - possible tampering");
+      logger.warn('[OAuth] Invalid state signature - possible tampering');
       return null;
     }
 
     // Decode payload
-    const decoded = Buffer.from(payload, "base64url").toString("utf-8");
+    const decoded = Buffer.from(payload, 'base64url').toString('utf-8');
     const state = JSON.parse(decoded) as OAuthState;
 
     // Check expiry
     if (state.createdAt && Date.now() - state.createdAt > STATE_EXPIRY_MS) {
-      logger.warn("[OAuth] State expired", {
+      logger.warn('[OAuth] State expired', {
         createdAt: state.createdAt,
         ageMs: Date.now() - state.createdAt,
       });
@@ -385,7 +380,7 @@ export function decodeState(encoded: string): OAuthState | null {
 
     return state;
   } catch (error) {
-    logger.error("[OAuth] Failed to decode state", { error: String(error) });
+    logger.error('[OAuth] Failed to decode state', { error: String(error) });
     return null;
   }
 }
@@ -396,5 +391,5 @@ export function decodeState(encoded: string): OAuthState | null {
 export function generateNonce(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
-  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('');
 }

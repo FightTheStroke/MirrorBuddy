@@ -61,6 +61,7 @@ export interface CallbackParams {
   code: string;
   state: string;
   codeVerifier: string;
+  nonce?: string;
 }
 
 /**
@@ -69,6 +70,7 @@ export interface CallbackParams {
 export interface CallbackResult {
   tokens: OIDCTokenResponse;
   userInfo: OIDCUserInfo;
+  verifiedClaims?: Record<string, unknown>;
 }
 
 /**
@@ -106,10 +108,7 @@ export interface OIDCProvider {
    * @returns Access token, ID token, and user info
    * @throws Error if state validation fails, token exchange fails, or ID token is invalid
    */
-  callback(
-    params: CallbackParams,
-    config: OIDCProviderConfig,
-  ): Promise<CallbackResult>;
+  callback(params: CallbackParams, config: OIDCProviderConfig): Promise<CallbackResult>;
 
   /**
    * Fetch user information from the provider's UserInfo endpoint
@@ -152,7 +151,7 @@ export class OIDCProviderError extends Error {
     public readonly details?: unknown,
   ) {
     super(message);
-    this.name = "OIDCProviderError";
+    this.name = 'OIDCProviderError';
   }
 }
 
@@ -161,8 +160,8 @@ export class OIDCProviderError extends Error {
  */
 export class AuthorizationError extends OIDCProviderError {
   constructor(message: string, details?: unknown) {
-    super(message, "AUTHORIZATION_ERROR", details);
-    this.name = "AuthorizationError";
+    super(message, 'AUTHORIZATION_ERROR', details);
+    this.name = 'AuthorizationError';
   }
 }
 
@@ -171,8 +170,8 @@ export class AuthorizationError extends OIDCProviderError {
  */
 export class CallbackError extends OIDCProviderError {
   constructor(message: string, details?: unknown) {
-    super(message, "CALLBACK_ERROR", details);
-    this.name = "CallbackError";
+    super(message, 'CALLBACK_ERROR', details);
+    this.name = 'CallbackError';
   }
 }
 
@@ -181,8 +180,8 @@ export class CallbackError extends OIDCProviderError {
  */
 export class TokenValidationError extends OIDCProviderError {
   constructor(message: string, details?: unknown) {
-    super(message, "TOKEN_VALIDATION_ERROR", details);
-    this.name = "TokenValidationError";
+    super(message, 'TOKEN_VALIDATION_ERROR', details);
+    this.name = 'TokenValidationError';
   }
 }
 
@@ -191,7 +190,7 @@ export class TokenValidationError extends OIDCProviderError {
  */
 export class UserInfoError extends OIDCProviderError {
   constructor(message: string, details?: unknown) {
-    super(message, "USERINFO_ERROR", details);
-    this.name = "UserInfoError";
+    super(message, 'USERINFO_ERROR', details);
+    this.name = 'UserInfoError';
   }
 }
