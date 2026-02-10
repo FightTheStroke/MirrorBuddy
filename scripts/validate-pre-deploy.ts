@@ -233,22 +233,22 @@ function validateSentryClientFallback(): void {
 
   const content = fs.readFileSync(clientConfigPath, 'utf8');
 
-  // Verify NODE_ENV is the primary production gate (Plan 141 / ADR 0070)
-  // NEXT_PUBLIC_VERCEL_ENV is unreliable — NODE_ENV is the single gate
-  if (content.includes('NODE_ENV') && content.includes('isProduction')) {
+  // Verify Vercel deployment gate (not NODE_ENV which matches local builds)
+  // NEXT_PUBLIC_VERCEL_ENV is the client-side gate, VERCEL for server/edge
+  if (content.includes('NEXT_PUBLIC_VERCEL_ENV') && content.includes('isVercel')) {
     addResult(
       'Sentry',
-      'NODE_ENV Gate',
+      'Vercel Gate',
       'PASS',
-      'Client config uses NODE_ENV as primary production gate (Plan 141)',
+      'Client config uses Vercel deployment gate (isVercel)',
       false,
     );
   } else {
     addResult(
       'Sentry',
-      'NODE_ENV Gate',
+      'Vercel Gate',
       'FAIL',
-      'Client config missing NODE_ENV production gate (required by Plan 141 / ADR 0070)',
+      'Client config missing Vercel deployment gate (isVercel + NEXT_PUBLIC_VERCEL_ENV)',
       true,
     );
   }
