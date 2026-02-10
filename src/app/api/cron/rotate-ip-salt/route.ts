@@ -8,11 +8,13 @@
  * Schedule: 0 0 1 * * (First day of month at midnight UTC)
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import crypto from "crypto";
-import { Redis } from "@upstash/redis";
-import { Resend } from "resend";
-import { logger } from "@/lib/logger";
+export const dynamic = 'force-dynamic';
+
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import crypto from 'crypto';
+import { Redis } from '@upstash/redis';
+import { Resend } from 'resend';
+import { logger } from '@/lib/logger';
 
 // Lazy initialization to avoid build-time errors
 let redis: ReturnType<typeof Redis.fromEnv> | null = null;
@@ -33,15 +35,15 @@ function getResend() {
 }
 
 export const POST = pipe(
-  withSentry("/api/cron/rotate-ip-salt"),
+  withSentry('/api/cron/rotate-ip-salt'),
   withCron,
 )(async () => {
   // Generate new salt (32 bytes = 256 bits = 64 hex chars)
-  const newSalt = crypto.randomBytes(32).toString("hex");
+  const newSalt = crypto.randomBytes(32).toString('hex');
   const rotationDate = new Date().toISOString();
 
   // Store in Redis as pending (admin must apply to env var)
-  await getRedis().set("mirrorbuddy:ip-salt:pending", {
+  await getRedis().set('mirrorbuddy:ip-salt:pending', {
     salt: newSalt,
     generatedAt: rotationDate,
     appliedToEnv: false,
@@ -52,9 +54,9 @@ export const POST = pipe(
   const resendClient = getResend();
   if (adminEmail && resendClient) {
     await resendClient.emails.send({
-      from: "MirrorBuddy <noreply@mirrorbuddy.it>",
+      from: 'MirrorBuddy <noreply@mirrorbuddy.it>',
       to: adminEmail,
-      subject: "[Action Required] Monthly IP Salt Rotation",
+      subject: '[Action Required] Monthly IP Salt Rotation',
       text: `New IP hash salt generated for monthly rotation.
 
 NEW SALT: ${newSalt}
@@ -70,11 +72,11 @@ This is a security measure to prevent IP hash rainbow table attacks.`,
     });
   }
 
-  logger.info("IP salt rotation completed", { rotationDate });
+  logger.info('IP salt rotation completed', { rotationDate });
 
   return Response.json({
     success: true,
-    message: "Salt rotation completed. Admin notified.",
+    message: 'Salt rotation completed. Admin notified.',
     rotationDate,
   });
 });

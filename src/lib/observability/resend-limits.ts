@@ -16,8 +16,8 @@
  *   console.log(limits.emailsToday.used, limits.emailsToday.limit);
  */
 
-import { logger } from "@/lib/logger";
-import { calculateStatus, AlertStatus } from "./threshold-logic";
+import { logger } from '@/lib/logger';
+import { calculateStatus, AlertStatus } from './threshold-logic';
 
 /**
  * Email usage metrics (used/limit pair) with threshold status (F-25)
@@ -70,14 +70,14 @@ let cache: CacheEntry | null = null;
 export async function getResendLimits(): Promise<ResendLimits> {
   // Check cache first (rate limiting)
   if (cache && cache.expiresAt > Date.now()) {
-    logger.debug("Returning cached Resend limits");
+    logger.debug('Returning cached Resend limits');
     return cache.data;
   }
 
   const apiKey = process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    const error = "RESEND_API_KEY not configured";
+    const error = 'RESEND_API_KEY not configured';
     logger.warn(error);
     return createEmptyLimits(error);
   }
@@ -90,14 +90,8 @@ export async function getResendLimits(): Promise<ResendLimits> {
     const emailsToday = stats.dailyCount ?? 0;
     const emailsMonth = stats.monthlyCount ?? 0;
 
-    const todayPercent = calculatePercent(
-      emailsToday,
-      RESEND_FREE_LIMITS.EMAILS_PER_DAY,
-    );
-    const monthPercent = calculatePercent(
-      emailsMonth,
-      RESEND_FREE_LIMITS.EMAILS_PER_MONTH,
-    );
+    const todayPercent = calculatePercent(emailsToday, RESEND_FREE_LIMITS.EMAILS_PER_DAY);
+    const monthPercent = calculatePercent(emailsMonth, RESEND_FREE_LIMITS.EMAILS_PER_MONTH);
 
     const limits: ResendLimits = {
       emailsToday: {
@@ -121,15 +115,15 @@ export async function getResendLimits(): Promise<ResendLimits> {
       expiresAt: Date.now() + CACHE_TTL_MS,
     };
 
-    logger.info("Resend limits fetched successfully", {
+    logger.info('Resend limits fetched successfully', {
       emailsToday: `${limits.emailsToday.percent.toFixed(1)}%`,
       emailsMonth: `${limits.emailsMonth.percent.toFixed(1)}%`,
     });
 
     return limits;
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Unknown error";
-    logger.error("Failed to fetch Resend limits", undefined, error as Error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Failed to fetch Resend limits', undefined, error as Error);
     return createEmptyLimits(errorMsg);
   }
 }
@@ -153,18 +147,23 @@ async function queryResendEmailStats(
 
   try {
     // Fetch emails from Resend API
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "GET",
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Resend API error: ${response.status} ${response.statusText}`,
-      );
+      // Provide specific error messages for auth issues
+      if (response.status === 401) {
+        throw new Error('API key invalid - check RESEND_API_KEY in environment');
+      }
+      if (response.status === 403) {
+        throw new Error('API key lacks required permissions');
+      }
+      throw new Error(`Resend API error: ${response.status} ${response.statusText}`);
     }
 
     const emailsData = await response.json();
@@ -189,7 +188,7 @@ async function queryResendEmailStats(
       }
     }
 
-    logger.debug("Resend email stats", {
+    logger.debug('Resend email stats', {
       dailyCount,
       monthlyCount,
       totalEmails: emails.length,
@@ -197,8 +196,8 @@ async function queryResendEmailStats(
 
     return { dailyCount, monthlyCount };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    logger.error("Failed to query Resend API", undefined, error as Error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Failed to query Resend API', undefined, error as Error);
     throw new Error(`Resend API query failed: ${message}`);
   }
 }
@@ -220,13 +219,13 @@ function createEmptyLimits(error: string): ResendLimits {
       used: 0,
       limit: RESEND_FREE_LIMITS.EMAILS_PER_DAY,
       percent: 0,
-      status: "ok",
+      status: 'ok',
     },
     emailsMonth: {
       used: 0,
       limit: RESEND_FREE_LIMITS.EMAILS_PER_MONTH,
       percent: 0,
-      status: "ok",
+      status: 'ok',
     },
     timestamp: Date.now(),
     error,
@@ -246,9 +245,7 @@ export function clearResendLimitsCache(): void {
  * @param thresholdPercent - Percentage threshold (default: 80%)
  * @returns Promise<boolean> True if either daily or monthly quota exceeds threshold
  */
-export async function isEmailQuotaStressed(
-  thresholdPercent: number = 80,
-): Promise<boolean> {
+export async function isEmailQuotaStressed(thresholdPercent: number = 80): Promise<boolean> {
   try {
     const limits = await getResendLimits();
     return (
@@ -256,7 +253,7 @@ export async function isEmailQuotaStressed(
       limits.emailsMonth.percent >= thresholdPercent
     );
   } catch (error) {
-    logger.error("Failed to check email quota stress", undefined, error);
+    logger.error('Failed to check email quota stress', undefined, error);
     return false; // Fail open - don't block on monitoring errors
   }
 }
@@ -278,7 +275,7 @@ export async function getEmailQuotaReport(): Promise<string> {
       lines.push(`Warning: ${limits.error}`);
     }
 
-    return lines.join("\n");
+    return lines.join('\n');
   } catch (error) {
     return `Error fetching email quota: ${error}`;
   }

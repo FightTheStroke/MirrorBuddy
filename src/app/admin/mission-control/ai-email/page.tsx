@@ -1,20 +1,21 @@
-"use client";
+'use client';
 
 /**
  * AI/Email Monitoring Page
  * Displays Azure OpenAI, Sentry, and Resend metrics
  */
 
-import { useEffect, useState } from "react";
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import type { AIEmailMetrics } from "@/lib/admin/ai-email-types";
-import { AzureOpenAICard, SentryCard, ResendCard } from "./components";
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Loader2, AlertCircle, RefreshCw, Brain, Bug, Mail } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { AIEmailMetrics } from '@/lib/admin/ai-email-types';
+import { AzureOpenAICard, SentryCard, ResendCard, NotConfiguredCard } from './components';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default function AIEmailMonitoringPage() {
+  const t = useTranslations('admin.aiEmail');
   const [metrics, setMetrics] = useState<AIEmailMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +26,8 @@ export default function AIEmailMonitoringPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/admin/ai-email", {
-        cache: "no-store",
+      const response = await fetch('/api/admin/ai-email', {
+        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -37,7 +38,7 @@ export default function AIEmailMonitoringPage() {
       setMetrics(data.data);
       setLastRefresh(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch metrics");
+      setError(err instanceof Error ? err.message : 'Failed to fetch metrics');
     } finally {
       setLoading(false);
     }
@@ -63,11 +64,11 @@ export default function AIEmailMonitoringPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <AlertCircle className="w-12 h-12 text-destructive" />
-        <p className="text-lg font-semibold">Failed to load metrics</p>
+        <p className="text-lg font-semibold">{t('failedToLoad')}</p>
         <p className="text-sm text-muted-foreground">{error}</p>
         <Button onClick={fetchMetrics} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          {t('retry')}
         </Button>
       </div>
     );
@@ -77,40 +78,48 @@ export default function AIEmailMonitoringPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">AI & Email Monitoring</h1>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Last updated: {lastRefresh.toLocaleTimeString()}
+            {t('lastUpdated')} {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
         <Button onClick={fetchMetrics} variant="outline" disabled={loading}>
-          <RefreshCw
-            className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
-          />
-          Refresh
+          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          {t('refresh')}
         </Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {metrics?.azureOpenAI && (
+        {metrics?.azureOpenAI ? (
           <AzureOpenAICard metrics={metrics.azureOpenAI} />
+        ) : (
+          <NotConfiguredCard
+            icon={<Brain className="w-5 h-5 text-blue-600" />}
+            serviceName="Azure OpenAI"
+            requiredVars={['AZURE_OPENAI_ENDPOINT', 'AZURE_OPENAI_API_KEY']}
+          />
         )}
-        {metrics?.sentry && <SentryCard metrics={metrics.sentry} />}
-        {metrics?.resend && <ResendCard metrics={metrics.resend} />}
-      </div>
 
-      {!metrics?.azureOpenAI && !metrics?.sentry && !metrics?.resend && (
-        <Card>
-          <CardHeader>
-            <CardTitle>No Data Available</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Configure environment variables to enable monitoring:
-              AZURE_OPENAI_API_KEY, SENTRY_DSN, RESEND_API_KEY
-            </p>
-          </CardContent>
-        </Card>
-      )}
+        {metrics?.sentry ? (
+          <SentryCard metrics={metrics.sentry} />
+        ) : (
+          <NotConfiguredCard
+            icon={<Bug className="w-5 h-5 text-purple-600" />}
+            serviceName="Sentry"
+            requiredVars={['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT']}
+          />
+        )}
+
+        {metrics?.resend ? (
+          <ResendCard metrics={metrics.resend} />
+        ) : (
+          <NotConfiguredCard
+            icon={<Mail className="w-5 h-5 text-green-600" />}
+            serviceName="Resend"
+            requiredVars={['RESEND_API_KEY']}
+          />
+        )}
+      </div>
     </div>
   );
 }

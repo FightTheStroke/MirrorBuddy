@@ -100,6 +100,13 @@
         "perMonth": "pro Monat",
         "configuredVia": "Konfiguriert über env var",
         "descriptionText": "Maximales monatliches Budget für Testbenutzer"
+      },
+      "envAudit": {
+        "title": "[TRANSLATE] Environment Configuration",
+        "description": "[TRANSLATE] Stato delle variabili d'ambiente per ciascun servizio",
+        "configured": "[TRANSLATE] Configurato",
+        "incomplete": "[TRANSLATE] Incompleto",
+        "requiredIndicator": "[TRANSLATE] Obbligatorio"
       }
     },
     "systemAlerts": "System Alerts",
@@ -444,7 +451,9 @@
       "search": "Suchen",
       "secondaryLocales": "Secondary Locales",
       "status": "Status",
-      "summary": "Summary"
+      "summary": "Zeigt {count} von {total} Konfigurationen",
+      "title": "[TRANSLATE] Gestione Lingue e Paesi",
+      "newConfig": "[TRANSLATE] Nuova Configurazione"
     },
     "protectedUsers": {
       "noUsers": "No Users",
@@ -818,6 +827,73 @@
       "menu": "[TRANSLATE] Menu",
       "closeMenu": "[TRANSLATE] Chiudi menu",
       "returnToApp": "[TRANSLATE] Torna all'app"
+    },
+    "revenue": {
+      "mrr": "MRR",
+      "arr": "ARR",
+      "activeSubs": "Active Subscriptions",
+      "proBase": "{pro} Pro / {base} Base",
+      "trialUsers": "Trial Users",
+      "churnRate": "Churn Rate",
+      "last30Days": "Last 30 days",
+      "avgLtv": "Avg LTV",
+      "mrrTrend6Months": "MRR Trend (6 months)",
+      "subs": "subs",
+      "revenueByCountry": "Revenue by Country",
+      "recentActivity": "Recent Activity",
+      "userPrefix": "User",
+      "noRecentActivity": "No recent activity"
+    },
+    "tax": {
+      "pageDescription": "Configure VAT rates per country for EU tax compliance",
+      "country": "Country",
+      "vatRate": "VAT Rate (%)",
+      "reverseCharge": "Reverse Charge",
+      "status": "Status",
+      "stripe": "Stripe",
+      "actions": "Actions",
+      "percentSymbol": "%",
+      "save": "Save",
+      "b2b": "B2B",
+      "active": "Active",
+      "inactive": "Inactive",
+      "synced": "✓ Synced",
+      "notSynced": "Not synced",
+      "syncToStripe": "Sync to Stripe",
+      "migrationRequired": "Database Migration Required",
+      "migrationInstructions": "Run npx prisma migrate dev to enable persistence.",
+      "euVatCompliance": "EU VAT Compliance",
+      "reverseChargeInfo": "Reverse Charge applies to B2B transactions with valid VAT ID",
+      "standardRatesInfo": "Standard rates apply to B2C and B2B without valid VAT ID",
+      "ukRatesInfo": "UK rates shown for reference (post-Brexit separate rules apply)"
+    },
+    "aiEmail": {
+      "title": "AI & Email Monitoring",
+      "lastUpdated": "Last updated:",
+      "refresh": "Refresh",
+      "failedToLoad": "Failed to load metrics",
+      "retry": "Retry",
+      "statusHealthy": "Healthy",
+      "statusDegraded": "Degraded",
+      "statusDown": "Down",
+      "tokenUsage": "Token Usage",
+      "requestsPerMin": "Requests/Min",
+      "estimatedCost": "Est. Cost",
+      "model": "Model",
+      "unresolvedIssues": "Unresolved Issues",
+      "eventsToday": "Events Today",
+      "status": "Status",
+      "allClear": "All clear",
+      "issuesNeedAttention": "{count} issue(s) need attention",
+      "emailsSentToday": "Emails Sent Today",
+      "bounceRate": "Bounce Rate",
+      "lastSent": "Last Sent",
+      "never": "Never",
+      "emailDeliveryHealthy": "Email delivery healthy",
+      "highBounceRate": "High bounce rate detected",
+      "serviceNotConfigured": "Service Not Configured",
+      "configureEnvVars": "Configure the following environment variables to enable monitoring:",
+      "requiredVariables": "Required Variables:"
     }
   }
 }

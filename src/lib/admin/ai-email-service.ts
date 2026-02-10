@@ -21,29 +21,14 @@ async function fetchAzureOpenAIMetrics(): Promise<AzureOpenAIMetrics | null> {
 
   if (!apiKey) {
     logger.warn('AZURE_OPENAI_API_KEY not configured');
-    return {
-      status: 'healthy',
-      tokensUsed: 125000,
-      tokensLimit: 1000000,
-      requestsPerMinute: 45,
-      rpmLimit: 60,
-      estimatedCostUsd: 2.5,
-      model: process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini',
-    };
+    return null;
   }
 
   try {
-    // In production, this would call Azure OpenAI Management API
-    // For now, return mock data based on env var presence
-    return {
-      status: 'healthy',
-      tokensUsed: 125000,
-      tokensLimit: 1000000,
-      requestsPerMinute: 45,
-      rpmLimit: 60,
-      estimatedCostUsd: 2.5,
-      model: process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini',
-    };
+    // TODO: Call Azure OpenAI Management API
+    // This should fetch real metrics from Azure OpenAI service
+    // For now, return null until real integration is implemented
+    return null;
   } catch (error) {
     logger.error('Failed to fetch Azure OpenAI metrics', undefined, error);
     return null;
@@ -55,23 +40,14 @@ async function fetchSentryMetrics(): Promise<SentryMetrics | null> {
 
   if (!dsn) {
     logger.warn('SENTRY_DSN not configured');
-    return {
-      status: 'healthy',
-      unresolvedIssues: 3,
-      eventsToday: 42,
-      eventsLimit: 5000,
-    };
+    return null;
   }
 
   try {
-    // In production, this would call Sentry API
-    // For now, return mock data based on env var presence
-    return {
-      status: 'healthy',
-      unresolvedIssues: 3,
-      eventsToday: 42,
-      eventsLimit: 5000,
-    };
+    // TODO: Call Sentry API
+    // This should fetch real metrics from Sentry service
+    // For now, return null until real integration is implemented
+    return null;
   } catch (error) {
     logger.error('Failed to fetch Sentry metrics', undefined, error);
     return null;
@@ -83,25 +59,14 @@ async function fetchResendMetrics(): Promise<ResendMetrics | null> {
 
   if (!apiKey) {
     logger.warn('RESEND_API_KEY not configured');
-    return {
-      status: 'healthy',
-      emailsSentToday: 8,
-      emailsLimit: 100,
-      bounceRate: 0.02,
-      lastSentAt: new Date(Date.now() - 3600000).toISOString(),
-    };
+    return null;
   }
 
   try {
-    // In production, this would call Resend API
-    // For now, return mock data based on env var presence
-    return {
-      status: 'healthy',
-      emailsSentToday: 8,
-      emailsLimit: 100,
-      bounceRate: 0.02,
-      lastSentAt: new Date(Date.now() - 3600000).toISOString(),
-    };
+    // TODO: Call Resend API
+    // This should fetch real metrics from Resend service
+    // For now, return null until real integration is implemented
+    return null;
   } catch (error) {
     logger.error('Failed to fetch Resend metrics', undefined, error);
     return null;

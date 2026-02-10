@@ -11,11 +11,11 @@
  * Plan 105 - W5-Alerting [T5-01]
  */
 
-import { sendEmail } from "@/lib/email";
-import { logger } from "@/lib/logger";
-import type { CostAlert } from "./cost-tracker";
+import { sendEmail } from '@/lib/email';
+import { logger } from '@/lib/logger';
+import type { CostAlert } from './cost-tracker';
 
-const log = logger.child({ module: "ops-alert" });
+const log = logger.child({ module: 'ops-alert' });
 
 /** Deduplication: track last send time per alert key */
 const lastSent = new Map<string, number>();
@@ -28,7 +28,7 @@ const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour between duplicate alerts
 export async function sendAlertEmails(alerts: CostAlert[]): Promise<number> {
   const to = process.env.ADMIN_EMAIL;
   if (!to) {
-    log.warn("ADMIN_EMAIL not set, skipping ops alerts");
+    log.warn('ADMIN_EMAIL not set, skipping ops alerts');
     return 0;
   }
 
@@ -55,13 +55,13 @@ export async function sendAlertEmails(alerts: CostAlert[]): Promise<number> {
     if (result.success) {
       lastSent.set(key, now);
       sent++;
-      log.info("Ops alert email sent", {
+      log.info('Ops alert email sent', {
         service: alert.service,
         severity: alert.severity,
         messageId: result.messageId,
       });
     } else {
-      log.error("Ops alert email failed", {
+      log.error('Ops alert email failed', {
         service: alert.service,
         error: result.error,
       });
@@ -72,8 +72,8 @@ export async function sendAlertEmails(alerts: CostAlert[]): Promise<number> {
 }
 
 function buildAlertHtml(alert: CostAlert): string {
-  const color = alert.severity === "critical" ? "#d32f2f" : "#f59e0b";
-  const label = alert.severity === "critical" ? "CRITICAL" : "WARNING";
+  const color = alert.severity === 'critical' ? '#d32f2f' : '#f59e0b';
+  const label = alert.severity === 'critical' ? 'CRITICAL' : 'WARNING';
 
   return `
 <!DOCTYPE html>
@@ -88,7 +88,7 @@ function buildAlertHtml(alert: CostAlert): string {
       <p>${alert.message}</p>
       <p style="color: #666; font-size: 0.9em;">
         Time: ${new Date().toISOString()}<br/>
-        Dashboard: <a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/admin/mission-control/ops-dashboard">View Ops Dashboard</a>
+        Dashboard: <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/admin">View Admin Dashboard</a>
       </p>
     </div>
     <p style="font-size: 0.8em; color: #999;">
@@ -105,7 +105,7 @@ function buildAlertText(alert: CostAlert): string {
 ${alert.message}
 
 Time: ${new Date().toISOString()}
-Dashboard: /admin/mission-control/ops-dashboard
+Dashboard: /admin
 
 ---
 Automated alert from MirrorBuddy Ops (max 1/hour per alert type)`;

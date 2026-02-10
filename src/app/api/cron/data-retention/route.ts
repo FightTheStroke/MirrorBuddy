@@ -10,24 +10,26 @@
  * 2. Execute scheduled deletions (after grace period)
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+export const dynamic = 'force-dynamic';
+
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import {
   markExpiredDataForDeletion,
   executeScheduledDeletions,
   applyDefaultRetentionSystemWide,
-} from "@/lib/privacy/server";
-import { purgeExpiredUserBackups } from "@/lib/admin/user-trash-service";
+} from '@/lib/privacy/server';
+import { purgeExpiredUserBackups } from '@/lib/admin/user-trash-service';
 import {
   cleanupExpiredTrialSessions,
   cleanupNurturingTrialSessions,
-} from "@/lib/trial/trial-cleanup";
+} from '@/lib/trial/trial-cleanup';
 
-const log = logger.child({ module: "cron-data-retention" });
+const log = logger.child({ module: 'cron-data-retention' });
 
 interface CronResponse {
-  status: "success" | "error";
+  status: 'success' | 'error';
   timestamp: string;
   duration_ms: number;
   summary: {
@@ -53,12 +55,12 @@ interface CronResponse {
 }
 
 export const POST = pipe(
-  withSentry("/api/cron/data-retention"),
+  withSentry('/api/cron/data-retention'),
   withCron,
 )(async () => {
   const startTime = Date.now();
   const response: CronResponse = {
-    status: "success",
+    status: 'success',
     timestamp: new Date().toISOString(),
     duration_ms: 0,
     summary: {
@@ -72,38 +74,35 @@ export const POST = pipe(
   };
 
   // Skip cron in non-production environments (staging/preview)
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-    log.info(
-      `[CRON] Skipping data-retention - not production (env: ${process.env.VERCEL_ENV})`,
-    );
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
+    log.info(`[CRON] Skipping data-retention - not production (env: ${process.env.VERCEL_ENV})`);
     return Response.json(
       {
         skipped: true,
-        reason: "Not production environment",
+        reason: 'Not production environment',
         environment: process.env.VERCEL_ENV,
       },
       { status: 200 },
     );
   }
 
-  log.info("Data retention cron job started");
+  log.info('Data retention cron job started');
 
   // Phase 0: Apply default retention to ALL users (GDPR Art. 5)
   // This ensures conversations older than default TTL are marked for deletion
   // regardless of whether users have custom policies
   try {
     const defaultResult = await applyDefaultRetentionSystemWide();
-    response.summary.default_retention.conversations_marked =
-      defaultResult.conversationsMarked;
+    response.summary.default_retention.conversations_marked = defaultResult.conversationsMarked;
 
     if (defaultResult.conversationsMarked > 0) {
-      log.info("Default retention applied system-wide", {
+      log.info('Default retention applied system-wide', {
         conversationsMarked: defaultResult.conversationsMarked,
       });
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    log.error("Failed to apply default retention", { error: errorMsg });
+    log.error('Failed to apply default retention', { error: errorMsg });
     response.summary.errors.push(`Default retention: ${errorMsg}`);
   }
 
@@ -116,7 +115,7 @@ export const POST = pipe(
     select: { userId: true },
   });
 
-  log.info("Processing users with retention policies", {
+  log.info('Processing users with retention policies', {
     count: usersWithPolicies.length,
   });
 
@@ -124,19 +123,16 @@ export const POST = pipe(
   for (const user of usersWithPolicies) {
     try {
       const marked = await markExpiredDataForDeletion(user.userId);
-      response.summary.marked_for_deletion.conversations +=
-        marked.conversations;
+      response.summary.marked_for_deletion.conversations += marked.conversations;
       response.summary.marked_for_deletion.embeddings += marked.embeddings;
       response.summary.users_processed += 1;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      log.error("Failed to mark data for user", {
+      log.error('Failed to mark data for user', {
         userId: user.userId.slice(0, 8),
         error: errorMsg,
       });
-      response.summary.errors.push(
-        `User ${user.userId.slice(0, 8)}: ${errorMsg}`,
-      );
+      response.summary.errors.push(`User ${user.userId.slice(0, 8)}: ${errorMsg}`);
     }
   }
 
@@ -144,20 +140,17 @@ export const POST = pipe(
   // This happens for all users (not just those with custom policies)
   try {
     const deletionResult = await executeScheduledDeletions();
-    response.summary.executed_deletions.conversations =
-      deletionResult.deletedConversations;
-    response.summary.executed_deletions.messages =
-      deletionResult.deletedMessages;
-    response.summary.executed_deletions.embeddings =
-      deletionResult.deletedEmbeddings;
+    response.summary.executed_deletions.conversations = deletionResult.deletedConversations;
+    response.summary.executed_deletions.messages = deletionResult.deletedMessages;
+    response.summary.executed_deletions.embeddings = deletionResult.deletedEmbeddings;
 
-    log.info("Scheduled deletions executed", {
+    log.info('Scheduled deletions executed', {
       conversations: deletionResult.deletedConversations,
       messages: deletionResult.deletedMessages,
     });
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    log.error("Failed to execute scheduled deletions", { error: errorMsg });
+    log.error('Failed to execute scheduled deletions', { error: errorMsg });
     response.summary.errors.push(`Deletion execution: ${errorMsg}`);
   }
 
@@ -165,11 +158,11 @@ export const POST = pipe(
   try {
     const purged = await purgeExpiredUserBackups();
     if (purged > 0) {
-      log.info("User backups purged", { purged });
+      log.info('User backups purged', { purged });
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    log.error("Failed to purge user backups", { error: errorMsg });
+    log.error('Failed to purge user backups', { error: errorMsg });
     response.summary.errors.push(`Backup purge: ${errorMsg}`);
   }
 
@@ -180,13 +173,13 @@ export const POST = pipe(
     response.summary.trial_sessions.deleted = deletionResult.deletedCount;
 
     if (deletionResult.deletedCount > 0) {
-      log.info("Trial sessions deleted (30-day)", {
+      log.info('Trial sessions deleted (30-day)', {
         deleted: deletionResult.deletedCount,
       });
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    log.error("Failed to cleanup trial sessions", { error: errorMsg });
+    log.error('Failed to cleanup trial sessions', { error: errorMsg });
     response.summary.errors.push(`Trial cleanup: ${errorMsg}`);
   }
 
@@ -194,17 +187,16 @@ export const POST = pipe(
   try {
     const anonymizeResult = await cleanupNurturingTrialSessions();
     // skippedWithEmail in this context = sessions that were anonymized
-    response.summary.trial_sessions.anonymized =
-      anonymizeResult.skippedWithEmail;
+    response.summary.trial_sessions.anonymized = anonymizeResult.skippedWithEmail;
 
     if (anonymizeResult.skippedWithEmail > 0) {
-      log.info("Trial sessions anonymized (90-day nurturing)", {
+      log.info('Trial sessions anonymized (90-day nurturing)', {
         anonymized: anonymizeResult.skippedWithEmail,
       });
     }
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    log.error("Failed to anonymize nurturing sessions", { error: errorMsg });
+    log.error('Failed to anonymize nurturing sessions', { error: errorMsg });
     response.summary.errors.push(`Nurturing anonymize: ${errorMsg}`);
   }
 
@@ -213,15 +205,15 @@ export const POST = pipe(
 
   // Determine overall status
   if (response.summary.errors.length > 0) {
-    response.status = "error";
-    log.warn("Data retention cron completed with errors", {
+    response.status = 'error';
+    log.warn('Data retention cron completed with errors', {
       errors: response.summary.errors.length,
       duration_ms: response.duration_ms,
     });
     return Response.json(response, { status: 207 }); // Multi-Status
   }
 
-  log.info("Data retention cron completed successfully", {
+  log.info('Data retention cron completed successfully', {
     duration_ms: response.duration_ms,
     default_marked: response.summary.default_retention.conversations_marked,
     users_processed: response.summary.users_processed,

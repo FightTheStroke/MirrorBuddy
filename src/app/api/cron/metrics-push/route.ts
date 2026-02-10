@@ -12,23 +12,24 @@
  *   - GRAFANA_CLOUD_PROMETHEUS_USER
  *   - GRAFANA_CLOUD_API_KEY
  *   - CRON_SECRET (for authentication)
- *
  * F-05b: All operational metrics collected every 5 minutes
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
-import { metricsStore } from "@/lib/observability/metrics-store";
-import { generateSLIMetrics } from "@/app/api/metrics/sli-metrics";
-import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
+export const dynamic = 'force-dynamic';
+
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
+import { metricsStore } from '@/lib/observability/metrics-store';
+import { generateSLIMetrics } from '@/app/api/metrics/sli-metrics';
+import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
 
 const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
-const log = logger.child({ module: "cron-metrics-push" });
+const log = logger.child({ module: 'cron-metrics-push' });
 
 interface PushResponse {
-  status: "success" | "skipped" | "error";
+  status: 'success' | 'skipped' | 'error';
   timestamp: string;
   duration_ms: number;
   metrics_pushed?: number;
@@ -49,9 +50,8 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
   const samples: MetricSample[] = [];
   const now = Date.now();
 
-  const env =
-    process.env.NODE_ENV === "production" ? "production" : "development";
-  const instanceLabels = { instance: "mirrorbuddy", env };
+  const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+  const instanceLabels = { instance: 'mirrorbuddy', env };
 
   // 1. HTTP/SLI metrics from metrics store
   const summary = metricsStore.getMetricsSummary();
@@ -71,19 +71,19 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     const routeLabels = { ...instanceLabels, route };
     samples.push(
       {
-        name: "http_requests_total",
+        name: 'http_requests_total',
         labels: routeLabels,
         value: metrics.count,
         timestamp: now,
       },
       {
-        name: "http_request_duration_seconds",
-        labels: { ...routeLabels, quantile: "0.95" },
+        name: 'http_request_duration_seconds',
+        labels: { ...routeLabels, quantile: '0.95' },
         value: metrics.p95LatencyMs / 1000,
         timestamp: now,
       },
       {
-        name: "http_request_error_rate",
+        name: 'http_request_error_rate',
         labels: routeLabels,
         value: metrics.errorRate,
         timestamp: now,
@@ -96,9 +96,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
 
     // Get unique user count per type (F-06: exclude test data via isTestData flag)
-    const uniqueByType = await prisma.$queryRaw<
-      Array<{ userType: string; count: bigint }>
-    >`
+    const uniqueByType = await prisma.$queryRaw<Array<{ userType: string; count: bigint }>>`
       SELECT "userType", COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
@@ -121,26 +119,26 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     // Total active users by type
     samples.push(
       {
-        name: "mirrorbuddy_realtime_active_users",
-        labels: { ...instanceLabels, user_type: "total" },
+        name: 'mirrorbuddy_realtime_active_users',
+        labels: { ...instanceLabels, user_type: 'total' },
         value: total,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_realtime_active_users",
-        labels: { ...instanceLabels, user_type: "logged" },
+        name: 'mirrorbuddy_realtime_active_users',
+        labels: { ...instanceLabels, user_type: 'logged' },
         value: counts.logged,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_realtime_active_users",
-        labels: { ...instanceLabels, user_type: "trial" },
+        name: 'mirrorbuddy_realtime_active_users',
+        labels: { ...instanceLabels, user_type: 'trial' },
         value: counts.trial,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_realtime_active_users",
-        labels: { ...instanceLabels, user_type: "anonymous" },
+        name: 'mirrorbuddy_realtime_active_users',
+        labels: { ...instanceLabels, user_type: 'anonymous' },
         value: counts.anonymous,
         timestamp: now,
       },
@@ -149,13 +147,13 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     // F-06: Dedicated trial session metrics
     samples.push(
       {
-        name: "mirrorbuddy_trial_sessions_active",
+        name: 'mirrorbuddy_trial_sessions_active',
         labels: instanceLabels,
         value: counts.trial,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_trial_to_total_ratio",
+        name: 'mirrorbuddy_trial_to_total_ratio',
         labels: instanceLabels,
         value: total > 0 ? counts.trial / total : 0,
         timestamp: now,
@@ -163,9 +161,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     );
 
     // Active users by route (top 10, F-06: exclude test data via isTestData flag)
-    const routeCounts = await prisma.$queryRaw<
-      Array<{ route: string; count: bigint }>
-    >`
+    const routeCounts = await prisma.$queryRaw<Array<{ route: string; count: bigint }>>`
       SELECT route, COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
@@ -177,14 +173,14 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     for (const row of routeCounts) {
       samples.push({
-        name: "mirrorbuddy_realtime_active_users_by_route",
+        name: 'mirrorbuddy_realtime_active_users_by_route',
         labels: { ...instanceLabels, route: row.route },
         value: Number(row.count),
         timestamp: now,
       });
     }
 
-    log.debug("Collected realtime active users from database", {
+    log.debug('Collected realtime active users from database', {
       total,
       logged: counts.logged,
       trial: counts.trial,
@@ -196,7 +192,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       where: { timestamp: { lt: cleanupCutoff } },
     });
   } catch (err) {
-    log.warn("Failed to collect realtime active users", {
+    log.warn('Failed to collect realtime active users', {
       error: String(err),
     });
   }
@@ -207,7 +203,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     // Get counts per stage
     const stageCounts = await prisma.funnelEvent.groupBy({
-      by: ["stage"],
+      by: ['stage'],
       where: {
         createdAt: { gte: thirtyDaysAgo },
         isTestData: false,
@@ -217,7 +213,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     for (const sc of stageCounts) {
       samples.push({
-        name: "mirrorbuddy_funnel_stage_count",
+        name: 'mirrorbuddy_funnel_stage_count',
         labels: { ...instanceLabels, stage: sc.stage },
         value: sc._count._all,
         timestamp: now,
@@ -226,14 +222,14 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     // Calculate conversion rates between stages
     const stageOrder = [
-      "VISITOR",
-      "TRIAL_START",
-      "TRIAL_ENGAGED",
-      "LIMIT_HIT",
-      "BETA_REQUEST",
-      "APPROVED",
-      "FIRST_LOGIN",
-      "ACTIVE",
+      'VISITOR',
+      'TRIAL_START',
+      'TRIAL_ENGAGED',
+      'LIMIT_HIT',
+      'BETA_REQUEST',
+      'APPROVED',
+      'FIRST_LOGIN',
+      'ACTIVE',
     ];
     const countMap = new Map(stageCounts.map((s) => [s.stage, s._count._all]));
 
@@ -243,7 +239,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       const rate = prevCount > 0 ? currCount / prevCount : 0;
 
       samples.push({
-        name: "mirrorbuddy_funnel_conversion_rate",
+        name: 'mirrorbuddy_funnel_conversion_rate',
         labels: {
           ...instanceLabels,
           from_stage: stageOrder[i - 1],
@@ -255,18 +251,18 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     }
 
     // Overall funnel conversion (VISITOR → ACTIVE)
-    const visitorCount = countMap.get("VISITOR") ?? 0;
-    const activeCount = countMap.get("ACTIVE") ?? 0;
+    const visitorCount = countMap.get('VISITOR') ?? 0;
+    const activeCount = countMap.get('ACTIVE') ?? 0;
     samples.push({
-      name: "mirrorbuddy_funnel_overall_conversion",
+      name: 'mirrorbuddy_funnel_overall_conversion',
       labels: instanceLabels,
       value: visitorCount > 0 ? activeCount / visitorCount : 0,
       timestamp: now,
     });
 
-    log.debug("Collected funnel metrics", { stages: stageCounts.length });
+    log.debug('Collected funnel metrics', { stages: stageCounts.length });
   } catch (err) {
-    log.warn("Failed to collect funnel metrics", { error: String(err) });
+    log.warn('Failed to collect funnel metrics', { error: String(err) });
   }
 
   // 4. Churn metrics (Plan 069)
@@ -304,19 +300,19 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     samples.push(
       {
-        name: "mirrorbuddy_funnel_total_users",
+        name: 'mirrorbuddy_funnel_total_users',
         labels: instanceLabels,
         value: totalUsers,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_funnel_churned_users",
+        name: 'mirrorbuddy_funnel_churned_users',
         labels: instanceLabels,
         value: churnedUsers,
         timestamp: now,
       },
       {
-        name: "mirrorbuddy_funnel_churn_rate",
+        name: 'mirrorbuddy_funnel_churn_rate',
         labels: instanceLabels,
         value: churnRate,
         timestamp: now,
@@ -336,16 +332,16 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     for (const [stage, data] of churnByStage) {
       samples.push({
-        name: "mirrorbuddy_funnel_stage_churn_rate",
+        name: 'mirrorbuddy_funnel_stage_churn_rate',
         labels: { ...instanceLabels, stage },
         value: data.total > 0 ? data.churned / data.total : 0,
         timestamp: now,
       });
     }
 
-    log.debug("Collected churn metrics", { totalUsers, churnedUsers });
+    log.debug('Collected churn metrics', { totalUsers, churnedUsers });
   } catch (err) {
-    log.warn("Failed to collect churn metrics", { error: String(err) });
+    log.warn('Failed to collect churn metrics', { error: String(err) });
   }
 
   // 5. Session health metrics (behavioral) - for Grafana alerts
@@ -359,11 +355,11 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
         timestamp: now,
       });
     }
-    log.debug("Collected behavioral metrics", {
+    log.debug('Collected behavioral metrics', {
       count: behavioralMetrics.length,
     });
   } catch (err) {
-    log.warn("Failed to collect behavioral metrics", { error: String(err) });
+    log.warn('Failed to collect behavioral metrics', { error: String(err) });
   }
 
   return samples;
@@ -376,11 +372,11 @@ function formatInfluxLineProtocol(samples: MetricSample[]): string {
   return samples
     .map((s) => {
       const tags = Object.entries(s.labels)
-        .map(([k, v]) => `${k}=${v.replace(/[\\,= ]/g, "\\$&")}`)
-        .join(",");
+        .map(([k, v]) => `${k}=${v.replace(/[\\,= ]/g, '\\$&')}`)
+        .join(',');
       return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -392,18 +388,16 @@ async function pushToGrafana(samples: MetricSample[]): Promise<void> {
   const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
 
   if (!url || !user || !apiKey) {
-    throw new Error(
-      "Grafana Cloud config incomplete (missing URL, USER, or API_KEY)",
-    );
+    throw new Error('Grafana Cloud config incomplete (missing URL, USER, or API_KEY)');
   }
 
   const body = formatInfluxLineProtocol(samples);
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "text/plain",
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString("base64")}`,
+      'Content-Type': 'text/plain',
+      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
     },
     body,
   });
@@ -415,25 +409,23 @@ async function pushToGrafana(samples: MetricSample[]): Promise<void> {
 }
 
 export const POST = pipe(
-  withSentry("/api/cron/metrics-push"),
+  withSentry('/api/cron/metrics-push'),
   withCron,
 )(async () => {
   const startTime = Date.now();
   const response: PushResponse = {
-    status: "success",
+    status: 'success',
     timestamp: new Date().toISOString(),
     duration_ms: 0,
   };
 
   // Skip cron in non-production environments (staging/preview)
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-    log.info(
-      `[CRON] Skipping metrics-push - not production (env: ${process.env.VERCEL_ENV})`,
-    );
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
+    log.info(`[CRON] Skipping metrics-push - not production (env: ${process.env.VERCEL_ENV})`);
     return Response.json(
       {
         skipped: true,
-        reason: "Not production environment",
+        reason: 'Not production environment',
         environment: process.env.VERCEL_ENV,
       },
       { status: 200 },
@@ -442,9 +434,9 @@ export const POST = pipe(
 
   // Check if Grafana Cloud is configured
   if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
-    response.status = "skipped";
+    response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
-    log.info("Metrics push skipped (Grafana Cloud not configured)");
+    log.info('Metrics push skipped (Grafana Cloud not configured)');
     return Response.json(response, { status: 200 });
   }
 
@@ -452,9 +444,9 @@ export const POST = pipe(
   const samples = await collectLightMetrics();
 
   if (samples.length === 0) {
-    response.status = "skipped";
+    response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
-    log.info("No metrics to push");
+    log.info('No metrics to push');
     return Response.json(response, { status: 200 });
   }
 
@@ -463,7 +455,7 @@ export const POST = pipe(
   response.metrics_pushed = samples.length;
   response.duration_ms = Date.now() - startTime;
 
-  log.info("Metrics pushed to Grafana Cloud", {
+  log.info('Metrics pushed to Grafana Cloud', {
     metrics_count: samples.length,
     duration_ms: response.duration_ms,
   });

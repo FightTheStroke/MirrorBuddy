@@ -17,6 +17,65 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unit tests for Sentry config enable logic: 19 tests covering client/server/edge enabled flag, beforeSend enrichment, hydration/digest tagging, FORCE_ENABLE escape hatch
 
+## Admin Dashboard Overhaul v3 (Plan 140)
+
+### W1: Security
+
+#### Fixed
+
+- Missing `validateAdminAuth()` on [locale]/admin pages (revenue, tax, tiers/pricing, tiers/new)
+- Missing CSRF protection on Server Action forms in admin financial pages
+- Hardcoded `adminId: "system"` replaced with actual admin userId in audit logs
+- Added `auditService.log()` to all financial mutations (pricing, tax, tier creation)
+
+#### Changed
+
+- Migrated revenue and tax pages from [locale]/admin/ to /admin/ with proper auth pattern
+- Deleted legacy [locale]/admin/ duplicate pages (tiers, revenue, tax)
+
+### W2: Data Integrity
+
+#### Fixed
+
+- Removed all hardcoded mock data from AI email metrics service (ADR 0121)
+- Health aggregator no longer counts unconfigured services as "down"
+- Key Vault returns specific error types (encryption_not_configured, database_error, decryption_failed)
+- Resend API shows "API key invalid" instead of raw 401 error
+
+#### Added
+
+- Environment configuration audit in admin settings (shows set/missing env vars per service)
+- AI Email page shows "Not Configured" cards with required env var names when services unavailable
+
+### W3: Navigation
+
+#### Changed
+
+- Sidebar restructured from 6 groups to 4: Overview, Management, Communications, Operations
+- Command palette updated to match new navigation structure
+- Consolidated business-kpi into analytics page
+- Consolidated ops-dashboard into main dashboard
+- Cleaned up mission-control directory (kept health, key-vault, infra, ai-email)
+
+#### Fixed
+
+- Locales page now displays actual locale data instead of "Not Found"
+- Removed hardcoded Italian text from locales page
+
+#### Added
+
+- Revenue and Tax pages accessible from Operations sidebar group
+
+### W4: Polish
+
+#### Fixed
+
+- All new admin pages internationalized with i18n keys
+- csrfFetch misuse on GET requests in school page
+- CI verification: lint (0 errors), typecheck (0 errors), build (pass)
+
+---
+
 ## [Unreleased] — Compliance Audit Remediation (Plan 138)
 
 ### Added
