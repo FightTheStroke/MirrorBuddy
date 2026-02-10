@@ -8,6 +8,7 @@ import { CalculatorSimple } from './calculator-simple';
 import { CalculatorScientific } from './calculator-scientific';
 import { CalculatorGraph } from './calculator-graph';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 const MODE_CONFIG: Record<CalculatorMode, { label: string; icon: React.ReactNode }> = {
   simple: { label: 'Semplice', icon: <Calculator className="w-4 h-4" /> },
@@ -16,6 +17,7 @@ const MODE_CONFIG: Record<CalculatorMode, { label: string; icon: React.ReactNode
 };
 
 export function CalculatorHeaderWidget() {
+  const t = useTranslations("common");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { mode, setMode, isOpen, setIsOpen, clear } = useCalculatorStore();
 
@@ -51,7 +53,7 @@ export function CalculatorHeaderWidget() {
             ? 'text-blue-500 bg-blue-500/10 hover:bg-blue-500/20'
             : 'text-slate-500 hover:text-blue-500 hover:bg-blue-500/10'
         )}
-        title="Calcolatrice"
+        title={t("calcolatrice")}
       >
         <Calculator className="w-4 h-4" />
         <ChevronDown className={cn('w-3 h-3 transition-transform', isOpen && 'rotate-180')} />

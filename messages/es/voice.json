@@ -106,6 +106,67 @@
       "howToRecord": "Cómo grabar: Presione el botón de micrófono y hable claramente.",
       "tips": "Consejos: Hable en un ambiente tranquilo para mejores resultados.",
       "troubleshooting": "Solución de problemas: Verifique que el micrófono funcione en su navegador."
-    }
+    },
+    "sessionGrade": {
+      "title": "Valutazione Sessione",
+      "by": "da",
+      "closeAriaLabel": "Chiudi valutazione",
+      "evaluating": "Il maestro sta valutando...",
+      "goodSession": "Buona sessione di studio!",
+      "commitment": "Impegno costante",
+      "keepGoing": "Continua così!",
+      "close": "Chiudi"
+    },
+    "voicePanel": {
+      "connecting": "Connessione...",
+      "speaking": "{name} sta parlando...",
+      "listening": "In ascolto...",
+      "connected": "Connesso",
+      "startingCall": "Avvio chiamata...",
+      "microphoneEnabled": "Attiva microfono",
+      "microphoneDisabled": "Disattiva microfono",
+      "ttsEnabled": "Disattiva lettura vocale",
+      "ttsDisabled": "Lettura vocale disattivata",
+      "newConversation": "Nuova conversazione",
+      "close": "Chiudi",
+      "microphoneMutedStatus": "Microfono disattivato",
+      "speakNowStatus": "Parla ora..."
+    },
+    "configError": {
+      "title": "Azure OpenAI Non Configurato",
+      "subtitle": "La voce richiede Azure OpenAI Realtime",
+      "missingVariables": "Variabili mancanti:",
+      "instructions": "Configura le variabili di ambiente nel file",
+      "useChatButton": "Usa Chat Testuale",
+      "closeButton": "Chiudi"
+    },
+    "sessionHeader": {
+      "closeSessionAriaLabel": "Chiudi sessione",
+      "level": "Lv."
+    },
+    "sessionTools": {
+      "toolsUsed": "Strumenti utilizzati",
+      "clear": "Cancella",
+      "webcamTitle": "Mostra compiti via webcam",
+      "webcamLabel": "Webcam",
+      "mindmapTitle": "Crea mappa mentale",
+      "mindmapLabel": "Mappa",
+      "quizTitle": "Crea quiz",
+      "quizLabel": "Quiz",
+      "flashcardTitle": "Crea flashcard",
+      "flashcardLabel": "Flashcard",
+      "searchTitle": "Cerca sul web",
+      "searchLabel": "Cerca"
+    },
+    "connessioneDiretta": "Connessione diretta",
+    "webrtcDirect": "WebRTC Direct",
+    "connessionePeerToPeer": "Connessione peer-to-peer",
+    "min": "min",
+    "durata": "Durata",
+    "domande": "Domande",
+    "puntiDiForza": "Punti di forza",
+    "daMigliorare": "Da migliorare",
+    "envLocal": ".env.local:",
+    "avatar": "Avatar"
   }
 }

@@ -105,12 +105,12 @@ export function PrivacySettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5 text-blue-500" />
-              Account
+              {t("account")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Sei connesso al tuo account MirrorBuddy.
+              {t("seiConnessoAlTuoAccountMirrorbuddy")}
             </p>
             <Button
               variant="outline"
@@ -131,14 +131,14 @@ export function PrivacySettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-blue-500" />
-            Consensi e Termini
+            {t("consensiETermini")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {consentData ? (
             <>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Stato dei tuoi consensi e termini accettati.
+                {t("statoDeiTuoiConsensiETerminiAccettati")}
               </p>
 
               {/* TOS Status */}
@@ -146,10 +146,10 @@ export function PrivacySettings() {
                 <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    Termini di Servizio
+                    {t("terminiDiServizio")}
                   </p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Accettati il{" "}
+                    {t("accettatiIl1")}{" "}
                     {new Date(consentData.tos.acceptedAt).toLocaleDateString(
                       "it-IT",
                       {
@@ -160,7 +160,7 @@ export function PrivacySettings() {
                     )}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    Versione: {consentData.tos.version}
+                    {t("versione1")} {consentData.tos.version}
                   </p>
                 </div>
               </div>
@@ -170,10 +170,10 @@ export function PrivacySettings() {
                 <Cookie className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    Cookie e Privacy
+                    {t("cookieEPrivacy")}
                   </p>
                   <p className="text-xs text-slate-600 dark:text-slate-400">
-                    Accettati il{" "}
+                    {t("accettatiIl")}{" "}
                     {new Date(
                       consentData.cookies.acceptedAt,
                     ).toLocaleDateString("it-IT", {
@@ -183,7 +183,7 @@ export function PrivacySettings() {
                     })}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    Cookie essenziali: ✓ | Cookie analitici:{" "}
+                    {t("cookieEssenzialiCookieAnalitici")}{" "}
                     {consentData.cookies.analytics ? "✓" : "✗"}
                   </p>
                 </div>
@@ -209,18 +209,18 @@ export function PrivacySettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-500" />
-            Privacy e Sicurezza
+            {t("privacyESicurezza")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
-            I tuoi dati sono al sicuro. MirrorBuddy e progettato pensando alla
-            privacy dei bambini e rispetta le normative COPPA e GDPR.
+            {t("iTuoiDatiSonoAlSicuroMirrorbuddyEProgettatoPensand")}
+            {t("privacyDeiBambiniERispettaLeNormativeCoppaEGdpr")}
           </p>
 
           <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
             <h4 className="font-medium text-green-700 dark:text-green-300 mb-2">
-              I tuoi dati sono protetti
+              {t("iTuoiDatiSonoProtetti")}
             </h4>
             <ul className="text-sm text-green-600 dark:text-green-400 space-y-1">
               <li>{t("dataStoredLocally")}</li>
@@ -274,7 +274,7 @@ export function PrivacySettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-blue-500" />
-            Telemetria e Analisi
+            {t("telemetriaEAnalisi")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -285,16 +285,16 @@ export function PrivacySettings() {
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
             <div>
               <p className="font-medium text-slate-900 dark:text-white text-sm">
-                Invia dati anonimi
+                {t("inviaDatiAnonimi")}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Statistiche di utilizzo anonime
+                {t("statisticheDiUtilizzoAnonime")}
               </p>
             </div>
             <button
               type="button"
               role="switch"
-              aria-label="Toggle analytics"
+              aria-label={t("toggleAnalytics")}
               aria-checked={analyticsEnabled}
               onClick={handleAnalyticsToggle}
               className={`relative w-11 h-6 rounded-full transition-colors ${
@@ -319,20 +319,20 @@ export function PrivacySettings() {
       {/* Version Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Informazioni App</CardTitle>
+          <CardTitle>{t("informazioniApp")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-500">Versione</span>
+            <span className="text-slate-500">{t("versione")}</span>
             <span className="font-mono">
               {version ? `v${version.version}` : "Loading..."}
             </span>
           </div>
           {version?.environment === "development" && (
             <div className="mt-2 flex items-center justify-between text-sm">
-              <span className="text-slate-500">Ambiente</span>
+              <span className="text-slate-500">{t("ambiente")}</span>
               <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs">
-                Development
+                {t("development")}
               </span>
             </div>
           )}

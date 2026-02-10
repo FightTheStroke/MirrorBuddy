@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Minus, Star } from "lucide-react";
 import {
@@ -11,12 +13,14 @@ import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import type { SuccessMetric } from "../types";
 import { METRIC_ICONS, METRIC_COLORS } from "../constants";
+import { useTranslations } from "next-intl";
 
 interface MetricCardProps {
   metric: SuccessMetric;
 }
 
 export function MetricCard({ metric }: MetricCardProps) {
+  const t = useTranslations("education");
   const { settings } = useAccessibilityStore();
   const Icon = METRIC_ICONS[metric.id];
   const colors = METRIC_COLORS[metric.id];
@@ -84,7 +88,7 @@ export function MetricCard({ metric }: MetricCardProps) {
                     ? "text-white"
                     : "text-slate-900 dark:text-white",
                 )}
-                aria-label={`Current score: ${metric.currentScore} out of 100`}
+                aria-label={t("currentScore", { score: metric.currentScore })}
               >
                 {metric.currentScore}
               </div>
@@ -97,7 +101,7 @@ export function MetricCard({ metric }: MetricCardProps) {
                       ? "text-red-600 dark:text-red-400"
                       : "text-slate-500",
                 )}
-                aria-label={`Trend: ${change > 0 ? "up" : change < 0 ? "down" : "stable"} by ${Math.abs(change)}%`}
+                aria-label={t("trendAriaLabel", { direction: change > 0 ? t("trendUp") : change < 0 ? t("trendDown") : t("trendStable"), change: Math.abs(change) })}
               >
                 <TrendIcon className="w-3 h-3" aria-hidden="true" />
                 <span className="sr-only">
@@ -106,7 +110,7 @@ export function MetricCard({ metric }: MetricCardProps) {
                     : change < 0
                       ? "Decrease"
                       : "No change"}{" "}
-                  of{" "}
+                  {t("of")}{" "}
                 </span>
                 {change > 0 ? "+" : ""}
                 {change}%
@@ -168,7 +172,7 @@ export function MetricCard({ metric }: MetricCardProps) {
                     {isAchieved && (
                       <Star
                         className="w-3 h-3 text-amber-500 shrink-0"
-                        aria-label="Goal achieved"
+                        aria-label={t("goalAchieved")}
                       />
                     )}
                   </div>

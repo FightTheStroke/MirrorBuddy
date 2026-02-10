@@ -59,25 +59,25 @@ export function AccessibilityContent({ config }: AccessibilityContentProps) {
         <ul className="space-y-2 text-slate-700 dark:text-gray-300">
           <li>
             <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-sm">
-              Tab
+              {t("tab")}
             </kbd>{" "}
             {t("keyboard.tab")}
           </li>
           <li>
             <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-sm">
-              Enter
+              {t("enter")}
             </kbd>{" "}
             {t("keyboard.enter")}
           </li>
           <li>
             <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-sm">
-              Esc
+              {t("esc")}
             </kbd>{" "}
             {t("keyboard.escape")}
           </li>
           <li>
             <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded text-sm">
-              Space
+              {t("space")}
             </kbd>{" "}
             {t("keyboard.space")}
           </li>
@@ -126,7 +126,7 @@ export function AccessibilityContent({ config }: AccessibilityContentProps) {
         </p>
         <ul className="space-y-2 text-slate-700 dark:text-gray-300">
           <li>• {config.regulation}</li>
-          <li>• WCAG 2.1 Level AA</li>
+          <li>{t("wcag21LevelAa")}</li>
           <li>• {t("regulatory.eudirective")}</li>
         </ul>
       </section>

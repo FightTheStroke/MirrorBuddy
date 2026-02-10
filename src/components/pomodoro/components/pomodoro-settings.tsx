@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface PomodoroSettingsProps {
   focusMinutes: number;
@@ -21,6 +22,7 @@ export function PomodoroSettings({
   onShortBreakChange,
   onLongBreakChange,
 }: PomodoroSettingsProps) {
+  const t = useTranslations("education");
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -33,7 +35,7 @@ export function PomodoroSettings({
           htmlFor="pomodoro-focus-minutes"
           className="text-sm text-white/70 block mb-2"
         >
-          Focus (minuti)
+          {t("focusMinuti")}
         </label>
         <input
           type="range"
@@ -46,7 +48,7 @@ export function PomodoroSettings({
           className="w-full accent-red-500"
         />
         <div className="text-right text-sm text-white/50">
-          {focusMinutes} min
+          {focusMinutes} {t("min2")}
         </div>
       </div>
 
@@ -55,7 +57,7 @@ export function PomodoroSettings({
           htmlFor="pomodoro-short-break"
           className="text-sm text-white/70 block mb-2"
         >
-          Pausa breve (minuti)
+          {t("pausaBreveMinuti")}
         </label>
         <input
           type="range"
@@ -68,7 +70,7 @@ export function PomodoroSettings({
           className="w-full accent-green-500"
         />
         <div className="text-right text-sm text-white/50">
-          {shortBreakMinutes} min
+          {shortBreakMinutes} {t("min1")}
         </div>
       </div>
 
@@ -77,7 +79,7 @@ export function PomodoroSettings({
           htmlFor="pomodoro-long-break"
           className="text-sm text-white/70 block mb-2"
         >
-          Pausa lunga (minuti)
+          {t("pausaLungaMinuti")}
         </label>
         <input
           type="range"
@@ -90,12 +92,12 @@ export function PomodoroSettings({
           className="w-full accent-blue-500"
         />
         <div className="text-right text-sm text-white/50">
-          {longBreakMinutes} min
+          {longBreakMinutes} {t("min")}
         </div>
       </div>
 
       <p className="text-xs text-white/40 text-center pt-2">
-        Pausa lunga ogni {pomodorosUntilLongBreak} pomodori
+        {t("pausaLungaOgni")} {pomodorosUntilLongBreak} {t("pomodori")}
       </p>
     </motion.div>
   );

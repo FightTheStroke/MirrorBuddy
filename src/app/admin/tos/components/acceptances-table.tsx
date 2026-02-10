@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * ToS Acceptances Table with Pagination
  */
@@ -12,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ResponsiveTable } from "@/components/admin/responsive-table";
+import { useTranslations } from "next-intl";
 
 interface TosAcceptance {
   id: string;
@@ -48,6 +51,7 @@ export function AcceptancesTable({
   pagination,
   onPageChange,
 }: AcceptancesTableProps) {
+  const t = useTranslations("admin");
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("it-IT", {
       year: "numeric",
@@ -61,10 +65,10 @@ export function AcceptancesTable({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Acceptances</CardTitle>
+        <CardTitle>{t("acceptances")}</CardTitle>
         <CardDescription>
-          Page {pagination.page} of {pagination.totalPages} (
-          {pagination.totalCount} total)
+          {t("page1")} {pagination.page} {t("of1")} {pagination.totalPages} (
+          {pagination.totalCount} {t("total")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -73,19 +77,19 @@ export function AcceptancesTable({
             <thead className="border-b border-border">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                  User
+                  {t("user")}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                  Email
+                  {t("email")}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                  Version
+                  {t("version")}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                  Accepted At
+                  {t("acceptedAt")}
                 </th>
                 <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                  IP (Last Segment)
+                  {t("ipLastSegment")}
                 </th>
               </tr>
             </thead>
@@ -124,11 +128,11 @@ export function AcceptancesTable({
             disabled={pagination.page === 1}
           >
             <ChevronLeft className="h-4 w-4 mr-1" />
-            Previous
+            {t("previous")}
           </Button>
 
           <p className="text-sm text-muted-foreground">
-            Page {pagination.page} of {pagination.totalPages}
+            {t("page")} {pagination.page} {t("of")} {pagination.totalPages}
           </p>
 
           <Button
@@ -139,7 +143,7 @@ export function AcceptancesTable({
             }
             disabled={pagination.page === pagination.totalPages}
           >
-            Next
+            {t("next")}
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         </div>

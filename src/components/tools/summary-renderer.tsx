@@ -14,6 +14,7 @@ import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { calculateSummaryWordCount, type SummarySection } from '@/types/tools';
+import { useTranslations } from "next-intl";
 
 // ============================================================================
 // TYPES
@@ -43,6 +44,7 @@ export function SummaryRenderer({
   expandAll = true,
   className,
 }: SummaryRendererProps) {
+  const t = useTranslations("tools");
   const [expandedSections, setExpandedSections] = useState<Set<number>>(
     expandAll ? new Set(sections.map((_, i) => i)) : new Set()
   );
@@ -86,10 +88,10 @@ export function SummaryRenderer({
             {title}
           </h2>
           <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-            {length && <span>Riassunto {getLengthLabel()}</span>}
+            {length && <span>{t("riassunto")} {getLengthLabel()}</span>}
             <span className="flex items-center gap-1">
               <FileText className="w-3.5 h-3.5" />
-              {wordCount} parole
+              {wordCount} {t("parole")}
             </span>
           </div>
         </div>
@@ -130,7 +132,7 @@ export function SummaryRenderer({
                 </span>
                 {section.keyPoints && section.keyPoints.length > 0 && (
                   <span className="text-xs text-slate-400 px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded-full">
-                    {section.keyPoints.length} punti
+                    {section.keyPoints.length} {t("punti")}
                   </span>
                 )}
               </button>
@@ -179,7 +181,7 @@ export function SummaryRenderer({
       {sections.length === 0 && (
         <div className="text-center py-8 text-slate-500 dark:text-slate-400">
           <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-          <p>Nessuna sezione nel riassunto</p>
+          <p>{t("nessunaSezioneNelRiassunto")}</p>
         </div>
       )}
     </div>

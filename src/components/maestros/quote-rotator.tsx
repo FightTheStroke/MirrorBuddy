@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getMaestroQuotes } from '@/data/maestri/quotes';
+import { useTranslations } from "next-intl";
 
 interface QuoteRotatorProps {
   maestroId: string;
@@ -23,6 +24,7 @@ export function QuoteRotator({
   pauseOnHover = true,
   compact = false,
 }: QuoteRotatorProps) {
+  const t = useTranslations("chat");
   const quotes = getMaestroQuotes(maestroId);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -72,7 +74,7 @@ export function QuoteRotator({
       onMouseLeave={handleMouseLeave}
       role="region"
       aria-live="polite"
-      aria-label="Citazione motivazionale"
+      aria-label={t("citazioneMotivazionale")}
     >
       <AnimatePresence mode="wait">
         <motion.p
@@ -91,7 +93,7 @@ export function QuoteRotator({
         <div
           className="flex justify-center gap-1 mt-2"
           role="tablist"
-          aria-label="Quote indicators"
+          aria-label={t("quoteIndicators")}
         >
           {quotes.map((_, index) => (
             <button
@@ -102,7 +104,7 @@ export function QuoteRotator({
                   ? 'bg-slate-400 dark:bg-slate-500 w-3'
                   : 'bg-slate-300 dark:bg-slate-600'
               }`}
-              aria-label={`Vai alla citazione ${index + 1}`}
+              aria-label={t("vaiAllaCitazione", { index: index + 1 })}
               aria-selected={index === currentIndex}
               role="tab"
             />

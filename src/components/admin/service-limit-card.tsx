@@ -7,6 +7,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RecommendationSection } from "./recommendation-section";
 import type { ServiceRecommendation } from "@/lib/admin/service-recommendations";
+import { useTranslations } from "next-intl";
 
 export type MetricStatus = "ok" | "warning" | "critical" | "emergency";
 
@@ -152,6 +153,7 @@ interface MetricRowProps {
 }
 
 function MetricRow({ metric }: MetricRowProps) {
+  const t = useTranslations("admin");
   const config = statusConfig[metric.status];
   const StatusIcon = config.icon;
 
@@ -189,7 +191,7 @@ function MetricRow({ metric }: MetricRowProps) {
           {formatValue(metric.usage, metric.unit)} / {formatValue(metric.limit, metric.unit)}
         </span>
         <span>
-          {formatValue(metric.limit - metric.usage, metric.unit)} remaining
+          {formatValue(metric.limit - metric.usage, metric.unit)} {t("remaining")}
         </span>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, User, Clock, CheckCircle, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface JourneyEvent {
   stage: string;
@@ -42,6 +43,7 @@ function formatDuration(ms: number): string {
 }
 
 export function UserJourneyLookup() {
+  const t = useTranslations("admin");
   const [searchId, setSearchId] = useState("");
   const [journey, setJourney] = useState<UserJourney | null>(null);
   const [loading, setLoading] = useState(false);
@@ -79,14 +81,14 @@ export function UserJourneyLookup() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="w-5 h-5" />
-          User Journey Lookup
+          {t("userJourneyLookup")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Search */}
         <div className="flex gap-2">
           <Input
-            placeholder="Visitor ID or User Email"
+            placeholder={t("visitorIdOrUserEmail")}
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -110,36 +112,36 @@ export function UserJourneyLookup() {
             {/* Summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
               <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
-                <p className="text-muted-foreground">Current Stage</p>
+                <p className="text-muted-foreground">{t("currentStage")}</p>
                 <p className="font-semibold">{journey.summary.currentStage}</p>
               </div>
               <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
-                <p className="text-muted-foreground">Days in Funnel</p>
+                <p className="text-muted-foreground">{t("daysInFunnel")}</p>
                 <p className="font-semibold">{journey.summary.daysInFunnel}</p>
               </div>
               <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
-                <p className="text-muted-foreground">Status</p>
+                <p className="text-muted-foreground">{t("status")}</p>
                 <p className="font-semibold flex items-center gap-1">
                   {journey.summary.converted ? (
                     <>
                       <CheckCircle className="w-4 h-4 text-green-500" />
-                      Converted
+                      {t("converted")}
                     </>
                   ) : journey.summary.churned ? (
                     <>
                       <XCircle className="w-4 h-4 text-red-500" />
-                      Churned
+                      {t("churned")}
                     </>
                   ) : (
                     <>
                       <Clock className="w-4 h-4 text-amber-500" />
-                      Active
+                      {t("active")}
                     </>
                   )}
                 </p>
               </div>
               <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded">
-                <p className="text-muted-foreground">Events</p>
+                <p className="text-muted-foreground">{t("events")}</p>
                 <p className="font-semibold">{journey.summary.totalEvents}</p>
               </div>
             </div>
@@ -156,7 +158,7 @@ export function UserJourneyLookup() {
                       {event.fromStage && (
                         <span className="text-muted-foreground">
                           {" "}
-                          from {event.fromStage}
+                          {t("from")} {event.fromStage}
                         </span>
                       )}
                       <div className="text-xs text-muted-foreground">

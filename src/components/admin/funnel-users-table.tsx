@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Search, User, Eye } from "lucide-react";
 import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { FUNNEL_STAGES } from "@/lib/funnel/constants";
+import { useTranslations } from "next-intl";
 
 interface FunnelUser {
   id: string;
@@ -56,6 +57,7 @@ const STAGE_BADGE_COLORS: Record<string, string> = {
 };
 
 export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
+  const t = useTranslations("admin");
   const [users, setUsers] = useState<FunnelUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
   if (error) {
     return (
       <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
-        Error: {error}
+        {t("error")} {error}
       </div>
     );
   }
@@ -121,7 +123,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 flex gap-2">
           <Input
-            placeholder="Search by email or ID..."
+            placeholder={t("searchByEmailOrId")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -139,10 +141,10 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
           }}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filter by stage" />
+            <SelectValue placeholder={t("filterByStage")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All stages</SelectItem>
+            <SelectItem value="all">{t("allStages")}</SelectItem>
             {FUNNEL_STAGES.map((stage) => (
               <SelectItem key={stage} value={stage}>
                 {stage}
@@ -159,19 +161,19 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  User
+                  {t("user")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Stage
+                  {t("stage")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">
-                  Events
+                  {t("events")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">
-                  Last Activity
+                  {t("lastActivity")}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Action
+                  {t("action")}
                 </th>
               </tr>
             </thead>
@@ -182,7 +184,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
                     colSpan={5}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
-                    Loading...
+                    {t("loading")}
                   </td>
                 </tr>
               ) : users.length === 0 ? (
@@ -191,7 +193,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
                     colSpan={5}
                     className="px-4 py-8 text-center text-muted-foreground"
                   >
-                    No users found
+                    {t("noUsersFound")}
                   </td>
                 </tr>
               ) : (
@@ -233,7 +235,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
                         variant="ghost"
                         size="sm"
                         onClick={() => onSelectUser(user.id)}
-                        aria-label={`View details for ${user.email || user.id}`}
+                        aria-label={t("viewDetailsFor", { user: user.email || user.id })}
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -249,7 +251,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
-          Page {page} of {totalPages}
+          {t("page")} {page} {t("of")} {totalPages}
         </span>
         <div className="flex gap-2">
           <Button
@@ -257,7 +259,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             size="sm"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            aria-label="Previous page"
+            aria-label={t("previousPage")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -266,7 +268,7 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
             size="sm"
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            aria-label="Next page"
+            aria-label={t("nextPage")}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

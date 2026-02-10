@@ -114,7 +114,7 @@ export function MaterialViewer({
             className="gap-2"
           >
             <ExternalLink className="w-4 h-4" />
-            Apri PDF
+            {t("apriPdf")}
           </Button>
         </div>
       );
@@ -200,7 +200,7 @@ export function MaterialViewer({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              aria-label="Chiudi"
+              aria-label={t("chiudi")}
             >
               <X className="w-5 h-5" />
             </Button>

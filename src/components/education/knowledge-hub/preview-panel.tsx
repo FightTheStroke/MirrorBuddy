@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Knowledge Hub Preview Panel (Task 7.16)
  * Shows material preview on the right side
@@ -8,6 +10,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MaterialCard } from "./components/material-card";
 import type { KnowledgeHubMaterial } from "./views";
+import { useTranslations } from "next-intl";
 
 interface PreviewPanelProps {
   material: KnowledgeHubMaterial | null;
@@ -20,6 +23,7 @@ export function PreviewPanel({
   onClose,
   onOpenMaterial,
 }: PreviewPanelProps) {
+  const t = useTranslations("education");
   return (
     <AnimatePresence>
       {material && (
@@ -32,13 +36,13 @@ export function PreviewPanel({
           <div className="p-4 w-full max-w-full lg:w-80">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900 dark:text-white">
-                Anteprima
+                {t("anteprima")}
               </h3>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                aria-label="Chiudi anteprima"
+                aria-label={t("chiudiAnteprima")}
               >
                 <X className="w-4 h-4" />
               </Button>

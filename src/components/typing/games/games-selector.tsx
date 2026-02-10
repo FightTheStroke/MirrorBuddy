@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { KeyboardLayout } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface GamesSelectorProps {
   layout: KeyboardLayout;
@@ -12,6 +13,7 @@ export function GamesSelector({
   layout: _layout,
   onSelectGame,
 }: GamesSelectorProps) {
+  const t = useTranslations("education");
   const [completedGames] = useState<string[]>([]);
 
   const games = [
@@ -37,7 +39,7 @@ export function GamesSelector({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold">Giochi</h3>
+      <h3 className="text-xl font-bold">{t("giochi")}</h3>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {games.map((game) => (
@@ -52,7 +54,7 @@ export function GamesSelector({
 
             {completedGames.includes(game.id) && (
               <div className="mt-3 text-xs text-green-600 dark:text-green-400">
-                ✓ Completato
+                {t("completato")}
               </div>
             )}
           </button>

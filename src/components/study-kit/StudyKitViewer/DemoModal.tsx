@@ -8,6 +8,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { HTMLPreview } from '@/components/education/html-preview';
+import { useTranslations } from "next-intl";
 
 interface DemoData {
   title?: string;
@@ -42,6 +43,7 @@ function getDemoDescription(demo?: DemoData | null): string | undefined {
 }
 
 export function DemoModal({ isOpen, onClose, demoCode, demo }: DemoModalProps) {
+  const t = useTranslations("education");
   return (
     <AnimatePresence>
       {isOpen && (
@@ -63,7 +65,7 @@ export function DemoModal({ isOpen, onClose, demoCode, demo }: DemoModalProps) {
             <button
               onClick={onClose}
               className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-              aria-label="Chiudi demo"
+              aria-label={t("chiudiDemo")}
             >
               <X className="w-5 h-5" />
             </button>

@@ -1,9 +1,12 @@
+"use client";
+
 /**
  * ToS Summary Stats Cards
  */
 
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Users, FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SummaryStatsProps {
   totalAcceptances: number;
@@ -16,6 +19,7 @@ export function SummaryStats({
   uniqueUsers,
   versionCounts,
 }: SummaryStatsProps) {
+  const t = useTranslations("admin");
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
       <Card>
@@ -23,7 +27,7 @@ export function SummaryStats({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-muted-foreground">
-                Total Acceptances
+                {t("totalAcceptances")}
               </p>
               <p className="text-2xl font-bold mt-1 text-foreground">
                 {totalAcceptances}
@@ -41,7 +45,7 @@ export function SummaryStats({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-muted-foreground">
-                Unique Users
+                {t("uniqueUsers")}
               </p>
               <p className="text-2xl font-bold mt-1 text-foreground">
                 {uniqueUsers}
@@ -59,7 +63,7 @@ export function SummaryStats({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-sm font-medium text-muted-foreground">
-                Versions
+                {t("versions")}
               </p>
               <p className="text-2xl font-bold mt-1 text-foreground">
                 {Object.keys(versionCounts).length}

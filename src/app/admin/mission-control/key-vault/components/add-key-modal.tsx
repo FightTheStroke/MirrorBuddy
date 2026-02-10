@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Add Key Modal Component
  * Form for creating new encrypted secrets
@@ -15,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth";
+import { useTranslations } from "next-intl";
 
 interface AddKeyModalProps {
   open: boolean;
@@ -23,6 +26,7 @@ interface AddKeyModalProps {
 }
 
 export function AddKeyModal({ open, onClose, onSuccess }: AddKeyModalProps) {
+  const t = useTranslations("admin");
   const [service, setService] = useState("");
   const [keyName, setKeyName] = useState("");
   const [value, setValue] = useState("");
@@ -61,7 +65,7 @@ export function AddKeyModal({ open, onClose, onSuccess }: AddKeyModalProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add API Key</DialogTitle>
+          <DialogTitle>{t("addApiKey")}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>
@@ -78,13 +82,13 @@ export function AddKeyModal({ open, onClose, onSuccess }: AddKeyModalProps) {
                 htmlFor="service"
                 className="block text-sm font-medium mb-2"
               >
-                Service
+                {t("service")}
               </label>
               <Input
                 id="service"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
-                placeholder="e.g., azure_openai, stripe"
+                placeholder={t("eGAzureOpenaiStripe")}
                 required
               />
             </div>
@@ -94,27 +98,27 @@ export function AddKeyModal({ open, onClose, onSuccess }: AddKeyModalProps) {
                 htmlFor="keyName"
                 className="block text-sm font-medium mb-2"
               >
-                Key Name
+                {t("keyName")}
               </label>
               <Input
                 id="keyName"
                 value={keyName}
                 onChange={(e) => setKeyName(e.target.value)}
-                placeholder="e.g., AZURE_OPENAI_API_KEY"
+                placeholder={t("eGAzureOpenaiApiKey")}
                 required
               />
             </div>
 
             <div>
               <label htmlFor="value" className="block text-sm font-medium mb-2">
-                Secret Value
+                {t("secretValue")}
               </label>
               <Input
                 id="value"
                 type="password"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="Enter the secret value"
+                placeholder={t("enterTheSecretValue")}
                 required
               />
             </div>
@@ -127,11 +131,11 @@ export function AddKeyModal({ open, onClose, onSuccess }: AddKeyModalProps) {
               onClick={onClose}
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Add Secret
+              {t("addSecret")}
             </Button>
           </DialogFooter>
         </form>

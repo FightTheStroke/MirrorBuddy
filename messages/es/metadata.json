@@ -48,7 +48,13 @@
     "terms": {
       "title": "Términos de Servicio | MirrorBuddy",
       "description": "Lee nuestros términos de servicio, acuerdos de usuario, políticas de uso aceptable e información legal para el uso de la plataforma educativa MirrorBuddy.",
-      "keywords": ["términos", "servicio", "legal", "acuerdo", "políticas"]
+      "keywords": [
+        "términos",
+        "servicio",
+        "legal",
+        "acuerdo",
+        "políticas"
+      ]
     },
     "title": "MirrorBuddy - Tu compañero de estudio",
     "description": "Plataforma educativa basada en IA para estudiantes con necesidades especiales",

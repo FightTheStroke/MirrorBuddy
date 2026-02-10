@@ -7,6 +7,7 @@
 import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface HintSectionProps {
   hints: string[];
@@ -15,6 +16,7 @@ interface HintSectionProps {
 }
 
 export function HintSection({ hints, showHint, onShowHint }: HintSectionProps) {
+  const t = useTranslations("education");
   if (hints.length === 0) return null;
 
   return (
@@ -40,7 +42,7 @@ export function HintSection({ hints, showHint, onShowHint }: HintSectionProps) {
           className="w-full sm:w-auto text-xs sm:text-sm"
         >
           <Lightbulb className="w-4 h-4 mr-2" />
-          Show hint
+          {t("showHint")}
         </Button>
       )}
     </div>

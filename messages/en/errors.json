@@ -88,6 +88,14 @@
       "title": "Page not found",
       "description": "The page you are looking for does not exist or has been moved.",
       "backHome": "Back to Home"
-    }
+    },
+    "erroreCritico": "Errore critico",
+    "siEVerificatoUnErroreImprevistoIlNostroTeamEStato": "Si è verificato un errore imprevisto. Il nostro team è stato",
+    "notificatoAutomaticamente": "notificato automaticamente.",
+    "riprova": "Riprova",
+    "tornaAllaHome": "Torna alla home",
+    "somethingWentWrong": "Something went wrong",
+    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
+    "retry": "Retry"
   }
 }

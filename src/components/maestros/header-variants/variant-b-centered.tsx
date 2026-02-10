@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 const VISUALIZER_BARS = [10, 14, 8, 16, 12, 14, 10];
 
@@ -45,6 +46,7 @@ interface HeaderVariantProps {
 }
 
 export function HeaderVariantB(props: HeaderVariantProps) {
+  const t = useTranslations("chat");
   const {
     maestro,
     isVoiceActive,
@@ -165,7 +167,7 @@ export function HeaderVariantB(props: HeaderVariantProps) {
           <div className="flex items-center justify-center gap-2">
             <h2 className="text-lg font-bold">{maestro.displayName}</h2>
             <span className="text-xs px-2 py-0.5 rounded-full bg-white/20">
-              Professore
+              {t("professore")}
             </span>
           </div>
           <p className="text-sm text-white/80">{statusText}</p>

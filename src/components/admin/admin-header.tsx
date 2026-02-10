@@ -64,13 +64,13 @@ export function AdminHeader({
           size="icon"
           onClick={onMenuClick}
           className="lg:hidden text-slate-500 h-11 w-11 shrink-0"
-          aria-label="Toggle menu"
+          aria-label={t("toggleMenu")}
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="hidden sm:block min-w-0">
+        <nav aria-label={t("breadcrumb")} className="hidden sm:block min-w-0">
           <ol className="flex items-center gap-1 text-sm">
             {breadcrumbs.map((crumb, index) => (
               <li key={crumb.href} className="flex items-center gap-1 min-w-0">
@@ -110,10 +110,10 @@ export function AdminHeader({
             );
           }}
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors text-sm"
-          aria-label="Open command palette (Cmd+K)"
+          aria-label={t("openCommandPaletteCmdK")}
         >
           <Search className="h-4 w-4" />
-          <span className="hidden md:inline">Search...</span>
+          <span className="hidden md:inline">{t("search")}</span>
           <kbd className="hidden md:inline-flex items-center gap-0.5 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono">
             ⌘K
           </kbd>

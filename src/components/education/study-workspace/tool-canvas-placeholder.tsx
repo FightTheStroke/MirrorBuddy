@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import type { ToolCanvasPlaceholderProps } from "./types";
+import { useTranslations } from "next-intl";
 
 export function ToolCanvasPlaceholder({
   sessionId: _sessionId,
@@ -17,6 +18,7 @@ export function ToolCanvasPlaceholder({
   onToolStart: _onToolStart,
   onToolComplete: _onToolComplete,
 }: ToolCanvasPlaceholderProps) {
+  const t = useTranslations("education");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -73,8 +75,8 @@ export function ToolCanvasPlaceholder({
             settings.highContrast ? "text-gray-600" : "text-slate-600",
           )}
         >
-          Il canvas mostra mappe mentali, quiz, flashcard e altri strumenti in
-          tempo reale
+          {t("ilCanvasMostraMappeMentaliQuizFlashcardEAltriStrum")}
+          {t("tempoReale")}
         </p>
       </div>
     </div>

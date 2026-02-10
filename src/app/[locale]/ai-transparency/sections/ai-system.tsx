@@ -11,13 +11,13 @@ export function AISystemSections() {
       <Section number={1} title={t("section1.title")}>
         <p>{t("section1.para1")}</p>
         <p>
-          Importante: <strong>{t("section1.para2")}</strong>
+          {t("importante")} <strong>{t("section1.para2")}</strong>
         </p>
       </Section>
 
       <Section number={2} title={t("section2.title")}>
         <p>
-          MirrorBuddy utilizza <strong>Azure OpenAI (GPT-4)</strong>,{" "}
+          {t("mirrorbuddyUtilizza")} <strong>{t("azureOpenaiGpt4")}</strong>,{" "}
           {t("section2.intro")}
         </p>
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">

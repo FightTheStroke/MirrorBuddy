@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Input Section Component
  *
@@ -15,6 +17,7 @@ import {
   getValidationError,
 } from "../homework-assistant-mobile-helpers";
 import { capturePhoto, isNativePlatform } from "@/lib/native/media-bridge";
+import { useTranslations } from "next-intl";
 
 interface InputSectionProps {
   onFileSelect: (file: File) => void;
@@ -37,6 +40,7 @@ export function InputSection({
   selectedSubject,
   onSubjectSelect,
 }: InputSectionProps) {
+  const t = useTranslations("education");
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,7 +120,7 @@ export function InputSection({
           id="subject-selection-label"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300"
         >
-          Select Subject (Optional)
+          {t("selectSubjectOptional")}
         </div>
         <div
           className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2"
@@ -166,7 +170,7 @@ export function InputSection({
         >
           <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-green-700 dark:text-green-300">
-            Analysis complete! Generating solution...
+            {t("analysisCompleteGeneratingSolution")}
           </p>
         </motion.div>
       )}
@@ -180,7 +184,7 @@ export function InputSection({
         >
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Analyzing homework...
+              {t("analyzingHomework")}
             </p>
             <p className="text-xs text-slate-600 dark:text-slate-400">
               {Math.round(uploadProgress)}%
@@ -205,7 +209,7 @@ export function InputSection({
             type="button"
             onClick={handleCameraClick}
             disabled={isAnalyzing}
-            aria-label="Capture homework with camera"
+            aria-label={t("captureHomeworkWithCamera")}
             className={cn(
               "w-full",
               "py-4 px-4",
@@ -222,7 +226,7 @@ export function InputSection({
             )}
           >
             <Camera className="w-6 h-6" />
-            <span>Take Photo</span>
+            <span>{t("takePhoto")}</span>
           </button>
         </TouchTarget>
 
@@ -232,7 +236,7 @@ export function InputSection({
             type="button"
             onClick={handleGalleryClick}
             disabled={isAnalyzing}
-            aria-label="Choose homework from gallery"
+            aria-label={t("chooseHomeworkFromGallery")}
             className={cn(
               "w-full",
               "py-4 px-4",
@@ -249,14 +253,14 @@ export function InputSection({
             )}
           >
             <Upload className="w-6 h-6" />
-            <span>Choose File</span>
+            <span>{t("chooseFile")}</span>
           </button>
         </TouchTarget>
       </div>
 
       {/* Helper Text */}
       <p className="text-xs xs:text-sm text-slate-500 dark:text-slate-400 text-center">
-        Supported: JPEG, PNG, WebP, PDF • Max 50MB
+        {t("supportedJpegPngWebpPdfMax50mb")}
       </p>
 
       {/* Hidden File Inputs */}

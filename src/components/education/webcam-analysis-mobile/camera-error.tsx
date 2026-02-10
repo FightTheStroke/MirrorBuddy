@@ -1,8 +1,11 @@
+"use client";
+
 /**
  * Camera error display component
  */
 
 import { AlertCircle, RotateCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export interface CameraErrorProps {
   error: string;
@@ -10,6 +13,7 @@ export interface CameraErrorProps {
 }
 
 export function CameraError({ error, onRetry }: CameraErrorProps) {
+  const t = useTranslations("education");
   return (
     <div className="w-full h-full flex items-center justify-center bg-red-900/20 rounded">
       <div className="flex flex-col items-center gap-4 p-6 text-center">
@@ -19,10 +23,10 @@ export function CameraError({ error, onRetry }: CameraErrorProps) {
           <button
             onClick={onRetry}
             className="min-h-[44px] min-w-[100px] px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 mx-auto"
-            aria-label="Retry camera access"
+            aria-label={t("retryCameraAccess")}
           >
             <RotateCw className="w-4 h-4" />
-            Retry
+            {t("retry")}
           </button>
         </div>
       </div>

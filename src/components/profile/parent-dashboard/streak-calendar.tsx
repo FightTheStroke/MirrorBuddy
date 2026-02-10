@@ -58,7 +58,7 @@ export function StreakCalendar({ streak, highContrast = false, className }: Stre
           {t('streak')}
         </h2>
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5" title="Streak attuale">
+          <div className="flex items-center gap-1.5" title={t("streakAttuale")}>
             <Flame
               className={cn(
                 'w-5 h-5',
@@ -84,7 +84,7 @@ export function StreakCalendar({ streak, highContrast = false, className }: Stre
               {t('streakDays')}
             </span>
           </div>
-          <div className="flex items-center gap-1.5" title="Record personale">
+          <div className="flex items-center gap-1.5" title={t("recordPersonale")}>
             <Trophy
               className={cn('w-5 h-5', highContrast ? 'text-yellow-400' : 'text-amber-500')}
               aria-hidden="true"
@@ -132,7 +132,7 @@ export function StreakCalendar({ streak, highContrast = false, className }: Stre
               highContrast ? 'text-yellow-200' : 'text-slate-500 dark:text-slate-400',
             )}
           >
-            {streak.todayMinutes}/{streak.dailyGoalMinutes} min
+            {streak.todayMinutes}/{streak.dailyGoalMinutes} {t("min")}
           </span>
         </div>
         <div
@@ -144,7 +144,7 @@ export function StreakCalendar({ streak, highContrast = false, className }: Stre
           aria-valuenow={goalProgress}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`Progresso obiettivo: ${goalProgress}%`}
+          aria-label={t("progressoObiettivo", { progress: goalProgress })}
         >
           <div
             className={cn(

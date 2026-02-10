@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { useTranslations } from "next-intl";
 
 interface ProfileCardsSectionProps {
   fontSizeMultiplier: number;
@@ -19,6 +20,7 @@ interface ProfileCardsSectionProps {
 export function ProfileCardsSection({
   fontSizeMultiplier,
 }: ProfileCardsSectionProps) {
+  const t = useTranslations("settings");
   const {
     settings,
     activeProfile,
@@ -104,7 +106,7 @@ export function ProfileCardsSection({
           fontSize: `${16 * fontSizeMultiplier}px`,
         }}
       >
-        Profili predefiniti
+        {t("profiliPredefiniti")}
       </h3>
 
       <div

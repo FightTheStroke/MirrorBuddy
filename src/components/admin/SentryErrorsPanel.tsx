@@ -138,7 +138,7 @@ export function SentryErrorsPanel({
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-orange-500" />
-            Sentry Errors
+            {t("sentryErrors")}
             {issues.length > 0 && (
               <span className="text-xs font-normal text-muted-foreground">
                 ({issues.length} {t("unresolved")})
@@ -159,7 +159,7 @@ export function SentryErrorsPanel({
             <Button variant="outline" size="sm" asChild>
               <a href={sentryUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-1" />
-                Sentry
+                {t("sentryTitle")}
               </a>
             </Button>
           </div>
@@ -194,6 +194,7 @@ interface IssueCardProps {
 }
 
 function IssueCard({ issue }: IssueCardProps) {
+  const t = useTranslations("admin.sentry");
   const config = levelConfig[issue.level] || levelConfig.error;
   const Icon = config.icon;
 
@@ -223,12 +224,12 @@ function IssueCard({ issue }: IssueCardProps) {
             </span>
           </div>
           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-            <span>{issue.count} eventi</span>
-            <span>{issue.userCount} utenti</span>
-            <span>Ultimo: {formatTimeAgo(issue.lastSeen)}</span>
+            <span>{issue.count} {t("eventi")}</span>
+            <span>{issue.userCount} {t("utenti")}</span>
+            <span>{t("ultimo")} {formatTimeAgo(issue.lastSeen)}</span>
             {issue.isUnhandled && (
               <span className="px-1.5 py-0.5 bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 rounded text-[10px] font-medium">
-                Unhandled
+                {t("unhandled")}
               </span>
             )}
           </div>

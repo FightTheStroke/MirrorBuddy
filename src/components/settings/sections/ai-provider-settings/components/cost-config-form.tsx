@@ -108,13 +108,13 @@ export function CostConfigForm({ onSave }: CostConfigFormProps) {
       <div className="bg-slate-900 dark:bg-slate-950 p-3 rounded-lg">
         <p className="text-xs text-slate-400 mb-2">{t('envVariablesRequired')}</p>
         <code className="text-xs text-green-400 font-mono block leading-relaxed">
-          AZURE_TENANT_ID=...
+          {t("azureTenantId")}
           <br />
-          AZURE_CLIENT_ID=...
+          {t("azureClientId")}
           <br />
-          AZURE_CLIENT_SECRET=...
+          {t("azureClientSecret")}
           <br />
-          AZURE_SUBSCRIPTION_ID=...
+          {t("azureSubscriptionId")}
         </code>
       </div>
     </div>

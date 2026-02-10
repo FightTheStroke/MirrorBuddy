@@ -50,6 +50,11 @@
       "subtitle": "Ihr KI-gestützter Lernbegleiter",
       "cta": "Jetzt starten",
       "secondaryCta": "Mehr erfahren"
-    }
+    },
+    "lv": "Lv.",
+    "streak1": "Streak",
+    "streak": "Streak",
+    "mb": "+% MB",
+    "sim": "(SIM)"
   }
 }

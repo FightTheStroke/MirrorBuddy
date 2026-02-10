@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface TrialUsageData {
   chat: { used: number; limit: number; percentage: number };
@@ -18,6 +19,7 @@ interface ResourceMetric {
 }
 
 export function TrialUsageDashboard() {
+  const t = useTranslations("auth");
   const [data, setData] = useState<TrialUsageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,11 +106,11 @@ export function TrialUsageDashboard() {
     <div className="space-y-6" data-testid="trial-usage-dashboard">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Your Trial Usage
+          {t("yourTrialUsage")}
         </h2>
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
-          You are currently in the free trial. Upgrade your account to continue
-          learning after reaching your limits.
+          {t("youAreCurrentlyInTheFreeTrialUpgradeYourAccountToC")}
+          {t("learningAfterReachingYourLimits")}
         </p>
       </div>
 
@@ -138,7 +140,7 @@ export function TrialUsageDashboard() {
 
             {/* Usage Text */}
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              {resource.used} of {resource.limit} used
+              {resource.used} {t("of")} {resource.limit} {t("used")}
             </p>
           </div>
         ))}
@@ -148,14 +150,14 @@ export function TrialUsageDashboard() {
       {hasHighUsage && (
         <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
           <p className="text-sm text-orange-900 dark:text-orange-100 mb-4">
-            You are approaching your trial limits. Upgrade now to continue
-            learning without interruptions.
+            {t("youAreApproachingYourTrialLimitsUpgradeNowToContin")}
+            {t("learningWithoutInterruptions")}
           </p>
           <Link
             href="/invite-request"
             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            Richiedi invito per continuare →
+            {t("richiediInvitoPerContinuare")}
           </Link>
         </div>
       )}
@@ -163,15 +165,15 @@ export function TrialUsageDashboard() {
       {/* Info Section */}
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
         <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          Trial Limits
+          {t("trialLimits.title")}
         </h3>
         <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-          <li>• {data.chat.limit} chat sessions per month</li>
-          <li>• {data.docs.limit} document per month</li>
+          <li>• {data.chat.limit} {t("chatSessionsPerMonth")}</li>
+          <li>• {data.docs.limit} {t("documentPerMonth")}</li>
           <li>
-            • {Math.floor(data.voice.limit / 60)} minutes of voice per month
+            • {Math.floor(data.voice.limit / 60)} {t("minutesOfVoicePerMonth")}
           </li>
-          <li>• {data.tools.limit} total tool uses per month</li>
+          <li>• {data.tools.limit} {t("totalToolUsesPerMonth")}</li>
         </ul>
       </div>
     </div>

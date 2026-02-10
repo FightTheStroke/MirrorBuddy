@@ -17,6 +17,7 @@ import {
 import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { ExportDropdown } from "@/components/admin/export-dropdown";
 import type { EmailCampaign } from "@/lib/email/campaign-service";
+import { useTranslations } from "next-intl";
 
 interface Recipient {
   id: string;
@@ -47,6 +48,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
+  const t = useTranslations("admin");
   const [search, setSearch] = useState("");
 
   const filteredRecipients = recipients.filter((r) =>
@@ -106,7 +108,7 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
         <Button asChild variant="ghost" size="sm">
           <Link href="/admin/communications/campaigns">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Campaigns
+            {t("backToCampaigns")}
           </Link>
         </Button>
       </div>
@@ -117,7 +119,7 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
         <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Status
+              {t("status1")}
             </dt>
             <dd className="mt-1">
               <span
@@ -138,7 +140,7 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
 
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Template
+              {t("template")}
             </dt>
             <dd className="mt-1 text-sm">
               {campaign.template?.name || campaign.templateId}
@@ -147,35 +149,35 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
 
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Created
+              {t("created")}
             </dt>
             <dd className="mt-1 text-sm">{formatDate(campaign.createdAt)}</dd>
           </div>
 
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Sent
+              {t("sent1")}
             </dt>
-            <dd className="mt-1 text-sm">{campaign.sentCount} recipients</dd>
+            <dd className="mt-1 text-sm">{campaign.sentCount} {t("recipients2")}</dd>
           </div>
 
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Failed
+              {t("failed")}
             </dt>
-            <dd className="mt-1 text-sm">{campaign.failedCount} recipients</dd>
+            <dd className="mt-1 text-sm">{campaign.failedCount} {t("recipients1")}</dd>
           </div>
 
           <div>
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Open Rate
+              {t("openRate")}
             </dt>
             <dd className="mt-1 text-sm">{openRate}%</dd>
           </div>
 
           <div className="sm:col-span-2 lg:col-span-3">
             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Filters
+              {t("filters")}
             </dt>
             <dd className="mt-1 text-sm">{formatFilters(campaign.filters)}</dd>
           </div>
@@ -184,18 +186,18 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
 
       <div>
         <h2 className="text-xl font-semibold mb-4">
-          Recipients ({recipients.length})
+          {t("recipients")}{recipients.length})
         </h2>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
           <div className="flex-1">
             <Input
               type="text"
-              placeholder="Search by email..."
+              placeholder={t("searchByEmail")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full"
-              aria-label="Search recipients"
+              aria-label={t("searchRecipients")}
             />
           </div>
           <ExportDropdown
@@ -215,13 +217,13 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead className="hidden md:table-cell">Status</TableHead>
-                <TableHead className="hidden lg:table-cell">Sent</TableHead>
+                <TableHead>{t("email")}</TableHead>
+                <TableHead className="hidden md:table-cell">{t("status")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t("sent")}</TableHead>
                 <TableHead className="hidden lg:table-cell">
-                  Delivered
+                  {t("delivered")}
                 </TableHead>
-                <TableHead className="hidden xl:table-cell">Opened</TableHead>
+                <TableHead className="hidden xl:table-cell">{t("opened")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -256,7 +258,7 @@ export function CampaignDetail({ campaign, recipients }: CampaignDetailProps) {
 
         {filteredRecipients.length === 0 && (
           <TableEmpty>
-            No recipients found. {search && "Try adjusting your search."}
+            {t("noRecipientsFound")} {search && "Try adjusting your search."}
           </TableEmpty>
         )}
       </div>

@@ -66,7 +66,7 @@ export function ToolHeader({
         <button
           onClick={onToggleFullscreen}
           className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
-          aria-label={isFullscreen ? 'Esci da fullscreen' : 'Fullscreen'}
+          aria-label={isFullscreen ? t("esciDaFullscreen") : t("fullscreen")}
         >
           {isFullscreen ? (
             <Minimize2 className="w-5 h-5 text-slate-400" />

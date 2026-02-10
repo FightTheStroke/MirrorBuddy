@@ -15,6 +15,7 @@ import {
   LimitOverrides,
   FeatureOverrides,
 } from "./user-limit-override-types";
+import { useTranslations } from "next-intl";
 
 export function UserLimitOverrideModal({
   isOpen,
@@ -22,6 +23,7 @@ export function UserLimitOverrideModal({
   onSuccess,
   user,
 }: UserLimitOverrideModalProps) {
+  const t = useTranslations("admin");
   const [limitOverrides, setLimitOverrides] = useState<LimitOverrides>({});
   const [featureOverrides, setFeatureOverrides] = useState<FeatureOverrides>(
     {},
@@ -153,7 +155,7 @@ export function UserLimitOverrideModal({
         className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-2xl w-full shadow-xl my-8"
       >
         <ModalHeader
-          title="Override User Limits"
+          title={t("overrideUserLimits")}
           onClose={handleClose}
           disabled={loading}
         />
@@ -190,13 +192,13 @@ export function UserLimitOverrideModal({
                 htmlFor="override-notes"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
               >
-                Notes (optional)
+                {t("notesOptional")}
               </label>
               <textarea
                 id="override-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Reason for override..."
+                placeholder={t("reasonForOverride")}
                 rows={3}
                 className="w-full px-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
               />

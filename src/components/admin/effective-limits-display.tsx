@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 interface TierInfo {
   id: string;
   code: string;
@@ -39,6 +42,7 @@ export function EffectiveLimitsDisplay({
   tier,
   limitOverrides,
 }: EffectiveLimitsDisplayProps) {
+  const t = useTranslations("admin");
   const effectiveLimits = {
     chatLimitDaily: getEffectiveLimit(
       limitOverrides.chatLimitDaily,
@@ -64,23 +68,23 @@ export function EffectiveLimitsDisplay({
         {/* Tier Defaults Column */}
         <div>
           <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-3">
-            Tier Defaults
+            {t("tierDefaults")}
           </h4>
           <div className="space-y-2 text-sm">
             <p className="text-slate-600 dark:text-slate-400">
-              <span className="font-medium">Chat:</span>{" "}
+              <span className="font-medium">{t("chat1")}</span>{" "}
               {tier?.chatLimitDaily || "—"}
             </p>
             <p className="text-slate-600 dark:text-slate-400">
-              <span className="font-medium">Voice:</span>{" "}
-              {tier?.voiceMinutesDaily || "—"} min
+              <span className="font-medium">{t("voice1")}</span>{" "}
+              {tier?.voiceMinutesDaily || "—"} {t("min1")}
             </p>
             <p className="text-slate-600 dark:text-slate-400">
-              <span className="font-medium">Tools:</span>{" "}
+              <span className="font-medium">{t("tools1")}</span>{" "}
               {tier?.toolsLimitDaily || "—"}
             </p>
             <p className="text-slate-600 dark:text-slate-400">
-              <span className="font-medium">Docs:</span>{" "}
+              <span className="font-medium">{t("docs1")}</span>{" "}
               {tier?.docsLimitTotal || "—"}
             </p>
           </div>
@@ -89,12 +93,12 @@ export function EffectiveLimitsDisplay({
         {/* Effective Limits Column */}
         <div>
           <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-3">
-            Effective Limits
+            {t("effectiveLimits")}
           </h4>
           <div className="space-y-2 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium">Chat:</span>{" "}
+                <span className="font-medium">{t("chat")}</span>{" "}
                 {effectiveLimits.chatLimitDaily || "—"}
               </span>
               {isOverridden(
@@ -105,14 +109,14 @@ export function EffectiveLimitsDisplay({
                   data-testid="override-badge"
                   className="override-badge-styling inline-block px-2 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full"
                 >
-                  Override
+                  {t("override3")}
                 </span>
               )}
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium">Voice:</span>{" "}
-                {effectiveLimits.voiceMinutesDaily || "—"} min
+                <span className="font-medium">{t("voice")}</span>{" "}
+                {effectiveLimits.voiceMinutesDaily || "—"} {t("min")}
               </span>
               {isOverridden(
                 limitOverrides.voiceMinutesDaily,
@@ -122,13 +126,13 @@ export function EffectiveLimitsDisplay({
                   data-testid="override-badge"
                   className="override-badge-styling inline-block px-2 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full"
                 >
-                  Override
+                  {t("override2")}
                 </span>
               )}
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium">Tools:</span>{" "}
+                <span className="font-medium">{t("tools")}</span>{" "}
                 {effectiveLimits.toolsLimitDaily || "—"}
               </span>
               {isOverridden(
@@ -139,13 +143,13 @@ export function EffectiveLimitsDisplay({
                   data-testid="override-badge"
                   className="override-badge-styling inline-block px-2 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full"
                 >
-                  Override
+                  {t("override1")}
                 </span>
               )}
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-600 dark:text-slate-400">
-                <span className="font-medium">Docs:</span>{" "}
+                <span className="font-medium">{t("docs")}</span>{" "}
                 {effectiveLimits.docsLimitTotal || "—"}
               </span>
               {isOverridden(
@@ -156,7 +160,7 @@ export function EffectiveLimitsDisplay({
                   data-testid="override-badge"
                   className="override-badge-styling inline-block px-2 py-1 text-xs font-semibold text-white bg-amber-500 rounded-full"
                 >
-                  Override
+                  {t("override")}
                 </span>
               )}
             </div>

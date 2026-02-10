@@ -17,6 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslations } from "next-intl";
 
 interface CollaboratorAvatarsProps {
   participants: RoomParticipant[];
@@ -34,6 +35,7 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
   maxVisible = 5,
   onInvite,
 }: CollaboratorAvatarsProps) {
+  const t = useTranslations("common");
   const visibleParticipants = participants.slice(0, maxVisible);
   const hiddenCount = Math.max(0, participants.length - maxVisible);
 
@@ -78,7 +80,7 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
               <button
                 onClick={onInvite}
                 className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-slate-300 text-slate-400 transition-colors hover:border-blue-400 hover:text-blue-500 dark:border-slate-600 dark:hover:border-blue-500"
-                aria-label="Invita collaboratori"
+                aria-label={t("invitaCollaboratori1")}
               >
                 <svg
                   className="h-4 w-4"
@@ -95,7 +97,7 @@ export const CollaboratorAvatars = memo(function CollaboratorAvatars({
                 </svg>
               </button>
             </TooltipTrigger>
-            <TooltipContent>Invita collaboratori</TooltipContent>
+            <TooltipContent>{t("invitaCollaboratori")}</TooltipContent>
           </Tooltip>
         )}
       </div>
@@ -114,6 +116,7 @@ const CollaboratorAvatar = memo(function CollaboratorAvatar({
   isEditing,
   index,
 }: CollaboratorAvatarProps) {
+  const t = useTranslations("common");
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -171,7 +174,7 @@ const CollaboratorAvatar = memo(function CollaboratorAvatar({
         <div className="text-center">
           <p className="font-medium">{participant.name}</p>
           {isEditing && (
-            <p className="text-xs text-slate-400">Sta modificando...</p>
+            <p className="text-xs text-slate-400">{t("staModificando")}</p>
           )}
         </div>
       </TooltipContent>

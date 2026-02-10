@@ -34,7 +34,23 @@
           "sectorPlaceholder": "[TRANSLATE] Seleziona un settore",
           "employeeCountPlaceholder": "[TRANSLATE] Seleziona una fascia",
           "submitButton": "[TRANSLATE] Invia Richiesta Enterprise"
-        }
+        },
+        "tornaAllaHome": "Torna alla Home",
+        "nome": "Nome *",
+        "ilTuoNomeCompleto": "Il tuo nome completo",
+        "email": "Email *",
+        "ruolo": "Ruolo *",
+        "esDirectorManagerCto": "es. Director, Manager, CTO",
+        "nomeAzienda": "Nome Azienda *",
+        "nomeDellaVostraAzienda": "Nome della vostra azienda",
+        "settore": "Settore *",
+        "selezionaUnSettore": "Seleziona un settore",
+        "nDipendenti": "N° Dipendenti *",
+        "selezionaUnaFascia": "Seleziona una fascia",
+        "temiDiInteresse": "Temi di interesse *",
+        "messaggio": "Messaggio",
+        "condividiITuoiRequisitiSpecifici": "Condividi i tuoi requisiti specifici...",
+        "inviaRichiestaEnterprise": "Invia Richiesta Enterprise"
       },
       "form": {
         "emailInvalid": "El correo electrónico no es válido",
@@ -95,7 +111,11 @@
         "submitButtonDefault": "Enviar solicitud",
         "submitButtonLoading": "Enviando...",
         "successMessage": "Su solicitud ha sido enviada con éxito. Le contactaremos pronto.",
-        "successTitle": "Solicitud enviada"
+        "successTitle": "Solicitud enviada",
+        "nome1": "Nome *",
+        "nome": "Nome",
+        "email1": "Email *",
+        "email": "Email"
       },
       "schools": {
         "title": "Contacto Escuelas - MirrorBuddy",
@@ -108,7 +128,9 @@
       "layout": {
         "title": "Contáctenos - MirrorBuddy",
         "description": "Contacte al equipo de MirrorBuddy"
-      }
+      },
+      "navigazionePagina": "Navigazione pagina",
+      "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy"
     },
     "page": {
       "subtitle": "Documentación legal, privacidad, cookies, accesibilidad y transparencia de IA",
@@ -191,7 +213,12 @@
         "authorityLabel": "Autoridad de supervisión",
         "responseTime": "Tiempo de respuesta",
         "responseTimeValue": "5 días laborables"
-      }
+      },
+      "tab": "Tab",
+      "enter": "Enter",
+      "esc": "Esc",
+      "space": "Space",
+      "wcag21LevelAa": "• WCAG 2.1 Level AA"
     },
     "aiTransparency": {
       "contact": {
@@ -475,8 +502,13 @@
           "formValue": "Valor Formulario",
           "intro": "Introducción",
           "title": "Título"
-        }
-      }
+        },
+        "importante": "Importante:",
+        "mirrorbuddyUtilizza": "MirrorBuddy utilizza Azure OpenAI (GPT-4),",
+        "azureOpenaiGpt4": "Azure Openai Gpt4"
+      },
+      "navigazionePagina": "Navigazione pagina",
+      "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy"
     },
     "privacyTitle": "Política de Privacidad",
     "termsTitle": "Términos de Servicio",
@@ -800,7 +832,18 @@
           "point2": "Punto2",
           "point3": "Punto3",
           "point4": "Punto4"
-        }
+        },
+        "notaTecnica": "Nota tecnica:",
+        "privacyPolicy": "Privacy Policy",
+        "chrome": "Chrome -",
+        "firefox": "Firefox -",
+        "safari": "Safari -",
+        "edge": "Edge -",
+        "supabase": "Supabase -",
+        "azureOpenai": "Azure OpenAI -",
+        "resend": "Resend -",
+        "upstash": "Upstash -",
+        "sentry": "Sentry -"
       },
       "privacy": {
         "page": {
@@ -818,8 +861,20 @@
             "noDataSale": "Nunca vendemos sus datos a terceros",
             "deleteAnytime": "Puede eliminar su cuenta y sus datos en cualquier momento",
             "europeanData": "Sus datos están protegidos por las leyes europeas de privacidad (GDPR)",
-            "optionalAnalytics": "Los análisis opcionales nos ayudan a comprender cómo usa la aplicación, pero puede rechazarlos"
-          }
+            "optionalAnalytics": "Los análisis opcionales nos ayudan a comprender cómo usa la aplicación, pero puede rechazarlos",
+            "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
+            "lastUpdated": "24 Gennaio 2026",
+            "pageNavigation": "Page Navigation",
+            "backToHome": "Back To Home",
+            "title": "Title",
+            "version": "Version",
+            "k24Gennaio2026": "K24 Gennaio2026",
+            "tldrHeading": "Tldr Heading",
+            "questionText": "Question Text",
+            "questionAriaLabel": "Question Aria Label"
+          },
+          "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
+          "k24Gennaio2026": "24 Gennaio 2026"
         },
         "section1": {
           "title": "Quiénes somos y cómo funciona esta política",
@@ -946,7 +1001,13 @@
             "conversations": "Conversaciones",
             "webVitals": "Métricas Web",
             "deletedAccount": "Cuenta eliminada"
-          }
+          },
+          "accountAttivo": "Account attivo",
+          "accountCancellato": "Account cancellato",
+          "conversazioni": "Conversazioni",
+          "resend": "Resend",
+          "supabase": "Supabase",
+          "webVitals": "Web Vitals"
         },
         "section10": {
           "title": "Sus derechos de privacidad",
@@ -1011,7 +1072,8 @@
             "euServers": "Los datos permanecen en servidores europeos",
             "improvement": "Ayuda a mejorar la fiabilidad global"
           },
-          "noTracking": "MirrorBuddy no utiliza seguimiento publicitario ni perfilado comercial."
+          "noTracking": "MirrorBuddy no utiliza seguimiento publicitario ni perfilado comercial.",
+          "sentryTitle": "Sentry (Monitoraggio Errori e Performance):"
         },
         "section12": {
           "title": "Google Drive e integraciones",
@@ -1091,7 +1153,9 @@
             }
           },
           "closing": "Apreciamos su confianza en la protección de su privacidad y estamos a su disposición para cualquier pregunta.",
-          "contactEmailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
+          "contactEmailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per domande sulla Privacy Policy",
+          "vercelAnalytics": "Vercel Analytics",
+          "sentryTitle": "Sentry (Monitoraggio Errori e Performance):"
         },
         "section16": {
           "title": "16. Sistemas de inteligencia artificial y derechos del usuario",
@@ -1147,7 +1211,10 @@
             "retention": "Conservamos los registros de decisiones de IA durante 90 días para revisión y mejora, luego los eliminamos"
           },
           "learnMoreHeading": "¿Quiere saber más?",
-          "learnMoreText": "para información completa sobre nuestra arquitectura de IA, pruebas de sesgo y cómo usamos los datos conversacionales."
+          "learnMoreText": "para información completa sobre nuestra arquitectura de IA, pruebas de sesgo y cómo usamos los datos conversacionales.",
+          "aiPolicyCompleta": "AI Policy completa",
+          "leggiLaNostra": "Leggi la nostra",
+          "nonElaboriamoConAi": "Non elaboriamo con AI"
         },
         "vendorsAndProcessors": {
           "title": "Proveedores de Servicios de IA y Encargados del Tratamiento",
@@ -1448,7 +1515,16 @@
         "nextReview": "27 de abril de 2026",
         "triggerEvents": "[\"Actualización significativa a un modelo base de Azure OpenAI\",\"Descubrimiento de sesgo relevante en las pruebas\",\"Reporte de incidente de seguridad\",\"Cambio en la normativa (EU AI Act, GDPR, Legge 132/2025)\",\"Comentarios de al menos 50 usuarios sobre precisión o sesgo\"]",
         "contact": "Para preguntas sobre esta ficha del modelo, contactar: roberdan@fightthestroke.org"
-      }
+      },
+      "website": "Website:",
+      "contextWindow": "Context Window:",
+      "latency": "Latency:",
+      "knowledgeCutoff": "Knowledge Cutoff:",
+      "reviewFrequency": "Review Frequency:",
+      "nextReview": "Next Review:",
+      "triggerEvents": "Trigger Events:",
+      "contact": "Contact:",
+      "compliance": "Compliance"
     },
     "pageTitle": "Cumplimiento y Documentación Legal",
     "pageDescription": "MirrorBuddy cumple con GDPR, la Ley de IA de la UE, la Ley 132/2025, COPPA y WCAG 2.1 AA. Aquí encontrará toda la documentación.",
@@ -1463,6 +1539,12 @@
       "fullLabel": "Respuesta IA",
       "ariaLabel": "Respuesta generada por inteligencia artificial",
       "tooltip": "Esta respuesta es generada por inteligencia artificial. Siempre verifica la información importante."
-    }
+    },
+    "nonElaboriamoConAi": "Non elaboriamo con AI:",
+    "leggiLaNostra": "Leggi la nostra",
+    "aiPolicyCompleta": "AI Policy completa",
+    "vercelAnalytics": "Vercel Analytics:",
+    "supabase": "Supabase:",
+    "resend": "Resend:"
   }
 }

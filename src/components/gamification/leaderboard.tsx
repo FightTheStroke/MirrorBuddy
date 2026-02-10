@@ -208,6 +208,7 @@ const LeaderboardRow = memo(function LeaderboardRow({
   rank,
   isCurrentPeriod,
 }: LeaderboardRowProps) {
+  const t = useTranslations('education.gamification.leaderboard');
   return (
     <div
       className={`flex items-center gap-2 sm:gap-3 rounded-lg border p-2 sm:p-3 transition-all ${
@@ -221,9 +222,9 @@ const LeaderboardRow = memo(function LeaderboardRow({
       <div className="flex-1 min-w-0">
         <p className="text-xs sm:text-sm font-medium truncate">{entry.label}</p>
         <div className="flex items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
-          <span>Lv.{entry.level}</span>
+          <span>{t("lv")}{entry.level}</span>
           <span className="hidden xs:inline">•</span>
-          <span className="hidden xs:inline">{entry.studyMinutes} min</span>
+          <span className="hidden xs:inline">{entry.studyMinutes} {t("min")}</span>
         </div>
       </div>
 

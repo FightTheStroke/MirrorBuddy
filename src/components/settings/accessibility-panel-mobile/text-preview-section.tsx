@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { useTranslations } from "next-intl";
 
 interface TextPreviewSectionProps {
   fontSizeMultiplier: number;
@@ -10,6 +11,7 @@ interface TextPreviewSectionProps {
 export function TextPreviewSection({
   fontSizeMultiplier,
 }: TextPreviewSectionProps) {
+  const t = useTranslations("settings");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -26,7 +28,7 @@ export function TextPreviewSection({
           fontSize: `${16 * fontSizeMultiplier}px`,
         }}
       >
-        Anteprima dimensione testo
+        {t("anteprimaDimensioneTesto")}
       </h3>
 
       <div
@@ -51,7 +53,7 @@ export function TextPreviewSection({
             lineHeight: settings.largeText ? 1.8 : 1.5,
           }}
         >
-          Abc 123 αβγ ÄÖÜ
+          {t("abc123")}
         </span>
       </div>
     </div>

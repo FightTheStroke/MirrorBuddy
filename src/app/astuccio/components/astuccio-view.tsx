@@ -166,7 +166,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
-      <PageHeader icon={PencilRuler} title="Astuccio" />
+      <PageHeader icon={PencilRuler} title={t("astuccio")} />
 
       <motion.div
         variants={containerVariants}

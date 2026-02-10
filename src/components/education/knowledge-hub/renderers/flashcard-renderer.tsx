@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
+import { useTranslations } from "next-intl";
 
 interface Flashcard {
   id: string;
@@ -34,6 +35,7 @@ interface FlashcardData {
  * Render flashcards for review in Knowledge Hub.
  */
 export function FlashcardRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education");
   const flashcardData = data as unknown as FlashcardData;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -44,7 +46,7 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
   if (cards.length === 0) {
     return (
       <div className={cn("p-4 text-center text-slate-500", className)}>
-        Nessuna flashcard disponibile
+        {t("nessunaFlashcardDisponibile")}
       </div>
     );
   }
@@ -123,7 +125,7 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
         <button
           onClick={handlePrev}
           className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-          aria-label="Carta precedente"
+          aria-label={t("cartaPrecedente")}
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -131,7 +133,7 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
         <button
           onClick={() => setIsFlipped(!isFlipped)}
           className="p-2 rounded-lg bg-accent-themed/10 hover:bg-accent-themed/20 text-accent-themed"
-          aria-label="Gira carta"
+          aria-label={t("giraCarta")}
         >
           <RotateCcw className="w-5 h-5" />
         </button>
@@ -139,7 +141,7 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
         <button
           onClick={handleNext}
           className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600"
-          aria-label="Carta successiva"
+          aria-label={t("cartaSuccessiva")}
         >
           <ChevronRight className="w-5 h-5" />
         </button>

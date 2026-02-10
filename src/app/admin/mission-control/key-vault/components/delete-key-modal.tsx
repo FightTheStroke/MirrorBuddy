@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Delete Key Modal Component
  * Confirmation dialog for removing secrets
@@ -16,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
+import { useTranslations } from "next-intl";
 
 interface DeleteKeyModalProps {
   secret: MaskedSecretVaultEntry;
@@ -30,6 +33,7 @@ export function DeleteKeyModal({
   onClose,
   onSuccess,
 }: DeleteKeyModalProps) {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,10 +63,10 @@ export function DeleteKeyModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete API Key</DialogTitle>
+          <DialogTitle>{t("deleteApiKey")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this secret? This action cannot be
-            undone.
+            {t("areYouSureYouWantToDeleteThisSecretThisActionCanno")}
+            {t("undone")}
           </DialogDescription>
         </DialogHeader>
 
@@ -75,8 +79,8 @@ export function DeleteKeyModal({
           )}
 
           <div className="rounded-lg bg-muted p-4">
-            <p className="text-sm font-medium">Service: {secret.service}</p>
-            <p className="text-sm font-medium">Key: {secret.keyName}</p>
+            <p className="text-sm font-medium">{t("service")} {secret.service}</p>
+            <p className="text-sm font-medium">{t("key")} {secret.keyName}</p>
           </div>
         </div>
 
@@ -87,7 +91,7 @@ export function DeleteKeyModal({
             onClick={onClose}
             disabled={loading}
           >
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             type="button"
@@ -96,7 +100,7 @@ export function DeleteKeyModal({
             disabled={loading}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete Secret
+            {t("deleteSecret")}
           </Button>
         </DialogFooter>
       </DialogContent>

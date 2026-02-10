@@ -210,7 +210,7 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
   if (error) {
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Modelli AI</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("modelliAi")}</h2>
         <div className="text-red-500">{error}</div>
       </div>
     );
@@ -250,7 +250,7 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
       {/* Tool Features */}
       <div>
         <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">
-          Strumenti
+          {t("strumenti")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {toolFeatures.map((f) => renderFeatureSelect(f))}

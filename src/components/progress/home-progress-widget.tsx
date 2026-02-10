@@ -6,8 +6,10 @@ import { Trophy, Flame, Clock, BookOpen, Star } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
+import { useTranslations } from "next-intl";
 
 export function HomeProgressWidget() {
+  const t = useTranslations("education");
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked, currentSession } = useProgressStore();
   const [liveMinutes, setLiveMinutes] = useState(0);
 
@@ -53,7 +55,7 @@ export function HomeProgressWidget() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-2 text-sm">
-              <span className="font-bold text-slate-900 dark:text-white">Lv.{level}</span>
+              <span className="font-bold text-slate-900 dark:text-white">{t("lv")}{level}</span>
               <span className="text-xs text-slate-500">{xpInLevel}/{xpNeeded} XP</span>
             </div>
             <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-1">
@@ -72,14 +74,14 @@ export function HomeProgressWidget() {
 
         {/* Quick Stats */}
         <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1.5" title="Streak">
+          <div className="flex items-center gap-1.5" title={t("streak")}>
             <Flame className={cn("w-4 h-4", streak.current > 0 ? "text-orange-500" : "text-slate-400")} />
             <span className={cn("font-semibold", streak.current > 0 ? "text-orange-500" : "text-slate-500")}>
               {streak.current}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5" title="Sessioni questa settimana">
+          <div className="flex items-center gap-1.5" title={t("sessioniQuestaSettimana")}>
             <BookOpen className="w-4 h-4 text-blue-500" />
             <span className="font-semibold text-slate-700 dark:text-slate-300">{sessionsThisWeek}</span>
           </div>
@@ -90,11 +92,11 @@ export function HomeProgressWidget() {
               {studyTimeStr}
             </span>
             {isSessionActive && (
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Sessione attiva" />
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title={t("sessioneAttiva")} />
             )}
           </div>
 
-          <div className="flex items-center gap-1.5" title="Domande fatte">
+          <div className="flex items-center gap-1.5" title={t("domandeFatte")}>
             <Star className="w-4 h-4 text-purple-500" />
             <span className="font-semibold text-slate-700 dark:text-slate-300">{questionsAsked}</span>
           </div>
@@ -104,7 +106,7 @@ export function HomeProgressWidget() {
         {streak.current >= 3 && (
           <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
             <Flame className="w-3 h-3" />
-            +{Math.min(streak.current * 10, 50)}% XP
+            +{Math.min(streak.current * 10, 50)}{t("xp")}
           </div>
         )}
       </div>

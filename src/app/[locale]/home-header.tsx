@@ -83,7 +83,7 @@ export function HomeHeader({
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 text-sm">
             <span className="font-bold text-slate-900 dark:text-white">
-              Lv.{seasonLevel}
+              {t("lv")}{seasonLevel}
             </span>
             <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
               {seasonName}

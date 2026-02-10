@@ -66,7 +66,7 @@ export function WebcamHeader({
             onClick={onToggleMenu}
             className="border-slate-600 bg-slate-800 text-white hover:bg-slate-700 text-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             disabled={isSwitchingCamera}
-            aria-label="Select camera"
+            aria-label={t("selectCamera")}
           >
             {isSwitchingCamera ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -106,7 +106,7 @@ export function WebcamHeader({
                     <span className="truncate flex-1">{camera.label}</span>
                     {camera.isContinuity && (
                       <span className="text-xs bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">
-                        Continuity
+                        {t("continuity")}
                       </span>
                     )}
                   </button>
@@ -122,7 +122,7 @@ export function WebcamHeader({
         size="icon"
         onClick={onClose}
         className="text-white hover:bg-slate-800 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-        aria-label="Close camera"
+        aria-label={t("closeCamera")}
       >
         <X className="w-5 h-5" />
       </Button>

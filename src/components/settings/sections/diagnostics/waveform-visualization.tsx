@@ -151,13 +151,13 @@ export function WaveformVisualization({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mic className="w-5 h-5 text-red-500" />
-          Test Microfono Live (Waveform)
+          {t("testMicrofonoLiveWaveform")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-slate-600 dark:text-slate-400">
-          Avvia il test per vedere la waveform del microfono in tempo reale.
-          Parla per vedere la forma d&apos;onda.
+          {t("avviaIlTestPerVedereLaWaveformDelMicrofonoInTempoR")}
+          {t("parlaPerVedereLaFormaDAposOnda")}
         </p>
 
         <div className="flex items-center gap-3">
@@ -165,7 +165,7 @@ export function WaveformVisualization({
             htmlFor="waveform-microphone"
             className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap"
           >
-            Microfono:
+            {t("microfono")}
           </label>
           <select
             id="waveform-microphone"
@@ -189,7 +189,7 @@ export function WaveformVisualization({
             variant="outline"
             size="sm"
             disabled={waveformActive}
-            title="Aggiorna lista microfoni"
+            title={t("aggiornaListaMicrofoni")}
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -214,7 +214,7 @@ export function WaveformVisualization({
 
         {waveformActive && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-slate-500">Livello:</span>
+            <span className="text-sm text-slate-500">{t("livello")}</span>
             <div className="flex-1 h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 transition-all duration-75"
@@ -235,7 +235,7 @@ export function WaveformVisualization({
               variant="default"
             >
               <Mic className="w-4 h-4 mr-2" />
-              Avvia Waveform
+              {t("avviaWaveform")}
             </Button>
           ) : (
             <Button
@@ -244,7 +244,7 @@ export function WaveformVisualization({
               variant="destructive"
             >
               <XCircle className="w-4 h-4 mr-2" />
-              Stop Waveform
+              {t("stopWaveform")}
             </Button>
           )}
         </div>

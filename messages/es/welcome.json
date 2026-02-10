@@ -29,7 +29,8 @@
       "welcome": "Bienvenido a",
       "learn": "Aprende",
       "withTeachers": "con los Grandes Profesores",
-      "anyAbility": "sean cuales sean tus habilidades"
+      "anyAbility": "sean cuales sean tus habilidades",
+      "mirrorbuddyLogo": "MirrorBuddy Logo"
     },
     "quickStart": {
       "heading": "Comienza tu camino",
@@ -135,7 +136,8 @@
         "students": "Estudiantes",
         "organizations": "Escuelas & Empresas",
         "individuals": "Estudiantes & Familias",
-        "ariaLabel": "Alternar entre estudiantes y organizaciones"
+        "ariaLabel": "Alternar entre estudiantes y organizaciones",
+        "switchTo": "Passa a {label}"
       },
       "footerNote": "Términos y condiciones aplicables"
     },
@@ -309,7 +311,9 @@
         "label": "Open Source"
       },
       "ariaLabel": "Pie de página con información legal y consentimiento de cookies",
-      "legalLinksAriaLabel": "Enlaces legales"
+      "legalLinksAriaLabel": "Enlaces legales",
+      "madeWith": "Made with ♥ in Europe",
+      "inEurope": "In Europe"
     },
     "principles": {
       "howItWorks": "¿Cómo funciona?",
@@ -428,7 +432,8 @@
         "cerebralPalsy": "Parálisis cerebral",
         "visualImpairment": "Discapacidad visual",
         "auditoryProcessing": "Discapacidad auditiva"
-      }
+      },
+      "melissaCoach": "Melissa - Coach"
     },
     "onboarding": {
       "transcript": {
@@ -624,6 +629,21 @@
       "checking": "Verificando...",
       "fallbackTooltip": "Voz sintética del navegador (Azure no disponible)",
       "azureTooltip": "Voz Azure Realtime de alta calidad"
-    }
+    },
+    "selectLanguage": "Select language",
+    "loadingProfessors": "Loading professors...",
+    "loadingAccessibilityProfiles": "Loading accessibility profiles...",
+    "loadingSupport": "Loading support...",
+    "loadingFeatures": "Loading features...",
+    "loadingCompliance": "Loading compliance...",
+    "ariaLabelFooterConInformazioniLegaliEConsensoCooki": "Footer con informazioni legali e consenso cookie",
+    "creatoConAiLeRispostePossonoContenereErrori": "Creato con AI - le risposte possono contenere errori",
+    "linkLegali": "Link legali",
+    "vediIlCodiceSorgenteSuGithub": "Vedi il codice sorgente su GitHub",
+    "openSource": "Open Source",
+    "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
+    "madeWith": "Made with ♥ in Europe",
+    "inEurope": "In Europe",
+    "switchTo": "Passa a {label}"
   }
 }

@@ -2,6 +2,7 @@
 
 import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from "next-intl";
 
 interface ChatInputProps {
   value: string;
@@ -24,6 +25,7 @@ export function ChatInput({
   onKeyDown,
   inputRef,
 }: ChatInputProps) {
+  const t = useTranslations("settings");
   return (
     <div className="flex-shrink-0 p-4 border-t bg-white dark:bg-slate-900">
       <div className="flex gap-2">
@@ -32,7 +34,7 @@ export function ChatInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Scrivi un messaggio..."
+          placeholder={t("scriviUnMessaggio")}
           className="flex-1 resize-none rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           rows={2}
           disabled={isLoading}
@@ -46,7 +48,7 @@ export function ChatInput({
         </Button>
       </div>
       <p className="text-xs text-slate-500 mt-2 text-center">
-        Le risposte sono generate da AI e potrebbero contenere imprecisioni.
+        {t("leRisposteSonoGenerateDaAiEPotrebberoContenereImpr")}
       </p>
     </div>
   );

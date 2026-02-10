@@ -117,7 +117,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
         <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
         <p className="text-red-800 dark:text-red-200">{error}</p>
         <Button variant="outline" onClick={loadStudyKits} className="mt-4">
-          Riprova
+          {t("riprova")}
         </Button>
       </div>
     );
@@ -195,7 +195,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
 
                   <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
                     <span>{formatDate(kit.createdAt)}</span>
-                    {kit.pageCount && <span>{kit.pageCount} pagine</span>}
+                    {kit.pageCount && <span>{kit.pageCount} {t("pages")}</span>}
                     {kit.status === "ready" && (
                       <span className="text-green-600 dark:text-green-400">
                         {
@@ -203,7 +203,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                             Boolean,
                           ).length
                         }{" "}
-                        materiali
+                        {t("materiali")}
                       </span>
                     )}
                   </div>

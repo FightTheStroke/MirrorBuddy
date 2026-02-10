@@ -7,12 +7,14 @@ import { AdminHeader } from "./admin-header";
 import { AdminBreadcrumbs } from "./admin-breadcrumbs";
 import { CommandPalette } from "./command-palette";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
 }
 
 export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
+  const t = useTranslations("admin");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,7 +42,7 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
       {/* Connection Status Indicators */}
       {status === "reconnecting" && (
         <div className="bg-yellow-50 dark:bg-yellow-950/30 border-b border-yellow-200 dark:border-yellow-900 px-4 py-2 text-sm text-yellow-800 dark:text-yellow-200">
-          Reconnecting to admin data stream...
+          {t("reconnectingToAdminDataStream")}
         </div>
       )}
       {status === "error" && (

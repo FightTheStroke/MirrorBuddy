@@ -43,7 +43,7 @@ export function CrossMaestroMemorySettings() {
           <button
             type="button"
             role="switch"
-            aria-label="Toggle cross-maestro memory"
+            aria-label={t("toggleCrossMaestroMemory")}
             aria-checked={crossMaestroEnabled}
             onClick={handleToggle}
             className={`relative w-11 h-6 rounded-full transition-colors ${

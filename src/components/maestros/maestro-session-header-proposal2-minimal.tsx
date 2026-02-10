@@ -13,6 +13,7 @@ import { Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MaestroSessionHeaderProposal2Props {
   maestro: Maestro;
@@ -31,6 +32,7 @@ export function MaestroSessionHeaderProposal2({
   onVoiceCall,
   onClose: _onClose,
 }: MaestroSessionHeaderProposal2Props) {
+  const t = useTranslations("chat");
   return (
     <div
       className="flex items-start gap-2 sm:gap-4 p-2 sm:p-4 rounded-t-2xl text-white"
@@ -70,7 +72,7 @@ export function MaestroSessionHeaderProposal2({
             {maestro.displayName}
           </h2>
           <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
-            Professore
+            {t("professore")}
           </span>
         </div>
         <p className="text-xs sm:text-sm text-white/80 truncate">

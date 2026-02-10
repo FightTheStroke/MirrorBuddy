@@ -1,4 +1,7 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface PaginationData {
   total: number;
@@ -18,6 +21,7 @@ export function AuditPagination({
   currentPage,
   onPageChange,
 }: AuditPaginationProps) {
+  const t = useTranslations("admin");
   if (pagination.totalPages <= 1) {
     return null;
   }
@@ -31,7 +35,7 @@ export function AuditPagination({
   return (
     <div className="mt-6 flex items-center justify-between">
       <p className="text-sm text-muted-foreground">
-        Showing {startEntry} to {endEntry} of {pagination.total} entries
+        {t("showing")} {startEntry} {t("to")} {endEntry} {t("of")} {pagination.total} {t("entries")}
       </p>
       <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row">
         <Button
@@ -41,7 +45,7 @@ export function AuditPagination({
           disabled={currentPage === 1}
           className="min-h-11 min-w-11"
         >
-          Previous
+          {t("previous")}
         </Button>
         <Button
           variant="outline"
@@ -50,7 +54,7 @@ export function AuditPagination({
           disabled={currentPage === pagination.totalPages}
           className="min-h-11 min-w-11"
         >
-          Next
+          {t("next")}
         </Button>
       </div>
     </div>

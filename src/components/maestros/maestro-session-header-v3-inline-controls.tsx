@@ -25,6 +25,7 @@ import { InlineAudioVisualizer } from "./inline-audio-visualizer";
 import { getVoiceStatusIndicator } from "./maestro-header-utils";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -63,6 +64,7 @@ export function MaestroSessionHeaderV3({
   onClearChat,
   onClose,
 }: MaestroSessionHeaderV3Props) {
+  const t = useTranslations("chat");
   return (
     <>
       {/* Compact header - always minimal */}
@@ -108,7 +110,7 @@ export function MaestroSessionHeaderV3({
               {maestro.displayName}
             </h2>
             <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
-              Professore
+              {t("professore")}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-white/80 truncate">
@@ -174,7 +176,7 @@ export function MaestroSessionHeaderV3({
             size="icon"
             onClick={onClearChat}
             className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-            aria-label="Nuova conversazione"
+            aria-label={t("nuovaConversazione")}
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -184,7 +186,7 @@ export function MaestroSessionHeaderV3({
             size="icon"
             onClick={onClose}
             className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-            aria-label="Chiudi"
+            aria-label={t("chiudi")}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -253,7 +255,7 @@ export function MaestroSessionHeaderV3({
                 ) : (
                   <Mic className="w-3 h-3" />
                 )}
-                <span className="ml-1 hidden sm:inline">Mute</span>
+                <span className="ml-1 hidden sm:inline">{t("mute")}</span>
               </Button>
             )}
 
@@ -264,7 +266,7 @@ export function MaestroSessionHeaderV3({
               className="h-7 px-2 text-xs"
             >
               <PhoneOff className="w-3 h-3" />
-              <span className="ml-1 hidden sm:inline">Termina</span>
+              <span className="ml-1 hidden sm:inline">{t("termina")}</span>
             </Button>
           </div>
         </motion.div>

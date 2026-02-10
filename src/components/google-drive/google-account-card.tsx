@@ -53,7 +53,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Cloud className="w-5 h-5" />
-          Google Drive
+          {t("googleDrive")}
         </CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
@@ -176,7 +176,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
 
             {/* Privacy notice */}
             <div className="text-xs text-muted-foreground bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
-              <strong>Privacy:</strong> {t("privacyNotice")}
+              <strong>{t("privacy")}</strong> {t("privacyNotice")}
             </div>
 
             {/* Connect button */}

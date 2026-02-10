@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useDeviceType } from "@/hooks/use-device-type";
+import { useTranslations } from "next-intl";
 
 /**
  * Math symbols for the virtual keyboard
@@ -72,6 +73,7 @@ export function FormulaInputMobile({
   placeholder = "Enter formula",
   className = "",
 }: FormulaInputMobileProps) {
+  const t = useTranslations("education");
   const [showKeyboard, setShowKeyboard] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { isPhone } = useDeviceType();
@@ -118,19 +120,19 @@ export function FormulaInputMobile({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="w-full px-3 py-2 text-base sm:text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-          aria-label="Formula input"
+          aria-label={t("formulaInput")}
         />
 
         {/* Toggle Math Keyboard Button */}
         <button
           onClick={() => setShowKeyboard(!showKeyboard)}
           className="min-h-[44px] min-w-[44px] px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 sm:self-start"
-          aria-label="Toggle math keyboard"
+          aria-label={t("toggleMathKeyboard")}
           aria-pressed={showKeyboard}
         >
           <span className="text-lg">𝑓(x)</span>
           <span className="text-xs hidden sm:inline">
-            {showKeyboard ? "Hide" : "Show"} Math
+            {showKeyboard ? "Hide" : "Show"} {t("math")}
           </span>
         </button>
       </div>
@@ -146,7 +148,7 @@ export function FormulaInputMobile({
             ${isPhone ? "fixed left-0 right-0 bottom-0 z-40 rounded-t-lg rounded-b-none" : ""}
           `}
           role="toolbar"
-          aria-label="Math symbols keyboard"
+          aria-label={t("mathSymbolsKeyboard")}
         >
           <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8">
             {MATH_SYMBOLS.map((item) => (
@@ -176,9 +178,9 @@ export function FormulaInputMobile({
             <button
               onClick={() => setShowKeyboard(false)}
               className="w-full mt-2 min-h-[44px] px-3 py-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-900 dark:text-white rounded-lg font-medium transition-colors"
-              aria-label="Close math keyboard"
+              aria-label={t("closeMathKeyboard")}
             >
-              Done
+              {t("done")}
             </button>
           )}
         </div>

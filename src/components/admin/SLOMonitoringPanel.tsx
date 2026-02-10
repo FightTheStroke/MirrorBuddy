@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { SLOStatus, Alert, GoNoGoResult } from "@/lib/alerting/types";
+import { useTranslations } from "next-intl";
 
 interface SLOMonitoringPanelProps {
   refreshInterval?: number;
@@ -24,6 +25,7 @@ interface ApiResponse {
 export function SLOMonitoringPanel({
   refreshInterval = 30000,
 }: SLOMonitoringPanelProps) {
+  const t = useTranslations("admin");
   const [sloStatuses, setSLOStatuses] = useState<SLOStatus[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [goNoGoResult, setGoNoGoResult] = useState<GoNoGoResult | null>(null);
@@ -96,7 +98,7 @@ export function SLOMonitoringPanel({
       {/* SLO Status Grid */}
       <Card>
         <CardHeader>
-          <CardTitle>SLO Status</CardTitle>
+          <CardTitle>{t("sloStatus")}</CardTitle>
         </CardHeader>
         <CardContent>
           {error ? (
@@ -121,6 +123,7 @@ interface GoNoGoCardProps {
 }
 
 function GoNoGoCard({ result }: GoNoGoCardProps) {
+  const t = useTranslations("admin");
   const colors = {
     go: "border-green-500 bg-green-50",
     nogo: "border-red-500 bg-red-50",
@@ -141,10 +144,10 @@ function GoNoGoCard({ result }: GoNoGoCardProps) {
       <CardContent>
         <div className="space-y-2">
           <p className="text-sm">
-            {result.passedCount}/{result.checks.length} checks passed
+            {result.passedCount}/{result.checks.length} {t("checksPassed")}
             {result.requiredFailures > 0 && (
               <span className="text-red-600 ml-2">
-                ({result.requiredFailures} required failures)
+                ({result.requiredFailures} {t("requiredFailures")}
               </span>
             )}
           </p>
@@ -177,6 +180,7 @@ interface AlertsCardProps {
 }
 
 function AlertsCard({ alerts, onAcknowledge }: AlertsCardProps) {
+  const t = useTranslations("admin");
   const severityColors = {
     info: "border-blue-300 bg-blue-50",
     warning: "border-yellow-300 bg-yellow-50",
@@ -188,7 +192,7 @@ function AlertsCard({ alerts, onAcknowledge }: AlertsCardProps) {
     <Card className="border-red-200">
       <CardHeader className="pb-2">
         <CardTitle className="text-red-700">
-          Active Alerts ({alerts.length})
+          {t("activeAlerts")}{alerts.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -211,7 +215,7 @@ function AlertsCard({ alerts, onAcknowledge }: AlertsCardProps) {
                     size="sm"
                     onClick={() => onAcknowledge(alert.id)}
                   >
-                    Acknowledge
+                    {t("acknowledge")}
                   </Button>
                 )}
               </div>
@@ -228,6 +232,7 @@ interface SLOCardProps {
 }
 
 function SLOCard({ slo }: SLOCardProps) {
+  const t = useTranslations("admin");
   const statusColors = {
     healthy: "text-green-600",
     warning: "text-yellow-600",
@@ -269,10 +274,10 @@ function SLOCard({ slo }: SLOCardProps) {
 
       <div className="flex justify-between mt-1">
         <span className="text-xs text-muted-foreground">
-          Target: {slo.target}%
+          {t("target")} {slo.target}%
         </span>
         <span className="text-xs text-muted-foreground">
-          Budget: {slo.errorBudgetRemaining.toFixed(2)}%
+          {t("budget")} {slo.errorBudgetRemaining.toFixed(2)}%
         </span>
       </div>
     </div>

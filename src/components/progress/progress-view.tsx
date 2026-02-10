@@ -49,10 +49,12 @@ import { OverviewTab } from './progress-view/components/overview-tab';
 import { AchievementsTab } from './progress-view/components/achievements-tab';
 import { MasteryTab } from './progress-view/components/mastery-tab';
 import { HistoryTab } from './progress-view/components/history-tab';
+import { useTranslations } from "next-intl";
 
 type ProgressTab = 'overview' | 'analytics' | 'achievements' | 'mastery' | 'history';
 
 export function ProgressView() {
+  const t = useTranslations("education");
   const [activeTab, setActiveTab] = useState<ProgressTab>('overview');
   const { 
     xp, level, streak, totalStudyMinutes, masteries, achievements,
@@ -122,7 +124,7 @@ export function ProgressView() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={Trophy} title="Progressi" />
+      <PageHeader icon={Trophy} title={t("progressi")} />
 
       <DashboardLayout>
         <DashboardCard>
@@ -235,27 +237,27 @@ export function ProgressView() {
       </motion.div>
 
       <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-        <h2 className="text-lg font-semibold mb-4">Riepilogo Totali</h2>
+        <h2 className="text-lg font-semibold mb-4">{t("riepilogoTotali")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-slate-500">Tempo totale</p>
+            <p className="text-sm text-slate-500">{t("tempoTotale")}</p>
             <p className="text-2xl font-bold">{Math.round(totalStudyMinutes / 60)}h</p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Sessioni totali</p>
+            <p className="text-sm text-slate-500">{t("sessioniTotali")}</p>
             <p className="text-2xl font-bold">{sessionHistory.length}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Media sessione</p>
+            <p className="text-sm text-slate-500">{t("mediaSessione")}</p>
             <p className="text-2xl font-bold">
               {sessionHistory.length > 0
                 ? Math.round(totalStudyMinutes / sessionHistory.length)
                 : 0}
-              min
+              {t("min")}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Streak massimo</p>
+            <p className="text-sm text-slate-500">{t("streakMassimo")}</p>
             <p className="text-2xl font-bold">{streak.longest}</p>
           </div>
         </div>

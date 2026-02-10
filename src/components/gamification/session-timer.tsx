@@ -6,6 +6,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { useTranslations } from "next-intl";
 
 interface SessionTimerProps {
   onPause?: () => void;
@@ -19,6 +20,7 @@ const INACTIVITY_THRESHOLD = 60000; // 60 seconds
 const WARNING_THRESHOLD = 45000; // 45 seconds
 
 export function SessionTimer({ onPause, onResume, className = '' }: SessionTimerProps) {
+  const t = useTranslations("achievements");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [timerState, setTimerState] = useState<TimerState>('active');
   const lastActivityRef = useRef<number>(0);
@@ -142,14 +144,14 @@ export function SessionTimer({ onPause, onResume, className = '' }: SessionTimer
     <div
       className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 font-mono text-lg transition-all ${stateColors[timerState]} ${className}`}
       role="timer"
-      aria-label={`Session timer: ${formatTime(elapsedSeconds)}, ${timerState}`}
+      aria-label={t("sessionTimerAriaLabel", { time: formatTime(elapsedSeconds), state: timerState })}
     >
       <span className="text-sm" aria-hidden="true">
         {stateIcons[timerState]}
       </span>
       <span className="font-semibold tabular-nums">{formatTime(elapsedSeconds)}</span>
       {timerState === 'paused' && (
-        <span className="text-xs text-muted-foreground ml-2">In pausa</span>
+        <span className="text-xs text-muted-foreground ml-2">{t("inPausa")}</span>
       )}
     </div>
   );

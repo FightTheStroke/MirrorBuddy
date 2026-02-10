@@ -1,6 +1,7 @@
 import { Trophy, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { useTranslations } from "next-intl";
 import type { Milestone } from "../types";
 import { METRIC_COLORS } from "../constants";
 
@@ -9,6 +10,7 @@ interface MilestoneItemProps {
 }
 
 export function MilestoneItem({ milestone }: MilestoneItemProps) {
+  const t = useTranslations("education");
   const { settings } = useAccessibilityStore();
   const isAchieved = !!milestone.achievedAt;
   const colors = METRIC_COLORS[milestone.metricId];
@@ -72,7 +74,7 @@ export function MilestoneItem({ milestone }: MilestoneItemProps) {
       {isAchieved && milestone.achievedAt && (
         <span
           className="text-xs text-slate-500 shrink-0"
-          aria-label={`Achievement date: ${milestone.achievedAt.toLocaleDateString("it-IT")}`}
+          aria-label={t("achievementDate", { date: milestone.achievedAt.toLocaleDateString("it-IT") })}
         >
           {milestone.achievedAt.toLocaleDateString("it-IT")}
         </span>

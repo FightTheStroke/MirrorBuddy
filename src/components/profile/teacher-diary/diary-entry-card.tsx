@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Individual diary entry card component
  */
@@ -22,6 +24,7 @@ import {
 } from "@/lib/profile/parent-suggestions";
 import { CATEGORY_LABELS } from "./constants";
 import type { DiaryEntry } from "./types";
+import { useTranslations } from "next-intl";
 
 interface DiaryEntryCardProps {
   entry: DiaryEntry;
@@ -38,6 +41,7 @@ export function DiaryEntryCard({
   onTalkToMaestro,
   delay = 0,
 }: DiaryEntryCardProps) {
+  const t = useTranslations("settings");
   const maestro = getMaestroById(entry.maestroId);
   const suggestion = getParentSuggestion(entry.category);
   const subjectName =
@@ -134,7 +138,7 @@ export function DiaryEntryCard({
                     {entry.occurrences}x
                   </span>
                   <span className="hidden sm:inline">
-                    Confidenza: {Math.round(entry.confidence * 100)}%
+                    {t("confidenza")} {Math.round(entry.confidence * 100)}%
                   </span>
                   <span className="sm:hidden">
                     {Math.round(entry.confidence * 100)}%
@@ -169,13 +173,13 @@ export function DiaryEntryCard({
                     </div>
                     <div className="flex-1 space-y-3">
                       <h5 className="font-semibold text-slate-800 dark:text-slate-200">
-                        Suggerimenti per i genitori
+                        {t("suggerimentiPerIGenitori")}
                       </h5>
 
                       <div className="space-y-2 text-sm">
                         <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
                           <p className="font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Attivita a casa:
+                            {t("attivitaACasa")}
                           </p>
                           <p className="text-slate-600 dark:text-slate-400">
                             {suggestion.homeActivity}
@@ -184,7 +188,7 @@ export function DiaryEntryCard({
 
                         <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
                           <p className="font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Come comunicare:
+                            {t("comeComunicare")}
                           </p>
                           <p className="text-slate-600 dark:text-slate-400">
                             {suggestion.communicationTip}
@@ -193,7 +197,7 @@ export function DiaryEntryCard({
 
                         <div className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
                           <p className="font-medium text-slate-700 dark:text-slate-300 mb-1">
-                            Ambiente di studio:
+                            {t("ambienteDiStudio")}
                           </p>
                           <p className="text-slate-600 dark:text-slate-400">
                             {suggestion.environmentTip}
@@ -215,12 +219,12 @@ export function DiaryEntryCard({
                             className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                           >
                             <Phone className="w-4 h-4 mr-2" />
-                            Parla con{" "}
+                            {t("parlaCon")}{" "}
                             {maestro?.displayName || entry.maestroName}
                           </Button>
                           <p className="text-xs text-slate-500 mt-2">
-                            Avvia una conversazione diretta con il Professore
-                            per discutere dei progressi.
+                            {t("avviaUnaConversazioneDirettaConIlProfessorePerDisc")}
+
                           </p>
                         </div>
                       )}

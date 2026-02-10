@@ -73,6 +73,7 @@
     "yes": "Sì",
     "parentAccess": {
       "arialabelaccediAllaSezioneGenitori": "aria-label=\"Accedi alla sezione genitori\""
-    }
+    },
+    "products": "Prodotti"
   }
 }

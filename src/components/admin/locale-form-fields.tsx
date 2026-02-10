@@ -97,7 +97,7 @@ export function LocaleFormFields({
             })
           }
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent font-mono"
-          placeholder="it"
+          placeholder={t("it")}
         />
         <p className="text-sm text-slate-500 mt-1">{t("primaryLocaleHelp")}</p>
       </div>
@@ -146,7 +146,7 @@ export function LocaleFormFields({
           value={secondaryLocalesInput}
           onChange={(e) => setSecondaryLocalesInput(e.target.value)}
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent font-mono"
-          placeholder="en, de, fr"
+          placeholder={t("enDeFr")}
         />
         <p className="text-sm text-slate-500 mt-1">
           {t("secondaryLocalesHelp")}

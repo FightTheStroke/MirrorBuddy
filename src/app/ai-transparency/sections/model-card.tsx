@@ -60,7 +60,7 @@ export function ModelCardSections() {
         <p className="mb-3">{t("provider.description")}</p>
         <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
           <p className="mb-2">
-            <strong>Website:</strong>{" "}
+            <strong>{t("website")}</strong>{" "}
             <a
               href={t("provider.website")}
               target="_blank"
@@ -71,7 +71,7 @@ export function ModelCardSections() {
             </a>
           </p>
           <p>
-            <strong>{t("provider.name")} Compliance:</strong>{" "}
+            <strong>{t("provider.name")} {t("compliance")}</strong>{" "}
             {t("provider.euCompliance")}
           </p>
         </div>
@@ -117,7 +117,7 @@ export function ModelCardSections() {
                 <dl className="space-y-2 text-sm">
                   <div>
                     <dt className="font-semibold text-slate-700 dark:text-gray-300">
-                      Context Window:
+                      {t("contextWindow")}
                     </dt>
                     <dd className="text-slate-600 dark:text-gray-400">
                       {contextWindow}
@@ -125,7 +125,7 @@ export function ModelCardSections() {
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-700 dark:text-gray-300">
-                      Latency:
+                      {t("latency")}
                     </dt>
                     <dd className="text-slate-600 dark:text-gray-400">
                       {latency}
@@ -133,7 +133,7 @@ export function ModelCardSections() {
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-700 dark:text-gray-300">
-                      Knowledge Cutoff:
+                      {t("knowledgeCutoff")}
                     </dt>
                     <dd className="text-slate-600 dark:text-gray-400">
                       {knowledgeCutoff}
@@ -141,7 +141,7 @@ export function ModelCardSections() {
                   </div>
                   <div>
                     <dt className="font-semibold text-slate-700 dark:text-gray-300">
-                      Capabilities:
+                      {t("capabilities.title")}
                     </dt>
                     <dd className="text-slate-600 dark:text-gray-400">
                       {capabilities}
@@ -355,14 +355,14 @@ export function ModelCardSections() {
         <p className="mb-4">{t("reviewCycle.description")}</p>
         <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg mb-4">
           <p className="mb-2">
-            <strong>Review Frequency:</strong>{" "}
+            <strong>{t("reviewFrequency")}</strong>{" "}
             {t("reviewCycle.reviewFrequency")}
           </p>
           <p className="mb-4">
-            <strong>Next Review:</strong> {t("reviewCycle.nextReview")}
+            <strong>{t("nextReview")}</strong> {t("reviewCycle.nextReview")}
           </p>
           <div>
-            <strong className="block mb-2">Trigger Events:</strong>
+            <strong className="block mb-2">{t("triggerEvents")}</strong>
             <ul className="space-y-1">
               {[0, 1, 2, 3, 4].map((index) => {
                 const event = t(`reviewCycle.triggerEvents.${index}`);
@@ -377,7 +377,7 @@ export function ModelCardSections() {
           </div>
         </div>
         <p className="text-sm text-slate-600 dark:text-gray-400">
-          <strong>Contact:</strong> {t("reviewCycle.contact")}
+          <strong>{t("contact")}</strong> {t("reviewCycle.contact")}
         </p>
       </Section>
     </>

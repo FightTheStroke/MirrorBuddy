@@ -104,13 +104,13 @@ export function TeacherDiaryFilters({
           {/* Period filter */}
           <Select value={selectedPeriod} onValueChange={onPeriodChange}>
             <SelectTrigger className="w-full h-9">
-              <SelectValue placeholder="Periodo" />
+              <SelectValue placeholder={t("periodo")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tutto</SelectItem>
-              <SelectItem value="week">Ultima settimana</SelectItem>
-              <SelectItem value="month">Ultimo mese</SelectItem>
-              <SelectItem value="3months">Ultimi 3 mesi</SelectItem>
+              <SelectItem value="all">{t("tutto")}</SelectItem>
+              <SelectItem value="week">{t("ultimaSettimana")}</SelectItem>
+              <SelectItem value="month">{t("ultimoMese")}</SelectItem>
+              <SelectItem value="3months">{t("ultimi3Mesi")}</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -11,6 +11,7 @@ import { MessageCircle, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { InlineComment as InlineCommentType } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface InlineCommentProps {
   comment: InlineCommentType;
@@ -25,6 +26,7 @@ export function InlineComment({
   onResolve,
   onDelete,
 }: InlineCommentProps) {
+  const t = useTranslations("tools");
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,7 @@ export function InlineComment({
             <div className="px-3 py-2 bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-600 flex items-center gap-2">
               <MessageCircle className="w-4 h-4 text-slate-500" />
               <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                Feedback del Maestro
+                {t("feedbackDelMaestro")}
               </span>
             </div>
             <div className="px-3 py-3">
@@ -113,7 +115,7 @@ export function InlineComment({
                     className="flex-1 h-7 text-xs"
                   >
                     <Check className="w-3 h-3 mr-1" />
-                    Risolto
+                    {t("risolto")}
                   </Button>
                 )}
                 {onDelete && (
@@ -134,7 +136,7 @@ export function InlineComment({
             {comment.resolved && (
               <div className="px-3 py-2 bg-green-50 dark:bg-green-900/20 border-t border-green-200 dark:border-green-800 flex items-center gap-1.5 text-xs text-green-600">
                 <Check className="w-3 h-3" />
-                Hai affrontato questo punto
+                {t("haiAffrontatoQuestoPunto")}
               </div>
             )}
           </motion.div>

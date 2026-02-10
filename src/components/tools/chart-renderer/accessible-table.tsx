@@ -6,17 +6,19 @@
 'use client';
 
 import type { ChartRequest } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface AccessibleChartTableProps {
   request: ChartRequest;
 }
 
 export function AccessibleChartTable({ request }: AccessibleChartTableProps) {
+  const t = useTranslations("tools");
   return (
-    <table className="sr-only" aria-label={`Data for ${request.title || 'chart'}`}>
+    <table className="sr-only" aria-label={t("dataFor", { title: request.title || t("chartDefault") })}>
       <thead>
         <tr>
-          <th>Label</th>
+          <th>{t("label1")}</th>
           {request.data.datasets.map((dataset) => (
             <th key={dataset.label}>{dataset.label}</th>
           ))}
@@ -37,12 +39,13 @@ export function AccessibleChartTable({ request }: AccessibleChartTableProps) {
 }
 
 export function AccessiblePieTable({ request }: AccessibleChartTableProps) {
+  const t = useTranslations("tools");
   return (
-    <table className="sr-only" aria-label={`Data for ${request.title || 'chart'}`}>
+    <table className="sr-only" aria-label={t("dataFor", { title: request.title || t("chartDefault") })}>
       <thead>
         <tr>
-          <th>Label</th>
-          <th>Value</th>
+          <th>{t("label")}</th>
+          <th>{t("value")}</th>
         </tr>
       </thead>
       <tbody>

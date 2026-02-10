@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Infrastructure Service Cards
  * Supabase and Redis metric display components
@@ -9,6 +11,7 @@ import type {
   RedisMetrics,
 } from "@/lib/admin/infra-panel-types";
 import { StatusBadge, MetricBar, formatBytes } from "./components";
+import { useTranslations } from "next-intl";
 
 /**
  * Supabase Card Component
@@ -18,38 +21,39 @@ interface SupabaseCardProps {
 }
 
 export function SupabaseCard({ metrics }: SupabaseCardProps) {
+  const t = useTranslations("admin");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Database className="h-5 w-5 text-green-600" />
-          <span className="font-medium">Status</span>
+          <span className="font-medium">{t("status1")}</span>
         </div>
         <StatusBadge status={metrics.status} />
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Database Size</span>
+          <span className="text-sm text-muted-foreground">{t("databaseSize")}</span>
           <span className="text-sm font-medium">
             {formatBytes(metrics.databaseSize)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Connections</span>
+          <span className="text-sm text-muted-foreground">{t("connections")}</span>
           <span className="text-sm font-medium">{metrics.connections}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Storage Used</span>
+          <span className="text-sm text-muted-foreground">{t("storageUsed")}</span>
           <span className="text-sm font-medium">
             {formatBytes(metrics.storageUsed)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Total Rows</span>
+          <span className="text-sm text-muted-foreground">{t("totalRows")}</span>
           <span className="text-sm font-medium">
             {metrics.rowCount.toLocaleString()}
           </span>
@@ -58,7 +62,7 @@ export function SupabaseCard({ metrics }: SupabaseCardProps) {
 
       <div className="border-t pt-4">
         <div className="text-xs text-muted-foreground">
-          Active connections: {metrics.connections < 50 ? "Normal" : "High"}
+          {t("activeConnections")} {metrics.connections < 50 ? "Normal" : "High"}
         </div>
       </div>
     </div>
@@ -73,12 +77,13 @@ interface RedisCardProps {
 }
 
 export function RedisCard({ metrics }: RedisCardProps) {
+  const t = useTranslations("admin");
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Server className="h-5 w-5 text-red-600" />
-          <span className="font-medium">Status</span>
+          <span className="font-medium">{t("status")}</span>
         </div>
         <StatusBadge status={metrics.status} />
       </div>
@@ -92,21 +97,21 @@ export function RedisCard({ metrics }: RedisCardProps) {
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Keys Count</span>
+          <span className="text-sm text-muted-foreground">{t("keysCount")}</span>
           <span className="text-sm font-medium">
             {metrics.keysCount.toLocaleString()}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Hit Rate</span>
+          <span className="text-sm text-muted-foreground">{t("hitRate")}</span>
           <span className="text-sm font-medium">
             {metrics.hitRate.toFixed(1)}%
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Commands</span>
+          <span className="text-sm text-muted-foreground">{t("commands")}</span>
           <span className="text-sm font-medium">
             {metrics.commands.toLocaleString()}
           </span>
@@ -127,7 +132,7 @@ export function RedisCard({ metrics }: RedisCardProps) {
           />
         </div>
         <div className="mt-1 text-xs text-muted-foreground">
-          Cache efficiency: {metrics.hitRate >= 90 ? "Excellent" : "Good"}
+          {t("cacheEfficiency")} {metrics.hitRate >= 90 ? "Excellent" : "Good"}
         </div>
       </div>
     </div>

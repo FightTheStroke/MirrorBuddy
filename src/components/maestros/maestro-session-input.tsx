@@ -4,6 +4,7 @@ import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MaestroSessionToolButtons } from "./maestro-session-tool-buttons";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 type ToolType =
   | "mindmap"
@@ -46,6 +47,7 @@ export function MaestroSessionInput({
   onRequestPhoto,
   onEndSession,
 }: MaestroSessionInputProps) {
+  const t = useTranslations("chat");
   // Hide toolbar if maestro has no tools or only internal tools like web_search
   const visibleTools = (maestro.tools || []).filter((t) => t !== "web_search");
   const hasVisibleTools = visibleTools.length > 0 || !maestro.tools;
@@ -103,7 +105,7 @@ export function MaestroSessionInput({
             onClick={onEndSession}
             className="text-slate-600"
           >
-            Termina sessione e valuta
+            {t("terminaSessioneEValuta")}
           </Button>
         </div>
       )}

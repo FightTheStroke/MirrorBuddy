@@ -24,6 +24,7 @@ import { AudioDeviceSelector } from "@/components/conversation/components/audio-
 import { AudioVisualizer } from "./components/audio-visualizer";
 import { cn } from "@/lib/utils";
 import type { Maestro } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface MaestroSessionHeaderV2Props {
   maestro: Maestro;
@@ -60,6 +61,7 @@ export function MaestroSessionHeaderV2({
   onClearChat,
   onClose,
 }: MaestroSessionHeaderV2Props) {
+  const t = useTranslations("chat");
   const getStatusText = () => {
     if (configError) return configError;
     if (isConnected && isSpeaking)
@@ -106,7 +108,7 @@ export function MaestroSessionHeaderV2({
                 {maestro.displayName}
               </h2>
               <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
-                Professore
+                {t("professore1")}
               </span>
             </div>
             <p className="text-xs sm:text-sm text-white/80 truncate">
@@ -161,7 +163,7 @@ export function MaestroSessionHeaderV2({
               size="icon"
               onClick={onClearChat}
               className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-              aria-label="Nuova conversazione"
+              aria-label={t("nuovaConversazione1")}
             >
               <RotateCcw className="w-4 h-4" />
             </Button>
@@ -171,7 +173,7 @@ export function MaestroSessionHeaderV2({
               size="icon"
               onClick={onClose}
               className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-              aria-label="Chiudi"
+              aria-label={t("chiudi1")}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -219,7 +221,7 @@ export function MaestroSessionHeaderV2({
                   {maestro.displayName}
                 </h2>
                 <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
-                  Professore
+                  {t("professore")}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-white/70 truncate">
@@ -271,12 +273,12 @@ export function MaestroSessionHeaderV2({
                 {isMuted ? (
                   <>
                     <MicOff className="w-4 h-4 mr-1.5" />
-                    <span className="text-xs hidden sm:inline">Muto</span>
+                    <span className="text-xs hidden sm:inline">{t("muto")}</span>
                   </>
                 ) : (
                   <>
                     <Mic className="w-4 h-4 mr-1.5" />
-                    <span className="text-xs hidden sm:inline">Microfono</span>
+                    <span className="text-xs hidden sm:inline">{t("microfono")}</span>
                   </>
                 )}
               </Button>
@@ -290,7 +292,7 @@ export function MaestroSessionHeaderV2({
               className="rounded-full px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white ml-auto"
             >
               <PhoneOff className="w-4 h-4 mr-1.5" />
-              <span className="text-xs hidden sm:inline">Termina</span>
+              <span className="text-xs hidden sm:inline">{t("termina")}</span>
             </Button>
 
             {/* Other controls */}
@@ -319,7 +321,7 @@ export function MaestroSessionHeaderV2({
                 size="icon"
                 onClick={onClearChat}
                 className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8"
-                aria-label="Nuova conversazione"
+                aria-label={t("nuovaConversazione")}
               >
                 <RotateCcw className="w-4 h-4" />
               </Button>
@@ -329,7 +331,7 @@ export function MaestroSessionHeaderV2({
                 size="icon"
                 onClick={onClose}
                 className="text-white hover:bg-white/20 h-8 w-8"
-                aria-label="Chiudi"
+                aria-label={t("chiudi")}
               >
                 <X className="w-4 h-4" />
               </Button>

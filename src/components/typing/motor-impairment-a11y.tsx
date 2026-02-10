@@ -147,7 +147,7 @@ export function MotorImpairmentA11y({
 
       <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
         <p className="text-sm">
-          <strong>Raccomandazioni:</strong> {t("motorRecommendations")}
+          <strong>{t("raccomandazioni")}</strong> {t("motorRecommendations")}
         </p>
       </div>
     </div>

@@ -44,6 +44,30 @@
       "hours": "{count} horas",
       "thisWeek": "Esta Semana",
       "sessions": "{count} sesiones"
-    }
+    },
+    "quickStats": "Quick Stats",
+    "achievementUnlocked": "Achievement Unlocked!",
+    "closeNotification": "Close notification",
+    "achievements": "Achievements",
+    "sbloccati": "/ sbloccati",
+    "sbloccato": "Sbloccato",
+    "trofei": "Trofei",
+    "sbloccatoIl": "Sbloccato il",
+    "completaLAposObiettivoPerSbloccare": "Completa l&apos;obiettivo per sbloccare",
+    "livello": "Livello  Raggiunto!",
+    "mbPerLivello": "MB per Livello",
+    "levelUp": "LEVEL UP!",
+    "mirrorbucks": "+ MirrorBucks",
+    "nuoviAchievement": "Nuovi Achievement",
+    "cliccaOvunquePerContinuare": "Clicca ovunque per continuare",
+    "stagione": "Stagione",
+    "rimanenti": "rimanenti",
+    "livelloStagionale": "Livello Stagionale",
+    "inPausa": "In pausa",
+    "padronanzaMaterie": "Padronanza Materie",
+    "argomenti": "/ argomenti",
+    "raggiunto": "Raggiunto",
+    "progressToNextLevel": "Progresso al prossimo livello: {progress}%",
+    "sessionTimerAriaLabel": "Timer sessione: {time}, {state}"
   }
 }

@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { getMaestroById, subjectNames } from '@/data';
 import type { Maestro } from '@/types';
+import { useTranslations } from "next-intl";
 
 interface PersonalizedSuggestionProps {
   onMaestroSelect?: (maestro: Maestro) => void;
@@ -19,6 +20,7 @@ function isSessionRecent(endedAt: Date | undefined): boolean {
 }
 
 export function PersonalizedSuggestion({ onMaestroSelect }: PersonalizedSuggestionProps) {
+  const t = useTranslations("chat");
   const { sessionHistory, streak, masteries, level, mirrorBucks } = useProgressStore();
 
   const suggestion = useMemo(() => {
@@ -146,7 +148,7 @@ export function PersonalizedSuggestion({ onMaestroSelect }: PersonalizedSuggesti
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-bold shadow-md"
         >
           <Trophy className="w-4 h-4" />
-          Lv.{level}
+          {t("lv")}{level}
         </motion.div>
       </div>
     </div>

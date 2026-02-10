@@ -45,8 +45,8 @@ export function ProviderSelection({
           <div className="flex items-center gap-3 mb-2">
             <Cloud className="w-6 h-6 text-blue-500" />
             <div className="flex-1">
-              <h4 className="font-medium">Azure OpenAI</h4>
-              <p className="text-xs text-slate-500">Cloud - Chat + Voice</p>
+              <h4 className="font-medium">{t("azureOpenai")}</h4>
+              <p className="text-xs text-slate-500">{t("cloudChatVoice")}</p>
             </div>
             {providerStatus.azure.configured ? (
               <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
@@ -68,7 +68,7 @@ export function ProviderSelection({
           )}
           {providerStatus.azure.realtimeConfigured && (
             <div className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-              Voice: {providerStatus.azure.realtimeModel}
+              {t("voice")} {providerStatus.azure.realtimeModel}
             </div>
           )}
         </button>
@@ -94,7 +94,7 @@ export function ProviderSelection({
             <Server className="w-6 h-6 text-green-500" />
             <div className="flex-1">
               <h4 className="font-medium">Ollama</h4>
-              <p className="text-xs text-slate-500">Locale - Solo Chat</p>
+              <p className="text-xs text-slate-500">{t("localeSoloChat")}</p>
             </div>
             {providerStatus.ollama.configured ? (
               <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400">
@@ -115,7 +115,7 @@ export function ProviderSelection({
             </div>
           )}
           <div className="mt-1 text-xs text-slate-500">
-            URL: {providerStatus.ollama.url}
+            {t("url")} {providerStatus.ollama.url}
           </div>
         </button>
       </div>

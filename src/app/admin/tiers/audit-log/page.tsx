@@ -9,6 +9,7 @@ import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { AuditFilters } from "./components/audit-filters";
 import { AuditTable } from "./components/audit-table";
 import { AuditPagination } from "./components/audit-pagination";
+import { useTranslations } from "next-intl";
 
 interface TierAuditLog {
   id: string;
@@ -39,6 +40,7 @@ interface ApiResponse {
 }
 
 export default function AuditLogPage() {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +99,7 @@ export default function AuditLogPage() {
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading audit logs...</p>
+          <p className="text-muted-foreground">{t("loadingAuditLogs")}</p>
         </div>
       </div>
     );
@@ -106,9 +108,9 @@ export default function AuditLogPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Tier Audit Log</h1>
+        <h1 className="text-3xl font-bold">{t("tierAuditLog")}</h1>
         <p className="text-muted-foreground mt-2">
-          Complete audit trail of all tier and subscription changes
+          {t("completeAuditTrailOfAllTierAndSubscriptionChanges")}
         </p>
       </div>
 
@@ -123,7 +125,7 @@ export default function AuditLogPage() {
           <RefreshCw
             className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 

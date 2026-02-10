@@ -17,6 +17,7 @@ import { ToolContent } from "./tool-content";
 import { functionNameToToolType } from "@/lib/tools/constants";
 import type { ToolCall, ToolCallRef } from "@/types";
 import type { ToolType } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface ToolResultDisplayProps {
   /** Tool call - can be full ToolCall (from chat) or lightweight ToolCallRef (from DB) */
@@ -37,6 +38,7 @@ export function ToolResultDisplay({
   isFullscreen = false,
   onToggleFullscreen,
 }: ToolResultDisplayProps) {
+  const t = useTranslations("tools");
   // Map function name to tool type for display
   const toolType =
     functionNameToToolType(toolCall.type) || (toolCall.type as ToolType);
@@ -57,7 +59,7 @@ export function ToolResultDisplay({
         className,
       )}
       role="region"
-      aria-label={`Tool result: ${name}`}
+      aria-label={t("toolResult", { name })}
     >
       {/* Status header */}
       <div
@@ -118,7 +120,7 @@ export function ToolResultDisplay({
             className="h-20 flex items-center justify-center bg-slate-200 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700"
           >
             <span className="text-sm text-slate-600 dark:text-slate-400">
-              Waiting to execute...
+              {t("waitingToExecute")}
             </span>
           </motion.div>
         )}
@@ -165,13 +167,14 @@ export function ToolResultsList({
   className,
   sessionId,
 }: ToolResultsListProps) {
+  const t = useTranslations("tools");
   if (toolCalls.length === 0) return null;
 
   return (
     <div
       className={cn("space-y-4", className)}
       role="list"
-      aria-label="Tool results"
+      aria-label={t("toolResults")}
     >
       <AnimatePresence>
         {toolCalls.map((toolCall) => (

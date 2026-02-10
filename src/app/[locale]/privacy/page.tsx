@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors print:hidden"
-            aria-label="Torna alla home page di MirrorBuddy"
+            aria-label={t("tornaAllaHomePageDiMirrorbuddy")}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             {t("backToHome")}

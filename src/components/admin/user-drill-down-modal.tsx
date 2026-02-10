@@ -24,6 +24,7 @@ import {
   Mail,
   User,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface FunnelEvent {
   stage: string;
@@ -84,6 +85,7 @@ export function UserDrilldownModal({
   onClose,
   _onAction,
 }: UserDrilldownModalProps) {
+  const t = useTranslations("admin");
   const [data, setData] = useState<UserDrilldownData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,13 +136,13 @@ export function UserDrilldownModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            User Details
+            {t("userDetails")}
           </DialogTitle>
         </DialogHeader>
 
         {loading && (
           <div className="py-8 text-center text-muted-foreground">
-            Loading...
+            {t("loading")}
           </div>
         )}
 
@@ -168,7 +170,7 @@ export function UserDrilldownModal({
                   )}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  Type: {data.type}
+                  {t("type")} {data.type}
                 </div>
               </div>
               <Badge
@@ -181,7 +183,7 @@ export function UserDrilldownModal({
             {/* Usage Metrics */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Usage Metrics</CardTitle>
+                <CardTitle className="text-sm">{t("usageMetrics")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -191,7 +193,7 @@ export function UserDrilldownModal({
                       <div className="text-lg font-semibold">
                         {data.usage.chatsUsed}
                       </div>
-                      <div className="text-xs text-muted-foreground">Chats</div>
+                      <div className="text-xs text-muted-foreground">{t("chats")}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -200,7 +202,7 @@ export function UserDrilldownModal({
                       <div className="text-lg font-semibold">
                         {formatDuration(data.usage.voiceSecondsUsed)}
                       </div>
-                      <div className="text-xs text-muted-foreground">Voice</div>
+                      <div className="text-xs text-muted-foreground">{t("voice")}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -209,7 +211,7 @@ export function UserDrilldownModal({
                       <div className="text-lg font-semibold">
                         {data.usage.toolsUsed}
                       </div>
-                      <div className="text-xs text-muted-foreground">Tools</div>
+                      <div className="text-xs text-muted-foreground">{t("tools")}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -218,7 +220,7 @@ export function UserDrilldownModal({
                       <div className="text-lg font-semibold">
                         {data.usage.docsUsed}
                       </div>
-                      <div className="text-xs text-muted-foreground">Docs</div>
+                      <div className="text-xs text-muted-foreground">{t("docs")}</div>
                     </div>
                   </div>
                 </div>
@@ -228,7 +230,7 @@ export function UserDrilldownModal({
             {/* Journey Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Journey Timeline</CardTitle>
+                <CardTitle className="text-sm">{t("journeyTimeline")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="relative pl-6 space-y-4">
@@ -248,7 +250,7 @@ export function UserDrilldownModal({
                         </div>
                         {event.fromStage && (
                           <div className="text-xs text-muted-foreground">
-                            from {event.fromStage}
+                            {t("from")} {event.fromStage}
                           </div>
                         )}
                       </div>
@@ -262,7 +264,7 @@ export function UserDrilldownModal({
             {data.inviteRequest && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Beta Request</CardTitle>
+                  <CardTitle className="text-sm">{t("betaRequest")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -277,7 +279,7 @@ export function UserDrilldownModal({
                         {data.inviteRequest.status}
                       </Badge>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Submitted: {formatDate(data.inviteRequest.createdAt)}
+                        {t("submitted")} {formatDate(data.inviteRequest.createdAt)}
                       </div>
                     </div>
                   </div>

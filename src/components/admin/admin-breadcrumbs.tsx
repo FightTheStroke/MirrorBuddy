@@ -30,7 +30,7 @@ export function AdminBreadcrumbs() {
 
   return (
     <nav
-      aria-label="Breadcrumb"
+      aria-label={t("breadcrumb")}
       className="mb-4 px-1"
       data-testid="admin-breadcrumbs"
     >

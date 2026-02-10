@@ -15,6 +15,7 @@ import { AudioDeviceSelector } from "./audio-device-selector";
 import { DotMatrixVisualizer } from "@/components/voice/waveform";
 import { useAccessibilityStore } from "@/lib/accessibility";
 import { getUserId, activeCharacterToMaestro } from "./voice-call-helpers";
+import { useTranslations } from "next-intl";
 
 interface VoiceConnectionInfo {
   provider: "azure";
@@ -38,6 +39,7 @@ export function VoiceCallOverlay({
   onEnd,
   onSessionIdChange,
 }: VoiceCallOverlayProps) {
+  const t = useTranslations("chat");
   const [connectionInfo, setConnectionInfo] =
     useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
@@ -355,7 +357,7 @@ export function VoiceCallOverlay({
             ))}
           </div>
           <p className="text-[10px] text-slate-600 mt-2 text-center">
-            Trascrizione approssimativa
+            {t("trascrizioneApprossimativa")}
           </p>
         </div>
       )}
@@ -382,7 +384,7 @@ export function VoiceCallOverlay({
 
         <Button variant="destructive" size="lg" onClick={handleEndCall}>
           <PhoneOff className="w-5 h-5 mr-2" />
-          Termina chiamata
+          {t("terminaChiamata")}
         </Button>
       </div>
     </motion.div>

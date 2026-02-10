@@ -3,6 +3,7 @@
 import { BookMarked } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { SubjectBreakdown } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface SubjectsStudiedProps {
   subjects: SubjectBreakdown[];
@@ -37,11 +38,12 @@ export function SubjectsStudied({
   highContrast = false,
   className,
 }: SubjectsStudiedProps) {
+  const t = useTranslations("settings");
   if (subjects.length === 0) {
     return (
       <section
         className={cn("space-y-3", className)}
-        aria-label="Materie studiate"
+        aria-label={t("materieStudiate3")}
       >
         <div className="flex items-center gap-2">
           <BookMarked
@@ -59,7 +61,7 @@ export function SubjectsStudied({
                 : "text-slate-900 dark:text-white",
             )}
           >
-            Materie studiate
+            {t("materieStudiate2")}
           </h2>
         </div>
         <p
@@ -70,7 +72,7 @@ export function SubjectsStudied({
               : "text-slate-500 dark:text-slate-400",
           )}
         >
-          Nessuna sessione di studio negli ultimi 30 giorni
+          {t("nessunaSessioneDiStudioNegliUltimi30Giorni")}
         </p>
       </section>
     );
@@ -79,7 +81,7 @@ export function SubjectsStudied({
   return (
     <section
       className={cn("space-y-4", className)}
-      aria-label="Materie studiate"
+      aria-label={t("materieStudiate1")}
     >
       <div className="flex items-center gap-2">
         <BookMarked
@@ -95,7 +97,7 @@ export function SubjectsStudied({
             highContrast ? "text-yellow-400" : "text-slate-900 dark:text-white",
           )}
         >
-          Materie studiate
+          {t("materieStudiate")}
         </h2>
         <span
           className={cn(
@@ -105,7 +107,7 @@ export function SubjectsStudied({
               : "text-slate-500 dark:text-slate-400",
           )}
         >
-          (ultimi 30 giorni)
+          {t("ultimi30Giorni")}
         </span>
       </div>
 

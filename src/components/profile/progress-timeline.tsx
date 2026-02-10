@@ -75,7 +75,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                     improvements.strengthsTrend > 0 ? 'text-green-500' : 'text-slate-400',
                   )}
                 />
-                <span className="text-sm font-medium">Punti di Forza</span>
+                <span className="text-sm font-medium">{t("puntiDiForza2")}</span>
               </div>
               <p
                 className={cn(
@@ -84,7 +84,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                 )}
               >
                 {improvements.strengthsTrend > 0 ? '+' : ''}
-                {improvements.strengthsTrend.toFixed(1)} /settimana
+                {improvements.strengthsTrend.toFixed(1)} {t("settimana1")}
               </p>
               <p className="text-xs text-slate-500 mt-1">
                 {improvements.strengthsTrend > 0
@@ -110,7 +110,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                     improvements.activityTrend > 0 ? 'text-blue-500' : 'text-slate-400',
                   )}
                 />
-                <span className="text-sm font-medium">Attivita</span>
+                <span className="text-sm font-medium">{t("attivita")}</span>
               </div>
               <p
                 className={cn(
@@ -119,7 +119,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                 )}
               >
                 {improvements.activityTrend > 0 ? '+' : ''}
-                {improvements.activityTrend.toFixed(1)} /settimana
+                {improvements.activityTrend.toFixed(1)} {t("settimana")}
               </p>
               <p className="text-xs text-slate-500 mt-1">
                 {improvements.activityTrend > 0
@@ -145,7 +145,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                     improvements.moreStrengthsThanGrowth ? 'text-amber-500' : 'text-slate-400',
                   )}
                 />
-                <span className="text-sm font-medium">Tendenza</span>
+                <span className="text-sm font-medium">{t("tendenza")}</span>
               </div>
               <p
                 className={cn(
@@ -170,16 +170,16 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="text-slate-600 dark:text-slate-400">Punti di forza</span>
+                <span className="text-slate-600 dark:text-slate-400">{t("puntiDiForza1")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-400" />
-                <span className="text-slate-600 dark:text-slate-400">Aree di crescita</span>
+                <span className="text-slate-600 dark:text-slate-400">{t("areeDiCrescita1")}</span>
               </div>
             </div>
             <div className="flex items-center gap-1 text-slate-500">
               <Calendar className="h-4 w-4" />
-              <span>Ultime {weeklyData.length} settimane</span>
+              <span>{t("ultime")} {weeklyData.length} {t("settimane")}</span>
             </div>
           </div>
 
@@ -212,11 +212,11 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
         <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
           <div className="flex items-center justify-between text-sm">
             <span className="text-slate-600 dark:text-slate-400">
-              Totale osservazioni nel periodo:
+              {t("totaleOsservazioniNelPeriodo")}
             </span>
             <span className="font-semibold text-slate-900 dark:text-white">
-              {entries.length} ({entries.filter((e) => e.isStrength).length} punti di forza,{' '}
-              {entries.filter((e) => !e.isStrength).length} aree di crescita)
+              {entries.length} ({entries.filter((e) => e.isStrength).length} {t("puntiDiForza")}{' '}
+              {entries.filter((e) => !e.isStrength).length} {t("areeDiCrescita")}
             </span>
           </div>
         </div>

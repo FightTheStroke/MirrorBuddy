@@ -14,10 +14,12 @@ import type {
   HealthAggregatorResponse,
   ServiceHealth,
 } from "@/lib/admin/health-aggregator-types";
+import { useTranslations } from "next-intl";
 
 export const dynamic = "force-dynamic";
 
 export default function ServiceHealthPage() {
+  const t = useTranslations("admin");
   const [healthData, setHealthData] = useState<HealthAggregatorResponse | null>(
     null,
   );
@@ -64,22 +66,22 @@ export default function ServiceHealthPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Service Health</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("serviceHealth")}</h1>
           <p className="text-muted-foreground">
-            Real-time monitoring of all external services
+            {t("realTimeMonitoringOfAllExternalServices")}
           </p>
         </div>
         <Button onClick={handleRefresh} disabled={loading}>
           <RefreshCw
             className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
           />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 
       {lastRefresh && (
         <p className="text-sm text-muted-foreground">
-          Last updated: {lastRefresh.toLocaleTimeString()}
+          {t("lastUpdated")} {lastRefresh.toLocaleTimeString()}
         </p>
       )}
 
@@ -88,7 +90,7 @@ export default function ServiceHealthPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              Overall Status
+              {t("overallStatus")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -103,7 +105,7 @@ export default function ServiceHealthPage() {
               />
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Based on {healthData.configuredCount} configured{" "}
+              {t("basedOn")} {healthData.configuredCount} {t("configured")}{" "}
               {healthData.configuredCount === 1 ? "service" : "services"}
             </p>
           </CardContent>
@@ -144,17 +146,17 @@ export default function ServiceHealthPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Status:</span>
+                  <span className="text-sm text-muted-foreground">{t("status1")}</span>
                   <StatusBadge status={service.status} />
                 </div>
 
                 {service.responseTimeMs !== undefined && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      Response:
+                      {t("response")}
                     </span>
                     <span className="text-sm font-medium">
-                      {service.responseTimeMs}ms
+                      {service.responseTimeMs}{t("ms")}
                     </span>
                   </div>
                 )}
@@ -162,7 +164,7 @@ export default function ServiceHealthPage() {
                 {service.details && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      Details:
+                      {t("details")}
                     </span>
                     <span className="text-sm font-medium">
                       {service.details}
@@ -172,7 +174,7 @@ export default function ServiceHealthPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    Checked:
+                    {t("checked")}
                   </span>
                   <span className="text-sm font-medium">
                     {new Date(service.lastChecked).toLocaleTimeString()}
@@ -186,11 +188,11 @@ export default function ServiceHealthPage() {
             return (
               <div className="rounded-lg border border-dashed p-8 text-center">
                 <h3 className="text-lg font-semibold mb-2">
-                  No services configured yet
+                  {t("noServicesConfiguredYet")}
                 </h3>
                 <p className="text-muted-foreground">
-                  Configure your services to start monitoring their health
-                  status.
+                  {t("configureYourServicesToStartMonitoringTheirHealthS")}
+
                 </p>
               </div>
             );
@@ -201,7 +203,7 @@ export default function ServiceHealthPage() {
               {configuredServices.length > 0 && (
                 <div>
                   <h2 className="text-xl font-semibold mb-4">
-                    Configured Services
+                    {t("configuredServices")}
                   </h2>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {configuredServices.map(renderServiceCard)}
@@ -211,7 +213,7 @@ export default function ServiceHealthPage() {
 
               {unconfiguredServices.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">Not Configured</h2>
+                  <h2 className="text-xl font-semibold mb-4">{t("notConfigured1")}</h2>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {unconfiguredServices.map((service) => (
                       <Card key={service.name} className="opacity-60">
@@ -224,10 +226,10 @@ export default function ServiceHealthPage() {
                         <CardContent className="space-y-2">
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">
-                              Status:
+                              {t("status")}
                             </span>
                             <span className="text-sm text-muted-foreground">
-                              Not Configured
+                              {t("notConfigured")}
                             </span>
                           </div>
                           {service.details && (

@@ -9,12 +9,14 @@
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
 
 interface ParentAccessButtonProps {
   className?: string;
 }
 
 export function ParentAccessButton({ className }: ParentAccessButtonProps) {
+  const t = useTranslations("common");
   const router = useRouter();
 
   return (
@@ -34,10 +36,10 @@ export function ParentAccessButton({ className }: ParentAccessButtonProps) {
         'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
         className
       )}
-      aria-label="Accedi alla sezione genitori"
+      aria-label={t("accediAllaSezioneGenitori")}
     >
       <Users className="w-4 h-4" />
-      <span className="hidden sm:inline">Area Genitori</span>
+      <span className="hidden sm:inline">{t("areaGenitori")}</span>
     </button>
   );
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import { LimitField } from "./limit-field";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface LimitOverrides {
   chatLimitDaily?: number | null;
@@ -28,10 +31,11 @@ export function LimitOverridesSection({
   onLimitChange,
   firstInputRef,
 }: LimitOverridesSectionProps) {
+  const t = useTranslations("admin");
   return (
     <div>
       <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-        Usage Limits
+        {t("usageLimits")}
       </h3>
       <div className="grid grid-cols-2 gap-4">
         <LimitField

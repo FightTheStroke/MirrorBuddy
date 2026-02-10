@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { KeyboardLayout, TypingHandMode } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface VirtualKeyboardProps {
   layout: KeyboardLayout;
@@ -79,6 +80,7 @@ export function VirtualKeyboard({
   highlightFingers: _highlightFingers = false,
   disabled = false,
 }: VirtualKeyboardProps) {
+  const t = useTranslations("education");
   const rows = KEYBOARD_LAYOUTS[layout];
 
   const getKeyState = (key: string) => {
@@ -101,7 +103,7 @@ export function VirtualKeyboard({
     <div
       className="flex flex-col items-center gap-2 p-4 bg-muted/30 rounded-xl"
       role="application"
-      aria-label="Virtual keyboard"
+      aria-label={t("virtualKeyboard")}
     >
       {rows.map((row, rowIndex) => (
         <div key={rowIndex} className="flex gap-1">
@@ -129,7 +131,7 @@ export function VirtualKeyboard({
                   state === "disabled" &&
                     "bg-muted/50 text-muted-foreground cursor-not-allowed",
                 )}
-                aria-label={`Key ${key}`}
+                aria-label={t("keyAriaLabel", { key })}
                 aria-current={state === "pressed" ? "true" : undefined}
               >
                 {key}

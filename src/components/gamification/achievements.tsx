@@ -17,6 +17,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { Achievement } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface AchievementsGridProps {
   achievements: Achievement[];
@@ -52,6 +53,7 @@ export function AchievementsGrid({
   achievements,
   className,
 }: AchievementsGridProps) {
+  const t = useTranslations("achievements");
   const [selectedAchievement, setSelectedAchievement] =
     useState<Achievement | null>(null);
 
@@ -77,10 +79,10 @@ export function AchievementsGrid({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-500" />
-            Trofei
+            {t("trofei")}
           </CardTitle>
           <span className="text-sm text-slate-500">
-            {unlockedCount}/{achievements.length} sbloccati
+            {unlockedCount}/{achievements.length} {t("sbloccati")}
           </span>
         </div>
       </CardHeader>
@@ -167,6 +169,7 @@ interface AchievementDetailProps {
 }
 
 function AchievementDetail({ achievement }: AchievementDetailProps) {
+  const t = useTranslations("achievements");
   const isUnlocked = !!achievement.unlockedAt;
 
   return (
@@ -204,12 +207,12 @@ function AchievementDetail({ achievement }: AchievementDetailProps) {
       {/* Status */}
       {isUnlocked ? (
         <div className="text-sm text-green-600 dark:text-green-400">
-          Sbloccato il{" "}
+          {t("sbloccatoIl")}{" "}
           {new Date(achievement.unlockedAt!).toLocaleDateString("it-IT")}
         </div>
       ) : (
         <div className="text-sm text-slate-500">
-          Completa l&apos;obiettivo per sbloccare
+          {t("completaLAposObiettivoPerSbloccare")}
         </div>
       )}
     </div>

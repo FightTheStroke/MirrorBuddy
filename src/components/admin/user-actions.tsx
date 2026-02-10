@@ -14,6 +14,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Mail, CheckCircle, Ban, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface UserActionsProps {
   userId: string;
@@ -32,6 +33,7 @@ export function UserActions({
   inviteStatus,
   onActionComplete,
 }: UserActionsProps) {
+  const t = useTranslations("admin");
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,22 +107,21 @@ export function UserActions({
                 ) : (
                   <Mail className="h-4 w-4 mr-1" />
                 )}
-                Send Invite
+                {t("sendInvite")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Send Beta Invite</DialogTitle>
+                <DialogTitle>{t("sendBetaInvite")}</DialogTitle>
                 <DialogDescription>
-                  Send a beta invite to {email}? They will receive an email with
-                  instructions.
+                  {t("sendABetaInviteTo")} {email}{t("theyWillReceiveEmail")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{t("cancel2")}</Button>
                 </DialogClose>
-                <Button onClick={() => handleAction("invite")}>Send</Button>
+                <Button onClick={() => handleAction("invite")}>{t("send")}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -136,22 +137,21 @@ export function UserActions({
                 ) : (
                   <CheckCircle className="h-4 w-4 mr-1" />
                 )}
-                Approve
+                {t("approve1")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Approve Beta Request</DialogTitle>
+                <DialogTitle>{t("approveBetaRequest")}</DialogTitle>
                 <DialogDescription>
-                  Approve beta access for {email}? They will be able to create
-                  an account.
+                  {t("approveBetaAccessFor")} {email}{t("theyWillCreateAccount")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{t("cancel1")}</Button>
                 </DialogClose>
-                <Button onClick={() => handleAction("approve")}>Approve</Button>
+                <Button onClick={() => handleAction("approve")}>{t("approve")}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -171,25 +171,25 @@ export function UserActions({
                 ) : (
                   <Ban className="h-4 w-4 mr-1" />
                 )}
-                Block
+                {t("block1")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Block User</DialogTitle>
+                <DialogTitle>{t("blockUser")}</DialogTitle>
                 <DialogDescription>
-                  Block this user? They will not be able to access MirrorBuddy.
+                  {t("blockThisUserTheyWillNotBeAbleToAccessMirrorbuddy")}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{t("cancel")}</Button>
                 </DialogClose>
                 <Button
                   variant="destructive"
                   onClick={() => handleAction("block")}
                 >
-                  Block
+                  {t("block")}
                 </Button>
               </DialogFooter>
             </DialogContent>

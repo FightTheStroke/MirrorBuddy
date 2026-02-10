@@ -1,3 +1,5 @@
+"use client";
+
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ToolPanel } from "@/components/tools/tool-panel";
@@ -7,6 +9,7 @@ import type {
   ActiveCharacter,
   FlowMessage,
 } from "@/lib/stores/conversation-flow-store";
+import { useTranslations } from "next-intl";
 
 interface ToolLayoutProps {
   activeTool: ToolState;
@@ -29,6 +32,7 @@ export function ToolLayout({
   onCloseTool,
   onToggleMinimize,
 }: ToolLayoutProps) {
+  const t = useTranslations("chat");
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       <div className="flex-[7] overflow-auto border-b border-slate-200 dark:border-slate-700">
@@ -57,7 +61,7 @@ export function ToolLayout({
         className="flex-[1.5] overflow-y-auto p-2 bg-slate-50 dark:bg-slate-800/50"
         role="log"
         aria-live="polite"
-        aria-label="Messaggi recenti"
+        aria-label={t("messaggiRecenti")}
       >
         {messages.slice(-3).map((message) => (
           <div
@@ -79,7 +83,7 @@ export function ToolLayout({
         {isLoading && (
           <div className="text-xs py-1 px-2 flex items-center gap-1">
             <Loader2 className="w-3 h-3 animate-spin" />
-            <span>{activeCharacter?.name} sta pensando...</span>
+            <span>{activeCharacter?.name} {t("staPensando")}</span>
           </div>
         )}
       </div>

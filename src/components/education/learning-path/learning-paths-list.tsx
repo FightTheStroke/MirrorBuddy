@@ -197,7 +197,7 @@ function PathCard({ path, onClick }: PathCardProps) {
           <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
             {path.estimatedTotalMinutes > 0 && (
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />~{path.estimatedTotalMinutes} min
+                <Clock className="w-3 h-3" />~{path.estimatedTotalMinutes} {t("min")}
               </span>
             )}
             <span

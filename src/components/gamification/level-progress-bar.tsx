@@ -11,6 +11,7 @@ import {
   getLevelProgress,
   MIRRORBUCKS_PER_LEVEL,
 } from '@/lib/constants/mirrorbucks';
+import { useTranslations } from "next-intl";
 
 interface LevelProgressBarProps {
   showDetails?: boolean;
@@ -21,6 +22,7 @@ export function LevelProgressBar({
   showDetails = true,
   className = '',
 }: LevelProgressBarProps) {
+  const t = useTranslations("achievements");
   const seasonLevel = useProgressStore((state) => state.seasonLevel);
   const seasonMirrorBucks = useProgressStore((state) => state.seasonMirrorBucks);
 
@@ -33,11 +35,11 @@ export function LevelProgressBar({
       {showDetails && (
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold">
-            Livello {seasonLevel}
+            {t("livello")} {seasonLevel}
             {isMaxLevel && ' (Max)'}
           </span>
           {!isMaxLevel && (
-            <span className="text-muted-foreground">{remaining} MB per Livello {seasonLevel + 1}</span>
+            <span className="text-muted-foreground">{remaining} {t("mbPerLivello")} {seasonLevel + 1}</span>
           )}
         </div>
       )}
@@ -50,7 +52,7 @@ export function LevelProgressBar({
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`Progress to next level: ${Math.round(progress)}%`}
+          aria-label={t("progressToNextLevel", { progress: Math.round(progress) })}
         >
           {progress > 10 && (
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer" />

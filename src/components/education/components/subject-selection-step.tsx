@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { Subject } from "@/types";
 import type { ToolType } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 const SUBJECT_LABELS: Record<string, string> = {
   mathematics: "Matematica",
@@ -68,6 +69,7 @@ export function SubjectSelectionStep({
   subjects,
   onSubjectSelect,
 }: SubjectSelectionStepProps) {
+  const t = useTranslations("education");
   const toolLabel = TOOL_LABELS[toolType] || toolType;
 
   return (
@@ -78,7 +80,7 @@ export function SubjectSelectionStep({
       exit={{ opacity: 0, x: 20 }}
     >
       <p className="text-slate-600 dark:text-slate-400 mb-4">
-        Di quale materia vuoi fare {toolLabel.toLowerCase()}?
+        {t("diQualeMateriaVuoiFare")} {toolLabel.toLowerCase()}?
       </p>
       <div className="grid grid-cols-3 gap-2">
         {subjects.map((subject) => (

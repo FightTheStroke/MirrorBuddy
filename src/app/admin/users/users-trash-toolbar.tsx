@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, Loader2 } from "lucide-react";
 import { csrfFetch } from "@/lib/auth";
+import { useTranslations } from "next-intl";
 
 interface UsersTrashToolbarProps {
   count: number;
@@ -14,6 +15,7 @@ export function UsersTrashToolbar({
   count,
   onEmptyComplete,
 }: UsersTrashToolbarProps) {
+  const t = useTranslations("admin");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEmptyTrash = async () => {
@@ -42,7 +44,7 @@ export function UsersTrashToolbar({
   return (
     <div className="flex items-center justify-between mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
       <span className="text-sm text-amber-800 dark:text-amber-200">
-        {count} {count === 1 ? "utente" : "utenti"} nel cestino
+        {count} {count === 1 ? "utente" : "utenti"} {t("nelCestino")}
       </span>
       <Button
         size="sm"
@@ -56,7 +58,7 @@ export function UsersTrashToolbar({
         ) : (
           <Trash2 className="w-4 h-4 mr-1" />
         )}
-        Svuota cestino
+        {t("svuotaCestino")}
       </Button>
     </div>
   );

@@ -9,17 +9,19 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import type { FsrsStatsData } from "../types";
+import { useTranslations } from "next-intl";
 
 export function FsrsStatsCard({ data }: { data: FsrsStatsData | null }) {
+  const t = useTranslations("admin");
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Brain className="h-4 w-4 text-blue-500" />
-          Flashcard (FSRS) Stats
+          {t("flashcardFsrsStats")}
         </CardTitle>
         <CardDescription className="text-xs">
-          Spaced repetition learning metrics
+          {t("spacedRepetitionLearningMetrics")}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -28,24 +30,24 @@ export function FsrsStatsCard({ data }: { data: FsrsStatsData | null }) {
             <p className="text-xl font-bold text-blue-600">
               {data?.summary.totalCards ?? 0}
             </p>
-            <p className="text-[10px] text-slate-500">Total Cards</p>
+            <p className="text-[10px] text-slate-500">{t("totalCards")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-green-600">
               {data?.summary.accuracy ?? 0}%
             </p>
-            <p className="text-[10px] text-slate-500">Accuracy</p>
+            <p className="text-[10px] text-slate-500">{t("accuracy")}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-amber-600">
               {data?.summary.cardsDueToday ?? 0}
             </p>
-            <p className="text-[10px] text-slate-500">Due Today</p>
+            <p className="text-[10px] text-slate-500">{t("dueToday")}</p>
           </div>
         </div>
         {data?.stateDistribution && (
           <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-500">Card States</p>
+            <p className="text-xs font-medium text-slate-500">{t("cardStates")}</p>
             {Object.entries(data.stateDistribution).map(([state, count]) => (
               <div
                 key={state}

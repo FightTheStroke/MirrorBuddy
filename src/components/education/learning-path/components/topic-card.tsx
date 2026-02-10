@@ -133,7 +133,7 @@ export function TopicCard({ topic, index, onClick, onStart }: TopicCardProps) {
             </span>
             <span className="flex items-center gap-1 text-slate-500">
               <Clock className="w-3 h-3" />
-              {topic.estimatedMinutes} min
+              {topic.estimatedMinutes} {t("min")}
             </span>
             {topic.keyConcepts.length > 0 && (
               <span className="text-slate-400 truncate">

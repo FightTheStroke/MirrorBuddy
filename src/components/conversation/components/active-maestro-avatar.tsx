@@ -6,6 +6,7 @@ import { MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getMaestroById } from "@/data";
 import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
+import { useTranslations } from "next-intl";
 
 interface ActiveMaestroAvatarProps {
   onReturnToMaestro?: () => void;
@@ -21,6 +22,7 @@ export function ActiveMaestroAvatar({
   onReturnToMaestro,
   className,
 }: ActiveMaestroAvatarProps) {
+  const t = useTranslations("chat");
   const { activeCharacter } = useConversationFlowStore();
 
   // Only show if current character is a maestro
@@ -62,7 +64,7 @@ export function ActiveMaestroAvatar({
         style={{
           ["--ring-color" as string]: maestro.color,
         }}
-        aria-label={`Torna alla conversazione con ${maestro.displayName}`}
+        aria-label={t("tornaAllaConversazioneCon", { name: maestro.displayName })}
       >
         {/* Avatar with green indicator */}
         <div className="relative flex-shrink-0">
@@ -81,7 +83,7 @@ export function ActiveMaestroAvatar({
 
           {/* Green active indicator */}
           <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full">
-            <span className="sr-only">Conversazione attiva</span>
+            <span className="sr-only">{t("conversazioneAttiva")}</span>
           </div>
         </div>
 
@@ -98,7 +100,7 @@ export function ActiveMaestroAvatar({
                 color: maestro.color,
               }}
             >
-              Attivo
+              {t("attivo")}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 truncate">

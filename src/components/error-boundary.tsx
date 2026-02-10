@@ -15,6 +15,7 @@
 import React, { Component, type ReactNode } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { logger } from "@/lib/logger";
+import { useTranslations } from "next-intl";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -86,6 +87,7 @@ export function DefaultErrorFallback({
   error,
   reset,
 }: ErrorFallbackProps): ReactNode {
+  const t = useTranslations("errors");
   // Use static strings to avoid i18n dependency during static prerendering
   return (
     <div
@@ -93,10 +95,10 @@ export function DefaultErrorFallback({
       className="flex min-h-[200px] flex-col items-center justify-center p-6 text-center"
     >
       <h2 className="mb-2 text-xl font-semibold text-red-600">
-        Something went wrong
+        {t("somethingWentWrong")}
       </h2>
       <p className="mb-4 text-gray-600">
-        An unexpected error occurred. Please try again later.
+        {t("anUnexpectedErrorOccurredPleaseTryAgainLater")}
       </p>
       {process.env.NODE_ENV !== "production" && error && (
         <pre className="mb-4 max-w-full overflow-auto rounded bg-gray-100 p-2 text-left text-xs">
@@ -108,7 +110,7 @@ export function DefaultErrorFallback({
           onClick={reset}
           className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
-          Retry
+          {t("retry")}
         </button>
       )}
     </div>

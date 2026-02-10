@@ -12,6 +12,7 @@ import toast from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { POMODORO_XP } from "@/lib/constants/xp-rewards";
 import { formatTime, requestNotificationPermission } from "./pomodoro-utils";
+import { useTranslations } from "next-intl";
 
 // Phase config with icons
 const PHASE_CONFIG_WITH_ICONS = {
@@ -53,6 +54,7 @@ function showNotification(title: string, body: string) {
 }
 
 export function PomodoroHeaderWidget() {
+  const t = useTranslations("education");
   const {
     phase,
     timeRemaining,
@@ -225,10 +227,10 @@ export function PomodoroHeaderWidget() {
         size="sm"
         onClick={handleStart}
         className="h-8 gap-1.5 text-slate-500 hover:text-purple-500 hover:bg-purple-500/10"
-        title="Avvia Pomodoro Timer"
+        title={t("avviaPomodoroTimer")}
       >
         <Timer className="w-4 h-4" />
-        <span className="text-xs font-medium hidden sm:inline">Pomodoro</span>
+        <span className="text-xs font-medium hidden sm:inline">{t("pomodoro")}</span>
       </Button>
     );
   }

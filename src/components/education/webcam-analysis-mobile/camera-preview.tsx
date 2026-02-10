@@ -1,9 +1,12 @@
+"use client";
+
 /**
  * Camera preview component with controls
  */
 
 import { Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export interface CameraPreviewProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -33,6 +36,7 @@ export function CameraPreview({
   availableCamerasCount,
   isLoadingOrDisabled,
 }: CameraPreviewProps) {
+  const t = useTranslations("education");
   return (
     <div className="flex flex-col gap-3 bg-black rounded-lg overflow-hidden flex-1 min-h-0">
       {/* Preview Container */}
@@ -41,7 +45,7 @@ export function CameraPreview({
           <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
             <div className="flex flex-col items-center gap-3">
               <Loader className="w-8 h-8 text-white animate-spin" />
-              <p className="text-sm text-white">Initializing camera...</p>
+              <p className="text-sm text-white">{t("initializingCamera")}</p>
             </div>
           </div>
         )}
@@ -52,7 +56,7 @@ export function CameraPreview({
           playsInline
           muted
           className="w-full h-full object-cover"
-          aria-label="Camera preview"
+          aria-label={t("cameraPreview")}
         />
 
         {isSwitchingCamera && (
@@ -85,10 +89,10 @@ export function CameraPreview({
               "disabled:opacity-50 disabled:cursor-not-allowed",
               isPhone ? "text-sm" : "text-base",
             )}
-            aria-label="Switch camera"
+            aria-label={t("switchCamera")}
           >
             <span>🔄</span>
-            {!isPhone && <span>Switch</span>}
+            {!isPhone && <span>{t("switchLabel")}</span>}
           </button>
         )}
 
@@ -105,7 +109,7 @@ export function CameraPreview({
             "hover:scale-105 active:scale-95",
             "shadow-lg hover:shadow-xl",
           )}
-          aria-label="Capture photo"
+          aria-label={t("capturePhoto")}
         >
           <span className="text-xl">📸</span>
         </button>

@@ -5,6 +5,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 interface QuizProgressHeaderProps {
   currentIndex: number;
@@ -19,13 +20,14 @@ export function QuizProgressHeader({
   correctCount,
   progress,
 }: QuizProgressHeaderProps) {
+  const t = useTranslations("education");
   return (
     <div className="space-y-2">
       <div className="flex justify-between items-center text-xs sm:text-sm">
         <span className="font-medium text-muted-foreground">
-          Question {currentIndex + 1} of {totalQuestions}
+          {t("question")} {currentIndex + 1} {t("of")} {totalQuestions}
         </span>
-        <span className="font-medium text-primary">{correctCount} correct</span>
+        <span className="font-medium text-primary">{correctCount} {t("correct")}</span>
       </div>
       {/* Progress bar */}
       <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">

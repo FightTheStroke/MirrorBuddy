@@ -55,7 +55,7 @@ export function ConfigErrorView({ error, onSwitchToChat, onClose }: ConfigErrorV
             <div className="space-y-2">
               <p className="text-sm text-slate-300">
                 {t('configError.instructions')}{' '}
-                <code className="text-xs bg-slate-800 px-1 rounded">.env.local</code>:
+                <code className="text-xs bg-slate-800 px-1 rounded">{t("envLocal")}</code>:
               </p>
               <pre className="text-xs bg-slate-900 p-3 rounded-lg overflow-x-auto">
                 {`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com

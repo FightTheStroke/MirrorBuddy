@@ -24,6 +24,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { TOOL_LABELS, SUBJECT_LABELS } from "@/components/education/archive";
 import type { ToolType } from "@/types/tools";
+import { useTranslations } from "next-intl";
 
 interface SidebarProps {
   counts: {
@@ -49,6 +50,7 @@ const TOOL_ICON_MAP: Partial<Record<ToolType, typeof Brain>> = {
 };
 
 export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
+  const t = useTranslations("education.supporti");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [expandedSections, setExpandedSections] = useState({
@@ -81,7 +83,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
 
   return (
     <aside className="w-56 flex-shrink-0 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 overflow-y-auto">
-      <nav aria-label="Filtri materiali">
+      <nav aria-label={t("filtriMateriali")}>
         {/* All Materials */}
         <button
           onClick={() =>
@@ -100,7 +102,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
           )}
         >
           <BookOpen className="w-4 h-4" />
-          Tutti i Supporti
+          {t("tuttiISupporti")}
           <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
             {counts.total}
           </span>
@@ -124,7 +126,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
           )}
         >
           <Bookmark className="w-4 h-4" />
-          Preferiti
+          {t("preferiti")}
           <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
             {counts.bookmarked}
           </span>
@@ -141,7 +143,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
             ) : (
               <ChevronRight className="w-3 h-3" />
             )}
-            Per Tipo
+            {t("perTipo")}
           </button>
           {expandedSections.type && (
             <div className="mt-1 space-y-0.5">
@@ -191,7 +193,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
               ) : (
                 <ChevronRight className="w-3 h-3" />
               )}
-              Per Materia
+              {t("perMateria")}
             </button>
             {expandedSections.subject && (
               <div className="mt-1 space-y-0.5 max-h-48 overflow-y-auto">
@@ -239,7 +241,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
               ) : (
                 <ChevronRight className="w-3 h-3" />
               )}
-              Per Maestro
+              {t("perMaestro")}
             </button>
             {expandedSections.maestro && (
               <div className="mt-1 space-y-0.5 max-h-48 overflow-y-auto">

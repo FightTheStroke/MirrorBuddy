@@ -48,7 +48,13 @@
     "terms": {
       "title": "Conditions d'Utilisation | MirrorBuddy",
       "description": "Lisez nos conditions d'utilisation, accords utilisateur, politiques acceptables et informations légales pour l'utilisation de la plateforme MirrorBuddy.",
-      "keywords": ["conditions", "service", "juridique", "accord", "politiques"]
+      "keywords": [
+        "conditions",
+        "service",
+        "juridique",
+        "accord",
+        "politiques"
+      ]
     },
     "title": "MirrorBuddy - Votre compagnon d'étude",
     "description": "Plateforme éducative basée sur l'IA pour les élèves ayant des besoins spéciaux",

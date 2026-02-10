@@ -4,7 +4,8 @@
       "headline": "Aprende con los Grandes Maestros de la Historia",
       "subtitle": "Tutoria IA que se adapta a cada estilo de aprendizaje. Conversaciones de voz con 26 profesores historicos.",
       "cta": "Empezar Gratis",
-      "schoolCta": "Contacto para Escuelas"
+      "schoolCta": "Contacto para Escuelas",
+      "mirrorbuddyVoiceAiDemo": "MirrorBuddy voice AI demo"
     },
     "features": {
       "heading": "Por que MirrorBuddy",
@@ -50,7 +51,8 @@
           "Marca personalizada"
         ],
         "cta": "Contactanos"
-      }
+      },
+      "popular": "Popolare"
     },
     "social": {
       "heading": "Confian en Nosotros",
@@ -103,7 +105,12 @@
       "privacy": "Politica de Privacidad",
       "terms": "Terminos de Servicio",
       "cookies": "Politica de Cookies",
-      "copyright": "MirrorBuddy. Todos los derechos reservados."
-    }
+      "copyright": "MirrorBuddy. Todos los derechos reservados.",
+      "aiPoweredInclusiveEducationPlatform": "AI-powered inclusive education platform."
+    },
+    "signUp": "Sign Up",
+    "mirrorbuddyForSchools": "MirrorBuddy for Schools",
+    "bringInclusiveAiEducationToYourInstitutionSsoAdmin": "Bring inclusive AI education to your institution. SSO, admin tools,",
+    "andDedicatedSupportIncluded": "and dedicated support included."
   }
 }
