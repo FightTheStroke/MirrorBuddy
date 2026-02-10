@@ -47,8 +47,9 @@ describe('sentry.client.config', () => {
     vi.unstubAllEnvs();
   });
 
-  it('calls init with enabled=true when NODE_ENV=production and DSN present (F-07)', async () => {
+  it('calls init with enabled=true when on Vercel and DSN present (F-07)', async () => {
     vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');
@@ -60,8 +61,8 @@ describe('sentry.client.config', () => {
     expect(initCall.dsn).toBe('https://test@sentry.io/123');
   });
 
-  it('calls init with enabled=false when NODE_ENV=development', async () => {
-    vi.stubEnv('NODE_ENV', 'development');
+  it('calls init with enabled=false when not on Vercel', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');
@@ -167,8 +168,9 @@ describe('sentry.server.config', () => {
     vi.unstubAllEnvs();
   });
 
-  it('calls init with enabled=true when NODE_ENV=production and DSN present (F-07)', async () => {
+  it('calls init with enabled=true when on Vercel and DSN present (F-07)', async () => {
     vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('VERCEL', '1');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');
@@ -180,8 +182,8 @@ describe('sentry.server.config', () => {
     expect(initCall.dsn).toBe('https://test@sentry.io/123');
   });
 
-  it('calls init with enabled=false when NODE_ENV=development', async () => {
-    vi.stubEnv('NODE_ENV', 'development');
+  it('calls init with enabled=false when not on Vercel', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');
@@ -263,8 +265,9 @@ describe('sentry.edge.config', () => {
     vi.unstubAllEnvs();
   });
 
-  it('calls init with enabled=true when NODE_ENV=production and DSN present (F-07)', async () => {
+  it('calls init with enabled=true when on Vercel and DSN present (F-07)', async () => {
     vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('VERCEL', '1');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');
@@ -276,8 +279,8 @@ describe('sentry.edge.config', () => {
     expect(initCall.dsn).toBe('https://test@sentry.io/123');
   });
 
-  it('calls init with enabled=false when NODE_ENV=development', async () => {
-    vi.stubEnv('NODE_ENV', 'development');
+  it('calls init with enabled=false when not on Vercel', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
     const Sentry = await import('@sentry/nextjs');

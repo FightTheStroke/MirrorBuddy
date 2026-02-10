@@ -4,7 +4,7 @@
  * Low-level client for querying Vercel API endpoints.
  */
 
-const VERCEL_API_BASE = "https://api.vercel.com";
+const VERCEL_API_BASE = 'https://api.vercel.com';
 
 /**
  * Query project-level usage from Vercel API
@@ -19,7 +19,11 @@ export async function queryProjectUsage(
   functions: { used: number };
 }> {
   if (!projectId) {
-    throw new Error("Project ID not available");
+    return {
+      bandwidth: { used: 0 },
+      builds: { used: 0 },
+      functions: { used: 0 },
+    };
   }
 
   const url = teamId
@@ -33,9 +37,7 @@ export async function queryProjectUsage(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Vercel API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Vercel API error: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
@@ -74,9 +76,7 @@ export async function queryTeamLimits(
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Vercel API error: ${response.status} ${response.statusText}`,
-    );
+    throw new Error(`Vercel API error: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();

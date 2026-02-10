@@ -1,7 +1,7 @@
 ---
 name: app-release-manager
 description: Use this agent when preparing to release a new version of MirrorBuddy. Ensures educational content quality, student safety, GDPR compliance, accessibility standards (WCAG 2.1 AA), ISE Engineering Fundamentals compliance, and AI tutor readiness before any public release.
-model: opus-4.5
+model: opus
 color: purple
 ---
 

@@ -4,8 +4,9 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-// STRICT: Only enable Sentry in production (NODE_ENV=production) by default
-const isProduction = process.env.NODE_ENV === 'production';
+// Deployment gate: NEXT_PUBLIC_VERCEL_ENV is auto-set by Vercel platform
+// NODE_ENV=production also matches local builds, polluting Sentry with dev errors
+const isVercel = !!process.env.NEXT_PUBLIC_VERCEL_ENV;
 
 // Optional debug escape hatch for Preview/local testing
 const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true';
@@ -16,7 +17,7 @@ const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || unde
 // Single concise log
 if (dsn) {
   console.log(
-    `[Sentry Client] enabled=${isProduction || isForceEnabled} env=${process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development'}`,
+    `[Sentry Client] enabled=${isVercel || isForceEnabled} env=${process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development'}`,
   );
 }
 
@@ -84,9 +85,8 @@ if (dsn) {
     // ZERO TOLERANCE: Capture ALL errors, filter nothing
     ignoreErrors: [],
 
-    // STRICT: Only send errors from production deployments by default
-    // Allow SENTRY_FORCE_ENABLE escape hatch for debugging on Preview/local
-    enabled: !!dsn && (isProduction || isForceEnabled),
+    // Only on Vercel deployments (not local builds where NODE_ENV=production)
+    enabled: !!dsn && (isVercel || isForceEnabled),
 
     // Add context before sending
     beforeSend(event, hint) {

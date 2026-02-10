@@ -3,8 +3,9 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-// Single gate: NODE_ENV === "production"
-const isProduction = process.env.NODE_ENV === 'production';
+// Deployment gate: VERCEL is auto-set by Vercel platform ("1")
+// NODE_ENV=production also matches local builds, polluting Sentry with dev errors
+const isVercel = !!process.env.VERCEL;
 
 // Optional debug escape hatch:
 // Set SENTRY_FORCE_ENABLE=true in Preview/local to test Sentry
@@ -14,7 +15,7 @@ const isForceEnabled = process.env.SENTRY_FORCE_ENABLE === 'true';
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
 
 // Concise logging
-if (dsn && (isProduction || isForceEnabled)) {
+if (dsn && (isVercel || isForceEnabled)) {
   console.log(
     `[Sentry Edge] Initialized (env=${process.env.VERCEL_ENV || process.env.NODE_ENV || 'development'})`,
   );
@@ -67,8 +68,8 @@ if (dsn) {
       return event;
     },
 
-    // THE ONLY GATE: enabled only in production or when force-enabled
-    enabled: !!dsn && (isProduction || isForceEnabled),
+    // Only on Vercel deployments (not local builds where NODE_ENV=production)
+    enabled: !!dsn && (isVercel || isForceEnabled),
 
     // Environment tagging
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',

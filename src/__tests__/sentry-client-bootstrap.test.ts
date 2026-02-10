@@ -23,9 +23,10 @@ describe('Sentry client bootstrap', () => {
     vi.unstubAllEnvs();
   });
 
-  it('enables Sentry in production when DSN is configured', async () => {
+  it('enables Sentry on Vercel when DSN is configured', async () => {
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
     vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'false');
 
     await import('../../instrumentation-client');

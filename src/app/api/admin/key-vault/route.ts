@@ -114,28 +114,45 @@ export const POST = pipe(
     );
   }
 
-  // Encrypt the secret
-  const { encrypted, iv, authTag } = encryptSecret(body.value);
+  try {
+    // Encrypt the secret
+    const { encrypted, iv, authTag } = encryptSecret(body.value);
 
-  // Store in database
-  const secret = await prisma.secretVault.create({
-    data: {
-      service: body.service,
-      keyName: body.keyName,
-      encrypted,
-      iv,
-      authTag,
-      status: 'active',
-    },
-  });
+    // Store in database
+    const secret = await prisma.secretVault.create({
+      data: {
+        service: body.service,
+        keyName: body.keyName,
+        encrypted,
+        iv,
+        authTag,
+        status: 'active',
+      },
+    });
 
-  return NextResponse.json(
-    {
-      id: secret.id,
-      service: secret.service,
-      keyName: secret.keyName,
-      status: secret.status,
-    },
-    { status: 201 },
-  );
+    return NextResponse.json(
+      {
+        id: secret.id,
+        service: secret.service,
+        keyName: secret.keyName,
+        status: secret.status,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+    if (errorMessage.includes('TOKEN_ENCRYPTION_KEY') || errorMessage.includes('32 char')) {
+      return NextResponse.json(
+        {
+          error: 'encryption_not_configured',
+          message:
+            'TOKEN_ENCRYPTION_KEY environment variable is not set or too short (min 32 chars)',
+        },
+        { status: 503 },
+      );
+    }
+
+    return NextResponse.json({ error: 'internal_error', message: errorMessage }, { status: 500 });
+  }
 });

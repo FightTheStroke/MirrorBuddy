@@ -4,8 +4,9 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-// Production gate: NODE_ENV is reliably set by Next.js in all environments
-const isProduction = process.env.NODE_ENV === 'production';
+// Deployment gate: VERCEL is auto-set by Vercel platform ("1")
+// NODE_ENV=production also matches local builds, polluting Sentry with dev errors
+const isVercel = !!process.env.VERCEL;
 
 // Optional escape hatch for Preview/local debugging
 const isForceEnabled = process.env.SENTRY_FORCE_ENABLE === 'true';
@@ -74,8 +75,8 @@ if (dsn) {
       return breadcrumb;
     },
 
-    // Single gate: enabled flag is the ONLY production check
-    enabled: !!dsn && (isProduction || isForceEnabled),
+    // Single gate: only on Vercel deployments (not local builds)
+    enabled: !!dsn && (isVercel || isForceEnabled),
 
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
 

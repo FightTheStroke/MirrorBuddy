@@ -1,7 +1,7 @@
 ---
 name: app-release-manager-execution
 description: Execution phases (3-5) for app-release-manager. Reference module.
-model: opus-4.5
+model: opus
 ---
 
 # Execution Phases - Reference
