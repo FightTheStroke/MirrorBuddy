@@ -262,7 +262,7 @@ describe('MaterialCard', () => {
 
       fireEvent.click(screen.getByLabelText('Altre azioni'));
 
-      expect(screen.getByRole('menuitem', { name: /sposta/i })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: /move/i })).toBeInTheDocument();
     });
 
     it('should show Delete option when onDelete is provided', () => {

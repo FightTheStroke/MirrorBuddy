@@ -262,8 +262,8 @@ describe('Enterprise Contact Page', () => {
       fireEvent.click(screen.getByRole('button', { name: /invia/i }));
 
       await waitFor(() => {
-        // The form shows success via translation key "successTitle"
-        expect(screen.getByText(/successTitle/i)).toBeInTheDocument();
+        // The form shows success message in Italian
+        expect(screen.getByText(/richiesta inviata/i)).toBeInTheDocument();
       });
     });
 

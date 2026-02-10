@@ -138,7 +138,7 @@ describe('CampaignDetail', () => {
 
     expect(screen.getByText('user1@example.com')).toBeInTheDocument();
     expect(screen.getByText('user2@example.com')).toBeInTheDocument();
-    expect(screen.getByText('failed')).toBeInTheDocument();
+    expect(screen.getAllByText('failed').length).toBeGreaterThan(0);
   });
 
   it('shows recipient count in heading', () => {

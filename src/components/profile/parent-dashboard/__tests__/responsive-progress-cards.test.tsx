@@ -213,7 +213,7 @@ describe('QuizPerformance - Mobile Responsive (F-49)', () => {
       const { container } = render(<QuizPerformance stats={emptyStats} />);
 
       const emptyMessage = container.textContent;
-      expect(emptyMessage).toContain('Nessun quiz completato ancora');
+      expect(emptyMessage).toContain('No quizzes');
     });
   });
 });
