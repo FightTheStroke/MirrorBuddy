@@ -36,7 +36,7 @@ model ResearchExperiment {
   status             String @default("draft") // draft | running | completed | failed
   maestroId          String
   syntheticProfileId String
-  syntheticProfile   SyntheticProfile @relation(fields: [syntheticProfileId], references: [id])
+  syntheticProfile   SyntheticProfile @relation(fields: [syntheticProfileId], references: [id], onDelete: Cascade)
   turns              Int    @default(10)
   config             Json?  // additional experiment parameters
 

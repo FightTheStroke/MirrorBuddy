@@ -80,20 +80,24 @@
 | 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
 | 0128 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
 | 0132 | Self-Service Password Reset Flow              | Time-limited tokens, secure recovery, rate limiting                                             |
+| 0136 | Compliance Absolute Charter                   | Immutable compliance rules, zero-tolerance policy enforcement                                   |
+| 0143 | SSO OIDC Security Hardening                   | OIDC token validation, session binding, PKCE enforcement                                        |
 
 ## Observability & Operations
 
-| #    | Decision                                            | Impact                            |
-| ---- | --------------------------------------------------- | --------------------------------- |
-| 0006 | Telemetry System with Prometheus-Compatible Metrics | Metrics in Prometheus format      |
-| 0007 | Server-Side Notification Persistence                | DB-backed notifications           |
-| 0014 | PWA Push Notifications                              | Native push notifications         |
-| 0047 | Grafana Cloud Enterprise Observability              | Production monitoring             |
-| 0058 | Observability and KPIs for Beta Launch              | KPI tracking dashboard            |
-| 0065 | Service Limits Monitoring and Observability         | External service quota monitoring |
-| 0070 | Sentry Error Tracking Integration                   | Error tracking and alerting       |
-| 0076 | Centralized Logging with Sentry Integration         | Structured logging                |
-| 0121 | Admin Console Data Integrity                        | No mock data, honest health       |
+| #    | Decision                                            | Impact                             |
+| ---- | --------------------------------------------------- | ---------------------------------- |
+| 0006 | Telemetry System with Prometheus-Compatible Metrics | Metrics in Prometheus format       |
+| 0007 | Server-Side Notification Persistence                | DB-backed notifications            |
+| 0014 | PWA Push Notifications                              | Native push notifications          |
+| 0047 | Grafana Cloud Enterprise Observability              | Production monitoring              |
+| 0058 | Observability and KPIs for Beta Launch              | KPI tracking dashboard             |
+| 0065 | Service Limits Monitoring and Observability         | External service quota monitoring  |
+| 0070 | Sentry Error Tracking Integration                   | Error tracking and alerting        |
+| 0076 | Centralized Logging with Sentry Integration         | Structured logging                 |
+| 0121 | Admin Console Data Integrity                        | No mock data, honest health        |
+| 0141 | Admin Dashboard Overhaul v3                         | Redesigned admin layout, new pages |
+| 0142 | Azure Service Principal for Monitoring              | Automated monitoring credentials   |
 
 ## Testing & CI
 
@@ -135,6 +139,9 @@
 | 0138 | Vercel Environment Variable Sync                          | Sync env vars across preview/prod       |
 | 0139 | Tool Naming Normalization                                 | Consistent tool naming conventions      |
 | 0140 | Compliance Audit Remediation                              | 22-issue remediation from 7-agent audit |
+| 0135 | iOS Release Pipeline                                      | Capacitor build, signing, App Store CI  |
+| 0144 | Disaster Recovery & Backup Strategy                       | Supabase backup/recovery procedures     |
+| 0145 | Migration Best Practices                                  | Migration guidelines and enforcement    |
 
 ## Features & Tools
 
@@ -175,6 +182,7 @@
 | 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
 | 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
 | 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
+| 0143 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view  |
 
 ## Consortium & Grants
 
@@ -196,6 +204,6 @@
 
 ---
 
-**Total Active ADRs**: 118
+**Total Active ADRs**: 126
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-09
+**Last Updated**: 2026-02-10

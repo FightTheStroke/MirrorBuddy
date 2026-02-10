@@ -14,10 +14,10 @@
  * - endDate: YYYY-MM-DD (default: today)
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { LocaleAnalyticsResponse } from "./types";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { LocaleAnalyticsResponse } from './types';
 import {
   buildUserLocaleMap,
   aggregateUserMetrics,
@@ -25,16 +25,16 @@ import {
   aggregateMessageMetrics,
   aggregateToolMetrics,
   calculateTrends,
-} from "./helpers";
+} from './helpers';
 
 export const GET = pipe(
-  withSentry("/api/admin/analytics/locales"),
+  withSentry('/api/admin/analytics/locales'),
   withAdmin,
 )(async (ctx) => {
   // Parse query parameters
   const searchParams = ctx.req.nextUrl.searchParams;
-  const startDateParam = searchParams.get("startDate");
-  const endDateParam = searchParams.get("endDate");
+  const startDateParam = searchParams.get('startDate');
+  const endDateParam = searchParams.get('endDate');
 
   const now = new Date();
   const startDate = startDateParam
@@ -44,7 +44,7 @@ export const GET = pipe(
 
   // Fetch user data by language/locale (from Settings)
   const usersByLocale = await prisma.settings.groupBy({
-    by: ["language"],
+    by: ['language'],
     where: {
       user: {
         isTestData: false,
@@ -57,7 +57,7 @@ export const GET = pipe(
 
   // Fetch conversation data to get session counts by locale
   const conversationsByLocale = await prisma.conversation.groupBy({
-    by: ["userId"],
+    by: ['userId'],
     where: {
       isTestData: false,
       createdAt: {
@@ -80,6 +80,7 @@ export const GET = pipe(
         in: userIdsFromConversations,
       },
     },
+    take: 50000,
     select: {
       language: true,
       userId: true,
@@ -104,6 +105,7 @@ export const GET = pipe(
       },
       isTestData: false,
     },
+    take: 50000,
     select: {
       id: true,
       conversationId: true,
@@ -125,6 +127,7 @@ export const GET = pipe(
         lte: endDate,
       },
     },
+    take: 50000,
     select: {
       id: true,
       toolType: true,
@@ -140,6 +143,7 @@ export const GET = pipe(
 
   // Get all user settings
   const allUserSettings = await prisma.settings.findMany({
+    take: 50000,
     select: {
       userId: true,
       language: true,
@@ -149,20 +153,14 @@ export const GET = pipe(
   const userLocaleMap = buildUserLocaleMap(allUserSettings);
   const localeMetricsMap = aggregateUserMetrics(usersByLocale);
 
-  aggregateSessionMetrics(
-    conversationsByLocale,
-    userLocaleMap,
-    localeMetricsMap,
-  );
+  aggregateSessionMetrics(conversationsByLocale, userLocaleMap, localeMetricsMap);
   aggregateMessageMetrics(messages, userLocaleMap, localeMetricsMap);
   aggregateToolMetrics(toolOutputs, userLocaleMap, localeMetricsMap);
 
   const trends = calculateTrends(messages, userLocaleMap);
 
   // Convert to array and sort
-  const byLocale = Array.from(localeMetricsMap.values()).sort(
-    (a, b) => b.userCount - a.userCount,
-  );
+  const byLocale = Array.from(localeMetricsMap.values()).sort((a, b) => b.userCount - a.userCount);
 
   // Top locales
   const topLocales = byLocale.slice(0, 10).map((metric) => ({
@@ -172,13 +170,8 @@ export const GET = pipe(
   }));
 
   // Summary
-  const totalUsers = Array.from(
-    new Set(allUserSettings.map((s) => s.userId)),
-  ).length;
-  const totalSessions = conversationsByLocale.reduce(
-    (sum, item) => sum + item._count.id,
-    0,
-  );
+  const totalUsers = Array.from(new Set(allUserSettings.map((s) => s.userId))).length;
+  const totalSessions = conversationsByLocale.reduce((sum, item) => sum + item._count.id, 0);
   const totalMessages = messages.length;
 
   const response: LocaleAnalyticsResponse = {
@@ -187,8 +180,8 @@ export const GET = pipe(
       totalUsers,
       totalSessions,
       totalMessages,
-      periodStart: startDate.toISOString().split("T")[0],
-      periodEnd: endDate.toISOString().split("T")[0],
+      periodStart: startDate.toISOString().split('T')[0],
+      periodEnd: endDate.toISOString().split('T')[0],
     },
     byLocale,
     trends,

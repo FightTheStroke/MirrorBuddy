@@ -4,52 +4,49 @@
 // Uses Prisma client with PostgreSQL driver adapter
 // ============================================================================
 
-import "server-only";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-import { logger } from "@/lib/logger";
-import { isSupabaseUrl } from "@/lib/utils/url-validation";
-import { isStagingMode } from "@/lib/environment/staging-detector";
-import { createPIIMiddleware } from "@/lib/db/pii-middleware";
+import 'server-only';
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import { logger } from '@/lib/logger';
+import { isSupabaseUrl } from '@/lib/utils/url-validation';
+import { isStagingMode } from '@/lib/environment/staging-detector';
+import { createPIIMiddleware } from '@/lib/db/pii-middleware';
+import { createSlowQueryMonitor } from '@/lib/db/slow-query-monitor';
 import {
   loadSupabaseCertificate,
   buildSslConfig,
   cleanConnectionString,
-} from "@/lib/db/ssl-config";
+} from '@/lib/db/ssl-config';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const isE2E = process.env.E2E_TESTS === "1";
+const isE2E = process.env.E2E_TESTS === '1';
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-const isProduction =
-  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
 // SAFETY CHECK: Auto-switch to local PostgreSQL in development
 // Prevents accidental writes to production Supabase database
 // Override with DEV_DATABASE_URL in .env for custom local setup
 const devLocalOverride =
-  !isProduction &&
-  !isE2E &&
-  !!process.env.DATABASE_URL &&
-  isSupabaseUrl(process.env.DATABASE_URL);
+  !isProduction && !isE2E && !!process.env.DATABASE_URL && isSupabaseUrl(process.env.DATABASE_URL);
 
 if (devLocalOverride) {
   logger.warn(
-    "[db] Supabase URL detected in development - auto-switching to local PostgreSQL. " +
-      "Set DEV_DATABASE_URL in .env to customize.",
+    '[db] Supabase URL detected in development - auto-switching to local PostgreSQL. ' +
+      'Set DEV_DATABASE_URL in .env to customize.',
   );
 }
 
 // DEBUG: Log environment variables when db.ts loads (E2E only)
 if (isE2E) {
-  logger.info("[db.ts] E2E_TESTS=1, checking environment variables", {
+  logger.info('[db.ts] E2E_TESTS=1, checking environment variables', {
     hasTestDatabaseUrl: !!testDatabaseUrl,
     hasDatabaseUrl: !!process.env.DATABASE_URL,
-    testDatabaseUrlSet: testDatabaseUrl ? "SET" : "MISSING",
-    databaseUrlSet: process.env.DATABASE_URL ? "SET" : "MISSING",
+    testDatabaseUrlSet: testDatabaseUrl ? 'SET' : 'MISSING',
+    databaseUrlSet: process.env.DATABASE_URL ? 'SET' : 'MISSING',
   });
 }
 
@@ -57,7 +54,7 @@ const connectionString = isE2E
   ? (() => {
       if (!testDatabaseUrl) {
         throw new Error(
-          "TEST_DATABASE_URL must be set when E2E_TESTS=1 to avoid using production data.",
+          'TEST_DATABASE_URL must be set when E2E_TESTS=1 to avoid using production data.',
         );
       }
       // CRITICAL: Block production Supabase URLs in E2E tests
@@ -69,18 +66,14 @@ const connectionString = isE2E
         );
       }
       // Validate that connection string has credentials
-      if (!testDatabaseUrl.includes("@")) {
-        throw new Error(
-          `TEST_DATABASE_URL missing credentials (no '@' found): ${testDatabaseUrl}`,
-        );
+      if (!testDatabaseUrl.includes('@')) {
+        throw new Error(`TEST_DATABASE_URL missing credentials (no '@' found): ${testDatabaseUrl}`);
       }
       return testDatabaseUrl;
     })()
   : devLocalOverride
-    ? process.env.DEV_DATABASE_URL ||
-      "postgresql://postgres:postgres@localhost:5432/mirrorbuddy"
-    : process.env.DATABASE_URL ||
-      "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+    ? process.env.DEV_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mirrorbuddy'
+    : process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mirrorbuddy';
 
 // Load Supabase certificate chain (ADR 0067)
 const supabaseCaCert = loadSupabaseCertificate();
@@ -100,7 +93,7 @@ const adapter = new PrismaPg(pool);
 
 const basePrisma = new PrismaClient({
   adapter,
-  log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
 });
 
 // ============================================================================
@@ -112,33 +105,30 @@ const basePrisma = new PrismaClient({
 // Models that have isTestData field (must be kept in sync with schema)
 // Update this list when adding/removing isTestData from models
 const MODELS_WITH_TEST_DATA_FLAG = [
-  "User",
-  "Conversation",
-  "Message",
-  "FlashcardProgress",
-  "QuizResult",
-  "Material",
-  "SessionMetrics",
-  "UserActivity",
-  "TelemetryEvent",
-  "StudySession",
-  "FunnelEvent",
+  'User',
+  'Conversation',
+  'Message',
+  'FlashcardProgress',
+  'QuizResult',
+  'Material',
+  'SessionMetrics',
+  'UserActivity',
+  'TelemetryEvent',
+  'StudySession',
+  'FunnelEvent',
 ] as const;
 
 type ModelWithTestData = (typeof MODELS_WITH_TEST_DATA_FLAG)[number];
 
 // Create extension for staging mode auto-tagging
 const stagingExtension = basePrisma.$extends({
-  name: "staging-test-data-tagger",
+  name: 'staging-test-data-tagger',
   query: {
     // Apply to all models that have isTestData field
     $allModels: {
       // Intercept create operations
       async create({ model, operation: _operation, args, query }) {
-        if (
-          isStagingMode &&
-          MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)
-        ) {
+        if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
           args.data = {
             ...args.data,
             isTestData: true,
@@ -148,10 +138,7 @@ const stagingExtension = basePrisma.$extends({
       },
       // Intercept createMany operations
       async createMany({ model, operation: _operation2, args, query }) {
-        if (
-          isStagingMode &&
-          MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)
-        ) {
+        if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
           if (Array.isArray(args.data)) {
             args.data = args.data.map((item: Record<string, unknown>) => ({
               ...item,
@@ -179,12 +166,19 @@ const stagingExtension = basePrisma.$extends({
 const piiMiddleware = createPIIMiddleware();
 const piiExtension = stagingExtension.$extends(piiMiddleware);
 
+// ============================================================================
+// SLOW QUERY MONITOR (using Prisma Client Extensions)
+// Logs queries exceeding 1s (warn) and 3s (critical) for performance monitoring
+// ============================================================================
+
+const slowQueryMonitor = createSlowQueryMonitor();
+const monitoredClient = piiExtension.$extends(slowQueryMonitor);
+
 // Export the extended client (or base client if already initialized)
 // Type assertion is safe because $extends preserves the PrismaClient interface
-export const prisma =
-  globalForPrisma.prisma ?? (piiExtension as unknown as PrismaClient);
+export const prisma = globalForPrisma.prisma ?? (monitoredClient as unknown as PrismaClient);
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
@@ -198,9 +192,7 @@ export { pool as dbPool };
 export function isDatabaseNotInitialized(error: unknown): boolean {
   const message = String(error);
   return (
-    message.includes("does not exist") ||
-    message.includes("relation") ||
-    message.includes("P2021")
+    message.includes('does not exist') || message.includes('relation') || message.includes('P2021')
   ); // Prisma error code for missing table
 }
 
@@ -209,9 +201,9 @@ export function isDatabaseNotInitialized(error: unknown): boolean {
  */
 export function getDatabaseErrorMessage(error: unknown): string {
   if (isDatabaseNotInitialized(error)) {
-    return "Database not initialized. Run: npx prisma migrate deploy";
+    return 'Database not initialized. Run: npx prisma migrate deploy';
   }
-  return "Database error";
+  return 'Database error';
 }
 
 export default prisma;

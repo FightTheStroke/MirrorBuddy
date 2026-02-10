@@ -8,15 +8,11 @@
  * @module rag/vector-store
  */
 
-import { prisma } from "@/lib/db";
-import { cosineSimilarity } from "./embedding-service";
-import { logger } from "@/lib/logger";
-import {
-  checkPgvectorStatus,
-  nativeVectorSearch,
-  updateNativeVector,
-} from "./pgvector-utils";
-import { anonymizeConversationMessage } from "@/lib/privacy";
+import { prisma } from '@/lib/db';
+import { cosineSimilarity } from './embedding-service';
+import { logger } from '@/lib/logger';
+import { checkPgvectorStatus, nativeVectorSearch, updateNativeVector } from './pgvector-utils';
+import { anonymizeConversationMessage } from '@/lib/privacy';
 
 /** Expected embedding dimensions */
 const EXPECTED_DIMENSIONS = 1536;
@@ -26,13 +22,7 @@ const EXPECTED_DIMENSIONS = 1536;
  */
 export interface StoreEmbeddingInput {
   userId: string;
-  sourceType:
-    | "material"
-    | "flashcard"
-    | "studykit"
-    | "message"
-    | "tool"
-    | "conversation_summary";
+  sourceType: 'material' | 'flashcard' | 'studykit' | 'message' | 'tool' | 'conversation_summary';
   sourceId: string;
   chunkIndex?: number;
   content: string;
@@ -89,7 +79,7 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
     );
   }
 
-  logger.debug("[VectorStore] Storing embedding", {
+  logger.debug('[VectorStore] Storing embedding', {
     sourceType: input.sourceType,
     sourceId: input.sourceId,
     chunkIndex: input.chunkIndex ?? 0,
@@ -106,7 +96,7 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
       chunkIndex: input.chunkIndex ?? 0,
       content: anonymizedContent,
       vector: JSON.stringify(input.vector),
-      model: input.model ?? "text-embedding-3-small",
+      model: input.model ?? 'text-embedding-3-small',
       dimensions: input.vector.length,
       tokenCount: Math.ceil(anonymizedContent.length / 4),
       subject: input.subject,
@@ -116,7 +106,7 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
 
   // Update native vector for pgvector search (non-blocking)
   updateNativeVector(prisma, embedding.id, input.vector).catch((err) => {
-    logger.warn("[VectorStore] Failed to update native vector", {
+    logger.warn('[VectorStore] Failed to update native vector', {
       error: String(err),
     });
   });
@@ -130,19 +120,10 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
  * PostgreSQL Mode: Uses native pgvector with HNSW index for O(log n) queries
  * Fallback Mode: Fetches all embeddings and computes similarity in JavaScript
  */
-export async function searchSimilar(
-  options: SearchOptions,
-): Promise<VectorSearchResult[]> {
-  const {
-    userId,
-    vector,
-    limit = 10,
-    minSimilarity = 0.5,
-    sourceType,
-    subject,
-  } = options;
+export async function searchSimilar(options: SearchOptions): Promise<VectorSearchResult[]> {
+  const { userId, vector, limit = 10, minSimilarity = 0.5, sourceType, subject } = options;
 
-  logger.debug("[VectorStore] Searching similar", {
+  logger.debug('[VectorStore] Searching similar', {
     userId,
     limit,
     minSimilarity,
@@ -163,7 +144,7 @@ export async function searchSimilar(
         subject,
       });
 
-      logger.debug("[VectorStore] Native pgvector search used", {
+      logger.debug('[VectorStore] Native pgvector search used', {
         resultCount: nativeResults.length,
         indexType: pgStatus.indexType,
       });
@@ -179,7 +160,7 @@ export async function searchSimilar(
         tags: JSON.parse(r.tags) as string[],
       }));
     } catch (err) {
-      logger.warn("[VectorStore] Native search failed, falling back to JS", {
+      logger.warn('[VectorStore] Native search failed, falling back to JS', {
         error: String(err),
       });
     }
@@ -192,6 +173,7 @@ export async function searchSimilar(
 
   const embeddings = await prisma.contentEmbedding.findMany({
     where,
+    take: 1000,
     select: {
       id: true,
       sourceType: true,
@@ -233,16 +215,14 @@ export async function searchSimilar(
 /**
  * Delete embeddings by source
  */
-export async function deleteEmbeddings(
-  options: DeleteOptions,
-): Promise<number> {
+export async function deleteEmbeddings(options: DeleteOptions): Promise<number> {
   const { userId, sourceType, sourceId } = options;
 
   const where: Record<string, unknown> = { userId };
   if (sourceType) where.sourceType = sourceType;
   if (sourceId) where.sourceId = sourceId;
 
-  logger.debug("[VectorStore] Deleting embeddings", where);
+  logger.debug('[VectorStore] Deleting embeddings', where);
 
   const result = await prisma.contentEmbedding.deleteMany({ where });
   return result.count;

@@ -4,9 +4,9 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { FUNNEL_STAGES, type FunnelStage } from "./constants";
+import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { FUNNEL_STAGES, type FunnelStage } from './constants';
 
 export { FUNNEL_STAGES, type FunnelStage };
 
@@ -32,14 +32,14 @@ export async function recordFunnelEvent({
   isTestData = false,
 }: RecordFunnelEventParams): Promise<void> {
   if (!visitorId && !userId) {
-    throw new Error("Either visitorId or userId must be provided");
+    throw new Error('Either visitorId or userId must be provided');
   }
 
   // Detect test data from identifier patterns (ADR 0065)
   const detectedTestData =
     isTestData ||
-    (visitorId?.startsWith("e2e-test-") ?? false) ||
-    (userId?.startsWith("e2e-test-") ?? false);
+    (visitorId?.startsWith('e2e-test-') ?? false) ||
+    (userId?.startsWith('e2e-test-') ?? false);
 
   await prisma.funnelEvent.create({
     data: {
@@ -66,7 +66,7 @@ export async function getLatestStage(identifier: {
 
   const latest = await prisma.funnelEvent.findFirst({
     where,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
     select: { stage: true },
   });
 
@@ -104,7 +104,8 @@ export async function getFunnelJourney(identifier: {
 
   const events = await prisma.funnelEvent.findMany({
     where,
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
+    take: 1000,
     select: {
       stage: true,
       createdAt: true,

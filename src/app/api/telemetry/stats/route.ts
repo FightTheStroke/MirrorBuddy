@@ -3,20 +3,20 @@
  * GET: Return aggregated usage statistics for dashboard visualization
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import type { UsageStats } from "@/lib/telemetry/types";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAuth } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import type { UsageStats } from '@/lib/telemetry/types';
 import {
   buildDailyActivityChart,
   buildFeatureUsageChart,
   buildMaestroPreferencesChart,
   calculateTrend,
   calculateEngagementScore,
-} from "./helpers";
+} from './helpers';
 
 export const GET = pipe(
-  withSentry("/api/telemetry/stats"),
+  withSentry('/api/telemetry/stats'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
@@ -35,33 +35,37 @@ export const GET = pipe(
         userId,
         timestamp: { gte: todayStart },
       },
+      take: 5000,
     }),
     prisma.telemetryEvent.findMany({
       where: {
         userId,
         timestamp: { gte: weekStart },
       },
-      orderBy: { timestamp: "asc" },
+      take: 10000,
+      orderBy: { timestamp: 'asc' },
     }),
     prisma.telemetryEvent.findMany({
       where: {
         userId,
-        category: "navigation",
-        action: "session_started",
+        category: 'navigation',
+        action: 'session_started',
         timestamp: { gte: weekStart },
       },
+      take: 1000,
     }),
     prisma.studySession.findMany({
       where: {
         userId,
         startedAt: { gte: weekStart },
       },
-      orderBy: { startedAt: "asc" },
+      take: 1000,
+      orderBy: { startedAt: 'asc' },
     }),
   ]);
 
   const todaySessions = todayEvents.filter(
-    (e) => e.category === "navigation" && e.action === "session_started",
+    (e) => e.category === 'navigation' && e.action === 'session_started',
   ).length;
 
   const todayStudyMinutes = studySessions
@@ -69,17 +73,12 @@ export const GET = pipe(
     .reduce((sum, s) => sum + (s.duration || 0), 0);
 
   const todayQuestions = todayEvents.filter(
-    (e) => e.category === "conversation" && e.action === "question_asked",
+    (e) => e.category === 'conversation' && e.action === 'question_asked',
   ).length;
 
-  const weeklyActiveMinutes = studySessions.reduce(
-    (sum, s) => sum + (s.duration || 0),
-    0,
-  );
+  const weeklyActiveMinutes = studySessions.reduce((sum, s) => sum + (s.duration || 0), 0);
 
-  const weeklyMaestrosUsed = [
-    ...new Set(studySessions.map((s) => s.maestroId).filter(Boolean)),
-  ];
+  const weeklyMaestrosUsed = [...new Set(studySessions.map((s) => s.maestroId).filter(Boolean))];
 
   const dailyActivityChart = buildDailyActivityChart(studySessions, now);
   const featureUsageChart = buildFeatureUsageChart(weekEvents);
@@ -90,7 +89,7 @@ export const GET = pipe(
     sessionsThisWeek: sessions.length,
     studyMinutesThisWeek: weeklyActiveMinutes,
     questionsThisWeek: weekEvents.filter(
-      (e) => e.category === "conversation" && e.action === "question_asked",
+      (e) => e.category === 'conversation' && e.action === 'question_asked',
     ).length,
     maestrosUsedThisWeek: weeklyMaestrosUsed.length,
   });

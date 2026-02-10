@@ -3,9 +3,9 @@
  * Aggregates telemetry events by locale for Prometheus metrics
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import type { MetricSample } from "./http-metrics-collector";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import type { MetricSample } from './http-metrics-collector';
 
 /**
  * Time window for aggregating telemetry events (last 5 minutes)
@@ -23,13 +23,13 @@ interface LocaleMetrics {
  * Extract locale from event metadata
  */
 function extractLocale(metadata: string | null): string {
-  if (!metadata) return "unknown";
+  if (!metadata) return 'unknown';
 
   try {
     const parsed = JSON.parse(metadata);
-    return parsed.locale || "unknown";
+    return parsed.locale || 'unknown';
   } catch {
-    return "unknown";
+    return 'unknown';
   }
 }
 
@@ -51,6 +51,7 @@ export async function collectTelemetryMetrics(
           gte: cutoffTime,
         },
       },
+      take: 50000,
       select: {
         category: true,
         action: true,
@@ -80,7 +81,7 @@ export async function collectTelemetryMetrics(
       const metrics = metricsByLocale[locale];
 
       // Count page views
-      if (event.category === "navigation" && event.action === "page_view") {
+      if (event.category === 'navigation' && event.action === 'page_view') {
         metrics.pageViews++;
       }
 
@@ -91,23 +92,22 @@ export async function collectTelemetryMetrics(
 
       // Count chat interactions
       if (
-        event.category === "conversation" &&
-        (event.action === "question_asked" || event.action === "message_sent")
+        event.category === 'conversation' &&
+        (event.action === 'question_asked' || event.action === 'message_sent')
       ) {
         metrics.chatMessages++;
       }
 
       // Count feature usage
-      if (event.category === "education" || event.category === "tools") {
+      if (event.category === 'education' || event.category === 'tools') {
         const feature = event.label || event.action;
-        metrics.featureUsage[feature] =
-          (metrics.featureUsage[feature] || 0) + 1;
+        metrics.featureUsage[feature] = (metrics.featureUsage[feature] || 0) + 1;
       }
     }
 
     // Count unique sessions per locale
     for (const sessionKey of uniqueSessions) {
-      const [locale] = sessionKey.split(":");
+      const [locale] = sessionKey.split(':');
       if (metricsByLocale[locale]) {
         metricsByLocale[locale].sessions++;
       }
@@ -119,7 +119,7 @@ export async function collectTelemetryMetrics(
 
       // Page views metric
       samples.push({
-        name: "telemetry_page_views_total",
+        name: 'telemetry_page_views_total',
         labels: localeLabels,
         value: metrics.pageViews,
         timestamp,
@@ -127,7 +127,7 @@ export async function collectTelemetryMetrics(
 
       // Sessions metric
       samples.push({
-        name: "telemetry_sessions_total",
+        name: 'telemetry_sessions_total',
         labels: localeLabels,
         value: metrics.sessions,
         timestamp,
@@ -135,7 +135,7 @@ export async function collectTelemetryMetrics(
 
       // Chat messages metric
       samples.push({
-        name: "telemetry_chat_messages_total",
+        name: 'telemetry_chat_messages_total',
         labels: localeLabels,
         value: metrics.chatMessages,
         timestamp,
@@ -144,7 +144,7 @@ export async function collectTelemetryMetrics(
       // Feature usage metrics
       for (const [feature, count] of Object.entries(metrics.featureUsage)) {
         samples.push({
-          name: "telemetry_feature_usage_total",
+          name: 'telemetry_feature_usage_total',
           labels: { ...localeLabels, feature },
           value: count,
           timestamp,
@@ -152,14 +152,14 @@ export async function collectTelemetryMetrics(
       }
     }
 
-    logger.debug("Telemetry metrics collected", {
+    logger.debug('Telemetry metrics collected', {
       locales: Object.keys(metricsByLocale).length,
       samples: samples.length,
     });
 
     return samples;
   } catch (error) {
-    logger.error("Failed to collect telemetry metrics", {
+    logger.error('Failed to collect telemetry metrics', {
       error: String(error),
     });
     return [];

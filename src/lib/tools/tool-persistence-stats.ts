@@ -17,6 +17,7 @@ export async function getToolStats(userId: string): Promise<{
 }> {
   const materials = await prisma.material.findMany({
     where: { userId, status: 'active' },
+    take: 5000,
     select: {
       toolType: true,
       isBookmarked: true,
@@ -49,10 +50,7 @@ export async function getToolStats(userId: string): Promise<{
 /**
  * Get recent tools for a user
  */
-export async function getRecentTools(
-  userId: string,
-  limit: number = 5
-): Promise<SavedTool[]> {
+export async function getRecentTools(userId: string, limit: number = 5): Promise<SavedTool[]> {
   const materials = await prisma.material.findMany({
     where: { userId, status: 'active' },
     orderBy: { createdAt: 'desc' },
@@ -69,6 +67,7 @@ export async function getBookmarkedTools(userId: string): Promise<SavedTool[]> {
   const materials = await prisma.material.findMany({
     where: { userId, status: 'active', isBookmarked: true },
     orderBy: { createdAt: 'desc' },
+    take: 500,
   });
 
   return materials.map(materialToSavedTool);
@@ -77,10 +76,7 @@ export async function getBookmarkedTools(userId: string): Promise<SavedTool[]> {
 /**
  * Get tools by session ID
  */
-export async function getToolsBySession(
-  userId: string,
-  sessionId: string
-): Promise<SavedTool[]> {
+export async function getToolsBySession(userId: string, sessionId: string): Promise<SavedTool[]> {
   const materials = await prisma.material.findMany({
     where: {
       userId,
@@ -88,6 +84,7 @@ export async function getToolsBySession(
       status: 'active',
     },
     orderBy: { createdAt: 'desc' },
+    take: 500,
   });
 
   return materials.map(materialToSavedTool);
@@ -99,7 +96,7 @@ export async function getToolsBySession(
 export async function linkToolToSession(
   idOrToolId: string,
   userId: string,
-  sessionId: string
+  sessionId: string,
 ): Promise<SavedTool | null> {
   const material = await prisma.material.findFirst({
     where: {
@@ -121,10 +118,7 @@ export async function linkToolToSession(
 /**
  * Increment view count for a tool
  */
-export async function incrementViewCount(
-  idOrToolId: string,
-  userId: string
-): Promise<void> {
+export async function incrementViewCount(idOrToolId: string, userId: string): Promise<void> {
   const material = await prisma.material.findFirst({
     where: {
       userId,

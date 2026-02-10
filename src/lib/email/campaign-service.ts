@@ -3,9 +3,9 @@
  * Manages email campaigns with recipient filtering and preview functionality.
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import type { Prisma } from "@prisma/client";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import type { Prisma } from '@prisma/client';
 
 /** Recipient filter criteria for targeting user segments */
 export interface RecipientFilters {
@@ -19,7 +19,7 @@ export interface RecipientFilters {
 
 /** Campaign list filter options */
 export interface CampaignListFilters {
-  status?: "DRAFT" | "SENDING" | "SENT" | "FAILED";
+  status?: 'DRAFT' | 'SENDING' | 'SENT' | 'FAILED';
 }
 
 /** Campaign data structure */
@@ -59,9 +59,7 @@ export interface RecipientPreview {
 }
 
 /** Build Prisma where clause from recipient filters */
-export function buildRecipientQuery(
-  filters: RecipientFilters,
-): Prisma.UserWhereInput {
+export function buildRecipientQuery(filters: RecipientFilters): Prisma.UserWhereInput {
   const where: Prisma.UserWhereInput = {};
 
   // Filter by subscription tier
@@ -78,7 +76,7 @@ export function buildRecipientQuery(
   // Filter by user role
   if (filters.roles && filters.roles.length > 0) {
     where.role = {
-      in: filters.roles as Array<"USER" | "ADMIN">,
+      in: filters.roles as Array<'USER' | 'ADMIN'>,
     };
   }
 
@@ -114,9 +112,7 @@ export function buildRecipientQuery(
 }
 
 /** Get recipient preview with count and first 10 sample users */
-export async function getRecipientPreview(
-  filters: RecipientFilters,
-): Promise<RecipientPreview> {
+export async function getRecipientPreview(filters: RecipientFilters): Promise<RecipientPreview> {
   try {
     const where = buildRecipientQuery(filters);
 
@@ -152,7 +148,7 @@ export async function getRecipientPreview(
       sampleUsers,
     };
   } catch (error) {
-    logger.error("Error getting recipient preview", {
+    logger.error('Error getting recipient preview', {
       filters,
       error: String(error),
     });
@@ -173,12 +169,12 @@ export async function createCampaign(
         name,
         templateId,
         filters: filters as Prisma.InputJsonValue,
-        status: "DRAFT",
+        status: 'DRAFT',
         adminId,
       },
     });
 
-    logger.info("Email campaign created", {
+    logger.info('Email campaign created', {
       id: campaign.id,
       name: campaign.name,
       adminId,
@@ -186,7 +182,7 @@ export async function createCampaign(
 
     return campaign as EmailCampaign;
   } catch (error) {
-    logger.error("Error creating email campaign", {
+    logger.error('Error creating email campaign', {
       name,
       templateId,
       adminId,
@@ -212,7 +208,7 @@ export async function getCampaign(id: string): Promise<EmailCampaign | null> {
 
     return campaign as EmailCampaign;
   } catch (error) {
-    logger.error("Error fetching email campaign", {
+    logger.error('Error fetching email campaign', {
       id,
       error: String(error),
     });
@@ -221,9 +217,7 @@ export async function getCampaign(id: string): Promise<EmailCampaign | null> {
 }
 
 /** List campaigns with optional status filter, ordered by createdAt DESC */
-export async function listCampaigns(
-  filters?: CampaignListFilters,
-): Promise<EmailCampaign[]> {
+export async function listCampaigns(filters?: CampaignListFilters): Promise<EmailCampaign[]> {
   try {
     const where: Prisma.EmailCampaignWhereInput = {};
     if (filters?.status) {
@@ -233,8 +227,9 @@ export async function listCampaigns(
     const campaigns = await prisma.emailCampaign.findMany({
       where,
       orderBy: {
-        createdAt: "desc",
+        createdAt: 'desc',
       },
+      take: 500,
       include: {
         template: true,
       },
@@ -242,7 +237,7 @@ export async function listCampaigns(
 
     return campaigns as EmailCampaign[];
   } catch (error) {
-    logger.error("Error listing email campaigns", {
+    logger.error('Error listing email campaigns', {
       filters,
       error: String(error),
     });
@@ -260,12 +255,10 @@ export async function sendCampaign(campaignId: string): Promise<void> {
     }
 
     if (!campaign.template) {
-      throw new Error(
-        `Campaign template not found for campaign: ${campaignId}`,
-      );
+      throw new Error(`Campaign template not found for campaign: ${campaignId}`);
     }
 
-    logger.info("Starting campaign send", {
+    logger.info('Starting campaign send', {
       campaignId,
       campaignName: campaign.name,
       templateId: campaign.template.id,
@@ -275,6 +268,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
     const where = buildRecipientQuery(campaign.filters as RecipientFilters);
     const recipients = await prisma.user.findMany({
       where,
+      take: 10000,
       select: {
         id: true,
         email: true,
@@ -304,14 +298,13 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       },
     });
 
-    logger.info("Recipients loaded", {
+    logger.info('Recipients loaded', {
       campaignId,
       recipientCount: recipients.length,
     });
 
     // Check quota
-    const { getResendLimits } =
-      await import("@/lib/observability/resend-limits");
+    const { getResendLimits } = await import('@/lib/observability/resend-limits');
     const limits = await getResendLimits();
 
     const availableQuota = Math.min(
@@ -325,7 +318,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       );
     }
 
-    logger.info("Quota check passed", {
+    logger.info('Quota check passed', {
       campaignId,
       needed: recipients.length,
       available: availableQuota,
@@ -335,41 +328,34 @@ export async function sendCampaign(campaignId: string): Promise<void> {
     await prisma.emailCampaign.update({
       where: { id: campaignId },
       data: {
-        status: "SENDING",
+        status: 'SENDING',
       },
     });
 
     // Import dependencies
-    const { canSendTo, getPreferences } = await import("./preference-service");
-    const { renderTemplate } = await import("./template-service");
-    const { sendEmail } = await import("./index");
+    const { canSendTo, getPreferences } = await import('./preference-service');
+    const { renderTemplate } = await import('./template-service');
+    const { sendEmail } = await import('./index');
 
     // Validate template category maps to a known preference key
-    const validCategories = [
-      "productUpdates",
-      "educationalNewsletter",
-      "announcements",
-    ];
+    const validCategories = ['productUpdates', 'educationalNewsletter', 'announcements'];
     const emailCategory = validCategories.includes(campaign.template.category)
-      ? (campaign.template.category as
-          | "productUpdates"
-          | "educationalNewsletter"
-          | "announcements")
-      : "announcements"; // Fallback to announcements for unmapped categories
+      ? (campaign.template.category as 'productUpdates' | 'educationalNewsletter' | 'announcements')
+      : 'announcements'; // Fallback to announcements for unmapped categories
 
     // Process recipients sequentially
     let sentCount = 0;
     let failedCount = 0;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.com";
-    const currentDate = new Date().toLocaleDateString("it-IT");
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.com';
+    const currentDate = new Date().toLocaleDateString('it-IT');
     const currentYear = new Date().getFullYear().toString();
 
     for (const recipient of recipients) {
       try {
         // Skip if no email
         if (!recipient.email) {
-          logger.warn("Recipient has no email, skipping", {
+          logger.warn('Recipient has no email, skipping', {
             campaignId,
             userId: recipient.id,
           });
@@ -378,8 +364,8 @@ export async function sendCampaign(campaignId: string): Promise<void> {
             data: {
               campaignId,
               userId: recipient.id,
-              email: recipient.email || "no-email@unknown.com",
-              status: "FAILED",
+              email: recipient.email || 'no-email@unknown.com',
+              status: 'FAILED',
             },
           });
 
@@ -391,7 +377,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
         const canSend = await canSendTo(recipient.id, emailCategory);
 
         if (!canSend) {
-          logger.info("User has opted out, skipping", {
+          logger.info('User has opted out, skipping', {
             campaignId,
             userId: recipient.id,
             category: emailCategory,
@@ -402,7 +388,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
               campaignId,
               userId: recipient.id,
               email: recipient.email,
-              status: "FAILED",
+              status: 'FAILED',
             },
           });
 
@@ -412,19 +398,19 @@ export async function sendCampaign(campaignId: string): Promise<void> {
 
         // Re-fetch preferences to get valid token (canSendTo may have created defaults)
         const preferences = await getPreferences(recipient.id);
-        const unsubscribeToken = preferences?.unsubscribeToken || "no-token";
+        const unsubscribeToken = preferences?.unsubscribeToken || 'no-token';
         const unsubscribeUrl = `${appUrl}/unsubscribe?token=${unsubscribeToken}&category=${emailCategory}`;
 
         // Prepare template variables
         const variables: Record<string, string> = {
-          name: recipient.profile?.name || recipient.username || "User",
+          name: recipient.profile?.name || recipient.username || 'User',
           email: recipient.email,
-          username: recipient.username || "",
-          tier: recipient.subscription?.tier?.code || "trial",
-          schoolLevel: recipient.profile?.schoolLevel || "",
-          gradeLevel: recipient.profile?.gradeLevel?.toString() || "",
-          age: recipient.profile?.age?.toString() || "",
-          language: recipient.settings?.language || "it",
+          username: recipient.username || '',
+          tier: recipient.subscription?.tier?.code || 'trial',
+          schoolLevel: recipient.profile?.schoolLevel || '',
+          gradeLevel: recipient.profile?.gradeLevel?.toString() || '',
+          age: recipient.profile?.age?.toString() || '',
+          language: recipient.settings?.language || 'it',
           appUrl,
           unsubscribeUrl,
           currentDate,
@@ -452,7 +438,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
             campaignId,
             userId: recipient.id,
             email: recipient.email,
-            status: result.success ? "SENT" : "FAILED",
+            status: result.success ? 'SENT' : 'FAILED',
             resendMessageId: result.messageId,
             sentAt: result.success ? new Date() : null,
           },
@@ -460,7 +446,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
 
         if (result.success) {
           sentCount++;
-          logger.info("Email sent successfully", {
+          logger.info('Email sent successfully', {
             campaignId,
             recipientId: recipientRecord.id,
             userId: recipient.id,
@@ -468,7 +454,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
           });
         } else {
           failedCount++;
-          logger.error("Email send failed", {
+          logger.error('Email send failed', {
             campaignId,
             recipientId: recipientRecord.id,
             userId: recipient.id,
@@ -480,7 +466,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
         await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (error) {
         failedCount++;
-        logger.error("Error sending email to recipient", {
+        logger.error('Error sending email to recipient', {
           campaignId,
           userId: recipient.id,
           error: String(error),
@@ -491,15 +477,15 @@ export async function sendCampaign(campaignId: string): Promise<void> {
           data: {
             campaignId,
             userId: recipient.id,
-            email: recipient.email ?? "",
-            status: "FAILED",
+            email: recipient.email ?? '',
+            status: 'FAILED',
           },
         });
       }
     }
 
     // Update campaign with final status
-    const finalStatus = sentCount > 0 ? "SENT" : "FAILED";
+    const finalStatus = sentCount > 0 ? 'SENT' : 'FAILED';
     await prisma.emailCampaign.update({
       where: { id: campaignId },
       data: {
@@ -510,7 +496,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       },
     });
 
-    logger.info("Campaign send completed", {
+    logger.info('Campaign send completed', {
       campaignId,
       status: finalStatus,
       sentCount,
@@ -518,7 +504,7 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       totalRecipients: recipients.length,
     });
   } catch (error) {
-    logger.error("Critical error in campaign send", {
+    logger.error('Critical error in campaign send', {
       campaignId,
       error: String(error),
     });
@@ -528,11 +514,11 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       await prisma.emailCampaign.update({
         where: { id: campaignId },
         data: {
-          status: "FAILED",
+          status: 'FAILED',
         },
       });
     } catch (updateError) {
-      logger.error("Failed to update campaign status to FAILED", {
+      logger.error('Failed to update campaign status to FAILED', {
         campaignId,
         error: String(updateError),
       });
