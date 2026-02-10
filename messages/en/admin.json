@@ -119,11 +119,13 @@
         "trialBudgetLimitEur": "TRIAL_BUDGET_LIMIT_EUR="
       },
       "envAudit": {
-        "title": "[TRANSLATE] Environment Configuration",
-        "description": "[TRANSLATE] Stato delle variabili d'ambiente per ciascun servizio",
-        "configured": "[TRANSLATE] Configurato",
-        "incomplete": "[TRANSLATE] Incompleto",
-        "requiredIndicator": "[TRANSLATE] Obbligatorio"
+        "title": "Environment Configuration",
+        "description": "Environment variable status for each service",
+        "configured": "Configured",
+        "incomplete": "Incomplete",
+        "requiredIndicator": "Required",
+        "loading": "Loading...",
+        "loadError": "Failed to load configuration"
       }
     },
     "systemAlerts": "System Alerts",
@@ -684,6 +686,7 @@
       "connectionError": "Connection error"
     },
     "communications": {
+      "title": "Communications",
       "templates": {
         "title": "Email Templates",
         "create": "Create Template",
@@ -763,7 +766,8 @@
         "loading": "[TRANSLATE] Caricamento...",
         "error": "[TRANSLATE] Errore caricamento statistiche",
         "loadingDetail": "[TRANSLATE] Caricamento dettagli...",
-        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna"
+        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna",
+        "quotaApiError": "Unable to retrieve email quota data. Check the Resend API key configuration."
       },
       "editor": {
         "title": "Email Editor",
@@ -1222,6 +1226,11 @@
     "configuredServices": "Configured Services",
     "notConfigured1": "Not Configured",
     "notConfigured": "Not Configured",
+    "healthDetails": {
+      "connected": "Connected",
+      "notConfigured": "Not configured",
+      "serviceUnavailable": "Service unavailable"
+    },
     "recentDeployments": "Recent Deployments",
     "noRecentDeployments": "No recent deployments",
     "requiredEnvironmentVariables": "Required environment variables:",

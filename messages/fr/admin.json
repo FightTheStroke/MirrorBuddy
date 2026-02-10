@@ -119,11 +119,13 @@
         "trialBudgetLimitEur": "TRIAL_BUDGET_LIMIT_EUR="
       },
       "envAudit": {
-        "title": "[TRANSLATE] Environment Configuration",
-        "description": "[TRANSLATE] Stato delle variabili d'ambiente per ciascun servizio",
-        "configured": "[TRANSLATE] Configurato",
-        "incomplete": "[TRANSLATE] Incompleto",
-        "requiredIndicator": "[TRANSLATE] Obbligatorio"
+        "title": "Configuration de l'environnement",
+        "description": "État des variables d'environnement pour chaque service",
+        "configured": "Configuré",
+        "incomplete": "Incomplet",
+        "requiredIndicator": "Obligatoire",
+        "loading": "Chargement...",
+        "loadError": "Échec du chargement de la configuration"
       }
     },
     "systemAlerts": "System Alerts",
@@ -684,6 +686,7 @@
       "connectionError": "Erreur de connexion"
     },
     "communications": {
+      "title": "Communications",
       "templates": {
         "title": "Modèles d'Email",
         "create": "Créer un Modèle",
@@ -763,7 +766,8 @@
         "loading": "[TRANSLATE] Caricamento...",
         "error": "[TRANSLATE] Errore caricamento statistiche",
         "loadingDetail": "[TRANSLATE] Caricamento dettagli...",
-        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna"
+        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna",
+        "quotaApiError": "Impossible de récupérer les données de quota email. Vérifiez la configuration de la clé API Resend."
       },
       "editor": {
         "title": "Éditeur d'Email",
@@ -1222,6 +1226,11 @@
     "configuredServices": "Configured Services",
     "notConfigured1": "Not Configured",
     "notConfigured": "Not Configured",
+    "healthDetails": {
+      "connected": "Connecté",
+      "notConfigured": "Non configuré",
+      "serviceUnavailable": "Service indisponible"
+    },
     "recentDeployments": "Recent Deployments",
     "noRecentDeployments": "No recent deployments",
     "requiredEnvironmentVariables": "Required environment variables:",

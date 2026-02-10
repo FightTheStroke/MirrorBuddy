@@ -123,11 +123,13 @@
         "trialBudgetLimitEur": "TRIAL_BUDGET_LIMIT_EUR="
       },
       "envAudit": {
-        "title": "Environment Configuration",
+        "title": "Configurazione Ambiente",
         "description": "Stato delle variabili d'ambiente per ciascun servizio",
         "configured": "Configurato",
         "incomplete": "Incompleto",
-        "requiredIndicator": "Obbligatorio"
+        "requiredIndicator": "Obbligatorio",
+        "loading": "Caricamento...",
+        "loadError": "Errore nel caricamento della configurazione"
       }
     },
     "systemAlerts": "System Alerts",
@@ -688,6 +690,7 @@
       "connectionError": "Errore di connessione"
     },
     "communications": {
+      "title": "Comunicazioni",
       "templates": {
         "title": "Modelli Email",
         "create": "Crea Modello",
@@ -767,7 +770,8 @@
         "loadingDetail": "Caricamento dettagli...",
         "errorDetail": "Errore caricamento dettagli campagna",
         "noStats": "Nessuna statistica disponibile",
-        "timeline": "Timeline"
+        "timeline": "Timeline",
+        "quotaApiError": "Impossibile recuperare i dati di quota email. Verificare la configurazione della chiave API Resend."
       },
       "editor": {
         "title": "Editor Email",
@@ -1222,6 +1226,11 @@
     "configuredServices": "Configured Services",
     "notConfigured1": "Not Configured",
     "notConfigured": "Not Configured",
+    "healthDetails": {
+      "connected": "Connesso",
+      "notConfigured": "Non configurato",
+      "serviceUnavailable": "Servizio non disponibile"
+    },
     "recentDeployments": "Recent Deployments",
     "noRecentDeployments": "No recent deployments",
     "requiredEnvironmentVariables": "Required environment variables:",

@@ -3,26 +3,21 @@
  * Admin interface for monitoring all external service health
  */
 
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, Activity, AlertCircle, RefreshCw } from "lucide-react";
-import { StatusBadge, StatusIcon } from "./status-utils";
-import type {
-  HealthAggregatorResponse,
-  ServiceHealth,
-} from "@/lib/admin/health-aggregator-types";
-import { useTranslations } from "next-intl";
+import { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Loader2, Activity, AlertCircle, RefreshCw } from 'lucide-react';
+import { StatusBadge, StatusIcon } from './status-utils';
+import type { HealthAggregatorResponse, ServiceHealth } from '@/lib/admin/health-aggregator-types';
+import { useTranslations } from 'next-intl';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default function ServiceHealthPage() {
-  const t = useTranslations("admin");
-  const [healthData, setHealthData] = useState<HealthAggregatorResponse | null>(
-    null,
-  );
+  const t = useTranslations('admin');
+  const [healthData, setHealthData] = useState<HealthAggregatorResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -31,17 +26,15 @@ export default function ServiceHealthPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("/api/admin/health-aggregator");
+      const response = await fetch('/api/admin/health-aggregator');
       if (!response.ok) {
-        throw new Error("Failed to fetch health data");
+        throw new Error('Failed to fetch health data');
       }
       const data = await response.json();
       setHealthData(data);
       setLastRefresh(new Date());
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch health data",
-      );
+      setError(err instanceof Error ? err.message : 'Failed to fetch health data');
     } finally {
       setLoading(false);
     }
@@ -62,26 +55,29 @@ export default function ServiceHealthPage() {
     void fetchHealth();
   };
 
+  const localizeDetails = (service: ServiceHealth) => {
+    if (service.status === 'healthy') return t('healthDetails.connected');
+    if (service.status === 'unknown') return t('healthDetails.notConfigured');
+    if (service.status === 'degraded') return service.details ?? '';
+    return t('healthDetails.serviceUnavailable');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t("serviceHealth")}</h1>
-          <p className="text-muted-foreground">
-            {t("realTimeMonitoringOfAllExternalServices")}
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('serviceHealth')}</h1>
+          <p className="text-muted-foreground">{t('realTimeMonitoringOfAllExternalServices')}</p>
         </div>
         <Button onClick={handleRefresh} disabled={loading}>
-          <RefreshCw
-            className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
-          />
-          {t("refresh")}
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          {t('refresh')}
         </Button>
       </div>
 
       {lastRefresh && (
         <p className="text-sm text-muted-foreground">
-          {t("lastUpdated")} {lastRefresh.toLocaleTimeString()}
+          {t('lastUpdated')} {lastRefresh.toLocaleTimeString()}
         </p>
       )}
 
@@ -90,23 +86,17 @@ export default function ServiceHealthPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              {t("overallStatus")}
+              {t('overallStatus')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-              <StatusIcon
-                status={healthData.overallStatus}
-                className="h-8 w-8"
-              />
-              <StatusBadge
-                status={healthData.overallStatus}
-                className="text-lg px-4 py-2"
-              />
+              <StatusIcon status={healthData.overallStatus} className="h-8 w-8" />
+              <StatusBadge status={healthData.overallStatus} className="text-lg px-4 py-2" />
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              {t("basedOn")} {healthData.configuredCount} {t("configured")}{" "}
-              {healthData.configuredCount === 1 ? "service" : "services"}
+              {t('basedOn')} {healthData.configuredCount} {t('configured')}{' '}
+              {healthData.configuredCount === 1 ? 'service' : 'services'}
             </p>
           </CardContent>
         </Card>
@@ -129,12 +119,8 @@ export default function ServiceHealthPage() {
         !error &&
         healthData &&
         (() => {
-          const configuredServices = healthData.services.filter(
-            (s) => s.configured,
-          );
-          const unconfiguredServices = healthData.services.filter(
-            (s) => !s.configured,
-          );
+          const configuredServices = healthData.services.filter((s) => s.configured);
+          const unconfiguredServices = healthData.services.filter((s) => !s.configured);
 
           const renderServiceCard = (service: ServiceHealth) => (
             <Card key={service.name}>
@@ -146,36 +132,29 @@ export default function ServiceHealthPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{t("status1")}</span>
+                  <span className="text-sm text-muted-foreground">{t('status1')}</span>
                   <StatusBadge status={service.status} />
                 </div>
 
                 {service.responseTimeMs !== undefined && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {t("response")}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{t('response')}</span>
                     <span className="text-sm font-medium">
-                      {service.responseTimeMs}{t("ms")}
+                      {service.responseTimeMs}
+                      {t('ms')}
                     </span>
                   </div>
                 )}
 
                 {service.details && (
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {t("details")}
-                    </span>
-                    <span className="text-sm font-medium">
-                      {service.details}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{t('details')}</span>
+                    <span className="text-sm font-medium">{localizeDetails(service)}</span>
                   </div>
                 )}
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {t("checked")}
-                  </span>
+                  <span className="text-sm text-muted-foreground">{t('checked')}</span>
                   <span className="text-sm font-medium">
                     {new Date(service.lastChecked).toLocaleTimeString()}
                   </span>
@@ -187,12 +166,9 @@ export default function ServiceHealthPage() {
           if (configuredServices.length === 0) {
             return (
               <div className="rounded-lg border border-dashed p-8 text-center">
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("noServicesConfiguredYet")}
-                </h3>
+                <h3 className="text-lg font-semibold mb-2">{t('noServicesConfiguredYet')}</h3>
                 <p className="text-muted-foreground">
-                  {t("configureYourServicesToStartMonitoringTheirHealthS")}
-
+                  {t('configureYourServicesToStartMonitoringTheirHealthS')}
                 </p>
               </div>
             );
@@ -202,9 +178,7 @@ export default function ServiceHealthPage() {
             <div className="space-y-6">
               {configuredServices.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">
-                    {t("configuredServices")}
-                  </h2>
+                  <h2 className="text-xl font-semibold mb-4">{t('configuredServices')}</h2>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {configuredServices.map(renderServiceCard)}
                   </div>
@@ -213,7 +187,7 @@ export default function ServiceHealthPage() {
 
               {unconfiguredServices.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">{t("notConfigured1")}</h2>
+                  <h2 className="text-xl font-semibold mb-4">{t('notConfigured1')}</h2>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {unconfiguredServices.map((service) => (
                       <Card key={service.name} className="opacity-60">
@@ -225,17 +199,13 @@ export default function ServiceHealthPage() {
                         </CardHeader>
                         <CardContent className="space-y-2">
                           <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">{t('status')}</span>
                             <span className="text-sm text-muted-foreground">
-                              {t("status")}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {t("notConfigured")}
+                              {t('notConfigured')}
                             </span>
                           </div>
                           {service.details && (
-                            <p className="text-sm text-muted-foreground">
-                              {service.details}
-                            </p>
+                            <p className="text-sm text-muted-foreground">{service.details}</p>
                           )}
                         </CardContent>
                       </Card>

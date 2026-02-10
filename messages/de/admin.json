@@ -119,11 +119,13 @@
         "trialBudgetLimitEur": "TRIAL_BUDGET_LIMIT_EUR="
       },
       "envAudit": {
-        "title": "[TRANSLATE] Environment Configuration",
-        "description": "[TRANSLATE] Stato delle variabili d'ambiente per ciascun servizio",
-        "configured": "[TRANSLATE] Configurato",
-        "incomplete": "[TRANSLATE] Incompleto",
-        "requiredIndicator": "[TRANSLATE] Obbligatorio"
+        "title": "Umgebungskonfiguration",
+        "description": "Status der Umgebungsvariablen für jeden Dienst",
+        "configured": "Konfiguriert",
+        "incomplete": "Unvollständig",
+        "requiredIndicator": "Erforderlich",
+        "loading": "Laden...",
+        "loadError": "Fehler beim Laden der Konfiguration"
       }
     },
     "systemAlerts": "System Alerts",
@@ -684,6 +686,7 @@
       "connectionError": "Verbindungsfehler"
     },
     "communications": {
+      "title": "Kommunikation",
       "templates": {
         "title": "E-Mail-Vorlagen",
         "create": "Vorlage Erstellen",
@@ -763,7 +766,8 @@
         "loading": "[TRANSLATE] Caricamento...",
         "error": "[TRANSLATE] Errore caricamento statistiche",
         "loadingDetail": "[TRANSLATE] Caricamento dettagli...",
-        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna"
+        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna",
+        "quotaApiError": "E-Mail-Kontingentdaten konnten nicht abgerufen werden. Überprüfen Sie die Resend-API-Schlüsselkonfiguration."
       },
       "editor": {
         "title": "E-Mail-Editor",
@@ -1222,6 +1226,11 @@
     "configuredServices": "Configured Services",
     "notConfigured1": "Not Configured",
     "notConfigured": "Not Configured",
+    "healthDetails": {
+      "connected": "Verbunden",
+      "notConfigured": "Nicht konfiguriert",
+      "serviceUnavailable": "Dienst nicht verfügbar"
+    },
     "recentDeployments": "Recent Deployments",
     "noRecentDeployments": "No recent deployments",
     "requiredEnvironmentVariables": "Required environment variables:",

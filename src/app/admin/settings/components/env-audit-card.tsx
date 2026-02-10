@@ -1,19 +1,41 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ShieldCheck, CheckCircle2, XCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { getEnvAudit } from '@/lib/admin/env-audit-service';
+import type { ServiceEnvAudit } from '@/lib/admin/env-audit-service';
 
 /**
  * EnvAuditCard - Displays environment variable configuration status
  *
- * Shows which env vars are set vs missing for each service.
+ * Fetches data from /api/admin/env-audit (server-side) where process.env
+ * is available. Client components cannot access server-only env vars.
  * SECURITY: Never displays actual values, only set/not-set status.
  */
 export function EnvAuditCard() {
   const t = useTranslations('admin.settings.envAudit');
-  const audit = getEnvAudit();
+  const [audit, setAudit] = useState<ServiceEnvAudit[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/admin/env-audit')
+      .then((res) => res.json())
+      .then((data: ServiceEnvAudit[]) => setAudit(data))
+      .catch(() => setAudit([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <Card className="border-border bg-card">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">{t('loading')}</span>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="border-border bg-card">

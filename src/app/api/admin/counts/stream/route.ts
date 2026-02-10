@@ -6,17 +6,16 @@
 // F-21: Heartbeat every 30s to keep connection alive
 // ============================================================================
 
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getLatestAdminCounts } from "@/lib/redis/admin-counts-storage";
-import { subscribeToAdminCounts } from "@/lib/redis/admin-counts-subscriber";
-import { type AdminCounts } from "@/lib/redis/admin-counts-types";
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { subscribeToAdminCounts } from '@/lib/redis/admin-counts-subscriber';
+import { type AdminCounts } from '@/lib/redis/admin-counts-types';
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
 
-const log = logger.child({ module: "admin-counts-sse" });
+const log = logger.child({ module: 'admin-counts-sse' });
 
 // Force dynamic rendering (no static optimization)
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 /**
  * SSE endpoint for admin dashboard real-time counts
@@ -33,14 +32,14 @@ export const dynamic = "force-dynamic";
  * - Heartbeat: `: heartbeat\n\n` (comment, ignored by EventSource)
  */
 export const GET = pipe(
-  withSentry("/api/admin/counts/stream"),
+  withSentry('/api/admin/counts/stream'),
   withAdmin,
 )(async (ctx) => {
   // ============================================================================
   // 1. AUTHENTICATION (admin only) - handled by withAdmin middleware
   // ============================================================================
 
-  log.info("Admin SSE connection established", { userId: ctx.userId });
+  log.info('Admin SSE connection established', { userId: ctx.userId });
 
   // ============================================================================
   // 2. CREATE SSE STREAM
@@ -58,20 +57,15 @@ export const GET = pipe(
         // 2.1 SEND INITIAL DATA (F-20)
         // ============================================================================
 
-        // Try to get cached data from Redis first (fast)
-        let initialCounts = await getLatestAdminCounts();
-
-        // If no cache, fetch from database (fallback)
-        if (!initialCounts) {
-          log.debug("No cached counts, fetching from database");
-          initialCounts = await fetchCountsFromDatabase();
-        }
+        // Always fetch fresh data from database for initial connection
+        // Prevents stale Redis cache from showing incorrect badge counts
+        const initialCounts = await fetchCountsFromDatabase();
 
         // Send initial data immediately (<500ms target)
         const initialData = `data: ${JSON.stringify(initialCounts)}\n\n`;
         controller.enqueue(encoder.encode(initialData));
 
-        log.debug("Initial data sent", {
+        log.debug('Initial data sent', {
           counts: initialCounts,
         });
 
@@ -84,17 +78,17 @@ export const GET = pipe(
             const data = `data: ${JSON.stringify(counts)}\n\n`;
             controller.enqueue(encoder.encode(data));
 
-            log.debug("Update sent to client", {
+            log.debug('Update sent to client', {
               counts,
             });
           } catch (error) {
-            log.error("Failed to send update", { error: String(error) });
+            log.error('Failed to send update', { error: String(error) });
           }
         };
 
         unsubscribe = await subscribeToAdminCounts(updateListener);
 
-        log.debug("Subscribed to admin counts updates");
+        log.debug('Subscribed to admin counts updates');
 
         // ============================================================================
         // 2.3 HEARTBEAT (F-21)
@@ -103,10 +97,10 @@ export const GET = pipe(
         heartbeatInterval = setInterval(() => {
           try {
             // SSE comment format (ignored by EventSource, keeps connection alive)
-            controller.enqueue(encoder.encode(": heartbeat\n\n"));
-            log.debug("Heartbeat sent");
+            controller.enqueue(encoder.encode(': heartbeat\n\n'));
+            log.debug('Heartbeat sent');
           } catch (error) {
-            log.error("Failed to send heartbeat", { error: String(error) });
+            log.error('Failed to send heartbeat', { error: String(error) });
           }
         }, 30000); // 30 seconds
 
@@ -114,8 +108,8 @@ export const GET = pipe(
         // 2.4 CLEANUP ON DISCONNECT
         // ============================================================================
 
-        ctx.req.signal.addEventListener("abort", () => {
-          log.info("SSE connection closed by client", {
+        ctx.req.signal.addEventListener('abort', () => {
+          log.info('SSE connection closed by client', {
             userId: ctx.userId,
           });
 
@@ -134,11 +128,11 @@ export const GET = pipe(
             controller.close();
           } catch (error) {
             // Stream may already be closed
-            log.debug("Stream already closed", { error: String(error) });
+            log.debug('Stream already closed', { error: String(error) });
           }
         });
       } catch (error) {
-        log.error("SSE stream error", { error: String(error) });
+        log.error('SSE stream error', { error: String(error) });
 
         // Cleanup on error
         if (unsubscribe) {
@@ -159,10 +153,10 @@ export const GET = pipe(
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-      "X-Accel-Buffering": "no", // Disable nginx buffering
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no', // Disable nginx buffering
     },
   });
 });
@@ -175,20 +169,19 @@ async function fetchCountsFromDatabase(): Promise<AdminCounts> {
   const now = new Date();
   const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  const [pendingInvites, totalUsers, activeUsersResult, criticalSafetyEvents] =
-    await Promise.all([
-      prisma.inviteRequest.count({ where: { status: "PENDING" } }),
-      prisma.user.count({ where: { isTestData: false } }),
-      prisma.userActivity.groupBy({
-        by: ["identifier"],
-        where: { timestamp: { gte: yesterday }, isTestData: false },
-      }),
-      prisma.safetyEvent
-        .count({
-          where: { resolvedAt: null, severity: "critical" },
-        })
-        .catch(() => 0),
-    ]);
+  const [pendingInvites, totalUsers, activeUsersResult, criticalSafetyEvents] = await Promise.all([
+    prisma.inviteRequest.count({ where: { status: 'PENDING' } }),
+    prisma.user.count({ where: { isTestData: false } }),
+    prisma.userActivity.groupBy({
+      by: ['identifier'],
+      where: { timestamp: { gte: yesterday }, isTestData: false },
+    }),
+    prisma.safetyEvent
+      .count({
+        where: { resolvedAt: null, severity: 'critical' },
+      })
+      .catch(() => 0),
+  ]);
 
   return {
     pendingInvites,

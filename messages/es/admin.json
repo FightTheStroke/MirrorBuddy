@@ -119,11 +119,13 @@
         "trialBudgetLimitEur": "TRIAL_BUDGET_LIMIT_EUR="
       },
       "envAudit": {
-        "title": "[TRANSLATE] Environment Configuration",
-        "description": "[TRANSLATE] Stato delle variabili d'ambiente per ciascun servizio",
-        "configured": "[TRANSLATE] Configurato",
-        "incomplete": "[TRANSLATE] Incompleto",
-        "requiredIndicator": "[TRANSLATE] Obbligatorio"
+        "title": "Configuración del entorno",
+        "description": "Estado de las variables de entorno para cada servicio",
+        "configured": "Configurado",
+        "incomplete": "Incompleto",
+        "requiredIndicator": "Obligatorio",
+        "loading": "Cargando...",
+        "loadError": "Error al cargar la configuración"
       }
     },
     "systemAlerts": "Alertas del Sistema",
@@ -684,6 +686,7 @@
       "connectionError": "Error de conexión"
     },
     "communications": {
+      "title": "Comunicaciones",
       "templates": {
         "title": "Plantillas de Email",
         "create": "Crear Plantilla",
@@ -763,7 +766,8 @@
         "loading": "[TRANSLATE] Caricamento...",
         "error": "[TRANSLATE] Errore caricamento statistiche",
         "loadingDetail": "[TRANSLATE] Caricamento dettagli...",
-        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna"
+        "errorDetail": "[TRANSLATE] Errore caricamento dettagli campagna",
+        "quotaApiError": "No se pudieron recuperar los datos de cuota de email. Verifique la configuración de la clave API de Resend."
       },
       "editor": {
         "title": "Editor de Email",
@@ -1222,6 +1226,11 @@
     "configuredServices": "Configured Services",
     "notConfigured1": "Not Configured",
     "notConfigured": "Not Configured",
+    "healthDetails": {
+      "connected": "Conectado",
+      "notConfigured": "No configurado",
+      "serviceUnavailable": "Servicio no disponible"
+    },
     "recentDeployments": "Recent Deployments",
     "noRecentDeployments": "No recent deployments",
     "requiredEnvironmentVariables": "Required environment variables:",
