@@ -151,6 +151,144 @@ describe('PII Decryption on Read', () => {
   });
 });
 
+describe('Nested Include Decryption', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('decrypts Profile.name in User.findUnique with include', async () => {
+    const mockQuery = vi.fn(() =>
+      Promise.resolve({
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        username: 'testuser',
+        profile: {
+          id: 'profile1',
+          name: 'pii:v1:encrypted_John Doe',
+          userId: 'user1',
+        },
+      }),
+    );
+
+    const middleware = createPIIMiddleware() as any;
+    const context = {
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' }, include: { profile: true } },
+      query: mockQuery,
+    };
+
+    const result = await middleware.query.$allModels.findUnique(context);
+
+    expect(result.email).toBe('user@example.com');
+    expect(result.profile.name).toBe('John Doe');
+    expect(piiEncryption.decryptPII).toHaveBeenCalledTimes(2);
+  });
+
+  it('decrypts GoogleAccount fields in User include', async () => {
+    const mockQuery = vi.fn(() =>
+      Promise.resolve({
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        googleAccount: {
+          id: 'ga1',
+          email: 'pii:v1:encrypted_google@example.com',
+          displayName: 'pii:v1:encrypted_Google User',
+        },
+      }),
+    );
+
+    const middleware = createPIIMiddleware() as any;
+    const context = {
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' }, include: { googleAccount: true } },
+      query: mockQuery,
+    };
+
+    const result = await middleware.query.$allModels.findUnique(context);
+
+    expect(result.email).toBe('user@example.com');
+    expect(result.googleAccount.email).toBe('google@example.com');
+    expect(result.googleAccount.displayName).toBe('Google User');
+  });
+
+  it('decrypts 1:many nested relations (studyKits)', async () => {
+    const mockQuery = vi.fn(() =>
+      Promise.resolve({
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        studyKits: [
+          { id: 'sk1', originalText: 'pii:v1:encrypted_Text One' },
+          { id: 'sk2', originalText: 'pii:v1:encrypted_Text Two' },
+        ],
+      }),
+    );
+
+    const middleware = createPIIMiddleware() as any;
+    const context = {
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' }, include: { studyKits: true } },
+      query: mockQuery,
+    };
+
+    const result = await middleware.query.$allModels.findUnique(context);
+
+    expect(result.email).toBe('user@example.com');
+    expect(result.studyKits[0].originalText).toBe('Text One');
+    expect(result.studyKits[1].originalText).toBe('Text Two');
+  });
+
+  it('handles null nested relations gracefully', async () => {
+    const mockQuery = vi.fn(() =>
+      Promise.resolve({
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        profile: null,
+      }),
+    );
+
+    const middleware = createPIIMiddleware() as any;
+    const context = {
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' }, include: { profile: true } },
+      query: mockQuery,
+    };
+
+    const result = await middleware.query.$allModels.findUnique(context);
+
+    expect(result.email).toBe('user@example.com');
+    expect(result.profile).toBeNull();
+  });
+
+  it('skips non-PII nested relations', async () => {
+    const mockQuery = vi.fn(() =>
+      Promise.resolve({
+        id: 'user1',
+        email: 'pii:v1:encrypted_user@example.com',
+        settings: { id: 'set1', theme: 'dark' },
+      }),
+    );
+
+    const middleware = createPIIMiddleware() as any;
+    const context = {
+      model: 'User',
+      operation: 'findUnique',
+      args: { where: { id: 'user1' }, include: { settings: true } },
+      query: mockQuery,
+    };
+
+    const result = await middleware.query.$allModels.findUnique(context);
+
+    expect(result.email).toBe('user@example.com');
+    expect(result.settings.theme).toBe('dark');
+    // Only 1 call for User.email, not for settings
+    expect(piiEncryption.decryptPII).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('Nested Operations', () => {
   beforeEach(() => {
     vi.clearAllMocks();

@@ -27,6 +27,20 @@ export const PII_FIELD_MAP: Record<string, string[]> = {
 };
 
 /**
+ * Map of Prisma relation field names to their model names.
+ * Used by decryptSingleRecord to recursively decrypt nested
+ * included relations (e.g. User.findUnique({ include: { profile: true } })).
+ */
+export const RELATION_TO_MODEL: Record<string, string> = {
+  user: 'User',
+  profile: 'Profile',
+  googleAccount: 'GoogleAccount',
+  coppaConsent: 'CoppaConsent',
+  studyKits: 'StudyKit',
+  htmlSnippets: 'HtmlSnippet',
+};
+
+/**
  * Check if a model has PII fields configured
  */
 export function hasPIIFields(model: string): boolean {
@@ -180,6 +194,18 @@ async function decryptSingleRecord(
         });
         decryptedData[field] = '[decryption-failed]';
       }
+    }
+  }
+
+  // Recursively decrypt nested included relations
+  for (const [key, value] of Object.entries(decryptedData)) {
+    const nestedModel = RELATION_TO_MODEL[key];
+    if (!nestedModel || !hasPIIFields(nestedModel)) continue;
+
+    if (Array.isArray(value)) {
+      decryptedData[key] = await decryptPIIFields(nestedModel, value);
+    } else if (value && typeof value === 'object') {
+      decryptedData[key] = await decryptPIIFields(nestedModel, value);
     }
   }
 
