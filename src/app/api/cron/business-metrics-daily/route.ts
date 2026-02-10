@@ -12,12 +12,14 @@
  * F-05a: Business/behavioral metrics collected and pushed daily at 3 AM
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { logger } from "@/lib/logger";
-import { generateBusinessMetrics } from "@/app/api/metrics/business-metrics";
-import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
+export const dynamic = 'force-dynamic';
 
-const log = logger.child({ module: "cron-business-metrics-daily" });
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
+import { generateBusinessMetrics } from '@/app/api/metrics/business-metrics';
+import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
+
+const log = logger.child({ module: 'cron-business-metrics-daily' });
 
 interface MetricSample {
   name: string;
@@ -27,7 +29,7 @@ interface MetricSample {
 }
 
 interface CronResponse {
-  status: "success" | "skipped" | "error";
+  status: 'success' | 'skipped' | 'error';
   timestamp: string;
   duration_ms: number;
   business_metrics?: number;
@@ -42,11 +44,11 @@ function formatInfluxLineProtocol(samples: MetricSample[]): string {
   return samples
     .map((s) => {
       const tags = Object.entries(s.labels)
-        .map(([k, v]) => `${k}=${v.replace(/[\\,= ]/g, "\\$&")}`)
-        .join(",");
+        .map(([k, v]) => `${k}=${v.replace(/[\\,= ]/g, '\\$&')}`)
+        .join(',');
       return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -58,18 +60,16 @@ async function pushToGrafana(samples: MetricSample[]): Promise<void> {
   const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
 
   if (!url || !user || !apiKey) {
-    throw new Error(
-      "Grafana Cloud config incomplete (missing URL, USER, or API_KEY)",
-    );
+    throw new Error('Grafana Cloud config incomplete (missing URL, USER, or API_KEY)');
   }
 
   const body = formatInfluxLineProtocol(samples);
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "text/plain",
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString("base64")}`,
+      'Content-Type': 'text/plain',
+      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
     },
     body,
   });
@@ -90,9 +90,8 @@ async function collectDailyMetrics(): Promise<{
 }> {
   const samples: MetricSample[] = [];
   const now = Date.now();
-  const env =
-    process.env.NODE_ENV === "production" ? "production" : "development";
-  const instanceLabels = { instance: "mirrorbuddy", env };
+  const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+  const instanceLabels = { instance: 'mirrorbuddy', env };
 
   // Collect business metrics (DAU, retention, maestri usage)
   const businessMetrics = await generateBusinessMetrics();
@@ -127,25 +126,25 @@ async function collectDailyMetrics(): Promise<{
  * POST: Main cron handler - collects and pushes daily metrics
  */
 export const POST = pipe(
-  withSentry("/api/cron/business-metrics-daily"),
+  withSentry('/api/cron/business-metrics-daily'),
   withCron,
 )(async () => {
   const startTime = Date.now();
   const response: CronResponse = {
-    status: "success",
+    status: 'success',
     timestamp: new Date().toISOString(),
     duration_ms: 0,
   };
 
   // Skip cron in non-production environments (staging/preview)
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
     log.info(
       `[CRON] Skipping business-metrics-daily - not production (env: ${process.env.VERCEL_ENV})`,
     );
     return Response.json(
       {
         skipped: true,
-        reason: "Not production environment",
+        reason: 'Not production environment',
         environment: process.env.VERCEL_ENV,
       },
       { status: 200 },
@@ -154,32 +153,31 @@ export const POST = pipe(
 
   // Check if Grafana Cloud is configured
   if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
-    response.status = "skipped";
+    response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
-    log.info("Daily metrics collection skipped (Grafana Cloud not configured)");
+    log.info('Daily metrics collection skipped (Grafana Cloud not configured)');
     return Response.json(response, { status: 200 });
   }
 
   // Collect daily metrics (business + behavioral)
-  const { samples, businessCount, behavioralCount } =
-    await collectDailyMetrics();
+  const { samples, businessCount, behavioralCount } = await collectDailyMetrics();
 
   if (samples.length === 0) {
-    response.status = "skipped";
+    response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
-    log.info("No daily metrics to push");
+    log.info('No daily metrics to push');
     return Response.json(response, { status: 200 });
   }
 
   // Push to Grafana Cloud
   await pushToGrafana(samples);
 
-  response.status = "success";
+  response.status = 'success';
   response.business_metrics = businessCount;
   response.behavioral_metrics = behavioralCount;
   response.duration_ms = Date.now() - startTime;
 
-  log.info("Daily metrics pushed to Grafana Cloud (F-05a)", {
+  log.info('Daily metrics pushed to Grafana Cloud (F-05a)', {
     business_metrics: businessCount,
     behavioral_metrics: behavioralCount,
     total_samples: samples.length,

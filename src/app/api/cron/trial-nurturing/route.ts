@@ -9,17 +9,19 @@
  * F-13: Reminder email dopo 7 giorni inattività trial
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { sendEmail } from "@/lib/email";
+export const dynamic = 'force-dynamic';
+
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email';
 import {
   getTrialUsageNudgeTemplate,
   type TrialUsageNudgeData,
-} from "@/lib/email/templates/trial-templates";
-import { recordStageTransition } from "@/lib/funnel";
+} from '@/lib/email/templates/trial-templates';
+import { recordStageTransition } from '@/lib/funnel';
 
-const log = logger.child({ module: "cron-trial-nurturing" });
+const log = logger.child({ module: 'cron-trial-nurturing' });
 
 const TRIAL_LIMITS = {
   chats: 10,
@@ -31,7 +33,7 @@ const USAGE_THRESHOLD = 0.7; // 70%
 const INACTIVITY_DAYS = 7;
 
 interface NurturingResult {
-  status: "success" | "error";
+  status: 'success' | 'error';
   nudgesSent: number;
   remindersSent: number;
   errors: string[];
@@ -46,8 +48,7 @@ function calculateUsagePercent(session: {
   toolsUsed: number;
 }): number {
   const chatPercent = session.chatsUsed / TRIAL_LIMITS.chats;
-  const voicePercent =
-    session.voiceSecondsUsed / 60 / TRIAL_LIMITS.voiceMinutes;
+  const voicePercent = session.voiceSecondsUsed / 60 / TRIAL_LIMITS.voiceMinutes;
   const toolPercent = session.toolsUsed / TRIAL_LIMITS.tools;
 
   return Math.max(chatPercent, voicePercent, toolPercent);
@@ -57,54 +58,50 @@ function calculateUsagePercent(session: {
  * Extract name from email or use default
  */
 function extractNameFromEmail(email: string): string {
-  const localPart = email.split("@")[0];
+  const localPart = email.split('@')[0];
 
   // Remove dots, underscores, numbers
-  const cleaned = localPart.replace(/[._\d]+/g, " ").trim();
+  const cleaned = localPart.replace(/[._\d]+/g, ' ').trim();
 
   // Capitalize first letter
   if (cleaned) {
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   }
 
-  return "Studente";
+  return 'Studente';
 }
 
 /**
  * Main cron handler - runs daily
  */
 export const POST = pipe(
-  withSentry("/api/cron/trial-nurturing"),
+  withSentry('/api/cron/trial-nurturing'),
   withCron,
 )(async () => {
   const result: NurturingResult = {
-    status: "success",
+    status: 'success',
     nudgesSent: 0,
     remindersSent: 0,
     errors: [],
   };
 
   // Skip cron in non-production environments (staging/preview)
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-    log.info(
-      `[CRON] Skipping trial-nurturing - not production (env: ${process.env.VERCEL_ENV})`,
-    );
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
+    log.info(`[CRON] Skipping trial-nurturing - not production (env: ${process.env.VERCEL_ENV})`);
     return Response.json(
       {
         skipped: true,
-        reason: "Not production environment",
+        reason: 'Not production environment',
         environment: process.env.VERCEL_ENV,
       },
       { status: 200 },
     );
   }
 
-  log.info("Trial nurturing cron started");
+  log.info('Trial nurturing cron started');
 
   const now = new Date();
-  const sevenDaysAgo = new Date(
-    now.getTime() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000,
-  );
+  const sevenDaysAgo = new Date(now.getTime() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
 
   // ============================================
   // 1. USAGE NUDGES (F-12): 70%+ usage emails
@@ -137,7 +134,7 @@ export const POST = pipe(
     const alreadyNudged = await prisma.funnelEvent.findFirst({
       where: {
         visitorId: session.visitorId,
-        stage: "LIMIT_HIT",
+        stage: 'LIMIT_HIT',
         metadata: {
           string_contains: '"emailSent":true',
         },
@@ -169,18 +166,17 @@ export const POST = pipe(
       });
 
       if (!sendResult.success) {
-        throw new Error(sendResult.error || "Unknown email error");
+        throw new Error(sendResult.error || 'Unknown email error');
       }
 
       // Record in funnel
-      await recordStageTransition(
-        { visitorId: session.visitorId },
-        "LIMIT_HIT",
-        { emailSent: true, usagePercent: emailData.usagePercent },
-      );
+      await recordStageTransition({ visitorId: session.visitorId }, 'LIMIT_HIT', {
+        emailSent: true,
+        usagePercent: emailData.usagePercent,
+      });
 
       result.nudgesSent++;
-      log.info("Sent trial nudge email", {
+      log.info('Sent trial nudge email', {
         visitorId: session.visitorId,
         email: session.email,
         usagePercent: emailData.usagePercent,
@@ -188,7 +184,7 @@ export const POST = pipe(
     } catch (err) {
       const errorMsg = `Nudge to ${session.email}: ${err}`;
       result.errors.push(errorMsg);
-      log.error("Failed to send nudge", {
+      log.error('Failed to send nudge', {
         error: String(err),
         email: session.email,
       });
@@ -231,7 +227,7 @@ export const POST = pipe(
     try {
       const sendResult = await sendEmail({
         to: session.email!,
-        subject: "Ti manca MirrorBuddy! 🎓",
+        subject: 'Ti manca MirrorBuddy! 🎓',
         html: `
 <!DOCTYPE html>
 <html>
@@ -273,24 +269,23 @@ export const POST = pipe(
       });
 
       if (!sendResult.success) {
-        throw new Error(sendResult.error || "Unknown email error");
+        throw new Error(sendResult.error || 'Unknown email error');
       }
 
-      await recordStageTransition(
-        { visitorId: session.visitorId },
-        "TRIAL_ENGAGED",
-        { inactivityReminder: true, daysInactive: INACTIVITY_DAYS },
-      );
+      await recordStageTransition({ visitorId: session.visitorId }, 'TRIAL_ENGAGED', {
+        inactivityReminder: true,
+        daysInactive: INACTIVITY_DAYS,
+      });
 
       result.remindersSent++;
-      log.info("Sent inactivity reminder", {
+      log.info('Sent inactivity reminder', {
         visitorId: session.visitorId,
         email: session.email,
       });
     } catch (err) {
       const errorMsg = `Reminder to ${session.email}: ${err}`;
       result.errors.push(errorMsg);
-      log.error("Failed to send reminder", {
+      log.error('Failed to send reminder', {
         error: String(err),
         email: session.email,
       });
@@ -298,10 +293,10 @@ export const POST = pipe(
   }
 
   if (result.errors.length > 0) {
-    result.status = "error";
+    result.status = 'error';
   }
 
-  log.info("Trial nurturing completed", {
+  log.info('Trial nurturing completed', {
     status: result.status,
     nudgesSent: result.nudgesSent,
     remindersSent: result.remindersSent,

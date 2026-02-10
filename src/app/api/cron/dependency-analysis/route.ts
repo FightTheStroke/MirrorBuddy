@@ -7,15 +7,17 @@
  * Runs daily via Vercel Cron (0 4 * * * = 4 AM UTC)
  */
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { runDependencyAnalysis } from "@/lib/safety/server";
+export const dynamic = 'force-dynamic';
 
-const log = logger.child({ module: "cron-dependency-analysis" });
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { runDependencyAnalysis } from '@/lib/safety/server';
+
+const log = logger.child({ module: 'cron-dependency-analysis' });
 
 interface CronResponse {
-  status: "success" | "error";
+  status: 'success' | 'error';
   timestamp: string;
   duration_ms: number;
   summary: {
@@ -31,12 +33,12 @@ interface CronResponse {
 }
 
 export const POST = pipe(
-  withSentry("/api/cron/dependency-analysis"),
+  withSentry('/api/cron/dependency-analysis'),
   withCron,
 )(async () => {
   const startTime = Date.now();
   const response: CronResponse = {
-    status: "success",
+    status: 'success',
     timestamp: new Date().toISOString(),
     duration_ms: 0,
     summary: {
@@ -48,21 +50,21 @@ export const POST = pipe(
   };
 
   // Skip in non-production environments
-  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
     log.info(
       `[CRON] Skipping dependency-analysis - not production (env: ${process.env.VERCEL_ENV})`,
     );
     return Response.json(
       {
         skipped: true,
-        reason: "Not production environment",
+        reason: 'Not production environment',
         environment: process.env.VERCEL_ENV,
       },
       { status: 200 },
     );
   }
 
-  log.info("Dependency analysis cron job started");
+  log.info('Dependency analysis cron job started');
 
   // Find users with activity in the last 24 hours
   const yesterday = new Date();
@@ -73,10 +75,10 @@ export const POST = pipe(
       date: { gte: yesterday },
     },
     select: { userId: true },
-    distinct: ["userId"],
+    distinct: ['userId'],
   });
 
-  log.info("Found active users for analysis", { count: activeUsers.length });
+  log.info('Found active users for analysis', { count: activeUsers.length });
 
   // Analyze each user
   for (const { userId } of activeUsers) {
@@ -89,17 +91,17 @@ export const POST = pipe(
 
       // Count by severity
       for (const alert of [...result.alerts, ...result.weeklyAlerts]) {
-        if (alert.severity === "warning") {
+        if (alert.severity === 'warning') {
           response.summary.alerts_by_severity.warning += 1;
-        } else if (alert.severity === "concern") {
+        } else if (alert.severity === 'concern') {
           response.summary.alerts_by_severity.concern += 1;
-        } else if (alert.severity === "critical") {
+        } else if (alert.severity === 'critical') {
           response.summary.alerts_by_severity.critical += 1;
         }
       }
 
       if (totalAlerts > 0) {
-        log.info("User dependency alerts created", {
+        log.info('User dependency alerts created', {
           userId: userId.slice(0, 8),
           alerts: totalAlerts,
           anomaly: result.isAnomaly,
@@ -108,7 +110,7 @@ export const POST = pipe(
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      log.error("Failed to analyze user", {
+      log.error('Failed to analyze user', {
         userId: userId.slice(0, 8),
         error: errorMsg,
       });
@@ -120,15 +122,15 @@ export const POST = pipe(
 
   // Determine overall status
   if (response.summary.errors.length > 0) {
-    response.status = "error";
-    log.warn("Dependency analysis cron completed with errors", {
+    response.status = 'error';
+    log.warn('Dependency analysis cron completed with errors', {
       errors: response.summary.errors.length,
       duration_ms: response.duration_ms,
     });
     return Response.json(response, { status: 207 });
   }
 
-  log.info("Dependency analysis cron completed", {
+  log.info('Dependency analysis cron completed', {
     duration_ms: response.duration_ms,
     users_analyzed: response.summary.users_analyzed,
     alerts_generated: response.summary.alerts_generated,

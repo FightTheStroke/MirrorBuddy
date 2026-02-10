@@ -4,9 +4,11 @@
 // Part of Total Memory System (ADR 0082-0090)
 // ============================================================================
 
-import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
-import { runHierarchicalSummarization } from "@/lib/cron/cron-hierarchical-summary";
-import { logger } from "@/lib/logger";
+export const dynamic = 'force-dynamic';
+
+import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
+import { runHierarchicalSummarization } from '@/lib/cron/cron-hierarchical-summary';
+import { logger } from '@/lib/logger';
 
 /**
  * POST /api/cron/hierarchical-summary
@@ -17,19 +19,19 @@ import { logger } from "@/lib/logger";
  * - Monthly summaries: Generated on 1st of month if not already exists
  */
 export const POST = pipe(
-  withSentry("/api/cron/hierarchical-summary"),
+  withSentry('/api/cron/hierarchical-summary'),
   withCron,
 )(async () => {
-  logger.info("Hierarchical summary cron job started");
+  logger.info('Hierarchical summary cron job started');
 
   // Run the summarization process
   await runHierarchicalSummarization();
 
-  logger.info("Hierarchical summary cron job completed");
+  logger.info('Hierarchical summary cron job completed');
 
   return Response.json({
     success: true,
-    message: "Hierarchical summaries generated",
+    message: 'Hierarchical summaries generated',
     timestamp: new Date().toISOString(),
   });
 });
