@@ -112,8 +112,8 @@
         "submitButtonLoading": "Submitting...",
         "successMessage": "Your request has been submitted successfully. We will contact you soon.",
         "successTitle": "Request submitted",
-        "nome1": "Nome *",
-        "nome": "Nome",
+        "nome1": "Name *",
+        "nome": "Name",
         "email1": "Email *",
         "email": "Email"
       },

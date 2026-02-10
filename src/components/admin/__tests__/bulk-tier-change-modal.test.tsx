@@ -1,36 +1,63 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { BulkTierChangeModal } from "../bulk-tier-change-modal";
-import * as csrfClient from "@/lib/auth";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BulkTierChangeModal } from '../bulk-tier-change-modal';
+import * as csrfClient from '@/lib/auth';
 
 // Mock csrf-client
-vi.mock("@/lib/auth", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth")>();
+vi.mock('@/lib/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth')>();
   return { ...actual, csrfFetch: vi.fn() };
 });
 
+// Mock next-intl
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      bulkTierChange: 'Bulk Tier Change',
+      usersSelected: 'users selected',
+      selectedUsers: 'Selected Users',
+      and: 'and',
+      more: 'more',
+      successful: 'successful',
+      failed: 'failed',
+      failedOperations: 'Failed Operations',
+      newTier1: 'New Tier',
+      newTier: 'New Tier',
+      selectATier: 'Select a tier',
+      notesOptional: 'Notes (optional)',
+      reasonForBulkChange: 'Reason for bulk change...',
+      cancel: 'Cancel',
+      processing: 'Processing...',
+      close: 'Close',
+      anonymous: 'Anonymous',
+      changeTierFor: 'Change tier for',
+    };
+    return translations[key] || key;
+  },
+}));
+
 // Mock toast
-vi.mock("@/components/ui/toast", () => ({
+vi.mock('@/components/ui/toast', () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),
   },
 }));
 
-describe("BulkTierChangeModal", () => {
+describe('BulkTierChangeModal', () => {
   const mockUsers = [
-    { id: "user1", username: "user1", email: "user1@test.com" },
-    { id: "user2", username: "user2", email: "user2@test.com" },
-    { id: "user3", username: null, email: "user3@test.com" },
+    { id: 'user1', username: 'user1', email: 'user1@test.com' },
+    { id: 'user2', username: 'user2', email: 'user2@test.com' },
+    { id: 'user3', username: null, email: 'user3@test.com' },
   ];
 
   const mockTiers = [
-    { id: "tier1", code: "BASE", name: "Base Tier" },
-    { id: "tier2", code: "PRO", name: "Pro Tier" },
-    { id: "tier3", code: "ENTERPRISE", name: "Enterprise Tier" },
+    { id: 'tier1', code: 'BASE', name: 'Base Tier' },
+    { id: 'tier2', code: 'PRO', name: 'Pro Tier' },
+    { id: 'tier3', code: 'ENTERPRISE', name: 'Enterprise Tier' },
   ];
 
   const defaultProps = {
@@ -45,20 +72,20 @@ describe("BulkTierChangeModal", () => {
     vi.clearAllMocks();
   });
 
-  it("should render modal when open", () => {
+  it('should render modal when open', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    expect(screen.getByText("Bulk Tier Change")).toBeInTheDocument();
-    expect(screen.getByText("3 users selected")).toBeInTheDocument();
+    expect(screen.getByText('Bulk Tier Change')).toBeInTheDocument();
+    expect(screen.getByText('3 users selected')).toBeInTheDocument();
   });
 
-  it("should not render when closed", () => {
+  it('should not render when closed', () => {
     render(<BulkTierChangeModal {...defaultProps} isOpen={false} />);
 
-    expect(screen.queryByText("Bulk Tier Change")).not.toBeInTheDocument();
+    expect(screen.queryByText('Bulk Tier Change')).not.toBeInTheDocument();
   });
 
-  it("should display user list", () => {
+  it('should display user list', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
     // Check for the formatted display (username - email or Anonymous - email)
@@ -67,49 +94,49 @@ describe("BulkTierChangeModal", () => {
     expect(screen.getByText(/Anonymous - user3@test\.com/)).toBeInTheDocument();
   });
 
-  it("should display tier options", () => {
+  it('should display tier options', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const select = screen.getByLabelText("New Tier");
+    const select = screen.getByLabelText('New Tier');
     expect(select).toBeInTheDocument();
 
     fireEvent.click(select);
-    expect(screen.getByText("Base Tier")).toBeInTheDocument();
-    expect(screen.getByText("Pro Tier")).toBeInTheDocument();
-    expect(screen.getByText("Enterprise Tier")).toBeInTheDocument();
+    expect(screen.getByText('Base Tier')).toBeInTheDocument();
+    expect(screen.getByText('Pro Tier')).toBeInTheDocument();
+    expect(screen.getByText('Enterprise Tier')).toBeInTheDocument();
   });
 
-  it("should require tier selection", () => {
+  it('should require tier selection', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const confirmButton = screen.getByRole("button", {
+    const confirmButton = screen.getByRole('button', {
       name: /change tier for/i,
     });
     expect(confirmButton).toBeDisabled();
   });
 
-  it("should enable confirm button when tier is selected", () => {
+  it('should enable confirm button when tier is selected', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const select = screen.getByLabelText("New Tier");
-    fireEvent.change(select, { target: { value: "tier2" } });
+    const select = screen.getByLabelText('New Tier');
+    fireEvent.change(select, { target: { value: 'tier2' } });
 
-    const confirmButton = screen.getByRole("button", {
+    const confirmButton = screen.getByRole('button', {
       name: /change tier for/i,
     });
     expect(confirmButton).not.toBeDisabled();
   });
 
-  it("should call API and show progress on submit", async () => {
+  it('should call API and show progress on submit', async () => {
     const mockResponse = {
       ok: true,
       json: async () => ({
         success: true,
         summary: { total: 3, successful: 3, failed: 0 },
         results: [
-          { userId: "user1", success: true },
-          { userId: "user2", success: true },
-          { userId: "user3", success: true },
+          { userId: 'user1', success: true },
+          { userId: 'user2', success: true },
+          { userId: 'user3', success: true },
         ],
       }),
     };
@@ -118,35 +145,35 @@ describe("BulkTierChangeModal", () => {
 
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const select = screen.getByLabelText("New Tier");
-    fireEvent.change(select, { target: { value: "tier2" } });
+    const select = screen.getByLabelText('New Tier');
+    fireEvent.change(select, { target: { value: 'tier2' } });
 
-    const confirmButton = screen.getByRole("button", {
+    const confirmButton = screen.getByRole('button', {
       name: /change tier for/i,
     });
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(csrfClient.csrfFetch).toHaveBeenCalledWith(
-        "/api/admin/users/bulk/tier",
+        '/api/admin/users/bulk/tier',
         expect.objectContaining({
-          method: "POST",
-          body: expect.stringContaining("tier2"),
+          method: 'POST',
+          body: expect.stringContaining('tier2'),
         }),
       );
     });
   });
 
-  it("should display results summary after successful operation", async () => {
+  it('should display results summary after successful operation', async () => {
     const mockResponse = {
       ok: true,
       json: async () => ({
         success: true,
         summary: { total: 3, successful: 2, failed: 1 },
         results: [
-          { userId: "user1", success: true },
-          { userId: "user2", success: true },
-          { userId: "user3", success: false, error: "Database error" },
+          { userId: 'user1', success: true },
+          { userId: 'user2', success: true },
+          { userId: 'user3', success: false, error: 'Database error' },
         ],
       }),
     };
@@ -155,10 +182,10 @@ describe("BulkTierChangeModal", () => {
 
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const select = screen.getByLabelText("New Tier");
-    fireEvent.change(select, { target: { value: "tier2" } });
+    const select = screen.getByLabelText('New Tier');
+    fireEvent.change(select, { target: { value: 'tier2' } });
 
-    const confirmButton = screen.getByRole("button", {
+    const confirmButton = screen.getByRole('button', {
       name: /change tier for/i,
     });
     fireEvent.click(confirmButton);
@@ -169,11 +196,11 @@ describe("BulkTierChangeModal", () => {
     });
   });
 
-  it("should handle API errors", async () => {
+  it('should handle API errors', async () => {
     const mockResponse = {
       ok: false,
       json: async () => ({
-        error: "Server error",
+        error: 'Server error',
       }),
     };
 
@@ -181,10 +208,10 @@ describe("BulkTierChangeModal", () => {
 
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const select = screen.getByLabelText("New Tier");
-    fireEvent.change(select, { target: { value: "tier2" } });
+    const select = screen.getByLabelText('New Tier');
+    fireEvent.change(select, { target: { value: 'tier2' } });
 
-    const confirmButton = screen.getByRole("button", {
+    const confirmButton = screen.getByRole('button', {
       name: /change tier for/i,
     });
     fireEvent.click(confirmButton);
@@ -194,19 +221,19 @@ describe("BulkTierChangeModal", () => {
     });
   });
 
-  it("should close modal on cancel", () => {
+  it('should close modal on cancel', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const cancelButton = screen.getByRole("button", { name: /cancel/i });
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
     fireEvent.click(cancelButton);
 
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it("should close modal on backdrop click", () => {
+  it('should close modal on backdrop click', () => {
     render(<BulkTierChangeModal {...defaultProps} />);
 
-    const backdrop = screen.getByRole("presentation");
+    const backdrop = screen.getByRole('presentation');
     fireEvent.click(backdrop);
 
     expect(defaultProps.onClose).toHaveBeenCalled();

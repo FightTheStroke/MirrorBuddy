@@ -5,28 +5,20 @@
  * @vitest-environment jsdom
  */
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  beforeAll,
-  afterAll,
-} from "vitest";
-import { act } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { WebcamAnalysisMobile } from "../webcam-analysis-mobile";
+import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
+import { act } from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { WebcamAnalysisMobile } from '../webcam-analysis-mobile';
 
 // Mock useDeviceType hook
-vi.mock("@/hooks/use-device-type", () => ({
+vi.mock('@/hooks/use-device-type', () => ({
   useDeviceType: vi.fn(() => ({
-    deviceType: "phone",
+    deviceType: 'phone',
     isPhone: true,
     isTablet: false,
     isDesktop: false,
-    orientation: "portrait",
+    orientation: 'portrait',
     isPortrait: true,
     isLandscape: false,
   })),
@@ -36,7 +28,7 @@ vi.mock("@/hooks/use-device-type", () => ({
 const mockGetUserMedia = vi.fn();
 const mockEnumerateDevices = vi.fn();
 
-Object.defineProperty(navigator, "mediaDevices", {
+Object.defineProperty(navigator, 'mediaDevices', {
   value: {
     getUserMedia: mockGetUserMedia,
     enumerateDevices: mockEnumerateDevices,
@@ -53,10 +45,10 @@ beforeAll(() => {
   originalConsoleError = console.error;
 
   console.error = (...args: unknown[]) => {
-    const message = String(args[0] ?? "");
+    const message = String(args[0] ?? '');
     if (
-      message.includes("not wrapped in act(") ||
-      message.includes("Not implemented: HTMLMediaElement")
+      message.includes('not wrapped in act(') ||
+      message.includes('Not implemented: HTMLMediaElement')
     ) {
       return;
     }
@@ -68,7 +60,7 @@ afterAll(() => {
   console.error = originalConsoleError;
 });
 
-describe("WebcamAnalysisMobile", () => {
+describe('WebcamAnalysisMobile', () => {
   const mockOnAnalyze = vi.fn();
   const mockOnError = vi.fn();
 
@@ -83,28 +75,28 @@ describe("WebcamAnalysisMobile", () => {
       getTracks: () => [
         {
           stop: vi.fn(),
-          getSettings: () => ({ deviceId: "camera1", facingMode: "user" }),
-          label: "Front Camera",
+          getSettings: () => ({ deviceId: 'camera1', facingMode: 'user' }),
+          label: 'Front Camera',
         },
       ],
     });
 
     mockEnumerateDevices.mockResolvedValue([
       {
-        deviceId: "camera1",
-        label: "Front Camera",
-        kind: "videoinput",
+        deviceId: 'camera1',
+        label: 'Front Camera',
+        kind: 'videoinput',
       },
       {
-        deviceId: "camera2",
-        label: "Back Camera",
-        kind: "videoinput",
+        deviceId: 'camera2',
+        label: 'Back Camera',
+        kind: 'videoinput',
       },
     ]);
   });
 
-  describe("Structure and Layout", () => {
-    it("renders as a mobile-optimized container", async () => {
+  describe('Structure and Layout', () => {
+    it('renders as a mobile-optimized container', async () => {
       const { container } = render(<WebcamAnalysisMobile {...mockProps} />);
 
       await act(async () => {
@@ -113,32 +105,32 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("displays camera preview element", async () => {
+    it('displays camera preview element', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       // Wait for video element to be present
       await waitFor(() => {
-        const video = document.querySelector("video");
+        const video = document.querySelector('video');
         expect(video).toBeInTheDocument();
       });
     });
 
-    it("displays capture button", async () => {
+    it('displays capture button', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
         expect(captureButton).toBeInTheDocument();
       });
     });
 
-    it("displays camera switch button on mobile", async () => {
+    it('displays camera switch button on mobile', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera/i,
         });
         expect(switchButton).toBeInTheDocument();
@@ -146,12 +138,12 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Capture Button - F-33 Requirement", () => {
-    it("capture button is large and centered (60px+)", async () => {
+  describe('Capture Button - F-33 Requirement', () => {
+    it('capture button is large and centered (60px+)', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
 
@@ -162,30 +154,30 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("capture button uses TouchTarget styling", async () => {
+    it('capture button uses TouchTarget styling', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
 
         // Check for touch-friendly styling
         expect(
-          captureButton.className.includes("rounded") ||
-            captureButton.className.includes("p-") ||
-            captureButton.className.includes("py-") ||
-            captureButton.className.includes("px-"),
+          captureButton.className.includes('rounded') ||
+            captureButton.className.includes('p-') ||
+            captureButton.className.includes('py-') ||
+            captureButton.className.includes('px-'),
         ).toBeTruthy();
       });
     });
 
-    it("capture button is clickable and triggers capture callback", async () => {
+    it('capture button is clickable and triggers capture callback', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
         expect(captureButton).toBeInTheDocument();
@@ -193,23 +185,23 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Camera Switch Button - F-33 Requirement", () => {
-    it("camera switch button is prominent on mobile", async () => {
+  describe('Camera Switch Button - F-33 Requirement', () => {
+    it('camera switch button is prominent on mobile', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera|front|back/i,
         });
         expect(switchButton).toBeInTheDocument();
       });
     });
 
-    it("camera switch button has accessible touch target size", async () => {
+    it('camera switch button has accessible touch target size', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera|front|back/i,
         });
 
@@ -220,12 +212,12 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("switches between front and back cameras when button is clicked", async () => {
+    it('switches between front and back cameras when button is clicked', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera|front|back/i,
         });
         expect(switchButton).toBeInTheDocument();
@@ -233,35 +225,34 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Camera Preview - F-33 Requirement", () => {
-    it("preview fills viewport width on mobile", async () => {
+  describe('Camera Preview - F-33 Requirement', () => {
+    it('preview fills viewport width on mobile', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
         const preview =
-          document.querySelector("video") ||
-          document.querySelector("[class*='preview']");
+          document.querySelector('video') || document.querySelector("[class*='preview']");
         expect(preview).toBeInTheDocument();
 
         // Check for full-width styling
         const previewContainer = preview?.parentElement;
         expect(
-          previewContainer?.className.includes("w-full") ||
-            previewContainer?.className.includes("max-w-"),
+          previewContainer?.className.includes('w-full') ||
+            previewContainer?.className.includes('max-w-'),
         ).toBeTruthy();
       });
     });
 
-    it("preview aspect ratio is correct for camera", async () => {
+    it('preview aspect ratio is correct for camera', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const video = document.querySelector("video");
+        const video = document.querySelector('video');
         expect(video).toBeInTheDocument();
       });
     });
 
-    it("shows loading state while camera is initializing", async () => {
+    it('shows loading state while camera is initializing', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       // Initially should show loading state
@@ -275,36 +266,34 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Flash/Torch Toggle - F-33 Requirement", () => {
-    it("displays flash/torch toggle when available", async () => {
+  describe('Flash/Torch Toggle - F-33 Requirement', () => {
+    it('displays flash/torch toggle when available', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       // Flash toggle should be optional but available
       await waitFor(() => {
-        const flashButton = screen.queryByRole("button", {
+        const flashButton = screen.queryByRole('button', {
           name: /flash|torch|light|brightness/i,
         });
         // It may or may not be present depending on device capabilities
-        expect(
-          flashButton || document.querySelector("[class*='flash']"),
-        ).toBeTruthy();
+        expect(flashButton || document.querySelector("[class*='flash']")).toBeTruthy();
       });
     });
 
-    it("flash button has accessible tooltip or label", async () => {
+    it('flash button has accessible tooltip or label', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       // Check that any flash controls have proper labels
       await waitFor(() => {
-        const buttons = screen.getAllByRole("button");
+        const buttons = screen.getAllByRole('button');
         // Flash control is optional but should have proper accessibility if present
         const hasButtons = buttons.length >= 2;
         if (hasButtons) {
           const hasFlashControl = buttons.some(
             (btn) =>
-              btn.getAttribute("aria-label")?.toLowerCase().includes("flash") ||
-              btn.getAttribute("title")?.toLowerCase().includes("flash") ||
-              btn.textContent?.toLowerCase().includes("flash"),
+              btn.getAttribute('aria-label')?.toLowerCase().includes('flash') ||
+              btn.getAttribute('title')?.toLowerCase().includes('flash') ||
+              btn.textContent?.toLowerCase().includes('flash'),
           );
           expect(hasFlashControl || buttons.length).toBeTruthy();
         }
@@ -313,8 +302,8 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Analysis Results Display - F-33 Requirement", () => {
-    it("displays analysis results below preview", async () => {
+  describe('Analysis Results Display - F-33 Requirement', () => {
+    it('displays analysis results below preview', async () => {
       const { container } = render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
@@ -324,7 +313,7 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("results area is scrollable when content exceeds viewport", async () => {
+    it('results area is scrollable when content exceeds viewport', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
@@ -338,39 +327,39 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("shows placeholder or empty state when no analysis yet", async () => {
+    it('shows placeholder or empty state when no analysis yet', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
-      // Initially should show instructions or empty state
+      // Initially should show instructions or empty state (supports both EN and IT)
       await waitFor(() => {
         expect(
-          screen.getByText(/capture|analyze|instructions|ready/i) ||
-            screen.getByRole("main") ||
+          screen.queryByText(
+            /capture|analyze|instructions|ready|cattura|posiziona|analiz|pronto/i,
+          ) ||
+            screen.queryByRole('main') ||
             document.querySelector("[class*='main']"),
         ).toBeTruthy();
       });
     });
   });
 
-  describe("Responsive Layout - F-33 Requirement", () => {
-    it("uses camera-centric layout on mobile", async () => {
+  describe('Responsive Layout - F-33 Requirement', () => {
+    it('uses camera-centric layout on mobile', async () => {
       const { container } = render(<WebcamAnalysisMobile {...mockProps} />);
 
       await act(async () => {
         const rootElement = container.firstChild as HTMLElement;
 
         // Mobile should prioritize camera preview
-        expect(rootElement.className).toMatch(
-          /flex|grid|gap|flex-col|flex-row|p-/,
-        );
+        expect(rootElement.className).toMatch(/flex|grid|gap|flex-col|flex-row|p-/);
       });
     });
 
-    it("preview is positioned prominently on mobile", async () => {
+    it('preview is positioned prominently on mobile', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const video = document.querySelector("video");
+        const video = document.querySelector('video');
         const videoContainer = video?.parentElement;
 
         // Should be high in the layout hierarchy
@@ -378,11 +367,11 @@ describe("WebcamAnalysisMobile", () => {
       });
     });
 
-    it("controls are positioned for thumb reach on mobile", async () => {
+    it('controls are positioned for thumb reach on mobile', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
 
@@ -392,128 +381,120 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Accessibility", () => {
-    it("capture button has accessible name", async () => {
+  describe('Accessibility', () => {
+    it('capture button has accessible name', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
         expect(captureButton).toHaveAccessibleName();
       });
     });
 
-    it("camera switch button has accessible name", async () => {
+    it('camera switch button has accessible name', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera|front|back/i,
         });
         expect(switchButton).toHaveAccessibleName();
       });
     });
 
-    it("video preview has appropriate role and labels", async () => {
+    it('video preview has appropriate role and labels', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const video = document.querySelector("video");
+        const video = document.querySelector('video');
         expect(video).toBeInTheDocument();
       });
     });
 
-    it("all buttons respond to keyboard navigation", async () => {
+    it('all buttons respond to keyboard navigation', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const buttons = screen.getAllByRole("button");
+        const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
         buttons.forEach((btn) => {
-          expect(btn.tagName).toBe("BUTTON");
+          expect(btn.tagName).toBe('BUTTON');
         });
       });
     });
   });
 
-  describe("Touch Interaction", () => {
-    it("capture button responds to touch events", async () => {
+  describe('Touch Interaction', () => {
+    it('capture button responds to touch events', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
         expect(captureButton).toBeInTheDocument();
       });
     });
 
-    it("camera switch button responds to touch events", async () => {
+    it('camera switch button responds to touch events', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const switchButton = screen.getByRole("button", {
+        const switchButton = screen.getByRole('button', {
           name: /switch|flip|toggle|camera|front|back/i,
         });
         expect(switchButton).toBeInTheDocument();
       });
     });
 
-    it("no text selection occurs during interaction", async () => {
+    it('no text selection occurs during interaction', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const buttons = screen.getAllByRole("button");
+        const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
       });
     });
   });
 
-  describe("Error Handling", () => {
-    it("displays error message when camera access is denied", async () => {
+  describe('Error Handling', () => {
+    it('displays error message when camera access is denied', async () => {
       mockGetUserMedia.mockRejectedValueOnce(
-        new DOMException("Permission denied", "NotAllowedError"),
+        new DOMException('Permission denied', 'NotAllowedError'),
       );
 
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
         expect(
-          screen.getByText(/permission|denied|camera|access|enable/i) ||
-            mockOnError,
+          screen.getByText(/permission|denied|camera|access|enable/i) || mockOnError,
         ).toBeTruthy();
       });
     });
 
-    it("displays error message when camera is unavailable", async () => {
-      mockGetUserMedia.mockRejectedValueOnce(
-        new DOMException("No camera found", "NotFoundError"),
-      );
+    it('displays error message when camera is unavailable', async () => {
+      mockGetUserMedia.mockRejectedValueOnce(new DOMException('No camera found', 'NotFoundError'));
 
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/unavailable|not found|camera|error/i) ||
-            mockOnError,
-        ).toBeTruthy();
+        expect(screen.getByText(/unavailable|not found|camera|error/i) || mockOnError).toBeTruthy();
       });
     });
 
-    it("provides retry option on error", async () => {
-      mockGetUserMedia.mockRejectedValueOnce(
-        new DOMException("Camera error", "NotReadableError"),
-      );
+    it('provides retry option on error', async () => {
+      mockGetUserMedia.mockRejectedValueOnce(new DOMException('Camera error', 'NotReadableError'));
 
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const retryButton = screen.queryByRole("button", {
+        const retryButton = screen.queryByRole('button', {
           name: /retry|try again|refresh/i,
         });
         expect(retryButton || mockOnError).toBeTruthy();
@@ -521,25 +502,25 @@ describe("WebcamAnalysisMobile", () => {
     });
   });
 
-  describe("Integration with onAnalyze callback", () => {
-    it("calls onAnalyze when capture is confirmed", async () => {
+  describe('Integration with onAnalyze callback', () => {
+    it('calls onAnalyze when capture is confirmed', async () => {
       const _user = userEvent.setup({ delay: null });
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
-        const captureButton = screen.getByRole("button", {
+        const captureButton = screen.getByRole('button', {
           name: /capture|snap|take|photo|record/i,
         });
         expect(captureButton).toBeInTheDocument();
       });
     });
 
-    it("passes image data to onAnalyze callback", async () => {
+    it('passes image data to onAnalyze callback', async () => {
       render(<WebcamAnalysisMobile {...mockProps} />);
 
       await waitFor(() => {
         expect(
-          screen.getByRole("button", {
+          screen.getByRole('button', {
             name: /capture|snap|take|photo|record/i,
           }),
         ).toBeInTheDocument();

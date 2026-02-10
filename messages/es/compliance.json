@@ -36,7 +36,7 @@
           "submitButton": "[TRANSLATE] Invia Richiesta Enterprise"
         },
         "tornaAllaHome": "Torna alla Home",
-        "nome": "Nome *",
+        "nome": "Nombre *",
         "ilTuoNomeCompleto": "Il tuo nome completo",
         "email": "Email *",
         "ruolo": "Ruolo *",
@@ -112,8 +112,8 @@
         "submitButtonLoading": "Enviando...",
         "successMessage": "Su solicitud ha sido enviada con éxito. Le contactaremos pronto.",
         "successTitle": "Solicitud enviada",
-        "nome1": "Nome *",
-        "nome": "Nome",
+        "nome1": "Nombre *",
+        "nome": "Nombre",
         "email1": "Email *",
         "email": "Email"
       },

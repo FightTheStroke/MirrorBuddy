@@ -957,14 +957,14 @@
             "optionalAnalytics": "Gli analytics opzionali ci aiutano a capire come usi l'app, ma puoi rifiutare",
             "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
             "lastUpdated": "24 Gennaio 2026",
-            "pageNavigation": "Page Navigation",
-            "backToHome": "Back To Home",
-            "title": "Title",
-            "version": "Version",
-            "k24Gennaio2026": "K24 Gennaio2026",
-            "tldrHeading": "Tldr Heading",
-            "questionText": "Question Text",
-            "questionAriaLabel": "Question Aria Label"
+            "pageNavigation": "Navigazione pagina",
+            "backToHome": "Torna alla home",
+            "title": "Informativa sulla Privacy",
+            "version": "Versione",
+            "k24Gennaio2026": "24 Gennaio 2026",
+            "tldrHeading": "Riassunto rapido",
+            "questionText": "Testo domanda",
+            "questionAriaLabel": "Etichetta domanda"
           },
           "tornaAllaHomePageDiMirrorbuddy": "Torna alla home page di MirrorBuddy",
           "k24Gennaio2026": "24 Gennaio 2026"
