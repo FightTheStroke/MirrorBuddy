@@ -14,13 +14,9 @@
  *   console.log(limits.bandwidth.used, limits.bandwidth.limit);
  */
 
-import { logger } from "@/lib/logger";
-import {
-  queryProjectUsage,
-  queryTeamLimits,
-  getDefaultLimits,
-} from "./vercel-api-client";
-import { calculateStatus, AlertStatus } from "./threshold-logic";
+import { logger } from '@/lib/logger';
+import { queryProjectUsage, queryTeamLimits, getDefaultLimits } from './vercel-api-client';
+import { calculateStatus, AlertStatus } from './threshold-logic';
 
 /**
  * Vercel usage metrics response with threshold status (F-18, F-25)
@@ -68,17 +64,22 @@ let cache: CacheEntry | null = null;
 export async function getVercelLimits(): Promise<VercelLimits> {
   // Check cache first (rate limiting)
   if (cache && cache.expiresAt > Date.now()) {
-    logger.debug("Returning cached Vercel limits");
+    logger.debug('Returning cached Vercel limits');
     return cache.data;
   }
 
   const token = process.env.VERCEL_TOKEN;
-  const projectId =
-    process.env.VERCEL_PROJECT_ID || process.env.VERCEL_URL?.split(".")[0];
+  const projectId = process.env.VERCEL_PROJECT_ID || process.env.VERCEL_URL?.split('.')[0];
   const teamId = process.env.VERCEL_TEAM_ID;
 
   if (!token) {
-    const error = "VERCEL_TOKEN not configured";
+    const error = 'VERCEL_TOKEN not configured';
+    logger.warn(error);
+    return createEmptyLimits(error);
+  }
+
+  if (!projectId) {
+    const error = 'VERCEL_PROJECT_ID not configured';
     logger.warn(error);
     return createEmptyLimits(error);
   }
@@ -88,23 +89,12 @@ export async function getVercelLimits(): Promise<VercelLimits> {
     const projectUsage = await queryProjectUsage(token, projectId, teamId);
 
     // Query team-level limits (if in a team)
-    const teamLimits = teamId
-      ? await queryTeamLimits(token, teamId)
-      : getDefaultLimits();
+    const teamLimits = teamId ? await queryTeamLimits(token, teamId) : getDefaultLimits();
 
     // Combine project usage with team limits (F-25: add status)
-    const bandwidthPercent = calculatePercent(
-      projectUsage.bandwidth.used,
-      teamLimits.bandwidth,
-    );
-    const buildsPercent = calculatePercent(
-      projectUsage.builds.used,
-      teamLimits.builds,
-    );
-    const functionsPercent = calculatePercent(
-      projectUsage.functions.used,
-      teamLimits.functions,
-    );
+    const bandwidthPercent = calculatePercent(projectUsage.bandwidth.used, teamLimits.bandwidth);
+    const buildsPercent = calculatePercent(projectUsage.builds.used, teamLimits.builds);
+    const functionsPercent = calculatePercent(projectUsage.functions.used, teamLimits.functions);
 
     const limits: VercelLimits = {
       bandwidth: {
@@ -134,7 +124,7 @@ export async function getVercelLimits(): Promise<VercelLimits> {
       expiresAt: Date.now() + CACHE_TTL_MS,
     };
 
-    logger.info("Vercel limits fetched successfully", {
+    logger.info('Vercel limits fetched successfully', {
       bandwidth: `${limits.bandwidth.percent.toFixed(1)}%`,
       builds: `${limits.builds.percent.toFixed(1)}%`,
       functions: `${limits.functions.percent.toFixed(1)}%`,
@@ -142,9 +132,8 @@ export async function getVercelLimits(): Promise<VercelLimits> {
 
     return limits;
   } catch (error) {
-    const errorMsg =
-      error instanceof Error ? error.message : "Unknown error";
-    logger.error("Failed to fetch Vercel limits", undefined, error as Error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Failed to fetch Vercel limits', undefined, error as Error);
     return createEmptyLimits(errorMsg);
   }
 }
@@ -162,9 +151,9 @@ function calculatePercent(used: number, limit: number): number {
  */
 function createEmptyLimits(error: string): VercelLimits {
   return {
-    bandwidth: { used: 0, limit: 0, percent: 0, status: "ok" },
-    builds: { used: 0, limit: 0, percent: 0, status: "ok" },
-    functions: { used: 0, limit: 0, percent: 0, status: "ok" },
+    bandwidth: { used: 0, limit: 0, percent: 0, status: 'ok' },
+    builds: { used: 0, limit: 0, percent: 0, status: 'ok' },
+    functions: { used: 0, limit: 0, percent: 0, status: 'ok' },
     timestamp: Date.now(),
     error,
   };
