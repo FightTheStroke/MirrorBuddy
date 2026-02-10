@@ -1,30 +1,64 @@
 /**
  * Stripe Admin API Route
  *
- * GET /api/admin/stripe - Get Stripe overview (products, subscriptions, revenue)
- *
- * Authentication: Admin only
- * Rate limiting: None (internal admin tool)
+ * GET /api/admin/stripe — Dashboard data + payment settings
+ * POST /api/admin/stripe — Update payment settings (kill switch)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getStripeAdminData } from "@/lib/admin/stripe-admin-service";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { getDashboardData } from '@/lib/admin/stripe-admin-service';
+import {
+  getPaymentSettings,
+  updatePaymentSettings,
+} from '@/lib/admin/stripe-settings-service';
+import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
+import { z } from 'zod';
+
+const SettingsSchema = z.object({
+  paymentsEnabled: z.boolean(),
+});
 
 export const GET = pipe(
-  withSentry("/api/admin/stripe"),
+  withSentry('/api/admin/stripe'),
+  withAdmin,
+)(async (_ctx) => {
+  const [dashboard, settings] = await Promise.all([
+    getDashboardData(),
+    getPaymentSettings(),
+  ]);
+
+  return NextResponse.json({ ...dashboard, settings });
+});
+
+export const POST = pipe(
+  withSentry('/api/admin/stripe'),
+  withCSRF,
   withAdmin,
 )(async (ctx) => {
-  // Get Stripe data (mock or real depending on configuration)
-  const data = await getStripeAdminData();
+  const body = await ctx.req.json();
+  const validation = SettingsSchema.safeParse(body);
 
-  logger.info("Stripe admin data fetched", {
-    adminId: ctx.userId,
-    configured: data.configured,
-    productsCount: data.products.length,
-    subscriptionsCount: data.subscriptions.length,
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: 'Invalid request', details: validation.error.issues },
+      { status: 400 },
+    );
+  }
+
+  const settings = await updatePaymentSettings(
+    validation.data.paymentsEnabled,
+    ctx.userId!,
+  );
+
+  await logAdminAction({
+    action: 'UPDATE_PAYMENT_SETTINGS',
+    entityType: 'GlobalConfig',
+    entityId: 'global',
+    adminId: ctx.userId!,
+    details: { paymentsEnabled: validation.data.paymentsEnabled },
+    ipAddress: getClientIp(ctx.req),
   });
 
-  return NextResponse.json(data);
+  return NextResponse.json(settings);
 });

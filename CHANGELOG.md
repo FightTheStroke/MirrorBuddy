@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Stripe Admin Panel (Plan 142)
+
+### W1 — Service Layer
+
+- Added: `paymentsEnabled` Boolean field to GlobalConfig (analytics.prisma)
+- Added: 6 new types in stripe-admin-types.ts (StripeWebhookEvent, PaymentSettings, ProductCreateInput, PriceCreateInput, SubscriptionActionInput, RefundInput)
+- Changed: Rewrote stripe-admin-service.ts with real Stripe SDK (getDashboardData, getProducts, getSubscriptions)
+- Added: stripe-products-service.ts — CRUD for products/prices + tier sync
+- Added: stripe-subscriptions-service.ts — list, cancel, refund, change plan
+- Added: stripe-webhooks-service.ts — event monitoring (list, detail, retry)
+- Added: stripe-settings-service.ts — payment kill switch via GlobalConfig
+
+### W2 — API Routes
+
+- Changed: Rewrote /api/admin/stripe/route.ts with GET dashboard+settings and POST kill switch
+- Added: /api/admin/stripe/products/ — GET list, POST create with price+tier sync
+- Added: /api/admin/stripe/products/[id]/ — PUT update, DELETE archive
+- Added: /api/admin/stripe/subscriptions/ — GET list with filters (status, email, pagination)
+- Added: /api/admin/stripe/subscriptions/[id]/ — PUT cancel/change plan, POST refund
+- Added: /api/admin/stripe/webhooks/ — GET list events, GET detail, POST retry
+
+### W3 — Admin UI (Dashboard + Products)
+
+- Added: /admin/stripe page with validateAdminAuth and StripeTabs
+- Added: StripeTabs client component with 4 tabs (Dashboard, Products, Subscriptions, Webhooks)
+- Added: StripeDashboardTab with connection status, MRR/ARR/subs metrics, kill switch toggle
+- Added: StripeProductsTab with product table, create dialog, archive button
+- Added: StripePriceDialog for creating new prices on products
+- Added: Stripe entry in admin sidebar (CreditCard icon) and command palette
+
+### W4 — Admin UI (Subscriptions + Webhooks)
+
+- Added: StripeSubscriptionsTab with status filter, email search, cursor pagination
+- Added: StripeSubscriptionActions with cancel/refund/change plan dialogs
+- Added: StripeWebhooksTab with event log, status badges, expandable detail, retry
+
+### W5 — Integration
+
+- Changed: /api/checkout/route.ts — kill switch check (GlobalConfig.paymentsEnabled, returns 503)
+- Added: i18n keys for Stripe admin in all 5 locales (it/en/fr/de/es) — ~45 keys each
+- Added: stripe-admin-service.test.ts (9 tests: dashboard data, products, subscriptions, formatCurrency, formatDate)
+- Added: stripe-settings-service.test.ts (4 tests: get/update payment settings)
+- Added: route.test.ts for /api/admin/stripe (4 tests: auth, dashboard, settings update, audit)
+
 ## [Unreleased] — Sentry Fix All Runtimes (Plan 141)
 
 ### Fixed

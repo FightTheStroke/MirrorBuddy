@@ -25,6 +25,7 @@ import {
   BookOpen,
   Coins,
   Receipt,
+  CreditCard,
 } from 'lucide-react';
 
 export interface CommandItem {
@@ -182,6 +183,14 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
       icon: Receipt,
       href: '/admin/tax',
       keywords: ['vat', 'fiscal', 'invoice'],
+    },
+    {
+      id: 'nav-stripe',
+      label: 'Stripe',
+      section: 'navigation',
+      icon: CreditCard,
+      href: '/admin/stripe',
+      keywords: ['payments', 'billing', 'subscriptions', 'products'],
     },
     {
       id: 'nav-keyvault',
