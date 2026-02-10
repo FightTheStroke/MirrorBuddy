@@ -26,7 +26,12 @@ export function getStateSecret(): string {
   return 'dev-secret-change-in-production';
 }
 
-const STATE_SECRET = getStateSecret();
+// Lazy-initialized secret: avoids crashing at build time during page data collection
+let _stateSecret: string | null = null;
+function stateSecret(): string {
+  if (!_stateSecret) _stateSecret = getStateSecret();
+  return _stateSecret;
+}
 
 /**
  * Generate PKCE code verifier (RFC 7636)
@@ -331,7 +336,7 @@ export async function disconnectGoogleAccount(userId: string): Promise<boolean> 
  * Sign data with HMAC-SHA256
  */
 function signData(data: string): string {
-  return createHmac('sha256', STATE_SECRET).update(data).digest('base64url');
+  return createHmac('sha256', stateSecret()).update(data).digest('base64url');
 }
 
 /**
