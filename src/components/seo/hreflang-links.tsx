@@ -3,12 +3,12 @@
  * Detects current pathname and renders appropriate hreflang tags
  */
 
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
-import { generateHreflangTags } from "@/lib/seo/hreflang";
-import type { Locale } from "@/lib/seo/hreflang.types";
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { generateHreflangTags } from '@/lib/seo/hreflang';
+import type { Locale } from '@/lib/seo/hreflang.types';
 
 interface HreflangLinksProps {
   locales?: readonly Locale[];
@@ -20,13 +20,10 @@ interface HreflangLinksProps {
  * Place this in your head section (it will render link tags to the head)
  */
 export function HreflangLinks({
-  locales = ["it", "en", "fr", "de", "es"] as const,
+  locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangLinksProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
-  if (!resolvedBaseUrl) {
-    throw new Error("NEXT_PUBLIC_SITE_URL is required for hreflang links");
-  }
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mirrorbuddy.org';
   const rawPathname = usePathname();
 
   // Strip locale prefix from pathname since usePathname() returns /it/welcome
@@ -37,7 +34,7 @@ export function HreflangLinks({
         return rawPathname.slice(locale.length + 1);
       }
       if (rawPathname === `/${locale}`) {
-        return "/";
+        return '/';
       }
     }
     return rawPathname;
@@ -47,16 +44,14 @@ export function HreflangLinks({
     const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
     // Remove existing hreflang tags
-    const existingTags = document.querySelectorAll(
-      'link[rel="alternate"][hreflang]',
-    );
+    const existingTags = document.querySelectorAll('link[rel="alternate"][hreflang]');
     existingTags.forEach((tag) => tag.remove());
 
     // Add new hreflang tags to head
     tags.forEach((tag) => {
-      const link = document.createElement("link");
-      link.rel = "alternate";
-      link.setAttribute("hreflang", tag.hreflang);
+      const link = document.createElement('link');
+      link.rel = 'alternate';
+      link.setAttribute('hreflang', tag.hreflang);
       link.href = tag.href;
       document.head.appendChild(link);
     });
@@ -68,7 +63,7 @@ export function HreflangLinks({
           `link[rel="alternate"][hreflang="${tag.hreflang}"]`,
         );
         links.forEach((link) => {
-          if (link.getAttribute("href") === tag.href) {
+          if (link.getAttribute('href') === tag.href) {
             link.remove();
           }
         });

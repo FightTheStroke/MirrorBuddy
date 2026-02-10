@@ -6,7 +6,7 @@
  * Reference: https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls
  */
 
-import type { Locale } from "@/i18n/config";
+import type { Locale } from '@/i18n/config';
 
 /**
  * Generate a canonical URL for a given locale and path
@@ -24,27 +24,19 @@ import type { Locale } from "@/i18n/config";
  * // => 'https://your-domain.com/en/search?q=test'
  */
 export function generateCanonicalUrl(locale: Locale, pathname: string): string {
-  // NEXT_PUBLIC_SITE_URL is required — no hardcoded fallback
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!baseUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_SITE_URL environment variable is required for canonical URL generation",
-    );
-  }
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
 
   // Remove hash fragments (SEO compliance - fragments should not be in canonical)
-  const pathWithoutHash = pathname.split("#")[0];
+  const pathWithoutHash = pathname.split('#')[0];
 
   // Construct the canonical URL with locale prefix
   // The URL() constructor will handle path joining and encoding
-  const url = new URL(
-    `${baseUrl}${baseUrl.endsWith("/") ? "" : "/"}${locale}${pathWithoutHash}`,
-  );
+  const url = new URL(`${baseUrl}${baseUrl.endsWith('/') ? '' : '/'}${locale}${pathWithoutHash}`);
 
   let result = url.toString();
 
   // Remove trailing slash for root locale paths (e.g., /it, not /it/)
-  if (pathWithoutHash === "/" && result.endsWith("/")) {
+  if (pathWithoutHash === '/' && result.endsWith('/')) {
     result = result.slice(0, -1);
   }
 
@@ -67,10 +59,7 @@ export function generateCanonicalUrl(locale: Locale, pathname: string): string {
  *   };
  * };
  */
-export function getCanonicalMetadata(
-  locale: Locale,
-  pathname: string,
-): { canonical: string } {
+export function getCanonicalMetadata(locale: Locale, pathname: string): { canonical: string } {
   return {
     canonical: generateCanonicalUrl(locale, pathname),
   };
@@ -91,9 +80,7 @@ export function getCanonicalMetadata(
  *
  * export const metadata = generateMetadata('it', '/path');
  */
-export function createLocalizedMetadataGenerator(
-  defaultMetadata: Record<string, unknown>,
-) {
+export function createLocalizedMetadataGenerator(defaultMetadata: Record<string, unknown>) {
   return (locale: Locale, pathname: string) => {
     return {
       ...defaultMetadata,

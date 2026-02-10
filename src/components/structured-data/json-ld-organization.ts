@@ -6,11 +6,11 @@
  * F-76: Pages have structured data for rich search results
  */
 
-import type { Locale } from "@/i18n/config";
+import type { Locale } from '@/i18n/config';
 
 export interface OrganizationSchema {
-  "@context": string;
-  "@type": string | string[];
+  '@context': string;
+  '@type': string | string[];
   name: string;
   url: string;
   logo: string;
@@ -24,27 +24,20 @@ export interface EducationalOrganizationSchema extends OrganizationSchema {
 
 // Locale-specific descriptions
 const localeDescriptions: Record<Locale, string> = {
-  it: "MirrorBuddy - La scuola che vorrei. Piattaforma educativa potenziata da IA per studenti con differenze di apprendimento, con 26 maestri storici, insegnanti, compagni e tutoraggio vocale personalizzato.",
-  en: "MirrorBuddy - The school we wished existed. AI-powered educational platform for students with learning differences, featuring 26 historical maestros, coaches, buddies, and personalized voice tutoring.",
+  it: 'MirrorBuddy - La scuola che vorrei. Piattaforma educativa potenziata da IA per studenti con differenze di apprendimento, con 26 maestri storici, insegnanti, compagni e tutoraggio vocale personalizzato.',
+  en: 'MirrorBuddy - The school we wished existed. AI-powered educational platform for students with learning differences, featuring 26 historical maestros, coaches, buddies, and personalized voice tutoring.',
   fr: "MirrorBuddy - L'école que nous avions souhaitée. Plateforme éducative alimentée par l'IA pour les étudiants ayant des troubles d'apprentissage, avec 26 maîtres historiques, entraîneurs, camarades et tutorat vocal personnalisé.",
-  de: "MirrorBuddy - Die Schule, die wir uns gewünscht haben. KI-gestützte Bildungsplattform für Schüler mit Lernbehinderungen, mit 26 historischen Meistern, Trainern, Begleitern und personalisierter Sprachbetreuung.",
-  es: "MirrorBuddy - La escuela que siempre deseamos. Plataforma educativa impulsada por IA para estudiantes con dificultades de aprendizaje, con 26 maestros históricos, entrenadores, compañeros y tutoría de voz personalizada.",
+  de: 'MirrorBuddy - Die Schule, die wir uns gewünscht haben. KI-gestützte Bildungsplattform für Schüler mit Lernbehinderungen, mit 26 historischen Meistern, Trainern, Begleitern und personalisierter Sprachbetreuung.',
+  es: 'MirrorBuddy - La escuela que siempre deseamos. Plataforma educativa impulsada por IA para estudiantes con dificultades de aprendizaje, con 26 maestros históricos, entrenadores, compañeros y tutoría de voz personalizada.',
 };
 
 // Educational levels (locale-specific)
 const educationalLevels: Record<Locale, string[]> = {
-  it: [
-    "Scuola Secondaria di Primo Grado",
-    "Scuola Secondaria di Secondo Grado",
-  ],
-  en: ["Middle School", "High School", "Secondary Education"],
-  fr: ["Collège", "Lycée", "Enseignement Secondaire"],
-  de: ["Sekundarstufe I", "Sekundarstufe II", "Weiterführende Schulen"],
-  es: [
-    "Educación Secundaria Obligatoria",
-    "Bachillerato",
-    "Educación Secundaria",
-  ],
+  it: ['Scuola Secondaria di Primo Grado', 'Scuola Secondaria di Secondo Grado'],
+  en: ['Middle School', 'High School', 'Secondary Education'],
+  fr: ['Collège', 'Lycée', 'Enseignement Secondaire'],
+  de: ['Sekundarstufe I', 'Sekundarstufe II', 'Weiterführende Schulen'],
+  es: ['Educación Secundaria Obligatoria', 'Bachillerato', 'Educación Secundaria'],
 };
 
 /**
@@ -55,24 +48,21 @@ const educationalLevels: Record<Locale, string[]> = {
  * @returns Organization schema object
  */
 export function generateOrganizationSchema(locale: Locale): OrganizationSchema {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!siteUrl) {
-    throw new Error("NEXT_PUBLIC_SITE_URL is required for structured data");
-  }
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
   const logoUrl = `${siteUrl}/logo-512.png`;
 
   return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "MirrorBuddy",
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'MirrorBuddy',
     url: siteUrl,
     logo: logoUrl,
     description: localeDescriptions[locale],
     sameAs: [
-      "https://github.com/FightTheStroke/MirrorBuddy",
-      "https://twitter.com/MirrorBuddy_AI",
-      "https://www.linkedin.com/company/mirrorbuddy/",
-      "https://www.instagram.com/mirrorbuddy.ai/",
+      'https://github.com/FightTheStroke/MirrorBuddy',
+      'https://twitter.com/MirrorBuddy_AI',
+      'https://www.linkedin.com/company/mirrorbuddy/',
+      'https://www.instagram.com/mirrorbuddy.ai/',
     ],
   };
 }
@@ -92,7 +82,7 @@ export function generateEducationalOrganizationSchema(
 
   return {
     ...baseSchema,
-    "@type": ["Organization", "EducationalOrganization"],
+    '@type': ['Organization', 'EducationalOrganization'],
     educationalLevel: educationalLevels[locale],
   };
 }

@@ -3,12 +3,12 @@
  * This can be used in page.tsx or layout.tsx files to add hreflang tags
  */
 
-import { headers } from "next/headers";
-import { generateHreflangTags } from "./hreflang";
-import type { Metadata } from "next";
-import type { Locale } from "./hreflang.types";
+import { headers } from 'next/headers';
+import { generateHreflangTags } from './hreflang';
+import type { Metadata } from 'next';
+import type { Locale } from './hreflang.types';
 
-const SUPPORTED_LOCALES: readonly Locale[] = ["it", "en", "fr", "de", "es"];
+const SUPPORTED_LOCALES: readonly Locale[] = ['it', 'en', 'fr', 'de', 'es'];
 
 /**
  * Get the current page pathname from headers
@@ -16,7 +16,7 @@ const SUPPORTED_LOCALES: readonly Locale[] = ["it", "en", "fr", "de", "es"];
  */
 export async function getCurrentPathname(): Promise<string> {
   const headersList = await headers();
-  const pathname = headersList.get("x-pathname") || "/";
+  const pathname = headersList.get('x-pathname') || '/';
   return pathname;
 }
 
@@ -35,13 +35,8 @@ export async function getCurrentPathname(): Promise<string> {
 export function getLocaleMetadata(
   pathname: string,
   locales: readonly Locale[] = SUPPORTED_LOCALES,
-): Pick<Metadata, "alternates"> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!baseUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_SITE_URL environment variable is required for locale metadata",
-    );
-  }
+): Pick<Metadata, 'alternates'> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
 
   const hreflangTags = generateHreflangTags(baseUrl, pathname, locales);
 
@@ -50,11 +45,11 @@ export function getLocaleMetadata(
     alternates: {
       languages: Object.fromEntries(
         hreflangTags
-          .filter((tag) => tag.hreflang !== "x-default")
+          .filter((tag) => tag.hreflang !== 'x-default')
           .map((tag) => [tag.hreflang, tag.href]),
       ),
       // Set canonical as x-default variant
-      canonical: hreflangTags.find((tag) => tag.hreflang === "x-default")?.href,
+      canonical: hreflangTags.find((tag) => tag.hreflang === 'x-default')?.href,
     },
   };
 }
@@ -63,15 +58,12 @@ export function getLocaleMetadata(
  * Extract page pathname from URL
  * Removes the locale prefix if present
  */
-export function extractPathnameWithoutLocale(
-  pathname: string,
-  locale: string,
-): string {
+export function extractPathnameWithoutLocale(pathname: string, locale: string): string {
   // Remove locale prefix from pathname
   const prefix = `/${locale}`;
   if (pathname.startsWith(prefix)) {
     const withoutLocale = pathname.slice(prefix.length);
-    return withoutLocale || "/";
+    return withoutLocale || '/';
   }
-  return pathname || "/";
+  return pathname || '/';
 }

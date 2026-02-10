@@ -3,8 +3,8 @@
  * Can be used in server-side page components to automatically generate hreflang tags
  */
 
-import { generateHreflangTags } from "@/lib/seo/hreflang";
-import type { Locale } from "@/lib/seo/hreflang.types";
+import { generateHreflangTags } from '@/lib/seo/hreflang';
+import type { Locale } from '@/lib/seo/hreflang.types';
 
 interface HreflangTagsProps {
   pathname: string;
@@ -28,13 +28,10 @@ interface HreflangTagsProps {
  */
 export function HreflangTags({
   pathname,
-  locales = ["it", "en", "fr", "de", "es"] as const,
+  locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangTagsProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
-  if (!resolvedBaseUrl) {
-    throw new Error("NEXT_PUBLIC_SITE_URL is required for hreflang tags");
-  }
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mirrorbuddy.org';
   const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
   return (
