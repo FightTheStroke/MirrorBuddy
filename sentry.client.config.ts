@@ -4,15 +4,8 @@
 
 import * as Sentry from '@sentry/nextjs';
 
-// Production detection: prefer NEXT_PUBLIC_VERCEL_ENV (auto-provided by Vercel),
-// but fallback to NODE_ENV when the env var is not available in the client bundle.
-// MUST use NEXT_PUBLIC_ prefix — non-prefixed env vars are NOT available in client bundles.
-const isVercelProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === 'production';
-// Fallback: NEXT_PUBLIC_VERCEL_ENV not set (undefined) + production build = likely production.
-// Explicitly set non-production values ("preview", "development") are still respected.
-const isProductionFallback =
-  !process.env.NEXT_PUBLIC_VERCEL_ENV && process.env.NODE_ENV === 'production';
-const isProduction = isVercelProduction || isProductionFallback;
+// STRICT: Only enable Sentry in production (NODE_ENV=production) by default
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Optional debug escape hatch for Preview/local testing
 const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true';
@@ -20,18 +13,11 @@ const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true';
 // Only initialize if DSN is present (support both public and server-side names)
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
 
-if (!dsn && isProduction) {
-  console.warn('[Sentry] NEXT_PUBLIC_SENTRY_DSN is not set - error tracking disabled');
-} else if (dsn && isProduction) {
+// Single concise log
+if (dsn) {
   console.log(
-    `[Sentry] Production client error tracking enabled (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || 'undefined'}, NODE_ENV=${process.env.NODE_ENV})`,
+    `[Sentry Client] enabled=${isProduction || isForceEnabled} env=${process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development'}`,
   );
-} else if (dsn && !isProduction && !isForceEnabled) {
-  console.log(
-    `[Sentry] Non-production environment (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || 'undefined'}) - error tracking disabled`,
-  );
-} else if (dsn && isForceEnabled) {
-  console.log('[Sentry] Force-enabled for debugging');
 }
 
 // Only initialize if DSN is present (even in dev, to avoid errors)
@@ -98,18 +84,12 @@ if (dsn) {
     // ZERO TOLERANCE: Capture ALL errors, filter nothing
     ignoreErrors: [],
 
-    // STRICT: Only send errors from Vercel production deployments by default
+    // STRICT: Only send errors from production deployments by default
     // Allow SENTRY_FORCE_ENABLE escape hatch for debugging on Preview/local
     enabled: !!dsn && (isProduction || isForceEnabled),
 
     // Add context before sending
     beforeSend(event, hint) {
-      // DOUBLE CHECK: Block errors from non-production environments
-      // unless SENTRY_FORCE_ENABLE is explicitly set for debugging
-      if (!isProduction && !isForceEnabled) {
-        return null; // Drop errors from non-production environments
-      }
-
       // Capture hydration errors with special tag
       const error = hint.originalException;
       if (error && error instanceof Error) {
@@ -156,7 +136,7 @@ if (dsn) {
     },
 
     // Environment tagging
-    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || 'development',
+    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development',
 
     // Release tracking
     release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'local',

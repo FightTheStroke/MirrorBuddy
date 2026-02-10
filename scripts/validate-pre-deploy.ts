@@ -229,22 +229,22 @@ function validateSentryClientFallback(): void {
 
   const content = fs.readFileSync(clientConfigPath, 'utf8');
 
-  // Verify NODE_ENV fallback exists (ADR 0052 - System Environment Variables)
-  // NEXT_PUBLIC_VERCEL_ENV may not be available in client bundles for existing projects
-  if (content.includes('NODE_ENV') && content.includes('isProductionFallback')) {
+  // Verify NODE_ENV is the primary production gate (Plan 141 / ADR 0070)
+  // NEXT_PUBLIC_VERCEL_ENV is unreliable — NODE_ENV is the single gate
+  if (content.includes('NODE_ENV') && content.includes('isProduction')) {
     addResult(
       'Sentry',
-      'NODE_ENV Fallback',
+      'NODE_ENV Gate',
       'PASS',
-      'Client config has NODE_ENV fallback for missing NEXT_PUBLIC_VERCEL_ENV',
+      'Client config uses NODE_ENV as primary production gate (Plan 141)',
       false,
     );
   } else {
     addResult(
       'Sentry',
-      'NODE_ENV Fallback',
+      'NODE_ENV Gate',
       'FAIL',
-      'Client config gates on NEXT_PUBLIC_VERCEL_ENV without NODE_ENV fallback (ADR 0052)',
+      'Client config missing NODE_ENV production gate (required by Plan 141 / ADR 0070)',
       true,
     );
   }

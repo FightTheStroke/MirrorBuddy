@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Sentry Fix All Runtimes (Plan 141)
+
+### Fixed
+
+- Sentry client/server/edge enable logic: replaced unreliable `VERCEL_ENV`/`NEXT_PUBLIC_VERCEL_ENV` with `NODE_ENV === 'production'` as single production gate
+- Removed triple-blocking anti-pattern (`enabled: false` + `beforeSend` null-return + console.log) from all three Sentry configs
+- Self-test endpoint (`/api/admin/sentry/self-test`) now uses `NODE_ENV` check and reports actual SDK state via `getClient()`
+
+### Added
+
+- Unit tests for Sentry config enable logic: 19 tests covering client/server/edge enabled flag, beforeSend enrichment, hydration/digest tagging, FORCE_ENABLE escape hatch
+
 ## [Unreleased] — Compliance Audit Remediation (Plan 138)
 
 ### Added

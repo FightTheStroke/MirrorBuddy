@@ -58,27 +58,27 @@ echo ""
 echo "2️⃣  Checking Sentry Configuration Files..."
 for file in sentry.client.config.ts sentry.server.config.ts sentry.edge.config.ts; do
 	if [ -f "$file" ]; then
-		if grep -q "VERCEL_ENV.*production" "$file"; then
-			echo "✅ $file: Uses VERCEL_ENV check"
+		# Plan 141: NODE_ENV is the single production gate (not VERCEL_ENV)
+		if grep -q "NODE_ENV.*production" "$file"; then
+			echo "✅ $file: Uses NODE_ENV production gate"
 		else
-			echo "❌ $file: Missing VERCEL_ENV check"
+			echo "❌ $file: Missing NODE_ENV production gate"
 			FAILED=$((FAILED + 1))
 		fi
 
-		# enabled flag: accepts isVercelProduction (server/edge) or isProduction (client with NODE_ENV fallback)
-		if grep -q "enabled.*isVercelProduction\|enabled.*isProduction" "$file"; then
+		# enabled flag: must use isProduction
+		if grep -q "enabled.*isProduction" "$file"; then
 			echo "   ✅ enabled flag set correctly"
 		else
 			echo "   ❌ enabled flag not set correctly"
 			FAILED=$((FAILED + 1))
 		fi
 
-		# beforeSend safety: blocks events from non-production environments
-		# Pattern matches: if (!isVercelProduction) OR if (!isProduction)
-		if grep -q "if (!isVercelProduction\|if (!isProduction" "$file" && grep -q "return null" "$file"; then
-			echo "   ✅ beforeSend safety check present"
+		# beforeSend: should NOT return null (Plan 141 removed triple-blocking)
+		if grep -q "beforeSend" "$file" && ! grep -q "return null.*Drop" "$file"; then
+			echo "   ✅ beforeSend is enrichment-only (no event dropping)"
 		else
-			echo "   ⚠️  beforeSend safety check missing (optional, enabled flag already blocks)"
+			echo "   ⚠️  beforeSend may be dropping events — verify"
 		fi
 	else
 		echo "❌ $file: NOT FOUND"
