@@ -3,32 +3,33 @@
 // POST: Receive and store batched telemetry events
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-import type { TelemetryCategory } from "@/lib/telemetry/types";
-import { getCorsHeaders } from "@/lib/security";
+import { NextResponse } from 'next/server';
+import { validateAuth } from '@/lib/auth/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry } from '@/lib/api/middlewares';
+import type { TelemetryCategory } from '@/lib/telemetry/types';
+import { getCorsHeaders } from '@/lib/security';
 
 // Handle CORS preflight
 // F-04: Get CORS headers based on request origin (no wildcard in production)
-export const OPTIONS = pipe(withSentry("/api/telemetry/events"))(async (
-  ctx,
-) => {
-  const requestOrigin = ctx.req.headers.get("origin");
+export const OPTIONS = pipe(withSentry('/api/telemetry/events'))(async (ctx) => {
+  const requestOrigin = ctx.req.headers.get('origin');
   const corsHeaders = getCorsHeaders(requestOrigin);
   return NextResponse.json({}, { headers: corsHeaders });
 });
 
 const VALID_CATEGORIES: TelemetryCategory[] = [
-  "navigation",
-  "education",
-  "conversation",
-  "maestro",
-  "tools",
-  "accessibility",
-  "error",
-  "performance",
+  'navigation',
+  'education',
+  'conversation',
+  'maestro',
+  'tools',
+  'accessibility',
+  'error',
+  'performance',
+  'ai',
+  'voice',
+  'realtime',
 ];
 
 interface EventPayload {
@@ -45,9 +46,9 @@ interface EventPayload {
 }
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
-export const POST = pipe(withSentry("/api/telemetry/events"))(async (ctx) => {
+export const POST = pipe(withSentry('/api/telemetry/events'))(async (ctx) => {
   // F-04: Get CORS headers based on request origin (no wildcard in production)
-  const requestOrigin = ctx.req.headers.get("origin");
+  const requestOrigin = ctx.req.headers.get('origin');
   const corsHeaders = getCorsHeaders(requestOrigin);
   const auth = await validateAuth();
   const userId = auth.authenticated ? auth.userId : null;
@@ -56,7 +57,7 @@ export const POST = pipe(withSentry("/api/telemetry/events"))(async (ctx) => {
   let body: EventPayload;
   try {
     const text = await ctx.req.text();
-    if (!text || text.trim() === "") {
+    if (!text || text.trim() === '') {
       return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
     }
     body = JSON.parse(text);
@@ -67,7 +68,7 @@ export const POST = pipe(withSentry("/api/telemetry/events"))(async (ctx) => {
 
   if (!body.events || !Array.isArray(body.events)) {
     return NextResponse.json(
-      { error: "Invalid events payload" },
+      { error: 'Invalid events payload' },
       { status: 400, headers: corsHeaders },
     );
   }

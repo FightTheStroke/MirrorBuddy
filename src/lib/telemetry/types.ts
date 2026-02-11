@@ -7,14 +7,17 @@
  * Telemetry event categories for grouping metrics.
  */
 export type TelemetryCategory =
-  | 'navigation'     // Page views, tab switches
-  | 'education'      // Quizzes, flashcards, mind maps
-  | 'conversation'   // Chat messages, voice sessions
-  | 'maestro'        // Maestro interactions
-  | 'tools'          // Tool usage (calculators, diagrams)
-  | 'accessibility'  // A11y feature usage
-  | 'error'          // Errors and crashes
-  | 'performance';   // Performance metrics (load times, etc.)
+  | 'navigation' // Page views, tab switches
+  | 'education' // Quizzes, flashcards, mind maps
+  | 'conversation' // Chat messages, voice sessions
+  | 'maestro' // Maestro interactions
+  | 'tools' // Tool usage (calculators, diagrams)
+  | 'accessibility' // A11y feature usage
+  | 'error' // Errors and crashes
+  | 'performance' // Performance metrics (load times, etc.)
+  | 'ai' // AI token usage (chat completions, TTS)
+  | 'voice' // Voice input/transcription sessions
+  | 'realtime'; // WebRTC realtime voice sessions
 
 /**
  * Individual telemetry event.
@@ -23,12 +26,12 @@ export interface TelemetryEvent {
   id: string;
   timestamp: Date;
   category: TelemetryCategory;
-  action: string;           // e.g., "page_view", "quiz_started", "voice_session_started"
-  label?: string;           // Additional context (page name, maestro ID, etc.)
-  value?: number;           // Numeric value (duration, count, etc.)
+  action: string; // e.g., "page_view", "quiz_started", "voice_session_started"
+  label?: string; // Additional context (page name, maestro ID, etc.)
+  value?: number; // Numeric value (duration, count, etc.)
   metadata?: Record<string, string | number | boolean>;
-  sessionId: string;        // Browser session ID
-  userId?: string;          // If authenticated
+  sessionId: string; // Browser session ID
+  userId?: string; // If authenticated
 }
 
 /**
@@ -92,10 +95,10 @@ export interface PrometheusMetric {
  */
 export interface TelemetryConfig {
   enabled: boolean;
-  sampleRate: number;           // 0-1, percentage of events to capture
-  batchSize: number;            // Events per batch before sending
-  flushIntervalMs: number;      // Auto-flush interval
-  maxQueueSize: number;         // Max events in memory queue
+  sampleRate: number; // 0-1, percentage of events to capture
+  batchSize: number; // Events per batch before sending
+  flushIntervalMs: number; // Auto-flush interval
+  maxQueueSize: number; // Max events in memory queue
   excludeCategories: TelemetryCategory[];
 }
 
