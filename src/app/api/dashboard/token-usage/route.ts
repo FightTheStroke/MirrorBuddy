@@ -1,79 +1,65 @@
 // ============================================================================
 // API ROUTE: Token Usage Analytics
 // GET: AI token usage statistics for dashboard
-// SECURITY: Requires authentication
+// DATA: Uses SessionMetrics table (real token counts from API responses)
+// SECURITY: Requires admin authentication
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
 export const GET = pipe(
-  withSentry("/api/dashboard/token-usage"),
+  withSentry('/api/dashboard/token-usage'),
   withAdmin,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get("days") ?? "7", 10);
+  const days = parseInt(searchParams.get('days') ?? '7', 10);
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
 
   // F-06: Exclude test data from token usage statistics
-  // Get token usage from telemetry events
-  const tokenEvents = await prisma.telemetryEvent.findMany({
-    where: {
-      category: "ai",
-      action: {
-        in: ["chat_completion", "voice_transcription", "tts_generation"],
-      },
-      timestamp: { gte: startDate },
-      isTestData: false,
-    },
-    select: {
-      action: true,
-      value: true,
-      timestamp: true,
-      metadata: true,
-    },
-    orderBy: { timestamp: "desc" },
+  // Query SessionMetrics which stores real token counts from API responses
+  const aggregates = await prisma.sessionMetrics.aggregate({
+    where: { createdAt: { gte: startDate }, isTestData: false },
+    _sum: { tokensIn: true, tokensOut: true, costEur: true },
+    _count: true,
   });
 
-  // Aggregate by action type
-  const byAction: Record<string, { count: number; totalTokens: number }> = {};
-  let totalTokens = 0;
-  let totalCalls = 0;
+  const totalTokensIn = aggregates._sum.tokensIn || 0;
+  const totalTokensOut = aggregates._sum.tokensOut || 0;
+  const totalTokens = totalTokensIn + totalTokensOut;
+  const totalCalls = aggregates._count;
+  const totalCostEur = aggregates._sum.costEur || 0;
 
-  for (const event of tokenEvents) {
-    const action = event.action;
-    if (!byAction[action]) {
-      byAction[action] = { count: 0, totalTokens: 0 };
-    }
-    byAction[action].count++;
-    byAction[action].totalTokens += event.value || 0;
-    totalTokens += event.value || 0;
-    totalCalls++;
-  }
+  // Daily breakdown from SessionMetrics
+  const dailyGrouped = await prisma.sessionMetrics.groupBy({
+    by: ['createdAt'],
+    where: { createdAt: { gte: startDate }, isTestData: false },
+    _sum: { tokensIn: true, tokensOut: true, costEur: true },
+    _count: true,
+  });
 
-  // Daily breakdown
   const dailyUsage: Record<string, number> = {};
-  for (const event of tokenEvents) {
-    const day = event.timestamp.toISOString().split("T")[0];
-    dailyUsage[day] = (dailyUsage[day] || 0) + (event.value || 0);
+  const dailyCost: Record<string, number> = {};
+  for (const row of dailyGrouped) {
+    const day = row.createdAt.toISOString().split('T')[0];
+    const tokens = (row._sum.tokensIn || 0) + (row._sum.tokensOut || 0);
+    dailyUsage[day] = (dailyUsage[day] || 0) + tokens;
+    dailyCost[day] = (dailyCost[day] || 0) + (row._sum.costEur || 0);
   }
-
-  // Estimated cost (rough estimate based on GPT-4 pricing)
-  // Input: $0.03/1K, Output: $0.06/1K - average $0.045/1K
-  const estimatedCost = (totalTokens / 1000) * 0.045;
 
   return NextResponse.json({
     period: { days, startDate: startDate.toISOString() },
     summary: {
       totalTokens,
+      totalTokensIn,
+      totalTokensOut,
       totalCalls,
-      avgTokensPerCall:
-        totalCalls > 0 ? Math.round(totalTokens / totalCalls) : 0,
-      estimatedCostUsd: Math.round(estimatedCost * 100) / 100,
+      avgTokensPerCall: totalCalls > 0 ? Math.round(totalTokens / totalCalls) : 0,
+      totalCostEur: Math.round(totalCostEur * 100) / 100,
     },
-    byAction,
     dailyUsage,
+    dailyCost,
   });
 });
