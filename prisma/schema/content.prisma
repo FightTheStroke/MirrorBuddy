@@ -15,7 +15,7 @@ model Material {
   // Context
   maestroId String?
   sessionId String?
-  session   StudySession? @relation(fields: [sessionId], references: [id])
+  session   StudySession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
   subject   String?
   preview   String?
 
@@ -39,7 +39,7 @@ model Material {
 
   // Organization (ADR 0022)
   collectionId String?
-  collection   Collection?   @relation(fields: [collectionId], references: [id])
+  collection   Collection?   @relation(fields: [collectionId], references: [id], onDelete: SetNull)
   tags         MaterialTag[]
 
   // Study Kit integration
@@ -77,7 +77,7 @@ model Collection {
   color       String?
   icon        String?
   parentId    String?
-  parent      Collection?  @relation("CollectionTree", fields: [parentId], references: [id])
+  parent      Collection?  @relation("CollectionTree", fields: [parentId], references: [id], onDelete: SetNull)
   children    Collection[] @relation("CollectionTree")
   materials   Material[]
   sortOrder   Int          @default(0)

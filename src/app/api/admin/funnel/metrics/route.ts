@@ -4,12 +4,12 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { FUNNEL_STAGES } from "@/lib/funnel/constants";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { FUNNEL_STAGES } from '@/lib/funnel/constants';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 interface StageMetrics {
   stage: string;
@@ -32,17 +32,17 @@ interface FunnelMetricsResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/metrics"),
+  withSentry('/api/admin/funnel/metrics'),
   withAdmin,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
-  const daysBack = parseInt(url.searchParams.get("days") ?? "30");
+  const daysBack = parseInt(url.searchParams.get('days') ?? '30');
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - daysBack);
   // Get counts per stage (excluding test data)
   const stageCounts = await prisma.funnelEvent.groupBy({
-    by: ["stage"],
+    by: ['stage'],
     where: {
       createdAt: { gte: startDate },
       isTestData: false,
@@ -52,10 +52,7 @@ export const GET = pipe(
 
   // Build stage metrics with conversion rates
   const stageCountMap = new Map(
-    stageCounts.map((s: { stage: string; _count: { _all: number } }) => [
-      s.stage,
-      s._count._all,
-    ]),
+    stageCounts.map((s: { stage: string; _count: { _all: number } }) => [s.stage, s._count._all]),
   );
 
   const stages: StageMetrics[] = FUNNEL_STAGES.map((stage, idx) => {
@@ -66,8 +63,7 @@ export const GET = pipe(
     return {
       stage,
       count,
-      conversionRate:
-        prevCount !== null && prevCount > 0 ? (count / prevCount) * 100 : null,
+      conversionRate: prevCount !== null && prevCount > 0 ? (count / prevCount) * 100 : null,
       avgTimeFromPrevious: null, // Could calculate with more complex query
     };
   });
@@ -76,23 +72,25 @@ export const GET = pipe(
   const [uniqueVisitorIds, uniqueUserIds] = await Promise.all([
     prisma.funnelEvent.findMany({
       where: {
-        stage: "VISITOR",
+        stage: 'VISITOR',
         createdAt: { gte: startDate },
         isTestData: false,
         visitorId: { not: null },
       },
-      distinct: ["visitorId"],
+      distinct: ['visitorId'],
+      take: 50000,
       select: { visitorId: true },
     }),
     prisma.funnelEvent.findMany({
       where: {
-        stage: "VISITOR",
+        stage: 'VISITOR',
         createdAt: { gte: startDate },
         isTestData: false,
         userId: { not: null },
         visitorId: null, // Only count userId if no visitorId (converted users)
       },
-      distinct: ["userId"],
+      distinct: ['userId'],
+      take: 50000,
       select: { userId: true },
     }),
   ]);
@@ -101,23 +99,25 @@ export const GET = pipe(
   const [convertedVisitorIds, convertedUserIds] = await Promise.all([
     prisma.funnelEvent.findMany({
       where: {
-        stage: "ACTIVE",
+        stage: 'ACTIVE',
         createdAt: { gte: startDate },
         isTestData: false,
         visitorId: { not: null },
       },
-      distinct: ["visitorId"],
+      distinct: ['visitorId'],
+      take: 50000,
       select: { visitorId: true },
     }),
     prisma.funnelEvent.findMany({
       where: {
-        stage: "ACTIVE",
+        stage: 'ACTIVE',
         createdAt: { gte: startDate },
         isTestData: false,
         userId: { not: null },
         visitorId: null,
       },
-      distinct: ["userId"],
+      distinct: ['userId'],
+      take: 50000,
       select: { userId: true },
     }),
   ]);
@@ -129,9 +129,7 @@ export const GET = pipe(
       uniqueVisitors: uniqueVisitors.length,
       uniqueConverted: uniqueConverted.length,
       overallConversionRate:
-        uniqueVisitors.length > 0
-          ? (uniqueConverted.length / uniqueVisitors.length) * 100
-          : 0,
+        uniqueVisitors.length > 0 ? (uniqueConverted.length / uniqueVisitors.length) * 100 : 0,
     },
     period: {
       start: startDate.toISOString(),

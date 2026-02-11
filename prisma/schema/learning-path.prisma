@@ -13,7 +13,7 @@ model LearningPath {
 
   // Source reference
   sourceStudyKitId String?
-  sourceStudyKit   StudyKit? @relation(fields: [sourceStudyKitId], references: [id])
+  sourceStudyKit   StudyKit? @relation(fields: [sourceStudyKitId], references: [id], onDelete: SetNull)
 
   // Progress tracking
   totalTopics      Int   @default(0)

@@ -5,22 +5,15 @@
 // F-03, F-04: Conversation considers contenuti generati/caricati
 // ============================================================================
 
-import { prisma } from "@/lib/db";
-import type { ToolOutput as PrismaToolOutput } from "@prisma/client";
-import { logger } from "@/lib/logger";
-import type { ToolType } from "@/types/tools";
-import { indexToolOutput } from "./tool-rag-indexer";
-import type {
-  SaveToolOutputOptions,
-  StoredToolOutput,
-} from "./tool-output-types";
+import { prisma } from '@/lib/db';
+import type { ToolOutput as PrismaToolOutput } from '@prisma/client';
+import { logger } from '@/lib/logger';
+import type { ToolType } from '@/types/tools';
+import { indexToolOutput } from './tool-rag-indexer';
+import type { SaveToolOutputOptions, StoredToolOutput } from './tool-output-types';
 
 // Re-export types for backwards compatibility
-export type {
-  ToolOutputData,
-  SaveToolOutputOptions,
-  StoredToolOutput,
-} from "./tool-output-types";
+export type { ToolOutputData, SaveToolOutputOptions, StoredToolOutput } from './tool-output-types';
 
 /**
  * Save a tool output to the database
@@ -53,7 +46,7 @@ export async function saveToolOutput(
       },
     });
 
-    logger.info("Tool output saved", {
+    logger.info('Tool output saved', {
       id: toolOutput.id,
       conversationId,
       toolType,
@@ -70,7 +63,7 @@ export async function saveToolOutput(
       // Don't await - index asynchronously to avoid blocking
       indexToolOutput(storedOutput, userId, conversationId).catch((err) => {
         logger.error(
-          "Failed to index tool output (non-blocking)",
+          'Failed to index tool output (non-blocking)',
           {
             toolOutputId: toolOutput.id,
           },
@@ -82,7 +75,7 @@ export async function saveToolOutput(
     return storedOutput;
   } catch (error) {
     logger.error(
-      "Failed to save tool output",
+      'Failed to save tool output',
       {
         conversationId,
         toolType,
@@ -100,13 +93,12 @@ export async function saveToolOutput(
  * @param conversationId - The conversation ID
  * @returns Array of tool outputs ordered by creation date (newest first)
  */
-export async function getToolOutputs(
-  conversationId: string,
-): Promise<StoredToolOutput[]> {
+export async function getToolOutputs(conversationId: string): Promise<StoredToolOutput[]> {
   try {
     const outputs = await prisma.toolOutput.findMany({
       where: { conversationId },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
     });
 
     return outputs.map((output: PrismaToolOutput) => ({
@@ -114,7 +106,7 @@ export async function getToolOutputs(
       data: JSON.parse(output.data),
     }));
   } catch (error) {
-    logger.error("Failed to get tool outputs", { conversationId }, error);
+    logger.error('Failed to get tool outputs', { conversationId }, error);
     throw error;
   }
 }
@@ -137,7 +129,8 @@ export async function getToolOutputsByType(
         conversationId,
         toolType,
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
+      take: 500,
     });
 
     return outputs.map((output: PrismaToolOutput) => ({
@@ -146,7 +139,7 @@ export async function getToolOutputsByType(
     }));
   } catch (error) {
     logger.error(
-      "Failed to get tool outputs by type",
+      'Failed to get tool outputs by type',
       {
         conversationId,
         toolType,
@@ -164,15 +157,13 @@ export async function getToolOutputsByType(
  * @param conversationId - The conversation ID
  * @returns Total count of tool outputs
  */
-export async function getToolOutputCount(
-  conversationId: string,
-): Promise<number> {
+export async function getToolOutputCount(conversationId: string): Promise<number> {
   try {
     return await prisma.toolOutput.count({
       where: { conversationId },
     });
   } catch (error) {
-    logger.error("Failed to get tool output count", { conversationId }, error);
+    logger.error('Failed to get tool output count', { conversationId }, error);
     return 0;
   }
 }
@@ -184,12 +175,11 @@ export async function getToolOutputCount(
  * @param conversationId - The conversation ID
  * @returns Object with counts per tool type
  */
-export async function getToolOutputStats(
-  conversationId: string,
-): Promise<Record<string, number>> {
+export async function getToolOutputStats(conversationId: string): Promise<Record<string, number>> {
   try {
     const outputs = await prisma.toolOutput.findMany({
       where: { conversationId },
+      take: 1000,
       select: { toolType: true },
     });
 
@@ -200,7 +190,7 @@ export async function getToolOutputStats(
 
     return stats;
   } catch (error) {
-    logger.error("Failed to get tool output stats", { conversationId }, error);
+    logger.error('Failed to get tool output stats', { conversationId }, error);
     return {};
   }
 }
@@ -212,22 +202,20 @@ export async function getToolOutputStats(
  * @param conversationId - The conversation ID
  * @returns Number of deleted records
  */
-export async function deleteToolOutputs(
-  conversationId: string,
-): Promise<number> {
+export async function deleteToolOutputs(conversationId: string): Promise<number> {
   try {
     const result = await prisma.toolOutput.deleteMany({
       where: { conversationId },
     });
 
-    logger.info("Tool outputs deleted", {
+    logger.info('Tool outputs deleted', {
       conversationId,
       count: result.count,
     });
 
     return result.count;
   } catch (error) {
-    logger.error("Failed to delete tool outputs", { conversationId }, error);
+    logger.error('Failed to delete tool outputs', { conversationId }, error);
     throw error;
   }
 }

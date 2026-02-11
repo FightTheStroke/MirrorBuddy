@@ -140,6 +140,8 @@
 | 0139 | Tool Naming Normalization                                 | Consistent tool naming conventions      |
 | 0140 | Compliance Audit Remediation                              | 22-issue remediation from 7-agent audit |
 | 0135 | iOS Release Pipeline                                      | Capacitor build, signing, App Store CI  |
+| 0144 | Disaster Recovery & Backup Strategy                       | Supabase backup/recovery procedures     |
+| 0145 | Migration Best Practices                                  | Migration guidelines and enforcement    |
 
 ## Features & Tools
 
@@ -202,6 +204,6 @@
 
 ---
 
-**Total Active ADRs**: 124
+**Total Active ADRs**: 126
 **Archived ADRs**: 7
 **Last Updated**: 2026-02-10

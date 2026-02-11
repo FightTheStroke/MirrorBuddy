@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] — Stripe Admin Panel (Plan 142)
 
+### Database Hardening
+
+- Fixed: Duplicate migration timestamp 20260125200000 (renamed to 20260125210000)
+- Fixed: 5 missing onDelete cascade/SetNull rules (LearningPath, Material, Collection, Research)
+- Fixed: Unbounded findMany queries across 16 files (added take limits to prevent OOM)
+- Added: Slow query monitoring Prisma extension (warn >1s, critical >3s)
+- Added: Migration for cascade foreign key rules (20260210230000)
+- Added: Materialized views for admin dashboard aggregations (prisma/manual/)
+- Added: Terraform database infrastructure documentation (terraform/database/)
+- Added: ADR 0144 — Disaster Recovery & Backup Strategy
+- Added: ADR 0145 — Migration Best Practices
+
 ### W1 — Service Layer
 
 - Added: `paymentsEnabled` Boolean field to GlobalConfig (analytics.prisma)
