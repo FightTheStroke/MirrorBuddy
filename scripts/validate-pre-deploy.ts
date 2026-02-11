@@ -144,6 +144,7 @@ function validateCriticalEnvVars(): void {
     // Misc
     { name: 'PROTECTED_USERS', sensitive: false },
     { name: 'TRIAL_BUDGET_LIMIT_EUR', sensitive: false },
+    { name: 'BRAVE_SEARCH_API_KEY', sensitive: true },
   ];
 
   for (const envVar of critical) {
