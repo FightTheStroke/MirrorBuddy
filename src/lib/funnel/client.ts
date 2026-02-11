@@ -1,15 +1,14 @@
-"use client";
+'use client';
 
 /**
  * Client-side funnel tracking utilities
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { type FunnelStage } from "./constants";
-import { getVisitorIdFromClient } from "@/lib/trial/visitor-id";
-import { hasAnalyticsConsent } from "@/lib/consent/consent-storage";
-import { csrfFetch } from "@/lib/auth";
-import { clientLogger } from "@/lib/logger/client";
+import { type FunnelStage } from './constants';
+import { hasAnalyticsConsent } from '@/lib/consent/consent-storage';
+import { csrfFetch } from '@/lib/auth';
+import { clientLogger } from '@/lib/logger/client';
 
 export { type FunnelStage };
 
@@ -21,7 +20,9 @@ interface TrackFunnelParams {
 
 /**
  * Track a funnel event from client
- * Respects analytics consent
+ * Respects analytics consent.
+ * The visitor ID cookie (httpOnly) is sent automatically with the request
+ * and extracted server-side by the /api/funnel/track endpoint.
  */
 export async function trackFunnelEvent({
   stage,
@@ -33,18 +34,9 @@ export async function trackFunnelEvent({
     return false;
   }
 
-  // Get visitor ID
-  const visitorId = getVisitorIdFromClient();
-  if (!visitorId) {
-    clientLogger.warn("No visitor ID, cannot track event", {
-      component: "Funnel",
-    });
-    return false;
-  }
-
   try {
-    const response = await csrfFetch("/api/funnel/track", {
-      method: "POST",
+    const response = await csrfFetch('/api/funnel/track', {
+      method: 'POST',
       body: JSON.stringify({
         stage,
         fromStage,
@@ -57,7 +49,7 @@ export async function trackFunnelEvent({
 
     return response.ok;
   } catch (error) {
-    clientLogger.error("Failed to track event", { component: "Funnel" }, error);
+    clientLogger.error('Failed to track event', { component: 'Funnel' }, error);
     return false;
   }
 }
@@ -67,10 +59,10 @@ export async function trackFunnelEvent({
  */
 export function trackWelcomeVisit(): Promise<boolean> {
   return trackFunnelEvent({
-    stage: "VISITOR",
+    stage: 'VISITOR',
     metadata: {
-      page: "welcome",
-      referrer: typeof document !== "undefined" ? document.referrer : undefined,
+      page: 'welcome',
+      referrer: typeof document !== 'undefined' ? document.referrer : undefined,
     },
   });
 }
@@ -80,11 +72,11 @@ export function trackWelcomeVisit(): Promise<boolean> {
  */
 export function trackTrialStartClick(): Promise<boolean> {
   return trackFunnelEvent({
-    stage: "TRIAL_START",
-    fromStage: "VISITOR",
+    stage: 'TRIAL_START',
+    fromStage: 'VISITOR',
     metadata: {
-      action: "prova_gratis_click",
-      page: "welcome",
+      action: 'prova_gratis_click',
+      page: 'welcome',
     },
   });
 }
@@ -94,11 +86,11 @@ export function trackTrialStartClick(): Promise<boolean> {
  */
 export function trackLoginClick(): Promise<boolean> {
   return trackFunnelEvent({
-    stage: "VISITOR",
+    stage: 'VISITOR',
     metadata: {
-      action: "login_click",
-      page: "welcome",
-      intent: "beta_access",
+      action: 'login_click',
+      page: 'welcome',
+      intent: 'beta_access',
     },
   });
 }
