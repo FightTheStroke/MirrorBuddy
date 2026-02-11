@@ -1,6 +1,6 @@
 # i18n Internationalization Incident Runbook
 
-> Specialized incident response guide for MirrorBuddy's multilingual platform. For general incidents, see [RUNBOOK.md](./RUNBOOK.md)
+> Specialized incident response guide for MirrorBuddy's multilingual platform. For general incidents, see [RUNBOOK.md](../operations/RUNBOOK.md)
 
 ## Overview
 
@@ -34,17 +34,17 @@ Users see untranslated keys (e.g., `i18n.chat.greeting`) or broken language pack
 ### Quick Diagnosis
 
 ```bash
-# 1. Check if translation file exists in source
-ls -la public/locales/fr/translation.json
+# 1. Check if translation files exist in source (next-intl namespace structure)
+ls -la messages/fr/
 
 # 2. Check build output includes locale
-grep -r "locales" dist/ | head -10
+grep -r "messages" .next/ | head -10
 
 # 3. Check browser network tab for 404s
-# Open DevTools > Network > Filter: /locales
+# Open DevTools > Network > Filter: /messages
 
 # 4. Test direct translation URL
-curl -I https://[domain]/locales/de/translation.json
+curl -I https://[domain]/messages/de/common.json
 
 # 5. Check console for load errors
 # DevTools > Console > Look for 404 or parse errors
@@ -52,32 +52,32 @@ curl -I https://[domain]/locales/de/translation.json
 
 ### Root Causes
 
-| Cause                         | Detection                                          | Fix                                       |
-| ----------------------------- | -------------------------------------------------- | ----------------------------------------- |
-| Missing source file           | `ls public/locales/{lang}/` returns empty          | Create translation file                   |
-| Build not including locale    | Grep dist/ shows no reference                      | Run `npm run build`                       |
-| Invalid JSON syntax           | `npx -y jsonlint locales/*/translation.json` fails | Fix JSON in translation file              |
-| CDN cache stale               | File exists locally but 404 remote                 | Clear CDN cache (see below)               |
-| Locale code mismatch          | Code requests `en-US` but file is `en`             | Update config in `src/lib/i18n/config.ts` |
-| Language pack failed download | Network/CORS error in console                      | Check CORS headers, retry                 |
+| Cause                         | Detection                                      | Fix                                       |
+| ----------------------------- | ---------------------------------------------- | ----------------------------------------- |
+| Missing source file           | `ls messages/{lang}/` returns empty            | Create translation file                   |
+| Build not including locale    | Grep dist/ shows no reference                  | Run `npm run build`                       |
+| Invalid JSON syntax           | `npx -y jsonlint messages/*/common.json` fails | Fix JSON in translation file              |
+| CDN cache stale               | File exists locally but 404 remote             | Clear CDN cache (see below)               |
+| Locale code mismatch          | Code requests `en-US` but file is `en`         | Update config in `src/lib/i18n/config.ts` |
+| Language pack failed download | Network/CORS error in console                  | Check CORS headers, retry                 |
 
 ### Resolution Steps
 
 #### Step 1: Add Missing Translation File
 
 ```bash
-# Check which languages are missing
-cd /Users/roberdan/GitHub/MirrorBuddy-i18n-multi-language
-ls public/locales/
+# Check which languages are available (next-intl namespace structure)
+cd /Users/roberdan/GitHub/MirrorBuddy
+ls messages/
 
-# Copy template from existing language
-cp public/locales/it/translation.json public/locales/fr/translation.json
+# Copy all namespace files from existing language
+cp -r messages/it/ messages/fr/
 
 # Edit with translations
-nano public/locales/fr/translation.json
+nano messages/fr/common.json
 
 # Validate JSON syntax
-npx -y jsonlint public/locales/fr/translation.json
+npx -y jsonlint messages/fr/common.json
 ```
 
 #### Step 2: Rebuild and Deploy
@@ -87,10 +87,10 @@ npx -y jsonlint public/locales/fr/translation.json
 npm run build
 
 # Check build includes new locale
-grep -r "fr/translation" dist/
+grep -r "fr" messages/ | head -5
 
 # Deploy
-git add public/locales/fr/translation.json
+git add messages/fr/
 git commit -m "i18n: add French translations"
 git push origin main
 
@@ -210,8 +210,8 @@ curl -s http://localhost:3000/api/user/[user-id]/locale
 
 ```typescript
 // src/lib/i18n/config.ts
-export const SUPPORTED_LOCALES = ["it", "en", "fr", "de", "es"];
-export const DEFAULT_LOCALE = "it";
+export const SUPPORTED_LOCALES = ['it', 'en', 'fr', 'de', 'es'];
+export const DEFAULT_LOCALE = 'it';
 
 // Verify user's language is in this list
 // If missing, either:
@@ -224,12 +224,12 @@ export const DEFAULT_LOCALE = "it";
 ```typescript
 // src/lib/i18n/locale-mapper.ts
 export const LOCALE_MAPPING: Record<string, string> = {
-  pt: "es", // Portuguese → Spanish
-  "pt-BR": "es", // Brazilian Portuguese → Spanish
-  "en-US": "en", // US English → English
-  "en-GB": "en", // British English → English
-  "fr-CA": "fr", // Canadian French → French
-  "de-AT": "de", // Austrian German → German
+  pt: 'es', // Portuguese → Spanish
+  'pt-BR': 'es', // Brazilian Portuguese → Spanish
+  'en-US': 'en', // US English → English
+  'en-GB': 'en', // British English → English
+  'fr-CA': 'fr', // Canadian French → French
+  'de-AT': 'de', // Austrian German → German
 };
 
 export function mapLocale(locale: string): string {
@@ -271,8 +271,8 @@ curl -X POST http://localhost:3000/api/admin/clear-locale-cache \
 If mapping unsupported locale to existing language doesn't solve it, add new language:
 
 ```bash
-# 1. Create translation file
-cp public/locales/it/translation.json public/locales/pt/translation.json
+# 1. Create translation files (next-intl namespace structure)
+cp -r messages/it/ messages/pt/
 
 # 2. Add to config
 # Edit src/lib/i18n/config.ts
@@ -280,7 +280,7 @@ export const SUPPORTED_LOCALES = ['it', 'en', 'fr', 'de', 'es', 'pt'];
 
 # 3. Build and deploy
 npm run build
-git add public/locales/pt/ src/lib/i18n/config.ts
+git add messages/pt/ src/lib/i18n/config.ts
 git commit -m "i18n: add Portuguese language support"
 git push
 
@@ -311,12 +311,9 @@ MirrorBuddy detects user language in priority order:
 
 ```typescript
 // src/lib/i18n/detect-locale.ts
-export async function detectUserLocale(
-  request: NextRequest,
-  userId?: string,
-): Promise<string> {
+export async function detectUserLocale(request: NextRequest, userId?: string): Promise<string> {
   // 1. Check cookie first
-  const cookieLocale = request.cookies.get("mirrorbuddy-locale")?.value;
+  const cookieLocale = request.cookies.get('mirrorbuddy-locale')?.value;
   if (cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale)) {
     return cookieLocale;
   }
@@ -330,7 +327,7 @@ export async function detectUserLocale(
   }
 
   // 3. Browser locale
-  const browserLocale = request.headers.get("accept-language")?.split(",")[0];
+  const browserLocale = request.headers.get('accept-language')?.split(',')[0];
   if (browserLocale) {
     const mapped = mapLocale(browserLocale);
     if (SUPPORTED_LOCALES.includes(mapped)) {
@@ -471,11 +468,9 @@ npm run test:unit -- i18n-keys.test.ts
 
 ## Related Documents
 
-- [RUNBOOK.md](./RUNBOOK.md) - General incident response
-- [FUNNEL-METRICS-BY-LOCALE.md](./FUNNEL-METRICS-BY-LOCALE.md) - Conversion metrics per language
-- [RELEASE-I18N-VERIFICATION.md](./RELEASE-I18N-VERIFICATION.md) - Pre-release i18n checklist
-- [ADR 0064](../adr/0064-language-specific-maestri.md) - Language-aware content delivery
-- [ADR 0068](../adr/0068-multilingual-platform-architecture.md) - i18n architecture
+- [RUNBOOK.md](../operations/RUNBOOK.md) - General incident response
+- [ADR 0064](../adr/0064-formal-informal-professor-address.md) - Formal/informal address rules
+- [ADR 0068](../adr/0068-conversion-funnel-dashboard.md) - Conversion funnel dashboard
 
 ---
 

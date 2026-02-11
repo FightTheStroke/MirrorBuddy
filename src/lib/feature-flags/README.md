@@ -31,25 +31,22 @@ For features that need:
 **Usage**:
 
 ```typescript
-import {
-  isFeatureEnabled,
-  updateFlag,
-} from "@/lib/feature-flags/feature-flags-service";
+import { isFeatureEnabled, updateFlag } from '@/lib/feature-flags/feature-flags-service';
 
 // Check if feature is enabled
-const result = isFeatureEnabled("voice_realtime", userId);
+const result = isFeatureEnabled('voice_realtime', userId);
 if (result.enabled) {
   // Feature is available
 }
 
 // Update flag status
-await updateFlag("voice_realtime", {
-  status: "enabled",
+await updateFlag('voice_realtime', {
+  status: 'enabled',
   enabledPercentage: 50, // 50% rollout
 });
 
 // Activate kill-switch
-await activateKillSwitch("voice_realtime", "API quota exceeded");
+await activateKillSwitch('voice_realtime', 'API quota exceeded');
 ```
 
 ### 2. Environment-Based Flags (i18n-flags.ts)
@@ -68,7 +65,7 @@ For features that need:
 **Usage**:
 
 ```typescript
-import { isI18nEnabled, getI18nStatus } from "@/lib/feature-flags/i18n-flags";
+import { isI18nEnabled, getI18nStatus } from '@/lib/feature-flags/i18n-flags';
 
 // Check if i18n is enabled
 if (isI18nEnabled()) {
@@ -79,7 +76,7 @@ if (isI18nEnabled()) {
 console.log(`i18n is ${getI18nStatus()}`);
 
 // Check specific locale
-if (isLocaleEnabled("fr")) {
+if (isLocaleEnabled('fr')) {
   // French locale is available
 }
 ```
@@ -109,7 +106,7 @@ production:  false → true (enable after validation)
 
 ### Integration Points
 
-1. **Middleware** (`middleware.ts`):
+1. **Proxy** (`src/proxy.ts`):
    - Conditionally applies i18n routing
    - If disabled: passes through without locale routing
    - If enabled: applies full next-intl middleware
@@ -165,11 +162,11 @@ Tests verify:
 ### Integration Testing
 
 ```typescript
-import { isI18nEnabled } from "@/lib/feature-flags/i18n-flags";
+import { isI18nEnabled } from '@/lib/feature-flags/i18n-flags';
 
-describe("i18n Feature Flag Integration", () => {
-  it("should disable locale routing when i18n is disabled", () => {
-    process.env.FEATURE_I18N_ENABLED = "false";
+describe('i18n Feature Flag Integration', () => {
+  it('should disable locale routing when i18n is disabled', () => {
+    process.env.FEATURE_I18N_ENABLED = 'false';
     expect(isI18nEnabled()).toBe(false);
     // Verify middleware passes through
   });
@@ -181,7 +178,7 @@ describe("i18n Feature Flag Integration", () => {
 ### Check Current Status
 
 ```typescript
-import { getI18nStatus } from "@/lib/feature-flags/i18n-flags";
+import { getI18nStatus } from '@/lib/feature-flags/i18n-flags';
 
 console.log(`i18n status: ${getI18nStatus()}`);
 // Output: "i18n status: enabled" or "i18n status: disabled"

@@ -339,8 +339,8 @@ MirrorBuddy is a **fully multilingual platform** supporting 5 languages with dyn
 To add a new language (e.g., Portuguese):
 
 ```bash
-# 1. Create translation file
-cp public/locales/it/translation.json public/locales/pt/translation.json
+# 1. Create translation file (next-intl namespace-based structure)
+cp -r messages/it/ messages/pt/
 
 # 2. Update config
 # Edit src/lib/i18n/config.ts
@@ -350,7 +350,7 @@ export const SUPPORTED_LOCALES = ['it', 'en', 'fr', 'de', 'es', 'pt'];
 npm run i18n:validate
 
 # 4. Deploy
-git add public/locales/pt/ src/lib/i18n/config.ts
+git add messages/pt/ src/lib/i18n/config.ts
 git commit -m "i18n: add Portuguese language support"
 git push
 ```

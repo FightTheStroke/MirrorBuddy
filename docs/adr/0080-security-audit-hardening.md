@@ -79,7 +79,7 @@ All Mermaid-generated SVG sanitized via DOMPurify:
 ```typescript
 const sanitizedSvg = DOMPurify.sanitize(svg, {
   USE_PROFILES: { svg: true, svgFilters: true },
-  ADD_TAGS: ["use"],
+  ADD_TAGS: ['use'],
 });
 ```
 
@@ -130,6 +130,25 @@ Parents receive 6-digit verification code via RESEND:
 - `src/components/tools/diagram-renderer.tsx` - DOMPurify
 - `src/app/api/privacy/delete-my-data/helpers.ts` - GDPR deletion
 - `docs/security/DATA-BREACH-PROTOCOL.md` - Incident response
+
+### 9. XSS Print/Export Hardening (Plan 144)
+
+All `document.write()` flows that interpolate user/AI content now use
+`escapeHtml()` from `@/lib/tools/accessible-print/helpers`.
+
+**Vulnerability**: Template literals in print windows interpolated raw
+user content (topic, title, section content, key points) into HTML.
+
+**Affected files**:
+
+- `src/components/tools/auto-save-wrappers.tsx` — summary PDF export
+- `src/components/tools/tool-result-display/auto-save-wrappers.tsx` — same
+- `src/components/tools/markmap/hooks/use-export.ts` — mindmap print/download
+- `src/lib/tools/accessible-print/renderers.ts` — already escaped (20 sites)
+
+**Pattern established**: All `document.write` flows must escape every
+interpolated content field via `escapeHtml()`. Integration tests in
+`accessible-print/__tests__/escaping.test.ts` enforce this.
 
 ## References
 

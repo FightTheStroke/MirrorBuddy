@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Audit Hardening (Plan 144)
+
+### Security
+
+- Fixed: Unescaped HTML in `document.write` for summary PDF export (auto-save-wrappers x2)
+- Fixed: Unescaped title in mindmap print/download (use-export.ts)
+- Added: `escapeHtml()` to all interpolated user/AI content in print flows
+- Added: Integration tests for XSS escaping in print/export renderers
+- Added: XSS Print/Export Hardening section in ADR 0080
+
+### Auth
+
+- Fixed: Visitor ID validated with `validateVisitorId()` UUID format check (tools/events)
+- Fixed: Visitor ID validated with `validateVisitorId()` UUID format check (tools/stream/modify)
+
+### Performance
+
+- Changed: Lazy-load `mathjs` in calculator-simple.tsx via dynamic import
+- Changed: Lazy-load `mathjs` in calculator-scientific.tsx with cached module ref
+- Documented: `localStorage` for trial-session-id is intentional (cross-tab persistence)
+
+### Documentation
+
+- Fixed: `.claude/rules/tier.md` limits aligned with `prisma/seed-tiers.ts` (Trial=10/day, Base=50/day)
+- Fixed: Replaced all `public/locales/` references with `messages/{locale}/` in README, RUNBOOK, I18N-RUNBOOK
+- Fixed: Replaced `middleware.ts` references with `src/proxy.ts` in ARCHITECTURE.md, feature-flags/README.md
+
 ## [Unreleased] — Stripe Admin Panel (Plan 142)
 
 ### Database Hardening

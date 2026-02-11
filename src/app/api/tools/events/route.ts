@@ -4,45 +4,46 @@
 // Events are sent to all SSE-connected clients in the session
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import { cookies } from "next/headers";
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
 import {
   broadcastToolEvent,
   getSessionClientCount,
   type ToolEvent,
   type ToolEventType,
   type ToolType,
-} from "@/lib/realtime/tool-events";
-import { validateAuth, validateSessionOwnership } from "@/lib/auth/server";
+} from '@/lib/realtime/tool-events';
+import { validateAuth, validateSessionOwnership } from '@/lib/auth/server';
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from "@/lib/rate-limit";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
+} from '@/lib/rate-limit';
+import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
+import { validateVisitorId } from '@/lib/auth';
 
 // Validate tool event type
 const VALID_EVENT_TYPES: ToolEventType[] = [
-  "tool:created",
-  "tool:update",
-  "tool:complete",
-  "tool:error",
-  "tool:cancelled",
+  'tool:created',
+  'tool:update',
+  'tool:complete',
+  'tool:error',
+  'tool:cancelled',
 ];
 
 // Validate tool type
 const VALID_TOOL_TYPES: ToolType[] = [
-  "mindmap",
-  "flashcard",
-  "quiz",
-  "summary",
-  "timeline",
-  "diagram",
-  "demo",
+  'mindmap',
+  'flashcard',
+  'quiz',
+  'summary',
+  'timeline',
+  'diagram',
+  'demo',
 ];
 
 interface PublishEventRequest {
@@ -73,7 +74,7 @@ interface PublishEventRequest {
  * - data: Event-specific data
  */
 export const POST = pipe(
-  withSentry("/api/tools/events"),
+  withSentry('/api/tools/events'),
   withCSRF,
 )(async (ctx) => {
   const body: PublishEventRequest = await ctx.req.json();
@@ -83,8 +84,8 @@ export const POST = pipe(
   if (!sessionId || !maestroId || !type || !toolType) {
     return NextResponse.json(
       {
-        error: "Missing required fields",
-        required: ["sessionId", "maestroId", "type", "toolType"],
+        error: 'Missing required fields',
+        required: ['sessionId', 'maestroId', 'type', 'toolType'],
       },
       { status: 400 },
     );
@@ -94,7 +95,7 @@ export const POST = pipe(
   if (!VALID_EVENT_TYPES.includes(type)) {
     return NextResponse.json(
       {
-        error: "Invalid event type",
+        error: 'Invalid event type',
         validTypes: VALID_EVENT_TYPES,
       },
       { status: 400 },
@@ -105,7 +106,7 @@ export const POST = pipe(
   if (!VALID_TOOL_TYPES.includes(toolType)) {
     return NextResponse.json(
       {
-        error: "Invalid tool type",
+        error: 'Invalid tool type',
         validTypes: VALID_TOOL_TYPES,
       },
       { status: 400 },
@@ -114,10 +115,7 @@ export const POST = pipe(
 
   // Validate session ID format
   if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
-    return NextResponse.json(
-      { error: "Invalid sessionId format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid sessionId format' }, { status: 400 });
   }
 
   // Verify session ownership (authenticated or trial)
@@ -128,17 +126,15 @@ export const POST = pipe(
     userId = auth.userId;
     const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
     if (!ownsSession) {
-      return NextResponse.json(
-        { error: "Session access denied" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Session access denied' }, { status: 403 });
     }
   } else {
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const rawVisitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const visitorId = validateVisitorId(rawVisitorId);
 
     if (!visitorId) {
-      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid visitor ID' }, { status: 400 });
     }
 
     const trialSession = await prisma.trialSession.findFirst({
@@ -150,10 +146,7 @@ export const POST = pipe(
     });
 
     if (!trialSession) {
-      return NextResponse.json(
-        { error: "Session access denied" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Session access denied' }, { status: 403 });
     }
   }
 
@@ -163,7 +156,7 @@ export const POST = pipe(
     RATE_LIMITS.GENERAL,
   );
   if (!rateLimitResult.success) {
-    logger.warn("Tool events rate limited", {
+    logger.warn('Tool events rate limited', {
       identifier: rateLimitIdentifier,
     });
     return rateLimitResponse(rateLimitResult);
@@ -171,21 +164,14 @@ export const POST = pipe(
 
   // Validate maestro ID format
   if (!/^[a-zA-Z0-9_-]{1,32}$/.test(maestroId)) {
-    return NextResponse.json(
-      { error: "Invalid maestroId format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid maestroId format' }, { status: 400 });
   }
 
   // Validate progress range if provided
   if (data.progress !== undefined) {
-    if (
-      typeof data.progress !== "number" ||
-      data.progress < 0 ||
-      data.progress > 100
-    ) {
+    if (typeof data.progress !== 'number' || data.progress < 0 || data.progress > 100) {
       return NextResponse.json(
-        { error: "Progress must be a number between 0 and 100" },
+        { error: 'Progress must be a number between 0 and 100' },
         { status: 400 },
       );
     }
@@ -194,7 +180,7 @@ export const POST = pipe(
   // Check if there are connected clients
   const clientCount = getSessionClientCount(sessionId);
   if (clientCount === 0) {
-    logger.warn("No SSE clients connected for session", { sessionId });
+    logger.warn('No SSE clients connected for session', { sessionId });
     // Still accept the event, just warn
   }
 
@@ -212,7 +198,7 @@ export const POST = pipe(
   // Broadcast to all connected clients in session
   broadcastToolEvent(event);
 
-  logger.info("Tool event published", {
+  logger.info('Tool event published', {
     eventId: event.id,
     type,
     toolType,
@@ -231,21 +217,21 @@ export const POST = pipe(
 /**
  * Get event publishing info
  */
-export const GET = pipe(withSentry("/api/tools/events"))(async () => {
+export const GET = pipe(withSentry('/api/tools/events'))(async () => {
   return NextResponse.json({
-    endpoint: "/api/tools/events",
-    method: "POST",
-    description: "Publish tool creation events to SSE clients",
+    endpoint: '/api/tools/events',
+    method: 'POST',
+    description: 'Publish tool creation events to SSE clients',
     eventTypes: VALID_EVENT_TYPES,
     toolTypes: VALID_TOOL_TYPES,
     example: {
-      sessionId: "session_abc123",
-      maestroId: "archimede",
-      type: "tool:created",
-      toolType: "mindmap",
+      sessionId: 'session_abc123',
+      maestroId: 'archimede',
+      type: 'tool:created',
+      toolType: 'mindmap',
       data: {
-        title: "La Rivoluzione Francese",
-        subject: "storia",
+        title: 'La Rivoluzione Francese',
+        subject: 'storia',
       },
     },
   });

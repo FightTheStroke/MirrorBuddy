@@ -125,7 +125,7 @@ sequenceDiagram
 **Diagnostic Tree**:
 
 1. Locale detected correctly? → Check browser/profile settings
-2. Translation file exists? → Verify `public/locales/{lang}/translation.json`
+2. Translation file exists? → Verify `messages/{lang}/{namespace}.json`
 3. Bundle includes locale? → Check build output for language pack
 4. Cache stale? → Check CDN/browser cache headers
 
@@ -138,7 +138,7 @@ sequenceDiagram
 
 **Resolution**:
 
-1. Add missing translation: `public/locales/{lang}/translation.json`
+1. Add missing translation: `messages/{lang}/{namespace}.json`
 2. Run `npm run build` to include in bundle
 3. Clear CDN cache: Contact DevOps team with language code
 4. Fallback to English if issue persists

@@ -4,58 +4,59 @@
 // Part of Phase 7: Voice Commands for Mindmaps
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import { cookies } from "next/headers";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { cookies } from 'next/headers';
+import { logger } from '@/lib/logger';
 import {
   broadcastToolEvent,
   type MindmapModifyCommand,
   type SummaryModifyCommand,
   type StudentSummaryModifyCommand,
-} from "@/lib/realtime/tool-events";
-import { nanoid } from "nanoid";
-import { prisma } from "@/lib/db";
-import { validateAuth, validateSessionOwnership } from "@/lib/auth/server";
+} from '@/lib/realtime/tool-events';
+import { nanoid } from 'nanoid';
+import { prisma } from '@/lib/db';
+import { validateAuth, validateSessionOwnership } from '@/lib/auth/server';
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from "@/lib/rate-limit";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
+} from '@/lib/rate-limit';
+import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
+import { validateVisitorId } from '@/lib/auth';
 
 interface ModifyRequest {
   sessionId: string;
-  toolType?: "mindmap" | "summary" | "student_summary";
+  toolType?: 'mindmap' | 'summary' | 'student_summary';
   command: string;
   args: Record<string, unknown>;
 }
 
 const VALID_COMMANDS: MindmapModifyCommand[] = [
-  "mindmap_add_node",
-  "mindmap_connect_nodes",
-  "mindmap_expand_node",
-  "mindmap_delete_node",
-  "mindmap_focus_node",
-  "mindmap_set_color",
+  'mindmap_add_node',
+  'mindmap_connect_nodes',
+  'mindmap_expand_node',
+  'mindmap_delete_node',
+  'mindmap_focus_node',
+  'mindmap_set_color',
 ];
 const SUMMARY_COMMANDS: SummaryModifyCommand[] = [
-  "summary_set_title",
-  "summary_add_section",
-  "summary_update_section",
-  "summary_delete_section",
-  "summary_add_point",
-  "summary_delete_point",
-  "summary_finalize",
+  'summary_set_title',
+  'summary_add_section',
+  'summary_update_section',
+  'summary_delete_section',
+  'summary_add_point',
+  'summary_delete_point',
+  'summary_finalize',
 ];
 const STUDENT_SUMMARY_COMMANDS: StudentSummaryModifyCommand[] = [
-  "student_summary_add_comment",
-  "student_summary_remove_comment",
-  "student_summary_update_content",
-  "student_summary_request_content",
-  "student_summary_save",
-  "student_summary_complete",
+  'student_summary_add_comment',
+  'student_summary_remove_comment',
+  'student_summary_update_content',
+  'student_summary_request_content',
+  'student_summary_save',
+  'student_summary_complete',
 ];
 
 const isValidCommand = <T extends string>(
@@ -64,39 +65,33 @@ const isValidCommand = <T extends string>(
 ): command is T => Boolean(command && validCommands.includes(command as T));
 
 export const POST = pipe(
-  withSentry("/api/tools/stream/modify"),
+  withSentry('/api/tools/stream/modify'),
   withCSRF,
 )(async (ctx) => {
   const body: ModifyRequest = await ctx.req.json();
   const { sessionId, command, args } = body;
-  const toolType = body.toolType ?? "mindmap";
+  const toolType = body.toolType ?? 'mindmap';
 
   // Validate required fields
   if (!sessionId) {
-    return NextResponse.json(
-      { error: "sessionId is required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
   }
 
   // Validate session ID format (prevent injection)
   if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
-    return NextResponse.json(
-      { error: "Invalid sessionId format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid sessionId format' }, { status: 400 });
   }
 
   const validCommands =
-    toolType === "mindmap"
+    toolType === 'mindmap'
       ? VALID_COMMANDS
-      : toolType === "summary"
+      : toolType === 'summary'
         ? SUMMARY_COMMANDS
         : STUDENT_SUMMARY_COMMANDS;
   if (!isValidCommand(command, validCommands)) {
     return NextResponse.json(
       {
-        error: "Invalid command",
+        error: 'Invalid command',
         validCommands,
       },
       { status: 400 },
@@ -112,16 +107,14 @@ export const POST = pipe(
     userId = auth.userId;
     const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
     if (!ownsSession) {
-      return NextResponse.json(
-        { error: "Session not found or access denied" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Session not found or access denied' }, { status: 403 });
     }
   } else {
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const rawVisitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    const visitorId = validateVisitorId(rawVisitorId);
     if (!visitorId) {
-      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid visitor ID' }, { status: 400 });
     }
 
     const trialSession = await prisma.trialSession.findFirst({
@@ -133,10 +126,7 @@ export const POST = pipe(
     });
 
     if (!trialSession) {
-      return NextResponse.json(
-        { error: "Session not found or access denied" },
-        { status: 403 },
-      );
+      return NextResponse.json({ error: 'Session not found or access denied' }, { status: 403 });
     }
   }
 
@@ -146,19 +136,19 @@ export const POST = pipe(
     RATE_LIMITS.GENERAL,
   );
   if (!rateLimitResult.success) {
-    logger.warn("Tool modification rate limited", {
+    logger.warn('Tool modification rate limited', {
       identifier: rateLimitIdentifier,
     });
     return rateLimitResponse(rateLimitResult);
   }
 
   const eventType =
-    toolType === "mindmap"
-      ? "mindmap:modify"
-      : toolType === "summary"
-        ? "summary:modify"
-        : "student_summary:modify";
-  const eventToolType = toolType === "mindmap" ? "mindmap" : "summary";
+    toolType === 'mindmap'
+      ? 'mindmap:modify'
+      : toolType === 'summary'
+        ? 'summary:modify'
+        : 'student_summary:modify';
+  const eventToolType = toolType === 'mindmap' ? 'mindmap' : 'summary';
 
   // Broadcast the modification event
   broadcastToolEvent({
@@ -166,7 +156,7 @@ export const POST = pipe(
     type: eventType,
     toolType: eventToolType,
     sessionId,
-    maestroId: "voice", // Voice commands don't have a specific maestro
+    maestroId: 'voice', // Voice commands don't have a specific maestro
     timestamp: Date.now(),
     data: {
       command: typedCommand,
@@ -174,7 +164,7 @@ export const POST = pipe(
     },
   });
 
-  logger.info("Tool modification broadcast", {
+  logger.info('Tool modification broadcast', {
     sessionId,
     command,
     args,
@@ -183,6 +173,6 @@ export const POST = pipe(
 
   return NextResponse.json({
     success: true,
-    message: "Modification broadcast",
+    message: 'Modification broadcast',
   });
 });

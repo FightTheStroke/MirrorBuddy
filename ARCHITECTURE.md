@@ -148,7 +148,7 @@ src/
 │   └── support-teachers/
 ├── hooks/            # 20+ React hooks
 ├── types/            # TypeScript definitions (barrel export)
-└── middleware.ts
+└── proxy.ts          # Request proxy (i18n, CSP, path exclusions)
 
 prisma/schema/        # PostgreSQL + pgvector schema
 docs/adr/             # 65+ Architecture Decision Records

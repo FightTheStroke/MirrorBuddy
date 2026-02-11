@@ -20,6 +20,7 @@ import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { debouncedAutoSave } from './auto-save-utils';
 import toast from '@/components/ui/toast';
 import { logger } from '@/lib/logger';
+import { escapeHtml } from '@/lib/tools/accessible-print/helpers';
 import type {
   QuizRequest,
   FlashcardDeckRequest,
@@ -33,35 +34,60 @@ import type {
 function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {
   const dedupKey = `${toolId || 'unknown'}-mindmap`;
   debouncedAutoSave('mindmap', dedupKey, () =>
-    autoSaveMaterial('mindmap', request.title, { nodes: request.nodes }, { subject: 'general', toolId })
+    autoSaveMaterial(
+      'mindmap',
+      request.title,
+      { nodes: request.nodes },
+      { subject: 'general', toolId },
+    ),
   );
 }
 
 function autoSaveQuiz(request: QuizRequest, toolId?: string): void {
   const dedupKey = `${toolId || 'unknown'}-quiz`;
   debouncedAutoSave('quiz', dedupKey, () =>
-    autoSaveMaterial('quiz', request.title, { questions: request.questions }, { subject: request.subject, toolId })
+    autoSaveMaterial(
+      'quiz',
+      request.title,
+      { questions: request.questions },
+      { subject: request.subject, toolId },
+    ),
   );
 }
 
 function autoSaveFlashcards(request: FlashcardDeckRequest, toolId?: string): void {
   const dedupKey = `${toolId || 'unknown'}-flashcard`;
   debouncedAutoSave('flashcard', dedupKey, () =>
-    autoSaveMaterial('flashcard', request.name, { cards: request.cards }, { subject: request.subject, toolId })
+    autoSaveMaterial(
+      'flashcard',
+      request.name,
+      { cards: request.cards },
+      { subject: request.subject, toolId },
+    ),
   );
 }
 
 function autoSaveSummaryFn(request: SummaryData, toolId?: string): void {
   const dedupKey = `${toolId || 'unknown'}-summary`;
   debouncedAutoSave('summary', dedupKey, () =>
-    autoSaveMaterial('summary', request.topic, { sections: request.sections, length: request.length }, { subject: 'general', toolId })
+    autoSaveMaterial(
+      'summary',
+      request.topic,
+      { sections: request.sections, length: request.length },
+      { subject: 'general', toolId },
+    ),
   );
 }
 
 function autoSaveDemo(request: DemoData, toolId?: string): void {
   const dedupKey = `${toolId || 'unknown'}-demo`;
   debouncedAutoSave('demo', dedupKey, () =>
-    autoSaveMaterial('demo', request.title, { html: request.html, css: request.css, js: request.js, description: request.description }, { subject: 'general', toolId })
+    autoSaveMaterial(
+      'demo',
+      request.title,
+      { html: request.html, css: request.css, js: request.js, description: request.description },
+      { subject: 'general', toolId },
+    ),
   );
 }
 
@@ -76,7 +102,13 @@ export function AutoSaveQuiz({ request, toolId }: { request: QuizRequest; toolId
   return <QuizTool request={request} />;
 }
 
-export function AutoSaveFlashcard({ request, toolId }: { request: FlashcardDeckRequest; toolId?: string }) {
+export function AutoSaveFlashcard({
+  request,
+  toolId,
+}: {
+  request: FlashcardDeckRequest;
+  toolId?: string;
+}) {
   const savedRef = useRef(false);
   useEffect(() => {
     if (!savedRef.current) {
@@ -87,7 +119,15 @@ export function AutoSaveFlashcard({ request, toolId }: { request: FlashcardDeckR
   return <FlashcardTool request={request} />;
 }
 
-export function AutoSaveMindmap({ request, sessionId, toolId }: { request: MindmapRequest; sessionId?: string | null; toolId?: string }) {
+export function AutoSaveMindmap({
+  request,
+  sessionId,
+  toolId,
+}: {
+  request: MindmapRequest;
+  sessionId?: string | null;
+  toolId?: string;
+}) {
   const savedRef = useRef(false);
   useEffect(() => {
     if (!savedRef.current) {
@@ -96,11 +136,7 @@ export function AutoSaveMindmap({ request, sessionId, toolId }: { request: Mindm
     }
   }, [request, toolId]);
   return (
-    <LiveMindmap
-      sessionId={sessionId ?? null}
-      title={request.title}
-      initialNodes={request.nodes}
-    />
+    <LiveMindmap sessionId={sessionId ?? null} title={request.title} initialNodes={request.nodes} />
   );
 }
 
@@ -133,24 +169,32 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
       return;
     }
 
-    const sectionsHtml = data.sections.map(section => `
+    const sectionsHtml = data.sections
+      .map(
+        (section) => `
       <div class="section">
-        <h2>${section.title}</h2>
-        <p>${section.content}</p>
-        ${section.keyPoints && section.keyPoints.length > 0 ? `
+        <h2>${escapeHtml(section.title)}</h2>
+        <p>${escapeHtml(section.content)}</p>
+        ${
+          section.keyPoints && section.keyPoints.length > 0
+            ? `
           <div class="key-points">
             <h3>Punti chiave:</h3>
-            ${section.keyPoints.map(kp => `<p class="key-point">* ${kp}</p>`).join('')}
+            ${section.keyPoints.map((kp) => `<p class="key-point">* ${escapeHtml(kp)}</p>`).join('')}
           </div>
-        ` : ''}
+        `
+            : ''
+        }
       </div>
-    `).join('');
+    `,
+      )
+      .join('');
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>${data.topic} - Riassunto</title>
+          <title>${escapeHtml(data.topic)} - Riassunto</title>
           <style>
             body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
             h1 { color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }
@@ -164,7 +208,7 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
           </style>
         </head>
         <body>
-          <h1>${data.topic}</h1>
+          <h1>${escapeHtml(data.topic)}</h1>
           ${sectionsHtml}
           <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };</script>
         </body>
@@ -182,7 +226,7 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
       const sectionId = `section-${i}`;
       nodes.push({ id: sectionId, label: section.title, parentId: 'root' });
 
-      const contentParts = section.content.split(/[.!?]\s+/).filter(s => s.trim().length > 5);
+      const contentParts = section.content.split(/[.!?]\s+/).filter((s) => s.trim().length > 5);
       contentParts.slice(0, 3).forEach((part, j) => {
         const label = part.length > 50 ? part.substring(0, 47) + '...' : part;
         nodes.push({ id: `${sectionId}-content-${j}`, label, parentId: sectionId });
@@ -199,7 +243,10 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
     const mindmapTitle = `Mappa: ${data.topic}`;
     autoSaveMaterial('mindmap', mindmapTitle, { nodes }, { subject: 'general' });
     toast.success('Mappa mentale salvata nello zaino!');
-    logger.info('[SummaryTool] Converted to mindmap', { topic: data.topic, nodeCount: nodes.length });
+    logger.info('[SummaryTool] Converted to mindmap', {
+      topic: data.topic,
+      nodeCount: nodes.length,
+    });
   }, []);
 
   const handleGenerateFlashcards = useCallback((data: SummaryData) => {
@@ -218,7 +265,10 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
       if (section.content && section.content.length > 20) {
         cards.push({
           front: `${section.title}: Spiega questo concetto`,
-          back: section.content.length > 200 ? section.content.substring(0, 200) + '...' : section.content,
+          back:
+            section.content.length > 200
+              ? section.content.substring(0, 200) + '...'
+              : section.content,
         });
       }
     });
@@ -233,7 +283,10 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
     const flashcardName = `Flashcard: ${data.topic}`;
     autoSaveMaterial('flashcard', flashcardName, { cards: limitedCards }, { subject: 'general' });
     toast.success(`${limitedCards.length} flashcard salvate nello zaino!`);
-    logger.info('[SummaryTool] Generated flashcards', { topic: data.topic, cardCount: limitedCards.length });
+    logger.info('[SummaryTool] Generated flashcards', {
+      topic: data.topic,
+      cardCount: limitedCards.length,
+    });
   }, []);
 
   return (
