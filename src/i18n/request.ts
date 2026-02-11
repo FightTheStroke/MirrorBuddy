@@ -1,32 +1,29 @@
-import { getRequestConfig } from "next-intl/server";
-import { locales, defaultLocale } from "./config";
-import type { Locale } from "./config";
+import { getRequestConfig } from 'next-intl/server';
+import { locales, defaultLocale } from './config';
+import type { Locale } from './config';
 
 // Namespace files to load (ADR 0082)
 const NAMESPACES = [
-  "common",
-  "auth",
-  "admin",
-  "chat",
-  "home",
-  "tools",
-  "settings",
-  "compliance",
-  "consent",
-  "education",
-  "navigation",
-  "errors",
-  "welcome",
-  "metadata",
-  "pricing",
-  "marketing",
-  "achievements",
+  'common',
+  'auth',
+  'admin',
+  'chat',
+  'home',
+  'tools',
+  'settings',
+  'compliance',
+  'consent',
+  'education',
+  'navigation',
+  'errors',
+  'welcome',
+  'metadata',
+  'pricing',
+  'marketing',
+  'achievements',
 ] as const;
 
-async function loadNamespace(
-  locale: string,
-  namespace: string,
-): Promise<Record<string, unknown>> {
+async function loadNamespace(locale: string, namespace: string): Promise<Record<string, unknown>> {
   try {
     return (await import(`../../messages/${locale}/${namespace}.json`)).default;
   } catch {
@@ -50,13 +47,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = defaultLocale;
   }
 
-  // Load all namespaces and merge into single messages object
-  const namespacePromises = NAMESPACES.map(async (ns) => {
-    const data = await loadNamespace(locale!, ns);
-    return data;
-  });
-
-  const namespaceResults = await Promise.all(namespacePromises);
+  // Load all namespaces with individual failure isolation
+  // Use Promise.allSettled to prevent a single namespace timeout from crashing
+  // the entire page on Vercel serverless cold starts
+  const namespaceResults = await Promise.allSettled(
+    NAMESPACES.map((ns) => loadNamespace(locale!, ns)),
+  );
 
   // Scope each namespace file under its namespace key
   // This eliminates cross-file collisions (compliance, tools, parentDashboard, navigation)
@@ -64,7 +60,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const messages: Record<string, unknown> = {};
   for (let i = 0; i < namespaceResults.length; i++) {
     const ns = NAMESPACES[i];
-    const nsData = namespaceResults[i];
+    const result = namespaceResults[i];
+    const nsData = result.status === 'fulfilled' ? result.value : {};
     // If JSON has wrapper key matching namespace, unwrap it
     // e.g., compliance.json: { "compliance": {...} } -> use {...}
     messages[ns] = (nsData as Record<string, unknown>)[ns] || nsData;
