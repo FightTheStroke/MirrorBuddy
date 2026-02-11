@@ -17,6 +17,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import * as Sentry from '@sentry/nextjs';
 import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/db';
@@ -192,6 +193,9 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       where: { timestamp: { lt: cleanupCutoff } },
     });
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'realtime-active-users' },
+    });
     log.warn('Failed to collect realtime active users', {
       error: String(err),
     });
@@ -262,6 +266,9 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     log.debug('Collected funnel metrics', { stages: stageCounts.length });
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'funnel-metrics' },
+    });
     log.warn('Failed to collect funnel metrics', { error: String(err) });
   }
 
@@ -270,22 +277,18 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     const churnCutoff = new Date(now - 14 * 24 * 60 * 60 * 1000); // 14 days
 
     // Get latest stage per user to determine churn
+    // Uses DISTINCT ON to get the most recent funnel event per user
     const latestStages = await prisma.$queryRaw<
       Array<{ stage: string; last_activity: Date; is_churned: boolean }>
     >`
       WITH latest AS (
-        SELECT
+        SELECT DISTINCT ON (COALESCE("visitorId", "userId"))
           COALESCE("visitorId", "userId") as user_key,
           stage,
-          MAX("createdAt") as last_activity
+          "createdAt" as last_activity
         FROM "FunnelEvent"
         WHERE "isTestData" = false
-        GROUP BY COALESCE("visitorId", "userId"), stage
-        HAVING MAX("createdAt") = (
-          SELECT MAX(fe2."createdAt")
-          FROM "FunnelEvent" fe2
-          WHERE COALESCE(fe2."visitorId", fe2."userId") = COALESCE("FunnelEvent"."visitorId", "FunnelEvent"."userId")
-        )
+        ORDER BY COALESCE("visitorId", "userId"), "createdAt" DESC
       )
       SELECT
         stage,
@@ -341,6 +344,9 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     log.debug('Collected churn metrics', { totalUsers, churnedUsers });
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'churn-metrics' },
+    });
     log.warn('Failed to collect churn metrics', { error: String(err) });
   }
 
@@ -359,6 +365,9 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       count: behavioralMetrics.length,
     });
   } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'behavioral-metrics' },
+    });
     log.warn('Failed to collect behavioral metrics', { error: String(err) });
   }
 
