@@ -147,27 +147,31 @@ ALTER TABLE "email_events" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "email_preferences" ENABLE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------
--- Step 2: Revoke privileges from anon and authenticated roles
+-- Step 2: Revoke privileges from anon and authenticated roles (Supabase only)
 -- ---------------------------------------------------------------------------
--- With RLS enabled and NO policies, these roles have zero access.
--- We also explicitly revoke schema-level privileges as defense-in-depth.
+-- These roles only exist in Supabase-managed PostgreSQL instances.
+-- Standard PostgreSQL (e.g., CI test databases) does not have them.
+-- We conditionally revoke only when the roles exist.
 -- ---------------------------------------------------------------------------
 
-REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
-REVOKE ALL ON ALL TABLES IN SCHEMA public FROM authenticated;
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') THEN
+    REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon;
+    REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon;
+    REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM anon;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM anon;
+  END IF;
 
--- Prevent future tables from inheriting default privileges
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM authenticated;
-
--- Revoke sequence access (prevents serial/identity column abuse)
-REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon;
-REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM authenticated;
-
--- Revoke function execution (prevents RPC abuse via PostgREST)
-REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM anon;
-REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM authenticated;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM anon;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM authenticated;
+  IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') THEN
+    REVOKE ALL ON ALL TABLES IN SCHEMA public FROM authenticated;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM authenticated;
+    REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM authenticated;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM authenticated;
+    REVOKE ALL ON ALL FUNCTIONS IN SCHEMA public FROM authenticated;
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM authenticated;
+  END IF;
+END
+$$;
