@@ -341,7 +341,10 @@ export default defineConfig({
       TEST_DATABASE_URL: finalTestDb,
       DIRECT_URL: process.env.TEST_DIRECT_URL || finalTestDb, // Same DB for direct connection
       E2E_TESTS: '1',
-      NODE_ENV: 'test', // Explicit test environment
+      // Next.js dev server expects NODE_ENV=development.
+      // Setting NODE_ENV=test can break Next internals (e.g. missing .next/dev artifacts),
+      // while E2E_TESTS already gates test-only behavior in the app.
+      NODE_ENV: process.env.CI ? 'production' : 'development',
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match
       SESSION_SECRET: 'e2e-test-session-secret-32-characters-min',

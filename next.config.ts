@@ -1,23 +1,23 @@
-import type { NextConfig } from "next";
-import packageJson from "./package.json";
-import bundleAnalyzer from "@next/bundle-analyzer";
-import { withSentryConfig } from "@sentry/nextjs";
-import createNextIntlPlugin from "next-intl/plugin";
-import mobileConfig from "./next.config.mobile";
+import type { NextConfig } from 'next';
+import packageJson from './package.json';
+import bundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
+import createNextIntlPlugin from 'next-intl/plugin';
+import mobileConfig from './next.config.mobile';
 
 // Bundle analyzer configuration (enabled via ANALYZE=true)
 const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
+  enabled: process.env.ANALYZE === 'true',
 });
 
 // Next-intl plugin for internationalization
 // Points to the i18n request config file
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
   // Creates .next/standalone with minimal server.js for production
-  output: "standalone",
+  output: 'standalone',
   env: {
     APP_VERSION: packageJson.version,
   },
@@ -34,54 +34,43 @@ const nextConfig: NextConfig = {
   experimental: {
     // Increase body size limit for file uploads (study kit PDFs up to 20MB)
     serverActions: {
-      bodySizeLimit: "20mb",
+      bodySizeLimit: '20mb',
     },
     optimizePackageImports: [
-      "@radix-ui/react-accordion",
-      "@radix-ui/react-alert-dialog",
-      "@radix-ui/react-checkbox",
-      "@radix-ui/react-collapsible",
-      "@radix-ui/react-dialog",
-      "@radix-ui/react-dropdown-menu",
-      "@radix-ui/react-hover-card",
-      "@radix-ui/react-label",
-      "@radix-ui/react-popover",
-      "@radix-ui/react-progress",
-      "@radix-ui/react-scroll-area",
-      "@radix-ui/react-select",
-      "@radix-ui/react-slider",
-      "@radix-ui/react-slot",
-      "@radix-ui/react-switch",
-      "@radix-ui/react-tabs",
-      "@radix-ui/react-toast",
-      "@radix-ui/react-tooltip",
-      "lucide-react",
-      "framer-motion",
-      "date-fns",
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-collapsible',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-hover-card',
+      '@radix-ui/react-label',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
+      '@radix-ui/react-tooltip',
+      'lucide-react',
+      'framer-motion',
+      'date-fns',
     ],
   },
 
-  // Ensure standalone output includes transitive deps needed at runtime
-  // isomorphic-dompurify -> jsdom@28 has nested deps (undici@7, whatwg-mimetype@5, etc.)
-  // that differ from root versions. Postbuild script (fix-standalone-jsdom-deps.js)
-  // bundles them into jsdom@28's own node_modules/ to avoid version conflicts
-  outputFileTracingIncludes: {
-    "/**": [
-      "./node_modules/jsdom/**",
-      "./node_modules/isomorphic-dompurify/**",
-      "./node_modules/isomorphic-dompurify/node_modules/**",
-      "./node_modules/parse5/**",
-    ],
-  },
+  // outputFileTracingIncludes removed: we avoid shipping nested jsdom copies from
+  // isomorphic-dompurify. Keep the standalone bundle minimal and let Next trace deps.
 
   // Image optimization settings
   images: {
     // E2E/test runs must not depend on native image tooling (sharp).
     // In production (Vercel), sharp is available and optimization stays enabled.
-    unoptimized:
-      process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "test",
+    unoptimized: process.env.E2E_TESTS === '1' || process.env.NODE_ENV === 'test',
     // Enable modern formats for smaller sizes
-    formats: ["image/avif", "image/webp"],
+    formats: ['image/avif', 'image/webp'],
     // Device sizes for responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     // Image sizes for fixed-size images
@@ -96,81 +85,81 @@ const nextConfig: NextConfig = {
     return [
       // Manifest.json - serve from root for all locales
       {
-        source: "/:locale(it|en|fr|de|es)/manifest.json",
-        destination: "/manifest.json",
+        source: '/:locale(it|en|fr|de|es)/manifest.json',
+        destination: '/manifest.json',
       },
       // Favicons - serve from root for all locales
       {
-        source: "/:locale(it|en|fr|de|es)/favicon-16.png",
-        destination: "/favicon-16.png",
+        source: '/:locale(it|en|fr|de|es)/favicon-16.png',
+        destination: '/favicon-16.png',
       },
       {
-        source: "/:locale(it|en|fr|de|es)/favicon-32.png",
-        destination: "/favicon-32.png",
+        source: '/:locale(it|en|fr|de|es)/favicon-32.png',
+        destination: '/favicon-32.png',
       },
       {
-        source: "/:locale(it|en|fr|de|es)/favicon-48.png",
-        destination: "/favicon-48.png",
+        source: '/:locale(it|en|fr|de|es)/favicon-48.png',
+        destination: '/favicon-48.png',
       },
       // Icons - serve from root for all locales
       {
-        source: "/:locale(it|en|fr|de|es)/icon-192.png",
-        destination: "/icon-192.png",
+        source: '/:locale(it|en|fr|de|es)/icon-192.png',
+        destination: '/icon-192.png',
       },
       {
-        source: "/:locale(it|en|fr|de|es)/icon-512.png",
-        destination: "/icon-512.png",
+        source: '/:locale(it|en|fr|de|es)/icon-512.png',
+        destination: '/icon-512.png',
       },
       // Apple touch icon - serve from root for all locales
       {
-        source: "/:locale(it|en|fr|de|es)/apple-touch-icon.png",
-        destination: "/apple-touch-icon.png",
+        source: '/:locale(it|en|fr|de|es)/apple-touch-icon.png',
+        destination: '/apple-touch-icon.png',
       },
       // Robots and sitemap
       {
-        source: "/:locale(it|en|fr|de|es)/robots.txt",
-        destination: "/robots.txt",
+        source: '/:locale(it|en|fr|de|es)/robots.txt',
+        destination: '/robots.txt',
       },
       {
-        source: "/:locale(it|en|fr|de|es)/sitemap.xml",
-        destination: "/sitemap.xml",
+        source: '/:locale(it|en|fr|de|es)/sitemap.xml',
+        destination: '/sitemap.xml',
       },
     ];
   },
 
   // Add security headers for proper permissions handling
   async headers() {
-    const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
+    const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
 
     return [
       {
         // Global security headers for all routes
-        source: "/:path*",
+        source: '/:path*',
         headers: [
           {
             // Allow microphone and camera for voice sessions
-            key: "Permissions-Policy",
-            value: "microphone=(self), camera=(self), display-capture=(self)",
+            key: 'Permissions-Policy',
+            value: 'microphone=(self), camera=(self), display-capture=(self)',
           },
           {
             // Prevent clickjacking
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: 'X-Frame-Options',
+            value: 'DENY',
           },
           {
             // Prevent MIME type sniffing
-            key: "X-Content-Type-Options",
-            value: "nosniff",
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
             // XSS protection
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
           },
           {
             // Enforce HTTPS with HSTS
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains; preload",
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload',
           },
           // Content-Security-Policy moved to src/proxy.ts (nonce-based)
           // See F-03: CSP proxy for XSS protection
@@ -178,23 +167,23 @@ const nextConfig: NextConfig = {
       },
       {
         // CORS headers for API routes only
-        source: "/api/:path*",
+        source: '/api/:path*',
         headers: [
           {
-            key: "Access-Control-Allow-Origin",
+            key: 'Access-Control-Allow-Origin',
             value: allowedOrigin,
           },
           {
-            key: "Access-Control-Allow-Methods",
-            value: "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
           },
           {
-            key: "Access-Control-Allow-Headers",
-            value: "Content-Type, Authorization, X-Requested-With",
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-Requested-With',
           },
           {
-            key: "Access-Control-Max-Age",
-            value: "86400", // 24 hours preflight cache
+            key: 'Access-Control-Max-Age',
+            value: '86400', // 24 hours preflight cache
           },
         ],
       },
@@ -210,8 +199,8 @@ const sentryConfig = {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: process.env.SENTRY_ORG || "fightthestroke",
-  project: process.env.SENTRY_PROJECT || "mirrorbuddy",
+  org: process.env.SENTRY_ORG || 'fightthestroke',
+  project: process.env.SENTRY_PROJECT || 'mirrorbuddy',
 
   // Pass auth token explicitly to avoid "No auth token" warnings
   // Only set if token exists to prevent warnings in Preview builds
@@ -230,9 +219,9 @@ const sentryConfig = {
   sourcemaps: hasSentryToken
     ? {
         ignore: [
-          "**/page_client-reference-manifest.js",
-          "**/_buildManifest.js",
-          "**/_ssgManifest.js",
+          '**/page_client-reference-manifest.js',
+          '**/_buildManifest.js',
+          '**/_ssgManifest.js',
         ],
       }
     : {
@@ -256,7 +245,7 @@ const sentryConfig = {
   hideSourceMaps: false,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
-  tunnelRoute: "/monitoring",
+  tunnelRoute: '/monitoring',
 
   // Webpack-specific options (new API)
   webpack: {
@@ -279,9 +268,9 @@ const config = withNextIntl(withBundleAnalyzer(nextConfig));
 // Mobile builds use dedicated static-export config (no Sentry, no server features)
 // Activated via MOBILE_BUILD=1 env var in build:mobile:web script
 const finalConfig =
-  process.env.MOBILE_BUILD === "1"
+  process.env.MOBILE_BUILD === '1'
     ? mobileConfig
-    : process.env.DISABLE_SENTRY_BUILD === "true"
+    : process.env.DISABLE_SENTRY_BUILD === 'true'
       ? config
       : withSentryConfig(config, sentryConfig);
 
