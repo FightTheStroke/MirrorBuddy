@@ -4,6 +4,36 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+type SentryEvent = {
+  logger?: string;
+  extra?: {
+    arguments?: unknown[];
+  };
+  tags?: Record<string, string>;
+};
+
+function isStructuredLoggerConsoleEvent(event: SentryEvent): boolean {
+  if (event.logger !== 'console') return false;
+
+  const firstArg = event.extra?.arguments?.[0];
+  if (typeof firstArg !== 'string') return false;
+
+  try {
+    const parsed = JSON.parse(firstArg) as {
+      timestamp?: unknown;
+      level?: unknown;
+      message?: unknown;
+    };
+    return (
+      typeof parsed.timestamp === 'string' &&
+      (parsed.level === 'warn' || parsed.level === 'error') &&
+      typeof parsed.message === 'string'
+    );
+  } catch {
+    return false;
+  }
+}
+
 // Deployment gate: NEXT_PUBLIC_VERCEL_ENV is auto-set by Vercel platform
 // NODE_ENV=production also matches local builds, polluting Sentry with dev errors
 const isVercel = !!process.env.NEXT_PUBLIC_VERCEL_ENV;
@@ -53,9 +83,11 @@ if (dsn) {
         maskAllText: true,
         blockAllMedia: true,
       }),
-      // NOTE: captureConsoleIntegration removed — the structured logger
-      // already sends errors/warnings to Sentry via captureException/captureMessage.
-      // Having both causes double-reporting (MIRRORBUDDY-F).
+      // Capture raw browser console warnings/errors from app code and 3rd-party libs.
+      // Duplicates emitted by our structured logger are filtered in beforeSend.
+      Sentry.captureConsoleIntegration({
+        levels: ['warn', 'error', 'assert'],
+      }),
       // Browser tracing for performance
       Sentry.browserTracingIntegration({
         enableInp: true,
@@ -89,6 +121,10 @@ if (dsn) {
 
     // Add context before sending
     beforeSend(event, hint) {
+      if (isStructuredLoggerConsoleEvent(event as SentryEvent)) {
+        return null;
+      }
+
       // Capture hydration errors with special tag
       const error = hint.originalException;
       if (error && error instanceof Error) {

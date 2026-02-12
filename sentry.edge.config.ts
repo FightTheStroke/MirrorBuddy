@@ -3,6 +3,35 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+type SentryEvent = {
+  logger?: string;
+  extra?: {
+    arguments?: unknown[];
+  };
+};
+
+function isStructuredLoggerConsoleEvent(event: SentryEvent): boolean {
+  if (event.logger !== 'console') return false;
+
+  const firstArg = event.extra?.arguments?.[0];
+  if (typeof firstArg !== 'string') return false;
+
+  try {
+    const parsed = JSON.parse(firstArg) as {
+      timestamp?: unknown;
+      level?: unknown;
+      message?: unknown;
+    };
+    return (
+      typeof parsed.timestamp === 'string' &&
+      (parsed.level === 'warn' || parsed.level === 'error') &&
+      typeof parsed.message === 'string'
+    );
+  } catch {
+    return false;
+  }
+}
+
 // Deployment gate: VERCEL is auto-set by Vercel platform ("1")
 // NODE_ENV=production also matches local builds, polluting Sentry with dev errors
 const isVercel = !!process.env.VERCEL;
@@ -45,9 +74,17 @@ if (dsn) {
     // ZERO TOLERANCE: Capture ALL edge errors
     ignoreErrors: [],
 
-    // Add context before sending
+    integrations: [
+      Sentry.captureConsoleIntegration({
+        levels: ['warn', 'error', 'assert'],
+      }),
+    ],
+
+    // Add context before sending and dedupe structured logger events
     beforeSend(event, hint) {
-      // Enrichment only - NEVER returns null
+      if (isStructuredLoggerConsoleEvent(event as SentryEvent)) {
+        return null;
+      }
 
       // Tag edge errors
       event.tags = {
