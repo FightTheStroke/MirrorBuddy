@@ -129,3 +129,5 @@ feature/
 
 # Copilot tracking (local)
 .copilot-tracking/
+
+/output/
