@@ -16,6 +16,7 @@ import {
   chatCompletion,
   getProviderStatus,
 } from '../providers';
+import { azureChatCompletion } from '../providers/azure';
 
 // Mock logger to prevent console output during tests
 vi.mock('@/lib/logger', () => ({
@@ -417,6 +418,79 @@ describe('providers', () => {
           contentFiltered: undefined,
           filteredCategories: undefined,
         });
+      });
+
+      it('should retry with max_tokens when max_completion_tokens is unsupported', async () => {
+        global.fetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            ok: false,
+            status: 400,
+            text: async () =>
+              "Unsupported parameter: 'max_completion_tokens'. Use 'max_tokens' instead.",
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+              choices: [{ message: { content: 'OK' }, finish_reason: 'stop' }],
+              usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+            }),
+          });
+
+        const result = await chatCompletion(mockMessages, mockSystemPrompt, { maxTokens: 50 });
+
+        expect(result.content).toBe('OK');
+
+        const firstCallBody = JSON.parse(
+          ((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1] as { body: string }).body,
+        ) as Record<string, unknown>;
+        const secondCallBody = JSON.parse(
+          ((fetch as ReturnType<typeof vi.fn>).mock.calls[1][1] as { body: string }).body,
+        ) as Record<string, unknown>;
+
+        expect(firstCallBody.max_completion_tokens).toBe(50);
+        expect(secondCallBody.max_tokens).toBe(50);
+      });
+
+      it('should retry with fallback deployment on DeploymentNotFound', async () => {
+        process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'good-deployment';
+
+        global.fetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            text: async () => JSON.stringify({ error: { code: 'DeploymentNotFound' } }),
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({
+              choices: [{ message: { content: 'Fallback OK' }, finish_reason: 'stop' }],
+              usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+            }),
+          });
+
+        const result = await azureChatCompletion(
+          {
+            provider: 'azure',
+            endpoint: 'https://my-resource.openai.azure.com',
+            apiKey: 'my-api-key',
+            model: 'bad-deployment',
+          },
+          mockMessages,
+          mockSystemPrompt,
+          0.7,
+          20,
+        );
+
+        expect(result.content).toBe('Fallback OK');
+        expect(result.model).toBe('good-deployment');
+
+        const firstUrl = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+        const secondUrl = (fetch as ReturnType<typeof vi.fn>).mock.calls[1][0] as string;
+
+        expect(firstUrl).toContain('/openai/deployments/bad-deployment/');
+        expect(secondUrl).toContain('/openai/deployments/good-deployment/');
       });
 
       it('should include tools in request when provided', async () => {

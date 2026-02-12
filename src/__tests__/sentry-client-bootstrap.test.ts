@@ -5,6 +5,7 @@ vi.mock('@sentry/nextjs', () => ({
   init: vi.fn(),
   replayIntegration: vi.fn(() => ({})),
   captureConsoleIntegration: vi.fn(() => ({})),
+  captureRouterTransitionStart: vi.fn(),
   browserTracingIntegration: vi.fn(() => ({})),
   feedbackIntegration: vi.fn(() => ({})),
   httpClientIntegration: vi.fn(() => ({})),

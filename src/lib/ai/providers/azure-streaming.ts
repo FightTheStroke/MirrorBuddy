@@ -11,6 +11,8 @@
 import { logger } from '@/lib/logger';
 import type { ProviderConfig } from './types';
 
+type TokenParamName = 'max_completion_tokens' | 'max_tokens';
+
 /**
  * Types for streaming chunks
  */
@@ -50,6 +52,25 @@ function getFilteredCategories(filterResult: Record<string, { filtered?: boolean
     .map(([k]) => k);
 }
 
+function isDeploymentNotFound(status: number, errorText: string): boolean {
+  if (status !== 404) return false;
+  try {
+    const data = JSON.parse(errorText) as { error?: { code?: string; message?: string } };
+    if (data.error?.code === 'DeploymentNotFound') return true;
+    return data.error?.message?.includes('DeploymentNotFound') ?? false;
+  } catch {
+    return errorText.includes('DeploymentNotFound');
+  }
+}
+
+function isUnsupportedTokenParam(status: number, errorText: string): TokenParamName | null {
+  if (status !== 400) return null;
+  if (errorText.includes("Unsupported parameter: 'max_tokens'")) return 'max_tokens';
+  if (errorText.includes("Unsupported parameter: 'max_completion_tokens'"))
+    return 'max_completion_tokens';
+  return null;
+}
+
 /**
  * Perform streaming chat completion using Azure OpenAI
  *
@@ -76,9 +97,11 @@ export async function* azureStreamingCompletion(
   options: StreamingOptions = {},
 ): AsyncGenerator<StreamChunk> {
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
-  const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
-
   const { temperature = 0.7, maxTokens = 2048, signal } = options;
+
+  const fallbackDeployment = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || undefined;
+  const buildUrl = (deployment: string): string =>
+    `${config.endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
 
   logger.debug('[Azure Streaming] Starting', {
     model: config.model,
@@ -92,8 +115,8 @@ export async function* azureStreamingCompletion(
 
   let response: Response;
 
-  try {
-    response = await fetch(url, {
+  async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<Response> {
+    return fetch(buildUrl(deployment), {
       method: 'POST',
       headers: {
         'api-key': config.apiKey!,
@@ -102,12 +125,58 @@ export async function* azureStreamingCompletion(
       body: JSON.stringify({
         messages: allMessages,
         temperature,
-        max_completion_tokens: maxTokens,
+        [tokenParamName]: maxTokens,
         stream: true,
         stream_options: { include_usage: true },
       }),
       signal,
     });
+  }
+
+  try {
+    // Prefer `max_completion_tokens`, but retry with legacy `max_tokens` when needed.
+    const first = await doFetch(config.model, 'max_completion_tokens');
+    if (first.ok) {
+      response = first;
+    } else {
+      const firstErrorText = await first.text();
+      logger.error(`[Azure Streaming] Error ${first.status}`, {
+        deployment: config.model,
+        tokenParamName: 'max_completion_tokens',
+        errorDetails: firstErrorText,
+      });
+
+      const unsupported = isUnsupportedTokenParam(first.status, firstErrorText);
+      const deploymentNotFound = isDeploymentNotFound(first.status, firstErrorText);
+
+      if (deploymentNotFound && fallbackDeployment && fallbackDeployment !== config.model) {
+        const second = await doFetch(fallbackDeployment, 'max_completion_tokens');
+        if (second.ok) {
+          response = second;
+        } else {
+          const secondErrorText = await second.text();
+          logger.error(`[Azure Streaming] Error ${second.status}`, {
+            deployment: fallbackDeployment,
+            tokenParamName: 'max_completion_tokens',
+            errorDetails: secondErrorText,
+          });
+          // Try legacy param on fallback deployment as last attempt.
+          const third = await doFetch(fallbackDeployment, 'max_tokens');
+          response = third;
+        }
+      } else if (unsupported) {
+        const second = await doFetch(config.model, 'max_tokens');
+        response = second;
+      } else {
+        // Keep original error body by re-wrapping into a synthetic response-like path below.
+        response = {
+          ok: false,
+          status: first.status,
+          text: async () => firstErrorText,
+          body: null,
+        } as unknown as Response;
+      }
+    }
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
       logger.debug('[Azure Streaming] Aborted by user');

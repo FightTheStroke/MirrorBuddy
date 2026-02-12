@@ -76,6 +76,10 @@ const AUTH_PUBLIC_ROUTES = [
   '/avatars',
 ];
 
+// Routes that MUST require a signed auth session (not a trial visitor session).
+// These pages deal with personal data and/or account management.
+const AUTH_ONLY_ROUTES = ['/parent-dashboard'];
+
 // Admin routes require authenticated user (ADR 0055)
 const ADMIN_PREFIX = '/admin';
 
@@ -377,6 +381,18 @@ export default function proxy(request: NextRequest) {
     : pathname;
 
   if (AUTH_PUBLIC_ROUTES.some((r) => pathMatchesRoute(pathWithoutLocale, r))) {
+    return finalizeResponse(NextResponse.next({ request: { headers: requestHeaders } }));
+  }
+
+  // Auth-only routes: redirect unauthenticated users to locale-aware login.
+  // This must run BEFORE the "trial session" fallback to /welcome.
+  if (AUTH_ONLY_ROUTES.some((r) => pathMatchesRoute(pathWithoutLocale, r))) {
+    if (!isAuthenticated) {
+      const loginPath = localePrefix ? `/${localePrefix}/login` : '/login';
+      const loginUrl = new URL(loginPath, request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return finalizeResponse(NextResponse.redirect(loginUrl), 307);
+    }
     return finalizeResponse(NextResponse.next({ request: { headers: requestHeaders } }));
   }
 
