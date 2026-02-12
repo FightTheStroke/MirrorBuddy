@@ -1,27 +1,23 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import { ThemeProvider } from "next-themes";
-import { AccessibilityProvider } from "@/components/accessibility";
-import { StagingBanner } from "@/components/ui/staging-banner";
-import { ToastContainer } from "@/components/ui/toast";
-import { IOSInstallBanner } from "@/components/pwa";
-import { UnifiedConsentWall } from "@/components/consent";
-import {
-  useSettingsStore,
-  initializeStores,
-  setupAutoSync,
-} from "@/lib/stores";
-import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
-import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { initializeTelemetry } from "@/lib/telemetry";
-import { ActivityTracker } from "@/lib/telemetry/use-activity-tracker";
-import { migrateSessionStorageKey } from "@/lib/storage/migrate-session-key";
-import { registerOfflineServiceWorker } from "@/lib/pwa/offline-sw-registration";
+import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { ThemeProvider } from 'next-themes';
+import { AccessibilityProvider } from '@/components/accessibility';
+import { StagingBanner } from '@/components/ui/staging-banner';
+import { ToastContainer } from '@/components/ui/toast';
+import { IOSInstallBanner } from '@/components/pwa';
+import { UnifiedConsentWall } from '@/components/consent';
+import { useSettingsStore, initializeStores, setupAutoSync } from '@/lib/stores';
+import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { initializeTelemetry } from '@/lib/telemetry';
+import { ActivityTracker } from '@/lib/telemetry/use-activity-tracker';
+import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';
+import { registerOfflineServiceWorker } from '@/lib/pwa/offline-sw-registration';
 
 // Debug logger - captures all browser errors to file (dev only)
-import "@/lib/client-error-logger";
+import '@/lib/client-error-logger';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -38,14 +34,14 @@ function AccentColorApplier() {
 
   useEffect(() => {
     // Apply accent color to document root (default to 'blue' if not set)
-    const accentColor = appearance?.accentColor || "blue";
-    document.documentElement.setAttribute("data-accent", accentColor);
+    const accentColor = appearance?.accentColor || 'blue';
+    document.documentElement.setAttribute('data-accent', accentColor);
   }, [appearance?.accentColor]);
 
   // Set default on mount before store hydrates
   useEffect(() => {
-    if (!document.documentElement.hasAttribute("data-accent")) {
-      document.documentElement.setAttribute("data-accent", "blue");
+    if (!document.documentElement.hasAttribute('data-accent')) {
+      document.documentElement.setAttribute('data-accent', 'blue');
     }
   }, []);
 
@@ -93,7 +89,7 @@ function StoreInitializer() {
       if (settings.pendingSync) {
         // Use sendBeacon for reliable sync on close (Blob ensures application/json content-type)
         navigator.sendBeacon(
-          "/api/user/settings",
+          '/api/user/settings',
           new Blob(
             [
               JSON.stringify({
@@ -102,18 +98,18 @@ function StoreInitializer() {
                 accentColor: settings.appearance.accentColor,
               }),
             ],
-            { type: "application/json" },
+            { type: 'application/json' },
           ),
         );
       }
     };
 
-    window.addEventListener("beforeunload", handleUnload);
+    window.addEventListener('beforeunload', handleUnload);
 
     return () => {
       clearInterval(syncInterval);
       cleanupTelemetry();
-      window.removeEventListener("beforeunload", handleUnload);
+      window.removeEventListener('beforeunload', handleUnload);
     };
   }, []);
 
@@ -123,16 +119,16 @@ function StoreInitializer() {
 // Pages where unified consent wall should be skipped
 // Legal pages MUST be accessible without accepting cookies (GDPR requirement)
 const PUBLIC_PATHS = [
-  "/welcome",
-  "/landing",
-  "/login",
-  "/change-password",
-  "/invite",
-  "/privacy",
-  "/cookies",
-  "/terms",
-  "/ai-transparency",
-  "/legal/data-request",
+  '/welcome',
+  '/landing',
+  '/login',
+  '/change-password',
+  '/invite',
+  '/privacy',
+  '/cookies',
+  '/terms',
+  '/ai-transparency',
+  '/legal/data-request',
 ];
 
 /**
@@ -142,15 +138,23 @@ const PUBLIC_PATHS = [
  * - Before onboarding is completed (so user can see landing/welcome)
  * Shows wall only when user has completed onboarding and is using the app
  */
-function ConditionalUnifiedConsent({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function ConditionalUnifiedConsent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { hasCompletedOnboarding } = useOnboardingStore();
 
-  const isPublicPath = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
+  const normalizedPathname = (() => {
+    if (!pathname) return '';
+    const segments = pathname.split('/').filter(Boolean);
+    const localeCandidate = segments[0];
+    const hasLocalePrefix = ['it', 'en', 'fr', 'de', 'es'].includes(localeCandidate);
+    if (!hasLocalePrefix) return pathname;
+    const withoutLocale = `/${segments.slice(1).join('/')}`;
+    return withoutLocale === '/' ? '/' : withoutLocale;
+  })();
+
+  const isPublicPath = PUBLIC_PATHS.some(
+    (p) => normalizedPathname === p || normalizedPathname.startsWith(`${p}/`),
+  );
 
   // On public/legal pages, skip blocking wall (users must access legal docs)
   if (isPublicPath) {
@@ -174,7 +178,7 @@ export function Providers({ children, nonce }: ProvidersProps) {
       enableSystem
       disableTransitionOnChange
       // Fix #4: Explicitly map themes to class names so .light class is added
-      value={{ light: "light", dark: "dark" }}
+      value={{ light: 'light', dark: 'dark' }}
       // CSP nonce for inline theme script (prevents flash of unstyled content)
       nonce={nonce}
     >
