@@ -4,7 +4,7 @@
 
 'use client';
 
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { recordWebRTCFirstAudio } from './latency-utils';
 
 export function handleWebRTCTrack(
@@ -14,7 +14,7 @@ export function handleWebRTCTrack(
     webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
     userSpeechEndTimeRef: React.MutableRefObject<number | null>;
     firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
-  }
+  },
 ) {
   logger.debug('[VoiceSession] onTrack received from Azure', { track: event.track.kind });
   if (event.track.kind === 'audio') {
@@ -34,7 +34,10 @@ export function handleWebRTCTrack(
     };
 
     refs.webrtcAudioElementRef.current = audioElement;
-    recordWebRTCFirstAudio({ userSpeechEndTimeRef: refs.userSpeechEndTimeRef, firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef });
+    recordWebRTCFirstAudio({
+      userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
+      firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
+    });
     logger.debug('[VoiceSession] WebRTC audio element created and connected');
   }
 }

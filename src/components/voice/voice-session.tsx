@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { Card } from "@/components/ui/card";
-import { useVoiceSession } from "@/lib/hooks/use-voice-session";
-import { usePermissions } from "@/lib/hooks/use-permissions";
-import { useProgressStore } from "@/lib/stores";
-import { logger } from "@/lib/logger";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { ErrorBoundary } from '@/components/error-boundary';
+import { Card } from '@/components/ui/card';
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
+import { usePermissions } from '@/lib/hooks/use-permissions';
+import { useProgressStore } from '@/lib/stores';
+import { clientLogger as logger } from '@/lib/logger/client';
 import {
   PermissionErrorView,
   ConfigErrorView,
@@ -23,30 +23,20 @@ import {
   calculateXpProgress,
   getStateText,
   calculateSessionXP,
-} from "./voice-session/";
-import type { VoiceSessionProps, WebcamRequest } from "./voice-session/";
+} from './voice-session/';
+import type { VoiceSessionProps, WebcamRequest } from './voice-session/';
 
-export function VoiceSession({
-  maestro,
-  onClose,
-  onSwitchToChat,
-}: VoiceSessionProps) {
+export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionProps) {
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [showWebcam, setShowWebcam] = useState(false);
-  const [webcamRequest, setWebcamRequest] = useState<WebcamRequest | null>(
-    null,
-  );
+  const [webcamRequest, setWebcamRequest] = useState<WebcamRequest | null>(null);
   const [showGrade, setShowGrade] = useState(false);
   const [finalSessionDuration, setFinalSessionDuration] = useState(0);
   const [finalQuestionCount, setFinalQuestionCount] = useState(0);
   const [, setSessionSummary] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
-  const {
-    permissions,
-    requestMicrophone,
-    isLoading: permissionsLoading,
-  } = usePermissions();
+  const { permissions, requestMicrophone, isLoading: permissionsLoading } = usePermissions();
   const { currentSession, endSession, xp, level } = useProgressStore();
 
   const {
@@ -83,26 +73,25 @@ export function VoiceSession({
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error("Voice error", { message });
+      logger.error('Voice error', { message });
     },
     onTranscript: (role, text) => {
-      logger.debug("Transcript", { role, text: text.substring(0, 100) });
+      logger.debug('Transcript', { role, text: text.substring(0, 100) });
     },
     onWebcamRequest: (request) => {
-      logger.debug("Webcam requested", { purpose: request.purpose });
+      logger.debug('Webcam requested', { purpose: request.purpose });
       setWebcamRequest(request);
       setShowWebcam(true);
     },
   });
 
-  const { sessionStartTime, questionCount, conversationIdRef } =
-    useSessionEffects({
-      maestro,
-      isConnected,
-      transcript,
-      toolCalls,
-      onSetElapsedSeconds: setElapsedSeconds,
-    });
+  const { sessionStartTime, questionCount, conversationIdRef } = useSessionEffects({
+    maestro,
+    isConnected,
+    transcript,
+    toolCalls,
+    onSetElapsedSeconds: setElapsedSeconds,
+  });
 
   const { configError } = useConnection({
     maestro,
@@ -142,9 +131,9 @@ export function VoiceSession({
   });
 
   useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => e.key === "Escape" && handleClose();
-    window.addEventListener("keydown", onEsc);
-    return () => window.removeEventListener("keydown", onEsc);
+    const onEsc = (e: KeyboardEvent) => e.key === 'Escape' && handleClose();
+    window.addEventListener('keydown', onEsc);
+    return () => window.removeEventListener('keydown', onEsc);
   }, [handleClose]);
 
   const stateText = getStateText(
@@ -173,11 +162,7 @@ export function VoiceSession({
 
   if (configError) {
     return (
-      <ConfigErrorView
-        error={configError}
-        onSwitchToChat={onSwitchToChat}
-        onClose={onClose}
-      />
+      <ConfigErrorView error={configError} onSwitchToChat={onSwitchToChat} onClose={onClose} />
     );
   }
 

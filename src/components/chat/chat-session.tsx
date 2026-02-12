@@ -1,24 +1,20 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import type { ToolCall } from "@/types";
-import { ToolResultDisplay } from "@/components/tools";
-import { useChatSession } from "./hooks";
-import { ChatHeader } from "./chat-header";
-import { ChatFooter } from "./chat-footer";
-import { MessageBubble } from "./message-bubble";
-import { MessageLoading } from "./message-loading";
-import type { ChatSessionProps } from "./types";
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
+import type { ToolCall } from '@/types';
+import { ToolResultDisplay } from '@/components/tools';
+import { useChatSession } from './hooks';
+import { ChatHeader } from './chat-header';
+import { ChatFooter } from './chat-footer';
+import { MessageBubble } from './message-bubble';
+import { MessageLoading } from './message-loading';
+import type { ChatSessionProps } from './types';
 
-export function ChatSession({
-  maestro,
-  onClose,
-  onSwitchToVoice,
-}: ChatSessionProps) {
+export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionProps) {
   const {
     messages,
     setMessages,
@@ -42,12 +38,12 @@ export function ChatSession({
   // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,25 +52,25 @@ export function ChatSession({
 
     const userMessage = {
       id: `user-${Date.now()}`,
-      role: "user" as const,
+      role: 'user' as const,
       content: input.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setInput('');
     setIsLoading(true);
 
     if (conversationIdRef.current) {
       addMessageToStore(conversationIdRef.current, {
-        role: "user",
+        role: 'user',
         content: userMessage.content,
       });
     }
 
     try {
-      const response = await csrfFetch("/api/chat", {
-        method: "POST",
+      const response = await csrfFetch('/api/chat', {
+        method: 'POST',
         body: JSON.stringify({
           messages: [...messages, userMessage].map((m) => ({
             role: m.role,
@@ -87,14 +83,14 @@ export function ChatSession({
       });
 
       if (!response.ok) {
-        throw new Error("Chat request failed");
+        throw new Error('Chat request failed');
       }
 
       const data = await response.json();
 
       const assistantMessage = {
         id: `assistant-${Date.now()}`,
-        role: "assistant" as const,
+        role: 'assistant' as const,
         content: data.content,
         timestamp: new Date(),
         tokens: data.usage?.total_tokens,
@@ -104,7 +100,7 @@ export function ChatSession({
 
       if (conversationIdRef.current) {
         addMessageToStore(conversationIdRef.current, {
-          role: "assistant",
+          role: 'assistant',
           content: assistantMessage.content,
         });
       }
@@ -117,18 +113,18 @@ export function ChatSession({
         speak(data.content);
       }
     } catch (error) {
-      logger.error("Chat error", { error: String(error) });
+      logger.error('Chat error', { error: String(error) });
       const errorMessage = {
         id: `error-${Date.now()}`,
-        role: "assistant" as const,
-        content: "Mi scuso, si è verificato un errore. Riprova.",
+        role: 'assistant' as const,
+        content: 'Mi scuso, si è verificato un errore. Riprova.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
 
       if (conversationIdRef.current) {
         addMessageToStore(conversationIdRef.current, {
-          role: "assistant",
+          role: 'assistant',
           content: errorMessage.content,
         });
       }
@@ -139,7 +135,7 @@ export function ChatSession({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent);
     }
@@ -153,8 +149,8 @@ export function ChatSession({
 
   const clearChat = async () => {
     const greetingMessage = {
-      id: "greeting",
-      role: "assistant" as const,
+      id: 'greeting',
+      role: 'assistant' as const,
       content: maestro.greeting,
       timestamp: new Date(),
     };
@@ -163,7 +159,7 @@ export function ChatSession({
 
     if (conversationIdRef.current) {
       await addMessageToStore(conversationIdRef.current, {
-        role: "assistant",
+        role: 'assistant',
         content: maestro.greeting,
       });
     }
@@ -183,10 +179,10 @@ export function ChatSession({
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          "w-full max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden",
+          'w-full max-w-3xl h-[90vh] flex flex-col rounded-2xl shadow-2xl overflow-hidden',
           settings.highContrast
-            ? "bg-black border-2 border-yellow-400"
-            : "bg-white dark:bg-slate-900",
+            ? 'bg-black border-2 border-yellow-400'
+            : 'bg-white dark:bg-slate-900',
         )}
         role="dialog"
         aria-modal="true"
@@ -204,8 +200,8 @@ export function ChatSession({
 
         <main
           className={cn(
-            "flex-1 overflow-y-auto p-4 space-y-4",
-            settings.highContrast ? "bg-black" : "",
+            'flex-1 overflow-y-auto p-4 space-y-4',
+            settings.highContrast ? 'bg-black' : '',
           )}
         >
           <AnimatePresence mode="popLayout">
@@ -231,12 +227,7 @@ export function ChatSession({
             </div>
           )}
 
-          {isLoading && (
-            <MessageLoading
-              maestro={maestro}
-              highContrast={settings.highContrast}
-            />
-          )}
+          {isLoading && <MessageLoading maestro={maestro} highContrast={settings.highContrast} />}
 
           <div ref={messagesEndRef} />
         </main>

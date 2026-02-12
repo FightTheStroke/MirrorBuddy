@@ -20,7 +20,7 @@ import {
   useMindmapModifications,
   type MindmapModificationCallbacks,
 } from '@/lib/hooks/use-mindmap-modifications';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import type { MindmapNode } from './markmap';
 
 // ============================================================================
@@ -60,7 +60,7 @@ export function LiveMindmap({
           onModification?.('mindmap_add_node', { concept, parentNode });
         }
       },
-      [onModification]
+      [onModification],
     ),
 
     onConnectNodes: useCallback(
@@ -70,7 +70,7 @@ export function LiveMindmap({
           onModification?.('mindmap_connect_nodes', { nodeA, nodeB });
         }
       },
-      [onModification]
+      [onModification],
     ),
 
     onExpandNode: useCallback(
@@ -80,7 +80,7 @@ export function LiveMindmap({
           onModification?.('mindmap_expand_node', { node, suggestions });
         }
       },
-      [onModification]
+      [onModification],
     ),
 
     onDeleteNode: useCallback(
@@ -90,7 +90,7 @@ export function LiveMindmap({
           onModification?.('mindmap_delete_node', { node });
         }
       },
-      [onModification]
+      [onModification],
     ),
 
     onFocusNode: useCallback(
@@ -100,7 +100,7 @@ export function LiveMindmap({
           onModification?.('mindmap_focus_node', { node });
         }
       },
-      [onModification]
+      [onModification],
     ),
 
     onSetColor: useCallback(
@@ -110,7 +110,7 @@ export function LiveMindmap({
           onModification?.('mindmap_set_color', { node, color });
         }
       },
-      [onModification]
+      [onModification],
     ),
   };
 
@@ -126,7 +126,7 @@ export function LiveMindmap({
     (nodes: MindmapNode[]) => {
       onNodesChange?.(nodes);
     },
-    [onNodesChange]
+    [onNodesChange],
   );
 
   logger.debug('[LiveMindmap] Render', {

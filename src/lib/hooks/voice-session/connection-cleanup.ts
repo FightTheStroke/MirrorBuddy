@@ -3,11 +3,11 @@
 // Resource cleanup for voice session disconnect (WebRTC only)
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { logger } from "@/lib/logger";
-import type { ConnectionRefs } from "./connection-types";
+import { useCallback } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import type { ConnectionRefs } from './connection-types';
 
 /**
  * Disconnect from voice session and clean up all resources
@@ -15,12 +15,10 @@ import type { ConnectionRefs } from "./connection-types";
 export function useDisconnect(
   refs: ConnectionRefs,
   reset: () => void,
-  setConnectionState: (
-    state: "idle" | "connecting" | "connected" | "error",
-  ) => void,
+  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void,
 ) {
   return useCallback(() => {
-    logger.debug("[VoiceSession] Disconnecting...");
+    logger.debug('[VoiceSession] Disconnecting...');
 
     // Cancel input level monitoring animation frame
     if (refs.animationFrameRef.current) {
@@ -38,7 +36,7 @@ export function useDisconnect(
 
     // WebRTC cleanup
     if (refs.webrtcCleanupRef.current) {
-      logger.debug("[VoiceSession] Cleaning up WebRTC connection");
+      logger.debug('[VoiceSession] Cleaning up WebRTC connection');
       refs.webrtcCleanupRef.current();
       refs.webrtcCleanupRef.current = null;
     }
@@ -50,9 +48,7 @@ export function useDisconnect(
       refs.webrtcAudioElementRef.current = null;
     }
     if (refs.remoteAudioStreamRef.current) {
-      refs.remoteAudioStreamRef.current
-        .getTracks()
-        .forEach((track) => track.stop());
+      refs.remoteAudioStreamRef.current.getTracks().forEach((track) => track.stop());
       refs.remoteAudioStreamRef.current = null;
     }
 
@@ -117,6 +113,6 @@ export function useDisconnect(
     refs.maestroRef.current = null;
 
     reset();
-    setConnectionState("idle");
+    setConnectionState('idle');
   }, [refs, reset, setConnectionState]);
 }

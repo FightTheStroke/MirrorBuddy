@@ -59,7 +59,7 @@ describe('Sentry console dedupe', () => {
     await import('../../../sentry.client.config');
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
 
-    const result = initCall.beforeSend?.(makeStructuredConsoleEvent(), {
+    const result = initCall.beforeSend?.(makeStructuredConsoleEvent() as any, {
       originalException: undefined,
     });
 
@@ -75,7 +75,7 @@ describe('Sentry console dedupe', () => {
     await import('../../../sentry.server.config');
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
 
-    const result = initCall.beforeSend?.(makeStructuredConsoleEvent(), {
+    const result = initCall.beforeSend?.(makeStructuredConsoleEvent() as any, {
       originalException: undefined,
     });
 
@@ -91,7 +91,7 @@ describe('Sentry console dedupe', () => {
     await import('../../../sentry.edge.config');
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
 
-    const result = initCall.beforeSend?.(makeStructuredConsoleEvent(), {
+    const result = initCall.beforeSend?.(makeStructuredConsoleEvent() as any, {
       originalException: undefined,
     });
 

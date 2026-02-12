@@ -2,11 +2,15 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { Button } from '@/components/ui/button';
-import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
+import {
+  buildDemoHTML,
+  getDemoSandboxPermissions,
+  getDemoAllowPermissions,
+} from '@/lib/tools/demo-html-builder';
 import { useBlobUrl } from '@/lib/tools/use-blob-url';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 interface DemoSandboxProps {
   data?: {
@@ -19,41 +23,43 @@ interface DemoSandboxProps {
 }
 
 export function DemoSandbox(props: DemoSandboxProps) {
-  const t = useTranslations("tools");
+  const t = useTranslations('tools');
   const { data } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [key, setKey] = useState(0);
 
   const demoData = data || {
-    html: '<div class="p-8 text-center"><h2 class="text-2xl font-bold mb-4">Demo Interattiva</h2><p>Seleziona un maestro per creare una demo</p></div>'
+    html: '<div class="p-8 text-center"><h2 class="text-2xl font-bold mb-4">Demo Interattiva</h2><p>Seleziona un maestro per creare una demo</p></div>',
   };
   const title = demoData.title || 'Simulazione Interattiva';
 
   // Use shared HTML builder for consistency
-  const fullHtml = useMemo(() => buildDemoHTML({
-    html: demoData.html || '',
-    css: demoData.css || '',
-    js: demoData.js || '',
-    code: demoData.code,
-  }), [demoData.html, demoData.css, demoData.js, demoData.code]);
+  const fullHtml = useMemo(
+    () =>
+      buildDemoHTML({
+        html: demoData.html || '',
+        css: demoData.css || '',
+        js: demoData.js || '',
+        code: demoData.code,
+      }),
+    [demoData.html, demoData.css, demoData.js, demoData.code],
+  );
 
   // Use blob URL instead of srcDoc to bypass parent CSP restrictions
   // This allows inline scripts to execute in the sandboxed iframe
   const blobUrl = useBlobUrl(fullHtml + key); // Include key to force refresh
 
   const handleRefresh = () => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   };
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-2 px-4 pt-4">
-        <h3 className="font-medium text-slate-900 dark:text-white">
-          {title}
-        </h3>
+        <h3 className="font-medium text-slate-900 dark:text-white">{title}</h3>
         <Button variant="ghost" size="sm" onClick={handleRefresh}>
           <RefreshCw className="w-4 h-4 mr-1" />
-          {t("ricarica")}
+          {t('ricarica')}
         </Button>
       </div>
 
@@ -64,7 +70,7 @@ export function DemoSandbox(props: DemoSandboxProps) {
           src={blobUrl}
           sandbox={getDemoSandboxPermissions()}
           className="w-full h-full border-0"
-          title={t("demoInterattiva")}
+          title={t('demoInterattiva')}
           allow={getDemoAllowPermissions()}
           style={{ minHeight: '400px', width: '100%', height: '100%' }}
           onLoad={() => {

@@ -1,35 +1,32 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { useRouter } from "@/i18n/navigation";
-import { HeroSection } from "./hero-section";
-import { QuickStart } from "./quick-start";
-import { WelcomeFooter } from "./welcome-footer";
-import { LanguageSwitcher } from "./language-switcher";
-import { RodariStorySection } from "./rodari-story-section";
+import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { useRouter } from '@/i18n/navigation';
+import { HeroSection } from './hero-section';
+import { QuickStart } from './quick-start';
+import { WelcomeFooter } from './welcome-footer';
+import { LanguageSwitcher } from './language-switcher';
+import { RodariStorySection } from './rodari-story-section';
 import {
   LazyMaestriShowcaseSection,
   LazySupportSection,
   LazyAccessibilitySection,
   LazyFeaturesSection,
   LazyComplianceSection,
-} from "./lazy";
-import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
-import type { ExistingUserData } from "../types";
+} from './lazy';
+import { trackWelcomeVisit, trackTrialStartClick } from '@/lib/funnel/client';
+import type { ExistingUserData } from '../types';
 
 interface LandingPageProps {
   existingUserData: ExistingUserData | null;
   onStartOnboarding: () => void;
 }
 
-export function LandingPage({
-  existingUserData,
-  onStartOnboarding,
-}: LandingPageProps) {
+export function LandingPage({ existingUserData, onStartOnboarding }: LandingPageProps) {
   const router = useRouter();
   const isReturningUser = Boolean(existingUserData?.name);
   const hasTrackedVisit = useRef(false);
@@ -45,16 +42,16 @@ export function LandingPage({
   // Create trial session via API before granting access
   const createTrialSession = async () => {
     try {
-      const response = await csrfFetch("/api/trial/session", {
-        method: "POST",
+      const response = await csrfFetch('/api/trial/session', {
+        method: 'POST',
       });
       if (!response.ok) {
-        logger.warn("[LandingPage] Failed to create trial session", {
+        logger.warn('[LandingPage] Failed to create trial session', {
           status: response.status,
         });
       }
     } catch (error) {
-      logger.warn("[LandingPage] Trial session creation failed", {
+      logger.warn('[LandingPage] Trial session creation failed', {
         error: String(error),
       });
     }
@@ -62,7 +59,7 @@ export function LandingPage({
 
   // Handle skip - create trial session and go to app
   const handleSkip = async () => {
-    logger.info("[WelcomePage] Skip clicked, creating trial session");
+    logger.info('[WelcomePage] Skip clicked, creating trial session');
 
     // Track TRIAL_START funnel event
     await trackTrialStartClick();
@@ -70,31 +67,31 @@ export function LandingPage({
     await createTrialSession();
 
     try {
-      const response = await csrfFetch("/api/onboarding", {
-        method: "POST",
+      const response = await csrfFetch('/api/onboarding', {
+        method: 'POST',
         body: JSON.stringify({ hasCompletedOnboarding: true }),
       });
 
       if (!response.ok) {
-        logger.error("[WelcomePage] Failed to persist onboarding completion", {
+        logger.error('[WelcomePage] Failed to persist onboarding completion', {
           status: response.status,
         });
       }
 
       useOnboardingStore.getState().completeOnboarding();
-      logger.info("[WelcomePage] Redirecting to dashboard");
-      router.push("/");
+      logger.info('[WelcomePage] Redirecting to dashboard');
+      router.push('/');
     } catch (error) {
-      logger.error("[WelcomePage] Error completing onboarding", {
+      logger.error('[WelcomePage] Error completing onboarding', {
         error: String(error),
       });
-      router.push("/");
+      router.push('/');
     }
   };
 
   // Handle start with onboarding - create trial session and start flow
   const handleStartWithOnboarding = async () => {
-    logger.info("[WelcomePage] Start clicked, creating trial session");
+    logger.info('[WelcomePage] Start clicked, creating trial session');
     await createTrialSession();
     onStartOnboarding();
   };
@@ -114,10 +111,7 @@ export function LandingPage({
           className="w-full flex-1 flex flex-col items-center justify-center"
         >
           {/* Hero with logo, tagline, accessibility profiles */}
-          <HeroSection
-            userName={existingUserData?.name}
-            isReturningUser={isReturningUser}
-          />
+          <HeroSection userName={existingUserData?.name} isReturningUser={isReturningUser} />
 
           {/* CTA boxes: Beta Access | Trial Mode */}
           <QuickStart
@@ -125,9 +119,7 @@ export function LandingPage({
             onStartWithVoice={handleStartWithOnboarding}
             onStartWithoutVoice={handleStartWithOnboarding}
             onSkip={handleSkip}
-            onUpdateProfile={
-              isReturningUser ? handleStartWithOnboarding : undefined
-            }
+            onUpdateProfile={isReturningUser ? handleStartWithOnboarding : undefined}
           />
 
           {/* Professors carousel */}

@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { logger } from "@/lib/logger";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { motion } from 'framer-motion';
 import {
   GraduationCap,
   Trophy,
@@ -14,41 +14,40 @@ import {
   Sparkles,
   PencilRuler,
   Backpack,
-} from "lucide-react";
-import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { useProgressStore, useSettingsStore } from "@/lib/stores";
-import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
-import { useParentInsightsIndicator } from "@/lib/hooks/use-parent-insights-indicator";
-import { useTrialStatus } from "@/lib/hooks/use-trial-status";
-import { useTrialToasts } from "@/lib/hooks/use-trial-toasts";
-import { getUserIdFromCookie } from "@/lib/auth";
-import { cn } from "@/lib/utils";
-import type { Maestro, ToolType } from "@/types";
-import { MaestriGrid } from "@/components/maestros/maestri-grid";
-import { LazyCalendarView, LazyGenitoriView } from "@/components/education";
-import { LazySettingsView } from "@/components/settings";
-import { LazyProgressView } from "@/components/progress";
-import { TrialHomeBanner, TrialUsageDashboard } from "@/components/trial";
-import { HomeHeader } from "./home-header";
-import { HomeSidebar } from "./home-sidebar";
-import { COACH_INFO, BUDDY_INFO } from "./home-constants";
-import type { View, MaestroSessionMode } from "./types";
+} from 'lucide-react';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { useProgressStore, useSettingsStore } from '@/lib/stores';
+import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
+import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
+import { useTrialStatus } from '@/lib/hooks/use-trial-status';
+import { useTrialToasts } from '@/lib/hooks/use-trial-toasts';
+import { getUserIdFromCookie } from '@/lib/auth';
+import { cn } from '@/lib/utils';
+import type { Maestro, ToolType } from '@/types';
+import { MaestriGrid } from '@/components/maestros/maestri-grid';
+import { LazyCalendarView, LazyGenitoriView } from '@/components/education';
+import { LazySettingsView } from '@/components/settings';
+import { LazyProgressView } from '@/components/progress';
+import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
+import { HomeHeader } from './home-header';
+import { HomeSidebar } from './home-sidebar';
+import { COACH_INFO, BUDDY_INFO } from './home-constants';
+import type { View, MaestroSessionMode } from './types';
 import {
   LazyMaestroSession,
   LazyCharacterChatView,
   LazyAstuccioView,
   LazyZainoView,
   HomeShellSkeleton,
-} from "./home-lazy";
+} from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
 
 export default function Home() {
   const router = useRouter();
-  const t = useTranslations("home");
+  const t = useTranslations('home');
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
-    useOnboardingStore();
+  const { hasCompletedOnboarding, isHydrated, hydrateFromApi } = useOnboardingStore();
 
   useEffect(() => {
     hydrateFromApi();
@@ -56,19 +55,16 @@ export default function Home() {
 
   useEffect(() => {
     if (isHydrated && !hasCompletedOnboarding) {
-      router.push("/welcome");
+      router.push('/welcome');
     }
   }, [isHydrated, hasCompletedOnboarding, router]);
 
-  const [currentView, setCurrentView] = useState<View>("maestri");
+  const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
-  const [maestroSessionMode, setMaestroSessionMode] =
-    useState<MaestroSessionMode>("voice");
+  const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
-  const [requestedToolType, setRequestedToolType] = useState<
-    ToolType | undefined
-  >(undefined);
+  const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,20 +72,18 @@ export default function Home() {
       else setSidebarOpen(true);
     };
     handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Focus management: move focus to main content heading when view changes
   useEffect(() => {
     if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
-      const mainHeading = mainContentRef.current.querySelector(
-        "h1:not(.sr-only), h2",
-      );
+      const mainHeading = mainContentRef.current.querySelector('h1:not(.sr-only), h2');
       if (mainHeading instanceof HTMLElement) {
-        mainHeading.setAttribute("tabindex", "-1");
+        mainHeading.setAttribute('tabindex', '-1');
         mainHeading.focus();
-        mainHeading.removeAttribute("tabindex");
+        mainHeading.removeAttribute('tabindex');
       }
     }
   }, [currentView, isHydrated, hasCompletedOnboarding]);
@@ -121,12 +115,9 @@ export default function Home() {
         const userId = getUserIdFromCookie();
         if (userId) {
           try {
-            await endConversationWithSummary(
-              characterConvo.conversationId,
-              userId,
-            );
+            await endConversationWithSummary(characterConvo.conversationId, userId);
           } catch (error) {
-            logger.error("Failed to close conversation", {
+            logger.error('Failed to close conversation', {
               error: String(error),
             });
           }
@@ -139,65 +130,65 @@ export default function Home() {
   const handleToolRequest = (toolType: ToolType, maestro: Maestro) => {
     setRequestedToolType(toolType);
     setSelectedMaestro(maestro);
-    setMaestroSessionMode("chat");
+    setMaestroSessionMode('chat');
     setMaestroSessionKey((prev) => prev + 1);
-    setCurrentView("maestro-session");
+    setCurrentView('maestro-session');
   };
 
   if (!isHydrated || !hasCompletedOnboarding) {
-    return <HomeShellSkeleton title={t("appTitle")} />;
+    return <HomeShellSkeleton title={t('appTitle')} />;
   }
 
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
-  const seasonName = currentSeason?.name || t("seasonDefault");
-  const selectedCoach = studentProfile?.preferredCoach || "melissa";
-  const selectedBuddy = studentProfile?.preferredBuddy || "mario";
+  const seasonName = currentSeason?.name || t('seasonDefault');
+  const selectedCoach = studentProfile?.preferredCoach || 'melissa';
+  const selectedBuddy = studentProfile?.preferredBuddy || 'mario';
   const coachInfo = COACH_INFO[selectedCoach];
   const buddyInfo = BUDDY_INFO[selectedBuddy];
 
   const navItems = [
     {
-      id: "coach" as const,
+      id: 'coach' as const,
       label: coachInfo.name,
       icon: Sparkles,
       isChat: true,
       avatar: coachInfo.avatar,
     },
     {
-      id: "buddy" as const,
+      id: 'buddy' as const,
       label: buddyInfo.name,
       icon: Heart,
       isChat: true,
       avatar: buddyInfo.avatar,
     },
     {
-      id: "maestri" as const,
-      label: t("navigation.professors"),
+      id: 'maestri' as const,
+      label: t('navigation.professors'),
       icon: GraduationCap,
     },
     {
-      id: "astuccio" as const,
-      label: t("navigation.astuccio"),
+      id: 'astuccio' as const,
+      label: t('navigation.astuccio'),
       icon: PencilRuler,
     },
-    { id: "supporti" as const, label: t("navigation.zaino"), icon: Backpack },
+    { id: 'supporti' as const, label: t('navigation.zaino'), icon: Backpack },
     {
-      id: "calendar" as const,
-      label: t("navigation.calendar"),
+      id: 'calendar' as const,
+      label: t('navigation.calendar'),
       icon: Calendar,
     },
-    { id: "progress" as const, label: t("navigation.progress"), icon: Trophy },
+    { id: 'progress' as const, label: t('navigation.progress'), icon: Trophy },
     {
-      id: "settings" as const,
-      label: t("navigation.settings"),
+      id: 'settings' as const,
+      label: t('navigation.settings'),
       icon: Settings,
     },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 overflow-x-hidden">
-      <h1 className="sr-only">{t("appTitle")}</h1>
+      <h1 className="sr-only">{t('appTitle')}</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
         onMenuClick={() => setSidebarOpen(true)}
@@ -223,15 +214,15 @@ export default function Home() {
         hasNewInsights={hasNewInsights}
         onParentAccess={() => {
           markAsViewed();
-          handleViewChange("genitori");
+          handleViewChange('genitori');
         }}
         trialStatus={trialStatus}
       />
 
       <div
         className={cn(
-          "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-14 pb-6",
-          sidebarOpen ? "lg:ml-64" : "lg:ml-20",
+          'flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-14 pb-6',
+          sidebarOpen ? 'lg:ml-64' : 'lg:ml-20',
         )}
         ref={mainContentRef}
       >
@@ -251,48 +242,40 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {currentView === "coach" && (
-              <LazyCharacterChatView
-                characterId={selectedCoach}
-                characterType="coach"
-              />
+            {currentView === 'coach' && (
+              <LazyCharacterChatView characterId={selectedCoach} characterType="coach" />
             )}
-            {currentView === "buddy" && (
-              <LazyCharacterChatView
-                characterId={selectedBuddy}
-                characterType="buddy"
-              />
+            {currentView === 'buddy' && (
+              <LazyCharacterChatView characterId={selectedBuddy} characterType="buddy" />
             )}
-            {currentView === "maestri" && (
+            {currentView === 'maestri' && (
               <MaestriGrid
                 onMaestroSelect={(maestro, mode) => {
                   setSelectedMaestro(maestro);
                   setMaestroSessionMode(mode);
                   setMaestroSessionKey((prev) => prev + 1);
-                  setCurrentView("maestro-session");
+                  setCurrentView('maestro-session');
                 }}
               />
             )}
-            {currentView === "maestro-session" && selectedMaestro && (
+            {currentView === 'maestro-session' && selectedMaestro && (
               <LazyMaestroSession
                 key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
                 maestro={selectedMaestro}
                 onClose={() => {
-                  setCurrentView("maestri");
+                  setCurrentView('maestri');
                   setRequestedToolType(undefined);
                 }}
                 initialMode={maestroSessionMode}
                 requestedToolType={requestedToolType}
               />
             )}
-            {currentView === "astuccio" && (
-              <LazyAstuccioView onToolRequest={handleToolRequest} />
-            )}
-            {currentView === "supporti" && <LazyZainoView />}
-            {currentView === "calendar" && <LazyCalendarView />}
-            {currentView === "progress" && <LazyProgressView />}
-            {currentView === "genitori" && <LazyGenitoriView />}
-            {currentView === "settings" && <LazySettingsView />}
+            {currentView === 'astuccio' && <LazyAstuccioView onToolRequest={handleToolRequest} />}
+            {currentView === 'supporti' && <LazyZainoView />}
+            {currentView === 'calendar' && <LazyCalendarView />}
+            {currentView === 'progress' && <LazyProgressView />}
+            {currentView === 'genitori' && <LazyGenitoriView />}
+            {currentView === 'settings' && <LazySettingsView />}
           </motion.div>
         </main>
 

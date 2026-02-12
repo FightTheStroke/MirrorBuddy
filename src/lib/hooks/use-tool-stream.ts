@@ -1,19 +1,19 @@
-"use client";
+'use client';
 // ============================================================================
 // HOOK: useToolStream
 // Connects to SSE endpoint for real-time tool updates
 // Provides reactive state for tool building progress
 // ============================================================================
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { logger } from "@/lib/logger";
-import { processStreamToolEvent } from "./use-tool-stream/tool-event-processor";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { processStreamToolEvent } from './use-tool-stream/tool-event-processor';
 import type {
   StreamToolEvent,
   ConnectionState,
   UseToolStreamResult,
   ActiveToolState,
-} from "./use-tool-stream/types";
+} from './use-tool-stream/types';
 
 // Re-export types for backwards compatibility
 export type {
@@ -21,7 +21,7 @@ export type {
   ConnectionState,
   UseToolStreamResult,
   ActiveToolState,
-} from "./use-tool-stream/types";
+} from './use-tool-stream/types';
 
 interface UseToolStreamOptions {
   sessionId: string;
@@ -32,9 +32,7 @@ interface UseToolStreamOptions {
   reconnectDelayMs?: number;
 }
 
-export function useToolStream(
-  options: UseToolStreamOptions,
-): UseToolStreamResult {
+export function useToolStream(options: UseToolStreamOptions): UseToolStreamResult {
   const {
     sessionId,
     autoConnect = true,
@@ -45,8 +43,7 @@ export function useToolStream(
   } = options;
 
   // State
-  const [connectionState, setConnectionState] =
-    useState<ConnectionState>("disconnected");
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const [clientId, setClientId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ActiveToolState | null>(null);
   const [toolHistory, setToolHistory] = useState<StreamToolEvent[]>([]);
@@ -63,9 +60,7 @@ export function useToolStream(
     error: (() => void) | null;
   }>({ connected: null, message: null, error: null });
   // Ref for setupEventSource to avoid circular dependency in useCallback
-  const setupEventSourceRef = useRef<((url: string) => EventSource) | null>(
-    null,
-  );
+  const setupEventSourceRef = useRef<((url: string) => EventSource) | null>(null);
   // Track mounted state to avoid setState on unmount
   const isMountedRef = useRef(true);
 
@@ -88,13 +83,13 @@ export function useToolStream(
     if (!es) return;
     const handlers = handlersRef.current;
     if (handlers.connected) {
-      es.removeEventListener("connected", handlers.connected);
+      es.removeEventListener('connected', handlers.connected);
     }
     if (handlers.message) {
-      es.removeEventListener("message", handlers.message);
+      es.removeEventListener('message', handlers.message);
     }
     if (handlers.error) {
-      es.removeEventListener("error", handlers.error);
+      es.removeEventListener('error', handlers.error);
     }
     es.close();
   }, []);
@@ -112,10 +107,10 @@ export function useToolStream(
 
     // Only update state if still mounted
     if (isMountedRef.current) {
-      setConnectionState("disconnected");
+      setConnectionState('disconnected');
       setClientId(null);
     }
-    logger.info("Disconnected from tool stream");
+    logger.info('Disconnected from tool stream');
   }, [cleanupEventSource]);
 
   // Set up EventSource with handlers
@@ -129,42 +124,41 @@ export function useToolStream(
         try {
           const data = JSON.parse((e as MessageEvent).data);
           setClientId(data.clientId);
-          setConnectionState("connected");
+          setConnectionState('connected');
           reconnectAttemptsRef.current = 0;
-          logger.info("Tool stream connected", { clientId: data.clientId });
+          logger.info('Tool stream connected', { clientId: data.clientId });
         } catch {
-          logger.warn("Failed to parse connected event");
+          logger.warn('Failed to parse connected event');
         }
       };
 
       const messageHandler = (e: MessageEvent) => {
-        if (e.data.startsWith(":")) return; // Ignore heartbeats
+        if (e.data.startsWith(':')) return; // Ignore heartbeats
         try {
           const event: StreamToolEvent = JSON.parse(e.data);
           setEventsReceived((prev) => prev + 1);
           processToolEvent(event);
           onEventRef.current?.(event);
         } catch {
-          logger.warn("Failed to parse SSE message", { data: e.data });
+          logger.warn('Failed to parse SSE message', { data: e.data });
         }
       };
 
       const errorHandler = () => {
-        logger.warn("Tool stream error");
+        logger.warn('Tool stream error');
         cleanupEventSource(eventSourceRef.current);
         eventSourceRef.current = null;
 
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
-          setConnectionState("reconnecting");
+          setConnectionState('reconnecting');
           reconnectAttemptsRef.current++;
 
-          const exponentialDelay =
-            reconnectDelayMs * Math.pow(2, reconnectAttemptsRef.current - 1);
+          const exponentialDelay = reconnectDelayMs * Math.pow(2, reconnectAttemptsRef.current - 1);
           const jitter = Math.random() * 500;
           const delay = Math.min(exponentialDelay + jitter, 30000);
 
           reconnectTimeoutRef.current = setTimeout(() => {
-            logger.info("Reconnecting to tool stream", {
+            logger.info('Reconnecting to tool stream', {
               attempt: reconnectAttemptsRef.current,
               delayMs: Math.round(delay),
             });
@@ -175,8 +169,8 @@ export function useToolStream(
             }
           }, delay);
         } else {
-          setConnectionState("error");
-          onErrorRef.current?.(new Error("Max reconnect attempts reached"));
+          setConnectionState('error');
+          onErrorRef.current?.(new Error('Max reconnect attempts reached'));
         }
       };
 
@@ -188,19 +182,13 @@ export function useToolStream(
       };
 
       // Attach handlers
-      eventSource.addEventListener("connected", connectedHandler);
-      eventSource.addEventListener("message", messageHandler);
-      eventSource.addEventListener("error", errorHandler);
+      eventSource.addEventListener('connected', connectedHandler);
+      eventSource.addEventListener('message', messageHandler);
+      eventSource.addEventListener('error', errorHandler);
 
       return eventSource;
     },
-    [
-      sessionId,
-      maxReconnectAttempts,
-      reconnectDelayMs,
-      processToolEvent,
-      cleanupEventSource,
-    ],
+    [sessionId, maxReconnectAttempts, reconnectDelayMs, processToolEvent, cleanupEventSource],
   );
 
   // Update ref for recursive calls - must be in useEffect
@@ -214,8 +202,8 @@ export function useToolStream(
     cleanupEventSource(eventSourceRef.current);
     eventSourceRef.current = null;
 
-    setConnectionState("connecting");
-    logger.info("Connecting to tool stream", { sessionId });
+    setConnectionState('connecting');
+    logger.info('Connecting to tool stream', { sessionId });
 
     const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
     eventSourceRef.current = setupEventSource(url);

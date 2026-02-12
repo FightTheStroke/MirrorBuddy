@@ -1,28 +1,24 @@
-"use client";
+'use client';
 
 /**
  * Inline conversation history sidebar - matches voice panel styling
  */
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useTranslations } from "next-intl";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Plus, Trash2, X, Search, MessageSquare, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type {
-  ConversationDrawerProps,
-  ConversationSummary,
-  DateFilter,
-} from "./types";
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash2, X, Search, MessageSquare, Calendar } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { ConversationDrawerProps, ConversationSummary, DateFilter } from './types';
 
-type DateGroup = "oggi" | "ieri" | "settimana" | "mese" | "vecchie";
+type DateGroup = 'oggi' | 'ieri' | 'settimana' | 'mese' | 'vecchie';
 
 function createGradientStyle(color: string) {
-  const hex = color.startsWith("#") ? color : "#6366F1";
+  const hex = color.startsWith('#') ? color : '#6366F1';
   return { background: `linear-gradient(180deg, ${hex}, ${hex}dd)` };
 }
 
@@ -37,63 +33,60 @@ function getDateGroup(date: Date): DateGroup {
   monthAgo.setMonth(monthAgo.getMonth() - 1);
 
   const d = new Date(date);
-  if (d >= today) return "oggi";
-  if (d >= yesterday) return "ieri";
-  if (d >= weekAgo) return "settimana";
-  if (d >= monthAgo) return "mese";
-  return "vecchie";
+  if (d >= today) return 'oggi';
+  if (d >= yesterday) return 'ieri';
+  if (d >= weekAgo) return 'settimana';
+  if (d >= monthAgo) return 'mese';
+  return 'vecchie';
 }
 
 export function ConversationSidebar({
   open,
   onOpenChange,
   characterId,
-  characterColor = "#6366F1",
+  characterColor = '#6366F1',
   onSelectConversation,
   onNewConversation,
 }: ConversationDrawerProps) {
-  const t = useTranslations("chat.conversation.sidebar");
+  const t = useTranslations('chat.conversation.sidebar');
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Create groupLabels object dynamically with translations
   const groupLabels: Record<DateGroup, string> = {
-    oggi: "Oggi",
-    ieri: "Ieri",
-    settimana: "Questa settimana",
-    mese: "Questo mese",
-    vecchie: "Più vecchie",
+    oggi: 'Oggi',
+    ieri: 'Ieri',
+    settimana: 'Questa settimana',
+    mese: 'Questo mese',
+    vecchie: 'Più vecchie',
   };
 
   const gradientStyle = createGradientStyle(characterColor);
-  const buttonBg = "bg-white/20 hover:bg-white/30";
+  const buttonBg = 'bg-white/20 hover:bg-white/30';
 
   const fetchConversations = useCallback(async () => {
     if (!open) return;
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.set("maestroId", characterId);
-      if (searchQuery) params.set("q", searchQuery);
+      params.set('maestroId', characterId);
+      if (searchQuery) params.set('q', searchQuery);
       const now = new Date();
-      if (dateFilter === "today") {
-        params.set(
-          "dateFrom",
-          new Date(now.setHours(0, 0, 0, 0)).toISOString(),
-        );
-      } else if (dateFilter === "week") {
+      if (dateFilter === 'today') {
+        params.set('dateFrom', new Date(now.setHours(0, 0, 0, 0)).toISOString());
+      } else if (dateFilter === 'week') {
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
-        params.set("dateFrom", weekAgo.toISOString());
-      } else if (dateFilter === "month") {
+        params.set('dateFrom', weekAgo.toISOString());
+      } else if (dateFilter === 'month') {
         const monthAgo = new Date(now);
         monthAgo.setMonth(monthAgo.getMonth() - 1);
-        params.set("dateFrom", monthAgo.toISOString());
+        params.set('dateFrom', monthAgo.toISOString());
       }
       const res = await fetch(`/api/conversations/search?${params}`);
       if (res.ok) {
@@ -107,7 +100,7 @@ export function ConversationSidebar({
         );
       }
     } catch (error) {
-      logger.error("Failed to fetch conversations", { error: String(error) });
+      logger.error('Failed to fetch conversations', { error: String(error) });
     } finally {
       setIsLoading(false);
     }
@@ -120,8 +113,8 @@ export function ConversationSidebar({
   useEffect(() => {
     if (!open) {
       setSelectedIds(new Set());
-      setSearchQuery("");
-      setDateFilter("all");
+      setSearchQuery('');
+      setDateFilter('all');
       setShowDeleteConfirm(false);
     }
   }, [open]);
@@ -158,8 +151,8 @@ export function ConversationSidebar({
   const handleDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
-      const res = await csrfFetch("/api/conversations/batch", {
-        method: "DELETE",
+      const res = await csrfFetch('/api/conversations/batch', {
+        method: 'DELETE',
         body: JSON.stringify({ ids: Array.from(selectedIds) }),
       });
       if (res.ok) {
@@ -168,19 +161,13 @@ export function ConversationSidebar({
         setShowDeleteConfirm(false);
       }
     } catch (error) {
-      logger.error("Failed to delete conversations", { error: String(error) });
+      logger.error('Failed to delete conversations', { error: String(error) });
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const groupOrder: DateGroup[] = [
-    "oggi",
-    "ieri",
-    "settimana",
-    "mese",
-    "vecchie",
-  ];
+  const groupOrder: DateGroup[] = ['oggi', 'ieri', 'settimana', 'mese', 'vecchie'];
 
   return (
     <AnimatePresence>
@@ -189,7 +176,7 @@ export function ConversationSidebar({
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 280, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          transition={{ duration: 0.2, ease: 'easeInOut' }}
           className="h-full flex-shrink-0 overflow-hidden rounded-2xl w-full sm:max-w-[280px]"
           style={gradientStyle}
         >
@@ -199,9 +186,9 @@ export function ConversationSidebar({
               <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center p-4 rounded-2xl">
                 <div className="bg-slate-800 rounded-xl p-4 max-w-[240px] text-center">
                   <p className="text-sm mb-3">
-                    {t("deleteConfirm.title", {
+                    {t('deleteConfirm.title', {
                       count: selectedIds.size,
-                      plural: selectedIds.size === 1 ? "e" : "i",
+                      plural: selectedIds.size === 1 ? 'e' : 'i',
                     })}
                   </p>
                   <div className="flex gap-2 justify-center">
@@ -211,7 +198,7 @@ export function ConversationSidebar({
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={isDeleting}
                     >
-                      {t("deleteConfirm.cancel")}
+                      {t('deleteConfirm.cancel')}
                     </Button>
                     <Button
                       size="sm"
@@ -219,9 +206,7 @@ export function ConversationSidebar({
                       onClick={handleDeleteConfirm}
                       disabled={isDeleting}
                     >
-                      {isDeleting
-                        ? t("deleteConfirm.deleting")
-                        : t("deleteConfirm.delete")}
+                      {isDeleting ? t('deleteConfirm.deleting') : t('deleteConfirm.delete')}
                     </Button>
                   </div>
                 </div>
@@ -230,7 +215,7 @@ export function ConversationSidebar({
 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">{t("title")}</h3>
+              <h3 className="text-sm font-semibold">{t('title')}</h3>
               <div className="flex items-center gap-1">
                 {selectedIds.size > 0 && (
                   <Button
@@ -238,8 +223,8 @@ export function ConversationSidebar({
                     size="icon"
                     onClick={handleDeleteClick}
                     className={cn(
-                      "rounded-full h-7 w-7",
-                      "bg-red-500/50 hover:bg-red-500/70 text-white",
+                      'rounded-full h-7 w-7',
+                      'bg-red-500/50 hover:bg-red-500/70 text-white',
                     )}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -249,7 +234,7 @@ export function ConversationSidebar({
                   variant="ghost"
                   size="icon"
                   onClick={onNewConversation}
-                  className={cn("rounded-full h-7 w-7", buttonBg, "text-white")}
+                  className={cn('rounded-full h-7 w-7', buttonBg, 'text-white')}
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </Button>
@@ -257,7 +242,7 @@ export function ConversationSidebar({
                   variant="ghost"
                   size="icon"
                   onClick={() => onOpenChange(false)}
-                  className={cn("rounded-full h-7 w-7", buttonBg, "text-white")}
+                  className={cn('rounded-full h-7 w-7', buttonBg, 'text-white')}
                 >
                   <X className="w-3.5 h-3.5" />
                 </Button>
@@ -268,7 +253,7 @@ export function ConversationSidebar({
             <div className="relative mb-3">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60" />
               <Input
-                placeholder={t("search.placeholder")}
+                placeholder={t('search.placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 h-8 text-xs bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/20"
@@ -277,24 +262,24 @@ export function ConversationSidebar({
 
             {/* Date filters */}
             <div className="flex gap-1 mb-3">
-              {(["all", "today", "week", "month"] as DateFilter[]).map((f) => (
+              {(['all', 'today', 'week', 'month'] as DateFilter[]).map((f) => (
                 <button
                   key={f}
                   onClick={() => setDateFilter(f)}
                   className={cn(
-                    "px-2 py-1 text-[10px] rounded-full transition-colors",
+                    'px-2 py-1 text-[10px] rounded-full transition-colors',
                     dateFilter === f
-                      ? "bg-white/30 text-white"
-                      : "bg-white/10 text-white/70 hover:bg-white/20",
+                      ? 'bg-white/30 text-white'
+                      : 'bg-white/10 text-white/70 hover:bg-white/20',
                   )}
                 >
-                  {f === "all"
-                    ? t("filters.all")
-                    : f === "today"
-                      ? t("filters.today")
-                      : f === "week"
-                        ? t("filters.week")
-                        : t("filters.month")}
+                  {f === 'all'
+                    ? t('filters.all')
+                    : f === 'today'
+                      ? t('filters.today')
+                      : f === 'week'
+                        ? t('filters.week')
+                        : t('filters.month')}
                 </button>
               ))}
             </div>
@@ -308,7 +293,7 @@ export function ConversationSidebar({
               ) : conversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-white/60">
                   <MessageSquare className="w-8 h-8 mb-2" />
-                  <p className="text-xs">{t("empty")}</p>
+                  <p className="text-xs">{t('empty')}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -326,10 +311,10 @@ export function ConversationSidebar({
                               key={conv.id}
                               onClick={() => onSelectConversation(conv.id)}
                               className={cn(
-                                "w-full text-left p-2 rounded-lg transition-colors",
+                                'w-full text-left p-2 rounded-lg transition-colors',
                                 selectedIds.has(conv.id)
-                                  ? "bg-white/30"
-                                  : "bg-white/10 hover:bg-white/20",
+                                  ? 'bg-white/30'
+                                  : 'bg-white/10 hover:bg-white/20',
                               )}
                             >
                               <div className="flex items-start gap-2">
@@ -342,7 +327,7 @@ export function ConversationSidebar({
                                 />
                                 <div className="flex-1 min-w-0">
                                   <p className="text-xs font-medium truncate">
-                                    {conv.title || "Conversazione"}
+                                    {conv.title || 'Conversazione'}
                                   </p>
                                   {conv.preview && (
                                     <p className="text-[10px] text-white/60 truncate mt-0.5">
@@ -351,7 +336,7 @@ export function ConversationSidebar({
                                   )}
                                   <div className="flex items-center gap-1 mt-1 text-[10px] text-white/50">
                                     <Calendar className="w-2.5 h-2.5" />
-                                    {conv.messageCount} {t("msg")}
+                                    {conv.messageCount} {t('msg')}
                                   </div>
                                 </div>
                               </div>

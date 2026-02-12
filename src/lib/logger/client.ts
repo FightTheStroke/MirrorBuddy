@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Client-side Logger for MirrorBuddy
@@ -12,9 +12,9 @@
  *   clientLogger.warn("Deprecated feature used", { feature: "oldApi" });
  */
 
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from '@sentry/nextjs';
 
-export type LogLevel = "error" | "warn" | "info" | "debug";
+export type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
 export interface ClientLogContext {
   component?: string;
@@ -22,55 +22,87 @@ export interface ClientLogContext {
   [key: string]: unknown;
 }
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
+const PII_FIELDS = [
+  'email',
+  'ip',
+  'name',
+  'firstName',
+  'lastName',
+  'phone',
+  'address',
+  'password',
+  'token',
+  'apiKey',
+  'secret',
+];
+
+function sanitizeContext(context?: ClientLogContext): ClientLogContext | undefined {
+  if (!context) return undefined;
+
+  const sanitized = { ...context };
+
+  if (isProduction) {
+    for (const field of PII_FIELDS) {
+      delete sanitized[field];
+    }
+
+    if (typeof sanitized.userId === 'string') {
+      sanitized.userId = `${sanitized.userId.substring(0, 8)}...`;
+    }
+  }
+
+  return sanitized;
+}
 
 /**
  * Send error to Sentry
  */
-function captureError(
-  message: string,
-  context?: ClientLogContext,
-  error?: unknown,
-): void {
+function captureError(message: string, context?: ClientLogContext, error?: unknown): void {
   const errorToCapture = error instanceof Error ? error : new Error(message);
+  const sanitizedContext = sanitizeContext(context);
 
   if (isProduction) {
     Sentry.captureException(errorToCapture, {
       tags: {
-        component: context?.component || "client",
-        source: "client-logger",
+        component: sanitizedContext?.component || 'client',
+        source: 'client-logger',
       },
       extra: {
         message,
-        ...context,
+        ...sanitizedContext,
         originalError: error ? String(error) : undefined,
       },
     });
   }
 
-  // Always log to console for visibility
-  console.error(`[ERROR] ${message}`, context, error);
+  if (!isProduction) {
+    console.error(`[ERROR] ${message}`, context, error);
+  }
 }
 
 /**
  * Send warning to Sentry
  */
 function captureWarning(message: string, context?: ClientLogContext): void {
+  const sanitizedContext = sanitizeContext(context);
+
   if (isProduction) {
     Sentry.captureMessage(message, {
-      level: "warning",
+      level: 'warning',
       tags: {
-        component: context?.component || "client",
-        source: "client-logger",
+        component: sanitizedContext?.component || 'client',
+        source: 'client-logger',
       },
       extra: {
-        ...context,
+        ...sanitizedContext,
       },
     });
   }
 
-  // Always log to console for visibility
-  console.warn(`[WARN] ${message}`, context);
+  if (!isProduction) {
+    console.warn(`[WARN] ${message}`, context);
+  }
 }
 
 /**
@@ -98,8 +130,7 @@ export const clientLogger = {
   /**
    * Log error - sent to Sentry in production
    */
-  error: (msg: string, ctx?: ClientLogContext, err?: unknown) =>
-    captureError(msg, ctx, err),
+  error: (msg: string, ctx?: ClientLogContext, err?: unknown) => captureError(msg, ctx, err),
 
   /**
    * Log warning - sent to Sentry in production
@@ -122,12 +153,9 @@ export const clientLogger = {
   child: (baseContext: ClientLogContext) => ({
     error: (msg: string, ctx?: ClientLogContext, err?: unknown) =>
       captureError(msg, { ...baseContext, ...ctx }, err),
-    warn: (msg: string, ctx?: ClientLogContext) =>
-      captureWarning(msg, { ...baseContext, ...ctx }),
-    info: (msg: string, ctx?: ClientLogContext) =>
-      logInfo(msg, { ...baseContext, ...ctx }),
-    debug: (msg: string, ctx?: ClientLogContext) =>
-      logDebug(msg, { ...baseContext, ...ctx }),
+    warn: (msg: string, ctx?: ClientLogContext) => captureWarning(msg, { ...baseContext, ...ctx }),
+    info: (msg: string, ctx?: ClientLogContext) => logInfo(msg, { ...baseContext, ...ctx }),
+    debug: (msg: string, ctx?: ClientLogContext) => logDebug(msg, { ...baseContext, ...ctx }),
   }),
 };
 

@@ -1,13 +1,14 @@
-import * as Sentry from "@sentry/nextjs";
-import { logger } from "@/lib/logger";
-import { ApiError } from "@/lib/api/pipe";
-import type { Middleware } from "./types";
+import { logger } from '@/lib/logger';
+import { ApiError } from '@/lib/api/pipe';
+import type { Middleware } from './types';
 
 /**
- * Sentry error capture middleware factory
+ * API error normalization middleware factory
  *
- * Wraps route handler to automatically capture 5xx errors to Sentry.
- * Logs all errors with structured context.
+ * Wraps route handler to:
+ * - Re-throw ApiError so pipe() can preserve status and payload semantics
+ * - Normalize unknown exceptions into generic 500 responses
+ * - Emit a single logger.error (which already forwards to Sentry)
  *
  * ApiError instances are re-thrown to let pipe() handle them with
  * proper status codes and messages. Unknown errors return generic 500.
@@ -20,44 +21,31 @@ export function withSentry(routeName: string): Middleware {
     try {
       return await next();
     } catch (error) {
-      // ApiError = intentional operational error with specific status/message.
-      // Re-throw so pipe() returns the proper status code and message.
-      // Only capture 5xx ApiErrors to Sentry (4xx are expected).
+      // ApiError = operational error with explicit status.
+      // Re-throw so pipe() keeps contract and response mapping.
       if (error instanceof ApiError) {
-        if (error.statusCode >= 500) {
-          Sentry.captureException(error, {
-            tags: { api: routeName, method: ctx.req.method },
-            extra: { url: ctx.req.url, userId: ctx.userId },
-          });
-        }
         throw error;
       }
 
-      // Unknown error: capture to Sentry and return generic 500
-      Sentry.captureException(error, {
-        tags: {
-          api: routeName,
-          method: ctx.req.method,
-        },
-        extra: {
-          url: ctx.req.url,
-          userId: ctx.userId,
-        },
-      });
-
+      // Unknown error: emit once through structured logger/Sentry bridge
       logger.error(
         `API Error: ${ctx.req.method} ${routeName}`,
-        { userId: ctx.userId },
+        {
+          userId: ctx.userId,
+          path: routeName,
+          method: ctx.req.method,
+          url: ctx.req.url,
+        },
         error,
       );
 
       return new Response(
         JSON.stringify({
-          error: "Internal server error",
+          error: 'Internal server error',
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
       );
     }

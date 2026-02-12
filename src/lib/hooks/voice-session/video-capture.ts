@@ -3,10 +3,10 @@
 // Camera stream, periodic JPEG capture, motion detection, auto-stop timer
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback, useRef, useState, useEffect } from "react";
-import { logger } from "@/lib/logger";
+import { useCallback, useRef, useState, useEffect } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 const CAPTURE_WIDTH = 640;
 const CAPTURE_HEIGHT = 360;
@@ -35,9 +35,7 @@ export interface UseVideoCaptureReturn {
   stopCapture: () => void;
 }
 
-export function useVideoCapture(
-  options: UseVideoCaptureOptions,
-): UseVideoCaptureReturn {
+export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptureReturn {
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [framesSent, setFramesSent] = useState(0);
@@ -77,14 +75,14 @@ export function useVideoCapture(
     if (prevFrameRef.current) {
       const diff = computeAvgDiff(prevFrameRef.current, current);
       if (diff < MOTION_THRESHOLD) {
-        logger.debug("[VideoCapture] Frame skipped (no motion)", { diff });
+        logger.debug('[VideoCapture] Frame skipped (no motion)', { diff });
         return;
       }
     }
     prevFrameRef.current = current;
 
-    const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
-    const base64 = dataUrl.split(",")[1];
+    const dataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+    const base64 = dataUrl.split(',')[1];
     if (base64) {
       onFrameRef.current(base64);
       setFramesSent((p) => p + 1);
@@ -109,7 +107,7 @@ export function useVideoCapture(
     }
     prevFrameRef.current = null;
     setIsCapturing(false);
-    logger.info("[VideoCapture] Capture stopped");
+    logger.info('[VideoCapture] Capture stopped');
   }, []);
 
   const startCapture = useCallback(async (): Promise<boolean> => {
@@ -118,23 +116,23 @@ export function useVideoCapture(
         video: {
           width: { ideal: CAPTURE_WIDTH },
           height: { ideal: CAPTURE_HEIGHT },
-          facingMode: "user",
+          facingMode: 'user',
         },
       });
       streamRef.current = stream;
 
-      const video = document.createElement("video");
+      const video = document.createElement('video');
       video.srcObject = stream;
       video.muted = true;
       video.playsInline = true;
       await video.play();
       videoElRef.current = video;
 
-      const canvas = document.createElement("canvas");
+      const canvas = document.createElement('canvas');
       canvas.width = CAPTURE_WIDTH;
       canvas.height = CAPTURE_HEIGHT;
       canvasRef.current = canvas;
-      ctxRef.current = canvas.getContext("2d");
+      ctxRef.current = canvas.getContext('2d');
 
       setVideoStream(stream);
       setIsCapturing(true);
@@ -150,16 +148,16 @@ export function useVideoCapture(
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
         setElapsedSeconds(elapsed);
         if (elapsed >= maxSecondsRef.current) {
-          logger.info("[VideoCapture] Max time reached", { elapsed });
+          logger.info('[VideoCapture] Max time reached', { elapsed });
           stopCapture();
           onAutoStopRef.current?.();
         }
       }, 1000);
 
-      logger.info("[VideoCapture] Capture started", { interval });
+      logger.info('[VideoCapture] Capture started', { interval });
       return true;
     } catch (error) {
-      logger.error("[VideoCapture] Failed to start", {
+      logger.error('[VideoCapture] Failed to start', {
         error: String(error),
       });
       return false;

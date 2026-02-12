@@ -3,11 +3,11 @@
 // User-initiated actions during voice session (WebRTC only)
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { logger } from "@/lib/logger";
-import type { RingBuffer } from "./ring-buffer";
+import { useCallback } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import type { RingBuffer } from './ring-buffer';
 
 export interface ActionRefs {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
@@ -22,10 +22,7 @@ export interface ActionRefs {
 /**
  * Toggle mute state for microphone input
  */
-export function useToggleMute(
-  isMuted: boolean,
-  setMuted: (value: boolean) => void,
-) {
+export function useToggleMute(isMuted: boolean, setMuted: (value: boolean) => void) {
   return useCallback(() => {
     setMuted(!isMuted);
   }, [isMuted, setMuted]);
@@ -38,7 +35,7 @@ function sendViaWebRTC(
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
   message: Record<string, unknown>,
 ): boolean {
-  if (webrtcDataChannelRef.current?.readyState === "open") {
+  if (webrtcDataChannelRef.current?.readyState === 'open') {
     webrtcDataChannelRef.current.send(JSON.stringify(message));
     return true;
   }
@@ -50,26 +47,24 @@ function sendViaWebRTC(
  */
 export function useSendText(
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
-  addTranscript: (role: "user" | "assistant", text: string) => void,
+  addTranscript: (role: 'user' | 'assistant', text: string) => void,
 ) {
   return useCallback(
     (text: string) => {
       const sent = sendViaWebRTC(webrtcDataChannelRef, {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "message",
-          role: "user",
-          content: [{ type: "input_text", text }],
+          type: 'message',
+          role: 'user',
+          content: [{ type: 'input_text', text }],
         },
       });
 
       if (sent) {
-        sendViaWebRTC(webrtcDataChannelRef, { type: "response.create" });
-        addTranscript("user", text);
+        sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
+        addTranscript('user', text);
       } else {
-        logger.warn(
-          "[VoiceSession] Failed to send text - WebRTC data channel not ready",
-        );
+        logger.warn('[VoiceSession] Failed to send text - WebRTC data channel not ready');
       }
     },
     [webrtcDataChannelRef, addTranscript],
@@ -79,22 +74,15 @@ export function useSendText(
 /**
  * Cancel current AI response and clear audio queue
  */
-export function useCancelResponse(
-  refs: ActionRefs,
-  setSpeaking: (value: boolean) => void,
-) {
+export function useCancelResponse(refs: ActionRefs, setSpeaking: (value: boolean) => void) {
   return useCallback(() => {
     // Only send response.cancel if Azure actually has an active response
     if (refs.hasActiveResponseRef.current) {
-      logger.debug("[VoiceSession] Cancelling active response");
+      logger.debug('[VoiceSession] Cancelling active response');
 
-      if (refs.webrtcDataChannelRef.current?.readyState === "open") {
-        refs.webrtcDataChannelRef.current.send(
-          JSON.stringify({ type: "response.cancel" }),
-        );
-        logger.debug(
-          "[VoiceSession] Sent response.cancel via WebRTC data channel",
-        );
+      if (refs.webrtcDataChannelRef.current?.readyState === 'open') {
+        refs.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+        logger.debug('[VoiceSession] Sent response.cancel via WebRTC data channel');
       }
 
       // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
@@ -104,7 +92,7 @@ export function useCancelResponse(
     // Pause WebRTC audio element if present
     if (refs.webrtcAudioElementRef.current) {
       refs.webrtcAudioElementRef.current.pause();
-      logger.debug("[VoiceSession] WebRTC audio element paused");
+      logger.debug('[VoiceSession] WebRTC audio element paused');
     }
 
     // Always clear local audio queue and stop scheduled sources
@@ -134,20 +122,20 @@ export function useSendVideoFrame(
   return useCallback(
     (base64ImageData: string) => {
       const sent = sendViaWebRTC(webrtcDataChannelRef, {
-        type: "conversation.item.create",
+        type: 'conversation.item.create',
         item: {
-          type: "message",
-          role: "user",
+          type: 'message',
+          role: 'user',
           content: [
             {
-              type: "input_image",
+              type: 'input_image',
               image_url: `data:image/jpeg;base64,${base64ImageData}`,
             },
           ],
         },
       });
       if (!sent) {
-        logger.warn("[VoiceSession] Video frame send failed - DC not ready");
+        logger.warn('[VoiceSession] Video frame send failed - DC not ready');
       }
       return sent;
     },
@@ -165,40 +153,40 @@ export function useSendWebcamResult(
     (callId: string, imageData: string | null) => {
       if (imageData) {
         sendViaWebRTC(webrtcDataChannelRef, {
-          type: "conversation.item.create",
+          type: 'conversation.item.create',
           item: {
-            type: "function_call_output",
+            type: 'function_call_output',
             call_id: callId,
             output: JSON.stringify({ success: true, image_captured: true }),
           },
         });
         sendViaWebRTC(webrtcDataChannelRef, {
-          type: "conversation.item.create",
+          type: 'conversation.item.create',
           item: {
-            type: "message",
-            role: "user",
+            type: 'message',
+            role: 'user',
             content: [
               {
-                type: "input_text",
-                text: "Ho scattato una foto. Chiedimi di descriverti cosa vedo.",
+                type: 'input_text',
+                text: 'Ho scattato una foto. Chiedimi di descriverti cosa vedo.',
               },
             ],
           },
         });
       } else {
         sendViaWebRTC(webrtcDataChannelRef, {
-          type: "conversation.item.create",
+          type: 'conversation.item.create',
           item: {
-            type: "function_call_output",
+            type: 'function_call_output',
             call_id: callId,
             output: JSON.stringify({
               success: false,
-              error: "Cattura annullata",
+              error: 'Cattura annullata',
             }),
           },
         });
       }
-      sendViaWebRTC(webrtcDataChannelRef, { type: "response.create" });
+      sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
     },
     [webrtcDataChannelRef],
   );

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { Video, XCircle, RefreshCw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { logger } from "@/lib/logger";
-import { useTranslations } from "next-intl";
+import { useState, useRef } from 'react';
+import { Video, XCircle, RefreshCw } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { useTranslations } from 'next-intl';
 
 interface WebcamPreviewProps {
   availableCameras: MediaDeviceInfo[];
@@ -20,7 +20,7 @@ export function WebcamPreview({
   onCameraChange,
   onRefresh,
 }: WebcamPreviewProps) {
-  const t = useTranslations("settings");
+  const t = useTranslations('settings');
   const [webcamActive, setWebcamActive] = useState(false);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const webcamStreamRef = useRef<MediaStream | null>(null);
@@ -42,7 +42,7 @@ export function WebcamPreview({
 
       setWebcamActive(true);
     } catch (error) {
-      logger.error("Webcam error", undefined, error);
+      logger.error('Webcam error', undefined, error);
       setWebcamActive(false);
     }
   };
@@ -63,14 +63,12 @@ export function WebcamPreview({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Video className="w-5 h-5 text-blue-500" />
-          {t("testWebcamLive")}
+          {t('testWebcamLive')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-slate-600 dark:text-slate-400">
-          {t("avviaIlTestPerVedereLAposAnteprimaDellaWebcamSelez")}
-
-
+          {t('avviaIlTestPerVedereLAposAnteprimaDellaWebcamSelez')}
         </p>
 
         <div className="flex items-center gap-3">
@@ -78,7 +76,7 @@ export function WebcamPreview({
             htmlFor="webcam-select"
             className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap"
           >
-            {t("webcam")}
+            {t('webcam')}
           </label>
           <select
             id="webcam-select"
@@ -88,7 +86,7 @@ export function WebcamPreview({
             className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {availableCameras.length === 0 ? (
-              <option value="">{t("nessunaWebcamTrovata")}</option>
+              <option value="">{t('nessunaWebcamTrovata')}</option>
             ) : (
               availableCameras.map((cam) => (
                 <option key={cam.deviceId} value={cam.deviceId}>
@@ -102,19 +100,14 @@ export function WebcamPreview({
             variant="outline"
             size="sm"
             disabled={webcamActive}
-            title={t("aggiornaListaWebcam")}
+            title={t('aggiornaListaWebcam')}
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
 
         <div className="relative rounded-lg overflow-hidden bg-slate-900 aspect-video">
-          <video
-            ref={videoPreviewRef}
-            className="w-full h-full object-cover"
-            muted
-            playsInline
-          />
+          <video ref={videoPreviewRef} className="w-full h-full object-cover" muted playsInline />
           {!webcamActive && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Video className="w-12 h-12 text-slate-600" />
@@ -123,9 +116,7 @@ export function WebcamPreview({
           {webcamActive && (
             <div className="absolute top-2 right-2 flex items-center gap-2">
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-              <span className="text-xs text-white bg-black/50 px-2 py-1 rounded">
-                LIVE
-              </span>
+              <span className="text-xs text-white bg-black/50 px-2 py-1 rounded">LIVE</span>
             </div>
           )}
         </div>
@@ -134,16 +125,12 @@ export function WebcamPreview({
           {!webcamActive ? (
             <Button onClick={startWebcam} className="flex-1" variant="default">
               <Video className="w-4 h-4 mr-2" />
-              {t("avviaWebcam")}
+              {t('avviaWebcam')}
             </Button>
           ) : (
-            <Button
-              onClick={stopWebcam}
-              className="flex-1"
-              variant="destructive"
-            >
+            <Button onClick={stopWebcam} className="flex-1" variant="destructive">
               <XCircle className="w-4 h-4 mr-2" />
-              {t("stopWebcam")}
+              {t('stopWebcam')}
             </Button>
           )}
         </div>

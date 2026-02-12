@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * StudyKitUpload Component
@@ -7,62 +7,55 @@
  * ADR 0038: Google Drive Integration support
  */
 
-import { useState, useRef, useCallback } from "react";
-import { UploadForm } from "./components/upload-form";
-import { UploadProgress } from "./components/upload-progress";
-import {
-  UnifiedFilePicker,
-  type SelectedFile,
-} from "@/components/google-drive";
-import { getUserId } from "@/lib/hooks/use-saved-materials/utils/user-id";
-import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
+import { useState, useRef, useCallback } from 'react';
+import { UploadForm } from './components/upload-form';
+import { UploadProgress } from './components/upload-progress';
+import { UnifiedFilePicker, type SelectedFile } from '@/components/google-drive';
+import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
+import { cn } from '@/lib/utils';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
 
 interface StudyKitUploadProps {
   onUploadComplete?: (studyKitId: string) => void;
   className?: string;
 }
 
-export function StudyKitUpload({
-  onUploadComplete,
-  className,
-}: StudyKitUploadProps) {
+export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [selectedDriveFile, setSelectedDriveFile] =
-    useState<SelectedFile | null>(null);
-  const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("");
+  const [selectedDriveFile, setSelectedDriveFile] = useState<SelectedFile | null>(null);
+  const [title, setTitle] = useState('');
+  const [subject, setSubject] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState<
-    "idle" | "uploading" | "processing" | "success" | "error"
-  >("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+    'idle' | 'uploading' | 'processing' | 'success' | 'error'
+  >('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [_studyKitId, setStudyKitId] = useState<string | null>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleFileSelect = useCallback(
     (selected: SelectedFile) => {
       // Validate file type
-      if (!selected.mimeType.includes("pdf")) {
-        setErrorMessage("Solo file PDF sono supportati");
+      if (!selected.mimeType.includes('pdf')) {
+        setErrorMessage('Solo file PDF sono supportati');
         return;
       }
 
-      setErrorMessage("");
+      setErrorMessage('');
 
-      if (selected.source === "local" && selected.file) {
+      if (selected.source === 'local' && selected.file) {
         setFile(selected.file);
         setSelectedDriveFile(null);
-      } else if (selected.source === "google-drive" && selected.driveFile) {
+      } else if (selected.source === 'google-drive' && selected.driveFile) {
         setFile(null);
         setSelectedDriveFile(selected);
       }
 
       // Auto-fill title from filename
       if (!title) {
-        const name = selected.name.replace(".pdf", "");
+        const name = selected.name.replace('.pdf', '');
         setTitle(name);
       }
     },
@@ -73,14 +66,14 @@ export function StudyKitUpload({
     try {
       const response = await fetch(`/api/study-kit/${id}`);
       if (!response.ok) {
-        throw new Error("Failed to check status");
+        throw new Error('Failed to check status');
       }
 
       const data = await response.json();
       const kit = data.studyKit;
 
-      if (kit.status === "ready") {
-        setUploadStatus("success");
+      if (kit.status === 'ready') {
+        setUploadStatus('success');
         setUploadProgress(100);
         setIsUploading(false);
         if (pollIntervalRef.current) {
@@ -88,9 +81,9 @@ export function StudyKitUpload({
           pollIntervalRef.current = null;
         }
         onUploadComplete?.(id);
-      } else if (kit.status === "error") {
-        setUploadStatus("error");
-        setErrorMessage(kit.errorMessage || "Errore durante la generazione");
+      } else if (kit.status === 'error') {
+        setUploadStatus('error');
+        setErrorMessage(kit.errorMessage || 'Errore durante la generazione');
         setIsUploading(false);
         if (pollIntervalRef.current) {
           clearInterval(pollIntervalRef.current);
@@ -99,29 +92,26 @@ export function StudyKitUpload({
       }
       // If still processing, continue polling
     } catch (error) {
-      logger.error("Failed to poll status", { error: String(error) });
+      logger.error('Failed to poll status', { error: String(error) });
     }
   };
 
   const handleUpload = async () => {
     if ((!file && !selectedDriveFile) || !title) {
-      setErrorMessage("File e titolo sono richiesti");
+      setErrorMessage('File e titolo sono richiesti');
       return;
     }
 
     setIsUploading(true);
-    setUploadStatus("uploading");
+    setUploadStatus('uploading');
     setUploadProgress(10);
-    setErrorMessage("");
+    setErrorMessage('');
 
     try {
       let uploadFile: File;
 
       // If Google Drive file, download it first
-      if (
-        selectedDriveFile?.source === "google-drive" &&
-        selectedDriveFile.driveFile
-      ) {
+      if (selectedDriveFile?.source === 'google-drive' && selectedDriveFile.driveFile) {
         setUploadProgress(20);
         const userId = getUserId();
         const downloadResponse = await fetch(
@@ -129,7 +119,7 @@ export function StudyKitUpload({
         );
 
         if (!downloadResponse.ok) {
-          throw new Error("Impossibile scaricare il file da Google Drive");
+          throw new Error('Impossibile scaricare il file da Google Drive');
         }
 
         const blob = await downloadResponse.blob();
@@ -139,21 +129,21 @@ export function StudyKitUpload({
       } else if (file) {
         uploadFile = file;
       } else {
-        throw new Error("Nessun file selezionato");
+        throw new Error('Nessun file selezionato');
       }
 
       // Create form data
       const formData = new FormData();
-      formData.append("file", uploadFile);
-      formData.append("title", title);
+      formData.append('file', uploadFile);
+      formData.append('title', title);
       if (subject) {
-        formData.append("subject", subject);
+        formData.append('subject', subject);
       }
 
       // Upload
       setUploadProgress(40);
-      const response = await csrfFetch("/api/study-kit/upload", {
-        method: "POST",
+      const response = await csrfFetch('/api/study-kit/upload', {
+        method: 'POST',
         body: formData,
       });
 
@@ -164,13 +154,13 @@ export function StudyKitUpload({
         // Include details if available for better debugging
         const message = error.details
           ? `${error.error}: ${error.details}`
-          : error.error || "Upload failed";
+          : error.error || 'Upload failed';
         throw new Error(message);
       }
 
       const data = await response.json();
       setStudyKitId(data.studyKitId);
-      setUploadStatus("processing");
+      setUploadStatus('processing');
       setUploadProgress(60);
 
       // Start polling for status
@@ -178,10 +168,8 @@ export function StudyKitUpload({
         pollStatus(data.studyKitId);
       }, 3000);
     } catch (error) {
-      setUploadStatus("error");
-      setErrorMessage(
-        error instanceof Error ? error.message : "Upload fallito",
-      );
+      setUploadStatus('error');
+      setErrorMessage(error instanceof Error ? error.message : 'Upload fallito');
       setIsUploading(false);
     }
   };
@@ -189,12 +177,12 @@ export function StudyKitUpload({
   const handleReset = () => {
     setFile(null);
     setSelectedDriveFile(null);
-    setTitle("");
-    setSubject("");
+    setTitle('');
+    setSubject('');
     setIsUploading(false);
     setUploadProgress(0);
-    setUploadStatus("idle");
-    setErrorMessage("");
+    setUploadStatus('idle');
+    setErrorMessage('');
     setStudyKitId(null);
     if (pollIntervalRef.current) {
       clearInterval(pollIntervalRef.current);
@@ -205,13 +193,13 @@ export function StudyKitUpload({
   const hasFile = file !== null || selectedDriveFile !== null;
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {uploadStatus === "idle" && (
+    <div className={cn('space-y-6', className)}>
+      {uploadStatus === 'idle' && (
         <UnifiedFilePicker
           userId={getUserId()}
           onFileSelect={handleFileSelect}
           accept=".pdf"
-          acceptedMimeTypes={["application/pdf"]}
+          acceptedMimeTypes={['application/pdf']}
           maxSizeMB={10}
           label="Carica il tuo PDF"
           description="Seleziona un file PDF dal computer o da Google Drive per generare il tuo Study Kit"
@@ -219,7 +207,7 @@ export function StudyKitUpload({
         />
       )}
 
-      {hasFile && uploadStatus === "idle" && (
+      {hasFile && uploadStatus === 'idle' && (
         <UploadForm
           title={title}
           subject={subject}

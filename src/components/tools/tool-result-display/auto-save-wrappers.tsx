@@ -19,7 +19,7 @@ import { LiveMindmap } from '../live-mindmap';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { debouncedAutoSave } from './auto-save-utils';
 import toast from '@/components/ui/toast';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { escapeHtml } from '@/lib/tools/accessible-print/helpers';
 import type {
   QuizRequest,

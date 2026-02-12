@@ -3,36 +3,29 @@
 // Azure Realtime API session setup (WebRTC only)
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { logger } from "@/lib/logger";
-import { useSettingsStore } from "@/lib/stores";
-import { useAccessibilityStore } from "@/lib/accessibility";
-import type { Maestro } from "@/types";
-import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from "@/lib/voice";
-import {
-  fetchConversationMemory,
-  buildMemoryContext,
-  sanitizeHtmlComments,
-} from "./memory-utils";
-import type { UseVoiceSessionOptions } from "./types";
+import { useCallback } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { useSettingsStore } from '@/lib/stores';
+import { useAccessibilityStore } from '@/lib/accessibility';
+import type { Maestro } from '@/types';
+import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
+import { fetchConversationMemory, buildMemoryContext, sanitizeHtmlComments } from './memory-utils';
+import type { UseVoiceSessionOptions } from './types';
 import {
   TRANSCRIPTION_LANGUAGES,
   TRANSCRIPTION_PROMPTS,
   BILINGUAL_PROMPTS,
   buildLanguageInstruction,
   buildCharacterInstruction,
-} from "./session-constants";
-import {
-  getAdaptiveVadConfig,
-  formatVadConfigForLogging,
-} from "./adaptive-vad";
+} from './session-constants';
+import { getAdaptiveVadConfig, formatVadConfigForLogging } from './adaptive-vad';
 
 // Re-export useSendGreeting from dedicated module
-export { useSendGreeting } from "./send-greeting";
+export { useSendGreeting } from './send-greeting';
 
-type InitialMessage = { role: "user" | "assistant"; content: string };
+type InitialMessage = { role: 'user' | 'assistant'; content: string };
 
 /**
  * Send session configuration to Azure Realtime API via WebRTC
@@ -41,9 +34,7 @@ export function useSendSessionConfig(
   maestroRef: React.MutableRefObject<Maestro | null>,
   setConnected: (value: boolean) => void,
   setCurrentMaestro: (maestro: Maestro | null) => void,
-  setConnectionState: (
-    state: "idle" | "connecting" | "connected" | "error",
-  ) => void,
+  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void,
   options: UseVoiceSessionOptions,
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
   initialMessagesRef: React.MutableRefObject<InitialMessage[] | null>,
@@ -54,21 +45,17 @@ export function useSendSessionConfig(
     const dataChannel = webrtcDataChannelRef.current;
 
     if (!maestro) {
-      logger.error(
-        "[VoiceSession] Cannot send session config: missing maestro",
-      );
+      logger.error('[VoiceSession] Cannot send session config: missing maestro');
       return;
     }
 
-    if (!dataChannel || dataChannel.readyState !== "open") {
-      logger.error(
-        "[VoiceSession] Cannot send session config: WebRTC data channel not ready",
-      );
+    if (!dataChannel || dataChannel.readyState !== 'open') {
+      logger.error('[VoiceSession] Cannot send session config: WebRTC data channel not ready');
       return;
     }
 
     const appearance = useSettingsStore.getState().appearance;
-    const userLanguage = appearance?.language || "it";
+    const userLanguage = appearance?.language || 'it';
 
     // Get accessibility settings for adaptive VAD (ADR-0069)
     const a11yState = useAccessibilityStore.getState();
@@ -76,31 +63,31 @@ export function useSendSessionConfig(
     const adaptiveVadEnabled = a11yState.settings.adaptiveVadEnabled;
     const vadConfig = getAdaptiveVadConfig(activeProfile, adaptiveVadEnabled);
 
-    logger.info("[VoiceSession] Adaptive VAD config", {
-      activeProfile: activeProfile ?? "none",
+    logger.info('[VoiceSession] Adaptive VAD config', {
+      activeProfile: activeProfile ?? 'none',
       adaptiveVadEnabled,
       config: formatVadConfigForLogging(vadConfig, activeProfile),
     });
 
     // Language teacher detection
     const isLanguageTeacher =
-      maestro.subject === "english" ||
-      maestro.subject === "spanish" ||
-      maestro.subject === "french" ||
-      maestro.subject === "german";
+      maestro.subject === 'english' ||
+      maestro.subject === 'spanish' ||
+      maestro.subject === 'french' ||
+      maestro.subject === 'german';
     const targetLanguage =
-      maestro.subject === "english"
-        ? "en"
-        : maestro.subject === "spanish"
-          ? "es"
-          : maestro.subject === "french"
-            ? "fr"
-            : maestro.subject === "german"
-              ? "de"
+      maestro.subject === 'english'
+        ? 'en'
+        : maestro.subject === 'spanish'
+          ? 'es'
+          : maestro.subject === 'french'
+            ? 'fr'
+            : maestro.subject === 'german'
+              ? 'de'
               : null;
 
     // Debug logging for language configuration
-    logger.info("[VoiceSession] Language config", {
+    logger.info('[VoiceSession] Language config', {
       maestroId: maestro.id,
       maestroSubject: maestro.subject,
       userLanguage,
@@ -109,7 +96,7 @@ export function useSendSessionConfig(
     });
 
     // Fetch conversation memory
-    let memoryContext = "";
+    let memoryContext = '';
     try {
       const memory = await fetchConversationMemory(maestro.id);
       memoryContext = buildMemoryContext(memory);
@@ -117,20 +104,16 @@ export function useSendSessionConfig(
       // Continue without memory
     }
 
-    let adaptiveInstruction = "";
+    let adaptiveInstruction = '';
     try {
-      const subjectParam = maestro.subject
-        ? `subject=${encodeURIComponent(maestro.subject)}`
-        : "";
-      const response = await fetch(
-        `/api/adaptive/context?${subjectParam}&source=voice`,
-      );
+      const subjectParam = maestro.subject ? `subject=${encodeURIComponent(maestro.subject)}` : '';
+      const response = await fetch(`/api/adaptive/context?${subjectParam}&source=voice`);
       if (response.ok) {
         const data = await response.json();
-        adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : "";
+        adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : '';
       }
     } catch (error) {
-      logger.warn("[VoiceSession] Adaptive context unavailable", {
+      logger.warn('[VoiceSession] Adaptive context unavailable', {
         error: String(error),
       });
     }
@@ -144,15 +127,15 @@ export function useSendSessionConfig(
     const characterInstruction = buildCharacterInstruction(maestro.name);
     const voicePersonality = maestro.voiceInstructions
       ? `\n## Voice Personality\n${sanitizeHtmlComments(maestro.voiceInstructions)}\n`
-      : "";
+      : '';
 
     // Truncate system prompt for voice (Azure works better with shorter instructions)
     const truncatedSystemPrompt = maestro.systemPrompt
       ? sanitizeHtmlComments(maestro.systemPrompt)
-          .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, "")
+          .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '')
           .slice(0, 800)
           .trim()
-      : "";
+      : '';
 
     const fullInstructions =
       languageInstruction +
@@ -163,37 +146,32 @@ export function useSendSessionConfig(
       voicePersonality +
       TOOL_USAGE_INSTRUCTIONS;
 
-    logger.debug(
-      `[VoiceSession] Instructions length: ${fullInstructions.length} chars`,
-    );
+    logger.debug(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 
     // Build session config
     const sessionConfig = {
-      type: "session.update",
+      type: 'session.update',
       session: {
-        voice: maestro.voice || "alloy",
+        voice: maestro.voice || 'alloy',
         instructions: fullInstructions,
-        input_audio_format: "pcm16",
-        output_audio_format: "pcm16",
+        input_audio_format: 'pcm16',
+        output_audio_format: 'pcm16',
         input_audio_noise_reduction: {
           type: options.noiseReductionType || vadConfig.noise_reduction,
         },
         input_audio_transcription: {
-          model: "whisper-1",
+          model: 'whisper-1',
           ...(isLanguageTeacher && targetLanguage
             ? {
-                prompt:
-                  BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
+                prompt: BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
               }
             : {
-                language: TRANSCRIPTION_LANGUAGES[userLanguage] || "it",
-                prompt:
-                  TRANSCRIPTION_PROMPTS[userLanguage] ||
-                  TRANSCRIPTION_PROMPTS.it,
+                language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
+                prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
               }),
         },
         turn_detection: {
-          type: "server_vad",
+          type: 'server_vad',
           threshold: vadConfig.threshold,
           prefix_padding_ms: vadConfig.prefix_padding_ms,
           silence_duration_ms: vadConfig.silence_duration_ms,
@@ -205,13 +183,13 @@ export function useSendSessionConfig(
       },
     };
 
-    logger.debug("[VoiceSession] Sending session.update via WebRTC");
+    logger.debug('[VoiceSession] Sending session.update via WebRTC');
     dataChannel.send(JSON.stringify(sessionConfig));
 
     // Inject conversation history for context continuity
     const initialMessages = initialMessagesRef.current;
     if (initialMessages && initialMessages.length > 0) {
-      logger.debug("[VoiceSession] Injecting conversation history", {
+      logger.debug('[VoiceSession] Injecting conversation history', {
         count: initialMessages.length,
       });
 
@@ -219,11 +197,11 @@ export function useSendSessionConfig(
       for (const msg of initialMessages) {
         dataChannel.send(
           JSON.stringify({
-            type: "conversation.item.create",
+            type: 'conversation.item.create',
             item: {
-              type: "message",
+              type: 'message',
               role: msg.role,
-              content: [{ type: "input_text", text: msg.content }],
+              content: [{ type: 'input_text', text: msg.content }],
             },
           }),
         );
@@ -235,15 +213,13 @@ export function useSendSessionConfig(
       // Clear the initial messages to avoid re-injection
       initialMessagesRef.current = null;
 
-      logger.debug(
-        "[VoiceSession] Conversation history injected, greeting skipped",
-      );
+      logger.debug('[VoiceSession] Conversation history injected, greeting skipped');
     }
 
     setConnected(true);
     setCurrentMaestro(maestro);
-    setConnectionState("connected");
-    options.onStateChange?.("connected");
+    setConnectionState('connected');
+    options.onStateChange?.('connected');
   }, [
     maestroRef,
     setConnected,

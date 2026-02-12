@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { parseSSEStream, fetchStreamingResponse } from './sse-parser';
 import type {
   StreamingState,
@@ -76,66 +76,69 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
     setStreamingState('idle');
   }, [cancelStream]);
 
-  const sendStreamingMessage = useCallback(async (params: StreamingMessageParams) => {
-    const { messages, systemPrompt, maestroId, enableMemory = true } = params;
+  const sendStreamingMessage = useCallback(
+    async (params: StreamingMessageParams) => {
+      const { messages, systemPrompt, maestroId, enableMemory = true } = params;
 
-    cancelStream();
-    setStreamedContent('');
-    setUsage(null);
-    setWasFiltered(false);
-    setError(null);
-    setStreamingState('streaming');
+      cancelStream();
+      setStreamedContent('');
+      setUsage(null);
+      setWasFiltered(false);
+      setError(null);
+      setStreamingState('streaming');
 
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
 
-    try {
-      const response = await fetchStreamingResponse(
-        messages,
-        systemPrompt,
-        maestroId,
-        enableMemory,
-        abortController.signal
-      );
+      try {
+        const response = await fetchStreamingResponse(
+          messages,
+          systemPrompt,
+          maestroId,
+          enableMemory,
+          abortController.signal,
+        );
 
-      const reader = response.body!.getReader();
+        const reader = response.body!.getReader();
 
-      await parseSSEStream(reader, {
-        onContent: (content, accumulated) => {
-          setStreamedContent(accumulated);
-          callbacksRef.current.onChunk?.(content, accumulated);
-        },
-        onUsage: (u) => {
-          setUsage(u);
-        },
-        onFiltered: () => {
-          setWasFiltered(true);
-          callbacksRef.current.onContentFiltered?.();
-        },
-        onError: (err) => {
-          throw err;
-        },
-        onDone: (accumulated, u) => {
-          setStreamingState('complete');
-          callbacksRef.current.onComplete?.(accumulated, u);
-        },
-      });
-    } catch (err) {
-      if ((err as Error).name === 'AbortError') {
-        logger.debug('[StreamingChat] Aborted');
-        setStreamingState('idle');
-        return;
+        await parseSSEStream(reader, {
+          onContent: (content, accumulated) => {
+            setStreamedContent(accumulated);
+            callbacksRef.current.onChunk?.(content, accumulated);
+          },
+          onUsage: (u) => {
+            setUsage(u);
+          },
+          onFiltered: () => {
+            setWasFiltered(true);
+            callbacksRef.current.onContentFiltered?.();
+          },
+          onError: (err) => {
+            throw err;
+          },
+          onDone: (accumulated, u) => {
+            setStreamingState('complete');
+            callbacksRef.current.onComplete?.(accumulated, u);
+          },
+        });
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') {
+          logger.debug('[StreamingChat] Aborted');
+          setStreamingState('idle');
+          return;
+        }
+
+        const errorMessage = (err as Error).message || 'Streaming failed';
+        logger.error('[StreamingChat] Error', { errorDetails: errorMessage });
+        setError(errorMessage);
+        setStreamingState('error');
+        callbacksRef.current.onError?.(err as Error);
+      } finally {
+        abortControllerRef.current = null;
       }
-
-      const errorMessage = (err as Error).message || 'Streaming failed';
-      logger.error('[StreamingChat] Error', { errorDetails: errorMessage });
-      setError(errorMessage);
-      setStreamingState('error');
-      callbacksRef.current.onError?.(err as Error);
-    } finally {
-      abortControllerRef.current = null;
-    }
-  }, [cancelStream]);
+    },
+    [cancelStream],
+  );
 
   return {
     streamingState,

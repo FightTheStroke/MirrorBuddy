@@ -3,13 +3,13 @@
 // Wires video capture hook with usage tracking API and data channel
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import { useVideoCapture } from "./video-capture";
-import { useSendVideoFrame } from "./actions";
+import { useCallback, useState } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
+import { useVideoCapture } from './video-capture';
+import { useSendVideoFrame } from './actions';
 
 interface VideoVisionRefs {
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
@@ -41,17 +41,17 @@ export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
       const usageId = vrefs.videoUsageIdRef.current;
       if (!usageId) return;
       try {
-        await csrfFetch("/api/video-vision/usage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        await csrfFetch('/api/video-vision/usage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: "end",
+            action: 'end',
             usageId,
             secondsUsed: seconds,
           }),
         });
       } catch (e) {
-        logger.error("[VideoVision] Failed to end session", {
+        logger.error('[VideoVision] Failed to end session', {
           error: String(e),
         });
       }
@@ -79,25 +79,22 @@ export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
     }
 
     try {
-      const res = await csrfFetch("/api/video-vision/usage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await csrfFetch('/api/video-vision/usage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: "start",
-          voiceSessionId: vrefs.sessionIdRef.current || "unknown",
+          action: 'start',
+          voiceSessionId: vrefs.sessionIdRef.current || 'unknown',
         }),
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "unknown" }));
+        const err = await res.json().catch(() => ({ error: 'unknown' }));
         const reason = err.error as string;
-        logger.warn("[VideoVision] Start denied", {
+        logger.warn('[VideoVision] Start denied', {
           status: res.status,
           reason,
         });
-        if (
-          reason === "monthly_limit_reached" ||
-          reason === "video_vision_disabled"
-        ) {
+        if (reason === 'monthly_limit_reached' || reason === 'video_vision_disabled') {
           setLimitReached(true);
         }
         return;
@@ -109,7 +106,7 @@ export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
       vrefs.videoMaxSecondsRef.current = data.maxSeconds;
       await capture.startCapture();
     } catch (e) {
-      logger.error("[VideoVision] Failed to start", { error: String(e) });
+      logger.error('[VideoVision] Failed to start', { error: String(e) });
     }
   }, [capture, endUsageSession, vrefs]);
 

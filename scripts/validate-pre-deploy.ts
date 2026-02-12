@@ -144,7 +144,6 @@ function validateCriticalEnvVars(): void {
     // Misc
     { name: 'PROTECTED_USERS', sensitive: false },
     { name: 'TRIAL_BUDGET_LIMIT_EUR', sensitive: false },
-    { name: 'BRAVE_SEARCH_API_KEY', sensitive: true },
   ];
 
   for (const envVar of critical) {
@@ -192,6 +191,8 @@ function validateOptionalEnvVars(): void {
     { name: 'LIVEKIT_API_KEY', category: 'LiveKit' },
     { name: 'LIVEKIT_API_SECRET', category: 'LiveKit' },
     { name: 'NEXT_PUBLIC_LIVEKIT_URL', category: 'LiveKit' },
+    // Brave Search
+    { name: 'BRAVE_SEARCH_API_KEY', category: 'Brave Search' },
     // Public URLs
     { name: 'NEXT_PUBLIC_SITE_URL', category: 'SEO' },
     { name: 'NEXT_PUBLIC_APP_URL', category: 'App' },

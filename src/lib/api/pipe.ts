@@ -18,9 +18,8 @@
  * ```
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import * as Sentry from "@sentry/nextjs";
-import { logger } from "@/lib/logger";
+import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 /**
  * Custom API Error with status code
@@ -33,7 +32,7 @@ export class ApiError extends Error {
     public details?: unknown,
   ) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
   }
 }
 
@@ -149,7 +148,7 @@ export function pipe(...middlewares: Middleware[]) {
         const response = await next();
 
         // Log successful requests (debug level)
-        logger.debug("API request completed", {
+        logger.debug('API request completed', {
           method: routeInfo.method,
           path: routeInfo.path,
           status: response.status,
@@ -158,31 +157,24 @@ export function pipe(...middlewares: Middleware[]) {
 
         return response;
       } catch (error) {
-        // Determine status code
         const statusCode = error instanceof ApiError ? error.statusCode : 500;
 
-        // Only capture 5xx errors to Sentry (client errors are expected)
+        // Log error with context
+        const errorMessage = error instanceof Error ? error.message : String(error);
         if (statusCode >= 500) {
-          Sentry.captureException(error, {
-            tags: {
-              api: routeInfo.path,
-              method: routeInfo.method,
-            },
-            extra: {
-              url: req.url,
-              statusCode,
-            },
+          logger.error(
+            `API Error: ${routeInfo.method} ${routeInfo.path}`,
+            { statusCode, path: routeInfo.path, method: routeInfo.method },
+            error,
+          );
+        } else {
+          logger.warn(`API handled error: ${routeInfo.method} ${routeInfo.path}`, {
+            statusCode,
+            path: routeInfo.path,
+            method: routeInfo.method,
+            detail: errorMessage,
           });
         }
-
-        // Log error with context
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(
-          `API Error: ${routeInfo.method} ${routeInfo.path}`,
-          { statusCode },
-          error,
-        );
 
         // Build error response
         const response: Record<string, unknown> = {
@@ -204,11 +196,9 @@ export function pipe(...middlewares: Middleware[]) {
  * Re-exported from error-handler.ts for convenience
  */
 export const errors = {
-  unauthorized: (message = "Unauthorized") => new ApiError(message, 401),
-  forbidden: (message = "Forbidden") => new ApiError(message, 403),
-  notFound: (message = "Not found") => new ApiError(message, 404),
-  badRequest: (message: string, details?: unknown) =>
-    new ApiError(message, 400, details),
-  internal: (message: string, details?: unknown) =>
-    new ApiError(message, 500, details),
+  unauthorized: (message = 'Unauthorized') => new ApiError(message, 401),
+  forbidden: (message = 'Forbidden') => new ApiError(message, 403),
+  notFound: (message = 'Not found') => new ApiError(message, 404),
+  badRequest: (message: string, details?: unknown) => new ApiError(message, 400, details),
+  internal: (message: string, details?: unknown) => new ApiError(message, 500, details),
 };

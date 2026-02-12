@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
-import DOMPurify from "dompurify";
-import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
-import type { DiagramRequest } from "@/types";
-import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from 'react';
+import { useTheme } from 'next-themes';
+import { motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
+import { cn } from '@/lib/utils';
+import { clientLogger as logger } from '@/lib/logger/client';
+import type { DiagramRequest } from '@/types';
+import { useTranslations } from 'next-intl';
 
 // Mermaid type for ref - avoids static import that bundles the library
 type MermaidAPI = {
@@ -16,43 +16,43 @@ type MermaidAPI = {
 };
 
 // Mermaid configuration - theme-aware
-type MermaidTheme = "default" | "dark" | "neutral" | "forest" | "base";
+type MermaidTheme = 'default' | 'dark' | 'neutral' | 'forest' | 'base';
 const getMermaidConfig = (isDark: boolean) => ({
   startOnLoad: false,
-  theme: (isDark ? "dark" : "default") as MermaidTheme,
+  theme: (isDark ? 'dark' : 'default') as MermaidTheme,
   themeVariables: isDark
     ? {
-        primaryColor: "#3b82f6",
-        primaryTextColor: "#f1f5f9",
-        primaryBorderColor: "#64748b",
-        lineColor: "#64748b",
-        secondaryColor: "#1e293b",
-        tertiaryColor: "#0f172a",
-        background: "#1e293b",
-        mainBkg: "#1e293b",
-        nodeBorder: "#64748b",
-        clusterBkg: "#0f172a",
-        clusterBorder: "#334155",
-        titleColor: "#f1f5f9",
-        edgeLabelBackground: "#1e293b",
+        primaryColor: '#3b82f6',
+        primaryTextColor: '#f1f5f9',
+        primaryBorderColor: '#64748b',
+        lineColor: '#64748b',
+        secondaryColor: '#1e293b',
+        tertiaryColor: '#0f172a',
+        background: '#1e293b',
+        mainBkg: '#1e293b',
+        nodeBorder: '#64748b',
+        clusterBkg: '#0f172a',
+        clusterBorder: '#334155',
+        titleColor: '#f1f5f9',
+        edgeLabelBackground: '#1e293b',
       }
     : {
-        primaryColor: "#3b82f6",
-        primaryTextColor: "#1e293b",
-        primaryBorderColor: "#94a3b8",
-        lineColor: "#94a3b8",
-        secondaryColor: "#f1f5f9",
-        tertiaryColor: "#ffffff",
-        background: "#ffffff",
-        mainBkg: "#f8fafc",
-        nodeBorder: "#cbd5e1",
-        clusterBkg: "#f1f5f9",
-        clusterBorder: "#e2e8f0",
-        titleColor: "#1e293b",
-        edgeLabelBackground: "#ffffff",
+        primaryColor: '#3b82f6',
+        primaryTextColor: '#1e293b',
+        primaryBorderColor: '#94a3b8',
+        lineColor: '#94a3b8',
+        secondaryColor: '#f1f5f9',
+        tertiaryColor: '#ffffff',
+        background: '#ffffff',
+        mainBkg: '#f8fafc',
+        nodeBorder: '#cbd5e1',
+        clusterBkg: '#f1f5f9',
+        clusterBorder: '#e2e8f0',
+        titleColor: '#1e293b',
+        edgeLabelBackground: '#ffffff',
       },
   flowchart: {
-    curve: "basis" as const,
+    curve: 'basis' as const,
     padding: 20,
   },
   sequence: {
@@ -70,9 +70,9 @@ interface DiagramRendererProps {
 }
 
 export function DiagramRenderer({ request, className }: DiagramRendererProps) {
-  const t = useTranslations("tools");
+  const t = useTranslations('tools');
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const isDark = resolvedTheme === 'dark';
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
@@ -92,15 +92,12 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
 
         // Lazy load mermaid library with race condition protection
         // Re-initialize if theme changed
-        const themeChanged =
-          lastThemeRef.current !== null && lastThemeRef.current !== isDark;
+        const themeChanged = lastThemeRef.current !== null && lastThemeRef.current !== isDark;
         if (!mermaidRef.current || themeChanged) {
           if (!loadingPromiseRef.current || themeChanged) {
-            loadingPromiseRef.current = import("mermaid").then((module) => {
+            loadingPromiseRef.current = import('mermaid').then((module) => {
               module.default.initialize(
-                getMermaidConfig(isDark) as Parameters<
-                  typeof module.default.initialize
-                >[0],
+                getMermaidConfig(isDark) as Parameters<typeof module.default.initialize>[0],
               );
               return module.default;
             });
@@ -110,7 +107,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         }
 
         // Clear previous content
-        containerRef.current.innerHTML = "";
+        containerRef.current.innerHTML = '';
 
         // Generate unique ID
         const id = `mermaid-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
@@ -122,7 +119,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
           // Sanitize SVG to prevent XSS attacks
           const sanitizedSvg = DOMPurify.sanitize(svg, {
             USE_PROFILES: { svg: true, svgFilters: true },
-            ADD_TAGS: ["use"],
+            ADD_TAGS: ['use'],
           });
           containerRef.current.innerHTML = sanitizedSvg;
           setRendered(true);
@@ -130,7 +127,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         setError(errorMsg);
-        logger.error("Mermaid render error", { error: String(err) });
+        logger.error('Mermaid render error', { error: String(err) });
       } finally {
         setIsLoading(false);
       }
@@ -144,7 +141,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
+        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800',
         className,
       )}
     >
@@ -161,15 +158,15 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       <div className="p-4">
         {error ? (
           <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
-            <strong>{t("diagramError")}</strong> {error}
+            <strong>{t('diagramError')}</strong> {error}
           </div>
         ) : (
           <div
             ref={containerRef}
             className={cn(
-              "flex justify-center items-center min-h-[200px]",
+              'flex justify-center items-center min-h-[200px]',
               (isLoading || !rendered) &&
-                "animate-pulse bg-slate-200 dark:bg-slate-700/50 rounded-lg",
+                'animate-pulse bg-slate-200 dark:bg-slate-700/50 rounded-lg',
             )}
           />
         )}
@@ -178,7 +175,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       {/* Source code toggle */}
       <details className="border-t border-slate-200 dark:border-slate-700">
         <summary className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50">
-          {t("viewSource")}
+          {t('viewSource')}
         </summary>
         <pre className="p-4 text-xs text-slate-600 dark:text-slate-400 overflow-x-auto bg-slate-100 dark:bg-slate-900/50">
           {request.code}
@@ -192,36 +189,31 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
 export const diagramTemplates = {
   flowchart: (steps: string[]) => `
 flowchart TD
-${steps.map((step, i) => `    S${i}["${step}"]`).join("\n")}
+${steps.map((step, i) => `    S${i}["${step}"]`).join('\n')}
 ${steps
   .slice(0, -1)
   .map((_, i) => `    S${i} --> S${i + 1}`)
-  .join("\n")}
+  .join('\n')}
 `,
 
-  sequence: (
-    actors: string[],
-    messages: Array<{ from: string; to: string; text: string }>,
-  ) => `
+  sequence: (actors: string[], messages: Array<{ from: string; to: string; text: string }>) => `
 sequenceDiagram
-${actors.map((a) => `    participant ${a}`).join("\n")}
-${messages.map((m) => `    ${m.from}->>+${m.to}: ${m.text}`).join("\n")}
+${actors.map((a) => `    participant ${a}`).join('\n')}
+${messages.map((m) => `    ${m.from}->>+${m.to}: ${m.text}`).join('\n')}
 `,
 
   // Mind maps use MarkMap - see markmap-renderer.tsx and ADR 0001
 
-  classDiagram: (
-    classes: Array<{ name: string; attributes: string[]; methods: string[] }>,
-  ) => `
+  classDiagram: (classes: Array<{ name: string; attributes: string[]; methods: string[] }>) => `
 classDiagram
 ${classes
   .map(
     (c) => `    class ${c.name} {
-${c.attributes.map((a) => `        ${a}`).join("\n")}
-${c.methods.map((m) => `        ${m}()`).join("\n")}
+${c.attributes.map((a) => `        ${a}`).join('\n')}
+${c.methods.map((m) => `        ${m}()`).join('\n')}
     }`,
   )
-  .join("\n")}
+  .join('\n')}
 `,
 
   stateDiagram: (
@@ -229,6 +221,6 @@ ${c.methods.map((m) => `        ${m}()`).join("\n")}
     transitions: Array<{ from: string; to: string; label?: string }>,
   ) => `
 stateDiagram-v2
-${transitions.map((t) => `    ${t.from} --> ${t.to}${t.label ? `: ${t.label}` : ""}`).join("\n")}
+${transitions.map((t) => `    ${t.from} --> ${t.to}${t.label ? `: ${t.label}` : ''}`).join('\n')}
 `,
 };

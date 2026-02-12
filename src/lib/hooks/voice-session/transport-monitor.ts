@@ -3,26 +3,15 @@
 // Runtime monitoring of WebRTC connection quality
 // ============================================================================
 
-"use client";
+'use client';
 
-import { logger } from "@/lib/logger";
-import { invalidateCache } from "./transport-cache";
-import {
-  calculateAverageLatency,
-  isLatencySpike,
-} from "./transport-monitor-helpers";
-import type {
-  ConnectionMetrics,
-  DegradationEvent,
-  DegradationCallback,
-} from "./transport-types";
+import { clientLogger as logger } from '@/lib/logger/client';
+import { invalidateCache } from './transport-cache';
+import { calculateAverageLatency, isLatencySpike } from './transport-monitor-helpers';
+import type { ConnectionMetrics, DegradationEvent, DegradationCallback } from './transport-types';
 
 // Re-export types
-export type {
-  ConnectionMetrics,
-  DegradationEvent,
-  DegradationCallback,
-} from "./transport-types";
+export type { ConnectionMetrics, DegradationEvent, DegradationCallback } from './transport-types';
 
 /**
  * Monitor configuration
@@ -93,14 +82,14 @@ export class TransportMonitor {
     // Check for latency spike
     if (this.isLatencySpikeDetected(latencyMs)) {
       this.metrics.latencySpikes++;
-      logger.warn("[TransportMonitor] Latency spike detected", {
+      logger.warn('[TransportMonitor] Latency spike detected', {
         latencyMs,
         avgLatencyMs: this.metrics.avgLatencyMs,
       });
-      this.emitDegradation("latency_spike");
+      this.emitDegradation('latency_spike');
     }
 
-    logger.debug("[TransportMonitor] Success recorded", {
+    logger.debug('[TransportMonitor] Success recorded', {
       latencyMs,
       avgLatencyMs: this.metrics.avgLatencyMs.toFixed(0),
     });
@@ -114,17 +103,15 @@ export class TransportMonitor {
     this.metrics.totalFailures++;
     this.metrics.lastUpdated = Date.now();
 
-    logger.warn("[TransportMonitor] Failure recorded", {
+    logger.warn('[TransportMonitor] Failure recorded', {
       consecutiveFailures: this.metrics.consecutiveFailures,
       totalFailures: this.metrics.totalFailures,
       error,
     });
 
     // Check if we've exceeded the failure threshold
-    if (
-      this.metrics.consecutiveFailures >= this.config.maxConsecutiveFailures
-    ) {
-      this.emitDegradation("failures");
+    if (this.metrics.consecutiveFailures >= this.config.maxConsecutiveFailures) {
+      this.emitDegradation('failures');
     }
   }
 
@@ -161,37 +148,37 @@ export class TransportMonitor {
   reset(): void {
     this.metrics = this.createInitialMetrics();
     this.latencyHistory = [];
-    logger.debug("[TransportMonitor] Metrics reset");
+    logger.debug('[TransportMonitor] Metrics reset');
   }
 
   /**
    * Start listening for network change events
    */
   startNetworkListeners(): void {
-    if (this.networkListenersBound || typeof window === "undefined") {
+    if (this.networkListenersBound || typeof window === 'undefined') {
       return;
     }
 
-    window.addEventListener("online", this.handleOnline);
-    window.addEventListener("offline", this.handleOffline);
+    window.addEventListener('online', this.handleOnline);
+    window.addEventListener('offline', this.handleOffline);
     this.networkListenersBound = true;
 
-    logger.debug("[TransportMonitor] Network listeners started");
+    logger.debug('[TransportMonitor] Network listeners started');
   }
 
   /**
    * Stop listening for network change events
    */
   stopNetworkListeners(): void {
-    if (!this.networkListenersBound || typeof window === "undefined") {
+    if (!this.networkListenersBound || typeof window === 'undefined') {
       return;
     }
 
-    window.removeEventListener("online", this.handleOnline);
-    window.removeEventListener("offline", this.handleOffline);
+    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleOffline);
     this.networkListenersBound = false;
 
-    logger.debug("[TransportMonitor] Network listeners stopped");
+    logger.debug('[TransportMonitor] Network listeners stopped');
   }
 
   /**
@@ -220,14 +207,14 @@ export class TransportMonitor {
     );
   }
 
-  private emitDegradation(reason: DegradationEvent["reason"]): void {
+  private emitDegradation(reason: DegradationEvent['reason']): void {
     const event: DegradationEvent = {
       reason,
       metrics: this.getMetrics(),
       timestamp: Date.now(),
     };
 
-    logger.warn("[TransportMonitor] Degradation detected", {
+    logger.warn('[TransportMonitor] Degradation detected', {
       reason,
       consecutiveFailures: this.metrics.consecutiveFailures,
       latencySpikes: this.metrics.latencySpikes,
@@ -237,20 +224,20 @@ export class TransportMonitor {
       try {
         callback(event);
       } catch (error) {
-        logger.error("[TransportMonitor] Degradation callback error", {
-          error: error instanceof Error ? error.message : "Unknown",
+        logger.error('[TransportMonitor] Degradation callback error', {
+          error: error instanceof Error ? error.message : 'Unknown',
         });
       }
     });
   }
 
   private handleOnline = (): void => {
-    logger.info("[TransportMonitor] Network online detected");
+    logger.info('[TransportMonitor] Network online detected');
     invalidateCache();
-    this.emitDegradation("network_change");
+    this.emitDegradation('network_change');
   };
 
   private handleOffline = (): void => {
-    logger.info("[TransportMonitor] Network offline detected");
+    logger.info('[TransportMonitor] Network offline detected');
   };
 }

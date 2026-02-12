@@ -5,7 +5,7 @@
 
 'use client';
 
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import type { StreamToolEvent } from '../use-tool-stream';
 
 /**
@@ -23,7 +23,7 @@ export interface EventHandlers {
 export function createEventHandlers(
   onConnected: (clientId: string) => void,
   onMessage: (event: StreamToolEvent) => void,
-  onError: () => void
+  onError: () => void,
 ): EventHandlers {
   const connectedHandler = (e: Event) => {
     try {
@@ -55,10 +55,7 @@ export function createEventHandlers(
 /**
  * Attach handlers to EventSource
  */
-export function attachEventSourceHandlers(
-  eventSource: EventSource,
-  handlers: EventHandlers
-): void {
+export function attachEventSourceHandlers(eventSource: EventSource, handlers: EventHandlers): void {
   if (handlers.connected) {
     eventSource.addEventListener('connected', handlers.connected);
   }
@@ -73,10 +70,7 @@ export function attachEventSourceHandlers(
 /**
  * Detach handlers from EventSource
  */
-export function detachEventSourceHandlers(
-  eventSource: EventSource,
-  handlers: EventHandlers
-): void {
+export function detachEventSourceHandlers(eventSource: EventSource, handlers: EventHandlers): void {
   if (handlers.connected) {
     eventSource.removeEventListener('connected', handlers.connected);
   }

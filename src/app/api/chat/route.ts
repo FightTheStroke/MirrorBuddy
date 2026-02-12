@@ -547,10 +547,7 @@ export const POST = pipe(
       return response;
     }
   } catch (error) {
-    Sentry.captureException(error, {
-      tags: { api: '/api/chat', errorType: 'unhandled' },
-    });
-    log.error('Chat API error', { error: String(error) });
+    log.error('Chat API error', { api: '/api/chat', errorType: 'unhandled' }, error);
     const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     response.headers.set('X-Request-ID', getRequestId(request));
     return response;

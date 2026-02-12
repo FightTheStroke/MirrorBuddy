@@ -18,7 +18,7 @@ import {
   useSummaryModifications,
   type SummaryModificationCallbacks,
 } from '@/lib/hooks/use-summary-modifications';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { cn } from '@/lib/utils';
 import type { SummaryData, SummarySection } from '@/types/tools';
 
@@ -69,7 +69,7 @@ export function LiveSummary({
     initialData || {
       topic: 'Nuovo Riassunto',
       sections: [],
-    }
+    },
   );
   const [isFinalized, setIsFinalized] = useState(false);
   const dataRef = useRef(data);
@@ -88,7 +88,7 @@ export function LiveSummary({
         return next;
       });
     },
-    [onDataChange]
+    [onDataChange],
   );
 
   // Define modification callbacks
@@ -98,7 +98,7 @@ export function LiveSummary({
         logger.info('[LiveSummary] Setting title', { title });
         updateData((prev) => ({ ...prev, topic: title }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onAddSection: useCallback(
@@ -112,11 +112,14 @@ export function LiveSummary({
           ],
         }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onUpdateSection: useCallback(
-      (sectionIndex: number, updates: { title?: string; content?: string; keyPoints?: string[] }) => {
+      (
+        sectionIndex: number,
+        updates: { title?: string; content?: string; keyPoints?: string[] },
+      ) => {
         logger.info('[LiveSummary] Updating section', { sectionIndex, updates });
         updateData((prev) => ({
           ...prev,
@@ -128,11 +131,11 @@ export function LiveSummary({
                   ...(updates.content !== undefined && { content: updates.content }),
                   ...(updates.keyPoints !== undefined && { keyPoints: updates.keyPoints }),
                 }
-              : s
+              : s,
           ),
         }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onDeleteSection: useCallback(
@@ -143,7 +146,7 @@ export function LiveSummary({
           sections: prev.sections.filter((_, i) => i !== sectionIndex),
         }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onAddPoint: useCallback(
@@ -152,13 +155,11 @@ export function LiveSummary({
         updateData((prev) => ({
           ...prev,
           sections: prev.sections.map((s, i) =>
-            i === sectionIndex
-              ? { ...s, keyPoints: [...(s.keyPoints || []), point] }
-              : s
+            i === sectionIndex ? { ...s, keyPoints: [...(s.keyPoints || []), point] } : s,
           ),
         }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onDeletePoint: useCallback(
@@ -172,11 +173,11 @@ export function LiveSummary({
                   ...s,
                   keyPoints: (s.keyPoints || []).filter((_, pi) => pi !== pointIndex),
                 }
-              : s
+              : s,
           ),
         }));
       },
-      [updateData]
+      [updateData],
     ),
 
     onFinalize: useCallback(() => {
@@ -198,7 +199,7 @@ export function LiveSummary({
     (title: string) => {
       updateData((prev) => ({ ...prev, topic: title }));
     },
-    [updateData]
+    [updateData],
   );
 
   // Handle sections change from editor
@@ -206,7 +207,7 @@ export function LiveSummary({
     (sections: SummarySection[]) => {
       updateData((prev) => ({ ...prev, sections }));
     },
-    [updateData]
+    [updateData],
   );
 
   // Handle manual save

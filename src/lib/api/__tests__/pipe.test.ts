@@ -3,12 +3,12 @@
  * Plan 113: T1-01 - Create composable middleware system
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { NextRequest } from "next/server";
-import type { Middleware } from "../pipe";
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
+import type { Middleware } from '../pipe';
 
 // Mock dependencies
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -23,11 +23,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@sentry/nextjs", () => ({
-  captureException: vi.fn(),
-}));
-
-describe("pipe() - Composable API handler pipeline", () => {
+describe('pipe() - Composable API handler pipeline', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -36,22 +32,22 @@ describe("pipe() - Composable API handler pipeline", () => {
     vi.restoreAllMocks();
   });
 
-  describe("F-02: Basic composition", () => {
-    it("should execute middlewares in order", async () => {
-      const { pipe } = await import("../pipe");
+  describe('F-02: Basic composition', () => {
+    it('should execute middlewares in order', async () => {
+      const { pipe } = await import('../pipe');
       const executionOrder: string[] = [];
 
       const middleware1: Middleware = async (ctx, next) => {
-        executionOrder.push("m1-before");
+        executionOrder.push('m1-before');
         const response = await next();
-        executionOrder.push("m1-after");
+        executionOrder.push('m1-after');
         return response;
       };
 
       const middleware2: Middleware = async (ctx, next) => {
-        executionOrder.push("m2-before");
+        executionOrder.push('m2-before');
         const response = await next();
-        executionOrder.push("m2-after");
+        executionOrder.push('m2-after');
         return response;
       };
 
@@ -59,61 +55,55 @@ describe("pipe() - Composable API handler pipeline", () => {
         middleware1,
         middleware2,
       )(async (_ctx) => {
-        executionOrder.push("handler");
+        executionOrder.push('handler');
         return new Response(JSON.stringify({ ok: true }), {
           status: 200,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
 
-      expect(executionOrder).toEqual([
-        "m1-before",
-        "m2-before",
-        "handler",
-        "m2-after",
-        "m1-after",
-      ]);
+      expect(executionOrder).toEqual(['m1-before', 'm2-before', 'handler', 'm2-after', 'm1-after']);
     });
 
-    it("should work with no middlewares", async () => {
-      const { pipe } = await import("../pipe");
+    it('should work with no middlewares', async () => {
+      const { pipe } = await import('../pipe');
 
       const handler = pipe()(async (_ctx) => {
-        return new Response(JSON.stringify({ data: "test" }), {
+        return new Response(JSON.stringify({ data: 'test' }), {
           status: 200,
         });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       const response = await handler(req);
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      expect(data).toEqual({ data: "test" });
+      expect(data).toEqual({ data: 'test' });
     });
   });
 
-  describe("F-20: Context accumulation", () => {
-    it("should accumulate typed properties through middleware chain", async () => {
-      const { pipe } = await import("../pipe");
+  describe('F-20: Context accumulation', () => {
+    it('should accumulate typed properties through middleware chain', async () => {
+      const { pipe } = await import('../pipe');
 
       const authMiddleware: Middleware = async (ctx, next) => {
-        ctx.userId = "user-123";
+        ctx.userId = 'user-123';
         ctx.isAdmin = false;
         return next();
       };
 
       const roleMiddleware: Middleware = async (ctx, next) => {
-        ctx.role = "editor";
+        ctx.role = 'editor';
         return next();
       };
 
@@ -121,43 +111,43 @@ describe("pipe() - Composable API handler pipeline", () => {
         authMiddleware,
         roleMiddleware,
       )(async (ctx) => {
-        expect(ctx.userId).toBe("user-123");
+        expect(ctx.userId).toBe('user-123');
         expect(ctx.isAdmin).toBe(false);
-        expect(ctx.role).toBe("editor");
+        expect(ctx.role).toBe('editor');
 
         return new Response(JSON.stringify({ userId: ctx.userId }), {
           status: 200,
         });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
     });
 
-    it("should pass routeContext.params through to handler", async () => {
-      const { pipe } = await import("../pipe");
+    it('should pass routeContext.params through to handler', async () => {
+      const { pipe } = await import('../pipe');
 
       const handler = pipe()(async (ctx) => {
         const params = await ctx.params;
-        expect(params).toEqual({ id: "123", slug: "test-post" });
+        expect(params).toEqual({ id: '123', slug: 'test-post' });
 
         return new Response(JSON.stringify({ params }), { status: 200 });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/posts/123", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/posts/123', {
+        method: 'GET',
       });
 
       await handler(req, {
-        params: Promise.resolve({ id: "123", slug: "test-post" }),
+        params: Promise.resolve({ id: '123', slug: 'test-post' }),
       });
     });
 
-    it("should provide empty params if routeContext not provided", async () => {
-      const { pipe } = await import("../pipe");
+    it('should provide empty params if routeContext not provided', async () => {
+      const { pipe } = await import('../pipe');
 
       const handler = pipe()(async (ctx) => {
         const params = await ctx.params;
@@ -166,25 +156,25 @@ describe("pipe() - Composable API handler pipeline", () => {
         return new Response(JSON.stringify({ ok: true }), { status: 200 });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
     });
   });
 
-  describe("Error handling and Sentry integration", () => {
-    it("should catch errors and return 500", async () => {
-      const { pipe } = await import("../pipe");
-      const { logger } = await import("@/lib/logger");
+  describe('Error handling and logging', () => {
+    it('should catch errors and return 500', async () => {
+      const { pipe } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
-        throw new Error("Test error");
+        throw new Error('Test error');
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "POST",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
       });
 
       const response = await handler(req);
@@ -193,152 +183,167 @@ describe("pipe() - Composable API handler pipeline", () => {
       expect(logger.error).toHaveBeenCalled();
     });
 
-    it("should capture 5xx errors to Sentry", async () => {
-      const { pipe } = await import("../pipe");
-      const Sentry = await import("@sentry/nextjs");
+    it('should log 5xx errors as logger.error', async () => {
+      const { pipe } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
-        throw new Error("Server error");
+        throw new Error('Server error');
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
 
-      expect(Sentry.captureException).toHaveBeenCalledWith(
-        expect.any(Error),
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('API Error'),
         expect.objectContaining({
-          tags: expect.objectContaining({
-            api: "/api/test",
-            method: "GET",
-          }),
+          statusCode: 500,
+          path: '/api/test',
+          method: 'GET',
         }),
+        expect.any(Error),
       );
     });
 
-    it("should handle ApiError with custom status code", async () => {
-      const { pipe, ApiError } = await import("../pipe");
-      const Sentry = await import("@sentry/nextjs");
+    it('should handle ApiError with custom status code and warn-log it', async () => {
+      const { pipe, ApiError } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
-        throw new ApiError("Not found", 404);
+        throw new ApiError('Not found', 404);
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       const response = await handler(req);
 
       expect(response.status).toBe(404);
-      // 4xx errors should not be sent to Sentry
-      expect(Sentry.captureException).not.toHaveBeenCalled();
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('API handled error'),
+        expect.objectContaining({
+          statusCode: 404,
+          path: '/api/test',
+          method: 'GET',
+          detail: 'Not found',
+        }),
+      );
     });
 
-    it("should send ApiError with 5xx status to Sentry", async () => {
-      const { pipe, ApiError } = await import("../pipe");
-      const Sentry = await import("@sentry/nextjs");
+    it('should log ApiError with 5xx status as error', async () => {
+      const { pipe, ApiError } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
-        throw new ApiError("Internal error", 503);
+        throw new ApiError('Internal error', 503);
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
 
-      expect(Sentry.captureException).toHaveBeenCalled();
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('API Error'),
+        expect.objectContaining({
+          statusCode: 503,
+          path: '/api/test',
+          method: 'GET',
+        }),
+        expect.any(Error),
+      );
     });
   });
 
-  describe("Logging", () => {
-    it("should log successful requests with timing", async () => {
-      const { pipe } = await import("../pipe");
-      const { logger } = await import("@/lib/logger");
+  describe('Logging', () => {
+    it('should log successful requests with timing', async () => {
+      const { pipe } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
         return new Response(JSON.stringify({ ok: true }), { status: 200 });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       await handler(req);
 
       expect(logger.debug).toHaveBeenCalledWith(
-        "API request completed",
+        'API request completed',
         expect.objectContaining({
-          method: "GET",
-          path: "/api/test",
+          method: 'GET',
+          path: '/api/test',
           status: 200,
           durationMs: expect.any(Number),
         }),
       );
     });
 
-    it("should log failed requests with timing", async () => {
-      const { pipe } = await import("../pipe");
-      const { logger } = await import("@/lib/logger");
+    it('should log failed requests with timing', async () => {
+      const { pipe } = await import('../pipe');
+      const { logger } = await import('@/lib/logger');
 
       const handler = pipe()(async () => {
-        throw new Error("Test failure");
+        throw new Error('Test failure');
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "POST",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'POST',
       });
 
       await handler(req);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("API Error"),
+        expect.stringContaining('API Error'),
         expect.objectContaining({ statusCode: 500 }),
         expect.any(Error),
       );
     });
   });
 
-  describe("Streaming Response support", () => {
-    it("should pass through streaming Response without modification", async () => {
-      const { pipe } = await import("../pipe");
+  describe('Streaming Response support', () => {
+    it('should pass through streaming Response without modification', async () => {
+      const { pipe } = await import('../pipe');
 
       const handler = pipe()(async () => {
         const encoder = new TextEncoder();
         const stream = new ReadableStream({
           start(controller) {
-            controller.enqueue(encoder.encode("data: chunk1\n\n"));
-            controller.enqueue(encoder.encode("data: chunk2\n\n"));
+            controller.enqueue(encoder.encode('data: chunk1\n\n'));
+            controller.enqueue(encoder.encode('data: chunk2\n\n'));
             controller.close();
           },
         });
 
         return new Response(stream, {
           headers: {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            Connection: 'keep-alive',
           },
         });
       });
 
-      const req = new NextRequest("http://localhost:3000/api/stream", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/stream', {
+        method: 'GET',
       });
 
       const response = await handler(req);
 
-      expect(response.headers.get("Content-Type")).toBe("text/event-stream");
+      expect(response.headers.get('Content-Type')).toBe('text/event-stream');
       expect(response.body).toBeInstanceOf(ReadableStream);
 
       // Read the stream to verify content
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
-      let result = "";
+      let result = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -346,36 +351,36 @@ describe("pipe() - Composable API handler pipeline", () => {
         result += decoder.decode(value, { stream: true });
       }
 
-      expect(result).toContain("chunk1");
-      expect(result).toContain("chunk2");
+      expect(result).toContain('chunk1');
+      expect(result).toContain('chunk2');
     });
   });
 
-  describe("Middleware can short-circuit", () => {
-    it("should allow middleware to return early without calling next()", async () => {
-      const { pipe } = await import("../pipe");
+  describe('Middleware can short-circuit', () => {
+    it('should allow middleware to return early without calling next()', async () => {
+      const { pipe } = await import('../pipe');
 
       const authMiddleware: Middleware = async (_ctx, _next) => {
         // Short-circuit if not authorized
-        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
         });
       };
 
       const handler = pipe(authMiddleware)(async () => {
         // This should never be called
-        throw new Error("Handler should not be called");
+        throw new Error('Handler should not be called');
       });
 
-      const req = new NextRequest("http://localhost:3000/api/test", {
-        method: "GET",
+      const req = new NextRequest('http://localhost:3000/api/test', {
+        method: 'GET',
       });
 
       const response = await handler(req);
 
       expect(response.status).toBe(401);
       const data = await response.json();
-      expect(data).toEqual({ error: "Unauthorized" });
+      expect(data).toEqual({ error: 'Unauthorized' });
     });
   });
 });

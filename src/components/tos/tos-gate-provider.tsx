@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { usePathname } from "next/navigation";
-import { TosAcceptanceModal } from "./tos-acceptance-modal";
-import { logger } from "@/lib/logger";
+import * as React from 'react';
+import { usePathname } from 'next/navigation';
+import { TosAcceptanceModal } from './tos-acceptance-modal';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 /**
  * TosGateProvider - Enforces Terms of Service acceptance for authenticated users.
@@ -20,21 +20,21 @@ import { logger } from "@/lib/logger";
 
 // Public pages that don't require ToS acceptance
 const PUBLIC_PATHS = [
-  "/terms",
-  "/privacy",
-  "/cookies",
-  "/landing",
-  "/welcome",
-  "/auth/login",
-  "/auth/signup",
+  '/terms',
+  '/privacy',
+  '/cookies',
+  '/landing',
+  '/welcome',
+  '/auth/login',
+  '/auth/signup',
 ];
 
 // API routes that should not trigger ToS check
-const API_PATH_PREFIX = "/api/";
+const API_PATH_PREFIX = '/api/';
 
 // Session storage keys
-const TOS_ACCEPTED_KEY = "tos_accepted";
-const TOS_VERSION_KEY = "tos_accepted_version";
+const TOS_ACCEPTED_KEY = 'tos_accepted';
+const TOS_VERSION_KEY = 'tos_accepted_version';
 
 interface TosStatus {
   accepted: boolean;
@@ -69,9 +69,9 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
     checkedRef.current = true;
 
     // Fetch ToS status from API (always, to check version)
-    fetch("/api/tos", {
-      method: "GET",
-      credentials: "include", // Include cookies for auth
+    fetch('/api/tos', {
+      method: 'GET',
+      credentials: 'include', // Include cookies for auth
     })
       .then((response) => {
         // If 401 Unauthorized, user is not logged in - allow access
@@ -95,7 +95,7 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
         const cachedVersion = sessionStorage.getItem(TOS_VERSION_KEY);
 
         // If cached and version matches, use cache
-        if (cachedAccepted === "true" && cachedVersion === currentVersion) {
+        if (cachedAccepted === 'true' && cachedVersion === currentVersion) {
           setTosStatus({
             accepted: true,
             checked: true,
@@ -116,7 +116,7 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
 
         // Cache in session if accepted (with version)
         if (accepted) {
-          sessionStorage.setItem(TOS_ACCEPTED_KEY, "true");
+          sessionStorage.setItem(TOS_ACCEPTED_KEY, 'true');
           sessionStorage.setItem(TOS_VERSION_KEY, currentVersion);
         } else {
           // Clear any stale cache
@@ -127,11 +127,7 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch((error) => {
-        logger.error(
-          "ToS check error",
-          { component: "TosGateProvider" },
-          error,
-        );
+        logger.error('ToS check error', { component: 'TosGateProvider' }, error);
         // On error, allow access (graceful degradation)
         setTosStatus({ accepted: true, checked: true });
       });
@@ -140,7 +136,7 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
   // Handle ToS acceptance
   const handleAccept = React.useCallback((version: string) => {
     // Cache acceptance in session (with version)
-    sessionStorage.setItem(TOS_ACCEPTED_KEY, "true");
+    sessionStorage.setItem(TOS_ACCEPTED_KEY, 'true');
     sessionStorage.setItem(TOS_VERSION_KEY, version);
 
     // Update state

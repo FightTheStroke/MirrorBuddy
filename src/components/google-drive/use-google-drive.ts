@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * useGoogleDrive Hook
@@ -7,14 +7,10 @@
  * Client-side hook for Google Drive connection status and file operations.
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import type {
-  GoogleConnectionStatus,
-  DriveFileUI,
-  DriveBreadcrumb,
-} from "@/lib/google";
+import { useState, useEffect, useCallback } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
+import type { GoogleConnectionStatus, DriveFileUI, DriveBreadcrumb } from '@/lib/google';
 
 interface UseGoogleDriveOptions {
   userId: string;
@@ -44,18 +40,15 @@ interface UseGoogleDriveReturn {
   clearSearch: () => Promise<void>;
 }
 
-export function useGoogleDrive({
-  userId,
-}: UseGoogleDriveOptions): UseGoogleDriveReturn {
+export function useGoogleDrive({ userId }: UseGoogleDriveOptions): UseGoogleDriveReturn {
   // Connection state
   const [isLoading, setIsLoading] = useState(true);
-  const [connectionStatus, setConnectionStatus] =
-    useState<GoogleConnectionStatus | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<GoogleConnectionStatus | null>(null);
 
   // File browser state
   const [files, setFiles] = useState<DriveFileUI[]>([]);
   const [breadcrumbs, setBreadcrumbs] = useState<DriveBreadcrumb[]>([]);
-  const [currentFolderId, setCurrentFolderId] = useState("root");
+  const [currentFolderId, setCurrentFolderId] = useState('root');
   const [isLoadingFiles, setIsLoadingFiles] = useState(false);
   const [nextPageToken, setNextPageToken] = useState<string | undefined>();
   const [hasMore, setHasMore] = useState(false);
@@ -74,7 +67,7 @@ export function useGoogleDrive({
         setConnectionStatus(status);
       }
     } catch (err) {
-      logger.error("[useGoogleDrive] Failed to get status:", {
+      logger.error('[useGoogleDrive] Failed to get status:', {
         error: String(err),
       });
     } finally {
@@ -90,19 +83,19 @@ export function useGoogleDrive({
   // Check URL for OAuth callback results
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("google_connected") === "true") {
+    if (params.get('google_connected') === 'true') {
       refreshStatus();
       // Clean URL
       const url = new URL(window.location.href);
-      url.searchParams.delete("google_connected");
-      window.history.replaceState({}, "", url.toString());
+      url.searchParams.delete('google_connected');
+      window.history.replaceState({}, '', url.toString());
     }
-    if (params.get("google_error")) {
-      setError(`Google connection failed: ${params.get("google_error")}`);
+    if (params.get('google_error')) {
+      setError(`Google connection failed: ${params.get('google_error')}`);
       // Clean URL
       const url = new URL(window.location.href);
-      url.searchParams.delete("google_error");
-      window.history.replaceState({}, "", url.toString());
+      url.searchParams.delete('google_error');
+      window.history.replaceState({}, '', url.toString());
     }
   }, [refreshStatus]);
 
@@ -115,8 +108,8 @@ export function useGoogleDrive({
   // Disconnect from Google
   const disconnect = useCallback(async () => {
     try {
-      const response = await csrfFetch("/api/auth/google/disconnect", {
-        method: "POST",
+      const response = await csrfFetch('/api/auth/google/disconnect', {
+        method: 'POST',
         body: JSON.stringify({ userId }),
       });
 
@@ -126,7 +119,7 @@ export function useGoogleDrive({
         setBreadcrumbs([]);
       }
     } catch (err) {
-      logger.error("[useGoogleDrive] Failed to disconnect:", {
+      logger.error('[useGoogleDrive] Failed to disconnect:', {
         error: String(err),
       });
     }
@@ -140,17 +133,15 @@ export function useGoogleDrive({
 
       try {
         const params = new URLSearchParams({ userId });
-        if (folderId && !search) params.set("folderId", folderId);
-        if (search) params.set("search", search);
-        if (pageToken) params.set("pageToken", pageToken);
+        if (folderId && !search) params.set('folderId', folderId);
+        if (search) params.set('search', search);
+        if (pageToken) params.set('pageToken', pageToken);
 
-        const response = await fetch(
-          `/api/google-drive/files?${params.toString()}`,
-        );
+        const response = await fetch(`/api/google-drive/files?${params.toString()}`);
 
         if (!response.ok) {
           const data = await response.json();
-          throw new Error(data.error || "Failed to fetch files");
+          throw new Error(data.error || 'Failed to fetch files');
         }
 
         const data = await response.json();
@@ -167,7 +158,7 @@ export function useGoogleDrive({
         setNextPageToken(data.nextPageToken);
         setHasMore(data.hasMore);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch files");
+        setError(err instanceof Error ? err.message : 'Failed to fetch files');
       } finally {
         setIsLoadingFiles(false);
       }
@@ -195,7 +186,7 @@ export function useGoogleDrive({
         return;
       }
       setSearchQuery(query);
-      await fetchFiles("root", query);
+      await fetchFiles('root', query);
     },
     [fetchFiles, currentFolderId],
   );
@@ -215,7 +206,7 @@ export function useGoogleDrive({
   // Auto-load files when connected
   useEffect(() => {
     if (connectionStatus?.isConnected && !files.length && !isLoadingFiles) {
-      fetchFiles("root");
+      fetchFiles('root');
     }
   }, [connectionStatus?.isConnected, files.length, isLoadingFiles, fetchFiles]);
 

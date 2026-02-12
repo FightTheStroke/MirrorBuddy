@@ -6,17 +6,16 @@
  * All entries are anonymized - no PII is stored.
  */
 
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
-import * as Sentry from "@sentry/nextjs";
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
 import {
   SafetyAuditEntry,
   SafetyAuditEventType,
   SafetyAuditMetadata,
   AuditSeverity,
-} from "./types";
+} from './types';
 
-const log = logger.child({ module: "safety-audit" });
+const log = logger.child({ module: 'safety-audit' });
 
 /**
  * In-memory audit buffer (flushes to persistent storage)
@@ -47,13 +46,9 @@ export function recordSafetyEvent(
     eventType,
     severity,
     timestamp: new Date(),
-    anonymizedUserId: options.userId
-      ? anonymizeUserId(options.userId)
-      : undefined,
+    anonymizedUserId: options.userId ? anonymizeUserId(options.userId) : undefined,
     maestroId: options.maestroId,
-    sessionHash: options.sessionId
-      ? hashSessionId(options.sessionId)
-      : undefined,
+    sessionHash: options.sessionId ? hashSessionId(options.sessionId) : undefined,
     metadata: sanitizeMetadata(options.metadata || {}),
     contentHash: options.contentHash,
   };
@@ -84,14 +79,14 @@ export function recordContentFiltered(
     actionTaken?: string;
   },
 ): string {
-  return recordSafetyEvent("content_filtered", {
+  return recordSafetyEvent('content_filtered', {
     ...options,
     metadata: {
       filterType,
       confidence: options.confidence,
-      actionTaken: options.actionTaken || "blocked",
+      actionTaken: options.actionTaken || 'blocked',
     },
-    severity: "medium",
+    severity: 'medium',
   });
 }
 
@@ -106,13 +101,13 @@ export function recordGuardrailTriggered(
     confidence?: number;
   },
 ): string {
-  return recordSafetyEvent("guardrail_triggered", {
+  return recordSafetyEvent('guardrail_triggered', {
     ...options,
     metadata: {
       guardrailRuleId: ruleId,
       confidence: options.confidence,
     },
-    severity: "medium",
+    severity: 'medium',
   });
 }
 
@@ -125,31 +120,28 @@ export function recordPromptInjectionAttempt(options: {
   confidence?: number;
   pattern?: string;
 }): string {
-  return recordSafetyEvent("prompt_injection_attempt", {
+  return recordSafetyEvent('prompt_injection_attempt', {
     ...options,
     metadata: {
       confidence: options.confidence,
       context: options.pattern ? { patternType: options.pattern } : undefined,
     },
-    severity: "high",
+    severity: 'high',
   });
 }
 
 /**
  * Record safety config change
  */
-export function recordSafetyConfigChange(
-  changeDescription: string,
-  changedBy: string,
-): string {
-  return recordSafetyEvent("safety_config_changed", {
+export function recordSafetyConfigChange(changeDescription: string, changedBy: string): string {
+  return recordSafetyEvent('safety_config_changed', {
     metadata: {
       context: {
         change: changeDescription,
         changedBy: anonymizeUserId(changedBy),
       },
     },
-    severity: "high",
+    severity: 'high',
   });
 }
 
@@ -198,7 +190,7 @@ export function getAuditStatistics(periodDays: number = 30): {
   totalEvents: number;
   byType: Record<string, number>;
   bySeverity: Record<string, number>;
-  trendDirection: "increasing" | "decreasing" | "stable";
+  trendDirection: 'increasing' | 'decreasing' | 'stable';
 } {
   const cutoff = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000);
   const entries = auditBuffer.filter((e) => e.timestamp >= cutoff);
@@ -212,17 +204,15 @@ export function getAuditStatistics(periodDays: number = 30): {
   }
 
   // Simple trend calculation (compare first half to second half)
-  const midpoint = new Date(
-    cutoff.getTime() + (Date.now() - cutoff.getTime()) / 2,
-  );
+  const midpoint = new Date(cutoff.getTime() + (Date.now() - cutoff.getTime()) / 2);
   const firstHalf = entries.filter((e) => e.timestamp < midpoint).length;
   const secondHalf = entries.filter((e) => e.timestamp >= midpoint).length;
 
-  let trendDirection: "increasing" | "decreasing" | "stable" = "stable";
+  let trendDirection: 'increasing' | 'decreasing' | 'stable' = 'stable';
   if (secondHalf > firstHalf * 1.2) {
-    trendDirection = "increasing";
+    trendDirection = 'increasing';
   } else if (secondHalf < firstHalf * 0.8) {
-    trendDirection = "decreasing";
+    trendDirection = 'decreasing';
   }
 
   return {
@@ -239,7 +229,7 @@ function generateAuditId(): string {
 }
 
 function anonymizeUserId(userId: string): string {
-  return userId.slice(0, 8) + "***";
+  return userId.slice(0, 8) + '***';
 }
 
 function hashSessionId(sessionId: string): string {
@@ -252,9 +242,7 @@ function hashSessionId(sessionId: string): string {
   return `sess_${Math.abs(hash).toString(16)}`;
 }
 
-function sanitizeMetadata(
-  metadata: Partial<SafetyAuditMetadata>,
-): SafetyAuditMetadata {
+function sanitizeMetadata(metadata: Partial<SafetyAuditMetadata>): SafetyAuditMetadata {
   // Ensure no PII leaks through metadata
   return {
     filterType: metadata.filterType,
@@ -267,17 +255,17 @@ function sanitizeMetadata(
 
 function inferSeverity(eventType: SafetyAuditEventType): AuditSeverity {
   switch (eventType) {
-    case "prompt_injection_attempt":
-    case "safety_config_changed":
-      return "high";
-    case "content_filtered":
-    case "guardrail_triggered":
-      return "medium";
-    case "rate_limit_triggered":
-    case "false_positive_logged":
-      return "low";
+    case 'prompt_injection_attempt':
+    case 'safety_config_changed':
+      return 'high';
+    case 'content_filtered':
+    case 'guardrail_triggered':
+      return 'medium';
+    case 'rate_limit_triggered':
+    case 'false_positive_logged':
+      return 'low';
     default:
-      return "medium";
+      return 'medium';
   }
 }
 
@@ -290,17 +278,17 @@ function logAuditEvent(entry: SafetyAuditEntry): void {
   };
 
   switch (entry.severity) {
-    case "critical":
-      log.error("CRITICAL safety event", logData);
+    case 'critical':
+      log.error('CRITICAL safety event', logData);
       break;
-    case "high":
-      log.warn("High severity safety event", logData);
+    case 'high':
+      log.warn('High severity safety event', logData);
       break;
-    case "medium":
-      log.info("Safety event recorded", logData);
+    case 'medium':
+      log.info('Safety event recorded', logData);
       break;
     default:
-      log.debug("Safety event", logData);
+      log.debug('Safety event', logData);
   }
 }
 
@@ -314,7 +302,7 @@ async function flushAuditBuffer(): Promise<void> {
   }
 
   const entriesToFlush = [...auditBuffer];
-  log.debug("Flushing audit buffer to database", {
+  log.debug('Flushing audit buffer to database', {
     entries: entriesToFlush.length,
   });
 
@@ -347,45 +335,41 @@ async function flushAuditBuffer(): Promise<void> {
 
     // Clear buffer only after successful write
     auditBuffer.length = 0;
-    log.info("Successfully flushed audit buffer to database", {
+    log.info('Successfully flushed audit buffer to database', {
       count: entriesToFlush.length,
     });
   } catch (error) {
-    // Log to Sentry and keep events in buffer for retry
-    log.error("Failed to flush audit buffer to database", {
-      error,
-      entries: entriesToFlush.length,
-    });
-    Sentry.captureException(error, {
-      contexts: {
-        audit: {
-          bufferedEntries: entriesToFlush.length,
-          eventTypes: [...new Set(entriesToFlush.map((e) => e.eventType))],
-        },
+    // Keep events in buffer for retry; logger forwards error to Sentry in production.
+    log.error(
+      'Failed to flush audit buffer to database',
+      {
+        bufferedEntries: entriesToFlush.length,
+        eventTypes: [...new Set(entriesToFlush.map((e) => e.eventType))],
       },
-    });
+      error,
+    );
     // Keep events in buffer - they will be retried on next flush
   }
 }
 
 // Set up periodic flush (async wrapper to handle Promise)
-if (typeof setInterval !== "undefined") {
+if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     flushAuditBuffer().catch((err) => {
-      log.error("Periodic flush failed", { error: err });
+      log.error('Periodic flush failed', { error: err });
     });
   }, BUFFER_FLUSH_INTERVAL_MS);
 }
 
 // Flush on shutdown to ensure no data loss
-if (typeof process !== "undefined") {
-  process.on("beforeExit", () => {
+if (typeof process !== 'undefined') {
+  process.on('beforeExit', () => {
     if (auditBuffer.length > 0) {
-      log.info("Flushing audit buffer before exit", {
+      log.info('Flushing audit buffer before exit', {
         entries: auditBuffer.length,
       });
       flushAuditBuffer().catch((err) => {
-        log.error("Shutdown flush failed", { error: err });
+        log.error('Shutdown flush failed', { error: err });
       });
     }
   });

@@ -1,39 +1,39 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Send, Loader2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { csrfFetch } from "@/lib/auth";
-import { logger } from "@/lib/logger";
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Send, Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { csrfFetch } from '@/lib/auth';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 const SECTORS = [
-  { value: "technology", label: "Tecnologia" },
-  { value: "finance", label: "Finanza" },
-  { value: "manufacturing", label: "Manifattura" },
-  { value: "healthcare", label: "Sanità" },
-  { value: "retail", label: "Retail" },
-  { value: "other", label: "Altro" },
+  { value: 'technology', label: 'Tecnologia' },
+  { value: 'finance', label: 'Finanza' },
+  { value: 'manufacturing', label: 'Manifattura' },
+  { value: 'healthcare', label: 'Sanità' },
+  { value: 'retail', label: 'Retail' },
+  { value: 'other', label: 'Altro' },
 ];
 
 const EMPLOYEE_COUNTS = [
-  { value: "under-50", label: "Meno di 50" },
-  { value: "50-200", label: "50-200" },
-  { value: "200-1000", label: "200-1000" },
-  { value: "over-1000", label: "Più di 1000" },
+  { value: 'under-50', label: 'Meno di 50' },
+  { value: '50-200', label: '50-200' },
+  { value: '200-1000', label: '200-1000' },
+  { value: 'over-1000', label: 'Più di 1000' },
 ];
 
 const TOPICS = [
-  { value: "leadership", label: "Leadership" },
-  { value: "ai-innovation", label: "AI & Innovazione" },
-  { value: "soft-skills", label: "Soft Skills" },
-  { value: "onboarding", label: "Onboarding" },
-  { value: "compliance", label: "Compliance" },
-  { value: "other", label: "Altro" },
+  { value: 'leadership', label: 'Leadership' },
+  { value: 'ai-innovation', label: 'AI & Innovazione' },
+  { value: 'soft-skills', label: 'Soft Skills' },
+  { value: 'onboarding', label: 'Onboarding' },
+  { value: 'compliance', label: 'Compliance' },
+  { value: 'other', label: 'Altro' },
 ];
 
-type FormState = "idle" | "submitting" | "success" | "error";
+type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 interface FormErrors {
   name?: string;
@@ -47,34 +47,31 @@ interface FormErrors {
 }
 
 export function EnterpriseForm() {
-  const t = useTranslations("compliance.contact.enterprise");
-  const [formState, setFormState] = useState<FormState>("idle");
+  const t = useTranslations('compliance.contact.enterprise');
+  const [formState, setFormState] = useState<FormState>('idle');
   const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    role: "",
-    company: "",
-    sector: "",
-    employeeCount: "",
+    name: '',
+    email: '',
+    role: '',
+    company: '',
+    sector: '',
+    employeeCount: '',
     topics: [] as string[],
-    message: "",
+    message: '',
   });
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Nome obbligatorio";
-    if (!formData.email.trim()) newErrors.email = "Email obbligatoria";
+    if (!formData.name.trim()) newErrors.name = 'Nome obbligatorio';
+    if (!formData.email.trim()) newErrors.email = 'Email obbligatoria';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       newErrors.email = "Inserisci un'email valida";
-    if (!formData.role.trim()) newErrors.role = "Ruolo obbligatorio";
-    if (!formData.company.trim())
-      newErrors.company = "Nome azienda obbligatorio";
-    if (!formData.sector) newErrors.sector = "Seleziona un settore";
-    if (!formData.employeeCount)
-      newErrors.employeeCount = "Seleziona il numero di dipendenti";
-    if (formData.topics.length === 0)
-      newErrors.topics = "Seleziona almeno un tema di interesse";
+    if (!formData.role.trim()) newErrors.role = 'Ruolo obbligatorio';
+    if (!formData.company.trim()) newErrors.company = 'Nome azienda obbligatorio';
+    if (!formData.sector) newErrors.sector = 'Seleziona un settore';
+    if (!formData.employeeCount) newErrors.employeeCount = 'Seleziona il numero di dipendenti';
+    if (formData.topics.length === 0) newErrors.topics = 'Seleziona almeno un tema di interesse';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -82,14 +79,14 @@ export function EnterpriseForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setFormState("submitting");
+    setFormState('submitting');
     setErrors({});
 
     try {
-      const response = await csrfFetch("/api/contact", {
-        method: "POST",
+      const response = await csrfFetch('/api/contact', {
+        method: 'POST',
         body: JSON.stringify({
-          type: "enterprise",
+          type: 'enterprise',
           name: formData.name.trim(),
           email: formData.email.trim().toLowerCase(),
           role: formData.role.trim(),
@@ -97,7 +94,7 @@ export function EnterpriseForm() {
           sector: formData.sector,
           employeeCount: formData.employeeCount,
           topics: formData.topics,
-          message: formData.message.trim() || "",
+          message: formData.message.trim() || '',
         }),
       });
 
@@ -105,34 +102,28 @@ export function EnterpriseForm() {
         const data = await response.json();
         throw new Error(data.message || "Errore durante l'invio");
       }
-      setFormState("success");
+      setFormState('success');
     } catch (error) {
-      logger.error("Enterprise contact submission failed", {
+      logger.error('Enterprise contact submission failed', {
         error: String(error),
       });
       const message =
         error instanceof Error && /csrf/i.test(error.message)
-          ? "Sessione scaduta. Ricarica la pagina e riprova."
+          ? 'Sessione scaduta. Ricarica la pagina e riprova.'
           : error instanceof Error
             ? error.message
             : "Errore durante l'invio";
       setErrors({ general: message });
-      setFormState("error");
+      setFormState('error');
     }
   };
 
-  if (formState === "success") {
+  if (formState === 'success') {
     return (
       <div className="text-center space-y-6">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          {t("successTitle")}
-        </h2>
-        <p className="text-slate-600 dark:text-slate-300">
-          {t("successDescription")}
-        </p>
-        <Button onClick={() => (window.location.href = "/")}>
-          {t("tornaAllaHome")}
-        </Button>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('successTitle')}</h2>
+        <p className="text-slate-600 dark:text-slate-300">{t('successDescription')}</p>
+        <Button onClick={() => (window.location.href = '/')}>{t('tornaAllaHome')}</Button>
       </div>
     );
   }
@@ -142,9 +133,7 @@ export function EnterpriseForm() {
       {errors.general && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-600 dark:text-red-400">
-            {errors.general}
-          </p>
+          <p className="text-sm text-red-600 dark:text-red-400">{errors.general}</p>
         </div>
       )}
 
@@ -154,23 +143,19 @@ export function EnterpriseForm() {
           htmlFor="name"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("nome")}
+          {t('nome')}
         </label>
         <Input
           type="text"
           id="name"
           value={formData.name}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, name: e.target.value }))
-          }
-          disabled={formState === "submitting"}
-          placeholder={t("ilTuoNomeCompleto")}
-          className={errors.name ? "border-red-500" : ""}
+          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+          disabled={formState === 'submitting'}
+          placeholder={t('ilTuoNomeCompleto')}
+          className={errors.name ? 'border-red-500' : ''}
         />
         {errors.name && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.name}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.name}</p>
         )}
       </div>
 
@@ -180,23 +165,19 @@ export function EnterpriseForm() {
           htmlFor="email"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("email")}
+          {t('email')}
         </label>
         <Input
           type="email"
           id="email"
           value={formData.email}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, email: e.target.value }))
-          }
-          disabled={formState === "submitting"}
+          onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+          disabled={formState === 'submitting'}
           placeholder="la-tua@azienda.com"
-          className={errors.email ? "border-red-500" : ""}
+          className={errors.email ? 'border-red-500' : ''}
         />
         {errors.email && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.email}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.email}</p>
         )}
       </div>
 
@@ -206,23 +187,19 @@ export function EnterpriseForm() {
           htmlFor="role"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("ruolo")}
+          {t('ruolo')}
         </label>
         <Input
           type="text"
           id="role"
           value={formData.role}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, role: e.target.value }))
-          }
-          disabled={formState === "submitting"}
-          placeholder={t("esDirectorManagerCto")}
-          className={errors.role ? "border-red-500" : ""}
+          onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
+          disabled={formState === 'submitting'}
+          placeholder={t('esDirectorManagerCto')}
+          className={errors.role ? 'border-red-500' : ''}
         />
         {errors.role && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.role}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.role}</p>
         )}
       </div>
 
@@ -232,23 +209,19 @@ export function EnterpriseForm() {
           htmlFor="company"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("nomeAzienda")}
+          {t('nomeAzienda')}
         </label>
         <Input
           type="text"
           id="company"
           value={formData.company}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, company: e.target.value }))
-          }
-          disabled={formState === "submitting"}
-          placeholder={t("nomeDellaVostraAzienda")}
-          className={errors.company ? "border-red-500" : ""}
+          onChange={(e) => setFormData((prev) => ({ ...prev, company: e.target.value }))}
+          disabled={formState === 'submitting'}
+          placeholder={t('nomeDellaVostraAzienda')}
+          className={errors.company ? 'border-red-500' : ''}
         />
         {errors.company && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.company}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.company}</p>
         )}
       </div>
 
@@ -258,22 +231,18 @@ export function EnterpriseForm() {
           htmlFor="sector"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("settore")}
+          {t('settore')}
         </label>
         <select
           id="sector"
           value={formData.sector}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, sector: e.target.value }))
-          }
-          disabled={formState === "submitting"}
+          onChange={(e) => setFormData((prev) => ({ ...prev, sector: e.target.value }))}
+          disabled={formState === 'submitting'}
           className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 ${
-            errors.sector
-              ? "border-red-500"
-              : "border-slate-300 dark:border-slate-600"
+            errors.sector ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
           }`}
         >
-          <option value="">{t("selezionaUnSettore")}</option>
+          <option value="">{t('selezionaUnSettore')}</option>
           {SECTORS.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
@@ -281,9 +250,7 @@ export function EnterpriseForm() {
           ))}
         </select>
         {errors.sector && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.sector}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.sector}</p>
         )}
       </div>
 
@@ -293,22 +260,18 @@ export function EnterpriseForm() {
           htmlFor="employeeCount"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("nDipendenti")}
+          {t('nDipendenti')}
         </label>
         <select
           id="employeeCount"
           value={formData.employeeCount}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, employeeCount: e.target.value }))
-          }
-          disabled={formState === "submitting"}
+          onChange={(e) => setFormData((prev) => ({ ...prev, employeeCount: e.target.value }))}
+          disabled={formState === 'submitting'}
           className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 ${
-            errors.employeeCount
-              ? "border-red-500"
-              : "border-slate-300 dark:border-slate-600"
+            errors.employeeCount ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'
           }`}
         >
-          <option value="">{t("selezionaUnaFascia")}</option>
+          <option value="">{t('selezionaUnaFascia')}</option>
           {EMPLOYEE_COUNTS.map((c) => (
             <option key={c.value} value={c.value}>
               {c.label}
@@ -316,9 +279,7 @@ export function EnterpriseForm() {
           ))}
         </select>
         {errors.employeeCount && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.employeeCount}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.employeeCount}</p>
         )}
       </div>
 
@@ -328,7 +289,7 @@ export function EnterpriseForm() {
           id="topics-label"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3"
         >
-          {t("temiDiInteresse")}
+          {t('temiDiInteresse')}
         </div>
         <div className="space-y-2" role="group" aria-labelledby="topics-label">
           {TOPICS.map((topic) => (
@@ -344,7 +305,7 @@ export function EnterpriseForm() {
                     : formData.topics.filter((t) => t !== topic.value);
                   setFormData((prev) => ({ ...prev, topics: newTopics }));
                 }}
-                disabled={formState === "submitting"}
+                disabled={formState === 'submitting'}
                 className="w-4 h-4 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
               />
               <label
@@ -357,9 +318,7 @@ export function EnterpriseForm() {
           ))}
         </div>
         {errors.topics && (
-          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            {errors.topics}
-          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">{errors.topics}</p>
         )}
       </div>
 
@@ -369,35 +328,33 @@ export function EnterpriseForm() {
           htmlFor="message"
           className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
         >
-          {t("messaggio")}
+          {t('messaggio')}
         </label>
         <textarea
           id="message"
           value={formData.message}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, message: e.target.value }))
-          }
-          disabled={formState === "submitting"}
+          onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+          disabled={formState === 'submitting'}
           rows={4}
-          placeholder={t("condividiITuoiRequisitiSpecifici")}
+          placeholder={t('condividiITuoiRequisitiSpecifici')}
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 resize-none"
         />
       </div>
 
       <Button
         type="submit"
-        disabled={formState === "submitting"}
+        disabled={formState === 'submitting'}
         className="w-full bg-indigo-600 hover:bg-indigo-700 gap-2"
       >
-        {formState === "submitting" ? (
+        {formState === 'submitting' ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            {t("submitting")}
+            {t('submitting')}
           </>
         ) : (
           <>
             <Send className="w-4 h-4" />
-            {t("inviaRichiestaEnterprise")}
+            {t('inviaRichiestaEnterprise')}
           </>
         )}
       </Button>

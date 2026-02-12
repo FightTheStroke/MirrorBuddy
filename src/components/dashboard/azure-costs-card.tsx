@@ -4,14 +4,14 @@
  * Shows monthly forecast and breakdown by service
  */
 
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { DollarSign, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { logger } from "@/lib/logger";
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { DollarSign, TrendingUp } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 interface CostSummary {
   totalCost: number;
@@ -35,7 +35,7 @@ interface AzureCostsCardProps {
 }
 
 export function AzureCostsCard({ className }: AzureCostsCardProps) {
-  const t = useTranslations("admin.dashboard");
+  const t = useTranslations('admin.dashboard');
   const [summary, setSummary] = useState<CostSummary | null>(null);
   const [forecast, setForecast] = useState<CostForecast | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,14 +49,14 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
         setError(null);
 
         const [summaryRes, forecastRes] = await Promise.all([
-          fetch("/api/azure/costs?days=30&type=summary"),
-          fetch("/api/azure/costs?type=forecast"),
+          fetch('/api/azure/costs?days=30&type=summary'),
+          fetch('/api/azure/costs?type=forecast'),
         ]);
 
         if (summaryRes.status === 503) {
           const data = await summaryRes.json();
           setConfigured(data.configured === false);
-          setError("Azure authentication not configured");
+          setError('Azure authentication not configured');
           return;
         }
 
@@ -70,8 +70,8 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
           setForecast(data);
         }
       } catch (err) {
-        logger.error("Failed to fetch Azure costs", { error: String(err) });
-        setError(t("loadingError"));
+        logger.error('Failed to fetch Azure costs', { error: String(err) });
+        setError(t('loadingError'));
       } finally {
         setLoading(false);
       }
@@ -82,17 +82,17 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
 
   if (!configured) {
     return (
-      <Card className={cn("overflow-hidden", className)}>
+      <Card className={cn('overflow-hidden', className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            {t("azureCosts")}
+            {t('azureCosts')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-slate-500">
-            <p className="text-sm">{t("notAvailable")}</p>
-            <p className="text-xs mt-2">{t("authNotConfigured")}</p>
+            <p className="text-sm">{t('notAvailable')}</p>
+            <p className="text-xs mt-2">{t('authNotConfigured')}</p>
           </div>
         </CardContent>
       </Card>
@@ -101,16 +101,16 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
 
   if (loading) {
     return (
-      <Card className={cn("overflow-hidden", className)}>
+      <Card className={cn('overflow-hidden', className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            {t("azureCosts")}
+            {t('azureCosts')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-slate-500">
-            <p className="text-sm">{t("loading")}</p>
+            <p className="text-sm">{t('loading')}</p>
           </div>
         </CardContent>
       </Card>
@@ -119,11 +119,11 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
 
   if (error) {
     return (
-      <Card className={cn("overflow-hidden", className)}>
+      <Card className={cn('overflow-hidden', className)}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            {t("azureCosts")}
+            {t('azureCosts')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -138,16 +138,16 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
   const topServices = summary?.costsByService.slice(0, 3) || [];
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn('overflow-hidden', className)}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <DollarSign className="w-5 h-5" />
-          {t("azureCosts")}
+          {t('azureCosts')}
         </CardTitle>
         {summary && (
           <p className="text-xs text-slate-500">
-            {new Date(summary.periodStart).toLocaleDateString("it-IT")} -{" "}
-            {new Date(summary.periodEnd).toLocaleDateString("it-IT")}
+            {new Date(summary.periodStart).toLocaleDateString('it-IT')} -{' '}
+            {new Date(summary.periodEnd).toLocaleDateString('it-IT')}
           </p>
         )}
       </CardHeader>
@@ -159,7 +159,7 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  {t("last30Days")}
+                  {t('last30Days')}
                 </span>
                 <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   ${summary.totalCost.toFixed(2)}
@@ -175,7 +175,7 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
-                    {t("monthlyForecast")}
+                    {t('monthlyForecast')}
                   </span>
                 </div>
                 <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
@@ -188,9 +188,7 @@ export function AzureCostsCard({ className }: AzureCostsCardProps) {
           {/* Top services */}
           {topServices.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-slate-500 mb-2">
-                {t("topServices")}
-              </h4>
+              <h4 className="text-xs font-semibold text-slate-500 mb-2">{t('topServices')}</h4>
               <div className="space-y-2">
                 {topServices.map((service, index) => (
                   <div

@@ -5,15 +5,13 @@
 
 'use client';
 
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { invalidateCache } from './transport-selector';
 
 /**
  * Setup online event handler
  */
-export function createOnlineHandler(
-  onNetworkChange: () => void
-): () => void {
+export function createOnlineHandler(onNetworkChange: () => void): () => void {
   return () => {
     logger.info('[TransportMonitor] Network online detected');
     invalidateCache();
@@ -34,10 +32,7 @@ export function createOfflineHandler(): () => void {
 /**
  * Bind network event listeners
  */
-export function bindNetworkListeners(
-  onlineHandler: () => void,
-  offlineHandler: () => void
-): void {
+export function bindNetworkListeners(onlineHandler: () => void, offlineHandler: () => void): void {
   if (typeof window === 'undefined') return;
 
   window.addEventListener('online', onlineHandler);
@@ -49,7 +44,7 @@ export function bindNetworkListeners(
  */
 export function unbindNetworkListeners(
   onlineHandler: () => void,
-  offlineHandler: () => void
+  offlineHandler: () => void,
 ): void {
   if (typeof window === 'undefined') return;
 

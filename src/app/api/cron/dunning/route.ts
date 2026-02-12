@@ -7,18 +7,15 @@
 
 export const dynamic = 'force-dynamic';
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { pipe, withCron, withSentry } from '@/lib/api/middlewares';
 import { dunningService } from '@/lib/stripe/dunning-service';
 import { logger } from '@/lib/logger';
 
-export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+export const GET = pipe(
+  withSentry('/api/cron/dunning'),
+  withCron,
+)(async () => {
   try {
     await dunningService.sendDunningReminders();
     await dunningService.processGracePeriodExpired();
@@ -26,8 +23,7 @@ export async function GET(req: NextRequest) {
     logger.info('Dunning cron completed successfully');
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Dunning cron failed', { message }, error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    logger.error('Dunning cron failed', undefined, error);
+    return NextResponse.json({ error: 'Dunning cron execution failed' }, { status: 500 });
   }
-}
+});

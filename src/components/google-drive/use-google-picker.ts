@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import toast from '@/components/ui/toast';
 
 // Google Picker types

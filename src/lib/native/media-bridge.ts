@@ -9,11 +9,11 @@
  * Microphone access uses standard getUserMedia API on all platforms.
  */
 
-"use client";
+'use client';
 
-import { Capacitor } from "@capacitor/core";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { logger } from "@/lib/logger";
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 // ============================================================================
 // Platform Detection
@@ -38,7 +38,7 @@ export function getPlatform(): string {
 // ============================================================================
 
 export interface CapturePhotoOptions {
-  source: "camera" | "gallery";
+  source: 'camera' | 'gallery';
   quality?: number; // 0-100, default 90
 }
 
@@ -51,9 +51,7 @@ export interface PhotoResult {
  * Capture photo using native camera or gallery
  * Falls back to file input on web
  */
-export async function capturePhoto(
-  options: CapturePhotoOptions,
-): Promise<PhotoResult> {
+export async function capturePhoto(options: CapturePhotoOptions): Promise<PhotoResult> {
   const { source, quality = 90 } = options;
 
   if (isNativePlatform()) {
@@ -61,23 +59,23 @@ export async function capturePhoto(
     try {
       const photo = await Camera.getPhoto({
         resultType: CameraResultType.Base64,
-        source: source === "camera" ? CameraSource.Camera : CameraSource.Photos,
+        source: source === 'camera' ? CameraSource.Camera : CameraSource.Photos,
         quality,
         correctOrientation: true,
         allowEditing: false,
       });
 
-      logger.debug("[MediaBridge] Photo captured via Capacitor", {
+      logger.debug('[MediaBridge] Photo captured via Capacitor', {
         format: photo.format,
         platform: getPlatform(),
       });
 
       return {
-        base64: photo.base64String || "",
-        format: photo.format || "jpeg",
+        base64: photo.base64String || '',
+        format: photo.format || 'jpeg',
       };
     } catch (error) {
-      logger.error("[MediaBridge] Capacitor camera error", undefined, error);
+      logger.error('[MediaBridge] Capacitor camera error', undefined, error);
       throw error;
     }
   } else {
@@ -91,26 +89,26 @@ export async function capturePhoto(
  */
 function capturePhotoWeb(options: CapturePhotoOptions): Promise<PhotoResult> {
   return new Promise((resolve, reject) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
 
-    if (options.source === "camera") {
-      input.capture = "environment";
+    if (options.source === 'camera') {
+      input.capture = 'environment';
     }
 
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) {
-        reject(new Error("No file selected"));
+        reject(new Error('No file selected'));
         return;
       }
 
       try {
         const base64 = await fileToBase64(file);
-        const format = file.type.split("/")[1] || "jpeg";
+        const format = file.type.split('/')[1] || 'jpeg';
 
-        logger.debug("[MediaBridge] Photo captured via web", { format });
+        logger.debug('[MediaBridge] Photo captured via web', { format });
 
         resolve({ base64, format });
       } catch (error) {
@@ -119,7 +117,7 @@ function capturePhotoWeb(options: CapturePhotoOptions): Promise<PhotoResult> {
     };
 
     input.onerror = () => {
-      reject(new Error("File input error"));
+      reject(new Error('File input error'));
     };
 
     input.click();
@@ -135,12 +133,12 @@ function fileToBase64(file: File): Promise<string> {
 
     reader.onload = () => {
       const result = reader.result as string;
-      const base64 = result.split(",")[1];
+      const base64 = result.split(',')[1];
       resolve(base64);
     };
 
     reader.onerror = () => {
-      reject(new Error("Failed to read file"));
+      reject(new Error('Failed to read file'));
     };
 
     reader.readAsDataURL(file);
@@ -175,14 +173,14 @@ export async function requestMicrophoneStream(
       video: false,
     });
 
-    logger.debug("[MediaBridge] Microphone stream acquired", {
+    logger.debug('[MediaBridge] Microphone stream acquired', {
       tracks: stream.getAudioTracks().length,
       platform: getPlatform(),
     });
 
     return stream;
   } catch (error) {
-    logger.error("[MediaBridge] Microphone access error", undefined, error);
+    logger.error('[MediaBridge] Microphone access error', undefined, error);
     throw error;
   }
 }
@@ -192,14 +190,14 @@ export async function requestMicrophoneStream(
  */
 export function stopMicrophoneStream(stream: MediaStream): void {
   stream.getTracks().forEach((track) => track.stop());
-  logger.debug("[MediaBridge] Microphone stream stopped");
+  logger.debug('[MediaBridge] Microphone stream stopped');
 }
 
 // ============================================================================
 // Permission Checks
 // ============================================================================
 
-export type PermissionStatus = "granted" | "denied" | "prompt";
+export type PermissionStatus = 'granted' | 'denied' | 'prompt';
 
 /**
  * Check camera permission status
@@ -208,21 +206,17 @@ export async function checkCameraPermission(): Promise<PermissionStatus> {
   if (isNativePlatform()) {
     try {
       const permissions = await Camera.checkPermissions();
-      return permissions.camera === "granted" ? "granted" : "denied";
+      return permissions.camera === 'granted' ? 'granted' : 'denied';
     } catch (error) {
-      logger.error(
-        "[MediaBridge] Camera permission check error",
-        undefined,
-        error,
-      );
-      return "denied";
+      logger.error('[MediaBridge] Camera permission check error', undefined, error);
+      return 'denied';
     }
   } else {
     // Web: check if mediaDevices API is available
     if (navigator.mediaDevices) {
-      return "prompt"; // Web doesn't expose permission state before requesting
+      return 'prompt'; // Web doesn't expose permission state before requesting
     }
-    return "denied";
+    return 'denied';
   }
 }
 
@@ -234,7 +228,7 @@ export async function checkMicrophonePermission(): Promise<PermissionStatus> {
     // Try Permissions API (not supported on all platforms)
     if (navigator.permissions?.query) {
       const result = await navigator.permissions.query({
-        name: "microphone" as PermissionName,
+        name: 'microphone' as PermissionName,
       });
       return result.state as PermissionStatus;
     }
@@ -243,7 +237,7 @@ export async function checkMicrophonePermission(): Promise<PermissionStatus> {
   }
 
   // Fallback: assume prompt state if API available
-  return navigator.mediaDevices ? "prompt" : "denied";
+  return navigator.mediaDevices ? 'prompt' : 'denied';
 }
 
 /**
@@ -253,14 +247,10 @@ export async function requestCameraPermission(): Promise<PermissionStatus> {
   if (isNativePlatform()) {
     try {
       const permissions = await Camera.requestPermissions();
-      return permissions.camera === "granted" ? "granted" : "denied";
+      return permissions.camera === 'granted' ? 'granted' : 'denied';
     } catch (error) {
-      logger.error(
-        "[MediaBridge] Camera permission request error",
-        undefined,
-        error,
-      );
-      return "denied";
+      logger.error('[MediaBridge] Camera permission request error', undefined, error);
+      return 'denied';
     }
   }
 

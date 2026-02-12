@@ -6,7 +6,7 @@
 'use client';
 
 import { useCallback, useRef, useEffect } from 'react';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { int16ToFloat32 } from './audio-utils';
 import {
   AZURE_SAMPLE_RATE,
@@ -22,7 +22,11 @@ import {
   createPlaybackAnalyser,
   createAndConnectGainNode,
 } from './audio-context-init';
-import { calculateAverageLevel, shouldUpdateLevel, shouldUpdateLevelByDelta } from './audio-polling-helpers';
+import {
+  calculateAverageLevel,
+  shouldUpdateLevel,
+  shouldUpdateLevelByDelta,
+} from './audio-polling-helpers';
 
 export type { AudioPlaybackRefs, PollingControls };
 
@@ -34,26 +38,41 @@ export function useInitPlaybackContext(
   playbackContextRef: React.MutableRefObject<AudioContext | null>,
   playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>,
   gainNodeRef: React.MutableRefObject<GainNode | null>,
-  preferredOutputId?: string
+  preferredOutputId?: string,
 ) {
   return useCallback(async () => {
     if (playbackContextRef.current) {
       await resumeAudioContext(playbackContextRef.current);
-      return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
+      return {
+        context: playbackContextRef.current,
+        analyser: playbackAnalyserRef.current,
+        gainNode: gainNodeRef.current,
+      };
     }
 
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
-    logger.debug(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
+    logger.debug(
+      `[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`,
+    );
 
     playbackAnalyserRef.current = createPlaybackAnalyser(playbackContextRef.current);
-    gainNodeRef.current = createAndConnectGainNode(playbackContextRef.current, playbackAnalyserRef.current);
+    gainNodeRef.current = createAndConnectGainNode(
+      playbackContextRef.current,
+      playbackAnalyserRef.current,
+    );
     logger.debug('[VoiceSession] 🔊 Playback analyser and gain node created');
 
     await setAudioOutputDevice(playbackContextRef.current, preferredOutputId);
     await resumeAudioContext(playbackContextRef.current);
 
-    return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
+    return {
+      context: playbackContextRef.current,
+      analyser: playbackAnalyserRef.current,
+      gainNode: gainNodeRef.current,
+    };
   }, [playbackContextRef, playbackAnalyserRef, gainNodeRef, preferredOutputId]);
 }
 
@@ -62,7 +81,11 @@ export function useInitPlaybackContext(
  * Uses AudioContext.currentTime for precise scheduling to prevent stuttering
  * Audio is routed through gainNode -> analyser -> destination for real-time level monitoring
  */
-export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (value: boolean) => void, setOutputLevel: (value: number) => void) {
+export function useScheduleQueuedChunks(
+  refs: AudioPlaybackRefs,
+  setSpeaking: (value: boolean) => void,
+  setOutputLevel: (value: number) => void,
+) {
   return useCallback(() => {
     const ctx = refs.playbackContextRef.current;
     const gainNode = refs.gainNodeRef.current;
@@ -116,7 +139,10 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
           refs.scheduledSourcesRef.current.delete(source);
 
           // Check if all playback is done
-          if (refs.scheduledSourcesRef.current.size === 0 && refs.audioQueueRef.current.length === 0) {
+          if (
+            refs.scheduledSourcesRef.current.size === 0 &&
+            refs.audioQueueRef.current.length === 0
+          ) {
             refs.isPlayingRef.current = false;
             refs.isBufferingRef.current = true; // Reset to buffering for next response
             setSpeaking(false);
@@ -126,7 +152,6 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
 
         // Update next play time
         refs.nextPlayTimeRef.current += chunkDuration;
-
       } catch (e) {
         logger.error('[VoiceSession] Playback scheduling error', undefined, e);
       }
@@ -141,7 +166,7 @@ export function usePlayNextChunk(
   refs: AudioPlaybackRefs,
   scheduleQueuedChunks: () => void,
   setSpeaking: (value: boolean) => void,
-  setOutputLevel: (value: number) => void
+  setOutputLevel: (value: number) => void,
 ) {
   return useCallback(() => {
     const ctx = refs.playbackContextRef.current;
@@ -159,7 +184,9 @@ export function usePlayNextChunk(
 
     // If we're in buffering mode, wait for enough chunks
     if (refs.isBufferingRef.current && refs.audioQueueRef.current.length < MIN_BUFFER_CHUNKS) {
-      logger.debug(`[VoiceSession] Buffering... ${refs.audioQueueRef.current.length}/${MIN_BUFFER_CHUNKS} chunks`);
+      logger.debug(
+        `[VoiceSession] Buffering... ${refs.audioQueueRef.current.length}/${MIN_BUFFER_CHUNKS} chunks`,
+      );
       return;
     }
 
@@ -167,7 +194,9 @@ export function usePlayNextChunk(
     if (refs.isBufferingRef.current) {
       refs.isBufferingRef.current = false;
       refs.nextPlayTimeRef.current = ctx.currentTime + SCHEDULE_AHEAD_TIME;
-      logger.debug(`[VoiceSession] Buffer ready, starting scheduled playback at ${refs.nextPlayTimeRef.current.toFixed(3)}`);
+      logger.debug(
+        `[VoiceSession] Buffer ready, starting scheduled playback at ${refs.nextPlayTimeRef.current.toFixed(3)}`,
+      );
     }
 
     refs.isPlayingRef.current = true;
@@ -185,7 +214,7 @@ export function usePlayNextChunk(
 export function useOutputLevelPolling(
   playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>,
   isPlayingRef: React.MutableRefObject<boolean>,
-  setOutputLevel: (value: number) => void
+  setOutputLevel: (value: number) => void,
 ): PollingControls {
   const animationFrameRef = useRef<number | null>(null);
   const _dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);

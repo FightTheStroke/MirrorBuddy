@@ -2,20 +2,18 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Maximize2,
-  Minimize2,
-  Save,
-  Check,
-  X,
-} from 'lucide-react';
-import { logger } from '@/lib/logger';
+import { Maximize2, Minimize2, Save, Check, X } from 'lucide-react';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { Button } from '@/components/ui/button';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
-import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
+import {
+  buildDemoHTML,
+  getDemoSandboxPermissions,
+  getDemoAllowPermissions,
+} from '@/lib/tools/demo-html-builder';
 import { useBlobUrl } from '@/lib/tools/use-blob-url';
 import { cn } from '@/lib/utils';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 interface HTMLPreviewProps {
   code: string;
@@ -36,7 +34,7 @@ export function HTMLPreview({
   onClose,
   allowSave = true,
 }: HTMLPreviewProps) {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -58,7 +56,7 @@ export function HTMLPreview({
         'demo',
         title,
         { code, description, tags: subject ? [subject] : [] },
-        { subject }
+        { subject },
       );
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
@@ -73,22 +71,23 @@ export function HTMLPreview({
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
         'bg-white dark:bg-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col',
-        isFullscreen
-          ? 'fixed inset-4 z-50'
-          : 'w-full max-w-4xl max-h-[80vh]'
+        isFullscreen ? 'fixed inset-4 z-50' : 'w-full max-w-4xl max-h-[80vh]',
       )}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
         <div>
           <h3 className="font-bold text-slate-900 dark:text-white">{title}</h3>
-          {description && (
-            <p className="text-sm text-slate-500">{description}</p>
-          )}
+          {description && <p className="text-sm text-slate-500">{description}</p>}
         </div>
         <div className="flex items-center gap-2">
           {allowSave && (
-            <Button variant="ghost" size="icon-sm" onClick={handleSave} aria-label={saved ? t("salvato") : t("salvaDemo")}>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleSave}
+              aria-label={saved ? t('salvato') : t('salvaDemo')}
+            >
               {saved ? <Check className="w-4 h-4 text-green-500" /> : <Save className="w-4 h-4" />}
             </Button>
           )}
@@ -97,13 +96,13 @@ export function HTMLPreview({
             variant="ghost"
             size="icon-sm"
             onClick={() => setIsFullscreen(!isFullscreen)}
-            aria-label={isFullscreen ? t("esciDaSchermoIntero") : t("schermoIntero")}
+            aria-label={isFullscreen ? t('esciDaSchermoIntero') : t('schermoIntero')}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </Button>
 
           {onClose && (
-            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t("chiudiDemo")}>
+            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t('chiudiDemo')}>
               <X className="w-4 h-4" />
             </Button>
           )}

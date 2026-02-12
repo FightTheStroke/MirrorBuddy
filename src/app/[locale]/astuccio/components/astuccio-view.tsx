@@ -1,40 +1,31 @@
-"use client";
+'use client';
 
-import { useReducer, useCallback } from "react";
-import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
-import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
-import { useRouter, useParams } from "next/navigation";
-import { nanoid } from "nanoid";
-import { toast } from "@/components/ui/toast";
-import { logger } from "@/lib/logger";
-import { ToolCard } from "./tool-card";
-import { AstuccioInfoSection } from "./astuccio-info-section";
-import { ToolMaestroSelectionDialog } from "@/components/education/tool-maestro-selection-dialog";
-import { StudyKitView } from "@/components/study-kit/StudyKitView";
-import { TypingView } from "@/components/typing/TypingView";
-import { WebcamCapture } from "@/components/tools/webcam-capture";
-import { forceSaveMaterial } from "@/lib/hooks/use-saved-materials";
-import type { ToolType } from "@/types/tools";
-import type { Maestro } from "@/types";
-import { cn } from "@/lib/utils";
-import { PageHeader } from "@/components/ui/page-header";
-import {
-  TOOL_CATEGORIES,
-  getToolsByCategory,
-  toolRequiresMaestro,
-} from "@/lib/tools/constants";
+import { useReducer, useCallback } from 'react';
+import { Pencil, PencilRuler, FolderUp, Globe } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { useRouter, useParams } from 'next/navigation';
+import { nanoid } from 'nanoid';
+import { toast } from '@/components/ui/toast';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { ToolCard } from './tool-card';
+import { AstuccioInfoSection } from './astuccio-info-section';
+import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
+import { StudyKitView } from '@/components/study-kit/StudyKitView';
+import { TypingView } from '@/components/typing/TypingView';
+import { WebcamCapture } from '@/components/tools/webcam-capture';
+import { forceSaveMaterial } from '@/lib/hooks/use-saved-materials';
+import type { ToolType } from '@/types/tools';
+import type { Maestro } from '@/types';
+import { cn } from '@/lib/utils';
+import { PageHeader } from '@/components/ui/page-header';
+import { TOOL_CATEGORIES, getToolsByCategory, toolRequiresMaestro } from '@/lib/tools/constants';
 
 // ============================================================================
 // STATE MANAGEMENT - Unified with useReducer
 // ============================================================================
 
-type DialogState =
-  | "closed"
-  | "selecting_maestro"
-  | "study_kit"
-  | "typing"
-  | "webcam_standalone";
+type DialogState = 'closed' | 'selecting_maestro' | 'study_kit' | 'typing' | 'webcam_standalone';
 
 interface AstuccioState {
   selectedToolType: ToolType | null;
@@ -42,41 +33,38 @@ interface AstuccioState {
 }
 
 type AstuccioAction =
-  | { type: "SELECT_TOOL"; toolType: ToolType }
-  | { type: "OPEN_STANDALONE_TOOL"; toolType: ToolType }
-  | { type: "CONFIRM_MAESTRO" }
-  | { type: "CLOSE_DIALOG" }
-  | { type: "RESET" };
+  | { type: 'SELECT_TOOL'; toolType: ToolType }
+  | { type: 'OPEN_STANDALONE_TOOL'; toolType: ToolType }
+  | { type: 'CONFIRM_MAESTRO' }
+  | { type: 'CLOSE_DIALOG' }
+  | { type: 'RESET' };
 
 const initialState: AstuccioState = {
   selectedToolType: null,
-  dialogState: "closed",
+  dialogState: 'closed',
 };
 
-function astuccioReducer(
-  state: AstuccioState,
-  action: AstuccioAction,
-): AstuccioState {
+function astuccioReducer(state: AstuccioState, action: AstuccioAction): AstuccioState {
   switch (action.type) {
-    case "SELECT_TOOL":
+    case 'SELECT_TOOL':
       return {
         selectedToolType: action.toolType,
-        dialogState: "selecting_maestro",
+        dialogState: 'selecting_maestro',
       };
-    case "OPEN_STANDALONE_TOOL":
+    case 'OPEN_STANDALONE_TOOL':
       // Map tool type to appropriate dialog state
       const dialogStateMap: Record<string, DialogState> = {
-        "study-kit": "study_kit",
-        typing: "typing",
-        "webcam-standalone": "webcam_standalone",
+        'study-kit': 'study_kit',
+        typing: 'typing',
+        'webcam-standalone': 'webcam_standalone',
       };
       return {
         selectedToolType: action.toolType,
-        dialogState: dialogStateMap[action.toolType] || "closed",
+        dialogState: dialogStateMap[action.toolType] || 'closed',
       };
-    case "CONFIRM_MAESTRO":
-    case "CLOSE_DIALOG":
-    case "RESET":
+    case 'CONFIRM_MAESTRO':
+    case 'CLOSE_DIALOG':
+    case 'RESET':
       return initialState;
     default:
       return state;
@@ -119,11 +107,9 @@ interface AstuccioViewProps {
   onToolRequest?: (toolType: ToolType, maestro: Maestro) => void;
 }
 
-export function AstuccioView({
-  onToolRequest: _onToolRequest,
-}: AstuccioViewProps) {
-  const t = useTranslations("tools.astuccio");
-  const tTools = useTranslations("tools");
+export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProps) {
+  const t = useTranslations('tools.astuccio');
+  const tTools = useTranslations('tools');
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
@@ -132,34 +118,30 @@ export function AstuccioView({
   const getToolI18nKey = useCallback((toolType: ToolType) => {
     // Tool i18n keys are camelCase in messages (ADR 0091).
     // ToolType includes kebab-case values (e.g., "study-kit") which must be mapped.
-    return toolType.replace(/-([a-z])/g, (_, letter: string) =>
-      letter.toUpperCase(),
-    );
+    return toolType.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
   }, []);
 
   const handleToolClick = useCallback((toolType: ToolType) => {
     // Standalone tools have their own flow (no maestro selection)
     if (!toolRequiresMaestro(toolType)) {
-      dispatch({ type: "OPEN_STANDALONE_TOOL", toolType });
+      dispatch({ type: 'OPEN_STANDALONE_TOOL', toolType });
       return;
     }
-    dispatch({ type: "SELECT_TOOL", toolType });
+    dispatch({ type: 'SELECT_TOOL', toolType });
   }, []);
 
   const handleMaestroConfirm = useCallback(
-    (maestro: Maestro, _mode: "voice" | "chat") => {
+    (maestro: Maestro, _mode: 'voice' | 'chat') => {
       if (state.selectedToolType) {
-        router.push(
-          `/${locale}/maestri/${maestro.id}?tool=${state.selectedToolType}`,
-        );
+        router.push(`/${locale}/maestri/${maestro.id}?tool=${state.selectedToolType}`);
       }
-      dispatch({ type: "CONFIRM_MAESTRO" });
+      dispatch({ type: 'CONFIRM_MAESTRO' });
     },
     [state.selectedToolType, router, locale],
   );
 
   const handleDialogClose = useCallback(() => {
-    dispatch({ type: "CLOSE_DIALOG" });
+    dispatch({ type: 'CLOSE_DIALOG' });
   }, []);
 
   const handleWebcamCapture = useCallback(
@@ -167,44 +149,44 @@ export function AstuccioView({
       try {
         const toolId = nanoid();
         const timestamp = new Date().toISOString();
-        const title = t("webcamStandalone.savedTitle", {
+        const title = t('webcamStandalone.savedTitle', {
           date: new Date().toLocaleDateString(),
         });
 
         const content = {
           imageBase64,
-          extractedText: "",
-          imageDescription: "",
+          extractedText: '',
+          imageDescription: '',
           analysisTimestamp: timestamp,
         };
 
-        const success = await forceSaveMaterial("webcam", title, content, {
+        const success = await forceSaveMaterial('webcam', title, content, {
           toolId,
         });
 
         if (success) {
-          toast.success(t("webcamStandalone.saveSuccess"));
-          dispatch({ type: "CLOSE_DIALOG" });
+          toast.success(t('webcamStandalone.saveSuccess'));
+          dispatch({ type: 'CLOSE_DIALOG' });
         } else {
-          toast.error(t("webcamStandalone.saveError"));
+          toast.error(t('webcamStandalone.saveError'));
         }
       } catch (error) {
-        logger.error("Error saving webcam capture", undefined, error);
-        toast.error(t("webcamStandalone.saveError"));
+        logger.error('Error saving webcam capture', undefined, error);
+        toast.error(t('webcamStandalone.saveError'));
       }
     },
     [t],
   );
 
   // Show Study Kit view if selected
-  if (state.dialogState === "study_kit") {
+  if (state.dialogState === 'study_kit') {
     return (
       <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
         <button
           onClick={handleDialogClose}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
         >
-          {t("backToAstuccio")}
+          {t('backToAstuccio')}
         </button>
         <StudyKitView />
       </div>
@@ -212,14 +194,14 @@ export function AstuccioView({
   }
 
   // Show Typing view if selected
-  if (state.dialogState === "typing") {
+  if (state.dialogState === 'typing') {
     return (
       <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
         <button
           onClick={handleDialogClose}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
         >
-          {t("backToAstuccio")}
+          {t('backToAstuccio')}
         </button>
         <TypingView />
       </div>
@@ -227,11 +209,11 @@ export function AstuccioView({
   }
 
   // Show WebcamCapture if webcam-standalone is selected
-  if (state.dialogState === "webcam_standalone") {
+  if (state.dialogState === 'webcam_standalone') {
     return (
       <WebcamCapture
-        purpose={t("webcamStandalone.purpose")}
-        instructions={t("webcamStandalone.instructions")}
+        purpose={t('webcamStandalone.purpose')}
+        instructions={t('webcamStandalone.instructions')}
         onCapture={handleWebcamCapture}
         onClose={handleDialogClose}
         showTimer={true}
@@ -241,7 +223,7 @@ export function AstuccioView({
 
   return (
     <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
-      <PageHeader icon={PencilRuler} title={t("title")} />
+      <PageHeader icon={PencilRuler} title={t('title')} />
 
       <motion.div
         variants={containerVariants}
@@ -254,11 +236,7 @@ export function AstuccioView({
           const tools = getToolsByCategory(category.category);
 
           return (
-            <motion.section
-              key={category.id}
-              variants={categoryVariants}
-              className="space-y-4"
-            >
+            <motion.section key={category.id} variants={categoryVariants} className="space-y-4">
               <div className="flex items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm">
                   <CategoryIcon className="w-6 h-6 text-muted-foreground" />
@@ -273,18 +251,18 @@ export function AstuccioView({
                 </div>
                 <div className="ml-auto">
                   <span className="text-sm font-medium px-3 py-1 rounded-full bg-card border text-foreground">
-                    {t("toolsCount", { count: tools.length })}
+                    {t('toolsCount', { count: tools.length })}
                   </span>
                 </div>
               </div>
               <div
                 className={cn(
-                  "grid gap-4",
+                  'grid gap-4',
                   tools.length === 1
-                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
                     : tools.length <= 3
-                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                      : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
                 )}
               >
                 {tools.map((tool, index) => (
@@ -296,9 +274,7 @@ export function AstuccioView({
                   >
                     <ToolCard
                       title={tTools(`${getToolI18nKey(tool.type)}.label`)}
-                      description={tTools(
-                        `${getToolI18nKey(tool.type)}.description`,
-                      )}
+                      description={tTools(`${getToolI18nKey(tool.type)}.description`)}
                       icon={tool.icon}
                       onClick={() => handleToolClick(tool.type)}
                       isActive={state.selectedToolType === tool.type}
@@ -314,8 +290,8 @@ export function AstuccioView({
       <AstuccioInfoSection />
 
       <ToolMaestroSelectionDialog
-        isOpen={state.dialogState === "selecting_maestro"}
-        toolType={state.selectedToolType ?? "mindmap"}
+        isOpen={state.dialogState === 'selecting_maestro'}
+        toolType={state.selectedToolType ?? 'mindmap'}
         onConfirm={handleMaestroConfirm}
         onClose={handleDialogClose}
       />

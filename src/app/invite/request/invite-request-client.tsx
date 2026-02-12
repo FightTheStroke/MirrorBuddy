@@ -1,40 +1,40 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth";
-import { logger } from "@/lib/logger";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { csrfFetch } from '@/lib/auth';
+import { clientLogger as logger } from '@/lib/logger/client';
 
-type FormState = "idle" | "submitting" | "success" | "error";
+type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
 export function InviteRequestClient() {
   const router = useRouter();
-  const t = useTranslations("auth.invite.request");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [motivation, setMotivation] = useState("");
-  const [formState, setFormState] = useState<FormState>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  const t = useTranslations('auth.invite.request');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [motivation, setMotivation] = useState('');
+  const [formState, setFormState] = useState<FormState>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormState("submitting");
-    setErrorMessage("");
+    setFormState('submitting');
+    setErrorMessage('');
 
     try {
       // Get trial session ID if available
       const visitorId =
         document.cookie
-          .split("; ")
-          .find((row) => row.startsWith("mirrorbuddy-visitor-id="))
-          ?.split("=")[1] || undefined;
+          .split('; ')
+          .find((row) => row.startsWith('mirrorbuddy-visitor-id='))
+          ?.split('=')[1] || undefined;
 
-      const response = await csrfFetch("/api/invites/request", {
-        method: "POST",
+      const response = await csrfFetch('/api/invites/request', {
+        method: 'POST',
         body: JSON.stringify({
           name,
           email,
@@ -46,38 +46,34 @@ export function InviteRequestClient() {
       const data = await response.json();
 
       if (!response.ok) {
-        setFormState("error");
-        setErrorMessage(data.error || t("errors.sendError"));
+        setFormState('error');
+        setErrorMessage(data.error || t('errors.sendError'));
         return;
       }
 
-      setFormState("success");
+      setFormState('success');
     } catch (error) {
-      logger.error("Invite request failed", { error: String(error) });
+      logger.error('Invite request failed', { error: String(error) });
       const message =
         error instanceof Error && /csrf/i.test(error.message)
-          ? t("errors.sessionExpired")
-          : t("errors.connectionError");
-      setFormState("error");
+          ? t('errors.sessionExpired')
+          : t('errors.connectionError');
+      setFormState('error');
       setErrorMessage(message);
     }
   };
 
-  if (formState === "success") {
+  if (formState === 'success') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
         <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center space-y-6">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {t("successTitle")}
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            {t("successMessage")}
-          </p>
-          <Button onClick={() => router.push("/welcome")} className="w-full">
-            {t("returnHome")}
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('successTitle')}</h1>
+          <p className="text-slate-600 dark:text-slate-300">{t('successMessage')}</p>
+          <Button onClick={() => router.push('/welcome')} className="w-full">
+            {t('returnHome')}
           </Button>
         </div>
       </div>
@@ -92,24 +88,18 @@ export function InviteRequestClient() {
           className="flex items-center gap-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
-          {t("backButton")}
+          {t('backButton')}
         </button>
 
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {t("title")}
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300 mt-2">
-            {t("subtitle")}
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
+          <p className="text-slate-600 dark:text-slate-300 mt-2">{t('subtitle')}</p>
         </div>
 
-        {formState === "error" && (
+        {formState === 'error' && (
           <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
             <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-600 dark:text-red-400">
-              {errorMessage}
-            </p>
+            <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
           </div>
         )}
 
@@ -119,7 +109,7 @@ export function InviteRequestClient() {
               htmlFor="name"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              {t("nameLabel")}
+              {t('nameLabel')}
             </label>
             <input
               id="name"
@@ -128,9 +118,9 @@ export function InviteRequestClient() {
               onChange={(e) => setName(e.target.value)}
               required
               minLength={2}
-              disabled={formState === "submitting"}
+              disabled={formState === 'submitting'}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder={t("namePlaceholder")}
+              placeholder={t('namePlaceholder')}
             />
           </div>
 
@@ -139,7 +129,7 @@ export function InviteRequestClient() {
               htmlFor="email"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              {t("emailLabel")}
+              {t('emailLabel')}
             </label>
             <input
               id="email"
@@ -147,9 +137,9 @@ export function InviteRequestClient() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={formState === "submitting"}
+              disabled={formState === 'submitting'}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder={t("emailPlaceholder")}
+              placeholder={t('emailPlaceholder')}
             />
           </div>
 
@@ -158,7 +148,7 @@ export function InviteRequestClient() {
               htmlFor="motivation"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              {t("motivationLabel")}
+              {t('motivationLabel')}
             </label>
             <textarea
               id="motivation"
@@ -167,43 +157,39 @@ export function InviteRequestClient() {
               required
               minLength={20}
               rows={4}
-              disabled={formState === "submitting"}
+              disabled={formState === 'submitting'}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 resize-none"
-              placeholder={t("motivationPlaceholder")}
+              placeholder={t('motivationPlaceholder')}
             />
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              {t("minimumCharacters")}
+              {t('minimumCharacters')}
             </p>
           </div>
 
-          <Button
-            type="submit"
-            disabled={formState === "submitting"}
-            className="w-full"
-          >
-            {formState === "submitting" ? (
-              t("submitting")
+          <Button type="submit" disabled={formState === 'submitting'} className="w-full">
+            {formState === 'submitting' ? (
+              t('submitting')
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                {t("submitButton")}
+                {t('submitButton')}
               </>
             )}
           </Button>
         </form>
 
         <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-          {t("confirmationMessage")}
+          {t('confirmationMessage')}
         </p>
 
         <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
           <p className="text-sm text-slate-600 dark:text-slate-400 text-center mb-3">
-            {t("alreadyHaveAccount")}
+            {t('alreadyHaveAccount')}
           </p>
           <Link href="/login" className="block">
             <Button variant="outline" className="w-full">
               <LogIn className="w-4 h-4 mr-2" />
-              {t("loginButton")}
+              {t('loginButton')}
             </Button>
           </Link>
         </div>

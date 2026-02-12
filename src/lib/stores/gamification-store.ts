@@ -6,7 +6,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
 
 export interface GamificationState {
@@ -59,7 +59,12 @@ interface GamificationActions {
   // API calls
   fetchProgression: () => Promise<void>;
   fetchAchievements: () => Promise<void>;
-  awardPoints: (points: number, reason: string, sourceId?: string, sourceType?: string) => Promise<void>;
+  awardPoints: (
+    points: number,
+    reason: string,
+    sourceId?: string,
+    sourceType?: string,
+  ) => Promise<void>;
   updateStreak: (minutes: number) => Promise<void>;
 
   // UI helpers
@@ -153,12 +158,9 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
           mirrorBucks: data.mirrorBucks,
           level: data.level,
           tier: data.tier,
-          pointsToNextLevel: Math.max(0, (data.level * 1000) - data.seasonPoints),
+          pointsToNextLevel: Math.max(0, data.level * 1000 - data.seasonPoints),
           progressPercent: Math.round(((data.seasonPoints % 1000) / 1000) * 100),
-          recentAchievements: [
-            ...state.recentAchievements,
-            ...(data.newAchievements || []),
-          ],
+          recentAchievements: [...state.recentAchievements, ...(data.newAchievements || [])],
         });
 
         logger.info('Points awarded', {

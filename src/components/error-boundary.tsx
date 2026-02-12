@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 /**
  * React Error Boundary for MirrorBuddy
  *
  * Catches React rendering errors and displays a fallback UI.
- * Logs errors to both structured logger and Sentry for monitoring.
+ * Logs errors via structured logger (forwarded to Sentry in production).
  *
  * Usage:
  *   <ErrorBoundary fallback={<ErrorFallback />}>
@@ -12,10 +12,9 @@
  *   </ErrorBoundary>
  */
 
-import React, { Component, type ReactNode } from "react";
-import * as Sentry from "@sentry/nextjs";
-import { logger } from "@/lib/logger";
-import { useTranslations } from "next-intl";
+import React, { Component, type ReactNode } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { useTranslations } from 'next-intl';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -28,10 +27,7 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -44,7 +40,7 @@ export class ErrorBoundary extends Component<
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log error using structured logger
     logger.error(
-      "React Error Boundary caught error",
+      'React Error Boundary caught error',
       {
         errorName: error.name,
         errorMessage: error.message,
@@ -53,26 +49,12 @@ export class ErrorBoundary extends Component<
       error,
     );
 
-    // Report to Sentry for monitoring
-    Sentry.captureException(error, {
-      tags: {
-        errorType: "react-error-boundary",
-      },
-      contexts: {
-        react: {
-          componentStack: errorInfo.componentStack,
-        },
-      },
-    });
-
     this.props.onError?.(error, errorInfo);
   }
 
   render(): ReactNode {
     if (this.state.hasError) {
-      return (
-        this.props.fallback ?? <DefaultErrorFallback error={this.state.error} />
-      );
+      return this.props.fallback ?? <DefaultErrorFallback error={this.state.error} />;
     }
     return this.props.children;
   }
@@ -83,24 +65,17 @@ interface ErrorFallbackProps {
   reset?: () => void;
 }
 
-export function DefaultErrorFallback({
-  error,
-  reset,
-}: ErrorFallbackProps): ReactNode {
-  const t = useTranslations("errors");
+export function DefaultErrorFallback({ error, reset }: ErrorFallbackProps): ReactNode {
+  const t = useTranslations('errors');
   // Use static strings to avoid i18n dependency during static prerendering
   return (
     <div
       role="alert"
       className="flex min-h-[200px] flex-col items-center justify-center p-6 text-center"
     >
-      <h2 className="mb-2 text-xl font-semibold text-red-600">
-        {t("somethingWentWrong")}
-      </h2>
-      <p className="mb-4 text-gray-600">
-        {t("anUnexpectedErrorOccurredPleaseTryAgainLater")}
-      </p>
-      {process.env.NODE_ENV !== "production" && error && (
+      <h2 className="mb-2 text-xl font-semibold text-red-600">{t('somethingWentWrong')}</h2>
+      <p className="mb-4 text-gray-600">{t('anUnexpectedErrorOccurredPleaseTryAgainLater')}</p>
+      {process.env.NODE_ENV !== 'production' && error && (
         <pre className="mb-4 max-w-full overflow-auto rounded bg-gray-100 p-2 text-left text-xs">
           {error.message}
         </pre>
@@ -110,7 +85,7 @@ export function DefaultErrorFallback({
           onClick={reset}
           className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
         >
-          {t("retry")}
+          {t('retry')}
         </button>
       )}
     </div>

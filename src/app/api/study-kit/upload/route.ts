@@ -6,19 +6,15 @@
  * Wave 2: Study Kit Generator
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
-import * as Sentry from "@sentry/nextjs";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { processStudyKit } from "@/lib/tools/handlers/study-kit-generators";
-import {
-  saveMaterialsFromStudyKit,
-  indexStudyKitContent,
-} from "@/lib/study-kit/sync-materials";
-import { UploadStudyKitSchema } from "@/lib/validation/schemas/study-kit";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
+import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
+import { UploadStudyKitSchema } from '@/lib/validation/schemas/study-kit';
 
-export const runtime = "nodejs";
+export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
 
 /**
@@ -26,7 +22,7 @@ export const maxDuration = 300; // 5 minutes for processing
  * Upload PDF and generate study kit
  */
 export const POST = pipe(
-  withSentry("/api/study-kit/upload"),
+  withSentry('/api/study-kit/upload'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -34,33 +30,24 @@ export const POST = pipe(
 
   // Parse form data
   const formData = await ctx.req.formData();
-  const file = formData.get("file") as File | null;
-  const titleRaw = formData.get("title") as string | null;
-  const subjectRaw = formData.get("subject") as string | null;
+  const file = formData.get('file') as File | null;
+  const titleRaw = formData.get('title') as string | null;
+  const subjectRaw = formData.get('subject') as string | null;
 
   // Validate required file
   if (!file) {
-    return NextResponse.json(
-      { error: "Missing required field: file" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Missing required field: file' }, { status: 400 });
   }
 
   // Validate file type
-  if (!file.type.includes("pdf")) {
-    return NextResponse.json(
-      { error: "Only PDF files are supported" },
-      { status: 400 },
-    );
+  if (!file.type.includes('pdf')) {
+    return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 });
   }
 
   // Validate file size (max 10MB)
   const MAX_FILE_SIZE = 10 * 1024 * 1024;
   if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json(
-      { error: "File size must be less than 10MB" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
   }
 
   // Validate title and subject using schema
@@ -71,14 +58,14 @@ export const POST = pipe(
 
   if (!validation.success) {
     return NextResponse.json(
-      { error: "Invalid input", details: validation.error.format() },
+      { error: 'Invalid input', details: validation.error.format() },
       { status: 400 },
     );
   }
 
   const { title, subject } = validation.data;
 
-  logger.info("Processing study kit upload", {
+  logger.info('Processing study kit upload', {
     userId,
     filename: file.name,
     size: file.size,
@@ -97,7 +84,7 @@ export const POST = pipe(
       sourceFile: file.name,
       title,
       subject,
-      status: "processing",
+      status: 'processing',
     },
   });
 
@@ -110,7 +97,7 @@ export const POST = pipe(
         title,
         subject,
         (step, progress) => {
-          logger.debug("Study kit progress", {
+          logger.debug('Study kit progress', {
             studyKitId: studyKit.id,
             step,
             progress,
@@ -123,7 +110,7 @@ export const POST = pipe(
       const updatedKit = await prisma.studyKit.update({
         where: { id: studyKit.id },
         data: {
-          status: "ready",
+          status: 'ready',
           summary: result.summary,
           mindmap: result.mindmap ? JSON.stringify(result.mindmap) : null,
           demo: result.demo ? JSON.stringify(result.demo) : null,
@@ -143,29 +130,24 @@ export const POST = pipe(
         originalText: result.originalText,
       });
 
-      logger.info("Study kit processing complete", {
+      logger.info('Study kit processing complete', {
         studyKitId: studyKit.id,
       });
     } catch (error) {
-      // Capture to Sentry for visibility
-      Sentry.captureException(error, {
-        tags: { api: "study-kit-upload", phase: "processing" },
-        extra: { studyKitId: studyKit.id },
-      });
-
       // Update with error status - guaranteed to run for any error
       await prisma.studyKit.update({
         where: { id: studyKit.id },
         data: {
-          status: "error",
+          status: 'error',
           errorMessage: String(error),
         },
       });
 
-      logger.error("Study kit processing failed", {
-        studyKitId: studyKit.id,
-        error: String(error),
-      });
+      logger.error(
+        'Study kit processing failed',
+        { api: 'study-kit-upload', phase: 'processing', studyKitId: studyKit.id },
+        error,
+      );
     }
   })();
 
@@ -173,7 +155,7 @@ export const POST = pipe(
   return NextResponse.json({
     success: true,
     studyKitId: studyKit.id,
-    status: "processing",
-    message: "Study kit is being processed. This may take a few minutes.",
+    status: 'processing',
+    message: 'Study kit is being processed. This may take a few minutes.',
   });
 });

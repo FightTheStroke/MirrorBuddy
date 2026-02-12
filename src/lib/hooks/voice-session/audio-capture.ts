@@ -5,11 +5,11 @@
 // For microphone permission checks, see @/lib/native/media-bridge
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useCallback } from "react";
-import { logger } from "@/lib/logger";
-import { logAudioContextState } from "./voice-error-logger";
+import { useCallback } from 'react';
+import { clientLogger as logger } from '@/lib/logger/client';
+import { logAudioContextState } from './voice-error-logger';
 
 export interface AudioCaptureRefs {
   captureContextRef: React.MutableRefObject<AudioContext | null>;
@@ -33,7 +33,7 @@ export function useStartAudioCapture(
 ) {
   return useCallback(async () => {
     if (!refs.mediaStreamRef.current) {
-      logger.warn("[VoiceSession] Cannot start capture: missing media stream");
+      logger.warn('[VoiceSession] Cannot start capture: missing media stream');
       return;
     }
 
@@ -49,25 +49,24 @@ export function useStartAudioCapture(
           sampleRate: context.sampleRate,
           baseLatency: context.baseLatency,
         });
-        logger.debug(
-          "[VoiceSession] Created AudioContext for input level monitoring",
-          { state: context.state },
-        );
+        logger.debug('[VoiceSession] Created AudioContext for input level monitoring', {
+          state: context.state,
+        });
 
         // Resume immediately after creation (iOS Safari requirement)
-        if (context.state === "suspended") {
+        if (context.state === 'suspended') {
           try {
             await context.resume();
-            logger.debug("[VoiceSession] AudioContext resumed after creation");
+            logger.debug('[VoiceSession] AudioContext resumed after creation');
           } catch (err) {
-            logger.warn("[VoiceSession] Failed to resume AudioContext", {
+            logger.warn('[VoiceSession] Failed to resume AudioContext', {
               err,
             });
           }
         }
       } catch (error) {
         logger.error(
-          "[VoiceSession] Failed to create AudioContext",
+          '[VoiceSession] Failed to create AudioContext',
           { error: String(error) },
           error,
         );
@@ -82,7 +81,7 @@ export function useStartAudioCapture(
 
     // WebRTC: Skip audio processing, codec handled by RTCPeerConnection
     logger.debug(
-      "[VoiceSession] WebRTC mode: skipping ScriptProcessor (codec handled by RTCPeerConnection)",
+      '[VoiceSession] WebRTC mode: skipping ScriptProcessor (codec handled by RTCPeerConnection)',
     );
 
     // Create analyser for input levels only (no audio processing)
@@ -102,15 +101,10 @@ export function useStartAudioCapture(
         refs.lastLevelUpdateRef.current = now;
 
         const binCount = refs.analyserRef.current.frequencyBinCount;
-        if (
-          !refs.frequencyDataRef.current ||
-          refs.frequencyDataRef.current.length !== binCount
-        ) {
+        if (!refs.frequencyDataRef.current || refs.frequencyDataRef.current.length !== binCount) {
           refs.frequencyDataRef.current = new Uint8Array(binCount);
         }
-        refs.analyserRef.current.getByteFrequencyData(
-          refs.frequencyDataRef.current,
-        );
+        refs.analyserRef.current.getByteFrequencyData(refs.frequencyDataRef.current);
 
         let sum = 0;
         for (let i = 0; i < binCount; i++) {
@@ -125,8 +119,6 @@ export function useStartAudioCapture(
 
     refs.animationFrameRef.current = requestAnimationFrame(updateInputLevel);
 
-    logger.debug(
-      "[VoiceSession] Audio capture started (WebRTC, input level monitoring only)",
-    );
+    logger.debug('[VoiceSession] Audio capture started (WebRTC, input level monitoring only)');
   }, [refs, setInputLevel]);
 }

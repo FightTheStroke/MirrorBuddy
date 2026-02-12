@@ -16,7 +16,7 @@ import { DemoSandbox } from './demo-sandbox';
 import { LiveMindmap } from './live-mindmap';
 import { useCallback } from 'react';
 import toast from '@/components/ui/toast';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { escapeHtml } from '@/lib/tools/accessible-print/helpers';
 import type { MindmapNode } from '@/types/tools';
 

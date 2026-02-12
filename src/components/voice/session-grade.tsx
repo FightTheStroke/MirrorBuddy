@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { GradeDisplay } from './components/grade-display';
 import { useProgressStore, type SessionGrade } from '@/lib/stores';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import {
   generateFeedback,
   generateStrengths,

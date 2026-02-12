@@ -3,21 +3,17 @@
 // WebRTC-only selection logic
 // ============================================================================
 
-"use client";
+'use client';
 
-import { logger } from "@/lib/logger";
-import type {
-  ProbeResults,
-  TransportError,
-  TransportSelectionResult,
-} from "./transport-types";
+import { clientLogger as logger } from '@/lib/logger/client';
+import type { ProbeResults, TransportError, TransportSelectionResult } from './transport-types';
 
 // Re-export types
 export type {
   TransportSelection,
   TransportError,
   TransportSelectionResult,
-} from "./transport-types";
+} from './transport-types';
 
 // Re-export cache functions
 export {
@@ -26,7 +22,7 @@ export {
   invalidateCache,
   isCacheValid,
   getCacheInfo,
-} from "./transport-cache";
+} from './transport-cache';
 
 /**
  * Selection thresholds
@@ -36,25 +32,23 @@ const WEBRTC_LATENCY_THRESHOLD_MS = 500;
 /**
  * Select best transport based on probe results
  */
-export function selectBestTransport(
-  probeResults: ProbeResults,
-): TransportSelectionResult {
+export function selectBestTransport(probeResults: ProbeResults): TransportSelectionResult {
   const { webrtc } = probeResults;
 
-  logger.debug("[TransportSelector] Evaluating WebRTC probe result", {
+  logger.debug('[TransportSelector] Evaluating WebRTC probe result', {
     success: webrtc.success,
     latencyMs: webrtc.latencyMs,
   });
 
   // WebRTC failed
   if (!webrtc.success) {
-    logger.error("[TransportSelector] WebRTC unavailable", {
+    logger.error('[TransportSelector] WebRTC unavailable', {
       error: webrtc.error,
     });
 
     return {
       error: true,
-      message: "WebRTC transport unavailable",
+      message: 'WebRTC transport unavailable',
       webrtcError: webrtc.error,
     };
   }
@@ -62,12 +56,12 @@ export function selectBestTransport(
   // WebRTC successful - determine confidence based on latency
   const confidence =
     webrtc.latencyMs < WEBRTC_LATENCY_THRESHOLD_MS
-      ? "high"
+      ? 'high'
       : webrtc.latencyMs < 1000
-        ? "medium"
-        : "low";
+        ? 'medium'
+        : 'low';
 
-  logger.info("[TransportSelector] WebRTC selected", {
+  logger.info('[TransportSelector] WebRTC selected', {
     latencyMs: webrtc.latencyMs,
     confidence,
   });
@@ -82,24 +76,20 @@ export function selectBestTransport(
 /**
  * Check if selection result is an error
  */
-export function isTransportError(
-  result: TransportSelectionResult,
-): result is TransportError {
-  return "error" in result && result.error === true;
+export function isTransportError(result: TransportSelectionResult): result is TransportError {
+  return 'error' in result && result.error === true;
 }
 
 /**
  * Get confidence level description
  */
-export function getConfidenceDescription(
-  confidence: "high" | "medium" | "low",
-): string {
+export function getConfidenceDescription(confidence: 'high' | 'medium' | 'low'): string {
   switch (confidence) {
-    case "high":
-      return "Optimal connection expected";
-    case "medium":
-      return "Good connection, some latency possible";
-    case "low":
-      return "Connection may be slow";
+    case 'high':
+      return 'Optimal connection expected';
+    case 'medium':
+      return 'Good connection, some latency possible';
+    case 'low':
+      return 'Connection may be slow';
   }
 }

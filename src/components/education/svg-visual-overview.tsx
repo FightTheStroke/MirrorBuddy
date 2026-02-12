@@ -3,12 +3,9 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
+import { clientLogger as logger } from '@/lib/logger/client';
 import { SVGOverviewToolbar } from './components/svg-overview-toolbar';
-import {
-  parseTextToOverview,
-  type OverviewData,
-} from '@/lib/tools/svg-overview-generator';
+import { parseTextToOverview, type OverviewData } from '@/lib/tools/svg-overview-generator';
 import { SVGDiagramContainer } from './svg-visual-overview/svg-diagram-container';
 import { renderSVGDiagram, downloadSVG, convertSVGToPNG } from './svg-visual-overview/svg-renderer';
 
@@ -97,10 +94,17 @@ export function SVGVisualOverview({
   const handleExportPNG = useCallback(async () => {
     if (!svgContent) return;
     if (onExport) {
-      await convertSVGToPNG(svgContent, `${title.replace(/\s+/g, '-').toLowerCase()}-overview.png`, theme)
-        .then(() => onExport(svgContent, 'png'));
+      await convertSVGToPNG(
+        svgContent,
+        `${title.replace(/\s+/g, '-').toLowerCase()}-overview.png`,
+        theme,
+      ).then(() => onExport(svgContent, 'png'));
     } else {
-      await convertSVGToPNG(svgContent, `${title.replace(/\s+/g, '-').toLowerCase()}-overview.png`, theme);
+      await convertSVGToPNG(
+        svgContent,
+        `${title.replace(/\s+/g, '-').toLowerCase()}-overview.png`,
+        theme,
+      );
     }
   }, [svgContent, title, theme, onExport]);
 
@@ -118,10 +122,8 @@ export function SVGVisualOverview({
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'rounded-xl border overflow-hidden',
-        theme === 'dark'
-          ? 'border-slate-700 bg-slate-800'
-          : 'border-slate-300 bg-white',
-        className
+        theme === 'dark' ? 'border-slate-700 bg-slate-800' : 'border-slate-300 bg-white',
+        className,
       )}
       role="figure"
       aria-label={ariaLabel || `Visual overview of ${title}`}
