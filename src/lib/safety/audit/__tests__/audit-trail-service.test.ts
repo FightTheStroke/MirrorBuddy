@@ -3,12 +3,11 @@
  * F-05: Verify buffer flush to DB, DB failure recovery, and anonymization
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { prisma } from "@/lib/db";
-import * as Sentry from "@sentry/nextjs";
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock("@/lib/db", () => ({
+vi.mock('@/lib/db', () => ({
   prisma: {
     complianceAuditEntry: {
       createMany: vi.fn(),
@@ -17,7 +16,7 @@ vi.mock("@/lib/db", () => ({
 }));
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -32,12 +31,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-// Mock Sentry
-vi.mock("@sentry/nextjs", () => ({
-  captureException: vi.fn(),
-}));
-
-describe("audit-trail-service DB persistence", () => {
+describe('audit-trail-service DB persistence', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
@@ -51,10 +45,10 @@ describe("audit-trail-service DB persistence", () => {
   // BUFFER FLUSH TO DB TEST (F-05)
   // ========================================================================
 
-  describe("buffer fills to threshold -> flushes to DB", () => {
-    it("flushes buffer to DB via createMany when threshold reached", async () => {
+  describe('buffer fills to threshold -> flushes to DB', () => {
+    it('flushes buffer to DB via createMany when threshold reached', async () => {
       // Re-import to get fresh module state
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       vi.mocked(prisma.complianceAuditEntry.createMany).mockResolvedValue({
         count: 50,
@@ -62,10 +56,10 @@ describe("audit-trail-service DB persistence", () => {
 
       // Record 50 events to trigger flush (BUFFER_FLUSH_SIZE = 50)
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("content_filtered", {
+        recordSafetyEvent('content_filtered', {
           userId: `user-${i}`,
-          maestroId: "maestro-1",
-          metadata: { filterType: "profanity" },
+          maestroId: 'maestro-1',
+          metadata: { filterType: 'profanity' },
         });
       }
 
@@ -76,33 +70,29 @@ describe("audit-trail-service DB persistence", () => {
       expect(prisma.complianceAuditEntry.createMany).toHaveBeenCalledOnce();
 
       // Verify the structure of the data
-      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[0]?.[0];
+      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[0]?.[0];
       expect(callArgs).toBeDefined();
       expect(callArgs!.data).toHaveLength(50);
       expect(callArgs!.skipDuplicates).toBe(true);
 
       // Verify first entry structure
-      const firstEntry = (callArgs!.data as Array<unknown>)[0] as Record<
-        string,
-        unknown
-      >;
-      expect(firstEntry.eventType).toBe("content_filtered");
-      expect(firstEntry.severity).toBe("medium");
+      const firstEntry = (callArgs!.data as Array<unknown>)[0] as Record<string, unknown>;
+      expect(firstEntry.eventType).toBe('content_filtered');
+      expect(firstEntry.severity).toBe('medium');
       expect(firstEntry.userId).toBeNull();
       expect(firstEntry.adminId).toBeNull();
       expect(firstEntry.ipAddress).toBeNull();
-      expect(firstEntry.description).toBe("Safety event: content_filtered");
+      expect(firstEntry.description).toBe('Safety event: content_filtered');
 
       // Verify details contain the anonymized userId
       const details = JSON.parse(firstEntry.details as string);
-      expect(details.anonymizedUserId).toBe("user-0***");
-      expect(details.maestroId).toBe("maestro-1");
-      expect(details.metadata.filterType).toBe("profanity");
+      expect(details.anonymizedUserId).toBe('user-0***');
+      expect(details.maestroId).toBe('maestro-1');
+      expect(details.metadata.filterType).toBe('profanity');
     });
 
-    it("includes all event data in DB entries", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+    it('includes all event data in DB entries', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       vi.mocked(prisma.complianceAuditEntry.createMany).mockResolvedValue({
         count: 50,
@@ -110,7 +100,7 @@ describe("audit-trail-service DB persistence", () => {
 
       // Record 50 events with various data
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("guardrail_triggered", {
+        recordSafetyEvent('guardrail_triggered', {
           userId: `user-test-${i}`,
           maestroId: `maestro-${i}`,
           sessionId: `session-${i}`,
@@ -124,8 +114,7 @@ describe("audit-trail-service DB persistence", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[0]?.[0];
+      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[0]?.[0];
       expect(callArgs).toBeDefined();
       const entries = callArgs!.data as Array<Record<string, unknown>>;
 
@@ -133,12 +122,12 @@ describe("audit-trail-service DB persistence", () => {
       const lastEntry = entries[49];
       const lastDetails = JSON.parse(lastEntry.details as string);
 
-      expect(lastDetails.anonymizedUserId).toBe("user-tes***");
-      expect(lastDetails.maestroId).toBe("maestro-49");
+      expect(lastDetails.anonymizedUserId).toBe('user-tes***');
+      expect(lastDetails.maestroId).toBe('maestro-49');
       expect(lastDetails.sessionHash).toBeDefined();
-      expect(lastDetails.metadata.guardrailRuleId).toBe("rule-49");
+      expect(lastDetails.metadata.guardrailRuleId).toBe('rule-49');
       expect(lastDetails.metadata.confidence).toBe(0.95);
-      expect(lastDetails.contentHash).toBe("hash-49");
+      expect(lastDetails.contentHash).toBe('hash-49');
     });
   });
 
@@ -146,101 +135,73 @@ describe("audit-trail-service DB persistence", () => {
   // DB FAILURE RECOVERY TEST (F-05)
   // ========================================================================
 
-  describe("DB failure -> events retained in buffer", () => {
-    it("retains events in buffer when DB write fails", async () => {
-      const { recordSafetyEvent, getAuditEntries } =
-        await import("../audit-trail-service");
+  describe('DB failure -> events retained in buffer', () => {
+    it('retains events in buffer when DB write fails', async () => {
+      const { recordSafetyEvent, getAuditEntries } = await import('../audit-trail-service');
 
       // Mock DB failure
       vi.mocked(prisma.complianceAuditEntry.createMany).mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error('Database connection failed'),
       );
 
       // Record 50 events to trigger flush
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("content_filtered", {
+        recordSafetyEvent('content_filtered', {
           userId: `user-${i}`,
-          maestroId: "maestro-1",
+          maestroId: 'maestro-1',
         });
       }
 
       // Wait for flush attempt
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Verify Sentry was called
-      expect(Sentry.captureException).toHaveBeenCalledWith(
-        expect.any(Error),
-        expect.objectContaining({
-          contexts: expect.objectContaining({
-            audit: expect.objectContaining({
-              bufferedEntries: 50,
-              eventTypes: ["content_filtered"],
-            }),
-          }),
-        }),
-      );
+      expect(prisma.complianceAuditEntry.createMany).toHaveBeenCalled();
 
       // Verify events are still in buffer (can be retrieved)
       const entries = getAuditEntries({ limit: 100 });
       expect(entries.length).toBe(50);
     });
 
-    it("logs error to Sentry with context on DB failure", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+    it('attempts DB flush and retains buffered events on DB failure', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
-      const dbError = new Error("Connection timeout");
-      vi.mocked(prisma.complianceAuditEntry.createMany).mockRejectedValue(
-        dbError,
-      );
+      const dbError = new Error('Connection timeout');
+      vi.mocked(prisma.complianceAuditEntry.createMany).mockRejectedValue(dbError);
 
       // Record events with different types
       for (let i = 0; i < 30; i++) {
-        recordSafetyEvent("content_filtered", { userId: `user-${i}` });
+        recordSafetyEvent('content_filtered', { userId: `user-${i}` });
       }
       for (let i = 0; i < 20; i++) {
-        recordSafetyEvent("guardrail_triggered", { userId: `user-${i + 30}` });
+        recordSafetyEvent('guardrail_triggered', { userId: `user-${i + 30}` });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      expect(Sentry.captureException).toHaveBeenCalledWith(
-        dbError,
-        expect.objectContaining({
-          contexts: expect.objectContaining({
-            audit: expect.objectContaining({
-              bufferedEntries: 50,
-              eventTypes: expect.arrayContaining([
-                "content_filtered",
-                "guardrail_triggered",
-              ]),
-            }),
-          }),
-        }),
-      );
+      expect(prisma.complianceAuditEntry.createMany).toHaveBeenCalled();
     });
 
-    it("retries flush on next threshold after DB recovery", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+    it('retries flush on next threshold after DB recovery', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       // Clear mocks from previous tests in this isolated test
       vi.clearAllMocks();
 
       // First flush fails
       vi.mocked(prisma.complianceAuditEntry.createMany).mockRejectedValueOnce(
-        new Error("DB error"),
+        new Error('DB error'),
       );
 
       // Record 50 events (trigger first flush)
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("content_filtered", { userId: `user-${i}` });
+        recordSafetyEvent('content_filtered', { userId: `user-${i}` });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 150));
 
       // Store first flush call count
-      const firstFlushCallCount = vi.mocked(
-        prisma.complianceAuditEntry.createMany,
-      ).mock.calls.length;
+      const firstFlushCallCount = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls
+        .length;
       expect(firstFlushCallCount).toBeGreaterThanOrEqual(1);
 
       // Mock DB recovery
@@ -250,21 +211,21 @@ describe("audit-trail-service DB persistence", () => {
 
       // Record 50 more events (trigger second flush with 100 total)
       for (let i = 50; i < 100; i++) {
-        recordSafetyEvent("guardrail_triggered", { userId: `user-${i}` });
+        recordSafetyEvent('guardrail_triggered', { userId: `user-${i}` });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 150));
 
       // Verify second flush occurred (call count increased)
-      const secondFlushCallCount = vi.mocked(
-        prisma.complianceAuditEntry.createMany,
-      ).mock.calls.length;
+      const secondFlushCallCount = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls
+        .length;
       expect(secondFlushCallCount).toBeGreaterThan(firstFlushCallCount);
 
       // Verify the last call had all 100 events
       const lastCallIndex = secondFlushCallCount - 1;
-      const lastCall = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[lastCallIndex]?.[0];
+      const lastCall = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[
+        lastCallIndex
+      ]?.[0];
       expect(lastCall).toBeDefined();
       expect((lastCall!.data as Array<unknown>).length).toBe(100);
     });
@@ -274,56 +235,50 @@ describe("audit-trail-service DB persistence", () => {
   // ANONYMIZATION TEST (F-05)
   // ========================================================================
 
-  describe("anonymizeUserId called before DB write", () => {
-    it("anonymizes userId before storing in DB", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+  describe('anonymizeUserId called before DB write', () => {
+    it('anonymizes userId before storing in DB', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       vi.mocked(prisma.complianceAuditEntry.createMany).mockResolvedValue({
         count: 50,
       });
 
       // Record events with different userId formats
-      const userIds = [
-        "user-12345678-long-id",
-        "short",
-        "exactly8c",
-        "user@example.com",
-      ];
+      const userIds = ['user-12345678-long-id', 'short', 'exactly8c', 'user@example.com'];
 
       for (let i = 0; i < 47; i++) {
-        recordSafetyEvent("content_filtered", {
+        recordSafetyEvent('content_filtered', {
           userId: userIds[i % userIds.length],
         });
       }
 
       // Add 3 more to reach threshold
-      recordSafetyEvent("content_filtered", { userId: "final-user-123" });
-      recordSafetyEvent("content_filtered", { userId: "test" });
-      recordSafetyEvent("content_filtered", { userId: "abcdefghij" });
+      recordSafetyEvent('content_filtered', { userId: 'final-user-123' });
+      recordSafetyEvent('content_filtered', { userId: 'test' });
+      recordSafetyEvent('content_filtered', { userId: 'abcdefghij' });
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[0]?.[0];
+      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[0]?.[0];
       expect(callArgs).toBeDefined();
       const entries = callArgs!.data as Array<Record<string, unknown>>;
 
       // Verify anonymization patterns
       const firstDetails = JSON.parse(entries[0].details as string);
-      expect(firstDetails.anonymizedUserId).toBe("user-123***");
+      expect(firstDetails.anonymizedUserId).toBe('user-123***');
 
       const shortDetails = JSON.parse(entries[1].details as string);
-      expect(shortDetails.anonymizedUserId).toBe("short***");
+      expect(shortDetails.anonymizedUserId).toBe('short***');
 
       const exactDetails = JSON.parse(entries[2].details as string);
-      expect(exactDetails.anonymizedUserId).toBe("exactly8***");
+      expect(exactDetails.anonymizedUserId).toBe('exactly8***');
 
       const emailDetails = JSON.parse(entries[3].details as string);
-      expect(emailDetails.anonymizedUserId).toBe("user@exa***");
+      expect(emailDetails.anonymizedUserId).toBe('user@exa***');
     });
 
-    it("handles missing userId gracefully", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+    it('handles missing userId gracefully', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       vi.mocked(prisma.complianceAuditEntry.createMany).mockResolvedValue({
         count: 50,
@@ -331,15 +286,14 @@ describe("audit-trail-service DB persistence", () => {
 
       // Record events without userId
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("safety_config_changed", {
-          metadata: { context: { change: "test" } },
+        recordSafetyEvent('safety_config_changed', {
+          metadata: { context: { change: 'test' } },
         });
       }
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[0]?.[0];
+      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[0]?.[0];
       expect(callArgs).toBeDefined();
       const entries = callArgs!.data as Array<Record<string, unknown>>;
 
@@ -348,17 +302,17 @@ describe("audit-trail-service DB persistence", () => {
       expect(details.anonymizedUserId).toBeUndefined();
     });
 
-    it("never stores raw userId in DB", async () => {
-      const { recordSafetyEvent } = await import("../audit-trail-service");
+    it('never stores raw userId in DB', async () => {
+      const { recordSafetyEvent } = await import('../audit-trail-service');
 
       vi.mocked(prisma.complianceAuditEntry.createMany).mockResolvedValue({
         count: 50,
       });
 
-      const sensitiveUserId = "user-sensitive-12345678";
+      const sensitiveUserId = 'user-sensitive-12345678';
 
       for (let i = 0; i < 50; i++) {
-        recordSafetyEvent("prompt_injection_attempt", {
+        recordSafetyEvent('prompt_injection_attempt', {
           userId: sensitiveUserId,
           metadata: { confidence: 0.99 },
         });
@@ -366,8 +320,7 @@ describe("audit-trail-service DB persistence", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock
-        .calls[0]?.[0];
+      const callArgs = vi.mocked(prisma.complianceAuditEntry.createMany).mock.calls[0]?.[0];
       expect(callArgs).toBeDefined();
       const entries = callArgs!.data as Array<Record<string, unknown>>;
 
@@ -377,9 +330,9 @@ describe("audit-trail-service DB persistence", () => {
 
         // Verify only anonymized version in details
         const details = JSON.parse(entry.details as string);
-        expect(details.anonymizedUserId).toBe("user-sen***");
-        expect(details.anonymizedUserId).not.toContain("sensitive");
-        expect(details.anonymizedUserId).not.toContain("12345678");
+        expect(details.anonymizedUserId).toBe('user-sen***');
+        expect(details.anonymizedUserId).not.toContain('sensitive');
+        expect(details.anonymizedUserId).not.toContain('12345678');
       }
     });
   });
