@@ -7,25 +7,27 @@
  * Multi-instance safe when Redis is configured.
  */
 
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
-import { logger } from "@/lib/logger";
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
-const log = logger.child({ module: "rate-limit" });
+const log = logger.child({ module: 'rate-limit' });
 
 interface RateLimitEntry {
   count: number;
   resetTime: number;
 }
 
+// Circuit breaker: if Redis auth is misconfigured (Upstash WRONGPASS), stop
+// calling Redis for the lifetime of the serverless instance to avoid log spam.
+let redisDisabledUntilRestart = false;
+
 // In-memory store (cleared on server restart)
 const store = new Map<string, RateLimitEntry>();
 
 // Check if Redis rate limiting is available
 function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
 }
 
 // Lazy-init Redis client - one per config
@@ -45,11 +47,11 @@ function getRedisRatelimit(maxRequests: number, windowMs: number): Ratelimit {
       redis,
       limiter: Ratelimit.slidingWindow(maxRequests, `${windowMs}ms`),
       analytics: false,
-      prefix: "mirrorbuddy:ratelimit",
+      prefix: 'mirrorbuddy:ratelimit',
     });
 
     redisLimiters.set(key, limiter);
-    log.info("Redis rate limiter initialized", { maxRequests, windowMs });
+    log.info('Redis rate limiter initialized', { maxRequests, windowMs });
   }
 
   return limiter;
@@ -58,8 +60,8 @@ function getRedisRatelimit(maxRequests: number, windowMs: number): Ratelimit {
 /**
  * Get the current rate limit mode
  */
-export function getRateLimitMode(): "redis" | "memory" {
-  return isRedisConfigured() ? "redis" : "memory";
+export function getRateLimitMode(): 'redis' | 'memory' {
+  return isRedisConfigured() ? 'redis' : 'memory';
 }
 
 // Cleanup old entries every 5 minutes (memory mode only)
@@ -90,16 +92,13 @@ export function stopCleanup(): void {
 }
 
 // Re-export types from shared module to maintain API compatibility
-export type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
-import type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
+export type { RateLimitConfig, RateLimitResult } from './rate-limit-types';
+import type { RateLimitConfig, RateLimitResult } from './rate-limit-types';
 
 /**
  * Memory-based rate limit check
  */
-function checkMemoryRateLimit(
-  identifier: string,
-  config: RateLimitConfig,
-): RateLimitResult {
+function checkMemoryRateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
   startCleanup();
 
   const now = Date.now();
@@ -141,6 +140,10 @@ async function checkRedisRateLimitAsync(
   identifier: string,
   config: RateLimitConfig,
 ): Promise<RateLimitResult> {
+  if (redisDisabledUntilRestart) {
+    return checkMemoryRateLimit(identifier, config);
+  }
+
   try {
     const limiter = getRedisRatelimit(config.maxRequests, config.windowMs);
     const result = await limiter.limit(identifier);
@@ -152,7 +155,15 @@ async function checkRedisRateLimitAsync(
       limit: result.limit,
     };
   } catch (error) {
-    log.error("Redis rate limit error, falling back to memory", { error });
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes('WRONGPASS')) {
+      redisDisabledUntilRestart = true;
+      log.error('Redis rate limiter disabled (WRONGPASS). Falling back to memory until restart.', {
+        error: message,
+      });
+    } else {
+      log.error('Redis rate limit error, falling back to memory', { error });
+    }
     return checkMemoryRateLimit(identifier, config);
   }
 }
@@ -167,10 +178,7 @@ async function checkRedisRateLimitAsync(
  * @param config - Rate limit configuration
  * @returns Rate limit result with remaining quota
  */
-export function checkRateLimit(
-  identifier: string,
-  config: RateLimitConfig,
-): RateLimitResult {
+export function checkRateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
   // Validate identifier at start
   const idValidation = validateIdentifier(identifier);
   if (!idValidation.valid) {
@@ -184,7 +192,7 @@ export function checkRateLimit(
   }
 
   // Skip rate limiting in E2E tests and development mode
-  if (process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "development") {
+  if (process.env.E2E_TESTS === '1' || process.env.NODE_ENV === 'development') {
     const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
@@ -223,7 +231,7 @@ export async function checkRateLimitAsync(
   }
 
   // Skip rate limiting in E2E tests and development mode
-  if (process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "development") {
+  if (process.env.E2E_TESTS === '1' || process.env.NODE_ENV === 'development') {
     const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
@@ -234,17 +242,15 @@ export async function checkRateLimitAsync(
   }
 
   // In production, Redis is REQUIRED - fail fast if not configured
-  if (process.env.NODE_ENV === "production" && !isRedisConfigured()) {
-    log.error(
-      "CRITICAL: Redis not configured in production - rate limiting disabled",
-    );
+  if (process.env.NODE_ENV === 'production' && !isRedisConfigured()) {
+    log.error('CRITICAL: Redis not configured in production - rate limiting disabled');
     // Fail-fast: return service unavailable
     return {
       success: false,
       remaining: 0,
       resetTime: Date.now() + 60000, // Retry in 1 minute
       limit: 0,
-      error: "Rate limiting service unavailable",
+      error: 'Rate limiting service unavailable',
     };
   }
 
@@ -263,11 +269,11 @@ export function validateIdentifier(identifier: string): {
   valid: boolean;
   error?: string;
 } {
-  if (process.env.NODE_ENV === "production" && identifier === "anonymous") {
-    log.warn("Anonymous rate limit identifier rejected in production");
+  if (process.env.NODE_ENV === 'production' && identifier === 'anonymous') {
+    log.warn('Anonymous rate limit identifier rejected in production');
     return {
       valid: false,
-      error: "Unable to identify client for rate limiting",
+      error: 'Unable to identify client for rate limiting',
     };
   }
   return { valid: true };
@@ -279,18 +285,18 @@ export function validateIdentifier(identifier: string): {
  */
 export function getClientIdentifier(request: Request): string {
   // Try various headers for IP
-  const forwarded = request.headers.get("x-forwarded-for");
+  const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
-    return forwarded.split(",")[0].trim();
+    return forwarded.split(',')[0].trim();
   }
 
-  const realIp = request.headers.get("x-real-ip");
+  const realIp = request.headers.get('x-real-ip');
   if (realIp) {
     return realIp;
   }
 
   // Fallback for local development
-  return "anonymous";
+  return 'anonymous';
 }
 
 /**
@@ -301,10 +307,7 @@ export function getClientIdentifier(request: Request): string {
  * @param userId - Optional authenticated userId
  * @returns Best identifier for rate limiting
  */
-export function getRateLimitIdentifier(
-  request: Request,
-  userId?: string | null,
-): string {
+export function getRateLimitIdentifier(request: Request, userId?: string | null): string {
   // Prefer userId for authenticated users (more accurate, prevents IP sharing issues)
   if (userId) {
     return `user:${userId}`;
@@ -405,28 +408,22 @@ export const RATE_LIMITS = {
 export function rateLimitResponse(result: RateLimitResult): Response {
   return new Response(
     JSON.stringify({
-      error: "Too many requests",
-      message: "Rate limit exceeded. Please try again later.",
+      error: 'Too many requests',
+      message: 'Rate limit exceeded. Please try again later.',
       retryAfter: Math.ceil((result.resetTime - Date.now()) / 1000),
     }),
     {
       status: 429,
       headers: {
-        "Content-Type": "application/json",
-        "X-RateLimit-Limit": result.limit.toString(),
-        "X-RateLimit-Remaining": "0",
-        "X-RateLimit-Reset": result.resetTime.toString(),
-        "Retry-After": Math.ceil(
-          (result.resetTime - Date.now()) / 1000,
-        ).toString(),
+        'Content-Type': 'application/json',
+        'X-RateLimit-Limit': result.limit.toString(),
+        'X-RateLimit-Remaining': '0',
+        'X-RateLimit-Reset': result.resetTime.toString(),
+        'Retry-After': Math.ceil((result.resetTime - Date.now()) / 1000).toString(),
       },
     },
   );
 }
 
 // Re-export persistence functions
-export {
-  logRateLimitEvent,
-  getRateLimitEvents,
-  getRateLimitStats,
-} from "./rate-limit-persistence";
+export { logRateLimitEvent, getRateLimitEvents, getRateLimitStats } from './rate-limit-persistence';

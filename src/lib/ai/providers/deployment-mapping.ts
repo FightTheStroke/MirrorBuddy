@@ -11,6 +11,11 @@
 
 import { logger } from '@/lib/logger';
 
+function getChatDeploymentFallback(): string | undefined {
+  const fallback = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim();
+  return fallback ? fallback : undefined;
+}
+
 /**
  * Mapping from tier model names to Azure deployment names
  *
@@ -24,11 +29,13 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || 'gpt-4-turbo',
 
   // GPT-5 family (new models)
-  'gpt-5-nano': process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || 'gpt-5-nano',
-  'gpt-5-mini': process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || 'gpt-5-edu-mini',
-  'gpt-5-chat': process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || 'gpt-5-chat',
-  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || 'gpt-5.2-chat',
-  'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || 'gpt-5.2-edu',
+  // IMPORTANT: In production, `AZURE_OPENAI_CHAT_DEPLOYMENT` should always point
+  // to an existing Azure deployment. We fall back to it to avoid 404 DeploymentNotFound.
+  'gpt-5-nano': process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || getChatDeploymentFallback(),
+  'gpt-5-mini': process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || getChatDeploymentFallback(),
+  'gpt-5-chat': process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
+  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
+  'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || getChatDeploymentFallback(),
 
   // Realtime models (voice)
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-4o-realtime',
@@ -52,8 +59,20 @@ export function getDeploymentForModel(tierModel: string): string {
     return deployment;
   }
 
-  // If no mapping, assume the tier model name IS the deployment name
-  logger.debug('No mapping for model, using as-is', { tierModel });
+  // If no mapping, use the default chat deployment when available.
+  const fallback = getChatDeploymentFallback();
+  if (fallback) {
+    logger.warn('No deployment mapping for model, falling back to AZURE_OPENAI_CHAT_DEPLOYMENT', {
+      tierModel,
+      fallback,
+    });
+    return fallback;
+  }
+
+  // Last resort: assume the tier model name IS the deployment name.
+  logger.warn('No deployment mapping and no AZURE_OPENAI_CHAT_DEPLOYMENT, using model as-is', {
+    tierModel,
+  });
   return tierModel;
 }
 
