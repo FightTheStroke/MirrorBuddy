@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Architecture Map & Drift Detection
+
+### Architecture
+
+- Added: `docs/architecture-map.md` — 6-layer dependency model (Types, Infrastructure, Horizontal, Domain, State, Presentation) with allowed-imports matrix, high-impact modules, entry points, and key invariants
+- Added: `scripts/drift-check.sh` — Automated codebase drift detection (file length >250 lines, @ts-ignore, `as any` casts, TODO/FIXME/HACK markers, circular domain dependencies)
+- Added: Three output modes: `--summary` (JSON), `--detail` (file lists), `--fix-hint` (remediation suggestions)
+- Added: ADR 0146 — Architecture Map and Drift-Check Script
+- Learnings: Inspired by OpenAI "Harness Engineering" article; automated quality gates catch drift faster than code review
+
 ## [Unreleased] — Audit Hardening (Plan 144)
 
 ### Security
