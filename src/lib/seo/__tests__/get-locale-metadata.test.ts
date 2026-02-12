@@ -46,12 +46,12 @@ describe('getLocaleMetadata', () => {
     expect(canonical).toBe(`${testBaseUrl}/it`);
   });
 
-  it('should fallback to mirrorbuddy.org when NEXT_PUBLIC_SITE_URL is not set', () => {
+  it('should fallback to localhost when NEXT_PUBLIC_SITE_URL is not set', () => {
     const original = process.env.NEXT_PUBLIC_SITE_URL;
     try {
       delete process.env.NEXT_PUBLIC_SITE_URL;
       const result = getLocaleMetadata('/home', locales);
-      expect(result.alternates?.canonical).toContain('https://mirrorbuddy.org');
+      expect(result.alternates?.canonical).toContain('http://localhost:3000');
     } finally {
       process.env.NEXT_PUBLIC_SITE_URL = original;
     }

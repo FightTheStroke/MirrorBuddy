@@ -31,7 +31,7 @@ export function HreflangTags({
   locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangTagsProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mirrorbuddy.org';
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
   const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
   return (

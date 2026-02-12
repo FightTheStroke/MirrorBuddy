@@ -36,7 +36,7 @@ export function getLocaleMetadata(
   pathname: string,
   locales: readonly Locale[] = SUPPORTED_LOCALES,
 ): Pick<Metadata, 'alternates'> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   const hreflangTags = generateHreflangTags(baseUrl, pathname, locales);
 

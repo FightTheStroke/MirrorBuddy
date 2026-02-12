@@ -56,7 +56,7 @@ export async function getLocalizedOGMetadata(
     };
   } = {},
 ): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   // Use provided values or fall back to defaults
   const defaultMetadata = DEFAULT_METADATA[locale] || DEFAULT_METADATA[defaultLocale];

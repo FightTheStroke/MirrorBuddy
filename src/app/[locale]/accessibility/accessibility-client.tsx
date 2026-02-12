@@ -1,18 +1,15 @@
-"use client";
+'use client';
 
-import { Link } from "@/i18n/navigation";
-import { ArrowLeft } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
-import { AccessibilityContent } from "./content";
-import {
-  getCookieConsentConfigFromLocale,
-  type CookieConsentConfig,
-} from "@/lib/compliance";
+import { Link } from '@/i18n/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { AccessibilityContent } from './content';
+import { getCookieConsentConfigFromLocale, type CookieConsentConfig } from '@/lib/compliance';
 
-export const ACCESSIBILITY_VERSION = "1.0";
+export const ACCESSIBILITY_VERSION = '1.0';
 
 export function AccessibilityClient() {
-  const t = useTranslations("compliance.accessibility");
+  const t = useTranslations('compliance.accessibility');
   const locale = useLocale();
 
   // Get country-specific configuration for authority contact
@@ -23,16 +20,16 @@ export function AccessibilityClient() {
       {/* Navigation */}
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 print:border-b-2"
-        aria-label={t("page.pageNavAriaLabel")}
+        aria-label={t('page.pageNavAriaLabel')}
       >
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors print:hidden"
-            aria-label={t("page.backHome")}
+            aria-label={t('page.backHome')}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            {t("page.backHome")}
+            {t('page.backHome')}
           </Link>
         </div>
       </nav>
@@ -43,16 +40,14 @@ export function AccessibilityClient() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              {t("page.title")}
+              {t('page.title')}
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-gray-400">
-              <span>
-                {t("page.version", { version: ACCESSIBILITY_VERSION })}
-              </span>
+              <span>{t('page.version', { version: ACCESSIBILITY_VERSION })}</span>
               <span>•</span>
-              <span>{t("page.lastUpdated", { date: "27 Gennaio 2026" })}</span>
+              <span>{t('page.lastUpdated', { date: '27 Gennaio 2026' })}</span>
               <span>•</span>
-              <span>{t("page.lastAudit")}</span>
+              <span>{t('page.lastAudit')}</span>
             </div>
           </div>
 
@@ -65,27 +60,25 @@ export function AccessibilityClient() {
               id="compliance-heading"
               className="text-xl font-bold text-slate-900 dark:text-white mb-4"
             >
-              {t("compliance.heading")}
+              {t('compliance.heading')}
             </h2>
-            <p className="text-slate-700 dark:text-gray-300 mb-4">
-              {t("compliance.declaration")}
-            </p>
+            <p className="text-slate-700 dark:text-gray-300 mb-4">{t('compliance.declaration')}</p>
             <ul className="space-y-2 text-sm text-slate-600 dark:text-gray-400">
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-1">✓</span>
-                <span>{t("compliance.wcag")}</span>
+                <span>{t('compliance.wcag')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-1">✓</span>
-                <span>{t("compliance.keyboard")}</span>
+                <span>{t('compliance.keyboard')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-1">✓</span>
-                <span>{t("compliance.screenReader")}</span>
+                <span>{t('compliance.screenReader')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-green-500 mt-1">✓</span>
-                <span>{t("compliance.colorContrast")}</span>
+                <span>{t('compliance.colorContrast')}</span>
               </li>
             </ul>
           </section>
@@ -102,23 +95,21 @@ export function AccessibilityClient() {
               id="feedback-heading"
               className="text-xl font-bold text-slate-900 dark:text-white mb-4"
             >
-              {t("feedback.heading")}
+              {t('feedback.heading')}
             </h2>
-            <p className="text-slate-700 dark:text-gray-300 mb-4">
-              {t("feedback.description")}
-            </p>
+            <p className="text-slate-700 dark:text-gray-300 mb-4">{t('feedback.description')}</p>
             <div className="space-y-3 text-sm">
               <div>
-                <strong>{t("feedback.emailLabel")}:</strong>{" "}
+                <strong>{t('feedback.emailLabel')}:</strong>{' '}
                 <a
-                  href="mailto:roberdan@fightthestroke.org"
+                  href="mailto:info@fightthestroke.org"
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  roberdan@fightthestroke.org
+                  info@fightthestroke.org
                 </a>
               </div>
               <div>
-                <strong>{t("feedback.authorityLabel")}:</strong>{" "}
+                <strong>{t('feedback.authorityLabel')}:</strong>{' '}
                 <a
                   href={config.authority.website}
                   target="_blank"
@@ -129,7 +120,7 @@ export function AccessibilityClient() {
                 </a>
                 {config.authority.email && (
                   <>
-                    {" "}
+                    {' '}
                     (
                     <a
                       href={`mailto:${config.authority.email}`}
@@ -142,8 +133,7 @@ export function AccessibilityClient() {
                 )}
               </div>
               <div>
-                <strong>{t("feedback.responseTime")}:</strong>{" "}
-                {t("feedback.responseTimeValue")}
+                <strong>{t('feedback.responseTime')}:</strong> {t('feedback.responseTimeValue')}
               </div>
             </div>
           </section>

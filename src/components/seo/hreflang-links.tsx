@@ -23,7 +23,7 @@ export function HreflangLinks({
   locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangLinksProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mirrorbuddy.org';
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
   const rawPathname = usePathname();
 
   // Strip locale prefix from pathname since usePathname() returns /it/welcome

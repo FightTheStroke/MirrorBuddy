@@ -197,14 +197,14 @@ describe('canonical-urls integration', () => {
       }
     });
 
-    it('falls back to mirrorbuddy.org when NEXT_PUBLIC_SITE_URL is not set', () => {
+    it('falls back to localhost when NEXT_PUBLIC_SITE_URL is not set', () => {
       const originalEnv = process.env.NEXT_PUBLIC_SITE_URL;
 
       try {
         delete process.env.NEXT_PUBLIC_SITE_URL;
 
         const result = generateCanonicalUrl('it', '/maestri');
-        expect(result).toContain('https://mirrorbuddy.org');
+        expect(result).toContain('http://localhost:3000');
       } finally {
         process.env.NEXT_PUBLIC_SITE_URL = originalEnv;
       }

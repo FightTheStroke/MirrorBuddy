@@ -24,7 +24,7 @@ import type { Locale } from '@/i18n/config';
  * // => 'https://your-domain.com/en/search?q=test'
  */
 export function generateCanonicalUrl(locale: Locale, pathname: string): string {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mirrorbuddy.org';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   // Remove hash fragments (SEO compliance - fragments should not be in canonical)
   const pathWithoutHash = pathname.split('#')[0];
