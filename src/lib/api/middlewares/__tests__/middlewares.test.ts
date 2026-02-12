@@ -3,7 +3,7 @@
  * Plan 113: T1-02 - Create middleware modules
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import type { MiddlewareContext } from '../types';
 
@@ -65,6 +65,10 @@ describe('Middleware modules', () => {
     };
 
     mockNext = vi.fn(async () => new Response(JSON.stringify({ success: true }), { status: 200 }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe('F-03: withCSRF', () => {
@@ -367,9 +371,9 @@ describe('Middleware modules', () => {
       process.env.CRON_SECRET = originalSecret;
     });
 
-    it('should allow all requests if CRON_SECRET is not configured', async () => {
-      const originalSecret = process.env.CRON_SECRET;
-      delete process.env.CRON_SECRET;
+    it('should allow all requests if CRON_SECRET is not configured in development', async () => {
+      vi.stubEnv('CRON_SECRET', '');
+      vi.stubEnv('NODE_ENV', 'development');
 
       const { withCron } = await import('../with-cron');
 
@@ -382,8 +386,26 @@ describe('Middleware modules', () => {
 
       expect(mockNext).toHaveBeenCalled();
       expect(response.status).toBe(200);
+    });
 
-      process.env.CRON_SECRET = originalSecret;
+    it('should return 401 if CRON_SECRET is not configured in production', async () => {
+      vi.stubEnv('CRON_SECRET', '');
+      vi.stubEnv('NODE_ENV', 'production');
+
+      const { withCron } = await import('../with-cron');
+
+      const req = new NextRequest('http://localhost:3000/api/cron/test', {
+        method: 'POST',
+      });
+
+      mockContext.req = req;
+      const response = await withCron(mockContext, mockNext);
+
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(response.status).toBe(401);
+
+      const data = await response.json();
+      expect(data).toEqual({ error: 'Unauthorized' });
     });
   });
 

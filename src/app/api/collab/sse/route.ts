@@ -5,11 +5,12 @@
 // Uses Redis for metadata (multi-instance aware), local Map for controllers
 // ============================================================================
 
-import { logger } from "@/lib/logger";
-import { nanoid } from "nanoid";
-import { getSSEStore, getInstanceId } from "@/lib/realtime";
-import { pipe } from "@/lib/api/pipe";
-import { withSentry, withAuth } from "@/lib/api/middlewares";
+import { logger } from '@/lib/logger';
+import { nanoid } from 'nanoid';
+import { getSSEStore, getInstanceId } from '@/lib/realtime';
+import { getRoom } from '@/lib/collab/mindmap-room';
+import { pipe } from '@/lib/api/pipe';
+import { withSentry, withAuth } from '@/lib/api/middlewares';
 
 // ============================================================================
 // TYPES
@@ -76,7 +77,7 @@ export async function registerCollabClient(
     createdAt: now,
   });
 
-  logger.info("Collab SSE client registered", {
+  logger.info('Collab SSE client registered', {
     clientId,
     roomId,
     userId,
@@ -97,7 +98,7 @@ export async function unregisterCollabClient(clientId: string): Promise<void> {
     const store = getSSEStore();
     await store.unregister(clientId);
 
-    logger.info("Collab SSE client unregistered", {
+    logger.info('Collab SSE client unregistered', {
       clientId,
       roomId: client.roomId,
       localClients: localClients.size,
@@ -110,10 +111,7 @@ export async function unregisterCollabClient(clientId: string): Promise<void> {
  * Note: In multi-instance deployments, only reaches clients on this instance
  * For cross-instance, use Redis pub/sub (future enhancement)
  */
-export function broadcastCollabEvent(
-  event: CollabSSEEvent,
-  excludeUserId?: string,
-): void {
+export function broadcastCollabEvent(event: CollabSSEEvent, excludeUserId?: string): void {
   const eventString = `data: ${JSON.stringify(event)}\n\n`;
   const eventBytes = new TextEncoder().encode(eventString);
 
@@ -127,7 +125,7 @@ export function broadcastCollabEvent(
       client.controller.enqueue(eventBytes);
       deliveredCount++;
     } catch (error) {
-      logger.warn("Failed to send to collab SSE client", {
+      logger.warn('Failed to send to collab SSE client', {
         clientId: client.id,
         error: String(error),
       });
@@ -136,7 +134,7 @@ export function broadcastCollabEvent(
     }
   });
 
-  logger.debug("Collab event broadcast", {
+  logger.debug('Collab event broadcast', {
     eventType: event.type,
     roomId: event.roomId,
     deliveredTo: deliveredCount,
@@ -190,7 +188,7 @@ export async function cleanupStaleCollabClients(): Promise<number> {
   const redisCleanedCount = await store.cleanupStale(CLIENT_TIMEOUT_MS);
 
   if (cleanedCount > 0 || redisCleanedCount > 0) {
-    logger.info("Cleaned up stale collab SSE clients", {
+    logger.info('Cleaned up stale collab SSE clients', {
       localCleaned: cleanedCount,
       redisCleaned: redisCleanedCount,
     });
@@ -204,29 +202,34 @@ export async function cleanupStaleCollabClients(): Promise<number> {
 // ============================================================================
 
 export const GET = pipe(
-  withSentry("/api/collab/sse"),
+  withSentry('/api/collab/sse'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
   const { searchParams } = new URL(ctx.req.url);
-  const roomId = searchParams.get("roomId");
+  const roomId = searchParams.get('roomId');
 
   if (!roomId) {
-    return new Response(JSON.stringify({ error: "roomId is required" }), {
+    return new Response(JSON.stringify({ error: 'roomId is required' }), {
       status: 400,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
   // Validate IDs
-  if (
-    !/^[a-zA-Z0-9_-]{1,64}$/.test(roomId) ||
-    !/^[a-zA-Z0-9_-]{1,64}$/.test(userId)
-  ) {
-    return new Response(
-      JSON.stringify({ error: "Invalid roomId or userId format" }),
-      { status: 400, headers: { "Content-Type": "application/json" } },
-    );
+  if (!/^[a-zA-Z0-9_-]{1,64}$/.test(roomId) || !/^[a-zA-Z0-9_-]{1,64}$/.test(userId)) {
+    return new Response(JSON.stringify({ error: 'Invalid roomId or userId format' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  const room = getRoom(roomId);
+  if (!room || !room.participants.has(userId)) {
+    return new Response(JSON.stringify({ error: 'Room not found or access denied' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   const clientId = nanoid();
@@ -239,7 +242,7 @@ export const GET = pipe(
 
       // Send initial connection event
       const connectEvent = `data: ${JSON.stringify({
-        type: "connected",
+        type: 'connected',
         clientId,
         roomId,
         userId,
@@ -251,7 +254,7 @@ export const GET = pipe(
       // Broadcast user joined to others
       broadcastCollabEvent(
         {
-          type: "user:online",
+          type: 'user:online',
           roomId,
           userId,
           timestamp: Date.now(),
@@ -282,7 +285,7 @@ export const GET = pipe(
       // Broadcast user offline to others
       broadcastCollabEvent(
         {
-          type: "user:offline",
+          type: 'user:offline',
           roomId,
           userId,
           timestamp: Date.now(),
@@ -297,10 +300,10 @@ export const GET = pipe(
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-      "X-Accel-Buffering": "no",
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
     },
   });
 });

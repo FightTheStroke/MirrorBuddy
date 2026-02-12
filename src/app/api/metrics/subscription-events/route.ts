@@ -4,13 +4,12 @@
  * Logs events for analytics and monitoring
  */
 
-import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 
 interface SubscriptionEventPayload {
   type: string;
-  userId: string;
   tierId: string;
   previousTierId?: string | null;
   timestamp: string;
@@ -18,39 +17,38 @@ interface SubscriptionEventPayload {
 }
 
 export const POST = pipe(
-  withSentry("/api/metrics/subscription-events"),
+  withSentry('/api/metrics/subscription-events'),
   withCSRF,
+  withAuth,
 )(async (ctx) => {
   const body: SubscriptionEventPayload = await ctx.req.json();
+  const userId = ctx.userId!;
 
   // Validate required fields
-  if (!body.type || !body.userId || !body.tierId || !body.timestamp) {
+  if (!body.type || !body.tierId || !body.timestamp) {
     return NextResponse.json(
-      { error: "Missing required fields: type, userId, tierId, timestamp" },
+      { error: 'Missing required fields: type, tierId, timestamp' },
       { status: 400 },
     );
   }
 
   // Validate event type
   const validEventTypes = [
-    "subscription.created",
-    "subscription.upgraded",
-    "subscription.downgraded",
-    "subscription.cancelled",
-    "subscription.expired",
+    'subscription.created',
+    'subscription.upgraded',
+    'subscription.downgraded',
+    'subscription.cancelled',
+    'subscription.expired',
   ];
 
   if (!validEventTypes.includes(body.type)) {
-    return NextResponse.json(
-      { error: `Invalid event type: ${body.type}` },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: `Invalid event type: ${body.type}` }, { status: 400 });
   }
 
   // Log the event
-  logger.info("[Subscription Telemetry API] Event received", {
+  logger.info('[Subscription Telemetry API] Event received', {
     eventType: body.type,
-    userId: body.userId,
+    userId,
     tierId: body.tierId,
     previousTierId: body.previousTierId,
     timestamp: body.timestamp,

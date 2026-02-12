@@ -4,39 +4,39 @@
 // Created for F-06: School Admin Self-Service SSO Configuration
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import { hashPII } from "@/lib/security";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { hashPII } from '@/lib/security';
 
 interface DirectorySyncRequest {
   schoolId: string;
-  provider: "google" | "microsoft";
+  provider: 'google' | 'microsoft';
   students?: StudentRecord[];
 }
 
 interface StudentRecord {
   email: string;
   name: string;
-  role?: "student" | "teacher" | "admin";
+  role?: 'student' | 'teacher' | 'admin';
 }
 
 function parseCSV(content: string): StudentRecord[] {
-  const lines = content.trim().split("\n");
+  const lines = content.trim().split('\n');
   const records: StudentRecord[] = [];
 
   for (const line of lines) {
-    const parts = line.split(",").map((p) => p.trim());
+    const parts = line.split(',').map((p) => p.trim());
     if (parts.length < 2) continue;
 
     const email = parts[0].toLowerCase();
-    if (email === "email") continue;
+    if (email === 'email') continue;
 
     records.push({
       email,
       name: parts[1],
-      role: (parts[2] as "student" | "teacher" | "admin") || "student",
+      role: (parts[2] as 'student' | 'teacher' | 'admin') || 'student',
     });
   }
 
@@ -44,24 +44,22 @@ function parseCSV(content: string): StudentRecord[] {
 }
 
 export const POST = pipe(
-  withSentry("/api/admin/sso/sync-directory"),
+  withSentry('/api/admin/sso/sync-directory'),
   withCSRF,
+  withAdmin,
 )(async (ctx) => {
   try {
-    const contentType = ctx.req.headers.get("content-type") || "";
+    const contentType = ctx.req.headers.get('content-type') || '';
     let syncRequest: DirectorySyncRequest;
 
-    if (contentType.includes("multipart/form-data")) {
+    if (contentType.includes('multipart/form-data')) {
       const formData = await ctx.req.formData();
-      const file = formData.get("file") as File | null;
-      const schoolId = formData.get("schoolId") as string;
-      const provider = formData.get("provider") as "google" | "microsoft";
+      const file = formData.get('file') as File | null;
+      const schoolId = formData.get('schoolId') as string;
+      const provider = formData.get('provider') as 'google' | 'microsoft';
 
       if (!file || !schoolId) {
-        return NextResponse.json(
-          { error: "Missing file or schoolId" },
-          { status: 400 },
-        );
+        return NextResponse.json({ error: 'Missing file or schoolId' }, { status: 400 });
       }
 
       const csvContent = await file.text();
@@ -73,10 +71,7 @@ export const POST = pipe(
     }
 
     if (!syncRequest.students?.length) {
-      return NextResponse.json(
-        { error: "No student records provided" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'No student records provided' }, { status: 400 });
     }
 
     let created = 0;
@@ -97,7 +92,7 @@ export const POST = pipe(
         data: {
           email: student.email,
           username: student.email,
-          role: student.role === "admin" ? "ADMIN" : "USER",
+          role: student.role === 'admin' ? 'ADMIN' : 'USER',
           profile: {
             create: {
               name: student.name,
@@ -108,7 +103,7 @@ export const POST = pipe(
       created++;
     }
 
-    logger.info("[SSO/Sync] Directory sync completed", {
+    logger.info('[SSO/Sync] Directory sync completed', {
       schoolId: syncRequest.schoolId,
       provider: syncRequest.provider,
       created,
@@ -123,10 +118,7 @@ export const POST = pipe(
       total: syncRequest.students.length,
     });
   } catch (error) {
-    logger.error("[SSO/Sync] Directory sync failed", undefined, error);
-    return NextResponse.json(
-      { error: "Directory sync failed" },
-      { status: 500 },
-    );
+    logger.error('[SSO/Sync] Directory sync failed', undefined, error);
+    return NextResponse.json({ error: 'Directory sync failed' }, { status: 500 });
   }
 });

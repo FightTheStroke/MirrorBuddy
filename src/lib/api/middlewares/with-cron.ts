@@ -1,7 +1,8 @@
-import { logger } from "@/lib/logger";
-import type { Middleware } from "./types";
+import { logger } from '@/lib/logger';
+import { timingSafeEqual } from 'node:crypto';
+import type { Middleware } from './types';
 
-const log = logger.child({ module: "cron-middleware" });
+const log = logger.child({ module: 'cron-middleware' });
 
 /**
  * Cron authentication middleware
@@ -26,23 +27,38 @@ const log = logger.child({ module: "cron-middleware" });
  */
 export const withCron: Middleware = async (ctx, next) => {
   const cronSecret = process.env.CRON_SECRET;
+  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 
-  // Allow all requests if CRON_SECRET is not configured (development)
+  // Allow missing secret only in local/dev-like environments.
+  // In production, missing CRON_SECRET is a hard failure.
   if (!cronSecret) {
-    log.warn("CRON_SECRET not configured - allowing all requests");
-    return next();
+    if (isDevOrTest) {
+      log.warn('CRON_SECRET not configured - allowing all requests');
+      return next();
+    }
+
+    log.error('CRON_SECRET not configured in non-development environment');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   // Get Authorization header
-  const authHeader = ctx.req.headers.get("authorization");
+  const authHeader = ctx.req.headers.get('authorization');
   const expectedHeader = `Bearer ${cronSecret}`;
 
   // Constant-time comparison to prevent timing attacks
-  if (!authHeader || authHeader !== expectedHeader) {
-    log.error("Invalid CRON_SECRET provided");
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+  const authBuffer = Buffer.from(authHeader || '', 'utf8');
+  const expectedBuffer = Buffer.from(expectedHeader, 'utf8');
+  const isValid =
+    authBuffer.length === expectedBuffer.length && timingSafeEqual(authBuffer, expectedBuffer);
+
+  if (!isValid) {
+    log.error('Invalid CRON_SECRET provided');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
