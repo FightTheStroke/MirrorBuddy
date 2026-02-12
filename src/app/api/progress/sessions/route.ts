@@ -4,24 +4,25 @@
 // POST: Create new session
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 import {
   SessionsGetQuerySchema,
   SessionsPostSchema,
   SessionsPatchSchema,
-} from "@/lib/validation/schemas/progress";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
+} from '@/lib/validation/schemas/progress';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
+import { safeReadJson } from '@/lib/api/safe-json';
 
 export const GET = pipe(
-  withSentry("/api/progress/sessions"),
+  withSentry('/api/progress/sessions'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
 
   const { searchParams } = new URL(ctx.req.url);
-  const rawLimit = searchParams.get("limit");
-  const rawMaestroId = searchParams.get("maestroId");
+  const rawLimit = searchParams.get('limit');
+  const rawMaestroId = searchParams.get('maestroId');
 
   // Validate query parameters
   const validation = SessionsGetQuerySchema.safeParse({
@@ -32,7 +33,7 @@ export const GET = pipe(
   if (!validation.success) {
     return NextResponse.json(
       {
-        error: "Invalid query parameters",
+        error: 'Invalid query parameters',
         details: validation.error.issues.map((i) => i.message),
       },
       { status: 400 },
@@ -46,7 +47,7 @@ export const GET = pipe(
       userId,
       ...(maestroId && { maestroId }),
     },
-    orderBy: { startedAt: "desc" },
+    orderBy: { startedAt: 'desc' },
     take: limit,
   });
 
@@ -54,20 +55,23 @@ export const GET = pipe(
 });
 
 export const POST = pipe(
-  withSentry("/api/progress/sessions"),
+  withSentry('/api/progress/sessions'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
 
-  const body = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
   // Validate request body
   const validation = SessionsPostSchema.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
       {
-        error: "Invalid session data",
+        error: 'Invalid session data',
         details: validation.error.issues.map((i) => i.message),
       },
       { status: 400 },
@@ -89,20 +93,23 @@ export const POST = pipe(
 
 // PATCH to end a session
 export const PATCH = pipe(
-  withSentry("/api/progress/sessions"),
+  withSentry('/api/progress/sessions'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
 
-  const body = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
 
   // Validate request body
   const validation = SessionsPatchSchema.safeParse(body);
   if (!validation.success) {
     return NextResponse.json(
       {
-        error: "Invalid session update data",
+        error: 'Invalid session update data',
         details: validation.error.issues.map((i) => i.message),
       },
       { status: 400 },
@@ -117,7 +124,7 @@ export const PATCH = pipe(
   });
 
   if (!existingSession) {
-    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   }
 
   const session = await prisma.studySession.update({

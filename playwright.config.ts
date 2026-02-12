@@ -329,8 +329,11 @@ export default defineConfig({
     // Use production server in CI (pre-built), dev server locally
     command: process.env.CI ? 'npm run start' : 'npm run dev',
     url: appBaseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 90000,
+    // Avoid reusing a manually-started dev server. The E2E webServer env overrides
+    // (DATABASE_URL/SESSION_SECRET/E2E_TESTS) are critical for correctness and safety.
+    reuseExistingServer: false,
+    // Next dev startup can exceed 90s on cold caches (first build, large repo).
+    timeout: 180000,
     env: {
       // Override PORT to match MIRRORBUDDY_PORT (default 3000)
       PORT: appPort,

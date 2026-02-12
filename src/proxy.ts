@@ -329,6 +329,15 @@ export default function proxy(request: NextRequest) {
     response.headers.set('X-NEXT-INTL-LOCALE', detectedLocale);
     response.headers.set('x-locale-detected', detectedLocale);
 
+    // Keep NEXT_LOCALE in sync when user explicitly navigates to a locale-prefixed URL.
+    // This improves locale persistence across navigation and matches next-intl expectations.
+    if (localeFromPath) {
+      response.cookies.set('NEXT_LOCALE', localeFromPath, {
+        path: '/',
+        sameSite: 'lax',
+      });
+    }
+
     // Record metrics for API routes
     if (trackMetrics) {
       const latencyMs = Date.now() - startTime;

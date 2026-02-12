@@ -6,51 +6,52 @@
  * Also creates the test user in the database (ADR 0081).
  */
 
-import path from "path";
-import fs from "fs";
-import { createHmac, randomUUID } from "crypto";
-import { config } from "dotenv";
-import { getPrismaClient, disconnectPrisma } from "./helpers/prisma-setup";
+import path from 'path';
+import fs from 'fs';
+import { createHmac, randomUUID } from 'crypto';
+import { config } from 'dotenv';
+import { getPrismaClient, disconnectPrisma } from './helpers/prisma-setup';
+import { seedTiers } from '../src/lib/seeds/tier-seed';
 
 // Load .env so we can read SESSION_SECRET (must match running dev server)
 config();
 
-const STORAGE_STATE_PATH = path.join(__dirname, ".auth", "storage-state.json");
+const STORAGE_STATE_PATH = path.join(__dirname, '.auth', 'storage-state.json');
 
-// Use the actual SESSION_SECRET from environment (matches running dev server).
-// Falls back to E2E test secret when Playwright starts its own server.
-const SESSION_SECRET =
-  process.env.SESSION_SECRET || "e2e-test-session-secret-32-characters-min";
+// CRITICAL: E2E tests must not depend on the developer's real SESSION_SECRET from .env.
+// The Playwright webServer always overrides SESSION_SECRET to this test value.
+// Cookie signatures must match between global setup and the running server.
+const SESSION_SECRET = 'e2e-test-session-secret-32-characters-min';
 
 /**
  * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
  */
 function signCookieValue(value: string): string {
-  const hmac = createHmac("sha256", SESSION_SECRET);
+  const hmac = createHmac('sha256', SESSION_SECRET);
   hmac.update(value);
-  const signature = hmac.digest("hex");
+  const signature = hmac.digest('hex');
   return `${value}.${signature}`;
 }
 
 async function globalSetup() {
   // PRODUCTION BLOCKER #1: Block if NODE_ENV is production
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === 'production') {
     throw new Error(
-      "🚨 CRITICAL SAFETY ERROR: E2E tests are blocked in production environment.\n" +
-        "E2E tests would corrupt real user data, delete sessions, and cause data loss.\n" +
-        "Set NODE_ENV=development or NODE_ENV=test to run tests.\n" +
-        "Contact DevOps if you believe this is incorrect.",
+      '🚨 CRITICAL SAFETY ERROR: E2E tests are blocked in production environment.\n' +
+        'E2E tests would corrupt real user data, delete sessions, and cause data loss.\n' +
+        'Set NODE_ENV=development or NODE_ENV=test to run tests.\n' +
+        'Contact DevOps if you believe this is incorrect.',
     );
   }
 
   // PRODUCTION BLOCKER #2: Require TEST_DATABASE_URL to be set
-  const testDbUrl = process.env.TEST_DATABASE_URL || "";
+  const testDbUrl = process.env.TEST_DATABASE_URL || '';
 
-  if (!testDbUrl || testDbUrl.trim() === "") {
+  if (!testDbUrl || testDbUrl.trim() === '') {
     throw new Error(
-      "🚨 BLOCKED: TEST_DATABASE_URL is not set!\n" +
-        "E2E tests require an explicit test database.\n" +
-        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
+      '🚨 BLOCKED: TEST_DATABASE_URL is not set!\n' +
+        'E2E tests require an explicit test database.\n' +
+        'Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test',
     );
   }
 
@@ -58,32 +59,29 @@ async function globalSetup() {
   // Extract host from PostgreSQL URL: postgresql://user:pass@HOST:port/db
   // Use regex to extract only the host portion, not query params or other parts
   const hostMatch = testDbUrl.match(/@([^:/?#]+)/);
-  const dbHost = hostMatch ? hostMatch[1].toLowerCase() : "";
+  const dbHost = hostMatch ? hostMatch[1].toLowerCase() : '';
   // Check if host is supabase.com, supabase.co, or any subdomain
   // Split on dots and check last 2 parts to avoid regex complexity
-  const hostParts = dbHost.split(".");
+  const hostParts = dbHost.split('.');
   const domain =
     hostParts.length >= 2
       ? `${hostParts[hostParts.length - 2]}.${hostParts[hostParts.length - 1]}`
       : dbHost;
-  const isSupabaseHost = domain === "supabase.com" || domain === "supabase.co";
+  const isSupabaseHost = domain === 'supabase.com' || domain === 'supabase.co';
 
   if (isSupabaseHost) {
     throw new Error(
-      "🚨 BLOCKED: TEST_DATABASE_URL contains production Supabase URL!\n" +
+      '🚨 BLOCKED: TEST_DATABASE_URL contains production Supabase URL!\n' +
         `TEST_DATABASE_URL: ${testDbUrl.substring(0, 50)}...\n` +
-        "E2E tests MUST use a local test database.\n" +
-        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
+        'E2E tests MUST use a local test database.\n' +
+        'Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test',
     );
   }
 
   // Note: DATABASE_URL may contain Supabase production URL from .env, but playwright.config.ts
   // webServer.env overrides it with TEST_DATABASE_URL for the actual server process
 
-  console.log(
-    "✅ Production guards passed. Using test database:",
-    testDbUrl.substring(0, 50),
-  );
+  console.log('✅ Production guards passed. Using test database:', testDbUrl.substring(0, 50));
 
   // Ensure .auth directory exists
   const authDir = path.dirname(STORAGE_STATE_PATH);
@@ -93,13 +91,16 @@ async function globalSetup() {
 
   // Generate unique test user ID per run to avoid conflicts with stale data
   // All workers share this ID (loaded from storage-state.json)
-  const randomSuffix = randomUUID().replace(/-/g, "").substring(0, 9);
+  const randomSuffix = randomUUID().replace(/-/g, '').substring(0, 9);
   const testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
 
   // Create the test user in the database (ADR 0081: isTestData=true)
   // Also create OnboardingState to bypass onboarding wall (ADR 0059)
   const prisma = getPrismaClient();
   try {
+    // Ensure critical reference data exists for E2E (e.g. Base tier assignment).
+    await seedTiers(prisma);
+
     await prisma.user.upsert({
       where: { id: testUserId },
       update: {},
@@ -108,11 +109,11 @@ async function globalSetup() {
         email: `e2e-test-${randomSuffix}@example.com`,
         username: `e2e_test_${randomSuffix}`,
         isTestData: true,
-        role: "USER",
+        role: 'USER',
         disabled: false,
         profile: {
           create: {
-            name: "E2E Test User",
+            name: 'E2E Test User',
             age: 12,
           },
         },
@@ -124,31 +125,31 @@ async function globalSetup() {
           create: {
             hasCompletedOnboarding: true,
             onboardingCompletedAt: new Date(),
-            currentStep: "ready",
+            currentStep: 'ready',
             isReplayMode: false,
             data: JSON.stringify({
-              name: "E2E Test User",
+              name: 'E2E Test User',
               age: 12,
-              schoolLevel: "media",
+              schoolLevel: 'media',
               learningDifferences: [],
-              gender: "other",
+              gender: 'other',
             }),
           },
         },
         // F-13: ToS acceptance to bypass consent wall
         tosAcceptances: {
           create: {
-            version: "1.0",
+            version: '1.0',
             acceptedAt: new Date(),
-            ipAddress: "127.0.0.1",
-            userAgent: "Playwright E2E Test",
+            ipAddress: '127.0.0.1',
+            userAgent: 'Playwright E2E Test',
           },
         },
       },
     });
-    console.log("✅ Test user created in database:", testUserId);
+    console.log('✅ Test user created in database:', testUserId);
   } catch (error) {
-    console.error("⚠️ Failed to create test user (may already exist):", error);
+    console.error('⚠️ Failed to create test user (may already exist):', error);
     // Continue anyway - the test might still work
   } finally {
     await disconnectPrisma();
@@ -162,43 +163,43 @@ async function globalSetup() {
     cookies: [
       {
         // Server-side auth cookie (signed)
-        name: "mirrorbuddy-user-id",
+        name: 'mirrorbuddy-user-id',
         value: signedCookie,
-        domain: "localhost",
-        path: "/",
+        domain: 'localhost',
+        path: '/',
         expires: -1,
         httpOnly: true,
         secure: false,
-        sameSite: "Lax",
+        sameSite: 'Lax',
       },
       {
         // Client-readable cookie (not signed, for JS access)
-        name: "mirrorbuddy-user-id-client",
+        name: 'mirrorbuddy-user-id-client',
         value: testUserId,
-        domain: "localhost",
-        path: "/",
+        domain: 'localhost',
+        path: '/',
         expires: -1,
         httpOnly: false,
         secure: false,
-        sameSite: "Lax",
+        sameSite: 'Lax',
       },
       {
         // Visitor cookie for trial session flows
-        name: "mirrorbuddy-visitor-id",
+        name: 'mirrorbuddy-visitor-id',
         value: `e2e-test-visitor-${randomSuffix}`,
-        domain: "localhost",
-        path: "/",
+        domain: 'localhost',
+        path: '/',
         expires: -1,
         httpOnly: false,
         secure: false,
-        sameSite: "Lax",
+        sameSite: 'Lax',
       },
       {
         // Accessibility settings bypass (ADR 0060)
-        name: "mirrorbuddy-a11y",
+        name: 'mirrorbuddy-a11y',
         value: encodeURIComponent(
           JSON.stringify({
-            version: "1",
+            version: '1',
             activeProfile: null,
             overrides: {
               dyslexiaFont: false,
@@ -209,32 +210,32 @@ async function globalSetup() {
             browserDetectedApplied: true,
           }),
         ),
-        domain: "localhost",
-        path: "/",
+        domain: 'localhost',
+        path: '/',
         expires: -1,
         httpOnly: false,
         secure: false,
-        sameSite: "Lax",
+        sameSite: 'Lax',
       },
     ],
     origins: [
       {
-        origin: "http://localhost:3000",
+        origin: 'http://localhost:3000',
         localStorage: [
           {
-            name: "mirrorbuddy-onboarding",
+            name: 'mirrorbuddy-onboarding',
             value: JSON.stringify({
               state: {
                 hasCompletedOnboarding: true,
                 onboardingCompletedAt: new Date().toISOString(),
-                currentStep: "ready",
+                currentStep: 'ready',
                 isReplayMode: false,
                 data: {
-                  name: "Test User",
+                  name: 'Test User',
                   age: 12,
-                  schoolLevel: "media",
+                  schoolLevel: 'media',
                   learningDifferences: [],
-                  gender: "other",
+                  gender: 'other',
                 },
               },
               version: 0,
@@ -242,12 +243,12 @@ async function globalSetup() {
           },
           {
             // Unified consent (TOS + Cookie) - matches unified-consent-storage.ts
-            name: "mirrorbuddy-unified-consent",
+            name: 'mirrorbuddy-unified-consent',
             value: JSON.stringify({
-              version: "1.0",
+              version: '1.0',
               tos: {
                 accepted: true,
-                version: "1.0",
+                version: '1.0',
                 acceptedAt: new Date().toISOString(),
               },
               cookies: {
@@ -265,10 +266,7 @@ async function globalSetup() {
   // Write storage state file
   fs.writeFileSync(STORAGE_STATE_PATH, JSON.stringify(storageState, null, 2));
 
-  console.log(
-    "Global setup complete: onboarding state saved to",
-    STORAGE_STATE_PATH,
-  );
+  console.log('Global setup complete: onboarding state saved to', STORAGE_STATE_PATH);
 }
 
 export default globalSetup;

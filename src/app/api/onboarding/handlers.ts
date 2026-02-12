@@ -1,24 +1,25 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/server";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from "@/lib/auth/server";
-import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/server';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from '@/lib/auth/server';
+import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
 import {
   COPPA_AGE_THRESHOLD,
   requestParentalConsent,
   checkCoppaStatus,
-} from "@/lib/compliance/server";
-import { assignBaseTierToNewUser } from "@/lib/tier/server";
+} from '@/lib/compliance/server';
+import { assignBaseTierToNewUser } from '@/lib/tier/server';
+import { safeReadJson } from '@/lib/api/safe-json';
 
-import { PostBodySchema, emptyResponse } from "./types";
-import { buildExistingData, buildEffectiveState } from "./helpers";
+import { PostBodySchema, emptyResponse } from './types';
+import { buildExistingData, buildEffectiveState } from './helpers';
 
-export { PostBodySchema } from "./types";
+export { PostBodySchema } from './types';
 
-export const GET = pipe(withSentry("/api/onboarding"))(async () => {
+export const GET = pipe(withSentry('/api/onboarding'))(async () => {
   const auth = await validateAuth();
   if (!auth.authenticated) {
     return NextResponse.json(emptyResponse);
@@ -42,10 +43,7 @@ export const GET = pipe(withSentry("/api/onboarding"))(async () => {
   const isCredentialedUser = Boolean(user.passwordHash);
   const hasExistingData = Boolean(existingData.name) || isCredentialedUser;
 
-  const effectiveOnboardingState = buildEffectiveState(
-    user.onboarding,
-    isCredentialedUser,
-  );
+  const effectiveOnboardingState = buildEffectiveState(user.onboarding, isCredentialedUser);
 
   return NextResponse.json({
     hasExistingData,
@@ -55,75 +53,70 @@ export const GET = pipe(withSentry("/api/onboarding"))(async () => {
 });
 
 export const POST = pipe(
-  withSentry("/api/onboarding"),
+  withSentry('/api/onboarding'),
   withCSRF,
 )(async (ctx) => {
-  const body = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
   const validation = PostBodySchema.safeParse(body);
   if (!validation.success) {
-    logger.warn("Onboarding API validation failed", {
+    logger.warn('Onboarding API validation failed', {
       issues: validation.error.issues,
     });
-    return NextResponse.json(
-      { error: "Invalid onboarding data" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid onboarding data' }, { status: 400 });
   }
 
   const data = validation.data;
   const auth = await validateAuth();
   let userId = auth.userId;
 
-  const {
-    data: onboardingData,
-    hasCompletedOnboarding,
-    currentStep,
-    isReplayMode,
-  } = data;
+  const { data: onboardingData, hasCompletedOnboarding, currentStep, isReplayMode } = data;
 
   if (!userId) {
-    logger.info("Creating new user for onboarding");
+    logger.info('Creating new user for onboarding');
     const user = await prisma.user.create({
       data: {},
     });
     userId = user.id;
-    logger.info("User created", { userId });
+    logger.info('User created', { userId });
 
     // Assign Base tier to new user (Plan 073: T4-07)
     await assignBaseTierToNewUser(user.id);
 
     // Trigger admin counts update (non-blocking)
-    calculateAndPublishAdminCounts("user-signup").catch((err) =>
-      logger.warn("Failed to publish admin counts on user signup", {
+    calculateAndPublishAdminCounts('user-signup').catch((err) =>
+      logger.warn('Failed to publish admin counts on user signup', {
         error: String(err),
       }),
     );
 
     try {
-      const { signCookieValue } = await import("@/lib/auth/server");
+      const { signCookieValue } = await import('@/lib/auth/server');
       const signedCookie = signCookieValue(user.id);
       const cookieStore = await cookies();
       // Server-side auth cookie (httpOnly, signed)
       cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 365,
-        path: "/",
+        path: '/',
       });
 
       // Client-readable cookie (for client-side userId access)
       cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
         httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 365,
-        path: "/",
+        path: '/',
       });
 
-      logger.info("User cookies set successfully", { userId });
+      logger.info('User cookies set successfully', { userId });
     } catch (cookieError) {
-      logger.error("Failed to set user cookie", {
+      logger.error('Failed to set user cookie', {
         userId,
         error: String(cookieError),
       });
@@ -131,7 +124,7 @@ export const POST = pipe(
     }
   }
 
-  logger.info("Upserting onboarding state", {
+  logger.info('Upserting onboarding state', {
     userId,
     hasCompletedOnboarding,
   });
@@ -139,9 +132,9 @@ export const POST = pipe(
     where: { userId },
     create: {
       userId,
-      data: onboardingData ? JSON.stringify(onboardingData) : "{}",
+      data: onboardingData ? JSON.stringify(onboardingData) : '{}',
       hasCompletedOnboarding: hasCompletedOnboarding ?? false,
-      currentStep: currentStep ?? "welcome",
+      currentStep: currentStep ?? 'welcome',
       isReplayMode: isReplayMode ?? false,
     },
     update: {
@@ -152,7 +145,7 @@ export const POST = pipe(
       ...(hasCompletedOnboarding && { onboardingCompletedAt: new Date() }),
     },
   });
-  logger.info("Onboarding state upserted", { userId });
+  logger.info('Onboarding state upserted', { userId });
 
   if (onboardingData?.name) {
     await prisma.profile.upsert({
@@ -161,7 +154,7 @@ export const POST = pipe(
         userId,
         name: onboardingData.name,
         age: onboardingData.age,
-        schoolLevel: onboardingData.schoolLevel ?? "superiore",
+        schoolLevel: onboardingData.schoolLevel ?? 'superiore',
       },
       update: {
         name: onboardingData.name,
@@ -181,9 +174,9 @@ export const POST = pipe(
       if (!onboardingData.parentEmail) {
         return NextResponse.json(
           {
-            error: "Parent email required",
+            error: 'Parent email required',
             message:
-              "Per legge (COPPA), i minori di 13 anni necessitano del consenso dei genitori. " +
+              'Per legge (COPPA), i minori di 13 anni necessitano del consenso dei genitori. ' +
               "Fornisci l'email di un genitore per la verifica.",
             requiresParentEmail: true,
             coppaRequired: true,
@@ -206,7 +199,7 @@ export const POST = pipe(
         expiresAt: consentResult.expiresAt.toISOString(),
       };
 
-      logger.info("COPPA consent initiated", {
+      logger.info('COPPA consent initiated', {
         userId,
         age: onboardingData.age,
         emailSent: consentResult.emailSent,
@@ -220,7 +213,7 @@ export const POST = pipe(
     }
   }
 
-  logger.info("Onboarding state saved", { userId, hasCompletedOnboarding });
+  logger.info('Onboarding state saved', { userId, hasCompletedOnboarding });
 
   return NextResponse.json({
     success: true,

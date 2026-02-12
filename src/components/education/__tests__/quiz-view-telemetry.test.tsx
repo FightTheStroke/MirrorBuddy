@@ -6,41 +6,41 @@
  * Plan 052 W1 T1-05: Add telemetry tracking for quiz complete
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { QuizView } from "../quiz-view";
-import type { QuizResult } from "@/types";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { QuizView } from '../quiz-view';
+import type { QuizResult } from '@/types';
 
 // Mock telemetry store
 const mockTrackEvent = vi.fn();
-vi.mock("@/lib/telemetry/telemetry-store", () => ({
+vi.mock('@/lib/telemetry/telemetry-store', () => ({
   useTelemetryStore: vi.fn(() => ({
     trackEvent: mockTrackEvent,
   })),
 }));
 
 // Mock next-intl
-vi.mock("next-intl", () => ({
+vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
-  useLocale: () => "it",
+  useLocale: () => 'it',
 }));
 
 // Mock next/navigation
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
 }));
 
 // Mock stores
-vi.mock("@/lib/stores", () => ({
+vi.mock('@/lib/stores', () => ({
   useProgressStore: () => ({
     addXP: vi.fn(),
   }),
 }));
 
 // Mock hooks
-vi.mock("@/lib/hooks/use-saved-materials", () => ({
+vi.mock('@/lib/hooks/use-saved-materials', () => ({
   useQuizzes: () => ({
     quizzes: [],
     loading: false,
@@ -49,29 +49,30 @@ vi.mock("@/lib/hooks/use-saved-materials", () => ({
 }));
 
 // Mock CSRF
-vi.mock("@/lib/auth", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth")>();
+vi.mock('@/lib/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth')>();
   return { ...actual, csrfFetch: vi.fn().mockResolvedValue({ ok: true }) };
 });
 
 // Mock framer-motion
-vi.mock("framer-motion", () => ({
+vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<unknown>) => (
-      <div {...props}>{children}</div>
-    ),
+    div: ({
+      children,
+      whileHover: _whileHover,
+      whileTap: _whileTap,
+      ...props
+    }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
   },
 }));
 
 // Mock error boundary
-vi.mock("@/components/error-boundary", () => ({
-  ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
-    <>{children}</>
-  ),
+vi.mock('@/components/error-boundary', () => ({
+  ErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock Quiz component to control completion
-vi.mock("../quiz", () => ({
+vi.mock('../quiz', () => ({
   Quiz: ({
     onComplete,
     quiz,
@@ -100,12 +101,12 @@ vi.mock("../quiz", () => ({
   ),
 }));
 
-describe("QuizView - Telemetry Tracking", () => {
+describe('QuizView - Telemetry Tracking', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("tracks quiz_completed event when quiz is finished", async () => {
+  it('tracks quiz_completed event when quiz is finished', async () => {
     render(<QuizView />);
 
     // Start a sample quiz
@@ -114,18 +115,18 @@ describe("QuizView - Telemetry Tracking", () => {
 
     // Wait for Quiz component
     await waitFor(() => {
-      expect(screen.getByTestId("quiz-component")).toBeInTheDocument();
+      expect(screen.getByTestId('quiz-component')).toBeInTheDocument();
     });
 
     // Complete quiz
-    const completeButton = screen.getByText("Complete Quiz");
+    const completeButton = screen.getByText('Complete Quiz');
     fireEvent.click(completeButton);
 
     // Verify telemetry event
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith(
-        "education",
-        "quiz_completed",
+        'education',
+        'quiz_completed',
         expect.any(String),
         expect.any(Number),
         expect.objectContaining({
@@ -139,21 +140,21 @@ describe("QuizView - Telemetry Tracking", () => {
     });
   });
 
-  it("calculates accuracy percentage correctly", async () => {
+  it('calculates accuracy percentage correctly', async () => {
     render(<QuizView />);
 
     const startButton = screen.getAllByText(/quiz.startButton/i)[0];
     fireEvent.click(startButton);
 
-    await waitFor(() => screen.getByTestId("quiz-component"));
+    await waitFor(() => screen.getByTestId('quiz-component'));
 
-    const completeButton = screen.getByText("Complete Quiz");
+    const completeButton = screen.getByText('Complete Quiz');
     fireEvent.click(completeButton);
 
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith(
-        "education",
-        "quiz_completed",
+        'education',
+        'quiz_completed',
         expect.any(String),
         expect.any(Number),
         expect.objectContaining({
@@ -169,26 +170,24 @@ describe("QuizView - Telemetry Tracking", () => {
       score: number;
       totalQuestions: number;
     };
-    const expectedAccuracy = Math.round(
-      (metadata.score / metadata.totalQuestions) * 100,
-    );
+    const expectedAccuracy = Math.round((metadata.score / metadata.totalQuestions) * 100);
     expect(metadata.accuracy).toBe(expectedAccuracy);
   });
 
-  it("tracks subject and quiz ID in telemetry", async () => {
+  it('tracks subject and quiz ID in telemetry', async () => {
     render(<QuizView />);
 
     const startButton = screen.getAllByText(/quiz.startButton/i)[0];
     fireEvent.click(startButton);
 
-    await waitFor(() => screen.getByTestId("quiz-component"));
+    await waitFor(() => screen.getByTestId('quiz-component'));
 
-    fireEvent.click(screen.getByText("Complete Quiz"));
+    fireEvent.click(screen.getByText('Complete Quiz'));
 
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith(
-        "education",
-        "quiz_completed",
+        'education',
+        'quiz_completed',
         expect.any(String),
         expect.any(Number),
         expect.objectContaining({

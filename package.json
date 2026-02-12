@@ -46,7 +46,7 @@
     "pretest": "./scripts/ensure-test-db.sh --check || echo 'Warning: PostgreSQL not running, tests may fail'",
     "test:e2e:smoke": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=chromium e2e/smoke e2e/full-app-smoke.spec.ts",
     "test:e2e:admin": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=chromium e2e/admin*.spec.ts",
-    "test:e2e:i18n": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=chromium e2e/*locale*.spec.ts e2e/a11y-locales.spec.ts e2e/hreflang.spec.ts e2e/maestri-greetings-i18n.spec.ts e2e/welcome-hero-translations.spec.ts e2e/welcome-i18n.spec.ts e2e/welcome-i18n-advanced.spec.ts e2e/welcome-language-switcher.spec.ts",
+    "test:e2e:i18n": "E2E_TESTS=1 playwright test --workers=2 --config playwright.config.iteration.ts --project=chromium e2e/locale-fixtures-basic.spec.ts e2e/locale-fixtures-integration.spec.ts e2e/locale-switching.spec.ts e2e/a11y-locales.spec.ts e2e/hreflang.spec.ts e2e/maestri-greetings-i18n.spec.ts e2e/welcome-hero-translations.spec.ts e2e/welcome-i18n.spec.ts e2e/welcome-i18n-advanced.spec.ts e2e/welcome-language-switcher.spec.ts",
     "test:e2e:compliance": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=chromium e2e/compliance.spec.ts e2e/gdpr-compliance.spec.ts e2e/legal-ai-act.spec.ts e2e/legal-data-privacy.spec.ts",
     "test:e2e:security": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=chromium e2e/csrf-protection.spec.ts e2e/authorization-cookies.spec.ts e2e/cookie-signing.spec.ts e2e/debug-endpoints-security.spec.ts",
     "test:e2e:cookie-signing": "E2E_TESTS=1 playwright test --config playwright.config.iteration.ts --project=cookie-signing",

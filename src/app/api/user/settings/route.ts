@@ -6,25 +6,26 @@
 // F-14: Added ETag/If-Match support for optimistic concurrency
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { getRequestId, getRequestLogger } from "@/lib/tracing";
-import { getOrCompute, del, CACHE_TTL } from "@/lib/cache";
-import { SettingsUpdateSchema } from "@/lib/validation/schemas/user";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
-import { createHash } from "crypto";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { getRequestId, getRequestLogger } from '@/lib/tracing';
+import { getOrCompute, del, CACHE_TTL } from '@/lib/cache';
+import { SettingsUpdateSchema } from '@/lib/validation/schemas/user';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
+import { safeReadJson } from '@/lib/api/safe-json';
+import { createHash } from 'crypto';
 
 /**
  * Generate ETag from settings data (F-14)
  * Uses updatedAt timestamp for version tracking
  */
 function generateETag(updatedAt: Date): string {
-  const hash = createHash("md5").update(updatedAt.toISOString()).digest("hex");
+  const hash = createHash('md5').update(updatedAt.toISOString()).digest('hex');
   return `"${hash.substring(0, 16)}"`;
 }
 
 export const GET = pipe(
-  withSentry("/api/user/settings"),
+  withSentry('/api/user/settings'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
@@ -43,43 +44,46 @@ export const GET = pipe(
   );
 
   // F-14: Add ETag header for optimistic concurrency
-  const etag = settings.updatedAt
-    ? generateETag(settings.updatedAt)
-    : undefined;
+  const etag = settings.updatedAt ? generateETag(settings.updatedAt) : undefined;
   const response = NextResponse.json(settings);
   if (etag) {
-    response.headers.set("ETag", etag);
+    response.headers.set('ETag', etag);
   }
-  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;
 });
 
 export const PUT = pipe(
-  withSentry("/api/user/settings"),
+  withSentry('/api/user/settings'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
   const log = getRequestLogger(ctx.req);
 
-  const body = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  if (!body) {
+    const response = NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    response.headers.set('X-Request-ID', getRequestId(ctx.req));
+    return response;
+  }
 
   // #92: Validate with Zod before writing to DB
   const validation = SettingsUpdateSchema.safeParse(body);
   if (!validation.success) {
     const response = NextResponse.json(
       {
-        error: "Invalid settings data",
+        error: 'Invalid settings data',
         details: validation.error.issues.map((i) => i.message),
       },
       { status: 400 },
     );
-    response.headers.set("X-Request-ID", getRequestId(ctx.req));
+    response.headers.set('X-Request-ID', getRequestId(ctx.req));
     return response;
   }
 
   // F-14: Check If-Match header for optimistic concurrency
-  const ifMatch = ctx.req.headers.get("If-Match");
+  const ifMatch = ctx.req.headers.get('If-Match');
   if (ifMatch) {
     const currentSettings = await prisma.settings.findUnique({
       where: { userId },
@@ -89,12 +93,12 @@ export const PUT = pipe(
     if (currentSettings?.updatedAt) {
       const currentETag = generateETag(currentSettings.updatedAt);
       if (ifMatch !== currentETag) {
-        log.warn("Settings update conflict (ETag mismatch)", { userId });
+        log.warn('Settings update conflict (ETag mismatch)', { userId });
         const response = NextResponse.json(
-          { error: "Conflict - settings were modified by another request" },
+          { error: 'Conflict - settings were modified by another request' },
           { status: 412 },
         );
-        response.headers.set("X-Request-ID", getRequestId(ctx.req));
+        response.headers.set('X-Request-ID', getRequestId(ctx.req));
         return response;
       }
     }
@@ -110,13 +114,11 @@ export const PUT = pipe(
   del(`settings:${userId}`);
 
   // F-14: Return ETag in response
-  const etag = settings.updatedAt
-    ? generateETag(settings.updatedAt)
-    : undefined;
+  const etag = settings.updatedAt ? generateETag(settings.updatedAt) : undefined;
   const response = NextResponse.json(settings);
   if (etag) {
-    response.headers.set("ETag", etag);
+    response.headers.set('ETag', etag);
   }
-  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;
 });
