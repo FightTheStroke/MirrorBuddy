@@ -491,7 +491,7 @@ describe('providers', () => {
 
         const callBody = JSON.parse((fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
         expect(callBody.temperature).toBe(0.3);
-        expect(callBody.max_tokens).toBe(500);
+        expect(callBody.max_completion_tokens).toBe(500);
       });
 
       it('should handle empty system prompt', async () => {

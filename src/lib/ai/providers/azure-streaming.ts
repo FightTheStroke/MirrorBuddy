@@ -38,7 +38,7 @@ export interface StreamingOptions {
  * Check if content filter was triggered in a chunk
  */
 function hasFilteredContent(filterResult: Record<string, { filtered?: boolean }>): boolean {
-  return Object.values(filterResult).some(v => v?.filtered === true);
+  return Object.values(filterResult).some((v) => v?.filtered === true);
 }
 
 /**
@@ -73,7 +73,7 @@ export async function* azureStreamingCompletion(
   config: ProviderConfig,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
-  options: StreamingOptions = {}
+  options: StreamingOptions = {},
 ): AsyncGenerator<StreamChunk> {
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
@@ -102,7 +102,7 @@ export async function* azureStreamingCompletion(
       body: JSON.stringify({
         messages: allMessages,
         temperature,
-        max_tokens: maxTokens,
+        max_completion_tokens: maxTokens,
         stream: true,
         stream_options: { include_usage: true },
       }),

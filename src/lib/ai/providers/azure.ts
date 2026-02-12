@@ -3,14 +3,9 @@
  * @brief Azure OpenAI implementation with resilience (F-06)
  */
 
-import { logger } from "@/lib/logger";
-import { CircuitBreaker, withRetry } from "@/lib/resilience/circuit-breaker";
-import type {
-  ProviderConfig,
-  ChatCompletionResult,
-  ToolCall,
-  ToolDefinition,
-} from "./types";
+import { logger } from '@/lib/logger';
+import { CircuitBreaker, withRetry } from '@/lib/resilience/circuit-breaker';
+import type { ProviderConfig, ChatCompletionResult, ToolCall, ToolDefinition } from './types';
 
 /**
  * Module-level circuit breaker for Azure provider
@@ -62,42 +57,37 @@ export async function azureChatCompletion(
   temperature: number,
   maxTokens: number,
   tools?: ToolDefinition[],
-  tool_choice?:
-    | "auto"
-    | "none"
-    | { type: "function"; function: { name: string } },
+  tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } },
 ): Promise<ChatCompletionResult> {
-  const apiVersion =
-    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
+  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
 
-  logger.debug(
-    `[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, "api-key=***")}`,
-  );
-  logger.debug(
-    `[Azure Chat] Model: ${config.model}, Endpoint: ${config.endpoint}`,
-  );
+  logger.debug(`[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, 'api-key=***')}`);
+  logger.debug(`[Azure Chat] Model: ${config.model}, Endpoint: ${config.endpoint}`);
 
   // Build messages array - only include system message if systemPrompt is provided
   const allMessages = systemPrompt
-    ? [{ role: "system", content: systemPrompt }, ...messages]
+    ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
 
   // Build request body
   const requestBody: Record<string, unknown> = {
     messages: allMessages,
     temperature,
-    max_tokens: maxTokens,
+    // Azure/OpenAI newer chat models may reject `max_tokens` and require `max_completion_tokens`.
+    // Prefer the new parameter; if a specific deployment only supports the legacy param, the
+    // provider layer should be updated with a targeted retry.
+    max_completion_tokens: maxTokens,
   };
 
   // Add tools if provided
   if (tools && tools.length > 0) {
     requestBody.tools = tools;
-    requestBody.tool_choice = tool_choice ?? "auto";
-    logger.debug("[Azure Chat] Tools enabled", {
+    requestBody.tool_choice = tool_choice ?? 'auto';
+    logger.debug('[Azure Chat] Tools enabled', {
       toolCount: tools.length,
       toolNames: tools.map((t) => t.function.name),
-      toolChoice: tool_choice ?? "auto",
+      toolChoice: tool_choice ?? 'auto',
     });
   }
 
@@ -107,10 +97,10 @@ export async function azureChatCompletion(
     return withRetry(
       async () => {
         const fetchResponse = await fetch(url, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "api-key": config.apiKey!,
-            "Content-Type": "application/json",
+            'api-key': config.apiKey!,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
         });
@@ -126,15 +116,14 @@ export async function azureChatCompletion(
           if (fetchResponse.status === 400) {
             try {
               const errorData = JSON.parse(errorText);
-              if (errorData.error?.code === "content_filter") {
-                const filterResult =
-                  errorData.error?.innererror?.content_filter_result;
+              if (errorData.error?.code === 'content_filter') {
+                const filterResult = errorData.error?.innererror?.content_filter_result;
                 const triggeredFilters = filterResult
                   ? Object.entries(filterResult)
                       .filter(([, v]) => (v as { filtered: boolean }).filtered)
                       .map(([k]) => k)
                   : [];
-                logger.warn("[Azure Chat] Content filter triggered", {
+                logger.warn('[Azure Chat] Content filter triggered', {
                   filters: triggeredFilters,
                 });
                 // Return successful response with content filter info
@@ -146,9 +135,9 @@ export async function azureChatCompletion(
                       {
                         message: {
                           content:
-                            "Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?",
+                            'Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?',
                         },
-                        finish_reason: "content_filter",
+                        finish_reason: 'content_filter',
                       },
                     ],
                   }),
@@ -161,9 +150,7 @@ export async function azureChatCompletion(
             }
           }
 
-          throw new Error(
-            `Azure OpenAI error (${fetchResponse.status}): ${errorText}`,
-          );
+          throw new Error(`Azure OpenAI error (${fetchResponse.status}): ${errorText}`);
         }
 
         return fetchResponse;
@@ -182,12 +169,11 @@ export async function azureChatCompletion(
   const message = choice?.message;
 
   // Debug: Log response details
-  logger.debug("[Azure Chat] Response received", {
+  logger.debug('[Azure Chat] Response received', {
     finishReason: choice?.finish_reason,
     hasToolCalls: !!(message?.tool_calls && message.tool_calls.length > 0),
-    toolCallNames:
-      message?.tool_calls?.map((tc: ToolCall) => tc.function.name) || [],
-    contentPreview: message?.content?.substring(0, 100) || "(no content)",
+    toolCallNames: message?.tool_calls?.map((tc: ToolCall) => tc.function.name) || [],
+    contentPreview: message?.content?.substring(0, 100) || '(no content)',
   });
 
   // Handle content filter response (from our custom Response object)
@@ -197,8 +183,8 @@ export async function azureChatCompletion(
   };
 
   return {
-    content: message?.content || "",
-    provider: "azure",
+    content: message?.content || '',
+    provider: 'azure',
     model: config.model,
     usage: data.usage,
     tool_calls: message?.tool_calls,
