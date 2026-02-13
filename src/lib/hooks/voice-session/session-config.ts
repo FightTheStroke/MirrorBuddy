@@ -21,6 +21,7 @@ import {
   buildCharacterInstruction,
 } from './session-constants';
 import { getAdaptiveVadConfig, formatVadConfigForLogging } from './adaptive-vad';
+import { normalizeVoiceLocale } from './voice-locale';
 
 // Re-export useSendGreeting from dedicated module
 export { useSendGreeting } from './send-greeting';
@@ -55,7 +56,7 @@ export function useSendSessionConfig(
     }
 
     const appearance = useSettingsStore.getState().appearance;
-    const userLanguage = appearance?.language || 'it';
+    const userLanguage = normalizeVoiceLocale(appearance?.language);
 
     // Get accessibility settings for adaptive VAD (ADR-0069)
     const a11yState = useAccessibilityStore.getState();
