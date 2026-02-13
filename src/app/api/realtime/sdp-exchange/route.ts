@@ -10,7 +10,7 @@ import { getRequestId, getRequestLogger } from '@/lib/tracing';
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- WebRTC proxy, uses ephemeral bearer token, no cookie auth
 export const POST = pipe(withSentry('/api/realtime/sdp-exchange'))(async (ctx) => {
   const requestId = getRequestId(ctx.req);
-  const log = getRequestLogger(ctx.req);
+  const log = getRequestLogger(ctx.req, requestId);
   const requestStartMs = Date.now();
 
   const body = await ctx.req.json();
