@@ -8,10 +8,10 @@
 
 import path from 'path';
 import fs from 'fs';
-import { createHmac, randomUUID } from 'crypto';
+import { createHmac } from 'crypto';
 import { config } from 'dotenv';
 import { getPrismaClient, disconnectPrisma } from './helpers/prisma-setup';
-import { seedTiers } from '../src/lib/seeds/tier-seed';
+import { createE2ETestUser } from './helpers/e2e-user-factory';
 
 // Load .env so we can read SESSION_SECRET (must match running dev server)
 config();
@@ -56,18 +56,9 @@ async function globalSetup() {
   }
 
   // PRODUCTION BLOCKER #3: TEST_DATABASE_URL must NOT be Supabase
-  // Extract host from PostgreSQL URL: postgresql://user:pass@HOST:port/db
-  // Use regex to extract only the host portion, not query params or other parts
   const hostMatch = testDbUrl.match(/@([^:/?#]+)/);
   const dbHost = hostMatch ? hostMatch[1].toLowerCase() : '';
-  // Check if host is supabase.com, supabase.co, or any subdomain
-  // Split on dots and check last 2 parts to avoid regex complexity
-  const hostParts = dbHost.split('.');
-  const domain =
-    hostParts.length >= 2
-      ? `${hostParts[hostParts.length - 2]}.${hostParts[hostParts.length - 1]}`
-      : dbHost;
-  const isSupabaseHost = domain === 'supabase.com' || domain === 'supabase.co';
+  const isSupabaseHost = dbHost.endsWith('.supabase.com') || dbHost.endsWith('.supabase.co');
 
   if (isSupabaseHost) {
     throw new Error(
@@ -78,9 +69,6 @@ async function globalSetup() {
     );
   }
 
-  // Note: DATABASE_URL may contain Supabase production URL from .env, but playwright.config.ts
-  // webServer.env overrides it with TEST_DATABASE_URL for the actual server process
-
   console.log('✅ Production guards passed. Using test database:', testDbUrl.substring(0, 50));
 
   // Ensure .auth directory exists
@@ -89,68 +77,20 @@ async function globalSetup() {
     fs.mkdirSync(authDir, { recursive: true });
   }
 
-  // Generate unique test user ID per run to avoid conflicts with stale data
-  // All workers share this ID (loaded from storage-state.json)
-  const randomSuffix = randomUUID().replace(/-/g, '').substring(0, 9);
-  const testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
-
-  // Create the test user in the database (ADR 0081: isTestData=true)
-  // Also create OnboardingState to bypass onboarding wall (ADR 0059)
+  // Create the test user via factory (ADR 0081: isTestData=true, ADR 0059: bypass walls)
   const prisma = getPrismaClient();
+  let testUserId: string;
+  let randomSuffix: string;
   try {
-    // Ensure critical reference data exists for E2E (e.g. Base tier assignment).
-    await seedTiers(prisma);
-
-    await prisma.user.upsert({
-      where: { id: testUserId },
-      update: {},
-      create: {
-        id: testUserId,
-        email: `e2e-test-${randomSuffix}@example.com`,
-        username: `e2e_test_${randomSuffix}`,
-        isTestData: true,
-        role: 'USER',
-        disabled: false,
-        profile: {
-          create: {
-            name: 'E2E Test User',
-            age: 12,
-          },
-        },
-        settings: {
-          create: {},
-        },
-        // ADR 0059: /api/onboarding checks OnboardingState, not localStorage
-        onboarding: {
-          create: {
-            hasCompletedOnboarding: true,
-            onboardingCompletedAt: new Date(),
-            currentStep: 'ready',
-            isReplayMode: false,
-            data: JSON.stringify({
-              name: 'E2E Test User',
-              age: 12,
-              schoolLevel: 'media',
-              learningDifferences: [],
-              gender: 'other',
-            }),
-          },
-        },
-        // F-13: ToS acceptance to bypass consent wall
-        tosAcceptances: {
-          create: {
-            version: '1.0',
-            acceptedAt: new Date(),
-            ipAddress: '127.0.0.1',
-            userAgent: 'Playwright E2E Test',
-          },
-        },
-      },
-    });
+    const result = await createE2ETestUser(prisma);
+    testUserId = result.testUserId;
+    randomSuffix = result.randomSuffix;
     console.log('✅ Test user created in database:', testUserId);
   } catch (error) {
     console.error('⚠️ Failed to create test user (may already exist):', error);
-    // Continue anyway - the test might still work
+    // Fallback: generate IDs locally so storage state can still be written
+    randomSuffix = Math.random().toString(36).substring(2, 11);
+    testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
   } finally {
     await disconnectPrisma();
   }
@@ -162,7 +102,6 @@ async function globalSetup() {
   const storageState = {
     cookies: [
       {
-        // Server-side auth cookie (signed)
         name: 'mirrorbuddy-user-id',
         value: signedCookie,
         domain: 'localhost',
@@ -173,7 +112,6 @@ async function globalSetup() {
         sameSite: 'Lax',
       },
       {
-        // Client-readable cookie (not signed, for JS access)
         name: 'mirrorbuddy-user-id-client',
         value: testUserId,
         domain: 'localhost',
@@ -184,7 +122,6 @@ async function globalSetup() {
         sameSite: 'Lax',
       },
       {
-        // Visitor cookie for trial session flows
         name: 'mirrorbuddy-visitor-id',
         value: `e2e-test-visitor-${randomSuffix}`,
         domain: 'localhost',
@@ -195,7 +132,6 @@ async function globalSetup() {
         sameSite: 'Lax',
       },
       {
-        // Accessibility settings bypass (ADR 0060)
         name: 'mirrorbuddy-a11y',
         value: encodeURIComponent(
           JSON.stringify({
@@ -242,7 +178,6 @@ async function globalSetup() {
             }),
           },
           {
-            // Unified consent (TOS + Cookie) - matches unified-consent-storage.ts
             name: 'mirrorbuddy-unified-consent',
             value: JSON.stringify({
               version: '1.0',
@@ -263,11 +198,9 @@ async function globalSetup() {
     ],
   };
 
-  // Write storage state file
   fs.writeFileSync(STORAGE_STATE_PATH, JSON.stringify(storageState, null, 2));
 
   console.log('Global setup complete: onboarding state saved to', STORAGE_STATE_PATH);
 }
 
 export default globalSetup;
-// Trigger CI re-run

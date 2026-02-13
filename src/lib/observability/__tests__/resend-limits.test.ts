@@ -11,6 +11,15 @@ import {
   getEmailQuotaReport,
   type ResendLimits,
 } from '../resend-limits';
+import { generateEmailsInRange } from './helpers/email-factory';
+
+/** Helper: mock fetch to return a given email list */
+function mockFetchEmails(emails: Array<{ id: string; created_at: string }>) {
+  global.fetch = vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ data: emails }),
+  });
+}
 
 describe('Resend Limits API', () => {
   beforeEach(() => {
@@ -44,14 +53,7 @@ describe('Resend Limits API', () => {
 
   it('returns typed ResendLimits interface', async () => {
     process.env.RESEND_API_KEY = 'test-key';
-
-    // Mock fetch
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [],
-      }),
-    });
+    mockFetchEmails([]);
 
     const limits: ResendLimits = await getResendLimits();
 
@@ -75,13 +77,7 @@ describe('Resend Limits API', () => {
 
   it('sets daily limit to 100 emails', async () => {
     process.env.RESEND_API_KEY = 'test-key';
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [],
-      }),
-    });
+    mockFetchEmails([]);
 
     const limits = await getResendLimits();
 
@@ -90,13 +86,7 @@ describe('Resend Limits API', () => {
 
   it('sets monthly limit to 3000 emails', async () => {
     process.env.RESEND_API_KEY = 'test-key';
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: [],
-      }),
-    });
+    mockFetchEmails([]);
 
     const limits = await getResendLimits();
 
@@ -108,9 +98,7 @@ describe('Resend Limits API', () => {
 
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [],
-      }),
+      json: async () => ({ data: [] }),
     });
 
     global.fetch = fetchMock;
@@ -121,9 +109,8 @@ describe('Resend Limits API', () => {
 
     // Second call - should use cache
     const limits2 = await getResendLimits();
-    expect(fetchMock).toHaveBeenCalledTimes(1); // Still 1, no new call
+    expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    // Results should be identical (same timestamp)
     expect(limits1.timestamp).toBe(limits2.timestamp);
   });
 
@@ -132,29 +119,11 @@ describe('Resend Limits API', () => {
 
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Mock 50 emails today - spread across the day from start of day to now
-    const timeRange = now.getTime() - startOfDay.getTime();
-    const interval = Math.max(1000, timeRange / 51);
-
-    const emailsToday = Array(50)
-      .fill(null)
-      .map((_, i) => ({
-        id: `email-${i}`,
-        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
-      }));
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: emailsToday,
-      }),
-    });
+    mockFetchEmails(generateEmailsInRange(50, startOfDay, now));
 
     clearResendLimitsCache();
     const limits = await getResendLimits();
 
-    // 50 / 100 = 50%
     expect(limits.emailsToday.used).toBe(50);
     expect(limits.emailsToday.percent).toBeCloseTo(50, 1);
   });
@@ -164,29 +133,11 @@ describe('Resend Limits API', () => {
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // Mock 1500 emails this month - spread across the month from start to now
-    const timeRange = now.getTime() - startOfMonth.getTime();
-    const interval = Math.max(1000, timeRange / 1501);
-
-    const emailsMonth = Array(1500)
-      .fill(null)
-      .map((_, i) => ({
-        id: `email-${i}`,
-        created_at: new Date(startOfMonth.getTime() + (i + 1) * interval).toISOString(),
-      }));
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: emailsMonth,
-      }),
-    });
+    mockFetchEmails(generateEmailsInRange(1500, startOfMonth, now));
 
     clearResendLimitsCache();
     const limits = await getResendLimits();
 
-    // 1500 / 3000 = 50%
     expect(limits.emailsMonth.used).toBe(1500);
     expect(limits.emailsMonth.percent).toBeCloseTo(50, 1);
   });
@@ -223,21 +174,16 @@ describe('Resend Limits API', () => {
 
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({
-        data: [],
-      }),
+      json: async () => ({ data: [] }),
     });
 
     global.fetch = fetchMock;
 
-    // First call
     await getResendLimits();
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    // Clear cache
     clearResendLimitsCache();
 
-    // Second call - should fetch again
     await getResendLimits();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
@@ -247,24 +193,7 @@ describe('Resend Limits API', () => {
 
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Mock 85 emails today (85% of 100) - spread across the day from start of day to now
-    const timeRange = now.getTime() - startOfDay.getTime();
-    const interval = Math.max(1000, timeRange / 86);
-
-    const emailsToday = Array(85)
-      .fill(null)
-      .map((_, i) => ({
-        id: `email-${i}`,
-        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
-      }));
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: emailsToday,
-      }),
-    });
+    mockFetchEmails(generateEmailsInRange(85, startOfDay, now));
 
     clearResendLimitsCache();
     const stressed = await isEmailQuotaStressed(80);
@@ -277,24 +206,7 @@ describe('Resend Limits API', () => {
 
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Mock 70 emails today (70% of 100) - spread across the day from start of day to now
-    const timeRange = now.getTime() - startOfDay.getTime();
-    const interval = Math.max(1000, timeRange / 71);
-
-    const emailsToday = Array(70)
-      .fill(null)
-      .map((_, i) => ({
-        id: `email-${i}`,
-        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
-      }));
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: emailsToday,
-      }),
-    });
+    mockFetchEmails(generateEmailsInRange(70, startOfDay, now));
 
     clearResendLimitsCache();
     const stressed = await isEmailQuotaStressed(80);
@@ -307,25 +219,7 @@ describe('Resend Limits API', () => {
 
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    // Mock 30 emails today - spread across the day from start of day to now
-    // This ensures all emails fall within "today" regardless of when the test runs
-    const timeRange = now.getTime() - startOfDay.getTime();
-    const interval = Math.max(1000, timeRange / 31); // At least 1 second apart, spread across available time
-
-    const emailsToday = Array(30)
-      .fill(null)
-      .map((_, i) => ({
-        id: `email-${i}`,
-        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
-      }));
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        data: emailsToday,
-      }),
-    });
+    mockFetchEmails(generateEmailsInRange(30, startOfDay, now));
 
     clearResendLimitsCache();
     const report = await getEmailQuotaReport();

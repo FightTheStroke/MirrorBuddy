@@ -1,21 +1,12 @@
 /**
  * @file azure-streaming.ts
- * @brief Azure OpenAI streaming implementation
- *
- * Implements Server-Sent Events (SSE) streaming for chat completions.
- * Uses AsyncGenerator to yield chunks as they arrive from Azure.
- *
- * @see ADR 0034 for architecture decisions
+ * @brief Azure OpenAI SSE streaming (ADR 0034)
  */
 
 import { logger } from '@/lib/logger';
 import type { ProviderConfig } from './types';
+import { type TokenParamName, isDeploymentNotFound, isUnsupportedTokenParam } from './azure-errors';
 
-type TokenParamName = 'max_completion_tokens' | 'max_tokens';
-
-/**
- * Types for streaming chunks
- */
 export type StreamChunkType = 'content' | 'content_filter' | 'usage' | 'error' | 'done';
 
 export interface StreamChunk {
@@ -36,66 +27,30 @@ export interface StreamingOptions {
   signal?: AbortSignal;
 }
 
-/**
- * Check if content filter was triggered in a chunk
- */
 function hasFilteredContent(filterResult: Record<string, { filtered?: boolean }>): boolean {
   return Object.values(filterResult).some((v) => v?.filtered === true);
 }
 
-/**
- * Extract filtered category names
- */
 function getFilteredCategories(filterResult: Record<string, { filtered?: boolean }>): string[] {
   return Object.entries(filterResult)
     .filter(([, v]) => v?.filtered === true)
     .map(([k]) => k);
 }
 
-function isDeploymentNotFound(status: number, errorText: string): boolean {
-  if (status !== 404) return false;
-  try {
-    const data = JSON.parse(errorText) as { error?: { code?: string; message?: string } };
-    if (data.error?.code === 'DeploymentNotFound') return true;
-    return data.error?.message?.includes('DeploymentNotFound') ?? false;
-  } catch {
-    return errorText.includes('DeploymentNotFound');
-  }
-}
-
-function isUnsupportedTokenParam(status: number, errorText: string): TokenParamName | null {
-  if (status !== 400) return null;
-  if (errorText.includes("Unsupported parameter: 'max_tokens'")) return 'max_tokens';
-  if (errorText.includes("Unsupported parameter: 'max_completion_tokens'"))
-    return 'max_completion_tokens';
-  return null;
-}
-
-/**
- * Perform streaming chat completion using Azure OpenAI
- *
- * @param config - Provider configuration with endpoint and API key
- * @param messages - Array of chat messages
- * @param systemPrompt - System prompt to prepend
- * @param options - Streaming options (temperature, maxTokens, abort signal)
- * @yields StreamChunk objects as they arrive
- *
- * @example
- * ```typescript
- * const generator = azureStreamingCompletion(config, messages, systemPrompt);
- * for await (const chunk of generator) {
- *   if (chunk.type === 'content') {
- *     process.stdout.write(chunk.content);
- *   }
- * }
- * ```
- */
+/** Perform streaming chat completion using Azure OpenAI */
 export async function* azureStreamingCompletion(
   config: ProviderConfig,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
   options: StreamingOptions = {},
 ): AsyncGenerator<StreamChunk> {
+  if (!config.apiKey) {
+    yield { type: 'error', error: 'Azure OpenAI requires an API key (config.apiKey is missing)' };
+    yield { type: 'done' };
+    return;
+  }
+  const apiKey = config.apiKey;
+
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const { temperature = 0.7, maxTokens = 2048, signal } = options;
 
@@ -108,7 +63,6 @@ export async function* azureStreamingCompletion(
     endpoint: config.endpoint?.substring(0, 30) + '...',
   });
 
-  // Build messages array
   const allMessages = systemPrompt
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
@@ -119,7 +73,7 @@ export async function* azureStreamingCompletion(
     return fetch(buildUrl(deployment), {
       method: 'POST',
       headers: {
-        'api-key': config.apiKey!,
+        'api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -134,7 +88,6 @@ export async function* azureStreamingCompletion(
   }
 
   try {
-    // Prefer `max_completion_tokens`, but retry with legacy `max_tokens` when needed.
     const first = await doFetch(config.model, 'max_completion_tokens');
     if (first.ok) {
       response = first;
@@ -160,7 +113,6 @@ export async function* azureStreamingCompletion(
             tokenParamName: 'max_completion_tokens',
             errorDetails: secondErrorText,
           });
-          // Try legacy param on fallback deployment as last attempt.
           const third = await doFetch(fallbackDeployment, 'max_tokens');
           response = third;
         }
@@ -168,7 +120,6 @@ export async function* azureStreamingCompletion(
         const second = await doFetch(config.model, 'max_tokens');
         response = second;
       } else {
-        // Keep original error body by re-wrapping into a synthetic response-like path below.
         response = {
           ok: false,
           status: first.status,
@@ -190,7 +141,6 @@ export async function* azureStreamingCompletion(
     const errorText = await response.text();
     logger.error(`[Azure Streaming] Error ${response.status}`, { errorDetails: errorText });
 
-    // Handle content filter on initial request
     if (response.status === 400) {
       try {
         const errorData = JSON.parse(errorText);
@@ -227,26 +177,21 @@ export async function* azureStreamingCompletion(
         break;
       }
 
-      // Decode chunk and add to buffer
       buffer += decoder.decode(value, { stream: true });
 
-      // Process complete lines
       const lines = buffer.split('\n');
-      buffer = lines.pop() || ''; // Keep incomplete line in buffer
+      buffer = lines.pop() || '';
 
       for (const line of lines) {
         const trimmedLine = line.trim();
 
-        // Skip empty lines and comments
         if (!trimmedLine || trimmedLine.startsWith(':')) {
           continue;
         }
 
-        // Parse SSE data line
         if (trimmedLine.startsWith('data: ')) {
           const data = trimmedLine.slice(6);
 
-          // Check for stream end
           if (data === '[DONE]') {
             yield { type: 'done' };
             return;
@@ -255,7 +200,6 @@ export async function* azureStreamingCompletion(
           try {
             const json = JSON.parse(data);
 
-            // Check for content filter in chunk
             const filterResult = json.choices?.[0]?.content_filter_results;
             if (filterResult && hasFilteredContent(filterResult)) {
               yield {
@@ -265,13 +209,11 @@ export async function* azureStreamingCompletion(
               continue;
             }
 
-            // Extract content delta
             const content = json.choices?.[0]?.delta?.content;
             if (content) {
               yield { type: 'content', content };
             }
 
-            // Extract usage from final chunk
             if (json.usage) {
               yield {
                 type: 'usage',

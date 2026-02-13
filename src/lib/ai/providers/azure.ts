@@ -6,26 +6,14 @@
 import { logger } from '@/lib/logger';
 import { CircuitBreaker, withRetry } from '@/lib/resilience/circuit-breaker';
 import type { ProviderConfig, ChatCompletionResult, ToolCall, ToolDefinition } from './types';
-
-type TokenParamName = 'max_completion_tokens' | 'max_tokens';
-
-type ParsedAzureError = {
-  code?: string;
-  message?: string;
-};
-
-class AzureHttpError extends Error {
-  public readonly status: number;
-  public readonly errorText: string;
-  public readonly code?: string;
-
-  constructor(status: number, errorText: string, code?: string) {
-    super(`Azure OpenAI error (${status}): ${errorText}`);
-    this.status = status;
-    this.errorText = errorText;
-    this.code = code;
-  }
-}
+import {
+  type TokenParamName,
+  AzureHttpError,
+  parseAzureError,
+  isDeploymentNotFound,
+  isUnsupportedTokenParam,
+  isRetryableAzureError,
+} from './azure-errors';
 
 /**
  * Module-level circuit breaker for Azure provider
@@ -40,63 +28,9 @@ export const azureCircuitBreaker = new CircuitBreaker({
   },
 });
 
-/**
- * Extract HTTP status from error message or custom property
- */
-function extractStatusFromError(error: Error): number | null {
-  // Check for status in error message (format: "Azure OpenAI error (500): ...")
-  const match = error.message.match(/Azure OpenAI error \((\d+)\):/);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-
-  // Check for custom status property (if fetch throws with status)
-  const errorWithStatus = error as Error & { status?: number };
-  return errorWithStatus.status ?? null;
-}
-
-function parseAzureError(errorText: string): ParsedAzureError {
-  try {
-    const data = JSON.parse(errorText) as { error?: { code?: string; message?: string } };
-    return {
-      code: data.error?.code,
-      message: data.error?.message,
-    };
-  } catch {
-    return {};
-  }
-}
-
-function isDeploymentNotFound(status: number, errorText: string): boolean {
-  if (status !== 404) return false;
-  const parsed = parseAzureError(errorText);
-  if (parsed.code === 'DeploymentNotFound') return true;
-  return (
-    errorText.includes('DeploymentNotFound') ||
-    (parsed.message?.includes('DeploymentNotFound') ?? false)
-  );
-}
-
-function isUnsupportedTokenParam(status: number, errorText: string): TokenParamName | null {
-  if (status !== 400) return null;
-  // Common message: "Unsupported parameter: 'max_tokens'. Use 'max_completion_tokens' instead."
-  if (errorText.includes("Unsupported parameter: 'max_tokens'")) return 'max_tokens';
-  if (errorText.includes("Unsupported parameter: 'max_completion_tokens'"))
-    return 'max_completion_tokens';
-  return null;
-}
-
-/**
- * Determine if an error is retryable based on HTTP status
- * F-06: Retry on 429 (rate limit) and 5xx (server errors)
- */
-function isRetryableAzureError(error: Error): boolean {
-  const status = extractStatusFromError(error);
-  if (!status) return false;
-
-  // Retry on rate limit (429) or server errors (5xx)
-  return status === 429 || (status >= 500 && status < 600);
-}
+type FetchResult =
+  | { kind: 'success'; response: Response; deployment: string; tokenParamName: TokenParamName }
+  | { kind: 'content_filtered'; deployment: string; filteredCategories: string[] };
 
 /**
  * Perform chat completion using Azure OpenAI
@@ -110,8 +44,12 @@ export async function azureChatCompletion(
   tools?: ToolDefinition[],
   tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } },
 ): Promise<ChatCompletionResult> {
-  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
+  if (!config.apiKey) {
+    throw new Error('Azure OpenAI requires an API key (config.apiKey is missing)');
+  }
+  const apiKey = config.apiKey;
 
+  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const fallbackDeployment = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || undefined;
 
   const buildUrl = (deployment: string): string =>
@@ -125,7 +63,6 @@ export async function azureChatCompletion(
     });
   }
 
-  // Build messages array - only include system message if systemPrompt is provided
   const allMessages = systemPrompt
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
@@ -145,13 +82,7 @@ export async function azureChatCompletion(
     });
   }
 
-  type FetchOk = {
-    response: Response;
-    deployment: string;
-    tokenParamName: TokenParamName;
-  };
-
-  async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<FetchOk> {
+  async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<FetchResult> {
     const requestBody: Record<string, unknown> = {
       ...baseRequestBody,
       [tokenParamName]: maxTokens,
@@ -160,22 +91,19 @@ export async function azureChatCompletion(
     const url = buildUrl(deployment);
 
     logger.debug(`[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, 'api-key=***')}`);
-    logger.debug('[Azure Chat] Request params', {
-      deployment,
-      tokenParamName,
-    });
+    logger.debug('[Azure Chat] Request params', { deployment, tokenParamName });
 
     const fetchResponse = await fetch(url, {
       method: 'POST',
       headers: {
-        'api-key': config.apiKey!,
+        'api-key': apiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestBody),
     });
 
     if (fetchResponse.ok) {
-      return { response: fetchResponse, deployment, tokenParamName };
+      return { kind: 'success', response: fetchResponse, deployment, tokenParamName };
     }
 
     const errorText = await fetchResponse.text();
@@ -197,29 +125,8 @@ export async function azureChatCompletion(
                 .filter(([, v]) => (v as { filtered: boolean }).filtered)
                 .map(([k]) => k)
             : [];
-          logger.warn('[Azure Chat] Content filter triggered', {
-            filters: triggeredFilters,
-          });
-          // Return successful response with content filter info
-          // This bypasses retry logic by not throwing an error
-          const syntheticResponse = {
-            ok: true,
-            json: async () => ({
-              choices: [
-                {
-                  message: {
-                    content:
-                      'Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?',
-                  },
-                  finish_reason: 'content_filter',
-                },
-              ],
-            }),
-            contentFiltered: true,
-            filteredCategories: triggeredFilters,
-          } as unknown as Response;
-
-          return { response: syntheticResponse, deployment, tokenParamName };
+          logger.warn('[Azure Chat] Content filter triggered', { filters: triggeredFilters });
+          return { kind: 'content_filtered', deployment, filteredCategories: triggeredFilters };
         }
       } catch {
         // Not a JSON error, fall through to throw
@@ -230,7 +137,7 @@ export async function azureChatCompletion(
     throw new AzureHttpError(fetchResponse.status, errorText, parsed.code);
   }
 
-  async function fetchWithCompatibility(): Promise<FetchOk> {
+  async function fetchWithCompatibility(): Promise<FetchResult> {
     const preferredTokenParamName: TokenParamName = 'max_completion_tokens';
     const legacyTokenParamName: TokenParamName = 'max_tokens';
 
@@ -238,12 +145,10 @@ export async function azureChatCompletion(
       { deployment: config.model, tokenParamName: preferredTokenParamName },
     ];
 
-    // If the configured model is wrong, try the known-good deployment as a targeted fallback.
     if (fallbackDeployment && fallbackDeployment !== config.model) {
       attempts.push({ deployment: fallbackDeployment, tokenParamName: preferredTokenParamName });
     }
 
-    // Fallback for deployments that only support legacy param.
     attempts.push({ deployment: config.model, tokenParamName: legacyTokenParamName });
     if (fallbackDeployment && fallbackDeployment !== config.model) {
       attempts.push({ deployment: fallbackDeployment, tokenParamName: legacyTokenParamName });
@@ -263,7 +168,6 @@ export async function azureChatCompletion(
           throw error;
         }
 
-        // If a deployment doesn't exist, switch to the fallback deployment (if any) before failing.
         if (isDeploymentNotFound(error.status, error.errorText)) {
           logger.warn('[Azure Chat] DeploymentNotFound; trying fallback deployment if available', {
             deployment: attempt.deployment,
@@ -272,7 +176,6 @@ export async function azureChatCompletion(
           continue;
         }
 
-        // If token param is unsupported, switch to the other token param for the same deployment.
         const unsupportedParam = isUnsupportedTokenParam(error.status, error.errorText);
         if (unsupportedParam) {
           logger.warn('[Azure Chat] Unsupported token param; trying alternative param', {
@@ -282,8 +185,6 @@ export async function azureChatCompletion(
           continue;
         }
 
-        // For retryable statuses (429/5xx), bubble up so withRetry can handle backoff.
-        // For other statuses (e.g. 401/403/other 400s), fail immediately.
         throw error;
       }
     }
@@ -292,7 +193,6 @@ export async function azureChatCompletion(
   }
 
   // Wrap fetch with resilience: circuit breaker + retry with exponential backoff
-  // Use circuit breaker directly to share state across requests
   const fetched = await azureCircuitBreaker.execute(async () => {
     return withRetry(
       async () => {
@@ -307,11 +207,22 @@ export async function azureChatCompletion(
     );
   });
 
+  // Handle content filter result (no Response to parse)
+  if (fetched.kind === 'content_filtered') {
+    return {
+      content: 'Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?',
+      provider: 'azure',
+      model: fetched.deployment,
+      finish_reason: 'content_filter',
+      contentFiltered: true,
+      filteredCategories: fetched.filteredCategories,
+    };
+  }
+
   const data = await fetched.response.json();
   const choice = data.choices[0];
   const message = choice?.message;
 
-  // Debug: Log response details
   logger.debug('[Azure Chat] Response received', {
     deployment: fetched.deployment,
     tokenParamName: fetched.tokenParamName,
@@ -321,12 +232,6 @@ export async function azureChatCompletion(
     contentPreview: message?.content?.substring(0, 100) || '(no content)',
   });
 
-  // Handle content filter response (from our custom Response object)
-  const responseWithFilter = fetched.response as Response & {
-    contentFiltered?: boolean;
-    filteredCategories?: string[];
-  };
-
   return {
     content: message?.content || '',
     provider: 'azure',
@@ -334,7 +239,5 @@ export async function azureChatCompletion(
     usage: data.usage,
     tool_calls: message?.tool_calls,
     finish_reason: choice?.finish_reason,
-    contentFiltered: responseWithFilter.contentFiltered,
-    filteredCategories: responseWithFilter.filteredCategories,
   };
 }
