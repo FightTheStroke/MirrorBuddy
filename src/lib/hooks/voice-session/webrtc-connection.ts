@@ -48,10 +48,13 @@ export class WebRTCConnection {
       maestroId: this.config.maestro.id,
     });
     try {
-      logger.debug('[WebRTC] Step 1: Getting ephemeral token...');
-      const token = await this.getEphemeralToken();
-      logger.debug('[WebRTC] Step 2: Requesting microphone access...');
-      this.mediaStream = await this.getUserMedia();
+      // Run token issuance and microphone permission in parallel to reduce
+      // end-to-end time and to show the mic permission prompt immediately.
+      logger.debug('[WebRTC] Step 1: Getting ephemeral token + microphone access (parallel)...');
+      const tokenPromise = this.getEphemeralToken();
+      const mediaPromise = this.getUserMedia();
+      const [token, mediaStream] = await Promise.all([tokenPromise, mediaPromise]);
+      this.mediaStream = mediaStream;
       logger.debug('[WebRTC] Step 3: Creating peer connection...');
       this.peerConnection = this.createPeerConnection();
       logger.debug('[WebRTC] Step 4: Adding audio tracks...');

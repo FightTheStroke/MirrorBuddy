@@ -18,6 +18,24 @@ export function handleWebRTCTrack(
 ) {
   logger.debug('[VoiceSession] onTrack received from Azure', { track: event.track.kind });
   if (event.track.kind === 'audio') {
+    // Guard against multiple ontrack events creating multiple audio elements.
+    // If we replace the ref without stopping the previous element/stream, audio can overlap.
+    const previousAudioEl = refs.webrtcAudioElementRef.current;
+    if (previousAudioEl) {
+      try {
+        previousAudioEl.pause();
+      } catch {
+        /* best-effort */
+      }
+      previousAudioEl.srcObject = null;
+    }
+
+    const previousStream = refs.remoteAudioStreamRef.current;
+    if (previousStream) {
+      previousStream.getTracks().forEach((track) => track.stop());
+      refs.remoteAudioStreamRef.current = null;
+    }
+
     const remoteStream = new MediaStream();
     remoteStream.addTrack(event.track);
     refs.remoteAudioStreamRef.current = remoteStream;
@@ -34,6 +52,25 @@ export function handleWebRTCTrack(
     };
 
     refs.webrtcAudioElementRef.current = audioElement;
+
+    // If this track ends, ensure we stop playback and release resources.
+    event.track.onended = () => {
+      // Only clean up if we're still holding the same stream/element.
+      if (refs.remoteAudioStreamRef.current === remoteStream) {
+        refs.remoteAudioStreamRef.current.getTracks().forEach((t) => t.stop());
+        refs.remoteAudioStreamRef.current = null;
+      }
+      if (refs.webrtcAudioElementRef.current === audioElement) {
+        try {
+          audioElement.pause();
+        } catch {
+          /* best-effort */
+        }
+        audioElement.srcObject = null;
+        refs.webrtcAudioElementRef.current = null;
+      }
+    };
+
     recordWebRTCFirstAudio({
       userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
       firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
