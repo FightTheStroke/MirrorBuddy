@@ -111,6 +111,9 @@ export function useDisconnect(
     refs.greetingSentRef.current = false;
     refs.hasActiveResponseRef.current = false;
     refs.maestroRef.current = null;
+    refs.voiceConnectStartTimeRef.current = null;
+    refs.voiceDataChannelOpenTimeRef.current = null;
+    refs.voiceSessionUpdatedTimeRef.current = null;
 
     reset();
     setConnectionState('idle');

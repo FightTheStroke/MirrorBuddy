@@ -10,6 +10,7 @@ import { clientLogger as logger } from '@/lib/logger/client';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
+import { computeVoiceTimingDurations } from './voice-timing';
 
 import type { RingBuffer } from './ring-buffer';
 
@@ -26,6 +27,9 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
+  voiceConnectStartTimeRef: React.MutableRefObject<number | null>;
+  voiceDataChannelOpenTimeRef: React.MutableRefObject<number | null>;
+  voiceSessionUpdatedTimeRef: React.MutableRefObject<number | null>;
   addTranscript: (role: 'user' | 'assistant', text: string) => void;
   setListening: (value: boolean) => void;
   setSpeaking: (value: boolean) => void;
@@ -68,6 +72,19 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
           // eslint-disable-next-line react-hooks/immutability -- refs are mutable by design
           deps.sessionReadyRef.current = true;
+          deps.voiceSessionUpdatedTimeRef.current = performance.now();
+          const timing = computeVoiceTimingDurations({
+            connectStartMs: deps.voiceConnectStartTimeRef.current,
+            dataChannelOpenMs: deps.voiceDataChannelOpenTimeRef.current,
+            sessionUpdatedMs: deps.voiceSessionUpdatedTimeRef.current,
+          });
+          logger.info('[VoiceSession] Connection timing', {
+            sessionId: deps.sessionIdRef.current,
+            maestroId: deps.maestroRef.current?.id,
+            connectToDataChannelOpenMs: timing.connectToDataChannelOpenMs,
+            connectToSessionUpdatedMs: timing.connectToSessionUpdatedMs,
+            dataChannelOpenToSessionUpdatedMs: timing.dataChannelOpenToSessionUpdatedMs,
+          });
           logger.debug('[VoiceSession] Starting audio capture...');
           // Fire and forget - AudioContext resume is best-effort
           void deps.startAudioCapture();

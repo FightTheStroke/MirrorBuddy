@@ -2,12 +2,12 @@
 // VOICE SESSION REFS - Extracted for file size management
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import type { Maestro } from "@/types";
-import { RingBuffer } from "./ring-buffer";
-import { MAX_QUEUE_SIZE } from "./constants";
+import { useRef, useState } from 'react';
+import type { Maestro } from '@/types';
+import { RingBuffer } from './ring-buffer';
+import { MAX_QUEUE_SIZE } from './constants';
 
 export interface VoiceSessionRefs {
   maestroRef: React.MutableRefObject<Maestro | null>;
@@ -30,9 +30,7 @@ export interface VoiceSessionRefs {
   sessionReadyRef: React.MutableRefObject<boolean>;
   greetingSentRef: React.MutableRefObject<boolean>;
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  handleServerEventRef: React.MutableRefObject<
-    ((event: Record<string, unknown>) => void) | null
-  >;
+  handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
@@ -44,9 +42,13 @@ export interface VoiceSessionRefs {
   animationFrameRef: React.MutableRefObject<number | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
+  /** performance.now() marks for end-to-end voice connection timing */
+  voiceConnectStartTimeRef: React.MutableRefObject<number | null>;
+  voiceDataChannelOpenTimeRef: React.MutableRefObject<number | null>;
+  voiceSessionUpdatedTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
   initialMessagesRef: React.MutableRefObject<Array<{
-    role: "user" | "assistant";
+    role: 'user' | 'assistant';
     content: string;
   }> | null>;
   /** Active video vision usage record ID (ADR 0122) */
@@ -65,9 +67,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     processorRef: useRef<ScriptProcessorNode | null>(null),
     analyserRef: useRef<AnalyserNode | null>(null),
     frequencyDataRef: useRef<Uint8Array<ArrayBuffer> | null>(null),
-    audioQueueRef: useRef<RingBuffer<Int16Array>>(
-      new RingBuffer(MAX_QUEUE_SIZE),
-    ),
+    audioQueueRef: useRef<RingBuffer<Int16Array>>(new RingBuffer(MAX_QUEUE_SIZE)),
     isPlayingRef: useRef(false),
     lastLevelUpdateRef: useRef<number>(0),
     playNextChunkRef: useRef<(() => void) | null>(null),
@@ -79,9 +79,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     sessionReadyRef: useRef(false),
     greetingSentRef: useRef(false),
     hasActiveResponseRef: useRef(false),
-    handleServerEventRef: useRef<
-      ((event: Record<string, unknown>) => void) | null
-    >(null),
+    handleServerEventRef: useRef<((event: Record<string, unknown>) => void) | null>(null),
     sessionIdRef: useRef<string | null>(null),
     connectionTimeoutRef: useRef<NodeJS.Timeout | null>(null),
     greetingTimeoutsRef: useRef<NodeJS.Timeout[]>([]),
@@ -93,9 +91,12 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     animationFrameRef: useRef<number | null>(null),
     userSpeechEndTimeRef: useRef<number | null>(null),
     firstAudioPlaybackTimeRef: useRef<number | null>(null),
+    voiceConnectStartTimeRef: useRef<number | null>(null),
+    voiceDataChannelOpenTimeRef: useRef<number | null>(null),
+    voiceSessionUpdatedTimeRef: useRef<number | null>(null),
     sendSessionConfigRef: useRef<(() => void) | null>(null),
     initialMessagesRef: useRef<Array<{
-      role: "user" | "assistant";
+      role: 'user' | 'assistant';
       content: string;
     }> | null>(null),
     videoUsageIdRef: useRef<string | null>(null),
@@ -104,5 +105,5 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
 }
 
 export function useConnectionState() {
-  return useState<"idle" | "connecting" | "connected" | "error">("idle");
+  return useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 }
