@@ -42,8 +42,8 @@ export function getRequestId(request: NextRequest): string {
  * Create a child logger with request context
  * Automatically includes requestId, method, and path
  */
-export function getRequestLogger(request: NextRequest) {
-  const requestId = getRequestId(request);
+export function getRequestLogger(request: NextRequest, requestIdOverride?: string) {
+  const requestId = requestIdOverride ?? getRequestId(request);
   const method = request.method;
   const path = new URL(request.url).pathname;
 
@@ -61,9 +61,10 @@ export function getClientInfo(request: NextRequest): {
   ip: string | null;
   userAgent: string | null;
 } {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')
-    || null;
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    null;
   const userAgent = request.headers.get('user-agent');
 
   return { ip, userAgent };
@@ -75,7 +76,7 @@ export function getClientInfo(request: NextRequest): {
  */
 export function addRequestIdToResponse<T extends { headers: Headers }>(
   request: NextRequest,
-  response: T
+  response: T,
 ): T {
   const requestId = getRequestId(request);
   response.headers.set('X-Request-ID', requestId);

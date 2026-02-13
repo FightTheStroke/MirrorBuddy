@@ -68,4 +68,49 @@ describe('WebRTCConnection.connect', () => {
 
     await expect(connectPromise).resolves.toBeDefined();
   });
+
+  it('should stop acquired media stream if token fetch fails after getUserMedia resolves', async () => {
+    const token = createDeferred<string>();
+    const media = createDeferred<MediaStream>();
+
+    const connection = new WebRTCConnection({
+      maestro: { id: 'm1' } as never,
+      connectionInfo: {} as never,
+    }) as unknown as {
+      connect: () => Promise<unknown>;
+      getEphemeralToken: () => Promise<string>;
+      getUserMedia: () => Promise<MediaStream>;
+      createPeerConnection: () => unknown;
+      addAudioTracks: () => void;
+      createDataChannel: () => void;
+      createOffer: () => Promise<unknown>;
+      exchangeSDP: () => Promise<void>;
+      waitForConnection: () => Promise<void>;
+    };
+
+    const trackStop = vi.fn();
+    const mediaStream = { getTracks: () => [{ stop: trackStop }] } as unknown as MediaStream;
+
+    connection.getEphemeralToken = vi.fn(() => token.promise);
+    connection.getUserMedia = vi.fn(() => media.promise);
+
+    // Stub the rest; they should not be called in this scenario.
+    connection.createPeerConnection = vi.fn(() => ({}));
+    connection.addAudioTracks = vi.fn();
+    connection.createDataChannel = vi.fn();
+    connection.createOffer = vi.fn(async () => ({}));
+    connection.exchangeSDP = vi.fn(async () => undefined);
+    connection.waitForConnection = vi.fn(async () => undefined);
+
+    const connectPromise = connection.connect();
+
+    // Allow synchronous part of connect() to run.
+    await Promise.resolve();
+
+    media.resolve(mediaStream);
+    token.reject(new Error('token-failed'));
+
+    await expect(connectPromise).rejects.toBeDefined();
+    expect(trackStop).toHaveBeenCalledTimes(1);
+  });
 });

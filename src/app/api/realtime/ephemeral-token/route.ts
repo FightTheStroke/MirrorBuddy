@@ -62,7 +62,7 @@ export const POST = pipe(
   withCSRF,
 )(async (ctx) => {
   const requestId = getRequestId(ctx.req);
-  const log = getRequestLogger(ctx.req);
+  const log = getRequestLogger(ctx.req, requestId);
   const requestStartMs = Date.now();
 
   const json = (body: unknown, status: number, headers?: Record<string, string>) => {

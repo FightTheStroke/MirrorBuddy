@@ -42,17 +42,38 @@ export class WebRTCConnection {
     this.config = config;
   }
 
+  private stopResolvedStreamIfUnassigned(resolvedStream: unknown): void {
+    if (this.mediaStream) return;
+    if (typeof resolvedStream !== 'object' || resolvedStream === null) return;
+    const candidate = resolvedStream as { getTracks?: unknown };
+    if (typeof candidate.getTracks !== 'function') return;
+
+    const tracks = candidate.getTracks.call(resolvedStream) as unknown;
+    if (!Array.isArray(tracks)) return;
+    for (const track of tracks) {
+      if (typeof track !== 'object' || track === null) continue;
+      const stoppable = track as { stop?: unknown };
+      if (typeof stoppable.stop === 'function') {
+        stoppable.stop.call(track);
+      }
+    }
+  }
+
   async connect(): Promise<WebRTCConnectionResult> {
     const startTime = Date.now();
     logger.info('[WebRTC] Connection sequence starting...', {
       maestroId: this.config.maestro.id,
     });
+    let resolvedMediaStream: unknown = null;
     try {
       // Run token issuance and microphone permission in parallel to reduce
       // end-to-end time and to show the mic permission prompt immediately.
       logger.debug('[WebRTC] Step 1: Getting ephemeral token + microphone access (parallel)...');
       const tokenPromise = this.getEphemeralToken();
-      const mediaPromise = this.getUserMedia();
+      const mediaPromise = this.getUserMedia().then((stream) => {
+        resolvedMediaStream = stream;
+        return stream;
+      });
       const [token, mediaStream] = await Promise.all([tokenPromise, mediaPromise]);
       this.mediaStream = mediaStream;
       logger.debug('[WebRTC] Step 3: Creating peer connection...');
@@ -76,6 +97,9 @@ export class WebRTCConnection {
         cleanup: () => this.cleanup(),
       };
     } catch (error) {
+      // If getUserMedia resolved but Promise.all rejected (e.g. token fetch failure),
+      // ensure we still stop the microphone tracks even before this.mediaStream is assigned.
+      this.stopResolvedStreamIfUnassigned(resolvedMediaStream);
       this.cleanup();
       const message = error instanceof Error ? error.message : 'Unknown WebRTC error';
       const connectionTime = Date.now() - startTime;
