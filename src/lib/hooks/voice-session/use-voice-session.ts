@@ -3,37 +3,28 @@
 // Azure OpenAI Realtime API via WebRTC
 // ============================================================================
 
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useVoiceSessionStore, useSettingsStore } from "@/lib/stores";
-import type { UseVoiceSessionOptions } from "./types";
+import { useEffect } from 'react';
+import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
+import type { UseVoiceSessionOptions } from './types';
 import {
   useInitPlaybackContext,
   useScheduleQueuedChunks,
   usePlayNextChunk,
   useOutputLevelPolling,
-} from "./audio-playback";
-import { useStartAudioCapture } from "./audio-capture";
-import { useSendGreeting, useSendSessionConfig } from "./session-config";
-import { useHandleServerEvent } from "./event-handlers";
-import { useConnect, useDisconnect } from "./connection";
-import {
-  useToggleMute,
-  useSendText,
-  useCancelResponse,
-  useSendWebcamResult,
-} from "./actions";
-import { useUnifiedCamera } from "./use-unified-camera";
-import {
-  useVoiceSessionRefs,
-  useConnectionState,
-} from "./use-voice-session-refs";
+} from './audio-playback';
+import { useStartAudioCapture } from './audio-capture';
+import { useSendGreeting, useSendSessionConfig } from './session-config';
+import { useHandleServerEvent } from './event-handlers';
+import { useConnect, useDisconnect } from './connection';
+import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
+import { useUnifiedCamera } from './use-unified-camera';
+import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
 
 export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const store = useVoiceSessionStore();
-  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } =
-    useSettingsStore();
+  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } = useSettingsStore();
 
   // All refs extracted to separate file for line count management
   const refs = useVoiceSessionRefs();
@@ -105,19 +96,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     frequencyDataRef: refs.frequencyDataRef,
   };
 
-  const startAudioCapture = useStartAudioCapture(
-    audioCaptureRefs,
-    store.setInputLevel,
-  );
+  const startAudioCapture = useStartAudioCapture(audioCaptureRefs, store.setInputLevel);
 
   // ============================================================================
   // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(
-    refs.greetingSentRef,
-    refs.webrtcDataChannelRef,
-  );
+  const sendGreeting = useSendGreeting(refs.greetingSentRef, refs.webrtcDataChannelRef);
   const sendSessionConfig = useSendSessionConfig(
     refs.maestroRef,
     store.setConnected,
@@ -149,6 +134,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     greetingTimeoutsRef: refs.greetingTimeoutsRef,
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
+    voiceConnectStartTimeRef: refs.voiceConnectStartTimeRef,
+    voiceDataChannelOpenTimeRef: refs.voiceDataChannelOpenTimeRef,
+    voiceSessionUpdatedTimeRef: refs.voiceSessionUpdatedTimeRef,
     addTranscript: store.addTranscript,
     addToolCall: store.addToolCall,
     updateToolCall: store.updateToolCall,
@@ -200,6 +188,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     animationFrameRef: refs.animationFrameRef,
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
+    voiceConnectStartTimeRef: refs.voiceConnectStartTimeRef,
+    voiceDataChannelOpenTimeRef: refs.voiceDataChannelOpenTimeRef,
+    voiceSessionUpdatedTimeRef: refs.voiceSessionUpdatedTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,
     initialMessagesRef: refs.initialMessagesRef,
   };
@@ -214,11 +205,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     initPlaybackContext,
     options,
   );
-  const disconnect = useDisconnect(
-    connectionRefs,
-    store.reset,
-    setConnectionState,
-  );
+  const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
 
   useEffect(() => {
     return () => {

@@ -3,8 +3,8 @@
 // Shared types for connection management
 // ============================================================================
 
-import type { Maestro } from "@/types";
-import type { RingBuffer } from "./ring-buffer";
+import type { Maestro } from '@/types';
+import type { RingBuffer } from './ring-buffer';
 
 /**
  * All refs used by connection management
@@ -24,9 +24,7 @@ export interface ConnectionRefs {
   sessionReadyRef: React.MutableRefObject<boolean>;
   greetingSentRef: React.MutableRefObject<boolean>;
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  handleServerEventRef: React.MutableRefObject<
-    ((event: Record<string, unknown>) => void) | null
-  >;
+  handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
@@ -38,10 +36,14 @@ export interface ConnectionRefs {
   animationFrameRef: React.MutableRefObject<number | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
+  /** performance.now() marks for end-to-end voice connection timing */
+  voiceConnectStartTimeRef: React.MutableRefObject<number | null>;
+  voiceDataChannelOpenTimeRef: React.MutableRefObject<number | null>;
+  voiceSessionUpdatedTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
   /** Messages to inject for conversation continuity */
   initialMessagesRef: React.MutableRefObject<Array<{
-    role: "user" | "assistant";
+    role: 'user' | 'assistant';
     content: string;
   }> | null>;
 }

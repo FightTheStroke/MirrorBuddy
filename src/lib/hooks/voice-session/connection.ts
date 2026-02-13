@@ -65,6 +65,9 @@ export function useConnect(
         refs.maestroRef.current = maestro;
         refs.sessionReadyRef.current = false;
         refs.greetingSentRef.current = false;
+        refs.voiceConnectStartTimeRef.current = performance.now();
+        refs.voiceDataChannelOpenTimeRef.current = null;
+        refs.voiceSessionUpdatedTimeRef.current = null;
 
         // Store initial messages for context continuity
         refs.initialMessagesRef.current = connectionInfo.initialMessages || null;
@@ -171,6 +174,7 @@ async function connectWebRTC(
     },
     onDataChannelOpen: () => {
       logger.debug('[VoiceSession] WebRTC data channel open');
+      refs.voiceDataChannelOpenTimeRef.current = performance.now();
       // Send session config now that data channel is ready
       if (refs.sendSessionConfigRef.current) {
         logger.debug('[VoiceSession] Sending session config via data channel');
