@@ -3,32 +3,37 @@
  * Tests F-05 (real-time metrics) and F-22 (automated limit queries)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getResendLimits,
   clearResendLimitsCache,
   isEmailQuotaStressed,
   getEmailQuotaReport,
   type ResendLimits,
-} from "../resend-limits";
+} from '../resend-limits';
 
-describe("Resend Limits API", () => {
+describe('Resend Limits API', () => {
   beforeEach(() => {
+    // Stabilize time-dependent tests (daily/monthly windows) to avoid CI flakes around midnight.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-02-13T12:00:00.000Z'));
+
     clearResendLimitsCache();
     vi.resetAllMocks();
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
-  it("returns error when RESEND_API_KEY is missing", async () => {
+  it('returns error when RESEND_API_KEY is missing', async () => {
     const originalKey = process.env.RESEND_API_KEY;
     delete process.env.RESEND_API_KEY;
 
     const limits = await getResendLimits();
 
-    expect(limits.error).toBe("RESEND_API_KEY not configured");
+    expect(limits.error).toBe('RESEND_API_KEY not configured');
     expect(limits.emailsToday.used).toBe(0);
     expect(limits.emailsToday.limit).toBe(100); // Free tier fallback
     expect(limits.emailsMonth.used).toBe(0);
@@ -37,8 +42,8 @@ describe("Resend Limits API", () => {
     process.env.RESEND_API_KEY = originalKey;
   });
 
-  it("returns typed ResendLimits interface", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('returns typed ResendLimits interface', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     // Mock fetch
     global.fetch = vi.fn().mockResolvedValue({
@@ -50,26 +55,26 @@ describe("Resend Limits API", () => {
 
     const limits: ResendLimits = await getResendLimits();
 
-    expect(limits).toHaveProperty("emailsToday");
-    expect(limits).toHaveProperty("emailsMonth");
-    expect(limits).toHaveProperty("timestamp");
+    expect(limits).toHaveProperty('emailsToday');
+    expect(limits).toHaveProperty('emailsMonth');
+    expect(limits).toHaveProperty('timestamp');
 
-    expect(limits.emailsToday).toHaveProperty("used");
-    expect(limits.emailsToday).toHaveProperty("limit");
-    expect(limits.emailsToday).toHaveProperty("percent");
+    expect(limits.emailsToday).toHaveProperty('used');
+    expect(limits.emailsToday).toHaveProperty('limit');
+    expect(limits.emailsToday).toHaveProperty('percent');
 
-    expect(limits.emailsMonth).toHaveProperty("used");
-    expect(limits.emailsMonth).toHaveProperty("limit");
-    expect(limits.emailsMonth).toHaveProperty("percent");
+    expect(limits.emailsMonth).toHaveProperty('used');
+    expect(limits.emailsMonth).toHaveProperty('limit');
+    expect(limits.emailsMonth).toHaveProperty('percent');
 
-    expect(typeof limits.emailsToday.used).toBe("number");
-    expect(typeof limits.emailsToday.limit).toBe("number");
-    expect(typeof limits.emailsToday.percent).toBe("number");
-    expect(typeof limits.emailsMonth.limit).toBe("number");
+    expect(typeof limits.emailsToday.used).toBe('number');
+    expect(typeof limits.emailsToday.limit).toBe('number');
+    expect(typeof limits.emailsToday.percent).toBe('number');
+    expect(typeof limits.emailsMonth.limit).toBe('number');
   });
 
-  it("sets daily limit to 100 emails", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('sets daily limit to 100 emails', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -83,8 +88,8 @@ describe("Resend Limits API", () => {
     expect(limits.emailsToday.limit).toBe(100);
   });
 
-  it("sets monthly limit to 3000 emails", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('sets monthly limit to 3000 emails', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -98,8 +103,8 @@ describe("Resend Limits API", () => {
     expect(limits.emailsMonth.limit).toBe(3000);
   });
 
-  it("caches results for 5 minutes (F-22)", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('caches results for 5 minutes (F-22)', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -122,15 +127,11 @@ describe("Resend Limits API", () => {
     expect(limits1.timestamp).toBe(limits2.timestamp);
   });
 
-  it("calculates daily usage percentage correctly", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('calculates daily usage percentage correctly', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const now = new Date();
-    const startOfDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Mock 50 emails today - spread across the day from start of day to now
     const timeRange = now.getTime() - startOfDay.getTime();
@@ -140,9 +141,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfDay.getTime() + (i + 1) * interval,
-        ).toISOString(),
+        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -160,8 +159,8 @@ describe("Resend Limits API", () => {
     expect(limits.emailsToday.percent).toBeCloseTo(50, 1);
   });
 
-  it("calculates monthly usage percentage correctly", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('calculates monthly usage percentage correctly', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -174,9 +173,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfMonth.getTime() + (i + 1) * interval,
-        ).toISOString(),
+        created_at: new Date(startOfMonth.getTime() + (i + 1) * interval).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -194,13 +191,13 @@ describe("Resend Limits API", () => {
     expect(limits.emailsMonth.percent).toBeCloseTo(50, 1);
   });
 
-  it("handles API errors gracefully", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('handles API errors gracefully', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
-      statusText: "Unauthorized",
+      statusText: 'Unauthorized',
     });
 
     const limits = await getResendLimits();
@@ -210,10 +207,10 @@ describe("Resend Limits API", () => {
     expect(limits.emailsMonth.used).toBe(0);
   });
 
-  it("handles network errors gracefully", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('handles network errors gracefully', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
-    global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
+    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
     const limits = await getResendLimits();
 
@@ -221,8 +218,8 @@ describe("Resend Limits API", () => {
     expect(limits.emailsToday.used).toBe(0);
   });
 
-  it("clears cache when clearResendLimitsCache is called", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('clears cache when clearResendLimitsCache is called', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -245,15 +242,11 @@ describe("Resend Limits API", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("detects quota stress at 80% threshold", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('detects quota stress at 80% threshold', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const now = new Date();
-    const startOfDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Mock 85 emails today (85% of 100) - spread across the day from start of day to now
     const timeRange = now.getTime() - startOfDay.getTime();
@@ -263,9 +256,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfDay.getTime() + (i + 1) * interval,
-        ).toISOString(),
+        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -281,15 +272,11 @@ describe("Resend Limits API", () => {
     expect(stressed).toBe(true);
   });
 
-  it("does not detect stress below threshold", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('does not detect stress below threshold', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const now = new Date();
-    const startOfDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Mock 70 emails today (70% of 100) - spread across the day from start of day to now
     const timeRange = now.getTime() - startOfDay.getTime();
@@ -299,9 +286,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfDay.getTime() + (i + 1) * interval,
-        ).toISOString(),
+        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -317,15 +302,11 @@ describe("Resend Limits API", () => {
     expect(stressed).toBe(false);
   });
 
-  it("generates readable quota report", async () => {
-    process.env.RESEND_API_KEY = "test-key";
+  it('generates readable quota report', async () => {
+    process.env.RESEND_API_KEY = 'test-key';
 
     const now = new Date();
-    const startOfDay = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     // Mock 30 emails today - spread across the day from start of day to now
     // This ensures all emails fall within "today" regardless of when the test runs
@@ -336,9 +317,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfDay.getTime() + (i + 1) * interval,
-        ).toISOString(),
+        created_at: new Date(startOfDay.getTime() + (i + 1) * interval).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -351,9 +330,9 @@ describe("Resend Limits API", () => {
     clearResendLimitsCache();
     const report = await getEmailQuotaReport();
 
-    expect(report).toContain("Daily");
-    expect(report).toContain("Monthly");
-    expect(report).toContain("30/100");
-    expect(report).toContain("30.0%");
+    expect(report).toContain('Daily');
+    expect(report).toContain('Monthly');
+    expect(report).toContain('30/100');
+    expect(report).toContain('30.0%');
   });
 });
