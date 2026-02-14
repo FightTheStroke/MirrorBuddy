@@ -57,6 +57,7 @@ const AUTH_PUBLIC_ROUTES = [
   '/welcome',
   '/login',
   '/landing',
+  '/maintenance',
   // Legal pages (GDPR, EU AI Act - legally required to be public)
   '/privacy',
   '/terms',
@@ -357,6 +358,27 @@ export default function proxy(request: NextRequest) {
   // Skip public routes but still add CSP and request ID
   if (PUBLIC_ROUTES.some((r) => pathMatchesRoute(pathname, r))) {
     return finalizeResponse(NextResponse.next({ request: { headers: requestHeaders } }));
+  }
+
+  // ==========================================================================
+  // MAINTENANCE MODE REDIRECT
+  // Redirect user pages to locale-aware maintenance page when enabled.
+  // Bypass admin/API/internal assets and maintenance route itself.
+  // ==========================================================================
+  if (process.env.MAINTENANCE_MODE === 'true') {
+    const pathWithoutLocale = localeFromPath
+      ? pathname.replace(`/${localeFromPath}`, '') || '/'
+      : pathname;
+    const isMaintenanceRoute = pathMatchesRoute(pathWithoutLocale, '/maintenance');
+    const isAdminRoute = pathWithoutLocale.startsWith(ADMIN_PREFIX);
+    const isApiRoute = pathWithoutLocale.startsWith('/api');
+    const isNextRoute = pathWithoutLocale.startsWith('/_next');
+
+    if (!isMaintenanceRoute && !isAdminRoute && !isApiRoute && !isNextRoute) {
+      const redirectLocale = localeFromPath ?? detectedLocale;
+      const maintenanceUrl = new URL(`/${redirectLocale}/maintenance`, request.url);
+      return finalizeResponse(NextResponse.redirect(maintenanceUrl), 307);
+    }
   }
 
   // ==========================================================================
