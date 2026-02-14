@@ -18,6 +18,7 @@ describe('WebRTCConnectionResult Structure', () => {
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: vi.fn(),
+      unmuteAudioTracks: vi.fn(),
     };
 
     expect(resultType.peerConnection).toBeDefined();
@@ -31,6 +32,7 @@ describe('WebRTCConnectionResult Structure', () => {
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: () => {},
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.dataChannel).toBeNull();
@@ -42,6 +44,7 @@ describe('WebRTCConnectionResult Structure', () => {
       mediaStream: {} as MediaStream,
       dataChannel: {} as RTCDataChannel,
       cleanup: () => {},
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.dataChannel).toBeDefined();
@@ -56,6 +59,7 @@ describe('Connection Cleanup', () => {
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: cleanup,
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.cleanup).toBeDefined();
@@ -78,6 +82,7 @@ describe('Connection Cleanup', () => {
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: cleanup,
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.cleanup).toBe(cleanup);

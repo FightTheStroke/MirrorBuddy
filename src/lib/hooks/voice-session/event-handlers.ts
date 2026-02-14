@@ -37,6 +37,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   voiceBargeInEnabled: boolean;
   sendSessionConfig: () => void;
   sendGreeting: () => void;
+  unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
   initPlaybackContext: () => Promise<
     | {
         context: AudioContext;
@@ -85,6 +86,11 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
             connectToSessionUpdatedMs: timing.connectToSessionUpdatedMs,
             dataChannelOpenToSessionUpdatedMs: timing.dataChannelOpenToSessionUpdatedMs,
           });
+          // Unmute mic tracks now that character identity is confirmed.
+          // This prevents Azure's default persona from responding to ambient
+          // audio received before session.update was processed.
+          deps.unmuteAudioTracksRef.current?.();
+
           logger.debug('[VoiceSession] Starting audio capture...');
           // Fire and forget - AudioContext resume is best-effort
           void deps.startAudioCapture();

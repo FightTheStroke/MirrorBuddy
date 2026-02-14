@@ -95,6 +95,7 @@ export class WebRTCConnection {
         mediaStream: this.mediaStream,
         dataChannel: this.dataChannel,
         cleanup: () => this.cleanup(),
+        unmuteAudioTracks: () => this.unmuteAudioTracks(),
       };
     } catch (error) {
       // If getUserMedia resolved but Promise.all rejected (e.g. token fetch failure),
@@ -255,9 +256,27 @@ export class WebRTCConnection {
     if (!this.peerConnection || !this.mediaStream) {
       throw new Error('PeerConnection or MediaStream not initialized');
     }
+    // Mute mic tracks initially to prevent Azure from receiving audio
+    // before session.update configures the character identity.
+    // Without this, Azure's default persona ("Aiden") responds to any
+    // ambient noise or speech detected before our instructions arrive.
+    // Tracks are unmuted after session.updated is confirmed.
     this.mediaStream.getTracks().forEach((track) => {
+      track.enabled = false;
       this.peerConnection!.addTrack(track, this.mediaStream!);
     });
+  }
+
+  /**
+   * Unmute mic tracks after session configuration is confirmed.
+   * Called from event handler on session.updated.
+   */
+  unmuteAudioTracks(): void {
+    if (!this.mediaStream) return;
+    this.mediaStream.getTracks().forEach((track) => {
+      track.enabled = true;
+    });
+    logger.debug('[WebRTC] Audio tracks unmuted after session.updated');
   }
 
   private async createOffer(): Promise<RTCSessionDescriptionInit> {

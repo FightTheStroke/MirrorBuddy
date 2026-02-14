@@ -184,10 +184,11 @@ async function connectWebRTC(
     onTrack: (event) => handleWebRTCTrack(event, refs),
   });
 
-  // Store cleanup, media stream, and data channel for later use
+  // Store cleanup, media stream, data channel, and unmute callback for later use
   refs.webrtcCleanupRef.current = result.cleanup;
   refs.mediaStreamRef.current = result.mediaStream;
   refs.webrtcDataChannelRef.current = result.dataChannel;
+  refs.unmuteAudioTracksRef.current = result.unmuteAudioTracks;
 
   // Start WebRTC keepalive heartbeat to prevent connection timeout
   // Uses setTimeout with jitter instead of setInterval to prevent synchronized requests

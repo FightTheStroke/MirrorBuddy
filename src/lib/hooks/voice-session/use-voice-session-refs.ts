@@ -47,6 +47,7 @@ export interface VoiceSessionRefs {
   voiceDataChannelOpenTimeRef: React.MutableRefObject<number | null>;
   voiceSessionUpdatedTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
+  unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
   initialMessagesRef: React.MutableRefObject<Array<{
     role: 'user' | 'assistant';
     content: string;
@@ -95,6 +96,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     voiceDataChannelOpenTimeRef: useRef<number | null>(null),
     voiceSessionUpdatedTimeRef: useRef<number | null>(null),
     sendSessionConfigRef: useRef<(() => void) | null>(null),
+    unmuteAudioTracksRef: useRef<(() => void) | null>(null),
     initialMessagesRef: useRef<Array<{
       role: 'user' | 'assistant';
       content: string;

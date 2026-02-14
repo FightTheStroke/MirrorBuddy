@@ -41,6 +41,8 @@ export interface ConnectionRefs {
   voiceDataChannelOpenTimeRef: React.MutableRefObject<number | null>;
   voiceSessionUpdatedTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
+  /** Unmute mic tracks after session.updated confirms character identity */
+  unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
   /** Messages to inject for conversation continuity */
   initialMessagesRef: React.MutableRefObject<Array<{
     role: 'user' | 'assistant';

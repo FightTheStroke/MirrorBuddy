@@ -39,6 +39,7 @@ export function useDisconnect(
       logger.debug('[VoiceSession] Cleaning up WebRTC connection');
       refs.webrtcCleanupRef.current();
       refs.webrtcCleanupRef.current = null;
+      refs.unmuteAudioTracksRef.current = null;
     }
 
     // WebRTC audio cleanup

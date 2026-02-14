@@ -82,6 +82,7 @@ function createMockRefs(): ConnectionRefs {
     voiceDataChannelOpenTimeRef: { current: null },
     voiceSessionUpdatedTimeRef: { current: null },
     sendSessionConfigRef: { current: null },
+    unmuteAudioTracksRef: { current: null },
     initialMessagesRef: { current: null },
   };
 }

@@ -147,6 +147,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     options,
     sendSessionConfig,
     sendGreeting,
+    unmuteAudioTracksRef: refs.unmuteAudioTracksRef,
     initPlaybackContext,
     startAudioCapture,
     playNextChunk,
@@ -192,6 +193,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     voiceDataChannelOpenTimeRef: refs.voiceDataChannelOpenTimeRef,
     voiceSessionUpdatedTimeRef: refs.voiceSessionUpdatedTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,
+    unmuteAudioTracksRef: refs.unmuteAudioTracksRef,
     initialMessagesRef: refs.initialMessagesRef,
   };
 

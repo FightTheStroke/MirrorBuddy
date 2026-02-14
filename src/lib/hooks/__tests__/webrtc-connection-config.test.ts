@@ -9,66 +9,66 @@
  * Requirements: F-05 (WebRTC connectivity), F-06 (SDP exchange)
  */
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi } from 'vitest';
 import type {
   WebRTCConnectionConfig,
   WebRTCConnectionResult,
-} from "../voice-session/webrtc-connection";
-import type { Maestro } from "@/types";
-import type { ConnectionInfo } from "../voice-session/types";
+} from '../voice-session/webrtc-connection';
+import type { Maestro } from '@/types';
+import type { ConnectionInfo } from '../voice-session/types';
 
 // ============================================================================
 // TEST DATA
 // ============================================================================
 
 const mockMaestro: Maestro = {
-  id: "galileo",
-  name: "galileo",
-  displayName: "Galileo",
-  subject: "physics",
-  avatar: "/maestri/galileo.webp",
-  color: "#FF6B6B",
-  systemPrompt: "You are Galileo...",
-  specialty: "astronomy",
-  voice: "alloy",
-  voiceInstructions: "Speak as Galileo",
-  teachingStyle: "socratic",
-  greeting: "Ciao!",
+  id: 'galileo',
+  name: 'galileo',
+  displayName: 'Galileo',
+  subject: 'physics',
+  avatar: '/maestri/galileo.webp',
+  color: '#FF6B6B',
+  systemPrompt: 'You are Galileo...',
+  specialty: 'astronomy',
+  voice: 'alloy',
+  voiceInstructions: 'Speak as Galileo',
+  teachingStyle: 'socratic',
+  greeting: 'Ciao!',
 };
 
 const mockConnectionInfo: ConnectionInfo = {
-  provider: "azure",
-  characterType: "maestro",
+  provider: 'azure',
+  characterType: 'maestro',
 };
 
 // ============================================================================
 // TESTS: Configuration Validation
 // ============================================================================
 
-describe("WebRTCConnectionConfig", () => {
-  it("should have required fields", () => {
+describe('WebRTCConnectionConfig', () => {
+  it('should have required fields', () => {
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
       connectionInfo: mockConnectionInfo,
     };
 
     expect(config.maestro).toBeDefined();
-    expect(config.maestro.id).toBe("galileo");
+    expect(config.maestro.id).toBe('galileo');
     expect(config.connectionInfo).toBeDefined();
-    expect(config.connectionInfo.characterType).toBe("maestro");
+    expect(config.connectionInfo.characterType).toBe('maestro');
   });
 
-  it("should support optional microphone preference", () => {
+  it('should support optional microphone preference', () => {
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
       connectionInfo: mockConnectionInfo,
-      preferredMicrophoneId: "device-id-123",
+      preferredMicrophoneId: 'device-id-123',
     };
 
-    expect(config.preferredMicrophoneId).toBe("device-id-123");
+    expect(config.preferredMicrophoneId).toBe('device-id-123');
   });
 
-  it("should support optional callbacks", () => {
+  it('should support optional callbacks', () => {
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
       connectionInfo: mockConnectionInfo,
@@ -80,7 +80,7 @@ describe("WebRTCConnectionConfig", () => {
     expect(config.onError).toBeDefined();
   });
 
-  it("should have all callback signatures", () => {
+  it('should have all callback signatures', () => {
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
       connectionInfo: mockConnectionInfo,
@@ -107,37 +107,41 @@ describe("WebRTCConnectionConfig", () => {
 // TESTS: WebRTCConnectionResult Structure
 // ============================================================================
 
-describe("WebRTCConnectionResult", () => {
-  it("should define required result properties", () => {
+describe('WebRTCConnectionResult', () => {
+  it('should define required result properties', () => {
     const resultType: WebRTCConnectionResult = {
       peerConnection: {} as RTCPeerConnection,
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: vi.fn(),
+      unmuteAudioTracks: vi.fn(),
     };
 
     expect(resultType.peerConnection).toBeDefined();
     expect(resultType.mediaStream).toBeDefined();
     expect(resultType.cleanup).toBeDefined();
+    expect(resultType.unmuteAudioTracks).toBeDefined();
   });
 
-  it("should allow null data channel", () => {
+  it('should allow null data channel', () => {
     const result: WebRTCConnectionResult = {
       peerConnection: {} as RTCPeerConnection,
       mediaStream: {} as MediaStream,
       dataChannel: null,
       cleanup: () => {},
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.dataChannel).toBeNull();
   });
 
-  it("should support data channel", () => {
+  it('should support data channel', () => {
     const result: WebRTCConnectionResult = {
       peerConnection: {} as RTCPeerConnection,
       mediaStream: {} as MediaStream,
       dataChannel: {} as RTCDataChannel,
       cleanup: () => {},
+      unmuteAudioTracks: () => {},
     };
 
     expect(result.dataChannel).toBeDefined();
@@ -148,8 +152,8 @@ describe("WebRTCConnectionResult", () => {
 // TESTS: Callback Invocations
 // ============================================================================
 
-describe("Callback Invocations", () => {
-  it("should invoke connection state change callback", () => {
+describe('Callback Invocations', () => {
+  it('should invoke connection state change callback', () => {
     const onStateChange = vi.fn();
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
@@ -160,7 +164,7 @@ describe("Callback Invocations", () => {
     expect(config.onConnectionStateChange).toBe(onStateChange);
   });
 
-  it("should invoke ICE connection state change callback", () => {
+  it('should invoke ICE connection state change callback', () => {
     const onIceStateChange = vi.fn();
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
@@ -171,7 +175,7 @@ describe("Callback Invocations", () => {
     expect(config.onICEConnectionStateChange).toBe(onIceStateChange);
   });
 
-  it("should invoke error callback", () => {
+  it('should invoke error callback', () => {
     const onError = vi.fn();
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
@@ -179,13 +183,13 @@ describe("Callback Invocations", () => {
       onError: onError,
     };
 
-    const error = new Error("Connection failed");
+    const error = new Error('Connection failed');
     config.onError?.(error);
 
     expect(onError).toHaveBeenCalledWith(error);
   });
 
-  it("should invoke track callback", () => {
+  it('should invoke track callback', () => {
     const onTrack = vi.fn();
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
@@ -196,7 +200,7 @@ describe("Callback Invocations", () => {
     expect(config.onTrack).toBe(onTrack);
   });
 
-  it("should invoke data channel callbacks", () => {
+  it('should invoke data channel callbacks', () => {
     const onOpen = vi.fn();
     const onClose = vi.fn();
     const onMessage = vi.fn();
@@ -214,15 +218,15 @@ describe("Callback Invocations", () => {
     expect(config.onDataChannelMessage).toBe(onMessage);
   });
 
-  it("should handle optional callbacks gracefully", () => {
+  it('should handle optional callbacks gracefully', () => {
     const config: WebRTCConnectionConfig = {
       maestro: mockMaestro,
       connectionInfo: mockConnectionInfo,
     };
 
     expect(() => {
-      config.onConnectionStateChange?.("connected");
-      config.onError?.(new Error("test"));
+      config.onConnectionStateChange?.('connected');
+      config.onError?.(new Error('test'));
       config.onDataChannelOpen?.();
     }).not.toThrow();
   });

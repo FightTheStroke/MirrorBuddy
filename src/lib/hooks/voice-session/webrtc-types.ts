@@ -30,6 +30,8 @@ export interface WebRTCConnectionResult {
   mediaStream: MediaStream;
   dataChannel: RTCDataChannel | null;
   cleanup: () => void;
+  /** Unmute mic tracks after session.updated confirms character identity */
+  unmuteAudioTracks: () => void;
 }
 
 /**
