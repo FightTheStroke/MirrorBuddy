@@ -22,7 +22,7 @@ describe('triggerMaintenanceNotification', () => {
     vi.mocked(prisma.user.findMany).mockResolvedValue([
       { id: 'user-1' },
       { id: 'user-2' },
-    ] as Array<{ id: string }>);
+    ] as never);
     vi.mocked(prisma.notification.createMany).mockResolvedValue({ count: 2 });
 
     const result = await triggerMaintenanceNotification({
@@ -50,7 +50,9 @@ describe('triggerMaintenanceNotification', () => {
       ]),
     });
 
-    const createManyCall = vi.mocked(prisma.notification.createMany).mock.calls[0][0];
+    const createManyCall = vi.mocked(prisma.notification.createMany).mock.calls[0]?.[0] as {
+      data: Array<Record<string, unknown>>;
+    };
     const firstNotification = createManyCall.data[0] as {
       metadata: string | null;
       title: string;
@@ -62,7 +64,7 @@ describe('triggerMaintenanceNotification', () => {
   });
 
   it('returns zero counts when no registered users are found', async () => {
-    vi.mocked(prisma.user.findMany).mockResolvedValue([] as Array<{ id: string }>);
+    vi.mocked(prisma.user.findMany).mockResolvedValue([] as never);
 
     const result = await triggerMaintenanceNotification({
       message: 'Maintenance starts soon',

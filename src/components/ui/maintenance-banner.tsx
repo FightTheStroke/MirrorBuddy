@@ -106,6 +106,9 @@ export function MaintenanceBanner() {
     return null;
   }
 
+  // Type narrowing: after shouldShow check, payload is 'upcoming' | 'active'
+  if (payload.status === 'none') return null;
+
   const isHighSeverity = payload.severity === 'high';
   const bannerClasses = isHighSeverity ? 'bg-red-600 text-red-50' : 'bg-amber-500 text-amber-950';
 
