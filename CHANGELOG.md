@@ -40,6 +40,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed: SETUP-PRODUCTION.md — ADR link text 0060 → 0080, removed broken docs-archive link, updated date
 - Fixed: AGENTS.md — added Claude as AI fallback provider
 
+## [Unreleased] — Character Voice DeepFix (Plan 145, W1)
+
+### Voice
+
+- Added: `voice-prompt-builder.ts` — Extracts essential character identity (name, personality, intensity dial, core identity) into structured ~2000 char voice prompt per ADR 0031
+- Fixed: Replaced arbitrary `.slice(0, 800)` truncation of systemPrompt with intelligent section extraction in `session-config.ts`
+- Fixed: Silent error swallowing in `fetchConversationMemory` — now logs warnings with actual error messages via `clientLogger`
+- Fixed: Silent catch in `session-config.ts` memory fetch — now logs warning with maestro ID and error details
+
+### Tests
+
+- Added: `voice-prompt-builder.test.ts` — 10 tests covering section extraction, char limits, edge cases
+- Added: `memory-utils.test.ts` — 13 tests covering sanitization, memory fetch, context building
+
+### Verified (No Change Needed)
+
+- `enableMemory` defaults to `true` in both `route.ts` and `stream/route.ts` — correctly passed to context builders for authenticated users
+- All 26 maestri, 6 coaches, 6 buddies have `voiceInstructions` populated
 ## [Unreleased] — Architecture Map & Drift Detection
 
 ### Architecture

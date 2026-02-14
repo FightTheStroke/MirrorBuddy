@@ -11,7 +11,8 @@ import { useSettingsStore } from '@/lib/stores';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import type { Maestro } from '@/types';
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
-import { fetchConversationMemory, buildMemoryContext, sanitizeHtmlComments } from './memory-utils';
+import { fetchConversationMemory, buildMemoryContext } from './memory-utils';
+import { buildVoicePrompt } from './voice-prompt-builder';
 import type { UseVoiceSessionOptions } from './types';
 import {
   TRANSCRIPTION_LANGUAGES,
@@ -101,8 +102,11 @@ export function useSendSessionConfig(
     try {
       const memory = await fetchConversationMemory(maestro.id);
       memoryContext = buildMemoryContext(memory);
-    } catch {
-      // Continue without memory
+    } catch (error) {
+      logger.warn('[VoiceSession] Memory context unavailable', {
+        maestroId: maestro.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     let adaptiveInstruction = '';
@@ -127,23 +131,18 @@ export function useSendSessionConfig(
     );
     const characterInstruction = buildCharacterInstruction(maestro.name);
     const voicePersonality = maestro.voiceInstructions
-      ? `\n## Voice Personality\n${sanitizeHtmlComments(maestro.voiceInstructions)}\n`
+      ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
       : '';
 
-    // Truncate system prompt for voice (Azure works better with shorter instructions)
-    const truncatedSystemPrompt = maestro.systemPrompt
-      ? sanitizeHtmlComments(maestro.systemPrompt)
-          .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '')
-          .slice(0, 800)
-          .trim()
-      : '';
+    // Build voice-optimized prompt (ADR 0031 intensity dial, ~2000 chars)
+    const voicePrompt = buildVoicePrompt(maestro);
 
     const fullInstructions =
       languageInstruction +
       characterInstruction +
       memoryContext +
       adaptiveInstruction +
-      truncatedSystemPrompt +
+      voicePrompt +
       voicePersonality +
       TOOL_USAGE_INSTRUCTIONS;
 

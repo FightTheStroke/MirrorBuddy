@@ -4,6 +4,7 @@
 // ============================================================================
 
 import type { ConversationMemory } from './types';
+import { clientLogger as logger } from '@/lib/logger/client';
 
 /**
  * Sanitize text by removing HTML comments completely.
@@ -32,7 +33,9 @@ export function sanitizeHtmlComments(text: string): string {
 /**
  * Fetch conversation memory for a maestro from the API
  */
-export async function fetchConversationMemory(maestroId: string): Promise<ConversationMemory | null> {
+export async function fetchConversationMemory(
+  maestroId: string,
+): Promise<ConversationMemory | null> {
   try {
     const response = await fetch(`/api/conversations?maestroId=${maestroId}&limit=1`);
     if (!response.ok) return null;
@@ -44,13 +47,21 @@ export async function fetchConversationMemory(maestroId: string): Promise<Conver
     return {
       summary: conv.summary,
       keyFacts: conv.keyFacts
-        ? (typeof conv.keyFacts === 'string' ? JSON.parse(conv.keyFacts) : conv.keyFacts)
+        ? typeof conv.keyFacts === 'string'
+          ? JSON.parse(conv.keyFacts)
+          : conv.keyFacts
         : undefined,
       recentTopics: conv.topics
-        ? (typeof conv.topics === 'string' ? JSON.parse(conv.topics) : conv.topics)
+        ? typeof conv.topics === 'string'
+          ? JSON.parse(conv.topics)
+          : conv.topics
         : undefined,
     };
-  } catch {
+  } catch (error) {
+    logger.warn('[VoiceSession] Failed to fetch conversation memory', {
+      maestroId,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }
@@ -70,7 +81,7 @@ export function buildMemoryContext(memory: ConversationMemory | null): string {
 
   if (memory.keyFacts?.learned?.length) {
     context += `### Concetti capiti:\n`;
-    memory.keyFacts.learned.forEach(l => {
+    memory.keyFacts.learned.forEach((l) => {
       context += `- ${l}\n`;
     });
     context += '\n';
@@ -78,7 +89,7 @@ export function buildMemoryContext(memory: ConversationMemory | null): string {
 
   if (memory.keyFacts?.preferences?.length) {
     context += `### Preferenze:\n`;
-    memory.keyFacts.preferences.forEach(p => {
+    memory.keyFacts.preferences.forEach((p) => {
       context += `- ${p}\n`;
     });
     context += '\n';
@@ -86,7 +97,7 @@ export function buildMemoryContext(memory: ConversationMemory | null): string {
 
   if (memory.recentTopics?.length) {
     context += `### Argomenti recenti:\n`;
-    memory.recentTopics.forEach(t => {
+    memory.recentTopics.forEach((t) => {
       context += `- ${t}\n`;
     });
     context += '\n';
