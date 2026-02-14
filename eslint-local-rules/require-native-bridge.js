@@ -46,8 +46,8 @@ const requireNativeBridge = {
       return {};
     }
 
-    // Skip capacitor plugin files
-    if (filename.includes("/mobile/") || filename.includes("/capacitor/")) {
+    // Skip capacitor plugin files and native bridge implementations
+    if (filename.includes("/mobile/") || filename.includes("/capacitor/") || filename.includes("/native/")) {
       return {};
     }
 

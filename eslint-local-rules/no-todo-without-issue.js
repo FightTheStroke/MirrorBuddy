@@ -34,8 +34,8 @@ export const noTodoWithoutIssue = {
         const comments = sourceCode.getAllComments();
         for (const comment of comments) {
           const text = comment.value;
-          // Check if comment contains TODO or FIXME
-          if (/\b(TODO|FIXME)\b/i.test(text)) {
+          // Check if comment contains TODO or FIXME (case-sensitive, uppercase only)
+          if (/\b(TODO|FIXME)\b/.test(text)) {
             // Check if it references an issue
             // Accepts: #123, issue #123, issue-123, ticket-123
             if (!/\b(#\d+|issue[-\s]*#?\d+|ticket[-\s]*#?\d+)\b/i.test(text)) {

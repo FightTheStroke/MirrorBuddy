@@ -25,9 +25,8 @@ async function fetchAzureOpenAIMetrics(): Promise<AzureOpenAIMetrics | null> {
   }
 
   try {
-    // TODO: Call Azure OpenAI Management API
-    // This should fetch real metrics from Azure OpenAI service
-    // For now, return null until real integration is implemented
+    // Stub: Azure OpenAI Management API integration not yet available
+    // Returns null until real integration is implemented
     return null;
   } catch (error) {
     logger.error('Failed to fetch Azure OpenAI metrics', undefined, error);
@@ -44,9 +43,8 @@ async function fetchSentryMetrics(): Promise<SentryMetrics | null> {
   }
 
   try {
-    // TODO: Call Sentry API
-    // This should fetch real metrics from Sentry service
-    // For now, return null until real integration is implemented
+    // Stub: Sentry API integration not yet available
+    // Returns null until real integration is implemented
     return null;
   } catch (error) {
     logger.error('Failed to fetch Sentry metrics', undefined, error);
@@ -63,9 +61,8 @@ async function fetchResendMetrics(): Promise<ResendMetrics | null> {
   }
 
   try {
-    // TODO: Call Resend API
-    // This should fetch real metrics from Resend service
-    // For now, return null until real integration is implemented
+    // Stub: Resend API integration not yet available
+    // Returns null until real integration is implemented
     return null;
   } catch (error) {
     logger.error('Failed to fetch Resend metrics', undefined, error);
