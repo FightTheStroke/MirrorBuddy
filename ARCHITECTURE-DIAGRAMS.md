@@ -5,8 +5,8 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
-**Version**: 0.12.0
-**Last Verified**: 2026-02-07
+**Version**: 0.15.0
+**Last Verified**: 2026-02-14
 **Update Policy**: This file is verified and updated during each release via `/release`
 
 ---
@@ -66,7 +66,8 @@ graph TB
     subgraph AI_Providers["AI Providers"]
         AzureChat["Azure OpenAI Chat API"]
         AzureRealtime["Azure Realtime Voice API"]
-        Ollama["Ollama Fallback"]
+        Claude["Claude (Anthropic Fallback)"]
+        Ollama["Ollama Local Dev"]
     end
 
     subgraph Supporting_Services["Supporting Services"]
@@ -97,6 +98,7 @@ graph TB
 
     Characters --> AzureChat
     Characters --> AzureRealtime
+    Characters --> Claude
     Characters --> Ollama
 
     Auth --> Characters
@@ -895,7 +897,7 @@ graph TB
     subgraph Indexing_Pipeline["Indexing Pipeline"]
         Doc[New Material]
         Chunk["Semantic Chunking (500 tokens + 50 overlap)"]
-        Embed["Azure Embeddings (text-embedding-ada-002)"]
+        Embed["Azure Embeddings (text-embedding-3-small)"]
         Store["pgvector Storage (1536 dimensions)"]
     end
 
@@ -947,19 +949,19 @@ erDiagram
 graph TB
     subgraph Trial_Tier["Trial Tier"]
         T1[Anonymous User]
-        T2[10 chats/month]
-        T3[5 min voice]
+        T2[10 chats/day]
+        T3[5 min voice/day]
         T4[3 random Professors]
-        T5[10 tool uses]
+        T5[10 tool uses/day]
         T6[gpt-5-nano]
     end
 
     subgraph Base_Tier["Base Tier"]
         B1[Registered Free]
-        B2[50 chats/month]
-        B3[100 min voice]
+        B2[50 chats/day]
+        B3[30 min voice/day]
         B4[All 25 Professors]
-        B5[All tools]
+        B5[30 tool uses/day]
         B6[gpt-5.2-edu]
     end
 
@@ -2760,7 +2762,8 @@ graph TB
         AzureRealtime["Azure Realtime API (Voice Sessions)"]
         AzureEmbed["Azure Embeddings (RAG Indexing)"]
         AzureTTS["Azure TTS (Text-to-Speech)"]
-        Ollama["Ollama (Local Fallback)"]
+        ClaudeAPI["Claude (Anthropic Fallback)"]
+        Ollama["Ollama (Local Dev)"]
     end
 
     subgraph Data_Services["Data Services"]
@@ -2785,6 +2788,7 @@ graph TB
     App --> AzureRealtime
     App --> AzureEmbed
     App --> AzureTTS
+    App --> ClaudeAPI
     App --> Ollama
 
     App --> Supabase
@@ -3198,7 +3202,7 @@ graph TB
 
 ---
 
-_Version: 0.12.0_
-_Last updated: 07 February 2026_
+_Version: 0.15.0_
+_Last updated: 14 February 2026_
 _Generated from codebase analysis and ADR documentation_
 _Updated on each release via `/release` command_

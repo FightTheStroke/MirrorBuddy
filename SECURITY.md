@@ -8,8 +8,8 @@ MirrorBuddy is an AI-powered educational platform designed for students with lea
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| 0.15.x  | :white_check_mark: |
+| < 0.15  | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -165,4 +165,4 @@ See [ADR 0062](docs/adr/0062-ai-compliance-framework.md) for the full compliance
 
 ---
 
-_Last updated: 20 Gennaio 2026, 11:30 CET_
+_Last updated: 14 Febbraio 2026, 12:00 CET_

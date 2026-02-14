@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Documentation Alignment
+
+### Documentation
+
+- Fixed: CLAUDE.md — AI providers path corrected to `src/lib/ai/providers/` (directory), FSRS path to `src/lib/education/fsrs/`, added `admin-patterns` to rules list, added Claude provider
+- Fixed: ARCHITECTURE.md — GPT-4o references updated to GPT-5-mini, ADR count 65+ → 146+, added Claude provider, updated date
+- Fixed: ARCHITECTURE-DIAGRAMS.md — version 0.12.0 → 0.15.0, embedding model `ada-002` → `3-small`, tier limits corrected to per-day, added Claude to system and integration diagrams
+- Fixed: README.md — tier table limits corrected (per-month → per-day, Base voice 100→30 min, tools 30/day), health check version 0.10.0 → 0.15.0, tech stack AI providers updated
+- Fixed: SECURITY.md — supported version 1.x.x → 0.15.x, updated date
+- Fixed: SETUP.md — Showcase maestri count 16 → 26, Docker node:18 → node:24, removed broken docs-archive link
+- Fixed: SETUP-PRODUCTION.md — ADR link text 0060 → 0080, removed broken docs-archive link, updated date
+- Fixed: AGENTS.md — added Claude as AI fallback provider
+
 ## [Unreleased] — Architecture Map & Drift Detection
 
 ### Architecture

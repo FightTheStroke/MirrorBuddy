@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > Technical overview of the MirrorBuddy platform architecture
-> Last updated: 07 February 2026, 22:20 CET
+> Last updated: 14 February 2026, 12:00 CET
 
 ---
 
@@ -90,9 +90,9 @@ Prometheus push metrics to Grafana Cloud (5 min interval). Dashboard at https://
 
 ### AI Provider Strategy
 
-Azure OpenAI primary (chat + voice + embeddings), Ollama fallback (text-only).
+Azure OpenAI primary (chat + voice + embeddings), Claude fallback (text), Ollama local dev (text-only).
 
-**Selection:** Azure → Ollama → Showcase Mode (demo)
+**Selection:** Azure → Claude → Ollama → Showcase Mode (demo)
 
 **Implementation:** `src/lib/ai/providers/` handles provider detection, environment variables control configuration.
 
@@ -118,7 +118,7 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 | **Styling**       | Tailwind CSS 4, Radix UI          | Utility-first + accessible components  |
 | **State**         | Zustand 5.0.9                     | Lightweight state management           |
 | **Voice**         | Azure OpenAI Realtime API         | Real-time voice conversations (WebRTC) |
-| **AI**            | Azure OpenAI (chat, embeddings)   | GPT-4o, text-embedding-3-small         |
+| **AI**            | Azure OpenAI / Claude / Ollama    | GPT-5-mini, text-embedding-3-small     |
 | **RAG**           | pgvector                          | Semantic search (1536 dims)            |
 | **Mind Maps**     | MarkMap                           | Interactive mind map visualization     |
 | **Database**      | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search          |
@@ -151,7 +151,7 @@ src/
 └── proxy.ts          # Request proxy (i18n, CSP, path exclusions)
 
 prisma/schema/        # PostgreSQL + pgvector schema
-docs/adr/             # 65+ Architecture Decision Records
+docs/adr/             # 146+ Architecture Decision Records
 ```
 
 ---
@@ -169,8 +169,9 @@ docs/adr/             # 65+ Architecture Decision Records
 
 ### AI Providers
 
-- **Azure OpenAI** - GPT-4o (chat), GPT-4o Realtime (voice WebRTC), text-embedding-3-small (RAG)
-- **Ollama** - Local fallback, text-only
+- **Azure OpenAI** - GPT-5-mini (chat), GPT-Realtime (voice WebRTC), text-embedding-3-small (RAG)
+- **Claude** - Anthropic fallback, text-only
+- **Ollama** - Local dev fallback, text-only
 
 ### RAG System
 

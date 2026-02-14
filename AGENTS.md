@@ -20,7 +20,7 @@ AI-powered educational platform for students with learning differences.
 
 - **Framework**: Next.js 16 (App Router)
 - **Database**: PostgreSQL + Prisma + pgvector
-- **AI**: Azure OpenAI (primary), Ollama (fallback)
+- **AI**: Azure OpenAI (primary), Claude (fallback), Ollama (local)
 - **State**: Zustand + REST (NO localStorage for user data)
 - **Auth**: Session-based `validateAuth()` (ADR 0075)
 - **i18n**: next-intl, 5 locales (it/en/fr/de/es)

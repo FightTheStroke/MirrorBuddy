@@ -284,19 +284,19 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 
 MirrorBuddy offers three tiers to meet different needs:
 
-| Feature                        | Trial        | Base (Free) | Pro       |
-| ------------------------------ | ------------ | ----------- | --------- |
-| **Account**                    | Anonymous    | Free signup | Paid      |
-| **Chat messages/month**        | 10           | 50          | Unlimited |
-| **Voice sessions/month**       | 5 min        | 100 min     | Unlimited |
-| **Tools** (mind maps, quizzes) | Limited (10) | All         | All       |
-| **Maestri access**             | 3 random     | All 25      | All 26    |
-| **Flashcards (FSRS)**          | —            | ✓           | ✓         |
-| **Progress analytics**         | —            | ✓           | ✓         |
-| **Homework help (PDF/photos)** | —            | ✓           | ✓         |
-| **Parental dashboard**         | —            | ✓           | ✓         |
-| **Custom learning paths**      | —            | —           | ✓         |
-| **Priority support**           | —            | —           | ✓         |
+| Feature                        | Trial     | Base (Free) | Pro       |
+| ------------------------------ | --------- | ----------- | --------- |
+| **Account**                    | Anonymous | Free signup | Paid      |
+| **Chat messages/day**          | 10        | 50          | Unlimited |
+| **Voice time/day**             | 5 min     | 30 min      | Unlimited |
+| **Tools/day** (mind maps, etc) | 10        | 30          | Unlimited |
+| **Maestri access**             | 3 random  | 25          | All 26    |
+| **Flashcards (FSRS)**          | ✓         | ✓           | ✓         |
+| **Progress analytics**         | —         | ✓           | ✓         |
+| **Homework help (PDF/photos)** | —         | ✓           | ✓         |
+| **Parental dashboard**         | —         | ✓           | ✓         |
+| **Video Vision**               | —         | —           | ✓         |
+| **Priority support**           | —         | —           | ✓         |
 
 **→ See detailed tier comparison: [Tier Rules](.claude/rules/tier.md)**
 
@@ -385,7 +385,7 @@ For i18n-specific incidents:
 
 ## Architecture
 
-**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
+**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Claude (fallback) / Ollama (local) → Prisma ORM → PostgreSQL + pgvector
 
 **Key Decisions:**
 
@@ -406,7 +406,7 @@ For i18n-specific incidents:
 | Language      | TypeScript 5 (strict mode)                 |
 | Styling       | Tailwind CSS 4                             |
 | State         | Zustand                                    |
-| AI            | Azure OpenAI (chat, voice, embeddings)     |
+| AI            | Azure OpenAI / Claude / Ollama             |
 | RAG           | pgvector (semantic search)                 |
 | Mind Maps     | MarkMap                                    |
 | Database      | Prisma + PostgreSQL + pgvector             |
@@ -457,7 +457,7 @@ npx tsx scripts/test-grafana-push.ts
 ```json
 {
   "status": "healthy",
-  "version": "0.10.0",
+  "version": "0.15.0",
   "timestamp": "2025-01-26T21:50:00.000Z",
   "uptime": 3600,
   "checks": {

@@ -2,7 +2,7 @@
 
 Step-by-step guide for deploying MirrorBuddy to production on Vercel with Azure OpenAI, Supabase, Upstash, and Resend.
 
-> Last updated: 24 Gennaio 2026, 16:00 CET
+> Last updated: 14 Febbraio 2026, 12:00 CET
 
 See [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md) for architecture decisions.
 
@@ -183,7 +183,7 @@ Create accounts and have credentials ready:
    vercel env add TOKEN_ENCRYPTION_KEY production --sensitive <<< "$(openssl rand -hex 32)"
    ```
 
-   > **Breaking Change (v0.8.0)**: `TOKEN_ENCRYPTION_KEY` is required for OAuth token encryption (AES-256-GCM). See [ADR 0060](docs/adr/0080-security-audit-hardening.md).
+   > **Breaking Change (v0.8.0)**: `TOKEN_ENCRYPTION_KEY` is required for OAuth token encryption (AES-256-GCM). See [ADR 0080](docs/adr/0080-security-audit-hardening.md).
 
 3. **Deploy**
    ```bash
@@ -248,4 +248,4 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed diagnostic steps.
 
 ---
 
-**See also:** [SETUP.md](SETUP.md) | [FEATURES.md](docs-archive/FEATURES.md) | [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md)
+**See also:** [SETUP.md](SETUP.md) | [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md)

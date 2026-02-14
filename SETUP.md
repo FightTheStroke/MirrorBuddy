@@ -96,7 +96,7 @@ OLLAMA_MODEL=llama3.2
 
 ## Showcase Mode (No API Required)
 
-Settings → "Modalità Showcase" or `/showcase`. Includes all 16 Maestri (simulated), demos (mind maps/flashcards/quizzes), voice UI preview (no actual voice), full accessibility.
+Settings → "Modalità Showcase" or `/showcase`. Includes all 26 Maestri (simulated), demos (mind maps/flashcards/quizzes), voice UI preview (no actual voice), full accessibility.
 
 **Perfect for:** Demos, presentations, trying before committing.
 
@@ -203,7 +203,7 @@ npm run test         # Run Playwright E2E tests
 **Docker:**
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:24-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
@@ -216,4 +216,4 @@ CMD ["npm", "start"]
 
 ---
 
-**See also:** [FEATURES.md](docs-archive/FEATURES.md) | [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+**See also:** [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)

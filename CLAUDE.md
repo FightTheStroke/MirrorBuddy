@@ -25,16 +25,16 @@ npx prisma migrate dev --name xyz  # Create migration (local only)
 ## Architecture
 
 **Database**: PostgreSQL + pgvector (`prisma/schema/`) — ADR 0028
-**AI**: Azure OpenAI (primary) | Ollama (fallback) — `src/lib/ai/providers.ts`
+**AI**: Azure OpenAI (primary) | Claude (fallback) | Ollama (local) — `src/lib/ai/providers/`
 **RAG**: Semantic search — `src/lib/rag/` — ADR 0033
 **State**: Zustand + REST — NO localStorage (ADR 0015) — `src/lib/stores/`
 **Auth**: Session-based `validateAuth()`, admin via `ADMIN_EMAIL` — ADR 0075
 **Tiers**: Trial/Base/Pro — `src/lib/tier/` — ADR 0065
-**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`
+**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs/` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`
 
 ## Modular Rules (auto-loaded)
 
-`.claude/rules/`: accessibility | compliance | e2e-testing | tier | cookies | i18n | proxy-architecture | ci-verification
+`.claude/rules/`: accessibility | admin-patterns | ci-verification | compliance | cookies | e2e-testing | i18n | proxy-architecture | tier
 
 ## On-Demand Docs (`@docs/claude/<name>.md`)
 
