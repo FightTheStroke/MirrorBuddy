@@ -268,6 +268,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     },
     connect,
     disconnect,
+    /** Switch character on active connection via session.update (no reconnect).
+     *  Returns false if no connection — caller should use connect() instead.
+     *  @see switch-character.ts */
     switchCharacter,
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
     sendText: useSendText(refs.webrtcDataChannelRef, store.addTranscript),

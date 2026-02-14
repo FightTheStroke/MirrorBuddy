@@ -29,61 +29,68 @@ interface CachedToken {
  */
 export function useTokenCache() {
   const cacheRef = useRef<CachedToken | null>(null);
-  const fetchingRef = useRef(false);
+  const inFlightRef = useRef<Promise<CachedToken | null> | null>(null);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchToken = useCallback(async (): Promise<CachedToken | null> => {
-    if (fetchingRef.current) return cacheRef.current;
-    fetchingRef.current = true;
+    // Reuse in-flight fetch so concurrent callers await the same promise
+    if (inFlightRef.current) return inFlightRef.current;
 
-    try {
-      const response = await csrfFetch('/api/realtime/ephemeral-token', {
-        method: 'POST',
-        body: JSON.stringify({ maestroId: 'prefetch', characterType: 'maestro' }),
-      });
+    const fetchPromise = (async (): Promise<CachedToken | null> => {
+      try {
+        const response = await csrfFetch('/api/realtime/ephemeral-token', {
+          method: 'POST',
+          body: JSON.stringify({ maestroId: 'prefetch', characterType: 'maestro' }),
+        });
 
-      if (!response.ok) {
-        logger.warn('[TokenCache] Failed to pre-fetch token', {
-          status: response.status,
+        if (!response.ok) {
+          logger.warn('[TokenCache] Failed to pre-fetch token', {
+            status: response.status,
+          });
+          return null;
+        }
+
+        const data = await response.json();
+        const cached: CachedToken = {
+          token: data.token,
+          expiresAt:
+            typeof data.expiresAt === 'string'
+              ? new Date(data.expiresAt).getTime()
+              : data.expiresAt,
+          fetchedAt: Date.now(),
+        };
+
+        cacheRef.current = cached;
+        logger.debug('[TokenCache] Token cached', {
+          ttl: Math.round((cached.expiresAt - Date.now()) / 1000),
+        });
+
+        // Schedule cache invalidation before expiry
+        if (refreshTimerRef.current) {
+          clearTimeout(refreshTimerRef.current);
+        }
+        const refreshIn = Math.max(
+          cached.expiresAt - Date.now() - REFRESH_BUFFER_MS,
+          MIN_FETCH_INTERVAL_MS,
+        );
+        refreshTimerRef.current = setTimeout(() => {
+          logger.debug('[TokenCache] Refreshing token before expiry');
+          cacheRef.current = null;
+        }, refreshIn);
+
+        return cached;
+      } catch (error) {
+        logger.warn('[TokenCache] Token pre-fetch failed', {
+          error: error instanceof Error ? error.message : String(error),
         });
         return null;
+      } finally {
+        inFlightRef.current = null;
       }
+    })();
 
-      const data = await response.json();
-      const cached: CachedToken = {
-        token: data.token,
-        expiresAt:
-          typeof data.expiresAt === 'string' ? new Date(data.expiresAt).getTime() : data.expiresAt,
-        fetchedAt: Date.now(),
-      };
-
-      cacheRef.current = cached;
-      logger.debug('[TokenCache] Token cached', {
-        ttl: Math.round((cached.expiresAt - Date.now()) / 1000),
-      });
-
-      // Schedule refresh before expiry (inline to avoid circular deps)
-      if (refreshTimerRef.current) {
-        clearTimeout(refreshTimerRef.current);
-      }
-      const refreshIn = Math.max(
-        cached.expiresAt - Date.now() - REFRESH_BUFFER_MS,
-        MIN_FETCH_INTERVAL_MS,
-      );
-      refreshTimerRef.current = setTimeout(() => {
-        logger.debug('[TokenCache] Refreshing token before expiry');
-        cacheRef.current = null;
-      }, refreshIn);
-
-      return cached;
-    } catch (error) {
-      logger.warn('[TokenCache] Token pre-fetch failed', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return null;
-    } finally {
-      fetchingRef.current = false;
-    }
+    inFlightRef.current = fetchPromise;
+    return fetchPromise;
   }, []);
 
   /**
