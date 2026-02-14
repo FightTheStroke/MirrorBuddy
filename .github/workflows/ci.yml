@@ -105,6 +105,32 @@ jobs:
           echo "  config=${{ steps.filter.outputs.config }}"
           echo "  docs=${{ steps.filter.outputs.docs }}"
 
+  deployment-freeze:
+    name: Deployment Freeze
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Check for HOTFIX bypass
+        id: hotfix
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if echo "$COMMIT_MESSAGE" | grep -q "\[HOTFIX\]"; then
+            echo "bypass=true" >> "$GITHUB_OUTPUT"
+            echo "HOTFIX marker detected. Bypassing deployment freeze."
+          else
+            echo "bypass=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Block deployment while maintenance mode is active
+        if: steps.hotfix.outputs.bypass != 'true'
+        run: |
+          if [[ "${{ vars.MAINTENANCE_MODE }}" == "true" ]]; then
+            echo "Deployment freeze active: MAINTENANCE_MODE=true."
+            exit 1
+          fi
+          echo "No deployment freeze active."
+
   # Lane 1: Build Validation (produces artifacts for other jobs)
   build:
     name: Build & Lint

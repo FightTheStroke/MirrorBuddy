@@ -132,13 +132,16 @@ export function MaintenanceBanner() {
       <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 text-center">
         <span>{message}</span>
         {countdownText ? <span className="font-semibold">{countdownText}</span> : null}
-        <Link href="/maintenance" className="underline underline-offset-2 font-semibold">
+        <Link
+          href="/maintenance"
+          className="rounded underline underline-offset-2 font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current focus-visible:ring-offset-2"
+        >
           {t('banner.learnMore')}
         </Link>
         <button
           type="button"
           onClick={handleDismiss}
-          className="rounded border border-current px-2 py-0.5 text-xs font-semibold"
+          className="rounded border border-current px-2 py-0.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current focus-visible:ring-offset-2"
           aria-label={t('banner.dismiss')}
         >
           {t('banner.dismiss')}

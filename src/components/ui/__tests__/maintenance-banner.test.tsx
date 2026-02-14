@@ -43,6 +43,31 @@ describe('MaintenanceBanner', () => {
     expect(screen.getByText(getTranslation('maintenance.banner.dismiss'))).toBeInTheDocument();
   });
 
+  it('has visible focus styles on interactive elements', async () => {
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: 'upcoming',
+        message: 'Scheduled update',
+        severity: 'medium',
+        startTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+      }),
+    } as Response);
+
+    render(<MaintenanceBanner />);
+
+    const learnMoreLink = await screen.findByRole('link', {
+      name: getTranslation('maintenance.banner.learnMore'),
+    });
+    const dismissButton = screen.getByRole('button', {
+      name: getTranslation('maintenance.banner.dismiss'),
+    });
+
+    expect(learnMoreLink.className).toContain('focus-visible:ring-2');
+    expect(dismissButton.className).toContain('focus-visible:ring-2');
+  });
+
   it('uses high severity styling when maintenance severity is high', async () => {
     vi.mocked(global.fetch).mockResolvedValue({
       ok: true,

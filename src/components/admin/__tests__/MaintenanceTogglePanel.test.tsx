@@ -4,6 +4,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { getTranslation } from '@/test/i18n-helpers';
 import { MaintenanceTogglePanel } from '../MaintenanceTogglePanel';
 
 const mockCsrfFetch = vi.fn();
@@ -15,6 +16,11 @@ vi.mock('@/lib/auth', async (importOriginal) => {
     csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
   };
 });
+
+vi.mock('next-intl', () => ({
+  useTranslations: (namespace: string) => (key: string, values?: Record<string, unknown>) =>
+    getTranslation(`${namespace}.${key}`, values),
+}));
 
 describe('MaintenanceTogglePanel', () => {
   beforeEach(() => {
@@ -56,7 +62,9 @@ describe('MaintenanceTogglePanel', () => {
       name: getTranslation('maintenance.admin.activate'),
     });
     fireEvent.click(openDialogButton);
-    fireEvent.click(screen.getByRole('button', { name: getTranslation('common.confirm') }));
+    fireEvent.click(
+      screen.getByRole('button', { name: getTranslation('maintenance.admin.confirmCancel') }),
+    );
 
     await waitFor(() => {
       expect(mockCsrfFetch).toHaveBeenCalledWith(
@@ -79,7 +87,9 @@ describe('MaintenanceTogglePanel', () => {
       name: getTranslation('maintenance.admin.activate'),
     });
     fireEvent.click(openDialogButton);
-    fireEvent.click(screen.getByRole('button', { name: getTranslation('common.confirm') }));
+    fireEvent.click(
+      screen.getByRole('button', { name: getTranslation('maintenance.admin.confirmCancel') }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText('toggle failed')).toBeInTheDocument();

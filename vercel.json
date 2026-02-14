@@ -30,6 +30,10 @@
     {
       "path": "/api/cron/dunning",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/maintenance-notify",
+      "schedule": "0 * * * *"
     }
   ]
 }
