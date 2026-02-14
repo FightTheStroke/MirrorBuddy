@@ -244,6 +244,15 @@ const eslintConfig = defineConfig([
       "local-rules/require-eventsource-cleanup": "error",
     },
   },
+  // Plan 145 TF-03: Block .slice() truncation on system prompts
+  // Voice prompts should use voice-prompt-builder.ts, not arbitrary truncation
+  {
+    files: ["src/lib/hooks/voice-session/**/*.ts"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "local-rules/no-arbitrary-prompt-truncation": "warn",
+    },
+  },
   // ADR 0075: Prefer validateAuth() over direct AUTH cookie reads in API routes
   // Only warns about AUTH_COOKIE_NAME reads, not VISITOR_COOKIE_NAME (valid for trial)
   {

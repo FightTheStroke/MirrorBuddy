@@ -7,7 +7,7 @@ import type { MaestroFull } from '@/data/maestri';
 
 interface MaestroPageProps {
   params: Promise<{ locale: string; id: string }>;
-  searchParams: Promise<{ tool?: string }>;
+  searchParams: Promise<{ tool?: string; context?: string }>;
 }
 
 export async function generateMetadata({ params }: MaestroPageProps) {

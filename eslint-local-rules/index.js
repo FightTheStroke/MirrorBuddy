@@ -26,6 +26,7 @@ import enforceDependencyDirection from './enforce-dependency-direction.js';
 import noLiteralStringsInJsx from './no-literal-strings-in-jsx.js';
 import { noTodoWithoutIssue } from './no-todo-without-issue.js';
 import requireNativeBridge from './require-native-bridge.js';
+import noArbitraryPromptTruncation from './no-arbitrary-prompt-truncation.js';
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -366,6 +367,7 @@ const rules = {
   'no-hardcoded-strings-in-tests': noHardcodedStringsInTestsRule,
   'no-todo-without-issue': noTodoWithoutIssue,
   'require-native-bridge': requireNativeBridge,
+  'no-arbitrary-prompt-truncation': noArbitraryPromptTruncation,
 };
 
 const localRules = {
