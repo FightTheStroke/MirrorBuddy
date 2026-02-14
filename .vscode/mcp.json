@@ -4,6 +4,10 @@
       "command": "npx",
       "args": ["-y", "@anthropic/codegraph-mcp", "--project", "."],
       "env": {}
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
     }
   }
 }
