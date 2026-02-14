@@ -10,6 +10,7 @@ import {
   requestMediaStream,
   requestMicrophoneStream,
   stopMediaStream,
+  onDeviceChange,
 } from '@/lib/native/media-bridge';
 
 export interface AudioDevice {
@@ -139,9 +140,9 @@ export function useAudioDevices(): UseAudioDevicesReturn {
       enumerateDevices();
     };
 
-    navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
+    const unsubscribe = onDeviceChange(handleDeviceChange);
     return () => {
-      navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
+      unsubscribe();
     };
   }, [enumerateDevices]);
 

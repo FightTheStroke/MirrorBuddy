@@ -266,5 +266,7 @@ export {
   stopMediaStream,
   enumerateMediaDevices,
   isMediaDevicesAvailable,
+  isEnumerateDevicesAvailable,
+  onDeviceChange,
 } from './media-bridge-stream';
 export type { VideoConstraints } from './media-bridge-stream';

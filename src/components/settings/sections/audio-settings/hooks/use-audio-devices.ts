@@ -9,6 +9,7 @@ import {
   requestMicrophoneStream,
   enumerateMediaDevices,
   stopMediaStream,
+  onDeviceChange,
 } from '@/lib/native/media-bridge';
 
 export function useAudioDevices() {
@@ -44,10 +45,10 @@ export function useAudioDevices() {
       refreshDevices();
     }, 0);
 
-    navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
+    const unsubscribe = onDeviceChange(refreshDevices);
     return () => {
       clearTimeout(timer);
-      navigator.mediaDevices.removeEventListener('devicechange', refreshDevices);
+      unsubscribe();
     };
   }, [refreshDevices]);
 

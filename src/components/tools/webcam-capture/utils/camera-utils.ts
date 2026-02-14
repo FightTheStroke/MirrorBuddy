@@ -3,6 +3,8 @@
  * @brief Camera utility functions
  */
 
+import { enumerateMediaDevices } from '@/lib/native/media-bridge';
+
 export function isMobile(): boolean {
   if (typeof window === 'undefined') return false;
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -32,7 +34,7 @@ export interface CameraDevice {
 
 export async function enumerateCameras(): Promise<CameraDevice[]> {
   try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
+    const devices = await enumerateMediaDevices();
     return devices
       .filter((d) => d.kind === 'videoinput')
       .map((d) => ({
@@ -45,4 +47,3 @@ export async function enumerateCameras(): Promise<CameraDevice[]> {
     return [];
   }
 }
-

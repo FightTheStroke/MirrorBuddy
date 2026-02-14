@@ -97,3 +97,21 @@ export async function enumerateMediaDevices(): Promise<MediaDeviceInfo[]> {
 export function isMediaDevicesAvailable(): boolean {
   return !!navigator?.mediaDevices?.getUserMedia;
 }
+
+/**
+ * Check if device enumeration is available
+ */
+export function isEnumerateDevicesAvailable(): boolean {
+  return !!navigator?.mediaDevices?.enumerateDevices;
+}
+
+/**
+ * Subscribe to device change events.
+ * Returns an unsubscribe function for cleanup.
+ */
+export function onDeviceChange(callback: () => void): () => void {
+  navigator.mediaDevices.addEventListener('devicechange', callback);
+  return () => {
+    navigator.mediaDevices.removeEventListener('devicechange', callback);
+  };
+}
