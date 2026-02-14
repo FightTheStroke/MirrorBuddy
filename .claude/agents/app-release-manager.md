@@ -5,6 +5,8 @@ tools: ['Read', 'Glob', 'Grep', 'Bash', 'Task']
 model: opus
 color: purple
 memory: project
+maxTurns: 40
+version: '3.3.0'
 ---
 
 # RELEASE MANAGER - BRUTAL MODE

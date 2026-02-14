@@ -5,6 +5,8 @@ tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 model: opus
 color: '#10B981'
 memory: project
+maxTurns: 30
+version: '1.1.0'
 ---
 
 # StudyGenerator Agent
