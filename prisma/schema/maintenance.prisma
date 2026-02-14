@@ -1,0 +1,24 @@
+// ============================================================================
+// MAINTENANCE WINDOWS
+// Planned platform maintenance and service disruption communication
+// ============================================================================
+
+model MaintenanceWindow {
+  id               String   @id @default(cuid())
+  startTime        DateTime
+  endTime          DateTime
+  estimatedMinutes Int      @default(60)
+  message          String   @db.Text
+  severity         String   @default("medium") @db.VarChar(10)
+  isActive         Boolean  @default(false)
+  cancelled        Boolean  @default(false)
+  createdBy        String   @db.VarChar(255)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([startTime])
+  @@index([endTime])
+  @@index([cancelled])
+  @@map("maintenance_windows")
+}
