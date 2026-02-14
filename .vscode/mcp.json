@@ -2,7 +2,7 @@
   "servers": {
     "codegraph": {
       "command": "npx",
-      "args": ["-y", "@anthropic/codegraph-mcp", "--project", "."],
+      "args": ["-y", "@colbymchenry/codegraph", "--project", "."],
       "env": {}
     },
     "playwright": {
