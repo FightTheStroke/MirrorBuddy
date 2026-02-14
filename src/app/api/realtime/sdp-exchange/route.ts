@@ -7,9 +7,8 @@ import { NextResponse } from 'next/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- WebRTC proxy, uses ephemeral bearer token, no cookie auth
-
 export const revalidate = 0;
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- WebRTC proxy, uses ephemeral bearer token, no cookie auth
 export const POST = pipe(withSentry('/api/realtime/sdp-exchange'))(async (ctx) => {
   const requestId = getRequestId(ctx.req);
   const log = getRequestLogger(ctx.req, requestId);
