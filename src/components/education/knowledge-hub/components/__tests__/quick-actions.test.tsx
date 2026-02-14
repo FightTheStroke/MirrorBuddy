@@ -5,6 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuickActions } from '../quick-actions';
+import { getTranslation } from '@/test/i18n-helpers';
 
 describe('QuickActions', () => {
   describe('Basic Rendering', () => {
@@ -70,7 +71,9 @@ describe('QuickActions', () => {
     it('should show label text in normal mode', () => {
       render(<QuickActions onUploadFile={vi.fn()} compact={false} />);
 
-      expect(screen.getByText('Carica file')).toBeInTheDocument();
+      expect(
+        screen.getByText(getTranslation('education.knowledgeHub.quickActions.uploadFile')),
+      ).toBeInTheDocument();
     });
 
     it('should call onUploadFile when clicked', () => {
@@ -124,7 +127,7 @@ describe('QuickActions', () => {
           onUploadFile={vi.fn()}
           onCreateFolder={vi.fn()}
           onCreateTag={vi.fn()}
-        />
+        />,
       );
 
       expect(screen.getByLabelText('Nuovo materiale')).toBeInTheDocument();
@@ -140,7 +143,7 @@ describe('QuickActions', () => {
           onUploadFile={vi.fn()}
           onCreateFolder={vi.fn()}
           onCreateTag={vi.fn()}
-        />
+        />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -189,7 +192,7 @@ describe('QuickActions', () => {
           onUploadFile={vi.fn()}
           onCreateFolder={vi.fn()}
           onCreateTag={vi.fn()}
-        />
+        />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -201,12 +204,7 @@ describe('QuickActions', () => {
 
   describe('Custom className', () => {
     it('should apply custom className', () => {
-      render(
-        <QuickActions
-          onCreateMaterial={vi.fn()}
-          className="custom-class"
-        />
-      );
+      render(<QuickActions onCreateMaterial={vi.fn()} className="custom-class" />);
 
       const toolbar = screen.getByRole('toolbar');
       expect(toolbar).toHaveClass('custom-class');

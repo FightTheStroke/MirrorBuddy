@@ -4,24 +4,25 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { MobileAdminNav } from "../mobile-admin-nav";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MobileAdminNav } from '../mobile-admin-nav';
+import { getTranslation } from '@/test/i18n-helpers';
 
 // Mock usePathname
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/admin/users",
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/admin/users',
 }));
 
-describe("MobileAdminNav", () => {
+describe('MobileAdminNav', () => {
   const mockOnClose = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Visibility and Rendering", () => {
-    it("renders hamburger trigger button", () => {
+  describe('Visibility and Rendering', () => {
+    it('renders hamburger trigger button', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -36,7 +37,7 @@ describe("MobileAdminNav", () => {
       expect(trigger).toBeInTheDocument();
     });
 
-    it("renders drawer when open", () => {
+    it('renders drawer when open', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -48,10 +49,10 @@ describe("MobileAdminNav", () => {
       );
 
       // Check for nav element or drawer
-      expect(screen.getByRole("navigation")).toBeInTheDocument();
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
-    it("drawer is hidden when closed", () => {
+    it('drawer is hidden when closed', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -63,11 +64,11 @@ describe("MobileAdminNav", () => {
       );
 
       // Drawer should be off-screen with -translate-x-full
-      const drawer = container.querySelector("aside");
-      expect(drawer).toHaveClass("-translate-x-full");
+      const drawer = container.querySelector('aside');
+      expect(drawer).toHaveClass('-translate-x-full');
     });
 
-    it("hidden on md+ screens", () => {
+    it('hidden on md+ screens', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -78,13 +79,13 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const wrapper = container.querySelector(".lg\\:hidden");
+      const wrapper = container.querySelector('.lg\\:hidden');
       expect(wrapper).toBeInTheDocument();
     });
   });
 
-  describe("Navigation Links", () => {
-    it("renders all admin navigation links", () => {
+  describe('Navigation Links', () => {
+    it('renders all admin navigation links', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -95,15 +96,15 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      expect(screen.getByText("Dashboard")).toBeInTheDocument();
-      expect(screen.getByText("Richieste Beta")).toBeInTheDocument();
-      expect(screen.getByText("Utenti")).toBeInTheDocument();
-      expect(screen.getByText("Piani")).toBeInTheDocument();
-      expect(screen.getByText("Analytics")).toBeInTheDocument();
-      expect(screen.getByText("Impostazioni")).toBeInTheDocument();
+      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Richieste Beta')).toBeInTheDocument();
+      expect(screen.getByText('Utenti')).toBeInTheDocument();
+      expect(screen.getByText('Piani')).toBeInTheDocument();
+      expect(screen.getByText('Analytics')).toBeInTheDocument();
+      expect(screen.getByText(getTranslation('admin.sidebar.settings'))).toBeInTheDocument();
     });
 
-    it("marks current page as active", () => {
+    it('marks current page as active', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -114,11 +115,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const usersLink = screen.getByRole("link", { name: /utenti/i });
-      expect(usersLink).toHaveClass("bg-slate-900", "text-white");
+      const usersLink = screen.getByRole('link', { name: /utenti/i });
+      expect(usersLink).toHaveClass('bg-slate-900', 'text-white');
     });
 
-    it("closes drawer when link is clicked", () => {
+    it('closes drawer when link is clicked', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -129,15 +130,15 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const link = screen.getByRole("link", { name: /utenti/i });
+      const link = screen.getByRole('link', { name: /utenti/i });
       fireEvent.click(link);
 
       expect(mockOnClose).toHaveBeenCalled();
     });
   });
 
-  describe("Touch Targets", () => {
-    it("hamburger button is at least 44x44px", () => {
+  describe('Touch Targets', () => {
+    it('hamburger button is at least 44x44px', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -149,10 +150,10 @@ describe("MobileAdminNav", () => {
       );
 
       const button = container.querySelector('button[aria-label*="Apri"]');
-      expect(button).toHaveClass("h-11", "w-11");
+      expect(button).toHaveClass('h-11', 'w-11');
     });
 
-    it("nav links have 44px minimum touch targets", () => {
+    it('nav links have 44px minimum touch targets', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={true}
@@ -163,16 +164,16 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const navLinks = container.querySelectorAll("nav a");
+      const navLinks = container.querySelectorAll('nav a');
       navLinks.forEach((link) => {
         // Should have adequate padding for touch target
-        expect(link).toHaveClass("py-3", "px-4");
+        expect(link).toHaveClass('py-3', 'px-4');
       });
     });
   });
 
-  describe("Backdrop and Interaction", () => {
-    it("backdrop is present when drawer is open", () => {
+  describe('Backdrop and Interaction', () => {
+    it('backdrop is present when drawer is open', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={true}
@@ -183,13 +184,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const backdrop = container.querySelector(
-        "div[aria-hidden='true'].bg-black\\/50",
-      );
+      const backdrop = container.querySelector("div[aria-hidden='true'].bg-black\\/50");
       expect(backdrop).toBeInTheDocument();
     });
 
-    it("no backdrop when drawer is closed", () => {
+    it('no backdrop when drawer is closed', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -200,13 +199,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const backdrop = container.querySelector(
-        "div[aria-hidden='true'].bg-black\\/50",
-      );
+      const backdrop = container.querySelector("div[aria-hidden='true'].bg-black\\/50");
       expect(backdrop).not.toBeInTheDocument();
     });
 
-    it("escape key listener is set up when open", () => {
+    it('escape key listener is set up when open', () => {
       const { rerender } = render(
         <MobileAdminNav
           isOpen={true}
@@ -218,7 +215,7 @@ describe("MobileAdminNav", () => {
       );
 
       // Verify component renders without errors and sets up listeners
-      expect(screen.getByRole("navigation")).toBeInTheDocument();
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
 
       rerender(
         <MobileAdminNav
@@ -235,8 +232,8 @@ describe("MobileAdminNav", () => {
     });
   });
 
-  describe("Badges and Indicators", () => {
-    it("displays pending invites badge when count > 0", () => {
+  describe('Badges and Indicators', () => {
+    it('displays pending invites badge when count > 0', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -247,11 +244,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const inviteItem = screen.getByText("Richieste Beta").closest("a");
-      expect(inviteItem).toHaveTextContent("5");
+      const inviteItem = screen.getByText('Richieste Beta').closest('a');
+      expect(inviteItem).toHaveTextContent('5');
     });
 
-    it("displays system alerts badge when count > 0", () => {
+    it('displays system alerts badge when count > 0', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -262,11 +259,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const dashboardItem = screen.getByText("Dashboard").closest("a");
-      expect(dashboardItem).toHaveTextContent("3");
+      const dashboardItem = screen.getByText('Dashboard').closest('a');
+      expect(dashboardItem).toHaveTextContent('3');
     });
 
-    it("caps badge at 99+", () => {
+    it('caps badge at 99+', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -277,13 +274,13 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const badge = screen.getByText("99+");
+      const badge = screen.getByText('99+');
       expect(badge).toBeInTheDocument();
     });
   });
 
-  describe("Return to App Link", () => {
-    it("displays return to app button", () => {
+  describe('Return to App Link', () => {
+    it('displays return to app button', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -298,7 +295,7 @@ describe("MobileAdminNav", () => {
       expect(returnBtn).toBeInTheDocument();
     });
 
-    it("return to app button links to home", () => {
+    it('return to app button links to home', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -309,13 +306,13 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const returnLink = screen.getByText(/torna all/i).closest("a");
-      expect(returnLink).toHaveAttribute("href", "/");
+      const returnLink = screen.getByText(/torna all/i).closest('a');
+      expect(returnLink).toHaveAttribute('href', '/');
     });
   });
 
-  describe("Accessibility", () => {
-    it("hamburger button has accessible label", () => {
+  describe('Accessibility', () => {
+    it('hamburger button has accessible label', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={false}
@@ -327,10 +324,10 @@ describe("MobileAdminNav", () => {
       );
 
       const button = container.querySelector('button[aria-label*="Apri"]');
-      expect(button).toHaveAttribute("aria-label");
+      expect(button).toHaveAttribute('aria-label');
     });
 
-    it("nav is semantic HTML5 nav element", () => {
+    it('nav is semantic HTML5 nav element', () => {
       render(
         <MobileAdminNav
           isOpen={true}
@@ -341,11 +338,11 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const nav = screen.getByRole("navigation");
-      expect(nav.tagName).toBe("NAV");
+      const nav = screen.getByRole('navigation');
+      expect(nav.tagName).toBe('NAV');
     });
 
-    it("backdrop has aria-hidden for assistive tech", () => {
+    it('backdrop has aria-hidden for assistive tech', () => {
       const { container } = render(
         <MobileAdminNav
           isOpen={true}
@@ -356,11 +353,9 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const backdrop = container.querySelector(
-        "div[aria-hidden='true'].bg-black\\/50",
-      );
+      const backdrop = container.querySelector("div[aria-hidden='true'].bg-black\\/50");
       expect(backdrop).toBeInTheDocument();
-      expect(backdrop).toHaveAttribute("aria-hidden", "true");
+      expect(backdrop).toHaveAttribute('aria-hidden', 'true');
     });
   });
 });

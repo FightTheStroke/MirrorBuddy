@@ -50,7 +50,10 @@
         "temiDiInteresse": "Temi di interesse *",
         "messaggio": "Messaggio",
         "condividiITuoiRequisitiSpecifici": "Condividi i tuoi requisiti specifici...",
-        "inviaRichiestaEnterprise": "Invia Richiesta Enterprise"
+        "inviaRichiestaEnterprise": "Invia Richiesta Enterprise",
+        "validation": {
+          "topicsRequired": "Sélectionnez au moins un sujet d intérêt"
+        }
       },
       "form": {
         "emailInvalid": "L'email n'est pas valide",

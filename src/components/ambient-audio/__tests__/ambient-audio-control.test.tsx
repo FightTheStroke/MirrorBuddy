@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { getTranslation, getTranslationRegex } from '@/test/i18n-helpers';
 import { AmbientAudioControl } from '../ambient-audio-control';
 
 // Mock the hook
@@ -68,7 +69,9 @@ describe('AmbientAudioControl', () => {
       render(<AmbientAudioControl />);
       expect(screen.getByText('Focus')).toBeInTheDocument();
       expect(screen.getByText('Lavoro Profondo')).toBeInTheDocument();
-      expect(screen.getByText('Creatività')).toBeInTheDocument();
+      expect(
+        screen.getByText(getTranslation('settings.ambientAudio.presets.creative')),
+      ).toBeInTheDocument();
     });
 
     it('renders mixer section', () => {
@@ -88,7 +91,7 @@ describe('AmbientAudioControl', () => {
       render(<AmbientAudioControl />);
       // Stop button exists but may be disabled in idle state
       const buttons = screen.getAllByRole('button');
-      const stopButton = buttons.find(btn => btn.querySelector('svg.lucide-square'));
+      const stopButton = buttons.find((btn) => btn.querySelector('svg.lucide-square'));
       if (stopButton) {
         fireEvent.click(stopButton);
       }
@@ -112,28 +115,30 @@ describe('AmbientAudioControl', () => {
   describe('Advanced Mixer', () => {
     it('shows mixer when toggle button is clicked', () => {
       render(<AmbientAudioControl />);
-      fireEvent.click(screen.getByText('Mostra'));
+      fireEvent.click(screen.getByText(getTranslation('settings.ambientAudio.show')));
       // Use getAllByText since there may be multiple
-      const addLayerButtons = screen.getAllByText('Aggiungi Layer');
+      const addLayerButtons = screen.getAllByText(getTranslation('settings.ambientAudio.addLayer'));
       expect(addLayerButtons.length).toBeGreaterThan(0);
     });
 
     it('shows noise options in mixer', () => {
       render(<AmbientAudioControl />);
-      fireEvent.click(screen.getByText('Mostra'));
+      fireEvent.click(screen.getByText(getTranslation('settings.ambientAudio.show')));
       expect(screen.getByText('Rumore')).toBeInTheDocument();
     });
 
     it('shows binaural options in mixer', () => {
       render(<AmbientAudioControl />);
-      fireEvent.click(screen.getByText('Mostra'));
+      fireEvent.click(screen.getByText(getTranslation('settings.ambientAudio.show')));
       expect(screen.getByText('Binaural Beats')).toBeInTheDocument();
     });
 
     it('calls addLayer when add button is clicked', () => {
       render(<AmbientAudioControl />);
-      fireEvent.click(screen.getByText('Mostra'));
-      fireEvent.click(screen.getByRole('button', { name: /aggiungi layer/i }));
+      fireEvent.click(screen.getByText(getTranslation('settings.ambientAudio.show')));
+      fireEvent.click(
+        screen.getByRole('button', { name: getTranslationRegex('settings.ambientAudio.addLayer') }),
+      );
       expect(mockAddLayer).toHaveBeenCalledWith('white_noise');
     });
   });

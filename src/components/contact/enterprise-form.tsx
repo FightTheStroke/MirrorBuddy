@@ -71,7 +71,7 @@ export function EnterpriseForm() {
     if (!formData.company.trim()) newErrors.company = 'Nome azienda obbligatorio';
     if (!formData.sector) newErrors.sector = 'Seleziona un settore';
     if (!formData.employeeCount) newErrors.employeeCount = 'Seleziona il numero di dipendenti';
-    if (formData.topics.length === 0) newErrors.topics = 'Seleziona almeno un tema di interesse';
+    if (formData.topics.length === 0) newErrors.topics = t('validation.topicsRequired');
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

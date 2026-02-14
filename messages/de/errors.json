@@ -96,6 +96,12 @@
     "tornaAllaHome": "Torna alla home",
     "somethingWentWrong": "Something went wrong",
     "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "errorPage": {
+      "title": "Etwas ist schiefgelaufen",
+      "message": "Beim Laden der Seite ist ein Fehler aufgetreten. Sie können es erneut versuchen oder zur vorherigen Seite zurückkehren.",
+      "retryButton": "Erneut versuchen",
+      "backButton": "Zurück"
+    }
   }
 }

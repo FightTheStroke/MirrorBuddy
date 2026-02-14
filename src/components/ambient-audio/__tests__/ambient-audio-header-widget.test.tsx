@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { getTranslation } from '@/test/i18n-helpers';
 import { AmbientAudioHeaderWidget } from '../ambient-audio-header-widget';
 
 // Mock the hooks
@@ -82,7 +83,9 @@ describe('AmbientAudioHeaderWidget', () => {
     it('shows settings link in dropdown', () => {
       render(<AmbientAudioHeaderWidget />);
       fireEvent.click(screen.getByTitle('Audio Ambientale'));
-      expect(screen.getByText('Impostazioni avanzate')).toBeInTheDocument();
+      expect(
+        screen.getByText(getTranslation('settings.ambientAudio.advancedSettings')),
+      ).toBeInTheDocument();
     });
   });
 

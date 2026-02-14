@@ -4,39 +4,36 @@
  * @vitest-environment jsdom
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { getTranslation } from '@/test/i18n-helpers';
 
 // Mock next-intl with Italian translations
-vi.mock("next-intl", () => ({
-  useTranslations:
-    () => (key: string, opts?: Record<string, string | number>) => {
-      const translations: Record<string, string> = {
-        errorTitle: "Errore di visualizzazione",
-        errorMessageDefault: "Impossibile visualizzare questo materiale.",
-        retryButton: "Riprova",
-      };
-      if (key === "errorMessageWithType" && opts?.type) {
-        return `Impossibile visualizzare il materiale di tipo "${opts.type}".`;
-      }
-      return translations[key] || key;
-    },
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string, opts?: Record<string, string | number>) => {
+    const translations: Record<string, string> = {
+      errorTitle: 'Errore di visualizzazione',
+      errorMessageDefault: 'Impossibile visualizzare questo materiale.',
+      retryButton: 'Riprova',
+    };
+    if (key === 'errorMessageWithType' && opts?.type) {
+      return `Impossibile visualizzare il materiale di tipo "${opts.type}".`;
+    }
+    return translations[key] || key;
+  },
 }));
 
-import {
-  RendererErrorBoundary,
-  withErrorBoundary,
-} from "../renderer-error-boundary";
+import { RendererErrorBoundary, withErrorBoundary } from '../renderer-error-boundary';
 
 // Component that throws an error
 const ThrowingComponent = () => {
-  throw new Error("Test error");
+  throw new Error('Test error');
 };
 
 // Component that renders normally
 const NormalComponent = () => <div>Normal content</div>;
 
-describe("RendererErrorBoundary", () => {
+describe('RendererErrorBoundary', () => {
   // Suppress console.error for error boundary tests
   const originalConsoleError = console.error;
   beforeEach(() => {
@@ -46,25 +43,27 @@ describe("RendererErrorBoundary", () => {
     console.error = originalConsoleError;
   });
 
-  it("renders children when no error", () => {
+  it('renders children when no error', () => {
     render(
       <RendererErrorBoundary>
         <NormalComponent />
       </RendererErrorBoundary>,
     );
-    expect(screen.getByText("Normal content")).toBeInTheDocument();
+    expect(screen.getByText('Normal content')).toBeInTheDocument();
   });
 
-  it("renders error UI when child throws", () => {
+  it('renders error UI when child throws', () => {
     render(
       <RendererErrorBoundary>
         <ThrowingComponent />
       </RendererErrorBoundary>,
     );
-    expect(screen.getByText("Errore di visualizzazione")).toBeInTheDocument();
+    expect(
+      screen.getByText(getTranslation('education.knowledgeHub.errorTitle')),
+    ).toBeInTheDocument();
   });
 
-  it("shows material type in error message when provided", () => {
+  it('shows material type in error message when provided', () => {
     render(
       <RendererErrorBoundary materialType="mindmap">
         <ThrowingComponent />
@@ -73,27 +72,25 @@ describe("RendererErrorBoundary", () => {
     expect(screen.getByText(/mindmap/)).toBeInTheDocument();
   });
 
-  it("shows generic error message when materialType not provided", () => {
+  it('shows generic error message when materialType not provided', () => {
     render(
       <RendererErrorBoundary>
         <ThrowingComponent />
       </RendererErrorBoundary>,
     );
-    expect(
-      screen.getByText("Impossibile visualizzare questo materiale."),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Impossibile visualizzare questo materiale.')).toBeInTheDocument();
   });
 
-  it("displays error message", () => {
+  it('displays error message', () => {
     render(
       <RendererErrorBoundary>
         <ThrowingComponent />
       </RendererErrorBoundary>,
     );
-    expect(screen.getByText("Test error")).toBeInTheDocument();
+    expect(screen.getByText('Test error')).toBeInTheDocument();
   });
 
-  it("calls onReset when retry button clicked", () => {
+  it('calls onReset when retry button clicked', () => {
     const onReset = vi.fn();
     render(
       <RendererErrorBoundary onReset={onReset}>
@@ -101,22 +98,22 @@ describe("RendererErrorBoundary", () => {
       </RendererErrorBoundary>,
     );
 
-    fireEvent.click(screen.getByText("Riprova"));
+    fireEvent.click(screen.getByText(getTranslation('education.knowledgeHub.retryButton')));
     expect(onReset).toHaveBeenCalled();
   });
 
-  it("has proper accessibility attributes", () => {
+  it('has proper accessibility attributes', () => {
     render(
       <RendererErrorBoundary>
         <ThrowingComponent />
       </RendererErrorBoundary>,
     );
-    const alert = screen.getByRole("alert");
-    expect(alert).toHaveAttribute("aria-live", "assertive");
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveAttribute('aria-live', 'assertive');
   });
 });
 
-describe("withErrorBoundary HOC", () => {
+describe('withErrorBoundary HOC', () => {
   const originalConsoleError = console.error;
   beforeEach(() => {
     console.error = vi.fn();
@@ -125,20 +122,22 @@ describe("withErrorBoundary HOC", () => {
     console.error = originalConsoleError;
   });
 
-  it("wraps component with error boundary", () => {
+  it('wraps component with error boundary', () => {
     const WrappedComponent = withErrorBoundary(NormalComponent);
     render(<WrappedComponent />);
-    expect(screen.getByText("Normal content")).toBeInTheDocument();
+    expect(screen.getByText('Normal content')).toBeInTheDocument();
   });
 
-  it("catches errors from wrapped component", () => {
-    const WrappedComponent = withErrorBoundary(ThrowingComponent, "test");
+  it('catches errors from wrapped component', () => {
+    const WrappedComponent = withErrorBoundary(ThrowingComponent, 'test');
     render(<WrappedComponent />);
-    expect(screen.getByText("Errore di visualizzazione")).toBeInTheDocument();
+    expect(
+      screen.getByText(getTranslation('education.knowledgeHub.errorTitle')),
+    ).toBeInTheDocument();
   });
 
-  it("includes material type from HOC parameter", () => {
-    const WrappedComponent = withErrorBoundary(ThrowingComponent, "quiz");
+  it('includes material type from HOC parameter', () => {
+    const WrappedComponent = withErrorBoundary(ThrowingComponent, 'quiz');
     render(<WrappedComponent />);
     expect(screen.getByText(/quiz/)).toBeInTheDocument();
   });

@@ -10,6 +10,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EnterpriseForm } from '@/components/contact/enterprise-form';
+import { getTranslationRegex } from '@/test/i18n-helpers';
 
 // next-intl mock handled by global test setup (src/test/setup.ts)
 
@@ -76,14 +77,20 @@ describe('Enterprise Contact Page', () => {
 
     it('renders submit button', () => {
       render(<EnterpriseForm />);
-      expect(screen.getByRole('button', { name: /invia/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      ).toBeInTheDocument();
     });
   });
 
   describe('Form Validation', () => {
     it('shows validation error when name is empty', async () => {
       render(<EnterpriseForm />);
-      const submitBtn = screen.getByRole('button', { name: /invia/i });
+      const submitBtn = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+      });
 
       fireEvent.click(submitBtn);
 
@@ -115,7 +122,11 @@ describe('Enterprise Contact Page', () => {
       const leadershipCheckbox = screen.getByDisplayValue('leadership');
       fireEvent.click(leadershipCheckbox);
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
       // Validation should prevent form submission, so csrfFetch should NOT be called
       expect(mockCsrfFetch).not.toHaveBeenCalled();
@@ -138,9 +149,17 @@ describe('Enterprise Contact Page', () => {
       fireEvent.change(sectorSelect, { target: { value: 'technology' } });
       fireEvent.change(empSelect, { target: { value: '50-200' } });
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
-      expect(screen.getByText(/seleziona almeno un tema/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslationRegex('compliance.contact.enterprise.validation.topicsRequired'),
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -174,7 +193,11 @@ describe('Enterprise Contact Page', () => {
 
       await userEvent.type(messageTextarea, 'Interested in enterprise customization');
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
       await waitFor(() => {
         expect(mockCsrfFetch).toHaveBeenCalledWith(
@@ -214,7 +237,11 @@ describe('Enterprise Contact Page', () => {
       fireEvent.click(aiCheckbox);
       fireEvent.click(complianceCheckbox);
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
       await waitFor(() => {
         expect(mockCsrfFetch).toHaveBeenCalledWith(
@@ -259,7 +286,11 @@ describe('Enterprise Contact Page', () => {
       const leadershipCheckbox = screen.getByDisplayValue('leadership');
       fireEvent.click(leadershipCheckbox);
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
       await waitFor(() => {
         // The form shows success message in Italian
@@ -292,7 +323,11 @@ describe('Enterprise Contact Page', () => {
       const topicCheckbox = screen.getByDisplayValue('other');
       fireEvent.click(topicCheckbox);
 
-      fireEvent.click(screen.getByRole('button', { name: /invia/i }));
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.enterprise.inviaRichiestaEnterprise'),
+        }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText(/network error/i)).toBeInTheDocument();

@@ -7,6 +7,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getTranslation, getTranslationRegex } from '@/test/i18n-helpers';
 import { UserMenuDropdown } from '../user-menu-dropdown';
 
 // Mock csrfFetch
@@ -53,9 +54,11 @@ describe('UserMenuDropdown', () => {
     it('renders trigger button with greeting when userName is provided', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
-      const button = screen.getByRole('button', { name: /ciao/i });
+      const button = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       expect(button).toBeInTheDocument();
-      expect(screen.getByText('Ciao')).toBeInTheDocument();
+      expect(screen.getByText(getTranslation('common.userMenu.greeting'))).toBeInTheDocument();
       expect(screen.getByText('Mario')).toBeInTheDocument();
     });
 
@@ -63,7 +66,7 @@ describe('UserMenuDropdown', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
       // Check that both greeting and username are present
-      const greeting = screen.getByText('Ciao');
+      const greeting = screen.getByText(getTranslation('common.userMenu.greeting'));
       const userName = screen.getByText('Mario');
 
       expect(greeting).toBeInTheDocument();
@@ -74,7 +77,9 @@ describe('UserMenuDropdown', () => {
     it('renders User icon when userName is not provided', () => {
       render(<UserMenuDropdown />);
 
-      const button = screen.getByRole('button', { name: /ciao/i });
+      const button = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       expect(button).toBeInTheDocument();
 
       // Check for User icon (lucide-react User component)
@@ -86,15 +91,19 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       // All 4 menu items should be visible
       await waitFor(() => {
-        expect(screen.getByText('Profilo')).toBeInTheDocument();
-        expect(screen.getByText('Cambia Password')).toBeInTheDocument();
-        expect(screen.getByText('Impostazioni')).toBeInTheDocument();
-        expect(screen.getByText('Esci')).toBeInTheDocument();
+        expect(screen.getByText(getTranslation('common.userMenu.profile'))).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslation('common.userMenu.changePassword')),
+        ).toBeInTheDocument();
+        expect(screen.getByText(getTranslation('common.userMenu.settings'))).toBeInTheDocument();
+        expect(screen.getByText(getTranslation('common.userMenu.logout'))).toBeInTheDocument();
       });
     });
 
@@ -102,7 +111,9 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       // Check that each menu item has an icon (svg)
@@ -121,10 +132,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const profileItem = await screen.findByText('Profilo');
+      const profileItem = await screen.findByText(getTranslation('common.userMenu.profile'));
       await user.click(profileItem);
 
       await waitFor(() => {
@@ -136,10 +149,14 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const changePasswordItem = await screen.findByText('Cambia Password');
+      const changePasswordItem = await screen.findByText(
+        getTranslation('common.userMenu.changePassword'),
+      );
       await user.click(changePasswordItem);
 
       await waitFor(() => {
@@ -151,10 +168,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const settingsItem = await screen.findByText('Impostazioni');
+      const settingsItem = await screen.findByText(getTranslation('common.userMenu.settings'));
       await user.click(settingsItem);
 
       await waitFor(() => {
@@ -168,10 +187,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       await user.click(logoutItem);
 
       await waitFor(() => {
@@ -185,10 +206,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       await user.click(logoutItem);
 
       await waitFor(() => {
@@ -202,10 +225,12 @@ describe('UserMenuDropdown', () => {
 
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       await user.click(logoutItem);
 
       await waitFor(() => {
@@ -228,10 +253,12 @@ describe('UserMenuDropdown', () => {
 
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       const menuItem = logoutItem.closest('[role="menuitem"]');
 
       await user.click(logoutItem);
@@ -260,10 +287,12 @@ describe('UserMenuDropdown', () => {
 
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
 
       // Click multiple times rapidly
       await user.click(logoutItem);
@@ -287,10 +316,12 @@ describe('UserMenuDropdown', () => {
 
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       await user.click(logoutItem);
 
       await waitFor(() => {
@@ -306,7 +337,9 @@ describe('UserMenuDropdown', () => {
     it('trigger button is keyboard focusable', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       trigger.focus();
 
       expect(document.activeElement).toBe(trigger);
@@ -316,12 +349,14 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       // Menu should be open
       await waitFor(() => {
-        expect(screen.getByText('Profilo')).toBeInTheDocument();
+        expect(screen.getByText(getTranslation('common.userMenu.profile'))).toBeInTheDocument();
       });
 
       // Press Escape
@@ -329,7 +364,9 @@ describe('UserMenuDropdown', () => {
 
       // Menu should be closed (items not visible)
       await waitFor(() => {
-        expect(screen.queryByText('Profilo')).not.toBeInTheDocument();
+        expect(
+          screen.queryByText(getTranslation('common.userMenu.profile')),
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -337,7 +374,9 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       await waitFor(async () => {
@@ -353,10 +392,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const profileItem = await screen.findByText('Profilo');
+      const profileItem = await screen.findByText(getTranslation('common.userMenu.profile'));
       const menuItem = profileItem.closest<HTMLElement>('[role="menuitem"]');
 
       // Focus and press Enter on profile item
@@ -375,15 +416,19 @@ describe('UserMenuDropdown', () => {
     it('trigger button has aria-label', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
-      expect(trigger).toHaveAttribute('aria-label', 'Ciao');
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
+      expect(trigger).toHaveAttribute('aria-label', getTranslation('common.userMenu.greeting'));
     });
 
     it('menu items have proper role attributes', async () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       await waitFor(() => {
@@ -399,7 +444,9 @@ describe('UserMenuDropdown', () => {
     it('has focus indicators on interactive elements', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
 
       // Trigger should have focus styles
       expect(trigger.className).toContain('focus:outline-none');
@@ -410,7 +457,9 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       await waitFor(() => {
@@ -426,10 +475,12 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText('Esci');
+      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
       const menuItem = logoutItem.closest('[role="menuitem"]');
 
       // Logout should have red/danger styling
@@ -441,14 +492,18 @@ describe('UserMenuDropdown', () => {
     it('applies custom className to trigger button', () => {
       render(<UserMenuDropdown userName="Mario" className="custom-class" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       expect(trigger.className).toContain('custom-class');
     });
 
     it('has hover states on trigger button', () => {
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       expect(trigger.className).toContain('hover:bg-slate-100');
     });
 
@@ -456,7 +511,9 @@ describe('UserMenuDropdown', () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
-      const trigger = screen.getByRole('button', { name: /ciao/i });
+      const trigger = screen.getByRole('button', {
+        name: getTranslationRegex('common.userMenu.greeting'),
+      });
       await user.click(trigger);
 
       await waitFor(() => {

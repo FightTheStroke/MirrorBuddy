@@ -204,9 +204,9 @@
       "bookmarked": "Bookmarked"
     },
     "knowledgeHub": {
-      "errorMessageDefault": "Error message default",
-      "errorMessageWithType": "Error message with type",
-      "errorTitle": "Error title",
+      "errorMessageDefault": "Impossibile visualizzare questo materiale.",
+      "errorMessageWithType": "Impossibile visualizzare il materiale di tipo \"{type}\".",
+      "errorTitle": "Errore di visualizzazione",
       "explorerView": {
         "allMaterials": "All materials",
         "allMaterialsAriaLabel": "All materials aria label",
@@ -283,7 +283,10 @@
         "move": "Move",
         "open": "Apri"
       },
-      "retryButton": "Retry button",
+      "quickActions": {
+        "uploadFile": "Carica file"
+      },
+      "retryButton": "Riprova",
       "sidebar": {
         "archived": "Archived",
         "collectionsAriaLabel": "Collections aria label",
@@ -760,7 +763,7 @@
       "correctAnswers": "Correct answers",
       "excellent": "Excellent",
       "keepPracticing": "Keep practicing",
-      "retryButton": "Retry button"
+      "retryButton": "Riprova"
     },
     "quizHeader": {
       "correctCount": "Correct count",

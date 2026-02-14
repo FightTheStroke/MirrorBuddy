@@ -4,18 +4,18 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { SettingsPageMobile } from "../settings-page-mobile";
-import { getTranslation } from "@/test/i18n-helpers";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { SettingsPageMobile } from '../settings-page-mobile';
+import { getTranslation, getTranslationRegex } from '@/test/i18n-helpers';
 
 // Mock stores
-vi.mock("@/lib/stores", () => ({
+vi.mock('@/lib/stores', () => ({
   useSettingsStore: () => ({
-    studentProfile: { id: "1", name: "Test User" },
+    studentProfile: { id: '1', name: 'Test User' },
     updateStudentProfile: vi.fn(),
-    appearance: { theme: "light" },
+    appearance: { theme: 'light' },
     updateAppearance: vi.fn(),
     adaptiveDifficultyMode: false,
     setAdaptiveDifficultyMode: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock("@/lib/stores", () => ({
   }),
 }));
 
-vi.mock("@/lib/accessibility", () => ({
+vi.mock('@/lib/accessibility', () => ({
   useAccessibilityStore: () => ({
     settings: { dyslexiaMode: false },
     updateSettings: vi.fn(),
@@ -31,13 +31,9 @@ vi.mock("@/lib/accessibility", () => ({
 }));
 
 // Mock all section components
-vi.mock("@/components/settings/sections", () => ({
-  ProfileSettings: () => (
-    <div data-testid="profile-section">Profile Settings</div>
-  ),
-  CharacterSettings: () => (
-    <div data-testid="character-section">Character Settings</div>
-  ),
+vi.mock('@/components/settings/sections', () => ({
+  ProfileSettings: () => <div data-testid="profile-section">Profile Settings</div>,
+  CharacterSettings: () => <div data-testid="character-section">Character Settings</div>,
   AccessibilityTab: () => <div>Accessibility Settings</div>,
   AppearanceSettings: () => <div>Appearance Settings</div>,
   NotificationSettings: () => <div>Notification Settings</div>,
@@ -49,23 +45,23 @@ vi.mock("@/components/settings/sections", () => ({
   MobileToolsSection: () => <div data-testid="tools-section">Mobile Tools</div>,
 }));
 
-vi.mock("@/components/google-drive", () => ({
+vi.mock('@/components/google-drive', () => ({
   GoogleAccountCard: () => <div>Google Account Card</div>,
 }));
 
-vi.mock("@/components/settings/onboarding-settings", () => ({
+vi.mock('@/components/settings/onboarding-settings', () => ({
   OnboardingSettings: () => <div>Onboarding Settings</div>,
 }));
 
-vi.mock("@/components/telemetry", () => ({
+vi.mock('@/components/telemetry', () => ({
   TelemetryDashboard: () => <div>Telemetry Dashboard</div>,
 }));
 
-vi.mock("@/lib/hooks/use-saved-materials/utils/user-id", () => ({
-  getUserId: () => "test-user-id",
+vi.mock('@/lib/hooks/use-saved-materials/utils/user-id', () => ({
+  getUserId: () => 'test-user-id',
 }));
 
-vi.mock("@/components/settings/settings-sections-mobile", () => ({
+vi.mock('@/components/settings/settings-sections-mobile', () => ({
   SettingsSectionsMobile: ({ sections }: any) => (
     <div data-testid="settings-sections">
       {sections.map((section: any) => (
@@ -85,60 +81,58 @@ vi.mock("@/components/settings/settings-sections-mobile", () => ({
   ),
 }));
 
-describe("SettingsPageMobile", () => {
+describe('SettingsPageMobile', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("renders the mobile page with header", () => {
+  it('renders the mobile page with header', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
-    const header = container.querySelector("header");
+    const header = container.querySelector('header');
     expect(header).toBeInTheDocument();
   });
 
-  it("renders title in header", () => {
+  it('renders title in header', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
-    expect(
-      screen.getByText(getTranslation("settings.title")),
-    ).toBeInTheDocument();
+    expect(screen.getByText(getTranslation('settings.title'))).toBeInTheDocument();
   });
 
-  it("calls onBack when back button is clicked", async () => {
+  it('calls onBack when back button is clicked', async () => {
     const mockOnBack = vi.fn();
     render(<SettingsPageMobile onBack={mockOnBack} />);
 
-    const backButton = screen.getByRole("button", { name: /back|indietro/i });
+    const backButton = screen.getByRole('button', { name: getTranslationRegex('common.back') });
     await userEvent.click(backButton);
 
     expect(mockOnBack).toHaveBeenCalledTimes(1);
   });
 
-  it("renders SettingsSectionsMobile component", () => {
+  it('renders SettingsSectionsMobile component', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
-    const sectionsContainer = screen.getByTestId("settings-sections");
+    const sectionsContainer = screen.getByTestId('settings-sections');
     expect(sectionsContainer).toBeInTheDocument();
   });
 
-  it("renders all settings sections", () => {
+  it('renders all settings sections', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
     // Check that sections container is rendered with section elements
-    const sectionsContainer = screen.getByTestId("settings-sections");
+    const sectionsContainer = screen.getByTestId('settings-sections');
     expect(sectionsContainer).toBeInTheDocument();
     // Verify multiple section elements exist
-    const sections = sectionsContainer.querySelectorAll("[data-section-id]");
+    const sections = sectionsContainer.querySelectorAll('[data-section-id]');
     expect(sections.length).toBeGreaterThan(0);
   });
 
-  it("renders section headers with icons", () => {
+  it('renders section headers with icons', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const sectionButtons = screen.getAllByRole("button");
+    const sectionButtons = screen.getAllByRole('button');
     // Should have back button + save button + 14 section headers
     expect(sectionButtons.length).toBeGreaterThanOrEqual(14);
   });
 
-  it("has full-width responsive layout", () => {
+  it('has full-width responsive layout', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
     const mainDiv = container.firstElementChild;
@@ -147,78 +141,78 @@ describe("SettingsPageMobile", () => {
     expect(mainDiv?.className).toMatch(/flex-col/);
   });
 
-  it("has dark mode support", () => {
+  it('has dark mode support', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
     const mainDiv = container.firstElementChild;
     expect(mainDiv?.className).toMatch(/dark:/);
   });
 
-  it("has safe area padding for iOS notch", () => {
+  it('has safe area padding for iOS notch', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
     const mainDiv = container.firstElementChild;
     expect(mainDiv?.className).toMatch(/pt-\[env\(safe-area-inset-top\)\]/);
   });
 
-  it("has scrollable content area", () => {
+  it('has scrollable content area', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const scrollableDiv = container.querySelector(".overflow-y-auto");
+    const scrollableDiv = container.querySelector('.overflow-y-auto');
     expect(scrollableDiv).toBeInTheDocument();
   });
 
-  it("has sticky header with proper classes", () => {
+  it('has sticky header with proper classes', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const header = container.querySelector("header");
+    const header = container.querySelector('header');
     expect(header?.className).toMatch(/sticky/);
     expect(header?.className).toMatch(/top-0/);
     expect(header?.className).toMatch(/z-40/);
   });
 
-  it("back button has proper touch target size", () => {
+  it('back button has proper touch target size', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const backButton = screen.getByRole("button", { name: /back|indietro/i });
+    const backButton = screen.getByRole('button', { name: getTranslationRegex('common.back') });
     expect(backButton.className).toMatch(/min-w-\[44px\]/);
     expect(backButton.className).toMatch(/min-h-\[44px\]/);
   });
 
-  it("renders save button in header", () => {
+  it('renders save button in header', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
     // Find save button by test-id or structure instead of translated text
-    const header = document.querySelector("header");
-    const buttons = header?.querySelectorAll("button") || [];
+    const header = document.querySelector('header');
+    const buttons = header?.querySelectorAll('button') || [];
     // Should have back button and save button
     expect(buttons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("has responsive container with px-4 and py-6", () => {
+  it('has responsive container with px-4 and py-6', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const contentDiv = container.querySelector(".overflow-y-auto");
+    const contentDiv = container.querySelector('.overflow-y-auto');
     expect(contentDiv?.className).toMatch(/px-4/);
     expect(contentDiv?.className).toMatch(/py-6/);
   });
 
-  it("renders sections with proper structure", () => {
+  it('renders sections with proper structure', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const profileSection = screen.getByTestId("profile-section");
+    const profileSection = screen.getByTestId('profile-section');
     expect(profileSection).toBeInTheDocument();
-    expect(profileSection).toHaveTextContent("Profile Settings");
+    expect(profileSection).toHaveTextContent('Profile Settings');
   });
 
-  it("header is hidden on desktop (sm:hidden class)", () => {
+  it('header is hidden on desktop (sm:hidden class)', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const header = container.querySelector("header");
+    const header = container.querySelector('header');
     expect(header?.className).toMatch(/sm:hidden/);
   });
 
-  it("has proper animation setup", () => {
+  it('has proper animation setup', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
     // Check for motion components or animation classes
@@ -226,17 +220,17 @@ describe("SettingsPageMobile", () => {
     expect(mainDiv).toBeTruthy();
   });
 
-  it("renders profile and character sections for testing", () => {
+  it('renders profile and character sections for testing', () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    expect(screen.getByTestId("profile-section")).toBeInTheDocument();
-    expect(screen.getByTestId("character-section")).toBeInTheDocument();
+    expect(screen.getByTestId('profile-section')).toBeInTheDocument();
+    expect(screen.getByTestId('character-section')).toBeInTheDocument();
   });
 
-  it("has pb-20 padding for bottom spacing", () => {
+  it('has pb-20 padding for bottom spacing', () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const contentDiv = container.querySelector(".overflow-y-auto");
+    const contentDiv = container.querySelector('.overflow-y-auto');
     expect(contentDiv?.className).toMatch(/pb-20/);
   });
 });

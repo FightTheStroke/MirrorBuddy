@@ -94,6 +94,12 @@
     "notificatoAutomaticamente": "notificato automaticamente.",
     "riprova": "Riprova",
     "tornaAllaHome": "Torna alla home",
+    "errorPage": {
+      "title": "Qualcosa è andato storto",
+      "message": "Si è verificato un errore durante il caricamento della pagina. Puoi riprovare o tornare alla pagina precedente.",
+      "retryButton": "Riprova",
+      "backButton": "Torna indietro"
+    },
     "somethingWentWrong": "Something went wrong",
     "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
     "retry": "Retry"

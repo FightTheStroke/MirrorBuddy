@@ -122,9 +122,9 @@
       "bookmarked": "Bookmarked"
     },
     "knowledgeHub": {
-      "errorMessageDefault": "Error message default",
-      "errorMessageWithType": "Error message with type",
-      "errorTitle": "Error title",
+      "errorMessageDefault": "Dieses Material kann nicht angezeigt werden.",
+      "errorMessageWithType": "Das Material vom Typ \"{type}\" kann nicht angezeigt werden.",
+      "errorTitle": "Anzeigefehler",
       "explorerView": {
         "allMaterials": "All materials",
         "allMaterialsAriaLabel": "All materials aria label",
@@ -160,7 +160,7 @@
         "move": "Move",
         "open": "Apri"
       },
-      "retryButton": "Retry button",
+      "retryButton": "Erneut versuchen",
       "sidebar": {
         "archived": "Archived",
         "collectionsAriaLabel": "Collections aria label",
@@ -273,7 +273,10 @@
       "arialabelcartaPrecedente": "[TRANSLATE] aria-label=\"Carta precedente\"",
       "knowledgeHub": "Knowledge Hub",
       "scadenza": "Scadenza:",
-      "note": "Note:"
+      "note": "Note:",
+      "quickActions": {
+        "uploadFile": "Upload file"
+      }
     },
     "quiz": {
       "comingSoon": "Coming Soon",

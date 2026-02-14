@@ -11,6 +11,10 @@
 # =============================================================================
 set -uo pipefail
 
+SCRIPT_DIR_PR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/build-lock.sh
+source "$SCRIPT_DIR_PR/lib/build-lock.sh"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -165,11 +169,14 @@ echo ""
 echo -e "${BLUE}[PHASE 3] Production build...${NC}"
 
 # Next.js automatically uses available cores
+acquire_build_lock
 if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
+    release_build_lock
     echo -e "${RED}✗ Build failed${NC}"
     cat "$TEMP_DIR/build.log"
     exit 1
 fi
+release_build_lock
 echo -e "${GREEN}✓ Build successful${NC}"
 
 PHASE3_TIME=$(date +%s)

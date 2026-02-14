@@ -18,10 +18,10 @@
  * ```
  */
 
-import { screen } from "@testing-library/react";
-import { expect } from "vitest";
-import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
+import { screen } from '@testing-library/react';
+import { expect } from 'vitest';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 // Deep merge utility (same as setup.ts)
 function deepMerge(
@@ -34,8 +34,8 @@ function deepMerge(
     if (
       tVal &&
       sVal &&
-      typeof tVal === "object" &&
-      typeof sVal === "object" &&
+      typeof tVal === 'object' &&
+      typeof sVal === 'object' &&
       !Array.isArray(tVal) &&
       !Array.isArray(sVal)
     ) {
@@ -50,24 +50,25 @@ function deepMerge(
   return target;
 }
 
-// Load all Italian messages (cached)
-let cachedMessages: Record<string, unknown> | null = null;
+// Load messages for a given locale (cached per locale)
+const messagesByLocale: Record<string, Record<string, unknown>> = {};
 
-function loadMessages(): Record<string, unknown> {
-  if (cachedMessages) return cachedMessages;
+function loadMessages(locale = 'it'): Record<string, unknown> {
+  if (messagesByLocale[locale]) return messagesByLocale[locale];
 
-  const localeDir = join(process.cwd(), "messages", "it");
-  const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
+  const localeDir = join(process.cwd(), 'messages', locale);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- safe: controlled path from project messages directory
+  const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
   const merged: Record<string, unknown> = {};
 
   for (const file of files) {
     const filePath = join(localeDir, file);
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const content = readFileSync(filePath, "utf-8");
+    const content = readFileSync(filePath, 'utf-8');
     deepMerge(merged, JSON.parse(content));
   }
 
-  cachedMessages = merged;
+  messagesByLocale[locale] = merged;
   return merged;
 }
 
@@ -81,10 +82,7 @@ function kebabToCamel(str: string): string {
 /**
  * Tries to find a key in an object, attempting both kebab-case and camelCase.
  */
-function findKey(
-  obj: Record<string, unknown>,
-  key: string,
-): [unknown, boolean] {
+function findKey(obj: Record<string, unknown>, key: string): [unknown, boolean] {
   if (key in obj) return [obj[key], true];
   const camelKey = kebabToCamel(key);
   if (camelKey in obj) return [obj[camelKey], true];
@@ -96,25 +94,28 @@ function findKey(
  *
  * @param key - Dot-separated key path (e.g., "common.save", "admin.tiers.form.limits")
  * @param values - Optional interpolation values (e.g., { count: 5 })
+ * @param locale - Optional locale (default: "it")
  * @returns The translated string, or the key if not found
  *
  * @example
  * ```tsx
  * const text = getTranslation('common.save'); // "Salva"
  * const text = getTranslation('trial.remaining', { count: 5 }); // "5 rimanenti"
+ * const text = getTranslation('errors.errorPage.title', undefined, 'fr'); // French
  * ```
  */
 export function getTranslation(
   key: string,
   values?: Record<string, unknown>,
+  locale?: string,
 ): string {
-  const messages = loadMessages();
-  const parts = key.split(".");
+  const messages = loadMessages(locale);
+  const parts = key.split('.');
 
   let current: unknown = messages;
 
   for (const part of parts) {
-    if (current && typeof current === "object") {
+    if (current && typeof current === 'object') {
       const [value, found] = findKey(current as Record<string, unknown>, part);
       if (found) {
         current = value;
@@ -128,7 +129,7 @@ export function getTranslation(
     }
   }
 
-  if (typeof current !== "string") {
+  if (typeof current !== 'string') {
     // Key is not a string - return key as fallback (silent in test env)
     return key;
   }
@@ -156,10 +157,7 @@ export function getTranslation(
  * fireEvent.click(button);
  * ```
  */
-export function getByTranslation(
-  key: string,
-  values?: Record<string, unknown>,
-): HTMLElement {
+export function getByTranslation(key: string, values?: Record<string, unknown>): HTMLElement {
   const text = getTranslation(key, values);
   return screen.getByText(text);
 }
@@ -187,10 +185,7 @@ export function queryByTranslation(
  * expectElementWithTranslation('trial.remaining', { count: 5 });
  * ```
  */
-export function expectElementWithTranslation(
-  key: string,
-  values?: Record<string, unknown>,
-): void {
+export function expectElementWithTranslation(key: string, values?: Record<string, unknown>): void {
   const text = getTranslation(key, values);
   expect(screen.getByText(text)).toBeInTheDocument();
 }
@@ -211,6 +206,7 @@ export function expectNoElementWithTranslation(
  *
  * @param key - Dot-separated key path
  * @param flags - Regex flags (default: "i" for case-insensitive)
+ * @param locale - Optional locale (default: "it")
  *
  * @example
  * ```tsx
@@ -218,10 +214,10 @@ export function expectNoElementWithTranslation(
  * expect(screen.getByText(regex)).toBeInTheDocument();
  * ```
  */
-export function getTranslationRegex(key: string, flags = "i"): RegExp {
-  const text = getTranslation(key);
+export function getTranslationRegex(key: string, flags = 'i', locale?: string): RegExp {
+  const text = getTranslation(key, undefined, locale);
   // Escape special regex characters
-  const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   // eslint-disable-next-line security/detect-non-literal-regexp -- safe: escaped translation text for testing
   return new RegExp(escaped, flags);
 }
@@ -229,14 +225,14 @@ export function getTranslationRegex(key: string, flags = "i"): RegExp {
 /**
  * Check if a translation key exists in the messages.
  */
-export function hasTranslation(key: string): boolean {
-  const messages = loadMessages();
-  const parts = key.split(".");
+export function hasTranslation(key: string, locale?: string): boolean {
+  const messages = loadMessages(locale);
+  const parts = key.split('.');
 
   let current: unknown = messages;
 
   for (const part of parts) {
-    if (current && typeof current === "object") {
+    if (current && typeof current === 'object') {
       const [value, found] = findKey(current as Record<string, unknown>, part);
       if (found) {
         current = value;
@@ -248,5 +244,5 @@ export function hasTranslation(key: string): boolean {
     }
   }
 
-  return typeof current === "string";
+  return typeof current === 'string';
 }

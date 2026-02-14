@@ -508,6 +508,59 @@ const eslintConfig = defineConfig([
       "local-rules/enforce-dependency-direction": "warn",
     },
   },
+  // ADR 0130: Enforce AI provider router - no direct provider imports
+  // Use aiRouter from "@/lib/ai/providers/router" for automatic failover
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "src/lib/ai/providers/**/*.ts", // Provider implementations and router
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-direct-ai-provider": "error",
+    },
+  },
+  // Prevent hardcoded Italian strings in test assertions
+  // Tests should use getTranslation() from @/test/i18n-helpers
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    ignores: [
+      "**/i18n-helpers*",
+      "**/i18n-check*",
+    ],
+    rules: {
+      "local-rules/no-hardcoded-strings-in-tests": "error",
+    },
+  },
+  // Plan 091: TODO/FIXME must reference a GitHub issue for tracking
+  // Project policy is zero TODOs; this catches untracked ones at commit time
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-todo-without-issue": "error",
+    },
+  },
+  // ADR 0128: Enforce media-bridge abstraction for camera/mic access
+  // Raw navigator.mediaDevices breaks on Capacitor native builds
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "src/lib/mobile/**/*.ts", // Media-bridge and Capacitor plugins
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/require-native-bridge": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;

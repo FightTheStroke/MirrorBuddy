@@ -7,13 +7,13 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { LocalePreviewSelector } from "../locale-preview-selector";
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LocalePreviewSelector } from '../locale-preview-selector';
 
 // Mock next/navigation
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
@@ -22,43 +22,43 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock next-intl
-vi.mock("next-intl", () => ({
+vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
-      previewLabel: "Preview Mode",
-      resetButton: "Reset",
+      previewLabel: 'Preview Mode',
+      resetButton: 'Reset',
     };
     return translations[key] || key;
   },
 }));
 
 // Mock useLocale hook
-vi.mock("@/hooks/use-locale", () => ({
+vi.mock('@/hooks/use-locale', () => ({
   useLocale: () => ({
-    locale: "it",
-    locales: ["it", "en", "fr", "de", "es"],
+    locale: 'it',
+    locales: ['it', 'en', 'fr', 'de', 'es'],
     localeNames: {
-      it: "Italiano",
-      en: "English",
-      fr: "Français",
-      de: "Deutsch",
-      es: "Español",
+      it: 'Italiano',
+      en: 'English',
+      fr: 'Français',
+      de: 'Deutsch',
+      es: 'Español',
     },
     localeFlags: {
-      it: "🇮🇹",
-      en: "🇬🇧",
-      fr: "🇫🇷",
-      de: "🇩🇪",
-      es: "🇪🇸",
+      it: '🇮🇹',
+      en: '🇬🇧',
+      fr: '🇫🇷',
+      de: '🇩🇪',
+      es: '🇪🇸',
     },
     switchLocale: vi.fn(),
   }),
 }));
 
-describe("LocalePreviewSelector", () => {
+describe('LocalePreviewSelector', () => {
   beforeEach(() => {
     // Setup: ensure sessionStorage is available
-    if (typeof sessionStorage === "undefined") {
+    if (typeof sessionStorage === 'undefined') {
       const store: Record<string, string> = {};
       global.sessionStorage = {
         getItem: (key: string) => store[key] || null,
@@ -82,87 +82,87 @@ describe("LocalePreviewSelector", () => {
     vi.clearAllMocks();
   });
 
-  it("renders a dropdown with all supported locales", () => {
+  it('renders a dropdown with all supported locales', () => {
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox", {
+    const select = screen.getByRole('combobox', {
       name: /preview language|anteprima lingua/i,
     });
     expect(select).toBeInTheDocument();
 
     // Check that all locales are available as options
-    const options = screen.getAllByRole("option");
+    const options = screen.getAllByRole('option');
     expect(options).toHaveLength(5); // 5 locales
   });
 
-  it("shows the current locale as selected by default", () => {
+  it('shows the current locale as selected by default', () => {
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
-    expect(select.value).toBe("it"); // Default locale from mock
+    const select = screen.getByRole('combobox') as HTMLSelectElement;
+    expect(select.value).toBe('it'); // Default locale from mock
   });
 
-  it("updates preview locale when user selects a different option", async () => {
+  it('updates preview locale when user selects a different option', async () => {
     const user = userEvent.setup();
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    const select = screen.getByRole('combobox') as HTMLSelectElement;
 
     // Change to French
-    await user.selectOptions(select, "fr");
+    await user.selectOptions(select, 'fr');
 
     // Session storage should be updated
-    expect(sessionStorage.getItem("admin_preview_locale")).toBe("fr");
+    expect(sessionStorage.getItem('admin_preview_locale')).toBe('fr');
   });
 
-  it("shows locale flag emoji next to locale names", () => {
+  it('shows locale flag emoji next to locale names', () => {
     render(<LocalePreviewSelector />);
 
     // Check for flag emojis in the rendered output
-    const select = screen.getByRole("combobox");
+    const select = screen.getByRole('combobox');
     const container = select.parentElement;
-    expect(container?.textContent).toContain("🇮🇹"); // Italian flag
-    expect(container?.textContent).toContain("🇬🇧"); // British flag
-    expect(container?.textContent).toContain("🇫🇷"); // French flag
+    expect(container?.textContent).toContain('🇮🇹'); // Italian flag
+    expect(container?.textContent).toContain('🇬🇧'); // British flag
+    expect(container?.textContent).toContain('🇫🇷'); // French flag
   });
 
-  it("clears preview locale when returning to current locale", async () => {
+  it('clears preview locale when returning to current locale', async () => {
     const user = userEvent.setup();
 
     // First, set a preview locale
-    sessionStorage.setItem("admin_preview_locale", "es");
+    sessionStorage.setItem('admin_preview_locale', 'es');
 
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
+    const select = screen.getByRole('combobox') as HTMLSelectElement;
 
     // Switch back to current locale (it)
-    await user.selectOptions(select, "it");
+    await user.selectOptions(select, 'it');
 
     // Preview locale should be cleared
-    expect(sessionStorage.getItem("admin_preview_locale")).toBeNull();
+    expect(sessionStorage.getItem('admin_preview_locale')).toBeNull();
   });
 
-  it("has a reset button to clear preview locale", async () => {
+  it('has a reset button to clear preview locale', async () => {
     const user = userEvent.setup();
 
     // Set a preview locale
-    sessionStorage.setItem("admin_preview_locale", "fr");
+    sessionStorage.setItem('admin_preview_locale', 'fr');
 
     render(<LocalePreviewSelector />);
 
-    const resetButton = screen.getByRole("button", {
-      name: /reset|clear|ripristina/i,
+    const resetButton = screen.getByRole('button', {
+      name: /reset|clear/i,
     });
 
     await user.click(resetButton);
 
     // Preview locale should be cleared
-    expect(sessionStorage.getItem("admin_preview_locale")).toBeNull();
+    expect(sessionStorage.getItem('admin_preview_locale')).toBeNull();
   });
 
-  it("displays a visual indicator when preview locale is active", () => {
-    sessionStorage.setItem("admin_preview_locale", "fr");
+  it('displays a visual indicator when preview locale is active', () => {
+    sessionStorage.setItem('admin_preview_locale', 'fr');
 
     render(<LocalePreviewSelector />);
 
@@ -171,34 +171,28 @@ describe("LocalePreviewSelector", () => {
     expect(indicator).toBeInTheDocument();
   });
 
-  it("includes an accessibility label for screen readers", () => {
+  it('includes an accessibility label for screen readers', () => {
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox", {
-      name: /preview language|anteprima lingua|seleziona locale per anteprima/i,
+    const select = screen.getByRole('combobox', {
+      name: /preview language/i,
     });
     expect(select).toBeInTheDocument();
   });
 
-  it("dispatches custom event when preview locale changes", async () => {
+  it('dispatches custom event when preview locale changes', async () => {
     const user = userEvent.setup();
     const eventListener = vi.fn();
 
-    window.addEventListener(
-      "admin_locale_preview_changed",
-      eventListener as EventListener,
-    );
+    window.addEventListener('admin_locale_preview_changed', eventListener as EventListener);
 
     render(<LocalePreviewSelector />);
 
-    const select = screen.getByRole("combobox") as HTMLSelectElement;
-    await user.selectOptions(select, "de");
+    const select = screen.getByRole('combobox') as HTMLSelectElement;
+    await user.selectOptions(select, 'de');
 
     expect(eventListener).toHaveBeenCalled();
 
-    window.removeEventListener(
-      "admin_locale_preview_changed",
-      eventListener as EventListener,
-    );
+    window.removeEventListener('admin_locale_preview_changed', eventListener as EventListener);
   });
 });

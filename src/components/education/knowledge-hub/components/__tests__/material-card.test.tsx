@@ -8,6 +8,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 // next-intl mock handled by global test setup (src/test/setup.ts)
 
 import { MaterialCard, Material } from '../material-card';
+import { getTranslationRegex } from '@/test/i18n-helpers';
 
 const mockMaterial: Material = {
   id: 'mat1',
@@ -246,7 +247,11 @@ describe('MaterialCard', () => {
 
       fireEvent.click(screen.getByLabelText('Altre azioni'));
 
-      expect(screen.getByRole('menuitem', { name: /apri/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', {
+          name: getTranslationRegex('education.knowledgeHub.materialMenu.open'),
+        }),
+      ).toBeInTheDocument();
     });
 
     it('should show Duplicate option when onDuplicate is provided', () => {
@@ -270,7 +275,11 @@ describe('MaterialCard', () => {
 
       fireEvent.click(screen.getByLabelText('Altre azioni'));
 
-      expect(screen.getByRole('menuitem', { name: /elimina/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('menuitem', {
+          name: getTranslationRegex('education.knowledgeHub.materialMenu.delete'),
+        }),
+      ).toBeInTheDocument();
     });
 
     it('should call action and close menu when option clicked', () => {
@@ -278,7 +287,11 @@ describe('MaterialCard', () => {
       render(<MaterialCard material={mockMaterial} onDelete={onDelete} />);
 
       fireEvent.click(screen.getByLabelText('Altre azioni'));
-      fireEvent.click(screen.getByRole('menuitem', { name: /elimina/i }));
+      fireEvent.click(
+        screen.getByRole('menuitem', {
+          name: getTranslationRegex('education.knowledgeHub.materialMenu.delete'),
+        }),
+      );
 
       expect(onDelete).toHaveBeenCalledWith('mat1');
       expect(screen.queryByRole('menu')).not.toBeInTheDocument();

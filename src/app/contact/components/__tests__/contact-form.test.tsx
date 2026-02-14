@@ -3,29 +3,30 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { ContactForm } from "../contact-form";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ContactForm } from '../contact-form';
+import { getTranslationRegex } from '@/test/i18n-helpers';
 
 // Mock csrfFetch
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth")>();
+vi.mock('@/lib/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth')>();
   return {
     ...actual,
     csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
   };
 });
 
-describe("ContactForm", () => {
+describe('ContactForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockCsrfFetch.mockReset();
   });
 
-  describe("Rendering", () => {
-    it("renders all form fields", () => {
+  describe('Rendering', () => {
+    it('renders all form fields', () => {
       render(<ContactForm />);
 
       expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
@@ -34,14 +35,16 @@ describe("ContactForm", () => {
       expect(screen.getByLabelText(/messaggio/i)).toBeInTheDocument();
     });
 
-    it("renders submit button", () => {
+    it('renders submit button', () => {
       render(<ContactForm />);
       expect(
-        screen.getByRole("button", { name: /invia/i }),
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+        }),
       ).toBeInTheDocument();
     });
 
-    it("renders required indicators for all fields", () => {
+    it('renders required indicators for all fields', () => {
       render(<ContactForm />);
 
       const labels = screen.getAllByText(/\*/);
@@ -49,38 +52,46 @@ describe("ContactForm", () => {
     });
   });
 
-  describe("Validation", () => {
-    it("shows error when submitting empty form", async () => {
+  describe('Validation', () => {
+    it('shows error when submitting empty form', async () => {
       const user = userEvent.setup();
       render(<ContactForm />);
 
-      const submitButton = screen.getByRole("button", { name: /invia/i });
+      const submitButton = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+      });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/il nome è obbligatorio/i)).toBeInTheDocument();
-        expect(screen.getByText(/l'email è obbligatoria/i)).toBeInTheDocument();
         expect(
-          screen.getByText(/l'oggetto è obbligatorio/i),
+          screen.getByText(getTranslationRegex('compliance.contact.form.nameRequired')),
         ).toBeInTheDocument();
         expect(
-          screen.getByText(/il messaggio è obbligatorio/i),
+          screen.getByText(getTranslationRegex('compliance.contact.form.emailRequired')),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslationRegex('compliance.contact.form.subjectRequired')),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslationRegex('compliance.contact.form.messageRequired')),
         ).toBeInTheDocument();
       });
     });
 
-    it("prevents form submission with invalid email", async () => {
+    it('prevents form submission with invalid email', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockClear();
       render(<ContactForm />);
 
       // Fill fields with invalid email
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "invalid-email");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'invalid-email');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test');
 
-      const submitButton = screen.getByRole("button", { name: /invia/i });
+      const submitButton = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+      });
       await user.click(submitButton);
 
       // Verify form did not submit (no fetch call)
@@ -89,30 +100,34 @@ describe("ContactForm", () => {
       });
     });
 
-    it("clears error messages when field is filled", async () => {
+    it('clears error messages when field is filled', async () => {
       const user = userEvent.setup();
       render(<ContactForm />);
 
-      const submitButton = screen.getByRole("button", { name: /invia/i });
+      const submitButton = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+      });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/il nome è obbligatorio/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslationRegex('compliance.contact.form.nameRequired')),
+        ).toBeInTheDocument();
       });
 
       const nameInput = screen.getByLabelText(/nome/i);
-      await user.type(nameInput, "John Doe");
+      await user.type(nameInput, 'John Doe');
 
       await waitFor(() => {
         expect(
-          screen.queryByText(/il nome è obbligatorio/i),
+          screen.queryByText(getTranslationRegex('compliance.contact.form.nameRequired')),
         ).not.toBeInTheDocument();
       });
     });
   });
 
-  describe("Submission", () => {
-    it("posts to /api/contact with form data", async () => {
+  describe('Submission', () => {
+    it('posts to /api/contact with form data', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
@@ -121,31 +136,32 @@ describe("ContactForm", () => {
 
       render(<ContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "john@example.com");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test Subject");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test message");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'john@example.com');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test Subject');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test message');
 
-      await user.click(screen.getByRole("button", { name: /invia/i }));
+      await user.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+        }),
+      );
 
       await waitFor(() => {
-        expect(mockCsrfFetch).toHaveBeenCalledWith(
-          "/api/contact",
-          expect.any(Object),
-        );
+        expect(mockCsrfFetch).toHaveBeenCalledWith('/api/contact', expect.any(Object));
       });
 
       const callArgs = mockCsrfFetch.mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
 
-      expect(body.name).toBe("John Doe");
-      expect(body.email).toBe("john@example.com"); // Trimmed and lowercased
-      expect(body.subject).toBe("Test Subject");
-      expect(body.message).toBe("Test message");
-      expect(body.type).toBe("general");
+      expect(body.name).toBe('John Doe');
+      expect(body.email).toBe('john@example.com'); // Trimmed and lowercased
+      expect(body.subject).toBe('Test Subject');
+      expect(body.message).toBe('Test message');
+      expect(body.type).toBe('general');
     });
 
-    it("disables submit button while submitting", async () => {
+    it('disables submit button while submitting', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100)),
@@ -153,18 +169,20 @@ describe("ContactForm", () => {
 
       render(<ContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "john@example.com");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'john@example.com');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test');
 
-      const submitButton = screen.getByRole("button", { name: /invia/i });
+      const submitButton = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+      });
       await user.click(submitButton);
 
       expect(submitButton).toBeDisabled();
     });
 
-    it("shows success message after successful submission", async () => {
+    it('shows success message after successful submission', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
@@ -173,19 +191,23 @@ describe("ContactForm", () => {
 
       render(<ContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "john@example.com");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'john@example.com');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test');
 
-      await user.click(screen.getByRole("button", { name: /invia/i }));
+      await user.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+        }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText(/messaggio inviato/i)).toBeInTheDocument();
       });
     });
 
-    it("shows error message on submission failure", async () => {
+    it('shows error message on submission failure', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: false,
@@ -194,21 +216,27 @@ describe("ContactForm", () => {
 
       render(<ContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "john@example.com");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'john@example.com');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test');
 
-      await user.click(screen.getByRole("button", { name: /invia/i }));
+      await user.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+        }),
+      );
 
       await waitFor(() => {
-        expect(screen.getByText(/errore durante l'invio/i)).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslationRegex('compliance.contact.form.errorMessage')),
+        ).toBeInTheDocument();
       });
     });
   });
 
-  describe("Accessibility", () => {
-    it("has proper labels for all inputs", () => {
+  describe('Accessibility', () => {
+    it('has proper labels for all inputs', () => {
       render(<ContactForm />);
 
       expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
@@ -217,20 +245,22 @@ describe("ContactForm", () => {
       expect(screen.getByLabelText(/messaggio/i)).toBeInTheDocument();
     });
 
-    it("announces validation errors to screen readers", async () => {
+    it('announces validation errors to screen readers', async () => {
       const user = userEvent.setup();
       render(<ContactForm />);
 
-      const submitButton = screen.getByRole("button", { name: /invia/i });
+      const submitButton = screen.getByRole('button', {
+        name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+      });
       await user.click(submitButton);
 
       await waitFor(() => {
-        const errorMessages = screen.getAllByRole("alert");
+        const errorMessages = screen.getAllByRole('alert');
         expect(errorMessages.length).toBeGreaterThan(0);
       });
     });
 
-    it("manages focus after submission", async () => {
+    it('manages focus after submission', async () => {
       const user = userEvent.setup();
       (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
@@ -239,12 +269,16 @@ describe("ContactForm", () => {
 
       render(<ContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "John Doe");
-      await user.type(screen.getByLabelText(/email/i), "john@example.com");
-      await user.type(screen.getByLabelText(/oggetto/i), "Test");
-      await user.type(screen.getByLabelText(/messaggio/i), "Test");
+      await user.type(screen.getByLabelText(/nome/i), 'John Doe');
+      await user.type(screen.getByLabelText(/email/i), 'john@example.com');
+      await user.type(screen.getByLabelText(/oggetto/i), 'Test');
+      await user.type(screen.getByLabelText(/messaggio/i), 'Test');
 
-      await user.click(screen.getByRole("button", { name: /invia/i }));
+      await user.click(
+        screen.getByRole('button', {
+          name: getTranslationRegex('compliance.contact.form.submitButtonDefault'),
+        }),
+      );
 
       await waitFor(() => {
         const successMessage = screen.getByText(/messaggio inviato/i);

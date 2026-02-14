@@ -13,7 +13,9 @@ import requirePipeHandler from './require-pipe-handler.js';
 import requireCompleteLoggerMock from './require-complete-logger-mock.js';
 import noPlaintextPiiStorage from './no-plaintext-pii-storage.js';
 import requireEmailHashLookup from './require-email-hash-lookup.js';
+import noDirectAiProvider from './no-direct-ai-provider.js';
 import noDirectEmbedding from './no-direct-embedding.js';
+import noHardcodedStringsInTestsRule from './no-hardcoded-strings-in-tests.js';
 import noLoggerErrorContext from './no-logger-error-context.js';
 import noHardcodedCookies from './no-hardcoded-cookies.js';
 import requireCsrfFetch from './require-csrf-fetch.js';
@@ -22,6 +24,8 @@ import requireEventsourceCleanup from './require-eventsource-cleanup.js';
 import enforceModuleBoundaries from './enforce-module-boundaries.js';
 import enforceDependencyDirection from './enforce-dependency-direction.js';
 import noLiteralStringsInJsx from './no-literal-strings-in-jsx.js';
+import { noTodoWithoutIssue } from './no-todo-without-issue.js';
+import requireNativeBridge from './require-native-bridge.js';
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -358,6 +362,10 @@ const rules = {
   'enforce-module-boundaries': enforceModuleBoundaries,
   'enforce-dependency-direction': enforceDependencyDirection,
   'no-literal-strings-in-jsx': noLiteralStringsInJsx,
+  'no-direct-ai-provider': noDirectAiProvider,
+  'no-hardcoded-strings-in-tests': noHardcodedStringsInTestsRule,
+  'no-todo-without-issue': noTodoWithoutIssue,
+  'require-native-bridge': requireNativeBridge,
 };
 
 const localRules = {

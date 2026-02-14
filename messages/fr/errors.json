@@ -94,6 +94,12 @@
     "notificatoAutomaticamente": "notificato automaticamente.",
     "riprova": "Riprova",
     "tornaAllaHome": "Torna alla home",
+    "errorPage": {
+      "title": "Quelque chose s'est mal passé",
+      "message": "Une erreur s'est produite lors du chargement de la page. Vous pouvez réessayer ou revenir à la page précédente.",
+      "retryButton": "Réessayer",
+      "backButton": "Retour"
+    },
     "somethingWentWrong": "Something went wrong",
     "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
     "retry": "Retry"

@@ -9,6 +9,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChartGeneratorMobile } from '../chart-generator-mobile';
+import { getTranslationRegex } from '@/test/i18n-helpers';
 
 const stripMotionProps = (props: Record<string, unknown>) => {
   const {
@@ -179,7 +180,7 @@ describe('ChartGeneratorMobile', () => {
       });
 
       const deleteButton = screen.getByRole('button', {
-        name: /delete|remove|elimina/i,
+        name: getTranslationRegex('common.delete'),
       });
       await user.click(deleteButton);
 

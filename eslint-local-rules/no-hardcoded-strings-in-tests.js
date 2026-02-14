@@ -200,7 +200,7 @@ const noHardcodedStringsInTests = {
           const arg = node.arguments[0];
           if (isHardcodedItalianString(arg)) {
             const text =
-              arg.type === "Literal"
+              (arg.type === "Literal" && typeof arg.value === "string")
                 ? arg.value
                 : arg.quasis?.map((q) => q.value.cooked).join("") || "";
             context.report({
@@ -220,7 +220,7 @@ const noHardcodedStringsInTests = {
             );
             if (nameProp && isHardcodedItalianString(nameProp.value)) {
               const text =
-                nameProp.value.type === "Literal" ? nameProp.value.value : "";
+                (nameProp.value.type === "Literal" && typeof nameProp.value.value === "string") ? nameProp.value.value : "";
               context.report({
                 node: nameProp.value,
                 messageId: "hardcodedString",

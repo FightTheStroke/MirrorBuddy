@@ -3,12 +3,13 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import _userEvent from "@testing-library/user-event";
-import { LimitsSection } from "../limits-section";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import _userEvent from '@testing-library/user-event';
+import { LimitsSection } from '../limits-section';
+import { getTranslation } from '@/test/i18n-helpers';
 
-describe("LimitsSection", () => {
+describe('LimitsSection', () => {
   let mockOnChange: any;
 
   const defaultFormData = {
@@ -24,46 +25,30 @@ describe("LimitsSection", () => {
     mockOnChange = vi.fn();
   });
 
-  describe("Rendering", () => {
-    it("renders the component with title", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
-      expect(screen.getByText("Limiti")).toBeInTheDocument();
+  describe('Rendering', () => {
+    it('renders the component with title', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
+      expect(screen.getByText(getTranslation('admin.tiers.form.limits'))).toBeInTheDocument();
     });
 
-    it("renders all 6 limit input fields", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('renders all 6 limit input fields', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      expect(
-        screen.getByLabelText(/Messaggi Chat Giornalieri/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByLabelText(/Minuti Voce Giornalieri/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByLabelText(/Strumenti Giornalieri/i),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/Messaggi Chat Giornalieri/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Minuti Voce Giornalieri/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Strumenti Giornalieri/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Documenti Totali/i)).toBeInTheDocument();
-      expect(
-        screen.getByLabelText(/Video Vision per Sessione/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByLabelText(/Video Vision Mensile/i),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText(/Video Vision per Sessione/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Video Vision Mensile/i)).toBeInTheDocument();
     });
 
-    it("renders help text for each field", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('renders help text for each field', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
       // Check that help text descriptions are rendered (6 fields = 6 help texts)
       // We check for the actual translated content from messages/it/admin.json
       // These are loaded by vitest setup.ts which mocks next-intl with real translations
-      const helpTexts = document.querySelectorAll(".text-xs.text-slate-600");
+      const helpTexts = document.querySelectorAll('.text-xs.text-slate-600');
       expect(helpTexts.length).toBe(6);
 
       // Verify each help text has content (non-empty)
@@ -72,207 +57,159 @@ describe("LimitsSection", () => {
       });
     });
 
-    it("displays correct input values", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('displays correct input values', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
-      const voiceInput = screen.getByLabelText(
-        /Minuti Voce Giornalieri/i,
-      ) as HTMLInputElement;
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
+      const voiceInput = screen.getByLabelText(/Minuti Voce Giornalieri/i) as HTMLInputElement;
 
       expect(chatInput).toHaveValue(10);
       expect(voiceInput).toHaveValue(5);
     });
 
-    it("displays max value hint for each field", () => {
+    it('displays max value hint for each field', () => {
       const { container } = render(
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
       // Check for max value display in the DOM
-      const maxHints = container.querySelectorAll("span");
+      const maxHints = container.querySelectorAll('span');
       const maxTexts = Array.from(maxHints).map((h) => h.textContent);
 
-      expect(maxTexts.some((t) => t?.includes("500"))).toBe(true);
-      expect(maxTexts.some((t) => t?.includes("1440"))).toBe(true);
+      expect(maxTexts.some((t) => t?.includes('500'))).toBe(true);
+      expect(maxTexts.some((t) => t?.includes('1440'))).toBe(true);
     });
   });
 
-  describe("User Interactions", () => {
-    it("calls onChange with valid chat limit value", async () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+  describe('User Interactions', () => {
+    it('calls onChange with valid chat limit value', async () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
-      fireEvent.change(chatInput, { target: { value: "20" } });
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
+      fireEvent.change(chatInput, { target: { value: '20' } });
 
       expect(mockOnChange).toHaveBeenCalled();
     });
 
-    it("calls onChange with valid voice minutes value", async () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('calls onChange with valid voice minutes value', async () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const voiceInput = screen.getByLabelText(
-        /Minuti Voce Giornalieri/i,
-      ) as HTMLInputElement;
-      fireEvent.change(voiceInput, { target: { value: "15" } });
+      const voiceInput = screen.getByLabelText(/Minuti Voce Giornalieri/i) as HTMLInputElement;
+      fireEvent.change(voiceInput, { target: { value: '15' } });
 
       expect(mockOnChange).toHaveBeenCalled();
     });
 
-    it("calls onChange with valid tools limit value", async () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('calls onChange with valid tools limit value', async () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const toolsInput = screen.getByLabelText(
-        /Strumenti Giornalieri/i,
-      ) as HTMLInputElement;
-      fireEvent.change(toolsInput, { target: { value: "25" } });
+      const toolsInput = screen.getByLabelText(/Strumenti Giornalieri/i) as HTMLInputElement;
+      fireEvent.change(toolsInput, { target: { value: '25' } });
 
       expect(mockOnChange).toHaveBeenCalled();
     });
 
-    it("calls onChange with valid docs limit value", async () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('calls onChange with valid docs limit value', async () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const docsInput = screen.getByLabelText(
-        /Documenti Totali/i,
-      ) as HTMLInputElement;
-      fireEvent.change(docsInput, { target: { value: "50" } });
+      const docsInput = screen.getByLabelText(/Documenti Totali/i) as HTMLInputElement;
+      fireEvent.change(docsInput, { target: { value: '50' } });
 
       expect(mockOnChange).toHaveBeenCalled();
     });
   });
 
-  describe("Validation", () => {
-    it("enforces min value of 0 on all inputs", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+  describe('Validation', () => {
+    it('enforces min value of 0 on all inputs', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const inputs = screen.getAllByRole("spinbutton") as HTMLInputElement[];
+      const inputs = screen.getAllByRole('spinbutton') as HTMLInputElement[];
       inputs.forEach((input) => {
-        expect(input).toHaveAttribute("min", "0");
+        expect(input).toHaveAttribute('min', '0');
       });
     });
 
-    it("enforces max values on all inputs", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('enforces max values on all inputs', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
-      const voiceInput = screen.getByLabelText(
-        /Minuti Voce Giornalieri/i,
-      ) as HTMLInputElement;
-      const toolsInput = screen.getByLabelText(
-        /Strumenti Giornalieri/i,
-      ) as HTMLInputElement;
-      const docsInput = screen.getByLabelText(
-        /Documenti Totali/i,
-      ) as HTMLInputElement;
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
+      const voiceInput = screen.getByLabelText(/Minuti Voce Giornalieri/i) as HTMLInputElement;
+      const toolsInput = screen.getByLabelText(/Strumenti Giornalieri/i) as HTMLInputElement;
+      const docsInput = screen.getByLabelText(/Documenti Totali/i) as HTMLInputElement;
 
       // All inputs should have a max attribute
-      expect(chatInput).toHaveAttribute("max", "500");
-      expect(voiceInput).toHaveAttribute("max", "1440");
-      expect(toolsInput).toHaveAttribute("max", "500");
-      expect(docsInput).toHaveAttribute("max", "10000");
+      expect(chatInput).toHaveAttribute('max', '500');
+      expect(voiceInput).toHaveAttribute('max', '1440');
+      expect(toolsInput).toHaveAttribute('max', '500');
+      expect(docsInput).toHaveAttribute('max', '10000');
     });
 
-    it("shows placeholder text indicating min and max values", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+    it('shows placeholder text indicating min and max values', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
-      expect(chatInput).toHaveAttribute("placeholder", "Min: 0, Max: 500");
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
+      expect(chatInput).toHaveAttribute('placeholder', 'Min: 0, Max: 500');
 
-      const voiceInput = screen.getByLabelText(
-        /Minuti Voce Giornalieri/i,
-      ) as HTMLInputElement;
-      expect(voiceInput).toHaveAttribute("placeholder", "Min: 0, Max: 1440");
+      const voiceInput = screen.getByLabelText(/Minuti Voce Giornalieri/i) as HTMLInputElement;
+      expect(voiceInput).toHaveAttribute('placeholder', 'Min: 0, Max: 1440');
     });
   });
 
-  describe("Input Types", () => {
-    it("uses number input type for all fields", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+  describe('Input Types', () => {
+    it('uses number input type for all fields', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const inputs = screen.getAllByRole("spinbutton") as HTMLInputElement[];
+      const inputs = screen.getAllByRole('spinbutton') as HTMLInputElement[];
       expect(inputs.length).toBe(6);
       inputs.forEach((input) => {
-        expect(input).toHaveAttribute("type", "number");
+        expect(input).toHaveAttribute('type', 'number');
       });
     });
   });
 
-  describe("Responsive Layout", () => {
-    it("renders in a 2-column grid", () => {
+  describe('Responsive Layout', () => {
+    it('renders in a 2-column grid', () => {
       const { container } = render(
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
-      const gridContainer = container.querySelector(".grid");
-      expect(gridContainer).toHaveClass("grid-cols-1", "md:grid-cols-2");
+      const gridContainer = container.querySelector('.grid');
+      expect(gridContainer).toHaveClass('grid-cols-1', 'md:grid-cols-2');
     });
 
-    it("renders with proper spacing between fields", () => {
+    it('renders with proper spacing between fields', () => {
       const { container } = render(
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
-      const gridContainer = container.querySelector(".grid");
-      expect(gridContainer).toHaveClass("gap-6");
+      const gridContainer = container.querySelector('.grid');
+      expect(gridContainer).toHaveClass('gap-6');
     });
   });
 
-  describe("Error Display", () => {
-    it("allows user to enter valid values without errors", () => {
-      render(
-        <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
-      );
+  describe('Error Display', () => {
+    it('allows user to enter valid values without errors', () => {
+      render(<LimitsSection formData={defaultFormData} onChange={mockOnChange} />);
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
-      fireEvent.change(chatInput, { target: { value: "100" } });
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
+      fireEvent.change(chatInput, { target: { value: '100' } });
       fireEvent.blur(chatInput);
 
-      const alerts = screen.queryAllByRole("alert");
+      const alerts = screen.queryAllByRole('alert');
       expect(alerts.length).toBe(0);
       expect(mockOnChange).toHaveBeenCalledWith({ chatLimitDaily: 100 });
     });
 
-    it("prevents onChange when value is invalid on blur", () => {
+    it('prevents onChange when value is invalid on blur', () => {
       const { rerender: _rerender } = render(
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
-      const chatInput = screen.getByLabelText(
-        /Messaggi Chat Giornalieri/i,
-      ) as HTMLInputElement;
+      const chatInput = screen.getByLabelText(/Messaggi Chat Giornalieri/i) as HTMLInputElement;
       mockOnChange.mockClear();
 
       // Try to enter an invalid value that exceeds max
-      fireEvent.change(chatInput, { target: { value: "" } });
+      fireEvent.change(chatInput, { target: { value: '' } });
       fireEvent.blur(chatInput);
 
       // Should not call onChange for invalid input
