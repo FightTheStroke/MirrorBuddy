@@ -4,11 +4,11 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 interface ChurnByStage {
   stage: string;
@@ -24,7 +24,7 @@ interface AtRiskUser {
   lastStage: string;
   lastActivity: string;
   daysSinceActivity: number;
-  riskLevel: "high" | "medium" | "low";
+  riskLevel: 'high' | 'medium' | 'low';
 }
 
 interface ChurnMetricsResponse {
@@ -43,13 +43,11 @@ interface ChurnMetricsResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/churn"),
+  withSentry('/api/admin/funnel/churn'),
   withAdmin,
 )(async (ctx) => {
-  const daysBack = parseInt(ctx.req.nextUrl.searchParams.get("days") ?? "30");
-  const churnThresholdDays = parseInt(
-    ctx.req.nextUrl.searchParams.get("churnDays") ?? "14",
-  );
+  const daysBack = parseInt(ctx.req.nextUrl.searchParams.get('days') ?? '30');
+  const churnThresholdDays = parseInt(ctx.req.nextUrl.searchParams.get('churnDays') ?? '14');
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - daysBack);
@@ -59,48 +57,42 @@ export const GET = pipe(
   // Get all unique visitors/users with their latest event
   const latestEvents = await prisma.$queryRaw<
     Array<{
-      visitor_id: string | null;
-      user_id: string | null;
+      visitorId: string | null;
+      userId: string | null;
       stage: string;
-      last_activity: Date;
-      first_activity: Date;
+      lastActivity: Date;
+      firstActivity: Date;
     }>
   >`
       SELECT
-        visitor_id,
-        user_id,
-        stage,
-        MAX(created_at) as last_activity,
-        MIN(created_at) as first_activity
+        "visitorId",
+        "userId",
+        "stage",
+        MAX("createdAt") as "lastActivity",
+        MIN("createdAt") as "firstActivity"
       FROM "FunnelEvent"
-      WHERE created_at >= ${startDate}
-        AND is_test_data = false
-      GROUP BY COALESCE(visitor_id, user_id), visitor_id, user_id, stage
-      HAVING MAX(created_at) = (
-        SELECT MAX(fe2.created_at)
+      WHERE "createdAt" >= ${startDate}
+        AND "isTestData" = false
+      GROUP BY COALESCE("visitorId", "userId"), "visitorId", "userId", "stage"
+      HAVING MAX("createdAt") = (
+        SELECT MAX(fe2."createdAt")
         FROM "FunnelEvent" fe2
-        WHERE COALESCE(fe2.visitor_id, fe2.user_id) = COALESCE("FunnelEvent".visitor_id, "FunnelEvent".user_id)
+        WHERE COALESCE(fe2."visitorId", fe2."userId") = COALESCE("FunnelEvent"."visitorId", "FunnelEvent"."userId")
       )
     `;
 
   // Analyze churn by stage
-  const stageChurn = new Map<
-    string,
-    { entered: number; churned: number; daysToChurn: number[] }
-  >();
+  const stageChurn = new Map<string, { entered: number; churned: number; daysToChurn: number[] }>();
 
   const atRiskUsers: AtRiskUser[] = [];
   let totalChurned = 0;
   const allDaysToChurn: number[] = [];
 
   for (const event of latestEvents) {
-    const lastActivityDate = new Date(event.last_activity);
-    const daysSince = Math.floor(
-      (Date.now() - lastActivityDate.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const lastActivityDate = new Date(event.lastActivity);
+    const daysSince = Math.floor((Date.now() - lastActivityDate.getTime()) / (1000 * 60 * 60 * 24));
 
-    const isConverted =
-      event.stage === "ACTIVE" || event.stage === "FIRST_LOGIN";
+    const isConverted = event.stage === 'ACTIVE' || event.stage === 'FIRST_LOGIN';
     const isChurned = !isConverted && lastActivityDate < churnCutoff;
 
     // Track stage metrics
@@ -118,8 +110,7 @@ export const GET = pipe(
       stageData.churned++;
       totalChurned++;
       const daysInStage = Math.floor(
-        (lastActivityDate.getTime() -
-          new Date(event.first_activity).getTime()) /
+        (lastActivityDate.getTime() - new Date(event.firstActivity).getTime()) /
           (1000 * 60 * 60 * 24),
       );
       stageData.daysToChurn.push(daysInStage);
@@ -128,12 +119,12 @@ export const GET = pipe(
 
     // Identify at-risk users (not churned yet, but close)
     if (!isConverted && !isChurned && daysSince >= 7) {
-      const riskLevel: "high" | "medium" | "low" =
-        daysSince >= 12 ? "high" : daysSince >= 10 ? "medium" : "low";
+      const riskLevel: 'high' | 'medium' | 'low' =
+        daysSince >= 12 ? 'high' : daysSince >= 10 ? 'medium' : 'low';
 
       atRiskUsers.push({
-        visitorId: event.visitor_id,
-        userId: event.user_id,
+        visitorId: event.visitorId,
+        userId: event.userId,
         lastStage: event.stage,
         lastActivity: lastActivityDate.toISOString(),
         daysSinceActivity: daysSince,
@@ -143,19 +134,16 @@ export const GET = pipe(
   }
 
   // Build stage metrics
-  const byStage: ChurnByStage[] = Array.from(stageChurn.entries()).map(
-    ([stage, data]) => ({
-      stage,
-      totalEntered: data.entered,
-      churned: data.churned,
-      churnRate: data.entered > 0 ? (data.churned / data.entered) * 100 : 0,
-      avgDaysBeforeChurn:
-        data.daysToChurn.length > 0
-          ? data.daysToChurn.reduce((a, b) => a + b, 0) /
-            data.daysToChurn.length
-          : 0,
-    }),
-  );
+  const byStage: ChurnByStage[] = Array.from(stageChurn.entries()).map(([stage, data]) => ({
+    stage,
+    totalEntered: data.entered,
+    churned: data.churned,
+    churnRate: data.entered > 0 ? (data.churned / data.entered) * 100 : 0,
+    avgDaysBeforeChurn:
+      data.daysToChurn.length > 0
+        ? data.daysToChurn.reduce((a, b) => a + b, 0) / data.daysToChurn.length
+        : 0,
+  }));
 
   // Sort at-risk users by risk level
   atRiskUsers.sort((a, b) => {
@@ -167,10 +155,7 @@ export const GET = pipe(
     overview: {
       totalVisitors: latestEvents.length,
       totalChurned,
-      overallChurnRate:
-        latestEvents.length > 0
-          ? (totalChurned / latestEvents.length) * 100
-          : 0,
+      overallChurnRate: latestEvents.length > 0 ? (totalChurned / latestEvents.length) * 100 : 0,
       avgDaysToChurn:
         allDaysToChurn.length > 0
           ? allDaysToChurn.reduce((a, b) => a + b, 0) / allDaysToChurn.length

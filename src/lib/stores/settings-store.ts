@@ -207,6 +207,11 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         fetch('/api/user/profile'),
       ]);
 
+      // No user cookie yet (pre-onboarding), not an error
+      if (settingsRes.status === 401 || profileRes.status === 401) {
+        return;
+      }
+
       if (settingsRes.ok) {
         const settings = await settingsRes.json();
         set((state) => ({
