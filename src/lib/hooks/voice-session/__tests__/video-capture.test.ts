@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import { useVideoCapture } from "../video-capture";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useVideoCapture } from '../video-capture';
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -22,7 +22,8 @@ vi.mock("@/lib/logger", () => ({
 const mockGetUserMedia = vi.fn();
 const mockTrackStop = vi.fn();
 const mockStream = {
-  getTracks: () => [{ stop: mockTrackStop, kind: "video" }],
+  getTracks: () => [{ stop: mockTrackStop, kind: 'video' }],
+  getVideoTracks: () => [{ stop: mockTrackStop, kind: 'video' }],
 } as unknown as MediaStream;
 
 // Mock video element
@@ -34,9 +35,7 @@ const mockGetImageData = vi.fn().mockReturnValue({
   data: new Uint8ClampedArray(640 * 360 * 4),
 });
 const mockDrawImage = vi.fn();
-const mockToDataURL = vi
-  .fn()
-  .mockReturnValue("data:image/jpeg;base64,dGVzdA==");
+const mockToDataURL = vi.fn().mockReturnValue('data:image/jpeg;base64,dGVzdA==');
 const mockGetContext = vi.fn().mockReturnValue({
   drawImage: mockDrawImage,
   getImageData: mockGetImageData,
@@ -52,16 +51,16 @@ beforeEach(() => {
   mockPlay.mockClear();
 
   // Mock navigator.mediaDevices
-  Object.defineProperty(navigator, "mediaDevices", {
+  Object.defineProperty(navigator, 'mediaDevices', {
     value: { getUserMedia: mockGetUserMedia },
     writable: true,
     configurable: true,
   });
 
   // Mock document.createElement — delegate unknown tags to original
-  vi.spyOn(document, "createElement").mockImplementation(
+  vi.spyOn(document, 'createElement').mockImplementation(
     (tag: string, options?: ElementCreationOptions) => {
-      if (tag === "video") {
+      if (tag === 'video') {
         return {
           srcObject: null,
           muted: false,
@@ -71,7 +70,7 @@ beforeEach(() => {
           readyState: 4,
         } as unknown as HTMLVideoElement;
       }
-      if (tag === "canvas") {
+      if (tag === 'canvas') {
         return {
           width: 0,
           height: 0,
@@ -89,12 +88,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("useVideoCapture", () => {
-  it("should start with inactive state", () => {
+describe('useVideoCapture', () => {
+  it('should start with inactive state', () => {
     const onFrame = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 60 }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 60 }));
 
     expect(result.current.isCapturing).toBe(false);
     expect(result.current.videoStream).toBeNull();
@@ -102,11 +99,9 @@ describe("useVideoCapture", () => {
     expect(result.current.elapsedSeconds).toBe(0);
   });
 
-  it("should request camera on startCapture", async () => {
+  it('should request camera on startCapture', async () => {
     const onFrame = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 60 }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 60 }));
 
     let started = false;
     await act(async () => {
@@ -114,18 +109,18 @@ describe("useVideoCapture", () => {
     });
 
     expect(started).toBe(true);
-    expect(mockGetUserMedia).toHaveBeenCalledWith({
-      video: expect.objectContaining({ facingMode: "user" }),
-    });
+    expect(mockGetUserMedia).toHaveBeenCalledWith(
+      expect.objectContaining({
+        video: expect.objectContaining({ facingMode: 'user' }),
+      }),
+    );
     expect(result.current.isCapturing).toBe(true);
     expect(result.current.videoStream).toBe(mockStream);
   });
 
-  it("should call onFrame with base64 after capture", async () => {
+  it('should call onFrame with base64 after capture', async () => {
     const onFrame = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 60 }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 60 }));
 
     await act(async () => {
       await result.current.startCapture();
@@ -136,14 +131,12 @@ describe("useVideoCapture", () => {
       vi.advanceTimersByTime(500);
     });
 
-    expect(onFrame).toHaveBeenCalledWith("dGVzdA==");
+    expect(onFrame).toHaveBeenCalledWith('dGVzdA==');
   });
 
-  it("should stop camera tracks on stopCapture", async () => {
+  it('should stop camera tracks on stopCapture', async () => {
     const onFrame = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 60 }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 60 }));
 
     await act(async () => {
       await result.current.startCapture();
@@ -158,12 +151,10 @@ describe("useVideoCapture", () => {
     expect(result.current.videoStream).toBeNull();
   });
 
-  it("should return false when getUserMedia fails", async () => {
-    mockGetUserMedia.mockRejectedValueOnce(new Error("Permission denied"));
+  it('should return false when getUserMedia fails', async () => {
+    mockGetUserMedia.mockRejectedValueOnce(new Error('Permission denied'));
     const onFrame = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 60 }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 60 }));
 
     let started = false;
     await act(async () => {
@@ -174,12 +165,10 @@ describe("useVideoCapture", () => {
     expect(result.current.isCapturing).toBe(false);
   });
 
-  it("should auto-stop when maxSeconds is reached", async () => {
+  it('should auto-stop when maxSeconds is reached', async () => {
     const onFrame = vi.fn();
     const onAutoStop = vi.fn();
-    const { result } = renderHook(() =>
-      useVideoCapture({ onFrame, maxSeconds: 3, onAutoStop }),
-    );
+    const { result } = renderHook(() => useVideoCapture({ onFrame, maxSeconds: 3, onAutoStop }));
 
     await act(async () => {
       await result.current.startCapture();

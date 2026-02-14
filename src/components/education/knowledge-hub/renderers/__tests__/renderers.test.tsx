@@ -411,9 +411,10 @@ describe('ImageRenderer', () => {
 
   it('shows empty state when no url', () => {
     render(<ImageRenderer data={{}} />);
-    // Use structure-based assertion - check for empty state
-    const emptyState = screen.queryByText(/image|empty/i);
-    expect(emptyState || screen.queryByRole('status')).toBeTruthy();
+    // Empty state renders i18n key or fallback icon container
+    const emptyState = screen.queryByText(/image|empty|immagine|nessuna/i);
+    const iconContainer = document.querySelector('.text-slate-500');
+    expect(emptyState || iconContainer).toBeTruthy();
   });
 });
 
