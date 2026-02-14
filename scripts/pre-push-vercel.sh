@@ -42,7 +42,7 @@ START_TIME=$(date +%s)
 echo -e "${BLUE}[1/5] Checking migration & proxy consistency...${NC}"
 
 # Verify all migrations are named correctly (with timestamp)
-INVALID_MIGRATIONS=$(ls prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
+INVALID_MIGRATIONS=$(ls prisma/migrations 2>/dev/null | /usr/bin/grep -v "^[0-9]\{14\}_" | /usr/bin/grep -v "migration_lock.toml" | /usr/bin/grep -v ".DS_Store" || true)
 if [ -n "$INVALID_MIGRATIONS" ]; then
 	echo -e "${RED}✗ Invalid migration folder names (must be YYYYMMDDHHMMSS_name):${NC}"
 	echo "$INVALID_MIGRATIONS"
@@ -55,7 +55,7 @@ echo -e "${GREEN}✓ Migration naming OK${NC}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if ! "$SCRIPT_DIR/check-schema-drift.sh" >"$TEMP_DIR/drift.log" 2>&1; then
 	echo -e "${RED}✗ Schema drift detected - models without migrations${NC}"
-	grep "MISSING:" "$TEMP_DIR/drift.log" | head -10
+	/usr/bin/grep "MISSING:" "$TEMP_DIR/drift.log" | head -10
 	echo -e "${YELLOW}Fix: npx prisma migrate dev --name <name> --create-only${NC}"
 	exit 1
 fi
@@ -159,13 +159,17 @@ if [ -f ".env" ]; then
 	REQUIRED_SET=$(printf '%s\n' "${REQUIRED_VARS[@]}")
 	UNREGISTERED=""
 
+	# Build associative array for O(1) lookup (avoids grep alias issues)
+	declare -A REQUIRED_MAP
+	for _rv in "${REQUIRED_VARS[@]}"; do REQUIRED_MAP[$_rv]=1; done
+
 	while IFS= read -r line; do
 		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
 		vn="${line%%=*}"
-		if echo "$vn" | grep -qE "^($SKIP_PATTERNS)$"; then continue; fi
+		if [[ "$vn" =~ ^($SKIP_PATTERNS)$ ]]; then continue; fi
 		vv="${line#*=}"
 		if [ -z "$vv" ]; then continue; fi
-		if ! echo "$REQUIRED_SET" | grep -q "^${vn}$"; then
+		if [[ -z "${REQUIRED_MAP[$vn]+x}" ]]; then
 			UNREGISTERED="$UNREGISTERED $vn"
 		fi
 	done <.env
@@ -192,7 +196,7 @@ elif command -v vercel &>/dev/null; then
 	MISSING_VARS=""
 
 	for var in "${REQUIRED_VARS[@]}"; do
-		if ! echo "$VERCEL_VARS" | grep -q "^$var$"; then
+		if ! echo "$VERCEL_VARS" | /usr/bin/grep -q "^$var$"; then
 			MISSING_VARS="$MISSING_VARS $var"
 		fi
 	done
@@ -207,7 +211,7 @@ elif command -v vercel &>/dev/null; then
 	# Check for corrupted env vars (literal \n at end)
 	vercel env pull "$TEMP_DIR/vercel-env.txt" --environment=production >/dev/null 2>&1 || true
 	if [ -f "$TEMP_DIR/vercel-env.txt" ]; then
-		CORRUPTED_VARS=$(grep '\\n"$' "$TEMP_DIR/vercel-env.txt" | cut -d'=' -f1 || true)
+		CORRUPTED_VARS=$(/usr/bin/grep '\\n"$' "$TEMP_DIR/vercel-env.txt" | cut -d'=' -f1 || true)
 		if [ -n "$CORRUPTED_VARS" ]; then
 			echo -e "${RED}✗ Env vars with literal \\n (corrupted):${NC}"
 			echo "$CORRUPTED_VARS"
