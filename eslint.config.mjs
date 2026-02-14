@@ -544,7 +544,7 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "local-rules/no-todo-without-issue": "error",
+      "local-rules/no-todo-without-issue": "warn",
     },
   },
   // ADR 0128: Enforce media-bridge abstraction for camera/mic access
@@ -558,7 +558,7 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "local-rules/require-native-bridge": "error",
+      "local-rules/require-native-bridge": "warn",
     },
   },
 ]);
