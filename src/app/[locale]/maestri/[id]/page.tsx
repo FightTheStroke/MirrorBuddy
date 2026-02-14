@@ -57,11 +57,13 @@ export default async function MaestroPage({ params, searchParams }: MaestroPageP
 
   // Read the tool query param if present
   const requestedToolType = search.tool as ToolType | undefined;
+  const contextMessage = typeof search.context === 'string' ? search.context : undefined;
 
   return (
     <MaestroSessionPage
       maestro={toSerializableMaestro(maestro)}
       requestedToolType={requestedToolType}
+      contextMessage={contextMessage}
     />
   );
 }

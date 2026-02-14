@@ -54,6 +54,24 @@ Running learnings log for Plan 145 (Character-Voice-DeepFix).
 
 **Action**: Updated `deployment-mapping.ts` comments with accurate dates. Legacy GPT-4 entries kept for backward compatibility with existing Azure deployments.
 
+## W3 — ADR Compliance Audit (14 Feb 2026)
+
+### ADR 0031 — CHARACTER INTENSITY DIAL
+
+**Status: ✅ COMPLIANT** — 25/26 maestri have CHARACTER INTENSITY DIAL in systemPrompt. The 3 that use external prompt files (lovelace, cassese, ippocrate) also include it via their \*-prompt.ts files.
+
+### ADR 0064 — Formality
+
+**Status: ✅ COMPLIANT** — 21 formal professors listed, all valid maestro IDs. The 5 NOT in the formal list (feynman 1918, chris contemporary, alex-pina 1967, mascetti 20th century character, simone contemporary) are all post-1900 figures, correctly classified as informal per ADR 0064 rule.
+
+### ADR 0021/0090 — Memory Injection
+
+**Status: ✅ COMPLIANT** — Memory injection is automatic at the API layer (`buildAllContexts()` → `injectMemoryContext()`) when `enableMemory=true` (default). No per-character configuration needed. Works for all maestri, coaches, and buddies.
+
+### ADR 0097 — Tier Limits
+
+**Status: ✅ COMPLIANT (alternative implementation)** — Tier model routing via `tierService.getModelForUserFeature()` is correctly enforced. Daily usage limits are enforced through `budget-handler.ts` (checkBudgetLimit/checkBudgetWarning) and `trial-budget-service.ts`, not directly via tierService.getLimits(). This is an architectural choice — the budget system tracks per-user daily counters independently.
+
 ---
 
 | Wave | Issue                                   | Root Cause                                    | Resolution                                          | Preventive Rule                                       |

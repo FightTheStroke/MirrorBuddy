@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2)
+## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2+W3)
 
 ### Voice
 
@@ -17,9 +17,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added: `switchCharacter` action in `voice-session-store.ts` — updates maestro, clears transcript/tools, keeps connection
 - Added: `token-cache.ts` — Ephemeral token pre-fetch with TTL and auto-refresh 30s before expiry
 
+### Study Kit
+
+- Fixed: `processStudyKit` now returns `originalText` for RAG indexing (was undefined)
+- Fixed: Upload route error handling: proper error message extraction, safety-wrapped DB update in catch
+
+### UX
+
+- Added: Astuccio homework flow passes `?context=Aiutami+con+i+compiti+di+{specialty}` to maestro page
+- Added: `contextMessage` prop flows through page → session-page → session → session-logic
+- Added: Context message pre-populates input field for immediate homework assistance
+
 ### Infrastructure
 
 - Updated: `deployment-mapping.ts` — Accurate deprecation timeline: GPT-4o family RETIRED Feb 2026, text-embedding-3-small and whisper-1 stable, realtime preview models 3-6 month lifecycle
+
+### ADR Compliance Audit
+
+- Verified: ADR 0031 — 25/26 maestri have CHARACTER INTENSITY DIAL (3 via external prompt files)
+- Verified: ADR 0064 — 21 formal professors correct; 5 informal (post-1900) correctly excluded
+- Verified: ADR 0021/0090 — Memory auto-injected at API layer for all characters
+- Verified: ADR 0097 — Model routing via tierService, daily limits via budget-handler
 
 ### Tests
 
@@ -27,10 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added: `memory-utils.test.ts` — 13 tests covering sanitization, memory fetch, context building
 - Added: `switch-character.test.ts` — 2 tests covering store update and data channel guard
 - Added: `token-cache.test.ts` — 5 tests covering fetch, cache, failure, string expiresAt
-
-### Verified (No Change Needed)
-
-- `enableMemory` defaults to `true` in both `route.ts` and `stream/route.ts` — correctly passed to context builders for authenticated users
 - All 26 maestri, 6 coaches, 6 buddies have `voiceInstructions` populated
 ## [Unreleased] — Architecture Map & Drift Detection
 

@@ -133,7 +133,11 @@ export function AstuccioView({ onToolRequest: _onToolRequest }: AstuccioViewProp
   const handleMaestroConfirm = useCallback(
     (maestro: Maestro, _mode: 'voice' | 'chat') => {
       if (state.selectedToolType) {
-        router.push(`/${locale}/maestri/${maestro.id}?tool=${state.selectedToolType}`);
+        const params = new URLSearchParams({ tool: state.selectedToolType });
+        if (state.selectedToolType === 'homework' && maestro.subject) {
+          params.set('context', `Aiutami con i compiti di ${maestro.specialty}`);
+        }
+        router.push(`/${locale}/maestri/${maestro.id}?${params.toString()}`);
       }
       dispatch({ type: 'CONFIRM_MAESTRO' });
     },

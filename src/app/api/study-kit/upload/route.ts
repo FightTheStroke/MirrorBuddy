@@ -14,7 +14,6 @@ import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
 import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
 import { UploadStudyKitSchema } from '@/lib/validation/schemas/study-kit';
 
-
 export const revalidate = 0;
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
@@ -137,17 +136,26 @@ export const POST = pipe(
       });
     } catch (error) {
       // Update with error status - guaranteed to run for any error
-      await prisma.studyKit.update({
-        where: { id: studyKit.id },
-        data: {
-          status: 'error',
-          errorMessage: String(error),
-        },
-      });
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      try {
+        await prisma.studyKit.update({
+          where: { id: studyKit.id },
+          data: {
+            status: 'error',
+            errorMessage: errorMsg,
+          },
+        });
+      } catch (dbError) {
+        logger.error(
+          'Failed to update study kit error status',
+          { studyKitId: studyKit.id },
+          dbError,
+        );
+      }
 
       logger.error(
         'Study kit processing failed',
-        { api: 'study-kit-upload', phase: 'processing', studyKitId: studyKit.id },
+        { api: 'study-kit-upload', phase: 'processing', studyKitId: studyKit.id, errorMsg },
         error,
       );
     }

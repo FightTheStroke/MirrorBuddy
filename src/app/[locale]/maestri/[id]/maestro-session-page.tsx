@@ -1,17 +1,19 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { MaestroSession } from "@/components/maestros/maestro-session";
-import type { Maestro, ToolType } from "@/types";
+import { useRouter } from 'next/navigation';
+import { MaestroSession } from '@/components/maestros/maestro-session';
+import type { Maestro, ToolType } from '@/types';
 
 interface MaestroSessionPageProps {
   maestro: Maestro;
   requestedToolType?: ToolType;
+  contextMessage?: string;
 }
 
 export function MaestroSessionPage({
   maestro,
   requestedToolType,
+  contextMessage,
 }: MaestroSessionPageProps) {
   const router = useRouter();
 
@@ -22,6 +24,7 @@ export function MaestroSessionPage({
         onClose={() => router.back()}
         initialMode="chat"
         requestedToolType={requestedToolType}
+        contextMessage={contextMessage}
       />
     </div>
   );

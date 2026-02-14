@@ -14,12 +14,14 @@ interface UseMaestroSessionLogicProps {
   maestro: Maestro;
   initialMode: 'voice' | 'chat';
   requestedToolType?: ToolType;
+  contextMessage?: string;
 }
 
 export function useMaestroSessionLogic({
   maestro,
   initialMode,
   requestedToolType,
+  contextMessage,
 }: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -126,6 +128,11 @@ export function useMaestroSessionLogic({
 
     setMessages(initialMessages);
 
+    // Pre-populate input with context message from URL param (e.g., from Astuccio)
+    if (contextMessage) {
+      setInput(contextMessage);
+    }
+
     // Handle legacy pendingToolRequest from sessionStorage (backward compatibility)
     const pendingRequest = sessionStorage.getItem('pendingToolRequest');
     if (pendingRequest) {
@@ -150,7 +157,7 @@ export function useMaestroSessionLogic({
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.id, requestedToolType]);
+  }, [maestro.id, requestedToolType, contextMessage]);
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {
