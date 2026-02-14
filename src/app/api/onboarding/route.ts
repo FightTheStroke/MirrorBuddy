@@ -7,4 +7,6 @@
  * Issue #73: Load existing user data for returning users
  */
 
+
+export const revalidate = 0;
 export { GET, POST } from "./handlers";

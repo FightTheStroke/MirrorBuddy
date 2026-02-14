@@ -11,6 +11,8 @@ import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 import { hashPII } from "@/lib/security";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "auth/login" });
 
 /**

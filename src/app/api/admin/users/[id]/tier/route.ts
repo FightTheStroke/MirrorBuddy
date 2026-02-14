@@ -6,6 +6,8 @@ import { prisma } from "@/lib/db";
  * POST /api/admin/users/[id]/tier
  * Change a user's tier subscription
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/users/[id]/tier"),
   withCSRF,

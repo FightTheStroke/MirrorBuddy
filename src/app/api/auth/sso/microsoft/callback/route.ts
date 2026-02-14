@@ -11,6 +11,8 @@ import { handleSSOCallback } from '@/lib/auth/server';
 import { logger } from '@/lib/logger';
 import { pipe, withSentry } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 const provider = new Microsoft365Provider();
 
 export const GET = pipe(withSentry('/api/auth/sso/microsoft/callback'))(async (ctx) => {

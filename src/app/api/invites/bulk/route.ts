@@ -15,6 +15,8 @@ import {
   bulkRejectInvites,
 } from "@/lib/invite/invite-service";
 
+
+export const revalidate = 0;
 interface BulkRequestBody {
   action: "approve" | "reject";
   requestIds: string[];

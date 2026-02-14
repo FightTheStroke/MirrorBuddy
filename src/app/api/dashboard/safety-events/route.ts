@@ -14,6 +14,8 @@ import {
 import { pipe, withSentry, withAdmin, withCSRF } from "@/lib/api/middlewares";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/dashboard/safety-events"),
   withAdmin,

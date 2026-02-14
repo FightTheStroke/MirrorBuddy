@@ -9,6 +9,8 @@ import { extractLearnings } from "@/lib/ai/server";
 import type { Message, Prisma } from "@prisma/client";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/learnings/extract"),
   withCSRF,

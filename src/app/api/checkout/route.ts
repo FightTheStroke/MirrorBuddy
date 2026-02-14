@@ -9,6 +9,8 @@ import { stripeService } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
+
+export const revalidate = 0;
 const CheckoutSchema = z.object({
   priceId: z.string().min(1, "Price ID required"),
   locale: z.enum(["it", "en", "fr", "de", "es"]).optional(),

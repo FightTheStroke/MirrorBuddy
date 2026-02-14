@@ -16,6 +16,8 @@ import { withSentry, withAuth } from '@/lib/api/middlewares';
 // TYPES
 // ============================================================================
 
+
+export const revalidate = 0;
 interface LocalSSEClient {
   id: string;
   roomId: string;

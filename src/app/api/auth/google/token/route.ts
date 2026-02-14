@@ -10,6 +10,8 @@ import { NextResponse } from "next/server";
 import { getValidAccessToken } from "@/lib/google/oauth";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/auth/google/token"),
   withAuth,

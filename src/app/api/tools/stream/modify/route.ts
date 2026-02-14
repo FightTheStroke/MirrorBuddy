@@ -26,6 +26,8 @@ import {
 import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
 import { validateVisitorId } from '@/lib/auth';
 
+
+export const revalidate = 0;
 interface ModifyRequest {
   sessionId: string;
   toolType?: 'mindmap' | 'summary' | 'student_summary';

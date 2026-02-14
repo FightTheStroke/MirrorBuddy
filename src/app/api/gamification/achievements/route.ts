@@ -13,6 +13,8 @@ import {
 import { getOrCompute, CACHE_TTL, getCacheControlHeader } from "@/lib/cache";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/gamification/achievements"),
   withAuth,

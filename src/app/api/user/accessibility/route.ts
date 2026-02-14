@@ -11,6 +11,8 @@ import { getOrCompute, del, CACHE_TTL } from "@/lib/cache";
 import { AccessibilitySettingsSchema } from "@/lib/validation/schemas/accessibility";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/user/accessibility"),
   withAuth,

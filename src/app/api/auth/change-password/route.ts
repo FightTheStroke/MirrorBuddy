@@ -21,6 +21,8 @@ import {
   withAuth,
 } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "auth/change-password" });
 
 export const POST = pipe(

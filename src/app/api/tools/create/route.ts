@@ -24,6 +24,8 @@ import {
 } from "@/lib/rate-limit";
 
 // Valid tool types
+
+export const revalidate = 0;
 const VALID_TOOL_TYPES: ToolType[] = [
   "mindmap",
   "flashcard",

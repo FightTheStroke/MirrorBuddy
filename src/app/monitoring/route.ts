@@ -4,6 +4,10 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
+// Mobile builds use `output: "export"` (static export). Next.js requires a
+// statically analyzable segment config for export builds.
+export const revalidate = 0;
+
 // Extract allowed project ID from the public DSN (already exposed in client bundle)
 function getAllowedProjectId(): string | null {
   const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;

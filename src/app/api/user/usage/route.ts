@@ -20,6 +20,8 @@ import { logger } from "@/lib/logger";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/user/usage" });
 
 interface ResourceUsage {

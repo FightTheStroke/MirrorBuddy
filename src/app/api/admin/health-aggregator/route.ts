@@ -10,6 +10,8 @@ import { aggregateHealth } from "@/lib/admin/health-aggregator";
 /**
  * GET - Fetch aggregated health status for all services
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/health-aggregator"),
   withAdmin,

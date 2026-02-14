@@ -7,6 +7,8 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface EnvVarStatus {
   name: string;
   configured: boolean;

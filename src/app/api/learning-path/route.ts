@@ -14,6 +14,8 @@ import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
  * GET /api/learning-path
  * List all learning paths for the current user
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/learning-path"),
   withAuth,

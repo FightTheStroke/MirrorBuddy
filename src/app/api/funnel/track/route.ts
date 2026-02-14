@@ -10,6 +10,8 @@ import { recordFunnelEvent, type FunnelStage } from "@/lib/funnel";
 import { logger } from "@/lib/logger";
 import { getVisitorIdFromCookie } from "@/lib/trial/visitor-id";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/funnel/track" });
 
 const VALID_STAGES: FunnelStage[] = [

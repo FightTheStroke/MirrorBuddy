@@ -16,6 +16,8 @@ import {
   type UserDataExport,
 } from "./helpers";
 
+
+export const revalidate = 0;
 interface ExportResponse {
   data: UserDataExport;
   stats: {

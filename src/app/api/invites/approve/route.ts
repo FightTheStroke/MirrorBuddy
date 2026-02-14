@@ -4,6 +4,8 @@ import { approveInviteRequest } from "@/lib/invite/invite-service";
 import { logger } from "@/lib/logger";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/invites/approve"),
   withCSRF,

@@ -10,6 +10,8 @@ import {
 } from "@/lib/rate-limit";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "contact-api" });
 
 /**

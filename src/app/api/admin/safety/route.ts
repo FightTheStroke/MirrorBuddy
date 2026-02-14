@@ -19,6 +19,8 @@ import {
 } from "@/lib/safety/server";
 import { prisma } from "@/lib/db";
 
+
+export const revalidate = 0;
 export interface SafetyDashboardResponse {
   overview: {
     totalEvents: number;

@@ -15,6 +15,8 @@ import { validateJsonRequest } from "@/lib/validation/middleware";
 import { AwardPointsRequestSchema } from "@/lib/validation/schemas/gamification";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/gamification/points"),
   withAuth,

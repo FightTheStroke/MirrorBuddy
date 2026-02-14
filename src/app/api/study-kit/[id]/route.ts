@@ -17,6 +17,8 @@ import { deleteMaterialsFromStudyKit } from "@/lib/study-kit/sync-materials";
  * GET /api/study-kit/[id]
  * Get study kit by ID
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/study-kit/[id]"),
   withAuth,

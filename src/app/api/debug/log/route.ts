@@ -10,6 +10,8 @@ import { debugLog } from "@/lib/debug-logger";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- debug endpoint only for development
+
+export const revalidate = 0;
 export const POST = pipe(withSentry("/api/debug/log"))(async (ctx) => {
   // Only in development
   if (process.env.NODE_ENV !== "development") {

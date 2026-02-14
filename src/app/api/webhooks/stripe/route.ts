@@ -18,6 +18,8 @@ import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import Stripe from "stripe";
 
+
+export const revalidate = 0;
 export const POST = pipe(withSentry("/api/webhooks/stripe"))(async (ctx) => {
   const body = await ctx.req.text();
   const signature = ctx.req.headers.get("stripe-signature");

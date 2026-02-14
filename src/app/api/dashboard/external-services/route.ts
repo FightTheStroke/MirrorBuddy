@@ -13,6 +13,8 @@ import {
   EXTERNAL_SERVICE_QUOTAS,
 } from "@/lib/metrics/external-service-metrics";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/dashboard/external-services"),
   withAuth,

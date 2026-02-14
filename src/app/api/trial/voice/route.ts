@@ -20,6 +20,8 @@ import { isSessionBlocked } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/trial/voice" });
 
 /**

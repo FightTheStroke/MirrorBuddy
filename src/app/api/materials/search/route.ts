@@ -11,6 +11,8 @@ import { logger } from "@/lib/logger";
 import { isPostgreSQL } from "@/lib/db/database-utils";
 import { Prisma } from "@prisma/client";
 
+
+export const revalidate = 0;
 interface SearchParams {
   query?: string;
   toolType?: string;

@@ -14,6 +14,8 @@ import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-coun
 import { assignBaseTierToNewUser } from "@/lib/tier/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/user"))(async () => {
   const auth = await validateAuth();
 

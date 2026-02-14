@@ -13,6 +13,8 @@ import { prisma } from "@/lib/db";
 import type { TierAuditLog, TierDefinition } from "@prisma/client";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface FunnelStage {
   tierCode: string;
   tierName: string;

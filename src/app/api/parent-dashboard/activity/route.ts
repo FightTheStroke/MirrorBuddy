@@ -10,6 +10,8 @@ import { prisma } from "@/lib/db";
 import { getMaestroById, SUBJECT_NAMES } from "@/data/maestri";
 import type { ParentDashboardActivity } from "@/types";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/parent-dashboard/activity"),
   withAuth,

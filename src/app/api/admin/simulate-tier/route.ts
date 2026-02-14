@@ -14,6 +14,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import type { TierName } from "@/types/tier-types";
 import { SIMULATED_TIER_COOKIE } from "@/lib/auth";
+
+export const revalidate = 0;
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 /**

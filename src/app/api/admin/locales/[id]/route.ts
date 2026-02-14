@@ -11,6 +11,8 @@ import { localeConfigService } from "@/lib/locale/locale-config-service";
  * GET /api/admin/locales/[id]
  * Get a single locale configuration by country code
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/locales/:id"),
   withAdmin,

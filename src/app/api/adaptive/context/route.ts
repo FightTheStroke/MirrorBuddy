@@ -4,6 +4,8 @@ import { buildAdaptiveInstruction } from "@/lib/education";
 import { getAdaptiveContextForUser } from "@/lib/education/server";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/adaptive/context"),
   withAuth,

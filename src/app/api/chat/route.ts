@@ -67,6 +67,8 @@ import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
  * Returns empty array if character not found (allows all tools via
  * filterToolDefinitions fallback).
  */
+
+export const revalidate = 0;
 function getCharacterTools(maestroId: string): string[] {
   const maestro = getMaestroById(maestroId);
   if (maestro) return maestro.tools;

@@ -11,6 +11,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const SENTRY_API_BASE = "https://sentry.io/api/0";
 
 interface SentryIssue {

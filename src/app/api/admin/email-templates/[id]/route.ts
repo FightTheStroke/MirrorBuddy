@@ -22,6 +22,8 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
  * GET /api/admin/email-templates/[id]
  * Fetch a single email template by ID
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-templates/:id"),
   withAdmin,

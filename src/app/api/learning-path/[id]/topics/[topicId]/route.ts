@@ -9,6 +9,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 type TopicStatus = "locked" | "unlocked" | "in_progress" | "completed";
 
 interface UpdateTopicRequest {

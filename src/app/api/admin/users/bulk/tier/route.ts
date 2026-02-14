@@ -3,6 +3,8 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 interface BulkTierChangeResult {
   userId: string;
   success: boolean;

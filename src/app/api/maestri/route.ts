@@ -5,6 +5,8 @@ import { getOrCompute, CACHE_TTL } from "@/lib/cache";
 import { generateMaestroGreeting } from "@/lib/greeting/greeting-generator";
 import type { SupportedLanguage } from "@/app/api/chat/types";
 
+
+export const revalidate = 0;
 const VALID_LOCALES = ["it", "en", "fr", "de", "es"];
 
 /**

@@ -20,6 +20,8 @@ import { pipe } from "@/lib/api/pipe";
 import { withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
 // OpenAI TTS voices
+
+export const revalidate = 0;
 type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
 
 interface TTSRequest {

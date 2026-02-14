@@ -8,6 +8,8 @@ import { RATE_LIMITS } from "@/lib/rate-limit";
 import { hashPII } from "@/lib/security";
 import crypto from "crypto";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "auth/forgot-password" });
 
 // Rate limit: 3 requests per email per hour

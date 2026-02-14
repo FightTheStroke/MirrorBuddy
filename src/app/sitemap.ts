@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+export const dynamic = "force-static";
+
 const LOCALES = ["it", "en", "fr", "de", "es"] as const;
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://mirrorbuddy.app";

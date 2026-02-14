@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { subscriptionTelemetry } from "@/lib/analytics/subscription-telemetry";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/subscriptions/[id]"),
   withAdmin,

@@ -20,6 +20,8 @@ import { getPoolMetrics, getPoolUtilization } from "@/lib/metrics/pool-metrics";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 /** Secret for health endpoint auth (optional) */
+
+export const revalidate = 0;
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
 
 /** Comma-separated list of allowed IPs (optional) */

@@ -10,6 +10,8 @@ import {
  * Returns Grafana configuration and panel list
  * Admin-only endpoint
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/grafana"),
   withAdmin,

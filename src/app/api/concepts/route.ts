@@ -8,6 +8,8 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const ConceptCreateSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),

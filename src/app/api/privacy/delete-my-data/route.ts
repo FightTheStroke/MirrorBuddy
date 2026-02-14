@@ -17,6 +17,8 @@ import {
   logDeletionAudit,
 } from "./helpers";
 
+
+export const revalidate = 0;
 interface DeleteRequestBody {
   /** Confirmation that user understands deletion is irreversible */
   confirmDeletion: boolean;

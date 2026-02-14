@@ -11,6 +11,8 @@ import {
   createExperiment,
 } from "@/lib/research/experiment-service";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/research/experiments"),
   withAdmin,

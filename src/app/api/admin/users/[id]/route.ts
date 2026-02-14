@@ -5,6 +5,8 @@ import { prisma } from '@/lib/db';
 import { createDeletedUserBackup } from '@/lib/admin/user-trash-service';
 import { executeUserDataDeletion } from '@/app/api/privacy/delete-my-data/helpers';
 
+
+export const revalidate = 0;
 export const PATCH = pipe(
   withSentry('/api/admin/users/[id]'),
   withCSRF,

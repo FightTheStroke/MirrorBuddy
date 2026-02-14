@@ -14,6 +14,8 @@ import {
   THRESHOLDS,
 } from "@/lib/metrics/cost-tracking-service";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/dashboard/session-metrics"),
   withAuth,

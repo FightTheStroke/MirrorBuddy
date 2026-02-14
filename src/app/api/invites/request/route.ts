@@ -10,6 +10,8 @@ import {
 } from "@/lib/rate-limit";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
+
+export const revalidate = 0;
 interface InviteRequestBody {
   name: string;
   email: string;

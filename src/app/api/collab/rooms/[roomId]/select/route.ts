@@ -10,6 +10,8 @@ import { broadcastCollabEvent } from '@/app/api/collab/sse/route';
 import { pipe } from '@/lib/api/pipe';
 import { withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry('/api/collab/rooms/:roomId/select'),
   withCSRF,

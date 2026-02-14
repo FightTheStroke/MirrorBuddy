@@ -6,6 +6,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { compareExperiments } from "@/lib/research/experiment-service";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/research/compare"),
   withAdmin,

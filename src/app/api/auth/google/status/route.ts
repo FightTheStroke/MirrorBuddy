@@ -10,6 +10,8 @@ import { prisma } from "@/lib/db";
 import type { GoogleConnectionStatus } from "@/lib/google";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/auth/google/status"),
   withAuth,

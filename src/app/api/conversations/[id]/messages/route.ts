@@ -14,6 +14,8 @@ import { anonymizeConversationMessage } from "@/lib/privacy";
  * Convert full ToolCall to lightweight ToolCallRef for DB storage.
  * Strips result.data to avoid duplicating Material content.
  */
+
+export const revalidate = 0;
 function toToolCallRefForStorage(toolCall: ToolCall): ToolCallRef {
   return {
     id: toolCall.id,

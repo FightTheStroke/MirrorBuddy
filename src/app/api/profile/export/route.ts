@@ -21,6 +21,8 @@ import type {
 import { generateProfileHTML } from "./helpers";
 
 // Rate limit for exports (prevent abuse)
+
+export const revalidate = 0;
 const EXPORT_RATE_LIMIT = {
   maxRequests: 10,
   windowMs: 60 * 1000, // 10 per minute

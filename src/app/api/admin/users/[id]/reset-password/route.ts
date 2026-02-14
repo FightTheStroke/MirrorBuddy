@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db";
 import { generateRandomPassword, hashPassword } from "@/lib/auth/server";
 import { sendEmail } from "@/lib/email";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/users/[id]/reset-password"),
   withCSRF,

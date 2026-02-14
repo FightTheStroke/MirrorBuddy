@@ -17,6 +17,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getAllExternalServiceUsage } from "@/lib/metrics/external-service-metrics";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "service-limits-api" });
 
 export interface ServiceLimit {

@@ -11,6 +11,8 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { tierService } from "@/lib/tier/server";
 import type { FeatureType, UserFeatureConfigInput } from "@/lib/tier/server";
 
+
+export const revalidate = 0;
 const VALID_FEATURES: FeatureType[] = [
   "chat",
   "realtime",

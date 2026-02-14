@@ -12,6 +12,8 @@ import { getCostDashboardData } from "@/lib/ops/cost-tracker";
 /**
  * GET - Fetch aggregated cost dashboard data
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/cost-tracking"),
   withAdmin,

@@ -23,6 +23,8 @@ import {
 } from "@/lib/rate-limit";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const VerifySchema = z.object({
   code: z.string().length(6),
   action: z.enum(["approve", "deny"]).default("approve"),

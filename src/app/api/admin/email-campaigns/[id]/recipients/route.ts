@@ -20,6 +20,8 @@ import { prisma } from "@/lib/db";
  * GET /api/admin/email-campaigns/[id]/recipients
  * Get all recipients for a campaign
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-campaigns/[id]/recipients"),
   withAdmin,

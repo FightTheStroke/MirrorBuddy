@@ -4,6 +4,8 @@ import { migrateTrialData } from "@/lib/invite/trial-migration";
 import { trackInviteFirstLogin } from "@/lib/telemetry/invite-events";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/user/migrate-trial"),
   withCSRF,

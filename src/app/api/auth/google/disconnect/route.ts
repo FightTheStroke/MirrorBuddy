@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import { disconnectGoogleAccount } from '@/lib/google';
 import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry('/api/auth/google/disconnect'),
   withCSRF,

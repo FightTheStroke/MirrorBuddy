@@ -13,6 +13,8 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/server";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/user/consent" });
 
 interface ConsentPayload {

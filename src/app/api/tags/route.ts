@@ -17,6 +17,8 @@ import { CreateTagSchema } from "@/lib/validation/schemas/organization";
  * Returns all tags for the current user with material counts.
  * Supports pagination via ?page=1&limit=100 (max 500)
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/tags"),
   withAuth,

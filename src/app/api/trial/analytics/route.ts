@@ -12,6 +12,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/trial/analytics" });
 
 interface TrialFunnelMetrics {

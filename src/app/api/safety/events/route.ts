@@ -13,6 +13,8 @@ import { validateAuth } from "@/lib/auth/server";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 import type { SafetyEventType, EventSeverity } from "@/lib/safety";
 
+
+export const revalidate = 0;
 interface SafetyEventBody {
   type: SafetyEventType;
   severity: EventSeverity;

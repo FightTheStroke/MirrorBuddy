@@ -12,6 +12,8 @@ import { findRelatedMaterials } from "@/lib/learning-path/material-linker";
 import { createLearningPath } from "@/lib/learning-path/path-generator";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface GenerateRequest {
   studyKitId: string;
   includeVisualOverview?: boolean;

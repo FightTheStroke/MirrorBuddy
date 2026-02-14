@@ -10,6 +10,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { queryAuditLog } from "@/lib/admin/audit-service";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/audit"),
   withAdmin,

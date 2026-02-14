@@ -8,6 +8,8 @@ import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { stripeService } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/billing/portal"),
   withCSRF,

@@ -14,6 +14,8 @@ import {
   getStressReport,
 } from "@/lib/observability/supabase-limits";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/test/supabase-limits"))(async () => {
   if (process.env.NODE_ENV === "production") {
     return NextResponse.json(

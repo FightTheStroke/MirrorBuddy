@@ -14,6 +14,8 @@ import {
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 import { z } from 'zod';
 
+
+export const revalidate = 0;
 const UpdateProductSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   description: z.string().max(500).optional(),

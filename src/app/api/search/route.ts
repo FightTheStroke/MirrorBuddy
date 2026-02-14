@@ -14,6 +14,8 @@ import {
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Blocked domains that are inappropriate for educational context
+
+export const revalidate = 0;
 const BLOCKED_DOMAINS = [
   "reddit.com",
   "tiktok.com",

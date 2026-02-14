@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { getInvites } from "@/lib/invite/invite-service";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/invites"),
   withAdmin,

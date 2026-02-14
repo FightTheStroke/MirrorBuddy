@@ -3,6 +3,8 @@ import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 import { Sentry } from '@/lib/sentry';
 import * as SentrySDK from '@sentry/nextjs';
 
+
+export const revalidate = 0;
 interface SentrySelfTestResult {
   dsnPresent: boolean;
   vercelEnv: string | undefined;

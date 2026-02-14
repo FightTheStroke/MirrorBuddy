@@ -37,6 +37,8 @@ import {
 } from "./helpers";
 
 /** Feature flag for streaming - can be disabled via env var */
+
+export const revalidate = 0;
 const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== "false";
 
 export const POST = pipe(

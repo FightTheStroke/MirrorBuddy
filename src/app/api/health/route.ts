@@ -10,6 +10,8 @@ import { getAppVersion } from "@/lib/version";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Track server start time for uptime calculation
+
+export const revalidate = 0;
 const startTime = Date.now();
 
 interface HealthCheck {

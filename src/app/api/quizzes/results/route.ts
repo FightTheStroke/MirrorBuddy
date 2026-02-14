@@ -11,6 +11,8 @@ import { recordAdaptiveSignal } from "@/lib/education/server";
 import type { AdaptiveSignalSource } from "@/types";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/quizzes/results"),
   withAuth,

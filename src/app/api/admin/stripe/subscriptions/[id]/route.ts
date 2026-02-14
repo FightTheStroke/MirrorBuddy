@@ -15,6 +15,8 @@ import {
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 import { z } from 'zod';
 
+
+export const revalidate = 0;
 const ActionSchema = z.object({
   action: z.enum(['cancel', 'change_plan']),
   cancelAtPeriodEnd: z.boolean().optional().default(true),

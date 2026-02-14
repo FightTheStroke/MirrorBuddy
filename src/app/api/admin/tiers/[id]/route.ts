@@ -8,6 +8,8 @@ import { tierService } from "@/lib/tier/server";
  * GET /api/admin/tiers/[id]
  * Get a single tier by ID
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/tiers/[id]"),
   withAdmin,

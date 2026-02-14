@@ -16,6 +16,8 @@ import { ListStudyKitsQuerySchema } from "@/lib/validation/schemas/study-kit";
  * GET /api/study-kit
  * List study kits for current user
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/study-kit"),
   withAuth,

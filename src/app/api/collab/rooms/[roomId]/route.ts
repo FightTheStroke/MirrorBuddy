@@ -22,6 +22,8 @@ import { withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 /**
  * GET /api/collab/rooms/[roomId] - Get room state
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/collab/rooms/:roomId'),
   withAuth,

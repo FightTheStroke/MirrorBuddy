@@ -22,6 +22,8 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
  * POST /api/admin/email-campaigns/[id]/send
  * Trigger campaign send to recipients
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/email-campaigns/[id]/send"),
   withCSRF,

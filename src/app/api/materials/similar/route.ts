@@ -9,6 +9,8 @@ import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { searchSimilar } from "@/lib/rag/server";
 
+
+export const revalidate = 0;
 interface SimilarMaterial {
   id: string;
   toolId: string;

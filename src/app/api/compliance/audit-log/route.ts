@@ -26,6 +26,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface ComplianceAuditEntryResponse {
   id: string;
   eventType: string;

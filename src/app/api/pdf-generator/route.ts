@@ -42,6 +42,8 @@ import type {
  *   error?: string;
  * }
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/pdf-generator"),
   withCSRF,

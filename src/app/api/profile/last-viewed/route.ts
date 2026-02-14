@@ -13,6 +13,8 @@ import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
  * GET /api/profile/last-viewed
  * Returns the timestamp when parent dashboard was last viewed
  */
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/profile/last-viewed"))(async () => {
   const auth = await validateAuth();
   if (!auth.authenticated) {

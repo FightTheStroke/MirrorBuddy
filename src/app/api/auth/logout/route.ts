@@ -8,6 +8,8 @@ import {
 } from "@/lib/auth";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/auth/logout" });
 
 export const POST = pipe(

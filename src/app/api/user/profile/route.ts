@@ -10,6 +10,8 @@ import { prisma } from "@/lib/db";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 // #92: Zod schema for profile validation
+
+export const revalidate = 0;
 const ProfileUpdateSchema = z
   .object({
     name: z.string().max(100).optional(),

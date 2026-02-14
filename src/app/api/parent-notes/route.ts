@@ -26,6 +26,8 @@ import { prisma } from "@/lib/db";
  * - unreadOnly: If 'true', only return unread notes
  * - countOnly: If 'true', only return unread count
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/parent-notes"),
   withAuth,

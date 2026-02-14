@@ -42,6 +42,8 @@ import {
  * - offset: Pagination offset
  * - stats: If 'true', return stats instead of tools
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/tools/saved"),
   withAuth,

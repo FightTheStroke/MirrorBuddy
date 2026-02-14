@@ -32,6 +32,8 @@ import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
  * - userId: Required for authorization
  * - reason: Optional reason for ending ('explicit' | 'timeout' | 'system')
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/conversations/[id]/end"),
   withCSRF,

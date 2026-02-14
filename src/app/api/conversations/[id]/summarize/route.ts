@@ -16,6 +16,8 @@ import {
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 // Minimum messages before summarization
+
+export const revalidate = 0;
 const MIN_MESSAGES_FOR_SUMMARY = 20;
 // Keep last N messages after summarization
 const MESSAGES_TO_KEEP = 10;

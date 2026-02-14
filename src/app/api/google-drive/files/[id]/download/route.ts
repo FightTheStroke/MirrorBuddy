@@ -13,6 +13,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import { downloadDriveFile } from "@/lib/google";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/google-drive/files/[id]/download"),
   withAuth,

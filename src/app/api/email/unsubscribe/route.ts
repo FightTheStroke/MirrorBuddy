@@ -20,6 +20,8 @@ import {
 } from "@/lib/email/preference-service";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const VALID_CATEGORIES: EmailCategory[] = [
   "productUpdates",
   "educationalNewsletter",

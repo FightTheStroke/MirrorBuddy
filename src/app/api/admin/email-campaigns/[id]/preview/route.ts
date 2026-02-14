@@ -24,6 +24,8 @@ import {
  * POST /api/admin/email-campaigns/[id]/preview
  * Get recipient preview with count and sample users
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/email-campaigns/[id]/preview"),
   withCSRF,

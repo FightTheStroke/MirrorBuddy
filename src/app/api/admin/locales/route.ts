@@ -9,6 +9,8 @@ import { localeConfigService } from "@/lib/locale/locale-config-service";
  * GET /api/admin/locales
  * Get all locale configurations
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/locales"),
   withAdmin,

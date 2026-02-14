@@ -22,6 +22,8 @@ import { VISITOR_COOKIE_NAME, validateVisitorId } from '@/lib/auth/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
 
 // Generate unique client ID
+
+export const revalidate = 0;
 function generateClientId(): string {
   return `sse_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }

@@ -10,6 +10,8 @@ import { logger } from '@/lib/logger';
 import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
 import { hashPII } from '@/lib/security';
 
+
+export const revalidate = 0;
 interface DirectorySyncRequest {
   schoolId: string;
   provider: 'google' | 'microsoft';

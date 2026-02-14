@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // NOTE: This route does NOT require auth - public search endpoint
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/conversations/search"))(async (
   ctx,
 ) => {

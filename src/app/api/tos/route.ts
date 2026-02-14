@@ -19,6 +19,8 @@ import {
 import { TOS_VERSION } from "@/lib/tos/constants";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/tos" });
 
 /**

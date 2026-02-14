@@ -16,6 +16,8 @@ import { UpdateCollectionSchema } from "@/lib/validation/schemas/organization";
  *
  * Get a single collection with its materials.
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/collections/:id"),
   withAuth,

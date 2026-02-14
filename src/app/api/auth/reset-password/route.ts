@@ -5,6 +5,8 @@ import { hashPassword, validatePasswordStrength } from "@/lib/auth/server";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "auth/reset-password" });
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public reset-password endpoint, uses rate limiting

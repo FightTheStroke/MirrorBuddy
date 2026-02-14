@@ -15,6 +15,8 @@ import type {
 /**
  * GET - Decrypt and return full secret value
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/key-vault/:id"),
   withAdmin,

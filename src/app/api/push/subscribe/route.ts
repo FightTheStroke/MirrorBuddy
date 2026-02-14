@@ -14,6 +14,8 @@ import {
 } from "@/lib/rate-limit";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface SubscriptionBody {
   endpoint: string;
   p256dh: string;

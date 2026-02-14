@@ -14,6 +14,8 @@ import {
 import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
 import { safeReadJson } from '@/lib/api/safe-json';
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/progress/sessions'),
   withAuth,

@@ -8,6 +8,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import { aiRouter } from "@/lib/ai/server";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/health/ai-providers"))(async () => {
   const health = await aiRouter.checkAllHealth();
 

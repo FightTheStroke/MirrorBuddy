@@ -17,6 +17,8 @@ import {
 import { analyzeImageWithVision } from "@/lib/tools/handlers/webcam-handler";
 import { extractUserIdWithCoppaCheck } from "@/app/api/chat/auth-handler";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/image/analyze"),
   withCSRF,

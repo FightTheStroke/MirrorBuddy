@@ -19,6 +19,8 @@ import { createHash } from 'crypto';
  * Generate ETag from settings data (F-14)
  * Uses updatedAt timestamp for version tracking
  */
+
+export const revalidate = 0;
 function generateETag(updatedAt: Date): string {
   const hash = createHash('md5').update(updatedAt.toISOString()).digest('hex');
   return `"${hash.substring(0, 16)}"`;

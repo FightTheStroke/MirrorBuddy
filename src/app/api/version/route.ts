@@ -8,6 +8,8 @@ import { pipe, withSentry } from "@/lib/api/middlewares";
 import { getCacheControlHeader, CACHE_TTL } from "@/lib/cache";
 import { getAppVersion } from "@/lib/version";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/version"))(async () => {
   const version = getAppVersion();
   const buildTime = process.env.BUILD_TIME || new Date().toISOString();

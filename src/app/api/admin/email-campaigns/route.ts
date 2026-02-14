@@ -22,6 +22,8 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
  * GET /api/admin/email-campaigns
  * List all email campaigns with optional status filter
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-campaigns"),
   withAdmin,

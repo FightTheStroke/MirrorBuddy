@@ -22,6 +22,8 @@ import {
 import { sendPushToUser, isPushConfigured } from "@/lib/push/send";
 import { parseTime, isQuietHours, getMelissaVoice } from "./helpers";
 
+
+export const revalidate = 0;
 const isUniqueConstraintError = (error: unknown) =>
   error instanceof Prisma.PrismaClientKnownRequestError &&
   error.code === "P2002";

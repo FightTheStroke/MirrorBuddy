@@ -32,6 +32,8 @@ import { SIMULATED_TIER_COOKIE } from "@/lib/auth/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import type { MiddlewareContext } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 interface TierFeaturesResponse {
   tier: string;
   features: Record<string, boolean>;

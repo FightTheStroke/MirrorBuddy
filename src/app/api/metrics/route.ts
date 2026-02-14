@@ -15,6 +15,8 @@ import { generateSecurityMetrics } from "./security-metrics";
 import { generateExternalServiceMetrics } from "@/lib/metrics/external-service-metrics";
 import { getPoolMetrics, getPoolUtilization } from "@/lib/metrics/pool-metrics";
 
+
+export const revalidate = 0;
 interface MetricLine {
   name: string;
   type: "counter" | "gauge" | "histogram";

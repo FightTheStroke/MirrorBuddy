@@ -6,6 +6,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { runExperiment } from "@/lib/research/experiment-service";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/research/experiments/[id]/run"),
   withCSRF,

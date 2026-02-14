@@ -14,6 +14,8 @@ import { getAllSupportTeachers } from "@/data/support-teachers";
 import { getAllBuddies } from "@/data/buddy-profiles";
 import type { CharacterType } from "@prisma/client";
 
+
+export const revalidate = 0;
 interface UpdateCharacterRequest {
   isEnabled?: boolean;
   displayNameOverride?: string;

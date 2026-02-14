@@ -28,6 +28,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import type { Prisma } from "@prisma/client";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "webhooks:resend" });
 
 // Resend webhook event types

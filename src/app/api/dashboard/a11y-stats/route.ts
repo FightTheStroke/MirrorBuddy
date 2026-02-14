@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export interface A11yStatsData {
   period: { days: number; startDate: string };
   summary: {

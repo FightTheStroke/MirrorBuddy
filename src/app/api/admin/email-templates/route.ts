@@ -17,6 +17,8 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
  * GET /api/admin/email-templates
  * List all email templates with optional category filter
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-templates"),
   withAdmin,

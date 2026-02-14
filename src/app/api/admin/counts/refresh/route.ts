@@ -18,6 +18,8 @@ import {
 } from "@/lib/helpers/publish-admin-counts";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "admin-counts-refresh" });
 
 export const POST = pipe(

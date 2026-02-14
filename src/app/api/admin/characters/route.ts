@@ -12,6 +12,8 @@ import { getAllMaestri } from "@/data/maestri";
 import { getAllSupportTeachers } from "@/data/support-teachers";
 import { getAllBuddies } from "@/data/buddy-profiles";
 
+
+export const revalidate = 0;
 interface CharacterWithConfig {
   id: string;
   name: string;

@@ -22,6 +22,8 @@ import {
  * GET /api/materials
  * List materials for current user with optional filters
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/materials"),
   withAuth,

@@ -9,6 +9,8 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/dashboard/token-usage'),
   withAdmin,

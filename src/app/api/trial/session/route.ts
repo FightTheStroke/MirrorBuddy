@@ -12,6 +12,8 @@ import { VISITOR_COOKIE_NAME, TRIAL_CONSENT_COOKIE } from '@/lib/auth/server';
 import { checkAbuse, incrementAbuseScore } from '@/lib/trial/anti-abuse';
 import { prisma } from '@/lib/db';
 
+
+export const revalidate = 0;
 const log = logger.child({ module: 'api/trial/session' });
 
 /**

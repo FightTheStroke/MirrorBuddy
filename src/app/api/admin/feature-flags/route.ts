@@ -39,6 +39,8 @@ import {
   getVoiceLimits,
 } from "@/lib/metrics";
 
+
+export const revalidate = 0;
 interface UpdateFlagRequest {
   featureId: KnownFeatureFlag;
   update: FeatureFlagUpdate;

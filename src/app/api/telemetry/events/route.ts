@@ -12,6 +12,8 @@ import { getCorsHeaders } from '@/lib/security';
 
 // Handle CORS preflight
 // F-04: Get CORS headers based on request origin (no wildcard in production)
+
+export const revalidate = 0;
 export const OPTIONS = pipe(withSentry('/api/telemetry/events'))(async (ctx) => {
   const requestOrigin = ctx.req.headers.get('origin');
   const corsHeaders = getCorsHeaders(requestOrigin);

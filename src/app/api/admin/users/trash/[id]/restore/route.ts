@@ -3,6 +3,8 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 import { restoreUserFromBackup } from "@/lib/admin/user-trash-service";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/users/trash/[id]/restore"),
   withCSRF,

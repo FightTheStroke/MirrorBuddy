@@ -13,6 +13,8 @@ import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
  * GET /api/learning-path/[id]
  * Get learning path details with all topics
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/learning-path/[id]"),
   withAuth,

@@ -17,6 +17,8 @@ import {
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
 // Default subscription for MirrorBuddy
+
+export const revalidate = 0;
 const DEFAULT_SUBSCRIPTION_ID = "8015083b-adad-42ff-922d-feaed61c5d62";
 
 export const GET = pipe(

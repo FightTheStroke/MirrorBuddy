@@ -7,6 +7,8 @@ import { prisma } from "@/lib/db";
  * List audit logs with filters and pagination
  * Query params: action, userId, adminId, startDate, endDate, page, pageSize
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/audit-logs"),
   withAdmin,

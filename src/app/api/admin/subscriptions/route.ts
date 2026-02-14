@@ -8,6 +8,8 @@ import { prisma } from "@/lib/db";
  * List all subscriptions with optional filters
  * Query params: userId, tierId, status
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/subscriptions"),
   withAdmin,

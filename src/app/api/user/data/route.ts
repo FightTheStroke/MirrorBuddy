@@ -19,6 +19,8 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth";
  * GET /api/user/data - Export all user data (GDPR portability)
  * Returns all user data from database as JSON
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/user/data"),
   withAuth,

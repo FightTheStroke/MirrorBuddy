@@ -12,6 +12,8 @@ import {
 } from '@/lib/admin/stripe-webhooks-service';
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/stripe/webhooks/[id]'),
   withAdmin,

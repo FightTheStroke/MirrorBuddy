@@ -10,6 +10,8 @@ import {
 } from "@/lib/rate-limit";
 import { verifyTrialEmailCode } from "@/lib/trial/trial-service";
 
+
+export const revalidate = 0;
 const VerifySchema = z.object({
   sessionId: z.string().min(1),
   code: z.string().min(4).max(12),

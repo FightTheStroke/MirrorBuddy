@@ -32,6 +32,8 @@ import type {
  * GET /api/profile
  * Returns the student's insight profile for the parent dashboard
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/profile"),
   withAuth,

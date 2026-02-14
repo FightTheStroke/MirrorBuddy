@@ -11,6 +11,8 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
 // Zod schema for bulk operations
+
+export const revalidate = 0;
 const BulkOperationSchema = z.object({
   materialIds: z.array(z.string().cuid()).min(1).max(100),
   operation: z.enum([

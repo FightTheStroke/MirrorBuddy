@@ -24,6 +24,8 @@ import {
   isProfileUpToDate,
 } from './helpers';
 
+
+export const revalidate = 0;
 const GENERATE_RATE_LIMIT = {
   maxRequests: 5,
   windowMs: 60 * 1000,

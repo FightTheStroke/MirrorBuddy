@@ -21,6 +21,8 @@ import { prisma } from "@/lib/db";
  * GET /api/admin/email-campaigns/[id]
  * Get campaign details with recipient statistics
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-campaigns/[id]"),
   withAdmin,

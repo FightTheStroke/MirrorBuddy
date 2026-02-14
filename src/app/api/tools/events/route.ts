@@ -27,6 +27,8 @@ import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
 import { validateVisitorId } from '@/lib/auth';
 
 // Validate tool event type
+
+export const revalidate = 0;
 const VALID_EVENT_TYPES: ToolEventType[] = [
   'tool:created',
   'tool:update',

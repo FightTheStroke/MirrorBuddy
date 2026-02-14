@@ -16,6 +16,8 @@ import { getAllBuddies } from "@/data/buddy-profiles";
  * POST /api/admin/characters/seed
  * Create CharacterConfig records for all characters that don't have one
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/characters/seed"),
   withCSRF,

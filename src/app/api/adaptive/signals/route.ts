@@ -6,6 +6,8 @@ import { recordAdaptiveSignalsBatch } from "@/lib/education/server";
 import type { AdaptiveSignalInput } from "@/types/adaptive-difficulty";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/adaptive/signals"),
   withCSRF,

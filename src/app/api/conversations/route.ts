@@ -11,6 +11,8 @@ import { ConversationCreateSchema } from "@/lib/validation/schemas/conversations
 import type { Conversation, Message } from "@prisma/client";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/conversations"),
   withAuth,

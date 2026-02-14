@@ -11,6 +11,8 @@ import { sendEmail } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { recordAuditEvent } from "@/lib/audit/admin-audit";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "school-register" });
 
 const handler = pipe(

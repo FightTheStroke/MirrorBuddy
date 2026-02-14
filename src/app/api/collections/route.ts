@@ -17,6 +17,8 @@ import { CreateCollectionSchema } from "@/lib/validation/schemas/organization";
  * Returns all collections for the current user.
  * Optionally filtered by parentId for nested navigation.
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/collections"),
   withAuth,

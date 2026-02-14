@@ -12,6 +12,8 @@ import { logAdminAction } from "@/lib/admin/audit-service";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "safety-intervention" });
 
 export const POST = pipe(

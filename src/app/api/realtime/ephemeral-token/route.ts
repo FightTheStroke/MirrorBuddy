@@ -17,6 +17,8 @@ import {
 import { logger } from '@/lib/logger';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
 
+
+export const revalidate = 0;
 interface AzureSessionResponse {
   client_secret: {
     value: string;

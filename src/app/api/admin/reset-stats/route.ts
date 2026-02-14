@@ -9,6 +9,8 @@ import { logger } from "@/lib/logger";
  * Emergency endpoint to reset all statistics (keeps user accounts but deletes all activity data)
  * Admin-only, requires explicit confirmation
  */
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/admin/reset-stats"),
   withCSRF,

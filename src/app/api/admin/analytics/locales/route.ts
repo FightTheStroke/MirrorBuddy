@@ -27,6 +27,8 @@ import {
   calculateTrends,
 } from './helpers';
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/analytics/locales'),
   withAdmin,

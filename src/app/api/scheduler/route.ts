@@ -25,6 +25,8 @@ import {
 } from "./helpers";
 
 // GET - Get user's study schedule
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/scheduler"),
   withAuth,

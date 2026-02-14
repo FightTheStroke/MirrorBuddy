@@ -17,6 +17,8 @@ import { logger } from "@/lib/logger";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
 import { hashPII } from "@/lib/security";
 
+
+export const revalidate = 0;
 export const DELETE = pipe(
   withSentry("/api/admin/cleanup-users"),
   withCSRF,

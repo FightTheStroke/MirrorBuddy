@@ -3,6 +3,8 @@ import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { buildReportContent } from "@/lib/admin/report-generator";
 import { generatePDFFromContent } from "@/lib/pdf-generator/generate";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/reports/summary"),
   withAdmin,

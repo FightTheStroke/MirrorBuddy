@@ -19,6 +19,8 @@ import {
   endSession,
 } from "@/lib/tier/server";
 
+
+export const revalidate = 0;
 const StartSchema = z.object({
   action: z.literal("start"),
   voiceSessionId: z.string().min(1),

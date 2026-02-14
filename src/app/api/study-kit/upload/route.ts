@@ -14,6 +14,8 @@ import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
 import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
 import { UploadStudyKitSchema } from '@/lib/validation/schemas/study-kit';
 
+
+export const revalidate = 0;
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
 

@@ -16,6 +16,8 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
  * Email validation regex
  * Simple validation - full validation happens at email service level
  */
+
+export const revalidate = 0;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**

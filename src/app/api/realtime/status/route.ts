@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import { getProxyStatus } from "@/server/realtime-proxy";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/realtime/status"))(async () => {
   try {
     const status = getProxyStatus();

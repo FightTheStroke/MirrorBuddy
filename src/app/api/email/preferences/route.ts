@@ -22,6 +22,8 @@ import { logger } from "@/lib/logger";
  * GET /api/email/preferences?token=xxx
  * Get email preferences by unsubscribe token
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/email/preferences"),
   withRateLimit({

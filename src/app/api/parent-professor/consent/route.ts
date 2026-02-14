@@ -9,6 +9,8 @@ import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/parent-professor/consent"),
   withAuth,

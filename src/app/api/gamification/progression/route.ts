@@ -7,6 +7,8 @@ import { NextResponse } from "next/server";
 import { getProgression } from "@/lib/gamification/db";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/gamification/progression"),
   withAuth,

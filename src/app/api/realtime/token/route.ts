@@ -15,6 +15,8 @@ import {
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 
 // WebSocket proxy port (must match instrumentation.ts)
+
+export const revalidate = 0;
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || "3001", 10);
 
 export const GET = pipe(withSentry("/api/realtime/token"))(async (ctx) => {

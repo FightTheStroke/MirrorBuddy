@@ -16,6 +16,8 @@ import { safeReadJson } from '@/lib/api/safe-json';
 import { AUTH_COOKIE_NAME, VISITOR_COOKIE_NAME } from '@/lib/auth';
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
+
+export const revalidate = 0;
 export const POST = pipe(withSentry('/api/telemetry/activity'))(async (ctx) => {
   // E2E tests generate a lot of navigation events. Writing each one to the DB can
   // exhaust the connection pool and cause unrelated tests to fail.

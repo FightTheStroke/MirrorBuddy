@@ -12,6 +12,8 @@ import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "purge-staging-data-api" });
 
 export interface StagingDataCounts {

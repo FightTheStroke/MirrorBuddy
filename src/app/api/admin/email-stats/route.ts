@@ -18,6 +18,8 @@ import {
  * GET /api/admin/email-stats
  * Returns global email statistics and recent campaign stats
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-stats"),
   withAdmin,

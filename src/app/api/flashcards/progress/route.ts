@@ -12,6 +12,8 @@ import {
 } from "@/lib/validation/schemas/progress";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/flashcards/progress"),
   withAuth,

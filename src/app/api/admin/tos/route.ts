@@ -11,6 +11,8 @@ import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
+
+export const revalidate = 0;
 const log = logger.child({ module: "api/admin/tos" });
 
 interface TosAcceptanceWithUser {

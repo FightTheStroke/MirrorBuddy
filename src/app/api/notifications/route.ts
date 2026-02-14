@@ -7,4 +7,6 @@
  * DELETE /api/notifications - Delete notifications
  */
 
+
+export const revalidate = 0;
 export { GET, POST, PATCH, DELETE } from "./handlers";

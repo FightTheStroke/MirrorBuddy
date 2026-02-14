@@ -39,6 +39,8 @@ import {
 /**
  * GET /api/profile/consent - Check consent status for a user
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/profile/consent'),
   withAuth,

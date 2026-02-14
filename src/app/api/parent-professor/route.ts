@@ -33,6 +33,8 @@ import {
 } from "./helpers";
 import type { ParentChatRequest } from "./types";
 
+
+export const revalidate = 0;
 export const POST = pipe(
   withSentry("/api/parent-professor"),
   withCSRF,

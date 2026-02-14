@@ -20,6 +20,8 @@ import {
  * GET /api/admin/control-panel
  * Retrieve all control panel state
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/control-panel"),
   withAdmin,

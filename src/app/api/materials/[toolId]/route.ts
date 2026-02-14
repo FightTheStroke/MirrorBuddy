@@ -14,6 +14,8 @@ import { prisma } from "@/lib/db";
  * GET /api/materials/[toolId]
  * Fetch a single material by toolId
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/materials/[toolId]"),
   withAuth,

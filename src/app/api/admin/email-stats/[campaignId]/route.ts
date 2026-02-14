@@ -20,6 +20,8 @@ import { getCampaignStats, getOpenTimeline } from "@/lib/email/stats-service";
  * GET /api/admin/email-stats/[campaignId]
  * Returns campaign statistics and hourly open timeline
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/email-stats/[campaignId]"),
   withAdmin,

@@ -10,6 +10,8 @@ import { getOpsDashboardData } from "@/lib/admin/ops-dashboard-service";
 /**
  * GET - Fetch real-time ops metrics
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/ops-dashboard"),
   withAdmin,

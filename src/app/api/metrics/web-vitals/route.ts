@@ -14,6 +14,8 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 
+
+export const revalidate = 0;
 interface WebVitalMetric {
   name: "CLS" | "FCP" | "INP" | "LCP" | "TTFB";
   value: number;

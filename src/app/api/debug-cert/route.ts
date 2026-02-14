@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
+
+export const revalidate = 0;
 export const GET = pipe(withSentry("/api/debug-cert"))(async () => {
   // Block in production - only allow in development
   if (process.env.NODE_ENV !== "development") {

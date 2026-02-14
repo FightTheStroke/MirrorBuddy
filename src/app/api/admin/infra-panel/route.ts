@@ -12,6 +12,8 @@ import { logger } from "@/lib/logger";
  * GET /api/admin/infra-panel
  * Returns Vercel, Supabase, and Redis metrics
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/infra-panel"),
   withAdmin,

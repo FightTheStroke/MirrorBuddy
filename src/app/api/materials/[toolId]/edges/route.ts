@@ -8,6 +8,8 @@ import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
 
+
+export const revalidate = 0;
 const EdgeCreateSchema = z.object({
   toId: z.string().min(1),
   relationType: z.enum([

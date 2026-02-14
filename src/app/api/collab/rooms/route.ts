@@ -13,6 +13,8 @@ import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-conv
 import { pipe } from '@/lib/api/pipe';
 import { withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 interface CreateRoomRequest {
   mindmap: ExportMindmapData;
   user: {

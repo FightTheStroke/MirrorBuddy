@@ -14,6 +14,8 @@ import { logger } from "@/lib/logger";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
 // Zod schema for query parameter validation
+
+export const revalidate = 0;
 const MemoryQuerySchema = z.object({
   maestroId: z.string().min(1).max(100),
 });

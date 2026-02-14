@@ -17,6 +17,8 @@ import {
   endSession,
 } from '@/lib/metrics';
 
+
+export const revalidate = 0;
 type MetricsAction = 'start' | 'end' | 'turn' | 'voice' | 'refusal' | 'incident';
 
 interface MetricsRequest {

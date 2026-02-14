@@ -8,6 +8,8 @@ import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 
+
+export const revalidate = 0;
 interface SubscriptionEventPayload {
   type: string;
   tierId: string;

@@ -12,6 +12,8 @@ import type { MaskedSecretVaultEntry, CreateSecretRequest } from '@/lib/admin/ke
 /**
  * GET - List all stored keys (masked values only)
  */
+
+export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/key-vault'),
   withAdmin,
