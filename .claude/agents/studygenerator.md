@@ -1,8 +1,10 @@
 ---
 name: studygenerator
 description: Generates accessible study materials (PDFs) for students with learning differences. Reads scanned textbooks with Claude vision, extracts content, and creates dyslexia-friendly PDFs with OpenDyslexic font, mind maps, and step-by-step guides.
+tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 model: opus
-color: "#10B981"
+color: '#10B981'
+memory: project
 ---
 
 # StudyGenerator Agent
@@ -26,6 +28,7 @@ Uses Claude vision to read scanned textbooks and generates optimized PDFs.
 ## Supported Profiles
 
 This agent generates material for **dyslexia profile**:
+
 - Large font (14pt+)
 - High contrast (black on white/light gray)
 - Uppercase text
@@ -62,6 +65,7 @@ Required input:
 ### 3. Structure Content
 
 For each topic, create:
+
 1. **Cover page** - Title, student name, index
 2. **Overview map** - All topics connected
 3. **For each section**:
@@ -132,68 +136,13 @@ open ~/Downloads/{OUTPUT_FILE}.pdf
 
 ---
 
-## Python Script Template
-
-```python
-#!/usr/bin/env python3
-"""
-Generate accessible PDF for [STUDENT] - [TOPIC]
-"""
-
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
-from reportlab.pdfgen import canvas
-from reportlab.lib.colors import black, white, HexColor
-import os
-
-# Configuration
-OUTPUT_PDF = "~/Downloads/[NAME]_[TOPIC].pdf"
-STUDENT = "[NAME]"
-TOPIC = "[TOPIC]"
-
-# DSA-friendly colors
-LIGHT_GRAY = HexColor("#F5F5F5")
-BLACK = black
-WHITE = white
-
-# Font (fallback to Helvetica if OpenDyslexic unavailable)
-FONT_DIR = os.path.join(os.path.dirname(__file__), "fonts")
-try:
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    pdfmetrics.registerFont(TTFont('OpenDyslexic',
-        os.path.join(FONT_DIR, 'OpenDyslexic-Regular.ttf')))
-    FONT_NORMAL = 'OpenDyslexic'
-    FONT_BOLD = 'OpenDyslexic-Bold'
-except:
-    FONT_NORMAL = 'Helvetica'
-    FONT_BOLD = 'Helvetica-Bold'
-
-# ... helper functions (see genera_pdf_mario_light.py) ...
-
-def main():
-    c = canvas.Canvas(OUTPUT_PDF, pagesize=A4)
-    # Generate content
-    c.save()
-    print(f"PDF created: {OUTPUT_PDF}")
-
-if __name__ == "__main__":
-    main()
-```
-
 ---
 
-## Available Helper Functions
+## Reference
 
-Scripts in `testingcase/` provide these reusable functions:
-
-| Function | Description |
-|----------|-------------|
-| `disegna_titolo_sezione(c, title, y)` | Large title with underline |
-| `disegna_box_concetto(c, title, contents, y)` | Gray box with bullet points |
-| `disegna_esempio(c, text, y)` | Dashed box for examples |
-| `calcola_punto_bordo_ellisse(...)` | For mind map connections |
-| `calcola_punto_bordo_box(...)` | For mind map connections |
+- Python templates: `testingcase/genera_pdf_mario_light.py` (base), `genera_pdf_mario.py` (full)
+- Helper functions: `disegna_titolo_sezione`, `disegna_box_concetto`, `disegna_esempio`, `calcola_punto_bordo_*`
+- Fonts: `testingcase/fonts/OpenDyslexic-*.ttf`, `AtkinsonHyperlegible-*.ttf`
 
 ---
 
@@ -257,14 +206,3 @@ Before delivering the PDF, verify:
 2. **Static PDF** - Not interactive (no audio, no embedded quizzes)
 3. **Requires Python** - To run generated scripts
 4. **Manual vision** - Claude reads pages, not automatic OCR
-
----
-
-## Future Development
-
-Component 2 (MirrorBuddy Integration) will add:
-- 7 complete accessibility profiles
-- Azure OpenAI GPT-4o for automatic vision
-- @react-pdf/renderer (solves OpenDyslexic font in browser)
-- Study Kit integration
-- Full learning path export
