@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Scheduled Maintenance & Communication System (Plan 146)
+
+### Maintenance System
+
+- Added: `MaintenanceWindow` Prisma model with DB-persisted scheduling (F-01)
+- Added: Maintenance service with env → DB → in-memory priority chain (F-02)
+- Added: Static `/maintenance` page with i18n (5 locales) and WCAG 2.1 AA (F-03)
+- Added: Proxy redirect during maintenance with admin/API/cron bypass (F-04)
+- Added: Admin CRUD API for maintenance windows with overlap validation (F-05, F-17)
+- Added: Admin toggle API for activate/deactivate maintenance (F-06)
+- Added: Admin UI toggle panel and scheduled windows widget (F-07)
+- Added: Public `/api/maintenance` status endpoint for banner (F-08)
+- Added: i18n keys for all 5 locales (it/en/fr/de/es) (F-13)
+- Added: Backward compatibility with existing MaintenanceModeState (F-24)
+
 ## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2+W3)
 
 ### Voice
@@ -46,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added: `switch-character.test.ts` — 2 tests covering store update and data channel guard
 - Added: `token-cache.test.ts` — 5 tests covering fetch, cache, failure, string expiresAt
 - All 26 maestri, 6 coaches, 6 buddies have `voiceInstructions` populated
+
 ## [Unreleased] — Architecture Map & Drift Detection
 
 ### Architecture
