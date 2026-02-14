@@ -5,42 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — Lint Infrastructure Hardening
-
-### Added
-
-- 4 ESLint rules activated: `no-direct-ai-provider`, `no-hardcoded-strings-in-tests`, `no-todo-without-issue`, `require-native-bridge` (all at error level)
-- Media-bridge extended with `requestVideoStream()`, `requestMediaStream()`, `enumerateMediaDevices()`, `onDeviceChange()`, `isMediaDevicesAvailable()` in `src/lib/native/media-bridge-stream.ts`
-- Toast integration tests for astuccio webcam capture (success + error paths)
-- Real API implementations in `ai-email-service.ts` (Azure OpenAI usage, Sentry issues, Resend emails)
-- Missing i18n keys (`errorPage`, `quickActions`, education error messages) across all 5 locales
-
-### Fixed
-
-- 4 orphaned ESLint rule files registered and configured in `eslint.config.mjs`
-- 111 hardcoded Italian strings in 24 test files migrated to `getTranslation()`/`getTranslationRegex()`
-- 28 direct `navigator.mediaDevices` usages migrated to media-bridge abstraction
-- `no-hardcoded-strings-in-tests` rule crash on regex literals (`text.slice is not a function`)
-- `no-todo-without-issue` false positive on Spanish "Todo" (case-sensitive match)
-- `pre-release-check.sh` missing build lock (multi-agent `.next/` corruption risk)
-- `release-gate.sh` redundant E2E smoke run removed (already included in full E2E)
-- `ci-verification.md` incorrect `ci-check.sh` path (now points to `~/.claude/scripts/`)
-- Placeholder translations in en/de/es `education.json` replaced with real translations
-
-## [Unreleased] — Documentation Alignment
-
-### Documentation
-
-- Fixed: CLAUDE.md — AI providers path corrected to `src/lib/ai/providers/` (directory), FSRS path to `src/lib/education/fsrs/`, added `admin-patterns` to rules list, added Claude provider
-- Fixed: ARCHITECTURE.md — GPT-4o references updated to GPT-5-mini, ADR count 65+ → 146+, added Claude provider, updated date
-- Fixed: ARCHITECTURE-DIAGRAMS.md — version 0.12.0 → 0.15.0, embedding model `ada-002` → `3-small`, tier limits corrected to per-day, added Claude to system and integration diagrams
-- Fixed: README.md — tier table limits corrected (per-month → per-day, Base voice 100→30 min, tools 30/day), health check version 0.10.0 → 0.15.0, tech stack AI providers updated
-- Fixed: SECURITY.md — supported version 1.x.x → 0.15.x, updated date
-- Fixed: SETUP.md — Showcase maestri count 16 → 26, Docker node:18 → node:24, removed broken docs-archive link
-- Fixed: SETUP-PRODUCTION.md — ADR link text 0060 → 0080, removed broken docs-archive link, updated date
-- Fixed: AGENTS.md — added Claude as AI fallback provider
-
-## [Unreleased] — Character Voice DeepFix (Plan 145, W1)
+## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2)
 
 ### Voice
 
@@ -48,11 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed: Replaced arbitrary `.slice(0, 800)` truncation of systemPrompt with intelligent section extraction in `session-config.ts`
 - Fixed: Silent error swallowing in `fetchConversationMemory` — now logs warnings with actual error messages via `clientLogger`
 - Fixed: Silent catch in `session-config.ts` memory fetch — now logs warning with maestro ID and error details
+- Added: `switch-character.ts` — Persistent WebRTC: switch characters via `session.update` without tearing down the RTCPeerConnection
+- Added: `switchCharacter` action in `voice-session-store.ts` — updates maestro, clears transcript/tools, keeps connection
+- Added: `token-cache.ts` — Ephemeral token pre-fetch with TTL and auto-refresh 30s before expiry
+
+### Infrastructure
+
+- Updated: `deployment-mapping.ts` — Accurate deprecation timeline: GPT-4o family RETIRED Feb 2026, text-embedding-3-small and whisper-1 stable, realtime preview models 3-6 month lifecycle
 
 ### Tests
 
 - Added: `voice-prompt-builder.test.ts` — 10 tests covering section extraction, char limits, edge cases
 - Added: `memory-utils.test.ts` — 13 tests covering sanitization, memory fetch, context building
+- Added: `switch-character.test.ts` — 2 tests covering store update and data channel guard
+- Added: `token-cache.test.ts` — 5 tests covering fetch, cache, failure, string expiresAt
 
 ### Verified (No Change Needed)
 

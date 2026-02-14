@@ -30,6 +30,8 @@ interface VoiceSessionState {
   clearToolCalls: () => void;
   setInputLevel: (level: number) => void;
   setOutputLevel: (level: number) => void;
+  /** Switch character: update maestro, clear transcript/tools, keep connection */
+  switchCharacter: (maestro: Maestro) => void;
   reset: () => void;
 }
 
@@ -64,13 +66,19 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
     })),
   updateToolCall: (id, updates) =>
     set((state) => ({
-      toolCalls: state.toolCalls.map((tc) =>
-        tc.id === id ? { ...tc, ...updates } : tc
-      ),
+      toolCalls: state.toolCalls.map((tc) => (tc.id === id ? { ...tc, ...updates } : tc)),
     })),
   clearToolCalls: () => set({ toolCalls: [] }),
   setInputLevel: (inputLevel) => set({ inputLevel }),
   setOutputLevel: (outputLevel) => set({ outputLevel }),
+  switchCharacter: (maestro) =>
+    set({
+      currentMaestro: maestro,
+      transcript: [],
+      toolCalls: [],
+      isSpeaking: false,
+      isListening: false,
+    }),
   reset: () =>
     set({
       isConnected: false,

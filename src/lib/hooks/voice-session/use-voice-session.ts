@@ -18,6 +18,7 @@ import { useStartAudioCapture } from './audio-capture';
 import { useSendGreeting, useSendSessionConfig } from './session-config';
 import { useHandleServerEvent } from './event-handlers';
 import { useConnect, useDisconnect } from './connection';
+import { useSwitchCharacter } from './switch-character';
 import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
 import { useUnifiedCamera } from './use-unified-camera';
 import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
@@ -208,6 +209,14 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     options,
   );
   const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
+  const switchCharacter = useSwitchCharacter({
+    webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    maestroRef: refs.maestroRef,
+    greetingSentRef: refs.greetingSentRef,
+    sessionReadyRef: refs.sessionReadyRef,
+    sendSessionConfigRef: refs.sendSessionConfigRef,
+    switchCharacterStore: store.switchCharacter,
+  });
 
   useEffect(() => {
     return () => {
@@ -259,6 +268,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     },
     connect,
     disconnect,
+    switchCharacter,
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
     sendText: useSendText(refs.webrtcDataChannelRef, store.addTranscript),
     cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),

@@ -7,6 +7,18 @@
  *
  * IMPORTANT: When adding new models, ensure the deployment exists in Azure.
  * Use `az cognitiveservices account deployment list` to verify.
+ *
+ * === DEPRECATION TIMELINE (as of Feb 2026) ===
+ * - gpt-4o:       RETIRED Feb 13-16, 2026 — migrate to gpt-5.2 or gpt-5
+ * - gpt-4o-mini:  RETIRED Feb 13-16, 2026 — migrate to gpt-5-mini or gpt-5-nano
+ * - gpt-4-turbo:  RETIRED (older than gpt-4o) — migrate to gpt-5 family
+ * - gpt-4o-realtime-preview: Preview versions retire within 3-6 months of release
+ * - text-embedding-3-small: No scheduled retirement (≥1 year from GA)
+ * - whisper-1: No scheduled retirement
+ *
+ * Migration: All GPT-4 family references should be updated to GPT-5 deployments.
+ * The GPT-4 entries below are kept only for backward compatibility with existing
+ * Azure deployments that haven't been migrated yet.
  */
 
 import { logger } from '@/lib/logger';
@@ -23,7 +35,8 @@ function getChatDeploymentFallback(): string | undefined {
  * Values: Actual Azure deployment names from env vars or direct names
  */
 const DEPLOYMENT_MAP: Record<string, string | undefined> = {
-  // GPT-4 family (legacy — retiring 2026-03-31, kept for backward compatibility)
+  // GPT-4 family (RETIRED Feb 2026 — kept for backward compatibility with
+  // existing Azure deployments. Migrate to GPT-5 family ASAP.)
   'gpt-4o': process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || 'gpt-4o',
   'gpt-4o-mini': process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || 'gpt4o-mini-deployment',
   'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || 'gpt-4-turbo',
@@ -37,7 +50,8 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
   'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || getChatDeploymentFallback(),
 
-  // Realtime models (voice)
+  // Realtime models (voice) — preview versions retire within 3-6 months
+  // Monitor Azure Health Alerts for specific deprecation notices
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-4o-realtime',
   'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
 };
