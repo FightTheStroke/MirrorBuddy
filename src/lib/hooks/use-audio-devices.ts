@@ -5,6 +5,12 @@
 // ============================================================================
 
 import { useState, useEffect, useCallback } from 'react';
+import {
+  enumerateMediaDevices,
+  requestMediaStream,
+  requestMicrophoneStream,
+  stopMediaStream,
+} from '@/lib/native/media-bridge';
 
 export interface AudioDevice {
   deviceId: string;
@@ -55,7 +61,7 @@ export function useAudioDevices(): UseAudioDevicesReturn {
       setIsLoading(true);
       setError(null);
 
-      const devices = await navigator.mediaDevices.enumerateDevices();
+      const devices = await enumerateMediaDevices();
 
       // Filter and map devices by kind
       const mics = devices
@@ -100,12 +106,9 @@ export function useAudioDevices(): UseAudioDevicesReturn {
     try {
       setError(null);
       // Request both audio and video to get all device labels
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
+      const stream = await requestMediaStream(true, true);
       // Stop the stream immediately - we just needed permission
-      stream.getTracks().forEach((track) => track.stop());
+      stopMediaStream(stream);
       setHasPermission(true);
       // Re-enumerate to get labels
       await enumerateDevices();
@@ -113,8 +116,8 @@ export function useAudioDevices(): UseAudioDevicesReturn {
     } catch (_err) {
       // Try audio only if video fails
       try {
-        const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        audioStream.getTracks().forEach((track) => track.stop());
+        const audioStream = await requestMicrophoneStream();
+        stopMediaStream(audioStream);
         setHasPermission(true);
         await enumerateDevices();
         return true;

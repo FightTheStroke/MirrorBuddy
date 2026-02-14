@@ -7,6 +7,11 @@
 
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
+import {
+  isMediaDevicesAvailable,
+  requestMicrophoneStream,
+  type MicrophoneConstraints,
+} from '@/lib/native/media-bridge';
 import { getConnectionTimeout } from './constants';
 import type {
   WebRTCConnectionConfig,
@@ -127,7 +132,7 @@ export class WebRTCConnection {
   }
 
   private async getUserMedia(): Promise<MediaStream> {
-    if (!navigator.mediaDevices?.getUserMedia) {
+    if (!isMediaDevicesAvailable()) {
       logVoiceError(
         'MicrophoneNotAvailable',
         'getUserMedia not available - HTTPS/localhost required',
@@ -139,7 +144,7 @@ export class WebRTCConnection {
     // Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 2
     // iOS Safari has limited constraint support - simplify for compatibility
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-    const audioConstraints: MediaTrackConstraints = isMobile
+    const audioConstraints: MicrophoneConstraints = isMobile
       ? {
           // iOS-compatible minimal constraints
           echoCancellation: true,
@@ -165,9 +170,7 @@ export class WebRTCConnection {
       logger.debug('[WebRTC] Requesting microphone access...', {
         preferredMicrophoneId: this.config.preferredMicrophoneId,
       });
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: audioConstraints,
-      });
+      const stream = await requestMicrophoneStream(audioConstraints);
       logMicrophonePermissionRequest('granted', { deviceId: this.config.preferredMicrophoneId });
       logMediaStreamTracks(stream, 'getUserMedia result');
       return stream;

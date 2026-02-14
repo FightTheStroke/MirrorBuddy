@@ -4,6 +4,12 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
+import {
+  requestMediaStream,
+  requestMicrophoneStream,
+  enumerateMediaDevices,
+  stopMediaStream,
+} from '@/lib/native/media-bridge';
 
 export function useAudioDevices() {
   const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([]);
@@ -13,18 +19,17 @@ export function useAudioDevices() {
   const refreshDevices = useCallback(async () => {
     try {
       // Request permissions first to get device labels
-      await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        .then(s => s.getTracks().forEach(t => t.stop()))
+      await requestMediaStream(true, true)
+        .then((s) => stopMediaStream(s))
         .catch(() => {
           // Try audio only if video fails
-          return navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(s => s.getTracks().forEach(t => t.stop()));
+          return requestMicrophoneStream().then((s) => stopMediaStream(s));
         });
 
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const mics = devices.filter(d => d.kind === 'audioinput');
-      const outputs = devices.filter(d => d.kind === 'audiooutput');
-      const cams = devices.filter(d => d.kind === 'videoinput');
+      const devices = await enumerateMediaDevices();
+      const mics = devices.filter((d) => d.kind === 'audioinput');
+      const outputs = devices.filter((d) => d.kind === 'audiooutput');
+      const cams = devices.filter((d) => d.kind === 'videoinput');
 
       setAvailableMics(mics);
       setAvailableOutputs(outputs);

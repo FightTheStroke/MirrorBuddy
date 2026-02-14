@@ -4,6 +4,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { requestVideoStream } from '@/lib/native/media-bridge';
 
 export function useCameraTest(preferredCameraId: string | null) {
   const [camTestActive, setCamTestActive] = useState(false);
@@ -12,12 +13,9 @@ export function useCameraTest(preferredCameraId: string | null) {
 
   const startCamTest = useCallback(async () => {
     try {
-      const constraints: MediaStreamConstraints = {
-        video: preferredCameraId
-          ? { deviceId: { ideal: preferredCameraId } }
-          : true
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = await requestVideoStream(
+        preferredCameraId ? { deviceId: { ideal: preferredCameraId } } : undefined,
+      );
       camStreamRef.current = stream;
 
       if (videoRef.current) {
@@ -33,7 +31,7 @@ export function useCameraTest(preferredCameraId: string | null) {
 
   const stopCamTest = useCallback(() => {
     if (camStreamRef.current) {
-      camStreamRef.current.getTracks().forEach(t => t.stop());
+      camStreamRef.current.getTracks().forEach((t) => t.stop());
       camStreamRef.current = null;
     }
     if (videoRef.current) {

@@ -8,6 +8,7 @@
 import { useCallback, useState, useRef } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
+import { requestVideoStream } from '@/lib/native/media-bridge';
 import { useVideoCapture } from './video-capture';
 import { useSendVideoFrame } from './actions';
 import type { CameraMode } from '@/types/voice';
@@ -154,12 +155,10 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
       }
     } else if (nextMode === 'photo') {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: CAPTURE_WIDTH },
-            height: { ideal: CAPTURE_HEIGHT },
-            facingMode: cameraFacing,
-          },
+        const stream = await requestVideoStream({
+          width: { ideal: CAPTURE_WIDTH },
+          height: { ideal: CAPTURE_HEIGHT },
+          facingMode: cameraFacing,
         });
         photoStreamRef.current = stream;
       } catch (e) {
@@ -242,14 +241,11 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     // Restart stream with new facing if in photo mode
     if (cameraMode === 'photo' && photoStreamRef.current) {
       photoStreamRef.current.getTracks().forEach((t) => t.stop());
-      navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            width: { ideal: CAPTURE_WIDTH },
-            height: { ideal: CAPTURE_HEIGHT },
-            facingMode: next,
-          },
-        })
+      requestVideoStream({
+        width: { ideal: CAPTURE_WIDTH },
+        height: { ideal: CAPTURE_HEIGHT },
+        facingMode: next,
+      })
         .then((stream) => {
           photoStreamRef.current = stream;
         })

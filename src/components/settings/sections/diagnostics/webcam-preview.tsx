@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { useTranslations } from 'next-intl';
+import { requestVideoStream } from '@/lib/native/media-bridge';
 
 interface WebcamPreviewProps {
   availableCameras: MediaDeviceInfo[];
@@ -27,12 +28,9 @@ export function WebcamPreview({
 
   const startWebcam = async () => {
     try {
-      const videoConstraints: boolean | MediaTrackConstraints = selectedCamId
-        ? { deviceId: { ideal: selectedCamId } }
-        : true;
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: videoConstraints,
-      });
+      const stream = await requestVideoStream(
+        selectedCamId ? { deviceId: { ideal: selectedCamId } } : undefined,
+      );
       webcamStreamRef.current = stream;
 
       if (videoPreviewRef.current) {

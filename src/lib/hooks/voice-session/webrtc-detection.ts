@@ -3,6 +3,8 @@
 // Detects browser support for WebRTC APIs
 // ============================================================================
 
+import { isMediaDevicesAvailable } from '@/lib/native/media-bridge';
+
 /**
  * Checks if the browser supports WebRTC APIs
  * Verifies both RTCPeerConnection and getUserMedia availability
@@ -18,7 +20,7 @@ export function isWebRTCSupported(): boolean {
   const hasRTCPeerConnection = !!window.RTCPeerConnection;
 
   // Check for getUserMedia availability via mediaDevices API
-  const hasGetUserMedia = !!(navigator.mediaDevices?.getUserMedia);
+  const hasGetUserMedia = isMediaDevicesAvailable();
 
   return hasRTCPeerConnection && hasGetUserMedia;
 }
@@ -42,7 +44,7 @@ export function hasGetUserMedia(): boolean {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
-  return !!navigator.mediaDevices?.getUserMedia;
+  return isMediaDevicesAvailable();
 }
 
 /**
@@ -61,6 +63,6 @@ export function getWebRTCSupportReport(): {
     webrtcSupported: isWebRTCSupported(),
     rtcPeerConnection: hasRTCPeerConnection(),
     getUserMedia: hasGetUserMedia(),
-    mediaDevices: hasNavigator && typeof navigator.mediaDevices !== 'undefined',
+    mediaDevices: hasNavigator && isMediaDevicesAvailable(),
   };
 }

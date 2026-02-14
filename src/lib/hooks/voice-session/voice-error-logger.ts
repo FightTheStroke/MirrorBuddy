@@ -5,6 +5,7 @@
 // ============================================================================
 
 import { logger } from '@/lib/logger';
+import { isMediaDevicesAvailable } from '@/lib/native/media-bridge';
 
 /**
  * Device and browser information for diagnostics
@@ -78,11 +79,11 @@ export function getWebRTCCapabilities(): Record<string, boolean> {
     };
     return {
       RTCPeerConnection: !!window.RTCPeerConnection,
-      getUserMedia: !!navigator.mediaDevices?.getUserMedia,
-      mediaDevices: !!navigator.mediaDevices,
+      getUserMedia: isMediaDevicesAvailable(),
+      mediaDevices: isMediaDevicesAvailable(),
       RTCDataChannel: !!window.RTCDataChannel,
       AudioContext: !!window.AudioContext || !!windowWithWebkit.webkitAudioContext,
-      WebRTC: !!window.RTCPeerConnection && !!navigator.mediaDevices?.getUserMedia,
+      WebRTC: !!window.RTCPeerConnection && isMediaDevicesAvailable(),
     };
   } catch (error) {
     logger.error('[VoiceErrorLogger] Failed to check WebRTC capabilities', {}, error);

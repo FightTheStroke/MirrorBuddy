@@ -5,6 +5,7 @@
 
 import type { RealTimeProbe, ProsodyResult, EmotionalIndicators } from './types';
 import { analyzeProsody, detectPitch, calculateRMS } from './analyzer';
+import { requestMicrophoneStream } from '@/lib/native/media-bridge';
 
 export interface MonitorConfig {
   /** Buffer size for analysis (default: 4096) */
@@ -63,12 +64,10 @@ export class ProsodyMonitor {
 
     try {
       // Request microphone access
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
+      this.stream = await requestMicrophoneStream({
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
       });
 
       // Set up Web Audio API
@@ -164,7 +163,8 @@ export class ProsodyMonitor {
     // Update emotional state with EMA
     const alpha = 0.3;
     this.emotionalState = {
-      frustration: alpha * result.emotions.frustration + (1 - alpha) * this.emotionalState.frustration,
+      frustration:
+        alpha * result.emotions.frustration + (1 - alpha) * this.emotionalState.frustration,
       stress: alpha * result.emotions.stress + (1 - alpha) * this.emotionalState.stress,
       confusion: alpha * result.emotions.confusion + (1 - alpha) * this.emotionalState.confusion,
       engagement: alpha * result.emotions.engagement + (1 - alpha) * this.emotionalState.engagement,
@@ -197,7 +197,7 @@ export class ProsodyMonitor {
     }
 
     if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
+      this.stream.getTracks().forEach((track) => track.stop());
       this.stream = null;
     }
 

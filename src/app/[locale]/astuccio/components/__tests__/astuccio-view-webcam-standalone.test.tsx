@@ -162,11 +162,16 @@ vi.mock('@/lib/hooks/use-saved-materials', () => ({
 }));
 
 // Mock toast for success/error feedback
-const mockToast = vi.fn();
-vi.mock('sonner', () => ({
+const mockToastSuccess = vi.fn();
+const mockToastError = vi.fn();
+vi.mock('@/components/ui/toast', () => ({
   toast: {
-    success: (...args: unknown[]) => mockToast('success', ...args),
-    error: (...args: unknown[]) => mockToast('error', ...args),
+    success: (...args: unknown[]) => mockToastSuccess(...args),
+    error: (...args: unknown[]) => mockToastError(...args),
+  },
+  default: {
+    success: (...args: unknown[]) => mockToastSuccess(...args),
+    error: (...args: unknown[]) => mockToastError(...args),
   },
 }));
 
@@ -254,8 +259,49 @@ describe('AstuccioView - Webcam Standalone (T1-08)', () => {
     }
   });
 
-  // Toast tests removed - require complex async mock setup
-  // Integration tests for toast feedback deferred to dedicated E2E suite
+  it('should show success toast after saving captured image', async () => {
+    mockForceSaveMaterial.mockResolvedValue(true);
+
+    render(<AstuccioView />);
+
+    const buttons = screen.getAllByRole('button');
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes('scatta foto'),
+    );
+
+    if (webcamButton) {
+      fireEvent.click(webcamButton);
+
+      const captureButton = screen.getByTestId('webcam-capture-button');
+      fireEvent.click(captureButton);
+
+      await waitFor(() => {
+        expect(mockToastSuccess).toHaveBeenCalledWith(expect.any(String));
+      });
+    }
+  });
+
+  it('should show error toast when save fails', async () => {
+    mockForceSaveMaterial.mockRejectedValue(new Error('Save failed'));
+
+    render(<AstuccioView />);
+
+    const buttons = screen.getAllByRole('button');
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes('scatta foto'),
+    );
+
+    if (webcamButton) {
+      fireEvent.click(webcamButton);
+
+      const captureButton = screen.getByTestId('webcam-capture-button');
+      fireEvent.click(captureButton);
+
+      await waitFor(() => {
+        expect(mockToastError).toHaveBeenCalledWith(expect.any(String));
+      });
+    }
+  });
 
   it('should close webcam view and return to astuccio on close', () => {
     render(<AstuccioView />);

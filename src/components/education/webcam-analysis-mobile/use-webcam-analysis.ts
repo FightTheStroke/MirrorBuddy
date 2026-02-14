@@ -2,8 +2,9 @@
  * Custom hook for webcam analysis functionality
  */
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { clientLogger } from "@/lib/logger/client";
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { clientLogger } from '@/lib/logger/client';
+import { requestVideoStream, enumerateMediaDevices } from '@/lib/native/media-bridge';
 
 export interface CameraDevice {
   deviceId: string;
@@ -28,23 +29,19 @@ export function useWebcamAnalysis() {
   // Enumerate cameras
   const enumerateCameras = useCallback(async () => {
     try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
+      const devices = await enumerateMediaDevices();
       const videoDevices = devices
-        .filter((device) => device.kind === "videoinput")
+        .filter((device) => device.kind === 'videoinput')
         .map((device) => ({
           deviceId: device.deviceId,
           label: device.label || `Camera ${device.deviceId.substring(0, 5)}`,
-          isFrontFacing: device.label.toLowerCase().includes("front"),
+          isFrontFacing: device.label.toLowerCase().includes('front'),
         }));
 
       setAvailableCameras(videoDevices);
       return videoDevices;
     } catch (err) {
-      clientLogger.error(
-        "Error enumerating cameras",
-        { component: "useWebcamAnalysis" },
-        err,
-      );
+      clientLogger.error('Error enumerating cameras', { component: 'useWebcamAnalysis' }, err);
       return [];
     }
   }, []);
@@ -61,13 +58,9 @@ export function useWebcamAnalysis() {
           stream.getTracks().forEach((track) => track.stop());
         }
 
-        const constraints: MediaStreamConstraints = {
-          video: deviceId ? { deviceId: { ideal: deviceId } } : true,
-          audio: false,
-        };
-
-        const mediaStream =
-          await navigator.mediaDevices.getUserMedia(constraints);
+        const mediaStream = await requestVideoStream(
+          deviceId ? { deviceId: { ideal: deviceId } } : undefined,
+        );
 
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
@@ -75,17 +68,15 @@ export function useWebcamAnalysis() {
           try {
             await videoRef.current.play();
           } catch (playErr) {
-            clientLogger.warn("Video autoplay blocked", {
-              component: "useWebcamAnalysis",
+            clientLogger.warn('Video autoplay blocked', {
+              component: 'useWebcamAnalysis',
               error: String(playErr),
             });
           }
 
           const videoTrack = mediaStream.getVideoTracks()[0];
           if (videoTrack) {
-            setSelectedCameraId(
-              videoTrack.getSettings().deviceId || deviceId || null,
-            );
+            setSelectedCameraId(videoTrack.getSettings().deviceId || deviceId || null);
           }
 
           setStream(mediaStream);
@@ -95,9 +86,7 @@ export function useWebcamAnalysis() {
         }
       } catch (err) {
         const errorMessage =
-          err instanceof DOMException
-            ? `Camera error: ${err.message}`
-            : "Failed to access camera";
+          err instanceof DOMException ? `Camera error: ${err.message}` : 'Failed to access camera';
 
         setError(errorMessage);
         setIsLoading(false);
@@ -112,21 +101,16 @@ export function useWebcamAnalysis() {
 
     setIsSwitchingCamera(true);
 
-    const currentCamera = availableCameras.find(
-      (c) => c.deviceId === selectedCameraId,
-    );
+    const currentCamera = availableCameras.find((c) => c.deviceId === selectedCameraId);
     const targetCamera = availableCameras.find(
-      (c) =>
-        c.isFrontFacing !== currentCamera?.isFrontFacing ||
-        c.deviceId !== selectedCameraId,
+      (c) => c.isFrontFacing !== currentCamera?.isFrontFacing || c.deviceId !== selectedCameraId,
     );
 
     if (targetCamera) {
       await startCamera(targetCamera.deviceId);
     } else {
       const nextIndex =
-        (availableCameras.findIndex((c) => c.deviceId === selectedCameraId) +
-          1) %
+        (availableCameras.findIndex((c) => c.deviceId === selectedCameraId) + 1) %
         availableCameras.length;
       await startCamera(availableCameras[nextIndex].deviceId);
     }
@@ -141,23 +125,23 @@ export function useWebcamAnalysis() {
     const canvas = canvasRef.current;
     const video = videoRef.current;
 
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext('2d');
     if (!context) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     // Flash effect
-    context.fillStyle = "white";
+    context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw video frame
     setTimeout(() => {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL("image/jpeg", 0.9);
+      const imageData = canvas.toDataURL('image/jpeg', 0.9);
 
       setCapturedImage(imageData);
-      setAnalysisResults("Image captured. Analyzing... (Mock result for demo)");
+      setAnalysisResults('Image captured. Analyzing... (Mock result for demo)');
     }, 100);
   }, []);
 
@@ -169,10 +153,7 @@ export function useWebcamAnalysis() {
       const videoTrack = stream.getVideoTracks()[0];
       if (!videoTrack) return;
 
-      const capabilities = videoTrack.getCapabilities() as Record<
-        string,
-        unknown
-      >;
+      const capabilities = videoTrack.getCapabilities() as Record<string, unknown>;
 
       if (capabilities.torch) {
         await videoTrack.applyConstraints({
@@ -182,8 +163,8 @@ export function useWebcamAnalysis() {
         setIsFlashEnabled(!isFlashEnabled);
       }
     } catch (err) {
-      clientLogger.warn("Flash control not available", {
-        component: "useWebcamAnalysis",
+      clientLogger.warn('Flash control not available', {
+        component: 'useWebcamAnalysis',
         error: String(err),
       });
     }

@@ -154,6 +154,7 @@ export interface MicrophoneConstraints {
   noiseSuppression?: boolean;
   autoGainControl?: boolean;
   sampleRate?: number;
+  deviceId?: string | { exact?: string; ideal?: string };
 }
 
 /**
@@ -257,3 +258,13 @@ export async function requestCameraPermission(): Promise<PermissionStatus> {
   // Web: permissions requested on getUserMedia call
   return checkCameraPermission();
 }
+
+// Re-exports from media-bridge-stream.ts (video, device enumeration)
+export {
+  requestVideoStream,
+  requestMediaStream,
+  stopMediaStream,
+  enumerateMediaDevices,
+  isMediaDevicesAvailable,
+} from './media-bridge-stream';
+export type { VideoConstraints } from './media-bridge-stream';

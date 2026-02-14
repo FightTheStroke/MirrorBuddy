@@ -552,17 +552,7 @@ const eslintConfig = defineConfig([
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
     ignores: [
-      "src/lib/native/**/*.ts", // Media-bridge implementation
-      "src/lib/hooks/voice-session/**/*.ts", // WebRTC layer (direct media access required)
-      "src/components/settings/sections/diagnostics/**/*.ts", // Hardware diagnostics
-      "src/components/settings/sections/diagnostics/**/*.tsx", // Hardware diagnostics
-      "src/components/settings/sections/audio-settings/hooks/**/*.ts", // Audio device enumeration
-      "src/components/tools/webcam-capture/hooks/**/*.ts", // Webcam capture implementation
-      "src/components/education/webcam-analysis-mobile/**/*.ts", // Webcam analysis (live preview)
-      "src/components/settings/profile-editor-mobile.tsx", // Avatar camera capture
-      "src/lib/hooks/use-audio-devices.ts", // Audio device enumeration
-      "src/lib/hooks/use-permissions.ts", // Permission probing
-      "src/lib/education/frustration-detection/**/*.ts", // Prosody realtime monitor
+      "src/lib/native/**/*.ts", // Media-bridge implementation (uses navigator.mediaDevices internally)
       "**/*.test.ts",
       "**/*.test.tsx",
       "**/__tests__/**",

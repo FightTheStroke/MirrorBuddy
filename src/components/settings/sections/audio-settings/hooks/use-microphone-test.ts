@@ -4,6 +4,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { requestMicrophoneStream } from '@/lib/native/media-bridge';
 
 export function useMicrophoneTest(preferredMicrophoneId: string | null) {
   const [micTestActive, setMicTestActive] = useState(false);
@@ -17,15 +18,14 @@ export function useMicrophoneTest(preferredMicrophoneId: string | null) {
 
   const startMicTest = useCallback(async () => {
     try {
-      const constraints: MediaStreamConstraints = {
-        audio: preferredMicrophoneId
-          ? { deviceId: { ideal: preferredMicrophoneId } }
-          : true
-      };
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const stream = await requestMicrophoneStream(
+        preferredMicrophoneId ? { deviceId: { ideal: preferredMicrophoneId } } : undefined,
+      );
       micStreamRef.current = stream;
 
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const audioContext = new AudioCtx();
       micContextRef.current = audioContext;
 
@@ -113,7 +113,7 @@ export function useMicrophoneTest(preferredMicrophoneId: string | null) {
       micAnimationRef.current = null;
     }
     if (micStreamRef.current) {
-      micStreamRef.current.getTracks().forEach(t => t.stop());
+      micStreamRef.current.getTracks().forEach((t) => t.stop());
       micStreamRef.current = null;
     }
     if (micContextRef.current) {

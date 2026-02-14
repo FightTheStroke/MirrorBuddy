@@ -7,6 +7,7 @@
 
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { requestVideoStream } from '@/lib/native/media-bridge';
 
 const CAPTURE_WIDTH = 640;
 const CAPTURE_HEIGHT = 360;
@@ -112,12 +113,10 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
 
   const startCapture = useCallback(async (): Promise<boolean> => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: CAPTURE_WIDTH },
-          height: { ideal: CAPTURE_HEIGHT },
-          facingMode: 'user',
-        },
+      const stream = await requestVideoStream({
+        width: { ideal: CAPTURE_WIDTH },
+        height: { ideal: CAPTURE_HEIGHT },
+        facingMode: 'user',
       });
       streamRef.current = stream;
 

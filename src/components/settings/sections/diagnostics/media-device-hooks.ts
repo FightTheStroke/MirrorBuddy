@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import {
+  requestMicrophoneStream,
+  requestVideoStream,
+  enumerateMediaDevices,
+  stopMediaStream,
+} from '@/lib/native/media-bridge';
 
 export function useMediaDevices() {
   const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([]);
@@ -10,12 +16,12 @@ export function useMediaDevices() {
   const refreshMicrophones = useCallback(async () => {
     try {
       // Request permission first to get device labels
-      await navigator.mediaDevices.getUserMedia({ audio: true }).then(s => s.getTracks().forEach(t => t.stop()));
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const mics = devices.filter(d => d.kind === 'audioinput');
+      await requestMicrophoneStream().then((s) => stopMediaStream(s));
+      const devices = await enumerateMediaDevices();
+      const mics = devices.filter((d) => d.kind === 'audioinput');
       setAvailableMics(mics);
       // Only set default if no selection exists
-      setSelectedMicId(prev => prev || (mics.length > 0 ? mics[0].deviceId : ''));
+      setSelectedMicId((prev) => prev || (mics.length > 0 ? mics[0].deviceId : ''));
     } catch (error) {
       logger.error('Error fetching microphones', undefined, error);
     }
@@ -24,12 +30,12 @@ export function useMediaDevices() {
   const refreshCameras = useCallback(async () => {
     try {
       // Request permission first to get device labels
-      await navigator.mediaDevices.getUserMedia({ video: true }).then(s => s.getTracks().forEach(t => t.stop()));
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const cams = devices.filter(d => d.kind === 'videoinput');
+      await requestVideoStream().then((s) => stopMediaStream(s));
+      const devices = await enumerateMediaDevices();
+      const cams = devices.filter((d) => d.kind === 'videoinput');
       setAvailableCameras(cams);
       // Only set default if no selection exists
-      setSelectedCamId(prev => prev || (cams.length > 0 ? cams[0].deviceId : ''));
+      setSelectedCamId((prev) => prev || (cams.length > 0 ? cams[0].deviceId : ''));
     } catch (error) {
       logger.error('Error fetching cameras', undefined, error);
     }

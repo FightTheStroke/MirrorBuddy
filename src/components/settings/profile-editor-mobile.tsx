@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { useTranslations } from "next-intl";
-import { Camera, Save, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { clientLogger } from "@/lib/logger/client";
+import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { Camera, Save, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { clientLogger } from '@/lib/logger/client';
+import { requestVideoStream } from '@/lib/native/media-bridge';
 
 interface ProfileEditorMobileProps {
   profile: {
@@ -14,14 +15,11 @@ interface ProfileEditorMobileProps {
     bio?: string;
     gradeLevel?: string;
   };
-  onSave: (profile: ProfileEditorMobileProps["profile"]) => void;
+  onSave: (profile: ProfileEditorMobileProps['profile']) => void;
 }
 
-export function ProfileEditorMobile({
-  profile,
-  onSave,
-}: ProfileEditorMobileProps) {
-  const t = useTranslations("common");
+export function ProfileEditorMobile({ profile, onSave }: ProfileEditorMobileProps) {
+  const t = useTranslations('common');
   const [formData, setFormData] = useState(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -31,9 +29,7 @@ export function ProfileEditorMobile({
   const [isCameraActive, setIsCameraActive] = useState(false);
 
   const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -43,7 +39,7 @@ export function ProfileEditorMobile({
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
-        [name]: "",
+        [name]: '',
       }));
     }
   };
@@ -64,33 +60,26 @@ export function ProfileEditorMobile({
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-        audio: false,
-      });
+      const stream = await requestVideoStream({ facingMode: 'user' });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsCameraActive(true);
       }
     } catch (error) {
-      clientLogger.error(
-        "Camera access denied",
-        { component: "ProfileEditorMobile" },
-        error,
-      );
+      clientLogger.error('Camera access denied', { component: 'ProfileEditorMobile' }, error);
       setErrors((prev) => ({
         ...prev,
-        camera: "Camera access denied. Please enable camera permissions.",
+        camera: 'Camera access denied. Please enable camera permissions.',
       }));
     }
   };
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d");
+      const context = canvasRef.current.getContext('2d');
       if (context) {
         context.drawImage(videoRef.current, 0, 0);
-        const imageData = canvasRef.current.toDataURL("image/png");
+        const imageData = canvasRef.current.toDataURL('image/png');
         setFormData((prev) => ({
           ...prev,
           avatar: imageData,
@@ -111,7 +100,7 @@ export function ProfileEditorMobile({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.name?.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -130,36 +119,29 @@ export function ProfileEditorMobile({
   };
 
   const gradeLevels = [
-    { value: "", label: "Select..." },
-    { value: "primary", label: "Primary School" },
-    { value: "middle", label: "Middle School" },
-    { value: "high", label: "High School" },
-    { value: "university", label: "University" },
+    { value: '', label: 'Select...' },
+    { value: 'primary', label: 'Primary School' },
+    { value: 'middle', label: 'Middle School' },
+    { value: 'high', label: 'High School' },
+    { value: 'university', label: 'University' },
   ];
 
   return (
     <div className="flex flex-col h-screen bg-white dark:bg-slate-950">
       {/* Keyboard-aware scrollable content */}
-      <div
-        className="flex-1 overflow-y-auto pb-24"
-        data-testid="keyboard-aware-container"
-      >
+      <div className="flex-1 overflow-y-auto pb-24" data-testid="keyboard-aware-container">
         <div className="p-4 xs:p-6 space-y-6">
           {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {t("profile")}
-            </h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('profile')}</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              {t("updateYourProfileInformation")}
+              {t('updateYourProfileInformation')}
             </p>
           </div>
 
           {/* Avatar Section */}
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-              {t("avatar1")}
-            </h2>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('avatar1')}</h2>
 
             {/* Avatar Preview */}
             <div className="flex justify-center">
@@ -168,14 +150,14 @@ export function ProfileEditorMobile({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={formData.avatar}
-                    alt={t("avatar")}
+                    alt={t('avatar')}
                     className="w-full h-full object-cover"
                     data-testid="avatar-preview"
                   />
                 ) : (
                   <div className="text-slate-400 dark:text-slate-500 text-center">
                     <div className="text-4xl mb-2">📷</div>
-                    <span className="text-xs">{t("noPhoto")}</span>
+                    <span className="text-xs">{t('noPhoto')}</span>
                   </div>
                 )}
               </div>
@@ -191,25 +173,20 @@ export function ProfileEditorMobile({
                   muted
                   className="w-full rounded-lg bg-slate-900"
                 />
-                <canvas
-                  ref={canvasRef}
-                  className="hidden"
-                  width={320}
-                  height={320}
-                />
+                <canvas ref={canvasRef} className="hidden" width={320} height={320} />
                 <div className="flex gap-3">
                   <Button
                     onClick={capturePhoto}
                     className="flex-1 min-h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    {t("capture")}
+                    {t('capture')}
                   </Button>
                   <Button
                     onClick={stopCamera}
                     variant="outline"
                     className="flex-1 min-h-12 text-base font-medium"
                   >
-                    {t("cancel")}
+                    {t('cancel')}
                   </Button>
                 </div>
               </div>
@@ -224,13 +201,13 @@ export function ProfileEditorMobile({
                 data-testid="camera-button"
               >
                 <Camera className="w-5 h-5" />
-                {t("camera")}
+                {t('camera')}
               </Button>
               <Button
                 onClick={() => fileInputRef.current?.click()}
                 className="min-h-12 text-base font-medium bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-900 dark:text-white"
               >
-                {t("upload")}
+                {t('upload')}
               </Button>
               <input
                 ref={fileInputRef}
@@ -244,17 +221,14 @@ export function ProfileEditorMobile({
           </div>
 
           {/* Form Fields - Flex column for mobile (xs breakpoint) */}
-          <div
-            className="flex flex-col space-y-4"
-            data-testid="profile-form-container"
-          >
+          <div className="flex flex-col space-y-4" data-testid="profile-form-container">
             {/* Name Field */}
             <div className="space-y-2">
               <label
                 htmlFor="profile-name"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                {t("name")}
+                {t('name')}
               </label>
               <input
                 type="text"
@@ -262,14 +236,14 @@ export function ProfileEditorMobile({
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder={t("yourName")}
+                placeholder={t('yourName')}
                 className={cn(
-                  "w-full px-4 py-3 text-base rounded-lg border-2 transition-colors",
-                  "bg-white dark:bg-slate-800",
-                  "text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400",
+                  'w-full px-4 py-3 text-base rounded-lg border-2 transition-colors',
+                  'bg-white dark:bg-slate-800',
+                  'text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400',
                   errors.name
-                    ? "border-red-500 focus:border-red-600 focus:ring-red-500"
-                    : "border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500",
+                    ? 'border-red-500 focus:border-red-600 focus:ring-red-500'
+                    : 'border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-blue-500',
                 )}
               />
               {errors.name && (
@@ -286,14 +260,14 @@ export function ProfileEditorMobile({
                 htmlFor="profile-bio"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                {t("bio")}
+                {t('bio')}
               </label>
               <textarea
                 id="profile-bio"
                 name="bio"
-                value={formData.bio || ""}
+                value={formData.bio || ''}
                 onChange={handleInputChange}
-                placeholder={t("tellUsAboutYourself")}
+                placeholder={t('tellUsAboutYourself')}
                 rows={4}
                 className="w-full px-4 py-3 text-base rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:border-blue-500 focus:ring-blue-500 transition-colors"
               />
@@ -305,12 +279,12 @@ export function ProfileEditorMobile({
                 htmlFor="profile-grade-level"
                 className="block text-sm font-medium text-slate-700 dark:text-slate-300"
               >
-                {t("gradeLevel")}
+                {t('gradeLevel')}
               </label>
               <select
                 id="profile-grade-level"
                 name="gradeLevel"
-                value={formData.gradeLevel || ""}
+                value={formData.gradeLevel || ''}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 text-base rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-blue-500 focus:ring-blue-500 transition-colors"
               >
@@ -344,7 +318,7 @@ export function ProfileEditorMobile({
           className="w-full min-h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg"
         >
           <Save className="w-4 h-4 mr-2" />
-          {isSaving ? "Saving..." : "Save"}
+          {isSaving ? 'Saving...' : 'Save'}
         </Button>
       </div>
     </div>

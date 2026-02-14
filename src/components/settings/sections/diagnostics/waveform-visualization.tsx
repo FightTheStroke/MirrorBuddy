@@ -6,6 +6,7 @@ import { Mic, XCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { requestMicrophoneStream } from '@/lib/native/media-bridge';
 
 interface WaveformVisualizationProps {
   availableMics: MediaDeviceInfo[];
@@ -31,12 +32,9 @@ export function WaveformVisualization({
 
   const startWaveform = async () => {
     try {
-      const audioConstraints: boolean | MediaTrackConstraints = selectedMicId
-        ? { deviceId: { ideal: selectedMicId } }
-        : true;
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: audioConstraints,
-      });
+      const stream = await requestMicrophoneStream(
+        selectedMicId ? { deviceId: { ideal: selectedMicId } } : undefined,
+      );
       waveformStreamRef.current = stream;
 
       const AudioCtx =

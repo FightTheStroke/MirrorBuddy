@@ -1,8 +1,9 @@
 import type { DiagnosticResult } from './types';
+import { requestMicrophoneStream, stopMediaStream } from '@/lib/native/media-bridge';
 
 export async function runMicTest(): Promise<DiagnosticResult> {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const stream = await requestMicrophoneStream();
     const tracks = stream.getAudioTracks();
 
     if (tracks.length === 0) {
@@ -13,7 +14,7 @@ export async function runMicTest(): Promise<DiagnosticResult> {
     const settings = track.getSettings();
 
     // Stop the stream
-    stream.getTracks().forEach(t => t.stop());
+    stopMediaStream(stream);
 
     return {
       status: 'success',
@@ -24,16 +25,20 @@ export async function runMicTest(): Promise<DiagnosticResult> {
     return {
       status: 'error',
       message: 'Microfono non accessibile',
-      details: error instanceof DOMException && error.name === 'NotAllowedError'
-        ? 'Permesso negato - abilita il microfono nelle impostazioni del browser'
-        : String(error),
+      details:
+        error instanceof DOMException && error.name === 'NotAllowedError'
+          ? 'Permesso negato - abilita il microfono nelle impostazioni del browser'
+          : String(error),
     };
   }
 }
 
 export async function runSpeakerTest(): Promise<DiagnosticResult> {
   try {
-    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const audioContext = new (
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    )();
 
     // Resume if suspended (autoplay policy)
     if (audioContext.state === 'suspended') {
@@ -56,7 +61,7 @@ export async function runSpeakerTest(): Promise<DiagnosticResult> {
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.5);
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 600));
 
     audioContext.close();
 
