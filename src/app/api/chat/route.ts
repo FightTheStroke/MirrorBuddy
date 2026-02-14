@@ -326,8 +326,16 @@ export const POST = pipe(
     }
 
     // Tier-based model selection: Get appropriate model for user's tier (ADR 0073)
-    const tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
-    const deploymentName = getDeploymentForModel(tierModel);
+    let tierModel: string;
+    let deploymentName: string;
+    try {
+      tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
+      deploymentName = getDeploymentForModel(tierModel);
+    } catch (tierError) {
+      log.warn('Tier service failed, using default model', { error: String(tierError) });
+      tierModel = 'gpt-5-mini';
+      deploymentName = getDeploymentForModel(tierModel);
+    }
 
     log.debug('Tier-based model selected', {
       userId: userId || 'anonymous',
@@ -410,11 +418,17 @@ export const POST = pipe(
           userId,
         });
 
-        // Track tool usage for trial users
+        // Track tool usage for trial users (non-blocking)
         if (trialSessionId && !userId) {
           for (const toolRef of toolCallRefs) {
             if (toolRef.status === 'completed') {
-              await incrementTrialToolUsage(trialSessionId);
+              try {
+                await incrementTrialToolUsage(trialSessionId);
+              } catch (toolTrackError) {
+                log.warn('Trial tool usage tracking failed (non-blocking)', {
+                  error: String(toolTrackError),
+                });
+              }
             }
           }
         }
@@ -465,14 +479,22 @@ export const POST = pipe(
       };
       const transparency = assessResponseTransparency(transparencyContext);
 
-      // Update budget
+      // Update budget (non-blocking: failure must not crash the response)
       if (userId && userSettings && result.usage) {
-        await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
+        try {
+          await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
+        } catch (budgetError) {
+          log.warn('Budget update failed (non-blocking)', { error: String(budgetError) });
+        }
       }
 
       // Increment trial usage and budget for anonymous users (ADR 0056, F-06)
       if (trialSessionId && !userId) {
-        await incrementTrialUsage(trialSessionId);
+        try {
+          await incrementTrialUsage(trialSessionId);
+        } catch (trialError) {
+          log.warn('Trial usage increment failed (non-blocking)', { error: String(trialError) });
+        }
 
         // Also increment trial budget to track cumulative cost (F-06: admin counts push)
         if (result.usage?.total_tokens) {
@@ -549,6 +571,12 @@ export const POST = pipe(
       return response;
     }
   } catch (error) {
+    // Explicit Sentry capture: withSentry middleware only sees thrown errors,
+    // but this catch returns a Response, so the middleware never intercepts.
+    Sentry.captureException(error, {
+      tags: { api: '/api/chat', errorType: 'unhandled' },
+      extra: { maestroId: 'unknown' },
+    });
     log.error('Chat API error', { api: '/api/chat', errorType: 'unhandled' }, error);
     const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     response.headers.set('X-Request-ID', getRequestId(request));
@@ -559,20 +587,8 @@ export const POST = pipe(
 export const GET = pipe(withSentry('/api/chat'))(async (ctx) => {
   const provider = getActiveProvider();
 
-  if (!provider) {
-    const response = NextResponse.json({
-      available: false,
-      provider: null,
-      message: 'No AI provider configured',
-    });
-    response.headers.set('X-Request-ID', getRequestId(ctx.req));
-    return response;
-  }
-
   const response = NextResponse.json({
-    available: true,
-    provider: provider.provider,
-    model: provider.model,
+    available: !!provider,
   });
   response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;

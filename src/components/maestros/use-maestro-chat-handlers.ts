@@ -93,9 +93,7 @@ export function useMaestroChatHandlers({
           setToolCalls((prev) => [...prev, ...data.toolCalls]);
         }
       } catch (error) {
-        // Server-side errors are already captured by withSentry middleware;
-        // only log as warning here to avoid duplicate Sentry events
-        logger.warn('Chat request failed', { error: String(error) });
+        logger.error('Chat request failed', { error: String(error) });
         setMessages((prev) => [
           ...prev,
           {
@@ -200,8 +198,7 @@ export function useMaestroChatHandlers({
           setToolCalls((prev) => [...prev, ...data.toolCalls]);
         }
       } catch (error) {
-        // Server-side errors are already captured by withSentry middleware
-        logger.warn('Webcam analysis failed', { error: String(error) });
+        logger.error('Webcam analysis failed', { error: String(error) });
         setMessages((prev) => [
           ...prev,
           {
