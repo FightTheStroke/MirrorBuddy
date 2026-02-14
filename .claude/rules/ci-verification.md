@@ -25,11 +25,11 @@ Drill down: `./scripts/health-check.sh --drill [ci|debt|i18n|comp|migrations]`
 
 ### GitHub CI
 
-| Need                | Command                       |
-| ------------------- | ----------------------------- |
-| Latest run (branch) | `./scripts/ci-check.sh`       |
-| Latest run (any)    | `./scripts/ci-check.sh --all` |
-| Specific run        | `./scripts/ci-check.sh <id>`  |
+| Need                | Command                                         |
+| ------------------- | ----------------------------------------------- |
+| Latest run (branch) | `ci-check.sh` (from `~/.claude/scripts/`)       |
+| Latest run (any)    | `ci-check.sh --all` (from `~/.claude/scripts/`) |
+| Specific run        | `ci-check.sh <id>` (from `~/.claude/scripts/`)  |
 
 ## NEVER use standalone: `npm run lint|typecheck|build|test:unit` or `gh run view --log` (8k-100k+ token waste each). Hook enforces this.
 
@@ -56,8 +56,24 @@ Full help: `./scripts/ci-summary.sh --help`
 | Script                    | Flag             | Output                              |
 | ------------------------- | ---------------- | ----------------------------------- |
 | `compliance-check.ts`     | `--fail-only`    | Only FAIL/WARN, skip PASS           |
+| `compliance-check.ts`     | `--category X`   | Run single category (see below)     |
 | `debt-check.ts`           | `--summary`      | Counts only, no file list           |
 | `i18n-sync-namespaces.ts` | `--quiet`        | 1-line pass/fail                    |
 | `release-gate.sh`         | `--summary-only` | Counts + top 3 instead of full list |
 
 Verbose allowed only when summary output is unclear, or targeted: `npm run test:unit -- path/file 2>&1 | tail -5`
+
+## Deep Compliance Check Categories
+
+`npx tsx scripts/compliance-check.ts --category <key>`
+
+| Key          | Checks | What it validates                                     |
+| ------------ | ------ | ----------------------------------------------------- |
+| `documents`  | 6+     | DPIA sections, AI Policy refs, Model Card, Bias Audit |
+| `safety`     | 9      | Content filter, jailbreak, age gating, crisis, STEM   |
+| `security`   | 6      | Middlewares, CSP, CSRF, cookies, PII encryption       |
+| `gdpr`       | 8      | Delete/export API, consent, ToS, anonymization, COPPA |
+| `ai-act`     | 7      | Transparency, conformity, oversight, literacy, PMM    |
+| `api`        | 4      | CSRF on mutating routes, withAdmin, pipe order        |
+| `env`        | 4      | .env.example, .gitignore, no hardcoded secrets/PII    |
+| `characters` | 5+     | Maestro prompts, safety content, a11y, formal address |

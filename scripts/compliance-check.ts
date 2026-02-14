@@ -1,215 +1,103 @@
-import fs from "fs";
-import path from "path";
-import { config } from "dotenv";
+import { config } from 'dotenv';
+import { CheckResult } from './compliance-checks/types';
+import { runDocumentContentChecks } from './compliance-checks/document-content';
+import { runSafetySystemsChecks } from './compliance-checks/safety-systems';
+import { runSecurityPatternsChecks } from './compliance-checks/security-patterns';
+import { runGdprPrivacyChecks } from './compliance-checks/gdpr-privacy';
+import { runEuAiActChecks } from './compliance-checks/eu-ai-act';
+import { runApiRouteAuditChecks } from './compliance-checks/api-route-audit';
+import { runEnvironmentSecurityChecks } from './compliance-checks/environment-security';
+import { runCharacterPromptsChecks } from './compliance-checks/character-prompts';
 
 // Load .env file
 config();
 
-interface CheckResult {
-  name: string;
-  status: "PASS" | "FAIL" | "WARN";
-  message: string;
+const failOnly = process.argv.includes('--fail-only');
+const categoryFlag = process.argv.indexOf('--category');
+const categoryFilter = categoryFlag !== -1 ? process.argv[categoryFlag + 1]?.toLowerCase() : null;
+
+interface CheckModule {
+  key: string;
+  label: string;
+  run: () => Promise<CheckResult[]>;
 }
 
-const results: CheckResult[] = [];
-const projectRoot = process.cwd();
-const failOnly = process.argv.includes("--fail-only");
+const CHECK_MODULES: CheckModule[] = [
+  { key: 'documents', label: 'Document Content', run: runDocumentContentChecks },
+  { key: 'safety', label: 'Safety Systems', run: runSafetySystemsChecks },
+  { key: 'security', label: 'Security Patterns', run: runSecurityPatternsChecks },
+  { key: 'gdpr', label: 'GDPR & Privacy', run: runGdprPrivacyChecks },
+  { key: 'ai-act', label: 'EU AI Act', run: runEuAiActChecks },
+  { key: 'api', label: 'API Route Audit', run: runApiRouteAuditChecks },
+  { key: 'env', label: 'Environment Security', run: runEnvironmentSecurityChecks },
+  { key: 'characters', label: 'Character Prompts', run: runCharacterPromptsChecks },
+];
 
-// Utility functions
-function checkFileExists(filePath: string, relativeTo = projectRoot): boolean {
-  const fullPath = path.join(relativeTo, filePath);
-  return fs.existsSync(fullPath);
-}
+function printResults(results: CheckResult[]): void {
+  console.log('\n=== MirrorBuddy Deep Compliance Check ===\n');
 
-function checkDirectoryExists(
-  dirPath: string,
-  relativeTo = projectRoot,
-): boolean {
-  const fullPath = path.join(relativeTo, dirPath);
-  return fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory();
-}
-
-function getEnvVar(name: string): string | undefined {
-  return process.env[name];
-}
-
-function addResult(
-  name: string,
-  status: "PASS" | "FAIL" | "WARN",
-  message: string,
-): void {
-  results.push({ name, status, message });
-}
-
-function printResults(): void {
-  console.log("\n=== MirrorBuddy Compliance Check ===\n");
-
-  for (const result of results) {
-    if (failOnly && result.status === "PASS") continue;
-    const icon =
-      result.status === "PASS"
-        ? "[PASS]"
-        : result.status === "WARN"
-          ? "[WARN]"
-          : "[FAIL]";
-    console.log(`${icon} ${result.message}`);
+  // Group by category
+  const grouped = new Map<string, CheckResult[]>();
+  for (const r of results) {
+    const cat = r.category || 'General';
+    if (!grouped.has(cat)) grouped.set(cat, []);
+    grouped.get(cat)!.push(r);
   }
 
-  const passCount = results.filter((r) => r.status === "PASS").length;
-  const warnCount = results.filter((r) => r.status === "WARN").length;
-  const failCount = results.filter((r) => r.status === "FAIL").length;
-  const totalChecks = results.length;
+  for (const [category, checks] of grouped) {
+    const visible = failOnly ? checks.filter((c) => c.status !== 'PASS') : checks;
+    if (visible.length === 0) continue;
 
-  console.log("\n" + "=".repeat(50));
+    console.log(`--- ${category} ---`);
+    for (const r of visible) {
+      const icon = r.status === 'PASS' ? '[PASS]' : r.status === 'WARN' ? '[WARN]' : '[FAIL]';
+      console.log(`  ${icon} ${r.message}`);
+    }
+    console.log('');
+  }
+
+  const passCount = results.filter((r) => r.status === 'PASS').length;
+  const warnCount = results.filter((r) => r.status === 'WARN').length;
+  const failCount = results.filter((r) => r.status === 'FAIL').length;
+
+  console.log('='.repeat(55));
   console.log(
-    `Summary: ${passCount}/${totalChecks} checks passed, ${warnCount} warning(s), ${failCount} failure(s)`,
+    `Summary: ${passCount}/${results.length} passed, ${warnCount} warning(s), ${failCount} failure(s)`,
   );
-  console.log("=".repeat(50) + "\n");
-}
-
-function getExitCode(): number {
-  const failCount = results.filter((r) => r.status === "FAIL").length;
-  return failCount > 0 ? 1 : 0;
+  console.log('='.repeat(55) + '\n');
 }
 
 async function runChecks(): Promise<void> {
-  if (!failOnly) console.log("Starting MirrorBuddy Compliance Check...\n");
-
-  // ===== 1. DOCUMENTATION CHECKS =====
-  if (!failOnly) console.log("Checking compliance documentation...");
-
-  const docChecks = [
-    { file: "docs/compliance/DPIA.md", name: "DPIA document" },
-    { file: "docs/compliance/AI-POLICY.md", name: "AI Policy document" },
-    { file: "docs/compliance/MODEL-CARD.md", name: "Model Card document" },
-    { file: "docs/compliance/AI-LITERACY.md", name: "AI Literacy document" },
-    {
-      file: "docs/compliance/AI-RISK-MANAGEMENT.md",
-      name: "AI Risk Management document",
-    },
-    {
-      file: "docs/compliance/BIAS-AUDIT-REPORT.md",
-      name: "Bias Audit Report document",
-    },
-  ];
-
-  for (const check of docChecks) {
-    if (checkFileExists(check.file)) {
-      addResult(check.name, "PASS", `${check.name} exists`);
-    } else {
-      addResult(check.name, "FAIL", `Missing: ${check.file}`);
-    }
+  if (!failOnly && !categoryFilter) {
+    console.log('Starting MirrorBuddy Deep Compliance Check...');
   }
 
-  // ===== 2. PAGES ACCESSIBILITY CHECKS =====
-  if (!failOnly) console.log("Checking compliance pages...");
+  const modulesToRun = categoryFilter
+    ? CHECK_MODULES.filter((m) => m.key === categoryFilter)
+    : CHECK_MODULES;
 
-  const pageChecks = [
-    { path: "src/app/ai-transparency", name: "AI Transparency page" },
-    { path: "src/app/privacy", name: "Privacy page" },
-    { path: "src/app/terms", name: "Terms page" },
-  ];
-
-  for (const check of pageChecks) {
-    if (checkDirectoryExists(check.path)) {
-      addResult(check.name, "PASS", `${check.name} accessible`);
-    } else {
-      addResult(check.name, "FAIL", `Missing: ${check.path}`);
-    }
+  if (categoryFilter && modulesToRun.length === 0) {
+    const keys = CHECK_MODULES.map((m) => m.key).join(', ');
+    console.error(`Unknown category: "${categoryFilter}". Available: ${keys}`);
+    process.exit(1);
   }
 
-  // ===== 3. API ENDPOINTS CHECKS =====
-  if (!failOnly) console.log("Checking compliance API endpoints...");
-
-  const apiChecks = [
-    {
-      path: "src/app/api/privacy/delete-my-data",
-      name: "Data export/deletion API",
-    },
-    {
-      path: "src/app/api/compliance/audit-log",
-      name: "Compliance audit log API",
-    },
-  ];
-
-  for (const check of apiChecks) {
-    if (checkDirectoryExists(check.path)) {
-      addResult(check.name, "PASS", `${check.name} exists`);
-    } else {
-      addResult(check.name, "FAIL", `Missing: ${check.path}`);
+  const allResults: CheckResult[] = [];
+  for (const mod of modulesToRun) {
+    if (!failOnly && !categoryFilter) {
+      console.log(`  Checking ${mod.label}...`);
     }
+    const results = await mod.run();
+    allResults.push(...results);
   }
 
-  // ===== 4. SAFETY SYSTEMS CHECKS =====
-  if (!failOnly) console.log("Checking safety systems...");
+  printResults(allResults);
 
-  const safetyChecks = [
-    {
-      path: "src/lib/safety/escalation",
-      name: "Safety escalation system",
-    },
-    {
-      path: "src/lib/safety/audit",
-      name: "Compliance audit service",
-    },
-  ];
-
-  for (const check of safetyChecks) {
-    if (checkDirectoryExists(check.path)) {
-      addResult(check.name, "PASS", `${check.name} exists`);
-    } else {
-      addResult(check.name, "FAIL", `Missing: ${check.path}`);
-    }
-  }
-
-  // ===== 5. ENVIRONMENT VARIABLES CHECKS =====
-  if (!failOnly) console.log("Checking environment variables...");
-
-  const envChecks = [
-    { name: "ADMIN_EMAIL", critical: true },
-    { name: "RESEND_API_KEY", critical: false },
-  ];
-
-  for (const check of envChecks) {
-    const value = getEnvVar(check.name);
-    if (value) {
-      addResult(check.name, "PASS", `${check.name} is set`);
-    } else if (check.critical) {
-      addResult(
-        check.name,
-        "FAIL",
-        `${check.name} not set (required for compliance)`,
-      );
-    } else {
-      addResult(
-        check.name,
-        "WARN",
-        `${check.name} not set (email features disabled)`,
-      );
-    }
-  }
-
-  // Additional environment checks for compliance
-  const additionalEnvChecks = [
-    { name: "DATABASE_URL", critical: true },
-    { name: "SESSION_SECRET", critical: true },
-  ];
-
-  for (const check of additionalEnvChecks) {
-    const value = getEnvVar(check.name);
-    if (value) {
-      addResult(check.name, "PASS", `${check.name} is set`);
-    } else {
-      addResult(check.name, "FAIL", `${check.name} not set (required)`);
-    }
-  }
-
-  printResults();
-  const exitCode = getExitCode();
-  process.exit(exitCode);
+  const failCount = allResults.filter((r) => r.status === 'FAIL').length;
+  process.exit(failCount > 0 ? 1 : 0);
 }
 
 runChecks().catch((error) => {
-  console.error("Error running compliance checks:", error);
+  console.error('Error running compliance checks:', error);
   process.exit(1);
 });

@@ -16,6 +16,9 @@ ZERO TOLERANCE. Script does work, agent interprets.
 ## EXECUTION FLOW
 
 ```bash
+# Step 0: Deep compliance check (safety, GDPR, EU AI Act, security, API audit)
+npx tsx scripts/compliance-check.ts
+
 # Step 1: Run ALL checks (single command)
 ./scripts/release-brutal.sh --json
 ```
@@ -35,7 +38,7 @@ ZERO TOLERANCE. Script does work, agent interprets.
 | Tests      | unit, e2e                                   | Yes      |
 | Perf       | perf, filesize                              | Yes      |
 | Security   | csp, csrf, no-debug, rate-limit             | Yes      |
-| Compliance | dpia, ai-policy, privacy-page, terms-page   | Yes      |
+| Compliance | deep-compliance (43 checks across 7 cats)   | Yes      |
 | Arch Diags | arch-diagrams (25 sections + 21 compliance) | Yes      |
 | Plans      | plans (no `[ ]` in done/)                   | Yes      |
 

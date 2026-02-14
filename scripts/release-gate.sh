@@ -95,11 +95,24 @@ npm run test:coverage
 
 echo ""
 echo -e "${BLUE}[PHASE 4] E2E tests...${NC}"
-npm run test:e2e:smoke
 npm run test
 
 echo ""
-echo -e "${BLUE}[PHASE 5] Legal review compliance check...${NC}"
+echo -e "${BLUE}[PHASE 5] Deep compliance check (safety/GDPR/AI Act/security)...${NC}"
+set +e
+deep_comp_output=$(npx tsx scripts/compliance-check.ts --fail-only 2>&1)
+deep_comp_exit=$?
+set -e
+if [ $deep_comp_exit -ne 0 ]; then
+	echo -e "${RED}✗ BLOCKED: Deep compliance check failed${NC}"
+	echo "$deep_comp_output" | tail -20
+	exit 1
+fi
+echo "$deep_comp_output" | grep -E "Summary:" | tail -1
+echo -e "${GREEN}✓ Deep compliance check passed${NC}"
+
+echo ""
+echo -e "${BLUE}[PHASE 5b] Legal review compliance check...${NC}"
 set +e
 legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1)
 legal_exit=$?
