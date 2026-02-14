@@ -20,25 +20,29 @@ We implement automatic formality detection based on character classification:
 
 These characters use formal address based on their historical context:
 
-| Professor   | Rationale                            |
-| ----------- | ------------------------------------ |
-| Manzoni     | 19th century Italian literary figure |
-| Shakespeare | Elizabethan era playwright           |
-| Erodoto     | Ancient Greek historian              |
-| Cicerone    | Roman orator and statesman           |
-| Socrate     | Ancient Greek philosopher            |
-| Mozart      | Classical composer (formal court)    |
-| Galileo     | Renaissance scientist                |
-| Darwin      | Victorian era naturalist             |
-| Curie       | Victorian/Edwardian scientist        |
-| Leonardo    | Renaissance polymath                 |
-| Euclide     | Ancient Greek mathematician          |
-| Smith       | 18th century economist               |
-| Humboldt    | 19th century explorer                |
-| Ippocrate   | Ancient Greek physician              |
-| Lovelace    | Victorian mathematician              |
-| Cassese     | Distinguished international jurist   |
-| Omero       | Ancient Greek epic poet              |
+| Professor       | Rationale                            |
+| --------------- | ------------------------------------ |
+| Manzoni         | 19th century Italian literary figure |
+| Shakespeare     | Elizabethan era playwright           |
+| Erodoto         | Ancient Greek historian              |
+| Cicerone        | Roman orator and statesman           |
+| Socrate         | Ancient Greek philosopher            |
+| Mozart          | Classical composer (formal court)    |
+| Galileo         | Renaissance scientist                |
+| Darwin          | Victorian era naturalist             |
+| Curie           | Victorian/Edwardian scientist        |
+| Leonardo        | Renaissance polymath                 |
+| Euclide         | Ancient Greek mathematician          |
+| Smith           | 18th century economist               |
+| Humboldt        | 19th century explorer                |
+| Ippocrate       | Ancient Greek physician              |
+| Lovelace        | Victorian mathematician              |
+| Cassese         | Distinguished international jurist   |
+| Omero           | Ancient Greek epic poet              |
+| Molière         | 17th century French playwright       |
+| Goethe          | 18th-19th century German writer      |
+| Cervantes       | 16th-17th century Spanish novelist   |
+| Levi-Montalcini | Nobel laureate, Italian senator      |
 
 ### Informal Professors (tu/du/tú)
 
@@ -63,10 +67,10 @@ These characters use informal address for accessibility:
 
 ```typescript
 // Formal greeting (Lei)
-"Buongiorno! Sono {name}. Come posso esserLe utile oggi?";
+'Buongiorno! Sono {name}. Come posso esserLe utile oggi?';
 
 // Informal greeting (tu)
-"Ciao! Sono {name}. Come posso aiutarti oggi?";
+'Ciao! Sono {name}. Come posso aiutarti oggi?';
 ```
 
 ### System Prompt Injection
@@ -82,30 +86,32 @@ The `injectSafetyGuardrails()` function in `safety-prompts-core.ts` automaticall
 ```typescript
 // In src/lib/greeting/templates/index.ts
 export const FORMAL_PROFESSORS = [
-  "manzoni",
-  "shakespeare",
-  "erodoto",
-  "cicerone",
-  "socrate",
-  "mozart",
-  "galileo",
-  "darwin",
-  "curie",
-  "leonardo",
-  "euclide",
-  "smith",
-  "humboldt",
-  "ippocrate",
-  "lovelace",
-  "cassese",
-  "omero",
+  'manzoni',
+  'shakespeare',
+  'erodoto',
+  'cicerone',
+  'socrate',
+  'mozart',
+  'galileo',
+  'darwin',
+  'curie',
+  'leonardo',
+  'euclide',
+  'smith',
+  'humboldt',
+  'ippocrate',
+  'lovelace',
+  'cassese',
+  'omero',
+  'moliere',
+  'goethe',
+  'cervantes',
+  'levi-montalcini',
 ] as const;
 
 export function isFormalProfessor(characterId: string): boolean {
-  const normalized = characterId.toLowerCase().split("-")[0];
-  return FORMAL_PROFESSORS.some(
-    (p) => normalized.includes(p) || p.includes(normalized),
-  );
+  const normalized = characterId.toLowerCase().split('-')[0];
+  return FORMAL_PROFESSORS.some((p) => normalized.includes(p) || p.includes(normalized));
 }
 ```
 

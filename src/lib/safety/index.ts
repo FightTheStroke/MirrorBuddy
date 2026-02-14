@@ -18,14 +18,14 @@ export {
   containsCrisisKeywords,
   CRISIS_RESPONSE,
   type SafetyInjectionOptions,
-} from "./safety-prompts-core";
+} from './safety-prompts-core';
 
 export {
   injectSafetyGuardrails as injectSafetyGuardrails_legacy,
   hasSafetyGuardrails as hasSafetyGuardrails_legacy,
-} from "./safety-prompts";
+} from './safety-prompts';
 
-export { IT_CONTENT_PATTERNS } from "./safety-patterns";
+export { IT_CONTENT_PATTERNS } from './safety-patterns';
 
 export {
   filterInput,
@@ -36,7 +36,7 @@ export {
   type FilterResult,
   type FilterSeverity,
   type FilterAction,
-} from "./content-filter-core";
+} from './content-filter-core';
 
 export {
   sanitizeOutput,
@@ -45,7 +45,7 @@ export {
   StreamingSanitizer,
   type SanitizeResult,
   type SanitizeCategory,
-} from "./output-sanitizer";
+} from './output-sanitizer';
 
 export {
   detectJailbreak,
@@ -56,7 +56,7 @@ export {
   type JailbreakCategory,
   type ThreatLevel,
   type ConversationContext,
-} from "./jailbreak-detector";
+} from './jailbreak-detector';
 
 export {
   checkAgeGate,
@@ -69,7 +69,7 @@ export {
   type TopicSensitivity,
   type ContentTopic,
   type AgeGateResult,
-} from "./age-gating";
+} from './age-gating';
 
 export {
   logSafetyEvent,
@@ -91,7 +91,7 @@ export {
   type EventSeverity,
   type SafetyEvent,
   type SafetyMetrics,
-} from "./monitoring";
+} from './monitoring';
 
 export type {
   EscalationEvent,
@@ -99,14 +99,24 @@ export type {
   EscalationSeverity,
   EscalationMetadata,
   EscalationConfig,
-} from "./escalation/types";
+} from './escalation/types';
 
 // ============================================================================
 // AMODEI SAFETY ENHANCEMENTS (Reference: "The Adolescence of Technology" 2026)
 // ============================================================================
-export { checkSTEMSafety, isSTEMProfessor } from "./stem-safety";
+export { checkSTEMSafety, isSTEMProfessor } from './stem-safety';
 
-export { normalizeUnicode } from "./versioning";
+export {
+  detectBias,
+  isSafeFromBias,
+  getBiasCategories,
+  type BiasCategory,
+  type BiasSeverity,
+  type BiasDetection,
+  type BiasAnalysisResult,
+} from './bias-detector';
+
+export { normalizeUnicode } from './versioning';
 
 // recordContentFiltered moved to ./server.ts (requires Prisma)
 
@@ -120,6 +130,6 @@ export {
   getComplianceStatistics,
   exportComplianceAudit,
   clearComplianceBuffer,
-} from "./audit/compliance-audit-service";
+} from './audit/compliance-audit-service';
 
 // escalation-service exports moved to ./server.ts (chains to @/lib/email → prisma)

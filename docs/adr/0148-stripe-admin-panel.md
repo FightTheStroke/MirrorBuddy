@@ -1,4 +1,4 @@
-# ADR 0143: Stripe Admin Panel
+# ADR 0148: Stripe Admin Panel
 
 Status: Accepted | Date: 10 Feb 2026 | Plan: 142
 
@@ -9,6 +9,7 @@ MirrorBuddy needed in-app Stripe management for admin users. Previously, all Str
 ## Decision
 
 Built a full Stripe admin panel within the existing admin layout. Key choices:
+
 - **Tab architecture**: 4 tabs (Dashboard, Products, Subscriptions, Webhooks) via shadcn Tabs
 - **Kill switch**: `GlobalConfig.paymentsEnabled` field controls checkout availability (503 when disabled)
 - **Service-per-domain**: Separate service files (products, subscriptions, webhooks, settings) each under 250 lines

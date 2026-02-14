@@ -78,10 +78,10 @@
 | 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance                                                                        |
 | 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety                                                               |
 | 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
-| 0128 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
 | 0132 | Self-Service Password Reset Flow              | Time-limited tokens, secure recovery, rate limiting                                             |
 | 0136 | Compliance Absolute Charter                   | Immutable compliance rules, zero-tolerance policy enforcement                                   |
 | 0143 | SSO OIDC Security Hardening                   | OIDC token validation, session binding, PKCE enforcement                                        |
+| 0147 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
 
 ## Observability & Operations
 
@@ -182,7 +182,7 @@
 | 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
 | 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
 | 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
-| 0143 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view  |
+| 0148 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view  |
 
 ## Consortium & Grants
 
@@ -206,4 +206,4 @@
 
 **Total Active ADRs**: 126
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-10
+**Last Updated**: 2026-02-14
