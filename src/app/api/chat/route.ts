@@ -21,7 +21,7 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { filterInput, sanitizeOutput } from '@/lib/safety';
+import { filterInput, sanitizeOutput, detectBias } from '@/lib/safety';
 import { checkSTEMSafety } from '@/lib/safety';
 import { recordMessage, recordSessionStart } from '@/lib/safety/server';
 import { analyzeIndependence } from '@/lib/gamification/independence-tracker';
@@ -466,6 +466,17 @@ export const POST = pipe(
           clientId,
           issuesFound: sanitized.issuesFound,
           categories: sanitized.categories,
+        });
+      }
+
+      // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
+      const biasResult = detectBias(sanitized.text);
+      if (biasResult.hasBias && !biasResult.safeForEducation) {
+        log.warn('Bias detected in AI response', {
+          clientId,
+          maestroId,
+          riskScore: biasResult.riskScore,
+          categories: biasResult.detections.map((d) => d.category),
         });
       }
 

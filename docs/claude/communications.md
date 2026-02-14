@@ -307,7 +307,7 @@ const stats = await getCampaignStats(campaignId);
 
 ## See Also
 
-- `docs/adr/0128-email-communications-system.md` — Architecture details
+- `docs/adr/0147-email-communications-system.md` — Architecture details
 - `docs/compliance/GDPR-compliance.md` — GDPR requirements
 - `.claude/rules/admin-patterns.md` — Admin API conventions
 - `src/lib/email/` — Email infrastructure

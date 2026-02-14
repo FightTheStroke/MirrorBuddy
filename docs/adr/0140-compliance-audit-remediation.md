@@ -76,9 +76,8 @@ Implement a 3-wave remediation plan addressing all 22 audit findings:
 
 **Honesty Remediation**:
 
-- Fix false "automated bias detection" claims (actual: manual quarterly audits)
-- Correct AI-RISK-CLASSIFICATION overstatements
 - Update COMPLIANCE-MATRIX to reflect current implementation state
+- Update bias detection status: now automated via `src/lib/safety/bias-detector.ts`
 - Mark unimplemented features as "Planned" or "Not yet implemented"
 
 **EU AI Act Post-Market Monitoring**:
