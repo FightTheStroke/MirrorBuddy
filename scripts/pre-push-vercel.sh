@@ -156,12 +156,8 @@ SKIP_PATTERNS="DEV_DATABASE_URL|TEST_DATABASE_URL|TEST_DIRECT_URL|OLLAMA_URL|OLL
 
 # Check .env vars are all in REQUIRED_VARS (runs ALWAYS, no Vercel CLI needed)
 if [ -f ".env" ]; then
+	# Check for unregistered env vars (bash 3 compatible - no associative arrays)
 	REQUIRED_SET=$(printf '%s\n' "${REQUIRED_VARS[@]}")
-	UNREGISTERED=""
-
-	# Build associative array for O(1) lookup (avoids grep alias issues)
-	declare -A REQUIRED_MAP
-	for _rv in "${REQUIRED_VARS[@]}"; do REQUIRED_MAP[$_rv]=1; done
 
 	while IFS= read -r line; do
 		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
@@ -169,7 +165,7 @@ if [ -f ".env" ]; then
 		if [[ "$vn" =~ ^($SKIP_PATTERNS)$ ]]; then continue; fi
 		vv="${line#*=}"
 		if [ -z "$vv" ]; then continue; fi
-		if [[ -z "${REQUIRED_MAP[$vn]+x}" ]]; then
+		if ! echo "$REQUIRED_SET" | grep -qxF "$vn"; then
 			UNREGISTERED="$UNREGISTERED $vn"
 		fi
 	done <.env
