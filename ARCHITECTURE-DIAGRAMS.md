@@ -47,7 +47,7 @@
 ```mermaid
 graph TB
     subgraph Client_Layer["Client Layer"]
-        Browser[Browser/PWA]
+        Browser["Browser/PWA"]
         Mobile[Mobile Browser]
     end
 
@@ -136,7 +136,7 @@ graph TB
     end
 
     subgraph Admin_Dashboard["Admin Dashboard"]
-        AC[Admin Counts Pub/Sub]
+        AC["Admin Counts Pub/Sub"]
         SSE[SSE Connection Store]
     end
 
@@ -201,7 +201,7 @@ graph LR
     end
 
     subgraph Infrastructure["Infrastructure"]
-        Vercel[Vercel Node.js\nRegion: fra1 (EU)]
+        Vercel["Vercel Node.js<br/>Region: fra1 (EU)"]
         Supabase[Supabase PostgreSQL]
         Upstash[Upstash Redis]
     end
@@ -471,7 +471,7 @@ graph LR
     end
 
     subgraph VOICE_SPECIFIC["VOICE-SPECIFIC"]
-        V1[WebRTC/WebSocket]
+        V1["WebRTC/WebSocket"]
         V2[VAD Detection]
         V3[TTS Output]
         V4[Audio Waveform UI]
@@ -950,19 +950,19 @@ erDiagram
 graph TB
     subgraph Trial_Tier["Trial Tier"]
         T1[Anonymous User]
-        T2[10 chats/day]
-        T3[5 min voice/day]
+        T2["10 chats/day"]
+        T3["5 min voice/day"]
         T4[3 random Professors]
-        T5[10 tool uses/day]
+        T5["10 tool uses/day"]
         T6[gpt-5-nano]
     end
 
     subgraph Base_Tier["Base Tier"]
         B1[Registered Free]
-        B2[50 chats/day]
-        B3[30 min voice/day]
+        B2["50 chats/day"]
+        B3["30 min voice/day"]
         B4[All 25 Professors]
-        B5[30 tool uses/day]
+        B5["30 tool uses/day"]
         B6[gpt-5.2-edu]
     end
 
@@ -1177,7 +1177,7 @@ stateDiagram-v2
 ```mermaid
 graph TB
     subgraph Trigger["Trigger"]
-        Push[Push to main/dev]
+        Push["Push to main/dev"]
         PR[Pull Request]
     end
 
@@ -1409,64 +1409,64 @@ sequenceDiagram
 graph TB
     subgraph API["/api"]
         subgraph Auth["Auth"]
-            AuthLogin[/auth/login]
-            AuthLogout[/auth/logout]
-            AuthGoogle[/auth/google]
-            AuthSession[/auth/session]
+            AuthLogin["/auth/login"]
+            AuthLogout["/auth/logout"]
+            AuthGoogle["/auth/google"]
+            AuthSession["/auth/session"]
         end
 
         subgraph Chat["Chat"]
-            ChatRoute[/chat]
-            ChatStream[/chat/stream]
+            ChatRoute["/chat"]
+            ChatStream["/chat/stream"]
         end
 
         subgraph Voice["Voice"]
-            RealtimeToken[/realtime/token]
-            RealtimeEphemeral[/realtime/ephemeral-token]
-            RealtimeStart[/realtime/start]
-            RealtimeStatus[/realtime/status]
+            RealtimeToken["/realtime/token"]
+            RealtimeEphemeral["/realtime/ephemeral-token"]
+            RealtimeStart["/realtime/start"]
+            RealtimeStatus["/realtime/status"]
         end
 
         subgraph User["User"]
-            UserProfile[/user/profile]
-            UserSettings[/user/settings]
-            UserSubscription[/user/subscription]
-            UserUsage[/user/usage]
+            UserProfile["/user/profile"]
+            UserSettings["/user/settings"]
+            UserSubscription["/user/subscription"]
+            UserUsage["/user/usage"]
         end
 
         subgraph Admin["Admin"]
-            AdminTiers[/admin/tiers]
-            AdminUsers[/admin/users]
-            AdminInvites[/admin/invites]
-            AdminCounts[/admin/counts]
-            AdminFunnel[/admin/funnel]
+            AdminTiers["/admin/tiers"]
+            AdminUsers["/admin/users"]
+            AdminInvites["/admin/invites"]
+            AdminCounts["/admin/counts"]
+            AdminFunnel["/admin/funnel"]
         end
 
         subgraph Content["Content"]
-            Conversations[/conversations]
-            Materials[/materials]
-            Collections[/collections]
-            Tags[/tags]
+            Conversations["/conversations"]
+            Materials["/materials"]
+            Collections["/collections"]
+            Tags["/tags"]
         end
 
         subgraph Education["Education"]
-            Flashcards[/flashcards]
-            Quizzes[/quizzes]
-            LearningPath[/learning-path]
-            StudyKit[/study-kit]
+            Flashcards["/flashcards"]
+            Quizzes["/quizzes"]
+            LearningPath["/learning-path"]
+            StudyKit["/study-kit"]
         end
 
         subgraph Gamification["Gamification"]
-            Points[/gamification/points]
-            Achievements[/gamification/achievements]
-            Streak[/gamification/streak]
+            Points["/gamification/points"]
+            Achievements["/gamification/achievements"]
+            Streak["/gamification/streak"]
         end
 
         subgraph System["System"]
-            Health[/health]
-            HealthDetailed[/health/detailed]
-            Metrics[/metrics]
-            CronRoutes[/cron/*]
+            Health["/health"]
+            HealthDetailed["/health/detailed"]
+            Metrics["/metrics"]
+            CronRoutes["/cron/*"]
         end
     end
 ```
@@ -1622,8 +1622,8 @@ graph TB
 ```mermaid
 graph TB
     subgraph Regulatory_Requirements["Regulatory Requirements"]
-        EUAI[EU AI Act 2024/1689]
-        Italy[L.132/2025 Italy]
+        EUAI["EU AI Act 2024/1689"]
+        Italy["L.132/2025 Italy"]
         GDPR[GDPR]
         COPPA[COPPA]
         WCAG[WCAG 2.1 AA]
@@ -1638,15 +1638,15 @@ graph TB
     end
 
     subgraph Public_Pages["Public Pages"]
-        AITransparency[/ai-transparency]
-        Privacy[/privacy]
-        Terms[/terms]
+        AITransparency["/ai-transparency"]
+        Privacy["/privacy"]
+        Terms["/terms"]
     end
 
     subgraph Admin_Tools["Admin Tools"]
-        SafetyDash[/admin/safety]
-        AuditLog[/api/compliance/audit-log]
-        DataExport[/api/privacy/export-data]
+        SafetyDash["/admin/safety"]
+        AuditLog["/api/compliance/audit-log"]
+        DataExport["/api/privacy/export-data"]
     end
 
     EUAI --> DPIA
@@ -2325,7 +2325,7 @@ graph TB
     end
 
     App -->|"Profiles, Conversations"| SB_Data
-    App -->|"Chat prompts (sanitized)"| AZ_Data
+    App -->|Chat prompts sanitized| AZ_Data
     App -->|"HTTP requests"| V_Data
     App -->|"Notification emails"| R_Data
     App -->|"Session hashes"| U_Data
@@ -2675,9 +2675,9 @@ graph TB
 graph TB
     subgraph Metrics_Collection["Metrics Collection"]
         App[Next.js App]
-        Health[/api/health]
-        HealthDetailed[/api/health/detailed]
-        Metrics[/api/metrics]
+        Health["/api/health"]
+        HealthDetailed["/api/health/detailed"]
+        Metrics["/api/metrics"]
     end
 
     subgraph Push_to_Grafana["Push to Grafana"]
@@ -2698,7 +2698,7 @@ graph TB
     subgraph Service_Limits["Service Limits"]
         Vercel[Vercel Limits]
         Supabase[Supabase Limits]
-        Azure[Azure OpenAI TPM/RPM]
+        Azure["Azure OpenAI TPM/RPM"]
         Redis[Upstash Redis]
         Resend[Resend Email]
     end
@@ -3017,7 +3017,7 @@ graph TB
     subgraph AI_Characters["AI and Characters"]
         ADR0003[0003 Support Triangle]
         ADR0031[0031 Embedded Knowledge]
-        ADR0064[0064 Formal/Informal]
+        ADR0064["0064 Formal/Informal"]
         ADR0073[0073 Per-Feature Models]
     end
 
@@ -3113,60 +3113,60 @@ graph LR
 ```mermaid
 graph TB
     subgraph New_ADRs["Recently Added"]
-        ADR0002[0002 Use MarkMap for Mind Map ]
-        ADR0006[0006 Telemetry System with Pro]
-        ADR0007[0007 Server-Side Notification ]
-        ADR0010[0010 Separate Conversations Pe]
-        ADR0011[0011 Voice Commands for Mindma]
-        ADR0012[0012 Unified Maestri Voice Exp]
-        ADR0013[0013 Platform Support Handled ]
-        ADR0014[0014 PWA Push Notifications]
-        ADR0016[0016 Component Modularization ]
-        ADR0017[0017 Voice Commands for Summar]
-        ADR0018[0018 Audio Coordination Archit]
-        ADR0019[0019 Session Summaries & Unifi]
-        ADR0020[0020 Mindmap Data Structure an]
-        ADR0021[0021 Conversational Memory Inj]
-        ADR0022[0022 Knowledge Hub Architectur]
+        ADR0002["0002 MarkMap for Mindmaps"]
+        ADR0006["0006 Telemetry System"]
+        ADR0007["0007 Notification Persistence"]
+        ADR0010["0010 Separate Conversations"]
+        ADR0011["0011 Voice Commands Mindmap"]
+        ADR0012["0012 Unified Maestri Voice"]
+        ADR0013["0013 Platform Support via Coach"]
+        ADR0014["0014 PWA Push Notifications"]
+        ADR0016["0016 Component Modularization"]
+        ADR0017["0017 Voice Commands Summary"]
+        ADR0018["0018 Audio Coordination"]
+        ADR0019["0019 Session Summaries Unified"]
+        ADR0020["0020 Mindmap Data Structure"]
+        ADR0021["0021 Conversational Memory"]
+        ADR0022["0022 Knowledge Hub"]
         ADR0023[0023 Apache 2.0 License]
-        ADR0024[0024 Demo HTML Builder Central]
-        ADR0026[0026 Maestro-Agent Communicati]
-        ADR0027[0027 Bilingual Voice Recogniti]
-        ADR0029[0029 Claude Code Optimization ]
+        ADR0024["0024 Demo HTML Builder"]
+        ADR0026["0026 Maestro-Agent Comm"]
+        ADR0027["0027 Bilingual Voice"]
+        ADR0029["0029 Claude Code Optimization"]
         ADR0030[0030 E2E Test Optimization]
-        ADR0032[0032 E2E Conversation Test Fra]
-        ADR0035[0035 Voice Session Context Con]
-        ADR0036[0036 Per-Character Conversatio]
-        ADR0039[0039 Deferred Production Items]
+        ADR0032["0032 E2E Conversation Tests"]
+        ADR0035["0035 Voice Session Context"]
+        ADR0036["0036 Per-Character Conversation"]
+        ADR0039["0039 Deferred Production Items"]
         ADR0040[0040 Google Drive Integration]
-        ADR0041[0041 Adaptive Difficulty Engin]
-        ADR0042[0042 Vocal Prosody Frustration]
-        ADR0043[0043 Brave Search API Integrat]
-        ADR0044[0044 Performance Optimizations]
-        ADR0045[0045 Domain Boundaries and Mod]
-        ADR0046[0046 Production Hardening (Pla]
-        ADR0049[0049 Enterprise Reliability Fe]
+        ADR0041["0041 Adaptive Difficulty"]
+        ADR0042["0042 Vocal Prosody Detection"]
+        ADR0043["0043 Brave Search API"]
+        ADR0044["0044 Performance Optimizations"]
+        ADR0045["0045 Domain Boundaries"]
+        ADR0046["0046 Production Hardening"]
+        ADR0049["0049 Enterprise Reliability"]
         ADR0050[0050 Voice Cost Guards]
         ADR0051[0051 CLAUDE.md Optimization]
-        ADR0052[0052 Vercel Deployment Configu]
+        ADR0052["0052 Vercel Deployment Config"]
         ADR0053[0053 Supabase Migration]
         ADR0054[0054 Upstash Redis for Distrib]
         ADR0061[0061 Admin Section Redesign]
-        ADR0065[0065 Service Limits Monitoring]
-        ADR0066[0066 Multi-Language i18n Archi]
-        ADR0068[0068 Conversion Funnel Dashboa]
-        ADR0074[0074 Contact Form Security and]
-        ADR0082[0082 i18n Namespace-Based Stru]
-        ADR0083[0083 i18n Context Architecture]
+        ADR0065["0065 Service Limits Monitoring"]
+        ADR0066["0066 Multi-Language i18n"]
+        ADR0068["0068 Conversion Funnel"]
+        ADR0074["0074 Contact Form Security"]
+        ADR0082["0082 i18n Namespace Structure"]
+        ADR0083["0083 i18n Context Architecture"]
         ADR0090[0090 Total Memory System]
-        ADR0091[0091 SSE Push Architecture for]
-        ADR0092[0092 Hreflang SEO Tags for Mul]
-        ADR0093[0093 Redirect Metadata + E2E G]
-        ADR0094[0094 Language Preference Synch]
-        ADR0095[0095 Localized Open Graph Meta]
-        ADR0096[0096 i18n Implementation and M]
-        ADR0097[0097 Tier-Specific Memory Syst]
-        ADR0098[0098 Trial Security Implementa]
+        ADR0091["0091 SSE Push Architecture"]
+        ADR0092["0092 Hreflang SEO Tags"]
+        ADR0093["0093 Redirect Metadata"]
+        ADR0094["0094 Language Preference Sync"]
+        ADR0095["0095 Localized Open Graph"]
+        ADR0096["0096 i18n Implementation"]
+        ADR0097["0097 Tier-Specific Memory"]
+        ADR0098["0098 Trial Security"]
     end
 ```
 
@@ -3175,9 +3175,9 @@ graph TB
 ```mermaid
 graph TB
     subgraph New_ADRs["Recently Added"]
-        ADR0099[0099 Vercel Deployment Checks ]
-        ADR0100[0100 Multi-Country Compliance ]
-        ADR0101[0101 i18n Translation Key Nami]
+        ADR0099["0099 Vercel Deployment Checks"]
+        ADR0100["0100 Multi-Country Compliance"]
+        ADR0101["0101 i18n Translation Keys"]
     end
 ```
 
@@ -3186,18 +3186,18 @@ graph TB
 ```mermaid
 graph TB
     subgraph New_ADRs["Recently Added"]
-        ADR0102[0102 0102 - Incremental E2E Ex]
-        ADR0103[0103 0103 - E2E Test Stability]
-        ADR0104[0104 i18n Namespace Wrapper Ke]
-        ADR0105[0105 Prisma Race Condition Pre]
+        ADR0102["0102 Incremental E2E"]
+        ADR0103["0103 E2E Test Stability"]
+        ADR0104["0104 i18n Namespace Wrapper Key"]
+        ADR0105["0105 Prisma Race Condition"]
         ADR0106[0106 Admin Panel Redesign]
-        ADR0107[0107 Composable API Handler Pi]
-        ADR0113[0113 Composable API Handler Pa]
+        ADR0107["0107 Composable API Handler"]
+        ADR0113["0113 API Handler Patterns"]
         ADR0114[0114 Query Raw Elimination]
-        ADR0115[0115 Amodei Safety Enhancement]
-        ADR0116[0116 Documentation AI-Ready Ar]
-        ADR0117[0117 Technical Debt Cleanup - ]
-        ADR0118[0118 Webcam Fullscreen Archite]
+        ADR0115["0115 Amodei Safety"]
+        ADR0116["0116 AI-Ready Documentation"]
+        ADR0117["0117 Technical Debt Cleanup"]
+        ADR0118["0118 Webcam Fullscreen"]
         ADR0119[0119 Stripe Payment Integratio]
     end
 ```
