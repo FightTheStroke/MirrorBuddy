@@ -95,25 +95,49 @@ Create accounts and have credentials ready:
 2. **Deploy Models**
 
    ```bash
+    # Chat models
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
-      --deployment-name gpt-5-mini --model-name gpt-5-mini --model-version 2025-08-07 \
-      --sku-name Standard --sku-capacity 10
+      --deployment-name gpt-5-nano --model-name gpt-5-nano --model-version 2025-08-07 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 10
 
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
-      --deployment-name gpt-realtime --model-name gpt-realtime --model-version 2025-08-28 \
-      --sku-name GlobalStandard --sku-capacity 1
+      --deployment-name gpt-5-edu-mini --model-name gpt-5-mini --model-version 2025-08-07 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 10
+
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-5.2-chat --model-name gpt-5.2-chat --model-version 2025-12-11 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 10
+
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-5.2-edu --model-name gpt-5.2-chat --model-version 2025-12-11 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 10
+
+    # Voice (realtime WebRTC)
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-4o-realtime --model-name gpt-realtime --model-version 2025-08-28 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
 
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
       --deployment-name gpt-realtime-mini --model-name gpt-realtime-mini --model-version 2025-12-15 \
-      --sku-name Standard --sku-capacity 1
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
 
+    # Embedding (RAG)
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
       --deployment-name text-embedding-3-small --model-name text-embedding-3-small --model-version 1 \
-      --sku-name Standard --sku-capacity 10
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 120
+
+    # TTS (accessibility)
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name tts-hd-deployment --model-name tts-hd --model-version 001 \
+      --model-format OpenAI --sku-name Standard --sku-capacity 1
    ```
 
 3. **Get Credentials**
@@ -123,11 +147,15 @@ Create accounts and have credentials ready:
 
 4. **Deployment Names**
    - Set environment variables:
-     - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini`
-     - `AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-5-mini` (optional premium)
-     - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
+     - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt4o-mini-deployment` (legacy fallback)
+     - `AZURE_OPENAI_GPT5_NANO_DEPLOYMENT=gpt-5-nano`
+     - `AZURE_OPENAI_GPT5_MINI_DEPLOYMENT=gpt-5-edu-mini`
+     - `AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT=gpt-5.2-chat`
+     - `AZURE_OPENAI_GPT52_EDU_DEPLOYMENT=gpt-5.2-edu`
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
      - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
+     - `AZURE_OPENAI_TTS_DEPLOYMENT=tts-hd-deployment`
 
 ---
 

@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] — Infrastructure Alignment (15 Feb 2026)
+
+### Azure Deployments
+
+- Added: `text-embedding-3-small` deployment (GlobalStandard, 1536 dims) — replaces ada-002
+- Added: `tts-hd-deployment` (tts-hd model) — replaces tts (better audio quality)
+- Added: `tts-deployment` (tts model, kept as fallback)
+- Note: `gpt-4o-mini-tts` not yet available in EU/swedencentral (tracked in #216)
+
+### Environment & Secrets
+
+- Added: `scripts/env-vault.sh` — backup/restore `.env` via Azure Key Vault
+- Added: `.env` backup in `kv-virtualbpm-prod/mirrorbuddy-env-backup`
+- Fixed: Vercel `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` had trailing `\n`
+- Synced: GitHub Secrets 65 → 76 vars (added Stripe, Supabase, Postgres, GPT-5 deployments)
+- Updated: `.env.example` aligned with real Azure deployment names
+
+### CI Fixes
+
+- Fixed: `validate-pre-deploy.ts` Vercel Gate check to recognize `isEnabled()` pattern
+- Fixed: `verify-sentry-config.sh` grep patterns for refactored sentry configs
+- Fixed: `src/lib/sentry/env.test.ts` TS2540 read-only `NODE_ENV` errors
+- Fixed: Admin API routes reverted from `force-static` to `force-dynamic` (cookie access)
+- Fixed: Mobile Build CI job uses Node 22, Build & Lint stays on Node 20
+
+### Database
+
+- Added: Ghost migration placeholder `20260125200000_add_trial_email_verification`
+- Applied: `20260214201356_add_maintenance_windows` migration
+
 ## [Unreleased] — Scheduled Maintenance & Communication System (Plan 146)
 
 ### Maintenance System
