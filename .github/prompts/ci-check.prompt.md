@@ -5,22 +5,24 @@ agent: 'agent'
 tools: ['terminalLastCommand']
 ---
 
-Run the CI summary check for MirrorBuddy. Execute the following command:
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
+
+Execute CI summary check for MirrorBuddy:
 
 ```bash
 ./scripts/ci-summary.sh
 ```
 
-This runs lint + typecheck + build in compact mode (~10 lines output).
+**Modes**:
 
-If all checks pass, report "CI PASS" with a summary.
-If any check fails, identify the specific failures and suggest fixes.
+- Default: lint + typecheck + build (~10 lines)
+- `--quick`: lint + typecheck only (no build)
+- `--full`: includes unit tests
+- `--unit`: unit tests only
 
-NEVER run raw `npm run lint`, `npm run typecheck`, or `npm run build` separately.
-Always use the ci-summary.sh script for compact, token-efficient output.
+**Output**:
 
-Additional modes available:
+- All pass: "CI PASS" + summary
+- Failures: identify specific failures, suggest fixes
 
-- `./scripts/ci-summary.sh --quick` — lint + typecheck only (no build)
-- `./scripts/ci-summary.sh --full` — includes unit tests
-- `./scripts/ci-summary.sh --unit` — unit tests only
+**NEVER** run raw `npm run lint|typecheck|build` separately. Always use ci-summary.sh for token efficiency.

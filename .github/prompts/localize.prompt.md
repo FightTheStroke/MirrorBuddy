@@ -5,31 +5,20 @@ agent: 'agent'
 tools: ['terminalLastCommand']
 ---
 
-Synchronize internationalization keys across all 5 locales for MirrorBuddy.
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
 
-## Steps
+Synchronize i18n keys across all 5 locales for MirrorBuddy.
 
-1. **Check current status**:
+**Workflow**:
 
-   ```bash
-   npm run i18n:check
-   ```
+1. Check status: `npm run i18n:check`
+2. If keys missing: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`
+3. Verify complete: `npm run i18n:check`
 
-2. **If keys are missing**, sync them:
-
-   ```bash
-   npx tsx scripts/i18n-sync-namespaces.ts --add-missing
-   ```
-
-3. **Verify all locales are complete**:
-   ```bash
-   npm run i18n:check
-   ```
-
-## Rules
+**Rules**:
 
 - Locales: it (default), en, fr, de, es
-- All JSON files use wrapper key convention: `{ "namespace": { ...keys } }`
-- Keys must be camelCase (ADR 0091)
-- Italian text is always the source of truth
+- JSON wrapper key convention: `{ "namespace": { ...keys } }`
+- Keys: camelCase (ADR 0091)
+- Italian text is source of truth
 - New keys: add Italian first, then run sync script

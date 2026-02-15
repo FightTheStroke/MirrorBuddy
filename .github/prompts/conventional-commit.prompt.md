@@ -6,24 +6,12 @@ agent: 'agent'
 tools: ['terminalLastCommand']
 ---
 
-Create a conventional commit for MirrorBuddy following these rules:
+Conventional commit for: ${input:description}
 
-1. **Check status**: Run `git status` and `git diff --staged` to see what's changed
-2. **Format**: `{type}({scope}): {description}`
-   - Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`, `perf`, `style`
-   - Scope: affected area (e.g., `api`, `auth`, `tier`, `i18n`, `a11y`)
-   - Description: imperative mood, lowercase, no period
-3. **Validate before commit**:
-   ```bash
-   ./scripts/ci-summary.sh --quick
-   ```
-4. **Commit**: Create the commit with the conventional message
+**Format**: `{type}({scope}): {description}` — imperative, lowercase, no period
+**Types**: `feat|fix|chore|docs|refactor|test|perf|style`
+**Scopes**: `api|auth|tier|i18n|a11y|admin|rag|...`
 
-Examples:
-
-- `feat(tier): add Pro tier voice limit enforcement`
-- `fix(auth): prevent CSRF bypass on admin mutations`
-- `docs(compliance): update DPIA for new data processor`
-- `refactor(admin): migrate user routes to pipe() middleware`
-
-User's request: ${input:description}
+1. `git status && git diff --staged` — check changes
+2. `./scripts/ci-summary.sh --quick` — validate
+3. Commit with conventional message

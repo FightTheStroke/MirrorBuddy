@@ -3,36 +3,24 @@ description: 'Tier system rules for Trial/Base/Pro subscription logic'
 applyTo: 'src/lib/tier/**/*.ts,src/lib/tier/**/*.tsx,src/lib/seeds/tier-seed.ts'
 ---
 
-# Tier System Rules
+# Tier System
 
-## Three Tiers
+## Tiers
 
-| Tier  | Users       | Chat      | Voice      | Maestri | Tools  | Price   |
-| ----- | ----------- | --------- | ---------- | ------- | ------ | ------- |
-| Trial | Anonymous   | 10/day    | 5 min/day  | 3       | 10/day | Free    |
-| Base  | Registered  | 50/day    | 30 min/day | 25      | 30/day | Free    |
-| Pro   | Subscribers | Unlimited | Unlimited  | 26      | Unl.   | 9.99/mo |
+Trial (anonymous): 10 chat/day, 5 min voice, 3 maestri, 10 tools
+Base (registered): 50 chat/day, 30 min voice, 25 maestri, 30 tools
+Pro (subscribers): unlimited, 26 maestri, 9.99/mo
 
-## Fallback Logic
+Fallback: `null` userId = Trial | no subscription = Base | expired = Base
 
-- `null` userId = Trial
-- No subscription = Base
-- Expired subscription = Base
+## Usage
 
-## Service Usage
-
-```typescript
-// Server-side
-import { tierService } from '@/lib/tier/tier-service';
-const limits = await tierService.getLimits(userId);
-
-// Client-side
-const { hasFeature, tier, isSimulated } = useTierFeatures();
-```
+Server: `tierService.getLimits(userId)` | Client: `useTierFeatures()`
 
 ## Rules
 
-- NEVER hardcode tier limits — always use `tierService` or `useTierFeatures()`
-- Tier checks must be server-validated (client checks are UX only)
-- Test all 3 tiers in unit tests for tier-dependent features
-- Reference: ADR 0065
+NEVER hardcode limits | server-validate (client = UX only) | test all 3 tiers
+
+Reference: ADR 0065
+
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
