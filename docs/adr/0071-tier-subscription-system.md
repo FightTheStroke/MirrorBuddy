@@ -362,8 +362,8 @@ If user doesn't have access:
 Pre-defined tier codes (never change):
 
 - `TRIAL`: Anonymous users (10 chats, 5 min voice, 10 tools, 1 doc, 3 maestri)
-- `BASE`: Default for registered users (10 chats, 5 min voice, 10 tools, 1 doc, all maestri)
-- `PRO`: Premium subscription (100 chats, 60 min voice, 100 tools, 50 docs, all maestri + priority)
+- `BASE`: Default for registered users (50 chats, 30 min voice, 30 tools, 5 docs, 25 maestri)
+- `PRO`: Premium subscription (unlimited chats/voice/tools/docs, all 26 maestri + priority)
 
 ### Fallback Tiers
 

@@ -2,6 +2,12 @@
 
 > Complete installation and configuration guide (aligned to .env.example defaults)
 
+## Prerequisites
+
+- **Node.js 20+** (LTS recommended — Docker uses `node:20-alpine`)
+- **npm 10+**
+- **PostgreSQL 17** with pgvector extension (or Supabase)
+
 ---
 
 ## Quick Start
@@ -147,7 +153,6 @@ See `.env.example` for all options. Key variables:
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini
-AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-5-mini
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
@@ -163,6 +168,35 @@ DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Production-Critical Variables
+
+These are required in production but optional for local development:
+
+```bash
+# Security (REQUIRED in production)
+PII_ENCRYPTION_KEY=           # AES-256 key for PII encryption — user creation fails without this
+COOKIE_SIGNING_SECRET=        # HMAC-SHA256 secret for signed cookies
+IP_HASH_SALT=                 # Salt for trial mode IP hashing
+
+# Database SSL (REQUIRED for Supabase production)
+SUPABASE_CA_CERT=             # PEM certificate — app fails fast if missing (ADR 0063)
+DIRECT_URL=                   # Direct DB connection for migrations (port 5432)
+
+# Payments
+STRIPE_SECRET_KEY=            # Stripe API key for Pro tier subscriptions
+STRIPE_WEBHOOK_SECRET=        # Webhook signature verification
+
+# Voice Rooms
+LIVEKIT_URL=                  # LiveKit server URL
+LIVEKIT_API_KEY=              # LiveKit API key
+LIVEKIT_API_SECRET=           # LiveKit API secret
+
+# Observability
+SENTRY_DSN=                   # Sentry error tracking
+SENTRY_AUTH_TOKEN=            # Sentry release management
+GRAFANA_CLOUD_TOKEN=          # Grafana Cloud metrics push
 ```
 
 ### Backup & Restore

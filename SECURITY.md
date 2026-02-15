@@ -71,9 +71,19 @@ Instead, please report vulnerabilities through one of these channels:
 | Login              | 5 req/15 min | Brute force prevention      |
 | Password Change    | 3 req/15 min | Account takeover prevention |
 | OAuth              | 10 req/min   | Token abuse prevention      |
+| Auth General       | 30 req/min   | General auth abuse          |
 | Invite Requests    | 3 req/hour   | Public endpoint protection  |
+| Contact Form       | 5 req/hour   | Form spam prevention        |
 | COPPA Verification | 5 req/hour   | Email abuse prevention      |
+| Chat               | 60 req/min   | Chat abuse prevention       |
+| Realtime Token     | 30 req/min   | Voice session abuse         |
+| Homework           | 10 req/min   | Upload abuse prevention     |
+| Search             | 30 req/min   | Search abuse prevention     |
+| TTS                | 15 req/min   | TTS cost control            |
 | General API        | 60 req/min   | DDoS mitigation             |
+| Web Vitals         | 60 req/min   | Telemetry flood prevention  |
+
+> **Note:** Production uses Redis (Upstash) for distributed rate limiting. Development uses in-memory store.
 
 ### Infrastructure
 

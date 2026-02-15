@@ -147,7 +147,7 @@ Create accounts and have credentials ready:
 
 4. **Deployment Names**
    - Set environment variables:
-     - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt4o-mini-deployment` (legacy fallback)
+     - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-5-mini` (primary chat model)
      - `AZURE_OPENAI_GPT5_NANO_DEPLOYMENT=gpt-5-nano`
      - `AZURE_OPENAI_GPT5_MINI_DEPLOYMENT=gpt-5-edu-mini`
      - `AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT=gpt-5.2-chat`

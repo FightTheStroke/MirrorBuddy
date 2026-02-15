@@ -150,7 +150,7 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 ## Built for Every Mind
 
-**WCAG 2.1 AA:** Dyslexia (OpenDyslexic, spacing, TTS) | Dyscalculia (visual numbers) | ADHD (focus mode, breaks) | Autism (predictable layouts) | Cerebral Palsy (large targets, keyboard, voice)
+**WCAG 2.1 AA:** Dyslexia (OpenDyslexic, spacing, TTS) | ADHD (focus mode, breaks) | Visual Impairment (high contrast, screen reader) | Motor Impairment (large targets, keyboard, voice) | Autism (predictable layouts) | Auditory Impairment (captions, visual cues) | Cerebral Palsy (adaptive interfaces)
 
 **Instant Accessibility (ADR 0060):** Floating button for quick profile switching with 90-day cookie persistence and automatic OS preference detection.
 

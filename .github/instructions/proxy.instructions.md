@@ -18,6 +18,6 @@ Skip i18n: `/api/*`, `/admin/*`, `/_next/*`, `/monitoring`, static files, `/maes
 
 Header: `src/proxy.ts` | Nonces: `src/components/providers.tsx` | Verify: `npm run test:unit -- csp-validation`
 
-Pre-push hook blocks root `proxy.ts`. Reference: ADR 0066 §9
+Pre-push hook blocks root `proxy.ts`. Reference: ADR 0066 §9 (proxy exclusion paths defined in i18n architecture)
 
 <!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->

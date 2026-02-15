@@ -92,7 +92,7 @@ Prometheus push metrics to Grafana Cloud (5 min interval). Dashboard at https://
 
 Azure OpenAI primary (chat + voice + embeddings), Claude fallback (text), Ollama local dev (text-only).
 
-**Selection:** Azure → Claude → Ollama → Showcase Mode (demo)
+**Selection:** Azure → Claude → Ollama → Landing page (no provider configured)
 
 **Implementation:** `src/lib/ai/providers/` handles provider detection, environment variables control configuration.
 
@@ -122,7 +122,7 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 | **RAG**           | pgvector                          | Semantic search (1536 dims)            |
 | **Mind Maps**     | MarkMap                           | Interactive mind map visualization     |
 | **Database**      | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search          |
-| **Testing**       | Playwright (E2E) + Vitest (unit)  | 229 E2E, 5169+ unit tests              |
+| **Testing**       | Playwright (E2E) + Vitest (unit)  | 86 E2E specs, 5169+ unit tests         |
 | **Observability** | Grafana Cloud + Sentry            | Metrics push + error tracking          |
 
 ---
@@ -131,7 +131,7 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 
 ```
 src/
-├── app/              # Next.js App Router (pages, 50+ API routes)
+├── app/              # Next.js App Router (pages, 190+ API routes)
 ├── components/       # React components (150+)
 ├── lib/
 │   ├── ai/           # Providers, character routing, intent detection
@@ -146,12 +146,12 @@ src/
 │   ├── maestri/      # 26 AI Maestri definitions (modular)
 │   ├── buddy-profiles/
 │   └── support-teachers/
-├── hooks/            # 20+ React hooks
+├── hooks/            # 35+ React hooks
 ├── types/            # TypeScript definitions (barrel export)
 └── proxy.ts          # Request proxy (i18n, CSP, path exclusions)
 
-prisma/schema/        # PostgreSQL + pgvector schema
-docs/adr/             # 146+ Architecture Decision Records
+prisma/schema/        # 27 modular PostgreSQL + pgvector schema files
+docs/adr/             # 126 active + 7 archived Architecture Decision Records
 ```
 
 ---
@@ -160,7 +160,7 @@ docs/adr/             # 146+ Architecture Decision Records
 
 ### Frontend
 
-- **Next.js App Router** (`src/app/`) - SSR, routing, 50+ API routes
+- **Next.js App Router** (`src/app/`) - SSR, routing, 190+ API routes
 - **Zustand Stores** (`src/lib/stores/`) - progress, settings, conversation, pomodoro, voice, accessibility, etc.
 
 ### Backend
@@ -319,7 +319,7 @@ WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 
 ## Testing & Monitoring
 
-**E2E Tests:** 229 Playwright tests, critical paths (chat, tools, accessibility), API-focused strategy (ADR 0030).
+**E2E Tests:** 86 Playwright spec files, critical paths (chat, tools, accessibility), API-focused strategy (ADR 0030).
 
 **Unit Tests:** 5169+ Vitest tests, 80%+ coverage on business logic.
 

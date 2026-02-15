@@ -21,6 +21,6 @@ Server: `tierService.getLimits(userId)` | Client: `useTierFeatures()`
 
 NEVER hardcode limits | server-validate (client = UX only) | test all 3 tiers
 
-Reference: ADR 0065
+Reference: ADR 0071
 
 <!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->

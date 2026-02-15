@@ -32,9 +32,20 @@ Thank you for your interest in contributing to MirrorBuddy!
 
 ### Code
 - TypeScript strict mode
-- ESLint with zero warnings
-- Tests for new features
+- ESLint with zero warnings (includes 14 custom rules for security, accessibility, privacy, and i18n)
+- Tests for new features (80% coverage on business logic, 100% on critical paths)
 - Comments in English
+- Run `npm run test:unit -- --reporter=dot` before every commit
+
+### Automated Enforcement (Pre-commit Hooks)
+
+The following checks run automatically on every commit and **will block** if they fail:
+
+- **Secrets scanning** — Prevents committing API keys, tokens, or credentials
+- **i18n validation** — Ensures no hardcoded Italian text, verifies locale file sync
+- **CSP validation** — Blocks root `proxy.ts` or `middleware.ts` creation
+- **Mobile regression patterns** — Catches patterns that break Capacitor builds
+- **Smart test runner** — Runs tests related to changed files
 
 ### Accessibility
 This project was born for inclusion. Every contribution MUST:

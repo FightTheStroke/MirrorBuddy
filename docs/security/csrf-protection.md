@@ -78,7 +78,7 @@ cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax",
-  maxAge: 60 * 60 * 24 * 365,
+  maxAge: SESSION_MAX_AGE, // 7 days (from cookie-constants.ts, per ADR 0075)
   path: "/",
 });
 ```
