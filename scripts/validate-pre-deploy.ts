@@ -108,6 +108,8 @@ function validateCriticalEnvVars(): void {
     { name: 'SESSION_SECRET', sensitive: true },
     { name: 'ADMIN_EMAIL', sensitive: false },
     { name: 'ADMIN_PASSWORD', sensitive: true },
+    { name: 'ADMIN_READONLY_EMAIL', sensitive: false },
+    { name: 'ADMIN_READONLY_COOKIE_VALUE', sensitive: true },
     { name: 'CRON_SECRET', sensitive: true },
     { name: 'TOKEN_ENCRYPTION_KEY', sensitive: true },
     { name: 'PII_ENCRYPTION_KEY', sensitive: true },
