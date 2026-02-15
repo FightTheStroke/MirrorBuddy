@@ -46,6 +46,9 @@ describe('WebRTCConnection.connect', () => {
 
     connection.getEphemeralToken = vi.fn(() => token.promise);
     connection.getUserMedia = vi.fn(() => media.promise);
+    (connection as any).fetchServerConfig = vi.fn(async () => {
+      (connection as any).serverConfig = { webrtcEndpoint: 'https://test.example.com' };
+    });
 
     // Stub the rest of the sequence so connect can finish.
     connection.createPeerConnection = vi.fn(() => ({}));
@@ -93,6 +96,9 @@ describe('WebRTCConnection.connect', () => {
 
     connection.getEphemeralToken = vi.fn(() => token.promise);
     connection.getUserMedia = vi.fn(() => media.promise);
+    (connection as any).fetchServerConfig = vi.fn(async () => {
+      (connection as any).serverConfig = { webrtcEndpoint: 'https://test.example.com' };
+    });
 
     // Stub the rest; they should not be called in this scenario.
     connection.createPeerConnection = vi.fn(() => ({}));

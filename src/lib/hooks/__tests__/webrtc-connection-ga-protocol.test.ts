@@ -1,20 +1,14 @@
 /**
  * Unit tests for WebRTC GA Protocol Changes
  *
- * Tests GA protocol feature flag behavior:
- * - T1-07: ICE server configuration guarded by voice_ga_protocol flag
- * - T1-08: ICE gathering wait guarded by voice_ga_protocol flag
+ * Tests server-driven protocol mode behavior:
+ * - T1-07: ICE server configuration driven by server token response
+ * - T1-08: ICE gathering wait driven by server token response
  *
  * Requirements: F-05 (WebRTC connectivity), F-06 (SDP exchange)
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { Mock } from 'vitest';
-
-// Mock feature flags service
-vi.mock('@/lib/feature-flags/client', () => ({
-  isFeatureEnabled: vi.fn(),
-}));
 
 // Mock logger
 vi.mock('@/lib/logger/client', () => ({
@@ -47,16 +41,29 @@ vi.mock('../voice-session/voice-error-logger', () => ({
   logVoiceError: vi.fn(),
 }));
 
+const mockMaestro = {
+  id: 'galileo',
+  name: 'galileo',
+  displayName: 'Galileo',
+  subject: 'physics',
+  avatar: '/maestri/galileo.webp',
+  color: '#FF6B6B',
+  systemPrompt: 'You are Galileo...',
+  specialty: 'astronomy',
+  voice: 'alloy',
+  voiceInstructions: 'Speak as Galileo',
+  teachingStyle: 'socratic',
+  greeting: 'Ciao!',
+};
+
 describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
   let originalRTCPeerConnection: typeof RTCPeerConnection;
   let mockPeerConnection: Partial<RTCPeerConnection>;
   let capturedConfig: RTCConfiguration | undefined;
 
   beforeEach(() => {
-    // Store original
     originalRTCPeerConnection = global.RTCPeerConnection;
 
-    // Create mock data channel
     const mockDataChannel = {
       label: 'realtime-channel',
       readyState: 'connecting',
@@ -68,7 +75,6 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
       close: vi.fn(),
     } as unknown as RTCDataChannel;
 
-    // Create mock peer connection
     mockPeerConnection = {
       onconnectionstatechange: null,
       oniceconnectionstatechange: null,
@@ -92,7 +98,6 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
       removeEventListener: vi.fn(),
     };
 
-    // Mock RTCPeerConnection constructor
     global.RTCPeerConnection = function (config?: RTCConfiguration) {
       capturedConfig = config;
       return mockPeerConnection as RTCPeerConnection;
@@ -100,49 +105,24 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
   });
 
   afterEach(() => {
-    // Restore original
     global.RTCPeerConnection = originalRTCPeerConnection;
     vi.clearAllMocks();
   });
 
-  it('should use empty iceServers array when voice_ga_protocol is enabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
-    (isFeatureEnabled as Mock).mockReturnValue({
-      enabled: true,
-      reason: 'enabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Switch from preview to GA realtime API',
-        status: 'enabled',
-        enabledPercentage: 100,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    } as any);
-
+  it('should use empty iceServers array when server returns GA config (azureResource)', async () => {
     const { WebRTCConnection } = await import('../voice-session/webrtc-connection');
-    const mockMaestro = {
-      id: 'galileo',
-      name: 'galileo',
-      displayName: 'Galileo',
-      subject: 'physics',
-      avatar: '/maestri/galileo.webp',
-      color: '#FF6B6B',
-      systemPrompt: 'You are Galileo...',
-      specialty: 'astronomy',
-      voice: 'alloy',
-      voiceInstructions: 'Speak as Galileo',
-      teachingStyle: 'socratic',
-      greeting: 'Ciao!',
-    };
 
     const connection = new WebRTCConnection({
       maestro: mockMaestro as any,
       connectionInfo: { provider: 'azure', characterType: 'maestro' },
     });
 
-    // Call the private method via reflection
+    // Simulate server returning GA config
+    (connection as any).serverConfig = {
+      azureResource: 'my-resource',
+      deployment: 'gpt-4o-realtime',
+    };
+
     const createPeerConnection = (connection as any).createPeerConnection.bind(connection);
     await createPeerConnection();
 
@@ -150,46 +130,21 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
     expect(capturedConfig?.iceServers).toEqual([]);
   });
 
-  it('should use ICE_SERVERS configuration when voice_ga_protocol is disabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
-    (isFeatureEnabled as Mock).mockReturnValue({
-      enabled: false,
-      reason: 'disabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Switch from preview to GA realtime API',
-        status: 'disabled',
-        enabledPercentage: 0,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    } as any);
-
+  it('should use ICE_SERVERS configuration when server returns preview config (webrtcEndpoint)', async () => {
     const { WebRTCConnection } = await import('../voice-session/webrtc-connection');
     const { ICE_SERVERS } = await import('../voice-session/webrtc-types');
-
-    const mockMaestro = {
-      id: 'galileo',
-      name: 'galileo',
-      displayName: 'Galileo',
-      subject: 'physics',
-      avatar: '/maestri/galileo.webp',
-      color: '#FF6B6B',
-      systemPrompt: 'You are Galileo...',
-      specialty: 'astronomy',
-      voice: 'alloy',
-      voiceInstructions: 'Speak as Galileo',
-      teachingStyle: 'socratic',
-      greeting: 'Ciao!',
-    };
 
     const connection = new WebRTCConnection({
       maestro: mockMaestro as any,
       connectionInfo: { provider: 'azure', characterType: 'maestro' },
     });
 
-    // Call the private method via reflection
+    // Simulate server returning preview config (no azureResource)
+    (connection as any).serverConfig = {
+      webrtcEndpoint: 'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc',
+      deployment: 'gpt-4o-realtime',
+    };
+
     const createPeerConnection = (connection as any).createPeerConnection.bind(connection);
     await createPeerConnection();
 
@@ -260,48 +215,21 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
     vi.clearAllMocks();
   });
 
-  it('should skip ICE gathering wait when voice_ga_protocol is enabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
-    (isFeatureEnabled as Mock).mockReturnValue({
-      enabled: true,
-      reason: 'enabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Switch from preview to GA realtime API',
-        status: 'enabled',
-        enabledPercentage: 100,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    } as any);
-
+  it('should skip ICE gathering wait when server returns GA config', async () => {
     const { WebRTCConnection } = await import('../voice-session/webrtc-connection');
-
-    const mockMaestro = {
-      id: 'galileo',
-      name: 'galileo',
-      displayName: 'Galileo',
-      subject: 'physics',
-      avatar: '/maestri/galileo.webp',
-      color: '#FF6B6B',
-      systemPrompt: 'You are Galileo...',
-      specialty: 'astronomy',
-      voice: 'alloy',
-      voiceInstructions: 'Speak as Galileo',
-      teachingStyle: 'socratic',
-      greeting: 'Ciao!',
-    };
 
     const connection = new WebRTCConnection({
       maestro: mockMaestro as any,
       connectionInfo: { provider: 'azure', characterType: 'maestro' },
     });
 
-    // Set up peer connection
+    // Simulate server returning GA config
+    (connection as any).serverConfig = {
+      azureResource: 'my-resource',
+      deployment: 'gpt-4o-realtime',
+    };
     (connection as any).peerConnection = mockPeerConnection;
 
-    // Call createOffer
     const startTime = Date.now();
     const createOffer = (connection as any).createOffer.bind(connection);
     await createOffer();
@@ -315,45 +243,19 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
     );
   });
 
-  it('should wait for ICE gathering completion when voice_ga_protocol is disabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
-    (isFeatureEnabled as Mock).mockReturnValue({
-      enabled: false,
-      reason: 'disabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Switch from preview to GA realtime API',
-        status: 'disabled',
-        enabledPercentage: 0,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    } as any);
-
+  it('should wait for ICE gathering completion when server returns preview config', async () => {
     const { WebRTCConnection } = await import('../voice-session/webrtc-connection');
-
-    const mockMaestro = {
-      id: 'galileo',
-      name: 'galileo',
-      displayName: 'Galileo',
-      subject: 'physics',
-      avatar: '/maestri/galileo.webp',
-      color: '#FF6B6B',
-      systemPrompt: 'You are Galileo...',
-      specialty: 'astronomy',
-      voice: 'alloy',
-      voiceInstructions: 'Speak as Galileo',
-      teachingStyle: 'socratic',
-      greeting: 'Ciao!',
-    };
 
     const connection = new WebRTCConnection({
       maestro: mockMaestro as any,
       connectionInfo: { provider: 'azure', characterType: 'maestro' },
     });
 
-    // Set up peer connection with 'gathering' state
+    // Simulate server returning preview config (no azureResource)
+    (connection as any).serverConfig = {
+      webrtcEndpoint: 'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc',
+      deployment: 'gpt-4o-realtime',
+    };
     (connection as any).peerConnection = mockPeerConnection;
 
     // Simulate ICE gathering completing after 50ms
@@ -367,7 +269,6 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
       }
     }, 50);
 
-    // Call createOffer
     const createOffer = (connection as any).createOffer.bind(connection);
     await createOffer();
 

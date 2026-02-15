@@ -29,10 +29,19 @@ import {
   logSDPExchange,
   logVoiceError,
 } from './voice-error-logger';
-import { isFeatureEnabled } from '@/lib/feature-flags/client';
-
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
+
+/**
+ * Server token config shape (from /api/realtime/token).
+ * GA mode returns azureResource + deployment.
+ * Preview mode returns webrtcEndpoint + deployment.
+ */
+interface ServerTokenConfig {
+  azureResource?: string;
+  webrtcEndpoint?: string;
+  deployment?: string;
+}
 
 /**
  * WebRTC connection manager for Azure OpenAI Realtime API
@@ -43,9 +52,16 @@ export class WebRTCConnection {
   private dataChannel: RTCDataChannel | null = null;
   private config: WebRTCConnectionConfig;
   private connectionTimeout: NodeJS.Timeout | null = null;
+  /** Server-driven protocol config, fetched once per connect() */
+  private serverConfig: ServerTokenConfig | null = null;
 
   constructor(config: WebRTCConnectionConfig) {
     this.config = config;
+  }
+
+  /** Whether server returned GA protocol config (azureResource present) */
+  private get isGAProtocol(): boolean {
+    return !!this.serverConfig?.azureResource;
   }
 
   private stopResolvedStreamIfUnassigned(resolvedStream: unknown): void {
@@ -72,17 +88,22 @@ export class WebRTCConnection {
     });
     let resolvedMediaStream: unknown = null;
     try {
-      // Run token issuance and microphone permission in parallel to reduce
-      // end-to-end time and to show the mic permission prompt immediately.
-      logger.debug('[WebRTC] Step 1: Getting ephemeral token + microphone access (parallel)...');
+      // Run token issuance, server config, and microphone permission in parallel
+      // to reduce end-to-end time and to show the mic permission prompt immediately.
+      logger.debug(
+        '[WebRTC] Step 1: Getting ephemeral token + server config + mic access (parallel)...',
+      );
       const tokenPromise = this.getEphemeralToken();
+      const configPromise = this.fetchServerConfig();
       const mediaPromise = this.getUserMedia().then((stream) => {
         resolvedMediaStream = stream;
         return stream;
       });
-      const [token, mediaStream] = await Promise.all([tokenPromise, mediaPromise]);
+      const [token, , mediaStream] = await Promise.all([tokenPromise, configPromise, mediaPromise]);
       this.mediaStream = mediaStream;
-      logger.debug('[WebRTC] Step 3: Creating peer connection...');
+      logger.debug('[WebRTC] Step 3: Creating peer connection...', {
+        protocol: this.isGAProtocol ? 'GA' : 'preview',
+      });
       this.peerConnection = await this.createPeerConnection();
       logger.debug('[WebRTC] Step 4: Adding audio tracks...');
       this.addAudioTracks();
@@ -115,6 +136,24 @@ export class WebRTCConnection {
       this.config.onError?.(new Error(message));
       throw error;
     }
+  }
+
+  /**
+   * Fetch server token config to determine protocol mode (GA vs preview).
+   * The server decides the protocol; the client follows.
+   */
+  private async fetchServerConfig(): Promise<void> {
+    const response = await fetch('/api/realtime/token');
+    if (!response.ok) {
+      logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
+      throw new Error('Failed to get server config');
+    }
+    this.serverConfig = await response.json();
+    logger.debug('[WebRTC] Server config received', {
+      protocol: this.isGAProtocol ? 'GA' : 'preview',
+      hasAzureResource: !!this.serverConfig?.azureResource,
+      hasWebrtcEndpoint: !!this.serverConfig?.webrtcEndpoint,
+    });
   }
 
   private async getEphemeralToken(): Promise<string> {
@@ -190,12 +229,11 @@ export class WebRTCConnection {
     logger.debug('[WebRTC] Creating peer connection');
 
     // T1-07: In GA protocol, Azure provides built-in TURN/STUN servers
-    // Check voice_ga_protocol feature flag to determine configuration
-    const gaProtocol = await isFeatureEnabled('voice_ga_protocol');
-    const iceConfig = gaProtocol.enabled ? [] : ICE_SERVERS;
+    // Protocol mode is determined by server token response (not client flags)
+    const iceConfig = this.isGAProtocol ? [] : ICE_SERVERS;
 
     logger.debug('[WebRTC] ICE server configuration', {
-      gaProtocol: gaProtocol.enabled,
+      gaProtocol: this.isGAProtocol,
       iceServers: iceConfig.length > 0 ? 'custom' : 'Azure built-in',
     });
 
@@ -304,10 +342,9 @@ export class WebRTCConnection {
     await this.peerConnection.setLocalDescription(offer);
 
     // T1-08: In GA protocol, SDP can be posted immediately without waiting for ICE gathering
-    // Check voice_ga_protocol feature flag
-    const gaProtocol = await isFeatureEnabled('voice_ga_protocol');
+    // Protocol mode is determined by server token response (not client flags)
 
-    if (!gaProtocol.enabled && this.peerConnection.iceGatheringState !== 'complete') {
+    if (!this.isGAProtocol && this.peerConnection.iceGatheringState !== 'complete') {
       // Preview protocol: wait for ICE gathering to complete
       logger.debug('[WebRTC] Waiting for ICE gathering to complete...');
       await new Promise<void>((resolve) => {
@@ -320,7 +357,7 @@ export class WebRTCConnection {
         };
         this.peerConnection!.addEventListener('icegatheringstatechange', checkState);
       });
-    } else if (gaProtocol.enabled) {
+    } else if (this.isGAProtocol) {
       logger.debug('[WebRTC] GA protocol: posting SDP immediately (no ICE wait)');
     }
 
@@ -330,35 +367,22 @@ export class WebRTCConnection {
   private async exchangeSDP(token: string, offer: RTCSessionDescriptionInit): Promise<void> {
     logger.debug('[WebRTC] Exchanging SDP with server...');
 
-    // Check if voice_ga_protocol feature flag is enabled
-    const gaProtocol = isFeatureEnabled('voice_ga_protocol');
-
+    // Protocol mode is driven by server token response (fetched in connect())
     let sdpEndpoint: string;
 
-    if (gaProtocol.enabled) {
-      // GA protocol: construct endpoint from azureResource
-      logger.debug('[WebRTC] Using GA protocol endpoint');
-      const configResponse = await fetch('/api/realtime/token');
-      if (!configResponse.ok) {
-        logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
-        throw new Error('Failed to get Azure config');
-      }
-      const config = await configResponse.json();
-      const { azureResource } = config;
+    if (this.isGAProtocol) {
+      // GA protocol: construct endpoint from azureResource (server-provided)
+      const { azureResource } = this.serverConfig!;
+      logger.debug('[WebRTC] Using GA protocol endpoint', { azureResource });
       if (!azureResource) {
         logVoiceError('AzureResourceMissing', 'Resource name not configured');
         throw new Error('Azure resource name not configured');
       }
       sdpEndpoint = `https://${azureResource}.openai.azure.com/openai/v1/realtime/calls`;
     } else {
-      // Preview protocol: use webrtcEndpoint from config
-      logger.debug('[WebRTC] Using preview protocol endpoint');
-      const configResponse = await fetch('/api/realtime/token');
-      if (!configResponse.ok) {
-        logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
-        throw new Error('Failed to get Azure config');
-      }
-      const { webrtcEndpoint } = await configResponse.json();
+      // Preview protocol: use webrtcEndpoint from server config
+      const { webrtcEndpoint } = this.serverConfig!;
+      logger.debug('[WebRTC] Using preview protocol endpoint', { webrtcEndpoint });
       if (!webrtcEndpoint) {
         logVoiceError('WebRTCEndpointMissing', 'Endpoint not configured');
         throw new Error('WebRTC endpoint not configured');
