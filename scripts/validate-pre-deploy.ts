@@ -236,21 +236,17 @@ function validateSentryClientFallback(): void {
   const content = fs.readFileSync(clientConfigPath, 'utf8');
 
   // Verify Vercel deployment gate (not NODE_ENV which matches local builds)
-  // NEXT_PUBLIC_VERCEL_ENV is the client-side gate, VERCEL for server/edge
-  if (content.includes('NEXT_PUBLIC_VERCEL_ENV') && content.includes('isVercel')) {
-    addResult(
-      'Sentry',
-      'Vercel Gate',
-      'PASS',
-      'Client config uses Vercel deployment gate (isVercel)',
-      false,
-    );
+  // Accept either direct VERCEL env checks OR isEnabled() from shared module
+  const hasDirectGate = content.includes('NEXT_PUBLIC_VERCEL_ENV') && content.includes('isVercel');
+  const hasSharedGate = content.includes('isEnabled(');
+  if (hasDirectGate || hasSharedGate) {
+    addResult('Sentry', 'Vercel Gate', 'PASS', 'Client config uses Vercel deployment gate', false);
   } else {
     addResult(
       'Sentry',
       'Vercel Gate',
       'FAIL',
-      'Client config missing Vercel deployment gate (isVercel + NEXT_PUBLIC_VERCEL_ENV)',
+      'Client config missing Vercel deployment gate (isVercel/isEnabled)',
       true,
     );
   }
