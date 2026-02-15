@@ -130,12 +130,12 @@ get_forecast() {
 		-o json 2>/dev/null)
 
 	local current_cost=$(echo "$result" | jq -r '.properties.rows[0][0] // 0')
-	local day_of_month=$(date +%d | sed 's/^0//')
-	local days_in_month=$(date -v1d -v+1m -v-1d +%d 2>/dev/null || date -d "$(date +%Y-%m-01) +1 month -1 day" +%d)
+	local day_of_month=$(date +%-d)
+	local days_in_month=$(date -v1d -v+1m -v-1d +%-d 2>/dev/null || date -d "$(date +%Y-%m-01) +1 month -1 day" +%-d)
 
-	local forecast=$(echo "scale=2; ($current_cost / $day_of_month) * $days_in_month" | bc)
+	local forecast=$(awk "BEGIN {printf \"%.2f\", ($current_cost / $day_of_month) * $days_in_month}")
 
-	printf "${YELLOW}Estimated end of month: \$%.2f${NC}\n" "$forecast"
+	printf "${YELLOW}Estimated end of month: \$%s${NC}\n" "$forecast"
 }
 
 # JSON output mode

@@ -1,0 +1,392 @@
+name: Infrastructure Monitor
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC (09:00 CET)
+    - cron: "0 8 * * 1"
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  # =========================================================================
+  # PUBLIC CHECKS → GitHub Issues (non-sensitive info)
+  # =========================================================================
+
+  azure-models:
+    name: Azure OpenAI Models
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for new models
+        id: check
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+        run: |
+          ENDPOINT="${AZURE_OPENAI_ENDPOINT%/}"
+          CURRENT=$(curl -sf "${ENDPOINT}/openai/models?api-version=2024-10-21" \
+            -H "api-key: ${AZURE_OPENAI_API_KEY}" | jq -r '[.data[] | .id] | unique | sort | .[]')
+
+          if [ -z "$CURRENT" ]; then
+            echo "::error::Failed to fetch models"
+            exit 1
+          fi
+
+          BASELINE=$(jq -r '.models[]' scripts/azure-models-baseline.json | sort -u)
+          NEW_MODELS=$(comm -13 <(echo "$BASELINE") <(echo "$CURRENT"))
+          REMOVED_MODELS=$(comm -23 <(echo "$BASELINE") <(echo "$CURRENT"))
+
+          if [ -z "$NEW_MODELS" ] && [ -z "$REMOVED_MODELS" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "body<<EOF"
+            echo "## Azure OpenAI Model Changes"
+            echo ""
+            echo "**Checked**: $(date -u +%Y-%m-%d) | **Baseline**: $(jq -r '.generated' scripts/azure-models-baseline.json)"
+            echo ""
+            if [ -n "$NEW_MODELS" ]; then
+              echo "### New Models"
+              echo ""
+              echo "$NEW_MODELS" | while IFS= read -r m; do
+                tag=""
+                case "$m" in
+                  *realtime*|*audio*) tag=" **[VOICE]**" ;;
+                  *tts*) tag=" **[TTS]**" ;;
+                  *transcribe*|*whisper*) tag=" **[STT]**" ;;
+                  gpt-5*|gpt-4.*|gpt-4o*) tag=" **[CHAT]**" ;;
+                  o1*|o3*|o4*) tag=" **[REASONING]**" ;;
+                esac
+                echo "- \`${m}\`${tag}"
+              done
+              echo ""
+            fi
+            if [ -n "$REMOVED_MODELS" ]; then
+              echo "### Removed"
+              echo ""
+              echo "$REMOVED_MODELS" | while IFS= read -r m; do echo "- ~~\`${m}\`~~"; done
+              echo ""
+            fi
+            echo "- [ ] Review for adoption"
+            echo "- [ ] Update baseline: \`./scripts/azure-model-monitor.sh --update-baseline\`"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create/update issue
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --label "azure-models" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "${{ steps.check.outputs.body }}"
+          else
+            gh issue create \
+              --title "Azure OpenAI: new models available ($(date -u +%Y-%m-%d))" \
+              --body "${{ steps.check.outputs.body }}" \
+              --label "azure-models,infra-monitor"
+          fi
+
+  claude-europe:
+    name: Claude EU Availability
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Claude EU endpoints
+        id: check
+        run: |
+          # Known potential EU endpoints
+          EU_ENDPOINTS=(
+            "https://api.eu-west-1.anthropic.com"
+            "https://api.eu.anthropic.com"
+            "https://eu.api.anthropic.com"
+            "https://api.anthropic.eu"
+          )
+
+          EU_AVAILABLE="false"
+          WORKING_ENDPOINT=""
+
+          for endpoint in "${EU_ENDPOINTS[@]}"; do
+            HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" \
+              "${endpoint}/v1/models" \
+              -H "x-api-key: test" \
+              -H "anthropic-version: 2023-06-01" \
+              --connect-timeout 5 2>/dev/null || echo "000")
+
+            # 401 = endpoint exists (auth failed = server is there)
+            # 000 = DNS/connection failure (not available)
+            if [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ] || [ "$HTTP_CODE" = "200" ]; then
+              EU_AVAILABLE="true"
+              WORKING_ENDPOINT="$endpoint"
+              break
+            fi
+          done
+
+          echo "eu_available=${EU_AVAILABLE}" >> "$GITHUB_OUTPUT"
+          echo "endpoint=${WORKING_ENDPOINT}" >> "$GITHUB_OUTPUT"
+
+      - name: Create issue if EU available
+        if: steps.check.outputs.eu_available == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --label "claude-europe" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "Issue already exists"
+            exit 0
+          fi
+
+          gh issue create \
+            --title "Claude API now available in Europe!" \
+            --body "$(cat <<'BODY'
+          ## Claude EU Endpoint Detected
+
+          Endpoint: `${{ steps.check.outputs.endpoint }}`
+
+          ### Action Required
+
+          - [ ] Test EU endpoint with MirrorBuddy
+          - [ ] Evaluate latency improvement vs US endpoint
+          - [ ] Update AI provider config if beneficial
+          - [ ] Review data residency implications (GDPR)
+
+          This could reduce latency and improve GDPR compliance for EU users.
+          BODY
+          )" \
+            --label "claude-europe,infra-monitor"
+
+  dependency-updates:
+    name: Critical Dependency Updates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for major/minor updates
+        id: check
+        run: |
+          # Critical deps and their GitHub repos
+          declare -A DEPS=(
+            ["next"]="vercel/next.js"
+            ["prisma"]="prisma/prisma"
+            ["@playwright/test"]="microsoft/playwright"
+            ["@sentry/nextjs"]="getsentry/sentry-javascript"
+            ["stripe"]="stripe/stripe-node"
+            ["next-intl"]="amannn/next-intl"
+          )
+
+          UPDATES=""
+          HAS_UPDATES="false"
+
+          for dep in "${!DEPS[@]}"; do
+            repo="${DEPS[$dep]}"
+
+            # Get current version from package.json (strip ^~)
+            CURRENT=$(jq -r "(.dependencies[\"${dep}\"] // .devDependencies[\"${dep}\"] // empty)" package.json | sed 's/[\^~]//')
+            if [ -z "$CURRENT" ]; then continue; fi
+
+            CURRENT_MAJOR=$(echo "$CURRENT" | cut -d. -f1)
+
+            # Get latest release from GitHub
+            LATEST=$(gh api "repos/${repo}/releases/latest" --jq '.tag_name' 2>/dev/null | sed 's/^v//')
+            if [ -z "$LATEST" ]; then continue; fi
+
+            LATEST_MAJOR=$(echo "$LATEST" | cut -d. -f1)
+
+            if [ "$CURRENT" != "$LATEST" ]; then
+              if [ "$CURRENT_MAJOR" != "$LATEST_MAJOR" ]; then
+                UPDATES="${UPDATES}- **\`${dep}\`**: \`${CURRENT}\` -> \`${LATEST}\` **[MAJOR]** - breaking changes likely\n"
+                HAS_UPDATES="true"
+              else
+                CURRENT_MINOR=$(echo "$CURRENT" | cut -d. -f2)
+                LATEST_MINOR=$(echo "$LATEST" | cut -d. -f2)
+                if [ "$CURRENT_MINOR" != "$LATEST_MINOR" ]; then
+                  UPDATES="${UPDATES}- \`${dep}\`: \`${CURRENT}\` -> \`${LATEST}\` [minor]\n"
+                  HAS_UPDATES="true"
+                fi
+              fi
+            fi
+          done
+
+          echo "has_updates=${HAS_UPDATES}" >> "$GITHUB_OUTPUT"
+          {
+            echo "body<<EOF"
+            echo "## Critical Dependency Updates Available"
+            echo ""
+            echo -e "$UPDATES"
+            echo ""
+            echo "- [ ] Review changelogs for breaking changes"
+            echo "- [ ] Update and run tests: \`npm run ci:summary:full\`"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create/update issue
+        if: steps.check.outputs.has_updates == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --label "dependency-update" --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "${{ steps.check.outputs.body }}"
+          else
+            gh issue create \
+              --title "Dependency updates available ($(date -u +%Y-%m-%d))" \
+              --body "${{ steps.check.outputs.body }}" \
+              --label "dependency-update,infra-monitor"
+          fi
+
+  # =========================================================================
+  # PRIVATE CHECKS → Email via Resend (sensitive data)
+  # =========================================================================
+
+  usage-alerts:
+    name: Usage & Cost Alerts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect usage data
+        id: usage
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: |
+          ALERTS=""
+          REPORT=""
+          HAS_ALERTS="false"
+
+          # --- Sentry Usage ---
+          SENTRY_30D=$(curl -sf "https://sentry.io/api/0/organizations/${SENTRY_ORG}/stats_v2/?field=sum(quantity)&category=error&interval=1d&statsPeriod=30d" \
+            -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" | jq -r '.groups[0].totals["sum(quantity)"] // 0')
+
+          # Sentry free tier: 5,000 errors/month
+          SENTRY_LIMIT=5000
+          SENTRY_PCT=$((SENTRY_30D * 100 / SENTRY_LIMIT))
+
+          REPORT="${REPORT}<tr><td>Sentry</td><td>${SENTRY_30D} / ${SENTRY_LIMIT} errors</td><td>${SENTRY_PCT}%</td>"
+          if [ "$SENTRY_PCT" -ge 80 ]; then
+            REPORT="${REPORT}<td style='color:#e74c3c'>WARNING</td></tr>"
+            ALERTS="${ALERTS}Sentry at ${SENTRY_PCT}% (${SENTRY_30D}/${SENTRY_LIMIT} errors)\n"
+            HAS_ALERTS="true"
+          elif [ "$SENTRY_PCT" -ge 60 ]; then
+            REPORT="${REPORT}<td style='color:#f39c12'>WATCH</td></tr>"
+          else
+            REPORT="${REPORT}<td style='color:#27ae60'>OK</td></tr>"
+          fi
+
+          # --- Upstash Redis ---
+          if [ -n "$UPSTASH_REDIS_REST_URL" ] && [ -n "$UPSTASH_REDIS_REST_TOKEN" ]; then
+            REDIS_INFO=$(curl -sf "${UPSTASH_REDIS_REST_URL}/info" \
+              -H "Authorization: Bearer ${UPSTASH_REDIS_REST_TOKEN}" 2>/dev/null)
+
+            if [ -n "$REDIS_INFO" ]; then
+              REDIS_MEMORY=$(echo "$REDIS_INFO" | jq -r '.result' 2>/dev/null | grep 'used_memory_human' | cut -d: -f2 | tr -d '[:space:]' || echo "N/A")
+              REPORT="${REPORT}<tr><td>Upstash Redis</td><td>Memory: ${REDIS_MEMORY}</td><td>-</td><td style='color:#27ae60'>OK</td></tr>"
+            fi
+          fi
+
+          # --- Azure OpenAI (token usage estimate from last 7 days) ---
+          ENDPOINT="${AZURE_OPENAI_ENDPOINT%/}"
+          DEPLOYMENTS=$(curl -sf "${ENDPOINT}/openai/deployments?api-version=2024-10-21" \
+            -H "api-key: ${AZURE_OPENAI_API_KEY}" | jq -r '.data | length // 0' 2>/dev/null || echo "0")
+          REPORT="${REPORT}<tr><td>Azure OpenAI</td><td>${DEPLOYMENTS} active deployments</td><td>-</td><td style='color:#27ae60'>OK</td></tr>"
+
+          echo "has_alerts=${HAS_ALERTS}" >> "$GITHUB_OUTPUT"
+          {
+            echo "report<<EOF"
+            echo "$REPORT"
+            echo "EOF"
+            echo "alerts<<EOF2"
+            echo -e "$ALERTS"
+            echo "EOF2"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Send email report
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          HAS_ALERTS="${{ steps.usage.outputs.has_alerts }}"
+
+          if [ "$HAS_ALERTS" = "true" ]; then
+            SUBJECT="[MirrorBuddy] Usage Alert - ${DATE}"
+            PRIORITY_COLOR="#e74c3c"
+            PRIORITY_TEXT="ACTION REQUIRED"
+          else
+            SUBJECT="[MirrorBuddy] Weekly Infra Report - ${DATE}"
+            PRIORITY_COLOR="#27ae60"
+            PRIORITY_TEXT="All systems OK"
+          fi
+
+          HTML=$(cat <<HTMLEOF
+          <!DOCTYPE html>
+          <html>
+          <head><meta charset="utf-8"></head>
+          <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:20px;color:#333">
+            <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;padding:20px;border-radius:8px 8px 0 0">
+              <h1 style="margin:0;font-size:20px">MirrorBuddy Infrastructure</h1>
+              <p style="margin:5px 0 0;opacity:0.8;font-size:14px">Weekly monitoring report - ${DATE}</p>
+            </div>
+            <div style="background:${PRIORITY_COLOR};color:white;padding:10px 20px;font-weight:bold;font-size:14px">
+              ${PRIORITY_TEXT}
+            </div>
+            <div style="border:1px solid #e0e0e0;border-top:none;padding:20px;border-radius:0 0 8px 8px">
+              <table style="width:100%;border-collapse:collapse;font-size:14px">
+                <tr style="background:#f5f5f5">
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #ddd">Service</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #ddd">Usage</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #ddd">%</th>
+                  <th style="text-align:left;padding:8px;border-bottom:2px solid #ddd">Status</th>
+                </tr>
+                ${{ steps.usage.outputs.report }}
+              </table>
+
+              <div style="margin-top:20px;padding:15px;background:#f8f9fa;border-radius:6px;font-size:13px">
+                <strong>Links</strong><br>
+                <a href="https://portal.azure.com">Azure Portal</a> |
+                <a href="https://sentry.io">Sentry</a> |
+                <a href="https://vercel.com/mirrorbuddy">Vercel</a> |
+                <a href="https://grafana.com">Grafana</a>
+              </div>
+
+              <p style="font-size:12px;color:#999;margin-top:15px">
+                Automated by MirrorBuddy infra-monitor workflow.
+                <a href="https://github.com/${{ github.repository }}/actions/workflows/infra-monitor.yml">View runs</a>
+              </p>
+            </div>
+          </body>
+          </html>
+          HTMLEOF
+          )
+
+          # Send via Resend API
+          HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" \
+            -X POST "https://api.resend.com/emails" \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg from "$FROM_EMAIL" \
+              --arg to "$ADMIN_EMAIL" \
+              --arg subject "$SUBJECT" \
+              --arg html "$HTML" \
+              '{from: $from, to: [$to], subject: $subject, html: $html}')")
+
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "Email sent successfully"
+          else
+            echo "::warning::Email send returned HTTP ${HTTP_CODE}"
+          fi
