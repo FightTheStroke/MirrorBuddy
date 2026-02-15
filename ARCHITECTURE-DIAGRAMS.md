@@ -2813,7 +2813,7 @@ graph LR
     subgraph Connect_Src["connect-src"]
         Self[self]
         AzureOpenAI["*.openai.azure.com"]
-        AzureRealtime["*.realtimeapi-preview.ai.azure.com"]
+        AzureRealtime["*.openai.azure.com (Realtime GA)"]
         Upstash["*.upstash.io"]
         Supabase["*.supabase.co"]
         Sentry["*.sentry.io"]
@@ -3050,7 +3050,7 @@ graph TB
     Streak --> Level
     Level --> Tier
     Level --> Achieve
-    
+
     Award --> UG
     Award --> PT
     Streak --> DS
@@ -3070,13 +3070,13 @@ stateDiagram-v2
     Day3 --> Streak7: Continue daily
     Streak7 --> Streak30: Continue daily
     Streak30 --> Streak100: Continue daily
-    
+
     Day1 --> NoStreak: Missed day
     Day2 --> NoStreak: Missed day
     Day3 --> NoStreak: Missed day
     Streak7 --> NoStreak: Missed day
     Streak30 --> NoStreak: Missed day
-    
+
     state "Achievements Unlocked" as Ach {
         Day1: Multiplier 1.1x
         Day3: Studente Costante 100pts

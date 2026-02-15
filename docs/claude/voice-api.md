@@ -4,14 +4,14 @@
 
 ## Quick Reference
 
-| Key          | Value                                                           |
-| ------------ | --------------------------------------------------------------- |
-| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                |
-| API          | `POST /api/realtime/ephemeral-token`                            |
-| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD)          |
-| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms) |
-| Audio Format | PCM16, 24kHz, mono, base64-encoded                              |
-| Model        | `gpt-realtime` (GA API)                                         |
+| Key          | Value                                                                       |
+| ------------ | --------------------------------------------------------------------------- |
+| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                            |
+| API          | `POST /api/realtime/ephemeral-token`                                        |
+| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration) |
+| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)             |
+| Audio Format | PCM16, 24kHz, mono, base64-encoded                                          |
+| Model        | `gpt-realtime` (GA API)                                                     |
 
 ## Architecture
 
@@ -54,10 +54,10 @@ const { isConnected, isSpeaking, isListening } = useVoiceSessionStore();
 
 ## Critical Notes
 
-- **Preview vs GA API**: Event names differ (`response.audio.delta` vs `response.output_audio.delta`). Handle both in switch statements.
+- **Preview vs GA API**: GA is default (`voice_ga_protocol=enabled`). Event names differ (`response.audio.delta` vs `response.output_audio.delta`). Both handled in switch statements. GA token payload requires `session.type: "realtime"` wrapper (ADR 0152).
 - **48kHz to 24kHz**: Browser captures at 48kHz; must resample to 24kHz before sending to Azure.
 - **Stale closure**: Use `useRef` pattern for WebSocket `onmessage` handler to avoid stale React closures.
-- **CSP**: `connect-src` must include `*.realtimeapi-preview.ai.azure.com` for WebRTC SDP exchange.
+- **CSP**: `connect-src` must include `*.openai.azure.com` for GA Realtime API (WebRTC SDP exchange).
 
 ## See Also
 

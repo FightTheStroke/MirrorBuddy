@@ -61,6 +61,7 @@
 | 0042 | Vocal Prosody Frustration Detection               | Detect student frustration from voice  |
 | 0050 | Voice Cost Guards                                 | Cost limits for voice features         |
 | 0069 | Adaptive VAD for Accessibility Profiles           | Voice activity detection per profile   |
+| 0152 | Azure OpenAI Realtime GA Migration                | GA protocol format, no preview headers |
 
 ## Security & Auth
 
@@ -82,6 +83,7 @@
 | 0136 | Compliance Absolute Charter                   | Immutable compliance rules, zero-tolerance policy enforcement                                   |
 | 0143 | SSO OIDC Security Hardening                   | OIDC token validation, session binding, PKCE enforcement                                        |
 | 0147 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
+| 0151 | Anonymous User Auto-Creation Guard            | Block phantom user creation in production                                                       |
 
 ## Observability & Operations
 
@@ -115,6 +117,7 @@
 | 0129 | Enterprise SSO Architecture                        | OIDC+PKCE for Google/Microsoft   |
 | 0130 | Multi-Provider AI Router                           | Azure/Claude/Ollama failover     |
 | 0131 | SOC 2 Type II Readiness Framework                  | Audit logging, policies, vendor  |
+| 0150 | Production Smoke Testing Strategy                  | Playwright smoke tests for prod  |
 
 ## Deployment & Infrastructure
 

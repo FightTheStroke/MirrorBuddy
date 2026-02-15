@@ -3,7 +3,7 @@
 > **IMPORTANT**: This documentation reflects REAL problems we solved in production.
 > NOT theoretical docs - these are VERIFIED fixes.
 >
-> **Last validated**: 2025-12-30
+> **Last validated**: 2026-07-14 (GA migration complete)
 
 ## Table of Contents
 
@@ -118,19 +118,20 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
 > Note: MirrorBuddy has migrated to GA API (`gpt-realtime`).
 > The format below reflects our current production configuration.
 
-### What Works (Preview API - VERIFIED)
+### What Works (GA API - VERIFIED 2026-07-14)
 
 ```typescript
 {
   type: 'session.update',
   session: {
-    voice: 'alloy',                   // FLAT in session (not in audio.output)
+    type: 'realtime',                // REQUIRED for GA (causes InvalidSessionType if missing)
+    voice: 'alloy',                  // GA also accepts top-level voice in session.update
     instructions: 'You are...',
     input_audio_format: 'pcm16',
     input_audio_transcription: {
-      model: 'whisper-1',             // ONLY whisper-1 supported (see below)
-      language: 'it',                 // ISO code from settings
-      prompt: 'keyword1, keyword2',   // Vocabulary hints (optional)
+      model: 'whisper-1',            // ONLY whisper-1 supported (see below)
+      language: 'it',                // ISO code from settings
+      prompt: 'keyword1, keyword2',  // Vocabulary hints (optional)
     },
     turn_detection: {
       type: 'server_vad',
@@ -139,10 +140,47 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
       silence_duration_ms: 700,
       create_response: true,
     },
-    tools: [...],                     // Optional: function calling
+    tools: [...],                    // Optional: function calling
   }
 }
 ```
+
+### Ephemeral Token Request (GA API)
+
+The token request payload wraps everything in a `session` object:
+
+```typescript
+// GA format — used by payload-builders.ts buildGAPayload()
+{
+  session: {
+    type: 'realtime',               // REQUIRED
+    model: 'gpt-4o-realtime',       // deployment name
+    audio: {
+      output: { voice: 'alloy' },   // voice nested here
+      input: {
+        transcription: { model: 'whisper-1' },
+        turn_detection: { type: 'server_vad', threshold: 0.5 },
+      },
+    },
+    instructions: '...',            // optional
+  }
+}
+
+// GA response format
+{ value: 'token...', expires_at: 1234567890, session: { id: 'sess_...', model: 'gpt-4o-realtime' } }
+```
+
+### Preview Format (DEPRECATED — rollback only)
+
+```typescript
+// Preview request: flat { model } only
+{ model: 'gpt-4o-realtime' }
+
+// Preview response
+{ client_secret: { value: 'token...', expires_at: 1234567890 }, id: 'sess_...' }
+```
+
+````
 
 ### input_audio_transcription - IMPORTANT
 
@@ -162,22 +200,21 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
 
 ```typescript
 prompt: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia...';
-```
+````
 
 **Audio flow note**: The model receives raw audio directly and understands it correctly.
 The transcription shown in chat is generated separately by Whisper and may have errors.
 
-### What We DON'T Use (But Documentation Mentions)
+### GA vs Preview: Fields That Changed
 
-These fields appear in Azure docs but we DON'T include them and it works:
-
-| Field                           | Status   | Note                        |
-| ------------------------------- | -------- | --------------------------- |
-| `session.type: 'realtime'`      | Not used | Works without it for GA API |
-| `modalities: ['text', 'audio']` | Not used | Azure may use default       |
-| `output_audio_format`           | Not used | Defaults to pcm16           |
-
-> Note: Our code works with GA API without these fields. They may be optional or have sensible defaults.
+| Field                           | Preview      | GA            | Note                                       |
+| ------------------------------- | ------------ | ------------- | ------------------------------------------ |
+| `session.type: 'realtime'`      | Not required | **REQUIRED**  | Omitting causes `InvalidSessionType` error |
+| `modalities: ['text', 'audio']` | Not used     | Not used      | Azure may use default                      |
+| `output_audio_format`           | Not used     | Not used      | Defaults to pcm16                          |
+| `session.audio.output.voice`    | Not used     | Used in token | GA token request nests voice under audio   |
+| `api-version` query param       | Required     | **NOT used**  | GA endpoint needs no version param         |
+| `OpenAI-Beta` header            | Required     | **NOT used**  | GA does not use beta header                |
 
 ### Implementation Reference
 
@@ -370,9 +407,10 @@ function playAudioChunk(base64Audio: string) {
 
 ### 2. session.update fails?
 
-**Check the format (Preview uses different structure than GA)**
+**Check the format (GA requires `type: 'realtime'` in session)**
 
-- For Preview: flat structure, no `type: 'realtime'` needed
+- For GA: `{ session: { type: 'realtime', voice: 'alloy', ... } }`
+- For Preview (deprecated): flat structure, no `type: 'realtime'` needed
 - File: `src/app/test-voice/page.tsx` for manual testing
 
 ### 3. Proxy doesn't connect to Azure?
@@ -787,7 +825,10 @@ WS_PROXY_PORT=3001
 
 ## Pre-Deploy Checklist
 
-- [ ] Voice in flat `session.voice` (Preview API)
+- [ ] GA token payload uses `{ session: { type: 'realtime', ... } }` format
+- [ ] `voice_ga_protocol` feature flag enabled
+- [ ] No `api-version` param in GA URL
+- [ ] No `OpenAI-Beta` header for GA
 - [ ] Proxy converts Buffer to string for JSON
 - [ ] Resampling 48kHz → 24kHz implemented
 - [ ] Playback context at 24kHz
@@ -815,6 +856,7 @@ WS_PROXY_PORT=3001
 | 2025-12-30 | session.update format confusion                  | Clarified: current code uses Preview API flat format                      |
 | 2026-01-01 | **Only first word plays in onboarding**          | Chunk scheduling bug - chunks 4+ never scheduled (see below)              |
 | 2026-01-04 | **gpt-4o-transcribe not working**                | Only `whisper-1` supported in Realtime API. Added prompt with keywords.   |
+| 2026-07-14 | **Voice 400 InvalidSessionType**                 | GA token payload needs `session.type: 'realtime'` wrapper (ADR 0038)      |
 
 ---
 
@@ -881,7 +923,7 @@ if (!isPlayingRef.current) {
 
 > **HONESTY SECTION**: These are things we're NOT 100% certain about.
 
-1. **Preview API deprecation**: The Preview API (`gpt-4o-realtime-preview`) is deprecated as of 2026-03-24. MirrorBuddy has migrated to GA API (`gpt-realtime`). Legacy Preview API references remain in this documentation for troubleshooting older deployments.
+1. **Preview API sunset**: The Preview API (`gpt-4o-realtime-preview`) is deprecated. MirrorBuddy runs on GA API (`gpt-realtime` v2025-08-28). Preview fallback exists behind `voice_ga_protocol=disabled` flag but is not actively tested.
 
 2. **ScriptProcessorNode deprecation**: We use ScriptProcessorNode which is deprecated. AudioWorklet would be better but requires more work. Current implementation works in all browsers.
 
