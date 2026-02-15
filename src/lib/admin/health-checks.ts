@@ -4,7 +4,10 @@
  */
 
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { getRedisUrl, getRedisToken } from '@/lib/redis';
+
+const log = logger.child({ module: 'health-checks' });
 import type { ServiceHealth } from './health-aggregator-types';
 import { fetchWithTimeout, buildHealthResponse } from './health-checks-utils';
 
@@ -37,6 +40,7 @@ export async function checkRedis(): Promise<ServiceHealth> {
   const configured = !!kvUrl;
 
   if (!kvUrl || !kvToken) {
+    log.warn('Redis not configured — health check skipped');
     return buildHealthResponse('Redis/KV', 'unknown', configured, undefined, 'Not configured');
   }
 

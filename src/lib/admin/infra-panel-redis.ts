@@ -47,7 +47,7 @@ function parseRedisInfo(info: string): Partial<RedisMetrics> {
 export async function getRedisMetrics(): Promise<RedisMetrics | null> {
   try {
     if (!isRedisConfigured()) {
-      logger.info('Redis not configured');
+      logger.warn('Redis not configured — metrics unavailable');
       return null;
     }
 

@@ -118,4 +118,5 @@ RATE_LIMITS = {
 - [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)
 - [Upstash Rate Limiting](https://upstash.com/docs/redis/features/ratelimiting)
 - ADR 0015: Database-First Architecture
+- ADR 0153: Centralized Redis Environment Variable Resolution
 - Wave 3: Rate Limiting implementation

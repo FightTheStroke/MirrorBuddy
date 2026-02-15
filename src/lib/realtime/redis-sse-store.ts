@@ -210,7 +210,7 @@ export function getSSEStore(): SSEClientStore {
       log.info('Using Redis SSE store');
     } else {
       storeInstance = new MemorySSEStore();
-      log.info('Using in-memory SSE store (Redis not configured)');
+      log.warn('Using in-memory SSE store (Redis not configured)');
     }
   }
   return storeInstance;

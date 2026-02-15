@@ -128,6 +128,7 @@
 | 0052 | Vercel Deployment Configuration                           | CI-controlled deployments               |
 | 0053 | Supabase Migration                                        | Managed PostgreSQL hosting              |
 | 0054 | Upstash Redis for Distributed Rate Limiting               | Serverless Redis                        |
+| 0153 | Centralized Redis Environment Variable Resolution         | Single resolver for UPSTASH/KV naming   |
 | 0063 | Supabase SSL Certificate Requirements                     | SSL certificate chain handling          |
 | 0067 | Database Performance Optimization for Serverless          | Connection pooling, query optimization  |
 | 0073 | Staging System on Vercel                                  | Preview deployments                     |
@@ -207,6 +208,6 @@
 
 ---
 
-**Total Active ADRs**: 126
+**Total Active ADRs**: 127
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-14
+**Last Updated**: 2026-02-15
