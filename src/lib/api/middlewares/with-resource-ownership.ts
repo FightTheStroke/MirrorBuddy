@@ -52,6 +52,10 @@ const resourceModels = {
   parentNote: prisma.parentNote,
 } as const;
 
+type OwnedResourceModel = {
+  findFirst: (query: Record<string, unknown>) => Promise<unknown>;
+};
+
 /**
  * Extend MiddlewareContext to include the verified resource.
  */
@@ -154,9 +158,7 @@ export function withResourceOwnership<T extends OwnedResourceType>(
         ...(options?.select && { select: options.select }),
       };
 
-      // Query resource with ownership check
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const resource = await (model as any).findFirst(queryOptions);
+      const resource = await (model as unknown as OwnedResourceModel).findFirst(queryOptions);
 
       if (!resource) {
         logger.debug('Resource not found or unauthorized', {
@@ -229,8 +231,7 @@ export async function verifyResourceOwnership<T extends OwnedResourceType>(
   };
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return await (model as any).findFirst(queryOptions);
+    return await (model as unknown as OwnedResourceModel).findFirst(queryOptions);
   } catch (error) {
     logger.error('verifyResourceOwnership failed', {
       resourceType,

@@ -387,6 +387,12 @@ For i18n-specific incidents:
 
 **Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Claude (fallback) / Ollama (local) → Prisma ORM → PostgreSQL + pgvector
 
+### Voice Architecture (GA)
+
+- Voice transport now defaults to **Azure Realtime GA** (`voice_ga_protocol=enabled`)
+- Calling overlay UX and transcript safety are both enabled by default
+- Chat and voice share a unified conversation shell/store for consistent handoff and memory
+
 **Key Decisions:**
 
 - **ADR 0015:** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.

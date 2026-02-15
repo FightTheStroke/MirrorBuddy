@@ -38,6 +38,7 @@
 23. [State Management](#23-state-management)
 24. [Deployment Flow](#24-deployment-flow)
 25. [ADR Index](#25-adr-index)
+26. [Voice GA + Unified Conversation (W7)](#26-voice-ga--unified-conversation-w7)
 
 ---
 
@@ -3061,6 +3062,51 @@ graph TB
 ```
 
 ---
+
+## 26. Voice GA + Unified Conversation (W7)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Voice UI (WebRTC)
+    participant API as /api/realtime/*
+    participant FF as Feature Flags
+    participant AZ as Azure Realtime GA
+    participant SAFE as Transcript Safety
+    participant CONV as Unified Conversation Store
+
+    U->>UI: Start voice session
+    UI->>FF: check voice_ga_protocol + voice_calling_overlay
+    FF-->>UI: enabled
+    UI->>API: request ephemeral token
+    API->>AZ: GA token exchange (no preview path)
+    AZ-->>UI: session credentials
+    UI->>AZ: WebRTC audio stream
+    AZ-->>SAFE: transcript events
+    SAFE-->>CONV: sanitized conversation items
+    CONV-->>UI: unified chat+voice state
+```
+
+```mermaid
+graph LR
+    subgraph InputChannels["Input Channels"]
+      TXT["Text Chat"]
+      VOC["Voice Realtime"]
+    end
+
+    subgraph UnifiedCore["Unified Conversation Core"]
+      SHELL["ConversationShell"]
+      STORE["Conversation Store (single source)"]
+      HANDOFF["Handoff Manager"]
+      CONSENT["Unified Consent Model"]
+    end
+
+    TXT --> SHELL
+    VOC --> SHELL
+    SHELL --> STORE
+    SHELL --> HANDOFF
+    STORE --> CONSENT
+```
 
 ### 25.2 Recently Added ADRs
 

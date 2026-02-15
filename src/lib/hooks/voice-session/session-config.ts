@@ -195,8 +195,8 @@ export function useSendSessionConfig(
     const sessionConfig = {
       type: 'session.update',
       session: {
-        type: 'realtime',
-        voice: maestro.voice || 'alloy',
+        type: 'realtime', // type: "realtime" required by GA session config contract
+        voice: a11yState.settings.voicePreference || maestro.voice || 'alloy',
         instructions: fullInstructions,
         input_audio_noise_reduction: {
           type: options.noiseReductionType || vadConfig.noise_reduction,

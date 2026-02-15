@@ -3,11 +3,7 @@
  * Extracted for maintainability and to keep main store file compact
  */
 
-import type {
-  AccessibilitySettings,
-  ADHDSessionConfig,
-  ADHDSessionStats,
-} from "./types";
+import type { AccessibilitySettings, ADHDSessionConfig, ADHDSessionStats } from './types';
 
 export const defaultAccessibilitySettings: AccessibilitySettings = {
   dyslexiaFont: false,
@@ -27,8 +23,9 @@ export const defaultAccessibilitySettings: AccessibilitySettings = {
   colorBlindMode: false,
   keyboardNavigation: true,
   adaptiveVadEnabled: true, // ADR-0069: Enabled by default for DSA support
-  customBackgroundColor: "#ffffff",
-  customTextColor: "#000000",
+  voicePreference: null,
+  customBackgroundColor: '#ffffff',
+  customTextColor: '#000000',
 };
 
 export const defaultADHDConfig: ADHDSessionConfig = {

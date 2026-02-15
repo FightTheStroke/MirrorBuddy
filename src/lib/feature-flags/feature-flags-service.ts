@@ -115,22 +115,22 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   voice_calling_overlay: {
     name: 'Voice Calling Overlay',
     description: 'New calling overlay UI',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   chat_unified_view: {
     name: 'Chat Unified View',
     description: 'Unified conversation view across character types',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   consent_unified_model: {
     name: 'Consent Unified Model',
     description: 'Unified consent storage model',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
 };
