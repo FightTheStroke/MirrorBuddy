@@ -3,16 +3,12 @@
  * Database, Redis/KV, and Vercel connectivity checks
  */
 
-import { prisma } from "@/lib/db";
-import type { ServiceHealth } from "./health-aggregator-types";
-import { fetchWithTimeout, buildHealthResponse } from "./health-checks-utils";
+import { prisma } from '@/lib/db';
+import type { ServiceHealth } from './health-aggregator-types';
+import { fetchWithTimeout, buildHealthResponse } from './health-checks-utils';
 
 // Re-export external checks for backwards compatibility
-export {
-  checkAzureOpenAI,
-  checkResend,
-  checkSentry,
-} from "./health-checks-external";
+export { checkAzureOpenAI, checkResend, checkSentry } from './health-checks-external';
 
 /**
  * Check Database connectivity
@@ -22,26 +18,12 @@ export async function checkDatabase(): Promise<ServiceHealth> {
   try {
     await prisma.$queryRaw`SELECT 1`;
     const responseTimeMs = Date.now() - start;
-    const status = responseTimeMs < 1000 ? "healthy" : "degraded";
-    const details =
-      status === "healthy" ? "Connected" : `Slow (${responseTimeMs}ms)`;
-    return buildHealthResponse(
-      "Database",
-      status,
-      true,
-      responseTimeMs,
-      details,
-    );
+    const status = responseTimeMs < 1000 ? 'healthy' : 'degraded';
+    const details = status === 'healthy' ? 'Connected' : `Slow (${responseTimeMs}ms)`;
+    return buildHealthResponse('Database', status, true, responseTimeMs, details);
   } catch (error) {
-    const details =
-      error instanceof Error ? error.message : "Connection failed";
-    return buildHealthResponse(
-      "Database",
-      "down",
-      true,
-      Date.now() - start,
-      details,
-    );
+    const details = error instanceof Error ? error.message : 'Connection failed';
+    return buildHealthResponse('Database', 'down', true, Date.now() - start, details);
   }
 }
 
@@ -49,18 +31,12 @@ export async function checkDatabase(): Promise<ServiceHealth> {
  * Check Redis/KV connectivity
  */
 export async function checkRedis(): Promise<ServiceHealth> {
-  const kvUrl = process.env.KV_REST_API_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN;
+  const kvUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const kvToken = process.env.UPSTASH_REDIS_REST_TOKEN;
   const configured = !!kvUrl;
 
   if (!kvUrl || !kvToken) {
-    return buildHealthResponse(
-      "Redis/KV",
-      "unknown",
-      configured,
-      undefined,
-      "Not configured",
-    );
+    return buildHealthResponse('Redis/KV', 'unknown', configured, undefined, 'Not configured');
   }
 
   const start = Date.now();
@@ -69,25 +45,12 @@ export async function checkRedis(): Promise<ServiceHealth> {
       Authorization: `Bearer ${kvToken}`,
     });
     const responseTimeMs = Date.now() - start;
-    const status = response.ok ? "healthy" : "degraded";
-    const details = response.ok ? "Connected" : `HTTP ${response.status}`;
-    return buildHealthResponse(
-      "Redis/KV",
-      status,
-      configured,
-      responseTimeMs,
-      details,
-    );
+    const status = response.ok ? 'healthy' : 'degraded';
+    const details = response.ok ? 'Connected' : `HTTP ${response.status}`;
+    return buildHealthResponse('Redis/KV', status, configured, responseTimeMs, details);
   } catch (error) {
-    const details =
-      error instanceof Error ? error.message : "Connection failed";
-    return buildHealthResponse(
-      "Redis/KV",
-      "down",
-      configured,
-      Date.now() - start,
-      details,
-    );
+    const details = error instanceof Error ? error.message : 'Connection failed';
+    return buildHealthResponse('Redis/KV', 'down', configured, Date.now() - start, details);
   }
 }
 
@@ -99,40 +62,20 @@ export async function checkVercel(): Promise<ServiceHealth> {
   const configured = !!token;
 
   if (!token) {
-    return buildHealthResponse(
-      "Vercel",
-      "unknown",
-      configured,
-      undefined,
-      "Not configured",
-    );
+    return buildHealthResponse('Vercel', 'unknown', configured, undefined, 'Not configured');
   }
 
   const start = Date.now();
   try {
-    const response = await fetchWithTimeout(
-      "https://api.vercel.com/v9/projects",
-      { Authorization: `Bearer ${token}` },
-    );
+    const response = await fetchWithTimeout('https://api.vercel.com/v9/projects', {
+      Authorization: `Bearer ${token}`,
+    });
     const responseTimeMs = Date.now() - start;
-    const status = response.ok ? "healthy" : "degraded";
-    const details = response.ok ? "Connected" : `HTTP ${response.status}`;
-    return buildHealthResponse(
-      "Vercel",
-      status,
-      configured,
-      responseTimeMs,
-      details,
-    );
+    const status = response.ok ? 'healthy' : 'degraded';
+    const details = response.ok ? 'Connected' : `HTTP ${response.status}`;
+    return buildHealthResponse('Vercel', status, configured, responseTimeMs, details);
   } catch (error) {
-    const details =
-      error instanceof Error ? error.message : "Connection failed";
-    return buildHealthResponse(
-      "Vercel",
-      "down",
-      configured,
-      Date.now() - start,
-      details,
-    );
+    const details = error instanceof Error ? error.message : 'Connection failed';
+    return buildHealthResponse('Vercel', 'down', configured, Date.now() - start, details);
   }
 }

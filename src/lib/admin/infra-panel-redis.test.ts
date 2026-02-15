@@ -2,10 +2,10 @@
  * Tests for Redis Metrics Provider
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getRedisMetrics } from "./infra-panel-redis";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { getRedisMetrics } from './infra-panel-redis';
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -20,7 +20,7 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-describe("getRedisMetrics", () => {
+describe('getRedisMetrics', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -32,47 +32,47 @@ describe("getRedisMetrics", () => {
     process.env = originalEnv;
   });
 
-  it("should return null when Redis is not configured", async () => {
-    delete process.env.KV_REST_API_URL;
-    delete process.env.KV_REST_API_TOKEN;
+  it('should return null when Redis is not configured', async () => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
     const result = await getRedisMetrics();
 
     expect(result).toBeNull();
   });
 
-  it("should return null when only URL is configured", async () => {
-    process.env.KV_REST_API_URL = "https://redis.example.com";
-    delete process.env.KV_REST_API_TOKEN;
+  it('should return null when only URL is configured', async () => {
+    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
     const result = await getRedisMetrics();
 
     expect(result).toBeNull();
   });
 
-  it("should return null when only TOKEN is configured", async () => {
-    delete process.env.KV_REST_API_URL;
-    process.env.KV_REST_API_TOKEN = "test-token";
+  it('should return null when only TOKEN is configured', async () => {
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
 
     const result = await getRedisMetrics();
 
     expect(result).toBeNull();
   });
 
-  it("should return null when API call fails", async () => {
-    process.env.KV_REST_API_URL = "https://redis.example.com";
-    process.env.KV_REST_API_TOKEN = "test-token";
+  it('should return null when API call fails', async () => {
+    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
 
-    global.fetch = vi.fn().mockRejectedValue(new Error("Connection error"));
+    global.fetch = vi.fn().mockRejectedValue(new Error('Connection error'));
 
     const result = await getRedisMetrics();
 
     expect(result).toBeNull();
   });
 
-  it("should return null when API returns non-ok response", async () => {
-    process.env.KV_REST_API_URL = "https://redis.example.com";
-    process.env.KV_REST_API_TOKEN = "test-token";
+  it('should return null when API returns non-ok response', async () => {
+    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -84,9 +84,9 @@ describe("getRedisMetrics", () => {
     expect(result).toBeNull();
   });
 
-  it("should return real data when Redis is configured and API succeeds", async () => {
-    process.env.KV_REST_API_URL = "https://redis.example.com";
-    process.env.KV_REST_API_TOKEN = "test-token";
+  it('should return real data when Redis is configured and API succeeds', async () => {
+    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
+    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
 
     const mockRedisInfo = `
 used_memory:10485760
@@ -106,6 +106,6 @@ total_commands_processed:5000
 
     expect(result).not.toBeNull();
     expect(result?.keysCount).toBe(100);
-    expect(result?.status).toBe("healthy");
+    expect(result?.status).toBe('healthy');
   });
 });

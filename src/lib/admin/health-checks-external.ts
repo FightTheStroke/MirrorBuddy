@@ -50,8 +50,20 @@ export async function checkResend(): Promise<ServiceHealth> {
     });
     const responseTimeMs = Date.now() - start;
 
-    // Handle specific error status codes
+    // A restricted (send-only) key gets 401 on /domains but is still valid
     if (response.status === 401) {
+      const body = await response.json().catch(() => null);
+      const isRestricted =
+        body && typeof body === 'object' && 'name' in body && body.name === 'restricted_api_key';
+      if (isRestricted) {
+        return buildHealthResponse(
+          'Resend',
+          'healthy',
+          configured,
+          responseTimeMs,
+          'Connected (send-only key)',
+        );
+      }
       return buildHealthResponse(
         'Resend',
         'down',
