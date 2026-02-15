@@ -23,7 +23,7 @@ export const POST = pipe(
   withSentry('/api/cron/maintenance-notify'),
   withCron,
 )(async () => {
-  const emailWindowRange = getWindowRange(23, 25);
+  const emailWindowRange = getWindowRange(23.5, 24.5);
   const inAppWindowRange = getWindowRange(1, 2);
 
   const [emailWindows, inAppWindows, users] = await Promise.all([
@@ -130,3 +130,6 @@ export const POST = pipe(
     inAppBatches,
   });
 });
+
+// Vercel Cron invokes scheduled routes with GET by default
+export const GET = POST;
