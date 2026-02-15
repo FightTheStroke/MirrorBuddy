@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
 
 type SentryEvent = {
   logger?: string;
@@ -34,21 +35,14 @@ function isStructuredLoggerConsoleEvent(event: SentryEvent): boolean {
   }
 }
 
-// Deployment gate: NEXT_PUBLIC_VERCEL_ENV is auto-set by Vercel platform
-// NODE_ENV=production also matches local builds, polluting Sentry with dev errors
-const isVercel = !!process.env.NEXT_PUBLIC_VERCEL_ENV;
-
-// Optional debug escape hatch for Preview/local testing
-const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true';
-
-// Only initialize if DSN is present (support both public and server-side names)
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
+// Use shared environment detection
+const dsn = getDsn();
+const enabled = isEnabled('client');
+const environment = getEnvironment('client');
 
 // Single concise log
 if (dsn) {
-  console.log(
-    `[Sentry Client] enabled=${isVercel || isForceEnabled} env=${process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development'}`,
-  );
+  console.log(`[Sentry Client] enabled=${enabled} env=${environment}`);
 }
 
 // Only initialize if DSN is present (even in dev, to avoid errors)
@@ -117,7 +111,7 @@ if (dsn) {
     ignoreErrors: [],
 
     // Only on Vercel deployments (not local builds where NODE_ENV=production)
-    enabled: !!dsn && (isVercel || isForceEnabled),
+    enabled,
 
     // Add context before sending
     beforeSend(event, hint) {
@@ -171,9 +165,9 @@ if (dsn) {
     },
 
     // Environment tagging
-    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development',
+    environment,
 
     // Release tracking
-    release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'local',
+    release: getRelease('client'),
   });
 }

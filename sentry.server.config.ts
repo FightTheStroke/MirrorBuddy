@@ -3,6 +3,7 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from '@sentry/nextjs';
+import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
 
 type SentryEvent = {
   logger?: string;
@@ -33,14 +34,10 @@ function isStructuredLoggerConsoleEvent(event: SentryEvent): boolean {
   }
 }
 
-// Deployment gate: VERCEL is auto-set by Vercel platform ("1")
-// NODE_ENV=production also matches local builds, polluting Sentry with dev errors
-const isVercel = !!process.env.VERCEL;
-
-// Optional escape hatch for Preview/local debugging
-const isForceEnabled = process.env.SENTRY_FORCE_ENABLE === 'true';
-
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
+// Use shared environment detection
+const dsn = getDsn();
+const enabled = isEnabled('server');
+const environment = getEnvironment('server');
 
 if (dsn) {
   Sentry.init({
@@ -112,10 +109,10 @@ if (dsn) {
     },
 
     // Single gate: only on Vercel deployments (not local builds)
-    enabled: !!dsn && (isVercel || isForceEnabled),
+    enabled,
 
-    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+    environment,
 
-    release: process.env.VERCEL_GIT_COMMIT_SHA || 'local',
+    release: getRelease('server'),
   });
 }
