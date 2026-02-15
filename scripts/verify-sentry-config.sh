@@ -58,16 +58,16 @@ echo ""
 echo "2️⃣  Checking Sentry Configuration Files..."
 for file in sentry.client.config.ts sentry.server.config.ts sentry.edge.config.ts; do
 	if [ -f "$file" ]; then
-		# Deployment gate: VERCEL env var (not NODE_ENV which matches local builds)
-		if grep -q "process\.env\.VERCEL\|NEXT_PUBLIC_VERCEL_ENV" "$file"; then
+		# Deployment gate: direct VERCEL env check OR isEnabled() from shared module
+		if grep -q "process\.env\.VERCEL\|NEXT_PUBLIC_VERCEL_ENV\|isEnabled(" "$file"; then
 			echo "✅ $file: Uses Vercel deployment gate"
 		else
 			echo "❌ $file: Missing Vercel deployment gate"
 			FAILED=$((FAILED + 1))
 		fi
 
-		# enabled flag: must use isVercel
-		if grep -q "enabled.*isVercel" "$file"; then
+		# enabled flag: isVercel direct OR isEnabled() from @/lib/sentry/env
+		if grep -q "enabled.*isVercel\|isEnabled(" "$file"; then
 			echo "   ✅ enabled flag set correctly"
 		else
 			echo "   ❌ enabled flag not set correctly"
