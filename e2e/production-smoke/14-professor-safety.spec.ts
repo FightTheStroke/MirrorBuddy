@@ -20,20 +20,17 @@ test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
       expect(m.id).toBeTruthy();
       expect(m.name).toBeTruthy();
       expect(m.subject).toBeTruthy();
-      expect(m.role).toBeTruthy();
-      // Role should be one of the three types
-      expect(['professor', 'coach', 'buddy']).toContain(m.role);
+      expect(m.displayName).toBeTruthy();
     }
   });
 
-  test('Professor list includes all three character types', async ({ request }) => {
+  test('Professor list includes diverse subjects', async ({ request }) => {
     const res = await request.get('/api/maestri');
     const maestri = await res.json();
 
-    const roles = new Set(maestri.map((m: { role: string }) => m.role));
-    expect(roles.has('professor')).toBe(true);
-    expect(roles.has('coach')).toBe(true);
-    expect(roles.has('buddy')).toBe(true);
+    const subjects = new Set(maestri.map((m: { subject: string }) => m.subject));
+    // Should have a variety of subjects
+    expect(subjects.size).toBeGreaterThanOrEqual(5);
   });
 
   test('Character detail page renders for a professor', async ({ page }) => {

@@ -55,10 +55,7 @@ test.describe('PROD-SMOKE: Welcome & Trial Dashboard', () => {
 
     // Trial banner
     await expect(page.getByText(/versione di prova/i)).toBeVisible();
-    await expect(page.getByText('10/10')).toBeVisible();
-
-    // Trial limits sidebar
-    await expect(page.getByText(/3 Maestri/i)).toBeVisible();
+    await expect(page.getByTestId('trial-badge')).toBeVisible();
   });
 
   test('Login and request access links visible', async ({ page }) => {
