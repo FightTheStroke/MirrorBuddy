@@ -234,12 +234,17 @@ npm run dev                       # Start development server
 
 **Where secrets are stored** (4 copies):
 
-| Location | What | Access |
-|---|---|---|
+| Location        | What                    | Access              |
+| --------------- | ----------------------- | ------------------- |
 | Azure Key Vault | Full `.env` (encrypted) | `az login` required |
-| GitHub Secrets | All production vars | Repo admin access |
-| Vercel | Production env vars | Vercel team access |
-| Local `.env` | Source of truth | This machine only |
+| GitHub Secrets  | All production vars     | Repo admin access   |
+| Vercel          | Production env vars     | Vercel team access  |
+| Local `.env`    | Source of truth         | This machine only   |
+
+For admin production smoke coverage, ensure these env vars are present in `.env`, GitHub Secrets, and Vercel:
+
+- `ADMIN_READONLY_EMAIL` (seeded read-only admin account)
+- `ADMIN_READONLY_COOKIE_VALUE` (signed cookie used by production admin smoke tests)
 
 ---
 

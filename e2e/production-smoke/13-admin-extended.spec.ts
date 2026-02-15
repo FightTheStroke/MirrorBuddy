@@ -7,6 +7,7 @@
  */
 
 import { test, expect } from './fixtures';
+import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
   const adminGetEndpoints = [
@@ -56,8 +57,8 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
 });
 
 test.describe('PROD-SMOKE: Admin Pages Navigation', () => {
-  const ADMIN_COOKIE = process.env.ADMIN_COOKIE_VALUE;
-  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'mirrorbuddy-user-id';
+  const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
+  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || DEFAULT_ADMIN_COOKIE_NAME;
   const adminTest = ADMIN_COOKIE ? test : test.skip;
 
   const adminPages = [
@@ -70,10 +71,10 @@ test.describe('PROD-SMOKE: Admin Pages Navigation', () => {
     { path: '/admin/invites', label: 'Invites' },
     { path: '/admin/tiers', label: 'Tiers' },
     { path: '/admin/knowledge', label: 'Knowledge' },
-    { path: '/admin/campaigns', label: 'Campaigns' },
+    { path: '/admin/communications/campaigns', label: 'Campaigns' },
     { path: '/admin/feature-flags', label: 'Feature Flags' },
     { path: '/admin/funnel', label: 'Funnel' },
-    { path: '/admin/infrastructure', label: 'Infrastructure' },
+    { path: '/admin/mission-control/infra', label: 'Infrastructure' },
   ];
 
   for (const { path, label } of adminPages) {
@@ -101,4 +102,12 @@ test.describe('PROD-SMOKE: Admin Pages Navigation', () => {
       expect(body?.length).toBeGreaterThan(50);
     });
   }
+
+  adminTest('Read-only admin cannot execute destructive mutations', async ({ request }) => {
+    const cookieHeader = `${ADMIN_COOKIE_NAME}=${ADMIN_COOKIE}`;
+    const res = await request.post('/api/admin/cleanup-users', {
+      headers: { Cookie: cookieHeader },
+    });
+    expect(res.status()).toBe(403);
+  });
 });

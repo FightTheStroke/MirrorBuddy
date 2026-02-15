@@ -8,19 +8,21 @@
  * - DATABASE_URL: PostgreSQL connection string
  * - ADMIN_EMAIL: Admin email address
  * - ADMIN_PASSWORD: Admin password (min 8 chars)
+ * - ADMIN_READONLY_EMAIL: Optional read-only admin email address
  *
  * Plan 052: Internal auth system
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
-import { createPrismaClient } from "../src/lib/ssl-config";
-import bcrypt from "bcrypt";
+import { createPrismaClient } from '../src/lib/ssl-config';
+import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
 
 async function seedAdmin(): Promise<void> {
   const email = process.env.ADMIN_EMAIL;
   const password = process.env.ADMIN_PASSWORD;
+  const readOnlyEmail = process.env.ADMIN_READONLY_EMAIL;
 
   if (!email || !password) {
     // Silent exit - env vars are optional for Preview deployments
@@ -29,7 +31,7 @@ async function seedAdmin(): Promise<void> {
   }
 
   if (password.length < 8) {
-    console.error("❌ ADMIN_PASSWORD must be at least 8 characters");
+    console.error('❌ ADMIN_PASSWORD must be at least 8 characters');
     process.exit(1);
   }
 
@@ -37,7 +39,7 @@ async function seedAdmin(): Promise<void> {
 
   try {
     // Extract username from email (part before @)
-    const username = email.split("@")[0];
+    const username = email.split('@')[0];
 
     console.log(`🔍 Checking for existing admin user: ${username}`);
 
@@ -59,44 +61,78 @@ async function seedAdmin(): Promise<void> {
         data: {
           passwordHash: newHash,
           email, // Ensure email is also up to date
-          role: "ADMIN", // Ensure role is ADMIN
+          role: 'ADMIN', // Ensure role is ADMIN
         },
       });
-      console.log("🔄 Admin password synchronized");
+      console.log('🔄 Admin password synchronized');
+    } else {
+      // Create new admin
+      console.log('📝 Creating new admin user...');
 
-      return;
+      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+      const admin = await prisma.user.create({
+        data: {
+          username,
+          email,
+          passwordHash,
+          role: 'ADMIN',
+          mustChangePassword: false,
+          disabled: false,
+          profile: { create: {} },
+          settings: { create: {} },
+          progress: { create: {} },
+        },
+      });
+
+      console.log(`✅ Admin user created successfully!`);
+      console.log(`   ID: ${admin.id}`);
+      console.log(`   Username: ${username}`);
+      console.log(`   Email: ${email}`);
+      console.log(`   Role: ADMIN`);
     }
 
-    // Create new admin
-    console.log("📝 Creating new admin user...");
+    if (readOnlyEmail) {
+      const readOnlyUsername = readOnlyEmail.split('@')[0];
+      const existingReadOnly = await prisma.user.findFirst({
+        where: {
+          OR: [{ username: readOnlyUsername }, { email: readOnlyEmail }],
+        },
+      });
 
-    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-
-    const admin = await prisma.user.create({
-      data: {
-        username,
-        email,
-        passwordHash,
-        role: "ADMIN",
-        mustChangePassword: false,
-        disabled: false,
-        profile: { create: {} },
-        settings: { create: {} },
-        progress: { create: {} },
-      },
-    });
-
-    console.log(`✅ Admin user created successfully!`);
-    console.log(`   ID: ${admin.id}`);
-    console.log(`   Username: ${username}`);
-    console.log(`   Email: ${email}`);
-    console.log(`   Role: ADMIN`);
+      if (existingReadOnly) {
+        await prisma.user.update({
+          where: { id: existingReadOnly.id },
+          data: {
+            email: readOnlyEmail,
+            role: 'ADMIN_READONLY',
+          },
+        });
+        console.log('🔄 Read-only admin synchronized');
+      } else {
+        const generatedPassword = await bcrypt.hash(`${Date.now()}-readonly-admin`, SALT_ROUNDS);
+        await prisma.user.create({
+          data: {
+            username: readOnlyUsername,
+            email: readOnlyEmail,
+            passwordHash: generatedPassword,
+            role: 'ADMIN_READONLY',
+            mustChangePassword: true,
+            disabled: false,
+            profile: { create: {} },
+            settings: { create: {} },
+            progress: { create: {} },
+          },
+        });
+        console.log('✅ Read-only admin user created successfully!');
+      }
+    }
   } finally {
     await prisma.$disconnect();
   }
 }
 
 seedAdmin().catch((error) => {
-  console.error("❌ Seed failed:", error.message || error);
+  console.error('❌ Seed failed:', error.message || error);
   process.exit(1);
 });

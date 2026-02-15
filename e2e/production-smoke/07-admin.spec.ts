@@ -2,19 +2,20 @@
  * Production Smoke Tests — Admin Panel
  *
  * Verifies admin routes require authentication.
- * Tests navigation structure WITH auth (using ADMIN_COOKIE if set).
+ * Tests navigation structure WITH auth (using ADMIN_READONLY_COOKIE_VALUE if set).
  *
  * To test admin navigation, set env vars:
- *   ADMIN_COOKIE_NAME=mirrorbuddy-user-id
- *   ADMIN_COOKIE_VALUE=<signed-cookie-value>
+ *   ADMIN_COOKIE_NAME=mirrorbuddy-admin
+ *   ADMIN_READONLY_COOKIE_VALUE=<signed-cookie-value>
  *
  * Without credentials, tests verify access is properly blocked.
  */
 
 import { test, expect } from './fixtures';
+import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
-const ADMIN_COOKIE = process.env.ADMIN_COOKIE_VALUE;
-const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'mirrorbuddy-user-id';
+const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
+const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || DEFAULT_ADMIN_COOKIE_NAME;
 
 test.describe('PROD-SMOKE: Admin Panel', () => {
   test('Admin routes redirect unauthenticated users', async ({ page }) => {
@@ -80,6 +81,8 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
       const title = await page.title();
       expect(title).not.toContain('404');
       expect(title).not.toContain('Error');
+      const body = await page.textContent('body');
+      expect(body).not.toContain('Not Configured');
     }
   });
 });

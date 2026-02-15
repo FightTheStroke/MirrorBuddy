@@ -10,7 +10,7 @@
 #   PROD_URL=https://staging.mirrorbuddy.org ./scripts/smoke-prod.sh  # Custom URL
 #
 # Admin tests require:
-#   export ADMIN_COOKIE_VALUE="<your-signed-cookie-value>"
+#   export ADMIN_READONLY_COOKIE_VALUE="<signed-readonly-admin-cookie>"
 #
 # These tests are READ-ONLY. They never create, modify, or delete data.
 # They use Trial mode (anonymous) and mock consent walls client-side.
@@ -34,9 +34,9 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --admin)
-      if [[ -z "${ADMIN_COOKIE_VALUE:-}" ]]; then
-        echo "⚠️  --admin requires ADMIN_COOKIE_VALUE env var"
-        echo "   Get it from browser DevTools → Application → Cookies → mirrorbuddy-user-id"
+      if [[ -z "${ADMIN_READONLY_COOKIE_VALUE:-}" ]]; then
+        echo "⚠️  --admin requires ADMIN_READONLY_COOKIE_VALUE env var"
+        echo "   Get it from browser DevTools → Application → Cookies → mirrorbuddy-admin"
         exit 1
       fi
       shift
@@ -63,7 +63,7 @@ done
 echo "🔍 Production Smoke Tests"
 echo "   URL: $PROD_URL"
 echo "   Project: ${PROJECT#--project=}"
-echo "   Admin: ${ADMIN_COOKIE_VALUE:+enabled}${ADMIN_COOKIE_VALUE:-disabled}"
+echo "   Admin: ${ADMIN_READONLY_COOKIE_VALUE:+enabled}${ADMIN_READONLY_COOKIE_VALUE:-disabled}"
 echo ""
 
 # Run tests

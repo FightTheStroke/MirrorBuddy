@@ -40,7 +40,7 @@ e2e/production-smoke/
 ./scripts/smoke-prod.sh --headed    # Watch tests run
 ./scripts/smoke-prod.sh --mobile    # Include mobile viewport
 ./scripts/smoke-prod.sh --fast      # Infrastructure + compliance only
-./scripts/smoke-prod.sh --admin     # Include admin tests (needs ADMIN_COOKIE_VALUE)
+./scripts/smoke-prod.sh --admin     # Include admin tests (needs ADMIN_READONLY_COOKIE_VALUE)
 ./scripts/smoke-prod.sh --debug     # Playwright inspector
 
 # Direct Playwright command
