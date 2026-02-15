@@ -1,0 +1,134 @@
+name: Azure OpenAI Model Monitor
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC (09:00 CET)
+    - cron: "0 8 * * 1"
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  check-models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for model changes
+        id: check
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          CI: "true"
+        run: |
+          # Fetch current models
+          ENDPOINT="${AZURE_OPENAI_ENDPOINT%/}"
+          CURRENT=$(curl -sf "${ENDPOINT}/openai/models?api-version=2024-10-21" \
+            -H "api-key: ${AZURE_OPENAI_API_KEY}" | jq -r '[.data[] | .id] | unique | sort | .[]')
+
+          if [ -z "$CURRENT" ]; then
+            echo "::error::Failed to fetch models from Azure OpenAI"
+            exit 1
+          fi
+
+          # Load baseline
+          BASELINE=$(jq -r '.models[]' scripts/azure-models-baseline.json | sort -u)
+
+          # Compute diffs
+          NEW_MODELS=$(comm -13 <(echo "$BASELINE") <(echo "$CURRENT"))
+          REMOVED_MODELS=$(comm -23 <(echo "$BASELINE") <(echo "$CURRENT"))
+
+          if [ -z "$NEW_MODELS" ] && [ -z "$REMOVED_MODELS" ]; then
+            echo "No model changes detected"
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+          # Build issue body
+          {
+            echo "issue_body<<ISSUE_EOF"
+            echo "## Azure OpenAI Model Changes Detected"
+            echo ""
+            echo "**Resource**: aoai-virtualbpm-prod (swedencentral)"
+            echo "**Checked**: $(date -u +%Y-%m-%d)"
+            echo "**Baseline**: $(jq -r '.generated' scripts/azure-models-baseline.json)"
+            echo ""
+
+            if [ -n "$NEW_MODELS" ]; then
+              NEW_COUNT=$(echo "$NEW_MODELS" | wc -l | tr -d ' ')
+              echo "### ${NEW_COUNT} New Models Available"
+              echo ""
+              echo "$NEW_MODELS" | while IFS= read -r model; do
+                tag=""
+                case "$model" in
+                  *realtime*|*audio*) tag=" **[VOICE/AUDIO]**" ;;
+                  *tts*) tag=" **[TTS]**" ;;
+                  *transcribe*|*whisper*) tag=" **[TRANSCRIPTION]**" ;;
+                  *embedding*) tag=" **[EMBEDDING]**" ;;
+                  gpt-5*|gpt-4.*|gpt-4o*) tag=" **[CHAT]**" ;;
+                  o1*|o3*|o4*) tag=" **[REASONING]**" ;;
+                  *sora*) tag=" **[VIDEO]**" ;;
+                esac
+                echo "- \`${model}\`${tag}"
+              done
+              echo ""
+            fi
+
+            if [ -n "$REMOVED_MODELS" ]; then
+              REMOVED_COUNT=$(echo "$REMOVED_MODELS" | wc -l | tr -d ' ')
+              echo "### ${REMOVED_COUNT} Models Removed"
+              echo ""
+              echo "$REMOVED_MODELS" | while IFS= read -r model; do
+                echo "- ~~\`${model}\`~~"
+              done
+              echo ""
+            fi
+
+            echo "### Action Required"
+            echo ""
+            echo "- [ ] Review new models for potential adoption in MirrorBuddy"
+            echo "- [ ] Check if removed models affect current deployments"
+            echo "- [ ] Update baseline: \`./scripts/azure-model-monitor.sh --update-baseline\`"
+            echo "- [ ] Commit updated baseline"
+            echo ""
+            echo "### Current Deployments"
+            echo ""
+            echo "| Deployment | Model | Use |"
+            echo "|---|---|---|"
+            echo "| gpt-5.2-edu | gpt-5.2-chat | Chat (edu) |"
+            echo "| gpt-5-edu-mini | gpt-5-mini | Chat (mini) |"
+            echo "| gpt-5-nano | gpt-5-nano | Chat (light) |"
+            echo "| gpt-4o-realtime | gpt-realtime | Voice premium |"
+            echo "| gpt-realtime-mini | gpt-realtime-mini | Voice standard |"
+            echo "| tts-deployment | tts | Text-to-Speech |"
+            echo "| text-embedding-3-small | text-embedding-3-small | RAG embeddings |"
+            echo ""
+            echo "---"
+            echo "*Automated by azure-model-monitor workflow*"
+
+            echo "ISSUE_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Issue
+        if: steps.check.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check for existing open issue
+          EXISTING=$(gh issue list --label "azure-models" --state open --json number --jq '.[0].number // empty')
+
+          if [ -n "$EXISTING" ]; then
+            # Comment on existing issue
+            gh issue comment "$EXISTING" --body "${{ steps.check.outputs.issue_body }}"
+            echo "Updated existing issue #${EXISTING}"
+          else
+            # Create new issue
+            gh issue create \
+              --title "Azure OpenAI: new models available ($(date -u +%Y-%m-%d))" \
+              --body "${{ steps.check.outputs.issue_body }}" \
+              --label "azure-models,infrastructure"
+          fi
