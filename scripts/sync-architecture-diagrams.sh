@@ -136,11 +136,15 @@ for adr_num in $MISSING_ADRS; do
     [ -z "$adr_num" ] && continue
     adr_file=$(ls "$ADR_DIR"/${adr_num}*.md 2>/dev/null | head -1)
     if [ -f "$adr_file" ]; then
-        adr_title=$(head -1 "$adr_file" | sed 's/^# //' | sed 's/ADR [0-9]*[: -]*//' | cut -c1-25)
+        # Extract title, sanitize for Mermaid: remove special chars, smart truncate
+        adr_title=$(head -1 "$adr_file" | sed 's/^# //' | sed 's/ADR [0-9]*[: -]*//' | cut -c1-40)
+        # Remove Mermaid-breaking characters: () / & < > " [ ]
+        adr_title=$(echo "$adr_title" | sed 's/[()/<>&"[\]]//g' | sed 's/  */ /g' | sed 's/ *$//')
     else
         adr_title="Unknown"
     fi
-    echo "        ADR${adr_num}[${adr_num} ${adr_title}]" >> "$TEMP_FILE"
+    # Always quote labels to prevent Mermaid parse errors
+    echo "        ADR${adr_num}[\"${adr_num} ${adr_title}\"]" >> "$TEMP_FILE"
     ADDED=$((ADDED + 1))
     pass "Added: ADR $adr_num - $adr_title"
 done

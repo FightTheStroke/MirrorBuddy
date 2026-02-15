@@ -5,354 +5,135 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] — Infrastructure Alignment (15 Feb 2026)
 
-### Azure Deployments
-
-- Added: `text-embedding-3-small` deployment (GlobalStandard, 1536 dims) — replaces ada-002
-- Added: `tts-hd-deployment` (tts-hd model) — replaces tts (better audio quality)
-- Added: `tts-deployment` (tts model, kept as fallback)
-- Note: `gpt-4o-mini-tts` not yet available in EU/swedencentral (tracked in #216)
-
-### Environment & Secrets
-
-- Added: `scripts/env-vault.sh` — backup/restore `.env` via Azure Key Vault
-- Added: `.env` backup in `kv-virtualbpm-prod/mirrorbuddy-env-backup`
-- Fixed: Vercel `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` had trailing `\n`
-- Synced: GitHub Secrets 65 → 76 vars (added Stripe, Supabase, Postgres, GPT-5 deployments)
-- Updated: `.env.example` aligned with real Azure deployment names
-
-### CI Fixes
-
-- Fixed: `validate-pre-deploy.ts` Vercel Gate check to recognize `isEnabled()` pattern
-- Fixed: `verify-sentry-config.sh` grep patterns for refactored sentry configs
-- Fixed: `src/lib/sentry/env.test.ts` TS2540 read-only `NODE_ENV` errors
-- Fixed: Admin API routes reverted from `force-static` to `force-dynamic` (cookie access)
-- Fixed: Mobile Build CI job uses Node 22, Build & Lint stays on Node 20
-
-### Database
-
-- Added: Ghost migration placeholder `20260125200000_add_trial_email_verification`
-- Applied: `20260214201356_add_maintenance_windows` migration
-
-## [Unreleased] — Scheduled Maintenance & Communication System (Plan 146)
-
-### Maintenance System
-
-- Added: `MaintenanceWindow` Prisma model with DB-persisted scheduling (F-01)
-- Added: Maintenance service with env → DB → in-memory priority chain (F-02)
-- Added: Static `/maintenance` page with i18n (5 locales) and WCAG 2.1 AA (F-03)
-- Added: Proxy redirect during maintenance with admin/API/cron bypass (F-04)
-- Added: Admin CRUD API for maintenance windows with overlap validation (F-05, F-17)
-- Added: Admin toggle API for activate/deactivate maintenance (F-06)
-- Added: Admin UI toggle panel and scheduled windows widget (F-07)
-- Added: Public `/api/maintenance` status endpoint for banner (F-08)
-- Added: i18n keys for all 5 locales (it/en/fr/de/es) (F-13)
-- Added: Backward compatibility with existing MaintenanceModeState (F-24)
-
-
-## [Unreleased] — V1SuperCodex Remediation (Plan 148, W0-Foundation + W1-VoiceGA + W2-VoiceSafety + W3-VoiceUX + W4-ConversationUnification)
-
-### W4: Conversation Unification & Documentation
-
-- Added: `UnifiedChatView` contract interface for cross-character conversation consistency (ADR 0149)
-- Added: `ConversationShell` shared component providing unified layout for maestro/coach/buddy chats
-- Added: Shared `MessageBubble` component with integrated TTS, voice input, and attachment support across all character types
-- Added: Maestro adapter (`useMaestroConversation`) mapping maestro-specific state to shared primitives
-- Added: Coach and buddy adapters (`useCoachConversation`, `useBuddyConversation`) for learning companion integration
-- Added: Handoff behavior integration in conversation flow (seamless character switching without session loss)
-- Added: Unified `ChatHeader` component with character avatar, info, and action menu
-- Added: Unified `CharacterCard` component with tier badges and consistent presentation
-- Changed: Education conversation system aligned with shared primitives (quiz, flashcard, summary views)
-- Documented: Conversation store consolidation analysis identifying merge opportunities
-- Added: Parity tests for TTS, voice, and handoff across all character types
-- Added: ADR 0149 - Static vs Dynamic Prompts (knowledge-base scope and injection strategy)
-- Documented: Knowledge-base scope rules per character type (maestri: domain-specific, coaches: learning strategies, buddies: peer support)
-- Learnings: Shared component architecture reduces duplication by ~1200 lines across 3 character types (see plan-147-notes.md W4 section)
-
-### W3: Voice UX & Multilingual Enhancements
-
-- Added: Locale threading into voice session configuration via `buildSessionConfig()` parameter
-- Added: Multilingual greeting system with proper locale resolution for all 26 maestri
-- Added: Formal/informal address (Lei/Sie/Vous vs tu/du/tú) support in voice greetings per ADR 0064
-- Added: `CallingOverlay` component with deterministic state machine (idle/connecting/connected/error)
-- Added: Comprehensive accessibility support in CallingOverlay (WCAG 2.1 AA, keyboard nav, ARIA labels)
-- Fixed: CSRF header verification in admin API routes (`requireCSRF` middleware enforcement)
-- Fixed: Query parameter preservation in admin authentication redirects (prevents lost state)
-- Changed: Voice assignment redistribution from 6 to 26 maestri per tier expansion
-- Verified: All voice UX flows work seamlessly across 5 locales (it/en/fr/de/es)
-- Learnings: State machine pattern critical for voice connection reliability (see plan-147-notes.md W3 section)
-
-### W2: Voice Safety & Prompt Optimization
-
-- Added: Full voice prompt assembly via `buildVoicePrompt()` with `useFullPrompt` feature flag
-- Added: Voice instruction assembly system extracting maestro identity, personality, intensity dial
-- Added: Safety guardrails integration in voice session flow (STEM, jailbreak, crisis detection)
-- Added: User transcript safety check (`checkUserTranscript`) before LLM processing (VCE-002 compliance)
-- Added: Assistant transcript post-check (`checkAssistantTranscript`) before voice synthesis (VCE-003 compliance)
-- Added: Safe-response redirect flow via `response.cancel` + safe continuation message injection (VCE-004)
-- Added: Safety warning UI component (`VoiceSafetyWarning`) for user-facing interventions
-- Changed: GA event names aligned with existing telemetry system (`voice_session_start`, not `voice.session.start`)
-- Fixed: `session.update` type declaration to include optional `type: 'realtime'` field per Azure GA spec
-- Added: Comprehensive test coverage for voice safety flow (transcript checks, intervention triggers, UI rendering)
-- Added: Persona fidelity review ensuring voice prompts maintain character authenticity across all 26 maestri
-
-### W1: Voice GA Migration
-
-- Changed: Azure Realtime ephemeral token endpoint from `/openai/realtimeapi/sessions` to `/openai/v1/realtime/client_secrets` (GA)
-- Changed: Session configuration moved from post-connection `session.update` to upfront token request body (reduces 1 round-trip)
-- Changed: SDP exchange endpoint from `https://{region}.realtimeapi-preview.ai.azure.com/v1/realtimertc` to `https://{resource}.openai.azure.com/openai/v1/realtime/calls` (unified GA domain)
-- Removed: `api-version` query parameter from realtime endpoints (GA uses `/v1/` path versioning)
-- Removed: `OpenAI-Beta: realtime=v1` header (no longer required in GA, gated by `voice_ga_protocol` flag)
-- Changed: Client types updated for GA contract (`client_secret` with `value` and `expires_at`, session config in token body)
-- Removed: STUN/ICE server configuration (Azure handles server-side, gated by `voice_ga_protocol` flag)
-- Removed: ICE gathering wait before SDP offer (GA allows immediate send after `setLocalDescription`, gated by `voice_ga_protocol` flag)
-- Changed: SDP exchange uses deterministic endpoint (no double-fetch, single POST to `/openai/v1/realtime/calls`)
-- Changed: Voice connection sequence parallelized with `Promise.allSettled` (audio context + mic + token fetch) for faster startup
-- Added: Token cache for ephemeral tokens with TTL-based refresh (pre-fetch 30s before expiry)
-- Changed: WebRTC filter remains disabled for GA (tool calls require full data channel access)
-- Changed: CSP updated to allow GA domains (`*.openai.azure.com`, preview domains will be removed in future cleanup)
-- Removed: Deprecated voice artifacts (preview endpoints behind `voice_ga_protocol` flag)
-- Changed: Azure deployment mapping aligned for GA models (`gpt-realtime`, `gpt-realtime-mini` - preview `gpt-4o-realtime-preview` deprecated)
-- Documented: Secret rotation plan in `plan-147-notes.md` with cleanup of `AZURE_OPENAI_REALTIME_REGION` and `AZURE_OPENAI_REALTIME_API_VERSION`
-- Updated: `.env.example` with DEPRECATED markers for preview-only environment variables
-- Added: Unit tests for GA flow (ephemeral token, session config, SDP exchange, token cache)
-
-### W0: Foundation
-
-- Added: 6 V1SuperCodex feature flags for controlled rollout (`voice_ga_protocol`, `voice_full_prompt`, `voice_transcript_safety`, `voice_calling_overlay`, `chat_unified_view`, `consent_unified_model`)
-- Added: Voice baseline metrics framework with SLI/SLO targets (99.5% availability, <500ms P50 latency, <2s P99 latency)
-- Added: parity matrix documentation (`docs/technical/parity-matrix.md`) for GA vs preview feature comparison
-- Added: Voice secret matrix (`docs/technical/voice-secret-matrix.md`) mapping environment variables to Azure resources
-- Added: 6 compliance logging checkpoints (VCE-001 to VCE-006) for EU AI Act Article 12/13/14 compliance
-- Verified: All CLI tools authenticated (Azure CLI, Vercel CLI, GitHub CLI) for Plan 147/148 workflow
-- Documented: Feature flag rollback strategy with default-off state for safe deployment
-- Documented: CSP/proxy baseline with preview and GA domain requirements
-
-## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2+W3)
-
-### Voice
-
-- Added: `voice-prompt-builder.ts` — Extracts essential character identity (name, personality, intensity dial, core identity) into structured ~2000 char voice prompt per ADR 0031
-- Fixed: Replaced arbitrary `.slice(0, 800)` truncation of systemPrompt with intelligent section extraction in `session-config.ts`
-- Fixed: Silent error swallowing in `fetchConversationMemory` — now logs warnings with actual error messages via `clientLogger`
-- Fixed: Silent catch in `session-config.ts` memory fetch — now logs warning with maestro ID and error details
-- Added: `switch-character.ts` — Persistent WebRTC: switch characters via `session.update` without tearing down the RTCPeerConnection
-- Added: `switchCharacter` action in `voice-session-store.ts` — updates maestro, clears transcript/tools, keeps connection
-- Added: `token-cache.ts` — Ephemeral token pre-fetch with TTL and auto-refresh 30s before expiry
-
-### Study Kit
-
-- Fixed: `processStudyKit` now returns `originalText` for RAG indexing (was undefined)
-- Fixed: Upload route error handling: proper error message extraction, safety-wrapped DB update in catch
-
-### UX
-
-- Added: Astuccio homework flow passes `?context=Aiutami+con+i+compiti+di+{specialty}` to maestro page
-- Added: `contextMessage` prop flows through page → session-page → session → session-logic
-- Added: Context message pre-populates input field for immediate homework assistance
-
-### Infrastructure
-
-- Updated: `deployment-mapping.ts` — Accurate deprecation timeline: GPT-4o family RETIRED Feb 2026, text-embedding-3-small and whisper-1 stable, realtime preview models 3-6 month lifecycle
-
-### ADR Compliance Audit
-
-- Verified: ADR 0031 — 25/26 maestri have CHARACTER INTENSITY DIAL (3 via external prompt files)
-- Verified: ADR 0064 — 21 formal professors correct; 5 informal (post-1900) correctly excluded
-- Verified: ADR 0021/0090 — Memory auto-injected at API layer for all characters
-- Verified: ADR 0097 — Model routing via tierService, daily limits via budget-handler
-
-### Tests
-
-- Added: `voice-prompt-builder.test.ts` — 10 tests covering section extraction, char limits, edge cases
-- Added: `memory-utils.test.ts` — 13 tests covering sanitization, memory fetch, context building
-- Added: `switch-character.test.ts` — 2 tests covering store update and data channel guard
-- Added: `token-cache.test.ts` — 5 tests covering fetch, cache, failure, string expiresAt
-- All 26 maestri, 6 coaches, 6 buddies have `voiceInstructions` populated
-
-## [Unreleased] — Architecture Map & Drift Detection
-
-### Architecture
-
-- Added: `docs/architecture-map.md` — 6-layer dependency model (Types, Infrastructure, Horizontal, Domain, State, Presentation) with allowed-imports matrix, high-impact modules, entry points, and key invariants
-- Added: `scripts/drift-check.sh` — Automated codebase drift detection (file length >250 lines, @ts-ignore, `as any` casts, TODO/FIXME/HACK markers, circular domain dependencies)
-- Added: Three output modes: `--summary` (JSON), `--detail` (file lists), `--fix-hint` (remediation suggestions)
-- Added: ADR 0146 — Architecture Map and Drift-Check Script
-- Learnings: Inspired by OpenAI "Harness Engineering" article; automated quality gates catch drift faster than code review
-
-## [Unreleased] — Audit Hardening (Plan 144)
-
-### Security
-
-- Fixed: Unescaped HTML in `document.write` for summary PDF export (auto-save-wrappers x2)
-- Fixed: Unescaped title in mindmap print/download (use-export.ts)
-- Added: `escapeHtml()` to all interpolated user/AI content in print flows
-- Added: Integration tests for XSS escaping in print/export renderers
-- Added: XSS Print/Export Hardening section in ADR 0080
-
-### Auth
-
-- Fixed: Visitor ID validated with `validateVisitorId()` UUID format check (tools/events)
-- Fixed: Visitor ID validated with `validateVisitorId()` UUID format check (tools/stream/modify)
-
-### Performance
-
-- Changed: Lazy-load `mathjs` in calculator-simple.tsx via dynamic import
-- Changed: Lazy-load `mathjs` in calculator-scientific.tsx with cached module ref
-- Documented: `localStorage` for trial-session-id is intentional (cross-tab persistence)
-
-### Documentation
-
-- Fixed: `.claude/rules/tier.md` limits aligned with `prisma/seed-tiers.ts` (Trial=10/day, Base=50/day)
-- Fixed: Replaced all `public/locales/` references with `messages/{locale}/` in README, RUNBOOK, I18N-RUNBOOK
-- Fixed: Replaced `middleware.ts` references with `src/proxy.ts` in ARCHITECTURE.md, feature-flags/README.md
-
-## [Unreleased] — Stripe Admin Panel (Plan 142)
-
-### Database Hardening
-
-- Fixed: Duplicate migration timestamp 20260125200000 (renamed to 20260125210000)
-- Fixed: 5 missing onDelete cascade/SetNull rules (LearningPath, Material, Collection, Research)
-- Fixed: Unbounded findMany queries across 16 files (added take limits to prevent OOM)
-- Added: Slow query monitoring Prisma extension (warn >1s, critical >3s)
-- Added: Migration for cascade foreign key rules (20260210230000)
-- Added: Materialized views for admin dashboard aggregations (prisma/manual/)
-- Added: Terraform database infrastructure documentation (terraform/database/)
-- Added: ADR 0144 — Disaster Recovery & Backup Strategy
-- Added: ADR 0145 — Migration Best Practices
-
-### W1 — Service Layer
-
-- Added: `paymentsEnabled` Boolean field to GlobalConfig (analytics.prisma)
-- Added: 6 new types in stripe-admin-types.ts (StripeWebhookEvent, PaymentSettings, ProductCreateInput, PriceCreateInput, SubscriptionActionInput, RefundInput)
-- Changed: Rewrote stripe-admin-service.ts with real Stripe SDK (getDashboardData, getProducts, getSubscriptions)
-- Added: stripe-products-service.ts — CRUD for products/prices + tier sync
-- Added: stripe-subscriptions-service.ts — list, cancel, refund, change plan
-- Added: stripe-webhooks-service.ts — event monitoring (list, detail, retry)
-- Added: stripe-settings-service.ts — payment kill switch via GlobalConfig
-
-### W2 — API Routes
-
-- Changed: Rewrote /api/admin/stripe/route.ts with GET dashboard+settings and POST kill switch
-- Added: /api/admin/stripe/products/ — GET list, POST create with price+tier sync
-- Added: /api/admin/stripe/products/[id]/ — PUT update, DELETE archive
-- Added: /api/admin/stripe/subscriptions/ — GET list with filters (status, email, pagination)
-- Added: /api/admin/stripe/subscriptions/[id]/ — PUT cancel/change plan, POST refund
-- Added: /api/admin/stripe/webhooks/ — GET list events, GET detail, POST retry
-
-### W3 — Admin UI (Dashboard + Products)
-
-- Added: /admin/stripe page with validateAdminAuth and StripeTabs
-- Added: StripeTabs client component with 4 tabs (Dashboard, Products, Subscriptions, Webhooks)
-- Added: StripeDashboardTab with connection status, MRR/ARR/subs metrics, kill switch toggle
-- Added: StripeProductsTab with product table, create dialog, archive button
-- Added: StripePriceDialog for creating new prices on products
-- Added: Stripe entry in admin sidebar (CreditCard icon) and command palette
-
-### W4 — Admin UI (Subscriptions + Webhooks)
-
-- Added: StripeSubscriptionsTab with status filter, email search, cursor pagination
-- Added: StripeSubscriptionActions with cancel/refund/change plan dialogs
-- Added: StripeWebhooksTab with event log, status badges, expandable detail, retry
-
-### W5 — Integration
-
-- Changed: /api/checkout/route.ts — kill switch check (GlobalConfig.paymentsEnabled, returns 503)
-- Added: i18n keys for Stripe admin in all 5 locales (it/en/fr/de/es) — ~45 keys each
-- Added: stripe-admin-service.test.ts (9 tests: dashboard data, products, subscriptions, formatCurrency, formatDate)
-- Added: stripe-settings-service.test.ts (4 tests: get/update payment settings)
-- Added: route.test.ts for /api/admin/stripe (4 tests: auth, dashboard, settings update, audit)
-
-## [Unreleased] — SSO OIDC Security Hardening (Plan 143)
-
-### Security
-
-- Fixed emailHash lookup in SSO callback: uses `hashPII` + `findFirst` with `OR` to find PII-encrypted users (F-01)
-- Removed insecure `determineRole()` that granted ADMIN based on email substrings; new SSO users always get USER role (F-03)
-- OAuth state secret fails fast in production if `OAUTH_STATE_SECRET`/`COOKIE_SECRET` missing — no dev-secret fallback (F-05)
+## [Unreleased]
 
 ### Added
 
+- `text-embedding-3-small` deployment (GlobalStandard, 1536 dims) — replaces ada-002
+- `tts-hd-deployment` (tts-hd model) — replaces tts (better audio quality)
+- `tts-deployment` (tts model, kept as fallback)
+- `scripts/env-vault.sh` — backup/restore `.env` via Azure Key Vault
+- `.env` backup in `kv-virtualbpm-prod/mirrorbuddy-env-backup`
+- Ghost migration placeholder `20260125200000_add_trial_email_verification`
+- Applied: `20260214201356_add_maintenance_windows` migration
+- `MaintenanceWindow` Prisma model with DB-persisted scheduling (F-01)
+- Maintenance service with env → DB → in-memory priority chain (F-02)
+- Static `/maintenance` page with i18n (5 locales) and WCAG 2.1 AA (F-03)
+- Proxy redirect during maintenance with admin/API/cron bypass (F-04)
+- Admin CRUD API for maintenance windows with overlap validation (F-05, F-17)
+- Admin toggle API for activate/deactivate maintenance (F-06)
+- Admin UI toggle panel and scheduled windows widget (F-07)
+- Public `/api/maintenance` status endpoint for banner (F-08)
+- i18n keys for all 5 locales (it/en/fr/de/es) (F-13)
+- Backward compatibility with existing MaintenanceModeState (F-24)
+- `UnifiedChatView` contract interface for cross-character conversation consistency (ADR 0149)
+- `ConversationShell` shared component providing unified layout for maestro/coach/buddy chats
+- Shared `MessageBubble` component with integrated TTS, voice input, and attachment support across all character types
+- Maestro adapter (`useMaestroConversation`) mapping maestro-specific state to shared primitives
+- Coach and buddy adapters (`useCoachConversation`, `useBuddyConversation`) for learning companion integration
+- Handoff behavior integration in conversation flow (seamless character switching without session loss)
+- Unified `ChatHeader` component with character avatar, info, and action menu
+- Unified `CharacterCard` component with tier badges and consistent presentation
+- Parity tests for TTS, voice, and handoff across all character types
+- ADR 0149 - Static vs Dynamic Prompts (knowledge-base scope and injection strategy)
+- Locale threading into voice session configuration via `buildSessionConfig()` parameter
+- Multilingual greeting system with proper locale resolution for all 26 maestri
+- Formal/informal address (Lei/Sie/Vous vs tu/du/tú) support in voice greetings per ADR 0064
+- `CallingOverlay` component with deterministic state machine (idle/connecting/connected/error)
+- Comprehensive accessibility support in CallingOverlay (WCAG 2.1 AA, keyboard nav, ARIA labels)
+- Full voice prompt assembly via `buildVoicePrompt()` with `useFullPrompt` feature flag
+- Voice instruction assembly system extracting maestro identity, personality, intensity dial
+- Safety guardrails integration in voice session flow (STEM, jailbreak, crisis detection)
+- User transcript safety check (`checkUserTranscript`) before LLM processing (VCE-002 compliance)
+- Assistant transcript post-check (`checkAssistantTranscript`) before voice synthesis (VCE-003 compliance)
+- Safe-response redirect flow via `response.cancel` + safe continuation message injection (VCE-004)
+- Safety warning UI component (`VoiceSafetyWarning`) for user-facing interventions
+- Comprehensive test coverage for voice safety flow (transcript checks, intervention triggers, UI rendering)
+- Persona fidelity review ensuring voice prompts maintain character authenticity across all 26 maestri
+- Token cache for ephemeral tokens with TTL-based refresh (pre-fetch 30s before expiry)
+- Unit tests for GA flow (ephemeral token, session config, SDP exchange, token cache)
+- 6 V1SuperCodex feature flags for controlled rollout (`voice_ga_protocol`, `voice_full_prompt`, `voice_transcript_safety`, `voice_calling_overlay`, `chat_unified_view`, `consent_unified_model`)
+- Voice baseline metrics framework with SLI/SLO targets (99.5% availability, <500ms P50 latency, <2s P99 latency)
+- parity matrix documentation (`docs/technical/parity-matrix.md`) for GA vs preview feature comparison
+- Voice secret matrix (`docs/technical/voice-secret-matrix.md`) mapping environment variables to Azure resources
+- 6 compliance logging checkpoints (VCE-001 to VCE-006) for EU AI Act Article 12/13/14 compliance
+- `voice-prompt-builder.ts` — Extracts essential character identity (name, personality, intensity dial, core identity) into structured ~2000 char voice prompt per ADR 0031
+- `switch-character.ts` — Persistent WebRTC: switch characters via `session.update` without tearing down the RTCPeerConnection
+- `switchCharacter` action in `voice-session-store.ts` — updates maestro, clears transcript/tools, keeps connection
+- `token-cache.ts` — Ephemeral token pre-fetch with TTL and auto-refresh 30s before expiry
+- Astuccio homework flow passes `?context=Aiutami+con+i+compiti+di+{specialty}` to maestro page
+- `contextMessage` prop flows through page → session-page → session → session-logic
+- Context message pre-populates input field for immediate homework assistance
+- `voice-prompt-builder.test.ts` — 10 tests covering section extraction, char limits, edge cases
+- `memory-utils.test.ts` — 13 tests covering sanitization, memory fetch, context building
+- `switch-character.test.ts` — 2 tests covering store update and data channel guard
+- `token-cache.test.ts` — 5 tests covering fetch, cache, failure, string expiresAt
+- All 26 maestri, 6 coaches, 6 buddies have `voiceInstructions` populated
+- `docs/architecture-map.md` — 6-layer dependency model (Types, Infrastructure, Horizontal, Domain, State, Presentation) with allowed-imports matrix, high-impact modules, entry points, and key invariants
+- `scripts/drift-check.sh` — Automated codebase drift detection (file length >250 lines, @ts-ignore, `as any` casts, TODO/FIXME/HACK markers, circular domain dependencies)
+- Three output modes: `--summary` (JSON), `--detail` (file lists), `--fix-hint` (remediation suggestions)
+- ADR 0146 — Architecture Map and Drift-Check Script
+- `escapeHtml()` to all interpolated user/AI content in print flows
+- Integration tests for XSS escaping in print/export renderers
+- XSS Print/Export Hardening section in ADR 0080
+- Slow query monitoring Prisma extension (warn >1s, critical >3s)
+- Migration for cascade foreign key rules (20260210230000)
+- Materialized views for admin dashboard aggregations (prisma/manual/)
+- Terraform database infrastructure documentation (terraform/database/)
+- ADR 0144 — Disaster Recovery & Backup Strategy
+- ADR 0145 — Migration Best Practices
+- `paymentsEnabled` Boolean field to GlobalConfig (analytics.prisma)
+- 6 new types in stripe-admin-types.ts (StripeWebhookEvent, PaymentSettings, ProductCreateInput, PriceCreateInput, SubscriptionActionInput, RefundInput)
+- stripe-products-service.ts — CRUD for products/prices + tier sync
+- stripe-subscriptions-service.ts — list, cancel, refund, change plan
+- stripe-webhooks-service.ts — event monitoring (list, detail, retry)
+- stripe-settings-service.ts — payment kill switch via GlobalConfig
+- /api/admin/stripe/products/ — GET list, POST create with price+tier sync
+- /api/admin/stripe/products/[id]/ — PUT update, DELETE archive
+- /api/admin/stripe/subscriptions/ — GET list with filters (status, email, pagination)
+- /api/admin/stripe/subscriptions/[id]/ — PUT cancel/change plan, POST refund
+- /api/admin/stripe/webhooks/ — GET list events, GET detail, POST retry
+- /admin/stripe page with validateAdminAuth and StripeTabs
+- StripeTabs client component with 4 tabs (Dashboard, Products, Subscriptions, Webhooks)
+- StripeDashboardTab with connection status, MRR/ARR/subs metrics, kill switch toggle
+- StripeProductsTab with product table, create dialog, archive button
+- StripePriceDialog for creating new prices on products
+- Stripe entry in admin sidebar (CreditCard icon) and command palette
+- StripeSubscriptionsTab with status filter, email search, cursor pagination
+- StripeSubscriptionActions with cancel/refund/change plan dialogs
+- StripeWebhooksTab with event log, status badges, expandable detail, retry
+- i18n keys for Stripe admin in all 5 locales (it/en/fr/de/es) — ~45 keys each
+- stripe-admin-service.test.ts (9 tests: dashboard data, products, subscriptions, formatCurrency, formatDate)
+- stripe-settings-service.test.ts (4 tests: get/update payment settings)
+- route.test.ts for /api/admin/stripe (4 tests: auth, dashboard, settings update, audit)
 - JWKS-based ID token verification via `jose` library — replaces unsigned `decodeJWT()` (F-02)
 - `verifyIdToken()` in `oidc-utils.ts`: validates signature, issuer, audience, and nonce (F-02)
 - Nonce validation in SSO callback flow to prevent replay attacks (F-04)
-
-## [Unreleased] — Sentry Fix All Runtimes (Plan 141)
-
-### Fixed
-
-- Sentry client/server/edge enable logic: replaced unreliable `VERCEL_ENV`/`NEXT_PUBLIC_VERCEL_ENV` with `NODE_ENV === 'production'` as single production gate
-- Removed triple-blocking anti-pattern (`enabled: false` + `beforeSend` null-return + console.log) from all three Sentry configs
-- Self-test endpoint (`/api/admin/sentry/self-test`) now uses `NODE_ENV` check and reports actual SDK state via `getClient()`
-
-### Added
-
 - Unit tests for Sentry config enable logic: 19 tests covering client/server/edge enabled flag, beforeSend enrichment, hydration/digest tagging, FORCE_ENABLE escape hatch
-
-## Admin Dashboard Overhaul v3 (Plan 140)
-
-### W1: Security
-
-#### Fixed
-
 - Missing `validateAdminAuth()` on [locale]/admin pages (revenue, tax, tiers/pricing, tiers/new)
 - Missing CSRF protection on Server Action forms in admin financial pages
 - Hardcoded `adminId: "system"` replaced with actual admin userId in audit logs
 - Added `auditService.log()` to all financial mutations (pricing, tax, tier creation)
-
-#### Changed
-
 - Migrated revenue and tax pages from [locale]/admin/ to /admin/ with proper auth pattern
 - Deleted legacy [locale]/admin/ duplicate pages (tiers, revenue, tax)
-
-### W2: Data Integrity
-
-#### Fixed
-
 - Removed all hardcoded mock data from AI email metrics service (ADR 0121)
 - Health aggregator no longer counts unconfigured services as "down"
 - Key Vault returns specific error types (encryption_not_configured, database_error, decryption_failed)
 - Resend API shows "API key invalid" instead of raw 401 error
-
-#### Added
-
 - Environment configuration audit in admin settings (shows set/missing env vars per service)
 - AI Email page shows "Not Configured" cards with required env var names when services unavailable
-
-### W3: Navigation
-
-#### Changed
-
 - Sidebar restructured from 6 groups to 4: Overview, Management, Communications, Operations
 - Command palette updated to match new navigation structure
 - Consolidated business-kpi into analytics page
 - Consolidated ops-dashboard into main dashboard
 - Cleaned up mission-control directory (kept health, key-vault, infra, ai-email)
-
-#### Fixed
-
 - Locales page now displays actual locale data instead of "Not Found"
 - Removed hardcoded Italian text from locales page
-
-#### Added
-
 - Revenue and Tax pages accessible from Operations sidebar group
-
-### W4: Polish
-
-#### Fixed
-
 - All new admin pages internationalized with i18n keys
 - csrfFetch misuse on GET requests in school page
 - CI verification: lint (0 errors), typecheck (0 errors), build (pass)
-
----
-
-## [Unreleased] — Compliance Audit Remediation (Plan 138)
-
-### Added
-
 - AI vendor disclosure: Anthropic Claude + Azure Realtime Voice API in privacy/compliance pages (all 5 locales)
 - AI disclosure badge in chat messages (EU AI Act Art. 13)
 - Safety audit trail persistence to PostgreSQL via ComplianceAuditEntry
@@ -369,12 +150,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `sync-architecture-diagrams.sh` now quotes Mermaid labels and sanitizes special characters to prevent parse errors
+- Note: `gpt-4o-mini-tts` not yet available in EU/swedencentral (tracked in #216)
+- Synced: GitHub Secrets 65 → 76 vars (added Stripe, Supabase, Postgres, GPT-5 deployments)
+- Updated: `.env.example` aligned with real Azure deployment names
+- Education conversation system aligned with shared primitives (quiz, flashcard, summary views)
+- Voice assignment redistribution from 6 to 26 maestri per tier expansion
+- GA event names aligned with existing telemetry system (`voice_session_start`, not `voice.session.start`)
+- Azure Realtime ephemeral token endpoint from `/openai/realtimeapi/sessions` to `/openai/v1/realtime/client_secrets` (GA)
+- Session configuration moved from post-connection `session.update` to upfront token request body (reduces 1 round-trip)
+- SDP exchange endpoint from `https://{region}.realtimeapi-preview.ai.azure.com/v1/realtimertc` to `https://{resource}.openai.azure.com/openai/v1/realtime/calls` (unified GA domain)
+- Client types updated for GA contract (`client_secret` with `value` and `expires_at`, session config in token body)
+- SDP exchange uses deterministic endpoint (no double-fetch, single POST to `/openai/v1/realtime/calls`)
+- Voice connection sequence parallelized with `Promise.allSettled` (audio context + mic + token fetch) for faster startup
+- WebRTC filter remains disabled for GA (tool calls require full data channel access)
+- CSP updated to allow GA domains (`*.openai.azure.com`, preview domains will be removed in future cleanup)
+- Azure deployment mapping aligned for GA models (`gpt-realtime`, `gpt-realtime-mini` - preview `gpt-4o-realtime-preview` deprecated)
+- Updated: `.env.example` with DEPRECATED markers for preview-only environment variables
+- Updated: `deployment-mapping.ts` — Accurate deprecation timeline: GPT-4o family RETIRED Feb 2026, text-embedding-3-small and whisper-1 stable, realtime preview models 3-6 month lifecycle
+- Lazy-load `mathjs` in calculator-simple.tsx via dynamic import
+- Lazy-load `mathjs` in calculator-scientific.tsx with cached module ref
+- Rewrote stripe-admin-service.ts with real Stripe SDK (getDashboardData, getProducts, getSubscriptions)
+- Rewrote /api/admin/stripe/route.ts with GET dashboard+settings and POST kill switch
+- /api/checkout/route.ts — kill switch check (GlobalConfig.paymentsEnabled, returns 503)
 - **AI Models Migration to GPT-5 Family** (9 Febbraio 2026):
-  - Migrated all Azure OpenAI models from GPT-4o family to GPT-5 family due to GPT-4o retirement (Standard: 2026-03-31, Provisioned: 2026-10-01)
-  - Model mapping: `gpt-4o-mini` → `gpt-5-mini` (chat, pdf, mindmap, flashcards, summary, chart), `gpt-4o-mini` → `gpt-5-nano` (demo, parameter extraction), `gpt-4o` → `gpt-5.2-edu` (education features: quiz, formula, homework, webcam for Base tier)
-  - Added `gpt-5.2-chat` deployment for Pro tier with enhanced conversational capabilities
-  - Model names now environment-driven via `DEFAULT_CHAT_MODEL`, `DEFAULT_CHAT_MODEL_EDU`, `DEFAULT_CHAT_MODEL_PRO`, `DEFAULT_DEMO_MODEL`, `DEFAULT_EXTRACTOR_MODEL` in Docker Compose and deployment configs
-  - Database migration `20260209120000_migrate_gpt4o_to_gpt5` updates all existing conversation and tool output records
 - Cookie documentation: all 9 cookies now disclosed with security attributes (was 4/9)
 - Tier system (Trial/Base/Pro) documented in compliance text
 - ~274 placeholder i18n keys replaced with real legal text (5 locales)
@@ -384,6 +183,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Documentation aligned with codebase: fixed 60 broken Mermaid diagrams, corrected DSA profiles, tier limits, API route counts, ADR references, rate limiting table, env vars
+- Vercel `AZURE_OPENAI_EMBEDDING_DEPLOYMENT` had trailing `\n`
+- `validate-pre-deploy.ts` Vercel Gate check to recognize `isEnabled()` pattern
+- `verify-sentry-config.sh` grep patterns for refactored sentry configs
+- `src/lib/sentry/env.test.ts` TS2540 read-only `NODE_ENV` errors
+- Admin API routes reverted from `force-static` to `force-dynamic` (cookie access)
+- Mobile Build CI job uses Node 22, Build & Lint stays on Node 20
+- CSRF header verification in admin API routes (`requireCSRF` middleware enforcement)
+- Query parameter preservation in admin authentication redirects (prevents lost state)
+- `session.update` type declaration to include optional `type: 'realtime'` field per Azure GA spec
+- Replaced arbitrary `.slice(0, 800)` truncation of systemPrompt with intelligent section extraction in `session-config.ts`
+- Silent error swallowing in `fetchConversationMemory` — now logs warnings with actual error messages via `clientLogger`
+- Silent catch in `session-config.ts` memory fetch — now logs warning with maestro ID and error details
+- `processStudyKit` now returns `originalText` for RAG indexing (was undefined)
+- Upload route error handling: proper error message extraction, safety-wrapped DB update in catch
+- Unescaped HTML in `document.write` for summary PDF export (auto-save-wrappers x2)
+- Unescaped title in mindmap print/download (use-export.ts)
+- Visitor ID validated with `validateVisitorId()` UUID format check (tools/events)
+- Visitor ID validated with `validateVisitorId()` UUID format check (tools/stream/modify)
+- `.claude/rules/tier.md` limits aligned with `prisma/seed-tiers.ts` (Trial=10/day, Base=50/day)
+- Replaced all `public/locales/` references with `messages/{locale}/` in README, RUNBOOK, I18N-RUNBOOK
+- Replaced `middleware.ts` references with `src/proxy.ts` in ARCHITECTURE.md, feature-flags/README.md
+- Duplicate migration timestamp 20260125200000 (renamed to 20260125210000)
+- 5 missing onDelete cascade/SetNull rules (LearningPath, Material, Collection, Research)
+- Unbounded findMany queries across 16 files (added take limits to prevent OOM)
+- Sentry client/server/edge enable logic: replaced unreliable `VERCEL_ENV`/`NEXT_PUBLIC_VERCEL_ENV` with `NODE_ENV === 'production'` as single production gate
+- Removed triple-blocking anti-pattern (`enabled: false` + `beforeSend` null-return + console.log) from all three Sentry configs
+- Self-test endpoint (`/api/admin/sentry/self-test`) now uses `NODE_ENV` check and reports actual SDK state via `getClient()`
 - Bias detection claims corrected: "manual auditing quarterly" (was "automated")
 - MODEL-CARD metrics marked as placeholder targets (were claimed as measured)
 - AI-POLICY aspirational features marked as "Planned" (were claimed as implemented)
@@ -399,6 +226,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Missing Prisma Migrations: Added migration for 9 models (CharacterConfig, ToolOutput, HierarchicalSummary, PasswordResetToken, ContactRequest, AdminAuditLog, AuditLog, SchoolSSOConfig, SSOSession) and CharacterType enum that had no corresponding database tables, causing 500 errors on all related API routes (ADR 0137)
 - Admin Breadcrumb i18n: Fixed `/admin/locales` breadcrumb mapping from non-existent `sidebar.locales` to correct `sidebar.localization` key
 
+### Removed
+
+- `api-version` query parameter from realtime endpoints (GA uses `/v1/` path versioning)
+- `OpenAI-Beta: realtime=v1` header (no longer required in GA, gated by `voice_ga_protocol` flag)
+- STUN/ICE server configuration (Azure handles server-side, gated by `voice_ga_protocol` flag)
+- ICE gathering wait before SDP offer (GA allows immediate send after `setLocalDescription`, gated by `voice_ga_protocol` flag)
+- Deprecated voice artifacts (preview endpoints behind `voice_ga_protocol` flag)
+
+### Security
+
+- Fixed emailHash lookup in SSO callback: uses `hashPII` + `findFirst` with `OR` to find PII-encrypted users (F-01)
+- Removed insecure `determineRole()` that granted ADMIN based on email substrings; new SSO users always get USER role (F-03)
+- OAuth state secret fails fast in production if `OAUTH_STATE_SECRET`/`COOKIE_SECRET` missing — no dev-secret fallback (F-05)
+
+### Documented
+
+- Documented: Conversation store consolidation analysis identifying merge opportunities
+- Documented: Knowledge-base scope rules per character type (maestri: domain-specific, coaches: learning strategies, buddies: peer support)
+- Learnings: Shared component architecture reduces duplication by ~1200 lines across 3 character types (see plan-147-notes.md W4 section)
+- Verified: All voice UX flows work seamlessly across 5 locales (it/en/fr/de/es)
+- Learnings: State machine pattern critical for voice connection reliability (see plan-147-notes.md W3 section)
+- Documented: Secret rotation plan in `plan-147-notes.md` with cleanup of `AZURE_OPENAI_REALTIME_REGION` and `AZURE_OPENAI_REALTIME_API_VERSION`
+- Verified: All CLI tools authenticated (Azure CLI, Vercel CLI, GitHub CLI) for Plan 147/148 workflow
+- Documented: Feature flag rollback strategy with default-off state for safe deployment
+- Documented: CSP/proxy baseline with preview and GA domain requirements
+- Verified: ADR 0031 — 25/26 maestri have CHARACTER INTENSITY DIAL (3 via external prompt files)
+- Verified: ADR 0064 — 21 formal professors correct; 5 informal (post-1900) correctly excluded
+- Verified: ADR 0021/0090 — Memory auto-injected at API layer for all characters
+- Verified: ADR 0097 — Model routing via tierService, daily limits via budget-handler
+- Learnings: Inspired by OpenAI "Harness Engineering" article; automated quality gates catch drift faster than code review
+- Documented: `localStorage` for trial-session-id is intentional (cross-tab persistence)
 ## [0.15.0] - 2026-02-08
 
 ### Changed
