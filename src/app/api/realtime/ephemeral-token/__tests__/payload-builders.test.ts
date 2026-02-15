@@ -14,16 +14,16 @@ import {
 describe('GA payload builders', () => {
   describe('buildGAPayload', () => {
     it('should wrap config in session object with type=realtime', () => {
-      const payload = buildGAPayload('gpt-4o-realtime', {});
+      const payload = buildGAPayload('gpt-realtime', {});
 
       expect(payload).toHaveProperty('session');
       const session = payload.session as Record<string, unknown>;
       expect(session.type).toBe('realtime');
-      expect(session.model).toBe('gpt-4o-realtime');
+      expect(session.model).toBe('gpt-realtime');
     });
 
     it('should set voice under session.audio.output.voice', () => {
-      const payload = buildGAPayload('gpt-4o-realtime', { voice: 'coral' });
+      const payload = buildGAPayload('gpt-realtime', { voice: 'coral' });
 
       const session = payload.session as Record<string, unknown>;
       const audio = session.audio as Record<string, Record<string, unknown>>;
@@ -31,7 +31,7 @@ describe('GA payload builders', () => {
     });
 
     it('should default voice to alloy', () => {
-      const payload = buildGAPayload('gpt-4o-realtime', {});
+      const payload = buildGAPayload('gpt-realtime', {});
 
       const session = payload.session as Record<string, unknown>;
       const audio = session.audio as Record<string, Record<string, unknown>>;
@@ -39,7 +39,7 @@ describe('GA payload builders', () => {
     });
 
     it('should include instructions when provided', () => {
-      const payload = buildGAPayload('gpt-4o-realtime', {
+      const payload = buildGAPayload('gpt-realtime', {
         instructions: 'You are Euclide, a math teacher.',
       });
 
@@ -49,7 +49,7 @@ describe('GA payload builders', () => {
 
     it('should include turn_detection in audio.input', () => {
       const turnDetection = { type: 'server_vad', threshold: 0.5 };
-      const payload = buildGAPayload('gpt-4o-realtime', {
+      const payload = buildGAPayload('gpt-realtime', {
         turn_detection: turnDetection,
       });
 
@@ -59,18 +59,18 @@ describe('GA payload builders', () => {
     });
 
     it('should NOT have top-level model field (only inside session)', () => {
-      const payload = buildGAPayload('gpt-4o-realtime', {});
+      const payload = buildGAPayload('gpt-realtime', {});
 
       expect(payload).not.toHaveProperty('model');
-      expect((payload.session as Record<string, unknown>).model).toBe('gpt-4o-realtime');
+      expect((payload.session as Record<string, unknown>).model).toBe('gpt-realtime');
     });
   });
 
   describe('buildPreviewPayload', () => {
     it('should use flat format with model at top level', () => {
-      const payload = buildPreviewPayload('gpt-4o-realtime');
+      const payload = buildPreviewPayload('gpt-realtime');
 
-      expect(payload.model).toBe('gpt-4o-realtime');
+      expect(payload.model).toBe('gpt-realtime');
       expect(payload).not.toHaveProperty('session');
     });
   });
@@ -82,7 +82,7 @@ describe('GA response parsers', () => {
       const result = parseGAResponse({
         value: 'ek_test_token_123',
         expires_at: 1771184786,
-        session: { id: 'sess_abc123', model: 'gpt-4o-realtime' },
+        session: { id: 'sess_abc123', model: 'gpt-realtime' },
       });
 
       expect(result).toEqual({

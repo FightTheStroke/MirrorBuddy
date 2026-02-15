@@ -5,8 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
+
+### Changed
+
+- Azure realtime deployment renamed from `gpt-4o-realtime` to `gpt-realtime` (cosmetic alignment with GA model name, no functional change)
+- Seed catalog deployment names aligned: `gpt-4o-realtime` → `gpt-realtime`, `gpt-4o-realtime-mini` → `gpt-realtime-mini`
 
 ### Added
 
@@ -257,6 +261,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Verified: ADR 0097 — Model routing via tierService, daily limits via budget-handler
 - Learnings: Inspired by OpenAI "Harness Engineering" article; automated quality gates catch drift faster than code review
 - Documented: `localStorage` for trial-session-id is intentional (cross-tab persistence)
+
 ## [0.15.0] - 2026-02-08
 
 ### Changed
