@@ -37,10 +37,36 @@ export const test = base.extend({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          visitorId: 'smoke-test-visitor',
+          sessionId: '00000000-0000-4000-a000-000000000001',
+          visitorId: '00000000-0000-4000-a000-000000000001',
           createdAt: new Date().toISOString(),
+          chatsUsed: 0,
+          chatsRemaining: 10,
+          maxChats: 10,
+          voiceSecondsUsed: 0,
+          voiceSecondsRemaining: 300,
+          maxVoiceSeconds: 300,
+          toolsUsed: 0,
+          toolsRemaining: 10,
+          maxTools: 10,
         }),
       });
+    });
+
+    // Mock onboarding API so home page doesn't redirect to /welcome
+    await page.route('**/api/onboarding', (route) => {
+      if (route.request().method() === 'GET') {
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            onboardingState: { hasCompletedOnboarding: true, currentStep: 'ready' },
+            hasExistingData: true,
+          }),
+        });
+      } else {
+        route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+      }
     });
 
     // Mock tracking endpoints to prevent 401 noise
@@ -49,6 +75,56 @@ export const test = base.extend({
     });
     await page.route('**/api/user/consent', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+    });
+
+    // Mock home page data APIs to prevent 401/500 noise
+    await page.route('**/api/user/trial-status', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ isTrialUser: true }),
+      });
+    });
+    await page.route('**/api/user/settings', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ theme: 'system', provider: 'azure', model: 'gpt-5-mini' }),
+      });
+    });
+    await page.route('**/api/user/profile', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ name: 'Smoke Test', schoolLevel: 'superiore' }),
+      });
+    });
+    await page.route('**/api/progress**', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          xp: 0,
+          level: 1,
+          streak: { current: 0, longest: 0 },
+          mirrorBucks: 0,
+          seasonMirrorBucks: 0,
+          seasonLevel: 1,
+        }),
+      });
+    });
+    await page.route('**/api/profile/last-viewed', (route) => {
+      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
+    });
+    await page.route('**/api/learnings**', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ learnings: [] }),
+      });
+    });
+    await page.route('**/api/conversations**', (route) => {
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     });
 
     // Set consent in localStorage before navigation
@@ -80,6 +156,12 @@ export const test = base.extend({
       {
         name: 'mirrorbuddy-trial-consent',
         value: JSON.stringify({ accepted: true, version: '1.0' }),
+        domain: new URL(PROD_URL).hostname,
+        path: '/',
+      },
+      {
+        name: 'mirrorbuddy-visitor-id',
+        value: '00000000-0000-4000-a000-000000000001',
         domain: new URL(PROD_URL).hostname,
         path: '/',
       },
