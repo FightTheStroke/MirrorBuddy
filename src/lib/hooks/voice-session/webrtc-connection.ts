@@ -157,6 +157,12 @@ export class WebRTCConnection {
   }
 
   private async getEphemeralToken(): Promise<string> {
+    const cachedToken = await this.config.getCachedToken?.();
+    if (cachedToken) {
+      logger.debug('[WebRTC] Using cached ephemeral token');
+      return cachedToken;
+    }
+
     const response = await csrfFetch('/api/realtime/ephemeral-token', {
       method: 'POST',
       body: JSON.stringify({

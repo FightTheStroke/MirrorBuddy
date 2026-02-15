@@ -25,6 +25,30 @@ function createDeferred<T>() {
 }
 
 describe('WebRTCConnection.connect', () => {
+  it('should use cached token when available', async () => {
+    const { csrfFetch } = await import('@/lib/auth');
+    const csrfFetchMock = csrfFetch as ReturnType<typeof vi.fn>;
+    csrfFetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ token: 'network-token' }),
+    });
+
+    const getCachedToken = vi.fn(async () => 'cached-token');
+    const connection = new WebRTCConnection({
+      maestro: { id: 'm1' } as never,
+      connectionInfo: {} as never,
+      getCachedToken,
+    });
+
+    const token = await (
+      connection as unknown as { getEphemeralToken: () => Promise<string> }
+    ).getEphemeralToken();
+
+    expect(token).toBe('cached-token');
+    expect(getCachedToken).toHaveBeenCalledTimes(1);
+    expect(csrfFetchMock).not.toHaveBeenCalled();
+  });
+
   it('should start token fetch and getUserMedia in parallel', async () => {
     const token = createDeferred<string>();
     const media = createDeferred<MediaStream>();
