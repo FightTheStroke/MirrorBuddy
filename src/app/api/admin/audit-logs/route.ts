@@ -8,8 +8,7 @@ import { prisma } from '@/lib/db';
  * Query params: action, userId, adminId, startDate, endDate, page, pageSize
  */
 
-export const revalidate = 0;
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 export const GET = pipe(
   withSentry('/api/admin/audit-logs'),
   withAdmin,
