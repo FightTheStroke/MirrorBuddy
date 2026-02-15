@@ -12,7 +12,7 @@ import { test, expect } from './fixtures';
 
 test.describe('PROD-SMOKE: Accessibility', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/it');
   });
 
   test('Skip-to-content link exists', async ({ page }) => {
@@ -27,23 +27,26 @@ test.describe('PROD-SMOKE: Accessibility', () => {
     const dialog = page.getByRole('dialog', { name: /Accessibilità/i });
     await expect(dialog).toBeVisible();
 
-    // All 7 profiles
-    const profiles = [
-      'Dislessia', 'ADHD', 'Visivo', 'Motorio',
-      'Autismo', 'Uditivo', 'Motorio+',
-    ];
+    const profiles = ['Dislessia', 'ADHD', 'Visivo', 'Autismo', 'Uditivo'];
     for (const profile of profiles) {
       await expect(
-        dialog.getByRole('button', { name: new RegExp(profile) }),
+        dialog.getByRole('button', { name: new RegExp(`Attiva profilo ${profile}`) }),
       ).toBeVisible();
     }
+    // Separate checks for Motorio/Motorio+ to avoid regex collision
+    await expect(
+      dialog.getByRole('button', { name: 'Attiva profilo Motorio', exact: true }),
+    ).toBeVisible();
+    await expect(
+      dialog.getByRole('button', { name: 'Attiva profilo Motorio+', exact: true }),
+    ).toBeVisible();
   });
 
   test('Dyslexia profile activates font and voice', async ({ page }) => {
     await page.getByRole('button', { name: /Impostazioni accessibilità/i }).click();
 
     const dialog = page.getByRole('dialog', { name: /Accessibilità/i });
-    await dialog.getByRole('button', { name: /Dislessia/i }).click();
+    await dialog.getByRole('button', { name: /Attiva profilo Dislessia/i }).click();
 
     // Font switch should auto-enable
     const fontSwitch = dialog.getByRole('switch', { name: /Font dislessia/i });
@@ -51,14 +54,11 @@ test.describe('PROD-SMOKE: Accessibility', () => {
 
     // Voice selector should change from default
     const voiceSelect = dialog.getByRole('combobox', { name: /voce/i });
-    const selectedVoice = await voiceSelect.inputValue();
-    expect(selectedVoice).not.toBe('');
+    await expect(voiceSelect).not.toHaveValue('');
 
     // Reset
     await dialog.getByRole('button', { name: /Ripristina/i }).click();
-    await expect(
-      dialog.getByRole('switch', { name: /Font dislessia/i }),
-    ).not.toBeChecked();
+    await expect(fontSwitch).not.toBeChecked();
   });
 
   test('Quick settings toggles work', async ({ page }) => {
@@ -66,17 +66,14 @@ test.describe('PROD-SMOKE: Accessibility', () => {
 
     const dialog = page.getByRole('dialog', { name: /Accessibilità/i });
 
-    // Toggle large text
     const largeText = dialog.getByRole('switch', { name: /Testo grande/i });
     await largeText.click();
     await expect(largeText).toBeChecked();
 
-    // Toggle high contrast
     const highContrast = dialog.getByRole('switch', { name: /Alto contrasto/i });
     await highContrast.click();
     await expect(highContrast).toBeChecked();
 
-    // Toggle reduced motion
     const reducedMotion = dialog.getByRole('switch', { name: /Riduci animazioni/i });
     await reducedMotion.click();
     await expect(reducedMotion).toBeChecked();
@@ -89,17 +86,7 @@ test.describe('PROD-SMOKE: Accessibility', () => {
   });
 
   test('Page has proper ARIA landmarks', async ({ page }) => {
-    // Enter trial to get full layout
-    const trialBtn = page.getByRole('button', { name: /Prova gratis/i });
-    if (await trialBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await trialBtn.click();
-      const tos = page.getByRole('button', { name: /Accetta e Continua/i });
-      if (await tos.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await tos.click();
-      }
-    }
-
-    // Main landmarks
+    // Trial dashboard auto-loads with full layout
     await expect(page.getByRole('main').first()).toBeVisible();
     await expect(page.getByRole('banner').first()).toBeVisible();
     await expect(page.getByRole('complementary').first()).toBeVisible();

@@ -12,10 +12,16 @@
  * - Validate accessibility features
  */
 
+/* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect } from '@playwright/test';
+
+export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 
 export const test = base.extend({
   page: async ({ page, context }, use) => {
+    // Force Italian locale so selectors are predictable
+    await context.setExtraHTTPHeaders({ 'Accept-Language': 'it-IT,it;q=0.9' });
+
     // Mock TOS API to bypass TosGateProvider
     await page.route('**/api/tos', (route) => {
       route.fulfill({
@@ -70,12 +76,11 @@ export const test = base.extend({
     });
 
     // Set trial consent cookie
-    const baseUrl = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
     await context.addCookies([
       {
         name: 'mirrorbuddy-trial-consent',
         value: JSON.stringify({ accepted: true, version: '1.0' }),
-        domain: new URL(baseUrl).hostname,
+        domain: new URL(PROD_URL).hostname,
         path: '/',
       },
     ]);
