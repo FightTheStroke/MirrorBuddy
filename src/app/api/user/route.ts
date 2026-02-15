@@ -1,22 +1,22 @@
 // ============================================================================
 // API ROUTE: User management
-// GET: Get or create current user (single-user local mode)
+// GET: Get current user (authenticated) or create user (dev/local mode only)
+// SECURITY: In production, unauthenticated requests return 401 (ADR 0151)
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/server";
-import { signCookieValue } from "@/lib/auth/server";
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from "@/lib/auth/server";
-import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
-import { assignBaseTierToNewUser } from "@/lib/tier/server";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/server';
+import { signCookieValue } from '@/lib/auth/server';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from '@/lib/auth/server';
+import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
+import { assignBaseTierToNewUser } from '@/lib/tier/server';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
-export const GET = pipe(withSentry("/api/user"))(async () => {
+export const GET = pipe(withSentry('/api/user'))(async () => {
   const auth = await validateAuth();
 
   if (auth.authenticated && auth.userId) {
@@ -35,10 +35,16 @@ export const GET = pipe(withSentry("/api/user"))(async () => {
     }
 
     // User authenticated but not found (shouldn't happen in normal flow)
-    logger.warn("Authenticated user not found", { userId: auth.userId });
+    logger.warn('Authenticated user not found', { userId: auth.userId });
   }
 
-  // No authenticated user - create new user for local mode
+  // In production, require authentication — never auto-create users
+  // This prevents bots/crawlers from polluting the DB with phantom records
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Authentication required', guest: true }, { status: 401 });
+  }
+
+  // Dev/local mode: create new user automatically
   const user = await prisma.user.create({
     data: {
       profile: { create: {} },
@@ -56,8 +62,8 @@ export const GET = pipe(withSentry("/api/user"))(async () => {
   await assignBaseTierToNewUser(user.id);
 
   // Trigger admin counts update (non-blocking)
-  calculateAndPublishAdminCounts("user-signup").catch((err) =>
-    logger.warn("Failed to publish admin counts on user signup", {
+  calculateAndPublishAdminCounts('user-signup').catch((err) =>
+    logger.warn('Failed to publish admin counts on user signup', {
       error: String(err),
     }),
   );
@@ -67,21 +73,22 @@ export const GET = pipe(withSentry("/api/user"))(async () => {
   const cookieStore = await cookies();
 
   // Server-side auth cookie (httpOnly, signed)
+  // This path only runs in dev/local mode (production returns 401 above)
   cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: false,
+    sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 365,
-    path: "/",
+    path: '/',
   });
 
   // Client-readable cookie (for client-side userId access)
   cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: false,
+    sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 365,
-    path: "/",
+    path: '/',
   });
 
   return NextResponse.json(user);

@@ -1,17 +1,18 @@
 /**
- * Tests for GET /api/user - User creation with Base tier subscription
- * Plan 073: T4-07 - Update registration flow: default to Base tier
+ * Tests for GET /api/user - User management with production security guard
+ * ADR 0151: In production, unauthenticated requests return 401 (no auto-creation)
+ * Plan 073: T4-07 - Update registration flow: default to Base tier (dev mode)
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { GET } from "../route";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { GET } from '../route';
 
 // Mock Prisma and helper
 const mockUserCreate = vi.fn();
 const mockUserFindUnique = vi.fn();
 const mockAssignBaseTierToNewUser = vi.fn();
 
-vi.mock("@/lib/db", () => ({
+vi.mock('@/lib/db', () => ({
   prisma: {
     user: {
       create: () => mockUserCreate(),
@@ -21,29 +22,28 @@ vi.mock("@/lib/db", () => ({
   isDatabaseNotInitialized: vi.fn(() => false),
 }));
 
-vi.mock("@/lib/tier/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+vi.mock('@/lib/tier/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tier/server')>();
   return {
     ...actual,
-    assignBaseTierToNewUser: (userId: string) =>
-      mockAssignBaseTierToNewUser(userId),
+    assignBaseTierToNewUser: (userId: string) => mockAssignBaseTierToNewUser(userId),
   };
 });
 
 // Mock dependencies
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAuth: vi.fn(),
     signCookieValue: vi.fn(() => ({
-      signed: "signed-value",
-      raw: "raw-value",
+      signed: 'signed-value',
+      raw: 'raw-value',
     })),
   };
 });
 
-vi.mock("next/headers", () => ({
+vi.mock('next/headers', () => ({
   cookies: vi.fn(() =>
     Promise.resolve({
       set: vi.fn(),
@@ -51,11 +51,11 @@ vi.mock("next/headers", () => ({
   ),
 }));
 
-vi.mock("@/lib/helpers/publish-admin-counts", () => ({
+vi.mock('@/lib/helpers/publish-admin-counts', () => ({
   calculateAndPublishAdminCounts: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -70,98 +70,148 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-describe("GET /api/user - Base tier assignment on registration", () => {
+describe('GET /api/user', () => {
+  const originalEnv = process.env.NODE_ENV;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // @ts-expect-error -- NODE_ENV override for testing
+    process.env.NODE_ENV = 'test';
   });
 
-  it("should create UserSubscription with Base tier when new user registers", async () => {
-    const { validateAuth } = await import("@/lib/auth/server");
-    vi.mocked(validateAuth).mockResolvedValue({
-      authenticated: false,
-      userId: null,
-    });
-
-    const mockUser = {
-      id: "user-123",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      profile: {},
-      settings: {},
-      progress: {},
-    };
-
-    mockUserCreate.mockResolvedValue(mockUser);
-    mockAssignBaseTierToNewUser.mockResolvedValue({
-      id: "sub-123",
-      tierId: "tier-base-123",
-    });
-
-    // Call the endpoint
-    const request = new Request("http://localhost:3000/api/user");
-    const response = (await GET(request as any)) as unknown as Response;
-    const data = await response.json();
-
-    // Verify user was created
-    expect(data).toHaveProperty("id");
-    expect(mockUserCreate).toHaveBeenCalled();
-    expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
+  afterEach(() => {
+    // @ts-expect-error -- NODE_ENV restore
+    process.env.NODE_ENV = originalEnv;
   });
 
-  it("should not create duplicate subscription if user already has one", async () => {
-    const { validateAuth } = await import("@/lib/auth/server");
+  describe('Production security guard (ADR 0151)', () => {
+    it('should return 401 for unauthenticated requests in production', async () => {
+      // @ts-expect-error -- NODE_ENV override for testing
+      process.env.NODE_ENV = 'production';
 
-    const mockUser = {
-      id: "user-existing",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      profile: {},
-      settings: {},
-      progress: {},
-    };
+      const { validateAuth } = await import('@/lib/auth/server');
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: false,
+        userId: null,
+      });
 
-    vi.mocked(validateAuth).mockResolvedValue({
-      authenticated: true,
-      userId: mockUser.id,
+      const request = new Request('http://localhost:3000/api/user');
+      const response = (await GET(request as any)) as unknown as Response;
+
+      expect(response.status).toBe(401);
+      const data = await response.json();
+      expect(data.guest).toBe(true);
+      expect(mockUserCreate).not.toHaveBeenCalled();
     });
 
-    mockUserFindUnique.mockResolvedValue(mockUser);
+    it('should return user data for authenticated requests in production', async () => {
+      // @ts-expect-error -- NODE_ENV override for testing
+      process.env.NODE_ENV = 'production';
 
-    // Call the endpoint
-    const request = new Request("http://localhost:3000/api/user");
-    await GET(request as any);
+      const { validateAuth } = await import('@/lib/auth/server');
+      const mockUser = {
+        id: 'user-prod',
+        profile: {},
+        settings: {},
+        progress: {},
+      };
 
-    // Verify assignBaseTier was not called for existing users
-    expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: true,
+        userId: mockUser.id,
+      });
+      mockUserFindUnique.mockResolvedValue(mockUser);
+
+      const request = new Request('http://localhost:3000/api/user');
+      const response = (await GET(request as any)) as unknown as Response;
+
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.id).toBe('user-prod');
+    });
   });
 
-  it("should handle missing Base tier gracefully", async () => {
-    const { validateAuth } = await import("@/lib/auth/server");
-    vi.mocked(validateAuth).mockResolvedValue({
-      authenticated: false,
-      userId: null,
+  describe('Dev mode - Base tier assignment on registration', () => {
+    it('should create user with Base tier in dev mode', async () => {
+      const { validateAuth } = await import('@/lib/auth/server');
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: false,
+        userId: null,
+      });
+
+      const mockUser = {
+        id: 'user-123',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        profile: {},
+        settings: {},
+        progress: {},
+      };
+
+      mockUserCreate.mockResolvedValue(mockUser);
+      mockAssignBaseTierToNewUser.mockResolvedValue({
+        id: 'sub-123',
+        tierId: 'tier-base-123',
+      });
+
+      const request = new Request('http://localhost:3000/api/user');
+      const response = (await GET(request as any)) as unknown as Response;
+      const data = await response.json();
+
+      expect(data).toHaveProperty('id');
+      expect(mockUserCreate).toHaveBeenCalled();
+      expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
     });
 
-    const mockUser = {
-      id: "user-456",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      profile: {},
-      settings: {},
-      progress: {},
-    };
+    it('should not create duplicate subscription for existing user', async () => {
+      const { validateAuth } = await import('@/lib/auth/server');
+      const mockUser = {
+        id: 'user-existing',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        profile: {},
+        settings: {},
+        progress: {},
+      };
 
-    mockUserCreate.mockResolvedValue(mockUser);
-    mockAssignBaseTierToNewUser.mockResolvedValue(null); // Null indicates tier assignment failed
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: true,
+        userId: mockUser.id,
+      });
+      mockUserFindUnique.mockResolvedValue(mockUser);
 
-    // Call the endpoint - should not crash
-    const request = new Request("http://localhost:3000/api/user");
-    const response = (await GET(request as any)) as unknown as Response;
-    const data = await response.json();
+      const request = new Request('http://localhost:3000/api/user');
+      await GET(request as any);
 
-    // Verify user was created even without subscription
-    expect(data).toHaveProperty("id");
-    expect(mockUserCreate).toHaveBeenCalled();
-    expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
+      expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
+    });
+
+    it('should handle missing Base tier gracefully', async () => {
+      const { validateAuth } = await import('@/lib/auth/server');
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: false,
+        userId: null,
+      });
+
+      const mockUser = {
+        id: 'user-456',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        profile: {},
+        settings: {},
+        progress: {},
+      };
+
+      mockUserCreate.mockResolvedValue(mockUser);
+      mockAssignBaseTierToNewUser.mockResolvedValue(null);
+
+      const request = new Request('http://localhost:3000/api/user');
+      const response = (await GET(request as any)) as unknown as Response;
+      const data = await response.json();
+
+      expect(data).toHaveProperty('id');
+      expect(mockUserCreate).toHaveBeenCalled();
+      expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
+    });
   });
 });
