@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { withRateLimit } from '@/lib/api/middlewares/with-rate-limit';
+import { RATE_LIMITS } from '@/lib/rate-limit';
 import { logAdminAction } from '@/lib/admin/audit-service';
 import {
   activateMaintenanceWindow,
@@ -29,6 +31,7 @@ export const POST = pipe(
   withSentry('/api/admin/maintenance/toggle'),
   withCSRF,
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_MUTATION),
 )(async (ctx) => {
   let body: ToggleMaintenanceBody;
 

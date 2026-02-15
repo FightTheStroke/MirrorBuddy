@@ -4,6 +4,8 @@
 
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
 
 
@@ -11,6 +13,7 @@ export const revalidate = 0;
 export const GET = pipe(
   withSentry("/api/admin/tiers"),
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_MUTATION),
 )(async (_ctx) => {
   const tiers = await prisma.tierDefinition.findMany({
     orderBy: { sortOrder: "asc" },
@@ -22,6 +25,7 @@ export const POST = pipe(
   withSentry("/api/admin/tiers"),
   withCSRF,
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_MUTATION),
 )(async (ctx) => {
   const body = await ctx.req.json();
   const tier = await prisma.tierDefinition.create({

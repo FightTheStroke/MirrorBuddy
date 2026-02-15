@@ -8,6 +8,8 @@
 
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
@@ -106,6 +108,7 @@ export const DELETE = pipe(
   withSentry("/api/admin/purge-staging-data"),
   withCSRF,
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_DESTRUCTIVE),
 )(async (
   ctx,
 ): Promise<NextResponse<{ success: boolean; deleted: number } | { error: string }>> => {

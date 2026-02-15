@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
@@ -25,6 +27,7 @@ export const POST = pipe(
   withSentry("/api/admin/users/bulk/tier"),
   withCSRF,
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_MUTATION),
 )(async (ctx) => {
   const body = await ctx.req.json();
   const { userIds, tierId, notes } = body;

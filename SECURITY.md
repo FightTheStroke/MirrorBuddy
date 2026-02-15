@@ -82,6 +82,8 @@ Instead, please report vulnerabilities through one of these channels:
 | TTS                | 15 req/min   | TTS cost control            |
 | General API        | 60 req/min   | DDoS mitigation             |
 | Web Vitals         | 60 req/min   | Telemetry flood prevention  |
+| Admin Mutations    | 30 req/min   | Compromised admin abuse     |
+| Admin Destructive  | 5 req/hour   | Bulk delete/purge abuse     |
 
 > **Note:** Production uses Redis (Upstash) for distributed rate limiting. Development uses in-memory store.
 

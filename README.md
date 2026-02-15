@@ -146,6 +146,22 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 **→ See detailed feature documentation in [docs/claude/](docs/claude/)**
 
+### How It Works
+
+```mermaid
+graph LR
+    Student["🧑‍🎓 Student"] --> Input["Chat or Voice"]
+    Input --> AI["🤖 AI Engine<br/>Azure OpenAI"]
+    AI --> Safety["🛡️ Safety Layer<br/>5-layer protection"]
+    Safety --> Character["🎭 38 Characters<br/>Maestri, Coaches, Buddies"]
+    Character --> Tools["🧰 14 Tools<br/>Quiz, Mindmap, Flashcard..."]
+    Tools --> Response["📚 Personalized<br/>Response"]
+    Response --> Student
+    
+    AI --> RAG["📖 RAG<br/>Student Materials"]
+    RAG --> AI
+```
+
 ---
 
 ## Built for Every Mind

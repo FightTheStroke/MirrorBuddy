@@ -400,6 +400,19 @@ export const RATE_LIMITS = {
     maxRequests: 60,
     windowMs: 60 * 1000,
   },
+
+  // ========== ADMIN ENDPOINTS (Prevent abuse from compromised accounts) ==========
+
+  /** Admin mutations: 30 requests per minute (tier changes, user management) */
+  ADMIN_MUTATION: {
+    maxRequests: 30,
+    windowMs: 60 * 1000,
+  },
+  /** Admin destructive operations: 5 requests per hour (deletions, purges) */
+  ADMIN_DESTRUCTIVE: {
+    maxRequests: 5,
+    windowMs: 60 * 60 * 1000,
+  },
 } as const;
 
 /**

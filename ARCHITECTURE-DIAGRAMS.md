@@ -37,8 +37,11 @@
 22. [Component Structure](#22-component-structure)
 23. [State Management](#23-state-management)
 24. [Deployment Flow](#24-deployment-flow)
-25. [ADR Index](#25-adr-index)
-26. [Voice GA + Unified Conversation (W7)](#26-voice-ga--unified-conversation-w7)
+25. [Gamification System](#25-gamification-system)
+26. [Payment Flow (Stripe)](#26-payment-flow-stripe)
+27. [Scheduler & Notifications](#27-scheduler--notifications)
+28. [ADR Index](#28-adr-index)
+29. [Voice GA + Unified Conversation (W7)](#29-voice-ga--unified-conversation-w7)
 
 ---
 
@@ -3001,7 +3004,205 @@ graph TB
 
 ---
 
-## 25. ADR Index
+## 25. Gamification System
+
+### 25.1 Points & Progression Flow
+
+```mermaid
+graph TB
+    subgraph Triggers["Activity Triggers"]
+        Chat["Chat Message"]
+        Quiz["Quiz Completed"]
+        Mind["Mindmap Created"]
+        Flash["Flashcard Review"]
+        Study["Study Time"]
+    end
+
+    subgraph Core["Gamification Engine"]
+        Award["awardPoints<br/>userId, points, reason"]
+        Streak["Streak Multiplier<br/>7+ days: 1.5x<br/>3-6 days: 1.25x<br/>1-2 days: 1.1x"]
+        Level["Level Calc<br/>1000 pts per level<br/>Max 100 per season"]
+        Tier["Tier Assignment<br/>Principiante to Leggenda"]
+        Achieve["checkAchievements<br/>50+ unlockable"]
+    end
+
+    subgraph Persistence["Data Layer"]
+        UG["UserGamification<br/>totalPoints, seasonPoints,<br/>mirrorBucks, level, tier"]
+        DS["DailyStreak<br/>currentStreak, longestStreak,<br/>todayMinutes, goalMet"]
+        PT["PointsTransaction<br/>Audit trail with multiplier"]
+        UA["UserAchievement<br/>unlockedAt, progress"]
+    end
+
+    subgraph Seasons["Season System"]
+        Aut["Autunno Sep-Nov"]
+        Inv["Inverno Dec-Feb"]
+        Pri["Primavera Mar-May"]
+        Est["Estate Jun-Aug"]
+    end
+
+    Chat --> Award
+    Quiz --> Award
+    Mind --> Award
+    Flash --> Award
+    Study --> Award
+
+    Award --> Streak
+    Streak --> Level
+    Level --> Tier
+    Level --> Achieve
+    
+    Award --> UG
+    Award --> PT
+    Streak --> DS
+    Achieve --> UA
+
+    Seasons -.->|Reset seasonPoints| UG
+```
+
+### 25.2 Streak & Achievement System
+
+```mermaid
+stateDiagram-v2
+    [*] --> NoStreak: First visit
+    NoStreak --> Day1: Study activity
+    Day1 --> Day2: Next day activity
+    Day2 --> Day3: Next day activity
+    Day3 --> Streak7: Continue daily
+    Streak7 --> Streak30: Continue daily
+    Streak30 --> Streak100: Continue daily
+    
+    Day1 --> NoStreak: Missed day
+    Day2 --> NoStreak: Missed day
+    Day3 --> NoStreak: Missed day
+    Streak7 --> NoStreak: Missed day
+    Streak30 --> NoStreak: Missed day
+    
+    state "Achievements Unlocked" as Ach {
+        Day1: Multiplier 1.1x
+        Day3: Studente Costante 100pts
+        Streak7: Studente Dedicato 250pts
+        Streak30: Inarrestabile 1000pts
+        Streak100: Leggenda 5000pts
+    }
+```
+
+---
+
+## 26. Payment Flow (Stripe)
+
+### 26.1 Subscription Lifecycle
+
+```mermaid
+graph TD
+    subgraph User_Journey["User Journey"]
+        Anon["Anonymous Visitor"]
+        Trial["Trial Tier<br/>10 chats, 3 maestri"]
+        Base["Base Tier<br/>50 chats, 25 maestri"]
+        Pro["Pro Tier<br/>Unlimited, 26 maestri"]
+    end
+
+    subgraph Checkout["Stripe Checkout"]
+        CreateSession["POST /api/checkout<br/>createCheckoutSession"]
+        StripeUI["Stripe Hosted Page<br/>Payment Collection"]
+        WebhookComplete["Webhook:<br/>checkout.session.completed"]
+    end
+
+    subgraph Lifecycle["Subscription Management"]
+        Portal["POST /api/billing/portal<br/>Stripe Customer Portal"]
+        SubUpdate["Webhook:<br/>subscription.updated"]
+        SubDelete["Webhook:<br/>subscription.deleted"]
+    end
+
+    subgraph Dunning["Payment Failure"]
+        PayFail["Webhook:<br/>invoice.payment_failed"]
+        Grace["PAUSED Status<br/>7-day grace period"]
+        Downgrade["Cron: processGracePeriod<br/>Downgrade to Base"]
+    end
+
+    subgraph Data["Persistence"]
+        UserSub["UserSubscription<br/>tierId, stripeCustomerId,<br/>status, expiresAt"]
+        TierDef["TierDefinition<br/>code, stripePriceId,<br/>monthlyPriceEur"]
+    end
+
+    Anon -->|Register| Base
+    Base -->|Click Upgrade| CreateSession
+    CreateSession --> StripeUI
+    StripeUI -->|Payment OK| WebhookComplete
+    WebhookComplete -->|handleCheckoutCompleted| Pro
+
+    Pro --> Portal
+    Pro -->|Cancel| SubDelete
+    SubDelete -->|handleSubscriptionDeleted| Base
+
+    Pro -->|Payment fails| PayFail
+    PayFail -->|handlePaymentFailed| Grace
+    Grace -->|7 days expire| Downgrade
+    Downgrade --> Base
+
+    WebhookComplete --> UserSub
+    SubUpdate --> UserSub
+    UserSub --> TierDef
+```
+
+---
+
+## 27. Scheduler & Notifications
+
+### 27.1 Study Scheduling System
+
+```mermaid
+graph TB
+    subgraph API["API Endpoints"]
+        GetSched["GET /api/scheduler<br/>Schedule + sessions + prefs"]
+        PostSched["POST /api/scheduler<br/>Create session or reminder"]
+        CheckDue["POST /api/scheduler/check-due<br/>Trigger notifications"]
+    end
+
+    subgraph Models["Data Model"]
+        SS["StudySchedule<br/>userId, preferences,<br/>quietHours"]
+        Sess["ScheduledSession<br/>dayOfWeek, time,<br/>duration, maestroId,<br/>reminderOffset"]
+        Remind["CustomReminder<br/>datetime, message,<br/>repeat pattern"]
+    end
+
+    subgraph CheckLogic["Check-Due Logic"]
+        ChkFlash["Flashcard Due<br/>nextReview lte now<br/>threshold: 3+ cards"]
+        ChkSession["Session Due<br/>dayOfWeek = today<br/>within reminderOffset"]
+        ChkReminder["Reminder Due<br/>datetime within 5min"]
+        ChkStreak["Streak at Risk<br/>No study today<br/>warningTime match"]
+    end
+
+    subgraph Notify["Notification System"]
+        NotifDB["Notification<br/>type, priority,<br/>scheduledFor, sentAt"]
+        Melissa["Melissa Voice Templates<br/>Friendly reminder messages"]
+        Push["PushSubscription<br/>sendPushToUser"]
+    end
+
+    GetSched --> SS
+    GetSched --> Sess
+    PostSched --> Sess
+    PostSched --> Remind
+
+    CheckDue --> ChkFlash
+    CheckDue --> ChkSession
+    CheckDue --> ChkReminder
+    CheckDue --> ChkStreak
+
+    ChkFlash --> NotifDB
+    ChkSession --> NotifDB
+    ChkReminder --> NotifDB
+    ChkStreak --> NotifDB
+
+    NotifDB --> Melissa
+    NotifDB --> Push
+
+    SS -->|preferences| Sess
+    Sess -->|reminderOffset| ChkSession
+    Remind -->|datetime| ChkReminder
+```
+
+---
+
+## 28. ADR Index
 
 ### 25.1 Architecture Decision Records
 
@@ -3063,7 +3264,7 @@ graph TB
 
 ---
 
-## 26. Voice GA + Unified Conversation (W7)
+## 29. Voice GA + Unified Conversation (W7)
 
 ```mermaid
 sequenceDiagram

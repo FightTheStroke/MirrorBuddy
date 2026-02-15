@@ -12,6 +12,8 @@
 
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
@@ -23,6 +25,7 @@ export const DELETE = pipe(
   withSentry("/api/admin/cleanup-users"),
   withCSRF,
   withAdmin,
+  withRateLimit(RATE_LIMITS.ADMIN_DESTRUCTIVE),
 )(async (ctx) => {
   const isDryRun = ctx.req.nextUrl.searchParams.get("dryRun") === "true";
 
