@@ -1,6 +1,8 @@
 # Codex Task Delegation Template
 
-## Instructions for the Codex Agent
+<!-- v2.0.0 (2026-02-15) -->
+
+## Instructions for the Codex Agent (GPT-5.3-Codex)
 
 You are executing a single task from a plan. Follow these rules EXACTLY.
 

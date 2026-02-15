@@ -3,6 +3,7 @@ name: 'execute'
 description: 'Execute plan tasks with TDD workflow (RED-GREEN-REFACTOR), drift detection, and validation.'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
 model: ['GPT-5.3-Codex']
+version: '2.0.0'
 ---
 
 TDD task executor for MirrorBuddy.

@@ -2,7 +2,7 @@
 name: mirrorbuddy-hardening-checks
 description: Production hardening validation for MirrorBuddy releases. Used by app-release-manager.
 tools: ['Read', 'Grep', 'Glob', 'Bash', 'Task']
-model: opus
+model: claude-opus-4.6
 memory: project
 maxTurns: 20
 version: '1.1.0'

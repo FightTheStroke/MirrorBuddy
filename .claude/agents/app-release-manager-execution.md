@@ -1,7 +1,7 @@
 ---
 name: app-release-manager-execution
 description: Execution phases (3-5) for app-release-manager. Reference module.
-model: opus
+model: claude-opus-4.6
 version: '3.3.0'
 ---
 

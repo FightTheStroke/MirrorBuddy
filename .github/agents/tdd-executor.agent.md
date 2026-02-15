@@ -2,7 +2,8 @@
 name: 'tdd-executor'
 description: 'TDD task executor. Writes failing tests first, implements, validates. Use for feature development.'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
-model: ['Claude Opus 4.6', 'GPT-4o']
+model: ['Claude Opus 4.6', 'GPT-5.3-Codex']
+version: '2.0.0'
 ---
 
 Strict RED-GREEN-REFACTOR TDD for MirrorBuddy.

@@ -1,5 +1,7 @@
 # Copilot Instructions — MirrorBuddy
 
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
+
 AI education platform: 26 tutor characters, voice, FSRS flashcards, mind maps, quizzes. Students with dyslexia, ADHD, autism, cerebral palsy.
 
 ## Pre-Commit Checklist (MANDATORY)
@@ -59,5 +61,3 @@ Next.js 16 App Router · TS strict · React 19 · Tailwind 4 · Zustand 5 · Pos
 Path-matched files in `.github/instructions/` auto-load:
 
 cookies, tier, testing, compliance, accessibility, admin, proxy, i18n, e2e
-
-<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->

@@ -3,6 +3,7 @@ name: 'planner'
 description: 'Create wave-based execution plans with task decomposition from F-xx requirements. Uses plan-db.sh.'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
 model: ['Claude Opus 4.6']
+version: '2.0.0'
 ---
 
 Transform F-xx requirements into wave-based plans.

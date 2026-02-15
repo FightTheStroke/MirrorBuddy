@@ -3,6 +3,7 @@ name: 'strategic-planner'
 description: 'Strategic planner for large initiatives. Decomposes complex goals into multi-phase wave-based plans.'
 tools: ['search/codebase', 'read']
 model: ['Claude Opus 4.6']
+version: '2.0.0'
 ---
 
 Decompose large initiatives (multi-week, cross-cutting) into phased plans.

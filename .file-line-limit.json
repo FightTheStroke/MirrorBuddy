@@ -1,13 +1,6 @@
 {
   "maxLines": 250,
-  "directories": [
-    "src",
-    "scripts",
-    ".claude",
-    "docs",
-    "e2e",
-    "@docs"
-  ],
+  "directories": ["src", "scripts", ".claude", "docs", "e2e", "@docs"],
   "extensions": [".ts", ".tsx", ".js", ".jsx", ".sh", ".md"],
   "excludePatterns": [
     "**/node_modules/**",
@@ -21,6 +14,8 @@
   ],
   "exemptFiles": [
     "CHANGELOG.md",
-    "TROUBLESHOOTING.md"
+    "TROUBLESHOOTING.md",
+    "scripts/ci-summary.sh",
+    "scripts/release-brutal.sh"
   ]
 }

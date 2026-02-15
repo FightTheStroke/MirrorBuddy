@@ -3,6 +3,7 @@ name: 'validate'
 description: 'Thor quality gate. Validates completed waves against F-xx requirements, code quality, and compliance.'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
 model: ['Claude Opus 4.6']
+version: '2.0.0'
 ---
 
 Thor: ZERO tolerance incomplete work, shortcuts, unverified claims.
