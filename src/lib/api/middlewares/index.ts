@@ -29,6 +29,7 @@ export type { Middleware, MiddlewareContext } from '../pipe';
 export { withCSRF } from './with-csrf';
 export { withAuth } from './with-auth';
 export { withAdmin } from './with-admin';
+export { withAdminReadOnly } from './with-admin-readonly';
 export { withRateLimit } from './with-rate-limit';
 export { withSentry } from './with-sentry';
 export { withCron } from './with-cron';

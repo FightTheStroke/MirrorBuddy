@@ -22,6 +22,7 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
     ...actual,
     validateAuth: vi.fn(),
     validateAdminAuth: vi.fn(),
+    validateAdminReadOnlyAuth: vi.fn(),
   };
 });
 
@@ -196,6 +197,43 @@ describe('Middleware modules', () => {
 
       const data = await response.json();
       expect(data).toEqual({ error: 'Forbidden: admin access required' });
+    });
+  });
+
+  describe('F-04b: withAdminReadOnly', () => {
+    it('should allow readonly admin access', async () => {
+      const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
+      const { withAdminReadOnly } = await import('../with-admin-readonly');
+
+      vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
+        authenticated: true,
+        userId: 'readonly-admin-123',
+        canAccessAdminReadOnly: true,
+      });
+
+      const response = await withAdminReadOnly(mockContext, mockNext);
+
+      expect(validateAdminReadOnlyAuth).toHaveBeenCalled();
+      expect(mockContext.userId).toBe('readonly-admin-123');
+      expect(mockNext).toHaveBeenCalled();
+      expect(response.status).toBe(200);
+    });
+
+    it('should return 403 when readonly admin access is denied', async () => {
+      const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
+      const { withAdminReadOnly } = await import('../with-admin-readonly');
+
+      vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
+        authenticated: true,
+        userId: 'user-123',
+        canAccessAdminReadOnly: false,
+      });
+
+      const response = await withAdminReadOnly(mockContext, mockNext);
+
+      expect(validateAdminReadOnlyAuth).toHaveBeenCalled();
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(response.status).toBe(403);
     });
   });
 

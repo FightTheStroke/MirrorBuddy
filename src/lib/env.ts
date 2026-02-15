@@ -3,22 +3,18 @@
 // Fail-fast validation of critical environment variables at bootstrap
 // ============================================================================
 
-import { z } from "zod";
-import { logger } from "@/lib/logger";
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const isProduction =
-  (process.env.NODE_ENV === "production" || process.env.VERCEL === "1") &&
-  process.env.E2E_TESTS !== "1";
+  (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') &&
+  process.env.E2E_TESTS !== '1';
 
 // Base schema - required in all environments
 const baseEnvSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
-  DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  SESSION_SECRET: z
-    .string()
-    .min(32, "SESSION_SECRET must be at least 32 characters"),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  SESSION_SECRET: z.string().min(32, 'SESSION_SECRET must be at least 32 characters'),
 });
 
 // Production-only requirements
@@ -30,16 +26,13 @@ const productionEnvSchema = baseEnvSchema.extend({
   AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: z.string().optional(),
   // Token encryption (required for OAuth features)
-  TOKEN_ENCRYPTION_KEY: z
-    .string()
-    .min(32, "TOKEN_ENCRYPTION_KEY must be at least 32 characters"),
+  TOKEN_ENCRYPTION_KEY: z.string().min(32, 'TOKEN_ENCRYPTION_KEY must be at least 32 characters'),
   // Cron job security
-  CRON_SECRET: z.string().min(32, "CRON_SECRET must be at least 32 characters"),
+  CRON_SECRET: z.string().min(32, 'CRON_SECRET must be at least 32 characters'),
   // Admin credentials
-  ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email"),
-  ADMIN_PASSWORD: z
-    .string()
-    .min(8, "ADMIN_PASSWORD must be at least 8 characters"),
+  ADMIN_EMAIL: z.string().email('ADMIN_EMAIL must be a valid email'),
+  ADMIN_PASSWORD: z.string().min(8, 'ADMIN_PASSWORD must be at least 8 characters'),
+  ADMIN_READONLY_EMAIL: z.string().email('ADMIN_READONLY_EMAIL must be a valid email').optional(),
 });
 
 // Development schema - more lenient
@@ -51,6 +44,7 @@ const developmentEnvSchema = baseEnvSchema.extend({
   CRON_SECRET: z.string().optional(),
   ADMIN_EMAIL: z.string().optional(),
   ADMIN_PASSWORD: z.string().optional(),
+  ADMIN_READONLY_EMAIL: z.string().optional(),
 });
 
 /**
@@ -64,26 +58,24 @@ export function validateEnv(): void {
 
   if (!result.success) {
     const errors = result.error.issues
-      .map((issue) => `  - ${issue.path.join(".")}: ${issue.message}`)
-      .join("\n");
+      .map((issue) => `  - ${issue.path.join('.')}: ${issue.message}`)
+      .join('\n');
 
     throw new Error(
       `Environment validation failed:\n${errors}\n\n` +
-        "Check your .env file or environment variables.",
+        'Check your .env file or environment variables.',
     );
   }
 
   // Additional production checks
   if (isProduction) {
-    const hasAzure =
-      process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT;
+    const hasAzure = process.env.AZURE_OPENAI_API_KEY && process.env.AZURE_OPENAI_ENDPOINT;
     const hasOllama = process.env.OLLAMA_URL;
 
     if (!hasAzure && !hasOllama) {
-      logger.warn(
-        "No AI provider configured. Set AZURE_OPENAI_* or OLLAMA_URL.",
-        { component: "env" },
-      );
+      logger.warn('No AI provider configured. Set AZURE_OPENAI_* or OLLAMA_URL.', {
+        component: 'env',
+      });
     }
   }
 }
@@ -94,10 +86,7 @@ export function validateEnv(): void {
  */
 export const env = {
   get NODE_ENV() {
-    return (process.env.NODE_ENV || "development") as
-      | "development"
-      | "production"
-      | "test";
+    return (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test';
   },
   get isProduction() {
     return isProduction;
@@ -122,5 +111,8 @@ export const env = {
   },
   get ADMIN_PASSWORD() {
     return process.env.ADMIN_PASSWORD;
+  },
+  get ADMIN_READONLY_EMAIL() {
+    return process.env.ADMIN_READONLY_EMAIL;
   },
 };

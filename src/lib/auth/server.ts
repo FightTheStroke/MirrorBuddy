@@ -14,9 +14,11 @@ export {
   validateAuth,
   validateSessionOwnership,
   validateAdminAuth,
+  validateAdminReadOnlyAuth,
   requireAuthenticatedUser,
   type AuthResult,
   type AdminAuthResult,
+  type AdminReadOnlyAuthResult,
 } from './session-auth';
 
 // Cookie signing (uses azure key vault)
