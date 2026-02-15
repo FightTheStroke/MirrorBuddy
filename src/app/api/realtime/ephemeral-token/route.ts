@@ -1,9 +1,7 @@
 // ============================================================================
 // API ROUTE: Get ephemeral token for Azure OpenAI Realtime WebRTC
-// Calls Azure REST API to create a session and return ephemeral token
+// Supports both GA (session.type=realtime) and preview protocols
 // SECURITY: API key is NEVER exposed to client
-// NOTE: Each request creates a unique session - no caching to prevent
-//       multiple clients sharing the same session (security/privacy issue)
 // ============================================================================
 
 import { NextResponse } from 'next/server';
@@ -17,44 +15,28 @@ import {
 import { logger } from '@/lib/logger';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
+import {
+  type AzureGAResponse,
+  type AzurePreviewResponse,
+  buildGAPayload,
+  buildPreviewPayload,
+  parseGAResponse,
+  parsePreviewResponse,
+} from './payload-builders';
 
 export const revalidate = 0;
-interface AzureSessionResponse {
-  client_secret: {
-    value: string;
-    expires_at: number;
-  };
-  id: string;
-}
-
-interface EphemeralTokenResponse {
-  token: string;
-  expiresAt: number;
-  sessionId: string;
-}
 
 // Per-IP rate limit tracker: clientId -> last request timestamp (ms)
 const rateLimitTracker = new Map<string, number>();
 
-/**
- * Check per-IP rate limit: 1 request per second maximum
- * Returns true if request is allowed, false if rate limited
- */
 function checkPerIPRateLimit(clientId: string): boolean {
   const nowMs = Date.now();
   const lastRequestMs = rateLimitTracker.get(clientId);
-
   if (!lastRequestMs) {
     rateLimitTracker.set(clientId, nowMs);
     return true;
   }
-
-  const timeSinceLastMs = nowMs - lastRequestMs;
-  if (timeSinceLastMs < 1000) {
-    // Less than 1 second since last request
-    return false;
-  }
-
+  if (nowMs - lastRequestMs < 1000) return false;
   rateLimitTracker.set(clientId, nowMs);
   return true;
 }
@@ -155,6 +137,8 @@ export const POST = pipe(
   }
 
   // Check if GA protocol is enabled via feature flag
+  // NOTE: Requires a GA-model deployment on Azure (e.g., gpt-realtime-2025-08-28).
+  // If using a preview deployment (gpt-4o-realtime-preview), disable this flag.
   const useGAProtocol = await isFeatureEnabled('voice_ga_protocol');
 
   // Build Azure REST API URL based on feature flag
@@ -163,44 +147,22 @@ export const POST = pipe(
 
   if (useGAProtocol.enabled) {
     // GA endpoint: POST https://{resource}.openai.azure.com/openai/v1/realtime/client_secrets
-    // No api-version query param needed
     azureUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/client_secrets`;
-    log.info('Using GA realtime endpoint', { endpoint: azureUrl });
   } else {
-    // Preview endpoint (fallback): POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
+    // Preview endpoint: POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
     azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
-    log.info('Using preview realtime endpoint', { endpoint: azureUrl });
   }
 
-  // Build token request payload
-  const tokenRequestPayload: Record<string, unknown> = {
-    model: azureDeployment,
-  };
+  log.info('Using realtime endpoint', {
+    protocol: useGAProtocol.enabled ? 'GA' : 'preview',
+    endpoint: azureUrl,
+    deployment: azureDeployment,
+  });
 
-  // T1-02: GA protocol includes session config in token request body
-  if (useGAProtocol.enabled) {
-    log.info('GA protocol: including session config in token request', {
-      hasVoice: !!requestBody.voice,
-      hasInstructions: !!requestBody.instructions,
-    });
-
-    // Include session configuration from request body or defaults
-    tokenRequestPayload.voice = requestBody.voice || 'alloy';
-    tokenRequestPayload.input_audio_format = requestBody.input_audio_format || 'pcm16';
-    tokenRequestPayload.output_audio_format = requestBody.output_audio_format || 'pcm16';
-
-    if (requestBody.instructions) {
-      tokenRequestPayload.instructions = requestBody.instructions;
-    }
-
-    if (requestBody.input_audio_transcription) {
-      tokenRequestPayload.input_audio_transcription = requestBody.input_audio_transcription;
-    }
-
-    if (requestBody.turn_detection) {
-      tokenRequestPayload.turn_detection = requestBody.turn_detection;
-    }
-  }
+  // Build token request payload based on protocol version
+  const tokenRequestPayload = useGAProtocol.enabled
+    ? buildGAPayload(azureDeployment, requestBody)
+    : buildPreviewPayload(azureDeployment);
 
   const azureRequestStartMs = Date.now();
 
@@ -229,6 +191,8 @@ export const POST = pipe(
     log.error('Azure ephemeral token request failed', {
       status: response.status,
       errorDetails: errorData,
+      protocol: useGAProtocol.enabled ? 'GA' : 'preview',
+      deployment: azureDeployment,
       azureRequestMs,
       totalMs,
     });
@@ -237,43 +201,31 @@ export const POST = pipe(
       {
         error: 'Failed to get ephemeral token from Azure',
         status: response.status,
+        details: errorData.slice(0, 200),
       },
       response.status >= 500 ? 503 : 400,
     );
   }
 
   const azureRequestMs = Date.now() - azureRequestStartMs;
-  const sessionData: AzureSessionResponse = await response.json();
+  const responseData = await response.json();
 
-  // Extract ephemeral token details
-  const { client_secret, id: sessionId } = sessionData;
-  if (!client_secret || !client_secret.value || !client_secret.expires_at) {
-    const totalMs = Date.now() - requestStartMs;
-    log.error('Invalid Azure session response - missing client_secret', {
-      sessionData,
-      azureRequestMs,
-      totalMs,
-    });
+  // Parse response — GA and preview have different shapes
+  const parsed = useGAProtocol.enabled
+    ? parseGAResponse(responseData as AzureGAResponse)
+    : parsePreviewResponse(responseData as AzurePreviewResponse);
 
-    return json(
-      {
-        error: 'Invalid response from Azure - missing ephemeral token',
-      },
-      503,
-    );
+  if (!parsed) {
+    log.error('Invalid Azure response - missing token', { responseData, azureRequestMs });
+    return json({ error: 'Invalid response from Azure - missing ephemeral token' }, 503);
   }
 
-  // Return ephemeral token to client (unique session per request)
-  const payload: EphemeralTokenResponse = {
-    token: client_secret.value,
-    expiresAt: client_secret.expires_at,
-    sessionId: sessionId || '',
-  };
+  const { expiresAt, sessionId } = parsed;
 
   logger.info('Ephemeral token issued (unique session)', {
     clientId,
     sessionId,
-    expiresAt: client_secret.expires_at,
+    expiresAt,
   });
 
   const totalMs = Date.now() - requestStartMs;
@@ -283,7 +235,7 @@ export const POST = pipe(
     totalMs,
   });
 
-  return json(payload, 200, {
+  return json(parsed, 200, {
     'Server-Timing': `azure;dur=${azureRequestMs}, total;dur=${totalMs}`,
   });
 });

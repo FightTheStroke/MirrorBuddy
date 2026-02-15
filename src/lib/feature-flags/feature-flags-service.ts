@@ -93,7 +93,7 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   },
   voice_ga_protocol: {
     name: 'Voice GA Protocol',
-    description: 'Switch from preview to GA realtime API',
+    description: 'Use GA realtime API (session.type=realtime format)',
     status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,

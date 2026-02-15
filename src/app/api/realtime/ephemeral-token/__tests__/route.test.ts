@@ -97,15 +97,13 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
       },
     });
 
-    // Mock fetch to capture the request
+    // Mock fetch to return GA format response
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        client_secret: {
-          value: 'test-token',
-          expires_at: Date.now() + 3600000,
-        },
-        id: 'test-session-id',
+        value: 'test-token',
+        expires_at: Date.now() + 3600000,
+        session: { id: 'test-session-id', model: 'gpt-realtime' },
       }),
     });
     global.fetch = mockFetch;
@@ -129,7 +127,7 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
 
     await POST(request as any);
 
-    // Verify fetch was called with session config in body
+    // Verify fetch was called with GA session format
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/openai/v1/realtime/client_secrets'),
       expect.objectContaining({
@@ -138,22 +136,26 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
           'api-key': 'test-key',
           'Content-Type': 'application/json',
         }),
-        body: expect.stringContaining('input_audio_format'),
+        body: expect.stringContaining('"type":"realtime"'),
       }),
     );
 
-    // Parse the request body to verify all fields
+    // Parse the request body to verify GA session format
     const callArgs = mockFetch.mock.calls[0];
     const requestBody = JSON.parse(callArgs[1].body);
 
-    expect(requestBody).toMatchObject({
+    expect(requestBody).toHaveProperty('session');
+    expect(requestBody.session).toMatchObject({
+      type: 'realtime',
       model: 'gpt-realtime',
-      voice: 'alloy',
       instructions: expect.any(String),
-      input_audio_format: 'pcm16',
-      output_audio_format: 'pcm16',
-      input_audio_transcription: { model: 'whisper-1' },
-      turn_detection: expect.objectContaining({ type: 'server_vad' }),
+      audio: expect.objectContaining({
+        output: { voice: 'alloy' },
+        input: expect.objectContaining({
+          transcription: { model: 'whisper-1' },
+          turn_detection: expect.objectContaining({ type: 'server_vad' }),
+        }),
+      }),
     });
   });
 
@@ -226,14 +228,13 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
       },
     });
 
+    // Mock fetch to return GA format response
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        client_secret: {
-          value: 'test-token',
-          expires_at: Date.now() + 3600000,
-        },
-        id: 'test-session-id',
+        value: 'test-token',
+        expires_at: Date.now() + 3600000,
+        session: { id: 'test-session-id', model: 'gpt-realtime' },
       }),
     });
     global.fetch = mockFetch;
@@ -251,12 +252,14 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
     const callArgs = mockFetch.mock.calls[0];
     const requestBody = JSON.parse(callArgs[1].body);
 
-    // Should have default values for required fields
-    expect(requestBody).toMatchObject({
+    // GA format: session wrapper with defaults
+    expect(requestBody).toHaveProperty('session');
+    expect(requestBody.session).toMatchObject({
+      type: 'realtime',
       model: 'gpt-realtime',
-      voice: 'alloy',
-      input_audio_format: 'pcm16',
-      output_audio_format: 'pcm16',
+      audio: expect.objectContaining({
+        output: { voice: 'alloy' },
+      }),
     });
   });
 });
