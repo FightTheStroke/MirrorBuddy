@@ -218,6 +218,26 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
   };
 
+  const safeResponseRedirect = (safeResponse: string) => {
+    const dc = refs.webrtcDataChannelRef.current;
+    if (!dc || dc.readyState !== 'open') return false;
+
+    dc.send(JSON.stringify({ type: 'response.cancel' }));
+    dc.send(
+      JSON.stringify({
+        type: 'conversation.item.create',
+        item: {
+          type: 'message',
+          role: 'assistant',
+          content: [{ type: 'output_text', text: safeResponse }],
+        },
+      }),
+    );
+    store.addTranscript('assistant', safeResponse);
+    store.setSpeaking(false);
+    return true;
+  };
+
   // Unified camera (ADR 0126) - video + photo modes
   const unifiedCamera = useUnifiedCamera({
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
@@ -255,6 +275,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
     sendText: useSendText(refs.webrtcDataChannelRef, store.addTranscript),
     cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),
+    safeResponseRedirect,
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
     sendWebcamResult: useSendWebcamResult(refs.webrtcDataChannelRef),
