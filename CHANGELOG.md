@@ -5,10 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
 
 ### Added
+
+- `ADMIN_READONLY` role with `withAdminReadOnly` middleware for read-only admin access
+- `validateAdminReadOnlyAuth()` in session-auth for ADMIN + ADMIN_READONLY role validation
+- All admin GET endpoints now use `withAdminReadOnly` (POST/PUT/DELETE still require ADMIN)
+- Prisma migration `20260215202500_add_admin_readonly_role` adding ADMIN_READONLY to UserRole enum
+- Production smoke test `16-admin-health.spec.ts` for admin health checks
+- `ADMIN_READONLY_EMAIL` and `ADMIN_READONLY_COOKIE_VALUE` environment variables
 
 - `text-embedding-3-small` deployment (GlobalStandard, 1536 dims) — replaces ada-002
 - `tts-hd-deployment` (tts-hd model) — replaces tts (better audio quality)
@@ -257,6 +263,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Verified: ADR 0097 — Model routing via tierService, daily limits via budget-handler
 - Learnings: Inspired by OpenAI "Harness Engineering" article; automated quality gates catch drift faster than code review
 - Documented: `localStorage` for trial-session-id is intentional (cross-tab persistence)
+
 ## [0.15.0] - 2026-02-08
 
 ### Changed

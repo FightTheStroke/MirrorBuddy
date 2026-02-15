@@ -13,21 +13,29 @@ We created a dedicated Playwright-based production smoke test suite that:
 1. **Runs against the live production URL** (configurable via `PROD_URL` env var)
 2. **Never creates, modifies, or deletes data** — read-only verification only
 3. **Uses client-side mocks** to bypass consent walls without touching the server
-4. **Covers 8 test areas** across 45+ test cases
+4. **Covers 16 test areas** across 80+ test cases
 
 ### Test Suite Structure
 
 ```
 e2e/production-smoke/
-├── fixtures.ts              # Base fixture with consent wall bypasses
-├── 01-infrastructure.spec.ts  # API health, CSP headers, static assets
-├── 02-welcome.spec.ts        # Landing page, UI elements
-├── 03-chat.spec.ts           # Chat interface accessibility
-├── 04-accessibility.spec.ts  # WCAG, ARIA, accessibility profiles
-├── 05-compliance.spec.ts     # Privacy, terms, ai-transparency pages
-├── 06-i18n.spec.ts           # 5 locale support, language switching
-├── 07-admin.spec.ts          # Admin login (requires credentials)
-└── 08-navigation.spec.ts     # Core navigation flows
+├── fixtures.ts                    # Base fixture with consent wall bypasses
+├── 01-infrastructure.spec.ts      # API health, CSP headers, static assets
+├── 02-welcome.spec.ts             # Landing page, UI elements
+├── 03-chat.spec.ts                # Chat interface accessibility
+├── 04-accessibility.spec.ts       # WCAG, ARIA, accessibility profiles
+├── 05-compliance.spec.ts          # Privacy, terms, ai-transparency pages
+├── 06-i18n.spec.ts                # 5 locale support, language switching
+├── 07-admin.spec.ts               # Admin login, ADMIN_READONLY role validation
+├── 08-navigation.spec.ts          # Core navigation flows
+├── 09-tools.spec.ts               # Educational tools (flashcards, mind maps, quizzes)
+├── 10-rag-search.spec.ts          # RAG semantic search
+├── 11-conversation-memory.spec.ts # Conversation memory and context
+├── 12-voice-realtime.spec.ts      # Voice/realtime session endpoints
+├── 13-admin-extended.spec.ts      # Admin extended panels, ADMIN_READONLY GET access
+├── 14-professor-safety.spec.ts    # Professor safety guardrails
+├── 15-tier-system.spec.ts         # Trial/Base/Pro tier enforcement
+└── 16-admin-health.spec.ts        # Admin health checks, Redis/Resend status
 ```
 
 ### Running the Tests
@@ -60,7 +68,7 @@ PROD_URL=https://mirrorbuddy.vercel.app npx playwright test \
 
 - **Fixtures mock `/api/tos`** and set consent cookies client-side — no server state changed
 - **No authentication by default** — tests run as anonymous visitors
-- **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only)
+- **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 
 ## Consequences
