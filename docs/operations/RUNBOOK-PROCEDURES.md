@@ -1,6 +1,8 @@
 # MirrorBuddy Operational Procedures
 
 > Supplementary to [RUNBOOK.md](./RUNBOOK.md)
+>
+> **Deployment Note:** Docker commands below apply to local/self-hosted environments. For Vercel production, use: `vercel logs`, Supabase SQL Editor, and Grafana dashboards.
 
 ## Recovery Procedures
 

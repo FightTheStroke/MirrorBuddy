@@ -98,7 +98,7 @@ For questions: roberdan@fightthestroke.org
 
 ### Technical Analysis
 
-- [ ] Review access logs (`/var/log/nginx/access.log`)
+- [ ] Review access logs (Vercel: `vercel logs --since 24h`, Sentry: Error tracking dashboard)
 - [ ] Check database query logs
 - [ ] Analyze rate limit violations
 - [ ] Review OAuth token activity

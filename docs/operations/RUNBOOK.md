@@ -2,6 +2,8 @@
 
 > Reference: [ISE Incident Management](https://microsoft.github.io/code-with-engineering-playbook/observability/incident-response/) | [Google SRE - Managing Incidents](https://sre.google/sre-book/managing-incidents/)
 
+> **Deployment Note:** MirrorBuddy runs on Vercel (serverless) + Supabase (managed PostgreSQL). Docker commands in this runbook apply only to local/self-hosted environments. For production, use: `vercel logs`, `vercel env pull`, Supabase Dashboard, and Sentry for error tracking.
+
 ## Incident Classification
 
 ```mermaid

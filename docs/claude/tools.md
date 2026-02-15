@@ -1,6 +1,6 @@
 # Tools
 
-> Plugin-based tool execution architecture with 15 educational tools
+> Plugin-based tool execution architecture with 14 educational tools
 
 ## Quick Reference
 
@@ -34,7 +34,7 @@ Tools integrate with voice sessions via WebRTC DataChannel protocol.
 
 | File                                     | Purpose                     |
 | ---------------------------------------- | --------------------------- |
-| `src/lib/tools/tool-configs.ts`          | Tool metadata (15 tools)    |
+| `src/lib/tools/tool-configs.ts`          | Tool metadata (14 tools)    |
 | `src/lib/tools/tool-executor.ts`         | Main execution orchestrator |
 | `src/lib/tools/tool-executor-schemas.ts` | Zod validation schemas      |
 | `src/lib/tools/tool-i18n.ts`             | Localization helpers        |

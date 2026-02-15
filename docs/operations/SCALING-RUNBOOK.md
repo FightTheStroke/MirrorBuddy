@@ -368,7 +368,7 @@ git add -A && git commit -m "ops(resend): upgrade to Pro plan"
 | **gpt-5-mini**         | gpt-5-mini | 100K      | 1,000     | $0.15/$0.60 per 1M tokens | Primary chat model       |
 | **gpt-5-mini-premium** | gpt-5-mini | 1K        | 6         | $15/$60 per 1M tokens     | Premium tier (low quota) |
 
-**Total Allocated Capacity**: 102K TPM (gpt4o-mini)
+**Total Allocated Capacity**: 102K TPM (gpt-5-mini)
 
 **Baseline Monthly Cost** (estimate):
 
@@ -404,7 +404,7 @@ az monitor metrics list \
 2. Search for "Quotas"
 3. Select "Cognitive Services"
 4. Filter by "aoai-virtualbpm-1763396587"
-5. Click "gpt4o-mini-deployment"
+5. Click "gpt-5-mini-deployment"
 6. Click "Request quota increase"
 
 # In request form:
@@ -420,7 +420,7 @@ az monitor metrics list \
 # Check email for approval notification
 
 # Verify new quota in Azure Portal:
-# Deployments → gpt4o-mini-deployment → Properties
+# Deployments → gpt-5-mini-deployment → Properties
 # Should show "Capacity: 200K TPM"
 ```
 
@@ -460,7 +460,7 @@ sed -i 's/100K/200K/' docs/operations/SCALING-RUNBOOK.md
 echo "- **Azure OpenAI**: Quota increased from 100K to 200K TPM due to growth" >> CHANGELOG.md
 
 # Commit
-git add -A && git commit -m "ops(azure): increase gpt4o-mini quota to 200K TPM"
+git add -A && git commit -m "ops(azure): increase gpt-5-mini quota to 200K TPM"
 ```
 
 ---
