@@ -1,6 +1,6 @@
 // ============================================================================
 // CONNECTION MANAGEMENT
-// WebRTC connection (WebSocket proxy deprecated, kept as fallback)
+// WebRTC connection
 // ============================================================================
 
 'use client';
@@ -29,7 +29,6 @@ export { useDisconnect } from './connection-cleanup';
 
 /**
  * Connect to Azure Realtime API via WebRTC
- * (WebSocket proxy deprecated but available via VOICE_TRANSPORT env var)
  */
 export function useConnect(
   refs: ConnectionRefs,
