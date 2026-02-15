@@ -318,7 +318,7 @@ describe('Consent Revocation Consistency', () => {
 
   describe('F-05: Timestamp consistency', () => {
     it('should update timestamps on consent changes', () => {
-      saveConsent(true, false);
+      const consent1 = saveConsent(true, false);
 
       // Wait a small amount
       const wait = new Promise((resolve) => setTimeout(resolve, 10));

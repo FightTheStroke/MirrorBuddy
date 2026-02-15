@@ -2,15 +2,9 @@
  * Helper functions for mindmap export
  */
 
-/**
- * Sanitize filename for safe file system usage
- */
-export function sanitizeFilename(name: string): string {
-  return name
-    .replace(/[<>:"/\\|?*]/g, '')
-    .replace(/\s+/g, '_')
-    .substring(0, 100);
-}
+import { sanitizeFilename } from '@/lib/utils/sanitize';
+
+export { sanitizeFilename };
 
 /**
  * Escape XML special characters
