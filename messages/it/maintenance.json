@@ -1,0 +1,54 @@
+{
+  "maintenance": {
+    "page": {
+      "title": "Manutenzione in corso | MirrorBuddy",
+      "heading": "Stiamo migliorando MirrorBuddy",
+      "description": "Il servizio è temporaneamente non disponibile per manutenzione programmata.",
+      "estimatedReturn": "Ritorno stimato: {time}",
+      "refreshPage": "Aggiorna la pagina",
+      "contactSupport": "Contatta il supporto",
+      "apology": "Ci scusiamo per il disagio e ti ringraziamo per la pazienza."
+    },
+    "banner": {
+      "scheduled": "Manutenzione programmata",
+      "countdown": "Inizio tra {timeRemaining}",
+      "dismiss": "Chiudi",
+      "learnMore": "Scopri di più"
+    },
+    "notification": {
+      "title": "Avviso di manutenzione",
+      "body": "È prevista una breve interruzione del servizio per miglioramenti tecnici.",
+      "reminder": "Ti invieremo un promemoria prima dell'inizio."
+    },
+    "email": {
+      "subject": "Manutenzione programmata di MirrorBuddy",
+      "greeting": "Ciao {name},",
+      "body": "Ti informiamo che MirrorBuddy sarà in manutenzione programmata.",
+      "duration": "Durata stimata: {minutes} minuti",
+      "closing": "Grazie per la comprensione."
+    },
+    "admin": {
+      "title": "Gestione manutenzione",
+      "currentStatus": "Stato attuale",
+      "active": "Attiva",
+      "inactive": "Non attiva",
+      "activate": "Attiva manutenzione",
+      "deactivate": "Disattiva manutenzione",
+      "schedule": "Pianifica",
+      "scheduledWindows": "Finestre pianificate",
+      "noWindows": "Nessuna finestra pianificata",
+      "confirmActivate": "Confermi l'attivazione della manutenzione?",
+      "confirmDeactivate": "Confermi la disattivazione della manutenzione?",
+      "message": "Messaggio per gli utenti",
+      "severity": "Gravità",
+      "severityLow": "Bassa",
+      "severityMedium": "Media",
+      "severityHigh": "Alta",
+      "startTime": "Ora di inizio",
+      "endTime": "Ora di fine",
+      "estimatedMinutes": "Minuti stimati",
+      "cancel": "Annulla",
+      "confirmCancel": "Conferma annullamento"
+    }
+  }
+}

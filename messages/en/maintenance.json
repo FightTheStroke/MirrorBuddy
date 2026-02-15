@@ -1,0 +1,54 @@
+{
+  "maintenance": {
+    "page": {
+      "title": "Maintenance in Progress | MirrorBuddy",
+      "heading": "We're improving MirrorBuddy",
+      "description": "The service is temporarily unavailable due to scheduled maintenance.",
+      "estimatedReturn": "Estimated return: {time}",
+      "refreshPage": "Refresh page",
+      "contactSupport": "Contact support",
+      "apology": "We're sorry for the inconvenience and thank you for your patience."
+    },
+    "banner": {
+      "scheduled": "Scheduled maintenance",
+      "countdown": "Starts in {timeRemaining}",
+      "dismiss": "Dismiss",
+      "learnMore": "Learn more"
+    },
+    "notification": {
+      "title": "Maintenance notice",
+      "body": "A short service interruption is planned for technical improvements.",
+      "reminder": "We'll send you a reminder before it starts."
+    },
+    "email": {
+      "subject": "Scheduled MirrorBuddy maintenance",
+      "greeting": "Hi {name},",
+      "body": "We're letting you know that MirrorBuddy will undergo scheduled maintenance.",
+      "duration": "Estimated duration: {minutes} minutes",
+      "closing": "Thank you for your understanding."
+    },
+    "admin": {
+      "title": "Maintenance management",
+      "currentStatus": "Current status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activate": "Activate maintenance",
+      "deactivate": "Deactivate maintenance",
+      "schedule": "Schedule",
+      "scheduledWindows": "Scheduled windows",
+      "noWindows": "No scheduled windows",
+      "confirmActivate": "Do you confirm activating maintenance?",
+      "confirmDeactivate": "Do you confirm deactivating maintenance?",
+      "message": "User message",
+      "severity": "Severity",
+      "severityLow": "Low",
+      "severityMedium": "Medium",
+      "severityHigh": "High",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "estimatedMinutes": "Estimated minutes",
+      "cancel": "Cancel",
+      "confirmCancel": "Confirm cancellation"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "maintenance": {
+    "page": {
+      "title": "Maintenance en cours | MirrorBuddy",
+      "heading": "Nous améliorons MirrorBuddy",
+      "description": "Le service est temporairement indisponible en raison d'une maintenance planifiée.",
+      "estimatedReturn": "Retour estimé : {time}",
+      "refreshPage": "Rafraîchir la page",
+      "contactSupport": "Contacter le support",
+      "apology": "Nous nous excusons pour la gêne occasionnée et vous remercions pour votre patience."
+    },
+    "banner": {
+      "scheduled": "Maintenance planifiée",
+      "countdown": "Débute dans {timeRemaining}",
+      "dismiss": "Fermer",
+      "learnMore": "En savoir plus"
+    },
+    "notification": {
+      "title": "Avis de maintenance",
+      "body": "Une courte interruption du service est prévue pour des améliorations techniques.",
+      "reminder": "Nous vous enverrons un rappel avant le début."
+    },
+    "email": {
+      "subject": "Maintenance planifiée de MirrorBuddy",
+      "greeting": "Bonjour {name},",
+      "body": "Nous vous informons que MirrorBuddy sera en maintenance planifiée.",
+      "duration": "Durée estimée : {minutes} minutes",
+      "closing": "Merci pour votre compréhension."
+    },
+    "admin": {
+      "title": "Gestion de la maintenance",
+      "currentStatus": "Statut actuel",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activate": "Activer la maintenance",
+      "deactivate": "Désactiver la maintenance",
+      "schedule": "Planifier",
+      "scheduledWindows": "Créneaux planifiés",
+      "noWindows": "Aucun créneau planifié",
+      "confirmActivate": "Confirmez-vous l'activation de la maintenance ?",
+      "confirmDeactivate": "Confirmez-vous la désactivation de la maintenance ?",
+      "message": "Message pour les utilisateurs",
+      "severity": "Sévérité",
+      "severityLow": "Faible",
+      "severityMedium": "Moyenne",
+      "severityHigh": "Élevée",
+      "startTime": "Heure de début",
+      "endTime": "Heure de fin",
+      "estimatedMinutes": "Minutes estimées",
+      "cancel": "Annuler",
+      "confirmCancel": "Confirmer l'annulation"
+    }
+  }
+}

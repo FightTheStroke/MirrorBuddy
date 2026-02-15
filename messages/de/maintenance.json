@@ -1,0 +1,54 @@
+{
+  "maintenance": {
+    "page": {
+      "title": "Wartung läuft | MirrorBuddy",
+      "heading": "Wir verbessern MirrorBuddy",
+      "description": "Der Dienst ist wegen geplanter Wartung vorübergehend nicht verfügbar.",
+      "estimatedReturn": "Voraussichtliche Rückkehr: {time}",
+      "refreshPage": "Seite aktualisieren",
+      "contactSupport": "Support kontaktieren",
+      "apology": "Wir entschuldigen uns für die Unannehmlichkeiten und danken für deine Geduld."
+    },
+    "banner": {
+      "scheduled": "Geplante Wartung",
+      "countdown": "Startet in {timeRemaining}",
+      "dismiss": "Schließen",
+      "learnMore": "Mehr erfahren"
+    },
+    "notification": {
+      "title": "Wartungshinweis",
+      "body": "Für technische Verbesserungen ist eine kurze Dienstunterbrechung geplant.",
+      "reminder": "Wir senden dir vor dem Start eine Erinnerung."
+    },
+    "email": {
+      "subject": "Geplante Wartung von MirrorBuddy",
+      "greeting": "Hallo {name},",
+      "body": "Wir möchten dich informieren, dass MirrorBuddy eine geplante Wartung durchführt.",
+      "duration": "Geschätzte Dauer: {minutes} Minuten",
+      "closing": "Danke für dein Verständnis."
+    },
+    "admin": {
+      "title": "Wartungsverwaltung",
+      "currentStatus": "Aktueller Status",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "activate": "Wartung aktivieren",
+      "deactivate": "Wartung deaktivieren",
+      "schedule": "Planen",
+      "scheduledWindows": "Geplante Zeitfenster",
+      "noWindows": "Keine geplanten Zeitfenster",
+      "confirmActivate": "Möchtest du die Wartung wirklich aktivieren?",
+      "confirmDeactivate": "Möchtest du die Wartung wirklich deaktivieren?",
+      "message": "Nachricht für Nutzer",
+      "severity": "Schweregrad",
+      "severityLow": "Niedrig",
+      "severityMedium": "Mittel",
+      "severityHigh": "Hoch",
+      "startTime": "Startzeit",
+      "endTime": "Endzeit",
+      "estimatedMinutes": "Geschätzte Minuten",
+      "cancel": "Abbrechen",
+      "confirmCancel": "Abbruch bestätigen"
+    }
+  }
+}
