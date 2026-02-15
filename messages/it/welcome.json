@@ -52,7 +52,15 @@
         "feature1": "3 Professori",
         "feature2": "10 messaggi/giorno",
         "feature3": "Nessuna registrazione",
-        "cta": "Prova gratis"
+        "cta": "Prova gratis",
+        "emailLabel": "Indirizzo email",
+        "emailPlaceholder": "La tua email per iniziare",
+        "emailInvalid": "Inserisci un indirizzo email valido",
+        "startTrial": "Inizia la prova",
+        "skipEmail": "Continua senza email",
+        "tosLabel": "Accetto la",
+        "privacyLink": "Privacy Policy",
+        "termsLink": "Termini di Servizio"
       },
       "updateProfile": "Aggiorna profilo",
       "login": "Accedi"

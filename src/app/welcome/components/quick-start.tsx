@@ -1,11 +1,13 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Settings, LogIn, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { trackLoginClick } from '@/lib/funnel/client';
+import { TrialEmailForm } from './trial-email-form';
 
 interface QuickStartProps {
   isReturningUser: boolean;
@@ -16,14 +18,15 @@ interface QuickStartProps {
 }
 
 /**
- * Quick Start Section - Two column layout
+ * Quick Start Section - Two column layout with email collection
  *
  * Two equal boxes side by side:
  * - Left: Beta access (login)
- * - Right: Trial mode (try free)
+ * - Right: Trial mode (email → try free)
  */
 export function QuickStart({ isReturningUser, onSkip, onUpdateProfile }: QuickStartProps) {
   const t = useTranslations('welcome.quickStart');
+  const [showEmailForm, setShowEmailForm] = useState(false);
 
   return (
     <motion.section
@@ -80,24 +83,14 @@ export function QuickStart({ isReturningUser, onSkip, onUpdateProfile }: QuickSt
             </div>
 
             <ul className="flex-1 space-y-3 mb-6">
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-                </span>
-                <span className="text-base font-medium">{t('betaAccess.feature1')}</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-                </span>
-                <span className="text-base font-medium">{t('betaAccess.feature2')}</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">
-                  <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
-                </span>
-                <span className="text-base font-medium">{t('betaAccess.feature3')}</span>
-              </li>
+              {(['feature1', 'feature2', 'feature3'] as const).map((key) => (
+                <li key={key} className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
+                  <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">
+                    <span className="text-green-600 dark:text-green-400 text-sm">✓</span>
+                  </span>
+                  <span className="text-base font-medium">{t(`betaAccess.${key}`)}</span>
+                </li>
+              ))}
             </ul>
 
             <Link href="/login" className="w-full" onClick={() => trackLoginClick()}>
@@ -131,34 +124,32 @@ export function QuickStart({ isReturningUser, onSkip, onUpdateProfile }: QuickSt
             </div>
 
             <ul className="flex-1 space-y-3 mb-6">
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <span className="text-blue-600 dark:text-blue-400 text-sm">•</span>
-                </span>
-                <span className="text-base font-medium">{t('trial.feature1')}</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <span className="text-blue-600 dark:text-blue-400 text-sm">•</span>
-                </span>
-                <span className="text-base font-medium">{t('trial.feature2')}</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <span className="text-blue-600 dark:text-blue-400 text-sm">•</span>
-                </span>
-                <span className="text-base font-medium">{t('trial.feature3')}</span>
-              </li>
+              {(['feature1', 'feature2', 'feature3'] as const).map((key) => (
+                <li key={key} className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
+                  <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                    <span className="text-blue-600 dark:text-blue-400 text-sm">•</span>
+                  </span>
+                  <span className="text-base font-medium">{t(`trial.${key}`)}</span>
+                </li>
+              ))}
             </ul>
 
-            <Button
-              size="lg"
-              onClick={onSkip}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-md py-6 text-lg"
-            >
-              <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
-              {t('trial.cta')}
-            </Button>
+            <AnimatePresence mode="wait">
+              {!showEmailForm ? (
+                <motion.div key="cta" exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.15 }}>
+                  <Button
+                    size="lg"
+                    onClick={() => setShowEmailForm(true)}
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-md py-6 text-lg"
+                  >
+                    <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
+                    {t('trial.cta')}
+                  </Button>
+                </motion.div>
+              ) : (
+                <TrialEmailForm onComplete={onSkip} />
+              )}
+            </AnimatePresence>
           </motion.div>
         </div>
       )}

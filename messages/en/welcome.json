@@ -52,7 +52,15 @@
         "feature1": "3 Professors",
         "feature2": "10 messages/day",
         "feature3": "No registration",
-        "cta": "Try free"
+        "cta": "Try free",
+        "emailLabel": "[TRANSLATE] Indirizzo email",
+        "emailPlaceholder": "[TRANSLATE] La tua email per iniziare",
+        "emailInvalid": "[TRANSLATE] Inserisci un indirizzo email valido",
+        "startTrial": "[TRANSLATE] Inizia la prova",
+        "skipEmail": "[TRANSLATE] Continua senza email",
+        "tosLabel": "[TRANSLATE] Accetto la",
+        "privacyLink": "[TRANSLATE] Privacy Policy",
+        "termsLink": "[TRANSLATE] Termini di Servizio"
       },
       "updateProfile": "Update profile",
       "login": "Log in"

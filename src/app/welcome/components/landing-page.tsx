@@ -47,11 +47,36 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
         logger.warn('[LandingPage] Failed to create trial session', {
           status: response.status,
         });
+        return null;
       }
+      const data = await response.json();
+
+      // If user provided email on welcome page, save it to trial session
+      const trialEmail =
+        typeof sessionStorage !== 'undefined'
+          ? sessionStorage.getItem('mirrorbuddy-trial-email')
+          : null;
+      if (trialEmail && data.visitorId) {
+        try {
+          await csrfFetch('/api/trial/email', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: data.visitorId, email: trialEmail }),
+          });
+          sessionStorage.removeItem('mirrorbuddy-trial-email');
+          logger.info('[LandingPage] Trial email saved', { hasEmail: true });
+        } catch (emailError) {
+          logger.warn('[LandingPage] Failed to save trial email', {
+            error: String(emailError),
+          });
+        }
+      }
+      return data;
     } catch (error) {
       logger.warn('[LandingPage] Trial session creation failed', {
         error: String(error),
       });
+      return null;
     }
   };
 

@@ -52,7 +52,15 @@
         "feature1": "3 Professoren",
         "feature2": "10 Nachrichten/Tag",
         "feature3": "Keine Registrierung",
-        "cta": "Kostenlos testen"
+        "cta": "Kostenlos testen",
+        "emailLabel": "[TRANSLATE] Indirizzo email",
+        "emailPlaceholder": "[TRANSLATE] La tua email per iniziare",
+        "emailInvalid": "[TRANSLATE] Inserisci un indirizzo email valido",
+        "startTrial": "[TRANSLATE] Inizia la prova",
+        "skipEmail": "[TRANSLATE] Continua senza email",
+        "tosLabel": "[TRANSLATE] Accetto la",
+        "privacyLink": "[TRANSLATE] Privacy Policy",
+        "termsLink": "[TRANSLATE] Termini di Servizio"
       },
       "updateProfile": "Profil aktualisieren",
       "login": "Anmelden"
