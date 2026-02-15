@@ -64,9 +64,6 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
   // Transport mode: webrtc or websocket (from env, defaults to webrtc)
   const transport = (process.env.VOICE_TRANSPORT || 'webrtc') as 'webrtc' | 'websocket';
 
-  // Azure region for WebRTC endpoint (e.g., 'swedencentral', 'eastus2')
-  const azureRegion = (process.env.AZURE_OPENAI_REALTIME_REGION || 'swedencentral').trim();
-
   // Check if GA protocol is enabled
   const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
 
@@ -92,8 +89,9 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
                 deployment: azureDeployment,
               }
             : {
+                // Preview fallback keeps a fixed regional host while GA is the default protocol.
                 // CRITICAL: model parameter is REQUIRED by Azure WebRTC endpoint
-                webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
+                webrtcEndpoint: `https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
                 deployment: azureDeployment,
               }),
         }

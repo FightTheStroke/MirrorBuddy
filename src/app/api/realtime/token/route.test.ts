@@ -470,7 +470,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
   });
 
   describe('Regional endpoint for preview mode', () => {
-    it('should use AZURE_OPENAI_REALTIME_REGION for preview webrtcEndpoint', async () => {
+    it('should ignore AZURE_OPENAI_REALTIME_REGION for preview webrtcEndpoint', async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue({
         enabled: false,
         reason: 'disabled',
@@ -494,7 +494,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       const response = await GET(request as any);
       const data = await response.json();
 
-      expect(data.webrtcEndpoint).toContain('eastus2.realtimeapi-preview.ai.azure.com');
+      expect(data.webrtcEndpoint).toContain('swedencentral.realtimeapi-preview.ai.azure.com');
     });
 
     it('should default to swedencentral if region not set', async () => {
