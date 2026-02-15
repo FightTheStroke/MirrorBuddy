@@ -2055,3 +2055,45 @@ Ready for final Thor validation and Plan 148 closure.
 **Files Kept**:
 
 - `messages/{it,en,fr,de,es}/email.json` (5 files) - actively used by unsubscribe feature
+
+---
+
+## W7: Hardening and Release Readiness
+
+**Wave Goal**: Verify all migration deliverables, validate release readiness, and prepare rollback procedures.
+
+**Summary**:
+
+- **GA Migration Complete (W1)**: Voice protocol upgraded to GA endpoints, CSP updated to remove preview domains, API version set to production-ready configuration.
+- **Safety Model Implemented (W2)**: Voice safety parity achieved with text chat, personality fidelity maintained across all interaction modes, content filtering integrated.
+- **Unified Architecture Ready (W4)**: Conversation platform unified under shared primitives (UnifiedChatView, MessageBubble, adapters), static maestri vs dynamic coaches properly scoped, feature flags in place for controlled rollout.
+
+**Release Readiness**:
+
+- All critical journeys (maestro, coach, buddy, handoffs) functioning correctly
+- CSP, proxy, i18n, and consent dashboards verified healthy
+- Full CI verification (lint, typecheck, build, unit tests) passing
+- Rollback procedures documented with feature flag fallback matrix
+
+**Feature Flags Deployed** (6 total):
+
+| Flag ID                   | Purpose                           | Default State | Rollback Action     |
+| ------------------------- | --------------------------------- | ------------- | ------------------- |
+| `voice_ga_protocol`       | Switch to GA realtime API         | `disabled`    | Set status=disabled |
+| `voice_full_prompt`       | Use full system prompts           | `disabled`    | Set status=disabled |
+| `voice_transcript_safety` | Enable transcript safety checking | `disabled`    | Set status=disabled |
+| `voice_calling_overlay`   | New calling overlay UI            | `disabled`    | Set status=disabled |
+| `chat_unified_view`       | Unified conversation view         | `disabled`    | Set status=disabled |
+| `consent_unified_model`   | Unified consent storage           | `disabled`    | Set status=disabled |
+
+**Rollback Procedure**:
+
+1. Navigate to `/admin/control-panel` (admin auth required)
+2. Locate failing feature flag in Feature Flags panel
+3. Set `status` to `disabled` OR enable `killSwitch` with reason
+4. Changes take effect immediately (no deployment needed)
+5. Legacy behavior is automatically restored
+
+**No Code Rollback Required**: All new features are behind flags. Disabling flags restores pre-migration behavior without code changes.
+
+**Next Steps**: User acceptance testing, final QA sign-off, production deployment.
