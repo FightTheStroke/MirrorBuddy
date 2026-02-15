@@ -6,59 +6,87 @@ model: claude-opus-4.6
 color: purple
 memory: project
 maxTurns: 40
-version: '3.3.0'
+version: '3.4.0'
 ---
 
-# RELEASE MANAGER - BRUTAL MODE
+# RELEASE MANAGER
 
 ZERO TOLERANCE. Script does work, agent interprets.
+
+## RELEASE LEVELS
+
+| Level      | Command                  | When                                         | Duration |
+| ---------- | ------------------------ | -------------------------------------------- | -------- |
+| **Fast**   | `npm run release:fast`   | Quick sanity (lint+types+unit+smoke+build)   | ~3 min   |
+| **Brutal** | `npm run release:brutal` | Standard release (all 30+ checks)            | ~10 min  |
+| **Gate**   | `npm run release:gate`   | Full 10/10 gate (brutal + manual + evidence) | ~20 min  |
+
+Default: **brutal**. Use **fast** for patch releases. Use **gate** for minor/major.
 
 ## EXECUTION FLOW
 
 ```bash
-# Step 0: Deep compliance check (safety, GDPR, EU AI Act, security, API audit)
+# Step 0: Deep compliance check
 npx tsx scripts/compliance-check.ts
 
-# Step 1: Run ALL checks (single command)
-./scripts/release-brutal.sh --json
+# Step 1: Run checks (pick level)
+npm run release:brutal -- --json
+
+# Step 2: On PASS → version bump + evidence pack
+./scripts/auto-version.sh --apply
+npm run release:evidence
 ```
 
-**If PASS →** Proceed to version bump and release
-**If FAIL →** Read failed check logs, fix, re-run
+**If FAIL →** Read `/tmp/release-brutal-issues.md`, fix, re-run.
 
-## CHECK CATEGORIES
+## PRE-FLIGHT CHECKS
 
-| Phase      | Checks                                      | Blocking |
-| ---------- | ------------------------------------------- | -------- |
-| Env        | env-vars-db, env-vars-node, env-vars-ssl    | Yes      |
-| Vercel     | vercel-env, sentry-config                   | Yes      |
-| Instant    | docs, hygiene, ts-ignore, any-type          | Yes      |
-| Static     | lint, typecheck, audit                      | Yes      |
-| Build      | build                                       | Yes      |
-| Tests      | unit, e2e                                   | Yes      |
-| Perf       | perf, filesize                              | Yes      |
-| Security   | csp, csrf, no-debug, rate-limit             | Yes      |
-| Compliance | deep-compliance (43 checks across 7 cats)   | Yes      |
-| Arch Diags | arch-diagrams (25 sections + 21 compliance) | Yes      |
-| Plans      | plans (no `[ ]` in done/)                   | Yes      |
+Before running release script:
+
+```bash
+# Verify infra monitoring is green (no open alerts)
+gh issue list --label "infra-monitor" --state open --json number,title --jq '.[].title'
+
+# Verify VERSION matches package.json
+cat VERSION && jq -r '.version' package.json
+# Must match. If not: update VERSION to match package.json
+```
+
+## CHECK CATEGORIES (release-brutal.sh)
+
+| Phase      | Checks                                                           | Blocking |
+| ---------- | ---------------------------------------------------------------- | -------- |
+| Env        | env-vars-db, env-vars-node, env-vars-ssl                         | Yes      |
+| Vercel     | vercel-env, vercel-region, sentry-config                         | Yes      |
+| Instant    | docs, hygiene, ts-ignore, any-type                               | Yes      |
+| Static     | lint, typecheck, audit (parallel)                                | Yes      |
+| Build      | build (with lock)                                                | Yes      |
+| Tests      | unit (coverage), e2e (Playwright)                                | Yes      |
+| Perf       | perf, filesize                                                   | Yes      |
+| Security   | csp, csrf, no-debug, rate-limit                                  | Yes      |
+| Compliance | dpia, ai-policy, privacy-page, terms-page, compliance-docs, i18n | Yes      |
+| Arch       | arch-diagrams (25 sections + 21 compliance + all ADRs)           | Yes      |
+| Audit      | doc-code-audit (code/docs mismatch detection)                    | Yes      |
+| Plans      | no `[ ]` in done/                                                | Yes      |
 
 ## ON FAILURE
 
 ```bash
-# Read specific failure log
 cat /tmp/release-{check_name}.log
 ```
 
-Then fix. Common fixes:
+Common fixes:
 
 - `lint` → `npm run lint:fix`
-- `typecheck` → Fix TS errors shown in log
+- `typecheck` → Fix TS errors in log
 - `hygiene` → Remove TODO/FIXME comments
 - `plans` → Move incomplete plans back to `doing/`
+- `i18n` → `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`
+- `arch-diagrams` → `./scripts/sync-architecture-diagrams.sh` then re-run
 
-## LOCAL-ONLY TESTS (Minor/Major only)
+## LOCAL-ONLY TESTS (Minor/Major)
 
-After `release-brutal.sh` passes, run manually:
+After brutal passes, run manually:
 
 ```bash
 npx playwright test voice-api.spec.ts
@@ -67,113 +95,60 @@ npx playwright test maestro-conversation.spec.ts
 VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts
 ```
 
-## Vercel Environment Validation
+## VERCEL VALIDATION
 
-**Before release**, validate production Vercel deployment is configured correctly (ADR 0063, 0067):
+Automatic via `release-brutal.sh`:
 
-### Automatic Checks (via release-brutal.sh)
+1. `verify-vercel-env.sh` — env vars, SSL cert, Vercel CLI
+2. `verify-sentry-config.sh` — DSN, auth token, tunnel route, CSP
 
-The release script automatically runs:
+**SSL**: Pipe-separated (`tr '\n' '|'`). NEVER base64. NEVER `NODE_TLS_REJECT_UNAUTHORIZED=0`. ADR 0063.
 
-1. **Vercel Environment Variables**: `./scripts/verify-vercel-env.sh`
-   - Validates required env vars (DATABASE_URL, NODE_ENV, SUPABASE_CA_CERT)
-   - Checks Vercel CLI availability
-   - Verifies SSL certificate configuration
+**Post-deploy**: Check `/api/health`, `/api/health/detailed`, Sentry dashboard.
 
-2. **Sentry Configuration**: `./scripts/verify-sentry-config.sh`
-   - Validates NEXT_PUBLIC_SENTRY_DSN format and presence
-   - Checks SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT
-   - Verifies configuration files use VERCEL_ENV check
-   - Ensures tunnel route `/monitoring` is configured
-   - Validates CSP includes Sentry domains
-
-**Both checks are blocking** - release fails if either check fails.
-
-### Required Environment Variables
-
-See `@docs/claude/vercel-deployment.md` and `.claude/rules/ci-verification.md` for the complete list. Key vars: `DATABASE_URL`, `ADMIN_EMAIL`, `SESSION_SECRET`, `CRON_SECRET`, `SUPABASE_CA_CERT`, `AZURE_OPENAI_API_KEY`, `TOKEN_ENCRYPTION_KEY`, `RESEND_API_KEY`.
-
-### SSL Certificate Setup
-
-**NEVER use base64**. Use pipe-separated format: `cat config/supabase-chain.pem | tr '\n' '|'`. **NEVER use `NODE_TLS_REJECT_UNAUTHORIZED=0`**. See ADR 0063.
-
-### Pre-Release Checklist
-
-- [ ] All env vars set in Vercel dashboard (Settings → Environment Variables)
-- [ ] SSL certificate `SUPABASE_CA_CERT` is pipe-separated (NOT base64)
-- [ ] No `NODE_TLS_REJECT_UNAUTHORIZED` in any env
-- [ ] `release-brutal.sh` passed (includes automatic Vercel/Sentry checks)
-- [ ] Build has ZERO warnings (Sentry `silent: true` in next.config.ts)
-- [ ] Health check returns "healthy": `curl https://mirrorbuddy.vercel.app/api/health`
-- [ ] Sentry configuration verified (automatic via `verify-sentry-config.sh`)
-
-**Release BLOCKED if**:
-
-- Any env var missing
-- Sentry configuration invalid (DSN missing, wrong format, or config files incorrect)
-- Health check fails
-
-### Post-Deployment Verification
-
-`vercel ls | head -5` then check `/api/health`, `/api/health/detailed`, and Sentry dashboard.
-
-### References
-
-- `@docs/claude/vercel-deployment.md` - Full deployment guide
-- ADR 0063 - Supabase SSL Certificate Requirements
-- ADR 0067 - Database Performance Optimization (Sentry warnings fix)
-
-## ARCHITECTURE DIAGRAMS VALIDATION (MANDATORY)
-
-The `arch-diagrams` check in release-brutal.sh validates:
-
-| Validation          | Count | Blocking |
-| ------------------- | ----- | -------- |
-| Main sections       | 25    | Yes      |
-| Compliance sections | 21    | Yes      |
-| Mermaid diagrams    | ≥40   | Yes      |
-| ALL ADRs referenced | 100%  | **Yes**  |
-
-**ALL ADRs must be referenced** - no exceptions. Missing ADRs block release.
+## ARCHITECTURE DIAGRAMS
 
 ```bash
-# Step 1: Auto-sync missing ADRs (run BEFORE check)
-./scripts/sync-architecture-diagrams.sh
-
-# Step 2: Run comprehensive check
-./scripts/check-architecture-diagrams.sh
+./scripts/sync-architecture-diagrams.sh   # Auto-sync missing ADRs
+./scripts/check-architecture-diagrams.sh  # Validate (25 main + 21 compliance + 40+ diagrams)
 ```
 
-Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:
-
-1. **Update version header** to match new version
-2. **Update "Last Verified" date** to release date
-3. **Add any new sections** if architecture expanded
-4. **Add missing ADRs** shown as warnings in check script
-
-**If adding new main section** (beyond 25): Update `EXPECTED_SECTIONS` in `scripts/check-architecture-diagrams.sh`
-
-**If adding new compliance section** (beyond 19.21): Update `COMPLIANCE_EXPECTED` in same script
-
-## DOCUMENTATION/CODE AUDIT VALIDATION
-
-Script: `./scripts/doc-code-audit.sh` — Detects documentation/code mismatches (trial limits, health status, voice model, metrics cadence). Exit 0 = PASS, exit 1 = BLOCKED. Run `./scripts/doc-code-audit.sh` for details. Automatically included in `release-brutal.sh`.
+ALL ADRs must be referenced. Before bump: update version header + "Last Verified" date in `ARCHITECTURE-DIAGRAMS.md`.
 
 ## VERSION + RELEASE
 
 ```bash
-./scripts/auto-version.sh           # Analyze commits
-./scripts/auto-version.sh --apply   # Bump version
-# Update ARCHITECTURE-DIAGRAMS.md version header
-sed -i '' "s/\*\*Version\*\*: .*/\*\*Version\*\*: $(cat VERSION)/" ARCHITECTURE-DIAGRAMS.md
+# 1. Analyze commits for version type
+./scripts/auto-version.sh
+
+# 2. Apply bump (updates VERSION + package.json)
+./scripts/auto-version.sh --apply
+
+# 3. Generate evidence pack
+npm run release:evidence
+
+# 4. Update arch diagrams version
+VER=$(cat VERSION)
+sed -i '' "s/\*\*Version\*\*: .*/\*\*Version\*\*: $VER/" ARCHITECTURE-DIAGRAMS.md
 sed -i '' "s/\*\*Last Verified\*\*: .*/\*\*Last Verified\*\*: $(date +%Y-%m-%d)/" ARCHITECTURE-DIAGRAMS.md
-sed -i '' "s/_Version: .*/_Version: $(cat VERSION)_/" ARCHITECTURE-DIAGRAMS.md
-sed -i '' "s/_Last updated: .*/_Last updated: $(date '+%d %B %Y')_/" ARCHITECTURE-DIAGRAMS.md
-git add ARCHITECTURE-DIAGRAMS.md && git commit --amend --no-edit
-git tag -a vX.Y.Z -m "Release X.Y.Z"
+
+# 5. Commit + tag + release
+git add -A && git commit -m "release: v$VER"
+git tag -a "v$VER" -m "Release $VER"
 git push origin main --tags
-gh release create vX.Y.Z --generate-notes
+gh release create "v$VER" --generate-notes
 ```
+
+## EVIDENCE PACK
+
+`npm run release:evidence` saves to `docs/releases/<version>/`:
+
+- `release-brutal.sh --json` output
+- Coverage report (`coverage/coverage-summary.json`)
+- Playwright report (`playwright-report/`)
+- Security audit (`npm audit`)
+
+**Evidence is MANDATORY for minor/major releases.**
 
 ## RULE
 
