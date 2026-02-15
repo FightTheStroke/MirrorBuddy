@@ -38,8 +38,8 @@ describe('/api/realtime/sdp-exchange', () => {
     it('should find realtime/calls endpoint in route code', async () => {
       // Read the route file and verify it contains the GA endpoint
       const { readFileSync } = await import('fs');
-      const routePath =
-        '/Users/roberdan/GitHub/MirrorBuddy-plan-148/src/app/api/realtime/sdp-exchange/route.ts';
+      const { resolve } = await import('path');
+      const routePath = resolve(__dirname, 'route.ts');
       const content = readFileSync(routePath, 'utf-8');
 
       // This should PASS even before implementation (already exists)

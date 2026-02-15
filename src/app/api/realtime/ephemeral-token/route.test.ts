@@ -70,8 +70,8 @@ describe('/api/realtime/ephemeral-token', () => {
     it('should find client_secrets in updated route code', async () => {
       // Read the route file and verify it contains client_secrets endpoint
       const { readFileSync } = await import('fs');
-      const routePath =
-        '/Users/roberdan/GitHub/MirrorBuddy-plan-148/src/app/api/realtime/ephemeral-token/route.ts';
+      const { resolve } = await import('path');
+      const routePath = resolve(__dirname, 'route.ts');
       const content = readFileSync(routePath, 'utf-8');
 
       // This will FAIL initially (RED) until implementation is done
