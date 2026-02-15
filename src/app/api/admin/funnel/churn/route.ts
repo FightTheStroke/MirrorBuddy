@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface ChurnByStage {
   stage: string;

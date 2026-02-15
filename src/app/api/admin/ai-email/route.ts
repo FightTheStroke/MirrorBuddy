@@ -3,14 +3,15 @@
  * GET /api/admin/ai-email
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getAIEmailMetrics } from "@/lib/admin/ai-email-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { getAIEmailMetrics } from '@/lib/admin/ai-email-service';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const dynamic = 'force-static';
 
 export const GET = pipe(
-  withSentry("/api/admin/ai-email"),
+  withSentry('/api/admin/ai-email'),
   withAdmin,
 )(async (_ctx) => {
   const data = await getAIEmailMetrics();

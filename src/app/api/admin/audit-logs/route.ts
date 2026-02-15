@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
 
 /**
  * GET /api/admin/audit-logs
@@ -9,27 +9,24 @@ import { prisma } from "@/lib/db";
  */
 
 export const revalidate = 0;
+export const dynamic = 'force-static';
 export const GET = pipe(
-  withSentry("/api/admin/audit-logs"),
+  withSentry('/api/admin/audit-logs'),
   withAdmin,
 )(async (ctx) => {
   const searchParams = ctx.req.nextUrl.searchParams;
-  const action = searchParams.get("action");
-  const userId = searchParams.get("userId");
-  const adminId = searchParams.get("adminId");
-  const startDate = searchParams.get("startDate");
-  const endDate = searchParams.get("endDate");
+  const action = searchParams.get('action');
+  const userId = searchParams.get('userId');
+  const adminId = searchParams.get('adminId');
+  const startDate = searchParams.get('startDate');
+  const endDate = searchParams.get('endDate');
 
   // Validate pagination parameters
-  const rawPage = parseInt(searchParams.get("page") || "1", 10);
-  const rawPageSize = parseInt(searchParams.get("pageSize") || "50", 10);
+  const rawPage = parseInt(searchParams.get('page') || '1', 10);
+  const rawPageSize = parseInt(searchParams.get('pageSize') || '50', 10);
   const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
   const pageSize =
-    Number.isNaN(rawPageSize) || rawPageSize < 1
-      ? 50
-      : rawPageSize > 100
-        ? 100
-        : rawPageSize;
+    Number.isNaN(rawPageSize) || rawPageSize < 1 ? 50 : rawPageSize > 100 ? 100 : rawPageSize;
 
   // Build filter object
   const where: Record<string, unknown> = {};
@@ -53,7 +50,7 @@ export const GET = pipe(
   const [logs, total] = await Promise.all([
     prisma.tierAuditLog.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       skip,
       take: pageSize,
     }),

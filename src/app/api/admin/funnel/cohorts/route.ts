@@ -4,12 +4,12 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { FUNNEL_STAGES, type FunnelStage } from "@/lib/funnel/constants";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { FUNNEL_STAGES, type FunnelStage } from '@/lib/funnel/constants';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface CohortData {
   week: string; // ISO week start date
@@ -43,28 +43,28 @@ function getWeekStart(date: Date): Date {
 
 function formatWeekLabel(date: Date): string {
   const months = [
-    "Gen",
-    "Feb",
-    "Mar",
-    "Apr",
-    "Mag",
-    "Giu",
-    "Lug",
-    "Ago",
-    "Set",
-    "Ott",
-    "Nov",
-    "Dic",
+    'Gen',
+    'Feb',
+    'Mar',
+    'Apr',
+    'Mag',
+    'Giu',
+    'Lug',
+    'Ago',
+    'Set',
+    'Ott',
+    'Nov',
+    'Dic',
   ];
   const weekNum = Math.ceil(date.getDate() / 7);
   return `W${weekNum} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/cohorts"),
+  withSentry('/api/admin/funnel/cohorts'),
   withAdmin,
 )(async (ctx) => {
-  const weeksBack = parseInt(ctx.req.nextUrl.searchParams.get("weeks") ?? "8");
+  const weeksBack = parseInt(ctx.req.nextUrl.searchParams.get('weeks') ?? '8');
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - weeksBack * 7);
@@ -81,7 +81,7 @@ export const GET = pipe(
       stage: true,
       createdAt: true,
     },
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
   });
 
   // Group users by their first event week
@@ -90,7 +90,7 @@ export const GET = pipe(
   const userLastActivity = new Map<string, Date>();
 
   for (const event of events) {
-    const userId = event.userId || event.visitorId || "";
+    const userId = event.userId || event.visitorId || '';
     if (!userId) continue;
 
     // Track first week
@@ -115,16 +115,17 @@ export const GET = pipe(
   const cohortMap = new Map<string, CohortData>();
 
   for (const [userId, firstWeek] of userFirstWeek) {
-    const weekKey = firstWeek.toISOString().split("T")[0];
+    const weekKey = firstWeek.toISOString().split('T')[0];
 
     if (!cohortMap.has(weekKey)) {
       cohortMap.set(weekKey, {
         week: weekKey,
         weekLabel: formatWeekLabel(firstWeek),
         totalUsers: 0,
-        stageBreakdown: Object.fromEntries(
-          FUNNEL_STAGES.map((s) => [s, 0]),
-        ) as Record<FunnelStage, number>,
+        stageBreakdown: Object.fromEntries(FUNNEL_STAGES.map((s) => [s, 0])) as Record<
+          FunnelStage,
+          number
+        >,
         conversionToTrial: 0,
         conversionToActive: 0,
         retention7d: 0,
@@ -146,10 +147,10 @@ export const GET = pipe(
     }
 
     // Conversion metrics
-    if (stages.has("TRIAL_START") || stages.has("TRIAL_ENGAGED")) {
+    if (stages.has('TRIAL_START') || stages.has('TRIAL_ENGAGED')) {
       cohort.conversionToTrial++;
     }
-    if (stages.has("ACTIVE") || stages.has("FIRST_LOGIN")) {
+    if (stages.has('ACTIVE') || stages.has('FIRST_LOGIN')) {
       cohort.conversionToActive++;
     }
 
@@ -177,13 +178,9 @@ export const GET = pipe(
           ? Math.round((cohort.conversionToActive / cohort.totalUsers) * 100)
           : 0,
       retention7d:
-        cohort.totalUsers > 0
-          ? Math.round((cohort.retention7d / cohort.totalUsers) * 100)
-          : 0,
+        cohort.totalUsers > 0 ? Math.round((cohort.retention7d / cohort.totalUsers) * 100) : 0,
       retention14d:
-        cohort.totalUsers > 0
-          ? Math.round((cohort.retention14d / cohort.totalUsers) * 100)
-          : 0,
+        cohort.totalUsers > 0 ? Math.round((cohort.retention14d / cohort.totalUsers) * 100) : 0,
     }));
 
   const response: CohortsResponse = {

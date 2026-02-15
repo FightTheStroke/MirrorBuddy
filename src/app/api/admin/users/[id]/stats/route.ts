@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const GET = pipe(
-  withSentry("/api/admin/users/[id]/stats"),
+  withSentry('/api/admin/users/[id]/stats'),
   withAdmin,
 )(async (ctx) => {
   const params = await ctx.params;
   const userId = params.id;
 
   if (!userId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({
@@ -35,7 +35,7 @@ export const GET = pipe(
   });
 
   if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   const thirtyDaysAgo = new Date();
@@ -56,10 +56,10 @@ export const GET = pipe(
       where: { userId, createdAt: { gte: thirtyDaysAgo } },
     }),
     prisma.conversation.groupBy({
-      by: ["maestroId"],
+      by: ['maestroId'],
       where: { userId },
       _count: true,
-      orderBy: { _count: { maestroId: "desc" } },
+      orderBy: { _count: { maestroId: 'desc' } },
       take: 5,
     }),
     prisma.message.count({
@@ -80,7 +80,7 @@ export const GET = pipe(
 
   const lastActivity = await prisma.conversation.findFirst({
     where: { userId },
-    orderBy: { updatedAt: "desc" },
+    orderBy: { updatedAt: 'desc' },
     select: { updatedAt: true },
   });
 
@@ -101,13 +101,11 @@ export const GET = pipe(
       },
       materials: totalMaterials,
       voiceMinutes: Math.round(sessionMetrics._sum.voiceMinutes || 0),
-      topMaestri: conversationsByMaestro.map(
-        (m: { maestroId: string | null; _count: number }) => ({
-          maestroId: m.maestroId || "unknown",
-          sessions: m._count,
-        }),
-      ),
+      topMaestri: conversationsByMaestro.map((m: { maestroId: string | null; _count: number }) => ({
+        maestroId: m.maestroId || 'unknown',
+        sessions: m._count,
+      })),
     },
-    settings: settings || { language: "it", theme: "system" },
+    settings: settings || { language: 'it', theme: 'system' },
   });
 });

@@ -15,7 +15,7 @@ import { prisma } from '@/lib/db';
 const log = logger.child({ module: 'admin-counts-sse' });
 
 // Force dynamic rendering (no static optimization)
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 /**
  * SSE endpoint for admin dashboard real-time counts

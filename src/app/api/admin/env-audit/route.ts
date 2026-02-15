@@ -10,7 +10,7 @@ import { NextResponse } from 'next/server';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 import { getEnvAudit } from '@/lib/admin/env-audit-service';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export const GET = pipe(
   withSentry('/api/admin/env-audit'),
