@@ -8,7 +8,13 @@
 #   ./scripts/env-vault.sh diff     # Compare local .env vs Key Vault version
 #   ./scripts/env-vault.sh status   # Show backup info
 #
-# Prerequisites: az CLI logged in, access to kv-virtualbpm-prod
+# Prerequisites:
+#   1. Azure CLI installed: brew install azure-cli
+#   2. Logged in: az login (opens browser, SSO with Microsoft account)
+#   3. Access to Key Vault kv-virtualbpm-prod (roberdan@microsoft.com)
+#
+# No extra credentials needed — uses your Azure AD session.
+# Session lasts ~24h, then run `az login` again.
 # ============================================================================
 set -euo pipefail
 

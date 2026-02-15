@@ -165,6 +165,48 @@ DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
+### Backup & Restore
+
+The `.env` file is NOT tracked in git. It is backed up to **Azure Key Vault** (`kv-virtualbpm-prod`) and synced to **GitHub Secrets** and **Vercel**.
+
+```bash
+# Prerequisites: Azure CLI logged in
+az login  # Only needed once per machine
+
+# Backup .env to Key Vault (run after any .env change)
+./scripts/env-vault.sh backup
+
+# Restore .env from Key Vault (new machine or disaster recovery)
+./scripts/env-vault.sh restore
+
+# Compare local .env vs Key Vault version
+./scripts/env-vault.sh diff
+
+# Show backup info (date, var count)
+./scripts/env-vault.sh status
+```
+
+**Disaster recovery** (new machine):
+
+```bash
+git clone https://github.com/FightTheStroke/MirrorBuddy.git
+cd MirrorBuddy
+az login                          # Authenticate with Azure
+./scripts/env-vault.sh restore    # Restore .env from Key Vault
+npm ci                            # Install dependencies
+npx prisma generate               # Generate Prisma client
+npm run dev                       # Start development server
+```
+
+**Where secrets are stored** (4 copies):
+
+| Location | What | Access |
+|---|---|---|
+| Azure Key Vault | Full `.env` (encrypted) | `az login` required |
+| GitHub Secrets | All production vars | Repo admin access |
+| Vercel | Production env vars | Vercel team access |
+| Local `.env` | Source of truth | This machine only |
+
 ---
 
 ## Available Scripts
