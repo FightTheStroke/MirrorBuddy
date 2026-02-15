@@ -66,3 +66,9 @@ Before modifying: `npm run test:unit -- csp-validation`. "Caricamento..." foreve
 ## Verification
 
 `./scripts/health-check.sh` (full triage, ~6 lines) or `npm run ci:summary` (build only). Details: `.claude/rules/ci-verification.md`.
+
+## Thor Validation
+
+Per-task Thor (Gate 1-4, 8, 9) after each task; per-wave Thor (all 9 gates + build) after wave.
+Gate 9 enforces ADR compliance (19 active ADRs in `docs/adr/`). ADR-Smart Mode for documentation tasks.
+Progress only counts Thor-validated tasks. `plan-db.sh validate-task` / `validate-wave`.
