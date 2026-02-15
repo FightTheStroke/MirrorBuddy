@@ -159,6 +159,7 @@ if [ -f ".env" ]; then
 	# Check for unregistered env vars (bash 3 compatible - no associative arrays)
 	REQUIRED_SET=$(printf '%s\n' "${REQUIRED_VARS[@]}")
 
+	UNREGISTERED=""
 	while IFS= read -r line; do
 		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
 		vn="${line%%=*}"
