@@ -226,4 +226,34 @@ describe('Session Config Locale Threading', () => {
     // Verify German language instructions are present
     expect(instructions).toContain('GERMAN');
   });
+
+  it('should not include deprecated pcm16 audio format fields in session.update', async () => {
+    useSettingsStore.setState({
+      appearance: { language: 'en', theme: 'system', accentColor: 'blue' },
+    });
+
+    const maestroRef = { current: mockMaestro };
+    const webrtcDataChannelRef = { current: mockDataChannel };
+    const initialMessagesRef = { current: null };
+    const greetingSentRef = { current: false };
+
+    const { result } = renderHook(() =>
+      useSendSessionConfig(
+        maestroRef,
+        vi.fn(),
+        vi.fn(),
+        vi.fn(),
+        { onStateChange: vi.fn() },
+        webrtcDataChannelRef,
+        initialMessagesRef,
+        greetingSentRef,
+      ),
+    );
+
+    await result.current();
+    const sessionUpdate = dataChannelMessages.find((msg: any) => msg.type === 'session.update') as any;
+
+    expect(sessionUpdate.session).not.toHaveProperty('input_audio_format');
+    expect(sessionUpdate.session).not.toHaveProperty('output_audio_format');
+  });
 });

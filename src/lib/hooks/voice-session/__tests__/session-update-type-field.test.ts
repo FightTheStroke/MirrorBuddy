@@ -26,8 +26,6 @@ describe('session.update type field', () => {
       session: {
         voice: 'alloy',
         instructions: 'Test instructions',
-        input_audio_format: 'pcm16',
-        output_audio_format: 'pcm16',
         turn_detection: {
           type: 'server_vad',
           threshold: 0.5,
@@ -54,7 +52,6 @@ describe('session.update type field', () => {
       session: {
         voice: 'alloy',
         instructions: 'Sei un assistente di test. Rispondi brevemente in italiano con una frase.',
-        input_audio_format: 'pcm16',
         turn_detection: {
           type: 'server_vad',
           threshold: 0.5,

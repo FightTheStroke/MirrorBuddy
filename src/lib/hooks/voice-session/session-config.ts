@@ -194,14 +194,12 @@ export function useSendSessionConfig(
     // Build session config
     const sessionConfig = {
       type: 'session.update',
-      session: {
-        voice: maestro.voice || 'alloy',
-        instructions: fullInstructions,
-        input_audio_format: 'pcm16',
-        output_audio_format: 'pcm16',
-        input_audio_noise_reduction: {
-          type: options.noiseReductionType || vadConfig.noise_reduction,
-        },
+        session: {
+          voice: maestro.voice || 'alloy',
+          instructions: fullInstructions,
+          input_audio_noise_reduction: {
+            type: options.noiseReductionType || vadConfig.noise_reduction,
+          },
         input_audio_transcription: {
           model: 'whisper-1',
           ...(isLanguageTeacher && targetLanguage
