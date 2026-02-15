@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 
 // Mock feature flags service
-vi.mock('@/lib/feature-flags/feature-flags-service', () => ({
+vi.mock('@/lib/feature-flags/client', () => ({
   isFeatureEnabled: vi.fn(),
 }));
 
@@ -106,7 +106,7 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
   });
 
   it('should use empty iceServers array when voice_ga_protocol is enabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/feature-flags-service');
+    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
     (isFeatureEnabled as Mock).mockReturnValue({
       enabled: true,
       reason: 'enabled',
@@ -151,7 +151,7 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
   });
 
   it('should use ICE_SERVERS configuration when voice_ga_protocol is disabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/feature-flags-service');
+    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
     (isFeatureEnabled as Mock).mockReturnValue({
       enabled: false,
       reason: 'disabled',
@@ -261,7 +261,7 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
   });
 
   it('should skip ICE gathering wait when voice_ga_protocol is enabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/feature-flags-service');
+    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
     (isFeatureEnabled as Mock).mockReturnValue({
       enabled: true,
       reason: 'enabled',
@@ -316,7 +316,7 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
   });
 
   it('should wait for ICE gathering completion when voice_ga_protocol is disabled', async () => {
-    const { isFeatureEnabled } = await import('@/lib/feature-flags/feature-flags-service');
+    const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
     (isFeatureEnabled as Mock).mockReturnValue({
       enabled: false,
       reason: 'disabled',

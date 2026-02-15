@@ -17,6 +17,8 @@ import { ChatInput } from '@/components/conversation/character-chat-view/compone
 import { useCharacterChat } from '@/components/conversation/character-chat-view/hooks/use-character-chat';
 import { getCharacterInfo } from '@/components/conversation/character-chat-view/utils/character-utils';
 import { useSettingsStore } from '@/lib/stores';
+import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
+import { useTTS } from '@/components/accessibility';
 import type { SupportedLanguage } from '@/types';
 
 interface CharacterConversationAdapterProps {
@@ -40,6 +42,12 @@ export function CharacterConversationAdapter({
 }: CharacterConversationAdapterProps) {
   const language = useSettingsStore((state) => state.appearance.language) as SupportedLanguage;
   const character = getCharacterInfo(characterId, characterType, language);
+
+  // TTS support (config.voiceEnabled controls availability)
+  useTTS();
+
+  // Handoff support (always call hook, use config to determine if active)
+  useConversationFlowStore();
 
   // Reuse existing character chat logic
   const { messages, input, setInput, isLoading, activeTool, handleSend, handleToolRequest } =

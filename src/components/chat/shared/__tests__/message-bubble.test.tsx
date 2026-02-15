@@ -71,7 +71,7 @@ describe('MessageBubble', () => {
       />,
     );
 
-    expect(screen.getByText(/trascrizioneVocale/i)).toBeInTheDocument();
+    expect(screen.getByText(/trascrizione vocale/i)).toBeInTheDocument();
   });
 
   it('shows TTS button when enabled for assistant messages', () => {
@@ -89,7 +89,7 @@ describe('MessageBubble', () => {
       />,
     );
 
-    const ttsButton = screen.getByTitle(/leggiAdAltaVoce/i);
+    const ttsButton = screen.getByTitle(/leggi ad alta voce/i);
     expect(ttsButton).toBeInTheDocument();
   });
 
@@ -106,7 +106,7 @@ describe('MessageBubble', () => {
       />,
     );
 
-    expect(screen.queryByTitle(/leggiAdAltaVoce/i)).not.toBeInTheDocument();
+    expect(screen.queryByTitle(/leggi ad alta voce/i)).not.toBeInTheDocument();
   });
 
   it('applies high contrast styles when enabled', () => {
@@ -189,7 +189,9 @@ describe('MessageBubble', () => {
       />,
     );
 
-    expect(screen.getByRole('button', { name: /ai/i })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/risposta generata da intelligenza artificiale/i),
+    ).toBeInTheDocument();
   });
 
   it('shows copy button on hover', () => {
@@ -206,7 +208,7 @@ describe('MessageBubble', () => {
       />,
     );
 
-    const copyButton = screen.getByTitle(/copiaMessaggio/i);
+    const copyButton = screen.getByTitle(/copia messaggio/i);
     expect(copyButton).toBeInTheDocument();
   });
 });

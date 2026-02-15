@@ -118,6 +118,9 @@ describe('Character Parity - TTS/Voice/Handoff', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock scrollIntoView for ConversationShell
+    Element.prototype.scrollIntoView = vi.fn();
   });
 
   describe('TTS (Text-to-Speech) Parity', () => {

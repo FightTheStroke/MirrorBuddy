@@ -8,18 +8,36 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import { CallingOverlay } from '../CallingOverlay';
-import * as featureFlagsModule from '@/lib/feature-flags';
+import * as featureFlagsModule from '@/lib/feature-flags/client';
 
 // Mock feature flags
-vi.mock('@/lib/feature-flags', () => ({
+vi.mock('@/lib/feature-flags/client', () => ({
   isFeatureEnabled: vi.fn(),
+}));
+
+// Mock accessibility store
+vi.mock('@/lib/accessibility', () => ({
+  useAccessibilityStore: vi.fn(() => ({
+    activeProfile: null,
+    shouldAnimate: () => true,
+  })),
 }));
 
 describe('CallingOverlay', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock matchMedia for all tests
+    window.matchMedia = vi.fn().mockImplementation((query) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
   });
 
   afterEach(() => {
@@ -122,12 +140,13 @@ describe('CallingOverlay', () => {
 
       expect(screen.getByText(/connected/i)).toBeInTheDocument();
 
-      // Fast-forward past the auto-hide delay (2 seconds)
-      vi.advanceTimersByTime(2500);
-
-      await waitFor(() => {
-        expect(container.firstChild).toBeNull();
+      // Fast-forward past the auto-hide delay (2 seconds) and wait for state updates
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(2500);
       });
+
+      // Component should now be hidden
+      expect(container.firstChild).toBeNull();
 
       vi.useRealTimers();
     });

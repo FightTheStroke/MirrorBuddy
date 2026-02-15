@@ -52,7 +52,7 @@ describe('export-helpers', () => {
 
   describe('sanitizeFilename', () => {
     it('removes illegal characters', () => {
-      expect(sanitizeFilename('file<>:"/\\|?*name')).toBe('file_________name');
+      expect(sanitizeFilename('file<>:"/\\|?*name')).toBe('filename');
     });
 
     it('replaces spaces with underscores', () => {
@@ -77,7 +77,7 @@ describe('export-helpers', () => {
     });
 
     it('handles filename with only illegal chars', () => {
-      expect(sanitizeFilename('<>:"/\\|?*')).toBe('_________');
+      expect(sanitizeFilename('<>:"/\\|?*')).toBe('');
     });
   });
 

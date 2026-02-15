@@ -17,6 +17,7 @@ import { ConversationShell } from '../shared/ConversationShell';
 import { MaestroSessionMessages } from '@/components/maestros/maestro-session-messages';
 import { MaestroSessionInput } from '@/components/maestros/maestro-session-input';
 import { useMaestroSessionLogic } from '@/components/maestros/use-maestro-session-logic';
+import { useTTS } from '@/components/accessibility';
 
 interface MaestroConversationAdapterProps {
   maestro: Maestro;
@@ -32,11 +33,15 @@ interface MaestroConversationAdapterProps {
  */
 export function MaestroConversationAdapter({
   maestro,
-  config: _config,
+  config,
   onClose: _onClose,
 }: MaestroConversationAdapterProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // TTS support (config.voiceEnabled controls availability)
+  const tts = useTTS();
+  const ttsEnabled = config.voiceEnabled && tts.enabled;
 
   // Reuse existing maestro session logic
   const session = useMaestroSessionLogic({
@@ -70,8 +75,8 @@ export function MaestroConversationAdapter({
         maestro={maestro}
         isLoading={session.isLoading}
         toolCalls={session.toolCalls}
-        ttsEnabled={false}
-        speak={() => {}}
+        ttsEnabled={ttsEnabled}
+        speak={tts.speak}
         messagesEndRef={messagesEndRef}
       />
     </ConversationShell>

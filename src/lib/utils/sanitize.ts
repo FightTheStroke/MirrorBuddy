@@ -8,7 +8,7 @@
  */
 export function sanitizeFilename(name: string, maxLength = 100): string {
   return name
-    .replace(/[<>:"/\\|?*]/g, '_')
+    .replace(/[<>:"/\\|?*]/g, '')
     .replace(/\s+/g, '_')
     .slice(0, maxLength);
 }
