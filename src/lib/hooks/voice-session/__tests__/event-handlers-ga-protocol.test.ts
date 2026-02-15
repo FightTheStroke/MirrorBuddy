@@ -23,11 +23,7 @@ describe('Event Handlers - GA Protocol Event Names', () => {
       sessionReadyRef: { current: false },
       audioQueueRef: {
         current: {
-          push: vi.fn(),
-          shift: vi.fn(),
           clear: vi.fn(),
-          size: vi.fn(() => 0),
-          isEmpty: vi.fn(() => true),
         } as never,
       },
       isPlayingRef: { current: false },
@@ -50,10 +46,7 @@ describe('Event Handlers - GA Protocol Event Names', () => {
       sendSessionConfig: vi.fn(),
       sendGreeting: vi.fn(),
       unmuteAudioTracksRef: { current: null },
-      initPlaybackContext: vi.fn(),
       startAudioCapture: vi.fn(),
-      playNextChunk: vi.fn(),
-      scheduleQueuedChunks: vi.fn(),
       maestroRef: { current: { id: 'm1', name: 'Test Maestro' } } as never,
       sessionIdRef: { current: 'session-123' },
       addToolCall: vi.fn(),

@@ -8,12 +8,7 @@
 import { useEffect } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
 import type { UseVoiceSessionOptions } from './types';
-import {
-  useInitPlaybackContext,
-  useScheduleQueuedChunks,
-  usePlayNextChunk,
-  useOutputLevelPolling,
-} from './audio-playback';
+import { useInitPlaybackContext, useOutputLevelPolling } from './audio-output-monitor';
 import { useStartAudioCapture } from './audio-capture';
 import { useSendGreeting, useSendSessionConfig } from './session-config';
 import { useHandleServerEvent } from './event-handlers';
@@ -52,38 +47,11 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     preferredOutputId,
   );
 
-  const audioPlaybackRefs = {
-    playbackContextRef: refs.playbackContextRef,
-    audioQueueRef: refs.audioQueueRef,
-    isPlayingRef: refs.isPlayingRef,
-    isBufferingRef: refs.isBufferingRef,
-    nextPlayTimeRef: refs.nextPlayTimeRef,
-    scheduledSourcesRef: refs.scheduledSourcesRef,
-    playNextChunkRef: refs.playNextChunkRef,
-    playbackAnalyserRef: refs.playbackAnalyserRef,
-    gainNodeRef: refs.gainNodeRef,
-  };
-
-  const scheduleQueuedChunks = useScheduleQueuedChunks(
-    audioPlaybackRefs,
-    store.setSpeaking,
-    store.setOutputLevel,
-  );
-  const playNextChunk = usePlayNextChunk(
-    audioPlaybackRefs,
-    scheduleQueuedChunks,
-    store.setSpeaking,
-    store.setOutputLevel,
-  );
   const { startPolling, stopPolling } = useOutputLevelPolling(
     refs.playbackAnalyserRef,
     refs.isPlayingRef,
     store.setOutputLevel,
   );
-
-  useEffect(() => {
-    refs.playNextChunkRef.current = playNextChunk;
-  }, [playNextChunk, refs]);
 
   useEffect(() => {
     if (store.isSpeaking) {
@@ -163,10 +131,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     sendSessionConfig,
     sendGreeting,
     unmuteAudioTracksRef: refs.unmuteAudioTracksRef,
-    initPlaybackContext,
     startAudioCapture,
-    playNextChunk,
-    scheduleQueuedChunks,
   });
 
   useEffect(() => {

@@ -48,16 +48,8 @@ function createMockRefs(): ConnectionRefs {
     processorRef: { current: null },
     audioQueueRef: {
       current: {
-        length: 0,
-        size: 0,
         clear: vi.fn(),
-        push: vi.fn(),
-        shift: vi.fn(),
-        unshift: vi.fn(),
-        peek: vi.fn(),
-        isFull: vi.fn(() => false),
-        isEmpty: vi.fn(() => true),
-      } as unknown as import('../voice-session/ring-buffer').RingBuffer<Int16Array>,
+      },
     },
     isPlayingRef: { current: false },
     isBufferingRef: { current: false },

@@ -6,8 +6,7 @@
 
 import { useRef, useState } from 'react';
 import type { Maestro } from '@/types';
-import { RingBuffer } from './ring-buffer';
-import { MAX_QUEUE_SIZE } from './constants';
+import { NoopAudioChunkQueue, type AudioChunkQueue } from './audio-queue';
 
 export interface VoiceSessionRefs {
   maestroRef: React.MutableRefObject<Maestro | null>;
@@ -18,7 +17,7 @@ export interface VoiceSessionRefs {
   processorRef: React.MutableRefObject<ScriptProcessorNode | null>;
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
   frequencyDataRef: React.MutableRefObject<Uint8Array<ArrayBuffer> | null>;
-  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
+  audioQueueRef: React.MutableRefObject<AudioChunkQueue>;
   isPlayingRef: React.MutableRefObject<boolean>;
   lastLevelUpdateRef: React.MutableRefObject<number>;
   playNextChunkRef: React.MutableRefObject<(() => void) | null>;
@@ -68,7 +67,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     processorRef: useRef<ScriptProcessorNode | null>(null),
     analyserRef: useRef<AnalyserNode | null>(null),
     frequencyDataRef: useRef<Uint8Array<ArrayBuffer> | null>(null),
-    audioQueueRef: useRef<RingBuffer<Int16Array>>(new RingBuffer(MAX_QUEUE_SIZE)),
+    audioQueueRef: useRef<AudioChunkQueue>(new NoopAudioChunkQueue()),
     isPlayingRef: useRef(false),
     lastLevelUpdateRef: useRef<number>(0),
     playNextChunkRef: useRef<(() => void) | null>(null),

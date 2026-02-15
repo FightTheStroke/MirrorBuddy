@@ -12,13 +12,12 @@ import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
 import { computeVoiceTimingDurations } from './voice-timing';
 import { checkUserTranscript, checkAssistantTranscript } from './transcript-safety';
-
-import type { RingBuffer } from './ring-buffer';
+import type { AudioChunkQueue } from './audio-queue';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
   sessionReadyRef: React.MutableRefObject<boolean>;
-  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
+  audioQueueRef: React.MutableRefObject<AudioChunkQueue>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
   scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;
@@ -39,17 +38,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   sendSessionConfig: () => void;
   sendGreeting: () => void;
   unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
-  initPlaybackContext: () => Promise<
-    | {
-        context: AudioContext;
-        analyser: AnalyserNode | null;
-        gainNode: GainNode | null;
-      }
-    | undefined
-  >;
   startAudioCapture: () => Promise<void>;
-  playNextChunk: () => void;
-  scheduleQueuedChunks: () => void;
 }
 
 /**
