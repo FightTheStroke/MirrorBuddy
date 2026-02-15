@@ -182,6 +182,7 @@ function validateOptionalEnvVars(): void {
     { name: 'GRAFANA_CLOUD_PROMETHEUS_USER', category: 'Observability' },
     { name: 'GRAFANA_CLOUD_API_KEY', category: 'Observability' },
     { name: 'GRAFANA_CLOUD_PUSH_INTERVAL', category: 'Observability' },
+    { name: 'GRAFANA_SERVICE_ACCOUNT_TOKEN', category: 'Observability' },
     // Stripe
     { name: 'STRIPE_SECRET_KEY', category: 'Stripe' },
     { name: 'STRIPE_WEBHOOK_SECRET', category: 'Stripe' },
