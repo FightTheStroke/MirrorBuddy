@@ -659,6 +659,10 @@
     "dataFor": "Dati per {title}",
     "toolResult": "Risultato strumento: {name}",
     "timerOption": "Timer {label}",
-    "chartDefault": "grafico"
+    "chartDefault": "grafico",
+    "statusBuilding": "[TRANSLATE] In costruzione...",
+    "statusCompleted": "[TRANSLATE] Completato!",
+    "statusError": "[TRANSLATE] Errore",
+    "statusCancelled": "[TRANSLATE] Annullato"
   }
 }

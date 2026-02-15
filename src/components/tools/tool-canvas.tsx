@@ -125,33 +125,33 @@ export function ToolCanvas({
       case 'building':
         return {
           icon: <Loader2 className="w-4 h-4 animate-spin" />,
-          text: 'In costruzione...',
+          text: t('statusBuilding'),
           color: 'text-blue-400',
           bg: 'bg-blue-900/20',
         };
       case 'completed':
         return {
           icon: <CheckCircle className="w-4 h-4" />,
-          text: 'Completato!',
+          text: t('statusCompleted'),
           color: 'text-green-400',
           bg: 'bg-green-900/20',
         };
       case 'error':
         return {
           icon: <XCircle className="w-4 h-4" />,
-          text: 'Errore',
+          text: t('statusError'),
           color: 'text-red-400',
           bg: 'bg-red-900/20',
         };
       case 'cancelled':
         return {
           icon: <Pause className="w-4 h-4" />,
-          text: 'Annullato',
+          text: t('statusCancelled'),
           color: 'text-yellow-400',
           bg: 'bg-yellow-900/20',
         };
     }
-  }, [toolStatus]);
+  }, [toolStatus, t]);
 
   return (
     <div
