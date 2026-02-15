@@ -96,8 +96,8 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   voice_full_prompt: {
     name: 'Voice Full Prompt',
     description: 'Use full system prompt instead of truncated',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   voice_transcript_safety: {
