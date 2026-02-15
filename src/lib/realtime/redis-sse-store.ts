@@ -3,10 +3,11 @@
 // Uses Upstash Redis in production, in-memory for development
 // ============================================================================
 
-import { Redis } from "@upstash/redis";
-import { logger } from "@/lib/logger";
+import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
+import { isRedisConfigured as checkRedisConfig, getRedisUrl, getRedisToken } from '@/lib/redis';
 
-const log = logger.child({ module: "sse-store" });
+const log = logger.child({ module: 'sse-store' });
 
 // ============================================================================
 // TYPES
@@ -26,26 +27,21 @@ export interface SSEClientStore {
   getClientsInRoom(roomId: string): Promise<SSEClientMetadata[]>;
   getRoomClientCount(roomId: string): Promise<number>;
   cleanupStale(maxAgeMs: number): Promise<number>;
-  getMode(): "redis" | "memory";
+  getMode(): 'redis' | 'memory';
 }
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
-const REDIS_KEY_PREFIX = "mirrorbuddy:sse:";
+const REDIS_KEY_PREFIX = 'mirrorbuddy:sse:';
 const CLIENT_TTL_SECONDS = 600; // 10 minutes TTL for client entries
 
 // Unique identifier for this server instance
 const INSTANCE_ID =
-  process.env.VERCEL_DEPLOYMENT_ID ||
-  `local-${Math.random().toString(36).slice(2, 8)}`;
+  process.env.VERCEL_DEPLOYMENT_ID || `local-${Math.random().toString(36).slice(2, 8)}`;
 
-function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
-}
+// Redis config resolved via centralized resolver in @/lib/redis
 
 // ============================================================================
 // IN-MEMORY STORE (Development)
@@ -56,7 +52,7 @@ class MemorySSEStore implements SSEClientStore {
 
   async register(client: SSEClientMetadata): Promise<void> {
     this.clients.set(client.id, client);
-    log.debug("Memory SSE client registered", {
+    log.debug('Memory SSE client registered', {
       clientId: client.id,
       roomId: client.roomId,
     });
@@ -64,7 +60,7 @@ class MemorySSEStore implements SSEClientStore {
 
   async unregister(clientId: string): Promise<void> {
     this.clients.delete(clientId);
-    log.debug("Memory SSE client unregistered", { clientId });
+    log.debug('Memory SSE client unregistered', { clientId });
   }
 
   async getClientsInRoom(roomId: string): Promise<SSEClientMetadata[]> {
@@ -97,8 +93,8 @@ class MemorySSEStore implements SSEClientStore {
     return cleaned;
   }
 
-  getMode(): "redis" | "memory" {
-    return "memory";
+  getMode(): 'redis' | 'memory' {
+    return 'memory';
   }
 }
 
@@ -111,10 +107,10 @@ class RedisSSEStore implements SSEClientStore {
 
   constructor() {
     this.redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!.trim(),
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!.trim(),
+      url: getRedisUrl()!.trim(),
+      token: getRedisToken()!.trim(),
     });
-    log.info("Redis SSE store initialized", { instanceId: INSTANCE_ID });
+    log.info('Redis SSE store initialized', { instanceId: INSTANCE_ID });
   }
 
   private clientKey(clientId: string): string {
@@ -129,13 +125,9 @@ class RedisSSEStore implements SSEClientStore {
     const clientData = { ...client, instanceId: INSTANCE_ID };
 
     // Store client data with TTL
-    await this.redis.set(
-      this.clientKey(client.id),
-      JSON.stringify(clientData),
-      {
-        ex: CLIENT_TTL_SECONDS,
-      },
-    );
+    await this.redis.set(this.clientKey(client.id), JSON.stringify(clientData), {
+      ex: CLIENT_TTL_SECONDS,
+    });
 
     // Add to room set with score as timestamp for ordered cleanup
     await this.redis.zadd(this.roomKey(client.roomId), {
@@ -143,7 +135,7 @@ class RedisSSEStore implements SSEClientStore {
       member: client.id,
     });
 
-    log.debug("Redis SSE client registered", {
+    log.debug('Redis SSE client registered', {
       clientId: client.id,
       roomId: client.roomId,
       instanceId: INSTANCE_ID,
@@ -154,10 +146,7 @@ class RedisSSEStore implements SSEClientStore {
     // Get client data first to know the room
     const data = await this.redis.get<string>(this.clientKey(clientId));
     if (data) {
-      const client =
-        typeof data === "string"
-          ? JSON.parse(data)
-          : (data as SSEClientMetadata);
+      const client = typeof data === 'string' ? JSON.parse(data) : (data as SSEClientMetadata);
       // Remove from room set
       await this.redis.zrem(this.roomKey(client.roomId), clientId);
     }
@@ -165,7 +154,7 @@ class RedisSSEStore implements SSEClientStore {
     // Delete client data
     await this.redis.del(this.clientKey(clientId));
 
-    log.debug("Redis SSE client unregistered", { clientId });
+    log.debug('Redis SSE client unregistered', { clientId });
   }
 
   async getClientsInRoom(roomId: string): Promise<SSEClientMetadata[]> {
@@ -180,9 +169,7 @@ class RedisSSEStore implements SSEClientStore {
     const clientPromises = clientIds.map(async (id) => {
       const data = await this.redis.get<string>(this.clientKey(id as string));
       if (!data) return null;
-      return typeof data === "string"
-        ? JSON.parse(data)
-        : (data as SSEClientMetadata);
+      return typeof data === 'string' ? JSON.parse(data) : (data as SSEClientMetadata);
     });
 
     const clients = await Promise.all(clientPromises);
@@ -197,12 +184,12 @@ class RedisSSEStore implements SSEClientStore {
   async cleanupStale(maxAgeMs: number): Promise<number> {
     // This is handled by Redis TTL, but we can clean room sets
     // For simplicity, TTL on individual keys handles this
-    log.debug("Redis cleanup triggered (handled by TTL)", { maxAgeMs });
+    log.debug('Redis cleanup triggered (handled by TTL)', { maxAgeMs });
     return 0;
   }
 
-  getMode(): "redis" | "memory" {
-    return "redis";
+  getMode(): 'redis' | 'memory' {
+    return 'redis';
   }
 }
 
@@ -218,12 +205,12 @@ let storeInstance: SSEClientStore | null = null;
  */
 export function getSSEStore(): SSEClientStore {
   if (!storeInstance) {
-    if (isRedisConfigured()) {
+    if (checkRedisConfig()) {
       storeInstance = new RedisSSEStore();
-      log.info("Using Redis SSE store");
+      log.info('Using Redis SSE store');
     } else {
       storeInstance = new MemorySSEStore();
-      log.info("Using in-memory SSE store (Redis not configured)");
+      log.info('Using in-memory SSE store (Redis not configured)');
     }
   }
   return storeInstance;

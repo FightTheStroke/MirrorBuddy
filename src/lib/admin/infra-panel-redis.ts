@@ -4,14 +4,8 @@
  */
 
 import { logger } from '@/lib/logger';
+import { isRedisConfigured, getRedisUrl, getRedisToken } from '@/lib/redis';
 import type { RedisMetrics } from './infra-panel-types';
-
-/**
- * Check if Redis is configured
- */
-function isRedisConfigured(): boolean {
-  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
-}
 
 /**
  * Parse Redis INFO response
@@ -53,14 +47,12 @@ function parseRedisInfo(info: string): Partial<RedisMetrics> {
 export async function getRedisMetrics(): Promise<RedisMetrics | null> {
   try {
     if (!isRedisConfigured()) {
-      logger.info(
-        'Redis not configured (missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN)',
-      );
+      logger.info('Redis not configured');
       return null;
     }
 
-    const url = process.env.UPSTASH_REDIS_REST_URL!;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
+    const url = getRedisUrl()!;
+    const token = getRedisToken()!;
 
     // Execute INFO command via REST API
     const response = await fetch(`${url}/INFO`, {

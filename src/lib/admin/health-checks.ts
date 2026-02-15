@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/db';
+import { getRedisUrl, getRedisToken } from '@/lib/redis';
 import type { ServiceHealth } from './health-aggregator-types';
 import { fetchWithTimeout, buildHealthResponse } from './health-checks-utils';
 
@@ -31,8 +32,8 @@ export async function checkDatabase(): Promise<ServiceHealth> {
  * Check Redis/KV connectivity
  */
 export async function checkRedis(): Promise<ServiceHealth> {
-  const kvUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const kvToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const kvUrl = getRedisUrl();
+  const kvToken = getRedisToken();
   const configured = !!kvUrl;
 
   if (!kvUrl || !kvToken) {

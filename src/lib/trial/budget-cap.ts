@@ -1,10 +1,11 @@
-import { Redis } from "@upstash/redis";
-import { logger } from "@/lib/logger";
+import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
+import { isRedisConfigured as checkRedisConfig, getRedisUrl, getRedisToken } from '@/lib/redis';
 
 export interface MonthlyBudgetData {
   used: number;
   limit: number;
-  currency: "EUR";
+  currency: 'EUR';
 }
 
 // ============================================================================
@@ -13,35 +14,27 @@ export interface MonthlyBudgetData {
 
 let redisInstance: Redis | null = null;
 
-function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
-}
-
 function getRedis(): Redis | null {
-  if (!isRedisConfigured()) {
+  if (!checkRedisConfig()) {
     return null;
   }
 
   if (!redisInstance) {
     redisInstance = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!.trim(),
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!.trim(),
+      url: getRedisUrl()!.trim(),
+      token: getRedisToken()!.trim(),
     });
   }
 
   return redisInstance;
 }
 
-const TRIAL_BUDGET_LIMIT_EUR = Number(
-  process.env.TRIAL_BUDGET_LIMIT_EUR || 100,
-);
+const TRIAL_BUDGET_LIMIT_EUR = Number(process.env.TRIAL_BUDGET_LIMIT_EUR || 100);
 
 function getMonthlyKey(): string {
   const now = new Date();
   const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, '0');
   return `mirrorbuddy:trial:budget:${year}-${month}`;
 }
 
@@ -50,11 +43,11 @@ async function getMonthlyBudget(): Promise<MonthlyBudgetData> {
 
   // Fallback when Redis not configured (development, CI)
   if (!redis) {
-    logger.warn("Redis not configured, using unlimited budget fallback");
+    logger.warn('Redis not configured, using unlimited budget fallback');
     return {
       used: 0,
       limit: TRIAL_BUDGET_LIMIT_EUR,
-      currency: "EUR",
+      currency: 'EUR',
     };
   }
 
@@ -70,16 +63,16 @@ async function getMonthlyBudget(): Promise<MonthlyBudgetData> {
     const initialData: MonthlyBudgetData = {
       used: 0,
       limit: TRIAL_BUDGET_LIMIT_EUR,
-      currency: "EUR",
+      currency: 'EUR',
     };
     await redis.setex(key, 30 * 24 * 60 * 60, initialData); // 30 days TTL
     return initialData;
   } catch (error) {
-    logger.error("Budget cache error", undefined, error as Error);
+    logger.error('Budget cache error', undefined, error as Error);
     return {
       used: 0,
       limit: TRIAL_BUDGET_LIMIT_EUR,
-      currency: "EUR",
+      currency: 'EUR',
     };
   }
 }
@@ -89,7 +82,7 @@ async function incrementBudget(amount: number): Promise<MonthlyBudgetData> {
 
   // Fallback when Redis not configured
   if (!redis) {
-    logger.warn("Redis not configured, budget increment skipped");
+    logger.warn('Redis not configured, budget increment skipped');
     return await getMonthlyBudget();
   }
 
@@ -103,7 +96,7 @@ async function incrementBudget(amount: number): Promise<MonthlyBudgetData> {
     await redis.setex(key, 30 * 24 * 60 * 60, updated);
     return updated;
   } catch (error) {
-    logger.error("Budget increment error", { amount }, error as Error);
+    logger.error('Budget increment error', { amount }, error as Error);
     return await getMonthlyBudget();
   }
 }
@@ -118,9 +111,4 @@ async function getRemainingBudget(): Promise<number> {
   return Math.max(0, budget.limit - budget.used);
 }
 
-export {
-  getMonthlyBudget,
-  incrementBudget,
-  isBudgetExhausted,
-  getRemainingBudget,
-};
+export { getMonthlyBudget, incrementBudget, isBudgetExhausted, getRemainingBudget };

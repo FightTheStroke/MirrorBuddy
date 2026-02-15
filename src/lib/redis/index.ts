@@ -2,19 +2,27 @@
 // REDIS CLIENT - Singleton Upstash Redis client (serverless-safe)
 // ============================================================================
 
-import { Redis } from "@upstash/redis";
-import { logger } from "@/lib/logger";
+import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
-const log = logger.child({ module: "redis" });
+const log = logger.child({ module: 'redis' });
 
 // ============================================================================
-// CONFIGURATION
+// CONFIGURATION - accepts both UPSTASH_REDIS_REST_* and KV_REST_API_* (Vercel)
 // ============================================================================
 
-function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+/** Resolve Redis URL from either naming convention */
+export function getRedisUrl(): string | undefined {
+  return process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+}
+
+/** Resolve Redis token from either naming convention */
+export function getRedisToken(): string | undefined {
+  return process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+}
+
+export function isRedisConfigured(): boolean {
+  return !!(getRedisUrl() && getRedisToken());
 }
 
 // ============================================================================
@@ -28,18 +36,18 @@ let redisInstance: Redis | null = null;
  * Serverless-safe: only creates instance once, safe for Next.js hot reload
  */
 export function getRedisClient(): Redis {
-  if (!isRedisConfigured()) {
+  const url = getRedisUrl();
+  const token = getRedisToken();
+
+  if (!url || !token) {
     throw new Error(
-      "Redis not configured: UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required",
+      'Redis not configured: set UPSTASH_REDIS_REST_URL/TOKEN or KV_REST_API_URL/TOKEN',
     );
   }
 
   if (!redisInstance) {
-    redisInstance = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    });
-    log.info("Redis client initialized");
+    redisInstance = new Redis({ url, token });
+    log.info('Redis client initialized');
   }
 
   return redisInstance;

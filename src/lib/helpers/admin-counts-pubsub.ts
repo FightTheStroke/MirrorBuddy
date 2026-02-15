@@ -11,10 +11,11 @@
  * - Graceful degradation: Non-fatal if Redis is unavailable
  */
 
-import { Redis } from "@upstash/redis";
-import { logger } from "@/lib/logger";
+import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
+import { isRedisConfigured as checkRedisConfig, getRedisUrl, getRedisToken } from '@/lib/redis';
 
-const log = logger.child({ module: "admin-counts-pubsub" });
+const log = logger.child({ module: 'admin-counts-pubsub' });
 
 // ============================================================================
 // TYPES
@@ -29,7 +30,7 @@ export interface AdminCounts {
 }
 
 export interface AdminCountsMessage {
-  type: "admin:counts";
+  type: 'admin:counts';
   data: AdminCounts;
   publishedAt: string;
 }
@@ -38,7 +39,7 @@ export interface AdminCountsMessage {
 // CONFIGURATION
 // ============================================================================
 
-const REDIS_CHANNEL = "mirrorbuddy:admin:counts";
+const REDIS_CHANNEL = 'mirrorbuddy:admin:counts';
 const IN_MEMORY_SUBSCRIBERS = new Set<(msg: AdminCountsMessage) => void>();
 
 // ============================================================================
@@ -48,18 +49,12 @@ const IN_MEMORY_SUBSCRIBERS = new Set<(msg: AdminCountsMessage) => void>();
 let redisInstance: Redis | null = null;
 let isInitializing = false;
 
-function isRedisConfigured(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
-}
-
 /**
  * Get or initialize Redis instance
  * Handles lazy initialization with single instance pattern
  */
 function getRedisInstance(): Redis | null {
-  if (!isRedisConfigured()) {
+  if (!checkRedisConfig()) {
     return null;
   }
 
@@ -71,12 +66,12 @@ function getRedisInstance(): Redis | null {
     try {
       isInitializing = true;
       redisInstance = new Redis({
-        url: process.env.UPSTASH_REDIS_REST_URL!,
-        token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+        url: getRedisUrl()!,
+        token: getRedisToken()!,
       });
-      log.info("Redis admin counts service initialized");
+      log.info('Redis admin counts service initialized');
     } catch (error) {
-      log.error("Failed to initialize Redis for admin counts", { error });
+      log.error('Failed to initialize Redis for admin counts', { error });
       isInitializing = false;
       return null;
     }
@@ -98,7 +93,7 @@ function getRedisInstance(): Redis | null {
  */
 export async function publishAdminCounts(counts: AdminCounts): Promise<void> {
   const message: AdminCountsMessage = {
-    type: "admin:counts",
+    type: 'admin:counts',
     data: counts,
     publishedAt: new Date().toISOString(),
   };
@@ -108,7 +103,7 @@ export async function publishAdminCounts(counts: AdminCounts): Promise<void> {
   if (redis) {
     try {
       await redis.publish(REDIS_CHANNEL, JSON.stringify(message));
-      log.debug("Admin counts published to Redis", {
+      log.debug('Admin counts published to Redis', {
         channel: REDIS_CHANNEL,
         counts: {
           pendingInvites: counts.pendingInvites,
@@ -119,7 +114,7 @@ export async function publishAdminCounts(counts: AdminCounts): Promise<void> {
       });
       return;
     } catch (error) {
-      log.warn("Failed to publish to Redis, falling back to in-memory", {
+      log.warn('Failed to publish to Redis, falling back to in-memory', {
         error: String(error),
       });
     }
@@ -131,17 +126,17 @@ export async function publishAdminCounts(counts: AdminCounts): Promise<void> {
       try {
         callback(message);
       } catch (error) {
-        log.error("Error in admin counts subscriber callback", { error });
+        log.error('Error in admin counts subscriber callback', { error });
       }
     });
 
     if (IN_MEMORY_SUBSCRIBERS.size > 0) {
-      log.debug("Admin counts published in-memory", {
+      log.debug('Admin counts published in-memory', {
         subscriberCount: IN_MEMORY_SUBSCRIBERS.size,
       });
     }
   } catch (error) {
-    log.error("Failed to publish admin counts in-memory", { error });
+    log.error('Failed to publish admin counts in-memory', { error });
   }
 }
 
@@ -176,7 +171,7 @@ export function getAdminCountsSubscriberCount(): number {
  */
 export function clearAdminCountsSubscribers(): void {
   IN_MEMORY_SUBSCRIBERS.clear();
-  log.debug("Admin counts subscribers cleared");
+  log.debug('Admin counts subscribers cleared');
 }
 
 /**

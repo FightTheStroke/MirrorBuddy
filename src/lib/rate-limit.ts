@@ -10,6 +10,7 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { logger } from '@/lib/logger';
+import { isRedisConfigured, getRedisUrl, getRedisToken } from '@/lib/redis';
 
 const log = logger.child({ module: 'rate-limit' });
 
@@ -25,11 +26,6 @@ let redisDisabledUntilRestart = false;
 // In-memory store (cleared on server restart)
 const store = new Map<string, RateLimitEntry>();
 
-// Check if Redis rate limiting is available
-function isRedisConfigured(): boolean {
-  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
-}
-
 // Lazy-init Redis client - one per config
 const redisLimiters = new Map<string, Ratelimit>();
 
@@ -39,8 +35,8 @@ function getRedisRatelimit(maxRequests: number, windowMs: number): Ratelimit {
 
   if (!limiter) {
     const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!.trim(),
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!.trim(),
+      url: getRedisUrl()!.trim(),
+      token: getRedisToken()!.trim(),
     });
 
     limiter = new Ratelimit({
