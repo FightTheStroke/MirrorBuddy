@@ -108,8 +108,8 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   voice_transcript_safety: {
     name: 'Voice Transcript Safety',
     description: 'Enable transcript safety checking',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   voice_calling_overlay: {
