@@ -76,7 +76,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       ...ORIGINAL_ENV,
       AZURE_OPENAI_REALTIME_ENDPOINT: 'https://test-resource.openai.azure.com',
       AZURE_OPENAI_REALTIME_API_KEY: 'test-key',
-      AZURE_OPENAI_REALTIME_DEPLOYMENT: 'gpt-4o-realtime',
+      AZURE_OPENAI_REALTIME_DEPLOYMENT: 'gpt-realtime',
       AZURE_OPENAI_REALTIME_REGION: 'swedencentral',
       VOICE_TRANSPORT: 'webrtc',
     };
@@ -117,7 +117,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
         transport: 'webrtc',
         endpoint: 'https://test-resource.openai.azure.com',
         azureResource: 'test-resource',
-        deployment: 'gpt-4o-realtime',
+        deployment: 'gpt-realtime',
         configured: true,
       });
 
@@ -154,8 +154,8 @@ describe('GET /api/realtime/token - GA Protocol', () => {
         transport: 'webrtc',
         endpoint: 'https://test-resource.openai.azure.com',
         webrtcEndpoint:
-          'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-4o-realtime',
-        deployment: 'gpt-4o-realtime',
+          'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-realtime',
+        deployment: 'gpt-realtime',
         configured: true,
       });
 
@@ -339,7 +339,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       });
 
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = ' https://test-resource.openai.azure.com \n';
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = ' gpt-4o-realtime  ';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = ' gpt-realtime  ';
 
       const request = new NextRequest('http://localhost:3000/api/realtime/token', {
         method: 'GET',
@@ -349,7 +349,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       const data = await response.json();
 
       expect(data.endpoint).toBe('https://test-resource.openai.azure.com');
-      expect(data.deployment).toBe('gpt-4o-realtime');
+      expect(data.deployment).toBe('gpt-realtime');
     });
   });
 

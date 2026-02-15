@@ -30,7 +30,7 @@ MirrorBuddy migrates voice transport to the GA realtime protocol. Preview compat
 ### Azure Deployment Configuration
 
 - Resource: `aoai-virtualbpm-prod` (Sweden Central)
-- `gpt-4o-realtime` → model `gpt-realtime` v2025-08-28 (GA)
+- `gpt-realtime` → model `gpt-realtime` v2025-08-28 (GA)
 - `gpt-realtime-mini` → model `gpt-realtime-mini` v2025-12-15 (GA)
 - API version: not needed for GA (removed from URL)
 
