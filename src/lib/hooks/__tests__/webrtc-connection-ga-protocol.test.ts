@@ -120,7 +120,7 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
     // Simulate server returning GA config
     (connection as any).serverConfig = {
       azureResource: 'my-resource',
-      deployment: 'gpt-4o-realtime',
+      deployment: 'gpt-realtime',
     };
 
     const createPeerConnection = (connection as any).createPeerConnection.bind(connection);
@@ -142,7 +142,7 @@ describe('WebRTC GA Protocol - ICE Configuration (T1-07)', () => {
     // Simulate server returning preview config (no azureResource)
     (connection as any).serverConfig = {
       webrtcEndpoint: 'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc',
-      deployment: 'gpt-4o-realtime',
+      deployment: 'gpt-realtime',
     };
 
     const createPeerConnection = (connection as any).createPeerConnection.bind(connection);
@@ -226,7 +226,7 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
     // Simulate server returning GA config
     (connection as any).serverConfig = {
       azureResource: 'my-resource',
-      deployment: 'gpt-4o-realtime',
+      deployment: 'gpt-realtime',
     };
     (connection as any).peerConnection = mockPeerConnection;
 
@@ -254,7 +254,7 @@ describe('WebRTC GA Protocol - ICE Gathering Wait (T1-08)', () => {
     // Simulate server returning preview config (no azureResource)
     (connection as any).serverConfig = {
       webrtcEndpoint: 'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc',
-      deployment: 'gpt-4o-realtime',
+      deployment: 'gpt-realtime',
     };
     (connection as any).peerConnection = mockPeerConnection;
 

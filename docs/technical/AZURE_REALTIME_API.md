@@ -154,7 +154,7 @@ The token request payload wraps everything in a `session` object:
 {
   session: {
     type: 'realtime',               // REQUIRED
-    model: 'gpt-4o-realtime',       // deployment name
+    model: 'gpt-realtime',       // deployment name
     audio: {
       output: { voice: 'alloy' },   // voice nested here
       input: {
@@ -167,14 +167,14 @@ The token request payload wraps everything in a `session` object:
 }
 
 // GA response format
-{ value: 'token...', expires_at: 1234567890, session: { id: 'sess_...', model: 'gpt-4o-realtime' } }
+{ value: 'token...', expires_at: 1234567890, session: { id: 'sess_...', model: 'gpt-realtime' } }
 ```
 
 ### Preview Format (DEPRECATED — rollback only)
 
 ```typescript
 // Preview request: flat { model } only
-{ model: 'gpt-4o-realtime' }
+{ model: 'gpt-realtime' }
 
 // Preview response
 { client_secret: { value: 'token...', expires_at: 1234567890 }, id: 'sess_...' }

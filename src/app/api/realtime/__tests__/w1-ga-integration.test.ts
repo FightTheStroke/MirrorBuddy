@@ -73,7 +73,7 @@ describe('W1 GA Protocol - Integration Flow', () => {
   describe('T1-02: Session config in token request (GA only)', () => {
     it('should include session config in ephemeral token request when GA is enabled', async () => {
       const sessionConfig = {
-        model: 'gpt-4o-realtime',
+        model: 'gpt-realtime',
         voice: 'alloy',
         instructions: 'Test instructions',
         input_audio_format: 'pcm16',
@@ -86,7 +86,7 @@ describe('W1 GA Protocol - Integration Flow', () => {
       const tokenRequestBody = { ...sessionConfig };
 
       expect(tokenRequestBody).toMatchObject({
-        model: 'gpt-4o-realtime',
+        model: 'gpt-realtime',
         voice: 'alloy',
         instructions: 'Test instructions',
         input_audio_format: 'pcm16',
@@ -97,10 +97,10 @@ describe('W1 GA Protocol - Integration Flow', () => {
     it('should NOT include session config in token request when preview is enabled', async () => {
       // Preview protocol: only model goes in token request
       const tokenRequestBody = {
-        model: 'gpt-4o-realtime',
+        model: 'gpt-realtime',
       };
 
-      expect(tokenRequestBody).toEqual({ model: 'gpt-4o-realtime' });
+      expect(tokenRequestBody).toEqual({ model: 'gpt-realtime' });
       expect(tokenRequestBody).not.toHaveProperty('voice');
       expect(tokenRequestBody).not.toHaveProperty('instructions');
     });
@@ -257,7 +257,7 @@ describe('W1 GA Protocol - Integration Flow', () => {
         transport: 'webrtc',
         endpoint: 'https://test-resource.openai.azure.com',
         azureResource: 'test-resource',
-        deployment: 'gpt-4o-realtime',
+        deployment: 'gpt-realtime',
         configured: true,
       };
 
@@ -272,7 +272,7 @@ describe('W1 GA Protocol - Integration Flow', () => {
         output_audio_format: 'pcm16',
       };
 
-      expect(tokenRequest.model).toBe('gpt-4o-realtime');
+      expect(tokenRequest.model).toBe('gpt-realtime');
 
       // Step 3: Construct deterministic SDP endpoint
       const sdpEndpoint = `https://${config.azureResource}.openai.azure.com/openai/v1/realtime/calls`;
@@ -297,8 +297,8 @@ describe('W1 GA Protocol - Integration Flow', () => {
         transport: 'webrtc',
         endpoint: 'https://test-resource.openai.azure.com',
         webrtcEndpoint:
-          'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-4o-realtime',
-        deployment: 'gpt-4o-realtime',
+          'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-realtime',
+        deployment: 'gpt-realtime',
         configured: true,
       };
 

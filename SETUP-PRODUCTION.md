@@ -119,7 +119,7 @@ Create accounts and have credentials ready:
     # Voice (realtime WebRTC)
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
-      --deployment-name gpt-4o-realtime --model-name gpt-realtime --model-version 2025-08-28 \
+      --deployment-name gpt-realtime --model-name gpt-realtime --model-version 2025-08-28 \
       --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
 
     az cognitiveservices account deployment create \
@@ -152,7 +152,7 @@ Create accounts and have credentials ready:
      - `AZURE_OPENAI_GPT5_MINI_DEPLOYMENT=gpt-5-edu-mini`
      - `AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT=gpt-5.2-chat`
      - `AZURE_OPENAI_GPT52_EDU_DEPLOYMENT=gpt-5.2-edu`
-     - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime`
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
      - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
      - `AZURE_OPENAI_TTS_DEPLOYMENT=tts-hd-deployment`

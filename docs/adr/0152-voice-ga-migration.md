@@ -51,7 +51,7 @@ preview fallback behind the `voice_ga_protocol` feature flag (enabled by default
 ### Azure Deployment (verified via `az` CLI)
 
 - Resource: `aoai-virtualbpm-prod` (Sweden Central)
-- `gpt-4o-realtime` → model `gpt-realtime` v2025-08-28 (GA)
+- `gpt-realtime` → model `gpt-realtime` v2025-08-28 (GA)
 - `gpt-realtime-mini` → model `gpt-realtime-mini` v2025-12-15 (GA)
 
 ## Consequences
