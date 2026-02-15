@@ -32,13 +32,13 @@ Launches `app-release-manager` subagent with MirrorBuddy-specific validations:
 
 ```typescript
 await Task({
-  subagent_type: "app-release-manager",
-  description: "MirrorBuddy release validation",
+  subagent_type: 'app-release-manager',
+  description: 'MirrorBuddy release validation',
   prompt: `
 RELEASE VALIDATION FOR MIRRORBUDDY
 
 Project: MirrorBuddy
-Target Version: ${version || "auto-detect from package.json"}
+Target Version: ${version || 'auto-detect from package.json'}
 Branch: ${branch}
 
 Execute full release gate:
@@ -108,15 +108,15 @@ If BLOCKED → fix issues, re-run `/release`
 
 ## Zero Tolerance Policy (Blocking)
 
-- ❌ ANY compiler/lint warning
-- ❌ ANY test failure
-- ❌ ANY security vulnerability
-- ❌ ANY TODO/FIXME in code
-- ❌ ANY hardcoded secrets
-- ❌ ANY debug prints (console.log)
-- ❌ ANY outdated deps with CVEs
-- ❌ ANY a11y violation (WCAG 2.1 AA)
-- ❌ ANY GDPR/EU AI Act compliance gap
+- BLOCK: ANY compiler/lint warning
+- BLOCK: ANY test failure
+- BLOCK: ANY security vulnerability
+- BLOCK: ANY TODO/FIXME in code
+- BLOCK: ANY hardcoded secrets
+- BLOCK: ANY debug prints (console.log)
+- BLOCK: ANY outdated deps with CVEs
+- BLOCK: ANY a11y violation (WCAG 2.1 AA)
+- BLOCK: ANY GDPR/EU AI Act compliance gap
 
 ## Quick Reference
 

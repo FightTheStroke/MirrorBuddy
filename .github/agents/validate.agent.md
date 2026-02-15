@@ -37,7 +37,7 @@ All wave tasks done | no orphan files | no dead code | changelog updated (user-f
 
 ## Verdict
 
-**PASS**: Requirements N/N ✅ | Quality (lint/types/tests) ✅ | Architecture ✅ | ready for commit
+**PASS**: Requirements N/N PASS | Quality (lint/types/tests) PASS | Architecture PASS | ready for commit
 **FAIL**: Rejections list (severity, category, file:line, fix) | FAIL — fix N issues, re-validate (round M/3)
 
 ## Rules

@@ -27,10 +27,10 @@ done
 
 ## PROOF STANDARD
 
-| Counts      | Doesn't Count  |
-| ----------- | -------------- |
-| Test output | "Tests pass"   |
-| Screenshot  | "I fixed it"   |
-| grep result | "✅ COMPLETED" |
+| Counts      | Doesn't Count       |
+| ----------- | ------------------- |
+| Test output | "Tests pass"        |
+| Screenshot  | "I fixed it"        |
+| grep result | "COMPLETED" (claim) |
 
 **RULE: No proof = BLOCKED.**

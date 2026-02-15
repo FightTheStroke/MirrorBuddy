@@ -91,7 +91,7 @@ The release script automatically runs:
 
 ### Required Environment Variables
 
-See `docs/adr/0063-*` and `.claude/rules/vercel-deployment.md` for the complete list. Key vars: `DATABASE_URL`, `ADMIN_EMAIL`, `SESSION_SECRET`, `CRON_SECRET`, `SUPABASE_CA_CERT`, `AZURE_OPENAI_API_KEY`, `TOKEN_ENCRYPTION_KEY`, `RESEND_API_KEY`.
+See `@docs/claude/vercel-deployment.md` and `.claude/rules/ci-verification.md` for the complete list. Key vars: `DATABASE_URL`, `ADMIN_EMAIL`, `SESSION_SECRET`, `CRON_SECRET`, `SUPABASE_CA_CERT`, `AZURE_OPENAI_API_KEY`, `TOKEN_ENCRYPTION_KEY`, `RESEND_API_KEY`.
 
 ### SSL Certificate Setup
 
@@ -119,7 +119,7 @@ See `docs/adr/0063-*` and `.claude/rules/vercel-deployment.md` for the complete 
 
 ### References
 
-- `.claude/rules/vercel-deployment.md` - Full deployment guide
+- `@docs/claude/vercel-deployment.md` - Full deployment guide
 - ADR 0063 - Supabase SSL Certificate Requirements
 - ADR 0067 - Database Performance Optimization (Sentry warnings fix)
 
