@@ -16,8 +16,13 @@ export async function initializeStores() {
   // Check if user is authenticated (in production, 401 = guest/trial mode)
   const res = await fetch('/api/user');
 
-  if (!res.ok) {
+  if (res.status === 401) {
     // Guest/trial mode — stores use defaults, no server sync needed
+    return;
+  }
+
+  if (!res.ok) {
+    // Transient error (5xx, timeout) — skip hydration, retry on next load
     return;
   }
 
