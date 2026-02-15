@@ -4,11 +4,11 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface JourneyEvent {
   stage: string;
@@ -36,23 +36,20 @@ interface UserJourneyResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/user"),
+  withSentry('/api/admin/funnel/user'),
   withAdmin,
 )(async (ctx) => {
-  const visitorId = ctx.req.nextUrl.searchParams.get("visitorId");
-  const userId = ctx.req.nextUrl.searchParams.get("userId");
+  const visitorId = ctx.req.nextUrl.searchParams.get('visitorId');
+  const userId = ctx.req.nextUrl.searchParams.get('userId');
 
   if (!visitorId && !userId) {
-    return NextResponse.json(
-      { error: "Either visitorId or userId required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Either visitorId or userId required' }, { status: 400 });
   }
   const where = userId ? { userId } : { visitorId };
 
   const events = await prisma.funnelEvent.findMany({
     where,
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: 'asc' },
     select: {
       stage: true,
       fromStage: true,
@@ -62,10 +59,7 @@ export const GET = pipe(
   });
 
   if (events.length === 0) {
-    return NextResponse.json(
-      { error: "No events found for this identifier" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'No events found for this identifier' }, { status: 404 });
   }
 
   // Build journey with time differences
@@ -100,7 +94,7 @@ export const GET = pipe(
 
   // Check if converted (reached ACTIVE or FIRST_LOGIN)
   const converted = events.some(
-    (e: { stage: string }) => e.stage === "ACTIVE" || e.stage === "FIRST_LOGIN",
+    (e: { stage: string }) => e.stage === 'ACTIVE' || e.stage === 'FIRST_LOGIN',
   );
 
   // Check if churned (no activity in 14 days and not converted)
@@ -110,8 +104,7 @@ export const GET = pipe(
   const churned = !converted && daysSinceLastActivity > 14;
 
   const daysInFunnel = Math.floor(
-    (lastEvent.createdAt.getTime() - firstEvent.createdAt.getTime()) /
-      (1000 * 60 * 60 * 24),
+    (lastEvent.createdAt.getTime() - firstEvent.createdAt.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   const response: UserJourneyResponse = {

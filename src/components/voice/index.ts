@@ -5,3 +5,5 @@ export type { VoicePanelProps, VoicePanelCharacter } from './voice-panel';
 export { SessionGradeDisplay } from './session-grade';
 export { Waveform } from './waveform';
 export { LazyVoiceSession } from './lazy';
+export { CallingOverlay } from './CallingOverlay';
+export type { CallingOverlayProps, CallingState } from './CallingOverlay';

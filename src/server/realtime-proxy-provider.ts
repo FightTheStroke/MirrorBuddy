@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 import type { ProviderConfig, CharacterType } from './realtime-proxy-types';
 
 /**
@@ -14,7 +15,9 @@ import type { ProviderConfig, CharacterType } from './realtime-proxy-types';
  * This proxy will be removed in a future release.
  * See: src/lib/hooks/voice-session/ for WebRTC implementation.
  */
-export function getProviderConfig(characterType: CharacterType = 'maestro'): ProviderConfig | null {
+export async function getProviderConfig(
+  characterType: CharacterType = 'maestro',
+): Promise<ProviderConfig | null> {
   // Priority 1: Azure OpenAI (GDPR compliant, configured for this project)
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
@@ -37,7 +40,7 @@ export function getProviderConfig(characterType: CharacterType = 'maestro'): Pro
     // Log which deployment is being used
     const modelTier = usePremium ? 'PREMIUM' : 'MINI';
     logger.debug(
-      `Using ${modelTier} deployment: ${azureDeployment} for characterType: ${characterType}`
+      `Using ${modelTier} deployment: ${azureDeployment} for characterType: ${characterType}`,
     );
 
     // =========================================================================
@@ -50,26 +53,28 @@ export function getProviderConfig(characterType: CharacterType = 'maestro'): Pro
     //
     // Preview API (gpt-4o-realtime-preview):
     //   - Path: /openai/realtime
+    //   - Query: api-version=2025-04-01-preview
     //   - Events: response.audio.delta, response.audio_transcript.delta
     //
     // GA API (gpt-realtime):
     //   - Path: /openai/v1/realtime
+    //   - Query: NO api-version (T1-04)
     //   - Events: response.output_audio.delta, response.output_audio_transcript.delta
     //
     // See: docs/AZURE_REALTIME_API.md for full documentation
     // =========================================================================
-    const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.includes('preview');
+    const useGAProtocol = await isFeatureEnabled('voice_ga_protocol');
 
-    if (isPreviewModel) {
+    if (useGAProtocol.enabled) {
+      // GA API format: /openai/v1/realtime with model, NO api-version (T1-04)
+      url.pathname = '/openai/v1/realtime';
+      url.searchParams.set('model', azureDeployment);
+      url.searchParams.set('api-key', azureApiKey);
+    } else {
       // Preview API format: /openai/realtime with api-version and deployment
       url.pathname = '/openai/realtime';
       url.searchParams.set('api-version', '2025-04-01-preview');
       url.searchParams.set('deployment', azureDeployment);
-      url.searchParams.set('api-key', azureApiKey);
-    } else {
-      // GA API format: /openai/v1/realtime with model
-      url.pathname = '/openai/v1/realtime';
-      url.searchParams.set('model', azureDeployment);
       url.searchParams.set('api-key', azureApiKey);
     }
 

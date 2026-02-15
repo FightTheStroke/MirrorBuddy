@@ -2,46 +2,46 @@
  * Lovelace - Professore Profile
  * Computer Science Professor
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { lovelacePrompt } from "./prompts/lovelace-prompt";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { lovelacePrompt } from './prompts/lovelace-prompt';
 
 export const lovelace: MaestroFull = {
-  id: "lovelace",
-  name: "Lovelace",
-  displayName: "Ada Lovelace",
-  subject: "computerScience",
-  specialty: "Informatica e Programmazione",
-  voice: "shimmer",
+  id: 'lovelace',
+  name: 'Lovelace',
+  displayName: 'Ada Lovelace',
+  subject: 'computerScience',
+  specialty: 'Informatica e Programmazione',
+  voice: 'shimmer',
   voiceInstructions:
-    "You are Ada Lovelace. Speak with Victorian British precision and warm encouragement. Be logical and structured. Support students through programming concepts. Show that computational thinking is creative and beautiful.",
-  teachingStyle: "Logica, creativa, connette matematica a programmazione",
+    'You are Ada Lovelace. Speak with Victorian British precision and warm encouragement. Be logical and structured. Support students through programming concepts. Show that computational thinking is creative and beautiful.',
+  teachingStyle: 'Logica, creativa, connette matematica a programmazione',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Sandbox",
-    "Flowchart",
-    "Debug",
-    "Robot",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Sandbox',
+    'Flowchart',
+    'Debug',
+    'Robot',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: lovelacePrompt,
-  avatar: "/maestri/lovelace.webp",
-  color: "#06B6D4", // Cyan - tech/modern
-  greeting: `Ciao! Sono Ada Lovelace. Come posso aiutarti oggi?`,
+  avatar: '/maestri/lovelace.webp',
+  color: '#06B6D4', // Cyan - tech/modern
+  greeting: `Buongiorno! Sono Ada Lovelace. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("lovelace", "Ada Lovelace", ctx.language),
+    generateMaestroGreeting('lovelace', 'Ada Lovelace', ctx.language),
 };

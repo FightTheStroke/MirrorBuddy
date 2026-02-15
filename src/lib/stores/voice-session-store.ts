@@ -17,6 +17,7 @@ interface VoiceSessionState {
   toolCalls: ToolCall[];
   inputLevel: number;
   outputLevel: number;
+  safetyWarning: string | null;
   // Actions
   setConnected: (connected: boolean) => void;
   setListening: (listening: boolean) => void;
@@ -30,12 +31,19 @@ interface VoiceSessionState {
   clearToolCalls: () => void;
   setInputLevel: (level: number) => void;
   setOutputLevel: (level: number) => void;
+  /** Set safety warning with optional auto-clear timeout (default 5000ms) */
+  setSafetyWarning: (message: string, timeoutMs?: number) => void;
+  /** Clear safety warning immediately */
+  clearSafetyWarning: () => void;
   /** Switch character: update maestro, clear transcript/tools, keep connection */
   switchCharacter: (maestro: Maestro) => void;
   reset: () => void;
 }
 
 // === STORE ===
+
+// Timeout ref for auto-clearing safety warnings
+let safetyWarningTimeout: NodeJS.Timeout | null = null;
 
 export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
   isConnected: false,
@@ -47,6 +55,7 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
   toolCalls: [],
   inputLevel: 0,
   outputLevel: 0,
+  safetyWarning: null,
 
   setConnected: (isConnected) => set({ isConnected }),
   setListening: (isListening) => set({ isListening }),
@@ -71,6 +80,28 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
   clearToolCalls: () => set({ toolCalls: [] }),
   setInputLevel: (inputLevel) => set({ inputLevel }),
   setOutputLevel: (outputLevel) => set({ outputLevel }),
+  setSafetyWarning: (message, timeoutMs = 5000) => {
+    // Clear any existing timeout to prevent memory leaks
+    if (safetyWarningTimeout) {
+      clearTimeout(safetyWarningTimeout);
+      safetyWarningTimeout = null;
+    }
+    // Set the warning
+    set({ safetyWarning: message });
+    // Auto-clear after timeout
+    safetyWarningTimeout = setTimeout(() => {
+      set({ safetyWarning: null });
+      safetyWarningTimeout = null;
+    }, timeoutMs);
+  },
+  clearSafetyWarning: () => {
+    // Clear timeout if exists
+    if (safetyWarningTimeout) {
+      clearTimeout(safetyWarningTimeout);
+      safetyWarningTimeout = null;
+    }
+    set({ safetyWarning: null });
+  },
   switchCharacter: (maestro) =>
     set({
       currentMaestro: maestro,
@@ -78,8 +109,14 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
       toolCalls: [],
       isSpeaking: false,
       isListening: false,
+      safetyWarning: null,
     }),
-  reset: () =>
+  reset: () => {
+    // Clear timeout on reset
+    if (safetyWarningTimeout) {
+      clearTimeout(safetyWarningTimeout);
+      safetyWarningTimeout = null;
+    }
     set({
       isConnected: false,
       isListening: false,
@@ -90,5 +127,7 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
       toolCalls: [],
       inputLevel: 0,
       outputLevel: 0,
-    }),
+      safetyWarning: null,
+    });
+  },
 }));

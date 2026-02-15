@@ -9,88 +9,127 @@
  * - Graceful degradation hooks
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import type {
   FeatureFlag,
   FeatureFlagCheckResult,
   FeatureFlagStatus,
   FeatureFlagUpdate,
   KnownFeatureFlag,
-} from "./types";
+} from './types';
 
 // Default feature flags configuration
-const DEFAULT_FLAGS: Record<
-  KnownFeatureFlag,
-  Omit<FeatureFlag, "id" | "updatedAt">
-> = {
+const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedAt'>> = {
   voice_realtime: {
-    name: "Real-time Voice",
-    description: "WebSocket-based real-time voice conversations",
-    status: "enabled",
+    name: 'Real-time Voice',
+    description: 'WebSocket-based real-time voice conversations',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   rag_enabled: {
-    name: "RAG Retrieval",
-    description: "Semantic search for conversation context",
-    status: "enabled",
+    name: 'RAG Retrieval',
+    description: 'Semantic search for conversation context',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   flashcards: {
-    name: "FSRS Flashcards",
-    description: "Spaced repetition flashcard system",
-    status: "enabled",
+    name: 'FSRS Flashcards',
+    description: 'Spaced repetition flashcard system',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   mindmap: {
-    name: "Mind Maps",
-    description: "Interactive mind map generation",
-    status: "enabled",
+    name: 'Mind Maps',
+    description: 'Interactive mind map generation',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   quiz: {
-    name: "Quiz Generation",
-    description: "AI-generated quizzes from content",
-    status: "enabled",
+    name: 'Quiz Generation',
+    description: 'AI-generated quizzes from content',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   pomodoro: {
-    name: "Pomodoro Timer",
-    description: "Focus timer with breaks",
-    status: "enabled",
+    name: 'Pomodoro Timer',
+    description: 'Focus timer with breaks',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   gamification: {
-    name: "Gamification",
-    description: "XP, levels, and achievements",
-    status: "enabled",
+    name: 'Gamification',
+    description: 'XP, levels, and achievements',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   parent_dashboard: {
-    name: "Parent Dashboard",
-    description: "Parent/professor monitoring portal",
-    status: "enabled",
+    name: 'Parent Dashboard',
+    description: 'Parent/professor monitoring portal',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   pdf_export: {
-    name: "PDF Export",
-    description: "Accessible PDF generation",
-    status: "enabled",
+    name: 'PDF Export',
+    description: 'Accessible PDF generation',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
   ambient_audio: {
-    name: "Ambient Audio",
-    description: "Background study sounds",
-    status: "enabled",
+    name: 'Ambient Audio',
+    description: 'Background study sounds',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_ga_protocol: {
+    name: 'Voice GA Protocol',
+    description: 'Switch from preview to GA realtime API',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_full_prompt: {
+    name: 'Voice Full Prompt',
+    description: 'Use full system prompt instead of truncated',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_transcript_safety: {
+    name: 'Voice Transcript Safety',
+    description: 'Enable transcript safety checking',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_calling_overlay: {
+    name: 'Voice Calling Overlay',
+    description: 'New calling overlay UI',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  chat_unified_view: {
+    name: 'Chat Unified View',
+    description: 'Unified conversation view across character types',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  consent_unified_model: {
+    name: 'Consent Unified Model',
+    description: 'Unified consent storage model',
+    status: 'enabled',
     enabledPercentage: 100,
     killSwitch: false,
   },
@@ -111,9 +150,9 @@ export async function initializeFlags(): Promise<void> {
   try {
     // Load global config (create if missing)
     const globalConfig = await prisma.globalConfig.upsert({
-      where: { id: "global" },
+      where: { id: 'global' },
       update: {},
-      create: { id: "global", killSwitch: false },
+      create: { id: 'global', killSwitch: false },
     });
 
     globalKillSwitch = globalConfig.killSwitch;
@@ -168,16 +207,12 @@ export async function initializeFlags(): Promise<void> {
     }
 
     initialized = true;
-    logger.info("Feature flags initialized from database", {
+    logger.info('Feature flags initialized from database', {
       count: flagCache.size,
     });
   } catch (error) {
     // Fallback to in-memory defaults if DB unavailable
-    logger.error(
-      "Failed to load flags from DB, using defaults",
-      undefined,
-      error,
-    );
+    logger.error('Failed to load flags from DB, using defaults', undefined, error);
     initializeFlagsSync();
   }
 }
@@ -191,7 +226,7 @@ function initializeFlagsSync(): void {
     flagCache.set(id, { id, ...config, updatedAt: now });
   }
   initialized = true;
-  logger.warn("Feature flags initialized from defaults (no DB)");
+  logger.warn('Feature flags initialized from defaults (no DB)');
 }
 
 /**
@@ -207,15 +242,15 @@ export function isFeatureEnabled(
   const flag = flagCache.get(featureId);
 
   if (!flag) {
-    logger.warn("Unknown feature flag checked", { featureId });
+    logger.warn('Unknown feature flag checked', { featureId });
     return {
       enabled: false,
-      reason: "disabled",
+      reason: 'disabled',
       flag: {
         id: featureId,
         name: featureId,
-        description: "Unknown feature",
-        status: "disabled",
+        description: 'Unknown feature',
+        status: 'disabled',
         enabledPercentage: 0,
         killSwitch: false,
         updatedAt: new Date(),
@@ -225,21 +260,21 @@ export function isFeatureEnabled(
 
   // Global kill-switch takes priority
   if (globalKillSwitch) {
-    return { enabled: false, reason: "kill_switch", flag };
+    return { enabled: false, reason: 'kill_switch', flag };
   }
 
   // Per-feature kill-switch
   if (flag.killSwitch) {
-    return { enabled: false, reason: "kill_switch", flag };
+    return { enabled: false, reason: 'kill_switch', flag };
   }
 
   // Status check
-  if (flag.status === "disabled") {
-    return { enabled: false, reason: "disabled", flag };
+  if (flag.status === 'disabled') {
+    return { enabled: false, reason: 'disabled', flag };
   }
 
-  if (flag.status === "degraded") {
-    return { enabled: true, reason: "degraded", flag };
+  if (flag.status === 'degraded') {
+    return { enabled: true, reason: 'degraded', flag };
   }
 
   // Percentage rollout (deterministic based on userId)
@@ -247,11 +282,11 @@ export function isFeatureEnabled(
     const hash = simpleHash(userId + featureId);
     const bucket = hash % 100;
     if (bucket >= flag.enabledPercentage) {
-      return { enabled: false, reason: "percentage_rollout", flag };
+      return { enabled: false, reason: 'percentage_rollout', flag };
     }
   }
 
-  return { enabled: true, reason: "enabled", flag };
+  return { enabled: true, reason: 'enabled', flag };
 }
 
 /**
@@ -266,7 +301,7 @@ export async function updateFlag(
 
   const flag = flagCache.get(featureId);
   if (!flag) {
-    logger.warn("Attempted to update unknown flag", { featureId });
+    logger.warn('Attempted to update unknown flag', { featureId });
     return null;
   }
 
@@ -293,12 +328,8 @@ export async function updateFlag(
       status: updated.status,
       enabledPercentage: updated.enabledPercentage,
       killSwitch: updated.killSwitch,
-      killSwitchReason: update.killSwitch
-        ? (update.metadata?.reason as string)
-        : null,
-      metadata: updated.metadata
-        ? JSON.parse(JSON.stringify(updated.metadata))
-        : undefined,
+      killSwitchReason: update.killSwitch ? (update.metadata?.reason as string) : null,
+      metadata: updated.metadata ? JSON.parse(JSON.stringify(updated.metadata)) : undefined,
       updatedBy: update.updatedBy,
     };
 
@@ -313,11 +344,11 @@ export async function updateFlag(
       },
     });
   } catch (error) {
-    logger.error("Failed to persist flag update", { featureId }, error);
+    logger.error('Failed to persist flag update', { featureId }, error);
     // Cache is still updated - will sync on next restart
   }
 
-  logger.info("Feature flag updated", {
+  logger.info('Feature flag updated', {
     featureId,
     status: updated.status,
     killSwitch: updated.killSwitch,
@@ -340,7 +371,7 @@ export async function activateKillSwitch(
     metadata: { reason },
     updatedBy,
   });
-  logger.error("Kill-switch activated", { featureId, reason, updatedBy });
+  logger.error('Kill-switch activated', { featureId, reason, updatedBy });
 }
 
 /**
@@ -351,33 +382,30 @@ export async function deactivateKillSwitch(
   updatedBy?: string,
 ): Promise<void> {
   await updateFlag(featureId, { killSwitch: false, updatedBy });
-  logger.info("Kill-switch deactivated", { featureId, updatedBy });
+  logger.info('Kill-switch deactivated', { featureId, updatedBy });
 }
 
 /**
  * Set global kill-switch (persists to DB)
  */
-export async function setGlobalKillSwitch(
-  enabled: boolean,
-  reason?: string,
-): Promise<void> {
+export async function setGlobalKillSwitch(enabled: boolean, reason?: string): Promise<void> {
   globalKillSwitch = enabled;
   globalKillSwitchReason = reason;
 
   try {
     await prisma.globalConfig.upsert({
-      where: { id: "global" },
+      where: { id: 'global' },
       update: { killSwitch: enabled, killSwitchReason: reason },
-      create: { id: "global", killSwitch: enabled, killSwitchReason: reason },
+      create: { id: 'global', killSwitch: enabled, killSwitchReason: reason },
     });
   } catch (error) {
-    logger.error("Failed to persist global kill-switch", undefined, error);
+    logger.error('Failed to persist global kill-switch', undefined, error);
   }
 
   if (enabled) {
-    logger.error("GLOBAL kill-switch activated", { reason });
+    logger.error('GLOBAL kill-switch activated', { reason });
   } else {
-    logger.info("GLOBAL kill-switch deactivated");
+    logger.info('GLOBAL kill-switch deactivated');
   }
 }
 

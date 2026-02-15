@@ -8,12 +8,7 @@
 import { useEffect } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
 import type { UseVoiceSessionOptions } from './types';
-import {
-  useInitPlaybackContext,
-  useScheduleQueuedChunks,
-  usePlayNextChunk,
-  useOutputLevelPolling,
-} from './audio-playback';
+import { useInitPlaybackContext, useOutputLevelPolling } from './audio-output-monitor';
 import { useStartAudioCapture } from './audio-capture';
 import { useSendGreeting, useSendSessionConfig } from './session-config';
 import { useHandleServerEvent } from './event-handlers';
@@ -22,14 +17,24 @@ import { useSwitchCharacter } from './switch-character';
 import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
 import { useUnifiedCamera } from './use-unified-camera';
 import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
+import { useTokenCache } from './token-cache';
 
 export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const store = useVoiceSessionStore();
-  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } = useSettingsStore();
+  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled, appearance } =
+    useSettingsStore();
+
+  // Token cache for reducing connection latency
+  const { getCachedToken, preloadToken } = useTokenCache();
 
   // All refs extracted to separate file for line count management
   const refs = useVoiceSessionRefs();
   const [connectionState, setConnectionState] = useConnectionState();
+
+  // Preload token on mount to have it ready for voice connections
+  useEffect(() => {
+    preloadToken();
+  }, [preloadToken]);
 
   // ============================================================================
   // AUDIO PLAYBACK
@@ -42,38 +47,11 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     preferredOutputId,
   );
 
-  const audioPlaybackRefs = {
-    playbackContextRef: refs.playbackContextRef,
-    audioQueueRef: refs.audioQueueRef,
-    isPlayingRef: refs.isPlayingRef,
-    isBufferingRef: refs.isBufferingRef,
-    nextPlayTimeRef: refs.nextPlayTimeRef,
-    scheduledSourcesRef: refs.scheduledSourcesRef,
-    playNextChunkRef: refs.playNextChunkRef,
-    playbackAnalyserRef: refs.playbackAnalyserRef,
-    gainNodeRef: refs.gainNodeRef,
-  };
-
-  const scheduleQueuedChunks = useScheduleQueuedChunks(
-    audioPlaybackRefs,
-    store.setSpeaking,
-    store.setOutputLevel,
-  );
-  const playNextChunk = usePlayNextChunk(
-    audioPlaybackRefs,
-    scheduleQueuedChunks,
-    store.setSpeaking,
-    store.setOutputLevel,
-  );
   const { startPolling, stopPolling } = useOutputLevelPolling(
     refs.playbackAnalyserRef,
     refs.isPlayingRef,
     store.setOutputLevel,
   );
-
-  useEffect(() => {
-    refs.playNextChunkRef.current = playNextChunk;
-  }, [playNextChunk, refs]);
 
   useEffect(() => {
     if (store.isSpeaking) {
@@ -103,7 +81,11 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(refs.greetingSentRef, refs.webrtcDataChannelRef);
+  const sendGreeting = useSendGreeting(
+    refs.greetingSentRef,
+    refs.webrtcDataChannelRef,
+    appearance?.language,
+  );
   const sendSessionConfig = useSendSessionConfig(
     refs.maestroRef,
     store.setConnected,
@@ -149,10 +131,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     sendSessionConfig,
     sendGreeting,
     unmuteAudioTracksRef: refs.unmuteAudioTracksRef,
-    initPlaybackContext,
     startAudioCapture,
-    playNextChunk,
-    scheduleQueuedChunks,
   });
 
   useEffect(() => {
@@ -207,6 +186,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     preferredMicrophoneId,
     initPlaybackContext,
     options,
+    getCachedToken,
   );
   const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
   const switchCharacter = useSwitchCharacter({
@@ -236,6 +216,26 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     scheduledSourcesRef: refs.scheduledSourcesRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
+  };
+
+  const safeResponseRedirect = (safeResponse: string) => {
+    const dc = refs.webrtcDataChannelRef.current;
+    if (!dc || dc.readyState !== 'open') return false;
+
+    dc.send(JSON.stringify({ type: 'response.cancel' }));
+    dc.send(
+      JSON.stringify({
+        type: 'conversation.item.create',
+        item: {
+          type: 'message',
+          role: 'assistant',
+          content: [{ type: 'output_text', text: safeResponse }],
+        },
+      }),
+    );
+    store.addTranscript('assistant', safeResponse);
+    store.setSpeaking(false);
+    return true;
   };
 
   // Unified camera (ADR 0126) - video + photo modes
@@ -275,6 +275,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
     sendText: useSendText(refs.webrtcDataChannelRef, store.addTranscript),
     cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),
+    safeResponseRedirect,
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
     sendWebcamResult: useSendWebcamResult(refs.webrtcDataChannelRef),

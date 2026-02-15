@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 import { FUNNEL_STAGES } from '@/lib/funnel/constants';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface StageMetrics {
   stage: string;

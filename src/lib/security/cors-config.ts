@@ -3,7 +3,7 @@
 // Purpose: Prevent wildcard CORS in production, enforce origin whitelist
 // ============================================================================
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 /**
  * Get allowed origins based on environment
@@ -11,17 +11,17 @@ import { logger } from "@/lib/logger";
  * @returns Array of allowed origin URLs
  */
 export function getAllowedOrigins(): string[] {
-  const isDevelopment = process.env.NODE_ENV === "development";
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   // Development: Allow localhost variants
   if (isDevelopment) {
     return [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://localhost:3002",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-      "http://127.0.0.1:3002",
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://localhost:3002',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001',
+      'http://127.0.0.1:3002',
     ];
   }
 
@@ -30,14 +30,14 @@ export function getAllowedOrigins(): string[] {
   if (!allowedOriginsEnv) {
     // F-04: Warn in production if ALLOWED_ORIGINS is not configured
     logger.warn(
-      "ALLOWED_ORIGINS not configured in production. All cross-origin requests will be blocked.",
-      { component: "CORS" },
+      'ALLOWED_ORIGINS not configured in production. All cross-origin requests will be blocked.',
+      { component: 'CORS' },
     );
     return [];
   }
 
   return allowedOriginsEnv
-    .split(",")
+    .split(',')
     .map((origin) => origin.trim())
     .filter((origin) => origin.length > 0);
 }
@@ -51,15 +51,13 @@ export function getAllowedOrigins(): string[] {
  * @param requestOrigin - Origin from request headers
  * @returns CORS headers object
  */
-export function getCorsHeaders(
-  requestOrigin: string | null | undefined,
-): Record<string, string> {
+export function getCorsHeaders(requestOrigin: string | null | undefined): Record<string, string> {
   const allowedOrigins = getAllowedOrigins();
 
   // Base headers (always returned)
   const baseHeaders: Record<string, string> = {
-    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, x-csrf-token',
   };
 
   // If no origin provided, return base headers only
@@ -74,8 +72,8 @@ export function getCorsHeaders(
   if (isAllowed) {
     return {
       ...baseHeaders,
-      "Access-Control-Allow-Origin": requestOrigin,
-      "Access-Control-Allow-Credentials": "true",
+      'Access-Control-Allow-Origin': requestOrigin,
+      'Access-Control-Allow-Credentials': 'true',
     };
   }
 

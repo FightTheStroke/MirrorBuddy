@@ -13,6 +13,8 @@ export interface WebRTCConnectionConfig {
   maestro: Maestro;
   connectionInfo: ConnectionInfo;
   preferredMicrophoneId?: string;
+  /** Optional cached token getter to reduce connection latency */
+  getCachedToken?: () => Promise<string | null>;
   onConnectionStateChange?: (state: RTCPeerConnectionState) => void;
   onICEConnectionStateChange?: (state: RTCIceConnectionState) => void;
   onTrack?: (event: RTCTrackEvent) => void;

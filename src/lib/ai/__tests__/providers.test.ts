@@ -189,7 +189,7 @@ describe('providers', () => {
     it('should return config when all realtime vars are set', () => {
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://realtime.openai.azure.com';
       process.env.AZURE_OPENAI_REALTIME_API_KEY = 'realtime-key';
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
 
       const result = getRealtimeProvider();
 
@@ -197,14 +197,14 @@ describe('providers', () => {
         provider: 'azure',
         endpoint: 'https://realtime.openai.azure.com',
         apiKey: 'realtime-key',
-        model: 'gpt-4o-realtime-preview',
+        model: 'gpt-realtime',
       });
     });
 
     it('should return null when endpoint is missing', () => {
       delete process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
       process.env.AZURE_OPENAI_REALTIME_API_KEY = 'realtime-key';
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
 
       expect(getRealtimeProvider()).toBeNull();
     });
@@ -212,7 +212,7 @@ describe('providers', () => {
     it('should return null when API key is missing', () => {
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://realtime.openai.azure.com';
       delete process.env.AZURE_OPENAI_REALTIME_API_KEY;
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
 
       expect(getRealtimeProvider()).toBeNull();
     });
@@ -228,7 +228,7 @@ describe('providers', () => {
     it('should remove trailing slash from endpoint', () => {
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://realtime.openai.azure.com/';
       process.env.AZURE_OPENAI_REALTIME_API_KEY = 'realtime-key';
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
 
       const result = getRealtimeProvider();
 
@@ -684,7 +684,7 @@ describe('providers', () => {
       process.env.AZURE_OPENAI_CHAT_DEPLOYMENT = 'gpt-5-mini';
       process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://realtime.openai.azure.com';
       process.env.AZURE_OPENAI_REALTIME_API_KEY = 'realtime-key';
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-4o-realtime-preview';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
 
       const result = await getProviderStatus();
 

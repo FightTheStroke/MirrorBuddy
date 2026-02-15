@@ -4,7 +4,7 @@
 // ============================================================================
 
 import type { Maestro } from '@/types';
-import type { RingBuffer } from './ring-buffer';
+import type { AudioChunkQueue } from './audio-queue';
 
 /**
  * All refs used by connection management
@@ -16,7 +16,7 @@ export interface ConnectionRefs {
   mediaStreamRef: React.MutableRefObject<MediaStream | null>;
   sourceNodeRef: React.MutableRefObject<MediaStreamAudioSourceNode | null>;
   processorRef: React.MutableRefObject<ScriptProcessorNode | null>;
-  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
+  audioQueueRef: React.MutableRefObject<AudioChunkQueue>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
   nextPlayTimeRef: React.MutableRefObject<number>;

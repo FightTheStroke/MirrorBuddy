@@ -336,7 +336,9 @@
       "altoContrasto": "Alto contrasto",
       "fontOpendyslexic1": "Font OpenDyslexic",
       "fontOpendyslexic": "Font OpenDyslexic",
-      "raccomandazioni": "Raccomandazioni:"
+      "raccomandazioni": "Raccomandazioni:",
+      "voiceSelector": "Selector de voz",
+      "defaultVoice": "Voz predeterminada"
     },
     "notifications": {
       "title": "Notifiche",

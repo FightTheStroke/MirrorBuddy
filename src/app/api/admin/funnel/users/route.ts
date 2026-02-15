@@ -4,11 +4,11 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { FunnelStage } from "@/lib/funnel/constants";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { FunnelStage } from '@/lib/funnel/constants';
 
 // Types for Prisma query results
 interface EventCountResult {
@@ -34,11 +34,11 @@ interface UserResult {
   email: string | null;
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface FunnelUser {
   id: string; // visitorId or userId
-  type: "visitor" | "user";
+  type: 'visitor' | 'user';
   email: string | null;
   currentStage: string;
   stageEnteredAt: string;
@@ -61,17 +61,14 @@ interface FunnelUsersResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/users"),
+  withSentry('/api/admin/funnel/users'),
   withAdmin,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
-  const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1"));
-  const pageSize = Math.min(
-    100,
-    Math.max(1, parseInt(url.searchParams.get("pageSize") ?? "20")),
-  );
-  const stage = url.searchParams.get("stage") as FunnelStage | null;
-  const search = url.searchParams.get("search");
+  const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));
+  const pageSize = Math.min(100, Math.max(1, parseInt(url.searchParams.get('pageSize') ?? '20')));
+  const stage = url.searchParams.get('stage') as FunnelStage | null;
+  const search = url.searchParams.get('search');
 
   // Get latest event per user/visitor to determine current stage using parameterized query
   const latestEvents = await prisma.$queryRaw<
@@ -92,15 +89,12 @@ export const GET = pipe(
 
   // Get event counts per user
   const eventCounts = await prisma.funnelEvent.groupBy({
-    by: ["visitorId", "userId"],
+    by: ['visitorId', 'userId'],
     where: { isTestData: false },
     _count: { _all: true },
   });
   const countMap = new Map(
-    eventCounts.map((e: EventCountResult) => [
-      e.userId ?? e.visitorId,
-      e._count._all,
-    ]),
+    eventCounts.map((e: EventCountResult) => [e.userId ?? e.visitorId, e._count._all]),
   );
 
   // Get trial session emails for visitors
@@ -115,9 +109,7 @@ export const GET = pipe(
           select: { visitorId: true, email: true },
         })
       : [];
-  const emailMap = new Map(
-    trialSessions.map((t: TrialSessionResult) => [t.visitorId, t.email]),
-  );
+  const emailMap = new Map(trialSessions.map((t: TrialSessionResult) => [t.visitorId, t.email]));
 
   // Get user emails
   const userIds = latestEvents
@@ -139,7 +131,7 @@ export const GET = pipe(
   if (search) {
     const searchLower = search.toLowerCase();
     filteredEvents = filteredEvents.filter((e: LatestEventResult) => {
-      const id = e.userId ?? e.visitorId ?? "";
+      const id = e.userId ?? e.visitorId ?? '';
       const email = e.userId
         ? userEmailMap.get(e.userId)
         : e.visitorId
@@ -153,32 +145,27 @@ export const GET = pipe(
   }
 
   const total = filteredEvents.length;
-  const paginatedEvents = filteredEvents.slice(
-    (page - 1) * pageSize,
-    page * pageSize,
-  );
+  const paginatedEvents = filteredEvents.slice((page - 1) * pageSize, page * pageSize);
 
-  const funnelUsers: FunnelUser[] = paginatedEvents.map(
-    (e: LatestEventResult) => {
-      const id = e.userId ?? e.visitorId ?? "unknown";
-      const isUser = !!e.userId;
-      const email = isUser
-        ? (userEmailMap.get(e.userId!) ?? null)
-        : e.visitorId
-          ? (emailMap.get(e.visitorId) ?? null)
-          : null;
+  const funnelUsers: FunnelUser[] = paginatedEvents.map((e: LatestEventResult) => {
+    const id = e.userId ?? e.visitorId ?? 'unknown';
+    const isUser = !!e.userId;
+    const email = isUser
+      ? (userEmailMap.get(e.userId!) ?? null)
+      : e.visitorId
+        ? (emailMap.get(e.visitorId) ?? null)
+        : null;
 
-      return {
-        id,
-        type: isUser ? "user" : "visitor",
-        email,
-        currentStage: e.stage,
-        stageEnteredAt: e.createdAt.toISOString(),
-        eventsCount: countMap.get(id) ?? 0,
-        lastActivity: e.createdAt.toISOString(),
-      };
-    },
-  );
+    return {
+      id,
+      type: isUser ? 'user' : 'visitor',
+      email,
+      currentStage: e.stage,
+      stageEnteredAt: e.createdAt.toISOString(),
+      eventsCount: countMap.get(id) ?? 0,
+      lastActivity: e.createdAt.toISOString(),
+    };
+  });
 
   const response: FunnelUsersResponse = {
     users: funnelUsers,

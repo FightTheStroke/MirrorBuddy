@@ -1,172 +1,121 @@
 {
   "voice": {
-    "panel": {
-      "connected": "Connesso",
-      "connecting": "Connessione...",
-      "listening": "In ascolto",
-      "microphoneDisabled": "Microfono disabilitato",
-      "mutedLabel": "Audio disattivato",
-      "muteLabel": "Disattiva audio",
-      "speakNow": "Parla ora",
-      "speaking": "Sta parlando",
-      "startingCall": "Avvio chiamata...",
-      "unmuteLabel": "Attiva audio"
+    "avatar": "Avatar",
+    "min": " min",
+    "durata": "Durata",
+    "domande": "Domande",
+    "puntiDiForza": "Punti di Forza",
+    "daMigliorare": "Da Migliorare",
+    "connessioneDiretta": "Connessione Diretta",
+    "webrtcDirect": "WebRTC Direct",
+    "connessionePeerToPeer": "Connessione peer-to-peer a bassa latenza",
+    "envLocal": ".env.local",
+    "safety": {
+      "warningTitle": "Attenzione alla Sicurezza"
     },
-    "connectionError": "Errore di connessione vocale",
-    "microphoneUnauthorized": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
-    "permission": {
-      "enableLabel": "Enable Label",
-      "steps": {
-        "findMicrophone": "Find Microphone",
-        "lockIcon": "Lock Icon",
-        "reload": "Reload",
-        "selectAllow": "Select Allow"
-      },
-      "subtitle": "Sottotitolo",
-      "switchToChat": "Switch To Chat",
-      "title": "Titolo"
-    },
-    "label": "Voce",
-    "description": "Attiva la conversazione vocale con i Maestri",
-    "chatUI": {
-      "startRecording": "Avvia registrazione",
-      "stopRecording": "Ferma registrazione",
-      "sendVoiceMessage": "Invia messaggio vocale",
-      "cancel": "Annulla",
-      "recordingInProgress": "Registrazione in corso...",
-      "microphonePermission": "Consenti accesso al microfono per usare la voce",
-      "grantPermission": "Consenti microfono",
-      "denyPermission": "Nega accesso"
-    },
-    "status": {
-      "listening": "In ascolto...",
-      "processing": "Elaborazione...",
-      "speaking": "Sto parlando...",
-      "connecting": "Connessione...",
-      "ready": "Pronto",
-      "initializing": "Inizializzazione...",
-      "processing_text": "Trascrizione in corso..."
-    },
-    "settings": {
-      "title": "Impostazioni vocali",
-      "speed": "Velocità di riproduzione",
-      "pitch": "Tonalità",
-      "voiceSelection": "Seleziona voce",
-      "volume": "Volume",
-      "enableCaptions": "Abilita sottotitoli",
-      "textToSpeech": "Testo a voce",
-      "speechToText": "Riconoscimento vocale",
-      "language": "Lingua di ascolto",
-      "reset": "Ripristina predefiniti"
-    },
-    "errors": {
-      "microphoneDenied": "Accesso al microfono negato. Abilita il microfono nelle impostazioni.",
-      "microphoneNotFound": "Nessun microfono rilevato. Controlla il tuo dispositivo.",
-      "connectionError": "Errore di connessione. Controlla la tua connessione internet.",
-      "timeout": "Timeout della connessione. Riprova.",
-      "recordingFailed": "Errore durante la registrazione. Riprova.",
-      "processingError": "Errore durante l'elaborazione. Riprova.",
-      "permissionError": "Errore di autorizzazione. Controlla le impostazioni.",
-      "unsupportedBrowser": "Il tuo browser non supporta la registrazione vocale.",
-      "unknownError": "Errore sconosciuto. Riprova più tardi."
-    },
-    "trialLimits": {
-      "voiceTitle": "Limite voce",
-      "minutesRemaining": "{minutes} minuti rimasti",
-      "secondsRemaining": "{seconds} secondi rimasti",
-      "limitReached": "Limite voce raggiunto",
-      "limitReachedMessage": "Hai esaurito i tuoi minuti di voce. Effettua l'upgrade per utilizzare la voce illimitata.",
-      "upgradePrompt": "Vuoi accesso illimitato alla voce?",
-      "upgrade": "Effettua upgrade"
-    },
-    "accessibility": {
-      "voiceToText": "Converti voce in testo",
-      "textAlternative": "Usa il testo come alternativa",
-      "captionsToggle": "Attiva/disattiva sottotitoli",
-      "enableSubtitles": "Abilita sottotitoli per tutte le risposte",
-      "voiceSpeed": "Velocità di lettura",
-      "slow": "Lento",
-      "normal": "Normale",
-      "fast": "Veloce",
-      "veryFast": "Molto veloce",
-      "screenReaderSupport": "Questo strumento supporta i lettori di schermo"
-    },
-    "confirmations": {
-      "deleteRecording": "Elimina registrazione?",
-      "discardMessage": "Scartare il messaggio?",
-      "confirmSend": "Invia messaggio vocale?"
-    },
-    "help": {
-      "title": "Guida vocale",
-      "howToRecord": "Come registrare: Premi il pulsante microfono e parla chiaramente.",
-      "tips": "Suggerimenti: Parla in un ambiente tranquillo per migliori risultati.",
-      "troubleshooting": "Risoluzione dei problemi: Verifica che il microfono funzioni nel browser."
-    },
-    "serviceUnavailable": "Impossibile connettersi al servizio vocale",
-    "microphonePermission": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
-    "sessionTitle": "Sessione vocale con {name}",
-    "studyMethod": "Metodo di studio",
-    "emotionalSupport": "Supporto emotivo",
-    "sessionGrade": {
-      "title": "Valutazione Sessione",
-      "by": "da",
-      "closeAriaLabel": "Chiudi valutazione",
-      "evaluating": "Il maestro sta valutando...",
-      "goodSession": "Buona sessione di studio!",
-      "commitment": "Impegno costante",
-      "keepGoing": "Continua così!",
-      "close": "Chiudi"
-    },
+    "videoStopAriaLabel": "Ferma video",
+    "videoFramesLabel": "fotogrammi",
     "voicePanel": {
       "connecting": "Connessione...",
-      "speaking": "{name} sta parlando...",
+      "speaking": "{name} sta parlando",
       "listening": "In ascolto...",
       "connected": "Connesso",
       "startingCall": "Avvio chiamata...",
-      "microphoneEnabled": "Attiva microfono",
-      "microphoneDisabled": "Disattiva microfono",
-      "ttsEnabled": "Disattiva lettura vocale",
-      "ttsDisabled": "Lettura vocale disattivata",
+      "microphoneEnabled": "Microfono abilitato",
+      "microphoneDisabled": "Microfono disabilitato",
+      "ttsEnabled": "Sintesi vocale abilitata",
+      "ttsDisabled": "Sintesi vocale disabilitata",
       "newConversation": "Nuova conversazione",
       "close": "Chiudi",
       "microphoneMutedStatus": "Microfono disattivato",
-      "speakNowStatus": "Parla ora..."
+      "speakNowStatus": "Parla ora"
     },
-    "configError": {
-      "title": "Azure OpenAI Non Configurato",
-      "subtitle": "La voce richiede Azure OpenAI Realtime",
-      "missingVariables": "Variabili mancanti:",
-      "instructions": "Configura le variabili di ambiente nel file",
-      "useChatButton": "Usa Chat Testuale",
-      "closeButton": "Chiudi"
+    "sessionGrade": {
+      "goodSession": "Ottima sessione di studio!",
+      "commitment": "Impegno dimostrato",
+      "keepGoing": "Continua così!",
+      "title": "Valutazione Sessione",
+      "by": "di",
+      "closeAriaLabel": "Chiudi valutazione",
+      "evaluating": "Valutazione in corso...",
+      "close": "Chiudi"
+    },
+    "panel": {
+      "connecting": "Connessione...",
+      "speaking": "{name} sta parlando",
+      "listening": "In ascolto...",
+      "connected": "Connesso",
+      "startingCall": "Avvio chiamata...",
+      "mutedLabel": "Riattiva microfono",
+      "unmuteLabel": "Disattiva microfono",
+      "microphoneDisabled": "Microfono disattivato",
+      "speakNow": "Parla ora"
+    },
+    "limitReached": "Limite raggiunto",
+    "videoMode": "Modalità video",
+    "photoMode": "Modalità foto",
+    "cameraOff": "Fotocamera disattivata",
+    "videoModeAriaLabel": "Attiva modalità video",
+    "photoModeAriaLabel": "Attiva modalità foto",
+    "cameraOffAriaLabel": "Disattiva fotocamera",
+    "flipCamera": "Capovolgi fotocamera",
+    "switchToBackCamera": "Passa alla fotocamera posteriore",
+    "switchToFrontCamera": "Passa alla fotocamera anteriore",
+    "takeSnapshot": "Scatta foto",
+    "takeSnapshotAriaLabel": "Scatta una foto",
+    "muteTooltip": {
+      "muted": "Riattiva microfono",
+      "unmuted": "Disattiva microfono"
+    },
+    "muteAriaLabel": {
+      "muted": "Riattiva microfono",
+      "unmuted": "Disattiva microfono"
+    },
+    "cancelResponseTooltip": "Annulla risposta",
+    "cancelResponseAriaLabel": "Annulla risposta in corso",
+    "sendMessageTooltip": "Invia messaggio",
+    "sendMessageAriaLabel": "Invia messaggio di testo",
+    "switchToChatTooltip": "Passa alla chat",
+    "switchToChatAriaLabel": "Passa alla modalità chat",
+    "endSessionTooltip": "Termina sessione",
+    "endSessionAriaLabel": "Termina sessione vocale",
+    "inputPlaceholder": "Scrivi un messaggio...",
+    "sendButton": "Invia",
+    "sessionTools": {
+      "toolsUsed": "Strumenti usati",
+      "clear": "Pulisci",
+      "webcamTitle": "Webcam",
+      "webcamLabel": "Webcam",
+      "mindmapTitle": "Mappa mentale",
+      "mindmapLabel": "Mappa",
+      "quizTitle": "Quiz",
+      "quizLabel": "Quiz",
+      "flashcardTitle": "Flashcard",
+      "flashcardLabel": "Flashcard",
+      "searchTitle": "Cerca",
+      "searchLabel": "Cerca"
     },
     "sessionHeader": {
       "closeSessionAriaLabel": "Chiudi sessione",
-      "level": "Lv."
+      "level": "Livello"
     },
-    "sessionTools": {
-      "toolsUsed": "Strumenti utilizzati",
-      "clear": "Cancella",
-      "webcamTitle": "Mostra compiti via webcam",
-      "webcamLabel": "Webcam",
-      "mindmapTitle": "Crea mappa mentale",
-      "mindmapLabel": "Mappa",
-      "quizTitle": "Crea quiz",
-      "quizLabel": "Quiz",
-      "flashcardTitle": "Crea flashcard",
-      "flashcardLabel": "Flashcard",
-      "searchTitle": "Cerca sul web",
-      "searchLabel": "Cerca"
+    "title": "Permessi richiesti",
+    "subtitle": "Per utilizzare la modalità vocale, abbiamo bisogno dell'accesso al microfono",
+    "enableLabel": "Per abilitare il microfono:",
+    "steps": {
+      "lockIcon": "Clicca sull'icona del lucchetto nella barra degli indirizzi",
+      "findMicrophone": "Trova l'impostazione 'Microfono'",
+      "selectAllow": "Seleziona 'Consenti'",
+      "reload": "Ricarica la pagina"
     },
-    "connessioneDiretta": "Connessione diretta",
-    "webrtcDirect": "WebRTC Direct",
-    "connessionePeerToPeer": "Connessione peer-to-peer",
-    "min": "min",
-    "durata": "Durata",
-    "domande": "Domande",
-    "puntiDiForza": "Punti di forza",
-    "daMigliorare": "Da migliorare",
-    "envLocal": ".env:",
-    "avatar": "Avatar"
+    "switchToChat": "Passa alla Chat",
+    "configError": {
+      "title": "Configurazione Mancante",
+      "subtitle": "La modalità vocale non è configurata correttamente",
+      "missingVariables": "Variabili di ambiente mancanti:",
+      "instructions": "Aggiungi queste variabili al tuo file",
+      "useChatButton": "Usa la Chat",
+      "closeButton": "Chiudi"
+    }
   }
 }

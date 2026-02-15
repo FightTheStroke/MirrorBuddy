@@ -70,7 +70,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       toolsLimitDaily: 30,
       docsLimitTotal: 5,
       chatModel: CHAT_MODEL_EDU,
-      realtimeModel: 'gpt-realtime',
+      realtimeModel: 'gpt-realtime-mini',
       features: {
         chat: true,
         voice: true,

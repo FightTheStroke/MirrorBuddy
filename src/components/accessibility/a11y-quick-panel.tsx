@@ -1,21 +1,23 @@
-"use client";
+'use client';
 
-import { useRef, useEffect } from "react";
-import { X, RotateCcw, Settings } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility";
-import { A11yProfileButton, getProfileConfigs } from "./a11y-profile-button";
+import { useRef, useEffect } from 'react';
+import { X, RotateCcw, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { useAccessibilityStore } from '@/lib/accessibility';
+import { A11yProfileButton, getProfileConfigs } from './a11y-profile-button';
 
 interface A11yQuickPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const VOICE_OPTIONS = ['alloy', 'ash', 'echo', 'fable', 'nova', 'onyx', 'shimmer'] as const;
+
 export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
-  const t = useTranslations("settings.accessibility");
+  const t = useTranslations('settings.accessibility');
   const panelRef = useRef<HTMLDivElement>(null);
   const activeProfile = useAccessibilityStore((state) => state.activeProfile);
   const settings = useAccessibilityStore((state) => state.settings);
@@ -36,10 +38,10 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
     firstEl?.focus();
 
     const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
+      if (e.key !== 'Tab') return;
 
       if (e.shiftKey && document.activeElement === firstEl) {
         e.preventDefault();
@@ -65,8 +67,8 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
       }
     };
 
-    document.addEventListener("keydown", handleTab);
-    return () => document.removeEventListener("keydown", handleTab);
+    document.addEventListener('keydown', handleTab);
+    return () => document.removeEventListener('keydown', handleTab);
   }, [isOpen]);
 
   return (
@@ -88,17 +90,17 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="a11y-panel-title"
-            initial={{ x: "100%", opacity: 0 }}
+            initial={{ x: '100%', opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "100%", opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={cn(
-              "fixed bottom-0 right-0 z-50",
-              "w-full sm:w-80 max-h-[85vh]",
-              "bg-white dark:bg-gray-800",
-              "rounded-t-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-tr-none",
-              "shadow-2xl",
-              "overflow-y-auto",
+              'fixed bottom-0 right-0 z-50',
+              'w-full sm:w-80 max-h-[85vh]',
+              'bg-white dark:bg-gray-800',
+              'rounded-t-2xl sm:rounded-tl-2xl sm:rounded-bl-2xl sm:rounded-tr-none',
+              'shadow-2xl',
+              'overflow-y-auto',
             )}
           >
             <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
@@ -106,13 +108,13 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                 id="a11y-panel-title"
                 className="text-lg font-semibold text-gray-900 dark:text-white"
               >
-                {t("panelTitle")}
+                {t('panelTitle')}
               </h2>
               <button
                 onClick={onClose}
                 data-testid="a11y-close-panel-btn"
                 className="min-h-11 min-w-11 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                aria-label={t("closePanel")}
+                aria-label={t('closePanel')}
               >
                 <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
@@ -123,12 +125,9 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   id="profiles-heading"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
                 >
-                  {t("quickProfiles")}
+                  {t('quickProfiles')}
                 </h3>
-                <div
-                  className="grid grid-cols-3 gap-2"
-                  data-testid="a11y-profile-buttons"
-                >
+                <div className="grid grid-cols-3 gap-2" data-testid="a11y-profile-buttons">
                   {PROFILE_CONFIGS.map((profile) => (
                     <A11yProfileButton
                       key={profile.id}
@@ -145,29 +144,55 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   id="toggles-heading"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
                 >
-                  {t("quickSettings")}
+                  {t('quickSettings')}
                 </h3>
                 <div className="space-y-3">
                   <QuickToggle
-                    label={t("largeText")}
+                    label={t('largeText')}
                     checked={settings.largeText}
                     onChange={(v) => updateSettings({ largeText: v })}
                   />
                   <QuickToggle
-                    label={t("highContrast")}
+                    label={t('highContrast')}
                     checked={settings.highContrast}
                     onChange={(v) => updateSettings({ highContrast: v })}
                   />
                   <QuickToggle
-                    label={t("reduceAnimations")}
+                    label={t('reduceAnimations')}
                     checked={settings.reducedMotion}
                     onChange={(v) => updateSettings({ reducedMotion: v })}
                   />
                   <QuickToggle
-                    label={t("dyslexiaFont")}
+                    label={t('dyslexiaFont')}
                     checked={settings.dyslexiaFont}
                     onChange={(v) => updateSettings({ dyslexiaFont: v })}
                   />
+                </div>
+                <div className="mt-4 space-y-2">
+                  <label
+                    htmlFor="a11y-voice-preference"
+                    className="text-sm text-gray-600 dark:text-gray-400"
+                  >
+                    {t('voiceSelector')}
+                  </label>
+                  <select
+                    id="a11y-voice-preference"
+                    data-testid="a11y-voice-selector"
+                    value={settings.voicePreference ?? ''}
+                    onChange={(event) =>
+                      updateSettings({
+                        voicePreference: event.target.value || null,
+                      })
+                    }
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm"
+                  >
+                    <option value="">{t('defaultVoice')}</option>
+                    {VOICE_OPTIONS.map((voice) => (
+                      <option key={voice} value={voice}>
+                        {voice}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </section>
               <div className="flex flex-col gap-2 pt-2">
@@ -177,7 +202,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  {t("resetSettings")}
+                  {t('resetSettings')}
                 </button>
                 <Link
                   href="/settings?section=accessibility"
@@ -186,7 +211,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg bg-violet-600 text-white hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 >
                   <Settings className="w-4 h-4" />
-                  {t("allSettings")}
+                  {t('allSettings')}
                 </Link>
               </div>
             </div>
@@ -204,8 +229,8 @@ interface QuickToggleProps {
 }
 
 function QuickToggle({ label, checked, onChange }: QuickToggleProps) {
-  const id = `toggle-${label.toLowerCase().replace(/\s/g, "-")}`;
-  const testId = `a11y-toggle-${label.toLowerCase().replace(/\s/g, "-")}`;
+  const id = `toggle-${label.toLowerCase().replace(/\s/g, '-')}`;
+  const testId = `a11y-toggle-${label.toLowerCase().replace(/\s/g, '-')}`;
 
   return (
     <div className="flex items-center justify-between gap-4">
@@ -220,20 +245,18 @@ function QuickToggle({ label, checked, onChange }: QuickToggleProps) {
         data-testid={testId}
         role="switch"
         aria-checked={checked}
-        aria-label={`${label}: ${checked ? "on" : "off"}`}
+        aria-label={`${label}: ${checked ? 'on' : 'off'}`}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative min-h-11 w-16 rounded-full transition-colors duration-200 flex-shrink-0",
-          "focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2",
-          checked
-            ? "bg-violet-600 dark:bg-violet-500"
-            : "bg-gray-200 dark:bg-gray-600",
+          'relative min-h-11 w-16 rounded-full transition-colors duration-200 flex-shrink-0',
+          'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2',
+          checked ? 'bg-violet-600 dark:bg-violet-500' : 'bg-gray-200 dark:bg-gray-600',
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 w-9 h-9 rounded-full bg-white shadow transition-transform duration-200",
-            checked && "translate-x-5",
+            'absolute top-0.5 left-0.5 w-9 h-9 rounded-full bg-white shadow transition-transform duration-200',
+            checked && 'translate-x-5',
           )}
         />
       </button>

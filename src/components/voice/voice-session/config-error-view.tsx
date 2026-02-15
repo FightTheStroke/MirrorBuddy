@@ -55,13 +55,12 @@ export function ConfigErrorView({ error, onSwitchToChat, onClose }: ConfigErrorV
             <div className="space-y-2">
               <p className="text-sm text-slate-300">
                 {t('configError.instructions')}{' '}
-                <code className="text-xs bg-slate-800 px-1 rounded">{t("envLocal")}</code>:
+                <code className="text-xs bg-slate-800 px-1 rounded">{t('envLocal')}</code>:
               </p>
               <pre className="text-xs bg-slate-900 p-3 rounded-lg overflow-x-auto">
                 {`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
-AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`}
               </pre>
             </div>
 

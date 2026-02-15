@@ -5,8 +5,8 @@
  * coaches, and buddies based on student profile and language preference.
  */
 
-import type { SupportedLanguage } from "@/app/api/chat/types";
-import type { GreetingContext } from "@/types/greeting";
+import type { SupportedLanguage } from '@/app/api/chat/types';
+import type { GreetingContext } from '@/types/greeting';
 import {
   GENERIC_GREETINGS,
   FORMAL_GREETINGS,
@@ -15,22 +15,23 @@ import {
   BILINGUAL_GREETINGS,
   MASCETTI_GREETINGS,
   applyGreetingTemplate,
+  getGreeting,
   isFormalProfessor,
-} from "./templates";
+} from './templates';
 
 /** Language teachers with bilingual greetings */
-const LANGUAGE_TEACHERS = ["shakespeare", "alex-pina"] as const;
+const LANGUAGE_TEACHERS = ['shakespeare', 'alex-pina'] as const;
 
 /** Non-teaching characters (Amici) */
-const AMICI = ["mascetti"] as const;
+const AMICI = ['mascetti'] as const;
 
 /**
  * Check if a character ID is a language teacher
  */
 function isLanguageTeacher(characterId: string): boolean {
-  const normalized = characterId.toLowerCase().split("-")[0];
+  const normalized = characterId.toLowerCase().split('-')[0];
   return LANGUAGE_TEACHERS.some(
-    (t) => t.includes(normalized) || normalized.includes(t.replace("-", "")),
+    (t) => t.includes(normalized) || normalized.includes(t.replace('-', '')),
   );
 }
 
@@ -38,7 +39,7 @@ function isLanguageTeacher(characterId: string): boolean {
  * Check if a character ID is an Amico (non-teaching)
  */
 function isAmico(characterId: string): boolean {
-  const normalized = characterId.toLowerCase().split("-")[0];
+  const normalized = characterId.toLowerCase().split('-')[0];
   return AMICI.some((a) => normalized.includes(a));
 }
 
@@ -60,14 +61,11 @@ export function generateMaestroGreeting(
   if (isLanguageTeacher(characterId)) {
     const teacherKey = LANGUAGE_TEACHERS.find(
       (t) =>
-        characterId.toLowerCase().includes(t.replace("-", "")) ||
-        t.includes(characterId.toLowerCase().split("-")[0]),
+        characterId.toLowerCase().includes(t.replace('-', '')) ||
+        t.includes(characterId.toLowerCase().split('-')[0]),
     );
     if (teacherKey && BILINGUAL_GREETINGS[teacherKey]) {
-      return (
-        BILINGUAL_GREETINGS[teacherKey][language] ||
-        BILINGUAL_GREETINGS[teacherKey].it
-      );
+      return BILINGUAL_GREETINGS[teacherKey][language] || BILINGUAL_GREETINGS[teacherKey].it;
     }
   }
 
@@ -78,18 +76,23 @@ export function generateMaestroGreeting(
   }
 
   // Informal professors use casual address (tu/du/tú)
-  const template = GENERIC_GREETINGS[language] || GENERIC_GREETINGS.it;
+  const template = getGreeting(
+    GENERIC_GREETINGS,
+    language,
+    'Ciao! Sono {name}. Come posso aiutarti oggi?',
+  );
   return applyGreetingTemplate(template, { name: displayName });
 }
 
 /**
  * Generate a greeting for a coach character
  */
-export function generateCoachGreeting(
-  displayName: string,
-  language: SupportedLanguage,
-): string {
-  const template = COACH_GREETINGS[language] || COACH_GREETINGS.it;
+export function generateCoachGreeting(displayName: string, language: SupportedLanguage): string {
+  const template = getGreeting(
+    COACH_GREETINGS,
+    language,
+    'Ciao! Sono {name}. Come posso aiutarti a imparare qualcosa di nuovo oggi?',
+  );
   return applyGreetingTemplate(template, { name: displayName });
 }
 
@@ -116,30 +119,22 @@ export function generateBuddyGreeting(
 export function generateGreeting(
   characterId: string,
   displayName: string,
-  characterType: "maestro" | "coach" | "buddy",
+  characterType: 'maestro' | 'coach' | 'buddy',
   context: GreetingContext,
   fallbackGreeting?: string,
 ): string {
   const { language } = context;
 
   switch (characterType) {
-    case "maestro":
-      return generateMaestroGreeting(
-        characterId,
-        displayName,
-        language,
-        fallbackGreeting,
-      );
-    case "coach":
+    case 'maestro':
+      return generateMaestroGreeting(characterId, displayName, language, fallbackGreeting);
+    case 'coach':
       return generateCoachGreeting(displayName, language);
-    case "buddy":
+    case 'buddy':
       // Buddies use age-aware greetings
       return generateBuddyGreeting(displayName, context.student.age, language);
     default:
-      return (
-        fallbackGreeting ||
-        applyGreetingTemplate(GENERIC_GREETINGS.it, { name: displayName })
-      );
+      return fallbackGreeting || applyGreetingTemplate(GENERIC_GREETINGS.it, { name: displayName });
   }
 }
 

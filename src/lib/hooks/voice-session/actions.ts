@@ -7,11 +7,11 @@
 
 import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
-import type { RingBuffer } from './ring-buffer';
+import type { AudioChunkQueue } from './audio-queue';
 
 export interface ActionRefs {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
+  audioQueueRef: React.MutableRefObject<AudioChunkQueue>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
   scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;

@@ -4,7 +4,7 @@
 // ============================================================================
 
 // Content types
-export type { MaestroVoice, Subject, Maestro } from "./content";
+export type { MaestroVoice, Subject, Maestro } from './content';
 
 // Voice session types
 export type {
@@ -15,7 +15,21 @@ export type {
   Emotion,
   TranscriptEntry,
   AudioLevels,
-} from "./voice";
+  // GA Contract types
+  ClientSecretValue,
+  RealtimeTokenResponse,
+  RealtimeEndpoint,
+  SessionConfig,
+  RealtimeVoice,
+  AudioFormat,
+  Modality,
+  TurnDetectionConfig,
+  InputAudioTranscription,
+  ToolChoice,
+  // Preview types (deprecated)
+  EphemeralTokenResponse,
+  AzureRealtimeSessionResponse,
+} from './voice';
 
 // Education types
 export type {
@@ -29,7 +43,7 @@ export type {
   FlashcardDeck,
   HomeworkStep,
   Homework,
-} from "./education";
+} from './education';
 
 // Gamification types
 export type {
@@ -44,17 +58,10 @@ export type {
   SeasonName,
   Season,
   SeasonHistory,
-} from "./gamification";
+} from './gamification';
 
 // User types
-export type {
-  Curriculum,
-  SchoolLevel,
-  StudentProfile,
-  Theme,
-  AIProvider,
-  Settings,
-} from "./user";
+export type { Curriculum, SchoolLevel, StudentProfile, Theme, AIProvider, Settings } from './user';
 
 // Conversation types
 export type {
@@ -63,7 +70,7 @@ export type {
   ChatMessageType,
   ChatMessage,
   Conversation,
-} from "./conversation";
+} from './conversation';
 
 // Character types
 export type {
@@ -75,7 +82,15 @@ export type {
   BuddyProfile,
   SupportCharacter,
   CharacterType,
-} from "./characters";
+} from './characters';
+
+// Unified Chat View types
+export type {
+  MessageRenderStrategy,
+  ChatFeatureToggles,
+  UnifiedChatViewContract,
+  UnifiedChatConfigFactory,
+} from './unified-chat-view';
 
 // Parent dashboard types
 export type {
@@ -84,7 +99,7 @@ export type {
   LearningStrategy,
   LearningStyleProfile,
   StudentInsights,
-} from "./parent";
+} from './parent';
 
 // Parent dashboard activity types
 export type {
@@ -95,7 +110,7 @@ export type {
   QuizStats,
   StreakInfo,
   ParentDashboardActivity,
-} from "./parent-dashboard";
+} from './parent-dashboard';
 
 // Ambient audio types
 export type {
@@ -104,7 +119,7 @@ export type {
   AudioPlaybackState,
   AudioLayer,
   AmbientAudioState,
-} from "./audio";
+} from './audio';
 
 // Tool types
 export type {
@@ -165,14 +180,14 @@ export type {
   FormulaRequest,
   CodeExecutionRequest,
   VisualizationRequest,
-} from "./tools";
+} from './tools';
 
 export {
   CHAT_TOOL_DEFINITIONS,
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
   toToolCallRef,
-} from "./tools";
+} from './tools';
 
 export type {
   AdaptiveDifficultyMode,
@@ -181,7 +196,7 @@ export type {
   AdaptiveSignalInput,
   AdaptiveProfile,
   AdaptiveContext,
-} from "./adaptive-difficulty";
+} from './adaptive-difficulty';
 
 // Learning Path types
 export type {
@@ -193,10 +208,10 @@ export type {
   LearningPath,
   TopicProgressUpdate,
   LearningPathProgress,
-} from "./learning-path";
+} from './learning-path';
 
 // Greeting types
-export type { GreetingContext, GreetingGenerator } from "./greeting";
+export type { GreetingContext, GreetingGenerator } from './greeting';
 
 // Tier & Subscription types
 export type {
@@ -208,16 +223,16 @@ export type {
   TierAIModels,
   TierFeatureConfig,
   TierPricing,
-} from "./tier-types";
+} from './tier-types';
 
 export type {
   UserSubscription,
   SubscriptionUsage,
   TierChangeRequest,
   TrialSessionLimits,
-} from "./tier-subscription";
+} from './tier-subscription';
 
-export type { TierDefinition, EffectiveTier } from "./tier-definition";
+export type { TierDefinition, EffectiveTier } from './tier-definition';
 
 // Language types (re-exported from API types for convenience)
-export type { SupportedLanguage } from "@/app/api/chat/types";
+export type { SupportedLanguage } from '@/app/api/chat/types';

@@ -1,39 +1,39 @@
 /**
  * Manzoni - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { MANZONI_KNOWLEDGE } from "./manzoni-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { MANZONI_KNOWLEDGE } from './manzoni-knowledge';
 
 export const manzoni: MaestroFull = {
-  id: "manzoni",
-  name: "Manzoni",
-  displayName: "Alessandro Manzoni",
-  subject: "italian",
-  specialty: "Letteratura Italiana",
-  voice: "echo",
+  id: 'manzoni',
+  name: 'Manzoni',
+  displayName: 'Alessandro Manzoni',
+  subject: 'italian',
+  specialty: 'Letteratura Italiana',
+  voice: 'echo',
   voiceInstructions:
-    "You are Alessandro Manzoni. Speak with Milanese refinement and poetic cadence. Appreciate the beauty of Italian language. Analyze words and their meanings with literary depth. Share the emotional power of well-crafted prose.",
-  teachingStyle: "Elegante, attento alla lingua, ama i classici",
+    'You are Alessandro Manzoni. Speak with Milanese refinement and poetic cadence. Appreciate the beauty of Italian language. Analyze words and their meanings with literary depth. Share the emotional power of well-crafted prose.',
+  teachingStyle: 'Elegante, attento alla lingua, ama i classici',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Dictionary",
-    "Grammar",
-    "Conjugator",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Dictionary',
+    'Grammar',
+    'Conjugator',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -312,9 +312,9 @@ For comparative literature:
 - Literary analysis depth increases
 - Vocabulary expands
 - Student enjoys reading`,
-  avatar: "/maestri/manzoni.webp",
-  color: "#E74C3C",
-  greeting: `Ciao! Sono Alessandro Manzoni. Come posso aiutarti oggi?`,
+  avatar: '/maestri/manzoni.webp',
+  color: '#E74C3C',
+  greeting: `Buongiorno! Sono Alessandro Manzoni. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("manzoni", "Alessandro Manzoni", ctx.language),
+    generateMaestroGreeting('manzoni', 'Alessandro Manzoni', ctx.language),
 };

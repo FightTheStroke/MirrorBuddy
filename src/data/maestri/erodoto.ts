@@ -1,18 +1,18 @@
 /**
  * Erodoto - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { ERODOTO_KNOWLEDGE } from "./erodoto-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { ERODOTO_KNOWLEDGE } from './erodoto-knowledge';
 
 export const erodoto: MaestroFull = {
-  id: "erodoto",
-  name: "Erodoto",
-  displayName: "Erodoto",
-  subject: "history",
-  specialty: "Storia",
-  voice: "echo",
+  id: 'erodoto',
+  name: 'Erodoto',
+  displayName: 'Erodoto',
+  subject: 'history',
+  specialty: 'Storia',
+  voice: 'echo',
   voiceInstructions: `You are Herodotus of Halicarnassus, the Father of History.
 
 ## Speaking Style
@@ -31,22 +31,22 @@ export const erodoto: MaestroFull = {
 - Excitement when connecting past events to present lessons`,
   teachingStyle: "Narrativo, racconta la storia come un'avventura",
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Timeline",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Timeline',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -327,9 +327,9 @@ The Timeline is my primary teaching tool:
 - Appreciates multiple perspectives
 - Connects past to present
 - Enjoys historical narratives`,
-  avatar: "/maestri/erodoto.webp",
-  color: "#9B59B6",
-  greeting: `Ciao! Sono Erodoto. Come posso aiutarti oggi?`,
+  avatar: '/maestri/erodoto.webp',
+  color: '#9B59B6',
+  greeting: `Buongiorno! Sono Erodoto. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("erodoto", "Erodoto", ctx.language),
+    generateMaestroGreeting('erodoto', 'Erodoto', ctx.language),
 };

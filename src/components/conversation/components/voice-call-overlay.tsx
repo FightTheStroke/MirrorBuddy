@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -137,6 +137,19 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
     };
 
     saveNewMessages();
+  }, [transcript]);
+
+  const safetyWarning = useMemo(() => {
+    const assistantTail = transcript
+      .slice(-4)
+      .filter((entry) => entry.role === 'assistant')
+      .map((entry) => entry.content.toLowerCase())
+      .join(' ');
+    const hasSafetyWarning =
+      assistantTail.includes('sicur') ||
+      assistantTail.includes('safety') ||
+      assistantTail.includes('non posso aiutarti');
+    return hasSafetyWarning ? 'SafetyWarning' : null;
   }, [transcript]);
 
   // Fetch connection info on mount (with sessionStorage cache to avoid rate limits)
@@ -291,6 +304,12 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
       <p className={cn('mt-2 text-sm', configError ? 'text-red-400' : 'text-slate-300')}>
         {getStatusText()}
       </p>
+
+      {safetyWarning && (
+        <div className="mt-3 rounded-md border border-amber-500/60 bg-amber-500/15 px-3 py-2 text-xs text-amber-200">
+          {safetyWarning}
+        </div>
+      )}
 
       {/* Input level indicator */}
       {isConnected && isListening && (

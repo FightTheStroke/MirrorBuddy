@@ -4,6 +4,9 @@
  */
 
 import type { ToolType } from '@/types/tools';
+import { sanitizeFilename } from '@/lib/utils/sanitize';
+
+export { sanitizeFilename };
 
 export function safeJsonParse(content: string): unknown {
   try {
@@ -11,13 +14,6 @@ export function safeJsonParse(content: string): unknown {
   } catch {
     return content;
   }
-}
-
-export function sanitizeFilename(name: string): string {
-  return name
-    .replace(/[<>:"/\\|?*]/g, '_')
-    .replace(/\s+/g, '_')
-    .slice(0, 100);
 }
 
 export function formatToolType(type: ToolType): string {

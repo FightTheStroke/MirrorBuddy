@@ -4,11 +4,11 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface FunnelEventItem {
   stage: string;
@@ -26,7 +26,7 @@ interface UsageMetrics {
 
 interface UserDrilldownResponse {
   id: string;
-  type: "visitor" | "user";
+  type: 'visitor' | 'user';
   email: string | null;
   currentStage: string;
   journey: FunnelEventItem[];
@@ -53,7 +53,7 @@ interface UserDrilldownResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/user/[id]"),
+  withSentry('/api/admin/funnel/user/[id]'),
   withAdmin,
 )(async (ctx) => {
   const { id } = await ctx.params;
@@ -67,10 +67,8 @@ export const GET = pipe(
 
   // Get funnel journey
   const journey = await prisma.funnelEvent.findMany({
-    where: isUser
-      ? { userId: id, isTestData: false }
-      : { visitorId: id, isTestData: false },
-    orderBy: { createdAt: "asc" },
+    where: isUser ? { userId: id, isTestData: false } : { visitorId: id, isTestData: false },
+    orderBy: { createdAt: 'asc' },
     select: {
       stage: true,
       fromStage: true,
@@ -80,10 +78,7 @@ export const GET = pipe(
   });
 
   if (journey.length === 0) {
-    return NextResponse.json(
-      { error: "User not found in funnel" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'User not found in funnel' }, { status: 404 });
   }
 
   const currentStage = journey[journey.length - 1].stage;
@@ -107,9 +102,7 @@ export const GET = pipe(
 
   // Get invite request if exists
   const inviteRequest = await prisma.inviteRequest.findFirst({
-    where: isUser
-      ? { email: user?.email ?? undefined }
-      : { trialSessionId: trialSession?.id },
+    where: isUser ? { email: user?.email ?? undefined } : { trialSessionId: trialSession?.id },
     select: {
       id: true,
       status: true,
@@ -128,7 +121,7 @@ export const GET = pipe(
 
   const response: UserDrilldownResponse = {
     id,
-    type: isUser ? "user" : "visitor",
+    type: isUser ? 'user' : 'visitor',
     email: user?.email ?? trialSession?.email ?? null,
     currentStage,
     journey: journey.map((e) => ({
@@ -151,14 +144,14 @@ export const GET = pipe(
           id: trialSession.id,
           createdAt: trialSession.createdAt.toISOString(),
           lastActivityAt: trialSession.lastActivityAt.toISOString(),
-          assignedMaestri: JSON.parse(trialSession.assignedMaestri || "[]"),
+          assignedMaestri: JSON.parse(trialSession.assignedMaestri || '[]'),
           assignedCoach: trialSession.assignedCoach,
         }
       : null,
     userAccount: user
       ? {
           id: user.id,
-          email: user.email ?? "",
+          email: user.email ?? '',
           createdAt: user.createdAt.toISOString(),
           lastLoginAt: null, // Would need Session table lookup
         }

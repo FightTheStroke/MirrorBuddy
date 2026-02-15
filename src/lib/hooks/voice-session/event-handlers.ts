@@ -11,13 +11,13 @@ import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
 import { computeVoiceTimingDurations } from './voice-timing';
-
-import type { RingBuffer } from './ring-buffer';
+import { checkUserTranscript, checkAssistantTranscript } from './transcript-safety';
+import type { AudioChunkQueue } from './audio-queue';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
   sessionReadyRef: React.MutableRefObject<boolean>;
-  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
+  audioQueueRef: React.MutableRefObject<AudioChunkQueue>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
   scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;
@@ -38,17 +38,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   sendSessionConfig: () => void;
   sendGreeting: () => void;
   unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
-  initPlaybackContext: () => Promise<
-    | {
-        context: AudioContext;
-        analyser: AnalyserNode | null;
-        gainNode: GainNode | null;
-      }
-    | undefined
-  >;
   startAudioCapture: () => Promise<void>;
-  playNextChunk: () => void;
-  scheduleQueuedChunks: () => void;
 }
 
 /**
@@ -169,6 +159,26 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
             logger.info('[VoiceSession] User transcript received', {
               transcript: event.transcript.substring(0, 100),
             });
+
+            // T2-04: Run transcript safety check (VCE-002 checkpoint)
+            // Check is guarded by voice_transcript_safety feature flag
+            const safetyResult = checkUserTranscript(
+              deps.sessionIdRef.current || 'unknown',
+              event.transcript,
+            );
+
+            // Safety intervention wiring deferred to T2-06
+            // For now, just log the result
+            if (safetyResult.actionTaken !== 'allow') {
+              logger.warn('[VoiceSession] Transcript safety check flagged content', {
+                sessionId: deps.sessionIdRef.current,
+                severity: safetyResult.severity,
+                actionTaken: safetyResult.actionTaken,
+                flaggedPatterns: safetyResult.flaggedPatterns,
+              });
+              // T2-06 will wire: response.cancel + redirect message injection
+            }
+
             deps.addTranscript('user', event.transcript);
             deps.options.onTranscript?.('user', event.transcript);
           } else {
@@ -202,6 +212,32 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
             logger.info('[VoiceSession] AI transcript received', {
               transcript: event.transcript.substring(0, 100),
             });
+
+            // T2-05: Run assistant transcript safety check (VCE-003 checkpoint)
+            // Check is guarded by voice_transcript_safety feature flag
+            const assistantSafetyResult = checkAssistantTranscript(
+              deps.sessionIdRef.current || 'unknown',
+              event.transcript,
+            );
+
+            // Log flagged assistant content for audit and escalation
+            // T2-06 will wire safety intervention (reject -> block playback)
+            if (assistantSafetyResult.actionTaken === 'reject') {
+              logger.error('[VoiceSession] Assistant transcript rejected by safety check', {
+                sessionId: deps.sessionIdRef.current,
+                severity: assistantSafetyResult.severity,
+                flaggedPatterns: assistantSafetyResult.flaggedPatterns,
+                // This indicates a prompt engineering failure - should escalate
+              });
+              // T2-06 will wire: stop audio playback + escalate to admin audit
+            } else if (assistantSafetyResult.actionTaken === 'sanitize') {
+              logger.warn('[VoiceSession] Assistant transcript flagged but allowed', {
+                sessionId: deps.sessionIdRef.current,
+                severity: assistantSafetyResult.severity,
+                flaggedPatterns: assistantSafetyResult.flaggedPatterns,
+              });
+            }
+
             deps.addTranscript('assistant', event.transcript);
             deps.options.onTranscript?.('assistant', event.transcript);
           } else {

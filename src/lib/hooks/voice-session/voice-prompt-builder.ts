@@ -1,121 +1,100 @@
 // ============================================================================
 // VOICE PROMPT BUILDER
-// Extracts essential character identity from full systemPrompt into a
-// voice-optimized prompt (~2000 chars) per ADR 0031 intensity dial format.
-// Replaces the old .slice(0, 800) arbitrary truncation.
+// Builds voice-optimized prompt from maestro systemPrompt.
+// Preserves full personality, pedagogy, safety — removes only KNOWLEDGE BASE.
 // ============================================================================
 
 import type { Maestro } from '@/types';
 import { sanitizeHtmlComments } from './memory-utils';
 
-const MAX_VOICE_PROMPT_CHARS = 2000;
+const MAX_VOICE_PROMPT_CHARS = 6000;
 
 /**
- * Extract a named markdown section (## Header ... next ## or end).
- * Returns content without the header line itself.
+ * Remove named sections from a markdown prompt.
+ * Handles sections whose content contains ## sub-headers (e.g. KNOWLEDGE BASE).
+ * Finds section start, then scans forward for next ## header NOT preceded by
+ * content from the same section (identified by double-newline paragraph break
+ * followed by ## that matches a known post-KB header like "Core Identity").
  */
-function extractSection(text: string, sectionName: string): string {
-  // Find section header position (avoid dynamic RegExp for security/detect-non-literal-regexp)
-  const lines = text.split('\n');
-  const lowerName = sectionName.toLowerCase();
-  let startIdx = -1;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (/^#{1,2}\s/.test(line) && line.toLowerCase().includes(lowerName)) {
-      startIdx = i + 1;
-      break;
-    }
+function removeSections(text: string, sectionNames: string[]): string {
+  let result = text;
+  for (const name of sectionNames) {
+    result = removeSection(result, name);
   }
-
-  if (startIdx < 0) return '';
-
-  // Collect until next ## header or end
-  const sectionLines: string[] = [];
-  for (let i = startIdx; i < lines.length; i++) {
-    if (/^#{1,2}\s/.test(lines[i])) break;
-    sectionLines.push(lines[i]);
-  }
-
-  return sectionLines
-    .join('\n')
-    .replace(/\n{3,}/g, '\n')
-    .trim();
+  return result;
 }
 
-/**
- * Extract the full CHARACTER INTENSITY DIAL block including sub-headers.
- */
-function extractIntensityDial(text: string): string {
-  const match = text.match(
-    /(?:^|\n)(##?\s*CHARACTER INTENSITY DIAL[\s\S]*?)(?=\n##?\s(?!#)|\n##\s[A-Z]|$)/i,
+function removeSection(text: string, sectionName: string): string {
+  // eslint-disable-next-line security/detect-non-literal-regexp -- input is escaped via escapeRegex
+  const pattern = new RegExp(`##?\\s*${escapeRegex(sectionName)}`, 'i');
+  const match = text.match(pattern);
+  if (!match || match.index === undefined) return text;
+
+  const sectionStart = match.index;
+  const afterHeader = text.substring(sectionStart + match[0].length);
+
+  // Find next top-level section: ## followed by a known non-sub-header.
+  // All maestri use "## Core Identity" after KB; accessibility sections
+  // are followed by "## Teaching Style" or similar.
+  // Fallback: match any ## preceded by \n\n (paragraph break) and then
+  // a capital letter (main sections start with capitals like "Core", "Teaching").
+  const nextSection = afterHeader.search(
+    /\n##?\s*(?:Core Identity|Teaching Style|Communication Style|Pedagogical|Famous Works)/i,
   );
-  if (!match?.[1]) return '';
-  return match[1].replace(/\n{3,}/g, '\n').trim();
+
+  if (nextSection >= 0) {
+    return text.substring(0, sectionStart) + afterHeader.substring(nextSection);
+  }
+
+  // No known next section found — remove to end
+  return text.substring(0, sectionStart);
 }
 
-/**
- * Compact a section by removing excessive whitespace and markdown cruft.
- */
-function compact(text: string): string {
-  return text
-    .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '')
-    .replace(/\n{3,}/g, '\n')
-    .replace(/^\s+/gm, '')
-    .trim();
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
  * Build a voice-optimized prompt from maestro data.
  *
- * Extracts essential character identity (name, personality, role, subject,
- * formality, intensity dial, key behavioral rules) into a structured prompt
- * of max ~2000 chars. Replaces the old `.slice(0, 800)` truncation.
+ * Includes full systemPrompt MINUS:
+ * - KNOWLEDGE BASE section (handled by RAG at query time, too large for voice context)
+ * - Accessibility Adaptations (visual UI only, not relevant for voice)
  *
- * Sections included:
- * - Character header (name, subject, specialty, style)
- * - CHARACTER INTENSITY DIAL (ADR 0031)
- * - Core Identity (personality traits, catchphrases)
+ * When voice_full_prompt flag is enabled, returns the complete prompt.
+ * When disabled (default), enforces MAX_VOICE_PROMPT_CHARS truncation.
  *
- * Sections excluded (too verbose for voice):
- * - Copyright headers, Values Integration, Security Framework
- * - KNOWLEDGE BASE (huge embedded content)
- * - Pedagogical Approach details
- * - Accessibility Adaptations (handled by accessibility layer)
+ * Preserves: personality, pedagogy, safety, formality, intensity dial.
  */
-export function buildVoicePrompt(maestro: Maestro): string {
+export function buildVoicePrompt(maestro: Maestro, useFullPrompt = false): string {
   const raw = maestro.systemPrompt || '';
   const sanitized = sanitizeHtmlComments(raw);
 
-  // 1. Character header — always present
-  const header = [
-    `## ${maestro.name} — ${maestro.subject}`,
-    `Role: ${maestro.specialty}`,
-    `Style: ${maestro.teachingStyle}`,
-  ].join('\n');
+  // Remove sections by finding boundaries programmatically.
+  // KB content contains ## sub-headers, so lazy regex fails — use indexOf approach.
+  const withoutKB = removeSections(sanitized, [
+    'KNOWLEDGE BASE',
+    'BASE DI CONOSCENZA',
+    'Accessibility Adaptations',
+    "Adattamenti per l'Accessibilità",
+  ])
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
-  // 2. CHARACTER INTENSITY DIAL (ADR 0031)
-  const dial = extractIntensityDial(sanitized);
-  const dialBlock = dial ? `\n\n${compact(dial)}` : '';
-
-  // 3. Core Identity — personality, catchphrases, communication style
-  const identity = extractSection(sanitized, 'Core Identity');
-  const identityBlock = identity ? `\n\n## Core Identity\n${compact(identity)}` : '';
-
-  // Assemble and enforce char limit
-  let prompt = header + dialBlock + identityBlock;
-
-  if (prompt.length > MAX_VOICE_PROMPT_CHARS) {
-    // Prefer cutting identity over intensity dial
-    const headAndDial = header + dialBlock;
-    if (headAndDial.length < MAX_VOICE_PROMPT_CHARS - 100) {
-      const remaining = MAX_VOICE_PROMPT_CHARS - headAndDial.length - 10;
-      const trimmedIdentity = identityBlock.slice(0, remaining);
-      prompt = headAndDial + trimmedIdentity;
-    } else {
-      prompt = prompt.slice(0, MAX_VOICE_PROMPT_CHARS);
-    }
+  // If voice_full_prompt flag is enabled, return full prompt (no truncation)
+  if (useFullPrompt) {
+    return withoutKB;
   }
 
-  return prompt.trim();
+  // Legacy behavior: enforce char limit — truncate at section boundary if too long
+  if (withoutKB.length <= MAX_VOICE_PROMPT_CHARS) {
+    return withoutKB;
+  }
+
+  const truncated = withoutKB.slice(0, MAX_VOICE_PROMPT_CHARS);
+  const lastSection = truncated.lastIndexOf('\n## ');
+  if (lastSection > MAX_VOICE_PROMPT_CHARS * 0.5) {
+    return truncated.slice(0, lastSection).trim();
+  }
+  return truncated.trim();
 }
