@@ -5,6 +5,22 @@ set -euo pipefail
 # Typecheck is intentionally omitted here — pre-push-vercel.sh runs a full
 # production build which includes type checking. Avoids redundant double-check.
 
+# i18n validation (unconditional - ensures translation consistency)
+npm run i18n:check || exit 1
+
+# Check for duplicate commit messages in last 5 commits
+DUPLICATE_COMMITS=$(git log --oneline -5 | awk '{$1=""; print $0}' | sort | uniq -d)
+if [ -n "$DUPLICATE_COMMITS" ]; then
+  echo "ERROR: Duplicate commit messages found in last 5 commits:"
+  echo "$DUPLICATE_COMMITS"
+  echo ""
+  echo "Each commit should have a unique message. Use git rebase -i to edit."
+  exit 1
+fi
+
+# Audit environment variables (ensures all process.env.X are documented)
+./scripts/env-var-audit.sh || exit 1
+
 echo "Running unit tests..."
 npm run test:unit -- --reporter=dot 2>&1 | tail -5
 # $? after pipe captures tail's exit code; use PIPESTATUS for the test runner

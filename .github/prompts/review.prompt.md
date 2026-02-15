@@ -5,11 +5,13 @@ agent: 'code-reviewer'
 tools: ['search/codebase', 'read']
 ---
 
-Review the current staged changes (or recent commits) for MirrorBuddy.
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
 
-Run `git diff --staged` (or `git diff HEAD~1` if nothing staged) to see changes.
+Review staged changes (or recent commits) for MirrorBuddy.
 
-Check each changed file against:
+**Get changes**: `git diff --staged` or `git diff HEAD~1` if nothing staged
+
+**Review criteria**:
 
 1. **Security**: OWASP top 10, auth patterns, CSRF, cookie handling
 2. **Accessibility**: WCAG 2.1 AA, DSA profile compatibility
@@ -17,4 +19,4 @@ Check each changed file against:
 4. **Quality**: Max 250 lines/file, no TODO/FIXME, typed properly
 5. **Compliance**: No PII leaks, parameterized queries, bias detection
 
-Output a structured review with severity levels and specific fix suggestions.
+Output structured review with severity levels and specific fix suggestions.

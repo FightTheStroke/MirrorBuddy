@@ -6,30 +6,9 @@ agent: 'tdd-executor'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
 ---
 
-Implement the following using strict TDD (RED-GREEN-REFACTOR):
+Strict TDD (RED-GREEN-REFACTOR) for: ${input:feature}
 
-## Feature/Fix: ${input:feature}
-
-### Step 1: RED — Write Failing Test
-
-- Create test colocated with source file
-- Use Vitest: `describe`, `it`, `expect`
-- AAA pattern (Arrange / Act / Assert)
-- Run test to confirm it fails: `npm run test:unit -- {test-file}`
-
-### Step 2: GREEN — Minimum Implementation
-
-- Write the minimum code to make the test pass
-- Max 250 lines per file
-- Follow project conventions (see .github/copilot-instructions.md)
-
-### Step 3: Validate
-
-```bash
-./scripts/ci-summary.sh --quick  # lint + typecheck
-./scripts/ci-summary.sh --unit   # all unit tests pass
-```
-
-### Step 4: Report
-
-Show the test file, implementation, and validation results.
+1. **RED**: Colocated test, Vitest AAA pattern → `npm run test:unit -- {file}` confirms fail
+2. **GREEN**: Minimum code to pass. Max 250 lines/file. Follow copilot-instructions.md
+3. **VALIDATE**: `./scripts/ci-summary.sh --quick` + `./scripts/ci-summary.sh --unit`
+4. **REPORT**: Show test, implementation, results

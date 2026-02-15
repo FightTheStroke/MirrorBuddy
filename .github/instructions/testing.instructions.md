@@ -3,51 +3,22 @@ description: 'Unit and integration testing conventions: TDD, AAA pattern, Vitest
 applyTo: '**/*.test.ts,**/*.test.tsx,**/*.spec.ts'
 ---
 
-# Testing Conventions
+# Testing
 
-## TDD Workflow
+## TDD
 
-1. **RED**: Write failing test based on requirements
-2. **GREEN**: Implement minimum code to pass
-3. **REFACTOR**: Clean up without changing behavior
+RED: failing test | GREEN: minimum code | REFACTOR: clean up
 
-## Unit Tests (Vitest)
+## Unit (Vitest)
 
-- Colocated with source: `feature.ts` + `feature.test.ts`
-- AAA pattern: Arrange / Act / Assert
-- One behavior per test
-- No shared mutable state between tests
-- 80% coverage for business logic, 100% for critical paths
-
-## Test Structure
-
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-
-describe('FeatureName', () => {
-  it('should handle specific case', () => {
-    // Arrange
-    const input = createTestInput();
-
-    // Act
-    const result = featureFunction(input);
-
-    // Assert
-    expect(result).toEqual(expectedOutput);
-  });
-});
-```
+Colocate (`feature.ts` + `feature.test.ts`) | AAA pattern | one behavior/test | no shared state | 80% business, 100% critical
 
 ## Mocking
 
-- Use `vi.mock()` for module-level mocks
-- Use `vi.spyOn()` for specific function spies
-- Reset mocks in `beforeEach` or `afterEach`
-- Never mock what you don't own — wrap external deps first
+`vi.mock()` modules | `vi.spyOn()` functions | reset in `beforeEach`/`afterEach` | wrap external deps
 
-## Validation Commands
+## Commands
 
-```bash
-./scripts/ci-summary.sh --unit   # Run unit tests (compact output)
-npm run test:unit -- path/file   # Run specific test file
-```
+`./scripts/ci-summary.sh --unit` (compact) | `npm run test:unit -- path/file` (specific)
+
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->

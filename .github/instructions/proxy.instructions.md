@@ -3,32 +3,21 @@ description: 'CRITICAL proxy architecture rules - only ONE proxy at src/proxy.ts
 applyTo: 'src/proxy.ts,src/components/providers.tsx'
 ---
 
-# Proxy Architecture (CRITICAL)
+# Proxy (CRITICAL)
 
-## Only ONE proxy — at `src/proxy.ts` (default export required)
+## Only ONE
 
-**NEVER create**:
+`src/proxy.ts` (default export) — FORBIDDEN: root `proxy.ts`, `middleware.ts`
+Two proxies = Next.js uses root = API 307 = 404
 
-- Root `proxy.ts` (FORBIDDEN)
-- `middleware.ts` (deprecated in Next.js 16)
+## Exclusions
 
-Two proxy files = Next.js uses root, ignores src = API 307 redirects = 404 = app failure.
-
-## Path Exclusions
-
-Proxy MUST skip i18n for:
-`/api/*`, `/admin/*`, `/_next/*`, `/monitoring`, static files
-(`.png`, `.webp`, `.svg`), `/maestri/*`, `/avatars/*`, `/logo*`
+Skip i18n: `/api/*`, `/admin/*`, `/_next/*`, `/monitoring`, static files, `/maestri/*`, `/avatars/*`, `/logo*`
 
 ## CSP
 
-- CSP header defined in `src/proxy.ts`
-- Nonces applied in `src/components/providers.tsx`
-- Before modifying: `npm run test:unit -- csp-validation`
-- "Caricamento..." forever = CSP blocking a resource
+Header: `src/proxy.ts` | Nonces: `src/components/providers.tsx` | Verify: `npm run test:unit -- csp-validation`
 
-## Pre-push Hook
+Pre-push hook blocks root `proxy.ts`. Reference: ADR 0066 §9
 
-Hook blocks if root `proxy.ts` exists.
-
-Reference: ADR 0066 Section 9
+<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
