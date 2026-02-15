@@ -26,13 +26,12 @@ describe('/api/realtime/sdp-exchange', () => {
       expect(gaUrl).not.toContain('/v1/realtimertc');
     });
 
-    it('should use preview SDP endpoint when voice_ga_protocol is disabled', async () => {
-      // Preview endpoint (fallback)
+    it('should keep WebRTC filter OFF for data-channel tool calls', async () => {
       const azureEndpoint = 'https://test-resource.openai.azure.com';
-      const previewUrl = `${azureEndpoint}/openai/v1/realtime/calls?webrtcfilter=on`;
+      const previewUrl = `${azureEndpoint}/openai/v1/realtime/calls?webrtcfilter=off`;
 
-      // Current implementation already uses the correct preview path
       expect(previewUrl).toContain('/openai/v1/realtime/calls');
+      expect(previewUrl).toContain('webrtcfilter=off');
     });
 
     it('should find realtime/calls endpoint in route code', async () => {
@@ -44,6 +43,7 @@ describe('/api/realtime/sdp-exchange', () => {
 
       // This should PASS even before implementation (already exists)
       expect(content).toMatch(/\/openai\/v1\/realtime\/calls/);
+      expect(content).toContain('webrtcfilter=off');
     });
   });
 

@@ -35,9 +35,10 @@ export const POST = pipe(withSentry('/api/realtime/sdp-exchange'))(async (ctx) =
     return response;
   }
 
-  // Construct the WebRTC SDP exchange URL
+  // Keep WebRTC filter OFF: tool/function calls travel on the data channel.
+  // Enabling filter can strip non-audio signaling and break tool execution.
   const url = new URL(azureEndpoint);
-  const sdpUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/calls?webrtcfilter=on`;
+  const sdpUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/calls?webrtcfilter=off`;
 
   log.debug('[SDP Proxy] Exchanging SDP with Azure', { url: sdpUrl });
 

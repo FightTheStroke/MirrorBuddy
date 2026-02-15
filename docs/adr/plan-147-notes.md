@@ -2097,3 +2097,8 @@ Ready for final Thor validation and Plan 148 closure.
 **No Code Rollback Required**: All new features are behind flags. Disabling flags restores pre-migration behavior without code changes.
 
 **Next Steps**: User acceptance testing, final QA sign-off, production deployment.
+
+### W1 Addendum: WebRTC Filter Decision
+
+- SDP exchange now uses `webrtcfilter=off` in `/api/realtime/sdp-exchange`.
+- Rationale: MirrorBuddy tool/function calls run over the WebRTC data channel. Keeping the filter off avoids stripping non-audio signaling required for tool execution and safety events.
