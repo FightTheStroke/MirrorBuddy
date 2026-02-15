@@ -4,6 +4,17 @@
 
 Localization verification for MirrorBuddy (5 locales: it/en/fr/de/es).
 
+## Overview
+
+Verify translation keys are complete across all locales, detect hardcoded Italian
+strings, and fix missing translations. Ensures i18n compliance before merge.
+
+## When to Use
+
+- Adding/changing UI text
+- Before merging PRs with component changes
+- Periodic translation completeness audits
+
 ## Quick Start
 
 ```bash
@@ -30,7 +41,7 @@ npx eslint {file} --rule 'local-rules/no-hardcoded-italian: error'
 
 Detects: accented chars (à,è,é,ì,ò,ù), common Italian words in JSX.
 
-### 3. Fix Missing Keys
+### 3. Verify Translation Keys
 
 For each missing key: verify intent → add to `messages/{locale}.json` → recheck.
 
