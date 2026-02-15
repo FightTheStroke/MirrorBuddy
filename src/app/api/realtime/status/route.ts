@@ -1,33 +1,20 @@
 // ============================================================================
-// API ROUTE: Check WebSocket Proxy Status
-// Returns whether the realtime proxy is running and accepting connections
+// API ROUTE: Deprecated WebSocket proxy status endpoint
+// Voice now uses WebRTC-only transport
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-import { getProxyStatus } from "@/server/realtime-proxy";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
-export const GET = pipe(withSentry("/api/realtime/status"))(async () => {
-  try {
-    const status = getProxyStatus();
-
-    return NextResponse.json({
-      ...status,
+export const GET = pipe(withSentry('/api/realtime/status'))(async () => {
+  return NextResponse.json(
+    {
+      running: false,
+      status: 'gone',
+      message: 'Realtime WebSocket proxy removed. Voice runs via WebRTC.',
       timestamp: new Date().toISOString(),
-    });
-  } catch {
-    // If getProxyStatus throws, proxy module likely not loaded
-    return NextResponse.json(
-      {
-        running: false,
-        port: 3001,
-        connections: 0,
-        error: "Proxy module not available",
-        timestamp: new Date().toISOString(),
-      },
-      { status: 503 },
-    );
-  }
+    },
+    { status: 410 },
+  );
 });
