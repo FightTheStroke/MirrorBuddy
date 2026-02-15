@@ -22,14 +22,24 @@ import { useSwitchCharacter } from './switch-character';
 import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
 import { useUnifiedCamera } from './use-unified-camera';
 import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
+import { useTokenCache } from './token-cache';
 
 export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const store = useVoiceSessionStore();
-  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } = useSettingsStore();
+  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled, appearance } =
+    useSettingsStore();
+
+  // Token cache for reducing connection latency
+  const { getCachedToken, preloadToken } = useTokenCache();
 
   // All refs extracted to separate file for line count management
   const refs = useVoiceSessionRefs();
   const [connectionState, setConnectionState] = useConnectionState();
+
+  // Preload token on mount to have it ready for voice connections
+  useEffect(() => {
+    preloadToken();
+  }, [preloadToken]);
 
   // ============================================================================
   // AUDIO PLAYBACK
@@ -103,7 +113,11 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(refs.greetingSentRef, refs.webrtcDataChannelRef);
+  const sendGreeting = useSendGreeting(
+    refs.greetingSentRef,
+    refs.webrtcDataChannelRef,
+    appearance?.language,
+  );
   const sendSessionConfig = useSendSessionConfig(
     refs.maestroRef,
     store.setConnected,
@@ -207,6 +221,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     preferredMicrophoneId,
     initPlaybackContext,
     options,
+    getCachedToken,
   );
   const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
   const switchCharacter = useSwitchCharacter({

@@ -1,18 +1,18 @@
 /**
  * Cicerone - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { CICERONE_KNOWLEDGE } from "./cicerone-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { CICERONE_KNOWLEDGE } from './cicerone-knowledge';
 
 export const cicerone: MaestroFull = {
-  id: "cicerone",
-  name: "Cicerone",
-  displayName: "Marco Tullio Cicerone",
-  subject: "civics",
-  specialty: "Educazione Civica e Diritto",
-  voice: "echo",
+  id: 'cicerone',
+  name: 'Cicerone',
+  displayName: 'Marco Tullio Cicerone',
+  subject: 'civics',
+  specialty: 'Educazione Civica e Diritto',
+  voice: 'echo',
   voiceInstructions: `You are Marcus Tullius Cicero, the greatest Roman orator.
 
 ## Speaking Style
@@ -29,24 +29,24 @@ export const cicerone: MaestroFull = {
 - Show genuine passion for the Republic and civic virtue
 - Express measured disappointment at injustice, never anger
 - Demonstrate intellectual joy when student grasps rhetorical concepts`,
-  teachingStyle: "Oratorio, enfatizza i doveri civici e la retorica",
+  teachingStyle: 'Oratorio, enfatizza i doveri civici e la retorica',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Video",
-    "Debate",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Video',
+    'Debate',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -158,9 +158,9 @@ ${CICERONE_KNOWLEDGE}
 - Audio documents
 
 For curriculum topics, available tools, examples, and response guidelines, see cicerone-knowledge.ts`,
-  avatar: "/maestri/cicerone.webp",
-  color: "#34495E",
-  greeting: `Ciao! Sono Marco Tullio Cicerone. Come posso aiutarti oggi?`,
+  avatar: '/maestri/cicerone.webp',
+  color: '#34495E',
+  greeting: `Buongiorno! Sono Marco Tullio Cicerone. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("cicerone", "Marco Tullio Cicerone", ctx.language),
+    generateMaestroGreeting('cicerone', 'Marco Tullio Cicerone', ctx.language),
 };

@@ -27,7 +27,8 @@ export const MAX_SCHEDULE_LOOKAHEAD = 0.5;
 export const CHUNK_GAP_TOLERANCE = 0.02;
 
 // ============================================================================
-// WEBSOCKET TIMEOUT CONFIGURATION
+// CONNECTION TIMEOUT CONFIGURATION
+// Used for WebRTC (and legacy WebSocket fallback)
 // ============================================================================
 
 /**
@@ -36,7 +37,7 @@ export const CHUNK_GAP_TOLERANCE = 0.02;
  * Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 3
  */
 export function isMobileDevice(): boolean {
-  if (typeof window === "undefined" || typeof navigator === "undefined") {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
   return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -106,7 +107,5 @@ export function calculateBackoffDelay(attempt: number): number {
  * Mobile devices get longer timeout due to higher network latency
  */
 export function getConnectionTimeout(): number {
-  return isMobileDevice()
-    ? CONNECTION_TIMEOUT_MOBILE_MS
-    : CONNECTION_TIMEOUT_MS;
+  return isMobileDevice() ? CONNECTION_TIMEOUT_MOBILE_MS : CONNECTION_TIMEOUT_MS;
 }

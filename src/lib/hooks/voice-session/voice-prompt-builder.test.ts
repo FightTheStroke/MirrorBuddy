@@ -70,11 +70,11 @@ Use larger text display
 `;
 
 describe('buildVoicePrompt', () => {
-  it('should include character header with name, subject, specialty, style', () => {
+  it('should include character identity from systemPrompt sections', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }));
-    expect(result).toContain('Test Maestro — math');
-    expect(result).toContain('Algebra and Geometry');
-    expect(result).toContain('Patient and methodical');
+    expect(result).toContain('Test Maestro');
+    expect(result).toContain('Core Identity');
+    expect(result).toContain('Patient, precise, encouraging');
   });
 
   it('should include CHARACTER INTENSITY DIAL (ADR 0031)', () => {
@@ -109,20 +109,19 @@ describe('buildVoicePrompt', () => {
     expect(result).not.toContain('<!--');
   });
 
-  it('should stay within MAX_VOICE_PROMPT_CHARS (~2000)', () => {
+  it('should stay within MAX_VOICE_PROMPT_CHARS (6000)', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }));
-    expect(result.length).toBeLessThanOrEqual(2000);
+    expect(result.length).toBeLessThanOrEqual(6000);
   });
 
   it('should handle empty systemPrompt gracefully', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: '' }));
-    expect(result).toContain('Test Maestro — math');
-    expect(result.length).toBeGreaterThan(0);
+    expect(result).toBe('');
   });
 
   it('should handle undefined systemPrompt', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: undefined as unknown as string }));
-    expect(result).toContain('Test Maestro');
+    expect(result).toBe('');
   });
 
   it('should extract more structured content than old .slice(0,800)', () => {
@@ -132,5 +131,50 @@ describe('buildVoicePrompt', () => {
     // Should include all three key sections
     expect(result).toContain('CHARACTER INTENSITY DIAL');
     expect(result).toContain('Core Identity');
+  });
+
+  describe('voice_full_prompt feature flag', () => {
+    it('should truncate by default when useFullPrompt=false', () => {
+      const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }), false);
+      // Should be truncated to MAX_VOICE_PROMPT_CHARS (6000)
+      expect(result.length).toBeLessThanOrEqual(6000);
+    });
+
+    it('should use full prompt when useFullPrompt=true', () => {
+      const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }), true);
+      // Should NOT be truncated - can exceed 6000 chars
+      // The prompt without KB should be longer than truncation limit
+      expect(result.length).toBeGreaterThan(500);
+      // Should still exclude KNOWLEDGE BASE
+      expect(result).not.toContain('KNOWLEDGE BASE');
+      expect(result).not.toContain('xxxxx');
+      // Should include all sections (no truncation)
+      expect(result).toContain('CHARACTER INTENSITY DIAL');
+      expect(result).toContain('Core Identity');
+      expect(result).toContain('Pedagogical Approach');
+    });
+
+    it('should preserve all sections when useFullPrompt=true even if very long', () => {
+      // Place additional section BEFORE Accessibility so it's not removed with it
+      const veryLongPrompt = FULL_SYSTEM_PROMPT.replace(
+        '## Accessibility Adaptations',
+        '## Additional Section\n' + 'x'.repeat(10000) + '\n\n## Accessibility Adaptations',
+      );
+      const result = buildVoicePrompt(makeMaestro({ systemPrompt: veryLongPrompt }), true);
+      // Should include the additional section (not truncated)
+      expect(result).toContain('Additional Section');
+      // Should be much longer than the truncation limit
+      expect(result.length).toBeGreaterThan(6000);
+    });
+
+    it('should maintain backward compatibility - default parameter is false', () => {
+      // Calling without second parameter should behave like useFullPrompt=false
+      const resultDefault = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }));
+      const resultExplicitFalse = buildVoicePrompt(
+        makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }),
+        false,
+      );
+      expect(resultDefault).toBe(resultExplicitFalse);
+    });
   });
 });

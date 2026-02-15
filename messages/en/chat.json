@@ -186,6 +186,10 @@
         "howToRecord": "How to record: Press the microphone button and speak clearly.",
         "tips": "Tips: Speak in a quiet environment for best results.",
         "troubleshooting": "Troubleshooting: Verify microphone works in your browser."
+      },
+      "safety": {
+        "warningTitle": "[TRANSLATE] Attenzione",
+        "interventionDetected": "[TRANSLATE] Intervento di sicurezza attivato"
       }
     },
     "handoff": {
@@ -464,7 +468,13 @@
       "ttsInactive": "[TRANSLATE] TTS disattivo",
       "switchToVoiceMode": "[TRANSLATE] Passa alla modalità voce",
       "newConversation": "[TRANSLATE] Nuova conversazione",
-      "close": "[TRANSLATE] Chiudi"
+      "close": "[TRANSLATE] Chiudi",
+      "back": "[TRANSLATE] Torna indietro",
+      "switchToCoach": "[TRANSLATE] Parla con il Coach",
+      "switchToBuddy": "[TRANSLATE] Parla con un amico",
+      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
+      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
+      "startVoiceCall": "[TRANSLATE] Chiama a voce"
     },
     "audioDevices": {
       "audioSettings": "[TRANSLATE] Impostazioni audio",

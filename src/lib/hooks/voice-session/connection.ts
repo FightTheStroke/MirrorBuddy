@@ -1,6 +1,6 @@
 // ============================================================================
 // CONNECTION MANAGEMENT
-// WebRTC-only connection (WebSocket proxy removed - legacy)
+// WebRTC connection (WebSocket proxy deprecated, kept as fallback)
 // ============================================================================
 
 'use client';
@@ -18,7 +18,7 @@ import { getDeviceInfo, getWebRTCCapabilities } from './voice-error-logger';
 import { logVoiceDiagnosticsReport } from './voice-diagnostics';
 
 // Pre-stringified heartbeat message to avoid JSON.stringify on every beat
-const HEARTBEAT_MESSAGE = JSON.stringify({
+export const HEARTBEAT_MESSAGE = JSON.stringify({
   type: 'session.update',
   session: {},
 });
@@ -29,7 +29,7 @@ export { useDisconnect } from './connection-cleanup';
 
 /**
  * Connect to Azure Realtime API via WebRTC
- * WebSocket proxy fallback removed - WebRTC is now the only transport
+ * (WebSocket proxy deprecated but available via VOICE_TRANSPORT env var)
  */
 export function useConnect(
   refs: ConnectionRefs,
@@ -47,6 +47,7 @@ export function useConnect(
     | undefined
   >,
   options: UseVoiceSessionOptions = {},
+  getCachedToken?: () => Promise<string | null>,
 ) {
   return useCallback(
     async (maestro: Maestro, connectionInfo: ConnectionInfo) => {
@@ -108,6 +109,7 @@ export function useConnect(
           setConnectionState,
           options,
           preferredMicrophoneId,
+          getCachedToken,
         );
       } catch (error) {
         const errorMessage =
@@ -124,7 +126,15 @@ export function useConnect(
         options.onError?.(new Error(errorMessage));
       }
     },
-    [refs, setConnected, setConnectionState, handleServerEvent, preferredMicrophoneId, options],
+    [
+      refs,
+      setConnected,
+      setConnectionState,
+      handleServerEvent,
+      preferredMicrophoneId,
+      options,
+      getCachedToken,
+    ],
   );
 }
 
@@ -139,6 +149,7 @@ async function connectWebRTC(
   setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void,
   options: UseVoiceSessionOptions,
   preferredMicrophoneId?: string,
+  getCachedToken?: () => Promise<string | null>,
 ): Promise<void> {
   logger.debug('[VoiceSession] Using WebRTC transport');
 
@@ -146,6 +157,7 @@ async function connectWebRTC(
     maestro,
     connectionInfo,
     preferredMicrophoneId,
+    getCachedToken,
     onConnectionStateChange: (state) => {
       logger.debug(`[VoiceSession] WebRTC state: ${state}`);
       if (state === 'connected') {

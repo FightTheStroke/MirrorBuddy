@@ -13,6 +13,7 @@ import type { Maestro } from '@/types';
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
 import { fetchConversationMemory, buildMemoryContext } from './memory-utils';
 import { buildVoicePrompt } from './voice-prompt-builder';
+import { injectSafetyGuardrails } from '@/lib/safety';
 import type { UseVoiceSessionOptions } from './types';
 import {
   TRANSCRIPTION_LANGUAGES,
@@ -23,6 +24,7 @@ import {
 } from './session-constants';
 import { getAdaptiveVadConfig, formatVadConfigForLogging } from './adaptive-vad';
 import { normalizeVoiceLocale } from './voice-locale';
+import { isFeatureEnabled } from '@/lib/feature-flags/client';
 
 // Re-export useSendGreeting from dedicated module
 export { useSendGreeting } from './send-greeting';
@@ -97,29 +99,50 @@ export function useSendSessionConfig(
       targetLanguage,
     });
 
-    // Fetch conversation memory
+    // Parallelize non-critical context fetches to reduce voice connect latency (T1-10)
+    // Both memory and adaptive context are non-critical: voice works without them
     let memoryContext = '';
-    try {
-      const memory = await fetchConversationMemory(maestro.id);
-      memoryContext = buildMemoryContext(memory);
-    } catch (error) {
+    let adaptiveInstruction = '';
+
+    const subjectParam = maestro.subject ? `subject=${encodeURIComponent(maestro.subject)}` : '';
+    const results = await Promise.allSettled([
+      fetchConversationMemory(maestro.id),
+      fetch(`/api/adaptive/context?${subjectParam}&source=voice`),
+    ]);
+
+    // Process memory result
+    if (results[0].status === 'fulfilled') {
+      try {
+        memoryContext = buildMemoryContext(results[0].value);
+      } catch (error) {
+        logger.warn('[VoiceSession] Memory context processing failed', {
+          maestroId: maestro.id,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    } else {
       logger.warn('[VoiceSession] Memory context unavailable', {
         maestroId: maestro.id,
-        error: error instanceof Error ? error.message : String(error),
+        error: String(results[0].reason),
       });
     }
 
-    let adaptiveInstruction = '';
-    try {
-      const subjectParam = maestro.subject ? `subject=${encodeURIComponent(maestro.subject)}` : '';
-      const response = await fetch(`/api/adaptive/context?${subjectParam}&source=voice`);
-      if (response.ok) {
-        const data = await response.json();
-        adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : '';
+    // Process adaptive context result
+    if (results[1].status === 'fulfilled') {
+      const response = results[1].value;
+      try {
+        if (response.ok) {
+          const data = await response.json();
+          adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : '';
+        }
+      } catch (error) {
+        logger.warn('[VoiceSession] Adaptive context processing failed', {
+          error: String(error),
+        });
       }
-    } catch (error) {
+    } else {
       logger.warn('[VoiceSession] Adaptive context unavailable', {
-        error: String(error),
+        error: String(results[1].reason),
       });
     }
 
@@ -134,15 +157,35 @@ export function useSendSessionConfig(
       ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
       : '';
 
-    // Build voice-optimized prompt (ADR 0031 intensity dial, ~2000 chars)
-    const voicePrompt = buildVoicePrompt(maestro);
+    // Check voice_full_prompt feature flag (V1SuperCodex W2-VoiceSafety)
+    const useFullPrompt = isFeatureEnabled('voice_full_prompt').enabled;
+
+    // Build voice-optimized prompt: full systemPrompt minus knowledge base & accessibility
+    // When voice_full_prompt is enabled, use complete prompt (no truncation)
+    const voicePrompt = buildVoicePrompt(maestro, useFullPrompt);
+
+    // Inject safety guardrails when voice_full_prompt is enabled (T2-03)
+    // Safety guardrails include: content filtering, crisis response, anti-influenza, human-first
+    const safeVoicePrompt = useFullPrompt
+      ? injectSafetyGuardrails(voicePrompt, {
+          role: 'maestro',
+          characterId: maestro.id,
+        })
+      : voicePrompt; // Legacy mode: no safety injection (backward compat)
+
+    logger.debug('[VoiceSession] Prompt config', {
+      useFullPrompt,
+      promptLength: voicePrompt.length,
+      safePromptLength: safeVoicePrompt.length,
+      safetyInjected: useFullPrompt,
+    });
 
     const fullInstructions =
       languageInstruction +
       characterInstruction +
+      safeVoicePrompt +
       memoryContext +
       adaptiveInstruction +
-      voicePrompt +
       voicePersonality +
       TOOL_USAGE_INSTRUCTIONS;
 

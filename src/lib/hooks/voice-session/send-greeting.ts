@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { useSettingsStore } from '@/lib/stores';
 import { getRandomGreetingPrompt } from './session-constants';
+import type { SupportedLanguage } from '@/app/api/chat/types';
 
 /**
  * Send greeting to maestro after session is ready
@@ -17,6 +18,7 @@ import { getRandomGreetingPrompt } from './session-constants';
 export function useSendGreeting(
   greetingSentRef: React.MutableRefObject<boolean>,
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
+  locale?: SupportedLanguage,
 ) {
   return useCallback(() => {
     logger.debug('[VoiceSession] sendGreeting called');
@@ -37,9 +39,11 @@ export function useSendGreeting(
 
     greetingSentRef.current = true;
     const studentName = useSettingsStore.getState().studentProfile?.name || null;
-    const greetingPrompt = getRandomGreetingPrompt(studentName);
+    const greetingPrompt = getRandomGreetingPrompt(studentName, locale || 'it');
 
-    logger.debug('[VoiceSession] Sending greeting request via WebRTC');
+    logger.debug('[VoiceSession] Sending greeting request via WebRTC', {
+      locale: locale || 'it',
+    });
 
     const createMsg = JSON.stringify({
       type: 'conversation.item.create',
@@ -55,5 +59,5 @@ export function useSendGreeting(
     dataChannel.send(responseMsg);
 
     logger.debug('[VoiceSession] Greeting request sent');
-  }, [greetingSentRef, webrtcDataChannelRef]);
+  }, [greetingSentRef, webrtcDataChannelRef, locale]);
 }

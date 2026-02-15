@@ -19,6 +19,7 @@ import { metricsStore } from '@/lib/observability/metrics-store';
 import { AUTH_COOKIE_NAME, VISITOR_COOKIE_NAME } from '@/lib/auth';
 import { routing } from '@/i18n/routing';
 import { detectLocaleFromRequest, extractLocaleFromUrl } from '@/lib/i18n/locale-detection';
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 
 const REQUEST_ID_HEADER = 'x-request-id';
 const RESPONSE_TIME_HEADER = 'x-response-time';
@@ -194,13 +195,18 @@ export function buildCSPHeader(nonce: string): string {
     ? ''
     : 'ws://localhost:* wss://localhost:* http://localhost:11434';
 
+  // Check if GA protocol is enabled
+  const useGAProtocol = isFeatureEnabled('voice_ga_protocol');
+
   // F-10: Required external service domains
   const externalDomains = [
-    // Azure OpenAI
+    // Azure OpenAI - GA endpoints (always included)
     'https://*.openai.azure.com',
     'wss://*.openai.azure.com',
-    'https://*.realtimeapi-preview.ai.azure.com',
-    'wss://*.realtimeapi-preview.ai.azure.com',
+    // Azure OpenAI - Preview endpoints (only when GA protocol is disabled)
+    ...(useGAProtocol.enabled
+      ? []
+      : ['https://*.realtimeapi-preview.ai.azure.com', 'wss://*.realtimeapi-preview.ai.azure.com']),
     // Supabase (database, realtime)
     'https://*.supabase.co',
     'wss://*.supabase.co',
@@ -297,11 +303,14 @@ export default function proxy(request: NextRequest) {
   // LOCALE-PREFIXED ADMIN REDIRECT
   // Admin panel doesn't support locale prefixes. If someone accesses
   // /it/admin, /en/admin, etc., redirect to /admin without locale prefix.
+  // CRITICAL: Preserve query parameters when redirecting (T3-08)
   // ==========================================================================
   if (localeFromPath) {
     const pathWithoutLocale = pathname.replace(`/${localeFromPath}`, '') || '/';
     if (pathWithoutLocale.startsWith(ADMIN_PREFIX)) {
       const adminUrl = new URL(pathWithoutLocale, request.url);
+      // Preserve query parameters from the original request
+      adminUrl.search = request.nextUrl.search;
       return NextResponse.redirect(adminUrl);
     }
   }

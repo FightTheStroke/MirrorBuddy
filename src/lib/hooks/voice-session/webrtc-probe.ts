@@ -90,17 +90,36 @@ export async function probeWebRTC(): Promise<ProbeResult> {
       }
 
       const config = await configResponse.json();
-      const webrtcEndpoint = config.webrtcEndpoint;
 
-      if (!webrtcEndpoint) {
-        throw new Error('No WebRTC endpoint in config');
+      // Check if voice_ga_protocol feature flag is enabled
+      const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
+      const gaProtocol = isFeatureEnabled('voice_ga_protocol');
+
+      let sdpEndpoint: string;
+
+      if (gaProtocol.enabled) {
+        // GA protocol: construct endpoint from azureResource
+        const { azureResource } = config;
+        if (!azureResource) {
+          throw new Error('Azure resource name not configured');
+        }
+        sdpEndpoint = `https://${azureResource}.openai.azure.com/openai/v1/realtime/calls`;
+        logger.debug('[TransportProbe] Using GA protocol endpoint', { sdpEndpoint });
+      } else {
+        // Preview protocol: use webrtcEndpoint from config
+        const webrtcEndpoint = config.webrtcEndpoint;
+        if (!webrtcEndpoint) {
+          throw new Error('No WebRTC endpoint in config');
+        }
+        sdpEndpoint = webrtcEndpoint;
+        logger.debug('[TransportProbe] Using preview protocol endpoint', { sdpEndpoint });
       }
 
       // Exchange SDP with Azure endpoint
       const sdpExchangeStart = performance.now();
 
       const sdpResponse = await Promise.race([
-        fetch(webrtcEndpoint, {
+        fetch(sdpEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/sdp',
@@ -119,7 +138,7 @@ export async function probeWebRTC(): Promise<ProbeResult> {
           status: sdpResponse.status,
           statusText: sdpResponse.statusText,
           errorBody,
-          webrtcEndpoint,
+          sdpEndpoint,
         });
         throw new Error(
           `SDP exchange failed: ${sdpResponse.status} - ${errorBody || sdpResponse.statusText}`,

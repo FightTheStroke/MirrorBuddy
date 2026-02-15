@@ -1,46 +1,46 @@
 {
   "analytics": {
-    "title": "Le Tue Analytics",
-    "description": "Scopri i tuoi pattern di apprendimento e ricevi raccomandazioni personalizzate",
-    "proOnly": "Funzionalità riservata agli abbonati Pro",
-    "upgradeToPro": "Passa a Pro per accedere alle tue analytics",
-    "loading": "Caricamento analytics...",
-    "error": "Errore nel caricamento delle analytics",
-    "noData": "Non ci sono ancora dati sufficienti per generare le analytics",
+    "title": "Analisi Apprendimento",
+    "description": "Visualizza i tuoi progressi e ricevi consigli personalizzati",
+    "proOnly": "Funzionalità riservata agli utenti Pro",
+    "upgradeToPro": "Passa a Pro",
+    "loading": "Caricamento...",
+    "error": "Errore durante il caricamento",
+    "noData": "Nessun dato disponibile",
     "refresh": "Aggiorna",
     "overallScore": {
       "title": "Punteggio Complessivo",
-      "description": "Valutazione del tuo progresso di apprendimento",
+      "description": "Basato sulle tue sessioni di studio recenti",
       "excellent": "Eccellente",
       "good": "Buono",
       "fair": "Discreto",
       "needsWork": "Da migliorare"
     },
+    "confidenceLevel": {
+      "title": "Livello di confidenza",
+      "low": "basso",
+      "medium": "medio",
+      "high": "alto"
+    },
     "strengths": {
-      "title": "I Tuoi Punti di Forza",
+      "title": "Punti di Forza",
       "description": "Aree in cui eccelli",
-      "empty": "Continua a studiare per identificare i tuoi punti di forza"
+      "empty": "Nessun punto di forza identificato ancora"
     },
     "weaknesses": {
       "title": "Aree di Miglioramento",
-      "description": "Concetti da approfondire",
-      "empty": "Nessuna area critica identificata"
+      "description": "Argomenti che necessitano più pratica",
+      "empty": "Nessuna area di miglioramento identificata"
     },
     "recommendedTopics": {
       "title": "Argomenti Consigliati",
-      "description": "Prossimi passi nel tuo percorso di apprendimento",
-      "empty": "Nessuna raccomandazione disponibile"
+      "description": "Temi suggeriti per lo studio",
+      "empty": "Nessun argomento consigliato al momento"
     },
     "focusAreas": {
-      "title": "Su Cosa Concentrarti",
-      "description": "Azioni concrete per migliorare",
-      "empty": "Nessuna azione specifica consigliata"
-    },
-    "confidenceLevel": {
-      "title": "Livello di Confidenza",
-      "low": "Basso - Servono più dati",
-      "medium": "Medio - Buona base di dati",
-      "high": "Alto - Dati molto affidabili"
+      "title": "Aree di Focus",
+      "description": "Concentrati su questi argomenti",
+      "empty": "Nessuna area di focus al momento"
     }
   }
 }

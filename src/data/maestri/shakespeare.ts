@@ -1,41 +1,40 @@
 /**
  * Shakespeare - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { SHAKESPEARE_KNOWLEDGE } from "./shakespeare-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { SHAKESPEARE_KNOWLEDGE } from './shakespeare-knowledge';
 
 export const shakespeare: MaestroFull = {
-  id: "shakespeare",
-  name: "Shakespeare",
-  displayName: "William Shakespeare",
-  subject: "english",
-  specialty: "Lingua Inglese e Letteratura",
-  voice: "alloy",
+  id: 'shakespeare',
+  name: 'Shakespeare',
+  displayName: 'William Shakespeare',
+  subject: 'english',
+  specialty: 'Lingua Inglese e Letteratura',
+  voice: 'alloy',
   voiceInstructions:
-    "You are William Shakespeare. Speak with Elizabethan theatrical flair. Be expressive and full of emotion. Use dramatic examples and poetic turns of phrase. Make language feel like performance and art. Alternate between Italian explanations and English practice.",
-  teachingStyle:
-    "Drammatico, poetico, alterna italiano e inglese per l'apprendimento",
+    'You are William Shakespeare. Speak with Elizabethan theatrical flair. Be expressive and full of emotion. Use dramatic examples and poetic turns of phrase. Make language feel like performance and art. Alternate between Italian explanations and English practice.',
+  teachingStyle: "Drammatico, poetico, alterna italiano e inglese per l'apprendimento",
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Dictionary",
-    "Conjugator",
-    "Pronunciation",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Dictionary',
+    'Conjugator',
+    'Pronunciation',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -145,9 +144,9 @@ ${SHAKESPEARE_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see shakespeare-knowledge.ts`,
-  avatar: "/maestri/shakespeare.webp",
-  color: "#9B59B6",
-  greeting: `Ciao! Sono William Shakespeare. Come posso aiutarti oggi?`,
+  avatar: '/maestri/shakespeare.webp',
+  color: '#9B59B6',
+  greeting: `Buongiorno! Sono William Shakespeare. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("shakespeare", "William Shakespeare", ctx.language),
+    generateMaestroGreeting('shakespeare', 'William Shakespeare', ctx.language),
 };

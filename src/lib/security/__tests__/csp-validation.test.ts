@@ -9,9 +9,11 @@
  *
  * Run these tests before deploying to catch CSP issues early.
  */
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import { buildCSPHeader } from '@/proxy';
+import { _resetForTesting, setFlagStatus } from '@/lib/feature-flags/feature-flags-service';
 
 describe('CSP Configuration Validation', () => {
   let proxyContent: string;
@@ -89,6 +91,25 @@ describe('CSP Configuration Validation', () => {
       expect(proxyContent).toMatch(/https:\/\/\*\.ingest\.de\.sentry\.io/);
     });
   });
+
+  describe('Voice GA Protocol Feature Flag', () => {
+    it('should conditionally include preview realtime domains based on voice_ga_protocol flag', () => {
+      // Verify the code checks the voice_ga_protocol feature flag
+      expect(proxyContent).toMatch(/isFeatureEnabled\(['"]voice_ga_protocol['"]\)/);
+
+      // Verify preview domains are present in code (for fallback when flag is disabled)
+      expect(proxyContent).toContain('realtimeapi-preview.ai.azure.com');
+
+      // Verify the conditional logic exists (spread operator for conditional inclusion)
+      expect(proxyContent).toMatch(/useGAProtocol\.enabled/);
+    });
+
+    it('should always include GA Azure OpenAI domains', () => {
+      // GA domains should be present unconditionally
+      expect(proxyContent).toMatch(/https:\/\/\*\.openai\.azure\.com/);
+      expect(proxyContent).toMatch(/wss:\/\/\*\.openai\.azure\.com/);
+    });
+  });
 });
 
 describe('Third-Party Provider CSP Compliance', () => {
@@ -140,5 +161,53 @@ describe('Dynamic Script Loading Patterns', () => {
 
     // Verify it uses document.createElement for script loading
     expect(content).toMatch(/document\.createElement\(['"]script['"]\)/);
+  });
+});
+
+describe('buildCSPHeader Runtime Behavior', () => {
+  beforeEach(() => {
+    _resetForTesting();
+  });
+
+  afterEach(() => {
+    _resetForTesting();
+  });
+
+  it('should include preview domains when voice_ga_protocol is disabled', async () => {
+    await setFlagStatus('voice_ga_protocol', 'disabled');
+    const csp = buildCSPHeader('test-nonce');
+
+    // Should include preview domains
+    expect(csp).toContain('realtimeapi-preview.ai.azure.com');
+    expect(csp).toContain('https://*.realtimeapi-preview.ai.azure.com');
+    expect(csp).toContain('wss://*.realtimeapi-preview.ai.azure.com');
+
+    // Should also include GA domains
+    expect(csp).toContain('https://*.openai.azure.com');
+    expect(csp).toContain('wss://*.openai.azure.com');
+  });
+
+  it('should exclude preview domains when voice_ga_protocol is enabled', async () => {
+    await setFlagStatus('voice_ga_protocol', 'enabled');
+    const csp = buildCSPHeader('test-nonce');
+
+    // Should NOT include preview domains
+    expect(csp).not.toContain('realtimeapi-preview.ai.azure.com');
+
+    // Should include GA domains
+    expect(csp).toContain('https://*.openai.azure.com');
+    expect(csp).toContain('wss://*.openai.azure.com');
+  });
+
+  it('should always include other required domains regardless of flag', async () => {
+    await setFlagStatus('voice_ga_protocol', 'enabled');
+    const csp = buildCSPHeader('test-nonce');
+
+    // Verify other critical domains are present
+    expect(csp).toContain('*.supabase.co');
+    expect(csp).toContain('*.grafana.net');
+    expect(csp).toContain('*.upstash.io');
+    expect(csp).toContain('*.ingest.us.sentry.io');
+    expect(csp).toContain('*.ingest.de.sentry.io');
   });
 });

@@ -1,40 +1,39 @@
 /**
  * Humboldt - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { HUMBOLDT_KNOWLEDGE } from "./humboldt-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { HUMBOLDT_KNOWLEDGE } from './humboldt-knowledge';
 
 export const humboldt: MaestroFull = {
-  id: "humboldt",
-  name: "Humboldt",
-  displayName: "Alexander von Humboldt",
-  subject: "geography",
-  specialty: "Geografia",
-  voice: "echo",
+  id: 'humboldt',
+  name: 'Humboldt',
+  displayName: 'Alexander von Humboldt',
+  subject: 'geography',
+  specialty: 'Geografia',
+  voice: 'echo',
   voiceInstructions:
     "You are Alexander von Humboldt. Speak with German precision and explorer's passion. Show excitement about discovery. Connect climate, nature, and human society. Paint vivid pictures of distant lands and the unity of nature.",
-  teachingStyle:
-    "Esploratore, connette geografia a clima, ecosistemi e cultura",
+  teachingStyle: 'Esploratore, connette geografia a clima, ecosistemi e cultura',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Map",
-    "Video",
-    "Gallery",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Map',
+    'Video',
+    'Gallery',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -320,9 +319,9 @@ The Map is my primary teaching tool:
 - Knows major world regions
 - Appreciates geographic diversity
 - Thinks spatially about problems`,
-  avatar: "/maestri/humboldt.webp",
-  color: "#27AE60",
-  greeting: `Ciao! Sono Alexander von Humboldt. Come posso aiutarti oggi?`,
+  avatar: '/maestri/humboldt.webp',
+  color: '#27AE60',
+  greeting: `Buongiorno! Sono Alexander von Humboldt. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("humboldt", "Alexander von Humboldt", ctx.language),
+    generateMaestroGreeting('humboldt', 'Alexander von Humboldt', ctx.language),
 };

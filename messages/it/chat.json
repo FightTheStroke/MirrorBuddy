@@ -127,6 +127,10 @@
         "initializing": "Inizializzazione...",
         "processing_text": "Trascrizione in corso..."
       },
+      "safety": {
+        "warningTitle": "Attenzione",
+        "interventionDetected": "Intervento di sicurezza attivato"
+      },
       "settings": {
         "title": "Impostazioni vocali",
         "speed": "Velocità di riproduzione",
@@ -464,7 +468,13 @@
       "ttsInactive": "TTS disattivo",
       "switchToVoiceMode": "Passa alla modalità voce",
       "newConversation": "Nuova conversazione",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "back": "Torna indietro",
+      "switchToCoach": "Parla con il Coach",
+      "switchToBuddy": "Parla con un amico",
+      "inVoiceCall": "In chiamata vocale",
+      "voiceUnavailable": "Voce non disponibile",
+      "startVoiceCall": "Chiama a voce"
     },
     "audioDevices": {
       "audioSettings": "Impostazioni audio",

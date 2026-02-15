@@ -217,11 +217,11 @@ describe('getAccessibleDescription', () => {
       icon: 'warning',
       color: 'yellow',
       label: 'Test',
-      message: 'Attenzione richiesta',
+      message: 'Warning required',
     };
 
     const description = getAccessibleDescription(config);
-    expect(description).toContain('Attenzione');
+    expect(description).toContain('Warning');
   });
 
   it('includes severity and message in accessible format', () => {

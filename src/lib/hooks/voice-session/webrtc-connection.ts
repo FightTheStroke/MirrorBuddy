@@ -29,6 +29,7 @@ import {
   logSDPExchange,
   logVoiceError,
 } from './voice-error-logger';
+import { isFeatureEnabled } from '@/lib/feature-flags/client';
 
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
@@ -82,7 +83,7 @@ export class WebRTCConnection {
       const [token, mediaStream] = await Promise.all([tokenPromise, mediaPromise]);
       this.mediaStream = mediaStream;
       logger.debug('[WebRTC] Step 3: Creating peer connection...');
-      this.peerConnection = this.createPeerConnection();
+      this.peerConnection = await this.createPeerConnection();
       logger.debug('[WebRTC] Step 4: Adding audio tracks...');
       this.addAudioTracks();
       logger.debug('[WebRTC] Step 5: Creating data channel...');
@@ -185,9 +186,20 @@ export class WebRTCConnection {
     }
   }
 
-  private createPeerConnection(): RTCPeerConnection {
+  private async createPeerConnection(): Promise<RTCPeerConnection> {
     logger.debug('[WebRTC] Creating peer connection');
-    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+
+    // T1-07: In GA protocol, Azure provides built-in TURN/STUN servers
+    // Check voice_ga_protocol feature flag to determine configuration
+    const gaProtocol = await isFeatureEnabled('voice_ga_protocol');
+    const iceConfig = gaProtocol.enabled ? [] : ICE_SERVERS;
+
+    logger.debug('[WebRTC] ICE server configuration', {
+      gaProtocol: gaProtocol.enabled,
+      iceServers: iceConfig.length > 0 ? 'custom' : 'Azure built-in',
+    });
+
+    const pc = new RTCPeerConnection({ iceServers: iceConfig });
     pc.onconnectionstatechange = () => {
       logConnectionStateChange(pc.connectionState, this.config.maestro.id);
       this.config.onConnectionStateChange?.(pc.connectionState);
@@ -290,7 +302,13 @@ export class WebRTCConnection {
     });
     logSDPExchange('offer', offer.sdp?.length || 0);
     await this.peerConnection.setLocalDescription(offer);
-    if (this.peerConnection.iceGatheringState !== 'complete') {
+
+    // T1-08: In GA protocol, SDP can be posted immediately without waiting for ICE gathering
+    // Check voice_ga_protocol feature flag
+    const gaProtocol = await isFeatureEnabled('voice_ga_protocol');
+
+    if (!gaProtocol.enabled && this.peerConnection.iceGatheringState !== 'complete') {
+      // Preview protocol: wait for ICE gathering to complete
       logger.debug('[WebRTC] Waiting for ICE gathering to complete...');
       await new Promise<void>((resolve) => {
         const checkState = () => {
@@ -302,23 +320,53 @@ export class WebRTCConnection {
         };
         this.peerConnection!.addEventListener('icegatheringstatechange', checkState);
       });
+    } else if (gaProtocol.enabled) {
+      logger.debug('[WebRTC] GA protocol: posting SDP immediately (no ICE wait)');
     }
+
     return this.peerConnection.localDescription!;
   }
 
   private async exchangeSDP(token: string, offer: RTCSessionDescriptionInit): Promise<void> {
     logger.debug('[WebRTC] Exchanging SDP with server...');
-    const configResponse = await fetch('/api/realtime/token');
-    if (!configResponse.ok) {
-      logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
-      throw new Error('Failed to get Azure config');
+
+    // Check if voice_ga_protocol feature flag is enabled
+    const gaProtocol = isFeatureEnabled('voice_ga_protocol');
+
+    let sdpEndpoint: string;
+
+    if (gaProtocol.enabled) {
+      // GA protocol: construct endpoint from azureResource
+      logger.debug('[WebRTC] Using GA protocol endpoint');
+      const configResponse = await fetch('/api/realtime/token');
+      if (!configResponse.ok) {
+        logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
+        throw new Error('Failed to get Azure config');
+      }
+      const config = await configResponse.json();
+      const { azureResource } = config;
+      if (!azureResource) {
+        logVoiceError('AzureResourceMissing', 'Resource name not configured');
+        throw new Error('Azure resource name not configured');
+      }
+      sdpEndpoint = `https://${azureResource}.openai.azure.com/openai/v1/realtime/calls`;
+    } else {
+      // Preview protocol: use webrtcEndpoint from config
+      logger.debug('[WebRTC] Using preview protocol endpoint');
+      const configResponse = await fetch('/api/realtime/token');
+      if (!configResponse.ok) {
+        logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
+        throw new Error('Failed to get Azure config');
+      }
+      const { webrtcEndpoint } = await configResponse.json();
+      if (!webrtcEndpoint) {
+        logVoiceError('WebRTCEndpointMissing', 'Endpoint not configured');
+        throw new Error('WebRTC endpoint not configured');
+      }
+      sdpEndpoint = webrtcEndpoint;
     }
-    const { webrtcEndpoint } = await configResponse.json();
-    if (!webrtcEndpoint) {
-      logVoiceError('WebRTCEndpointMissing', 'Endpoint not configured');
-      throw new Error('WebRTC endpoint not configured');
-    }
-    const response = await fetch(webrtcEndpoint, {
+
+    const response = await fetch(sdpEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/sdp',

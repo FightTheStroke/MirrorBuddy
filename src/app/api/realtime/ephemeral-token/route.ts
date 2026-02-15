@@ -16,7 +16,7 @@ import {
 } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
-
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 
 export const revalidate = 0;
 interface AzureSessionResponse {
@@ -143,21 +143,82 @@ export const POST = pipe(
     return json({ error: 'Azure endpoint not configured' }, 503);
   }
 
-  // Call Azure REST API to create ephemeral session
-  // POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
+  // Parse request body for session config (GA protocol only)
+  let requestBody: Record<string, unknown> = {};
+  try {
+    const text = await ctx.req.text();
+    if (text) {
+      requestBody = JSON.parse(text) as Record<string, unknown>;
+    }
+  } catch (error) {
+    log.warn('Failed to parse request body', { error: String(error) });
+  }
+
+  // Check if GA protocol is enabled via feature flag
+  const useGAProtocol = await isFeatureEnabled('voice_ga_protocol');
+
+  // Build Azure REST API URL based on feature flag
   const url = new URL(azureEndpoint);
-  const azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
+  let azureUrl: string;
+
+  if (useGAProtocol.enabled) {
+    // GA endpoint: POST https://{resource}.openai.azure.com/openai/v1/realtime/client_secrets
+    // No api-version query param needed
+    azureUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/client_secrets`;
+    log.info('Using GA realtime endpoint', { endpoint: azureUrl });
+  } else {
+    // Preview endpoint (fallback): POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
+    azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
+    log.info('Using preview realtime endpoint', { endpoint: azureUrl });
+  }
+
+  // Build token request payload
+  const tokenRequestPayload: Record<string, unknown> = {
+    model: azureDeployment,
+  };
+
+  // T1-02: GA protocol includes session config in token request body
+  if (useGAProtocol.enabled) {
+    log.info('GA protocol: including session config in token request', {
+      hasVoice: !!requestBody.voice,
+      hasInstructions: !!requestBody.instructions,
+    });
+
+    // Include session configuration from request body or defaults
+    tokenRequestPayload.voice = requestBody.voice || 'alloy';
+    tokenRequestPayload.input_audio_format = requestBody.input_audio_format || 'pcm16';
+    tokenRequestPayload.output_audio_format = requestBody.output_audio_format || 'pcm16';
+
+    if (requestBody.instructions) {
+      tokenRequestPayload.instructions = requestBody.instructions;
+    }
+
+    if (requestBody.input_audio_transcription) {
+      tokenRequestPayload.input_audio_transcription = requestBody.input_audio_transcription;
+    }
+
+    if (requestBody.turn_detection) {
+      tokenRequestPayload.turn_detection = requestBody.turn_detection;
+    }
+  }
 
   const azureRequestStartMs = Date.now();
+
+  // Build headers based on protocol version
+  const headers: Record<string, string> = {
+    'api-key': azureApiKey,
+    'Content-Type': 'application/json',
+  };
+
+  // T1-05: Add OpenAI-Beta header only for preview protocol
+  if (!useGAProtocol.enabled) {
+    headers['OpenAI-Beta'] = 'realtime=v1';
+  }
+
   const response = await fetch(azureUrl, {
     method: 'POST',
-    headers: {
-      'api-key': azureApiKey,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: azureDeployment,
-    }),
+    headers,
+    body: JSON.stringify(tokenRequestPayload),
   });
 
   // Handle Azure API errors

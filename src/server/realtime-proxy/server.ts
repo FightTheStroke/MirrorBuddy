@@ -3,11 +3,11 @@
 // WebSocket server and connection handler
 // ============================================================================
 
-import { WebSocketServer, WebSocket } from "ws";
-import { IncomingMessage } from "http";
-import { logger } from "@/lib/logger";
-import { getProviderConfig } from "../realtime-proxy-provider";
-import type { ProxyConnection, CharacterType } from "../realtime-proxy-types";
+import { WebSocketServer, WebSocket } from 'ws';
+import { IncomingMessage } from 'http';
+import { logger } from '@/lib/logger';
+import { getProviderConfig } from '../realtime-proxy-provider';
+import type { ProxyConnection, CharacterType } from '../realtime-proxy-types';
 import {
   getConnections,
   getConnection,
@@ -15,7 +15,7 @@ import {
   cleanupConnection,
   getConnectionCount,
   forEachConnection,
-} from "./connections";
+} from './connections';
 import {
   resetIdleTimer,
   clearIdleTimer,
@@ -24,9 +24,9 @@ import {
   startPingInterval,
   clearPingTimer,
   handlePong,
-} from "./timers";
+} from './timers';
 
-const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || "3001", 10);
+const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
 let wss: WebSocketServer | null = null;
 
@@ -39,7 +39,7 @@ function createTimeoutCallback(connectionId: string): () => void {
     if (!conn) return;
 
     if (conn.clientWs.readyState === WebSocket.OPEN) {
-      conn.clientWs.close(4001, "Timeout");
+      conn.clientWs.close(4001, 'Timeout');
     }
     if (conn.backendWs?.readyState === WebSocket.OPEN) {
       conn.backendWs.close();
@@ -48,26 +48,24 @@ function createTimeoutCallback(connectionId: string): () => void {
   };
 }
 
-export function startRealtimeProxy(): void {
+export async function startRealtimeProxy(): Promise<void> {
   if (wss) {
-    logger.info("WebSocket proxy already running");
+    logger.info('WebSocket proxy already running');
     return;
   }
 
-  const config = getProviderConfig();
+  const config = await getProviderConfig();
   if (!config) {
-    logger.warn(
-      "Realtime API not configured - set OPENAI_API_KEY or AZURE_OPENAI_REALTIME_* vars",
-    );
+    logger.warn('Realtime API not configured - set OPENAI_API_KEY or AZURE_OPENAI_REALTIME_* vars');
     return;
   }
 
   // #85: Bind to localhost only - prevents external access to unauthenticated WebSocket
   try {
-    wss = new WebSocketServer({ port: WS_PROXY_PORT, host: "127.0.0.1" });
+    wss = new WebSocketServer({ port: WS_PROXY_PORT, host: '127.0.0.1' });
   } catch (error) {
     // Handle port already in use (e.g., multiple Next.js workers)
-    if ((error as NodeJS.ErrnoException).code === "EADDRINUSE") {
+    if ((error as NodeJS.ErrnoException).code === 'EADDRINUSE') {
       logger.info(
         `WebSocket proxy port ${WS_PROXY_PORT} already in use - another worker likely owns it`,
       );
@@ -78,18 +76,18 @@ export function startRealtimeProxy(): void {
   }
 
   // Handle async binding errors (EADDRINUSE can also be emitted as event)
-  wss.on("error", (error: Error) => {
-    if ((error as NodeJS.ErrnoException).code === "EADDRINUSE") {
+  wss.on('error', (error: Error) => {
+    if ((error as NodeJS.ErrnoException).code === 'EADDRINUSE') {
       logger.info(
         `WebSocket proxy port ${WS_PROXY_PORT} already in use - another worker likely owns it`,
       );
       wss = null;
       return;
     }
-    logger.error("WebSocket server error", { error: error.message });
+    logger.error('WebSocket server error', { error: error.message });
   });
 
-  const safeUrl = config.wsUrl.replace(/key=[^&]+/gi, "key=***");
+  const safeUrl = config.wsUrl.replace(/key=[^&]+/gi, 'key=***');
   logger.info(
     `WebSocket proxy started on 127.0.0.1:${WS_PROXY_PORT} (${config.provider.toUpperCase()})`,
   );
@@ -97,36 +95,33 @@ export function startRealtimeProxy(): void {
 
   // #85: Allowed origins for WebSocket connections
   const ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
     `http://localhost:${WS_PROXY_PORT}`,
     `http://127.0.0.1:${WS_PROXY_PORT}`,
   ];
 
-  wss.on("connection", (clientWs: WebSocket, req: IncomingMessage) => {
+  wss.on('connection', async (clientWs: WebSocket, req: IncomingMessage) => {
     // #85: Validate origin to prevent cross-site WebSocket hijacking
     const origin = req.headers.origin;
     if (origin && !ALLOWED_ORIGINS.includes(origin)) {
-      logger.warn("WebSocket connection rejected - invalid origin", { origin });
-      clientWs.close(4003, "Forbidden: Invalid origin");
+      logger.warn('WebSocket connection rejected - invalid origin', { origin });
+      clientWs.close(4003, 'Forbidden: Invalid origin');
       return;
     }
 
     const connectionId = crypto.randomUUID();
-    const url = new URL(req.url || "/", `http://localhost:${WS_PROXY_PORT}`);
-    const maestroId = url.searchParams.get("maestroId") || "unknown";
-    const characterType = (url.searchParams.get("characterType") ||
-      "maestro") as CharacterType;
+    const url = new URL(req.url || '/', `http://localhost:${WS_PROXY_PORT}`);
+    const maestroId = url.searchParams.get('maestroId') || 'unknown';
+    const characterType = (url.searchParams.get('characterType') || 'maestro') as CharacterType;
 
-    logger.info(
-      `Client connected: ${connectionId} for maestro: ${maestroId} (${characterType})`,
-    );
+    logger.info(`Client connected: ${connectionId} for maestro: ${maestroId} (${characterType})`);
 
     // Get provider config with appropriate model deployment for this character type
-    const connectionConfig = getProviderConfig(characterType);
+    const connectionConfig = await getProviderConfig(characterType);
     if (!connectionConfig) {
-      logger.error("Provider config not available for connection");
-      clientWs.close(4000, "Service unavailable");
+      logger.error('Provider config not available for connection');
+      clientWs.close(4000, 'Service unavailable');
       return;
     }
 
@@ -153,21 +148,21 @@ export function startRealtimeProxy(): void {
     // Start connection timeout - close if backend doesn't connect within 30s
     startConnectionTimeout(connectionId, conn, timeoutCallback);
 
-    backendWs.on("open", () => {
+    backendWs.on('open', () => {
       logger.info(`Backend WebSocket OPEN for ${connectionId}`);
       clearConnectionTimeout(conn);
       startPingInterval(connectionId, conn, timeoutCallback);
-      clientWs.send(JSON.stringify({ type: "proxy.ready" }));
+      clientWs.send(JSON.stringify({ type: 'proxy.ready' }));
       resetIdleTimer(connectionId, conn, timeoutCallback);
     });
 
     // Proxy messages from Backend to Client
-    backendWs.on("message", (data: Buffer) => {
+    backendWs.on('message', (data: Buffer) => {
       const msg = data.toString();
       try {
         const parsed = JSON.parse(msg);
         logger.debug(`Backend -> Client [${parsed.type}]`);
-        if (parsed.type === "error") {
+        if (parsed.type === 'error') {
           logger.error(`Backend error: ${JSON.stringify(parsed.error)}`);
         }
       } catch {
@@ -181,18 +176,16 @@ export function startRealtimeProxy(): void {
     });
 
     // Proxy messages from Client to Backend
-    clientWs.on("message", (data: Buffer) => {
+    clientWs.on('message', (data: Buffer) => {
       // Reset idle timer on client activity
       resetIdleTimer(connectionId, conn, timeoutCallback);
 
       if (backendWs.readyState === WebSocket.OPEN) {
         // Convert Buffer to string - Azure requires text messages, not binary
-        const msg = data.toString("utf-8");
+        const msg = data.toString('utf-8');
         try {
           const parsed = JSON.parse(msg);
-          logger.info(
-            `Client -> Backend [${parsed.type}]: ${msg.substring(0, 200)}...`,
-          );
+          logger.info(`Client -> Backend [${parsed.type}]: ${msg.substring(0, 200)}...`);
           // Send as TEXT string, not as Buffer (binary)
           backendWs.send(msg);
         } catch {
@@ -204,13 +197,13 @@ export function startRealtimeProxy(): void {
     });
 
     // Handle backend connection errors
-    backendWs.on("error", (error: Error) => {
+    backendWs.on('error', (error: Error) => {
       logger.error(`Backend WebSocket error for ${connectionId}`, {
         error: error.message,
       });
       clientWs.send(
         JSON.stringify({
-          type: "error",
+          type: 'error',
           error: {
             message: `${connectionConfig.provider} connection error: ${error.message}`,
           },
@@ -219,21 +212,20 @@ export function startRealtimeProxy(): void {
     });
 
     // Handle backend connection close
-    backendWs.on("close", (code: number, reason: Buffer) => {
+    backendWs.on('close', (code: number, reason: Buffer) => {
       logger.debug(`Backend connection closed for ${connectionId}`, {
         code,
         reason: reason.toString(),
       });
       if (clientWs.readyState === WebSocket.OPEN) {
-        const validCode =
-          code === 1000 || (code >= 3000 && code <= 4999) ? code : 1000;
+        const validCode = code === 1000 || (code >= 3000 && code <= 4999) ? code : 1000;
         clientWs.close(validCode, reason.toString());
       }
       cleanupConnection(connectionId);
     });
 
     // Handle client disconnection
-    clientWs.on("close", () => {
+    clientWs.on('close', () => {
       logger.debug(`Client disconnected: ${connectionId}`);
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
@@ -242,7 +234,7 @@ export function startRealtimeProxy(): void {
     });
 
     // Handle client errors
-    clientWs.on("error", (error: Error) => {
+    clientWs.on('error', (error: Error) => {
       logger.error(`Client WebSocket error for ${connectionId}`, {
         error: error.message,
       });
@@ -253,7 +245,7 @@ export function startRealtimeProxy(): void {
     });
 
     // Handle pong response - clears pong timeout
-    clientWs.on("pong", () => {
+    clientWs.on('pong', () => {
       handlePong(conn);
     });
   });
@@ -271,7 +263,7 @@ export function stopRealtimeProxy(): void {
     getConnections().clear();
     wss.close();
     wss = null;
-    logger.info("WebSocket proxy stopped");
+    logger.info('WebSocket proxy stopped');
   }
 }
 

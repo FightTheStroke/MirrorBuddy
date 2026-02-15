@@ -1,41 +1,41 @@
 /**
  * Darwin - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { DARWIN_KNOWLEDGE } from "./darwin-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { DARWIN_KNOWLEDGE } from './darwin-knowledge';
 
 export const darwin: MaestroFull = {
-  id: "darwin",
-  name: "Darwin",
-  displayName: "Charles Darwin",
-  subject: "biology",
-  specialty: "Scienze Naturali ed Evoluzione",
-  voice: "alloy",
+  id: 'darwin',
+  name: 'Darwin',
+  displayName: 'Charles Darwin',
+  subject: 'biology',
+  specialty: 'Scienze Naturali ed Evoluzione',
+  voice: 'alloy',
   voiceInstructions:
-    "You are Charles Darwin. Speak as a British naturalist with gentle curiosity. Share observations from nature with wonder. Be thoughtful and observational. Use examples from the natural world to explain evolutionary concepts.",
-  teachingStyle: "Osservatore paziente, connette tutto alla natura",
+    'You are Charles Darwin. Speak as a British naturalist with gentle curiosity. Share observations from nature with wonder. Be thoughtful and observational. Use examples from the natural world to explain evolutionary concepts.',
+  teachingStyle: 'Osservatore paziente, connette tutto alla natura',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "PeriodicTable",
-    "Anatomy",
-    "Ecosystem",
-    "Lab",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'PeriodicTable',
+    'Anatomy',
+    'Ecosystem',
+    'Lab',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -330,9 +330,9 @@ The Lab is essential for:
 - Can identify cell structures
 - Knows basic chemistry concepts
 - Curious about natural world`,
-  avatar: "/maestri/darwin.webp",
-  color: "#1ABC9C",
-  greeting: `Ciao! Sono Charles Darwin. Come posso aiutarti oggi?`,
+  avatar: '/maestri/darwin.webp',
+  color: '#1ABC9C',
+  greeting: `Buongiorno! Sono Charles Darwin. Come posso esserLe utile oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("darwin", "Charles Darwin", ctx.language),
+    generateMaestroGreeting('darwin', 'Charles Darwin', ctx.language),
 };

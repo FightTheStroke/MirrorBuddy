@@ -12,7 +12,7 @@
  * - gpt-4o:       RETIRED Feb 13-16, 2026 — migrate to gpt-5.2 or gpt-5
  * - gpt-4o-mini:  RETIRED Feb 13-16, 2026 — migrate to gpt-5-mini or gpt-5-nano
  * - gpt-4-turbo:  RETIRED (older than gpt-4o) — migrate to gpt-5 family
- * - gpt-4o-realtime-preview: Preview versions retire within 3-6 months of release
+ * - gpt-4o-realtime-preview: DEPRECATED — replaced by gpt-realtime / gpt-realtime-mini (GA)
  * - text-embedding-3-small: No scheduled retirement (≥1 year from GA)
  * - whisper-1: No scheduled retirement
  *
@@ -50,9 +50,10 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
   'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || getChatDeploymentFallback(),
 
-  // Realtime models (voice) — preview versions retire within 3-6 months
-  // Monitor Azure Health Alerts for specific deprecation notices
-  'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-4o-realtime',
+  // Realtime models (voice) — GA deployments (Feb 2026+)
+  // Pro tier uses gpt-realtime (best quality), Base/Trial use gpt-realtime-mini (cost-effective)
+  // Guarded by voice_ga_protocol feature flag at the API route level
+  'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
   'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
 };
 

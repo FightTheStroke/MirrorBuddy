@@ -186,6 +186,10 @@
         "howToRecord": "So zeichnen Sie auf: Drücken Sie die Mikrofontaste und sprechen Sie deutlich.",
         "tips": "Tipps: Sprechen Sie in einer ruhigen Umgebung für beste Ergebnisse.",
         "troubleshooting": "Fehlerbehebung: Überprüfen Sie, dass das Mikrofon in Ihrem Browser funktioniert."
+      },
+      "safety": {
+        "warningTitle": "[TRANSLATE] Attenzione",
+        "interventionDetected": "[TRANSLATE] Intervento di sicurezza attivato"
       }
     },
     "handoff": {
@@ -464,7 +468,13 @@
       "ttsInactive": "[TRANSLATE] TTS disattivo",
       "switchToVoiceMode": "[TRANSLATE] Passa alla modalità voce",
       "newConversation": "[TRANSLATE] Nuova conversazione",
-      "close": "[TRANSLATE] Chiudi"
+      "close": "[TRANSLATE] Chiudi",
+      "back": "[TRANSLATE] Torna indietro",
+      "switchToCoach": "[TRANSLATE] Parla con il Coach",
+      "switchToBuddy": "[TRANSLATE] Parla con un amico",
+      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
+      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
+      "startVoiceCall": "[TRANSLATE] Chiama a voce"
     },
     "audioDevices": {
       "audioSettings": "[TRANSLATE] Impostazioni audio",

@@ -20,6 +20,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added: i18n keys for all 5 locales (it/en/fr/de/es) (F-13)
 - Added: Backward compatibility with existing MaintenanceModeState (F-24)
 
+
+## [Unreleased] — V1SuperCodex Remediation (Plan 148, W0-Foundation + W1-VoiceGA + W2-VoiceSafety + W3-VoiceUX + W4-ConversationUnification)
+
+### W4: Conversation Unification & Documentation
+
+- Added: `UnifiedChatView` contract interface for cross-character conversation consistency (ADR 0149)
+- Added: `ConversationShell` shared component providing unified layout for maestro/coach/buddy chats
+- Added: Shared `MessageBubble` component with integrated TTS, voice input, and attachment support across all character types
+- Added: Maestro adapter (`useMaestroConversation`) mapping maestro-specific state to shared primitives
+- Added: Coach and buddy adapters (`useCoachConversation`, `useBuddyConversation`) for learning companion integration
+- Added: Handoff behavior integration in conversation flow (seamless character switching without session loss)
+- Added: Unified `ChatHeader` component with character avatar, info, and action menu
+- Added: Unified `CharacterCard` component with tier badges and consistent presentation
+- Changed: Education conversation system aligned with shared primitives (quiz, flashcard, summary views)
+- Documented: Conversation store consolidation analysis identifying merge opportunities
+- Added: Parity tests for TTS, voice, and handoff across all character types
+- Added: ADR 0149 - Static vs Dynamic Prompts (knowledge-base scope and injection strategy)
+- Documented: Knowledge-base scope rules per character type (maestri: domain-specific, coaches: learning strategies, buddies: peer support)
+- Learnings: Shared component architecture reduces duplication by ~1200 lines across 3 character types (see plan-147-notes.md W4 section)
+
+### W3: Voice UX & Multilingual Enhancements
+
+- Added: Locale threading into voice session configuration via `buildSessionConfig()` parameter
+- Added: Multilingual greeting system with proper locale resolution for all 26 maestri
+- Added: Formal/informal address (Lei/Sie/Vous vs tu/du/tú) support in voice greetings per ADR 0064
+- Added: `CallingOverlay` component with deterministic state machine (idle/connecting/connected/error)
+- Added: Comprehensive accessibility support in CallingOverlay (WCAG 2.1 AA, keyboard nav, ARIA labels)
+- Fixed: CSRF header verification in admin API routes (`requireCSRF` middleware enforcement)
+- Fixed: Query parameter preservation in admin authentication redirects (prevents lost state)
+- Changed: Voice assignment redistribution from 6 to 26 maestri per tier expansion
+- Verified: All voice UX flows work seamlessly across 5 locales (it/en/fr/de/es)
+- Learnings: State machine pattern critical for voice connection reliability (see plan-147-notes.md W3 section)
+
+### W2: Voice Safety & Prompt Optimization
+
+- Added: Full voice prompt assembly via `buildVoicePrompt()` with `useFullPrompt` feature flag
+- Added: Voice instruction assembly system extracting maestro identity, personality, intensity dial
+- Added: Safety guardrails integration in voice session flow (STEM, jailbreak, crisis detection)
+- Added: User transcript safety check (`checkUserTranscript`) before LLM processing (VCE-002 compliance)
+- Added: Assistant transcript post-check (`checkAssistantTranscript`) before voice synthesis (VCE-003 compliance)
+- Added: Safe-response redirect flow via `response.cancel` + safe continuation message injection (VCE-004)
+- Added: Safety warning UI component (`VoiceSafetyWarning`) for user-facing interventions
+- Changed: GA event names aligned with existing telemetry system (`voice_session_start`, not `voice.session.start`)
+- Fixed: `session.update` type declaration to include optional `type: 'realtime'` field per Azure GA spec
+- Added: Comprehensive test coverage for voice safety flow (transcript checks, intervention triggers, UI rendering)
+- Added: Persona fidelity review ensuring voice prompts maintain character authenticity across all 26 maestri
+
+### W1: Voice GA Migration
+
+- Changed: Azure Realtime ephemeral token endpoint from `/openai/realtimeapi/sessions` to `/openai/v1/realtime/client_secrets` (GA)
+- Changed: Session configuration moved from post-connection `session.update` to upfront token request body (reduces 1 round-trip)
+- Changed: SDP exchange endpoint from `https://{region}.realtimeapi-preview.ai.azure.com/v1/realtimertc` to `https://{resource}.openai.azure.com/openai/v1/realtime/calls` (unified GA domain)
+- Removed: `api-version` query parameter from realtime endpoints (GA uses `/v1/` path versioning)
+- Removed: `OpenAI-Beta: realtime=v1` header (no longer required in GA, gated by `voice_ga_protocol` flag)
+- Changed: Client types updated for GA contract (`client_secret` with `value` and `expires_at`, session config in token body)
+- Removed: STUN/ICE server configuration (Azure handles server-side, gated by `voice_ga_protocol` flag)
+- Removed: ICE gathering wait before SDP offer (GA allows immediate send after `setLocalDescription`, gated by `voice_ga_protocol` flag)
+- Changed: SDP exchange uses deterministic endpoint (no double-fetch, single POST to `/openai/v1/realtime/calls`)
+- Changed: Voice connection sequence parallelized with `Promise.allSettled` (audio context + mic + token fetch) for faster startup
+- Added: Token cache for ephemeral tokens with TTL-based refresh (pre-fetch 30s before expiry)
+- Changed: WebRTC filter remains disabled for GA (tool calls require full data channel access)
+- Changed: CSP updated to allow GA domains (`*.openai.azure.com`, preview domains will be removed in future cleanup)
+- Removed: Deprecated voice artifacts (preview endpoints behind `voice_ga_protocol` flag)
+- Changed: Azure deployment mapping aligned for GA models (`gpt-realtime`, `gpt-realtime-mini` - preview `gpt-4o-realtime-preview` deprecated)
+- Documented: Secret rotation plan in `plan-147-notes.md` with cleanup of `AZURE_OPENAI_REALTIME_REGION` and `AZURE_OPENAI_REALTIME_API_VERSION`
+- Updated: `.env.example` with DEPRECATED markers for preview-only environment variables
+- Added: Unit tests for GA flow (ephemeral token, session config, SDP exchange, token cache)
+
+### W0: Foundation
+
+- Added: 6 V1SuperCodex feature flags for controlled rollout (`voice_ga_protocol`, `voice_full_prompt`, `voice_transcript_safety`, `voice_calling_overlay`, `chat_unified_view`, `consent_unified_model`)
+- Added: Voice baseline metrics framework with SLI/SLO targets (99.5% availability, <500ms P50 latency, <2s P99 latency)
+- Added: parity matrix documentation (`docs/technical/parity-matrix.md`) for GA vs preview feature comparison
+- Added: Voice secret matrix (`docs/technical/voice-secret-matrix.md`) mapping environment variables to Azure resources
+- Added: 6 compliance logging checkpoints (VCE-001 to VCE-006) for EU AI Act Article 12/13/14 compliance
+- Verified: All CLI tools authenticated (Azure CLI, Vercel CLI, GitHub CLI) for Plan 147/148 workflow
+- Documented: Feature flag rollback strategy with default-off state for safe deployment
+- Documented: CSP/proxy baseline with preview and GA domain requirements
+
 ## [Unreleased] — Character Voice DeepFix (Plan 145, W1+W2+W3)
 
 ### Voice
