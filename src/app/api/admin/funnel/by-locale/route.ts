@@ -11,10 +11,9 @@
  * Plan T6-04: Locale segmentation for conversion funnel
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 interface LocaleFunnelMetrics {
@@ -52,13 +51,13 @@ interface LocaleFunnelResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/funnel/by-locale"),
-  withAdmin,
+  withSentry('/api/admin/funnel/by-locale'),
+  withAdminReadOnly,
 )(async (ctx) => {
   // Parse query parameters
   const searchParams = ctx.req.nextUrl.searchParams;
-  const startDateParam = searchParams.get("startDate");
-  const endDateParam = searchParams.get("endDate");
+  const startDateParam = searchParams.get('startDate');
+  const endDateParam = searchParams.get('endDate');
 
   const now = new Date();
   const startDate = startDateParam
@@ -84,7 +83,7 @@ export const GET = pipe(
       createdAt: true,
     },
     orderBy: {
-      createdAt: "asc",
+      createdAt: 'asc',
     },
   });
 
@@ -92,7 +91,7 @@ export const GET = pipe(
   const localeMap = new Map<string, typeof funnelEvents>();
 
   funnelEvents.forEach((event) => {
-    const locale = event.locale || "unknown";
+    const locale = event.locale || 'unknown';
     if (!localeMap.has(locale)) {
       localeMap.set(locale, []);
     }
@@ -115,65 +114,44 @@ export const GET = pipe(
 
     // Count stage transitions for conversion rates
     const stageCounts = {
-      visitor: stageBreakdown["VISITOR"] || 0,
-      trialStart: stageBreakdown["TRIAL_START"] || 0,
-      trialEngaged: stageBreakdown["TRIAL_ENGAGED"] || 0,
-      limitHit: stageBreakdown["LIMIT_HIT"] || 0,
-      betaRequest: stageBreakdown["BETA_REQUEST"] || 0,
-      approved: stageBreakdown["APPROVED"] || 0,
-      firstLogin: stageBreakdown["FIRST_LOGIN"] || 0,
-      active: stageBreakdown["ACTIVE"] || 0,
+      visitor: stageBreakdown['VISITOR'] || 0,
+      trialStart: stageBreakdown['TRIAL_START'] || 0,
+      trialEngaged: stageBreakdown['TRIAL_ENGAGED'] || 0,
+      limitHit: stageBreakdown['LIMIT_HIT'] || 0,
+      betaRequest: stageBreakdown['BETA_REQUEST'] || 0,
+      approved: stageBreakdown['APPROVED'] || 0,
+      firstLogin: stageBreakdown['FIRST_LOGIN'] || 0,
+      active: stageBreakdown['ACTIVE'] || 0,
     };
 
     const conversionRates = {
       visitorToTrialStart:
-        stageCounts.visitor > 0
-          ? (stageCounts.trialStart / stageCounts.visitor) * 100
-          : 0,
+        stageCounts.visitor > 0 ? (stageCounts.trialStart / stageCounts.visitor) * 100 : 0,
       trialStartToEngaged:
-        stageCounts.trialStart > 0
-          ? (stageCounts.trialEngaged / stageCounts.trialStart) * 100
-          : 0,
+        stageCounts.trialStart > 0 ? (stageCounts.trialEngaged / stageCounts.trialStart) * 100 : 0,
       engagedToLimitHit:
-        stageCounts.trialEngaged > 0
-          ? (stageCounts.limitHit / stageCounts.trialEngaged) * 100
-          : 0,
+        stageCounts.trialEngaged > 0 ? (stageCounts.limitHit / stageCounts.trialEngaged) * 100 : 0,
       limitHitToBetaRequest:
-        stageCounts.limitHit > 0
-          ? (stageCounts.betaRequest / stageCounts.limitHit) * 100
-          : 0,
+        stageCounts.limitHit > 0 ? (stageCounts.betaRequest / stageCounts.limitHit) * 100 : 0,
       betaRequestToApproved:
-        stageCounts.betaRequest > 0
-          ? (stageCounts.approved / stageCounts.betaRequest) * 100
-          : 0,
+        stageCounts.betaRequest > 0 ? (stageCounts.approved / stageCounts.betaRequest) * 100 : 0,
       approvedToFirstLogin:
-        stageCounts.approved > 0
-          ? (stageCounts.firstLogin / stageCounts.approved) * 100
-          : 0,
+        stageCounts.approved > 0 ? (stageCounts.firstLogin / stageCounts.approved) * 100 : 0,
       firstLoginToActive:
-        stageCounts.firstLogin > 0
-          ? (stageCounts.active / stageCounts.firstLogin) * 100
-          : 0,
+        stageCounts.firstLogin > 0 ? (stageCounts.active / stageCounts.firstLogin) * 100 : 0,
     };
 
     byLocale.push({
       locale,
       stageBreakdown,
       conversionRates: {
-        visitorToTrialStart:
-          Math.round(conversionRates.visitorToTrialStart * 100) / 100,
-        trialStartToEngaged:
-          Math.round(conversionRates.trialStartToEngaged * 100) / 100,
-        engagedToLimitHit:
-          Math.round(conversionRates.engagedToLimitHit * 100) / 100,
-        limitHitToBetaRequest:
-          Math.round(conversionRates.limitHitToBetaRequest * 100) / 100,
-        betaRequestToApproved:
-          Math.round(conversionRates.betaRequestToApproved * 100) / 100,
-        approvedToFirstLogin:
-          Math.round(conversionRates.approvedToFirstLogin * 100) / 100,
-        firstLoginToActive:
-          Math.round(conversionRates.firstLoginToActive * 100) / 100,
+        visitorToTrialStart: Math.round(conversionRates.visitorToTrialStart * 100) / 100,
+        trialStartToEngaged: Math.round(conversionRates.trialStartToEngaged * 100) / 100,
+        engagedToLimitHit: Math.round(conversionRates.engagedToLimitHit * 100) / 100,
+        limitHitToBetaRequest: Math.round(conversionRates.limitHitToBetaRequest * 100) / 100,
+        betaRequestToApproved: Math.round(conversionRates.betaRequestToApproved * 100) / 100,
+        approvedToFirstLogin: Math.round(conversionRates.approvedToFirstLogin * 100) / 100,
+        firstLoginToActive: Math.round(conversionRates.firstLoginToActive * 100) / 100,
       },
       totalEvents: events.length,
       uniqueVisitors,
@@ -195,8 +173,8 @@ export const GET = pipe(
     summary: {
       totalLocales: localeMap.size,
       totalEvents: funnelEvents.length,
-      periodStart: startDate.toISOString().split("T")[0],
-      periodEnd: endDate.toISOString().split("T")[0],
+      periodStart: startDate.toISOString().split('T')[0],
+      periodEnd: endDate.toISOString().split('T')[0],
     },
     byLocale,
     topLocales,

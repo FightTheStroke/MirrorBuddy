@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { FUNNEL_STAGES } from '@/lib/funnel/constants';
 
 export const revalidate = 0;
@@ -33,7 +33,7 @@ interface FunnelMetricsResponse {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/metrics'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
   const daysBack = parseInt(url.searchParams.get('days') ?? '30');

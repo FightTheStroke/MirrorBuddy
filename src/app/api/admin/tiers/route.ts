@@ -2,27 +2,26 @@
  * Admin Tier CRUD API
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { prisma } from "@/lib/db";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { withRateLimit } from '@/lib/api/middlewares/with-rate-limit';
+import { RATE_LIMITS } from '@/lib/rate-limit';
+import { prisma } from '@/lib/db';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/tiers"),
-  withAdmin,
+  withSentry('/api/admin/tiers'),
+  withAdminReadOnly,
   withRateLimit(RATE_LIMITS.ADMIN_MUTATION),
 )(async (_ctx) => {
   const tiers = await prisma.tierDefinition.findMany({
-    orderBy: { sortOrder: "asc" },
+    orderBy: { sortOrder: 'asc' },
   });
   return NextResponse.json({ tiers });
 });
 
 export const POST = pipe(
-  withSentry("/api/admin/tiers"),
+  withSentry('/api/admin/tiers'),
   withCSRF,
   withAdmin,
   withRateLimit(RATE_LIMITS.ADMIN_MUTATION),

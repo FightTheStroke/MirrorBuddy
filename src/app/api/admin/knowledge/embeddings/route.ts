@@ -1,15 +1,14 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/knowledge/embeddings"),
-  withAdmin,
+  withSentry('/api/admin/knowledge/embeddings'),
+  withAdminReadOnly,
 )(async () => {
   const counts = await prisma.contentEmbedding.groupBy({
-    by: ["sourceType"],
+    by: ['sourceType'],
     _count: true,
     _sum: { tokenCount: true },
   });

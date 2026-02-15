@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 
@@ -54,7 +54,7 @@ interface UserDrilldownResponse {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/user/[id]'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const { id } = await ctx.params;
   // Determine if this is a userId or visitorId

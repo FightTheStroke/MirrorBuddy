@@ -3,19 +3,18 @@
  * GET: List all available models with metadata
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/models"),
-  withAdmin,
+  withSentry('/api/admin/models'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   const models = await prisma.modelCatalog.findMany({
     where: { isActive: true },
-    orderBy: [{ category: "asc" }, { qualityScore: "desc" }],
+    orderBy: [{ category: 'asc' }, { qualityScore: 'desc' }],
     select: {
       id: true,
       name: true,

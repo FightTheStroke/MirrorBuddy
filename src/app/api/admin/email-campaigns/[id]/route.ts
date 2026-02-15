@@ -7,15 +7,10 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import {
-  pipe,
-  withSentry,
-  withAdmin,
-  type MiddlewareContext,
-} from "@/lib/api/middlewares";
-import { getCampaign } from "@/lib/email/campaign-service";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly, type MiddlewareContext } from '@/lib/api/middlewares';
+import { getCampaign } from '@/lib/email/campaign-service';
+import { prisma } from '@/lib/db';
 
 /**
  * GET /api/admin/email-campaigns/[id]
@@ -24,8 +19,8 @@ import { prisma } from "@/lib/db";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-campaigns/[id]"),
-  withAdmin,
+  withSentry('/api/admin/email-campaigns/[id]'),
+  withAdminReadOnly,
 )(async (ctx: MiddlewareContext) => {
   try {
     const { id } = await ctx.params;
@@ -34,10 +29,7 @@ export const GET = pipe(
     const campaign = await getCampaign(id);
 
     if (!campaign) {
-      return NextResponse.json(
-        { error: "Campaign not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
 
     // Get recipient statistics
@@ -52,8 +44,8 @@ export const GET = pipe(
 
     // Calculate statistics
     const stats = {
-      totalSent: recipients.filter((r) => r.status === "SENT").length,
-      totalFailed: recipients.filter((r) => r.status === "FAILED").length,
+      totalSent: recipients.filter((r) => r.status === 'SENT').length,
+      totalFailed: recipients.filter((r) => r.status === 'FAILED').length,
       totalDelivered: recipients.filter((r) => r.deliveredAt !== null).length,
       totalOpened: recipients.filter((r) => r.openedAt !== null).length,
     };

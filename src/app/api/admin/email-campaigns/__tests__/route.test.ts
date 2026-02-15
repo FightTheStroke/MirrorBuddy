@@ -2,16 +2,16 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GET, POST } from "../route";
-import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { GET, POST } from '../route';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -27,67 +27,70 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock auth and CSRF
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAdminAuth: vi.fn().mockResolvedValue({
       authenticated: true,
       isAdmin: true,
-      userId: "admin-123",
+      userId: 'admin-123',
+    }),
+    validateAdminReadOnlyAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      canAccessAdminReadOnly: true,
+      userId: 'admin-123',
     }),
   };
 });
 
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return { ...actual, requireCSRF: vi.fn().mockReturnValue(true) };
 });
 
-const { mockListCampaigns, mockCreateCampaign, mockLogAdminAction } =
-  vi.hoisted(() => ({
-    mockListCampaigns: vi.fn(),
-    mockCreateCampaign: vi.fn(),
-    mockLogAdminAction: vi.fn(),
-  }));
+const { mockListCampaigns, mockCreateCampaign, mockLogAdminAction } = vi.hoisted(() => ({
+  mockListCampaigns: vi.fn(),
+  mockCreateCampaign: vi.fn(),
+  mockLogAdminAction: vi.fn(),
+}));
 
-vi.mock("@/lib/email/campaign-service", () => ({
+vi.mock('@/lib/email/campaign-service', () => ({
   listCampaigns: (...args: unknown[]) => mockListCampaigns(...args),
   createCampaign: (...args: unknown[]) => mockCreateCampaign(...args),
 }));
 
-vi.mock("@/lib/admin/audit-service", () => ({
+vi.mock('@/lib/admin/audit-service', () => ({
   logAdminAction: (...args: unknown[]) => mockLogAdminAction(...args),
-  getClientIp: () => "127.0.0.1",
+  getClientIp: () => '127.0.0.1',
 }));
 
-describe("GET /api/admin/email-campaigns", () => {
+describe('GET /api/admin/email-campaigns', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("lists all campaigns without filters", async () => {
+  it('lists all campaigns without filters', async () => {
     const mockCampaigns = [
       {
-        id: "campaign-1",
-        name: "Welcome Email",
-        status: "DRAFT",
-        templateId: "template-1",
+        id: 'campaign-1',
+        name: 'Welcome Email',
+        status: 'DRAFT',
+        templateId: 'template-1',
         filters: {},
         sentCount: 0,
         failedCount: 0,
         createdAt: new Date(),
         sentAt: null,
-        adminId: "admin-1",
+        adminId: 'admin-1',
       },
     ];
 
     mockListCampaigns.mockResolvedValueOnce(mockCampaigns);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
@@ -98,27 +101,26 @@ describe("GET /api/admin/email-campaigns", () => {
     expect(mockListCampaigns).toHaveBeenCalledWith({});
   });
 
-  it("filters campaigns by status", async () => {
+  it('filters campaigns by status', async () => {
     mockListCampaigns.mockResolvedValueOnce([]);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns?status=SENT",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns?status=SENT', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
 
     expect(response.status).toBe(200);
-    expect(mockListCampaigns).toHaveBeenCalledWith({ status: "SENT" });
+    expect(mockListCampaigns).toHaveBeenCalledWith({ status: 'SENT' });
   });
 
-  it("handles invalid status filter", async () => {
+  it('handles invalid status filter', async () => {
     mockListCampaigns.mockResolvedValueOnce([]);
 
     const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns?status=INVALID",
-      { method: "GET" },
+      'http://localhost:3000/api/admin/email-campaigns?status=INVALID',
+      { method: 'GET' },
     );
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
@@ -128,190 +130,171 @@ describe("GET /api/admin/email-campaigns", () => {
     expect(mockListCampaigns).toHaveBeenCalledWith({});
   });
 
-  it("handles database errors", async () => {
-    mockListCampaigns.mockRejectedValueOnce(new Error("Database error"));
+  it('handles database errors', async () => {
+    mockListCampaigns.mockRejectedValueOnce(new Error('Database error'));
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain("Failed to list email campaigns");
+    expect(data.error).toContain('Failed to list email campaigns');
   });
 });
 
-describe("POST /api/admin/email-campaigns", () => {
+describe('POST /api/admin/email-campaigns', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("creates campaign with valid data", async () => {
+  it('creates campaign with valid data', async () => {
     const mockCampaign = {
-      id: "campaign-1",
-      name: "New Campaign",
-      templateId: "template-1",
-      filters: { tiers: ["pro"] },
-      status: "DRAFT",
+      id: 'campaign-1',
+      name: 'New Campaign',
+      templateId: 'template-1',
+      filters: { tiers: ['pro'] },
+      status: 'DRAFT',
       sentCount: 0,
       failedCount: 0,
       createdAt: new Date(),
       sentAt: null,
-      adminId: "admin-1",
+      adminId: 'admin-1',
     };
 
     mockCreateCampaign.mockResolvedValueOnce(mockCampaign);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: "New Campaign",
-          templateId: "template-1",
-          filters: { tiers: ["pro"] },
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'New Campaign',
+        templateId: 'template-1',
+        filters: { tiers: ['pro'] },
+      }),
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(201);
-    expect(data.campaign.name).toBe("New Campaign");
+    expect(data.campaign.name).toBe('New Campaign');
     expect(mockCreateCampaign).toHaveBeenCalledWith(
-      "New Campaign",
-      "template-1",
-      { tiers: ["pro"] },
+      'New Campaign',
+      'template-1',
+      { tiers: ['pro'] },
       expect.any(String),
     );
     expect(mockLogAdminAction).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: "CREATE_EMAIL_CAMPAIGN",
-        entityType: "EmailCampaign",
-        entityId: "campaign-1",
+        action: 'CREATE_EMAIL_CAMPAIGN',
+        entityType: 'EmailCampaign',
+        entityId: 'campaign-1',
       }),
     );
   });
 
-  it("creates campaign with empty filters", async () => {
+  it('creates campaign with empty filters', async () => {
     const mockCampaign = {
-      id: "campaign-2",
-      name: "All Users",
-      templateId: "template-1",
+      id: 'campaign-2',
+      name: 'All Users',
+      templateId: 'template-1',
       filters: {},
-      status: "DRAFT",
+      status: 'DRAFT',
       sentCount: 0,
       failedCount: 0,
       createdAt: new Date(),
       sentAt: null,
-      adminId: "admin-1",
+      adminId: 'admin-1',
     };
 
     mockCreateCampaign.mockResolvedValueOnce(mockCampaign);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: "All Users",
-          templateId: "template-1",
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'All Users',
+        templateId: 'template-1',
+      }),
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
 
     expect(response.status).toBe(201);
     expect(mockCreateCampaign).toHaveBeenCalledWith(
-      "All Users",
-      "template-1",
+      'All Users',
+      'template-1',
       {},
       expect.any(String),
     );
   });
 
-  it("rejects request with missing name", async () => {
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          templateId: "template-1",
-        }),
-      },
-    );
+  it('rejects request with missing name', async () => {
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: JSON.stringify({
+        templateId: 'template-1',
+      }),
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toContain("Missing required fields");
+    expect(data.error).toContain('Missing required fields');
   });
 
-  it("rejects request with missing templateId", async () => {
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: "Campaign",
-        }),
-      },
-    );
+  it('rejects request with missing templateId', async () => {
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Campaign',
+      }),
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toContain("Missing required fields");
+    expect(data.error).toContain('Missing required fields');
   });
 
-  it("rejects request with invalid JSON", async () => {
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: "invalid json",
-      },
-    );
+  it('rejects request with invalid JSON', async () => {
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: 'invalid json',
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toBe("Invalid JSON in request body");
+    expect(data.error).toBe('Invalid JSON in request body');
   });
 
-  it("handles database errors", async () => {
-    mockCreateCampaign.mockRejectedValueOnce(new Error("Database error"));
+  it('handles database errors', async () => {
+    mockCreateCampaign.mockRejectedValueOnce(new Error('Database error'));
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-campaigns",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: "Campaign",
-          templateId: "template-1",
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-campaigns', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Campaign',
+        templateId: 'template-1',
+      }),
+    });
 
     const handler = POST as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain("Failed to create email campaign");
+    expect(data.error).toContain('Failed to create email campaign');
   });
 });

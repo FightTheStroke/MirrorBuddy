@@ -1,18 +1,17 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getMaestroById } from "@/data/maestri";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getMaestroById } from '@/data/maestri';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/knowledge/:maestroId"),
-  withAdmin,
+  withSentry('/api/admin/knowledge/:maestroId'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { maestroId } = await ctx.params;
   const maestro = getMaestroById(maestroId);
 
   if (!maestro) {
-    return NextResponse.json({ error: "Maestro not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Maestro not found' }, { status: 404 });
   }
 
   return NextResponse.json({

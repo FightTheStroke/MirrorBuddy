@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { Sentry } from '@/lib/sentry';
 import * as SentrySDK from '@sentry/nextjs';
-
 
 export const revalidate = 0;
 interface SentrySelfTestResult {
@@ -17,7 +16,7 @@ interface SentrySelfTestResult {
 
 export const GET = pipe(
   withSentry('/api/admin/sentry/self-test'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (_ctx) => {
   const dsnEnv = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || '';
 

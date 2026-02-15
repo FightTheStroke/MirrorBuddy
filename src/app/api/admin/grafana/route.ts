@@ -1,9 +1,6 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import {
-  getGrafanaConfig,
-  getGrafanaPanels,
-} from "@/lib/admin/grafana-embed-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getGrafanaConfig, getGrafanaPanels } from '@/lib/admin/grafana-embed-service';
 
 /**
  * GET /api/admin/grafana
@@ -13,8 +10,8 @@ import {
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/grafana"),
-  withAdmin,
+  withSentry('/api/admin/grafana'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   // Fetch Grafana configuration and panels
   const config = await getGrafanaConfig();

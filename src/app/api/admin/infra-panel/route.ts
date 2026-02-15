@@ -3,10 +3,10 @@
  * Admin-only endpoint for infrastructure metrics
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getInfraMetrics } from "@/lib/admin/infra-panel-service";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getInfraMetrics } from '@/lib/admin/infra-panel-service';
+import { logger } from '@/lib/logger';
 
 /**
  * GET /api/admin/infra-panel
@@ -15,10 +15,10 @@ import { logger } from "@/lib/logger";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/infra-panel"),
-  withAdmin,
+  withSentry('/api/admin/infra-panel'),
+  withAdminReadOnly,
 )(async (ctx) => {
-  logger.info("Fetching infrastructure metrics", {
+  logger.info('Fetching infrastructure metrics', {
     userId: ctx.userId,
   });
 

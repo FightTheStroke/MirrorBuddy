@@ -3,9 +3,9 @@
  * Returns aggregated health status for all external services
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { aggregateHealth } from "@/lib/admin/health-aggregator";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { aggregateHealth } from '@/lib/admin/health-aggregator';
 
 /**
  * GET - Fetch aggregated health status for all services
@@ -13,8 +13,8 @@ import { aggregateHealth } from "@/lib/admin/health-aggregator";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/health-aggregator"),
-  withAdmin,
+  withSentry('/api/admin/health-aggregator'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   // Get aggregated health data (with caching)
   const healthData = await aggregateHealth();

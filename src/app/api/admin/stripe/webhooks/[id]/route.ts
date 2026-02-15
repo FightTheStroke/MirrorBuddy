@@ -5,18 +5,14 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
-import {
-  getEventDetail,
-  retryEvent,
-} from '@/lib/admin/stripe-webhooks-service';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getEventDetail, retryEvent } from '@/lib/admin/stripe-webhooks-service';
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
-
 
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/stripe/webhooks/[id]'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const id = (await ctx.params).id;
   const event = await getEventDetail(id);

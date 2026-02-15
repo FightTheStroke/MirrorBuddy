@@ -9,14 +9,10 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import {
-  getTemplate,
-  updateTemplate,
-  deleteTemplate,
-} from "@/lib/email/template-service";
-import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getTemplate, updateTemplate, deleteTemplate } from '@/lib/email/template-service';
+import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 
 /**
  * GET /api/admin/email-templates/[id]
@@ -25,18 +21,15 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-templates/:id"),
-  withAdmin,
+  withSentry('/api/admin/email-templates/:id'),
+  withAdminReadOnly,
 )(async (ctx) => {
   try {
     const { id } = await ctx.params;
     const template = await getTemplate(id);
 
     if (!template) {
-      return NextResponse.json(
-        { error: "Email template not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Email template not found' }, { status: 404 });
     }
 
     return NextResponse.json({ template });
@@ -55,7 +48,7 @@ export const GET = pipe(
  * Update an email template
  */
 export const PUT = pipe(
-  withSentry("/api/admin/email-templates/:id"),
+  withSentry('/api/admin/email-templates/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -75,10 +68,7 @@ export const PUT = pipe(
   try {
     body = await ctx.req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON in request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
   }
 
   try {
@@ -88,8 +78,8 @@ export const PUT = pipe(
     // Log admin action
     if (ctx.userId) {
       await logAdminAction({
-        action: "UPDATE_EMAIL_TEMPLATE",
-        entityType: "EmailTemplate",
+        action: 'UPDATE_EMAIL_TEMPLATE',
+        entityType: 'EmailTemplate',
         entityId: id,
         adminId: ctx.userId,
         details: body,
@@ -113,7 +103,7 @@ export const PUT = pipe(
  * Delete an email template
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/email-templates/:id"),
+  withSentry('/api/admin/email-templates/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -126,8 +116,8 @@ export const DELETE = pipe(
     // Log admin action
     if (ctx.userId) {
       await logAdminAction({
-        action: "DELETE_EMAIL_TEMPLATE",
-        entityType: "EmailTemplate",
+        action: 'DELETE_EMAIL_TEMPLATE',
+        entityType: 'EmailTemplate',
         entityId: id,
         adminId: ctx.userId,
         details: { name: template.name },
@@ -137,7 +127,7 @@ export const DELETE = pipe(
 
     return NextResponse.json({
       success: true,
-      message: "Email template deleted successfully",
+      message: 'Email template deleted successfully',
     });
   } catch (error) {
     return NextResponse.json(

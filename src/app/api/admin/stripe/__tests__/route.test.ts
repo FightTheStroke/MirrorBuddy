@@ -28,6 +28,11 @@ vi.mock('@/lib/auth/server', () => ({
     isAdmin: true,
     userId: 'admin-1',
   }),
+  validateAdminReadOnlyAuth: vi.fn().mockResolvedValue({
+    authenticated: true,
+    canAccessAdminReadOnly: true,
+    userId: 'admin-1',
+  }),
 }));
 
 vi.mock('@/lib/security', () => ({
@@ -64,18 +69,18 @@ vi.mock('@/lib/admin/audit-service', () => ({
 
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
-import { validateAdminAuth } from '@/lib/auth/server';
+import { validateAdminReadOnlyAuth } from '@/lib/auth/server';
 import { logAdminAction } from '@/lib/admin/audit-service';
 
 describe('GET /api/admin/stripe', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('should return 401 if not admin', async () => {
-    vi.mocked(validateAdminAuth).mockResolvedValueOnce({
+    vi.mocked(validateAdminReadOnlyAuth).mockResolvedValueOnce({
       authenticated: false,
-      isAdmin: false,
+      canAccessAdminReadOnly: false,
       userId: undefined,
-    } as unknown as Awaited<ReturnType<typeof validateAdminAuth>>);
+    } as unknown as Awaited<ReturnType<typeof validateAdminReadOnlyAuth>>);
 
     const req = new NextRequest('http://localhost:3000/api/admin/stripe');
     const res = await GET(req);

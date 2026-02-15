@@ -5,20 +5,19 @@
  * and joins with CharacterConfig from database
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { getAllMaestri } from "@/data/maestri";
-import { getAllSupportTeachers } from "@/data/support-teachers";
-import { getAllBuddies } from "@/data/buddy-profiles";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { getAllMaestri } from '@/data/maestri';
+import { getAllSupportTeachers } from '@/data/support-teachers';
+import { getAllBuddies } from '@/data/buddy-profiles';
 
 export const revalidate = 0;
 interface CharacterWithConfig {
   id: string;
   name: string;
   displayName: string;
-  type: "MAESTRO" | "COACH" | "BUDDY";
+  type: 'MAESTRO' | 'COACH' | 'BUDDY';
   isEnabled: boolean;
   avatar: string;
   subject?: string;
@@ -35,8 +34,8 @@ interface CharacterWithConfig {
  * with their configuration from CharacterConfig table
  */
 export const GET = pipe(
-  withSentry("/api/admin/characters"),
-  withAdmin,
+  withSentry('/api/admin/characters'),
+  withAdminReadOnly,
 )(async () => {
   // Fetch all character configs from database
   const configs = await prisma.characterConfig.findMany();
@@ -52,7 +51,7 @@ export const GET = pipe(
       id: maestro.id,
       name: maestro.name,
       displayName: maestro.displayName,
-      type: "MAESTRO",
+      type: 'MAESTRO',
       isEnabled: config?.isEnabled ?? true,
       avatar: maestro.avatar,
       subject: maestro.subject,
@@ -72,7 +71,7 @@ export const GET = pipe(
       id: coach.id,
       name: coach.name,
       displayName: coach.name, // Coaches use name as displayName
-      type: "COACH",
+      type: 'COACH',
       isEnabled: config?.isEnabled ?? true,
       avatar: coach.avatar,
       color: coach.color,
@@ -91,7 +90,7 @@ export const GET = pipe(
       id: buddy.id,
       name: buddy.name,
       displayName: buddy.name, // Buddies use name as displayName
-      type: "BUDDY",
+      type: 'BUDDY',
       isEnabled: config?.isEnabled ?? true,
       avatar: buddy.avatar,
       color: buddy.color,

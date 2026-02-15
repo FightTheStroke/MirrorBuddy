@@ -7,13 +7,13 @@
  * Only admins can set/clear simulated tiers.
  */
 
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { NextResponse } from 'next/server';
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import type { TierName } from "@/types/tier-types";
-import { SIMULATED_TIER_COOKIE } from "@/lib/auth";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import type { TierName } from '@/types/tier-types';
+import { SIMULATED_TIER_COOKIE } from '@/lib/auth';
 
 export const revalidate = 0;
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
@@ -23,16 +23,16 @@ const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
  * Body: { tier: "trial" | "base" | "pro" }
  */
 export const POST = pipe(
-  withSentry("/api/admin/simulate-tier"),
+  withSentry('/api/admin/simulate-tier'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
   const body = (await ctx.req.json()) as { tier: TierName };
   const { tier } = body;
 
-  if (!tier || !["trial", "base", "pro"].includes(tier)) {
+  if (!tier || !['trial', 'base', 'pro'].includes(tier)) {
     return NextResponse.json(
-      { error: "Invalid tier. Must be: trial, base, or pro" },
+      { error: 'Invalid tier. Must be: trial, base, or pro' },
       { status: 400 },
     );
   }
@@ -47,13 +47,10 @@ export const POST = pipe(
   });
 
   if (!tierExists) {
-    return NextResponse.json(
-      { error: `Tier '${tier}' not found in database` },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: `Tier '${tier}' not found in database` }, { status: 404 });
   }
 
-  logger.info("Admin simulating tier", {
+  logger.info('Admin simulating tier', {
     adminId: ctx.userId,
     simulatedTier: tier,
   });
@@ -67,10 +64,10 @@ export const POST = pipe(
   // Set HTTP-only cookie
   response.cookies.set(SIMULATED_TIER_COOKIE, tier, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
     maxAge: COOKIE_MAX_AGE,
-    path: "/",
+    path: '/',
   });
 
   return response;
@@ -79,24 +76,24 @@ export const POST = pipe(
  * DELETE: Clear simulated tier
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/simulate-tier"),
+  withSentry('/api/admin/simulate-tier'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
-  logger.info("Admin cleared simulated tier", { adminId: ctx.userId });
+  logger.info('Admin cleared simulated tier', { adminId: ctx.userId });
 
   const response = NextResponse.json({
     success: true,
-    message: "Simulated tier cleared. Back to real tier.",
+    message: 'Simulated tier cleared. Back to real tier.',
   });
 
   // Clear the cookie
-  response.cookies.set(SIMULATED_TIER_COOKIE, "", {
+  response.cookies.set(SIMULATED_TIER_COOKIE, '', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
     maxAge: 0,
-    path: "/",
+    path: '/',
   });
 
   return response;
@@ -106,8 +103,8 @@ export const DELETE = pipe(
  * GET: Check current simulation status
  */
 export const GET = pipe(
-  withSentry("/api/admin/simulate-tier"),
-  withAdmin,
+  withSentry('/api/admin/simulate-tier'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const simulatedTier = ctx.req.cookies.get(SIMULATED_TIER_COOKIE)?.value;
 

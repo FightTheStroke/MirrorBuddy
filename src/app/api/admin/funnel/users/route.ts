@@ -7,7 +7,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { FunnelStage } from '@/lib/funnel/constants';
 
 // Types for Prisma query results
@@ -62,7 +62,7 @@ interface FunnelUsersResponse {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/users'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
   const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1'));

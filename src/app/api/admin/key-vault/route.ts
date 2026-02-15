@@ -5,7 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { encryptSecret, decryptSecret, maskValue } from '@/lib/admin/key-vault-encryption';
 import type { MaskedSecretVaultEntry, CreateSecretRequest } from '@/lib/admin/key-vault-types';
 
@@ -16,7 +16,7 @@ import type { MaskedSecretVaultEntry, CreateSecretRequest } from '@/lib/admin/ke
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/key-vault'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (_ctx) => {
   try {
     // Fetch all secrets from database

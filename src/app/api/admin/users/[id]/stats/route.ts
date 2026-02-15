@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 
 export const revalidate = 0;
 
 export const GET = pipe(
   withSentry('/api/admin/users/[id]/stats'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const params = await ctx.params;
   const userId = params.id;

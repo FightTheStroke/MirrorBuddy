@@ -6,7 +6,7 @@
 // F-21: Heartbeat every 30s to keep connection alive
 // ============================================================================
 
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { subscribeToAdminCounts } from '@/lib/redis/admin-counts-subscriber';
 import { type AdminCounts } from '@/lib/redis/admin-counts-types';
 import { logger } from '@/lib/logger';
@@ -33,7 +33,7 @@ export const revalidate = 0;
  */
 export const GET = pipe(
   withSentry('/api/admin/counts/stream'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   // ============================================================================
   // 1. AUTHENTICATION (admin only) - handled by withAdmin middleware

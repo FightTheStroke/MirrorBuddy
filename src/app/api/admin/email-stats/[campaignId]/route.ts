@@ -7,14 +7,9 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import {
-  pipe,
-  withSentry,
-  withAdmin,
-  type MiddlewareContext,
-} from "@/lib/api/middlewares";
-import { getCampaignStats, getOpenTimeline } from "@/lib/email/stats-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly, type MiddlewareContext } from '@/lib/api/middlewares';
+import { getCampaignStats, getOpenTimeline } from '@/lib/email/stats-service';
 
 /**
  * GET /api/admin/email-stats/[campaignId]
@@ -23,18 +18,15 @@ import { getCampaignStats, getOpenTimeline } from "@/lib/email/stats-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-stats/[campaignId]"),
-  withAdmin,
+  withSentry('/api/admin/email-stats/[campaignId]'),
+  withAdminReadOnly,
 )(async (ctx: MiddlewareContext) => {
   try {
     const { campaignId } = await ctx.params;
 
     // Validate campaignId parameter
     if (!campaignId) {
-      return NextResponse.json(
-        { error: "Campaign ID is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Campaign ID is required' }, { status: 400 });
     }
 
     // Fetch campaign stats and timeline in parallel

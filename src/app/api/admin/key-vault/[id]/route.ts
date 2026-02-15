@@ -3,14 +3,11 @@
  * Individual secret operations (GET, PUT, DELETE)
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { encryptSecret, decryptSecret } from "@/lib/admin/key-vault-encryption";
-import type {
-  UpdateSecretRequest,
-  DecryptSecretResponse,
-} from "@/lib/admin/key-vault-types";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { encryptSecret, decryptSecret } from '@/lib/admin/key-vault-encryption';
+import type { UpdateSecretRequest, DecryptSecretResponse } from '@/lib/admin/key-vault-types';
 
 /**
  * GET - Decrypt and return full secret value
@@ -18,8 +15,8 @@ import type {
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/key-vault/:id"),
-  withAdmin,
+  withSentry('/api/admin/key-vault/:id'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { id } = await ctx.params;
 
@@ -29,7 +26,7 @@ export const GET = pipe(
   });
 
   if (!secret) {
-    return NextResponse.json({ error: "Secret not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Secret not found' }, { status: 404 });
   }
 
   // Decrypt the value
@@ -49,7 +46,7 @@ export const GET = pipe(
  * PUT - Update secret value or status
  */
 export const PUT = pipe(
-  withSentry("/api/admin/key-vault/:id"),
+  withSentry('/api/admin/key-vault/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -95,7 +92,7 @@ export const PUT = pipe(
  * DELETE - Remove secret from vault
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/key-vault/:id"),
+  withSentry('/api/admin/key-vault/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {

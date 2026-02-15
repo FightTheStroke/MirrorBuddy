@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 
@@ -44,7 +44,7 @@ interface ChurnMetricsResponse {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/churn'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const daysBack = parseInt(ctx.req.nextUrl.searchParams.get('days') ?? '30');
   const churnThresholdDays = parseInt(ctx.req.nextUrl.searchParams.get('churnDays') ?? '14');

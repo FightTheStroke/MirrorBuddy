@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { FUNNEL_STAGES, type FunnelStage } from '@/lib/funnel/constants';
 
 export const revalidate = 0;
@@ -62,7 +62,7 @@ function formatWeekLabel(date: Date): string {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/cohorts'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const weeksBack = parseInt(ctx.req.nextUrl.searchParams.get('weeks') ?? '8');
 

@@ -6,33 +6,30 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { getProducts } from '@/lib/admin/stripe-admin-service';
-import {
-  createProduct,
-  createPrice,
-  syncProductToTier,
-} from '@/lib/admin/stripe-products-service';
+import { createProduct, createPrice, syncProductToTier } from '@/lib/admin/stripe-products-service';
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 import { z } from 'zod';
-
 
 export const revalidate = 0;
 const CreateProductSchema = z.object({
   name: z.string().min(1).max(200),
   description: z.string().max(500).optional(),
-  price: z.object({
-    unitAmount: z.number().int().positive(),
-    currency: z.string().default('eur'),
-    interval: z.enum(['month', 'year']),
-  }).optional(),
+  price: z
+    .object({
+      unitAmount: z.number().int().positive(),
+      currency: z.string().default('eur'),
+      interval: z.enum(['month', 'year']),
+    })
+    .optional(),
   tierCode: z.string().optional(),
   metadata: z.record(z.string(), z.string()).optional(),
 });
 
 export const GET = pipe(
   withSentry('/api/admin/stripe/products'),
-  withAdmin,
+  withAdminReadOnly,
 )(async () => {
   const products = await getProducts();
   return NextResponse.json({ products });

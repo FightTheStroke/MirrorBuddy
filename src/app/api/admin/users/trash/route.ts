@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-
 
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/users/trash'),
-  withAdmin,
+  withAdminReadOnly,
 )(async () => {
   const backups = await prisma.deletedUserBackup.findMany({
     orderBy: { deletedAt: 'desc' },

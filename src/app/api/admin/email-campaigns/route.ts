@@ -8,15 +8,15 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import {
   listCampaigns,
   createCampaign,
   type RecipientFilters,
   type CampaignListFilters,
-} from "@/lib/email/campaign-service";
-import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
+} from '@/lib/email/campaign-service';
+import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 
 /**
  * GET /api/admin/email-campaigns
@@ -25,16 +25,16 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-campaigns"),
-  withAdmin,
+  withSentry('/api/admin/email-campaigns'),
+  withAdminReadOnly,
 )(async (ctx) => {
   try {
     const { searchParams } = new URL(ctx.req.url);
-    const status = searchParams.get("status");
+    const status = searchParams.get('status');
 
     const filters: CampaignListFilters = {};
-    if (status && ["DRAFT", "SENDING", "SENT", "FAILED"].includes(status)) {
-      filters.status = status as "DRAFT" | "SENDING" | "SENT" | "FAILED";
+    if (status && ['DRAFT', 'SENDING', 'SENT', 'FAILED'].includes(status)) {
+      filters.status = status as 'DRAFT' | 'SENDING' | 'SENT' | 'FAILED';
     }
 
     const campaigns = await listCampaigns(filters);
@@ -55,7 +55,7 @@ export const GET = pipe(
  * Create a new email campaign in DRAFT status
  */
 export const POST = pipe(
-  withSentry("/api/admin/email-campaigns"),
+  withSentry('/api/admin/email-campaigns'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -69,17 +69,14 @@ export const POST = pipe(
   try {
     body = await ctx.req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON in request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
   }
 
   // Validate required fields
   if (!body.name || !body.templateId) {
     return NextResponse.json(
       {
-        error: "Missing required fields: name and templateId are required",
+        error: 'Missing required fields: name and templateId are required',
       },
       { status: 400 },
     );
@@ -90,25 +87,17 @@ export const POST = pipe(
 
   // Ensure admin user ID is available
   if (!ctx.userId) {
-    return NextResponse.json(
-      { error: "Admin user ID not found in context" },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: 'Admin user ID not found in context' }, { status: 401 });
   }
 
   try {
     // Create campaign
-    const campaign = await createCampaign(
-      body.name,
-      body.templateId,
-      filters,
-      ctx.userId,
-    );
+    const campaign = await createCampaign(body.name, body.templateId, filters, ctx.userId);
 
     // Log admin action
     await logAdminAction({
-      action: "CREATE_EMAIL_CAMPAIGN",
-      entityType: "EmailCampaign",
+      action: 'CREATE_EMAIL_CAMPAIGN',
+      entityType: 'EmailCampaign',
       entityId: campaign.id,
       adminId: ctx.userId,
       details: { name: campaign.name, templateId: campaign.templateId },

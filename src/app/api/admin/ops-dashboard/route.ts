@@ -3,9 +3,9 @@
  * Real-time metrics endpoint for admin operations dashboard
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { getOpsDashboardData } from "@/lib/admin/ops-dashboard-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getOpsDashboardData } from '@/lib/admin/ops-dashboard-service';
 
 /**
  * GET - Fetch real-time ops metrics
@@ -13,8 +13,8 @@ import { getOpsDashboardData } from "@/lib/admin/ops-dashboard-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/ops-dashboard"),
-  withAdmin,
+  withSentry('/api/admin/ops-dashboard'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   // Fetch metrics (cached for 30 seconds)
   const data = await getOpsDashboardData();

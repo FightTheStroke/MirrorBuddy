@@ -1,9 +1,9 @@
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { NextResponse } from 'next/server';
 
-import { prisma } from "@/lib/db";
-import { logLocaleCreate } from "@/lib/locale/locale-audit-service";
-import { localeConfigService } from "@/lib/locale/locale-config-service";
+import { prisma } from '@/lib/db';
+import { logLocaleCreate } from '@/lib/locale/locale-audit-service';
+import { localeConfigService } from '@/lib/locale/locale-config-service';
 
 /**
  * GET /api/admin/locales
@@ -12,11 +12,11 @@ import { localeConfigService } from "@/lib/locale/locale-config-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/locales"),
-  withAdmin,
+  withSentry('/api/admin/locales'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   const locales = await prisma.localeConfig.findMany({
-    orderBy: { countryName: "asc" },
+    orderBy: { countryName: 'asc' },
   });
 
   return NextResponse.json({ locales });
@@ -26,23 +26,17 @@ export const GET = pipe(
  * Create a new locale configuration
  */
 export const POST = pipe(
-  withSentry("/api/admin/locales"),
+  withSentry('/api/admin/locales'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
   const body = await ctx.req.json();
 
   // Validate required fields
-  if (
-    !body.id ||
-    !body.countryName ||
-    !body.primaryLocale ||
-    !body.primaryLanguageMaestroId
-  ) {
+  if (!body.id || !body.countryName || !body.primaryLocale || !body.primaryLanguageMaestroId) {
     return NextResponse.json(
       {
-        error:
-          "id, countryName, primaryLocale, and primaryLanguageMaestroId are required",
+        error: 'id, countryName, primaryLocale, and primaryLanguageMaestroId are required',
       },
       { status: 400 },
     );
@@ -56,7 +50,7 @@ export const POST = pipe(
   if (existing) {
     return NextResponse.json(
       {
-        error: "A locale configuration with this country code already exists",
+        error: 'A locale configuration with this country code already exists',
       },
       { status: 409 },
     );
@@ -77,7 +71,7 @@ export const POST = pipe(
   // Log the audit event
   await logLocaleCreate(
     locale.id,
-    ctx.userId || "unknown",
+    ctx.userId || 'unknown',
     {
       id: locale.id,
       countryName: locale.countryName,
@@ -86,7 +80,7 @@ export const POST = pipe(
       secondaryLocales: locale.secondaryLocales,
       enabled: locale.enabled,
     },
-    "Locale configuration created via API",
+    'Locale configuration created via API',
   );
 
   // Invalidate cache to reflect new locale immediately

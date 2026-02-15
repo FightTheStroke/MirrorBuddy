@@ -7,14 +7,14 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { getEnvAudit } from '@/lib/admin/env-audit-service';
 
 export const revalidate = 0;
 
 export const GET = pipe(
   withSentry('/api/admin/env-audit'),
-  withAdmin,
+  withAdminReadOnly,
 )(async () => {
   const audit = getEnvAudit();
   return NextResponse.json(audit);

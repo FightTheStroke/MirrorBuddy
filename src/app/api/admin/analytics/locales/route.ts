@@ -16,7 +16,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { LocaleAnalyticsResponse } from './types';
 import {
   buildUserLocaleMap,
@@ -27,11 +27,10 @@ import {
   calculateTrends,
 } from './helpers';
 
-
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/analytics/locales'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   // Parse query parameters
   const searchParams = ctx.req.nextUrl.searchParams;

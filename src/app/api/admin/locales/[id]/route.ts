@@ -1,11 +1,8 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import {
-  logLocaleUpdate,
-  logLocaleDelete,
-} from "@/lib/locale/locale-audit-service";
-import { localeConfigService } from "@/lib/locale/locale-config-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logLocaleUpdate, logLocaleDelete } from '@/lib/locale/locale-audit-service';
+import { localeConfigService } from '@/lib/locale/locale-config-service';
 
 /**
  * GET /api/admin/locales/[id]
@@ -14,8 +11,8 @@ import { localeConfigService } from "@/lib/locale/locale-config-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/locales/:id"),
-  withAdmin,
+  withSentry('/api/admin/locales/:id'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { id } = await ctx.params;
 
@@ -24,10 +21,7 @@ export const GET = pipe(
   });
 
   if (!locale) {
-    return NextResponse.json(
-      { error: "Locale configuration not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Locale configuration not found' }, { status: 404 });
   }
 
   return NextResponse.json({ locale });
@@ -38,7 +32,7 @@ export const GET = pipe(
  * Update a locale configuration
  */
 export const PUT = pipe(
-  withSentry("/api/admin/locales/:id"),
+  withSentry('/api/admin/locales/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -52,18 +46,14 @@ export const PUT = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json(
-      { error: "Locale configuration not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Locale configuration not found' }, { status: 404 });
   }
 
   // Prepare updated data
   const updatedData = {
     countryName: body.countryName ?? existing.countryName,
     primaryLocale: body.primaryLocale ?? existing.primaryLocale,
-    primaryLanguageMaestroId:
-      body.primaryLanguageMaestroId ?? existing.primaryLanguageMaestroId,
+    primaryLanguageMaestroId: body.primaryLanguageMaestroId ?? existing.primaryLanguageMaestroId,
     secondaryLocales: body.secondaryLocales ?? existing.secondaryLocales,
     enabled: body.enabled ?? existing.enabled,
   };
@@ -76,16 +66,10 @@ export const PUT = pipe(
 
   // Build change summary for audit
   const changes: Record<string, unknown> = {};
-  if (
-    body.countryName !== undefined &&
-    body.countryName !== existing.countryName
-  ) {
+  if (body.countryName !== undefined && body.countryName !== existing.countryName) {
     changes.countryName = body.countryName;
   }
-  if (
-    body.primaryLocale !== undefined &&
-    body.primaryLocale !== existing.primaryLocale
-  ) {
+  if (body.primaryLocale !== undefined && body.primaryLocale !== existing.primaryLocale) {
     changes.primaryLocale = body.primaryLocale;
   }
   if (
@@ -126,7 +110,7 @@ export const PUT = pipe(
         secondaryLocales: locale.secondaryLocales,
         enabled: locale.enabled,
       },
-      `Updated fields: ${Object.keys(changes).join(", ")}`,
+      `Updated fields: ${Object.keys(changes).join(', ')}`,
     );
 
     // Invalidate cache to reflect changes immediately
@@ -141,7 +125,7 @@ export const PUT = pipe(
  * Delete a locale configuration
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/locales/:id"),
+  withSentry('/api/admin/locales/:id'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -154,10 +138,7 @@ export const DELETE = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json(
-      { error: "Locale configuration not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: 'Locale configuration not found' }, { status: 404 });
   }
 
   // Delete locale configuration
@@ -177,14 +158,14 @@ export const DELETE = pipe(
       secondaryLocales: existing.secondaryLocales,
       enabled: existing.enabled,
     },
-    "Locale configuration deleted via API",
+    'Locale configuration deleted via API',
   );
 
   // Invalidate cache to reflect deletion immediately
   localeConfigService.invalidateCache();
 
   return NextResponse.json(
-    { success: true, message: "Locale configuration deleted" },
+    { success: true, message: 'Locale configuration deleted' },
     { status: 200 },
   );
 });

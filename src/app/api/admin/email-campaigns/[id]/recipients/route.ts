@@ -7,14 +7,9 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import {
-  pipe,
-  withSentry,
-  withAdmin,
-  type MiddlewareContext,
-} from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly, type MiddlewareContext } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
 
 /**
  * GET /api/admin/email-campaigns/[id]/recipients
@@ -23,8 +18,8 @@ import { prisma } from "@/lib/db";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-campaigns/[id]/recipients"),
-  withAdmin,
+  withSentry('/api/admin/email-campaigns/[id]/recipients'),
+  withAdminReadOnly,
 )(async (ctx: MiddlewareContext) => {
   try {
     const { id } = await ctx.params;
@@ -36,10 +31,7 @@ export const GET = pipe(
     });
 
     if (!campaign) {
-      return NextResponse.json(
-        { error: "Campaign not found" },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 });
     }
 
     // Get all recipients
@@ -55,7 +47,7 @@ export const GET = pipe(
         resendMessageId: true,
       },
       orderBy: {
-        sentAt: "desc",
+        sentAt: 'desc',
       },
     });
 

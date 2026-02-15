@@ -27,6 +27,7 @@ vi.mock('@/lib/api/middlewares', () => ({
   },
   withSentry: () => (ctx: any) => ctx,
   withAdmin: () => (ctx: any) => ctx,
+  withAdminReadOnly: () => (ctx: any) => ctx,
   withCSRF: () => (ctx: any) => ctx,
 }));
 

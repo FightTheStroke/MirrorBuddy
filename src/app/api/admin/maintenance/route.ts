@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { logAdminAction } from '@/lib/admin/audit-service';
 import { listMaintenanceWindows } from '@/lib/maintenance/maintenance-service';
@@ -23,7 +23,7 @@ export const revalidate = 0;
 
 export const GET = pipe(
   withSentry('/api/admin/maintenance'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const url = new URL(ctx.req.url);
   const includeCompleted = url.searchParams.get('includeCompleted') === 'true';

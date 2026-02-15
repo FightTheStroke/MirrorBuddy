@@ -2,22 +2,27 @@
  * @jest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock Sentry
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAdminAuth: vi.fn().mockResolvedValue({
       authenticated: true,
       isAdmin: true,
-      userId: "admin-1",
+      userId: 'admin-1',
+    }),
+    validateAdminReadOnlyAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      canAccessAdminReadOnly: true,
+      userId: 'admin-1',
     }),
   };
 });
@@ -59,7 +64,7 @@ const mockTx = {
   },
 };
 
-vi.mock("@/lib/db", () => ({
+vi.mock('@/lib/db', () => ({
   prisma: {
     user: {
       count: vi.fn().mockResolvedValue(5),
@@ -107,16 +112,16 @@ vi.mock("@/lib/db", () => ({
     },
     complianceAuditEntry: {
       create: vi.fn().mockResolvedValue({
-        id: "audit-1",
-        eventType: "admin_action",
-        severity: "info",
+        id: 'audit-1',
+        eventType: 'admin_action',
+        severity: 'info',
       }),
     },
     $transaction: vi.fn().mockImplementation((callback) => callback(mockTx)),
   },
 }));
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -131,153 +136,139 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return {
     ...actual,
     requireCSRF: vi.fn().mockReturnValue(true),
   };
 });
 
-import { GET, DELETE } from "../route";
+import { GET, DELETE } from '../route';
 
-describe("admin purge-staging-data API", () => {
+describe('admin purge-staging-data API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("GET - Preview counts", () => {
-    it("returns counts of test data records", async () => {
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+  describe('GET - Preview counts', () => {
+    it('returns counts of test data records', async () => {
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await GET(request);
       const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(body).toHaveProperty("users", 5);
-      expect(body).toHaveProperty("conversations", 10);
-      expect(body).toHaveProperty("messages", 50);
-      expect(body).toHaveProperty("flashcardProgress", 20);
-      expect(body).toHaveProperty("quizResults", 15);
-      expect(body).toHaveProperty("materials", 8);
-      expect(body).toHaveProperty("sessionMetrics", 30);
-      expect(body).toHaveProperty("userActivity", 40);
-      expect(body).toHaveProperty("telemetryEvents", 100);
-      expect(body).toHaveProperty("studySessions", 12);
-      expect(body).toHaveProperty("funnelEvents", 25);
-      expect(body).toHaveProperty("total");
+      expect(body).toHaveProperty('users', 5);
+      expect(body).toHaveProperty('conversations', 10);
+      expect(body).toHaveProperty('messages', 50);
+      expect(body).toHaveProperty('flashcardProgress', 20);
+      expect(body).toHaveProperty('quizResults', 15);
+      expect(body).toHaveProperty('materials', 8);
+      expect(body).toHaveProperty('sessionMetrics', 30);
+      expect(body).toHaveProperty('userActivity', 40);
+      expect(body).toHaveProperty('telemetryEvents', 100);
+      expect(body).toHaveProperty('studySessions', 12);
+      expect(body).toHaveProperty('funnelEvents', 25);
+      expect(body).toHaveProperty('total');
       expect(body.total).toBe(315); // Sum of all counts
     });
 
-    it("returns 401 if not authenticated", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/server");
-      vi.mocked(validateAdminAuth).mockResolvedValueOnce({
+    it('returns 401 if not authenticated', async () => {
+      const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
+      vi.mocked(validateAdminReadOnlyAuth).mockResolvedValueOnce({
         authenticated: false,
-        isAdmin: false,
+        canAccessAdminReadOnly: false,
         userId: null,
       });
 
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await GET(request);
       const body = await response.json();
 
       expect(response.status).toBe(401);
-      expect(body).toHaveProperty("error", "Unauthorized");
+      expect(body).toHaveProperty('error', 'Unauthorized');
     });
 
-    it("returns 403 if not admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/server");
-      vi.mocked(validateAdminAuth).mockResolvedValueOnce({
+    it('returns 403 if not admin', async () => {
+      const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
+      vi.mocked(validateAdminReadOnlyAuth).mockResolvedValueOnce({
         authenticated: true,
-        isAdmin: false,
-        userId: "user-1",
+        canAccessAdminReadOnly: false,
+        userId: 'user-1',
       });
 
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await GET(request);
       const body = await response.json();
 
       expect(response.status).toBe(403);
-      expect(body).toHaveProperty("error", "Forbidden: admin access required");
+      expect(body).toHaveProperty('error', 'Forbidden: admin access required');
     });
   });
 
-  describe("DELETE - Purge test data", () => {
-    it("deletes all test data records", async () => {
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+  describe('DELETE - Purge test data', () => {
+    it('deletes all test data records', async () => {
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await DELETE(request);
       const body = await response.json();
 
       expect(response.status).toBe(200);
-      expect(body).toHaveProperty("success", true);
-      expect(body).toHaveProperty("deleted", 315);
+      expect(body).toHaveProperty('success', true);
+      expect(body).toHaveProperty('deleted', 315);
     });
 
-    it("logs the purge action in audit log", async () => {
-      const { prisma } = await import("@/lib/db");
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+    it('logs the purge action in audit log', async () => {
+      const { prisma } = await import('@/lib/db');
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       await DELETE(request);
 
       expect(prisma.complianceAuditEntry.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          eventType: "admin_action",
-          severity: "info",
-          description: expect.stringContaining("Purged staging data"),
-          adminId: "admin-1",
+          eventType: 'admin_action',
+          severity: 'info',
+          description: expect.stringContaining('Purged staging data'),
+          adminId: 'admin-1',
         }),
       });
     });
 
-    it("returns 401 if not authenticated", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/server");
+    it('returns 401 if not authenticated', async () => {
+      const { validateAdminAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: false,
         isAdmin: false,
         userId: null,
       });
 
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await DELETE(request);
       const body = await response.json();
 
       expect(response.status).toBe(401);
-      expect(body).toHaveProperty("error", "Unauthorized");
+      expect(body).toHaveProperty('error', 'Unauthorized');
     });
 
-    it("returns 403 if not admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/server");
+    it('returns 403 if not admin', async () => {
+      const { validateAdminAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: true,
         isAdmin: false,
-        userId: "user-1",
+        userId: 'user-1',
       });
 
-      const request = new NextRequest(
-        "http://localhost/api/admin/purge-staging-data",
-      );
+      const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
 
       const response = await DELETE(request);
       const body = await response.json();
 
       expect(response.status).toBe(403);
-      expect(body).toHaveProperty("error", "Forbidden: admin access required");
+      expect(body).toHaveProperty('error', 'Forbidden: admin access required');
     });
   });
 });

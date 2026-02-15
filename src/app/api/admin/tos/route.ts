@@ -6,14 +6,13 @@
  * F-13: Admin panel to view ToS acceptances (who, when, version)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 0;
-const log = logger.child({ module: "api/admin/tos" });
+const log = logger.child({ module: 'api/admin/tos' });
 
 interface TosAcceptanceWithUser {
   id: string;
@@ -59,18 +58,15 @@ interface GetResponse {
  * - sortOrder: "asc" | "desc" (default: "desc")
  */
 export const GET = pipe(
-  withSentry("/api/admin/tos"),
-  withAdmin,
+  withSentry('/api/admin/tos'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-  const pageSize = Math.min(
-    100,
-    Math.max(1, parseInt(searchParams.get("pageSize") || "50", 10)),
-  );
-  const version = searchParams.get("version") || undefined;
-  const sortBy = searchParams.get("sortBy") || "acceptedAt";
-  const sortOrder = searchParams.get("sortOrder") || "desc";
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+  const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10)));
+  const version = searchParams.get('version') || undefined;
+  const sortBy = searchParams.get('sortBy') || 'acceptedAt';
+  const sortOrder = searchParams.get('sortOrder') || 'desc';
 
   // Build where clause
   const where = version ? { version } : {};
@@ -107,11 +103,11 @@ export const GET = pipe(
   // Get summary stats
   const [uniqueUsersCount, versionGroups] = await Promise.all([
     prisma.tosAcceptance.groupBy({
-      by: ["userId"],
+      by: ['userId'],
       _count: true,
     }),
     prisma.tosAcceptance.groupBy({
-      by: ["version"],
+      by: ['version'],
       _count: true,
     }),
   ]);
@@ -139,7 +135,7 @@ export const GET = pipe(
     },
   };
 
-  log.info("Admin ToS list accessed", {
+  log.info('Admin ToS list accessed', {
     adminId: ctx.userId,
     page,
     pageSize,

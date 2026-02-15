@@ -6,7 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 
@@ -37,7 +37,7 @@ interface UserJourneyResponse {
 
 export const GET = pipe(
   withSentry('/api/admin/funnel/user'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const visitorId = ctx.req.nextUrl.searchParams.get('visitorId');
   const userId = ctx.req.nextUrl.searchParams.get('userId');

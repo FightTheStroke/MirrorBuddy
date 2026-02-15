@@ -7,12 +7,9 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import {
-  getGlobalStats,
-  getRecentCampaignStats,
-} from "@/lib/email/stats-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getGlobalStats, getRecentCampaignStats } from '@/lib/email/stats-service';
 
 /**
  * GET /api/admin/email-stats
@@ -21,15 +18,12 @@ import {
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-stats"),
-  withAdmin,
+  withSentry('/api/admin/email-stats'),
+  withAdminReadOnly,
 )(async () => {
   try {
     // Fetch global stats and recent campaigns in parallel
-    const [global, recent] = await Promise.all([
-      getGlobalStats(),
-      getRecentCampaignStats(10),
-    ]);
+    const [global, recent] = await Promise.all([getGlobalStats(), getRecentCampaignStats(10)]);
 
     return NextResponse.json({
       global,

@@ -2,16 +2,16 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { GET } from "../route";
-import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { GET } from '../route';
+import { NextRequest } from 'next/server';
 
 // Mock dependencies
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -29,31 +29,36 @@ vi.mock("@/lib/logger", () => ({
 const mockGetGlobalStats = vi.fn();
 const mockGetRecentCampaignStats = vi.fn();
 
-vi.mock("@/lib/email/stats-service", () => ({
+vi.mock('@/lib/email/stats-service', () => ({
   getGlobalStats: (...args: unknown[]) => mockGetGlobalStats(...args),
-  getRecentCampaignStats: (...args: unknown[]) =>
-    mockGetRecentCampaignStats(...args),
+  getRecentCampaignStats: (...args: unknown[]) => mockGetRecentCampaignStats(...args),
 }));
 
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAdminAuth: () =>
       Promise.resolve({
         authenticated: true,
-        userId: "admin-user-123",
+        userId: 'admin-user-123',
         isAdmin: true,
+      }),
+    validateAdminReadOnlyAuth: () =>
+      Promise.resolve({
+        authenticated: true,
+        userId: 'admin-user-123',
+        canAccessAdminReadOnly: true,
       }),
   };
 });
 
-describe("GET /api/admin/email-stats", () => {
+describe('GET /api/admin/email-stats', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("returns global stats and recent campaigns", async () => {
+  it('returns global stats and recent campaigns', async () => {
     const mockGlobalStats = {
       totalCampaigns: 5,
       sent: 1000,
@@ -68,8 +73,8 @@ describe("GET /api/admin/email-stats", () => {
 
     const mockRecentStats = [
       {
-        campaignId: "campaign-1",
-        campaignName: "Welcome Email",
+        campaignId: 'campaign-1',
+        campaignName: 'Welcome Email',
         sent: 500,
         delivered: 475,
         opened: 150,
@@ -80,8 +85,8 @@ describe("GET /api/admin/email-stats", () => {
         bounceRate: 3.0,
       },
       {
-        campaignId: "campaign-2",
-        campaignName: "Newsletter",
+        campaignId: 'campaign-2',
+        campaignName: 'Newsletter',
         sent: 500,
         delivered: 475,
         opened: 150,
@@ -96,10 +101,9 @@ describe("GET /api/admin/email-stats", () => {
     mockGetGlobalStats.mockResolvedValueOnce(mockGlobalStats);
     mockGetRecentCampaignStats.mockResolvedValueOnce(mockRecentStats);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-stats",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-stats', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
@@ -112,7 +116,7 @@ describe("GET /api/admin/email-stats", () => {
     expect(mockGetRecentCampaignStats).toHaveBeenCalledWith(10);
   });
 
-  it("handles empty stats gracefully", async () => {
+  it('handles empty stats gracefully', async () => {
     const mockGlobalStats = {
       totalCampaigns: 0,
       sent: 0,
@@ -128,10 +132,9 @@ describe("GET /api/admin/email-stats", () => {
     mockGetGlobalStats.mockResolvedValueOnce(mockGlobalStats);
     mockGetRecentCampaignStats.mockResolvedValueOnce([]);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-stats",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-stats', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
@@ -142,24 +145,23 @@ describe("GET /api/admin/email-stats", () => {
     expect(data.recent).toEqual([]);
   });
 
-  it("handles database errors from getGlobalStats", async () => {
-    mockGetGlobalStats.mockRejectedValueOnce(new Error("Database error"));
+  it('handles database errors from getGlobalStats', async () => {
+    mockGetGlobalStats.mockRejectedValueOnce(new Error('Database error'));
     mockGetRecentCampaignStats.mockResolvedValueOnce([]);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-stats",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-stats', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain("Failed to fetch email stats");
+    expect(data.error).toContain('Failed to fetch email stats');
   });
 
-  it("handles database errors from getRecentCampaignStats", async () => {
+  it('handles database errors from getRecentCampaignStats', async () => {
     const mockGlobalStats = {
       totalCampaigns: 5,
       sent: 1000,
@@ -173,18 +175,17 @@ describe("GET /api/admin/email-stats", () => {
     };
 
     mockGetGlobalStats.mockResolvedValueOnce(mockGlobalStats);
-    mockGetRecentCampaignStats.mockRejectedValueOnce(new Error("Query failed"));
+    mockGetRecentCampaignStats.mockRejectedValueOnce(new Error('Query failed'));
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/email-stats",
-      { method: "GET" },
-    );
+    const request = new NextRequest('http://localhost:3000/api/admin/email-stats', {
+      method: 'GET',
+    });
 
     const handler = GET as (req: NextRequest) => Promise<Response>;
     const response = await handler(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain("Failed to fetch email stats");
+    expect(data.error).toContain('Failed to fetch email stats');
   });
 });

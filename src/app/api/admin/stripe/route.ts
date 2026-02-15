@@ -6,15 +6,11 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { getDashboardData } from '@/lib/admin/stripe-admin-service';
-import {
-  getPaymentSettings,
-  updatePaymentSettings,
-} from '@/lib/admin/stripe-settings-service';
+import { getPaymentSettings, updatePaymentSettings } from '@/lib/admin/stripe-settings-service';
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 import { z } from 'zod';
-
 
 export const revalidate = 0;
 const SettingsSchema = z.object({
@@ -23,12 +19,9 @@ const SettingsSchema = z.object({
 
 export const GET = pipe(
   withSentry('/api/admin/stripe'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (_ctx) => {
-  const [dashboard, settings] = await Promise.all([
-    getDashboardData(),
-    getPaymentSettings(),
-  ]);
+  const [dashboard, settings] = await Promise.all([getDashboardData(), getPaymentSettings()]);
 
   return NextResponse.json({ ...dashboard, settings });
 });
@@ -48,10 +41,7 @@ export const POST = pipe(
     );
   }
 
-  const settings = await updatePaymentSettings(
-    validation.data.paymentsEnabled,
-    ctx.userId!,
-  );
+  const settings = await updatePaymentSettings(validation.data.paymentsEnabled, ctx.userId!);
 
   await logAdminAction({
     action: 'UPDATE_PAYMENT_SETTINGS',

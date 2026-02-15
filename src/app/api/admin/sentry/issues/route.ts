@@ -7,13 +7,12 @@
  * @see ADR 0070 - Sentry Error Tracking Integration
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { logger } from "@/lib/logger";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 0;
-const SENTRY_API_BASE = "https://sentry.io/api/0";
+const SENTRY_API_BASE = 'https://sentry.io/api/0';
 
 interface SentryIssue {
   id: string;
@@ -25,8 +24,8 @@ interface SentryIssue {
   lastSeen: string;
   count: string;
   userCount: number;
-  level: "error" | "warning" | "info" | "fatal";
-  status: "resolved" | "unresolved" | "ignored";
+  level: 'error' | 'warning' | 'info' | 'fatal';
+  status: 'resolved' | 'unresolved' | 'ignored';
   isUnhandled: boolean;
   metadata: {
     type?: string;
@@ -42,12 +41,12 @@ interface SentryIssueResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/sentry/issues"),
-  withAdmin,
+  withSentry('/api/admin/sentry/issues'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 25);
-  const query = searchParams.get("query") || "is:unresolved";
+  const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 25);
+  const query = searchParams.get('query') || 'is:unresolved';
 
   // Check required env vars
   const authToken = process.env.SENTRY_AUTH_TOKEN;
@@ -57,7 +56,7 @@ export const GET = pipe(
   if (!authToken || !org || !project) {
     return NextResponse.json(
       {
-        error: "Sentry not configured",
+        error: 'Sentry not configured',
         issues: [],
         total: 0,
         hasMore: false,
@@ -72,26 +71,26 @@ export const GET = pipe(
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${authToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       next: { revalidate: 60 }, // Cache for 1 minute
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error("Sentry API error response", {
-        component: "sentry-issues",
+      logger.error('Sentry API error response', {
+        component: 'sentry-issues',
         status: response.status,
         errorText,
       });
       return NextResponse.json(
-        { error: "Failed to fetch Sentry issues", issues: [], total: 0 },
+        { error: 'Failed to fetch Sentry issues', issues: [], total: 0 },
         { status: 200 },
       );
     }
 
     const issues: SentryIssue[] = await response.json();
-    const linkHeader = response.headers.get("link");
+    const linkHeader = response.headers.get('link');
     const hasMore = linkHeader?.includes('rel="next"') || false;
 
     const result: SentryIssueResponse = {
@@ -116,13 +115,9 @@ export const GET = pipe(
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error(
-      "Sentry API request failed",
-      { component: "sentry-issues" },
-      error,
-    );
+    logger.error('Sentry API request failed', { component: 'sentry-issues' }, error);
     return NextResponse.json(
-      { error: "Sentry API request failed", issues: [], total: 0 },
+      { error: 'Sentry API request failed', issues: [], total: 0 },
       { status: 200 },
     );
   }

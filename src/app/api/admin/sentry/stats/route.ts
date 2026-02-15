@@ -7,13 +7,12 @@
  * Requires SENTRY_AUTH_TOKEN, SENTRY_ORG env vars.
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-import { logger } from "@/lib/logger";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 0;
-const SENTRY_API_BASE = "https://sentry.io/api/0";
+const SENTRY_API_BASE = 'https://sentry.io/api/0';
 
 // Sentry Free Tier (Developer plan) limit
 const FREE_TIER_EVENTS_MONTHLY = 5000;
@@ -31,8 +30,8 @@ interface SentryStatsResponse {
 }
 
 export const GET = pipe(
-  withSentry("/api/admin/sentry/stats"),
-  withAdmin,
+  withSentry('/api/admin/sentry/stats'),
+  withAdminReadOnly,
 )(async (_ctx) => {
   const authToken = process.env.SENTRY_AUTH_TOKEN;
   const org = process.env.SENTRY_ORG;
@@ -40,16 +39,16 @@ export const GET = pipe(
   if (!authToken || !org) {
     return NextResponse.json(
       {
-        error: "Sentry not configured",
+        error: 'Sentry not configured',
         eventsConsumed: 0,
         eventsLimit: FREE_TIER_EVENTS_MONTHLY,
         percentUsed: 0,
-        periodStart: "",
-        periodEnd: "",
+        periodStart: '',
+        periodEnd: '',
         isFreeTier: true,
         warningThreshold: 80,
         criticalThreshold: 95,
-        recommendation: "Configure SENTRY_AUTH_TOKEN and SENTRY_ORG",
+        recommendation: 'Configure SENTRY_AUTH_TOKEN and SENTRY_ORG',
       },
       { status: 200 },
     );
@@ -66,14 +65,14 @@ export const GET = pipe(
     const response = await fetch(statsUrl, {
       headers: {
         Authorization: `Bearer ${authToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       next: { revalidate: 300 }, // Cache for 5 minutes
     });
 
     if (!response.ok) {
       // Fallback: try to get issue count as proxy
-      const issuesUrl = `${SENTRY_API_BASE}/organizations/${org}/issues/?query=firstSeen:>=${periodStart.toISOString().split("T")[0]}&limit=1`;
+      const issuesUrl = `${SENTRY_API_BASE}/organizations/${org}/issues/?query=firstSeen:>=${periodStart.toISOString().split('T')[0]}&limit=1`;
       const issuesResponse = await fetch(issuesUrl, {
         headers: {
           Authorization: `Bearer ${authToken}`,
@@ -82,18 +81,18 @@ export const GET = pipe(
 
       if (issuesResponse.ok) {
         // Get total from X-Hits header if available
-        const totalHits = issuesResponse.headers.get("X-Hits");
+        const totalHits = issuesResponse.headers.get('X-Hits');
         const eventsConsumed = totalHits ? parseInt(totalHits, 10) : 0;
 
         return buildResponse(eventsConsumed, periodStart, periodEnd);
       }
 
-      logger.warn("Sentry stats API error, returning defaults", {
-        component: "sentry-stats",
+      logger.warn('Sentry stats API error, returning defaults', {
+        component: 'sentry-stats',
         status: response.status,
       });
 
-      return buildResponse(0, periodStart, periodEnd, "Unable to fetch stats");
+      return buildResponse(0, periodStart, periodEnd, 'Unable to fetch stats');
     }
 
     const data = await response.json();
@@ -102,27 +101,23 @@ export const GET = pipe(
     let eventsConsumed = 0;
     if (data.groups && Array.isArray(data.groups)) {
       for (const group of data.groups) {
-        if (group.totals && group.totals["sum(quantity)"]) {
-          eventsConsumed += group.totals["sum(quantity)"];
+        if (group.totals && group.totals['sum(quantity)']) {
+          eventsConsumed += group.totals['sum(quantity)'];
         }
       }
     }
 
     return buildResponse(eventsConsumed, periodStart, periodEnd);
   } catch (error) {
-    logger.error(
-      "Sentry stats request failed",
-      { component: "sentry-stats" },
-      error,
-    );
+    logger.error('Sentry stats request failed', { component: 'sentry-stats' }, error);
     return NextResponse.json(
       {
-        error: "Failed to fetch Sentry stats",
+        error: 'Failed to fetch Sentry stats',
         eventsConsumed: 0,
         eventsLimit: FREE_TIER_EVENTS_MONTHLY,
         percentUsed: 0,
-        periodStart: "",
-        periodEnd: "",
+        periodStart: '',
+        periodEnd: '',
         isFreeTier: true,
         warningThreshold: 80,
         criticalThreshold: 95,
@@ -139,22 +134,18 @@ function buildResponse(
   periodEnd: Date,
   errorMsg?: string,
 ): NextResponse {
-  const percentUsed = Math.round(
-    (eventsConsumed / FREE_TIER_EVENTS_MONTHLY) * 100,
-  );
+  const percentUsed = Math.round((eventsConsumed / FREE_TIER_EVENTS_MONTHLY) * 100);
 
   let recommendation: string | null = null;
 
   if (errorMsg) {
     recommendation = errorMsg;
   } else if (percentUsed >= 95) {
-    recommendation =
-      "CRITICAL: Consider upgrading Sentry plan or disabling warnings";
+    recommendation = 'CRITICAL: Consider upgrading Sentry plan or disabling warnings';
   } else if (percentUsed >= 80) {
-    recommendation =
-      "WARNING: Approaching quota limit, consider reducing warnings";
+    recommendation = 'WARNING: Approaching quota limit, consider reducing warnings';
   } else if (percentUsed >= 50) {
-    recommendation = "Usage is moderate, monitor regularly";
+    recommendation = 'Usage is moderate, monitor regularly';
   }
 
   const result: SentryStatsResponse = {

@@ -6,17 +6,16 @@
  * DELETE: Execute purge and log the action
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { prisma } from "@/lib/db";
-import type { Prisma } from "@prisma/client";
-import { logger } from "@/lib/logger";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { withRateLimit } from '@/lib/api/middlewares/with-rate-limit';
+import { RATE_LIMITS } from '@/lib/rate-limit';
+import { prisma } from '@/lib/db';
+import type { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 0;
-const log = logger.child({ module: "purge-staging-data-api" });
+const log = logger.child({ module: 'purge-staging-data-api' });
 
 export interface StagingDataCounts {
   users: number;
@@ -37,8 +36,8 @@ export interface StagingDataCounts {
  * GET: Preview counts of staging data records
  */
 export const GET = pipe(
-  withSentry("/api/admin/purge-staging-data"),
-  withAdmin,
+  withSentry('/api/admin/purge-staging-data'),
+  withAdminReadOnly,
 )(async (ctx): Promise<NextResponse<StagingDataCounts | { error: string }>> => {
   // Count all records with isTestData=true
   const [
@@ -80,7 +79,7 @@ export const GET = pipe(
     studySessions +
     funnelEvents;
 
-  log.info("Staging data counts retrieved", {
+  log.info('Staging data counts retrieved', {
     total,
     adminId: ctx.userId,
   });
@@ -105,13 +104,11 @@ export const GET = pipe(
  * DELETE: Purge all staging data records
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/purge-staging-data"),
+  withSentry('/api/admin/purge-staging-data'),
   withCSRF,
   withAdmin,
   withRateLimit(RATE_LIMITS.ADMIN_DESTRUCTIVE),
-)(async (
-  ctx,
-): Promise<NextResponse<{ success: boolean; deleted: number } | { error: string }>> => {
+)(async (ctx): Promise<NextResponse<{ success: boolean; deleted: number } | { error: string }>> => {
   // Count records before deletion (for audit log)
   const [
     users,
@@ -173,8 +170,8 @@ export const DELETE = pipe(
   // Log the action in compliance audit log
   await prisma.complianceAuditEntry.create({
     data: {
-      eventType: "admin_action",
-      severity: "info",
+      eventType: 'admin_action',
+      severity: 'info',
       description: `Purged staging data: ${totalToDelete} records deleted`,
       details: JSON.stringify({
         breakdown: {
@@ -197,7 +194,7 @@ export const DELETE = pipe(
     },
   });
 
-  log.info("Staging data purged successfully", {
+  log.info('Staging data purged successfully', {
     deleted: totalToDelete,
     adminId: ctx.userId,
   });

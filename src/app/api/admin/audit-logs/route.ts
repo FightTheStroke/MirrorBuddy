@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 
 /**
@@ -11,7 +11,7 @@ import { prisma } from '@/lib/db';
 export const dynamic = 'force-dynamic';
 export const GET = pipe(
   withSentry('/api/admin/audit-logs'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const searchParams = ctx.req.nextUrl.searchParams;
   const action = searchParams.get('action');

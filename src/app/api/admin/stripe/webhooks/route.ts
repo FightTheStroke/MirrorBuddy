@@ -5,19 +5,17 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { listWebhookEvents } from '@/lib/admin/stripe-webhooks-service';
-
 
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/stripe/webhooks'),
-  withAdmin,
+  withAdminReadOnly,
 )(async (ctx) => {
   const url = ctx.req.nextUrl;
   const limit = parseInt(url.searchParams.get('limit') || '25', 10);
-  const startingAfter =
-    url.searchParams.get('starting_after') || undefined;
+  const startingAfter = url.searchParams.get('starting_after') || undefined;
   const type = url.searchParams.get('type') || undefined;
 
   const result = await listWebhookEvents({

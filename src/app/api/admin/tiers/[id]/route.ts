@@ -1,8 +1,8 @@
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { tierService } from "@/lib/tier/server";
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { tierService } from '@/lib/tier/server';
 
 /**
  * GET /api/admin/tiers/[id]
@@ -11,8 +11,8 @@ import { tierService } from "@/lib/tier/server";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/tiers/[id]"),
-  withAdmin,
+  withSentry('/api/admin/tiers/[id]'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { id } = await ctx.params;
 
@@ -21,7 +21,7 @@ export const GET = pipe(
   });
 
   if (!tier) {
-    return NextResponse.json({ error: "Tier not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Tier not found' }, { status: 404 });
   }
 
   return NextResponse.json(tier);
@@ -32,7 +32,7 @@ export const GET = pipe(
  * Update a tier
  */
 export const PUT = pipe(
-  withSentry("/api/admin/tiers/[id]"),
+  withSentry('/api/admin/tiers/[id]'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -45,15 +45,12 @@ export const PUT = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json({ error: "Tier not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Tier not found' }, { status: 404 });
   }
 
   // Tier code cannot be changed
   if (body.code && body.code !== existing.code) {
-    return NextResponse.json(
-      { error: "Tier code cannot be changed" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Tier code cannot be changed' }, { status: 400 });
   }
 
   // Store old values for audit
@@ -70,56 +67,33 @@ export const PUT = pipe(
     where: { id },
     data: {
       name: body.name || existing.name,
-      description:
-        body.description !== undefined
-          ? body.description
-          : existing.description,
+      description: body.description !== undefined ? body.description : existing.description,
       monthlyPriceEur:
         body.monthlyPriceEur !== null && body.monthlyPriceEur !== undefined
           ? new Prisma.Decimal(body.monthlyPriceEur)
           : existing.monthlyPriceEur,
-      sortOrder:
-        body.sortOrder !== undefined ? body.sortOrder : existing.sortOrder,
+      sortOrder: body.sortOrder !== undefined ? body.sortOrder : existing.sortOrder,
       isActive: body.isActive !== undefined ? body.isActive : existing.isActive,
       chatLimitDaily:
-        body.chatLimitDaily !== undefined
-          ? body.chatLimitDaily
-          : existing.chatLimitDaily,
+        body.chatLimitDaily !== undefined ? body.chatLimitDaily : existing.chatLimitDaily,
       voiceMinutesDaily:
-        body.voiceMinutesDaily !== undefined
-          ? body.voiceMinutesDaily
-          : existing.voiceMinutesDaily,
+        body.voiceMinutesDaily !== undefined ? body.voiceMinutesDaily : existing.voiceMinutesDaily,
       toolsLimitDaily:
-        body.toolsLimitDaily !== undefined
-          ? body.toolsLimitDaily
-          : existing.toolsLimitDaily,
+        body.toolsLimitDaily !== undefined ? body.toolsLimitDaily : existing.toolsLimitDaily,
       docsLimitTotal:
-        body.docsLimitTotal !== undefined
-          ? body.docsLimitTotal
-          : existing.docsLimitTotal,
+        body.docsLimitTotal !== undefined ? body.docsLimitTotal : existing.docsLimitTotal,
       chatModel: body.chatModel || existing.chatModel,
       realtimeModel: body.realtimeModel || existing.realtimeModel,
       features: body.features !== undefined ? body.features : existing.features,
       availableMaestri:
-        body.availableMaestri !== undefined
-          ? body.availableMaestri
-          : existing.availableMaestri,
+        body.availableMaestri !== undefined ? body.availableMaestri : existing.availableMaestri,
       availableCoaches:
-        body.availableCoaches !== undefined
-          ? body.availableCoaches
-          : existing.availableCoaches,
+        body.availableCoaches !== undefined ? body.availableCoaches : existing.availableCoaches,
       availableBuddies:
-        body.availableBuddies !== undefined
-          ? body.availableBuddies
-          : existing.availableBuddies,
+        body.availableBuddies !== undefined ? body.availableBuddies : existing.availableBuddies,
       availableTools:
-        body.availableTools !== undefined
-          ? body.availableTools
-          : existing.availableTools,
-      stripePriceId:
-        body.stripePriceId !== undefined
-          ? body.stripePriceId
-          : existing.stripePriceId,
+        body.availableTools !== undefined ? body.availableTools : existing.availableTools,
+      stripePriceId: body.stripePriceId !== undefined ? body.stripePriceId : existing.stripePriceId,
     },
   });
 
@@ -127,8 +101,8 @@ export const PUT = pipe(
   await prisma.tierAuditLog.create({
     data: {
       tierId: tier.id,
-      adminId: ctx.userId || "unknown",
-      action: "TIER_UPDATE",
+      adminId: ctx.userId || 'unknown',
+      action: 'TIER_UPDATE',
       changes: {
         old: oldValues,
         new: {
@@ -153,7 +127,7 @@ export const PUT = pipe(
  * Delete a tier (optional - only if not used by any subscriptions)
  */
 export const DELETE = pipe(
-  withSentry("/api/admin/tiers/[id]"),
+  withSentry('/api/admin/tiers/[id]'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -168,15 +142,14 @@ export const DELETE = pipe(
   });
 
   if (!existing) {
-    return NextResponse.json({ error: "Tier not found" }, { status: 404 });
+    return NextResponse.json({ error: 'Tier not found' }, { status: 404 });
   }
 
   // Prevent deletion if tier has active subscriptions
   if (existing.subscriptions.length > 0) {
     return NextResponse.json(
       {
-        error:
-          "Cannot delete tier with active subscriptions. Please reassign users first.",
+        error: 'Cannot delete tier with active subscriptions. Please reassign users first.',
       },
       { status: 409 },
     );
@@ -191,8 +164,8 @@ export const DELETE = pipe(
   await prisma.tierAuditLog.create({
     data: {
       tierId: id,
-      adminId: ctx.userId || "unknown",
-      action: "TIER_DELETE",
+      adminId: ctx.userId || 'unknown',
+      action: 'TIER_DELETE',
       changes: {
         deleted: {
           code: existing.code,

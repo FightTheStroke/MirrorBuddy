@@ -8,10 +8,10 @@
  * Reference: ADR 0113 (Composable API Handler Pattern)
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { listTemplates, createTemplate } from "@/lib/email/template-service";
-import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
+import { listTemplates, createTemplate } from '@/lib/email/template-service';
+import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 
 /**
  * GET /api/admin/email-templates
@@ -20,12 +20,12 @@ import { logAdminAction, getClientIp } from "@/lib/admin/audit-service";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/admin/email-templates"),
-  withAdmin,
+  withSentry('/api/admin/email-templates'),
+  withAdminReadOnly,
 )(async (ctx) => {
   try {
     const { searchParams } = new URL(ctx.req.url);
-    const category = searchParams.get("category");
+    const category = searchParams.get('category');
 
     const filters = category ? { category } : undefined;
     const templates = await listTemplates(filters);
@@ -46,7 +46,7 @@ export const GET = pipe(
  * Create a new email template
  */
 export const POST = pipe(
-  withSentry("/api/admin/email-templates"),
+  withSentry('/api/admin/email-templates'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -64,24 +64,14 @@ export const POST = pipe(
   try {
     body = await ctx.req.json();
   } catch {
-    return NextResponse.json(
-      { error: "Invalid JSON in request body" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
   }
 
   // Validate required fields
-  if (
-    !body.name ||
-    !body.subject ||
-    !body.htmlBody ||
-    !body.textBody ||
-    !body.category
-  ) {
+  if (!body.name || !body.subject || !body.htmlBody || !body.textBody || !body.category) {
     return NextResponse.json(
       {
-        error:
-          "Missing required fields: name, subject, htmlBody, textBody, category are required",
+        error: 'Missing required fields: name, subject, htmlBody, textBody, category are required',
       },
       { status: 400 },
     );
@@ -105,8 +95,8 @@ export const POST = pipe(
     // Log admin action
     if (ctx.userId) {
       await logAdminAction({
-        action: "CREATE_EMAIL_TEMPLATE",
-        entityType: "EmailTemplate",
+        action: 'CREATE_EMAIL_TEMPLATE',
+        entityType: 'EmailTemplate',
         entityId: template.id,
         adminId: ctx.userId,
         details: { name: template.name, category: template.category },
