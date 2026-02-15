@@ -2,18 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getEnvironment, isEnabled, getDsn, getRelease } from './env';
 
 describe('Sentry Environment Detection', () => {
+  const env = process.env as Record<string, string | undefined>;
+
   beforeEach(() => {
     vi.resetModules();
-    delete process.env.NEXT_PUBLIC_VERCEL_ENV;
-    delete process.env.VERCEL_ENV;
-    delete process.env.VERCEL;
-    delete process.env.NODE_ENV;
-    delete process.env.NEXT_PUBLIC_SENTRY_DSN;
-    delete process.env.SENTRY_DSN;
-    delete process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE;
-    delete process.env.SENTRY_FORCE_ENABLE;
-    delete process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
-    delete process.env.VERCEL_GIT_COMMIT_SHA;
+    delete env.NEXT_PUBLIC_VERCEL_ENV;
+    delete env.VERCEL_ENV;
+    delete env.VERCEL;
+    delete env.NODE_ENV;
+    delete env.NEXT_PUBLIC_SENTRY_DSN;
+    delete env.SENTRY_DSN;
+    delete env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE;
+    delete env.SENTRY_FORCE_ENABLE;
+    delete env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
+    delete env.VERCEL_GIT_COMMIT_SHA;
   });
 
   describe('getEnvironment', () => {
@@ -33,7 +35,7 @@ describe('Sentry Environment Detection', () => {
     });
 
     it('falls back to NODE_ENV for all runtimes', () => {
-      process.env.NODE_ENV = 'development';
+      env.NODE_ENV = 'development';
       expect(getEnvironment('client')).toBe('development');
       expect(getEnvironment('server')).toBe('development');
       expect(getEnvironment('edge')).toBe('development');
@@ -87,7 +89,7 @@ describe('Sentry Environment Detection', () => {
 
     it('returns false in local builds without force enable', () => {
       process.env.SENTRY_DSN = 'https://example.com';
-      process.env.NODE_ENV = 'production';
+      env.NODE_ENV = 'production';
       expect(isEnabled('client')).toBe(false);
       expect(isEnabled('server')).toBe(false);
       expect(isEnabled('edge')).toBe(false);
@@ -156,7 +158,7 @@ describe('Sentry Environment Detection', () => {
 
     it('all runtimes agree on disabled state without Vercel', () => {
       process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
-      process.env.NODE_ENV = 'production';
+      env.NODE_ENV = 'production';
 
       const clientEnabled = isEnabled('client');
       const serverEnabled = isEnabled('server');
