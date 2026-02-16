@@ -89,12 +89,14 @@ function validateVercelToken(token: string | undefined): void {
       token.substring(0, 4) + '*'.repeat(token.length - 8) + token.substring(token.length - 4);
     addResult('Vercel', 'Token Format', 'PASS', `Valid token format (${masked})`, false);
   } else {
+    // Non-critical: actual Vercel deployment step validates the token at deploy time.
+    // A format mismatch here should warn, not block CI.
     addResult(
       'Vercel',
       'Token Format',
       'FAIL',
       `Invalid token format (length: ${token.length}, expected: ≥20 alphanumeric)`,
-      true,
+      false,
     );
   }
 }
