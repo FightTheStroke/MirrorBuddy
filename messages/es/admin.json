@@ -1751,6 +1751,22 @@
     "dailyQuota": "Quota giornaliera: {used} di {limit}",
     "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
-    "selezionaInvite": "Seleziona {name}"
+    "selezionaInvite": "Seleziona {name}",
+    "modelComparison": {
+      "title": "Comparación de Modelos",
+      "description": "Comparar modelos IA en TutorBench y benchmarks de seguridad",
+      "configTitle": "Configuración",
+      "models": "Modelos",
+      "profiles": "Perfiles Sintéticos",
+      "maestroIds": "IDs Maestros (separados por coma)",
+      "turns": "Turnos",
+      "runButton": "Ejecutar Comparación",
+      "running": "Ejecutando...",
+      "experiments": "experimentos",
+      "safetyBaseline": "Base de Seguridad",
+      "scenarios": "Escenarios",
+      "reportTitle": "Informe Completo",
+      "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    }
   }
 }
