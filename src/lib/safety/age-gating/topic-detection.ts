@@ -24,6 +24,7 @@ export function detectTopics(text: string): ContentTopic[] {
     biology_reproduction: [/riproduzione/i, /pubertà/i, /sesso biologico/i, /mestruazion/i],
     health_mental: [/ansia/i, /depression/i, /salute mentale/i, /disturb/i],
     health_physical: [/malatti/i, /igiene/i, /nutrizione/i, /esercizio/i],
+    health_substances: [/drog[ah]/i, /alcol/i, /tabacco/i, /fumare/i, /stupefacent/i, /sostanz/i],
     social_relationships: [/amicizi/i, /compagni/i, /litig/i, /bullismo/i],
     social_romance: [/fidanzat/i, /innamorat/i, /ragazzo\/a/i, /relazione amorosa/i],
     current_events: [/notizie/i, /politic/i, /election/i, /attualità/i],
@@ -33,7 +34,7 @@ export function detectTopics(text: string): ContentTopic[] {
   };
 
   for (const [topic, patterns] of Object.entries(topicPatterns)) {
-    if (patterns.some(pattern => pattern.test(lowerText))) {
+    if (patterns.some((pattern) => pattern.test(lowerText))) {
       detected.push(topic as ContentTopic);
     }
   }
@@ -56,7 +57,7 @@ export function detectTopics(text: string): ContentTopic[] {
  */
 export function filterForAge(text: string, age: number): AgeGateResult {
   const topics = detectTopics(text);
-  const results = topics.map(topic => checkAgeGate(topic, age));
+  const results = topics.map((topic) => checkAgeGate(topic, age));
 
   // Return the most restrictive result
   const mostRestrictive = results.reduce((worst, current) => {

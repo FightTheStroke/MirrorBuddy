@@ -1751,6 +1751,22 @@
     "dailyQuota": "Quota giornaliera: {used} di {limit}",
     "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
-    "selezionaInvite": "Seleziona {name}"
+    "selezionaInvite": "Seleziona {name}",
+    "modelComparison": {
+      "title": "Modellvergleich",
+      "description": "KI-Modelle auf TutorBench und Sicherheits-Benchmarks vergleichen",
+      "configTitle": "Konfiguration",
+      "models": "Modelle",
+      "profiles": "Synthetische Profile",
+      "maestroIds": "Maestro-IDs (kommagetrennt)",
+      "turns": "Runden",
+      "runButton": "Vergleich Starten",
+      "running": "Läuft...",
+      "experiments": "Experimente",
+      "safetyBaseline": "Sicherheits-Baseline",
+      "scenarios": "Szenarien",
+      "reportTitle": "Vollständiger Bericht",
+      "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    }
   }
 }

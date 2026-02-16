@@ -1,10 +1,6 @@
 /**
- * Bias Detection Patterns — Multilingual (IT/EN)
- * EU AI Act Art. 10 Compliance
- *
- * Separated from bias-detector.ts to keep files under 250 lines.
- * Categories: gender, racial/ethnic, age, disability, socioeconomic,
- * cultural, and educational ability bias.
+ * Bias Detection Patterns — Multilingual (IT/EN/FR/DE/ES)
+ * EU AI Act Art. 10 Compliance. Separated from bias-detector.ts for 250-line limit.
  */
 
 import type { BiasCategory, BiasSeverity } from './bias-detector';
@@ -18,19 +14,27 @@ export interface BiasPattern {
 }
 
 export const BIAS_PATTERNS: BiasPattern[] = [
-  // --- Gender bias ---
+  // --- Gender bias (IT) ---
   {
-    pattern: /\b(le donne|le ragazze) (non )?(possono|sanno|capiscono|sono capaci)\b/gi,
+    pattern:
+      /\b(le donne|le ragazze|gli uomini|i ragazzi) (non )?(possono|sanno|capiscono|sono capaci)\b/gi,
     category: 'gender',
     severity: 'high',
     reason: 'Gender-based capability generalization',
     suggestion: 'Avoid generalizing abilities by gender',
   },
   {
-    pattern: /\b(gli uomini|i ragazzi) (non )?(possono|sanno|capiscono|sono capaci)\b/gi,
+    pattern: /\b(le ragazze|i ragazzi|le donne|gli uomini) non sono brav[ei]\b/gi,
     category: 'gender',
     severity: 'high',
-    reason: 'Gender-based capability generalization',
+    reason: 'Gender-based competence denial',
+    suggestion: 'Avoid linking gender to academic or skill competence',
+  },
+  {
+    pattern: /\b(le ragazze|i ragazzi|le donne|gli uomini) non (sono|possono|riescono)\b/gi,
+    category: 'gender',
+    severity: 'high',
+    reason: 'Gender-based ability limitation',
     suggestion: 'Avoid generalizing abilities by gender',
   },
   {
@@ -60,6 +64,23 @@ export const BIAS_PATTERNS: BiasPattern[] = [
     severity: 'high',
     reason: 'Naturalistic gender stereotype',
     suggestion: 'Avoid claims of inherent gender differences in abilities',
+  },
+  // French gender bias
+  {
+    pattern: /\b(les filles|les femmes|les garçons|les hommes) ne (sont|peuvent|savent) pas\b/gi,
+    category: 'gender',
+    severity: 'high',
+    reason: 'Gender-based capability denial (FR)',
+    suggestion: 'Avoid generalizing abilities by gender',
+  },
+  // DE/ES gender bias (compact)
+  {
+    pattern:
+      /(mädchen|frauen|jungen|männer) (können|sind) nicht|(las chicas|las mujeres|los chicos) no (son|pueden|saben)/gi,
+    category: 'gender',
+    severity: 'high',
+    reason: 'Gender-based capability denial (DE/ES)',
+    suggestion: 'Avoid generalizing abilities by gender',
   },
 
   // --- Racial/ethnic bias ---
@@ -100,8 +121,7 @@ export const BIAS_PATTERNS: BiasPattern[] = [
     reason: 'Age-based learning dismissal',
     suggestion: 'Adapt explanation level without dismissing capability',
   },
-
-  // --- Disability bias ---
+  // --- Disability bias (IT) ---
   {
     pattern: /(handicappat|ritardat|mongoloide|deficient|subnormal)/gi,
     category: 'disability',
@@ -123,6 +143,38 @@ export const BIAS_PATTERNS: BiasPattern[] = [
     reason: 'Attributing inability to disability',
     suggestion: 'Focus on support strategies, not limitations',
   },
+  {
+    pattern:
+      /\b(con disabilità|disabil[ei]) non (possono|riescono|sono in grado di) (imparare|studiare|capire)\b/gi,
+    category: 'disability',
+    severity: 'high',
+    reason: 'Denying learning capability to people with disabilities',
+    suggestion: 'All students can learn with appropriate support',
+  },
+  {
+    pattern: /\bstudenti con\b.{0,20}\bnon possono imparare\b/gi,
+    category: 'disability',
+    severity: 'high',
+    reason: 'Blanket denial of learning ability based on condition',
+    suggestion: 'Focus on inclusive education and adapted teaching methods',
+  },
+  // English disability bias
+  {
+    pattern: /\b(students|people|kids) with disabilit(y|ies) (can't|cannot|don't|won't) learn\b/gi,
+    category: 'disability',
+    severity: 'high',
+    reason: 'Denying learning capability to people with disabilities (EN)',
+    suggestion: 'All students can learn with appropriate support',
+  },
+  // FR/DE/ES disability bias (compact)
+  {
+    pattern:
+      /(handicapés? ne (peuvent|savent) pas|behinderte? können nicht|discapacitados no pueden) (apprendre|comprendre|lernen|verstehen|aprender|entender)/gi,
+    category: 'disability',
+    severity: 'high',
+    reason: 'Denying learning capability (multilingual)',
+    suggestion: 'Use person-first inclusive language',
+  },
 
   // --- Socioeconomic bias ---
   {
@@ -131,6 +183,29 @@ export const BIAS_PATTERNS: BiasPattern[] = [
     severity: 'high',
     reason: 'Socioeconomic stereotyping',
     suggestion: 'Avoid linking economic status to capability',
+  },
+  {
+    pattern: /\bsolo i ricchi (possono|riescono|hanno)\b/gi,
+    category: 'socioeconomic',
+    severity: 'high',
+    reason: 'Wealth-based exclusion generalization',
+    suggestion: 'Avoid linking success or ability to wealth',
+  },
+  {
+    pattern: /\bchi è povero non (può|riesce|ha)\b/gi,
+    category: 'socioeconomic',
+    severity: 'high',
+    reason: 'Poverty-based capability denial',
+    suggestion: 'Focus on systemic barriers, not personal limitations',
+  },
+  // FR/DE/ES socioeconomic bias (compact)
+  {
+    pattern:
+      /(seuls? les riches|les pauvres ne|nur die reichen|arme können nicht|solo los ricos|los pobres no)/gi,
+    category: 'socioeconomic',
+    severity: 'high',
+    reason: 'Wealth-based exclusion (multilingual)',
+    suggestion: 'Avoid linking success to wealth',
   },
   {
     pattern: /\b(poor (people|kids|students) (can't|don't|won't|never))\b/gi,

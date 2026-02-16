@@ -151,4 +151,39 @@ describe('simulation-engine', () => {
       }),
     );
   });
+
+  it('should pass model option to chatCompletion calls', async () => {
+    mockChatCompletion.mockResolvedValue({
+      content: 'Test response',
+      provider: 'azure' as const,
+      model: 'gpt-5.2-edu',
+      usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 },
+    });
+
+    await runSimulation({ ...baseConfig, model: 'gpt-5.2-edu' });
+
+    // Every chatCompletion call should have received model in options
+    for (const call of mockChatCompletion.mock.calls) {
+      const options = call[2]; // third argument is options
+      expect(options).toEqual(expect.objectContaining({ model: 'gpt-5.2-edu' }));
+    }
+  });
+
+  it('should work without model option (backward compat)', async () => {
+    mockChatCompletion.mockResolvedValue({
+      content: 'Test response',
+      provider: 'azure' as const,
+      model: 'gpt-5-mini',
+      usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 },
+    });
+
+    const result = await runSimulation(baseConfig);
+
+    expect(result.status).toBe('completed');
+    // model should be undefined in options (backward compatible)
+    for (const call of mockChatCompletion.mock.calls) {
+      const options = call[2];
+      expect(options?.model).toBeUndefined();
+    }
+  });
 });

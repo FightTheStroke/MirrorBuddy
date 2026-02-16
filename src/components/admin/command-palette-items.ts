@@ -26,6 +26,8 @@ import {
   Coins,
   Receipt,
   CreditCard,
+  FlaskConical,
+  GitCompareArrows,
 } from 'lucide-react';
 
 export interface CommandItem {
@@ -136,6 +138,22 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
       icon: Shield,
       href: '/admin/safety',
       keywords: ['guardrails', 'content'],
+    },
+    {
+      id: 'nav-research',
+      label: t('research.title'),
+      section: 'navigation',
+      icon: FlaskConical,
+      href: '/admin/research',
+      keywords: ['experiment', 'benchmark', 'tutorbench'],
+    },
+    {
+      id: 'nav-model-comparison',
+      label: t('modelComparison.title'),
+      section: 'navigation',
+      icon: GitCompareArrows,
+      href: '/admin/research/model-comparison',
+      keywords: ['model', 'compare', 'gpt', 'benchmark', 'safety'],
     },
     {
       id: 'nav-tos',
