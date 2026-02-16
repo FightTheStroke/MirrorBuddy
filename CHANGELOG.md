@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Azure realtime deployment renamed from `gpt-4o-realtime` to `gpt-realtime` (cosmetic alignment with GA model name, no functional change)
+- Seed catalog deployment names aligned: `gpt-4o-realtime` → `gpt-realtime`, `gpt-4o-realtime-mini` → `gpt-realtime-mini`
+
 ### Added
 
 - `ADMIN_READONLY` role with `withAdminReadOnly` middleware for read-only admin access

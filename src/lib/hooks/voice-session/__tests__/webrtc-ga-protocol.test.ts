@@ -91,7 +91,7 @@ describe('WebRTC GA Protocol', () => {
           provider: 'azure',
           transport: 'webrtc',
           azureResource: 'my-resource',
-          deployment: 'gpt-4o-realtime',
+          deployment: 'gpt-realtime',
         }),
       });
 
@@ -163,7 +163,7 @@ describe('WebRTC GA Protocol', () => {
           provider: 'azure',
           transport: 'webrtc',
           webrtcEndpoint:
-            'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-4o-realtime',
+            'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-realtime',
         }),
       });
 
@@ -187,7 +187,7 @@ describe('WebRTC GA Protocol', () => {
 
       // Verify: Should use preview endpoint from config
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-4o-realtime',
+        'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-realtime',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -231,7 +231,7 @@ describe('WebRTC GA Protocol', () => {
           provider: 'azure',
           transport: 'webrtc',
           azureResource: 'probe-resource',
-          deployment: 'gpt-4o-realtime',
+          deployment: 'gpt-realtime',
         }),
       });
 

@@ -200,7 +200,7 @@ Based on real-world testing (~$0.067 per 640x360 image at $5/M image tokens):
 | Deployment Name        | Model                  | Version    | SKU            |
 | ---------------------- | ---------------------- | ---------- | -------------- |
 | gpt4o-mini-deployment  | gpt-4o-mini            | 2024-07-18 | Standard       |
-| gpt-4o-realtime        | gpt-realtime           | 2025-08-28 | GlobalStandard |
+| gpt-realtime           | gpt-realtime           | 2025-08-28 | GlobalStandard |
 | gpt-5.2-edu            | gpt-5.2-chat           | 2025-12-11 | GlobalStandard |
 | gpt-5-edu-mini         | gpt-5-mini             | 2025-08-07 | GlobalStandard |
 | gpt-5-chat             | gpt-5-chat             | 2025-10-03 | GlobalStandard |
