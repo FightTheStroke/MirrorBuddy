@@ -18,7 +18,7 @@ export function containsCrisisKeywords(text: string): boolean {
     /voglio\s+morire/,
     /non\s+voglio\s+\S*\s*vivere/, // "non voglio più vivere"
     /non\s+ce\s+la\s+faccio\s+più/,
-    /\bfaccio\s+del\s+male/, // "mi faccio del male"
+    /\bmi\s+faccio\s+del\s+male/, // self-harm only, excludes "ti faccio del male"
     /farmi\s+del\s+male/,
     /suicidio/,
     /ammazzarmi/,

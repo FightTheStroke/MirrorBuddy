@@ -3,12 +3,12 @@
  * Create, run, and compare experiments across synthetic profiles and maestri.
  */
 
-import { prisma } from "@/lib/db";
-import type { ResearchResult, ResearchExperiment } from "@prisma/client";
-import { getMaestroById } from "@/data";
-import { SYNTHETIC_PROFILES } from "./synthetic-students";
-import { runSimulation, type SimulationSummary } from "./simulation-engine";
-import { scoreTutorBench, type TutorBenchScores } from "./benchmarks";
+import { prisma } from '@/lib/db';
+import type { ResearchResult, ResearchExperiment } from '@prisma/client';
+import { getMaestroById } from '@/data';
+import { SYNTHETIC_PROFILES } from './synthetic-students';
+import { runSimulation, type SimulationSummary } from './simulation-engine';
+import { scoreTutorBench, type TutorBenchScores } from './benchmarks';
 
 export interface ExperimentInput {
   name: string;
@@ -17,7 +17,7 @@ export interface ExperimentInput {
   syntheticProfileId: string;
   turns?: number;
   topic?: string;
-  difficulty?: "easy" | "medium" | "hard";
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
 export interface ExperimentWithScores {
@@ -46,9 +46,7 @@ export interface ComparisonResult {
 /**
  * Create a new experiment in DRAFT status.
  */
-export async function createExperiment(
-  input: ExperimentInput,
-): Promise<{ id: string }> {
+export async function createExperiment(input: ExperimentInput): Promise<{ id: string }> {
   const maestro = getMaestroById(input.maestroId);
   if (!maestro) {
     throw new Error(`Maestro not found: ${input.maestroId}`);
@@ -63,7 +61,7 @@ export async function createExperiment(
       turns: input.turns ?? 10,
       config: {
         topic: input.topic ?? maestro.subject,
-        difficulty: input.difficulty ?? "medium",
+        difficulty: input.difficulty ?? 'medium',
       },
     },
   });
@@ -76,6 +74,7 @@ export async function createExperiment(
  */
 export async function runExperiment(
   experimentId: string,
+  options?: { model?: string },
 ): Promise<SimulationSummary & { scores?: TutorBenchScores }> {
   const experiment = await prisma.researchExperiment.findUnique({
     where: { id: experimentId },
@@ -83,23 +82,17 @@ export async function runExperiment(
   });
 
   if (!experiment) throw new Error(`Experiment not found: ${experimentId}`);
-  if (experiment.status !== "draft") {
-    throw new Error(
-      `Experiment ${experimentId} is ${experiment.status}, expected draft`,
-    );
+  if (experiment.status !== 'draft') {
+    throw new Error(`Experiment ${experimentId} is ${experiment.status}, expected draft`);
   }
 
   const maestro = getMaestroById(experiment.maestroId);
   if (!maestro) throw new Error(`Maestro not found: ${experiment.maestroId}`);
 
   // Find matching synthetic profile from code-defined profiles
-  const profile = SYNTHETIC_PROFILES.find(
-    (p) => p.name === experiment.syntheticProfile.name,
-  );
+  const profile = SYNTHETIC_PROFILES.find((p) => p.name === experiment.syntheticProfile.name);
   if (!profile) {
-    throw new Error(
-      `Synthetic profile not matched: ${experiment.syntheticProfile.name}`,
-    );
+    throw new Error(`Synthetic profile not matched: ${experiment.syntheticProfile.name}`);
   }
 
   const config = (experiment.config ?? {}) as Record<string, string>;
@@ -112,15 +105,16 @@ export async function runExperiment(
     maestroId: maestro.id,
     topic: config.topic ?? maestro.subject,
     turns: experiment.turns,
-    difficulty: (config.difficulty as "easy" | "medium" | "hard") ?? "medium",
+    difficulty: (config.difficulty as 'easy' | 'medium' | 'hard') ?? 'medium',
+    model: options?.model,
   });
 
   // 2. Score with TutorBench (only if simulation completed)
   let scores: TutorBenchScores | undefined;
-  if (summary.status === "completed") {
+  if (summary.status === 'completed') {
     const results = await prisma.researchResult.findMany({
       where: { experimentId },
-      orderBy: { turn: "asc" },
+      orderBy: { turn: 'asc' },
     });
 
     const turns = results.map((r: ResearchResult) => ({
@@ -179,9 +173,7 @@ export async function getExperimentResults(
 /**
  * Compare multiple experiments side-by-side.
  */
-export async function compareExperiments(
-  experimentIds: string[],
-): Promise<ComparisonResult> {
+export async function compareExperiments(experimentIds: string[]): Promise<ComparisonResult> {
   const experiments: ExperimentWithScores[] = [];
 
   for (const id of experimentIds) {
@@ -190,19 +182,14 @@ export async function compareExperiments(
   }
 
   // Find best per dimension
-  const dimensions = [
-    "scaffolding",
-    "hinting",
-    "adaptation",
-    "misconceptionHandling",
-  ] as const;
+  const dimensions = ['scaffolding', 'hinting', 'adaptation', 'misconceptionHandling'] as const;
   const dimensionWinners: Record<string, string> = {};
   let bestOverallId: string | null = null;
   let bestOverallScore = -1;
 
   for (const dim of dimensions) {
     let best = -1;
-    let winnerId = "";
+    let winnerId = '';
     for (const exp of experiments) {
       const score = exp.scores[dim];
       if (score !== null && score > best) {
@@ -245,7 +232,7 @@ export async function listExperiments(options?: {
     prisma.researchExperiment.findMany({
       where,
       include: { _count: { select: { results: true } } },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       take: options?.limit ?? 50,
       skip: options?.offset ?? 0,
     }),
@@ -253,24 +240,22 @@ export async function listExperiments(options?: {
   ]);
 
   return {
-    items: items.map(
-      (exp: ResearchExperiment & { _count: { results: number } }) => ({
-        id: exp.id,
-        name: exp.name,
-        hypothesis: exp.hypothesis,
-        maestroId: exp.maestroId,
-        status: exp.status,
-        scores: {
-          scaffolding: exp.scoreScaffolding,
-          hinting: exp.scoreHinting,
-          adaptation: exp.scoreAdaptation,
-          misconceptionHandling: exp.scoreMisconceptionHandling,
-        },
-        turnsCompleted: exp._count.results,
-        createdAt: exp.createdAt,
-        completedAt: exp.completedAt,
-      }),
-    ),
+    items: items.map((exp: ResearchExperiment & { _count: { results: number } }) => ({
+      id: exp.id,
+      name: exp.name,
+      hypothesis: exp.hypothesis,
+      maestroId: exp.maestroId,
+      status: exp.status,
+      scores: {
+        scaffolding: exp.scoreScaffolding,
+        hinting: exp.scoreHinting,
+        adaptation: exp.scoreAdaptation,
+        misconceptionHandling: exp.scoreMisconceptionHandling,
+      },
+      turnsCompleted: exp._count.results,
+      createdAt: exp.createdAt,
+      completedAt: exp.completedAt,
+    })),
     total,
   };
 }

@@ -115,13 +115,13 @@ async function runSingleComparison(
       name: `compare-${model}-${maestroId}-${profileName}`,
       hypothesis: `Model ${model} performance with ${maestroId} and ${profileName}`,
       maestroId,
-      syntheticProfileId: profileName,
+      syntheticProfileId: profile.name,
       turns: config.turns,
       topic: config.topic ?? maestro.subject,
       difficulty: config.difficulty ?? 'medium',
     });
 
-    const experimentResult = await runExperiment(experimentId);
+    const experimentResult = await runExperiment(experimentId, { model });
 
     return {
       model,
