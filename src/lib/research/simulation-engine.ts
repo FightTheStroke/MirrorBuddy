@@ -4,12 +4,9 @@
  * capturing per-turn metrics for TutorBench evaluation.
  */
 
-import { prisma } from "@/lib/db";
-import { chatCompletion } from "@/lib/ai/server";
-import {
-  type SyntheticStudentProfile,
-  buildStudentSystemPrompt,
-} from "./synthetic-students";
+import { prisma } from '@/lib/db';
+import { chatCompletion } from '@/lib/ai/server';
+import { type SyntheticStudentProfile, buildStudentSystemPrompt } from './synthetic-students';
 
 export interface SimulationConfig {
   experimentId: string;
@@ -18,7 +15,8 @@ export interface SimulationConfig {
   maestroId: string;
   topic: string;
   turns: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
+  model?: string;
 }
 
 export interface SimulationSummary {
@@ -26,12 +24,12 @@ export interface SimulationSummary {
   turnsCompleted: number;
   totalTokens: number;
   avgResponseTimeMs: number;
-  status: "completed" | "failed";
+  status: 'completed' | 'failed';
   error?: string;
 }
 
 interface ConversationMessage {
-  role: "user" | "assistant";
+  role: 'user' | 'assistant';
   content: string;
 }
 
@@ -39,22 +37,13 @@ interface ConversationMessage {
  * Run a full simulation: synthetic student talks to a maestro for N turns.
  * Each turn: student generates message → maestro responds → metrics captured.
  */
-export async function runSimulation(
-  config: SimulationConfig,
-): Promise<SimulationSummary> {
-  const {
-    experimentId,
-    profile,
-    maestroSystemPrompt,
-    topic,
-    turns,
-    difficulty,
-  } = config;
+export async function runSimulation(config: SimulationConfig): Promise<SimulationSummary> {
+  const { experimentId, profile, maestroSystemPrompt, topic, turns, difficulty } = config;
 
   // Mark experiment as running
   await prisma.researchExperiment.update({
     where: { id: experimentId },
-    data: { status: "running", startedAt: new Date() },
+    data: { status: 'running', startedAt: new Date() },
   });
 
   const conversation: ConversationMessage[] = [];
@@ -74,46 +63,42 @@ export async function runSimulation(
 
       const studentContext =
         turn === 1
-          ? "Inizia la conversazione chiedendo aiuto sul topic."
+          ? 'Inizia la conversazione chiedendo aiuto sul topic.'
           : `Continue the conversation based on what the tutor just said.`;
 
       const studentResult = await chatCompletion(
         [
           ...conversation.map((m) => ({
-            role: m.role === "user" ? "assistant" : "user",
+            role: m.role === 'user' ? 'assistant' : 'user',
             content: m.content,
           })),
-          { role: "user", content: studentContext },
+          { role: 'user', content: studentContext },
         ],
         studentPrompt,
-        { temperature: 0.9, maxTokens: 256 },
+        { temperature: 0.9, maxTokens: 256, model: config.model },
       );
 
       const studentMessage = studentResult.content;
-      conversation.push({ role: "user", content: studentMessage });
+      conversation.push({ role: 'user', content: studentMessage });
 
       // 2. Maestro responds
       const startTime = Date.now();
       const maestroResult = await chatCompletion(
         conversation.map((m) => ({ role: m.role, content: m.content })),
         maestroSystemPrompt,
-        { temperature: 0.7, maxTokens: 1024 },
+        { temperature: 0.7, maxTokens: 1024, model: config.model },
       );
       const responseTimeMs = Date.now() - startTime;
 
       const maestroResponse = maestroResult.content;
-      conversation.push({ role: "assistant", content: maestroResponse });
+      conversation.push({ role: 'assistant', content: maestroResponse });
 
       // 3. Detect pedagogical patterns in maestro response
       const scaffoldingDetected = detectScaffolding(maestroResponse);
-      const adaptationDetected = detectAdaptation(
-        maestroResponse,
-        profile.dsaProfile,
-      );
+      const adaptationDetected = detectAdaptation(maestroResponse, profile.dsaProfile);
 
       const turnTokens =
-        (maestroResult.usage?.total_tokens ?? 0) +
-        (studentResult.usage?.total_tokens ?? 0);
+        (maestroResult.usage?.total_tokens ?? 0) + (studentResult.usage?.total_tokens ?? 0);
       totalTokens += turnTokens;
       totalResponseTimeMs += responseTimeMs;
 
@@ -141,7 +126,7 @@ export async function runSimulation(
     // Mark experiment completed
     await prisma.researchExperiment.update({
       where: { id: experimentId },
-      data: { status: "completed", completedAt: new Date() },
+      data: { status: 'completed', completedAt: new Date() },
     });
 
     return {
@@ -149,25 +134,22 @@ export async function runSimulation(
       turnsCompleted,
       totalTokens,
       avgResponseTimeMs: Math.round(totalResponseTimeMs / turnsCompleted),
-      status: "completed",
+      status: 'completed',
     };
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
 
     await prisma.researchExperiment.update({
       where: { id: experimentId },
-      data: { status: "failed", errorLog: errorMsg },
+      data: { status: 'failed', errorLog: errorMsg },
     });
 
     return {
       experimentId,
       turnsCompleted,
       totalTokens,
-      avgResponseTimeMs:
-        turnsCompleted > 0
-          ? Math.round(totalResponseTimeMs / turnsCompleted)
-          : 0,
-      status: "failed",
+      avgResponseTimeMs: turnsCompleted > 0 ? Math.round(totalResponseTimeMs / turnsCompleted) : 0,
+      status: 'failed',
       error: errorMsg,
     };
   }

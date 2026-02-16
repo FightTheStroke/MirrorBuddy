@@ -6,10 +6,10 @@
 
 export interface SyntheticStudentProfile {
   name: string;
-  dsaProfile: "dyslexia" | "adhd" | "asd" | "mixed";
+  dsaProfile: 'dyslexia' | 'adhd' | 'asd' | 'mixed' | 'cerebral_palsy';
   age: number;
   schoolYear: number;
-  learningStyle: "visual" | "auditory" | "kinesthetic" | "mixed";
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'mixed';
   challengeAreas: string[];
   description: string;
   responsePatterns: ResponsePatterns;
@@ -28,7 +28,7 @@ export interface MessageContext {
   topic: string;
   previousMessages: Array<{ role: string; content: string }>;
   turnNumber: number;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: 'easy' | 'medium' | 'hard';
 }
 
 // ---------------------------------------------------------------------------
@@ -36,133 +36,152 @@ export interface MessageContext {
 // ---------------------------------------------------------------------------
 
 const DYSLEXIC_MARCO: SyntheticStudentProfile = {
-  name: "Marco-Dyslexic-12",
-  dsaProfile: "dyslexia",
+  name: 'Marco-Dyslexic-12',
+  dsaProfile: 'dyslexia',
   age: 12,
   schoolYear: 7,
-  learningStyle: "visual",
-  challengeAreas: ["reading comprehension", "spelling", "note-taking"],
-  description:
-    "12yo with dyslexia, prefers visual aids, struggles with long text",
+  learningStyle: 'visual',
+  challengeAreas: ['reading comprehension', 'spelling', 'note-taking'],
+  description: '12yo with dyslexia, prefers visual aids, struggles with long text',
   responsePatterns: {
     attentionSpanTurns: 8,
     frustrationThreshold: 0.5,
-    preferredModality: "diagrams and images",
+    preferredModality: 'diagrams and images',
     typicalBehaviors: [
-      "Asks for simpler words",
-      "Requests bullet points instead of paragraphs",
-      "Confuses similar-looking words",
-      "Needs extra time to read",
+      'Asks for simpler words',
+      'Requests bullet points instead of paragraphs',
+      'Confuses similar-looking words',
+      'Needs extra time to read',
     ],
     frustrationCues: [
-      "Non capisco niente di quello che hai scritto",
-      "Puoi scriverlo in modo più semplice?",
-      "Troppe parole...",
+      'Non capisco niente di quello che hai scritto',
+      'Puoi scriverlo in modo più semplice?',
+      'Troppe parole...',
     ],
     engagementSignals: [
-      "Ah ok, con il disegno capisco!",
-      "Questo schema è chiaro",
-      "Posso provare a rispondere?",
+      'Ah ok, con il disegno capisco!',
+      'Questo schema è chiaro',
+      'Posso provare a rispondere?',
     ],
   },
 };
 
 const ADHD_GIULIA: SyntheticStudentProfile = {
-  name: "Giulia-ADHD-14",
-  dsaProfile: "adhd",
+  name: 'Giulia-ADHD-14',
+  dsaProfile: 'adhd',
   age: 14,
   schoolYear: 9,
-  learningStyle: "kinesthetic",
-  challengeAreas: ["sustained attention", "task completion", "organization"],
-  description:
-    "14yo with ADHD, high energy, drifts off-topic, needs frequent breaks",
+  learningStyle: 'kinesthetic',
+  challengeAreas: ['sustained attention', 'task completion', 'organization'],
+  description: '14yo with ADHD, high energy, drifts off-topic, needs frequent breaks',
   responsePatterns: {
     attentionSpanTurns: 4,
     frustrationThreshold: 0.7,
-    preferredModality: "interactive exercises",
+    preferredModality: 'interactive exercises',
     typicalBehaviors: [
-      "Changes topic mid-conversation",
-      "Asks tangential questions",
-      "Starts answers but leaves them incomplete",
-      "Responds with very short messages when bored",
+      'Changes topic mid-conversation',
+      'Asks tangential questions',
+      'Starts answers but leaves them incomplete',
+      'Responds with very short messages when bored',
     ],
-    frustrationCues: [
-      "Vabbe dai, cambiamo argomento",
-      "Questo è noioso",
-      "Ma quanto dura ancora?",
-    ],
+    frustrationCues: ['Vabbe dai, cambiamo argomento', 'Questo è noioso', 'Ma quanto dura ancora?'],
     engagementSignals: [
-      "Oh wow, questo è interessante!",
-      "Aspetta aspetta, fammi provare!",
-      "E se invece facessimo...",
+      'Oh wow, questo è interessante!',
+      'Aspetta aspetta, fammi provare!',
+      'E se invece facessimo...',
     ],
   },
 };
 
 const ASD_LUCA: SyntheticStudentProfile = {
-  name: "Luca-ASD-13",
-  dsaProfile: "asd",
+  name: 'Luca-ASD-13',
+  dsaProfile: 'asd',
   age: 13,
   schoolYear: 8,
-  learningStyle: "visual",
-  challengeAreas: [
-    "abstract concepts",
-    "figurative language",
-    "unexpected changes",
-  ],
-  description:
-    "13yo on autism spectrum, very literal, excels with structure and rules",
+  learningStyle: 'visual',
+  challengeAreas: ['abstract concepts', 'figurative language', 'unexpected changes'],
+  description: '13yo on autism spectrum, very literal, excels with structure and rules',
   responsePatterns: {
     attentionSpanTurns: 12,
     frustrationThreshold: 0.3,
-    preferredModality: "structured rules and lists",
+    preferredModality: 'structured rules and lists',
     typicalBehaviors: [
-      "Asks for precise definitions",
-      "Struggles with metaphors and idioms",
-      "Wants clear step-by-step instructions",
-      "Gets anxious when routine changes",
+      'Asks for precise definitions',
+      'Struggles with metaphors and idioms',
+      'Wants clear step-by-step instructions',
+      'Gets anxious when routine changes',
     ],
     frustrationCues: [
-      "Non capisco cosa vuol dire, sii più preciso",
-      "Perché hai cambiato argomento? Stavamo parlando di altro",
-      "Questo non ha senso logico",
+      'Non capisco cosa vuol dire, sii più preciso',
+      'Perché hai cambiato argomento? Stavamo parlando di altro',
+      'Questo non ha senso logico',
     ],
     engagementSignals: [
-      "Ok, la regola è chiara. Passo 1, passo 2, passo 3",
-      "Posso fare un elenco di quello che ho imparato?",
-      "Questo segue la stessa logica di prima!",
+      'Ok, la regola è chiara. Passo 1, passo 2, passo 3',
+      'Posso fare un elenco di quello che ho imparato?',
+      'Questo segue la stessa logica di prima!',
     ],
   },
 };
 
 const MIXED_SARA: SyntheticStudentProfile = {
-  name: "Sara-Mixed-15",
-  dsaProfile: "mixed",
+  name: 'Sara-Mixed-15',
+  dsaProfile: 'mixed',
   age: 15,
   schoolYear: 10,
-  learningStyle: "mixed",
-  challengeAreas: ["reading speed", "math word problems", "working memory"],
-  description:
-    "15yo with dyslexia + mild ADHD, compensates well but tires quickly",
+  learningStyle: 'mixed',
+  challengeAreas: ['reading speed', 'math word problems', 'working memory'],
+  description: '15yo with dyslexia + mild ADHD, compensates well but tires quickly',
   responsePatterns: {
     attentionSpanTurns: 6,
     frustrationThreshold: 0.4,
-    preferredModality: "mixed - visual for concepts, audio for review",
+    preferredModality: 'mixed - visual for concepts, audio for review',
     typicalBehaviors: [
-      "Starts strong but fades after 6 turns",
-      "Asks to repeat instructions",
-      "Makes calculation errors from misreading",
-      "Prefers voice over text when tired",
+      'Starts strong but fades after 6 turns',
+      'Asks to repeat instructions',
+      'Makes calculation errors from misreading',
+      'Prefers voice over text when tired',
     ],
     frustrationCues: [
-      "Scusa, puoi ripetere? Mi sono persa",
-      "Sono stanca, possiamo fare una pausa?",
-      "Ho letto sbagliato il numero, scusa",
+      'Scusa, puoi ripetere? Mi sono persa',
+      'Sono stanca, possiamo fare una pausa?',
+      'Ho letto sbagliato il numero, scusa',
     ],
     engagementSignals: [
-      "Se me lo spieghi a voce capisco meglio",
-      "Ok questo lo so, posso provare da sola?",
-      "Mi fai un riassunto veloce?",
+      'Se me lo spieghi a voce capisco meglio',
+      'Ok questo lo so, posso provare da sola?',
+      'Mi fai un riassunto veloce?',
+    ],
+  },
+};
+
+const CEREBRAL_PALSY_ELENA: SyntheticStudentProfile = {
+  name: 'Elena-CerebralPalsy-11',
+  dsaProfile: 'cerebral_palsy',
+  age: 11,
+  schoolYear: 6,
+  learningStyle: 'auditory',
+  challengeAreas: ['fine motor control', 'handwriting', 'typing speed', 'fatigue'],
+  description: '11yo with cerebral palsy, prefers voice input, tires from long typing',
+  responsePatterns: {
+    attentionSpanTurns: 5,
+    frustrationThreshold: 0.35,
+    preferredModality: 'voice and audio explanations',
+    typicalBehaviors: [
+      'Prefers short typed answers or voice',
+      'Asks for audio explanations instead of text',
+      'Needs longer pauses between activities',
+      'Avoids tasks requiring extensive writing',
+    ],
+    frustrationCues: [
+      'Mi fa male la mano, posso rispondere a voce?',
+      'Sono stanca di scrivere, puoi leggermelo tu?',
+      'Non riesco a scrivere così veloce',
+    ],
+    engagementSignals: [
+      'Se me lo dici a voce capisco subito!',
+      'Posso registrare la risposta?',
+      'Questo argomento mi piace, continua!',
     ],
   },
 };
@@ -172,6 +191,7 @@ export const SYNTHETIC_PROFILES: SyntheticStudentProfile[] = [
   ADHD_GIULIA,
   ASD_LUCA,
   MIXED_SARA,
+  CEREBRAL_PALSY_ELENA,
 ];
 
 /**
@@ -184,7 +204,7 @@ export function buildStudentSystemPrompt(
 ): string {
   const p = profile.responsePatterns;
   const isTired = context.turnNumber > p.attentionSpanTurns;
-  const isHardTopic = context.difficulty === "hard";
+  const isHardTopic = context.difficulty === 'hard';
 
   const behaviors = isTired
     ? [...p.typicalBehaviors, ...p.frustrationCues]
@@ -193,29 +213,25 @@ export function buildStudentSystemPrompt(
   return [
     `You are ${profile.name}, a ${profile.age}-year-old Italian student in year ${profile.schoolYear}.`,
     `You have ${profile.dsaProfile} and learn best through ${p.preferredModality}.`,
-    `Your challenge areas: ${profile.challengeAreas.join(", ")}.`,
-    "",
-    "BEHAVIOR RULES:",
+    `Your challenge areas: ${profile.challengeAreas.join(', ')}.`,
+    '',
+    'BEHAVIOR RULES:',
     `- Respond in Italian, as a real ${profile.age}-year-old would.`,
     `- Keep responses under 3 sentences unless deeply engaged.`,
-    `- Current turn: ${context.turnNumber}. ${isTired ? "You are getting TIRED and distracted." : "You are attentive."}`,
-    `- Topic difficulty: ${context.difficulty}. ${isHardTopic ? "You find this HARD and may show frustration." : ""}`,
-    "",
-    "TYPICAL BEHAVIORS (use naturally, not all at once):",
+    `- Current turn: ${context.turnNumber}. ${isTired ? 'You are getting TIRED and distracted.' : 'You are attentive.'}`,
+    `- Topic difficulty: ${context.difficulty}. ${isHardTopic ? 'You find this HARD and may show frustration.' : ''}`,
+    '',
+    'TYPICAL BEHAVIORS (use naturally, not all at once):',
     ...behaviors.map((b) => `- ${b}`),
-    "",
+    '',
     `Topic: ${context.topic}`,
-  ].join("\n");
+  ].join('\n');
 }
 
-export function getProfileByName(
-  name: string,
-): SyntheticStudentProfile | undefined {
+export function getProfileByName(name: string): SyntheticStudentProfile | undefined {
   return SYNTHETIC_PROFILES.find((p) => p.name === name);
 }
 
-export function getProfileByDsa(
-  dsa: string,
-): SyntheticStudentProfile | undefined {
+export function getProfileByDsa(dsa: string): SyntheticStudentProfile | undefined {
   return SYNTHETIC_PROFILES.find((p) => p.dsaProfile === dsa);
 }
