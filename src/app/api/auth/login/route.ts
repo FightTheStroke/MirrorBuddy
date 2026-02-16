@@ -1,19 +1,18 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import {
   verifyPassword,
   signCookieValue,
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
-} from "@/lib/auth/server";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
-import { hashPII } from "@/lib/security";
-
+} from '@/lib/auth/server';
+import { RATE_LIMITS } from '@/lib/rate-limit';
+import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
+import { hashPII } from '@/lib/security';
 
 export const revalidate = 0;
-const log = logger.child({ module: "auth/login" });
+const log = logger.child({ module: 'auth/login' });
 
 /**
  * Validate redirect URL - must be relative (start with /) to prevent open redirect
@@ -22,14 +21,12 @@ function isValidRedirectUrl(url: string | undefined): boolean {
   if (!url) return false;
   // Only allow relative URLs starting with /
   // Prevent open redirects (e.g., https://evil.com, //evil.com, \/\/evil.com)
-  return (
-    typeof url === "string" && url.startsWith("/") && !url.startsWith("//")
-  );
+  return typeof url === 'string' && url.startsWith('/') && !url.startsWith('//');
 }
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public login endpoint, uses rate limiting
 export const POST = pipe(
-  withSentry("/api/auth/login"),
+  withSentry('/api/auth/login'),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),
 )(async (ctx) => {
   const { username, email, password, redirect } = await ctx.req.json();
@@ -37,25 +34,16 @@ export const POST = pipe(
   // Accept either email or username (email preferred)
   const identifier = email || username;
 
-  if (
-    !identifier ||
-    typeof identifier !== "string" ||
-    !password ||
-    typeof password !== "string"
-  ) {
-    log.warn("Login attempt: invalid input", { identifier });
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  if (!identifier || typeof identifier !== 'string' || !password || typeof password !== 'string') {
+    log.warn('Login attempt: invalid input', { identifier });
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   // Try email hash (PII-encrypted users), plain email (legacy), or username
   const identifierHash = await hashPII(identifier);
   const user = await prisma.user.findFirst({
     where: {
-      OR: [
-        { emailHash: identifierHash },
-        { email: identifier },
-        { username: identifier },
-      ],
+      OR: [{ emailHash: identifierHash }, { email: identifier }, { username: identifier }],
     },
     select: {
       id: true,
@@ -68,25 +56,31 @@ export const POST = pipe(
   });
 
   if (!user) {
-    log.warn("Login attempt: user not found", { identifier });
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    log.warn('Login attempt: user not found', { identifier });
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   if (user.disabled) {
-    log.warn("Login attempt: user disabled", { userId: user.id });
-    return NextResponse.json({ error: "Account is disabled" }, { status: 403 });
+    log.warn('Login attempt: user disabled', { userId: user.id });
+    return NextResponse.json({ error: 'Account is disabled' }, { status: 403 });
   }
 
-  if (
-    !user.passwordHash ||
-    !(await verifyPassword(password, user.passwordHash))
-  ) {
-    log.warn("Login attempt: invalid password", { userId: user.id });
-    return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  if (!user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
+    log.warn('Login attempt: invalid password', { userId: user.id });
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   const signed = signCookieValue(user.id);
-  log.info("User logged in successfully", { userId: user.id });
+  log.info('User logged in successfully', { userId: user.id });
+
+  // Funnel: FIRST_LOGIN (non-blocking, with deduplication)
+  (async () => {
+    const { hasStage, recordStageTransition } = await import('@/lib/funnel');
+    if (await hasStage({ userId: user.id }, 'FIRST_LOGIN')) return;
+    await recordStageTransition({ userId: user.id }, 'FIRST_LOGIN', {
+      source: 'password_login',
+    });
+  })().catch(() => {});
 
   const responseData: Record<string, unknown> = {
     user: {
@@ -107,19 +101,19 @@ export const POST = pipe(
   // Server-side auth cookie (httpOnly, signed)
   response.cookies.set(AUTH_COOKIE_NAME, signed.signed, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60,
-    path: "/",
+    path: '/',
   });
 
   // Client-readable cookie (for client-side userId access)
   response.cookies.set(AUTH_COOKIE_CLIENT, user.id, {
     httpOnly: false,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60,
-    path: "/",
+    path: '/',
   });
 
   return response;

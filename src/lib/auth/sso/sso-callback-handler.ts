@@ -96,6 +96,15 @@ export async function handleSSOCallback(
     role: 'USER',
   });
 
+  // Funnel: FIRST_LOGIN for SSO new user (non-blocking)
+  import('@/lib/funnel')
+    .then(({ recordStageTransition }) => {
+      recordStageTransition({ userId: newUser.id }, 'FIRST_LOGIN', {
+        source: `sso_${provider}`,
+      }).catch(() => {});
+    })
+    .catch(() => {});
+
   return {
     userId: newUser.id,
     isNewUser: true,

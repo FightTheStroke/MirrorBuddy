@@ -371,6 +371,18 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     log.warn('Failed to collect behavioral metrics', { error: String(err) });
   }
 
+  // 6. Batch funnel event recording (ACTIVE + CHURNED)
+  try {
+    const { processBatchFunnelEvents } = await import('@/lib/funnel/batch-funnel');
+    const batchResult = await processBatchFunnelEvents();
+    log.debug('Batch funnel events processed', batchResult);
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'batch-funnel' },
+    });
+    log.warn('Failed to process batch funnel events', { error: String(err) });
+  }
+
   return samples;
 }
 

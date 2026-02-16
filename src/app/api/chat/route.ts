@@ -61,6 +61,9 @@ import {
 import { incrementTrialBudgetWithPublish } from '@/lib/trial/trial-budget-service';
 import { TOKEN_COST_PER_UNIT } from './stream/helpers';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { recordStageTransition } from '@/lib/funnel';
+import { getVisitorIdFromCookie } from '@/lib/trial/visitor-id';
+import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 
 /**
  * Look up a character's allowed tools array by maestroId.
@@ -146,6 +149,17 @@ export const POST = pipe(
     // Trial limit check for anonymous users (ADR 0056)
     const trialCheck = await checkTrialForAnonymous(!!userId, userId);
     if (!trialCheck.allowed) {
+      // Funnel: LIMIT_HIT for trial chat (non-blocking)
+      const funnelVisitorId = getVisitorIdFromCookie(request);
+      if (funnelVisitorId) {
+        const locale = detectLocaleFromNextRequest(request);
+        recordStageTransition(
+          { visitorId: funnelVisitorId },
+          'LIMIT_HIT',
+          { limitType: 'trial_chat', source: 'chat_api' },
+          locale,
+        ).catch(() => {});
+      }
       const response = NextResponse.json(
         {
           error: 'Trial limit reached',
@@ -202,7 +216,17 @@ export const POST = pipe(
 
     if (userSettings) {
       const budgetError = checkBudgetLimit(userId!, userSettings);
-      if (budgetError) return budgetError;
+      if (budgetError) {
+        // Funnel: LIMIT_HIT for budget (non-blocking)
+        const locale = detectLocaleFromNextRequest(request);
+        recordStageTransition(
+          { userId: userId! },
+          'LIMIT_HIT',
+          { limitType: 'budget', source: 'chat_api' },
+          locale,
+        ).catch(() => {});
+        return budgetError;
+      }
       checkBudgetWarning(userId!, userSettings);
     }
 

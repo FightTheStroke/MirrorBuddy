@@ -32,6 +32,7 @@ export interface ApproveInviteResult {
   success: boolean;
   userId?: string;
   username?: string;
+  visitorId?: string;
   error?: string;
 }
 
@@ -239,6 +240,16 @@ export async function approveInviteRequest(
       text: template.text,
     });
 
+    // Look up visitorId from trial session for funnel tracking
+    let visitorId: string | undefined;
+    if (request.trialSessionId) {
+      const trialSession = await prisma.trialSession.findUnique({
+        where: { id: request.trialSessionId },
+        select: { visitorId: true },
+      });
+      visitorId = trialSession?.visitorId;
+    }
+
     logger.info('Invite approved', {
       requestId,
       userId: result.id,
@@ -246,7 +257,7 @@ export async function approveInviteRequest(
       adminUserId,
     });
 
-    return { success: true, userId: result.id, username };
+    return { success: true, userId: result.id, username, visitorId };
   } catch (error) {
     logger.error('Failed to approve invite', { requestId }, error as Error);
     return {
