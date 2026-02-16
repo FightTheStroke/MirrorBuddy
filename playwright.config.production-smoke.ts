@@ -8,6 +8,18 @@
  *   npm run test:smoke:prod
  *   npm run test:smoke:prod -- --headed   # watch in browser
  *   PROD_URL=https://mirrorbuddy.org npx playwright test --config playwright.config.production-smoke.ts
+ *
+ * Admin tests (54 tests):
+ *   Without ADMIN_READONLY_COOKIE_VALUE, admin panel tests are SKIPPED.
+ *   Set it from .env to run full coverage:
+ *
+ *   ADMIN_READONLY_COOKIE_VALUE="<value-from-.env>" \
+ *   PROD_URL=https://mirrorbuddy.org \
+ *   npx playwright test --config playwright.config.production-smoke.ts
+ *
+ *   The value is a signed cookie (HMAC-SHA256) for the read-only admin user.
+ *   See .env line ADMIN_READONLY_COOKIE_VALUE for the current production value.
+ *   Without it: ~193 tests run, ~57 skipped. With it: ~247 tests run, ~3 skipped.
  */
 
 import { defineConfig, devices } from '@playwright/test';
