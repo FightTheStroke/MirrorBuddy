@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { ApiError } from '@/lib/api/pipe';
+import { setSentryTierContext } from '@/lib/observability/sentry-tier-context';
 import type { Middleware } from './types';
 
 /**
@@ -25,6 +26,15 @@ export function withSentry(routeName: string): Middleware {
       // Re-throw so pipe() keeps contract and response mapping.
       if (error instanceof ApiError) {
         throw error;
+      }
+
+      // Enrich Sentry context with tier info (only on errors, no overhead on success)
+      if (ctx.userId) {
+        try {
+          await setSentryTierContext(ctx.userId);
+        } catch {
+          // Ignore - don't block error handling
+        }
       }
 
       // Unknown error: emit once through structured logger/Sentry bridge

@@ -78,15 +78,29 @@ async function getRevenueMetrics(): Promise<RevenueMetrics> {
   const arpu = totalActive > 0 ? mrr / totalActive : 0;
   const avgLTV = churnRate > 0 ? Math.round((arpu / (churnRate / 100)) * 100) / 100 : arpu * 12;
 
-  // Revenue by country (from user locale/metadata if available)
-  // Simplified: aggregate from audit logs or user metadata
-  const revenueByCountry = [
-    { country: 'IT', revenue: mrr * 0.4 },
-    { country: 'FR', revenue: mrr * 0.2 },
-    { country: 'DE', revenue: mrr * 0.15 },
-    { country: 'ES', revenue: mrr * 0.15 },
-    { country: 'Other', revenue: mrr * 0.1 },
-  ];
+  // Revenue by country from actual subscription + user language data
+  const revenueByLocale = await prisma.$queryRaw<Array<{ language: string; revenue: number }>>`
+    SELECT COALESCE(s.language, 'it') as language,
+           COALESCE(SUM(CAST(td."monthlyPriceEur" AS DECIMAL)), 0) as revenue
+    FROM "UserSubscription" us
+    JOIN "TierDefinition" td ON us."tierId" = td.id
+    LEFT JOIN "Settings" s ON us."userId" = s."userId"
+    WHERE us.status = 'ACTIVE'
+    GROUP BY COALESCE(s.language, 'it')
+    ORDER BY revenue DESC
+  `;
+
+  const localeToCountry: Record<string, string> = {
+    it: 'IT',
+    en: 'GB',
+    fr: 'FR',
+    de: 'DE',
+    es: 'ES',
+  };
+  const revenueByCountry = revenueByLocale.map((r) => ({
+    country: localeToCountry[r.language] || 'Other',
+    revenue: Number(r.revenue),
+  }));
 
   // Monthly trend (last 6 months)
   const monthlyTrend: { month: string; mrr: number; subscribers: number }[] = [];
