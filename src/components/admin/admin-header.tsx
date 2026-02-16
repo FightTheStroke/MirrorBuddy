@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { ChevronRight, Menu, Bell, UserPlus, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { TierSimulator } from "./tier-simulator";
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { ChevronRight, Menu, Bell, UserPlus, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { TierSimulator } from './tier-simulator';
 
 interface AdminHeaderProps {
   onMenuClick?: () => void;
@@ -21,23 +21,25 @@ export function AdminHeader({
   pendingInvites = 0,
   systemAlerts = 0,
 }: AdminHeaderProps) {
-  const t = useTranslations("admin");
+  const t = useTranslations('admin');
   const pathname = usePathname();
 
   const SECTION_TITLES: Record<string, string> = {
-    "/admin": t("dashboardTitle"),
-    "/admin/invites": t("betaRequests"),
-    "/admin/users": t("sidebar.users"),
-    "/admin/analytics": t("sidebar.analytics"),
-    "/admin/tos": t("terms"),
-    "/admin/settings": t("sidebar.settings"),
+    '/admin': t('dashboardTitle'),
+    '/admin/invites': t('betaRequests'),
+    '/admin/users': t('sidebar.users'),
+    '/admin/analytics': t('sidebar.analytics'),
+    '/admin/tos': t('terms'),
+    '/admin/settings': t('sidebar.settings'),
+    '/admin/research': t('research.title'),
+    '/admin/research/model-comparison': t('modelComparison.title'),
   };
 
   const getBreadcrumbs = () => {
-    const parts = pathname.split("/").filter(Boolean);
+    const parts = pathname.split('/').filter(Boolean);
     const breadcrumbs: { label: string; href: string }[] = [];
 
-    let currentPath = "";
+    let currentPath = '';
     for (const part of parts) {
       currentPath += `/${part}`;
       const label = SECTION_TITLES[currentPath] || part;
@@ -48,13 +50,13 @@ export function AdminHeader({
   };
 
   const breadcrumbs = getBreadcrumbs();
-  const currentTitle = SECTION_TITLES[pathname] || "Admin";
+  const currentTitle = SECTION_TITLES[pathname] || 'Admin';
 
   return (
     <header
       className={cn(
-        "h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800",
-        "flex items-center justify-between px-3 sm:px-4 sticky top-0 z-30",
+        'h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800',
+        'flex items-center justify-between px-3 sm:px-4 sticky top-0 z-30',
       )}
     >
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
@@ -64,19 +66,17 @@ export function AdminHeader({
           size="icon"
           onClick={onMenuClick}
           className="lg:hidden text-slate-500 h-11 w-11 shrink-0"
-          aria-label={t("toggleMenu")}
+          aria-label={t('toggleMenu')}
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         {/* Breadcrumb */}
-        <nav aria-label={t("breadcrumb")} className="hidden sm:block min-w-0">
+        <nav aria-label={t('breadcrumb')} className="hidden sm:block min-w-0">
           <ol className="flex items-center gap-1 text-sm">
             {breadcrumbs.map((crumb, index) => (
               <li key={crumb.href} className="flex items-center gap-1 min-w-0">
-                {index > 0 && (
-                  <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
-                )}
+                {index > 0 && <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />}
                 {index === breadcrumbs.length - 1 ? (
                   <span className="font-medium text-slate-900 dark:text-white truncate">
                     {crumb.label}
@@ -105,15 +105,13 @@ export function AdminHeader({
         {/* Cmd+K search trigger */}
         <button
           onClick={() => {
-            document.dispatchEvent(
-              new KeyboardEvent("keydown", { key: "k", metaKey: true }),
-            );
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
           }}
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors text-sm"
-          aria-label={t("openCommandPaletteCmdK")}
+          aria-label={t('openCommandPaletteCmdK')}
         >
           <Search className="h-4 w-4" />
-          <span className="hidden md:inline">{t("search")}</span>
+          <span className="hidden md:inline">{t('search')}</span>
           <kbd className="hidden md:inline-flex items-center gap-0.5 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono">
             ⌘K
           </kbd>
@@ -127,11 +125,11 @@ export function AdminHeader({
           <Link
             href="/admin/invites"
             className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-            aria-label={t("pendingBetaRequests", { count: pendingInvites })}
+            aria-label={t('pendingBetaRequests', { count: pendingInvites })}
           >
             <UserPlus className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
-              {pendingInvites > 99 ? "99+" : pendingInvites}
+              {pendingInvites > 99 ? '99+' : pendingInvites}
             </span>
           </Link>
         )}
@@ -141,11 +139,11 @@ export function AdminHeader({
           <Link
             href="/admin"
             className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            aria-label={t("systemAlerts", { count: systemAlerts })}
+            aria-label={t('systemAlerts', { count: systemAlerts })}
           >
             <Bell className="h-4 w-4 text-red-600 dark:text-red-400" />
             <span className="text-xs font-bold text-red-700 dark:text-red-300">
-              {systemAlerts > 99 ? "99+" : systemAlerts}
+              {systemAlerts > 99 ? '99+' : systemAlerts}
             </span>
           </Link>
         )}
