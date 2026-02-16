@@ -66,6 +66,22 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
 
     await createTrialSession();
 
+    // Save trial email if provided via TrialEmailForm
+    const trialEmail =
+      typeof window !== 'undefined' ? sessionStorage.getItem('mirrorbuddy-trial-email') : null;
+    if (trialEmail) {
+      try {
+        await csrfFetch('/api/trial/email', {
+          method: 'PATCH',
+          body: JSON.stringify({ email: trialEmail }),
+        });
+      } catch (error) {
+        logger.warn('[WelcomePage] Failed to save trial email', {
+          error: String(error),
+        });
+      }
+    }
+
     try {
       const response = await csrfFetch('/api/onboarding', {
         method: 'POST',

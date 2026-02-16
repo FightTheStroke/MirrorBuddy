@@ -53,14 +53,14 @@
         "feature2": "10 Nachrichten/Tag",
         "feature3": "Keine Registrierung",
         "cta": "Kostenlos testen",
-        "emailLabel": "[TRANSLATE] Indirizzo email",
-        "emailPlaceholder": "[TRANSLATE] La tua email per iniziare",
-        "emailInvalid": "[TRANSLATE] Inserisci un indirizzo email valido",
-        "startTrial": "[TRANSLATE] Inizia la prova",
-        "skipEmail": "[TRANSLATE] Continua senza email",
-        "tosLabel": "[TRANSLATE] Accetto la",
-        "privacyLink": "[TRANSLATE] Privacy Policy",
-        "termsLink": "[TRANSLATE] Termini di Servizio"
+        "emailLabel": "E-Mail-Adresse",
+        "emailPlaceholder": "Deine E-Mail zum Starten",
+        "emailInvalid": "Bitte gib eine gültige E-Mail-Adresse ein",
+        "startTrial": "Kostenlos testen",
+        "skipEmail": "Ohne E-Mail fortfahren",
+        "tosLabel": "Ich akzeptiere die",
+        "privacyLink": "Datenschutzrichtlinie",
+        "termsLink": "Nutzungsbedingungen"
       },
       "updateProfile": "Profil aktualisieren",
       "login": "Anmelden"

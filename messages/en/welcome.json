@@ -53,14 +53,14 @@
         "feature2": "10 messages/day",
         "feature3": "No registration",
         "cta": "Try free",
-        "emailLabel": "[TRANSLATE] Indirizzo email",
-        "emailPlaceholder": "[TRANSLATE] La tua email per iniziare",
-        "emailInvalid": "[TRANSLATE] Inserisci un indirizzo email valido",
-        "startTrial": "[TRANSLATE] Inizia la prova",
-        "skipEmail": "[TRANSLATE] Continua senza email",
-        "tosLabel": "[TRANSLATE] Accetto la",
-        "privacyLink": "[TRANSLATE] Privacy Policy",
-        "termsLink": "[TRANSLATE] Termini di Servizio"
+        "emailLabel": "Email address",
+        "emailPlaceholder": "Your email to get started",
+        "emailInvalid": "Please enter a valid email address",
+        "startTrial": "Start free trial",
+        "skipEmail": "Continue without email",
+        "tosLabel": "I accept the",
+        "privacyLink": "Privacy Policy",
+        "termsLink": "Terms of Service"
       },
       "updateProfile": "Update profile",
       "login": "Log in"
