@@ -18,6 +18,11 @@ import { test as base, expect } from '@playwright/test';
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 
 export const test = base.extend({
+  // Clear global storageState so production smoke tests start without auth cookies.
+  // These tests verify unauthenticated behavior — global auth cookies must not leak.
+  storageState: async ({}, use) => {
+    await use({ cookies: [], origins: [] });
+  },
   page: async ({ page, context }, use) => {
     // Force Italian locale so selectors are predictable
     await context.setExtraHTTPHeaders({ 'Accept-Language': 'it-IT,it;q=0.9' });
