@@ -4,9 +4,8 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Sparkles, Mail } from 'lucide-react';
+import { Sparkles, Mail, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { setTrialConsent } from '@/lib/consent/trial-consent';
 import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 
@@ -17,7 +16,7 @@ interface TrialEmailFormProps {
 /**
  * Trial Email Form - collects email + TOS acceptance before starting trial.
  * Sets trial consent cookie and stores email in sessionStorage.
- * Locale-aware version using next-intl Link.
+ * Registers user in funnel as TRIAL_START.
  */
 export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
   const t = useTranslations('welcome.quickStart');
@@ -57,11 +56,6 @@ export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
     }
   };
 
-  const handleSkipEmail = () => {
-    acceptTrialConsent();
-    onComplete();
-  };
-
   return (
     <motion.form
       key="email-form"
@@ -99,27 +93,46 @@ export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
           </p>
         )}
       </div>
-      <div className="flex items-start gap-2">
-        <Checkbox
-          id="trial-tos"
-          checked={tosAccepted}
-          onCheckedChange={(checked) => setTosAccepted(checked === true)}
+
+      {/* Clickable TOS checkbox - entire row is clickable */}
+      <label className="flex items-start gap-2.5 cursor-pointer select-none group">
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={tosAccepted}
           aria-label={t('trial.tosLabel')}
-        />
-        <label
-          htmlFor="trial-tos"
-          className="text-[11px] leading-tight text-slate-500 dark:text-slate-400 cursor-pointer select-none"
+          onClick={(e) => {
+            e.preventDefault();
+            setTosAccepted(!tosAccepted);
+          }}
+          className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded border-2 transition-colors flex items-center justify-center ${
+            tosAccepted
+              ? 'bg-blue-600 border-blue-600'
+              : 'bg-white border-slate-300 dark:border-slate-500 dark:bg-slate-800 group-hover:border-blue-400'
+          }`}
         >
+          {tosAccepted && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />}
+        </button>
+        <span className="text-xs leading-snug text-slate-600 dark:text-slate-400">
           {t('trial.tosLabel')}{' '}
-          <Link href="/privacy" className="text-blue-600 underline dark:text-blue-400">
+          <Link
+            href="/privacy"
+            className="text-blue-600 underline dark:text-blue-400"
+            onClick={(e) => e.stopPropagation()}
+          >
             {t('trial.privacyLink')}
           </Link>
           {' · '}
-          <Link href="/terms" className="text-blue-600 underline dark:text-blue-400">
+          <Link
+            href="/terms"
+            className="text-blue-600 underline dark:text-blue-400"
+            onClick={(e) => e.stopPropagation()}
+          >
             {t('trial.termsLink')}
           </Link>
-        </label>
-      </div>
+        </span>
+      </label>
+
       <Button
         type="submit"
         size="lg"
@@ -129,13 +142,6 @@ export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
         <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
         {t('trial.startTrial')}
       </Button>
-      <button
-        type="button"
-        onClick={handleSkipEmail}
-        className="w-full text-center text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
-      >
-        {t('trial.skipEmail')}
-      </button>
     </motion.form>
   );
 }

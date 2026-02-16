@@ -139,7 +139,7 @@
       "loading": "Caricamento...",
       "titleWelcome": "Benvenuto su MirrorBuddy",
       "subtitleWelcome": "Prima di iniziare, accetta i nostri termini",
-      "bannerDescription": "Utilizziamo cookie essenziali per il funzionamento e analytics opzionali.",
+      "bannerDescription": "Noi (mirrorbuddy.org) utilizziamo cookie e tecnologie simili per finalità tecniche e, con il tuo consenso, anche per finalità di analisi, come specificato nella",
       "titleUpdated": "Termini Aggiornati",
       "subtitleUpdated": "I nostri termini sono stati aggiornati",
       "reconsentNotice": {
@@ -174,14 +174,23 @@
         "description": "Aiutaci a migliorare l'app (anonimo)"
       },
       "buttons": {
-        "disabled": "Accetta i termini per continuare",
+        "disabled": "Accetta per continuare",
         "accept": "Accetta e Continua",
-        "submitting": "Salvataggio..."
+        "submitting": "Salvataggio...",
+        "learnMore": "Scopri di più",
+        "rejectAll": "Rifiuta tutto",
+        "acceptAll": "Accetta tutto"
       },
       "coppa": "Se hai meno di 13 anni, è necessario il consenso dei genitori",
       "screenReader": {
         "required": "È necessario accettare i Termini di Servizio per continuare",
         "submitting": "Salvataggio del consenso in corso..."
+      },
+      "bannerTitle": "Informativa",
+      "bannerRights": "Puoi liberamente prestare, rifiutare o revocare il tuo consenso, in qualsiasi momento. Usa il pulsante \"Accetta tutto\" per acconsentire. Usa il pulsante \"Rifiuta tutto\" per continuare senza accettare.",
+      "categories": {
+        "essential": "Necessari",
+        "analytics": "Analytics (opzionale)"
       }
     }
   }

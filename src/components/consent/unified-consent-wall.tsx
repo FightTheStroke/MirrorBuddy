@@ -1,67 +1,53 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useSyncExternalStore, useCallback } from "react";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { clientLogger } from "@/lib/logger/client";
+import { useState, useEffect, useSyncExternalStore, useCallback } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { clientLogger } from '@/lib/logger/client';
+import { ConsentToggle } from './consent-toggle';
 import {
   saveUnifiedConsent,
   syncUnifiedConsentToServer,
   needsReconsent,
   initializeConsent,
   markConsentLoaded,
-} from "@/lib/consent/unified-consent-storage";
+} from '@/lib/consent/unified-consent-storage';
 import {
   subscribeToConsent,
   getConsentSnapshot,
   getServerConsentSnapshot,
   updateConsentSnapshot,
-} from "@/lib/consent/consent-store";
+} from '@/lib/consent/consent-store';
 
 interface UnifiedConsentWallProps {
   children: React.ReactNode;
 }
 
 /**
- * Unified Consent Wall - Slim Bottom Banner (TOS + Cookie consent)
+ * Unified Consent Wall - Prominent Bottom Banner (GDPR/COPPA)
  *
- * Single-step acceptance:
- * - Terms of Service (required)
- * - Essential cookies (required)
- * - Analytics cookies (optional, inline toggle)
- *
- * Design:
- * - Fixed bottom banner (not fullscreen modal)
- * - Compact, minimal friction
- * - Slide-up animation (respects prefers-reduced-motion)
- * - Links open in new tab
- *
- * GDPR/COPPA compliant.
+ * Large, always-visible banner until user accepts or rejects.
+ * Cookie categories with toggles, "Reject All" / "Accept All" buttons.
+ * Compliant with EU GDPR, Italian Garante, CNIL, TTDSG, ICO guidelines.
  */
 export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
-  const t = useTranslations("consent.unified");
+  const t = useTranslations('consent.unified');
 
-  // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(
     subscribeToConsent,
     getConsentSnapshot,
     getServerConsentSnapshot,
   );
 
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Check if this is a re-consent scenario
   const isReconsent = needsReconsent();
 
-  // Initialize consent from DB on mount
   useEffect(() => {
     let mounted = true;
-
     const loadConsent = async () => {
       try {
         const hasConsent = await initializeConsent();
@@ -69,15 +55,12 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           updateConsentSnapshot(hasConsent);
           markConsentLoaded();
           setIsLoading(false);
-          // Show banner with animation if consent needed
-          if (!hasConsent || isReconsent) {
-            setIsVisible(true);
-          }
+          if (!hasConsent || isReconsent) setIsVisible(true);
         }
       } catch (error) {
         clientLogger.error(
-          "Failed to initialize consent",
-          { component: "UnifiedConsentWall" },
+          'Failed to initialize consent',
+          { component: 'UnifiedConsentWall' },
           error,
         );
         if (mounted) {
@@ -86,166 +69,148 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
         }
       }
     };
-
     loadConsent();
-
     return () => {
       mounted = false;
     };
   }, [isReconsent]);
 
-  const handleAccept = useCallback(async () => {
+  const saveConsent = useCallback(async (analytics: boolean) => {
     setIsSubmitting(true);
     try {
-      // Save to localStorage
-      const consent = saveUnifiedConsent(analyticsEnabled);
-
-      // Sync to server (best effort)
+      const consent = saveUnifiedConsent(analytics);
       await syncUnifiedConsentToServer(consent);
-
-      // Update external store and notify subscribers
       updateConsentSnapshot(true);
-
-      // Hide banner
       setIsVisible(false);
     } catch (error) {
-      clientLogger.error(
-        "Failed to save consent",
-        { component: "UnifiedConsentWall" },
-        error,
-      );
-      // Still proceed - localStorage is primary
+      clientLogger.error('Failed to save consent', { component: 'UnifiedConsentWall' }, error);
       updateConsentSnapshot(true);
       setIsVisible(false);
     } finally {
       setIsSubmitting(false);
     }
-  }, [analyticsEnabled]);
+  }, []);
 
-  // User has consented and doesn't need re-consent, show app
-  if (consented && !isReconsent) {
-    return <>{children}</>;
-  }
+  const handleAcceptAll = useCallback(() => saveConsent(true), [saveConsent]);
+  const handleRejectAll = useCallback(() => saveConsent(false), [saveConsent]);
 
-  // Detect prefers-reduced-motion
+  if (consented && !isReconsent) return <>{children}</>;
+
   const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Show consent banner (slim bottom banner)
   return (
     <>
       {children}
-      {/* Slim bottom consent banner */}
       {(isLoading || isVisible) && (
-        <div
-          data-testid="consent-banner"
-          className={`fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 shadow-lg transition-transform duration-300 ${
-            prefersReducedMotion ? "" : "ease-out"
-          } ${isLoading ? "translate-y-0 opacity-50" : isVisible ? "translate-y-0" : "translate-y-full"}`}
-          role="dialog"
-          aria-labelledby="consent-banner-title"
-          aria-describedby="consent-banner-description"
-        >
-          <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center gap-3">
-                <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                <p className="text-sm text-slate-600 dark:text-slate-400">
-                  {t("loading")}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-                {/* Brief text */}
-                <div className="flex-1 min-w-0">
-                  <p
-                    id="consent-banner-title"
-                    className="text-sm font-medium text-slate-900 dark:text-white"
-                  >
-                    {isReconsent ? t("titleUpdated") : t("titleWelcome")}
-                  </p>
-                  <p
-                    id="consent-banner-description"
-                    className="text-xs text-slate-600 dark:text-slate-400 mt-0.5"
-                  >
-                    {t("bannerDescription")}{" "}
-                    <Link
-                      href="/privacy"
-                      target="_blank"
-                      rel="noopener"
-                      className="inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {t("links.privacy")}
-                      <ExternalLink className="w-3 h-3 inline" />
-                    </Link>
-                    {" • "}
-                    <Link
-                      href="/terms"
-                      target="_blank"
-                      rel="noopener"
-                      className="inline-flex items-center gap-0.5 text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {t("links.full")}
-                      <ExternalLink className="w-3 h-3 inline" />
-                    </Link>
-                  </p>
-                </div>
-
-                {/* Analytics toggle (compact inline) */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <label
-                    htmlFor="analytics-toggle"
-                    className="text-xs text-slate-700 dark:text-slate-300 cursor-pointer"
-                  >
-                    {t("analytics.label")}
-                  </label>
-                  <button
-                    id="analytics-toggle"
-                    type="button"
-                    role="switch"
-                    aria-checked={analyticsEnabled}
-                    aria-label={t("analytics.label")}
-                    onClick={() => setAnalyticsEnabled(!analyticsEnabled)}
-                    disabled={isSubmitting}
-                    className={`relative w-9 h-5 rounded-full transition-colors ${
-                      analyticsEnabled
-                        ? "bg-blue-600"
-                        : "bg-slate-300 dark:bg-slate-600"
-                    } ${isSubmitting ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                  >
-                    <span
-                      className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                        analyticsEnabled ? "translate-x-4" : ""
-                      }`}
-                    />
-                  </button>
-                </div>
-
-                {/* Single accept button */}
-                <Button
-                  onClick={handleAccept}
-                  disabled={isSubmitting}
-                  size="sm"
-                  className="shrink-0"
-                  aria-label={t("buttons.accept")}
-                >
-                  {isSubmitting ? t("buttons.submitting") : t("buttons.accept")}
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Screen reader announcement */}
+        <>
+          {/* Backdrop overlay */}
+          <div className="fixed inset-0 z-40 bg-black/40" aria-hidden="true" />
+          {/* Banner */}
           <div
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-            className="sr-only"
+            data-testid="consent-banner"
+            className={`fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900
+              border-t border-slate-200 dark:border-slate-700
+              shadow-2xl transition-transform duration-500
+              ${prefersReducedMotion ? '' : 'ease-out'}
+              ${isLoading ? 'translate-y-0 opacity-60' : isVisible ? 'translate-y-0' : 'translate-y-full'}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="consent-banner-title"
+            aria-describedby="consent-banner-desc"
           >
-            {isSubmitting && t("screenReader.submitting")}
+            <div className="max-w-4xl mx-auto px-6 py-6 sm:py-8">
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-3 py-4">
+                  <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{t('loading')}</p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {/* Title */}
+                  <h2
+                    id="consent-banner-title"
+                    className="text-lg font-bold text-slate-900 dark:text-white"
+                  >
+                    {isReconsent ? t('titleUpdated') : t('bannerTitle')}
+                  </h2>
+
+                  {/* Description */}
+                  <p
+                    id="consent-banner-desc"
+                    className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"
+                  >
+                    {t('bannerDescription')}{' '}
+                    <Link
+                      href="/cookies"
+                      target="_blank"
+                      rel="noopener"
+                      className="text-blue-600 dark:text-blue-400 underline hover:no-underline font-medium"
+                    >
+                      {t('links.cookies')}
+                    </Link>
+                    .
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{t('bannerRights')}</p>
+
+                  {/* Cookie category toggles */}
+                  <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                    <ConsentToggle
+                      label={t('categories.essential')}
+                      enabled={true}
+                      locked
+                      disabled={isSubmitting}
+                    />
+                    <ConsentToggle
+                      label={t('categories.analytics')}
+                      enabled={analyticsEnabled}
+                      onChange={() => setAnalyticsEnabled(!analyticsEnabled)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  {/* Action buttons */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                    <Link
+                      href="/cookies"
+                      target="_blank"
+                      rel="noopener"
+                      className="px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300
+                        bg-slate-100 dark:bg-slate-800 rounded-full
+                        hover:bg-slate-200 dark:hover:bg-slate-700
+                        transition-colors text-center"
+                    >
+                      {t('buttons.learnMore')}
+                    </Link>
+                    <div className="flex-1" />
+                    <button
+                      onClick={handleRejectAll}
+                      disabled={isSubmitting}
+                      className="px-6 py-2.5 text-sm font-semibold text-white
+                        bg-blue-600 hover:bg-blue-700 rounded-full
+                        transition-colors disabled:opacity-50 text-center"
+                    >
+                      {t('buttons.rejectAll')}
+                    </button>
+                    <button
+                      onClick={handleAcceptAll}
+                      disabled={isSubmitting}
+                      className="px-6 py-2.5 text-sm font-semibold text-white
+                        bg-blue-600 hover:bg-blue-700 rounded-full
+                        transition-colors disabled:opacity-50 text-center"
+                    >
+                      {t('buttons.acceptAll')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+              {isSubmitting && t('screenReader.submitting')}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

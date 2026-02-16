@@ -139,7 +139,7 @@
       "loading": "Loading...",
       "titleWelcome": "Welcome to MirrorBuddy",
       "subtitleWelcome": "Before you start, accept our terms",
-      "bannerDescription": "[TRANSLATE] Utilizziamo cookie essenziali per il funzionamento e analytics opzionali.",
+      "bannerDescription": "We (mirrorbuddy.org) use cookies and similar technologies for technical purposes and, with your consent, for analytics purposes, as specified in our",
       "titleUpdated": "Updated Terms",
       "subtitleUpdated": "Our terms have been updated",
       "reconsentNotice": {
@@ -176,12 +176,21 @@
       "buttons": {
         "disabled": "Accept the terms to continue",
         "accept": "Accept and Continue",
-        "submitting": "Saving..."
+        "submitting": "Saving...",
+        "learnMore": "Learn more",
+        "rejectAll": "Reject all",
+        "acceptAll": "Accept all"
       },
       "coppa": "If you are under 13, parental consent is required",
       "screenReader": {
         "required": "You must accept the Terms of Service to continue",
         "submitting": "Consent saving in progress..."
+      },
+      "bannerTitle": "Cookie Notice",
+      "bannerRights": "You can freely give, refuse or withdraw your consent at any time. Use the \"Accept all\" button to consent. Use the \"Reject all\" button to continue without accepting.",
+      "categories": {
+        "essential": "Essential",
+        "analytics": "Analytics (optional)"
       }
     }
   }
