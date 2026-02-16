@@ -176,4 +176,17 @@ export const test = base.extend({
   },
 });
 
+/**
+ * Open the mobile sidebar hamburger menu if present.
+ * On desktop viewports the sidebar is always visible, so this is a no-op.
+ */
+export async function openMobileMenu(page: import('@playwright/test').Page) {
+  const menuButton = page.getByRole('button', { name: /Apri menu/i }).first();
+  if (await menuButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await menuButton.click();
+    // Wait for sidebar animation
+    await page.waitForTimeout(300);
+  }
+}
+
 export { expect };

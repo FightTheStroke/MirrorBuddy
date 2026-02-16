@@ -6,7 +6,7 @@
  * Read-only, no data mutations.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect, openMobileMenu } from './fixtures';
 
 test.describe('PROD-SMOKE: Welcome & Trial Dashboard', () => {
   test('Trial dashboard loads with professors heading', async ({ page }) => {
@@ -50,17 +50,25 @@ test.describe('PROD-SMOKE: Welcome & Trial Dashboard', () => {
     await expect(nav.getByRole('button', { name: /Mario/i })).toBeVisible();
   });
 
-  test('Trial mode shows correct limits', async ({ page }) => {
+  test('Trial mode shows correct limits', async ({ page, isMobile }) => {
     await page.goto('/it');
+    await openMobileMenu(page);
 
-    // Trial banner
+    // Trial text is always visible in sidebar
     await expect(page.getByText(/versione di prova/i)).toBeVisible();
-    await expect(page.getByTestId('trial-badge')).toBeVisible();
+    // Trial badge is only in desktop header
+    if (!isMobile) {
+      await expect(page.getByTestId('trial-badge')).toBeVisible();
+    }
   });
 
-  test('Login and request access links visible', async ({ page }) => {
+  test('Login and request access links visible', async ({ page, isMobile }) => {
     await page.goto('/it');
-    await expect(page.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /Richiedi Accesso/i })).toBeVisible();
+    await openMobileMenu(page);
+    // On mobile, "Accedi" link may not be in sidebar — but "Richiedi accesso" is always visible
+    if (!isMobile) {
+      await expect(page.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
+    }
+    await expect(page.getByRole('button', { name: /Richiedi accesso/i }).first()).toBeVisible();
   });
 });

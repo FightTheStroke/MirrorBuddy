@@ -6,7 +6,7 @@
  * trial quota. Read-only, no data mutations.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect, openMobileMenu } from './fixtures';
 
 test.describe('PROD-SMOKE: Chat & AI', () => {
   test.beforeEach(async ({ page }) => {
@@ -37,13 +37,13 @@ test.describe('PROD-SMOKE: Chat & AI', () => {
   });
 
   test('Voice panel shows for professor', async ({ page }) => {
+    await openMobileMenu(page);
     await page.getByRole('button', { name: /Studia con Euclide/i }).click();
 
-    const voicePanel = page.getByRole('complementary');
-    await expect(voicePanel.getByRole('heading', { name: 'Euclide' })).toBeVisible();
-
-    // Audio controls exist
-    await expect(voicePanel.getByRole('button', { name: /audio/i }).first()).toBeVisible();
+    // On mobile, professor info is inline (no separate voice panel sidebar)
+    // Verify professor heading and audio button are accessible somewhere on page
+    await expect(page.getByRole('heading', { name: 'Euclide', level: 2 }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Lettura vocale|audio/i }).first()).toBeVisible();
   });
 
   test('Chat close returns to professor list', async ({ page }) => {
