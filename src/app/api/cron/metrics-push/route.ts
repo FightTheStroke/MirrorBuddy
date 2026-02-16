@@ -375,7 +375,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
   try {
     const { processBatchFunnelEvents } = await import('@/lib/funnel/batch-funnel');
     const batchResult = await processBatchFunnelEvents();
-    log.debug('Batch funnel events processed', batchResult);
+    log.debug('Batch funnel events processed', { ...batchResult });
   } catch (err) {
     Sentry.captureException(err, {
       tags: { cron: 'metrics-push', section: 'batch-funnel' },
