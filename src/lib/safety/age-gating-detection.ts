@@ -20,57 +20,17 @@ export function detectTopics(text: string): ContentTopic[] {
   const topicPatterns: Record<ContentTopic, RegExp[]> = {
     basic_education: [/matematic/i, /lettura/i, /scrittura/i, /scienz/i],
     history_war: [/guerra/i, /battaglia/i, /conflitto/i, /world war/i],
-    history_violence: [
-      /olocausto/i,
-      /holocaust/i,
-      /schiavitù/i,
-      /slavery/i,
-      /genocid/i,
-    ],
-    biology_reproduction: [
-      /riproduzione/i,
-      /pubertà/i,
-      /sesso biologico/i,
-      /mestruazion/i,
-    ],
-    health_mental: [
-      /ansia/i,
-      /depression/i,
-      /salute mentale/i,
-      /disturb/i,
-    ],
+    history_violence: [/olocausto/i, /holocaust/i, /schiavitù/i, /slavery/i, /genocid/i],
+    biology_reproduction: [/riproduzione/i, /pubertà/i, /sesso biologico/i, /mestruazion/i],
+    health_mental: [/ansia/i, /depression/i, /salute mentale/i, /disturb/i],
     health_physical: [/malatti/i, /igiene/i, /nutrizione/i, /esercizio/i],
-    social_relationships: [
-      /amicizi/i,
-      /compagni/i,
-      /litig/i,
-      /bullismo/i,
-    ],
-    social_romance: [
-      /fidanzat/i,
-      /innamorat/i,
-      /ragazzo\/a/i,
-      /relazione amorosa/i,
-    ],
+    health_substances: [/drog[ah]/i, /alcol/i, /tabacco/i, /fumare/i, /stupefacent/i, /sostanz/i],
+    social_relationships: [/amicizi/i, /compagni/i, /litig/i, /bullismo/i],
+    social_romance: [/fidanzat/i, /innamorat/i, /ragazzo\/a/i, /relazione amorosa/i],
     current_events: [/notizie/i, /politic/i, /election/i, /attualità/i],
-    philosophy_ethics: [
-      /etica/i,
-      /morale/i,
-      /giusto o sbagliato/i,
-      /dilemma/i,
-    ],
-    literature_mature: [
-      /romanzo adulto/i,
-      /temi maturi/i,
-      /contenuti per adulti/i,
-    ],
-    economics_finance: [
-      /economia/i,
-      /soldi/i,
-      /finanza/i,
-      /risparmio/i,
-      /investiment/i,
-    ],
+    philosophy_ethics: [/etica/i, /morale/i, /giusto o sbagliato/i, /dilemma/i],
+    literature_mature: [/romanzo adulto/i, /temi maturi/i, /contenuti per adulti/i],
+    economics_finance: [/economia/i, /soldi/i, /finanza/i, /risparmio/i, /investiment/i],
   };
 
   for (const [topic, patterns] of Object.entries(topicPatterns)) {
