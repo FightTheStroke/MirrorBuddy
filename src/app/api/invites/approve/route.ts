@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { approveInviteRequest } from "@/lib/invite/invite-service";
-import { logger } from "@/lib/logger";
-import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { approveInviteRequest } from '@/lib/invite/invite-service';
+import { logger } from '@/lib/logger';
+import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
 
 export const revalidate = 0;
 export const POST = pipe(
-  withSentry("/api/invites/approve"),
+  withSentry('/api/invites/approve'),
   withCSRF,
   withAdmin,
 )(async (ctx) => {
@@ -16,10 +15,7 @@ export const POST = pipe(
   const { requestId } = body as { requestId: string };
 
   if (!requestId) {
-    return NextResponse.json(
-      { error: "requestId is required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'requestId is required' }, { status: 400 });
   }
 
   const result = await approveInviteRequest(requestId, userId);
@@ -28,15 +24,30 @@ export const POST = pipe(
     return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  logger.info("Admin approved invite", {
+  logger.info('Admin approved invite', {
     requestId,
     adminId: userId,
     newUserId: result.userId,
   });
 
+  // Funnel: APPROVED (non-blocking)
+  if (result.userId) {
+    import('@/lib/funnel')
+      .then(({ recordStageTransition }) => {
+        const identifier = result.visitorId
+          ? { visitorId: result.visitorId, userId: result.userId! }
+          : { userId: result.userId! };
+        recordStageTransition(identifier, 'APPROVED', {
+          source: 'admin_approval',
+          requestId,
+        }).catch(() => {});
+      })
+      .catch(() => {});
+  }
+
   // Trigger admin counts push (F-06, F-27, F-32: non-blocking, rate-limited per event type)
-  calculateAndPublishAdminCounts("invite").catch((err) =>
-    logger.warn("Failed to publish admin counts on invite approval", {
+  calculateAndPublishAdminCounts('invite').catch((err) =>
+    logger.warn('Failed to publish admin counts on invite approval', {
       error: String(err),
     }),
   );

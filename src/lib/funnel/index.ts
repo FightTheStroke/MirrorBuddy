@@ -15,6 +15,7 @@ interface RecordFunnelEventParams {
   userId?: string;
   stage: FunnelStage;
   fromStage?: FunnelStage;
+  locale?: string;
   metadata?: Record<string, unknown>;
   isTestData?: boolean;
 }
@@ -28,6 +29,7 @@ export async function recordFunnelEvent({
   userId,
   stage,
   fromStage,
+  locale,
   metadata,
   isTestData = false,
 }: RecordFunnelEventParams): Promise<void> {
@@ -47,10 +49,31 @@ export async function recordFunnelEvent({
       userId,
       stage,
       fromStage,
+      locale,
       metadata: metadata as Prisma.InputJsonValue | undefined,
       isTestData: detectedTestData,
     },
   });
+}
+
+/**
+ * Check if a user/visitor already has a specific funnel stage recorded.
+ * Used for deduplication to prevent duplicate stage events.
+ */
+export async function hasStage(
+  identifier: { visitorId?: string; userId?: string },
+  stage: FunnelStage,
+): Promise<boolean> {
+  const where = identifier.userId
+    ? { userId: identifier.userId, stage }
+    : { visitorId: identifier.visitorId, stage };
+
+  const existing = await prisma.funnelEvent.findFirst({
+    where,
+    select: { id: true },
+  });
+
+  return !!existing;
 }
 
 /**
@@ -80,6 +103,7 @@ export async function recordStageTransition(
   identifier: { visitorId?: string; userId?: string },
   toStage: FunnelStage,
   metadata?: Record<string, unknown>,
+  locale?: string,
 ): Promise<void> {
   const fromStage = await getLatestStage(identifier);
 
@@ -88,6 +112,7 @@ export async function recordStageTransition(
     stage: toStage,
     fromStage: fromStage ?? undefined,
     metadata,
+    locale,
   });
 }
 
