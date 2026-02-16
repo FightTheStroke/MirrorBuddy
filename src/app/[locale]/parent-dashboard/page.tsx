@@ -5,20 +5,21 @@
  * Related: ADR 0008 (Parent Dashboard GDPR Consent Model), F-05, F-13
  */
 
-import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { validateAuth } from "@/lib/auth/server";
-import { ParentDashboard } from "@/components/profile/parent-dashboard";
-import { ParentDashboardClient } from "./parent-dashboard-client";
-import type { StudentInsights } from "@/types";
+import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
+import { validateAuth } from '@/lib/auth/server';
+import { ParentDashboard } from '@/components/profile/parent-dashboard';
+import { ParentDashboardClient } from './parent-dashboard-client';
+import { CrisisAlertSection } from '@/components/profile/parent-dashboard/crisis-alert-section';
+import type { StudentInsights } from '@/types';
 
 // Force dynamic rendering (this page requires authentication and real-time data)
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "Dashboard Genitori | MirrorBuddy",
-  description: "Visualizza i progressi e gli insights del tuo studente",
+  title: 'Dashboard Genitori | MirrorBuddy',
+  description: 'Visualizza i progressi e gli insights del tuo studente',
 };
 
 interface PageProps {
@@ -38,11 +39,11 @@ export default async function ParentDashboardPage({ params }: PageProps) {
 
   // Fetch consent status
   const consentResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/profile/consent?userId=${userId}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/profile/consent?userId=${userId}`,
     {
-      cache: "no-store",
+      cache: 'no-store',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     },
   );
@@ -65,11 +66,11 @@ export default async function ParentDashboardPage({ params }: PageProps) {
 
   // Fetch profile data
   const profileResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/profile`,
+    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/profile`,
     {
-      cache: "no-store",
+      cache: 'no-store',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Cookie: `mirrorbuddy-user-id=${userId}`,
       },
     },
@@ -84,7 +85,9 @@ export default async function ParentDashboardPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 p-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Crisis Alert Section - shown at top if any events exist */}
+        <CrisisAlertSection userId={userId} />
         <ParentDashboard insights={insights} />
       </div>
     </div>
@@ -95,7 +98,7 @@ export default async function ParentDashboardPage({ params }: PageProps) {
  * Error state component
  */
 async function ErrorState({ locale }: { locale: string }) {
-  const t = await getTranslations("education.parentDashboard");
+  const t = await getTranslations('education.parentDashboard');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 p-4 flex items-center justify-center">
@@ -114,16 +117,14 @@ async function ErrorState({ locale }: { locale: string }) {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-          {t("error.title")}
+          {t('error.title')}
         </h2>
-        <p className="text-slate-600 dark:text-slate-400 mb-6">
-          {t("error.message")}
-        </p>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">{t('error.message')}</p>
         <a
           href={`/${locale}`}
           className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
         >
-          {t("error.backHome")}
+          {t('error.backHome')}
         </a>
       </div>
     </div>
@@ -133,33 +134,13 @@ async function ErrorState({ locale }: { locale: string }) {
 /**
  * No profile state - show generate profile button
  */
-function NoProfileState({
-  userId,
-  locale,
-}: {
-  userId: string;
-  locale: string;
-}) {
-  return (
-    <ParentDashboardClient state="no-profile" userId={userId} locale={locale} />
-  );
+function NoProfileState({ userId, locale }: { userId: string; locale: string }) {
+  return <ParentDashboardClient state="no-profile" userId={userId} locale={locale} />;
 }
 
 /**
  * Consent required state - show consent form
  */
-function ConsentRequiredState({
-  userId,
-  locale,
-}: {
-  userId: string;
-  locale: string;
-}) {
-  return (
-    <ParentDashboardClient
-      state="needs-consent"
-      userId={userId}
-      locale={locale}
-    />
-  );
+function ConsentRequiredState({ userId, locale }: { userId: string; locale: string }) {
+  return <ParentDashboardClient state="needs-consent" userId={userId} locale={locale} />;
 }

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Crisis messages now blocked** with CRISIS_RESPONSE containing helpline numbers (was: crisis detection set action='redirect' but endpoint only checked action='block')
+
+### Added
+
+- Safety event persistence to database (SafetyEvent model with category, severity, contentSnippet, locale, metadata)
+- Admin email notification on crisis detection via escalation service
+- Parent/guardian email notification on crisis (when consented via CoppaConsent or Settings.guardianEmail)
+- Parent dashboard crisis alerts section with severity badges, helpline numbers, recommended actions
+- Guardian contact fields (email, phone, name) in user settings for voluntary parent notification
+- Admin safety dashboard with DB-backed events (replaces in-memory buffer)
+- Multilingual crisis parent notification email template (IT/EN/FR/DE/ES)
+- ADR 0157: Crisis Response Protocol
+
 ### Changed
 
 - Azure realtime deployment renamed from `gpt-4o-realtime` to `gpt-realtime` (cosmetic alignment with GA model name, no functional change)

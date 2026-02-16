@@ -1035,7 +1035,24 @@
       "timeOfDayAfternoon": "Pomeriggio",
       "timeOfDayEvening": "Sera",
       "timeOfDayMorning": "Mattina",
-      "progressoObiettivo": "Progresso obiettivo: {progress}%"
+      "progressoObiettivo": "Progresso obiettivo: {progress}%",
+      "crisisAlertTitle": "Alertas de seguridad",
+      "crisisAlertUrgent": "Atención urgente requerida",
+      "crisisAlertDescription": "Sistema de apoyo de crisis activado",
+      "crisisAlertUnreadCount": "{count} evento no leído",
+      "crisisAlertUnreadCountPlural": "{count} eventos no leídos",
+      "crisisAlertViewDetails": "Ver detalles",
+      "crisisAlertMarkViewed": "Marcar como visto",
+      "crisisAlertTimestamp": "Fecha",
+      "crisisAlertSeverity": "Gravedad",
+      "crisisAlertSeverityCritical": "Crítico",
+      "crisisAlertSeverityAlert": "Alerta",
+      "crisisAlertSeverityWarning": "Aviso",
+      "crisisAlertHelplineTitle": "Números de apoyo disponibles 24/7",
+      "crisisAlertRecommendedActionsTitle": "Acciones recomendadas",
+      "crisisAlertNoEvents": "Ningún evento de seguridad registrado",
+      "crisisAlertLoadingError": "Error al cargar los eventos de seguridad",
+      "loading": "Cargando..."
     },
     "aiProviderSettings": {
       "webSearchBraveConfigured": "[TRANSLATE] Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
@@ -1236,6 +1253,21 @@
     "parent": "Parent",
     "student": "Student",
     "areaDedicataGenitori": "- Area dedicata ai genitori per monitorare i progressi.",
-    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente"
+    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente",
+    "guardianContact": {
+      "title": "Contactos Tutor/Padre",
+      "recommendationBanner": "Te recomendamos agregar un contacto de padre o tutor para tu seguridad. En caso de emergencia, el sistema podra contactarlos.",
+      "nameLabel": "Nombre completo",
+      "namePlaceholder": "Nombre del padre o tutor",
+      "emailLabel": "Email",
+      "emailPlaceholder": "email@ejemplo.com",
+      "phoneLabel": "Telefono",
+      "phonePlaceholder": "+34 612 345 678",
+      "save": "Guardar contactos",
+      "saving": "Guardando...",
+      "saved": "Guardado!",
+      "saveError": "Error al guardar los contactos",
+      "privacyNote": "Estos datos se utilizan exclusivamente para notificaciones de seguridad y no se compartiran con terceros."
+    }
   }
 }

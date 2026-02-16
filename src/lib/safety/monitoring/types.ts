@@ -25,6 +25,9 @@ export interface SafetyEvent {
   context?: Record<string, unknown>;
   autoHandled: boolean;
   response?: string;
+  contentSnippet?: string;
+  locale?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SafetyMetrics {
@@ -37,4 +40,3 @@ export interface SafetyMetrics {
   terminatedSessions: number;
   crisisCount: number;
 }
-

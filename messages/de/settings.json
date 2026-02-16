@@ -1035,7 +1035,24 @@
       "timeOfDayAfternoon": "Pomeriggio",
       "timeOfDayEvening": "Sera",
       "timeOfDayMorning": "Mattina",
-      "progressoObiettivo": "Progresso obiettivo: {progress}%"
+      "progressoObiettivo": "Progresso obiettivo: {progress}%",
+      "crisisAlertTitle": "Sicherheitswarnungen",
+      "crisisAlertUrgent": "Dringende Aufmerksamkeit erforderlich",
+      "crisisAlertDescription": "Krisenunterstützungssystem aktiviert",
+      "crisisAlertUnreadCount": "{count} ungelesenes Ereignis",
+      "crisisAlertUnreadCountPlural": "{count} ungelesene Ereignisse",
+      "crisisAlertViewDetails": "Details anzeigen",
+      "crisisAlertMarkViewed": "Als gelesen markieren",
+      "crisisAlertTimestamp": "Datum",
+      "crisisAlertSeverity": "Schweregrad",
+      "crisisAlertSeverityCritical": "Kritisch",
+      "crisisAlertSeverityAlert": "Warnung",
+      "crisisAlertSeverityWarning": "Hinweis",
+      "crisisAlertHelplineTitle": "Hilfenummern rund um die Uhr verfügbar",
+      "crisisAlertRecommendedActionsTitle": "Empfohlene Maßnahmen",
+      "crisisAlertNoEvents": "Keine Sicherheitsereignisse aufgezeichnet",
+      "crisisAlertLoadingError": "Fehler beim Laden der Sicherheitsereignisse",
+      "loading": "Wird geladen..."
     },
     "aiProviderSettings": {
       "webSearchBraveConfigured": "[TRANSLATE] Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
@@ -1236,6 +1253,21 @@
     "parent": "Parent",
     "student": "Student",
     "areaDedicataGenitori": "- Area dedicata ai genitori per monitorare i progressi.",
-    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente"
+    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente",
+    "guardianContact": {
+      "title": "Kontakte Vormund/Elternteil",
+      "recommendationBanner": "Wir empfehlen, einen Eltern- oder Vormundkontakt fuer Ihre Sicherheit hinzuzufuegen. Im Notfall kann das System sie kontaktieren.",
+      "nameLabel": "Vollstaendiger Name",
+      "namePlaceholder": "Name des Elternteils oder Vormunds",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "email@beispiel.de",
+      "phoneLabel": "Telefon",
+      "phonePlaceholder": "+49 151 12345678",
+      "save": "Kontakte speichern",
+      "saving": "Speichern...",
+      "saved": "Gespeichert!",
+      "saveError": "Fehler beim Speichern der Kontakte",
+      "privacyNote": "Diese Daten werden ausschliesslich fuer Sicherheitsbenachrichtigungen verwendet und nicht an Dritte weitergegeben."
+    }
   }
 }

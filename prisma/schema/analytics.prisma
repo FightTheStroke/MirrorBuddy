@@ -56,10 +56,19 @@ model SafetyEvent {
   resolvedAt     DateTime?
   resolution     String?
   timestamp      DateTime  @default(now())
+  // NEW fields for crisis response protocol
+  category       String?
+  sessionId      String?
+  contentSnippet String?
+  locale         String?
+  metadata       Json?
+  parentNotified   Boolean   @default(false)
+  parentNotifiedAt DateTime?
 
   @@index([userId, timestamp])
   @@index([severity, timestamp])
   @@index([timestamp])
+  @@index([category, timestamp])
 }
 
 // ============================================================================

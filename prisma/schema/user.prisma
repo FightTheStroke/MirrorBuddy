@@ -166,6 +166,11 @@ model Settings {
   // Azure Cost Configuration
   azureCostConfig String? // JSON: {token_cost, audio_cost, etc.}
 
+  // Guardian/parent contact (for users >13, optional)
+  guardianEmail String?
+  guardianPhone String?
+  guardianName  String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -1035,7 +1035,24 @@
       "timeOfDayAfternoon": "Pomeriggio",
       "timeOfDayEvening": "Sera",
       "timeOfDayMorning": "Mattina",
-      "progressoObiettivo": "Progresso obiettivo: {progress}%"
+      "progressoObiettivo": "Progresso obiettivo: {progress}%",
+      "crisisAlertTitle": "Alertes de sécurité",
+      "crisisAlertUrgent": "Attention urgente requise",
+      "crisisAlertDescription": "Système de soutien de crise activé",
+      "crisisAlertUnreadCount": "{count} événement non lu",
+      "crisisAlertUnreadCountPlural": "{count} événements non lus",
+      "crisisAlertViewDetails": "Voir les détails",
+      "crisisAlertMarkViewed": "Marquer comme lu",
+      "crisisAlertTimestamp": "Date",
+      "crisisAlertSeverity": "Gravité",
+      "crisisAlertSeverityCritical": "Critique",
+      "crisisAlertSeverityAlert": "Alerte",
+      "crisisAlertSeverityWarning": "Avertissement",
+      "crisisAlertHelplineTitle": "Numéros de soutien disponibles 24h/24",
+      "crisisAlertRecommendedActionsTitle": "Actions recommandées",
+      "crisisAlertNoEvents": "Aucun événement de sécurité enregistré",
+      "crisisAlertLoadingError": "Erreur lors du chargement des événements de sécurité",
+      "loading": "Chargement..."
     },
     "aiProviderSettings": {
       "webSearchBraveConfigured": "[TRANSLATE] Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
@@ -1236,6 +1253,21 @@
     "parent": "Parent",
     "student": "Student",
     "areaDedicataGenitori": "- Area dedicata ai genitori per monitorare i progressi.",
-    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente"
+    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente",
+    "guardianContact": {
+      "title": "Contacts Tuteur/Parent",
+      "recommendationBanner": "Nous vous recommandons d'ajouter un contact parent ou tuteur pour votre securite. En cas d'urgence, le systeme pourra les contacter.",
+      "nameLabel": "Nom complet",
+      "namePlaceholder": "Nom du parent ou tuteur",
+      "emailLabel": "Email",
+      "emailPlaceholder": "email@exemple.fr",
+      "phoneLabel": "Telephone",
+      "phonePlaceholder": "+33 6 12 34 56 78",
+      "save": "Enregistrer les contacts",
+      "saving": "Enregistrement...",
+      "saved": "Enregistre !",
+      "saveError": "Erreur lors de l'enregistrement des contacts",
+      "privacyNote": "Ces donnees sont utilisees exclusivement pour les notifications de securite et ne seront pas partagees avec des tiers."
+    }
   }
 }
