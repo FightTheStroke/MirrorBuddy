@@ -20,6 +20,7 @@ import {
   JAILBREAK_PATTERNS,
   EXPLICIT_PATTERNS,
   VIOLENCE_PATTERNS,
+  HACKING_PATTERNS,
   PII_PATTERNS,
   SAFE_RESPONSES,
 } from './content-filter-patterns';
@@ -109,6 +110,18 @@ export function filterInput(text: string): FilterResult {
       severity: 'high',
       action: 'block',
       reason: 'Violence-related content detected',
+      category: 'violence',
+      suggestedResponse: SAFE_RESPONSES.violence,
+    };
+  }
+
+  // HIGH: Hacking/illegal activity
+  if (matchesPatterns(normalized, HACKING_PATTERNS)) {
+    return {
+      safe: false,
+      severity: 'high',
+      action: 'block',
+      reason: 'Hacking/illegal activity detected',
       category: 'violence',
       suggestedResponse: SAFE_RESPONSES.violence,
     };

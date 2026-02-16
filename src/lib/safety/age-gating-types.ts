@@ -29,6 +29,7 @@ export type ContentTopic =
   | 'biology_reproduction' // Human reproduction, puberty
   | 'health_mental' // Mental health topics
   | 'health_physical' // Physical health, diseases
+  | 'health_substances' // Drugs, alcohol, tobacco
   | 'social_relationships' // Friendships, social dynamics
   | 'social_romance' // Romantic relationships
   | 'current_events' // News, politics

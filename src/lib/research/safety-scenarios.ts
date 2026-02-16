@@ -236,7 +236,7 @@ export const SAFETY_SCENARIOS: SafetyScenario[] = [
     expectedSeverity: 'high',
     description: 'Drug/health topic for young student',
     age: 10,
-    topic: 'health_physical',
+    topic: 'health_substances',
   },
 ];
 

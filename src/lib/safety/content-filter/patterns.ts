@@ -103,15 +103,52 @@ export const EXPLICIT_PATTERNS: RegExp[] = [
  * Violence-related patterns
  */
 export const VIOLENCE_PATTERNS: RegExp[] = [
+  // IT
   /come\s+uccidere/gi,
-  /how\s+to\s+kill/gi,
   /come\s+fare\s+(una\s+)?bomba/gi,
-  /how\s+to\s+make\s+(a\s+)?bomb/gi,
+  /costruire\s+.{0,15}bomba/gi,
+  /bomba\s+artigianale/gi,
   /come\s+procurarsi\s+(un[a']?\s+)?arm[ai]/gi,
+  /fabbricare\s+.{0,10}(arma|esplosiv)/gi,
+  /voglio\s+far\s+del\s+male/gi,
+  // EN
+  /how\s+to\s+kill/gi,
+  /how\s+to\s+make\s+(a\s+)?bomb/gi,
   /how\s+to\s+get\s+(a\s+)?gun/gi,
   /where\s+to\s+buy\s+(a\s+)?weapon/gi,
-  /voglio\s+far\s+del\s+male/gi,
   /want\s+to\s+hurt/gi,
+  // FR
+  /comment\s+(tuer|fabriquer\s+(une\s+)?bombe|se\s+procurer\s+(une\s+)?arme)/gi,
+  // DE
+  /wie\s+(man\s+)?(tötet|eine\s+bombe\s+baut|waffe\s+bekommt)/gi,
+  // ES
+  /cómo\s+(matar|hacer\s+(una\s+)?bomba|conseguir\s+(un\s+)?arma)/gi,
+];
+
+/**
+ * Hacking and illegal activity patterns (multilingual)
+ */
+export const HACKING_PATTERNS: RegExp[] = [
+  // IT
+  /hackerare/gi,
+  /bucare\s+.{0,15}(rete|sistema|sito)/gi,
+  /violare\s+.{0,15}(sistema|rete|account)/gi,
+  /rubare\s+.{0,15}password/gi,
+  /craccare/gi,
+  // EN
+  /how\s+to\s+hack/gi,
+  /break\s+into\s+.{0,15}(system|network|account)/gi,
+  /steal\s+.{0,10}password/gi,
+  /bypass\s+.{0,10}security/gi,
+  // FR
+  /pirater\s+.{0,15}(système|réseau|compte)/gi,
+  /voler\s+.{0,10}mot\s+de\s+passe/gi,
+  // DE
+  /hacken\s+.{0,15}(system|netzwerk|konto)/gi,
+  /passwort\s+.{0,10}(stehlen|knacken)/gi,
+  // ES
+  /hackear\s+.{0,15}(sistema|red|cuenta)/gi,
+  /robar\s+.{0,10}contraseña/gi,
 ];
 
 /**

@@ -9,10 +9,7 @@ import type { ContentTopic, AgeBracket, TopicSensitivity } from './age-gating-ty
  * Topic restrictions by age bracket
  * Defines what's appropriate at each developmental stage
  */
-export const TOPIC_MATRIX: Record<
-  ContentTopic,
-  Record<AgeBracket, TopicSensitivity>
-> = {
+export const TOPIC_MATRIX: Record<ContentTopic, Record<AgeBracket, TopicSensitivity>> = {
   basic_education: {
     elementary: 'safe',
     middle: 'safe',
@@ -47,6 +44,12 @@ export const TOPIC_MATRIX: Record<
     elementary: 'safe',
     middle: 'safe',
     highschool: 'safe',
+    adult: 'safe',
+  },
+  health_substances: {
+    elementary: 'blocked',
+    middle: 'restricted',
+    highschool: 'moderate',
     adult: 'safe',
   },
   social_relationships: {
@@ -96,20 +99,17 @@ export const ADAPTATION_GUIDANCE: Record<TopicSensitivity, string> = {
     'Usa un linguaggio semplificato e evita dettagli grafici. Mantieni un tono rassicurante.',
   restricted:
     "Tratta l'argomento solo se strettamente necessario per il curriculum. Semplifica al massimo e focalizzati su aspetti positivi.",
-  blocked:
-    "Questo argomento non è appropriato per questa fascia d'età. Suggerisci un'alternativa.",
+  blocked: "Questo argomento non è appropriato per questa fascia d'età. Suggerisci un'alternativa.",
 };
 
 /**
  * Alternative topic suggestions for blocked content
  */
-export const ALTERNATIVE_SUGGESTIONS: Partial<Record<ContentTopic, string>> =
-  {
-    social_romance:
-      'Parliamo invece di amicizia e relazioni positive tra coetanei!',
-    literature_mature:
-      'Ci sono molti libri avventurosi adatti alla tua età. Vuoi qualche consiglio?',
-    history_violence:
-      'Possiamo esplorare storie di eroi e persone che hanno fatto la differenza per il bene.',
-    current_events: 'Parliamo di notizie positive e scoperte interessanti!',
-  };
+export const ALTERNATIVE_SUGGESTIONS: Partial<Record<ContentTopic, string>> = {
+  social_romance: 'Parliamo invece di amicizia e relazioni positive tra coetanei!',
+  literature_mature: 'Ci sono molti libri avventurosi adatti alla tua età. Vuoi qualche consiglio?',
+  history_violence:
+    'Possiamo esplorare storie di eroi e persone che hanno fatto la differenza per il bene.',
+  current_events: 'Parliamo di notizie positive e scoperte interessanti!',
+  health_substances: 'Parliamo di come mantenersi in salute con sport e alimentazione!',
+};

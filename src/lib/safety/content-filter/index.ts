@@ -23,6 +23,7 @@ export {
   JAILBREAK_PATTERNS,
   EXPLICIT_PATTERNS,
   VIOLENCE_PATTERNS,
+  HACKING_PATTERNS,
   PII_PATTERNS,
   matchesPatterns,
 } from './patterns';
