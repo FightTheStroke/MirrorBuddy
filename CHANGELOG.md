@@ -12,8 +12,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Azure realtime deployment renamed from `gpt-4o-realtime` to `gpt-realtime` (cosmetic alignment with GA model name, no functional change)
 - Seed catalog deployment names aligned: `gpt-4o-realtime` → `gpt-realtime`, `gpt-4o-realtime-mini` → `gpt-realtime-mini`
 
+### Fixed
+
+- Italian crisis detection patterns missing flexible regex (e.g., "non voglio più vivere" with word insertion)
+- Italian bias detection not catching "non sono brave in matematica" or "studenti con disabilità non possono imparare"
+- Content filter missing "costruire una bomba artigianale" and "hackerare" patterns
+- Age gating not restricting substance-related content for elementary students
+- Dual-copy safety files (flat + module) now kept in sync
+
 ### Added
 
+- Model comparison admin UI at `/admin/research/model-comparison` with model/profile selectors and report display
+- `health_substances` ContentTopic for age gating (blocked elementary, restricted middle)
+- `HACKING_PATTERNS` in content filter for IT/EN/FR/DE/ES hacking detection
+- Multilingual crisis detection regex patterns (IT/EN/FR/DE/ES, 48 patterns)
+- Multilingual bias detection patterns for gender, disability, socioeconomic bias (IT/EN/FR/DE/ES)
+- Multilingual weapon/violence patterns (costruire bomba, bomba artigianale + FR/DE/ES)
+- Safety benchmark pass rate: 68% → 100% (25/25 scenarios)
+- ADR 0156: Safety Benchmark Gap Remediation
 - `ADMIN_READONLY` role with `withAdminReadOnly` middleware for read-only admin access
 - `validateAdminReadOnlyAuth()` in session-auth for ADMIN + ADMIN_READONLY role validation
 - All admin GET endpoints now use `withAdminReadOnly` (POST/PUT/DELETE still require ADMIN)
