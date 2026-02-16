@@ -7,7 +7,7 @@
  * Read-only, no data mutations even with valid auth.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect, PROD_URL } from './fixtures';
 import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
@@ -67,7 +67,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
       {
         name: ADMIN_COOKIE_NAME,
         value: ADMIN_COOKIE!,
-        domain: 'mirrorbuddy.vercel.app',
+        domain: new URL(PROD_URL).hostname,
         path: '/',
         httpOnly: true,
         secure: true,

@@ -11,7 +11,7 @@
  * Without credentials, tests verify access is properly blocked.
  */
 
-import { test, expect } from './fixtures';
+import { test, expect, PROD_URL } from './fixtures';
 import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
@@ -41,7 +41,7 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
       {
         name: ADMIN_COOKIE_NAME,
         value: ADMIN_COOKIE!,
-        domain: new URL(page.url() || 'https://mirrorbuddy.vercel.app').hostname,
+        domain: new URL(PROD_URL).hostname,
         path: '/',
         httpOnly: true,
         secure: true,
@@ -57,7 +57,7 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
       {
         name: ADMIN_COOKIE_NAME,
         value: ADMIN_COOKIE!,
-        domain: 'mirrorbuddy.vercel.app',
+        domain: new URL(PROD_URL).hostname,
         path: '/',
         httpOnly: true,
         secure: true,

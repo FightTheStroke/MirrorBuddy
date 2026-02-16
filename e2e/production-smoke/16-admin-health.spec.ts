@@ -1,4 +1,4 @@
-import { test, expect } from './fixtures';
+import { test, expect, PROD_URL } from './fixtures';
 import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
@@ -25,7 +25,7 @@ test.describe('PROD-SMOKE: Admin Health', () => {
       {
         name: ADMIN_COOKIE_NAME,
         value: ADMIN_COOKIE!,
-        domain: 'mirrorbuddy.vercel.app',
+        domain: new URL(PROD_URL).hostname,
         path: '/',
         httpOnly: true,
         secure: true,
