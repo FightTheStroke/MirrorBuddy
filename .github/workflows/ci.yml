@@ -572,6 +572,7 @@ jobs:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+          ADMIN_READONLY_COOKIE_VALUE: ${{ secrets.ADMIN_READONLY_COOKIE_VALUE }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           TOKEN_ENCRYPTION_KEY: ${{ secrets.TOKEN_ENCRYPTION_KEY }}
           PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
