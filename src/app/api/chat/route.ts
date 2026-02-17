@@ -23,7 +23,14 @@ import {
 } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput, detectBias } from '@/lib/safety';
 import { checkSTEMSafety } from '@/lib/safety';
-import { recordMessage, recordSessionStart } from '@/lib/safety/server';
+import {
+  recordMessage,
+  recordSessionStart,
+  logSafetyEvent,
+  recordComplianceCrisisDetected,
+  escalateCrisisDetected,
+  notifyParentOfCrisis,
+} from '@/lib/safety/server';
 import { analyzeIndependence } from '@/lib/gamification/independence-tracker';
 import { awardPoints } from '@/lib/gamification/db';
 import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
@@ -267,7 +274,10 @@ export const POST = pipe(
       }
 
       const filterResult = filterInput(lastUserMessage.content);
-      if (!filterResult.safe && filterResult.action === 'block') {
+      if (
+        !filterResult.safe &&
+        (filterResult.action === 'block' || filterResult.action === 'redirect')
+      ) {
         log.warn('Content blocked by safety filter', {
           clientId,
           category: filterResult.category,
@@ -278,6 +288,41 @@ export const POST = pipe(
           maestroId,
           actionTaken: 'blocked',
         });
+
+        // Crisis-specific: log safety event and escalate
+        if (filterResult.action === 'redirect') {
+          try {
+            void logSafetyEvent('crisis_detected', 'critical', {
+              userId: userId || undefined,
+              sessionId: conversationId,
+              category: 'crisis',
+              contentSnippet: lastUserMessage.content.slice(0, 50),
+            });
+            void recordComplianceCrisisDetected('crisis_detected', {
+              sessionId: conversationId,
+              maestroId,
+            });
+            void escalateCrisisDetected(userId || 'anonymous', conversationId, {
+              contentSnippet: lastUserMessage.content.slice(0, 50),
+              maestroId,
+            });
+            // Notify parent/guardian of crisis
+            if (userId) {
+              const locale = detectLocaleFromNextRequest(request);
+              void notifyParentOfCrisis({
+                userId,
+                category: 'crisis',
+                severity: 'critical',
+                maestroId,
+                timestamp: new Date(),
+                locale,
+              });
+            }
+          } catch {
+            // Crisis logging must never crash the main flow
+          }
+        }
+
         const response = NextResponse.json({
           content: filterResult.suggestedResponse,
           provider: 'safety_filter',

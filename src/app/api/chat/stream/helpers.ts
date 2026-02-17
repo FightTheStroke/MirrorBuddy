@@ -3,24 +3,26 @@
  * Business logic for streaming endpoint
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/server";
-import { canAccessFullFeatures } from "@/lib/compliance/server";
-import { filterInput } from "@/lib/safety";
-import { loadPreviousContext } from "@/lib/conversation/memory-loader";
-import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
-import { findSimilarMaterials, findRelatedConcepts } from "@/lib/rag/server";
-import type { AIProvider } from "@/lib/ai/server";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/server';
+import { canAccessFullFeatures } from '@/lib/compliance/server';
+import { filterInput } from '@/lib/safety';
+import { loadPreviousContext } from '@/lib/conversation/memory-loader';
+import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
+import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/server';
+import type { AIProvider } from '@/lib/ai/server';
+import {
+  logSafetyEvent,
+  recordComplianceCrisisDetected,
+  escalateCrisisDetected,
+  notifyParentOfCrisis,
+} from '@/lib/safety/server';
 
-import type { ChatRequest } from "../types";
+import type { ChatRequest } from '../types';
 
 // Import and re-export budget tracker for backwards compatibility
-import {
-  TOKEN_COST_PER_UNIT,
-  estimateTokens,
-  MidStreamBudgetTracker,
-} from "./budget-tracker";
+import { TOKEN_COST_PER_UNIT, estimateTokens, MidStreamBudgetTracker } from './budget-tracker';
 export { TOKEN_COST_PER_UNIT, estimateTokens, MidStreamBudgetTracker };
 
 /**
@@ -38,7 +40,7 @@ export interface UserSettings {
 export interface PreparedContext {
   userId: string | undefined;
   userSettings: UserSettings | null;
-  providerPreference: AIProvider | "auto" | undefined;
+  providerPreference: AIProvider | 'auto' | undefined;
   enhancedSystemPrompt: string;
   safetyBlock: { blocked: true; response: string } | null;
   budgetExceeded: boolean;
@@ -58,7 +60,7 @@ export async function getUserId(): Promise<string | undefined> {
 export interface CoppaCheckResult {
   allowed: boolean;
   userId?: string;
-  reason?: "coppa_blocked";
+  reason?: 'coppa_blocked';
 }
 
 /**
@@ -75,10 +77,10 @@ export async function getUserIdWithCoppaCheck(): Promise<CoppaCheckResult> {
   const canAccess = await canAccessFullFeatures(auth.userId);
 
   if (!canAccess) {
-    logger.info("COPPA: Streaming access blocked", {
+    logger.info('COPPA: Streaming access blocked', {
       userId: auth.userId.slice(0, 8),
     });
-    return { allowed: false, userId: auth.userId, reason: "coppa_blocked" };
+    return { allowed: false, userId: auth.userId, reason: 'coppa_blocked' };
   }
 
   return { allowed: true, userId: auth.userId };
@@ -89,7 +91,7 @@ export async function getUserIdWithCoppaCheck(): Promise<CoppaCheckResult> {
  */
 export async function loadUserSettings(userId: string): Promise<{
   settings: UserSettings | null;
-  providerPreference: AIProvider | "auto" | undefined;
+  providerPreference: AIProvider | 'auto' | undefined;
 }> {
   try {
     const settings = await prisma.settings.findUnique({
@@ -97,17 +99,14 @@ export async function loadUserSettings(userId: string): Promise<{
       select: { provider: true, budgetLimit: true, totalSpent: true },
     });
 
-    let providerPreference: AIProvider | "auto" | undefined;
-    if (
-      settings?.provider &&
-      (settings.provider === "azure" || settings.provider === "ollama")
-    ) {
+    let providerPreference: AIProvider | 'auto' | undefined;
+    if (settings?.provider && (settings.provider === 'azure' || settings.provider === 'ollama')) {
       providerPreference = settings.provider;
     }
 
     return { settings, providerPreference };
   } catch (e) {
-    logger.debug("Failed to load settings", { error: String(e) });
+    logger.debug('Failed to load settings', { error: String(e) });
     return { settings: null, providerPreference: undefined };
   }
 }
@@ -119,7 +118,7 @@ export async function enhancePromptWithContext(
   basePrompt: string,
   userId: string | undefined,
   maestroId: string | undefined,
-  messages: ChatRequest["messages"],
+  messages: ChatRequest['messages'],
   enableMemory: boolean,
 ): Promise<string> {
   let enhanced = basePrompt;
@@ -133,16 +132,16 @@ export async function enhancePromptWithContext(
           basePrompt: enhanced,
           memory,
           // ADR 0064: Pass characterId for automatic formal/informal address detection
-          safetyOptions: { role: "maestro", characterId: maestroId },
+          safetyOptions: { role: 'maestro', characterId: maestroId },
         });
       }
     } catch (memoryError) {
-      logger.warn("Failed to load memory", { error: String(memoryError) });
+      logger.warn('Failed to load memory', { error: String(memoryError) });
     }
   }
 
   // RAG context injection - search materials and study kits
-  const lastUserMessage = messages.filter((m) => m.role === "user").pop();
+  const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
   if (userId && lastUserMessage) {
     try {
       // Search in materials (generated content)
@@ -166,11 +165,11 @@ export async function enhancePromptWithContext(
       const allResults = [...relevantMaterials, ...relatedStudyKits];
 
       if (allResults.length > 0) {
-        const ragContext = allResults.map((m) => `- ${m.content}`).join("\n");
+        const ragContext = allResults.map((m) => `- ${m.content}`).join('\n');
         enhanced = `${enhanced}\n\n[Materiali rilevanti]\n${ragContext}`;
       }
     } catch (ragError) {
-      logger.warn("Failed to load RAG context", { error: String(ragError) });
+      logger.warn('Failed to load RAG context', { error: String(ragError) });
     }
   }
 
@@ -182,12 +181,48 @@ export async function enhancePromptWithContext(
  */
 export function checkInputSafety(
   content: string,
+  context?: { userId?: string; conversationId?: string; maestroId?: string; locale?: string },
 ): { blocked: true; response: string } | null {
   const filterResult = filterInput(content);
-  if (!filterResult.safe && filterResult.action === "block") {
+  if (
+    !filterResult.safe &&
+    (filterResult.action === 'block' || filterResult.action === 'redirect')
+  ) {
+    // Crisis-specific logging
+    if (filterResult.action === 'redirect' && context) {
+      try {
+        void logSafetyEvent('crisis_detected', 'critical', {
+          userId: context.userId || undefined,
+          sessionId: context.conversationId,
+          category: 'crisis',
+          contentSnippet: content.slice(0, 50),
+        });
+        void recordComplianceCrisisDetected('crisis_detected', {
+          sessionId: context.conversationId,
+          maestroId: context.maestroId,
+        });
+        void escalateCrisisDetected(context.userId || 'anonymous', context.conversationId || '', {
+          contentSnippet: content.slice(0, 50),
+          maestroId: context.maestroId,
+        });
+        // Notify parent/guardian of crisis
+        if (context.userId) {
+          void notifyParentOfCrisis({
+            userId: context.userId,
+            category: 'crisis',
+            severity: 'critical',
+            maestroId: context.maestroId,
+            timestamp: new Date(),
+            locale: context.locale || 'it',
+          });
+        }
+      } catch {
+        // Crisis logging must never crash main flow
+      }
+    }
     return {
       blocked: true,
-      response: filterResult.suggestedResponse || "Content blocked.",
+      response: filterResult.suggestedResponse || 'Content blocked.',
     };
   }
   return null;
@@ -196,10 +231,7 @@ export function checkInputSafety(
 /**
  * Update user budget after streaming
  */
-export async function updateBudget(
-  userId: string,
-  totalTokens: number,
-): Promise<void> {
+export async function updateBudget(userId: string, totalTokens: number): Promise<void> {
   try {
     const estimatedCost = totalTokens * TOKEN_COST_PER_UNIT;
     await prisma.settings.update({
@@ -207,16 +239,14 @@ export async function updateBudget(
       data: { totalSpent: { increment: estimatedCost } },
     });
   } catch (e) {
-    logger.warn("Failed to update budget", { error: String(e) });
+    logger.warn('Failed to update budget', { error: String(e) });
   }
 }
 
 /**
  * Create SSE response from async generator
  */
-export function createSSEResponse(
-  generator: () => AsyncGenerator<string>,
-): Response {
+export function createSSEResponse(generator: () => AsyncGenerator<string>): Response {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
@@ -229,9 +259,9 @@ export function createSSEResponse(
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
     },
   });
 }

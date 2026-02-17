@@ -27,12 +27,7 @@ export const AiProvider = z.enum(['azure', 'ollama']);
  */
 export const FontSize = z.enum(['small', 'medium', 'large', 'extra-large']);
 
-export const AdaptiveDifficultyMode = z.enum([
-  'manual',
-  'guided',
-  'balanced',
-  'automatic',
-]);
+export const AdaptiveDifficultyMode = z.enum(['manual', 'guided', 'balanced', 'automatic']);
 
 // ============================================================================
 // Profile update schema
@@ -41,19 +36,26 @@ export const AdaptiveDifficultyMode = z.enum([
 /**
  * PUT /api/user/profile request body schema
  */
-export const ProfileUpdateSchema = z.object({
-  name: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
-  age: z.number().int().min(VALIDATION_LIMITS.MIN_AGE).max(VALIDATION_LIMITS.MAX_AGE).optional(),
-  schoolYear: z.number().int().min(VALIDATION_LIMITS.MIN_SCHOOL_YEAR).max(VALIDATION_LIMITS.MAX_SCHOOL_YEAR).optional(),
-  schoolLevel: SchoolLevel.optional(),
-  gradeLevel: OptionalString(20),
-  learningGoals: createOptionalArraySchema(
-    z.string().max(200),
-    VALIDATION_LIMITS.SMALL_ARRAY_MAX
-  ),
-  preferredCoach: Coach.nullable().optional(),
-  preferredBuddy: Buddy.nullable().optional(),
-}).strict();
+export const ProfileUpdateSchema = z
+  .object({
+    name: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
+    age: z.number().int().min(VALIDATION_LIMITS.MIN_AGE).max(VALIDATION_LIMITS.MAX_AGE).optional(),
+    schoolYear: z
+      .number()
+      .int()
+      .min(VALIDATION_LIMITS.MIN_SCHOOL_YEAR)
+      .max(VALIDATION_LIMITS.MAX_SCHOOL_YEAR)
+      .optional(),
+    schoolLevel: SchoolLevel.optional(),
+    gradeLevel: OptionalString(20),
+    learningGoals: createOptionalArraySchema(
+      z.string().max(200),
+      VALIDATION_LIMITS.SMALL_ARRAY_MAX,
+    ),
+    preferredCoach: Coach.nullable().optional(),
+    preferredBuddy: Buddy.nullable().optional(),
+  })
+  .strict();
 
 // ============================================================================
 // Settings update schema
@@ -62,28 +64,35 @@ export const ProfileUpdateSchema = z.object({
 /**
  * PUT /api/user/settings request body schema
  */
-export const SettingsUpdateSchema = z.object({
-  // Appearance
-  theme: Theme.optional(),
-  language: OptionalString(10),
-  accentColor: OptionalString(20),
+export const SettingsUpdateSchema = z
+  .object({
+    // Appearance
+    theme: Theme.optional(),
+    language: OptionalString(10),
+    accentColor: OptionalString(20),
 
-  // AI Configuration
-  provider: AiProvider.optional(),
-  model: OptionalString(50),
-  budgetLimit: z.number().min(0).max(10000).optional(),
-  totalSpent: z.number().min(0).optional(),
-  adaptiveDifficultyMode: AdaptiveDifficultyMode.optional(),
+    // AI Configuration
+    provider: AiProvider.optional(),
+    model: OptionalString(50),
+    budgetLimit: z.number().min(0).max(10000).optional(),
+    totalSpent: z.number().min(0).optional(),
+    adaptiveDifficultyMode: AdaptiveDifficultyMode.optional(),
 
-  // Accessibility
-  fontSize: FontSize.optional(),
-  highContrast: z.boolean().optional(),
-  dyslexiaFont: z.boolean().optional(),
-  reducedMotion: z.boolean().optional(),
-  voiceEnabled: z.boolean().optional(),
-  simplifiedLanguage: z.boolean().optional(),
-  adhdMode: z.boolean().optional(),
-}).strict();
+    // Accessibility
+    fontSize: FontSize.optional(),
+    highContrast: z.boolean().optional(),
+    dyslexiaFont: z.boolean().optional(),
+    reducedMotion: z.boolean().optional(),
+    voiceEnabled: z.boolean().optional(),
+    simplifiedLanguage: z.boolean().optional(),
+    adhdMode: z.boolean().optional(),
+
+    // Guardian contact (crisis response protocol)
+    guardianEmail: z.string().email().max(254).nullable().optional(),
+    guardianPhone: OptionalString(30),
+    guardianName: OptionalString(100),
+  })
+  .strict();
 
 // ============================================================================
 // Export types

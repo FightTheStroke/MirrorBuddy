@@ -930,6 +930,23 @@
       }
     },
     "parentDashboard": {
+      "crisisAlertTitle": "Avvisi di sicurezza",
+      "crisisAlertUrgent": "Attenzione urgente richiesta",
+      "crisisAlertDescription": "Sistema di supporto alla crisi attivato",
+      "crisisAlertUnreadCount": "{count} evento non visualizzato",
+      "crisisAlertUnreadCountPlural": "{count} eventi non visualizzati",
+      "crisisAlertViewDetails": "Visualizza dettagli",
+      "crisisAlertMarkViewed": "Segna come visualizzato",
+      "crisisAlertTimestamp": "Data",
+      "crisisAlertSeverity": "Gravità",
+      "crisisAlertSeverityCritical": "Critico",
+      "crisisAlertSeverityAlert": "Allerta",
+      "crisisAlertSeverityWarning": "Avviso",
+      "crisisAlertHelplineTitle": "Numeri di supporto disponibili 24/7",
+      "crisisAlertRecommendedActionsTitle": "Azioni consigliate",
+      "crisisAlertNoEvents": "Nessun evento di sicurezza registrato",
+      "crisisAlertLoadingError": "Errore nel caricamento degli eventi di sicurezza",
+      "loading": "Caricamento...",
       "strengthsPoints": "Punti di forza",
       "strengthsTitle": "Punti di Forza",
       "showLess": "Mostra meno",
@@ -1236,6 +1253,21 @@
     "parent": "Parent",
     "student": "Student",
     "areaDedicataGenitori": "- Area dedicata ai genitori per monitorare i progressi.",
-    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente"
+    "macOsPotrebbeSelezionare": ", macOS potrebbe selezionare automaticamente",
+    "guardianContact": {
+      "title": "Contatti Tutore/Genitore",
+      "recommendationBanner": "Ti consigliamo di aggiungere i contatti di un genitore o tutore per la tua sicurezza. In caso di emergenza, il sistema potra' contattarli.",
+      "nameLabel": "Nome completo",
+      "namePlaceholder": "Nome del genitore o tutore",
+      "emailLabel": "Email",
+      "emailPlaceholder": "email@esempio.com",
+      "phoneLabel": "Telefono",
+      "phonePlaceholder": "+39 333 1234567",
+      "save": "Salva contatti",
+      "saving": "Salvataggio...",
+      "saved": "Salvato!",
+      "saveError": "Errore nel salvataggio dei contatti",
+      "privacyNote": "Questi dati vengono utilizzati esclusivamente per notifiche di sicurezza e non verranno condivisi con terze parti."
+    }
   }
 }

@@ -29,6 +29,7 @@ import {
   AmbientAudioSettings,
   AIProviderSettings,
   DiagnosticsTab,
+  GuardianContactSection,
 } from './sections';
 import { GoogleAccountCard } from '@/components/google-drive';
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
@@ -218,28 +219,31 @@ export function SettingsView() {
         )}
 
         {activeTab === 'genitori' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserCircle className="w-5 h-5" />
-                {t('parentAreaTitle')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-muted-foreground">{t('parentAreaDescription')}</p>
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                <p className="text-sm text-amber-800 dark:text-amber-200">
-                  <strong>{t('consentRequiredTitle')}</strong> {t('consentRequiredText')}
-                </p>
-              </div>
-              <Link href="/parent-dashboard">
-                <Button className="w-full mt-4" size="lg">
-                  <UserCircle className="w-5 h-5 mr-2" />
-                  {t('openParentDashboard')}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCircle className="w-5 h-5" />
+                  {t('parentAreaTitle')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-muted-foreground">{t('parentAreaDescription')}</p>
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>{t('consentRequiredTitle')}</strong> {t('consentRequiredText')}
+                  </p>
+                </div>
+                <Link href="/parent-dashboard">
+                  <Button className="w-full mt-4" size="lg">
+                    <UserCircle className="w-5 h-5 mr-2" />
+                    {t('openParentDashboard')}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            <GuardianContactSection />
+          </div>
         )}
 
         {activeTab === 'telemetry' && <TelemetryDashboard />}
