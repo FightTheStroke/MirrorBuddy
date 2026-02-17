@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Coming Soon mode** with `coming_soon_overlay` feature flag toggle — proxy gating redirects unauthenticated users to `/coming-soon`
+- **Waitlist signup** with GDPR double opt-in (email verification + consent version tracking)
+- **Promo code system** — verified waitlist leads get unique 8-char alphanumeric code for 1 month Pro free
+- **Promo redemption** via `POST /api/promo/redeem` with Stripe non-combinability guard
+- **Admin waitlist dashboard** at `/admin/waitlist` with stats (total, verified, unsubscribed, conversion rate), search, pagination, export
+- **Dual-source email campaigns** targeting both registered users and waitlist entries
+- **Waitlist funnel stages** — WAITLIST_SIGNUP, WAITLIST_VERIFIED integrated into funnel tracking
+- **Waitlist KPIs** in metrics-push cron (7 new Grafana metrics: signups, verified, unsubscribed, promo redeemed, conversion rate)
+- **Automated cleanup cron** deletes unverified waitlist entries older than 90 days
+- **Waitlist i18n** — new `waitlist` namespace with 38 keys across 5 locales (it/en/fr/de/es)
+- E2E tests for coming-soon page and waitlist verification flow
+
 ### Fixed
 
 - **Crisis messages now blocked** with CRISIS_RESPONSE containing helpline numbers (was: crisis detection set action='redirect' but endpoint only checked action='block')

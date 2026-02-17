@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from 'react';
 
 interface StageData {
   stage: string;
@@ -15,27 +15,31 @@ interface FunnelChartProps {
 }
 
 const STAGE_LABELS: Record<string, string> = {
-  VISITOR: "Visitor",
-  TRIAL_START: "Trial Started",
-  TRIAL_ENGAGED: "Trial Engaged",
-  LIMIT_HIT: "Limit Hit",
-  BETA_REQUEST: "Beta Request",
-  APPROVED: "Approved",
-  FIRST_LOGIN: "First Login",
-  ACTIVE: "Active",
-  CHURNED: "Churned",
+  WAITLIST_SIGNUP: 'Waitlist Signup',
+  WAITLIST_VERIFIED: 'Waitlist Verified',
+  VISITOR: 'Visitor',
+  TRIAL_START: 'Trial Started',
+  TRIAL_ENGAGED: 'Trial Engaged',
+  LIMIT_HIT: 'Limit Hit',
+  BETA_REQUEST: 'Beta Request',
+  APPROVED: 'Approved',
+  FIRST_LOGIN: 'First Login',
+  ACTIVE: 'Active',
+  CHURNED: 'Churned',
 };
 
 const STAGE_COLORS: Record<string, string> = {
-  VISITOR: "#64748b",
-  TRIAL_START: "#3b82f6",
-  TRIAL_ENGAGED: "#6366f1",
-  LIMIT_HIT: "#f59e0b",
-  BETA_REQUEST: "#8b5cf6",
-  APPROVED: "#22c55e",
-  FIRST_LOGIN: "#10b981",
-  ACTIVE: "#0d9488",
-  CHURNED: "#ef4444",
+  WAITLIST_SIGNUP: '#a78bfa',
+  WAITLIST_VERIFIED: '#7c3aed',
+  VISITOR: '#64748b',
+  TRIAL_START: '#3b82f6',
+  TRIAL_ENGAGED: '#6366f1',
+  LIMIT_HIT: '#f59e0b',
+  BETA_REQUEST: '#8b5cf6',
+  APPROVED: '#22c55e',
+  FIRST_LOGIN: '#10b981',
+  ACTIVE: '#0d9488',
+  CHURNED: '#ef4444',
 };
 
 function formatDuration(ms: number): string {
@@ -45,14 +49,8 @@ function formatDuration(ms: number): string {
   return `${(hours / 24).toFixed(1)}d`;
 }
 
-export function FunnelChart({
-  stages,
-  showVelocity = false,
-}: FunnelChartProps) {
-  const maxCount = useMemo(
-    () => Math.max(...stages.map((s) => s.count), 1),
-    [stages],
-  );
+export function FunnelChart({ stages, showVelocity = false }: FunnelChartProps) {
+  const maxCount = useMemo(() => Math.max(...stages.map((s) => s.count), 1), [stages]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -65,7 +63,7 @@ export function FunnelChart({
       {stages.map((stage, idx) => {
         const widthPct = Math.max((stage.count / maxCount) * 100, 12);
         const label = STAGE_LABELS[stage.stage] || stage.stage;
-        const color = STAGE_COLORS[stage.stage] || "#94a3b8";
+        const color = STAGE_COLORS[stage.stage] || '#94a3b8';
 
         return (
           <div key={stage.stage}>
@@ -77,7 +75,7 @@ export function FunnelChart({
                 <div
                   className="h-9 rounded-md flex items-center justify-between px-3 transition-all duration-500 ease-out"
                   style={{
-                    width: mounted ? `${widthPct}%` : "0%",
+                    width: mounted ? `${widthPct}%` : '0%',
                     backgroundColor: color,
                     transitionDelay: `${idx * 60}ms`,
                   }}
@@ -88,9 +86,7 @@ export function FunnelChart({
                   {stage.conversionRate !== null && (
                     <span
                       className={`text-[10px] font-medium ${
-                        stage.conversionRate >= 50
-                          ? "text-white/90"
-                          : "text-white/70"
+                        stage.conversionRate >= 50 ? 'text-white/90' : 'text-white/70'
                       }`}
                     >
                       {stage.conversionRate.toFixed(1)}%

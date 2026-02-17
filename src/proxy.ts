@@ -73,6 +73,9 @@ const AUTH_PUBLIC_ROUTES = [
   // Invite and trial flow
   '/invite',
   '/trial',
+  // Coming soon and waitlist (must be accessible before any auth gating)
+  '/coming-soon',
+  '/waitlist',
   // Static assets (images)
   '/maestri',
   '/avatars',
@@ -387,6 +390,36 @@ export default function proxy(request: NextRequest) {
       const redirectLocale = localeFromPath ?? detectedLocale;
       const maintenanceUrl = new URL(`/${redirectLocale}/maintenance`, request.url);
       return finalizeResponse(NextResponse.redirect(maintenanceUrl), 307);
+    }
+  }
+
+  // ==========================================================================
+  // COMING SOON GATING
+  // Redirect unauthenticated users to coming-soon page when feature flag is on.
+  // Runs AFTER maintenance check and BEFORE route protection so that:
+  // - Authenticated users always pass through
+  // - AUTH_PUBLIC_ROUTES remain accessible (login, welcome, /coming-soon itself)
+  // - Maintenance mode takes priority over coming soon
+  // ==========================================================================
+  {
+    const comingSoonEnabled = isFeatureEnabled('coming_soon_overlay');
+    if (comingSoonEnabled.enabled) {
+      const csPathWithoutLocale = localeFromPath
+        ? pathname.replace(`/${localeFromPath}`, '') || '/'
+        : pathname;
+      const isPublicRoute = AUTH_PUBLIC_ROUTES.some((r) =>
+        pathMatchesRoute(csPathWithoutLocale, r),
+      );
+      const isAdminRoute = csPathWithoutLocale.startsWith(ADMIN_PREFIX);
+      const isApiRoute = csPathWithoutLocale.startsWith('/api');
+      const csUserCookie = request.cookies.get(AUTH_COOKIE_NAME);
+      const csIsAuthenticated = !!csUserCookie?.value;
+
+      if (!isPublicRoute && !isAdminRoute && !isApiRoute && !csIsAuthenticated) {
+        const redirectLocale = localeFromPath ?? detectedLocale;
+        const comingSoonUrl = new URL(`/${redirectLocale}/coming-soon`, request.url);
+        return finalizeResponse(NextResponse.redirect(comingSoonUrl), 307);
+      }
     }
   }
 

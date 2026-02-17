@@ -180,13 +180,14 @@
 
 ## Tier & Business
 
-| #    | Decision                              | Impact                                              |
-| ---- | ------------------------------------- | --------------------------------------------------- |
-| 0056 | Trial Mode Architecture               | Anonymous trial access                              |
-| 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
-| 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
-| 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
-| 0148 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view  |
+| #    | Decision                              | Impact                                               |
+| ---- | ------------------------------------- | ---------------------------------------------------- |
+| 0056 | Trial Mode Architecture               | Anonymous trial access                               |
+| 0057 | Beta Invite System and Data Migration | Invite-based beta access                             |
+| 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                 |
+| 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard  |
+| 0148 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view   |
+| 0158 | Coming Soon Waitlist + Invited Access | Pre-launch waitlist, promo codes, GDPR double opt-in |
 
 ## Consortium & Grants
 

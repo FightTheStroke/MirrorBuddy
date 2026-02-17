@@ -59,7 +59,7 @@ AI-powered educational platform for students with learning differences.
 **Core**: mirrorbuddy | tools | database | api-routes
 **Learning**: knowledge-hub | rag | learning-path | conversation-memory
 **Characters**: coaches | buddies | adding-maestri | safety
-**Features**: voice-api | ambient-audio | onboarding | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | pdf-generator | gamification | validation
+**Features**: voice-api | ambient-audio | onboarding | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | pdf-generator | gamification | validation | waitlist
 **Compliance**: accessibility
 **Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations | staging | ios-release
 **Beta**: trial-mode | google-drive

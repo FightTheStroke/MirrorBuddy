@@ -383,6 +383,55 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     log.warn('Failed to process batch funnel events', { error: String(err) });
   }
 
+  // 7. Waitlist KPIs (Plan 157)
+  try {
+    const [total, verified, unsubscribed, promoRedeemed, converted] = await Promise.all([
+      prisma.waitlistEntry.count({ where: { isTestData: false } }),
+      prisma.waitlistEntry.count({ where: { isTestData: false, verifiedAt: { not: null } } }),
+      prisma.waitlistEntry.count({ where: { isTestData: false, unsubscribedAt: { not: null } } }),
+      prisma.waitlistEntry.count({ where: { isTestData: false, promoRedeemedAt: { not: null } } }),
+      prisma.waitlistEntry.count({ where: { isTestData: false, convertedUserId: { not: null } } }),
+    ]);
+
+    const conversionRate = total > 0 ? converted / total : 0;
+
+    samples.push(
+      { name: 'waitlist_signups_total', labels: instanceLabels, value: total, timestamp: now },
+      { name: 'waitlist_verified_total', labels: instanceLabels, value: verified, timestamp: now },
+      {
+        name: 'waitlist_unsubscribed_total',
+        labels: instanceLabels,
+        value: unsubscribed,
+        timestamp: now,
+      },
+      {
+        name: 'waitlist_promo_redeemed_total',
+        labels: instanceLabels,
+        value: promoRedeemed,
+        timestamp: now,
+      },
+      {
+        name: 'waitlist_conversion_rate',
+        labels: instanceLabels,
+        value: conversionRate,
+        timestamp: now,
+      },
+    );
+
+    log.debug('Collected waitlist metrics', {
+      total,
+      verified,
+      unsubscribed,
+      promoRedeemed,
+      converted,
+    });
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { cron: 'metrics-push', section: 'waitlist-metrics' },
+    });
+    log.warn('Failed to collect waitlist metrics', { error: String(err) });
+  }
+
   return samples;
 }
 

@@ -35,7 +35,8 @@ export type KnownFeatureFlag =
   | 'voice_transcript_safety' // Enable transcript safety checking
   | 'voice_calling_overlay' // New calling overlay UI
   | 'chat_unified_view' // Unified conversation view across character types
-  | 'consent_unified_model'; // Unified consent storage model
+  | 'consent_unified_model' // Unified consent storage model
+  | 'coming_soon_overlay'; // Coming soon overlay for waitlist feature
 
 export interface FeatureFlagUpdate {
   status?: FeatureFlagStatus;

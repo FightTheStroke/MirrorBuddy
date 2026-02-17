@@ -133,6 +133,13 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  coming_soon_overlay: {
+    name: 'Coming Soon Overlay',
+    description: 'Show coming soon overlay with waitlist signup form',
+    status: 'disabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
 };
 
 // In-memory cache for performance

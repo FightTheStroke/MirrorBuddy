@@ -1,20 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { csrfFetch } from "@/lib/auth";
-import { toast } from "@/components/ui/toast";
-import type { EmailTemplate } from "@/lib/email/template-service";
-import type { ResendLimits } from "@/lib/observability/resend-limits";
-import type {
-  RecipientFilters,
-  RecipientPreview,
-} from "@/lib/email/campaign-service";
-import { TemplateSelector } from "./campaign-composer/template-selector";
-import { FilterConfigurator } from "./campaign-composer/filter-configurator";
-import { RecipientPreviewStep } from "./campaign-composer/recipient-preview";
-import { SendConfirmation } from "./campaign-composer/send-confirmation";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { csrfFetch } from '@/lib/auth';
+import { toast } from '@/components/ui/toast';
+import type { EmailTemplate } from '@/lib/email/template-service';
+import type { ResendLimits } from '@/lib/observability/resend-limits';
+import type { RecipientFilters, RecipientPreview } from '@/lib/email/campaign-service';
+import { TemplateSelector } from './campaign-composer/template-selector';
+import { FilterConfigurator } from './campaign-composer/filter-configurator';
+import { RecipientPreviewStep } from './campaign-composer/recipient-preview';
+import { SendConfirmation } from './campaign-composer/send-confirmation';
 
 interface CampaignComposerProps {
   templates: EmailTemplate[];
@@ -34,19 +31,20 @@ interface CampaignComposerProps {
  */
 export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
   const router = useRouter();
-  const t = useTranslations("admin.communications.campaigns");
+  const t = useTranslations('admin.communications.campaigns');
 
   const [step, setStep] = useState(1);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
-    null,
-  );
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [filters, setFilters] = useState<RecipientFilters>({
+    recipientSource: 'users',
     tiers: [],
     roles: [],
     languages: [],
     schoolLevels: [],
     disabled: false,
     isTestData: false,
+    verifiedOnly: false,
+    marketingConsentOnly: false,
   });
   const [preview, setPreview] = useState<RecipientPreview | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,8 +54,7 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
   const availableDaily = limits.emailsToday.limit - limits.emailsToday.used;
   const availableMonthly = limits.emailsMonth.limit - limits.emailsMonth.used;
   const isOverQuota = preview
-    ? preview.totalCount > availableDaily ||
-      preview.totalCount > availableMonthly
+    ? preview.totalCount > availableDaily || preview.totalCount > availableMonthly
     : false;
 
   const handleTemplateSelect = (templateId: string) => {
@@ -72,9 +69,7 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
   const handleTierToggle = (tier: string) => {
     setFilters((prev) => {
       const tiers = prev.tiers || [];
-      const newTiers = tiers.includes(tier)
-        ? tiers.filter((t) => t !== tier)
-        : [...tiers, tier];
+      const newTiers = tiers.includes(tier) ? tiers.filter((t) => t !== tier) : [...tiers, tier];
       return { ...prev, tiers: newTiers };
     });
   };
@@ -87,28 +82,22 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
   const handleFetchPreview = async () => {
     setIsLoading(true);
     try {
-      const response = await csrfFetch(
-        "/api/admin/email-campaigns/preview/preview",
-        {
-          method: "POST",
-          body: JSON.stringify({ filters }),
-        },
-      );
+      const response = await csrfFetch('/api/admin/email-campaigns/preview/preview', {
+        method: 'POST',
+        body: JSON.stringify({ filters }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch preview");
+        throw new Error(data.error || 'Failed to fetch preview');
       }
 
       // Store preview data for quota validation in step 4
       setPreview(data.preview);
       setStep(3);
     } catch (error) {
-      toast.error(
-        t("previewError"),
-        error instanceof Error ? error.message : String(error),
-      );
+      toast.error(t('previewError'), error instanceof Error ? error.message : String(error));
     } finally {
       setIsLoading(false);
     }
@@ -123,8 +112,8 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
 
     setIsSending(true);
     try {
-      const response = await csrfFetch("/api/admin/email-campaigns", {
-        method: "POST",
+      const response = await csrfFetch('/api/admin/email-campaigns', {
+        method: 'POST',
         body: JSON.stringify({
           templateId: selectedTemplateId,
           filters,
@@ -134,19 +123,13 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to send campaign");
+        throw new Error(data.error || 'Failed to send campaign');
       }
 
-      toast.success(
-        t("sendSuccess"),
-        `Campaign sent to ${preview.totalCount} recipients`,
-      );
-      router.push("/admin/communications/campaigns");
+      toast.success(t('sendSuccess'), `Campaign sent to ${preview.totalCount} recipients`);
+      router.push('/admin/communications/campaigns');
     } catch (error) {
-      toast.error(
-        t("sendError"),
-        error instanceof Error ? error.message : String(error),
-      );
+      toast.error(t('sendError'), error instanceof Error ? error.message : String(error));
     } finally {
       setIsSending(false);
     }
@@ -160,9 +143,7 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
           <div key={num} className="flex items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                step >= num
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-600"
+                step >= num ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'
               }`}
             >
               {num}
@@ -173,12 +154,7 @@ export function CampaignComposer({ templates, limits }: CampaignComposerProps) {
       </div>
 
       {/* Step 1: Template Selection */}
-      {step === 1 && (
-        <TemplateSelector
-          templates={templates}
-          onSelect={handleTemplateSelect}
-        />
-      )}
+      {step === 1 && <TemplateSelector templates={templates} onSelect={handleTemplateSelect} />}
 
       {/* Step 2: Filter Configuration */}
       {step === 2 && (
