@@ -33,6 +33,7 @@ import { ExportDropdown } from '@/components/admin/export-dropdown';
 import { UsersBulkActions } from './users-bulk-actions';
 import { UsersSearch } from './users-search';
 import { UsersTrashToolbar } from './users-trash-toolbar';
+import { ResetPasswordModal } from '@/components/admin/reset-password-modal';
 import { UsersTableRow } from './users-table-row';
 import { UsersTrashRow } from './users-trash-row';
 
@@ -79,6 +80,7 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
   const { deletedBackups, error, loadTrash } = useUsersTrash();
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (filter === 'trash') void loadTrash();
@@ -270,6 +272,7 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
                       onSelect={() => toggleSelect(user.id)}
                       onToggle={() => handleAction(user.id, 'toggle', user.disabled, loadTrash)}
                       onRoleToggle={() => handleAction(user.id, 'roleToggle', user.role, loadTrash)}
+                      onResetPassword={() => setResetPasswordUser(user)}
                       onDelete={() => handleDelete(user.id)}
                       availableTiers={availableTiers}
                     />
@@ -297,10 +300,10 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("confirmDelete")}</DialogTitle>
+            <DialogTitle>{t('confirmDelete')}</DialogTitle>
             <DialogDescription>
-              {t("areYouSureYouWantToDeleteThisUserThisActionCannotB")}
-              {t("undoneTheUserWillBeMovedToTrashAndCanBeRestoredWit")}
+              {t('areYouSureYouWantToDeleteThisUserThisActionCannotB')}
+              {t('undoneTheUserWillBeMovedToTrashAndCanBeRestoredWit')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -311,14 +314,27 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
                 setUserToDelete(null);
               }}
             >
-              {t("cancel")}
+              {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              {t("deleteUser")}
+              {t('deleteUser')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {resetPasswordUser && (
+        <ResetPasswordModal
+          isOpen={!!resetPasswordUser}
+          onClose={() => setResetPasswordUser(null)}
+          onSuccess={() => router.refresh()}
+          user={{
+            id: resetPasswordUser.id,
+            username: resetPasswordUser.username,
+            email: resetPasswordUser.email,
+          }}
+        />
+      )}
     </div>
   );
 }

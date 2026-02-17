@@ -328,9 +328,9 @@ export const RATE_LIMITS = {
     maxRequests: 5,
     windowMs: 15 * 60 * 1000,
   },
-  /** Password changes: 3 per 15 minutes (very strict) */
+  /** Password changes: 10 per 15 minutes (allows retries after admin reset) */
   AUTH_PASSWORD: {
-    maxRequests: 3,
+    maxRequests: 10,
     windowMs: 15 * 60 * 1000,
   },
   /** OAuth flows: 10 per minute */

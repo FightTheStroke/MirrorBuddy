@@ -44,6 +44,7 @@ describe('Admin Button Groups - Mobile Responsive', () => {
               onSelect={() => {}}
               onToggle={() => {}}
               onRoleToggle={() => {}}
+              onResetPassword={() => {}}
               onDelete={() => {}}
               availableTiers={[]}
             />
@@ -91,6 +92,7 @@ describe('Admin Button Groups - Mobile Responsive', () => {
               onSelect={() => {}}
               onToggle={() => {}}
               onRoleToggle={() => {}}
+              onResetPassword={() => {}}
               onDelete={() => {}}
               availableTiers={[]}
             />

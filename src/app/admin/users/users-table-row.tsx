@@ -14,10 +14,11 @@ import {
   ExternalLink,
   Shield,
   ShieldOff,
+  KeyRound,
 } from 'lucide-react';
 import { TierChangeModal } from '@/components/admin/tier-change-modal';
 import { UserLimitOverrideModal } from '@/components/admin/user-limit-override-modal';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 interface User {
   id: string;
@@ -56,6 +57,7 @@ interface UsersTableRowProps {
   onSelect: () => void;
   onToggle: () => void;
   onRoleToggle: () => void;
+  onResetPassword: () => void;
   onDelete: () => void;
   availableTiers: Tier[];
 }
@@ -85,10 +87,11 @@ export function UsersTableRow({
   onSelect,
   onToggle,
   onRoleToggle,
+  onResetPassword,
   onDelete,
   availableTiers,
 }: UsersTableRowProps) {
-  const t = useTranslations("admin");
+  const t = useTranslations('admin');
   const router = useRouter();
   const [showTierModal, setShowTierModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
@@ -134,8 +137,8 @@ export function UsersTableRow({
               onClick={() => setShowTierModal(true)}
               disabled={isLoading}
               className="text-xs h-11 px-3"
-              aria-label={t("changeTier1")}
-              title={t("changeTier")}
+              aria-label={t('changeTier1')}
+              title={t('changeTier')}
             >
               <RefreshCw className="w-3 h-3" />
             </Button>
@@ -145,8 +148,8 @@ export function UsersTableRow({
               onClick={() => setShowLimitModal(true)}
               disabled={isLoading || !user.subscription}
               className="text-xs h-11 px-3"
-              aria-label={t("overrideLimits1")}
-              title={t("overrideLimits")}
+              aria-label={t('overrideLimits1')}
+              title={t('overrideLimits')}
             >
               <Settings className="w-3 h-3" />
             </Button>
@@ -156,7 +159,7 @@ export function UsersTableRow({
               onClick={onToggle}
               disabled={isLoading}
               className="text-xs h-11 px-3"
-              aria-label={user.disabled ? t("enableUser") : t("disableUser")}
+              aria-label={user.disabled ? t('enableUser') : t('disableUser')}
             >
               {user.disabled ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
             </Button>
@@ -166,8 +169,8 @@ export function UsersTableRow({
               onClick={onRoleToggle}
               disabled={isLoading}
               className="text-xs h-11 px-3"
-              aria-label={user.role === 'ADMIN' ? t("demoteToUser") : t("promoteToAdmin")}
-              title={user.role === 'ADMIN' ? t("demoteToUser") : t("promoteToAdmin")}
+              aria-label={user.role === 'ADMIN' ? t('demoteToUser') : t('promoteToAdmin')}
+              title={user.role === 'ADMIN' ? t('demoteToUser') : t('promoteToAdmin')}
             >
               {user.role === 'ADMIN' ? (
                 <ShieldOff className="w-3 h-3" />
@@ -178,10 +181,21 @@ export function UsersTableRow({
             <Button
               size="sm"
               variant="outline"
+              onClick={onResetPassword}
+              disabled={isLoading || !user.email}
+              className="text-xs h-11 px-3"
+              aria-label={t('resetPassword')}
+              title={!user.email ? t('resetPasswordNoEmail') : t('resetPassword')}
+            >
+              <KeyRound className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
               onClick={onDelete}
               disabled={isLoading}
               className="text-xs h-11 px-3 text-red-600"
-              aria-label={t("deleteUser")}
+              aria-label={t('deleteUser')}
             >
               <Trash2 className="w-3 h-3" />
             </Button>
@@ -190,8 +204,8 @@ export function UsersTableRow({
               variant="outline"
               onClick={() => router.push(`/admin/users/${user.id}`)}
               className="text-xs h-11 px-3"
-              aria-label={t("viewUserDetails")}
-              title={t("viewDetails")}
+              aria-label={t('viewUserDetails')}
+              title={t('viewDetails')}
             >
               <ExternalLink className="w-3 h-3" />
             </Button>
