@@ -21,13 +21,13 @@ describe('session.update type field', () => {
 
   it('should include type field in session config structure (GA format)', () => {
     // Simulate the GA structure from useSendSessionConfig
+    // GA protocol does NOT include temperature (rejected by Azure API)
     const sessionConfig = {
       type: 'session.update',
       session: {
         type: 'realtime',
         instructions: 'Test instructions',
         tools: [],
-        temperature: 0.6,
         audio: {
           output: { voice: 'alloy' },
           input: {
@@ -48,6 +48,8 @@ describe('session.update type field', () => {
     expect(sessionConfig.type).toBe('session.update');
     expect(sessionConfig).toHaveProperty('session');
     expect(sessionConfig.session.audio.output).toHaveProperty('voice');
+    // Verify temperature is NOT present in GA format
+    expect(sessionConfig.session).not.toHaveProperty('temperature');
   });
 
   it('should include type field in voice diagnostics test message (GA format)', () => {

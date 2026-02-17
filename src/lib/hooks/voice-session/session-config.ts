@@ -221,9 +221,9 @@ export function useSendSessionConfig(
         type: 'realtime', // type: "realtime" required by GA session config contract
         instructions: fullInstructions,
         tools: VOICE_TOOLS,
-        temperature: 0.6,
         // GA protocol nests voice/transcription/turn_detection under audio object
         // Preview protocol uses flat session-level fields
+        // temperature is only supported in preview protocol (GA rejects it)
         ...(useGAProtocol
           ? {
               audio: {
@@ -238,6 +238,7 @@ export function useSendSessionConfig(
               },
             }
           : {
+              temperature: 0.6,
               voice,
               input_audio_noise_reduction: {
                 type: options.noiseReductionType || vadConfig.noise_reduction,
