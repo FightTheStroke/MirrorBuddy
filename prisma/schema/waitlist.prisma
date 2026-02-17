@@ -1,0 +1,56 @@
+// ============================================================================
+// WAITLIST DOMAIN
+// Pre-launch waitlist signups with GDPR consent, email verification,
+// promo codes, and conversion tracking.
+// ============================================================================
+
+/// Stores waitlist signups from the coming-soon overlay.
+/// Supports email verification, unsubscribe flows, promo code assignment,
+/// and conversion tracking when signup converts to a registered user.
+model WaitlistEntry {
+  id     String @id @default(cuid())
+  email  String @unique
+  name   String?
+
+  /// BCP-47 locale code of the user at signup
+  locale String @default("it")
+
+  /// Acquisition source (e.g. 'coming-soon', 'referral')
+  source     String  @default("coming-soon")
+  isTestData Boolean @default(false)
+
+  // GDPR consent (required at signup)
+  gdprConsentAt      DateTime
+  gdprConsentVersion String
+
+  // Marketing consent (optional opt-in)
+  marketingConsent   Boolean   @default(false)
+  marketingConsentAt DateTime?
+
+  // Email verification
+  verificationToken     String   @unique @default(cuid())
+  verificationExpiresAt DateTime
+  verifiedAt            DateTime?
+
+  // Unsubscribe flow
+  unsubscribeToken String    @unique @default(cuid())
+  unsubscribedAt   DateTime?
+
+  // Promo code (assigned after verification)
+  promoCode        String?   @unique
+  promoRedeemedAt  DateTime?
+
+  // Conversion tracking
+  convertedUserId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([verificationToken])
+  @@index([unsubscribeToken])
+  @@index([promoCode])
+  @@index([verifiedAt])
+  @@index([createdAt])
+  @@map("waitlist_entries")
+}

@@ -43,6 +43,7 @@ const EXPECTED_SCHEMA_FILES = [
   'audit.prisma', // Audit log entries
   'communications.prisma', // EmailTemplate, EmailCampaign, EmailRecipient, EmailPreference, EmailEvent
   'maintenance.prisma', // MaintenanceWindow (planned outages/maintenance)
+  'waitlist.prisma', // WaitlistEntry (coming soon waitlist)
 ];
 
 // Expected models that should be present across all schema files
@@ -138,6 +139,8 @@ const EXPECTED_MODELS = [
   'EmailPreference',
   'EmailEvent',
   'MaintenanceWindow',
+  // waitlist.prisma
+  'WaitlistEntry',
 ];
 
 describe('Prisma Schema Split', () => {

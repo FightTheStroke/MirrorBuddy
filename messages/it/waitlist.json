@@ -1,0 +1,24 @@
+{
+  "waitlist": {
+    "title": "Presto disponibile",
+    "subtitle": "Stiamo preparando qualcosa di straordinario. Iscriviti alla lista d'attesa per essere tra i primi a scoprirlo.",
+    "emailLabel": "Indirizzo email",
+    "emailPlaceholder": "tua@email.com",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Il tuo nome",
+    "gdprConsent": "Ho letto e accetto l'informativa sulla privacy e il trattamento dei miei dati personali.",
+    "marketingConsent": "Desidero ricevere aggiornamenti, novità e offerte speciali via email.",
+    "submitButton": "Iscriviti alla lista d'attesa",
+    "successTitle": "Iscrizione completata!",
+    "successMessage": "Grazie per esserti iscritto. Controlla la tua email per confermare l'iscrizione.",
+    "verifyTitle": "Verifica email",
+    "verifySuccess": "Email verificata con successo! Sei nella lista d'attesa.",
+    "verifyExpired": "Il link di verifica è scaduto. Richiedi un nuovo link.",
+    "verifyAlready": "Questa email è già stata verificata.",
+    "unsubscribeTitle": "Cancellazione iscrizione",
+    "unsubscribeSuccess": "Sei stato rimosso dalla lista d'attesa con successo.",
+    "unsubscribeAlready": "Questa email non è presente nella lista d'attesa.",
+    "promoCodeLabel": "Codice promozionale (opzionale)",
+    "loginLink": "Hai già un account? Accedi"
+  }
+}

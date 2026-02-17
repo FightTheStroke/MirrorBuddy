@@ -1,0 +1,24 @@
+{
+  "waitlist": {
+    "title": "Coming Soon",
+    "subtitle": "We are preparing something extraordinary. Sign up for the waitlist to be among the first to discover it.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "nameLabel": "Name",
+    "namePlaceholder": "Your name",
+    "gdprConsent": "I have read and accept the privacy policy and the processing of my personal data.",
+    "marketingConsent": "I would like to receive updates, news and special offers by email.",
+    "submitButton": "Join the waitlist",
+    "successTitle": "Registration complete!",
+    "successMessage": "Thank you for signing up. Check your email to confirm your registration.",
+    "verifyTitle": "Email verification",
+    "verifySuccess": "Email successfully verified! You are on the waitlist.",
+    "verifyExpired": "The verification link has expired. Request a new link.",
+    "verifyAlready": "This email has already been verified.",
+    "unsubscribeTitle": "Unsubscribe",
+    "unsubscribeSuccess": "You have been successfully removed from the waitlist.",
+    "unsubscribeAlready": "This email is not on the waitlist.",
+    "promoCodeLabel": "Promotional code (optional)",
+    "loginLink": "Already have an account? Sign in"
+  }
+}
