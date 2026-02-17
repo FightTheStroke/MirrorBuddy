@@ -21,6 +21,7 @@ vi.mock('@/lib/api/middlewares', () => ({
     (req: NextRequest) =>
       handler({ req, userId: undefined }),
   withSentry: () => {},
+  withCSRF: {},
   withRateLimit: () => {},
 }));
 
@@ -70,19 +71,19 @@ vi.mock('@sentry/nextjs', () => ({
 
 // Mock audit service
 vi.mock('@/lib/admin/audit-service', () => ({
-  auditService: {
-    log: vi.fn().mockResolvedValue(undefined),
-  },
+  logAdminAction: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { POST } from '../route';
 import { redeemCode } from '@/lib/promo/promo-service';
 import { checkRateLimitAsync } from '@/lib/rate-limit';
 import { validateAuth } from '@/lib/auth/server';
+import { logAdminAction } from '@/lib/admin/audit-service';
 
 const mockRedeemCode = redeemCode as ReturnType<typeof vi.fn>;
 const mockCheckRateLimit = checkRateLimitAsync as ReturnType<typeof vi.fn>;
 const mockValidateAuth = validateAuth as ReturnType<typeof vi.fn>;
+const mockLogAdminAction = logAdminAction as ReturnType<typeof vi.fn>;
 
 const VALID_SUBSCRIPTION = {
   id: 'sub-1',
@@ -127,6 +128,14 @@ describe('POST /api/promo/redeem', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(mockRedeemCode).toHaveBeenCalledWith('ABC12345', 'user-123');
+    expect(mockLogAdminAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'REDEEM_PROMO_CODE',
+        entityType: 'PromoCode',
+        entityId: 'ABC12345',
+        adminId: 'user-123',
+      }),
+    );
   });
 
   it('returns 401 without auth', async () => {

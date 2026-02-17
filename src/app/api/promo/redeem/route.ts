@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withRateLimit } from '@/lib/api/middlewares';
 import { redeemCode } from '@/lib/promo/promo-service';
 import { validateAuth } from '@/lib/auth/server';
+import { logAdminAction } from '@/lib/admin/audit-service';
 import { checkRateLimitAsync, getRateLimitIdentifier, rateLimitResponse } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 
@@ -18,9 +19,9 @@ interface RedeemBody {
   code: unknown;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- authenticated endpoint; CSRF enforced via session cookie auth
 export const POST = pipe(
   withSentry('/api/promo/redeem'),
+  withCSRF,
   withRateLimit(PROMO_RATE_LIMIT),
 )(async (ctx) => {
   // Explicit rate limit check (allows direct testing via checkRateLimitAsync mock)
@@ -59,6 +60,13 @@ export const POST = pipe(
     const result = await redeemCode(trimmedCode, userId);
 
     log.info('Promo code redeemed', { userId, code: trimmedCode });
+
+    await logAdminAction({
+      action: 'REDEEM_PROMO_CODE',
+      entityType: 'PromoCode',
+      entityId: trimmedCode,
+      adminId: userId,
+    });
 
     return NextResponse.json({ success: true, subscription: result }, { status: 200 });
   } catch (err) {
