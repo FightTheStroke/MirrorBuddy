@@ -118,9 +118,12 @@ describe('Session Config Locale Threading', () => {
     expect(sessionUpdate).toBeDefined();
 
     // Verify locale is used in transcription config
+    // GA protocol nests transcription under session.audio.input.transcription
     const config = sessionUpdate as any;
-    expect(config.session.input_audio_transcription).toBeDefined();
-    expect(config.session.input_audio_transcription.language).toBe('en');
+    const transcription =
+      config.session.audio?.input?.transcription ?? config.session.input_audio_transcription;
+    expect(transcription).toBeDefined();
+    expect(transcription.language).toBe('en');
   });
 
   it('should default to Italian when locale is not set', async () => {
@@ -152,7 +155,9 @@ describe('Session Config Locale Threading', () => {
     const sessionUpdate = dataChannelMessages.find((msg: any) => msg.type === 'session.update');
 
     const config = sessionUpdate as any;
-    expect(config.session.input_audio_transcription.language).toBe('it');
+    const transcription =
+      config.session.audio?.input?.transcription ?? config.session.input_audio_transcription;
+    expect(transcription.language).toBe('it');
   });
 
   it('should handle all supported locales', async () => {
@@ -189,7 +194,9 @@ describe('Session Config Locale Threading', () => {
       const sessionUpdate = dataChannelMessages.find((msg: any) => msg.type === 'session.update');
 
       const config = sessionUpdate as any;
-      expect(config.session.input_audio_transcription.language).toBe(locale);
+      const transcription =
+        config.session.audio?.input?.transcription ?? config.session.input_audio_transcription;
+      expect(transcription.language).toBe(locale);
     }
   });
 
@@ -251,7 +258,9 @@ describe('Session Config Locale Threading', () => {
     );
 
     await result.current();
-    const sessionUpdate = dataChannelMessages.find((msg: any) => msg.type === 'session.update') as any;
+    const sessionUpdate = dataChannelMessages.find(
+      (msg: any) => msg.type === 'session.update',
+    ) as any;
 
     expect(sessionUpdate.session).not.toHaveProperty('input_audio_format');
     expect(sessionUpdate.session).not.toHaveProperty('output_audio_format');

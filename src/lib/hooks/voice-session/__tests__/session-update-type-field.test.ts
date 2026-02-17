@@ -19,45 +19,54 @@ describe('session.update type field', () => {
     expect(parsed).toHaveProperty('session');
   });
 
-  it('should include type field in session config structure', () => {
-    // Simulate the structure from useSendSessionConfig
+  it('should include type field in session config structure (GA format)', () => {
+    // Simulate the GA structure from useSendSessionConfig
     const sessionConfig = {
       type: 'session.update',
       session: {
-        voice: 'alloy',
+        type: 'realtime',
         instructions: 'Test instructions',
-        turn_detection: {
-          type: 'server_vad',
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 500,
-          create_response: true,
-          interrupt_response: true,
-        },
         tools: [],
         temperature: 0.6,
+        audio: {
+          output: { voice: 'alloy' },
+          input: {
+            turn_detection: {
+              type: 'server_vad',
+              threshold: 0.5,
+              prefix_padding_ms: 300,
+              silence_duration_ms: 500,
+              create_response: true,
+              interrupt_response: true,
+            },
+          },
+        },
       },
     };
 
     expect(sessionConfig).toHaveProperty('type');
     expect(sessionConfig.type).toBe('session.update');
     expect(sessionConfig).toHaveProperty('session');
-    expect(sessionConfig.session).toHaveProperty('voice');
+    expect(sessionConfig.session.audio.output).toHaveProperty('voice');
   });
 
-  it('should include type field in voice diagnostics test message', () => {
-    // Simulate structure from voice-test.ts
+  it('should include type field in voice diagnostics test message (GA format)', () => {
+    // Simulate GA structure from voice-test.ts
     const diagnosticsSessionUpdate = {
       type: 'session.update',
       session: {
-        voice: 'alloy',
         instructions: 'Sei un assistente di test. Rispondi brevemente in italiano con una frase.',
-        turn_detection: {
-          type: 'server_vad',
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 500,
-          create_response: true,
+        audio: {
+          output: { voice: 'alloy' },
+          input: {
+            turn_detection: {
+              type: 'server_vad',
+              threshold: 0.5,
+              prefix_padding_ms: 300,
+              silence_duration_ms: 500,
+              create_response: true,
+            },
+          },
         },
       },
     };
@@ -67,15 +76,15 @@ describe('session.update type field', () => {
   });
 
   it('should validate type field is required for GA protocol', () => {
-    // GA protocol may require explicit type field for all messages
+    // GA protocol requires explicit type field for all messages
     const validMessage = {
       type: 'session.update',
-      session: { voice: 'alloy' },
+      session: { audio: { output: { voice: 'alloy' } } },
     };
 
     const invalidMessage = {
       // Missing type field
-      session: { voice: 'alloy' },
+      session: { audio: { output: { voice: 'alloy' } } },
     };
 
     expect(validMessage).toHaveProperty('type');

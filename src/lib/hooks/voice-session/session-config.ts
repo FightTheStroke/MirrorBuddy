@@ -191,37 +191,60 @@ export function useSendSessionConfig(
 
     logger.debug(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 
-    // Build session config
+    // Build session config — GA protocol nests voice/audio under session.audio
+    const voice = a11yState.settings.voicePreference || maestro.voice || 'alloy';
+    const transcriptionConfig = {
+      model: 'whisper-1' as const,
+      ...(isLanguageTeacher && targetLanguage
+        ? {
+            prompt: BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
+          }
+        : {
+            language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
+            prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
+          }),
+    };
+    const turnDetectionConfig = {
+      type: 'server_vad' as const,
+      threshold: vadConfig.threshold,
+      prefix_padding_ms: vadConfig.prefix_padding_ms,
+      silence_duration_ms: vadConfig.silence_duration_ms,
+      create_response: true,
+      interrupt_response: !options.disableBargeIn,
+    };
+
+    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
+
     const sessionConfig = {
       type: 'session.update',
       session: {
         type: 'realtime', // type: "realtime" required by GA session config contract
-        voice: a11yState.settings.voicePreference || maestro.voice || 'alloy',
         instructions: fullInstructions,
-        input_audio_noise_reduction: {
-          type: options.noiseReductionType || vadConfig.noise_reduction,
-        },
-        input_audio_transcription: {
-          model: 'whisper-1',
-          ...(isLanguageTeacher && targetLanguage
-            ? {
-                prompt: BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
-              }
-            : {
-                language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
-                prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
-              }),
-        },
-        turn_detection: {
-          type: 'server_vad',
-          threshold: vadConfig.threshold,
-          prefix_padding_ms: vadConfig.prefix_padding_ms,
-          silence_duration_ms: vadConfig.silence_duration_ms,
-          create_response: true,
-          interrupt_response: !options.disableBargeIn,
-        },
         tools: VOICE_TOOLS,
         temperature: 0.6,
+        // GA protocol nests voice/transcription/turn_detection under audio object
+        // Preview protocol uses flat session-level fields
+        ...(useGAProtocol
+          ? {
+              audio: {
+                output: { voice },
+                input: {
+                  noise_reduction: {
+                    type: options.noiseReductionType || vadConfig.noise_reduction,
+                  },
+                  transcription: transcriptionConfig,
+                  turn_detection: turnDetectionConfig,
+                },
+              },
+            }
+          : {
+              voice,
+              input_audio_noise_reduction: {
+                type: options.noiseReductionType || vadConfig.noise_reduction,
+              },
+              input_audio_transcription: transcriptionConfig,
+              turn_detection: turnDetectionConfig,
+            }),
       },
     };
 

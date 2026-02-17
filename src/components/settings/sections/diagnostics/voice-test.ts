@@ -1,5 +1,9 @@
 import type { DiagnosticResult } from './types';
-import { isWebRTCSupported, getWebRTCSupportReport } from '@/lib/hooks/voice-session/webrtc-detection';
+import {
+  isWebRTCSupported,
+  getWebRTCSupportReport,
+} from '@/lib/hooks/voice-session/webrtc-detection';
+import { isFeatureEnabled } from '@/lib/feature-flags/client';
 
 export async function runVoiceTest(): Promise<DiagnosticResult> {
   // Audio playback setup
@@ -10,7 +14,9 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
 
   const initPlayback = () => {
     if (!playbackContext) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       playbackContext = new AudioCtx({ sampleRate: 24000 });
     }
     return playbackContext;
@@ -125,32 +131,50 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
 
           // Wait for proxy.ready, then send session.update
           if (data.type === 'proxy.ready') {
-            ws.send(JSON.stringify({
-              type: 'session.update',
-              session: {
-                voice: 'alloy',
-                instructions: 'Sei un assistente di test. Rispondi brevemente in italiano con una frase.',
-                input_audio_format: 'pcm16',
-                turn_detection: {
-                  type: 'server_vad',
-                  threshold: 0.5,
-                  prefix_padding_ms: 300,
-                  silence_duration_ms: 500,
-                  create_response: true
-                }
-              }
-            }));
+            const useGA = isFeatureEnabled('voice_ga_protocol').enabled;
+            const instructions =
+              'Sei un assistente di test. Rispondi brevemente in italiano con una frase.';
+            const turnDetection = {
+              type: 'server_vad',
+              threshold: 0.5,
+              prefix_padding_ms: 300,
+              silence_duration_ms: 500,
+              create_response: true,
+            };
+            ws.send(
+              JSON.stringify({
+                type: 'session.update',
+                session: useGA
+                  ? {
+                      instructions,
+                      audio: {
+                        output: { voice: 'alloy' },
+                        input: { turn_detection: turnDetection },
+                      },
+                    }
+                  : {
+                      voice: 'alloy',
+                      instructions,
+                      input_audio_format: 'pcm16',
+                      turn_detection: turnDetection,
+                    },
+              }),
+            );
           }
 
           if (data.type === 'session.updated') {
-            ws.send(JSON.stringify({
-              type: 'conversation.item.create',
-              item: {
-                type: 'message',
-                role: 'user',
-                content: [{ type: 'input_text', text: 'Ciao! Dimmi OK per confermare che funzioni.' }]
-              }
-            }));
+            ws.send(
+              JSON.stringify({
+                type: 'conversation.item.create',
+                item: {
+                  type: 'message',
+                  role: 'user',
+                  content: [
+                    { type: 'input_text', text: 'Ciao! Dimmi OK per confermare che funzioni.' },
+                  ],
+                },
+              }),
+            );
             // Trigger response
             setTimeout(() => {
               if (ws.readyState === WebSocket.OPEN) {
@@ -160,7 +184,10 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
           }
 
           // Handle audio - both Preview and GA API formats
-          if ((data.type === 'response.audio.delta' || data.type === 'response.output_audio.delta') && data.delta) {
+          if (
+            (data.type === 'response.audio.delta' || data.type === 'response.output_audio.delta') &&
+            data.delta
+          ) {
             queueAudio(data.delta);
           }
 
@@ -176,7 +203,6 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
             ws.close();
             reject(new Error(JSON.stringify(data.error)));
           }
-
         } catch {
           // Parse error, ignore
         }
@@ -190,19 +216,22 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
       ws.onclose = (event) => {
         clearTimeout(timeout);
         if (!audioReceived && !responseDone) {
-          reject(new Error(`WebSocket chiuso: code=${event.code}, reason=${event.reason || 'none'}`));
+          reject(
+            new Error(`WebSocket chiuso: code=${event.code}, reason=${event.reason || 'none'}`),
+          );
         }
       };
     });
 
     // Success - audio was played!
-    const webrtcInfo = webrtcSupported ? 'WebRTC supportato' : 'WebRTC non supportato (fallback a WebSocket)';
+    const webrtcInfo = webrtcSupported
+      ? 'WebRTC supportato'
+      : 'WebRTC non supportato (fallback a WebSocket)';
     return {
       status: 'success',
       message: 'Voice funzionante! Hai sentito la risposta?',
       details: `Transport: ${transportMode} | ${webrtcInfo} | Proxy: ${wsUrl} | Audio ricevuto e riprodotto`,
     };
-
   } catch (error) {
     const webrtcInfo = isWebRTCSupported() ? 'WebRTC supportato' : 'WebRTC non supportato';
     return {
