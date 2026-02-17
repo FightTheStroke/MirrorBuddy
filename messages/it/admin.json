@@ -549,7 +549,8 @@
       "logs": "Log",
       "auditLog": "Registro Audit",
       "serviceLimits": "Limiti Servizi",
-      "safety": "Sicurezza"
+      "safety": "Sicurezza",
+      "waitlist": "Waitlist"
     },
     "header": {
       "title": "Pannello Amministrazione",
@@ -744,7 +745,14 @@
         "dailyQuota": "Quota giornaliera",
         "monthlyQuota": "Quota mensile",
         "campaignSummary": "Riepilogo campagna",
-        "template": "Modello"
+        "template": "Modello",
+        "recipientSource": "Fonte destinatari",
+        "sourceUsers": "Utenti",
+        "sourceWaitlist": "Lista d'attesa",
+        "sourceBoth": "Entrambi",
+        "verifiedOnly": "Solo verificati",
+        "marketingConsentOnly": "Solo consenso marketing",
+        "promoCode": "Codice promozionale"
       },
       "stats": {
         "title": "Statistiche Email",
@@ -1767,6 +1775,33 @@
       "scenarios": "Scenari",
       "reportTitle": "Report Completo",
       "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    },
+    "waitlist": {
+      "title": "Gestione Waitlist",
+      "loading": "Caricamento waitlist...",
+      "refresh": "Aggiorna",
+      "errorLoading": "Errore nel caricamento dei dati",
+      "totalSignups": "Totale Iscrizioni",
+      "pending": "In Attesa",
+      "invited": "Invitati",
+      "todaySignups": "Iscrizioni Oggi",
+      "searchPlaceholder": "Cerca per email...",
+      "entriesTitle": "Iscritti",
+      "tableAriaLabel": "Tabella iscritti alla waitlist",
+      "noEntries": "Nessun iscritto trovato",
+      "columnEmail": "Email",
+      "columnStatus": "Stato",
+      "columnPosition": "Posizione",
+      "columnSignedUp": "Iscritto il",
+      "columnInvited": "Invitato il",
+      "pageInfo": "Pagina {current} di {total}",
+      "previousPage": "Precedente",
+      "nextPage": "Successivo",
+      "status": {
+        "pending": "In attesa",
+        "invited": "Invitato",
+        "registered": "Registrato"
+      }
     }
   }
 }

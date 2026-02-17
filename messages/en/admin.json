@@ -545,7 +545,8 @@
       "logs": "Logs",
       "auditLog": "Audit Log",
       "serviceLimits": "Service Limits",
-      "safety": "Safety"
+      "safety": "Safety",
+      "waitlist": "Waitlist"
     },
     "header": {
       "title": "Admin Panel",
@@ -740,7 +741,14 @@
         "previewError": "Preview Error",
         "sendSuccess": "Campaign Sent",
         "sendError": "Send Error",
-        "name": "[TRANSLATE] Nome"
+        "name": "[TRANSLATE] Nome",
+        "recipientSource": "[TRANSLATE] Fonte destinatari",
+        "sourceUsers": "[TRANSLATE] Utenti",
+        "sourceWaitlist": "[TRANSLATE] Lista d'attesa",
+        "sourceBoth": "[TRANSLATE] Entrambi",
+        "verifiedOnly": "[TRANSLATE] Solo verificati",
+        "marketingConsentOnly": "[TRANSLATE] Solo consenso marketing",
+        "promoCode": "[TRANSLATE] Codice promozionale"
       },
       "stats": {
         "title": "Email Statistics",
@@ -1767,6 +1775,33 @@
       "scenarios": "Scenarios",
       "reportTitle": "Full Report",
       "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    },
+    "waitlist": {
+      "title": "Waitlist Management",
+      "loading": "Loading waitlist...",
+      "refresh": "Refresh",
+      "errorLoading": "Error loading data",
+      "totalSignups": "Total Signups",
+      "pending": "Pending",
+      "invited": "Invited",
+      "todaySignups": "Today's Signups",
+      "searchPlaceholder": "Search by email...",
+      "entriesTitle": "Subscribers",
+      "tableAriaLabel": "Waitlist subscribers table",
+      "noEntries": "No subscribers found",
+      "columnEmail": "Email",
+      "columnStatus": "Status",
+      "columnPosition": "Position",
+      "columnSignedUp": "Signed Up",
+      "columnInvited": "Invited On",
+      "pageInfo": "Page {current} of {total}",
+      "previousPage": "Previous",
+      "nextPage": "Next",
+      "status": {
+        "pending": "Pending",
+        "invited": "Invited",
+        "registered": "Registered"
+      }
     }
   }
 }

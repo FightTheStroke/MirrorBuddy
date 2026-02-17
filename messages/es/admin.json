@@ -545,7 +545,8 @@
       "logs": "Registros",
       "auditLog": "Registro de Auditoría",
       "serviceLimits": "Límites de Servicio",
-      "safety": "Seguridad"
+      "safety": "Seguridad",
+      "waitlist": "[TRANSLATE] Waitlist"
     },
     "header": {
       "title": "Panel de administración",
@@ -740,7 +741,14 @@
         "dailyQuota": "[TRANSLATE] Quota giornaliera",
         "monthlyQuota": "[TRANSLATE] Quota mensile",
         "campaignSummary": "[TRANSLATE] Riepilogo campagna",
-        "template": "[TRANSLATE] Modello"
+        "template": "[TRANSLATE] Modello",
+        "recipientSource": "[TRANSLATE] Fonte destinatari",
+        "sourceUsers": "[TRANSLATE] Utenti",
+        "sourceWaitlist": "[TRANSLATE] Lista d'attesa",
+        "sourceBoth": "[TRANSLATE] Entrambi",
+        "verifiedOnly": "[TRANSLATE] Solo verificati",
+        "marketingConsentOnly": "[TRANSLATE] Solo consenso marketing",
+        "promoCode": "[TRANSLATE] Codice promozionale"
       },
       "stats": {
         "title": "Estadísticas de Email",
@@ -1767,6 +1775,33 @@
       "scenarios": "Escenarios",
       "reportTitle": "Informe Completo",
       "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    },
+    "waitlist": {
+      "title": "Gestión de lista de espera",
+      "loading": "Cargando lista de espera...",
+      "refresh": "Actualizar",
+      "errorLoading": "Error al cargar los datos",
+      "totalSignups": "Total de registros",
+      "pending": "Pendiente",
+      "invited": "Invitados",
+      "todaySignups": "Registros hoy",
+      "searchPlaceholder": "Buscar por email...",
+      "entriesTitle": "Suscriptores",
+      "tableAriaLabel": "Tabla de suscriptores de la lista de espera",
+      "noEntries": "No se encontraron suscriptores",
+      "columnEmail": "Email",
+      "columnStatus": "Estado",
+      "columnPosition": "Posición",
+      "columnSignedUp": "Registrado el",
+      "columnInvited": "Invitado el",
+      "pageInfo": "Página {current} de {total}",
+      "previousPage": "Anterior",
+      "nextPage": "Siguiente",
+      "status": {
+        "pending": "Pendiente",
+        "invited": "Invitado",
+        "registered": "Registrado"
+      }
     }
   }
 }

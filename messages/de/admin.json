@@ -545,7 +545,8 @@
       "logs": "Protokolle",
       "auditLog": "Prüfprotokoll",
       "serviceLimits": "Dienstgrenzen",
-      "safety": "Sicherheit"
+      "safety": "Sicherheit",
+      "waitlist": "Warteliste"
     },
     "header": {
       "title": "Admin-Panel",
@@ -740,7 +741,14 @@
         "dailyQuota": "[TRANSLATE] Quota giornaliera",
         "monthlyQuota": "[TRANSLATE] Quota mensile",
         "campaignSummary": "[TRANSLATE] Riepilogo campagna",
-        "template": "[TRANSLATE] Modello"
+        "template": "[TRANSLATE] Modello",
+        "recipientSource": "[TRANSLATE] Fonte destinatari",
+        "sourceUsers": "[TRANSLATE] Utenti",
+        "sourceWaitlist": "[TRANSLATE] Lista d'attesa",
+        "sourceBoth": "[TRANSLATE] Entrambi",
+        "verifiedOnly": "[TRANSLATE] Solo verificati",
+        "marketingConsentOnly": "[TRANSLATE] Solo consenso marketing",
+        "promoCode": "[TRANSLATE] Codice promozionale"
       },
       "stats": {
         "title": "E-Mail-Statistiken",
@@ -1767,6 +1775,33 @@
       "scenarios": "Szenarien",
       "reportTitle": "Vollständiger Bericht",
       "maestroPlaceholder": "prof-einstein, prof-fibonacci"
+    },
+    "waitlist": {
+      "title": "Wartelisten-Verwaltung",
+      "loading": "Warteliste wird geladen...",
+      "refresh": "Aktualisieren",
+      "errorLoading": "Fehler beim Laden der Daten",
+      "totalSignups": "Gesamt-Anmeldungen",
+      "pending": "Ausstehend",
+      "invited": "Eingeladen",
+      "todaySignups": "Heutige Anmeldungen",
+      "searchPlaceholder": "Nach E-Mail suchen...",
+      "entriesTitle": "Abonnenten",
+      "tableAriaLabel": "Tabelle der Wartelisten-Abonnenten",
+      "noEntries": "Keine Abonnenten gefunden",
+      "columnEmail": "E-Mail",
+      "columnStatus": "Status",
+      "columnPosition": "Position",
+      "columnSignedUp": "Angemeldet am",
+      "columnInvited": "Eingeladen am",
+      "pageInfo": "Seite {current} von {total}",
+      "previousPage": "Vorherige",
+      "nextPage": "Nächste",
+      "status": {
+        "pending": "Ausstehend",
+        "invited": "Eingeladen",
+        "registered": "Registriert"
+      }
     }
   }
 }

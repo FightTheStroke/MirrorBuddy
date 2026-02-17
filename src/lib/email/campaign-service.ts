@@ -7,14 +7,27 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
 
+/** Recipient source for campaign sending */
+export type CampaignSource = 'users' | 'waitlist' | 'both';
+
+/** Waitlist-specific filter criteria */
+export interface WaitlistFilters {
+  locales?: string[];
+}
+
 /** Recipient filter criteria for targeting user segments */
 export interface RecipientFilters {
+  recipientSource?: CampaignSource;
+  // User filters
   tiers?: string[];
   roles?: string[];
   languages?: string[];
   schoolLevels?: string[];
   disabled?: boolean;
   isTestData?: boolean;
+  // Waitlist filters
+  verifiedOnly?: boolean;
+  marketingConsentOnly?: boolean;
 }
 
 /** Campaign list filter options */
@@ -48,12 +61,22 @@ export interface EmailCampaign {
   };
 }
 
-/** Recipient preview result */
+/** Recipient preview result with optional dual-source breakdown */
 export interface RecipientPreview {
   totalCount: number;
+  /** User count when source includes users (undefined for waitlist-only) */
+  userCount?: number;
+  /** Waitlist lead count when source includes waitlist */
+  waitlistCount?: number;
   sampleUsers: Array<{
     id: string;
     email: string | null;
+    name: string | null;
+  }>;
+  /** Sample waitlist leads when source includes waitlist */
+  sampleWaitlistLeads?: Array<{
+    id: string;
+    email: string;
     name: string | null;
   }>;
 }
@@ -111,47 +134,76 @@ export function buildRecipientQuery(filters: RecipientFilters): Prisma.UserWhere
   return where;
 }
 
-/** Get recipient preview with count and first 10 sample users */
-export async function getRecipientPreview(filters: RecipientFilters): Promise<RecipientPreview> {
+/** Build Prisma where clause for WaitlistEntry recipients (GDPR: verified + not unsubscribed) */
+export function buildWaitlistRecipientQuery(filters: WaitlistFilters): Record<string, unknown> {
+  const where: Record<string, unknown> = {
+    verifiedAt: { not: null },
+    unsubscribedAt: null,
+  };
+
+  if (filters.locales && filters.locales.length > 0) {
+    where.locale = { in: filters.locales };
+  }
+
+  return where;
+}
+
+/** Get recipient preview with count and samples; supports dual source (users + waitlist) */
+export async function getRecipientPreview(
+  filters: RecipientFilters,
+  source?: CampaignSource,
+): Promise<RecipientPreview> {
   try {
-    const where = buildRecipientQuery(filters);
+    const includesUsers = !source || source === 'users' || source === 'both';
+    const includesWaitlist = source === 'waitlist' || source === 'both';
 
-    // Get total count of matching users
-    const totalCount = await prisma.user.count({
-      where,
-    });
+    let userCount = 0;
+    let sampleUsers: Array<{ id: string; email: string | null; name: string | null }> = [];
 
-    // Get first 10 users as sample
-    const users = await prisma.user.findMany({
-      where,
-      take: 10,
-      select: {
-        id: true,
-        email: true,
-        profile: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
+    if (includesUsers) {
+      const userWhere = buildRecipientQuery(filters);
+      const [count, users] = await Promise.all([
+        prisma.user.count({ where: userWhere }),
+        prisma.user.findMany({
+          where: userWhere,
+          take: 10,
+          select: { id: true, email: true, profile: { select: { name: true } } },
+        }),
+      ]);
+      userCount = count;
+      sampleUsers = users.map((u) => ({ id: u.id, email: u.email, name: u.profile?.name ?? null }));
+    }
 
-    // Transform to simple structure
-    const sampleUsers = users.map((user) => ({
-      id: user.id,
-      email: user.email,
-      name: user.profile?.name ?? null,
+    if (!includesWaitlist) {
+      return { totalCount: userCount, sampleUsers };
+    }
+
+    // Dual source: query waitlist leads with GDPR filters
+    const wlWhere = buildWaitlistRecipientQuery({});
+    const [waitlistCount, waitlistLeads] = await Promise.all([
+      prisma.waitlistEntry.count({ where: wlWhere }),
+      prisma.waitlistEntry.findMany({
+        where: wlWhere,
+        take: 10,
+        select: { id: true, email: true, name: true },
+      }),
+    ]);
+
+    const sampleWaitlistLeads = waitlistLeads.map((l) => ({
+      id: l.id,
+      email: l.email,
+      name: l.name ?? null,
     }));
 
     return {
-      totalCount,
+      totalCount: userCount + waitlistCount,
+      userCount,
+      waitlistCount,
       sampleUsers,
+      sampleWaitlistLeads,
     };
   } catch (error) {
-    logger.error('Error getting recipient preview', {
-      filters,
-      error: String(error),
-    });
+    logger.error('Error getting recipient preview', { filters, error: String(error) });
     throw error;
   }
 }
@@ -246,7 +298,7 @@ export async function listCampaigns(filters?: CampaignListFilters): Promise<Emai
 }
 
 /** Send email campaign to recipients with quota checking and preference validation */
-export async function sendCampaign(campaignId: string): Promise<void> {
+export async function sendCampaign(campaignId: string, source?: CampaignSource): Promise<void> {
   try {
     // Load campaign with template
     const campaign = await getCampaign(campaignId);
@@ -264,43 +316,50 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       templateId: campaign.template.id,
     });
 
-    // Get recipients using filter query
-    const where = buildRecipientQuery(campaign.filters as RecipientFilters);
-    const recipients = await prisma.user.findMany({
-      where,
-      take: 10000,
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        profile: {
-          select: {
-            name: true,
-            schoolLevel: true,
-            gradeLevel: true,
-            age: true,
-          },
-        },
-        settings: {
-          select: {
-            language: true,
-          },
-        },
-        subscription: {
-          select: {
-            tier: {
-              select: {
-                code: true,
-              },
+    // Determine effective source (parameter overrides campaign field)
+    const effectiveSource: CampaignSource =
+      source ??
+      ((campaign as unknown as Record<string, unknown>).source as CampaignSource) ??
+      'users';
+
+    // Get user recipients (unless source is waitlist-only)
+    const recipients =
+      effectiveSource === 'waitlist'
+        ? []
+        : await prisma.user.findMany({
+            where: buildRecipientQuery(campaign.filters as RecipientFilters),
+            take: 10000,
+            select: {
+              id: true,
+              email: true,
+              username: true,
+              profile: { select: { name: true, schoolLevel: true, gradeLevel: true, age: true } },
+              settings: { select: { language: true } },
+              subscription: { select: { tier: { select: { code: true } } } },
             },
-          },
-        },
-      },
-    });
+          });
+
+    // Get waitlist recipients when source includes waitlist
+    const waitlistRecipients =
+      effectiveSource === 'waitlist' || effectiveSource === 'both'
+        ? await prisma.waitlistEntry.findMany({
+            where: buildWaitlistRecipientQuery({}),
+            take: 10000,
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              locale: true,
+              unsubscribeToken: true,
+              promoCode: true,
+            },
+          })
+        : [];
 
     logger.info('Recipients loaded', {
       campaignId,
       recipientCount: recipients.length,
+      waitlistCount: waitlistRecipients.length,
     });
 
     // Check quota
@@ -312,15 +371,14 @@ export async function sendCampaign(campaignId: string): Promise<void> {
       limits.emailsMonth.limit - limits.emailsMonth.used,
     );
 
-    if (recipients.length > availableQuota) {
-      throw new Error(
-        `Insufficient email quota: need ${recipients.length}, available ${availableQuota}`,
-      );
+    const totalNeeded = recipients.length + waitlistRecipients.length;
+    if (totalNeeded > availableQuota) {
+      throw new Error(`Insufficient email quota: need ${totalNeeded}, available ${availableQuota}`);
     }
 
     logger.info('Quota check passed', {
       campaignId,
-      needed: recipients.length,
+      needed: totalNeeded,
       available: availableQuota,
     });
 
@@ -480,6 +538,69 @@ export async function sendCampaign(campaignId: string): Promise<void> {
             email: recipient.email ?? '',
             status: 'FAILED',
           },
+        });
+      }
+    }
+
+    // Process waitlist leads (no preference check required — consent given at signup)
+    for (const lead of waitlistRecipients) {
+      try {
+        // GDPR guard: skip if unsubscribed (defensive check in case query missed it)
+        if ((lead as unknown as Record<string, unknown>).unsubscribedAt) {
+          failedCount++;
+          continue;
+        }
+
+        if (!lead.email) {
+          failedCount++;
+          continue;
+        }
+
+        const unsubscribeUrl = `${appUrl}/unsubscribe?token=${lead.unsubscribeToken}&type=waitlist`;
+        const variables: Record<string, string> = {
+          name: lead.name ?? 'User',
+          email: lead.email,
+          promoCode: lead.promoCode ?? '',
+          language: ((lead as unknown as Record<string, unknown>).locale as string) ?? 'it',
+          appUrl,
+          unsubscribeUrl,
+          currentDate,
+          currentYear,
+        };
+
+        const rendered = await renderTemplate(campaign.template!.id, variables);
+        const gdprFooter = `<hr><p style='font-size:12px;color:#666;'>Legal basis: Consent. <a href='${unsubscribeUrl}'>Unsubscribe</a>. MirrorBuddy - Educational Platform.</p>`;
+        const result = await sendEmail({
+          to: lead.email,
+          subject: rendered.subject,
+          html: rendered.htmlBody + gdprFooter,
+          text: rendered.textBody,
+        });
+
+        await prisma.emailRecipient.create({
+          data: {
+            campaignId,
+            userId: null,
+            email: lead.email,
+            status: result.success ? 'SENT' : 'FAILED',
+            resendMessageId: result.messageId,
+            sentAt: result.success ? new Date() : null,
+          },
+        });
+
+        if (result.success) {
+          sentCount++;
+        } else {
+          failedCount++;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } catch (error) {
+        failedCount++;
+        logger.error('Error sending email to waitlist lead', {
+          campaignId,
+          leadEmail: lead.email,
+          error: String(error),
         });
       }
     }
