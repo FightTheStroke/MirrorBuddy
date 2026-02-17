@@ -107,7 +107,8 @@ test.describe('Waitlist form submission', () => {
     // Success feedback must appear (toast, message, or confirmation text)
     const successMessage = page
       .getByRole('status')
-      .or(page.getByText(/aggiunto|waitlist|success|grazie|thank/i).first());
+      .or(page.getByText(/aggiunto|waitlist|success|grazie|thank/i))
+      .first();
     await expect(successMessage).toBeVisible({ timeout: 5000 });
   });
 
@@ -172,7 +173,8 @@ test.describe('Keyboard navigation', () => {
     // Success feedback must appear
     const successMessage = page
       .getByRole('status')
-      .or(page.getByText(/aggiunto|waitlist|success|grazie|thank/i).first());
+      .or(page.getByText(/aggiunto|waitlist|success|grazie|thank/i))
+      .first();
     await expect(successMessage).toBeVisible({ timeout: 5000 });
   });
 
