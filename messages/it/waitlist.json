@@ -15,10 +15,26 @@
     "verifySuccess": "Email verificata con successo! Sei nella lista d'attesa.",
     "verifyExpired": "Il link di verifica è scaduto. Richiedi un nuovo link.",
     "verifyAlready": "Questa email è già stata verificata.",
+    "verifyNotFound": "Link di verifica non valido o non trovato.",
+    "promoCodeTitle": "Il tuo codice promozionale",
+    "backToComingSoon": "Torna alla pagina principale",
     "unsubscribeTitle": "Cancellazione iscrizione",
     "unsubscribeSuccess": "Sei stato rimosso dalla lista d'attesa con successo.",
     "unsubscribeAlready": "Questa email non è presente nella lista d'attesa.",
+    "unsubscribeNotFound": "Richiesta di cancellazione non trovata o non valida.",
     "promoCodeLabel": "Codice promozionale (opzionale)",
-    "loginLink": "Hai già un account? Accedi"
+    "loginLink": "Hai già un account? Accedi",
+    "optional": "opzionale",
+    "privacyLink": "informativa sulla privacy",
+    "submitting": "Iscrizione in corso...",
+    "errorEmailRequired": "L'indirizzo email è obbligatorio.",
+    "errorEmailInvalid": "Inserisci un indirizzo email valido.",
+    "errorGdprRequired": "Devi accettare l'informativa sulla privacy per procedere.",
+    "errorDuplicate": "Questa email è già registrata nella lista d'attesa.",
+    "errorRateLimit": "Troppi tentativi. Riprova tra qualche minuto.",
+    "errorValidation": "Controlla i dati inseriti e riprova.",
+    "errorServer": "Si è verificato un errore. Riprova più tardi.",
+    "accountNavigation": "Navigazione account",
+    "mainNavigation": "Navigazione principale"
   }
 }

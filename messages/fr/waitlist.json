@@ -19,6 +19,16 @@
     "unsubscribeSuccess": "Vous avez été retiré de la liste d'attente avec succès.",
     "unsubscribeAlready": "Cet email n'est pas sur la liste d'attente.",
     "promoCodeLabel": "Code promotionnel (optionnel)",
-    "loginLink": "Vous avez déjà un compte ? Connectez-vous"
+    "loginLink": "Vous avez déjà un compte ? Connectez-vous",
+    "optional": "optionnel",
+    "privacyLink": "politique de confidentialité",
+    "submitting": "Inscription en cours...",
+    "errorEmailRequired": "L'adresse email est obligatoire.",
+    "errorEmailInvalid": "Veuillez entrer une adresse email valide.",
+    "errorGdprRequired": "Vous devez accepter la politique de confidentialité pour continuer.",
+    "errorDuplicate": "Cet email est déjà inscrit sur la liste d'attente.",
+    "errorRateLimit": "Trop de tentatives. Réessayez dans quelques minutes.",
+    "errorValidation": "Vérifiez vos informations et réessayez.",
+    "errorServer": "Une erreur s'est produite. Réessayez plus tard."
   }
 }

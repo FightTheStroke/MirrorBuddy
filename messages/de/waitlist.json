@@ -19,6 +19,16 @@
     "unsubscribeSuccess": "Sie wurden erfolgreich von der Warteliste entfernt.",
     "unsubscribeAlready": "Diese E-Mail befindet sich nicht auf der Warteliste.",
     "promoCodeLabel": "Aktionscode (optional)",
-    "loginLink": "Haben Sie bereits ein Konto? Anmelden"
+    "loginLink": "Haben Sie bereits ein Konto? Anmelden",
+    "optional": "optional",
+    "privacyLink": "Datenschutzrichtlinie",
+    "submitting": "Anmeldung läuft...",
+    "errorEmailRequired": "E-Mail-Adresse ist erforderlich.",
+    "errorEmailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorGdprRequired": "Sie müssen die Datenschutzrichtlinie akzeptieren, um fortzufahren.",
+    "errorDuplicate": "Diese E-Mail ist bereits auf der Warteliste registriert.",
+    "errorRateLimit": "Zu viele Versuche. Bitte versuchen Sie es in ein paar Minuten erneut.",
+    "errorValidation": "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+    "errorServer": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
   }
 }
