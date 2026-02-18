@@ -20,11 +20,15 @@ export interface ActionRefs {
 }
 
 /**
- * Toggle mute state for microphone input
+ * Toggle mute state for microphone input.
+ * The actual WebRTC track muting is handled by a useEffect in use-voice-session.ts
+ * that watches the isMuted store value and sets track.enabled accordingly.
  */
 export function useToggleMute(isMuted: boolean, setMuted: (value: boolean) => void) {
   return useCallback(() => {
-    setMuted(!isMuted);
+    const newMuted = !isMuted;
+    logger.debug(`[VoiceSession] Mute toggled: ${newMuted ? 'muted' : 'unmuted'}`);
+    setMuted(newMuted);
   }, [isMuted, setMuted]);
 }
 

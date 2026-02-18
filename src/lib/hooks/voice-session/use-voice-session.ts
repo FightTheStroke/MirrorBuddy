@@ -205,6 +205,18 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ============================================================================
+  // MUTE SYNC — disable/enable WebRTC audio tracks based on store state
+  // ============================================================================
+
+  useEffect(() => {
+    const stream = refs.mediaStreamRef.current;
+    if (!stream) return;
+    stream.getAudioTracks().forEach((track) => {
+      track.enabled = !store.isMuted;
+    });
+  }, [store.isMuted, refs.mediaStreamRef]);
+
+  // ============================================================================
   // ACTIONS & RETURN
   // ============================================================================
 
