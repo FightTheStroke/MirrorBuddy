@@ -64,7 +64,10 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
     // Track TRIAL_START funnel event
     await trackTrialStartClick();
 
-    await createTrialSession();
+    // Only create trial session for new users (returning users already have auth)
+    if (!isReturningUser) {
+      await createTrialSession();
+    }
 
     // Save trial email if provided via TrialEmailForm
     const trialEmail =
