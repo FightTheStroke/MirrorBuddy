@@ -9,9 +9,15 @@ import { test, expect } from './fixtures';
 
 test.describe('PROD-SMOKE: Infrastructure', () => {
   test('Health endpoint returns healthy', async ({ request }) => {
-    const res = await request.get('/api/health');
-    expect(res.status()).toBe(200);
-    const body = await res.json();
+    // Retry health check — in CI the DB service container may still be warming up
+    let res;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      res = await request.get('/api/health');
+      if (res.status() === 200) break;
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+    expect(res!.status()).toBe(200);
+    const body = await res!.json();
     // In CI, AI provider may be unavailable → status is 'degraded'
     expect(['healthy', 'degraded']).toContain(body.status);
     expect(body.checks.database.status).toBe('pass');
