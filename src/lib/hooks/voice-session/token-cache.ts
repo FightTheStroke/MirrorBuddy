@@ -44,8 +44,10 @@ export function useTokenCache() {
         });
 
         if (!response.ok) {
+          const errorBody = await response.text().catch(() => '');
           logger.warn('[TokenCache] Failed to pre-fetch token', {
             status: response.status,
+            details: errorBody.slice(0, 200),
           });
           return null;
         }
