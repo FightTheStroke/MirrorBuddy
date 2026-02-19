@@ -171,7 +171,10 @@ export class WebRTCConnection {
       }),
     });
     if (!response.ok) {
-      throw new Error(`Failed to get ephemeral token: ${response.statusText}`);
+      const errorBody = await response.text().catch(() => '');
+      throw new Error(
+        `Failed to get ephemeral token: ${response.status} - ${errorBody.slice(0, 200)}`,
+      );
     }
     const data: EphemeralTokenResponse = await response.json();
     return data.token;

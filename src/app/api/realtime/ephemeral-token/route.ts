@@ -203,7 +203,7 @@ export const POST = pipe(
         status: response.status,
         details: errorData.slice(0, 200),
       },
-      response.status >= 500 ? 503 : 400,
+      response.status >= 500 ? 503 : response.status,
     );
   }
 
