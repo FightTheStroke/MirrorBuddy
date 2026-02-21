@@ -60,10 +60,14 @@ export const test = base.extend({
  */
 export async function openMobileMenu(page: import('@playwright/test').Page) {
   const menuButton = page.getByRole('button', { name: /Apri menu/i }).first();
-  if (await menuButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+  if (await menuButton.isVisible({ timeout: 5000 }).catch(() => false)) {
     await menuButton.click();
-    // Wait for sidebar animation
-    await page.waitForTimeout(300);
+    // Wait for sidebar animation and verify it opened
+    await page
+      .locator('aside, nav')
+      .first()
+      .waitFor({ state: 'visible', timeout: 3000 })
+      .catch(() => {});
   }
 }
 

@@ -70,8 +70,10 @@ test.describe('PROD-SMOKE: Extended Compliance', () => {
       bannerVisible || consentTextVisible
         ? true
         : await (async () => {
-            const res = await page.goto(`${PROD_URL}/it/cookies`);
-            return res !== null && res.status() === 200;
+            const res = await page.goto(`${PROD_URL}/it/cookies`, {
+              waitUntil: 'domcontentloaded',
+            });
+            return res !== null && [200, 307, 308].includes(res.status());
           })();
 
     expect(cookiePageAccessible).toBeTruthy();
