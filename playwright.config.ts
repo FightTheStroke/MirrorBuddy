@@ -153,6 +153,7 @@ export default defineConfig({
         '**/legal-data-privacy.spec.ts', // Runs in Compliance E2E CI job
         '**/full-app-smoke.spec.ts', // Runs in Smoke Tests CI job
         '**/smoke/**', // Runs in Smoke Tests CI job
+        '**/production-smoke/**', // Runs in Smoke Tests CI job (production-smoke config)
         '**/auth/sso-*.spec.ts', // SSO tables not yet migrated
         '**/marketing/**', // Requires TrialConsentGate bypass
         '**/trial/**', // Requires trial-specific fixture setup
