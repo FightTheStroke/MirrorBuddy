@@ -12,8 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Study Kit upload 500**: Wrapped formData parsing in try-catch, added pdf-parse import resilience with 30s timeout on Vercel serverless
 - **XP/MirrorBucks not persisted**: Progress model now synced from gamification points — XP, mirrorBucks, and sessionsThisWeek written to both UserGamification and Progress models
 - **i18n: 196 placeholder keys**: Translated English placeholders across all 5 locales (it/en/fr/de/es) in education.json and settings.json — calendar days, settings labels, zaino title, accessibility profiles
+- **Sentry client enabled=false**: Added `NEXT_PUBLIC_VERCEL` fallback in client detection logic
 
 ### Added
+
+- **Production security smoke tests** (`18-security.spec.ts`): CSRF enforcement, CSP headers, cookie httpOnly/secure flags, auth rejection on 13 protected endpoints, CORS, security headers
+- **Production compliance smoke tests** (`19-compliance-extended.spec.ts`): GDPR privacy/data rights, EU AI Act transparency, COPPA children's privacy, cookie policy categories, terms of service, data export/deletion endpoints
+- **Production safety smoke tests** (`20-safety.spec.ts`): AI disclaimers in chat, content safety APIs, professor metadata validation, bias detection, age-appropriate content, emergency conversation closure
 
 - **Coming Soon mode** with `coming_soon_overlay` feature flag toggle — proxy gating redirects unauthenticated users to `/coming-soon`
 - **Waitlist signup** with GDPR double opt-in (email verification + consent version tracking)
