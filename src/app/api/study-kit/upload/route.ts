@@ -28,144 +28,172 @@ export const POST = pipe(
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
+  try {
+    let file: File | null;
+    let titleRaw: string | null;
+    let subjectRaw: string | null;
 
-  // Parse form data
-  const formData = await ctx.req.formData();
-  const file = formData.get('file') as File | null;
-  const titleRaw = formData.get('title') as string | null;
-  const subjectRaw = formData.get('subject') as string | null;
-
-  // Validate required file
-  if (!file) {
-    return NextResponse.json({ error: 'Missing required field: file' }, { status: 400 });
-  }
-
-  // Validate file type
-  if (!file.type.includes('pdf')) {
-    return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 });
-  }
-
-  // Validate file size (max 10MB)
-  const MAX_FILE_SIZE = 10 * 1024 * 1024;
-  if (file.size > MAX_FILE_SIZE) {
-    return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
-  }
-
-  // Validate title and subject using schema
-  const validation = UploadStudyKitSchema.safeParse({
-    title: titleRaw,
-    subject: subjectRaw || undefined,
-  });
-
-  if (!validation.success) {
-    return NextResponse.json(
-      { error: 'Invalid input', details: validation.error.format() },
-      { status: 400 },
-    );
-  }
-
-  const { title, subject } = validation.data;
-
-  logger.info('Processing study kit upload', {
-    userId,
-    filename: file.name,
-    size: file.size,
-    title,
-    subject,
-  });
-
-  // Convert file to buffer
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  // Create initial study kit record (processing state)
-  const studyKit = await prisma.studyKit.create({
-    data: {
-      userId,
-      sourceFile: file.name,
-      title,
-      subject,
-      status: 'processing',
-    },
-  });
-
-  // Process in background (for production, use a queue like BullMQ)
-  // Wrapped in async IIFE to ensure all errors (sync and async) are caught
-  (async () => {
     try {
-      const result = await processStudyKit(
-        buffer,
-        title,
-        subject,
-        (step, progress) => {
-          logger.debug('Study kit progress', {
-            studyKitId: studyKit.id,
-            step,
-            progress,
-          });
-        },
-        userId,
-      );
-
-      // Update study kit with generated materials
-      const updatedKit = await prisma.studyKit.update({
-        where: { id: studyKit.id },
-        data: {
-          status: 'ready',
-          summary: result.summary,
-          mindmap: result.mindmap ? JSON.stringify(result.mindmap) : null,
-          demo: result.demo ? JSON.stringify(result.demo) : null,
-          quiz: result.quiz ? JSON.stringify(result.quiz) : null,
-          originalText: result.originalText,
-          pageCount: result.pageCount,
-          wordCount: result.wordCount,
-        },
-      });
-
-      // Sync materials to archive (Phase 1 - T-02)
-      await saveMaterialsFromStudyKit(userId, updatedKit);
-
-      // Index original text for RAG retrieval
-      await indexStudyKitContent(userId, {
-        ...updatedKit,
-        originalText: result.originalText,
-      });
-
-      logger.info('Study kit processing complete', {
-        studyKitId: studyKit.id,
-      });
+      const formData = await ctx.req.formData();
+      file = formData.get('file') as File | null;
+      titleRaw = formData.get('title') as string | null;
+      subjectRaw = formData.get('subject') as string | null;
     } catch (error) {
-      // Update with error status - guaranteed to run for any error
       const errorMsg = error instanceof Error ? error.message : String(error);
-      try {
-        await prisma.studyKit.update({
-          where: { id: studyKit.id },
-          data: {
-            status: 'error',
-            errorMessage: errorMsg,
-          },
-        });
-      } catch (dbError) {
-        logger.error(
-          'Failed to update study kit error status',
-          { studyKitId: studyKit.id },
-          dbError,
-        );
-      }
+      logger.warn('Failed to parse study kit upload form data', {
+        api: 'study-kit-upload',
+        userId,
+        errorMsg,
+      });
+      return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
+    }
 
-      logger.error(
-        'Study kit processing failed',
-        { api: 'study-kit-upload', phase: 'processing', studyKitId: studyKit.id, errorMsg },
-        error,
+    // Validate required file
+    if (!file) {
+      return NextResponse.json({ error: 'Missing required field: file' }, { status: 400 });
+    }
+
+    // Validate file type
+    if (!file.type.includes('pdf')) {
+      return NextResponse.json({ error: 'Only PDF files are supported' }, { status: 400 });
+    }
+
+    // Validate file size (max 10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
+    }
+
+    // Validate title and subject using schema
+    const validation = UploadStudyKitSchema.safeParse({
+      title: titleRaw,
+      subject: subjectRaw || undefined,
+    });
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validation.error.format() },
+        { status: 400 },
       );
     }
-  })();
 
-  // Return immediately with processing status
-  return NextResponse.json({
-    success: true,
-    studyKitId: studyKit.id,
-    status: 'processing',
-    message: 'Study kit is being processed. This may take a few minutes.',
-  });
+    const { title, subject } = validation.data;
+
+    logger.info('Processing study kit upload', {
+      userId,
+      filename: file.name,
+      size: file.size,
+      title,
+      subject,
+    });
+
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Create initial study kit record (processing state)
+    const studyKit = await prisma.studyKit.create({
+      data: {
+        userId,
+        sourceFile: file.name,
+        title,
+        subject,
+        status: 'processing',
+      },
+    });
+
+    // Process in background (for production, use a queue like BullMQ)
+    // Wrapped in async IIFE to ensure all errors (sync and async) are caught
+    (async () => {
+      try {
+        const result = await processStudyKit(
+          buffer,
+          title,
+          subject,
+          (step, progress) => {
+            logger.debug('Study kit progress', {
+              studyKitId: studyKit.id,
+              step,
+              progress,
+            });
+          },
+          userId,
+        );
+
+        // Update study kit with generated materials
+        const updatedKit = await prisma.studyKit.update({
+          where: { id: studyKit.id },
+          data: {
+            status: 'ready',
+            summary: result.summary,
+            mindmap: result.mindmap ? JSON.stringify(result.mindmap) : null,
+            demo: result.demo ? JSON.stringify(result.demo) : null,
+            quiz: result.quiz ? JSON.stringify(result.quiz) : null,
+            originalText: result.originalText,
+            pageCount: result.pageCount,
+            wordCount: result.wordCount,
+          },
+        });
+
+        // Sync materials to archive (Phase 1 - T-02)
+        await saveMaterialsFromStudyKit(userId, updatedKit);
+
+        // Index original text for RAG retrieval
+        await indexStudyKitContent(userId, {
+          ...updatedKit,
+          originalText: result.originalText,
+        });
+
+        logger.info('Study kit processing complete', {
+          studyKitId: studyKit.id,
+        });
+      } catch (error) {
+        // Update with error status - guaranteed to run for any error
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        try {
+          await prisma.studyKit.update({
+            where: { id: studyKit.id },
+            data: {
+              status: 'error',
+              errorMessage: errorMsg,
+            },
+          });
+        } catch (dbError) {
+          logger.error(
+            'Failed to update study kit error status',
+            { studyKitId: studyKit.id },
+            dbError,
+          );
+        }
+
+        logger.error(
+          'Study kit processing failed',
+          { api: 'study-kit-upload', phase: 'processing', studyKitId: studyKit.id, errorMsg },
+          error,
+        );
+      }
+    })();
+
+    // Return immediately with processing status
+    return NextResponse.json({
+      success: true,
+      studyKitId: studyKit.id,
+      status: 'processing',
+      message: 'Study kit is being processed. This may take a few minutes.',
+    });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    logger.error(
+      'Study kit upload request failed',
+      { api: 'study-kit-upload', phase: 'request', userId, errorMsg },
+      error,
+    );
+    return NextResponse.json(
+      {
+        error: 'Failed to upload study kit',
+        message: 'An internal server error occurred while uploading the study kit.',
+      },
+      { status: 500 },
+    );
+  }
 });

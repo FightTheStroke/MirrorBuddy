@@ -29,8 +29,12 @@ export function isEnabled(runtime: Runtime): boolean {
       : process.env.SENTRY_FORCE_ENABLE === 'true';
 
   // Check if running on Vercel platform
+  // NEXT_PUBLIC_VERCEL_ENV may not be available in all build contexts,
+  // so also check NEXT_PUBLIC_VERCEL (always set by Vercel) as fallback
   const isVercel =
-    runtime === 'client' ? !!process.env.NEXT_PUBLIC_VERCEL_ENV : !!process.env.VERCEL;
+    runtime === 'client'
+      ? !!(process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL)
+      : !!process.env.VERCEL;
 
   return isVercel || forceEnable;
 }
