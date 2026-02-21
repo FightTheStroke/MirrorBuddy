@@ -1,14 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    funnelEvent: {
-      create: vi.fn(),
-      findFirst: vi.fn(),
-    },
-    $queryRaw: vi.fn(),
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {

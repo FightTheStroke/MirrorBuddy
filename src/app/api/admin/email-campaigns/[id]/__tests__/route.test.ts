@@ -51,13 +51,10 @@ vi.mock('@/lib/email/campaign-service', () => ({
   getCampaign: (...args: unknown[]) => mockGetCampaign(...args),
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    emailRecipient: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import { prisma } from '@/lib/db';
 

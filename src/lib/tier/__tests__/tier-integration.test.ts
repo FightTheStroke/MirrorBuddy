@@ -5,31 +5,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock Prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    tierDefinition: {
-      findFirst: vi.fn(() =>
-        Promise.resolve({
-          id: 'tier-trial',
-          name: 'Trial',
-          isDefault: true,
-          aiModelConfig: { defaultModel: 'gpt-5-mini' },
-          featureConfigs: {
-            formula: { model: 'gpt-5-mini', temperature: 0.3, maxTokens: 1500 },
-            demo: { model: 'gpt-5-nano', temperature: 0.8, maxTokens: 4000 },
-          },
-        }),
-      ),
-      findMany: vi.fn(() => Promise.resolve([])),
-    },
-    userFeatureConfig: {
-      findFirst: vi.fn(() => Promise.resolve(null)),
-    },
-    userSubscription: {
-      findFirst: vi.fn(() => Promise.resolve(null)),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

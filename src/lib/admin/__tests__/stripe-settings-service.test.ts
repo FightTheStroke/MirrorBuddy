@@ -1,13 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    globalConfig: {
-      findFirst: vi.fn(),
-      upsert: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -25,10 +21,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 import { prisma } from '@/lib/db';
-import {
-  getPaymentSettings,
-  updatePaymentSettings,
-} from '../stripe-settings-service';
+import { getPaymentSettings, updatePaymentSettings } from '../stripe-settings-service';
 
 const mockFindFirst = prisma.globalConfig.findFirst as ReturnType<typeof vi.fn>;
 const mockUpsert = prisma.globalConfig.upsert as ReturnType<typeof vi.fn>;

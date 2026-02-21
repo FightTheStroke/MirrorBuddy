@@ -7,13 +7,10 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    complianceAuditEntry: {
-      createMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

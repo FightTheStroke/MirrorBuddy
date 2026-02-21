@@ -5,12 +5,12 @@
  * F-24: Verify memory leak prevention through proper listener cleanup
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   calculateAndPublishAdminCounts,
   triggerAdminCountsUpdate,
   clearRateLimiterState,
-} from "../publish-admin-counts";
+} from '../publish-admin-counts';
 import {
   publishAdminCounts,
   subscribeToAdminCounts,
@@ -18,28 +18,16 @@ import {
   clearAdminCountsSubscribers,
   type AdminCounts,
   type AdminCountsMessage,
-} from "../admin-counts-pubsub";
-import { prisma } from "@/lib/db";
+} from '../admin-counts-pubsub';
+import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    inviteRequest: {
-      count: vi.fn(),
-    },
-    user: {
-      count: vi.fn(),
-    },
-    userActivity: {
-      groupBy: vi.fn(),
-    },
-    safetyEvent: {
-      count: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-describe("admin-counts-pubsub", () => {
+describe('admin-counts-pubsub', () => {
   beforeEach(() => {
     clearAdminCountsSubscribers();
     vi.clearAllMocks();
@@ -53,8 +41,8 @@ describe("admin-counts-pubsub", () => {
   // PUBLISHER TESTS
   // ========================================================================
 
-  describe("publishAdminCounts", () => {
-    it("publishes counts to in-memory subscribers", async () => {
+  describe('publishAdminCounts', () => {
+    it('publishes counts to in-memory subscribers', async () => {
       const callback = vi.fn();
       subscribeToAdminCounts(callback);
 
@@ -71,13 +59,13 @@ describe("admin-counts-pubsub", () => {
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: "admin:counts",
+          type: 'admin:counts',
           data: counts,
         }),
       );
     });
 
-    it("handles multiple subscribers", async () => {
+    it('handles multiple subscribers', async () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
       const callback3 = vi.fn();
@@ -101,9 +89,9 @@ describe("admin-counts-pubsub", () => {
       expect(callback3).toHaveBeenCalledTimes(1);
     });
 
-    it("gracefully handles subscriber errors", async () => {
+    it('gracefully handles subscriber errors', async () => {
       const errorCallback = vi.fn(() => {
-        throw new Error("Subscriber error");
+        throw new Error('Subscriber error');
       });
       const normalCallback = vi.fn();
 
@@ -125,7 +113,7 @@ describe("admin-counts-pubsub", () => {
       expect(normalCallback).toHaveBeenCalledTimes(1);
     });
 
-    it("includes publishedAt timestamp", async () => {
+    it('includes publishedAt timestamp', async () => {
       const callback = vi.fn();
       subscribeToAdminCounts(callback);
 
@@ -154,19 +142,19 @@ describe("admin-counts-pubsub", () => {
   // SUBSCRIBER TESTS
   // ========================================================================
 
-  describe("subscribeToAdminCounts", () => {
-    it("returns unsubscribe function", () => {
+  describe('subscribeToAdminCounts', () => {
+    it('returns unsubscribe function', () => {
       const callback = vi.fn();
       const unsubscribe = subscribeToAdminCounts(callback);
 
-      expect(typeof unsubscribe).toBe("function");
+      expect(typeof unsubscribe).toBe('function');
 
       expect(getAdminCountsSubscriberCount()).toBe(1);
       unsubscribe();
       expect(getAdminCountsSubscriberCount()).toBe(0);
     });
 
-    it("unsubscribe removes subscriber from list", async () => {
+    it('unsubscribe removes subscriber from list', async () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
@@ -189,7 +177,7 @@ describe("admin-counts-pubsub", () => {
       expect(callback2).toHaveBeenCalledTimes(1);
     });
 
-    it("supports multiple subscribe/unsubscribe cycles", async () => {
+    it('supports multiple subscribe/unsubscribe cycles', async () => {
       const callback = vi.fn();
 
       const unsub1 = subscribeToAdminCounts(callback);
@@ -206,7 +194,7 @@ describe("admin-counts-pubsub", () => {
     });
 
     // F-24: Memory leak prevention test
-    it("prevents memory leaks through proper cleanup", async () => {
+    it('prevents memory leaks through proper cleanup', async () => {
       const callbacks = Array.from({ length: 100 }, () => vi.fn());
       const unsubscribes = callbacks.map((cb) => subscribeToAdminCounts(cb));
 
@@ -232,12 +220,12 @@ describe("admin-counts-pubsub", () => {
   // SUBSCRIBER COUNT TESTS
   // ========================================================================
 
-  describe("getAdminCountsSubscriberCount", () => {
-    it("returns 0 initially", () => {
+  describe('getAdminCountsSubscriberCount', () => {
+    it('returns 0 initially', () => {
       expect(getAdminCountsSubscriberCount()).toBe(0);
     });
 
-    it("increments on subscribe", () => {
+    it('increments on subscribe', () => {
       subscribeToAdminCounts(vi.fn());
       expect(getAdminCountsSubscriberCount()).toBe(1);
 
@@ -245,7 +233,7 @@ describe("admin-counts-pubsub", () => {
       expect(getAdminCountsSubscriberCount()).toBe(2);
     });
 
-    it("decrements on unsubscribe", () => {
+    it('decrements on unsubscribe', () => {
       const unsub1 = subscribeToAdminCounts(vi.fn());
       const unsub2 = subscribeToAdminCounts(vi.fn());
 
@@ -263,8 +251,8 @@ describe("admin-counts-pubsub", () => {
   // CLEAR TESTS
   // ========================================================================
 
-  describe("clearAdminCountsSubscribers", () => {
-    it("clears all subscribers", () => {
+  describe('clearAdminCountsSubscribers', () => {
+    it('clears all subscribers', () => {
       subscribeToAdminCounts(vi.fn());
       subscribeToAdminCounts(vi.fn());
       subscribeToAdminCounts(vi.fn());
@@ -282,7 +270,7 @@ describe("admin-counts-pubsub", () => {
 // HELPER FUNCTION TESTS
 // ============================================================================
 
-describe("publish-admin-counts helper", () => {
+describe('publish-admin-counts helper', () => {
   beforeEach(() => {
     clearAdminCountsSubscribers();
     clearRateLimiterState();
@@ -294,14 +282,14 @@ describe("publish-admin-counts helper", () => {
     clearRateLimiterState();
   });
 
-  describe("calculateAndPublishAdminCounts", () => {
-    it("calculates counts from database", async () => {
+  describe('calculateAndPublishAdminCounts', () => {
+    it('calculates counts from database', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(5);
       vi.mocked(prisma.user.count).mockResolvedValueOnce(100);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([
-        { identifier: "user1" },
-        { identifier: "user2" },
-        { identifier: "user3" },
+        { identifier: 'user1' },
+        { identifier: 'user2' },
+        { identifier: 'user3' },
       ] as any);
       vi.mocked(prisma.safetyEvent.count).mockResolvedValueOnce(2);
 
@@ -317,9 +305,9 @@ describe("publish-admin-counts helper", () => {
       });
     });
 
-    it("handles database errors gracefully", async () => {
+    it('handles database errors gracefully', async () => {
       vi.mocked(prisma.inviteRequest.count).mockRejectedValueOnce(
-        new Error("Database connection failed"),
+        new Error('Database connection failed'),
       );
       // Mock other calls to avoid undefined errors
       vi.mocked(prisma.user.count).mockResolvedValueOnce(0);
@@ -333,7 +321,7 @@ describe("publish-admin-counts helper", () => {
       expect(result.counts).toBeUndefined();
     });
 
-    it("includes duration in result", async () => {
+    it('includes duration in result', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(0);
       vi.mocked(prisma.user.count).mockResolvedValueOnce(0);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([]);
@@ -342,10 +330,10 @@ describe("publish-admin-counts helper", () => {
       const result = await calculateAndPublishAdminCounts();
 
       expect(result.duration).toBeGreaterThanOrEqual(0);
-      expect(typeof result.duration).toBe("number");
+      expect(typeof result.duration).toBe('number');
     });
 
-    it("publishes counts to subscribers", async () => {
+    it('publishes counts to subscribers', async () => {
       const callback = vi.fn();
       subscribeToAdminCounts(callback);
 
@@ -359,7 +347,7 @@ describe("publish-admin-counts helper", () => {
       expect(callback).toHaveBeenCalledTimes(1);
       expect(callback).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: "admin:counts",
+          type: 'admin:counts',
           data: expect.objectContaining({
             pendingInvites: 5,
             totalUsers: 100,
@@ -369,8 +357,8 @@ describe("publish-admin-counts helper", () => {
     });
   });
 
-  describe("triggerAdminCountsUpdate", () => {
-    it("triggers calculation without awaiting", async () => {
+  describe('triggerAdminCountsUpdate', () => {
+    it('triggers calculation without awaiting', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(0);
       vi.mocked(prisma.user.count).mockResolvedValueOnce(0);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([]);
@@ -393,33 +381,33 @@ describe("publish-admin-counts helper", () => {
   // RATE LIMITING TESTS (F-32)
   // ========================================================================
 
-  describe("rate limiting (F-32)", () => {
-    it("allows first publish for event type", async () => {
+  describe('rate limiting (F-32)', () => {
+    it('allows first publish for event type', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(5);
       vi.mocked(prisma.user.count).mockResolvedValueOnce(100);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([]);
       vi.mocked(prisma.safetyEvent.count).mockResolvedValueOnce(0);
 
-      const result = await calculateAndPublishAdminCounts("invite");
+      const result = await calculateAndPublishAdminCounts('invite');
 
       expect(result.success).toBe(true);
       expect(result.counts).toBeDefined();
       expect(result.duration).toBeGreaterThanOrEqual(0);
     });
 
-    it("rate limits subsequent publishes within 60s window", async () => {
+    it('rate limits subsequent publishes within 60s window', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValue(5);
       vi.mocked(prisma.user.count).mockResolvedValue(100);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValue([]);
       vi.mocked(prisma.safetyEvent.count).mockResolvedValue(0);
 
       // First publish should succeed
-      const result1 = await calculateAndPublishAdminCounts("invite");
+      const result1 = await calculateAndPublishAdminCounts('invite');
       expect(result1.success).toBe(true);
       expect(result1.counts).toBeDefined();
 
       // Second publish immediately after should be rate limited
-      const result2 = await calculateAndPublishAdminCounts("invite");
+      const result2 = await calculateAndPublishAdminCounts('invite');
       expect(result2.success).toBe(true); // Still returns success
       expect(result2.counts).toBeUndefined(); // But no counts published
       expect(result2.duration).toBe(0); // No time spent
@@ -428,19 +416,19 @@ describe("publish-admin-counts helper", () => {
       expect(vi.mocked(prisma.inviteRequest.count)).toHaveBeenCalledTimes(1);
     });
 
-    it("allows different event types to publish independently", async () => {
+    it('allows different event types to publish independently', async () => {
       vi.mocked(prisma.inviteRequest.count).mockResolvedValue(5);
       vi.mocked(prisma.user.count).mockResolvedValue(100);
       vi.mocked(prisma.userActivity.groupBy).mockResolvedValue([]);
       vi.mocked(prisma.safetyEvent.count).mockResolvedValue(0);
 
       // First invite event
-      const result1 = await calculateAndPublishAdminCounts("invite");
+      const result1 = await calculateAndPublishAdminCounts('invite');
       expect(result1.success).toBe(true);
       expect(result1.counts).toBeDefined();
 
       // Safety event should NOT be rate limited (different event type)
-      const result2 = await calculateAndPublishAdminCounts("safety");
+      const result2 = await calculateAndPublishAdminCounts('safety');
       expect(result2.success).toBe(true);
       expect(result2.counts).toBeDefined();
 

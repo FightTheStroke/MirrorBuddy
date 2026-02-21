@@ -16,12 +16,10 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    googleAccount: { findUnique: vi.fn(), upsert: vi.fn(), update: vi.fn() },
-    user: { upsert: vi.fn() },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/security', () => ({
   encryptToken: vi.fn((v: string) => Promise.resolve(`enc_${v}`)),

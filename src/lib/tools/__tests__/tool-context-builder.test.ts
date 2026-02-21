@@ -13,13 +13,10 @@ import {
 import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    material: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 describe('tool-context-builder', () => {
   const userId = 'test-user-123';
@@ -36,7 +33,9 @@ describe('tool-context-builder', () => {
           toolId: 'tool-1',
           toolType: 'quiz',
           title: 'Math Quiz',
-          content: JSON.stringify({ questions: [{ question: 'What is 2+2?', correctAnswer: '4' }] }),
+          content: JSON.stringify({
+            questions: [{ question: 'What is 2+2?', correctAnswer: '4' }],
+          }),
           createdAt: new Date('2024-01-01'),
         },
       ];
@@ -98,10 +97,7 @@ describe('tool-context-builder', () => {
         title: 'Biology Concepts',
         content: {
           root: { label: 'Cell' },
-          nodes: [
-            { label: 'Nucleus' },
-            { label: 'Mitochondria' },
-          ],
+          nodes: [{ label: 'Nucleus' }, { label: 'Mitochondria' }],
         },
         createdAt: new Date(),
       };
@@ -141,7 +137,9 @@ describe('tool-context-builder', () => {
           toolId: 'tool-1',
           toolType: 'quiz',
           title: 'Math Quiz',
-          content: JSON.stringify({ questions: [{ question: 'What is 2+2?', correctAnswer: '4' }] }),
+          content: JSON.stringify({
+            questions: [{ question: 'What is 2+2?', correctAnswer: '4' }],
+          }),
           createdAt: new Date('2024-01-01'),
         },
         {

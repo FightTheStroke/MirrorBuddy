@@ -15,16 +15,10 @@ import {
 import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    toolOutput: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      count: vi.fn(),
-      deleteMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock tool-rag-indexer to avoid side effects
 vi.mock('../tool-rag-indexer', () => ({

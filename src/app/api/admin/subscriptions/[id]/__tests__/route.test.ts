@@ -48,18 +48,10 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    userSubscription: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    tierAuditLog: {
-      create: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/security', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/security')>();

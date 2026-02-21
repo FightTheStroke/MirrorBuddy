@@ -7,29 +7,21 @@
  * 3. Conversation ownership is verified
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { NextRequest } from "next/server";
-import { POST } from "../route";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { NextRequest } from 'next/server';
+import { POST } from '../route';
 
 // Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    conversation: {
-      findFirst: vi.fn(),
-      update: vi.fn(),
-    },
-    message: {
-      create: vi.fn(),
-    },
-    $transaction: vi.fn(),
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/privacy", () => ({
+vi.mock('@/lib/privacy', () => ({
   anonymizeConversationMessage: vi.fn(),
 }));
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -44,52 +36,50 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return {
     ...actual,
     requireCSRF: vi.fn().mockReturnValue(true),
   };
 });
 
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAuth: vi.fn().mockResolvedValue({
-      userId: "user-123",
+      userId: 'user-123',
       authenticated: true,
     }),
   };
 });
 
-import { prisma } from "@/lib/db";
-import { anonymizeConversationMessage } from "@/lib/privacy";
+import { prisma } from '@/lib/db';
+import { anonymizeConversationMessage } from '@/lib/privacy';
 
-const mockPrismaFindFirst = prisma.conversation.findFirst as ReturnType<
-  typeof vi.fn
->;
+const mockPrismaFindFirst = prisma.conversation.findFirst as ReturnType<typeof vi.fn>;
 const mockPrismaTransaction = prisma.$transaction as ReturnType<typeof vi.fn>;
 const mockAnonymize = anonymizeConversationMessage as ReturnType<typeof vi.fn>;
 
-describe("POST /api/conversations/[id]/messages", () => {
+describe('POST /api/conversations/[id]/messages', () => {
   const mockConversation = {
-    id: "conv-123",
-    userId: "user-123",
+    id: 'conv-123',
+    userId: 'user-123',
     title: null,
     messageCount: 0,
     lastMessageAt: new Date(),
   };
 
   const mockMessage = {
-    id: "msg-123",
-    conversationId: "conv-123",
-    role: "user",
-    content: "Anonymized content",
+    id: 'msg-123',
+    conversationId: 'conv-123',
+    role: 'user',
+    content: 'Anonymized content',
     toolCalls: null,
     tokenCount: 10,
     createdAt: new Date(),
@@ -99,10 +89,9 @@ describe("POST /api/conversations/[id]/messages", () => {
     vi.clearAllMocks();
   });
 
-  it("anonymizes user messages before storing to database", async () => {
-    const originalContent =
-      "My name is John Smith and my email is john@example.com";
-    const anonymizedContent = "My name is [NAME] and my email is [EMAIL]";
+  it('anonymizes user messages before storing to database', async () => {
+    const originalContent = 'My name is John Smith and my email is john@example.com';
+    const anonymizedContent = 'My name is [NAME] and my email is [EMAIL]';
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockConversation);
     mockAnonymize.mockReturnValueOnce(anonymizedContent);
@@ -111,18 +100,15 @@ describe("POST /api/conversations/[id]/messages", () => {
       mockConversation,
     ]);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/conversations/conv-123/messages",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          role: "user",
-          content: originalContent,
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/conversations/conv-123/messages', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'user',
+        content: originalContent,
+      }),
+    });
 
-    const routeContext = { params: Promise.resolve({ id: "conv-123" }) };
+    const routeContext = { params: Promise.resolve({ id: 'conv-123' }) };
     const response = await POST(request, routeContext);
     const data = await response.json();
 
@@ -140,27 +126,24 @@ describe("POST /api/conversations/[id]/messages", () => {
     expect(data.content).toBe(anonymizedContent);
   });
 
-  it("does not anonymize assistant messages", async () => {
-    const assistantContent = "Hello! How can I help you today?";
+  it('does not anonymize assistant messages', async () => {
+    const assistantContent = 'Hello! How can I help you today?';
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockConversation);
     mockPrismaTransaction.mockResolvedValueOnce([
-      { ...mockMessage, role: "assistant", content: assistantContent },
+      { ...mockMessage, role: 'assistant', content: assistantContent },
       mockConversation,
     ]);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/conversations/conv-123/messages",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          role: "assistant",
-          content: assistantContent,
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/conversations/conv-123/messages', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'assistant',
+        content: assistantContent,
+      }),
+    });
 
-    const routeContext = { params: Promise.resolve({ id: "conv-123" }) };
+    const routeContext = { params: Promise.resolve({ id: 'conv-123' }) };
     const response = await POST(request, routeContext);
 
     expect(response.status).toBe(200);
@@ -169,42 +152,36 @@ describe("POST /api/conversations/[id]/messages", () => {
     expect(mockAnonymize).not.toHaveBeenCalled();
   });
 
-  it("returns 404 for non-existent conversation", async () => {
+  it('returns 404 for non-existent conversation', async () => {
     mockPrismaFindFirst.mockResolvedValueOnce(null);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/conversations/conv-999/messages",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          role: "user",
-          content: "Test message",
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/conversations/conv-999/messages', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'user',
+        content: 'Test message',
+      }),
+    });
 
-    const routeContext = { params: Promise.resolve({ id: "conv-999" }) };
+    const routeContext = { params: Promise.resolve({ id: 'conv-999' }) };
     const response = await POST(request, routeContext);
 
     expect(response.status).toBe(404);
     expect(mockAnonymize).not.toHaveBeenCalled();
   });
 
-  it("returns 400 for missing required fields", async () => {
+  it('returns 400 for missing required fields', async () => {
     mockPrismaFindFirst.mockResolvedValueOnce(mockConversation);
 
-    const request = new NextRequest(
-      "http://localhost:3000/api/conversations/conv-123/messages",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          role: "user",
-          // missing content
-        }),
-      },
-    );
+    const request = new NextRequest('http://localhost:3000/api/conversations/conv-123/messages', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: 'user',
+        // missing content
+      }),
+    });
 
-    const routeContext = { params: Promise.resolve({ id: "conv-123" }) };
+    const routeContext = { params: Promise.resolve({ id: 'conv-123' }) };
     const response = await POST(request, routeContext);
 
     expect(response.status).toBe(400);

@@ -1,21 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  cleanupExpiredTrialSessions,
-  cleanupNurturingTrialSessions,
-} from "../trial-cleanup";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { cleanupExpiredTrialSessions, cleanupNurturingTrialSessions } from '../trial-cleanup';
 
 // Mock prisma
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    trialSession: {
-      count: vi.fn(),
-      deleteMany: vi.fn(),
-      updateMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -30,14 +22,14 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-import { prisma } from "@/lib/db";
+import { prisma } from '@/lib/db';
 
-describe("cleanupExpiredTrialSessions", () => {
+describe('cleanupExpiredTrialSessions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("deletes sessions older than 30 days without email", async () => {
+  it('deletes sessions older than 30 days without email', async () => {
     (prisma.trialSession.count as any).mockResolvedValue(5);
     (prisma.trialSession.deleteMany as any).mockResolvedValue({ count: 10 });
 
@@ -58,7 +50,7 @@ describe("cleanupExpiredTrialSessions", () => {
     );
   });
 
-  it("preserves sessions with collected emails", async () => {
+  it('preserves sessions with collected emails', async () => {
     (prisma.trialSession.count as any).mockResolvedValue(3);
     (prisma.trialSession.deleteMany as any).mockResolvedValue({ count: 0 });
 
@@ -75,21 +67,21 @@ describe("cleanupExpiredTrialSessions", () => {
     );
   });
 
-  it("returns cleanup statistics with correct structure", async () => {
+  it('returns cleanup statistics with correct structure', async () => {
     (prisma.trialSession.count as any).mockResolvedValue(2);
     (prisma.trialSession.deleteMany as any).mockResolvedValue({ count: 8 });
 
     const result = await cleanupExpiredTrialSessions();
 
-    expect(result).toHaveProperty("deletedCount");
-    expect(result).toHaveProperty("skippedWithEmail");
-    expect(result).toHaveProperty("cutoffDate");
-    expect(typeof result.deletedCount).toBe("number");
-    expect(typeof result.skippedWithEmail).toBe("number");
+    expect(result).toHaveProperty('deletedCount');
+    expect(result).toHaveProperty('skippedWithEmail');
+    expect(result).toHaveProperty('cutoffDate');
+    expect(typeof result.deletedCount).toBe('number');
+    expect(typeof result.skippedWithEmail).toBe('number');
     expect(result.cutoffDate).toBeInstanceOf(Date);
   });
 
-  it("calculates correct 30-day cutoff date", async () => {
+  it('calculates correct 30-day cutoff date', async () => {
     (prisma.trialSession.count as any).mockResolvedValue(0);
     (prisma.trialSession.deleteMany as any).mockResolvedValue({ count: 0 });
 
@@ -102,19 +94,17 @@ describe("cleanupExpiredTrialSessions", () => {
     expectedCutoff.setDate(expectedCutoff.getDate() - 30);
 
     // Allow 1 second tolerance for test execution time
-    const diff = Math.abs(
-      result.cutoffDate.getTime() - expectedCutoff.getTime(),
-    );
+    const diff = Math.abs(result.cutoffDate.getTime() - expectedCutoff.getTime());
     expect(diff).toBeLessThan(1000);
   });
 });
 
-describe("cleanupNurturingTrialSessions", () => {
+describe('cleanupNurturingTrialSessions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("anonymizes sessions with email older than 90 days", async () => {
+  it('anonymizes sessions with email older than 90 days', async () => {
     (prisma.trialSession.updateMany as any).mockResolvedValue({ count: 5 });
 
     const result = await cleanupNurturingTrialSessions();
@@ -137,7 +127,7 @@ describe("cleanupNurturingTrialSessions", () => {
     );
   });
 
-  it("calculates correct 90-day cutoff date", async () => {
+  it('calculates correct 90-day cutoff date', async () => {
     (prisma.trialSession.updateMany as any).mockResolvedValue({ count: 0 });
 
     const result = await cleanupNurturingTrialSessions();
@@ -147,9 +137,7 @@ describe("cleanupNurturingTrialSessions", () => {
     expectedCutoff.setDate(expectedCutoff.getDate() - 90);
 
     // Allow 1 second tolerance for test execution time
-    const diff = Math.abs(
-      result.cutoffDate.getTime() - expectedCutoff.getTime(),
-    );
+    const diff = Math.abs(result.cutoffDate.getTime() - expectedCutoff.getTime());
     expect(diff).toBeLessThan(1000);
   });
 });

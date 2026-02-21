@@ -9,16 +9,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
 
 // Mock Prisma to prevent DB calls from TierService.getEffectiveTier
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    tierDefinition: {
-      findUnique: vi.fn().mockResolvedValue(null),
-    },
-    userSubscription: {
-      findUnique: vi.fn().mockResolvedValue(null),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Import TierService after mocks are set up
 import { TierService } from '../tier-service';

@@ -3,26 +3,26 @@
  * Unit tests for Billing Portal API logic
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock stripeService
 const { mockCreateCustomerPortalSession } = vi.hoisted(() => ({
   mockCreateCustomerPortalSession: vi.fn(),
 }));
 
-vi.mock("@/lib/stripe", () => ({
+vi.mock('@/lib/stripe', () => ({
   stripeService: {
     createCustomerPortalSession: mockCreateCustomerPortalSession,
   },
 }));
 
 // Mock Sentry
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -39,47 +39,44 @@ vi.mock("@/lib/logger", () => ({
 
 // Mock prisma
 const mockFindUnique = vi.fn();
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    userSubscription: {
-      findUnique: (...args: unknown[]) => mockFindUnique(...args),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-describe("Billing Portal API", () => {
+describe('Billing Portal API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("subscription lookup", () => {
-    it("finds subscription by userId", async () => {
-      mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: "cus_123" });
+  describe('subscription lookup', () => {
+    it('finds subscription by userId', async () => {
+      mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_123' });
 
       const result = await mockFindUnique({
-        where: { userId: "user_123" },
+        where: { userId: 'user_123' },
         select: { stripeCustomerId: true },
       });
 
-      expect(result?.stripeCustomerId).toBe("cus_123");
+      expect(result?.stripeCustomerId).toBe('cus_123');
     });
 
-    it("returns null when no subscription exists", async () => {
+    it('returns null when no subscription exists', async () => {
       mockFindUnique.mockResolvedValueOnce(null);
 
       const result = await mockFindUnique({
-        where: { userId: "user_no_sub" },
+        where: { userId: 'user_no_sub' },
         select: { stripeCustomerId: true },
       });
 
       expect(result).toBeNull();
     });
 
-    it("returns null when subscription has no stripeCustomerId", async () => {
+    it('returns null when subscription has no stripeCustomerId', async () => {
       mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: null });
 
       const result = await mockFindUnique({
-        where: { userId: "user_123" },
+        where: { userId: 'user_123' },
         select: { stripeCustomerId: true },
       });
 
@@ -87,56 +84,54 @@ describe("Billing Portal API", () => {
     });
   });
 
-  describe("stripeService.createCustomerPortalSession", () => {
-    it("creates portal session with correct params", async () => {
+  describe('stripeService.createCustomerPortalSession', () => {
+    it('creates portal session with correct params', async () => {
       const mockSession = {
-        url: "https://billing.stripe.com/session/123",
+        url: 'https://billing.stripe.com/session/123',
       };
       mockCreateCustomerPortalSession.mockResolvedValueOnce(mockSession);
 
       const result = await mockCreateCustomerPortalSession({
-        customerId: "cus_123",
-        returnUrl: "https://example.com/dashboard",
+        customerId: 'cus_123',
+        returnUrl: 'https://example.com/dashboard',
       });
 
-      expect(result.url).toContain("billing.stripe.com");
+      expect(result.url).toContain('billing.stripe.com');
     });
 
-    it("throws error when Stripe fails", async () => {
-      mockCreateCustomerPortalSession.mockRejectedValueOnce(
-        new Error("No such customer"),
-      );
+    it('throws error when Stripe fails', async () => {
+      mockCreateCustomerPortalSession.mockRejectedValueOnce(new Error('No such customer'));
 
       await expect(
         mockCreateCustomerPortalSession({
-          customerId: "invalid_customer",
-          returnUrl: "https://example.com/dashboard",
+          customerId: 'invalid_customer',
+          returnUrl: 'https://example.com/dashboard',
         }),
-      ).rejects.toThrow("No such customer");
+      ).rejects.toThrow('No such customer');
     });
 
-    it("includes correct return URL", async () => {
+    it('includes correct return URL', async () => {
       mockCreateCustomerPortalSession.mockImplementationOnce(
         async (params: { customerId: string; returnUrl: string }) => {
-          expect(params.returnUrl).toContain("/dashboard");
-          return { url: "https://billing.stripe.com/session/123" };
+          expect(params.returnUrl).toContain('/dashboard');
+          return { url: 'https://billing.stripe.com/session/123' };
         },
       );
 
       await mockCreateCustomerPortalSession({
-        customerId: "cus_123",
-        returnUrl: "https://example.com/dashboard",
+        customerId: 'cus_123',
+        returnUrl: 'https://example.com/dashboard',
       });
     });
   });
 
-  describe("business logic", () => {
-    it("requires stripeCustomerId to create portal session", async () => {
+  describe('business logic', () => {
+    it('requires stripeCustomerId to create portal session', async () => {
       // Simulate the check that happens in the route
       mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: null });
 
       const subscription = await mockFindUnique({
-        where: { userId: "user_123" },
+        where: { userId: 'user_123' },
         select: { stripeCustomerId: true },
       });
 
@@ -145,11 +140,11 @@ describe("Billing Portal API", () => {
       expect(hasValidSubscription).toBe(false);
     });
 
-    it("allows portal session when stripeCustomerId exists", async () => {
-      mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: "cus_123" });
+    it('allows portal session when stripeCustomerId exists', async () => {
+      mockFindUnique.mockResolvedValueOnce({ stripeCustomerId: 'cus_123' });
 
       const subscription = await mockFindUnique({
-        where: { userId: "user_123" },
+        where: { userId: 'user_123' },
         select: { stripeCustomerId: true },
       });
 

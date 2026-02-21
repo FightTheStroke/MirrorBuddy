@@ -14,18 +14,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { TierDefinition, UserSubscription } from '../types';
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    tierDefinition: {
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-    },
-    userSubscription: {
-      findUnique: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

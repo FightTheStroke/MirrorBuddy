@@ -19,31 +19,10 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    featureFlag: {
-      findMany: vi.fn().mockResolvedValue([]),
-      create: vi.fn().mockImplementation((args) =>
-        Promise.resolve({
-          ...args.data,
-          updatedAt: new Date(),
-        }),
-      ),
-      update: vi.fn().mockImplementation((args) =>
-        Promise.resolve({
-          id: args.where.id,
-          ...args.data,
-          updatedAt: new Date(),
-        }),
-      ),
-    },
-    globalConfig: {
-      findUnique: vi.fn().mockResolvedValue(null),
-      create: vi.fn().mockResolvedValue({ id: 'global', killSwitch: false }),
-      upsert: vi.fn().mockResolvedValue({ id: 'global', killSwitch: false }),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import {
   isFeatureEnabled,

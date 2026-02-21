@@ -16,23 +16,10 @@ import {
 } from '../campaign-service';
 
 // Mock Prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    emailCampaign: {
-      create: vi.fn(),
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
-    },
-    user: {
-      count: vi.fn(),
-      findMany: vi.fn(),
-    },
-    emailRecipient: {
-      create: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

@@ -14,13 +14,10 @@ vi.mock('@/lib/waitlist/waitlist-service', () => ({
 }));
 
 // Mock prisma — verify route uses it for locale lookup on error paths
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: {
-      findUnique: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock rate-limit to allow pass-through by default
 vi.mock('@/lib/rate-limit', () => ({

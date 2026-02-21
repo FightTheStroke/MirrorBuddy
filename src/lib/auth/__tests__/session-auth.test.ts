@@ -14,17 +14,10 @@ vi.mock('next/headers', () => ({
 }));
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-    },
-    conversation: {
-      findFirst: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

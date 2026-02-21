@@ -8,13 +8,10 @@ import { prisma } from '@/lib/db';
 import * as encryption from '@/lib/admin/key-vault-encryption';
 
 // Mock dependencies
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    secretVault: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/admin/key-vault-encryption', () => ({
   decryptSecret: vi.fn(),

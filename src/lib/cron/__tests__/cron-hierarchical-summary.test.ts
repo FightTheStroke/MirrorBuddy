@@ -1,27 +1,17 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   runHierarchicalSummarization,
   shouldGenerateWeeklySummary,
   shouldGenerateMonthlySummary,
-} from "../cron-hierarchical-summary";
+} from '../cron-hierarchical-summary';
 
 // Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    hierarchicalSummary: {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-    },
-    user: {
-      findMany: vi.fn(),
-    },
-    conversation: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -36,24 +26,24 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("../hierarchical-summarizer", () => ({
+vi.mock('../hierarchical-summarizer', () => ({
   generateHierarchicalSummary: vi.fn(),
 }));
 
 // Import after mocking
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { generateHierarchicalSummary } from "../hierarchical-summarizer";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { generateHierarchicalSummary } from '../hierarchical-summarizer';
 
-describe("cron-hierarchical-summary", () => {
+describe('cron-hierarchical-summary', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("shouldGenerateWeeklySummary", () => {
-    it("should return true if no weekly summary exists for the week", async () => {
-      const userId = "user-123";
-      const weekStart = new Date("2024-01-01"); // Monday
+  describe('shouldGenerateWeeklySummary', () => {
+    it('should return true if no weekly summary exists for the week', async () => {
+      const userId = 'user-123';
+      const weekStart = new Date('2024-01-01'); // Monday
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValueOnce(null);
 
@@ -63,22 +53,22 @@ describe("cron-hierarchical-summary", () => {
       expect(prisma.hierarchicalSummary.findFirst).toHaveBeenCalledWith({
         where: {
           userId,
-          type: "weekly",
+          type: 'weekly',
           startDate: weekStart,
         },
       });
     });
 
-    it("should return false if weekly summary already exists", async () => {
-      const userId = "user-123";
-      const weekStart = new Date("2024-01-01");
+    it('should return false if weekly summary already exists', async () => {
+      const userId = 'user-123';
+      const weekStart = new Date('2024-01-01');
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValueOnce({
-        id: "summary-123",
+        id: 'summary-123',
         userId,
-        type: "weekly",
+        type: 'weekly',
         startDate: weekStart,
-        endDate: new Date("2024-01-07"),
+        endDate: new Date('2024-01-07'),
         consolidatedLearnings: [],
         keyThemes: [],
         frequentTopics: [],
@@ -93,10 +83,10 @@ describe("cron-hierarchical-summary", () => {
     });
   });
 
-  describe("shouldGenerateMonthlySummary", () => {
-    it("should return true if no monthly summary exists for the month", async () => {
-      const userId = "user-456";
-      const monthStart = new Date("2024-01-01");
+  describe('shouldGenerateMonthlySummary', () => {
+    it('should return true if no monthly summary exists for the month', async () => {
+      const userId = 'user-456';
+      const monthStart = new Date('2024-01-01');
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValueOnce(null);
 
@@ -106,22 +96,22 @@ describe("cron-hierarchical-summary", () => {
       expect(prisma.hierarchicalSummary.findFirst).toHaveBeenCalledWith({
         where: {
           userId,
-          type: "monthly",
+          type: 'monthly',
           startDate: monthStart,
         },
       });
     });
 
-    it("should return false if monthly summary already exists", async () => {
-      const userId = "user-456";
-      const monthStart = new Date("2024-01-01");
+    it('should return false if monthly summary already exists', async () => {
+      const userId = 'user-456';
+      const monthStart = new Date('2024-01-01');
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValueOnce({
-        id: "summary-456",
+        id: 'summary-456',
         userId,
-        type: "monthly",
+        type: 'monthly',
         startDate: monthStart,
-        endDate: new Date("2024-01-31"),
+        endDate: new Date('2024-01-31'),
         consolidatedLearnings: [],
         keyThemes: [],
         frequentTopics: [],
@@ -136,21 +126,21 @@ describe("cron-hierarchical-summary", () => {
     });
   });
 
-  describe("runHierarchicalSummarization", () => {
-    it("should find users with recent conversations", async () => {
+  describe('runHierarchicalSummarization', () => {
+    it('should find users with recent conversations', async () => {
       const weekStart = new Date();
       weekStart.setDate(weekStart.getDate() - 7);
 
       (prisma.user.findMany as any).mockResolvedValueOnce([
-        { id: "user-1", createdAt: new Date() } as any,
-        { id: "user-2", createdAt: new Date() } as any,
+        { id: 'user-1', createdAt: new Date() } as any,
+        { id: 'user-2', createdAt: new Date() } as any,
       ]);
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
       (prisma.hierarchicalSummary.create as any).mockResolvedValue({
-        id: "summary-1",
-        userId: "user-1",
-        type: "weekly",
+        id: 'summary-1',
+        userId: 'user-1',
+        type: 'weekly',
         startDate: weekStart,
         endDate: new Date(),
         consolidatedLearnings: [],
@@ -162,10 +152,10 @@ describe("cron-hierarchical-summary", () => {
       });
 
       (generateHierarchicalSummary as any).mockResolvedValue({
-        keyThemes: ["theme1", "theme2"],
-        consolidatedLearnings: ["learning1"],
-        frequentTopics: ["topic1", "topic2", "topic3"],
-        sourceConversationIds: ["conv1", "conv2"],
+        keyThemes: ['theme1', 'theme2'],
+        consolidatedLearnings: ['learning1'],
+        frequentTopics: ['topic1', 'topic2', 'topic3'],
+        sourceConversationIds: ['conv1', 'conv2'],
       });
 
       await runHierarchicalSummarization();
@@ -173,7 +163,7 @@ describe("cron-hierarchical-summary", () => {
       expect(prisma.user.findMany).toHaveBeenCalled();
     });
 
-    it("should process users in batches of max 10", async () => {
+    it('should process users in batches of max 10', async () => {
       const users = Array.from({ length: 25 }, (_, i) => ({
         id: `user-${i}`,
       })) as any[];
@@ -181,22 +171,22 @@ describe("cron-hierarchical-summary", () => {
       (prisma.user.findMany as any).mockResolvedValueOnce(users);
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
       (prisma.hierarchicalSummary.create as any).mockResolvedValue({
-        id: "summary-1",
-        userId: "user-1",
-        periodType: "WEEKLY",
+        id: 'summary-1',
+        userId: 'user-1',
+        periodType: 'WEEKLY',
         periodStart: new Date(),
         periodEnd: new Date(),
-        summary: "Summary",
+        summary: 'Summary',
         topicsCount: 5,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
       (generateHierarchicalSummary as any).mockResolvedValue({
-        keyThemes: ["theme1", "theme2"],
-        consolidatedLearnings: ["learning1"],
-        frequentTopics: ["topic1", "topic2", "topic3"],
-        sourceConversationIds: ["conv1", "conv2"],
+        keyThemes: ['theme1', 'theme2'],
+        consolidatedLearnings: ['learning1'],
+        frequentTopics: ['topic1', 'topic2', 'topic3'],
+        sourceConversationIds: ['conv1', 'conv2'],
       });
 
       await runHierarchicalSummarization();
@@ -205,32 +195,30 @@ describe("cron-hierarchical-summary", () => {
       expect(logger.info).toHaveBeenCalled();
     });
 
-    it("should create weekly summaries for past week", async () => {
+    it('should create weekly summaries for past week', async () => {
       const weekStart = new Date();
       weekStart.setDate(weekStart.getDate() - 7);
 
-      (prisma.user.findMany as any).mockResolvedValueOnce([
-        { id: "user-1" } as any,
-      ]);
+      (prisma.user.findMany as any).mockResolvedValueOnce([{ id: 'user-1' } as any]);
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
       (prisma.hierarchicalSummary.create as any).mockResolvedValue({
-        id: "summary-1",
-        userId: "user-1",
-        periodType: "WEEKLY",
+        id: 'summary-1',
+        userId: 'user-1',
+        periodType: 'WEEKLY',
         periodStart: weekStart,
         periodEnd: new Date(),
-        summary: "Weekly summary",
+        summary: 'Weekly summary',
         topicsCount: 5,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
       (generateHierarchicalSummary as any).mockResolvedValue({
-        keyThemes: ["theme1"],
-        consolidatedLearnings: ["learning1"],
-        frequentTopics: [{ topic: "topic1", count: 5 }],
-        sourceConversationIds: ["conv1"],
+        keyThemes: ['theme1'],
+        consolidatedLearnings: ['learning1'],
+        frequentTopics: [{ topic: 'topic1', count: 5 }],
+        sourceConversationIds: ['conv1'],
       });
 
       await runHierarchicalSummarization();
@@ -238,28 +226,26 @@ describe("cron-hierarchical-summary", () => {
       expect(prisma.hierarchicalSummary.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            type: "weekly",
+            type: 'weekly',
           }),
         }),
       );
     });
 
-    it("should create monthly summaries on 1st of month", async () => {
+    it('should create monthly summaries on 1st of month', async () => {
       const today = new Date();
       const isFirstOfMonth = today.getDate() === 1;
 
       if (isFirstOfMonth) {
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
 
-        (prisma.user.findMany as any).mockResolvedValueOnce([
-          { id: "user-1" } as any,
-        ]);
+        (prisma.user.findMany as any).mockResolvedValueOnce([{ id: 'user-1' } as any]);
 
         (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
         (prisma.hierarchicalSummary.create as any).mockResolvedValue({
-          id: "summary-1",
-          userId: "user-1",
-          type: "monthly",
+          id: 'summary-1',
+          userId: 'user-1',
+          type: 'monthly',
           startDate: monthStart,
           endDate: new Date(),
           consolidatedLearnings: [],
@@ -271,13 +257,13 @@ describe("cron-hierarchical-summary", () => {
         });
 
         (generateHierarchicalSummary as any).mockResolvedValue({
-          keyThemes: ["theme1", "theme2"],
-          consolidatedLearnings: ["learning1"],
+          keyThemes: ['theme1', 'theme2'],
+          consolidatedLearnings: ['learning1'],
           frequentTopics: [
-            { topic: "topic1", count: 5 },
-            { topic: "topic2", count: 3 },
+            { topic: 'topic1', count: 5 },
+            { topic: 'topic2', count: 3 },
           ],
-          sourceConversationIds: ["conv1", "conv2"],
+          sourceConversationIds: ['conv1', 'conv2'],
         });
 
         await runHierarchicalSummarization();
@@ -285,72 +271,70 @@ describe("cron-hierarchical-summary", () => {
         expect(prisma.hierarchicalSummary.create).toHaveBeenCalledWith(
           expect.objectContaining({
             data: expect.objectContaining({
-              type: "monthly",
+              type: 'monthly',
             }),
           }),
         );
       }
     });
 
-    it("should log progress during batch processing", async () => {
-      (prisma.user.findMany as any).mockResolvedValueOnce([
-        { id: "user-1" } as any,
-      ]);
+    it('should log progress during batch processing', async () => {
+      (prisma.user.findMany as any).mockResolvedValueOnce([{ id: 'user-1' } as any]);
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
       (prisma.hierarchicalSummary.create as any).mockResolvedValue({
-        id: "summary-1",
-        userId: "user-1",
-        periodType: "WEEKLY",
+        id: 'summary-1',
+        userId: 'user-1',
+        periodType: 'WEEKLY',
         periodStart: new Date(),
         periodEnd: new Date(),
-        summary: "Summary",
+        summary: 'Summary',
         topicsCount: 5,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
       (generateHierarchicalSummary as any).mockResolvedValue({
-        keyThemes: ["theme1", "theme2"],
-        consolidatedLearnings: ["learning1"],
-        frequentTopics: ["topic1", "topic2", "topic3"],
-        sourceConversationIds: ["conv1", "conv2"],
+        keyThemes: ['theme1', 'theme2'],
+        consolidatedLearnings: ['learning1'],
+        frequentTopics: ['topic1', 'topic2', 'topic3'],
+        sourceConversationIds: ['conv1', 'conv2'],
       });
 
       await runHierarchicalSummarization();
 
       expect(logger.info).toHaveBeenCalledWith(
-        expect.stringContaining("started"),
+        expect.stringContaining('started'),
         expect.any(Object),
       );
     });
 
-    it("should handle errors and continue processing", async () => {
+    it('should handle errors and continue processing', async () => {
       (prisma.user.findMany as any).mockResolvedValueOnce([
-        { id: "user-1" } as any,
-        { id: "user-2" } as any,
+        { id: 'user-1' } as any,
+        { id: 'user-2' } as any,
       ]);
 
       (prisma.hierarchicalSummary.findFirst as any).mockResolvedValue(null);
       (prisma.hierarchicalSummary.create as any)
-        .mockRejectedValueOnce(new Error("DB error"))
+        .mockRejectedValueOnce(new Error('DB error'))
         .mockResolvedValueOnce({
-          id: "summary-2",
-          userId: "user-2",
-          periodType: "WEEKLY",
+          id: 'summary-2',
+          userId: 'user-2',
+          periodType: 'WEEKLY',
           periodStart: new Date(),
           periodEnd: new Date(),
-          summary: "Summary",
+          summary: 'Summary',
           topicsCount: 5,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
 
       (generateHierarchicalSummary as any).mockResolvedValue({
-        keyThemes: ["theme1", "theme2"],
-        consolidatedLearnings: ["learning1"],
-        frequentTopics: ["topic1", "topic2", "topic3"],
-        sourceConversationIds: ["conv1", "conv2"],
+        keyThemes: ['theme1', 'theme2'],
+        consolidatedLearnings: ['learning1'],
+        frequentTopics: ['topic1', 'topic2', 'topic3'],
+        sourceConversationIds: ['conv1', 'conv2'],
       });
 
       await expect(runHierarchicalSummarization()).resolves.not.toThrow();
@@ -358,7 +342,7 @@ describe("cron-hierarchical-summary", () => {
       expect(logger.error).toHaveBeenCalled();
     });
 
-    it("should skip users without recent conversations", async () => {
+    it('should skip users without recent conversations', async () => {
       (prisma.user.findMany as any).mockResolvedValueOnce([]);
 
       await runHierarchicalSummarization();

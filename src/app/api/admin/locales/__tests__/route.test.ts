@@ -40,20 +40,10 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
     },
   };
 });
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    localeConfig: {
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    localeAuditLog: {
-      create: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 vi.mock('@/lib/locale/locale-audit-service', () => ({
   logLocaleCreate: vi.fn(),
   logLocaleUpdate: vi.fn(),

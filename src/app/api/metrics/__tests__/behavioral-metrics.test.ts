@@ -3,13 +3,10 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    studySession: { findMany: vi.fn() },
-    safetyEvent: { findMany: vi.fn() },
-    telemetryEvent: { findMany: vi.fn() },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/metrics/cost-tracking-service', () => ({
   getCostMetricsSummary: vi.fn().mockResolvedValue({

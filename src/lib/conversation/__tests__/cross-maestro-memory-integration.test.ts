@@ -5,25 +5,19 @@
  * Covers end-to-end flows and error recovery scenarios.
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  loadCrossMaestroLearnings,
-  type CrossMaestroLearning,
-} from "../cross-maestro-memory";
-import { enhanceSystemPrompt } from "../prompt-enhancer";
-import type { ConversationMemory } from "../memory-loader";
-import type { TierMemoryLimits } from "../tier-memory-config";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { loadCrossMaestroLearnings, type CrossMaestroLearning } from '../cross-maestro-memory';
+import { enhanceSystemPrompt } from '../prompt-enhancer';
+import type { ConversationMemory } from '../memory-loader';
+import type { TierMemoryLimits } from '../tier-memory-config';
 
 // Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    conversation: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -38,8 +32,8 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/tier/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+vi.mock('@/lib/tier/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tier/server')>();
   return {
     ...actual,
     tierService: {
@@ -48,43 +42,41 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
   };
 });
 
-vi.mock("../tier-memory-config", () => ({
+vi.mock('../tier-memory-config', () => ({
   getTierMemoryLimits: vi.fn(),
 }));
 
-vi.mock("@/data/maestri", () => ({
+vi.mock('@/data/maestri', () => ({
   getMaestroById: vi.fn(),
 }));
 
-vi.mock("@/lib/safety", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/safety")>();
+vi.mock('@/lib/safety', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/safety')>();
   return {
     ...actual,
-    injectSafetyGuardrails: vi.fn(
-      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
-    ),
+    injectSafetyGuardrails: vi.fn((prompt: string, _options: unknown) => `[SAFE] ${prompt}`),
   };
 });
 
-import { prisma } from "@/lib/db";
-import { tierService } from "@/lib/tier/server";
-import { getTierMemoryLimits } from "../tier-memory-config";
-import { getMaestroById } from "@/data/maestri";
+import { prisma } from '@/lib/db';
+import { tierService } from '@/lib/tier/server';
+import { getTierMemoryLimits } from '../tier-memory-config';
+import { getMaestroById } from '@/data/maestri';
 
-describe("Cross-Maestro Memory Integration", () => {
+describe('Cross-Maestro Memory Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("End-to-end flow: settings -> memory loading -> prompt enhancement", () => {
-    it("should complete full flow for Pro tier user with crossMaestroEnabled=true", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
-      const basePrompt = "Sei Euclide, insegnante di matematica.";
+  describe('End-to-end flow: settings -> memory loading -> prompt enhancement', () => {
+    it('should complete full flow for Pro tier user with crossMaestroEnabled=true', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
+      const basePrompt = 'Sei Euclide, insegnante di matematica.';
 
       // 1. Setup: Pro tier user
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -99,33 +91,30 @@ describe("Cross-Maestro Memory Integration", () => {
       // 2. Mock cross-maestro learnings
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
+          maestroId: 'galileo-fisica',
           keyFacts: JSON.stringify({
             decisions: [],
             preferences: [],
-            learned: ["Leggi del moto", "Gravitazione"],
+            learned: ['Leggi del moto', 'Gravitazione'],
           }),
-          updatedAt: new Date("2026-01-20"),
+          updatedAt: new Date('2026-01-20'),
         },
       ] as any);
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
-        if (id === "galileo-fisica") {
-          return { displayName: "Galileo", subject: "physics" } as any;
+        if (id === 'galileo-fisica') {
+          return { displayName: 'Galileo', subject: 'physics' } as any;
         }
         return undefined;
       });
 
       // 3. Load cross-maestro learnings
-      const learnings = await loadCrossMaestroLearnings(
-        userId,
-        currentMaestroId,
-      );
+      const learnings = await loadCrossMaestroLearnings(userId, currentMaestroId);
       expect(learnings).toHaveLength(1);
-      expect(learnings[0].maestroName).toBe("Galileo");
+      expect(learnings[0].maestroName).toBe('Galileo');
 
       // 4. Enhance prompt with cross-maestro context
-      const proLimits = getTierMemoryLimits("pro");
+      const proLimits = getTierMemoryLimits('pro');
       const memory: ConversationMemory = {
         recentSummary: null,
         keyFacts: [],
@@ -136,25 +125,25 @@ describe("Cross-Maestro Memory Integration", () => {
       const enhancedPrompt = enhanceSystemPrompt({
         basePrompt,
         memory,
-        safetyOptions: { role: "maestro" },
+        safetyOptions: { role: 'maestro' },
         tierLimits: proLimits,
         crossMaestroLearnings: learnings,
       });
 
       // 5. Verify prompt includes cross-maestro context
-      expect(enhancedPrompt).toContain("## Conoscenze Interdisciplinari");
-      expect(enhancedPrompt).toContain("Galileo (physics)");
-      expect(enhancedPrompt).toContain("Leggi del moto");
+      expect(enhancedPrompt).toContain('## Conoscenze Interdisciplinari');
+      expect(enhancedPrompt).toContain('Galileo (physics)');
+      expect(enhancedPrompt).toContain('Leggi del moto');
     });
 
-    it("should skip cross-maestro when setting is disabled", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+    it('should skip cross-maestro when setting is disabled', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       // Even though user is Pro tier, if getTierMemoryLimits returns crossMaestroEnabled=false,
       // the feature should be disabled
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       // User has disabled cross-maestro in settings
@@ -177,13 +166,13 @@ describe("Cross-Maestro Memory Integration", () => {
     });
   });
 
-  describe("Error recovery and graceful degradation", () => {
-    it("should gracefully handle database errors when loading learnings", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+  describe('Error recovery and graceful degradation', () => {
+    it('should gracefully handle database errors when loading learnings', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -197,19 +186,19 @@ describe("Cross-Maestro Memory Integration", () => {
 
       // Simulate database error
       vi.mocked(prisma.conversation.findMany).mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error('Database connection failed'),
       );
 
       const result = await loadCrossMaestroLearnings(userId, currentMaestroId);
       expect(result).toEqual([]); // Returns empty array on error
     });
 
-    it("should continue with partial learnings when some maestros fail lookup", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+    it('should continue with partial learnings when some maestros fail lookup', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -224,20 +213,20 @@ describe("Cross-Maestro Memory Integration", () => {
       // Two conversations, but one maestro lookup fails
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
-          keyFacts: JSON.stringify({ learned: ["Physics concept"] }),
+          maestroId: 'galileo-fisica',
+          keyFacts: JSON.stringify({ learned: ['Physics concept'] }),
           updatedAt: new Date(),
         },
         {
-          maestroId: "unknown-maestro",
-          keyFacts: JSON.stringify({ learned: ["Unknown concept"] }),
+          maestroId: 'unknown-maestro',
+          keyFacts: JSON.stringify({ learned: ['Unknown concept'] }),
           updatedAt: new Date(),
         },
       ] as any);
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
-        if (id === "galileo-fisica") {
-          return { displayName: "Galileo", subject: "physics" } as any;
+        if (id === 'galileo-fisica') {
+          return { displayName: 'Galileo', subject: 'physics' } as any;
         }
         return undefined; // Unknown maestro
       });
@@ -246,13 +235,13 @@ describe("Cross-Maestro Memory Integration", () => {
 
       // Should return only the successfully looked up maestro
       expect(result).toHaveLength(1);
-      expect(result[0].maestroName).toBe("Galileo");
+      expect(result[0].maestroName).toBe('Galileo');
     });
 
-    it("should handle prompt enhancement even when cross-maestro loading fails", async () => {
-      const basePrompt = "Base prompt";
+    it('should handle prompt enhancement even when cross-maestro loading fails', async () => {
+      const basePrompt = 'Base prompt';
       const memory: ConversationMemory = {
-        recentSummary: "Session summary",
+        recentSummary: 'Session summary',
         keyFacts: [],
         topics: [],
         lastSessionDate: null,
@@ -274,23 +263,23 @@ describe("Cross-Maestro Memory Integration", () => {
       const result = enhanceSystemPrompt({
         basePrompt,
         memory,
-        safetyOptions: { role: "maestro" },
+        safetyOptions: { role: 'maestro' },
         tierLimits: proLimits,
         crossMaestroLearnings,
       });
 
-      expect(result).toContain("Memoria delle Sessioni Precedenti");
-      expect(result).not.toContain("Conoscenze Interdisciplinari");
+      expect(result).toContain('Memoria delle Sessioni Precedenti');
+      expect(result).not.toContain('Conoscenze Interdisciplinari');
     });
   });
 
-  describe("Malformed data handling", () => {
-    it("should skip conversations with unparseable keyFacts", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+  describe('Malformed data handling', () => {
+    it('should skip conversations with unparseable keyFacts', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -305,17 +294,17 @@ describe("Cross-Maestro Memory Integration", () => {
       // Mix of valid and invalid keyFacts
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
-          keyFacts: JSON.stringify({ learned: ["Valid learning"] }),
+          maestroId: 'galileo-fisica',
+          keyFacts: JSON.stringify({ learned: ['Valid learning'] }),
           updatedAt: new Date(),
         },
         {
-          maestroId: "curie-chimica",
-          keyFacts: "invalid json {{{", // Malformed JSON
+          maestroId: 'curie-chimica',
+          keyFacts: 'invalid json {{{', // Malformed JSON
           updatedAt: new Date(),
         },
         {
-          maestroId: "euclide-matematica",
+          maestroId: 'euclide-matematica',
           keyFacts: null, // Null keyFacts
           updatedAt: new Date(),
         },
@@ -323,12 +312,12 @@ describe("Cross-Maestro Memory Integration", () => {
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
         const names: Record<string, string> = {
-          "galileo-fisica": "Galileo",
-          "curie-chimica": "Curie",
-          "euclide-matematica": "Euclide",
+          'galileo-fisica': 'Galileo',
+          'curie-chimica': 'Curie',
+          'euclide-matematica': 'Euclide',
         };
         if (names[id]) {
-          return { displayName: names[id], subject: "subject" } as any;
+          return { displayName: names[id], subject: 'subject' } as any;
         }
         return undefined;
       });
@@ -337,15 +326,15 @@ describe("Cross-Maestro Memory Integration", () => {
 
       // Only valid conversation should be returned
       expect(result).toHaveLength(1);
-      expect(result[0].maestroName).toBe("Galileo");
+      expect(result[0].maestroName).toBe('Galileo');
     });
 
-    it("should filter out empty and whitespace-only learnings", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+    it('should filter out empty and whitespace-only learnings', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -359,17 +348,17 @@ describe("Cross-Maestro Memory Integration", () => {
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
+          maestroId: 'galileo-fisica',
           keyFacts: JSON.stringify({
-            learned: ["Valid learning", "", "  ", null, "Another valid"],
+            learned: ['Valid learning', '', '  ', null, 'Another valid'],
           }),
           updatedAt: new Date(),
         },
       ] as any);
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
-        if (id === "galileo-fisica") {
-          return { displayName: "Galileo", subject: "physics" } as any;
+        if (id === 'galileo-fisica') {
+          return { displayName: 'Galileo', subject: 'physics' } as any;
         }
         return undefined;
       });
@@ -378,17 +367,17 @@ describe("Cross-Maestro Memory Integration", () => {
 
       // Should only include non-empty, non-whitespace learnings
       expect(result).toHaveLength(1);
-      expect(result[0].learnings).toEqual(["Valid learning", "Another valid"]);
+      expect(result[0].learnings).toEqual(['Valid learning', 'Another valid']);
     });
   });
 
-  describe("Memory aggregation from multiple conversations", () => {
-    it("should aggregate learnings from multiple conversations with same maestro", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+  describe('Memory aggregation from multiple conversations', () => {
+    it('should aggregate learnings from multiple conversations with same maestro', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -401,29 +390,29 @@ describe("Cross-Maestro Memory Integration", () => {
       } as any);
 
       // Multiple conversations with Galileo
-      const galileoDate1 = new Date("2026-01-15");
-      const galileoDate2 = new Date("2026-01-20");
+      const galileoDate1 = new Date('2026-01-15');
+      const galileoDate2 = new Date('2026-01-20');
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
+          maestroId: 'galileo-fisica',
           keyFacts: JSON.stringify({
-            learned: ["Gravity", "Motion laws"],
+            learned: ['Gravity', 'Motion laws'],
           }),
           updatedAt: galileoDate1,
         },
         {
-          maestroId: "galileo-fisica",
+          maestroId: 'galileo-fisica',
           keyFacts: JSON.stringify({
-            learned: ["Inertia", "Acceleration"],
+            learned: ['Inertia', 'Acceleration'],
           }),
           updatedAt: galileoDate2,
         },
       ] as any);
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
-        if (id === "galileo-fisica") {
-          return { displayName: "Galileo", subject: "physics" } as any;
+        if (id === 'galileo-fisica') {
+          return { displayName: 'Galileo', subject: 'physics' } as any;
         }
         return undefined;
       });
@@ -432,21 +421,21 @@ describe("Cross-Maestro Memory Integration", () => {
 
       // Should merge into single entry
       expect(result).toHaveLength(1);
-      expect(result[0].maestroName).toBe("Galileo");
+      expect(result[0].maestroName).toBe('Galileo');
       expect(result[0].learnings).toHaveLength(4);
-      expect(result[0].learnings).toContain("Gravity");
-      expect(result[0].learnings).toContain("Inertia");
+      expect(result[0].learnings).toContain('Gravity');
+      expect(result[0].learnings).toContain('Inertia');
       expect(result[0].date).toEqual(galileoDate2); // Most recent date
     });
   });
 
-  describe("Subject filtering with cross-maestro", () => {
-    it("should correctly filter cross-maestro learnings by subject before prompt enhancement", async () => {
-      const userId = "pro-user";
-      const currentMaestroId = "euclide-matematica";
+  describe('Subject filtering with cross-maestro', () => {
+    it('should correctly filter cross-maestro learnings by subject before prompt enhancement', async () => {
+      const userId = 'pro-user';
+      const currentMaestroId = 'euclide-matematica';
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-        code: "pro",
+        code: 'pro',
       } as any);
 
       vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -461,32 +450,32 @@ describe("Cross-Maestro Memory Integration", () => {
       // Multiple subjects
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
-          maestroId: "galileo-fisica",
-          keyFacts: JSON.stringify({ learned: ["Physics"] }),
+          maestroId: 'galileo-fisica',
+          keyFacts: JSON.stringify({ learned: ['Physics'] }),
           updatedAt: new Date(),
         },
         {
-          maestroId: "curie-chimica",
-          keyFacts: JSON.stringify({ learned: ["Chemistry"] }),
+          maestroId: 'curie-chimica',
+          keyFacts: JSON.stringify({ learned: ['Chemistry'] }),
           updatedAt: new Date(),
         },
         {
-          maestroId: "manzoni-italiano",
-          keyFacts: JSON.stringify({ learned: ["Italian"] }),
+          maestroId: 'manzoni-italiano',
+          keyFacts: JSON.stringify({ learned: ['Italian'] }),
           updatedAt: new Date(),
         },
       ] as any);
 
       vi.mocked(getMaestroById).mockImplementation((id: string) => {
         const subjects: Record<string, string> = {
-          "galileo-fisica": "physics",
-          "curie-chimica": "chemistry",
-          "manzoni-italiano": "italian",
+          'galileo-fisica': 'physics',
+          'curie-chimica': 'chemistry',
+          'manzoni-italiano': 'italian',
         };
         const names: Record<string, string> = {
-          "galileo-fisica": "Galileo",
-          "curie-chimica": "Curie",
-          "manzoni-italiano": "Manzoni",
+          'galileo-fisica': 'Galileo',
+          'curie-chimica': 'Curie',
+          'manzoni-italiano': 'Manzoni',
         };
         return {
           displayName: names[id],
@@ -495,17 +484,15 @@ describe("Cross-Maestro Memory Integration", () => {
       });
 
       // Load only physics and chemistry
-      const learnings = await loadCrossMaestroLearnings(
-        userId,
-        currentMaestroId,
-        { subjects: ["physics", "chemistry"] },
-      );
+      const learnings = await loadCrossMaestroLearnings(userId, currentMaestroId, {
+        subjects: ['physics', 'chemistry'],
+      });
 
       expect(learnings).toHaveLength(2);
       const subjects = learnings.map((l) => l.subject);
-      expect(subjects).toContain("physics");
-      expect(subjects).toContain("chemistry");
-      expect(subjects).not.toContain("italian");
+      expect(subjects).toContain('physics');
+      expect(subjects).toContain('chemistry');
+      expect(subjects).not.toContain('italian');
     });
   });
 });

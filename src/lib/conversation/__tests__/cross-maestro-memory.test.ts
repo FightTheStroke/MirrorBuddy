@@ -4,19 +4,16 @@
  * Tests for sharing learned concepts across different maestros (Pro tier feature)
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { loadCrossMaestroLearnings } from "../cross-maestro-memory";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { loadCrossMaestroLearnings } from '../cross-maestro-memory';
 
 // Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    conversation: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -31,8 +28,8 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/tier/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+vi.mock('@/lib/tier/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tier/server')>();
   return {
     ...actual,
     tierService: {
@@ -41,85 +38,76 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
   };
 });
 
-vi.mock("../tier-memory-config", () => ({
+vi.mock('../tier-memory-config', () => ({
   getTierMemoryLimits: vi.fn(),
 }));
 
-vi.mock("@/data/maestri", () => ({
+vi.mock('@/data/maestri', () => ({
   getMaestroById: vi.fn(),
 }));
 
-import { prisma } from "@/lib/db";
-import { tierService } from "@/lib/tier/server";
-import { getTierMemoryLimits } from "../tier-memory-config";
-import { getMaestroById } from "@/data/maestri";
+import { prisma } from '@/lib/db';
+import { tierService } from '@/lib/tier/server';
+import { getTierMemoryLimits } from '../tier-memory-config';
+import { getMaestroById } from '@/data/maestri';
 
-describe("loadCrossMaestroLearnings", () => {
-  const testUserId = "test-user-cross-maestro";
-  const currentMaestroId = "euclide";
+describe('loadCrossMaestroLearnings', () => {
+  const testUserId = 'test-user-cross-maestro';
+  const currentMaestroId = 'euclide';
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should return empty array for non-existent user", async () => {
+  it('should return empty array for non-existent user', async () => {
     // Mock trial tier for non-existent user
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "trial",
+      code: 'trial',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
     } as any);
 
-    const result = await loadCrossMaestroLearnings(
-      "non-existent-user",
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings('non-existent-user', currentMaestroId);
 
     expect(result).toEqual([]);
   });
 
-  it("should return empty array for trial tier users", async () => {
+  it('should return empty array for trial tier users', async () => {
     // Mock trial tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "trial",
+      code: 'trial',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
     } as any);
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
 
     expect(result).toEqual([]);
   });
 
-  it("should return empty array for base tier users", async () => {
+  it('should return empty array for base tier users', async () => {
     // Mock base tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "base",
+      code: 'base',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
     } as any);
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
 
     expect(result).toEqual([]);
   });
 
-  it("should return learnings from other maestros for Pro tier users", async () => {
+  it('should return learnings from other maestros for Pro tier users', async () => {
     // Mock Pro tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "pro",
+      code: 'pro',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -127,31 +115,25 @@ describe("loadCrossMaestroLearnings", () => {
     } as any);
 
     // Mock conversations data
-    const galileoDate = new Date("2024-01-15");
-    const curieDate = new Date("2024-01-20");
+    const galileoDate = new Date('2024-01-15');
+    const curieDate = new Date('2024-01-20');
 
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "curie",
+        maestroId: 'curie',
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
-          learned: [
-            "Chemical bonds form between atoms",
-            "Periodic table organization",
-          ],
+          learned: ['Chemical bonds form between atoms', 'Periodic table organization'],
         }),
         updatedAt: curieDate,
       },
       {
-        maestroId: "galileo",
+        maestroId: 'galileo',
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
-          learned: [
-            "Newton's laws of motion",
-            "Gravity acceleration is 9.8 m/s²",
-          ],
+          learned: ["Newton's laws of motion", 'Gravity acceleration is 9.8 m/s²'],
         }),
         updatedAt: galileoDate,
       },
@@ -159,39 +141,36 @@ describe("loadCrossMaestroLearnings", () => {
 
     // Mock maestro lookups
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "curie") {
-        return { displayName: "Marie Curie", subject: "chemistry" } as any;
+      if (id === 'curie') {
+        return { displayName: 'Marie Curie', subject: 'chemistry' } as any;
       }
-      if (id === "galileo") {
-        return { displayName: "Galileo Galilei", subject: "physics" } as any;
+      if (id === 'galileo') {
+        return { displayName: 'Galileo Galilei', subject: 'physics' } as any;
       }
       return undefined;
     });
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
 
     expect(result).toHaveLength(2);
 
     // Should be sorted by date (most recent first)
-    expect(result[0].maestroId).toBe("curie");
-    expect(result[0].subject).toBe("chemistry");
+    expect(result[0].maestroId).toBe('curie');
+    expect(result[0].subject).toBe('chemistry');
     expect(result[0].learnings).toHaveLength(2);
-    expect(result[0].learnings).toContain("Chemical bonds form between atoms");
+    expect(result[0].learnings).toContain('Chemical bonds form between atoms');
     expect(result[0].date).toEqual(curieDate);
 
-    expect(result[1].maestroId).toBe("galileo");
-    expect(result[1].subject).toBe("physics");
+    expect(result[1].maestroId).toBe('galileo');
+    expect(result[1].subject).toBe('physics');
     expect(result[1].learnings).toHaveLength(2);
     expect(result[1].learnings).toContain("Newton's laws of motion");
   });
 
-  it("should exclude current maestro from results", async () => {
+  it('should exclude current maestro from results', async () => {
     // Mock Pro tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "pro",
+      code: 'pro',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -202,7 +181,7 @@ describe("loadCrossMaestroLearnings", () => {
     // The query already filters out currentMaestroId via WHERE maestroId != currentMaestroId
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo",
+        maestroId: 'galileo',
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
@@ -213,19 +192,16 @@ describe("loadCrossMaestroLearnings", () => {
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo") {
-        return { displayName: "Galileo", subject: "physics" } as any;
+      if (id === 'galileo') {
+        return { displayName: 'Galileo', subject: 'physics' } as any;
       }
       return undefined;
     });
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
 
     expect(result).toHaveLength(1);
-    expect(result[0].maestroId).toBe("galileo");
+    expect(result[0].maestroId).toBe('galileo');
     expect(result[0].maestroId).not.toBe(currentMaestroId);
 
     // Verify prisma was called with correct filter
@@ -238,10 +214,10 @@ describe("loadCrossMaestroLearnings", () => {
     );
   });
 
-  it("should filter by subject when option provided", async () => {
+  it('should filter by subject when option provided', async () => {
     // Mock Pro tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "pro",
+      code: 'pro',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -251,49 +227,44 @@ describe("loadCrossMaestroLearnings", () => {
     // Mock conversations with different subjects
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo",
-        keyFacts: JSON.stringify({ learned: ["Physics concept"] }),
+        maestroId: 'galileo',
+        keyFacts: JSON.stringify({ learned: ['Physics concept'] }),
         updatedAt: new Date(),
       },
       {
-        maestroId: "curie",
-        keyFacts: JSON.stringify({ learned: ["Chemistry concept"] }),
+        maestroId: 'curie',
+        keyFacts: JSON.stringify({ learned: ['Chemistry concept'] }),
         updatedAt: new Date(),
       },
       {
-        maestroId: "manzoni",
-        keyFacts: JSON.stringify({ learned: ["Italian concept"] }),
+        maestroId: 'manzoni',
+        keyFacts: JSON.stringify({ learned: ['Italian concept'] }),
         updatedAt: new Date(),
       },
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo")
-        return { displayName: "Galileo", subject: "physics" } as any;
-      if (id === "curie")
-        return { displayName: "Curie", subject: "chemistry" } as any;
-      if (id === "manzoni")
-        return { displayName: "Manzoni", subject: "italian" } as any;
+      if (id === 'galileo') return { displayName: 'Galileo', subject: 'physics' } as any;
+      if (id === 'curie') return { displayName: 'Curie', subject: 'chemistry' } as any;
+      if (id === 'manzoni') return { displayName: 'Manzoni', subject: 'italian' } as any;
       return undefined;
     });
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-      { subjects: ["physics", "chemistry"] },
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId, {
+      subjects: ['physics', 'chemistry'],
+    });
 
     expect(result).toHaveLength(2);
     const subjects = result.map((r) => r.subject);
-    expect(subjects).toContain("physics");
-    expect(subjects).toContain("chemistry");
-    expect(subjects).not.toContain("italian");
+    expect(subjects).toContain('physics');
+    expect(subjects).toContain('chemistry');
+    expect(subjects).not.toContain('italian');
   });
 
-  it("should respect limit option", async () => {
+  it('should respect limit option', async () => {
     // Mock Pro tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "pro",
+      code: 'pro',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -301,7 +272,7 @@ describe("loadCrossMaestroLearnings", () => {
     } as any);
 
     // Mock 5 conversations, but limit should return only 3
-    const maestros = ["galileo", "curie", "manzoni"];
+    const maestros = ['galileo', 'curie', 'manzoni'];
 
     vi.mocked(prisma.conversation.findMany).mockResolvedValue(
       maestros.map((id, i) => ({
@@ -312,14 +283,10 @@ describe("loadCrossMaestroLearnings", () => {
     );
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      return { displayName: id, subject: "subject" } as any;
+      return { displayName: id, subject: 'subject' } as any;
     });
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-      { limit: 3 },
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId, { limit: 3 });
 
     expect(result).toHaveLength(3);
 
@@ -331,10 +298,10 @@ describe("loadCrossMaestroLearnings", () => {
     );
   });
 
-  it("should handle conversations without learnings gracefully", async () => {
+  it('should handle conversations without learnings gracefully', async () => {
     // Mock Pro tier
     vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
-      code: "pro",
+      code: 'pro',
     } as any);
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
@@ -344,33 +311,28 @@ describe("loadCrossMaestroLearnings", () => {
     // Mock conversations: one with empty learnings, one with null keyFacts
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo",
+        maestroId: 'galileo',
         keyFacts: JSON.stringify({
-          decisions: ["Some decision"],
-          preferences: ["Some preference"],
+          decisions: ['Some decision'],
+          preferences: ['Some preference'],
           learned: [], // Empty learnings
         }),
         updatedAt: new Date(),
       },
       {
-        maestroId: "curie",
+        maestroId: 'curie',
         keyFacts: null, // Null keyFacts
         updatedAt: new Date(),
       },
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo")
-        return { displayName: "Galileo", subject: "physics" } as any;
-      if (id === "curie")
-        return { displayName: "Curie", subject: "chemistry" } as any;
+      if (id === 'galileo') return { displayName: 'Galileo', subject: 'physics' } as any;
+      if (id === 'curie') return { displayName: 'Curie', subject: 'chemistry' } as any;
       return undefined;
     });
 
-    const result = await loadCrossMaestroLearnings(
-      testUserId,
-      currentMaestroId,
-    );
+    const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
 
     // Should return empty array as no actual learnings found
     expect(result).toEqual([]);

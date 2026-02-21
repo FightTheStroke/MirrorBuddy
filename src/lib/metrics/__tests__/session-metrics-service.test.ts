@@ -2,18 +2,15 @@
  * Unit tests for session-metrics-service
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock prisma before importing the service
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    sessionMetrics: {
-      create: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -36,17 +33,17 @@ import {
   recordIncident,
   getSessionState,
   endSession,
-} from "../session-metrics-service";
+} from '../session-metrics-service';
 
-describe("session-metrics-service", () => {
+describe('session-metrics-service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("startSession", () => {
-    it("creates a new session state", () => {
-      const sessionId = "test-session-1";
-      const userId = "user-123";
+  describe('startSession', () => {
+    it('creates a new session state', () => {
+      const sessionId = 'test-session-1';
+      const userId = 'user-123';
 
       startSession(sessionId, userId);
 
@@ -58,14 +55,14 @@ describe("session-metrics-service", () => {
     });
   });
 
-  describe("recordTurn", () => {
-    it("adds turn data to session", () => {
-      const sessionId = "test-session-2";
-      startSession(sessionId, "user-123");
+  describe('recordTurn', () => {
+    it('adds turn data to session', () => {
+      const sessionId = 'test-session-2';
+      startSession(sessionId, 'user-123');
 
       recordTurn(sessionId, {
         latencyMs: 150,
-        intent: "ask_question",
+        intent: 'ask_question',
         tokensIn: 100,
         tokensOut: 200,
       });
@@ -77,15 +74,15 @@ describe("session-metrics-service", () => {
       expect(state?.turns[0].tokensOut).toBe(200);
     });
 
-    it("tracks recent intents for stuck loop detection", () => {
-      const sessionId = "test-session-3";
-      startSession(sessionId, "user-123");
+    it('tracks recent intents for stuck loop detection', () => {
+      const sessionId = 'test-session-3';
+      startSession(sessionId, 'user-123');
 
       // Record same intent multiple times
       for (let i = 0; i < 5; i++) {
         recordTurn(sessionId, {
           latencyMs: 100,
-          intent: "same_intent",
+          intent: 'same_intent',
           tokensIn: 50,
           tokensOut: 50,
         });
@@ -93,14 +90,14 @@ describe("session-metrics-service", () => {
 
       const state = getSessionState(sessionId);
       expect(state?.recentIntents).toHaveLength(5);
-      expect(state?.recentIntents.every((i) => i === "same_intent")).toBe(true);
+      expect(state?.recentIntents.every((i) => i === 'same_intent')).toBe(true);
     });
   });
 
-  describe("recordVoiceUsage", () => {
-    it("accumulates voice minutes", () => {
-      const sessionId = "test-session-4";
-      startSession(sessionId, "user-123");
+  describe('recordVoiceUsage', () => {
+    it('accumulates voice minutes', () => {
+      const sessionId = 'test-session-4';
+      startSession(sessionId, 'user-123');
 
       recordVoiceUsage(sessionId, 2.5);
       recordVoiceUsage(sessionId, 1.5);
@@ -110,10 +107,10 @@ describe("session-metrics-service", () => {
     });
   });
 
-  describe("recordRefusal", () => {
-    it("tracks refusal counts", () => {
-      const sessionId = "test-session-5";
-      startSession(sessionId, "user-123");
+  describe('recordRefusal', () => {
+    it('tracks refusal counts', () => {
+      const sessionId = 'test-session-5';
+      startSession(sessionId, 'user-123');
 
       recordRefusal(sessionId, true);
       recordRefusal(sessionId, false);
@@ -125,24 +122,24 @@ describe("session-metrics-service", () => {
     });
   });
 
-  describe("recordIncident", () => {
-    it("keeps highest severity incident", () => {
-      const sessionId = "test-session-6";
-      startSession(sessionId, "user-123");
+  describe('recordIncident', () => {
+    it('keeps highest severity incident', () => {
+      const sessionId = 'test-session-6';
+      startSession(sessionId, 'user-123');
 
-      recordIncident(sessionId, "S1");
-      recordIncident(sessionId, "S3");
-      recordIncident(sessionId, "S2");
+      recordIncident(sessionId, 'S1');
+      recordIncident(sessionId, 'S3');
+      recordIncident(sessionId, 'S2');
 
       const state = getSessionState(sessionId);
-      expect(state?.incidentSeverity).toBe("S3");
+      expect(state?.incidentSeverity).toBe('S3');
     });
   });
 
-  describe("endSession", () => {
-    it("clears session from memory after saving", async () => {
-      const sessionId = "test-session-7";
-      startSession(sessionId, "user-123");
+  describe('endSession', () => {
+    it('clears session from memory after saving', async () => {
+      const sessionId = 'test-session-7';
+      startSession(sessionId, 'user-123');
 
       recordTurn(sessionId, {
         latencyMs: 100,

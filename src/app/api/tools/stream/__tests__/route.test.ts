@@ -15,13 +15,10 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(() => mockCookies),
 }));
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: { findUnique: vi.fn() },
-    conversation: { findFirst: vi.fn() },
-    trialSession: { findFirst: vi.fn() },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {

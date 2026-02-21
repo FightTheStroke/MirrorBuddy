@@ -44,13 +44,10 @@ vi.mock('@/lib/trial/trial-service', () => ({
 }));
 
 // Mock Prisma to prevent DB calls from anti-abuse dbAdapter
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    trialSession: {
-      findUnique: vi.fn().mockResolvedValue(null),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock anti-abuse to prevent DB calls
 vi.mock('@/lib/trial/anti-abuse', () => ({

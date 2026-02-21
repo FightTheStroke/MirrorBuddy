@@ -16,17 +16,10 @@ import { buildCSPHeader } from '@/proxy';
 import { _resetForTesting, setFlagStatus } from '@/lib/feature-flags/feature-flags-service';
 
 // Mock Prisma to prevent DB calls from feature-flags-service
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    featureFlag: {
-      findMany: vi.fn().mockResolvedValue([]),
-      upsert: vi.fn().mockResolvedValue({}),
-    },
-    globalConfig: {
-      upsert: vi.fn().mockResolvedValue({}),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 describe('CSP Configuration Validation', () => {
   let proxyContent: string;

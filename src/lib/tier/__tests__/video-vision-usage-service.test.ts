@@ -1,19 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { TierLimits } from "../types";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { TierLimits } from '../types';
 
 // Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    videoVisionUsage: {
-      aggregate: vi.fn(),
-      findFirst: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -38,14 +32,14 @@ const mockLimits: TierLimits = {
   videoVisionMinutesMonthly: 10,
 };
 
-vi.mock("../tier-service", () => ({
+vi.mock('../tier-service', () => ({
   tierService: {
     getLimitsForUser: vi.fn(),
   },
 }));
 
 // Import after mocks
-import { prisma } from "@/lib/db";
+import { prisma } from '@/lib/db';
 import {
   canStartSession,
   startSession,
@@ -53,8 +47,8 @@ import {
   endSession,
   getMonthlyUsage,
   getLimitsAndUsage,
-} from "../video-vision-usage-service";
-import { tierService } from "../tier-service";
+} from '../video-vision-usage-service';
+import { tierService } from '../tier-service';
 
 // Create typed references to mocked functions to bypass vi.mocked() type issues
 const mockAggregate = prisma.videoVisionUsage.aggregate as any;
@@ -69,77 +63,77 @@ function setupAggregateResult(secondsUsed: number | null) {
   });
 }
 
-describe("video-vision-usage-service", () => {
+describe('video-vision-usage-service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(tierService.getLimitsForUser).mockResolvedValue(mockLimits);
   });
 
-  describe("getMonthlyUsage", () => {
-    it("should return total seconds used this month", async () => {
+  describe('getMonthlyUsage', () => {
+    it('should return total seconds used this month', async () => {
       setupAggregateResult(120);
 
-      const result = await getMonthlyUsage("user-1");
+      const result = await getMonthlyUsage('user-1');
       expect(result).toBe(120);
     });
 
-    it("should return 0 when no usage exists", async () => {
+    it('should return 0 when no usage exists', async () => {
       setupAggregateResult(null);
 
-      const result = await getMonthlyUsage("user-1");
+      const result = await getMonthlyUsage('user-1');
       expect(result).toBe(0);
     });
   });
 
-  describe("canStartSession", () => {
-    it("should allow session when under limits", async () => {
+  describe('canStartSession', () => {
+    it('should allow session when under limits', async () => {
       setupAggregateResult(0);
       mockFindFirst.mockResolvedValue(null);
 
-      const result = await canStartSession("user-1");
+      const result = await canStartSession('user-1');
 
       expect(result.allowed).toBe(true);
       expect(result.remainingSessionSeconds).toBe(60);
       expect(result.remainingMonthlyMinutes).toBe(10);
     });
 
-    it("should deny when video vision is disabled (0 seconds)", async () => {
+    it('should deny when video vision is disabled (0 seconds)', async () => {
       vi.mocked(tierService.getLimitsForUser).mockResolvedValue({
         ...mockLimits,
         videoVisionSecondsPerSession: 0,
       });
 
-      const result = await canStartSession("user-1");
+      const result = await canStartSession('user-1');
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe("video_vision_disabled");
+      expect(result.reason).toBe('video_vision_disabled');
     });
 
-    it("should deny when monthly limit is reached", async () => {
+    it('should deny when monthly limit is reached', async () => {
       setupAggregateResult(600); // 10 minutes = 600 seconds
 
-      const result = await canStartSession("user-1");
+      const result = await canStartSession('user-1');
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe("monthly_limit_reached");
+      expect(result.reason).toBe('monthly_limit_reached');
     });
 
-    it("should deny when session is already active", async () => {
+    it('should deny when session is already active', async () => {
       setupAggregateResult(0);
-      mockFindFirst.mockResolvedValue({ id: "active-session" });
+      mockFindFirst.mockResolvedValue({ id: 'active-session' });
 
-      const result = await canStartSession("user-1");
+      const result = await canStartSession('user-1');
 
       expect(result.allowed).toBe(false);
-      expect(result.reason).toBe("session_already_active");
+      expect(result.reason).toBe('session_already_active');
     });
 
-    it("should cap session to remaining monthly time", async () => {
+    it('should cap session to remaining monthly time', async () => {
       // 30 seconds remaining in monthly (570/600 used)
       setupAggregateResult(570);
       mockFindFirst.mockResolvedValue(null);
 
-      const result = await canStartSession("user-1");
+      const result = await canStartSession('user-1');
 
       expect(result.allowed).toBe(true);
       // Session limit is 60s, but only 30s remaining monthly
@@ -147,70 +141,70 @@ describe("video-vision-usage-service", () => {
     });
   });
 
-  describe("startSession", () => {
-    it("should create usage record and return id", async () => {
+  describe('startSession', () => {
+    it('should create usage record and return id', async () => {
       setupAggregateResult(0);
       mockFindFirst.mockResolvedValue(null);
       mockCreate.mockResolvedValue({
-        id: "usage-1",
+        id: 'usage-1',
         framesUsed: 0,
         secondsUsed: 0,
       });
 
-      const result = await startSession("user-1", "voice-session-1");
+      const result = await startSession('user-1', 'voice-session-1');
 
       expect(result).not.toBeNull();
-      expect(result!.id).toBe("usage-1");
+      expect(result!.id).toBe('usage-1');
       expect(result!.maxSeconds).toBe(60);
     });
 
-    it("should return null when not allowed", async () => {
+    it('should return null when not allowed', async () => {
       vi.mocked(tierService.getLimitsForUser).mockResolvedValue({
         ...mockLimits,
         videoVisionSecondsPerSession: 0,
       });
 
-      const result = await startSession("user-1", "voice-session-1");
+      const result = await startSession('user-1', 'voice-session-1');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("addFrames", () => {
-    it("should increment frame count", async () => {
+  describe('addFrames', () => {
+    it('should increment frame count', async () => {
       mockUpdate.mockResolvedValue({});
 
-      const ok = await addFrames("usage-1", 5);
+      const ok = await addFrames('usage-1', 5);
 
       expect(ok).toBe(true);
       expect(mockUpdate).toHaveBeenCalledWith({
-        where: { id: "usage-1" },
+        where: { id: 'usage-1' },
         data: { framesUsed: { increment: 5 } },
       });
     });
   });
 
-  describe("endSession", () => {
-    it("should update seconds and set endedAt", async () => {
+  describe('endSession', () => {
+    it('should update seconds and set endedAt', async () => {
       mockUpdate.mockResolvedValue({});
 
-      const ok = await endSession("usage-1", 45);
+      const ok = await endSession('usage-1', 45);
 
       expect(ok).toBe(true);
       expect(mockUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: "usage-1" },
+          where: { id: 'usage-1' },
           data: expect.objectContaining({ secondsUsed: 45 }),
         }),
       );
     });
   });
 
-  describe("getLimitsAndUsage", () => {
-    it("should return limits and current usage", async () => {
+  describe('getLimitsAndUsage', () => {
+    it('should return limits and current usage', async () => {
       setupAggregateResult(120);
 
-      const result = await getLimitsAndUsage("user-1");
+      const result = await getLimitsAndUsage('user-1');
 
       expect(result.allowed).toBe(true);
       expect(result.perSessionSeconds).toBe(60);
@@ -219,7 +213,7 @@ describe("video-vision-usage-service", () => {
       expect(result.monthlyMinutesRemaining).toBe(8); // (600-120)/60 = 8
     });
 
-    it("should return disabled when per-session is 0", async () => {
+    it('should return disabled when per-session is 0', async () => {
       vi.mocked(tierService.getLimitsForUser).mockResolvedValue({
         ...mockLimits,
         videoVisionSecondsPerSession: 0,
@@ -227,7 +221,7 @@ describe("video-vision-usage-service", () => {
       });
       setupAggregateResult(0);
 
-      const result = await getLimitsAndUsage("user-1");
+      const result = await getLimitsAndUsage('user-1');
 
       expect(result.allowed).toBe(false);
       expect(result.perSessionSeconds).toBe(0);

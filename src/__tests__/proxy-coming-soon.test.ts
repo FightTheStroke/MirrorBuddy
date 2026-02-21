@@ -39,17 +39,10 @@ vi.mock('@/lib/observability/metrics-store', () => ({
 }));
 
 // Mock Prisma to prevent DB calls from feature-flags updateFlag
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    featureFlag: {
-      findMany: vi.fn().mockResolvedValue([]),
-      upsert: vi.fn().mockResolvedValue({}),
-    },
-    globalConfig: {
-      upsert: vi.fn().mockResolvedValue({}),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock generateNonce
 vi.mock('@/lib/security', () => ({

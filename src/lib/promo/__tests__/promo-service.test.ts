@@ -13,22 +13,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock prisma BEFORE importing service
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: { findUnique: vi.fn(), update: vi.fn() },
-    userSubscription: { findUnique: vi.fn(), upsert: vi.fn() },
-    tierDefinition: { findUnique: vi.fn() },
-    tierAuditLog: { create: vi.fn() },
-    $transaction: vi.fn((fn: (tx: unknown) => Promise<unknown>) =>
-      fn({
-        waitlistEntry: { findUnique: vi.fn(), update: vi.fn() },
-        userSubscription: { findUnique: vi.fn(), upsert: vi.fn() },
-        tierDefinition: { findUnique: vi.fn() },
-        tierAuditLog: { create: vi.fn() },
-      }),
-    ),
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {

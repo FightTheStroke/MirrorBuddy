@@ -9,16 +9,10 @@ import { canSendTo } from '@/lib/email/preference-service';
 import { sendEmail } from '@/lib/email';
 import { triggerMaintenanceNotification } from '@/lib/maintenance/notification-triggers';
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    maintenanceWindow: {
-      findMany: vi.fn(),
-    },
-    user: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/email/preference-service', () => ({
   canSendTo: vi.fn(),

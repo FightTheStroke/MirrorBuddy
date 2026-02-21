@@ -38,14 +38,10 @@ vi.mock('@/lib/observability/sentry-tier-context', () => ({
 }));
 
 // Mock prisma (verify route uses it for locale lookup on error, not used in signup)
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import { POST } from '../route';
 import { signup } from '@/lib/waitlist/waitlist-service';

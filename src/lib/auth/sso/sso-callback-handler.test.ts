@@ -1,17 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies before imports
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: {
-      findFirst: vi.fn(),
-      create: vi.fn(),
-    },
-    schoolSSOConfig: {
-      findFirst: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/security', () => ({
   hashPII: vi.fn((val: string) => Promise.resolve(`hashed_${val}`)),

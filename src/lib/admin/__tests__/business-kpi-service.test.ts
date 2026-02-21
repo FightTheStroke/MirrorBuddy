@@ -10,23 +10,10 @@ import { getBusinessKPIs, clearCache } from '../business-kpi-service';
 import { prisma } from '@/lib/db';
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    userSubscription: {
-      findMany: vi.fn(),
-      count: vi.fn(),
-    },
-    user: {
-      count: vi.fn(),
-    },
-    settings: {
-      groupBy: vi.fn(),
-    },
-    conversation: {
-      groupBy: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

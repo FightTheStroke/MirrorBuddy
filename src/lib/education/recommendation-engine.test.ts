@@ -13,25 +13,10 @@ import {
 import type { StudentInsights } from './recommendation-engine';
 
 // Mock dependencies
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    conversation: {
-      findMany: vi.fn(),
-    },
-    learningPath: {
-      findMany: vi.fn(),
-    },
-    flashcardReview: {
-      findMany: vi.fn(),
-    },
-    flashcardProgress: {
-      findMany: vi.fn(),
-    },
-    quizResult: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/ai/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/ai/server')>();

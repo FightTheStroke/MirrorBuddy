@@ -7,41 +7,32 @@
  * - getTrialStatus
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock prisma
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    trialSession: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-import { prisma } from "@/lib/db";
-import {
-  incrementUsage,
-  addVoiceSeconds,
-  getTrialStatus,
-  TRIAL_LIMITS,
-} from "../trial-service";
+import { prisma } from '@/lib/db';
+import { incrementUsage, addVoiceSeconds, getTrialStatus, TRIAL_LIMITS } from '../trial-service';
 
-describe("Trial Service Usage", () => {
-  const sessionId = "test-session-123";
+describe('Trial Service Usage', () => {
+  const sessionId = 'test-session-123';
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("incrementUsage", () => {
-    it("increments chat count", async () => {
+  describe('incrementUsage', () => {
+    it('increments chat count', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         chatsUsed: 1,
       } as any);
 
-      await incrementUsage(sessionId, "chat");
+      await incrementUsage(sessionId, 'chat');
 
       expect(prisma.trialSession.update).toHaveBeenCalledWith({
         where: { id: sessionId },
@@ -49,13 +40,13 @@ describe("Trial Service Usage", () => {
       });
     });
 
-    it("increments doc count", async () => {
+    it('increments doc count', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         docsUsed: 1,
       } as any);
 
-      await incrementUsage(sessionId, "doc");
+      await incrementUsage(sessionId, 'doc');
 
       expect(prisma.trialSession.update).toHaveBeenCalledWith({
         where: { id: sessionId },
@@ -63,13 +54,13 @@ describe("Trial Service Usage", () => {
       });
     });
 
-    it("increments tool count", async () => {
+    it('increments tool count', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         toolsUsed: 1,
       } as any);
 
-      await incrementUsage(sessionId, "tool");
+      await incrementUsage(sessionId, 'tool');
 
       expect(prisma.trialSession.update).toHaveBeenCalledWith({
         where: { id: sessionId },
@@ -78,8 +69,8 @@ describe("Trial Service Usage", () => {
     });
   });
 
-  describe("addVoiceSeconds", () => {
-    it("adds voice seconds and returns updated total", async () => {
+  describe('addVoiceSeconds', () => {
+    it('adds voice seconds and returns updated total', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         voiceSecondsUsed: 120,
@@ -94,7 +85,7 @@ describe("Trial Service Usage", () => {
       });
     });
 
-    it("rounds fractional seconds up", async () => {
+    it('rounds fractional seconds up', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         voiceSecondsUsed: 61,
@@ -108,7 +99,7 @@ describe("Trial Service Usage", () => {
       });
     });
 
-    it("handles zero seconds", async () => {
+    it('handles zero seconds', async () => {
       vi.mocked(prisma.trialSession.update).mockResolvedValue({
         id: sessionId,
         voiceSecondsUsed: 100,
@@ -120,8 +111,8 @@ describe("Trial Service Usage", () => {
     });
   });
 
-  describe("getTrialStatus", () => {
-    it("returns null when session not found", async () => {
+  describe('getTrialStatus', () => {
+    it('returns null when session not found', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue(null);
 
       const result = await getTrialStatus(sessionId);
@@ -129,7 +120,7 @@ describe("Trial Service Usage", () => {
       expect(result).toBeNull();
     });
 
-    it("calculates remaining chats correctly", async () => {
+    it('calculates remaining chats correctly', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 3,
@@ -137,7 +128,7 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 0,
         toolsUsed: 0,
         assignedMaestri: '["euclide","galileo","darwin"]',
-        assignedCoach: "melissa",
+        assignedCoach: 'melissa',
       } as any);
 
       const result = await getTrialStatus(sessionId);
@@ -147,7 +138,7 @@ describe("Trial Service Usage", () => {
       expect(result?.maxChats).toBe(TRIAL_LIMITS.CHAT);
     });
 
-    it("calculates remaining voice seconds correctly", async () => {
+    it('calculates remaining voice seconds correctly', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 0,
@@ -155,7 +146,7 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 180,
         toolsUsed: 0,
         assignedMaestri: '["euclide","galileo","darwin"]',
-        assignedCoach: "melissa",
+        assignedCoach: 'melissa',
       } as any);
 
       const result = await getTrialStatus(sessionId);
@@ -166,7 +157,7 @@ describe("Trial Service Usage", () => {
       expect(result?.voiceMinutesRemaining).toBe(2); // floor(120/60)
     });
 
-    it("calculates remaining tools correctly", async () => {
+    it('calculates remaining tools correctly', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 0,
@@ -174,7 +165,7 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 0,
         toolsUsed: 7,
         assignedMaestri: '["euclide","galileo","darwin"]',
-        assignedCoach: "melissa",
+        assignedCoach: 'melissa',
       } as any);
 
       const result = await getTrialStatus(sessionId);
@@ -184,7 +175,7 @@ describe("Trial Service Usage", () => {
       expect(result?.maxTools).toBe(TRIAL_LIMITS.TOOLS);
     });
 
-    it("calculates remaining docs correctly", async () => {
+    it('calculates remaining docs correctly', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 0,
@@ -192,7 +183,7 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 0,
         toolsUsed: 0,
         assignedMaestri: '["euclide","galileo","darwin"]',
-        assignedCoach: "melissa",
+        assignedCoach: 'melissa',
       } as any);
 
       const result = await getTrialStatus(sessionId);
@@ -202,8 +193,8 @@ describe("Trial Service Usage", () => {
       expect(result?.maxDocs).toBe(TRIAL_LIMITS.DOCS);
     });
 
-    it("returns assigned maestri and coach", async () => {
-      const maestri = ["euclide", "galileo", "darwin"];
+    it('returns assigned maestri and coach', async () => {
+      const maestri = ['euclide', 'galileo', 'darwin'];
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 0,
@@ -211,16 +202,16 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 0,
         toolsUsed: 0,
         assignedMaestri: JSON.stringify(maestri),
-        assignedCoach: "laura",
+        assignedCoach: 'laura',
       } as any);
 
       const result = await getTrialStatus(sessionId);
 
       // Maestri restrictions removed - only coach is assigned
-      expect(result?.assignedCoach).toBe("laura");
+      expect(result?.assignedCoach).toBe('laura');
     });
 
-    it("clamps remaining values to zero when over limit", async () => {
+    it('clamps remaining values to zero when over limit', async () => {
       vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
         id: sessionId,
         chatsUsed: 15, // Over limit
@@ -228,7 +219,7 @@ describe("Trial Service Usage", () => {
         voiceSecondsUsed: 500, // Over limit
         toolsUsed: 20, // Over limit
         assignedMaestri: '["euclide"]',
-        assignedCoach: "melissa",
+        assignedCoach: 'melissa',
       } as any);
 
       const result = await getTrialStatus(sessionId);

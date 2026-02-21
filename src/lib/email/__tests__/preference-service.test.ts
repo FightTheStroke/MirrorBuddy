@@ -3,7 +3,7 @@
  * Tests preference creation, updates, category checks, and token-based unsubscribe
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   createDefaultPreferences,
   getPreferences,
@@ -12,21 +12,16 @@ import {
   unsubscribeByToken,
   getPreferencesByToken,
   type EmailPreferences,
-} from "../preference-service";
+} from '../preference-service';
 
 // Mock Prisma client
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    emailPreference: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger to avoid console noise
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -42,31 +37,31 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Get mocked functions from Prisma mock
-const { prisma } = await vi.importMock<typeof import("@/lib/db")>("@/lib/db");
+const { prisma } = await vi.importMock<typeof import('@/lib/db')>('@/lib/db');
 const mockFindUnique = vi.mocked(prisma.emailPreference.findUnique);
 const mockCreate = vi.mocked(prisma.emailPreference.create);
 const mockUpdate = vi.mocked(prisma.emailPreference.update);
 
-describe("Email Preference Service", () => {
-  const mockUserId = "user-123";
-  const mockToken = "token-abc-123";
+describe('Email Preference Service', () => {
+  const mockUserId = 'user-123';
+  const mockToken = 'token-abc-123';
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(crypto, "randomUUID").mockReturnValue(mockToken);
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue(mockToken);
   });
 
-  describe("createDefaultPreferences", () => {
-    it("should create default preferences with randomUUID token", async () => {
+  describe('createDefaultPreferences', () => {
+    it('should create default preferences with randomUUID token', async () => {
       const mockCreatedPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockCreate.mockResolvedValueOnce(mockCreatedPrefs);
@@ -86,16 +81,16 @@ describe("Email Preference Service", () => {
       expect(crypto.randomUUID).toHaveBeenCalledOnce();
     });
 
-    it("should create preferences with overrides", async () => {
+    it('should create preferences with overrides', async () => {
       const mockCreatedPrefs: EmailPreferences = {
-        id: "pref-2",
+        id: 'pref-2',
         userId: mockUserId,
         productUpdates: false,
         educationalNewsletter: true,
         announcements: false,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockCreate.mockResolvedValueOnce(mockCreatedPrefs);
@@ -118,17 +113,17 @@ describe("Email Preference Service", () => {
     });
   });
 
-  describe("getPreferences", () => {
-    it("should return existing preferences", async () => {
+  describe('getPreferences', () => {
+    it('should return existing preferences', async () => {
       const mockPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(mockPrefs);
@@ -141,7 +136,7 @@ describe("Email Preference Service", () => {
       });
     });
 
-    it("should return null if preferences do not exist", async () => {
+    it('should return null if preferences do not exist', async () => {
       mockFindUnique.mockResolvedValueOnce(null);
 
       const result = await getPreferences(mockUserId);
@@ -150,23 +145,23 @@ describe("Email Preference Service", () => {
     });
   });
 
-  describe("updatePreferences", () => {
-    it("should update specific fields in existing preferences", async () => {
+  describe('updatePreferences', () => {
+    it('should update specific fields in existing preferences', async () => {
       const existingPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       const updatedPrefs: EmailPreferences = {
         ...existingPrefs,
         productUpdates: false,
-        updatedAt: new Date("2024-01-02T00:00:00Z"),
+        updatedAt: new Date('2024-01-02T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(existingPrefs);
@@ -183,16 +178,16 @@ describe("Email Preference Service", () => {
       });
     });
 
-    it("should create preferences if they do not exist", async () => {
+    it('should create preferences if they do not exist', async () => {
       const newPrefs: EmailPreferences = {
-        id: "pref-2",
+        id: 'pref-2',
         userId: mockUserId,
         productUpdates: false,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(null);
@@ -215,90 +210,90 @@ describe("Email Preference Service", () => {
     });
   });
 
-  describe("canSendTo", () => {
-    it("should return true when category is enabled", async () => {
+  describe('canSendTo', () => {
+    it('should return true when category is enabled', async () => {
       const mockPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: false,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(mockPrefs);
 
-      const result = await canSendTo(mockUserId, "productUpdates");
+      const result = await canSendTo(mockUserId, 'productUpdates');
 
       expect(result).toBe(true);
     });
 
-    it("should return false when category is disabled", async () => {
+    it('should return false when category is disabled', async () => {
       const mockPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: false,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(mockPrefs);
 
-      const result = await canSendTo(mockUserId, "announcements");
+      const result = await canSendTo(mockUserId, 'announcements');
 
       expect(result).toBe(false);
     });
 
-    it("should create default preferences if they do not exist and return true", async () => {
+    it('should create default preferences if they do not exist and return true', async () => {
       const newPrefs: EmailPreferences = {
-        id: "pref-2",
+        id: 'pref-2',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(null);
       mockCreate.mockResolvedValueOnce(newPrefs);
 
-      const result = await canSendTo(mockUserId, "productUpdates");
+      const result = await canSendTo(mockUserId, 'productUpdates');
 
       expect(result).toBe(true);
       expect(mockCreate).toHaveBeenCalledOnce();
     });
   });
 
-  describe("unsubscribeByToken", () => {
-    it("should disable specific category when provided", async () => {
+  describe('unsubscribeByToken', () => {
+    it('should disable specific category when provided', async () => {
       const existingPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       const updatedPrefs: EmailPreferences = {
         ...existingPrefs,
         productUpdates: false,
-        updatedAt: new Date("2024-01-02T00:00:00Z"),
+        updatedAt: new Date('2024-01-02T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(existingPrefs);
       mockUpdate.mockResolvedValueOnce(updatedPrefs);
 
-      const result = await unsubscribeByToken(mockToken, "productUpdates");
+      const result = await unsubscribeByToken(mockToken, 'productUpdates');
 
       expect(result).toEqual(updatedPrefs);
       expect(mockUpdate).toHaveBeenCalledWith({
@@ -307,16 +302,16 @@ describe("Email Preference Service", () => {
       });
     });
 
-    it("should disable all categories when no category is provided", async () => {
+    it('should disable all categories when no category is provided', async () => {
       const existingPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       const updatedPrefs: EmailPreferences = {
@@ -324,7 +319,7 @@ describe("Email Preference Service", () => {
         productUpdates: false,
         educationalNewsletter: false,
         announcements: false,
-        updatedAt: new Date("2024-01-02T00:00:00Z"),
+        updatedAt: new Date('2024-01-02T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(existingPrefs);
@@ -343,27 +338,27 @@ describe("Email Preference Service", () => {
       });
     });
 
-    it("should return null if token is not found", async () => {
+    it('should return null if token is not found', async () => {
       mockFindUnique.mockResolvedValueOnce(null);
 
-      const result = await unsubscribeByToken("invalid-token");
+      const result = await unsubscribeByToken('invalid-token');
 
       expect(result).toBeNull();
       expect(mockUpdate).not.toHaveBeenCalled();
     });
   });
 
-  describe("getPreferencesByToken", () => {
-    it("should return correct record for valid token", async () => {
+  describe('getPreferencesByToken', () => {
+    it('should return correct record for valid token', async () => {
       const mockPrefs: EmailPreferences = {
-        id: "pref-1",
+        id: 'pref-1',
         userId: mockUserId,
         productUpdates: true,
         educationalNewsletter: true,
         announcements: true,
         unsubscribeToken: mockToken,
-        consentedAt: new Date("2024-01-01T00:00:00Z"),
-        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        consentedAt: new Date('2024-01-01T00:00:00Z'),
+        updatedAt: new Date('2024-01-01T00:00:00Z'),
       };
 
       mockFindUnique.mockResolvedValueOnce(mockPrefs);
@@ -376,10 +371,10 @@ describe("Email Preference Service", () => {
       });
     });
 
-    it("should return null for invalid token", async () => {
+    it('should return null for invalid token', async () => {
       mockFindUnique.mockResolvedValueOnce(null);
 
-      const result = await getPreferencesByToken("invalid-token");
+      const result = await getPreferencesByToken('invalid-token');
 
       expect(result).toBeNull();
     });

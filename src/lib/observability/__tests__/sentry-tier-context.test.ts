@@ -17,13 +17,10 @@ vi.mock('@/lib/tier/server', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    userSubscription: {
-      findUnique: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Import after mocks
 import { setSentryTierContext } from '../sentry-tier-context';

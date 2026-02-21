@@ -45,13 +45,10 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    userSubscription: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 describe('GET /api/admin/subscriptions', () => {
   beforeEach(() => {

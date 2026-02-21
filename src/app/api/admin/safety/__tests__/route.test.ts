@@ -35,13 +35,10 @@ const mockGetUnresolvedEscalations = safetyServer.getUnresolvedEscalations as Re
 >;
 
 // Mock Prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    safetyEvent: {
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Import mocked prisma
 import { prisma } from '@/lib/db';

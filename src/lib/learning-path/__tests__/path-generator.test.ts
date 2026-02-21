@@ -52,19 +52,10 @@ vi.mock('@/lib/tier/server', async (importOriginal) => {
 // Mock deployment mapping
 
 // Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    learningPath: {
-      create: vi.fn(),
-      update: vi.fn(),
-    },
-    learningPathTopic: {
-      create: vi.fn(),
-      createMany: vi.fn(),
-      findMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import { chatCompletion } from '@/lib/ai/server';
 import { prisma } from '@/lib/db';

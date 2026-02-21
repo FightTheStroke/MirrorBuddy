@@ -58,14 +58,10 @@ vi.mock('@/lib/security', async (importOriginal) => {
 });
 
 // Mock prisma — only waitlistEntry methods needed
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: {
-      findMany: vi.fn(),
-      count: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import { GET } from '../route';
 import { prisma } from '@/lib/db';

@@ -3,23 +3,19 @@
  * Verifies caching, country resolution, and error handling
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { localeConfigService } from "../locale-config-service";
-import { prisma } from "@/lib/db";
-import type { LocaleConfig } from "@prisma/client";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { localeConfigService } from '../locale-config-service';
+import { prisma } from '@/lib/db';
+import type { LocaleConfig } from '@prisma/client';
 
 // Mock Prisma client
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    localeConfig: {
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -34,34 +30,34 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-describe("LocaleConfigService", () => {
+describe('LocaleConfigService', () => {
   const mockLocales: LocaleConfig[] = [
     {
-      id: "IT",
-      countryName: "Italia",
-      primaryLocale: "it",
-      primaryLanguageMaestroId: "manzoni-italiano",
-      secondaryLocales: ["en", "fr"],
+      id: 'IT',
+      countryName: 'Italia',
+      primaryLocale: 'it',
+      primaryLanguageMaestroId: 'manzoni-italiano',
+      secondaryLocales: ['en', 'fr'],
       enabled: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
-      id: "FR",
-      countryName: "France",
-      primaryLocale: "fr",
-      primaryLanguageMaestroId: "moliere-french",
-      secondaryLocales: ["en"],
+      id: 'FR',
+      countryName: 'France',
+      primaryLocale: 'fr',
+      primaryLanguageMaestroId: 'moliere-french',
+      secondaryLocales: ['en'],
       enabled: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
-      id: "DE",
-      countryName: "Germany",
-      primaryLocale: "de",
-      primaryLanguageMaestroId: "goethe-german",
-      secondaryLocales: ["en"],
+      id: 'DE',
+      countryName: 'Germany',
+      primaryLocale: 'de',
+      primaryLanguageMaestroId: 'goethe-german',
+      secondaryLocales: ['en'],
       enabled: false, // Disabled locale
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -75,8 +71,8 @@ describe("LocaleConfigService", () => {
     localeConfigService.invalidateCache();
   });
 
-  describe("Singleton Pattern", () => {
-    it("should return the same instance on multiple calls", () => {
+  describe('Singleton Pattern', () => {
+    it('should return the same instance on multiple calls', () => {
       const instance1 = localeConfigService;
       const instance2 = localeConfigService;
 
@@ -84,8 +80,8 @@ describe("LocaleConfigService", () => {
     });
   });
 
-  describe("getEnabledLocales", () => {
-    it("should fetch enabled locales from database", async () => {
+  describe('getEnabledLocales', () => {
+    it('should fetch enabled locales from database', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -95,11 +91,11 @@ describe("LocaleConfigService", () => {
       expect(result).toHaveLength(2); // IT and FR only (DE is disabled)
       expect(prisma.localeConfig.findMany).toHaveBeenCalledWith({
         where: { enabled: true },
-        orderBy: { countryName: "asc" },
+        orderBy: { countryName: 'asc' },
       });
     });
 
-    it("should use cached data on subsequent calls", async () => {
+    it('should use cached data on subsequent calls', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -113,10 +109,8 @@ describe("LocaleConfigService", () => {
       expect(prisma.localeConfig.findMany).toHaveBeenCalledTimes(1);
     });
 
-    it("should return empty array on database error", async () => {
-      vi.mocked(prisma.localeConfig.findMany).mockRejectedValue(
-        new Error("Database error"),
-      );
+    it('should return empty array on database error', async () => {
+      vi.mocked(prisma.localeConfig.findMany).mockRejectedValue(new Error('Database error'));
 
       const result = await localeConfigService.getEnabledLocales();
 
@@ -124,102 +118,94 @@ describe("LocaleConfigService", () => {
     });
   });
 
-  describe("getLocaleForCountry", () => {
-    it("should fetch locale for valid country code", async () => {
+  describe('getLocaleForCountry', () => {
+    it('should fetch locale for valid country code', async () => {
       const italyLocale = mockLocales[0];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
 
-      const result = await localeConfigService.getLocaleForCountry("IT");
+      const result = await localeConfigService.getLocaleForCountry('IT');
 
       expect(result).toEqual(italyLocale);
       expect(prisma.localeConfig.findUnique).toHaveBeenCalledWith({
-        where: { id: "IT" },
+        where: { id: 'IT' },
       });
     });
 
-    it("should normalize country code to uppercase", async () => {
+    it('should normalize country code to uppercase', async () => {
       const italyLocale = mockLocales[0];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
 
-      await localeConfigService.getLocaleForCountry("it");
+      await localeConfigService.getLocaleForCountry('it');
 
       expect(prisma.localeConfig.findUnique).toHaveBeenCalledWith({
-        where: { id: "IT" },
+        where: { id: 'IT' },
       });
     });
 
-    it("should return null for disabled locale", async () => {
+    it('should return null for disabled locale', async () => {
       const disabledLocale = mockLocales[2]; // DE is disabled
-      vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(
-        disabledLocale,
-      );
+      vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(disabledLocale);
 
-      const result = await localeConfigService.getLocaleForCountry("DE");
+      const result = await localeConfigService.getLocaleForCountry('DE');
 
       expect(result).toBeNull();
     });
 
-    it("should return null for non-existent country", async () => {
+    it('should return null for non-existent country', async () => {
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(null);
 
-      const result = await localeConfigService.getLocaleForCountry("XX");
+      const result = await localeConfigService.getLocaleForCountry('XX');
 
       expect(result).toBeNull();
     });
 
-    it("should return null on database error", async () => {
-      vi.mocked(prisma.localeConfig.findUnique).mockRejectedValue(
-        new Error("Database error"),
-      );
+    it('should return null on database error', async () => {
+      vi.mocked(prisma.localeConfig.findUnique).mockRejectedValue(new Error('Database error'));
 
-      const result = await localeConfigService.getLocaleForCountry("IT");
+      const result = await localeConfigService.getLocaleForCountry('IT');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("getMaestroForCountry", () => {
-    it("should return maestro ID for valid country", async () => {
+  describe('getMaestroForCountry', () => {
+    it('should return maestro ID for valid country', async () => {
       const italyLocale = mockLocales[0];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
 
-      const result = await localeConfigService.getMaestroForCountry("IT");
+      const result = await localeConfigService.getMaestroForCountry('IT');
 
-      expect(result).toBe("manzoni-italiano");
+      expect(result).toBe('manzoni-italiano');
     });
 
-    it("should return null for disabled country", async () => {
+    it('should return null for disabled country', async () => {
       const disabledLocale = mockLocales[2];
-      vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(
-        disabledLocale,
-      );
+      vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(disabledLocale);
 
-      const result = await localeConfigService.getMaestroForCountry("DE");
+      const result = await localeConfigService.getMaestroForCountry('DE');
 
       expect(result).toBeNull();
     });
 
-    it("should return null for non-existent country", async () => {
+    it('should return null for non-existent country', async () => {
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(null);
 
-      const result = await localeConfigService.getMaestroForCountry("XX");
+      const result = await localeConfigService.getMaestroForCountry('XX');
 
       expect(result).toBeNull();
     });
 
-    it("should return null on database error", async () => {
-      vi.mocked(prisma.localeConfig.findUnique).mockRejectedValue(
-        new Error("Database error"),
-      );
+    it('should return null on database error', async () => {
+      vi.mocked(prisma.localeConfig.findUnique).mockRejectedValue(new Error('Database error'));
 
-      const result = await localeConfigService.getMaestroForCountry("IT");
+      const result = await localeConfigService.getMaestroForCountry('IT');
 
       expect(result).toBeNull();
     });
   });
 
-  describe("invalidateCache", () => {
-    it("should clear cache and force database fetch", async () => {
+  describe('invalidateCache', () => {
+    it('should clear cache and force database fetch', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -236,8 +222,8 @@ describe("LocaleConfigService", () => {
     });
   });
 
-  describe("getCacheStats", () => {
-    it("should return cache statistics", async () => {
+  describe('getCacheStats', () => {
+    it('should return cache statistics', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -251,7 +237,7 @@ describe("LocaleConfigService", () => {
       expect(stats.isStale).toBe(false);
     });
 
-    it("should show stale=true after cache invalidation", () => {
+    it('should show stale=true after cache invalidation', () => {
       localeConfigService.invalidateCache();
 
       const stats = localeConfigService.getCacheStats();
@@ -263,22 +249,22 @@ describe("LocaleConfigService", () => {
     });
   });
 
-  describe("Cache Behavior", () => {
-    it("should cache getLocaleForCountry results", async () => {
+  describe('Cache Behavior', () => {
+    it('should cache getLocaleForCountry results', async () => {
       const italyLocale = mockLocales[0];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
 
       // First call
-      await localeConfigService.getLocaleForCountry("IT");
+      await localeConfigService.getLocaleForCountry('IT');
 
       // Second call - should use cache
-      await localeConfigService.getLocaleForCountry("IT");
+      await localeConfigService.getLocaleForCountry('IT');
 
       // Should only call database once due to caching
       expect(prisma.localeConfig.findUnique).toHaveBeenCalledTimes(1);
     });
 
-    it("should update lastCacheUpdate when caching new entries", async () => {
+    it('should update lastCacheUpdate when caching new entries', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -295,13 +281,13 @@ describe("LocaleConfigService", () => {
       expect(statsAfter.lastUpdate).toBeGreaterThan(timeBeforeCall);
     });
 
-    it("should clear country locale cache when getEnabledLocales is called", async () => {
+    it('should clear country locale cache when getEnabledLocales is called', async () => {
       const italyLocale = mockLocales[0];
       const enabledLocales = mockLocales.filter((l) => l.enabled);
 
       // First, populate country cache
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
-      await localeConfigService.getLocaleForCountry("IT");
+      await localeConfigService.getLocaleForCountry('IT');
 
       // Now call getEnabledLocales which should clear and repopulate cache
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
@@ -314,20 +300,20 @@ describe("LocaleConfigService", () => {
     });
   });
 
-  describe("Edge Cases", () => {
-    it("should handle mixed case country codes consistently", async () => {
+  describe('Edge Cases', () => {
+    it('should handle mixed case country codes consistently', async () => {
       const italyLocale = mockLocales[0];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
 
-      const result1 = await localeConfigService.getLocaleForCountry("it");
+      const result1 = await localeConfigService.getLocaleForCountry('it');
       vi.clearAllMocks();
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(italyLocale);
-      const result2 = await localeConfigService.getLocaleForCountry("It");
+      const result2 = await localeConfigService.getLocaleForCountry('It');
 
       expect(result1).toEqual(result2);
     });
 
-    it("should return different results for enabled vs disabled locales", async () => {
+    it('should return different results for enabled vs disabled locales', async () => {
       const enabledLocale = mockLocales[0];
       const disabledLocale = mockLocales[2];
 
@@ -335,15 +321,14 @@ describe("LocaleConfigService", () => {
         .mockResolvedValueOnce(enabledLocale)
         .mockResolvedValueOnce(disabledLocale);
 
-      const enabledResult = await localeConfigService.getLocaleForCountry("IT");
-      const disabledResult =
-        await localeConfigService.getLocaleForCountry("DE");
+      const enabledResult = await localeConfigService.getLocaleForCountry('IT');
+      const disabledResult = await localeConfigService.getLocaleForCountry('DE');
 
       expect(enabledResult).not.toBeNull();
       expect(disabledResult).toBeNull();
     });
 
-    it("should handle concurrent requests consistently", async () => {
+    it('should handle concurrent requests consistently', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -360,31 +345,31 @@ describe("LocaleConfigService", () => {
       expect(results[0]).toHaveLength(2);
     });
 
-    it("should log warnings for non-existent countries", async () => {
-      const { logger } = await import("@/lib/logger");
+    it('should log warnings for non-existent countries', async () => {
+      const { logger } = await import('@/lib/logger');
 
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(null);
 
-      await localeConfigService.getMaestroForCountry("XX");
+      await localeConfigService.getMaestroForCountry('XX');
 
       expect(logger.warn).toHaveBeenCalledWith(
-        expect.stringContaining("No enabled locale found for country"),
-        expect.objectContaining({ countryCode: "XX" }),
+        expect.stringContaining('No enabled locale found for country'),
+        expect.objectContaining({ countryCode: 'XX' }),
       );
     });
   });
 
-  describe("Integration Scenarios", () => {
-    it("should fetch maestro through getLocaleForCountry", async () => {
+  describe('Integration Scenarios', () => {
+    it('should fetch maestro through getLocaleForCountry', async () => {
       const frenchLocale = mockLocales[1];
       vi.mocked(prisma.localeConfig.findUnique).mockResolvedValue(frenchLocale);
 
-      const maestro = await localeConfigService.getMaestroForCountry("FR");
+      const maestro = await localeConfigService.getMaestroForCountry('FR');
 
-      expect(maestro).toBe("moliere-french");
+      expect(maestro).toBe('moliere-french');
     });
 
-    it("should handle rapid invalidation and refetch", async () => {
+    it('should handle rapid invalidation and refetch', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       vi.mocked(prisma.localeConfig.findMany).mockResolvedValue(enabledLocales);
 
@@ -403,7 +388,7 @@ describe("LocaleConfigService", () => {
       expect(prisma.localeConfig.findMany).toHaveBeenCalledTimes(3);
     });
 
-    it("should maintain cache consistency across multiple operations", async () => {
+    it('should maintain cache consistency across multiple operations', async () => {
       const enabledLocales = mockLocales.filter((l) => l.enabled);
       const italyLocale = mockLocales[0];
 
@@ -414,11 +399,10 @@ describe("LocaleConfigService", () => {
       const locales = await localeConfigService.getEnabledLocales();
 
       // Second operation
-      const italyFromCountry =
-        await localeConfigService.getLocaleForCountry("IT");
+      const italyFromCountry = await localeConfigService.getLocaleForCountry('IT');
 
       // Verify consistency
-      const italyFromList = locales.find((l) => l.id === "IT");
+      const italyFromList = locales.find((l) => l.id === 'IT');
       expect(italyFromCountry).toEqual(italyFromList);
     });
   });

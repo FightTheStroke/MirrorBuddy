@@ -2,16 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '@/lib/db';
 import { triggerMaintenanceNotification } from '@/lib/maintenance/notification-triggers';
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: {
-      findMany: vi.fn(),
-    },
-    notification: {
-      createMany: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 describe('triggerMaintenanceNotification', () => {
   beforeEach(() => {

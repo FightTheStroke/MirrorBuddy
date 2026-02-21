@@ -1,16 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    researchExperiment: {
-      update: vi.fn().mockResolvedValue({}),
-    },
-    researchResult: {
-      create: vi.fn().mockResolvedValue({ id: 'result-1' }),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/ai/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/ai/server')>();

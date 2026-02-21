@@ -20,13 +20,10 @@ vi.mock('@sentry/nextjs', () => ({
 }));
 
 // Mock Prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: {
-      deleteMany: _mockDeleteMany,
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger - child returns a logger with the shared mockChildInfo
 vi.mock('@/lib/logger', () => ({
