@@ -95,7 +95,7 @@
     "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
   },
   "overrides": {
-    "hono": "4.11.7",
+    "hono": "4.11.10",
     "tmp": "0.2.5",
     "lodash": "4.17.23",
     "lodash-es": "4.17.23"
