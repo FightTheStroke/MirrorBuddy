@@ -69,44 +69,44 @@
         "automatic": "Automatic",
         "automaticDesc": "Complete real-time adaptation"
       },
-      "adaptiveDifficultyTitle": "Adaptive Difficulty Title",
-      "feedbackBalanced": "Feedback Balanced",
-      "feedbackBrutal": "Feedback Brutal",
-      "feedbackEncouraging": "Feedback Encouraging",
-      "feedbackExampleTitle": "Feedback Example Title",
-      "feedbackStrict": "Feedback Strict",
-      "feedbackSuperEncouraging": "Feedback Super Encouraging",
-      "gradeLevelLabel": "Grade Level Label",
-      "introductionTitle": "Introduction Title",
-      "nameLabel": "Name Label",
-      "personalInfoTitle": "Personal Info Title",
-      "reviewIntroductionButton": "Review Introduction Button",
-      "teachingStyleTitle": "Teaching Style Title",
+      "adaptiveDifficultyTitle": "Adaptive Schwierigkeit",
+      "feedbackBalanced": "Ausgewogen: Balance zwischen Lob und Korrekturen",
+      "feedbackBrutal": "Brutal: direkte, ungefilterte Korrekturen",
+      "feedbackEncouraging": "Ermutigend: unterstützendes und motivierendes Feedback",
+      "feedbackExampleTitle": "Beispielfeedback",
+      "feedbackStrict": "Streng: hohe Standards und präzise Korrekturen",
+      "feedbackSuperEncouraging": "Sehr ermutigend: Positivität und kontinuierliche Unterstützung",
+      "gradeLevelLabel": "Bildungsstufe",
+      "introductionTitle": "Einführung",
+      "nameLabel": "Name",
+      "personalInfoTitle": "Persönliche Informationen",
+      "reviewIntroductionButton": "Einführung erneut ansehen",
+      "teachingStyleTitle": "Lehrstil",
       "genitori": {
-        "consentButton": "Consent Button",
-        "consentDescription": "Consent Description",
-        "consentTitle": "Consent Title",
+        "consentButton": "Einwilligung verwalten",
+        "consentDescription": "Verwalten Sie Einwilligungseinstellungen für den Elternzugang.",
+        "consentTitle": "Elterliche Einwilligung",
         "error": "Fehler",
-        "loadingProfile": "Loading Profile",
+        "loadingProfile": "Profil wird geladen...",
         "retry": "Retry",
-        "welcomeDescription": "Welcome Description",
-        "welcomeTitle": "Welcome Title",
+        "welcomeDescription": "Willkommen im Elternbereich von MirrorBuddy.",
+        "welcomeTitle": "Willkommen, Elternteil",
         "cancellazioneRichiesta": "Cancellazione Richiesta",
         "iDatiVerrannoEliminatiEntro30GiorniComePrevistoDal": "I dati verranno eliminati entro 30 giorni, come previsto dal GDPR."
       },
       "parentChat": {
         "askAbout": "Ask About",
         "cancel": "Abbrechen",
-        "conversationTitle": "Conversation Title",
-        "description": "Descrizione",
-        "disclaimerText": "Disclaimer Text",
-        "disclaimerTitle": "Disclaimer Title",
-        "formalLanguage": "Formal Language",
-        "loadingConversation": "Loading Conversation",
+        "conversationTitle": "Gespräch mit dem Eltern-Assistenten",
+        "description": "Chatten Sie mit dem Assistenten für Hinweise und Updates.",
+        "disclaimerText": "KI-Hinweise unterstützen Familien, ersetzen aber keine professionelle Bewertung.",
+        "disclaimerTitle": "Wichtiger Hinweis",
+        "formalLanguage": "Formelle Sprache",
+        "loadingConversation": "Unterhaltung wird geladen...",
         "messagesSaved": "Messages Saved",
         "observationsStudySessions": "Observations Study Sessions",
-        "startConversation": "Start Conversation",
-        "title": "Titolo",
+        "startConversation": "Unterhaltung starten",
+        "title": "Eltern-Assistent-Chat",
         "understood": "Understood"
       },
       "areaGenitori": "Area Genitori",
@@ -135,12 +135,12 @@
       },
       "language": "Language",
       "languageDescription": "Select the language professors will speak to you",
-      "accentColorTitle": "Accent Color Title",
-      "currentThemeInfo": "Current Theme Info",
-      "darkTheme": "Dark Theme",
-      "languageTitle": "Language Title",
-      "lightTheme": "Light Theme",
-      "themeTitle": "Theme Title",
+      "accentColorTitle": "Akzentfarbe",
+      "currentThemeInfo": "Aktuelles Design",
+      "darkTheme": "Dunkles Design",
+      "languageTitle": "Sprache",
+      "lightTheme": "Helles Design",
+      "themeTitle": "Design",
       "tema": "Tema"
     },
     "accessibility": {
@@ -175,15 +175,15 @@
       "a11yActiveProfile": "Barrierefreiheitsprofil aktiv",
       "a11yOpenSettings": "Einstellungen zur Barrierefreiheit",
       "adhdInfo": "Adhd Info",
-      "adhdTitle": "Adhd Title",
+      "adhdTitle": "ADHS-Unterstützung",
       "allSettings": "Alle Einstellungen",
-      "audioFeedback": "Audio Feedback",
-      "audioFeedbackDesc": "Audio Feedback Desc",
+      "audioFeedback": "Audio-Feedback",
+      "audioFeedbackDesc": "Spielt Tonsignale für Bestätigungen und Hinweise ab",
       "auditoryCaptions": "Auditory Captions",
       "auditoryCaptionsDesc": "Auditory Captions Desc",
       "auditoryNoAudioOnly": "Auditory No Audio Only",
       "auditoryNoAudioOnlyDesc": "Auditory No Audio Only Desc",
-      "auditoryTitle": "Auditory Title",
+      "auditoryTitle": "Hörunterstützung",
       "auditoryVisualCues": "Auditory Visual Cues",
       "auditoryVisualCuesDesc": "Auditory Visual Cues Desc",
       "autismMinimalUI": "Autism Minimal U I",
@@ -192,12 +192,12 @@
       "autismPredictableLayoutsDesc": "Autism Predictable Layouts Desc",
       "autismReducedMotion": "Reduzierte Bewegung",
       "autismReducedMotionDesc": "Reduziert Animationen für eine ruhigere Umgebung",
-      "autismTitle": "Autism Title",
-      "breakLabel": "Break Label",
+      "autismTitle": "Autismus-Unterstützung",
+      "breakLabel": "Pausendauer",
       "breakRemindersDesc": "Break Reminders Desc",
-      "breakRemindersLabel": "Break Reminders Label",
-      "cerebralAdaptiveDifficulty": "Cerebral Adaptive Difficulty",
-      "cerebralAdaptiveDifficultyDesc": "Cerebral Adaptive Difficulty Desc",
+      "breakRemindersLabel": "Pausenerinnerungen",
+      "cerebralAdaptiveDifficulty": "Adaptive Schwierigkeit",
+      "cerebralAdaptiveDifficultyDesc": "Passt die Schwierigkeit an Reaktionstempo und motorische Bedürfnisse an.",
       "cerebralCustomShortcuts": "Cerebral Custom Shortcuts",
       "cerebralCustomShortcutsDesc": "Cerebral Custom Shortcuts Desc",
       "cerebralDesc": "Cerebral Desc",
@@ -205,16 +205,16 @@
       "cerebralSimplifiedUIDesc": "Cerebral Simplified U I Desc",
       "cerebralTimeoutExtended": "Cerebral Timeout Extended",
       "cerebralTimeoutExtendedDesc": "Cerebral Timeout Extended Desc",
-      "cerebralTitle": "Cerebral Title",
+      "cerebralTitle": "Motor+-Unterstützung",
       "closePanel": "Panel schließen",
       "closeSettings": "Close Settings",
-      "customizeButton": "Customize Button",
+      "customizeButton": "Anpassen",
       "distractionFree": "Distraction Free",
       "distractionFreeDesc": "Distraction Free Desc",
       "dyslexiaFont": "Legasthenie-Schrift",
       "dyslexiaInfo": "Dyslexia Info",
-      "dyslexiaLineHeightText": "Dyslexia Line Height Text",
-      "dyslexiaTitle": "Dyslexia Title",
+      "dyslexiaLineHeightText": "Zeilenhöhe",
+      "dyslexiaTitle": "Dyslexie-Unterstützung",
       "fontOpenDyslexic": "Font Open Dyslexic",
       "fontOpenDyslexicDesc": "Font Open Dyslexic Desc",
       "hideInfo": "Hide Info",
@@ -243,9 +243,9 @@
       "motorShortcutTab": "Motor Shortcut Tab",
       "motorShowShortcuts": "Motor Show Shortcuts",
       "motorTimeoutDisableHint": "Motor Timeout Disable Hint",
-      "motorTimeoutLabel": "Motor Timeout Label",
-      "motorTitle": "Motor Title",
-      "panelTitle": "Panel Title",
+      "motorTimeoutLabel": "Interaktions-Timeout",
+      "motorTitle": "Motorische Unterstützung",
+      "panelTitle": "Barrierefreiheitseinstellungen",
       "pomodoroDesc": "Pomodoro Desc",
       "pomodoroTimer": "Pomodoro Timer",
       "presetADHD": "Preset A D H D",
@@ -275,28 +275,28 @@
       "reduceAnimations": "Animationen reduzieren",
       "resetDefaults": "Standardeinstellungen wiederherstellen",
       "resetSettings": "Zurücksetzen",
-      "sectionTitle": "Section Title",
-      "shortTextChunks": "Short Text Chunks",
-      "shortTextChunksDesc": "Short Text Chunks Desc",
+      "sectionTitle": "Optionen zur Barrierefreiheit",
+      "shortTextChunks": "Kurze Textblöcke",
+      "shortTextChunksDesc": "Teilt lange Texte in kurze, leichter lesbare Abschnitte.",
       "showInfo": "Show Info",
       "spacingExtra": "Spacing Extra",
       "spacingExtraDesc": "Spacing Extra Desc",
-      "spacingExtraText": "Spacing Extra Text",
+      "spacingExtraText": "Zusätzlicher Textabstand",
       "visualFocusIndicators": "Visual Focus Indicators",
       "visualFocusIndicatorsDesc": "Visual Focus Indicators Desc",
       "visualHideTTSSettings": "Visual Hide T T S Settings",
       "visualHighContrast": "Visueller Hochkontrast",
       "visualHighContrastDesc": "Erhöht den Kontrast für bessere Lesbarkeit",
       "visualShowTTSSettings": "Visual Show T T S Settings",
-      "visualSpeechRateLabel": "Visual Speech Rate Label",
-      "visualSpeechVolumeLabel": "Visual Speech Volume Label",
+      "visualSpeechRateLabel": "Sprechgeschwindigkeit",
+      "visualSpeechVolumeLabel": "Sprechlautstärke",
       "visualTTS": "Visual T T S",
       "visualTTSDesc": "Visual T T S Desc",
-      "visualTextSizeLabel": "Visual Text Size Label",
-      "visualTextSizeRange": "Visual Text Size Range",
-      "visualTitle": "Visual Title",
+      "visualTextSizeLabel": "Textgröße",
+      "visualTextSizeRange": "Bereich der Textgröße",
+      "visualTitle": "Visuelle Unterstützung",
       "visualWCAGCompliance": "Visual W C A G Compliance",
-      "workLabel": "Work Label",
+      "workLabel": "Arbeitssitzung",
       "title": "Accessibilità",
       "description": "Personalizza l'esperienza in base alle tue esigenze",
       "skipToContent": "Skip to content",
@@ -328,8 +328,8 @@
       "infoMessage": "Info message",
       "screenReaderOnly": "Screen reader only",
       "newWindow": "opens in new window",
-      "externalLink": "external link",
-      "categoriesAriaLabel": "[TRANSLATE] Categorie accessibilità",
+      "externalLink": "Externer Link",
+      "categoriesAriaLabel": "Barrierefreiheitskategorien",
       "testoGrande1": "Testo grande",
       "testoGrande": "Testo grande",
       "altoContrasto1": "Alto contrasto",
@@ -371,13 +371,13 @@
       "email": "Email notifications",
       "emailDesc": "Receive summary emails",
       "breaks": "Breaks",
-      "breaksDesc": "Breaks Desc",
-      "description": "Descrizione",
-      "pushButton": "Push Button",
+      "breaksDesc": "Benachrichtigungen für geplante Pausen.",
+      "description": "Verwalten Sie Ihre Benachrichtigungseinstellungen.",
+      "pushButton": "Push-Benachrichtigungen",
       "reminders": "Reminders",
-      "remindersDesc": "Reminders Desc",
-      "soundDescription": "Sound Description",
-      "typeTitle": "Type Title"
+      "remindersDesc": "Erinnerungen zur Unterstützung Ihrer Lernroutine.",
+      "soundDescription": "Wählen Sie, ob Benachrichtigungstöne aktiviert sind.",
+      "typeTitle": "Benachrichtigungstypen"
     },
     "privacy": {
       "account": "Account",
@@ -406,7 +406,7 @@
       "dataStoredLocally": "Data Stored Locally",
       "deleteAllData": "Delete All Data",
       "deleteDataAnytime": "Delete Data Anytime",
-      "noConsentFound": "No Consent Found",
+      "noConsentFound": "Keine Einwilligung gefunden",
       "noDataShared": "No Data Shared",
       "reviewAndModifyConsents": "Review And Modify Consents",
       "seiConnessoAlTuoAccountMirrorbuddy": "Sei connesso al tuo account MirrorBuddy.",
@@ -616,29 +616,29 @@
         }
       },
       "resetComplete": {
-        "button": "Button",
+        "button": "Fertig",
         "description": "Descrizione",
         "title": "Titolo"
       },
       "reviewTutorial": {
-        "button": "Button",
+        "button": "Tutorial erneut ansehen",
         "description": "Descrizione",
         "title": "Titolo"
       },
       "title": "Titolo"
     },
     "view": {
-      "consentRequiredText": "Consent Required Text",
-      "consentRequiredTitle": "Consent Required Title",
-      "openParentDashboard": "Open Parent Dashboard",
-      "parentAreaDescription": "Parent Area Description",
-      "parentAreaTitle": "Parent Area Title",
-      "saveButton": "Save Button",
-      "saveChangesButton": "Save Changes Button",
-      "savingButton": "Saving Button",
-      "title": "Titolo",
-      "undoButton": "Undo Button",
-      "undoTitle": "Undo Title"
+      "consentRequiredText": "Sie müssen zustimmen, um fortzufahren.",
+      "consentRequiredTitle": "Einwilligung erforderlich",
+      "openParentDashboard": "Eltern-Dashboard öffnen",
+      "parentAreaDescription": "Zugriff auf Elternfunktionen und Einblicke in den Lernfortschritt.",
+      "parentAreaTitle": "Elternbereich",
+      "saveButton": "Speichern",
+      "saveChangesButton": "Änderungen speichern",
+      "savingButton": "Wird gespeichert...",
+      "title": "Einstellungen",
+      "undoButton": "Rückgängig",
+      "undoTitle": "Änderungen rückgängig machen"
     },
     "account": {
       "title": "Account",
@@ -745,8 +745,8 @@
           "title": "Analyse-Cookies (optional)",
           "description": "Helfen Sie uns, MirrorBuddy zu verbessern",
           "ariaLabel": "Analyse-Cookies aktivieren",
-          "aria": "Aria",
-          "label": "Label"
+          "aria": "analyse-cookies-aktivieren",
+          "label": "Analyse-Cookies aktivieren"
         },
         "acceptButton": "Akzeptieren und fortfahren",
         "links": {
@@ -754,7 +754,7 @@
           "cookies": "Cookie-Richtlinie"
         },
         "complianceNote": "MirrorBuddy entspricht den DSGVO- und COPPA-Bestimmungen zum Schutz von Minderjährigen. Ihre Daten sind bei uns sicher.",
-        "button": "Button",
+        "button": "Cookies verwalten",
         "coppa": "Coppa",
         "explanation": "Explanation",
         "list": {
@@ -791,16 +791,16 @@
         "toastSyncFailed": "Server-Synchronisierung fehlgeschlagen. Wir versuchen es später erneut.",
         "modal": {
           "buttons": {
-            "accept": "Accept",
-            "disabled": "Disabilitato",
-            "submitting": "Submitting"
+            "accept": "Akzeptieren",
+            "disabled": "Deaktiviert",
+            "submitting": "Wird gesendet..."
           },
           "checkbox": "Checkbox",
           "description": {
-            "updated": "Updated",
-            "welcome": "Welcome"
+            "updated": "Die Nutzungsbedingungen wurden aktualisiert.",
+            "welcome": "Willkommen! Bitte die Bedingungen prüfen und akzeptieren, um fortzufahren."
           },
-          "link": "Link",
+          "link": "Nutzungsbedingungen lesen",
           "points": {
             "aiCanErr": "Ai Can Err",
             "free": "Free",
@@ -809,80 +809,80 @@
           },
           "screenReader": {
             "required": "Richiesto",
-            "submitting": "Submitting"
+            "submitting": "Übermittlung der Zustimmung"
           },
           "summary": "Summary",
           "title": {
-            "updated": "Updated",
-            "welcome": "Welcome"
+            "updated": "Aktualisierte Bedingungen",
+            "welcome": "Willkommen bei MirrorBuddy"
           },
           "warning": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Sie müssen die Bedingungen akzeptieren, um fortzufahren.",
+            "title": "Achtung"
           }
         },
         "toast": {
-          "saveFailed": "Save Failed",
+          "saveFailed": "Speichern fehlgeschlagen",
           "saved": "Saved"
         }
       },
       "inline": {
-        "acceptButton": "Accept Button",
-        "acceptedText": "Accepted Text",
-        "analyticsLabel": "Analytics Label",
-        "description": "Descrizione",
+        "acceptButton": "Akzeptieren",
+        "acceptedText": "Einstellungen gespeichert",
+        "analyticsLabel": "Analyse-Cookies aktivieren",
+        "description": "Verwalten Sie Ihre Einwilligungseinstellungen.",
         "info": "Informazione",
         "learnMore": "Learn More",
-        "manage": "Manage",
-        "submitButton": "Submit Button",
-        "title": "Titolo"
+        "manage": "Einstellungen verwalten",
+        "submitButton": "Senden",
+        "title": "Einwilligungseinstellungen"
       },
       "unified": {
         "analytics": {
-          "description": "Descrizione",
-          "label": "Label"
+          "description": "Helfen Sie uns, MirrorBuddy mit anonymen Analysen zu verbessern.",
+          "label": "Analyse-Cookies aktivieren"
         },
         "buttons": {
-          "accept": "Accept",
-          "disabled": "Disabilitato",
-          "submitting": "Submitting"
+          "accept": "Akzeptieren",
+          "disabled": "Deaktiviert",
+          "submitting": "Wird gesendet..."
         },
         "cookies": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Essenzielle Cookies halten die App sicher und funktionsfähig.",
+          "title": "Essenzielle Cookies"
         },
         "coppa": "Coppa",
         "links": {
-          "cookies": "Cookies",
-          "full": "Full",
-          "privacy": "Privacy"
+          "cookies": "Cookie-Richtlinie",
+          "full": "Vollständige Bedingungen",
+          "privacy": "Datenschutzrichtlinie"
         },
         "loading": "Laden...",
         "privacy": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Erfahren Sie, wie Ihre Daten geschützt und verwendet werden.",
+          "title": "Datenschutz"
         },
         "reconsentNotice": {
-          "changed": "Changed",
-          "details": "Details",
-          "lastAccepted": "Last Accepted"
+          "changed": "Was sich geändert hat",
+          "details": "Details anzeigen",
+          "lastAccepted": "Zuletzt akzeptiert"
         },
         "screenReader": {
           "required": "Richiesto",
-          "submitting": "Submitting"
+          "submitting": "Einwilligung wird gesendet"
         },
-        "subtitleUpdated": "Subtitle Updated",
-        "subtitleWelcome": "Subtitle Welcome",
-        "summaryTitle": "Summary Title",
-        "titleUpdated": "Title Updated",
-        "titleWelcome": "Title Welcome",
+        "subtitleUpdated": "Bitte prüfe und akzeptiere die aktualisierten Bedingungen, um fortzufahren.",
+        "subtitleWelcome": "Bevor du beginnst, bestätige die Bedingungen und Cookie-Einstellungen.",
+        "summaryTitle": "Kurz gesagt",
+        "titleUpdated": "Aktualisierte Bedingungen und Einwilligungen",
+        "titleWelcome": "Willkommen bei MirrorBuddy",
         "tos": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Lesen und akzeptieren Sie die Nutzungsbedingungen, um fortzufahren.",
+          "title": "Nutzungsbedingungen"
         },
         "tosCheckbox": {
-          "label": "Label",
-          "text": "Text"
+          "label": "Ich akzeptiere die Nutzungsbedingungen",
+          "text": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie."
         }
       }
     },
@@ -891,25 +891,25 @@
       "capabilityDocuments": "Capability Documents",
       "capabilityHomework": "Capability Homework",
       "capabilityPdf": "Capability Pdf",
-      "connectButton": "Connect Button",
-      "connectPrompt": "Connect Prompt",
-      "description": "Descrizione",
-      "disconnectButton": "Disconnect Button",
-      "disconnectConfirm": "Disconnect Confirm",
-      "disconnectTitle": "Disconnect Title",
-      "disconnectWarning": "Disconnect Warning",
+      "connectButton": "Google Drive verbinden",
+      "connectPrompt": "Verbinde dein Google-Drive-Konto, um Materialien zu importieren.",
+      "description": "Importieren Sie Dateien sicher aus Ihrem Google Drive.",
+      "disconnectButton": "Google Drive trennen",
+      "disconnectConfirm": "Möchtest du Google Drive wirklich trennen?",
+      "disconnectTitle": "Google Drive trennen",
+      "disconnectWarning": "Importierte Dateien bleiben verfügbar, neue Inhalte werden jedoch nicht mehr synchronisiert.",
       "dragOrChoose": "Drag Or Choose",
       "fromComputer": "From Computer",
       "fromGoogleDrive": "From Google Drive",
       "loadMore": "Load More",
-      "loadingCheck": "Loading Check",
+      "loadingCheck": "Verbindung wird geprüft...",
       "maxFileSize": "Max File Size",
       "myDrive": "My Drive",
       "noFilesFound": "No Files Found",
       "notConnected": "Not Connected",
-      "privacyNotice": "Privacy Notice",
+      "privacyNotice": "Auf Ihre Dateien wird nur zugegriffen, wenn Sie sie auswählen.",
       "readOnlyAccess": "Read Only Access",
-      "searchPlaceholder": "Search Placeholder",
+      "searchPlaceholder": "Dateien suchen...",
       "select": "Seleziona",
       "sharedWithMe": "Shared With Me"
     },
@@ -923,10 +923,10 @@
         "saving": "Salvataggio...",
         "subject": "Subject",
         "time": "Time",
-        "titleEdit": "Title Edit",
-        "titleNew": "Title New",
+        "titleEdit": "Erinnerung bearbeiten",
+        "titleNew": "Neue Erinnerung",
         "topic": "Topic",
-        "topicPlaceholder": "Topic Placeholder"
+        "topicPlaceholder": "Thema eingeben"
       }
     },
     "parentDashboard": {

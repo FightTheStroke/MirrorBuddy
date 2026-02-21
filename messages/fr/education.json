@@ -57,40 +57,40 @@
       "bySubject": "By Subject",
       "byType": "By Type",
       "emptyState": {
-        "backpackEmpty": "Backpack Empty",
+        "backpackEmpty": "Le sac est vide",
         "goToToolcase": "Go To Toolcase",
-        "startCreating": "Start Creating"
+        "startCreating": "Commencer à créer"
       },
-      "errorTitle": "Error Title",
+      "errorTitle": "Une erreur s'est produite",
       "favorites": "Favorites",
       "filters": {
         "reset": "Reimposta",
-        "subjectLabel": "[TRANSLATE] Materia",
-        "subjectAriaLabel": "[TRANSLATE] Filtra per materia",
-        "subjectPlaceholder": "[TRANSLATE] Tutte le materie",
-        "allSubjects": "[TRANSLATE] Tutte le materie",
-        "maestroLabel": "[TRANSLATE] Maestro",
-        "maestroAriaLabel": "[TRANSLATE] Filtra per maestro",
-        "maestroPlaceholder": "[TRANSLATE] Tutti i maestri",
-        "allMaestri": "[TRANSLATE] Tutti i maestri",
-        "clearAdvancedFilters": "[TRANSLATE] Rimuovi filtri avanzati",
+        "subjectLabel": "Matière",
+        "subjectAriaLabel": "Filtrer par matière",
+        "subjectPlaceholder": "Toutes les matières",
+        "allSubjects": "Toutes les matières",
+        "maestroLabel": "Professeur",
+        "maestroAriaLabel": "Filtrer par professeur",
+        "maestroPlaceholder": "Tous les professeurs",
+        "allMaestri": "Tous les professeurs",
+        "clearAdvancedFilters": "Effacer les filtres avancés",
         "tipoDiMateriale": "Tipo di materiale",
         "altro": "Altro",
         "periodo": "Periodo",
         "tutte": "Tutte"
       },
-      "loadingMaterials": "Loading Materials",
-      "pageTitle": "Page Title",
-      "reloadButton": "Reload Button",
+      "loadingMaterials": "Chargement des supports...",
+      "pageTitle": "Supports éducatifs",
+      "reloadButton": "Recharger",
       "results": {
-        "plural": "Plural",
-        "singular": "Singular"
+        "plural": "ressources",
+        "singular": "ressource"
       },
       "search": {
         "clear": "Cancella",
-        "label": "Label",
-        "placeholder": "Placeholder",
-        "clearAriaLabel": "[TRANSLATE] Cancella ricerca",
+        "label": "Rechercher des supports",
+        "placeholder": "Rechercher des supports...",
+        "clearAriaLabel": "Effacer la recherche",
         "resettaFiltri": "Resetta filtri",
         "ordinaPer1": "Ordina per",
         "ordinaPer": "Ordina per",
@@ -98,18 +98,18 @@
         "vistaLista": "Vista lista"
       },
       "sort": {
-        "label": "Label",
-        "placeholder": "Placeholder"
+        "label": "Trier par",
+        "placeholder": "Trier par"
       },
       "view": {
-        "grid": "Grid",
-        "list": "List"
+        "grid": "Vue grille",
+        "list": "Vue liste"
       },
       "voiceSearch": {
-        "start": "Start",
-        "stop": "Stop"
+        "start": "Recherche vocale",
+        "stop": "Arrêter la recherche vocale"
       },
-      "perMateria": "[TRANSLATE] Per Materia",
+      "perMateria": "Par matière",
       "in": "in",
       "filtriMateriali": "Filtri materiali",
       "tuttiISupporti": "Tutti i Supporti",
@@ -127,8 +127,8 @@
       "errorTitle": "Erreur d'affichage",
       "explorerView": {
         "allMaterials": "All materials",
-        "allMaterialsAriaLabel": "All materials aria label",
-        "folderAriaLabel": "Folder aria label",
+        "allMaterialsAriaLabel": "Afficher tous les contenus",
+        "folderAriaLabel": "Ouvrir le dossier",
         "noMaterials": "No materials"
       },
       "galleryView": {
@@ -136,14 +136,14 @@
       },
       "header": {
         "filter": {
-          "ariaLabel": "Aria label",
-          "listboxAriaLabel": "Listbox aria label"
+          "ariaLabel": "Filtres des contenus",
+          "listboxAriaLabel": "Liste des filtres"
         },
         "search": {
           "announcement": "Announcement",
-          "ariaLabel": "Aria label",
-          "clearAriaLabel": "Clear aria label",
-          "placeholder": "Placeholder"
+          "ariaLabel": "Rechercher des contenus",
+          "clearAriaLabel": "Effacer la recherche",
+          "placeholder": "Rechercher des contenus..."
         }
       },
       "homework": {
@@ -153,7 +153,7 @@
       "materialMenu": {
         "addTags": "Add tags",
         "archive": "Archive",
-        "ariaLabel": "Aria label",
+        "ariaLabel": "Menu des actions du contenu",
         "delete": "Supprimer",
         "duplicate": "Duplicate",
         "findSimilar": "Find similar",
@@ -163,23 +163,23 @@
       "retryButton": "Réessayer",
       "sidebar": {
         "archived": "Archived",
-        "collectionsAriaLabel": "Collections aria label",
+        "collectionsAriaLabel": "Collections",
         "collectionsTitle": "Collections title",
-        "createCollectionAriaLabel": "Create collection aria label",
-        "createTagAriaLabel": "Create tag aria label",
+        "createCollectionAriaLabel": "Créer une collection",
+        "createTagAriaLabel": "Créer une étiquette",
         "favorites": "Favorites",
-        "navigationAriaLabel": "Navigation aria label",
+        "navigationAriaLabel": "Navigation du Knowledge Hub",
         "noCollections": "No collections",
         "noTags": "No tags",
-        "quickFiltersAriaLabel": "Quick filters aria label",
+        "quickFiltersAriaLabel": "Filtres rapides",
         "quickFiltersTitle": "Quick filters title",
         "recent": "Recent",
-        "tagsAriaLabel": "Tags aria label",
+        "tagsAriaLabel": "Étiquettes",
         "tagsTitle": "Tags title"
       },
       "similarMaterials": {
-        "ariaLabel": "Aria label",
-        "closeAriaLabel": "Close aria label",
+        "ariaLabel": "Contenus similaires",
+        "closeAriaLabel": "Fermer les contenus similaires",
         "errorLoading": "Error loading",
         "loading": "Chargement...",
         "noResults": "No results",
@@ -187,8 +187,8 @@
         "title": "Titolo"
       },
       "statusBar": {
-        "deleteButton": "Delete button",
-        "deselectButton": "Deselect button",
+        "deleteButton": "Supprimer",
+        "deselectButton": "Désélectionner",
         "selectedCount": "Selected count"
       },
       "timelineView": {
@@ -280,31 +280,31 @@
     },
     "quiz": {
       "comingSoon": "Coming Soon",
-      "comingSoonMessage": "Coming Soon Message",
+      "comingSoonMessage": "Fonctionnalité bientôt disponible.",
       "completed": "Completed",
       "completedBadge": "Completed badge",
       "createWithProfessor": "Create With Professor",
       "created": "Created",
-      "deleteButton": "Delete button",
+      "deleteButton": "Supprimer",
       "deleteConfirm": "Delete confirm",
       "loading": "Chargement...",
-      "questionsCount": "Questions count",
+      "questionsCount": "Questions",
       "sampleQuizzes": "Sample Quizzes",
-      "startButton": "Start button",
-      "subtitle": "Sottotitolo",
-      "title": "Titolo",
+      "startButton": "Commencer le quiz",
+      "subtitle": "Entraîne-toi avec des quiz rapides",
+      "title": "Quiz",
       "yourQuizzes": "Your Quizzes",
-      "verifica": "[TRANSLATE] Verifica"
+      "verifica": "Vérifier les réponses"
     },
     "quizReview": {
       "failedSuggestions": "Failed Suggestions",
       "highPriority": "High Priority",
-      "loadingSuggestions": "Loading Suggestions",
+      "loadingSuggestions": "Chargement des suggestions...",
       "needsReview": "Needs Review",
-      "reviewText": "Review Text",
+      "reviewText": "Revois tes réponses et réessaie les sujets les plus difficiles.",
       "suggestedMaterials": "Suggested Materials",
-      "suggestionsText": "Suggestions Text",
-      "suggestionsTitle": "Suggestions Title"
+      "suggestionsText": "Supports conseillés pour améliorer les points faibles.",
+      "suggestionsTitle": "Suggestions d'étude"
     },
     "toolSelection": {
       "back": "Retour",
@@ -331,45 +331,45 @@
       "studyKit": "Kit d'Étude"
     },
     "archive": {
-      "emptyDescription": "Empty Description",
+      "emptyDescription": "Aucun support archivé pour le moment.",
       "emptyMaterials": "Empty Materials",
       "emptyPreferred": "Empty Preferred",
-      "gridView": "Grid View",
-      "listView": "List View",
-      "searchPlaceholder": "Search Placeholder",
-      "sortLabel": "Sort Label",
+      "gridView": "Vue grille",
+      "listView": "Vue liste",
+      "searchPlaceholder": "Rechercher dans les supports archivés...",
+      "sortLabel": "Trier par",
       "startConversation": "Start Conversation",
-      "subtitle": "Sottotitolo",
-      "title": "Titolo",
+      "subtitle": "Revois les supports enregistrés et continue à étudier.",
+      "title": "Archive",
       "filters": {
-        "ariaLabelFilterByType": "[TRANSLATE] Filtra per tipo",
-        "label": "[TRANSLATE] Filtri:",
-        "ariaLabelFilterBySubject": "[TRANSLATE] Filtra per materia",
-        "allSubjects": "[TRANSLATE] Tutte le materie",
-        "dateFrom": "[TRANSLATE] Data da",
-        "dateTo": "[TRANSLATE] Data a",
-        "clearFilters": "[TRANSLATE] Pulisci filtri"
+        "ariaLabelFilterByType": "Filtrer par type",
+        "label": "Filtres :",
+        "ariaLabelFilterBySubject": "Filtrer par matière",
+        "allSubjects": "Toutes les matières",
+        "dateFrom": "Date de début",
+        "dateTo": "Date de fin",
+        "clearFilters": "Effacer les filtres"
       },
       "preview": {
-        "closePreview": "[TRANSLATE] Chiudi anteprima",
-        "close": "[TRANSLATE] Chiudi",
-        "open": "[TRANSLATE] Apri",
-        "noQuestionsAvailable": "[TRANSLATE] Nessuna domanda disponibile",
-        "noFlashcardsAvailable": "[TRANSLATE] Nessuna flashcard disponibile",
-        "noPreviewAvailable": "[TRANSLATE] Anteprima non disponibile per questo tipo di contenuto"
+        "closePreview": "Fermer l'aperçu",
+        "close": "Fermer",
+        "open": "Ouvrir",
+        "noQuestionsAvailable": "Aucune question disponible",
+        "noFlashcardsAvailable": "Aucune carte mémoire disponible",
+        "noPreviewAvailable": "Aperçu non disponible pour ce type de contenu"
       },
       "grid": {
-        "removeFromBookmarks": "[TRANSLATE] Rimuovi dai preferiti",
-        "addToBookmarks": "[TRANSLATE] Aggiungi ai preferiti",
-        "delete": "[TRANSLATE] Elimina"
+        "removeFromBookmarks": "Retirer des favoris",
+        "addToBookmarks": "Ajouter aux favoris",
+        "delete": "Supprimer"
       },
       "list": {
-        "removeFromBookmarks": "[TRANSLATE] Rimuovi dai preferiti",
-        "addToBookmarks": "[TRANSLATE] Aggiungi ai preferiti",
-        "open": "[TRANSLATE] Apri",
-        "delete": "[TRANSLATE] Elimina"
+        "removeFromBookmarks": "Retirer des favoris",
+        "addToBookmarks": "Ajouter aux favoris",
+        "open": "Ouvrir",
+        "delete": "Supprimer"
       },
-      "materialiAriaLabel": "Materiali {filter}",
+      "materialiAriaLabel": "Supports {filter}",
       "tutti": "tutti"
     },
     "calendar": {
@@ -399,19 +399,19 @@
       "upcomingEvents": "Prossimi Eventi"
     },
     "calendarGrid": {
-      "ariaLabelNextMonth": "Aria label next month",
-      "ariaLabelPreviousMonth": "Aria label previous month",
+      "ariaLabelNextMonth": "Aller au mois suivant",
+      "ariaLabelPreviousMonth": "Aller au mois précédent",
       "dayNames": {
-        "friday": "Friday",
-        "monday": "Monday",
-        "saturday": "Saturday",
-        "sunday": "Sunday",
-        "thursday": "Thursday",
-        "tuesday": "Tuesday",
-        "wednesday": "Wednesday"
+        "friday": "Vendredi",
+        "monday": "Lundi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche",
+        "thursday": "Jeudi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi"
       },
-      "moreEvents": "More events",
-      "todayButton": "Today button"
+      "moreEvents": "Plus d'événements",
+      "todayButton": "Aujourd'hui"
     },
     "characterSwitcher": {
       "noCharactersFound": "No Characters Found",
@@ -430,7 +430,7 @@
       "cardsReviewed": "Cards Reviewed",
       "completed": "Completed",
       "completedMessage": "Completed Message",
-      "continueButton": "Continue Button",
+      "continueButton": "Continuer",
       "easy": "Easy",
       "easyQuestion": "Easy Question",
       "good": "Good",
@@ -492,11 +492,11 @@
       "locked": "Locked",
       "nextTopic": "Next topic",
       "noPathsCreated": "No paths created",
-      "noPathsDescription": "No paths description",
+      "noPathsDescription": "Crée ton premier parcours d'apprentissage avec un professeur pour commencer.",
       "noStepsAvailable": "No steps available",
       "pathNotFound": "Path not found",
-      "pathPlural": "Path plural",
-      "pathSingular": "Path singular",
+      "pathPlural": "parcours",
+      "pathSingular": "parcours",
       "progress": "Progresso",
       "start": "Start",
       "statusCompleted": "Status completed",
@@ -528,26 +528,26 @@
       "backToExamples": "Back To Examples",
       "cancel": "Annuler",
       "create": "Créer",
-      "createTitle": "Create Title",
+      "createTitle": "Créer une carte mentale",
       "createWithProfessor": "Create With Professor",
-      "description": "Descrizione",
-      "emptyDescription": "Empty Description",
-      "emptyTitle": "Empty Title",
+      "description": "Crée des liens visuels entre les concepts.",
+      "emptyDescription": "Aucune carte mentale pour le moment. Crée la première.",
+      "emptyTitle": "Aucune carte mentale",
       "examples": "Examples",
-      "examplesTitle": "Examples Title",
+      "examplesTitle": "Exemples de cartes mentales",
       "exploreExamples": "Explore Examples",
       "how": "How",
       "import": "Import",
       "manualMode": "Manual Mode",
       "saveToCollection": "Save To Collection",
-      "subjectLabel": "Subject Label",
-      "subtitle": "Sottotitolo",
-      "subtopicPlaceholder": "Subtopic Placeholder",
-      "title": "Titolo",
-      "titleLabel": "Title Label",
-      "titlePlaceholder": "Title Placeholder",
-      "topicPlaceholder": "Topic Placeholder",
-      "topicsLabel": "Topics Label"
+      "subjectLabel": "Matière",
+      "subtitle": "Crée des cartes visuelles pour organiser les idées",
+      "subtopicPlaceholder": "Saisis un sous-thème",
+      "title": "Cartes mentales",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Saisis un titre",
+      "topicPlaceholder": "Saisis un sujet",
+      "topicsLabel": "Sujets"
     },
     "parentDashboard": {
       "error": {
@@ -562,41 +562,41 @@
       },
       "generateProfile": "Générer le profil",
       "activity": {
-        "ariaLabel": "Aria label",
+        "ariaLabel": "Section activité",
         "mirrorBucks": "Mirror bucks",
         "sessions": "Sessions",
         "studyTime": "Study time",
         "thisWeek": "This week",
-        "title": "Titolo",
+        "title": "Activité hebdomadaire",
         "xpEarned": "Xp earned"
       },
       "empty": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Aucune donnée disponible pour le moment.",
+        "title": "Rien à afficher pour le moment"
       },
       "features": {
-        "accessibilityDesc": "Accessibility desc",
-        "accessibilityTitle": "Accessibility title",
-        "ariaLabel": "Aria label",
-        "flashcardsDesc": "Flashcards desc",
-        "flashcardsTitle": "Flashcards title",
-        "maestriDesc": "Maestri desc",
-        "maestriTitle": "Maestri title",
-        "mindmapDesc": "Mindmap desc",
-        "mindmapTitle": "Mindmap title",
-        "quizDesc": "Quiz desc",
-        "quizTitle": "Quiz title",
-        "voiceDesc": "Voice desc",
-        "voiceTitle": "Voice title"
+        "accessibilityDesc": "Paramètres d'accessibilité personnalisés pour chaque élève.",
+        "accessibilityTitle": "Outils d'accessibilité",
+        "ariaLabel": "Section fonctionnalités",
+        "flashcardsDesc": "Cartes de révision intelligentes pour renforcer la mémoire.",
+        "flashcardsTitle": "Cartes mémoire",
+        "maestriDesc": "Mentors IA par matière pour un apprentissage guidé.",
+        "maestriTitle": "Professeurs IA",
+        "mindmapDesc": "Cartes visuelles pour organiser clairement les concepts.",
+        "mindmapTitle": "Cartes mentales",
+        "quizDesc": "Exercices interactifs pour consolider les apprentissages.",
+        "quizTitle": "Quiz",
+        "voiceDesc": "Interactions vocales pour un soutien d'apprentissage inclusif.",
+        "voiceTitle": "Assistance vocale"
       },
       "guide": {
-        "ariaLabel": "Aria label",
-        "intro": "Intro",
-        "title": "Titolo"
+        "ariaLabel": "Section guide",
+        "intro": "Utilisez ces informations pour soutenir votre enfant.",
+        "title": "Guide d'étude"
       },
       "header": {
-        "subtitle": "Sottotitolo",
-        "title": "Titolo"
+        "subtitle": "Suivez les progrès, les habitudes et les besoins de soutien.",
+        "title": "Tableau de bord parents"
       },
       "learningStyle": {
         "approach": "Approach",
@@ -657,7 +657,7 @@
         "overview": "Overview",
         "progress": "Progresso"
       },
-      "profileTitle": "Profile Title",
+      "profileTitle": "Profil élève",
       "learningChannelVisual": "Visuel",
       "learningChannelAuditory": "Auditif",
       "learningChannelKinesthetic": "Kinesthésique",
@@ -677,7 +677,7 @@
       "cosaLoMotiva": "Cosa lo motiva:"
     },
     "quizCompletion": {
-      "continueButton": "Continue button",
+      "continueButton": "Continuer",
       "correctAnswers": "Correct answers",
       "excellent": "Excellent",
       "keepPracticing": "Keep practicing",
@@ -691,11 +691,11 @@
       "contentUnavailable": "Content unavailable",
       "flashcardDescription": "Flashcard description",
       "mindmapDescription": "Mindmap description",
-      "openMindmapButton": "Open mindmap button",
+      "openMindmapButton": "Ouvrir la carte mentale",
       "overviewUnavailable": "Overview unavailable",
       "quizDescription": "Quiz description",
-      "startFlashcardButton": "Start flashcard button",
-      "startQuizButton": "Start quiz button"
+      "startFlashcardButton": "Démarrer les flashcards",
+      "startQuizButton": "Démarrer le quiz"
     },
     "subjectConfirmation": {
       "chooseProfessor": "Choose Professor",
@@ -731,7 +731,7 @@
       "pending": "pending"
     },
     "summaries": {
-      "createButton": "Create Button",
+      "createButton": "Créer",
       "defaultTitle": "Default Title",
       "emptyDescription": "Empty Description",
       "emptySummaries": "Empty Summaries",
@@ -762,14 +762,14 @@
       "webcamAlt": "Webcam alt"
     },
     "topicCard": {
-      "continueButton": "Continue button",
+      "continueButton": "Continuer",
       "difficulty": {
         "advanced": "Advanced",
         "basic": "Basic",
         "intermediate": "Intermediate"
       },
       "quizLabel": "Quiz label",
-      "startButton": "Start button",
+      "startButton": "Commencer",
       "min": "min"
     },
     "scheduler": {
