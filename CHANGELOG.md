@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Study Kit upload 500**: Wrapped formData parsing in try-catch, added pdf-parse import resilience with 30s timeout on Vercel serverless
+- **XP/MirrorBucks not persisted**: Progress model now synced from gamification points — XP, mirrorBucks, and sessionsThisWeek written to both UserGamification and Progress models
+- **i18n: 196 placeholder keys**: Translated English placeholders across all 5 locales (it/en/fr/de/es) in education.json and settings.json — calendar days, settings labels, zaino title, accessibility profiles
+
 ### Added
 
 - **Coming Soon mode** with `coming_soon_overlay` feature flag toggle — proxy gating redirects unauthenticated users to `/coming-soon`
