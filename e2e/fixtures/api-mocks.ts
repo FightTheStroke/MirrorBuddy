@@ -45,8 +45,8 @@ export async function mockConsentStorage(context: BrowserContext) {
       localStorage.setItem(
         'mirrorbuddy-unified-consent',
         JSON.stringify({
-          tos: { accepted: true, version: '1.0' },
-          cookies: { essential: true, analytics: false },
+          tos: { accepted: true, version: '1.0', acceptedAt: new Date().toISOString() },
+          cookies: { essential: true, analytics: false, acceptedAt: new Date().toISOString() },
           trial: { accepted: true, version: '1.0' },
         }),
       );
