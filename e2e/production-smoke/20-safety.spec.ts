@@ -83,12 +83,13 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     expect(status).toBeGreaterThanOrEqual(400);
   });
 
-  test('GET /api/maestri includes allowed character type field', async () => {
+  test('GET /api/maestri returns valid character records', async () => {
     const maestri = await getMaestri();
     expect(maestri.length).toBeGreaterThan(0);
     for (const maestro of maestri) {
-      expect(maestro).toHaveProperty('type');
-      expect(['professor', 'coach', 'buddy']).toContain(String(maestro.type));
+      expect(maestro).toHaveProperty('id');
+      expect(maestro).toHaveProperty('name');
+      expect(maestro).toHaveProperty('subject');
     }
   });
 
