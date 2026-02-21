@@ -49,6 +49,11 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
+// Mock Sentry tier context to prevent DB calls
+vi.mock('@/lib/observability/sentry-tier-context', () => ({
+  setSentryTierContext: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe('Middleware modules', () => {
   let mockContext: MiddlewareContext;
   let mockNext: () => Promise<Response>;

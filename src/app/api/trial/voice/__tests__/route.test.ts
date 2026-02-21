@@ -4,37 +4,37 @@
  * Tests for POST and GET /api/trial/voice
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { NextRequest } from "next/server";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock Sentry
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
 // Mock dependencies
-vi.mock("next/headers", () => ({
+vi.mock('next/headers', () => ({
   cookies: vi.fn(),
   headers: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/server", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+vi.mock('@/lib/auth/server', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
     validateAuth: vi.fn(),
   };
 });
 
-vi.mock("@/lib/security", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/security")>();
+vi.mock('@/lib/security', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/security')>();
   return {
     ...actual,
     requireCSRF: vi.fn(),
   };
 });
 
-vi.mock("@/lib/trial/trial-service", () => ({
+vi.mock('@/lib/trial/trial-service', () => ({
   getOrCreateTrialSession: vi.fn(),
   checkTrialLimits: vi.fn(),
   addVoiceSeconds: vi.fn(),
@@ -43,7 +43,26 @@ vi.mock("@/lib/trial/trial-service", () => ({
   },
 }));
 
-vi.mock("@/lib/logger", () => ({
+// Mock Prisma to prevent DB calls from anti-abuse dbAdapter
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    trialSession: {
+      findUnique: vi.fn().mockResolvedValue(null),
+    },
+  },
+}));
+
+// Mock anti-abuse to prevent DB calls
+vi.mock('@/lib/trial/anti-abuse', () => ({
+  isSessionBlocked: vi.fn().mockResolvedValue(false),
+}));
+
+// Mock Sentry tier context to prevent DB calls via withSentry
+vi.mock('@/lib/observability/sentry-tier-context', () => ({
+  setSentryTierContext: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),
@@ -58,24 +77,24 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-import { cookies, headers } from "next/headers";
-import { validateAuth } from "@/lib/auth/server";
-import { requireCSRF } from "@/lib/security";
+import { cookies, headers } from 'next/headers';
+import { validateAuth } from '@/lib/auth/server';
+import { requireCSRF } from '@/lib/security';
 import {
   getOrCreateTrialSession,
   checkTrialLimits,
   addVoiceSeconds,
-} from "@/lib/trial/trial-service";
-import { GET, POST } from "../route";
+} from '@/lib/trial/trial-service';
+import { GET, POST } from '../route';
 
-describe("Trial Voice API", () => {
+describe('Trial Voice API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
     // Default mock for headers
     vi.mocked(headers).mockResolvedValue({
       get: vi.fn((key: string) => {
-        if (key === "x-forwarded-for") return "192.168.1.1";
+        if (key === 'x-forwarded-for') return '192.168.1.1';
         return null;
       }),
     } as any);
@@ -84,16 +103,14 @@ describe("Trial Voice API", () => {
     vi.mocked(requireCSRF).mockReturnValue(true);
   });
 
-  describe("GET /api/trial/voice", () => {
-    it("returns unlimited for authenticated users", async () => {
+  describe('GET /api/trial/voice', () => {
+    it('returns unlimited for authenticated users', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: true,
-        userId: "user-123",
+        userId: 'user-123',
       } as any);
 
-      const response = await GET(
-        new NextRequest("http://localhost/api/trial/voice"),
-      );
+      const response = await GET(new NextRequest('http://localhost/api/trial/voice'));
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -101,7 +118,7 @@ describe("Trial Voice API", () => {
       expect(data.voiceSecondsRemaining).toBe(-1);
     });
 
-    it("returns full quota when no visitor cookie", async () => {
+    it('returns full quota when no visitor cookie', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
@@ -109,9 +126,7 @@ describe("Trial Voice API", () => {
         get: vi.fn().mockReturnValue(undefined),
       } as any);
 
-      const response = await GET(
-        new NextRequest("http://localhost/api/trial/voice"),
-      );
+      const response = await GET(new NextRequest('http://localhost/api/trial/voice'));
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -119,22 +134,20 @@ describe("Trial Voice API", () => {
       expect(data.voiceSecondsRemaining).toBe(300);
     });
 
-    it("returns current usage for trial user with session", async () => {
+    it('returns current usage for trial user with session', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
         voiceSecondsUsed: 120,
       } as any);
       vi.mocked(checkTrialLimits).mockResolvedValue({ allowed: true });
 
-      const response = await GET(
-        new NextRequest("http://localhost/api/trial/voice"),
-      );
+      const response = await GET(new NextRequest('http://localhost/api/trial/voice'));
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -144,57 +157,55 @@ describe("Trial Voice API", () => {
       expect(data.maxVoiceSeconds).toBe(300);
     });
 
-    it("returns denied when voice limit reached", async () => {
+    it('returns denied when voice limit reached', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
         voiceSecondsUsed: 300,
       } as any);
       vi.mocked(checkTrialLimits).mockResolvedValue({
         allowed: false,
-        reason: "Limite voce raggiunto",
+        reason: 'Limite voce raggiunto',
       });
 
-      const response = await GET(
-        new NextRequest("http://localhost/api/trial/voice"),
-      );
+      const response = await GET(new NextRequest('http://localhost/api/trial/voice'));
       const data = await response.json();
 
       expect(data.allowed).toBe(false);
       expect(data.voiceSecondsRemaining).toBe(0);
-      expect(data.reason).toBe("Limite voce raggiunto");
+      expect(data.reason).toBe('Limite voce raggiunto');
     });
   });
 
-  describe("POST /api/trial/voice", () => {
+  describe('POST /api/trial/voice', () => {
     function createRequest(body: unknown): NextRequest {
-      return new NextRequest("http://localhost/api/trial/voice", {
-        method: "POST",
+      return new NextRequest('http://localhost/api/trial/voice', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
       });
     }
 
-    it("accepts requests without CSRF (public endpoint)", async () => {
+    it('accepts requests without CSRF (public endpoint)', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-123" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-123' }),
       } as any);
       vi.mocked(headers).mockResolvedValue({
         get: vi.fn().mockReturnValue(null),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
-        visitorId: "visitor-123",
+        id: 'session-123',
+        visitorId: 'visitor-123',
         voiceSecondsUsed: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -213,21 +224,21 @@ describe("Trial Voice API", () => {
       expect(data.voiceSecondsRemaining).toBe(240);
     });
 
-    it("skips tracking for authenticated users", async () => {
+    it('skips tracking for authenticated users', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: true,
-        userId: "user-123",
+        userId: 'user-123',
       } as any);
 
       const response = await POST(createRequest({ durationSeconds: 60 }));
       const data = await response.json();
 
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("authenticated");
+      expect(data.reason).toBe('authenticated');
       expect(addVoiceSeconds).not.toHaveBeenCalled();
     });
 
-    it("returns 400 when no visitor cookie", async () => {
+    it('returns 400 when no visitor cookie', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
@@ -239,38 +250,36 @@ describe("Trial Voice API", () => {
 
       expect(response.status).toBe(400);
       const data = await response.json();
-      expect(data.error).toBe("No trial session");
+      expect(data.error).toBe('No trial session');
     });
 
-    it("returns 400 for invalid duration", async () => {
+    it('returns 400 for invalid duration', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
       } as any);
 
-      const response = await POST(
-        createRequest({ durationSeconds: "invalid" }),
-      );
+      const response = await POST(createRequest({ durationSeconds: 'invalid' }));
 
       expect(response.status).toBe(400);
       const data = await response.json();
-      expect(data.error).toBe("Invalid duration");
+      expect(data.error).toBe('Invalid duration');
     });
 
-    it("returns 400 for negative duration", async () => {
+    it('returns 400 for negative duration', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
       } as any);
 
       const response = await POST(createRequest({ durationSeconds: -10 }));
@@ -278,15 +287,15 @@ describe("Trial Voice API", () => {
       expect(response.status).toBe(400);
     });
 
-    it("successfully records voice usage", async () => {
+    it('successfully records voice usage', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
       } as any);
       vi.mocked(addVoiceSeconds).mockResolvedValue(180);
 
@@ -299,18 +308,18 @@ describe("Trial Voice API", () => {
       expect(data.maxVoiceSeconds).toBe(300);
       expect(data.limitReached).toBe(false);
 
-      expect(addVoiceSeconds).toHaveBeenCalledWith("session-123", 60);
+      expect(addVoiceSeconds).toHaveBeenCalledWith('session-123', 60);
     });
 
-    it("indicates limit reached when voice exhausted", async () => {
+    it('indicates limit reached when voice exhausted', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: "visitor-abc" }),
+        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
       vi.mocked(getOrCreateTrialSession).mockResolvedValue({
-        id: "session-123",
+        id: 'session-123',
       } as any);
       vi.mocked(addVoiceSeconds).mockResolvedValue(300);
 

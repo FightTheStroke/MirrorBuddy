@@ -12,12 +12,14 @@ import { NextRequest } from 'next/server';
 import { _resetForTesting, updateFlag } from '@/lib/feature-flags/feature-flags-service';
 
 // Mock next-intl createIntlMiddleware to avoid locale routing side effects
-vi.mock('next-intl/middleware', () => ({
-  default: () => async () => {
-    const mod = await vi.importActual<typeof import('next/server')>('next/server');
-    return mod.NextResponse.next();
-  },
-}));
+vi.mock('next-intl/middleware', () => {
+  const { NextResponse } = require('next/server'); // eslint-disable-line @typescript-eslint/no-require-imports
+  return {
+    default: () => {
+      return () => NextResponse.next();
+    },
+  };
+});
 
 // Mock locale detection helpers
 vi.mock('@/lib/i18n/locale-detection', () => ({
@@ -33,6 +35,19 @@ vi.mock('@/lib/observability/metrics-store', () => ({
   metricsStore: {
     recordLatency: vi.fn(),
     recordError: vi.fn(),
+  },
+}));
+
+// Mock Prisma to prevent DB calls from feature-flags updateFlag
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    featureFlag: {
+      findMany: vi.fn().mockResolvedValue([]),
+      upsert: vi.fn().mockResolvedValue({}),
+    },
+    globalConfig: {
+      upsert: vi.fn().mockResolvedValue({}),
+    },
   },
 }));
 

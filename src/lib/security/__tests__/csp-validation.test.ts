@@ -9,11 +9,24 @@
  *
  * Run these tests before deploying to catch CSP issues early.
  */
-import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { buildCSPHeader } from '@/proxy';
 import { _resetForTesting, setFlagStatus } from '@/lib/feature-flags/feature-flags-service';
+
+// Mock Prisma to prevent DB calls from feature-flags-service
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    featureFlag: {
+      findMany: vi.fn().mockResolvedValue([]),
+      upsert: vi.fn().mockResolvedValue({}),
+    },
+    globalConfig: {
+      upsert: vi.fn().mockResolvedValue({}),
+    },
+  },
+}));
 
 describe('CSP Configuration Validation', () => {
   let proxyContent: string;
