@@ -49,18 +49,18 @@ vi.mock('@/app/api/metrics/sli-metrics', () => ({
 }));
 
 vi.mock('@/app/api/metrics/behavioral-metrics', () => ({
-  generateBehavioralMetrics: vi.fn().mockResolvedValue([]),
+  generateBehavioralMetrics: vi.fn().mockResolvedValue([] as any),
 }));
 
 vi.mock('@/lib/funnel/batch-funnel', () => ({
-  processBatchFunnelEvents: vi.fn().mockResolvedValue({ processed: 0 }),
+  processBatchFunnelEvents: vi.fn().mockResolvedValue({ processed: 0 } as any),
 }));
 
 // Mock fetch for Grafana push
 const mockFetch = vi.fn().mockResolvedValue({
   ok: true,
-  text: vi.fn().mockResolvedValue(''),
-});
+  text: vi.fn().mockResolvedValue('' as any),
+} as any);
 global.fetch = mockFetch as typeof fetch;
 
 describe('metrics-push - waitlist KPIs', () => {
@@ -82,7 +82,7 @@ describe('metrics-push - waitlist KPIs', () => {
     process.env.GRAFANA_CLOUD_API_KEY = 'test-key';
 
     // Setup waitlistEntry.count mock: 100 total, 80 verified, 10 unsubscribed, 5 redeemed, 20 converted
-    prisma.waitlistEntry.count
+    vi.mocked(prisma.waitlistEntry.count)
       .mockResolvedValueOnce(100) // total signups
       .mockResolvedValueOnce(80) // verified
       .mockResolvedValueOnce(10) // unsubscribed
@@ -90,7 +90,7 @@ describe('metrics-push - waitlist KPIs', () => {
       .mockResolvedValueOnce(20); // converted
 
     vi.clearAllMocks();
-    prisma.waitlistEntry.count
+    vi.mocked(prisma.waitlistEntry.count)
       .mockResolvedValueOnce(100)
       .mockResolvedValueOnce(80)
       .mockResolvedValueOnce(10)

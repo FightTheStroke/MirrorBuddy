@@ -88,7 +88,7 @@ describe('GET /api/user', () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
         userId: null,
-      });
+      } as any);
 
       const request = new Request('http://localhost:3000/api/user');
       const response = (await GET(request as any)) as unknown as Response;
@@ -114,8 +114,8 @@ describe('GET /api/user', () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: true,
         userId: mockUser.id,
-      });
-      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as any);
 
       const request = new Request('http://localhost:3000/api/user');
       const response = (await GET(request as any)) as unknown as Response;
@@ -132,7 +132,7 @@ describe('GET /api/user', () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
         userId: null,
-      });
+      } as any);
 
       const mockUser = {
         id: 'user-123',
@@ -143,11 +143,11 @@ describe('GET /api/user', () => {
         progress: {},
       };
 
-      vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any);
       mockAssignBaseTierToNewUser.mockResolvedValue({
         id: 'sub-123',
         tierId: 'tier-base-123',
-      });
+      } as any);
 
       const request = new Request('http://localhost:3000/api/user');
       const response = (await GET(request as any)) as unknown as Response;
@@ -172,8 +172,8 @@ describe('GET /api/user', () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: true,
         userId: mockUser.id,
-      });
-      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as any);
 
       const request = new Request('http://localhost:3000/api/user');
       await GET(request as any);
@@ -186,7 +186,7 @@ describe('GET /api/user', () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
         userId: null,
-      });
+      } as any);
 
       const mockUser = {
         id: 'user-456',
@@ -197,7 +197,7 @@ describe('GET /api/user', () => {
         progress: {},
       };
 
-      vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any);
       mockAssignBaseTierToNewUser.mockResolvedValue(null);
 
       const request = new Request('http://localhost:3000/api/user');

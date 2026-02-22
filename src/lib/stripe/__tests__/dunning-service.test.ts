@@ -64,8 +64,8 @@ describe('DunningService', () => {
 
   describe('handlePaymentFailure', () => {
     it('sets 7-day grace period and pauses subscription', async () => {
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' });
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' });
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' } as any);
 
       await dunningService.handlePaymentFailure({
         userId: 'user_123',
@@ -90,8 +90,8 @@ describe('DunningService', () => {
     });
 
     it('sends dunning email on day 1', async () => {
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' });
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' });
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' } as any);
 
       await dunningService.handlePaymentFailure({
         userId: 'user_123',
@@ -108,7 +108,7 @@ describe('DunningService', () => {
     });
 
     it('skips email when user has no email', async () => {
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' });
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' } as any);
       vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
 
       await dunningService.handlePaymentFailure({
@@ -121,8 +121,8 @@ describe('DunningService', () => {
     });
 
     it('handles email send failure gracefully', async () => {
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' });
-      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' });
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' } as any);
+      vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({ email: 'test@example.com' } as any);
       mockSendEmail.mockRejectedValueOnce(new Error('Email API error'));
 
       // Should not throw
@@ -143,12 +143,12 @@ describe('DunningService', () => {
         userId: 'user_123',
         user: { email: 'test@example.com' },
       };
-      vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([expiredSub]);
+      vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([expiredSub] as any);
       vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({
         id: 'tier_base',
         code: 'base',
-      });
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_db_123' });
+      } as any);
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_db_123' } as any);
 
       await dunningService.processGracePeriodExpired();
 
@@ -169,9 +169,9 @@ describe('DunningService', () => {
           userId: 'user_123',
           user: { email: 'test@example.com' },
         },
-      ]);
-      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' });
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' });
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' } as any);
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({ id: 'sub_123' } as any);
 
       await dunningService.processGracePeriodExpired();
 
@@ -186,7 +186,7 @@ describe('DunningService', () => {
     it('handles missing base tier gracefully', async () => {
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([
         { id: 'sub_123', user: { email: 'test@example.com' } },
-      ]);
+      ] as any);
       vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce(null);
 
       await dunningService.processGracePeriodExpired();
@@ -198,9 +198,9 @@ describe('DunningService', () => {
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([
         { id: 'sub_1', userId: 'user_1', user: { email: 'user1@example.com' } },
         { id: 'sub_2', userId: 'user_2', user: { email: 'user2@example.com' } },
-      ]);
-      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' });
-      vi.mocked(prisma.userSubscription.update).mockResolvedValue({});
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' } as any);
+      vi.mocked(prisma.userSubscription.update).mockResolvedValue({} as any);
 
       await dunningService.processGracePeriodExpired();
 
@@ -211,9 +211,9 @@ describe('DunningService', () => {
     it('skips email for users without email', async () => {
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([
         { id: 'sub_123', userId: 'user_123', user: { email: null } },
-      ]);
-      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' });
-      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({});
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValueOnce({ id: 'tier_base' } as any);
+      vi.mocked(prisma.userSubscription.update).mockResolvedValueOnce({} as any);
 
       await dunningService.processGracePeriodExpired();
 
@@ -235,7 +235,7 @@ describe('DunningService', () => {
           updatedAt: threeDaysAgo,
           user: { email: 'test@example.com' },
         },
-      ]);
+      ] as any);
 
       await dunningService.sendDunningReminders();
 
@@ -259,7 +259,7 @@ describe('DunningService', () => {
           updatedAt: sevenDaysAgo,
           user: { email: 'test@example.com' },
         },
-      ]);
+      ] as any);
 
       await dunningService.sendDunningReminders();
 
@@ -282,7 +282,7 @@ describe('DunningService', () => {
           updatedAt: twoDaysAgo,
           user: { email: 'test@example.com' },
         },
-      ]);
+      ] as any);
 
       await dunningService.sendDunningReminders();
 
@@ -297,7 +297,7 @@ describe('DunningService', () => {
           updatedAt: new Date(),
           user: { email: 'test@example.com' },
         },
-      ]);
+      ] as any);
 
       await dunningService.sendDunningReminders();
 
@@ -315,7 +315,7 @@ describe('DunningService', () => {
           updatedAt: threeDaysAgo,
           user: { email: null },
         },
-      ]);
+      ] as any);
 
       await dunningService.sendDunningReminders();
 

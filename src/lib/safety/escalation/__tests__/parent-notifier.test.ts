@@ -59,24 +59,24 @@ describe('notifyParentOfCrisis', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSendEmail.mockResolvedValue({ success: true, messageId: 'msg123' });
+    mockSendEmail.mockResolvedValue({ success: true, messageId: 'msg123' } as any);
   });
 
   it('sends email when CoppaConsent exists with parentEmail', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue({
       parentEmail: 'parent@example.com',
-    });
-    prisma.settings.findUnique.mockResolvedValue(null);
-    prisma.safetyEvent.findFirst.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.safetyEvent.findFirst).mockResolvedValue({
       id: 'event123',
       userId: 'user123',
       category: 'crisis',
       parentNotified: false,
-    });
-    prisma.safetyEvent.update.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.safetyEvent.update).mockResolvedValue({
       id: 'event123',
       parentNotified: true,
-    });
+    } as any);
 
     await notifyParentOfCrisis(baseParams);
 
@@ -117,20 +117,20 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('sends email when Settings has guardianEmail', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue(null);
-    prisma.settings.findUnique.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue({
       guardianEmail: 'guardian@example.com',
-    });
-    prisma.safetyEvent.findFirst.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.safetyEvent.findFirst).mockResolvedValue({
       id: 'event456',
       userId: 'user123',
       category: 'crisis',
       parentNotified: false,
-    });
-    prisma.safetyEvent.update.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.safetyEvent.update).mockResolvedValue({
       id: 'event456',
       parentNotified: true,
-    });
+    } as any);
 
     await notifyParentOfCrisis(baseParams);
 
@@ -153,10 +153,10 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('does NOT send when no parent contact found', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue(null);
-    prisma.settings.findUnique.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue({
       guardianEmail: null,
-    });
+    } as any);
 
     await notifyParentOfCrisis(baseParams);
 
@@ -168,21 +168,21 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('updates SafetyEvent.parentNotified to true on success', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue({
       parentEmail: 'parent@example.com',
-    });
-    prisma.settings.findUnique.mockResolvedValue(null);
-    prisma.safetyEvent.findFirst.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.safetyEvent.findFirst).mockResolvedValue({
       id: 'event789',
       userId: 'user123',
       category: 'crisis',
       parentNotified: false,
-    });
-    prisma.safetyEvent.update.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.safetyEvent.update).mockResolvedValue({
       id: 'event789',
       parentNotified: true,
       parentNotifiedAt: new Date(),
-    });
+    } as any);
 
     await notifyParentOfCrisis(baseParams);
 
@@ -197,14 +197,14 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('handles sendEmail failure gracefully', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue({
       parentEmail: 'parent@example.com',
-    });
-    prisma.settings.findUnique.mockResolvedValue(null);
+    } as any);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue(null);
     mockSendEmail.mockResolvedValue({
       success: false,
       error: 'Email service unavailable',
-    });
+    } as any);
 
     // Should not throw
     await expect(notifyParentOfCrisis(baseParams)).resolves.toBeUndefined();
@@ -214,7 +214,9 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('handles database errors gracefully', async () => {
-    prisma.coppaConsent.findFirst.mockRejectedValue(new Error('Database connection failed'));
+    vi.mocked(prisma.coppaConsent.findFirst).mockRejectedValue(
+      new Error('Database connection failed'),
+    );
 
     // Should not throw
     await expect(notifyParentOfCrisis(baseParams)).resolves.toBeUndefined();
@@ -224,13 +226,13 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('prefers CoppaConsent over Settings when both exist', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue({
       parentEmail: 'coppa-parent@example.com',
-    });
-    prisma.settings.findUnique.mockResolvedValue({
+    } as any);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue({
       guardianEmail: 'settings-guardian@example.com',
-    });
-    prisma.safetyEvent.findFirst.mockResolvedValue(null);
+    } as any);
+    vi.mocked(prisma.safetyEvent.findFirst).mockResolvedValue(null);
 
     await notifyParentOfCrisis(baseParams);
 
@@ -243,11 +245,11 @@ describe('notifyParentOfCrisis', () => {
   });
 
   it('does not update SafetyEvent if no recent event found', async () => {
-    prisma.coppaConsent.findFirst.mockResolvedValue({
+    vi.mocked(prisma.coppaConsent.findFirst).mockResolvedValue({
       parentEmail: 'parent@example.com',
-    });
-    prisma.settings.findUnique.mockResolvedValue(null);
-    prisma.safetyEvent.findFirst.mockResolvedValue(null); // No recent event
+    } as any);
+    vi.mocked(prisma.settings.findUnique).mockResolvedValue(null);
+    vi.mocked(prisma.safetyEvent.findFirst).mockResolvedValue(null); // No recent event
 
     await notifyParentOfCrisis(baseParams);
 

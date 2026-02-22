@@ -21,7 +21,7 @@ vi.mock('@/lib/email', () => ({
 
 // Mock rate limiting to always allow requests during tests
 vi.mock('@/lib/rate-limit', () => ({
-  checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true }),
+  checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true } as any),
   getClientIdentifier: vi.fn().mockReturnValue('test-ip'),
   rateLimitResponse: vi.fn(),
   RATE_LIMITS: { CONTACT_FORM: { maxRequests: 5, windowMs: 3600000 } },
@@ -54,7 +54,7 @@ describe('POST /api/contact', () => {
         message: 'I have a question',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id-123',
         type: 'general',
         name: 'John Doe',
@@ -67,12 +67,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-123',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -111,7 +111,7 @@ describe('POST /api/contact', () => {
         specificNeeds: 'DSA support',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id-456',
         type: 'schools',
         name: 'Jane Smith',
@@ -127,12 +127,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-456',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -174,7 +174,7 @@ describe('POST /api/contact', () => {
         message: 'Need enterprise license',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id-789',
         type: 'enterprise',
         name: 'Bob Johnson',
@@ -191,12 +191,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-789',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -222,7 +222,7 @@ describe('POST /api/contact', () => {
         message: 'Test message',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id',
         type: 'general',
         name: 'John Doe',
@@ -232,12 +232,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-123',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -267,7 +267,7 @@ describe('POST /api/contact', () => {
         specificNeeds: 'DSA',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id',
         type: 'schools',
         name: 'Jane Smith',
@@ -277,12 +277,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-456',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -310,7 +310,7 @@ describe('POST /api/contact', () => {
         message: 'Test',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'test-id',
         type: 'general',
         name: 'John Doe',
@@ -320,12 +320,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: false,
         error: 'Email service unavailable',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -352,7 +352,9 @@ describe('POST /api/contact', () => {
         message: 'Test',
       };
 
-      prisma.contactRequest.create.mockRejectedValue(new Error('Database connection failed'));
+      vi.mocked(prisma.contactRequest.create).mockRejectedValue(
+        new Error('Database connection failed'),
+      );
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',
@@ -391,7 +393,7 @@ describe('POST /api/contact', () => {
         message: 'Test',
       };
 
-      prisma.contactRequest.create.mockResolvedValue({
+      vi.mocked(prisma.contactRequest.create).mockResolvedValue({
         id: 'cuid-12345',
         type: 'general',
         name: 'John Doe',
@@ -401,12 +403,12 @@ describe('POST /api/contact', () => {
         notes: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       mockSendEmail.mockResolvedValue({
         success: true,
         messageId: 'msg-123',
-      });
+      } as any);
 
       const request = new NextRequest('http://localhost:3000/api/contact', {
         method: 'POST',

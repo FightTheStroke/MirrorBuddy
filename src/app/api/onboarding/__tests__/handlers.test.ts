@@ -101,7 +101,7 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,
-    });
+    } as any);
 
     const mockUser = {
       id: 'user-123',
@@ -109,16 +109,16 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
       updatedAt: new Date(),
     };
 
-    vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any);
     mockAssignBaseTierToNewUser.mockResolvedValue({
       id: 'sub-123',
       tierId: 'tier-base-123',
-    });
+    } as any);
     vi.mocked(prisma.onboardingState.upsert).mockResolvedValue({
       userId: mockUser.id,
       hasCompletedOnboarding: false,
       currentStep: 'welcome',
-    });
+    } as any);
 
     const requestData = {
       data: {
@@ -158,13 +158,13 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
       userId: mockUser.id,
-    });
+    } as any);
 
     vi.mocked(prisma.onboardingState.upsert).mockResolvedValue({
       userId: mockUser.id,
       hasCompletedOnboarding: false,
       currentStep: 'profile',
-    });
+    } as any);
 
     const _mockRequest = {
       headers: new Headers({ 'x-csrf-token': 'valid-token' }),
@@ -198,7 +198,7 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,
-    });
+    } as any);
 
     const mockUser = {
       id: 'user-cookie-test',
@@ -206,16 +206,16 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
       updatedAt: new Date(),
     };
 
-    vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any);
     mockAssignBaseTierToNewUser.mockResolvedValue({
       id: 'sub-123',
       tierId: 'tier-base-123',
-    });
+    } as any);
     vi.mocked(prisma.onboardingState.upsert).mockResolvedValue({
       userId: mockUser.id,
       hasCompletedOnboarding: false,
       currentStep: 'welcome',
-    });
+    } as any);
 
     const requestData = {
       data: {
@@ -259,7 +259,7 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,
-    });
+    } as any);
 
     const mockUser = {
       id: 'user-456',
@@ -267,13 +267,13 @@ describe('POST /api/onboarding - Base tier assignment on registration', () => {
       updatedAt: new Date(),
     };
 
-    vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.create).mockResolvedValue(mockUser as any);
     mockAssignBaseTierToNewUser.mockResolvedValue(null); // Null indicates tier assignment failed
     vi.mocked(prisma.onboardingState.upsert).mockResolvedValue({
       userId: mockUser.id,
       hasCompletedOnboarding: false,
       currentStep: 'welcome',
-    });
+    } as any);
 
     const _mockRequest = {
       headers: new Headers({ 'x-csrf-token': 'valid-token' }),

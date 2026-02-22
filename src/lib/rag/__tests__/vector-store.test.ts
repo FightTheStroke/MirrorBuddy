@@ -79,7 +79,7 @@ describe('Vector Store Service', () => {
         tags: '[]',
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       const result = await storeEmbedding(input);
 
@@ -137,7 +137,7 @@ describe('Vector Store Service', () => {
         tags: '[]',
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       await storeEmbedding(input);
 
@@ -190,7 +190,7 @@ describe('Vector Store Service', () => {
         },
       ];
 
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings as any);
 
       const results = await searchSimilar({
         userId: 'user-123',
@@ -204,7 +204,7 @@ describe('Vector Store Service', () => {
     });
 
     it('should filter by sourceType', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([]);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',
@@ -222,7 +222,7 @@ describe('Vector Store Service', () => {
     });
 
     it('should filter by subject', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([]);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',
@@ -261,7 +261,7 @@ describe('Vector Store Service', () => {
         },
       ];
 
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings as any);
 
       const results = await searchSimilar({
         userId: 'user-123',
@@ -277,7 +277,7 @@ describe('Vector Store Service', () => {
     it('should delete embeddings by sourceId', async () => {
       vi.mocked(prisma.contentEmbedding.deleteMany).mockResolvedValueOnce({
         count: 3,
-      });
+      } as any);
 
       const count = await deleteEmbeddings({
         userId: 'user-123',
@@ -298,7 +298,7 @@ describe('Vector Store Service', () => {
     it('should delete all embeddings of a type', async () => {
       vi.mocked(prisma.contentEmbedding.deleteMany).mockResolvedValueOnce({
         count: 10,
-      });
+      } as any);
 
       await deleteEmbeddings({
         userId: 'user-123',
@@ -334,7 +334,7 @@ describe('Vector Store Service', () => {
         updatedAt: new Date(),
       };
 
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([storedEmbedding]);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([storedEmbedding] as any);
 
       const results: VectorSearchResult[] = await searchSimilar({
         userId: 'user-123',
@@ -372,7 +372,7 @@ describe('Vector Store Service', () => {
         tags: '[]',
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       const result = await storeEmbedding(input);
 
@@ -386,7 +386,7 @@ describe('Vector Store Service', () => {
     });
 
     it('should search embeddings filtered by conversation_summary sourceType', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([]);
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',

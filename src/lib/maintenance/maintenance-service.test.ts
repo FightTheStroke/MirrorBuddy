@@ -68,7 +68,7 @@ describe('maintenance-service', () => {
         endTime: new Date('2026-02-15T11:00:00Z'),
         message: 'Scheduled maintenance in progress',
         severity: 'high',
-      });
+      } as any);
 
       const result = await getMaintenanceState();
 

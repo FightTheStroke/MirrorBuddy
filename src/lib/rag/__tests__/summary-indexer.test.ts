@@ -82,7 +82,7 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 20 },
-      });
+      } as any);
 
       mockStoreEmbedding.mockResolvedValueOnce({
         id: 'emb-789',
@@ -91,7 +91,7 @@ describe('Summary Indexer', () => {
         sourceId: conversationId,
         content: summary,
         vector: JSON.stringify(mockVector),
-      });
+      } as any);
 
       await indexConversationSummary(conversationId, userId, summary, metadata);
 
@@ -123,18 +123,18 @@ describe('Summary Indexer', () => {
         userId,
         sourceType: 'conversation_summary',
         sourceId: conversationId,
-      });
+      } as any);
 
       const mockVector = Array(1536).fill(0.2);
       mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 15 },
-      });
+      } as any);
 
       vi.mocked(prisma.contentEmbedding.delete).mockResolvedValueOnce({
         id: 'existing-emb-123',
-      });
+      } as any);
 
       mockStoreEmbedding.mockResolvedValueOnce({
         id: 'new-emb-456',
@@ -142,7 +142,7 @@ describe('Summary Indexer', () => {
         sourceType: 'conversation_summary',
         sourceId: conversationId,
         content: summary,
-      });
+      } as any);
 
       await indexConversationSummary(conversationId, userId, summary);
 
@@ -194,11 +194,11 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 10 },
-      });
+      } as any);
 
       mockStoreEmbedding.mockResolvedValueOnce({
         id: 'emb-999',
-      });
+      } as any);
 
       await indexConversationSummary(conversationId, userId, summary);
 
@@ -224,9 +224,9 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 25 },
-      });
+      } as any);
 
-      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-111' });
+      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-111' } as any);
 
       await indexConversationSummary('conv-456', 'user-789', 'Physics lesson', metadata);
 
@@ -243,7 +243,7 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 15 },
-      });
+      } as any);
 
       mockStoreEmbedding.mockRejectedValueOnce(new Error('Database connection failed'));
 
@@ -266,9 +266,9 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 18 },
-      });
+      } as any);
 
-      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-555' });
+      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-555' } as any);
 
       await indexConversationSummary('conv-999', 'user-888', 'Math lesson', metadata);
 
@@ -294,9 +294,9 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 12 },
-      });
+      } as any);
 
-      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-666' });
+      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-666' } as any);
 
       await indexConversationSummary('conv-111', 'user-222', 'Music lesson', metadata);
 
@@ -322,9 +322,9 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-large',
         usage: { tokens: 30 },
-      });
+      } as any);
 
-      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-777' });
+      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-777' } as any);
 
       await indexConversationSummary('conv-333', 'user-444', 'Test summary');
 
@@ -343,9 +343,9 @@ describe('Summary Indexer', () => {
         vector: mockVector,
         model: 'text-embedding-3-small',
         usage: { tokens: 20 },
-      });
+      } as any);
 
-      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-888' });
+      mockStoreEmbedding.mockResolvedValueOnce({ id: 'emb-888' } as any);
 
       await indexConversationSummary('conv-555', 'user-666', 'CS lesson', metadata);
 

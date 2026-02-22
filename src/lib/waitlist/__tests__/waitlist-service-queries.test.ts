@@ -54,14 +54,14 @@ beforeEach(() => {
 describe('getByEmail', () => {
   it('returns entry when found', async () => {
     const entry = { id: 'id', email: 'test@example.com' };
-    prisma.waitlistEntry.findUnique.mockResolvedValue(entry);
+    vi.mocked(prisma.waitlistEntry.findUnique).mockResolvedValue(entry as any);
 
     const result = await getByEmail('test@example.com');
     expect(result).toEqual(entry);
   });
 
   it('returns null when not found', async () => {
-    prisma.waitlistEntry.findUnique.mockResolvedValue(null);
+    vi.mocked(prisma.waitlistEntry.findUnique).mockResolvedValue(null);
 
     const result = await getByEmail('notfound@example.com');
     expect(result).toBeNull();
@@ -70,7 +70,7 @@ describe('getByEmail', () => {
 
 describe('getStats', () => {
   it('returns counts by status', async () => {
-    prisma.waitlistEntry.count
+    vi.mocked(prisma.waitlistEntry.count)
       .mockResolvedValueOnce(100) // total
       .mockResolvedValueOnce(60) // verified
       .mockResolvedValueOnce(10) // unsubscribed

@@ -50,7 +50,7 @@ describe('Decrypt Audit Logging', () => {
         context: { endpoint: '/api/users/profile' },
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
@@ -76,7 +76,7 @@ describe('Decrypt Audit Logging', () => {
         field: 'name',
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
@@ -105,13 +105,13 @@ describe('Decrypt Audit Logging', () => {
         },
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       const details = JSON.parse(call[0].data.details);
 
       expect(details).toMatchObject({
@@ -131,7 +131,7 @@ describe('Decrypt Audit Logging', () => {
       };
 
       vi.mocked(prisma.complianceAuditEntry.create).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 1000)),
+        (() => new Promise((resolve) => setTimeout(resolve, 1000))) as any,
       );
 
       const start = Date.now();
@@ -169,13 +169,13 @@ describe('Decrypt Audit Logging', () => {
         userId: 'user-789',
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe('user-789');
@@ -189,13 +189,13 @@ describe('Decrypt Audit Logging', () => {
         adminId: 'admin-456',
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe('admin-456');
@@ -207,20 +207,20 @@ describe('Decrypt Audit Logging', () => {
         field: 'email',
       };
 
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe('system');
     });
 
     it('should handle multiple concurrent log calls', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess({ model: 'User', field: 'email' });
       logDecryptAccess({ model: 'Profile', field: 'name' });
@@ -238,13 +238,13 @@ describe('Decrypt Audit Logging', () => {
 
   describe('logBulkDecryptAccess', () => {
     it('should log bulk operation with count', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logBulkDecryptAccess('User', 'email', 50, 'user-123');
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       const details = JSON.parse(call[0].data.details);
 
       expect(details.bulkOperation).toBe(true);
@@ -253,26 +253,26 @@ describe('Decrypt Audit Logging', () => {
     });
 
     it('should include adminId for admin bulk operations', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logBulkDecryptAccess('User', 'email', 100, undefined, 'admin-789');
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
 
       expect(call[0].data.adminId).toBe('admin-789');
       expect(call[0].data.userId).toBeNull();
     });
 
     it('should handle both userId and adminId', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logBulkDecryptAccess('User', 'email', 25, 'user-123', 'admin-456');
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
 
       expect(call[0].data.userId).toBe('user-123');
       expect(call[0].data.adminId).toBe('admin-456');
@@ -280,7 +280,7 @@ describe('Decrypt Audit Logging', () => {
 
     it('should fire-and-forget without blocking', () => {
       vi.mocked(prisma.complianceAuditEntry.create).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 1000)),
+        (() => new Promise((resolve) => setTimeout(resolve, 1000))) as any,
       );
 
       const start = Date.now();
@@ -293,7 +293,7 @@ describe('Decrypt Audit Logging', () => {
 
   describe('Edge Cases', () => {
     it('should handle very long context objects', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       const largeContext: Record<string, unknown> = {};
       for (let i = 0; i < 100; i++) {
@@ -312,7 +312,7 @@ describe('Decrypt Audit Logging', () => {
     });
 
     it('should handle special characters in model and field names', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess({
         model: 'User_Profile_v2',
@@ -321,12 +321,12 @@ describe('Decrypt Audit Logging', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0];
+      const call = vi.mocked(prisma.complianceAuditEntry.create).mock.calls[0] as any;
       expect(call[0].data.description).toBe('PII field decrypted: User_Profile_v2.email_address');
     });
 
     it('should handle null values in context', async () => {
-      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({});
+      vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({} as any);
 
       logDecryptAccess({
         model: 'User',

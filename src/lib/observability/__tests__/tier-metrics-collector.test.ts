@@ -25,21 +25,21 @@ describe('Tier Metrics Collector', () => {
   describe('collectTierMetrics', () => {
     it('should return metric samples for users by tier', async () => {
       // Mock: 5 trial, 3 base, 2 pro users
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 5 }, tierId: 'tier-1' },
         { _count: { id: 3 }, tierId: 'tier-2' },
         { _count: { id: 2 }, tierId: 'tier-3' },
-      ]);
+      ] as any);
 
       // Mock tier definitions
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', code: 'trial' },
         { id: 'tier-2', code: 'base' },
         { id: 'tier-3', code: 'pro' },
-      ]);
+      ] as any);
 
       // Mock per-tier queries (activeCount, mauCount, dauCount) for each tier
-      prisma.userSubscription.count
+      vi.mocked(prisma.userSubscription.count)
         // tier-1 (trial)
         .mockResolvedValueOnce(4) // trial activeCount/WAU (7d)
         .mockResolvedValueOnce(4) // trial mauCount/MAU (30d)
@@ -54,7 +54,7 @@ describe('Tier Metrics Collector', () => {
         .mockResolvedValueOnce(1); // pro dauCount/DAU (1d)
 
       // Mock tier changes (with JSON parsing for upgrade/downgrade detection)
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         // 10 upgrades (trial->base or base->pro)
         ...Array(10).fill({
           changes: { from: { tierId: 'tier-1' }, to: { tierId: 'tier-2' } },
@@ -63,14 +63,14 @@ describe('Tier Metrics Collector', () => {
         ...Array(2).fill({
           changes: { from: { tierId: 'tier-3' }, to: { tierId: 'tier-2' } },
         }),
-      ]);
+      ] as any);
 
       // Mock second tierDefinition.findMany for sortOrder lookup
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', sortOrder: 0 }, // trial
         { id: 'tier-2', sortOrder: 1 }, // base
         { id: 'tier-3', sortOrder: 2 }, // pro
-      ]);
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -107,22 +107,26 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should return active users by tier (last 7 days)', async () => {
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 5 }, tierId: 'tier-1' },
-      ]);
+      ] as any);
 
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', code: 'trial' }]);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', code: 'trial' },
+      ] as any);
 
       // Mock counts for: active (7d), mau (30d), dau (1d), churned (30+ days)
-      prisma.userSubscription.count
+      vi.mocked(prisma.userSubscription.count)
         .mockResolvedValueOnce(3) // activeCount/WAU (7d)
         .mockResolvedValueOnce(4) // mauCount/MAU (30d)
         .mockResolvedValueOnce(2) // dauCount/DAU (1d)
         .mockResolvedValueOnce(1); // churned (30+ days)
 
       // Mock empty tier changes
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', sortOrder: 0 }]);
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', sortOrder: 0 },
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -135,16 +139,16 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should return upgrade/downgrade counters based on sortOrder', async () => {
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([]);
-      prisma.tierDefinition.findMany
-        .mockResolvedValueOnce([]) // First call for tier codes
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([] as any);
+      vi.mocked(prisma.tierDefinition.findMany)
+        .mockResolvedValueOnce([] as any) // First call for tier codes
         .mockResolvedValueOnce([
           { id: 'tier-trial', sortOrder: 0 },
           { id: 'tier-base', sortOrder: 1 },
           { id: 'tier-pro', sortOrder: 2 },
-        ]);
+        ] as any);
 
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         // 15 upgrades (lower sortOrder -> higher sortOrder)
         ...Array(10).fill({
           changes: {
@@ -175,7 +179,7 @@ describe('Tier Metrics Collector', () => {
         ...Array(2).fill({
           changes: { from: null, to: { tierId: 'tier-trial' } },
         }),
-      ]);
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -189,11 +193,11 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should handle empty database gracefully', async () => {
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([]);
-      prisma.tierDefinition.findMany
-        .mockResolvedValueOnce([]) // First call for tier codes
-        .mockResolvedValueOnce([]); // Second call for sortOrder
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([] as any);
+      vi.mocked(prisma.tierDefinition.findMany)
+        .mockResolvedValueOnce([] as any) // First call for tier codes
+        .mockResolvedValueOnce([] as any); // Second call for sortOrder
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -208,27 +212,29 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should include instance labels in all samples', async () => {
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 5 }, tierId: 'tier-1' },
-      ]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', code: 'trial' }]);
-      prisma.userSubscription.count
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', code: 'trial' },
+      ] as any);
+      vi.mocked(prisma.userSubscription.count)
         .mockResolvedValueOnce(3) // activeCount
         .mockResolvedValueOnce(4) // mauCount
         .mockResolvedValueOnce(2) // dauCount
         .mockResolvedValueOnce(1); // churned
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         ...Array(10).fill({
           changes: { from: { tierId: 'tier-1' }, to: { tierId: 'tier-2' } },
         }),
         ...Array(2).fill({
           changes: { from: { tierId: 'tier-2' }, to: { tierId: 'tier-1' } },
         }),
-      ]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', sortOrder: 0 },
         { id: 'tier-2', sortOrder: 1 },
-      ]);
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -239,25 +245,25 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should handle database errors', async () => {
-      prisma.userSubscription.groupBy.mockRejectedValueOnce(new Error('Database error'));
+      vi.mocked(prisma.userSubscription.groupBy).mockRejectedValueOnce(new Error('Database error'));
 
       await expect(collectTierMetrics(instanceLabels, timestamp)).rejects.toThrow('Database error');
     });
 
     it('should return churned users count by tier (inactive 30+ days)', async () => {
       // Users inactive for 30+ days
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 5 }, tierId: 'tier-1' }, // 5 trial users
         { _count: { id: 3 }, tierId: 'tier-2' }, // 3 base users
-      ]);
+      ] as any);
 
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', code: 'trial' },
         { id: 'tier-2', code: 'base' },
-      ]);
+      ] as any);
 
       // Mock counts for: active (7d), mau (30d), dau (1d), churned (30+ days inactive)
-      prisma.userSubscription.count
+      vi.mocked(prisma.userSubscription.count)
         // tier-1 (trial)
         .mockResolvedValueOnce(4) // activeCount/WAU (7d)
         .mockResolvedValueOnce(4) // mauCount/MAU (30d)
@@ -269,18 +275,18 @@ describe('Tier Metrics Collector', () => {
         .mockResolvedValueOnce(1) // dauCount/DAU (1d)
         .mockResolvedValueOnce(1); // churned (30+ days)
 
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([
         ...Array(10).fill({
           changes: { from: { tierId: 'tier-1' }, to: { tierId: 'tier-2' } },
         }),
         ...Array(2).fill({
           changes: { from: { tierId: 'tier-2' }, to: { tierId: 'tier-1' } },
         }),
-      ]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([
+      ] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
         { id: 'tier-1', sortOrder: 0 },
         { id: 'tier-2', sortOrder: 1 },
-      ]);
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -299,20 +305,24 @@ describe('Tier Metrics Collector', () => {
 
     it('should return churn rate by tier (churned / total ratio)', async () => {
       // 5 trial users total, 2 churned = 40% churn rate
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 5 }, tierId: 'tier-1' }, // 5 trial users
-      ]);
+      ] as any);
 
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', code: 'trial' }]);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', code: 'trial' },
+      ] as any);
 
-      prisma.userSubscription.count
+      vi.mocked(prisma.userSubscription.count)
         .mockResolvedValueOnce(4) // activeCount/WAU (7d)
         .mockResolvedValueOnce(4) // mauCount/MAU (30d)
         .mockResolvedValueOnce(2) // dauCount/DAU (1d)
         .mockResolvedValueOnce(2); // churned (30+ days)
 
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', sortOrder: 0 }]);
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', sortOrder: 0 },
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -324,20 +334,24 @@ describe('Tier Metrics Collector', () => {
     });
 
     it('should return 0 churn rate when no users in tier', async () => {
-      prisma.userSubscription.groupBy.mockResolvedValueOnce([
+      vi.mocked(prisma.userSubscription.groupBy).mockResolvedValueOnce([
         { _count: { id: 0 }, tierId: 'tier-1' }, // 0 users
-      ]);
+      ] as any);
 
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', code: 'trial' }]);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', code: 'trial' },
+      ] as any);
 
-      prisma.userSubscription.count
+      vi.mocked(prisma.userSubscription.count)
         .mockResolvedValueOnce(0) // activeCount/WAU (7d)
         .mockResolvedValueOnce(0) // mauCount/MAU (30d)
         .mockResolvedValueOnce(0) // dauCount/DAU (1d)
         .mockResolvedValueOnce(0); // churned (30+ days)
 
-      prisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-      prisma.tierDefinition.findMany.mockResolvedValueOnce([{ id: 'tier-1', sortOrder: 0 }]);
+      vi.mocked(prisma.tierAuditLog.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(prisma.tierDefinition.findMany).mockResolvedValueOnce([
+        { id: 'tier-1', sortOrder: 0 },
+      ] as any);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 

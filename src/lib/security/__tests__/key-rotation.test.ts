@@ -62,8 +62,8 @@ describe('Key Rotation Service', () => {
           refreshToken: mockRefreshToken,
         },
         { id: 'int2', accessToken: mockAccessToken, refreshToken: null },
-      ]);
-      vi.mocked(prisma.googleAccount.update).mockResolvedValue({});
+      ] as any);
+      vi.mocked(prisma.googleAccount.update).mockResolvedValue({} as any);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
 
@@ -92,8 +92,8 @@ describe('Key Rotation Service', () => {
       vi.mocked(prisma.googleAccount.count).mockResolvedValue(1);
       vi.mocked(prisma.googleAccount.findMany).mockResolvedValue([
         { id: 'int1', accessToken: mockToken, refreshToken: null },
-      ]);
-      vi.mocked(prisma.googleAccount.update).mockResolvedValue({});
+      ] as any);
+      vi.mocked(prisma.googleAccount.update).mockResolvedValue({} as any);
 
       const progressCallback = vi.fn();
 
@@ -115,7 +115,7 @@ describe('Key Rotation Service', () => {
       vi.mocked(prisma.googleAccount.count).mockResolvedValue(1);
       vi.mocked(prisma.googleAccount.findMany).mockResolvedValue([
         { id: 'int1', accessToken: mockToken, refreshToken: null },
-      ]);
+      ] as any);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey, {
         dryRun: true,
@@ -139,8 +139,8 @@ describe('Key Rotation Service', () => {
           accessToken: await encryptTokenWithKey('valid', oldTokenKey),
           refreshToken: null,
         },
-      ]);
-      vi.mocked(prisma.googleAccount.update).mockResolvedValue({});
+      ] as any);
+      vi.mocked(prisma.googleAccount.update).mockResolvedValue({} as any);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
 
@@ -161,23 +161,23 @@ describe('Key Rotation Service', () => {
             id: 'int1',
             accessToken: mockToken,
             refreshToken: null,
-          }),
+          }) as any,
         )
         .mockResolvedValueOnce(
           Array(100).fill({
             id: 'int2',
             accessToken: mockToken,
             refreshToken: null,
-          }),
+          }) as any,
         )
         .mockResolvedValueOnce(
           Array(50).fill({
             id: 'int3',
             accessToken: mockToken,
             refreshToken: null,
-          }),
+          }) as any,
         );
-      vi.mocked(prisma.googleAccount.update).mockResolvedValue({});
+      vi.mocked(prisma.googleAccount.update).mockResolvedValue({} as any);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey, {
         batchSize: 100,
@@ -197,8 +197,8 @@ describe('Key Rotation Service', () => {
       vi.mocked(prisma.user.findMany).mockResolvedValue([
         { id: 'user1', email: mockEmail },
         { id: 'user2', email: mockEmail },
-      ]);
-      vi.mocked(prisma.user.update).mockResolvedValue({});
+      ] as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
@@ -214,8 +214,8 @@ describe('Key Rotation Service', () => {
       const mockEmail = await encryptPIIWithKey('test@example.com', oldPIIKey);
 
       vi.mocked(prisma.user.count).mockResolvedValue(1);
-      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }]);
-      vi.mocked(prisma.user.update).mockResolvedValue({});
+      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }] as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
@@ -230,7 +230,7 @@ describe('Key Rotation Service', () => {
 
     it('should skip users with null email', async () => {
       vi.mocked(prisma.user.count).mockResolvedValue(1);
-      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: null }]);
+      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: null }] as any);
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
@@ -243,7 +243,7 @@ describe('Key Rotation Service', () => {
       const mockEmail = await encryptPIIWithKey('user@example.com', oldPIIKey);
 
       vi.mocked(prisma.user.count).mockResolvedValue(1);
-      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }]);
+      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }] as any);
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey, {
         dryRun: true,
@@ -257,8 +257,8 @@ describe('Key Rotation Service', () => {
       const mockEmail = await encryptPIIWithKey('user@example.com', oldPIIKey);
 
       vi.mocked(prisma.user.count).mockResolvedValue(1);
-      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }]);
-      vi.mocked(prisma.user.update).mockResolvedValue({});
+      vi.mocked(prisma.user.findMany).mockResolvedValue([{ id: 'user1', email: mockEmail }] as any);
+      vi.mocked(prisma.user.update).mockResolvedValue({} as any);
 
       const progressCallback = vi.fn();
 

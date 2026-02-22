@@ -16,7 +16,7 @@ vi.mock('@/lib/db', async () => {
 vi.mock('@/lib/email');
 vi.mock('@/lib/security', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/security')>();
-  return { ...actual, hashPII: vi.fn().mockResolvedValue('mocked-hash') };
+  return { ...actual, hashPII: vi.fn().mockResolvedValue('mocked-hash' as any) };
 });
 vi.mock('@/lib/email/templates/password-reset-template', () => ({
   getPasswordResetEmail: vi.fn().mockReturnValue({
@@ -106,7 +106,7 @@ describe('POST /api/auth/forgot-password', () => {
       settings: { language: 'en' },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as any);
     vi.mocked(prisma.passwordResetToken.count).mockResolvedValue(0);
     vi.mocked(prisma.passwordResetToken.create).mockResolvedValue({
       id: 'token-123',
@@ -115,11 +115,11 @@ describe('POST /api/auth/forgot-password', () => {
       expiresAt: new Date(Date.now() + 3600000),
       used: false,
       createdAt: new Date(),
-    });
+    } as any);
     vi.mocked(email.sendEmail).mockResolvedValue({
       success: true,
       messageId: 'msg-123',
-    });
+    } as any);
 
     const req = new Request('http://localhost/api/auth/forgot-password', {
       method: 'POST',
@@ -148,7 +148,7 @@ describe('POST /api/auth/forgot-password', () => {
       settings: { language: 'en' },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as any);
     vi.mocked(prisma.passwordResetToken.count).mockResolvedValue(3);
 
     const req = new Request('http://localhost/api/auth/forgot-password', {
@@ -170,7 +170,7 @@ describe('POST /api/auth/forgot-password', () => {
       settings: { language: 'en' },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser);
+    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as any);
     vi.mocked(prisma.passwordResetToken.count).mockResolvedValue(0);
     vi.mocked(prisma.passwordResetToken.create).mockResolvedValue({
       id: 'token-123',
@@ -179,11 +179,11 @@ describe('POST /api/auth/forgot-password', () => {
       expiresAt: new Date(Date.now() + 3600000),
       used: false,
       createdAt: new Date(),
-    });
+    } as any);
     vi.mocked(email.sendEmail).mockResolvedValue({
       success: false,
       error: 'Email service unavailable',
-    });
+    } as any);
 
     const req = new Request('http://localhost/api/auth/forgot-password', {
       method: 'POST',
