@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 interface HeroSectionProps {
   userName?: string;
@@ -13,7 +13,7 @@ interface HeroSectionProps {
  * Hero Section for MirrorBuddy Welcome Page
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
-  const t = useTranslations("welcome.hero");
+  const t = useTranslations('welcome.hero');
 
   return (
     <div className="text-center max-w-4xl mx-auto relative mb-8">
@@ -21,19 +21,15 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
       <motion.div
         initial={{ scale: 0, rotate: -15 }}
         animate={{ scale: 1, rotate: -12 }}
-        transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+        transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
         className="absolute -top-4 -right-4 md:-right-12 z-10"
-        aria-label={`${t("betaBadge")} - ${t("betaSubtitle")}`}
+        aria-label={`${t('betaBadge')} - MirrorBuddy v${process.env.APP_VERSION}`}
       >
         <div className="relative">
-          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900">
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-xs font-bold tracking-wider uppercase">
-                {t("betaBadge")}
-              </span>
-              <span className="text-[10px] opacity-90">
-                {t("betaSubtitle")}
-              </span>
+          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-5 py-3 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900">
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-xs font-bold tracking-wider uppercase">{t('betaBadge')}</span>
+              <span className="text-[10px] opacity-80 font-mono">v{process.env.APP_VERSION}</span>
             </div>
           </div>
           <div className="absolute inset-0 bg-purple-600/20 blur-xl -z-10 rounded-2xl" />
@@ -44,12 +40,12 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5, type: "spring" }}
+        transition={{ duration: 0.5, type: 'spring' }}
         className="mb-8"
       >
         <Image
           src="/logo-mirrorbuddy-full.png"
-          alt={t("mirrorbuddyLogo")}
+          alt={t('mirrorbuddyLogo')}
           width={280}
           height={75}
           className="mx-auto max-w-[280px] h-auto"
@@ -67,7 +63,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
             >
-              {t("welcomeBack")}{" "}
+              {t('welcomeBack')}{' '}
               <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                 {userName}!
               </span>
@@ -78,7 +74,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.2 }}
               className="text-2xl text-gray-700 dark:text-gray-200 mb-4 font-semibold"
             >
-              {t("welcomeBackSubtitle")}
+              {t('welcomeBackSubtitle')}
             </motion.p>
           </>
         ) : (
@@ -89,7 +85,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.1 }}
               className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight"
             >
-              {t("primaryHeadline")}
+              {t('primaryHeadline')}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
@@ -97,7 +93,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.2 }}
               className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8"
             >
-              {t("primarySubtitle")}
+              {t('primarySubtitle')}
             </motion.p>
           </>
         )}

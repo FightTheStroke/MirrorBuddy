@@ -23,14 +23,13 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
         animate={{ scale: 1, rotate: -12 }}
         transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
         className="absolute -top-4 right-0 sm:-right-4 md:-right-12 z-10"
-        aria-label={`${t('betaBadge')} - ${t('betaSubtitle')}`}
+        aria-label={`${t('betaBadge')} - MirrorBuddy v${process.env.APP_VERSION}`}
       >
         <div className="relative">
-          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900">
-            <div className="flex flex-col items-center gap-1">
+          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-5 py-3 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900">
+            <div className="flex flex-col items-center gap-0.5">
               <span className="text-xs font-bold tracking-wider uppercase">{t('betaBadge')}</span>
-              <span className="text-[10px] opacity-90">{t('betaSubtitle')}</span>
-              <span className="text-[9px] opacity-70 font-mono">v{process.env.APP_VERSION}</span>
+              <span className="text-[10px] opacity-80 font-mono">v{process.env.APP_VERSION}</span>
             </div>
           </div>
           <div className="absolute inset-0 bg-purple-600/20 blur-xl -z-10 rounded-2xl" />

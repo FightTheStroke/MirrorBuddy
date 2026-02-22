@@ -50,7 +50,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it("should use camelCase 'withTeachers' key for new user view", () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcome: 'Benvenuto in',
       learn: 'Impara',
       withTeachers: 'con i Grandi Professori',
@@ -68,7 +67,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it("should use camelCase 'anyAbility' key for new user view", () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcome: 'Benvenuto in',
       learn: 'Impara',
       withTeachers: 'con i Grandi Professori',
@@ -86,7 +84,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it("should use 'welcomeBack' key for returning user greeting", () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcomeBack: 'Bentornato,',
       welcomeBackSubtitle: 'Cosa impariamo di nuovo oggi?',
     });
@@ -102,7 +99,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it("should use 'welcomeBackSubtitle' key for returning user", () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcomeBack: 'Bentornato,',
       welcomeBackSubtitle: 'Cosa impariamo di nuovo oggi?',
     });
@@ -117,7 +113,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it("should use 'description' key via t.rich for new user view", () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcome: 'Benvenuto in',
       learn: 'Impara',
       withTeachers: 'con i Grandi Professori',
@@ -135,7 +130,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it('should render beta badge with translation keys', () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcome: 'Benvenuto in',
       learn: 'Impara',
       withTeachers: 'con i Grandi Professori',
@@ -148,13 +142,12 @@ describe('HeroSection - Translation Keys F-92', () => {
     render(<HeroSection isReturningUser={false} />);
 
     expect(screen.getByText('Beta Privata')).toBeInTheDocument();
-    expect(screen.getByText('MirrorBuddy v0.10')).toBeInTheDocument();
+    expect(screen.getByText(/^v/)).toBeInTheDocument();
   });
 
   it('should render all keys without MISSING prefix (new user)', () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcome: 'Benvenuto in',
       learn: 'Impara',
       withTeachers: 'con i Grandi Professori',
@@ -172,7 +165,6 @@ describe('HeroSection - Translation Keys F-92', () => {
   it('should render all keys without MISSING prefix (returning user)', () => {
     const mockT = createMockTranslations({
       betaBadge: 'Beta Privata',
-      betaSubtitle: 'MirrorBuddy v0.10',
       welcomeBack: 'Bentornato,',
       welcomeBackSubtitle: 'Cosa impariamo di nuovo oggi?',
     });
