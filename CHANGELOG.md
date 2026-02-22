@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.8] - 2026-02-22
+
+### Added
+
+- **Production status dashboard**: `npm run production:status` — CLI tool showing version alignment (local vs prod), health, DB latency, AI status, CI status. Supports `--json` output
+- **Dynamic version badge** on welcome landing page — shows real `APP_VERSION` from package.json instead of hardcoded string
+- **Shields.io badge endpoints**: `/api/shields/version` and `/api/shields/health` for dynamic README badges
+- **README production badges**: Live production version and health status badges using Shields.io endpoint protocol
+
+### Changed
+
+- **CI: Mobile Build Validation on main** — previously only ran on PRs, now also runs on push to main to prevent broken Capacitor builds reaching production undetected
+- **Welcome beta badge** simplified from 3 lines (badge + subtitle + version) to 2 lines (badge + dynamic version). Removed `betaSubtitle` i18n key from all 5 locales
+
+### Fixed
+
+- **E2E: welcome hero translation tests** updated to verify semver pattern instead of hardcoded "MirrorBuddy v0.10"
+- **TypeScript strict mode**: Added `vi.mocked()` wrappers and `as any` casts in 16 test files for centralized Prisma mock compatibility
+- **CI: production-smoke exclusion** — added `**/production-smoke/**` to chromium project testIgnore in playwright.config.ts
+- **E2E: consent + mobile** — fixed missing `acceptedAt` in consent mock, mobile consent banner after reload
+- **5 production smoke tests**: maestri API type field, data-export routes, search filter, close button timeout
+- **25 unit tests**: missing Prisma/Sentry mocks across 6 files
+
+### Refactored
+
+- **Test infrastructure zero-debt**: Centralized ALL Prisma mocks into `src/test/mocks/prisma.ts` (91 models, full CRUD). Migrated 102 unit test files — eliminated ~5,000+ lines of duplicated mock code
+- **E2E fixtures consolidated**: Created `e2e/fixtures/api-mocks.ts` with shared helpers. Reduced base-fixtures from 194→42 lines, production-smoke fixtures from 192→48 lines
+
 ### Fixed
 
 - **Study Kit upload 500**: Wrapped formData parsing in try-catch, added pdf-parse import resilience with 30s timeout on Vercel serverless
