@@ -35,25 +35,10 @@ vi.mock('@/lib/security', async (importOriginal) => {
   };
 });
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    deletedUserBackup: {
-      findMany: vi.fn().mockResolvedValue([
-        {
-          userId: 'user-1',
-          email: 'user@test.com',
-          username: 'user',
-          role: 'USER',
-          deletedAt: new Date('2026-01-01T00:00:00Z'),
-          purgeAt: new Date('2026-02-01T00:00:00Z'),
-          deletedBy: 'admin-1',
-          reason: null,
-        },
-      ]),
-      deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -71,10 +56,25 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 import { GET, DELETE } from '../route';
+import { prisma } from '@/lib/db';
 
 describe('admin users trash API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    vi.mocked(prisma.deletedUserBackup.findMany).mockResolvedValue([
+      {
+        userId: 'user-1',
+        email: 'user@test.com',
+        username: 'user',
+        role: 'USER',
+        deletedAt: new Date('2026-01-01T00:00:00Z'),
+        purgeAt: new Date('2026-02-01T00:00:00Z'),
+        deletedBy: 'admin-1',
+        reason: null,
+      },
+    ] as never);
+    vi.mocked(prisma.deletedUserBackup.deleteMany).mockResolvedValue({ count: 1 } as never);
   });
 
   it('returns deleted user backups', async () => {

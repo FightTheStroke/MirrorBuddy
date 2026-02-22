@@ -8,19 +8,14 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { GET } from '../route';
 
 // Mock Prisma and helper
-const mockUserCreate = vi.fn();
-const mockUserFindUnique = vi.fn();
 const mockAssignBaseTierToNewUser = vi.fn();
 
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: {
-      create: () => mockUserCreate(),
-      findUnique: () => mockUserFindUnique(),
-    },
-  },
-  isDatabaseNotInitialized: vi.fn(() => false),
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma(), isDatabaseNotInitialized: vi.fn(() => false) };
+});
+
+import { prisma } from '@/lib/db';
 
 vi.mock('@/lib/tier/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/tier/server')>();
@@ -101,7 +96,7 @@ describe('GET /api/user', () => {
       expect(response.status).toBe(401);
       const data = await response.json();
       expect(data.guest).toBe(true);
-      expect(mockUserCreate).not.toHaveBeenCalled();
+      expect(prisma.user.create).not.toHaveBeenCalled();
     });
 
     it('should return user data for authenticated requests in production', async () => {
@@ -120,7 +115,7 @@ describe('GET /api/user', () => {
         authenticated: true,
         userId: mockUser.id,
       });
-      mockUserFindUnique.mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const request = new Request('http://localhost:3000/api/user');
       const response = (await GET(request as any)) as unknown as Response;
@@ -148,7 +143,7 @@ describe('GET /api/user', () => {
         progress: {},
       };
 
-      mockUserCreate.mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
       mockAssignBaseTierToNewUser.mockResolvedValue({
         id: 'sub-123',
         tierId: 'tier-base-123',
@@ -159,7 +154,7 @@ describe('GET /api/user', () => {
       const data = await response.json();
 
       expect(data).toHaveProperty('id');
-      expect(mockUserCreate).toHaveBeenCalled();
+      expect(prisma.user.create).toHaveBeenCalled();
       expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
     });
 
@@ -178,7 +173,7 @@ describe('GET /api/user', () => {
         authenticated: true,
         userId: mockUser.id,
       });
-      mockUserFindUnique.mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const request = new Request('http://localhost:3000/api/user');
       await GET(request as any);
@@ -202,7 +197,7 @@ describe('GET /api/user', () => {
         progress: {},
       };
 
-      mockUserCreate.mockResolvedValue(mockUser);
+      vi.mocked(prisma.user.create).mockResolvedValue(mockUser);
       mockAssignBaseTierToNewUser.mockResolvedValue(null);
 
       const request = new Request('http://localhost:3000/api/user');
@@ -210,7 +205,7 @@ describe('GET /api/user', () => {
       const data = await response.json();
 
       expect(data).toHaveProperty('id');
-      expect(mockUserCreate).toHaveBeenCalled();
+      expect(prisma.user.create).toHaveBeenCalled();
       expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
     });
   });

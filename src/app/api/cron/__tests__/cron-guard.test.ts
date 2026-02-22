@@ -5,16 +5,16 @@
  * Requirement F-03: All cron jobs must skip execution in non-production environments
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { NextRequest } from "next/server";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { NextRequest } from 'next/server';
 
 // Mock Sentry
-vi.mock("@sentry/nextjs", () => ({
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
 }));
 
 // Mock logger for all cron tests
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -30,35 +30,24 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock prisma
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    userPrivacyPreferences: {
-      findMany: vi.fn().mockResolvedValue([]),
-    },
-    userActivity: {
-      deleteMany: vi.fn().mockResolvedValue({}),
-    },
-    funnelEvent: {
-      groupBy: vi.fn().mockResolvedValue([]),
-      findFirst: vi.fn().mockResolvedValue(null),
-    },
-    trialSession: {
-      findMany: vi.fn().mockResolvedValue([]),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock email service
-vi.mock("@/lib/email", () => ({
+vi.mock('@/lib/email', () => ({
   sendEmail: vi.fn().mockResolvedValue({ success: true }),
 }));
 
+import { prisma } from '@/lib/db';
+
 // Mock funnel
-vi.mock("@/lib/funnel", () => ({
+vi.mock('@/lib/funnel', () => ({
   recordStageTransition: vi.fn().mockResolvedValue({}),
 }));
 
-describe("Cron Guard - Production Environment Check", () => {
+describe('Cron Guard - Production Environment Check', () => {
   let originalEnv: Record<string, string | undefined>;
 
   beforeEach(() => {
@@ -72,13 +61,19 @@ describe("Cron Guard - Production Environment Check", () => {
       NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     };
 
+    // Default mock return values for prisma
+    vi.mocked(prisma.userPrivacyPreferences.findMany).mockResolvedValue([] as never);
+    vi.mocked(prisma.userActivity.deleteMany).mockResolvedValue({} as never);
+    vi.mocked(prisma.funnelEvent.groupBy).mockResolvedValue([] as never);
+    vi.mocked(prisma.funnelEvent.findFirst).mockResolvedValue(null as never);
+    vi.mocked(prisma.trialSession.findMany).mockResolvedValue([] as never);
+
     // Set default values for testing
-    process.env.CRON_SECRET = "test-secret";
-    process.env.GRAFANA_CLOUD_PROMETHEUS_URL =
-      "https://test.grafana.net/api/prom/push";
-    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = "test-user";
-    process.env.GRAFANA_CLOUD_API_KEY = "test-key";
-    process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
+    process.env.CRON_SECRET = 'test-secret';
+    process.env.GRAFANA_CLOUD_PROMETHEUS_URL = 'https://test.grafana.net/api/prom/push';
+    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = 'test-user';
+    process.env.GRAFANA_CLOUD_API_KEY = 'test-key';
+    process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
   });
 
   afterEach(() => {
@@ -92,68 +87,59 @@ describe("Cron Guard - Production Environment Check", () => {
     });
   });
 
-  describe("data-retention cron", () => {
+  describe('data-retention cron', () => {
     it("should skip when VERCEL_ENV is 'staging'", async () => {
-      process.env.VERCEL_ENV = "staging";
+      process.env.VERCEL_ENV = 'staging';
 
-      const { GET } = await import("../data-retention/route");
+      const { GET } = await import('../data-retention/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/data-retention"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/data-retention'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
-      expect(data.environment).toBe("staging");
+      expect(data.reason).toBe('Not production environment');
+      expect(data.environment).toBe('staging');
     });
 
     it("should skip when VERCEL_ENV is 'preview'", async () => {
-      process.env.VERCEL_ENV = "preview";
+      process.env.VERCEL_ENV = 'preview';
 
-      const { GET } = await import("../data-retention/route");
+      const { GET } = await import('../data-retention/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/data-retention"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/data-retention'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
+      expect(data.reason).toBe('Not production environment');
     });
 
     it("should allow execution when VERCEL_ENV is 'production'", async () => {
-      process.env.VERCEL_ENV = "production";
+      process.env.VERCEL_ENV = 'production';
 
-      const { GET } = await import("../data-retention/route");
+      const { GET } = await import('../data-retention/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/data-retention"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/data-retention'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
@@ -164,67 +150,61 @@ describe("Cron Guard - Production Environment Check", () => {
     });
   });
 
-  describe("metrics-push cron", () => {
+  describe('metrics-push cron', () => {
     it("should skip when VERCEL_ENV is 'staging'", async () => {
-      process.env.VERCEL_ENV = "staging";
+      process.env.VERCEL_ENV = 'staging';
 
-      const { GET } = await import("../metrics-push/route");
+      const { GET } = await import('../metrics-push/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/metrics-push"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/metrics-push'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
-      expect(data.environment).toBe("staging");
+      expect(data.reason).toBe('Not production environment');
+      expect(data.environment).toBe('staging');
     });
 
     it("should skip when VERCEL_ENV is 'preview'", async () => {
-      process.env.VERCEL_ENV = "preview";
+      process.env.VERCEL_ENV = 'preview';
 
-      const { GET } = await import("../metrics-push/route");
+      const { GET } = await import('../metrics-push/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/metrics-push"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/metrics-push'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
+      expect(data.reason).toBe('Not production environment');
     });
   });
 
-  describe("business-metrics-daily cron", () => {
+  describe('business-metrics-daily cron', () => {
     it("should skip when VERCEL_ENV is 'staging'", async () => {
-      process.env.VERCEL_ENV = "staging";
+      process.env.VERCEL_ENV = 'staging';
 
-      const { GET } = await import("../business-metrics-daily/route");
+      const { GET } = await import('../business-metrics-daily/route');
 
       const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/business-metrics-daily"),
+        new URL('http://localhost:3000/api/cron/business-metrics-daily'),
         {
-          method: "GET",
+          method: 'GET',
           headers: {
-            authorization: "Bearer test-secret",
+            authorization: 'Bearer test-secret',
           },
         },
       );
@@ -234,21 +214,21 @@ describe("Cron Guard - Production Environment Check", () => {
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
-      expect(data.environment).toBe("staging");
+      expect(data.reason).toBe('Not production environment');
+      expect(data.environment).toBe('staging');
     });
 
     it("should skip when VERCEL_ENV is 'preview'", async () => {
-      process.env.VERCEL_ENV = "preview";
+      process.env.VERCEL_ENV = 'preview';
 
-      const { GET } = await import("../business-metrics-daily/route");
+      const { GET } = await import('../business-metrics-daily/route');
 
       const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/business-metrics-daily"),
+        new URL('http://localhost:3000/api/cron/business-metrics-daily'),
         {
-          method: "GET",
+          method: 'GET',
           headers: {
-            authorization: "Bearer test-secret",
+            authorization: 'Bearer test-secret',
           },
         },
       );
@@ -258,56 +238,50 @@ describe("Cron Guard - Production Environment Check", () => {
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
+      expect(data.reason).toBe('Not production environment');
     });
   });
 
-  describe("trial-nurturing cron", () => {
+  describe('trial-nurturing cron', () => {
     it("should skip when VERCEL_ENV is 'staging'", async () => {
-      process.env.VERCEL_ENV = "staging";
+      process.env.VERCEL_ENV = 'staging';
 
-      const { GET } = await import("../trial-nurturing/route");
+      const { GET } = await import('../trial-nurturing/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/trial-nurturing"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/trial-nurturing'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
-      expect(data.environment).toBe("staging");
+      expect(data.reason).toBe('Not production environment');
+      expect(data.environment).toBe('staging');
     });
 
     it("should skip when VERCEL_ENV is 'preview'", async () => {
-      process.env.VERCEL_ENV = "preview";
+      process.env.VERCEL_ENV = 'preview';
 
-      const { GET } = await import("../trial-nurturing/route");
+      const { GET } = await import('../trial-nurturing/route');
 
-      const request = new NextRequest(
-        new URL("http://localhost:3000/api/cron/trial-nurturing"),
-        {
-          method: "GET",
-          headers: {
-            authorization: "Bearer test-secret",
-          },
+      const request = new NextRequest(new URL('http://localhost:3000/api/cron/trial-nurturing'), {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer test-secret',
         },
-      );
+      });
 
       const response = await GET(request);
       const data = await response.json();
 
       expect(response.status).toBe(200);
       expect(data.skipped).toBe(true);
-      expect(data.reason).toBe("Not production environment");
+      expect(data.reason).toBe('Not production environment');
     });
   });
 });

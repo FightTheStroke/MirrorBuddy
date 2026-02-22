@@ -31,20 +31,12 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-const mockPrisma = {
-  $queryRaw: vi.fn().mockResolvedValue([]),
-  userActivity: {
-    deleteMany: vi.fn().mockResolvedValue({}),
-  },
-  funnelEvent: {
-    groupBy: vi.fn().mockResolvedValue([]),
-  },
-  waitlistEntry: {
-    count: vi.fn(),
-  },
-};
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
-vi.mock('@/lib/db', () => ({ prisma: mockPrisma }));
+import { prisma } from '@/lib/db';
 
 vi.mock('@/lib/observability/metrics-store', () => ({
   metricsStore: {
@@ -90,7 +82,7 @@ describe('metrics-push - waitlist KPIs', () => {
     process.env.GRAFANA_CLOUD_API_KEY = 'test-key';
 
     // Setup waitlistEntry.count mock: 100 total, 80 verified, 10 unsubscribed, 5 redeemed, 20 converted
-    mockPrisma.waitlistEntry.count
+    prisma.waitlistEntry.count
       .mockResolvedValueOnce(100) // total signups
       .mockResolvedValueOnce(80) // verified
       .mockResolvedValueOnce(10) // unsubscribed
@@ -98,7 +90,7 @@ describe('metrics-push - waitlist KPIs', () => {
       .mockResolvedValueOnce(20); // converted
 
     vi.clearAllMocks();
-    mockPrisma.waitlistEntry.count
+    prisma.waitlistEntry.count
       .mockResolvedValueOnce(100)
       .mockResolvedValueOnce(80)
       .mockResolvedValueOnce(10)
@@ -127,7 +119,7 @@ describe('metrics-push - waitlist KPIs', () => {
 
     await POST(request);
 
-    expect(mockPrisma.waitlistEntry.count).toHaveBeenCalledTimes(5);
+    expect(prisma.waitlistEntry.count).toHaveBeenCalledTimes(5);
   });
 
   it('should push waitlist_signups_total metric to Grafana', async () => {

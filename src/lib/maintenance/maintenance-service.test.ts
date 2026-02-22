@@ -1,25 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { prisma } from '@/lib/db';
 
-const { mockFindFirst, mockFindMany, mockCreate, mockUpdate, mockGetMaintenanceMode } = vi.hoisted(
-  () => ({
-    mockFindFirst: vi.fn(),
-    mockFindMany: vi.fn(),
-    mockCreate: vi.fn(),
-    mockUpdate: vi.fn(),
-    mockGetMaintenanceMode: vi.fn(),
-  }),
-);
-
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    maintenanceWindow: {
-      findFirst: mockFindFirst,
-      findMany: mockFindMany,
-      create: mockCreate,
-      update: mockUpdate,
-    },
-  },
+const { mockGetMaintenanceMode } = vi.hoisted(() => ({
+  mockGetMaintenanceMode: vi.fn(),
 }));
+
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/admin/control-panel-service', () => ({
   getMaintenanceMode: mockGetMaintenanceMode,
@@ -31,7 +20,7 @@ describe('maintenance-service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     delete process.env.MAINTENANCE_MODE;
-    mockFindFirst.mockResolvedValue(null);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValue(null);
     mockGetMaintenanceMode.mockReturnValue({
       isEnabled: false,
       customMessage: '',
@@ -68,12 +57,12 @@ describe('maintenance-service', () => {
         isActive: true,
         source: 'env',
       });
-      expect(mockFindFirst).not.toHaveBeenCalled();
+      expect(prisma.maintenanceWindow.findFirst).not.toHaveBeenCalled();
       expect(mockGetMaintenanceMode).not.toHaveBeenCalled();
     });
 
     it('returns db state when an active maintenance window exists', async () => {
-      mockFindFirst.mockResolvedValue({
+      vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValue({
         id: 'mw-1',
         startTime: new Date('2026-02-15T10:00:00Z'),
         endTime: new Date('2026-02-15T11:00:00Z'),

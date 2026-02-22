@@ -27,99 +27,10 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
   };
 });
 
-// Create a mock transaction object that mirrors prisma structure
-const mockTx = {
-  user: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 5 }),
-  },
-  conversation: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 10 }),
-  },
-  message: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 50 }),
-  },
-  flashcardProgress: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 20 }),
-  },
-  quizResult: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 15 }),
-  },
-  material: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 8 }),
-  },
-  sessionMetrics: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 30 }),
-  },
-  userActivity: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 40 }),
-  },
-  telemetryEvent: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 100 }),
-  },
-  studySession: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 12 }),
-  },
-  funnelEvent: {
-    deleteMany: vi.fn().mockResolvedValue({ count: 25 }),
-  },
-};
-
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    user: {
-      count: vi.fn().mockResolvedValue(5),
-      deleteMany: vi.fn().mockResolvedValue({ count: 5 }),
-    },
-    conversation: {
-      count: vi.fn().mockResolvedValue(10),
-      deleteMany: vi.fn().mockResolvedValue({ count: 10 }),
-    },
-    message: {
-      count: vi.fn().mockResolvedValue(50),
-      deleteMany: vi.fn().mockResolvedValue({ count: 50 }),
-    },
-    flashcardProgress: {
-      count: vi.fn().mockResolvedValue(20),
-      deleteMany: vi.fn().mockResolvedValue({ count: 20 }),
-    },
-    quizResult: {
-      count: vi.fn().mockResolvedValue(15),
-      deleteMany: vi.fn().mockResolvedValue({ count: 15 }),
-    },
-    material: {
-      count: vi.fn().mockResolvedValue(8),
-      deleteMany: vi.fn().mockResolvedValue({ count: 8 }),
-    },
-    sessionMetrics: {
-      count: vi.fn().mockResolvedValue(30),
-      deleteMany: vi.fn().mockResolvedValue({ count: 30 }),
-    },
-    userActivity: {
-      count: vi.fn().mockResolvedValue(40),
-      deleteMany: vi.fn().mockResolvedValue({ count: 40 }),
-    },
-    telemetryEvent: {
-      count: vi.fn().mockResolvedValue(100),
-      deleteMany: vi.fn().mockResolvedValue({ count: 100 }),
-    },
-    studySession: {
-      count: vi.fn().mockResolvedValue(12),
-      deleteMany: vi.fn().mockResolvedValue({ count: 12 }),
-    },
-    funnelEvent: {
-      count: vi.fn().mockResolvedValue(25),
-      deleteMany: vi.fn().mockResolvedValue({ count: 25 }),
-    },
-    complianceAuditEntry: {
-      create: vi.fn().mockResolvedValue({
-        id: 'audit-1',
-        eventType: 'admin_action',
-        severity: 'info',
-      }),
-    },
-    $transaction: vi.fn().mockImplementation((callback) => callback(mockTx)),
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -145,10 +56,49 @@ vi.mock('@/lib/security', async (importOriginal) => {
 });
 
 import { GET, DELETE } from '../route';
+import { prisma } from '@/lib/db';
 
 describe('admin purge-staging-data API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Default mock return values for GET (preview counts)
+    vi.mocked(prisma.user.count).mockResolvedValue(5 as never);
+    vi.mocked(prisma.conversation.count).mockResolvedValue(10 as never);
+    vi.mocked(prisma.message.count).mockResolvedValue(50 as never);
+    vi.mocked(prisma.flashcardProgress.count).mockResolvedValue(20 as never);
+    vi.mocked(prisma.quizResult.count).mockResolvedValue(15 as never);
+    vi.mocked(prisma.material.count).mockResolvedValue(8 as never);
+    vi.mocked(prisma.sessionMetrics.count).mockResolvedValue(30 as never);
+    vi.mocked(prisma.userActivity.count).mockResolvedValue(40 as never);
+    vi.mocked(prisma.telemetryEvent.count).mockResolvedValue(100 as never);
+    vi.mocked(prisma.studySession.count).mockResolvedValue(12 as never);
+    vi.mocked(prisma.funnelEvent.count).mockResolvedValue(25 as never);
+
+    // Default for DELETE (audit log)
+    vi.mocked(prisma.complianceAuditEntry.create).mockResolvedValue({
+      id: 'audit-1',
+      eventType: 'admin_action',
+      severity: 'info',
+    } as never);
+
+    // Default for DELETE ($transaction)
+    const mockTx = {
+      user: { deleteMany: vi.fn().mockResolvedValue({ count: 5 }) },
+      conversation: { deleteMany: vi.fn().mockResolvedValue({ count: 10 }) },
+      message: { deleteMany: vi.fn().mockResolvedValue({ count: 50 }) },
+      flashcardProgress: { deleteMany: vi.fn().mockResolvedValue({ count: 20 }) },
+      quizResult: { deleteMany: vi.fn().mockResolvedValue({ count: 15 }) },
+      material: { deleteMany: vi.fn().mockResolvedValue({ count: 8 }) },
+      sessionMetrics: { deleteMany: vi.fn().mockResolvedValue({ count: 30 }) },
+      userActivity: { deleteMany: vi.fn().mockResolvedValue({ count: 40 }) },
+      telemetryEvent: { deleteMany: vi.fn().mockResolvedValue({ count: 100 }) },
+      studySession: { deleteMany: vi.fn().mockResolvedValue({ count: 12 }) },
+      funnelEvent: { deleteMany: vi.fn().mockResolvedValue({ count: 25 }) },
+    };
+    vi.mocked(prisma.$transaction).mockImplementation((callback: unknown) =>
+      (callback as Function)(mockTx),
+    );
   });
 
   describe('GET - Preview counts', () => {

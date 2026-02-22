@@ -1,31 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    researchExperiment: {
-      create: vi.fn().mockResolvedValue({ id: 'exp-mock-1' }),
-      update: vi.fn().mockResolvedValue({}),
-      findUnique: vi.fn().mockResolvedValue({
-        id: 'exp-mock-1',
-        status: 'draft',
-        maestroId: 'maestro-math',
-        syntheticProfile: { name: 'Marco-Dyslexic-12' },
-        config: { topic: 'fractions', difficulty: 'medium' },
-        turns: 3,
-      }),
-    },
-    researchResult: {
-      create: vi.fn().mockResolvedValue({ id: 'result-1' }),
-      findMany: vi.fn().mockResolvedValue([
-        {
-          studentMessage: 'Non capisco',
-          maestroResponse: 'Passo 1: iniziamo con...',
-        },
-      ]),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/ai/server', () => ({
   chatCompletion: vi.fn().mockResolvedValue({
@@ -55,6 +34,25 @@ const mockExperimentCreate = vi.mocked(prisma.researchExperiment.create);
 describe('model-comparison', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Default mock return values for prisma
+    vi.mocked(prisma.researchExperiment.update).mockResolvedValue({} as never);
+    vi.mocked(prisma.researchExperiment.findUnique).mockResolvedValue({
+      id: 'exp-mock-1',
+      status: 'draft',
+      maestroId: 'maestro-math',
+      syntheticProfile: { name: 'Marco-Dyslexic-12' },
+      config: { topic: 'fractions', difficulty: 'medium' },
+      turns: 3,
+    } as never);
+    vi.mocked(prisma.researchResult.create).mockResolvedValue({ id: 'result-1' } as never);
+    vi.mocked(prisma.researchResult.findMany).mockResolvedValue([
+      {
+        studentMessage: 'Non capisco',
+        maestroResponse: 'Passo 1: iniziamo con...',
+      },
+    ] as never);
+
     // Reset create mock to return incrementing IDs
     let callCount = 0;
     mockExperimentCreate.mockImplementation(() => {

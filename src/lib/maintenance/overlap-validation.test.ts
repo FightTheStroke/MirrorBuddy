@@ -1,16 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { prisma } from '@/lib/db';
 
-const { mockFindFirst } = vi.hoisted(() => ({
-  mockFindFirst: vi.fn(),
-}));
-
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    maintenanceWindow: {
-      findFirst: mockFindFirst,
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 import { checkOverlap } from './overlap-validation';
 
@@ -20,7 +14,7 @@ describe('overlap-validation', () => {
   });
 
   it('returns overlaps=false when there is no conflicting window', async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValueOnce(null);
 
     const result = await checkOverlap(
       new Date('2026-03-01T10:00:00.000Z'),
@@ -44,7 +38,7 @@ describe('overlap-validation', () => {
       createdAt: new Date('2026-03-01T09:00:00.000Z'),
       updatedAt: new Date('2026-03-01T09:00:00.000Z'),
     };
-    mockFindFirst.mockResolvedValueOnce(conflictingWindow);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValueOnce(conflictingWindow);
 
     const result = await checkOverlap(
       new Date('2026-03-01T10:15:00.000Z'),
@@ -68,7 +62,7 @@ describe('overlap-validation', () => {
       createdAt: new Date('2026-03-01T09:30:00.000Z'),
       updatedAt: new Date('2026-03-01T09:30:00.000Z'),
     };
-    mockFindFirst.mockResolvedValueOnce(conflictingWindow);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValueOnce(conflictingWindow);
 
     const result = await checkOverlap(
       new Date('2026-03-01T10:00:00.000Z'),
@@ -79,13 +73,13 @@ describe('overlap-validation', () => {
   });
 
   it('uses strict range boundaries so adjacent windows are allowed', async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValueOnce(null);
     const startTime = new Date('2026-03-01T11:00:00.000Z');
     const endTime = new Date('2026-03-01T12:00:00.000Z');
 
     await checkOverlap(startTime, endTime);
 
-    expect(mockFindFirst).toHaveBeenCalledWith(
+    expect(prisma.maintenanceWindow.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           startTime: { lt: endTime },
@@ -96,7 +90,7 @@ describe('overlap-validation', () => {
   });
 
   it('excludes the same window when excludeId is provided', async () => {
-    mockFindFirst.mockResolvedValueOnce(null);
+    vi.mocked(prisma.maintenanceWindow.findFirst).mockResolvedValueOnce(null);
     const excludeId = 'mw-same-id';
 
     await checkOverlap(
@@ -105,7 +99,7 @@ describe('overlap-validation', () => {
       excludeId,
     );
 
-    expect(mockFindFirst).toHaveBeenCalledWith(
+    expect(prisma.maintenanceWindow.findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
           NOT: { id: excludeId },

@@ -5,16 +5,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
-vi.mock('@/lib/db', () => ({
-  prisma: {
-    waitlistEntry: {
-      findUnique: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      count: vi.fn(),
-    },
-  },
-}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 vi.mock('@/lib/funnel', () => ({
   recordFunnelEvent: vi.fn(),
@@ -56,15 +50,6 @@ import { prisma } from '@/lib/db';
 import { recordFunnelEvent } from '@/lib/funnel';
 import { signup, verify, unsubscribe } from '../waitlist-service';
 
-const mockPrisma = prisma as unknown as {
-  waitlistEntry: {
-    findUnique: ReturnType<typeof vi.fn>;
-    create: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
-    count: ReturnType<typeof vi.fn>;
-  };
-};
-
 const mockRecordFunnelEvent = recordFunnelEvent as ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
@@ -79,15 +64,15 @@ describe('signup', () => {
   });
 
   it('throws on duplicate email', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({ id: 'existing-id' });
+    prisma.waitlistEntry.findUnique.mockResolvedValue({ id: 'existing-id' });
     await expect(
       signup({ email: 'test@example.com', locale: 'it', gdprConsentVersion: '1.0' }),
     ).rejects.toThrow('Email already registered');
   });
 
   it('creates entry and records funnel event on success', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue(null);
-    mockPrisma.waitlistEntry.create.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue(null);
+    prisma.waitlistEntry.create.mockResolvedValue({
       id: 'new-id',
       email: 'test@example.com',
       verificationToken: 'token123',
@@ -99,7 +84,7 @@ describe('signup', () => {
       gdprConsentVersion: '1.0',
     });
 
-    expect(mockPrisma.waitlistEntry.create).toHaveBeenCalledOnce();
+    expect(prisma.waitlistEntry.create).toHaveBeenCalledOnce();
     expect(mockRecordFunnelEvent).toHaveBeenCalledWith(
       expect.objectContaining({ stage: 'WAITLIST_SIGNUP' }),
     );
@@ -113,8 +98,8 @@ describe('signup', () => {
   });
 
   it('sets marketingConsentAt when marketingConsent is true', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue(null);
-    mockPrisma.waitlistEntry.create.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue(null);
+    prisma.waitlistEntry.create.mockResolvedValue({
       id: 'new-id',
       email: 'test@example.com',
       verificationToken: 'token123',
@@ -127,7 +112,7 @@ describe('signup', () => {
       marketingConsent: true,
     });
 
-    const createCall = mockPrisma.waitlistEntry.create.mock.calls[0][0];
+    const createCall = prisma.waitlistEntry.create.mock.calls[0][0];
     expect(createCall.data.marketingConsent).toBe(true);
     expect(createCall.data.marketingConsentAt).toBeInstanceOf(Date);
   });
@@ -135,13 +120,13 @@ describe('signup', () => {
 
 describe('verify', () => {
   it('throws when token not found', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue(null);
+    prisma.waitlistEntry.findUnique.mockResolvedValue(null);
     await expect(verify('invalid-token')).rejects.toThrow('Invalid verification token');
   });
 
   it('throws when token is expired', async () => {
     const past = new Date(Date.now() - 25 * 60 * 60 * 1000); // 25h ago
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue({
       id: 'id',
       verifiedAt: null,
       verificationExpiresAt: past,
@@ -150,7 +135,7 @@ describe('verify', () => {
   });
 
   it('throws when already verified', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue({
       id: 'id',
       verifiedAt: new Date(),
       verificationExpiresAt: new Date(Date.now() + 3600000),
@@ -160,14 +145,14 @@ describe('verify', () => {
 
   it('sets verifiedAt and generates promoCode on success', async () => {
     const future = new Date(Date.now() + 3600000);
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       verifiedAt: null,
       verificationExpiresAt: future,
       locale: 'it',
     });
-    mockPrisma.waitlistEntry.update.mockResolvedValue({
+    prisma.waitlistEntry.update.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       verifiedAt: new Date(),
@@ -176,8 +161,8 @@ describe('verify', () => {
 
     const result = await verify('valid-token');
 
-    expect(mockPrisma.waitlistEntry.update).toHaveBeenCalledOnce();
-    const updateCall = mockPrisma.waitlistEntry.update.mock.calls[0][0];
+    expect(prisma.waitlistEntry.update).toHaveBeenCalledOnce();
+    const updateCall = prisma.waitlistEntry.update.mock.calls[0][0];
     expect(updateCall.data.verifiedAt).toBeInstanceOf(Date);
     expect(updateCall.data.promoCode).toMatch(/^[A-Z0-9]{8}$/);
     expect(mockRecordFunnelEvent).toHaveBeenCalledWith(
@@ -189,17 +174,17 @@ describe('verify', () => {
 
 describe('unsubscribe', () => {
   it('throws when token not found', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue(null);
+    prisma.waitlistEntry.findUnique.mockResolvedValue(null);
     await expect(unsubscribe('invalid-token')).rejects.toThrow('Invalid unsubscribe token');
   });
 
   it('sets unsubscribedAt on success', async () => {
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       unsubscribedAt: null,
     });
-    mockPrisma.waitlistEntry.update.mockResolvedValue({
+    prisma.waitlistEntry.update.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       unsubscribedAt: new Date(),
@@ -207,20 +192,20 @@ describe('unsubscribe', () => {
 
     const result = await unsubscribe('valid-unsubscribe-token');
 
-    expect(mockPrisma.waitlistEntry.update).toHaveBeenCalledOnce();
-    const updateCall = mockPrisma.waitlistEntry.update.mock.calls[0][0];
+    expect(prisma.waitlistEntry.update).toHaveBeenCalledOnce();
+    const updateCall = prisma.waitlistEntry.update.mock.calls[0][0];
     expect(updateCall.data.unsubscribedAt).toBeInstanceOf(Date);
     expect(result).toMatchObject({ email: 'test@example.com' });
   });
 
   it('is idempotent when already unsubscribed', async () => {
     const alreadyUnsubscribed = new Date(Date.now() - 3600000);
-    mockPrisma.waitlistEntry.findUnique.mockResolvedValue({
+    prisma.waitlistEntry.findUnique.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       unsubscribedAt: alreadyUnsubscribed,
     });
-    mockPrisma.waitlistEntry.update.mockResolvedValue({
+    prisma.waitlistEntry.update.mockResolvedValue({
       id: 'id',
       email: 'test@example.com',
       unsubscribedAt: alreadyUnsubscribed,
