@@ -1,170 +1,91 @@
 /**
  * E2E Tests: Welcome Hero Section Translations
  *
- * Verifies that hardcoded Italian strings in the hero section are properly
- * translated using i18n t() calls across all supported locales.
+ * Verifies that the hero section beta badge is properly translated
+ * and shows the dynamic app version (not hardcoded).
  *
  * Test Coverage:
- * - Beta badge text uses t("betaBadge")
- * - Beta subtitle text uses t("betaSubtitle")
- * - Aria label includes translated beta badge
+ * - Beta badge text uses t("betaBadge") per locale
+ * - Version shown is dynamic (from APP_VERSION env var)
+ * - Aria label includes translated beta badge + version
  * - All locales (it, en, fr, de, es) render correctly
  *
  * Run: npx playwright test e2e/welcome-hero-translations.spec.ts
  * Run specific locale: npx playwright test e2e/welcome-hero-translations.spec.ts --grep "@it"
- *
- * F-xx: Replace hardcoded strings with t() calls
  */
 
-import { test, expect, testAllLocales } from "./fixtures";
+import { test, expect, testAllLocales } from './fixtures';
 
 // IMPORTANT: These tests check unauthenticated /welcome page
-// Override global storageState to start without authentication
 test.use({ storageState: undefined });
 
-const EXPECTED_TRANSLATIONS = {
-  it: {
-    betaBadge: "Beta Privata",
-    betaSubtitle: "MirrorBuddy v0.10",
-  },
-  en: {
-    betaBadge: "Private Beta",
-    betaSubtitle: "MirrorBuddy v0.10",
-  },
-  fr: {
-    betaBadge: "Bêta Privée",
-    betaSubtitle: "MirrorBuddy v0.10",
-  },
-  de: {
-    betaBadge: "Private Beta",
-    betaSubtitle: "MirrorBuddy v0.10",
-  },
-  es: {
-    betaBadge: "Beta Privada",
-    betaSubtitle: "MirrorBuddy v0.10",
-  },
+const EXPECTED_BADGE_TEXT: Record<string, string> = {
+  it: 'Beta Privata',
+  en: 'Private Beta',
+  fr: 'Bêta Privée',
+  de: 'Private Beta',
+  es: 'Beta Privada',
 };
 
-// Test new user welcome page (shows hero section)
-testAllLocales(
-  "hero section displays correct beta badge text",
-  async ({ localePage }) => {
-    await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("domcontentloaded");
+testAllLocales('hero section displays correct beta badge text', async ({ localePage }) => {
+  await localePage.goto('/welcome');
+  await localePage.page.waitForLoadState('domcontentloaded');
 
-    // Find the beta badge (uppercase span with font-bold)
-    const badgeSpan = localePage.page.locator(".uppercase.font-bold").first();
-    await expect(badgeSpan).toBeVisible();
+  const badgeSpan = localePage.page.locator('.uppercase.font-bold').first();
+  await expect(badgeSpan).toBeVisible();
 
-    // Get the text content
-    const badgeText = await badgeSpan.textContent();
-
-    // Verify the translation is being used
-    const expectedBadge =
-      EXPECTED_TRANSLATIONS[
-        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
-      ]?.betaBadge || EXPECTED_TRANSLATIONS.it.betaBadge;
-    expect(badgeText?.trim()).toBe(expectedBadge);
-  },
-);
-
-testAllLocales(
-  "hero section displays correct beta subtitle text",
-  async ({ localePage }) => {
-    await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("domcontentloaded");
-
-    // Find the beta subtitle (small text inside the badge container)
-    const badgeDiv = localePage.page
-      .locator(".uppercase.font-bold")
-      .first()
-      .locator("..");
-    const subtitleSpan = badgeDiv.locator("span").nth(1); // Second span in the badge
-    await expect(subtitleSpan).toBeVisible();
-
-    // Get the text content
-    const subtitleText = await subtitleSpan.textContent();
-
-    // Verify the translation is being used
-    const expectedSubtitle =
-      EXPECTED_TRANSLATIONS[
-        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
-      ]?.betaSubtitle || EXPECTED_TRANSLATIONS.it.betaSubtitle;
-    expect(subtitleText?.trim()).toBe(expectedSubtitle);
-  },
-);
-
-testAllLocales(
-  "hero section aria-label uses translation",
-  async ({ localePage }) => {
-    await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("domcontentloaded");
-
-    // Find the beta badge container with aria-label (motion.div renders as div)
-    const betaBadgeContainer = localePage.page
-      .locator("div[aria-label]")
-      .filter({
-        has: localePage.page.locator(".uppercase.font-bold"),
-      });
-
-    // Check aria-label includes the translated text
-    const ariaLabel = await betaBadgeContainer
-      .first()
-      .getAttribute("aria-label");
-    expect(ariaLabel).toBeDefined();
-
-    // Verify it uses the correct locale translation, not hardcoded Italian
-    const expectedBadge =
-      EXPECTED_TRANSLATIONS[
-        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
-      ]?.betaBadge || EXPECTED_TRANSLATIONS.it.betaBadge;
-    expect(ariaLabel).toContain(expectedBadge);
-  },
-);
-
-// Regression test: ensure beta badge uses translations across all locales
-test("@it: verify Italian beta badge uses correct translations", async ({
-  page,
-}) => {
-  await page.goto("/it/welcome");
-  await page.waitForLoadState("domcontentloaded");
-
-  // Verify Italian translations are displayed
-  const badgeText = await page
-    .locator(".uppercase.font-bold")
-    .first()
-    .textContent();
-  expect(badgeText?.trim()).toBe("Beta Privata");
-
-  const subtitleText = await page
-    .locator(".uppercase.font-bold")
-    .first()
-    .locator("..")
-    .locator("span")
-    .nth(1)
-    .textContent();
-  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
+  const badgeText = await badgeSpan.textContent();
+  const expected = EXPECTED_BADGE_TEXT[localePage.locale] || EXPECTED_BADGE_TEXT.it;
+  expect(badgeText?.trim()).toBe(expected);
 });
 
-test("@en: verify English beta badge uses correct translations", async ({
-  page,
-}) => {
-  await page.goto("/en/welcome");
-  await page.waitForLoadState("domcontentloaded");
+testAllLocales('hero section displays dynamic version in badge', async ({ localePage }) => {
+  await localePage.goto('/welcome');
+  await localePage.page.waitForLoadState('domcontentloaded');
 
-  // Verify English translations are displayed
-  const badgeText = await page
-    .locator(".uppercase.font-bold")
-    .first()
-    .textContent();
-  expect(badgeText?.trim()).toBe("Private Beta");
+  // Version span is the second span inside the badge (font-mono class)
+  const versionSpan = localePage.page.locator('.font-mono').first();
+  await expect(versionSpan).toBeVisible();
 
-  const subtitleText = await page
-    .locator(".uppercase.font-bold")
-    .first()
-    .locator("..")
-    .locator("span")
-    .nth(1)
-    .textContent();
-  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
+  const versionText = await versionSpan.textContent();
+  // Version must match semver pattern vX.Y.Z
+  expect(versionText?.trim()).toMatch(/^v\d+\.\d+\.\d+$/);
+});
+
+testAllLocales('hero section aria-label uses translation and version', async ({ localePage }) => {
+  await localePage.goto('/welcome');
+  await localePage.page.waitForLoadState('domcontentloaded');
+
+  const betaBadgeContainer = localePage.page.locator('div[aria-label]').filter({
+    has: localePage.page.locator('.uppercase.font-bold'),
+  });
+
+  const ariaLabel = await betaBadgeContainer.first().getAttribute('aria-label');
+  expect(ariaLabel).toBeDefined();
+
+  const expected = EXPECTED_BADGE_TEXT[localePage.locale] || EXPECTED_BADGE_TEXT.it;
+  expect(ariaLabel).toContain(expected);
+  expect(ariaLabel).toMatch(/v\d+\.\d+\.\d+/);
+});
+
+test('@it: verify Italian beta badge with dynamic version', async ({ page }) => {
+  await page.goto('/it/welcome');
+  await page.waitForLoadState('domcontentloaded');
+
+  const badgeText = await page.locator('.uppercase.font-bold').first().textContent();
+  expect(badgeText?.trim()).toBe('Beta Privata');
+
+  const versionText = await page.locator('.font-mono').first().textContent();
+  expect(versionText?.trim()).toMatch(/^v\d+\.\d+\.\d+$/);
+});
+
+test('@en: verify English beta badge with dynamic version', async ({ page }) => {
+  await page.goto('/en/welcome');
+  await page.waitForLoadState('domcontentloaded');
+
+  const badgeText = await page.locator('.uppercase.font-bold').first().textContent();
+  expect(badgeText?.trim()).toBe('Private Beta');
+
+  const versionText = await page.locator('.font-mono').first().textContent();
+  expect(versionText?.trim()).toMatch(/^v\d+\.\d+\.\d+$/);
 });
