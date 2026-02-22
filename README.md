@@ -11,6 +11,8 @@
 
 <p align="center">
   <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://mirrorbuddy.org/api/version"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fmirrorbuddy.org%2Fapi%2Fshields%2Fversion&label=production" alt="Production Version"></a>
+  <a href="https://mirrorbuddy.org/api/health"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fmirrorbuddy.org%2Fapi%2Fshields%2Fhealth&label=status" alt="Production Health"></a>
   <img src="https://img.shields.io/badge/tests-6790-brightgreen" alt="Tests: 6790">
   <img src="https://img.shields.io/badge/e2e-229-blue" alt="E2E: 229">
   <img src="https://img.shields.io/badge/coverage-80%25-brightgreen" alt="Coverage: 80%">
@@ -157,7 +159,7 @@ graph LR
     Character --> Tools["🧰 14 Tools<br/>Quiz, Mindmap, Flashcard..."]
     Tools --> Response["📚 Personalized<br/>Response"]
     Response --> Student
-    
+
     AI --> RAG["📖 RAG<br/>Student Materials"]
     RAG --> AI
 ```
