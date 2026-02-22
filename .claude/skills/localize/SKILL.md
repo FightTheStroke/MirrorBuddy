@@ -14,6 +14,12 @@ user-invocable: true
 
 Localization verification for MirrorBuddy (5 languages: it, en, fr, de, es).
 
+## When to Use
+
+- Adding or changing UI text
+- Checking PRs that touch user-facing copy
+- Auditing locale completeness before merge
+
 ## Workflow
 
 ### 1. Run Full i18n Check
@@ -28,17 +34,25 @@ npm run i18n:check
 npx eslint {file} --rule 'local-rules/no-hardcoded-italian: error'
 ```
 
-### 3. Fix and Recheck
+### 3. Verify Translation Keys and Recheck
 
-For missing keys: add translations to `messages/{locale}.json`. For hardcoded Italian: use `useTranslations()` hook.
-
-## Quick Commands
+For each missing key: verify intent, sync locales, then rerun checks.
 
 ```bash
-npm run i18n:check                    # Full check
-grep -r "key.name" src/               # Find key usage
-jq 'keys | length' messages/*.json    # Count keys per locale
+npx tsx scripts/i18n-sync-namespaces.ts --add-missing
+npm run i18n:check
 ```
+
+### 4. Fix Hardcoded Italian
+
+- BAD: `<span>Ciao!</span>`
+- GOOD: `const t = useTranslations(); <span>{t('greetings.hello')}</span>`
+
+## Verification Checklist
+
+- [ ] `npm run i18n:check` returns PASS
+- [ ] No hardcoded Italian detected
+- [ ] All 5 locales have aligned key coverage
 
 ## Blocking Rules
 

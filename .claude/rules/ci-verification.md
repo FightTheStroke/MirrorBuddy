@@ -35,33 +35,14 @@ Drill down: `./scripts/health-check.sh --drill [ci|debt|i18n|comp|migrations]`
 
 ## Multi-Agent Build Lock
 
-Modes that include a build (`default`, `--full`, `--build`, `--all`) acquire an exclusive lock via `/tmp/mirrorbuddy-build-lock-{PWD-hash}`. This prevents concurrent `next build` from corrupting `.next/`.
-
-- **Lock is per-directory**: agents in different worktrees do NOT block each other.
-- **Same directory**: agents wait up to `BUILD_LOCK_TIMEOUT` (default 120s), then fail.
-- **Stale locks** (dead PID) are auto-cleaned.
-
-| Scenario                  | Recommended mode                        |
-| ------------------------- | --------------------------------------- |
-| Development (any agent)   | `--quick` (no build lock)               |
-| Single check              | `--lint`, `--types`, `--unit` (no lock) |
-| Thor / pre-commit         | `--full` or default (acquires lock)     |
-| Multiple agents, same dir | Use separate worktrees or `--quick`     |
-
-Override timeout: `BUILD_LOCK_TIMEOUT=300 ./scripts/ci-summary.sh`
-Full help: `./scripts/ci-summary.sh --help`
+Build modes (`default`, `--full`, `--build`, `--all`) use `/tmp/mirrorbuddy-build-lock-{PWD-hash}` to serialize `next build` per worktree directory (stale PID locks are auto-cleaned).
+Override wait with `BUILD_LOCK_TIMEOUT=<seconds> ./scripts/ci-summary.sh ...` (default `120`).
+Full options and lock behavior details: `./scripts/ci-summary.sh --help`
 
 ## Quiet modes for scripts
 
-| Script                    | Flag             | Output                              |
-| ------------------------- | ---------------- | ----------------------------------- |
-| `compliance-check.ts`     | `--fail-only`    | Only FAIL/WARN, skip PASS           |
-| `compliance-check.ts`     | `--category X`   | Run single category (see below)     |
-| `debt-check.ts`           | `--summary`      | Counts only, no file list           |
-| `i18n-sync-namespaces.ts` | `--quiet`        | 1-line pass/fail                    |
-| `release-gate.sh`         | `--summary-only` | Counts + top 3 instead of full list |
-
-Verbose allowed only when summary output is unclear, or targeted: `npm run test:unit -- path/file 2>&1 | tail -5`
+Use each script's summary/quiet flags (for example `--fail-only`, `--category`, `--summary`, `--quiet`, `--summary-only`); check each script `--help` for current options.
+Use verbose output only when summaries are unclear, or for targeted debug runs: `npm run test:unit -- path/file 2>&1 | tail -5`
 
 ## Deep Compliance Check Categories
 
