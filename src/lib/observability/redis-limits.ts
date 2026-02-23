@@ -1,24 +1,22 @@
 /**
  * Redis Cache Limits (F-18, F-25)
  *
- * Monitors Redis memory and connection usage.
+ * Monitors Redis memory and connection usage via Upstash REST API.
  * Used for proactive alerts when approaching resource limits.
- *
- * Environment Variables Required:
- *   - REDIS_URL: Redis connection URL
  */
 
-import { logger } from "@/lib/logger";
-import { calculateStatus, AlertStatus } from "./threshold-logic";
+import { logger } from '@/lib/logger';
+import { isRedisConfigured, getRedisUrl, getRedisToken } from '@/lib/redis';
+import { calculateStatus, AlertStatus } from './threshold-logic';
 
 /**
  * Resource metric
  */
 export interface ResourceMetric {
-  used: number; // Used amount
-  limit: number; // Limit amount
-  percent: number; // Usage percentage (0-100)
-  status: AlertStatus; // Alert status from threshold logic
+  used: number;
+  limit: number;
+  percent: number;
+  status: AlertStatus;
 }
 
 /**
@@ -31,9 +29,6 @@ export interface RedisLimits {
   error?: string;
 }
 
-/**
- * Cache for rate limiting
- */
 interface CacheEntry {
   data: RedisLimits;
   expiresAt: number;
@@ -43,71 +38,76 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 let cache: CacheEntry | null = null;
 
 /**
- * Get Redis resource limits
- * Note: Requires REDIS_URL environment variable to be set.
- * In development, returns placeholder values if Redis is not available.
- *
- * @returns Promise<RedisLimits> Current Redis resource usage
+ * Get Redis resource limits from Upstash REST API
  */
 export async function getRedisLimits(): Promise<RedisLimits> {
-  // Check cache first
   if (cache && cache.expiresAt > Date.now()) {
-    logger.debug("Returning cached Redis limits");
+    logger.debug('Returning cached Redis limits');
     return cache.data;
   }
 
-  const redisUrl = process.env.REDIS_URL;
-
-  if (!redisUrl) {
-    const error = "REDIS_URL not configured";
-    logger.warn(error);
-    return createEmptyLimits(error);
+  if (!isRedisConfigured()) {
+    return createEmptyLimits('Redis not configured');
   }
 
-  try {
-    // Placeholder: Redis client would connect and query stats
-    // For now, return placeholder values
-    const memoryUsed = 0;
-    const memoryLimit = 256;
-    const memoryPercent = memoryLimit > 0 ? Math.round((memoryUsed / memoryLimit) * 100) : 0;
+  const url = getRedisUrl()!;
+  const token = getRedisToken()!;
 
-    const connectionsUsed = 0;
-    const connectionsLimit = 10000;
+  try {
+    const response = await fetch(`${url}/INFO`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      return createEmptyLimits(`Redis INFO failed: HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const infoString: string = data.result || '';
+
+    const infoMap: Record<string, string> = {};
+    for (const line of infoString.split('\n')) {
+      const [k, v] = line.split(':');
+      if (k && v) infoMap[k.trim()] = v.trim();
+    }
+
+    const memoryUsed = parseInt(infoMap.used_memory || '0', 10);
+    const maxMemory = parseInt(infoMap.maxmemory || '0', 10) || 268_435_456; // Default 256 MB (Upstash free)
+    const memoryPercent = maxMemory > 0 ? Math.round((memoryUsed / maxMemory) * 100) : 0;
+
+    const connectedClients = parseInt(infoMap.connected_clients || '0', 10);
+    const maxClients = parseInt(infoMap.maxclients || '0', 10) || 1000;
     const connectionsPercent =
-      connectionsLimit > 0 ? Math.round((connectionsUsed / connectionsLimit) * 100) : 0;
+      maxClients > 0 ? Math.round((connectedClients / maxClients) * 100) : 0;
 
     const limits: RedisLimits = {
       memory: {
         used: memoryUsed,
-        limit: memoryLimit,
+        limit: maxMemory,
         percent: memoryPercent,
-        status: calculateStatus(memoryPercent), // F-25
+        status: calculateStatus(memoryPercent),
       },
       connections: {
-        used: connectionsUsed,
-        limit: connectionsLimit,
+        used: connectedClients,
+        limit: maxClients,
         percent: connectionsPercent,
-        status: calculateStatus(connectionsPercent), // F-25
+        status: calculateStatus(connectionsPercent),
       },
       timestamp: Date.now(),
     };
 
-    // Update cache
-    cache = {
-      data: limits,
-      expiresAt: Date.now() + CACHE_TTL_MS,
-    };
+    cache = { data: limits, expiresAt: Date.now() + CACHE_TTL_MS };
 
-    logger.info("Redis limits fetched successfully", {
-      memory: "0.0%",
-      connections: "0.0%",
+    logger.info('Redis limits fetched', {
+      memory: `${memoryPercent}%`,
+      connections: `${connectionsPercent}%`,
     });
 
     return limits;
   } catch (error) {
-    const errorMsg =
-      error instanceof Error ? error.message : "Unknown error";
-    logger.error("Failed to fetch Redis limits", undefined, error as Error);
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Failed to fetch Redis limits', undefined, error as Error);
     return createEmptyLimits(errorMsg);
   }
 }
@@ -117,8 +117,8 @@ export async function getRedisLimits(): Promise<RedisLimits> {
  */
 function createEmptyLimits(error: string): RedisLimits {
   return {
-    memory: { used: 0, limit: 0, percent: 0, status: "ok" },
-    connections: { used: 0, limit: 0, percent: 0, status: "ok" },
+    memory: { used: 0, limit: 0, percent: 0, status: 'ok' },
+    connections: { used: 0, limit: 0, percent: 0, status: 'ok' },
     timestamp: Date.now(),
     error,
   };

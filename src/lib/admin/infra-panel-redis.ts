@@ -80,7 +80,7 @@ export async function getRedisMetrics(): Promise<RedisMetrics | null> {
       keysCount: parsed.keysCount || 0,
       hitRate: parsed.hitRate || 0,
       commands: parsed.commands || 0,
-      status: memoryUsage > 0.9 ? 'degraded' : memoryUsage > 0.95 ? 'down' : 'healthy',
+      status: memoryUsage > 0.95 ? 'down' : memoryUsage > 0.9 ? 'degraded' : 'healthy',
     };
   } catch (error) {
     logger.error('Error fetching Redis metrics', { error: String(error) });
