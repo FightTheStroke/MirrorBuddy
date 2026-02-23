@@ -88,20 +88,19 @@ docs/legal/
 # Business plan documents (confidential, financial data)
 docs/busplan/
 
-# Local audit notes
+# Historical local planning notes
 fallo17.md
 plan17.md
-# V1 Planning (internal, not tracked)
 V1Plan.md
 REPO-HYGIENE-PLAN.md
-.mcp.json
-audit-report.txt
-.env*.local
-.security-reports/
-
-# Local analysis notes
 Plan20Jan.md
 25JanCodexPlan.md
+audit-report.txt
+
+# Local config and security
+.mcp.json
+.env*.local
+.security-reports/
 
 # Cursor project MCP config (local, may contain secrets)
 .cursor/mcp.local.json

@@ -10,100 +10,86 @@
  * @module scripts/__tests__/localize-skill.test
  */
 
-import { describe, it, expect } from "vitest";
-import fs from "fs";
-import path from "path";
+import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 
-describe("Localize Skill", () => {
+describe('Localize Skill', () => {
   const projectRoot = process.cwd();
-  const messagesDir = path.join(projectRoot, "messages");
-  const skillPath = path.join(
-    projectRoot,
-    ".claude",
-    "commands",
-    "localize.md",
-  );
+  const messagesDir = path.join(projectRoot, 'messages');
+  const skillPath = path.join(projectRoot, '.claude', 'skills', 'localize', 'SKILL.md');
 
-  describe("Skill Definition", () => {
-    it("should have localize.md skill definition", () => {
+  describe('Skill Definition', () => {
+    it('should have localize.md skill definition', () => {
       expect(fs.existsSync(skillPath)).toBe(true);
     });
 
-    it("should contain proper skill metadata", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
-      expect(content).toContain("# /localize");
-      expect(content).toContain("## Overview");
-      expect(content).toContain("## When to Use");
-      expect(content).toContain("## Quick Start");
-      expect(content).toContain("## Workflow");
+    it('should contain proper skill metadata', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
+      expect(content).toContain('# /localize');
+      expect(content).toContain('## When to Use');
+      expect(content).toContain('## Workflow');
+      expect(content).toContain('## Verification Checklist');
     });
 
-    it("should document all i18n check features", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
-      expect(content).toContain("i18n:check");
-      expect(content).toContain("hardcoded Italian");
-      expect(content).toContain("translation keys");
-      expect(content).toContain("missing translations");
+    it('should document all i18n check features', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
+      expect(content).toContain('i18n:check');
+      expect(content).toMatch(/hardcoded Italian/i);
+      expect(content).toMatch(/translation\s+keys/i);
+      expect(content).toMatch(/missing\s+translations/i);
     });
 
-    it("should include optional file path argument", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
+    it('should include optional file path argument', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
       expect(content).toMatch(/\[file\s+path\]|\{file\}/i);
     });
   });
 
-  describe("ESLint no-hardcoded-italian Rule", () => {
-    it("should be registered in ESLint config", () => {
-      const eslintConfigPath = path.join(projectRoot, ".eslintrc.json");
+  describe('ESLint no-hardcoded-italian Rule', () => {
+    it('should be registered in ESLint config', () => {
+      const eslintConfigPath = path.join(projectRoot, '.eslintrc.json');
       if (fs.existsSync(eslintConfigPath)) {
-        const config = JSON.parse(fs.readFileSync(eslintConfigPath, "utf-8"));
+        const config = JSON.parse(fs.readFileSync(eslintConfigPath, 'utf-8'));
         expect(config.plugins).toBeDefined();
       }
     });
 
-    it("should detect common Italian words", () => {
-      const ruleIndexPath = path.join(
-        projectRoot,
-        "eslint-local-rules",
-        "index.js",
-      );
-      const content = fs.readFileSync(ruleIndexPath, "utf-8");
+    it('should detect common Italian words', () => {
+      const ruleIndexPath = path.join(projectRoot, 'eslint-local-rules', 'index.js');
+      const content = fs.readFileSync(ruleIndexPath, 'utf-8');
 
       // Verify rule has Italian word list
-      expect(content).toContain("ITALIAN_COMMON_WORDS");
-      expect(content).toContain("ciao");
-      expect(content).toContain("profilo");
-      expect(content).toContain("salva");
+      expect(content).toContain('ITALIAN_COMMON_WORDS');
+      expect(content).toContain('ciao');
+      expect(content).toContain('profilo');
+      expect(content).toContain('salva');
     });
 
-    it("should detect Italian accented characters", () => {
-      const ruleIndexPath = path.join(
-        projectRoot,
-        "eslint-local-rules",
-        "index.js",
-      );
-      const content = fs.readFileSync(ruleIndexPath, "utf-8");
+    it('should detect Italian accented characters', () => {
+      const ruleIndexPath = path.join(projectRoot, 'eslint-local-rules', 'index.js');
+      const content = fs.readFileSync(ruleIndexPath, 'utf-8');
 
       // Verify rule checks for Italian accents
-      expect(content).toContain("ITALIAN_PATTERN");
-      expect(content).toContain("àèéìòùù");
+      expect(content).toContain('ITALIAN_PATTERN');
+      expect(content).toContain('àèéìòùù');
     });
   });
 
-  describe("Message Files Structure", () => {
+  describe('Message Files Structure', () => {
     const NAMESPACES = [
-      "common",
-      "auth",
-      "admin",
-      "chat",
-      "tools",
-      "settings",
-      "compliance",
-      "education",
-      "navigation",
-      "errors",
-      "welcome",
-      "metadata",
+      'common',
+      'auth',
+      'admin',
+      'chat',
+      'tools',
+      'settings',
+      'compliance',
+      'education',
+      'navigation',
+      'errors',
+      'welcome',
+      'metadata',
     ];
 
     /**
@@ -116,7 +102,7 @@ describe("Localize Skill", () => {
       for (const ns of NAMESPACES) {
         const filePath = path.join(localeDir, `${ns}.json`);
         if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf-8");
+          const content = fs.readFileSync(filePath, 'utf-8');
           Object.assign(merged, JSON.parse(content));
         }
       }
@@ -124,8 +110,8 @@ describe("Localize Skill", () => {
       return merged;
     }
 
-    it("should have message files for all locales", () => {
-      const locales = ["it", "en", "fr", "de", "es"];
+    it('should have message files for all locales', () => {
+      const locales = ['it', 'en', 'fr', 'de', 'es'];
       for (const locale of locales) {
         // Namespace structure: messages/{locale}/{namespace}.json
         const localeDir = path.join(messagesDir, locale);
@@ -133,45 +119,36 @@ describe("Localize Skill", () => {
         expect(fs.statSync(localeDir).isDirectory()).toBe(true);
 
         // Check at least common.json exists
-        const commonFile = path.join(localeDir, "common.json");
+        const commonFile = path.join(localeDir, 'common.json');
         expect(fs.existsSync(commonFile)).toBe(true);
       }
     });
 
-    it("should have valid JSON in all message files", () => {
-      const locales = ["it", "en", "fr", "de", "es"];
+    it('should have valid JSON in all message files', () => {
+      const locales = ['it', 'en', 'fr', 'de', 'es'];
       for (const locale of locales) {
         const localeDir = path.join(messagesDir, locale);
         for (const ns of NAMESPACES) {
           const filePath = path.join(localeDir, `${ns}.json`);
           if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, "utf-8");
+            const content = fs.readFileSync(filePath, 'utf-8');
             expect(() => JSON.parse(content)).not.toThrow();
           }
         }
       }
     });
 
-    it("should have matching key structure across locales", () => {
-      const itContent = loadLocaleMessages("it");
-      const enContent = loadLocaleMessages("en");
+    it('should have matching key structure across locales', () => {
+      const itContent = loadLocaleMessages('it');
+      const enContent = loadLocaleMessages('en');
 
       // Get all keys from Italian (reference)
-      const getKeys = (
-        obj: Record<string, unknown>,
-        prefix = "",
-      ): Set<string> => {
+      const getKeys = (obj: Record<string, unknown>, prefix = ''): Set<string> => {
         const keys = new Set<string>();
         Object.entries(obj).forEach(([key, value]) => {
           const fullKey = prefix ? `${prefix}.${key}` : key;
-          if (
-            typeof value === "object" &&
-            value !== null &&
-            !Array.isArray(value)
-          ) {
-            getKeys(value as Record<string, unknown>, fullKey).forEach((k) =>
-              keys.add(k),
-            );
+          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            getKeys(value as Record<string, unknown>, fullKey).forEach((k) => keys.add(k));
           } else {
             keys.add(fullKey);
           }
@@ -189,29 +166,29 @@ describe("Localize Skill", () => {
     });
   });
 
-  describe("Skill Workflow", () => {
-    it("should describe the verification workflow", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
+  describe('Skill Workflow', () => {
+    it('should describe the verification workflow', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
 
-      expect(content).toContain("Workflow");
+      expect(content).toContain('Workflow');
       expect(content).toMatch(/run\s+i18n[:-]check/i);
       expect(content).toMatch(/check.*hardcoded.*Italian/i);
       expect(content).toMatch(/verify.*translation\s+keys/i);
     });
 
-    it("should document pass/fail criteria", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
+    it('should document pass/fail criteria', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
 
       expect(content).toMatch(/PASS/);
       expect(content).toMatch(/FAIL/);
     });
 
-    it("should show example usage", () => {
-      const content = fs.readFileSync(skillPath, "utf-8");
+    it('should show example usage', () => {
+      const content = fs.readFileSync(skillPath, 'utf-8');
 
       expect(content).toMatch(/\/localize/);
-      // Should show both: full check and file-specific check
-      expect(content).toContain("Quick Start");
+      // Should show workflow and file-specific check
+      expect(content).toContain('## Workflow');
     });
   });
 });

@@ -150,6 +150,45 @@ gh release create "v$VER" --generate-notes
 
 **Evidence is MANDATORY for minor/major releases.**
 
+## EXECUTION PHASES
+
+### Phase 3: Pre-flight Vercel checks
+
+```bash
+./scripts/verify-vercel-env.sh
+npm run sentry:verify
+# Optional: npm run secrets:sync
+```
+
+Required vars: `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_ORG_ID`, `SUPABASE_CA_CERT` (ADR 0063). Any fail = STOP.
+
+### Phase 3.5: Infra monitoring checks
+
+```bash
+gh issue list --label "infra-monitor" --state open --json number,title --jq '.[].title'
+./scripts/azure-costs.sh
+```
+
+Review open `usage-alert` or `azure-models` issues before release.
+
+### Phase 4: Manual validation (after script pass)
+
+```bash
+npm run test:unit -- src/lib/safety/__tests__/
+rg -n "localStorage\." src/ -g '*.ts' -g '*.tsx' | rg -v test
+rg -c "catch.*\{\}" src/ -g '*.ts' | rg -v test | rg -v ":0$"
+rg -n "console\.(log|error|warn)" src/ -g '*.ts' | rg -v test | rg -v logger
+```
+
+Checklist: FSRS intervals, XP/levels progression, mind map hierarchy, Knowledge Hub content rendering.
+
+### Phase 5: Evidence pack + release
+
+```bash
+npm run release:evidence
+ls docs/releases/$(cat VERSION)/
+```
+
 ## RULE
 
 **No proof = BLOCKED.** Show script output, not claims.
