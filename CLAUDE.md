@@ -36,6 +36,18 @@ AI-powered educational platform for students with learning differences.
 | `npx prisma generate`               | After schema changes                       |
 | `npx prisma migrate dev --name xyz` | Create migration (local only)              |
 | `./scripts/sync-databases.sh`       | Sync prod + test DBs after migrations      |
+| `./scripts/stop-local-services.sh`  | Stop local PostgreSQL after dev sessions   |
+
+## Local PostgreSQL (On-Demand — LOCAL DEV ONLY)
+
+⚠️ This applies ONLY to local macOS development. In production (Vercel + Supabase) and CI, PostgreSQL is managed by Supabase — never touch it.
+
+PostgreSQL is NOT auto-started at login. Before `npm run dev` or tests, ensure it's running:
+
+- **Start**: `brew services start postgresql@17` (or `./scripts/ensure-test-db.sh`)
+- **Stop**: `./scripts/stop-local-services.sh` (or `brew services stop postgresql@17`)
+
+Agents: always check `pg_isready` before running local dev/test commands. If PostgreSQL is down, start it first. Do NOT run brew commands in CI/CD or production.
 
 ## Architecture
 
