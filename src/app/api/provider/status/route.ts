@@ -64,7 +64,7 @@ export const GET = pipe(withSentry('/api/provider/status'))(async () => {
   const azureRealtimeConfigured = !!(
     azureRealtimeEndpoint &&
     azureRealtimeApiKey &&
-    azureRealtimeDeployment
+    (azureRealtimeDeployment || azureRealtimeV15Deployment)
   );
 
   // Determine active provider

@@ -103,7 +103,9 @@ export const POST = pipe(
   // Get API key (needed for new token request)
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
   const useRealtime15 = await isFeatureEnabled('voice_realtime_15');
-  const azureDeployment = useRealtime15.enabled ? azureDeploymentV15 : azureDeploymentLegacy;
+  const azureDeployment = useRealtime15.enabled
+    ? (azureDeploymentV15 || azureDeploymentLegacy)
+    : azureDeploymentLegacy;
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
