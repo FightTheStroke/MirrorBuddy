@@ -6,12 +6,27 @@
 
 | Key          | Value                                                                       |
 | ------------ | --------------------------------------------------------------------------- |
-| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                            |
-| API          | `POST /api/realtime/ephemeral-token`                                        |
-| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration) |
-| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)             |
-| Audio Format | PCM16, 24kHz, mono, base64-encoded                                          |
-| Model        | `gpt-realtime` (GA API)                                                     |
+| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                                           |
+| API          | `POST /api/realtime/ephemeral-token`                                                       |
+| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration), 0159 (v1.5+) |
+| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)                            |
+| Audio Format | PCM16, 24kHz, mono, base64-encoded                                                         |
+| Model        | `gpt-realtime-1.5` (v1.5, default) / `gpt-realtime` (v1.0, fallback)                       |
+
+## Models
+
+| Model              | Version    | Purpose     | Feature Flag        | Env Var                                |
+| ------------------ | ---------- | ----------- | ------------------- | -------------------------------------- |
+| `gpt-realtime-1.5` | v2026-02-23| Voice (GA)  | `voice_realtime_15` | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15` |
+| `gpt-realtime`     | v2024-10-01| Voice (GA)  | -                   | `AZURE_OPENAI_REALTIME_DEPLOYMENT`     |
+| `gpt-audio-1.5`    | v2026-02-23| TTS         | `tts_audio_15`      | `AZURE_OPENAI_AUDIO_DEPLOYMENT`        |
+| `tts-hd`           | -          | TTS fallback| -                   | `AZURE_OPENAI_TTS_HD_DEPLOYMENT`       |
+
+**Fallback chains** (ADR 0159):
+- **Realtime**: `gpt-realtime-1.5` → `gpt-realtime`
+- **TTS**: `gpt-audio-1.5` → `tts-hd` → OpenAI TTS API
+
+`gpt-audio-1.5` uses Chat Completions API with `modalities: ["text", "audio"]` instead of dedicated TTS endpoint.
 
 ## Architecture
 
@@ -55,6 +70,8 @@ const { isConnected, isSpeaking, isListening } = useVoiceSessionStore();
 ## Critical Notes
 
 - **Preview vs GA API**: GA is default (`voice_ga_protocol=enabled`). Event names differ (`response.audio.delta` vs `response.output_audio.delta`). Both handled in switch statements. GA token payload requires `session.type: "realtime"` wrapper (ADR 0152).
+- **v1.5 vs v1.0**: v1.5 is default (`voice_realtime_15=enabled`). Both use GA protocol. Fallback to v1.0 if v1.5 deployment unavailable.
+- **TTS: gpt-audio-1.5**: Uses Chat Completions endpoint (`POST /chat/completions`) with `modalities: ["text", "audio"]` instead of `/audio/speech`. Requires `tts_audio_15=enabled`.
 - **48kHz to 24kHz**: Browser captures at 48kHz; must resample to 24kHz before sending to Azure.
 - **Stale closure**: Use `useRef` pattern for WebSocket `onmessage` handler to avoid stale React closures.
 - **CSP**: `connect-src` must include `*.openai.azure.com` for GA Realtime API (WebRTC SDP exchange).
@@ -65,4 +82,5 @@ const { isConnected, isSpeaking, isListening } = useVoiceSessionStore();
 - `docs/adr/0038-webrtc-migration.md` -- Transport selection and rollout strategy
 - `docs/adr/0050-voice-cost-guards.md` -- Cost sustainability controls
 - `docs/adr/0069-adaptive-vad-accessibility-profiles.md` -- DSA-aware VAD tuning
+- `docs/adr/0159-gpt-realtime-15-audio-15.md` -- v1.5 models and fallback chains
 - `.claude/rules/accessibility.md` -- 7 DSA profiles

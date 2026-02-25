@@ -9,6 +9,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { Buffer } from "buffer";
 import {
   checkRateLimit,
   getClientIdentifier,
@@ -18,11 +19,13 @@ import {
 import { logger } from "@/lib/logger";
 import { pipe } from "@/lib/api/pipe";
 import { withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
+import { isFeatureEnabled } from "@/lib/feature-flags/feature-flags-service";
 
 // OpenAI TTS voices
 
 export const revalidate = 0;
 type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+type TTSProviderType = "azure-audio-1.5" | "azure" | "openai" | null;
 
 interface TTSRequest {
   text: string;
@@ -31,9 +34,21 @@ interface TTSRequest {
 
 /**
  * Check which TTS provider is configured
+ * Fallback chain: gpt-audio-1.5 → tts-hd → OpenAI TTS
  */
-function getTTSProvider(): "azure" | "openai" | null {
-  // Check for Azure OpenAI TTS deployment
+function getTTSProvider(): TTSProviderType {
+  // Check for gpt-audio-1.5 (behind feature flag)
+  const useAudio15 = isFeatureEnabled('tts_audio_15')?.enabled ?? false;
+  if (
+    useAudio15 &&
+    process.env.AZURE_OPENAI_ENDPOINT &&
+    process.env.AZURE_OPENAI_API_KEY &&
+    process.env.AZURE_OPENAI_AUDIO_DEPLOYMENT
+  ) {
+    return "azure-audio-1.5";
+  }
+
+  // Check for Azure OpenAI TTS deployment (tts-hd)
   if (
     process.env.AZURE_OPENAI_ENDPOINT &&
     process.env.AZURE_OPENAI_API_KEY &&
@@ -90,6 +105,67 @@ async function generateAzureTTS(
   }
 
   return response.arrayBuffer();
+}
+
+/**
+ * Generate speech using Azure OpenAI gpt-audio-1.5 (Chat Completions API)
+ * Different from tts-hd: uses modalities: ["text", "audio"] and returns base64
+ */
+async function generateAzureAudio15TTS(
+  text: string,
+  voice: TTSVoice,
+): Promise<ArrayBuffer> {
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
+  const apiKey = process.env.AZURE_OPENAI_API_KEY!;
+  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
+  const deployment = process.env.AZURE_OPENAI_AUDIO_DEPLOYMENT!;
+
+  const url = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: deployment,
+      modalities: ["text", "audio"],
+      audio: { voice, format: "mp3" },
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text,
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    logger.error("[TTS] Azure Audio 1.5 API error", {
+      status: response.status,
+      errorMessage: errorText,
+    });
+    throw new Error(`Azure Audio 1.5 TTS failed: ${response.status}`);
+  }
+
+  const json = await response.json();
+  const base64Audio = json.choices?.[0]?.message?.audio?.data;
+  if (!base64Audio) {
+    throw new Error("Azure Audio 1.5: no audio data in response");
+  }
+
+  const buffer = Buffer.from(base64Audio, "base64");
+  return buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength,
+  );
 }
 
 /**
@@ -176,7 +252,9 @@ export const POST = pipe(
 
   let audioData: ArrayBuffer;
 
-  if (provider === "azure") {
+  if (provider === "azure-audio-1.5") {
+    audioData = await generateAzureAudio15TTS(text, voice);
+  } else if (provider === "azure") {
     audioData = await generateAzureTTS(text, voice);
   } else {
     audioData = await generateOpenAITTS(text, voice);

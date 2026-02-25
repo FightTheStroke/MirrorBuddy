@@ -36,11 +36,17 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
     });
     return rateLimitResponse(rateLimit);
   }
+  // Check if v1.5 model is enabled via feature flag
+  const useV15 = isFeatureEnabled('voice_realtime_15')?.enabled ?? false;
+
   // Azure OpenAI Realtime configuration (required)
   // Use .trim() to handle env vars with trailing whitespace/newlines
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
-  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
+  const azureDeployment = useV15
+    ? (process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
+        process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim())
+    : process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
 
   // Validate Azure configuration
   const missingConfig: string[] = [];

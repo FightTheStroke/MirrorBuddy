@@ -550,4 +550,84 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       expect(response.headers.get('X-Request-ID')).toBe('test-request-id');
     });
   });
+
+  describe('voice_realtime_15 feature flag', () => {
+    it('should use V15 deployment when voice_realtime_15 flag is enabled', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 = 'gpt-realtime-1.5';
+
+      vi.mocked(isFeatureEnabled).mockImplementation((flag: string) => ({
+        enabled: flag === 'voice_ga_protocol' || flag === 'voice_realtime_15',
+        reason: 'enabled',
+        flag: {
+          id: flag,
+          name: flag,
+          description: 'Test',
+          status: 'enabled' as const,
+          enabledPercentage: 100,
+          killSwitch: false,
+          updatedAt: new Date(),
+        },
+      }));
+
+      const request = new NextRequest('http://localhost:3000/api/realtime/token', {
+        method: 'GET',
+      });
+      const response = await GET(request as any);
+      const data = await response.json();
+
+      expect(data.deployment).toBe('gpt-realtime-1.5');
+    });
+
+    it('should fallback to current deployment when V15 env var is not set', async () => {
+      delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
+
+      vi.mocked(isFeatureEnabled).mockImplementation((flag: string) => ({
+        enabled: flag === 'voice_ga_protocol' || flag === 'voice_realtime_15',
+        reason: 'enabled',
+        flag: {
+          id: flag,
+          name: flag,
+          description: 'Test',
+          status: 'enabled' as const,
+          enabledPercentage: 100,
+          killSwitch: false,
+          updatedAt: new Date(),
+        },
+      }));
+
+      const request = new NextRequest('http://localhost:3000/api/realtime/token', {
+        method: 'GET',
+      });
+      const response = await GET(request as any);
+      const data = await response.json();
+
+      expect(data.deployment).toBe('gpt-realtime');
+    });
+
+    it('should use current deployment when voice_realtime_15 flag is disabled', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 = 'gpt-realtime-1.5';
+
+      vi.mocked(isFeatureEnabled).mockImplementation((flag: string) => ({
+        enabled: flag === 'voice_ga_protocol',
+        reason: flag === 'voice_realtime_15' ? 'disabled' : 'enabled',
+        flag: {
+          id: flag,
+          name: flag,
+          description: 'Test',
+          status: flag === 'voice_realtime_15' ? ('disabled' as const) : ('enabled' as const),
+          enabledPercentage: flag === 'voice_realtime_15' ? 0 : 100,
+          killSwitch: false,
+          updatedAt: new Date(),
+        },
+      }));
+
+      const request = new NextRequest('http://localhost:3000/api/realtime/token', {
+        method: 'GET',
+      });
+      const response = await GET(request as any);
+      const data = await response.json();
+
+      expect(data.deployment).toBe('gpt-realtime');
+    });
+  });
 });

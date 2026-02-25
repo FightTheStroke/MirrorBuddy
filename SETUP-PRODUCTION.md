@@ -154,6 +154,8 @@ Create accounts and have credentials ready:
      - `AZURE_OPENAI_GPT52_EDU_DEPLOYMENT=gpt-5.2-edu`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-1.5` *(optional, voice v1.5)*
+     - `AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-1.5` *(optional, TTS v1.5)*
      - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
      - `AZURE_OPENAI_TTS_DEPLOYMENT=tts-hd-deployment`
 
