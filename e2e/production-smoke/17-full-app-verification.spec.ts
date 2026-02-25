@@ -16,6 +16,19 @@
 import { test, expect, PROD_URL, openMobileMenu } from './fixtures';
 import { request as pwRequest } from '@playwright/test';
 
+/** Navigate to Astuccio — mobile uses direct URL (bottom-nav is Link, not button) */
+async function goToAstuccio(page: import('@playwright/test').Page, isMobile: boolean) {
+  if (isMobile) {
+    await page.goto('/it/astuccio');
+  } else {
+    await page.goto('/it');
+    await page.getByRole('button', { name: /Astuccio/i }).first().click();
+  }
+  await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
+    timeout: 15000,
+  });
+}
+
 // ============================================================================
 // 1. PROFESSORI PAGE
 // ============================================================================
@@ -154,13 +167,7 @@ test.describe('PROD: Chat UI', () => {
 
 test.describe('PROD: Astuccio', () => {
   test.beforeEach(async ({ page, isMobile }) => {
-    await page.goto('/it');
-    if (isMobile) await openMobileMenu(page);
-    const astuccioBtn = page.getByRole('button', { name: /Astuccio/i }).first();
-    await astuccioBtn.click();
-    await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
-      timeout: 15000,
-    });
+    await goToAstuccio(page, isMobile ?? false);
   });
 
   test('3 categories: Carica, Crea, Cerca', async ({ page }) => {
@@ -208,15 +215,7 @@ test.describe('PROD: Astuccio', () => {
 
 test.describe('PROD: Study Kit', () => {
   test('Opens from Astuccio with list view', async ({ page, isMobile }) => {
-    await page.goto('/it');
-    if (isMobile) await openMobileMenu(page);
-    await page
-      .getByRole('button', { name: /Astuccio/i })
-      .first()
-      .click();
-    await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
-      timeout: 15000,
-    });
+    await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible({
       timeout: 10000,
@@ -224,15 +223,7 @@ test.describe('PROD: Study Kit', () => {
   });
 
   test('Upload form shows file picker', async ({ page, isMobile }) => {
-    await page.goto('/it');
-    if (isMobile) await openMobileMenu(page);
-    await page
-      .getByRole('button', { name: /Astuccio/i })
-      .first()
-      .click();
-    await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
-      timeout: 15000,
-    });
+    await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await page.getByRole('button', { name: /Nuovo Kit/i }).click();
     await expect(page.getByText(/Carica il tuo PDF/i)).toBeVisible({ timeout: 5000 });
@@ -241,15 +232,7 @@ test.describe('PROD: Study Kit', () => {
 
   // i18n regression: feature cards should show real text, not "Titolo"/"Descrizione"
   test.fail('Study Kit feature cards are translated', async ({ page, isMobile }) => {
-    await page.goto('/it');
-    if (isMobile) await openMobileMenu(page);
-    await page
-      .getByRole('button', { name: /Astuccio/i })
-      .first()
-      .click();
-    await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
-      timeout: 15000,
-    });
+    await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible({
       timeout: 10000,
@@ -260,15 +243,7 @@ test.describe('PROD: Study Kit', () => {
 
   // i18n regression: header should not show "Intestazione"
   test.fail('Study Kit header is translated', async ({ page, isMobile }) => {
-    await page.goto('/it');
-    if (isMobile) await openMobileMenu(page);
-    await page
-      .getByRole('button', { name: /Astuccio/i })
-      .first()
-      .click();
-    await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
-      timeout: 15000,
-    });
+    await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible({
       timeout: 10000,
