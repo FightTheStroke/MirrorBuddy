@@ -164,28 +164,28 @@ describe('feature-flags-service', () => {
   });
 
   describe('voice 1.5 rollout flags', () => {
-    it('seeds voice_realtime_15 as disabled by default', () => {
+    it('seeds voice_realtime_15 as enabled by default', () => {
       const flag = getFlag('voice_realtime_15' as KnownFeatureFlag);
       expect(flag).toBeDefined();
-      expect(flag?.status).toBe('disabled');
-      expect(flag?.enabledPercentage).toBe(0);
+      expect(flag?.status).toBe('enabled');
+      expect(flag?.enabledPercentage).toBe(100);
       expect(flag?.killSwitch).toBe(false);
 
       const result = isFeatureEnabled('voice_realtime_15' as KnownFeatureFlag);
-      expect(result.enabled).toBe(false);
-      expect(result.reason).toBe('disabled');
+      expect(result.enabled).toBe(true);
+      expect(result.reason).toBe('enabled');
     });
 
-    it('seeds tts_audio_15 as disabled by default', () => {
+    it('seeds tts_audio_15 as enabled by default', () => {
       const flag = getFlag('tts_audio_15' as KnownFeatureFlag);
       expect(flag).toBeDefined();
-      expect(flag?.status).toBe('disabled');
-      expect(flag?.enabledPercentage).toBe(0);
+      expect(flag?.status).toBe('enabled');
+      expect(flag?.enabledPercentage).toBe(100);
       expect(flag?.killSwitch).toBe(false);
 
       const result = isFeatureEnabled('tts_audio_15' as KnownFeatureFlag);
-      expect(result.enabled).toBe(false);
-      expect(result.reason).toBe('disabled');
+      expect(result.enabled).toBe(true);
+      expect(result.reason).toBe('enabled');
     });
   });
 });

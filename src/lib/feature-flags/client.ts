@@ -26,8 +26,8 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   voice_realtime_15: {
     name: 'Real-time Voice 1.5',
     description: 'Control rollout of GPT Audio 1.5 realtime stack',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   rag_enabled: {
@@ -124,8 +124,8 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   tts_audio_15: {
     name: 'TTS Audio 1.5',
     description: 'Enable GPT Audio 1.5 text-to-speech voices',
-    status: 'disabled',
-    enabledPercentage: 0,
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   chat_unified_view: {
