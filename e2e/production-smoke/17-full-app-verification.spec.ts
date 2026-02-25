@@ -231,7 +231,7 @@ test.describe('PROD: Study Kit', () => {
   });
 
   // i18n regression: feature cards should show real text, not "Titolo"/"Descrizione"
-  test.fail('Study Kit feature cards are translated', async ({ page, isMobile }) => {
+  test('Study Kit feature cards are translated', async ({ page, isMobile }) => {
     await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible({
@@ -242,7 +242,7 @@ test.describe('PROD: Study Kit', () => {
   });
 
   // i18n regression: header should not show "Intestazione"
-  test.fail('Study Kit header is translated', async ({ page, isMobile }) => {
+  test('Study Kit header is translated', async ({ page, isMobile }) => {
     await goToAstuccio(page, isMobile ?? false);
     await page.getByRole('button', { name: /Kit di Studio/i }).click();
     await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible({

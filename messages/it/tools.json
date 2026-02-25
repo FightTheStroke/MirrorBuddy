@@ -84,7 +84,7 @@
         "export": "Esporta",
         "cancel": "Annulla",
         "closeLabel": "Chiudi",
-        "description": "Descrizione",
+        "description": "Esporta il kit di studio come PDF accessibile",
         "error": "Errore",
         "formatLabel": "Etichetta formato",
         "generating": "Generazione...",
@@ -109,8 +109,8 @@
         "deleteConfirm": "Conferma eliminazione",
         "deleteError": "Errore eliminazione",
         "error": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Non è stato possibile caricare i kit di studio",
+          "title": "Errore di caricamento"
         },
         "filters": {
           "all": "Tutti",
@@ -120,8 +120,8 @@
         },
         "open": "Apri",
         "processing": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Il tuo kit di studio è in fase di elaborazione",
+          "title": "Elaborazione in corso"
         },
         "status": "Stato",
         "riprova": "Riprova",
@@ -136,26 +136,26 @@
         "backToList": "Torna alla lista",
         "features": {
           "demo": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Esplora il contenuto in modo interattivo",
+            "title": "Demo Interattiva"
           },
           "mindmap": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Crea una mappa concettuale visiva",
+            "title": "Mappa Mentale"
           },
           "quiz": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Verifica la comprensione con domande",
+            "title": "Quiz"
           },
           "summary": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Genera un riassunto chiaro e strutturato",
+            "title": "Riassunto"
           }
         },
-        "header": "Intestazione",
+        "header": "Kit di Studio",
         "myKits": "I miei Kit",
         "newKit": "Nuovo Kit",
-        "subtitle": "Sottotitolo",
+        "subtitle": "Carica documenti e genera materiale di studio accessibile",
         "uploadTitle": "Carica documento"
       },
       "uploadProgress": {
@@ -584,8 +584,8 @@
       },
       "itemCount": "Numero elementi",
       "study_tip": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Usa il Kit di Studio per generare materiale personalizzato",
+        "title": "Suggerimento di Studio"
       },
       "astuccio": "Astuccio"
     },

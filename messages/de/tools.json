@@ -77,7 +77,7 @@
         "export": "Exportieren",
         "cancel": "Abbrechen",
         "closeLabel": "Schließen",
-        "description": "Beschreibung",
+        "description": "Exportiere das Lernpaket als barrierefreies PDF",
         "error": "Fehler",
         "formatLabel": "Format",
         "generating": "Generierung...",
@@ -102,8 +102,8 @@
         "deleteConfirm": "Löschen bestätigen",
         "deleteError": "Löschfehler",
         "error": {
-          "description": "Fehler beim Laden",
-          "title": "Fehler"
+          "description": "Lernpakete konnten nicht geladen werden",
+          "title": "Ladefehler"
         },
         "filters": {
           "all": "Alle",
@@ -113,7 +113,7 @@
         },
         "open": "Öffnen",
         "processing": {
-          "description": "Wird verarbeitet",
+          "description": "Dein Lernpaket wird verarbeitet",
           "title": "Verarbeitung"
         },
         "status": "Status",
@@ -129,26 +129,26 @@
         "backToList": "Zurück zur Liste",
         "features": {
           "demo": {
-            "description": "Interaktive Demonstration",
-            "title": "Demo"
+            "description": "Erkunde den Inhalt interaktiv",
+            "title": "Interaktive Demo"
           },
           "mindmap": {
-            "description": "Visuelle Mind-Map",
-            "title": "Mind-Map"
+            "description": "Erstelle eine visuelle Konzeptkarte",
+            "title": "Mindmap"
           },
           "quiz": {
-            "description": "Interaktives Quiz",
+            "description": "Überprüfe das Verständnis mit Fragen",
             "title": "Quiz"
           },
           "summary": {
-            "description": "Strukturierte Zusammenfassung",
+            "description": "Erstelle eine klare, strukturierte Zusammenfassung",
             "title": "Zusammenfassung"
           }
         },
-        "header": "Kopfzeile",
+        "header": "Lernpaket",
         "myKits": "Meine Kits",
         "newKit": "Neues Kit",
-        "subtitle": "Untertitel",
+        "subtitle": "Dokumente hochladen und barrierefreies Lernmaterial erstellen",
         "uploadTitle": "Upload-Titel"
       },
       "uploadProgress": {
@@ -575,7 +575,7 @@
       },
       "itemCount": "Anzahl Elemente",
       "study_tip": {
-        "description": "Beginnen Sie mit einer Mind Map für einen Überblick, erstellen Sie dann Flashcards, um Schlüsselkonzepte zu merken",
+        "description": "Nutze das Lernpaket, um personalisiertes Material zu erstellen",
         "title": "Lerntipp"
       },
       "astuccio": "Astuccio"

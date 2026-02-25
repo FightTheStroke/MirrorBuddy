@@ -77,7 +77,7 @@
         "export": "Export",
         "cancel": "Cancel",
         "closeLabel": "Close Label",
-        "description": "Descrizione",
+        "description": "Export the study kit as an accessible PDF",
         "error": "Error",
         "formatLabel": "Format Label",
         "generating": "Generazione...",
@@ -102,8 +102,8 @@
         "deleteConfirm": "Delete Confirm",
         "deleteError": "Delete Error",
         "error": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Could not load study kits",
+          "title": "Loading error"
         },
         "filters": {
           "all": "Tutti",
@@ -113,8 +113,8 @@
         },
         "open": "Apri",
         "processing": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Your study kit is being processed",
+          "title": "Processing"
         },
         "status": "Stato",
         "riprova": "Riprova",
@@ -129,26 +129,26 @@
         "backToList": "Back To List",
         "features": {
           "demo": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Explore content interactively",
+            "title": "Interactive Demo"
           },
           "mindmap": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Create a visual concept map",
+            "title": "Mind Map"
           },
           "quiz": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Test comprehension with questions",
+            "title": "Quiz"
           },
           "summary": {
-            "description": "Descrizione",
-            "title": "Titolo"
+            "description": "Generate a clear, structured summary",
+            "title": "Summary"
           }
         },
-        "header": "Header",
+        "header": "Study Kit",
         "myKits": "My Kits",
         "newKit": "New Kit",
-        "subtitle": "Sottotitolo",
+        "subtitle": "Upload documents and generate accessible study materials",
         "uploadTitle": "Upload Title"
       },
       "uploadProgress": {
@@ -575,8 +575,8 @@
       },
       "itemCount": "Item Count",
       "study_tip": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Use the Study Kit to generate personalised materials",
+        "title": "Study Tip"
       },
       "astuccio": "Astuccio"
     },
