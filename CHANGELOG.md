@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **GPT-Audio-1.5 TTS provider**: New TTS provider using Chat Completions API with `modalities: ["text", "audio"]`. Fallback chain: `gpt-audio-1.5` → `tts-hd` → OpenAI. Behind `tts_audio_15` feature flag
 - **Azure v1.5 deployments**: `gpt-realtime-15` and `gpt-audio-15` deployed to Sweden Central on `aoai-virtualbpm-prod` (GlobalStandard SKU, capacity 1)
 - **New env vars**: `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`, `AZURE_OPENAI_AUDIO_DEPLOYMENT` (set on Vercel production)
+- **Voice 1.5 flags enabled at 100%**: `voice_realtime_15` and `tts_audio_15` activated in code defaults (server + client)
+
+### Fixed
+
+- **DB cleanup**: Dropped orphan `CreatedTool` table from prod and test DBs (model removed from schema, table left behind)
+- **Migration hygiene**: Removed 7 duplicate records from local `_prisma_migrations`, applied 6 missing migrations to local DB and 6 to test DB. All 3 environments (local, test, prod) now have identical 40 migrations and 91 tables
+- **DB sync verified**: Schema ↔ DB table audit confirmed 91/91 match across all environments with zero orphans
 
 ## [0.15.8] - 2026-02-22
 

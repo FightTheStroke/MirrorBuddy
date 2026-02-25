@@ -577,4 +577,64 @@ connect-src: 'self' ... https://*.ingest.us.sentry.io https://*.ingest.de.sentry
 
 ---
 
-_Version 2.4 | January 2026 | Added i18n Incidents (INC-005, INC-006), Grafana i18n monitoring, and escalation paths_
+## DB Hygiene Procedures
+
+### Sync Local/Test/Prod Databases
+
+```bash
+# Apply pending migrations to local
+DIRECT_URL="postgresql://roberdan@localhost:5432/mirrorbuddy" \
+DATABASE_URL="postgresql://roberdan@localhost:5432/mirrorbuddy" \
+npx prisma migrate deploy
+
+# Apply to test DB
+DIRECT_URL="postgresql://roberdan@localhost:5432/mirrorbuddy_test" \
+DATABASE_URL="postgresql://roberdan@localhost:5432/mirrorbuddy_test" \
+npx prisma migrate deploy
+
+# Verify all 3 match: should show 40 migrations, 91 tables, 0 orphans each
+./scripts/sync-databases.sh
+```
+
+### Find Orphan Tables (in DB but not in Prisma schema)
+
+```sql
+-- Compare pg_tables against Prisma models + @@map names
+SELECT tablename FROM pg_tables
+WHERE schemaname='public' AND tablename != '_prisma_migrations'
+ORDER BY tablename;
+-- Cross-reference with: grep -rh '@@map\|^model ' prisma/schema/*.prisma
+```
+
+### Clean Duplicate Migration Records
+
+```sql
+DELETE FROM _prisma_migrations WHERE id IN (
+  SELECT id FROM (
+    SELECT id, ROW_NUMBER() OVER (
+      PARTITION BY migration_name ORDER BY finished_at DESC NULLS LAST
+    ) as rn FROM _prisma_migrations
+  ) sub WHERE rn > 1
+);
+```
+
+### Resolve Failed Migrations
+
+```bash
+# If migrate deploy fails on a previously-applied migration:
+DIRECT_URL="$DB_URL" DATABASE_URL="$DB_URL" \
+npx prisma migrate resolve --applied "MIGRATION_NAME"
+```
+
+### Incident Log
+
+| Date | Action | Env | Details |
+|------|--------|-----|---------|
+| 2026-02-25 | Drop orphan `CreatedTool` | prod, test | Model removed from schema, table left behind |
+| 2026-02-25 | Remove 7 duplicate migration records | local | `_prisma_migrations` had duplicate rows |
+| 2026-02-25 | Apply 6 missing migrations | local, test | `add_trial_email_verification`, `add_cascade_rules`, `enable_rls_all_tables`, `add_maintenance_windows`, `add_admin_readonly_role`, `crisis_response_protocol`, `add_waitlist_entry` |
+| 2026-02-25 | Resolve failed migration | local | `add_adaptive_vad_enabled` marked as applied |
+
+---
+
+_Version 2.5 | February 2026 | Added DB Hygiene Procedures, incident log, orphan/duplicate cleanup runbook_
