@@ -17,6 +17,7 @@ describe('deployment-mapping', () => {
     // Clear realtime-related env vars to test defaults
     delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
     delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI;
+    delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
     vi.resetModules();
   });
 
@@ -63,6 +64,22 @@ describe('deployment-mapping', () => {
 
       expect(getDeploymentForModel('gpt-realtime-mini')).toBe('custom-mini-deploy');
     });
+
+    it('should map gpt-realtime-1.5 to GA deployment name when env is unset', async () => {
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+
+      const deployment = getDeploymentForModel('gpt-realtime-1.5');
+
+      expect(deployment).toBe('gpt-realtime-1.5');
+    });
+
+    it('should respect env var override for gpt-realtime-1.5', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 = 'custom-realtime-15';
+
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+
+      expect(getDeploymentForModel('gpt-realtime-1.5')).toBe('custom-realtime-15');
+    });
   });
 
   describe('no deprecated references in available models', () => {
@@ -74,6 +91,7 @@ describe('deployment-mapping', () => {
       expect(models).not.toContain('gpt-4o-realtime-preview');
       expect(models).toContain('gpt-realtime');
       expect(models).toContain('gpt-realtime-mini');
+      expect(models).toContain('gpt-realtime-1.5');
     });
   });
 });

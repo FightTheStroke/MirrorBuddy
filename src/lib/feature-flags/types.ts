@@ -21,6 +21,7 @@ export interface FeatureFlag {
 // Known feature flags for type safety
 export type KnownFeatureFlag =
   | 'voice_realtime' // Real-time voice API
+  | 'voice_realtime_15' // Real-time voice API (1.5 stack rollout)
   | 'rag_enabled' // RAG retrieval
   | 'flashcards' // FSRS flashcards
   | 'mindmap' // Mind map generation
@@ -34,6 +35,7 @@ export type KnownFeatureFlag =
   | 'voice_full_prompt' // Use full system prompt instead of truncated
   | 'voice_transcript_safety' // Enable transcript safety checking
   | 'voice_calling_overlay' // New calling overlay UI
+  | 'tts_audio_15' // Text-to-speech GPT-Audio 1.5 rollout
   | 'chat_unified_view' // Unified conversation view across character types
   | 'consent_unified_model' // Unified consent storage model
   | 'coming_soon_overlay'; // Coming soon overlay for waitlist feature

@@ -81,7 +81,8 @@ export const POST = pipe(
   // Azure OpenAI Realtime configuration (required)
   // Use .trim() to handle env vars with trailing whitespace/newlines
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
-  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
+  const azureDeploymentLegacy = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
+  const azureDeploymentV15 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim();
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
   const rateLimit = await checkRateLimitAsync(
@@ -101,12 +102,18 @@ export const POST = pipe(
 
   // Get API key (needed for new token request)
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
+  const useRealtime15 = await isFeatureEnabled('voice_realtime_15');
+  const azureDeployment = useRealtime15.enabled ? azureDeploymentV15 : azureDeploymentLegacy;
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
   if (!azureEndpoint) missingConfig.push('AZURE_OPENAI_REALTIME_ENDPOINT');
   if (!azureApiKey) missingConfig.push('AZURE_OPENAI_REALTIME_API_KEY');
-  if (!azureDeployment) missingConfig.push('AZURE_OPENAI_REALTIME_DEPLOYMENT');
+  if (!azureDeployment) {
+    missingConfig.push(
+      useRealtime15.enabled ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15' : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
+    );
+  }
 
   if (missingConfig.length > 0 || !azureEndpoint || !azureApiKey || !azureDeployment) {
     log.error('Azure OpenAI Realtime not configured', { missingConfig });
@@ -157,6 +164,7 @@ export const POST = pipe(
     protocol: useGAProtocol.enabled ? 'GA' : 'preview',
     endpoint: azureUrl,
     deployment: azureDeployment,
+    stack: useRealtime15.enabled ? 'voice_realtime_15' : 'voice_realtime',
   });
 
   // Build token request payload based on protocol version

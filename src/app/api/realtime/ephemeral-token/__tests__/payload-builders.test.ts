@@ -74,6 +74,59 @@ describe('GA payload builders', () => {
       expect(payload).not.toHaveProperty('session');
     });
   });
+
+  describe('GA format compatibility with gpt-realtime-1.5', () => {
+    it('should handle gpt-realtime-1.5 deployment name in buildGAPayload', () => {
+      const payload = buildGAPayload('gpt-realtime-1.5', { voice: 'shimmer' });
+
+      expect(payload).toHaveProperty('session');
+      const session = payload.session as Record<string, unknown>;
+      expect(session.type).toBe('realtime');
+      expect(session.model).toBe('gpt-realtime-1.5');
+    });
+
+    it('should produce identical GA format structure for 1.5 and 1.0', () => {
+      const payload1_5 = buildGAPayload('gpt-realtime-1.5', {
+        voice: 'echo',
+        instructions: 'Be helpful.',
+        turn_detection: { type: 'server_vad' },
+      });
+
+      const payload1_0 = buildGAPayload('gpt-realtime', {
+        voice: 'echo',
+        instructions: 'Be helpful.',
+        turn_detection: { type: 'server_vad' },
+      });
+
+      const session1_5 = payload1_5.session as Record<string, unknown>;
+      const session1_0 = payload1_0.session as Record<string, unknown>;
+
+      expect(session1_5.type).toBe(session1_0.type);
+      expect(session1_5).toHaveProperty('audio');
+      expect(session1_0).toHaveProperty('audio');
+      expect(session1_5).toHaveProperty('instructions');
+      expect(session1_0).toHaveProperty('instructions');
+
+      const audio1_5 = session1_5.audio as Record<string, unknown>;
+      const audio1_0 = session1_0.audio as Record<string, unknown>;
+      expect(audio1_5.output).toEqual(audio1_0.output);
+      expect(audio1_5.input).toEqual(audio1_0.input);
+    });
+
+    it('should parse GA response from gpt-realtime-1.5 correctly', () => {
+      const result = parseGAResponse({
+        value: 'ek_1_5_token',
+        expires_at: 1771200000,
+        session: { id: 'sess_v15_123', model: 'gpt-realtime-1.5' },
+      });
+
+      expect(result).toEqual({
+        token: 'ek_1_5_token',
+        expiresAt: 1771200000,
+        sessionId: 'sess_v15_123',
+      });
+    });
+  });
 });
 
 describe('GA response parsers', () => {

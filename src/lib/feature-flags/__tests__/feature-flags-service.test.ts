@@ -162,4 +162,30 @@ describe('feature-flags-service', () => {
       expect(flags.some((f) => f.id === 'rag_enabled')).toBe(true);
     });
   });
+
+  describe('voice 1.5 rollout flags', () => {
+    it('seeds voice_realtime_15 as disabled by default', () => {
+      const flag = getFlag('voice_realtime_15' as KnownFeatureFlag);
+      expect(flag).toBeDefined();
+      expect(flag?.status).toBe('disabled');
+      expect(flag?.enabledPercentage).toBe(0);
+      expect(flag?.killSwitch).toBe(false);
+
+      const result = isFeatureEnabled('voice_realtime_15' as KnownFeatureFlag);
+      expect(result.enabled).toBe(false);
+      expect(result.reason).toBe('disabled');
+    });
+
+    it('seeds tts_audio_15 as disabled by default', () => {
+      const flag = getFlag('tts_audio_15' as KnownFeatureFlag);
+      expect(flag).toBeDefined();
+      expect(flag?.status).toBe('disabled');
+      expect(flag?.enabledPercentage).toBe(0);
+      expect(flag?.killSwitch).toBe(false);
+
+      const result = isFeatureEnabled('tts_audio_15' as KnownFeatureFlag);
+      expect(result.enabled).toBe(false);
+      expect(result.reason).toBe('disabled');
+    });
+  });
 });

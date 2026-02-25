@@ -55,6 +55,7 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // Guarded by voice_ga_protocol feature flag at the API route level
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
   'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
+  'gpt-realtime-1.5': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 || 'gpt-realtime-1.5',
 };
 
 /**

@@ -97,6 +97,8 @@
 
 **Underlying Model**: Azure OpenAI GPT-5-mini (primary), GPT-5.2-edu (education tier), GPT-5.2-chat (pro tier) — trained on diverse web and academic corpus
 
+**Voice Models**: GPT-Realtime-1.5 (v2026-02-23, live voice via WebRTC), GPT-Audio-1.5 (v2026-02-23, TTS via Chat Completions API). Deployed in Sweden Central (GDPR-compliant). See ADR 0159.
+
 **MirrorBuddy Enhancement**:
 
 - 26 embedded knowledge bases (verified academic sources per Maestro)

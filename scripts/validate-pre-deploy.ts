@@ -213,6 +213,9 @@ function validateOptionalEnvVars(): void {
     { name: 'AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT52_EDU_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI', category: 'AI Models' },
+    // GPT Realtime 1.5 + Audio 1.5 (optional - behind feature flags)
+    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15', category: 'Voice v1.5' },
+    { name: 'AZURE_OPENAI_AUDIO_DEPLOYMENT', category: 'Voice v1.5' },
   ];
 
   for (const envVar of optional) {

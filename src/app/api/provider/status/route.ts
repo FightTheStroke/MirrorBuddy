@@ -21,6 +21,8 @@ interface ProviderStatus {
     model: string | null;
     realtimeConfigured: boolean;
     realtimeModel: string | null;
+    realtimeV15Model: string | null;
+    audioModel: string | null;
     envVars: EnvVarStatus[];
   };
   ollama: {
@@ -50,6 +52,8 @@ export const GET = pipe(withSentry('/api/provider/status'))(async () => {
   const azureRealtimeEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureRealtimeApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
   const azureRealtimeDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+  const azureRealtimeV15Deployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
+  const azureAudioDeployment = process.env.AZURE_OPENAI_AUDIO_DEPLOYMENT;
 
   const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
   const ollamaModel = process.env.OLLAMA_MODEL || 'llama3.2';
@@ -88,6 +92,8 @@ export const GET = pipe(withSentry('/api/provider/status'))(async () => {
       model: azureModel || null,
       realtimeConfigured: azureRealtimeConfigured,
       realtimeModel: azureRealtimeDeployment || null,
+      realtimeV15Model: azureRealtimeV15Deployment || null,
+      audioModel: azureAudioDeployment || null,
       envVars: [
         {
           name: 'AZURE_OPENAI_ENDPOINT',

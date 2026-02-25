@@ -23,6 +23,13 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  voice_realtime_15: {
+    name: 'Real-time Voice 1.5',
+    description: 'Control rollout of GPT Audio 1.5 realtime stack',
+    status: 'disabled',
+    enabledPercentage: 0,
+    killSwitch: false,
+  },
   rag_enabled: {
     name: 'RAG Retrieval',
     description: 'Semantic search for conversation context',
@@ -112,6 +119,13 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     description: 'New calling overlay UI',
     status: 'enabled',
     enabledPercentage: 100,
+    killSwitch: false,
+  },
+  tts_audio_15: {
+    name: 'TTS Audio 1.5',
+    description: 'Enable GPT Audio 1.5 text-to-speech voices',
+    status: 'disabled',
+    enabledPercentage: 0,
     killSwitch: false,
   },
   chat_unified_view: {

@@ -9,6 +9,7 @@ import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 import { getClientIdentifier } from '@/lib/rate-limit';
+import type { FeatureFlagCheckResult, KnownFeatureFlag } from '@/lib/feature-flags/types';
 
 // Mock dependencies
 vi.mock('@/lib/api/middlewares', () => ({
@@ -61,6 +62,36 @@ vi.mock('@/lib/feature-flags/feature-flags-service', () => ({
 
 let testCounter = 0;
 
+type MockFlagOptions = {
+  ga?: boolean;
+  realtime15?: boolean;
+};
+
+const buildFlagResult = (flagId: KnownFeatureFlag, enabled: boolean): FeatureFlagCheckResult => {
+  const state: FeatureFlagCheckResult['reason'] = enabled ? 'enabled' : 'disabled';
+  return {
+    enabled,
+    reason: state,
+    flag: {
+      id: flagId,
+      name: flagId,
+      description: `${flagId} test flag`,
+      status: enabled ? 'enabled' : 'disabled',
+      enabledPercentage: enabled ? 100 : 0,
+      killSwitch: false,
+      updatedAt: new Date(),
+    },
+  };
+};
+
+const mockFeatureFlags = ({ ga = false, realtime15 = false }: MockFlagOptions = {}) => {
+  vi.mocked(isFeatureEnabled).mockImplementation((flagId: KnownFeatureFlag) => {
+    if (flagId === 'voice_ga_protocol') return buildFlagResult(flagId, ga);
+    if (flagId === 'voice_realtime_15') return buildFlagResult(flagId, realtime15);
+    return buildFlagResult(flagId, false);
+  });
+};
+
 describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
   const ORIGINAL_ENV = process.env;
 
@@ -74,6 +105,7 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
       AZURE_OPENAI_REALTIME_ENDPOINT: 'https://test.openai.azure.com',
       AZURE_OPENAI_REALTIME_API_KEY: 'test-key',
       AZURE_OPENAI_REALTIME_DEPLOYMENT: 'gpt-realtime',
+      AZURE_OPENAI_REALTIME_DEPLOYMENT_V15: 'gpt-realtime-1.5',
     };
   });
 
@@ -82,20 +114,7 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
   });
 
   it('should include session config in token request body when voice_ga_protocol is enabled', async () => {
-    // Mock feature flag as enabled
-    vi.mocked(isFeatureEnabled).mockReturnValue({
-      enabled: true,
-      reason: 'enabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Test',
-        status: 'enabled',
-        enabledPercentage: 100,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    });
+    mockFeatureFlags({ ga: true });
 
     // Mock fetch to return GA format response
     const mockFetch = vi.fn().mockResolvedValue({
@@ -159,21 +178,42 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
     });
   });
 
-  it('should only send model in token request body when voice_ga_protocol is disabled', async () => {
-    // Mock feature flag as disabled
-    vi.mocked(isFeatureEnabled).mockReturnValue({
-      enabled: false,
-      reason: 'disabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Test',
-        status: 'disabled',
-        enabledPercentage: 0,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
+  it('should use v1.5 deployment when voice_realtime_15 flag is enabled', async () => {
+    mockFeatureFlags({ ga: true, realtime15: true });
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        value: 'test-token-v15',
+        expires_at: Date.now() + 3600000,
+        session: { id: 'test-session-v15', model: 'gpt-realtime-1.5' },
+      }),
     });
+    global.fetch = mockFetch;
+
+    const request = new NextRequest('http://localhost:3000/api/realtime/ephemeral-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-csrf-token': 'test-csrf-token',
+      },
+      body: JSON.stringify({
+        model: 'gpt-realtime',
+        voice: 'verse',
+      }),
+    });
+
+    await POST(request as any);
+
+    const callArgs = mockFetch.mock.calls[0];
+    const requestBody = JSON.parse(callArgs[1].body);
+
+    expect(requestBody.session).toBeDefined();
+    expect(requestBody.session.model).toBe('gpt-realtime-1.5');
+  });
+
+  it('should only send model in token request body when voice_ga_protocol is disabled', async () => {
+    mockFeatureFlags({ ga: false, realtime15: false });
 
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -213,20 +253,7 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
   });
 
   it('should use default values when session config is not provided in request', async () => {
-    // Mock feature flag as enabled
-    vi.mocked(isFeatureEnabled).mockReturnValue({
-      enabled: true,
-      reason: 'enabled',
-      flag: {
-        id: 'voice_ga_protocol',
-        name: 'Voice GA Protocol',
-        description: 'Test',
-        status: 'enabled',
-        enabledPercentage: 100,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-    });
+    mockFeatureFlags({ ga: true });
 
     // Mock fetch to return GA format response
     const mockFetch = vi.fn().mockResolvedValue({
