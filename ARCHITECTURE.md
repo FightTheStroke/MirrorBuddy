@@ -169,7 +169,7 @@ docs/adr/             # 126 active + 7 archived Architecture Decision Records
 
 ### AI Providers
 
-- **Azure OpenAI** - GPT-5-mini (chat), GPT-Realtime (voice WebRTC), text-embedding-3-small (RAG)
+- **Azure OpenAI** - GPT-5-mini (chat), GPT-Realtime-1.5 (voice WebRTC), GPT-Audio-1.5 (TTS), text-embedding-3-small (RAG)
 - **Claude** - Anthropic fallback, text-only
 - **Ollama** - Local dev fallback, text-only
 

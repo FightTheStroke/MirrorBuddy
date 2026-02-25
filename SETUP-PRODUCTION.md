@@ -127,13 +127,25 @@ Create accounts and have credentials ready:
       --deployment-name gpt-realtime-mini --model-name gpt-realtime-mini --model-version 2025-12-15 \
       --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
 
+    # Voice v1.5 (recommended — behind voice_realtime_15 feature flag)
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-realtime-15 --model-name gpt-realtime-1.5 --model-version 2026-02-23 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
+
+    # TTS v1.5 (behind tts_audio_15 feature flag)
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-audio-15 --model-name gpt-audio-1.5 --model-version 2026-02-23 \
+      --model-format OpenAI --sku-name GlobalStandard --sku-capacity 1
+
     # Embedding (RAG)
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
       --deployment-name text-embedding-3-small --model-name text-embedding-3-small --model-version 1 \
       --model-format OpenAI --sku-name GlobalStandard --sku-capacity 120
 
-    # TTS (accessibility)
+    # TTS legacy (accessibility fallback)
     az cognitiveservices account deployment create \
       --name {resource-name} --resource-group {rg-name} \
       --deployment-name tts-hd-deployment --model-name tts-hd --model-version 001 \
@@ -154,8 +166,8 @@ Create accounts and have credentials ready:
      - `AZURE_OPENAI_GPT52_EDU_DEPLOYMENT=gpt-5.2-edu`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
-     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-1.5` *(optional, voice v1.5)*
-     - `AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-1.5` *(optional, TTS v1.5)*
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15` *(voice v1.5, behind feature flag)*
+     - `AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15` *(TTS v1.5, behind feature flag)*
      - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
      - `AZURE_OPENAI_TTS_DEPLOYMENT=tts-hd-deployment`
 
@@ -192,6 +204,8 @@ Create accounts and have credentials ready:
     vercel env add AZURE_OPENAI_GPT4O_DEPLOYMENT production <<< "gpt-5-mini"
     vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT production <<< "gpt-realtime"
     vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI production <<< "gpt-realtime-mini"
+    vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 production <<< "gpt-realtime-15"
+    vercel env add AZURE_OPENAI_AUDIO_DEPLOYMENT production <<< "gpt-audio-15"
     vercel env add AZURE_OPENAI_EMBEDDING_DEPLOYMENT production <<< "text-embedding-3-small"
 
    # Upstash

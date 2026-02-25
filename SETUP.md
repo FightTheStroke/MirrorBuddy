@@ -61,8 +61,8 @@ AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 # Voice v1.5 (optional — behind feature flags voice_realtime_15 / tts_audio_15)
-AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-1.5
-AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-1.5
+AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15
+AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15
 
 # RAG Embeddings (optional - enables semantic search)
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small

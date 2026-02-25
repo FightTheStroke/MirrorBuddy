@@ -11,8 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **GPT-Realtime-1.5 voice support**: Upgraded voice model from `gpt-realtime` to `gpt-realtime-1.5` (v2026-02-23) behind `voice_realtime_15` feature flag. Improved multilingual support, tool calling, instruction following
 - **GPT-Audio-1.5 TTS provider**: New TTS provider using Chat Completions API with `modalities: ["text", "audio"]`. Fallback chain: `gpt-audio-1.5` → `tts-hd` → OpenAI. Behind `tts_audio_15` feature flag
-- **Azure v1.5 deployments**: `gpt-realtime-1.5` and `gpt-audio-1.5` deployed to Sweden Central (GlobalStandard SKU)
-- **New env vars**: `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`, `AZURE_OPENAI_AUDIO_DEPLOYMENT`
+- **Azure v1.5 deployments**: `gpt-realtime-15` and `gpt-audio-15` deployed to Sweden Central on `aoai-virtualbpm-prod` (GlobalStandard SKU, capacity 1)
+- **New env vars**: `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`, `AZURE_OPENAI_AUDIO_DEPLOYMENT` (set on Vercel production)
 
 ## [0.15.8] - 2026-02-22
 

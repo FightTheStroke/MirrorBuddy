@@ -15,12 +15,12 @@
 
 ## Models
 
-| Model              | Version    | Purpose     | Feature Flag        | Env Var                                |
-| ------------------ | ---------- | ----------- | ------------------- | -------------------------------------- |
-| `gpt-realtime-1.5` | v2026-02-23| Voice (GA)  | `voice_realtime_15` | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15` |
-| `gpt-realtime`     | v2024-10-01| Voice (GA)  | -                   | `AZURE_OPENAI_REALTIME_DEPLOYMENT`     |
-| `gpt-audio-1.5`    | v2026-02-23| TTS         | `tts_audio_15`      | `AZURE_OPENAI_AUDIO_DEPLOYMENT`        |
-| `tts-hd`           | -          | TTS fallback| -                   | `AZURE_OPENAI_TTS_HD_DEPLOYMENT`       |
+| Model              | Version    | Purpose     | Feature Flag        | Env Var                                | Deployment Name   |
+| ------------------ | ---------- | ----------- | ------------------- | -------------------------------------- | ----------------- |
+| `gpt-realtime-1.5` | v2026-02-23| Voice (GA)  | `voice_realtime_15` | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15` | `gpt-realtime-15` |
+| `gpt-realtime`     | v2025-08-28| Voice (GA)  | -                   | `AZURE_OPENAI_REALTIME_DEPLOYMENT`     | `gpt-realtime`    |
+| `gpt-audio-1.5`    | v2026-02-23| TTS         | `tts_audio_15`      | `AZURE_OPENAI_AUDIO_DEPLOYMENT`        | `gpt-audio-15`    |
+| `tts-hd`           | -          | TTS fallback| -                   | `AZURE_OPENAI_TTS_HD_DEPLOYMENT`       | `tts-hd-deployment` |
 
 **Fallback chains** (ADR 0159):
 - **Realtime**: `gpt-realtime-1.5` → `gpt-realtime`
