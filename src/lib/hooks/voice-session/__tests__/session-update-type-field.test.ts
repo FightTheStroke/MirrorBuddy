@@ -5,18 +5,16 @@
 // ============================================================================
 
 import { describe, it, expect } from 'vitest';
+import { HEARTBEAT_MESSAGE } from '../connection';
 
 describe('session.update type field', () => {
-  it('should include type field in heartbeat message', () => {
-    // Heartbeat is pre-stringified for performance
-    const parsed = JSON.parse(
-      // Access the private constant via module exports
-      '{"type":"session.update","session":{}}',
-    );
+  it('should include session.type=realtime in heartbeat message', () => {
+    const parsed = JSON.parse(HEARTBEAT_MESSAGE);
 
     expect(parsed).toHaveProperty('type');
     expect(parsed.type).toBe('session.update');
     expect(parsed).toHaveProperty('session');
+    expect(parsed.session.type).toBe('realtime');
   });
 
   it('should include type field in session config structure (GA format)', () => {

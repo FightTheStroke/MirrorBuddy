@@ -22,6 +22,7 @@ import { useSettingsStore } from '@/lib/stores';
 import type { SupportedLanguage } from '@/types';
 import { SharedChatLayout } from '@/components/chat/shared-chat-layout';
 import { useWakeLock } from '@/lib/hooks/use-wake-lock';
+import { cn } from '@/lib/utils';
 
 interface CharacterChatViewProps {
   characterId:
@@ -38,9 +39,10 @@ interface CharacterChatViewProps {
     | 'sofia'
     | 'marta';
   characterType: 'coach' | 'buddy';
+  onClose?: () => void;
 }
 
-export function CharacterChatView({ characterId, characterType }: CharacterChatViewProps) {
+export function CharacterChatView({ characterId, characterType, onClose }: CharacterChatViewProps) {
   const router = useRouter();
   const language = useSettingsStore((state) => state.appearance.language) as SupportedLanguage;
   const character = getCharacterInfo(characterId, characterType, language);
@@ -117,15 +119,22 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     onVoiceCall: handleVoiceCall,
     onStopTTS: stopTTS,
     onClearChat: clearChat,
-    onClose: () => router.back(),
+    onClose: onClose ?? (() => router.back()),
     onToggleMute: toggleMute,
     onOpenHistory: handleOpenHistory,
   };
 
   const hasActiveTool = activeTool && activeTool.status !== 'error';
 
+  const isOverlay = !!onClose;
+
   return (
-    <div className="flex flex-col lg:flex-row gap-0 md:gap-4 h-[calc(100dvh-5rem)]">
+    <div
+      className={cn(
+        'flex flex-col lg:flex-row gap-0 md:gap-4',
+        isOverlay ? 'h-dvh' : 'h-[calc(100dvh-5rem)]',
+      )}
+    >
       {/* Main Chat Area using SharedChatLayout */}
       <SharedChatLayout
         header={

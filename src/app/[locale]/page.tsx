@@ -210,12 +210,20 @@ export default function Home() {
       )}
       {currentView === 'coach' && (
         <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView characterId={selectedCoach} characterType="coach" />
+          <LazyCharacterChatView
+            characterId={selectedCoach}
+            characterType="coach"
+            onClose={() => setCurrentView('maestri')}
+          />
         </div>
       )}
       {currentView === 'buddy' && (
         <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView characterId={selectedBuddy} characterType="buddy" />
+          <LazyCharacterChatView
+            characterId={selectedBuddy}
+            characterType="buddy"
+            onClose={() => setCurrentView('maestri')}
+          />
         </div>
       )}
 

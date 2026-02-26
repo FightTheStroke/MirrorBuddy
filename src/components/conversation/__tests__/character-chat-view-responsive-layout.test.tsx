@@ -9,28 +9,28 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
-import { useDeviceType } from "@/hooks/use-device-type";
-import { CharacterChatView } from "../character-chat-view";
-import fs from "fs";
-import path from "path";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render } from '@testing-library/react';
+import { useDeviceType } from '@/hooks/use-device-type';
+import { CharacterChatView } from '../character-chat-view';
+import fs from 'fs';
+import path from 'path';
 
 // Mock useDeviceType hook
-vi.mock("@/hooks/use-device-type", () => ({
+vi.mock('@/hooks/use-device-type', () => ({
   useDeviceType: vi.fn(),
 }));
 
 // Mock useCharacterChat hook
-vi.mock("../character-chat-view/hooks/use-character-chat", () => ({
+vi.mock('../character-chat-view/hooks/use-character-chat', () => ({
   useCharacterChat: vi.fn(() => ({
     messages: [],
-    input: "",
+    input: '',
     setInput: vi.fn(),
     isLoading: false,
     isVoiceActive: false,
     isConnected: false,
-    connectionState: "closed",
+    connectionState: 'closed',
     configError: null,
     activeTool: null,
     setActiveTool: vi.fn(),
@@ -44,7 +44,7 @@ vi.mock("../character-chat-view/hooks/use-character-chat", () => ({
 }));
 
 // Mock useVoiceSession hook
-vi.mock("@/lib/hooks/use-voice-session", () => ({
+vi.mock('@/lib/hooks/use-voice-session', () => ({
   useVoiceSession: vi.fn(() => ({
     isListening: false,
     isSpeaking: false,
@@ -52,12 +52,12 @@ vi.mock("@/lib/hooks/use-voice-session", () => ({
     inputLevel: 0,
     outputLevel: 0,
     toggleMute: vi.fn(),
-    sessionId: "test-session",
+    sessionId: 'test-session',
   })),
 }));
 
 // Mock useTTS hook
-vi.mock("@/components/accessibility", () => ({
+vi.mock('@/components/accessibility', () => ({
   useTTS: vi.fn(() => ({
     speak: vi.fn(),
     stop: vi.fn(),
@@ -66,101 +66,90 @@ vi.mock("@/components/accessibility", () => ({
 }));
 
 // Mock useRouter
-vi.mock("next/navigation", () => ({
+vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({
     back: vi.fn(),
   })),
 }));
 
 // Mock useSettingsStore
-vi.mock("@/lib/stores", () => ({
+vi.mock('@/lib/stores', () => ({
   useSettingsStore: vi.fn((selector) => {
     if (selector) {
       return selector({
         appearance: {
-          language: "it",
+          language: 'it',
         },
       });
     }
-    return { appearance: { language: "it" } };
+    return { appearance: { language: 'it' } };
   }),
 }));
 
 // Mock character utilities and components
-vi.mock("../character-chat-view/utils/character-utils", () => ({
+vi.mock('../character-chat-view/utils/character-utils', () => ({
   getCharacterInfo: vi.fn(() => ({
-    name: "Test Coach",
-    avatar: "/avatars/test.webp",
-    themeColor: "#3B82F6",
+    name: 'Test Coach',
+    avatar: '/avatars/test.webp',
+    themeColor: '#3B82F6',
   })),
 }));
 
-vi.mock("@/components/character", () => ({
+vi.mock('@/components/character', () => ({
   CharacterHeader: () => <div data-testid="character-header">Header</div>,
-  CharacterVoicePanel: () => (
-    <div data-testid="character-voice-panel">Voice Panel</div>
-  ),
+  CharacterVoicePanel: () => <div data-testid="character-voice-panel">Voice Panel</div>,
   characterInfoToUnified: vi.fn((char) => char),
 }));
 
-vi.mock("../character-chat-view/components/messages-list", () => ({
+vi.mock('../character-chat-view/components/messages-list', () => ({
   MessagesList: () => <div data-testid="messages-list">Messages</div>,
 }));
 
-vi.mock("../character-chat-view/components/chat-input", () => ({
+vi.mock('../character-chat-view/components/chat-input', () => ({
   ChatInput: () => <div data-testid="chat-input">Input</div>,
 }));
 
-vi.mock("./conversation-drawer", () => ({
-  ConversationSidebar: () => (
-    <div data-testid="conversation-sidebar">Sidebar</div>
-  ),
+vi.mock('./conversation-drawer', () => ({
+  ConversationSidebar: () => <div data-testid="conversation-sidebar">Sidebar</div>,
 }));
 
-vi.mock("@/components/tools/tool-panel", () => ({
+vi.mock('@/components/tools/tool-panel', () => ({
   ToolPanel: () => <div data-testid="tool-panel">Tool Panel</div>,
 }));
 
-describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", () => {
+describe('CharacterChatView - F-05 Responsive Layout (No isPhone for layout)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Source Code Verification", () => {
-    it("should NOT use isPhone in className template literals for flex direction", () => {
+  describe('Source Code Verification', () => {
+    it('should NOT use isPhone in className template literals for flex direction', () => {
       // Read the source file and verify no isPhone ternary for layout
       const filePath = path.join(
         process.cwd(),
-        "src/components/conversation/character-chat-view.tsx",
+        'src/components/conversation/character-chat-view.tsx',
       );
-      const source = fs.readFileSync(filePath, "utf-8");
+      const source = fs.readFileSync(filePath, 'utf-8');
 
       // Should NOT have: ${isPhone ? "flex-col" : "lg:flex-row"}
       // Should NOT have: className={`flex ${isPhone
-      const hasIsPhoneFlex = /\$\{isPhone\s*\?\s*["']flex-col["']/i.test(
-        source,
-      );
-      const hasIsPhoneHeight = /\$\{isPhone\s*\?\s*["']h-screen["']/i.test(
-        source,
-      );
+      const hasIsPhoneFlex = /\$\{isPhone\s*\?\s*["']flex-col["']/i.test(source);
+      const hasIsPhoneHeight = /\$\{isPhone\s*\?\s*["']h-screen["']/i.test(source);
 
       expect(hasIsPhoneFlex).toBe(false);
       expect(hasIsPhoneHeight).toBe(false);
     });
 
-    it("should have pure Tailwind responsive classes in main container", () => {
+    it('should have pure Tailwind responsive classes in main container', () => {
       const filePath = path.join(
         process.cwd(),
-        "src/components/conversation/character-chat-view.tsx",
+        'src/components/conversation/character-chat-view.tsx',
       );
-      const source = fs.readFileSync(filePath, "utf-8");
+      const source = fs.readFileSync(filePath, 'utf-8');
 
-      // Should have: className="flex flex-col lg:flex-row"
+      // Should have: flex flex-col lg:flex-row (inline or via cn())
       // Should have: gap-0 md:gap-4
-      // Should have: h-full lg:h-[calc(100vh-8rem)]
-      const hasFlexColLgRow = /className="flex\s+flex-col\s+lg:flex-row/i.test(
-        source,
-      );
+      const hasFlexColLgRow = /flex.+flex-col.+lg:flex-row/i.test(source);
       const hasMdGap = /md:gap-4/i.test(source);
 
       expect(hasFlexColLgRow).toBe(true);
@@ -168,14 +157,14 @@ describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", (
     });
   });
 
-  describe("Runtime Behavior", () => {
-    it("should render with flex-col class on mobile device", () => {
+  describe('Runtime Behavior', () => {
+    it('should render with flex-col class on mobile device', () => {
       vi.mocked(useDeviceType).mockReturnValue({
-        deviceType: "phone",
+        deviceType: 'phone',
         isPhone: true,
         isTablet: false,
         isDesktop: false,
-        orientation: "portrait",
+        orientation: 'portrait',
         isPortrait: true,
         isLandscape: false,
       });
@@ -185,17 +174,17 @@ describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", (
       );
 
       const mainContainer = container.firstChild as HTMLElement;
-      expect(mainContainer?.classList.contains("flex")).toBe(true);
-      expect(mainContainer?.classList.contains("flex-col")).toBe(true);
+      expect(mainContainer?.classList.contains('flex')).toBe(true);
+      expect(mainContainer?.classList.contains('flex-col')).toBe(true);
     });
 
-    it("should have responsive gap classes (gap-0 md:gap-4)", () => {
+    it('should have responsive gap classes (gap-0 md:gap-4)', () => {
       vi.mocked(useDeviceType).mockReturnValue({
-        deviceType: "phone",
+        deviceType: 'phone',
         isPhone: true,
         isTablet: false,
         isDesktop: false,
-        orientation: "portrait",
+        orientation: 'portrait',
         isPortrait: true,
         isLandscape: false,
       });
@@ -206,19 +195,19 @@ describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", (
 
       const mainContainer = container.firstChild as HTMLElement;
       // Check for gap classes
-      const classStr = mainContainer?.className || "";
+      const classStr = mainContainer?.className || '';
       expect(classStr).toMatch(/gap-0/);
       expect(classStr).toMatch(/md:gap-4/);
     });
 
-    it("should not have conditional flex direction based on isPhone", () => {
+    it('should not have conditional flex direction based on isPhone', () => {
       // Render with isPhone=true
       vi.mocked(useDeviceType).mockReturnValue({
-        deviceType: "phone",
+        deviceType: 'phone',
         isPhone: true,
         isTablet: false,
         isDesktop: false,
-        orientation: "portrait",
+        orientation: 'portrait',
         isPortrait: true,
         isLandscape: false,
       });
@@ -227,16 +216,16 @@ describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", (
         <CharacterChatView characterId="melissa" characterType="coach" />,
       );
       const mainContainer1 = container1.firstChild as HTMLElement;
-      const classes1 = mainContainer1?.className || "";
+      const classes1 = mainContainer1?.className || '';
 
       // Render with isPhone=false
       vi.clearAllMocks();
       vi.mocked(useDeviceType).mockReturnValue({
-        deviceType: "desktop",
+        deviceType: 'desktop',
         isPhone: false,
         isTablet: false,
         isDesktop: true,
-        orientation: "landscape",
+        orientation: 'landscape',
         isPortrait: false,
         isLandscape: true,
       });
@@ -245,7 +234,7 @@ describe("CharacterChatView - F-05 Responsive Layout (No isPhone for layout)", (
         <CharacterChatView characterId="melissa" characterType="coach" />,
       );
       const mainContainer2 = container2.firstChild as HTMLElement;
-      const classes2 = mainContainer2?.className || "";
+      const classes2 = mainContainer2?.className || '';
 
       // Both should have flex-col and lg:flex-row (Tailwind handles breakpoint)
       expect(classes1).toMatch(/flex-col/);

@@ -20,7 +20,7 @@ import { logVoiceDiagnosticsReport } from './voice-diagnostics';
 // Pre-stringified heartbeat message to avoid JSON.stringify on every beat
 export const HEARTBEAT_MESSAGE = JSON.stringify({
   type: 'session.update',
-  session: {},
+  session: { type: 'realtime' },
 });
 
 // Re-export types for backwards compatibility
