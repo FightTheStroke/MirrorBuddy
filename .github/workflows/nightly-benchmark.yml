@@ -1,0 +1,82 @@
+name: nightly-benchmark
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nightly-benchmark:
+    runs-on: ubuntu-latest
+    outputs:
+      benchmark_exit_code: ${{ steps.run-benchmark.outputs.benchmark_exit_code }}
+      regression_detected: ${{ steps.run-benchmark.outputs.regression_detected }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run nightly benchmark
+        id: run-benchmark
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set +e
+          npx tsx scripts/nightly-benchmark.ts
+          BENCHMARK_EXIT_CODE=$?
+          echo "BENCHMARK_EXIT_CODE=${BENCHMARK_EXIT_CODE}" >> "$GITHUB_ENV"
+          echo "benchmark_exit_code=${BENCHMARK_EXIT_CODE}" >> "$GITHUB_OUTPUT"
+          if [ "$BENCHMARK_EXIT_CODE" -ne 0 ]; then
+            echo "regression_detected=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "regression_detected=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
+  notify-on-regression:
+    runs-on: ubuntu-latest
+    needs: nightly-benchmark
+    if: needs.nightly-benchmark.outputs.regression_detected == 'true'
+    steps:
+      - name: Send Slack alert
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -sf -X POST "${SLACK_WEBHOOK_URL}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg repo "${{ github.repository }}" \
+              --arg run_url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+              --arg code "${{ needs.nightly-benchmark.outputs.benchmark_exit_code }}" \
+              '{text: ("Nightly benchmark regression detected in " + $repo + " (exit code: " + $code + "). " + $run_url)}')"
+
+      - name: Send email alert via Resend
+        if: ${{ secrets.RESEND_API_KEY != '' && secrets.ADMIN_EMAIL != '' && secrets.EMAIL_FROM != '' }}
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          FROM_EMAIL: ${{ secrets.EMAIL_FROM }}
+        run: |
+          SUBJECT="MirrorBuddy nightly benchmark regression"
+          HTML="<p>Nightly benchmark failed with exit code <strong>${{ needs.nightly-benchmark.outputs.benchmark_exit_code }}</strong>.</p><p>Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>View workflow run</a></p>"
+          curl -sf -X POST "https://api.resend.com/emails" \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg from "$FROM_EMAIL" \
+              --arg to "$ADMIN_EMAIL" \
+              --arg subject "$SUBJECT" \
+              --arg html "$HTML" \
+              '{from: $from, to: [$to], subject: $subject, html: $html}')"

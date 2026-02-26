@@ -67,6 +67,8 @@ function createMockConversation(overrides: {
     markedForDeletion: false,
     markedForDeletionAt: null,
     isTestData: false,
+    abExperimentId: null,
+    abBucketLabel: null,
   };
 }
 

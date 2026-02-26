@@ -62,6 +62,8 @@ describe('message-anonymization in POST /api/conversations/[id]/messages', () =>
     updatedAt: new Date(),
     markedForDeletion: false,
     markedForDeletionAt: null,
+    abExperimentId: null,
+    abBucketLabel: null,
   };
 
   const mockMessage = {

@@ -46,6 +46,8 @@ export function createMockPrisma() {
     complianceAuditEntry: createModelMock(),
     concept: createModelMock(),
     contactRequest: createModelMock(),
+    communityContribution: createModelMock(),
+    contributionVote: createModelMock(),
     contentEmbedding: createModelMock(),
     conversation: createModelMock(),
     coppaConsent: createModelMock(),

@@ -26,6 +26,60 @@
     "average": "Average",
     "draft": "Draft",
     "completed": "Completed",
-    "failed": "Failed"
+    "failed": "Failed",
+    "stats": {
+      "sectionAriaLabel": "Maestro ranking statistics",
+      "rankLabel": "Rank #{rank}",
+      "completedExperiments": "{count} completed experiments",
+      "averageLabel": "Avg {value}",
+      "dimensions": {
+        "scaffolding": "Scaffolding",
+        "hinting": "Hinting",
+        "adaptation": "Adaptation",
+        "misconceptionHandling": "Misconception handling"
+      },
+      "avg": "Avg",
+      "loading": "Loading maestro ranking stats...",
+      "cardAriaLabel": "Maestro ranking statistics",
+      "dimensionsAriaLabel": "Scores by dimension"
+    },
+    "form": {
+      "title": "Create experiment",
+      "name": "Name",
+      "hypothesis": "Hypothesis",
+      "maestroId": "Maestro",
+      "syntheticProfileId": "Synthetic profile",
+      "turns": "Turns",
+      "topic": "Topic",
+      "difficulty": "Difficulty",
+      "difficultyEasy": "Easy",
+      "difficultyMedium": "Medium",
+      "difficultyHard": "Hard",
+      "selectPlaceholder": "Select an option",
+      "submit": "Create",
+      "submitting": "Creating...",
+      "success": "Experiment created",
+      "error": "Failed to create experiment",
+      "validationRequired": "Fill all required fields",
+      "validationTurns": "Turns must be at least 1"
+    },
+    "ranking": {
+      "rank": "Rank",
+      "average": "Average"
+    },
+    "drillDown": {
+      "title": "Benchmark Drill-down",
+      "description": "Detailed TutorBench scores, metadata, and turn-by-turn progression",
+      "maestroLabel": "Maestro",
+      "profileLabel": "Profile",
+      "experimentName": "Experiment name",
+      "hypothesis": "Hypothesis",
+      "scaffolding": "Scaffolding",
+      "hinting": "Hinting",
+      "adaptation": "Adaptation",
+      "misconceptionHandling": "Misconception handling",
+      "progressionAriaLabel": "Turn-by-turn score progression",
+      "noProgression": "No progression data available."
+    }
   }
 }

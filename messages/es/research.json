@@ -26,6 +26,60 @@
     "average": "Promedio",
     "draft": "Borrador",
     "completed": "Completado",
-    "failed": "Fallido"
+    "failed": "Fallido",
+    "stats": {
+      "sectionAriaLabel": "Estadísticas de clasificación de maestros",
+      "rankLabel": "Posición #{rank}",
+      "completedExperiments": "{count} experimentos completados",
+      "averageLabel": "Prom. {value}",
+      "dimensions": {
+        "scaffolding": "Scaffolding",
+        "hinting": "Pistas",
+        "adaptation": "Adaptación",
+        "misconceptionHandling": "Gestión de errores"
+      },
+      "avg": "Prom",
+      "loading": "Cargando estadísticas de maestro...",
+      "cardAriaLabel": "Estadísticas de ranking de maestro",
+      "dimensionsAriaLabel": "Puntuaciones por dimensión"
+    },
+    "form": {
+      "title": "Crear experimento",
+      "name": "Nombre",
+      "hypothesis": "Hipótesis",
+      "maestroId": "Maestro",
+      "syntheticProfileId": "Perfil sintético",
+      "turns": "Turnos",
+      "topic": "Tema",
+      "difficulty": "Dificultad",
+      "difficultyEasy": "Fácil",
+      "difficultyMedium": "Media",
+      "difficultyHard": "Difícil",
+      "selectPlaceholder": "Selecciona una opción",
+      "submit": "Crear",
+      "submitting": "Creando...",
+      "success": "Experimento creado",
+      "error": "No se pudo crear el experimento",
+      "validationRequired": "Completa todos los campos obligatorios",
+      "validationTurns": "Los turnos deben ser al menos 1"
+    },
+    "ranking": {
+      "rank": "Posición",
+      "average": "Promedio"
+    },
+    "drillDown": {
+      "title": "Detalle del Benchmark",
+      "description": "Puntuaciones TutorBench detalladas, metadatos y progresión turno a turno",
+      "maestroLabel": "Maestro",
+      "profileLabel": "Perfil",
+      "experimentName": "Nombre del experimento",
+      "hypothesis": "Hipótesis",
+      "scaffolding": "Scaffolding",
+      "hinting": "Pistas",
+      "adaptation": "Adaptación",
+      "misconceptionHandling": "Manejo de concepciones erróneas",
+      "progressionAriaLabel": "Progresión de puntuación turno a turno",
+      "noProgression": "No hay datos de progresión disponibles."
+    }
   }
 }

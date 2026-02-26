@@ -108,6 +108,10 @@ model User {
   // Password Reset Tokens (Plan 125)
   passwordResetTokens PasswordResetToken[]
 
+  // Community Domain (F-13)
+  communityContributions CommunityContribution[]
+  contributionVotes      ContributionVote[]
+
   @@index([emailHash])
 }
 

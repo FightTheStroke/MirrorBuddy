@@ -15,6 +15,8 @@ import {
   Activity,
   Layers,
   ScrollText,
+  Beaker,
+  MessageSquare,
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -75,6 +77,30 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Analytics',
     href: '/admin/analytics',
     icon: BarChart3,
+  },
+  {
+    id: 'research-lab',
+    label: 'Research Lab',
+    href: '/admin/research-lab',
+    icon: Activity,
+  },
+  {
+    id: 'model-comparison',
+    label: 'Model Comparison',
+    href: '/admin/research-lab/model-comparison',
+    icon: Activity,
+  },
+  {
+    id: 'ab-testing',
+    label: 'A/B Testing',
+    href: '/admin/research/ab-testing',
+    icon: Beaker,
+  },
+  {
+    id: 'review-queue',
+    label: 'Review Queue',
+    href: '/admin/community',
+    icon: MessageSquare,
   },
   {
     id: 'service-limits',
@@ -203,6 +229,7 @@ export function MobileAdminNav({
                 key={item.id}
                 href={item.href}
                 onClick={handleNavItemClick}
+                aria-label={item.label}
                 className={cn(
                   'flex items-center gap-3 rounded-xl transition-all relative px-4 py-3',
                   active && 'bg-slate-900 dark:bg-white text-white dark:text-slate-900',

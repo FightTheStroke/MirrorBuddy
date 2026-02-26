@@ -2,51 +2,51 @@
  * Test for verify-backup-encryption script
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { execSync } from "child_process";
-import * as path from "path";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { execSync } from 'child_process';
+import * as path from 'path';
 
-const SCRIPT_PATH = path.join(__dirname, "../verify-backup-encryption.ts");
+const SCRIPT_PATH = path.join(__dirname, '../verify-backup-encryption.ts');
 
-describe("verify-backup-encryption", () => {
+const TEST_ENV = {
+  ...process.env,
+  PII_ENCRYPTION_KEY: 'test-key-at-least-32-chars-long!!',
+  TOKEN_ENCRYPTION_KEY: 'test-token-key-at-least-32-chars!',
+};
+
+describe('verify-backup-encryption', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should exist and be executable", () => {
+  it('should exist and be executable', () => {
     expect(() => {
-      execSync(`test -f ${SCRIPT_PATH}`, { encoding: "utf8" });
+      execSync(`test -f ${SCRIPT_PATH}`, { encoding: 'utf8' });
     }).not.toThrow();
   });
 
-  it("should run with --dry-run flag", () => {
+  it('should run with --dry-run flag', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH} --dry-run`, {
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        PII_ENCRYPTION_KEY: "test-key-at-least-32-chars-long!!",
-      },
+      encoding: 'utf8',
+      env: TEST_ENV,
     });
 
-    expect(result).toContain("PASS");
+    expect(result).toContain('PASS');
   });
 
-  it("should check encryption key availability", () => {
+  it('should check encryption key availability', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        PII_ENCRYPTION_KEY: "test-key-at-least-32-chars-long!!",
-      },
+      encoding: 'utf8',
+      env: TEST_ENV,
     });
 
     expect(result).toMatch(/Encryption key.*PASS/i);
   });
 
-  it("should fail when encryption key is missing", () => {
+  it('should fail when encryption key is missing', () => {
     expect(() => {
       execSync(`npx tsx ${SCRIPT_PATH}`, {
-        encoding: "utf8",
+        encoding: 'utf8',
         env: {
           ...process.env,
           PII_ENCRYPTION_KEY: undefined,
@@ -57,25 +57,19 @@ describe("verify-backup-encryption", () => {
     }).toThrow();
   });
 
-  it("should verify encryption/decryption works", () => {
+  it('should verify encryption/decryption works', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        PII_ENCRYPTION_KEY: "test-key-at-least-32-chars-long!!",
-      },
+      encoding: 'utf8',
+      env: TEST_ENV,
     });
 
-    expect(result).toMatch(/Encryption.*decrypt.*PASS/i);
+    expect(result).toMatch(/Encrypt.*Decrypt.*PASS/i);
   });
 
-  it("should verify key-rotation-helpers import", () => {
+  it('should verify key-rotation-helpers import', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
-      encoding: "utf8",
-      env: {
-        ...process.env,
-        PII_ENCRYPTION_KEY: "test-key-at-least-32-chars-long!!",
-      },
+      encoding: 'utf8',
+      env: TEST_ENV,
     });
 
     expect(result).toMatch(/Key rotation.*PASS/i);

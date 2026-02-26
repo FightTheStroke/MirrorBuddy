@@ -38,12 +38,14 @@ const EXPECTED_SCHEMA_FILES = [
   'characters.prisma', // CharacterConfig (admin character management)
   'dependency-monitoring.prisma', // UsagePattern, DependencyAlert (AI safety)
   'research.prisma', // ResearchExperiment, ResearchResult, SyntheticProfile
+  'ab-testing.prisma', // ABExperiment, ABBucketConfig (A/B model routing)
   'video-vision.prisma', // VideoVisionSession (realtime video vision capabilities)
   'sso.prisma', // Enterprise SSO (OIDC providers, sessions)
   'audit.prisma', // Audit log entries
   'communications.prisma', // EmailTemplate, EmailCampaign, EmailRecipient, EmailPreference, EmailEvent
   'maintenance.prisma', // MaintenanceWindow (planned outages/maintenance)
   'waitlist.prisma', // WaitlistEntry (coming soon waitlist)
+  'community.prisma', // CommunityContribution, ContributionVote (community moderation/voting)
 ];
 
 // Expected models that should be present across all schema files
@@ -132,6 +134,9 @@ const EXPECTED_MODELS = [
   'SyntheticProfile',
   'ResearchExperiment',
   'ResearchResult',
+  // ab-testing.prisma
+  'ABExperiment',
+  'ABBucketConfig',
   // communications.prisma
   'EmailTemplate',
   'EmailCampaign',
@@ -141,6 +146,9 @@ const EXPECTED_MODELS = [
   'MaintenanceWindow',
   // waitlist.prisma
   'WaitlistEntry',
+  // community.prisma
+  'CommunityContribution',
+  'ContributionVote',
 ];
 
 describe('Prisma Schema Split', () => {
@@ -216,6 +224,13 @@ describe('Prisma Schema Split', () => {
     it('should have Conversation model in conversations.prisma', () => {
       const content = readFileSync(join(SCHEMA_DIR, 'conversations.prisma'), 'utf-8');
       expect(content).toContain('model Conversation {');
+    });
+
+    it('should include Conversation A/B metadata fields and index', () => {
+      const content = readFileSync(join(SCHEMA_DIR, 'conversations.prisma'), 'utf-8');
+      expect(content).toContain('abExperimentId String?');
+      expect(content).toContain('abBucketLabel  String?');
+      expect(content).toContain('@@index([abExperimentId])');
     });
 
     it('should have Material model in content.prisma', () => {

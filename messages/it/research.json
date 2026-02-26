@@ -26,6 +26,60 @@
     "average": "Media",
     "draft": "Bozza",
     "completed": "Completato",
-    "failed": "Fallito"
+    "failed": "Fallito",
+    "stats": {
+      "sectionAriaLabel": "Statistiche classifica maestri",
+      "rankLabel": "Posizione #{rank}",
+      "completedExperiments": "{count} esperimenti completati",
+      "averageLabel": "Media {value}",
+      "dimensions": {
+        "scaffolding": "Scaffolding",
+        "hinting": "Hinting",
+        "adaptation": "Adattamento",
+        "misconceptionHandling": "Gestione misconcezioni"
+      },
+      "avg": "Media",
+      "loading": "Caricamento statistiche maestro...",
+      "cardAriaLabel": "Statistiche ranking maestro",
+      "dimensionsAriaLabel": "Punteggi per dimensione"
+    },
+    "form": {
+      "title": "Crea esperimento",
+      "name": "Nome",
+      "hypothesis": "Ipotesi",
+      "maestroId": "Maestro",
+      "syntheticProfileId": "Profilo sintetico",
+      "turns": "Turni",
+      "topic": "Argomento",
+      "difficulty": "Difficoltà",
+      "difficultyEasy": "Facile",
+      "difficultyMedium": "Media",
+      "difficultyHard": "Difficile",
+      "selectPlaceholder": "Seleziona un'opzione",
+      "submit": "Crea",
+      "submitting": "Creazione in corso...",
+      "success": "Esperimento creato",
+      "error": "Creazione esperimento non riuscita",
+      "validationRequired": "Compila tutti i campi obbligatori",
+      "validationTurns": "I turni devono essere almeno 1"
+    },
+    "ranking": {
+      "rank": "Posizione",
+      "average": "Media"
+    },
+    "drillDown": {
+      "title": "Dettaglio Benchmark",
+      "description": "Punteggi TutorBench dettagliati, metadati e progressione turno per turno",
+      "maestroLabel": "Maestro",
+      "profileLabel": "Profilo",
+      "experimentName": "Nome esperimento",
+      "hypothesis": "Ipotesi",
+      "scaffolding": "Scaffolding",
+      "hinting": "Suggerimento",
+      "adaptation": "Adattamento",
+      "misconceptionHandling": "Gestione misconcezioni",
+      "progressionAriaLabel": "Progressione punteggio turno per turno",
+      "noProgression": "Nessun dato di progressione disponibile."
+    }
   }
 }

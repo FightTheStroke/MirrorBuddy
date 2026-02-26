@@ -83,3 +83,15 @@ model ResearchResult {
   @@index([experimentId])
   @@index([experimentId, turn])
 }
+
+model BenchmarkTrend {
+  id           String   @id @default(cuid())
+  maestroId    String
+  profileId    String
+  dimension    String
+  score        Float
+  runDate      DateTime
+  experimentId String
+
+  @@index([maestroId, dimension, runDate])
+}

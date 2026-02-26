@@ -1,0 +1,81 @@
+{
+  "community": {
+    "title": "Contributions de la communauté",
+    "description": "Partage des ressources d'étude avec la communauté MirrorBuddy.",
+    "contributionForm": {
+      "title": "Soumettre une contribution",
+      "nameLabel": "Titre",
+      "contentLabel": "Description",
+      "typeLabel": "Type de contribution",
+      "submitButton": "Soumettre la contribution",
+      "submittingButton": "Envoi en cours...",
+      "cancelButton": "Annuler",
+      "contributionType": "Type de contribution",
+      "contributionTitle": "Titre de la contribution",
+      "contributionContent": "Contenu de la contribution",
+      "rewardPreview": "Aperçu des MirrorBucks :",
+      "feedback": "Feedback",
+      "tip": "Conseil",
+      "resource": "Ressource",
+      "question": "Question",
+      "avg": "Moy"
+    },
+    "typeNames": {
+      "studyGuide": "Guide d'étude",
+      "mindMap": "Carte mentale",
+      "flashcards": "Flashcards",
+      "quiz": "Quiz",
+      "summary": "Résumé"
+    },
+    "statusLabels": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Rejeté",
+      "flagged": "Signalé"
+    },
+    "reviewQueue": {
+      "title": "Titre",
+      "pendingHeading": "Contributions en attente",
+      "recentHeading": "Récemment révisées",
+      "typeHeading": "Type",
+      "statusHeading": "Statut",
+      "rewardHeading": "Récompense",
+      "actionsHeading": "Actions",
+      "type": "Type",
+      "author": "Auteur",
+      "submitted": "Soumis",
+      "preview": "Aperçu",
+      "actions": "Actions",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "flag": "Signaler",
+      "noPending": "Aucune contribution en attente.",
+      "loadingPending": "Chargement des contributions en attente...",
+      "moderateDescription": "Modérer les contributions communautaires en attente"
+    },
+    "mirrorBucksRewards": {
+      "title": "Récompenses MirrorBucks",
+      "approvedLabel": "Récompense contribution approuvée",
+      "rejectedLabel": "Récompense contribution rejetée",
+      "bonusLabel": "Bonus qualité",
+      "totalLabel": "Récompense totale"
+    },
+    "moderationMessages": {
+      "approved": "Contribution approuvée et publiée.",
+      "rejected": "Contribution rejetée.",
+      "flagged": "Contribution signalée pour révision manuelle.",
+      "needsReview": "Cette contribution nécessite une révision de modération."
+    },
+    "toasts": {
+      "submitSuccess": "Contribution envoyée avec succès.",
+      "submitError": "Impossible d'envoyer la contribution.",
+      "reviewSuccess": "Action de révision enregistrée.",
+      "reviewError": "Impossible d'enregistrer l'action de révision."
+    },
+    "emptyStates": {
+      "noContributions": "Aucune contribution pour le moment.",
+      "noPendingReviews": "Aucune révision en attente.",
+      "noSearchResults": "Aucune contribution ne correspond à votre recherche."
+    }
+  }
+}
