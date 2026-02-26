@@ -53,7 +53,10 @@ function getABExperimentModel(): ABExperimentModel {
 
 function buildBucketRanges(bucketConfigs: ABBucketConfigRecord[]): BucketRanges {
   const ranges: BucketRanges = {};
-  const totalWeight = bucketConfigs.reduce((sum, config) => sum + Math.max(config.percentage, 0), 0);
+  const totalWeight = bucketConfigs.reduce(
+    (sum, config) => sum + Math.max(config.percentage, 0),
+    0,
+  );
 
   if (totalWeight <= 0) {
     throw new Error('Experiment bucket percentages must be greater than 0');
@@ -64,11 +67,13 @@ function buildBucketRanges(bucketConfigs: ABBucketConfigRecord[]): BucketRanges 
 
   for (let index = 0; index < bucketConfigs.length; index++) {
     const config = bucketConfigs[index];
-    cumulativeWeight += Math.max(config.percentage, 0);
+    if (config.percentage <= 0) {
+      ranges[config.bucketLabel] = [-1, -1];
+      continue;
+    }
+    cumulativeWeight += config.percentage;
     const boundary =
-      index === bucketConfigs.length - 1
-        ? 100
-        : Math.max(rangeStart + 1, Math.round((cumulativeWeight / totalWeight) * 100));
+      index === bucketConfigs.length - 1 ? 100 : Math.round((cumulativeWeight / totalWeight) * 100);
 
     const rangeEnd = Math.min(99, boundary - 1);
     ranges[config.bucketLabel] = [rangeStart, rangeEnd];
@@ -101,7 +106,9 @@ export async function getActiveExperiments(): Promise<ABExperimentRecord[]> {
   return experiments;
 }
 
-export async function getExperimentConfig(experimentId: string): Promise<ABExperimentRecord | null> {
+export async function getExperimentConfig(
+  experimentId: string,
+): Promise<ABExperimentRecord | null> {
   if (!experimentId) {
     throw new Error('experimentId is required');
   }
@@ -118,7 +125,10 @@ export async function getExperimentConfig(experimentId: string): Promise<ABExper
   });
 }
 
-export async function resolveUserBucket(userId: string, experimentId: string): Promise<{
+export async function resolveUserBucket(
+  userId: string,
+  experimentId: string,
+): Promise<{
   bucketLabel: string;
   modelProvider: string;
   modelName: string;
@@ -138,7 +148,9 @@ export async function resolveUserBucket(userId: string, experimentId: string): P
 
   const bucketRanges = buildBucketRanges(experiment.bucketConfigs);
   const bucketLabel = assignBucket(userId, experiment.id, bucketRanges);
-  const bucketConfig = experiment.bucketConfigs.find((config) => config.bucketLabel === bucketLabel);
+  const bucketConfig = experiment.bucketConfigs.find(
+    (config) => config.bucketLabel === bucketLabel,
+  );
 
   if (!bucketConfig) {
     throw new Error(`Bucket config not found for label ${bucketLabel}`);

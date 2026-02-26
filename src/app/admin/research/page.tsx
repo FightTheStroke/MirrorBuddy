@@ -31,6 +31,11 @@ interface ExperimentList {
   total: number;
 }
 
+interface SelectOption {
+  id: string;
+  label: string;
+}
+
 export default function ResearchLabPage() {
   const t = useTranslations('admin');
   const [data, setData] = useState<ExperimentList | null>(null);
@@ -38,6 +43,7 @@ export default function ResearchLabPage() {
   const [running, setRunning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [createFormOpen, setCreateFormOpen] = useState(false);
+  const [syntheticProfiles, setSyntheticProfiles] = useState<SelectOption[]>([]);
 
   const fetchExperiments = useCallback(async () => {
     try {
@@ -51,6 +57,15 @@ export default function ResearchLabPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/admin/research/synthetic-profiles')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((profiles: Array<{ id: string; name: string }>) =>
+        setSyntheticProfiles(profiles.map((p) => ({ id: p.id, label: p.name }))),
+      )
+      .catch(() => setSyntheticProfiles([]));
   }, []);
 
   useEffect(() => {
@@ -129,7 +144,9 @@ export default function ResearchLabPage() {
       {/* Experiments Table */}
       <section>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold">{t('research.experiments', { count: data?.total ?? 0 })}</h2>
+          <h2 className="text-lg font-semibold">
+            {t('research.experiments', { count: data?.total ?? 0 })}
+          </h2>
           <button
             type="button"
             onClick={() => setCreateFormOpen((prev) => !prev)}
@@ -144,7 +161,7 @@ export default function ResearchLabPage() {
           <div id="experiment-create-panel" className="mb-3">
             <ExperimentCreateForm
               maestros={maestroOptions}
-              syntheticProfiles={[]}
+              syntheticProfiles={syntheticProfiles}
               onCreated={() => {
                 setCreateFormOpen(false);
                 void fetchExperiments();

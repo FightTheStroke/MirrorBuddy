@@ -99,9 +99,9 @@ export const GET = pipe(
             };
           }
 
-          const sessionIds = conversations.map((row) => row.id);
+          const conversationIds = conversations.map((row) => row.id);
           const metrics = (await prisma.sessionMetrics.aggregate({
-            where: { sessionId: { in: sessionIds } },
+            where: { conversationId: { in: conversationIds } },
             _avg: {
               turnCount: true,
               avgTurnLatencyMs: true,
@@ -112,7 +112,7 @@ export const GET = pipe(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma groupBy typing mismatch
           const outcomes = (await (prisma.sessionMetrics.groupBy as any)({
             by: ['outcome'],
-            where: { sessionId: { in: sessionIds } },
+            where: { conversationId: { in: conversationIds } },
             _count: { _all: true },
           })) as SessionOutcomeGroup[];
           const successCount =
