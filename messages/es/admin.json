@@ -1845,6 +1845,9 @@
       "sampleSize": "Tamaño de muestra",
       "avgTutorBench": "Prom TutorBench",
       "chartAriaLabel": "Gráfico de comparación A/B"
+    },
+    "community": {
+      "reviewQueue": "Cola de revisión"
     }
   }
 }

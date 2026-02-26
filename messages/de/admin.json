@@ -1845,6 +1845,9 @@
       "sampleSize": "Stichprobengröße",
       "avgTutorBench": "Durchschn. TutorBench",
       "chartAriaLabel": "A/B-Vergleichsdiagramm"
+    },
+    "community": {
+      "reviewQueue": "Überprüfungswarteschlange"
     }
   }
 }

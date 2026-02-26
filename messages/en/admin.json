@@ -1845,6 +1845,9 @@
       "sampleSize": "Sample Size",
       "avgTutorBench": "Avg TutorBench",
       "chartAriaLabel": "A/B comparison chart"
+    },
+    "community": {
+      "reviewQueue": "Review Queue"
     }
   }
 }

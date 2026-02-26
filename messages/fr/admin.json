@@ -1845,6 +1845,9 @@
       "sampleSize": "Taille échantillon",
       "avgTutorBench": "Moy TutorBench",
       "chartAriaLabel": "Graphique de comparaison A/B"
+    },
+    "community": {
+      "reviewQueue": "File de révision"
     }
   }
 }

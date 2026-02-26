@@ -1845,6 +1845,9 @@
       "sampleSize": "Dimensione campione",
       "avgTutorBench": "Media TutorBench",
       "chartAriaLabel": "Grafico confronto A/B"
+    },
+    "community": {
+      "reviewQueue": "Coda revisione"
     }
   }
 }
