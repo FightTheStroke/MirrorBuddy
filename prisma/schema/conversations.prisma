@@ -29,6 +29,10 @@ model Conversation {
   isParentMode Boolean @default(false)
   studentId    String?
 
+  // A/B experiment metadata (F-11)
+  abExperimentId String?
+  abBucketLabel  String?
+
   // F-17: Test data isolation
   isTestData Boolean @default(false)
 
@@ -44,6 +48,7 @@ model Conversation {
   @@index([updatedAt])
   @@index([isParentMode])
   @@index([markedForDeletion])
+  @@index([abExperimentId])
 }
 
 model Message {

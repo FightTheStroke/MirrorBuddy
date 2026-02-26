@@ -1,0 +1,81 @@
+{
+  "community": {
+    "title": "Community Contributions",
+    "description": "Share study resources with the MirrorBuddy community.",
+    "contributionForm": {
+      "title": "Submit a contribution",
+      "nameLabel": "Title",
+      "contentLabel": "Description",
+      "typeLabel": "Contribution type",
+      "submitButton": "Submit contribution",
+      "submittingButton": "Submitting...",
+      "cancelButton": "Cancel",
+      "contributionType": "Contribution type",
+      "contributionTitle": "Contribution title",
+      "contributionContent": "Contribution content",
+      "rewardPreview": "MirrorBucks reward preview:",
+      "feedback": "Feedback",
+      "tip": "Tip",
+      "resource": "Resource",
+      "question": "Question",
+      "avg": "Avg"
+    },
+    "typeNames": {
+      "studyGuide": "Study guide",
+      "mindMap": "Mind map",
+      "flashcards": "Flashcards",
+      "quiz": "Quiz",
+      "summary": "Summary"
+    },
+    "statusLabels": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "flagged": "Flagged"
+    },
+    "reviewQueue": {
+      "title": "Title",
+      "pendingHeading": "Pending contributions",
+      "recentHeading": "Recently reviewed",
+      "typeHeading": "Type",
+      "statusHeading": "Status",
+      "rewardHeading": "Reward",
+      "actionsHeading": "Actions",
+      "type": "Type",
+      "author": "Author",
+      "submitted": "Submitted",
+      "preview": "Preview",
+      "actions": "Actions",
+      "approve": "Approve",
+      "reject": "Reject",
+      "flag": "Flag",
+      "noPending": "No pending contributions to review.",
+      "loadingPending": "Loading pending contributions...",
+      "moderateDescription": "Moderate pending community contributions"
+    },
+    "mirrorBucksRewards": {
+      "title": "MirrorBucks rewards",
+      "approvedLabel": "Approved contribution reward",
+      "rejectedLabel": "Rejected contribution reward",
+      "bonusLabel": "Quality bonus",
+      "totalLabel": "Total reward"
+    },
+    "moderationMessages": {
+      "approved": "Contribution approved and published.",
+      "rejected": "Contribution rejected.",
+      "flagged": "Contribution flagged for manual review.",
+      "needsReview": "This contribution requires moderation review."
+    },
+    "toasts": {
+      "submitSuccess": "Contribution submitted successfully.",
+      "submitError": "Unable to submit contribution.",
+      "reviewSuccess": "Review action saved.",
+      "reviewError": "Unable to save review action."
+    },
+    "emptyStates": {
+      "noContributions": "No contributions yet.",
+      "noPendingReviews": "No pending reviews.",
+      "noSearchResults": "No contributions match your search."
+    }
+  }
+}

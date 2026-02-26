@@ -1,0 +1,58 @@
+// ============================================================================
+// COMMUNITY DOMAIN
+// User community contributions, moderation workflow, and voting
+// ============================================================================
+
+enum CommunityContributionType {
+  feedback
+  tip
+  resource
+  question
+}
+
+enum CommunityContributionStatus {
+  pending
+  approved
+  rejected
+  flagged
+}
+
+model CommunityContribution {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type  CommunityContributionType
+  title String
+  content String
+
+  status         CommunityContributionStatus @default(pending)
+  moderationNote String?
+
+  mirrorBucksReward Int @default(0)
+
+  votes ContributionVote[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ContributionVote {
+  id             String                @id @default(cuid())
+  contributionId String
+  contribution   CommunityContribution @relation(fields: [contributionId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value          Int
+  createdAt      DateTime              @default(now())
+
+  @@unique([contributionId, userId])
+  @@index([contributionId])
+  @@index([userId])
+  @@index([value])
+}

@@ -876,7 +876,28 @@
       "actions": "[TRANSLATE] Azioni",
       "noExperiments": "[TRANSLATE] Nessun esperimento ancora. Creane uno via API.",
       "running": "[TRANSLATE] In esecuzione...",
-      "run": "[TRANSLATE] Esegui"
+      "run": "[TRANSLATE] Esegui",
+      "createForm": {
+        "title": "[TRANSLATE] Crea esperimento",
+        "name": "[TRANSLATE] Nome",
+        "hypothesis": "[TRANSLATE] Ipotesi",
+        "maestroId": "[TRANSLATE] Maestro",
+        "syntheticProfileId": "[TRANSLATE] Profilo sintetico",
+        "turns": "[TRANSLATE] Turni",
+        "topic": "[TRANSLATE] Argomento",
+        "difficulty": "[TRANSLATE] Difficoltà",
+        "difficultyEasy": "[TRANSLATE] Facile",
+        "difficultyMedium": "[TRANSLATE] Media",
+        "difficultyHard": "[TRANSLATE] Difficile",
+        "selectPlaceholder": "[TRANSLATE] Seleziona...",
+        "submit": "[TRANSLATE] Crea",
+        "submitting": "[TRANSLATE] Creazione...",
+        "success": "[TRANSLATE] Esperimento creato",
+        "error": "[TRANSLATE] Creazione esperimento fallita",
+        "validationRequired": "[TRANSLATE] Compila tutti i campi obbligatori",
+        "validationTurns": "[TRANSLATE] I turni devono essere almeno 1",
+        "ariaLabel": "Experiment-Erstellungsformular"
+      }
     },
     "mobileNav": {
       "openMenu": "[TRANSLATE] Apri menu di navigazione",
@@ -1810,6 +1831,20 @@
         "invited": "Eingeladen",
         "registered": "Registriert"
       }
+    },
+    "overall": "Gesamt",
+    "colorScaleLegend": "Farbskala-Legende",
+    "colorScale": "Farbskala:",
+    "abTesting": {
+      "title": "A/B-Ergebnis-Dashboard",
+      "description": "Vergleiche Stichprobengröße und Durchschnitt zwischen Gruppen",
+      "loading": "A/B-Experimentergebnisse werden geladen...",
+      "noExperiments": "Noch keine Experimente verfügbar.",
+      "experimentId": "Experiment-ID:",
+      "bucket": "Gruppe",
+      "sampleSize": "Stichprobengröße",
+      "avgTutorBench": "Durchschn. TutorBench",
+      "chartAriaLabel": "A/B-Vergleichsdiagramm"
     }
   }
 }

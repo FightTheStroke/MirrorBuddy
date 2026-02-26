@@ -26,6 +26,60 @@
     "average": "Durchschnitt",
     "draft": "Entwurf",
     "completed": "Abgeschlossen",
-    "failed": "Fehlgeschlagen"
+    "failed": "Fehlgeschlagen",
+    "stats": {
+      "sectionAriaLabel": "Maestro-Ranglistenstatistiken",
+      "rankLabel": "Rang #{rank}",
+      "completedExperiments": "{count} abgeschlossene Experimente",
+      "averageLabel": "Durchschn. {value}",
+      "dimensions": {
+        "scaffolding": "Scaffolding",
+        "hinting": "Hinweise",
+        "adaptation": "Anpassung",
+        "misconceptionHandling": "Fehlerbehandlung"
+      },
+      "avg": "Durchschn.",
+      "loading": "Maestro-Ranking wird geladen...",
+      "cardAriaLabel": "Maestro-Ranking-Statistiken",
+      "dimensionsAriaLabel": "Bewertungen nach Dimension"
+    },
+    "form": {
+      "title": "Experiment erstellen",
+      "name": "Name",
+      "hypothesis": "Hypothese",
+      "maestroId": "Maestro",
+      "syntheticProfileId": "Synthetisches Profil",
+      "turns": "Runden",
+      "topic": "Thema",
+      "difficulty": "Schwierigkeit",
+      "difficultyEasy": "Leicht",
+      "difficultyMedium": "Mittel",
+      "difficultyHard": "Schwer",
+      "selectPlaceholder": "Option auswählen",
+      "submit": "Erstellen",
+      "submitting": "Wird erstellt...",
+      "success": "Experiment erstellt",
+      "error": "Experiment konnte nicht erstellt werden",
+      "validationRequired": "Bitte alle Pflichtfelder ausfüllen",
+      "validationTurns": "Runden müssen mindestens 1 sein"
+    },
+    "ranking": {
+      "rank": "Rang",
+      "average": "Durchschnitt"
+    },
+    "drillDown": {
+      "title": "Benchmark-Details",
+      "description": "Detaillierte TutorBench-Scores, Metadaten und Runde-für-Runde-Verlauf",
+      "maestroLabel": "Maestro",
+      "profileLabel": "Profil",
+      "experimentName": "Experimentname",
+      "hypothesis": "Hypothese",
+      "scaffolding": "Scaffolding",
+      "hinting": "Hinweise",
+      "adaptation": "Anpassung",
+      "misconceptionHandling": "Umgang mit Fehlvorstellungen",
+      "progressionAriaLabel": "Score-Verlauf Runde für Runde",
+      "noProgression": "Keine Verlaufsdaten verfügbar."
+    }
   }
 }

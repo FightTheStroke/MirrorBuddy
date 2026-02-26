@@ -1,0 +1,81 @@
+{
+  "community": {
+    "title": "Contribuciones de la comunidad",
+    "description": "Comparte recursos de estudio con la comunidad de MirrorBuddy.",
+    "contributionForm": {
+      "title": "Enviar una contribución",
+      "nameLabel": "Título",
+      "contentLabel": "Descripción",
+      "typeLabel": "Tipo de contribución",
+      "submitButton": "Enviar contribución",
+      "submittingButton": "Enviando...",
+      "cancelButton": "Cancelar",
+      "contributionType": "Tipo de contribución",
+      "contributionTitle": "Título de la contribución",
+      "contributionContent": "Contenido de la contribución",
+      "rewardPreview": "Vista previa de MirrorBucks:",
+      "feedback": "Feedback",
+      "tip": "Consejo",
+      "resource": "Recurso",
+      "question": "Pregunta",
+      "avg": "Prom"
+    },
+    "typeNames": {
+      "studyGuide": "Guía de estudio",
+      "mindMap": "Mapa mental",
+      "flashcards": "Tarjetas",
+      "quiz": "Cuestionario",
+      "summary": "Resumen"
+    },
+    "statusLabels": {
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "flagged": "Marcado"
+    },
+    "reviewQueue": {
+      "title": "Título",
+      "pendingHeading": "Contribuciones pendientes",
+      "recentHeading": "Revisadas recientemente",
+      "typeHeading": "Tipo",
+      "statusHeading": "Estado",
+      "rewardHeading": "Recompensa",
+      "actionsHeading": "Acciones",
+      "type": "Tipo",
+      "author": "Autor",
+      "submitted": "Enviado",
+      "preview": "Vista previa",
+      "actions": "Acciones",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "flag": "Marcar",
+      "noPending": "No hay contribuciones pendientes de revisión.",
+      "loadingPending": "Cargando contribuciones pendientes...",
+      "moderateDescription": "Moderar contribuciones pendientes de la comunidad"
+    },
+    "mirrorBucksRewards": {
+      "title": "Recompensas MirrorBucks",
+      "approvedLabel": "Recompensa por contribución aprobada",
+      "rejectedLabel": "Recompensa por contribución rechazada",
+      "bonusLabel": "Bono de calidad",
+      "totalLabel": "Recompensa total"
+    },
+    "moderationMessages": {
+      "approved": "Contribución aprobada y publicada.",
+      "rejected": "Contribución rechazada.",
+      "flagged": "Contribución marcada para revisión manual.",
+      "needsReview": "Esta contribución requiere revisión de moderación."
+    },
+    "toasts": {
+      "submitSuccess": "Contribución enviada correctamente.",
+      "submitError": "No se pudo enviar la contribución.",
+      "reviewSuccess": "Acción de revisión guardada.",
+      "reviewError": "No se pudo guardar la acción de revisión."
+    },
+    "emptyStates": {
+      "noContributions": "Aún no hay contribuciones.",
+      "noPendingReviews": "No hay revisiones pendientes.",
+      "noSearchResults": "No hay contribuciones que coincidan con tu búsqueda."
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "community": {
+    "title": "Community-Beiträge",
+    "description": "Teile Lernressourcen mit der MirrorBuddy-Community.",
+    "contributionForm": {
+      "title": "Beitrag einreichen",
+      "nameLabel": "Titel",
+      "contentLabel": "Beschreibung",
+      "typeLabel": "Beitragstyp",
+      "submitButton": "Beitrag einreichen",
+      "submittingButton": "Wird eingereicht...",
+      "cancelButton": "Abbrechen",
+      "contributionType": "Beitragstyp",
+      "contributionTitle": "Beitragstitel",
+      "contributionContent": "Beitragsinhalt",
+      "rewardPreview": "MirrorBucks-Vorschau:",
+      "feedback": "Feedback",
+      "tip": "Tipp",
+      "resource": "Ressource",
+      "question": "Frage",
+      "avg": "Durchschn."
+    },
+    "typeNames": {
+      "studyGuide": "Lernleitfaden",
+      "mindMap": "Mindmap",
+      "flashcards": "Lernkarten",
+      "quiz": "Quiz",
+      "summary": "Zusammenfassung"
+    },
+    "statusLabels": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "flagged": "Markiert"
+    },
+    "reviewQueue": {
+      "title": "Titel",
+      "pendingHeading": "Ausstehende Beiträge",
+      "recentHeading": "Zuletzt geprüft",
+      "typeHeading": "Typ",
+      "statusHeading": "Status",
+      "rewardHeading": "Belohnung",
+      "actionsHeading": "Aktionen",
+      "type": "Typ",
+      "author": "Autor",
+      "submitted": "Eingereicht",
+      "preview": "Vorschau",
+      "actions": "Aktionen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "flag": "Markieren",
+      "noPending": "Keine ausstehenden Beiträge zur Überprüfung.",
+      "loadingPending": "Ausstehende Beiträge werden geladen...",
+      "moderateDescription": "Ausstehende Community-Beiträge moderieren"
+    },
+    "mirrorBucksRewards": {
+      "title": "MirrorBucks-Belohnungen",
+      "approvedLabel": "Belohnung für genehmigten Beitrag",
+      "rejectedLabel": "Belohnung für abgelehnten Beitrag",
+      "bonusLabel": "Qualitätsbonus",
+      "totalLabel": "Gesamtbelohnung"
+    },
+    "moderationMessages": {
+      "approved": "Beitrag genehmigt und veröffentlicht.",
+      "rejected": "Beitrag abgelehnt.",
+      "flagged": "Beitrag zur manuellen Prüfung markiert.",
+      "needsReview": "Dieser Beitrag erfordert Moderationsprüfung."
+    },
+    "toasts": {
+      "submitSuccess": "Beitrag erfolgreich eingereicht.",
+      "submitError": "Beitrag konnte nicht eingereicht werden.",
+      "reviewSuccess": "Prüfaktion gespeichert.",
+      "reviewError": "Prüfaktion konnte nicht gespeichert werden."
+    },
+    "emptyStates": {
+      "noContributions": "Noch keine Beiträge.",
+      "noPendingReviews": "Keine ausstehenden Prüfungen.",
+      "noSearchResults": "Keine Beiträge entsprechen deiner Suche."
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "community": {
+    "title": "Contributi della community",
+    "description": "Condividi risorse di studio con la community MirrorBuddy.",
+    "contributionForm": {
+      "title": "Invia un contributo",
+      "nameLabel": "Titolo",
+      "contentLabel": "Descrizione",
+      "typeLabel": "Tipo di contributo",
+      "submitButton": "Invia contributo",
+      "submittingButton": "Invio in corso...",
+      "cancelButton": "Annulla",
+      "contributionType": "Tipo di contributo",
+      "contributionTitle": "Titolo del contributo",
+      "contributionContent": "Contenuto del contributo",
+      "rewardPreview": "Anteprima MirrorBucks:",
+      "feedback": "Feedback",
+      "tip": "Consiglio",
+      "resource": "Risorsa",
+      "question": "Domanda",
+      "avg": "Media"
+    },
+    "typeNames": {
+      "studyGuide": "Guida allo studio",
+      "mindMap": "Mappa mentale",
+      "flashcards": "Flashcard",
+      "quiz": "Quiz",
+      "summary": "Riassunto"
+    },
+    "statusLabels": {
+      "pending": "In attesa",
+      "approved": "Approvato",
+      "rejected": "Rifiutato",
+      "flagged": "Segnalato"
+    },
+    "reviewQueue": {
+      "title": "Titolo",
+      "pendingHeading": "Contributi in attesa",
+      "recentHeading": "Revisionati di recente",
+      "typeHeading": "Tipo",
+      "statusHeading": "Stato",
+      "rewardHeading": "Ricompensa",
+      "actionsHeading": "Azioni",
+      "type": "Tipo",
+      "author": "Autore",
+      "submitted": "Inviato",
+      "preview": "Anteprima",
+      "actions": "Azioni",
+      "approve": "Approva",
+      "reject": "Rifiuta",
+      "flag": "Segnala",
+      "noPending": "Nessun contributo in attesa di revisione.",
+      "loadingPending": "Caricamento contributi in attesa...",
+      "moderateDescription": "Modera i contributi della community in attesa"
+    },
+    "mirrorBucksRewards": {
+      "title": "Ricompense MirrorBucks",
+      "approvedLabel": "Ricompensa contributo approvato",
+      "rejectedLabel": "Ricompensa contributo rifiutato",
+      "bonusLabel": "Bonus qualitativo",
+      "totalLabel": "Ricompensa totale"
+    },
+    "moderationMessages": {
+      "approved": "Contributo approvato e pubblicato.",
+      "rejected": "Contributo rifiutato.",
+      "flagged": "Contributo segnalato per revisione manuale.",
+      "needsReview": "Questo contributo richiede revisione moderazione."
+    },
+    "toasts": {
+      "submitSuccess": "Contributo inviato con successo.",
+      "submitError": "Impossibile inviare il contributo.",
+      "reviewSuccess": "Azione di revisione salvata.",
+      "reviewError": "Impossibile salvare l'azione di revisione."
+    },
+    "emptyStates": {
+      "noContributions": "Nessun contributo disponibile.",
+      "noPendingReviews": "Nessuna revisione in attesa.",
+      "noSearchResults": "Nessun contributo corrisponde alla ricerca."
+    }
+  }
+}

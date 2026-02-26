@@ -23,6 +23,7 @@ import {
   CreditCard,
   FlaskConical,
   GitCompareArrows,
+  MessageSquare,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -147,6 +148,25 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           label: t('modelComparison.title'),
           href: '/admin/research/model-comparison',
           icon: GitCompareArrows,
+        },
+        {
+          id: 'ab-testing',
+          label: 'A/B Testing',
+          href: '/admin/research/ab-testing',
+          icon: FlaskConical,
+        },
+      ],
+    },
+    {
+      id: 'community',
+      label: 'Community',
+      icon: MessageSquare,
+      items: [
+        {
+          id: 'review-queue',
+          label: t('community.reviewQueue'),
+          href: '/admin/community',
+          icon: MessageSquare,
         },
       ],
     },

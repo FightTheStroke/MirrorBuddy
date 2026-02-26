@@ -26,6 +26,60 @@
     "average": "Moyenne",
     "draft": "Brouillon",
     "completed": "Terminé",
-    "failed": "Échoué"
+    "failed": "Échoué",
+    "stats": {
+      "sectionAriaLabel": "Statistiques du classement des maestros",
+      "rankLabel": "Rang #{rank}",
+      "completedExperiments": "{count} expériences terminées",
+      "averageLabel": "Moy. {value}",
+      "dimensions": {
+        "scaffolding": "Étayage",
+        "hinting": "Indices",
+        "adaptation": "Adaptation",
+        "misconceptionHandling": "Gestion des erreurs"
+      },
+      "avg": "Moy",
+      "loading": "Chargement des statistiques...",
+      "cardAriaLabel": "Statistiques de classement maestro",
+      "dimensionsAriaLabel": "Scores par dimension"
+    },
+    "form": {
+      "title": "Créer une expérience",
+      "name": "Nom",
+      "hypothesis": "Hypothèse",
+      "maestroId": "Maestro",
+      "syntheticProfileId": "Profil synthétique",
+      "turns": "Tours",
+      "topic": "Sujet",
+      "difficulty": "Difficulté",
+      "difficultyEasy": "Facile",
+      "difficultyMedium": "Moyenne",
+      "difficultyHard": "Difficile",
+      "selectPlaceholder": "Sélectionnez une option",
+      "submit": "Créer",
+      "submitting": "Création en cours...",
+      "success": "Expérience créée",
+      "error": "Échec de la création de l'expérience",
+      "validationRequired": "Remplissez tous les champs obligatoires",
+      "validationTurns": "Le nombre de tours doit être au moins de 1"
+    },
+    "ranking": {
+      "rank": "Rang",
+      "average": "Moyenne"
+    },
+    "drillDown": {
+      "title": "Détail du Benchmark",
+      "description": "Scores TutorBench détaillés, métadonnées et progression tour par tour",
+      "maestroLabel": "Maestro",
+      "profileLabel": "Profil",
+      "experimentName": "Nom de l'expérience",
+      "hypothesis": "Hypothèse",
+      "scaffolding": "Échafaudage",
+      "hinting": "Indices",
+      "adaptation": "Adaptation",
+      "misconceptionHandling": "Gestion des idées fausses",
+      "progressionAriaLabel": "Progression des scores tour par tour",
+      "noProgression": "Aucune donnée de progression disponible."
+    }
   }
 }

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-02-26
+
+### Added
+
+- **Research dashboard enhancements**: Added research performance stats cards, experiment creation form, and enhanced benchmark heatmap with drill-down insights for maestro/profile analysis.
+- **Nightly benchmarks**: Added scheduled nightly benchmark workflow and script execution with regression alerting support.
+- **A/B testing framework**: Introduced deterministic bucketing and admin A/B testing surfaces with architecture documented in ADR 0157.
+- **Community contribution engine**: Added submission, moderation/review flow, rewards/voting foundations, and architecture documented in ADR 0158.
+
 ## [0.15.9] - 2026-02-25
 
 ### Added

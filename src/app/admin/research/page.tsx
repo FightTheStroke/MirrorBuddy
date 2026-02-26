@@ -2,10 +2,12 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { csrfFetch } from '@/lib/auth';
 import BenchmarkHeatmap from './benchmark-heatmap';
+import { ResearchStatsCards } from './stats-cards';
+import { ExperimentCreateForm } from './experiment-form';
 
 interface Experiment {
   id: string;
@@ -35,6 +37,7 @@ export default function ResearchLabPage() {
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [createFormOpen, setCreateFormOpen] = useState(false);
 
   const fetchExperiments = useCallback(async () => {
     try {
@@ -86,6 +89,14 @@ export default function ResearchLabPage() {
     );
   };
 
+  const maestroOptions = useMemo(
+    () =>
+      Array.from(new Set((data?.items ?? []).map((item) => item.maestroId)))
+        .filter((id) => Boolean(id))
+        .map((id) => ({ id, label: id })),
+    [data?.items],
+  );
+
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -113,11 +124,34 @@ export default function ResearchLabPage() {
         <BenchmarkHeatmap experiments={data?.items ?? []} />
       </section>
 
+      <ResearchStatsCards />
+
       {/* Experiments Table */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold">
-          {t('research.experiments', { count: data?.total ?? 0 })}
-        </h2>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold">{t('research.experiments', { count: data?.total ?? 0 })}</h2>
+          <button
+            type="button"
+            onClick={() => setCreateFormOpen((prev) => !prev)}
+            className="rounded border px-3 py-1 text-xs font-medium hover:bg-muted"
+            aria-expanded={createFormOpen}
+            aria-controls="experiment-create-panel"
+          >
+            {t('research.createForm.title')}
+          </button>
+        </div>
+        {createFormOpen && (
+          <div id="experiment-create-panel" className="mb-3">
+            <ExperimentCreateForm
+              maestros={maestroOptions}
+              syntheticProfiles={[]}
+              onCreated={() => {
+                setCreateFormOpen(false);
+                void fetchExperiments();
+              }}
+            />
+          </div>
+        )}
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead>
@@ -134,7 +168,7 @@ export default function ResearchLabPage() {
               {(data?.items ?? []).length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
-                    {t('research.noExperiments')}
+                    {t('research.createForm.title')}
                   </td>
                 </tr>
               ) : (

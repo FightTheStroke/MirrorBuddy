@@ -1,0 +1,37 @@
+// ============================================================================
+// A/B TESTING DOMAIN
+// Experiment definitions and model bucket configurations
+// ============================================================================
+
+enum ABExperimentStatus {
+  draft
+  active
+  completed
+}
+
+model ABExperiment {
+  id        String             @id @default(cuid())
+  name      String
+  status    ABExperimentStatus @default(draft)
+  startDate DateTime
+  endDate   DateTime?
+  createdAt DateTime           @default(now())
+
+  bucketConfigs ABBucketConfig[]
+
+  @@index([status])
+  @@index([startDate])
+}
+
+model ABBucketConfig {
+  id           String       @id @default(cuid())
+  experimentId String
+  experiment   ABExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  bucketLabel  String
+  percentage   Float
+  modelProvider String
+  modelName    String
+  extraConfig  Json
+
+  @@index([experimentId])
+}
