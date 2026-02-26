@@ -25,6 +25,9 @@ const NAMESPACES = [
   'voice',
   'analytics',
   'waitlist',
+  'community',
+  'research',
+  'email',
 ] as const;
 
 async function loadNamespace(locale: string, namespace: string): Promise<Record<string, unknown>> {
