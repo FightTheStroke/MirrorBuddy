@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { pipe } from '@/lib/api/middleware-utils';
-import { withSentry } from '@/lib/api/sentry-middleware';
-import { withAdmin } from '@/lib/api/admin-middleware';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 
 async function handler() {
@@ -13,4 +11,4 @@ async function handler() {
   return NextResponse.json(profiles);
 }
 
-export const GET = pipe(withSentry, withAdmin)(handler);
+export const GET = pipe(withSentry('/api/admin/research/synthetic-profiles'), withAdmin)(handler);
