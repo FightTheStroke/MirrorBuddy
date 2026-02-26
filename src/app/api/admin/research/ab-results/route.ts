@@ -23,7 +23,7 @@ type BucketCount = {
   _count: { _all: number };
 };
 
-type ConversationIdRow = { id: string };
+type ConversationIdRow = { id: string; userId: string };
 
 type SessionMetricsAggregate = {
   _avg: {
@@ -84,7 +84,7 @@ export const GET = pipe(
               abExperimentId: experiment.id,
               abBucketLabel: bucket.bucketLabel,
             },
-            select: { id: true },
+            select: { id: true, userId: true },
           })) as ConversationIdRow[];
           if (conversations.length === 0) {
             return {
@@ -99,9 +99,9 @@ export const GET = pipe(
             };
           }
 
-          const conversationIds = conversations.map((row) => row.id);
+          const userIds = [...new Set(conversations.map((row) => row.userId))];
           const metrics = (await prisma.sessionMetrics.aggregate({
-            where: { conversationId: { in: conversationIds } },
+            where: { userId: { in: userIds } },
             _avg: {
               turnCount: true,
               avgTurnLatencyMs: true,
@@ -112,7 +112,7 @@ export const GET = pipe(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma groupBy typing mismatch
           const outcomes = (await (prisma.sessionMetrics.groupBy as any)({
             by: ['outcome'],
-            where: { conversationId: { in: conversationIds } },
+            where: { userId: { in: userIds } },
             _count: { _all: true },
           })) as SessionOutcomeGroup[];
           const successCount =
