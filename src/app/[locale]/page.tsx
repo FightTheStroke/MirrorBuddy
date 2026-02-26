@@ -186,106 +186,125 @@ export default function Home() {
     },
   ];
 
+  const isSessionActive =
+    currentView === 'maestro-session' || currentView === 'coach' || currentView === 'buddy';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 overflow-x-hidden">
       <h1 className="sr-only">{t('appTitle')}</h1>
-      <HomeHeader
-        sidebarOpen={sidebarOpen}
-        onMenuClick={() => setSidebarOpen(true)}
-        userName={studentProfile?.name}
-        seasonLevel={seasonLevel}
-        mbInLevel={mbInLevel}
-        mbNeeded={MB_PER_LEVEL}
-        progressPercent={progressPercent}
-        seasonName={seasonName}
-        streak={streak}
-        sessionsThisWeek={sessionsThisWeek}
-        totalStudyMinutes={totalStudyMinutes}
-        questionsAsked={questionsAsked}
-        trialStatus={trialStatus}
-      />
 
-      <HomeSidebar
-        open={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-        currentView={currentView}
-        onViewChange={handleViewChange}
-        navItems={navItems}
-        hasNewInsights={hasNewInsights}
-        onParentAccess={() => {
-          markAsViewed();
-          handleViewChange('genitori');
-        }}
-        trialStatus={trialStatus}
-      />
+      {/* Full-screen session overlays — above HomeHeader (z-50) to prevent overlap */}
+      {currentView === 'maestro-session' && selectedMaestro && (
+        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+          <LazyMaestroSession
+            key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
+            maestro={selectedMaestro}
+            onClose={() => {
+              setCurrentView('maestri');
+              setRequestedToolType(undefined);
+            }}
+            initialMode={maestroSessionMode}
+            requestedToolType={requestedToolType}
+          />
+        </div>
+      )}
+      {currentView === 'coach' && (
+        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+          <LazyCharacterChatView characterId={selectedCoach} characterType="coach" />
+        </div>
+      )}
+      {currentView === 'buddy' && (
+        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+          <LazyCharacterChatView characterId={selectedBuddy} characterType="buddy" />
+        </div>
+      )}
 
-      <div
-        className={cn(
-          'flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-14 pb-6',
-          sidebarOpen ? 'lg:ml-64' : 'lg:ml-20',
-        )}
-        ref={mainContentRef}
-      >
-        <main className="flex-1">
-          {/* Trial mode banner */}
-          {trialStatus.isTrialMode && !trialStatus.isLoading && (
-            <TrialHomeBanner
-              chatsRemaining={trialStatus.chatsRemaining}
-              maxChats={trialStatus.maxChats}
-              visitorId={trialStatus.visitorId}
-            />
+      {/* Hide header and sidebar during full-screen sessions */}
+      {!isSessionActive && (
+        <>
+          <HomeHeader
+            sidebarOpen={sidebarOpen}
+            onMenuClick={() => setSidebarOpen(true)}
+            userName={studentProfile?.name}
+            seasonLevel={seasonLevel}
+            mbInLevel={mbInLevel}
+            mbNeeded={MB_PER_LEVEL}
+            progressPercent={progressPercent}
+            seasonName={seasonName}
+            streak={streak}
+            sessionsThisWeek={sessionsThisWeek}
+            totalStudyMinutes={totalStudyMinutes}
+            questionsAsked={questionsAsked}
+            trialStatus={trialStatus}
+          />
+
+          <HomeSidebar
+            open={sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+            currentView={currentView}
+            onViewChange={handleViewChange}
+            navItems={navItems}
+            hasNewInsights={hasNewInsights}
+            onParentAccess={() => {
+              markAsViewed();
+              handleViewChange('genitori');
+            }}
+            trialStatus={trialStatus}
+          />
+        </>
+      )}
+
+      {!isSessionActive && (
+        <div
+          className={cn(
+            'flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-14 pb-6',
+            sidebarOpen ? 'lg:ml-64' : 'lg:ml-20',
           )}
-
-          <motion.div
-            key={currentView}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {currentView === 'coach' && (
-              <LazyCharacterChatView characterId={selectedCoach} characterType="coach" />
-            )}
-            {currentView === 'buddy' && (
-              <LazyCharacterChatView characterId={selectedBuddy} characterType="buddy" />
-            )}
-            {currentView === 'maestri' && (
-              <MaestriGrid
-                onMaestroSelect={(maestro, mode) => {
-                  setSelectedMaestro(maestro);
-                  setMaestroSessionMode(mode);
-                  setMaestroSessionKey((prev) => prev + 1);
-                  setCurrentView('maestro-session');
-                }}
+          ref={mainContentRef}
+        >
+          <main className="flex-1">
+            {/* Trial mode banner */}
+            {trialStatus.isTrialMode && !trialStatus.isLoading && (
+              <TrialHomeBanner
+                chatsRemaining={trialStatus.chatsRemaining}
+                maxChats={trialStatus.maxChats}
+                visitorId={trialStatus.visitorId}
               />
             )}
-            {currentView === 'maestro-session' && selectedMaestro && (
-              <LazyMaestroSession
-                key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
-                maestro={selectedMaestro}
-                onClose={() => {
-                  setCurrentView('maestri');
-                  setRequestedToolType(undefined);
-                }}
-                initialMode={maestroSessionMode}
-                requestedToolType={requestedToolType}
-              />
-            )}
-            {currentView === 'astuccio' && <LazyAstuccioView onToolRequest={handleToolRequest} />}
-            {currentView === 'supporti' && <LazyZainoView />}
-            {currentView === 'calendar' && <LazyCalendarView />}
-            {currentView === 'progress' && <LazyProgressView />}
-            {currentView === 'genitori' && <LazyGenitoriView />}
-            {currentView === 'settings' && <LazySettingsView />}
-          </motion.div>
-        </main>
 
-        {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
-        {trialStatus.isTrialMode && !trialStatus.isLoading && (
-          <aside className="w-80 hidden lg:block flex-shrink-0">
-            <TrialUsageDashboard />
-          </aside>
-        )}
-      </div>
+            <motion.div
+              key={currentView}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {currentView === 'maestri' && (
+                <MaestriGrid
+                  onMaestroSelect={(maestro, mode) => {
+                    setSelectedMaestro(maestro);
+                    setMaestroSessionMode(mode);
+                    setMaestroSessionKey((prev) => prev + 1);
+                    setCurrentView('maestro-session');
+                  }}
+                />
+              )}
+              {currentView === 'astuccio' && <LazyAstuccioView onToolRequest={handleToolRequest} />}
+              {currentView === 'supporti' && <LazyZainoView />}
+              {currentView === 'calendar' && <LazyCalendarView />}
+              {currentView === 'progress' && <LazyProgressView />}
+              {currentView === 'genitori' && <LazyGenitoriView />}
+              {currentView === 'settings' && <LazySettingsView />}
+            </motion.div>
+          </main>
+
+          {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
+          {trialStatus.isTrialMode && !trialStatus.isLoading && (
+            <aside className="w-80 hidden lg:block flex-shrink-0">
+              <TrialUsageDashboard />
+            </aside>
+          )}
+        </div>
+      )}
     </div>
   );
 }

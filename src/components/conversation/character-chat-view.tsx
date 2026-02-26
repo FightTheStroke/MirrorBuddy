@@ -1,61 +1,56 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
-import { ToolPanel } from "@/components/tools/tool-panel";
-import { ConversationSidebar } from "./conversation-drawer";
-import { getCharacterInfo } from "./character-chat-view/utils/character-utils";
-import { useCharacterChat } from "./character-chat-view/hooks/use-character-chat";
-import { MessagesList } from "./character-chat-view/components/messages-list";
-import { ChatInput } from "./character-chat-view/components/chat-input";
-import { useVoiceSession } from "@/lib/hooks/use-voice-session";
-import { useTTS } from "@/components/accessibility";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { AnimatePresence } from 'framer-motion';
+import { ToolPanel } from '@/components/tools/tool-panel';
+import { ConversationSidebar } from './conversation-drawer';
+import { getCharacterInfo } from './character-chat-view/utils/character-utils';
+import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
+import { MessagesList } from './character-chat-view/components/messages-list';
+import { ChatInput } from './character-chat-view/components/chat-input';
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
+import { useTTS } from '@/components/accessibility';
 import {
   CharacterHeader,
   CharacterVoicePanel,
   characterInfoToUnified,
   type VoiceState,
   type HeaderActions,
-} from "@/components/character";
-import { useSettingsStore } from "@/lib/stores";
-import type { SupportedLanguage } from "@/types";
-import { SharedChatLayout } from "@/components/chat/shared-chat-layout";
+} from '@/components/character';
+import { useSettingsStore } from '@/lib/stores';
+import type { SupportedLanguage } from '@/types';
+import { SharedChatLayout } from '@/components/chat/shared-chat-layout';
+import { useWakeLock } from '@/lib/hooks/use-wake-lock';
 
 interface CharacterChatViewProps {
   characterId:
-    | "melissa"
-    | "roberto"
-    | "chiara"
-    | "andrea"
-    | "favij"
-    | "laura"
-    | "mario"
-    | "noemi"
-    | "enea"
-    | "bruno"
-    | "sofia"
-    | "marta";
-  characterType: "coach" | "buddy";
+    | 'melissa'
+    | 'roberto'
+    | 'chiara'
+    | 'andrea'
+    | 'favij'
+    | 'laura'
+    | 'mario'
+    | 'noemi'
+    | 'enea'
+    | 'bruno'
+    | 'sofia'
+    | 'marta';
+  characterType: 'coach' | 'buddy';
 }
 
-export function CharacterChatView({
-  characterId,
-  characterType,
-}: CharacterChatViewProps) {
+export function CharacterChatView({ characterId, characterType }: CharacterChatViewProps) {
   const router = useRouter();
-  const language = useSettingsStore(
-    (state) => state.appearance.language,
-  ) as SupportedLanguage;
+  const language = useSettingsStore((state) => state.appearance.language) as SupportedLanguage;
   const character = getCharacterInfo(characterId, characterType, language);
-  const unifiedCharacter = characterInfoToUnified(
-    character,
-    characterId,
-    characterType,
-  );
+  const unifiedCharacter = characterInfoToUnified(character, characterId, characterType);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
+
+  // Prevent screen sleep during active sessions
+  useWakeLock(true);
 
   const {
     messages,
@@ -91,7 +86,7 @@ export function CharacterChatView({
   } = voiceSession;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -127,7 +122,7 @@ export function CharacterChatView({
     onOpenHistory: handleOpenHistory,
   };
 
-  const hasActiveTool = activeTool && activeTool.status !== "error";
+  const hasActiveTool = activeTool && activeTool.status !== 'error';
 
   return (
     <div className="flex flex-col lg:flex-row gap-0 md:gap-4 h-[calc(100dvh-5rem)]">
@@ -185,11 +180,7 @@ export function CharacterChatView({
         showRightPanel={isVoiceActive || isHistoryOpen}
         className="flex-1 h-full"
       >
-        <MessagesList
-          messages={messages}
-          character={character}
-          isLoading={isLoading}
-        />
+        <MessagesList messages={messages} character={character} isLoading={isLoading} />
         <div ref={messagesEndRef} />
       </SharedChatLayout>
 
@@ -200,7 +191,7 @@ export function CharacterChatView({
             tool={activeTool}
             maestro={{
               displayName: character.name,
-              avatar: character.avatar || "/avatars/default.webp",
+              avatar: character.avatar || '/avatars/default.webp',
               color: character.themeColor,
             }}
             onClose={() => setActiveTool(null)}

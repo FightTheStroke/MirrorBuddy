@@ -113,7 +113,10 @@ describe('WebRTC GA Protocol', () => {
       await connection.connect();
 
       // Verify: Should fetch config once
-      expect(mockFetch).toHaveBeenCalledWith('/api/realtime/token');
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/realtime/token',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
 
       // Verify: Should use GA endpoint directly (no second config fetch)
       expect(mockFetch).toHaveBeenCalledWith(
@@ -183,9 +186,10 @@ describe('WebRTC GA Protocol', () => {
       await connection.connect();
 
       // Verify: Should fetch config to get webrtcEndpoint
-      expect(mockFetch).toHaveBeenCalledWith('/api/realtime/token');
-
-      // Verify: Should use preview endpoint from config
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/realtime/token',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
       expect(mockFetch).toHaveBeenCalledWith(
         'https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=gpt-realtime',
         expect.objectContaining({

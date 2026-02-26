@@ -24,6 +24,7 @@ import { MaestroSessionMessages } from './maestro-session-messages';
 import { MaestroSessionInput } from './maestro-session-input';
 import { MaestroSessionWebcam } from './maestro-session-webcam';
 import { cn } from '@/lib/utils';
+import { useWakeLock } from '@/lib/hooks/use-wake-lock';
 import {
   CharacterHeader,
   CharacterVoicePanel,
@@ -58,6 +59,9 @@ export function MaestroSession({
 
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
   const unifiedCharacter = maestroToUnified(maestro);
+
+  // Prevent screen sleep during active sessions
+  useWakeLock(true);
 
   const {
     messages,

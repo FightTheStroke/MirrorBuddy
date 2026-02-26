@@ -143,17 +143,29 @@ export class WebRTCConnection {
    * The server decides the protocol; the client follows.
    */
   private async fetchServerConfig(): Promise<void> {
-    const response = await fetch('/api/realtime/token');
-    if (!response.ok) {
-      logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
-      throw new Error('Failed to get server config');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      const response = await fetch('/api/realtime/token', { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!response.ok) {
+        logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
+        throw new Error('Failed to get server config');
+      }
+      this.serverConfig = await response.json();
+      logger.debug('[WebRTC] Server config received', {
+        protocol: this.isGAProtocol ? 'GA' : 'preview',
+        hasAzureResource: !!this.serverConfig?.azureResource,
+        hasWebrtcEndpoint: !!this.serverConfig?.webrtcEndpoint,
+      });
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        logVoiceError('ConfigFetchTimeout', 'Server config fetch timed out after 10s');
+        throw new Error('Connessione al server scaduta. Verifica la connessione internet.');
+      }
+      throw error;
     }
-    this.serverConfig = await response.json();
-    logger.debug('[WebRTC] Server config received', {
-      protocol: this.isGAProtocol ? 'GA' : 'preview',
-      hasAzureResource: !!this.serverConfig?.azureResource,
-      hasWebrtcEndpoint: !!this.serverConfig?.webrtcEndpoint,
-    });
   }
 
   private async getEphemeralToken(): Promise<string> {
@@ -163,21 +175,34 @@ export class WebRTCConnection {
       return cachedToken;
     }
 
-    const response = await csrfFetch('/api/realtime/ephemeral-token', {
-      method: 'POST',
-      body: JSON.stringify({
-        maestroId: this.config.maestro.id,
-        characterType: this.config.connectionInfo.characterType || 'maestro',
-      }),
-    });
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => '');
-      throw new Error(
-        `Failed to get ephemeral token: ${response.status} - ${errorBody.slice(0, 200)}`,
-      );
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      const response = await csrfFetch('/api/realtime/ephemeral-token', {
+        method: 'POST',
+        body: JSON.stringify({
+          maestroId: this.config.maestro.id,
+          characterType: this.config.connectionInfo.characterType || 'maestro',
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => '');
+        throw new Error(
+          `Failed to get ephemeral token: ${response.status} - ${errorBody.slice(0, 200)}`,
+        );
+      }
+      const data: EphemeralTokenResponse = await response.json();
+      return data.token;
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        logVoiceError('TokenFetchTimeout', 'Ephemeral token fetch timed out after 10s');
+        throw new Error('Connessione al server scaduta. Verifica la connessione internet.');
+      }
+      throw error;
     }
-    const data: EphemeralTokenResponse = await response.json();
-    return data.token;
   }
 
   private async getUserMedia(): Promise<MediaStream> {

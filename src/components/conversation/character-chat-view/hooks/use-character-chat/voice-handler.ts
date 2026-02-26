@@ -12,20 +12,24 @@ export async function fetchVoiceConnectionInfo(): Promise<{
   connectionInfo: ConnectionInfo | null;
   error: string | null;
 }> {
-  try {
-    const cached = sessionStorage.getItem('voice-connection-info');
-    if (cached) {
-      try {
-        const data = JSON.parse(cached);
-        if (data.provider) {
-          return { connectionInfo: data as ConnectionInfo, error: null };
-        }
-      } catch {
-        sessionStorage.removeItem('voice-connection-info');
+  const cached = sessionStorage.getItem('voice-connection-info');
+  if (cached) {
+    try {
+      const data = JSON.parse(cached);
+      if (data.provider) {
+        return { connectionInfo: data as ConnectionInfo, error: null };
       }
+    } catch {
+      sessionStorage.removeItem('voice-connection-info');
     }
+  }
 
-    const response = await fetch('/api/realtime/token');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch('/api/realtime/token', { signal: controller.signal });
+    clearTimeout(timeout);
     const data = await response.json();
 
     if (response.status === 429) {
@@ -46,12 +50,14 @@ export async function fetchVoiceConnectionInfo(): Promise<{
 
     sessionStorage.setItem('voice-connection-info', JSON.stringify(data));
     return { connectionInfo: data as ConnectionInfo, error: null };
-  } catch (error) {
-    logger.error('Failed to get voice connection info', { error: String(error) });
-    return {
-      connectionInfo: null,
-      error: 'Impossibile connettersi al servizio vocale',
-    };
+  } catch (fetchError) {
+    clearTimeout(timeout);
+    const message =
+      fetchError instanceof DOMException && fetchError.name === 'AbortError'
+        ? 'Connessione al servizio vocale scaduta. Verifica la connessione internet.'
+        : 'Impossibile connettersi al servizio vocale';
+    logger.error('Failed to get voice connection info', { error: String(fetchError) });
+    return { connectionInfo: null, error: message };
   }
 }
 
