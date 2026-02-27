@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **A/B Testing framework wired into chat** — `injectABMetadata` from Plan 224 was dead code; now called in `chat/route.ts` and `stream/helpers.ts` to actually assign user buckets and override models during A/B experiments
+- **Nightly benchmark trend tracking** — `recordBenchmarkTrend` and `detectRegression` from Plan 224 were dead code; now called in nightly-benchmark.ts to persist trend data and alert on score regressions (exit code 1 → Slack/email alert)
 
 ## [0.16.0] - 2026-02-26
 
