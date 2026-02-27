@@ -1,7 +1,13 @@
 {
   "community": {
+    "pageTitle": "Community-Beiträge",
+    "pageDescription": "Durchsuche und teile Lernressourcen mit der MirrorBuddy-Community.",
     "title": "Community-Beiträge",
     "description": "Teile Lernressourcen mit der MirrorBuddy-Community.",
+    "list": {
+      "title": "Genehmigte Beiträge",
+      "empty": "Noch keine genehmigten Beiträge verfügbar."
+    },
     "contributionForm": {
       "title": "Beitrag einreichen",
       "nameLabel": "Titel",

@@ -10,27 +10,20 @@
  * - Safe area bottom padding for iOS
  */
 
-"use client";
+'use client';
 
-import {
-  Home,
-  MessageSquare,
-  Briefcase,
-  Trophy,
-  Settings,
-  User,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { Home, MessageSquare, Briefcase, Trophy, Settings, User, Users } from 'lucide-react';
+import { Link, usePathname } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 
 const NAV_ITEMS = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/chat", icon: MessageSquare, label: "Chat" },
-  { href: "/astuccio", icon: Briefcase, label: "Tools" },
-  { href: "/achievements", icon: Trophy, label: "Achievements" },
-  { href: "/settings", icon: Settings, label: "Settings" },
-  { href: "/profile", icon: User, label: "Profile" },
+  { href: '/', icon: Home, label: 'Home' },
+  { href: '/chat', icon: MessageSquare, label: 'Chat' },
+  { href: '/astuccio', icon: Briefcase, label: 'Tools' },
+  { href: '/achievements', icon: Trophy, label: 'Achievements' },
+  { href: '/community', icon: Users, label: 'Community' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
+  { href: '/profile', icon: User, label: 'Profile' },
 ] as const;
 
 export function BottomNav() {
@@ -40,15 +33,14 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white dark:bg-slate-900 border-t pb-[env(safe-area-inset-bottom)]">
       <div className="flex justify-around items-center h-14">
         {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-          const isActive =
-            pathname === href || pathname?.startsWith(href + "/");
+          const isActive = pathname === href || pathname?.startsWith(href + '/');
           return (
             <Link
               key={href}
               href={href}
               className={cn(
-                "flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-3",
-                isActive ? "text-primary" : "text-muted-foreground",
+                'flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-3',
+                isActive ? 'text-primary' : 'text-muted-foreground',
               )}
             >
               <Icon className="w-5 h-5" />

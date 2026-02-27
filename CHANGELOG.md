@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **User-facing community page** — `/community` route with ContributionForm and approved list (was admin-only since Plan 224); mobile bottom-nav link added; i18n keys for all 5 locales
+
 ### Fixed
 
 - **A/B Testing framework wired into chat** — `injectABMetadata` from Plan 224 was dead code; now called in `chat/route.ts` and `stream/helpers.ts` to actually assign user buckets and override models during A/B experiments
