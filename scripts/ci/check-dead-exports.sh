@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Detects exported symbols in src/lib/ that are never imported by non-test files.
 # Exits with warning (exit 0) — informational only, does not block CI.
-set -euo pipefail
+set -uo pipefail
 
 SEARCH_DIR="${1:-src/lib}"
 ORPHANS=0
@@ -17,7 +17,7 @@ while IFS= read -r file; do
     import_count=$(grep -r --include='*.ts' --include='*.tsx' \
       -l "$symbol" src/ 2>/dev/null | \
       grep -v '__tests__' | grep -v '.test.' | grep -v '.spec.' | \
-      grep -v "$file" | wc -l | tr -d ' ')
+      grep -v "$file" | wc -l | tr -d ' ' || echo 0)
 
     if [[ "$import_count" -eq 0 ]]; then
       echo "⚠️  Orphan export: '$symbol' in $file — not imported by any non-test file"
