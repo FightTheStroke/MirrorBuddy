@@ -1740,14 +1740,14 @@ jobs:
           echo "Triggering Vercel deployment via CLI..."
 
   # ============================================================================
-  # DEPLOY TO VERCEL (via CLI)
+  # DEPLOY TO STAGING (Vercel Preview)
   # ============================================================================
-  # Deploys to Vercel ONLY after ALL checks pass.
+  # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
+  # Production promotion happens via promote-to-production.yml workflow.
   # Auto-deploy is disabled via ignoreCommand in vercel.json.
-  # This saves build minutes by not building until CI passes.
   # ============================================================================
-  deploy-to-vercel:
-    name: "🚀 Deploy to Vercel"
+  deploy-to-staging:
+    name: "🎪 Deploy to Staging"
     runs-on: ubuntu-latest
     needs: [deployment-gate]
     if: |
@@ -1768,7 +1768,7 @@ jobs:
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
             echo "::error::VERCEL_TOKEN is not configured in GitHub secrets"
             echo ""
-            echo "This token is required to deploy to production."
+            echo "This token is required to deploy."
             echo ""
             echo "To fix:"
             echo "1. Regenerate personal access token: https://vercel.com/account/tokens"
@@ -1789,27 +1789,50 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build Project
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy to Production
+      - name: Deploy to Staging (Preview)
+        id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "✅ Deployed to: $url"
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "✅ Staging deployed to: $url"
           echo "DEPLOYMENT_URL=$url" >> $GITHUB_ENV
+          echo "deployment_url=$url" >> $GITHUB_OUTPUT
 
-      - name: Verify Deployment Health
+      - name: Verify Staging Health
         run: |
-          echo "Waiting 10s for deployment to stabilize..."
-          sleep 10
-          status=$(curl -s -o /dev/null -w "%{http_code}" https://mirrorbuddy.vercel.app/api/health)
+          echo "Waiting 15s for staging deployment to stabilize..."
+          sleep 15
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ env.DEPLOYMENT_URL }}/api/health")
           if [ "$status" = "200" ]; then
-            echo "✅ Health check passed (HTTP $status)"
+            echo "✅ Staging health check passed (HTTP $status)"
           else
-            echo "⚠️ Health check returned HTTP $status (may still be warming up)"
+            echo "⚠️ Staging health check returned HTTP $status (may still be warming up)"
           fi
+
+      - name: Post Staging URL Summary
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = process.env.DEPLOYMENT_URL;
+            const sha = context.sha.slice(0, 7);
+            await core.summary
+              .addHeading('🎪 Staging Deployment', 2)
+              .addTable([
+                [{data: 'URL', header: true}, {data: 'Commit', header: true}, {data: 'Status', header: true}],
+                [
+                  `<a href="${url}">${url}</a>`,
+                  `<code>${sha}</code>`,
+                  '✅ Deployed'
+                ]
+              ])
+              .addRaw('\n\n**To promote to production**, run the [Promote to Production](' +
+                `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/promote-to-production.yml` +
+                ') workflow.\n')
+              .write();
 
       - name: Update GitHub Deployment Status
         if: success()
@@ -1820,18 +1843,18 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: context.sha,
-              environment: 'Production',
+              environment: 'Staging',
               auto_merge: false,
               required_contexts: [],
-              description: `Deployed via CI (${context.sha.slice(0, 7)})`,
+              description: `Staging deploy (${context.sha.slice(0, 7)})`,
             });
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               deployment_id: deployment.id,
               state: 'success',
-              environment_url: process.env.DEPLOYMENT_URL || 'https://mirrorbuddy.vercel.app',
-              description: 'Deployment successful',
+              environment_url: process.env.DEPLOYMENT_URL,
+              description: 'Staging deployment successful — promote via workflow when ready',
             });
 
   # ============================================================================
