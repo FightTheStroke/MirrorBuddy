@@ -5,7 +5,7 @@
 | Status | Accepted   |
 | Date   | 2026-02-27 |
 | Plan   | 263        |
-| PR     | TBD        |
+| PR     | #231       |
 
 ## Context
 
