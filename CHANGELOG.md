@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **User-facing community page** — `/community` route with ContributionForm and approved list (was admin-only since Plan 224); mobile bottom-nav link added; i18n keys for all 5 locales
+- **Crisis pipeline integration tests** — end-to-end proof that crisis detection → LLM block → safety logging → parent notification works; parent email template verified across all 5 locales
 
 ### Fixed
 
