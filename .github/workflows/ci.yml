@@ -515,6 +515,28 @@ jobs:
           echo "Module boundary rule enforced at error level in ESLint config."
           echo "Any violations fail the lint step. Zero violations baseline."
 
+  # Lane 5b: Structural Safeguards (Plan 263 — prevent workflow gaps)
+  structural-safeguards:
+    name: Structural Safeguards
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check Prisma schema has migration
+        if: needs.detect-changes.outputs.prisma == 'true'
+        run: bash scripts/ci/check-prisma-migration.sh origin/${{ github.base_ref }}
+
+      - name: Check i18n namespaces registered
+        if: needs.detect-changes.outputs.i18n == 'true'
+        run: bash scripts/ci/check-i18n-namespace.sh origin/${{ github.base_ref }}
+
+      - name: Detect dead exports (informational)
+        run: bash scripts/ci/check-dead-exports.sh src/lib
+
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
     name: Sentry Config (Vercel)
