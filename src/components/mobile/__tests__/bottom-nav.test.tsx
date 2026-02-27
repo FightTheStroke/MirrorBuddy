@@ -5,111 +5,121 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { BottomNav } from "../bottom-nav";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { BottomNav } from '../bottom-nav';
 
-// Mock Next.js navigation
-vi.mock("next/navigation", () => ({
+// Mock i18n navigation
+vi.mock('@/i18n/navigation', () => ({
+  Link: ({
+    href,
+    children,
+    ...props
+  }: { href: string; children?: ReactNode } & Record<string, unknown>) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
   usePathname: vi.fn(),
 }));
 
-import { usePathname } from "next/navigation";
+import { usePathname } from '@/i18n/navigation';
 
-describe("BottomNav", () => {
+describe('BottomNav', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("Structure and Visibility", () => {
-    it("renders navigation with all 6 items including achievements", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+  describe('Structure and Visibility', () => {
+    it('renders navigation with all 7 items including community', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      // All 6 navigation items should be present (structure-based assertion)
-      const links = container.querySelectorAll("a");
-      expect(links.length).toBe(6);
+      // All 7 navigation items should be present (structure-based assertion)
+      const links = container.querySelectorAll('a');
+      expect(links.length).toBe(7);
 
       // Verify expected hrefs are present (i18n-agnostic)
-      const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
-      expect(hrefs).toContain("/");
-      expect(hrefs).toContain("/chat");
-      expect(hrefs).toContain("/astuccio");
-      expect(hrefs).toContain("/achievements");
-      expect(hrefs).toContain("/settings");
-      expect(hrefs).toContain("/profile");
+      const hrefs = Array.from(links).map((a) => a.getAttribute('href'));
+      expect(hrefs).toContain('/');
+      expect(hrefs).toContain('/chat');
+      expect(hrefs).toContain('/astuccio');
+      expect(hrefs).toContain('/achievements');
+      expect(hrefs).toContain('/community');
+      expect(hrefs).toContain('/settings');
+      expect(hrefs).toContain('/profile');
     });
 
-    it("renders as navigation landmark", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('renders as navigation landmark', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       render(<BottomNav />);
 
-      const nav = screen.getByRole("navigation");
+      const nav = screen.getByRole('navigation');
       expect(nav).toBeInTheDocument();
     });
 
-    it("has sm:hidden class for desktop hiding", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('has sm:hidden class for desktop hiding', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/sm:hidden/);
     });
 
-    it("has fixed positioning at bottom", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('has fixed positioning at bottom', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/fixed/);
       expect(nav?.className).toMatch(/bottom-0/);
     });
 
-    it("has safe area padding for iOS", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('has safe area padding for iOS', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/pb-\[env\(safe-area-inset-bottom\)\]/);
     });
   });
 
-  describe("Navigation Items", () => {
-    it("renders correct hrefs for each item", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+  describe('Navigation Items', () => {
+    it('renders correct hrefs for each item', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
       // Use href-based assertions (i18n-agnostic)
-      const links = container.querySelectorAll("a");
-      const linkMap = new Map(
-        Array.from(links).map((a) => [a.getAttribute("href"), a]),
-      );
+      const links = container.querySelectorAll('a');
+      const linkMap = new Map(Array.from(links).map((a) => [a.getAttribute('href'), a]));
 
-      expect(linkMap.get("/")).toBeTruthy();
-      expect(linkMap.get("/chat")).toBeTruthy();
-      expect(linkMap.get("/astuccio")).toBeTruthy();
-      expect(linkMap.get("/achievements")).toBeTruthy();
-      expect(linkMap.get("/settings")).toBeTruthy();
-      expect(linkMap.get("/profile")).toBeTruthy();
+      expect(linkMap.get('/')).toBeTruthy();
+      expect(linkMap.get('/chat')).toBeTruthy();
+      expect(linkMap.get('/astuccio')).toBeTruthy();
+      expect(linkMap.get('/achievements')).toBeTruthy();
+      expect(linkMap.get('/community')).toBeTruthy();
+      expect(linkMap.get('/settings')).toBeTruthy();
+      expect(linkMap.get('/profile')).toBeTruthy();
     });
 
-    it("renders correct icons for each item", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('renders correct icons for each item', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
       // Each link should have an SVG icon (lucide-react renders as SVG)
-      const links = container.querySelectorAll("a");
-      expect(links.length).toBe(6);
+      const links = container.querySelectorAll('a');
+      expect(links.length).toBe(7);
       links.forEach((link) => {
-        const svg = link.querySelector("svg");
+        const svg = link.querySelector('svg');
         expect(svg).toBeInTheDocument();
       });
     });
   });
 
-  describe("Active State", () => {
-    it("marks home as active when on home page", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+  describe('Active State', () => {
+    it('marks home as active when on home page', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
       // Find link by href (i18n-agnostic)
@@ -117,42 +127,40 @@ describe("BottomNav", () => {
       expect(homeLink?.className).toMatch(/text-primary/);
     });
 
-    it("marks chat as active when on chat page", () => {
-      vi.mocked(usePathname).mockReturnValue("/chat");
+    it('marks chat as active when on chat page', () => {
+      vi.mocked(usePathname).mockReturnValue('/chat');
       const { container } = render(<BottomNav />);
 
       const chatLink = container.querySelector('a[href="/chat"]');
       expect(chatLink?.className).toMatch(/text-primary/);
     });
 
-    it("marks tools as active when on astuccio page", () => {
-      vi.mocked(usePathname).mockReturnValue("/astuccio");
+    it('marks tools as active when on astuccio page', () => {
+      vi.mocked(usePathname).mockReturnValue('/astuccio');
       const { container } = render(<BottomNav />);
 
       const toolsLink = container.querySelector('a[href="/astuccio"]');
       expect(toolsLink?.className).toMatch(/text-primary/);
     });
 
-    it("marks settings as active when on settings subpage", () => {
-      vi.mocked(usePathname).mockReturnValue("/settings/profile");
+    it('marks settings as active when on settings subpage', () => {
+      vi.mocked(usePathname).mockReturnValue('/settings/profile');
       const { container } = render(<BottomNav />);
 
       const settingsLink = container.querySelector('a[href="/settings"]');
       expect(settingsLink?.className).toMatch(/text-primary/);
     });
 
-    it("marks achievements as active when on achievements page", () => {
-      vi.mocked(usePathname).mockReturnValue("/achievements");
+    it('marks achievements as active when on achievements page', () => {
+      vi.mocked(usePathname).mockReturnValue('/achievements');
       const { container } = render(<BottomNav />);
 
-      const achievementsLink = container.querySelector(
-        'a[href="/achievements"]',
-      );
+      const achievementsLink = container.querySelector('a[href="/achievements"]');
       expect(achievementsLink?.className).toMatch(/text-primary/);
     });
 
-    it("marks non-active items with muted color", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('marks non-active items with muted color', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
       const chatLink = container.querySelector('a[href="/chat"]');
@@ -160,23 +168,23 @@ describe("BottomNav", () => {
     });
   });
 
-  describe("Touch Targets (Accessibility)", () => {
-    it("has minimum 44px touch targets", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+  describe('Touch Targets (Accessibility)', () => {
+    it('has minimum 44px touch targets', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const links = container.querySelectorAll("a");
+      const links = container.querySelectorAll('a');
       links.forEach((link) => {
         expect(link.className).toMatch(/min-w-\[44px\]/);
         expect(link.className).toMatch(/min-h-\[44px\]/);
       });
     });
 
-    it("has flex layout for centering", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('has flex layout for centering', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const links = container.querySelectorAll("a");
+      const links = container.querySelectorAll('a');
       links.forEach((link) => {
         expect(link.className).toMatch(/flex/);
         expect(link.className).toMatch(/flex-col/);
@@ -186,28 +194,28 @@ describe("BottomNav", () => {
     });
   });
 
-  describe("Styling", () => {
-    it("has high z-index for stacking", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+  describe('Styling', () => {
+    it('has high z-index for stacking', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/z-50/);
     });
 
-    it("has border-top for separation", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('has border-top for separation', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/border-t/);
     });
 
-    it("supports dark mode", () => {
-      vi.mocked(usePathname).mockReturnValue("/");
+    it('supports dark mode', () => {
+      vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      const nav = container.querySelector("nav");
+      const nav = container.querySelector('nav');
       expect(nav?.className).toMatch(/dark:bg-slate-900/);
     });
   });

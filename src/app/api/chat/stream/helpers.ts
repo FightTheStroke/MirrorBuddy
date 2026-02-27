@@ -11,6 +11,7 @@ import { filterInput } from '@/lib/safety';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
 import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/server';
+import { injectABMetadata } from '@/lib/ab-testing/session-injector';
 import type { AIProvider } from '@/lib/ai/server';
 import {
   logSafetyEvent,
@@ -241,6 +242,28 @@ export async function updateBudget(userId: string, totalTokens: number): Promise
   } catch (e) {
     logger.warn('Failed to update budget', { error: String(e) });
   }
+}
+
+export async function getABModelOverride(
+  userId: string | undefined,
+  conversationId: string | undefined,
+): Promise<string | null> {
+  if (!userId || !conversationId) {
+    return null;
+  }
+
+  // A/B Testing: inject experiment metadata + resolve model override
+  let abModelOverride: string | null = null;
+  try {
+    const abOverride = await injectABMetadata(userId, conversationId);
+    if (abOverride?.modelName) {
+      abModelOverride = abOverride.modelName;
+    }
+  } catch {
+    // A/B injection must never break the chat flow
+  }
+
+  return abModelOverride;
 }
 
 /**

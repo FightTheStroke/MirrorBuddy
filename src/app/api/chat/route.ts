@@ -71,6 +71,7 @@ import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import { recordStageTransition } from '@/lib/funnel';
 import { getVisitorIdFromCookie } from '@/lib/trial/visitor-id';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
+import { injectABMetadata } from '@/lib/ab-testing/session-injector';
 
 /**
  * Look up a character's allowed tools array by maestroId.
@@ -141,6 +142,18 @@ export const POST = pipe(
       return response;
     }
     const userId = coppaCheck.userId;
+    // A/B Testing: inject experiment metadata + resolve model override
+    let abModelOverride: string | null = null;
+    if (userId && conversationId) {
+      try {
+        const abOverride = await injectABMetadata(userId, conversationId);
+        if (abOverride?.modelName) {
+          abModelOverride = abOverride.modelName;
+        }
+      } catch {
+        // A/B injection must never break the chat flow
+      }
+    }
 
     // Dependency Detection (Amodei 2026) - track session start
     // Detect new session: only 1 user message means this is the start
@@ -399,10 +412,16 @@ export const POST = pipe(
     let deploymentName: string;
     try {
       tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
+      if (abModelOverride) {
+        tierModel = abModelOverride;
+      }
       deploymentName = getDeploymentForModel(tierModel);
     } catch (tierError) {
       log.warn('Tier service failed, using default model', { error: String(tierError) });
       tierModel = 'gpt-5-mini';
+      if (abModelOverride) {
+        tierModel = abModelOverride;
+      }
       deploymentName = getDeploymentForModel(tierModel);
     }
 

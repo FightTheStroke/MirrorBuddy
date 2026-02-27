@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.4] - 2026-02-27
+
+### Added
+
+- **User-facing community page** — `/community` route with ContributionForm and approved list (was admin-only since Plan 224); mobile bottom-nav link added; i18n keys for all 5 locales
+- **Crisis pipeline integration tests** — end-to-end proof that crisis detection → LLM block → safety logging → parent notification works; parent email template verified across all 5 locales
+- **CI structural safeguards** — pre-merge checks for Prisma schema→migration consistency, i18n namespace registration, and dead export detection (prevents Plan 224-type gaps)
+
+### Fixed
+
+- **A/B Testing framework wired into chat** — `injectABMetadata` from Plan 224 was dead code; now called in `chat/route.ts` and `stream/helpers.ts` to actually assign user buckets and override models during A/B experiments
+- **Nightly benchmark trend tracking** — `recordBenchmarkTrend` and `detectRegression` from Plan 224 were dead code; now called in nightly-benchmark.ts to persist trend data and alert on score regressions (exit code 1 → Slack/email alert)
+
 ## [0.16.0] - 2026-02-26
 
 ### Added

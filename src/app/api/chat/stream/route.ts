@@ -8,24 +8,24 @@
  * @see ADR 0034 for streaming architecture
  */
 
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 import {
   azureStreamingCompletion,
   getActiveProvider,
   getDeploymentForModel,
-} from "@/lib/ai/server";
-import { tierService } from "@/lib/tier/server";
-import { getRequestLogger, getRequestId } from "@/lib/tracing";
+} from '@/lib/ai/server';
+import { tierService } from '@/lib/tier/server';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   RATE_LIMITS,
   rateLimitResponse,
-} from "@/lib/rate-limit";
-import { StreamingSanitizer } from "@/lib/safety";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+} from '@/lib/rate-limit';
+import { StreamingSanitizer } from '@/lib/safety';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 
-import type { ChatRequest } from "../types";
+import type { ChatRequest } from '../types';
 import {
   getUserIdWithCoppaCheck,
   loadUserSettings,
@@ -34,38 +34,36 @@ import {
   updateBudget,
   createSSEResponse,
   MidStreamBudgetTracker,
-} from "./helpers";
+  getABModelOverride,
+} from './helpers';
 
 /** Feature flag for streaming - can be disabled via env var */
 
 export const revalidate = 0;
-const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== "false";
+const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== 'false';
 
 export const POST = pipe(
-  withSentry("/api/chat/stream"),
+  withSentry('/api/chat/stream'),
   withCSRF,
 )(async (ctx) => {
   const request = ctx.req;
 
   if (!STREAMING_ENABLED) {
     const response = NextResponse.json(
-      { error: "Streaming is disabled", fallback: "/api/chat" },
+      { error: 'Streaming is disabled', fallback: '/api/chat' },
       { status: 503 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set('X-Request-ID', getRequestId(request));
     return response;
   }
 
   const log = getRequestLogger(request);
 
   const clientId = getClientIdentifier(request);
-  const rateLimit = await checkRateLimitAsync(
-    `chat:${clientId}`,
-    RATE_LIMITS.CHAT,
-  );
+  const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);
 
   if (!rateLimit.success) {
-    log.warn("Rate limit exceeded", { clientId, endpoint: "/api/chat/stream" });
+    log.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat/stream' });
     return rateLimitResponse(rateLimit);
   }
 
@@ -75,22 +73,20 @@ export const POST = pipe(
       messages,
       systemPrompt,
       maestroId,
+      conversationId,
       enableMemory = true,
       enableTools,
     } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      const response = NextResponse.json(
-        { error: "Messages array is required" },
-        { status: 400 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
+      const response = NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     }
 
     // Streaming does not support tool calls - warn if requested
     if (enableTools) {
-      log.debug("Tool calls requested but not supported in streaming mode", {
+      log.debug('Tool calls requested but not supported in streaming mode', {
         maestroId,
       });
     }
@@ -100,15 +96,14 @@ export const POST = pipe(
     if (!coppaCheck.allowed) {
       const response = NextResponse.json(
         {
-          error: "Parental consent required",
-          code: "COPPA_CONSENT_REQUIRED",
-          message:
-            "Users under 13 require parental consent to use AI features.",
-          fallback: "/api/chat",
+          error: 'Parental consent required',
+          code: 'COPPA_CONSENT_REQUIRED',
+          message: 'Users under 13 require parental consent to use AI features.',
+          fallback: '/api/chat',
         },
         { status: 403 },
       );
-      response.headers.set("X-Request-ID", getRequestId(request));
+      response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     }
     const userId = coppaCheck.userId;
@@ -121,48 +116,48 @@ export const POST = pipe(
     if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
       const response = NextResponse.json(
         {
-          error: "Budget limit exceeded",
+          error: 'Budget limit exceeded',
           message: `You have reached your budget limit of $${userSettings.budgetLimit.toFixed(2)}.`,
-          fallback: "/api/chat",
+          fallback: '/api/chat',
         },
         { status: 402 },
       );
-      response.headers.set("X-Request-ID", getRequestId(request));
+      response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     }
 
     // Tier-based model selection for streaming (ADR 0073)
-    const tierModel = await tierService.getModelForUserFeature(
-      userId ?? null,
-      "chat",
-    );
-    const deploymentName = getDeploymentForModel(tierModel);
+    const tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
+    const abModelOverride = await getABModelOverride(userId, conversationId);
+    const selectedModel = abModelOverride ?? tierModel;
+    const deploymentName = getDeploymentForModel(selectedModel);
 
-    log.debug("Tier-based model selected for streaming", {
-      userId: userId || "anonymous",
+    log.debug('Tier-based model selected for streaming', {
+      userId: userId || 'anonymous',
       tierModel,
+      abModelOverride,
       deploymentName,
     });
 
     const config = getActiveProvider(providerPreference, deploymentName);
     if (!config) {
       const response = NextResponse.json(
-        { error: "No AI provider configured", fallback: "/api/chat" },
+        { error: 'No AI provider configured', fallback: '/api/chat' },
         { status: 503 },
       );
-      response.headers.set("X-Request-ID", getRequestId(request));
+      response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     }
 
-    if (config.provider !== "azure") {
+    if (config.provider !== 'azure') {
       const response = NextResponse.json(
         {
-          error: "Streaming only available with Azure OpenAI",
-          fallback: "/api/chat",
+          error: 'Streaming only available with Azure OpenAI',
+          fallback: '/api/chat',
         },
         { status: 400 },
       );
-      response.headers.set("X-Request-ID", getRequestId(request));
+      response.headers.set('X-Request-ID', getRequestId(request));
       return response;
     }
 
@@ -176,14 +171,14 @@ export const POST = pipe(
     );
 
     // Safety filter on input
-    const lastUserMessage = messages.filter((m) => m.role === "user").pop();
+    const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
     if (lastUserMessage) {
       const safetyBlock = checkInputSafety(lastUserMessage.content);
       if (safetyBlock) {
-        log.warn("Content blocked by safety filter", { clientId });
+        log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
           yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
-          yield "data: [DONE]\n\n";
+          yield 'data: [DONE]\n\n';
         });
       }
     }
@@ -193,11 +188,7 @@ export const POST = pipe(
     const encoder = new TextEncoder();
     const budgetTracker =
       userId && userSettings
-        ? new MidStreamBudgetTracker(
-            userSettings.budgetLimit,
-            userSettings.totalSpent,
-            userId,
-          )
+        ? new MidStreamBudgetTracker(userSettings.budgetLimit, userSettings.totalSpent, userId)
         : null;
 
     const stream = new ReadableStream({
@@ -214,12 +205,11 @@ export const POST = pipe(
           );
 
           for await (const chunk of generator) {
-            if (chunk.type === "content" && chunk.content) {
+            if (chunk.type === 'content' && chunk.content) {
               // Mid-stream budget check (F-13)
               if (budgetTracker && budgetTracker.trackChunk(chunk.content)) {
                 budgetExceededMidStream = true;
-                const budgetMsg =
-                  "\n\n[Budget limit reached. Response truncated.]";
+                const budgetMsg = '\n\n[Budget limit reached. Response truncated.]';
                 controller.enqueue(
                   encoder.encode(
                     `data: ${JSON.stringify({
@@ -234,31 +224,22 @@ export const POST = pipe(
               const sanitized = sanitizer.processChunk(chunk.content);
               if (sanitized) {
                 controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({ content: sanitized })}\n\n`,
-                  ),
+                  encoder.encode(`data: ${JSON.stringify({ content: sanitized })}\n\n`),
                 );
               }
-            } else if (chunk.type === "content_filter") {
-              const msg =
-                "I cannot respond to this request due to content filtering.";
+            } else if (chunk.type === 'content_filter') {
+              const msg = 'I cannot respond to this request due to content filtering.';
               controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ content: msg, filtered: true })}\n\n`,
-                ),
+                encoder.encode(`data: ${JSON.stringify({ content: msg, filtered: true })}\n\n`),
               );
-            } else if (chunk.type === "usage" && chunk.usage) {
+            } else if (chunk.type === 'usage' && chunk.usage) {
               totalTokens = chunk.usage.total_tokens;
               controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ usage: chunk.usage })}\n\n`,
-                ),
+                encoder.encode(`data: ${JSON.stringify({ usage: chunk.usage })}\n\n`),
               );
-            } else if (chunk.type === "error") {
+            } else if (chunk.type === 'error') {
               controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ error: chunk.error })}\n\n`,
-                ),
+                encoder.encode(`data: ${JSON.stringify({ error: chunk.error })}\n\n`),
               );
             }
           }
@@ -267,32 +248,26 @@ export const POST = pipe(
             const remaining = sanitizer.flush();
             if (remaining) {
               controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({ content: remaining })}\n\n`,
-                ),
+                encoder.encode(`data: ${JSON.stringify({ content: remaining })}\n\n`),
               );
             }
           }
 
-          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 
           // Update budget: use actual tokens if available, else estimated
           if (userId && userSettings) {
             const tokensToCharge =
-              totalTokens > 0
-                ? totalTokens
-                : (budgetTracker?.getEstimatedTokens() ?? 0);
+              totalTokens > 0 ? totalTokens : (budgetTracker?.getEstimatedTokens() ?? 0);
             if (tokensToCharge > 0) {
               await updateBudget(userId, tokensToCharge);
             }
           }
         } catch (error) {
-          if ((error as Error).name !== "AbortError") {
-            log.error("Streaming error", { error: String(error) });
+          if ((error as Error).name !== 'AbortError') {
+            log.error('Streaming error', { error: String(error) });
             controller.enqueue(
-              encoder.encode(
-                `data: ${JSON.stringify({ error: "Streaming failed" })}\n\n`,
-              ),
+              encoder.encode(`data: ${JSON.stringify({ error: 'Streaming failed' })}\n\n`),
             );
           }
         } finally {
@@ -303,37 +278,37 @@ export const POST = pipe(
 
     return new Response(stream, {
       headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache, no-transform",
-        Connection: "keep-alive",
-        "X-Accel-Buffering": "no",
-        "X-Request-ID": getRequestId(request),
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+        'X-Request-ID': getRequestId(request),
       },
     });
   } catch (error) {
-    log.error("Chat stream API error", { error: String(error) });
+    log.error('Chat stream API error', { error: String(error) });
     const response = NextResponse.json(
-      { error: "Internal server error", fallback: "/api/chat" },
+      { error: 'Internal server error', fallback: '/api/chat' },
       { status: 500 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set('X-Request-ID', getRequestId(request));
     return response;
   }
 });
 
 /** GET endpoint for connection test */
-export const GET = pipe(withSentry("/api/chat/stream"))(async (ctx) => {
+export const GET = pipe(withSentry('/api/chat/stream'))(async (ctx) => {
   const config = getActiveProvider();
-  const providerSupportsStreaming = config?.provider === "azure";
+  const providerSupportsStreaming = config?.provider === 'azure';
   const streamingAvailable = STREAMING_ENABLED && providerSupportsStreaming;
 
   const response = NextResponse.json({
     streaming: streamingAvailable,
     provider: config?.provider ?? null,
-    endpoint: "/api/chat/stream",
-    method: "POST",
-    note: "Tool calls not supported - use /api/chat for tools",
+    endpoint: '/api/chat/stream',
+    method: 'POST',
+    note: 'Tool calls not supported - use /api/chat for tools',
   });
-  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;
 });

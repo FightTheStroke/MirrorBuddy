@@ -1,7 +1,13 @@
 {
   "community": {
+    "pageTitle": "Contributions de la communauté",
+    "pageDescription": "Explorez et partagez des ressources d'étude avec la communauté MirrorBuddy.",
     "title": "Contributions de la communauté",
     "description": "Partage des ressources d'étude avec la communauté MirrorBuddy.",
+    "list": {
+      "title": "Contributions Approuvées",
+      "empty": "Aucune contribution approuvée disponible."
+    },
     "contributionForm": {
       "title": "Soumettre une contribution",
       "nameLabel": "Titre",

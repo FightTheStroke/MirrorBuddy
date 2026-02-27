@@ -1,7 +1,13 @@
 {
   "community": {
+    "pageTitle": "Community Contributions",
+    "pageDescription": "Browse and share study resources with the MirrorBuddy community.",
     "title": "Community Contributions",
     "description": "Share study resources with the MirrorBuddy community.",
+    "list": {
+      "title": "Approved Contributions",
+      "empty": "No approved contributions yet."
+    },
     "contributionForm": {
       "title": "Submit a contribution",
       "nameLabel": "Title",
