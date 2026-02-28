@@ -36,5 +36,7 @@ export const GET = pipe(
       role: user.role,
       isAdmin: user.role === "ADMIN",
     },
+  }, {
+    headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
   });
 });

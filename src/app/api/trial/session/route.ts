@@ -135,6 +135,8 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
     verificationPending: isTrialVerificationPending(session),
   });
 
+  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+
   if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
     response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
       httpOnly: true,

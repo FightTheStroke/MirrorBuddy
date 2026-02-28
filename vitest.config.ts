@@ -24,7 +24,7 @@ export default defineConfig({
     sequence: {
       hooks: 'list',
     },
-    fileParallelism: false,
+    fileParallelism: true,
     server: {
       deps: {
         inline: ['next-intl'],
