@@ -4,7 +4,7 @@ import { pipe, withSentry } from '@/lib/api/middlewares';
 import { listApproved } from '@/lib/community/community-service';
 import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/db';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { validateAuth } from '@/lib/auth/server';
 
 const PAGE_SIZE = 20;
 type CommunityType = 'feedback' | 'tip' | 'resource' | 'question';
