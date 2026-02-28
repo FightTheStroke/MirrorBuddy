@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
-type ContributionStatus = 'pending' | 'approved' | 'rejected';
+type ContributionStatus = 'pending' | 'approved' | 'rejected' | 'flagged';
 
 interface MyContribution {
   id: string;
@@ -23,10 +23,11 @@ const STATUS_STYLES: Record<ContributionStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
   approved: 'bg-green-100 text-green-800 border-green-300',
   rejected: 'bg-red-100 text-red-800 border-red-300',
+  flagged: 'bg-orange-100 text-orange-800 border-orange-300',
 };
 
 function isContributionStatus(value: unknown): value is ContributionStatus {
-  return value === 'pending' || value === 'approved' || value === 'rejected';
+  return value === 'pending' || value === 'approved' || value === 'rejected' || value === 'flagged';
 }
 
 function normalizeContribution(value: unknown): MyContribution | null {

@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
 import { listApproved } from '@/lib/community/community-service';
 import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 const PAGE_SIZE = 20;
 type CommunityType = 'feedback' | 'tip' | 'resource' | 'question';
@@ -35,8 +37,30 @@ export const GET = pipe(withSentry('/api/community/list'))(async (ctx) => {
       { limit: PAGE_SIZE, offset },
     );
 
+    // Optionally enrich with hasVoted for authenticated users
+    let userId: string | null = null;
+    try {
+      const auth = await validateAuth();
+      userId = auth.authenticated ? auth.userId : null;
+    } catch {
+      // Not authenticated — skip vote enrichment
+    }
+
+    let enrichedItems = items;
+    if (userId && items.length > 0) {
+      const userVotes = await prisma.contributionVote.findMany({
+        where: { userId, contributionId: { in: items.map((i) => i.id) } },
+        select: { contributionId: true },
+      });
+      const votedIds = new Set(userVotes.map((v) => v.contributionId));
+      enrichedItems = items.map((item) => ({
+        ...item,
+        hasVoted: votedIds.has(item.id),
+      }));
+    }
+
     return NextResponse.json({
-      items,
+      items: enrichedItems,
       pagination: {
         page,
         limit: PAGE_SIZE,
