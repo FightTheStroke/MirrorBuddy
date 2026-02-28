@@ -59,7 +59,7 @@ This DPIA assesses high-risk data processing activities under GDPR Article 35, i
 
 - **Database-level encryption**: PostgreSQL encrypted at rest (AES-256), TLS 1.3 in transit
 - **Application-level PII encryption**: AES-256-GCM for email, name, and user-generated content (`src/lib/security/pii-encryption.ts`)
-- **Cookie encryption**: Session cookies encrypted with AES-256-GCM (`src/lib/auth/cookie-encryption.ts`)
+- **Cookie security**: Session cookies cryptographically signed with HMAC (`src/lib/auth/session-auth.ts`)
 - **Privacy-aware RAG**: PII anonymization before embedding generation and vector storage (`src/lib/privacy/privacy-aware-embedding.ts`)
 - **Key management**: Versioned key rotation with Azure Key Vault integration and environment variable fallback
 - **Audit trail**: All PII decryption operations logged to AuditLog table (30-day retention)

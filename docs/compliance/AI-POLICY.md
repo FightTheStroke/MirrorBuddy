@@ -26,12 +26,11 @@ MirrorBuddy adheres to the following principles in the deployment of AI systems:
 
 ## 4. System Classification
 
-MirrorBuddy is classified as a **high-risk AI system** (Art. 6, AI Act) because:
+MirrorBuddy is classified as a **limited-risk AI system** (Art. 52, AI Act) because:
 
-- **Educational Context**: Supports learning for minors
-- **Minor Protection**: Processes sensitive student data with diagnoses of cognitive disabilities
-- **Significant Impact**: Influences learning pathways and cognitive development
-- **Biometric Data**: Manages biometric data (voice) for access and recognition
+- **Tutoring Role**: Assists learning but does NOT determine access to education or make assessment decisions (Annex III, point 3 applies only to admissions/grading systems)
+- **Transparency Obligations**: Users are clearly informed they interact with an AI system
+- **Minor Protection**: Despite limited-risk classification, we voluntarily implement high-risk safeguards for child safety
 
 Consequently, we implement transparency, compliance, and oversight measures according to Chapter III of the AI Act.
 

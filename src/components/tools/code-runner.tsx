@@ -27,18 +27,21 @@ async function loadPyodide(): Promise<unknown> {
 
   pyodideLoading = true;
   pyodideLoadPromise = (async () => {
-    // Dynamically load Pyodide from CDN
+    const PYODIDE_VERSION = 'v0.27.0';
+    const CDN_BASE = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full`;
     const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
+    script.src = `${CDN_BASE}/pyodide.js`;
+    script.crossOrigin = 'anonymous';
     document.head.appendChild(script);
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve, reject) => {
       script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Pyodide'));
     });
 
     // @ts-expect-error - Pyodide is loaded via script
     pyodideInstance = await window.loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/',
+      indexURL: `${CDN_BASE}/`,
     });
 
     return pyodideInstance;

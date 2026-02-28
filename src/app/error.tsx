@@ -103,7 +103,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center p-4">
-      <div className="max-w-md text-center">
+      <div className="max-w-md text-center" role="alert" aria-live="assertive">
         <h2 className="mb-4 text-2xl font-bold text-red-600">{t.title}</h2>
         <p className="mb-6 text-gray-600">{t.message}</p>
         {process.env.NODE_ENV !== "production" && (
