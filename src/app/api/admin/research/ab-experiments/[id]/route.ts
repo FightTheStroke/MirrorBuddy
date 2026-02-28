@@ -6,6 +6,7 @@
 
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import type { MiddlewareContext } from '@/lib/api/pipe';
 import { prisma } from '@/lib/db';
 import { invalidateActiveExperimentsCache } from '@/lib/ab-testing/ab-service';
 
@@ -31,7 +32,7 @@ export const PATCH = pipe(
   withSentry('/api/admin/research/ab-experiments/[id]'),
   withCSRF,
   withAdmin,
-)(async (ctx: { req: Request; params: Promise<{ id: string }> }) => {
+)(async (ctx: MiddlewareContext) => {
   const { id } = await ctx.params;
   const body = await ctx.req.json();
   const { status } = body as { status?: string };
@@ -74,7 +75,7 @@ export const DELETE = pipe(
   withSentry('/api/admin/research/ab-experiments/[id]'),
   withCSRF,
   withAdmin,
-)(async (ctx: { req: Request; params: Promise<{ id: string }> }) => {
+)(async (ctx: MiddlewareContext) => {
   const { id } = await ctx.params;
 
   const model = getABModel();

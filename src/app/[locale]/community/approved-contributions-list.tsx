@@ -141,13 +141,16 @@ export function ApprovedContributionsList({
           throw new Error('Invalid vote response body');
         }
 
+        const voted = body.voted;
+        const newVoteCount = body.newVoteCount;
+
         setItems((previousItems) =>
           previousItems.map((item) =>
             item.id === contributionId
               ? {
                   ...item,
-                  hasVoted: body.voted,
-                  voteCount: body.newVoteCount,
+                  hasVoted: voted,
+                  voteCount: newVoteCount,
                 }
               : item,
           ),
