@@ -1,6 +1,14 @@
-export default function MaestroLoading() {
+import { getTranslations } from 'next-intl/server';
+
+export default async function MaestroLoading() {
+  const t = await getTranslations('loading');
+
   return (
-    <div className="flex min-h-screen items-center justify-center" role="status" aria-label="Loading chat">
+    <div
+      className="flex min-h-screen items-center justify-center"
+      role="status"
+      aria-label={t('chatAriaLabel')}
+    >
       <div className="space-y-4 w-full max-w-3xl px-4">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200 motion-reduce:animate-none" />

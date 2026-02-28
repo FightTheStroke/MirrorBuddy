@@ -5,12 +5,12 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { PdfInputMobile } from "../pdf-input-mobile";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { PdfInputMobile } from '../pdf-input-mobile';
 
-describe("PdfInputMobile", () => {
+describe('PdfInputMobile', () => {
   const mockOnUpload = vi.fn();
   const mockOnError = vi.fn();
 
@@ -23,15 +23,15 @@ describe("PdfInputMobile", () => {
     vi.clearAllMocks();
   });
 
-  describe("Structure and Layout", () => {
-    it("renders as a mobile-optimized container", () => {
+  describe('Structure and Layout', () => {
+    it('renders as a mobile-optimized container', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       const rootElement = container.firstChild as HTMLElement;
       expect(rootElement).toBeInTheDocument();
     });
 
-    it("has responsive layout adapted to xs breakpoint", () => {
+    it('has responsive layout adapted to xs breakpoint', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       const rootElement = container.firstChild as HTMLElement;
@@ -39,34 +39,30 @@ describe("PdfInputMobile", () => {
       expect(rootElement.className).toMatch(/p-|px-|py-/);
     });
 
-    it("displays main title or heading", () => {
+    it('displays main title or heading', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const heading =
-        screen.queryByRole("heading") ||
-        screen.queryByText(/upload|pdf|document/i);
+      const heading = screen.queryByRole('heading') || screen.queryByText(/upload|pdf|document/i);
       expect(heading).toBeInTheDocument();
     });
   });
 
-  describe("File Picker Control", () => {
-    it("renders file input with correct accept attribute", () => {
+  describe('File Picker Control', () => {
+    it('renders file input with correct accept attribute', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
       expect(fileInput).toBeInTheDocument();
-      expect(fileInput.accept).toContain("application/pdf");
-      expect(fileInput.accept).toContain("image");
+      expect(fileInput.accept).toContain('application/pdf');
+      expect(fileInput.accept).toContain('image');
     });
 
-    it("renders file picker button with touch-friendly size", () => {
+    it('renders file picker button with touch-friendly size', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const filePickerButton = buttons.find((btn) =>
-        /choose|select|pick|file/i.test(btn.textContent || ""),
+        /choose|select|pick|file/i.test(btn.textContent || ''),
       );
 
       expect(filePickerButton).toBeInTheDocument();
@@ -74,18 +70,16 @@ describe("PdfInputMobile", () => {
       expect(filePickerButton?.className).toMatch(/min-w-\[44px\]/);
     });
 
-    it("file picker button triggers file input click", async () => {
+    it('file picker button triggers file input click', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      const clickSpy = vi.spyOn(fileInput, "click");
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const clickSpy = vi.spyOn(fileInput, 'click');
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const filePickerButton = buttons.find((btn) =>
-        /choose|select|pick|file/i.test(btn.textContent || ""),
+        /choose|select|pick|file/i.test(btn.textContent || ''),
       );
 
       if (filePickerButton) {
@@ -95,37 +89,37 @@ describe("PdfInputMobile", () => {
     });
   });
 
-  describe("Camera Capture Control", () => {
-    it("renders camera capture button", () => {
+  describe('Camera Capture Control', () => {
+    it('renders camera capture button', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const cameraButton = buttons.find((btn) =>
-        /camera|capture|scan/i.test(btn.textContent || ""),
+        /camera|capture|scan/i.test(btn.textContent || ''),
       );
 
       expect(cameraButton).toBeInTheDocument();
     });
 
-    it("camera button has touch-friendly size (44px minimum)", () => {
+    it('camera button has touch-friendly size (44px minimum)', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const cameraButton = buttons.find((btn) =>
-        /camera|capture|scan/i.test(btn.textContent || ""),
+        /camera|capture|scan/i.test(btn.textContent || ''),
       );
 
       expect(cameraButton?.className).toMatch(/min-h-\[44px\]/);
       expect(cameraButton?.className).toMatch(/min-w-\[44px\]/);
     });
 
-    it("camera button is clickable and callable", async () => {
+    it('camera button is clickable and callable', async () => {
       const user = userEvent.setup({ delay: null });
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const cameraButton = buttons.find((btn) =>
-        /camera|capture|scan/i.test(btn.textContent || ""),
+        /camera|capture|scan/i.test(btn.textContent || ''),
       );
 
       if (cameraButton) {
@@ -135,39 +129,39 @@ describe("PdfInputMobile", () => {
     });
   });
 
-  describe("Touch Target Sizing (WCAG Mobile)", () => {
-    it("all interactive elements have minimum 44px height", () => {
+  describe('Touch Target Sizing (WCAG Mobile)', () => {
+    it('all interactive elements have minimum 44px height', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = container.querySelectorAll("button");
+      const buttons = container.querySelectorAll('button');
       buttons.forEach((button) => {
         // Either has min-h class or sufficient natural height
         expect(button.className).toMatch(/min-h-\[44px\]|h-\d|py-\d|p-\d/);
       });
     });
 
-    it("all interactive elements have minimum 44px width", () => {
+    it('all interactive elements have minimum 44px width', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = container.querySelectorAll("button");
+      const buttons = container.querySelectorAll('button');
       buttons.forEach((button) => {
         // Either has min-w class or sufficient natural width
         expect(button.className).toMatch(/min-w-\[44px\]|w-\d|px-\d|p-\d/);
       });
     });
 
-    it("buttons have adequate spacing to prevent accidental clicks", () => {
+    it('buttons have adequate spacing to prevent accidental clicks', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = container.querySelectorAll("button");
+      const buttons = container.querySelectorAll('button');
       // Check for gap or margin classes between buttons
       const parentWithButtons = container.querySelector("[class*='gap']");
       expect(parentWithButtons?.className || buttons.length === 1).toBeTruthy();
     });
   });
 
-  describe("Progress Indicator", () => {
-    it("renders progress indicator or upload status area", () => {
+  describe('Progress Indicator', () => {
+    it('renders progress indicator or upload status area', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       // Component should have progress bar element ready
@@ -176,16 +170,14 @@ describe("PdfInputMobile", () => {
       ).toBeInTheDocument();
     });
 
-    it("displays upload progress when file is selected", async () => {
+    it('displays upload progress when file is selected', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
       // Simulate file selection
-      const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+      const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
       await user.upload(fileInput, file);
 
       // After upload, should show progress bar
@@ -196,16 +188,14 @@ describe("PdfInputMobile", () => {
     });
   });
 
-  describe("File Upload Handling", () => {
-    it("accepts PDF files", async () => {
+  describe('File Upload Handling', () => {
+    it('accepts PDF files', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      const file = new File(["content"], "document.pdf", {
-        type: "application/pdf",
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['content'], 'document.pdf', {
+        type: 'application/pdf',
       });
 
       await user.upload(fileInput, file);
@@ -217,14 +207,12 @@ describe("PdfInputMobile", () => {
       );
     });
 
-    it("accepts image files", async () => {
+    it('accepts image files', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      const file = new File(["image"], "scan.jpg", { type: "image/jpeg" });
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['image'], 'scan.jpg', { type: 'image/jpeg' });
 
       await user.upload(fileInput, file);
       await waitFor(
@@ -235,64 +223,57 @@ describe("PdfInputMobile", () => {
       );
     });
 
-    it("calls onUpload callback with selected file", async () => {
+    it('calls onUpload callback with selected file', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
 
       await user.upload(fileInput, file);
       await waitFor(
         () => {
-          expect(mockOnUpload).toHaveBeenCalledTimes(1);
           expect(mockOnUpload).toHaveBeenCalledWith(file);
         },
         { timeout: 2500 },
       );
     });
 
-    it("file input accepts only PDF and image files", () => {
+    it('file input accepts only PDF and image files', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
       // Check that file input has correct accept attribute
-      expect(fileInput.accept).toContain("application/pdf");
-      expect(fileInput.accept).toContain("image");
+      expect(fileInput.accept).toContain('application/pdf');
+      expect(fileInput.accept).toContain('image');
     });
   });
 
-  describe("Accessibility", () => {
-    it("buttons have accessible names", () => {
+  describe('Accessibility', () => {
+    it('buttons have accessible names', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       buttons.forEach((button) => {
         expect(button).toHaveAccessibleName();
       });
     });
 
-    it("file input has associated label or is hidden", () => {
+    it('file input has associated label or is hidden', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       const fileInput = container.querySelector('input[type="file"]');
       // Input should be hidden visually (not visible to users, only for internal use)
-      expect(fileInput?.className).toContain("hidden");
+      expect(fileInput?.className).toContain('hidden');
     });
 
-    it("progress indicator has proper ARIA roles", async () => {
+    it('progress indicator has proper ARIA roles', async () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      const file = new File(["test"], "test.pdf", { type: "application/pdf" });
+      const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+      const file = new File(['test'], 'test.pdf', { type: 'application/pdf' });
 
       await user.upload(fileInput, file);
 
@@ -303,18 +284,18 @@ describe("PdfInputMobile", () => {
       });
     });
 
-    it("provides feedback for screen readers", () => {
+    it('provides feedback for screen readers', () => {
       render(<PdfInputMobile {...mockProps} />);
 
-      const buttons = screen.getAllByRole("button");
+      const buttons = screen.getAllByRole('button');
       const uploadButton = buttons[0];
 
       expect(uploadButton).toHaveAccessibleName();
     });
   });
 
-  describe("Responsive Behavior (xs breakpoint)", () => {
-    it("uses appropriate padding for mobile screens", () => {
+  describe('Responsive Behavior (xs breakpoint)', () => {
+    it('uses appropriate padding for mobile screens', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       const rootElement = container.firstChild as HTMLElement;
@@ -322,29 +303,29 @@ describe("PdfInputMobile", () => {
       expect(rootElement.className).toMatch(/p-|px-|py-/);
     });
 
-    it("buttons stack vertically on narrow screens", () => {
+    it('buttons stack vertically on narrow screens', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       const buttonContainer = container.querySelector("[class*='flex']");
       // Should have flex-col for vertical stacking
       expect(
-        buttonContainer?.className.includes("flex-col") ||
-          buttonContainer?.className.includes("flex"),
+        buttonContainer?.className.includes('flex-col') ||
+          buttonContainer?.className.includes('flex'),
       ).toBeTruthy();
     });
 
-    it("text is readable on small screens (adequate text size)", () => {
+    it('text is readable on small screens (adequate text size)', () => {
       render(<PdfInputMobile {...mockProps} />);
 
       // Check that heading text is present
-      const heading = screen.getByRole("heading");
+      const heading = screen.getByRole('heading');
       expect(heading).toBeInTheDocument();
       expect(heading.textContent).toMatch(/upload|document/i);
     });
   });
 
-  describe("Mobile Components Integration", () => {
-    it("uses mobile component patterns", () => {
+  describe('Mobile Components Integration', () => {
+    it('uses mobile component patterns', () => {
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
       // Component should follow mobile conventions
@@ -353,9 +334,9 @@ describe("PdfInputMobile", () => {
 
       // Check for mobile-appropriate styling
       const hasMobileClasses =
-        rootElement.className.includes("rounded") ||
-        rootElement.className.includes("border") ||
-        rootElement.className.includes("bg");
+        rootElement.className.includes('rounded') ||
+        rootElement.className.includes('border') ||
+        rootElement.className.includes('bg');
 
       expect(hasMobileClasses).toBeTruthy();
     });
