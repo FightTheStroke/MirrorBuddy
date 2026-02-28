@@ -37,6 +37,18 @@ vi.mock('@/lib/db', async () => {
   return { prisma: createMockPrisma() };
 });
 
+// Mock pgvector utilities
+vi.mock('../pgvector-utils', () => ({
+  checkPgvectorStatus: vi.fn().mockResolvedValue({
+    available: true,
+    version: '0.8.0',
+    indexType: 'hnsw',
+    error: null,
+  }),
+  nativeVectorSearch: vi.fn(),
+  updateNativeVector: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Import after mocks
 import {
   storeEmbedding,
@@ -47,6 +59,7 @@ import {
 } from '../vector-store';
 import { prisma } from '@/lib/db';
 import { anonymizeConversationMessage } from '@/lib/privacy';
+import { nativeVectorSearch } from '../pgvector-utils';
 
 describe('Vector Store Service', () => {
   beforeEach(() => {
@@ -154,43 +167,30 @@ describe('Vector Store Service', () => {
     it('should return results sorted by similarity', async () => {
       const queryVector = Array(1536).fill(0.1);
 
-      // Mock stored embeddings
-      const storedEmbeddings = [
+      const nativeResults = [
         {
           id: 'emb-1',
-          userId: 'user-123',
-          sourceType: 'material',
-          sourceId: 'mat-1',
-          chunkIndex: 0,
+          source_type: 'material',
+          source_id: 'mat-1',
+          chunk_index: 0,
           content: 'Very similar content',
-          vector: JSON.stringify(Array(1536).fill(0.09)), // Very similar
-          model: 'text-embedding-3-small',
-          dimensions: 1536,
-          tokenCount: 10,
+          similarity: 0.96,
           subject: 'math',
           tags: '[]',
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
         {
           id: 'emb-2',
-          userId: 'user-123',
-          sourceType: 'material',
-          sourceId: 'mat-2',
-          chunkIndex: 0,
+          source_type: 'material',
+          source_id: 'mat-2',
+          chunk_index: 0,
           content: 'Less similar content',
-          vector: JSON.stringify(Array(1536).fill(0.5)), // Less similar
-          model: 'text-embedding-3-small',
-          dimensions: 1536,
-          tokenCount: 10,
+          similarity: 0.71,
           subject: 'math',
           tags: '[]',
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
       ];
 
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce(nativeResults as any);
 
       const results = await searchSimilar({
         userId: 'user-123',
@@ -204,7 +204,7 @@ describe('Vector Store Service', () => {
     });
 
     it('should filter by sourceType', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',
@@ -212,17 +212,16 @@ describe('Vector Store Service', () => {
         sourceType: 'flashcard',
       });
 
-      expect(prisma.contentEmbedding.findMany).toHaveBeenCalledWith(
+      expect(nativeVectorSearch).toHaveBeenCalledWith(
+        expect.anything(),
         expect.objectContaining({
-          where: expect.objectContaining({
-            sourceType: 'flashcard',
-          }),
+          sourceType: 'flashcard',
         }),
       );
     });
 
     it('should filter by subject', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',
@@ -230,11 +229,10 @@ describe('Vector Store Service', () => {
         subject: 'history',
       });
 
-      expect(prisma.contentEmbedding.findMany).toHaveBeenCalledWith(
+      expect(nativeVectorSearch).toHaveBeenCalledWith(
+        expect.anything(),
         expect.objectContaining({
-          where: expect.objectContaining({
-            subject: 'history',
-          }),
+          subject: 'history',
         }),
       );
     });
@@ -242,26 +240,7 @@ describe('Vector Store Service', () => {
     it('should respect minSimilarity threshold', async () => {
       const queryVector = Array(1536).fill(0.1);
 
-      const storedEmbeddings = [
-        {
-          id: 'emb-1',
-          userId: 'user-123',
-          sourceType: 'material',
-          sourceId: 'mat-1',
-          chunkIndex: 0,
-          content: 'Content',
-          vector: JSON.stringify(Array(1536).fill(-0.5)), // Low similarity
-          model: 'text-embedding-3-small',
-          dimensions: 1536,
-          tokenCount: 10,
-          subject: null,
-          tags: '[]',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce(storedEmbeddings as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([] as any);
 
       const results = await searchSimilar({
         userId: 'user-123',
@@ -269,7 +248,13 @@ describe('Vector Store Service', () => {
         minSimilarity: 0.8,
       });
 
-      expect(results).toHaveLength(0); // Should be filtered out
+      expect(results).toHaveLength(0);
+      expect(nativeVectorSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          minSimilarity: 0.8,
+        }),
+      );
     });
   });
 
@@ -317,24 +302,18 @@ describe('Vector Store Service', () => {
   describe('VectorSearchResult interface', () => {
     it('should have correct structure', async () => {
       const queryVector = Array(1536).fill(0.1);
-      const storedEmbedding = {
+      const nativeResult = {
         id: 'emb-1',
-        userId: 'user-123',
-        sourceType: 'material',
-        sourceId: 'mat-1',
-        chunkIndex: 0,
+        source_type: 'material',
+        source_id: 'mat-1',
+        chunk_index: 0,
         content: 'Content',
-        vector: JSON.stringify(queryVector),
-        model: 'text-embedding-3-small',
-        dimensions: 1536,
-        tokenCount: 10,
+        similarity: 1,
         subject: 'math',
         tags: '["test"]',
-        createdAt: new Date(),
-        updatedAt: new Date(),
       };
 
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([storedEmbedding] as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([nativeResult] as any);
 
       const results: VectorSearchResult[] = await searchSimilar({
         userId: 'user-123',
@@ -386,7 +365,7 @@ describe('Vector Store Service', () => {
     });
 
     it('should search embeddings filtered by conversation_summary sourceType', async () => {
-      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([] as any);
 
       await searchSimilar({
         userId: 'user-123',
@@ -394,11 +373,10 @@ describe('Vector Store Service', () => {
         sourceType: 'conversation_summary',
       });
 
-      expect(prisma.contentEmbedding.findMany).toHaveBeenCalledWith(
+      expect(nativeVectorSearch).toHaveBeenCalledWith(
+        expect.anything(),
         expect.objectContaining({
-          where: expect.objectContaining({
-            sourceType: 'conversation_summary',
-          }),
+          sourceType: 'conversation_summary',
         }),
       );
     });

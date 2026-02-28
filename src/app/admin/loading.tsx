@@ -1,6 +1,8 @@
+const ADMIN_LOADING_ARIA_LABEL = 'Loading admin panel';
+
 export default function AdminLoading() {
   return (
-    <div className="flex min-h-screen" role="status" aria-label="Loading admin panel">
+    <div className="flex min-h-screen" role="status" aria-label={ADMIN_LOADING_ARIA_LABEL}>
       <div className="w-64 animate-pulse bg-gray-100 motion-reduce:animate-none" />
       <div className="flex-1 space-y-4 p-6">
         <div className="h-8 w-56 animate-pulse rounded bg-gray-200 motion-reduce:animate-none" />
