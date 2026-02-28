@@ -45,18 +45,17 @@ jobs:
       - name: Find Staging Deployment
         id: find-staging
         run: |
+          SCOPE="--scope=team_nDwLfqx9JbVIs4C7Il79f4ln"
           if [ -n "${{ inputs.deployment_url }}" ]; then
             echo "Using provided deployment URL: ${{ inputs.deployment_url }}"
             echo "deployment_url=${{ inputs.deployment_url }}" >> $GITHUB_OUTPUT
           else
             echo "Finding latest staging deployment..."
-            # List recent deployments and find the latest preview
-            latest=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta gitSource=main 2>/dev/null | grep -v "Production" | head -5)
+            latest=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --meta gitSource=main 2>/dev/null | grep -v "Production" | head -5)
             echo "Recent deployments:"
             echo "$latest"
 
-            # Get the latest preview deployment URL
-            url=$(vercel inspect --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null | grep "url:" | head -1 | awk '{print $2}')
+            url=$(vercel inspect --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>/dev/null | grep "url:" | head -1 | awk '{print $2}')
             if [ -z "$url" ]; then
               echo "::error::Could not find a staging deployment to promote"
               echo "Please provide the staging deployment URL manually"
@@ -84,7 +83,7 @@ jobs:
         run: |
           url="${{ steps.find-staging.outputs.deployment_url }}"
           echo "🚀 Promoting $url to production..."
-          vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --yes
+          vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes
           echo "✅ Promotion complete"
           echo "promoted_url=$url" >> $GITHUB_OUTPUT
 
