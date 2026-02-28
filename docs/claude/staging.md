@@ -1,23 +1,47 @@
 # Staging System
 
-> Logical staging environment on Vercel preview deployments with zero infrastructure cost
+> Push to `main` deploys to staging (Vercel preview). Promote to production manually when ready.
 
 ## Quick Reference
 
-| Key       | Value                                            |
-| --------- | ------------------------------------------------ |
-| Detection | `src/lib/environment/staging-detector.ts`        |
-| DB layer  | `src/lib/db.ts` (Prisma extension, auto-tagging) |
-| Banner    | `src/components/ui/staging-banner.tsx`           |
-| Admin     | `src/components/admin/staging-data-toggle.tsx`   |
-| Purge API | `DELETE /api/admin/purge-staging-data`           |
-| Plan      | Plan 75 / ADR 0073 (pending)                     |
+| Key                | Value                                                 |
+| ------------------ | ----------------------------------------------------- |
+| Detection          | `src/lib/environment/staging-detector.ts`             |
+| DB layer           | `src/lib/db.ts` (Prisma extension, auto-tagging)      |
+| Banner             | `src/components/ui/staging-banner.tsx`                |
+| Admin              | `src/components/admin/staging-data-toggle.tsx`        |
+| Purge API          | `DELETE /api/admin/purge-staging-data`                |
+| CI deploy job      | `.github/workflows/ci.yml` → `deploy-to-staging`     |
+| Promote workflow   | `.github/workflows/promote-to-production.yml`         |
+
+## Deployment Flow
+
+```
+Push to main → CI (18 gate checks) → Deploy to Staging (Vercel Preview)
+                                           ↓
+                                    Test on staging URL
+                                           ↓
+                              Manual: "Promote to Production" workflow
+                                           ↓
+                              vercel promote → Production (mirrorbuddy.vercel.app)
+```
+
+### How to Promote
+
+1. Go to **Actions** → **Promote to Production** → **Run workflow**
+2. Optionally paste a specific staging URL (defaults to latest)
+3. Workflow runs `vercel promote`, health check, and updates GitHub deployment status
+
+### Rollback
+
+To rollback production, promote any previous staging deployment URL.
 
 ## Architecture
 
 ```
-Production (main)     -> VERCEL_ENV=production -> Normal operations
-Preview (PR/branches) -> VERCEL_ENV=preview   -> is_test_data=true, cron disabled
+Push to main      -> VERCEL_ENV=preview   -> Staging (auto URL)
+Promote workflow   -> VERCEL_ENV=production -> Production (mirrorbuddy.vercel.app)
+PR/branches        -> VERCEL_ENV=preview   -> Preview (auto URL)
 ```
 
 All data created in preview deployments is tagged with `isTestData: true`, enabling separation without a separate database.

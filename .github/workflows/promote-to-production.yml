@@ -1,0 +1,168 @@
+name: Promote to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_url:
+        description: "Staging deployment URL to promote (leave empty for latest)"
+        required: false
+        type: string
+      skip_health_check:
+        description: "Skip post-promotion health check"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  deployments: write
+  issues: write
+
+jobs:
+  promote:
+    name: "🚀 Promote Staging → Production"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Validate VERCEL_TOKEN
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not configured"
+            exit 1
+          fi
+          echo "✅ VERCEL_TOKEN is configured"
+
+      - name: Find Staging Deployment
+        id: find-staging
+        run: |
+          if [ -n "${{ inputs.deployment_url }}" ]; then
+            echo "Using provided deployment URL: ${{ inputs.deployment_url }}"
+            echo "deployment_url=${{ inputs.deployment_url }}" >> $GITHUB_OUTPUT
+          else
+            echo "Finding latest staging deployment..."
+            # List recent deployments and find the latest preview
+            latest=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} --meta gitSource=main 2>/dev/null | grep -v "Production" | head -5)
+            echo "Recent deployments:"
+            echo "$latest"
+
+            # Get the latest preview deployment URL
+            url=$(vercel inspect --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null | grep "url:" | head -1 | awk '{print $2}')
+            if [ -z "$url" ]; then
+              echo "::error::Could not find a staging deployment to promote"
+              echo "Please provide the staging deployment URL manually"
+              exit 1
+            fi
+            echo "deployment_url=https://$url" >> $GITHUB_OUTPUT
+            echo "Found latest deployment: https://$url"
+          fi
+
+      - name: Pre-promotion Staging Health Check
+        run: |
+          url="${{ steps.find-staging.outputs.deployment_url }}"
+          echo "Verifying staging deployment is healthy: $url"
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$url/api/health")
+          if [ "$status" != "200" ]; then
+            echo "::error::Staging deployment is not healthy (HTTP $status)"
+            echo "URL: $url"
+            echo "Please verify the staging deployment is working before promoting"
+            exit 1
+          fi
+          echo "✅ Staging is healthy (HTTP $status)"
+
+      - name: Promote to Production
+        id: promote
+        run: |
+          url="${{ steps.find-staging.outputs.deployment_url }}"
+          echo "🚀 Promoting $url to production..."
+          vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --yes
+          echo "✅ Promotion complete"
+          echo "promoted_url=$url" >> $GITHUB_OUTPUT
+
+      - name: Post-promotion Health Check
+        if: ${{ !inputs.skip_health_check }}
+        run: |
+          echo "Waiting 15s for production to stabilize..."
+          sleep 15
+          status=$(curl -s -o /dev/null -w "%{http_code}" "https://mirrorbuddy.vercel.app/api/health")
+          if [ "$status" = "200" ]; then
+            echo "✅ Production health check passed (HTTP $status)"
+          else
+            echo "::warning::Production health check returned HTTP $status"
+            echo "The deployment may still be warming up. Check manually."
+          fi
+
+      - name: Update GitHub Deployment Status
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.find-staging.outputs.deployment_url }}';
+            const { data: deployment } = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'Production',
+              auto_merge: false,
+              required_contexts: [],
+              description: `Promoted from staging: ${url}`,
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.id,
+              state: 'success',
+              environment_url: 'https://mirrorbuddy.vercel.app',
+              description: 'Promoted from staging to production',
+            });
+
+      - name: Post Summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const success = '${{ job.status }}' === 'success';
+            const stagingUrl = '${{ steps.find-staging.outputs.deployment_url }}';
+            const icon = success ? '✅' : '❌';
+            const status = success ? 'Successfully promoted' : 'Promotion failed';
+
+            await core.summary
+              .addHeading(`${icon} Production Promotion`, 2)
+              .addTable([
+                [{data: 'Staging URL', header: true}, {data: 'Status', header: true}],
+                [stagingUrl || 'N/A', status]
+              ])
+              .addLink('Production', 'https://mirrorbuddy.vercel.app')
+              .write();
+
+      - name: Close Staging Reminder Issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'staging-pending-promotion';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, labels: label, state: 'open',
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: '✅ Promoted to production successfully.',
+              });
+            }
