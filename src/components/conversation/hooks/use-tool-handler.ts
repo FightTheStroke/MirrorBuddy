@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
 import { getMaestroById } from '@/data/maestri';
@@ -6,6 +6,7 @@ import type { MaestroFull } from '@/data/maestri';
 import type { ToolType, ToolState } from '@/types/tools';
 import { TOOL_PROMPTS } from '../constants/tool-constants';
 import { functionNameToToolType } from '@/lib/tools/constants';
+import { usePendingToolRequestStore } from '@/lib/stores';
 
 interface UseToolHandlerProps {
   isLoading: boolean;
@@ -23,6 +24,17 @@ export function useToolHandler({
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
   const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
+  const pendingToolRequest = usePendingToolRequestStore((state) => state.pendingToolRequest);
+  const clearPendingToolRequest = usePendingToolRequestStore(
+    (state) => state.clearPendingToolRequest,
+  );
+  const hydrateLegacyPendingToolRequest = usePendingToolRequestStore(
+    (state) => state.hydrateLegacyPendingToolRequest,
+  );
+
+  useEffect(() => {
+    hydrateLegacyPendingToolRequest();
+  }, [hydrateLegacyPendingToolRequest]);
 
   const handleMaestroSelected = useCallback(
     async (maestro: MaestroFull, toolType: ToolType) => {
@@ -97,37 +109,26 @@ export function useToolHandler({
         setIsLoading(false);
       }
     },
-    [isLoading, setIsLoading, messages, addMessage]
+    [isLoading, setIsLoading, messages, addMessage],
   );
 
   const handleToolRequest = useCallback(
     (toolType: ToolType) => {
       if (isLoading) return;
 
-      const pendingRequest = sessionStorage.getItem('pendingToolRequest');
-      if (pendingRequest) {
-        try {
-          const parsed = JSON.parse(pendingRequest);
-          if (parsed && typeof parsed === 'object' && 'tool' in parsed && 'maestroId' in parsed) {
-            const { tool, maestroId } = parsed;
-            if (tool === toolType && maestroId) {
-              const maestro = getMaestroById(maestroId);
-              if (maestro) {
-                sessionStorage.removeItem('pendingToolRequest');
-                handleMaestroSelected(maestro, toolType);
-                return;
-              }
-            }
-          }
-        } catch (error) {
-          logger.error('Failed to parse pendingToolRequest', undefined, error);
+      if (pendingToolRequest?.tool === toolType && pendingToolRequest.maestroId) {
+        const maestro = getMaestroById(pendingToolRequest.maestroId);
+        if (maestro) {
+          clearPendingToolRequest();
+          handleMaestroSelected(maestro, toolType);
+          return;
         }
       }
 
       setPendingToolType(toolType);
       setShowMaestroDialog(true);
     },
-    [isLoading, handleMaestroSelected]
+    [isLoading, pendingToolRequest, clearPendingToolRequest, handleMaestroSelected],
   );
 
   return {

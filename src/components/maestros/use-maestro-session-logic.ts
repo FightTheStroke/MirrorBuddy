@@ -8,6 +8,7 @@ import { useMaestroChatHandlers } from './use-maestro-chat-handlers';
 import { useSessionMetrics } from '@/hooks/useSessionMetrics';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
+import { usePendingToolRequestStore } from '@/lib/stores';
 import type { Maestro, ChatMessage, ToolCall, ToolType } from '@/types';
 
 interface UseMaestroSessionLogicProps {
@@ -45,6 +46,17 @@ export function useMaestroSessionLogic({
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { addXP, endSession } = useProgressStore();
+  const pendingToolRequest = usePendingToolRequestStore((state) => state.pendingToolRequest);
+  const clearPendingToolRequest = usePendingToolRequestStore(
+    (state) => state.clearPendingToolRequest,
+  );
+  const hydrateLegacyPendingToolRequest = usePendingToolRequestStore(
+    (state) => state.hydrateLegacyPendingToolRequest,
+  );
+
+  useEffect(() => {
+    hydrateLegacyPendingToolRequest();
+  }, [hydrateLegacyPendingToolRequest]);
 
   const onQuestionAsked = useCallback(() => {
     questionCount.current += 1;
@@ -133,31 +145,25 @@ export function useMaestroSessionLogic({
       setInput(contextMessage);
     }
 
-    // Handle legacy pendingToolRequest from sessionStorage (backward compatibility)
-    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
-    if (pendingRequest) {
-      try {
-        const { tool, maestroId } = JSON.parse(pendingRequest);
-        if (maestroId === maestro.id) {
-          const toolPrompts: Record<string, string> = {
-            mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
-            quiz: `Crea un quiz per verificare la mia comprensione`,
-            flashcards: `Crea delle flashcard per aiutarmi a memorizzare`,
-            demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
-          };
-          if (toolPrompts[tool]) setInput(toolPrompts[tool]);
-          sessionStorage.removeItem('pendingToolRequest');
-        }
-      } catch {
-        sessionStorage.removeItem('pendingToolRequest');
+    if (pendingToolRequest?.maestroId === maestro.id) {
+      const toolPrompts: Partial<Record<ToolType, string>> = {
+        mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
+        quiz: `Crea un quiz per verificare la mia comprensione`,
+        flashcard: `Crea delle flashcard per aiutarmi a memorizzare`,
+        demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
+      };
+      const pendingPrompt = toolPrompts[pendingToolRequest.tool];
+      if (pendingPrompt) {
+        setInput(pendingPrompt);
       }
+      clearPendingToolRequest();
     }
 
     const timeoutRef = closeTimeoutRef.current;
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.id, requestedToolType, contextMessage]);
+  }, [maestro.id, requestedToolType, contextMessage, pendingToolRequest, clearPendingToolRequest]);
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {

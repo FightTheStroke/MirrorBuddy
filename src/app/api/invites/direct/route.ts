@@ -18,7 +18,6 @@ import { getApprovalTemplate } from '@/lib/email/templates/invite-templates';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
 
-
 export const revalidate = 0;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
 
@@ -65,7 +64,7 @@ export const POST = pipe(
 
   const email = rawEmail;
 
-  // Check for existing user by emailHash (PII-encrypted) or legacy plain email
+  // Backfill historical plain-email records before hash-only duplicate lookup.
   let emailHash: string;
   try {
     emailHash = await hashPII(email);
@@ -76,14 +75,18 @@ export const POST = pipe(
 
   let existingUser;
   try {
+    await prisma.user.updateMany({
+      where: { email, emailHash: null },
+      data: { emailHash },
+    });
+    await prisma.googleAccount.updateMany({
+      where: { email, emailHash: null },
+      data: { emailHash },
+    });
+
     existingUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { emailHash },
-          { email }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
-          { googleAccount: { emailHash } },
-          { googleAccount: { email } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat
-        ],
+        OR: [{ emailHash }, { googleAccount: { emailHash } }],
       },
     });
   } catch (err) {

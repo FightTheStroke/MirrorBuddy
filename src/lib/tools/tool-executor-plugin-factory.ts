@@ -1,6 +1,6 @@
 // ============================================================================
 // TOOL EXECUTOR PLUGIN FACTORY
-// Factory for creating ToolPlugin instances from legacy handlers
+// Factory for creating ToolPlugin instances from registered handlers
 // ============================================================================
 
 import { z } from 'zod';
@@ -14,19 +14,16 @@ import { getToolSchema } from './tool-executor-schemas';
  */
 export type ToolHandler = (
   args: Record<string, unknown>,
-  context: ToolContext
+  context: ToolContext,
 ) => Promise<ToolExecutionResult>;
 
 /**
- * Create a ToolPlugin from a legacy handler
- * Bridges between legacy Map-based handlers and the new plugin system
+ * Create a ToolPlugin from a registered tool handler
+ * Bridges handler registration and the plugin execution system
  */
-export function createPluginFromHandler(
-  functionName: string,
-  handler: ToolHandler
-): ToolPlugin {
+export function createPluginFromHandler(functionName: string, handler: ToolHandler): ToolPlugin {
   const schema = getToolSchema(functionName);
-  const displayName = functionName.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+  const displayName = functionName.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
 
   return {
     id: functionName,
