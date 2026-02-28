@@ -35,7 +35,7 @@
 
 - Schema changes MUST have Prisma migration
 - VarChar limits on all string columns; indexes on queried columns
-- Run `npx prisma generate` + `npx prisma db push` before commit
+- Run `npx prisma generate` after schema changes (never `db push` — use `migrate dev`)
 
 ## API Contracts (5+)
 
