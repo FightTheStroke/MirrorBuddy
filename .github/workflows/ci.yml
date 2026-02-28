@@ -11,6 +11,7 @@ permissions:
   contents: read
   security-events: write
   deployments: write
+  issues: write
 
 # Cancel in-progress runs for same PR
 concurrency:
@@ -1855,6 +1856,67 @@ jobs:
               state: 'success',
               environment_url: process.env.DEPLOYMENT_URL,
               description: 'Staging deployment successful — promote via workflow when ready',
+            });
+
+      - name: Create Promotion Reminder Issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'staging-pending-promotion';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha.slice(0, 7);
+            const url = process.env.DEPLOYMENT_URL;
+            const promoteUrl = `https://github.com/${owner}/${repo}/actions/workflows/promote-to-production.yml`;
+
+            // Ensure label exists
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                owner, repo, name: label,
+                color: 'FFA500',
+                description: 'Staging deployment waiting to be promoted to production',
+              });
+            }
+
+            // Close any existing reminder issues
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, labels: label, state: 'open',
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'not_planned',
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: `Superseded by newer staging deployment (\`${sha}\`).`,
+              });
+            }
+
+            // Create new reminder
+            await github.rest.issues.create({
+              owner, repo,
+              title: `🎪 Staging ${sha} ready — promote to production`,
+              labels: [label],
+              body: [
+                `## Staging Deployment Ready`,
+                ``,
+                `| Field | Value |`,
+                `|-------|-------|`,
+                `| **Staging URL** | ${url} |`,
+                `| **Commit** | \`${context.sha}\` |`,
+                `| **Deployed** | ${new Date().toISOString()} |`,
+                ``,
+                `### 👉 [Promote to Production](${promoteUrl})`,
+                ``,
+                `Click the link above, then **Run workflow** to promote this build to production.`,
+                ``,
+                `This issue will be **closed automatically** when promotion completes.`,
+              ].join('\n'),
             });
 
   # ============================================================================

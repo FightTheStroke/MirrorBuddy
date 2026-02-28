@@ -16,6 +16,7 @@ on:
 permissions:
   contents: read
   deployments: write
+  issues: write
 
 jobs:
   promote:
@@ -142,3 +143,26 @@ jobs:
               ])
               .addLink('Production', 'https://mirrorbuddy.vercel.app')
               .write();
+
+      - name: Close Staging Reminder Issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'staging-pending-promotion';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, labels: label, state: 'open',
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: '✅ Promoted to production successfully.',
+              });
+            }
