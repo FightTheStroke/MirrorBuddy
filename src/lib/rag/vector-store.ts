@@ -3,12 +3,13 @@
  * Handles storage and similarity search of embeddings.
  *
  * PostgreSQL Mode: Uses native pgvector with HNSW index for O(log n) queries
- * Fallback: Returns empty results with warning if pgvector unavailable
+ * Fallback Mode: Uses JSON string for vectors, JavaScript cosine similarity
  *
  * @module rag/vector-store
  */
 
 import { prisma } from '@/lib/db';
+import { cosineSimilarity } from './embedding-service';
 import { logger } from '@/lib/logger';
 import { checkPgvectorStatus, nativeVectorSearch, updateNativeVector } from './pgvector-utils';
 import { anonymizeConversationMessage } from '@/lib/privacy';
@@ -165,13 +166,50 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     }
   }
 
-  // pgvector unavailable — return empty results instead of expensive JS fallback
-  logger.warn('[VectorStore] pgvector unavailable, returning empty results', {
-    userId,
-    sourceType,
-    subject,
+  // Fallback: JavaScript-based similarity computation
+  const where: Record<string, unknown> = { userId, vector: { not: null } };
+  if (sourceType) where.sourceType = sourceType;
+  if (subject) where.subject = subject;
+
+  const embeddings = await prisma.contentEmbedding.findMany({
+    where,
+    take: 1000,
+    select: {
+      id: true,
+      sourceType: true,
+      sourceId: true,
+      chunkIndex: true,
+      content: true,
+      vector: true,
+      subject: true,
+      tags: true,
+    },
   });
-  return [];
+
+  const results: VectorSearchResult[] = [];
+
+  for (const emb of embeddings) {
+    if (!emb.vector) continue;
+
+    const storedVector = JSON.parse(emb.vector) as number[];
+    const similarity = cosineSimilarity(vector, storedVector);
+
+    if (similarity >= minSimilarity) {
+      results.push({
+        id: emb.id,
+        sourceType: emb.sourceType,
+        sourceId: emb.sourceId,
+        chunkIndex: emb.chunkIndex,
+        content: emb.content,
+        similarity,
+        subject: emb.subject,
+        tags: JSON.parse(emb.tags) as string[],
+      });
+    }
+  }
+
+  results.sort((a, b) => b.similarity - a.similarity);
+  return results.slice(0, limit);
 }
 
 /**
