@@ -37,7 +37,6 @@ interface BenchmarkHeatmapProps {
 }
 
 const SCORE_KEYS: ScoreKey[] = ['scaffolding', 'hinting', 'adaptation', 'misconceptionHandling'];
-const UNKNOWN_PROFILE = 'Unknown profile';
 
 function scoreColor(score: number | null): string {
   if (score === null) return 'bg-gray-100 dark:bg-gray-800 text-gray-400';
@@ -50,13 +49,13 @@ function scoreColor(score: number | null): string {
   return 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200';
 }
 
-function getProfileName(experiment: ExperimentRow): string {
+function getProfileName(experiment: ExperimentRow, unknownProfileLabel: string): string {
   if (experiment.profileName) return experiment.profileName;
   if (typeof experiment.syntheticProfile === 'string') return experiment.syntheticProfile;
   if (experiment.syntheticProfile?.profileName) return experiment.syntheticProfile.profileName;
   if (experiment.syntheticProfile?.name) return experiment.syntheticProfile.name;
   if (experiment.syntheticProfileId) return experiment.syntheticProfileId;
-  return UNKNOWN_PROFILE;
+  return unknownProfileLabel;
 }
 
 function computeOverall(scores: ExperimentRow['scores']): number | null {
@@ -68,7 +67,9 @@ function computeOverall(scores: ExperimentRow['scores']): number | null {
 }
 
 export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps) {
-  const t = useTranslations('admin');
+  const tAdmin = useTranslations('admin');
+  const tResearch = useTranslations('research');
+  const unknownProfileLabel = tResearch('heatmap.unknownProfile');
   const [selected, setSelected] = useState<{
     maestroId: string;
     profile: string;
@@ -79,8 +80,11 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
     [experiments],
   );
   const profiles = useMemo(
-    () => Array.from(new Set(completed.map((experiment) => getProfileName(experiment)))).sort(),
-    [completed],
+    () =>
+      Array.from(
+        new Set(completed.map((experiment) => getProfileName(experiment, unknownProfileLabel))),
+      ).sort(),
+    [completed, unknownProfileLabel],
   );
   const maestros = useMemo(
     () => Array.from(new Set(completed.map((experiment) => experiment.maestroId))).sort(),
@@ -94,7 +98,7 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
       const overall = computeOverall(experiment.scores);
       if (overall === null) continue;
       const maestroId = experiment.maestroId;
-      const profile = getProfileName(experiment);
+      const profile = getProfileName(experiment, unknownProfileLabel);
       const rowCellMap =
         matrix.get(maestroId) ?? new Map<string, { total: number; count: number }>();
       const previousCell = rowCellMap.get(profile) ?? { total: 0, count: 0 };
@@ -112,12 +116,12 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
     }
 
     return { matrix, rowTotals };
-  }, [completed]);
+  }, [completed, unknownProfileLabel]);
 
   if (completed.length === 0) {
     return (
       <div className="rounded-lg border p-6 text-center text-sm text-muted-foreground">
-        {t('noCompletedExperimentsYetRunASimulationToSeeBenchm')}
+        {tAdmin('noCompletedExperimentsYetRunASimulationToSeeBenchm')}
       </div>
     );
   }
@@ -128,13 +132,13 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-3 py-2 text-left font-medium">{t('maestro')}</th>
+              <th className="px-3 py-2 text-left font-medium">{tAdmin('maestro')}</th>
               {profiles.map((profile) => (
                 <th key={profile} className="px-3 py-2 text-center font-medium">
                   {profile}
                 </th>
               ))}
-              <th className="px-3 py-2 text-center font-medium">{t('overall')}</th>
+              <th className="px-3 py-2 text-center font-medium">{tAdmin('overall')}</th>
             </tr>
           </thead>
           <tbody>
@@ -172,7 +176,7 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
                                 experiments: completed.filter(
                                   (experiment) =>
                                     experiment.maestroId === maestroId &&
-                                    getProfileName(experiment) === profile,
+                                    getProfileName(experiment, unknownProfileLabel) === profile,
                                 ),
                               })
                             }
@@ -198,8 +202,11 @@ export default function BenchmarkHeatmap({ experiments }: BenchmarkHeatmapProps)
           </tbody>
         </table>
       </div>
-      <div className="flex flex-wrap items-center gap-2 text-xs" aria-label={t('colorScaleLegend')}>
-        <span className="font-medium text-muted-foreground">{t('colorScale')}</span>
+      <div
+        className="flex flex-wrap items-center gap-2 text-xs"
+        aria-label={tAdmin('colorScaleLegend')}
+      >
+        <span className="font-medium text-muted-foreground">{tAdmin('colorScale')}</span>
         {[
           { label: '80-100', score: 90 },
           { label: '60-79', score: 70 },

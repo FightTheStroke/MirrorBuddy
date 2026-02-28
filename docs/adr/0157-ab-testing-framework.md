@@ -54,3 +54,9 @@ MirrorBuddy needs a deterministic, low-overhead A/B testing framework for resear
 
 - FNV-1a is non-cryptographic (acceptable for distribution, not for security guarantees).
 - Cache invalidation logic must stay aligned with admin experiment update flows.
+
+## Implementation Complete
+
+- CRUD admin UI is implemented for A/B experiment management (create, list, update, delete flows).
+- Cache invalidation is explicit on admin mutation paths to avoid stale experiment/bucket configuration.
+- Status transition guards are implemented on update/delete paths to prevent invalid lifecycle changes.

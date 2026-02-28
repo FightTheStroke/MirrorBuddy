@@ -67,6 +67,9 @@
       "rank": "Rank",
       "average": "Average"
     },
+    "heatmap": {
+      "unknownProfile": "Unknown profile"
+    },
     "drillDown": {
       "title": "Benchmark Drill-down",
       "description": "Detailed TutorBench scores, metadata, and turn-by-turn progression",

@@ -46,3 +46,10 @@ Adopt a per-user, per-contribution vote model with a unique constraint `(contrib
 - Added moderation/review steps increase time-to-publish versus direct posting.
 - Reward idempotency and audit requirements add backend complexity.
 - Vote signals require anti-abuse monitoring to stay reliable.
+
+## Implementation Complete
+
+- Vote system is implemented with authenticated toggle voting and aggregate vote count updates.
+- "My Contributions" page is implemented for user-scoped submission history, status tracking, and rejection feedback.
+- Status transition guards are implemented for moderation/admin flows to enforce valid lifecycle changes.
+- Cache invalidation is explicit on moderation and contribution mutation paths to keep listings and counters fresh.

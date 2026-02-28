@@ -9,7 +9,7 @@ model ContactRequest {
   type      String   @db.VarChar(50) // general, schools, enterprise
   name      String   @db.VarChar(255)
   email     String   @db.VarChar(254) // RFC 5321 max email length
-  data      Json     // Form-specific fields (schoolName, companyName, etc.)
+  data      Json // Form-specific fields (schoolName, companyName, etc.)
   status    String   @default("pending") @db.VarChar(50) // pending, contacted, converted, closed
   notes     String?  @db.VarChar(2000) // Admin notes
   createdAt DateTime @default(now())

@@ -75,6 +75,7 @@
     "toasts": {
       "submitSuccess": "Contributo inviato con successo.",
       "submitError": "Impossibile inviare il contributo.",
+      "flaggedForModeration": "Segnalato per moderazione",
       "reviewSuccess": "Azione di revisione salvata.",
       "reviewError": "Impossibile salvare l'azione di revisione."
     },
@@ -82,6 +83,23 @@
       "noContributions": "Nessun contributo disponibile.",
       "noPendingReviews": "Nessuna revisione in attesa.",
       "noSearchResults": "Nessun contributo corrisponde alla ricerca."
+    },
+    "votes": {
+      "voteButton": "Vota",
+      "removeVote": "Rimuovi voto",
+      "voteCount": "{count} voti",
+      "loginToVote": "Accedi per votare",
+      "voteError": "Impossibile registrare il voto."
+    },
+    "myContributions": {
+      "title": "I miei contributi",
+      "noContributions": "Non hai ancora inviato contributi.",
+      "statusPending": "In attesa",
+      "statusApproved": "Approvato",
+      "statusRejected": "Rifiutato",
+      "rejectionReason": "Motivo del rifiuto",
+      "viewDetails": "Visualizza dettagli",
+      "submittedOn": "Inviato il"
     }
   }
 }

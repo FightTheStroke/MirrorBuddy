@@ -1862,7 +1862,9 @@
       "saveChanges": "Guardar cambios",
       "deleteSuccess": "Experimento eliminado correctamente",
       "activateSuccess": "Experimento activado correctamente",
-      "completeSuccess": "Experimento completado correctamente"
+      "completeSuccess": "Experimento completado correctamente",
+      "startDate": "Fecha de inicio",
+      "cancel": "Cancelar"
     },
     "community": {
       "reviewQueue": "Cola de revisión"

@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
 
 type ABBucket = {
@@ -79,9 +80,17 @@ export default function ABTestingDashboardPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('abTesting.title')}</h1>
-        <p className="text-sm text-muted-foreground">{t('abTesting.description')}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t('abTesting.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('abTesting.description')}</p>
+        </div>
+        <Link
+          href="/admin/research/ab-testing/manage"
+          className="rounded bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          {t('abTesting.manageTitle')}
+        </Link>
       </div>
 
       <section className="space-y-4">

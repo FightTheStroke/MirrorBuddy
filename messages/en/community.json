@@ -75,6 +75,7 @@
     "toasts": {
       "submitSuccess": "Contribution submitted successfully.",
       "submitError": "Unable to submit contribution.",
+      "flaggedForModeration": "Flagged for moderation",
       "reviewSuccess": "Review action saved.",
       "reviewError": "Unable to save review action."
     },
@@ -82,6 +83,23 @@
       "noContributions": "No contributions yet.",
       "noPendingReviews": "No pending reviews.",
       "noSearchResults": "No contributions match your search."
+    },
+    "votes": {
+      "voteButton": "Vote",
+      "removeVote": "Remove vote",
+      "voteCount": "{count} votes",
+      "loginToVote": "Log in to vote",
+      "voteError": "Unable to record your vote."
+    },
+    "myContributions": {
+      "title": "My contributions",
+      "noContributions": "You haven't submitted any contributions yet.",
+      "statusPending": "Pending",
+      "statusApproved": "Approved",
+      "statusRejected": "Rejected",
+      "rejectionReason": "Rejection reason",
+      "viewDetails": "View details",
+      "submittedOn": "Submitted on"
     }
   }
 }

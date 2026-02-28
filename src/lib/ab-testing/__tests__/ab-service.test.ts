@@ -25,6 +25,7 @@ import {
   __resetActiveExperimentsCacheForTests,
   getActiveExperiments,
   getExperimentConfig,
+  invalidateActiveExperimentsCache,
   resolveUserBucket,
 } from '../ab-service';
 import { injectABMetadata } from '../session-injector';
@@ -158,5 +159,31 @@ describe('ab-service', () => {
       modelName: 'gpt-4.1',
       extraConfig: { temperature: 0.3 },
     });
+  });
+
+  it('invalidateActiveExperimentsCache forces a fresh DB fetch on next call', async () => {
+    mockABExperiment.findMany.mockResolvedValue([
+      {
+        id: 'exp-4',
+        status: 'active',
+        bucketConfigs: [
+          {
+            bucketLabel: 'control',
+            percentage: 100,
+            modelProvider: 'azure',
+            modelName: 'gpt-4.1',
+            extraConfig: {},
+          },
+        ],
+      },
+    ]);
+
+    await getActiveExperiments();
+    expect(mockABExperiment.findMany).toHaveBeenCalledTimes(1);
+
+    invalidateActiveExperimentsCache();
+
+    await getActiveExperiments();
+    expect(mockABExperiment.findMany).toHaveBeenCalledTimes(2);
   });
 });

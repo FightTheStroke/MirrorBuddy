@@ -1862,7 +1862,9 @@
       "saveChanges": "Änderungen speichern",
       "deleteSuccess": "Experiment erfolgreich gelöscht",
       "activateSuccess": "Experiment erfolgreich aktiviert",
-      "completeSuccess": "Experiment erfolgreich abgeschlossen"
+      "completeSuccess": "Experiment erfolgreich abgeschlossen",
+      "startDate": "Startdatum",
+      "cancel": "Abbrechen"
     },
     "community": {
       "reviewQueue": "Überprüfungswarteschlange"

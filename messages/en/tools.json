@@ -30,34 +30,34 @@
       "takePhoto": "Take Photo",
       "errors": {
         "permission": {
-          "title": "[TRANSLATE] Permesso fotocamera negato",
-          "message": "[TRANSLATE] Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
-          "instruction1": "[TRANSLATE] Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
-          "instruction2": "[TRANSLATE] Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
-          "instruction3": "[TRANSLATE] Seleziona \"Consenti\"",
-          "instruction4": "[TRANSLATE] Ricarica la pagina o premi il pulsante Riprova"
+          "title": "Permesso fotocamera negato",
+          "message": "Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
+          "instruction1": "Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
+          "instruction2": "Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
+          "instruction3": "Select \"Consenti\"",
+          "instruction4": "Ricarica la pagina o premi il pulsante Riprova"
         },
         "unavailable": {
-          "title": "[TRANSLATE] Fotocamera non disponibile",
-          "message": "[TRANSLATE] Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+          "title": "Fotocamera non disponibile",
+          "message": "Noa fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
         },
         "inUse": {
-          "title": "[TRANSLATE] Fotocamera in uso",
-          "message": "[TRANSLATE] La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app che potrebbero utilizzarla e riprova."
+          "title": "Fotocamera in uso",
+          "message": "La fotocamera è già in uso da un'altra applicazione. Close le altre app che potrebbero utilizzarla e riprova."
         },
         "timeout": {
-          "title": "[TRANSLATE] Timeout fotocamera",
-          "message": "[TRANSLATE] La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+          "title": "Timeout fotocamera",
+          "message": "La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
         },
         "generic": {
-          "title": "[TRANSLATE] Errore fotocamera",
-          "message": "[TRANSLATE] Impossibile accedere alla fotocamera. Verifica le impostazioni e riprova."
+          "title": "Errore fotocamera",
+          "message": "Unable accedere alla fotocamera. Verifica le impostazioni e riprova."
         },
-        "retry": "[TRANSLATE] Riprova",
-        "close": "[TRANSLATE] Chiudi",
-        "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
+        "retry": "Riprova",
+        "close": "Close",
+        "howToEnable": "Come abilitare la fotocamera:"
       },
-      "selectCamera": "[TRANSLATE] Seleziona fotocamera",
+      "selectCamera": "Select fotocamera",
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
@@ -205,10 +205,10 @@
       "unsaved": "Unsaved",
       "word": "Word",
       "words": "Words",
-      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
-      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
-      "deleteSection": "[TRANSLATE] Elimina sezione",
-      "editTitle": "[TRANSLATE] Modifica titolo",
+      "addKeyPoint": "Add punto",
+      "deleteKeyPoint": "Delete punto",
+      "deleteSection": "Delete sezione",
+      "editTitle": "Edit titolo",
       "mappa": "Mappa",
       "flashcard": "Flashcard",
       "contenutoDellaSezione": "Contenuto della sezione",
@@ -381,12 +381,12 @@
       "ratingQuestion": "Rating Question",
       "label": "Flashcard",
       "description": "Crea flashcard per lo studio",
-      "completed": "[TRANSLATE] Completato!",
-      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
-      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
-      "continue": "[TRANSLATE] Continua",
-      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "[TRANSLATE] Premi o scorri per valutare",
+      "completed": "Completato!",
+      "reviewedAllCards": "Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "Carte riviste: {count}",
+      "continue": "Continua",
+      "swipeHint": "Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "Premi o scorri per valutare",
       "completato": "Completato!",
       "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
       "continua": "Continua",
@@ -445,10 +445,10 @@
         "ariaLabel": "Aria Label",
         "title": "Titolo"
       },
-      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "nodesCount": "({count} nodi)",
       "undo": {
-        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
-        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
+        "ariaLabel": "Annulla ultima modifica",
+        "title": "Annulla (Ctrl+Z)"
       }
     },
     "print": {
@@ -518,7 +518,7 @@
       "capabilityHomework": "Import documents for homework assistant",
       "capabilityDocuments": "Access your documents without having to download them",
       "privacyNotice": "MirrorBuddy only accesses files with your authorization. We do not store your Drive files.",
-      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive",
+      "selezionaDaGoogleDrive": "Select da Google Drive",
       "googleDrive": "Google Drive",
       "privacy": "Privacy:"
     },
@@ -607,7 +607,7 @@
       "instructions": "Frame the document or whiteboard and snap"
     },
     "pomodoro": {
-      "iniziaFocus": "[TRANSLATE] Inizia Focus"
+      "iniziaFocus": "Inizia Focus"
     },
     "passaggiDiCalcolo": "Passaggi di calcolo (",
     "label1": "Label",
@@ -660,9 +660,9 @@
     "toolResult": "Risultato strumento: {name}",
     "timerOption": "Timer {label}",
     "chartDefault": "grafico",
-    "statusBuilding": "[TRANSLATE] In costruzione...",
-    "statusCompleted": "[TRANSLATE] Completato!",
-    "statusError": "[TRANSLATE] Errore",
-    "statusCancelled": "[TRANSLATE] Annullato"
+    "statusBuilding": "In costruzione...",
+    "statusCompleted": "Completato!",
+    "statusError": "Errore",
+    "statusCancelled": "Annullato"
   }
 }

@@ -1862,7 +1862,9 @@
       "saveChanges": "Enregistrer les modifications",
       "deleteSuccess": "Expérience supprimée avec succès",
       "activateSuccess": "Expérience activée avec succès",
-      "completeSuccess": "Expérience terminée avec succès"
+      "completeSuccess": "Expérience terminée avec succès",
+      "startDate": "Date de début",
+      "cancel": "Annuler"
     },
     "community": {
       "reviewQueue": "File de révision"

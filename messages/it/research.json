@@ -67,6 +67,9 @@
       "rank": "Posizione",
       "average": "Media"
     },
+    "heatmap": {
+      "unknownProfile": "Profilo sconosciuto"
+    },
     "drillDown": {
       "title": "Dettaglio Benchmark",
       "description": "Punteggi TutorBench dettagliati, metadati e progressione turno per turno",

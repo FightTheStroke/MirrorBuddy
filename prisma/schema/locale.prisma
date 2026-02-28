@@ -9,12 +9,12 @@ enum LocaleAuditAction {
 }
 
 model LocaleConfig {
-  id                        String   @id // Country code (e.g., "IT", "FR", "DE")
-  countryName               String   // Display name (e.g., "Italia", "France", "Germany")
-  primaryLocale             String   // Primary locale code (e.g., "it", "en", "fr")
-  primaryLanguageMaestroId  String   // Maestro ID for the primary language teacher
-  secondaryLocales          String[] // Additional supported locale codes
-  enabled                   Boolean  @default(true)
+  id                       String   @id // Country code (e.g., "IT", "FR", "DE")
+  countryName              String // Display name (e.g., "Italia", "France", "Germany")
+  primaryLocale            String // Primary locale code (e.g., "it", "en", "fr")
+  primaryLanguageMaestroId String // Maestro ID for the primary language teacher
+  secondaryLocales         String[] // Additional supported locale codes
+  enabled                  Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -24,13 +24,13 @@ model LocaleConfig {
 }
 
 model LocaleAuditLog {
-  id        String              @id @default(cuid())
+  id        String            @id @default(cuid())
   localeId  String
   adminId   String
   action    LocaleAuditAction
   changes   Json
   notes     String?
-  createdAt DateTime            @default(now())
+  createdAt DateTime          @default(now())
 
   @@index([localeId])
   @@index([adminId])

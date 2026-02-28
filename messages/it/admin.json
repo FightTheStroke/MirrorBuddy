@@ -1862,7 +1862,9 @@
       "saveChanges": "Salva modifiche",
       "deleteSuccess": "Esperimento eliminato con successo",
       "activateSuccess": "Esperimento attivato con successo",
-      "completeSuccess": "Esperimento completato con successo"
+      "completeSuccess": "Esperimento completato con successo",
+      "startDate": "Data di inizio",
+      "cancel": "Annulla"
     },
     "community": {
       "reviewQueue": "Coda revisione"

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -37,6 +38,12 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
       <header className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">{t('pageTitle')}</h1>
         <p className="text-sm text-muted-foreground">{t('pageDescription')}</p>
+        <Link
+          href={`/${locale}/community/my-contributions`}
+          className="inline-flex text-sm font-medium text-primary underline-offset-2 hover:underline"
+        >
+          {t('myContributions.title')}
+        </Link>
       </header>
 
       <section className="space-y-3">

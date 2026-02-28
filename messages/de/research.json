@@ -67,6 +67,9 @@
       "rank": "Rang",
       "average": "Durchschnitt"
     },
+    "heatmap": {
+      "unknownProfile": "Unbekanntes Profil"
+    },
     "drillDown": {
       "title": "Benchmark-Details",
       "description": "Detaillierte TutorBench-Scores, Metadaten und Runde-für-Runde-Verlauf",

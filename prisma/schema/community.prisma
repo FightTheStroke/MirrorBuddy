@@ -22,8 +22,8 @@ model CommunityContribution {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  type  CommunityContributionType
-  title String
+  type    CommunityContributionType
+  title   String
   content String
 
   status         CommunityContributionStatus @default(pending)
