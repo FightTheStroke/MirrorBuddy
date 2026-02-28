@@ -1790,10 +1790,14 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pull Vercel Environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          # Copy production env vars to preview so `vercel build` (preview target)
+          # gets DATABASE_URL and other secrets, while deploy stays as preview
+          cp .vercel/.env.production.local .vercel/.env.preview.local 2>/dev/null || true
 
       - name: Build Project
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Staging (Preview)
         id: deploy
