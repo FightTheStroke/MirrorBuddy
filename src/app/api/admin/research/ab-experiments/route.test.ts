@@ -28,11 +28,11 @@ const mockPrisma = () => prisma as unknown as MockPrismaWithAB;
 describe('GET /api/admin/research/ab-experiments', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (prisma as unknown as MockPrismaWithAB).aBExperiment = {
+    (prisma as any).aBExperiment = {
       findMany: vi.fn(),
       create: vi.fn(),
     };
-    (prisma as unknown as MockPrismaWithAB).aBBucketConfig = {
+    (prisma as any).aBBucketConfig = {
       createMany: vi.fn(),
     };
   });
@@ -71,7 +71,7 @@ describe('GET /api/admin/research/ab-experiments', () => {
 
     const req = new Request('http://localhost/api/admin/research/ab-experiments');
     const ctx = { req };
-    const response = await (GET as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (GET as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -85,7 +85,7 @@ describe('GET /api/admin/research/ab-experiments', () => {
 
     const req = new Request('http://localhost/api/admin/research/ab-experiments');
     const ctx = { req };
-    const response = await (GET as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (GET as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -97,7 +97,7 @@ describe('GET /api/admin/research/ab-experiments', () => {
 
     const req = new Request('http://localhost/api/admin/research/ab-experiments?status=active');
     const ctx = { req };
-    await (GET as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    await (GET as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(mockPrisma().aBExperiment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ where: expect.objectContaining({ status: 'active' }) }),
@@ -108,11 +108,11 @@ describe('GET /api/admin/research/ab-experiments', () => {
 describe('POST /api/admin/research/ab-experiments', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (prisma as unknown as MockPrismaWithAB).aBExperiment = {
+    (prisma as any).aBExperiment = {
       findMany: vi.fn(),
       create: vi.fn(),
     };
-    (prisma as unknown as MockPrismaWithAB).aBBucketConfig = {
+    (prisma as any).aBBucketConfig = {
       createMany: vi.fn(),
     };
   });
@@ -155,7 +155,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       body: JSON.stringify(validPayload),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
     const data = await response.json();
 
     expect(response.status).toBe(201);
@@ -168,7 +168,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       body: JSON.stringify({ ...validPayload, name: undefined }),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(response.status).toBe(400);
   });
@@ -190,7 +190,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       }),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(response.status).toBe(400);
   });
@@ -208,7 +208,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       body: JSON.stringify({ ...validPayload, buckets }),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(response.status).toBe(400);
   });
@@ -237,7 +237,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       }),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(response.status).toBe(400);
   });
@@ -248,7 +248,7 @@ describe('POST /api/admin/research/ab-experiments', () => {
       body: JSON.stringify({ ...validPayload, startDate: undefined }),
     });
     const ctx = { req };
-    const response = await (POST as unknown as (ctx: typeof ctx) => Promise<Response>)(ctx);
+    const response = await (POST as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
 
     expect(response.status).toBe(400);
   });
