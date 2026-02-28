@@ -166,8 +166,8 @@ Create accounts and have credentials ready:
      - `AZURE_OPENAI_GPT52_EDU_DEPLOYMENT=gpt-5.2-edu`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
-     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15` *(voice v1.5, behind feature flag)*
-     - `AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15` *(TTS v1.5, behind feature flag)*
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15` _(voice v1.5, behind feature flag)_
+     - `AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15` _(TTS v1.5, behind feature flag)_
      - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
      - `AZURE_OPENAI_TTS_DEPLOYMENT=tts-hd-deployment`
 
@@ -289,6 +289,29 @@ Create accounts and have credentials ready:
 **Sentry Not Receiving Events**: Verify `SENTRY_DSN` is correct, check browser console for Sentry init errors
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed diagnostic steps.
+
+---
+
+## Staging Pipeline
+
+MirrorBuddy uses a staging-first deployment model. Code pushed to `main` deploys to **staging** (Vercel preview), not directly to production.
+
+### Flow
+
+1. **Push to main** → CI runs all 18 gate checks → deploys to staging (auto-generated Vercel preview URL)
+2. **GitHub issue created** automatically with label `staging-pending-promotion` containing the staging URL
+3. **Test on staging** — full app with same database, AI, and services as production
+4. **Promote to production** → Actions → "Promote to Production" → Run workflow → `vercel promote` (zero rebuild)
+5. **Issue auto-closed** after successful promotion
+
+### Prerequisites
+
+- All env vars must be configured for **both** Production and Preview environments in [Vercel Dashboard](https://vercel.com/fightthestroke/mirrorbuddy/settings/environment-variables)
+- Vercel Authentication must be **disabled** for Preview deployments in [Deployment Protection settings](https://vercel.com/fightthestroke/mirrorbuddy/settings/deployment-protection)
+
+### Adding New Env Vars
+
+When adding a new environment variable, always add it to **both** Production and Preview in Vercel Dashboard. Otherwise staging will break.
 
 ---
 
