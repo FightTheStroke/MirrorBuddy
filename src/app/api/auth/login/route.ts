@@ -39,11 +39,29 @@ export const POST = pipe(
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  // Try email hash (PII-encrypted users), plain email (legacy), or username
-  const identifierHash = await hashPII(identifier);
+  const normalizedIdentifier = identifier.trim();
+  const normalizedEmail = normalizedIdentifier.toLowerCase();
+  const isEmailIdentifier = normalizedEmail.includes('@');
+  const identifierHash = isEmailIdentifier ? await hashPII(normalizedEmail) : null;
+
+  if (identifierHash) {
+    // Backfill historical records that still have plain-email only, then use hash lookup only.
+    await prisma.user.updateMany({
+      where: { email: normalizedEmail, emailHash: null },
+      data: { emailHash: identifierHash },
+    });
+    await prisma.googleAccount.updateMany({
+      where: { email: normalizedEmail, emailHash: null },
+      data: { emailHash: identifierHash },
+    });
+  }
+
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ emailHash: identifierHash }, { email: identifier }, { username: identifier }],
+      OR: [
+        ...(identifierHash ? [{ emailHash: identifierHash }] : []),
+        { username: normalizedIdentifier },
+      ],
     },
     select: {
       id: true,

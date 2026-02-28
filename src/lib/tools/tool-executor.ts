@@ -5,29 +5,21 @@
 // Related: ADR 0009 - Tool Execution Architecture
 // ============================================================================
 
-import { nanoid } from "nanoid";
-import { logger } from "@/lib/logger";
-import { ToolRegistry } from "@/lib/tools/plugin/registry";
-import { ToolOrchestrator } from "@/lib/tools/plugin/orchestrator";
-import type { ToolExecutionResult, ToolContext } from "@/types/tools";
-import { saveToolOutput } from "@/lib/tools/tool-output-storage";
-import { getToolSchema } from "./tool-executor-schemas";
-import { getToolTypeFromFunctionName } from "./tool-executor-mapping";
-import type { ToolHandler } from "./tool-executor-plugin-factory";
-import { createPluginFromHandler } from "./tool-executor-plugin-factory";
-import { executeViaOrchestrator } from "./tool-executor-orchestration";
+import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
+import { ToolRegistry } from '@/lib/tools/plugin/registry';
+import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
+import type { ToolExecutionResult, ToolContext } from '@/types/tools';
+import { saveToolOutput } from '@/lib/tools/tool-output-storage';
+import { getToolSchema } from './tool-executor-schemas';
+import { getToolTypeFromFunctionName } from './tool-executor-mapping';
+import type { ToolHandler } from './tool-executor-plugin-factory';
+import { createPluginFromHandler } from './tool-executor-plugin-factory';
+import { executeViaOrchestrator } from './tool-executor-orchestration';
 
 /**
- * LEGACY: Registry of tool handlers (maintained for backward compatibility only)
- *
- * DEPRECATION: This Map is a transitional mechanism and will be removed once all
- * handlers are migrated to register directly with ToolRegistry.
- *
- * See executeToolCall() for how this interacts with the new ToolRegistry system.
- * Current role: Fallback handler lookup when ToolRegistry doesn't contain a tool.
- *
- * Handlers are registered to BOTH this Map and ToolRegistry via registerToolHandler()
- * to support the transition period. New code should use ToolRegistry directly.
+ * Intentional compatibility shim: keep Map-based handlers while plugin migration
+ * finalizes across tool modules.
  */
 const handlers = new Map<string, ToolHandler>();
 
@@ -42,28 +34,27 @@ function initializeRegistry(): void {
   if (!registry) {
     registry = ToolRegistry.getInstance();
     orchestrator = new ToolOrchestrator(registry);
-    if (process.env.NODE_ENV === "development") {
-      logger.debug(
-        "Tool executor: ToolRegistry and ToolOrchestrator initialized",
-      );
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Tool executor: ToolRegistry and ToolOrchestrator initialized');
     }
   }
 }
 
 /** Get all registered handlers (for testing) */
 export function getRegisteredHandlers(): Map<string, ToolHandler> {
+  // Intentional compatibility shim: tests still validate handler registration surface.
   return handlers;
 }
 
 /** Clear all handlers (for testing cleanup) */
 export function clearHandlers(): void {
+  // Intentional compatibility shim: test isolation needs explicit reset support.
   handlers.clear();
 }
 
 /**
  * Register a tool handler for a function name
- * DUAL REGISTRATION: Stores in both legacy Map and ToolRegistry
- * Maintains backward compatibility while syncing with the new ToolRegistry system
+ * DUAL REGISTRATION: stores in Map shim and ToolRegistry.
  *
  * DEPRECATION: This function will be replaced with direct ToolRegistry.register() calls.
  * Currently it serves as a bridge during the transition from Map-based to plugin-based system.
@@ -71,18 +62,15 @@ export function clearHandlers(): void {
  * @param functionName - OpenAI function name (e.g., 'create_mindmap')
  * @param handler - Async function that executes the tool
  */
-export function registerToolHandler(
-  functionName: string,
-  handler: ToolHandler,
-): void {
-  // Store in legacy handlers map for backward compatibility
+export function registerToolHandler(functionName: string, handler: ToolHandler): void {
+  // Intentional compatibility shim: retain Map registration for non-migrated handlers.
   handlers.set(functionName, handler);
 
   // Also register with ToolRegistry if initialized
   initializeRegistry();
   if (registry && orchestrator) {
     try {
-      // Create a minimal ToolPlugin from the legacy handler using factory
+      // Intentional compatibility shim: wrap function handlers as plugins on registration.
       const plugin = createPluginFromHandler(functionName, handler);
 
       // Register if not already registered
@@ -93,20 +81,19 @@ export function registerToolHandler(
       logger.warn(`Failed to register ${functionName} with ToolRegistry:`, {
         error: String(error),
       });
-      // Continue with legacy handler even if registry sync fails
+      // Intentional compatibility shim: preserve execution continuity if plugin registration fails.
     }
   }
 }
 
 /**
- * Execute a tool call
- * DUAL EXECUTION PATH:
- * 1. Primary (NEW): ToolRegistry + ToolOrchestrator (preferred)
- * 2. Fallback (LEGACY): Direct handler from legacy Map (backward compatibility)
+ * Execute a tool call with dual path:
+ * 1. ToolRegistry + ToolOrchestrator (preferred)
+ * 2. Map shim fallback for non-migrated handlers
  *
  * Execution flow:
  * - If tool found in ToolRegistry: Execute via ToolOrchestrator
- * - Otherwise: Fall back to legacy handler from Map
+ * - Otherwise: Fall back to compatibility handler from Map
  * - If no handler found anywhere: Return error
  *
  * Tool events are broadcast via ToolOrchestrator's unified EventBroadcaster,
@@ -146,13 +133,11 @@ export async function executeToolCall(
     }
   }
 
-  // LEGACY FALLBACK PATH: Try to execute via legacy handler Map
-  // This is reached only if tool is NOT in ToolRegistry (primary system)
-  // Maintained for backward compatibility during transition to plugin-based system
+  // Intentional compatibility shim: Map fallback for handlers not yet plugin-registered.
   const handler = handlers.get(functionName);
 
   if (!handler) {
-    const error = `Unknown tool: ${functionName} (not found in ToolRegistry or legacy handlers)`;
+    const error = `Unknown tool: ${functionName} (not found in ToolRegistry or compatibility handlers)`;
 
     // Log error - broadcasting would be handled by ToolOrchestrator if tool was registered
     return {
@@ -169,8 +154,8 @@ export async function executeToolCall(
     const validation = schema.safeParse(args);
     if (!validation.success) {
       const validationError = validation.error.issues
-        .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
-        .join("; ");
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+        .join('; ');
       const error = `Invalid arguments for ${functionName}: ${validationError}`;
 
       logger.warn(`[Tool Validation] ${error}`);
@@ -186,7 +171,7 @@ export async function executeToolCall(
   }
 
   // Tool events are broadcast through ToolOrchestrator's unified EventBroadcaster
-  // For legacy handlers, minimal broadcast is expected
+  // Intentional compatibility shim: minimal broadcast path for Map-based handlers.
   try {
     const result = await handler(args, context);
 
@@ -205,7 +190,7 @@ export async function executeToolCall(
         );
       } catch (error) {
         // Log error but don't fail the tool execution
-        logger.warn("Failed to save tool output to database:", {
+        logger.warn('Failed to save tool output to database:', {
           error: String(error),
         });
       }

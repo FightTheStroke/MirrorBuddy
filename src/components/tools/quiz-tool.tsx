@@ -42,79 +42,81 @@ export function QuizTool({ request, onComplete }: QuizToolProps) {
   }, [request.subject]);
 
   // Convert request to Quiz format
-  const quiz: QuizType = useMemo(() => ({
-    id: crypto.randomUUID(),
-    title: request.title,
-    subject: request.subject,
-    questions: request.questions.map((q, index) => {
-      const legacy = q as Partial<{
-        question: string;
-        correctIndex: number;
-        options: string[];
-        explanation: string;
-      }>;
-      const fallbackDifficulty = normalizeDifficulty(adaptiveDifficulty ?? request.difficulty ?? 3);
-      return {
-        id: `q-${index}`,
-        text: q.text || legacy.question || '',
-        type: q.type || 'multiple_choice',
-        options: q.options || legacy.options,
-        correctAnswer: q.correctAnswer ?? legacy.correctIndex ?? 0,
-        hints: q.hints || [],
-        explanation: q.explanation || legacy.explanation || '',
-        difficulty: q.difficulty ?? fallbackDifficulty,
-        subject: request.subject,
-        topic: q.topic || request.title,
-      };
-    }),
-    masteryThreshold: request.masteryThreshold ?? 70,
-    xpReward: request.xpReward ?? 50,
-  }), [request, adaptiveDifficulty, normalizeDifficulty]);
-
-  const handleComplete = useCallback((result: QuizResult) => {
-    const avgDifficulty =
-      quiz.questions.reduce((sum, q) => sum + (q.difficulty || 3), 0) / quiz.questions.length;
-
-    csrfFetch('/api/quizzes/results', {
-      method: 'POST',
-      body: JSON.stringify({
-        quizId: result.quizId,
-        score: result.correctAnswers,
-        totalQuestions: result.totalQuestions,
-        subject: request.subject,
-        topic: request.title,
-        avgDifficulty,
-        source: 'quiz',
+  const quiz: QuizType = useMemo(
+    () => ({
+      id: crypto.randomUUID(),
+      title: request.title,
+      subject: request.subject,
+      questions: request.questions.map((q, index) => {
+        const fallbackDifficulty = normalizeDifficulty(
+          adaptiveDifficulty ?? request.difficulty ?? 3,
+        );
+        return {
+          id: `q-${index}`,
+          text: q.text || '',
+          type: q.type || 'multiple_choice',
+          options: q.options,
+          correctAnswer: q.correctAnswer ?? 0,
+          hints: q.hints || [],
+          explanation: q.explanation || '',
+          difficulty: q.difficulty ?? fallbackDifficulty,
+          subject: request.subject,
+          topic: q.topic || request.title,
+        };
       }),
-    }).catch(() => undefined);
+      masteryThreshold: request.masteryThreshold ?? 70,
+      xpReward: request.xpReward ?? 50,
+    }),
+    [request, adaptiveDifficulty, normalizeDifficulty],
+  );
 
-    // Award XP
-    if (result.xpEarned > 0) {
-      addXP(result.xpEarned);
+  const handleComplete = useCallback(
+    (result: QuizResult) => {
+      const avgDifficulty =
+        quiz.questions.reduce((sum, q) => sum + (q.difficulty || 3), 0) / quiz.questions.length;
 
-      // Show XP toast notification
-      const scorePercent = Math.round(result.score);
-      toast.success(
-        `Quiz completato! +${result.xpEarned} XP`,
-        `Punteggio: ${scorePercent}% - ${result.masteryAchieved ? 'Maestria raggiunta!' : 'Continua così!'}`,
-        { duration: 5000 }
-      );
-    }
+      csrfFetch('/api/quizzes/results', {
+        method: 'POST',
+        body: JSON.stringify({
+          quizId: result.quizId,
+          score: result.correctAnswers,
+          totalQuestions: result.totalQuestions,
+          subject: request.subject,
+          topic: request.title,
+          avgDifficulty,
+          source: 'quiz',
+        }),
+      }).catch(() => undefined);
 
-    // Update mastery based on score
-    if (result.masteryAchieved) {
-      updateMastery({
-        subject: request.subject,
-        percentage: Math.min(100, result.score),
-        tier: result.score >= 90 ? 'expert' : result.score >= 70 ? 'advanced' : 'intermediate',
-        topicsCompleted: 1,
-        totalTopics: 1,
-        lastStudied: new Date(),
-      });
-    }
+      // Award XP
+      if (result.xpEarned > 0) {
+        addXP(result.xpEarned);
 
-    onComplete?.(result);
-  }, [quiz.questions, request.subject, request.title, addXP, updateMastery, onComplete]);
+        // Show XP toast notification
+        const scorePercent = Math.round(result.score);
+        toast.success(
+          `Quiz completato! +${result.xpEarned} XP`,
+          `Punteggio: ${scorePercent}% - ${result.masteryAchieved ? 'Maestria raggiunta!' : 'Continua così!'}`,
+          { duration: 5000 },
+        );
+      }
+
+      // Update mastery based on score
+      if (result.masteryAchieved) {
+        updateMastery({
+          subject: request.subject,
+          percentage: Math.min(100, result.score),
+          tier: result.score >= 90 ? 'expert' : result.score >= 70 ? 'advanced' : 'intermediate',
+          topicsCompleted: 1,
+          totalTopics: 1,
+          lastStudied: new Date(),
+        });
+      }
+
+      onComplete?.(result);
+    },
+    [quiz.questions, request.subject, request.title, addXP, updateMastery, onComplete],
+  );
 
   const handleClose = useCallback(() => {
     // Just close without completing
@@ -122,11 +124,7 @@ export function QuizTool({ request, onComplete }: QuizToolProps) {
 
   return (
     <div className="p-4">
-      <Quiz
-        quiz={quiz}
-        onComplete={handleComplete}
-        onClose={handleClose}
-      />
+      <Quiz quiz={quiz} onComplete={handleComplete} onClose={handleClose} />
     </div>
   );
 }

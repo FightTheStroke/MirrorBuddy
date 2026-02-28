@@ -13,6 +13,7 @@ export { useCalendarStore } from './calendar-store';
 export { useUIStore } from './ui-store';
 export { useConsentStore } from './consent-store';
 export { useTypingStore } from './typing-store';
+export { usePendingToolRequestStore } from './pending-tool-request-store';
 
 // Re-export sync utilities
 export { initializeStores, setupAutoSync } from './use-store-sync';
