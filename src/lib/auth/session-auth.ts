@@ -96,8 +96,10 @@ export async function validateAuth(): Promise<AuthResult> {
         // Use try-catch to handle race conditions where concurrent requests
         // may try to create the same user simultaneously
         try {
-          const created = await prisma.user.create({
-            data: {
+          const created = await prisma.user.upsert({
+            where: { id: userId },
+            update: {},
+            create: {
               id: userId,
               role: isAdminSession ? 'ADMIN' : 'USER',
               profile: { create: {} },

@@ -156,15 +156,16 @@ describe('Session Auth', () => {
         value: userId,
       });
       vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.user.create).mockResolvedValue({ id: userId } as never);
+      vi.mocked(prisma.user.upsert).mockResolvedValue({ id: userId } as never);
 
       const result = await validateAuth();
 
       expect(result.authenticated).toBe(true);
       expect(result.userId).toBe(userId);
-      expect(prisma.user.create).toHaveBeenCalledWith(
+      expect(prisma.user.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          where: { id: userId },
+          create: expect.objectContaining({
             id: userId,
             role: 'USER',
           }),
@@ -193,14 +194,14 @@ describe('Session Auth', () => {
         value: userId,
       });
       vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
-      vi.mocked(prisma.user.create).mockResolvedValue({ id: userId } as never);
+      vi.mocked(prisma.user.upsert).mockResolvedValue({ id: userId } as never);
 
       const result = await validateAuth();
 
       expect(result.authenticated).toBe(true);
-      expect(prisma.user.create).toHaveBeenCalledWith(
+      expect(prisma.user.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          create: expect.objectContaining({
             role: 'ADMIN',
           }),
         }),
@@ -220,7 +221,7 @@ describe('Session Auth', () => {
       vi.mocked(prisma.user.findUnique)
         .mockResolvedValueOnce(null) // First check
         .mockResolvedValueOnce({ id: userId } as never); // After race condition
-      vi.mocked(prisma.user.create).mockRejectedValue({ code: 'P2002' });
+      vi.mocked(prisma.user.upsert).mockRejectedValue({ code: 'P2002' });
 
       const result = await validateAuth();
 
