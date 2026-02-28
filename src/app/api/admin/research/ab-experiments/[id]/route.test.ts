@@ -57,7 +57,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.update.mockResolvedValue(updated);
 
     const ctx = makeCtx('PATCH', { status: 'active' });
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -71,7 +71,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.update.mockResolvedValue(updated);
 
     const ctx = makeCtx('PATCH', { status: 'completed' });
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -83,7 +83,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.findUnique.mockResolvedValue(null);
 
     const ctx = makeCtx('PATCH', { status: 'active' });
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
 
     expect(response.status).toBe(404);
   });
@@ -92,7 +92,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.findUnique.mockResolvedValue({ id: 'ab-1', status: 'completed' });
 
     const ctx = makeCtx('PATCH', { status: 'active' });
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
 
     expect(response.status).toBe(409);
     expect(invalidateActiveExperimentsCache).not.toHaveBeenCalled();
@@ -102,7 +102,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.findUnique.mockResolvedValue({ id: 'ab-1', status: 'active' });
 
     const ctx = makeCtx('PATCH', { status: 'draft' });
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
 
     expect(response.status).toBe(409);
     expect(invalidateActiveExperimentsCache).not.toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe('PATCH /api/admin/research/ab-experiments/[id]', () => {
 
   it('returns 400 when status field is missing', async () => {
     const ctx = makeCtx('PATCH', {});
-    const response = await (PATCH as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((PATCH as any))(ctx);
 
     expect(response.status).toBe(400);
   });
@@ -132,7 +132,7 @@ describe('DELETE /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.delete.mockResolvedValue({ id: 'ab-1' });
 
     const ctx = makeCtx('DELETE');
-    const response = await (DELETE as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((DELETE as any))(ctx);
 
     expect(response.status).toBe(200);
     expect(mockPrisma().aBExperiment.delete).toHaveBeenCalledWith(
@@ -145,7 +145,7 @@ describe('DELETE /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.delete.mockResolvedValue({ id: 'ab-1' });
 
     const ctx = makeCtx('DELETE');
-    const response = await (DELETE as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((DELETE as any))(ctx);
 
     expect(response.status).toBe(200);
   });
@@ -154,7 +154,7 @@ describe('DELETE /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.findUnique.mockResolvedValue({ id: 'ab-1', status: 'active' });
 
     const ctx = makeCtx('DELETE');
-    const response = await (DELETE as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((DELETE as any))(ctx);
 
     expect(response.status).toBe(409);
     expect(mockPrisma().aBExperiment.delete).not.toHaveBeenCalled();
@@ -164,7 +164,7 @@ describe('DELETE /api/admin/research/ab-experiments/[id]', () => {
     mockPrisma().aBExperiment.findUnique.mockResolvedValue(null);
 
     const ctx = makeCtx('DELETE');
-    const response = await (DELETE as (ctx: ReturnType<typeof makeCtx>) => Promise<Response>)(ctx);
+    const response = await ((DELETE as any))(ctx);
 
     expect(response.status).toBe(404);
   });
