@@ -7,16 +7,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 describe('i18n CI Integration', () => {
   let workflowContent: any;
   let packageJson: any;
-  const runI18nCheck = () => {
-    try {
-      return execSync('npm run i18n:check', {
-        cwd: process.cwd(),
-        encoding: 'utf-8',
-      });
-    } catch (error: any) {
-      return `${error.stdout?.toString() ?? ''}${error.stderr?.toString() ?? ''}`;
-    }
-  };
+  let i18nCheckOutput: string;
 
   beforeAll(() => {
     const workflowPath = join(process.cwd(), '.github/workflows/i18n-validation.yml');
@@ -26,7 +17,16 @@ describe('i18n CI Integration', () => {
     packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
 
     workflowContent = YAML.parse(rawWorkflow);
-  });
+
+    try {
+      i18nCheckOutput = execSync('npm run i18n:check', {
+        cwd: process.cwd(),
+        encoding: 'utf-8',
+      });
+    } catch (error: any) {
+      i18nCheckOutput = `${error.stdout?.toString() ?? ''}${error.stderr?.toString() ?? ''}`;
+    }
+  }, 30000);
 
   describe('Workflow CI Configuration', () => {
     it('workflow should be triggered on PR creation and updates', () => {
@@ -66,25 +66,14 @@ describe('i18n CI Integration', () => {
     });
 
     it('should run i18n:check without errors on current codebase', () => {
-      try {
-        const output = execSync('npm run i18n:check', {
-          cwd: process.cwd(),
-          encoding: 'utf-8',
-        });
-        expect(output).toContain('Result: PASS');
-      } catch (error: any) {
-        throw new Error(`i18n:check failed: ${error.message}`);
-      }
-    }, 30000);
+      expect(i18nCheckOutput).toContain('Result: PASS');
+    });
 
     it('i18n:check output should show all locales are validated', () => {
-      const output = runI18nCheck();
-      // ADR 0082: namespace-based structure outputs "{✓|✗} {locale}: X/Y keys"
-      // Note: Status may be ✗ if another test temporarily modified message files
-      expect(output).toMatch(/[✓✗]\s+it:/);
-      expect(output).toMatch(/[✓✗]\s+en:/);
-      expect(output).toContain('keys');
-    }, 30000);
+      expect(i18nCheckOutput).toMatch(/[✓✗]\s+it:/);
+      expect(i18nCheckOutput).toMatch(/[✓✗]\s+en:/);
+      expect(i18nCheckOutput).toContain('keys');
+    });
   });
 
   describe('PR Feedback Configuration', () => {
@@ -154,13 +143,10 @@ describe('i18n CI Integration', () => {
     });
 
     it('F-03: Validation script must check all required locales', () => {
-      const output = runI18nCheck();
-      // ADR 0082: namespace-based structure outputs locale names without .json suffix
-      // Note: Status may be ✗ if another test temporarily modified message files
-      expect(output).toMatch(/[✓✗]\s+it:/);
-      expect(output).toMatch(/[✓✗]\s+en:/);
-      expect(output).toContain('Result:');
-    }, 30000);
+      expect(i18nCheckOutput).toMatch(/[✓✗]\s+it:/);
+      expect(i18nCheckOutput).toMatch(/[✓✗]\s+en:/);
+      expect(i18nCheckOutput).toContain('Result:');
+    });
 
     it('F-04: PR must have visibility into validation failures', () => {
       const job = workflowContent.jobs['i18n-check'];
