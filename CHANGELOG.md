@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Staging pipeline** — push to `main` deploys to Vercel preview (staging) instead of production; manual "Promote to Production" workflow via `vercel promote` (zero rebuild); auto-created GitHub issue reminder with `staging-pending-promotion` label; auto-closed on promotion
 - **User-facing community page** — `/community` route with ContributionForm and approved list (was admin-only since Plan 224); mobile bottom-nav link added; i18n keys for all 5 locales
 - **Crisis pipeline integration tests** — end-to-end proof that crisis detection → LLM block → safety logging → parent notification works; parent email template verified across all 5 locales
 - **CI structural safeguards** — pre-merge checks for Prisma schema→migration consistency, i18n namespace registration, and dead export detection (prevents Plan 224-type gaps)

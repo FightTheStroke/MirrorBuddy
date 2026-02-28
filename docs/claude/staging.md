@@ -4,26 +4,30 @@
 
 ## Quick Reference
 
-| Key                | Value                                                 |
-| ------------------ | ----------------------------------------------------- |
-| Detection          | `src/lib/environment/staging-detector.ts`             |
-| DB layer           | `src/lib/db.ts` (Prisma extension, auto-tagging)      |
-| Banner             | `src/components/ui/staging-banner.tsx`                |
-| Admin              | `src/components/admin/staging-data-toggle.tsx`        |
-| Purge API          | `DELETE /api/admin/purge-staging-data`                |
-| CI deploy job      | `.github/workflows/ci.yml` → `deploy-to-staging`     |
-| Promote workflow   | `.github/workflows/promote-to-production.yml`         |
+| Key              | Value                                            |
+| ---------------- | ------------------------------------------------ |
+| Detection        | `src/lib/environment/staging-detector.ts`        |
+| DB layer         | `src/lib/db.ts` (Prisma extension, auto-tagging) |
+| Banner           | `src/components/ui/staging-banner.tsx`           |
+| Admin            | `src/components/admin/staging-data-toggle.tsx`   |
+| Purge API        | `DELETE /api/admin/purge-staging-data`           |
+| CI deploy job    | `.github/workflows/ci.yml` → `deploy-to-staging` |
+| Promote workflow | `.github/workflows/promote-to-production.yml`    |
 
 ## Deployment Flow
 
 ```
 Push to main → CI (18 gate checks) → Deploy to Staging (Vercel Preview)
                                            ↓
-                                    Test on staging URL
+                                    🎫 Auto-creates GitHub issue reminder
+                                           ↓
+                                    Test on staging URL (full app, same DB)
                                            ↓
                               Manual: "Promote to Production" workflow
                                            ↓
                               vercel promote → Production (mirrorbuddy.vercel.app)
+                                           ↓
+                                    🎫 Issue auto-closed
 ```
 
 ### How to Promote
@@ -31,10 +35,18 @@ Push to main → CI (18 gate checks) → Deploy to Staging (Vercel Preview)
 1. Go to **Actions** → **Promote to Production** → **Run workflow**
 2. Optionally paste a specific staging URL (defaults to latest)
 3. Workflow runs `vercel promote`, health check, and updates GitHub deployment status
+4. The `staging-pending-promotion` reminder issue closes automatically
 
 ### Rollback
 
 To rollback production, promote any previous staging deployment URL.
+
+### Reminder Issues
+
+- Each staging deploy creates a GitHub issue with label `staging-pending-promotion`
+- Contains staging URL and direct link to the promote workflow
+- New staging deploys close previous reminder (superseded)
+- Promote workflow closes issue with "completed" reason
 
 ## Architecture
 
@@ -44,16 +56,42 @@ Promote workflow   -> VERCEL_ENV=production -> Production (mirrorbuddy.vercel.ap
 PR/branches        -> VERCEL_ENV=preview   -> Preview (auto URL)
 ```
 
+## Vercel Configuration
+
+### Environment Variables
+
+All env vars must be configured for **both** Production and Preview environments in Vercel Dashboard.
+When adding a new env var, always select both environments.
+
+To sync all production env vars to preview (one-time setup or after adding many vars):
+
+```bash
+vercel env pull .env.prod.tmp --environment=production
+# For each production-only var, copy to preview:
+vercel env add VAR_NAME preview  # pipe value via stdin
+rm .env.prod.tmp  # clean up sensitive file
+```
+
+### Deployment Protection
+
+Vercel Authentication is **disabled** for Preview deployments so staging URLs are accessible for testing.
+The staging URLs are random and not indexed — security by obscurity is acceptable for this use case.
+
+### Build Configuration
+
+The CI staging deploy uses:
+
+- `vercel pull --environment=production` → gets all env vars including DATABASE_URL
+- Copies `.env.production.local` → `.env.preview.local` so preview build has production secrets
+- `vercel build` (preview target) → builds for preview environment
+- `vercel deploy --prebuilt` (no `--prod`) → deploys as preview (staging URL)
+
 All data created in preview deployments is tagged with `isTestData: true`, enabling separation without a separate database.
 
 ## Detection API
 
 ```typescript
-import {
-  isStaging,
-  isStagingMode,
-  getEnvironmentName,
-} from "@/lib/environment/staging-detector";
+import { isStaging, isStagingMode, getEnvironmentName } from '@/lib/environment/staging-detector';
 
 if (isStaging()) {
   /* preview-only features */
