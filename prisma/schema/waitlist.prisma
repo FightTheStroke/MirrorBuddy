@@ -8,9 +8,9 @@
 /// Supports email verification, unsubscribe flows, promo code assignment,
 /// and conversion tracking when signup converts to a registered user.
 model WaitlistEntry {
-  id    String  @id @default(cuid())
-  email String  @unique
-  name  String?
+  id     String @id @default(cuid())
+  email  String @unique
+  name   String?
 
   /// BCP-47 locale code of the user at signup
   locale String @default("it")
@@ -28,7 +28,7 @@ model WaitlistEntry {
   marketingConsentAt DateTime?
 
   // Email verification
-  verificationToken     String    @unique @default(cuid())
+  verificationToken     String   @unique @default(cuid())
   verificationExpiresAt DateTime
   verifiedAt            DateTime?
 
@@ -37,8 +37,8 @@ model WaitlistEntry {
   unsubscribedAt   DateTime?
 
   // Promo code (assigned after verification)
-  promoCode       String?   @unique
-  promoRedeemedAt DateTime?
+  promoCode        String?   @unique
+  promoRedeemedAt  DateTime?
 
   // Conversion tracking
   convertedUserId String?

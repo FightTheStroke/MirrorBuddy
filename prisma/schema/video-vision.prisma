@@ -4,16 +4,16 @@
 // ============================================================================
 
 model VideoVisionUsage {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   userId         String
-  user           User      @relation("VideoVisionUsages", fields: [userId], references: [id], onDelete: Cascade)
-  voiceSessionId String // Reference to the voice session where video was used
-  framesUsed     Int       @default(0)
-  secondsUsed    Int       @default(0)
-  periodMonth    String // "2026-02" format for monthly aggregation
-  startedAt      DateTime  @default(now())
+  user           User     @relation("VideoVisionUsages", fields: [userId], references: [id], onDelete: Cascade)
+  voiceSessionId String   // Reference to the voice session where video was used
+  framesUsed     Int      @default(0)
+  secondsUsed    Int      @default(0)
+  periodMonth    String   // "2026-02" format for monthly aggregation
+  startedAt      DateTime @default(now())
   endedAt        DateTime?
-  createdAt      DateTime  @default(now())
+  createdAt      DateTime @default(now())
 
   @@index([userId, periodMonth])
   @@index([voiceSessionId])

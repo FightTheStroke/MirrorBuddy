@@ -8,11 +8,11 @@ model SyntheticProfile {
   name String @unique
 
   // Student characteristics
-  dsaProfile       String // dyslexia | adhd | asd | mixed
-  age              Int
-  schoolYear       Int
-  learningStyle    String // visual | auditory | kinesthetic | mixed
-  challengeAreas   Json // string[] - specific difficulty areas
+  dsaProfile     String // dyslexia | adhd | asd | mixed
+  age            Int
+  schoolYear     Int
+  learningStyle  String // visual | auditory | kinesthetic | mixed
+  challengeAreas Json // string[] - specific difficulty areas
   responsePatterns Json // behavioral patterns for message generation
 
   // Metadata
@@ -33,12 +33,12 @@ model ResearchExperiment {
 
   // Experiment design
   hypothesis         String
-  status             String           @default("draft") // draft | running | completed | failed
+  status             String @default("draft") // draft | running | completed | failed
   maestroId          String
   syntheticProfileId String
   syntheticProfile   SyntheticProfile @relation(fields: [syntheticProfileId], references: [id], onDelete: Cascade)
-  turns              Int              @default(10)
-  config             Json? // additional experiment parameters
+  turns              Int    @default(10)
+  config             Json?  // additional experiment parameters
 
   // Execution
   startedAt   DateTime?
@@ -46,9 +46,9 @@ model ResearchExperiment {
   errorLog    String?
 
   // Aggregated scores (filled on completion)
-  scoreScaffolding           Float?
-  scoreHinting               Float?
-  scoreAdaptation            Float?
+  scoreScaffolding         Float?
+  scoreHinting             Float?
+  scoreAdaptation          Float?
   scoreMisconceptionHandling Float?
 
   createdAt DateTime @default(now())
@@ -72,11 +72,11 @@ model ResearchResult {
   maestroResponse String
 
   // Per-turn metrics
-  responseTimeMs      Int?
-  tokensUsed          Int?
+  responseTimeMs     Int?
+  tokensUsed         Int?
   scaffoldingDetected Boolean @default(false)
   adaptationDetected  Boolean @default(false)
-  metrics             Json? // additional structured metrics
+  metrics            Json?   // additional structured metrics
 
   createdAt DateTime @default(now())
 

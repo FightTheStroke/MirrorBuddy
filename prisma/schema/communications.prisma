@@ -31,15 +31,15 @@ enum EmailEventType {
 
 // Email template with variable substitution support
 model EmailTemplate {
-  id       String @id @default(cuid())
-  name     String @unique
+  id       String  @id @default(cuid())
+  name     String  @unique
   subject  String
   htmlBody String
   textBody String
   category String
 
   // JSON array of variable names used in template (e.g., ["firstName", "unsubscribeUrl"])
-  variables Json @default("[]")
+  variables Json    @default("[]")
 
   isActive Boolean @default(true)
 
@@ -55,13 +55,13 @@ model EmailTemplate {
 
 // Email campaign management
 model EmailCampaign {
-  id         String        @id @default(cuid())
+  id         String               @id @default(cuid())
   name       String
   templateId String
-  template   EmailTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  template   EmailTemplate        @relation(fields: [templateId], references: [id], onDelete: Restrict)
 
   // JSON filter criteria for recipient selection (e.g., {"tier": "pro", "locale": "it"})
-  filters Json @default("{}")
+  filters Json                  @default("{}")
 
   status      EmailCampaignStatus @default(DRAFT)
   sentCount   Int                 @default(0)
@@ -82,9 +82,9 @@ model EmailCampaign {
 
 // Individual email recipient tracking
 model EmailRecipient {
-  id         String        @id @default(cuid())
+  id         String               @id @default(cuid())
   campaignId String
-  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaign   EmailCampaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   userId String?
   email  String
@@ -119,7 +119,7 @@ model EmailPreference {
   announcements         Boolean @default(true)
 
   // Secure unsubscribe token
-  unsubscribeToken String @unique @default(cuid())
+  unsubscribeToken String   @unique @default(cuid())
 
   consentedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt

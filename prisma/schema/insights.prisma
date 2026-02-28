@@ -111,13 +111,13 @@ model HomeworkSession {
 model HierarchicalSummary {
   id                    String   @id @default(cuid())
   userId                String
-  type                  String // 'weekly' or 'monthly'
+  type                  String   // 'weekly' or 'monthly'
   startDate             DateTime
   endDate               DateTime
-  keyThemes             Json // string[]
-  consolidatedLearnings Json // string[]
-  frequentTopics        Json // { topic: string; count: number }[]
-  sourceConversationIds Json // string[]
+  keyThemes             Json     // string[]
+  consolidatedLearnings Json     // string[]
+  frequentTopics        Json     // { topic: string; count: number }[]
+  sourceConversationIds Json     // string[]
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
