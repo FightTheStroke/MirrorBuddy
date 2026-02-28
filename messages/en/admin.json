@@ -1844,7 +1844,25 @@
       "bucket": "Bucket",
       "sampleSize": "Sample Size",
       "avgTutorBench": "Avg TutorBench",
-      "chartAriaLabel": "A/B comparison chart"
+      "chartAriaLabel": "A/B comparison chart",
+      "manageTitle": "Manage A/B Experiments",
+      "manageDescription": "Create, edit, and manage the status of A/B experiments",
+      "createExperiment": "Create experiment",
+      "editExperiment": "Edit experiment",
+      "deleteExperiment": "Delete experiment",
+      "confirmDelete": "Are you sure you want to delete this experiment?",
+      "cannotDeleteActive": "Cannot delete an active experiment",
+      "activate": "Activate",
+      "complete": "Complete",
+      "statusDraft": "Draft",
+      "statusActive": "Active",
+      "statusCompleted": "Completed",
+      "invalidTransition": "Invalid status transition",
+      "experimentName": "Experiment name",
+      "saveChanges": "Save changes",
+      "deleteSuccess": "Experiment deleted successfully",
+      "activateSuccess": "Experiment activated successfully",
+      "completeSuccess": "Experiment completed successfully"
     },
     "community": {
       "reviewQueue": "Review Queue"
