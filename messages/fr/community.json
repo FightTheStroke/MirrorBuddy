@@ -75,6 +75,7 @@
     "toasts": {
       "submitSuccess": "Contribution envoyée avec succès.",
       "submitError": "Impossible d'envoyer la contribution.",
+      "flaggedForModeration": "Signalée pour modération",
       "reviewSuccess": "Action de révision enregistrée.",
       "reviewError": "Impossible d'enregistrer l'action de révision."
     },
@@ -82,6 +83,23 @@
       "noContributions": "Aucune contribution pour le moment.",
       "noPendingReviews": "Aucune révision en attente.",
       "noSearchResults": "Aucune contribution ne correspond à votre recherche."
+    },
+    "votes": {
+      "voteButton": "Voter",
+      "removeVote": "Retirer le vote",
+      "voteCount": "{count} votes",
+      "loginToVote": "Connectez-vous pour voter",
+      "voteError": "Impossible d'enregistrer votre vote."
+    },
+    "myContributions": {
+      "title": "Mes contributions",
+      "noContributions": "Vous n'avez pas encore soumis de contribution.",
+      "statusPending": "En attente",
+      "statusApproved": "Approuvé",
+      "statusRejected": "Rejeté",
+      "rejectionReason": "Motif du rejet",
+      "viewDetails": "Voir les détails",
+      "submittedOn": "Soumis le"
     }
   }
 }

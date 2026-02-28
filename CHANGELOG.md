@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.5] - 2026-02-28
+
+### Added
+
+- **A/B experiment management UI** — delivered admin surfaces to manage experiment lifecycle and controls in the research dashboard.
+- **Community voting system** — added authenticated vote toggle API and UI wiring so students can vote approved community contributions.
+- **My Contributions page with rejection feedback** — added `/community/my-contributions` with status visibility and moderation note display for rejected submissions.
+
+### Fixed
+
+- **i18n completeness across community and research** — completed missing translations/placeholders and aligned locale namespaces for it/en/fr/de/es.
+
 ## [0.16.4] - 2026-02-27
 
 ### Added

@@ -67,6 +67,9 @@
       "rank": "Rang",
       "average": "Moyenne"
     },
+    "heatmap": {
+      "unknownProfile": "Profil inconnu"
+    },
     "drillDown": {
       "title": "Détail du Benchmark",
       "description": "Scores TutorBench détaillés, métadonnées et progression tour par tour",

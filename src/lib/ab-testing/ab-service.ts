@@ -39,6 +39,10 @@ export function __resetActiveExperimentsCacheForTests(): void {
   activeExperimentsCache = null;
 }
 
+export function invalidateActiveExperimentsCache(): void {
+  activeExperimentsCache = null;
+}
+
 function getABExperimentModel(): ABExperimentModel {
   const model = (prisma as unknown as Record<string, unknown>).aBExperiment as
     | ABExperimentModel

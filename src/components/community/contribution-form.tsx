@@ -25,7 +25,8 @@ const INITIAL_STATE = {
 };
 
 export function ContributionForm() {
-  const t = useTranslations('community.contributionForm');
+  const tContributionForm = useTranslations('community.contributionForm');
+  const tToasts = useTranslations('community.toasts');
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -33,7 +34,9 @@ export function ContributionForm() {
 
   const rewardPreview = useMemo(() => REWARD_BY_TYPE[formData.type], [formData.type]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = event.target;
     setFormData((previous) => ({ ...previous, [name]: value }));
   };
@@ -59,55 +62,61 @@ export function ContributionForm() {
       if (!response.ok) {
         if (response.status === 422) {
           const firstFlag = body.flags?.[0] ?? 'content:review';
-          setErrorMessage(`Flagged for moderation: ${firstFlag}`);
+          setErrorMessage(`${tToasts('flaggedForModeration')}: ${firstFlag}`);
           return;
         }
 
-        setErrorMessage(body.error ?? 'Unable to submit contribution.');
+        setErrorMessage(body.error ?? tToasts('submitError'));
         return;
       }
 
       setFormData(INITIAL_STATE);
-      setSuccessMessage('Contribution submitted successfully.');
+      setSuccessMessage(tToasts('submitSuccess'));
     } catch {
-      setErrorMessage('Unable to submit contribution.');
+      setErrorMessage(tToasts('submitError'));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border p-4" aria-label={t('title')}>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 rounded-lg border p-4"
+      aria-label={tContributionForm('title')}
+    >
       <div className="space-y-1">
         <label htmlFor="contribution-type" className="text-sm font-medium">
-          {t('contributionType')}
+          {tContributionForm('contributionType')}
         </label>
         <select
           id="contribution-type"
           name="type"
-          aria-label={t('contributionType')}
+          aria-label={tContributionForm('contributionType')}
           className="w-full rounded border px-3 py-2"
           value={formData.type}
           onChange={handleChange}
           disabled={isSubmitting}
         >
-          <option value="feedback">{t('feedback')}</option>
-          <option value="tip">{t('tip')}</option>
-          <option value="resource">{t('resource')}</option>
-          <option value="question">{t('question')}</option>
+          <option value="feedback">{tContributionForm('feedback')}</option>
+          <option value="tip">{tContributionForm('tip')}</option>
+          <option value="resource">{tContributionForm('resource')}</option>
+          <option value="question">{tContributionForm('question')}</option>
         </select>
       </div>
 
-      <p className="text-sm font-medium">{t('rewardPreview')} {rewardPreview}</p>
+      <p className="text-sm font-medium">
+        {tContributionForm('rewardPreview')} {rewardPreview}
+      </p>
 
       <div className="space-y-1">
         <label htmlFor="contribution-title" className="text-sm font-medium">
-          {t('contributionTitle')}
+          {tContributionForm('contributionTitle')}
         </label>
         <input
           id="contribution-title"
           name="title"
-          aria-label={t('contributionTitle')}
+          aria-label={tContributionForm('contributionTitle')}
           className="w-full rounded border px-3 py-2"
           value={formData.title}
           onChange={handleChange}
@@ -118,12 +127,12 @@ export function ContributionForm() {
 
       <div className="space-y-1">
         <label htmlFor="contribution-content" className="text-sm font-medium">
-          {t('contributionContent')}
+          {tContributionForm('contributionContent')}
         </label>
         <textarea
           id="contribution-content"
           name="content"
-          aria-label={t('contributionContent')}
+          aria-label={tContributionForm('contributionContent')}
           className="w-full rounded border px-3 py-2"
           value={formData.content}
           onChange={handleChange}
@@ -134,13 +143,19 @@ export function ContributionForm() {
       </div>
 
       {errorMessage && (
-        <div role="alert" className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div
+          role="alert"
+          className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+        >
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div role="status" className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <div
+          role="status"
+          className="rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+        >
           {successMessage}
         </div>
       )}
@@ -150,7 +165,7 @@ export function ContributionForm() {
         className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
         disabled={isSubmitting}
       >
-        {isSubmitting ? t('submittingButton') : t('submitButton')}
+        {isSubmitting ? tContributionForm('submittingButton') : tContributionForm('submitButton')}
       </button>
     </form>
   );

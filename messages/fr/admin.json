@@ -1844,7 +1844,27 @@
       "bucket": "Groupe",
       "sampleSize": "Taille échantillon",
       "avgTutorBench": "Moy TutorBench",
-      "chartAriaLabel": "Graphique de comparaison A/B"
+      "chartAriaLabel": "Graphique de comparaison A/B",
+      "manageTitle": "Gérer les expériences A/B",
+      "manageDescription": "Créez, modifiez et gérez le statut des expériences A/B",
+      "createExperiment": "Créer une expérience",
+      "editExperiment": "Modifier l'expérience",
+      "deleteExperiment": "Supprimer l'expérience",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette expérience ?",
+      "cannotDeleteActive": "Impossible de supprimer une expérience active",
+      "activate": "Activer",
+      "complete": "Terminer",
+      "statusDraft": "Brouillon",
+      "statusActive": "Active",
+      "statusCompleted": "Terminée",
+      "invalidTransition": "Transition de statut invalide",
+      "experimentName": "Nom de l'expérience",
+      "saveChanges": "Enregistrer les modifications",
+      "deleteSuccess": "Expérience supprimée avec succès",
+      "activateSuccess": "Expérience activée avec succès",
+      "completeSuccess": "Expérience terminée avec succès",
+      "startDate": "Date de début",
+      "cancel": "Annuler"
     },
     "community": {
       "reviewQueue": "File de révision"

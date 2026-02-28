@@ -170,30 +170,30 @@
       "logoutConfirm": "Are you sure you want to log out?"
     },
     "notifications": {
-      "cancellaTutteLeNotifiche": "[TRANSLATE] Cancella tutte le notifiche",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\"",
-      "arialabeleliminaNotifica": "[TRANSLATE] aria-label=\"Elimina notifica\""
+      "cancellaTutteLeNotifiche": "Cancella tutte le notifiche",
+      "arialabelchiudi": "aria-label=\"Close\"",
+      "arialabeleliminaNotifica": "aria-label=\"Delete notifica\""
     },
     "pwa": {
-      "selezionaQuotaggiungiAllaSchermata": "[TRANSLATE] Seleziona &quot;Aggiungi alla schermata Home&quot;",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
+      "selezionaQuotaggiungiAllaSchermata": "Select &quot;Add alla schermata Home&quot;",
+      "arialabelchiudi": "aria-label=\"Close\""
     },
     "tier": {
-      "allMaestri": "[TRANSLATE] All Maestri"
+      "allMaestri": "All Mentors"
     },
     "trial": {
-      "continuaConLaProva": "[TRANSLATE] Continua con la prova limitata",
-      "tuttiI17Maestri": "[TRANSLATE] Tutti i 17 Maestri e 5 Coach",
-      "chatIllimitateConI": "[TRANSLATE] Chat illimitate con i Maestri",
-      "registratiPerAccessoIllimitato": "[TRANSLATE] Registrati per accesso illimitato",
-      "3Maestri": "[TRANSLATE] 3 Maestri",
-      "vuoiLaposaccessoCompletoRichiedi": "[TRANSLATE] Vuoi l&apos;accesso completo? Richiedi la beta",
-      "saltaIntroduzione": "[TRANSLATE] Salta introduzione",
-      "avanti": "[TRANSLATE] Avanti",
-      "accessoCompletoATutti": "[TRANSLATE] Accesso completo a tutti i Maestri e strumenti"
+      "continuaConLaProva": "Continua con la prova limitata",
+      "tuttiI17Maestri": "Tutti i 17 Mentors e 5 Coach",
+      "chatIllimitateConI": "Chat illimitate con i Mentors",
+      "registratiPerAccessoIllimitato": "Registrati per accesso illimitato",
+      "3Maestri": "3 Mentors",
+      "vuoiLaposaccessoCompletoRichiedi": "Vuoi l&apos;accesso completo? Richiedi la beta",
+      "saltaIntroduzione": "Salta introduzione",
+      "avanti": "Avanti",
+      "accessoCompletoATutti": "Accesso completo a tutti i Mentors e strumenti"
     },
     "toast": {
-      "arialabelchiudiNotifica": "[TRANSLATE] aria-label=\"Chiudi notifica\""
+      "arialabelchiudiNotifica": "aria-label=\"Close notifica\""
     },
     "registrationReceived": "Registration Received",
     "weWillContactYouWithin24HoursToSetUpYourSchoolPilo": "We will contact you within 24 hours to set up your school pilot.",

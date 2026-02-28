@@ -4,6 +4,9 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import BenchmarkHeatmap from './benchmark-heatmap';
 
 vi.mock('next-intl', () => ({
@@ -84,5 +87,30 @@ describe('BenchmarkHeatmap', () => {
     expect(screen.getByRole('dialog', { name: /drillDown.title/i })).toBeInTheDocument();
     expect(screen.getByText('Improve adaptation')).toBeInTheDocument();
     expect(screen.getByLabelText('drillDown.progressionAriaLabel')).toBeInTheDocument();
+  });
+
+  it('uses translated fallback for unknown profile labels', () => {
+    render(
+      <BenchmarkHeatmap
+        experiments={[
+          {
+            id: 'e-unknown',
+            name: 'exp-unknown',
+            maestroId: 'maestro-x',
+            scores: { scaffolding: 70, hinting: 70, adaptation: 70, misconceptionHandling: 70 },
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('columnheader', { name: 'heatmap.unknownProfile' }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not keep hardcoded unknown profile string in source', () => {
+    const sourcePath = join(dirname(fileURLToPath(import.meta.url)), 'benchmark-heatmap.tsx');
+    const source = readFileSync(sourcePath, 'utf8');
+    expect(source).not.toContain('Unknown profile');
   });
 });

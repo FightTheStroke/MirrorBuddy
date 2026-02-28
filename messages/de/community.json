@@ -75,6 +75,7 @@
     "toasts": {
       "submitSuccess": "Beitrag erfolgreich eingereicht.",
       "submitError": "Beitrag konnte nicht eingereicht werden.",
+      "flaggedForModeration": "Zur Moderation markiert",
       "reviewSuccess": "Prüfaktion gespeichert.",
       "reviewError": "Prüfaktion konnte nicht gespeichert werden."
     },
@@ -82,6 +83,23 @@
       "noContributions": "Noch keine Beiträge.",
       "noPendingReviews": "Keine ausstehenden Prüfungen.",
       "noSearchResults": "Keine Beiträge entsprechen deiner Suche."
+    },
+    "votes": {
+      "voteButton": "Abstimmen",
+      "removeVote": "Stimme entfernen",
+      "voteCount": "{count} Stimmen",
+      "loginToVote": "Zum Abstimmen anmelden",
+      "voteError": "Stimme konnte nicht gespeichert werden."
+    },
+    "myContributions": {
+      "title": "Meine Beiträge",
+      "noContributions": "Du hast noch keine Beiträge eingereicht.",
+      "statusPending": "Ausstehend",
+      "statusApproved": "Genehmigt",
+      "statusRejected": "Abgelehnt",
+      "rejectionReason": "Ablehnungsgrund",
+      "viewDetails": "Details anzeigen",
+      "submittedOn": "Eingereicht am"
     }
   }
 }

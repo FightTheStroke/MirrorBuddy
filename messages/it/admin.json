@@ -1844,7 +1844,27 @@
       "bucket": "Gruppo",
       "sampleSize": "Dimensione campione",
       "avgTutorBench": "Media TutorBench",
-      "chartAriaLabel": "Grafico confronto A/B"
+      "chartAriaLabel": "Grafico confronto A/B",
+      "manageTitle": "Gestisci Esperimenti A/B",
+      "manageDescription": "Crea, modifica e gestisci lo stato degli esperimenti A/B",
+      "createExperiment": "Crea esperimento",
+      "editExperiment": "Modifica esperimento",
+      "deleteExperiment": "Elimina esperimento",
+      "confirmDelete": "Sei sicuro di voler eliminare questo esperimento?",
+      "cannotDeleteActive": "Impossibile eliminare un esperimento attivo",
+      "activate": "Attiva",
+      "complete": "Completa",
+      "statusDraft": "Bozza",
+      "statusActive": "Attivo",
+      "statusCompleted": "Completato",
+      "invalidTransition": "Transizione di stato non valida",
+      "experimentName": "Nome esperimento",
+      "saveChanges": "Salva modifiche",
+      "deleteSuccess": "Esperimento eliminato con successo",
+      "activateSuccess": "Esperimento attivato con successo",
+      "completeSuccess": "Esperimento completato con successo",
+      "startDate": "Data di inizio",
+      "cancel": "Annulla"
     },
     "community": {
       "reviewQueue": "Coda revisione"
