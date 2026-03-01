@@ -115,7 +115,8 @@
       },
       "safetyEvents": "Sicherheitsereignisse",
       "healthMonitoring": "Gesundheitsüberwachung",
-      "dailyAvgEur": "Tagesdurchschnitt €"
+      "dailyAvgEur": "Tagesdurchschnitt €",
+      "viewDetails": "Details anzeigen"
     },
     "expandMenu": "Expand Menu",
     "pendingBetaRequests": "Pending Beta Requests",
