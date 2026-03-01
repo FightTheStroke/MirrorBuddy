@@ -16,13 +16,13 @@
  * - full-ui-audit/trial-ui.spec.ts (route audit tests)
  */
 
-import { test, expect } from "./fixtures/auth-fixtures";
+import { test, expect } from './fixtures/auth-fixtures';
 import {
   PUBLIC_ROUTES,
   checkButtonsClickable,
   generateReport,
   type RouteError,
-} from "./full-ui-audit/trial-ui-helpers";
+} from './full-ui-audit/trial-ui-helpers';
 
 // Errors to ignore (CSP violations, expected 401s, etc.)
 const IGNORE_CONSOLE_ERRORS = [
@@ -47,65 +47,61 @@ const IGNORE_CONSOLE_ERRORS = [
 // GDPR COMPLIANCE (F-07)
 // ============================================================================
 
-test.describe("Trial Mode - GDPR Compliance", () => {
-  test("legal pages accessible without blocking consent wall", async ({
-    trialPage,
-  }) => {
+test.describe('Trial Mode - GDPR Compliance', () => {
+  test('legal pages accessible without blocking consent wall', async ({ trialPage }) => {
     // Clear consent - simulate user who hasn't accepted yet
     // But keep TosGateProvider mock from fixture to prevent ToS modal blocking
     await trialPage.addInitScript(() => {
-      localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem('mirrorbuddy-consent');
     });
 
     // Legal pages must use locale prefix — bare /terms redirects to /landing
     // GDPR: users must read privacy/terms BEFORE accepting cookies
-    await trialPage.goto("/it/terms");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/it/terms');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     // Terms page renders with i18n title via t("title")
-    const heading = trialPage.locator("h1").first();
+    const heading = trialPage.locator('h1').first();
     await expect(heading).toBeVisible({ timeout: 10000 });
 
     // Page should have substantive content (article)
-    await expect(trialPage.locator("article")).toBeVisible();
+    await expect(trialPage.locator('article')).toBeVisible();
   });
 
-  test("privacy page accessible without prior consent", async ({
-    trialPage,
-  }) => {
+  test('privacy page accessible without prior consent', async ({ trialPage }) => {
     // Clear consent - user hasn't accepted yet
     await trialPage.addInitScript(() => {
-      localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem('mirrorbuddy-consent');
     });
 
     // Privacy page must use locale prefix
-    await trialPage.goto("/it/privacy");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/it/privacy');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     // Privacy page title from i18n: "Informativa sulla Privacy"
-    const heading = trialPage.locator("h1").first();
+    const heading = trialPage.locator('h1').first();
     await expect(heading).toBeVisible({ timeout: 10000 });
     await expect(heading).toContainText(/Privacy|Informativa/i);
 
     // Navigate to terms and verify privacy link exists
-    await trialPage.goto("/it/terms");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/it/terms');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     const privacyLink = trialPage.locator('a[href*="/privacy"]').first();
     await expect(privacyLink).toBeVisible();
   });
 
-  test("cookie policy page accessible", async ({ trialPage }) => {
+  test('cookie policy page accessible', async ({ trialPage }) => {
     // Cookie page must use locale prefix
-    await trialPage.goto("/it/cookies");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/it/cookies');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     // Cookie policy page renders with i18n title
-    const heading = trialPage.locator("h1").first();
+    const heading = trialPage.locator('h1').first();
     await expect(heading).toBeVisible({ timeout: 10000 });
 
     // Page should have substantive content
-    await expect(trialPage.locator("article")).toBeVisible();
+    await expect(trialPage.locator('article')).toBeVisible();
   });
 });
 
@@ -113,27 +109,24 @@ test.describe("Trial Mode - GDPR Compliance", () => {
 // TRIAL STATUS & LIMITS (F-07)
 // ============================================================================
 
-test.describe("Trial Mode - Status & Limits", () => {
-  test("trial status indicator shows remaining chats", async ({
-    trialPage,
-    context,
-  }) => {
+test.describe('Trial Mode - Status & Limits', () => {
+  test('trial status indicator shows remaining chats', async ({ trialPage, context }) => {
     // Add trial session cookie
     await context.addCookies([
       {
-        name: "mirrorbuddy-trial-session",
-        value: "test-trial-session-id",
-        domain: "localhost",
-        path: "/",
-        sameSite: "Lax",
+        name: 'mirrorbuddy-trial-session',
+        value: 'test-trial-session-id',
+        domain: 'localhost',
+        path: '/',
+        sameSite: 'Lax',
       },
     ]);
 
     // Mock trial session API to return trial mode status
-    await trialPage.route("**/api/trial/session", (route) => {
+    await trialPage.route('**/api/trial/session', (route) => {
       route.fulfill({
         status: 200,
-        contentType: "application/json",
+        contentType: 'application/json',
         body: JSON.stringify({
           hasSession: true,
           isTrialMode: true,
@@ -145,10 +138,10 @@ test.describe("Trial Mode - Status & Limits", () => {
     });
 
     // Mock onboarding API to prevent redirect
-    await trialPage.route("**/api/user/onboarding", (route) => {
+    await trialPage.route('**/api/user/onboarding', (route) => {
       route.fulfill({
         status: 200,
-        contentType: "application/json",
+        contentType: 'application/json',
         body: JSON.stringify({
           hasCompletedOnboarding: true,
           onboardingCompletedAt: new Date().toISOString(),
@@ -156,28 +149,26 @@ test.describe("Trial Mode - Status & Limits", () => {
       });
     });
 
-    await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     // Trial indicator should show remaining chats
     const trialIndicator = trialPage.locator("[data-testid='trial-status']");
 
     if (await trialIndicator.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(trialIndicator).toContainText("10");
+      await expect(trialIndicator).toContainText('10');
     } else {
       // Home page loaded correctly even without indicator
-      await expect(trialPage.locator("h1")).toBeVisible();
+      await expect(trialPage.locator('h1')).toBeVisible();
     }
   });
 
-  test("limit reached modal appears when trial exhausted", async ({
-    trialPage,
-  }) => {
+  test('limit reached modal appears when trial exhausted', async ({ trialPage }) => {
     // Mock trial session at limit
-    await trialPage.route("**/api/trial/session", (route) => {
+    await trialPage.route('**/api/trial/session', (route) => {
       route.fulfill({
         status: 200,
-        contentType: "application/json",
+        contentType: 'application/json',
         body: JSON.stringify({
           hasSession: true,
           chatsUsed: 10,
@@ -186,12 +177,12 @@ test.describe("Trial Mode - Status & Limits", () => {
       });
     });
 
-    await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.goto('/');
+    await trialPage.waitForLoadState('domcontentloaded');
 
     // Navigate to coach chat
     const coachButton = trialPage
-      .locator("button")
+      .locator('button')
       .filter({ hasText: /Melissa|Roberto|Chiara/i })
       .first();
 
@@ -202,23 +193,21 @@ test.describe("Trial Mode - Status & Limits", () => {
       // Try to send message
       const chatInput = trialPage.locator("[data-testid='chat-input']");
       if (await chatInput.isVisible()) {
-        await chatInput.fill("Test message");
+        await chatInput.fill('Test message');
         await trialPage.click("[data-testid='send-button']");
 
         // Modal should appear if trial limit enforcement is active
-        const modal = trialPage.locator("text=Hai esaurito i messaggi");
+        const modal = trialPage.locator('text=Hai esaurito i messaggi');
         if (await modal.isVisible({ timeout: 3000 }).catch(() => false)) {
-          await expect(
-            trialPage.locator("text=Richiedi accesso"),
-          ).toBeVisible();
+          await expect(trialPage.locator('text=Richiedi accesso')).toBeVisible();
         }
       }
     }
   });
 
-  test("trial mode restrictions are in place", async ({ trialPage }) => {
-    await trialPage.goto("/", { waitUntil: "domcontentloaded" });
-    await trialPage.waitForLoadState("domcontentloaded").catch(() => {});
+  test('trial mode restrictions are in place', async ({ trialPage }) => {
+    await trialPage.goto('/', { waitUntil: 'domcontentloaded' });
+    await trialPage.waitForLoadState('domcontentloaded').catch(() => {});
 
     // Check that page loaded with content
     const visibleContent = trialPage
@@ -227,25 +216,19 @@ test.describe("Trial Mode - Status & Limits", () => {
     const pageHasContent = await visibleContent.isVisible().catch(() => false);
 
     const hasTextContent = await trialPage
-      .locator("body")
+      .locator('body')
       .innerText()
       .then((t) => t.length > 100)
       .catch(() => false);
 
     const trialIndicator = trialPage.locator('[data-testid="trial-status"]');
-    const hasTrialIndicator = await trialIndicator
-      .isVisible()
-      .catch(() => false);
+    const hasTrialIndicator = await trialIndicator.isVisible().catch(() => false);
 
-    const trialMessage = trialPage
-      .locator("text=/trial|prova|demo|benvenuto|welcome/i")
-      .first();
+    const trialMessage = trialPage.locator('text=/trial|prova|demo|benvenuto|welcome/i').first();
     const hasTrialMessage = await trialMessage.isVisible().catch(() => false);
 
     // At least one indicator of working app should be visible
-    expect(
-      pageHasContent || hasTextContent || hasTrialIndicator || hasTrialMessage,
-    ).toBeTruthy();
+    expect(pageHasContent || hasTextContent || hasTrialIndicator || hasTrialMessage).toBeTruthy();
   });
 });
 
@@ -253,18 +236,16 @@ test.describe("Trial Mode - Status & Limits", () => {
 // ROUTE AUDIT (F-09, F-34)
 // ============================================================================
 
-test.describe("Trial Mode - Route Audit", () => {
+test.describe('Trial Mode - Route Audit', () => {
   test.setTimeout(120000);
 
-  test("all public routes accessible without critical errors", async ({
-    trialPage,
-  }) => {
+  test('all public routes accessible without critical errors', async ({ trialPage }) => {
     const errors: RouteError[] = [];
     const consoleErrors: string[] = [];
 
     // Listen for console errors
-    trialPage.on("console", (msg) => {
-      if (msg.type() === "error") {
+    trialPage.on('console', (msg) => {
+      if (msg.type() === 'error') {
         const text = msg.text();
         if (!IGNORE_CONSOLE_ERRORS.some((pattern) => pattern.test(text))) {
           consoleErrors.push(`[${msg.type()}] ${text}`);
@@ -279,33 +260,52 @@ test.describe("Trial Mode - Route Audit", () => {
       try {
         if (trialPage.isClosed()) break;
 
-        const response = await trialPage.goto(`http://localhost:3000${route}`, {
-          waitUntil: "domcontentloaded",
-          timeout: 15000,
-        });
+        // Retry once on ERR_ABORTED — common during Next.js cold-start compilation in CI.
+        // ERR_ABORTED is a transient server-side event, not a real route error.
+        let response = null;
+        let navError: Error | null = null;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            response = await trialPage.goto(`http://localhost:3000${route}`, {
+              waitUntil: 'domcontentloaded',
+              timeout: 15000,
+            });
+            navError = null;
+            break;
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : String(e);
+            if (attempt === 0 && msg.includes('ERR_ABORTED')) {
+              // Brief wait for the server to finish compiling the route
+              await trialPage.waitForTimeout(3000);
+            } else {
+              navError = e instanceof Error ? e : new Error(msg);
+              break;
+            }
+          }
+        }
+
+        if (navError) throw navError;
 
         // F-09: Check for 404 errors
         if (response?.status() === 404) {
           errors.push({
             route,
-            type: "404",
-            message: "Route returned 404 Not Found",
-            severity: "critical",
+            type: '404',
+            message: 'Route returned 404 Not Found',
+            severity: 'critical',
           });
           continue;
         }
 
-        await trialPage
-          .waitForLoadState("domcontentloaded", { timeout: 3000 })
-          .catch(() => {});
+        await trialPage.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
 
         // F-05: Check for console errors
         if (consoleErrors.length > 0) {
           errors.push({
             route,
-            type: "console_error",
-            message: `Console errors: ${consoleErrors.join("; ")}`,
-            severity: "warning",
+            type: 'console_error',
+            message: `Console errors: ${consoleErrors.join('; ')}`,
+            severity: 'warning',
           });
         }
 
@@ -314,17 +314,16 @@ test.describe("Trial Mode - Route Audit", () => {
           await checkButtonsClickable(trialPage, route, errors);
         }
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         const severity =
-          errorMessage.includes("closed") || errorMessage.includes("Target")
-            ? "warning"
-            : "critical";
+          errorMessage.includes('closed') || errorMessage.includes('Target')
+            ? 'warning'
+            : 'critical';
 
         errors.push({
           route,
-          type: "navigation_error",
-          message: `Navigation ${severity === "warning" ? "interrupted" : "failed"}: ${errorMessage}`,
+          type: 'navigation_error',
+          message: `Navigation ${severity === 'warning' ? 'interrupted' : 'failed'}: ${errorMessage}`,
           severity,
         });
       }
@@ -332,30 +331,30 @@ test.describe("Trial Mode - Route Audit", () => {
 
     // Generate report
     const report = generateReport(errors);
-    console.log("\n" + report);
+    console.log('\n' + report);
 
     // F-34: Assert zero critical errors
-    const criticalErrors = errors.filter((e) => e.severity === "critical");
+    const criticalErrors = errors.filter((e) => e.severity === 'critical');
     expect(
       criticalErrors,
-      `Found ${criticalErrors.length} critical error(s):\n${criticalErrors.map((e) => `  - ${e.route}: ${e.message}`).join("\n")}`,
+      `Found ${criticalErrors.length} critical error(s):\n${criticalErrors.map((e) => `  - ${e.route}: ${e.message}`).join('\n')}`,
     ).toHaveLength(0);
   });
 
-  test("basic navigation between public routes", async ({ trialPage }) => {
+  test('basic navigation between public routes', async ({ trialPage }) => {
     // Start at home
-    await trialPage.goto("/", { waitUntil: "domcontentloaded" });
+    await trialPage.goto('/', { waitUntil: 'domcontentloaded' });
 
     // Navigate to landing (may redirect to /welcome)
-    await trialPage.goto("/landing", { waitUntil: "domcontentloaded" });
+    await trialPage.goto('/landing', { waitUntil: 'domcontentloaded' });
     expect(trialPage.url()).toMatch(/\/(landing|welcome)/);
 
     // Navigate to astuccio
-    await trialPage.goto("/astuccio", { waitUntil: "domcontentloaded" });
+    await trialPage.goto('/astuccio', { waitUntil: 'domcontentloaded' });
     await expect(trialPage).toHaveURL(/\/astuccio/);
 
     // Navigate to privacy
-    await trialPage.goto("/privacy", { waitUntil: "domcontentloaded" });
+    await trialPage.goto('/privacy', { waitUntil: 'domcontentloaded' });
     await expect(trialPage).toHaveURL(/\/privacy/);
   });
 });
