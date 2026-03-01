@@ -48,11 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: nightly-benchmark
     if: needs.nightly-benchmark.outputs.regression_detected == 'true'
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      FROM_EMAIL: ${{ secrets.EMAIL_FROM }}
     steps:
       - name: Send Slack alert
-        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: env.SLACK_WEBHOOK_URL != ''
         run: |
           curl -sf -X POST "${SLACK_WEBHOOK_URL}" \
             -H "Content-Type: application/json" \
@@ -63,11 +66,7 @@ jobs:
               '{text: ("Nightly benchmark regression detected in " + $repo + " (exit code: " + $code + "). " + $run_url)}')"
 
       - name: Send email alert via Resend
-        if: ${{ secrets.RESEND_API_KEY != '' && secrets.ADMIN_EMAIL != '' && secrets.EMAIL_FROM != '' }}
-        env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          FROM_EMAIL: ${{ secrets.EMAIL_FROM }}
+        if: env.RESEND_API_KEY != '' && env.ADMIN_EMAIL != '' && env.FROM_EMAIL != ''
         run: |
           SUBJECT="MirrorBuddy nightly benchmark regression"
           HTML="<p>Nightly benchmark failed with exit code <strong>${{ needs.nightly-benchmark.outputs.benchmark_exit_code }}</strong>.</p><p>Run: <a href='${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'>View workflow run</a></p>"
