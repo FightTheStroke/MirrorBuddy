@@ -100,7 +100,7 @@ export function DashboardKpiGrid({ counts, sentryErrorCount, summary }: Dashboar
           />
           <KpiCard
             title={t('kpi.trialConversion')}
-            value={`${(summary.business.trialConversionRate * 100).toFixed(1)}%`}
+            value={`${summary.business.trialConversionRate.toFixed(1)}%`}
             icon={Percent}
             href="/admin/tiers/conversion-funnel"
             color="blue"

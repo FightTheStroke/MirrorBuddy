@@ -138,7 +138,11 @@ export default function AdminDashboardPage() {
             title={t('safetyEvents')}
             defaultOpen={(summary?.safety.unresolvedCount ?? 0) > 0}
           >
-            <SLOMonitoringPanel />
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {summary?.safety.unresolvedCount
+                ? `${summary.safety.unresolvedCount} ${t('actionRequired.safetyEvents')}`
+                : t('noDataAvailable')}
+            </p>
           </CollapsibleSection>
           <CollapsibleSection
             id="cost-section"
