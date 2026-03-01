@@ -397,8 +397,20 @@ test.describe('Style Consistency - Cross-Page Uniformity', () => {
     const primaryColors: string[] = [];
 
     for (const testPage of PAGES_TO_TEST.slice(0, 5)) {
-      await page.goto(testPage.path);
-      await page.waitForLoadState('domcontentloaded');
+      // Retry once on ERR_ABORTED — transient Next.js cold-start in CI.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          await page.goto(testPage.path, { waitUntil: 'domcontentloaded' });
+          break;
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          if (attempt === 0 && msg.includes('ERR_ABORTED')) {
+            await page.waitForTimeout(3000);
+          } else {
+            throw e;
+          }
+        }
+      }
 
       // Apply explicit light class to prevent dark-mode CSS vars from being
       // applied if next-themes hasn't hydrated yet (theme class undefined state).
