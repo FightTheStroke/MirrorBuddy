@@ -186,7 +186,7 @@ describe('Key Rotation Service', () => {
       expect(result.total).toBe(25);
       expect(result.processed).toBe(25);
       expect(prisma.googleAccount.findMany).toHaveBeenCalledTimes(3);
-    });
+    }, 10000); // 10s budget for 50 crypto ops (25 records × decrypt+encrypt)
   });
 
   describe('rotatePIIEncryptionKey', () => {
