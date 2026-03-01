@@ -400,7 +400,7 @@ test.describe('Style Consistency - Cross-Page Uniformity', () => {
       // Retry once on ERR_ABORTED — transient Next.js cold-start in CI.
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          await page.goto(testPage.path, { waitUntil: 'domcontentloaded', timeout: 15000 });
+          await page.goto(testPage.path, { waitUntil: 'domcontentloaded' });
           break;
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
