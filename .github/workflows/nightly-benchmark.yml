@@ -1,8 +1,8 @@
-name: nightly-benchmark
+name: quarterly-benchmark
 
 on:
   schedule:
-    - cron: "0 2 * * *"
+    - cron: "0 2 1 */3 *"
   workflow_dispatch:
 
 permissions:
