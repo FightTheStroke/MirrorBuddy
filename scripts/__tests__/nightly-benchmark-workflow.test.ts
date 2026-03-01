@@ -9,7 +9,7 @@ describe("nightly benchmark workflow", () => {
     const content = readFileSync(workflowPath, "utf8");
 
     expect(content).toContain("schedule:");
-    expect(content).toContain('cron: "0 2 * * *"');
+    expect(content).toContain('cron: "0 2 1 */3 *"');
     expect(content).toContain("nightly-benchmark");
   });
 
