@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Settings, LogIn, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { trackLoginClick } from '@/lib/funnel/client';
 import { TrialEmailForm } from './trial-email-form';
 
@@ -103,14 +104,16 @@ export function QuickStart({ isReturningUser, onSkip, onUpdateProfile }: QuickSt
               </li>
             </ul>
 
-            <Link href="/login" className="w-full" onClick={() => trackLoginClick()}>
-              <Button
-                size="lg"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-md py-6 text-lg"
-              >
-                <LogIn className="w-5 h-5 mr-2" aria-hidden="true" />
-                {t('betaAccess.cta')}
-              </Button>
+            <Link
+              href="/login"
+              onClick={() => trackLoginClick()}
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                'w-full bg-purple-600 hover:bg-purple-700 text-white shadow-md py-6 text-lg',
+              )}
+            >
+              <LogIn className="w-5 h-5 mr-2" aria-hidden="true" />
+              {t('betaAccess.cta')}
             </Link>
           </motion.div>
 

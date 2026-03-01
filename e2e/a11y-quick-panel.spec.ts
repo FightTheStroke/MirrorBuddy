@@ -11,46 +11,39 @@
  * Run: npx playwright test e2e/a11y-quick-panel.spec.ts
  */
 
-import {
-  test,
-  expect,
-  toLocalePath,
-  openA11yPanel,
-} from "./fixtures/a11y-fixtures";
+import { test, expect, toLocalePath, openA11yPanel } from './fixtures/a11y-fixtures';
 
-test.describe("A11y Quick Panel - Dialog Accessibility", () => {
+test.describe('A11y Quick Panel - Dialog Accessibility', () => {
   // Panel tests open a dialog and interact with it — very slow under CI load
   test.setTimeout(600000);
 
-  test("quick panel has data-testid", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('quick panel has data-testid', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     const { panel } = await openA11yPanel(page);
     await expect(panel).toBeVisible();
   });
 
-  test("quick panel has role=dialog", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('quick panel has role=dialog', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     const { panel: dialog } = await openA11yPanel(page);
-    await expect(dialog).toHaveAttribute("role", "dialog");
+    await expect(dialog).toHaveAttribute('role', 'dialog');
   });
 
-  test("quick panel has aria-modal=true", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('quick panel has aria-modal=true', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     const { panel: dialog } = await openA11yPanel(page);
-    await expect(dialog).toHaveAttribute("aria-modal", "true");
+    await expect(dialog).toHaveAttribute('aria-modal', 'true');
   });
 
-  test("quick panel has aria-labelledby pointing to title", async ({
-    page,
-  }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('quick panel has aria-labelledby pointing to title', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
     // Extra wait for hydration in CI
     await page.waitForTimeout(1000);
 
@@ -58,7 +51,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     // Wait for panel to fully render
     await page.waitForTimeout(500);
 
-    const labelledBy = await dialog.getAttribute("aria-labelledby");
+    const labelledBy = await dialog.getAttribute('aria-labelledby');
 
     expect(labelledBy).toBeTruthy();
 
@@ -66,14 +59,14 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await expect(titleElement).toBeAttached({ timeout: 10000 });
   });
 
-  test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('focus trap keeps focus within panel', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
 
     for (let i = 0; i < 20; i++) {
-      await page.keyboard.press("Tab");
+      await page.keyboard.press('Tab');
     }
 
     const activeElement = await page.evaluate(() => {
@@ -84,19 +77,22 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     expect(activeElement).toBe(true);
   });
 
-  test("escape key closes panel", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('escape key closes panel', async ({ page }) => {
+    // Navigate directly to /welcome to avoid client-side redirect from /
+    // which can delay React hydration and make button clicks unresponsive.
+    await page.goto(toLocalePath('/welcome'));
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000);
 
     const { panel } = await openA11yPanel(page);
 
-    await page.keyboard.press("Escape");
+    await page.keyboard.press('Escape');
     await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
-  test("close button has data-testid", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('close button has data-testid', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
 
@@ -104,9 +100,9 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await expect(closeBtn).toBeVisible({ timeout: 15000 });
   });
 
-  test("close button closes panel", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('close button closes panel', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     const { panel } = await openA11yPanel(page);
 
@@ -118,23 +114,21 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
-  test("profile buttons container has data-testid", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('profile buttons container has data-testid', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
     // Wait for panel animation to complete
     await page.waitForTimeout(500);
 
-    const profilesContainer = page.locator(
-      '[data-testid="a11y-profile-buttons"]',
-    );
+    const profilesContainer = page.locator('[data-testid="a11y-profile-buttons"]');
     await expect(profilesContainer).toBeVisible({ timeout: 10000 });
   });
 
-  test("reset button has data-testid", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('reset button has data-testid', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
 
@@ -142,21 +136,19 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await expect(resetBtn).toBeVisible();
   });
 
-  test("full settings link has data-testid", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('full settings link has data-testid', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
 
-    const settingsLink = page.locator(
-      '[data-testid="a11y-full-settings-link"]',
-    );
+    const settingsLink = page.locator('[data-testid="a11y-full-settings-link"]');
     await expect(settingsLink).toBeVisible({ timeout: 10000 });
   });
 
-  test("toggle switches visible in panel", async ({ page }) => {
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+  test('toggle switches visible in panel', async ({ page }) => {
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
 
     await openA11yPanel(page);
 
@@ -166,20 +158,20 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test("panel does not interfere with page content", async ({ page }) => {
+  test('panel does not interfere with page content', async ({ page }) => {
     // Long timeout for CI
     test.setTimeout(300000);
 
-    await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.goto(toLocalePath('/'));
+    await page.waitForLoadState('domcontentloaded');
     await page.waitForTimeout(3000);
 
-    const mainCountBefore = await page.locator("main").count();
+    const mainCountBefore = await page.locator('main').count();
 
     await openA11yPanel(page);
     await page.waitForTimeout(500);
 
-    const mainCountAfter = await page.locator("main").count();
+    const mainCountAfter = await page.locator('main').count();
 
     expect(mainCountAfter).toBe(mainCountBefore);
   });

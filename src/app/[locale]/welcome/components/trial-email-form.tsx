@@ -95,16 +95,14 @@ export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
       </div>
 
       {/* Clickable TOS checkbox - entire row is clickable */}
-      <label className="flex items-start gap-2.5 cursor-pointer select-none group">
+      <div className="flex items-start gap-2.5 select-none group">
         <button
           type="button"
+          id="tos-checkbox"
           role="checkbox"
           aria-checked={tosAccepted}
           aria-label={t('trial.tosLabel')}
-          onClick={(e) => {
-            e.preventDefault();
-            setTosAccepted(!tosAccepted);
-          }}
+          onClick={() => setTosAccepted(!tosAccepted)}
           className={`mt-0.5 flex-shrink-0 h-5 w-5 rounded border-2 transition-colors flex items-center justify-center ${
             tosAccepted
               ? 'bg-blue-600 border-blue-600'
@@ -131,7 +129,7 @@ export function TrialEmailForm({ onComplete }: TrialEmailFormProps) {
             {t('trial.termsLink')}
           </Link>
         </span>
-      </label>
+      </div>
 
       <Button
         type="submit"
