@@ -750,10 +750,15 @@ jobs:
   # BLOCKING: Gates deployment AND PR merge - ensures WCAG 2.1 AA compliance
   # Smart mode: full E2E suite when UI changes, unit test baseline otherwise
   accessibility-tests:
-    name: Accessibility Tests
+    name: Accessibility Tests (${{ matrix.shard }})
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: [build, detect-changes]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [core, it, en, fr, de, es]
 
     services:
       postgres:
@@ -822,8 +827,14 @@ jobs:
       - name: Run Accessibility Tests (smart)
         run: |
           if [ "${{ needs.detect-changes.outputs.ui }}" = "true" ] || [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "Running FULL a11y E2E suite (UI changes detected or push event)"
-            npx playwright test --project=a11y --reporter=list
+            SHARD="${{ matrix.shard }}"
+            if [ "$SHARD" = "core" ]; then
+              echo "Running core a11y E2E (accessibility.spec.ts only)"
+              npx playwright test --project=a11y e2e/accessibility.spec.ts --workers=1 --reporter=list
+            else
+              echo "Running a11y E2E for locale $SHARD"
+              npx playwright test --project=a11y e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
+            fi
           else
             echo "Running a11y unit test baseline (no UI changes)"
             npm run test:unit -- accessibility --reporter=verbose
@@ -840,8 +851,9 @@ jobs:
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: accessibility-test-report
+          name: accessibility-test-report-${{ matrix.shard }}
           path: test-results/
           retention-days: 7
 
