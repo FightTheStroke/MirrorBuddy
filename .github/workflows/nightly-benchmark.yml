@@ -33,7 +33,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set +e
-          npx tsx scripts/nightly-benchmark.ts
+          npx tsx --conditions react-server scripts/nightly-benchmark.ts
           BENCHMARK_EXIT_CODE=$?
           echo "BENCHMARK_EXIT_CODE=${BENCHMARK_EXIT_CODE}" >> "$GITHUB_ENV"
           echo "benchmark_exit_code=${BENCHMARK_EXIT_CODE}" >> "$GITHUB_OUTPUT"
