@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface CollapsibleSectionProps {
+  id?: string;
   title: string;
   defaultOpen?: boolean;
   children: React.ReactNode;
 }
 
 export function CollapsibleSection({
+  id,
   title,
   defaultOpen = false,
   children,
@@ -18,19 +20,17 @@ export function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+    <div
+      id={id}
+      className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden scroll-mt-4"
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
       >
-        <span className="font-medium text-slate-900 dark:text-white text-sm">
-          {title}
-        </span>
+        <span className="font-medium text-slate-900 dark:text-white text-sm">{title}</span>
         <ChevronDown
-          className={cn(
-            "h-4 w-4 text-slate-400 transition-transform",
-            isOpen && "rotate-180",
-          )}
+          className={cn('h-4 w-4 text-slate-400 transition-transform', isOpen && 'rotate-180')}
         />
       </button>
       {isOpen && (

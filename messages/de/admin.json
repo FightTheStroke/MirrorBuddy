@@ -94,7 +94,28 @@
         "minuti2": "minuti",
         "ore": "Ore",
         "chartAriaLabel": "Chart Aria Label"
-      }
+      },
+      "statusBar": {
+        "system": "System",
+        "safety": "Sicherheit",
+        "costs": "Kosten",
+        "loading": "Status wird geladen..."
+      },
+      "actionRequired": {
+        "title": "Handlung erforderlich",
+        "pendingInvites": "Ausstehende Einladungen",
+        "safetyEvents": "Sicherheitsereignisse",
+        "sentryErrors": "Sentry-Fehler",
+        "servicesDown": "Dienste offline"
+      },
+      "kpi": {
+        "mrr": "MRR",
+        "dailyCost": "Tageskosten",
+        "trialConversion": "Testkonvertierung"
+      },
+      "safetyEvents": "Sicherheitsereignisse",
+      "healthMonitoring": "Gesundheitsüberwachung",
+      "dailyAvgEur": "Tagesdurchschnitt €"
     },
     "expandMenu": "Expand Menu",
     "pendingBetaRequests": "Pending Beta Requests",

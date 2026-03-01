@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Admin dashboard summary API** — `GET /api/admin/dashboard-summary` endpoint aggregating health status, unresolved safety events, 7-day cost, and business KPIs (MRR, trial conversion, churn) with 30s in-memory cache
+- **StatusBar component** — 3 pill-badges (System, Safety, Costs) with semaphore colors and smooth-scroll to sections
+- **ActionRequired section** — conditional alert card for pending invites, safety events, sentry errors, services down
+- **KPI grid extension** — MRR, Daily AI Cost, Trial→Pro conversion cards with DashboardSummary integration
+
+### Changed
+
+- **Admin dashboard layout** — redesigned as Command Center with status bar, action alerts, collapsible sections with anchor scroll
+
 ## [0.16.5] - 2026-02-28
 
 ### Added
