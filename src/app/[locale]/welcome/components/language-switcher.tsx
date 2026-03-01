@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
-import { useRouter } from "@/i18n/navigation";
-import { Globe } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
-import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
+import { Globe } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { locales, localeNames, localeFlags, type Locale } from '@/i18n/config';
+import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 /**
  * Language Switcher Component
@@ -22,40 +22,37 @@ import { useTranslations } from "next-intl";
  * - Mobile responsive
  */
 export function LanguageSwitcher() {
-  const t = useTranslations("welcome");
+  const t = useTranslations('welcome');
   const router = useRouter();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Extract current locale from pathname (e.g., /en/welcome -> en)
-  const currentLocale = pathname?.split("/")[1] as Locale | undefined;
+  const currentLocale = pathname?.split('/')[1] as Locale | undefined;
 
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen]);
 
@@ -70,7 +67,7 @@ export function LanguageSwitcher() {
     setIsOpen(false);
 
     // Redirect to new locale path
-    router.push("/welcome", { locale });
+    router.push('/welcome', { locale });
   };
 
   const toggleDropdown = () => {
@@ -83,45 +80,41 @@ export function LanguageSwitcher() {
       <button
         onClick={toggleDropdown}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
+          if (e.key === 'Enter') {
             e.preventDefault(); // Prevent default button activation (which also triggers onClick)
             toggleDropdown();
           }
         }}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded={isOpen}
-        aria-label={t("selectLanguage")}
+        aria-label={t('selectLanguage')}
         className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-lg",
-          "bg-white dark:bg-gray-800",
-          "border border-gray-200 dark:border-gray-700",
-          "hover:bg-gray-50 dark:hover:bg-gray-700",
-          "transition-colors duration-200",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-          "shadow-sm hover:shadow-md",
+          'flex items-center gap-2 px-4 py-2 rounded-lg',
+          'bg-white dark:bg-gray-800',
+          'border border-gray-200 dark:border-gray-700',
+          'hover:bg-gray-50 dark:hover:bg-gray-700',
+          'transition-colors duration-200',
+          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+          'shadow-sm hover:shadow-md',
         )}
       >
-        <Globe className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        <Globe className="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {currentLocale
             ? `${localeFlags[currentLocale]} ${localeNames[currentLocale]}`
-            : "Language"}
+            : 'Language'}
         </span>
         <svg
           className={cn(
-            "w-4 h-4 text-gray-500 transition-transform duration-200",
-            isOpen && "rotate-180",
+            'w-4 h-4 text-gray-500 transition-transform duration-200',
+            isOpen && 'rotate-180',
           )}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
@@ -135,13 +128,13 @@ export function LanguageSwitcher() {
             transition={{ duration: 0.15 }}
             role="menu"
             className={cn(
-              "absolute right-0 mt-2 w-56",
-              "bg-white dark:bg-gray-800",
-              "border border-gray-200 dark:border-gray-700",
-              "rounded-lg shadow-xl",
-              "py-2",
-              "z-50",
-              "max-h-[300px] overflow-y-auto",
+              'absolute right-0 mt-2 w-56',
+              'bg-white dark:bg-gray-800',
+              'border border-gray-200 dark:border-gray-700',
+              'rounded-lg shadow-xl',
+              'py-2',
+              'z-50',
+              'max-h-[300px] overflow-y-auto',
             )}
           >
             {locales.map((locale) => {
@@ -153,13 +146,12 @@ export function LanguageSwitcher() {
                   aria-current={isCurrent}
                   onClick={() => handleLanguageSelect(locale)}
                   className={cn(
-                    "w-full flex items-center gap-3 px-4 py-2.5",
-                    "text-left text-sm",
-                    "hover:bg-gray-100 dark:hover:bg-gray-700",
-                    "transition-colors duration-150",
-                    "focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700",
-                    isCurrent &&
-                      "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+                    'w-full flex items-center gap-3 px-4 py-2.5',
+                    'text-left text-sm',
+                    'hover:bg-gray-100 dark:hover:bg-gray-700',
+                    'transition-colors duration-150',
+                    'focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700',
+                    isCurrent && 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
                   )}
                 >
                   <span className="text-2xl" aria-hidden="true">
@@ -167,10 +159,10 @@ export function LanguageSwitcher() {
                   </span>
                   <span
                     className={cn(
-                      "flex-1 font-medium",
+                      'flex-1 font-medium',
                       isCurrent
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-700 dark:text-gray-300",
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : 'text-gray-700 dark:text-gray-300',
                     )}
                   >
                     {localeNames[locale]}

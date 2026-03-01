@@ -68,17 +68,17 @@ test.describe('Community submission flow', () => {
   });
 
   test('renders form and submits a contribution', async ({ page }) => {
-    await page.goto('/it/community', { waitUntil: 'domcontentloaded' });
+    await page.goto('/en/community', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('main')).toBeVisible();
     await expect(page.locator('#contribution-title')).toBeVisible();
     await expect(page.locator('#contribution-content')).toBeVisible();
     await expect(page.locator('#contribution-type')).toBeVisible();
 
-    await page.fill('#contribution-title', 'Suggerimento E2E community');
+    await page.fill('#contribution-title', 'E2E community suggestion');
     await page.fill(
       '#contribution-content',
-      'Contenuto di test per verificare il flusso di invio contributi.',
+      'Test content to verify the contribution submission flow.',
     );
     await page.selectOption('#contribution-type', 'tip');
 
@@ -89,7 +89,7 @@ test.describe('Community submission flow', () => {
 
   test('form is accessible and usable on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/it/community', { waitUntil: 'domcontentloaded' });
+    await page.goto('/en/community', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('#contribution-title')).toBeVisible();
     await expect(page.locator('#contribution-content')).toBeVisible();

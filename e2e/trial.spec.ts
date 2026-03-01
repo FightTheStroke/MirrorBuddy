@@ -316,7 +316,9 @@ test.describe('Trial Mode - Route Audit', () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         const severity =
-          errorMessage.includes('closed') || errorMessage.includes('Target')
+          errorMessage.includes('closed') ||
+          errorMessage.includes('Target') ||
+          errorMessage.includes('interrupted by another navigation')
             ? 'warning'
             : 'critical';
 

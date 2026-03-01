@@ -30,22 +30,22 @@ export function WelcomeFooter() {
 
   const complianceBadges: ComplianceBadge[] = [
     {
-      icon: <Shield className="w-4 h-4" />,
+      icon: <Shield className="w-4 h-4" aria-hidden="true" />,
       label: t('compliance.gdpr.label'),
       description: t('compliance.gdpr.description'),
     },
     {
-      icon: <Brain className="w-4 h-4" />,
+      icon: <Brain className="w-4 h-4" aria-hidden="true" />,
       label: t('compliance.aiAct.label'),
       description: t('compliance.aiAct.description'),
     },
     {
-      icon: <Lock className="w-4 h-4" />,
+      icon: <Lock className="w-4 h-4" aria-hidden="true" />,
       label: t('compliance.coppa.label'),
       description: t('compliance.coppa.description'),
     },
     {
-      icon: <AlertTriangle className="w-4 h-4" />,
+      icon: <AlertTriangle className="w-4 h-4" aria-hidden="true" />,
       label: t('compliance.italianLaw.label'),
       description: t('compliance.italianLaw.description'),
     },
@@ -72,7 +72,7 @@ export function WelcomeFooter() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* AI Disclaimer */}
         <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-700">
-          <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+          <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" aria-hidden="true" />
           <span className="text-sm text-blue-900 dark:text-blue-100">{t('aiDisclaimer')}</span>
         </div>
 
@@ -134,7 +134,7 @@ export function WelcomeFooter() {
 
         {/* Made in Europe - intentionally not localized */}
         <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-2">
-          {t("madeWith")} <span className="text-red-500">♥</span> {t("inEurope")}
+          {t('madeWith')} <span className="text-red-500">♥</span> {t('inEurope')}
         </p>
       </div>
     </motion.footer>
