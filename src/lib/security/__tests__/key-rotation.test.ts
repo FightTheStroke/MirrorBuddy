@@ -154,24 +154,24 @@ describe('Key Rotation Service', () => {
     it('should batch process records', async () => {
       const mockToken = await encryptTokenWithKey('token123', oldTokenKey);
 
-      vi.mocked(prisma.googleAccount.count).mockResolvedValue(250);
+      vi.mocked(prisma.googleAccount.count).mockResolvedValue(25);
       vi.mocked(prisma.googleAccount.findMany)
         .mockResolvedValueOnce(
-          Array(100).fill({
+          Array(10).fill({
             id: 'int1',
             accessToken: mockToken,
             refreshToken: null,
           }) as any,
         )
         .mockResolvedValueOnce(
-          Array(100).fill({
+          Array(10).fill({
             id: 'int2',
             accessToken: mockToken,
             refreshToken: null,
           }) as any,
         )
         .mockResolvedValueOnce(
-          Array(50).fill({
+          Array(5).fill({
             id: 'int3',
             accessToken: mockToken,
             refreshToken: null,
@@ -180,13 +180,13 @@ describe('Key Rotation Service', () => {
       vi.mocked(prisma.googleAccount.update).mockResolvedValue({} as any);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey, {
-        batchSize: 100,
+        batchSize: 10,
       });
 
-      expect(result.total).toBe(250);
-      expect(result.processed).toBe(250);
+      expect(result.total).toBe(25);
+      expect(result.processed).toBe(25);
       expect(prisma.googleAccount.findMany).toHaveBeenCalledTimes(3);
-    }, 30000); // 30 second timeout for crypto operations on 250 records (CI runners are slower)
+    });
   });
 
   describe('rotatePIIEncryptionKey', () => {
