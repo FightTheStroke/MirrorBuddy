@@ -115,7 +115,8 @@
       },
       "safetyEvents": "Safety Events",
       "healthMonitoring": "Health Monitoring",
-      "dailyAvgEur": "daily avg €"
+      "dailyAvgEur": "daily avg €",
+      "viewDetails": "View details"
     },
     "expandMenu": "Expand Menu",
     "pendingBetaRequests": "Pending Beta Requests",

@@ -115,7 +115,8 @@
       },
       "safetyEvents": "Événements de Sécurité",
       "healthMonitoring": "Surveillance Santé",
-      "dailyAvgEur": "moy. journalière €"
+      "dailyAvgEur": "moy. journalière €",
+      "viewDetails": "Voir les détails"
     },
     "expandMenu": "Expand Menu",
     "pendingBetaRequests": "Pending Beta Requests",

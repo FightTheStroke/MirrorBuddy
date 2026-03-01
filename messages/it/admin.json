@@ -119,7 +119,8 @@
       },
       "safetyEvents": "Eventi Sicurezza",
       "healthMonitoring": "Monitoraggio Salute",
-      "dailyAvgEur": "media giornaliera €"
+      "dailyAvgEur": "media giornaliera €",
+      "viewDetails": "Vedi dettagli"
     },
     "expandMenu": "Expand Menu",
     "pendingBetaRequests": "Pending Beta Requests",

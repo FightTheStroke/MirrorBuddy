@@ -13,9 +13,9 @@ import { FeatureFlagsPanel } from '@/components/admin/FeatureFlagsPanel';
 import { SLOMonitoringPanel } from '@/components/admin/SLOMonitoringPanel';
 import { SentryErrorsPanel } from '@/components/admin/SentryErrorsPanel';
 import { SentryQuotaCard } from '@/components/admin/SentryQuotaCard';
-import { CollapsibleSection } from '@/components/admin/dashboard/collapsible-section';
 import { FunnelSection } from '@/components/admin/dashboard/funnel-section';
 import { DashboardKpiGrid } from '@/components/admin/dashboard/dashboard-kpi-grid';
+import { DashboardPanel } from '@/components/admin/dashboard/dashboard-panel';
 import { StatusBar } from '@/components/admin/dashboard/status-bar';
 import { ActionRequiredSection } from '@/components/admin/dashboard/action-required-section';
 import { PurgeStagingButton } from '@/components/admin/purge-staging-button';
@@ -35,7 +35,6 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadData() {
       try {
         const res = await fetch('/api/admin/dashboard-summary');
@@ -53,27 +52,18 @@ export default function AdminDashboardPage() {
         // Non-blocking
       }
     }
-
     loadData();
     const interval = setInterval(loadData, POLL_INTERVAL);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
+    return () => { cancelled = true; clearInterval(interval); };
   }, []);
 
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    window.location.reload();
-  };
+  const handleRefresh = () => { setIsRefreshing(true); window.location.reload(); };
 
   if (status === 'idle' || status === 'connecting') {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-          <p className="text-sm text-slate-500">{t('loading')}</p>
-        </div>
+        <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+        <p className="ml-3 text-sm text-slate-500">{t('loading')}</p>
       </div>
     );
   }
@@ -82,17 +72,15 @@ export default function AdminDashboardPage() {
 
   return (
     <ErrorBoundary>
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-4">
         {status === 'reconnecting' && (
-          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-            <p className="text-sm text-amber-700 dark:text-amber-300">{t('reconnecting')}</p>
+          <div className="p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+            <p className="text-xs text-amber-700 dark:text-amber-300">{t('reconnecting')}</p>
           </div>
         )}
         {status === 'error' && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-700 dark:text-red-300">
-              {error || t('connectionFailed')}
-            </p>
+          <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-xs text-red-700 dark:text-red-300">{error || t('connectionFailed')}</p>
           </div>
         )}
 
@@ -106,14 +94,12 @@ export default function AdminDashboardPage() {
             <PurgeStagingButton />
             <Button variant="outline" size="sm" asChild>
               <a href="/api/admin/reports/summary" download>
-                <FileDown className="h-4 w-4 mr-1.5" />
-                {t('reportPdf')}
+                <FileDown className="h-4 w-4 mr-1.5" />{t('reportPdf')}
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a href={GRAFANA_URL} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-1.5" />
-                {t('grafana')}
+                <ExternalLink className="h-4 w-4 mr-1.5" />{t('grafana')}
               </a>
             </Button>
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
@@ -132,44 +118,37 @@ export default function AdminDashboardPage() {
 
         <DashboardKpiGrid counts={counts} sentryErrorCount={sentryErrorCount} summary={summary} />
 
-        <div className="space-y-3">
-          <CollapsibleSection
-            id="safety-section"
-            title={t('safetyEvents')}
-            defaultOpen={(summary?.safety.unresolvedCount ?? 0) > 0}
-          >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <DashboardPanel title={t('healthMonitoring')} detailHref="/admin/mission-control/health" span={2}>
+            <SLOMonitoringPanel />
+          </DashboardPanel>
+
+          <DashboardPanel title={t('costMonitoring')} detailHref="/admin/analytics" span={2}>
+            <CostPanel />
+          </DashboardPanel>
+
+          <DashboardPanel title={t('safetyEvents')} detailHref="/admin/safety">
             <p className="text-sm text-slate-500 dark:text-slate-400">
               {summary?.safety.unresolvedCount
                 ? `${summary.safety.unresolvedCount} ${t('actionRequired.safetyEvents')}`
                 : t('noDataAvailable')}
             </p>
-          </CollapsibleSection>
-          <CollapsibleSection
-            id="cost-section"
-            title={t('costMonitoring')}
-            defaultOpen={(dailyCostAvg ?? 0) > 5}
-          >
-            <CostPanel />
-          </CollapsibleSection>
-          <CollapsibleSection
-            id="health-section"
-            title={t('healthMonitoring')}
-            defaultOpen={summary?.health.overallStatus !== 'healthy'}
-          >
-            <SLOMonitoringPanel />
-          </CollapsibleSection>
-          <CollapsibleSection title={t('conversionFunnel')} defaultOpen>
+          </DashboardPanel>
+
+          <DashboardPanel title={t('conversionFunnel')} detailHref="/admin/tiers/conversion-funnel">
             <FunnelSection />
-          </CollapsibleSection>
-          <CollapsibleSection title={t('featureFlags')}>
+          </DashboardPanel>
+
+          <DashboardPanel title={t('featureFlags')} detailHref="/admin/settings">
             <FeatureFlagsPanel />
-          </CollapsibleSection>
-          <CollapsibleSection title={t('sentryErrorsPanel')} defaultOpen>
+          </DashboardPanel>
+
+          <DashboardPanel title={t('sentryErrorsPanel')} detailHref="https://fightthestroke.sentry.io/issues/">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
               <SentryQuotaCard />
             </div>
             <SentryErrorsPanel />
-          </CollapsibleSection>
+          </DashboardPanel>
         </div>
       </div>
     </ErrorBoundary>
