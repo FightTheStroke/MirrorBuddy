@@ -63,6 +63,11 @@ export async function azureChatCompletion(
     });
   }
 
+  // Azure OpenAI automatic prompt caching:
+  // System prompt is sent as first message — Azure caches prefix automatically
+  // when it's ≥1024 tokens and stable between requests. Our hybrid approach
+  // (static mini-KB + identity) ensures a stable prefix. Dynamic context
+  // (memory, RAG, tools) is appended after the stable prefix.
   const allMessages = systemPrompt
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;

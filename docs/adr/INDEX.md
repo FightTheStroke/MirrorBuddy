@@ -5,15 +5,16 @@
 
 ## Core Architecture
 
-| #    | Decision                                            | Impact                                           |
-| ---- | --------------------------------------------------- | ------------------------------------------------ |
-| 0003 | Triangle of Support Architecture                    | Maestri/Coaches/Buddies character system         |
-| 0010 | Separate Conversations Per Character                | Each character has own chat history              |
-| 0015 | Database-First Architecture (No localStorage)       | Zustand + REST, never localStorage for user data |
-| 0016 | Component Modularization & Infrastructure Hardening | Modular components, cleaner boundaries           |
-| 0028 | PostgreSQL with pgvector Migration                  | Vector search for RAG, production-grade DB       |
-| 0045 | Domain Boundaries and Module Organization           | Clear separation of concerns                     |
-| 0117 | Technical Debt Cleanup (Plan 112)                   | Systematic debt reduction strategy               |
+| #    | Decision                                            | Impact                                                  |
+| ---- | --------------------------------------------------- | ------------------------------------------------------- |
+| 0003 | Triangle of Support Architecture                    | Maestri/Coaches/Buddies character system                |
+| 0010 | Separate Conversations Per Character                | Each character has own chat history                     |
+| 0015 | Database-First Architecture (No localStorage)       | Zustand + REST, never localStorage for user data        |
+| 0016 | Component Modularization & Infrastructure Hardening | Modular components, cleaner boundaries                  |
+| 0028 | PostgreSQL with pgvector Migration                  | Vector search for RAG, production-grade DB              |
+| 0045 | Domain Boundaries and Module Organization           | Clear separation of concerns                            |
+| 0117 | Technical Debt Cleanup (Plan 112)                   | Systematic debt reduction strategy                      |
+| 0162 | Prompt Optimization — Hybrid Mini-KB + RAG          | ~42% token reduction via mini-KB + RAG + sliding window |
 
 ## UI & Layout
 
