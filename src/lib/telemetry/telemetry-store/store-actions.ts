@@ -3,16 +3,12 @@
 // Business logic extracted from store methods
 // ============================================================================
 
-import { nanoid } from "nanoid";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import type {
-  TelemetryEvent,
-  TelemetryConfig,
-  TelemetryCategory,
-} from "../types";
-import type { TelemetryState } from "./types";
-import { isSameDay } from "./utils";
+import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth';
+import type { TelemetryEvent, TelemetryConfig, TelemetryCategory } from '../types';
+import type { TelemetryState } from './types';
+import { isSameDay } from './utils';
 
 /**
  * Handle track event logic - validates, updates queue and local stats
@@ -24,7 +20,7 @@ export function handleTrackEvent(
   label: string | undefined,
   value: number | undefined,
   metadata: Record<string, string | number | boolean> | undefined,
-): { eventQueue: TelemetryEvent[]; localStats: TelemetryState["localStats"] } {
+): { eventQueue: TelemetryEvent[]; localStats: TelemetryState['localStats'] } {
   // Check if telemetry is enabled
   if (!state.config.enabled) {
     return { eventQueue: state.eventQueue, localStats: state.localStats };
@@ -72,13 +68,13 @@ export function handleTrackEvent(
   localStats.lastActivityAt = today;
 
   // Track specific actions
-  if (category === "navigation" && action === "page_view") {
+  if (category === 'navigation' && action === 'page_view') {
     localStats.todayPageViews++;
   }
-  if (category === "conversation" && action === "question_asked") {
+  if (category === 'conversation' && action === 'question_asked') {
     localStats.todayQuestions++;
   }
-  if (category === "conversation" && action === "session_ended" && value) {
+  if (category === 'conversation' && action === 'session_ended' && value) {
     localStats.todayStudyMinutes += Math.round(value / 60);
   }
 
@@ -90,7 +86,7 @@ export function handleTrackEvent(
  */
 export function handleStartSession(state: TelemetryState): {
   sessionStartedAt: Date;
-  localStats: TelemetryState["localStats"];
+  localStats: TelemetryState['localStats'];
 } {
   const today = new Date();
   let localStats = { ...state.localStats };
@@ -136,26 +132,23 @@ export async function handleFlushEvents(
   const eventsToSend = [...eventQueue];
 
   try {
-    await csrfFetch("/api/telemetry/events", {
-      method: "POST",
+    await csrfFetch('/api/telemetry/events', {
+      method: 'POST',
       body: JSON.stringify({ events: eventsToSend }),
     });
   } catch (error) {
-    logger.warn("Telemetry flush failed (non-critical)", { error });
-    throw error;
+    logger.debug('Telemetry flush failed (non-critical)', { error });
   }
 }
 
 /**
  * Handle fetch usage stats from server
  */
-export async function handleFetchUsageStats(): Promise<
-  TelemetryState["usageStats"]
-> {
+export async function handleFetchUsageStats(): Promise<TelemetryState['usageStats']> {
   try {
-    const response = await fetch("/api/telemetry/stats", {
-      credentials: "same-origin",
-      mode: "same-origin",
+    const response = await fetch('/api/telemetry/stats', {
+      credentials: 'same-origin',
+      mode: 'same-origin',
     });
 
     if (response.ok) {
@@ -166,7 +159,7 @@ export async function handleFetchUsageStats(): Promise<
       };
     }
   } catch (error) {
-    logger.error("Failed to fetch usage stats", undefined, error);
+    logger.error('Failed to fetch usage stats', undefined, error);
   }
   return null;
 }

@@ -45,7 +45,7 @@ export function useTokenCache() {
 
         if (!response.ok) {
           const errorBody = await response.text().catch(() => '');
-          logger.warn('[TokenCache] Failed to pre-fetch token', {
+          logger.debug('[TokenCache] Pre-fetch token unavailable (non-critical)', {
             status: response.status,
             details: errorBody.slice(0, 200),
           });
@@ -82,7 +82,7 @@ export function useTokenCache() {
 
         return cached;
       } catch (error) {
-        logger.warn('[TokenCache] Token pre-fetch failed', {
+        logger.debug('[TokenCache] Token pre-fetch unavailable (non-critical)', {
           error: error instanceof Error ? error.message : String(error),
         });
         return null;

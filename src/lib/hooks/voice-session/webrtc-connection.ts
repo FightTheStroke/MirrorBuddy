@@ -133,8 +133,11 @@ export class WebRTCConnection {
       const connectionTime = Date.now() - startTime;
       logVoiceError('WebRTCConnectionFailed', message, { connectionTime });
       logger.error('[WebRTC] Connection failed', { errorDetails: message });
-      this.config.onError?.(new Error(message));
-      throw error;
+      // Propagate a marked error to prevent duplicate Sentry events in upstream handlers
+      const wrappedError = new Error(message);
+      (wrappedError as Error & { _voiceRootCause: boolean })._voiceRootCause = true;
+      this.config.onError?.(wrappedError);
+      throw wrappedError;
     }
   }
 
@@ -149,6 +152,10 @@ export class WebRTCConnection {
       const response = await fetch('/api/realtime/token', { signal: controller.signal });
       clearTimeout(timeout);
       if (!response.ok) {
+        if (response.status === 429) {
+          logVoiceError('ConfigFetchRateLimited', 'Rate limited by server');
+          throw new Error('Troppi tentativi di connessione. Attendi qualche secondo e riprova.');
+        }
         logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
         throw new Error('Failed to get server config');
       }

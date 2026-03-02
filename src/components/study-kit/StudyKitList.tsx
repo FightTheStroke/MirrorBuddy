@@ -47,7 +47,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       setStudyKits(data.studyKits);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
-      logger.error('Failed to load study kits', { error: String(err) });
+      logger.warn('Failed to load study kits', { error: String(err) });
     } finally {
       setIsLoading(false);
     }

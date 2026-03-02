@@ -163,12 +163,17 @@ async function connectWebRTC(
         setConnectionState('connected');
         setConnected(true);
         options.onStateChange?.('connected');
-      } else if (state === 'failed' || state === 'disconnected') {
-        setConnectionState('error');
-        options.onStateChange?.('error');
       }
+      // 'failed'/'disconnected' are handled by onError to avoid duplicate Sentry events
     },
     onError: (error) => {
+      // Skip duplicate Sentry logging if root cause was already reported by WebRTCConnection
+      if ((error as Error & { _voiceRootCause?: boolean })._voiceRootCause) {
+        setConnectionState('error');
+        options.onStateChange?.('error');
+        options.onError?.(error);
+        return;
+      }
       logger.error('[VoiceSession] WebRTC error', { error: error.message });
       setConnectionState('error');
       options.onStateChange?.('error');
