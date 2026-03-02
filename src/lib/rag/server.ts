@@ -9,7 +9,7 @@
  */
 
 // Re-export all client-safe symbols
-export * from "./index";
+export * from './index';
 
 // Server-only exports - vector store (uses @/lib/db)
 export {
@@ -21,7 +21,7 @@ export {
   type VectorSearchResult,
   type SearchOptions,
   type DeleteOptions,
-} from "./vector-store";
+} from './vector-store';
 
 // Server-only exports - pgvector utils (uses Prisma client types + DB)
 export {
@@ -36,7 +36,7 @@ export {
   type NativeSearchResult,
   type PrismaQueryClient,
   type PrismaExecuteClient,
-} from "./pgvector-utils";
+} from './pgvector-utils';
 
 // Server-only exports - retrieval service (uses vector-store which has DB deps)
 export {
@@ -48,7 +48,7 @@ export {
   type FindRelatedOptions,
   type IndexMaterialInput,
   type IndexResult,
-} from "./retrieval-service";
+} from './retrieval-service';
 
 // Server-only exports - hybrid retrieval (uses @/lib/db)
 export {
@@ -56,7 +56,7 @@ export {
   textSimilarity,
   type HybridRetrievalResult,
   type HybridSearchOptions,
-} from "./hybrid-retrieval";
+} from './hybrid-retrieval';
 
 // Server-only exports - privacy-aware embedding (uses @/lib/privacy)
 export {
@@ -66,4 +66,11 @@ export {
   anonymizeConversationForRAG,
   type PrivacyAwareEmbeddingResult,
   type PrivacyEmbeddingOptions,
-} from "./privacy-aware-embedding";
+} from './privacy-aware-embedding';
+
+// Server-only exports - maestro knowledge retriever (uses vector-store)
+export {
+  retrieveMaestroKnowledge,
+  retrieveMaestroKnowledgeRaw,
+  type MaestroKnowledgeResult,
+} from './maestro-knowledge-retriever';
