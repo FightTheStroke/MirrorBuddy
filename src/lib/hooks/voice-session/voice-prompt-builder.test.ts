@@ -173,4 +173,54 @@ describe('buildVoicePrompt', () => {
       expect(resultDefault).toBe(resultExplicitFalse);
     });
   });
+
+  describe('non-regression: mini-KB token reduction', () => {
+    it('should produce shorter prompt than old full-KB approach', () => {
+      // Simulate old approach: large KNOWLEDGE BASE section
+      const oldPrompt = `You are a test maestro.
+
+## KNOWLEDGE BASE
+${'x'.repeat(5000)}
+
+## Core Identity
+Test identity.`;
+
+      // Simulate new approach: small IDENTITÀ E STILE section
+      const newPrompt = `You are a test maestro.
+
+## IDENTITÀ E STILE
+Brief identity: 50 lines of bio, style, quotes.
+
+## Core Identity
+Test identity.`;
+
+      const oldResult = buildVoicePrompt(makeMaestro({ systemPrompt: oldPrompt }));
+      const newResult = buildVoicePrompt(makeMaestro({ systemPrompt: newPrompt }));
+
+      // New prompt should be significantly shorter
+      expect(newResult.length).toBeLessThan(oldResult.length);
+    });
+
+    it('voice prompt preserves identity with mini-KB', () => {
+      const prompt = `You are Feynman.
+
+## CHARACTER INTENSITY DIAL
+Full energy mode.
+
+## IDENTITÀ E STILE
+Richard Feynman (1918-1988), physicist.
+Famous quote: "What I cannot create, I do not understand."
+
+## Core Identity
+Enthusiastic, curious, playful.`;
+
+      const result = buildVoicePrompt(makeMaestro({ systemPrompt: prompt }));
+
+      // Identity preserved
+      expect(result).toContain('Feynman');
+      expect(result).toContain('IDENTITÀ E STILE');
+      expect(result).toContain('Core Identity');
+      expect(result).toContain('CHARACTER INTENSITY DIAL');
+    });
+  });
 });
