@@ -72,6 +72,11 @@ import { recordStageTransition } from '@/lib/funnel';
 import { getVisitorIdFromCookie } from '@/lib/trial/visitor-id';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { injectABMetadata } from '@/lib/ab-testing/session-injector';
+import {
+  compressConversationHistory,
+  type ConversationMessage,
+} from '@/lib/conversation/conversation-window';
+import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
 
 /**
  * Look up a character's allowed tools array by maestroId.
@@ -451,7 +456,19 @@ export const POST = pipe(
         ? filterToolDefinitions(CHAT_TOOL_DEFINITIONS, characterTools)
         : undefined;
 
-      const result = await chatCompletion(messages, enhancedSystemPrompt, {
+      // Sliding window compression (tier-aware token limits)
+      const userTier = userId
+        ? await tierService
+            .getEffectiveTier(userId)
+            .then((t) => t.code)
+            .catch(() => 'base')
+        : 'trial';
+      const tierLimits = getTierMemoryLimits(userTier as 'trial' | 'base' | 'pro');
+      const compressedMessages = compressConversationHistory(messages as ConversationMessage[], {
+        maxTokens: tierLimits.conversationWindowTokens,
+      });
+
+      const result = await chatCompletion(compressedMessages, enhancedSystemPrompt, {
         tools: filteredTools as (typeof CHAT_TOOL_DEFINITIONS)[number][] | undefined,
         tool_choice: toolChoice,
         providerPreference,

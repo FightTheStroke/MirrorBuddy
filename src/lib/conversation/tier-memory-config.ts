@@ -11,7 +11,7 @@
  * ADR: 0021-conversational-memory-injection.md
  */
 
-import type { TierName } from "@/types/tier-types";
+import type { TierName } from '@/types/tier-types';
 
 /**
  * Configuration for conversation memory limits per tier
@@ -34,6 +34,9 @@ export interface TierMemoryLimits {
 
   /** Whether memory can be shared across different maestri (cross-maestro memory) */
   crossMaestroEnabled: boolean;
+
+  /** Maximum token window for conversation history (sliding window) */
+  conversationWindowTokens: number;
 }
 
 /**
@@ -51,6 +54,7 @@ export const TIER_MEMORY_CONFIG: Record<TierName, TierMemoryLimits> = {
     maxTopics: 0,
     semanticEnabled: false,
     crossMaestroEnabled: false,
+    conversationWindowTokens: 4000,
   },
 
   base: {
@@ -60,6 +64,7 @@ export const TIER_MEMORY_CONFIG: Record<TierName, TierMemoryLimits> = {
     maxTopics: 15,
     semanticEnabled: false,
     crossMaestroEnabled: false,
+    conversationWindowTokens: 8000,
   },
 
   pro: {
@@ -69,6 +74,7 @@ export const TIER_MEMORY_CONFIG: Record<TierName, TierMemoryLimits> = {
     maxTopics: 30,
     semanticEnabled: true,
     crossMaestroEnabled: true,
+    conversationWindowTokens: 16000,
   },
 };
 
