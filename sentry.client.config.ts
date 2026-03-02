@@ -11,6 +11,8 @@ type SentryEvent = {
     arguments?: unknown[];
   };
   tags?: Record<string, string>;
+  fingerprint?: string[];
+  message?: string;
 };
 
 function isStructuredLoggerConsoleEvent(event: SentryEvent): boolean {
@@ -119,8 +121,26 @@ if (dsn) {
         return null;
       }
 
-      // Capture hydration errors with special tag
       const error = hint.originalException;
+      const errorMessage = error instanceof Error ? error.message : String(error || '');
+      const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+      const isIOSSafari = /iPad|iPhone|iPod/i.test(ua) && /Safari/i.test(ua) && !/Chrome/i.test(ua);
+
+      // Filter known iOS Safari transient errors (not app bugs)
+      if (isIOSSafari) {
+        if (errorMessage.includes('Load failed') && errorMessage.includes('TypeError')) return null;
+        if (errorMessage.includes('sw.js load failed')) return null;
+      }
+
+      // Fingerprint voice errors to group cascading events
+      if (
+        errorMessage.match(/\[VoiceSession\]|\[WebRTC\]|Voice call error|WebRTCConnectionFailed/)
+      ) {
+        (event as SentryEvent).fingerprint = ['voice-connection-error'];
+        event.tags = { ...event.tags, errorType: 'voice' };
+      }
+
+      // Capture hydration errors with special tag
       if (error && error instanceof Error) {
         if (error.message.includes('Hydration') || error.message.includes('hydrat')) {
           event.tags = {

@@ -232,7 +232,8 @@ export function logSDPExchange(direction: 'offer' | 'answer', sdpLength: number)
 }
 
 /**
- * Log voice connection error with full context
+ * Log voice connection error with full context.
+ * Returns the error string for Sentry deduplication.
  */
 export function logVoiceError(
   errorName: string,

@@ -33,7 +33,7 @@ export const MIN_MESSAGES_FOR_SUMMARY = 2;
 export async function createConversationInDB(
   characterId: string,
   characterType: CharacterType,
-  characterName: string
+  characterName: string,
 ): Promise<string | null> {
   try {
     const response = await csrfFetch('/api/conversations', {
@@ -62,7 +62,7 @@ export async function createConversationInDB(
 export async function saveMessageToDB(
   conversationId: string,
   role: string,
-  content: string
+  content: string,
 ): Promise<void> {
   try {
     const response = await csrfFetch(`/api/conversations/${conversationId}/messages`, {
@@ -108,7 +108,7 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
     return data;
   } catch (error) {
     // Network error or JSON parse error
-    logger.warn('Error loading conversation summaries', { error: String(error) });
+    logger.debug('Error loading conversation summaries (non-critical)', { error: String(error) });
     return [];
   }
 }
@@ -122,7 +122,7 @@ export async function updateConversationSummary(
   conversationId: string,
   summary: string,
   keyFacts: string[],
-  topics: string[]
+  topics: string[],
 ): Promise<void> {
   try {
     await csrfFetch(`/api/conversations/${conversationId}`, {
