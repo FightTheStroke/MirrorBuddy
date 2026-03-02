@@ -3,33 +3,27 @@
  * @module conversation/prompt-enhancer
  */
 
-import { describe, it, expect, vi } from "vitest";
-import {
-  enhanceSystemPrompt,
-  hasMemoryContext,
-  extractBasePrompt,
-} from "../prompt-enhancer";
-import type { ConversationMemory } from "../memory-loader";
-import type { TierMemoryLimits } from "../tier-memory-config";
+import { describe, it, expect, vi } from 'vitest';
+import { enhanceSystemPrompt, hasMemoryContext, extractBasePrompt } from '../prompt-enhancer';
+import type { ConversationMemory } from '../memory-loader';
+import type { TierMemoryLimits } from '../tier-memory-config';
 // CrossMaestroLearning type used internally by promptCrossMaestroSection
 
 // Mock the safety guardrails
-vi.mock("@/lib/safety", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/safety")>();
+vi.mock('@/lib/safety', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/safety')>();
   return {
     ...actual,
-    injectSafetyGuardrails: vi.fn(
-      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
-    ),
+    injectSafetyGuardrails: vi.fn((prompt: string, _options: unknown) => `[SAFE] ${prompt}`),
   };
 });
 
-describe("prompt-enhancer", () => {
-  const basePrompt = "Sei Melissa, una professoressa di matematica.";
-  const safetyOptions = { role: "maestro" as const };
+describe('prompt-enhancer', () => {
+  const basePrompt = 'Sei Melissa, una professoressa di matematica.';
+  const safetyOptions = { role: 'maestro' as const };
 
-  describe("enhanceSystemPrompt", () => {
-    it("returns safe prompt when no memory", () => {
+  describe('enhanceSystemPrompt', () => {
+    it('returns safe prompt when no memory', () => {
       const emptyMemory: ConversationMemory = {
         recentSummary: null,
         keyFacts: [],
@@ -43,17 +37,15 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toBe(
-        "[SAFE] Sei Melissa, una professoressa di matematica.",
-      );
+      expect(result).toBe('[SAFE] Sei Melissa, una professoressa di matematica.');
     });
 
-    it("appends memory section when summary exists", () => {
+    it('appends memory section when summary exists', () => {
       const memory: ConversationMemory = {
-        recentSummary: "Lo studente ha imparato le frazioni",
+        recentSummary: 'Lo studente ha imparato le frazioni',
         keyFacts: [],
         topics: [],
-        lastSessionDate: new Date("2026-01-01"),
+        lastSessionDate: new Date('2026-01-01'),
       };
 
       const result = enhanceSystemPrompt({
@@ -62,17 +54,14 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toContain("Memoria delle Sessioni Precedenti");
-      expect(result).toContain("Lo studente ha imparato le frazioni");
+      expect(result).toContain('Memoria delle Sessioni Precedenti');
+      expect(result).toContain('Lo studente ha imparato le frazioni');
     });
 
-    it("includes key facts in memory section", () => {
+    it('includes key facts in memory section', () => {
       const memory: ConversationMemory = {
         recentSummary: null,
-        keyFacts: [
-          "preferisce esempi visivi",
-          "ha difficoltà con le divisioni",
-        ],
+        keyFacts: ['preferisce esempi visivi', 'ha difficoltà con le divisioni'],
         topics: [],
         lastSessionDate: null,
       };
@@ -83,16 +72,16 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toContain("Fatti Chiave dello Studente");
-      expect(result).toContain("- preferisce esempi visivi");
-      expect(result).toContain("- ha difficoltà con le divisioni");
+      expect(result).toContain('Fatti Chiave dello Studente');
+      expect(result).toContain('- preferisce esempi visivi');
+      expect(result).toContain('- ha difficoltà con le divisioni');
     });
 
-    it("includes topics in memory section", () => {
+    it('includes topics in memory section', () => {
       const memory: ConversationMemory = {
         recentSummary: null,
-        keyFacts: ["fatto1"],
-        topics: ["matematica", "frazioni", "divisioni"],
+        keyFacts: ['fatto1'],
+        topics: ['matematica', 'frazioni', 'divisioni'],
         lastSessionDate: null,
       };
 
@@ -102,16 +91,16 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toContain("Argomenti Già Trattati");
-      expect(result).toContain("matematica, frazioni, divisioni");
+      expect(result).toContain('Argomenti Già Trattati');
+      expect(result).toContain('matematica, frazioni, divisioni');
     });
 
-    it("includes relative date for last session", () => {
+    it('includes relative date for last session', () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
       const memory: ConversationMemory = {
-        recentSummary: "Sessione precedente",
+        recentSummary: 'Sessione precedente',
         keyFacts: [],
         topics: [],
         lastSessionDate: yesterday,
@@ -123,12 +112,12 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toContain("Ultimo Incontro (ieri)");
+      expect(result).toContain('Ultimo Incontro (ieri)');
     });
 
-    it("applies safety guardrails first", () => {
+    it('applies safety guardrails first', () => {
       const memory: ConversationMemory = {
-        recentSummary: "Summary",
+        recentSummary: 'Summary',
         keyFacts: [],
         topics: [],
         lastSessionDate: new Date(),
@@ -143,9 +132,9 @@ describe("prompt-enhancer", () => {
       expect(result).toMatch(/^\[SAFE\]/);
     });
 
-    it("includes usage instructions", () => {
+    it('includes usage instructions', () => {
       const memory: ConversationMemory = {
-        recentSummary: "Summary",
+        recentSummary: 'Summary',
         keyFacts: [],
         topics: [],
         lastSessionDate: new Date(),
@@ -157,44 +146,42 @@ describe("prompt-enhancer", () => {
         safetyOptions,
       });
 
-      expect(result).toContain("ISTRUZIONI MEMORIA");
+      expect(result).toContain('ISTRUZIONI MEMORIA');
       expect(result).toContain("personalizzare l'interazione");
     });
   });
 
-  describe("hasMemoryContext", () => {
-    it("returns true when memory section present", () => {
-      const prompt = "Base prompt\n\n## Memoria delle Sessioni Precedenti\n...";
+  describe('hasMemoryContext', () => {
+    it('returns true when memory section present', () => {
+      const prompt = 'Base prompt\n\n## Memoria delle Sessioni Precedenti\n...';
       expect(hasMemoryContext(prompt)).toBe(true);
     });
 
-    it("returns false when memory section absent", () => {
-      const prompt = "Base prompt without memory";
+    it('returns false when memory section absent', () => {
+      const prompt = 'Base prompt without memory';
       expect(hasMemoryContext(prompt)).toBe(false);
     });
   });
 
-  describe("extractBasePrompt", () => {
-    it("returns full prompt when no memory section", () => {
-      const prompt = "This is the full prompt without memory";
+  describe('extractBasePrompt', () => {
+    it('returns full prompt when no memory section', () => {
+      const prompt = 'This is the full prompt without memory';
       expect(extractBasePrompt(prompt)).toBe(prompt);
     });
 
-    it("returns base prompt without memory section", () => {
-      const prompt =
-        "Base prompt\n\n## Memoria delle Sessioni Precedenti\nMemory content";
-      expect(extractBasePrompt(prompt)).toBe("Base prompt");
+    it('returns base prompt without memory section', () => {
+      const prompt = 'Base prompt\n\n## Memoria delle Sessioni Precedenti\nMemory content';
+      expect(extractBasePrompt(prompt)).toBe('Base prompt');
     });
 
-    it("trims whitespace from extracted prompt", () => {
-      const prompt =
-        "Base prompt   \n\n## Memoria delle Sessioni Precedenti\n...";
-      expect(extractBasePrompt(prompt)).toBe("Base prompt");
+    it('trims whitespace from extracted prompt', () => {
+      const prompt = 'Base prompt   \n\n## Memoria delle Sessioni Precedenti\n...';
+      expect(extractBasePrompt(prompt)).toBe('Base prompt');
     });
   });
 
-  describe("cross-maestro context injection", () => {
-    it("injects cross-maestro learnings for Pro tier", () => {
+  describe('cross-maestro context injection', () => {
+    it('injects cross-maestro learnings for Pro tier', () => {
       const proLimits: TierMemoryLimits = {
         recentConversations: 5,
         timeWindowDays: null,
@@ -202,6 +189,7 @@ describe("prompt-enhancer", () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       const memory: ConversationMemory = {
@@ -213,18 +201,18 @@ describe("prompt-enhancer", () => {
 
       const crossMaestroLearnings = [
         {
-          maestroId: "galileo-fisica",
-          maestroName: "Galileo",
-          subject: "physics",
-          learnings: ["gravitazione", "leggi del moto"],
-          date: new Date("2026-01-20"),
+          maestroId: 'galileo-fisica',
+          maestroName: 'Galileo',
+          subject: 'physics',
+          learnings: ['gravitazione', 'leggi del moto'],
+          date: new Date('2026-01-20'),
         },
         {
-          maestroId: "curie-chimica",
-          maestroName: "Marie Curie",
-          subject: "chemistry",
-          learnings: ["radioattività"],
-          date: new Date("2026-01-15"),
+          maestroId: 'curie-chimica',
+          maestroName: 'Marie Curie',
+          subject: 'chemistry',
+          learnings: ['radioattività'],
+          date: new Date('2026-01-15'),
         },
       ];
 
@@ -236,15 +224,15 @@ describe("prompt-enhancer", () => {
         crossMaestroLearnings,
       });
 
-      expect(result).toContain("## Conoscenze Interdisciplinari");
-      expect(result).toContain("Galileo (physics)");
-      expect(result).toContain("gravitazione");
-      expect(result).toContain("leggi del moto");
-      expect(result).toContain("Marie Curie (chemistry)");
-      expect(result).toContain("radioattività");
+      expect(result).toContain('## Conoscenze Interdisciplinari');
+      expect(result).toContain('Galileo (physics)');
+      expect(result).toContain('gravitazione');
+      expect(result).toContain('leggi del moto');
+      expect(result).toContain('Marie Curie (chemistry)');
+      expect(result).toContain('radioattività');
     });
 
-    it("skips cross-maestro section for non-Pro tiers", () => {
+    it('skips cross-maestro section for non-Pro tiers', () => {
       const baseLimits: TierMemoryLimits = {
         recentConversations: 3,
         timeWindowDays: 15,
@@ -252,6 +240,7 @@ describe("prompt-enhancer", () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       };
 
       const memory: ConversationMemory = {
@@ -263,10 +252,10 @@ describe("prompt-enhancer", () => {
 
       const crossMaestroLearnings = [
         {
-          maestroId: "galileo-fisica",
-          maestroName: "Galileo",
-          subject: "physics",
-          learnings: ["gravitazione"],
+          maestroId: 'galileo-fisica',
+          maestroName: 'Galileo',
+          subject: 'physics',
+          learnings: ['gravitazione'],
           date: new Date(),
         },
       ];
@@ -279,12 +268,12 @@ describe("prompt-enhancer", () => {
         crossMaestroLearnings,
       });
 
-      expect(result).not.toContain("## Conoscenze Interdisciplinari");
-      expect(result).not.toContain("Galileo");
-      expect(result).not.toContain("gravitazione");
+      expect(result).not.toContain('## Conoscenze Interdisciplinari');
+      expect(result).not.toContain('Galileo');
+      expect(result).not.toContain('gravitazione');
     });
 
-    it("skips cross-maestro section when no learnings provided", () => {
+    it('skips cross-maestro section when no learnings provided', () => {
       const proLimits: TierMemoryLimits = {
         recentConversations: 5,
         timeWindowDays: null,
@@ -292,6 +281,7 @@ describe("prompt-enhancer", () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       const memory: ConversationMemory = {
@@ -309,10 +299,10 @@ describe("prompt-enhancer", () => {
         crossMaestroLearnings: undefined,
       });
 
-      expect(result).not.toContain("## Conoscenze Interdisciplinari");
+      expect(result).not.toContain('## Conoscenze Interdisciplinari');
     });
 
-    it("skips cross-maestro section when empty array provided", () => {
+    it('skips cross-maestro section when empty array provided', () => {
       const proLimits: TierMemoryLimits = {
         recentConversations: 5,
         timeWindowDays: null,
@@ -320,6 +310,7 @@ describe("prompt-enhancer", () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       const memory: ConversationMemory = {
@@ -337,10 +328,10 @@ describe("prompt-enhancer", () => {
         crossMaestroLearnings: [],
       });
 
-      expect(result).not.toContain("## Conoscenze Interdisciplinari");
+      expect(result).not.toContain('## Conoscenze Interdisciplinari');
     });
 
-    it("formats multiple learnings per maestro correctly", () => {
+    it('formats multiple learnings per maestro correctly', () => {
       const proLimits: TierMemoryLimits = {
         recentConversations: 5,
         timeWindowDays: null,
@@ -348,6 +339,7 @@ describe("prompt-enhancer", () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       const memory: ConversationMemory = {
@@ -359,10 +351,10 @@ describe("prompt-enhancer", () => {
 
       const crossMaestroLearnings = [
         {
-          maestroId: "euclide-matematica",
-          maestroName: "Euclide",
-          subject: "mathematics",
-          learnings: ["teorema di Pitagora", "geometria euclidea", "assiomi"],
+          maestroId: 'euclide-matematica',
+          maestroName: 'Euclide',
+          subject: 'mathematics',
+          learnings: ['teorema di Pitagora', 'geometria euclidea', 'assiomi'],
           date: new Date(),
         },
       ];
@@ -375,14 +367,14 @@ describe("prompt-enhancer", () => {
         crossMaestroLearnings,
       });
 
-      expect(result).toContain("teorema di Pitagora");
-      expect(result).toContain("geometria euclidea");
-      expect(result).toContain("assiomi");
+      expect(result).toContain('teorema di Pitagora');
+      expect(result).toContain('geometria euclidea');
+      expect(result).toContain('assiomi');
     });
   });
 
-  describe("tier-aware memory injection", () => {
-    it("skips memory injection for Trial tier (0 limits)", () => {
+  describe('tier-aware memory injection', () => {
+    it('skips memory injection for Trial tier (0 limits)', () => {
       const trialLimits: TierMemoryLimits = {
         recentConversations: 0,
         timeWindowDays: 0,
@@ -390,12 +382,13 @@ describe("prompt-enhancer", () => {
         maxTopics: 0,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       };
 
       const memory: ConversationMemory = {
-        recentSummary: "Important summary",
-        keyFacts: ["fact1", "fact2"],
-        topics: ["math", "algebra"],
+        recentSummary: 'Important summary',
+        keyFacts: ['fact1', 'fact2'],
+        topics: ['math', 'algebra'],
         lastSessionDate: new Date(),
       };
 
@@ -407,13 +400,11 @@ describe("prompt-enhancer", () => {
       });
 
       // Trial tier should not include memory section even if memory exists
-      expect(result).toBe(
-        "[SAFE] Sei Melissa, una professoressa di matematica.",
-      );
-      expect(result).not.toContain("Memoria delle Sessioni Precedenti");
+      expect(result).toBe('[SAFE] Sei Melissa, una professoressa di matematica.');
+      expect(result).not.toContain('Memoria delle Sessioni Precedenti');
     });
 
-    it("respects maxKeyFacts limit from tier", () => {
+    it('respects maxKeyFacts limit from tier', () => {
       const baseLimits: TierMemoryLimits = {
         recentConversations: 3,
         timeWindowDays: 15,
@@ -421,11 +412,12 @@ describe("prompt-enhancer", () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       };
 
       const memory: ConversationMemory = {
         recentSummary: null,
-        keyFacts: ["fact1", "fact2", "fact3", "fact4", "fact5"], // 5 facts provided
+        keyFacts: ['fact1', 'fact2', 'fact3', 'fact4', 'fact5'], // 5 facts provided
         topics: [],
         lastSessionDate: null,
       };
@@ -438,14 +430,14 @@ describe("prompt-enhancer", () => {
       });
 
       // Should only include first 2 facts
-      expect(result).toContain("fact1");
-      expect(result).toContain("fact2");
-      expect(result).not.toContain("fact3");
-      expect(result).not.toContain("fact4");
-      expect(result).not.toContain("fact5");
+      expect(result).toContain('fact1');
+      expect(result).toContain('fact2');
+      expect(result).not.toContain('fact3');
+      expect(result).not.toContain('fact4');
+      expect(result).not.toContain('fact5');
     });
 
-    it("respects maxTopics limit from tier", () => {
+    it('respects maxTopics limit from tier', () => {
       const baseLimits: TierMemoryLimits = {
         recentConversations: 3,
         timeWindowDays: 15,
@@ -453,12 +445,13 @@ describe("prompt-enhancer", () => {
         maxTopics: 2, // Only allow 2 topics
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       };
 
       const memory: ConversationMemory = {
         recentSummary: null,
         keyFacts: [],
-        topics: ["math", "algebra", "geometry", "calculus", "statistics"], // 5 topics
+        topics: ['math', 'algebra', 'geometry', 'calculus', 'statistics'], // 5 topics
         lastSessionDate: null,
       };
 
@@ -470,13 +463,13 @@ describe("prompt-enhancer", () => {
       });
 
       // Should only include first 2 topics
-      expect(result).toContain("math, algebra");
-      expect(result).not.toContain("geometry");
-      expect(result).not.toContain("calculus");
-      expect(result).not.toContain("statistics");
+      expect(result).toContain('math, algebra');
+      expect(result).not.toContain('geometry');
+      expect(result).not.toContain('calculus');
+      expect(result).not.toContain('statistics');
     });
 
-    it("includes full memory for Pro tier with no limits", () => {
+    it('includes full memory for Pro tier with no limits', () => {
       const proLimits: TierMemoryLimits = {
         recentConversations: 5,
         timeWindowDays: null,
@@ -484,12 +477,13 @@ describe("prompt-enhancer", () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       const memory: ConversationMemory = {
-        recentSummary: "Summary",
-        keyFacts: ["fact1", "fact2", "fact3"],
-        topics: ["math", "algebra", "geometry"],
+        recentSummary: 'Summary',
+        keyFacts: ['fact1', 'fact2', 'fact3'],
+        topics: ['math', 'algebra', 'geometry'],
         lastSessionDate: new Date(),
       };
 
@@ -501,17 +495,17 @@ describe("prompt-enhancer", () => {
       });
 
       // Pro tier should include all facts and topics
-      expect(result).toContain("fact1");
-      expect(result).toContain("fact2");
-      expect(result).toContain("fact3");
-      expect(result).toContain("math, algebra, geometry");
+      expect(result).toContain('fact1');
+      expect(result).toContain('fact2');
+      expect(result).toContain('fact3');
+      expect(result).toContain('math, algebra, geometry');
     });
 
-    it("defaults to including all memory when no tierLimits provided", () => {
+    it('defaults to including all memory when no tierLimits provided', () => {
       const memory: ConversationMemory = {
-        recentSummary: "Summary",
-        keyFacts: ["fact1", "fact2"],
-        topics: ["math", "algebra"],
+        recentSummary: 'Summary',
+        keyFacts: ['fact1', 'fact2'],
+        topics: ['math', 'algebra'],
         lastSessionDate: new Date(),
       };
 
@@ -522,10 +516,10 @@ describe("prompt-enhancer", () => {
         // No tierLimits provided - should include all memory
       });
 
-      expect(result).toContain("Memoria delle Sessioni Precedenti");
-      expect(result).toContain("fact1");
-      expect(result).toContain("fact2");
-      expect(result).toContain("math, algebra");
+      expect(result).toContain('Memoria delle Sessioni Precedenti');
+      expect(result).toContain('fact1');
+      expect(result).toContain('fact2');
+      expect(result).toContain('math, algebra');
     });
   });
 });

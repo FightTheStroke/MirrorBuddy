@@ -67,6 +67,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
+      conversationWindowTokens: 8000,
     } as any);
 
     const result = await loadCrossMaestroLearnings('non-existent-user', currentMaestroId);
@@ -82,6 +83,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
+      conversationWindowTokens: 8000,
     } as any);
 
     const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
@@ -97,6 +99,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: false,
+      conversationWindowTokens: 8000,
     } as any);
 
     const result = await loadCrossMaestroLearnings(testUserId, currentMaestroId);
@@ -112,6 +115,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: true,
+      conversationWindowTokens: 16000,
     } as any);
 
     // Mock conversations data
@@ -175,6 +179,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: true,
+      conversationWindowTokens: 16000,
     } as any);
 
     // Mock only non-current maestro conversations
@@ -222,6 +227,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: true,
+      conversationWindowTokens: 16000,
     } as any);
 
     // Mock conversations with different subjects
@@ -269,6 +275,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: true,
+      conversationWindowTokens: 16000,
     } as any);
 
     // Mock 5 conversations, but limit should return only 3
@@ -306,6 +313,7 @@ describe('loadCrossMaestroLearnings', () => {
 
     vi.mocked(getTierMemoryLimits).mockReturnValue({
       crossMaestroEnabled: true,
+      conversationWindowTokens: 16000,
     } as any);
 
     // Mock conversations: one with empty learnings, one with null keyFacts
