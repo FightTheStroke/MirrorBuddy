@@ -101,4 +101,14 @@ Large text.`;
     const stripped = stripAccessibilitySection(withA11y, null);
     expect(stripped.length).toBeLessThan(withA11y.length);
   });
+
+  it('DSA users still receive relevant accessibility sections', () => {
+    const profiles: DSAProfileName[] = ['autism', 'cerebral-palsy'];
+    const result = stripAccessibilitySection(PROMPT_WITH_ACCESSIBILITY, profiles);
+    expect(result).toContain('Autism Support');
+    expect(result).toContain('Cerebral Palsy Support');
+    expect(result).not.toContain('Dyslexia Support');
+    expect(result).not.toContain('ADHD Support');
+    expect(result).toContain('Curriculum Topics');
+  });
 });
