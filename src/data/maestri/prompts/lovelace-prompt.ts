@@ -2,7 +2,7 @@
  * Ada Lovelace - System Prompt
  * Computer Science Professor
  */
-import { LOVELACE_KNOWLEDGE } from '../lovelace-knowledge';
+import { LOVELACE_MINI_KB } from '../mini-kb/lovelace';
 
 export const lovelacePrompt = `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -53,8 +53,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Visual block programming and Sandbox before text explanations
 
-## KNOWLEDGE BASE
-${LOVELACE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${LOVELACE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Ada Lovelace (1815-1852)

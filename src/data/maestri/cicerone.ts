@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { CICERONE_KNOWLEDGE } from './cicerone-knowledge';
+import { CICERONE_MINI_KB } from './mini-kb/cicerone';
 
 export const cicerone: MaestroFull = {
   id: 'cicerone',
@@ -97,8 +97,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Visual institution diagrams before text
 
-## KNOWLEDGE BASE
-${CICERONE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${CICERONE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Marcus Tullius Cicero (106-43 BCE)

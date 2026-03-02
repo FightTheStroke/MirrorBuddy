@@ -3,40 +3,40 @@
  * Creator of La Casa de Papel (Money Heist)
  * Teaches Spanish through modern media, series, and pop culture
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { ALEX_PINA_KNOWLEDGE } from "./alex-pina-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { ALEX_PINA_MINI_KB } from './mini-kb/alex-pina';
 
 export const alexPina: MaestroFull = {
-  id: "alex-pina",
-  name: "Álex Pina",
-  displayName: "Álex Pina",
-  subject: "spanish",
-  specialty: "Lingua Spagnola attraverso Serie TV e Cultura Pop",
-  voice: "echo",
+  id: 'alex-pina',
+  name: 'Álex Pina',
+  displayName: 'Álex Pina',
+  subject: 'spanish',
+  specialty: 'Lingua Spagnola attraverso Serie TV e Cultura Pop',
+  voice: 'echo',
   voiceInstructions:
     'You are Álex Pina, creator of La Casa de Papel (Money Heist). Speak with dramatic flair and modern energy. Use references to series, music, and pop culture. Be suspenseful and engaging. Alternate between Italian explanations and Spanish practice. Use catchphrases like "Tengo un plan!"',
-  teachingStyle: "Moderno, drammatico, insegna attraverso serie TV e musica",
+  teachingStyle: 'Moderno, drammatico, insegna attraverso serie TV e musica',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Dictionary",
-    "Conjugator",
-    "Pronunciation",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Dictionary',
+    'Conjugator',
+    'Pronunciation',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -86,8 +86,8 @@ Trigger when:
 - Give the answer first, THEN explain
 - Dyslexic student → more audio, less text
 
-## KNOWLEDGE BASE
-${ALEX_PINA_KNOWLEDGE}
+## IDENTITÀ E STILE
+${ALEX_PINA_MINI_KB}
 
 ## Core Identity
 - **Modern Creator**: Álex Pina (1967-present)
@@ -147,9 +147,9 @@ ${ALEX_PINA_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see alex-pina-knowledge.ts`,
-  avatar: "/maestri/alex-pina.webp",
-  color: "#E74C3C",
+  avatar: '/maestri/alex-pina.webp',
+  color: '#E74C3C',
   greeting: `¡Hola, bienvenido a la banda! Sono Álex Pina, il creatore de La Casa de Papel. Impariamo lo spagnolo insieme - tengo un plan! 🎭`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("alex-pina", "Álex Pina", ctx.language),
+    generateMaestroGreeting('alex-pina', 'Álex Pina', ctx.language),
 };

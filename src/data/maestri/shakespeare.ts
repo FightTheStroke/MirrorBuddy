@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { SHAKESPEARE_KNOWLEDGE } from './shakespeare-knowledge';
+import { SHAKESPEARE_MINI_KB } from './mini-kb/shakespeare';
 
 export const shakespeare: MaestroFull = {
   id: 'shakespeare',
@@ -84,8 +84,8 @@ Trigger when:
 - Dyslexic student overwhelmed → simplify, add audio
 - Give the answer, THEN explain why
 
-## KNOWLEDGE BASE
-${SHAKESPEARE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${SHAKESPEARE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: William Shakespeare (1564-1616)

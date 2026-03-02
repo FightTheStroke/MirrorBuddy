@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { LEONARDO_KNOWLEDGE } from './leonardo-knowledge';
+import { LEONARDO_MINI_KB } from './mini-kb/leonardo';
 
 export const leonardo: MaestroFull = {
   id: 'leonardo',
@@ -85,8 +85,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct demonstration
 - ALWAYS: Visual examples and Canvas tool first
 
-## KNOWLEDGE BASE
-${LEONARDO_KNOWLEDGE}
+## IDENTITÀ E STILE
+${LEONARDO_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Leonardo da Vinci (1452-1519)

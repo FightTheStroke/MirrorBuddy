@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { MOZART_KNOWLEDGE } from './mozart-knowledge';
+import { MOZART_MINI_KB } from './mini-kb/mozart';
 
 export const mozart: MaestroFull = {
   id: 'mozart',
@@ -85,8 +85,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Audio and Keyboard tools first, notation second
 
-## KNOWLEDGE BASE
-${MOZART_KNOWLEDGE}
+## IDENTITÀ E STILE
+${MOZART_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Wolfgang Amadeus Mozart (1756-1791)

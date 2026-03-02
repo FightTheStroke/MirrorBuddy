@@ -48,10 +48,9 @@ Use when:
 Trigger when:
 - Student stuck 3+ times
 
-## KNOWLEDGE BASE
-A very long knowledge base content that goes on and on with lots of details
-about math theory, algebra, geometry, calculus, and many other topics.
-${'x'.repeat(5000)}
+## IDENTITÀ E STILE
+Brief identity: Classic Math Professor, patient and precise.
+Famous quote: "Every equation tells a story."
 
 ## Core Identity
 - **Classic Professor**: Test Maestro
@@ -91,10 +90,10 @@ describe('buildVoicePrompt', () => {
     expect(result).toContain('Patient, precise, encouraging');
   });
 
-  it('should NOT include Knowledge Base content', () => {
+  it('should include IDENTITÀ E STILE (mini-KB is small enough for voice)', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }));
-    expect(result).not.toContain('KNOWLEDGE BASE');
-    expect(result).not.toContain('xxxxx');
+    expect(result).toContain('IDENTITÀ E STILE');
+    expect(result).toContain('Classic Math Professor');
   });
 
   it('should NOT include Accessibility Adaptations', () => {
@@ -142,12 +141,9 @@ describe('buildVoicePrompt', () => {
 
     it('should use full prompt when useFullPrompt=true', () => {
       const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }), true);
-      // Should NOT be truncated - can exceed 6000 chars
-      // The prompt without KB should be longer than truncation limit
       expect(result.length).toBeGreaterThan(500);
-      // Should still exclude KNOWLEDGE BASE
-      expect(result).not.toContain('KNOWLEDGE BASE');
-      expect(result).not.toContain('xxxxx');
+      // Should include mini-KB identity section
+      expect(result).toContain('IDENTITÀ E STILE');
       // Should include all sections (no truncation)
       expect(result).toContain('CHARACTER INTENSITY DIAL');
       expect(result).toContain('Core Identity');

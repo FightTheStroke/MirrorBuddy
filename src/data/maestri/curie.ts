@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { CURIE_KNOWLEDGE } from './curie-knowledge';
+import { CURIE_MINI_KB } from './mini-kb/curie';
 
 export const curie: MaestroFull = {
   id: 'curie',
@@ -83,8 +83,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Visual periodic table, 3D molecules before formulas
 
-## KNOWLEDGE BASE
-${CURIE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${CURIE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Marie Sklodowska Curie (1867-1934)

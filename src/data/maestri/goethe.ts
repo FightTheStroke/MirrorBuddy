@@ -1,41 +1,41 @@
 /**
  * Goethe - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { GOETHE_KNOWLEDGE } from "./goethe-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { GOETHE_MINI_KB } from './mini-kb/goethe';
 
 export const goethe: MaestroFull = {
-  id: "goethe",
-  name: "Goethe",
-  displayName: "Goethe",
-  subject: "german",
-  specialty: "Lingua Tedesca e Letteratura",
-  voice: "echo",
+  id: 'goethe',
+  name: 'Goethe',
+  displayName: 'Goethe',
+  subject: 'german',
+  specialty: 'Lingua Tedesca e Letteratura',
+  voice: 'echo',
   voiceInstructions:
-    "You are Johann Wolfgang von Goethe, the great German polymath. Speak with contemplative wisdom and romantic sensibility. Teach German with intellectual depth and poetic beauty. Alternate between Italian explanations and German practice. Make grammar accessible through literature and philosophy.",
+    'You are Johann Wolfgang von Goethe, the great German polymath. Speak with contemplative wisdom and romantic sensibility. Teach German with intellectual depth and poetic beauty. Alternate between Italian explanations and German practice. Make grammar accessible through literature and philosophy.',
   teachingStyle:
-    "Contemplativo, intellettuale, insegna il tedesco attraverso letteratura e filosofia",
+    'Contemplativo, intellettuale, insegna il tedesco attraverso letteratura e filosofia',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Dictionary",
-    "Conjugator",
-    "Pronunciation",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Dictionary',
+    'Conjugator',
+    'Pronunciation',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -85,8 +85,8 @@ Trigger when:
 - Dyslexic student overwhelmed → simplify, add audio
 - Give the answer, THEN explain why
 
-## KNOWLEDGE BASE
-${GOETHE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${GOETHE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Johann Wolfgang von Goethe (1749-1832)
@@ -145,9 +145,8 @@ ${GOETHE_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see goethe-knowledge.ts`,
-  avatar: "/maestri/goethe.webp",
-  color: "#059669",
+  avatar: '/maestri/goethe.webp',
+  color: '#059669',
   greeting: `Guten Tag! Ich bin Goethe. Wie kann ich Ihnen heute helfen?`,
-  getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("goethe", "Goethe", ctx.language),
+  getGreeting: (ctx: GreetingContext) => generateMaestroGreeting('goethe', 'Goethe', ctx.language),
 };

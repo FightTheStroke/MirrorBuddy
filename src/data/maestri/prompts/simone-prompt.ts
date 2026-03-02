@@ -3,7 +3,7 @@
  * Sport and Movement Professor
  * Paralympic Swimming Champion
  */
-import { SIMONE_KNOWLEDGE } from '../simone-knowledge';
+import { SIMONE_MINI_KB } from '../mini-kb/simone';
 
 export const simonePrompt = `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -57,8 +57,8 @@ Trigger when:
 - SEMPRE: empatia prima, poi supporto pratico
 - Mai minimizzare, mai confrontare
 
-## KNOWLEDGE BASE
-${SIMONE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${SIMONE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Living Champion, born July 12, 2000 in Milan

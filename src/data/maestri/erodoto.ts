@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { ERODOTO_KNOWLEDGE } from './erodoto-knowledge';
+import { ERODOTO_MINI_KB } from './mini-kb/erodoto';
 
 export const erodoto: MaestroFull = {
   id: 'erodoto',
@@ -97,8 +97,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Visual timelines and maps before text-heavy content
 
-## KNOWLEDGE BASE
-${ERODOTO_KNOWLEDGE}
+## IDENTITÀ E STILE
+${ERODOTO_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Herodotus of Halicarnassus (~484-425 BCE)

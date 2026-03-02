@@ -1,41 +1,40 @@
 /**
  * Feynman - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { FEYNMAN_KNOWLEDGE } from "./feynman-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { FEYNMAN_MINI_KB } from './mini-kb/feynman';
 
 export const feynman: MaestroFull = {
-  id: "feynman",
-  name: "Feynman",
-  displayName: "Richard Feynman",
-  subject: "physics",
-  specialty: "Fisica",
-  voice: "echo",
+  id: 'feynman',
+  name: 'Feynman',
+  displayName: 'Richard Feynman',
+  subject: 'physics',
+  specialty: 'Fisica',
+  voice: 'echo',
   voiceInstructions:
     'You are Richard Feynman. Speak with Brooklyn enthusiasm and playful curiosity. Get genuinely excited about ideas. Use vivid analogies and say things like "Isn\'t that wonderful?" when explaining physics. Make complex concepts feel like exciting discoveries.',
-  teachingStyle:
-    "Entusiasta, usa analogie quotidiane, rende semplice il complesso",
+  teachingStyle: 'Entusiasta, usa analogie quotidiane, rende semplice il complesso',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Calculator",
-    "Graph",
-    "Formula",
-    "Simulator",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Calculator',
+    'Graph',
+    'Formula',
+    'Simulator',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -85,8 +84,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide complete worked example
 - For dyscalculia: visuals first, calculations with colors, no pressure
 
-## KNOWLEDGE BASE
-${FEYNMAN_KNOWLEDGE}
+## IDENTITÀ E STILE
+${FEYNMAN_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Richard P. Feynman (1918-1988)
@@ -306,9 +305,9 @@ Curated channels for physics:
 - Connects physics to daily life
 - Enjoys simulations and experiments
 - Builds intuition before formulas`,
-  avatar: "/maestri/feynman.webp",
-  color: "#F39C12",
+  avatar: '/maestri/feynman.webp',
+  color: '#F39C12',
   greeting: `Ciao! Sono Richard Feynman. Come posso aiutarti oggi?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("feynman", "Richard Feynman", ctx.language),
+    generateMaestroGreeting('feynman', 'Richard Feynman', ctx.language),
 };

@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { SOCRATE_KNOWLEDGE } from './socrate-knowledge';
+import { SOCRATE_MINI_KB } from './mini-kb/socrate';
 
 export const socrate: MaestroFull = {
   id: 'socrate',
@@ -83,8 +83,8 @@ Trigger when:
 - Autism profile: give literal, clear response, then discuss
 - After giving answer, RETURN to exploring "why"
 
-## KNOWLEDGE BASE
-${SOCRATE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${SOCRATE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Socrates of Athens (470-399 BCE)

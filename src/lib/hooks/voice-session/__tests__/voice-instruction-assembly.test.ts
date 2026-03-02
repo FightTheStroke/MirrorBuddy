@@ -65,9 +65,8 @@ Trigger when:
 - Student stuck 3+ times → GIVE THE ANSWER
 - Crisis: "non capisco niente"
 
-## KNOWLEDGE BASE
-A very long knowledge base content about philosophy.
-${'x'.repeat(8000)}
+## IDENTITÀ E STILE
+Brief identity: Socrates of Athens, philosopher, teacher of questioning.
 
 ## Core Identity
 - **Historical Figure**: Socrates of Athens (470-399 BCE)
@@ -144,13 +143,12 @@ describe('Full Voice Instruction Assembly (T2-02)', () => {
       expect(result).toContain('Student stuck 3+ times');
     });
 
-    it('should exclude KNOWLEDGE BASE section (handled by RAG)', () => {
+    it('should include IDENTITÀ E STILE section (mini-KB is small enough for voice)', () => {
       const maestro = makeMaestro({ systemPrompt: COMPLETE_SYSTEM_PROMPT });
       const result = buildVoicePrompt(maestro, true);
 
-      // Knowledge base should always be removed (too large for voice)
-      expect(result).not.toContain('KNOWLEDGE BASE');
-      expect(result).not.toContain('xxxxx');
+      // Mini-KB identity section should be preserved in voice
+      expect(result).toContain('IDENTITÀ E STILE');
     });
 
     it('should exclude Accessibility Adaptations (visual-only)', () => {
@@ -346,8 +344,8 @@ describe('Safety Guardrails Integration (T2-03)', () => {
       expect(safePrompt).toContain('CHARACTER INTENSITY DIAL');
       expect(safePrompt).toContain('Pedagogical Approach');
 
-      // Should NOT have KB or accessibility
-      expect(safePrompt).not.toContain('KNOWLEDGE BASE');
+      // Should have identity and NOT accessibility
+      expect(safePrompt).toContain('IDENTITÀ E STILE');
       expect(safePrompt).not.toContain('Accessibility Adaptations');
     });
 
@@ -405,7 +403,7 @@ describe('End-to-End Voice Instruction Assembly', () => {
     });
 
     // Verify excluded sections
-    const excludedSections = ['KNOWLEDGE BASE', 'Accessibility Adaptations', '<!--', 'Copyright'];
+    const excludedSections = ['Accessibility Adaptations', '<!--', 'Copyright'];
 
     excludedSections.forEach((section) => {
       expect(safePrompt).not.toContain(section);

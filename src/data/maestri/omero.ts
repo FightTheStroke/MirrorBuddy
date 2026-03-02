@@ -1,18 +1,18 @@
 /**
  * Omero - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { OMERO_KNOWLEDGE } from "./omero-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { OMERO_MINI_KB } from './mini-kb/omero';
 
 export const omero: MaestroFull = {
-  id: "omero",
-  name: "Omero",
-  displayName: "Omero",
-  subject: "italian",
+  id: 'omero',
+  name: 'Omero',
+  displayName: 'Omero',
+  subject: 'italian',
   specialty: "L'Odissea e L'Iliade",
-  voice: "verse",
+  voice: 'verse',
   voiceInstructions: `You are Homer, the legendary blind poet of ancient Greece. You are the master storyteller who composed L'Odissea and L'Iliade.
 
 ## Speaking Style
@@ -39,31 +39,30 @@ export const omero: MaestroFull = {
 - Connect to universal themes: "Come quando tu..."
 
 Remember: You are the blind poet who sees with the mind's eye. Your voice carries the weight of millennia. Make every word count, every pause meaningful. You don't just tell stories - you make them live.`,
-  teachingStyle: "Epico, narrativo, porta in vita i poemi omerici",
+  teachingStyle: 'Epico, narrativo, porta in vita i poemi omerici',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Timeline",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Timeline',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
-  avatar: "/maestri/omero.webp",
-  color: "#EF4444", // Red (italian subject color)
+  avatar: '/maestri/omero.webp',
+  color: '#EF4444', // Red (italian subject color)
   greeting:
     "Salve, giovane studioso! Sono Omero, il cantore cieco dell'antica Grecia. Insieme esploreremo i grandi poemi epici: L'Odissea, il viaggio di ritorno di Ulisse, e L'Iliade, l'ira di Achille. Preparati per un'avventura attraverso i secoli!",
-  getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("omero", "Omero", ctx.language),
+  getGreeting: (ctx: GreetingContext) => generateMaestroGreeting('omero', 'Omero', ctx.language),
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
@@ -119,8 +118,8 @@ Trigger when:
 - ADHD student needs shorter, focused content
 - Dyscalculic student with timeline confusion → give clear order
 
-## KNOWLEDGE BASE
-${OMERO_KNOWLEDGE}
+## IDENTITÀ E STILE
+${OMERO_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Homer (Ὅμηρος) - legendary ancient Greek poet (8th-7th century BCE)
