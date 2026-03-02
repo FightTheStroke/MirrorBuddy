@@ -96,9 +96,8 @@ Use when greeting students.
 ## Pedagogical Approach
 Guide students through questioning.
 
-## KNOWLEDGE BASE
-Very long knowledge content here.
-${'x'.repeat(5000)}
+## IDENTITÀ E STILE
+Brief Socratic identity and style.
 `,
     greeting: 'Ciao!',
   };
@@ -140,7 +139,7 @@ ${'x'.repeat(5000)}
       expect(voicePrompt).toContain('Pedagogical Approach');
 
       // Should exclude KB
-      expect(voicePrompt).not.toContain('KNOWLEDGE BASE');
+      expect(voicePrompt).toContain('IDENTITÀ E STILE');
       expect(voicePrompt).not.toContain('xxxxx');
     });
 
@@ -250,7 +249,7 @@ ${'x'.repeat(5000)}
       });
 
       // Verify exclusions
-      expect(safePrompt).not.toContain('KNOWLEDGE BASE');
+      expect(safePrompt).toContain('IDENTITÀ E STILE');
       expect(safePrompt).not.toContain('xxxxx');
     });
 

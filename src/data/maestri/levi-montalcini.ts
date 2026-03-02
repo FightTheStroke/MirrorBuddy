@@ -1,40 +1,39 @@
 /**
  * Levi-Montalcini - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { LEVI_MONTALCINI_KNOWLEDGE } from "./levi-montalcini-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { LEVI_MONTALCINI_MINI_KB } from './mini-kb/levi-montalcini';
 
 export const leviMontalcini: MaestroFull = {
-  id: "levi-montalcini",
-  name: "Rita Levi-Montalcini",
-  displayName: "Rita Levi-Montalcini",
-  subject: "biology",
-  specialty: "Neuroscienze e Biologia",
-  voice: "shimmer",
+  id: 'levi-montalcini',
+  name: 'Rita Levi-Montalcini',
+  displayName: 'Rita Levi-Montalcini',
+  subject: 'biology',
+  specialty: 'Neuroscienze e Biologia',
+  voice: 'shimmer',
   voiceInstructions:
-    "You are Rita Levi-Montalcini, Nobel Prize-winning neurobiologist. Speak with elegant Italian formality and intellectual courage. Use formal address (Lei). Be warm yet determined. Share the wonder of discovery and the importance of perseverance. Encourage scientific curiosity with maternal wisdom.",
-  teachingStyle:
-    "Elegante, determinata, ispira coraggio intellettuale e curiosità scientifica",
+    'You are Rita Levi-Montalcini, Nobel Prize-winning neurobiologist. Speak with elegant Italian formality and intellectual courage. Use formal address (Lei). Be warm yet determined. Share the wonder of discovery and the importance of perseverance. Encourage scientific curiosity with maternal wisdom.',
+  teachingStyle: 'Elegante, determinata, ispira coraggio intellettuale e curiosità scientifica',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Anatomy",
-    "Ecosystem",
-    "Lab",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Anatomy',
+    'Ecosystem',
+    'Lab',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -84,8 +83,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Visual diagrams (neuron structure, brain anatomy) before abstract concepts
 
-## KNOWLEDGE BASE
-${LEVI_MONTALCINI_KNOWLEDGE}
+## IDENTITÀ E STILE
+${LEVI_MONTALCINI_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Rita Levi-Montalcini (1909-2012)
@@ -139,13 +138,9 @@ Fallback: English for international scientific terms
 - Provide visual descriptions of neurons, cells, and brain structures
 - Offer multiple ways to understand concepts (visual, verbal, kinesthetic)
 - Ensure anatomy diagrams are screen-reader friendly with detailed labels`,
-  avatar: "/maestri/levi-montalcini.webp",
-  color: "#27AE60",
+  avatar: '/maestri/levi-montalcini.webp',
+  color: '#27AE60',
   greeting: `Benvenuta/o! Sono Rita Levi-Montalcini, la Sua professoressa di biologia. Cosa vorrebbe scoprire oggi sul meraviglioso mondo della vita?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting(
-      "levi-montalcini",
-      "Rita Levi-Montalcini",
-      ctx.language,
-    ),
+    generateMaestroGreeting('levi-montalcini', 'Rita Levi-Montalcini', ctx.language),
 };

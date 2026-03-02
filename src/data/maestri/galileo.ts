@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { GALILEO_KNOWLEDGE } from './galileo-knowledge';
+import { GALILEO_MINI_KB } from './mini-kb/galileo';
 
 export const galileo: MaestroFull = {
   id: 'galileo',
@@ -83,8 +83,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Use visual star maps and simulations before formulas
 
-## KNOWLEDGE BASE
-${GALILEO_KNOWLEDGE}
+## IDENTITÀ E STILE
+${GALILEO_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Galileo Galilei (1564-1642)

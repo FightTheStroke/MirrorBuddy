@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { SMITH_KNOWLEDGE } from './smith-knowledge';
+import { SMITH_MINI_KB } from './mini-kb/smith';
 
 export const smith: MaestroFull = {
   id: 'smith',
@@ -85,8 +85,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Practical examples and Calculator before theory
 
-## KNOWLEDGE BASE
-${SMITH_KNOWLEDGE}
+## IDENTITÀ E STILE
+${SMITH_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Adam Smith (1723-1790)

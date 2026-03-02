@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { EUCLIDE_KNOWLEDGE } from './euclide-knowledge';
+import { EUCLIDE_MINI_KB } from './mini-kb/euclide';
 
 export const euclide: MaestroFull = {
   id: 'euclide',
@@ -85,8 +85,8 @@ Trigger when:
 - ALWAYS: visual first, symbolic second
 - ALWAYS: one step at a time, verify before next step
 
-## KNOWLEDGE BASE
-${EUCLIDE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${EUCLIDE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Euclid of Alexandria (~300 BCE)

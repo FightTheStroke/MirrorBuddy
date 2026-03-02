@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { HUMBOLDT_KNOWLEDGE } from './humboldt-knowledge';
+import { HUMBOLDT_MINI_KB } from './mini-kb/humboldt';
 
 export const humboldt: MaestroFull = {
   id: 'humboldt',
@@ -84,8 +84,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Interactive maps before text-heavy content
 
-## KNOWLEDGE BASE
-${HUMBOLDT_KNOWLEDGE}
+## IDENTITÀ E STILE
+${HUMBOLDT_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Alexander von Humboldt (1769-1859)

@@ -2,7 +2,7 @@
  * Ippocrate - System Prompt
  * Physical Education and Human Body Professor
  */
-import { IPPOCRATE_KNOWLEDGE } from '../ippocrate-knowledge';
+import { IPPOCRATE_MINI_KB } from '../mini-kb/ippocrate';
 
 export const ippokratePrompt = `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -53,8 +53,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: Anatomy 3D and Video before text-heavy content
 
-## KNOWLEDGE BASE
-${IPPOCRATE_KNOWLEDGE}
+## IDENTITÀ E STILE
+${IPPOCRATE_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Hippocrates of Kos (~460-370 BCE)

@@ -8,12 +8,12 @@
  * ADR: 0021-conversational-memory-injection.md
  */
 
-import type { ConversationMemory } from "./memory-loader";
-import { formatRelativeDate } from "./memory-loader";
-import { injectSafetyGuardrails } from "@/lib/safety";
-import type { SafetyInjectionOptions } from "@/lib/safety";
-import type { TierMemoryLimits } from "./tier-memory-config";
-import type { CrossMaestroLearning } from "./cross-maestro-memory";
+import type { ConversationMemory } from './memory-loader';
+import { formatRelativeDate } from './memory-loader';
+import { injectSafetyGuardrails } from '@/lib/safety';
+import type { SafetyInjectionOptions } from '@/lib/safety';
+import type { TierMemoryLimits } from './tier-memory-config';
+import type { CrossMaestroLearning } from './cross-maestro-memory';
 
 export interface PromptEnhancementOptions {
   /** Base system prompt from the Maestro configuration */
@@ -28,6 +28,27 @@ export interface PromptEnhancementOptions {
   crossMaestroLearnings?: CrossMaestroLearning[];
 }
 
+/** Active DSA profile names for conditional accessibility assembly */
+export type DSAProfileName =
+  | 'dyslexia'
+  | 'adhd'
+  | 'visual'
+  | 'motor'
+  | 'autism'
+  | 'auditory'
+  | 'cerebral-palsy';
+
+/** All 7 DSA subsection headings in the Accessibility Adaptations section */
+const DSA_SUBSECTION_MAP: Record<DSAProfileName, RegExp> = {
+  dyslexia: /###?\s*(Dyslexia|Dislessia)/i,
+  adhd: /###?\s*ADHD/i,
+  visual: /###?\s*(Visual\s+Impairment|Ipovisione|Dyscalculia)/i,
+  motor: /###?\s*(Motor\s+Impairment|Disabilità\s+Motori)/i,
+  autism: /###?\s*(Autism|Autismo)/i,
+  auditory: /###?\s*(Auditory|Cerebral\s+Palsy|Paralisi)/i,
+  'cerebral-palsy': /###?\s*(Cerebral\s+Palsy|Paralisi)/i,
+};
+
 /**
  * Enhance a system prompt with conversation memory.
  * ALWAYS applies safety guardrails per ADR 0004.
@@ -39,13 +60,7 @@ export interface PromptEnhancementOptions {
  * - No tierLimits provided: All memory is included (backward compatible)
  */
 export function enhanceSystemPrompt(options: PromptEnhancementOptions): string {
-  const {
-    basePrompt,
-    memory,
-    safetyOptions,
-    tierLimits,
-    crossMaestroLearnings,
-  } = options;
+  const { basePrompt, memory, safetyOptions, tierLimits, crossMaestroLearnings } = options;
 
   // First, apply safety guardrails to the base prompt
   const safePrompt = injectSafetyGuardrails(basePrompt, safetyOptions);
@@ -56,14 +71,9 @@ export function enhanceSystemPrompt(options: PromptEnhancementOptions): string {
   }
 
   // Check if we have any content to inject
-  const hasMemory =
-    memory.recentSummary ||
-    memory.keyFacts.length > 0 ||
-    memory.topics.length > 0;
+  const hasMemory = memory.recentSummary || memory.keyFacts.length > 0 || memory.topics.length > 0;
   const hasCrossMaestro =
-    tierLimits?.crossMaestroEnabled &&
-    crossMaestroLearnings &&
-    crossMaestroLearnings.length > 0;
+    tierLimits?.crossMaestroEnabled && crossMaestroLearnings && crossMaestroLearnings.length > 0;
 
   // If no memory or cross-maestro content, return the safe prompt as-is
   if (!hasMemory && !hasCrossMaestro) {
@@ -85,7 +95,7 @@ export function enhanceSystemPrompt(options: PromptEnhancementOptions): string {
   // Inject sections before the end of the prompt
   return `${safePrompt}
 
-${sections.join("\n\n")}`;
+${sections.join('\n\n')}`;
 }
 
 /**
@@ -95,27 +105,22 @@ ${sections.join("\n\n")}`;
  * @param memory The loaded conversation memory
  * @param tierLimits Optional tier configuration limiting memory injection
  */
-function buildMemorySection(
-  memory: ConversationMemory,
-  tierLimits?: TierMemoryLimits,
-): string {
+function buildMemorySection(memory: ConversationMemory, tierLimits?: TierMemoryLimits): string {
   const sections: string[] = [];
 
-  sections.push("## Memoria delle Sessioni Precedenti");
-  sections.push("");
-  sections.push(
-    "ISTRUZIONI MEMORIA: Usa queste informazioni per personalizzare l'interazione.",
-  );
-  sections.push("Fai riferimento a conversazioni passate quando rilevante.");
-  sections.push("Non ripetere concetti già acquisiti dallo studente.");
-  sections.push("");
+  sections.push('## Memoria delle Sessioni Precedenti');
+  sections.push('');
+  sections.push("ISTRUZIONI MEMORIA: Usa queste informazioni per personalizzare l'interazione.");
+  sections.push('Fai riferimento a conversazioni passate quando rilevante.');
+  sections.push('Non ripetere concetti già acquisiti dallo studente.');
+  sections.push('');
 
   // Recent summary
   if (memory.recentSummary) {
     const relativeDate = formatRelativeDate(memory.lastSessionDate);
     sections.push(`### Ultimo Incontro (${relativeDate})`);
     sections.push(memory.recentSummary);
-    sections.push("");
+    sections.push('');
   }
 
   // Key facts - respect tier limit (if provided)
@@ -124,11 +129,11 @@ function buildMemorySection(
     const factsToInclude = memory.keyFacts.slice(0, maxFacts);
 
     if (factsToInclude.length > 0) {
-      sections.push("### Fatti Chiave dello Studente");
+      sections.push('### Fatti Chiave dello Studente');
       for (const fact of factsToInclude) {
         sections.push(`- ${fact}`);
       }
-      sections.push("");
+      sections.push('');
     }
   }
 
@@ -138,20 +143,20 @@ function buildMemorySection(
     const topicsToInclude = memory.topics.slice(0, maxTopics);
 
     if (topicsToInclude.length > 0) {
-      sections.push("### Argomenti Già Trattati");
-      sections.push(topicsToInclude.join(", "));
-      sections.push("");
+      sections.push('### Argomenti Già Trattati');
+      sections.push(topicsToInclude.join(', '));
+      sections.push('');
     }
   }
 
-  return sections.join("\n");
+  return sections.join('\n');
 }
 
 /**
  * Check if a prompt has memory context injected.
  */
 export function hasMemoryContext(prompt: string): boolean {
-  return prompt.includes("## Memoria delle Sessioni Precedenti");
+  return prompt.includes('## Memoria delle Sessioni Precedenti');
 }
 
 /**
@@ -159,9 +164,7 @@ export function hasMemoryContext(prompt: string): boolean {
  * Useful for debugging or comparison.
  */
 export function extractBasePrompt(enhancedPrompt: string): string {
-  const memoryIndex = enhancedPrompt.indexOf(
-    "## Memoria delle Sessioni Precedenti",
-  );
+  const memoryIndex = enhancedPrompt.indexOf('## Memoria delle Sessioni Precedenti');
   if (memoryIndex === -1) {
     return enhancedPrompt;
   }
@@ -178,23 +181,82 @@ export function extractBasePrompt(enhancedPrompt: string): string {
 function buildCrossMaestroSection(learnings: CrossMaestroLearning[]): string {
   const sections: string[] = [];
 
-  sections.push("## Conoscenze Interdisciplinari");
-  sections.push("");
+  sections.push('## Conoscenze Interdisciplinari');
+  sections.push('');
   sections.push(
-    "ISTRUZIONI INTERDISCIPLINARI: Lo studente ha appreso questi concetti da altri professori.",
+    'ISTRUZIONI INTERDISCIPLINARI: Lo studente ha appreso questi concetti da altri professori.',
   );
   sections.push(
-    "Puoi fare riferimento a queste conoscenze per creare collegamenti interdisciplinari.",
+    'Puoi fare riferimento a queste conoscenze per creare collegamenti interdisciplinari.',
   );
-  sections.push("");
+  sections.push('');
 
   for (const learning of learnings) {
     sections.push(`### Da ${learning.maestroName} (${learning.subject})`);
     for (const item of learning.learnings) {
       sections.push(`- ${item}`);
     }
-    sections.push("");
+    sections.push('');
   }
 
-  return sections.join("\n");
+  return sections.join('\n');
+}
+
+/**
+ * Conditionally strip the Accessibility Adaptations section from a prompt.
+ *
+ * - No active DSA profiles → remove entire section (save tokens for neurotypical users)
+ * - Active DSA profiles → keep only relevant subsections
+ */
+export function stripAccessibilitySection(
+  prompt: string,
+  activeProfiles: DSAProfileName[] | null,
+): string {
+  const sectionPattern = /##?\s*(Accessibility Adaptations|Adattamenti per l'Accessibilità)/i;
+  const match = prompt.match(sectionPattern);
+  if (!match || match.index === undefined) return prompt;
+
+  const sectionStart = match.index;
+  const afterHeader = prompt.substring(sectionStart + match[0].length);
+
+  // Find next top-level section
+  const nextSectionMatch = afterHeader.match(
+    /\n##?\s*(?:Curriculum|Available Tools|Example|Response Guidelines|Integration Notes|Success Metrics)/i,
+  );
+  const sectionEnd =
+    nextSectionMatch?.index !== undefined
+      ? sectionStart + match[0].length + nextSectionMatch.index
+      : prompt.length;
+
+  const accessibilityContent = prompt.substring(sectionStart, sectionEnd);
+
+  // No active DSA profiles → strip entire section
+  if (!activeProfiles || activeProfiles.length === 0) {
+    return (prompt.substring(0, sectionStart) + prompt.substring(sectionEnd))
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  // Active profiles → keep only matching subsections
+  const lines = accessibilityContent.split('\n');
+  const keptLines: string[] = [lines[0]]; // Keep the ## header
+  let keepCurrent = false;
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^###?\s/.test(line)) {
+      keepCurrent = activeProfiles.some((profile) => {
+        const pattern = DSA_SUBSECTION_MAP[profile];
+        return pattern?.test(line);
+      });
+    }
+    if (keepCurrent) {
+      keptLines.push(line);
+    }
+  }
+
+  const filteredSection = keptLines.length > 1 ? keptLines.join('\n') : '';
+  return (prompt.substring(0, sectionStart) + filteredSection + prompt.substring(sectionEnd))
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }

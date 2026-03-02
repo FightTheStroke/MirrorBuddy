@@ -48,10 +48,9 @@ Use when:
 Trigger when:
 - Student stuck 3+ times
 
-## KNOWLEDGE BASE
-A very long knowledge base content that goes on and on with lots of details
-about math theory, algebra, geometry, calculus, and many other topics.
-${'x'.repeat(5000)}
+## IDENTITÀ E STILE
+Brief identity: Classic Math Professor, patient and precise.
+Famous quote: "Every equation tells a story."
 
 ## Core Identity
 - **Classic Professor**: Test Maestro
@@ -91,10 +90,10 @@ describe('buildVoicePrompt', () => {
     expect(result).toContain('Patient, precise, encouraging');
   });
 
-  it('should NOT include Knowledge Base content', () => {
+  it('should include IDENTITÀ E STILE (mini-KB is small enough for voice)', () => {
     const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }));
-    expect(result).not.toContain('KNOWLEDGE BASE');
-    expect(result).not.toContain('xxxxx');
+    expect(result).toContain('IDENTITÀ E STILE');
+    expect(result).toContain('Classic Math Professor');
   });
 
   it('should NOT include Accessibility Adaptations', () => {
@@ -142,12 +141,9 @@ describe('buildVoicePrompt', () => {
 
     it('should use full prompt when useFullPrompt=true', () => {
       const result = buildVoicePrompt(makeMaestro({ systemPrompt: FULL_SYSTEM_PROMPT }), true);
-      // Should NOT be truncated - can exceed 6000 chars
-      // The prompt without KB should be longer than truncation limit
       expect(result.length).toBeGreaterThan(500);
-      // Should still exclude KNOWLEDGE BASE
-      expect(result).not.toContain('KNOWLEDGE BASE');
-      expect(result).not.toContain('xxxxx');
+      // Should include mini-KB identity section
+      expect(result).toContain('IDENTITÀ E STILE');
       // Should include all sections (no truncation)
       expect(result).toContain('CHARACTER INTENSITY DIAL');
       expect(result).toContain('Core Identity');
@@ -175,6 +171,56 @@ describe('buildVoicePrompt', () => {
         false,
       );
       expect(resultDefault).toBe(resultExplicitFalse);
+    });
+  });
+
+  describe('non-regression: mini-KB token reduction', () => {
+    it('should produce shorter prompt than old full-KB approach', () => {
+      // Simulate old approach: large KNOWLEDGE BASE section
+      const oldPrompt = `You are a test maestro.
+
+## KNOWLEDGE BASE
+${'x'.repeat(5000)}
+
+## Core Identity
+Test identity.`;
+
+      // Simulate new approach: small IDENTITÀ E STILE section
+      const newPrompt = `You are a test maestro.
+
+## IDENTITÀ E STILE
+Brief identity: 50 lines of bio, style, quotes.
+
+## Core Identity
+Test identity.`;
+
+      const oldResult = buildVoicePrompt(makeMaestro({ systemPrompt: oldPrompt }));
+      const newResult = buildVoicePrompt(makeMaestro({ systemPrompt: newPrompt }));
+
+      // New prompt should be significantly shorter
+      expect(newResult.length).toBeLessThan(oldResult.length);
+    });
+
+    it('voice prompt preserves identity with mini-KB', () => {
+      const prompt = `You are Feynman.
+
+## CHARACTER INTENSITY DIAL
+Full energy mode.
+
+## IDENTITÀ E STILE
+Richard Feynman (1918-1988), physicist.
+Famous quote: "What I cannot create, I do not understand."
+
+## Core Identity
+Enthusiastic, curious, playful.`;
+
+      const result = buildVoicePrompt(makeMaestro({ systemPrompt: prompt }));
+
+      // Identity preserved
+      expect(result).toContain('Feynman');
+      expect(result).toContain('IDENTITÀ E STILE');
+      expect(result).toContain('Core Identity');
+      expect(result).toContain('CHARACTER INTENSITY DIAL');
     });
   });
 });

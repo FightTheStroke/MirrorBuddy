@@ -83,6 +83,7 @@ describe('memory-loader', () => {
       maxTopics: 15,
       semanticEnabled: false,
       crossMaestroEnabled: false,
+      conversationWindowTokens: 8000,
     });
   });
 
@@ -158,6 +159,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
       const conversations = [
         createMockConversation({
@@ -181,6 +183,7 @@ describe('memory-loader', () => {
         maxTopics: 10,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
       const manyTopics = Array.from({ length: 15 }, (_, i) => `topic${i}`);
       const conversations = [
@@ -221,6 +224,7 @@ describe('memory-loader', () => {
         maxTopics: 0,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
       const mockConversation = createMockConversation({
         summary: 'Should be ignored',
@@ -247,6 +251,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
       const conversations = Array.from({ length: 5 }, (_, i) =>
         createMockConversation({
@@ -275,6 +280,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
@@ -318,6 +324,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
 
@@ -346,6 +353,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       // Mock conversation data
@@ -403,6 +411,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       const mockConversation = createMockConversation({
@@ -435,6 +444,7 @@ describe('memory-loader', () => {
         maxTopics: 0,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       const query = 'Some query';
@@ -457,6 +467,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       const mockConversation = createMockConversation({
@@ -485,6 +496,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       const mockConversation = createMockConversation({
@@ -511,6 +523,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
@@ -728,6 +741,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
@@ -749,6 +763,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       vi.mocked(prisma.conversation.findMany).mockRejectedValue(new Error('Database error'));
@@ -775,6 +790,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       const mockConversation = createMockConversation({
@@ -802,6 +818,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       const mockConversation = createMockConversation({
@@ -846,6 +863,7 @@ describe('memory-loader', () => {
         maxTopics: 0,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       const { loadHierarchicalContext } = await import('../memory-loader');
@@ -856,6 +874,7 @@ describe('memory-loader', () => {
         maxTopics: 0,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       expect(result).toEqual({
@@ -873,6 +892,7 @@ describe('memory-loader', () => {
         maxTopics: 15,
         semanticEnabled: false,
         crossMaestroEnabled: false,
+        conversationWindowTokens: 8000,
       });
 
       expect(result).toEqual({
@@ -926,6 +946,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       expect(result.weeklySummary).toBeDefined();
@@ -959,6 +980,7 @@ describe('memory-loader', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       });
 
       expect(result.monthlySummary).toBeDefined();

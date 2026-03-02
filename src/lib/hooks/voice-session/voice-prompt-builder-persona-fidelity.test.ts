@@ -383,12 +383,11 @@ describe('buildVoicePrompt - Persona Fidelity Review', () => {
       expect(result).toContain('Section 1');
     });
 
-    it('should handle maestro with Italian knowledge base header', () => {
-      const italianKBPrompt = `You are a test maestro.
+    it('should handle maestro with mini-KB identity section', () => {
+      const miniKBPrompt = `You are a test maestro.
 
-## BASE DI CONOSCENZA
-This should be removed.
-${'x'.repeat(1000)}
+## IDENTITÀ E STILE
+Brief identity content (small, kept in voice).
 
 ## Core Identity
 This should be preserved.`;
@@ -404,13 +403,13 @@ This should be preserved.`;
         teachingStyle: 'Test',
         avatar: '/test.webp',
         color: '#000',
-        systemPrompt: italianKBPrompt,
+        systemPrompt: miniKBPrompt,
         greeting: 'Ciao',
       };
 
       const result = buildVoicePrompt(italianMaestro);
-      expect(result).not.toContain('BASE DI CONOSCENZA');
-      expect(result).not.toContain('This should be removed');
+      expect(result).toContain('IDENTITÀ E STILE');
+      expect(result).toContain('Brief identity content');
       expect(result).toContain('Core Identity');
       expect(result).toContain('This should be preserved');
     });

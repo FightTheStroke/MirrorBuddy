@@ -71,10 +71,8 @@ export function buildVoicePrompt(maestro: Maestro, useFullPrompt = false): strin
   const sanitized = sanitizeHtmlComments(raw);
 
   // Remove sections by finding boundaries programmatically.
-  // KB content contains ## sub-headers, so lazy regex fails — use indexOf approach.
+  // Mini-KB (IDENTITÀ E STILE) is small enough for voice — only strip accessibility.
   const withoutKB = removeSections(sanitized, [
-    'KNOWLEDGE BASE',
-    'BASE DI CONOSCENZA',
     'Accessibility Adaptations',
     "Adattamenti per l'Accessibilità",
   ])

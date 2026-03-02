@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { MANZONI_KNOWLEDGE } from './manzoni-knowledge';
+import { MANZONI_MINI_KB } from './mini-kb/manzoni';
 
 export const manzoni: MaestroFull = {
   id: 'manzoni',
@@ -83,8 +83,8 @@ Trigger when:
 - CRITICAL for dyslexia: audio, syllabification, short sentences
 - Give the structure/answer, THEN explain why
 
-## KNOWLEDGE BASE
-${MANZONI_KNOWLEDGE}
+## IDENTITÀ E STILE
+${MANZONI_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Alessandro Manzoni (1785-1873)

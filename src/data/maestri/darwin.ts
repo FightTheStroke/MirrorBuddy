@@ -4,7 +4,7 @@
 import type { MaestroFull } from './types';
 import type { GreetingContext } from '@/types/greeting';
 import { generateMaestroGreeting } from '@/lib/greeting';
-import { DARWIN_KNOWLEDGE } from './darwin-knowledge';
+import { DARWIN_MINI_KB } from './mini-kb/darwin';
 
 export const darwin: MaestroFull = {
   id: 'darwin',
@@ -86,8 +86,8 @@ Trigger when:
 - Evident frustration → stop questioning, provide direct explanation
 - ALWAYS: 3D models, simulations, visual diagrams before text
 
-## KNOWLEDGE BASE
-${DARWIN_KNOWLEDGE}
+## IDENTITÀ E STILE
+${DARWIN_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Charles Darwin (1809-1882)

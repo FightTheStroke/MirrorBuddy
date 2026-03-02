@@ -1,41 +1,41 @@
 /**
  * Cervantes - Professore Profile
  */
-import type { MaestroFull } from "./types";
-import type { GreetingContext } from "@/types/greeting";
-import { generateMaestroGreeting } from "@/lib/greeting";
-import { CERVANTES_KNOWLEDGE } from "./cervantes-knowledge";
+import type { MaestroFull } from './types';
+import type { GreetingContext } from '@/types/greeting';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import { CERVANTES_MINI_KB } from './mini-kb/cervantes';
 
 export const cervantes: MaestroFull = {
-  id: "cervantes",
-  name: "Cervantes",
-  displayName: "Cervantes",
-  subject: "spanish",
-  specialty: "Lingua Spagnola e Letteratura",
-  voice: "echo",
+  id: 'cervantes',
+  name: 'Cervantes',
+  displayName: 'Cervantes',
+  subject: 'spanish',
+  specialty: 'Lingua Spagnola e Letteratura',
+  voice: 'echo',
   voiceInstructions:
-    "You are Miguel de Cervantes, the great Spanish author. Speak with chivalric spirit and literary imagination. Teach Spanish with adventure and wisdom from Don Quijote. Alternate between Italian explanations and Spanish practice. Make grammar an exciting quest through stories and proverbs.",
+    'You are Miguel de Cervantes, the great Spanish author. Speak with chivalric spirit and literary imagination. Teach Spanish with adventure and wisdom from Don Quijote. Alternate between Italian explanations and Spanish practice. Make grammar an exciting quest through stories and proverbs.',
   teachingStyle:
-    "Cavalleresco, avventuroso, insegna lo spagnolo attraverso letteratura e avventura",
+    'Cavalleresco, avventuroso, insegna lo spagnolo attraverso letteratura e avventura',
   tools: [
-    "Task",
-    "Read",
-    "Write",
-    "WebSearch",
-    "MindMap",
-    "Quiz",
-    "Flashcards",
-    "Audio",
-    "Dictionary",
-    "Conjugator",
-    "Pronunciation",
-    "Video",
-    "HtmlInteractive",
-    "PDF",
-    "Webcam",
-    "Homework",
-    "Formula",
-    "Chart",
+    'Task',
+    'Read',
+    'Write',
+    'WebSearch',
+    'MindMap',
+    'Quiz',
+    'Flashcards',
+    'Audio',
+    'Dictionary',
+    'Conjugator',
+    'Pronunciation',
+    'Video',
+    'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -85,8 +85,8 @@ Trigger when:
 - Dyslexic student overwhelmed → simplify, add audio
 - Give the answer, THEN explain why
 
-## KNOWLEDGE BASE
-${CERVANTES_KNOWLEDGE}
+## IDENTITÀ E STILE
+${CERVANTES_MINI_KB}
 
 ## Core Identity
 - **Historical Figure**: Miguel de Cervantes Saavedra (1547-1616)
@@ -146,9 +146,9 @@ ${CERVANTES_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see cervantes-knowledge.ts`,
-  avatar: "/maestri/cervantes.webp",
-  color: "#C19A6B",
+  avatar: '/maestri/cervantes.webp',
+  color: '#C19A6B',
   greeting: `¡Buenos días! Soy Cervantes. ¿Cómo puedo ayudarle hoy?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("cervantes", "Cervantes", ctx.language),
+    generateMaestroGreeting('cervantes', 'Cervantes', ctx.language),
 };

@@ -86,6 +86,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // 2. Mock cross-maestro learnings
@@ -182,6 +183,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // Simulate database error
@@ -208,6 +210,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // Two conversations, but one maestro lookup fails
@@ -254,6 +257,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       };
 
       // Simulate cross-maestro loading that returned empty due to error
@@ -289,6 +293,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // Mix of valid and invalid keyFacts
@@ -344,6 +349,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
@@ -387,6 +393,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // Multiple conversations with Galileo
@@ -445,6 +452,7 @@ describe('Cross-Maestro Memory Integration', () => {
         maxTopics: 30,
         semanticEnabled: true,
         crossMaestroEnabled: true,
+        conversationWindowTokens: 16000,
       } as any);
 
       // Multiple subjects
