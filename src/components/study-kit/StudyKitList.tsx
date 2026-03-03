@@ -39,6 +39,10 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       }
 
       const response = await fetch(url);
+      if (response.status === 401) {
+        setStudyKits([]);
+        return;
+      }
       if (!response.ok) {
         throw new Error('Failed to load study kits');
       }
@@ -47,7 +51,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       setStudyKits(data.studyKits);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
-      logger.warn('Failed to load study kits', { error: String(err) });
+      logger.debug('Failed to load study kits', { error: String(err) });
     } finally {
       setIsLoading(false);
     }

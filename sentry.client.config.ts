@@ -126,6 +126,18 @@ if (dsn) {
       const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
       const isIOSSafari = /iPad|iPhone|iPod/i.test(ua) && /Safari/i.test(ua) && !/Chrome/i.test(ua);
 
+      // Filter transient Next.js RSC navigation failures (handled by browser fallback)
+      if (errorMessage.includes('Failed to fetch RSC payload')) return null;
+      if (event.logger === 'console') {
+        const args = (event as SentryEvent).extra?.arguments;
+        if (
+          Array.isArray(args) &&
+          args.some((a) => typeof a === 'string' && a.includes('Failed to fetch RSC payload'))
+        ) {
+          return null;
+        }
+      }
+
       // Filter known iOS Safari transient errors (not app bugs)
       if (isIOSSafari) {
         if (errorMessage.includes('Load failed') && errorMessage.includes('TypeError')) return null;
