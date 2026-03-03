@@ -143,9 +143,25 @@ export class WebRTCConnection {
 
   /**
    * Fetch server token config to determine protocol mode (GA vs preview).
-   * The server decides the protocol; the client follows.
+   * Reuses connectionInfo fields if already populated by the caller
+   * (e.g. from the overlay fetch), avoiding a duplicate /api/realtime/token request.
    */
   private async fetchServerConfig(): Promise<void> {
+    const ci = this.config.connectionInfo;
+    if (ci.azureResource || ci.webrtcEndpoint) {
+      this.serverConfig = {
+        azureResource: ci.azureResource,
+        webrtcEndpoint: ci.webrtcEndpoint,
+        deployment: ci.deployment,
+      };
+      logger.debug('[WebRTC] Server config from connectionInfo (no extra fetch)', {
+        protocol: this.isGAProtocol ? 'GA' : 'preview',
+        hasAzureResource: !!this.serverConfig.azureResource,
+        hasWebrtcEndpoint: !!this.serverConfig.webrtcEndpoint,
+      });
+      return;
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     try {

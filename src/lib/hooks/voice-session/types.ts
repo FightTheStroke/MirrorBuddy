@@ -23,6 +23,14 @@ export interface ConnectionInfo {
   characterType?: 'maestro' | 'coach' | 'buddy';
   /** Previous messages to inject into voice session for context continuity */
   initialMessages?: Array<{ role: 'user' | 'assistant'; content: string }>;
+  /** Azure resource name for GA protocol (from /api/realtime/token) */
+  azureResource?: string;
+  /** WebRTC endpoint URL for preview protocol (from /api/realtime/token) */
+  webrtcEndpoint?: string;
+  /** Azure deployment name (from /api/realtime/token) */
+  deployment?: string;
+  /** Transport mode: webrtc or websocket */
+  transport?: 'webrtc' | 'websocket';
 }
 
 export interface ConversationMemory {
