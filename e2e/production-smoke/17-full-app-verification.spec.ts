@@ -13,7 +13,7 @@
  * to avoid side effects and AI costs.
  */
 
-import { test, expect, PROD_URL, openMobileMenu } from './fixtures';
+import { test, expect, PROD_URL } from './fixtures';
 import { request as pwRequest } from '@playwright/test';
 
 /** Navigate to Astuccio — mobile uses direct URL (bottom-nav is Link, not button) */
@@ -22,7 +22,10 @@ async function goToAstuccio(page: import('@playwright/test').Page, isMobile: boo
     await page.goto('/it/astuccio');
   } else {
     await page.goto('/it');
-    await page.getByRole('button', { name: /Astuccio/i }).first().click();
+    await page
+      .getByRole('button', { name: /Astuccio/i })
+      .first()
+      .click();
   }
   await expect(page.getByRole('heading', { name: 'Carica', level: 2 })).toBeVisible({
     timeout: 15000,

@@ -132,7 +132,9 @@ export class WebRTCConnection {
       const message = error instanceof Error ? error.message : 'Unknown WebRTC error';
       const connectionTime = Date.now() - startTime;
       logVoiceError('WebRTCConnectionFailed', message, { connectionTime });
-      logger.error('[WebRTC] Connection failed', { errorDetails: message });
+      logger.debug('[WebRTC] Connection failed (already reported via logVoiceError)', {
+        errorDetails: message,
+      });
       // Propagate a marked error to prevent duplicate Sentry events in upstream handlers
       const wrappedError = new Error(message);
       (wrappedError as Error & { _voiceRootCause: boolean })._voiceRootCause = true;
@@ -339,7 +341,7 @@ export class WebRTCConnection {
     };
     channel.onerror = (event) => {
       logVoiceError('DataChannelError', event.error?.message || 'Unknown error');
-      logger.error('[WebRTC] Data channel error', {
+      logger.debug('[WebRTC] Data channel error (already reported via logVoiceError)', {
         errorDetails: event.error,
       });
     };
@@ -348,7 +350,7 @@ export class WebRTCConnection {
         this.config.onDataChannelMessage?.(JSON.parse(event.data));
       } catch (error) {
         logVoiceError('DataChannelParseError', `Failed to parse: ${String(error)}`);
-        logger.error('[WebRTC] Failed to parse message');
+        logger.debug('[WebRTC] Failed to parse message (already reported via logVoiceError)');
       }
     };
   }
@@ -358,7 +360,7 @@ export class WebRTCConnection {
     try {
       this.dataChannel.send(JSON.stringify(event));
     } catch (_error) {
-      logger.error('[WebRTC] Failed to send message');
+      logger.debug('[WebRTC] Failed to send message');
     }
   }
 
