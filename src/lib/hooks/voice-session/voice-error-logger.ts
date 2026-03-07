@@ -52,7 +52,7 @@ export function getDeviceInfo(): Record<string, string | number | boolean> {
       onLine: navigator.onLine,
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to get device info', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to get device info', { error: String(error) });
     return { error: 'Failed to get device info' };
   }
 }
@@ -86,7 +86,9 @@ export function getWebRTCCapabilities(): Record<string, boolean> {
       WebRTC: !!window.RTCPeerConnection && isMediaDevicesAvailable(),
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to check WebRTC capabilities', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to check WebRTC capabilities', {
+      error: String(error),
+    });
     return { error: true };
   }
 }

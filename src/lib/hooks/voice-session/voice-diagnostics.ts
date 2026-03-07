@@ -49,7 +49,7 @@ export function getAudioContextInfo(): Record<string, string | number | boolean 
     testContext.close();
     return info;
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to get audio context info', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to get audio context info', { error: String(error) });
     return {
       audioContextAvailable: false,
       error: String(error),
@@ -87,7 +87,7 @@ export async function getAudioDevices(): Promise<Record<string, unknown>> {
       })),
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to enumerate audio devices', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to enumerate audio devices', { error: String(error) });
     return {
       available: false,
       error: String(error),
@@ -119,7 +119,9 @@ export async function checkMicrophonePermissions(): Promise<
       canTry: permissionStatus.state !== 'denied',
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to check microphone permissions', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to check microphone permissions', {
+      error: String(error),
+    });
     return {
       permissionsAPI: false,
       status: 'Error checking permissions',
@@ -162,7 +164,9 @@ export async function logVoiceDiagnosticsReport(): Promise<void> {
       });
     }
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to generate diagnostics report', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to generate diagnostics report', {
+      error: String(error),
+    });
   }
 }
 
@@ -194,6 +198,8 @@ export function logMediaStreamTracks(stream: MediaStream, label: string = 'Media
 
     logger.debug('[VoiceSession] MediaStream tracks', context);
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to log media stream tracks', {}, error);
+    logger.debug('[VoiceErrorLogger] Failed to log media stream tracks', {
+      error: String(error),
+    });
   }
 }
