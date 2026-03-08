@@ -99,6 +99,17 @@ Before modifying: `npm run test:unit -- csp-validation`. "Caricamento..." foreve
 
 `./scripts/health-check.sh` (full triage, ~6 lines) or `npm run ci:summary` (build only). Details: `.claude/rules/ci-verification.md`.
 
+## NightMaintenance Routing (MANDATORY)
+
+- For Sentry+issue maintenance requests, use `.github/agents/night-maintenance.agent.md` as the primary execution contract.
+- Mandatory closure checks for this flow:
+  - `npm run test:smoke:prod`
+  - `npm run production:status`
+  - `curl -sS https://mirrorbuddy.org/api/health`
+  - `sentry-cli issues list --query "is:unresolved"`
+- During long CI/deploy waits, provide heartbeat updates at least every 5 minutes.
+- If a global `~/.claude` Nightly Guardian is used, it must load the MirrorBuddy runbook above and let repository-specific rules override generic multi-repo defaults.
+
 ## Thor Validation
 
 Per-task Thor (Gate 1-4, 8, 9) after each task; per-wave Thor (all 9 gates + build) after wave.

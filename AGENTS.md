@@ -48,6 +48,14 @@ AI-powered educational platform for students with learning differences.
 - 80% test coverage business logic, 100% critical paths
 - Parameterized queries only (Prisma)
 
+## NightMaintenance Routing (MANDATORY)
+
+- Trigger this flow whenever work includes **Sentry unresolved triage**, **GitHub incident/bug issue hygiene**, or **post-production verification**.
+- Canonical runbook: `.github/agents/night-maintenance.agent.md` (must be used as source of truth for check order and closure criteria).
+- While CI/deploy is running, publish heartbeat updates at least every 5 minutes.
+- Do not close operations without evidence for: `main` CI green, production health/version aligned, `npm run test:smoke:prod`, `npm run production:status`, and `sentry-cli issues list --query "is:unresolved"`.
+- If invoked from a global `~/.claude` Nightly Guardian, load the repository runbook above and let repo-specific rules override generic defaults.
+
 ## Detailed Instructions
 
 See `.github/copilot-instructions.md` for full project rules.
