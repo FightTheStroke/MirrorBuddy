@@ -16,6 +16,7 @@ import { DotMatrixVisualizer } from '@/components/voice/waveform';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import { getUserId, activeCharacterToMaestro } from './voice-call-helpers';
 import { useTranslations } from 'next-intl';
+import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
@@ -51,7 +52,14 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
   const voiceSession = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice call error', { message });
+      if (shouldEscalateVoiceError(error)) {
+        logger.error('Voice call error', { component: 'VoiceCallOverlay', message }, error);
+      } else {
+        logger.info('[VoiceCallOverlay] Voice call unavailable', {
+          component: 'VoiceCallOverlay',
+          message,
+        });
+      }
       setConfigError(message || 'Errore di connessione vocale');
     },
     onTranscript: (role, text) => {
@@ -219,7 +227,19 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
           characterType: character.type,
         });
       } catch (error) {
-        logger.error('Voice connection failed', { error: String(error) });
+        const message = error instanceof Error ? error.message : String(error);
+        if (shouldEscalateVoiceError(error)) {
+          logger.error(
+            'Voice connection failed',
+            { component: 'VoiceCallOverlay', message },
+            error,
+          );
+        } else {
+          logger.info('[VoiceCallOverlay] Voice connection unavailable', {
+            component: 'VoiceCallOverlay',
+            message,
+          });
+        }
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
           setConfigError(
             'Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.',

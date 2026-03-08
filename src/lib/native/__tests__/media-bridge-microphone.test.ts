@@ -3,32 +3,42 @@
  * Tests for microphone stream management and permission checks
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   requestMicrophoneStream,
   stopMicrophoneStream,
   checkMicrophonePermission,
-} from "../media-bridge";
+} from '../media-bridge';
 
 // Mock Capacitor
-const { mockCapacitor } = vi.hoisted(() => ({
+const { mockCapacitor, mockClientLogger } = vi.hoisted(() => ({
   mockCapacitor: {
     getPlatform: vi.fn(),
     isNativePlatform: vi.fn(),
   },
+  mockClientLogger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
 }));
 
-vi.mock("@capacitor/core", () => ({
+vi.mock('@capacitor/core', () => ({
   Capacitor: mockCapacitor,
 }));
 
-vi.mock("@capacitor/camera", () => ({
+vi.mock('@capacitor/camera', () => ({
   Camera: {},
-  CameraResultType: { Uri: "uri", Base64: "base64", DataUrl: "dataUrl" },
-  CameraSource: { Camera: "CAMERA", Photos: "PHOTOS" },
+  CameraResultType: { Uri: 'uri', Base64: 'base64', DataUrl: 'dataUrl' },
+  CameraSource: { Camera: 'CAMERA', Photos: 'PHOTOS' },
 }));
 
-describe("media-bridge — microphone", () => {
+vi.mock('@/lib/logger/client', () => ({
+  clientLogger: mockClientLogger,
+}));
+
+describe('media-bridge — microphone', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -37,11 +47,11 @@ describe("media-bridge — microphone", () => {
     vi.restoreAllMocks();
   });
 
-  describe("requestMicrophoneStream", () => {
-    it("uses getUserMedia on all platforms", async () => {
+  describe('requestMicrophoneStream', () => {
+    it('uses getUserMedia on all platforms', async () => {
       const mockStream = {
-        id: "mock-stream",
-        getAudioTracks: vi.fn().mockReturnValue([{ id: "track-1" }]),
+        id: 'mock-stream',
+        getAudioTracks: vi.fn().mockReturnValue([{ id: 'track-1' }]),
       } as unknown as MediaStream;
       const mockGetUserMedia = vi.fn().mockResolvedValue(mockStream);
 
@@ -60,10 +70,10 @@ describe("media-bridge — microphone", () => {
       expect(stream).toBe(mockStream);
     });
 
-    it("passes audio constraints", async () => {
+    it('passes audio constraints', async () => {
       const mockStream = {
-        id: "mock-stream",
-        getAudioTracks: vi.fn().mockReturnValue([{ id: "track-1" }]),
+        id: 'mock-stream',
+        getAudioTracks: vi.fn().mockReturnValue([{ id: 'track-1' }]),
       } as unknown as MediaStream;
       const mockGetUserMedia = vi.fn().mockResolvedValue(mockStream);
 
@@ -87,10 +97,8 @@ describe("media-bridge — microphone", () => {
       });
     });
 
-    it("handles permission denied", async () => {
-      const mockGetUserMedia = vi
-        .fn()
-        .mockRejectedValue(new Error("Permission denied"));
+    it('handles permission denied', async () => {
+      const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('Permission denied'));
 
       global.navigator = {
         mediaDevices: {
@@ -98,16 +106,79 @@ describe("media-bridge — microphone", () => {
         },
       } as never;
 
-      await expect(requestMicrophoneStream()).rejects.toThrow(
-        "Permission denied",
+      await expect(requestMicrophoneStream()).rejects.toThrow('Permission denied');
+    });
+
+    it('retries with default constraints on NotSupportedError', async () => {
+      const notSupportedError = new Error('Not supported');
+      notSupportedError.name = 'NotSupportedError';
+      const fallbackStream = {
+        id: 'fallback-stream',
+        getAudioTracks: vi.fn().mockReturnValue([{ id: 'track-fallback' }]),
+      } as unknown as MediaStream;
+
+      const mockGetUserMedia = vi
+        .fn()
+        .mockRejectedValueOnce(notSupportedError)
+        .mockResolvedValueOnce(fallbackStream);
+
+      global.navigator = {
+        mediaDevices: {
+          getUserMedia: mockGetUserMedia,
+        },
+      } as never;
+
+      const stream = await requestMicrophoneStream({
+        echoCancellation: true,
+        noiseSuppression: true,
+      });
+
+      expect(mockGetUserMedia).toHaveBeenNthCalledWith(1, {
+        audio: { echoCancellation: true, noiseSuppression: true },
+        video: false,
+      });
+      expect(mockGetUserMedia).toHaveBeenNthCalledWith(2, {
+        audio: true,
+        video: false,
+      });
+      expect(stream).toBe(fallbackStream);
+      expect(mockClientLogger.warn).toHaveBeenCalledWith(
+        '[MediaBridge] Retrying microphone stream with default constraints',
+        expect.objectContaining({
+          component: 'media-bridge',
+          errorName: 'NotSupportedError',
+        }),
       );
+    });
+
+    it('downgrades expected microphone access errors to warnings', async () => {
+      const notSupportedError = new Error('Not supported');
+      notSupportedError.name = 'NotSupportedError';
+      const mockGetUserMedia = vi.fn().mockRejectedValue(notSupportedError);
+
+      global.navigator = {
+        mediaDevices: {
+          getUserMedia: mockGetUserMedia,
+        },
+      } as never;
+
+      await expect(requestMicrophoneStream()).rejects.toThrow('Not supported');
+
+      expect(mockClientLogger.warn).toHaveBeenCalledWith(
+        '[MediaBridge] Microphone access unavailable',
+        expect.objectContaining({
+          component: 'media-bridge',
+          errorName: 'NotSupportedError',
+        }),
+      );
+      expect(mockClientLogger.error).not.toHaveBeenCalled();
     });
   });
 
-  describe("stopMicrophoneStream", () => {
-    it("stops all tracks in the stream", () => {
-      const mockTrack1 = { stop: vi.fn(), id: "track-1" };
-      const mockTrack2 = { stop: vi.fn(), id: "track-2" };
+  describe('stopMicrophoneStream', () => {
+    it('stops all tracks in the stream', () => {
+      const mockTrack1 = { stop: vi.fn(), id: 'track-1' };
+      const mockTrack2 = { stop: vi.fn(), id: 'track-2' };
       const mockStream = {
         getTracks: vi.fn().mockReturnValue([mockTrack1, mockTrack2]),
       } as unknown as MediaStream;
@@ -119,7 +190,7 @@ describe("media-bridge — microphone", () => {
       expect(mockTrack2.stop).toHaveBeenCalled();
     });
 
-    it("handles empty track list", () => {
+    it('handles empty track list', () => {
       const mockStream = {
         getTracks: vi.fn().mockReturnValue([]),
       } as unknown as MediaStream;
@@ -128,12 +199,12 @@ describe("media-bridge — microphone", () => {
     });
   });
 
-  describe("checkMicrophonePermission", () => {
-    it("uses Permissions API when available", async () => {
+  describe('checkMicrophonePermission', () => {
+    it('uses Permissions API when available', async () => {
       mockCapacitor.isNativePlatform.mockReturnValue(false);
 
       const mockPermissionStatus = {
-        state: "granted",
+        state: 'granted',
       };
 
       global.navigator = {
@@ -144,10 +215,10 @@ describe("media-bridge — microphone", () => {
 
       const result = await checkMicrophonePermission();
 
-      expect(result).toBe("granted");
+      expect(result).toBe('granted');
     });
 
-    it("returns prompt if Permissions API unavailable", async () => {
+    it('returns prompt if Permissions API unavailable', async () => {
       mockCapacitor.isNativePlatform.mockReturnValue(false);
       global.navigator = {
         mediaDevices: {
@@ -156,15 +227,15 @@ describe("media-bridge — microphone", () => {
       } as never;
 
       const result = await checkMicrophonePermission();
-      expect(result).toBe("prompt");
+      expect(result).toBe('prompt');
     });
 
-    it("returns denied if no getUserMedia available", async () => {
+    it('returns denied if no getUserMedia available', async () => {
       mockCapacitor.isNativePlatform.mockReturnValue(false);
       global.navigator = {} as never;
 
       const result = await checkMicrophonePermission();
-      expect(result).toBe("denied");
+      expect(result).toBe('denied');
     });
   });
 });

@@ -18,6 +18,7 @@ import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 import type { Maestro } from '@/types';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { getUserIdFromCookie } from '@/lib/auth';
+import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
@@ -78,7 +79,14 @@ export function VoiceCallPanel({
   const voiceSession = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice call error', { message });
+      if (shouldEscalateVoiceError(error)) {
+        logger.error('Voice call error', { component: 'VoiceCallPanel', message }, error);
+      } else {
+        logger.info('[VoiceCallPanel] Voice call unavailable', {
+          component: 'VoiceCallPanel',
+          message,
+        });
+      }
       setConfigError(message || 'Errore di connessione vocale');
     },
     onTranscript: (role, text) => {
@@ -180,7 +188,15 @@ export function VoiceCallPanel({
           characterType: character.type,
         });
       } catch (error) {
-        logger.error('Voice connection failed', { error: String(error) });
+        const message = error instanceof Error ? error.message : String(error);
+        if (shouldEscalateVoiceError(error)) {
+          logger.error('Voice connection failed', { component: 'VoiceCallPanel', message }, error);
+        } else {
+          logger.info('[VoiceCallPanel] Voice connection unavailable', {
+            component: 'VoiceCallPanel',
+            message,
+          });
+        }
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
           setConfigError(
             'Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.',

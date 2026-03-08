@@ -8,6 +8,7 @@ import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { usePermissions } from '@/lib/hooks/use-permissions';
 import { useProgressStore } from '@/lib/stores';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
 import {
   PermissionErrorView,
   ConfigErrorView,
@@ -73,7 +74,11 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice error', { message });
+      if (shouldEscalateVoiceError(error)) {
+        logger.error('Voice error', { component: 'VoiceSession', message }, error);
+      } else {
+        logger.info('[VoiceSession] Voice unavailable', { component: 'VoiceSession', message });
+      }
     },
     onTranscript: (role, text) => {
       logger.debug('Transcript', { role, text: text.substring(0, 100) });
