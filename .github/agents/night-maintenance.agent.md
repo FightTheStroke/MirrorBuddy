@@ -27,6 +27,13 @@ Run the NightMaintenance operational loop for MirrorBuddy.
 `sentry-cli issues list --query "is:unresolved"`  
 `npm audit --audit-level=high`
 
+## Flake Triage Rules
+
+1. Browser-native permission dialogs are not DOM elements and cannot be clicked by Playwright; use browser launch flags (`--use-fake-ui-for-media-stream`, `--use-fake-device-for-media-stream`) instead.
+2. If mobile smoke clicks are intercepted, pre-dismiss transient overlays (e.g., iOS install banner via localStorage key `ios-install-banner-dismissed`) in fixtures before first navigation.
+3. For compliance/content checks that are timing-sensitive, prefer `waitUntil: 'domcontentloaded'` plus `expect.poll(...)` over single immediate assertions.
+4. Before closing maintenance, rerun failing tests targeted first, then rerun full `npm run test:smoke:prod`; mark closure only on a full green run or documented non-blocking flaky quarantine.
+
 ## Output
 
 PR merged | main CI status | deploy target + version | Sentry delta | issue updates | docs/changelog updates
