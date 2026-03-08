@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Admin dashboard layout** — redesigned as Command Center with status bar, action alerts, collapsible sections with anchor scroll
 
+## [0.16.8] - 2026-03-08
+
+### Fixed
+
+- **Security dependencies (Issue #265)** — removed all high-severity `npm audit` findings by updating `dompurify` to `3.3.2` and refreshing vulnerable transitive packages (`@hono/node-server` `1.19.11`, `hono` `4.12.5`, `minimatch` `10.2.4`, `tar` `7.5.10`, `terser-webpack-plugin` `5.3.17`) via controlled overrides/lockfile refresh.
+- **Dependency vulnerability baseline** — `npm audit --audit-level=high` now reports `0` vulnerabilities on the release branch after remediation.
+
 ## [0.16.5] - 2026-02-28
 
 ### Added
