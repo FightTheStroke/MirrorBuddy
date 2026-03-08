@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **KPI grid extension** — MRR, Daily AI Cost, Trial→Pro conversion cards with DashboardSummary integration
 - **NightMaintenance process documentation** — codified recurring overnight operations workflow (CI/main monitoring, deploy promotion, post-production smoke validation, Sentry/issue hygiene) in ADR 0163
 - **NightMaintenance agent profile** — added reusable `.github/agents/night-maintenance.agent.md` for recurring maintenance runs
+- **NightMaintenance governance routing** — AGENTS.md and CLAUDE.md now require `.github/agents/night-maintenance.agent.md` for Sentry+issue maintenance tasks; global `~/.claude` Nightly Guardian is configured to load this repo-specific runbook.
 
 ### Changed
 
