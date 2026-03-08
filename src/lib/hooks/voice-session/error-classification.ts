@@ -17,8 +17,10 @@ const CAPABILITY_MESSAGE_HINTS = [
   'webrtc non supportato',
   'webrtc not supported',
   'microfono non autorizzato',
-  'permission denied',
 ];
+
+const PERMISSION_DENIED_HINT = 'permission denied';
+const MICROPHONE_CONTEXT_HINTS = ['microphone', 'microfono', 'audio input', 'getusermedia'];
 
 export function getVoiceErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -40,7 +42,15 @@ export function isVoiceCapabilityError(error: unknown): boolean {
   }
 
   const message = getVoiceErrorMessage(error).toLowerCase();
-  return CAPABILITY_MESSAGE_HINTS.some((hint) => message.includes(hint));
+  if (CAPABILITY_MESSAGE_HINTS.some((hint) => message.includes(hint))) {
+    return true;
+  }
+
+  if (message.includes(PERMISSION_DENIED_HINT)) {
+    return MICROPHONE_CONTEXT_HINTS.some((hint) => message.includes(hint));
+  }
+
+  return false;
 }
 
 export function shouldEscalateVoiceError(error: unknown): boolean {

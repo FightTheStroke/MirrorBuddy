@@ -30,6 +30,20 @@ describe('voice error classification', () => {
     expect(shouldEscalateVoiceError(error)).toBe(false);
   });
 
+  it('classifies microphone permission denied messages as capability errors', () => {
+    const error = new Error('Microphone permission denied by user');
+
+    expect(isVoiceCapabilityError(error)).toBe(true);
+    expect(shouldEscalateVoiceError(error)).toBe(false);
+  });
+
+  it('escalates generic permission denied backend failures', () => {
+    const error = new Error('Failed to get ephemeral token: 403 - Permission denied');
+
+    expect(isVoiceCapabilityError(error)).toBe(false);
+    expect(shouldEscalateVoiceError(error)).toBe(true);
+  });
+
   it('escalates unexpected errors', () => {
     const error = new Error('Unexpected transport failure');
 
