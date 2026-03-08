@@ -165,14 +165,23 @@ export interface MicrophoneConstraints {
 export async function requestMicrophoneStream(
   constraints?: MicrophoneConstraints,
 ): Promise<MediaStream> {
-  try {
-    const audioConstraints =
-      constraints && Object.keys(constraints).length > 0 ? constraints : true;
+  const getErrorName = (error: unknown): string =>
+    error instanceof Error ? error.name : 'UnknownError';
+  const getErrorMessage = (error: unknown): string =>
+    error instanceof Error ? error.message : String(error);
+  const isCompatibilityError = (error: unknown): boolean =>
+    ['NotSupportedError', 'OverconstrainedError'].includes(getErrorName(error));
+  const isExpectedAccessError = (error: unknown): boolean =>
+    ['NotSupportedError', 'NotAllowedError', 'NotFoundError', 'OverconstrainedError'].includes(
+      getErrorName(error),
+    );
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: audioConstraints,
-      video: false,
-    });
+  const audioConstraints = constraints && Object.keys(constraints).length > 0 ? constraints : true;
+  const requestAudio = (audio: MicrophoneConstraints | boolean) =>
+    navigator.mediaDevices.getUserMedia({ audio, video: false });
+
+  try {
+    const stream = await requestAudio(audioConstraints);
 
     logger.debug('[MediaBridge] Microphone stream acquired', {
       tracks: stream.getAudioTracks().length,
@@ -181,7 +190,45 @@ export async function requestMicrophoneStream(
 
     return stream;
   } catch (error) {
-    logger.error('[MediaBridge] Microphone access error', undefined, error);
+    if (audioConstraints !== true && isCompatibilityError(error)) {
+      logger.warn('[MediaBridge] Retrying microphone stream with default constraints', {
+        component: 'media-bridge',
+        errorName: getErrorName(error),
+      });
+      try {
+        const fallbackStream = await requestAudio(true);
+        logger.info('[MediaBridge] Microphone stream acquired with fallback constraints', {
+          tracks: fallbackStream.getAudioTracks().length,
+          platform: getPlatform(),
+        });
+        return fallbackStream;
+      } catch (fallbackError) {
+        if (isExpectedAccessError(fallbackError)) {
+          logger.warn('[MediaBridge] Microphone access unavailable after fallback', {
+            component: 'media-bridge',
+            errorName: getErrorName(fallbackError),
+            errorMessage: getErrorMessage(fallbackError),
+          });
+        } else {
+          logger.error(
+            '[MediaBridge] Microphone access error after fallback',
+            undefined,
+            fallbackError,
+          );
+        }
+        throw fallbackError;
+      }
+    }
+
+    if (isExpectedAccessError(error)) {
+      logger.warn('[MediaBridge] Microphone access unavailable', {
+        component: 'media-bridge',
+        errorName: getErrorName(error),
+        errorMessage: getErrorMessage(error),
+      });
+    } else {
+      logger.error('[MediaBridge] Microphone access error', undefined, error);
+    }
     throw error;
   }
 }

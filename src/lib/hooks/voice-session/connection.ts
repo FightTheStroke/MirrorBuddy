@@ -16,6 +16,7 @@ import { getHeartbeatIntervalWithJitter } from './constants';
 import { isWebRTCSupported } from './webrtc-support';
 import { getDeviceInfo, getWebRTCCapabilities } from './voice-error-logger';
 import { logVoiceDiagnosticsReport } from './voice-diagnostics';
+import { shouldEscalateVoiceError } from './error-classification';
 
 // Pre-stringified heartbeat message to avoid JSON.stringify on every beat
 export const HEARTBEAT_MESSAGE = JSON.stringify({
@@ -96,7 +97,9 @@ export function useConnect(
           await logVoiceDiagnosticsReport();
           setConnectionState('error');
           options.onStateChange?.('error');
-          options.onError?.(new Error(errorMsg));
+          const unsupportedError = new Error(errorMsg);
+          unsupportedError.name = 'NotSupportedError';
+          options.onError?.(unsupportedError);
           return;
         }
 
@@ -117,12 +120,25 @@ export function useConnect(
             : typeof error === 'string'
               ? error
               : 'Errore di connessione sconosciuto';
-        logger.error('[VoiceSession] Connection error', {
-          message: errorMessage,
-        });
+        const normalizedError = error instanceof Error ? error : new Error(errorMessage);
+        if (shouldEscalateVoiceError(normalizedError)) {
+          logger.error(
+            '[VoiceSession] Connection error',
+            {
+              component: 'voice-session',
+              message: errorMessage,
+            },
+            normalizedError,
+          );
+        } else {
+          logger.info('[VoiceSession] Connection unavailable', {
+            component: 'voice-session',
+            message: errorMessage,
+          });
+        }
         setConnectionState('error');
         options.onStateChange?.('error');
-        options.onError?.(new Error(errorMessage));
+        options.onError?.(normalizedError);
       }
     },
     [

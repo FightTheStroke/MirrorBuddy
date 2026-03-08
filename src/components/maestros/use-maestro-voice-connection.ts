@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { logger } from '@/lib/logger';
+import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
 import type { Maestro, ChatMessage } from '@/types';
 
 interface UseMaestroVoiceConnectionProps {
@@ -21,7 +22,11 @@ export function useMaestroVoiceConnection({
 }: UseMaestroVoiceConnectionProps) {
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [configError, setConfigError] = useState<string | null>(null);
-  const [connectionInfo, setConnectionInfo] = useState<{ provider: 'azure'; proxyPort: number; configured: boolean } | null>(null);
+  const [connectionInfo, setConnectionInfo] = useState<{
+    provider: 'azure';
+    proxyPort: number;
+    configured: boolean;
+  } | null>(null);
 
   const lastTranscriptIdRef = useRef<string | null>(null);
 
@@ -40,7 +45,18 @@ export function useMaestroVoiceConnection({
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice call error', { message });
+      if (shouldEscalateVoiceError(error)) {
+        logger.error(
+          'Voice call error',
+          { component: 'UseMaestroVoiceConnection', message },
+          error,
+        );
+      } else {
+        logger.info('[UseMaestroVoiceConnection] Voice call unavailable', {
+          component: 'UseMaestroVoiceConnection',
+          message,
+        });
+      }
       setConfigError(message || 'Errore di connessione vocale');
     },
     onTranscript: (role, text) => {
@@ -113,14 +129,28 @@ export function useMaestroVoiceConnection({
       try {
         // Convert messages to format needed for voice context
         const initialMessages = currentMessages
-          .filter(m => m.role === 'user' || m.role === 'assistant')
-          .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+          .filter((m) => m.role === 'user' || m.role === 'assistant')
+          .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
 
         await connect(maestro, { ...connectionInfo, initialMessages });
       } catch (error) {
-        logger.error('Voice connection failed', { error: String(error) });
+        const message = error instanceof Error ? error.message : String(error);
+        if (shouldEscalateVoiceError(error)) {
+          logger.error(
+            'Voice connection failed',
+            { component: 'UseMaestroVoiceConnection', message },
+            error,
+          );
+        } else {
+          logger.info('[UseMaestroVoiceConnection] Voice connection unavailable', {
+            component: 'UseMaestroVoiceConnection',
+            message,
+          });
+        }
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+          setConfigError(
+            'Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.',
+          );
         } else {
           setConfigError('Errore di connessione vocale');
         }
@@ -133,7 +163,7 @@ export function useMaestroVoiceConnection({
 
   const handleVoiceCall = useCallback(() => {
     if (isVoiceActive) disconnect();
-    setIsVoiceActive(prev => !prev);
+    setIsVoiceActive((prev) => !prev);
   }, [isVoiceActive, disconnect]);
 
   return {

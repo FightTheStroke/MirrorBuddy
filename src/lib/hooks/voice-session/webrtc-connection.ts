@@ -29,6 +29,7 @@ import {
   logSDPExchange,
   logVoiceError,
 } from './voice-error-logger';
+import { isVoiceCapabilityError } from './error-classification';
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
 
@@ -131,9 +132,20 @@ export class WebRTCConnection {
       this.cleanup();
       const message = error instanceof Error ? error.message : 'Unknown WebRTC error';
       const connectionTime = Date.now() - startTime;
-      logVoiceError('WebRTCConnectionFailed', message, { connectionTime });
+      const capabilityError = isVoiceCapabilityError(error);
+      if (capabilityError) {
+        logger.warn('[VoiceSession] WebRTC capability limitation', {
+          component: 'voice-error',
+          errorName: 'WebRTCConnectionFailed',
+          errorMessage: message,
+          connectionTime,
+        });
+      } else {
+        logVoiceError('WebRTCConnectionFailed', message, { connectionTime });
+      }
       logger.debug('[WebRTC] Connection failed (already reported via logVoiceError)', {
         errorDetails: message,
+        capabilityError,
       });
       // Propagate a marked error to prevent duplicate Sentry events in upstream handlers
       const wrappedError = new Error(message);
