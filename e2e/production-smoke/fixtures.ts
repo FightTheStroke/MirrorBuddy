@@ -28,6 +28,7 @@ import {
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 
 const PROD_VISITOR = '00000000-0000-4000-a000-000000000001';
+const IOS_INSTALL_BANNER_DISMISSED_KEY = 'ios-install-banner-dismissed';
 
 export const test = base.extend({
   // Clear global storageState so production smoke tests start without auth cookies.
@@ -39,6 +40,10 @@ export const test = base.extend({
 
     // Force Italian locale so selectors are predictable
     await context.setExtraHTTPHeaders({ 'Accept-Language': 'it-IT,it;q=0.9' });
+    // Prevent iOS install banner from intercepting clicks on mobile checks.
+    await context.addInitScript((dismissKey: string) => {
+      localStorage.setItem(dismissKey, new Date().toISOString());
+    }, IOS_INSTALL_BANNER_DISMISSED_KEY);
 
     // Bypass all consent walls
     await mockTOS(page);

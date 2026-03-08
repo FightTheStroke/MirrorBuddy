@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Admin dashboard layout** — redesigned as Command Center with status bar, action alerts, collapsible sections with anchor scroll
 
+### Fixed
+
+- **Production smoke stability** — reduced NightMaintenance false negatives by dismissing the iOS install banner in smoke fixtures, enabling fake media stream browser flags for production-smoke runs, and hardening `/it/ai-policy` compliance checks with polling-based assertions.
+
 ## [0.16.8] - 2026-03-08
 
 ### Fixed
