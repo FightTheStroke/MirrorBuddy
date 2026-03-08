@@ -104,11 +104,11 @@ test.describe('PROD-SMOKE: Extended Compliance', () => {
   });
 
   test('EU AI Act: /it/ai-policy loads with AI usage policy', async ({ page }) => {
-    await page.goto('/it/ai-policy');
-    const content = await bodyText(page);
-    expect(
-      hasAny(content, [/politica/i, /policy/i, /trasparenza ai/i, /ai transparency/i]),
-    ).toBeTruthy();
+    await page.goto('/it/ai-policy', { waitUntil: 'domcontentloaded' });
+    const patterns = [/politica/i, /policy/i, /trasparenza ai/i, /ai transparency/i];
+    await expect
+      .poll(async () => hasAny(await bodyText(page), patterns), { timeout: 15000 })
+      .toBeTruthy();
   });
 
   test('COPPA: /it/privacy contains children privacy or COPPA reference', async ({ page }) => {
