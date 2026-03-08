@@ -1,6 +1,6 @@
 {
   "name": "mirrorbuddy",
-  "version": "0.16.7",
+  "version": "0.16.8",
   "private": true,
   "description": "MirrorBuddy - La Scuola Che Vorrei: AI-powered educational platform for students with learning differences",
   "author": "Roberto D'Angelo <roberdan@fightthestroke.org>",
@@ -96,10 +96,13 @@
     "production:status": "./scripts/production-status.sh"
   },
   "overrides": {
-    "hono": "4.11.10",
+    "hono": "4.12.5",
     "tmp": "0.2.5",
     "lodash": "4.17.23",
-    "lodash-es": "4.17.23"
+    "lodash-es": "4.17.23",
+    "@hono/node-server": "1.19.11",
+    "tar": "7.5.10",
+    "terser-webpack-plugin": "5.3.17"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.73.0",
@@ -126,7 +129,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie": "^1.1.1",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.3.2",
     "framer-motion": "^12.23.26",
     "function-plot": "^1.25.3",
     "fuse.js": "^7.1.0",
