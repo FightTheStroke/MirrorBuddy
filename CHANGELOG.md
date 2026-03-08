@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **StatusBar component** — 3 pill-badges (System, Safety, Costs) with semaphore colors and smooth-scroll to sections
 - **ActionRequired section** — conditional alert card for pending invites, safety events, sentry errors, services down
 - **KPI grid extension** — MRR, Daily AI Cost, Trial→Pro conversion cards with DashboardSummary integration
-- **NightMaintenance process documentation** — codified recurring overnight operations workflow (CI/main monitoring, deploy promotion, Sentry/issue hygiene) in ADR 0163
+- **NightMaintenance process documentation** — codified recurring overnight operations workflow (CI/main monitoring, deploy promotion, post-production smoke validation, Sentry/issue hygiene) in ADR 0163
 - **NightMaintenance agent profile** — added reusable `.github/agents/night-maintenance.agent.md` for recurring maintenance runs
 
 ### Changed
