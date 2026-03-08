@@ -88,19 +88,20 @@
 
 ## Observability & Operations
 
-| #    | Decision                                            | Impact                             |
-| ---- | --------------------------------------------------- | ---------------------------------- |
-| 0006 | Telemetry System with Prometheus-Compatible Metrics | Metrics in Prometheus format       |
-| 0007 | Server-Side Notification Persistence                | DB-backed notifications            |
-| 0014 | PWA Push Notifications                              | Native push notifications          |
-| 0047 | Grafana Cloud Enterprise Observability              | Production monitoring              |
-| 0058 | Observability and KPIs for Beta Launch              | KPI tracking dashboard             |
-| 0065 | Service Limits Monitoring and Observability         | External service quota monitoring  |
-| 0070 | Sentry Error Tracking Integration                   | Error tracking and alerting        |
-| 0076 | Centralized Logging with Sentry Integration         | Structured logging                 |
-| 0121 | Admin Console Data Integrity                        | No mock data, honest health        |
-| 0141 | Admin Dashboard Overhaul v3                         | Redesigned admin layout, new pages |
-| 0142 | Azure Service Principal for Monitoring              | Automated monitoring credentials   |
+| #    | Decision                                            | Impact                               |
+| ---- | --------------------------------------------------- | ------------------------------------ |
+| 0006 | Telemetry System with Prometheus-Compatible Metrics | Metrics in Prometheus format         |
+| 0007 | Server-Side Notification Persistence                | DB-backed notifications              |
+| 0014 | PWA Push Notifications                              | Native push notifications            |
+| 0047 | Grafana Cloud Enterprise Observability              | Production monitoring                |
+| 0058 | Observability and KPIs for Beta Launch              | KPI tracking dashboard               |
+| 0065 | Service Limits Monitoring and Observability         | External service quota monitoring    |
+| 0070 | Sentry Error Tracking Integration                   | Error tracking and alerting          |
+| 0076 | Centralized Logging with Sentry Integration         | Structured logging                   |
+| 0121 | Admin Console Data Integrity                        | No mock data, honest health          |
+| 0141 | Admin Dashboard Overhaul v3                         | Redesigned admin layout, new pages   |
+| 0142 | Azure Service Principal for Monitoring              | Automated monitoring credentials     |
+| 0163 | NightMaintenance Release & Incident Hygiene         | Standard CI→deploy→Sentry→issue loop |
 
 ## Testing & CI
 
@@ -210,6 +211,6 @@
 
 ---
 
-**Total Active ADRs**: 127
+**Total Active ADRs**: 128
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-15
+**Last Updated**: 2026-03-08
