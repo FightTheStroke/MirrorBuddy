@@ -10,9 +10,9 @@
  * - STRIPE_WEBHOOK_SECRET (webhook verification)
  */
 
-import Stripe from "stripe";
-import { loadStripe, type Stripe as StripeClient } from "@stripe/stripe-js";
-import { logger } from "@/lib/logger";
+import Stripe from 'stripe';
+import { loadStripe, type Stripe as StripeClient } from '@stripe/stripe-js';
+import { logger } from '@/lib/logger';
 
 class StripeService {
   private static instance: StripeService;
@@ -20,7 +20,7 @@ class StripeService {
   private stripeClientPromise: Promise<StripeClient | null> | null = null;
 
   private constructor() {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       this.initServerStripe();
     } else {
       this.initClientStripe();
@@ -37,22 +37,22 @@ class StripeService {
   private initServerStripe(): void {
     const secretKey = process.env.STRIPE_SECRET_KEY;
     if (!secretKey) {
-      logger.warn("STRIPE_SECRET_KEY not set, Stripe server features disabled");
+      logger.warn('STRIPE_SECRET_KEY not set, Stripe server features disabled');
       return;
     }
 
     this.stripeServer = new Stripe(secretKey, {
-      apiVersion: "2026-01-28.clover",
+      apiVersion: '2026-02-25.clover',
       typescript: true,
     });
 
-    logger.info("Stripe server SDK initialized");
+    logger.info('Stripe server SDK initialized');
   }
 
   private initClientStripe(): void {
     const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
     if (!publishableKey) {
-      logger.warn("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not set");
+      logger.warn('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not set');
       return;
     }
 
@@ -61,18 +61,14 @@ class StripeService {
 
   getServerClient(): Stripe {
     if (!this.stripeServer) {
-      throw new Error(
-        "Stripe server client not initialized. Check STRIPE_SECRET_KEY.",
-      );
+      throw new Error('Stripe server client not initialized. Check STRIPE_SECRET_KEY.');
     }
     return this.stripeServer;
   }
 
   async getClientStripe(): Promise<StripeClient | null> {
     if (!this.stripeClientPromise) {
-      throw new Error(
-        "Stripe client not initialized. Check NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
-      );
+      throw new Error('Stripe client not initialized. Check NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.');
     }
     return this.stripeClientPromise;
   }
@@ -80,7 +76,7 @@ class StripeService {
   getWebhookSecret(): string {
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!secret) {
-      throw new Error("STRIPE_WEBHOOK_SECRET not configured");
+      throw new Error('STRIPE_WEBHOOK_SECRET not configured');
     }
     return secret;
   }
@@ -96,8 +92,8 @@ class StripeService {
     const stripe = this.getServerClient();
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
+      mode: 'subscription',
+      payment_method_types: ['card'],
       line_items: [
         {
           price: params.priceId,
@@ -108,16 +104,15 @@ class StripeService {
       client_reference_id: params.userId,
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
-      locale:
-        (params.locale as Stripe.Checkout.SessionCreateParams.Locale) || "auto",
+      locale: (params.locale as Stripe.Checkout.SessionCreateParams.Locale) || 'auto',
       automatic_tax: { enabled: true },
-      billing_address_collection: "required",
+      billing_address_collection: 'required',
       metadata: {
-        userId: params.userId || "",
+        userId: params.userId || '',
       },
     });
 
-    logger.info("Checkout session created", {
+    logger.info('Checkout session created', {
       sessionId: session.id,
       email: params.email,
     });
@@ -135,16 +130,13 @@ class StripeService {
       return_url: params.returnUrl,
     });
 
-    logger.info("Customer portal session created", {
+    logger.info('Customer portal session created', {
       customerId: params.customerId,
     });
     return session;
   }
 
-  async constructWebhookEvent(
-    payload: string | Buffer,
-    signature: string,
-  ): Promise<Stripe.Event> {
+  async constructWebhookEvent(payload: string | Buffer, signature: string): Promise<Stripe.Event> {
     const stripe = this.getServerClient();
     const webhookSecret = this.getWebhookSecret();
 
@@ -185,7 +177,7 @@ class StripeService {
     productId: string;
     amount: number;
     currency: string;
-    interval: "month" | "year";
+    interval: 'month' | 'year';
     metadata?: Record<string, string>;
   }): Promise<Stripe.Price> {
     const stripe = this.getServerClient();
