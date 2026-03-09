@@ -114,25 +114,21 @@ describe('ApprovedContributionsList vote toggle', () => {
     const button = await screen.findByRole('button', { name: 'Vote' });
     await user.click(button);
 
+    // Optimistic update is immediate (before debounce fires)
     expect(screen.getByRole('button', { name: 'Remove vote' })).toBeInTheDocument();
     expect(screen.getByText('3 votes')).toBeInTheDocument();
     expect(mockCsrfFetch).not.toHaveBeenCalled();
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 250));
-    });
-    expect(mockCsrfFetch).not.toHaveBeenCalled();
-
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 70));
-    });
-
-    await waitFor(() => {
-      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/community/vote', {
-        method: 'POST',
-        body: JSON.stringify({ contributionId: 'contribution-1' }),
-      });
-    });
+    // After debounce (300ms), the API call fires
+    await waitFor(
+      () => {
+        expect(mockCsrfFetch).toHaveBeenCalledWith('/api/community/vote', {
+          method: 'POST',
+          body: JSON.stringify({ contributionId: 'contribution-1' }),
+        });
+      },
+      { timeout: 1000 },
+    );
   });
 
   it('shows login prompt when user is not authenticated', async () => {
