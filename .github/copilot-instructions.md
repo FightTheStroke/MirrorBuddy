@@ -56,6 +56,22 @@ Next.js 16 App Router · TS strict · React 19 · Tailwind 4 · Zustand 5 · Pos
 | Admin          | `withCSRF` before `withAdmin`. Audit: `auditService.log('VERB_ENTITY')`                                     |
 | Compliance     | EU AI Act + GDPR + COPPA. Parameterized queries. No PII logs. Pages: `/ai-transparency`, `/privacy`         |
 
+## Workflow Enforcement (MANDATORY — ALL AGENTS)
+
+Every agent MUST follow this sequence for multi-task work (3+ tasks):
+
+| Step      | Command (Claude / Copilot equivalent)              | Skip = REJECTED                  |
+| --------- | -------------------------------------------------- | -------------------------------- |
+| Plan      | `@planner` / structured plan before coding         | No direct plan creation          |
+| Execute   | `@execute {id}` / follow plan tasks in order       | No direct file edits during plan |
+| Task done | `plan-db-safe.sh update-task {id} done`            | No skipping DB update            |
+| Validate  | `@validate {task_id}` / verify before marking done | No self-declaring done           |
+| Merge     | After all tasks validated                          | No merge with pending tasks      |
+
+After every task: checkpoint → validate → next task.
+
+Single fixes: direct edit OK without plan.
+
 ## Domain Instructions
 
 Path-matched files in `.github/instructions/` auto-load:
