@@ -1,117 +1,71 @@
 # MirrorBuddy
 
-<!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
+<!-- v2.1.0 (2026-03-13): Token-optimized -->
 
-icon: public/logo-brain.png
-
-AI-powered educational platform for students with learning differences.
-26 AI "Maestri" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
+AI education platform: 26 Maestri, voice, FSRS, mind maps, quizzes, gamification. Students with learning differences.
 
 ## Quality Gates (MANDATORY)
 
-**Before EVERY commit**:
+1. `npm run test:unit -- --reporter=dot` before EVERY commit
+2. UI text change: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`
+3. New env var: update `.env.example` + `validate-pre-deploy.ts` + workflows + `SETUP.md`
 
-1. `npm run test:unit -- --reporter=dot` (MUST pass)
-2. After ANY UI text change: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`
-3. New env var: update ALL of `.env.example`, `validate-pre-deploy.ts`, `.github/workflows/*.yml`, `SETUP.md`
-
-**Code standards**:
-
-- Defensive coding: null/undefined handling on all external input
-- Every async call MUST have error handling
+Defensive coding: null/undefined on external input. Every async = error handling.
 
 ## Commands
 
-| Command                             | Purpose                                    |
-| ----------------------------------- | ------------------------------------------ |
-| `npm run dev`                       | Dev server :3000                           |
-| `npm run build`                     | Production build                           |
-| `npm run ci:summary`                | PREFERRED: compact lint+typecheck+build    |
-| `npm run ci:summary:full`           | Same + unit tests                          |
-| `npm run test`                      | Playwright E2E                             |
-| `npm run test:unit`                 | Vitest unit tests                          |
-| `npm run release:fast`              | Fast gate: lint+typecheck+unit+smoke+build |
-| `npm run release:gate`              | Full 10/10 release gate                    |
-| `npm run ios:check`                 | iOS release readiness verification         |
-| `npx prisma generate`               | After schema changes                       |
-| `npx prisma migrate dev --name xyz` | Create migration (local only)              |
-| `./scripts/sync-databases.sh`       | Sync prod + test DBs after migrations      |
-| `./scripts/stop-local-services.sh`  | Stop local PostgreSQL after dev sessions   |
+| Command                            | Purpose                                 |
+| ---------------------------------- | --------------------------------------- |
+| `npm run dev`                      | Dev :3000                               |
+| `npm run build`                    | Prod build                              |
+| `npm run ci:summary`               | Compact lint+types+build                |
+| `npm run ci:summary:full`          | Same + unit tests                       |
+| `npm run test`                     | Playwright E2E                          |
+| `npm run test:unit`                | Vitest                                  |
+| `npm run release:fast`             | Fast gate (lint+types+unit+smoke+build) |
+| `npm run release:gate`             | Full 10/10 release                      |
+| `npm run ios:check`                | iOS readiness                           |
+| `npx prisma generate`              | After schema changes                    |
+| `./scripts/stop-local-services.sh` | Stop local PostgreSQL                   |
 
-## Local PostgreSQL (On-Demand — LOCAL DEV ONLY)
+## Local PostgreSQL (macOS dev only)
 
-⚠️ This applies ONLY to local macOS development. In production (Vercel + Supabase) and CI, PostgreSQL is managed by Supabase — never touch it.
-
-PostgreSQL is NOT auto-started at login. Before `npm run dev` or tests, ensure it's running:
-
-- **Start**: `brew services start postgresql@17` (or `./scripts/ensure-test-db.sh`)
-- **Stop**: `./scripts/stop-local-services.sh` (or `brew services stop postgresql@17`)
-
-Agents: always check `pg_isready` before running local dev/test commands. If PostgreSQL is down, start it first. Do NOT run brew commands in CI/CD or production.
+NOT auto-started. Before dev/tests: `brew services start postgresql@17` or `./scripts/ensure-test-db.sh`. Stop: `./scripts/stop-local-services.sh`. Never in CI/prod (Supabase managed).
 
 ## Architecture
 
-| Component | Technology                                              | Location                | ADR  |
-| --------- | ------------------------------------------------------- | ----------------------- | ---- |
-| Database  | PostgreSQL + pgvector                                   | `prisma/schema/`        | 0028 |
-| AI        | Azure OpenAI \| Claude (fallback) \| Ollama (local)     | `src/lib/ai/providers/` | -    |
-| RAG       | Semantic search                                         | `src/lib/rag/`          | 0033 |
-| State     | Zustand + REST (NO localStorage)                        | `src/lib/stores/`       | 0015 |
-| Auth      | Session-based `validateAuth()`, admin via `ADMIN_EMAIL` | -                       | 0075 |
-| Tiers     | Trial/Base/Pro                                          | `src/lib/tier/`         | 0065 |
+| Component | Tech                                              | Location                |
+| --------- | ------------------------------------------------- | ----------------------- |
+| DB        | PostgreSQL + pgvector                             | `prisma/schema/`        |
+| AI        | Azure OpenAI / Claude / Ollama                    | `src/lib/ai/providers/` |
+| State     | Zustand + REST (NO localStorage)                  | `src/lib/stores/`       |
+| Auth      | Session `validateAuth()`, admin via `ADMIN_EMAIL` | ADR 0075                |
+| Tiers     | Trial/Base/Pro                                    | `src/lib/tier/`         |
 
-**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs/` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`
+Key: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs/` | Maestros `src/data/maestri/`
 
-## Modular Rules (auto-loaded)
+## Rules & Docs
 
-`.claude/rules/`: accessibility | admin-patterns | ci-verification | compliance | cookies | e2e-testing | i18n | proxy-architecture | tier
+**Auto-loaded rules**: `.claude/rules/` (accessibility, admin-patterns, ci-verification, compliance, cookies, e2e, i18n, proxy, tier)
 
-## On-Demand Docs
-
-**Core**: mirrorbuddy | tools | database | api-routes
-**Learning**: knowledge-hub | rag | learning-path | conversation-memory
-**Characters**: coaches | buddies | adding-maestri | safety
-**Features**: voice-api | ambient-audio | onboarding | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | pdf-generator | gamification | validation | waitlist
-**Compliance**: accessibility
-**Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations | staging | ios-release
-**Beta**: trial-mode | google-drive
-**Setup**: `docs/setup/` — database.md | docker.md
-
-All docs: `@docs/claude/<name>.md`
-
-## CSP (Content Security Policy)
-
-`src/proxy.ts` (CSP header) + `src/components/providers.tsx` (nonces).
-Before modifying: `npm run test:unit -- csp-validation`. "Caricamento..." forever = CSP blocking.
+**On-demand docs**: `@docs/claude/<name>.md` — mirrorbuddy, tools, database, api-routes, coaches, rag, voice-api, gamification, tier, ios-release, etc.
 
 ## Constraints
 
-- WCAG 2.1 AA (7 DSA profiles in `src/lib/accessibility/`)
-- NO localStorage for user data — Zustand + REST only
-- Prisma for all DB operations — parameterized queries
-- Path aliases: `@/lib/...`, `@/components/...`, `@/types`
-- 5 locales (it/en/fr/de/es) via next-intl — see `.claude/rules/i18n.md`
-- TypeScript LSP active — prefer LSP over grep/glob
-- Tests first: failing test -> implement -> pass
-- Conventional commits, update CHANGELOG for user-facing changes
+WCAG 2.1 AA (7 DSA profiles) | NO localStorage | Prisma only | Path aliases `@/` | 5 locales (next-intl) | TypeScript LSP preferred | TDD | Conventional commits
+
+## CSP
+
+`src/proxy.ts` (header) + `src/components/providers.tsx` (nonces). Test: `npm run test:unit -- csp-validation`. "Caricamento..." forever = CSP blocking.
+
+## NightMaintenance
+
+Runbook: `.github/agents/night-maintenance.agent.md`. Closure: `npm run test:smoke:prod` + `npm run production:status` + health endpoint + `sentry-cli`. Heartbeat every 5min during CI waits.
+
+## Thor
+
+Per-task (Gates 1-4, 8, 9) + per-wave (all 9 + build). Gate 9 = ADR compliance. `plan-db.sh validate-task` / `validate-wave`.
 
 ## Verification
 
-`./scripts/health-check.sh` (full triage, ~6 lines) or `npm run ci:summary` (build only). Details: `.claude/rules/ci-verification.md`.
-
-## NightMaintenance Routing (MANDATORY)
-
-- For Sentry+issue maintenance requests, use `.github/agents/night-maintenance.agent.md` as the primary execution contract.
-- Mandatory closure checks for this flow:
-  - `npm run test:smoke:prod`
-  - `npm run production:status`
-  - `curl -sS https://mirrorbuddy.org/api/health`
-  - `sentry-cli issues list --query "is:unresolved"`
-- During long CI/deploy waits, provide heartbeat updates at least every 5 minutes.
-- If a global `~/.claude` Nightly Guardian is used, it must load the MirrorBuddy runbook above and let repository-specific rules override generic multi-repo defaults.
-
-## Thor Validation
-
-Per-task Thor (Gate 1-4, 8, 9) after each task; per-wave Thor (all 9 gates + build) after wave.
-Gate 9 enforces ADR compliance (19 active ADRs in `docs/adr/`). ADR-Smart Mode for documentation tasks.
-Progress only counts Thor-validated tasks. `plan-db.sh validate-task` / `validate-wave`.
+`./scripts/health-check.sh` (full) or `npm run ci:summary` (build). Details: `.claude/rules/ci-verification.md`.
