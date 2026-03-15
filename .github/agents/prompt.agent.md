@@ -2,8 +2,7 @@
 name: 'prompt'
 description: 'Extract structured F-xx requirements from user input. Outputs requirement specs for planner agent.'
 tools: ['search/codebase', 'read']
-model: ['Claude Opus 4.6']
-version: '2.0.0'
+model: claude-opus-4.6
 ---
 
 Extract structured F-xx requirements from user descriptions.

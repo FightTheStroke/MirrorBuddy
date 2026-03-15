@@ -2,8 +2,7 @@
 name: 'a11y-auditor'
 description: "WCAG 2.1 AA accessibility auditor for MirrorBuddy's 7 DSA profiles"
 tools: ['search/codebase', 'read']
-model: ['Claude Opus 4.6', 'GPT-5.3-Codex']
-version: '2.0.0'
+model: claude-opus-4.6
 ---
 
 Audit WCAG 2.1 AA compliance for MirrorBuddy's 7 DSA profiles.

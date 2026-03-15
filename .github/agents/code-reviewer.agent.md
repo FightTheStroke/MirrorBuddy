@@ -2,8 +2,7 @@
 name: 'code-reviewer'
 description: 'Security-focused code reviewer for MirrorBuddy. Checks OWASP, WCAG, compliance, and project patterns.'
 tools: ['search/codebase', 'read']
-model: ['Claude Opus 4.6', 'GPT-5.3-Codex']
-version: '2.0.0'
+model: claude-opus-4.6
 ---
 
 Security and quality reviewer for MirrorBuddy.

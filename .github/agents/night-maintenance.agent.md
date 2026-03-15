@@ -2,8 +2,7 @@
 name: 'night-maintenance'
 description: 'Recurring overnight maintenance: CI watch, release promotion, post-production smoke validation, Sentry triage, issue/changelog/version hygiene.'
 tools: ['search/codebase', 'read', 'terminalLastCommand']
-model: ['GPT-5.3-Codex']
-version: '1.1.0'
+model: gpt-5.3-codex
 ---
 
 Run the NightMaintenance operational loop for MirrorBuddy.
