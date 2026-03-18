@@ -29,6 +29,12 @@
     "errorDuplicate": "Cet email est déjà inscrit sur la liste d'attente.",
     "errorRateLimit": "Trop de tentatives. Réessayez dans quelques minutes.",
     "errorValidation": "Vérifiez vos informations et réessayez.",
-    "errorServer": "Une erreur s'est produite. Réessayez plus tard."
+    "errorServer": "Une erreur s'est produite. Réessayez plus tard.",
+    "verifyNotFound": "Lien de vérification introuvable",
+    "promoCodeTitle": "Code promotionnel",
+    "backToComingSoon": "Retour à Bientôt disponible",
+    "unsubscribeNotFound": "Lien de désabonnement introuvable",
+    "accountNavigation": "Navigation du compte",
+    "mainNavigation": "Navigation principale"
   }
 }

@@ -15,13 +15,13 @@
     "verifySuccess": "Email successfully verified! You are on the waitlist.",
     "verifyExpired": "The verification link has expired. Request a new link.",
     "verifyAlready": "This email has already been verified.",
-    "verifyNotFound": "Verification link is invalid or not found.",
-    "promoCodeTitle": "Your promotional code",
-    "backToComingSoon": "Back to main page",
+    "verifyNotFound": "Verification link not found",
+    "promoCodeTitle": "Promo Code",
+    "backToComingSoon": "Back to Coming Soon",
     "unsubscribeTitle": "Unsubscribe",
     "unsubscribeSuccess": "You have been successfully removed from the waitlist.",
     "unsubscribeAlready": "This email is not on the waitlist.",
-    "unsubscribeNotFound": "Unsubscribe request not found or invalid.",
+    "unsubscribeNotFound": "Unsubscribe link not found",
     "promoCodeLabel": "Promotional code (optional)",
     "loginLink": "Already have an account? Sign in",
     "optional": "optional",
@@ -33,6 +33,8 @@
     "errorDuplicate": "This email is already registered on the waitlist.",
     "errorRateLimit": "Too many attempts. Please try again in a few minutes.",
     "errorValidation": "Please check your input and try again.",
-    "errorServer": "An error occurred. Please try again later."
+    "errorServer": "An error occurred. Please try again later.",
+    "accountNavigation": "Account navigation",
+    "mainNavigation": "Main navigation"
   }
 }

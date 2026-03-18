@@ -29,6 +29,12 @@
     "errorDuplicate": "Este email ya está registrado en la lista de espera.",
     "errorRateLimit": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
     "errorValidation": "Comprueba los datos introducidos y vuelve a intentarlo.",
-    "errorServer": "Se ha producido un error. Inténtalo de nuevo más tarde."
+    "errorServer": "Se ha producido un error. Inténtalo de nuevo más tarde.",
+    "verifyNotFound": "Enlace de verificación no encontrado",
+    "promoCodeTitle": "Código promocional",
+    "backToComingSoon": "Volver a Próximamente",
+    "unsubscribeNotFound": "Enlace de cancelación no encontrado",
+    "accountNavigation": "Navegación de cuenta",
+    "mainNavigation": "Navegación principal"
   }
 }
