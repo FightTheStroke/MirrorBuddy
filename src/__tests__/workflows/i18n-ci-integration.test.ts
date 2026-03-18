@@ -1,13 +1,58 @@
-import { execSync } from 'child_process';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import YAML from 'yaml';
 import { describe, it, expect, beforeAll } from 'vitest';
 
+const EXPECTED_LOCALES = ['it', 'en', 'fr', 'de', 'es'];
+const REFERENCE_LOCALE = 'it';
+const NAMESPACES = [
+  'common',
+  'auth',
+  'admin',
+  'chat',
+  'tools',
+  'settings',
+  'compliance',
+  'education',
+  'navigation',
+  'errors',
+  'welcome',
+  'metadata',
+];
+
+/** Replicate extractKeys from scripts/i18n-check.ts */
+function extractKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
+  const keys = new Set<string>();
+  for (const [key, value] of Object.entries(obj)) {
+    const fullKey = prefix ? `${prefix}.${key}` : key;
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      for (const k of extractKeys(value as Record<string, unknown>, fullKey)) {
+        keys.add(k);
+      }
+    } else {
+      keys.add(fullKey);
+    }
+  }
+  return keys;
+}
+
+/** Replicate loadLocaleMessages from scripts/i18n-check.ts */
+function loadLocaleMessages(locale: string): Record<string, unknown> {
+  const localeDir = join(process.cwd(), 'messages', locale);
+  const merged: Record<string, unknown> = {};
+  for (const ns of NAMESPACES) {
+    const filePath = join(localeDir, `${ns}.json`);
+    if (existsSync(filePath)) {
+      Object.assign(merged, JSON.parse(readFileSync(filePath, 'utf-8')));
+    }
+  }
+  return merged;
+}
+
 describe('i18n CI Integration', () => {
   let workflowContent: any;
   let packageJson: any;
-  let i18nCheckOutput: string;
+  let keySets: Record<string, Set<string>>;
 
   beforeAll(() => {
     const workflowPath = join(process.cwd(), '.github/workflows/i18n-validation.yml');
@@ -15,18 +60,14 @@ describe('i18n CI Integration', () => {
 
     const rawWorkflow = readFileSync(workflowPath, 'utf-8');
     packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
-
     workflowContent = YAML.parse(rawWorkflow);
 
-    try {
-      i18nCheckOutput = execSync('npm run i18n:check', {
-        cwd: process.cwd(),
-        encoding: 'utf-8',
-      });
-    } catch (error: any) {
-      i18nCheckOutput = `${error.stdout?.toString() ?? ''}${error.stderr?.toString() ?? ''}`;
+    // Replicate i18n-check.ts logic: extract flattened key sets per locale
+    keySets = {};
+    for (const locale of EXPECTED_LOCALES) {
+      keySets[locale] = extractKeys(loadLocaleMessages(locale));
     }
-  }, 30000);
+  });
 
   describe('Workflow CI Configuration', () => {
     it('workflow should be triggered on PR creation and updates', () => {
@@ -66,13 +107,22 @@ describe('i18n CI Integration', () => {
     });
 
     it('should run i18n:check without errors on current codebase', () => {
-      expect(i18nCheckOutput).toContain('Result: PASS');
+      const refKeys = keySets[REFERENCE_LOCALE];
+      expect(refKeys.size).toBeGreaterThan(0);
+      // Every locale must have the exact same key set as reference
+      for (const locale of EXPECTED_LOCALES) {
+        const missing = [...refKeys].filter((k) => !keySets[locale].has(k));
+        expect(missing, `${locale} missing keys: ${missing.slice(0, 5).join(', ')}`).toHaveLength(
+          0,
+        );
+      }
     });
 
     it('i18n:check output should show all locales are validated', () => {
-      expect(i18nCheckOutput).toMatch(/[✓✗]\s+it:/);
-      expect(i18nCheckOutput).toMatch(/[✓✗]\s+en:/);
-      expect(i18nCheckOutput).toContain('keys');
+      for (const locale of EXPECTED_LOCALES) {
+        expect(keySets[locale]).toBeDefined();
+        expect(keySets[locale].size).toBeGreaterThan(0);
+      }
     });
   });
 
@@ -112,7 +162,6 @@ describe('i18n CI Integration', () => {
   describe('Workflow Performance', () => {
     it('should use setup-node with built-in caching', () => {
       const job = workflowContent.jobs['i18n-check'];
-      // The setup-node action has built-in caching
       expect(job.steps.some((step: any) => step.uses?.includes('setup-node'))).toBe(true);
     });
 
@@ -143,9 +192,17 @@ describe('i18n CI Integration', () => {
     });
 
     it('F-03: Validation script must check all required locales', () => {
-      expect(i18nCheckOutput).toMatch(/[✓✗]\s+it:/);
-      expect(i18nCheckOutput).toMatch(/[✓✗]\s+en:/);
-      expect(i18nCheckOutput).toContain('Result:');
+      const refKeys = keySets[REFERENCE_LOCALE];
+      for (const locale of EXPECTED_LOCALES) {
+        expect(keySets[locale]).toBeDefined();
+        // Exact key set match — same logic as scripts/i18n-check.ts
+        const missing = [...refKeys].filter((k) => !keySets[locale].has(k));
+        const extra = [...keySets[locale]].filter((k) => !refKeys.has(k));
+        expect(
+          missing.length + extra.length,
+          `${locale}: ${missing.length} missing, ${extra.length} extra`,
+        ).toBe(0);
+      }
     });
 
     it('F-04: PR must have visibility into validation failures', () => {

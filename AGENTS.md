@@ -1,63 +1,35 @@
 # MirrorBuddy — Cross-Agent Instructions
 
-AI-powered educational platform for students with learning differences.
-26 AI "Maestri" with voice, FSRS flashcards, mind maps, quizzes, gamification.
+AI education platform: 26 Maestri, voice, FSRS, mind maps, quizzes, gamification. Students with learning differences.
 
 ## Language
 
-- **Code, comments, documentation**: ALWAYS English
-- **UI text**: Localized via next-intl (it/en/fr/de/es)
+Code/comments/docs: English | UI: next-intl (it/en/fr/de/es)
 
-## Core Rules
+## Rules
 
-1. Minimum complexity — only what's requested, no over-engineering
-2. Max 250 lines per file — split if exceeds
-3. Tests first — TDD (RED, GREEN, REFACTOR)
-4. No workarounds — no TODO, FIXME, @ts-ignore, `any` casts
-5. Conventional commits — `feat:`, `fix:`, `chore:`, `docs:`
+1. Minimum complexity 2. Max 250 lines/file 3. TDD (RED→GREEN→REFACTOR) 4. No TODO/FIXME/@ts-ignore/`any` 5. Conventional commits
 
 ## Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **Database**: PostgreSQL + Prisma + pgvector
-- **AI**: Azure OpenAI (primary), Claude (fallback), Ollama (local)
-- **State**: Zustand + REST (NO localStorage for user data)
-- **Auth**: Session-based `validateAuth()` (ADR 0075)
-- **i18n**: next-intl, 5 locales (it/en/fr/de/es)
-- **Tiers**: Trial/Base/Pro (`src/lib/tier/`)
+Next.js 16 App Router | PostgreSQL+Prisma+pgvector | Azure OpenAI→Claude→Ollama | Zustand+REST (NO localStorage) | Session auth (ADR 0075) | Trial/Base/Pro tiers
 
 ## Critical Paths
 
-- **Proxy**: Only at `src/proxy.ts` (never root)
-- **CSP**: `src/proxy.ts` headers + `src/components/providers.tsx` nonces
-- **Safety**: `src/lib/safety/` (bias detection, content filtering)
-- **Accessibility**: 7 DSA profiles, WCAG 2.1 AA
+Proxy: `src/proxy.ts` ONLY | CSP: proxy.ts + providers.tsx nonces | Safety: `src/lib/safety/` | A11y: 7 DSA profiles, WCAG 2.1 AA
 
 ## Validation
 
-```bash
-./scripts/ci-summary.sh          # lint + typecheck + build
-./scripts/ci-summary.sh --quick  # lint + typecheck only
-./scripts/health-check.sh        # full project triage
-```
+`./scripts/ci-summary.sh` (lint+types+build) | `./scripts/health-check.sh` (full triage)
 
-## Quality
+## Workflow (3+ tasks)
 
-- WCAG 2.1 AA (4.5:1 contrast, keyboard nav, screen readers)
-- EU AI Act + GDPR + COPPA compliance
-- 80% test coverage business logic, 100% critical paths
-- Parameterized queries only (Prisma)
+`@planner` → `@execute {id}` → `plan-db-safe.sh update-task {id} done` → `@validate` → merge after all validated. Single fixes: direct edit OK.
 
-## NightMaintenance Routing (MANDATORY)
+## NightMaintenance
 
-- Trigger this flow whenever work includes **Sentry unresolved triage**, **GitHub incident/bug issue hygiene**, or **post-production verification**.
-- Canonical runbook: `.github/agents/night-maintenance.agent.md` (must be used as source of truth for check order and closure criteria).
-- While CI/deploy is running, publish heartbeat updates at least every 5 minutes.
-- Do not close operations without evidence for: `main` CI green, production health/version aligned, `npm run test:smoke:prod`, `npm run production:status`, and `sentry-cli issues list --query "is:unresolved"`.
-- If invoked from a global `~/.claude` Nightly Guardian, load the repository runbook above and let repo-specific rules override generic defaults.
+Runbook: `.github/agents/night-maintenance.agent.md`. Closure: `npm run test:smoke:prod` + `npm run production:status` + health endpoint + sentry-cli. Heartbeat every 5min during CI waits.
 
-## Detailed Instructions
+## Refs
 
-See `.github/copilot-instructions.md` for full project rules.
-See `.github/instructions/` for domain-specific rules.
-See `.github/agents/` for specialized agent personas.
+`.github/copilot-instructions.md` | `.github/instructions/` (domain rules) | `.github/agents/` (personas)
