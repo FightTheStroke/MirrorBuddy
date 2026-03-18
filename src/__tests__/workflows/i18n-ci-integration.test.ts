@@ -19,9 +19,10 @@ describe('i18n CI Integration', () => {
     workflowContent = YAML.parse(rawWorkflow);
 
     try {
-      i18nCheckOutput = execSync('npm run i18n:check', {
+      i18nCheckOutput = execSync('npx tsx scripts/i18n-check.ts', {
         cwd: process.cwd(),
         encoding: 'utf-8',
+        env: { ...process.env, npm_config_loglevel: 'silent' },
       });
     } catch (error: any) {
       i18nCheckOutput = `${error.stdout?.toString() ?? ''}${error.stderr?.toString() ?? ''}`;
