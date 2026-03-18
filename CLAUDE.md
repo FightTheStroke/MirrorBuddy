@@ -45,7 +45,7 @@ Rules: `.claude/rules/` (auto-loaded) | On-demand: `@docs/claude/<name>.md`
 
 ## Constraints
 
-WCAG 2.1 AA (7 DSA profiles) | NO localStorage | Prisma only | `@/` aliases | 5 locales (next-intl) | TDD | Conventional commits
+WCAG 2.1 AA (7 DSA profiles) | NO localStorage | Prisma only | `@/` aliases | 5 locales: it, en, fr, de, es (next-intl) | TDD | Conventional commits
 
 ## CSP
 
