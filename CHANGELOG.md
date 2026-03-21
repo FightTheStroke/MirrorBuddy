@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.9] - 2026-03-18
+
 ### Added
 
 - **Admin dashboard summary API** — `GET /api/admin/dashboard-summary` endpoint aggregating health status, unresolved safety events, 7-day cost, and business KPIs (MRR, trial conversion, churn) with 30s in-memory cache
@@ -24,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Production smoke stability** — reduced NightMaintenance false negatives by dismissing the iOS install banner in smoke fixtures, enabling fake media stream browser flags for production-smoke runs, and hardening `/it/ai-policy` compliance checks with polling-based assertions.
+- **i18n test stability** — replaced `execSync` subprocess with direct JSON key-set comparison to eliminate deadlock under concurrent vitest workers
+- **Stripe apiVersion** — aligned to `2026-02-25.clover` matching stripe@20.4.1
+- **Waitlist i18n** — added missing `accountNavigation`, `mainNavigation` and other keys in en/fr/de/es
 
 ## [0.16.8] - 2026-03-08
 

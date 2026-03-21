@@ -29,6 +29,12 @@
     "errorDuplicate": "Diese E-Mail ist bereits auf der Warteliste registriert.",
     "errorRateLimit": "Zu viele Versuche. Bitte versuchen Sie es in ein paar Minuten erneut.",
     "errorValidation": "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
-    "errorServer": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut."
+    "errorServer": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+    "verifyNotFound": "Bestätigungslink nicht gefunden",
+    "promoCodeTitle": "Aktionscode",
+    "backToComingSoon": "Zurück zu Demnächst verfügbar",
+    "unsubscribeNotFound": "Abmeldelink nicht gefunden",
+    "accountNavigation": "Kontonavigation",
+    "mainNavigation": "Hauptnavigation"
   }
 }
