@@ -55,14 +55,17 @@ jobs:
             echo "Recent deployments:"
             echo "$latest"
 
-            url=$(vercel inspect --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>/dev/null | grep "url:" | head -1 | awk '{print $2}')
+            url=$(echo "$latest" | grep "https://" | head -1 | awk '{for(i=1;i<=NF;i++) if($i ~ /^https:\/\//) print $i}')
+            if [ -z "$url" ]; then
+              url=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>/dev/null | grep -v "Production" | grep "https://" | head -1 | awk '{for(i=1;i<=NF;i++) if($i ~ /^https:\/\//) print $i}')
+            fi
             if [ -z "$url" ]; then
               echo "::error::Could not find a staging deployment to promote"
               echo "Please provide the staging deployment URL manually"
               exit 1
             fi
-            echo "deployment_url=https://$url" >> $GITHUB_OUTPUT
-            echo "Found latest deployment: https://$url"
+            echo "deployment_url=$url" >> $GITHUB_OUTPUT
+            echo "Found latest deployment: $url"
           fi
 
       - name: Pre-promotion Staging Health Check
