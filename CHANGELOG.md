@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.10] - 2026-03-21
+
+### Security
+
+- **undici** 6.23.0 → 6.24.1 — fixes CVE-2026-1525 (HTTP smuggling), CVE-2026-1527 (CRLF injection), CVE-2026-1528 (WebSocket crash), CVE-2026-2229 (WebSocket unhandled exception), CVE-2026-1526 (WebSocket memory exhaustion)
+- **flatted** → 3.4.2 — fixes GHSA-25h7-pfq9-p65f (unbounded recursion DoS)
+- **next** 16.1.5 → 16.2.1 — fixes GHSA-ggv3-7p47-pfv8 (HTTP smuggling in rewrites), GHSA-3x4c-7xq6-9pq8 (image cache exhaustion), GHSA-h27x-g6w4-24gq (resume buffering DoS), GHSA-mq59-m269-xvcx (CSRF bypass), GHSA-jcc7-9wpm-mj36 (HMR CSRF bypass)
+
+### Fixed
+
+- **promote-to-production workflow** — fixed staging URL lookup that used `vercel inspect` without a deployment URL; now extracts URL from `vercel list` output
+
 ## [0.16.9] - 2026-03-18
 
 ### Added
