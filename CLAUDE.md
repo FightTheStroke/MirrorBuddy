@@ -54,3 +54,19 @@ WCAG 2.1 AA (7 DSA profiles) | NO localStorage | Prisma only | `@/` aliases | 5 
 ## Verification
 
 `./scripts/health-check.sh` (full) or `npm run ci:summary` (build). Thor: per-task (Gates 1-4, 8, 9) + per-wave (all 9 + build). Night: `.github/agents/night-maintenance.agent.md`.
+
+## Execution Bias
+
+When user says "execute", "continue", "fai", or references a plan/MISSION.md: act within ≤3 exploratory tool calls, then start work. No drift into exploration. Skills `/pr`, `/worktree-start`, `/verify-done` encode recurring checklists — invoke them instead of re-deriving steps.
+
+## Worktree Discipline
+
+Never work directly on `main`. Use `/worktree-start` → creates `./worktrees/<id>` + branch. MainGuard hook (`.claude/hooks/main-guard.sh`) blocks writes to src on main (carve-outs: CLAUDE.md, `.claude/**`, `docs/**`, `*.md`). Emergency override: `MB_ALLOW_MAIN_WRITES=1`.
+
+## Pre-Push Checklist (hook-enforced)
+
+Bash guard (`.claude/hooks/bash-guard.sh`) blocks: standalone `npm run lint|typecheck|build|test:unit`, `gh run view --log`, `git push --no-verify|--force`. Use `npm run ci:summary` + `~/.claude/scripts/ci-check.sh`. `gh pr merge` triggers confirmation — paste `gh pr checks <n>` output + wait user "yes".
+
+## Verify-Before-Done
+
+Never claim "done" without running `/verify-done` (or equivalent: `./scripts/health-check.sh` + `npm run ci:summary`). Paste actual output. If red → not done. Applies to TaskUpdate completed status too.
