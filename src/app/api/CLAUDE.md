@@ -1,6 +1,6 @@
 # API Routes — MirrorBuddy
 
-Route handlers under `src/app/api/`. See root `CLAUDE.md` + `.claude/rules/admin-patterns.md` for context.
+Route handlers under `src/app/api/`. See root `CLAUDE.md` + `.claude/rules/auth-api.md` for context.
 
 ## Mutation Template (POST/PUT/PATCH/DELETE)
 
