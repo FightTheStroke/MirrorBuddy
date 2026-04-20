@@ -10,7 +10,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/bash-guard.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/bash-guard.sh\"",
             "timeout": 10
           }
         ]
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/main-guard.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/main-guard.sh\"",
             "timeout": 10
           }
         ]
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/post-edit-ts.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-ts.sh\"",
             "timeout": 10
           }
         ]

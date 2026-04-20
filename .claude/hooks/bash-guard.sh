@@ -53,7 +53,7 @@ if printf '%s' "$norm" | grep -qE 'gh[[:space:]]+run[[:space:]]+view.*--log'; th
 fi
 
 # 3) Dangerous git push flags
-if printf '%s' "$norm" | grep -qE 'git[[:space:]]+push.*(--no-verify|-f[[:space:]]|--force)'; then
+if printf '%s' "$norm" | grep -qE 'git[[:space:]]+push.*(--no-verify|(^|[[:space:]])-f([[:space:]]|$)|--force)'; then
   deny "--no-verify / --force on git push forbidden. Fix the root cause (hook failure, merge conflict) instead of bypassing."
 fi
 
