@@ -6,7 +6,7 @@ EU AI Act (2024/1689), Italian Law 132/2025, GDPR, COPPA, WCAG 2.1 AA.
 
 ## Docs (`docs/compliance/`)
 
-`DPIA.md` | `AI-POLICY.md` | `MODEL-CARD.md` | `AI-RISK-MANAGEMENT.md` | `POST-MARKET-MONITORING-PLAN.md` | `LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md` | `countries/{it|fr|es}/`
+`DPIA.md` | `AI-POLICY.md` | `MODEL-CARD.md` | `AI-RISK-MANAGEMENT.md` | `POST-MARKET-MONITORING-PLAN.md` | `LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md` | `countries/{italy|france|spain}/` (e.g. `italy/accessibility-compliance.md`, `france/cookie-compliance.md`, `spain/cookie-compliance.md`)
 
 ## Public pages
 
