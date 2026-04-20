@@ -96,10 +96,10 @@ export function MaestroUsageChart({ sessions, className }: MaestroUsageChartProp
                     borderRadius: '8px',
                     color: '#fff',
                   }}
-                  formatter={(value: number | undefined, name: string | undefined) => {
-                    if (name === 'sessions')
-                      return [`${value || 0} ${t('sessionsLabel')}`, t('sessions')];
-                    return [value || 0, name || ''];
+                  formatter={(value, name) => {
+                    const n = typeof value === 'number' ? value : Number(value) || 0;
+                    if (name === 'sessions') return [`${n} ${t('sessionsLabel')}`, t('sessions')];
+                    return [n, String(name ?? '')];
                   }}
                 />
                 <Bar dataKey="sessions" radius={[0, 8, 8, 0]}>
