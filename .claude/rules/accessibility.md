@@ -1,25 +1,25 @@
-# Accessibility Rules - MirrorBuddy
+# Accessibility — MirrorBuddy
 
 ## 7 DSA Profiles (`src/lib/accessibility/`)
 
-Dyslexia | ADHD | Visual Impairment | Motor Impairment | Autism | Auditory Impairment | Cerebral Palsy
+Dyslexia | ADHD | Visual | Motor | Autism | Auditory | Cerebral Palsy.
 
-## WCAG 2.1 AA Requirements
+## WCAG 2.1 AA
 
-- **Contrast**: 4.5:1 normal text, 3:1 large text
-- **Focus**: Visible indicators on all interactive elements
-- **Keyboard**: All functionality via keyboard
-- **Motion**: Respect `prefers-reduced-motion`
-- **Text**: 200% zoom without horizontal scroll
+- Contrast: 4.5:1 normal / 3:1 large
+- Visible focus on interactive elements
+- Full keyboard (Tab/Enter/Escape)
+- Respect `prefers-reduced-motion`
+- 200% zoom no horizontal scroll
 
-## UI Component Checklist
+## Component checklist
 
-- [ ] Test with each accessibility profile enabled
-- [ ] Verify keyboard navigation (Tab, Enter, Escape)
-- [ ] Check color contrast with high contrast mode
-- [ ] Ensure TTS reads content correctly
-- [ ] Test with reduced motion enabled
+- [ ] Test each profile enabled
+- [ ] Keyboard nav (Tab/Enter/Escape)
+- [ ] Contrast in high-contrast mode
+- [ ] TTS reads correctly
+- [ ] Reduced motion
 
-## Store: `useAccessibilityStore` from `@/lib/accessibility` (Zustand, NOT localStorage)
+## Store: `useAccessibilityStore` from `@/lib/accessibility` (Zustand — NOT localStorage)
 
-## Full reference: `@docs/claude/accessibility.md` | ADR 0060
+## Ref: `@docs/claude/accessibility.md` | ADR 0060

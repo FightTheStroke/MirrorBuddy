@@ -1,14 +1,13 @@
-# Proxy Architecture - MirrorBuddy
+# Proxy Architecture — MirrorBuddy
 
-## CRITICAL: Only ONE `proxy.ts` — at `src/proxy.ts` (default export required)
+## ONE `proxy.ts` at `src/proxy.ts` only (default export)
 
-**NEVER create**: root `proxy.ts` (FORBIDDEN) or `middleware.ts` (deprecated in Next.js 16).
-Two proxy files = Next.js uses root, ignores src → API 307 redirects → 404 → complete app failure.
+NEVER create: root `proxy.ts` (forbidden) | `middleware.ts` (deprecated in Next.js 16). Two proxy files = Next picks root, ignores src → API 307 → 404 → app fails.
 
-## Path Exclusion
+## Proxy skips i18n for
 
-Proxy MUST skip i18n for: `/api/*`, `/admin/*`, `/_next/*`, `/monitoring`, static files (`.png`, `.webp`, `.svg`), `/maestri/*`, `/avatars/*`, `/logo*`
+`/api/*`, `/admin/*`, `/_next/*`, `/monitoring`, static (`.png`, `.webp`, `.svg`), `/maestri/*`, `/avatars/*`, `/logo*`.
 
 ## Pre-push hook blocks if root `proxy.ts` exists.
 
-## Reference: ADR 0066 Section 9 | `@docs/claude/vercel-deployment.md`
+## Ref: ADR 0066 §9 | `@docs/claude/vercel-deployment.md`
