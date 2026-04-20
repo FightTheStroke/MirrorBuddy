@@ -121,7 +121,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
     <Card className={cn('overflow-hidden', className)}>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{t("tempoDiStudio")}</CardTitle>
+          <CardTitle>{t('tempoDiStudio')}</CardTitle>
           <div className="flex gap-2">
             {(['today', 'week', 'month', 'season'] as TimePeriod[]).map((p) => (
               <button
@@ -144,7 +144,8 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
           </div>
         </div>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          {t("totale1")} {totalMinutes} {t("minuti2")}{Math.round(totalMinutes / 60)} {t("ore")}
+          {t('totale1')} {totalMinutes} {t('minuti2')}
+          {Math.round(totalMinutes / 60)} {t('ore')}
         </p>
       </CardHeader>
 
@@ -175,10 +176,11 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                     borderRadius: '8px',
                     color: '#fff',
                   }}
-                  formatter={(value: number | undefined, name: string | undefined) => [
-                    `${value || 0} min`,
-                    SUBJECT_NAMES[name || ''] || name || '',
-                  ]}
+                  formatter={(value, name) => {
+                    const n = typeof value === 'number' ? value : Number(value) || 0;
+                    const k = String(name ?? '');
+                    return [`${n} min`, SUBJECT_NAMES[k] || k];
+                  }}
                 />
                 <Legend
                   formatter={(value) => SUBJECT_NAMES[value] || value}
@@ -199,14 +201,14 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
             </ResponsiveContainer>
 
             {/* Accessible table for screen readers */}
-            <table className="sr-only" aria-label={t("datiTempoDiStudio")}>
+            <table className="sr-only" aria-label={t('datiTempoDiStudio')}>
               <thead>
                 <tr>
-                  <th>{t("data")}</th>
+                  <th>{t('data')}</th>
                   {subjects.map((subject) => (
                     <th key={subject}>{SUBJECT_NAMES[subject] || subject}</th>
                   ))}
-                  <th>{t("totale")}</th>
+                  <th>{t('totale')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -215,10 +217,12 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                     <td>{point.date}</td>
                     {subjects.map((subject) => (
                       <td key={subject}>
-                        {(point as Record<string, string | number>)[subject] || 0} {t("minuti1")}
+                        {(point as Record<string, string | number>)[subject] || 0} {t('minuti1')}
                       </td>
                     ))}
-                    <td>{point.total} {t("minuti")}</td>
+                    <td>
+                      {point.total} {t('minuti')}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -226,7 +230,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-slate-500">
-            {t("nessunaSessioneDiStudioNelPeriodoSelezionato")}
+            {t('nessunaSessioneDiStudioNelPeriodoSelezionato')}
           </div>
         )}
       </CardContent>

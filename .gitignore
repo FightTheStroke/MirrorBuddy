@@ -31,6 +31,9 @@
 *.pptx
 ~$*
 
+# turbo
+.turbo
+
 # debug
 npm-debug.log*
 yarn-debug.log*
