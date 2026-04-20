@@ -82,8 +82,8 @@ export function HomeSidebar({
       >
         {/* Logo - clickable to return home */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
-          <button
-            onClick={() => handleViewChange('maestri')}
+          <Link
+            href="/"
             className="flex items-center gap-3 h-11 min-w-[44px] hover:opacity-80 transition-opacity"
             aria-label={t('sidebar.backToHome')}
           >
@@ -98,7 +98,7 @@ export function HomeSidebar({
                 </span>
               </div>
             )}
-          </button>
+          </Link>
           <Button
             variant="ghost"
             size="icon"
