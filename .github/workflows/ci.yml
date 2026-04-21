@@ -280,8 +280,10 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: pnpm install --frozen-lockfile
 
-      - name: Generate SBOM
-        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json
+      - name: Generate SBOM (pnpm)
+        # @cyclonedx/cyclonedx-npm requires npm lockfile; post-W4 drop-lock
+        # we use cdxgen which auto-detects pnpm-lock.yaml.
+        run: npx @cyclonedx/cdxgen@^11 --type npm --output sbom.json
 
       - name: Upload SBOM
         uses: actions/upload-artifact@v4
