@@ -221,22 +221,25 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 ## Quick Start
 
 ```bash
-# Clone and install
+# Clone and install (pnpm required; see below)
 git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
-npm install
+pnpm install      # npm install still works during W1–W3 transition
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your Azure OpenAI or Ollama credentials
 
 # Initialize database
-npx prisma generate
-npx prisma migrate dev
+pnpm prisma generate
+pnpm prisma migrate dev
 
 # Start development server
-npm run dev
+pnpm dev
 ```
+
+**Prerequisites:** Node ≥ 20, pnpm ≥ 10.33.0 (pinned via the `packageManager` field).
+Turborepo handles cross-package task orchestration; `pnpm dev` / `pnpm build` / `pnpm lint` run through Turbo automatically.
 
 Open http://localhost:3000 and start learning.
 
@@ -258,14 +261,14 @@ MirrorBuddy ships as native iOS and Android apps using Capacitor, sharing the sa
 
 ```bash
 # Install Capacitor
-npm install @capacitor/cli @capacitor/core
+pnpm add @capacitor/cli @capacitor/core
 
 # Add iOS/Android platforms
-npx cap add ios
-npx cap add android
+pnpm cap add ios
+pnpm cap add android
 
 # Build for mobile
-npm run build:mobile
+pnpm build:mobile
 
 # Open native IDE to build & deploy
 npx cap open ios   # Opens Xcode
@@ -436,6 +439,7 @@ For i18n-specific incidents:
 | Database      | Prisma + PostgreSQL + pgvector             |
 | Testing       | Playwright E2E (API-focused) + Vitest unit |
 | Observability | Grafana Cloud + Prometheus metrics         |
+| Monorepo      | pnpm workspaces + Turborepo (see ADR 0164) |
 
 ---
 
