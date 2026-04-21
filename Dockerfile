@@ -12,7 +12,11 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat openssl
 
 # Copy package files and Prisma config
-COPY package.json package-lock.json ./
+# Monorepo: copy workspace config + packages/ so npm ci can resolve
+# workspace:* deps (added in W1b migration). Excluding prisma-lock.yaml
+# because we use package-lock.json in Docker until W4 migration completes.
+COPY package.json package-lock.json pnpm-workspace.yaml ./
+COPY packages ./packages/
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
