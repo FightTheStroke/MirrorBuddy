@@ -239,12 +239,18 @@ function getUnifiedConsent(): UnifiedConsentData | null {
  */
 function saveUnifiedConsent(analytics: boolean = true, trial: boolean = false): UnifiedConsentData {
   const now = new Date().toISOString();
+  const existing = getUnifiedConsent();
   const consent: UnifiedConsentData = {
     version: CONSENT_VERSION,
     tos: {
       accepted: true,
       version: TOS_VERSION,
-      acceptedAt: now,
+      // Preserve original ToS timestamp across cookie-only changes;
+      // regenerate only on first acceptance or when TOS_VERSION changes.
+      acceptedAt:
+        existing?.tos?.acceptedAt && existing.tos.version === TOS_VERSION
+          ? existing.tos.acceptedAt
+          : now,
     },
     cookies: {
       essential: true,
