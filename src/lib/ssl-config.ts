@@ -8,11 +8,11 @@
  * ADR 0067: Supabase SSL Configuration
  */
 
-import fs from "fs";
-import path from "path";
-import { Pool } from "pg";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import fs from 'fs';
+import path from 'path';
+import { Pool } from 'pg';
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 export interface SSLConfig {
   rejectUnauthorized: boolean;
@@ -31,15 +31,13 @@ const log = {
  */
 export function loadSupabaseCertificate(): string | undefined {
   // Priority 1: Load from repository file
-  const certPath = path.join(process.cwd(), "config", "supabase-chain.pem");
+  const certPath = path.join(process.cwd(), 'config', 'supabase-chain.pem');
 
   if (fs.existsSync(certPath)) {
     try {
-      const cert = fs.readFileSync(certPath, "utf-8");
+      const cert = fs.readFileSync(certPath, 'utf-8');
       const certCount = (cert.match(/BEGIN CERTIFICATE/g) || []).length;
-      log.info(
-        `Loaded certificate chain from ${certPath} (${certCount} certs)`,
-      );
+      log.info(`Loaded certificate chain from ${certPath} (${certCount} certs)`);
       return cert;
     } catch (error) {
       log.warn(`Failed to read certificate: ${error}`);
@@ -49,8 +47,8 @@ export function loadSupabaseCertificate(): string | undefined {
   // Priority 2: Environment variable fallback
   const envCert = process.env.SUPABASE_CA_CERT;
   if (envCert) {
-    log.info("Using certificate from SUPABASE_CA_CERT");
-    return envCert.split("|").join("\n");
+    log.info('Using certificate from SUPABASE_CA_CERT');
+    return envCert.split('|').join('\n');
   }
 
   return undefined;
@@ -65,10 +63,7 @@ function isLocalDatabase(url?: string): boolean {
     const parsed = new URL(url);
     const host = parsed.hostname.toLowerCase();
     return (
-      host === "localhost" ||
-      host === "127.0.0.1" ||
-      host === "::1" ||
-      host.endsWith(".local")
+      host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.local')
     );
   } catch {
     return false;
@@ -82,8 +77,7 @@ function isLocalDatabase(url?: string): boolean {
  */
 export function buildSSLConfig(): SSLConfig | undefined {
   const dbUrl = process.env.DATABASE_URL;
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
   // Never use SSL for local databases (localhost, 127.0.0.1, etc.)
   // This allows running production builds locally for testing
@@ -110,7 +104,7 @@ export function buildSSLConfig(): SSLConfig | undefined {
   }
 
   // Fallback: TLS without certificate verification
-  log.warn("No valid certificate, using TLS without verification");
+  log.warn('No valid certificate, using TLS without verification');
   return { rejectUnauthorized: false };
 }
 
@@ -121,14 +115,14 @@ export function buildSSLConfig(): SSLConfig | undefined {
 function cleanConnectionString(url: string): string {
   try {
     const parsed = new URL(url);
-    parsed.searchParams.delete("sslmode");
+    parsed.searchParams.delete('sslmode');
     return parsed.toString();
   } catch {
     // Fallback for malformed URLs: use regex
-    let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
-    cleaned = cleaned.replace(/\?&/g, "?");
-    cleaned = cleaned.replace(/&&/g, "&");
-    cleaned = cleaned.replace(/[?&]$/, "");
+    let cleaned = url.replace(/([?&])sslmode=[^&]*/g, '$1');
+    cleaned = cleaned.replace(/\?&/g, '?');
+    cleaned = cleaned.replace(/&&/g, '&');
+    cleaned = cleaned.replace(/[?&]$/, '');
     return cleaned;
   }
 }
@@ -140,7 +134,7 @@ export function createPool(connectionString?: string): Pool {
   const rawConnStr =
     connectionString ||
     process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+    'postgresql://postgres:postgres@localhost:5432/mirrorbuddy';
 
   // Remove sslmode from connection string - we manage SSL explicitly
   const connStr = cleanConnectionString(rawConnStr);
@@ -157,6 +151,6 @@ export function createPool(connectionString?: string): Pool {
  */
 export function createPrismaClient(connectionString?: string): PrismaClient {
   const pool = createPool(connectionString);
-  const adapter = new PrismaPg(pool);
+  const adapter = new PrismaPg(pool as never as ConstructorParameters<typeof PrismaPg>[0]);
   return new PrismaClient({ adapter });
 }
