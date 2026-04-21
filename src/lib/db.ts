@@ -89,7 +89,7 @@ const pool = new Pool({
   connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
 });
 
-const adapter = new PrismaPg(pool);
+const adapter = new PrismaPg(pool as never as ConstructorParameters<typeof PrismaPg>[0]);
 
 const basePrisma = new PrismaClient({
   adapter,
