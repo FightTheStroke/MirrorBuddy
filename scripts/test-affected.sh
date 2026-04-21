@@ -62,7 +62,7 @@ while IFS= read -r file; do
 	prisma/*)
 		HAS_PRISMA=true
 		;;
-	package.json | package-lock.json | tsconfig*.json | eslint.config.mjs | eslint-local-rules/* | next.config.ts | vitest.config.ts)
+	package.json | pnpm-lock.yaml | tsconfig*.json | eslint.config.mjs | eslint-local-rules/* | next.config.ts | vitest.config.ts)
 		HAS_CONFIG=true
 		;;
 	src/*)

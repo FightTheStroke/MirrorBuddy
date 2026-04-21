@@ -9,14 +9,14 @@ on:
       - 'src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     paths:
       - 'messages/**'
       - 'src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
 
 permissions:
   contents: read
