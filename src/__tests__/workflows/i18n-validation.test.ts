@@ -67,10 +67,10 @@ describe("i18n Validation Workflow", () => {
       expect(setupStep["with"]["node-version"]).toBe("20");
     });
 
-    it("should install dependencies with npm ci", () => {
+    it("should install dependencies with pnpm install --frozen-lockfile", () => {
       const job = workflowContent.jobs["i18n-check"];
       const installStep = job.steps.find((step: any) =>
-        step.run?.includes("npm ci"),
+        step.run?.includes("pnpm install --frozen-lockfile"),
       );
       expect(installStep).toBeDefined();
     });
