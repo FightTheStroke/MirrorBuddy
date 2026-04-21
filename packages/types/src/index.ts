@@ -9,5 +9,8 @@ export * from './gamification';
 export * from './learning-path';
 export * from './parent';
 export * from './parent-dashboard';
+export * from './tier-definition';
+export * from './tier-subscription';
 export * from './tier-types';
 export * from './user';
+export * from './voice';
