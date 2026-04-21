@@ -106,7 +106,7 @@
     "terser-webpack-plugin": "5.3.17"
   },
   "dependencies": {
-    "@mirrorbuddy/types": "*",
+    "@mirrorbuddy/types": "workspace:*",
     "@anthropic-ai/sdk": "^0.73.0",
     "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.32",
     "@capacitor/camera": "^8.0.0",
