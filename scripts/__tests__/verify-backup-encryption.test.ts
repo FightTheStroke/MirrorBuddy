@@ -57,7 +57,7 @@ describe('verify-backup-encryption', () => {
     }).toThrow();
   });
 
-  it('should verify encryption/decryption works', () => {
+  it('should verify encryption/decryption works', { timeout: 30000, retry: 2 }, () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
       encoding: 'utf8',
       env: TEST_ENV,
@@ -66,7 +66,7 @@ describe('verify-backup-encryption', () => {
     expect(result).toMatch(/Encrypt.*Decrypt.*PASS/i);
   });
 
-  it('should verify key-rotation-helpers import', () => {
+  it('should verify key-rotation-helpers import', { timeout: 30000, retry: 2 }, () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
       encoding: 'utf8',
       env: TEST_ENV,

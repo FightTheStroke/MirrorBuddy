@@ -223,5 +223,19 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "pnpm": {
+    "overrides": {
+      "hono": "4.12.14",
+      "tmp": "0.2.5",
+      "lodash": "4.17.23",
+      "lodash-es": "4.17.23",
+      "@hono/node-server": "1.19.11",
+      "tar": "7.5.13",
+      "terser-webpack-plugin": "5.3.17",
+      "protobufjs": "7.5.5",
+      "@opentelemetry/otlp-transformer>protobufjs": "8.0.1",
+      "eslint-plugin-react-hooks": "7.0.1"
+    }
+  }
 }

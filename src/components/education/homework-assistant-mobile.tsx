@@ -14,18 +14,15 @@
  * - Uses TouchTarget and xs: breakpoint
  */
 
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { Zap } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import { InputSection } from "./homework-assistant-mobile/input-section";
-import {
-  SolutionDisplay,
-  Solution,
-} from "./homework-assistant-mobile/solution-display";
-import { useTranslations } from "next-intl";
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { Zap } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { InputSection } from './homework-assistant-mobile/input-section';
+import { SolutionDisplay, Solution } from './homework-assistant-mobile/solution-display';
+import { useTranslations } from 'next-intl';
 
 interface AnalysisPayload {
   file: File;
@@ -44,13 +41,28 @@ export function HomeworkAssistantMobile({
   onError,
   className,
 }: HomeworkAssistantMobileProps) {
-  const t = useTranslations("education");
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
+  const t = useTranslations('education');
+  const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [solution, setSolution] = useState<Solution | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [analysisSuccess, setAnalysisSuccess] = useState(false);
+
+  // Track mount state + active timers so unmounting cancels pending updates.
+  // Without this, tests that unmount before the simulated-progress timer
+  // fires hit "window is not defined" on a stale setState.
+  const mountedRef = useRef(true);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    },
+    [],
+  );
 
   const handleFileSelect = useCallback(
     (file: File) => {
@@ -62,10 +74,10 @@ export function HomeworkAssistantMobile({
       setUploadProgress(0);
 
       // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) =>
-          prev >= 90 ? prev : prev + Math.random() * 30,
-        );
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = setInterval(() => {
+        if (!mountedRef.current) return;
+        setUploadProgress((prev) => (prev >= 90 ? prev : prev + Math.random() * 30));
       }, 200);
 
       // Trigger analysis callback
@@ -75,8 +87,10 @@ export function HomeworkAssistantMobile({
       });
 
       // Simulate analysis completion
-      setTimeout(() => {
-        clearInterval(progressInterval);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (!mountedRef.current) return;
         setUploadProgress(100);
         setIsAnalyzing(false);
         setAnalysisSuccess(true);
@@ -84,15 +98,14 @@ export function HomeworkAssistantMobile({
         // Mock solution display
         setSolution({
           steps: [
-            "Step 1: Identify the problem type",
-            "Step 2: Gather necessary information",
-            "Step 3: Apply relevant formulas",
-            "Step 4: Calculate the answer",
-            "Step 5: Verify the result",
+            'Step 1: Identify the problem type',
+            'Step 2: Gather necessary information',
+            'Step 3: Apply relevant formulas',
+            'Step 4: Calculate the answer',
+            'Step 5: Verify the result',
           ],
-          answer: "The solution is displayed here",
-          explanation:
-            "Detailed explanation of the solution process and approach",
+          answer: 'The solution is displayed here',
+          explanation: 'Detailed explanation of the solution process and approach',
         });
 
         setTimeout(() => {
@@ -107,7 +120,7 @@ export function HomeworkAssistantMobile({
   const handleReset = () => {
     setSolution(null);
     setError(null);
-    setSelectedSubject("");
+    setSelectedSubject('');
     setUploadProgress(0);
   };
 
@@ -122,10 +135,10 @@ export function HomeworkAssistantMobile({
   return (
     <div
       className={cn(
-        "w-full max-w-2xl mx-auto p-4 xs:p-6",
-        "bg-white dark:bg-slate-950",
-        "rounded-lg border border-slate-200 dark:border-slate-800",
-        "shadow-sm dark:shadow-lg",
+        'w-full max-w-2xl mx-auto p-4 xs:p-6',
+        'bg-white dark:bg-slate-950',
+        'rounded-lg border border-slate-200 dark:border-slate-800',
+        'shadow-sm dark:shadow-lg',
         className,
       )}
     >
@@ -133,10 +146,10 @@ export function HomeworkAssistantMobile({
       <div className="mb-6">
         <h2 className="text-xl xs:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Zap className="w-6 h-6 text-amber-500" />
-          {t("homeworkAssistant")}
+          {t('homeworkAssistant')}
         </h2>
         <p className="text-sm xs:text-base text-slate-600 dark:text-slate-400 mt-2">
-          {t("captureOrUploadYourHomeworkToGetStepByStepSolution")}
+          {t('captureOrUploadYourHomeworkToGetStepByStepSolution')}
         </p>
       </div>
 
