@@ -172,7 +172,8 @@
     "zustand": "^5.0.9",
     "@mirrorbuddy/education": "workspace:*",
     "@mirrorbuddy/i18n": "workspace:*",
-    "@mirrorbuddy/utils": "workspace:*"
+    "@mirrorbuddy/utils": "workspace:*",
+    "@mirrorbuddy/logger": "workspace:*"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
