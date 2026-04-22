@@ -16,7 +16,12 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
   // Monorepo: transpile workspace packages so Next can bundle their TS sources.
-  transpilePackages: ['@mirrorbuddy/types', '@mirrorbuddy/education', '@mirrorbuddy/i18n'],
+  transpilePackages: [
+    '@mirrorbuddy/types',
+    '@mirrorbuddy/education',
+    '@mirrorbuddy/i18n',
+    '@mirrorbuddy/utils',
+  ],
   // Enable standalone output for Docker deployment
   // Creates .next/standalone with minimal server.js for production
   output: 'standalone',

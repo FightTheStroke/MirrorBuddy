@@ -38,6 +38,9 @@ importers:
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:packages/types
+      '@mirrorbuddy/utils':
+        specifier: workspace:*
+        version: link:packages/utils
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.1
@@ -359,6 +362,12 @@ importers:
         version: 5.9.3
 
   packages/types:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/utils:
     devDependencies:
       typescript:
         specifier: ^5
