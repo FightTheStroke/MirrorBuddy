@@ -32,6 +32,9 @@ importers:
       '@mirrorbuddy/education':
         specifier: workspace:*
         version: link:packages/education
+      '@mirrorbuddy/i18n':
+        specifier: workspace:*
+        version: link:packages/i18n
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:packages/types
@@ -344,6 +347,12 @@ importers:
         version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@20.19.39)(@vitest/coverage-v8@4.1.5)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@8.0.9(@types/node@20.19.39)(esbuild@0.27.7)(jiti@2.6.1)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
 
   packages/education:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/i18n:
     devDependencies:
       typescript:
         specifier: ^5

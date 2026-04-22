@@ -169,7 +169,8 @@
     "ws": "^8.18.3",
     "zod": "^4.3.5",
     "zustand": "^5.0.9",
-    "@mirrorbuddy/education": "workspace:*"
+    "@mirrorbuddy/education": "workspace:*",
+    "@mirrorbuddy/i18n": "workspace:*"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",

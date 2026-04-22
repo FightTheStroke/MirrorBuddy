@@ -1,23 +1,3 @@
-// Supported locales configuration for MirrorBuddy
-// This file centralizes locale configuration for both client and server
-
-export const locales = ["it", "en", "fr", "de", "es"] as const;
-export type Locale = (typeof locales)[number];
-
-export const defaultLocale: Locale = "it";
-
-export const localeNames: Record<Locale, string> = {
-  it: "Italiano",
-  en: "English",
-  fr: "Français",
-  de: "Deutsch",
-  es: "Español",
-};
-
-export const localeFlags: Record<Locale, string> = {
-  it: "🇮🇹",
-  en: "🇬🇧",
-  fr: "🇫🇷",
-  de: "🇩🇪",
-  es: "🇪🇸",
-};
+// Re-export shim — source of truth in @mirrorbuddy/i18n
+// (W3 packages/i18n extraction; preserves @/i18n/config import paths).
+export * from '@mirrorbuddy/i18n';
