@@ -1,0 +1,32 @@
+{
+  "name": "@mirrorbuddy/logger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Structured server + client logger for MirrorBuddy workspace",
+  "license": "Apache-2.0",
+  "main": "./src/server.ts",
+  "types": "./src/server.ts",
+  "exports": {
+    ".": {
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "default": "./src/client.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@sentry/nextjs": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
