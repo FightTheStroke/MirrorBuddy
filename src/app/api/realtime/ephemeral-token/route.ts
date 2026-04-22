@@ -26,18 +26,29 @@ import {
 
 export const revalidate = 0;
 
-// Per-IP rate limit tracker: clientId -> last request timestamp (ms)
-const rateLimitTracker = new Map<string, number>();
+// Per-IP burst window: track recent request timestamps per client.
+// Allows up to PER_IP_MAX_BURST requests within PER_IP_BURST_WINDOW_MS.
+// Global RATE_LIMITS.REALTIME_TOKEN (30/min) still guards sustained abuse.
+//
+// Was 1 req/sec fixed — too aggressive: a normal voice-session flow fires
+// preloadToken() on character mount + webrtc-probe() on connectivity test +
+// webrtc-connection.getToken() on user click, which can legitimately land
+// within a single second. The cache layer dedupes same-hook calls but not
+// cross-hook bursts.
+const PER_IP_BURST_WINDOW_MS = 1000;
+const PER_IP_MAX_BURST = 5;
+const rateLimitTracker = new Map<string, number[]>();
 
 function checkPerIPRateLimit(clientId: string): boolean {
   const nowMs = Date.now();
-  const lastRequestMs = rateLimitTracker.get(clientId);
-  if (!lastRequestMs) {
-    rateLimitTracker.set(clientId, nowMs);
-    return true;
+  const prior = rateLimitTracker.get(clientId) ?? [];
+  const recent = prior.filter((ts) => nowMs - ts < PER_IP_BURST_WINDOW_MS);
+  if (recent.length >= PER_IP_MAX_BURST) {
+    rateLimitTracker.set(clientId, recent);
+    return false;
   }
-  if (nowMs - lastRequestMs < 1000) return false;
-  rateLimitTracker.set(clientId, nowMs);
+  recent.push(nowMs);
+  rateLimitTracker.set(clientId, recent);
   return true;
 }
 
@@ -72,7 +83,7 @@ export const POST = pipe(
     return json(
       {
         error: 'Too many requests',
-        message: 'Maximum 1 request per second per IP',
+        message: 'Maximum 5 requests per second per IP',
       },
       429,
     );
@@ -104,7 +115,7 @@ export const POST = pipe(
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
   const useRealtime15 = await isFeatureEnabled('voice_realtime_15');
   const azureDeployment = useRealtime15.enabled
-    ? (azureDeploymentV15 || azureDeploymentLegacy)
+    ? azureDeploymentV15 || azureDeploymentLegacy
     : azureDeploymentLegacy;
 
   // Validate Azure configuration
@@ -113,7 +124,9 @@ export const POST = pipe(
   if (!azureApiKey) missingConfig.push('AZURE_OPENAI_REALTIME_API_KEY');
   if (!azureDeployment) {
     missingConfig.push(
-      useRealtime15.enabled ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15' : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
+      useRealtime15.enabled
+        ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15'
+        : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
     );
   }
 
