@@ -24,7 +24,7 @@ COPY prisma ./prisma/
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client (using prisma.config.ts for multi-file schema)
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # ==============================================================================
 # Stage 2: Builder
@@ -41,7 +41,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Generate Prisma client (needed for build)
-RUN npx prisma generate
+RUN pnpm exec prisma generate
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -72,7 +72,12 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# Skip explicit .prisma COPY — Next.js output: 'standalone' already
+# bundles the generated Prisma client into .next/standalone. Under pnpm's
+# isolated node-modules layout (even with node-linker=hoisted), .prisma
+# may not land at the expected top-level path across Docker build layers,
+# and the explicit COPY fails buildx's checksum stage. Trust standalone
+# output which has been handling this correctly since Next 16.
 
 # Set correct permissions
 RUN chown -R nextjs:nodejs /app
