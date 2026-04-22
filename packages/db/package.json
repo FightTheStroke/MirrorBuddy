@@ -1,0 +1,32 @@
+{
+  "name": "@mirrorbuddy/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prisma client + PII middleware + slow-query monitor for MirrorBuddy",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mirrorbuddy/logger": "workspace:*",
+    "@mirrorbuddy/utils": "workspace:*",
+    "@prisma/client": "^7.7.0",
+    "@prisma/adapter-pg": "^7.2.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/pg": "^8.15.0"
+  }
+}
