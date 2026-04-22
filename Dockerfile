@@ -32,6 +32,10 @@ RUN npx prisma generate
 FROM node:20-alpine AS builder
 WORKDIR /app
 
+# Enable pnpm in builder stage too (corepack activation doesn't carry across
+# FROM boundaries in multi-stage Dockerfile)
+RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
+
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
