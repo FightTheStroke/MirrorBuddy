@@ -144,3 +144,47 @@ Updated privacy policy v1.4 with Sentry disclosure:
 
 - ADR 0047: Grafana Cloud Observability (metrics push)
 - ADR 0058: Observability KPIs (business metrics)
+
+## CI Enforcement
+
+### `Sentry Config (Vercel)` CI job
+
+Workflow: `.github/workflows/ci.yml` — job `sentry-config`.
+
+**What it validates** (`scripts/verify-sentry-config.sh`):
+1. `NEXT_PUBLIC_SENTRY_DSN` presence + format on the Vercel project
+2. `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` env vars set
+3. `sentry.{client,server,edge}.config.ts` `enabled` gate + Vercel deployment condition
+4. Tunnel route `src/app/monitoring/route.ts` exists
+5. CSP + PUBLIC_ROUTES allowlist for `src/proxy.ts`
+6. `@sentry/nextjs` installed
+
+**Trigger**: `push` events to `main` / tag pushes only (condition
+`github.event_name != 'pull_request'` in ci.yml). PRs skip the check
+by design — rationale: Sentry config changes rarely and the full
+validation requires `VERCEL_TOKEN` (a secret not available to
+untrusted fork PRs).
+
+**Dependencies**:
+- `VERCEL_TOKEN` GitHub secret (required for `vercel env pull`)
+- Permissions: read-only on Vercel project; no deploy scope needed
+
+**Manual trigger**: open an empty PR with a `sentry.*.config.ts` edit
+and push a commit directly to a branch (not via PR), or run the
+script locally:
+
+```bash
+VERCEL_TOKEN=<token> ./scripts/verify-sentry-config.sh
+```
+
+**Failure modes** (all soft-warn in local/dev, hard-fail on push):
+- Missing `VERCEL_TOKEN` → skip with yellow warning
+- Missing env var on Vercel → red fail with install hint
+- `enabled: true` without Vercel gate → red fail
+- Missing tunnel route → red fail
+
+### Production runtime verification
+
+After deploy, Sentry errors appear at `https://sentry.io/organizations/fightthestroke/issues/`.
+Check within 5 minutes of deploy by triggering a known error path (e.g.,
+`GET /api/health?force_error=1` in dev with Sentry enabled).
