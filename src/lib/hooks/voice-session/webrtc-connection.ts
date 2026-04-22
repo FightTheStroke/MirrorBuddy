@@ -215,14 +215,24 @@ export class WebRTCConnection {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
     try {
-      const response = await csrfFetch('/api/realtime/ephemeral-token', {
-        method: 'POST',
-        body: JSON.stringify({
-          maestroId: this.config.maestro.id,
-          characterType: this.config.connectionInfo.characterType || 'maestro',
-        }),
-        signal: controller.signal,
-      });
+      const fetchToken = () =>
+        csrfFetch('/api/realtime/ephemeral-token', {
+          method: 'POST',
+          body: JSON.stringify({
+            maestroId: this.config.maestro.id,
+            characterType: this.config.connectionInfo.characterType || 'maestro',
+          }),
+          signal: controller.signal,
+        });
+      let response = await fetchToken();
+      // Soft-retry once on 429 after a 1.1s cooldown so normal bursts
+      // (preloadToken + webrtc-probe + webrtc-connection within a second)
+      // don't surface to the user as "Failed to get ephemeral token".
+      if (response.status === 429) {
+        logger.debug('[WebRTC] Token endpoint rate-limited; retrying after cooldown');
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+        response = await fetchToken();
+      }
       clearTimeout(timeout);
       if (!response.ok) {
         const errorBody = await response.text().catch(() => '');
