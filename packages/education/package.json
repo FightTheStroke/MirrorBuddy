@@ -1,0 +1,28 @@
+{
+  "name": "@mirrorbuddy/education",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Educational domain logic — FSRS spaced repetition + maestri data",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./fsrs": {
+      "types": "./src/fsrs/index.ts",
+      "default": "./src/fsrs/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
