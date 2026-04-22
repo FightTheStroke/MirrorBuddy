@@ -249,7 +249,7 @@ EOF
     echo ""
     echo -e "Next steps:"
     echo -e "  1. Review CHANGELOG.md"
-    echo -e "  2. git add VERSION package.json package-lock.json"
+    echo -e "  2. git add VERSION package.json pnpm-lock.yaml"
     echo -e "  3. git commit -m \"chore(release): bump version to $new_version\""
     echo -e "  4. git tag -a v$new_version -m \"Release $new_version\""
     echo -e "  5. git push origin main --tags"

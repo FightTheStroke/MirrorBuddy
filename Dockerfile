@@ -11,17 +11,17 @@ WORKDIR /app
 # Install dependencies for native modules (Prisma, sharp)
 RUN apk add --no-cache libc6-compat openssl
 
-# Copy package files and Prisma config
-# Monorepo: copy workspace config + packages/ so npm ci can resolve
-# workspace:* deps (added in W1b migration). Excluding prisma-lock.yaml
-# because we use package-lock.json in Docker until W4 migration completes.
-COPY package.json package-lock.json pnpm-workspace.yaml ./
+# Install pnpm matching packageManager field in package.json
+RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
+
+# Copy workspace config + packages/ so pnpm can resolve workspace:* deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages/
 COPY prisma.config.ts ./
 COPY prisma ./prisma/
 
 # Install ALL dependencies (devDeps needed for build: Tailwind, TypeScript, PostCSS)
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client (using prisma.config.ts for multi-file schema)
 RUN npx prisma generate
@@ -42,7 +42,7 @@ RUN npx prisma generate
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-RUN npm run build
+RUN pnpm run build
 
 # ==============================================================================
 # Stage 3: Runner (Production)
