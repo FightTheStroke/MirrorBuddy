@@ -201,6 +201,7 @@
     "@types/dompurify": "^3.0.5",
     "@types/jsdom": "^27.0.0",
     "@types/node": "^20",
+    "@types/pg": "^8.15.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
