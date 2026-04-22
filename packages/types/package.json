@@ -10,6 +10,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./tools": {
+      "types": "./src/tools/index.ts",
+      "default": "./src/tools/index.ts"
     }
   },
   "files": [
