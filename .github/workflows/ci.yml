@@ -736,6 +736,16 @@ jobs:
           name: build-output
           path: .next
 
+      # Re-generate Prisma client. The build artifact's .next/ bakes paths
+      # that resolve to node_modules/.prisma/client at runtime. pnpm's
+      # hoisting leaves .prisma/client in a nested location; regenerating
+      # here writes it to the expected root node_modules path.
+      - name: Regenerate Prisma client post-download
+        run: pnpm exec prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -839,6 +849,16 @@ jobs:
         with:
           name: build-output
           path: .next
+
+      # Re-generate Prisma client. The build artifact's .next/ bakes paths
+      # that resolve to node_modules/.prisma/client at runtime. pnpm's
+      # hoisting leaves .prisma/client in a nested location; regenerating
+      # here writes it to the expected root node_modules path.
+      - name: Regenerate Prisma client post-download
+        run: pnpm exec prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -950,6 +970,16 @@ jobs:
         with:
           name: build-output
           path: .next
+
+      # Re-generate Prisma client. The build artifact's .next/ bakes paths
+      # that resolve to node_modules/.prisma/client at runtime. pnpm's
+      # hoisting leaves .prisma/client in a nested location; regenerating
+      # here writes it to the expected root node_modules path.
+      - name: Regenerate Prisma client post-download
+        run: pnpm exec prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1135,6 +1165,16 @@ jobs:
           name: build-output
           path: .next
 
+      # Re-generate Prisma client. The build artifact's .next/ bakes paths
+      # that resolve to node_modules/.prisma/client at runtime. pnpm's
+      # hoisting leaves .prisma/client in a nested location; regenerating
+      # here writes it to the expected root node_modules path.
+      - name: Regenerate Prisma client post-download
+        run: pnpm exec prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
@@ -1256,6 +1296,16 @@ jobs:
         with:
           name: build-output
           path: .next
+
+      # Re-generate Prisma client. The build artifact's .next/ bakes paths
+      # that resolve to node_modules/.prisma/client at runtime. pnpm's
+      # hoisting leaves .prisma/client in a nested location; regenerating
+      # here writes it to the expected root node_modules path.
+      - name: Regenerate Prisma client post-download
+        run: pnpm exec prisma generate
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
