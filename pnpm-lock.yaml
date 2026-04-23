@@ -35,6 +35,9 @@ importers:
       '@mirrorbuddy/education':
         specifier: workspace:*
         version: link:packages/education
+      '@mirrorbuddy/greeting':
+        specifier: workspace:*
+        version: link:packages/greeting
       '@mirrorbuddy/i18n':
         specifier: workspace:*
         version: link:packages/i18n
@@ -402,6 +405,19 @@ importers:
         version: 5.9.3
 
   packages/education:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/greeting:
+    dependencies:
+      '@mirrorbuddy/i18n':
+        specifier: workspace:*
+        version: link:../i18n
+      '@mirrorbuddy/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       typescript:
         specifier: ^5

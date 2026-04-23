@@ -116,6 +116,7 @@
     "@capacitor/camera": "^8.0.0",
     "@mirrorbuddy/db": "workspace:*",
     "@mirrorbuddy/education": "workspace:*",
+    "@mirrorbuddy/greeting": "workspace:*",
     "@mirrorbuddy/i18n": "workspace:*",
     "@mirrorbuddy/logger": "workspace:*",
     "@mirrorbuddy/types": "workspace:*",
