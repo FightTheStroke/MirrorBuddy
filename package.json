@@ -114,6 +114,7 @@
     "@anthropic-ai/sdk": "^0.73.0",
     "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.32",
     "@capacitor/camera": "^8.0.0",
+    "@mirrorbuddy/accessibility": "workspace:*",
     "@mirrorbuddy/ai-providers": "workspace:*",
     "@mirrorbuddy/db": "workspace:*",
     "@mirrorbuddy/education": "workspace:*",
