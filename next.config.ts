@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
     '@mirrorbuddy/education',
     '@mirrorbuddy/i18n',
     '@mirrorbuddy/utils',
+    '@mirrorbuddy/tier',
   ],
   // Enable standalone output for Docker deployment
   // Creates .next/standalone with minimal server.js for production
