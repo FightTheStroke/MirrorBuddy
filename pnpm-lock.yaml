@@ -59,6 +59,9 @@ importers:
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:packages/types
+      '@mirrorbuddy/ui':
+        specifier: workspace:*
+        version: link:packages/ui
       '@mirrorbuddy/utils':
         specifier: workspace:*
         version: link:packages/utils
@@ -510,6 +513,12 @@ importers:
         version: 5.9.3
 
   packages/types:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/ui:
     devDependencies:
       typescript:
         specifier: ^5
