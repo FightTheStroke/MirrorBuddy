@@ -1,0 +1,27 @@
+{
+  "name": "@mirrorbuddy/accessibility",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Accessibility store + helpers (DSA profiles, ADHD session) for MirrorBuddy (reversed-shim — canonical impl in src/lib/accessibility)",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mirrorbuddy/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
