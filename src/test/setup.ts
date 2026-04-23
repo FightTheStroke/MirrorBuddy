@@ -6,11 +6,11 @@
  * to maintain backward compatibility with existing test assertions.
  */
 
-import { vi } from "vitest";
-import React from "react";
-import "@testing-library/jest-dom/vitest";
-import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
+import { vi } from 'vitest';
+import React from 'react';
+import '@testing-library/jest-dom/vitest';
+import { readdirSync, readFileSync } from 'fs';
+import { join } from 'path';
 
 // Deep merge utility to avoid top-level key collisions between namespace files
 // (e.g., compliance.json and welcome.json both export a "compliance" key)
@@ -24,8 +24,8 @@ function deepMerge(
     if (
       tVal &&
       sVal &&
-      typeof tVal === "object" &&
-      typeof sVal === "object" &&
+      typeof tVal === 'object' &&
+      typeof sVal === 'object' &&
       !Array.isArray(tVal) &&
       !Array.isArray(sVal)
     ) {
@@ -42,13 +42,13 @@ function deepMerge(
 
 // Load all Italian namespace files and deep-merge them (ADR 0082)
 function loadItalianMessages(): Record<string, unknown> {
-  const localeDir = join(process.cwd(), "messages", "it");
-  const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
+  const localeDir = join(process.cwd(), 'messages', 'it');
+  const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
   const merged: Record<string, unknown> = {};
   for (const file of files) {
     const filePath = join(localeDir, file);
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Safe: file is from controlled readdirSync
-    const content = readFileSync(filePath, "utf-8");
+    const content = readFileSync(filePath, 'utf-8');
     deepMerge(merged, JSON.parse(content));
   }
   return merged;
@@ -58,7 +58,7 @@ const itMessages = loadItalianMessages();
 
 // Mock server-only module - it throws when imported outside of server components
 // This allows testing modules that import server-only code
-vi.mock("server-only", () => ({}));
+vi.mock('server-only', () => ({}));
 
 /**
  * Converts kebab-case to camelCase.
@@ -72,10 +72,7 @@ function kebabToCamel(str: string): string {
  * Tries to find a key in an object, attempting both kebab-case and camelCase.
  * Returns [value, found] tuple.
  */
-function findKey(
-  obj: Record<string, unknown>,
-  key: string,
-): [unknown, boolean] {
+function findKey(obj: Record<string, unknown>, key: string): [unknown, boolean] {
   // Try exact key first
   if (key in obj) return [obj[key], true];
   // Try camelCase version
@@ -95,11 +92,11 @@ function resolveTranslation(
   key: string,
 ): string {
   // Navigate to namespace first (e.g., "welcome.tier-comparison" -> messages.welcome.tierComparison)
-  const parts = namespace.split(".");
+  const parts = namespace.split('.');
   let current: unknown = messages;
 
   for (const part of parts) {
-    if (current && typeof current === "object") {
+    if (current && typeof current === 'object') {
       const [value, found] = findKey(current as Record<string, unknown>, part);
       if (found) {
         current = value;
@@ -112,9 +109,9 @@ function resolveTranslation(
   }
 
   // Now resolve the key within the namespace
-  const keyParts = key.split(".");
+  const keyParts = key.split('.');
   for (const part of keyParts) {
-    if (current && typeof current === "object") {
+    if (current && typeof current === 'object') {
       const [value, found] = findKey(current as Record<string, unknown>, part);
       if (found) {
         current = value;
@@ -126,17 +123,17 @@ function resolveTranslation(
     }
   }
 
-  return typeof current === "string" ? current : key;
+  return typeof current === 'string' ? current : key;
 }
 
 // Mock next-intl for components using useTranslations
 // Uses REAL Italian translations to maintain test compatibility (ADR 0080)
-vi.mock("next-intl", () => ({
-  useTranslations: (namespace: string = "") => {
+vi.mock('next-intl', () => ({
+  useTranslations: (namespace: string = '') => {
     return (key: string, values?: Record<string, unknown>) => {
       const translation = resolveTranslation(itMessages, namespace, key);
       // Handle interpolation if values provided
-      if (values && typeof translation === "string") {
+      if (values && typeof translation === 'string') {
         return translation.replace(/\{(\w+)\}/g, (_, name) =>
           values[name] !== undefined ? String(values[name]) : `{${name}}`,
         );
@@ -144,33 +141,32 @@ vi.mock("next-intl", () => ({
       return translation;
     };
   },
-  useLocale: () => "it",
+  useLocale: () => 'it',
   useMessages: () => itMessages,
-  useTimeZone: () => "Europe/Rome",
+  useTimeZone: () => 'Europe/Rome',
   useFormatter: () => ({
     dateTime: (date: Date) => date.toISOString(),
     number: (n: number) => n.toString(),
-    relativeTime: () => "now",
+    relativeTime: () => 'now',
   }),
   useNow: () => new Date(),
-  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) =>
-    children,
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 // -----------------------------------------------------------------------------
 // DOM API stabilizers for jsdom
 // -----------------------------------------------------------------------------
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   // Avoid jsdom "Not implemented" warnings for media playback
-  Object.defineProperty(window.HTMLMediaElement.prototype, "play", {
+  Object.defineProperty(window.HTMLMediaElement.prototype, 'play', {
     configurable: true,
     value: vi.fn().mockResolvedValue(undefined),
   });
-  Object.defineProperty(window.HTMLMediaElement.prototype, "pause", {
+  Object.defineProperty(window.HTMLMediaElement.prototype, 'pause', {
     configurable: true,
     value: vi.fn(),
   });
-  Object.defineProperty(window.HTMLMediaElement.prototype, "load", {
+  Object.defineProperty(window.HTMLMediaElement.prototype, 'load', {
     configurable: true,
     value: vi.fn(),
   });
@@ -179,14 +175,14 @@ if (typeof window !== "undefined") {
   try {
     const currentLocation = window.location;
     // Ensure we can redefine location in jsdom
-    if (Object.prototype.hasOwnProperty.call(window, "location")) {
+    if (Object.prototype.hasOwnProperty.call(window, 'location')) {
       try {
-        Reflect.deleteProperty(window, "location");
+        Reflect.deleteProperty(window, 'location');
       } catch {
         // ignore delete failures
       }
     }
-    Object.defineProperty(window, "location", {
+    Object.defineProperty(window, 'location', {
       configurable: true,
       writable: true,
       value: {
@@ -198,22 +194,22 @@ if (typeof window !== "undefined") {
     });
   } catch {
     // Fallback for environments where window.location is non-configurable
-    Object.defineProperty(window.location, "assign", {
+    Object.defineProperty(window.location, 'assign', {
       configurable: true,
       value: vi.fn(),
     });
-    Object.defineProperty(window.location, "replace", {
+    Object.defineProperty(window.location, 'replace', {
       configurable: true,
       value: vi.fn(),
     });
-    Object.defineProperty(window.location, "reload", {
+    Object.defineProperty(window.location, 'reload', {
       configurable: true,
       value: vi.fn(),
     });
   }
 
   try {
-    Object.defineProperty(window.location, "href", {
+    Object.defineProperty(window.location, 'href', {
       configurable: true,
       writable: true,
       value: window.location.href,
@@ -229,11 +225,11 @@ if (typeof window !== "undefined") {
 // Tests should use the shared logger instead of console.log.
 // We mock the logger here so that domain-level error/warn logs do not flood
 // the test output, while still allowing DEBUG runs to see full logs.
-vi.mock("@/lib/logger", () => {
+vi.mock('@/lib/logger', () => {
   const shouldLog = Boolean(process.env.DEBUG);
 
   const makeMethod =
-    (name: "info" | "warn" | "error" | "debug") =>
+    (name: 'info' | 'warn' | 'error' | 'debug') =>
     (...args: unknown[]) => {
       if (shouldLog) {
         console[name](...args);
@@ -241,10 +237,10 @@ vi.mock("@/lib/logger", () => {
     };
 
   const baseLogger = {
-    info: makeMethod("info"),
-    warn: makeMethod("warn"),
-    error: makeMethod("error"),
-    debug: makeMethod("debug"),
+    info: makeMethod('info'),
+    warn: makeMethod('warn'),
+    error: makeMethod('error'),
+    debug: makeMethod('debug'),
     // Child logger for scoped logging (same mock instance is fine for tests)
     child: (_context?: unknown) => baseLogger,
   };
@@ -255,18 +251,18 @@ vi.mock("@/lib/logger", () => {
 });
 
 // Mock next-intl navigation helpers to avoid Next.js runtime imports in tests
-vi.mock("next-intl/navigation", () => ({
+vi.mock('next-intl/navigation', () => ({
   createNavigation: () => ({
     Link: ({ children, ...props }: { children: React.ReactNode }) =>
-      React.createElement("a", props, children),
+      React.createElement('a', props, children),
     redirect: vi.fn(),
-    usePathname: () => "/",
+    usePathname: () => '/',
     useRouter: () => ({
       push: vi.fn(),
       replace: vi.fn(),
       prefetch: vi.fn(),
     }),
-    getPathname: () => "/",
+    getPathname: () => '/',
   }),
 }));
 // Mock console methods for cleaner test output
@@ -282,9 +278,9 @@ global.console = {
 
 // Mock crypto for nanoid - use Node.js crypto module (CSPRNG, not Math.random)
 // This ensures CodeQL doesn't flag test code as using insecure randomness
-if (typeof globalThis.crypto === "undefined") {
+if (typeof globalThis.crypto === 'undefined') {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const nodeCrypto = require("crypto");
+  const nodeCrypto = require('crypto');
   globalThis.crypto = {
     randomUUID: () => nodeCrypto.randomUUID(),
     getRandomValues: (arr: Uint8Array) => {
@@ -296,7 +292,7 @@ if (typeof globalThis.crypto === "undefined") {
 }
 
 // Mock ResizeObserver for components using it
-if (typeof global.ResizeObserver === "undefined") {
+if (typeof global.ResizeObserver === 'undefined') {
   global.ResizeObserver = class ResizeObserver {
     observe() {}
     unobserve() {}
@@ -325,10 +321,10 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(globalThis, "localStorage", { value: localStorageMock });
+Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 
 // Polyfill Blob methods for jsdom environment
-if (typeof Blob !== "undefined") {
+if (typeof Blob !== 'undefined') {
   // Polyfill Blob.text() (needed for svg-generator tests)
   if (!Blob.prototype.text) {
     Blob.prototype.text = async function () {
@@ -359,21 +355,35 @@ if (typeof Blob !== "undefined") {
 // Prevent "Not implemented: HTMLMediaElement.play" warnings in tests that
 // exercise video/audio components (e.g. WebcamAnalysisMobile).
 const mediaPrototype =
-  (globalThis.HTMLMediaElement as HTMLMediaElement["constructor"] | undefined)
-    ?.prototype ??
-  (globalThis.HTMLVideoElement as HTMLVideoElement["constructor"] | undefined)
-    ?.prototype ??
-  (globalThis.HTMLAudioElement as HTMLAudioElement["constructor"] | undefined)
-    ?.prototype;
+  (globalThis.HTMLMediaElement as HTMLMediaElement['constructor'] | undefined)?.prototype ??
+  (globalThis.HTMLVideoElement as HTMLVideoElement['constructor'] | undefined)?.prototype ??
+  (globalThis.HTMLAudioElement as HTMLAudioElement['constructor'] | undefined)?.prototype;
 
 if (mediaPrototype) {
-  if (typeof mediaPrototype.play !== "function") {
+  if (typeof mediaPrototype.play !== 'function') {
     mediaPrototype.play = vi.fn().mockResolvedValue(undefined);
   }
-  if (typeof mediaPrototype.pause !== "function") {
+  if (typeof mediaPrototype.pause !== 'function') {
     mediaPrototype.pause = vi.fn();
   }
-  if (typeof mediaPrototype.load !== "function") {
+  if (typeof mediaPrototype.load !== 'function') {
     mediaPrototype.load = vi.fn();
   }
 }
+
+// W3 monorepo test-arch (#365): strategy documented in CONTRIBUTING-MONOREPO.md
+// §Test-arch.
+//
+// Current W3 packages (logger, db, utils, greeting) use FORWARD shims:
+// src/lib/X re-exports from @mirrorbuddy/X. A global delegation
+// `vi.mock('@mirrorbuddy/X', () => importActual('@/lib/X'))` is circular in this
+// direction: the shim's internal re-export of @mirrorbuddy/X hits the mock again
+// and recurses (empirically → 51 test-file regressions; see PR #365 analysis).
+//
+// Policy going forward:
+//  - NEW package extractions (tier, safety, ai-providers, maestri, tools, ui)
+//    SHOULD use REVERSED shims: canonical impl stays at src/lib/X; packages/X/src
+//    re-exports via relative path `../../../src/lib/X`. This makes test mocks of
+//    '@/lib/X' propagate transparently to package consumers of '@mirrorbuddy/X'.
+//  - For tests that need per-test dual mocking today, use mockPackageAndLib()
+//    from src/test/mock-helpers.ts.

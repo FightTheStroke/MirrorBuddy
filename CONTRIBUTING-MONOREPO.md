@@ -27,13 +27,13 @@ W3 adds: `packages/{db,ai-providers,safety,tools,education,i18n,ui}`.
 
 ## Common commands
 
-| Command | Purpose |
-|---|---|
-| `pnpm install` | Install deps for root + every workspace |
-| `pnpm dev` | Start the dev server (Turbo runs the right targets) |
-| `pnpm build` | Production build |
-| `pnpm test:unit` | Vitest across all packages |
-| `pnpm --filter @mirrorbuddy/types <cmd>` | Run a script inside a specific workspace |
+| Command                                  | Purpose                                             |
+| ---------------------------------------- | --------------------------------------------------- |
+| `pnpm install`                           | Install deps for root + every workspace             |
+| `pnpm dev`                               | Start the dev server (Turbo runs the right targets) |
+| `pnpm build`                             | Production build                                    |
+| `pnpm test:unit`                         | Vitest across all packages                          |
+| `pnpm --filter @mirrorbuddy/types <cmd>` | Run a script inside a specific workspace            |
 
 ## Adding a dep to a specific workspace
 
@@ -113,6 +113,57 @@ creates a dependency cycle; W3 adds an eslint rule to enforce).
 pnpm --filter @mirrorbuddy/types run typecheck
 pnpm --filter @mirrorbuddy/types exec vitest run
 ```
+
+## Test-arch: module identity across shims (#365)
+
+When a file in `src/lib/X` (app) and a file in `packages/X` (workspace
+package) co-exist, two module IDs coexist: `@/lib/X` (via tsconfig
+paths) and `@mirrorbuddy/X` (via workspace resolution). A `vi.mock`
+registered on one path does NOT intercept imports via the other — the
+module identities differ.
+
+### Shim directions
+
+**Forward shim** — canonical impl lives in `packages/X`; `src/lib/X`
+re-exports from `@mirrorbuddy/X`:
+
+```ts
+// src/lib/logger/client.ts
+export { clientLogger } from '@mirrorbuddy/logger/client';
+```
+
+Used by the initial W3 batch (logger, db, utils, greeting). A global
+delegation `vi.mock('@mirrorbuddy/X', () => importActual('@/lib/X'))`
+is CIRCULAR in this direction (the shim's inner re-export hits the
+mock again) and breaks ~50 test files if added. Do NOT enable such a
+delegation against forward shims.
+
+**Reversed shim (recommended for new extractions)** — canonical impl
+stays at `src/lib/X`; `packages/X/src/*.ts` re-exports via relative
+path:
+
+```ts
+// packages/tier/src/index.ts
+export * from '../../../src/lib/tier';
+```
+
+With reversed shims, a test `vi.mock('@/lib/tier', …)` transparently
+intercepts package consumers of `@mirrorbuddy/tier` because the mock
+lives at the single canonical module ID.
+
+### Policy
+
+1. Future W3 extractions (tier #358, safety #356, ai-providers #357,
+   maestri #361, tools #359, ui #360) SHOULD adopt reversed shims for
+   any file that is mocked by existing unit tests. Pure-types sub-paths
+   (no runtime) may still use forward shims because types aren't
+   mocked.
+2. When retrofitting a mock for a forward-shim package is unavoidable,
+   use `mockPackageAndLib()` from `src/test/mock-helpers.ts` to
+   register both module IDs with a single factory.
+3. The global `src/test/setup.ts` intentionally does NOT delegate
+   `@mirrorbuddy/*` → `@/lib/*` for the four forward-shim packages;
+   see the rationale comment in that file.
 
 ## Troubleshooting
 
