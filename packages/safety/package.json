@@ -23,6 +23,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mirrorbuddy/db": "workspace:*",
+    "@mirrorbuddy/greeting": "workspace:*",
+    "@mirrorbuddy/logger": "workspace:*",
     "@mirrorbuddy/types": "workspace:*"
   },
   "devDependencies": {

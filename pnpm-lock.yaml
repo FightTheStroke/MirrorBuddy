@@ -450,6 +450,15 @@ importers:
 
   packages/safety:
     dependencies:
+      '@mirrorbuddy/db':
+        specifier: workspace:*
+        version: link:../db
+      '@mirrorbuddy/greeting':
+        specifier: workspace:*
+        version: link:../greeting
+      '@mirrorbuddy/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:../types
