@@ -124,6 +124,7 @@
     "@mirrorbuddy/safety": "workspace:*",
     "@mirrorbuddy/tier": "workspace:*",
     "@mirrorbuddy/types": "workspace:*",
+    "@mirrorbuddy/ui": "workspace:*",
     "@mirrorbuddy/utils": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.73.0",
