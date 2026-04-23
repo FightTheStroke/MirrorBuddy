@@ -44,6 +44,9 @@ importers:
       '@mirrorbuddy/logger':
         specifier: workspace:*
         version: link:packages/logger
+      '@mirrorbuddy/safety':
+        specifier: workspace:*
+        version: link:packages/safety
       '@mirrorbuddy/tier':
         specifier: workspace:*
         version: link:packages/tier
@@ -440,6 +443,25 @@ importers:
       '@sentry/nextjs':
         specifier: ^10.0.0
         version: 10.49.0(@opentelemetry/core@2.7.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.215.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.7.0(@opentelemetry/api@1.9.1))(next@16.2.4(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(webpack@5.106.2(esbuild@0.27.7))
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/safety:
+    dependencies:
+      '@mirrorbuddy/db':
+        specifier: workspace:*
+        version: link:../db
+      '@mirrorbuddy/greeting':
+        specifier: workspace:*
+        version: link:../greeting
+      '@mirrorbuddy/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@mirrorbuddy/types':
+        specifier: workspace:*
+        version: link:../types
     devDependencies:
       typescript:
         specifier: ^5

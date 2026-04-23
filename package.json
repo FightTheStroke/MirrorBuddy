@@ -119,6 +119,7 @@
     "@mirrorbuddy/greeting": "workspace:*",
     "@mirrorbuddy/i18n": "workspace:*",
     "@mirrorbuddy/logger": "workspace:*",
+    "@mirrorbuddy/safety": "workspace:*",
     "@mirrorbuddy/tier": "workspace:*",
     "@mirrorbuddy/types": "workspace:*",
     "@mirrorbuddy/utils": "workspace:*",

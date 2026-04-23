@@ -1,0 +1,34 @@
+{
+  "name": "@mirrorbuddy/safety",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Child-safety guardrails for MirrorBuddy (reversed-shim — canonical impl in src/lib/safety)",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./src/server.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mirrorbuddy/db": "workspace:*",
+    "@mirrorbuddy/greeting": "workspace:*",
+    "@mirrorbuddy/logger": "workspace:*",
+    "@mirrorbuddy/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
