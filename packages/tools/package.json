@@ -1,0 +1,31 @@
+{
+  "name": "@mirrorbuddy/tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tool plugins (mindmap, summary, flashcard, accessible-print, persistence) for MirrorBuddy (reversed-shim — canonical impl in src/lib/tools)",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mirrorbuddy/ai-providers": "workspace:*",
+    "@mirrorbuddy/db": "workspace:*",
+    "@mirrorbuddy/education": "workspace:*",
+    "@mirrorbuddy/logger": "workspace:*",
+    "@mirrorbuddy/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

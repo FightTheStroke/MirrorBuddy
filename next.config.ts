@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
     '@mirrorbuddy/maestri',
     '@mirrorbuddy/ui',
     '@mirrorbuddy/accessibility',
+    '@mirrorbuddy/tools',
   ],
   // Enable standalone output for Docker deployment
   // Creates .next/standalone with minimal server.js for production
