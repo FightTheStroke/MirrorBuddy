@@ -1,0 +1,32 @@
+{
+  "name": "@mirrorbuddy/greeting",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Character greeting generation for MirrorBuddy",
+  "license": "Apache-2.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./templates": {
+      "types": "./src/templates/index.ts",
+      "default": "./src/templates/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mirrorbuddy/types": "workspace:*",
+    "@mirrorbuddy/i18n": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
