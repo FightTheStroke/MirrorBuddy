@@ -59,6 +59,9 @@ importers:
       '@mirrorbuddy/tier':
         specifier: workspace:*
         version: link:packages/tier
+      '@mirrorbuddy/tools':
+        specifier: workspace:*
+        version: link:packages/tools
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:packages/types
@@ -517,6 +520,28 @@ importers:
 
   packages/tier:
     dependencies:
+      '@mirrorbuddy/types':
+        specifier: workspace:*
+        version: link:../types
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/tools:
+    dependencies:
+      '@mirrorbuddy/ai-providers':
+        specifier: workspace:*
+        version: link:../ai-providers
+      '@mirrorbuddy/db':
+        specifier: workspace:*
+        version: link:../db
+      '@mirrorbuddy/education':
+        specifier: workspace:*
+        version: link:../education
+      '@mirrorbuddy/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@mirrorbuddy/types':
         specifier: workspace:*
         version: link:../types

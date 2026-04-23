@@ -124,6 +124,7 @@
     "@mirrorbuddy/maestri": "workspace:*",
     "@mirrorbuddy/safety": "workspace:*",
     "@mirrorbuddy/tier": "workspace:*",
+    "@mirrorbuddy/tools": "workspace:*",
     "@mirrorbuddy/types": "workspace:*",
     "@mirrorbuddy/ui": "workspace:*",
     "@mirrorbuddy/utils": "workspace:*",
