@@ -3,4 +3,4 @@
 // CONTRIBUTING-MONOREPO.md §Test-arch). Tests mocking @/lib/tier paths
 // propagate transparently to consumers of @mirrorbuddy/tier because both
 // resolve to the same module identity at src/lib/tier.
-export * from '../../../src/lib/tier';
+export * from '../../../apps/web/src/lib/tier';

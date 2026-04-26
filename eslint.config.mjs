@@ -78,9 +78,11 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    "apps/web/.next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "apps/web/next-env.d.ts",
     // Coverage reports
     "coverage/**",
     // Playwright reports (generated files)

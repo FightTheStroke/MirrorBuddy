@@ -52,12 +52,18 @@ jobs:
           filters: |
             src:
               - 'src/**'
+              - 'apps/web/src/**'
               - 'public/**'
+              - 'apps/web/public/**'
             ui:
               - 'src/app/**'
               - 'src/components/**'
               - 'src/styles/**'
+              - 'apps/web/src/app/**'
+              - 'apps/web/src/components/**'
+              - 'apps/web/src/styles/**'
               - 'public/**'
+              - 'apps/web/public/**'
               - 'apps/web/messages/**'
             mobile:
               - 'ios/**'
@@ -65,6 +71,8 @@ jobs:
               - 'capacitor.config.ts'
               - 'src/lib/native/**'
               - 'src/components/mobile/**'
+              - 'apps/web/src/lib/native/**'
+              - 'apps/web/src/components/mobile/**'
             prisma:
               - 'apps/web/prisma/**'
               - 'prisma.config.ts'
@@ -72,14 +80,22 @@ jobs:
               - 'apps/web/messages/**'
               - 'src/i18n/**'
               - 'src/lib/i18n/**'
+              - 'apps/web/src/i18n/**'
+              - 'apps/web/src/lib/i18n/**'
             safety:
               - 'src/lib/safety/**'
               - 'src/lib/ai/**'
               - 'src/lib/privacy/**'
               - 'src/lib/compliance/**'
               - 'src/data/maestri/**'
+              - 'apps/web/src/lib/safety/**'
+              - 'apps/web/src/lib/ai/**'
+              - 'apps/web/src/lib/privacy/**'
+              - 'apps/web/src/lib/compliance/**'
+              - 'apps/web/src/data/maestri/**'
             e2e:
               - 'apps/web/e2e/**'
+              - 'apps/web/playwright.config*.ts'
               - 'playwright.config*.ts'
             config:
               - 'package.json'
@@ -88,8 +104,11 @@ jobs:
               - 'eslint.config.mjs'
               - 'eslint-local-rules/**'
               - 'next.config.ts'
+              - 'apps/web/next.config.ts'
               - 'vitest.config.ts'
+              - 'apps/web/vitest.config.ts'
               - 'playwright.config*.ts'
+              - 'apps/web/playwright.config*.ts'
               - '.github/**'
             docs:
               - 'docs/**'
@@ -165,7 +184,7 @@ jobs:
       - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: .next/cache
+          path: apps/web/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
@@ -185,26 +204,28 @@ jobs:
       - name: Verify and prepare build output
         run: |
           echo "Build output contents:"
-          ls -la .next/ || echo ".next directory not found!"
-          du -sh .next/ || echo "Cannot check .next size"
-          rm -rf .next/cache
+          ls -la apps/web/.next/ || echo "apps/web/.next directory not found!"
+          du -sh apps/web/.next/ || echo "Cannot check .next size"
+          rm -rf apps/web/.next/cache
           # Remove files with colons in names (Turbopack externals) - not supported by GitHub artifact upload
-          find .next -name "*:*" -delete 2>/dev/null || true
+          find apps/web/.next -name "*:*" -delete 2>/dev/null || true
           # Copy static assets into standalone directory (required by Next.js standalone server)
           # See: https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
-          cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
+          # W2c (#362): standalone is now under apps/web/.next/standalone/apps/web/ because
+          # outputFileTracingRoot points at the workspace root.
+          cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
+          cp -r apps/web/public apps/web/.next/standalone/apps/web/public
           echo "After cleanup:"
-          ls -la .next/ || echo ".next directory missing after cleanup!"
+          ls -la apps/web/.next/ || echo ".next directory missing after cleanup!"
           echo "Standalone static assets:"
-          ls -la .next/standalone/.next/static/ || echo "static copy failed!"
-          ls -la .next/standalone/public/ | head -5 || echo "public copy failed!"
+          ls -la apps/web/.next/standalone/apps/web/.next/static/ || echo "static copy failed!"
+          ls -la apps/web/.next/standalone/apps/web/public/ | head -5 || echo "public copy failed!"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 1
@@ -341,8 +362,8 @@ jobs:
       - name: Verify critical pattern coverage
         run: |
           echo "Verifying LLM safety test coverage..."
-          PATTERNS=$(grep -c "pattern:" src/lib/safety/jailbreak-detector/patterns.ts || echo "0")
-          TESTS=$(grep -c "it\|test(" src/lib/safety/__tests__/jailbreak-detector.test.ts || echo "0")
+          PATTERNS=$(grep -c "pattern:" apps/web/src/lib/safety/jailbreak-detector/patterns.ts || echo "0")
+          TESTS=$(grep -c "it\|test(" apps/web/src/lib/safety/__tests__/jailbreak-detector.test.ts || echo "0")
           echo "Pattern definitions: $PATTERNS"
           echo "Test cases: $TESTS"
           if [ "$TESTS" -lt 80 ]; then
@@ -384,7 +405,7 @@ jobs:
 
       - name: Check coverage thresholds
         run: |
-          if [ -f coverage/coverage-final.json ]; then
+          if [ -f apps/web/coverage/coverage-final.json ]; then
             echo "Coverage report generated - thresholds enforced by Vitest"
           else
             echo "Coverage report not found"
@@ -397,7 +418,7 @@ jobs:
           BASELINE=3  # Reduced baseline after fixing skipped tests
 
           # Count describe.skip/it.skip/test.skip in source (more reliable than coverage grep)
-          SKIPPED=$(grep -rE '\b(describe|it|test)\.skip\b' src/ --include='*.test.ts' --include='*.test.tsx' | wc -l | tr -d ' ')
+          SKIPPED=$(grep -rE '\b(describe|it|test)\.skip\b' apps/web/src/ --include='*.test.ts' --include='*.test.tsx' | wc -l | tr -d ' ')
 
           echo "Skipped unit tests found: $SKIPPED (baseline: $BASELINE)"
 
@@ -413,7 +434,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: apps/web/coverage/
           retention-days: 30
 
   # Lane 4: Documentation Check (fast, runs in parallel)
@@ -475,7 +496,7 @@ jobs:
 
       - name: Check for forbidden TODOs in critical areas
         run: |
-          CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
+          CRITICAL=$(find apps/web/src/lib/privacy apps/web/src/lib/safety apps/web/src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
           if [ -n "$CRITICAL" ]; then
             echo "BLOCKING: TODOs found in critical areas:"
             echo "$CRITICAL"
@@ -485,7 +506,7 @@ jobs:
 
       - name: Check console.log (fail on any)
         run: |
-          LOGS=$(find src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
+          LOGS=$(find apps/web/src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
           if [ -n "$LOGS" ]; then
             echo "BLOCKING: console.log found (use logger instead):"
             echo "$LOGS"
@@ -515,7 +536,7 @@ jobs:
       - name: Check for circular imports
         run: |
           BASELINE=32
-          npx madge --circular --extensions ts,tsx src/ > circular.txt 2>&1 || true
+          npx madge --circular --extensions ts,tsx apps/web/src/ > circular.txt 2>&1 || true
           if grep -q "Found .* circular" circular.txt; then
             COUNT=$(grep -oE "Found ([0-9]+)" circular.txt | grep -oE "[0-9]+")
             echo "Found $COUNT circular dependencies (baseline: $BASELINE)"
@@ -557,7 +578,7 @@ jobs:
         run: bash scripts/ci/check-i18n-namespace.sh origin/${{ github.base_ref }}
 
       - name: Detect dead exports (informational)
-        run: bash scripts/ci/check-dead-exports.sh src/lib
+        run: bash scripts/ci/check-dead-exports.sh apps/web/src/lib
 
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
@@ -735,7 +756,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       # Re-generate Prisma client. The build artifact's .next/ bakes paths
       # that resolve to node_modules/.prisma/client at runtime. pnpm's
@@ -849,7 +870,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       # Re-generate Prisma client. The build artifact's .next/ bakes paths
       # that resolve to node_modules/.prisma/client at runtime. pnpm's
@@ -882,10 +903,10 @@ jobs:
             SHARD="${{ matrix.shard }}"
             if [ "$SHARD" = "core" ]; then
               echo "Running core a11y E2E (accessibility.spec.ts only)"
-              npx playwright test --project=a11y apps/web/e2e/accessibility.spec.ts --workers=1 --reporter=list
+              npx playwright test --config apps/web/playwright.config.ts --project=a11y apps/web/e2e/accessibility.spec.ts --workers=1 --reporter=list
             else
               echo "Running a11y E2E for locale $SHARD"
-              npx playwright test --project=a11y apps/web/e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
+              npx playwright test --config apps/web/playwright.config.ts --project=a11y apps/web/e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
             fi
           else
             echo "Running a11y unit test baseline (no UI changes)"
@@ -970,7 +991,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       # Re-generate Prisma client. The build artifact's .next/ bakes paths
       # that resolve to node_modules/.prisma/client at runtime. pnpm's
@@ -1000,7 +1021,7 @@ jobs:
       - name: Run Mobile Smoke tests
         run: |
           echo "Running mobile smoke tests (iPhone SE)..."
-          npx playwright test --project=iphone-se --reporter=list
+          npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --reporter=list
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
@@ -1078,12 +1099,12 @@ jobs:
         run: |
           echo "Verifying mobile build output directories..."
 
-          # Check Next.js export output
-          if [ -d "out" ]; then
-            echo "✓ Next.js export directory exists: out/"
-            du -sh out/
+          # Check Next.js export output (apps/web after W2c monorepo move)
+          if [ -d "apps/web/out" ]; then
+            echo "✓ Next.js export directory exists: apps/web/out/"
+            du -sh apps/web/out/
           else
-            echo "ERROR: out/ directory not found"
+            echo "ERROR: apps/web/out/ directory not found"
             exit 1
           fi
 
@@ -1164,7 +1185,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       # Re-generate Prisma client. The build artifact's .next/ bakes paths
       # that resolve to node_modules/.prisma/client at runtime. pnpm's
@@ -1194,7 +1215,7 @@ jobs:
       - name: Run Mobile E2E tests
         run: |
           echo "Running mobile E2E tests on 3 core devices..."
-          npx playwright test --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
+          npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
@@ -1296,7 +1317,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       # Re-generate Prisma client. The build artifact's .next/ bakes paths
       # that resolve to node_modules/.prisma/client at runtime. pnpm's
@@ -1329,7 +1350,7 @@ jobs:
           timeout_minutes: 20
           max_attempts: 2
           retry_on: error
-          command: npx playwright test --project=chromium --reporter=list
+          command: npx playwright test --config apps/web/playwright.config.ts --project=chromium --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -1407,7 +1428,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1501,7 +1522,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1592,14 +1613,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
 
       - name: Check bundle sizes
         run: |
           # Check for large chunks (>500KB is warning, >2MB is error)
           # Note: markmap-lib bundles prismjs + highlight.js (~1.1-1.6MB) for mindmap code highlighting
           # Turbopack chunk redistribution can shift content between builds, so budget is 2MB
-          LARGE_CHUNKS=$(find .next/static/chunks -name "*.js" -size +2048k 2>/dev/null | head -5)
+          LARGE_CHUNKS=$(find apps/web/.next/static/chunks -name "*.js" -size +2048k 2>/dev/null | head -5)
           if [ -n "$LARGE_CHUNKS" ]; then
             echo "ERROR: Chunks over 1.2MB found:"
             for chunk in $LARGE_CHUNKS; do
@@ -1608,7 +1629,7 @@ jobs:
             exit 1
           fi
 
-          WARN_CHUNKS=$(find .next/static/chunks -name "*.js" -size +500k 2>/dev/null | head -5)
+          WARN_CHUNKS=$(find apps/web/.next/static/chunks -name "*.js" -size +500k 2>/dev/null | head -5)
           if [ -n "$WARN_CHUNKS" ]; then
             echo "WARNING: Chunks over 500KB found:"
             for chunk in $WARN_CHUNKS; do
@@ -1616,7 +1637,7 @@ jobs:
             done
           fi
 
-          TOTAL=$(du -sh .next/static/chunks 2>/dev/null | cut -f1)
+          TOTAL=$(du -sh apps/web/.next/static/chunks 2>/dev/null | cut -f1)
           echo "Total chunks size: $TOTAL"
 
       - name: Generate bundle report
@@ -1628,11 +1649,11 @@ jobs:
           echo "" >> bundle-report/report.md
           echo "## Chunk Sizes" >> bundle-report/report.md
           echo '```' >> bundle-report/report.md
-          find .next/static/chunks -name "*.js" -exec du -h {} \; | sort -rh | head -20 >> bundle-report/report.md
+          find apps/web/.next/static/chunks -name "*.js" -exec du -h {} \; | sort -rh | head -20 >> bundle-report/report.md
           echo '```' >> bundle-report/report.md
           echo "" >> bundle-report/report.md
           echo "## Total Size" >> bundle-report/report.md
-          du -sh .next/static/chunks >> bundle-report/report.md
+          du -sh apps/web/.next/static/chunks >> bundle-report/report.md
 
       - name: Upload bundle report
         uses: actions/upload-artifact@v4
