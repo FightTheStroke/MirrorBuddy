@@ -83,7 +83,7 @@ export default defineConfig({
   reporter: [['list'], ['json', { outputFile: 'test-results/pw-results.json' }]],
 
   // Global setup: sets onboarding as completed
-  globalSetup: path.join(__dirname, 'e2e', 'global-setup.ts'),
+  globalSetup: path.join(__dirname, 'apps', 'web', 'e2e', 'global-setup.ts'),
   // Global teardown: cleans up test users after all tests
   globalTeardown: path.join(__dirname, 'e2e', 'global-teardown.ts'),
 
