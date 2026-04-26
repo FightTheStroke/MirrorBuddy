@@ -192,7 +192,7 @@ jobs:
           # Copy static assets into standalone directory (required by Next.js standalone server)
           # See: https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
           cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
+          cp -r apps/web/public .next/standalone/public
           echo "After cleanup:"
           ls -la .next/ || echo ".next directory missing after cleanup!"
           echo "Standalone static assets:"

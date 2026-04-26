@@ -67,7 +67,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
 # Copy necessary files
-COPY --from=builder /app/public ./public
+# W2 app move (#362): public/ now under apps/web/public/
+COPY --from=builder /app/apps/web/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma.config.ts ./
