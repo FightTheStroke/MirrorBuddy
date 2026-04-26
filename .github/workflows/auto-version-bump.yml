@@ -59,5 +59,7 @@ jobs:
           NEXT="${{ steps.bump.outputs.next }}"
           git add VERSION package.json
           git commit -m "chore(release): v${NEXT} [skip ci]"
-          git tag "v${NEXT}"
+          # Annotated tag (-a) so --follow-tags actually pushes it; lightweight
+          # tags are filtered out by that flag (Codex P1 on PR #380).
+          git tag -a "v${NEXT}" -m "Release v${NEXT}"
           git push origin HEAD:main --follow-tags
