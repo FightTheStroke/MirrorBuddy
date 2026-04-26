@@ -33,11 +33,12 @@ const NAMESPACES = [
 
 async function loadNamespace(locale: string, namespace: string): Promise<Record<string, unknown>> {
   try {
-    return (await import(`../../messages/${locale}/${namespace}.json`)).default;
+    // W2 app move (#362): messages/ relocated to apps/web/messages/.
+    return (await import(`../../apps/web/messages/${locale}/${namespace}.json`)).default;
   } catch {
     // Fallback to Italian if namespace missing
     try {
-      return (await import(`../../messages/it/${namespace}.json`)).default;
+      return (await import(`../../apps/web/messages/it/${namespace}.json`)).default;
     } catch {
       return {};
     }
