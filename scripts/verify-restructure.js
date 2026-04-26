@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const it = require('../messages/it/compliance.json');
-const en = require('../messages/en/compliance.json');
+const it = require('../apps/web/messages/it/compliance.json');
+const en = require('../apps/web/messages/en/compliance.json');
 
 console.log('=== Structure Verification ===\n');
 console.log('Italian (it):');

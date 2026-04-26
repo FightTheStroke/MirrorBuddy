@@ -8,7 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const messagesDir = path.join(__dirname, '../messages');
+const messagesDir = path.join(__dirname, '../apps/web/messages');
 
 // Convert kebab-case to camelCase
 const toCamelCase = (str) => {
