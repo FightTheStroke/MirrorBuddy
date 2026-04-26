@@ -7,6 +7,9 @@ generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
   engineType      = "binary"
+  // W2 app move (#362): explicit binaryTargets for Vercel runtime (rhel),
+  // local macOS arm64 (native), and Linux arm64 production hosts.
+  binaryTargets   = ["native", "rhel-openssl-3.0.x", "linux-arm64-openssl-3.0.x"]
 }
 
 datasource db {

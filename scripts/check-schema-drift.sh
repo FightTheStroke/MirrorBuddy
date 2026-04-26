@@ -11,8 +11,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-SCHEMA_DIR="$PROJECT_DIR/prisma/schema"
-MIGRATIONS_DIR="$PROJECT_DIR/prisma/migrations"
+# W2 app move (#362): prisma/ relocated to apps/web/prisma/.
+SCHEMA_DIR="$PROJECT_DIR/apps/web/prisma/schema"
+MIGRATIONS_DIR="$PROJECT_DIR/apps/web/prisma/migrations"
 
 MISSING=0
 CHECKED=0

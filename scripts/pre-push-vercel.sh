@@ -42,7 +42,7 @@ START_TIME=$(date +%s)
 echo -e "${BLUE}[1/5] Checking migration & proxy consistency...${NC}"
 
 # Verify all migrations are named correctly (with timestamp)
-INVALID_MIGRATIONS=$(ls prisma/migrations 2>/dev/null | /usr/bin/grep -v "^[0-9]\{14\}_" | /usr/bin/grep -v "migration_lock.toml" | /usr/bin/grep -v ".DS_Store" || true)
+INVALID_MIGRATIONS=$(ls apps/web/prisma/migrations 2>/dev/null | /usr/bin/grep -v "^[0-9]\{14\}_" | /usr/bin/grep -v "migration_lock.toml" | /usr/bin/grep -v ".DS_Store" || true)
 if [ -n "$INVALID_MIGRATIONS" ]; then
 	echo -e "${RED}✗ Invalid migration folder names (must be YYYYMMDDHHMMSS_name):${NC}"
 	echo "$INVALID_MIGRATIONS"

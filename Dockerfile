@@ -18,7 +18,8 @@ RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages/
 COPY prisma.config.ts ./
-COPY prisma ./prisma/
+# W2 app move (#362): prisma/ now under apps/web/prisma/
+COPY apps/web/prisma ./apps/web/prisma/
 
 # Install ALL dependencies (devDeps needed for build: Tailwind, TypeScript, PostCSS)
 RUN pnpm install --frozen-lockfile
@@ -71,7 +72,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma.config.ts ./
-COPY --from=builder /app/prisma ./prisma
+# W2 app move (#362): prisma/ now under apps/web/prisma/
+COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
 # Skip explicit .prisma COPY — Next.js output: 'standalone' already
 # bundles the generated Prisma client into .next/standalone. Under pnpm's
 # isolated node-modules layout (even with node-linker=hoisted), .prisma

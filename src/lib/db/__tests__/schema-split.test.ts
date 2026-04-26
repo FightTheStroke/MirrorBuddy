@@ -12,7 +12,7 @@ import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 
-const SCHEMA_DIR = join(process.cwd(), 'prisma/schema');
+const SCHEMA_DIR = join(process.cwd(), 'apps/web/prisma/schema');
 
 // Expected schema files by domain
 const EXPECTED_SCHEMA_FILES = [
