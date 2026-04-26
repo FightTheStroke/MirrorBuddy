@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 
 describe('PWA Offline Support', () => {
-  // W2 app move (#362): public/ relocated to apps/web/public/.
-  const publicDir = path.join(process.cwd(), 'apps', 'web', 'public');
+  // W2 app move (#362): public/ relocated to public/.
+  const publicDir = path.join(process.cwd(), 'public');
   const swPath = path.join(publicDir, 'sw.js');
   const offlinePath = path.join(publicDir, 'offline.html');
 

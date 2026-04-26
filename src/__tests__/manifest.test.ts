@@ -9,7 +9,7 @@ describe('Web App Manifest (T1-03)', () => {
   let manifest: any;
 
   it('should exist and be valid JSON', () => {
-    const manifestPath = join(process.cwd(), 'apps', 'web', 'public', 'manifest.json');
+    const manifestPath = join(process.cwd(), 'public', 'manifest.json');
     const manifestContent = readFileSync(manifestPath, 'utf-8');
     expect(() => {
       manifest = JSON.parse(manifestContent);
@@ -17,7 +17,7 @@ describe('Web App Manifest (T1-03)', () => {
   });
 
   it('should have lang set to "en" as default (not "it")', () => {
-    const manifestPath = join(process.cwd(), 'apps', 'web', 'public', 'manifest.json');
+    const manifestPath = join(process.cwd(), 'public', 'manifest.json');
     const manifestContent = readFileSync(manifestPath, 'utf-8');
     manifest = JSON.parse(manifestContent);
 
@@ -26,7 +26,7 @@ describe('Web App Manifest (T1-03)', () => {
   });
 
   it('should have related_applications array with iOS and Android entries', () => {
-    const manifestPath = join(process.cwd(), 'apps', 'web', 'public', 'manifest.json');
+    const manifestPath = join(process.cwd(), 'public', 'manifest.json');
     const manifestContent = readFileSync(manifestPath, 'utf-8');
     manifest = JSON.parse(manifestContent);
 
@@ -46,7 +46,7 @@ describe('Web App Manifest (T1-03)', () => {
   });
 
   it('should have prefer_related_applications set to false', () => {
-    const manifestPath = join(process.cwd(), 'apps', 'web', 'public', 'manifest.json');
+    const manifestPath = join(process.cwd(), 'public', 'manifest.json');
     const manifestContent = readFileSync(manifestPath, 'utf-8');
     manifest = JSON.parse(manifestContent);
 
@@ -54,7 +54,7 @@ describe('Web App Manifest (T1-03)', () => {
   });
 
   it('should have proper PWA configuration', () => {
-    const manifestPath = join(process.cwd(), 'apps', 'web', 'public', 'manifest.json');
+    const manifestPath = join(process.cwd(), 'public', 'manifest.json');
     const manifestContent = readFileSync(manifestPath, 'utf-8');
     manifest = JSON.parse(manifestContent);
 
