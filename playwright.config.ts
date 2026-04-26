@@ -105,7 +105,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Use storage state with onboarding completed
-    storageState: path.join(__dirname, 'e2e', '.auth', 'storage-state.json'),
+    storageState: path.join(__dirname, 'apps', 'web', 'e2e', '.auth', 'storage-state.json'),
 
     // Visual regression settings
     ...(process.env.VISUAL_REGRESSION && {
