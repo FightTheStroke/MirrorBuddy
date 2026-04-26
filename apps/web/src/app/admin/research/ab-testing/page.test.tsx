@@ -5,7 +5,7 @@ import { join } from 'node:path';
 describe('Admin A/B testing page source', () => {
   it('uses Recharts BarChart and ab-results API endpoint', async () => {
     const source = await readFile(
-      join(process.cwd(), 'src/app/admin/research/ab-testing/page.tsx'),
+      join(process.cwd(), 'apps/web/src/app/admin/research/ab-testing/page.tsx'),
       'utf8',
     );
 
@@ -15,7 +15,7 @@ describe('Admin A/B testing page source', () => {
 
   it('renders experiment status badge and bucket breakdown section', async () => {
     const source = await readFile(
-      join(process.cwd(), 'src/app/admin/research/ab-testing/page.tsx'),
+      join(process.cwd(), 'apps/web/src/app/admin/research/ab-testing/page.tsx'),
       'utf8',
     );
 

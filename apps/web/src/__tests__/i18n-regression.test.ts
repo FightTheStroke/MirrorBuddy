@@ -276,7 +276,7 @@ describe('i18n Regression Tests', () => {
     });
 
     it('should have maestri data files', () => {
-      const maestriDir = path.join(process.cwd(), 'src/data/maestri');
+      const maestriDir = path.join(process.cwd(), 'apps/web/src/data/maestri');
 
       Object.values(LANGUAGE_MAESTRI).forEach((maestro) => {
         const knowledgeFile = path.join(maestriDir, `${maestro}-knowledge.ts`);

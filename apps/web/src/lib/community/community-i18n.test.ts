@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import de from '@/../apps/web/messages/de/community.json';
-import en from '@/../apps/web/messages/en/community.json';
-import es from '@/../apps/web/messages/es/community.json';
-import fr from '@/../apps/web/messages/fr/community.json';
-import itLocale from '@/../apps/web/messages/it/community.json';
+import de from '@/../messages/de/community.json';
+import en from '@/../messages/en/community.json';
+import es from '@/../messages/es/community.json';
+import fr from '@/../messages/fr/community.json';
+import itLocale from '@/../messages/it/community.json';
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 

@@ -8,21 +8,21 @@
 import { describe, test, expect } from 'vitest';
 
 // Import namespace files for each locale
-import itWelcome from '../../apps/web/messages/it/welcome.json';
-import itNavigation from '../../apps/web/messages/it/navigation.json';
-import itHome from '../../apps/web/messages/it/home.json';
-import enWelcome from '../../apps/web/messages/en/welcome.json';
-import enNavigation from '../../apps/web/messages/en/navigation.json';
-import enHome from '../../apps/web/messages/en/home.json';
-import frWelcome from '../../apps/web/messages/fr/welcome.json';
-import frNavigation from '../../apps/web/messages/fr/navigation.json';
-import frHome from '../../apps/web/messages/fr/home.json';
-import deWelcome from '../../apps/web/messages/de/welcome.json';
-import deNavigation from '../../apps/web/messages/de/navigation.json';
-import deHome from '../../apps/web/messages/de/home.json';
-import esWelcome from '../../apps/web/messages/es/welcome.json';
-import esNavigation from '../../apps/web/messages/es/navigation.json';
-import esHome from '../../apps/web/messages/es/home.json';
+import itWelcome from '../../messages/it/welcome.json';
+import itNavigation from '../../messages/it/navigation.json';
+import itHome from '../../messages/it/home.json';
+import enWelcome from '../../messages/en/welcome.json';
+import enNavigation from '../../messages/en/navigation.json';
+import enHome from '../../messages/en/home.json';
+import frWelcome from '../../messages/fr/welcome.json';
+import frNavigation from '../../messages/fr/navigation.json';
+import frHome from '../../messages/fr/home.json';
+import deWelcome from '../../messages/de/welcome.json';
+import deNavigation from '../../messages/de/navigation.json';
+import deHome from '../../messages/de/home.json';
+import esWelcome from '../../messages/es/welcome.json';
+import esNavigation from '../../messages/es/navigation.json';
+import esHome from '../../messages/es/home.json';
 
 // Merge namespace files to simulate runtime behavior
 const itMessages = { ...itWelcome, ...itNavigation, ...itHome };

@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 describe('realtime proxy cleanup', () => {
   it('removes deprecated WebSocket proxy directory and API imports', () => {
-    const root = process.cwd();
+    // apps/web/src/app/api/realtime/__tests__ → apps/web
+    const root = path.resolve(__dirname, '../../../../..');
     const proxyDir = path.join(root, 'src/server/realtime-proxy');
     const startRoute = fs.readFileSync(
       path.join(root, 'src/app/api/realtime/start/route.ts'),

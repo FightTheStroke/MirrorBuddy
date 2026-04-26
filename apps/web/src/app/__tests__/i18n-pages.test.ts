@@ -7,16 +7,16 @@
 import { describe, it, expect } from 'vitest';
 
 // Import namespace files for each locale
-import itCompliance from '../../../apps/web/messages/it/compliance.json';
-import itTools from '../../../apps/web/messages/it/tools.json';
-import enCompliance from '../../../apps/web/messages/en/compliance.json';
-import enTools from '../../../apps/web/messages/en/tools.json';
-import frCompliance from '../../../apps/web/messages/fr/compliance.json';
-import frTools from '../../../apps/web/messages/fr/tools.json';
-import deCompliance from '../../../apps/web/messages/de/compliance.json';
-import deTools from '../../../apps/web/messages/de/tools.json';
-import esCompliance from '../../../apps/web/messages/es/compliance.json';
-import esTools from '../../../apps/web/messages/es/tools.json';
+import itCompliance from '../../../messages/it/compliance.json';
+import itTools from '../../../messages/it/tools.json';
+import enCompliance from '../../../messages/en/compliance.json';
+import enTools from '../../../messages/en/tools.json';
+import frCompliance from '../../../messages/fr/compliance.json';
+import frTools from '../../../messages/fr/tools.json';
+import deCompliance from '../../../messages/de/compliance.json';
+import deTools from '../../../messages/de/tools.json';
+import esCompliance from '../../../messages/es/compliance.json';
+import esTools from '../../../messages/es/tools.json';
 
 // Merge namespace files to simulate runtime behavior
 const itMessages = { ...itCompliance, ...itTools };

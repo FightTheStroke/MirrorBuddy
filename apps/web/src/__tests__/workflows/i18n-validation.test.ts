@@ -39,6 +39,7 @@ describe('i18n Validation Workflow', () => {
       // W2 app move (#362): messages/ relocated to apps/web/messages/.
       expect(paths).toContain('apps/web/messages/**');
       expect(paths).toContain('src/**');
+      expect(paths).toContain('apps/web/src/**');
       expect(paths).toContain('scripts/i18n-check.ts');
       expect(paths).toContain('package.json');
       expect(paths).toContain('pnpm-lock.yaml');

@@ -7,7 +7,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 
 // Import waitlist messages
-import itWaitlist from '../../../../../apps/web/messages/it/waitlist.json';
+import itWaitlist from '../../../../../messages/it/waitlist.json';
 
 const PAGES_ROOT = resolve(__dirname, '../..');
 

@@ -26,11 +26,11 @@
     "voice-ai"
   ],
   "scripts": {
-    "dev": "next dev apps/web",
-    "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev apps/web",
-    "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build apps/web",
-    "start": "node .next/standalone/server.js",
-    "build:mobile:web": "MOBILE_BUILD=1 BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build apps/web apps/web",
+    "dev": "cd apps/web && next dev",
+    "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; cd apps/web && next dev",
+    "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) bash -c 'cd apps/web && next build'",
+    "start": "node apps/web/.next/standalone/apps/web/server.js",
+    "build:mobile:web": "MOBILE_BUILD=1 BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) bash -c 'cd apps/web && next build'",
     "build:mobile": "npm run build:mobile:web && npx cap copy && npx cap sync",
     "build:mobile:ios": "./scripts/mobile-build.sh ios",
     "build:mobile:android": "./scripts/mobile-build.sh android",

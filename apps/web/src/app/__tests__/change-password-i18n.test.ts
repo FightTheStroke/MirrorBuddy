@@ -6,6 +6,8 @@ import path from 'path';
  * TDD Test: Verify change-password pages use i18n keys instead of hardcoded Italian text
  */
 describe('change-password i18n compliance', () => {
+  // apps/web/src/app/__tests__ → apps/web (cwd-anchor for src-relative paths)
+  const webRoot = path.join(__dirname, '..', '..', '..');
   const files = ['src/app/change-password/page.tsx', 'src/app/[locale]/change-password/page.tsx'];
 
   // Files that must contain useTranslations hook (client components)
@@ -37,7 +39,7 @@ describe('change-password i18n compliance', () => {
 
   it('should not contain hardcoded Italian strings in change-password pages', () => {
     files.forEach((filePath) => {
-      const fullPath = path.join(process.cwd(), filePath);
+      const fullPath = path.join(webRoot, filePath);
       const content = fs.readFileSync(fullPath, 'utf-8');
 
       hardcodedItalianStrings.forEach((italianString) => {
@@ -53,7 +55,7 @@ describe('change-password i18n compliance', () => {
 
   it('should use useTranslations hook in change-password pages', () => {
     filesWithTranslations.forEach((filePath) => {
-      const fullPath = path.join(process.cwd(), filePath);
+      const fullPath = path.join(webRoot, filePath);
       const content = fs.readFileSync(fullPath, 'utf-8');
 
       expect(content, `File ${filePath} should import useTranslations`).toMatch(
@@ -63,16 +65,16 @@ describe('change-password i18n compliance', () => {
   });
 
   const localeFiles = [
-    'apps/web/messages/it/auth.json',
-    'apps/web/messages/en/auth.json',
-    'apps/web/messages/fr/auth.json',
-    'apps/web/messages/de/auth.json',
-    'apps/web/messages/es/auth.json',
+    'messages/it/auth.json',
+    'messages/en/auth.json',
+    'messages/fr/auth.json',
+    'messages/de/auth.json',
+    'messages/es/auth.json',
   ];
 
   localeFiles.forEach((filePath) => {
     it(`should have all required i18n keys in ${filePath}`, () => {
-      const fullPath = path.join(process.cwd(), filePath);
+      const fullPath = path.join(webRoot, filePath);
       const content = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
 
       requiredI18nKeys.forEach((key) => {

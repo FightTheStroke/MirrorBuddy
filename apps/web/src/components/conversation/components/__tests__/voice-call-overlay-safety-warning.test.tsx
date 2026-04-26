@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest';
 describe('VoiceCallOverlay safety warning UI', () => {
   it('defines safetyWarning state and renders SafetyWarning banner', () => {
     const source = fs.readFileSync(
-      path.join(process.cwd(), 'src/components/conversation/components/voice-call-overlay.tsx'),
+      path.join(
+        process.cwd(),
+        'apps/web/src/components/conversation/components/voice-call-overlay.tsx',
+      ),
       'utf8',
     );
 

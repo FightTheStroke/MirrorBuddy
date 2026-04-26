@@ -87,6 +87,7 @@ describe('i18n CI Integration', () => {
       const i18nRelatedPaths = [
         'apps/web/messages/**',
         'src/**',
+        'apps/web/src/**',
         'scripts/i18n-check.ts',
         'package.json',
       ];

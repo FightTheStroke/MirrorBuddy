@@ -9,75 +9,70 @@
  * causing metrics to not be pushed to Grafana Cloud.
  */
 
-import { describe, it, expect } from "vitest";
-import * as fs from "fs";
-import * as path from "path";
+import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 
-describe("Instrumentation Services", () => {
-  const instrumentationPath = path.join(process.cwd(), "instrumentation.ts");
-  const instrumentationContent = fs.readFileSync(instrumentationPath, "utf-8");
+describe('Instrumentation Services', () => {
+  // apps/web/src/lib/observability/__tests__ → apps/web/instrumentation.ts
+  const instrumentationPath = path.join(__dirname, '../../../..', 'instrumentation.ts');
+  const instrumentationContent = fs.readFileSync(instrumentationPath, 'utf-8');
 
-  describe("Required service starts", () => {
-    it("should start prometheusPushService for Grafana Cloud metrics", () => {
+  describe('Required service starts', () => {
+    it('should start prometheusPushService for Grafana Cloud metrics', () => {
       // Verify import (dynamic import in instrumentation.ts)
       expect(instrumentationContent).toMatch(
         /prometheusPushService.*=.*await\s+import.*@\/lib\/observability/,
       );
       // Verify start call
-      expect(instrumentationContent).toMatch(
-        /prometheusPushService\.start\(\)/,
-      );
+      expect(instrumentationContent).toMatch(/prometheusPushService\.start\(\)/);
     });
 
-    it("should initialize OpenTelemetry SDK", () => {
+    it('should initialize OpenTelemetry SDK', () => {
       expect(instrumentationContent).toMatch(/initializeOpenTelemetry/);
       expect(instrumentationContent).toMatch(/startOpenTelemetry/);
     });
 
-    it("should validate environment variables", () => {
+    it('should validate environment variables', () => {
       expect(instrumentationContent).toMatch(/validateEnv\(\)/);
     });
   });
 
-  describe("Service initialization order", () => {
-    it("should validate env before starting services", () => {
-      const validateEnvPos = instrumentationContent.indexOf("validateEnv()");
-      const pushServicePos = instrumentationContent.indexOf(
-        "prometheusPushService.start()",
-      );
+  describe('Service initialization order', () => {
+    it('should validate env before starting services', () => {
+      const validateEnvPos = instrumentationContent.indexOf('validateEnv()');
+      const pushServicePos = instrumentationContent.indexOf('prometheusPushService.start()');
 
       expect(validateEnvPos).toBeLessThan(pushServicePos);
     });
 
-    it("should start OpenTelemetry before other services", () => {
-      const otelPos = instrumentationContent.indexOf("startOpenTelemetry");
-      const pushServicePos = instrumentationContent.indexOf(
-        "prometheusPushService.start()",
-      );
+    it('should start OpenTelemetry before other services', () => {
+      const otelPos = instrumentationContent.indexOf('startOpenTelemetry');
+      const pushServicePos = instrumentationContent.indexOf('prometheusPushService.start()');
 
       expect(otelPos).toBeLessThan(pushServicePos);
     });
   });
 });
 
-describe("PrometheusPushService", () => {
-  it("should export prometheusPushService from observability module", async () => {
-    const { prometheusPushService } = await import("../index");
+describe('PrometheusPushService', () => {
+  it('should export prometheusPushService from observability module', async () => {
+    const { prometheusPushService } = await import('../index');
     expect(prometheusPushService).toBeDefined();
-    expect(typeof prometheusPushService.start).toBe("function");
-    expect(typeof prometheusPushService.stop).toBe("function");
-    expect(typeof prometheusPushService.isConfigured).toBe("function");
-    expect(typeof prometheusPushService.isActive).toBe("function");
+    expect(typeof prometheusPushService.start).toBe('function');
+    expect(typeof prometheusPushService.stop).toBe('function');
+    expect(typeof prometheusPushService.isConfigured).toBe('function');
+    expect(typeof prometheusPushService.isActive).toBe('function');
   });
 
-  it("should have initialize method that checks env vars", async () => {
-    const { prometheusPushService } = await import("../index");
-    expect(typeof prometheusPushService.initialize).toBe("function");
+  it('should have initialize method that checks env vars', async () => {
+    const { prometheusPushService } = await import('../index');
+    expect(typeof prometheusPushService.initialize).toBe('function');
   });
 
-  it("should NOT start in development (cost savings)", async () => {
+  it('should NOT start in development (cost savings)', async () => {
     // In test environment (which is not production), the service should not activate
-    const { prometheusPushService } = await import("../index");
+    const { prometheusPushService } = await import('../index');
     prometheusPushService.start();
     expect(prometheusPushService.isActive()).toBe(false);
   });

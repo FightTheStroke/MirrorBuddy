@@ -25,7 +25,7 @@ describe('CSP Configuration Validation', () => {
   let proxyContent: string;
 
   beforeAll(() => {
-    const proxyPath = path.join(process.cwd(), 'src/proxy.ts');
+    const proxyPath = path.join(process.cwd(), 'apps/web/src/proxy.ts');
     proxyContent = fs.readFileSync(proxyPath, 'utf-8');
   });
 
@@ -122,7 +122,7 @@ describe('Third-Party Provider CSP Compliance', () => {
   let providersContent: string;
 
   beforeAll(() => {
-    const providersPath = path.join(process.cwd(), 'src/components/providers.tsx');
+    const providersPath = path.join(process.cwd(), 'apps/web/src/components/providers.tsx');
     providersContent = fs.readFileSync(providersPath, 'utf-8');
   });
 
@@ -149,20 +149,26 @@ describe('Third-Party Provider CSP Compliance', () => {
 describe('Dynamic Script Loading Patterns', () => {
   it('code-runner.tsx uses document.createElement for Pyodide (strict-dynamic required)', () => {
     // This test documents that code-runner.tsx relies on strict-dynamic
-    const codeRunnerPath = path.join(process.cwd(), 'src/components/tools/code-runner.tsx');
+    const codeRunnerPath = path.join(
+      process.cwd(),
+      'apps/web/src/components/tools/code-runner.tsx',
+    );
     const content = fs.readFileSync(codeRunnerPath, 'utf-8');
 
     // Verify it uses document.createElement for script loading
     expect(content).toMatch(/document\.createElement\(['"]script['"]\)/);
 
     // Verify the proxy.ts has strict-dynamic to support this
-    const proxyPath = path.join(process.cwd(), 'src/proxy.ts');
+    const proxyPath = path.join(process.cwd(), 'apps/web/src/proxy.ts');
     const proxyContent = fs.readFileSync(proxyPath, 'utf-8');
     expect(proxyContent).toMatch(/'strict-dynamic'/);
   });
 
   it('use-google-picker.ts uses document.createElement for Google API (strict-dynamic required)', () => {
-    const pickerPath = path.join(process.cwd(), 'src/components/google-drive/use-google-picker.ts');
+    const pickerPath = path.join(
+      process.cwd(),
+      'apps/web/src/components/google-drive/use-google-picker.ts',
+    );
     const content = fs.readFileSync(pickerPath, 'utf-8');
 
     // Verify it uses document.createElement for script loading

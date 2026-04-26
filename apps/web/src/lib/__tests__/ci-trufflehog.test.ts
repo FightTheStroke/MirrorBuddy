@@ -15,7 +15,8 @@ describe('CI Workflow - TruffleHog Secret Scanning (F-09)', () => {
   let ciWorkflow: any;
 
   beforeAll(() => {
-    const workflowPath = path.join(__dirname, '../../../.github/workflows/ci.yml');
+    // apps/web/src/lib/__tests__ → repo root → .github/workflows/ci.yml
+    const workflowPath = path.join(__dirname, '../../../../..', '.github/workflows/ci.yml');
     const content = fs.readFileSync(workflowPath, 'utf-8');
     ciWorkflow = yaml.load(content) as any;
   });

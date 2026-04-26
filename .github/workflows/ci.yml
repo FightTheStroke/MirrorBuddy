@@ -52,12 +52,18 @@ jobs:
           filters: |
             src:
               - 'src/**'
+              - 'apps/web/src/**'
               - 'public/**'
+              - 'apps/web/public/**'
             ui:
               - 'src/app/**'
               - 'src/components/**'
               - 'src/styles/**'
+              - 'apps/web/src/app/**'
+              - 'apps/web/src/components/**'
+              - 'apps/web/src/styles/**'
               - 'public/**'
+              - 'apps/web/public/**'
               - 'apps/web/messages/**'
             mobile:
               - 'ios/**'
@@ -65,6 +71,8 @@ jobs:
               - 'capacitor.config.ts'
               - 'src/lib/native/**'
               - 'src/components/mobile/**'
+              - 'apps/web/src/lib/native/**'
+              - 'apps/web/src/components/mobile/**'
             prisma:
               - 'apps/web/prisma/**'
               - 'prisma.config.ts'
@@ -72,14 +80,22 @@ jobs:
               - 'apps/web/messages/**'
               - 'src/i18n/**'
               - 'src/lib/i18n/**'
+              - 'apps/web/src/i18n/**'
+              - 'apps/web/src/lib/i18n/**'
             safety:
               - 'src/lib/safety/**'
               - 'src/lib/ai/**'
               - 'src/lib/privacy/**'
               - 'src/lib/compliance/**'
               - 'src/data/maestri/**'
+              - 'apps/web/src/lib/safety/**'
+              - 'apps/web/src/lib/ai/**'
+              - 'apps/web/src/lib/privacy/**'
+              - 'apps/web/src/lib/compliance/**'
+              - 'apps/web/src/data/maestri/**'
             e2e:
               - 'apps/web/e2e/**'
+              - 'apps/web/playwright.config*.ts'
               - 'playwright.config*.ts'
             config:
               - 'package.json'
@@ -88,8 +104,11 @@ jobs:
               - 'eslint.config.mjs'
               - 'eslint-local-rules/**'
               - 'next.config.ts'
+              - 'apps/web/next.config.ts'
               - 'vitest.config.ts'
+              - 'apps/web/vitest.config.ts'
               - 'playwright.config*.ts'
+              - 'apps/web/playwright.config*.ts'
               - '.github/**'
             docs:
               - 'docs/**'
@@ -185,26 +204,28 @@ jobs:
       - name: Verify and prepare build output
         run: |
           echo "Build output contents:"
-          ls -la .next/ || echo ".next directory not found!"
-          du -sh .next/ || echo "Cannot check .next size"
-          rm -rf .next/cache
+          ls -la apps/web/.next/ || echo "apps/web/.next directory not found!"
+          du -sh apps/web/.next/ || echo "Cannot check .next size"
+          rm -rf apps/web/.next/cache
           # Remove files with colons in names (Turbopack externals) - not supported by GitHub artifact upload
-          find .next -name "*:*" -delete 2>/dev/null || true
+          find apps/web/.next -name "*:*" -delete 2>/dev/null || true
           # Copy static assets into standalone directory (required by Next.js standalone server)
           # See: https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
-          cp -r .next/static .next/standalone/.next/static
-          cp -r public .next/standalone/public
+          # W2c (#362): standalone is now under apps/web/.next/standalone/apps/web/ because
+          # outputFileTracingRoot points at the workspace root.
+          cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static
+          cp -r apps/web/public apps/web/.next/standalone/apps/web/public
           echo "After cleanup:"
-          ls -la .next/ || echo ".next directory missing after cleanup!"
+          ls -la apps/web/.next/ || echo ".next directory missing after cleanup!"
           echo "Standalone static assets:"
-          ls -la .next/standalone/.next/static/ || echo "static copy failed!"
-          ls -la .next/standalone/public/ | head -5 || echo "public copy failed!"
+          ls -la apps/web/.next/standalone/apps/web/.next/static/ || echo "static copy failed!"
+          ls -la apps/web/.next/standalone/apps/web/public/ | head -5 || echo "public copy failed!"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: .next
+          path: apps/web/.next
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 1

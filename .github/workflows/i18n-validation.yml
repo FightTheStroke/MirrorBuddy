@@ -7,6 +7,7 @@ on:
     paths:
       - 'apps/web/messages/**'
       - 'src/**'
+      - 'apps/web/src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -14,6 +15,7 @@ on:
     paths:
       - 'apps/web/messages/**'
       - 'src/**'
+      - 'apps/web/src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'

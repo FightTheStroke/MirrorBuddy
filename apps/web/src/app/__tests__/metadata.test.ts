@@ -34,7 +34,7 @@ const REQUIRED_PAGES = ['home', 'settings', 'aiTransparency', 'privacy', 'terms'
 
 // Load metadata namespace for a locale (ADR 0082 namespace structure)
 const loadLocaleMessages = (locale: Locale): LocaleMessages => {
-  const filePath = path.resolve(__dirname, `../../../apps/web/messages/${locale}/metadata.json`);
+  const filePath = path.resolve(__dirname, `../../../messages/${locale}/metadata.json`);
   const content = fs.readFileSync(filePath, 'utf-8');
   return JSON.parse(content);
 };

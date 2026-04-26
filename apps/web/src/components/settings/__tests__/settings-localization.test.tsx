@@ -6,11 +6,11 @@
 import { describe, it, expect } from 'vitest';
 
 // Import settings namespace files for each locale
-import enSettings from '../../../../apps/web/messages/en/settings.json';
-import itSettings from '../../../../apps/web/messages/it/settings.json';
-import esSettings from '../../../../apps/web/messages/es/settings.json';
-import frSettings from '../../../../apps/web/messages/fr/settings.json';
-import deSettings from '../../../../apps/web/messages/de/settings.json';
+import enSettings from '../../../../messages/en/settings.json';
+import itSettings from '../../../../messages/it/settings.json';
+import esSettings from '../../../../messages/es/settings.json';
+import frSettings from '../../../../messages/fr/settings.json';
+import deSettings from '../../../../messages/de/settings.json';
 
 // Create message objects with settings namespace
 const enMessages = { settings: enSettings.settings };

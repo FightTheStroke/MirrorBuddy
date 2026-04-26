@@ -126,7 +126,7 @@ describe('CharacterChatView - F-05 Responsive Layout (No isPhone for layout)', (
     it('should NOT use isPhone in className template literals for flex direction', () => {
       // Read the source file and verify no isPhone ternary for layout
       const filePath = path.join(
-        process.cwd(),
+        path.resolve(__dirname, '..', '..', '..', '..'),
         'src/components/conversation/character-chat-view.tsx',
       );
       const source = fs.readFileSync(filePath, 'utf-8');
@@ -142,7 +142,7 @@ describe('CharacterChatView - F-05 Responsive Layout (No isPhone for layout)', (
 
     it('should have pure Tailwind responsive classes in main container', () => {
       const filePath = path.join(
-        process.cwd(),
+        path.resolve(__dirname, '..', '..', '..', '..'),
         'src/components/conversation/character-chat-view.tsx',
       );
       const source = fs.readFileSync(filePath, 'utf-8');

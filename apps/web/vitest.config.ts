@@ -65,7 +65,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      'next/server': path.resolve(__dirname, './node_modules/next/server.js'),
+      // next is hoisted to the workspace root by pnpm; no copy under apps/web/node_modules
+      'next/server': path.resolve(__dirname, '../../node_modules/next/server.js'),
     },
   },
 });

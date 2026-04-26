@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ROOT = process.cwd();
+// apps/web/src/lib/tools/__tests__ → apps/web (Next workspace anchor for src-relative reads)
+const ROOT = join(__dirname, '../../../..');
 
 function readSource(relativePath: string): string {
   return readFileSync(join(ROOT, relativePath), 'utf8');

@@ -1,9 +1,16 @@
 import type { NextConfig } from 'next';
-import packageJson from './package.json';
+import path from 'node:path';
+import { readFileSync } from 'node:fs';
 import bundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 import createNextIntlPlugin from 'next-intl/plugin';
 import mobileConfig from './next.config.mobile';
+
+// Read the workspace-root package.json for APP_VERSION (apps/web/package.json
+// is a thin manifest used only so Vercel's rootDirectory='apps/web' resolves).
+const packageJson = JSON.parse(
+  readFileSync(path.join(__dirname, '../..', 'package.json'), 'utf8'),
+) as { version: string };
 
 // Bundle analyzer configuration (enabled via ANALYZE=true)
 const withBundleAnalyzer = bundleAnalyzer({
@@ -32,6 +39,9 @@ const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
   // Creates .next/standalone with minimal server.js for production
   output: 'standalone',
+  // Monorepo: tell Next to trace files starting from the workspace root, not apps/web.
+  // Without this, dynamic requires of workspace packages fail at runtime in standalone.
+  outputFileTracingRoot: path.join(__dirname, '../..'),
   env: {
     APP_VERSION: packageJson.version,
   },

@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-const EN_COMPLIANCE_PATH = path.resolve(__dirname, '../../apps/web/messages/en/compliance.json');
+const EN_COMPLIANCE_PATH = path.resolve(__dirname, '../../messages/en/compliance.json');
 
 function getAllValues(obj: unknown, prefix = ''): Array<{ key: string; value: string }> {
   const results: Array<{ key: string; value: string }> = [];

@@ -4,7 +4,8 @@ import path from 'node:path';
 
 describe('voice transport cleanup', () => {
   it('keeps use-voice-session and connection on WebRTC-only wording', () => {
-    const root = process.cwd();
+    // apps/web/src/lib/hooks/voice-session/__tests__ → apps/web
+    const root = path.resolve(__dirname, '../../../../..');
     const useVoiceSessionPath = path.join(root, 'src/lib/hooks/voice-session/use-voice-session.ts');
     const connectionPath = path.join(root, 'src/lib/hooks/voice-session/connection.ts');
 
