@@ -27,7 +27,7 @@ import { defineConfig, devices } from '@playwright/test';
 const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 
 export default defineConfig({
-  testDir: './apps/web/e2e/production-smoke',
+  testDir: './e2e/production-smoke',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   timeout: 30000,

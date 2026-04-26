@@ -362,8 +362,8 @@ jobs:
       - name: Verify critical pattern coverage
         run: |
           echo "Verifying LLM safety test coverage..."
-          PATTERNS=$(grep -c "pattern:" src/lib/safety/jailbreak-detector/patterns.ts || echo "0")
-          TESTS=$(grep -c "it\|test(" src/lib/safety/__tests__/jailbreak-detector.test.ts || echo "0")
+          PATTERNS=$(grep -c "pattern:" apps/web/src/lib/safety/jailbreak-detector/patterns.ts || echo "0")
+          TESTS=$(grep -c "it\|test(" apps/web/src/lib/safety/__tests__/jailbreak-detector.test.ts || echo "0")
           echo "Pattern definitions: $PATTERNS"
           echo "Test cases: $TESTS"
           if [ "$TESTS" -lt 80 ]; then
@@ -405,7 +405,7 @@ jobs:
 
       - name: Check coverage thresholds
         run: |
-          if [ -f coverage/coverage-final.json ]; then
+          if [ -f apps/web/coverage/coverage-final.json ]; then
             echo "Coverage report generated - thresholds enforced by Vitest"
           else
             echo "Coverage report not found"
@@ -418,7 +418,7 @@ jobs:
           BASELINE=3  # Reduced baseline after fixing skipped tests
 
           # Count describe.skip/it.skip/test.skip in source (more reliable than coverage grep)
-          SKIPPED=$(grep -rE '\b(describe|it|test)\.skip\b' src/ --include='*.test.ts' --include='*.test.tsx' | wc -l | tr -d ' ')
+          SKIPPED=$(grep -rE '\b(describe|it|test)\.skip\b' apps/web/src/ --include='*.test.ts' --include='*.test.tsx' | wc -l | tr -d ' ')
 
           echo "Skipped unit tests found: $SKIPPED (baseline: $BASELINE)"
 
@@ -434,7 +434,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: apps/web/coverage/
           retention-days: 30
 
   # Lane 4: Documentation Check (fast, runs in parallel)
@@ -496,7 +496,7 @@ jobs:
 
       - name: Check for forbidden TODOs in critical areas
         run: |
-          CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
+          CRITICAL=$(find apps/web/src/lib/privacy apps/web/src/lib/safety apps/web/src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
           if [ -n "$CRITICAL" ]; then
             echo "BLOCKING: TODOs found in critical areas:"
             echo "$CRITICAL"
@@ -506,7 +506,7 @@ jobs:
 
       - name: Check console.log (fail on any)
         run: |
-          LOGS=$(find src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
+          LOGS=$(find apps/web/src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
           if [ -n "$LOGS" ]; then
             echo "BLOCKING: console.log found (use logger instead):"
             echo "$LOGS"
@@ -536,7 +536,7 @@ jobs:
       - name: Check for circular imports
         run: |
           BASELINE=32
-          npx madge --circular --extensions ts,tsx src/ > circular.txt 2>&1 || true
+          npx madge --circular --extensions ts,tsx apps/web/src/ > circular.txt 2>&1 || true
           if grep -q "Found .* circular" circular.txt; then
             COUNT=$(grep -oE "Found ([0-9]+)" circular.txt | grep -oE "[0-9]+")
             echo "Found $COUNT circular dependencies (baseline: $BASELINE)"
@@ -578,7 +578,7 @@ jobs:
         run: bash scripts/ci/check-i18n-namespace.sh origin/${{ github.base_ref }}
 
       - name: Detect dead exports (informational)
-        run: bash scripts/ci/check-dead-exports.sh src/lib
+        run: bash scripts/ci/check-dead-exports.sh apps/web/src/lib
 
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
@@ -1099,12 +1099,12 @@ jobs:
         run: |
           echo "Verifying mobile build output directories..."
 
-          # Check Next.js export output
-          if [ -d "out" ]; then
-            echo "✓ Next.js export directory exists: out/"
-            du -sh out/
+          # Check Next.js export output (apps/web after W2c monorepo move)
+          if [ -d "apps/web/out" ]; then
+            echo "✓ Next.js export directory exists: apps/web/out/"
+            du -sh apps/web/out/
           else
-            echo "ERROR: out/ directory not found"
+            echo "ERROR: apps/web/out/ directory not found"
             exit 1
           fi
 
