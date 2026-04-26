@@ -1,0 +1,63 @@
+name: Auto Version Bump
+
+# Bumps package.json version on every push to main using Conventional Commits
+# (scripts/auto-version.sh). The follow-up commit is tagged so Vercel auto-deploy
+# picks it up on the same merge cycle.
+#
+# Loop guard: skips itself when the head commit was authored by this workflow
+# (commit message prefix "chore(release):" + [skip ci]).
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-version-bump-main
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Bump version + tag
+    runs-on: ubuntu-latest
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !startsWith(github.event.head_commit.message, 'chore(release):')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Compute next version
+        id: bump
+        run: |
+          ./scripts/auto-version.sh --json > /tmp/bump.json
+          cat /tmp/bump.json
+          NEXT=$(node -p "JSON.parse(require('fs').readFileSync('/tmp/bump.json','utf8')).newVersion")
+          BUMP=$(node -p "JSON.parse(require('fs').readFileSync('/tmp/bump.json','utf8')).bumpType")
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "bump=$BUMP" >> $GITHUB_OUTPUT
+
+      - name: Apply bump
+        if: steps.bump.outputs.bump != 'none'
+        run: |
+          ./scripts/auto-version.sh --apply
+          NEXT="${{ steps.bump.outputs.next }}"
+          git add VERSION package.json
+          git commit -m "chore(release): v${NEXT} [skip ci]"
+          git tag "v${NEXT}"
+          git push origin HEAD:main --follow-tags
