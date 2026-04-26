@@ -903,10 +903,10 @@ jobs:
             SHARD="${{ matrix.shard }}"
             if [ "$SHARD" = "core" ]; then
               echo "Running core a11y E2E (accessibility.spec.ts only)"
-              npx playwright test --project=a11y apps/web/e2e/accessibility.spec.ts --workers=1 --reporter=list
+              npx playwright test --config apps/web/playwright.config.ts --project=a11y apps/web/e2e/accessibility.spec.ts --workers=1 --reporter=list
             else
               echo "Running a11y E2E for locale $SHARD"
-              npx playwright test --project=a11y apps/web/e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
+              npx playwright test --config apps/web/playwright.config.ts --project=a11y apps/web/e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
             fi
           else
             echo "Running a11y unit test baseline (no UI changes)"
@@ -1021,7 +1021,7 @@ jobs:
       - name: Run Mobile Smoke tests
         run: |
           echo "Running mobile smoke tests (iPhone SE)..."
-          npx playwright test --project=iphone-se --reporter=list
+          npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --reporter=list
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
@@ -1215,7 +1215,7 @@ jobs:
       - name: Run Mobile E2E tests
         run: |
           echo "Running mobile E2E tests on 3 core devices..."
-          npx playwright test --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
+          npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
@@ -1350,7 +1350,7 @@ jobs:
           timeout_minutes: 20
           max_attempts: 2
           retry_on: error
-          command: npx playwright test --project=chromium --reporter=list
+          command: npx playwright test --config apps/web/playwright.config.ts --project=chromium --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
