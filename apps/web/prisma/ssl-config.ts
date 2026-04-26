@@ -23,8 +23,7 @@ export function getSSLConfig():
     }
   | undefined {
   const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
   if (supabaseCaCert) {
     return { rejectUnauthorized: true, ca: supabaseCaCert };

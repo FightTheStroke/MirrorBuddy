@@ -8,7 +8,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
-const SCHEMA_PATH = join(process.cwd(), 'prisma', 'schema', 'waitlist.prisma');
+const SCHEMA_PATH = join(process.cwd(), 'apps', 'web', 'prisma', 'schema', 'waitlist.prisma');
 
 describe('waitlist.prisma schema', () => {
   it('file exists at prisma/schema/waitlist.prisma', () => {

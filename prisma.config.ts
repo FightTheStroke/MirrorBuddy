@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import 'dotenv/config';
+import { defineConfig } from 'prisma/config';
 
 // PostgreSQL connection URL from environment
 // For local: postgresql://user:pass@localhost:5432/mirrorbuddy
@@ -10,17 +10,18 @@ import { defineConfig } from "prisma/config";
 // WARNING: This placeholder is intentionally invalid - DO NOT use for actual connections
 const databaseUrl =
   process.env.DATABASE_URL ||
-  "postgresql://INVALID_CREDENTIALS:INVALID_CREDENTIALS@localhost:5432/schema_only";
+  'postgresql://INVALID_CREDENTIALS:INVALID_CREDENTIALS@localhost:5432/schema_only';
 
 // For Supabase migrations, use DIRECT_URL (port 5432) instead of pooled URL (port 6543)
 // Run migrations with: DATABASE_URL="$DIRECT_URL" npx prisma db push
 const effectiveUrl = process.env.DIRECT_URL || databaseUrl;
 
+// W2 app move (#362): prisma/ relocated to apps/web/prisma/.
 export default defineConfig({
-  schema: "prisma/schema",
+  schema: 'apps/web/prisma/schema',
   migrations: {
-    path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
+    path: 'apps/web/prisma/migrations',
+    seed: 'tsx apps/web/prisma/seed.ts',
   },
   datasource: {
     url: effectiveUrl,

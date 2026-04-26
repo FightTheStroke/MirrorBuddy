@@ -7,9 +7,9 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
-import { createPrismaClient } from '../src/lib/ssl-config';
-import { seedTiers } from '../src/lib/seeds/tier-seed';
-import { seedLocaleConfigs } from '../src/lib/seeds/locale-config-seed';
+import { createPrismaClient } from '../../../src/lib/ssl-config';
+import { seedTiers } from '../../../src/lib/seeds/tier-seed';
+import { seedLocaleConfigs } from '../../../src/lib/seeds/locale-config-seed';
 
 async function main() {
   const prisma = createPrismaClient();

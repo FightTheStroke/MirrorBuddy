@@ -4,7 +4,10 @@ import { describe, expect, it } from 'vitest';
 
 describe('BenchmarkTrend Prisma model schema', () => {
   it('defines BenchmarkTrend with required fields and index', () => {
-    const schema = readFileSync(join(process.cwd(), 'prisma/schema/research.prisma'), 'utf8');
+    const schema = readFileSync(
+      join(process.cwd(), 'apps/web/prisma/schema/research.prisma'),
+      'utf8',
+    );
 
     expect(schema).toContain('model BenchmarkTrend {');
     expect(schema).toContain('id           String');

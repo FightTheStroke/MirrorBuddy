@@ -66,7 +66,8 @@ jobs:
               - 'src/lib/native/**'
               - 'src/components/mobile/**'
             prisma:
-              - 'prisma/**'
+              - 'apps/web/prisma/**'
+              - 'prisma.config.ts'
             i18n:
               - 'apps/web/messages/**'
               - 'src/i18n/**'
@@ -442,7 +443,7 @@ jobs:
       - name: Check migration naming convention
         run: |
           echo "Checking migration folder naming..."
-          INVALID=$(ls prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
+          INVALID=$(ls apps/web/prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
           if [ -n "$INVALID" ]; then
             echo "ERROR: Migration folders must be named YYYYMMDDHHMMSS_name"
             echo "Invalid migrations found:"
@@ -454,7 +455,7 @@ jobs:
       - name: Verify migration.sql exists
         run: |
           echo "Checking each migration has migration.sql..."
-          for dir in prisma/migrations/[0-9]*/; do
+          for dir in apps/web/prisma/migrations/[0-9]*/; do
             if [ ! -f "${dir}migration.sql" ]; then
               echo "ERROR: Missing migration.sql in $dir"
               exit 1
