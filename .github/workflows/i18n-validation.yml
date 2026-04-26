@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'messages/**'
+      - 'apps/web/messages/**'
       - 'src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'
       - 'pnpm-lock.yaml'
   pull_request:
     paths:
-      - 'messages/**'
+      - 'apps/web/messages/**'
       - 'src/**'
       - 'scripts/i18n-check.ts'
       - 'package.json'

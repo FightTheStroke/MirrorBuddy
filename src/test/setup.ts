@@ -42,7 +42,8 @@ function deepMerge(
 
 // Load all Italian namespace files and deep-merge them (ADR 0082)
 function loadItalianMessages(): Record<string, unknown> {
-  const localeDir = join(process.cwd(), 'messages', 'it');
+  // W2 app move (#362): messages/ relocated to apps/web/messages/.
+  const localeDir = join(process.cwd(), 'apps', 'web', 'messages', 'it');
   const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
   const merged: Record<string, unknown> = {};
   for (const file of files) {

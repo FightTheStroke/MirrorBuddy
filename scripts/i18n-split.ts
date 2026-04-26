@@ -8,94 +8,94 @@
  * Usage: npx tsx scripts/i18n-split.ts [--dry-run]
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-const LOCALES = ["it", "en", "de", "es", "fr"] as const;
-const MESSAGES_DIR = path.join(process.cwd(), "messages");
+const LOCALES = ['it', 'en', 'de', 'es', 'fr'] as const;
+const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 
 // Mapping from existing top-level keys to target namespaces
 const NAMESPACE_MAPPING: Record<string, string> = {
   // common - Global UI elements
-  common: "common",
-  ui: "common",
-  status: "common",
+  common: 'common',
+  ui: 'common',
+  status: 'common',
 
   // auth - Authentication flows
-  auth: "auth",
-  invite: "auth",
+  auth: 'auth',
+  invite: 'auth',
 
   // admin - Admin dashboard
-  admin: "admin",
-  dashboard: "admin",
-  parentDashboard: "admin",
+  admin: 'admin',
+  dashboard: 'admin',
+  parentDashboard: 'admin',
 
   // chat - Chat interface
-  chat: "chat",
-  conversation: "chat",
-  session: "chat",
-  voice: "chat",
-  typing: "chat",
+  chat: 'chat',
+  conversation: 'chat',
+  session: 'chat',
+  voice: 'chat',
+  typing: 'chat',
 
   // tools - All tools
-  tools: "tools",
-  astuccio: "tools",
-  zaino: "tools",
-  studyKit: "tools",
+  tools: 'tools',
+  astuccio: 'tools',
+  zaino: 'tools',
+  studyKit: 'tools',
 
   // settings - User settings
-  settings: "settings",
-  profile: "settings",
-  accessibility: "settings",
-  consent: "settings",
-  telemetry: "settings",
-  ambientAudio: "settings",
-  scheduler: "settings",
-  googleDrive: "settings",
+  settings: 'settings',
+  profile: 'settings',
+  accessibility: 'settings',
+  consent: 'settings',
+  telemetry: 'settings',
+  ambientAudio: 'settings',
+  scheduler: 'settings',
+  googleDrive: 'settings',
 
   // compliance - Legal pages
-  compliance: "compliance",
-  aiTransparency: "compliance",
-  legal: "compliance",
-  contact: "compliance",
+  compliance: 'compliance',
+  aiTransparency: 'compliance',
+  legal: 'compliance',
+  contact: 'compliance',
 
   // education - Learning features
-  education: "education",
-  coaches: "education",
-  supporti: "education",
-  maestros: "education",
+  education: 'education',
+  coaches: 'education',
+  supporti: 'education',
+  maestros: 'education',
 
   // navigation - Menus, sidebar
-  navigation: "navigation",
+  navigation: 'navigation',
 
   // errors - Error messages
-  errors: "errors",
-  "not-found": "errors",
-  validation: "errors",
+  errors: 'errors',
+  'not-found': 'errors',
+  validation: 'errors',
 
   // welcome - Home, onboarding
-  welcome: "welcome",
-  home: "welcome",
-  onboarding: "welcome",
+  welcome: 'welcome',
+  home: 'welcome',
+  onboarding: 'welcome',
 
   // metadata - SEO, page titles
-  metadata: "metadata",
+  metadata: 'metadata',
 };
 
 // Target namespaces (for validation)
 const NAMESPACES = [
-  "common",
-  "auth",
-  "admin",
-  "chat",
-  "tools",
-  "settings",
-  "compliance",
-  "education",
-  "navigation",
-  "errors",
-  "welcome",
-  "metadata",
+  'common',
+  'auth',
+  'admin',
+  'chat',
+  'tools',
+  'settings',
+  'compliance',
+  'education',
+  'navigation',
+  'errors',
+  'welcome',
+  'metadata',
 ] as const;
 
 interface SplitResult {
@@ -116,7 +116,7 @@ function splitLocale(
     return { results: [], unmapped: [] };
   }
 
-  const sourceContent = JSON.parse(fs.readFileSync(sourceFile, "utf-8"));
+  const sourceContent = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
   const sourceKeys = Object.keys(sourceContent);
 
   // Group keys by target namespace
@@ -153,10 +153,7 @@ function splitLocale(
     if (keyCount === 0) {
       // Write empty object for consistency
       if (!dryRun) {
-        fs.writeFileSync(
-          path.join(localeDir, `${ns}.json`),
-          JSON.stringify({}, null, 2) + "\n",
-        );
+        fs.writeFileSync(path.join(localeDir, `${ns}.json`), JSON.stringify({}, null, 2) + '\n');
       }
       continue;
     }
@@ -171,7 +168,7 @@ function splitLocale(
 
     if (!dryRun) {
       const outputFile = path.join(localeDir, `${ns}.json`);
-      fs.writeFileSync(outputFile, JSON.stringify(data, null, 2) + "\n");
+      fs.writeFileSync(outputFile, JSON.stringify(data, null, 2) + '\n');
     }
   }
 
@@ -179,13 +176,10 @@ function splitLocale(
 }
 
 function countDeepKeys(obj: unknown): number {
-  if (typeof obj !== "object" || obj === null) {
+  if (typeof obj !== 'object' || obj === null) {
     return 1;
   }
-  return Object.values(obj).reduce(
-    (sum: number, val) => sum + countDeepKeys(val),
-    0,
-  );
+  return Object.values(obj).reduce((sum: number, val) => sum + countDeepKeys(val), 0);
 }
 
 function validateSplit(locale: string): {
@@ -198,7 +192,7 @@ function validateSplit(locale: string): {
     return { valid: false, originalCount: 0, splitCount: 0 };
   }
 
-  const sourceContent = JSON.parse(fs.readFileSync(sourceFile, "utf-8"));
+  const sourceContent = JSON.parse(fs.readFileSync(sourceFile, 'utf-8'));
   const originalCount = countDeepKeys(sourceContent);
 
   let splitCount = 0;
@@ -207,7 +201,7 @@ function validateSplit(locale: string): {
   for (const ns of NAMESPACES) {
     const nsFile = path.join(localeDir, `${ns}.json`);
     if (fs.existsSync(nsFile)) {
-      const nsContent = JSON.parse(fs.readFileSync(nsFile, "utf-8"));
+      const nsContent = JSON.parse(fs.readFileSync(nsFile, 'utf-8'));
       splitCount += countDeepKeys(nsContent);
     }
   }
@@ -221,10 +215,10 @@ function validateSplit(locale: string): {
 
 function main() {
   const args = process.argv.slice(2);
-  const dryRun = args.includes("--dry-run");
+  const dryRun = args.includes('--dry-run');
 
-  console.log("🔄 i18n Split Script");
-  console.log(`   Mode: ${dryRun ? "DRY RUN" : "EXECUTE"}`);
+  console.log('🔄 i18n Split Script');
+  console.log(`   Mode: ${dryRun ? 'DRY RUN' : 'EXECUTE'}`);
   console.log(`   Source: messages/{locale}.json`);
   console.log(`   Target: messages/{locale}/{namespace}.json\n`);
 
@@ -244,7 +238,7 @@ function main() {
     }
 
     if (unmapped.length > 0) {
-      console.log(`   ⚠️  Unmapped keys: ${unmapped.join(", ")}`);
+      console.log(`   ⚠️  Unmapped keys: ${unmapped.join(', ')}`);
       unmapped.forEach((k) => allUnmapped.add(k));
     }
 
@@ -252,9 +246,7 @@ function main() {
     if (!dryRun) {
       const validation = validateSplit(locale);
       if (validation.valid) {
-        console.log(
-          `   ✓ Validation passed (${validation.originalCount} keys)`,
-        );
+        console.log(`   ✓ Validation passed (${validation.originalCount} keys)`);
       } else {
         console.log(
           `   ❌ Validation FAILED: original=${validation.originalCount}, split=${validation.splitCount}`,
@@ -265,15 +257,15 @@ function main() {
 
   if (allUnmapped.size > 0) {
     console.log(`\n⚠️  Unmapped keys found across locales:`);
-    console.log(`   ${Array.from(allUnmapped).join(", ")}`);
+    console.log(`   ${Array.from(allUnmapped).join(', ')}`);
     console.log(`   Add these to NAMESPACE_MAPPING in this script.`);
   }
 
-  console.log("\n✅ Split complete!");
+  console.log('\n✅ Split complete!');
   if (dryRun) {
-    console.log("   Run without --dry-run to execute.");
+    console.log('   Run without --dry-run to execute.');
   } else {
-    console.log("   Namespace files created in messages/{locale}/");
+    console.log('   Namespace files created in messages/{locale}/');
   }
 }
 

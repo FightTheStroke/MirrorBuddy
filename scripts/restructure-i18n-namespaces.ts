@@ -7,11 +7,11 @@
  * Plan 109, Wave W2, Task T2-02
  */
 
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-const LOCALES = ["it", "en", "fr", "de", "es"];
-const MESSAGES_DIR = path.join(process.cwd(), "messages");
+const LOCALES = ['it', 'en', 'fr', 'de', 'es'];
+const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 
 interface FileRestructureConfig {
   filename: string;
@@ -21,58 +21,51 @@ interface FileRestructureConfig {
 
 const RESTRUCTURE_CONFIG: FileRestructureConfig[] = [
   {
-    filename: "compliance.json",
-    wrapperKey: "compliance",
+    filename: 'compliance.json',
+    wrapperKey: 'compliance',
     keysToMove: [
-      "legal",
-      "aiTransparency",
-      "accessibility",
-      "contact",
-      "aiRegulatoryContacts",
-      "dataSubjectRights",
-      "cookiePolicy",
-      "modelCard",
+      'legal',
+      'aiTransparency',
+      'accessibility',
+      'contact',
+      'aiRegulatoryContacts',
+      'dataSubjectRights',
+      'cookiePolicy',
+      'modelCard',
     ],
   },
   {
-    filename: "admin.json",
-    wrapperKey: "admin",
-    keysToMove: ["dashboard", "parentDashboard"],
+    filename: 'admin.json',
+    wrapperKey: 'admin',
+    keysToMove: ['dashboard', 'parentDashboard'],
   },
   {
-    filename: "home.json",
-    wrapperKey: "home",
+    filename: 'home.json',
+    wrapperKey: 'home',
+    keysToMove: ['loading', 'sidebar', 'navigation', 'appTitle', 'seasonDefault', 'header'],
+  },
+  {
+    filename: 'welcome.json',
+    wrapperKey: 'welcome',
     keysToMove: [
-      "loading",
-      "sidebar",
-      "navigation",
-      "appTitle",
-      "seasonDefault",
-      "header",
+      'tierComparison',
+      'features',
+      'hero',
+      'compliance',
+      'trialLimits',
+      'support',
+      'footer',
+      'quickStart',
+      'trialConsent',
+      'valueProposition',
+      'accessibilityFirstSection',
+      'socialProof',
     ],
   },
   {
-    filename: "welcome.json",
-    wrapperKey: "welcome",
-    keysToMove: [
-      "tierComparison",
-      "features",
-      "hero",
-      "compliance",
-      "trialLimits",
-      "support",
-      "footer",
-      "quickStart",
-      "trialConsent",
-      "valueProposition",
-      "accessibilityFirstSection",
-      "socialProof",
-    ],
-  },
-  {
-    filename: "errors.json",
-    wrapperKey: "errors",
-    keysToMove: ["notFound", "validation"],
+    filename: 'errors.json',
+    wrapperKey: 'errors',
+    keysToMove: ['notFound', 'validation'],
   },
 ];
 
@@ -85,7 +78,7 @@ function restructureFile(locale: string, config: FileRestructureConfig): void {
   }
 
   // Read the JSON file
-  const content = fs.readFileSync(filePath, "utf-8");
+  const content = fs.readFileSync(filePath, 'utf-8');
   const data = JSON.parse(content);
 
   // Check if wrapper key exists
@@ -109,7 +102,7 @@ function restructureFile(locale: string, config: FileRestructureConfig): void {
   }
 
   // Write back the restructured JSON
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf-8");
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + '\n', 'utf-8');
 
   console.log(
     `✅ ${locale}/${config.filename}: Moved ${moveCount} keys inside "${config.wrapperKey}"`,
@@ -117,7 +110,7 @@ function restructureFile(locale: string, config: FileRestructureConfig): void {
 }
 
 function main(): void {
-  console.log("🔄 Starting i18n namespace restructuring...\n");
+  console.log('🔄 Starting i18n namespace restructuring...\n');
 
   for (const config of RESTRUCTURE_CONFIG) {
     console.log(`\n📁 Processing ${config.filename}...`);
@@ -127,10 +120,10 @@ function main(): void {
     }
   }
 
-  console.log("\n✅ Restructuring complete!");
-  console.log("\nNext steps:");
-  console.log("  1. Run: npm run i18n:check");
-  console.log("  2. Run: npm run typecheck && npm run build");
+  console.log('\n✅ Restructuring complete!');
+  console.log('\nNext steps:');
+  console.log('  1. Run: npm run i18n:check');
+  console.log('  2. Run: npm run typecheck && npm run build');
 }
 
 main();

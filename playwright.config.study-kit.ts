@@ -6,7 +6,7 @@ import path from 'path';
  * Uses existing dev server (no webServer)
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './apps/web/e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
@@ -14,7 +14,7 @@ export default defineConfig({
   reporter: 'list',
 
   // Global setup: sets onboarding as completed
-  globalSetup: path.join(__dirname, 'e2e', 'global-setup.ts'),
+  globalSetup: path.join(__dirname, 'apps', 'web', 'e2e', 'global-setup.ts'),
 
   use: {
     baseURL: 'http://localhost:3000',
@@ -22,7 +22,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Use storage state with onboarding completed
-    storageState: path.join(__dirname, 'e2e', '.auth', 'storage-state.json'),
+    storageState: path.join(__dirname, 'apps', 'web', 'e2e', '.auth', 'storage-state.json'),
   },
 
   projects: [

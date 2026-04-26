@@ -58,7 +58,7 @@ jobs:
               - 'src/components/**'
               - 'src/styles/**'
               - 'public/**'
-              - 'messages/**'
+              - 'apps/web/messages/**'
             mobile:
               - 'ios/**'
               - 'android/**'
@@ -68,7 +68,7 @@ jobs:
             prisma:
               - 'prisma/**'
             i18n:
-              - 'messages/**'
+              - 'apps/web/messages/**'
               - 'src/i18n/**'
               - 'src/lib/i18n/**'
             safety:
@@ -78,7 +78,7 @@ jobs:
               - 'src/lib/compliance/**'
               - 'src/data/maestri/**'
             e2e:
-              - 'e2e/**'
+              - 'apps/web/e2e/**'
               - 'playwright.config*.ts'
             config:
               - 'package.json'
@@ -881,10 +881,10 @@ jobs:
             SHARD="${{ matrix.shard }}"
             if [ "$SHARD" = "core" ]; then
               echo "Running core a11y E2E (accessibility.spec.ts only)"
-              npx playwright test --project=a11y e2e/accessibility.spec.ts --workers=1 --reporter=list
+              npx playwright test --project=a11y apps/web/e2e/accessibility.spec.ts --workers=1 --reporter=list
             else
               echo "Running a11y E2E for locale $SHARD"
-              npx playwright test --project=a11y e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
+              npx playwright test --project=a11y apps/web/e2e/a11y-locales.spec.ts --grep="\[$SHARD\]" --workers=1 --reporter=list
             fi
           else
             echo "Running a11y unit test baseline (no UI changes)"

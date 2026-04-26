@@ -1,0 +1,153 @@
+/**
+ * Admin Test Helpers
+ *
+ * Shared utilities for admin E2E tests.
+ * Used by: admin.spec.ts, admin-sidebar.spec.ts
+ */
+
+// Merged ignore patterns for admin tests
+export const ADMIN_IGNORE_ERRORS = [
+  /ResizeObserver loop/i,
+  /Download the React DevTools/i,
+  /favicon\.ico/i,
+  /429.*Too Many Requests/i,
+  /net::ERR_/i,
+  /Failed to load resource/i,
+  /hydrat/i,
+  /WebSocket/i,
+  /Content Security Policy/i,
+  /\/api\/chat/i,
+  /\/api\/voice/i,
+  /realtime.*token/i,
+  /\/api\/admin\//i, // Admin API calls may fail in test env (no real data)
+  /500.*Internal/i,
+  /AbortError/i, // Navigation aborts during page transitions
+  /ChunkLoadError/i, // Next.js code splitting in dev mode
+  /Unexpected token/i, // JSON parse from failed API calls
+  /NEXT_REDIRECT/i, // Next.js redirect signals (not real errors)
+  /ECONNREFUSED/i, // External service connections in test env
+  /fetch.*failed/i, // Fetch failures for external services
+  /Failed to fetch/i, // TypeError: Failed to fetch in CI (no backend)
+  /load failed/i, // Conversations/Learnings/Settings/Progress load failed
+  /Error loading/i, // Error loading control panel etc.
+];
+
+// Admin routes for route audit
+export const ADMIN_ROUTES = [
+  '/admin',
+  '/admin/analytics',
+  '/admin/audit',
+  '/admin/characters',
+  '/admin/funnel',
+  '/admin/invites',
+  '/admin/tiers',
+  '/admin/tos',
+  '/admin/users',
+  '/change-password',
+];
+
+// Admin sidebar links for click-based navigation
+export const ADMIN_NAV_ITEMS = [
+  { label: 'Dashboard', href: '/admin', exact: true },
+  { label: 'Funnel', href: '/admin/funnel', exact: false },
+  { label: 'Richieste Beta', href: '/admin/invites', exact: false },
+  { label: 'Utenti', href: '/admin/users', exact: false },
+  { label: 'Analytics', href: '/admin/analytics', exact: false },
+  { label: 'Termini Servizio', href: '/admin/tos', exact: false },
+  { label: 'Audit Log', href: '/admin/audit', exact: false },
+  { label: 'Characters', href: '/admin/characters', exact: false },
+];
+
+export interface AuditIssue {
+  route: string;
+  type: 'navigation' | 'console' | 'network' | 'button';
+  severity: 'error' | 'warning';
+  message: string;
+}
+
+export interface NavigationIssue {
+  link: string;
+  expected: string;
+  actual: string;
+  type: '404' | 'redirect' | 'error';
+}
+
+/**
+ * Dismiss TOS/consent modals that may block interaction
+ */
+export async function dismissBlockingModals(page: import('@playwright/test').Page) {
+  await page.route('/api/tos', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ accepted: true, version: '1.0' }),
+    });
+  });
+
+  await page.context().addInitScript(() => {
+    localStorage.setItem(
+      'mirrorbuddy-consent',
+      JSON.stringify({
+        version: '1.0',
+        acceptedAt: new Date().toISOString(),
+        essential: true,
+        analytics: false,
+        marketing: false,
+      }),
+    );
+    sessionStorage.setItem('tos_accepted', 'true');
+    sessionStorage.setItem('tos_accepted_version', '1.0');
+  });
+}
+
+/**
+ * Close any open dialog (TOS, consent, etc.)
+ */
+export async function closeOpenDialogs(page: import('@playwright/test').Page) {
+  const dialog = page.locator('[role="dialog"]');
+  if (await dialog.isVisible({ timeout: 1000 }).catch(() => false)) {
+    const closeButton = dialog.locator(
+      'button:has-text("Accett"), button:has-text("Chiudi"), button:has-text("Close"), button[aria-label*="close"]',
+    );
+    if (await closeButton.isVisible({ timeout: 500 }).catch(() => false)) {
+      const checkbox = dialog.locator('input[type="checkbox"]');
+      if (await checkbox.isVisible({ timeout: 500 }).catch(() => false)) {
+        await checkbox.check({ force: true });
+        await page.waitForTimeout(200);
+      }
+      await closeButton.click({ force: true });
+      await page.waitForTimeout(500);
+    }
+  }
+}
+
+/**
+ * Login as admin user for billing/tier management tests
+ * Uses test admin credentials from environment or defaults
+ */
+export async function loginAsAdmin(page: import('@playwright/test').Page) {
+  const adminEmail = process.env.TEST_ADMIN_EMAIL || 'admin@mirrorbuddy.test';
+  const adminPassword = process.env.TEST_ADMIN_PASSWORD || 'testadmin123';
+
+  await page.goto('/login');
+
+  // Fill login form
+  await page.fill('input[name="email"], input[type="email"]', adminEmail);
+  await page.fill('input[name="password"], input[type="password"]', adminPassword);
+
+  // Submit
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect to admin or dashboard
+  await page.waitForURL(/\/(admin|dashboard)/, { timeout: 10000 }).catch(() => {
+    // May already be on admin page via session
+  });
+
+  // Navigate to admin if not already there
+  if (!page.url().includes('/admin')) {
+    await page.goto('/admin');
+  }
+
+  // Wait for admin page to load
+  await page.waitForSelector('h1', { timeout: 5000 });
+}

@@ -11,7 +11,7 @@ export default defineConfig({
       'src/**/*.spec.ts',
       'scripts/__tests__/**/*.test.ts',
     ],
-    exclude: ['node_modules', 'e2e/**', 'feat/**'],
+    exclude: ['node_modules', 'e2e/**', 'apps/web/e2e/**', 'feat/**'],
     setupFiles: ['./src/test/setup.ts'],
     // Retry flaky tests on CI (F-07)
     retry: process.env.CI ? 2 : 0,
@@ -45,6 +45,7 @@ export default defineConfig({
       exclude: [
         'node_modules/',
         'e2e/',
+        'apps/web/e2e/',
         '**/*.config.*',
         '**/*.d.ts',
         'src/types/**',

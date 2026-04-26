@@ -42,7 +42,7 @@ function getByPath(obj: unknown, path: string): unknown {
 
 describe('research locale keys', () => {
   it.each(LOCALES)('contains dashboard keys for %s locale', async (locale) => {
-    const filePath = join(process.cwd(), 'messages', locale, 'research.json');
+    const filePath = join(process.cwd(), 'apps', 'web', 'messages', locale, 'research.json');
     const file = await readFile(filePath, 'utf8');
     const content = JSON.parse(file) as unknown;
 

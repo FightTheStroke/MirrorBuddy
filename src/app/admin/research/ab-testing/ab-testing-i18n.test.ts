@@ -36,7 +36,7 @@ function getByPath(obj: unknown, path: string): unknown {
 
 describe('ab-testing manage page locale keys', () => {
   it.each(LOCALES)('contains abTesting manage keys for %s locale', async (locale) => {
-    const filePath = join(process.cwd(), 'messages', locale, 'admin.json');
+    const filePath = join(process.cwd(), 'apps', 'web', 'messages', locale, 'admin.json');
     const file = await readFile(filePath, 'utf8');
     const content = JSON.parse(file) as unknown;
 

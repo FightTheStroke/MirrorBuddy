@@ -12,9 +12,9 @@
  * 5. Keywords are defined
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
-import fs from "fs";
-import path from "path";
+import { describe, it, expect, beforeAll } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 
 interface PageMetadata {
   title: string;
@@ -27,28 +27,19 @@ interface LocaleMessages {
   metadata?: Record<string, PageMetadata>;
 }
 
-const LOCALES = ["it", "en", "fr", "de", "es"] as const;
+const LOCALES = ['it', 'en', 'fr', 'de', 'es'] as const;
 type Locale = (typeof LOCALES)[number];
 
-const REQUIRED_PAGES = [
-  "home",
-  "settings",
-  "aiTransparency",
-  "privacy",
-  "terms",
-] as const;
+const REQUIRED_PAGES = ['home', 'settings', 'aiTransparency', 'privacy', 'terms'] as const;
 
 // Load metadata namespace for a locale (ADR 0082 namespace structure)
 const loadLocaleMessages = (locale: Locale): LocaleMessages => {
-  const filePath = path.resolve(
-    __dirname,
-    `../../../messages/${locale}/metadata.json`,
-  );
-  const content = fs.readFileSync(filePath, "utf-8");
+  const filePath = path.resolve(__dirname, `../../../apps/web/messages/${locale}/metadata.json`);
+  const content = fs.readFileSync(filePath, 'utf-8');
   return JSON.parse(content);
 };
 
-describe("Page Metadata (F-75)", () => {
+describe('Page Metadata (F-75)', () => {
   let messages: Record<Locale, LocaleMessages>;
 
   beforeAll(() => {
@@ -58,24 +49,22 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Metadata Namespace Presence", () => {
-    it("should have metadata namespace in all locales", () => {
+  describe('Metadata Namespace Presence', () => {
+    it('should have metadata namespace in all locales', () => {
       LOCALES.forEach((locale) => {
-        expect(messages[locale]).toHaveProperty("metadata");
-        expect(typeof messages[locale].metadata).toBe("object");
+        expect(messages[locale]).toHaveProperty('metadata');
+        expect(typeof messages[locale].metadata).toBe('object');
       });
     });
 
-    it("should have metadata as a non-empty object", () => {
+    it('should have metadata as a non-empty object', () => {
       LOCALES.forEach((locale) => {
-        expect(
-          Object.keys(messages[locale].metadata || {}).length,
-        ).toBeGreaterThan(0);
+        expect(Object.keys(messages[locale].metadata || {}).length).toBeGreaterThan(0);
       });
     });
   });
 
-  describe("Required Pages Metadata", () => {
+  describe('Required Pages Metadata', () => {
     REQUIRED_PAGES.forEach((_page) => {
       describe(`${_page} _page`, () => {
         it(`should exist in metadata for all locales`, () => {
@@ -88,9 +77,9 @@ describe("Page Metadata (F-75)", () => {
         it(`should have required fields in all locales`, () => {
           LOCALES.forEach((locale) => {
             const _pageMetadata = (messages[locale].metadata || {})[_page];
-            expect(_pageMetadata).toHaveProperty("title");
-            expect(_pageMetadata).toHaveProperty("description");
-            expect(_pageMetadata).toHaveProperty("keywords");
+            expect(_pageMetadata).toHaveProperty('title');
+            expect(_pageMetadata).toHaveProperty('description');
+            expect(_pageMetadata).toHaveProperty('keywords');
           });
         });
 
@@ -109,7 +98,7 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Title Format", () => {
+  describe('Title Format', () => {
     REQUIRED_PAGES.forEach((_page) => {
       it(`${_page} title should follow format "{PageTitle} | MirrorBuddy"`, () => {
         LOCALES.forEach((locale) => {
@@ -127,12 +116,11 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Description Length", () => {
+  describe('Description Length', () => {
     REQUIRED_PAGES.forEach((_page) => {
       it(`${_page} description should be 150-160 characters`, () => {
         LOCALES.forEach((locale) => {
-          const description = (messages[locale].metadata || {})[_page]
-            ?.description;
+          const description = (messages[locale].metadata || {})[_page]?.description;
           const length = description?.length || 0;
           expect(length).toBeGreaterThanOrEqual(150);
           expect(length).toBeLessThanOrEqual(160);
@@ -141,14 +129,14 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Keywords", () => {
+  describe('Keywords', () => {
     REQUIRED_PAGES.forEach((_page) => {
       it(`${_page} keywords should be an array of strings`, () => {
         LOCALES.forEach((locale) => {
           const keywords = (messages[locale].metadata || {})[_page]?.keywords;
           expect(Array.isArray(keywords)).toBe(true);
           keywords?.forEach((keyword) => {
-            expect(typeof keyword).toBe("string");
+            expect(typeof keyword).toBe('string');
             expect(keyword.length).toBeGreaterThan(0);
           });
         });
@@ -163,13 +151,11 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Language-Specific Translations", () => {
-    it("should have different titles for different locales", () => {
+  describe('Language-Specific Translations', () => {
+    it('should have different titles for different locales', () => {
       const firstPageTitles = REQUIRED_PAGES.map((_page) => ({
         _page,
-        titles: LOCALES.map(
-          (locale) => (messages[locale].metadata || {})[_page]?.title,
-        ),
+        titles: LOCALES.map((locale) => (messages[locale].metadata || {})[_page]?.title),
       }));
 
       firstPageTitles.forEach(({ _page, titles }) => {
@@ -179,7 +165,7 @@ describe("Page Metadata (F-75)", () => {
       });
     });
 
-    it("should have different descriptions for different locales", () => {
+    it('should have different descriptions for different locales', () => {
       const firstPageDescriptions = REQUIRED_PAGES.map((_page) => ({
         _page,
         descriptions: LOCALES.map(
@@ -194,8 +180,8 @@ describe("Page Metadata (F-75)", () => {
     });
   });
 
-  describe("Metadata Consistency", () => {
-    it("should have same _pages across all locales", () => {
+  describe('Metadata Consistency', () => {
+    it('should have same _pages across all locales', () => {
       const italianPages = Object.keys(messages.it.metadata || {}).sort();
       LOCALES.forEach((locale) => {
         const localePages = Object.keys(messages[locale].metadata || {}).sort();

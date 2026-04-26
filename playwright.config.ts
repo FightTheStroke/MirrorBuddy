@@ -71,7 +71,7 @@ export const screenshotComparisonOptions = {
 } as const;
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './apps/web/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   // 2 min default timeout in CI, 30s local
@@ -83,9 +83,9 @@ export default defineConfig({
   reporter: [['list'], ['json', { outputFile: 'test-results/pw-results.json' }]],
 
   // Global setup: sets onboarding as completed
-  globalSetup: path.join(__dirname, 'e2e', 'global-setup.ts'),
+  globalSetup: path.join(__dirname, 'apps', 'web', 'e2e', 'global-setup.ts'),
   // Global teardown: cleans up test users after all tests
-  globalTeardown: path.join(__dirname, 'e2e', 'global-teardown.ts'),
+  globalTeardown: path.join(__dirname, 'apps', 'web', 'e2e', 'global-teardown.ts'),
 
   // Visual regression threshold for screenshot comparisons
   expect: {
@@ -105,7 +105,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Use storage state with onboarding completed
-    storageState: path.join(__dirname, 'e2e', '.auth', 'storage-state.json'),
+    storageState: path.join(__dirname, 'apps', 'web', 'e2e', '.auth', 'storage-state.json'),
 
     // Visual regression settings
     ...(process.env.VISUAL_REGRESSION && {

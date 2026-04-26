@@ -38,7 +38,7 @@ function extractKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
 
 /** Replicate loadLocaleMessages from scripts/i18n-check.ts */
 function loadLocaleMessages(locale: string): Record<string, unknown> {
-  const localeDir = join(process.cwd(), 'messages', locale);
+  const localeDir = join(process.cwd(), 'apps', 'web', 'messages', locale);
   const merged: Record<string, unknown> = {};
   for (const ns of NAMESPACES) {
     const filePath = join(localeDir, `${ns}.json`);
@@ -83,7 +83,13 @@ describe('i18n CI Integration', () => {
 
     it('workflow should only run when i18n-related files change', () => {
       const paths = workflowContent.on.pull_request.paths;
-      const i18nRelatedPaths = ['messages/**', 'src/**', 'scripts/i18n-check.ts', 'package.json'];
+      // W2 app move (#362): messages/ relocated to apps/web/messages/.
+      const i18nRelatedPaths = [
+        'apps/web/messages/**',
+        'src/**',
+        'scripts/i18n-check.ts',
+        'package.json',
+      ];
       i18nRelatedPaths.forEach((path) => {
         expect(paths).toContain(path);
       });
@@ -173,7 +179,9 @@ describe('i18n CI Integration', () => {
 
     it('should use pnpm install --frozen-lockfile in CI', () => {
       const job = workflowContent.jobs['i18n-check'];
-      const installStep = job.steps.find((step: any) => step.run?.includes('pnpm install --frozen-lockfile'));
+      const installStep = job.steps.find((step: any) =>
+        step.run?.includes('pnpm install --frozen-lockfile'),
+      );
       expect(installStep).toBeDefined();
     });
   });
