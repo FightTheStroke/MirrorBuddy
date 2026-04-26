@@ -175,5 +175,6 @@ lives at the single canonical module ID.
   `package.json` to pin the version, or add a precise cast at the
   interop point (see `src/lib/db.ts` for the `@types/pg` example).
 - **`spawn pnpm ENOENT`** on Vercel or a GitHub runner: pnpm isn't on
-  PATH. Add `pnpm/action-setup@v4` to the workflow (see ADR 0164 and
-  PR #320 for precedent).
+PATH. Add `pnpm/action-setup@v4` to the workflow (see ADR 0164 and
+PR #320 for precedent).
+<!-- ci-trigger: 1777214747 -->
