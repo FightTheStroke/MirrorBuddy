@@ -7,7 +7,7 @@ DIFF_BASE="${1:-origin/main}"
 I18N_CONFIG="src/i18n/request.ts"
 ERRORS=0
 
-new_json_files=$(git diff "$DIFF_BASE"... --name-only --diff-filter=A -- 'messages/*/*.json' 2>/dev/null || true)
+new_json_files=$(git diff "$DIFF_BASE"... --name-only --diff-filter=A -- 'messages/*/*.json' 'apps/web/messages/*/*.json' 2>/dev/null || true)
 
 if [[ -z "$new_json_files" ]]; then
   echo "✅ No new i18n JSON files detected."

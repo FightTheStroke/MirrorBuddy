@@ -16,7 +16,7 @@ import Database from 'better-sqlite3';
 import { PrismaClient } from '@prisma/client';
 import * as path from 'path';
 
-const SQLITE_PATH = path.join(__dirname, '..', 'prisma', 'dev.db');
+const SQLITE_PATH = path.join(__dirname, '..', 'apps', 'web', 'prisma', 'dev.db');
 
 // Tables in order that respects foreign key constraints
 const TABLES = [
@@ -57,7 +57,7 @@ interface MigrationStats {
 async function migrateTable(
   sqlite: Database.Database,
   prisma: PrismaClient,
-  tableName: string
+  tableName: string,
 ): Promise<MigrationStats> {
   const stats: MigrationStats = {
     table: tableName,
@@ -79,7 +79,10 @@ async function migrateTable(
     }
 
     // Get all records from SQLite
-    const records = sqlite.prepare(`SELECT * FROM "${tableName}"`).all() as Record<string, unknown>[];
+    const records = sqlite.prepare(`SELECT * FROM "${tableName}"`).all() as Record<
+      string,
+      unknown
+    >[];
     stats.sourceCount = records.length;
 
     if (records.length === 0) {
@@ -144,7 +147,7 @@ async function migrateTable(
 
 function transformRecord(
   tableName: string,
-  record: Record<string, unknown>
+  record: Record<string, unknown>,
 ): Record<string, unknown> {
   const transformed = { ...record };
 
@@ -166,10 +169,20 @@ function transformRecord(
       // Note: This list is intentionally hardcoded for this one-time migration script.
       // It reflects the schema at migration time and does not need to track future changes.
       const booleanFields = [
-        'highContrast', 'dyslexiaFont', 'reducedMotion', 'voiceEnabled',
-        'soundEffects', 'notificationsEnabled', 'pomodoroAutoStart',
-        'voiceBargeInEnabled', 'isRetired', 'isSystem', 'completed',
-        'hasSeenWelcome', 'hasCompletedOnboarding', 'isActive',
+        'highContrast',
+        'dyslexiaFont',
+        'reducedMotion',
+        'voiceEnabled',
+        'soundEffects',
+        'notificationsEnabled',
+        'pomodoroAutoStart',
+        'voiceBargeInEnabled',
+        'isRetired',
+        'isSystem',
+        'completed',
+        'hasSeenWelcome',
+        'hasCompletedOnboarding',
+        'isActive',
       ];
       if (booleanFields.includes(key)) {
         transformed[key] = value === 1;
@@ -229,7 +242,7 @@ async function main() {
       }
       if (stats.errors.length > 0) {
         console.log(`  ⚠️  Errors: ${stats.errors.length}`);
-        stats.errors.slice(0, 3).forEach(e => console.log(`     - ${e}`));
+        stats.errors.slice(0, 3).forEach((e) => console.log(`     - ${e}`));
         if (stats.errors.length > 3) {
           console.log(`     ... and ${stats.errors.length - 3} more`);
         }
