@@ -71,7 +71,7 @@ export const screenshotComparisonOptions = {
 } as const;
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './apps/web/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   // 2 min default timeout in CI, 30s local

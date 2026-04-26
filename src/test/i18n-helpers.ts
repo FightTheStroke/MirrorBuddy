@@ -56,7 +56,7 @@ const messagesByLocale: Record<string, Record<string, unknown>> = {};
 function loadMessages(locale = 'it'): Record<string, unknown> {
   if (messagesByLocale[locale]) return messagesByLocale[locale];
 
-  const localeDir = join(process.cwd(), 'messages', locale);
+  const localeDir = join(process.cwd(), 'apps', 'web', 'messages', locale);
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- safe: controlled path from project messages directory
   const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
   const merged: Record<string, unknown> = {};

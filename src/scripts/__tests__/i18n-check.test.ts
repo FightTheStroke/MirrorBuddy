@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const MESSAGES_DIR = path.join(process.cwd(), 'messages');
+const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 const TEST_BACKUP_DIR = path.join(process.cwd(), '.test-i18n-backup');
 const LOCALES = ['en', 'it', 'de', 'es', 'fr'];
 

@@ -4,35 +4,29 @@
  *
  * TDD: Written BEFORE filling placeholders (RED phase).
  */
-import { describe, it, expect } from "vitest";
-import fs from "fs";
-import path from "path";
+import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
 
-const COMPLIANCE_PATH = path.resolve(
-  __dirname,
-  "../../messages/it/compliance.json",
-);
+const COMPLIANCE_PATH = path.resolve(__dirname, '../../apps/web/messages/it/compliance.json');
 
-function getAllValues(
-  obj: unknown,
-  prefix = "",
-): Array<{ key: string; value: string }> {
+function getAllValues(obj: unknown, prefix = ''): Array<{ key: string; value: string }> {
   const results: Array<{ key: string; value: string }> = [];
-  if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+  if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
     for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
       const fullKey = prefix ? `${prefix}.${k}` : k;
-      if (typeof v === "string") {
+      if (typeof v === 'string') {
         results.push({ key: fullKey, value: v });
-      } else if (typeof v === "object" && v !== null) {
+      } else if (typeof v === 'object' && v !== null) {
         results.push(...getAllValues(v, fullKey));
       }
     }
   } else if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       const fullKey = `${prefix}[${i}]`;
-      if (typeof obj[i] === "string") {
+      if (typeof obj[i] === 'string') {
         results.push({ key: fullKey, value: obj[i] as string });
-      } else if (typeof obj[i] === "object" && obj[i] !== null) {
+      } else if (typeof obj[i] === 'object' && obj[i] !== null) {
         results.push(...getAllValues(obj[i], fullKey));
       }
     }
@@ -133,31 +127,24 @@ const PLACEHOLDER_PATTERNS = [
   /^Important Changes$/,
 ];
 
-describe("compliance.json placeholder validation", () => {
-  const raw = fs.readFileSync(COMPLIANCE_PATH, "utf-8");
+describe('compliance.json placeholder validation', () => {
+  const raw = fs.readFileSync(COMPLIANCE_PATH, 'utf-8');
   const data = JSON.parse(raw);
   const allValues = getAllValues(data);
 
-  it("should have no placeholder values matching known patterns", () => {
+  it('should have no placeholder values matching known patterns', () => {
     const placeholders = allValues.filter(({ value }) =>
       PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(value)),
     );
 
     if (placeholders.length > 0) {
-      const report = placeholders
-        .map(({ key, value }) => `  ${key}: "${value}"`)
-        .join("\n");
-      expect(
-        placeholders.length,
-        `Found ${placeholders.length} placeholders:\n${report}`,
-      ).toBe(0);
+      const report = placeholders.map(({ key, value }) => `  ${key}: "${value}"`).join('\n');
+      expect(placeholders.length, `Found ${placeholders.length} placeholders:\n${report}`).toBe(0);
     }
   });
 
-  it("should not contain English-only placeholder words in aiTransparency.sections", () => {
-    const sectionValues = allValues.filter(({ key }) =>
-      key.includes("aiTransparency.sections."),
-    );
+  it('should not contain English-only placeholder words in aiTransparency.sections', () => {
+    const sectionValues = allValues.filter(({ key }) => key.includes('aiTransparency.sections.'));
 
     const englishPlaceholders = sectionValues.filter(({ value }) =>
       PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(value)),
@@ -169,10 +156,8 @@ describe("compliance.json placeholder validation", () => {
     ).toBe(0);
   });
 
-  it("should not contain English-only placeholder words in legal.cookies", () => {
-    const cookieValues = allValues.filter(({ key }) =>
-      key.includes("legal.cookies."),
-    );
+  it('should not contain English-only placeholder words in legal.cookies', () => {
+    const cookieValues = allValues.filter(({ key }) => key.includes('legal.cookies.'));
 
     const placeholders = cookieValues.filter(({ value }) =>
       PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(value)),
@@ -184,10 +169,8 @@ describe("compliance.json placeholder validation", () => {
     ).toBe(0);
   });
 
-  it("should not contain English-only placeholder words in legal.terms", () => {
-    const termsValues = allValues.filter(({ key }) =>
-      key.includes("legal.terms."),
-    );
+  it('should not contain English-only placeholder words in legal.terms', () => {
+    const termsValues = allValues.filter(({ key }) => key.includes('legal.terms.'));
 
     const placeholders = termsValues.filter(({ value }) =>
       PLACEHOLDER_PATTERNS.some((pattern) => pattern.test(value)),
@@ -199,23 +182,20 @@ describe("compliance.json placeholder validation", () => {
     ).toBe(0);
   });
 
-  it("should have all string values with minimum length of 3 characters (excluding version numbers)", () => {
+  it('should have all string values with minimum length of 3 characters (excluding version numbers)', () => {
     const tooShort = allValues.filter(
       ({ key, value }) =>
         value.length < 3 &&
-        !key.includes("version") &&
-        !key.includes("Version") &&
-        !key.includes("phone") &&
-        !key.includes("status"),
+        !key.includes('version') &&
+        !key.includes('Version') &&
+        !key.includes('phone') &&
+        !key.includes('status'),
     );
 
     // Allow a few exceptions for truly short legitimate values
     const filtered = tooShort.filter(
       ({ value }) =>
-        !/^\d+$/.test(value) &&
-        !/^\d+\.\d+$/.test(value) &&
-        value !== "AI" &&
-        value !== "Tu",
+        !/^\d+$/.test(value) && !/^\d+\.\d+$/.test(value) && value !== 'AI' && value !== 'Tu',
     );
 
     expect(

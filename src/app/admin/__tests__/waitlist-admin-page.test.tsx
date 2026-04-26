@@ -41,13 +41,13 @@ describe('Waitlist Admin Page - Mobile Responsive Grid', () => {
 
 describe('Waitlist Admin Page - i18n Keys', () => {
   it('should have waitlist section in Italian admin.json', async () => {
-    const mod = await import('../../../../messages/it/admin.json');
+    const mod = await import('../../../../apps/web/messages/it/admin.json');
     const data = mod.default as { admin: Record<string, unknown> };
     expect(data.admin).toHaveProperty('waitlist');
   });
 
   it('should have required waitlist keys in Italian admin.json', async () => {
-    const mod = await import('../../../../messages/it/admin.json');
+    const mod = await import('../../../../apps/web/messages/it/admin.json');
     const data = mod.default as { admin: { waitlist: Record<string, unknown> } };
     const waitlist = data.admin.waitlist;
     expect(waitlist).toHaveProperty('title');
@@ -58,7 +58,7 @@ describe('Waitlist Admin Page - i18n Keys', () => {
   });
 
   it('should have waitlist section in English admin.json', async () => {
-    const mod = await import('../../../../messages/en/admin.json');
+    const mod = await import('../../../../apps/web/messages/en/admin.json');
     const data = mod.default as { admin: Record<string, unknown> };
     expect(data.admin).toHaveProperty('waitlist');
   });

@@ -13,7 +13,7 @@ import * as path from 'path';
 
 const REFERENCE_LOCALE = 'it';
 const OTHER_LOCALES = ['en', 'de', 'es', 'fr'] as const;
-const MESSAGES_DIR = path.join(process.cwd(), 'messages');
+const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 
 const NAMESPACES = [
   'common',

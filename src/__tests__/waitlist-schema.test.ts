@@ -136,7 +136,7 @@ describe('waitlist.prisma schema', () => {
  */
 describe('waitlist i18n wrapper key structure (ADR 0104)', () => {
   const LOCALES = ['it', 'en', 'fr', 'de', 'es'] as const;
-  const MESSAGES_DIR = join(process.cwd(), 'messages');
+  const MESSAGES_DIR = join(process.cwd(), 'apps', 'web', 'messages');
 
   it.each(LOCALES)('%s/waitlist.json has correct wrapper key', (locale) => {
     const filePath = join(MESSAGES_DIR, locale, 'waitlist.json');

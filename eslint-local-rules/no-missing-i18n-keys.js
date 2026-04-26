@@ -11,7 +11,8 @@ const REFERENCE_LOCALE = "it";
 
 // Dynamically load namespaces from filesystem
 function loadNamespaceList() {
-  const messagesDir = path.join(process.cwd(), "messages", REFERENCE_LOCALE);
+  // W2 app move (#362): messages/ relocated to apps/web/messages/.
+  const messagesDir = path.join(process.cwd(), "apps", "web", "messages", REFERENCE_LOCALE);
 
   if (!fs.existsSync(messagesDir)) {
     return [];
@@ -34,7 +35,8 @@ function loadMessages() {
   if (messageCache) return messageCache;
 
   const messages = {};
-  const messagesDir = path.join(process.cwd(), "messages", REFERENCE_LOCALE);
+  // W2 app move (#362): messages/ relocated to apps/web/messages/.
+  const messagesDir = path.join(process.cwd(), "apps", "web", "messages", REFERENCE_LOCALE);
 
   for (const ns of NAMESPACES) {
     const filePath = path.join(messagesDir, `${ns}.json`);

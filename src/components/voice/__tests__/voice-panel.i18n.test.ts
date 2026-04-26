@@ -15,7 +15,7 @@ type MessageFile = Record<string, any>;
 
 function getMessageFile(locale: string): MessageFile {
   // Load all namespace files and merge them
-  const localeDir = resolve(process.cwd(), 'messages', locale);
+  const localeDir = resolve(process.cwd(), 'apps', 'web', 'messages', locale);
   const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
 
   const merged: MessageFile = {};

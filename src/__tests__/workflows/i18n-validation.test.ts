@@ -36,7 +36,8 @@ describe('i18n Validation Workflow', () => {
 
     it('should trigger on i18n-related path changes', () => {
       const paths = workflowContent.on.pull_request.paths;
-      expect(paths).toContain('messages/**');
+      // W2 app move (#362): messages/ relocated to apps/web/messages/.
+      expect(paths).toContain('apps/web/messages/**');
       expect(paths).toContain('src/**');
       expect(paths).toContain('scripts/i18n-check.ts');
       expect(paths).toContain('package.json');

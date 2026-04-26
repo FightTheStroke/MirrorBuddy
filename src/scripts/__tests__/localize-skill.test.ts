@@ -16,7 +16,7 @@ import path from 'path';
 
 describe('Localize Skill', () => {
   const projectRoot = process.cwd();
-  const messagesDir = path.join(projectRoot, 'messages');
+  const messagesDir = path.join(projectRoot, 'apps', 'web', 'messages');
   const skillPath = path.join(projectRoot, '.claude', 'skills', 'localize', 'SKILL.md');
 
   describe('Skill Definition', () => {

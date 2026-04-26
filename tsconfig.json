@@ -35,6 +35,7 @@
     "node_modules",
     "MirrorBuddy-Memory",
     "e2e",
+    "apps/web/e2e",
     "scripts",
     "feature",
     "feat"

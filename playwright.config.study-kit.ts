@@ -6,7 +6,7 @@ import path from 'path';
  * Uses existing dev server (no webServer)
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './apps/web/e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
