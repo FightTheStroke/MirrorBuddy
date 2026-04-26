@@ -68,9 +68,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
 # Copy necessary files
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/apps/web/public ./apps/web/public
+# W2c app move (#362): standalone output is now under apps/web/.next/
+COPY --from=builder /app/apps/web/.next/standalone ./
+COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder /app/prisma.config.ts ./
 # W2 app move (#362): prisma/ now under apps/web/prisma/
 COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
@@ -94,5 +95,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Start the application
-CMD ["node", "server.js"]
+# Start the application (standalone server.js lives under apps/web/ in workspace tracing root)
+CMD ["node", "apps/web/server.js"]

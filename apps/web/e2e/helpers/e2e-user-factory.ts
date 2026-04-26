@@ -8,7 +8,8 @@
 
 import { randomUUID } from 'crypto';
 import type { PrismaClient } from '@prisma/client';
-import { seedTiers } from '../../../../src/lib/seeds/tier-seed';
+// apps/web/e2e/helpers → apps/web/src/lib/seeds (W2c app move)
+import { seedTiers } from '../../src/lib/seeds/tier-seed';
 
 export interface E2ETestUser {
   testUserId: string;

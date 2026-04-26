@@ -5,12 +5,12 @@
     "declaration": false,
     "composite": false
   },
-  "include": ["src/**/*", "../../src/lib/accessibility/**/*"],
+  "include": ["src/**/*", "../../apps/web/src/lib/accessibility/**/*"],
   "exclude": [
     "dist",
     "node_modules",
-    "../../src/lib/accessibility/__tests__/**",
-    "../../src/lib/accessibility/**/*.test.ts",
-    "../../src/lib/accessibility/**/*.test.tsx"
+    "../../apps/web/src/lib/accessibility/__tests__/**",
+    "../../apps/web/src/lib/accessibility/**/*.test.ts",
+    "../../apps/web/src/lib/accessibility/**/*.test.tsx"
   ]
 }

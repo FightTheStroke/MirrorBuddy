@@ -5,6 +5,6 @@
     "declaration": false,
     "composite": false
   },
-  "include": ["src/**/*", "../../src/lib/tier/**/*"],
+  "include": ["src/**/*", "../../apps/web/src/lib/tier/**/*"],
   "exclude": ["dist", "node_modules"]
 }

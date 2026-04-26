@@ -5,12 +5,12 @@
     "declaration": false,
     "composite": false
   },
-  "include": ["src/**/*", "../../src/lib/tools/**/*"],
+  "include": ["src/**/*", "../../apps/web/src/lib/tools/**/*"],
   "exclude": [
     "dist",
     "node_modules",
-    "../../src/lib/tools/__tests__/**",
-    "../../src/lib/tools/**/*.test.ts",
-    "../../src/lib/tools/**/*.test.tsx"
+    "../../apps/web/src/lib/tools/__tests__/**",
+    "../../apps/web/src/lib/tools/**/*.test.ts",
+    "../../apps/web/src/lib/tools/**/*.test.tsx"
   ]
 }

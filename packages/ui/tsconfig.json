@@ -5,12 +5,12 @@
     "declaration": false,
     "composite": false
   },
-  "include": ["src/**/*", "../../src/components/ui/**/*"],
+  "include": ["src/**/*", "../../apps/web/src/components/ui/**/*"],
   "exclude": [
     "dist",
     "node_modules",
-    "../../src/components/ui/__tests__/**",
-    "../../src/components/ui/**/*.test.ts",
-    "../../src/components/ui/**/*.test.tsx"
+    "../../apps/web/src/components/ui/__tests__/**",
+    "../../apps/web/src/components/ui/**/*.test.ts",
+    "../../apps/web/src/components/ui/**/*.test.tsx"
   ]
 }

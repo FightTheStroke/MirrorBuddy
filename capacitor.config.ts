@@ -1,11 +1,11 @@
-import type { CapacitorConfig } from "@capacitor/cli";
+import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: "com.mirror-labs.MirrorBuddy",
-  appName: "MirrorBuddy",
-  webDir: "out",
+  appId: 'com.mirror-labs.MirrorBuddy',
+  appName: 'MirrorBuddy',
+  webDir: 'apps/web/out',
   server: {
-    androidScheme: "https",
+    androidScheme: 'https',
     // For dev mode: uncomment and set to your local dev server
     // url: "http://localhost:3000",
     // cleartext: true,
