@@ -5,13 +5,16 @@ set -euo pipefail
 
 DIFF_BASE="${1:-origin/main}"
 
-schema_changed=$(git diff "$DIFF_BASE"... --name-only -- 'prisma/schema/*.prisma' 2>/dev/null | wc -l | tr -d ' ')
-migration_added=$(git diff "$DIFF_BASE"... --name-only --diff-filter=A -- 'prisma/migrations/*/migration.sql' 2>/dev/null | wc -l | tr -d ' ')
+# W2 app move (#362): prisma/ relocated to apps/web/prisma/. Match both
+# old and new locations during the transition; ignore pure renames
+# (-M -B) so a directory move alone doesn't trip this guard.
+schema_changed=$(git diff -M -B "$DIFF_BASE"... --name-only --diff-filter=AM -- 'prisma/schema/*.prisma' 'apps/web/prisma/schema/*.prisma' 2>/dev/null | wc -l | tr -d ' ')
+migration_added=$(git diff "$DIFF_BASE"... --name-only --diff-filter=A -- 'prisma/migrations/*/migration.sql' 'apps/web/prisma/migrations/*/migration.sql' 2>/dev/null | wc -l | tr -d ' ')
 
 if [[ "$schema_changed" -gt 0 && "$migration_added" -eq 0 ]]; then
   echo "❌ Prisma schema files were modified but no migration was added."
   echo "   Changed schema files:"
-  git diff "$DIFF_BASE"... --name-only -- 'prisma/schema/*.prisma'
+  git diff -M -B "$DIFF_BASE"... --name-only --diff-filter=AM -- 'prisma/schema/*.prisma' 'apps/web/prisma/schema/*.prisma'
   echo ""
   echo "   Run: npx prisma migrate dev --name <description>"
   exit 1
