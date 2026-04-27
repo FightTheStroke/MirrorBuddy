@@ -82,7 +82,7 @@ test.describe('Mobile Responsive Layout', () => {
     await expect(overlay).not.toBeVisible();
   });
 
-  test('sidebar logo button should meet touch target minimum', async ({ page, mobile }) => {
+  test('sidebar logo link should meet touch target minimum', async ({ page, mobile }) => {
     // Skip on large viewports where sidebar is always visible
     const viewportWidth = await mobile.getViewportWidth();
     if (viewportWidth >= 1024) {
@@ -93,11 +93,12 @@ test.describe('Mobile Responsive Layout', () => {
     // Open sidebar first
     await mobile.openMobileSidebar();
 
-    const logoButton = page.locator('button[aria-label="Torna alla Home"]').first();
-    await expect(logoButton).toBeVisible();
+    // PR #319: logo became a <Link> (anchor) for client-side nav home; keep WCAG check.
+    const logoLink = page.locator('a[aria-label="Torna alla Home"]').first();
+    await expect(logoLink).toBeVisible();
 
     // Should meet touch target minimum (44px height)
-    await mobile.verifyTouchTarget(logoButton);
+    await mobile.verifyTouchTarget(logoLink);
   });
 
   test('sidebar toggle button should meet touch target minimum', async ({ page, mobile }) => {

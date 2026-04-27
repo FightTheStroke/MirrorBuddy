@@ -106,7 +106,7 @@ test.describe('iPhone SE / iPhone 13 Mobile UX', () => {
     await mobile.openMobileSidebar();
 
     // Test logo button (wait for sidebar animation to complete)
-    const logoButton = page.locator('button[aria-label="Torna alla Home"]').first();
+    const logoButton = page.locator('[aria-label="Torna alla Home"]').first();
     await logoButton.waitFor({ state: 'visible', timeout: 10000 });
     await mobile.verifyTouchTarget(logoButton);
 

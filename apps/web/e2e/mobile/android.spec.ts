@@ -61,7 +61,7 @@ test.describe('Android Pixel 7 Mobile UX', () => {
     await mobile.openMobileSidebar();
 
     // Sidebar buttons
-    const logoButton = page.locator('button[aria-label="Torna alla Home"]').first();
+    const logoButton = page.locator('[aria-label="Torna alla Home"]').first();
     await mobile.verifyTouchTarget(logoButton);
 
     const toggleButton = page.locator('button[aria-label="Chiudi menu"]').first();
