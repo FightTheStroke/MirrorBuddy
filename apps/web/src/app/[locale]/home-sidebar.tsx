@@ -80,10 +80,16 @@ export function HomeSidebar({
           open ? 'translate-x-0 lg:w-64' : '-translate-x-full lg:translate-x-0 lg:w-20',
         )}
       >
-        {/* Logo - clickable to return home */}
+        {/* Logo - clickable to return home (resets in-memory view + closes drawer on mobile) */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <Link
             href="/"
+            onClick={() => {
+              // Restore the maestri view on the home route (PR #319 / Codex P1):
+              // pathname-based <Link> alone leaves currentView state on whatever
+              // section the user previously opened (settings, calendar, ...).
+              handleViewChange('maestri');
+            }}
             className="flex items-center gap-3 h-11 min-w-[44px] hover:opacity-80 transition-opacity"
             aria-label={t('sidebar.backToHome')}
           >
