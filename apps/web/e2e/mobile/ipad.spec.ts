@@ -105,7 +105,7 @@ test.describe('iPad Mini Responsive UX', () => {
     // Test sidebar buttons
     await mobile.openMobileSidebar();
 
-    const logoButton = page.locator('button[aria-label="Torna alla Home"]').first();
+    const logoButton = page.locator('[aria-label="Torna alla Home"]').first();
     if (await logoButton.isVisible()) {
       await mobile.verifyTouchTarget(logoButton);
     }
@@ -176,7 +176,7 @@ test.describe('iPad Mini Responsive UX', () => {
     await page.waitForTimeout(500);
 
     // Find logo button
-    const logoButton = page.locator('button[aria-label="Torna alla Home"]').first();
+    const logoButton = page.locator('[aria-label="Torna alla Home"]').first();
 
     try {
       await logoButton.waitFor({ state: 'visible', timeout: 5000 });
