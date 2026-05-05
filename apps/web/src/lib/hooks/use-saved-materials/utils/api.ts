@@ -164,23 +164,16 @@ export async function saveMaterialToAPIWithId(
       try {
         errorData = await response.json();
       } catch {
-        // If response is not JSON, try to get text
         const text = await response.text().catch(() => '');
         errorData = { message: text || `HTTP ${response.status}` };
       }
 
-      const errorMessage = `API error: ${response.status} - ${JSON.stringify(errorData)}`;
-      logger.error('Failed to save material - API error', {
-        errorDetails: errorMessage,
-        status: response.status,
-        statusText: response.statusText,
-        toolType,
-        title,
-        userId,
-        toolId,
-        errorData,
-      });
-      throw new Error(errorMessage);
+      const apiError = new Error(
+        `API error: ${response.status} - ${JSON.stringify(errorData)}`,
+      ) as Error & { status?: number; errorData?: Record<string, unknown> };
+      apiError.status = response.status;
+      apiError.errorData = errorData;
+      throw apiError;
     }
 
     const data = await response.json();
@@ -205,6 +198,17 @@ export async function saveMaterialToAPIWithId(
       return null;
     }
 
+    const status = (error as { status?: number } | null)?.status;
+    if (status === 401 || status === 403) {
+      logger.warn('Save material denied (auth)', {
+        status,
+        toolType,
+        title,
+        toolId,
+      });
+      return null;
+    }
+
     const errorMessage =
       error instanceof Error ? error.message : typeof error === 'string' ? error : String(error);
 
@@ -212,6 +216,7 @@ export async function saveMaterialToAPIWithId(
       'Failed to save material',
       {
         errorDetails: errorMessage || 'Unknown error',
+        status,
         toolType: toolType || 'unknown',
         title: title || 'untitled',
         userId: userId || 'unknown',
