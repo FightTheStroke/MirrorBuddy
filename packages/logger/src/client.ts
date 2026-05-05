@@ -59,7 +59,24 @@ function sanitizeContext(context?: ClientLogContext): ClientLogContext | undefin
  * Send error to Sentry
  */
 function captureError(message: string, context?: ClientLogContext, error?: unknown): void {
-  const errorToCapture = error instanceof Error ? error : new Error(message);
+  let errorToCapture: Error;
+  if (error instanceof Error) {
+    errorToCapture = error;
+  } else if (error === undefined || error === null) {
+    errorToCapture = new Error(message);
+  } else {
+    let serialized: string;
+    if (typeof error === 'string') {
+      serialized = error;
+    } else {
+      try {
+        serialized = JSON.stringify(error).slice(0, 500);
+      } catch {
+        serialized = String(error);
+      }
+    }
+    errorToCapture = new Error(`${message}: ${serialized}`);
+  }
   const sanitizedContext = sanitizeContext(context);
 
   if (isProduction) {
