@@ -191,11 +191,18 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
   const switchCharacter = useSwitchCharacter({
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    webrtcAudioElementRef: refs.webrtcAudioElementRef,
+    audioQueueRef: refs.audioQueueRef,
+    isPlayingRef: refs.isPlayingRef,
+    isBufferingRef: refs.isBufferingRef,
+    scheduledSourcesRef: refs.scheduledSourcesRef,
+    hasActiveResponseRef: refs.hasActiveResponseRef,
     maestroRef: refs.maestroRef,
     greetingSentRef: refs.greetingSentRef,
     sessionReadyRef: refs.sessionReadyRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,
     switchCharacterStore: store.switchCharacter,
+    setSpeaking: store.setSpeaking,
   });
 
   useEffect(() => {

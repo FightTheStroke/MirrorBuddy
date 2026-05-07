@@ -9,14 +9,15 @@
 import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import type { Maestro } from '@/types';
+import { performCancelResponse, type ActionRefs } from './actions';
 
-interface SwitchCharacterDeps {
-  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
+interface SwitchCharacterDeps extends ActionRefs {
   maestroRef: React.MutableRefObject<Maestro | null>;
   greetingSentRef: React.MutableRefObject<boolean>;
   sessionReadyRef: React.MutableRefObject<boolean>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
   switchCharacterStore: (maestro: Maestro) => void;
+  setSpeaking: (value: boolean) => void;
 }
 
 /**
@@ -39,17 +40,19 @@ export function useSwitchCharacter(deps: SwitchCharacterDeps) {
         to: maestro.id,
       });
 
-      // Update refs for the new character
+      // Cancel any in-flight response from the previous maestro and flush
+      // buffered audio. Without this, Azure keeps streaming the old voice's
+      // audio frames into the same WebRTC remote track while the new
+      // session.update provokes a second response, and the two voices overlap.
+      performCancelResponse(deps, deps.setSpeaking);
+
       // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation for character switch
       deps.maestroRef.current = maestro;
       deps.greetingSentRef.current = false;
       deps.sessionReadyRef.current = false;
 
-      // Update store (clears transcript/tools, keeps connection)
       deps.switchCharacterStore(maestro);
 
-      // Re-send session config via existing data channel
-      // This triggers useSendSessionConfig which builds new instructions
       if (deps.sendSessionConfigRef.current) {
         deps.sendSessionConfigRef.current();
       }
