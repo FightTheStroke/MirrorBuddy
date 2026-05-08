@@ -76,42 +76,52 @@ export function useSendText(
 }
 
 /**
+ * Cancel the active assistant response and flush any locally buffered audio.
+ *
+ * Pure helper (not a hook) so callers like character switching can run the
+ * same teardown without depending on the React `useCallback` returned by
+ * `useCancelResponse`.
+ */
+export function performCancelResponse(
+  refs: ActionRefs,
+  setSpeaking: (value: boolean) => void,
+): void {
+  if (refs.hasActiveResponseRef.current) {
+    logger.debug('[VoiceSession] Cancelling active response');
+
+    if (refs.webrtcDataChannelRef.current?.readyState === 'open') {
+      refs.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+      logger.debug('[VoiceSession] Sent response.cancel via WebRTC data channel');
+    }
+
+    refs.hasActiveResponseRef.current = false;
+  }
+
+  if (refs.webrtcAudioElementRef.current) {
+    refs.webrtcAudioElementRef.current.pause();
+    logger.debug('[VoiceSession] WebRTC audio element paused');
+  }
+
+  refs.audioQueueRef.current.clear();
+  refs.isPlayingRef.current = false;
+  refs.isBufferingRef.current = true;
+  refs.scheduledSourcesRef.current.forEach((source) => {
+    try {
+      source.stop();
+    } catch {
+      /* already stopped */
+    }
+  });
+  refs.scheduledSourcesRef.current.clear();
+  setSpeaking(false);
+}
+
+/**
  * Cancel current AI response and clear audio queue
  */
 export function useCancelResponse(refs: ActionRefs, setSpeaking: (value: boolean) => void) {
   return useCallback(() => {
-    // Only send response.cancel if Azure actually has an active response
-    if (refs.hasActiveResponseRef.current) {
-      logger.debug('[VoiceSession] Cancelling active response');
-
-      if (refs.webrtcDataChannelRef.current?.readyState === 'open') {
-        refs.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-        logger.debug('[VoiceSession] Sent response.cancel via WebRTC data channel');
-      }
-
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
-      refs.hasActiveResponseRef.current = false;
-    }
-
-    // Pause WebRTC audio element if present
-    if (refs.webrtcAudioElementRef.current) {
-      refs.webrtcAudioElementRef.current.pause();
-      logger.debug('[VoiceSession] WebRTC audio element paused');
-    }
-
-    // Always clear local audio queue and stop scheduled sources
-    refs.audioQueueRef.current.clear();
-    refs.isPlayingRef.current = false;
-    refs.isBufferingRef.current = true;
-    refs.scheduledSourcesRef.current.forEach((source) => {
-      try {
-        source.stop();
-      } catch {
-        /* already stopped */
-      }
-    });
-    refs.scheduledSourcesRef.current.clear();
-    setSpeaking(false);
+    performCancelResponse(refs, setSpeaking);
   }, [refs, setSpeaking]);
 }
 

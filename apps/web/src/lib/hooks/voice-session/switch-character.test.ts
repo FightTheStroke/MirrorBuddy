@@ -71,14 +71,21 @@ describe('useSwitchCharacter hook', () => {
 
     const deps = {
       webrtcDataChannelRef: { current: null },
+      webrtcAudioElementRef: { current: null },
+      audioQueueRef: { current: { clear: vi.fn() } },
+      isPlayingRef: { current: false },
+      isBufferingRef: { current: false },
+      scheduledSourcesRef: { current: new Set() },
+      hasActiveResponseRef: { current: false },
       maestroRef: { current: null },
       greetingSentRef: { current: false },
       sessionReadyRef: { current: false },
       sendSessionConfigRef: { current: null },
       switchCharacterStore: vi.fn(),
+      setSpeaking: vi.fn(),
     };
 
-    const switchFn = useSwitchCharacter(deps);
+    const switchFn = useSwitchCharacter(deps as never);
     const result = switchFn({
       id: 'test',
       name: 'Test',
