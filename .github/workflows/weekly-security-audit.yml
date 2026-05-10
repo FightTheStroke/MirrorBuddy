@@ -29,10 +29,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run npm audit
+      - name: Run pnpm audit
         id: audit
         run: |
-          npm audit --audit-level=high > audit-report.txt 2>&1 || echo "AUDIT_FAILED=true" >> "$GITHUB_OUTPUT"
+          pnpm audit --audit-level=high > audit-report.txt 2>&1 || echo "AUDIT_FAILED=true" >> "$GITHUB_OUTPUT"
 
       - name: Create issue on failure
         if: steps.audit.outputs.AUDIT_FAILED == 'true'
@@ -48,11 +48,11 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Security: npm audit found high-severity vulnerabilities`,
+              title: `Security: pnpm audit found high-severity vulnerabilities`,
               body: [
                 '## Weekly Security Audit Failed',
                 '',
-                '`npm audit --audit-level=high` found vulnerabilities:',
+                '`pnpm audit --audit-level=high` found vulnerabilities:',
                 '',
                 '```',
                 truncated,
@@ -60,7 +60,7 @@ jobs:
                 '',
                 '**Action required**: Review and update affected packages.',
                 '',
-                'Run locally: `npm audit` for full report.',
+                'Run locally: `pnpm audit` for full report.',
               ].join('\n'),
               labels: ['security', 'dependencies'],
             });
