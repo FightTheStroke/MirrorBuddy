@@ -20,7 +20,7 @@ interface InviteRequestBody {
   trialSessionId?: string;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public invite form, rate-limited, no cookie auth
+ 
 export const POST = pipe(withSentry('/api/invites/request'))(async (ctx) => {
   // Rate limit invite requests (3 per hour - public endpoint, strict)
   const clientId = getClientIdentifier(ctx.req);

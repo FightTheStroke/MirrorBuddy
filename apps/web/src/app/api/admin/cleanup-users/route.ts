@@ -42,7 +42,7 @@ export const DELETE = pipe(
     where: {
       OR: [
         { emailHash: { in: protectedEmailHashes } },
-        { email: { in: protectedEmails } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
+        { email: { in: protectedEmails } },  
       ],
     },
     select: { id: true, email: true },

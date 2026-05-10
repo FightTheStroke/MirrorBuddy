@@ -63,7 +63,7 @@ export function TitleEditor({
         </div>
       ) : (
         <>
-          {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Heading used for semantic structure, made interactive for inline editing UX */}
+          { }
           <h2
             className={cn(
               'flex-1 text-xl font-bold text-slate-900 dark:text-white',

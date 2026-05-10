@@ -58,7 +58,7 @@ export function PricingSection() {
                   {tier === "pro" && (
                     <span className="text-base font-normal text-gray-500">
                       {/* Period from pricing namespace - eslint misresolves parent */}
-                      {/* eslint-disable-next-line local-rules/no-missing-i18n-keys */}
+                      { }
                       {t("tiers.pro.period")}
                     </span>
                   )}

@@ -78,11 +78,11 @@ export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
           </div>
         )}
         <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-          {/* eslint-disable local-rules/no-literal-strings-in-jsx */}
+          { }
           <p className="text-[10px] text-slate-400">
             €{data?.cost.pricing.textPer1kTokens ?? 0.002}/1K tokens · €{data?.cost.pricing.voicePerMin ?? 0.04}{t("minVoice")}
           </p>
-          {/* eslint-enable local-rules/no-literal-strings-in-jsx */}
+          { }
         </div>
       </CardContent>
     </Card>

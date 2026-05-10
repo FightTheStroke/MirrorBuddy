@@ -47,7 +47,7 @@ interface EventPayload {
   }>;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
+ 
 export const POST = pipe(withSentry('/api/telemetry/events'))(async (ctx) => {
   // F-04: Get CORS headers based on request origin (no wildcard in production)
   const requestOrigin = ctx.req.headers.get('origin');

@@ -79,7 +79,7 @@ export function SectionContent({
               aria-label={t("contenutoDellaSezione")}
             />
           ) : (
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Paragraph used for semantic structure, made interactive for inline editing UX
+             
             <p
               role={!readOnly ? 'button' : undefined}
               tabIndex={!readOnly ? 0 : undefined}

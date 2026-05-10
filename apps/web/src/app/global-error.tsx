@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-html-link-for-pages */
+ 
 
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";

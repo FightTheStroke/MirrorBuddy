@@ -23,7 +23,7 @@ const log = logger.child({ module: "api/trial/email" });
  * Email capture is optional and can be triggered after X messages or at limit.
  */
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial email capture, public endpoint with rate limiting
+ 
 export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
   const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(

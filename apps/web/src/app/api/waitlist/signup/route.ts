@@ -22,7 +22,7 @@ interface SignupBody {
   marketingConsent?: unknown;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public waitlist endpoint, no auth needed, uses rate limiting
+ 
 export const POST = pipe(
   withSentry('/api/waitlist/signup'),
   withRateLimit(WAITLIST_RATE_LIMIT),

@@ -97,7 +97,7 @@ export function CallingOverlay({
         className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm"
         role="dialog"
         aria-modal="true"
-        // eslint-disable-next-line local-rules/no-literal-strings-in-jsx -- behind voice_calling_overlay flag
+         
         aria-label="Voice connection status"
       >
         <motion.div
@@ -163,10 +163,10 @@ export function CallingOverlay({
 
               {state === 'ringing' && (
                 <>
-                  {/* eslint-disable-next-line local-rules/no-literal-strings-in-jsx */}
+                  { }
                   <p className="text-sm text-slate-400">Establishing voice connection</p>
                   {onCancel && (
-                    // eslint-disable-next-line local-rules/no-literal-strings-in-jsx
+                     
                     <p className="text-xs text-slate-500 mt-2">Press Escape to cancel</p>
                   )}
                 </>

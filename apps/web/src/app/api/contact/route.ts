@@ -85,7 +85,7 @@ interface ContactResponse {
   emailSent?: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public contact form, uses rate limiting
+ 
 export const POST = pipe(withSentry("/api/contact"))(async (
   ctx,
 ): Promise<NextResponse<ContactResponse>> => {

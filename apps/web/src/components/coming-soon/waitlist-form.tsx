@@ -60,7 +60,7 @@ export function WaitlistForm() {
     setErrors({});
 
     try {
-      // eslint-disable-next-line local-rules/require-csrf-fetch -- public waitlist endpoint, no auth, uses rate limiting
+       
       const response = await fetch('/api/waitlist/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

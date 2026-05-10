@@ -92,7 +92,7 @@ interface SafeSearchResponse {
   safeSearchEnabled: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public search endpoint, uses rate limiting
+ 
 export const POST = pipe(withSentry("/api/search"))(async (ctx) => {
   // Rate limit check
   const clientId = getClientIdentifier(ctx.req);

@@ -32,7 +32,7 @@ interface TrackRequest {
   metadata?: Record<string, unknown>;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public analytics endpoint, visitor cookie only, no session auth
+ 
 export const POST = pipe(withSentry("/api/funnel/track"))(async (ctx) => {
   const body = (await ctx.req.json()) as TrackRequest;
   const { stage, fromStage, metadata } = body;

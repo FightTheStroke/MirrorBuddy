@@ -73,7 +73,7 @@ export const GET = pipe(
  * POST /api/email/preferences?token=xxx
  * Update email preferences by unsubscribe token
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public endpoint with token-based auth (unsubscribe), no session cookies
+ 
 export const POST = pipe(
   withSentry("/api/email/preferences"),
   withRateLimit({

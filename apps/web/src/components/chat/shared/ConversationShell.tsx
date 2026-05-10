@@ -58,7 +58,7 @@ export function ConversationShell({
         className="flex-1 overflow-y-auto px-4 py-2"
         role="log"
         aria-live="polite"
-        // eslint-disable-next-line local-rules/no-literal-strings-in-jsx -- behind chat_unified_view flag, will i18n when enabled
+         
         aria-label="Conversation messages"
       >
         {children}

@@ -75,7 +75,7 @@ export function LevelUpCelebration({
   if (typeof window === "undefined") return null;
 
   const content = (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Dialog backdrop with click-to-dismiss is standard UX pattern
+     
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
         isVisible ? "opacity-100" : "opacity-0"
@@ -107,7 +107,7 @@ export function LevelUpCelebration({
         ))}
       </div>
 
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
+      { }
       <div
         className={`relative max-w-md space-y-6 rounded-2xl bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-cyan-500/20 p-8 text-center backdrop-blur-xl transition-transform duration-500 ${
           isVisible ? "scale-100" : "scale-75"

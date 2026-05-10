@@ -154,7 +154,7 @@ export function FlashcardSession({
       )}
 
       <div className="mt-4 text-center text-sm text-gray-500">
-        {/* eslint-disable-next-line local-rules/no-literal-strings-in-jsx */}
+        { }
         <p>Keyboard: 1 (Again) • 2 (Hard) • 3 (Good) • 4 (Easy) • Space (Show)</p>
       </div>
     </div>

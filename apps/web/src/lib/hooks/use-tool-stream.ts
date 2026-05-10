@@ -116,7 +116,7 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
   // Set up EventSource with handlers
   const setupEventSource = useCallback(
     (url: string): EventSource => {
-      // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: disconnect() in useEffect return (line 218) calls cleanupEventSource() which calls close()
+       
       const eventSource = new EventSource(url);
 
       // Create handlers and store references for cleanup

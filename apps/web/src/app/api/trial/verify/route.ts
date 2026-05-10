@@ -17,7 +17,7 @@ const VerifySchema = z.object({
   code: z.string().min(4).max(12),
 });
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public verification endpoint, rate-limited, no cookie auth
+ 
 export const POST = pipe(withSentry("/api/trial/verify"))(async (ctx) => {
   const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(

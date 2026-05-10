@@ -175,7 +175,7 @@ export function HTMLSnippetsView() {
               }
             }}
           >
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
+            { }
             <div onClick={(e) => e.stopPropagation()}>
               <HTMLPreview
                 code={previewSnippet.code}

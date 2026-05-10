@@ -32,7 +32,7 @@ function generateSecureToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public forgot-password endpoint, uses rate limiting
+ 
 export const POST = pipe(
   withSentry("/api/auth/forgot-password"),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),

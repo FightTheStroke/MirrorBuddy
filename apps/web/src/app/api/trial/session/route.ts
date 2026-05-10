@@ -23,7 +23,7 @@ const log = logger.child({ module: 'api/trial/session' });
  * Uses IP hash + visitor cookie for session tracking (ADR 0056).
  * Requires explicit consent to privacy policy (F-02: GDPR compliance).
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial endpoint, visitor cookie only, no session auth to protect
+ 
 export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
   // F-02: Check GDPR consent before creating trial session
   const cookieStore = await cookies();

@@ -169,7 +169,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * Accept Web Vitals data and push to Grafana Cloud
  */
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public metrics endpoint, no session auth, rate-limited by IP
+ 
 export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
   // Rate limiting: 60 req/min per IP (F-05 protection)
   const clientId = getClientIdentifier(ctx.req);

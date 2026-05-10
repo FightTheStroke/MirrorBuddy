@@ -1,7 +1,7 @@
 // ============================================================================
 // CENTRALIZED VERSION MANAGEMENT
 // Single source of truth for app version across all endpoints
-// Source priority: VERSION file > package.json > fallback
+// Source priority: VERSION file > APP_VERSION env > package.json > fallback
 // ============================================================================
 
 import { readFileSync } from "fs";
@@ -12,7 +12,7 @@ let cachedVersion: string | null = null;
 
 /**
  * Get app version from centralized source
- * Priority: VERSION file > package.json > fallback
+ * Priority: VERSION file > APP_VERSION env > package.json > fallback
  *
  * NOTE: This function reads from disk only once, then caches.
  * Safe for serverless environments where process may restart.
@@ -30,6 +30,14 @@ export function getAppVersion(): string {
     }
   } catch {
     // VERSION file not found, try package.json
+  }
+
+  // Next standalone/Vercel may run from apps/web where the thin package.json is
+  // intentionally versioned 0.0.1; next.config.ts injects the root version here.
+  const envVersion = process.env.APP_VERSION?.trim();
+  if (envVersion) {
+    cachedVersion = envVersion;
+    return cachedVersion;
   }
 
   // Fallback to package.json

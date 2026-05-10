@@ -10,8 +10,22 @@ export interface CheckResult {
 
 export const projectRoot = process.cwd();
 
-export function resolve(...segments: string[]): string {
+function resolveRaw(...segments: string[]): string {
   return path.join(projectRoot, ...segments);
+}
+
+export function resolve(...segments: string[]): string {
+  const full = resolveRaw(...segments);
+  if (fs.existsSync(full)) return full;
+
+  const relPath = path.join(...segments);
+  if (relPath === 'src' || relPath.startsWith(`src${path.sep}`) || relPath.startsWith('src/')) {
+    const webRelPath = path.join('apps', 'web', relPath);
+    const webFull = resolveRaw(webRelPath);
+    if (fs.existsSync(webFull)) return webFull;
+  }
+
+  return full;
 }
 
 export function fileExists(relPath: string): boolean {

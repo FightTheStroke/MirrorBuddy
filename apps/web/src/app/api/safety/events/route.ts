@@ -23,7 +23,7 @@ interface SafetyEventBody {
   category?: string;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- accepts both authenticated and anonymous users for safety event logging
+ 
 export const POST = pipe(withSentry("/api/safety/events"))(async (ctx) => {
   const auth = await validateAuth();
   const userId = auth.authenticated && auth.userId ? auth.userId : null;

@@ -29,7 +29,7 @@ const log = logger.child({ module: 'api/trial/voice' });
  * Reports voice session duration for trial users.
  * Called when a voice session ends.
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial voice tracking, public endpoint
+ 
 export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
   try {
     // Check if authenticated user (skip trial tracking)

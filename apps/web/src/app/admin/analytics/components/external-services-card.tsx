@@ -99,11 +99,11 @@ export function ExternalServicesCard({
             </div>
           ))}
         <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
-          {/* eslint-disable local-rules/no-literal-strings-in-jsx */}
+          { }
           <p className="text-[10px] text-slate-400">
             Azure {data?.quotas.azureOpenAI.chatTpm.toLocaleString()} TPM · Drive {data?.quotas.googleDrive.queriesPerMin.toLocaleString()}/min · Brave {data?.quotas.braveSearch.monthlyQueries.toLocaleString()}{t("month")}
           </p>
-          {/* eslint-enable local-rules/no-literal-strings-in-jsx */}
+          { }
         </div>
       </CardContent>
     </Card>
