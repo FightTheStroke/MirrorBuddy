@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.12] - 2026-05-10
+
+### Fixed
+
+- **Dockerfile build** — switched to `pnpm --dir apps/web build` so the runner stage no longer relies on `bash -c` (the `node:20-alpine` base image ships without `bash`). Adds `NEXT_PUBLIC_SITE_URL` build ARG/ENV and copies the root `VERSION` file into the runner image so version reporting works in container builds.
+- **Sentry verify script (`scripts/verify-sentry-config.sh`)** — now resolves repo root explicitly and looks for `sentry.{client,server,edge}.config.ts` and `proxy.ts` under `apps/web/` instead of CWD. Fixes the `Sentry Config (Vercel)` CI job that started failing after the W2 monorepo move (#362).
+- **`/api/version` reporter** — added `APP_VERSION` env fallback to `apps/web/src/lib/version.ts`. On Vercel `process.cwd()` is `apps/web/`, so the previous lookup fell back to the thin `apps/web/package.json` (`0.0.1`). The env value is injected by `apps/web/next.config.ts` from the workspace-root `package.json`, keeping a single source of truth.
+- **Compliance check resolver** — `scripts/compliance-checks/types.ts:resolve()` now also looks under `apps/web/<path>` when a `src/...` path doesn't exist at the repo root, so monorepo layouts work without per-script changes.
+- **Weekly security audit workflow** — replaced `npm audit` with `pnpm audit` (closes #388, #389). The previous workflow failed every run with `ENOLOCK` because the project has no `package-lock.json`, only opening false-positive issues.
+
+### Changed
+
+- **Version manifest alignment** — `apps/web/package.json` `version` now tracks the workspace root (`0.16.12`). The thin manifest exists only so Vercel `rootDirectory='apps/web'` resolves; aligning the value avoids confusion when reading it directly.
+
+## [0.16.11] - 2026-05-10
+
+### Changed
+
+- **next-intl** 4.9.1 → 4.9.2 (#393) — patch bump including prototype-safety guards for `precompile: true` and `@formatjs/*` updates.
+
 ## [0.16.10] - 2026-03-21
 
 ### Security
