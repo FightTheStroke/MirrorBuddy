@@ -4,6 +4,18 @@
 
 set -e
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+
+WEB_DIR="apps/web"
+PROXY_FILE="${WEB_DIR}/src/proxy.ts"
+TUNNEL_ROUTE="${WEB_DIR}/src/app/monitoring/route.ts"
+SENTRY_CONFIG_FILES=(
+	"${WEB_DIR}/sentry.client.config.ts"
+	"${WEB_DIR}/sentry.server.config.ts"
+	"${WEB_DIR}/sentry.edge.config.ts"
+)
+
 echo "🔍 Sentry Configuration Verification"
 echo "===================================="
 echo ""
@@ -56,7 +68,7 @@ echo ""
 
 # 2. Check configuration files
 echo "2️⃣  Checking Sentry Configuration Files..."
-for file in sentry.client.config.ts sentry.server.config.ts sentry.edge.config.ts; do
+for file in "${SENTRY_CONFIG_FILES[@]}"; do
 	if [ -f "$file" ]; then
 		# Deployment gate: direct VERCEL env check OR isEnabled() from shared module
 		if grep -q "process\.env\.VERCEL\|NEXT_PUBLIC_VERCEL_ENV\|isEnabled(" "$file"; then
@@ -90,9 +102,9 @@ echo ""
 
 # 3. Check tunnel route
 echo "3️⃣  Checking Sentry Tunnel Route..."
-if [ -f "src/app/monitoring/route.ts" ]; then
-	echo "✅ Tunnel route exists: src/app/monitoring/route.ts"
-	if grep -q "getAllowedProjectId\|validate.*project" "src/app/monitoring/route.ts"; then
+if [ -f "$TUNNEL_ROUTE" ]; then
+	echo "✅ Tunnel route exists: $TUNNEL_ROUTE"
+	if grep -q "getAllowedProjectId\|validate.*project" "$TUNNEL_ROUTE"; then
 		echo "   ✅ Project ID validation present"
 	else
 		echo "   ⚠️  Project ID validation missing"
@@ -103,7 +115,7 @@ else
 fi
 
 # Check if tunnel is in PUBLIC_ROUTES
-if grep -q "/monitoring" "src/proxy.ts"; then
+if [ -f "$PROXY_FILE" ] && grep -q "/monitoring" "$PROXY_FILE"; then
 	echo "✅ Tunnel route in PUBLIC_ROUTES"
 else
 	echo "❌ Tunnel route NOT in PUBLIC_ROUTES (will be blocked!)"
@@ -114,7 +126,7 @@ echo ""
 
 # 4. Check CSP configuration
 echo "4️⃣  Checking CSP Configuration..."
-if grep -q "ingest.*sentry\.io" "src/proxy.ts"; then
+if [ -f "$PROXY_FILE" ] && grep -q "ingest.*sentry\.io" "$PROXY_FILE"; then
 	echo "✅ Sentry domains in CSP"
 else
 	echo "❌ Sentry domains NOT in CSP"
@@ -125,8 +137,8 @@ echo ""
 
 # 5. Check package installation
 echo "5️⃣  Checking Package Installation..."
-if npm list @sentry/nextjs &>/dev/null; then
-	VERSION=$(npm list @sentry/nextjs 2>/dev/null | grep "@sentry/nextjs" | awk '{print $NF}' | tr -d '└─')
+if pnpm list @sentry/nextjs --depth 0 &>/dev/null; then
+	VERSION=$(pnpm list @sentry/nextjs --depth 0 2>/dev/null | grep "@sentry/nextjs" | awk '{print $NF}' | tr -d '└─')
 	echo "✅ @sentry/nextjs installed: $VERSION"
 else
 	echo "❌ @sentry/nextjs NOT installed"

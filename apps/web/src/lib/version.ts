@@ -1,18 +1,18 @@
 // ============================================================================
 // CENTRALIZED VERSION MANAGEMENT
 // Single source of truth for app version across all endpoints
-// Source priority: VERSION file > package.json > fallback
+// Source priority: VERSION file > APP_VERSION env > package.json > fallback
 // ============================================================================
 
-import { readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 // Cache version in memory (read once at startup)
 let cachedVersion: string | null = null;
 
 /**
  * Get app version from centralized source
- * Priority: VERSION file > package.json > fallback
+ * Priority: VERSION file > APP_VERSION env > package.json > fallback
  *
  * NOTE: This function reads from disk only once, then caches.
  * Safe for serverless environments where process may restart.
@@ -22,8 +22,8 @@ export function getAppVersion(): string {
 
   // Try VERSION file first (single source of truth)
   try {
-    const versionPath = join(process.cwd(), "VERSION");
-    const version = readFileSync(versionPath, "utf-8").trim();
+    const versionPath = join(process.cwd(), 'VERSION');
+    const version = readFileSync(versionPath, 'utf-8').trim();
     if (version) {
       cachedVersion = version;
       return cachedVersion;
@@ -32,16 +32,24 @@ export function getAppVersion(): string {
     // VERSION file not found, try package.json
   }
 
-  // Fallback to package.json
-  try {
-    const pkgPath = join(process.cwd(), "package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
-    cachedVersion = pkg.version || "0.0.0";
-  } catch {
-    cachedVersion = "0.0.0";
+  // Next standalone/Vercel may run from apps/web where the thin package.json is
+  // intentionally versioned 0.0.1; next.config.ts injects the root version here.
+  const envVersion = process.env.APP_VERSION?.trim();
+  if (envVersion) {
+    cachedVersion = envVersion;
+    return cachedVersion;
   }
 
-  return cachedVersion ?? "0.0.0";
+  // Fallback to package.json
+  try {
+    const pkgPath = join(process.cwd(), 'package.json');
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    cachedVersion = pkg.version || '0.0.0';
+  } catch {
+    cachedVersion = '0.0.0';
+  }
+
+  return cachedVersion ?? '0.0.0';
 }
 
 /**

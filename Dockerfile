@@ -45,9 +45,11 @@ COPY . .
 RUN pnpm exec prisma generate
 
 # Build the application
+ARG NEXT_PUBLIC_SITE_URL=https://mirrorbuddy.org
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-RUN pnpm run build
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+RUN BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) pnpm --dir apps/web build
 
 # ==============================================================================
 # Stage 3: Runner (Production)
@@ -72,6 +74,7 @@ COPY --from=builder /app/apps/web/public ./apps/web/public
 # W2c app move (#362): standalone output is now under apps/web/.next/
 COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder /app/VERSION ./VERSION
 COPY --from=builder /app/prisma.config.ts ./
 # W2 app move (#362): prisma/ now under apps/web/prisma/
 COPY --from=builder /app/apps/web/prisma ./apps/web/prisma
