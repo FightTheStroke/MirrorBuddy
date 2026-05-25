@@ -8,17 +8,19 @@ function isTransientFetchError(error: unknown): boolean {
     return true;
   }
   if (error instanceof Error) {
-    // AbortError/TimeoutError: client cancellation; TypeError: network unreachable
-    // / DNS / CORS-blocked; messages containing "5xx" suggest server errors
-    // surfaced via `throw new Error('/api/onboarding 5xx')`. All treated as
-    // transient to avoid Sentry alerts on infra hiccups (MIRRORBUDDY-1T).
-    if (
-      error.name === 'AbortError' ||
-      error.name === 'TimeoutError' ||
-      error.name === 'TypeError'
-    ) {
+    if (error.name === 'AbortError' || error.name === 'TimeoutError') {
       return true;
     }
+    // Narrow TypeError to fetch/network signatures. Browsers throw TypeError
+    // with messages like 'Failed to fetch', 'NetworkError when attempting to
+    // fetch', or 'Load failed' (Safari) for network failures. Avoid blanket
+    // TypeError suppression so genuine bugs (e.g. null dereferences post-fetch)
+    // still surface (MIRRORBUDDY-1T, PR #408 P2).
+    if (error.name === 'TypeError' && /fetch|network|load failed/i.test(error.message)) {
+      return true;
+    }
+    // 5xx surfaced via `throw new Error('/api/onboarding 5xx')` is server-side
+    // and treated as transient (no client bug).
     if (/\b5\d{2}\b/.test(error.message)) {
       return true;
     }
