@@ -402,7 +402,7 @@ describe('checkAssistantTranscript', () => {
 
       checkAssistantTranscript('test-session-vce-003', 'flagged assistant output');
 
-      expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect(clientLogger.info).toHaveBeenCalledWith(
         expect.stringContaining('[TranscriptSafety]'),
         expect.objectContaining({
           component: 'voice-transcript-safety',
@@ -426,13 +426,13 @@ describe('checkAssistantTranscript', () => {
 
       checkAssistantTranscript('test-session-safe-assistant', 'safe assistant output');
 
-      // Should only have debug log, not warn with VCE-003
-      const warnCall = vi
-        .mocked(clientLogger.warn)
+      // Should only have debug log, not info with VCE-003
+      const infoCall = vi
+        .mocked(clientLogger.info)
         .mock.calls.find(
           (call: unknown[]) => (call[1] as Record<string, unknown>)?.eventId === 'VCE-003',
         );
-      expect(warnCall).toBeUndefined();
+      expect(infoCall).toBeUndefined();
     });
 
     it('should emit VCE-003 logging with sanitize action for warnings', () => {
@@ -445,7 +445,7 @@ describe('checkAssistantTranscript', () => {
 
       checkAssistantTranscript('test-session-sanitize', 'minor issue');
 
-      expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect(clientLogger.info).toHaveBeenCalledWith(
         expect.any(String),
         expect.objectContaining({
           eventId: 'VCE-003',
