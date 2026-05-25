@@ -38,9 +38,9 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
   voice_realtime_2: {
     name: 'Real-time Voice 2.0 (Preview)',
     description:
-      'ADR 0165: Drop-in next-gen gpt-realtime-2 (Preview, 2026-05-06). A/B vs gpt-realtime-1.5.',
-    status: 'disabled',
-    enabledPercentage: 10,
+      'ADR 0165: Drop-in next-gen gpt-realtime-2 (Preview, 2026-05-06). Activated 100% — preferred over v1.5 when AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 is configured (with graceful fallback to V15/legacy).',
+    status: 'enabled',
+    enabledPercentage: 100,
     killSwitch: false,
   },
   voice_realtime_whisper_transcription: {
