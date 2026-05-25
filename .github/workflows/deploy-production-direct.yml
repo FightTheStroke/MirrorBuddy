@@ -1,0 +1,170 @@
+name: Deploy to Production (Direct)
+
+# Manual emergency / fallback workflow that deploys main HEAD straight to
+# production without going through the staging-first promotion flow defined in
+# ci.yml + promote-to-production.yml.
+#
+# Use this when:
+# - The staging pipeline is broken (e.g. deployment-gate failing because of a
+#   skipped/failing required job) and you still need to ship a fix
+# - You need to redeploy production at the current main HEAD without waiting
+#   for the next staging build cycle
+#
+# This workflow does NOT replace the standard staging→promote flow. Prefer
+# promote-to-production.yml whenever a recent staging exists.
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_health_check:
+        description: "Skip post-deploy health check"
+        required: false
+        type: boolean
+        default: false
+      reason:
+        description: "Why are you using the direct path? (audit trail)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+  issues: write
+
+jobs:
+  deploy:
+    name: "🚀 Direct Production Deploy"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refuse non-main refs
+        run: |
+          if [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "::error::This workflow can only be run against main (got ${{ github.ref }})"
+            exit 1
+          fi
+          echo "✅ Running against main"
+          echo "Reason: ${{ inputs.reason }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate VERCEL_TOKEN
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not configured in repo secrets"
+            exit 1
+          fi
+          echo "✅ VERCEL_TOKEN present"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel production env
+        run: |
+          vercel pull --yes --environment=production \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=team_nDwLfqx9JbVIs4C7Il79f4ln
+
+      - name: Build for production
+        run: |
+          vercel build --prod \
+            --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to production
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=team_nDwLfqx9JbVIs4C7Il79f4ln)
+          echo "✅ Deployed: $url"
+          echo "deployment_url=$url" >> $GITHUB_OUTPUT
+
+      - name: Post-deploy health check
+        if: ${{ !inputs.skip_health_check }}
+        run: |
+          echo "Waiting 15s for production to stabilize..."
+          sleep 15
+          status=$(curl -s -o /dev/null -w "%{http_code}" "https://mirrorbuddy.vercel.app/api/health")
+          if [ "$status" = "200" ]; then
+            echo "✅ Production health check passed (HTTP $status)"
+          else
+            echo "::warning::Production health check returned HTTP $status (may still be warming up)"
+          fi
+
+      - name: Record GitHub Deployment
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.deploy.outputs.deployment_url }}';
+            const { data: deployment } = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'Production',
+              auto_merge: false,
+              required_contexts: [],
+              description: `Direct production deploy: ${url} (reason: ${{ toJSON(inputs.reason) }})`,
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.id,
+              state: 'success',
+              environment_url: 'https://mirrorbuddy.vercel.app',
+              description: 'Direct production deploy via workflow_dispatch',
+            });
+
+      - name: Post Summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const success = '${{ job.status }}' === 'success';
+            const url = '${{ steps.deploy.outputs.deployment_url }}';
+            const sha = context.sha.slice(0, 7);
+            const icon = success ? '✅' : '❌';
+            const status = success ? 'Deployed' : 'Failed';
+            await core.summary
+              .addHeading(`${icon} Direct Production Deploy (${sha})`, 2)
+              .addTable([
+                [{data: 'Field', header: true}, {data: 'Value', header: true}],
+                ['Status', status],
+                ['Deployment URL', url || 'n/a'],
+                ['Reason', `${{ toJSON(inputs.reason) }}`],
+              ])
+              .addLink('Production', 'https://mirrorbuddy.vercel.app')
+              .write();
+
+      - name: Close Staging Reminder Issues
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'staging-pending-promotion';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const open = await github.rest.issues.listForRepo({
+              owner, repo, labels: label, state: 'open',
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.update({
+                owner, repo, issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed',
+              });
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: '✅ Superseded by direct production deploy.',
+              });
+            }
