@@ -58,13 +58,13 @@ describe('fetchConversationMemory', () => {
     expect(result).toBeNull();
   });
 
-  it('should return null and log warning on network error', async () => {
+  it('should return null and log info on network error', async () => {
     const { clientLogger } = await import('@/lib/logger/client');
     global.fetch = vi.fn().mockRejectedValue(new Error('Network failed'));
 
     const result = await fetchConversationMemory('test-maestro');
     expect(result).toBeNull();
-    expect(clientLogger.warn).toHaveBeenCalledWith(
+    expect(clientLogger.info).toHaveBeenCalledWith(
       '[VoiceSession] Failed to fetch conversation memory',
       expect.objectContaining({ maestroId: 'test-maestro', error: 'Network failed' }),
     );

@@ -58,7 +58,9 @@ export async function fetchConversationMemory(
         : undefined,
     };
   } catch (error) {
-    logger.warn('[VoiceSession] Failed to fetch conversation memory', {
+    // Optional memory recall — degrade gracefully on transient failures.
+    // Logged at info to avoid Sentry noise (MIRRORBUDDY-1K).
+    logger.info('[VoiceSession] Failed to fetch conversation memory', {
       maestroId,
       error: error instanceof Error ? error.message : String(error),
     });

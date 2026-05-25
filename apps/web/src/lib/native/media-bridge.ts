@@ -204,7 +204,9 @@ export async function requestMicrophoneStream(
         return fallbackStream;
       } catch (fallbackError) {
         if (isExpectedAccessError(fallbackError)) {
-          logger.warn('[MediaBridge] Microphone access unavailable after fallback', {
+          // Expected user action (denied/dismissed permission). Log at info so it
+          // doesn't surface as Sentry noise (MIRRORBUDDY-1S).
+          logger.info('[MediaBridge] Microphone access unavailable after fallback', {
             component: 'media-bridge',
             errorName: getErrorName(fallbackError),
             errorMessage: getErrorMessage(fallbackError),
@@ -221,7 +223,9 @@ export async function requestMicrophoneStream(
     }
 
     if (isExpectedAccessError(error)) {
-      logger.warn('[MediaBridge] Microphone access unavailable', {
+      // Expected user action (denied/dismissed permission). Log at info so it
+      // doesn't surface as Sentry noise (MIRRORBUDDY-1S).
+      logger.info('[MediaBridge] Microphone access unavailable', {
         component: 'media-bridge',
         errorName: getErrorName(error),
         errorMessage: getErrorMessage(error),

@@ -192,9 +192,11 @@ export function checkAssistantTranscript(
     checkDurationMs,
   };
 
-  // Log safety check (VCE-003 checkpoint)
+  // Log safety check (VCE-003 checkpoint). Filter firing means the safety
+  // system is working as designed — log at info to keep Sentry noise low
+  // while preserving structured metadata for audit trails (MIRRORBUDDY-1Q).
   if (actionTaken !== 'allow') {
-    logger.warn('[TranscriptSafety] Safety check flagged assistant transcript', {
+    logger.info('[TranscriptSafety] Safety filter applied to assistant transcript', {
       component: 'voice-transcript-safety',
       eventId: 'VCE-003',
       eventName: 'Transcript Safety Check (Output)',
