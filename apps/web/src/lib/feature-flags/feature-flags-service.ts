@@ -35,6 +35,30 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  voice_realtime_2: {
+    name: 'Real-time Voice 2.0 (Preview)',
+    description:
+      'ADR 0165: Drop-in next-gen gpt-realtime-2 (Preview, 2026-05-06). Activated 100% — preferred over v1.5 when AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 is configured (with graceful fallback to V15/legacy).',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_realtime_whisper_transcription: {
+    name: 'Realtime Whisper Transcription',
+    description:
+      'ADR 0165: Use gpt-realtime-whisper as input.transcription.model — tighter caption deltas for DSA profiles.',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_realtime_translate: {
+    name: 'Realtime Translate (Pending Azure)',
+    description:
+      'ADR 0165: gpt-realtime-translate S2S. Deployment exists, but Azure /v1/realtime/translations endpoint is not yet available in swedencentral.',
+    status: 'degraded',
+    enabledPercentage: 0,
+    killSwitch: false,
+  },
   rag_enabled: {
     name: 'RAG Retrieval',
     description: 'Semantic search for conversation context',

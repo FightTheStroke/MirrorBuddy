@@ -18,6 +18,9 @@ describe('deployment-mapping', () => {
     delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
     delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI;
     delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
+    delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2;
+    delete process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT;
+    delete process.env.AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT;
     vi.resetModules();
   });
 
@@ -79,6 +82,34 @@ describe('deployment-mapping', () => {
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
 
       expect(getDeploymentForModel('gpt-realtime-1.5')).toBe('custom-realtime-15');
+    });
+
+    // ADR 0165 — Azure voice 2026-05 wave
+    it('should map gpt-realtime-2 to GA deployment name when env is unset', async () => {
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-2')).toBe('gpt-realtime-2');
+    });
+
+    it('should respect env var override for gpt-realtime-2', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 = 'custom-rt2';
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-2')).toBe('custom-rt2');
+    });
+
+    it('should map gpt-realtime-whisper to its deployment name', async () => {
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-whisper')).toBe('gpt-realtime-whisper');
+    });
+
+    it('should respect env var override for gpt-realtime-whisper', async () => {
+      process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT = 'custom-whisper-rt';
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-whisper')).toBe('custom-whisper-rt');
+    });
+
+    it('should map gpt-realtime-translate to its deployment name', async () => {
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-translate')).toBe('gpt-realtime-translate');
     });
   });
 
