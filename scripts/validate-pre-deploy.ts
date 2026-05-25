@@ -216,6 +216,10 @@ function validateOptionalEnvVars(): void {
     // GPT Realtime 1.5 + Audio 1.5 (optional - behind feature flags)
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15', category: 'Voice v1.5' },
     { name: 'AZURE_OPENAI_AUDIO_DEPLOYMENT', category: 'Voice v1.5' },
+    // ADR 0165 — Azure voice 2026-05 wave (optional - behind feature flags)
+    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2', category: 'Voice v2' },
+    { name: 'AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT', category: 'Voice v2' },
+    { name: 'AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT', category: 'Voice v2' },
   ];
 
   for (const envVar of optional) {

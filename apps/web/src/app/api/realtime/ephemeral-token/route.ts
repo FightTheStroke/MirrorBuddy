@@ -94,6 +94,8 @@ export const POST = pipe(
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
   const azureDeploymentLegacy = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
   const azureDeploymentV15 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim();
+  // ADR 0165: gpt-realtime-2 Preview deployment — wins over V15/legacy when flag on
+  const azureDeploymentV2 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim();
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
   const rateLimit = await checkRateLimitAsync(
@@ -114,9 +116,13 @@ export const POST = pipe(
   // Get API key (needed for new token request)
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
   const useRealtime15 = await isFeatureEnabled('voice_realtime_15');
-  const azureDeployment = useRealtime15.enabled
-    ? azureDeploymentV15 || azureDeploymentLegacy
-    : azureDeploymentLegacy;
+  // ADR 0165: voice_realtime_2 takes precedence over V15 and legacy.
+  const useRealtime2 = await isFeatureEnabled('voice_realtime_2');
+  const azureDeployment = useRealtime2.enabled
+    ? azureDeploymentV2 || azureDeploymentV15 || azureDeploymentLegacy
+    : useRealtime15.enabled
+      ? azureDeploymentV15 || azureDeploymentLegacy
+      : azureDeploymentLegacy;
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
@@ -124,9 +130,11 @@ export const POST = pipe(
   if (!azureApiKey) missingConfig.push('AZURE_OPENAI_REALTIME_API_KEY');
   if (!azureDeployment) {
     missingConfig.push(
-      useRealtime15.enabled
-        ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15'
-        : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
+      useRealtime2.enabled
+        ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2'
+        : useRealtime15.enabled
+          ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15'
+          : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
     );
   }
 
@@ -179,7 +187,11 @@ export const POST = pipe(
     protocol: useGAProtocol.enabled ? 'GA' : 'preview',
     endpoint: azureUrl,
     deployment: azureDeployment,
-    stack: useRealtime15.enabled ? 'voice_realtime_15' : 'voice_realtime',
+    stack: useRealtime2.enabled
+      ? 'voice_realtime_2'
+      : useRealtime15.enabled
+        ? 'voice_realtime_15'
+        : 'voice_realtime',
   });
 
   // Build token request payload based on protocol version

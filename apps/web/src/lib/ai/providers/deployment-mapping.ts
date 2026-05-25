@@ -56,6 +56,16 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
   'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
   'gpt-realtime-1.5': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 || 'gpt-realtime-1.5',
+
+  // 2026-05-06 wave (ADR 0165) — EU swedencentral only
+  // gpt-realtime-2:        next-gen successor of 1.5 (Preview). Drop-in.
+  // gpt-realtime-whisper:  used as input.transcription.model inside realtime session.
+  // gpt-realtime-translate: PROVISIONED but Azure endpoint not yet enabled — see ADR 0165.
+  'gpt-realtime-2': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 || 'gpt-realtime-2',
+  'gpt-realtime-whisper':
+    process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper',
+  'gpt-realtime-translate':
+    process.env.AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT || 'gpt-realtime-translate',
 };
 
 /**

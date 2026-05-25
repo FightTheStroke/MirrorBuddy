@@ -30,6 +30,29 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  voice_realtime_2: {
+    name: 'Real-time Voice 2.0 (Preview)',
+    description:
+      'ADR 0165: gpt-realtime-2 (Preview, 2026-05-06). A/B vs gpt-realtime-1.5.',
+    status: 'disabled',
+    enabledPercentage: 10,
+    killSwitch: false,
+  },
+  voice_realtime_whisper_transcription: {
+    name: 'Realtime Whisper Transcription',
+    description: 'ADR 0165: gpt-realtime-whisper as input.transcription.model.',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
+  voice_realtime_translate: {
+    name: 'Realtime Translate (Pending Azure)',
+    description:
+      'ADR 0165: gpt-realtime-translate S2S. Awaiting Azure endpoint rollout.',
+    status: 'degraded',
+    enabledPercentage: 0,
+    killSwitch: false,
+  },
   rag_enabled: {
     name: 'RAG Retrieval',
     description: 'Semantic search for conversation context',

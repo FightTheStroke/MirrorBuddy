@@ -22,6 +22,9 @@ export interface FeatureFlag {
 export type KnownFeatureFlag =
   | 'voice_realtime' // Real-time voice API
   | 'voice_realtime_15' // Real-time voice API (1.5 stack rollout)
+  | 'voice_realtime_2' // Real-time voice API (2.0 preview — ADR 0165)
+  | 'voice_realtime_whisper_transcription' // gpt-realtime-whisper as input.transcription.model (ADR 0165)
+  | 'voice_realtime_translate' // gpt-realtime-translate S2S (degraded: Azure endpoint pending — ADR 0165)
   | 'rag_enabled' // RAG retrieval
   | 'flashcards' // FSRS flashcards
   | 'mindmap' // Mind map generation

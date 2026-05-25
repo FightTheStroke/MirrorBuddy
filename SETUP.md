@@ -63,6 +63,11 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 # Voice v1.5 (optional — behind feature flags voice_realtime_15 / tts_audio_15)
 AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15
 AZURE_OPENAI_AUDIO_DEPLOYMENT=gpt-audio-15
+# Voice v2 / 2026-05 wave (ADR 0165 — behind feature flags voice_realtime_2,
+# voice_realtime_whisper_transcription, voice_realtime_translate)
+AZURE_OPENAI_REALTIME_DEPLOYMENT_V2=gpt-realtime-2
+AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT=gpt-realtime-whisper
+# AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT=gpt-realtime-translate  # blocked: Azure /realtime/translations endpoint not yet rolled out
 
 # RAG Embeddings (optional - enables semantic search)
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
