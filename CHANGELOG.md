@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-05-25
+
+### Added
+
+- **Azure OpenAI Realtime 2026-05-06** — production rollout (PR #406, ADR 0165). Three new EU-region deployments on `swedencentral`:
+  - `gpt-realtime-2` (Preview) — next-gen realtime voice model, enabled at 100% rollout via `voice_realtime_2` flag.
+  - `gpt-realtime-whisper` (GA) — dedicated transcription model, enabled at 100% via `voice_realtime_whisper_transcription` flag.
+  - `gpt-realtime-translate` (GA) — defined and flagged `degraded`; auto-flip wired through `apps/web/src/lib/azure/realtime-translate-availability.ts` once Azure exposes the endpoint (currently 404).
+- **New env vars** — `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`, `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT`, `NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT` (documented in `.env.example`, `SETUP.md`, `.github/workflows/ci.yml`, `validate-pre-deploy.ts`).
+- **ADR 0165** — `docs/adr/0165-azure-voice-2026-05-rollout.md` covering deployment names, rollout plan, kill-switches.
+
+### Fixed
+
+- **Sentry noise reduction** — three `logger.warn` call sites (which auto-capture to Sentry as messages) downgraded to `logger.info` for events that represent expected user behavior or system safety functioning as designed, not anomalies worth alerting on:
+  - `[MediaBridge] Microphone access unavailable` — user denied/dismissed permission prompt (`NotAllowedError`/`NotFoundError`). Resolves `MIRRORBUDDY-1S`.
+  - `[VoiceSession] Failed to fetch conversation memory` — optional memory recall transient failure; voice session degrades gracefully. Resolves `MIRRORBUDDY-1K`.
+  - `[TranscriptSafety] Safety check flagged assistant transcript` — safety filter doing its job; rewritten as `[VCE-003] Safety filter applied to assistant transcript` at `info`. Resolves `MIRRORBUDDY-1Q`.
+- **WelcomePage existing-data fetch** — broadened transient-error detection to include HTTP 5xx and `TypeError` (network unreachable / DNS), so server hiccups no longer surface as Sentry errors. Resolves `MIRRORBUDDY-1T`.
+
+### Changed
+
+- **Default voice realtime model** — sessions now prefer `gpt-realtime-2` (`AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`) when the `voice_realtime_2` flag is enabled; falls back to the previous `gpt-realtime` model when disabled.
+- **Default transcription model** — `gpt-realtime-whisper` (`AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT`) used by `session-config.ts` `input.transcription.model`.
+
 ## [0.16.12] - 2026-05-10
 
 ### Fixed

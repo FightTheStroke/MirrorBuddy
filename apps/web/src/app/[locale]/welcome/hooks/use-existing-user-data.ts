@@ -8,7 +8,20 @@ function isTransientFetchError(error: unknown): boolean {
     return true;
   }
   if (error instanceof Error) {
-    return error.name === 'AbortError' || error.name === 'TimeoutError';
+    // AbortError/TimeoutError: client cancellation; TypeError: network unreachable
+    // / DNS / CORS-blocked; messages containing "5" suggest 5xx surfaced via
+    // throw `new Error('/api/onboarding 5xx')`. All treated as transient to
+    // avoid Sentry alerts on infra hiccups (MIRRORBUDDY-1T).
+    if (
+      error.name === 'AbortError' ||
+      error.name === 'TimeoutError' ||
+      error.name === 'TypeError'
+    ) {
+      return true;
+    }
+    if (/\b5\d{2}\b/.test(error.message)) {
+      return true;
+    }
   }
   return false;
 }

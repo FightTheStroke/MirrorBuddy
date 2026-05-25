@@ -164,13 +164,14 @@ describe('media-bridge — microphone', () => {
 
       await expect(requestMicrophoneStream()).rejects.toThrow('Not supported');
 
-      expect(mockClientLogger.warn).toHaveBeenCalledWith(
+      expect(mockClientLogger.info).toHaveBeenCalledWith(
         '[MediaBridge] Microphone access unavailable',
         expect.objectContaining({
           component: 'media-bridge',
           errorName: 'NotSupportedError',
         }),
       );
+      expect(mockClientLogger.warn).not.toHaveBeenCalled();
       expect(mockClientLogger.error).not.toHaveBeenCalled();
     });
   });
