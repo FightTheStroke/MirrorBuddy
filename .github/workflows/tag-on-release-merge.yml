@@ -1,0 +1,45 @@
+name: Tag on Release Merge
+
+# Creates an annotated git tag `v<version>` on the merge commit of an
+# auto-release PR. Triggered when a PR with head branch matching
+# `chore/auto-release-v*` is closed-as-merged on main.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'chore/auto-release-v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout merge commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from branch name
+        id: ver
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          VERSION="${BRANCH#chore/auto-release-v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push annotated tag
+        run: |
+          TAG="${{ steps.ver.outputs.tag }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --tags origin "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists on origin — nothing to do."
+            exit 0
+          fi
+          git tag -a "$TAG" -m "Release $TAG"
+          git push origin "$TAG"
