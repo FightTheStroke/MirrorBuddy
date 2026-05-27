@@ -240,12 +240,30 @@ EOF
 
     # Update VERSION file
     echo "$new_version" > VERSION
-
-    # Update package.json
-    npm version "$new_version" --no-git-tag-version --allow-same-version
-
     echo -e "${GREEN}✓ VERSION file updated to $new_version${NC}"
-    echo -e "${GREEN}✓ package.json updated to $new_version${NC}"
+
+    # Update root + all workspace package.json files so the monorepo stays
+    # in sync (Vercel reads apps/web/package.json, not the root one).
+    # Keep the workspace list explicit so an accidental new package never
+    # silently desyncs versions.
+    PACKAGES=(
+      "package.json"
+      "apps/web/package.json"
+    )
+    for pkg in "${PACKAGES[@]}"; do
+      if [[ -f "$pkg" ]]; then
+        node -e "
+          const fs = require('fs');
+          const path = '$pkg';
+          const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+          data.version = '$new_version';
+          fs.writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
+        "
+        echo -e "${GREEN}✓ $pkg updated to $new_version${NC}"
+      else
+        echo -e "${YELLOW}⚠ $pkg not found, skipping${NC}"
+      fi
+    done
     echo ""
     echo -e "Next steps:"
     echo -e "  1. Review CHANGELOG.md"

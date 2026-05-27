@@ -80,7 +80,7 @@ jobs:
           BRANCH="${{ steps.branch.outputs.name }}"
           git checkout -b "$BRANCH"
           ./scripts/auto-version.sh --apply
-          git add VERSION package.json apps/web/package.json 2>/dev/null || git add VERSION package.json
+          git add VERSION package.json apps/web/package.json
           git commit -m "chore(release): v${NEXT}" -m "Automated version bump from Conventional Commits since last tag."
           git push origin "$BRANCH"
 
