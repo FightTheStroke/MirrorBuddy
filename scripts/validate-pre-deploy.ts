@@ -239,9 +239,14 @@ function validateOptionalEnvVars(): void {
 }
 
 function validateSentryClientFallback(): void {
-  const clientConfigPath = path.join(process.cwd(), 'sentry.client.config.ts');
-  if (!fs.existsSync(clientConfigPath)) {
-    addResult('Sentry', 'Client Config', 'FAIL', 'sentry.client.config.ts not found', true);
+  const candidates = [
+    path.join(process.cwd(), 'sentry.client.config.ts'),
+    path.join(process.cwd(), 'apps', 'web', 'sentry.client.config.ts'),
+    path.join(process.cwd(), 'apps', 'web', 'instrumentation-client.ts'),
+  ];
+  const clientConfigPath = candidates.find((p) => fs.existsSync(p));
+  if (!clientConfigPath) {
+    addResult('Sentry', 'Client Config', 'FAIL', 'sentry client config not found', true);
     return;
   }
 
