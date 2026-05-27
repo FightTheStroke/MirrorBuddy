@@ -39,6 +39,7 @@ export function useExistingUserData() {
         const response = await fetch('/api/onboarding');
         if (!response.ok) {
           if (response.status === 401 || response.status === 403) {
+            // Anonymous visitor — expected, no Sentry noise
             setHasCheckedExistingData(true);
             return;
           }
