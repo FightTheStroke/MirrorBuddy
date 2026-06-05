@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -13,12 +13,12 @@
 # testing
 /coverage
 /reports
-/test-results/
-/playwright-report/
+test-results/
+playwright-report/
 /playwright/.cache/
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
