@@ -79,17 +79,20 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Focus management: announce view changes to SR without disrupting Tab order.
-  // Keep tabindex=-1 on the heading so it stays focusable via focus() but is
-  // never in the natural Tab sequence. Removing the attribute while the element
-  // has focus causes browsers to move focus to BODY (keyboard trap bug).
+  // Announce view changes to SR by focusing the section heading.
+  // Skips the initial render to avoid disrupting natural Tab order on page load
+  // (WCAG 2.1 §3.2: no unexpected context change).
+  const prevView = useRef<View | null>(null);
   useEffect(() => {
-    if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
-      const mainHeading = mainContentRef.current.querySelector<HTMLElement>(
-        'h1:not(.sr-only), h2[tabindex="-1"]',
-      );
-      if (mainHeading) {
-        mainHeading.focus();
+    if (prevView.current === null) {
+      prevView.current = currentView;
+      return;
+    }
+    if (prevView.current !== currentView) {
+      prevView.current = currentView;
+      if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
+        const mainHeading = mainContentRef.current.querySelector<HTMLElement>('h2[tabindex="-1"]');
+        mainHeading?.focus();
       }
     }
   }, [currentView, isHydrated, hasCompletedOnboarding]);

@@ -53,6 +53,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
   const { hasFeature, isLoading } = useTierFeatures();
   const [pendingIntent, setPendingIntent] = useState<Intent | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const mounted = useRef(false);
 
   // Subjects that actually have at least one Maestro backing them.
   const subjects = useMemo<Subject[]>(
@@ -60,8 +61,14 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
     [],
   );
 
-  // Move focus to the step heading on step change for keyboard/SR users.
+  // Move focus to the step heading only when the step CHANGES (intent→subject),
+  // never on initial mount — auto-focusing on load disrupts Tab order and
+  // is against WCAG 2.1 guideline 3.2 (no focus change on user input).
   useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
     headingRef.current?.focus();
   }, [pendingIntent]);
 
