@@ -10,7 +10,8 @@
       "zaino": "Backpack",
       "calendar": "Calendar",
       "progress": "Progress",
-      "settings": "Settings"
+      "settings": "Settings",
+      "home": "Home"
     },
     "header": {
       "openMenu": "Open menu",
@@ -55,6 +56,55 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Hi! What do you want to do today?",
+      "greetingNamed": "Hi {name}! What do you want to do today?",
+      "question": "Pick where to start: I'll guide you.",
+      "back": "Back",
+      "lockedHint": "Available when you sign up for free",
+      "subjectSubtitle": "Pick a subject and I'll assign the right professor.",
+      "homework": {
+        "title": "Help me with my homework",
+        "subtitle": "Chat with photos, PDFs, formulas and search",
+        "contextMessage": "Hi! I need help with my homework. Tell me what you need, and feel free to use photos, PDFs or formulas."
+      },
+      "study": {
+        "title": "Help me study",
+        "subtitle": "Mind map, summary and flashcards",
+        "subjectTitle": "What do you want to study?",
+        "contextMessage": "I want to study this topic. Help me with a mind map, then a summary, and finally some flashcards to review."
+      },
+      "quizMe": {
+        "title": "Quiz me",
+        "subtitle": "Quizzes and interactive flashcards",
+        "subjectTitle": "What should I quiz you on?",
+        "contextMessage": "I want to be quizzed on this topic. Prepare a quiz and let’s use flashcards to practice."
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathematics",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology",
+      "history": "History",
+      "geography": "Geography",
+      "italian": "Italian",
+      "english": "English",
+      "spanish": "Spanish",
+      "french": "French",
+      "german": "German",
+      "art": "Art",
+      "music": "Music",
+      "civics": "Civic Education",
+      "economics": "Economics",
+      "computerScience": "Computer Science",
+      "health": "Health",
+      "philosophy": "Philosophy",
+      "internationalLaw": "International Law",
+      "storytelling": "Storytelling",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

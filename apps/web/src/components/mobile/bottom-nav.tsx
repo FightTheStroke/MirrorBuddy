@@ -12,7 +12,7 @@
 
 'use client';
 
-import { Home, MessageSquare, Briefcase, Trophy, Settings, User, Users } from 'lucide-react';
+import { Home, MessageSquare, Briefcase, Trophy, Settings, User } from 'lucide-react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 
@@ -21,7 +21,6 @@ const NAV_ITEMS = [
   { href: '/chat', icon: MessageSquare, label: 'Chat' },
   { href: '/astuccio', icon: Briefcase, label: 'Tools' },
   { href: '/achievements', icon: Trophy, label: 'Achievements' },
-  { href: '/community', icon: Users, label: 'Community' },
   { href: '/settings', icon: Settings, label: 'Settings' },
   { href: '/profile', icon: User, label: 'Profile' },
 ] as const;

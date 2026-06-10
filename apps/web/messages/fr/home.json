@@ -10,7 +10,8 @@
       "zaino": "Sac à dos",
       "calendar": "Calendrier",
       "progress": "Progrès",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "home": "Accueil"
     },
     "header": {
       "openMenu": "Ouvrir le menu",
@@ -55,6 +56,55 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Salut ! Que veux-tu faire aujourd'hui ?",
+      "greetingNamed": "Salut {name} ! Que veux-tu faire aujourd'hui ?",
+      "question": "Choisis par où commencer : je te guide.",
+      "back": "Retour",
+      "lockedHint": "Disponible en t'inscrivant gratuitement",
+      "subjectSubtitle": "Choisis la matière et je te donne le bon professeur.",
+      "homework": {
+        "title": "Aide-moi à faire mes devoirs",
+        "subtitle": "Discussion avec photos, PDF, formules et recherche",
+        "contextMessage": "Salut ! J'ai besoin d'aide pour mes devoirs. Dis-moi ce qu'il te faut, et utilise photos, PDF ou formules si besoin."
+      },
+      "study": {
+        "title": "Aide-moi à réviser",
+        "subtitle": "Carte mentale, résumé et cartes mémoire",
+        "subjectTitle": "Que veux-tu étudier ?",
+        "contextMessage": "Je veux étudier ce sujet. Aide-moi avec une carte mentale, puis un résumé, et enfin des cartes mémoire pour réviser."
+      },
+      "quizMe": {
+        "title": "Interroge-moi",
+        "subtitle": "Quiz et cartes mémoire interactives",
+        "subjectTitle": "Sur quoi dois-je t’interroger ?",
+        "contextMessage": "Je veux être interrogé sur ce sujet. Prépare un quiz et utilisons des cartes mémoire pour nous entraîner."
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathématiques",
+      "physics": "Physique",
+      "chemistry": "Chimie",
+      "biology": "Biologie",
+      "history": "Histoire",
+      "geography": "Géographie",
+      "italian": "Italien",
+      "english": "Anglais",
+      "spanish": "Espagnol",
+      "french": "Français",
+      "german": "Allemand",
+      "art": "Art",
+      "music": "Musique",
+      "civics": "Éducation civique",
+      "economics": "Économie",
+      "computerScience": "Informatique",
+      "health": "Santé",
+      "philosophy": "Philosophie",
+      "internationalLaw": "Droit international",
+      "storytelling": "Récits",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

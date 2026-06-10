@@ -32,13 +32,13 @@ describe('BottomNav', () => {
   });
 
   describe('Structure and Visibility', () => {
-    it('renders navigation with all 7 items including community', () => {
+    it('renders navigation with all 6 items', () => {
       vi.mocked(usePathname).mockReturnValue('/');
       const { container } = render(<BottomNav />);
 
-      // All 7 navigation items should be present (structure-based assertion)
+      // All 6 navigation items should be present (structure-based assertion)
       const links = container.querySelectorAll('a');
-      expect(links.length).toBe(7);
+      expect(links.length).toBe(6);
 
       // Verify expected hrefs are present (i18n-agnostic)
       const hrefs = Array.from(links).map((a) => a.getAttribute('href'));
@@ -46,7 +46,6 @@ describe('BottomNav', () => {
       expect(hrefs).toContain('/chat');
       expect(hrefs).toContain('/astuccio');
       expect(hrefs).toContain('/achievements');
-      expect(hrefs).toContain('/community');
       expect(hrefs).toContain('/settings');
       expect(hrefs).toContain('/profile');
     });
@@ -98,7 +97,6 @@ describe('BottomNav', () => {
       expect(linkMap.get('/chat')).toBeTruthy();
       expect(linkMap.get('/astuccio')).toBeTruthy();
       expect(linkMap.get('/achievements')).toBeTruthy();
-      expect(linkMap.get('/community')).toBeTruthy();
       expect(linkMap.get('/settings')).toBeTruthy();
       expect(linkMap.get('/profile')).toBeTruthy();
     });
@@ -109,7 +107,7 @@ describe('BottomNav', () => {
 
       // Each link should have an SVG icon (lucide-react renders as SVG)
       const links = container.querySelectorAll('a');
-      expect(links.length).toBe(7);
+      expect(links.length).toBe(6);
       links.forEach((link) => {
         const svg = link.querySelector('svg');
         expect(svg).toBeInTheDocument();

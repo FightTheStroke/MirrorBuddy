@@ -10,7 +10,8 @@
       "zaino": "Rucksack",
       "calendar": "Kalender",
       "progress": "Fortschritt",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "home": "Start"
     },
     "header": {
       "openMenu": "Menü öffnen",
@@ -55,6 +56,55 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Hallo! Was möchtest du heute tun?",
+      "greetingNamed": "Hallo {name}! Was möchtest du heute tun?",
+      "question": "Wähle, wo du starten möchtest: Ich begleite dich.",
+      "back": "Zurück",
+      "lockedHint": "Verfügbar nach kostenloser Registrierung",
+      "subjectSubtitle": "Wähle das Fach und ich gebe dir den passenden Professor.",
+      "homework": {
+        "title": "Hilf mir bei den Hausaufgaben",
+        "subtitle": "Chat mit Fotos, PDFs, Formeln und Suche",
+        "contextMessage": "Hallo! Ich brauche Hilfe bei den Hausaufgaben. Sag mir, was du brauchst, und nutze gern Fotos, PDFs oder Formeln."
+      },
+      "study": {
+        "title": "Hilf mir beim Lernen",
+        "subtitle": "Mindmap, Zusammenfassung und Lernkarten",
+        "subjectTitle": "Was möchtest du lernen?",
+        "contextMessage": "Ich möchte dieses Thema lernen. Hilf mir mit einer Mindmap, dann einer Zusammenfassung und schließlich Lernkarten zum Wiederholen."
+      },
+      "quizMe": {
+        "title": "Prüfe mich",
+        "subtitle": "Quiz und interaktive Lernkarten",
+        "subjectTitle": "Worüber soll ich dich abfragen?",
+        "contextMessage": "Ich möchte zu diesem Thema abgefragt werden. Bereite ein Quiz vor und lass uns mit Lernkarten üben."
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathematik",
+      "physics": "Physik",
+      "chemistry": "Chemie",
+      "biology": "Biologie",
+      "history": "Geschichte",
+      "geography": "Geografie",
+      "italian": "Italienisch",
+      "english": "Englisch",
+      "spanish": "Spanisch",
+      "french": "Französisch",
+      "german": "Deutsch",
+      "art": "Kunst",
+      "music": "Musik",
+      "civics": "Sozialkunde",
+      "economics": "Wirtschaft",
+      "computerScience": "Informatik",
+      "health": "Gesundheit",
+      "philosophy": "Philosophie",
+      "internationalLaw": "Völkerrecht",
+      "storytelling": "Geschichten",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

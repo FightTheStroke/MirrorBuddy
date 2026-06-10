@@ -85,10 +85,10 @@ export function HomeSidebar({
           <Link
             href="/"
             onClick={() => {
-              // Restore the maestri view on the home route (PR #319 / Codex P1):
+              // Restore the intent home on the home route (PR #319 / Codex P1):
               // pathname-based <Link> alone leaves currentView state on whatever
               // section the user previously opened (settings, calendar, ...).
-              handleViewChange('maestri');
+              handleViewChange('intent');
             }}
             className="flex items-center gap-3 h-11 min-w-[44px] hover:opacity-80 transition-opacity"
             aria-label={t('sidebar.backToHome')}

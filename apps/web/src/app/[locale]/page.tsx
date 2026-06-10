@@ -14,6 +14,7 @@ import {
   Sparkles,
   PencilRuler,
   Backpack,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useProgressStore, useSettingsStore } from '@/lib/stores';
@@ -31,6 +32,7 @@ import { LazyProgressView } from '@/components/progress';
 import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
+import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
 import { COACH_INFO, BUDDY_INFO } from './home-constants';
 import type { View, MaestroSessionMode } from './types';
 import {
@@ -59,12 +61,13 @@ export default function Home() {
     }
   }, [isHydrated, hasCompletedOnboarding, router]);
 
-  const [currentView, setCurrentView] = useState<View>('maestri');
+  const [currentView, setCurrentView] = useState<View>('intent');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
   const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
+  const [sessionContextMessage, setSessionContextMessage] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const handleResize = () => {
@@ -131,6 +134,19 @@ export default function Home() {
     setRequestedToolType(toolType);
     setSelectedMaestro(maestro);
     setMaestroSessionMode('chat');
+    setSessionContextMessage(undefined);
+    setMaestroSessionKey((prev) => prev + 1);
+    setCurrentView('maestro-session');
+  };
+
+  // Intention-based entry: each intent resolves to a Maestro (auto-selected by
+  // subject) and opens a session pre-framed with a context message. The
+  // student never picks a professor from the 26-Maestri grid.
+  const handleIntentStart = (start: IntentStart) => {
+    setSelectedMaestro(start.maestro);
+    setMaestroSessionMode(start.mode);
+    setRequestedToolType(start.requestedToolType);
+    setSessionContextMessage(start.contextMessage);
     setMaestroSessionKey((prev) => prev + 1);
     setCurrentView('maestro-session');
   };
@@ -148,6 +164,11 @@ export default function Home() {
   const buddyInfo = BUDDY_INFO[selectedBuddy];
 
   const navItems = [
+    {
+      id: 'intent' as const,
+      label: t('navigation.home'),
+      icon: HomeIcon,
+    },
     {
       id: 'coach' as const,
       label: coachInfo.name,
@@ -200,11 +221,13 @@ export default function Home() {
             key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
             maestro={selectedMaestro}
             onClose={() => {
-              setCurrentView('maestri');
+              setCurrentView('intent');
               setRequestedToolType(undefined);
+              setSessionContextMessage(undefined);
             }}
             initialMode={maestroSessionMode}
             requestedToolType={requestedToolType}
+            contextMessage={sessionContextMessage}
           />
         </div>
       )}
@@ -286,11 +309,15 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
+              {currentView === 'intent' && (
+                <HomeIntentChooser userName={studentProfile?.name} onStart={handleIntentStart} />
+              )}
               {currentView === 'maestri' && (
                 <MaestriGrid
                   onMaestroSelect={(maestro, mode) => {
                     setSelectedMaestro(maestro);
                     setMaestroSessionMode(mode);
+                    setSessionContextMessage(undefined);
                     setMaestroSessionKey((prev) => prev + 1);
                     setCurrentView('maestro-session');
                   }}

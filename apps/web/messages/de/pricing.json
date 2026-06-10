@@ -5,42 +5,40 @@
     "tiers": {
       "trial": {
         "name": "Trial",
-        "description": "Free trial with limited features",
+        "description": "Kostenlose Testversion: nur „Hilf mir bei den Hausaufgaben“",
         "price": "Free",
         "features": [
-          "5 chat messages per day",
-          "3 voice minutes per day",
-          "1 Maestro available",
-          "Basic tools"
+          "1 Absicht: Hausaufgabenhilfe",
+          "10 Chat-Nachrichten pro Tag",
+          "5 Sprachminuten pro Tag",
+          "Basis-Werkzeuge (10 pro Tag)"
         ],
         "cta": "Start now"
       },
       "base": {
         "name": "Base",
-        "description": "Free plan with standard features",
+        "description": "Kostenloser Plan: alle 3 Absichten",
         "price": "Free",
         "features": [
-          "10 chat messages per day",
-          "5 voice minutes per day",
-          "3 Maestros available",
-          "All tools",
-          "Mind maps and quizzes"
+          "Alle 3 Absichten: Hausaufgaben, Lernen, Abfrage",
+          "50 Chat-Nachrichten pro Tag",
+          "30 Sprachminuten pro Tag",
+          "Alle Werkzeuge (30 pro Tag)"
         ],
         "cta": "Sign up free"
       },
       "pro": {
         "name": "Pro",
-        "description": "Premium plan with everything unlocked",
+        "description": "Premium-Plan: unbegrenzte Absichten und Werkzeuge",
         "price": "€9.99",
         "period": "/month",
         "features": [
-          "Unlimited chat",
-          "Unlimited voice",
-          "All 26 Maestros",
-          "All tools",
-          "Parent dashboard",
-          "Priority support",
-          "Advanced analytics"
+          "Alle 3 Absichten ohne Limit",
+          "Unbegrenzter Chat",
+          "Unbegrenzte Sprache",
+          "Unbegrenzte Werkzeuge",
+          "Eltern-Dashboard",
+          "Prioritäts-Support"
         ],
         "cta": "Upgrade to Pro"
       }

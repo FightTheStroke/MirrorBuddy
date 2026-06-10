@@ -10,7 +10,8 @@
       "zaino": "Mochila",
       "calendar": "Calendario",
       "progress": "Progreso",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "home": "Inicio"
     },
     "header": {
       "openMenu": "Abrir menú",
@@ -55,6 +56,55 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "¡Hola! ¿Qué quieres hacer hoy?",
+      "greetingNamed": "¡Hola {name}! ¿Qué quieres hacer hoy?",
+      "question": "Elige por dónde empezar: yo te guío.",
+      "back": "Atrás",
+      "lockedHint": "Disponible al registrarte gratis",
+      "subjectSubtitle": "Elige la asignatura y te asigno el profesor adecuado.",
+      "homework": {
+        "title": "Ayúdame con los deberes",
+        "subtitle": "Chat con fotos, PDF, fórmulas y búsqueda",
+        "contextMessage": "¡Hola! Necesito ayuda con los deberes. Dime qué necesitas y usa fotos, PDF o fórmulas si te hacen falta."
+      },
+      "study": {
+        "title": "Ayúdame a estudiar",
+        "subtitle": "Mapa mental, resumen y tarjetas",
+        "subjectTitle": "¿Qué quieres estudiar?",
+        "contextMessage": "Quiero estudiar este tema. Ayúdame con un mapa mental, luego un resumen y por último unas tarjetas para repasar."
+      },
+      "quizMe": {
+        "title": "Examíname",
+        "subtitle": "Cuestionarios y tarjetas interactivas",
+        "subjectTitle": "¿Sobre qué quieres que te examine?",
+        "contextMessage": "Quiero que me examinen sobre este tema. Prepara un cuestionario y usemos tarjetas para practicar."
+      }
+    },
+    "subjects": {
+      "mathematics": "Matemáticas",
+      "physics": "Física",
+      "chemistry": "Química",
+      "biology": "Biología",
+      "history": "Historia",
+      "geography": "Geografía",
+      "italian": "Italiano",
+      "english": "Inglés",
+      "spanish": "Español",
+      "french": "Francés",
+      "german": "Alemán",
+      "art": "Arte",
+      "music": "Música",
+      "civics": "Educación Cívica",
+      "economics": "Economía",
+      "computerScience": "Informática",
+      "health": "Salud",
+      "philosophy": "Filosofía",
+      "internationalLaw": "Derecho Internacional",
+      "storytelling": "Relatos",
+      "supercazzola": "Supercazzola",
+      "sport": "Deporte"
+    }
   }
 }

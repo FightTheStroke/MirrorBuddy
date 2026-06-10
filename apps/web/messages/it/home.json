@@ -5,12 +5,62 @@
     "seasonDefault": "Stagione Corrente",
     "mirrorBucksShort": "MB",
     "navigation": {
+      "home": "Home",
       "astuccio": "Astuccio",
       "zaino": "Zaino",
       "calendar": "Calendario",
       "progress": "Progresso",
       "settings": "Impostazioni",
       "professors": "Professori"
+    },
+    "intent": {
+      "greeting": "Ciao! Cosa vuoi fare oggi?",
+      "greetingNamed": "Ciao {name}! Cosa vuoi fare oggi?",
+      "question": "Scegli da dove partire: ci penso io a guidarti.",
+      "back": "Indietro",
+      "lockedHint": "Disponibile registrandoti gratuitamente",
+      "subjectSubtitle": "Scegli la materia: ti assegno il professore giusto.",
+      "homework": {
+        "title": "Aiutami a fare i compiti",
+        "subtitle": "Chat con foto, PDF, formule e ricerca",
+        "contextMessage": "Ciao! Ho bisogno di aiuto con i compiti. Dimmi pure di cosa hai bisogno e usa pure foto, PDF o formule se ti servono."
+      },
+      "study": {
+        "title": "Aiutami a studiare",
+        "subtitle": "Mappa mentale, riassunto e flashcard",
+        "subjectTitle": "Cosa vuoi studiare?",
+        "contextMessage": "Voglio studiare questo argomento. Aiutami con una mappa mentale, poi un riassunto e infine delle flashcard per ripassare."
+      },
+      "quizMe": {
+        "title": "Interrogami",
+        "subtitle": "Quiz e flashcard interattive",
+        "subjectTitle": "Su cosa vuoi essere interrogato?",
+        "contextMessage": "Voglio essere interrogato su questo argomento. Preparami un quiz e usiamo le flashcard per allenarci."
+      }
+    },
+    "subjects": {
+      "mathematics": "Matematica",
+      "physics": "Fisica",
+      "chemistry": "Chimica",
+      "biology": "Biologia",
+      "history": "Storia",
+      "geography": "Geografia",
+      "italian": "Italiano",
+      "english": "Inglese",
+      "spanish": "Spagnolo",
+      "french": "Francese",
+      "german": "Tedesco",
+      "art": "Arte",
+      "music": "Musica",
+      "civics": "Educazione Civica",
+      "economics": "Economia",
+      "computerScience": "Informatica",
+      "health": "Salute",
+      "philosophy": "Filosofia",
+      "internationalLaw": "Diritto Internazionale",
+      "storytelling": "Racconti",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
     },
     "header": {
       "openMenu": "Apri menu",
