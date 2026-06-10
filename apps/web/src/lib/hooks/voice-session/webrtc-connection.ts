@@ -236,9 +236,14 @@ export class WebRTCConnection {
       clearTimeout(timeout);
       if (!response.ok) {
         const errorBody = await response.text().catch(() => '');
-        throw new Error(
-          `Failed to get ephemeral token: ${response.status} - ${errorBody.slice(0, 200)}`,
+        // Log the raw provider detail (status, Azure error JSON) for diagnostics
+        // ONLY — never surface it to the student. A child must not read
+        // "401 invalid subscription key": show a calm, reassuring message.
+        logVoiceError(
+          'EphemeralTokenError',
+          `Ephemeral token request failed: ${response.status} - ${errorBody.slice(0, 300)}`,
         );
+        throw new Error('Il tuo professore non è disponibile in questo momento. Riprova tra poco!');
       }
       const data: EphemeralTokenResponse = await response.json();
       return data.token;
