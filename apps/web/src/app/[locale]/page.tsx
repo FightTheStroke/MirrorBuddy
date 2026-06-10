@@ -93,15 +93,7 @@ export default function Home() {
     }
   }, [currentView, isHydrated, hasCompletedOnboarding]);
 
-  const {
-    seasonMirrorBucks,
-    seasonLevel,
-    currentSeason,
-    streak,
-    totalStudyMinutes,
-    sessionsThisWeek,
-    questionsAsked,
-  } = useProgressStore();
+  const { seasonMirrorBucks, seasonLevel, currentSeason, streak } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const trialStatus = useTrialStatus();
@@ -248,14 +240,9 @@ export default function Home() {
             onMenuClick={() => setSidebarOpen(true)}
             userName={studentProfile?.name}
             seasonLevel={seasonLevel}
-            mbInLevel={mbInLevel}
-            mbNeeded={MB_PER_LEVEL}
             progressPercent={progressPercent}
             seasonName={seasonName}
             streak={streak}
-            sessionsThisWeek={sessionsThisWeek}
-            totalStudyMinutes={totalStudyMinutes}
-            questionsAsked={questionsAsked}
             trialStatus={trialStatus}
           />
 
