@@ -1,12 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import toast from "@/components/ui/toast";
-import {
-  trackTrialChat,
-  trackTrialLimitHit,
-} from "@/lib/telemetry/trial-events";
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import toast from '@/components/ui/toast';
+import { trackTrialChat, trackTrialLimitHit } from '@/lib/telemetry/trial-events';
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -17,7 +15,7 @@ interface TrialStatus {
   visitorId?: string;
 }
 
-const SHOWN_KEY = "mirrorbuddy-trial-toast-shown";
+const SHOWN_KEY = 'mirrorbuddy-trial-toast-shown';
 
 /**
  * Hook to show toast notifications for trial mode status.
@@ -29,6 +27,7 @@ const SHOWN_KEY = "mirrorbuddy-trial-toast-shown";
  */
 export function useTrialToasts(trialStatus: TrialStatus) {
   const router = useRouter();
+  const t = useTranslations('auth');
   const previousRemaining = useRef<number | null>(null);
   const hasShownWelcome = useRef(false);
 
@@ -40,16 +39,16 @@ export function useTrialToasts(trialStatus: TrialStatus) {
       const shown = sessionStorage.getItem(SHOWN_KEY);
       if (!shown) {
         hasShownWelcome.current = true;
-        sessionStorage.setItem(SHOWN_KEY, "true");
+        sessionStorage.setItem(SHOWN_KEY, 'true');
 
         toast.info(
-          "Benvenuto in MirrorBuddy!",
-          `Hai ${trialStatus.maxChats} messaggi gratuiti. Richiedi l'accesso beta per sbloccare tutto.`,
+          t('trialToastWelcomeTitle'),
+          t('trialToastWelcomeBody', { max: trialStatus.maxChats }),
           {
             duration: 8000,
             action: {
-              label: "Richiedi accesso",
-              onClick: () => router.push("/invite/request"),
+              label: t('trialToastWelcomeAction'),
+              onClick: () => router.push('/invite/request'),
             },
           },
         );
@@ -61,7 +60,7 @@ export function useTrialToasts(trialStatus: TrialStatus) {
     // Track remaining messages for threshold notifications
     const prev = previousRemaining.current;
     const curr = trialStatus.chatsRemaining;
-    const visitorId = trialStatus.visitorId || "unknown";
+    const visitorId = trialStatus.visitorId || 'unknown';
 
     if (prev !== null && prev !== curr) {
       // Track chat event (chat count increased)
@@ -71,53 +70,41 @@ export function useTrialToasts(trialStatus: TrialStatus) {
 
       // Just crossed 3 remaining threshold
       if (prev > 3 && curr === 3) {
-        toast.warning(
-          "Solo 3 messaggi rimasti",
-          "Richiedi l'accesso beta per continuare senza limiti.",
-          {
-            duration: 6000,
-            action: {
-              label: "Richiedi accesso",
-              onClick: () => router.push("/invite/request"),
-            },
+        toast.warning(t('trialToastWarnTitle'), t('trialToastWarnBody'), {
+          duration: 6000,
+          action: {
+            label: t('trialToastWelcomeAction'),
+            onClick: () => router.push('/invite/request'),
           },
-        );
+        });
       }
 
       // Just crossed 1 remaining threshold
       if (prev > 1 && curr === 1) {
-        toast.warning(
-          "Ultimo messaggio!",
-          "Questo è il tuo ultimo messaggio di prova.",
-          {
-            duration: 6000,
-            action: {
-              label: "Richiedi accesso",
-              onClick: () => router.push("/invite/request"),
-            },
+        toast.warning(t('trialToastLastTitle'), t('trialToastLastBody'), {
+          duration: 6000,
+          action: {
+            label: t('trialToastWelcomeAction'),
+            onClick: () => router.push('/invite/request'),
           },
-        );
+        });
       }
 
       // Messages exhausted
       if (prev > 0 && curr === 0) {
         // Track limit reached
-        trackTrialLimitHit(visitorId, "chat");
+        trackTrialLimitHit(visitorId, 'chat');
 
-        toast.error(
-          "Messaggi esauriti",
-          "Richiedi l'accesso beta per continuare a usare MirrorBuddy.",
-          {
-            duration: 10000,
-            action: {
-              label: "Richiedi accesso",
-              onClick: () => router.push("/invite/request"),
-            },
+        toast.error(t('trialToastDoneTitle'), t('trialToastDoneBody'), {
+          duration: 10000,
+          action: {
+            label: t('trialToastWelcomeAction'),
+            onClick: () => router.push('/invite/request'),
           },
-        );
+        });
       }
     }
 
     previousRemaining.current = curr;
-  }, [trialStatus, router]);
+  }, [trialStatus, router, t]);
 }
