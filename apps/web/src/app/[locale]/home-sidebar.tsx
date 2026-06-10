@@ -40,6 +40,7 @@ interface HomeSidebarProps {
   currentView: View;
   onViewChange: (view: View) => Promise<void>;
   navItems: NavItem[];
+  grownUpNavItems?: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
   trialStatus?: TrialStatus;
@@ -51,6 +52,7 @@ export function HomeSidebar({
   currentView,
   onViewChange,
   navItems,
+  grownUpNavItems,
   hasNewInsights,
   onParentAccess,
   trialStatus,
@@ -62,6 +64,64 @@ export function HomeSidebar({
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       onToggle();
     }
+  };
+
+  const renderNavItem = (item: NavItem) => {
+    const avatarSrc = 'avatar' in item ? item.avatar : null;
+    const isActive = currentView === item.id;
+    const isCollapsed = !open;
+
+    return (
+      <button
+        key={item.id}
+        data-testid={`home-nav-${item.id}`}
+        onClick={() => handleViewChange(item.id)}
+        className={cn(
+          'w-full flex items-center gap-3 rounded-xl transition-all',
+          isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
+          isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
+          !isActive &&
+            'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
+        )}
+        style={
+          isActive && !isCollapsed
+            ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' }
+            : undefined
+        }
+      >
+        {avatarSrc ? (
+          <div
+            className={cn(
+              'relative flex-shrink-0 rounded-full',
+              isCollapsed &&
+                isActive &&
+                'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
+            )}
+          >
+            <Image
+              src={avatarSrc}
+              alt={item.label}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+              isCollapsed &&
+                isActive &&
+                'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10',
+            )}
+          >
+            <item.icon className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')} />
+          </div>
+        )}
+        {open && <span className="font-medium">{item.label}</span>}
+      </button>
+    );
   };
 
   return (
@@ -162,75 +222,20 @@ export function HomeSidebar({
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
-          {navItems.map((item) => {
-            const isChatItem = item.id === 'coach' || item.id === 'buddy';
-            const avatarSrc = 'avatar' in item ? item.avatar : null;
+          {navItems.map(renderNavItem)}
 
-            const isActive = currentView === item.id;
-            const isCollapsed = !open;
-
-            return (
-              <button
-                key={item.id}
-                data-testid={`home-nav-${item.id}`}
-                onClick={() => handleViewChange(item.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 rounded-xl transition-all',
-                  // Collapsed: center content, minimal padding
-                  isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
-                  // Active state: full background only when expanded
-                  isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
-                  // Inactive state
-                  !isActive &&
-                    'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
-                  isChatItem && 'relative',
-                )}
-                style={
-                  isActive && !isCollapsed
-                    ? {
-                        boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40',
-                      }
-                    : undefined
-                }
-              >
-                {avatarSrc ? (
-                  <div
-                    className={cn(
-                      'relative flex-shrink-0 rounded-full',
-                      // When collapsed and active, add accent ring around avatar
-                      isCollapsed &&
-                        isActive &&
-                        'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
-                    )}
-                  >
-                    <Image
-                      src={avatarSrc}
-                      alt={item.label}
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
-                  </div>
-                ) : (
-                  <div
-                    className={cn(
-                      'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-                      // When collapsed and active, add accent ring around icon (circular)
-                      isCollapsed &&
-                        isActive &&
-                        'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10',
-                    )}
-                  >
-                    <item.icon
-                      className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')}
-                    />
-                  </div>
-                )}
-                {open && <span className="font-medium">{item.label}</span>}
-              </button>
-            );
-          })}
+          {/* Grown-ups section — visually separated so a child does not wander
+              into the professor grid, planner or settings. */}
+          {grownUpNavItems && grownUpNavItems.length > 0 && (
+            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+              {open && (
+                <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                  {t('sidebar.grownUps')}
+                </p>
+              )}
+              {grownUpNavItems.map(renderNavItem)}
+            </div>
+          )}
         </nav>
 
         {/* Active Maestro Avatar */}

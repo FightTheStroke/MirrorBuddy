@@ -37,6 +37,19 @@ const INTENT_CARDS: IntentCardConfig[] = [
 ];
 
 /**
+ * Subjects hidden from the child-facing picker. These are either adult/abstract
+ * (economics, philosophy, international law) or a joke subject (supercazzola) and
+ * have no place in a 6–14 learning flow. The Maestri behind them stay in the data
+ * layer; we only remove the *choice* from the child.
+ */
+const EXCLUDED_CHILD_SUBJECTS: ReadonlySet<Subject> = new Set<Subject>([
+  'supercazzola',
+  'internationalLaw',
+  'economics',
+  'philosophy',
+]);
+
+/**
  * Intention-based home screen.
  *
  * Step 1: three intent cards (homework / study / quizMe). The student always
@@ -55,9 +68,12 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
-  // Subjects that actually have at least one Maestro backing them.
+  // Subjects that have at least one Maestro AND are appropriate for a child.
   const subjects = useMemo<Subject[]>(
-    () => getAllSubjects().filter((s) => getMaestriBySubject(s).length > 0),
+    () =>
+      getAllSubjects().filter(
+        (s) => getMaestriBySubject(s).length > 0 && !EXCLUDED_CHILD_SUBJECTS.has(s),
+      ),
     [],
   );
 
@@ -77,50 +93,36 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
 
   const handleIntentSelect = (card: IntentCardConfig) => {
     if (!isIntentUnlocked(card)) return;
-    if (card.intent === 'homework') {
-      startHomework();
-      return;
-    }
+    // Every intent now goes through the subject step. This removes the old
+    // "homework always opened the maths Maestro" bug: the child tells us the
+    // subject (or picks "I don't know") and we open the right Maestro.
     setPendingIntent(card.intent);
   };
 
-  const startHomework = () => {
-    // Homework intent: no subject step. Buddy is the generalist coordinator;
-    // the actual subject Maestro is resolved server-side from the message.
-    // We open a chat with the first Maestro as the host avatar and a
-    // homework-framed context message; tools (pdf/webcam/formula/search) live
-    // in the session toolbar.
-    const host = getMaestriBySubject('mathematics')[0] ?? getAllMaestriHost();
-    if (!host) return;
+  const openSession = (intent: Intent, maestro: Maestro) => {
+    const requestedToolType: ToolType | undefined =
+      intent === 'study' ? 'mindmap' : intent === 'quizMe' ? 'quiz' : undefined;
     onStart({
-      intent: 'homework',
-      maestro: host,
+      intent,
+      maestro,
       mode: 'chat',
-      contextMessage: t('intent.homework.contextMessage'),
+      requestedToolType,
+      contextMessage: t(`intent.${intent}.contextMessage`),
     });
   };
 
   const handleSubjectSelect = (subject: Subject) => {
     const maestro = getMaestriBySubject(subject)[0];
     if (!maestro || !pendingIntent) return;
+    openSession(pendingIntent, maestro);
+  };
 
-    if (pendingIntent === 'study') {
-      onStart({
-        intent: 'study',
-        maestro,
-        mode: 'chat',
-        requestedToolType: 'mindmap',
-        contextMessage: t('intent.study.contextMessage'),
-      });
-    } else {
-      onStart({
-        intent: 'quizMe',
-        maestro,
-        mode: 'chat',
-        requestedToolType: 'quiz',
-        contextMessage: t('intent.quizMe.contextMessage'),
-      });
-    }
+  // Homework only: the child taps "I don't know / a bit of everything". We open
+  // a generalist host so they can just show their homework and get help.
+  const handleAnySubject = () => {
+    const host = getAllMaestriHost();
+    if (!host || pendingIntent !== 'homework') return;
+    openSession('homework', host);
   };
 
   // --- Step 2: subject picker -------------------------------------------------
@@ -150,6 +152,15 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
           {t(`intent.${pendingIntent}.subjectTitle`)}
         </h2>
         <p className="text-slate-600 dark:text-slate-300 mb-6">{t('intent.subjectSubtitle')}</p>
+        {pendingIntent === 'homework' && (
+          <button
+            type="button"
+            onClick={handleAnySubject}
+            className="w-full min-h-[56px] mb-4 px-5 py-4 rounded-2xl bg-accent-themed/10 border-2 border-accent-themed/30 text-slate-800 dark:text-slate-100 font-semibold text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
+          >
+            {t('intent.subjectAny')}
+          </button>
+        )}
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 list-none p-0">
           {subjects.map((subject) => (
             <li key={subject}>
@@ -198,7 +209,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                 aria-disabled={!unlocked || isLoading}
                 onClick={() => handleIntentSelect(card)}
                 className={cn(
-                  'group relative w-full h-full min-h-[140px] text-left rounded-2xl border p-6 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed',
+                  'group relative w-full h-full min-h-[160px] text-left rounded-2xl border p-6 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed',
                   unlocked
                     ? 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-accent-themed hover:shadow-xl cursor-pointer'
                     : 'bg-slate-50 dark:bg-slate-800/50 border-dashed border-slate-300 dark:border-slate-700 cursor-not-allowed opacity-70',
@@ -207,13 +218,13 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                 <div className="flex items-start justify-between mb-4">
                   <span
                     className={cn(
-                      'inline-flex items-center justify-center w-12 h-12 rounded-xl',
+                      'inline-flex items-center justify-center w-16 h-16 rounded-2xl',
                       unlocked
                         ? 'bg-accent-themed/10 text-accent-themed'
                         : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
                     )}
                   >
-                    <Icon className="h-6 w-6" aria-hidden="true" />
+                    <Icon className="h-9 w-9" aria-hidden="true" />
                   </span>
                   {!unlocked && (
                     <Lock

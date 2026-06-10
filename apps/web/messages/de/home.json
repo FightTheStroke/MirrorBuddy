@@ -11,7 +11,9 @@
       "calendar": "Kalender",
       "progress": "Fortschritt",
       "settings": "Einstellungen",
-      "home": "Start"
+      "home": "Zuhause",
+      "myWork": "Meine Sachen",
+      "myRewards": "Meine Belohnungen"
     },
     "header": {
       "openMenu": "Menü öffnen",
@@ -34,7 +36,8 @@
       "requestAccess": "Zugang Anfordern",
       "adminDashboardAria": "Zum Administrator-Dashboard gehen",
       "adminDashboard": "Admin-Dashboard",
-      "parentArea": "Elternbereich"
+      "parentArea": "Elternbereich",
+      "grownUps": "Für Erwachsene"
     },
     "adminDashboard": "Admin-Dashboard",
     "closeMenu": "Menü schließen",
@@ -58,29 +61,31 @@
     "mb": "+% MB",
     "sim": "(SIM)",
     "intent": {
-      "greeting": "Hallo! Was möchtest du heute tun?",
-      "greetingNamed": "Hallo {name}! Was möchtest du heute tun?",
+      "greeting": "Hallo! Was machen wir heute?",
+      "greetingNamed": "Hallo {name}! Was machen wir heute?",
       "question": "Wähle, wo du starten möchtest: Ich begleite dich.",
       "back": "Zurück",
-      "lockedHint": "Verfügbar nach kostenloser Registrierung",
-      "subjectSubtitle": "Wähle das Fach und ich gebe dir den passenden Professor.",
+      "lockedHint": "Bitte einen Erwachsenen, es freizuschalten",
+      "subjectSubtitle": "Wähle das Fach und ich hole den passenden Professor.",
       "homework": {
-        "title": "Hilf mir bei den Hausaufgaben",
-        "subtitle": "Chat mit Fotos, PDFs, Formeln und Suche",
-        "contextMessage": "Hallo! Ich brauche Hilfe bei den Hausaufgaben. Sag mir, was du brauchst, und nutze gern Fotos, PDFs oder Formeln."
+        "title": "Hausaufgaben machen",
+        "subtitle": "Ich helfe dir Schritt für Schritt",
+        "contextMessage": "Hallo! Ich brauche Hilfe bei den Hausaufgaben. Sag mir, was du brauchst, und nutze gern Fotos, PDFs oder Formeln.",
+        "subjectTitle": "Wobei brauchst du Hilfe?"
       },
       "study": {
-        "title": "Hilf mir beim Lernen",
-        "subtitle": "Mindmap, Zusammenfassung und Lernkarten",
+        "title": "Lernen",
+        "subtitle": "Lass uns zusammen eine Karte machen",
         "subjectTitle": "Was möchtest du lernen?",
         "contextMessage": "Ich möchte dieses Thema lernen. Hilf mir mit einer Mindmap, dann einer Zusammenfassung und schließlich Lernkarten zum Wiederholen."
       },
       "quizMe": {
-        "title": "Prüfe mich",
-        "subtitle": "Quiz und interaktive Lernkarten",
+        "title": "Teste dich",
+        "subtitle": "Ich stelle dir die Fragen",
         "subjectTitle": "Worüber soll ich dich abfragen?",
         "contextMessage": "Ich möchte zu diesem Thema abgefragt werden. Bereite ein Quiz vor und lass uns mit Lernkarten üben."
-      }
+      },
+      "subjectAny": "Weiß ich nicht / Ein bisschen von allem"
     },
     "subjects": {
       "mathematics": "Mathematik",

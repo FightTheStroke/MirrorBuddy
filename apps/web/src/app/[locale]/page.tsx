@@ -10,9 +10,6 @@ import {
   Trophy,
   Settings,
   Calendar,
-  Heart,
-  Sparkles,
-  PencilRuler,
   Backpack,
   Home as HomeIcon,
 } from 'lucide-react';
@@ -33,7 +30,6 @@ import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
 import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
-import { COACH_INFO, BUDDY_INFO } from './home-constants';
 import type { View, MaestroSessionMode } from './types';
 import {
   LazyMaestroSession,
@@ -166,46 +162,34 @@ export default function Home() {
   const seasonName = currentSeason?.name || t('seasonDefault');
   const selectedCoach = studentProfile?.preferredCoach || 'melissa';
   const selectedBuddy = studentProfile?.preferredBuddy || 'mario';
-  const coachInfo = COACH_INFO[selectedCoach];
-  const buddyInfo = BUDDY_INFO[selectedBuddy];
 
-  const navItems = [
+  // Child space: only three friendly destinations. The 26-Maestri grid, the
+  // coach/buddy character chats and the standalone tools launcher are
+  // intentionally NOT here — they would re-introduce the choice overload the
+  // intention-based home is meant to remove.
+  const childNavItems = [
     {
       id: 'intent' as const,
       label: t('navigation.home'),
       icon: HomeIcon,
     },
-    {
-      id: 'coach' as const,
-      label: coachInfo.name,
-      icon: Sparkles,
-      isChat: true,
-      avatar: coachInfo.avatar,
-    },
-    {
-      id: 'buddy' as const,
-      label: buddyInfo.name,
-      icon: Heart,
-      isChat: true,
-      avatar: buddyInfo.avatar,
-    },
+    { id: 'supporti' as const, label: t('navigation.myWork'), icon: Backpack },
+    { id: 'progress' as const, label: t('navigation.myRewards'), icon: Trophy },
+  ];
+
+  // Grown-up space: shown under a clearly separated "for grown-ups" group so a
+  // child does not wander into the professor grid, the planner or settings.
+  const grownUpNavItems = [
     {
       id: 'maestri' as const,
       label: t('navigation.professors'),
       icon: GraduationCap,
     },
     {
-      id: 'astuccio' as const,
-      label: t('navigation.astuccio'),
-      icon: PencilRuler,
-    },
-    { id: 'supporti' as const, label: t('navigation.zaino'), icon: Backpack },
-    {
       id: 'calendar' as const,
       label: t('navigation.calendar'),
       icon: Calendar,
     },
-    { id: 'progress' as const, label: t('navigation.progress'), icon: Trophy },
     {
       id: 'settings' as const,
       label: t('navigation.settings'),
@@ -280,7 +264,8 @@ export default function Home() {
             onToggle={() => setSidebarOpen(!sidebarOpen)}
             currentView={currentView}
             onViewChange={handleViewChange}
-            navItems={navItems}
+            navItems={childNavItems}
+            grownUpNavItems={grownUpNavItems}
             hasNewInsights={hasNewInsights}
             onParentAccess={() => {
               markAsViewed();

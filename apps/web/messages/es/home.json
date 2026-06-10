@@ -11,7 +11,9 @@
       "calendar": "Calendario",
       "progress": "Progreso",
       "settings": "Configuración",
-      "home": "Inicio"
+      "home": "Casa",
+      "myWork": "Mis trabajos",
+      "myRewards": "Mis premios"
     },
     "header": {
       "openMenu": "Abrir menú",
@@ -34,7 +36,8 @@
       "requestAccess": "Solicitar Acceso",
       "adminDashboardAria": "Ir al Panel de Administración",
       "adminDashboard": "Panel de Administración",
-      "parentArea": "Área de Padres"
+      "parentArea": "Área de Padres",
+      "grownUps": "Para los grandes"
     },
     "adminDashboard": "Panel de Administración",
     "closeMenu": "Cerrar Menú",
@@ -58,29 +61,31 @@
     "mb": "+% MB",
     "sim": "(SIM)",
     "intent": {
-      "greeting": "¡Hola! ¿Qué quieres hacer hoy?",
-      "greetingNamed": "¡Hola {name}! ¿Qué quieres hacer hoy?",
+      "greeting": "¡Hola! ¿Qué hacemos hoy?",
+      "greetingNamed": "¡Hola {name}! ¿Qué hacemos hoy?",
       "question": "Elige por dónde empezar: yo te guío.",
       "back": "Atrás",
-      "lockedHint": "Disponible al registrarte gratis",
-      "subjectSubtitle": "Elige la asignatura y te asigno el profesor adecuado.",
+      "lockedHint": "Pide a un adulto que lo desbloquee",
+      "subjectSubtitle": "Elige la asignatura y te traigo el profesor adecuado.",
       "homework": {
-        "title": "Ayúdame con los deberes",
-        "subtitle": "Chat con fotos, PDF, fórmulas y búsqueda",
-        "contextMessage": "¡Hola! Necesito ayuda con los deberes. Dime qué necesitas y usa fotos, PDF o fórmulas si te hacen falta."
+        "title": "Hacer los deberes",
+        "subtitle": "Te ayudo paso a paso",
+        "contextMessage": "¡Hola! Necesito ayuda con los deberes. Dime qué necesitas y usa fotos, PDF o fórmulas si te hacen falta.",
+        "subjectTitle": "¿Con qué necesitas ayuda?"
       },
       "study": {
-        "title": "Ayúdame a estudiar",
-        "subtitle": "Mapa mental, resumen y tarjetas",
+        "title": "Estudiar",
+        "subtitle": "Hagamos un mapa juntos",
         "subjectTitle": "¿Qué quieres estudiar?",
         "contextMessage": "Quiero estudiar este tema. Ayúdame con un mapa mental, luego un resumen y por último unas tarjetas para repasar."
       },
       "quizMe": {
-        "title": "Examíname",
-        "subtitle": "Cuestionarios y tarjetas interactivas",
+        "title": "Ponte a prueba",
+        "subtitle": "Yo te hago las preguntas",
         "subjectTitle": "¿Sobre qué quieres que te examine?",
         "contextMessage": "Quiero que me examinen sobre este tema. Prepara un cuestionario y usemos tarjetas para practicar."
-      }
+      },
+      "subjectAny": "No lo sé / Un poco de todo"
     },
     "subjects": {
       "mathematics": "Matemáticas",

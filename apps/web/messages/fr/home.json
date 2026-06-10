@@ -11,7 +11,9 @@
       "calendar": "Calendrier",
       "progress": "Progrès",
       "settings": "Paramètres",
-      "home": "Accueil"
+      "home": "Maison",
+      "myWork": "Mes travaux",
+      "myRewards": "Mes récompenses"
     },
     "header": {
       "openMenu": "Ouvrir le menu",
@@ -34,7 +36,8 @@
       "requestAccess": "Demander l'accès",
       "adminDashboardAria": "Aller au tableau de bord d'administration",
       "adminDashboard": "Tableau de bord Admin",
-      "parentArea": "Espace Parents"
+      "parentArea": "Espace Parents",
+      "grownUps": "Pour les grands"
     },
     "adminDashboard": "Tableau de bord Admin",
     "closeMenu": "Fermer le menu",
@@ -58,29 +61,31 @@
     "mb": "+% MB",
     "sim": "(SIM)",
     "intent": {
-      "greeting": "Salut ! Que veux-tu faire aujourd'hui ?",
-      "greetingNamed": "Salut {name} ! Que veux-tu faire aujourd'hui ?",
+      "greeting": "Salut ! On fait quoi aujourd'hui ?",
+      "greetingNamed": "Salut {name} ! On fait quoi aujourd'hui ?",
       "question": "Choisis par où commencer : je te guide.",
       "back": "Retour",
-      "lockedHint": "Disponible en t'inscrivant gratuitement",
-      "subjectSubtitle": "Choisis la matière et je te donne le bon professeur.",
+      "lockedHint": "Demande à un grand de le débloquer",
+      "subjectSubtitle": "Choisis la matière et je t'amène le bon professeur.",
       "homework": {
-        "title": "Aide-moi à faire mes devoirs",
-        "subtitle": "Discussion avec photos, PDF, formules et recherche",
-        "contextMessage": "Salut ! J'ai besoin d'aide pour mes devoirs. Dis-moi ce qu'il te faut, et utilise photos, PDF ou formules si besoin."
+        "title": "Faire mes devoirs",
+        "subtitle": "Je t'aide pas à pas",
+        "contextMessage": "Salut ! J'ai besoin d'aide pour mes devoirs. Dis-moi ce qu'il te faut, et utilise photos, PDF ou formules si besoin.",
+        "subjectTitle": "Pour quoi as-tu besoin d'aide ?"
       },
       "study": {
-        "title": "Aide-moi à réviser",
-        "subtitle": "Carte mentale, résumé et cartes mémoire",
+        "title": "Réviser",
+        "subtitle": "Faisons une carte ensemble",
         "subjectTitle": "Que veux-tu étudier ?",
         "contextMessage": "Je veux étudier ce sujet. Aide-moi avec une carte mentale, puis un résumé, et enfin des cartes mémoire pour réviser."
       },
       "quizMe": {
-        "title": "Interroge-moi",
-        "subtitle": "Quiz et cartes mémoire interactives",
+        "title": "Mets-toi à l'épreuve",
+        "subtitle": "C'est moi qui pose les questions",
         "subjectTitle": "Sur quoi dois-je t’interroger ?",
         "contextMessage": "Je veux être interrogé sur ce sujet. Prépare un quiz et utilisons des cartes mémoire pour nous entraîner."
-      }
+      },
+      "subjectAny": "Je ne sais pas / Un peu de tout"
     },
     "subjects": {
       "mathematics": "Mathématiques",
