@@ -132,6 +132,13 @@
       "microphoneMutedStatus": "Microfono disattivato",
       "speakNowStatus": "Parla ora..."
     },
+    "errorTokenUnavailable": "Tu profesor no está disponible ahora mismo. ¡Inténtalo pronto!",
+    "errorServerTimeout": "Está tardando un poco. Revisa tu conexión e inténtalo de nuevo.",
+    "errorRateLimited": "Espera unos segundos e inténtalo de nuevo.",
+    "errorConfigUnavailable": "La voz no está disponible ahora. Inténtalo más tarde.",
+    "errorMicUnavailable": "No puedo usar el micrófono. Comprueba que esté conectado.",
+    "errorMicNotAllowed": "Para hablar, pide a un adulto que active el micrófono.",
+    "errorConnectionFailed": "Algo no funcionó con la voz. ¡Inténtalo pronto!",
     "configError": {
       "title": "Azure OpenAI Non Configurato",
       "subtitle": "La voce richiede Azure OpenAI Realtime",

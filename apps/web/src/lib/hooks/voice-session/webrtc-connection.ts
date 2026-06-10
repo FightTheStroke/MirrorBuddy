@@ -30,6 +30,7 @@ import {
   logVoiceError,
 } from './voice-error-logger';
 import { isVoiceCapabilityError } from './error-classification';
+import { VoiceError, getVoiceErrorCode } from './voice-error-codes';
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
 
@@ -147,9 +148,15 @@ export class WebRTCConnection {
         errorDetails: message,
         capabilityError,
       });
-      // Propagate a marked error to prevent duplicate Sentry events in upstream handlers
+      // Propagate a marked error to prevent duplicate Sentry events in upstream handlers.
+      // Preserve a VoiceErrorCode (if the root cause carried one) so the UI layer can
+      // map it to a localized, child-friendly message instead of showing raw text.
+      const code = getVoiceErrorCode(error);
       const wrappedError = new Error(message);
       (wrappedError as Error & { _voiceRootCause: boolean })._voiceRootCause = true;
+      if (code) {
+        (wrappedError as Error & { code: string }).code = code;
+      }
       this.config.onError?.(wrappedError);
       throw wrappedError;
     }
@@ -184,10 +191,10 @@ export class WebRTCConnection {
       if (!response.ok) {
         if (response.status === 429) {
           logVoiceError('ConfigFetchRateLimited', 'Rate limited by server');
-          throw new Error('Troppi tentativi di connessione. Attendi qualche secondo e riprova.');
+          throw new VoiceError('VOICE_RATE_LIMITED');
         }
         logVoiceError('ConfigFetchFailed', `Status: ${response.status}`);
-        throw new Error('Failed to get server config');
+        throw new VoiceError('VOICE_CONFIG_UNAVAILABLE');
       }
       this.serverConfig = await response.json();
       logger.debug('[WebRTC] Server config received', {
@@ -199,7 +206,7 @@ export class WebRTCConnection {
       clearTimeout(timeout);
       if (error instanceof DOMException && error.name === 'AbortError') {
         logVoiceError('ConfigFetchTimeout', 'Server config fetch timed out after 10s');
-        throw new Error('Connessione al server scaduta. Verifica la connessione internet.');
+        throw new VoiceError('VOICE_SERVER_TIMEOUT');
       }
       throw error;
     }
@@ -243,7 +250,7 @@ export class WebRTCConnection {
           'EphemeralTokenError',
           `Ephemeral token request failed: ${response.status} - ${errorBody.slice(0, 300)}`,
         );
-        throw new Error('Il tuo professore non è disponibile in questo momento. Riprova tra poco!');
+        throw new VoiceError('VOICE_TOKEN_UNAVAILABLE');
       }
       const data: EphemeralTokenResponse = await response.json();
       return data.token;
@@ -251,7 +258,7 @@ export class WebRTCConnection {
       clearTimeout(timeout);
       if (error instanceof DOMException && error.name === 'AbortError') {
         logVoiceError('TokenFetchTimeout', 'Ephemeral token fetch timed out after 10s');
-        throw new Error('Connessione al server scaduta. Verifica la connessione internet.');
+        throw new VoiceError('VOICE_SERVER_TIMEOUT');
       }
       throw error;
     }
@@ -263,7 +270,7 @@ export class WebRTCConnection {
         'MicrophoneNotAvailable',
         'getUserMedia not available - HTTPS/localhost required',
       );
-      throw new Error('Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.');
+      throw new VoiceError('MIC_UNAVAILABLE');
     }
 
     // Priority 1 Fix: Minimal iOS Audio Constraints (Safari iOS compatibility)
