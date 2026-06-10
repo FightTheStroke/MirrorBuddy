@@ -79,14 +79,17 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Focus management: move focus to main content heading when view changes
+  // Focus management: announce view changes to SR without disrupting Tab order.
+  // Keep tabindex=-1 on the heading so it stays focusable via focus() but is
+  // never in the natural Tab sequence. Removing the attribute while the element
+  // has focus causes browsers to move focus to BODY (keyboard trap bug).
   useEffect(() => {
     if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
-      const mainHeading = mainContentRef.current.querySelector('h1:not(.sr-only), h2');
-      if (mainHeading instanceof HTMLElement) {
-        mainHeading.setAttribute('tabindex', '-1');
+      const mainHeading = mainContentRef.current.querySelector<HTMLElement>(
+        'h1:not(.sr-only), h2[tabindex="-1"]',
+      );
+      if (mainHeading) {
         mainHeading.focus();
-        mainHeading.removeAttribute('tabindex');
       }
     }
   }, [currentView, isHydrated, hasCompletedOnboarding]);
