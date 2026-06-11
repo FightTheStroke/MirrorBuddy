@@ -12,22 +12,6 @@ export const LazyMaestroSession = dynamic(
   { loading: () => <SessionSkeleton />, ssr: false },
 );
 
-export const LazyCharacterChatView = dynamic(
-  () =>
-    import('@/components/conversation/character-chat-view').then((m) => ({
-      default: m.CharacterChatView,
-    })),
-  { loading: () => <SessionSkeleton />, ssr: false },
-);
-
-export const LazyAstuccioView = dynamic(
-  () =>
-    import('@/app/[locale]/astuccio/components/astuccio-view').then((m) => ({
-      default: m.AstuccioView,
-    })),
-  { loading: () => <ViewSkeleton />, ssr: false },
-);
-
 export const LazyZainoView = dynamic(
   () =>
     import('@/app/[locale]/supporti/components/zaino-view').then((m) => ({

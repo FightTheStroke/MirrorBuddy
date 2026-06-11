@@ -1,10 +1,7 @@
 export type View =
   | 'intent'
-  | 'coach'
-  | 'buddy'
   | 'maestri'
   | 'maestro-session'
-  | 'astuccio'
   | 'supporti'
   | 'calendar'
   | 'progress'

@@ -111,6 +111,20 @@ describe('useTrialToasts', () => {
     );
   });
 
+  it('suppresses all promo toasts in distraction-free mode (A11Y-05)', () => {
+    const { rerender } = renderHook(
+      (props: { status: TrialStatus; suppress: boolean }) =>
+        useTrialToasts(props.status, { suppress: props.suppress }),
+      { initialProps: { status: { ...baseStatus, chatsRemaining: 1 }, suppress: true } },
+    );
+    // No welcome toast on first visit while suppressed.
+    expect(mockToast.info).not.toHaveBeenCalled();
+    // No threshold toast even when crossing the exhausted boundary.
+    rerender({ status: { ...baseStatus, chatsRemaining: 0 }, suppress: true });
+    expect(mockToast.error).not.toHaveBeenCalled();
+    expect(mockToast.warning).not.toHaveBeenCalled();
+  });
+
   it('shows a localized error and tracks limit hit when messages run out', () => {
     const { rerender } = renderHook((props: TrialStatus) => useTrialToasts(props), {
       initialProps: { ...baseStatus, chatsRemaining: 1 },

@@ -102,7 +102,7 @@ export function HomeHeader({
             href="/invite/request"
             data-testid="trial-badge"
             className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
+              'flex items-center gap-2 min-h-[44px] px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
               trialStatus.chatsRemaining <= 3
                 ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40'
                 : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40',

@@ -76,6 +76,7 @@ export function HomeSidebar({
         key={item.id}
         data-testid={`home-nav-${item.id}`}
         onClick={() => handleViewChange(item.id)}
+        aria-current={isActive ? 'page' : undefined}
         className={cn(
           'w-full flex items-center gap-3 rounded-xl transition-all',
           isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
@@ -199,7 +200,11 @@ export function HomeSidebar({
               {open && (
                 <div className="flex flex-col gap-1 mt-2">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm" className="w-full justify-start text-xs">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full min-h-[44px] justify-start text-xs"
+                    >
                       <LogIn className="w-3 h-3 mr-2" />
                       {t('sidebar.login')}
                     </Button>
@@ -208,7 +213,7 @@ export function HomeSidebar({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
+                      className="w-full min-h-[44px] justify-start text-xs text-purple-600 dark:text-purple-400"
                     >
                       <UserPlus className="w-3 h-3 mr-2" />
                       {t('sidebar.requestAccess')}
@@ -267,6 +272,7 @@ export function HomeSidebar({
           {/* Parent Access Button */}
           <button
             onClick={onParentAccess}
+            aria-label={t('sidebar.parentArea')}
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl',
               'bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50',
@@ -276,7 +282,7 @@ export function HomeSidebar({
               'relative',
             )}
           >
-            <span className="relative">
+            <span className="relative" aria-hidden="true">
               👥
               {hasNewInsights && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />

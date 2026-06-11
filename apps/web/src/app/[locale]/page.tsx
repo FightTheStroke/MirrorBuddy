@@ -19,6 +19,7 @@ import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { useTrialStatus } from '@/lib/hooks/use-trial-status';
 import { useTrialToasts } from '@/lib/hooks/use-trial-toasts';
+import { useAccessibilityStore } from '@/lib/accessibility';
 import { getUserIdFromCookie } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import type { Maestro, ToolType } from '@/types';
@@ -31,13 +32,7 @@ import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
 import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
 import type { View, MaestroSessionMode } from './types';
-import {
-  LazyMaestroSession,
-  LazyCharacterChatView,
-  LazyAstuccioView,
-  LazyZainoView,
-  HomeShellSkeleton,
-} from './home-lazy';
+import { LazyMaestroSession, LazyZainoView, HomeShellSkeleton } from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
 
@@ -97,7 +92,11 @@ export default function Home() {
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const trialStatus = useTrialStatus();
-  useTrialToasts(trialStatus);
+  // A11Y-05: ADHD/autism profiles set distractionFreeMode. In the child (student)
+  // space this hides non-essential promo surfaces (trial banner, usage dashboard,
+  // trial toasts) so the only thing on screen is the learning flow.
+  const distractionFreeMode = useAccessibilityStore((state) => state.settings.distractionFreeMode);
+  useTrialToasts(trialStatus, { suppress: distractionFreeMode });
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -124,15 +123,6 @@ export default function Home() {
     setCurrentView(newView);
   };
 
-  const handleToolRequest = (toolType: ToolType, maestro: Maestro) => {
-    setRequestedToolType(toolType);
-    setSelectedMaestro(maestro);
-    setMaestroSessionMode('chat');
-    setSessionContextMessage(undefined);
-    setMaestroSessionKey((prev) => prev + 1);
-    setCurrentView('maestro-session');
-  };
-
   // Intention-based entry: each intent resolves to a Maestro (auto-selected by
   // subject) and opens a session pre-framed with a context message. The
   // student never picks a professor from the 26-Maestri grid.
@@ -152,8 +142,6 @@ export default function Home() {
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
   const seasonName = currentSeason?.name || t('seasonDefault');
-  const selectedCoach = studentProfile?.preferredCoach || 'melissa';
-  const selectedBuddy = studentProfile?.preferredBuddy || 'mario';
 
   // Child space: only three friendly destinations. The 26-Maestri grid, the
   // coach/buddy character chats and the standalone tools launcher are
@@ -189,8 +177,7 @@ export default function Home() {
     },
   ];
 
-  const isSessionActive =
-    currentView === 'maestro-session' || currentView === 'coach' || currentView === 'buddy';
+  const isSessionActive = currentView === 'maestro-session';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 overflow-x-hidden">
@@ -213,25 +200,6 @@ export default function Home() {
           />
         </div>
       )}
-      {currentView === 'coach' && (
-        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView
-            characterId={selectedCoach}
-            characterType="coach"
-            onClose={() => setCurrentView('maestri')}
-          />
-        </div>
-      )}
-      {currentView === 'buddy' && (
-        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView
-            characterId={selectedBuddy}
-            characterType="buddy"
-            onClose={() => setCurrentView('maestri')}
-          />
-        </div>
-      )}
-
       {/* Hide header and sidebar during full-screen sessions */}
       {!isSessionActive && (
         <>
@@ -272,8 +240,8 @@ export default function Home() {
           ref={mainContentRef}
         >
           <main className="flex-1">
-            {/* Trial mode banner */}
-            {trialStatus.isTrialMode && !trialStatus.isLoading && (
+            {/* Trial mode banner — suppressed in distraction-free mode (A11Y-05) */}
+            {trialStatus.isTrialMode && !trialStatus.isLoading && !distractionFreeMode && (
               <TrialHomeBanner
                 chatsRemaining={trialStatus.chatsRemaining}
                 maxChats={trialStatus.maxChats}
@@ -301,7 +269,6 @@ export default function Home() {
                   }}
                 />
               )}
-              {currentView === 'astuccio' && <LazyAstuccioView onToolRequest={handleToolRequest} />}
               {currentView === 'supporti' && <LazyZainoView />}
               {currentView === 'calendar' && <LazyCalendarView />}
               {currentView === 'progress' && <LazyProgressView />}
@@ -310,8 +277,9 @@ export default function Home() {
             </motion.div>
           </main>
 
-          {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
-          {trialStatus.isTrialMode && !trialStatus.isLoading && (
+          {/* Trial usage dashboard sidebar - visible only in trial mode on lg
+              screens, and never in distraction-free mode (A11Y-05) */}
+          {trialStatus.isTrialMode && !trialStatus.isLoading && !distractionFreeMode && (
             <aside className="w-80 hidden lg:block flex-shrink-0">
               <TrialUsageDashboard />
             </aside>

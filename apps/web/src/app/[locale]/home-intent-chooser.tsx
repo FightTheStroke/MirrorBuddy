@@ -203,13 +203,21 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
         {INTENT_CARDS.map((card) => {
           const unlocked = isIntentUnlocked(card);
           const Icon = card.icon;
+          const hintId = `intent-locked-hint-${card.intent}`;
           return (
             <li key={card.intent}>
               <button
                 type="button"
                 data-testid={`intent-card-${card.intent}`}
-                disabled={!unlocked || isLoading}
+                // While tier is loading, the card is genuinely inert (nothing to
+                // announce yet) → real `disabled`. Once we KNOW it is tier-locked,
+                // keep it focusable with `aria-disabled` so screen-reader and
+                // keyboard users can Tab to it and hear WHY it is locked
+                // (WCAG 2.1 — discoverable state). The click handler still refuses
+                // to start a session for locked cards.
+                disabled={isLoading}
                 aria-disabled={!unlocked || isLoading}
+                aria-describedby={!unlocked ? hintId : undefined}
                 onClick={() => handleIntentSelect(card)}
                 className={cn(
                   'group relative w-full h-full min-h-[160px] text-left rounded-2xl border p-6 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed',
@@ -243,7 +251,10 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                   {t(`intent.${card.intent}.subtitle`)}
                 </p>
                 {!unlocked && (
-                  <p className="mt-3 text-xs font-medium text-amber-700 dark:text-amber-400">
+                  <p
+                    id={hintId}
+                    className="mt-3 text-xs font-medium text-amber-700 dark:text-amber-400"
+                  >
                     {t('intent.lockedHint')}
                   </p>
                 )}

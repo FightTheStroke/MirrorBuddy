@@ -25,14 +25,24 @@ const SHOWN_KEY = 'mirrorbuddy-trial-toast-shown';
  * - Warning toast when 3 messages remaining
  * - Critical toast when 1 message remaining
  */
-export function useTrialToasts(trialStatus: TrialStatus) {
+interface UseTrialToastsOptions {
+  /**
+   * When true (ADHD/autism distractionFreeMode, A11Y-05) the promotional trial
+   * toasts are silenced — they are non-essential surfaces that interrupt the
+   * learning flow. Usage counters still update elsewhere; only the pop-ups stop.
+   */
+  suppress?: boolean;
+}
+
+export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToastsOptions = {}) {
   const router = useRouter();
   const t = useTranslations('auth');
   const previousRemaining = useRef<number | null>(null);
   const hasShownWelcome = useRef(false);
+  const { suppress = false } = options;
 
   useEffect(() => {
-    if (trialStatus.isLoading || !trialStatus.isTrialMode) return;
+    if (trialStatus.isLoading || !trialStatus.isTrialMode || suppress) return;
 
     // Show welcome toast once per session
     if (!hasShownWelcome.current) {
@@ -106,5 +116,5 @@ export function useTrialToasts(trialStatus: TrialStatus) {
     }
 
     previousRemaining.current = curr;
-  }, [trialStatus, router, t]);
+  }, [trialStatus, router, t, suppress]);
 }
