@@ -15,6 +15,23 @@ interface TrialStatus {
   visitorId?: string;
 }
 
+/**
+ * ADR 0015 derogation (TD-05): the "welcome toast already shown" flag lives in
+ * `sessionStorage`, not the DB or a Zustand store. This is intentional and the
+ * lowest-risk option:
+ * - ADR 0015 ("No localStorage") governs *durable user data* (settings,
+ *   progress, conversations, materials) that must survive devices/sessions and
+ *   has a server-side source of truth. This flag is the opposite: ephemeral,
+ *   per-session, device-local UI state with zero durable value.
+ * - We *want* it scoped to the session: the welcome toast should re-appear in a
+ *   new tab/session. `sessionStorage` gives exactly that lifetime for free.
+ * - A Zustand store would be worse here: in-memory state is wiped on a full
+ *   page reload, so the toast would re-fire on every refresh within the same
+ *   session. `sessionStorage` survives reloads but not new sessions — the
+ *   precise semantics we need.
+ * No persistence, no PII, no cross-device expectation → DB/REST round-trip
+ * would add latency and complexity for no benefit.
+ */
 const SHOWN_KEY = 'mirrorbuddy-trial-toast-shown';
 
 /**
