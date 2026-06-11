@@ -65,7 +65,7 @@
       "greetingNamed": "Hallo {name}! Was machen wir heute?",
       "question": "Wähle, wo du starten möchtest: Ich begleite dich.",
       "back": "Zurück",
-      "lockedHint": "Bitte einen Erwachsenen, es freizuschalten",
+      "lockedHint": "Bitte einen Erwachsenen, es zu öffnen",
       "subjectSubtitle": "Wähle das Fach und ich hole den passenden Professor.",
       "homework": {
         "title": "Hausaufgaben machen",
@@ -88,7 +88,7 @@
       "subjectAny": "Weiß ich nicht / Ein bisschen von allem",
       "ttsCardLabel": "Anhören: {label}",
       "lockedDialog": {
-        "title": "Bitte einen Erwachsenen, es freizuschalten",
+        "title": "Bitte einen Erwachsenen, es zu öffnen",
         "body": "Diese Aktivität ist mit einem Schloss gesperrt. Ruf Mama, Papa oder deine Lehrerin: Sie können sie für dich öffnen!",
         "listen": "Anhören",
         "gotIt": "Verstanden"

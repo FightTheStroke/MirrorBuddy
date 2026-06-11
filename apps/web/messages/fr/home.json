@@ -65,7 +65,7 @@
       "greetingNamed": "Salut {name} ! On fait quoi aujourd'hui ?",
       "question": "Choisis par où commencer : je te guide.",
       "back": "Retour",
-      "lockedHint": "Demande à un grand de le débloquer",
+      "lockedHint": "Demande à un grand de l’ouvrir",
       "subjectSubtitle": "Choisis la matière et je t'amène le bon professeur.",
       "homework": {
         "title": "Faire mes devoirs",
@@ -88,7 +88,7 @@
       "subjectAny": "Je ne sais pas / Un peu de tout",
       "ttsCardLabel": "Écouter : {label}",
       "lockedDialog": {
-        "title": "Demande à un grand de la débloquer",
+        "title": "Demande à un grand de l’ouvrir",
         "body": "Cette activité est fermée avec un cadenas. Appelle maman, papa ou la maîtresse : ils peuvent l'ouvrir pour toi !",
         "listen": "Écouter",
         "gotIt": "Compris"

@@ -65,7 +65,7 @@
       "greetingNamed": "¡Hola {name}! ¿Qué hacemos hoy?",
       "question": "Elige por dónde empezar: yo te guío.",
       "back": "Atrás",
-      "lockedHint": "Pide a un adulto que lo desbloquee",
+      "lockedHint": "Pide a un mayor que lo abra",
       "subjectSubtitle": "Elige la asignatura y te traigo el profesor adecuado.",
       "homework": {
         "title": "Hacer los deberes",
@@ -88,7 +88,7 @@
       "subjectAny": "No lo sé / Un poco de todo",
       "ttsCardLabel": "Escuchar: {label}",
       "lockedDialog": {
-        "title": "Pide a un mayor que lo desbloquee",
+        "title": "Pide a un mayor que lo abra",
         "body": "Esta actividad tiene un candado. Llama a mamá, papá o a tu profe: ¡pueden abrirla por ti!",
         "listen": "Escuchar",
         "gotIt": "Entendido"

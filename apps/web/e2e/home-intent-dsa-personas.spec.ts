@@ -322,7 +322,7 @@ test.describe('Elena, 13 — Deaf (auditory profile)', () => {
     // lock reason on gated cards.
     await expect(page.getByTestId('intent-card-homework')).toContainText('Fare i compiti');
     await expect(page.getByTestId('intent-card-study')).toContainText(
-      'Chiedi a un grande di sbloccarlo',
+      'Chiedi a un grande di aprirla',
     );
   });
 

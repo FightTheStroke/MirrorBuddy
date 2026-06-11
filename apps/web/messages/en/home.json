@@ -65,7 +65,7 @@
       "greetingNamed": "Hi {name}! What shall we do today?",
       "question": "Pick where to start: I'll guide you.",
       "back": "Back",
-      "lockedHint": "Ask a grown-up to unlock it",
+      "lockedHint": "Ask a grown-up to open it",
       "subjectSubtitle": "Pick a subject and I'll bring the right professor.",
       "homework": {
         "title": "Do my homework",
@@ -88,7 +88,7 @@
       "subjectAny": "I don't know / A bit of everything",
       "ttsCardLabel": "Listen: {label}",
       "lockedDialog": {
-        "title": "Ask a grown-up to unlock it",
+        "title": "Ask a grown-up to open it",
         "body": "This activity has a lock on it. Call mum, dad or your teacher: they can open it for you!",
         "listen": "Listen",
         "gotIt": "Got it"
