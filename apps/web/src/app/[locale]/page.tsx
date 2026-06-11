@@ -31,7 +31,7 @@ import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
 import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
-import type { View, MaestroSessionMode } from './types';
+import type { View, MaestroSessionMode, Intent } from './types';
 import { LazyMaestroSession, LazyZainoView, HomeShellSkeleton } from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
@@ -59,6 +59,11 @@ export default function Home() {
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
   const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
   const [sessionContextMessage, setSessionContextMessage] = useState<string | undefined>(undefined);
+  // UX-01: the intent + subject that opened the session, for the child-first
+  // handoff banner ("Buddy ti ha portato dal Prof X"). undefined when a session
+  // is opened directly from the grown-ups Maestri grid (no handoff to explain).
+  const [sessionIntent, setSessionIntent] = useState<Intent | undefined>(undefined);
+  const [sessionSubjectLabel, setSessionSubjectLabel] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const handleResize = () => {
@@ -131,6 +136,8 @@ export default function Home() {
     setMaestroSessionMode(start.mode);
     setRequestedToolType(start.requestedToolType);
     setSessionContextMessage(start.contextMessage);
+    setSessionIntent(start.intent);
+    setSessionSubjectLabel(start.subjectLabel);
     setMaestroSessionKey((prev) => prev + 1);
     setCurrentView('maestro-session');
   };
@@ -193,10 +200,14 @@ export default function Home() {
               setCurrentView('intent');
               setRequestedToolType(undefined);
               setSessionContextMessage(undefined);
+              setSessionIntent(undefined);
+              setSessionSubjectLabel(undefined);
             }}
             initialMode={maestroSessionMode}
             requestedToolType={requestedToolType}
             contextMessage={sessionContextMessage}
+            intent={sessionIntent}
+            subjectLabel={sessionSubjectLabel}
           />
         </div>
       )}
@@ -264,6 +275,9 @@ export default function Home() {
                     setSelectedMaestro(maestro);
                     setMaestroSessionMode(mode);
                     setSessionContextMessage(undefined);
+                    // Grid (grown-ups) entry: no intent handoff to explain.
+                    setSessionIntent(undefined);
+                    setSessionSubjectLabel(undefined);
                     setMaestroSessionKey((prev) => prev + 1);
                     setCurrentView('maestro-session');
                   }}

@@ -565,6 +565,18 @@
     "citazioneMotivazionale": "Citazione motivazionale",
     "quoteIndicators": "Quote indicators",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}"
+    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "intentHandoff": {
+      "headline": "Ich habe dich zu Prof. {name} für {intent} gebracht.",
+      "headlineSubject": "Ich habe dich zu Prof. {name} für {subject} gebracht.",
+      "contextHint": "Ich habe die Frage schon für dich geschrieben: Drück Enter, wenn du bereit bist, oder ändere sie, wie du willst.",
+      "intent": {
+        "homework": "die Hausaufgaben",
+        "study": "Lernen",
+        "quizMe": "ein kleines Quiz"
+      },
+      "listen": "Nachricht anhören",
+      "dismiss": "Verstanden, schließen"
+    }
   }
 }

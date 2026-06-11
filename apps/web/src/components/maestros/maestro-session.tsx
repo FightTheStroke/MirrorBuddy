@@ -20,7 +20,9 @@ import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
 import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
+import { MaestroSessionHandoff } from './maestro-session-handoff';
 import { MaestroSessionMessages } from './maestro-session-messages';
+import type { Intent } from '@/app/[locale]/types';
 import { MaestroSessionInput } from './maestro-session-input';
 import { MaestroSessionWebcam } from './maestro-session-webcam';
 import { cn } from '@/lib/utils';
@@ -41,6 +43,10 @@ interface MaestroSessionProps {
   initialMode?: 'voice' | 'chat';
   requestedToolType?: ToolType;
   contextMessage?: string;
+  /** The intent that opened this session (drives the UX-01 handoff banner). */
+  intent?: Intent;
+  /** Localized subject label chosen by the child, for the handoff banner. */
+  subjectLabel?: string;
 }
 
 export function MaestroSession({
@@ -49,6 +55,8 @@ export function MaestroSession({
   initialMode = 'voice',
   requestedToolType,
   contextMessage,
+  intent,
+  subjectLabel,
 }: MaestroSessionProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -256,6 +264,19 @@ export function MaestroSession({
         }
         showRightPanel={isVoiceActive || isHistoryOpen}
       >
+        {/* UX-01/UX-07: child-first handoff banner. Only when arriving via an
+            intent (grid entry passes no intent) and before the child has sent
+            anything (it explains who they are talking to + the pre-filled
+            question). Lives above the first message; never steals focus. */}
+        {intent && messages.length === 0 && (
+          <MaestroSessionHandoff
+            maestroName={maestro.displayName ?? maestro.name}
+            intent={intent}
+            subjectLabel={subjectLabel}
+            hasContextMessage={Boolean(contextMessage)}
+          />
+        )}
+
         {/* Messages area - scrollable */}
         <MaestroSessionMessages
           messages={messages}

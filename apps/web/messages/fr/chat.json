@@ -565,6 +565,18 @@
     "citazioneMotivazionale": "Citazione motivazionale",
     "quoteIndicators": "Quote indicators",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}"
+    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "intentHandoff": {
+      "headline": "Je t'ai emmené chez le Prof. {name} pour {intent}.",
+      "headlineSubject": "Je t'ai emmené chez le Prof. {name} pour {subject}.",
+      "contextHint": "J'ai déjà écrit la question pour toi : appuie sur entrée quand tu es prêt, ou modifie-la comme tu veux.",
+      "intent": {
+        "homework": "les devoirs",
+        "study": "réviser",
+        "quizMe": "un petit quiz"
+      },
+      "listen": "Écouter le message",
+      "dismiss": "Compris, fermer"
+    }
   }
 }

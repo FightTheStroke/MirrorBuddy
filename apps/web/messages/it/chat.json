@@ -197,6 +197,18 @@
       "decline": "No grazie",
       "accept": "Parla con {name}"
     },
+    "intentHandoff": {
+      "headline": "Ti ho portato dal Prof. {name} per {intent}.",
+      "headlineSubject": "Ti ho portato dal Prof. {name} per {subject}.",
+      "contextHint": "Ho già scritto la domanda per te: premi invio quando sei pronto, oppure cambiala come vuoi.",
+      "intent": {
+        "homework": "i compiti",
+        "study": "studiare",
+        "quizMe": "metterti alla prova"
+      },
+      "listen": "Ascolta il messaggio",
+      "dismiss": "Ho capito, chiudi"
+    },
     "loading": "Caricamento...",
     "error": "Errore nel caricamento della chat",
     "newChat": "Nuova chat",
