@@ -85,7 +85,14 @@
         "subjectTitle": "¿Sobre qué quieres que te examine?",
         "contextMessage": "Quiero que me examinen sobre este tema. Prepara un cuestionario y usemos tarjetas para practicar."
       },
-      "subjectAny": "No lo sé / Un poco de todo"
+      "subjectAny": "No lo sé / Un poco de todo",
+      "ttsCardLabel": "Escuchar: {label}",
+      "lockedDialog": {
+        "title": "Pide a un mayor que lo desbloquee",
+        "body": "Esta actividad tiene un candado. Llama a mamá, papá o a tu profe: ¡pueden abrirla por ti!",
+        "listen": "Escuchar",
+        "gotIt": "Entendido"
+      }
     },
     "subjects": {
       "mathematics": "Matemáticas",

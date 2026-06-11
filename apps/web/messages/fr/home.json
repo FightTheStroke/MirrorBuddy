@@ -85,7 +85,14 @@
         "subjectTitle": "Sur quoi dois-je t’interroger ?",
         "contextMessage": "Je veux être interrogé sur ce sujet. Prépare un quiz et utilisons des cartes mémoire pour nous entraîner."
       },
-      "subjectAny": "Je ne sais pas / Un peu de tout"
+      "subjectAny": "Je ne sais pas / Un peu de tout",
+      "ttsCardLabel": "Écouter : {label}",
+      "lockedDialog": {
+        "title": "Demande à un grand de la débloquer",
+        "body": "Cette activité est fermée avec un cadenas. Appelle maman, papa ou la maîtresse : ils peuvent l'ouvrir pour toi !",
+        "listen": "Écouter",
+        "gotIt": "Compris"
+      }
     },
     "subjects": {
       "mathematics": "Mathématiques",

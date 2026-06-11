@@ -45,6 +45,33 @@ test('shows three intents — homework unlocked, study/quizMe gated for trial', 
   await expect(study).toBeFocused();
 });
 
+test('tapping a locked intent opens the child-friendly "ask a grown-up" dialog (UX-03)', async ({
+  page,
+}) => {
+  await gotoHome(page);
+  const study = page.getByTestId('intent-card-study');
+  await expect(study).toHaveAttribute('aria-disabled', 'true');
+  // The card is not natively disabled (A11Y-03) but exposes aria-disabled, which
+  // Playwright treats as "disabled" and refuses to auto-click. Dispatch the DOM
+  // click directly — aria-disabled does not block React's onClick handler. We
+  // poll the dispatch so the very first render (tier still settling its closure)
+  // can't swallow a single one-shot event.
+  const dialog = page.getByTestId('intent-locked-dialog');
+  await expect(async () => {
+    await study.dispatchEvent('click');
+    await expect(dialog).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 10000 });
+  // Child-first copy, no prices / Stripe / upgrade CTA in the child space.
+  await expect(dialog).toContainText('Chiedi a un grande');
+  await expect(dialog).not.toContainText('9.99');
+  await expect(dialog).not.toContainText('Pro');
+  // It does NOT open a session.
+  await expect(page.locator('#intent-subject-heading')).toHaveCount(0);
+  // And it is dismissible.
+  await page.getByTestId('intent-locked-dialog-close').click();
+  await expect(dialog).toHaveCount(0);
+});
+
 test('homework opens a child-safe subject picker with an "I do not know" option', async ({
   page,
 }) => {

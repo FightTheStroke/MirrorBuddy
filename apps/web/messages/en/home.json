@@ -85,7 +85,14 @@
         "subjectTitle": "What should I quiz you on?",
         "contextMessage": "I want to be quizzed on this topic. Prepare a quiz and let’s use flashcards to practice."
       },
-      "subjectAny": "I don't know / A bit of everything"
+      "subjectAny": "I don't know / A bit of everything",
+      "ttsCardLabel": "Listen: {label}",
+      "lockedDialog": {
+        "title": "Ask a grown-up to unlock it",
+        "body": "This activity has a lock on it. Call mum, dad or your teacher: they can open it for you!",
+        "listen": "Listen",
+        "gotIt": "Got it"
+      }
     },
     "subjects": {
       "mathematics": "Mathematics",

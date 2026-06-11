@@ -3,10 +3,20 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
-import { BookOpenCheck, Map, Target, Lock, ArrowLeft } from 'lucide-react';
+import { BookOpenCheck, Map, Target, Lock, ArrowLeft, Volume2 } from 'lucide-react';
 import type { ToolType, Subject, Maestro } from '@/types';
 import { getAllSubjects, getMaestriBySubject } from '@/data/maestri';
 import { useTierFeatures } from '@/hooks/useTierFeatures';
+import { useTTS } from '@/components/accessibility';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Intent, MaestroSessionMode } from './types';
 
@@ -16,7 +26,43 @@ export interface IntentStart {
   mode: MaestroSessionMode;
   requestedToolType?: ToolType;
   contextMessage: string;
+  /** Subject chosen by the child (undefined for the "I don't know" host). */
+  subject?: Subject;
+  /** Localized subject label for the handoff banner (UX-01). */
+  subjectLabel?: string;
 }
+
+/**
+ * Per-subject emoji (UX-04). Recognition-before-reading helps dyslexic readers
+ * scan the picker visually instead of decoding ~18 text labels. Emoji are
+ * locale-neutral so they live here, not in the i18n catalog. Covers every
+ * Subject key; child-excluded ones (supercazzola/economics/…) are listed for
+ * completeness but never render.
+ */
+const SUBJECT_EMOJI: Partial<Record<Subject, string>> = {
+  mathematics: '🔢',
+  physics: '🧲',
+  chemistry: '⚗️',
+  biology: '🌱',
+  history: '🏛️',
+  geography: '🗺️',
+  italian: '📖',
+  english: '🇬🇧',
+  spanish: '🇪🇸',
+  french: '🇫🇷',
+  german: '🇩🇪',
+  art: '🎨',
+  music: '🎵',
+  civics: '⚖️',
+  computerScience: '💻',
+  health: '❤️',
+  storytelling: '📚',
+  sport: '⚽',
+  economics: '💰',
+  philosophy: '🤔',
+  internationalLaw: '🌍',
+  supercazzola: '🎭',
+};
 
 interface HomeIntentChooserProps {
   userName?: string;
@@ -64,7 +110,12 @@ const EXCLUDED_CHILD_SUBJECTS: ReadonlySet<Subject> = new Set<Subject>([
 export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps) {
   const t = useTranslations('home');
   const { hasFeature, isLoading } = useTierFeatures();
+  const { speak, enabled: ttsEnabled } = useTTS();
   const [pendingIntent, setPendingIntent] = useState<Intent | null>(null);
+  // UX-03: tapping a tier-locked card opens a child-friendly "ask a grown-up"
+  // dialog instead of doing nothing. Holds the locked intent's title so the
+  // dialog can name what the child tried to open.
+  const [lockedDialogTitle, setLockedDialogTitle] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -92,14 +143,19 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
     !card.featureKey || hasFeature(card.featureKey);
 
   const handleIntentSelect = (card: IntentCardConfig) => {
-    if (!isIntentUnlocked(card)) return;
+    if (!isIntentUnlocked(card)) {
+      // UX-03: locked cards no longer fall silently inert. Show a child-first
+      // dialog ("ask a grown-up") — no prices, no Stripe, no adult copy.
+      setLockedDialogTitle(t(`intent.${card.intent}.title`));
+      return;
+    }
     // Every intent now goes through the subject step. This removes the old
     // "homework always opened the maths Maestro" bug: the child tells us the
     // subject (or picks "I don't know") and we open the right Maestro.
     setPendingIntent(card.intent);
   };
 
-  const openSession = (intent: Intent, maestro: Maestro) => {
+  const openSession = (intent: Intent, maestro: Maestro, subject?: Subject) => {
     const requestedToolType: ToolType | undefined =
       intent === 'study' ? 'mindmap' : intent === 'quizMe' ? 'quiz' : undefined;
     onStart({
@@ -108,13 +164,15 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
       mode: 'chat',
       requestedToolType,
       contextMessage: t(`intent.${intent}.contextMessage`),
+      subject,
+      subjectLabel: subject ? t(`subjects.${subject}`) : undefined,
     });
   };
 
   const handleSubjectSelect = (subject: Subject) => {
     const maestro = getMaestriBySubject(subject)[0];
     if (!maestro || !pendingIntent) return;
-    openSession(pendingIntent, maestro);
+    openSession(pendingIntent, maestro, subject);
   };
 
   // Homework only: the child taps "I don't know / a bit of everything". We open
@@ -123,6 +181,14 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
     const host = getAllMaestriHost();
     if (!host || pendingIntent !== 'homework') return;
     openSession('homework', host);
+  };
+
+  // UX-02: read a card aloud on demand. Only wired when the child's profile has
+  // TTS enabled; never auto-fires and never moves focus (stopPropagation keeps
+  // the parent card from activating, preserving the keyboard path).
+  const handleSpeak = (text: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    speak(text);
   };
 
   // --- Step 2: subject picker -------------------------------------------------
@@ -163,18 +229,41 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
           </button>
         )}
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 list-none p-0">
-          {subjects.map((subject) => (
-            <li key={subject}>
-              <button
-                type="button"
-                data-testid={`subject-${subject}`}
-                onClick={() => handleSubjectSelect(subject)}
-                className="w-full min-h-[44px] px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
-              >
-                {t(`subjects.${subject}`)}
-              </button>
-            </li>
-          ))}
+          {subjects.map((subject) => {
+            const subjectLabel = t(`subjects.${subject}`);
+            const emoji = SUBJECT_EMOJI[subject];
+            return (
+              <li key={subject} className="relative">
+                <button
+                  type="button"
+                  data-testid={`subject-${subject}`}
+                  onClick={() => handleSubjectSelect(subject)}
+                  className={cn(
+                    'w-full min-h-[44px] px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed flex items-center gap-2',
+                    ttsEnabled && 'pr-12',
+                  )}
+                >
+                  {emoji && (
+                    <span className="text-xl leading-none" aria-hidden="true">
+                      {emoji}
+                    </span>
+                  )}
+                  <span>{subjectLabel}</span>
+                </button>
+                {ttsEnabled && (
+                  <button
+                    type="button"
+                    data-testid={`tts-subject-${subject}`}
+                    onClick={handleSpeak(subjectLabel)}
+                    aria-label={t('intent.ttsCardLabel', { label: subjectLabel })}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-lg text-accent-themed hover:bg-accent-themed/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
+                  >
+                    <Volume2 className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </motion.section>
     );
@@ -204,8 +293,10 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
           const unlocked = isIntentUnlocked(card);
           const Icon = card.icon;
           const hintId = `intent-locked-hint-${card.intent}`;
+          const cardTitle = t(`intent.${card.intent}.title`);
+          const cardSubtitle = t(`intent.${card.intent}.subtitle`);
           return (
-            <li key={card.intent}>
+            <li key={card.intent} className="relative">
               <button
                 type="button"
                 data-testid={`intent-card-${card.intent}`}
@@ -245,11 +336,9 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                   )}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
-                  {t(`intent.${card.intent}.title`)}
+                  {cardTitle}
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  {t(`intent.${card.intent}.subtitle`)}
-                </p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{cardSubtitle}</p>
                 {!unlocked && (
                   <p
                     id={hintId}
@@ -259,10 +348,66 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                   </p>
                 )}
               </button>
+              {ttsEnabled && (
+                <button
+                  type="button"
+                  data-testid={`tts-intent-${card.intent}`}
+                  onClick={handleSpeak(`${cardTitle}. ${cardSubtitle}`)}
+                  aria-label={t('intent.ttsCardLabel', { label: cardTitle })}
+                  className="absolute right-3 bottom-3 inline-flex items-center justify-center w-11 h-11 rounded-xl text-accent-themed bg-white/80 dark:bg-slate-900/60 hover:bg-accent-themed/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
+                >
+                  <Volume2 className="h-5 w-5" aria-hidden="true" />
+                </button>
+              )}
             </li>
           );
         })}
       </ul>
+
+      {/* UX-03: child-friendly tier-lock dialog (no prices, no Stripe). */}
+      <Dialog
+        open={lockedDialogTitle !== null}
+        onOpenChange={(open) => !open && setLockedDialogTitle(null)}
+      >
+        <DialogContent
+          data-testid="intent-locked-dialog"
+          className="max-w-md text-center sm:rounded-2xl"
+        >
+          <DialogHeader className="items-center text-center sm:text-center">
+            <span className="text-5xl mb-2" aria-hidden="true">
+              🔒
+            </span>
+            <DialogTitle className="text-xl">{t('intent.lockedDialog.title')}</DialogTitle>
+            <DialogDescription className="text-base text-slate-600 dark:text-slate-300">
+              {t('intent.lockedDialog.body')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            {ttsEnabled && (
+              <Button
+                type="button"
+                variant="outline"
+                data-testid="intent-locked-dialog-tts"
+                onClick={() =>
+                  speak(`${t('intent.lockedDialog.title')}. ${t('intent.lockedDialog.body')}`)
+                }
+                className="min-h-[44px] gap-2"
+              >
+                <Volume2 className="h-5 w-5" aria-hidden="true" />
+                {t('intent.lockedDialog.listen')}
+              </Button>
+            )}
+            <Button
+              type="button"
+              data-testid="intent-locked-dialog-close"
+              onClick={() => setLockedDialogTitle(null)}
+              className="min-h-[44px]"
+            >
+              {t('intent.lockedDialog.gotIt')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.section>
   );
 }

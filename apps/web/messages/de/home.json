@@ -85,7 +85,14 @@
         "subjectTitle": "Worüber soll ich dich abfragen?",
         "contextMessage": "Ich möchte zu diesem Thema abgefragt werden. Bereite ein Quiz vor und lass uns mit Lernkarten üben."
       },
-      "subjectAny": "Weiß ich nicht / Ein bisschen von allem"
+      "subjectAny": "Weiß ich nicht / Ein bisschen von allem",
+      "ttsCardLabel": "Anhören: {label}",
+      "lockedDialog": {
+        "title": "Bitte einen Erwachsenen, es freizuschalten",
+        "body": "Diese Aktivität ist mit einem Schloss gesperrt. Ruf Mama, Papa oder deine Lehrerin: Sie können sie für dich öffnen!",
+        "listen": "Anhören",
+        "gotIt": "Verstanden"
+      }
     },
     "subjects": {
       "mathematics": "Mathematik",

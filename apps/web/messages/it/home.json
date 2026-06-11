@@ -21,6 +21,13 @@
       "question": "Scegli da dove partire: ci penso io a guidarti.",
       "back": "Indietro",
       "lockedHint": "Chiedi a un grande di sbloccarlo",
+      "ttsCardLabel": "Ascolta: {label}",
+      "lockedDialog": {
+        "title": "Chiedi a un grande per sbloccarlo",
+        "body": "Questa attività è chiusa con un lucchetto. Chiama mamma, papà o la maestra: possono aprirla per te!",
+        "listen": "Ascolta",
+        "gotIt": "Ho capito"
+      },
       "subjectSubtitle": "Scegli la materia: ti porto il professore giusto.",
       "subjectAny": "Non lo so / Un po' di tutto",
       "homework": {
