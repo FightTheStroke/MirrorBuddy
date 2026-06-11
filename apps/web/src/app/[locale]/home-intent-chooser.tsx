@@ -250,11 +250,14 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
                   )}
                 >
                   {emoji && (
-                    <span className="text-xl leading-none" aria-hidden="true">
+                    <span className="text-xl leading-none shrink-0" aria-hidden="true">
                       {emoji}
                     </span>
                   )}
-                  <span>{subjectLabel}</span>
+                  {/* A11Y-13: min-w-0 + break-words let long names (e.g. "Educazione
+                      Civica") wrap onto a second line instead of clipping at the cell
+                      edge or running under the TTS speaker button at 130%+ text. */}
+                  <span className="min-w-0 break-words">{subjectLabel}</span>
                 </button>
                 {ttsEnabled && (
                   <button

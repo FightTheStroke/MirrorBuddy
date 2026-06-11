@@ -247,3 +247,37 @@ test('intent cards are not covered by the sidebar at 200% zoom / 640px (visual p
     `intent card title "${probe.titleText}" is covered by ${probe.coveredBy} at 640px (sidebar right edge=${probe.asideRight}px)`,
   ).toBe(true);
 });
+
+/**
+ * A11Y-13 regression (focus-group pilot, low-vision persona at 130% text):
+ * long subject names ("Educazione Civica") clipped at the cell edge and ran
+ * under the TTS speaker button. With min-w-0 + break-words the label wraps, so
+ * no subject button should overflow its own box horizontally.
+ */
+test('subject names do not overflow their button at 130% text (visual profile)', async ({
+  page,
+  context,
+}) => {
+  await seedPersonaProfile(page, context, ['visual']);
+  await gotoIntentHome(page, 640);
+  await page.getByTestId('intent-card-homework').click();
+  await expect(page.locator('#intent-subject-heading')).toBeVisible();
+  await waitForSectionSettled(page, 'intent-subject-heading');
+
+  const overflowing = await page.evaluate(() => {
+    const buttons = Array.from(document.querySelectorAll('[data-testid^="subject-"]'));
+    return buttons
+      .map((b) => ({
+        id: b.getAttribute('data-testid'),
+        scrollW: (b as HTMLElement).scrollWidth,
+        clientW: (b as HTMLElement).clientWidth,
+      }))
+      .filter((b) => b.scrollW > b.clientW + 1)
+      .map((b) => `${b.id} (${b.scrollW}>${b.clientW})`);
+  });
+
+  expect(
+    overflowing,
+    `subject buttons overflowing horizontally: ${overflowing.join(', ')}`,
+  ).toEqual([]);
+});
