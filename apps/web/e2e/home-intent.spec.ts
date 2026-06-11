@@ -35,11 +35,14 @@ test('shows three intents — homework unlocked, study/quizMe gated for trial', 
   // Homework is always available; wait for it to settle (tier finished loading).
   await expect(page.getByTestId('intent-card-homework')).toBeEnabled();
   // Trial-locked cards stay focusable (A11Y-03): they are NOT natively `disabled`
-  // but expose aria-disabled so screen-reader / keyboard users can reach them
-  // and hear why they are locked.
-  await expect(page.getByTestId('intent-card-study')).toHaveAttribute('aria-disabled', 'true');
+  // (which would drop them from the Tab order) but expose aria-disabled so
+  // screen-reader / keyboard users can reach them and hear why they are locked.
+  const study = page.getByTestId('intent-card-study');
+  await expect(study).toHaveAttribute('aria-disabled', 'true');
   await expect(page.getByTestId('intent-card-quizMe')).toHaveAttribute('aria-disabled', 'true');
-  await expect(page.getByTestId('intent-card-study')).toBeEnabled();
+  expect(await study.evaluate((el) => (el as HTMLButtonElement).disabled)).toBe(false);
+  await study.focus();
+  await expect(study).toBeFocused();
 });
 
 test('homework opens a child-safe subject picker with an "I do not know" option', async ({

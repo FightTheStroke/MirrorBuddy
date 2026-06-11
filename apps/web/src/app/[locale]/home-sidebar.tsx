@@ -234,7 +234,7 @@ export function HomeSidebar({
           {grownUpNavItems && grownUpNavItems.length > 0 && (
             <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
               {open && (
-                <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   {t('sidebar.grownUps')}
                 </p>
               )}
