@@ -254,6 +254,21 @@ body {
   outline-offset: 2px;
 }
 
+/*
+ * FG-07: the step headings (#intent-heading / #intent-subject-heading) receive
+ * programmatic focus on step change so screen readers announce the new step
+ * (WCAG 3.2.2) — but they are tabindex="-1" and NOT interactive. The visible
+ * focus ring made them look like a selected input box (a keyboard child tried to
+ * "type" in it). Suppress the box on these announce-only headings; ID + !important
+ * beats the .high-contrast :focus-visible rule too. Keyboard-operable controls
+ * keep their indicator (this targets only these two heading ids).
+ */
+#intent-heading:focus,
+#intent-subject-heading:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
 /* Animation utilities */
 @keyframes pulse-ring {
   0% {
