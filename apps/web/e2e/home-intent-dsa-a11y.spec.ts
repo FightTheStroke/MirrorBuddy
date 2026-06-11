@@ -57,21 +57,15 @@ test.beforeEach(async ({ page }) => {
 // ── axe scans: step 1 under every DSA profile ─────────────────────────────
 
 /**
- * KNOWN PRODUCT BUG (quarantined below, not papered over): the `.high-contrast`
- * mode (visual profile) forces `color: #ffff00 !important` on every button/link
- * (globals.css) WITHOUT forcing a dark background, so sidebar nav labels, the
- * trial login/access links and usage chips render yellow-on-white (~1.07:1,
- * 11 axe nodes). Fixing it is a high-contrast palette redesign (blanket black
- * backgrounds would invert the problem for elements with explicit slate text).
- * Until then: the visual-profile scans below disable ONLY `color-contrast` so
- * every other WCAG rule stays guarded, and the `test.fixme` scans keep the
- * full-contrast requirement on record.
+ * A11Y-11 (FIXED): the `.high-contrast` mode used to force `color: #ffff00` on
+ * every button/link WITHOUT a dark background, so sidebar nav labels, trial
+ * links and usage chips rendered yellow-on-white (~1.07:1). globals.css now
+ * pins background + foreground + border together on all non-media elements in
+ * high-contrast mode, so the full color-contrast scan below (no rule disabled)
+ * must be clean for every profile — including `visual`.
  */
-const scanWithProfileQuirks = (page: import('@playwright/test').Page, profile: DsaProfileId) => {
-  const builder = new AxeBuilder({ page }).withTags(WCAG_TAGS);
-  if (profile === 'visual') builder.disableRules(['color-contrast']);
-  return builder.analyze();
-};
+const scanWithProfileQuirks = (page: import('@playwright/test').Page, _profile: DsaProfileId) =>
+  new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
 
 for (const profile of ALL_PROFILES) {
   test(`step 1 (intent cards) has no axe violations with the ${profile} profile`, async ({
@@ -90,7 +84,7 @@ for (const profile of ALL_PROFILES) {
   });
 }
 
-test.fixme('step 1 full-contrast axe scan with the visual profile (KNOWN BUG: high-contrast forces #ffff00 text on light buttons)', async ({
+test('step 1 full-contrast axe scan with the visual profile (A11Y-11 regression guard)', async ({
   page,
   context,
 }) => {
