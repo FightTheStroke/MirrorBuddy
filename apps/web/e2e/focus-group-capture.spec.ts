@@ -85,7 +85,16 @@ async function extractTextAndAttrs(page: Page) {
 
 /** Walk Tab from the top and record every focus stop (keyboard personas). */
 async function captureFocusTrace(page: Page, maxTabs = 40) {
-  await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+  // Reset the sequential-focus START POINT to the top of the document. Just
+  // blur()-ing leaves the browser's nav origin wherever focus last was, so Tab
+  // resumes mid-page and the trace looks like the skip-link / header come AFTER
+  // the content (a false "skip-link is late" alarm in pilot #1, FG-05). Focusing
+  // a tabindex=-1 body makes the next Tab land on the first real focusable.
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.body.setAttribute('tabindex', '-1');
+    document.body.focus();
+  });
   const trace: Array<{ index: number; testid: string | null; name: string; tag: string }> = [];
   for (let i = 0; i < maxTabs; i++) {
     await page.keyboard.press('Tab');
