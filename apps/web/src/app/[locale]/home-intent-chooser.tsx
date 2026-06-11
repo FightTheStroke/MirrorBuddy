@@ -116,6 +116,11 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
   // dialog instead of doing nothing. Holds the locked intent's title so the
   // dialog can name what the child tried to open.
   const [lockedDialogTitle, setLockedDialogTitle] = useState<string | null>(null);
+  // WCAG 2.4.3: the lock dialog is opened programmatically (no Radix Trigger),
+  // so Radix has no anchor to restore focus to on close and focus would drop
+  // to <body>, stranding keyboard users. Remember WHICH locked card opened the
+  // dialog so onCloseAutoFocus can put focus back on it.
+  const lockedIntentRef = useRef<Intent | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
@@ -146,6 +151,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
     if (!isIntentUnlocked(card)) {
       // UX-03: locked cards no longer fall silently inert. Show a child-first
       // dialog ("ask a grown-up") — no prices, no Stripe, no adult copy.
+      lockedIntentRef.current = card.intent;
       setLockedDialogTitle(t(`intent.${card.intent}.title`));
       return;
     }
@@ -372,6 +378,19 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
         <DialogContent
           data-testid="intent-locked-dialog"
           className="max-w-md text-center sm:rounded-2xl"
+          onCloseAutoFocus={(e) => {
+            // Return focus to the locked card that opened the dialog (see
+            // lockedIntentRef above) instead of letting it fall to <body>.
+            const intent = lockedIntentRef.current;
+            if (!intent) return;
+            const card = document.querySelector<HTMLElement>(
+              `[data-testid="intent-card-${intent}"]`,
+            );
+            if (card) {
+              e.preventDefault();
+              card.focus();
+            }
+          }}
         >
           <DialogHeader className="items-center text-center sm:text-center">
             <span className="text-5xl mb-2" aria-hidden="true">
