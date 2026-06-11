@@ -109,3 +109,17 @@ FG-10 (❓, lessico) non genera E2E: richiede conferma umana + ancora lessicale 
 **Nota di calibrazione**: nessun confronto con utenti reali esiste ancora (VAL-01..07 e ponte R1-R3 aperti). Fino ad allora questo report è un generatore di ipotesi ad alto recall (§1.4): i finding S1-S2+✅ sono candidabili al masterplan come proposta diretta (§8.2); tutti gli altri richiedono conferma umana. Confronti ordinali tra run varranno solo a parità di modello partecipante (qui: Fable).
 
 **Trascrizioni**: la Parte 1 integrale delle tre sessioni è agli atti del run (somministrazione single-spawn); le quote in §3 ne sono estratti verbatim. Finding scartati (✗): nessun claim dei partecipanti è stato scartato come non verificabile; gli elementi esclusi sono gli artefatti del dev server elencati in `verification.md`.
+
+---
+
+## Aggiornamento post-pilota — fix applicati (2026-06-11)
+
+Il loop §8.3 (finding → fix → regression test) è stato chiuso sul finding più grave:
+
+- **FG-01 (S1) + FG-02 (S2) → RISOLTI** (stesso root cause). Diagnosi strumentale (computed style + `elementFromPoint` a 640px col profilo `visual`): il titolo carta «Fare i compiti» era **correttamente** giallo-su-nero (`rgb(255,255,0)` su `rgb(0,0,0)`, opacity 1) — **NON** un bug di contrasto (il fix A11Y-11 regge anche a 640px). La causa reale: la **sidebar `fixed` partiva aperta** (`useState(true)`) e a 640px (≈ zoom 200%) restava un overlay che **copriva** i titoli delle carte (`elementFromPoint` sul titolo = `INSIDE-ASIDE`); restava visibile solo l'icona altoparlante (a destra), da cui «riquadri neri vuoti». Quindi FG-01 era una manifestazione di FG-02, non un secondo difetto di contrasto.
+- **Fix**: `page.tsx` — `sidebarOpen` ora inizializzato in base al viewport (`window.innerWidth >= 1024`), così su schermo stretto la sidebar parte **off-canvas** e non copre il contenuto al primo paint. Verificato: post-fix `elementFromPoint` sul titolo restituisce l'`<h3>` stesso (carta leggibile), sidebar a `right=0` (fuori schermo). Desktop 1280px invariato.
+- **Regression test**: `home-intent-dsa-a11y.spec.ts` → «intent cards are not covered by the sidebar at 200% zoom / 640px (visual profile)» (verde). I 34 test a11y/home-intent restano verdi (1 flake noto isolato sul dialog autism, verde in isolamento).
+
+**Nota di metodo (validità confermata)**: il pilota ha fatto emergere un bug **S1 reale, verificato ai pixel**, che gli axe-scan a 1280px non intercettavano — esattamente il valore del livello 4 (§1.2). Ma la diagnosi ha anche mostrato che la _causa_ ipotizzata dal partecipante (contrasto) era sbagliata: serviva il Verificatore strumentale per riclassificarla (overlay sidebar). Conferma che il focus group è un **generatore di ipotesi ad alto recall**, non un classificatore di cause (§1.4).
+
+Restano aperti: FG-03 (troncamento nomi materia a 130%), FG-05/06/07/09 (focus-order / catalogo materie), FG-08 (DEC-03), FG-10 (lessico), FG-11/12 (da riconfermare su build prod).

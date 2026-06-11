@@ -53,7 +53,14 @@ export default function Home() {
   }, [isHydrated, hasCompletedOnboarding, router]);
 
   const [currentView, setCurrentView] = useState<View>('intent');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Start collapsed on narrow viewports (incl. 200% zoom ≈ 640px CSS) so the
+  // fixed sidebar never overlays the home content on first paint. SSR has no
+  // window → defaults open (desktop-first markup); the lazy initializer + the
+  // resize effect below reconcile to the real width on the client. (FG-01/FG-02:
+  // a low-vision child at 200% zoom saw the sidebar covering the intent cards.)
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === 'undefined' || window.innerWidth >= 1024,
+  );
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);

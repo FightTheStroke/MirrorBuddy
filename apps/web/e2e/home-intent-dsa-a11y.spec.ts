@@ -208,3 +208,42 @@ for (const profile of ['dyslexia', 'visual', 'cerebral'] as DsaProfileId[]) {
     await expectNoHorizontalScrollAt200(page);
   });
 }
+
+/**
+ * FG-01/FG-02 regression (focus-group pilot #1): a low-vision child at 200%
+ * zoom (≈640px CSS) saw the fixed sidebar overlaying the home — its dark panel
+ * covered the intent-card titles ("riquadri neri vuoti"), leaving only the TTS
+ * speaker icon visible. The sidebar must start collapsed (off-canvas) on narrow
+ * viewports so primary navigation cards stay readable on first paint.
+ */
+test('intent cards are not covered by the sidebar at 200% zoom / 640px (visual profile)', async ({
+  page,
+  context,
+}) => {
+  await seedPersonaProfile(page, context, ['visual']);
+  await gotoIntentHome(page, 640);
+  await waitForSectionSettled(page, 'intent-heading');
+
+  const probe = await page.evaluate(() => {
+    const card = document.querySelector('[data-testid="intent-card-homework"]');
+    const h3 = card?.querySelector('h3') as HTMLElement | null;
+    const rect = h3?.getBoundingClientRect();
+    if (!rect) return { ok: false, reason: 'no card title' };
+    // The element painted at the title's start must be the title itself (or its
+    // card), NOT a sidebar <aside> overlay.
+    const top = document.elementFromPoint(rect.x + 8, rect.y + 8);
+    const aside = document.querySelector('aside');
+    const asideRight = aside?.getBoundingClientRect().right ?? 0;
+    return {
+      ok: !!top && !top.closest('aside'),
+      coveredBy: top?.closest('aside') ? 'aside' : (top?.tagName ?? 'none'),
+      titleText: h3.textContent,
+      asideRight: Math.round(asideRight),
+    };
+  });
+
+  expect(
+    probe.ok,
+    `intent card title "${probe.titleText}" is covered by ${probe.coveredBy} at 640px (sidebar right edge=${probe.asideRight}px)`,
+  ).toBe(true);
+});
