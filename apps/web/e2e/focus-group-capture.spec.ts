@@ -274,9 +274,14 @@ test('capture P3 Sofia (visual, Base, 640px)', async ({ page, context }) => {
     });
   }
 
-  await gotoIntentHome(page, 640);
+  // Re-nav can hit a slow dev recompile; degrade gracefully so the manifest
+  // and the critical 640px regression artefacts (s01/s02) are never lost.
+  const reHome = await gotoIntentHome(page, 640).then(
+    () => true,
+    () => false,
+  );
   const premi = page.getByTestId('home-nav-progress');
-  if (await premi.count()) {
+  if (reHome && (await premi.count())) {
     await premi.click({ timeout: 6000 }).catch(() => {});
     await page.waitForTimeout(500);
     await captureStep(page, dir, steps, {
@@ -331,4 +336,178 @@ test('capture P4 Luca (motor, Base, focus traces)', async ({ page, context }) =>
   }
 
   writeManifest('P4-luca', 'motor', 'base', steps);
+});
+
+// ── P5 Giulia (autism), Trial — literal/predictability; quizMe/study LOCKED ────
+test('capture P5 Giulia (autism, Trial)', async ({ page, context }) => {
+  const steps: StepRecord[] = [];
+  const dir = personaDir('P5-giulia');
+  await stubSpeechSynthesis(page);
+  await mockHealthyUsage(page);
+  await seedPersonaProfile(page, context, ['autism']); // Trial: no mockBaseTier
+  await gotoIntentHome(page);
+
+  await captureStep(page, dir, steps, {
+    step: 's01',
+    task: 'T2-landing',
+    action: 'land on intent home (step 1)',
+  });
+
+  // T2 — open homework → subject picker (context change she must anticipate).
+  await page.getByTestId('intent-card-homework').click();
+  await page.locator('#intent-subject-heading').waitFor({ state: 'visible', timeout: 10000 });
+  await captureStep(page, dir, steps, {
+    step: 's02',
+    task: 'T2/T8-subjects',
+    action: 'open Compiti → subject picker',
+  });
+
+  // T4 — locked "Mettiti alla prova" card → tier-lock dialog (the name may
+  // unsettle her; the dialog is an unannounced context change).
+  await gotoIntentHome(page);
+  const quiz = page.getByTestId('intent-card-quizMe');
+  if (await quiz.count()) {
+    await quiz.dispatchEvent('click'); // aria-disabled → dispatchEvent, not click
+    await page
+      .getByTestId('intent-locked-dialog')
+      .waitFor({ state: 'visible', timeout: 8000 })
+      .catch(() => {});
+    await captureStep(page, dir, steps, {
+      step: 's03',
+      task: 'T4-tierlock',
+      action: 'click locked "Mettiti alla prova" → tier-lock dialog',
+    });
+  }
+
+  // T5 — navigate to "I miei premi".
+  await gotoIntentHome(page);
+  const premi = page.getByTestId('home-nav-progress');
+  if (await premi.count()) {
+    await premi.click({ timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    await captureStep(page, dir, steps, {
+      step: 's04',
+      task: 'T5-premi',
+      action: 'navigate to "I miei premi" (progress)',
+    });
+  }
+
+  writeManifest('P5-giulia', 'autism', 'trial', steps);
+});
+
+// ── P6 Elena (auditory/sorda), Base — NO audio: TTS buttons must be ABSENT ─────
+test('capture P6 Elena (auditory, Base)', async ({ page, context }) => {
+  const steps: StepRecord[] = [];
+  const dir = personaDir('P6-elena');
+  // Stub speech synthesis so any (unexpected) utterance is recorded — for Elena
+  // the EXPECTED capture is an empty tts.json and zero tts-intent buttons.
+  await stubSpeechSynthesis(page);
+  await mockHealthyUsage(page);
+  await mockBaseTier(page);
+  await seedPersonaProfile(page, context, ['auditory']); // ttsEnabled:false preset
+  await gotoIntentHome(page);
+
+  // T2 + T6-visual — landing: record presence/absence of speaker buttons.
+  const ttsButtonsLanding = await page.locator('[data-testid^="tts-intent-"]').count();
+  fs.writeFileSync(
+    path.join(dir, 's01.tts-buttons.json'),
+    JSON.stringify({ where: 'landing', ttsIntentButtonCount: ttsButtonsLanding }, null, 2),
+  );
+  await captureStep(page, dir, steps, {
+    step: 's01',
+    task: 'T2-landing/T6-visual',
+    action: `land on intent home; tts-intent button count = ${ttsButtonsLanding} (expected 0)`,
+    tts: true,
+  });
+
+  // T2 — open homework → subject picker; check for speaker buttons there too.
+  await page.getByTestId('intent-card-homework').click();
+  await page.locator('#intent-subject-heading').waitFor({ state: 'visible', timeout: 10000 });
+  const ttsButtonsPicker = await page.locator('[data-testid^="tts-intent-"]').count();
+  fs.writeFileSync(
+    path.join(dir, 's02.tts-buttons.json'),
+    JSON.stringify({ where: 'subject-picker', ttsIntentButtonCount: ttsButtonsPicker }, null, 2),
+  );
+  await captureStep(page, dir, steps, {
+    step: 's02',
+    task: 'T2/T8-subjects',
+    action: `open Compiti → subject picker; tts-intent button count = ${ttsButtonsPicker}`,
+    tts: true,
+  });
+
+  // T5 — navigate to "I miei premi".
+  await gotoIntentHome(page);
+  const premi = page.getByTestId('home-nav-progress');
+  if (await premi.count()) {
+    await premi.click({ timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    await captureStep(page, dir, steps, {
+      step: 's03',
+      task: 'T5-premi',
+      action: 'navigate to "I miei premi" (progress)',
+      tts: true,
+    });
+  }
+
+  writeManifest('P6-elena', 'auditory', 'base', steps);
+});
+
+// ── P7 Davide (cerebral), Base — keyboard + reduced motion + large text + TTS ──
+test('capture P7 Davide (cerebral, Base, focus traces + TTS)', async ({ page, context }) => {
+  const steps: StepRecord[] = [];
+  const dir = personaDir('P7-davide');
+  await stubSpeechSynthesis(page);
+  await mockHealthyUsage(page);
+  await mockBaseTier(page);
+  await seedPersonaProfile(page, context, ['cerebral']);
+  await gotoIntentHome(page);
+
+  await captureStep(page, dir, steps, {
+    step: 's01',
+    task: 'T2-landing',
+    action: 'land on intent home + full Tab focus trace (cost of each stop)',
+    focusTrace: true,
+    tts: true,
+  });
+
+  // T2 — keyboard to homework, Enter → subject picker + focus trace.
+  await page.getByTestId('intent-card-homework').focus();
+  await page.keyboard.press('Enter');
+  await page.locator('#intent-subject-heading').waitFor({ state: 'visible', timeout: 10000 });
+  await captureStep(page, dir, steps, {
+    step: 's02',
+    task: 'T2-subjects',
+    action: 'keyboard-open Compiti → subject picker + focus trace',
+    focusTrace: true,
+  });
+
+  // T6 — TTS speaker on the subject picker (TTS = energy saving for him).
+  const speaker = page.locator('[data-testid^="tts-intent-"]').first();
+  if (await speaker.count()) {
+    await speaker.click({ timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(300);
+    await captureStep(page, dir, steps, {
+      step: 's03',
+      task: 'T6-tts',
+      action: 'activate TTS speaker',
+      tts: true,
+    });
+  }
+
+  // T5 — navigate to "I miei premi" + focus trace.
+  await gotoIntentHome(page);
+  const premi = page.getByTestId('home-nav-progress');
+  if (await premi.count()) {
+    await premi.focus().catch(() => {});
+    await premi.click({ timeout: 6000 }).catch(() => {});
+    await page.waitForTimeout(500);
+    await captureStep(page, dir, steps, {
+      step: 's04',
+      task: 'T5-premi',
+      action: 'navigate to "I miei premi" + focus trace',
+      focusTrace: true,
+    });
+  }
+
+  writeManifest('P7-davide', 'cerebral', 'base', steps);
 });

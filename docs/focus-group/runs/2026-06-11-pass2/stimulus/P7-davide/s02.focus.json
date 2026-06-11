@@ -1,0 +1,236 @@
+[
+  {
+    "index": 1,
+    "testid": "intent-subject-any",
+    "name": "Non lo so / Un po' di tutto",
+    "tag": "button"
+  },
+  {
+    "index": 2,
+    "testid": "subject-art",
+    "name": "🎨\nArte",
+    "tag": "button"
+  },
+  {
+    "index": 3,
+    "testid": "tts-subject-art",
+    "name": "Ascolta: Arte",
+    "tag": "button"
+  },
+  {
+    "index": 4,
+    "testid": "subject-biology",
+    "name": "🌱\nBiologia",
+    "tag": "button"
+  },
+  {
+    "index": 5,
+    "testid": "tts-subject-biology",
+    "name": "Ascolta: Biologia",
+    "tag": "button"
+  },
+  {
+    "index": 6,
+    "testid": "subject-chemistry",
+    "name": "⚗️\nChimica",
+    "tag": "button"
+  },
+  {
+    "index": 7,
+    "testid": "tts-subject-chemistry",
+    "name": "Ascolta: Chimica",
+    "tag": "button"
+  },
+  {
+    "index": 8,
+    "testid": "subject-civics",
+    "name": "⚖️\nEducazione Civica",
+    "tag": "button"
+  },
+  {
+    "index": 9,
+    "testid": "tts-subject-civics",
+    "name": "Ascolta: Educazione Civica",
+    "tag": "button"
+  },
+  {
+    "index": 10,
+    "testid": "subject-computerScience",
+    "name": "💻\nInformatica",
+    "tag": "button"
+  },
+  {
+    "index": 11,
+    "testid": "tts-subject-computerScience",
+    "name": "Ascolta: Informatica",
+    "tag": "button"
+  },
+  {
+    "index": 12,
+    "testid": "subject-english",
+    "name": "🇬🇧\nInglese",
+    "tag": "button"
+  },
+  {
+    "index": 13,
+    "testid": "tts-subject-english",
+    "name": "Ascolta: Inglese",
+    "tag": "button"
+  },
+  {
+    "index": 14,
+    "testid": "subject-french",
+    "name": "🇫🇷\nFrancese",
+    "tag": "button"
+  },
+  {
+    "index": 15,
+    "testid": "tts-subject-french",
+    "name": "Ascolta: Francese",
+    "tag": "button"
+  },
+  {
+    "index": 16,
+    "testid": "subject-geography",
+    "name": "🗺️\nGeografia",
+    "tag": "button"
+  },
+  {
+    "index": 17,
+    "testid": "tts-subject-geography",
+    "name": "Ascolta: Geografia",
+    "tag": "button"
+  },
+  {
+    "index": 18,
+    "testid": "subject-german",
+    "name": "🇩🇪\nTedesco",
+    "tag": "button"
+  },
+  {
+    "index": 19,
+    "testid": "tts-subject-german",
+    "name": "Ascolta: Tedesco",
+    "tag": "button"
+  },
+  {
+    "index": 20,
+    "testid": "subject-health",
+    "name": "❤️\nSalute",
+    "tag": "button"
+  },
+  {
+    "index": 21,
+    "testid": "tts-subject-health",
+    "name": "Ascolta: Salute",
+    "tag": "button"
+  },
+  {
+    "index": 22,
+    "testid": "subject-history",
+    "name": "🏛️\nStoria",
+    "tag": "button"
+  },
+  {
+    "index": 23,
+    "testid": "tts-subject-history",
+    "name": "Ascolta: Storia",
+    "tag": "button"
+  },
+  {
+    "index": 24,
+    "testid": "subject-italian",
+    "name": "📖\nItaliano",
+    "tag": "button"
+  },
+  {
+    "index": 25,
+    "testid": "tts-subject-italian",
+    "name": "Ascolta: Italiano",
+    "tag": "button"
+  },
+  {
+    "index": 26,
+    "testid": "subject-mathematics",
+    "name": "🔢\nMatematica",
+    "tag": "button"
+  },
+  {
+    "index": 27,
+    "testid": "tts-subject-mathematics",
+    "name": "Ascolta: Matematica",
+    "tag": "button"
+  },
+  {
+    "index": 28,
+    "testid": "subject-music",
+    "name": "🎵\nMusica",
+    "tag": "button"
+  },
+  {
+    "index": 29,
+    "testid": "tts-subject-music",
+    "name": "Ascolta: Musica",
+    "tag": "button"
+  },
+  {
+    "index": 30,
+    "testid": "subject-physics",
+    "name": "🧲\nFisica",
+    "tag": "button"
+  },
+  {
+    "index": 31,
+    "testid": "tts-subject-physics",
+    "name": "Ascolta: Fisica",
+    "tag": "button"
+  },
+  {
+    "index": 32,
+    "testid": "subject-spanish",
+    "name": "🇪🇸\nSpagnolo",
+    "tag": "button"
+  },
+  {
+    "index": 33,
+    "testid": "tts-subject-spanish",
+    "name": "Ascolta: Spagnolo",
+    "tag": "button"
+  },
+  {
+    "index": 34,
+    "testid": "subject-sport",
+    "name": "⚽\nSport",
+    "tag": "button"
+  },
+  {
+    "index": 35,
+    "testid": "tts-subject-sport",
+    "name": "Ascolta: Sport",
+    "tag": "button"
+  },
+  {
+    "index": 36,
+    "testid": "subject-storytelling",
+    "name": "📚\nRacconti",
+    "tag": "button"
+  },
+  {
+    "index": 37,
+    "testid": "tts-subject-storytelling",
+    "name": "Ascolta: Racconti",
+    "tag": "button"
+  },
+  {
+    "index": 38,
+    "testid": null,
+    "name": "Chiedi a un grande",
+    "tag": "button"
+  },
+  {
+    "index": 39,
+    "testid": null,
+    "name": "Chiudi notifica",
+    "tag": "button"
+  }
+]
