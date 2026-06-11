@@ -1,0 +1,203 @@
+{
+  "visibleText": "Stai provando MirrorBuddy\n\n10/10\nAiuto compiti\nStrumenti utili\nChiedi a un grande\nCiao! Cosa facciamo oggi?\n\nScegli da dove partire: ci penso io a guidarti.\n\nFare i compiti\n\nTi aiuto passo passo\n\nStudiare\n\nFacciamo una mappa insieme\n\nMettiti alla prova\n\nTi faccio io le domande",
+  "nodes": [
+    {
+      "testid": "skip-link",
+      "role": null,
+      "tag": "a",
+      "text": "Vai al contenuto principale",
+      "ariaLabel": "Vai al contenuto principale",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "a11y-floating-button",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": "Impostazioni accessibilità",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "trial-badge",
+      "role": null,
+      "tag": "a",
+      "text": "Prova10/10",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "trial-status",
+      "role": null,
+      "tag": "div",
+      "text": "10\n5m\n10",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "home-nav-intent",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": "page",
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-supporti",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-progress",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-maestri",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-calendar",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-settings",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-homework",
+      "role": null,
+      "tag": "button",
+      "text": "Fare i compiti\n\nTi aiuto passo passo",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "tts-intent-homework",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": "Ascolta: Fare i compiti",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-study",
+      "role": null,
+      "tag": "button",
+      "text": "Studiare\n\nFacciamo una mappa insieme",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "tts-intent-study",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": "Ascolta: Studiare",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-quizMe",
+      "role": null,
+      "tag": "button",
+      "text": "Mettiti alla prova\n\nTi faccio io le domande",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "tts-intent-quizMe",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": "Ascolta: Mettiti alla prova",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "trial-usage-dashboard",
+      "role": null,
+      "tag": "div",
+      "text": "Your Trial UsageYou are currently in the free trial. Upgrade your account to continuelearning after reaching your limits.Chat Sessions20%2 of  used 10 UsedDocuments0%0 of  used 5 UsedVoice Time (minut",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "consent-banner",
+      "role": "dialog",
+      "tag": "div",
+      "text": "Informativa\n\nNoi (mirrorbuddy.org) utilizziamo cookie e tecnologie simili per finalità tecniche e, con il tuo consenso, anche per finalità di analisi, come specificato nella Cookie Policy.\n\nPuoi liber",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": "consent-banner-desc",
+      "ariaDisabled": null,
+      "disabled": null
+    }
+  ]
+}

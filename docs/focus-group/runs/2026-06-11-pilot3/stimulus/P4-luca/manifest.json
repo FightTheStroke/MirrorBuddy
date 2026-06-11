@@ -1,0 +1,28 @@
+{
+  "personaId": "P4-luca",
+  "profile": "motor",
+  "tier": "base",
+  "runTag": "2026-06-11-pilot3",
+  "branch": "feat/ux-simplification-intention-based",
+  "capturedAt": "2026-06-11T18:34:16.845Z",
+  "steps": [
+    {
+      "step": "s01",
+      "task": "T2-landing",
+      "action": "land on intent home (step 1) + full Tab focus trace",
+      "artefacts": ["s01.png", "s01.aria.yaml", "s01.text.json", "s01.focus.json"]
+    },
+    {
+      "step": "s02",
+      "task": "T2-subjects",
+      "action": "keyboard-open Compiti → subject picker + focus trace",
+      "artefacts": ["s02.png", "s02.aria.yaml", "s02.text.json", "s02.focus.json"]
+    },
+    {
+      "step": "s03",
+      "task": "T5-premi",
+      "action": "navigate to \"I miei premi\" + focus trace",
+      "artefacts": ["s03.png", "s03.aria.yaml", "s03.text.json", "s03.focus.json"]
+    }
+  ]
+}
