@@ -1,0 +1,59 @@
+{
+  "cookies": [
+    {
+      "name": "mirrorbuddy-user-id",
+      "value": "e2e-test-user-1781164576287-lecyygibg.6fb88c720994912ec1851ceefae7c306498c7343deb000500046db978e5aac14",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "mirrorbuddy-user-id-client",
+      "value": "e2e-test-user-1781164576287-lecyygibg",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "mirrorbuddy-visitor-id",
+      "value": "e2e-test-visitor-lecyygibg",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "mirrorbuddy-a11y",
+      "value": "%7B%22version%22%3A%221%22%2C%22activeProfile%22%3Anull%2C%22overrides%22%3A%7B%22dyslexiaFont%22%3Afalse%2C%22highContrast%22%3Afalse%2C%22largeText%22%3Afalse%2C%22reducedMotion%22%3Afalse%7D%2C%22browserDetectedApplied%22%3Atrue%7D",
+      "domain": "localhost",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "mirrorbuddy-onboarding",
+          "value": "{\"state\":{\"hasCompletedOnboarding\":true,\"onboardingCompletedAt\":\"2026-06-11T07:56:16.288Z\",\"currentStep\":\"ready\",\"isReplayMode\":false,\"data\":{\"name\":\"Test User\",\"age\":12,\"schoolLevel\":\"media\",\"learningDifferences\":[],\"gender\":\"other\"}},\"version\":0}"
+        },
+        {
+          "name": "mirrorbuddy-unified-consent",
+          "value": "{\"version\":\"1.0\",\"tos\":{\"accepted\":true,\"version\":\"1.0\",\"acceptedAt\":\"2026-06-11T07:56:16.288Z\"},\"cookies\":{\"essential\":true,\"analytics\":true,\"acceptedAt\":\"2026-06-11T07:56:16.288Z\"}}"
+        }
+      ]
+    }
+  ]
+}
