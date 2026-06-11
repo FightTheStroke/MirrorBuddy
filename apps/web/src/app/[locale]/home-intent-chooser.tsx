@@ -155,6 +155,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
         {pendingIntent === 'homework' && (
           <button
             type="button"
+            data-testid="intent-subject-any"
             onClick={handleAnySubject}
             className="w-full min-h-[56px] mb-4 px-5 py-4 rounded-2xl bg-accent-themed/10 border-2 border-accent-themed/30 text-slate-800 dark:text-slate-100 font-semibold text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
           >
@@ -166,6 +167,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
             <li key={subject}>
               <button
                 type="button"
+                data-testid={`subject-${subject}`}
                 onClick={() => handleSubjectSelect(subject)}
                 className="w-full min-h-[44px] px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
               >
@@ -205,6 +207,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
             <li key={card.intent}>
               <button
                 type="button"
+                data-testid={`intent-card-${card.intent}`}
                 disabled={!unlocked || isLoading}
                 aria-disabled={!unlocked || isLoading}
                 onClick={() => handleIntentSelect(card)}
