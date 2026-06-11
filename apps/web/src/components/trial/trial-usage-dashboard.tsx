@@ -57,7 +57,7 @@ export function TrialUsageDashboard() {
   if (error || !data) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-700 text-sm">{error || 'Unable to load trial usage data'}</p>
+        <p className="text-red-700 text-sm">{t('unableToLoadTrialUsage')}</p>
       </div>
     );
   }
@@ -65,25 +65,25 @@ export function TrialUsageDashboard() {
   // Calculate resource metrics
   const resources: Record<string, ResourceMetric> = {
     chats: {
-      label: 'Chat Sessions',
+      label: t('chatSessionsLabel'),
       used: data.chat.used,
       limit: data.chat.limit,
       percentage: Math.round(data.chat.percentage),
     },
     docs: {
-      label: 'Documents',
+      label: t('documentsLabel'),
       used: data.docs.used,
       limit: data.docs.limit,
       percentage: Math.round(data.docs.percentage),
     },
     voice: {
-      label: 'Voice Time (minutes)',
+      label: t('voiceTimeLabel'),
       used: Math.floor(data.voice.used / 60),
       limit: Math.floor(data.voice.limit / 60),
       percentage: Math.round(data.voice.percentage),
     },
     tools: {
-      label: 'Tools Used',
+      label: t('toolsUsedLabel'),
       used: data.tools.used,
       limit: data.tools.limit,
       percentage: Math.round(data.tools.percentage),
@@ -133,7 +133,7 @@ export function TrialUsageDashboard() {
 
             {/* Usage Text */}
             <p className="text-xs text-gray-600 dark:text-gray-400">
-              {resource.used} {t('of')} {resource.limit} {t('used')}
+              {t('usageOfLimit', { used: resource.used, limit: resource.limit })}
             </p>
           </div>
         ))}
