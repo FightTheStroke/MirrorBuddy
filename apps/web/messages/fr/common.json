@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "C’est pour les grands",
+      "body": "Demande à un adulte de répondre pour continuer.",
+      "question": "Combien font {a} + {b} ?",
+      "wrong": "Mauvaise réponse. Réessaie ou demande à un grand.",
+      "submit": "Continuer",
+      "cancel": "Retour"
+    }
   }
 }

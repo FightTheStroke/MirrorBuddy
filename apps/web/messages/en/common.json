@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "This is for grown-ups",
+      "body": "Ask an adult to answer to continue.",
+      "question": "What is {a} + {b}?",
+      "wrong": "Wrong answer. Try again or ask a grown-up.",
+      "submit": "Continue",
+      "cancel": "Go back"
+    }
   }
 }

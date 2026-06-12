@@ -7,6 +7,8 @@ import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { csrfFetch } from '@/lib/auth';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { GrownUpGate } from '@/components/safety/grown-up-gate';
+import { isGrownUpVerified } from '@/lib/safety';
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -18,6 +20,10 @@ export default function InviteRequestPage() {
   const [motivation, setMotivation] = useState('');
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  // COMP-01 (#431): this form collects a minor's PII (name, email). Gate it
+  // behind the grown-up challenge so a child cannot self-submit. SSR has no
+  // window → renders the gate; the client initializer reads the session flag.
+  const [grownUpVerified, setGrownUpVerifiedState] = useState<boolean>(() => isGrownUpVerified());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +67,19 @@ export default function InviteRequestPage() {
       setErrorMessage(message);
     }
   };
+
+  // Gate (#431): hold the PII form behind the grown-up challenge.
+  if (!grownUpVerified) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 p-4">
+        <GrownUpGate
+          open
+          onPass={() => setGrownUpVerifiedState(true)}
+          onCancel={() => router.back()}
+        />
+      </div>
+    );
+  }
 
   if (formState === 'success') {
     return (

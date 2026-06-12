@@ -160,3 +160,44 @@ test('never shows the PII decryption placeholder as the student name', async ({ 
   // Generic (nameless) greeting is shown instead.
   await expect(page.locator('#intent-heading')).toContainText('Cosa facciamo oggi?');
 });
+
+test('the grown-up area is gated behind a child-resistant challenge (COMP-01 / #432)', async ({
+  page,
+}) => {
+  await gotoHome(page);
+  // A child destination must NOT trigger the gate.
+  await page.getByTestId('home-nav-progress').click();
+  await expect(page.getByTestId('grown-up-gate')).toHaveCount(0);
+
+  // A grown-up destination DOES — the view does not change until an adult passes.
+  await page.getByTestId('home-nav-settings').click();
+  await expect(page.getByTestId('grown-up-gate')).toBeVisible();
+
+  // Solve the arithmetic challenge → the gate dismisses (session verified).
+  const q = (await page.getByText(/\d+\s*\+\s*\d+/).textContent()) ?? '';
+  const [a, b] = q.match(/\d+/g)!.map(Number);
+  await page.getByTestId('grown-up-gate-input').fill(String(a + b));
+  await page.getByTestId('grown-up-gate-submit').click();
+  await expect(page.getByTestId('grown-up-gate')).toHaveCount(0);
+
+  // Verified for the session: a second grown-up destination opens without re-gating.
+  await page.getByTestId('home-nav-calendar').click();
+  await expect(page.getByTestId('grown-up-gate')).toHaveCount(0);
+});
+
+test('the invite-request PII form is gated behind the grown-up challenge (COMP-01 / #431)', async ({
+  page,
+}) => {
+  await page.goto('/invite/request');
+  // The child sees the gate, NOT the email/name form.
+  await expect(page.getByTestId('grown-up-gate')).toBeVisible();
+  await expect(page.locator('#email')).toHaveCount(0);
+
+  const q = (await page.getByText(/\d+\s*\+\s*\d+/).textContent()) ?? '';
+  const [a, b] = q.match(/\d+/g)!.map(Number);
+  await page.getByTestId('grown-up-gate-input').fill(String(a + b));
+  await page.getByTestId('grown-up-gate-submit').click();
+
+  // After a grown-up passes, the form is available.
+  await expect(page.locator('#email')).toBeVisible();
+});

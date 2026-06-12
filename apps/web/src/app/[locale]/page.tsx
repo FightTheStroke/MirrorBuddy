@@ -28,6 +28,8 @@ import { LazyCalendarView, LazyGenitoriView } from '@/components/education';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { TrialUsageDashboard } from '@/components/trial';
+import { GrownUpGate } from '@/components/safety/grown-up-gate';
+import { isGrownUpVerified } from '@/lib/safety';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
 import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
@@ -35,6 +37,11 @@ import type { View, MaestroSessionMode, Intent } from './types';
 import { LazyMaestroSession, LazyZainoView, HomeShellSkeleton } from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
+
+// COMP-01 (#432): the "Per i grandi" destinations are adult/account surfaces.
+// First entry into any of them in a session requires the grown-up gate; passing
+// once covers the whole session (the gate marks sessionStorage verified).
+const GROWN_UP_VIEWS = new Set<View>(['maestri', 'calendar', 'settings', 'genitori']);
 
 export default function Home() {
   const router = useRouter();
@@ -71,6 +78,9 @@ export default function Home() {
   // is opened directly from the grown-ups Maestri grid (no handoff to explain).
   const [sessionIntent, setSessionIntent] = useState<Intent | undefined>(undefined);
   const [sessionSubjectLabel, setSessionSubjectLabel] = useState<string | undefined>(undefined);
+  // COMP-01 (#432): the grown-up view the child is trying to reach, held until
+  // an adult passes the gate (null = no gate pending).
+  const [pendingGrownUpView, setPendingGrownUpView] = useState<View | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -120,6 +130,13 @@ export default function Home() {
   } = useConversationFlowStore();
 
   const handleViewChange = async (newView: View) => {
+    // COMP-01 (#432): hold entry to an adult/account view until a grown-up
+    // passes the gate (once per session). On pass we re-run this with the same
+    // view, now verified, so the conversation-close logic below still applies.
+    if (GROWN_UP_VIEWS.has(newView) && !isGrownUpVerified()) {
+      setPendingGrownUpView(newView);
+      return;
+    }
     if (isConversationActive && activeCharacter) {
       const characterConvo = conversationsByCharacter[activeCharacter.id];
       if (characterConvo?.conversationId) {
@@ -199,6 +216,17 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 overflow-x-hidden">
       <h1 className="sr-only">{t('appTitle')}</h1>
+
+      {/* COMP-01 (#432): grown-up gate before the adult/account area. */}
+      <GrownUpGate
+        open={pendingGrownUpView !== null}
+        onPass={() => {
+          const view = pendingGrownUpView;
+          setPendingGrownUpView(null);
+          if (view) handleViewChange(view);
+        }}
+        onCancel={() => setPendingGrownUpView(null)}
+      />
 
       {/* Full-screen session overlays — above HomeHeader (z-50) to prevent overlap */}
       {currentView === 'maestro-session' && selectedMaestro && (

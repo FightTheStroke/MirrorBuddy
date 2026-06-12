@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "Das ist für Erwachsene",
+      "body": "Bitte einen Erwachsenen, zu antworten, um fortzufahren.",
+      "question": "Was ist {a} + {b}?",
+      "wrong": "Falsche Antwort. Versuch es nochmal oder frag einen Erwachsenen.",
+      "submit": "Weiter",
+      "cancel": "Zurück"
+    }
   }
 }

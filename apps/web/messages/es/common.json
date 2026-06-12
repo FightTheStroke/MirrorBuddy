@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "Esto es para los mayores",
+      "body": "Pide a un adulto que responda para continuar.",
+      "question": "¿Cuánto es {a} + {b}?",
+      "wrong": "Respuesta incorrecta. Inténtalo otra vez o pide a un mayor.",
+      "submit": "Continuar",
+      "cancel": "Volver"
+    }
   }
 }
