@@ -92,6 +92,12 @@
         "body": "Diese Aktivität ist mit einem Schloss gesperrt. Ruf Mama, Papa oder deine Lehrerin: Sie können sie für dich öffnen!",
         "listen": "Anhören",
         "gotIt": "Verstanden"
+      },
+      "areas": {
+        "numbersScience": "Zahlen & Naturwissenschaften",
+        "languages": "Sprachen & Geschichten",
+        "worldHistory": "Welt & Geschichte",
+        "artBody": "Kunst & Körper"
       }
     },
     "subjects": {

@@ -96,6 +96,39 @@ const EXCLUDED_CHILD_SUBJECTS: ReadonlySet<Subject> = new Set<Subject>([
 ]);
 
 /**
+ * Child-facing subjects grouped into a few labelled areas (DEC-03). The focus-
+ * group pilots found a flat 18-item list overwhelming for EVERY DSA profile —
+ * too much to scan for dyslexia/low-vision ("tante tutte insieme"), too many Tab
+ * stops for keyboard users ("14 Tab per Matematica"), and the implicit English-
+ * key order ("Inglese" before "Francese") unpredictable. Grouping into a few
+ * areas + sorting each by the LOCALIZED label gives structure and predictability
+ * while keeping every subject one tap away. Areas are ordered by rough homework
+ * frequency. Edit this map to re-balance the groups.
+ */
+const SUBJECT_AREA_ORDER = ['numbersScience', 'languages', 'worldHistory', 'artBody'] as const;
+type SubjectArea = (typeof SUBJECT_AREA_ORDER)[number];
+const SUBJECT_AREA: Partial<Record<Subject, SubjectArea>> = {
+  mathematics: 'numbersScience',
+  physics: 'numbersScience',
+  chemistry: 'numbersScience',
+  biology: 'numbersScience',
+  computerScience: 'numbersScience',
+  italian: 'languages',
+  english: 'languages',
+  french: 'languages',
+  german: 'languages',
+  spanish: 'languages',
+  storytelling: 'languages',
+  history: 'worldHistory',
+  geography: 'worldHistory',
+  civics: 'worldHistory',
+  health: 'worldHistory',
+  art: 'artBody',
+  music: 'artBody',
+  sport: 'artBody',
+};
+
+/**
  * Intention-based home screen.
  *
  * Step 1: three intent cards (homework / study / quizMe). The student always
@@ -124,14 +157,20 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mounted = useRef(false);
 
-  // Subjects that have at least one Maestro AND are appropriate for a child.
-  const subjects = useMemo<Subject[]>(
-    () =>
-      getAllSubjects().filter(
-        (s) => getMaestriBySubject(s).length > 0 && !EXCLUDED_CHILD_SUBJECTS.has(s),
-      ),
-    [],
-  );
+  // Subjects that have at least one Maestro AND are appropriate for a child,
+  // grouped into labelled areas and sorted by localized label (DEC-03). Every
+  // eligible subject lands in exactly one area (unmapped → artBody fallback).
+  const subjectGroups = useMemo(() => {
+    const eligible = getAllSubjects().filter(
+      (s) => getMaestriBySubject(s).length > 0 && !EXCLUDED_CHILD_SUBJECTS.has(s),
+    );
+    return SUBJECT_AREA_ORDER.map((area) => ({
+      area,
+      subjects: eligible
+        .filter((s) => (SUBJECT_AREA[s] ?? 'artBody') === area)
+        .sort((a, b) => t(`subjects.${a}`).localeCompare(t(`subjects.${b}`))),
+    })).filter((group) => group.subjects.length > 0);
+  }, [t]);
 
   // Move focus to the step heading only when the step CHANGES (intent→subject),
   // never on initial mount — auto-focusing on load disrupts Tab order and
@@ -234,46 +273,60 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
             {t('intent.subjectAny')}
           </button>
         )}
-        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 list-none p-0">
-          {subjects.map((subject) => {
-            const subjectLabel = t(`subjects.${subject}`);
-            const emoji = SUBJECT_EMOJI[subject];
-            return (
-              <li key={subject} className="relative">
-                <button
-                  type="button"
-                  data-testid={`subject-${subject}`}
-                  onClick={() => handleSubjectSelect(subject)}
-                  className={cn(
-                    'w-full min-h-[44px] px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed flex items-center gap-2',
-                    ttsEnabled && 'pr-12',
-                  )}
-                >
-                  {emoji && (
-                    <span className="text-xl leading-none shrink-0" aria-hidden="true">
-                      {emoji}
-                    </span>
-                  )}
-                  {/* A11Y-13: min-w-0 + break-words let long names (e.g. "Educazione
+        {subjectGroups.map((group) => (
+          <section
+            key={group.area}
+            aria-labelledby={`subject-area-${group.area}`}
+            className="mb-5 last:mb-0"
+          >
+            <h3
+              id={`subject-area-${group.area}`}
+              className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-2"
+            >
+              {t(`intent.areas.${group.area}`)}
+            </h3>
+            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 list-none p-0">
+              {group.subjects.map((subject) => {
+                const subjectLabel = t(`subjects.${subject}`);
+                const emoji = SUBJECT_EMOJI[subject];
+                return (
+                  <li key={subject} className="relative">
+                    <button
+                      type="button"
+                      data-testid={`subject-${subject}`}
+                      onClick={() => handleSubjectSelect(subject)}
+                      className={cn(
+                        'w-full min-h-[44px] px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 font-medium text-left hover:border-accent-themed hover:shadow-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed flex items-center gap-2',
+                        ttsEnabled && 'pr-12',
+                      )}
+                    >
+                      {emoji && (
+                        <span className="text-xl leading-none shrink-0" aria-hidden="true">
+                          {emoji}
+                        </span>
+                      )}
+                      {/* A11Y-13: min-w-0 + break-words let long names (e.g. "Educazione
                       Civica") wrap onto a second line instead of clipping at the cell
                       edge or running under the TTS speaker button at 130%+ text. */}
-                  <span className="min-w-0 break-words">{subjectLabel}</span>
-                </button>
-                {ttsEnabled && (
-                  <button
-                    type="button"
-                    data-testid={`tts-subject-${subject}`}
-                    onClick={handleSpeak(subjectLabel)}
-                    aria-label={t('intent.ttsCardLabel', { label: subjectLabel })}
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-lg text-accent-themed hover:bg-accent-themed/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
-                  >
-                    <Volume2 className="h-5 w-5" aria-hidden="true" />
-                  </button>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                      <span className="min-w-0 break-words">{subjectLabel}</span>
+                    </button>
+                    {ttsEnabled && (
+                      <button
+                        type="button"
+                        data-testid={`tts-subject-${subject}`}
+                        onClick={handleSpeak(subjectLabel)}
+                        aria-label={t('intent.ttsCardLabel', { label: subjectLabel })}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center w-9 h-9 rounded-lg text-accent-themed hover:bg-accent-themed/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed"
+                      >
+                        <Volume2 className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
       </motion.section>
     );
   }

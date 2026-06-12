@@ -87,6 +87,38 @@ test('homework opens a child-safe subject picker with an "I do not know" option'
   await expect(page.getByTestId('subject-internationalLaw')).toHaveCount(0);
 });
 
+test('the subject picker is grouped into labelled areas, sorted by localized label (DEC-03)', async ({
+  page,
+}) => {
+  await gotoHome(page);
+  await page.getByTestId('intent-card-homework').click();
+  await expect(page.locator('#intent-subject-heading')).toBeVisible();
+
+  // The flat 18-item list is now grouped into labelled areas (focus-group #1/#2
+  // found the flat list overwhelming for every DSA profile).
+  await expect(page.locator('#subject-area-numbersScience')).toBeVisible();
+  await expect(page.locator('#subject-area-languages')).toBeVisible();
+  await expect(page.locator('#subject-area-worldHistory')).toBeVisible();
+  await expect(page.locator('#subject-area-artBody')).toBeVisible();
+
+  // Maths lives in its area; every subject is still one tap away.
+  await expect(
+    page
+      .locator('section[aria-labelledby="subject-area-numbersScience"]')
+      .getByTestId('subject-mathematics'),
+  ).toBeVisible();
+
+  // Subjects are sorted by the LOCALIZED label, so the order is predictable for
+  // keyboard users (fixes the "Inglese before Francese" English-key order):
+  // within Languages, Francese must come before Inglese in DOM order.
+  const languageIds = await page
+    .locator('section[aria-labelledby="subject-area-languages"] [data-testid^="subject-"]')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
+  expect(languageIds.indexOf('subject-french')).toBeLessThan(
+    languageIds.indexOf('subject-english'),
+  );
+});
+
 test('sidebar shows 3 child destinations + a separated grown-ups group', async ({ page }) => {
   await gotoHome(page);
   // Child space

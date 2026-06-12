@@ -47,6 +47,12 @@
         "subtitle": "Ti faccio io le domande",
         "subjectTitle": "Su cosa ti metto alla prova?",
         "contextMessage": "Voglio essere interrogato su questo argomento. Preparami un quiz e usiamo le flashcard per allenarci."
+      },
+      "areas": {
+        "numbersScience": "Numeri e scienze",
+        "languages": "Lingue e racconti",
+        "worldHistory": "Mondo e storia",
+        "artBody": "Arte e corpo"
       }
     },
     "subjects": {

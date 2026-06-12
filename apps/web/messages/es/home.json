@@ -92,6 +92,12 @@
         "body": "Esta actividad tiene un candado. Llama a mamá, papá o a tu profe: ¡pueden abrirla por ti!",
         "listen": "Escuchar",
         "gotIt": "Entendido"
+      },
+      "areas": {
+        "numbersScience": "Números y ciencias",
+        "languages": "Lenguas y relatos",
+        "worldHistory": "Mundo e historia",
+        "artBody": "Arte y cuerpo"
       }
     },
     "subjects": {

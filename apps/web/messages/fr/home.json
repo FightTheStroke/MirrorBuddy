@@ -92,6 +92,12 @@
         "body": "Cette activité est fermée avec un cadenas. Appelle maman, papa ou la maîtresse : ils peuvent l'ouvrir pour toi !",
         "listen": "Écouter",
         "gotIt": "Compris"
+      },
+      "areas": {
+        "numbersScience": "Nombres et sciences",
+        "languages": "Langues et récits",
+        "worldHistory": "Monde et histoire",
+        "artBody": "Art et corps"
       }
     },
     "subjects": {

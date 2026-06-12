@@ -92,6 +92,12 @@
         "body": "This activity has a lock on it. Call mum, dad or your teacher: they can open it for you!",
         "listen": "Listen",
         "gotIt": "Got it"
+      },
+      "areas": {
+        "numbersScience": "Numbers & science",
+        "languages": "Languages & stories",
+        "worldHistory": "World & history",
+        "artBody": "Art & body"
       }
     },
     "subjects": {
