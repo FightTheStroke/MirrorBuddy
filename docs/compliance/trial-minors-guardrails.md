@@ -111,3 +111,14 @@ this guardrail review first.
 - [ ] ⚑ **DPIA / AI-POLICY update**: this guardrail set should be reflected in
       `docs/compliance/DPIA.md` (child-facing commercial surfaces removed) at
       the next document revision.
+
+## Aggiornamento — grown-up gate implementato (2026-06-12, commit `08f41512`)
+
+Decisione presa (opzione "media"): aggiunto un **GrownUpGate** child-resistant (sfida aritmetica 2 cifre + framing "per i grandi", `@/components/safety/grown-up-gate.tsx`) PRIMA di:
+
+- **`/invite/request`** — il form PII non si renderizza finché un adulto non supera il gate (un bambino non può auto-inviare i propri dati);
+- **le viste "Per i grandi"** della home (maestri/calendar/settings/genitori) — gate al primo ingresso per sessione.
+
+Stato "verified" per-sessione (`sessionStorage`, ADR 0015). Test: 3 unit + 2 E2E.
+
+⚠️ **Resta aperto (⚑ #1, issue #431)**: questo è uno **screen UI**, NON un consenso genitoriale verificabile ai sensi di GDPR Art. 8 / COPPA / L. 132/2025. Riduce il rischio (screening intent + barriera), ma la sufficienza legale e l'eventuale necessità di un consenso verificabile (es. verifica email genitore) richiedono **decisione/firma legale**.
