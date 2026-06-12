@@ -93,6 +93,15 @@ export default function InviteRequestPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('pageTitle')}</h1>
           <p className="text-slate-600 dark:text-slate-300 mt-2">{t('pageDescription')}</p>
+          {/* COMP-01: this form solicits PII (name, email). It must address the
+              adult, never the child — explicit notice pending a real parental
+              gate (legal decision, see docs/compliance/trial-minors-guardrails.md). */}
+          <p
+            data-testid="invite-adults-only-notice"
+            className="mt-2 text-sm font-medium text-indigo-700 dark:text-indigo-300"
+          >
+            {t('adultsOnlyNotice')}
+          </p>
         </div>
 
         {formState === 'error' && (

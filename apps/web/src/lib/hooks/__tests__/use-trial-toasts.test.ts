@@ -138,4 +138,58 @@ describe('useTrialToasts', () => {
     );
     expect(mockTrackTrialLimitHit).toHaveBeenCalledWith('visitor-test-1', 'chat');
   });
+
+  // COMP-01: the child (student) space must never receive commercial trial
+  // toasts or CTAs that navigate to the PII-collecting invite-request form.
+  describe('childSafe mode (COMP-01)', () => {
+    const opts = { childSafe: true };
+
+    it('does not show the promotional welcome toast', () => {
+      renderHook(() => useTrialToasts(baseStatus, opts));
+      expect(mockToast.info).not.toHaveBeenCalled();
+    });
+
+    it('does not show the 3-left / 1-left upsell toasts', () => {
+      const { rerender } = renderHook((props: TrialStatus) => useTrialToasts(props, opts), {
+        initialProps: { ...baseStatus, chatsRemaining: 4 },
+      });
+      rerender({ ...baseStatus, chatsRemaining: 3 });
+      rerender({ ...baseStatus, chatsRemaining: 1 });
+      expect(mockToast.warning).not.toHaveBeenCalled();
+    });
+
+    it('shows a child-friendly "ask a grown-up" message on exhaustion, with NO action', () => {
+      const { rerender } = renderHook((props: TrialStatus) => useTrialToasts(props, opts), {
+        initialProps: { ...baseStatus, chatsRemaining: 1 },
+      });
+      rerender({ ...baseStatus, chatsRemaining: 0 });
+
+      // No adult/commercial error toast…
+      expect(mockToast.error).not.toHaveBeenCalled();
+      // …but an informative child toast with no navigation action.
+      expect(mockToast.info).toHaveBeenCalledTimes(1);
+      const [title, body, options] = mockToast.info.mock.calls[0];
+      expect(title).toBe('trialToastChildDoneTitle');
+      expect(body).toBe('trialToastChildDoneBody');
+      expect(options).not.toHaveProperty('action');
+      expect(mockPush).not.toHaveBeenCalled();
+    });
+
+    it('keeps telemetry tracking intact', () => {
+      const { rerender } = renderHook((props: TrialStatus) => useTrialToasts(props, opts), {
+        initialProps: { ...baseStatus, chatsRemaining: 1 },
+      });
+      rerender({ ...baseStatus, chatsRemaining: 0 });
+      expect(mockTrackTrialLimitHit).toHaveBeenCalledWith('visitor-test-1', 'chat');
+    });
+
+    it('suppress (distraction-free) still silences even the child toast', () => {
+      const { rerender } = renderHook(
+        (props: TrialStatus) => useTrialToasts(props, { childSafe: true, suppress: true }),
+        { initialProps: { ...baseStatus, chatsRemaining: 1 } },
+      );
+      rerender({ ...baseStatus, chatsRemaining: 0 });
+      expect(mockToast.info).not.toHaveBeenCalled();
+    });
+  });
 });

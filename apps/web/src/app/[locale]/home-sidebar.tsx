@@ -177,54 +177,6 @@ export function HomeSidebar({
           </Button>
         </div>
 
-        {/* Trial Status Indicator */}
-        {trialStatus?.isTrialMode && (
-          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col gap-2">
-              {open && (
-                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                  {t('sidebar.trialMode')}
-                </span>
-              )}
-              <TrialStatusIndicator
-                chatsUsed={trialStatus.chatsUsed}
-                maxChats={trialStatus.maxChats}
-                voiceSecondsUsed={trialStatus.voiceSecondsUsed}
-                maxVoiceSeconds={trialStatus.maxVoiceSeconds}
-                toolsUsed={trialStatus.toolsUsed}
-                maxTools={trialStatus.maxTools}
-                showVoice={true}
-                showTools={true}
-                className={cn(!open && 'justify-center')}
-              />
-              {open && (
-                <div className="flex flex-col gap-1 mt-2">
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full min-h-[44px] justify-start text-xs"
-                    >
-                      <LogIn className="w-3 h-3 mr-2" />
-                      {t('sidebar.login')}
-                    </Button>
-                  </Link>
-                  <Link href="/invite/request">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full min-h-[44px] justify-start text-xs text-purple-600 dark:text-purple-400"
-                    >
-                      <UserPlus className="w-3 h-3 mr-2" />
-                      {t('sidebar.requestAccess')}
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
           {navItems.map(renderNavItem)}
@@ -232,13 +184,62 @@ export function HomeSidebar({
           {/* Grown-ups section — visually separated so a child does not wander
               into the professor grid, planner or settings. */}
           {grownUpNavItems && grownUpNavItems.length > 0 && (
-            <div className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-3">
+            <div
+              data-testid="sidebar-grownups-group"
+              className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-3"
+            >
               {open && (
                 <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   {t('sidebar.grownUps')}
                 </p>
               )}
               {grownUpNavItems.map(renderNavItem)}
+
+              {/* COMP-01: trial status, login and "request access" are ADULT
+                  account/commercial surfaces — they live INSIDE the "for
+                  grown-ups" group, never at the top of the sidebar where they
+                  visually address the child (focus group FG-10: a 9-year-old
+                  cannot parse "Richiedi Accesso"). The invite-request form
+                  collects PII (email) and must not be solicited from a minor. */}
+              {trialStatus?.isTrialMode && open && (
+                <div data-testid="sidebar-trial-grownups" className="px-4 pt-2 flex flex-col gap-2">
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                    {t('sidebar.trialMode')}
+                  </span>
+                  <TrialStatusIndicator
+                    chatsUsed={trialStatus.chatsUsed}
+                    maxChats={trialStatus.maxChats}
+                    voiceSecondsUsed={trialStatus.voiceSecondsUsed}
+                    maxVoiceSeconds={trialStatus.maxVoiceSeconds}
+                    toolsUsed={trialStatus.toolsUsed}
+                    maxTools={trialStatus.maxTools}
+                    showVoice={true}
+                    showTools={true}
+                  />
+                  <div className="flex flex-col gap-1 mt-1">
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full min-h-[44px] justify-start text-xs"
+                      >
+                        <LogIn className="w-3 h-3 mr-2" />
+                        {t('sidebar.login')}
+                      </Button>
+                    </Link>
+                    <Link href="/invite/request">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full min-h-[44px] justify-start text-xs text-purple-600 dark:text-purple-400"
+                      >
+                        <UserPlus className="w-3 h-3 mr-2" />
+                        {t('sidebar.requestAccess')}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </nav>

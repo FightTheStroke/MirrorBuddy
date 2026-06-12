@@ -49,6 +49,16 @@ interface UseTrialToastsOptions {
    * learning flow. Usage counters still update elsewhere; only the pop-ups stop.
    */
   suppress?: boolean;
+  /**
+   * COMP-01: when true the toasts are child-safe — no commercial copy and no
+   * solicitation directed at the (likely minor) student. The promo welcome
+   * toast and the 3-left/1-left upsell toasts are dropped entirely; when the
+   * trial runs out the child gets a plain "ask a grown-up" message with NO
+   * action that navigates to the invite-request form (which collects PII).
+   * GDPR/COPPA: commercial CTAs and data solicitation belong to the adult
+   * surfaces only (parent area / "Per i grandi"). Telemetry is unchanged.
+   */
+  childSafe?: boolean;
 }
 
 export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToastsOptions = {}) {
@@ -56,29 +66,32 @@ export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToasts
   const t = useTranslations('auth');
   const previousRemaining = useRef<number | null>(null);
   const hasShownWelcome = useRef(false);
-  const { suppress = false } = options;
+  const { suppress = false, childSafe = false } = options;
 
   useEffect(() => {
     if (trialStatus.isLoading || !trialStatus.isTrialMode || suppress) return;
 
-    // Show welcome toast once per session
+    // Show welcome toast once per session (skipped in child-safe mode: it is a
+    // promotional surface with a "request access" CTA — adult copy, COMP-01).
     if (!hasShownWelcome.current) {
       const shown = sessionStorage.getItem(SHOWN_KEY);
       if (!shown) {
         hasShownWelcome.current = true;
         sessionStorage.setItem(SHOWN_KEY, 'true');
 
-        toast.info(
-          t('trialToastWelcomeTitle'),
-          t('trialToastWelcomeBody', { max: trialStatus.maxChats }),
-          {
-            duration: 8000,
-            action: {
-              label: t('trialToastWelcomeAction'),
-              onClick: () => router.push('/invite/request'),
+        if (!childSafe) {
+          toast.info(
+            t('trialToastWelcomeTitle'),
+            t('trialToastWelcomeBody', { max: trialStatus.maxChats }),
+            {
+              duration: 8000,
+              action: {
+                label: t('trialToastWelcomeAction'),
+                onClick: () => router.push('/invite/request'),
+              },
             },
-          },
-        );
+          );
+        }
       } else {
         hasShownWelcome.current = true;
       }
@@ -95,8 +108,8 @@ export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToasts
         trackTrialChat(visitorId, trialStatus.chatsUsed, curr);
       }
 
-      // Just crossed 3 remaining threshold
-      if (prev > 3 && curr === 3) {
+      // Just crossed 3 remaining threshold (child-safe: no upsell pressure)
+      if (prev > 3 && curr === 3 && !childSafe) {
         toast.warning(t('trialToastWarnTitle'), t('trialToastWarnBody'), {
           duration: 6000,
           action: {
@@ -106,8 +119,8 @@ export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToasts
         });
       }
 
-      // Just crossed 1 remaining threshold
-      if (prev > 1 && curr === 1) {
+      // Just crossed 1 remaining threshold (child-safe: no upsell pressure)
+      if (prev > 1 && curr === 1 && !childSafe) {
         toast.warning(t('trialToastLastTitle'), t('trialToastLastBody'), {
           duration: 6000,
           action: {
@@ -122,16 +135,25 @@ export function useTrialToasts(trialStatus: TrialStatus, options: UseTrialToasts
         // Track limit reached
         trackTrialLimitHit(visitorId, 'chat');
 
-        toast.error(t('trialToastDoneTitle'), t('trialToastDoneBody'), {
-          duration: 10000,
-          action: {
-            label: t('trialToastWelcomeAction'),
-            onClick: () => router.push('/invite/request'),
-          },
-        });
+        if (childSafe) {
+          // COMP-01: the child must understand WHY the chat stopped, but the
+          // message is informative only — "ask a grown-up", no numbers, no
+          // commercial action, no navigation to a form that collects PII.
+          toast.info(t('trialToastChildDoneTitle'), t('trialToastChildDoneBody'), {
+            duration: 10000,
+          });
+        } else {
+          toast.error(t('trialToastDoneTitle'), t('trialToastDoneBody'), {
+            duration: 10000,
+            action: {
+              label: t('trialToastWelcomeAction'),
+              onClick: () => router.push('/invite/request'),
+            },
+          });
+        }
       }
     }
 
     previousRemaining.current = curr;
-  }, [trialStatus, router, t, suppress]);
+  }, [trialStatus, router, t, suppress, childSafe]);
 }

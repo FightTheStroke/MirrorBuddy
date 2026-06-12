@@ -27,7 +27,7 @@ import { MaestriGrid } from '@/components/maestros/maestri-grid';
 import { LazyCalendarView, LazyGenitoriView } from '@/components/education';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
-import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
+import { TrialUsageDashboard } from '@/components/trial';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
 import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
@@ -108,7 +108,10 @@ export default function Home() {
   // space this hides non-essential promo surfaces (trial banner, usage dashboard,
   // trial toasts) so the only thing on screen is the learning flow.
   const distractionFreeMode = useAccessibilityStore((state) => state.settings.distractionFreeMode);
-  useTrialToasts(trialStatus, { suppress: distractionFreeMode });
+  // COMP-01: the home IS the child space, so trial toasts are ALWAYS child-safe
+  // here (no promo welcome, no upsell, exhaustion = "ask a grown-up") —
+  // independent of distractionFreeMode, which remains an extra layer on top.
+  useTrialToasts(trialStatus, { suppress: distractionFreeMode, childSafe: true });
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -229,7 +232,6 @@ export default function Home() {
             progressPercent={progressPercent}
             seasonName={seasonName}
             streak={streak}
-            trialStatus={trialStatus}
           />
 
           <HomeSidebar
@@ -258,15 +260,10 @@ export default function Home() {
           ref={mainContentRef}
         >
           <main className="flex-1">
-            {/* Trial mode banner — suppressed in distraction-free mode (A11Y-05) */}
-            {trialStatus.isTrialMode && !trialStatus.isLoading && !distractionFreeMode && (
-              <TrialHomeBanner
-                chatsRemaining={trialStatus.chatsRemaining}
-                maxChats={trialStatus.maxChats}
-                visitorId={trialStatus.visitorId}
-              />
-            )}
-
+            {/* COMP-01: the trial promo banner (quota bar + "request access" CTA
+                → /invite/request) was removed from the child home. Commercial /
+                account surfaces must never target the student; the adult sees
+                trial usage in the parent area (genitori view) instead. */}
             <motion.div
               key={currentView}
               initial={{ opacity: 0, y: 20 }}
@@ -298,9 +295,12 @@ export default function Home() {
             </motion.div>
           </main>
 
-          {/* Trial usage dashboard sidebar - visible only in trial mode on lg
-              screens, and never in distraction-free mode (A11Y-05) */}
-          {trialStatus.isTrialMode && !trialStatus.isLoading && !distractionFreeMode && (
+          {/* COMP-01: trial usage (quotas, percentages, invite CTA) is an ADULT
+              account surface. It renders ONLY next to the parent area (genitori
+              view) — never alongside the child learning flow — regardless of
+              distractionFreeMode, which is an accessibility extra, not the
+              barrier that keeps commercial surfaces away from the child. */}
+          {trialStatus.isTrialMode && !trialStatus.isLoading && currentView === 'genitori' && (
             <aside className="w-80 hidden lg:block flex-shrink-0">
               <TrialUsageDashboard />
             </aside>

@@ -1,20 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { Flame, Coins, Gift, MessageCircle, Menu } from 'lucide-react';
+import { Flame, Coins, Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ToolsDropdown } from '@/components/tools';
 import { UserMenuDropdown } from '@/components/ui/user-menu-dropdown';
-
-interface TrialStatus {
-  isTrialMode: boolean;
-  chatsUsed: number;
-  chatsRemaining: number;
-  maxChats: number;
-}
 
 interface HomeHeaderProps {
   sidebarOpen: boolean;
@@ -24,7 +16,6 @@ interface HomeHeaderProps {
   progressPercent: number;
   seasonName: string;
   streak: { current: number };
-  trialStatus?: TrialStatus;
 }
 
 export function HomeHeader({
@@ -35,7 +26,6 @@ export function HomeHeader({
   progressPercent,
   seasonName,
   streak,
-  trialStatus,
 }: HomeHeaderProps) {
   const t = useTranslations('home');
 
@@ -96,27 +86,11 @@ export function HomeHeader({
           </span>
         </div>
 
-        {/* Trial mode badge */}
-        {trialStatus?.isTrialMode && (
-          <Link
-            href="/invite/request"
-            data-testid="trial-badge"
-            className={cn(
-              'flex items-center gap-2 min-h-[44px] px-3 py-1.5 rounded-full text-xs font-medium transition-colors',
-              trialStatus.chatsRemaining <= 3
-                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40'
-                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40',
-            )}
-            title={t('header.trialClickToRequest')}
-          >
-            <Gift className="w-3.5 h-3.5" />
-            <span>{t('header.trial')}</span>
-            <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
-              <MessageCircle className="w-3 h-3" />
-              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
-            </span>
-          </Link>
-        )}
+        {/* COMP-01: the trial badge ("Prova 7/10" linking to /invite/request)
+            was removed — adult/commercial jargon a 9-year-old does not parse
+            (focus group FG-10) and a data-collecting CTA aimed at the child.
+            Trial quota + invite live in adult contexts only ("Per i grandi"
+            sidebar group and the parent area). */}
       </div>
 
       {/* Right section: tools dropdown + notifications + user menu */}

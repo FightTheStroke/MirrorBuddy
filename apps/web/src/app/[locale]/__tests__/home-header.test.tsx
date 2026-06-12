@@ -164,6 +164,17 @@ describe('HomeHeader - User Greeting F-08', () => {
     expect(screen.getByTestId('user-menu-dropdown')).toBeInTheDocument();
   });
 
+  // COMP-01: the child-facing header must not carry trial/commercial surfaces.
+  describe('Child-space guardrails - COMP-01', () => {
+    it('renders no trial badge and no link to the invite-request form', () => {
+      const { container } = render(<HomeHeader {...defaultProps} userName="Marco" />);
+
+      expect(container.querySelector('[data-testid="trial-badge"]')).not.toBeInTheDocument();
+      const links = Array.from(container.querySelectorAll('a'));
+      expect(links.some((a) => (a.getAttribute('href') || '').includes('invite'))).toBe(false);
+    });
+  });
+
   describe('Accessibility - F-14', () => {
     it('menu button has accessible aria-label', () => {
       const { container } = render(<HomeHeader {...defaultProps} onMenuClick={vi.fn()} />);

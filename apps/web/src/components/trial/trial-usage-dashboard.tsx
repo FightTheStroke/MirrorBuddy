@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -146,8 +146,10 @@ export function TrialUsageDashboard() {
             {t('youAreApproachingYourTrialLimitsUpgradeNowToContin')}
             {t('learningWithoutInterruptions')}
           </p>
+          {/* COMP-01: this CTA collects PII downstream (email on the invite
+              form) — the dashboard renders ONLY in the parent area context. */}
           <Link
-            href="/invite-request"
+            href="/invite/request"
             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
           >
             {t('richiediInvitoPerContinuare')}
