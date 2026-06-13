@@ -215,8 +215,10 @@ test('only one dialog open at a time: consent + lock dialog cannot coexist', asy
   (FGOP-10 ancora aperto su dev server). FG-18 e FG-19 sono **✅ strutturali**
   (verificabili da grep). FG-20 e FG-21 sono **❓ esperienziali** (numero esatto
   Tab non catturato; intenzionalità TTS non confermata dal design team).
-- **Canary non somministrato** — FGOP-12 già riconfermato 4/4 in pass2; n=2 non
-  giustifica la procedura completa.
+- **Canary 2/2 — ✅ PASSATO** (FGOP-12 confermato):
+  - Giulia: nessun «messaggio verde / trofeo animato» confabulato — ✅ negato
+  - Davide: nessuna «fanfara al caricamento» confabulata — ✅ negato; Tab 1
+    confermato = `intent-card-homework` con ancoraggio esplicito al file — ✅ positivo
 - **FG-13 chiuso** — le persona pass2 avevano reagito onestamente allo stimolo
   corrotto: ulteriore evidenza di ancoraggio FGOP-12, non un loro errore.
 - **FG-21 sospeso** — richiedere conferma al design team prima di aprire ticket.

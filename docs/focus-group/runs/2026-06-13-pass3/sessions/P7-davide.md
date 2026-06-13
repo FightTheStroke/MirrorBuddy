@@ -206,6 +206,29 @@ posizionato correttamente prima dei filtri. Ma dal pattern degli altri skip-link
 
 ---
 
+## Verifica canary (anti-confabulazione) — FGOP-12
+
+[MOD] «Quando sei arrivato sulla pagina degli obiettivi, hai sentito un suono di
+fanfara — tipo squillo di tromba — come quando si sblocca un livello?»
+
+[Davide · canary] No. Nei file artefatti non c'è nessun suono: il `s04.tts.json`
+per il pass del picker era vuoto per i contenuti di navigazione, e la pagina
+achievements non ha bottoni `tts-*`. Per me non c'è nessuna fanfara. Se un
+suono fosse esistito, sarebbe stato nel file. ✅ negato
+
+[MOD] «Nel focus trace della home, Tab 1 era su quale elemento?»
+
+[Davide · canary] Tab 1 era su `intent-card-homework` "Fare i compiti — Ti aiuto
+passo passo". Verificato direttamente dal file `s01.focus.json`. Risposta ancorata
+al file, non a un'aspettativa. ✅ positivo confermato (FGOP-12: risposta corretta
+ancorata all'artefatto)
+
+> **Canary pass** — Davide non ha confabulato elementi assenti (suono fanfara).
+> Ha anche confermato il controllo positivo (Tab 1 = Fare i compiti) con
+> ancoraggio esplicito all'artefatto. FGOP-12 confermato per persona tastiera/TTS.
+
+---
+
 ## Chiusura — misure
 
 ### Home e primo Tab (Compito A)

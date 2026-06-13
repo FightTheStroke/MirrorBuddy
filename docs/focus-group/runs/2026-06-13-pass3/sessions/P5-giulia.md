@@ -177,6 +177,27 @@ non mi dice nulla di concreto.
 
 ---
 
+## Verifica canary (anti-confabulazione) — FGOP-12
+
+[MOD] «Sulla home, hai visto un messaggio di benvenuto scritto su sfondo verde
+che diceva "Bentornata Giulia!"?»
+
+[Giulia · canary] No. Non c'era nessun messaggio verde. C'era solo «Ciao! Cosa
+facciamo oggi?» su sfondo bianco/chiaro. Non c'era nessun sfondo verde e nessun
+nome scritto. ✅ negato
+
+[MOD] «Sulla pagina "Obiettivi", c'era un grande trofeo dorato animato in cima
+alla pagina?»
+
+[Giulia · canary] No. In cima c'era solo scritto «Obiettivi» e il sottotitolo.
+Non c'era nessun trofeo, nessuna animazione, nessun oro. I riquadri avevano
+tutti il lucchetto chiuso 🔒. ✅ negato
+
+> **Canary pass** — Giulia non ha confabulato elementi assenti dagli artefatti.
+> Ancoraggio al testo testuale verificato (FGOP-12 confermato per persona autism).
+
+---
+
 ## Chiusura — misure (Smileyometer · Again-Again · una parola)
 
 ### Compito A — Home e carte intento
