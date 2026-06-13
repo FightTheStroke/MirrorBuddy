@@ -20,6 +20,8 @@ export default function InviteRequestPage() {
   const [motivation, setMotivation] = useState('');
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  // COMP-01 (#431): guardian self-declaration; not stored in DB, audit log only.
+  const [guardianDeclared, setGuardianDeclared] = useState(false);
   // COMP-01 (#431): this form collects a minor's PII (name, email). Gate it
   // behind the grown-up challenge so a child cannot self-submit. SSR has no
   // window → renders the gate; the client initializer reads the session flag.
@@ -45,6 +47,7 @@ export default function InviteRequestPage() {
           email,
           motivation,
           visitorId,
+          guardianDeclared,
         }),
       });
 
@@ -121,6 +124,24 @@ export default function InviteRequestPage() {
           >
             {t('adultsOnlyNotice')}
           </p>
+          {/* COMP-01 (#431): self-declaration; audit-logged server-side, never stored in DB */}
+          <div className="mt-3 flex items-start gap-2">
+            <input
+              id="guardian-declaration"
+              type="checkbox"
+              required
+              checked={guardianDeclared}
+              onChange={(e) => setGuardianDeclared(e.target.checked)}
+              disabled={formState === 'submitting'}
+              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+            />
+            <label
+              htmlFor="guardian-declaration"
+              className="text-sm text-slate-700 dark:text-slate-300"
+            >
+              {t('guardianDeclarationLabel')}
+            </label>
+          </div>
         </div>
 
         {formState === 'error' && (
@@ -193,7 +214,11 @@ export default function InviteRequestPage() {
             </p>
           </div>
 
-          <Button type="submit" disabled={formState === 'submitting'} className="w-full">
+          <Button
+            type="submit"
+            disabled={formState === 'submitting' || !guardianDeclared}
+            className="w-full"
+          >
             {formState === 'submitting' ? (
               t('submitButtonSubmitting')
             ) : (

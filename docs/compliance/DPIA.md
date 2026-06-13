@@ -49,6 +49,8 @@ This DPIA assesses high-risk data processing activities under GDPR Article 35, i
 
 **Collection** (`src/lib/compliance/coppa-service.ts`): Opt-in registration with privacy notice + dual consent (student + parent for under-16/13).
 
+> **2026-06-13**: Commercial surfaces (TrialHomeBanner, trial badge, quota CTAs) removed from child home per COMP-01 (#431, commit 1287f514). `/invite/request` now guarded by: (1) arithmetic grown-up gate (sessionStorage), (2) guardian self-declaration checkbox, (3) adults-only informational notice. Legal sufficiency pending sign-off — see `docs/compliance/trial-minors-guardrails.md §5`.
+
 **Processing** (`src/lib/safety/safety-core.ts`):
 
 - Conversations → Azure OpenAI → Sanitized response (5-layer safety: jailbreak detector, content filter, output sanitizer, age-gating, audit trail)
@@ -86,6 +88,8 @@ See `docs/compliance/DPIA-risks.md` for detailed 12-risk matrix with likelihood�
 **Key risks**: Unauthorized access (R-01), harmful AI content (R-02), missing COPPA consent (R-03).
 
 **Risk verdict**: ACCEPTABLE with planned mitigations (human escalation pathway + complete COPPA email verification in Q1 2026).
+
+2026-06-13: Commercial surfaces (TrialHomeBanner, trial badge, quota CTAs) removed from child home per COMP-01 (#431, commit 1287f514). `/invite/request` now guarded by: (1) arithmetic grown-up gate (sessionStorage), (2) guardian self-declaration checkbox, (3) adults-only informational notice. Legal sufficiency pending sign-off — see `docs/compliance/trial-minors-guardrails.md` §5.
 
 ### 5.1 External Services Risk Assessment
 
