@@ -1887,9 +1887,6 @@
       "completeSuccess": "Esperimento completato con successo",
       "startDate": "Data di inizio",
       "cancel": "Annulla"
-    },
-    "community": {
-      "reviewQueue": "Coda revisione"
     }
   }
 }

@@ -45,5 +45,22 @@ if [ -n "$BASE_URL" ]; then
   esac
 fi
 
-[ "$missing" -eq 0 ] || { echo "FAIL: $missing required var(s) missing"; exit 1; }
+if [ "$missing" -gt 0 ]; then
+  echo ""
+  echo "== Fix: add missing vars to Vercel production environment =="
+  echo "  Run each command and paste the value when prompted:"
+  echo ""
+  echo "  vercel env add AZURE_OPENAI_REALTIME_API_KEY production"
+  echo "  vercel env add AZURE_OPENAI_REALTIME_ENDPOINT production"
+  echo "  vercel env add AZURE_OPENAI_REALTIME_REGION production"
+  echo "  vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT production"
+  echo "  vercel env add AZURE_OPENAI_REALTIME_API_VERSION production"
+  echo ""
+  echo "  Then redeploy and recheck:"
+  echo "  vercel redeploy --target production"
+  echo "  scripts/check-azure-realtime.sh https://<your-production-url>"
+  echo ""
+  echo "FAIL: $missing required var(s) missing"
+  exit 1
+fi
 echo "OK"

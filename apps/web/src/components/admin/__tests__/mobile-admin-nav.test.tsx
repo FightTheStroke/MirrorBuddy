@@ -103,7 +103,6 @@ describe('MobileAdminNav', () => {
       expect(screen.getByText('Analytics')).toBeInTheDocument();
       expect(screen.getByText('Research Lab')).toBeInTheDocument();
       expect(screen.getByText('Model Comparison')).toBeInTheDocument();
-      expect(screen.getByText('Review Queue')).toBeInTheDocument();
       expect(screen.getByText(getTranslation('admin.sidebar.settings'))).toBeInTheDocument();
     });
 
@@ -141,22 +140,6 @@ describe('MobileAdminNav', () => {
       const abTestingLink = screen.getByRole('link', { name: 'A/B Testing' });
       expect(abTestingLink).toHaveAttribute('href', '/admin/research/ab-testing');
       expect(abTestingLink).toHaveAttribute('aria-label', 'A/B Testing');
-    });
-
-    it('renders Review Queue link with aria label and href', () => {
-      render(
-        <MobileAdminNav
-          isOpen={true}
-          onOpen={vi.fn()}
-          onClose={mockOnClose}
-          pendingInvites={0}
-          systemAlerts={0}
-        />,
-      );
-
-      const reviewQueueLink = screen.getByRole('link', { name: 'Review Queue' });
-      expect(reviewQueueLink).toHaveAttribute('href', '/admin/community');
-      expect(reviewQueueLink).toHaveAttribute('aria-label', 'Review Queue');
     });
 
     it('marks current page as active', () => {
