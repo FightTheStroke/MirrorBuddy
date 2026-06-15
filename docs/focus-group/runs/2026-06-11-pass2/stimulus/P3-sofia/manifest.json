@@ -1,0 +1,28 @@
+{
+  "personaId": "P3-sofia",
+  "profile": "visual",
+  "tier": "base",
+  "runTag": "2026-06-11-pass2",
+  "branch": "feat/ux-simplification-intention-based",
+  "capturedAt": "2026-06-11T20:15:54.953Z",
+  "steps": [
+    {
+      "step": "s01",
+      "task": "T2-landing",
+      "action": "land on intent home at 640px (high-contrast + 130%)",
+      "artefacts": ["s01.png", "s01.aria.yaml", "s01.text.json", "s01.tts.json"]
+    },
+    {
+      "step": "s02",
+      "task": "T2/T8-subjects",
+      "action": "open Compiti → subject picker (640px)",
+      "artefacts": ["s02.png", "s02.aria.yaml", "s02.text.json"]
+    },
+    {
+      "step": "s04",
+      "task": "T5-premi",
+      "action": "navigate to \"I miei premi\" (640px)",
+      "artefacts": ["s04.png", "s04.aria.yaml", "s04.text.json"]
+    }
+  ]
+}

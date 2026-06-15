@@ -1,0 +1,176 @@
+[
+  {
+    "index": 1,
+    "testid": "intent-card-homework",
+    "name": "Fare i compiti\n\nTi aiuto passo passo",
+    "tag": "button"
+  },
+  {
+    "index": 2,
+    "testid": "intent-card-study",
+    "name": "Studiare\n\nFacciamo una mappa insieme",
+    "tag": "button"
+  },
+  {
+    "index": 3,
+    "testid": "intent-card-quizMe",
+    "name": "Mettiti alla prova\n\nTi faccio io le domande",
+    "tag": "button"
+  },
+  {
+    "index": 4,
+    "testid": null,
+    "name": "Chiedi a un grande",
+    "tag": "button"
+  },
+  {
+    "index": 5,
+    "testid": null,
+    "name": "Chiudi notifica",
+    "tag": "button"
+  },
+  {
+    "index": 7,
+    "testid": "skip-link",
+    "name": "Vai al contenuto principale",
+    "tag": "a"
+  },
+  {
+    "index": 8,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 9,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 10,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 11,
+    "testid": "a11y-floating-button",
+    "name": "Impostazioni accessibilità",
+    "tag": "button"
+  },
+  {
+    "index": 12,
+    "testid": "trial-badge",
+    "name": "Prova\n10/10",
+    "tag": "a"
+  },
+  {
+    "index": 13,
+    "testid": null,
+    "name": "Strumenti",
+    "tag": "button"
+  },
+  {
+    "index": 14,
+    "testid": null,
+    "name": "Notifiche",
+    "tag": "button"
+  },
+  {
+    "index": 15,
+    "testid": null,
+    "name": "Ciao",
+    "tag": "button"
+  },
+  {
+    "index": 16,
+    "testid": null,
+    "name": "Torna alla Home",
+    "tag": "a"
+  },
+  {
+    "index": 17,
+    "testid": null,
+    "name": "Chiudi menu",
+    "tag": "button"
+  },
+  {
+    "index": 18,
+    "testid": null,
+    "name": "Accedi",
+    "tag": "a"
+  },
+  {
+    "index": 19,
+    "testid": null,
+    "name": "Accedi",
+    "tag": "button"
+  },
+  {
+    "index": 20,
+    "testid": null,
+    "name": "Richiedi Accesso",
+    "tag": "a"
+  },
+  {
+    "index": 21,
+    "testid": null,
+    "name": "Richiedi Accesso",
+    "tag": "button"
+  },
+  {
+    "index": 22,
+    "testid": "home-nav-intent",
+    "name": "Casa",
+    "tag": "button"
+  },
+  {
+    "index": 23,
+    "testid": "home-nav-supporti",
+    "name": "I miei lavori",
+    "tag": "button"
+  },
+  {
+    "index": 24,
+    "testid": "home-nav-progress",
+    "name": "I miei premi",
+    "tag": "button"
+  },
+  {
+    "index": 25,
+    "testid": "home-nav-maestri",
+    "name": "I Professori",
+    "tag": "button"
+  },
+  {
+    "index": 26,
+    "testid": "home-nav-calendar",
+    "name": "Calendario",
+    "tag": "button"
+  },
+  {
+    "index": 27,
+    "testid": "home-nav-settings",
+    "name": "Impostazioni",
+    "tag": "button"
+  },
+  {
+    "index": 28,
+    "testid": null,
+    "name": "Area Genitori",
+    "tag": "button"
+  },
+  {
+    "index": 29,
+    "testid": null,
+    "name": "Chiedi a un grande",
+    "tag": "button"
+  },
+  {
+    "index": 30,
+    "testid": "intent-card-homework",
+    "name": "Fare i compiti\n\nTi aiuto passo passo",
+    "tag": "button"
+  }
+]

@@ -132,8 +132,8 @@ describe('HomeHeader - User Greeting F-08', () => {
     // Verify that useTranslations was called with "home"
     expect(useTranslations).toHaveBeenCalledWith('home');
 
-    // Header translations are used for stats and level info
-    expect(mockT).toHaveBeenCalledWith('mirrorBucksShort');
+    // Header translations are used for level info
+    expect(mockT).toHaveBeenCalledWith('lv');
   });
 
   it('displays UserMenuDropdown in right section with other controls', () => {
@@ -150,10 +150,10 @@ describe('HomeHeader - User Greeting F-08', () => {
   it('still renders level badge and progress when userName is provided', () => {
     render(<HomeHeader {...defaultProps} userName="Giovanni" />);
 
-    // Level badge should still be present
+    // Level badge should still be present (MirrorBucks count text was removed
+    // from the child-facing header — the progress bar stays, the jargon goes).
     expect(screen.getByText(/Lv\.5/)).toBeInTheDocument();
     expect(screen.getByText(/Autumn/)).toBeInTheDocument();
-    expect(screen.getByText(/500\/1000/)).toBeInTheDocument();
   });
 
   it('renders without userName (backward compatibility)', () => {
@@ -162,6 +162,17 @@ describe('HomeHeader - User Greeting F-08', () => {
     expect(container.querySelector('header')).toBeInTheDocument();
     // UserMenuDropdown should still render (without userName)
     expect(screen.getByTestId('user-menu-dropdown')).toBeInTheDocument();
+  });
+
+  // COMP-01: the child-facing header must not carry trial/commercial surfaces.
+  describe('Child-space guardrails - COMP-01', () => {
+    it('renders no trial badge and no link to the invite-request form', () => {
+      const { container } = render(<HomeHeader {...defaultProps} userName="Marco" />);
+
+      expect(container.querySelector('[data-testid="trial-badge"]')).not.toBeInTheDocument();
+      const links = Array.from(container.querySelectorAll('a'));
+      expect(links.some((a) => (a.getAttribute('href') || '').includes('invite'))).toBe(false);
+    });
   });
 
   describe('Accessibility - F-14', () => {
@@ -173,12 +184,12 @@ describe('HomeHeader - User Greeting F-08', () => {
       expect(menuButton).toHaveAttribute('aria-label', 'Open menu');
     });
 
-    it('stats have accessible title attributes for screen readers', () => {
+    it('streak stat has an accessible title attribute for screen readers', () => {
       const { container } = render(<HomeHeader {...defaultProps} />);
       const elementsWithTitle = container.querySelectorAll('[title]');
 
-      // Should have at least 4 stats with titles (streak, sessions, study time, questions)
-      expect(elementsWithTitle.length).toBeGreaterThanOrEqual(4);
+      // De-gamified child header keeps only the streak stat with a title.
+      expect(elementsWithTitle.length).toBeGreaterThanOrEqual(1);
     });
 
     it('menu button is keyboard focusable', () => {

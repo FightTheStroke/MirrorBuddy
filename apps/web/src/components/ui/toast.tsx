@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
@@ -53,14 +53,10 @@ function initToastState(): ToastState {
         const newToast: Toast = { ...toast, id };
         toastState!.toasts = [...toastState!.toasts, newToast];
         notifyListeners();
-
-        // Auto remove after duration
-        const duration = toast.duration ?? 5000;
-        if (duration > 0) {
-          setTimeout(() => {
-            toastState?.removeToast(id);
-          }, duration);
-        }
+        // Auto-dismiss is owned by ToastItem so the countdown can PAUSE while the
+        // toast is hovered or keyboard-focused (WCAG 2.2.1 Timing Adjustable) — a
+        // fire-and-forget setTimeout here could not be paused, cutting off slow
+        // readers (dyslexia) and motor users before they finish reading.
       },
       removeToast: (id) => {
         toastState!.toasts = toastState!.toasts.filter((t) => t.id !== id);
@@ -116,18 +112,45 @@ const ToastIcon = ({ type }: { type: ToastType }) => {
 
 // Individual toast component
 function ToastItem({ toast: toastItem, onRemove }: { toast: Toast; onRemove: () => void }) {
-  const t = useTranslations("common");
+  const t = useTranslations('common');
+  const duration = toastItem.duration ?? 5000;
+  // Keep the latest onRemove without resetting the timer on every parent render.
+  const onRemoveRef = useRef(onRemove);
+  useEffect(() => {
+    onRemoveRef.current = onRemove;
+  });
+  // WCAG 2.2.1: pause the auto-dismiss countdown while the toast is hovered or
+  // keyboard-focused, and resume from the REMAINING time — so a slow reader
+  // (dyslexia) or a motor user can keep it on screen as long as they need. The
+  // close button (below) is the explicit dismiss; duration<=0 means sticky.
+  const [paused, setPaused] = useState(false);
+  const remainingRef = useRef(duration);
+
+  useEffect(() => {
+    if (duration <= 0 || paused) return;
+    const start = Date.now();
+    const id = setTimeout(() => onRemoveRef.current(), remainingRef.current);
+    return () => {
+      clearTimeout(id);
+      remainingRef.current = Math.max(0, remainingRef.current - (Date.now() - start));
+    };
+  }, [paused, duration]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
       className={cn(
         'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border bg-white p-4 shadow-lg dark:bg-gray-900',
         toastItem.type === 'success' && 'border-green-200 dark:border-green-800',
         toastItem.type === 'error' && 'border-red-200 dark:border-red-800',
         toastItem.type === 'warning' && 'border-yellow-200 dark:border-yellow-800',
-        toastItem.type === 'info' && 'border-blue-200 dark:border-blue-800'
+        toastItem.type === 'info' && 'border-blue-200 dark:border-blue-800',
       )}
     >
       <ToastIcon type={toastItem.type} />
@@ -151,7 +174,7 @@ function ToastItem({ toast: toastItem, onRemove }: { toast: Toast; onRemove: () 
       <button
         onClick={onRemove}
         className="flex-shrink-0 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-800"
-        aria-label={t("chiudiNotifica")}
+        aria-label={t('chiudiNotifica')}
       >
         <X className="h-4 w-4" />
       </button>
@@ -161,7 +184,7 @@ function ToastItem({ toast: toastItem, onRemove }: { toast: Toast; onRemove: () 
 
 // Toast container component - must be mounted in layout
 export function ToastContainer() {
-  const t = useTranslations("common");
+  const t = useTranslations('common');
   // Initialize state lazily to avoid setState in useEffect
   const [toasts, setToasts] = useState<Toast[]>(() => {
     initToastState();
@@ -183,13 +206,17 @@ export function ToastContainer() {
   return (
     <div
       aria-live="polite"
-      aria-label={t("notifiche")}
+      aria-label={t('notifiche')}
       role="status"
       className="pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:max-w-sm"
     >
       <AnimatePresence mode="popLayout">
         {toasts.map((toastItem) => (
-          <ToastItem key={toastItem.id} toast={toastItem} onRemove={() => handleRemove(toastItem.id)} />
+          <ToastItem
+            key={toastItem.id}
+            toast={toastItem}
+            onRemove={() => handleRemove(toastItem.id)}
+          />
         ))}
       </AnimatePresence>
     </div>

@@ -133,3 +133,11 @@ export {
 } from './audit/compliance-audit-service';
 
 // escalation-service exports moved to ./server.ts (chains to @/lib/email → prisma)
+
+// Grown-up gate (COMP-01 / #431, #432): client-safe sessionStorage state + challenge.
+export {
+  isGrownUpVerified,
+  setGrownUpVerified,
+  makeGrownUpChallenge,
+  type GrownUpChallenge,
+} from './grown-up-gate-state';

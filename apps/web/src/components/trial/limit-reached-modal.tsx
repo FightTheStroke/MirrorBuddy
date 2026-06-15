@@ -1,47 +1,41 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
-import { X, MessageCircle, Sparkles, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  trackBetaCtaShown,
-  trackBetaCtaClicked,
-} from "@/lib/telemetry/trial-events";
-import { useTranslations } from "next-intl";
+import { useEffect, useRef } from 'react';
+import { X, MessageCircle, Sparkles, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { trackBetaCtaShown, trackBetaCtaClicked } from '@/lib/telemetry/trial-events';
+import { useTranslations } from 'next-intl';
 
 interface LimitReachedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  limitType: "chat" | "document" | "maestro" | "coach" | "tool";
+  limitType: 'chat' | 'document' | 'maestro' | 'coach' | 'tool';
   visitorId: string;
   onRequestBeta: () => void;
 }
 
 const LIMIT_MESSAGES: Record<string, { title: string; message: string }> = {
   chat: {
-    title: "Hai esaurito i messaggi di prova",
+    title: 'Hai esaurito i messaggi di prova',
     message:
-      "Hai usato tutti i 10 messaggi gratuiti. Richiedi accesso alla beta per continuare a studiare con MirrorBuddy!",
+      'Hai usato tutti i 10 messaggi gratuiti. Richiedi accesso alla beta per continuare a studiare con MirrorBuddy!',
   },
   document: {
-    title: "Documento limite raggiunto",
+    title: 'Documento limite raggiunto',
     message:
-      "In modalita prova puoi caricare solo 1 documento. Richiedi la beta per sbloccare tutto!",
+      'In modalita prova puoi caricare solo 1 documento. Richiedi la beta per sbloccare tutto!',
   },
   maestro: {
-    title: "Maestri limite raggiunto",
-    message:
-      "Hai provato 3 dei nostri 17 Maestri. Richiedi la beta per accedere a tutti!",
+    title: 'Maestri limite raggiunto',
+    message: 'Hai provato 3 dei nostri 17 Maestri. Richiedi la beta per accedere a tutti!',
   },
   coach: {
-    title: "Coach non disponibile in prova",
-    message:
-      "I Coach sono disponibili solo nella versione completa. Richiedi la beta!",
+    title: 'Coach non disponibile in prova',
+    message: 'I Coach sono disponibili solo nella versione completa. Richiedi la beta!',
   },
   tool: {
-    title: "Strumento non disponibile",
-    message:
-      "Questo strumento e disponibile solo nella versione completa. Richiedi la beta!",
+    title: 'Strumento non disponibile',
+    message: 'Questo strumento e disponibile solo nella versione completa. Richiedi la beta!',
   },
 };
 
@@ -58,12 +52,12 @@ export function LimitReachedModal({
   visitorId,
   onRequestBeta,
 }: LimitReachedModalProps) {
-  const t = useTranslations("auth");
+  const t = useTranslations('auth');
   const hasTrackedRef = useRef(false);
 
   useEffect(() => {
     if (isOpen && !hasTrackedRef.current) {
-      trackBetaCtaShown(visitorId, "limit_modal");
+      trackBetaCtaShown(visitorId, 'limit_modal');
       hasTrackedRef.current = true;
     }
   }, [isOpen, visitorId]);
@@ -73,7 +67,7 @@ export function LimitReachedModal({
   const { title, message } = LIMIT_MESSAGES[limitType] || LIMIT_MESSAGES.chat;
 
   const handleRequestBeta = () => {
-    trackBetaCtaClicked(visitorId, "limit_modal");
+    trackBetaCtaClicked(visitorId, 'limit_modal');
     onRequestBeta();
   };
 
@@ -99,40 +93,34 @@ export function LimitReachedModal({
 
           {/* Title */}
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-              {title}
-            </h2>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h2>
             <p className="text-slate-600 dark:text-slate-300">{message}</p>
           </div>
 
           {/* Features preview */}
           <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-2">
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-              {t("conMirrorbuddyBetaAvrai")}
+              {t('conMirrorbuddyBetaAvrai')}
             </p>
             <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                {t("chatIllimitateConIMaestri")}
+                {t('chatIllimitateConIMaestri')}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                {t("tuttiI17MaestriE5Coach")}
+                {t('tuttiI17MaestriE5Coach')}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-500" />
-                {t("strumentiCompletiQuizFlashcardMappe")}
+                {t('strumentiCompletiQuizFlashcardMappe')}
               </li>
             </ul>
           </div>
 
           {/* CTA */}
-          <Button
-            onClick={handleRequestBeta}
-            size="lg"
-            className="w-full gap-2"
-          >
-            {t("richiediAccessoBeta")}
+          <Button onClick={handleRequestBeta} size="lg" className="w-full gap-2">
+            {t('requestBetaAccess')}
             <ArrowRight className="w-4 h-4" />
           </Button>
 
@@ -141,7 +129,7 @@ export function LimitReachedModal({
             onClick={onClose}
             className="w-full text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           >
-            {t("continuaConLaProvaLimitata")}
+            {t('continuaConLaProvaLimitata')}
           </button>
         </div>
       </div>

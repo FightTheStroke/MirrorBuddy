@@ -1,0 +1,34 @@
+{
+  "personaId": "P5-giulia",
+  "profile": "autism",
+  "tier": "trial",
+  "runTag": "2026-06-11-pass2",
+  "branch": "feat/ux-simplification-intention-based",
+  "capturedAt": "2026-06-11T20:14:29.400Z",
+  "steps": [
+    {
+      "step": "s01",
+      "task": "T2-landing",
+      "action": "land on intent home (step 1)",
+      "artefacts": ["s01.png", "s01.aria.yaml", "s01.text.json"]
+    },
+    {
+      "step": "s02",
+      "task": "T2/T8-subjects",
+      "action": "open Compiti → subject picker",
+      "artefacts": ["s02.png", "s02.aria.yaml", "s02.text.json"]
+    },
+    {
+      "step": "s03",
+      "task": "T4-tierlock",
+      "action": "click locked \"Mettiti alla prova\" → tier-lock dialog",
+      "artefacts": ["s03.png", "s03.aria.yaml", "s03.text.json"]
+    },
+    {
+      "step": "s04",
+      "task": "T5-premi",
+      "action": "navigate to \"I miei premi\" (progress)",
+      "artefacts": ["s04.png", "s04.aria.yaml", "s04.text.json"]
+    }
+  ]
+}

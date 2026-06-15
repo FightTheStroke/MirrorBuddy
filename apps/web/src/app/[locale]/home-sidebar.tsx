@@ -40,6 +40,7 @@ interface HomeSidebarProps {
   currentView: View;
   onViewChange: (view: View) => Promise<void>;
   navItems: NavItem[];
+  grownUpNavItems?: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
   trialStatus?: TrialStatus;
@@ -51,6 +52,7 @@ export function HomeSidebar({
   currentView,
   onViewChange,
   navItems,
+  grownUpNavItems,
   hasNewInsights,
   onParentAccess,
   trialStatus,
@@ -62,6 +64,65 @@ export function HomeSidebar({
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       onToggle();
     }
+  };
+
+  const renderNavItem = (item: NavItem) => {
+    const avatarSrc = 'avatar' in item ? item.avatar : null;
+    const isActive = currentView === item.id;
+    const isCollapsed = !open;
+
+    return (
+      <button
+        key={item.id}
+        data-testid={`home-nav-${item.id}`}
+        onClick={() => handleViewChange(item.id)}
+        aria-current={isActive ? 'page' : undefined}
+        className={cn(
+          'w-full flex items-center gap-3 rounded-xl transition-all',
+          isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
+          isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
+          !isActive &&
+            'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
+        )}
+        style={
+          isActive && !isCollapsed
+            ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' }
+            : undefined
+        }
+      >
+        {avatarSrc ? (
+          <div
+            className={cn(
+              'relative flex-shrink-0 rounded-full',
+              isCollapsed &&
+                isActive &&
+                'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
+            )}
+          >
+            <Image
+              src={avatarSrc}
+              alt={item.label}
+              width={32}
+              height={32}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+              isCollapsed &&
+                isActive &&
+                'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10',
+            )}
+          >
+            <item.icon className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')} />
+          </div>
+        )}
+        {open && <span className="font-medium">{item.label}</span>}
+      </button>
+    );
   };
 
   return (
@@ -85,10 +146,10 @@ export function HomeSidebar({
           <Link
             href="/"
             onClick={() => {
-              // Restore the maestri view on the home route (PR #319 / Codex P1):
+              // Restore the intent home on the home route (PR #319 / Codex P1):
               // pathname-based <Link> alone leaves currentView state on whatever
               // section the user previously opened (settings, calendar, ...).
-              handleViewChange('maestri');
+              handleViewChange('intent');
             }}
             className="flex items-center gap-3 h-11 min-w-[44px] hover:opacity-80 transition-opacity"
             aria-label={t('sidebar.backToHome')}
@@ -116,121 +177,71 @@ export function HomeSidebar({
           </Button>
         </div>
 
-        {/* Trial Status Indicator */}
-        {trialStatus?.isTrialMode && (
-          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col gap-2">
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
+          {navItems.map(renderNavItem)}
+
+          {/* Grown-ups section — visually separated so a child does not wander
+              into the professor grid, planner or settings. */}
+          {grownUpNavItems && grownUpNavItems.length > 0 && (
+            <div
+              data-testid="sidebar-grownups-group"
+              className="pt-3 mt-3 border-t border-slate-200 dark:border-slate-800 space-y-3"
+            >
               {open && (
-                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                  {t('sidebar.trialMode')}
-                </span>
+                <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  {t('sidebar.grownUps')}
+                </p>
               )}
-              <TrialStatusIndicator
-                chatsUsed={trialStatus.chatsUsed}
-                maxChats={trialStatus.maxChats}
-                voiceSecondsUsed={trialStatus.voiceSecondsUsed}
-                maxVoiceSeconds={trialStatus.maxVoiceSeconds}
-                toolsUsed={trialStatus.toolsUsed}
-                maxTools={trialStatus.maxTools}
-                showVoice={true}
-                showTools={true}
-                className={cn(!open && 'justify-center')}
-              />
-              {open && (
-                <div className="flex flex-col gap-1 mt-2">
-                  <Link href="/login">
-                    <Button variant="ghost" size="sm" className="w-full justify-start text-xs">
-                      <LogIn className="w-3 h-3 mr-2" />
-                      {t('sidebar.login')}
-                    </Button>
-                  </Link>
-                  <Link href="/invite/request">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
-                    >
-                      <UserPlus className="w-3 h-3 mr-2" />
-                      {t('sidebar.requestAccess')}
-                    </Button>
-                  </Link>
+              {grownUpNavItems.map(renderNavItem)}
+
+              {/* COMP-01: trial status, login and "request access" are ADULT
+                  account/commercial surfaces — they live INSIDE the "for
+                  grown-ups" group, never at the top of the sidebar where they
+                  visually address the child (focus group FG-10: a 9-year-old
+                  cannot parse "Richiedi Accesso"). The invite-request form
+                  collects PII (email) and must not be solicited from a minor. */}
+              {trialStatus?.isTrialMode && open && (
+                <div data-testid="sidebar-trial-grownups" className="px-4 pt-2 flex flex-col gap-2">
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                    {t('sidebar.trialMode')}
+                  </span>
+                  <TrialStatusIndicator
+                    chatsUsed={trialStatus.chatsUsed}
+                    maxChats={trialStatus.maxChats}
+                    voiceSecondsUsed={trialStatus.voiceSecondsUsed}
+                    maxVoiceSeconds={trialStatus.maxVoiceSeconds}
+                    toolsUsed={trialStatus.toolsUsed}
+                    maxTools={trialStatus.maxTools}
+                    showVoice={true}
+                    showTools={true}
+                  />
+                  <div className="flex flex-col gap-1 mt-1">
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full min-h-[44px] justify-start text-xs"
+                      >
+                        <LogIn className="w-3 h-3 mr-2" />
+                        {t('sidebar.login')}
+                      </Button>
+                    </Link>
+                    <Link href="/invite/request">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full min-h-[44px] justify-start text-xs text-purple-600 dark:text-purple-400"
+                      >
+                        <UserPlus className="w-3 h-3 mr-2" />
+                        {t('sidebar.requestAccess')}
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
-          {navItems.map((item) => {
-            const isChatItem = item.id === 'coach' || item.id === 'buddy';
-            const avatarSrc = 'avatar' in item ? item.avatar : null;
-
-            const isActive = currentView === item.id;
-            const isCollapsed = !open;
-
-            return (
-              <button
-                key={item.id}
-                data-testid={`home-nav-${item.id}`}
-                onClick={() => handleViewChange(item.id)}
-                className={cn(
-                  'w-full flex items-center gap-3 rounded-xl transition-all',
-                  // Collapsed: center content, minimal padding
-                  isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
-                  // Active state: full background only when expanded
-                  isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
-                  // Inactive state
-                  !isActive &&
-                    'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
-                  isChatItem && 'relative',
-                )}
-                style={
-                  isActive && !isCollapsed
-                    ? {
-                        boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40',
-                      }
-                    : undefined
-                }
-              >
-                {avatarSrc ? (
-                  <div
-                    className={cn(
-                      'relative flex-shrink-0 rounded-full',
-                      // When collapsed and active, add accent ring around avatar
-                      isCollapsed &&
-                        isActive &&
-                        'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
-                    )}
-                  >
-                    <Image
-                      src={avatarSrc}
-                      alt={item.label}
-                      width={32}
-                      height={32}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
-                  </div>
-                ) : (
-                  <div
-                    className={cn(
-                      'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
-                      // When collapsed and active, add accent ring around icon (circular)
-                      isCollapsed &&
-                        isActive &&
-                        'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10',
-                    )}
-                  >
-                    <item.icon
-                      className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')}
-                    />
-                  </div>
-                )}
-                {open && <span className="font-medium">{item.label}</span>}
-              </button>
-            );
-          })}
+          )}
         </nav>
 
         {/* Active Maestro Avatar */}
@@ -262,6 +273,7 @@ export function HomeSidebar({
           {/* Parent Access Button */}
           <button
             onClick={onParentAccess}
+            aria-label={t('sidebar.parentArea')}
             className={cn(
               'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl',
               'bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50',
@@ -271,7 +283,7 @@ export function HomeSidebar({
               'relative',
             )}
           >
-            <span className="relative">
+            <span className="relative" aria-hidden="true">
               👥
               {hasNewInsights && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />

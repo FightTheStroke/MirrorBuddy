@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { logger } from '@/lib/logger';
 import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classification';
+import {
+  getVoiceErrorCode,
+  VOICE_ERROR_I18N_KEYS,
+} from '@/lib/hooks/voice-session/voice-error-codes';
 import type { Maestro, ChatMessage } from '@/types';
 
 interface UseMaestroVoiceConnectionProps {
@@ -20,8 +25,24 @@ export function useMaestroVoiceConnection({
   onQuestionAsked,
   currentMessages = [],
 }: UseMaestroVoiceConnectionProps) {
+  const t = useTranslations('voice');
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [configError, setConfigError] = useState<string | null>(null);
+
+  // Resolve any voice error to a localized, child-friendly message.
+  // Coded errors (VoiceError) map to dedicated keys; anything else falls back
+  // to a single calm generic message. A child must never read raw provider text.
+  const resolveVoiceError = useCallback(
+    (error: unknown): string => {
+      if (error instanceof DOMException && error.name === 'NotAllowedError') {
+        return t(VOICE_ERROR_I18N_KEYS.MIC_NOT_ALLOWED);
+      }
+      const code = getVoiceErrorCode(error);
+      if (code) return t(VOICE_ERROR_I18N_KEYS[code]);
+      return t(VOICE_ERROR_I18N_KEYS.VOICE_CONNECTION_FAILED);
+    },
+    [t],
+  );
   const [connectionInfo, setConnectionInfo] = useState<{
     provider: 'azure';
     proxyPort: number;
@@ -57,7 +78,7 @@ export function useMaestroVoiceConnection({
           message,
         });
       }
-      setConfigError(message || 'Errore di connessione vocale');
+      setConfigError(resolveVoiceError(error));
     },
     onTranscript: (role, text) => {
       const transcriptId = `voice-${role}-${Date.now()}`;
@@ -100,13 +121,13 @@ export function useMaestroVoiceConnection({
 
         if (response.status === 429) {
           logger.warn('Rate limit exceeded for voice token', { retryAfter: data.retryAfter });
-          setConfigError('Troppe richieste. Riprova tra qualche secondo.');
+          setConfigError(t(VOICE_ERROR_I18N_KEYS.VOICE_RATE_LIMITED));
           return;
         }
 
         if (data.error) {
           logger.error('Voice API error', { error: data.error });
-          setConfigError(data.message || 'Servizio vocale non configurato');
+          setConfigError(t(VOICE_ERROR_I18N_KEYS.VOICE_CONFIG_UNAVAILABLE));
           return;
         }
 
@@ -114,11 +135,11 @@ export function useMaestroVoiceConnection({
         setConnectionInfo(data);
       } catch (error) {
         logger.error('Failed to get voice connection info', { error: String(error) });
-        setConfigError('Impossibile connettersi al servizio vocale');
+        setConfigError(t(VOICE_ERROR_I18N_KEYS.VOICE_CONFIG_UNAVAILABLE));
       }
     }
     fetchConnectionInfo();
-  }, []);
+  }, [t]);
 
   // Connect voice when activated
   useEffect(() => {
@@ -147,19 +168,21 @@ export function useMaestroVoiceConnection({
             message,
           });
         }
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          setConfigError(
-            'Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.',
-          );
-        } else {
-          setConfigError('Errore di connessione vocale');
-        }
+        setConfigError(resolveVoiceError(error));
         setIsVoiceActive(false);
       }
     };
 
     startVoice();
-  }, [isVoiceActive, connectionInfo, connectionState, maestro, connect, currentMessages]);
+  }, [
+    isVoiceActive,
+    connectionInfo,
+    connectionState,
+    maestro,
+    connect,
+    currentMessages,
+    resolveVoiceError,
+  ]);
 
   const handleVoiceCall = useCallback(() => {
     if (isVoiceActive) disconnect();

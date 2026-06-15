@@ -5,42 +5,40 @@
     "tiers": {
       "trial": {
         "name": "Trial",
-        "description": "Prova gratuita con funzionalità limitate",
+        "description": "Prova gratuita: solo \"Aiutami a fare i compiti\"",
         "price": "Gratis",
         "features": [
-          "5 messaggi chat al giorno",
-          "3 minuti voce al giorno",
-          "1 Maestro disponibile",
-          "Strumenti di base"
+          "1 intenzione: fare i compiti",
+          "10 messaggi chat al giorno",
+          "5 minuti voce al giorno",
+          "Strumenti di base (10 al giorno)"
         ],
         "cta": "Inizia ora"
       },
       "base": {
         "name": "Base",
-        "description": "Piano gratuito con funzionalità standard",
+        "description": "Piano gratuito: tutte e 3 le intenzioni",
         "price": "Gratis",
         "features": [
-          "10 messaggi chat al giorno",
-          "5 minuti voce al giorno",
-          "3 Maestri disponibili",
-          "Tutti gli strumenti",
-          "Mind map e quiz"
+          "Tutte e 3 le intenzioni: compiti, studio, interrogazione",
+          "50 messaggi chat al giorno",
+          "30 minuti voce al giorno",
+          "Tutti gli strumenti (30 al giorno)"
         ],
         "cta": "Registrati gratis"
       },
       "pro": {
         "name": "Pro",
-        "description": "Piano premium con tutto sbloccato",
+        "description": "Piano premium: intenzioni e strumenti illimitati",
         "price": "€9,99",
         "period": "/mese",
         "features": [
+          "Tutte e 3 le intenzioni senza limiti",
           "Chat illimitata",
           "Voce illimitata",
-          "Tutti i 26 Maestri",
-          "Tutti gli strumenti",
+          "Strumenti illimitati",
           "Dashboard genitori",
-          "Supporto prioritario",
-          "Analitiche avanzate"
+          "Supporto prioritario"
         ],
         "cta": "Passa a Pro"
       }

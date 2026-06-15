@@ -5,42 +5,40 @@
     "tiers": {
       "trial": {
         "name": "Trial",
-        "description": "Free trial with limited features",
+        "description": "Prueba gratuita: solo «Ayúdame con los deberes»",
         "price": "Free",
         "features": [
-          "5 chat messages per day",
-          "3 voice minutes per day",
-          "1 Maestro available",
-          "Basic tools"
+          "1 intención: ayuda con los deberes",
+          "10 mensajes de chat al día",
+          "5 minutos de voz al día",
+          "Herramientas básicas (10 al día)"
         ],
         "cta": "Start now"
       },
       "base": {
         "name": "Base",
-        "description": "Free plan with standard features",
+        "description": "Plan gratuito: las 3 intenciones",
         "price": "Free",
         "features": [
-          "10 chat messages per day",
-          "5 voice minutes per day",
-          "3 Maestros available",
-          "All tools",
-          "Mind maps and quizzes"
+          "Las 3 intenciones: deberes, estudio, examen",
+          "50 mensajes de chat al día",
+          "30 minutos de voz al día",
+          "Todas las herramientas (30 al día)"
         ],
         "cta": "Sign up free"
       },
       "pro": {
         "name": "Pro",
-        "description": "Premium plan with everything unlocked",
+        "description": "Plan premium: intenciones y herramientas ilimitadas",
         "price": "€9.99",
         "period": "/month",
         "features": [
-          "Unlimited chat",
-          "Unlimited voice",
-          "All 26 Maestros",
-          "All tools",
-          "Parent dashboard",
-          "Priority support",
-          "Advanced analytics"
+          "Las 3 intenciones sin límites",
+          "Chat ilimitado",
+          "Voz ilimitada",
+          "Herramientas ilimitadas",
+          "Panel para padres",
+          "Soporte prioritario"
         ],
         "cta": "Upgrade to Pro"
       }

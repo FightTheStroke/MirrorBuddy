@@ -10,7 +10,10 @@
       "zaino": "Rucksack",
       "calendar": "Kalender",
       "progress": "Fortschritt",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "home": "Zuhause",
+      "myWork": "Meine Sachen",
+      "myRewards": "Meine Belohnungen"
     },
     "header": {
       "openMenu": "Menü öffnen",
@@ -33,7 +36,8 @@
       "requestAccess": "Zugang Anfordern",
       "adminDashboardAria": "Zum Administrator-Dashboard gehen",
       "adminDashboard": "Admin-Dashboard",
-      "parentArea": "Elternbereich"
+      "parentArea": "Elternbereich",
+      "grownUps": "Für Erwachsene"
     },
     "adminDashboard": "Admin-Dashboard",
     "closeMenu": "Menü schließen",
@@ -55,6 +59,70 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Hallo! Was machen wir heute?",
+      "greetingNamed": "Hallo {name}! Was machen wir heute?",
+      "question": "Wähle, wo du starten möchtest: Ich begleite dich.",
+      "back": "Zurück",
+      "lockedHint": "Bitte einen Erwachsenen, es zu öffnen",
+      "subjectSubtitle": "Wähle das Fach und ich hole den passenden Professor.",
+      "homework": {
+        "title": "Hausaufgaben machen",
+        "subtitle": "Ich helfe dir Schritt für Schritt",
+        "contextMessage": "Hallo! Ich brauche Hilfe bei den Hausaufgaben. Sag mir, was du brauchst, und nutze gern Fotos, PDFs oder Formeln.",
+        "subjectTitle": "Wobei brauchst du Hilfe?"
+      },
+      "study": {
+        "title": "Lernen",
+        "subtitle": "Lass uns zusammen eine Karte machen",
+        "subjectTitle": "Was möchtest du lernen?",
+        "contextMessage": "Ich möchte dieses Thema lernen. Hilf mir mit einer Mindmap, dann einer Zusammenfassung und schließlich Lernkarten zum Wiederholen."
+      },
+      "quizMe": {
+        "title": "Teste dich",
+        "subtitle": "Ich stelle dir die Fragen",
+        "subjectTitle": "Worüber soll ich dich abfragen?",
+        "contextMessage": "Ich möchte zu diesem Thema abgefragt werden. Bereite ein Quiz vor und lass uns mit Lernkarten üben."
+      },
+      "subjectAny": "Weiß ich nicht / Ein bisschen von allem",
+      "ttsCardLabel": "Anhören: {label}",
+      "lockedDialog": {
+        "title": "Bitte einen Erwachsenen, es zu öffnen",
+        "body": "Diese Aktivität ist mit einem Schloss gesperrt. Ruf Mama, Papa oder deine Lehrerin: Sie können sie für dich öffnen!",
+        "listen": "Anhören",
+        "gotIt": "Verstanden"
+      },
+      "areas": {
+        "numbersScience": "Zahlen & Naturwissenschaften",
+        "languages": "Sprachen & Geschichten",
+        "worldHistory": "Welt & Geschichte",
+        "artBody": "Kunst & Körper"
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathematik",
+      "physics": "Physik",
+      "chemistry": "Chemie",
+      "biology": "Biologie",
+      "history": "Geschichte",
+      "geography": "Geografie",
+      "italian": "Italienisch",
+      "english": "Englisch",
+      "spanish": "Spanisch",
+      "french": "Französisch",
+      "german": "Deutsch",
+      "art": "Kunst",
+      "music": "Musik",
+      "civics": "Sozialkunde",
+      "economics": "Wirtschaft",
+      "computerScience": "Informatik",
+      "health": "Gesundheit",
+      "philosophy": "Philosophie",
+      "internationalLaw": "Völkerrecht",
+      "storytelling": "Geschichten",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

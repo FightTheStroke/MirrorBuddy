@@ -1,36 +1,20 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { ViewSkeleton, SessionSkeleton } from "@/components/ui/skeleton";
+import dynamic from 'next/dynamic';
+import { ViewSkeleton, SessionSkeleton } from '@/components/ui/skeleton';
 
 // Lazy load heavy components not visible on initial render
 export const LazyMaestroSession = dynamic(
   () =>
-    import("@/components/maestros/maestro-session").then((m) => ({
+    import('@/components/maestros/maestro-session').then((m) => ({
       default: m.MaestroSession,
     })),
   { loading: () => <SessionSkeleton />, ssr: false },
 );
 
-export const LazyCharacterChatView = dynamic(
-  () =>
-    import("@/components/conversation/character-chat-view").then((m) => ({
-      default: m.CharacterChatView,
-    })),
-  { loading: () => <SessionSkeleton />, ssr: false },
-);
-
-export const LazyAstuccioView = dynamic(
-  () =>
-    import("@/app/[locale]/astuccio/components/astuccio-view").then((m) => ({
-      default: m.AstuccioView,
-    })),
-  { loading: () => <ViewSkeleton />, ssr: false },
-);
-
 export const LazyZainoView = dynamic(
   () =>
-    import("@/app/[locale]/supporti/components/zaino-view").then((m) => ({
+    import('@/app/[locale]/supporti/components/zaino-view').then((m) => ({
       default: m.ZainoView,
     })),
   { loading: () => <ViewSkeleton />, ssr: false },
@@ -48,7 +32,7 @@ export function HomeShellSkeleton({ title }: { title: string }) {
       <div className="flex">
         <div className="hidden lg:block w-64 min-h-[calc(100vh-3.5rem)] border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
           <div className="p-4 space-y-3">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
                 className="h-10 bg-slate-100 dark:bg-slate-800 rounded-lg animate-pulse"
@@ -57,11 +41,12 @@ export function HomeShellSkeleton({ title }: { title: string }) {
           </div>
         </div>
         <main className="flex-1 p-6">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
+          {/* Matches the intention-based home: three large intent cards. */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl">
+            {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-48 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"
+                className="h-40 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse"
               />
             ))}
           </div>

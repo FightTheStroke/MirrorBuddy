@@ -233,10 +233,17 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
         const profile = await profileRes.json();
         if (profile) {
           const accessibility = profile.accessibility || {};
+          // Never surface the PII decryption placeholder to the student. If the
+          // server failed to decrypt the name (e.g. key rotation/mismatch), the
+          // middleware returns the literal '[decryption-failed]'; treat it as no
+          // name so the UI falls back to a generic greeting instead of showing
+          // "Ciao [decryption-failed]!" to a child.
+          const safeName =
+            profile.name && profile.name !== '[decryption-failed]' ? profile.name : undefined;
           set((state) => ({
             studentProfile: {
               ...state.studentProfile,
-              name: profile.name ?? state.studentProfile.name,
+              name: safeName ?? state.studentProfile.name,
               age: profile.age ?? state.studentProfile.age,
               schoolYear: profile.schoolYear ?? state.studentProfile.schoolYear,
               schoolLevel: profile.schoolLevel ?? state.studentProfile.schoolLevel,

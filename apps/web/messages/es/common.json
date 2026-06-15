@@ -296,7 +296,7 @@
     "tellUsAboutYourself": "Tell us about yourself",
     "gradeLevel": "Grade Level",
     "registratiPerAccessoIllimitato": "Registrati per accesso illimitato",
-    "richiediAccesso": "Richiedi accesso",
+    "requestAccess": "Solicitar acceso",
     "stagingEnvironmentIndicator": "Staging environment indicator",
     "stagingEnvironmentDataWillBeMarkedAsTestData": "⚠️ STAGING ENVIRONMENT - Data will be marked as test data",
     "dismissStagingBanner": "Dismiss staging banner",
@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "Esto es para los mayores",
+      "body": "Pide a un adulto que responda para continuar.",
+      "question": "¿Cuánto es {a} + {b}?",
+      "wrong": "Respuesta incorrecta. Inténtalo otra vez o pide a un mayor.",
+      "submit": "Continuar",
+      "cancel": "Volver"
+    }
   }
 }

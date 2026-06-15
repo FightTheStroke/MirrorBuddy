@@ -1,0 +1,236 @@
+[
+  {
+    "index": 1,
+    "testid": "intent-subject-any",
+    "name": "Non lo so / Un po' di tutto",
+    "tag": "button"
+  },
+  {
+    "index": 2,
+    "testid": "subject-art",
+    "name": "🎨\nArte",
+    "tag": "button"
+  },
+  {
+    "index": 3,
+    "testid": "subject-biology",
+    "name": "🌱\nBiologia",
+    "tag": "button"
+  },
+  {
+    "index": 4,
+    "testid": "subject-chemistry",
+    "name": "⚗️\nChimica",
+    "tag": "button"
+  },
+  {
+    "index": 5,
+    "testid": "subject-civics",
+    "name": "⚖️\nEducazione Civica",
+    "tag": "button"
+  },
+  {
+    "index": 6,
+    "testid": "subject-computerScience",
+    "name": "💻\nInformatica",
+    "tag": "button"
+  },
+  {
+    "index": 7,
+    "testid": "subject-english",
+    "name": "🇬🇧\nInglese",
+    "tag": "button"
+  },
+  {
+    "index": 8,
+    "testid": "subject-french",
+    "name": "🇫🇷\nFrancese",
+    "tag": "button"
+  },
+  {
+    "index": 9,
+    "testid": "subject-geography",
+    "name": "🗺️\nGeografia",
+    "tag": "button"
+  },
+  {
+    "index": 10,
+    "testid": "subject-german",
+    "name": "🇩🇪\nTedesco",
+    "tag": "button"
+  },
+  {
+    "index": 11,
+    "testid": "subject-health",
+    "name": "❤️\nSalute",
+    "tag": "button"
+  },
+  {
+    "index": 12,
+    "testid": "subject-history",
+    "name": "🏛️\nStoria",
+    "tag": "button"
+  },
+  {
+    "index": 13,
+    "testid": "subject-italian",
+    "name": "📖\nItaliano",
+    "tag": "button"
+  },
+  {
+    "index": 14,
+    "testid": "subject-mathematics",
+    "name": "🔢\nMatematica",
+    "tag": "button"
+  },
+  {
+    "index": 15,
+    "testid": "subject-music",
+    "name": "🎵\nMusica",
+    "tag": "button"
+  },
+  {
+    "index": 16,
+    "testid": "subject-physics",
+    "name": "🧲\nFisica",
+    "tag": "button"
+  },
+  {
+    "index": 17,
+    "testid": "subject-spanish",
+    "name": "🇪🇸\nSpagnolo",
+    "tag": "button"
+  },
+  {
+    "index": 18,
+    "testid": "subject-sport",
+    "name": "⚽\nSport",
+    "tag": "button"
+  },
+  {
+    "index": 19,
+    "testid": "subject-storytelling",
+    "name": "📚\nRacconti",
+    "tag": "button"
+  },
+  {
+    "index": 20,
+    "testid": null,
+    "name": "Chiedi a un grande",
+    "tag": "button"
+  },
+  {
+    "index": 21,
+    "testid": null,
+    "name": "Chiudi notifica",
+    "tag": "button"
+  },
+  {
+    "index": 23,
+    "testid": "skip-link",
+    "name": "Vai al contenuto principale",
+    "tag": "a"
+  },
+  {
+    "index": 24,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 25,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 26,
+    "testid": null,
+    "name": "NEXTJS-PORTAL",
+    "tag": "nextjs-portal"
+  },
+  {
+    "index": 27,
+    "testid": "a11y-floating-button",
+    "name": "Impostazioni accessibilità",
+    "tag": "button"
+  },
+  {
+    "index": 28,
+    "testid": "trial-badge",
+    "name": "Prova\n10/10",
+    "tag": "a"
+  },
+  {
+    "index": 29,
+    "testid": null,
+    "name": "Strumenti",
+    "tag": "button"
+  },
+  {
+    "index": 30,
+    "testid": null,
+    "name": "Notifiche",
+    "tag": "button"
+  },
+  {
+    "index": 31,
+    "testid": null,
+    "name": "Ciao",
+    "tag": "button"
+  },
+  {
+    "index": 32,
+    "testid": null,
+    "name": "Torna alla Home",
+    "tag": "a"
+  },
+  {
+    "index": 33,
+    "testid": null,
+    "name": "Chiudi menu",
+    "tag": "button"
+  },
+  {
+    "index": 34,
+    "testid": null,
+    "name": "Accedi",
+    "tag": "a"
+  },
+  {
+    "index": 35,
+    "testid": null,
+    "name": "Accedi",
+    "tag": "button"
+  },
+  {
+    "index": 36,
+    "testid": null,
+    "name": "Richiedi Accesso",
+    "tag": "a"
+  },
+  {
+    "index": 37,
+    "testid": null,
+    "name": "Richiedi Accesso",
+    "tag": "button"
+  },
+  {
+    "index": 38,
+    "testid": "home-nav-intent",
+    "name": "Casa",
+    "tag": "button"
+  },
+  {
+    "index": 39,
+    "testid": "home-nav-supporti",
+    "name": "I miei lavori",
+    "tag": "button"
+  },
+  {
+    "index": 40,
+    "testid": "home-nav-progress",
+    "name": "I miei premi",
+    "tag": "button"
+  }
+]

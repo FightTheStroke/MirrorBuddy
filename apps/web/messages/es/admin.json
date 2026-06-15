@@ -1887,9 +1887,6 @@
       "completeSuccess": "Experimento completado correctamente",
       "startDate": "Fecha de inicio",
       "cancel": "Cancelar"
-    },
-    "community": {
-      "reviewQueue": "Cola de revisión"
     }
   }
 }

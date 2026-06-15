@@ -18,9 +18,9 @@ interface InviteRequestBody {
   motivation: string;
   visitorId?: string;
   trialSessionId?: string;
+  guardianDeclared?: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public invite form, rate-limited, no cookie auth
 export const POST = pipe(withSentry('/api/invites/request'))(async (ctx) => {
   // Rate limit invite requests (3 per hour - public endpoint, strict)
   const clientId = getClientIdentifier(ctx.req);
@@ -34,7 +34,7 @@ export const POST = pipe(withSentry('/api/invites/request'))(async (ctx) => {
   }
 
   const body = (await ctx.req.json()) as InviteRequestBody;
-  const { name, email, motivation, trialSessionId } = body;
+  const { name, email, motivation, trialSessionId, guardianDeclared } = body;
 
   // Validation
   if (!name || name.trim().length < 2) {
@@ -99,6 +99,14 @@ export const POST = pipe(withSentry('/api/invites/request'))(async (ctx) => {
     email: inviteRequest.email,
     hasTrialSession: !!trialSessionId,
   });
+
+  // COMP-01 (#431): guardian self-declaration — audit log only, not stored in DB.
+  if (guardianDeclared === true) {
+    logger.info('Guardian declaration recorded for invite request', {
+      inviteId: inviteRequest.id,
+      guardianDeclared: true,
+    });
+  }
 
   // Funnel: BETA_REQUEST (non-blocking)
   const funnelVisitorId = body.visitorId || getVisitorIdFromCookie(ctx.req);

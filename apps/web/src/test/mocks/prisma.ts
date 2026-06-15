@@ -1,7 +1,7 @@
 /**
  * Centralized Prisma Mock
  *
- * Universal mock for `@/lib/db` — covers all 91 Prisma models.
+ * Universal mock for `@/lib/db` — covers all 89 Prisma models.
  * Generated from prisma/schema/*.prisma.
  *
  * Usage:
@@ -33,7 +33,7 @@ function createModelMock() {
   };
 }
 
-/** Creates a fresh Prisma mock with all 91 models and root methods */
+/** Creates a fresh Prisma mock with all 89 models and root methods */
 export function createMockPrisma() {
   return {
     accessibilitySettings: createModelMock(),
@@ -46,8 +46,6 @@ export function createMockPrisma() {
     complianceAuditEntry: createModelMock(),
     concept: createModelMock(),
     contactRequest: createModelMock(),
-    communityContribution: createModelMock(),
-    contributionVote: createModelMock(),
     contentEmbedding: createModelMock(),
     conversation: createModelMock(),
     coppaConsent: createModelMock(),

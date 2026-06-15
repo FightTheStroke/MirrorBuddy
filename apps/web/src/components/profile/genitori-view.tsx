@@ -15,7 +15,8 @@ import { AccessibilityTab } from '@/components/settings/sections';
 import type { StudentInsights, ObservationCategory, ParentDashboardActivity } from '@/types';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import type { ProfileMeta, PageState, LearningEntry } from './genitori-view/types';
-import { DEMO_USER_ID, MAESTRO_NAMES, EMPTY_ACTIVITY } from './genitori-view/constants';
+import { MAESTRO_NAMES, EMPTY_ACTIVITY } from './genitori-view/constants';
+import { getUserIdFromCookie } from '@/lib/auth/client-auth';
 import {
   fetchConsentStatus,
   fetchProfile,
@@ -60,6 +61,14 @@ export function GenitoriView() {
     id: string;
     name: string;
   } | null>(null);
+  // Real authenticated student id (parent and child share one account; the
+  // parent dashboard inspects the signed-in user's data). Replaces the former
+  // hardcoded demo-student-1 (BUG-03).
+  const [studentId, setStudentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setStudentId(getUserIdFromCookie());
+  }, []);
 
   const setContext = useAccessibilityStore((state) => state.setContext);
   const parentSettings = useAccessibilityStore((state) => state.parentSettings);
@@ -91,7 +100,9 @@ export function GenitoriView() {
 
     setIsDiaryLoading(true);
     try {
-      const response = await fetch(`/api/learnings?userId=${DEMO_USER_ID}`);
+      // The /api/learnings GET route scopes results to the authenticated user
+      // (ctx.userId); no userId query param is needed or honored.
+      const response = await fetch('/api/learnings');
       const data = await response.json();
       if (response.ok && data.learnings) {
         const entries: DiaryEntry[] = data.learnings.map((l: LearningEntry) => ({
@@ -116,9 +127,9 @@ export function GenitoriView() {
     }
   }, [tProfile]);
 
-  const handleFetchProfile = useCallback(async () => {
+  const handleFetchProfile = useCallback(async (uid: string) => {
     try {
-      const profileData = await fetchProfile();
+      const profileData = await fetchProfile(uid);
       if (profileData) {
         setInsights(profileData);
         return true;
@@ -133,8 +144,14 @@ export function GenitoriView() {
     const load = async () => {
       setPageState('loading');
       setError(null);
+      const uid = getUserIdFromCookie();
+      if (!uid) {
+        // Not signed in: cannot inspect any student profile.
+        setPageState('no-profile');
+        return;
+      }
       try {
-        const consent = await fetchConsentStatus();
+        const consent = await fetchConsentStatus(uid);
         if (consent?.deletionRequested) {
           setPageState('deletion-pending');
           return;
@@ -147,7 +164,7 @@ export function GenitoriView() {
           setPageState('needs-consent');
           return;
         }
-        const result = await handleFetchProfile();
+        const result = await handleFetchProfile(uid);
         await Promise.all([fetchDiaryEntries(), fetchActivity()]);
         setPageState(result ? 'ready' : 'error');
       } catch (err) {
@@ -159,11 +176,13 @@ export function GenitoriView() {
   }, [handleFetchProfile, fetchDiaryEntries, fetchActivity]);
 
   const handleGenerateProfile = async () => {
+    const uid = studentId;
+    if (!uid) return;
     setIsGenerating(true);
     setError(null);
     try {
-      await generateProfile();
-      await handleFetchProfile();
+      await generateProfile(uid);
+      await handleFetchProfile(uid);
       await Promise.all([fetchDiaryEntries(), fetchActivity()]);
       setPageState('ready');
     } catch (err) {
@@ -174,11 +193,13 @@ export function GenitoriView() {
   };
 
   const handleGiveConsentClick = async () => {
+    const uid = studentId;
+    if (!uid) return;
     try {
-      await giveConsent();
-      const consent = await fetchConsentStatus();
+      await giveConsent(uid);
+      const consent = await fetchConsentStatus(uid);
       if (consent?.parentConsent) {
-        const result = await handleFetchProfile();
+        const result = await handleFetchProfile(uid);
         await Promise.all([fetchDiaryEntries(), fetchActivity()]);
         if (result) setPageState('ready');
       }
@@ -188,9 +209,11 @@ export function GenitoriView() {
   };
 
   const handleExportClick = async (format: 'json' | 'pdf') => {
+    const uid = studentId;
+    if (!uid) return;
     setIsExporting(true);
     try {
-      await exportProfile(format);
+      await exportProfile(uid, format);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Export failed');
     } finally {
@@ -199,9 +222,11 @@ export function GenitoriView() {
   };
 
   const handleRequestDeletionClick = async () => {
+    const uid = studentId;
+    if (!uid) return;
     if (!confirm(tProfile('dataDeletionRequestConfirm'))) return;
     try {
-      await requestDeletion();
+      await requestDeletion(uid);
       setPageState('deletion-pending');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to request deletion');
@@ -452,11 +477,11 @@ export function GenitoriView() {
         )}
       </div>
 
-      {chatMaestro && (
+      {chatMaestro && studentId && (
         <ParentProfessorChat
           maestroId={chatMaestro.id}
           maestroName={chatMaestro.name}
-          studentId={DEMO_USER_ID}
+          studentId={studentId}
           studentName={studentName}
           onClose={() => setChatMaestro(null)}
         />

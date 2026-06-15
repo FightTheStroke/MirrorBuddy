@@ -10,7 +10,10 @@
       "zaino": "Sac à dos",
       "calendar": "Calendrier",
       "progress": "Progrès",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "home": "Maison",
+      "myWork": "Mes travaux",
+      "myRewards": "Mes récompenses"
     },
     "header": {
       "openMenu": "Ouvrir le menu",
@@ -33,7 +36,8 @@
       "requestAccess": "Demander l'accès",
       "adminDashboardAria": "Aller au tableau de bord d'administration",
       "adminDashboard": "Tableau de bord Admin",
-      "parentArea": "Espace Parents"
+      "parentArea": "Espace Parents",
+      "grownUps": "Pour les grands"
     },
     "adminDashboard": "Tableau de bord Admin",
     "closeMenu": "Fermer le menu",
@@ -55,6 +59,70 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Salut ! On fait quoi aujourd'hui ?",
+      "greetingNamed": "Salut {name} ! On fait quoi aujourd'hui ?",
+      "question": "Choisis par où commencer : je te guide.",
+      "back": "Retour",
+      "lockedHint": "Demande à un grand de l’ouvrir",
+      "subjectSubtitle": "Choisis la matière et je t'amène le bon professeur.",
+      "homework": {
+        "title": "Faire mes devoirs",
+        "subtitle": "Je t'aide pas à pas",
+        "contextMessage": "Salut ! J'ai besoin d'aide pour mes devoirs. Dis-moi ce qu'il te faut, et utilise photos, PDF ou formules si besoin.",
+        "subjectTitle": "Pour quoi as-tu besoin d'aide ?"
+      },
+      "study": {
+        "title": "Réviser",
+        "subtitle": "Faisons une carte ensemble",
+        "subjectTitle": "Que veux-tu étudier ?",
+        "contextMessage": "Je veux étudier ce sujet. Aide-moi avec une carte mentale, puis un résumé, et enfin des cartes mémoire pour réviser."
+      },
+      "quizMe": {
+        "title": "Mets-toi à l'épreuve",
+        "subtitle": "C'est moi qui pose les questions",
+        "subjectTitle": "Sur quoi dois-je t’interroger ?",
+        "contextMessage": "Je veux être interrogé sur ce sujet. Prépare un quiz et utilisons des cartes mémoire pour nous entraîner."
+      },
+      "subjectAny": "Je ne sais pas / Un peu de tout",
+      "ttsCardLabel": "Écouter : {label}",
+      "lockedDialog": {
+        "title": "Demande à un grand de l’ouvrir",
+        "body": "Cette activité est fermée avec un cadenas. Appelle maman, papa ou la maîtresse : ils peuvent l'ouvrir pour toi !",
+        "listen": "Écouter",
+        "gotIt": "Compris"
+      },
+      "areas": {
+        "numbersScience": "Nombres et sciences",
+        "languages": "Langues et récits",
+        "worldHistory": "Monde et histoire",
+        "artBody": "Art et corps"
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathématiques",
+      "physics": "Physique",
+      "chemistry": "Chimie",
+      "biology": "Biologie",
+      "history": "Histoire",
+      "geography": "Géographie",
+      "italian": "Italien",
+      "english": "Anglais",
+      "spanish": "Espagnol",
+      "french": "Français",
+      "german": "Allemand",
+      "art": "Art",
+      "music": "Musique",
+      "civics": "Éducation civique",
+      "economics": "Économie",
+      "computerScience": "Informatique",
+      "health": "Santé",
+      "philosophy": "Philosophie",
+      "internationalLaw": "Droit international",
+      "storytelling": "Récits",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

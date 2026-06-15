@@ -1,0 +1,159 @@
+{
+  "visibleText": "Stai provando MirrorBuddy\n\n10/10\nAiuto compiti\nStrumenti utili\nChiedi a un grande\nCiao! Cosa facciamo oggi?\n\nScegli da dove partire: ci penso io a guidarti.\n\nFare i compiti\n\nTi aiuto passo passo\n\nStudiare\n\nFacciamo una mappa insieme\n\nMettiti alla prova\n\nTi faccio io le domande",
+  "nodes": [
+    {
+      "testid": "skip-link",
+      "role": null,
+      "tag": "a",
+      "text": "Vai al contenuto principale",
+      "ariaLabel": "Vai al contenuto principale",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "a11y-floating-button",
+      "role": null,
+      "tag": "button",
+      "text": "",
+      "ariaLabel": "Impostazioni accessibilità",
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "trial-badge",
+      "role": null,
+      "tag": "a",
+      "text": "Prova\n10/10",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "trial-status",
+      "role": null,
+      "tag": "div",
+      "text": "10\n5m\n10",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    },
+    {
+      "testid": "home-nav-intent",
+      "role": null,
+      "tag": "button",
+      "text": "Casa",
+      "ariaLabel": null,
+      "ariaCurrent": "page",
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-supporti",
+      "role": null,
+      "tag": "button",
+      "text": "I miei lavori",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-progress",
+      "role": null,
+      "tag": "button",
+      "text": "I miei premi",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-maestri",
+      "role": null,
+      "tag": "button",
+      "text": "I Professori",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-calendar",
+      "role": null,
+      "tag": "button",
+      "text": "Calendario",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "home-nav-settings",
+      "role": null,
+      "tag": "button",
+      "text": "Impostazioni",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-homework",
+      "role": null,
+      "tag": "button",
+      "text": "Fare i compiti\n\nTi aiuto passo passo",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-study",
+      "role": null,
+      "tag": "button",
+      "text": "Studiare\n\nFacciamo una mappa insieme",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "intent-card-quizMe",
+      "role": null,
+      "tag": "button",
+      "text": "Mettiti alla prova\n\nTi faccio io le domande",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": "false",
+      "disabled": false
+    },
+    {
+      "testid": "trial-usage-dashboard",
+      "role": null,
+      "tag": "div",
+      "text": "Your Trial Usage\n\nYou are currently in the free trial. Upgrade your account to continuelearning after reaching your limits.\n\nChat Sessions\n20%\n\n2 of used 10 Used\n\nDocuments\n0%\n\n0 of used 5 Used\n\nVoice",
+      "ariaLabel": null,
+      "ariaCurrent": null,
+      "ariaDescribedby": null,
+      "ariaDisabled": null,
+      "disabled": null
+    }
+  ]
+}

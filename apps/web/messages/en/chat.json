@@ -565,6 +565,18 @@
     "citazioneMotivazionale": "Citazione motivazionale",
     "quoteIndicators": "Quote indicators",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}"
+    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "intentHandoff": {
+      "headline": "I brought you to Prof. {name} for {intent}.",
+      "headlineSubject": "I brought you to Prof. {name} for {subject}.",
+      "contextHint": "I've already written the question for you: press enter when you're ready, or change it however you like.",
+      "intent": {
+        "homework": "homework",
+        "study": "studying",
+        "quizMe": "a little quiz"
+      },
+      "listen": "Listen to the message",
+      "dismiss": "Got it, close"
+    }
   }
 }

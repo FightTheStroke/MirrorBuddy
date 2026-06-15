@@ -10,10 +10,8 @@ import {
   Trophy,
   Settings,
   Calendar,
-  Heart,
-  Sparkles,
-  PencilRuler,
   Backpack,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useProgressStore, useSettingsStore } from '@/lib/stores';
@@ -21,6 +19,7 @@ import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { useTrialStatus } from '@/lib/hooks/use-trial-status';
 import { useTrialToasts } from '@/lib/hooks/use-trial-toasts';
+import { useAccessibilityStore } from '@/lib/accessibility';
 import { getUserIdFromCookie } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import type { Maestro, ToolType } from '@/types';
@@ -28,20 +27,21 @@ import { MaestriGrid } from '@/components/maestros/maestri-grid';
 import { LazyCalendarView, LazyGenitoriView } from '@/components/education';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
-import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
+import { TrialUsageDashboard } from '@/components/trial';
+import { GrownUpGate } from '@/components/safety/grown-up-gate';
+import { isGrownUpVerified } from '@/lib/safety';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
-import { COACH_INFO, BUDDY_INFO } from './home-constants';
-import type { View, MaestroSessionMode } from './types';
-import {
-  LazyMaestroSession,
-  LazyCharacterChatView,
-  LazyAstuccioView,
-  LazyZainoView,
-  HomeShellSkeleton,
-} from './home-lazy';
+import { HomeIntentChooser, type IntentStart } from './home-intent-chooser';
+import type { View, MaestroSessionMode, Intent } from './types';
+import { LazyMaestroSession, LazyZainoView, HomeShellSkeleton } from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
+
+// COMP-01 (#432): the "Per i grandi" destinations are adult/account surfaces.
+// First entry into any of them in a session requires the grown-up gate; passing
+// once covers the whole session (the gate marks sessionStorage verified).
+const GROWN_UP_VIEWS = new Set<View>(['maestri', 'calendar', 'settings', 'genitori']);
 
 export default function Home() {
   const router = useRouter();
@@ -59,12 +59,28 @@ export default function Home() {
     }
   }, [isHydrated, hasCompletedOnboarding, router]);
 
-  const [currentView, setCurrentView] = useState<View>('maestri');
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [currentView, setCurrentView] = useState<View>('intent');
+  // Start collapsed on narrow viewports (incl. 200% zoom ≈ 640px CSS) so the
+  // fixed sidebar never overlays the home content on first paint. SSR has no
+  // window → defaults open (desktop-first markup); the lazy initializer + the
+  // resize effect below reconcile to the real width on the client. (FG-01/FG-02:
+  // a low-vision child at 200% zoom saw the sidebar covering the intent cards.)
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === 'undefined' || window.innerWidth >= 1024,
+  );
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
   const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
+  const [sessionContextMessage, setSessionContextMessage] = useState<string | undefined>(undefined);
+  // UX-01: the intent + subject that opened the session, for the child-first
+  // handoff banner ("Buddy ti ha portato dal Prof X"). undefined when a session
+  // is opened directly from the grown-ups Maestri grid (no handoff to explain).
+  const [sessionIntent, setSessionIntent] = useState<Intent | undefined>(undefined);
+  const [sessionSubjectLabel, setSessionSubjectLabel] = useState<string | undefined>(undefined);
+  // COMP-01 (#432): the grown-up view the child is trying to reach, held until
+  // an adult passes the gate (null = no gate pending).
+  const [pendingGrownUpView, setPendingGrownUpView] = useState<View | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,31 +92,36 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Focus management: move focus to main content heading when view changes
+  // Announce view changes to SR by focusing the section heading.
+  // Skips the initial render to avoid disrupting natural Tab order on page load
+  // (WCAG 2.1 §3.2: no unexpected context change).
+  const prevView = useRef<View | null>(null);
   useEffect(() => {
-    if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
-      const mainHeading = mainContentRef.current.querySelector('h1:not(.sr-only), h2');
-      if (mainHeading instanceof HTMLElement) {
-        mainHeading.setAttribute('tabindex', '-1');
-        mainHeading.focus();
-        mainHeading.removeAttribute('tabindex');
+    if (prevView.current === null) {
+      prevView.current = currentView;
+      return;
+    }
+    if (prevView.current !== currentView) {
+      prevView.current = currentView;
+      if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
+        const mainHeading = mainContentRef.current.querySelector<HTMLElement>('h2[tabindex="-1"]');
+        mainHeading?.focus();
       }
     }
   }, [currentView, isHydrated, hasCompletedOnboarding]);
 
-  const {
-    seasonMirrorBucks,
-    seasonLevel,
-    currentSeason,
-    streak,
-    totalStudyMinutes,
-    sessionsThisWeek,
-    questionsAsked,
-  } = useProgressStore();
+  const { seasonMirrorBucks, seasonLevel, currentSeason, streak } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const trialStatus = useTrialStatus();
-  useTrialToasts(trialStatus);
+  // A11Y-05: ADHD/autism profiles set distractionFreeMode. In the child (student)
+  // space this hides non-essential promo surfaces (trial banner, usage dashboard,
+  // trial toasts) so the only thing on screen is the learning flow.
+  const distractionFreeMode = useAccessibilityStore((state) => state.settings.distractionFreeMode);
+  // COMP-01: the home IS the child space, so trial toasts are ALWAYS child-safe
+  // here (no promo welcome, no upsell, exhaustion = "ask a grown-up") —
+  // independent of distractionFreeMode, which remains an extra layer on top.
+  useTrialToasts(trialStatus, { suppress: distractionFreeMode, childSafe: true });
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -109,6 +130,13 @@ export default function Home() {
   } = useConversationFlowStore();
 
   const handleViewChange = async (newView: View) => {
+    // COMP-01 (#432): hold entry to an adult/account view until a grown-up
+    // passes the gate (once per session). On pass we re-run this with the same
+    // view, now verified, so the conversation-close logic below still applies.
+    if (GROWN_UP_VIEWS.has(newView) && !isGrownUpVerified()) {
+      setPendingGrownUpView(newView);
+      return;
+    }
     if (isConversationActive && activeCharacter) {
       const characterConvo = conversationsByCharacter[activeCharacter.id];
       if (characterConvo?.conversationId) {
@@ -127,10 +155,16 @@ export default function Home() {
     setCurrentView(newView);
   };
 
-  const handleToolRequest = (toolType: ToolType, maestro: Maestro) => {
-    setRequestedToolType(toolType);
-    setSelectedMaestro(maestro);
-    setMaestroSessionMode('chat');
+  // Intention-based entry: each intent resolves to a Maestro (auto-selected by
+  // subject) and opens a session pre-framed with a context message. The
+  // student never picks a professor from the 26-Maestri grid.
+  const handleIntentStart = (start: IntentStart) => {
+    setSelectedMaestro(start.maestro);
+    setMaestroSessionMode(start.mode);
+    setRequestedToolType(start.requestedToolType);
+    setSessionContextMessage(start.contextMessage);
+    setSessionIntent(start.intent);
+    setSessionSubjectLabel(start.subjectLabel);
     setMaestroSessionKey((prev) => prev + 1);
     setCurrentView('maestro-session');
   };
@@ -142,43 +176,34 @@ export default function Home() {
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
   const seasonName = currentSeason?.name || t('seasonDefault');
-  const selectedCoach = studentProfile?.preferredCoach || 'melissa';
-  const selectedBuddy = studentProfile?.preferredBuddy || 'mario';
-  const coachInfo = COACH_INFO[selectedCoach];
-  const buddyInfo = BUDDY_INFO[selectedBuddy];
 
-  const navItems = [
+  // Child space: only three friendly destinations. The 26-Maestri grid, the
+  // coach/buddy character chats and the standalone tools launcher are
+  // intentionally NOT here — they would re-introduce the choice overload the
+  // intention-based home is meant to remove.
+  const childNavItems = [
     {
-      id: 'coach' as const,
-      label: coachInfo.name,
-      icon: Sparkles,
-      isChat: true,
-      avatar: coachInfo.avatar,
+      id: 'intent' as const,
+      label: t('navigation.home'),
+      icon: HomeIcon,
     },
-    {
-      id: 'buddy' as const,
-      label: buddyInfo.name,
-      icon: Heart,
-      isChat: true,
-      avatar: buddyInfo.avatar,
-    },
+    { id: 'supporti' as const, label: t('navigation.myWork'), icon: Backpack },
+    { id: 'progress' as const, label: t('navigation.myRewards'), icon: Trophy },
+  ];
+
+  // Grown-up space: shown under a clearly separated "for grown-ups" group so a
+  // child does not wander into the professor grid, the planner or settings.
+  const grownUpNavItems = [
     {
       id: 'maestri' as const,
       label: t('navigation.professors'),
       icon: GraduationCap,
     },
     {
-      id: 'astuccio' as const,
-      label: t('navigation.astuccio'),
-      icon: PencilRuler,
-    },
-    { id: 'supporti' as const, label: t('navigation.zaino'), icon: Backpack },
-    {
       id: 'calendar' as const,
       label: t('navigation.calendar'),
       icon: Calendar,
     },
-    { id: 'progress' as const, label: t('navigation.progress'), icon: Trophy },
     {
       id: 'settings' as const,
       label: t('navigation.settings'),
@@ -186,12 +211,22 @@ export default function Home() {
     },
   ];
 
-  const isSessionActive =
-    currentView === 'maestro-session' || currentView === 'coach' || currentView === 'buddy';
+  const isSessionActive = currentView === 'maestro-session';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 overflow-x-hidden">
       <h1 className="sr-only">{t('appTitle')}</h1>
+
+      {/* COMP-01 (#432): grown-up gate before the adult/account area. */}
+      <GrownUpGate
+        open={pendingGrownUpView !== null}
+        onPass={() => {
+          const view = pendingGrownUpView;
+          setPendingGrownUpView(null);
+          if (view) handleViewChange(view);
+        }}
+        onCancel={() => setPendingGrownUpView(null)}
+      />
 
       {/* Full-screen session overlays — above HomeHeader (z-50) to prevent overlap */}
       {currentView === 'maestro-session' && selectedMaestro && (
@@ -200,33 +235,20 @@ export default function Home() {
             key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
             maestro={selectedMaestro}
             onClose={() => {
-              setCurrentView('maestri');
+              setCurrentView('intent');
               setRequestedToolType(undefined);
+              setSessionContextMessage(undefined);
+              setSessionIntent(undefined);
+              setSessionSubjectLabel(undefined);
             }}
             initialMode={maestroSessionMode}
             requestedToolType={requestedToolType}
+            contextMessage={sessionContextMessage}
+            intent={sessionIntent}
+            subjectLabel={sessionSubjectLabel}
           />
         </div>
       )}
-      {currentView === 'coach' && (
-        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView
-            characterId={selectedCoach}
-            characterType="coach"
-            onClose={() => setCurrentView('maestri')}
-          />
-        </div>
-      )}
-      {currentView === 'buddy' && (
-        <div className="fixed inset-0 z-[55] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-          <LazyCharacterChatView
-            characterId={selectedBuddy}
-            characterType="buddy"
-            onClose={() => setCurrentView('maestri')}
-          />
-        </div>
-      )}
-
       {/* Hide header and sidebar during full-screen sessions */}
       {!isSessionActive && (
         <>
@@ -235,15 +257,9 @@ export default function Home() {
             onMenuClick={() => setSidebarOpen(true)}
             userName={studentProfile?.name}
             seasonLevel={seasonLevel}
-            mbInLevel={mbInLevel}
-            mbNeeded={MB_PER_LEVEL}
             progressPercent={progressPercent}
             seasonName={seasonName}
             streak={streak}
-            sessionsThisWeek={sessionsThisWeek}
-            totalStudyMinutes={totalStudyMinutes}
-            questionsAsked={questionsAsked}
-            trialStatus={trialStatus}
           />
 
           <HomeSidebar
@@ -251,7 +267,8 @@ export default function Home() {
             onToggle={() => setSidebarOpen(!sidebarOpen)}
             currentView={currentView}
             onViewChange={handleViewChange}
-            navItems={navItems}
+            navItems={childNavItems}
+            grownUpNavItems={grownUpNavItems}
             hasNewInsights={hasNewInsights}
             onParentAccess={() => {
               markAsViewed();
@@ -271,32 +288,33 @@ export default function Home() {
           ref={mainContentRef}
         >
           <main className="flex-1">
-            {/* Trial mode banner */}
-            {trialStatus.isTrialMode && !trialStatus.isLoading && (
-              <TrialHomeBanner
-                chatsRemaining={trialStatus.chatsRemaining}
-                maxChats={trialStatus.maxChats}
-                visitorId={trialStatus.visitorId}
-              />
-            )}
-
+            {/* COMP-01: the trial promo banner (quota bar + "request access" CTA
+                → /invite/request) was removed from the child home. Commercial /
+                account surfaces must never target the student; the adult sees
+                trial usage in the parent area (genitori view) instead. */}
             <motion.div
               key={currentView}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
+              {currentView === 'intent' && (
+                <HomeIntentChooser userName={studentProfile?.name} onStart={handleIntentStart} />
+              )}
               {currentView === 'maestri' && (
                 <MaestriGrid
                   onMaestroSelect={(maestro, mode) => {
                     setSelectedMaestro(maestro);
                     setMaestroSessionMode(mode);
+                    setSessionContextMessage(undefined);
+                    // Grid (grown-ups) entry: no intent handoff to explain.
+                    setSessionIntent(undefined);
+                    setSessionSubjectLabel(undefined);
                     setMaestroSessionKey((prev) => prev + 1);
                     setCurrentView('maestro-session');
                   }}
                 />
               )}
-              {currentView === 'astuccio' && <LazyAstuccioView onToolRequest={handleToolRequest} />}
               {currentView === 'supporti' && <LazyZainoView />}
               {currentView === 'calendar' && <LazyCalendarView />}
               {currentView === 'progress' && <LazyProgressView />}
@@ -305,8 +323,12 @@ export default function Home() {
             </motion.div>
           </main>
 
-          {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
-          {trialStatus.isTrialMode && !trialStatus.isLoading && (
+          {/* COMP-01: trial usage (quotas, percentages, invite CTA) is an ADULT
+              account surface. It renders ONLY next to the parent area (genitori
+              view) — never alongside the child learning flow — regardless of
+              distractionFreeMode, which is an accessibility extra, not the
+              barrier that keeps commercial surfaces away from the child. */}
+          {trialStatus.isTrialMode && !trialStatus.isLoading && currentView === 'genitori' && (
             <aside className="w-80 hidden lg:block flex-shrink-0">
               <TrialUsageDashboard />
             </aside>

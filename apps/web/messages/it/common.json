@@ -296,7 +296,7 @@
     "tellUsAboutYourself": "Tell us about yourself",
     "gradeLevel": "Grade Level",
     "registratiPerAccessoIllimitato": "Registrati per accesso illimitato",
-    "richiediAccesso": "Richiedi accesso",
+    "requestAccess": "Richiedi accesso",
     "stagingEnvironmentIndicator": "Staging environment indicator",
     "stagingEnvironmentDataWillBeMarkedAsTestData": "⚠️ STAGING ENVIRONMENT - Data will be marked as test data",
     "dismissStagingBanner": "Dismiss staging banner",
@@ -311,6 +311,14 @@
     "vaiAllaCitazione": "Vai alla citazione {index}",
     "notificheConNonLette": "Notifiche ({count} non lette)",
     "esciDaFullscreen": "Esci da fullscreen",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "grownUpGate": {
+      "title": "Questo è per i grandi",
+      "body": "Chiedi a un adulto di rispondere per continuare.",
+      "question": "Quanto fa {a} + {b}?",
+      "wrong": "Risposta sbagliata. Riprova o chiedi a un grande.",
+      "submit": "Continua",
+      "cancel": "Torna indietro"
+    }
   }
 }
