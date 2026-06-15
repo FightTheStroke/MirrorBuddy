@@ -231,11 +231,21 @@ test('capture P1 Marco (dyslexia+adhd, Trial)', async ({ page, context }) => {
     });
   }
 
-  // T5 — navigate to "I miei premi".
+  // T5 — dismiss any open T4 dialog, then navigate to "I miei premi".
+  // The intent-locked-dialog opened by T4 intercepts clicks while visible;
+  // Escape + wait-hidden ensures home-nav-progress receives the click (FGOP-13).
+  await page.keyboard.press('Escape');
+  await page
+    .getByTestId('intent-locked-dialog')
+    .waitFor({ state: 'hidden', timeout: 3000 })
+    .catch(() => {});
   const premi = page.getByTestId('home-nav-progress');
   if (await premi.count()) {
     await premi.click({ timeout: 6000 }).catch(() => {});
-    await page.waitForTimeout(500);
+    await page
+      .getByTestId('progress-view')
+      .waitFor({ state: 'visible', timeout: 8000 })
+      .catch(() => {});
     await captureStep(page, dir, steps, {
       step: 's05',
       task: 'T5-premi',

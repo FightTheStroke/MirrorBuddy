@@ -15,31 +15,36 @@ import {
   Loader2,
 } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores';
-import { AnalyticsDashboard, DashboardLayout, DashboardCard, StatCard } from '@/components/dashboard';
+import {
+  AnalyticsDashboard,
+  DashboardLayout,
+  DashboardCard,
+  StatCard,
+} from '@/components/dashboard';
 import { AchievementsPanel } from '@/components/gamification/achievements-panel';
 
 // Lazy load Recharts-based components (reduces initial bundle ~200KB)
 const TimeStudyChart = dynamic(
-  () => import('@/components/dashboard/time-study-chart').then(m => m.TimeStudyChart),
+  () => import('@/components/dashboard/time-study-chart').then((m) => m.TimeStudyChart),
   {
     ssr: false,
     loading: () => (
       <div className="h-[300px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg">
         <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
       </div>
-    )
-  }
+    ),
+  },
 );
 const MaestroUsageChart = dynamic(
-  () => import('@/components/dashboard/maestro-usage-chart').then(m => m.MaestroUsageChart),
+  () => import('@/components/dashboard/maestro-usage-chart').then((m) => m.MaestroUsageChart),
   {
     ssr: false,
     loading: () => (
       <div className="h-[300px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg">
         <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
       </div>
-    )
-  }
+    ),
+  },
 );
 import { SeasonBanner } from '@/components/gamification/season-banner';
 import { cn } from '@/lib/utils';
@@ -49,16 +54,23 @@ import { OverviewTab } from './progress-view/components/overview-tab';
 import { AchievementsTab } from './progress-view/components/achievements-tab';
 import { MasteryTab } from './progress-view/components/mastery-tab';
 import { HistoryTab } from './progress-view/components/history-tab';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 type ProgressTab = 'overview' | 'analytics' | 'achievements' | 'mastery' | 'history';
 
 export function ProgressView() {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   const [activeTab, setActiveTab] = useState<ProgressTab>('overview');
-  const { 
-    xp, level, streak, totalStudyMinutes, masteries, achievements,
-    mirrorBucks, sessionHistory, loadFromServer 
+  const {
+    xp,
+    level,
+    streak,
+    totalStudyMinutes,
+    masteries,
+    achievements,
+    mirrorBucks,
+    sessionHistory,
+    loadFromServer,
   } = useProgressStore();
 
   useEffect(() => {
@@ -95,9 +107,12 @@ export function ProgressView() {
     })
     .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
 
-  const weeklyChange = lastWeekMinutes === 0
-    ? (weeklyMinutes > 0 ? 100 : 0)
-    : Math.round(((weeklyMinutes - lastWeekMinutes) / lastWeekMinutes) * 100);
+  const weeklyChange =
+    lastWeekMinutes === 0
+      ? weeklyMinutes > 0
+        ? 100
+        : 0
+      : Math.round(((weeklyMinutes - lastWeekMinutes) / lastWeekMinutes) * 100);
 
   const tabs: Array<{ id: ProgressTab; label: string; icon: React.ReactNode }> = [
     { id: 'overview', label: 'Panoramica', icon: <TrendingUp className="w-4 h-4" /> },
@@ -111,20 +126,20 @@ export function ProgressView() {
   const currentLevelXP = xp % xpToNextLevel;
   const levelProgress = (currentLevelXP / xpToNextLevel) * 100;
 
-  const _unlockedAchievementIds = (achievements || []).map(a => a.id);
+  const _unlockedAchievementIds = (achievements || []).map((a) => a.id);
   const _achievementProgress = (_unlockedAchievementIds.length / ACHIEVEMENTS.length) * 100;
 
   const masteriesRecord = useMemo(() => {
-    const record: Record<string, typeof masteries[0]> = {};
-    (masteries || []).forEach(m => {
+    const record: Record<string, (typeof masteries)[0]> = {};
+    (masteries || []).forEach((m) => {
       record[m.subject] = m;
     });
     return record;
   }, [masteries]);
 
   return (
-    <div className="space-y-6">
-      <PageHeader icon={Trophy} title={t("progressi")} />
+    <div className="space-y-6" data-testid="progress-view">
+      <PageHeader icon={Trophy} title={t('progressi')} />
 
       <DashboardLayout>
         <DashboardCard>
@@ -187,7 +202,7 @@ export function ProgressView() {
       </DashboardLayout>
 
       <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-4">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
@@ -195,7 +210,7 @@ export function ProgressView() {
               'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
               activeTab === tab.id
                 ? 'bg-accent-themed text-white'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
             )}
           >
             {tab.icon}
@@ -223,41 +238,36 @@ export function ProgressView() {
         {activeTab === 'analytics' && <AnalyticsDashboard />}
 
         {activeTab === 'achievements' && (
-          <AchievementsTab
-            unlocked={_unlockedAchievementIds}
-            allAchievements={ACHIEVEMENTS}
-          />
+          <AchievementsTab unlocked={_unlockedAchievementIds} allAchievements={ACHIEVEMENTS} />
         )}
 
-        {activeTab === 'mastery' && (
-          <MasteryTab masteries={masteriesRecord} />
-        )}
+        {activeTab === 'mastery' && <MasteryTab masteries={masteriesRecord} />}
 
         {activeTab === 'history' && <HistoryTab />}
       </motion.div>
 
       <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-        <h2 className="text-lg font-semibold mb-4">{t("riepilogoTotali")}</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('riepilogoTotali')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-slate-500">{t("tempoTotale")}</p>
+            <p className="text-sm text-slate-500">{t('tempoTotale')}</p>
             <p className="text-2xl font-bold">{Math.round(totalStudyMinutes / 60)}h</p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">{t("sessioniTotali")}</p>
+            <p className="text-sm text-slate-500">{t('sessioniTotali')}</p>
             <p className="text-2xl font-bold">{sessionHistory.length}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">{t("mediaSessione")}</p>
+            <p className="text-sm text-slate-500">{t('mediaSessione')}</p>
             <p className="text-2xl font-bold">
               {sessionHistory.length > 0
                 ? Math.round(totalStudyMinutes / sessionHistory.length)
                 : 0}
-              {t("min")}
+              {t('min')}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">{t("streakMassimo")}</p>
+            <p className="text-sm text-slate-500">{t('streakMassimo')}</p>
             <p className="text-2xl font-bold">{streak.longest}</p>
           </div>
         </div>
