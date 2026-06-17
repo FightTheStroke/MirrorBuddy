@@ -109,6 +109,13 @@
       "reload": "Ricarica la pagina"
     },
     "switchToChat": "Passa alla Chat",
+    "errorTokenUnavailable": "Il tuo professore non è disponibile in questo momento. Riprova tra poco!",
+    "errorServerTimeout": "Ci sta mettendo un po'. Controlla la connessione e riprova.",
+    "errorRateLimited": "Aspetta qualche secondo e riprova.",
+    "errorConfigUnavailable": "La voce non è disponibile adesso. Riprova più tardi.",
+    "errorMicUnavailable": "Non riesco a usare il microfono. Controlla che sia collegato.",
+    "errorMicNotAllowed": "Per parlare, fai sì che un grande attivi il microfono.",
+    "errorConnectionFailed": "Qualcosa non ha funzionato con la voce. Riprova tra poco!",
     "configError": {
       "title": "Configurazione Mancante",
       "subtitle": "La modalità vocale non è configurata correttamente",

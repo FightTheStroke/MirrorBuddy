@@ -7,6 +7,8 @@ import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { csrfFetch } from '@/lib/auth';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { GrownUpGate } from '@/components/safety/grown-up-gate';
+import { isGrownUpVerified } from '@/lib/safety';
 
 type FormState = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -18,6 +20,12 @@ export default function InviteRequestPage() {
   const [motivation, setMotivation] = useState('');
   const [formState, setFormState] = useState<FormState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  // COMP-01 (#431): guardian self-declaration; not stored in DB, audit log only.
+  const [guardianDeclared, setGuardianDeclared] = useState(false);
+  // COMP-01 (#431): this form collects a minor's PII (name, email). Gate it
+  // behind the grown-up challenge so a child cannot self-submit. SSR has no
+  // window → renders the gate; the client initializer reads the session flag.
+  const [grownUpVerified, setGrownUpVerifiedState] = useState<boolean>(() => isGrownUpVerified());
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +47,7 @@ export default function InviteRequestPage() {
           email,
           motivation,
           visitorId,
+          guardianDeclared,
         }),
       });
 
@@ -61,6 +70,19 @@ export default function InviteRequestPage() {
       setErrorMessage(message);
     }
   };
+
+  // Gate (#431): hold the PII form behind the grown-up challenge.
+  if (!grownUpVerified) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 p-4">
+        <GrownUpGate
+          open
+          onPass={() => setGrownUpVerifiedState(true)}
+          onCancel={() => router.back()}
+        />
+      </div>
+    );
+  }
 
   if (formState === 'success') {
     return (
@@ -93,6 +115,33 @@ export default function InviteRequestPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('pageTitle')}</h1>
           <p className="text-slate-600 dark:text-slate-300 mt-2">{t('pageDescription')}</p>
+          {/* COMP-01: this form solicits PII (name, email). It must address the
+              adult, never the child — explicit notice pending a real parental
+              gate (legal decision, see docs/compliance/trial-minors-guardrails.md). */}
+          <p
+            data-testid="invite-adults-only-notice"
+            className="mt-2 text-sm font-medium text-indigo-700 dark:text-indigo-300"
+          >
+            {t('adultsOnlyNotice')}
+          </p>
+          {/* COMP-01 (#431): self-declaration; audit-logged server-side, never stored in DB */}
+          <div className="mt-3 flex items-start gap-2">
+            <input
+              id="guardian-declaration"
+              type="checkbox"
+              required
+              checked={guardianDeclared}
+              onChange={(e) => setGuardianDeclared(e.target.checked)}
+              disabled={formState === 'submitting'}
+              className="mt-0.5 h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 disabled:opacity-50"
+            />
+            <label
+              htmlFor="guardian-declaration"
+              className="text-sm text-slate-700 dark:text-slate-300"
+            >
+              {t('guardianDeclarationLabel')}
+            </label>
+          </div>
         </div>
 
         {formState === 'error' && (
@@ -165,7 +214,11 @@ export default function InviteRequestPage() {
             </p>
           </div>
 
-          <Button type="submit" disabled={formState === 'submitting'} className="w-full">
+          <Button
+            type="submit"
+            disabled={formState === 'submitting' || !guardianDeclared}
+            className="w-full"
+          >
             {formState === 'submitting' ? (
               t('submitButtonSubmitting')
             ) : (

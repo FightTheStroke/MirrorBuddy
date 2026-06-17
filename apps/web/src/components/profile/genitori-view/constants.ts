@@ -2,28 +2,26 @@
  * Constants for GenitoriView
  */
 
-import type { ParentDashboardActivity } from "@/types";
-
-export const DEMO_USER_ID = "demo-student-1";
+import type { ParentDashboardActivity } from '@/types';
 
 export const MAESTRO_NAMES: Record<string, string> = {
-  leonardo: "Leonardo",
-  galileo: "Galileo",
-  curie: "Marie Curie",
-  cicerone: "Cicerone",
-  lovelace: "Ada Lovelace",
-  smith: "Adam Smith",
-  shakespeare: "Shakespeare",
-  humboldt: "Humboldt",
-  erodoto: "Erodoto",
-  manzoni: "Manzoni",
-  euclide: "Euclide",
-  mozart: "Mozart",
-  socrate: "Socrate",
-  ippocrate: "Ippocrate",
-  feynman: "Feynman",
-  darwin: "Darwin",
-  chris: "Chris",
+  leonardo: 'Leonardo',
+  galileo: 'Galileo',
+  curie: 'Marie Curie',
+  cicerone: 'Cicerone',
+  lovelace: 'Ada Lovelace',
+  smith: 'Adam Smith',
+  shakespeare: 'Shakespeare',
+  humboldt: 'Humboldt',
+  erodoto: 'Erodoto',
+  manzoni: 'Manzoni',
+  euclide: 'Euclide',
+  mozart: 'Mozart',
+  socrate: 'Socrate',
+  ippocrate: 'Ippocrate',
+  feynman: 'Feynman',
+  darwin: 'Darwin',
+  chris: 'Chris',
 };
 
 /**

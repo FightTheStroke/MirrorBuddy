@@ -10,7 +10,10 @@
       "zaino": "Mochila",
       "calendar": "Calendario",
       "progress": "Progreso",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "home": "Casa",
+      "myWork": "Mis trabajos",
+      "myRewards": "Mis premios"
     },
     "header": {
       "openMenu": "Abrir menú",
@@ -33,7 +36,8 @@
       "requestAccess": "Solicitar Acceso",
       "adminDashboardAria": "Ir al Panel de Administración",
       "adminDashboard": "Panel de Administración",
-      "parentArea": "Área de Padres"
+      "parentArea": "Área de Padres",
+      "grownUps": "Para los grandes"
     },
     "adminDashboard": "Panel de Administración",
     "closeMenu": "Cerrar Menú",
@@ -55,6 +59,70 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "¡Hola! ¿Qué hacemos hoy?",
+      "greetingNamed": "¡Hola {name}! ¿Qué hacemos hoy?",
+      "question": "Elige por dónde empezar: yo te guío.",
+      "back": "Atrás",
+      "lockedHint": "Pide a un mayor que lo abra",
+      "subjectSubtitle": "Elige la asignatura y te traigo el profesor adecuado.",
+      "homework": {
+        "title": "Hacer los deberes",
+        "subtitle": "Te ayudo paso a paso",
+        "contextMessage": "¡Hola! Necesito ayuda con los deberes. Dime qué necesitas y usa fotos, PDF o fórmulas si te hacen falta.",
+        "subjectTitle": "¿Con qué necesitas ayuda?"
+      },
+      "study": {
+        "title": "Estudiar",
+        "subtitle": "Hagamos un mapa juntos",
+        "subjectTitle": "¿Qué quieres estudiar?",
+        "contextMessage": "Quiero estudiar este tema. Ayúdame con un mapa mental, luego un resumen y por último unas tarjetas para repasar."
+      },
+      "quizMe": {
+        "title": "Ponte a prueba",
+        "subtitle": "Yo te hago las preguntas",
+        "subjectTitle": "¿Sobre qué quieres que te examine?",
+        "contextMessage": "Quiero que me examinen sobre este tema. Prepara un cuestionario y usemos tarjetas para practicar."
+      },
+      "subjectAny": "No lo sé / Un poco de todo",
+      "ttsCardLabel": "Escuchar: {label}",
+      "lockedDialog": {
+        "title": "Pide a un mayor que lo abra",
+        "body": "Esta actividad tiene un candado. Llama a mamá, papá o a tu profe: ¡pueden abrirla por ti!",
+        "listen": "Escuchar",
+        "gotIt": "Entendido"
+      },
+      "areas": {
+        "numbersScience": "Números y ciencias",
+        "languages": "Lenguas y relatos",
+        "worldHistory": "Mundo e historia",
+        "artBody": "Arte y cuerpo"
+      }
+    },
+    "subjects": {
+      "mathematics": "Matemáticas",
+      "physics": "Física",
+      "chemistry": "Química",
+      "biology": "Biología",
+      "history": "Historia",
+      "geography": "Geografía",
+      "italian": "Italiano",
+      "english": "Inglés",
+      "spanish": "Español",
+      "french": "Francés",
+      "german": "Alemán",
+      "art": "Arte",
+      "music": "Música",
+      "civics": "Educación Cívica",
+      "economics": "Economía",
+      "computerScience": "Informática",
+      "health": "Salud",
+      "philosophy": "Filosofía",
+      "internationalLaw": "Derecho Internacional",
+      "storytelling": "Relatos",
+      "supercazzola": "Supercazzola",
+      "sport": "Deporte"
+    }
   }
 }

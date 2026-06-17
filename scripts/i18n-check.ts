@@ -7,20 +7,23 @@ const LOCALES = ['it', 'en', 'fr', 'de', 'es'];
 // W2 app move (#362): messages/ relocated to apps/web/messages/.
 const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 const REFERENCE_LOCALE = 'it';
-const NAMESPACES = [
-  'common',
-  'auth',
-  'admin',
-  'chat',
-  'tools',
-  'settings',
-  'compliance',
-  'education',
-  'navigation',
-  'errors',
-  'welcome',
-  'metadata',
-];
+
+/**
+ * Discover namespaces dynamically from the reference locale directory.
+ * Hardcoding the list (TD-07) silently dropped coverage for newer namespaces
+ * (voice, home, pricing, consent, marketing, …) so their keys went unchecked
+ * across locales. Deriving from disk keeps the check exhaustive automatically.
+ */
+function discoverNamespaces(): string[] {
+  const refDir = path.join(MESSAGES_DIR, REFERENCE_LOCALE);
+  return fs
+    .readdirSync(refDir)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => f.replace(/\.json$/, ''))
+    .sort();
+}
+
+const NAMESPACES = discoverNamespaces();
 
 /**
  * Recursively extract all keys from a nested object

@@ -1887,9 +1887,6 @@
       "completeSuccess": "Expérience terminée avec succès",
       "startDate": "Date de début",
       "cancel": "Annuler"
-    },
-    "community": {
-      "reviewQueue": "File de révision"
     }
   }
 }

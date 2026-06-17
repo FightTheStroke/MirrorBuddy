@@ -1,0 +1,34 @@
+{
+  "personaId": "P1-marco",
+  "profile": "dyslexia+adhd",
+  "tier": "trial",
+  "runTag": "2026-06-11-pass2",
+  "branch": "feat/ux-simplification-intention-based",
+  "capturedAt": "2026-06-11T19:57:11.405Z",
+  "steps": [
+    {
+      "step": "s01",
+      "task": "T2-landing",
+      "action": "land on intent home (step 1)",
+      "artefacts": ["s01.png", "s01.aria.yaml", "s01.text.json", "s01.tts.json"]
+    },
+    {
+      "step": "s03",
+      "task": "T2/T8-subjects",
+      "action": "open Compiti → subject picker",
+      "artefacts": ["s03.png", "s03.aria.yaml", "s03.text.json"]
+    },
+    {
+      "step": "s04",
+      "task": "T4-tierlock",
+      "action": "click locked \"Mettiti alla prova\" → tier-lock dialog",
+      "artefacts": ["s04.png", "s04.aria.yaml", "s04.text.json"]
+    },
+    {
+      "step": "s05",
+      "task": "T5-premi",
+      "action": "navigate to \"I miei premi\" (progress)",
+      "artefacts": ["s05.png", "s05.aria.yaml", "s05.text.json"]
+    }
+  ]
+}

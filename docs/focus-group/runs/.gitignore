@@ -1,0 +1,4 @@
+# Stimulus artefacts are heavy and reproducible from the capture spec (FGOP-03):
+# commit the report, verification and manifests; not the PNGs / aria dumps.
+*/stimulus/**/*.png
+*/stimulus/**/*.aria.yaml

@@ -1,11 +1,17 @@
 /**
- * E2E Tests: Trial Header Badge
+ * E2E Tests: Trial Child-Space Guardrails (COMP-01)
  *
- * Tests for trial mode header badge displaying usage statistics.
- * F-05: Verify badge displays chat count correctly
+ * The home is the CHILD space. Trial quota dashboards, percentages and
+ * "request access" CTAs are adult account/commercial surfaces: they must
+ * never render alongside the child learning flow, regardless of the
+ * accessibility profile (distractionFreeMode is an extra layer, not the
+ * barrier). The adult keeps them in the "for grown-ups" sidebar group and
+ * in the parent area.
  *
- * The locale home header renders trial status as a Link element
- * with localized text and chat count (not a dropdown button).
+ * Replaces the former "Trial Header Badge (F-05)" spec: the badge
+ * ("Prova 7/10" linking to /invite/request) was removed from the child
+ * header (focus group FG-10 + GDPR/COPPA: no commercial CTA or PII
+ * solicitation directed at a minor).
  *
  * Run: npx playwright test e2e/trial-dashboard.spec.ts
  */
@@ -16,8 +22,8 @@ import { test, expect } from './fixtures/auth-fixtures';
 // Override global storageState to start without authentication
 test.use({ storageState: undefined });
 
-test.describe('Trial Mode - Header Badge (F-05)', () => {
-  // Set viewport to large screen size (trial badge is hidden on md:)
+test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
+  // Large screen: the old badge and the usage-dashboard aside only rendered on lg+.
   test.use({ viewport: { width: 1920, height: 1080 } });
   test.setTimeout(60000);
 
@@ -100,8 +106,7 @@ test.describe('Trial Mode - Header Badge (F-05)', () => {
       });
     });
 
-    // Mock onboarding API - IMPORTANT: hydrateFromApi() calls /api/onboarding (not /api/user/onboarding)
-    // This mock prevents redirect to /welcome by reporting onboarding as completed
+    // Mock onboarding API - hydrateFromApi() calls /api/onboarding
     await page.route('**/api/onboarding', (route) => {
       route.fulfill({
         status: 200,
@@ -135,103 +140,58 @@ test.describe('Trial Mode - Header Badge (F-05)', () => {
     });
   }
 
-  test('trial badge is visible in header for trial users', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage, {
-      chatsUsed: 3,
-      chatsRemaining: 7,
-      maxChats: 10,
-    });
-
-    // Navigate to locale home page (not "/" which redirects to /landing → /welcome)
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
-
-    // Trial badge is a Link with data-testid in the locale header
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
-
-    // Verify it shows chat count
-    await expect(trialBadge).toContainText('7/10');
-  });
-
-  test('trial badge shows correct chat remaining count', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage, {
-      chatsUsed: 5,
-      chatsRemaining: 5,
-      maxChats: 10,
-    });
+  test('child home header has no trial badge and no invite link', async ({ trialPage }) => {
+    await setupTrialMocks(trialPage, { chatsUsed: 3, chatsRemaining: 7, maxChats: 10 });
 
     await trialPage.goto('/it');
     await trialPage.waitForLoadState('domcontentloaded');
 
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
-    await expect(trialBadge).toContainText('5/10');
+    // The intent home (child space) is rendered.
+    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
+
+    // The old commercial badge is gone for good.
+    await expect(trialPage.locator('[data-testid="trial-badge"]')).toHaveCount(0);
+
+    // No header link to the PII-collecting invite-request form.
+    const headerInviteLinks = trialPage.locator('header a[href*="invite"]');
+    await expect(headerInviteLinks).toHaveCount(0);
   });
 
-  test('trial badge links to invite request page', async ({ trialPage }) => {
+  test('trial usage dashboard never renders next to the child learning flow', async ({
+    trialPage,
+  }) => {
+    // Default profile (NOT distraction-free): the guardrail must hold anyway.
+    await setupTrialMocks(trialPage, { chatsUsed: 9, chatsRemaining: 1, maxChats: 10 });
+
+    await trialPage.goto('/it');
+    await trialPage.waitForLoadState('domcontentloaded');
+
+    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
+    await expect(trialPage.getByTestId('trial-usage-dashboard')).toHaveCount(0);
+  });
+
+  test('invite/login CTAs live only inside the grown-ups sidebar group', async ({ trialPage }) => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto('/it');
     await trialPage.waitForLoadState('domcontentloaded');
 
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
+    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
 
-    // The badge links to /invite/request
-    const href = await trialBadge.getAttribute('href');
-    expect(href).toContain('/invite/request');
+    // The adult flow is preserved: trial status + request access exist…
+    const grownUpsTrialBlock = trialPage.getByTestId('sidebar-trial-grownups');
+    await expect(grownUpsTrialBlock).toBeVisible();
+
+    // …but every invite link on the page sits inside the grown-ups group.
+    const allInviteLinks = trialPage.locator('a[href*="invite"]');
+    const groupedInviteLinks = trialPage.locator(
+      '[data-testid="sidebar-grownups-group"] a[href*="invite"]',
+    );
+    expect(await allInviteLinks.count()).toBe(await groupedInviteLinks.count());
+    expect(await groupedInviteLinks.count()).toBeGreaterThan(0);
   });
 
-  test('badge changes color when resources are low', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage, {
-      chatsUsed: 8,
-      chatsRemaining: 2,
-      maxChats: 10,
-    });
-
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
-
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
-
-    // Verify amber color class when low (<=3 remaining)
-    await expect(trialBadge).toHaveClass(/amber/);
-  });
-
-  test('badge uses purple color when resources are sufficient', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage, {
-      chatsUsed: 2,
-      chatsRemaining: 8,
-      maxChats: 10,
-    });
-
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
-
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
-
-    // Verify purple color class when resources are sufficient
-    await expect(trialBadge).toHaveClass(/purple/);
-  });
-
-  test('trial badge has accessible title attribute', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage);
-
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
-
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).toBeVisible({ timeout: 15000 });
-
-    // Badge should have a title attribute for accessibility
-    const title = await trialBadge.getAttribute('title');
-    expect(title?.length).toBeGreaterThan(0);
-  });
-
-  test('trial badge is not visible for authenticated users', async ({ trialPage }) => {
+  test('trial surfaces are absent for authenticated users', async ({ trialPage }) => {
     // Mock as non-trial user (authenticated)
     await trialPage.route('**/api/user/trial-status', (route) => {
       route.fulfill({
@@ -241,7 +201,6 @@ test.describe('Trial Mode - Header Badge (F-05)', () => {
       });
     });
 
-    // Mock onboarding API - hydrateFromApi() calls /api/onboarding (not /api/user/onboarding)
     await trialPage.route('**/api/onboarding', (route) => {
       route.fulfill({
         status: 200,
@@ -275,12 +234,10 @@ test.describe('Trial Mode - Header Badge (F-05)', () => {
 
     await trialPage.goto('/it');
     await trialPage.waitForLoadState('domcontentloaded');
-
-    // Wait for page to fully hydrate
     await trialPage.waitForTimeout(3000);
 
-    // Trial badge should not be visible for authenticated users
-    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
-    await expect(trialBadge).not.toBeVisible();
+    await expect(trialPage.locator('[data-testid="trial-badge"]')).toHaveCount(0);
+    await expect(trialPage.getByTestId('sidebar-trial-grownups')).toHaveCount(0);
+    await expect(trialPage.getByTestId('trial-usage-dashboard')).toHaveCount(0);
   });
 });

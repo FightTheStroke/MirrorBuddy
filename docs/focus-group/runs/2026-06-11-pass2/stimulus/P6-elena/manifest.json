@@ -1,0 +1,28 @@
+{
+  "personaId": "P6-elena",
+  "profile": "auditory",
+  "tier": "base",
+  "runTag": "2026-06-11-pass2",
+  "branch": "feat/ux-simplification-intention-based",
+  "capturedAt": "2026-06-11T20:14:37.263Z",
+  "steps": [
+    {
+      "step": "s01",
+      "task": "T2-landing/T6-visual",
+      "action": "land on intent home; tts-intent button count = 0 (expected 0)",
+      "artefacts": ["s01.png", "s01.aria.yaml", "s01.text.json", "s01.tts.json"]
+    },
+    {
+      "step": "s02",
+      "task": "T2/T8-subjects",
+      "action": "open Compiti → subject picker; tts-intent button count = 0",
+      "artefacts": ["s02.png", "s02.aria.yaml", "s02.text.json", "s02.tts.json"]
+    },
+    {
+      "step": "s03",
+      "task": "T5-premi",
+      "action": "navigate to \"I miei premi\" (progress)",
+      "artefacts": ["s03.png", "s03.aria.yaml", "s03.text.json", "s03.tts.json"]
+    }
+  ]
+}

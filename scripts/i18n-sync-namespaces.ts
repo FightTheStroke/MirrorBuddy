@@ -15,22 +15,15 @@ const REFERENCE_LOCALE = 'it';
 const OTHER_LOCALES = ['en', 'de', 'es', 'fr'] as const;
 const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
 
-const NAMESPACES = [
-  'common',
-  'auth',
-  'admin',
-  'chat',
-  'tools',
-  'settings',
-  'compliance',
-  'consent',
-  'education',
-  'home',
-  'navigation',
-  'errors',
-  'welcome',
-  'metadata',
-] as const;
+// Discover namespaces from the reference locale (TD-07): a hardcoded list
+// silently skipped newer namespaces (voice, pricing, marketing, …) so their
+// translations drifted across locales unchecked. Deriving from disk keeps sync
+// exhaustive and self-maintaining.
+const NAMESPACES = fs
+  .readdirSync(path.join(MESSAGES_DIR, REFERENCE_LOCALE))
+  .filter((f) => f.endsWith('.json'))
+  .map((f) => f.replace(/\.json$/, ''))
+  .sort();
 
 interface SyncReport {
   locale: string;

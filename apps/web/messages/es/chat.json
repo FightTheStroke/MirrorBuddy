@@ -565,6 +565,18 @@
     "citazioneMotivazionale": "Citazione motivazionale",
     "quoteIndicators": "Quote indicators",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}"
+    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "intentHandoff": {
+      "headline": "Te he llevado con el Prof. {name} para {intent}.",
+      "headlineSubject": "Te he llevado con el Prof. {name} para {subject}.",
+      "contextHint": "Ya he escrito la pregunta por ti: pulsa enter cuando estés listo, o cámbiala como quieras.",
+      "intent": {
+        "homework": "los deberes",
+        "study": "estudiar",
+        "quizMe": "un pequeño cuestionario"
+      },
+      "listen": "Escuchar el mensaje",
+      "dismiss": "Entendido, cerrar"
+    }
   }
 }

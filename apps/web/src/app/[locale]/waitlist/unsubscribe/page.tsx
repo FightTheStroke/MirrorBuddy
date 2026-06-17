@@ -89,7 +89,7 @@ export default async function UnsubscribePage(props: UnsubscribePageProps) {
         {/* Back link */}
         <nav aria-label={t('mainNavigation')} className="text-center">
           <Link
-            href="/coming-soon"
+            href="/"
             className="inline-block text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-sm transition-colors"
           >
             {t('backToComingSoon')}

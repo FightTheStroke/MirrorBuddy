@@ -10,7 +10,10 @@
       "zaino": "Backpack",
       "calendar": "Calendar",
       "progress": "Progress",
-      "settings": "Settings"
+      "settings": "Settings",
+      "home": "Home",
+      "myWork": "My work",
+      "myRewards": "My rewards"
     },
     "header": {
       "openMenu": "Open menu",
@@ -33,7 +36,8 @@
       "requestAccess": "Request Access",
       "adminDashboardAria": "Go to Admin Dashboard",
       "adminDashboard": "Admin Dashboard",
-      "parentArea": "Parent Area"
+      "parentArea": "Parent Area",
+      "grownUps": "For grown-ups"
     },
     "adminDashboard": "Admin Dashboard",
     "closeMenu": "Close Menu",
@@ -55,6 +59,70 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "intent": {
+      "greeting": "Hi! What shall we do today?",
+      "greetingNamed": "Hi {name}! What shall we do today?",
+      "question": "Pick where to start: I'll guide you.",
+      "back": "Back",
+      "lockedHint": "Ask a grown-up to open it",
+      "subjectSubtitle": "Pick a subject and I'll bring the right professor.",
+      "homework": {
+        "title": "Do my homework",
+        "subtitle": "I'll help you step by step",
+        "contextMessage": "Hi! I need help with my homework. Tell me what you need, and feel free to use photos, PDFs or formulas.",
+        "subjectTitle": "What do you need help with?"
+      },
+      "study": {
+        "title": "Study",
+        "subtitle": "Let's make a map together",
+        "subjectTitle": "What do you want to study?",
+        "contextMessage": "I want to study this topic. Help me with a mind map, then a summary, and finally some flashcards to review."
+      },
+      "quizMe": {
+        "title": "Test yourself",
+        "subtitle": "I'll ask the questions",
+        "subjectTitle": "What should I quiz you on?",
+        "contextMessage": "I want to be quizzed on this topic. Prepare a quiz and let’s use flashcards to practice."
+      },
+      "subjectAny": "I don't know / A bit of everything",
+      "ttsCardLabel": "Listen: {label}",
+      "lockedDialog": {
+        "title": "Ask a grown-up to open it",
+        "body": "This activity has a lock on it. Call mum, dad or your teacher: they can open it for you!",
+        "listen": "Listen",
+        "gotIt": "Got it"
+      },
+      "areas": {
+        "numbersScience": "Numbers & science",
+        "languages": "Languages & stories",
+        "worldHistory": "World & history",
+        "artBody": "Art & body"
+      }
+    },
+    "subjects": {
+      "mathematics": "Mathematics",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology",
+      "history": "History",
+      "geography": "Geography",
+      "italian": "Italian",
+      "english": "English",
+      "spanish": "Spanish",
+      "french": "French",
+      "german": "German",
+      "art": "Art",
+      "music": "Music",
+      "civics": "Civic Education",
+      "economics": "Economics",
+      "computerScience": "Computer Science",
+      "health": "Health",
+      "philosophy": "Philosophy",
+      "internationalLaw": "International Law",
+      "storytelling": "Storytelling",
+      "supercazzola": "Supercazzola",
+      "sport": "Sport"
+    }
   }
 }

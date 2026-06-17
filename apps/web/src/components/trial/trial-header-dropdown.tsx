@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gift,
   MessageCircle,
@@ -13,8 +13,8 @@ import {
   ChevronDown,
   LogIn,
   UserPlus,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface TrialUsageData {
   chat: { used: number; limit: number; percentage: number };
@@ -28,11 +28,8 @@ interface TrialHeaderDropdownProps {
   maxChats: number;
 }
 
-export function TrialHeaderDropdown({
-  chatsRemaining,
-  maxChats,
-}: TrialHeaderDropdownProps) {
-  const t = useTranslations("common");
+export function TrialHeaderDropdown({ chatsRemaining, maxChats }: TrialHeaderDropdownProps) {
+  const t = useTranslations('common');
   const [isOpen, setIsOpen] = useState(false);
   const [usageData, setUsageData] = useState<TrialUsageData | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -43,7 +40,7 @@ export function TrialHeaderDropdown({
   // Fetch full usage data when dropdown opens
   useEffect(() => {
     if (isOpen && !usageData) {
-      fetch("/api/user/usage")
+      fetch('/api/user/usage')
         .then((res) => res.json())
         .then(setUsageData)
         .catch(() => null);
@@ -53,30 +50,27 @@ export function TrialHeaderDropdown({
   // Close on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Close on Escape
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsOpen(false);
+      if (event.key === 'Escape') setIsOpen(false);
     };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 90) return "bg-red-500";
-    if (percentage >= 70) return "bg-amber-500";
-    return "bg-green-500";
+    if (percentage >= 90) return 'bg-red-500';
+    if (percentage >= 70) return 'bg-amber-500';
+    return 'bg-green-500';
   };
 
   return (
@@ -85,23 +79,21 @@ export function TrialHeaderDropdown({
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all",
+          'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
           isLow
-            ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40"
-            : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40",
+            ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40'
+            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40',
         )}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <Gift className="w-3.5 h-3.5" />
-        <span>{t("trialLabel")}</span>
+        <span>{t('trialLabel')}</span>
         <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
           <MessageCircle className="w-3 h-3" />
           {chatsRemaining}/{maxChats}
         </span>
-        <ChevronDown
-          className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")}
-        />
+        <ChevronDown className={cn('w-3 h-3 transition-transform', isOpen && 'rotate-180')} />
       </button>
 
       {/* Dropdown Panel */}
@@ -117,24 +109,24 @@ export function TrialHeaderDropdown({
             {/* Header */}
             <div
               className={cn(
-                "px-4 py-3",
+                'px-4 py-3',
                 isLow
-                  ? "bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20"
-                  : "bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20",
+                  ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
+                  : 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20',
               )}
             >
               <h3
                 className={cn(
-                  "font-semibold text-sm",
+                  'font-semibold text-sm',
                   isLow
-                    ? "text-amber-900 dark:text-amber-100"
-                    : "text-purple-900 dark:text-purple-100",
+                    ? 'text-amber-900 dark:text-amber-100'
+                    : 'text-purple-900 dark:text-purple-100',
                 )}
               >
-                {isLow ? "Risorse quasi esaurite!" : "Modalità Prova"}
+                {isLow ? 'Risorse quasi esaurite!' : 'Modalità Prova'}
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                {t("registratiPerAccessoIllimitato")}
+                {t('registratiPerAccessoIllimitato')}
               </p>
             </div>
 
@@ -153,12 +145,8 @@ export function TrialHeaderDropdown({
               <UsageRow
                 icon={<Mic className="w-4 h-4" />}
                 label="Voce"
-                used={
-                  usageData ? Math.floor(usageData.voice.used / 60) : undefined
-                }
-                limit={
-                  usageData ? Math.floor(usageData.voice.limit / 60) : undefined
-                }
+                used={usageData ? Math.floor(usageData.voice.used / 60) : undefined}
+                limit={usageData ? Math.floor(usageData.voice.limit / 60) : undefined}
                 unit="min"
                 getProgressColor={getProgressColor}
               />
@@ -187,15 +175,15 @@ export function TrialHeaderDropdown({
               <Link
                 href="/invite/request"
                 className={cn(
-                  "flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors",
+                  'flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-colors',
                   isLow
-                    ? "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
-                    : "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700",
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700'
+                    : 'bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700',
                 )}
                 onClick={() => setIsOpen(false)}
               >
                 <UserPlus className="w-4 h-4" />
-                {t("richiediAccesso")}
+                {t('requestAccess')}
               </Link>
               <Link
                 href="/login"
@@ -203,7 +191,7 @@ export function TrialHeaderDropdown({
                 onClick={() => setIsOpen(false)}
               >
                 <LogIn className="w-4 h-4" />
-                {t("login")}
+                {t('login')}
               </Link>
             </div>
           </motion.div>
@@ -222,14 +210,7 @@ interface UsageRowProps {
   getProgressColor: (percentage: number) => string;
 }
 
-function UsageRow({
-  icon,
-  label,
-  used,
-  limit,
-  unit = "",
-  getProgressColor,
-}: UsageRowProps) {
+function UsageRow({ icon, label, used, limit, unit = '', getProgressColor }: UsageRowProps) {
   const isLoading = used === undefined || limit === undefined;
   const percentage = isLoading ? 0 : Math.round((used / limit) * 100);
 
@@ -253,10 +234,7 @@ function UsageRow({
             <div className="h-full w-1/3 bg-slate-300 dark:bg-slate-600 animate-pulse rounded-full" />
           ) : (
             <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                getProgressColor(percentage),
-              )}
+              className={cn('h-full rounded-full transition-all', getProgressColor(percentage))}
               style={{ width: `${Math.min(percentage, 100)}%` }}
             />
           )}

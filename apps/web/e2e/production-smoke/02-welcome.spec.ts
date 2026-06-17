@@ -50,25 +50,22 @@ test.describe('PROD-SMOKE: Welcome & Trial Dashboard', () => {
     await expect(nav.getByRole('button', { name: /Mario/i })).toBeVisible();
   });
 
-  test('Trial mode shows correct limits', async ({ page, isMobile }) => {
+  test('Trial mode shows no commercial badge in the child header (COMP-01)', async ({ page }) => {
     await page.goto('/it');
     await openMobileMenu(page);
 
-    // Trial text is always visible in sidebar
-    await expect(page.getByText(/versione di prova/i)).toBeVisible();
-    // Trial badge is only in desktop header
-    if (!isMobile) {
-      await expect(page.getByTestId('trial-badge')).toBeVisible();
-    }
+    // COMP-01: the header trial badge ("Prova 7/10" → /invite/request) was
+    // removed from the child space; trial status lives in the grown-ups
+    // sidebar group only.
+    await expect(page.getByTestId('trial-badge')).toHaveCount(0);
   });
 
-  test('Login and request access links visible', async ({ page, isMobile }) => {
+  test('Login and request access live inside the grown-ups sidebar group', async ({ page }) => {
     await page.goto('/it');
     await openMobileMenu(page);
-    // On mobile, "Accedi" link may not be in sidebar — but "Richiedi accesso" is always visible
-    if (!isMobile) {
-      await expect(page.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
-    }
-    await expect(page.getByRole('button', { name: /Richiedi accesso/i }).first()).toBeVisible();
+    // COMP-01: account CTAs render only inside the "for grown-ups" group.
+    const grownUps = page.getByTestId('sidebar-grownups-group');
+    await expect(grownUps.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
+    await expect(grownUps.getByRole('link', { name: /Richiedi accesso/i }).first()).toBeVisible();
   });
 });

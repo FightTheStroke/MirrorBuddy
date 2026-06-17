@@ -1,16 +1,22 @@
 /**
  * API handlers for GenitoriView
  * Extracted from genitori-view.tsx
+ *
+ * All handlers require the real authenticated user id (BUG-03). The parent and
+ * child share a single account, so the parent dashboard inspects the signed-in
+ * user's own data. The /api/profile/consent and /api/profile/generate routes
+ * additionally reject any userId that does not match the authenticated session
+ * (403), so passing the real id is mandatory — the former hardcoded
+ * demo-student-1 made every call fail for real users.
  */
 
 import type { ConsentStatus } from './types';
 import type { StudentInsights } from '@/types';
-import { DEMO_USER_ID } from './constants';
 import { csrfFetch } from '@/lib/auth';
 
-export async function fetchConsentStatus(): Promise<ConsentStatus | null> {
+export async function fetchConsentStatus(userId: string): Promise<ConsentStatus | null> {
   try {
-    const response = await fetch(`/api/profile/consent?userId=${DEMO_USER_ID}`);
+    const response = await fetch(`/api/profile/consent?userId=${encodeURIComponent(userId)}`);
     const data = await response.json();
     return data.success ? (data.data as ConsentStatus) : null;
   } catch {
@@ -18,9 +24,9 @@ export async function fetchConsentStatus(): Promise<ConsentStatus | null> {
   }
 }
 
-export async function fetchProfile(): Promise<StudentInsights | null> {
+export async function fetchProfile(userId: string): Promise<StudentInsights | null> {
   try {
-    const response = await fetch(`/api/profile?userId=${DEMO_USER_ID}`);
+    const response = await fetch(`/api/profile?userId=${encodeURIComponent(userId)}`);
     const data = await response.json();
     if (response.ok && data.success) {
       const profileData = data.data;
@@ -41,26 +47,28 @@ export async function fetchProfile(): Promise<StudentInsights | null> {
   }
 }
 
-export async function generateProfile(): Promise<void> {
+export async function generateProfile(userId: string): Promise<void> {
   const response = await csrfFetch('/api/profile/generate', {
     method: 'POST',
-    body: JSON.stringify({ userId: DEMO_USER_ID, forceRegenerate: true }),
+    body: JSON.stringify({ userId, forceRegenerate: true }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || data.error || 'Failed to generate profile');
 }
 
-export async function giveConsent(): Promise<void> {
+export async function giveConsent(userId: string): Promise<void> {
   const response = await csrfFetch('/api/profile/consent', {
     method: 'POST',
-    body: JSON.stringify({ userId: DEMO_USER_ID, parentConsent: true, studentConsent: true }),
+    body: JSON.stringify({ userId, parentConsent: true, studentConsent: true }),
   });
   const data = await response.json();
   if (!data.success) throw new Error('Failed to record consent');
 }
 
-export async function exportProfile(format: 'json' | 'pdf'): Promise<void> {
-  const response = await fetch(`/api/profile/export?userId=${DEMO_USER_ID}&format=${format}`);
+export async function exportProfile(userId: string, format: 'json' | 'pdf'): Promise<void> {
+  const response = await fetch(
+    `/api/profile/export?userId=${encodeURIComponent(userId)}&format=${format}`,
+  );
   if (!response.ok) throw new Error('Export failed');
   const blob = await response.blob();
   const url = window.URL.createObjectURL(blob);
@@ -73,8 +81,10 @@ export async function exportProfile(format: 'json' | 'pdf'): Promise<void> {
   document.body.removeChild(a);
 }
 
-export async function requestDeletion(): Promise<void> {
-  const response = await csrfFetch(`/api/profile/consent?userId=${DEMO_USER_ID}`, { method: 'DELETE' });
+export async function requestDeletion(userId: string): Promise<void> {
+  const response = await csrfFetch(`/api/profile/consent?userId=${encodeURIComponent(userId)}`, {
+    method: 'DELETE',
+  });
   const data = await response.json();
   if (!data.success) throw new Error('Failed to request deletion');
 }

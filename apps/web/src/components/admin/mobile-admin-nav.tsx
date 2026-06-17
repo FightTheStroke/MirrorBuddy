@@ -16,7 +16,6 @@ import {
   Layers,
   ScrollText,
   Beaker,
-  MessageSquare,
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -95,12 +94,6 @@ const NAV_ITEMS: NavItem[] = [
     label: 'A/B Testing',
     href: '/admin/research/ab-testing',
     icon: Beaker,
-  },
-  {
-    id: 'review-queue',
-    label: 'Review Queue',
-    href: '/admin/community',
-    icon: MessageSquare,
   },
   {
     id: 'service-limits',

@@ -17,21 +17,4 @@ describe('createNavSections', () => {
       ]),
     );
   });
-
-  it('includes Community section with review queue item', () => {
-    const sections = createNavSections((key) => key);
-    const communitySection = sections.find((section) => section.id === 'community');
-
-    expect(communitySection).toBeDefined();
-    expect(communitySection).toMatchObject({ label: 'Community' });
-    expect(communitySection?.items).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'review-queue',
-          label: 'community.reviewQueue',
-          href: '/admin/community',
-        }),
-      ]),
-    );
-  });
 });

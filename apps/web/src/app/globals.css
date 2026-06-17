@@ -254,6 +254,21 @@ body {
   outline-offset: 2px;
 }
 
+/*
+ * FG-07: the step headings (#intent-heading / #intent-subject-heading) receive
+ * programmatic focus on step change so screen readers announce the new step
+ * (WCAG 3.2.2) — but they are tabindex="-1" and NOT interactive. The visible
+ * focus ring made them look like a selected input box (a keyboard child tried to
+ * "type" in it). Suppress the box on these announce-only headings; ID + !important
+ * beats the .high-contrast :focus-visible rule too. Keyboard-operable controls
+ * keep their indicator (this targets only these two heading ids).
+ */
+#intent-heading:focus,
+#intent-subject-heading:focus {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
 /* Animation utilities */
 @keyframes pulse-ring {
   0% {
@@ -320,10 +335,29 @@ body {
   color: #ffff00 !important;
 }
 
+/*
+ * A11Y-11: forcing yellow text on links/buttons alone left them yellow-on-white
+ * wherever a component paints its own light surface (sidebar nav labels, trial
+ * links, usage chips) — ~1.07:1, an AA failure for low-vision users. In a forced
+ * high-contrast theme every element must carry a dark background UNDER its
+ * foreground, so we pin background + foreground + border together on all
+ * non-media elements (#ffff00 on #000 = 19.6:1). Media is excluded so images
+ * keep rendering; SVG icons inherit currentColor below and turn yellow.
+ */
+.high-contrast *:not(img):not(picture):not(video):not(canvas) {
+  background-color: #000 !important;
+  background-image: none !important;
+  color: #ffff00 !important;
+  border-color: #ffff00 !important;
+}
+
 .high-contrast a,
 .high-contrast button {
-  color: #ffff00 !important;
   text-decoration: underline !important;
+}
+
+.high-contrast svg {
+  color: #ffff00 !important;
 }
 
 .high-contrast input,

@@ -66,25 +66,27 @@
 
 ## Security & Auth
 
-| #    | Decision                                      | Impact                                                                                          |
-| ---- | --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| 0004 | Safety Guardrails for Child Protection        | Content filtering, bias detection                                                               |
-| 0055 | Internal Auth System for Beta Access          | Session-based auth                                                                              |
-| 0062 | AI Compliance Framework                       | EU AI Act compliance                                                                            |
-| 0072 | Secrets Scan Pre-Commit Hook                  | Prevent secret leaks                                                                            |
-| 0074 | Contact Form Security and Validation Patterns | Input validation standards                                                                      |
-| 0075 | Cookie Handling Standards                     | httpOnly, signed cookies                                                                        |
-| 0077 | Security Hardening (Plan 17)                  | Comprehensive security measures                                                                 |
-| 0080 | Security Audit Hardening                      | Post-audit security fixes                                                                       |
-| 0098 | Trial Security Implementation                 | Secure anonymous trial access                                                                   |
-| 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance                                                                        |
-| 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety                                                               |
-| 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
-| 0132 | Self-Service Password Reset Flow              | Time-limited tokens, secure recovery, rate limiting                                             |
-| 0136 | Compliance Absolute Charter                   | Immutable compliance rules, zero-tolerance policy enforcement                                   |
-| 0143 | SSO OIDC Security Hardening                   | OIDC token validation, session binding, PKCE enforcement                                        |
-| 0147 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
-| 0151 | Anonymous User Auto-Creation Guard            | Block phantom user creation in production                                                       |
+| #    | Decision                                        | Impact                                                                                          |
+| ---- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 0004 | Safety Guardrails for Child Protection          | Content filtering, bias detection                                                               |
+| 0055 | Internal Auth System for Beta Access            | Session-based auth                                                                              |
+| 0062 | AI Compliance Framework                         | EU AI Act compliance                                                                            |
+| 0072 | Secrets Scan Pre-Commit Hook                    | Prevent secret leaks                                                                            |
+| 0074 | Contact Form Security and Validation Patterns   | Input validation standards                                                                      |
+| 0075 | Cookie Handling Standards                       | httpOnly, signed cookies                                                                        |
+| 0077 | Security Hardening (Plan 17)                    | Comprehensive security measures                                                                 |
+| 0080 | Security Audit Hardening                        | Post-audit security fixes                                                                       |
+| 0098 | Trial Security Implementation                   | Secure anonymous trial access                                                                   |
+| 0100 | Multi-Country Compliance Architecture           | EU, Italy, US compliance                                                                        |
+| 0115 | Amodei Safety Enhancements                      | Dependency detection, STEM safety                                                               |
+| 0127 | Security & Encryption Hardening                 | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
+| 0132 | Self-Service Password Reset Flow                | Time-limited tokens, secure recovery, rate limiting                                             |
+| 0136 | Compliance Absolute Charter                     | Immutable compliance rules, zero-tolerance policy enforcement                                   |
+| 0143 | SSO OIDC Security Hardening                     | OIDC token validation, session binding, PKCE enforcement                                        |
+| 0147 | Email Communications System                     | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
+| 0151 | Anonymous User Auto-Creation Guard              | Block phantom user creation in production                                                       |
+| 0166 | Parental Gate level for "Per i grandi" (DEC-01) | PROPOSED — decision on gate strength for `/invite/request` (GDPR Art. 8, L. 132/2025)           |
+| 0167 | Buddy Identity Unification — Phase 2 (DEC-08)   | PROPOSED — options A/B/C for naming the handoff banner narrator; awaiting human decision        |
 
 ## Observability & Operations
 
@@ -211,6 +213,6 @@
 
 ---
 
-**Total Active ADRs**: 128
+**Total Active ADRs**: 129
 **Archived ADRs**: 7
-**Last Updated**: 2026-03-08
+**Last Updated**: 2026-06-13

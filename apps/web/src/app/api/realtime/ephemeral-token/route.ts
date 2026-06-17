@@ -142,9 +142,9 @@ export const POST = pipe(
     log.error('Azure OpenAI Realtime not configured', { missingConfig });
     return json(
       {
-        error: 'Azure OpenAI not configured',
+        error: 'Azure realtime credentials not configured',
+        code: 'MISSING_CREDENTIALS',
         missingVariables: missingConfig,
-        message: 'Configure Azure OpenAI settings in the app or add environment variables',
       },
       503,
     );
@@ -232,13 +232,20 @@ export const POST = pipe(
       totalMs,
     });
 
+    // Map Azure 401/403 (expired/invalid key) to 503 with a structured error —
+    // callers must not receive a raw upstream 401 (no auth context on this endpoint).
+    const outStatus =
+      response.status === 401 || response.status === 403 || response.status >= 500
+        ? 503
+        : response.status;
     return json(
       {
         error: 'Failed to get ephemeral token from Azure',
+        code: 'AZURE_ERROR',
         status: response.status,
         details: errorData.slice(0, 200),
       },
-      response.status >= 500 ? 503 : response.status,
+      outStatus,
     );
   }
 

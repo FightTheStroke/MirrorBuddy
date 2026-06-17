@@ -1887,9 +1887,6 @@
       "completeSuccess": "Experiment completed successfully",
       "startDate": "Start date",
       "cancel": "Cancel"
-    },
-    "community": {
-      "reviewQueue": "Review Queue"
     }
   }
 }
