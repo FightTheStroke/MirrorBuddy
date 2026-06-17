@@ -55,6 +55,27 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "parentalGate": {
+      "title": "Espace réservé aux adultes",
+      "description": "Cette partie est réservée aux adultes.",
+      "mathPrompt": "Pour continuer, combien font {a} + {b} ?",
+      "mathPlaceholder": "Votre réponse",
+      "pinPrompt": "Saisissez le code PIN parent",
+      "pinPlaceholder": "PIN",
+      "unlock": "Déverrouiller",
+      "cancel": "Annuler",
+      "wrongAnswer": "Réponse incorrecte. Réessayez.",
+      "wrongPin": "Code PIN incorrect. Réessayez.",
+      "setPinCta": "Protéger avec un code PIN",
+      "setPinHint": "De 4 à 6 chiffres.",
+      "newPin": "Nouveau PIN",
+      "confirmPin": "Confirmez le PIN",
+      "save": "Enregistrer",
+      "pinMismatch": "Les deux codes PIN ne correspondent pas.",
+      "pinInvalid": "Le code PIN doit comporter de 4 à 6 chiffres.",
+      "pinSaved": "Code PIN enregistré.",
+      "loading": "Un instant…"
+    }
   }
 }

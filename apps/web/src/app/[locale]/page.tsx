@@ -31,6 +31,8 @@ import { LazyProgressView } from '@/components/progress';
 import { TrialHomeBanner, TrialUsageDashboard } from '@/components/trial';
 import { HomeHeader } from './home-header';
 import { HomeSidebar } from './home-sidebar';
+import { ParentalGateDialog } from '@/components/parental-gate';
+import { useParentalGateStore } from '@/lib/stores/parental-gate-store';
 import { COACH_INFO, BUDDY_INFO } from './home-constants';
 import type { View, MaestroSessionMode } from './types';
 import {
@@ -42,6 +44,10 @@ import {
 } from './home-lazy';
 
 const MB_PER_LEVEL = 1000;
+
+// Adult-only surfaces ("Per i grandi") gated behind the parental gate (#432).
+// The default child landing ('maestri') is intentionally NOT gated.
+const ADULT_VIEWS: View[] = ['genitori', 'settings', 'calendar'];
 
 export default function Home() {
   const router = useRouter();
@@ -65,6 +71,8 @@ export default function Home() {
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
   const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
+  const [gatePendingView, setGatePendingView] = useState<View | null>(null);
+  const isAdultUnlocked = useParentalGateStore((s) => s.isUnlocked);
 
   useEffect(() => {
     const handleResize = () => {
@@ -125,6 +133,15 @@ export default function Home() {
       }
     }
     setCurrentView(newView);
+  };
+
+  // Gate adult surfaces ("Per i grandi") behind the parental gate (#432).
+  const requestViewChange = async (newView: View) => {
+    if (ADULT_VIEWS.includes(newView) && !isAdultUnlocked) {
+      setGatePendingView(newView);
+      return;
+    }
+    await handleViewChange(newView);
   };
 
   const handleToolRequest = (toolType: ToolType, maestro: Maestro) => {
@@ -250,12 +267,12 @@ export default function Home() {
             open={sidebarOpen}
             onToggle={() => setSidebarOpen(!sidebarOpen)}
             currentView={currentView}
-            onViewChange={handleViewChange}
+            onViewChange={requestViewChange}
             navItems={navItems}
             hasNewInsights={hasNewInsights}
             onParentAccess={() => {
               markAsViewed();
-              handleViewChange('genitori');
+              void requestViewChange('genitori');
             }}
             trialStatus={trialStatus}
           />
@@ -313,6 +330,17 @@ export default function Home() {
           )}
         </div>
       )}
+
+      <ParentalGateDialog
+        key={gatePendingView ?? 'closed'}
+        open={gatePendingView !== null}
+        onUnlock={() => {
+          const target = gatePendingView;
+          setGatePendingView(null);
+          if (target) void handleViewChange(target);
+        }}
+        onCancel={() => setGatePendingView(null)}
+      />
     </div>
   );
 }

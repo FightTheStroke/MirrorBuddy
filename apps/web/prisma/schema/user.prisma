@@ -167,6 +167,9 @@ model Settings {
   // Parent Dashboard (Issue #64)
   parentDashboardLastViewed DateTime?
 
+  // Parental gate PIN (Issue #432) — bcrypt hash; never returned to the client
+  parentalPinHash String?
+
   // Azure Cost Configuration
   azureCostConfig String? // JSON: {token_cost, audio_cost, etc.}
 

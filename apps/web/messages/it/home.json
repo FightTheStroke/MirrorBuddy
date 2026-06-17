@@ -55,6 +55,27 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "parentalGate": {
+      "title": "Area per i grandi",
+      "description": "Questa parte è riservata agli adulti.",
+      "mathPrompt": "Per continuare, quanto fa {a} + {b}?",
+      "mathPlaceholder": "La tua risposta",
+      "pinPrompt": "Inserisci il PIN dei genitori",
+      "pinPlaceholder": "PIN",
+      "unlock": "Sblocca",
+      "cancel": "Annulla",
+      "wrongAnswer": "Risposta non corretta. Riprova.",
+      "wrongPin": "PIN non corretto. Riprova.",
+      "setPinCta": "Proteggi con un PIN",
+      "setPinHint": "Da 4 a 6 cifre.",
+      "newPin": "Nuovo PIN",
+      "confirmPin": "Conferma il PIN",
+      "save": "Salva",
+      "pinMismatch": "I due PIN non coincidono.",
+      "pinInvalid": "Il PIN deve avere da 4 a 6 cifre.",
+      "pinSaved": "PIN impostato correttamente.",
+      "loading": "Un attimo…"
+    }
   }
 }

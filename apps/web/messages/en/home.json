@@ -55,6 +55,27 @@
     "streak1": "Streak",
     "streak": "Streak",
     "mb": "+% MB",
-    "sim": "(SIM)"
+    "sim": "(SIM)",
+    "parentalGate": {
+      "title": "Grown-ups only",
+      "description": "This area is for grown-ups.",
+      "mathPrompt": "To continue, what is {a} + {b}?",
+      "mathPlaceholder": "Your answer",
+      "pinPrompt": "Enter the parent PIN",
+      "pinPlaceholder": "PIN",
+      "unlock": "Unlock",
+      "cancel": "Cancel",
+      "wrongAnswer": "Wrong answer. Try again.",
+      "wrongPin": "Wrong PIN. Try again.",
+      "setPinCta": "Protect with a PIN",
+      "setPinHint": "4 to 6 digits.",
+      "newPin": "New PIN",
+      "confirmPin": "Confirm PIN",
+      "save": "Save",
+      "pinMismatch": "The two PINs don’t match.",
+      "pinInvalid": "The PIN must be 4 to 6 digits.",
+      "pinSaved": "PIN set successfully.",
+      "loading": "One moment…"
+    }
   }
 }
