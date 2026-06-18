@@ -46,6 +46,16 @@ test.use({ locale: 'it-IT', extraHTTPHeaders: { 'Accept-Language': 'it-IT,it;q=0
 // renders #intent-heading (real /api/user errors).
 test.beforeEach(async ({ page, context }) => {
   await context.addCookies([{ name: 'NEXT_LOCALE', value: 'it', domain: 'localhost', path: '/' }]);
+  // FGOP-10: hide the Next.js dev overlay (<nextjs-portal> + dev toasts/dialogs)
+  // so captures stay clean even when accidentally run against `npm run dev`
+  // instead of a production build. No-op on a production build (elements absent).
+  await page.addInitScript(() => {
+    const style = document.createElement('style');
+    style.setAttribute('data-fgop10', 'hide-dev-overlay');
+    style.textContent =
+      'nextjs-portal,[data-nextjs-dialog-overlay],[data-nextjs-toast],[data-nextjs-dev-tools-button]{display:none !important;}';
+    document.documentElement.appendChild(style);
+  });
   await mockOnboarding(page);
   await mockHomePageAPIs(page);
   await mockTracking(page);
