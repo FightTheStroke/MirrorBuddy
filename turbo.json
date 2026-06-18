@@ -3,7 +3,15 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_SITE_URL",
+        "NEXT_PUBLIC_APP_URL",
+        "OLLAMA_URL",
+        "NEXT_TELEMETRY_DISABLED",
+        "APP_VERSION"
+      ]
     },
     "dev": {
       "cache": false,

@@ -192,8 +192,14 @@ jobs:
 
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run build
+      - name: Build (Turbo + Vercel remote cache)
+        run: npx turbo run build --filter=@mirrorbuddy/web
         env:
+          # Remote cache (#363): TURBO_TOKEN reuses the Vercel token. Turbo falls
+          # back to local cache automatically if the remote is unreachable, so a
+          # cache miss or auth issue degrades to today's behaviour, never blocks.
+          TURBO_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TURBO_TEAM: fightthestroke
           NEXT_TELEMETRY_DISABLED: 1
           # Required for provider check during build - ensures correct page rendering
           OLLAMA_URL: http://localhost:11434
