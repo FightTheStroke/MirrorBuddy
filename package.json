@@ -97,18 +97,20 @@
     "production:status": "./scripts/production-status.sh"
   },
   "overrides": {
-    "hono": "4.12.14",
-    "tmp": "0.2.6",
+    "hono": "4.12.25",
+    "tmp": "0.2.7",
     "lodash": "4.18.1",
     "lodash-es": "4.18.1",
     "@hono/node-server": "1.19.11",
     "tar": "7.5.13",
     "terser-webpack-plugin": "5.3.17",
-    "protobufjs": "7.5.6",
+    "protobufjs": "7.6.4",
     "fast-uri": "3.1.2",
     "@opentelemetry/otlp-transformer": {
-      "protobufjs": "8.0.2"
+      "protobufjs": "8.6.4"
     },
+    "vite": "8.0.16",
+    "@grpc/grpc-js": "1.14.4",
     "eslint-plugin-react-hooks": "7.0.1",
     "basic-ftp": "5.3.1"
   },
@@ -185,7 +187,7 @@
     "uuid": "^14.0.0",
     "web-push": "^3.6.7",
     "web-vitals": "^5.1.0",
-    "ws": "^8.20.1",
+    "ws": "^8.21.0",
     "yaml": "^2.0.0",
     "zod": "^4.3.5",
     "zustand": "^5.0.9"
@@ -248,16 +250,18 @@
   ],
   "pnpm": {
     "overrides": {
-      "hono": "4.12.14",
-      "tmp": "0.2.6",
+      "hono": "4.12.25",
+      "tmp": "0.2.7",
       "lodash": "4.18.1",
       "lodash-es": "4.18.1",
       "@hono/node-server": "1.19.11",
       "tar": "7.5.13",
       "terser-webpack-plugin": "5.3.17",
-      "protobufjs": "7.5.6",
+      "protobufjs": "7.6.4",
       "fast-uri": "3.1.2",
-      "@opentelemetry/otlp-transformer>protobufjs": "8.0.2",
+      "@opentelemetry/otlp-transformer>protobufjs": "8.6.4",
+      "vite": "8.0.16",
+      "@grpc/grpc-js": "1.14.4",
       "eslint-plugin-react-hooks": "7.0.1",
       "basic-ftp": "5.3.1"
     }
