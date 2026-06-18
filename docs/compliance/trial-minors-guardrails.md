@@ -108,6 +108,26 @@ this guardrail review first.
       `docs/compliance/DPIA.md` (child-facing commercial surfaces removed) at
       the next document revision.
 
+## 5a. Sign-off — maintainer risk acceptance (2026-06-18)
+
+**Decision (Roberdan, product / risk owner, FightTheStroke):** the current
+child-resistant approach — arithmetic **grown-up gate** + **guardian
+self-declaration** before the `/invite/request` PII form and the "Per i grandi"
+area (commit `08f41512`) — is **accepted as sufficient for the current stage**.
+Verifiable parental consent (e.g. parent-email verification) is **deferred**;
+the residual risk of the items in §5 is knowingly accepted for now.
+
+Scope of acceptance: the open §5 items (exact COPPA wording, `visitorId`↔email
+join lawful basis/retention, 14-year-old login policy, trial telemetry toward
+minors, DPIA/AI-POLICY revision) are accepted at the current pre-scale stage.
+
+**Caveat (important):** this is a documented **product/risk-owner decision**,
+**not** a formal legal opinion from qualified counsel. Before scaling
+child-facing data collection (or onboarding a school/B2B customer), obtain a
+formal legal review of GDPR Art. 8 / COPPA / L. 132/2025 sufficiency and revisit
+DEC-01 (`docs/adr/0166-parental-gate-dec01.md`). Tracking issue #431 is closed
+on the basis of this acceptance; reopen if the risk posture changes.
+
 ## Aggiornamento — grown-up gate implementato (2026-06-12, commit `08f41512`)
 
 Decisione presa (opzione "media"): aggiunto un **GrownUpGate** child-resistant (sfida aritmetica 2 cifre + framing "per i grandi", `@/components/safety/grown-up-gate.tsx`) PRIMA di:
