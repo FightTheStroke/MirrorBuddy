@@ -143,6 +143,34 @@ describe('/api/tts POST - provider selection', () => {
     expect(Array.from(buffer)).toEqual(Array.from(audioBytes));
   });
 
+  it('falls back to tts-hd when gpt-audio-1.5 fails at runtime (#216)', async () => {
+    setTtsAudio15Flag(true);
+
+    const azureBytes = Uint8Array.from([7, 7]);
+    const mockFetch = vi
+      .fn()
+      // 1st call: gpt-audio-1.5 chat/completions fails
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        text: async () => 'audio model unavailable',
+      })
+      // 2nd call: tts-hd audio/speech succeeds
+      .mockResolvedValueOnce({
+        ok: true,
+        arrayBuffer: async () => azureBytes.buffer,
+      });
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    const response = await POST(createRequest({ text: 'Fallback please' }) as any);
+
+    expect(mockFetch.mock.calls[0][0]).toContain('/chat/completions');
+    expect(mockFetch.mock.calls[1][0]).toContain('/audio/speech');
+    expect(response.status).toBe(200);
+    const buffer = new Uint8Array(await response.arrayBuffer());
+    expect(Array.from(buffer)).toEqual(Array.from(azureBytes));
+  });
+
   it('falls back to Azure tts-hd when audio 1.5 is disabled', async () => {
     setTtsAudio15Flag(false);
 
