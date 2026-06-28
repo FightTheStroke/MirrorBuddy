@@ -43,6 +43,7 @@ const createMockSession = (overrides = {}) => ({
   handleSubmit: vi.fn(),
   clearChat: vi.fn(),
   handleWebcamCapture: vi.fn(),
+  handleWebcamClose: vi.fn(),
   requestTool: vi.fn(),
   handleRequestPhoto: vi.fn(),
   setShowWebcam: vi.fn(),
