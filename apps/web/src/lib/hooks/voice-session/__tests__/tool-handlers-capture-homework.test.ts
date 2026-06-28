@@ -84,4 +84,24 @@ describe('handleToolCall — capture_homework', () => {
     expect((output?.item as Record<string, unknown>)?.call_id).toBe('call-123');
     expect(sends.some((m) => m.type === 'response.create')).toBe(true);
   });
+
+  it('resolves the call when tool arguments are malformed JSON (catch-block recovery)', async () => {
+    const sends: Array<Record<string, unknown>> = [];
+    const params = makeParams({
+      dataChannelSends: sends,
+      event: { name: 'create_quiz', arguments: '{ not valid json', call_id: 'call-bad' },
+    });
+
+    await handleToolCall(params);
+
+    const output = sends.find(
+      (m) => (m.item as Record<string, unknown>)?.type === 'function_call_output',
+    );
+    expect(output).toBeDefined();
+    expect((output?.item as Record<string, unknown>)?.call_id).toBe('call-bad');
+    expect(JSON.parse(String((output?.item as Record<string, unknown>)?.output)).success).toBe(
+      false,
+    );
+    expect(sends.some((m) => m.type === 'response.create')).toBe(true);
+  });
 });

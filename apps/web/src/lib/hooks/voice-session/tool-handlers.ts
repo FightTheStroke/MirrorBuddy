@@ -74,10 +74,14 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
   }
 
   const toolName = event.name;
+  // Resolve callId BEFORE the try so the catch block can still send a
+  // function_call_output if anything throws (e.g. malformed JSON args). Without
+  // this, any exception leaves the realtime model waiting forever for a tool
+  // result that never arrives and the assistant goes silent mid-conversation.
+  const callId =
+    typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
   try {
     const args = JSON.parse(event.arguments as string);
-    const callId =
-      typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
     const toolCall = {
       id: callId,
       type: toolName as import('@/types').ToolType,
@@ -249,6 +253,17 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     });
     sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
   } catch (error) {
-    logger.error('[VoiceSession] Failed to parse/execute tool call', undefined, error);
+    logger.error('[VoiceSession] Failed to parse/execute tool call', { toolName, callId }, error);
+    // Resolve the call even on failure so the model never hangs waiting for a
+    // result. Best-effort: the data channel may already be closed.
+    sendViaWebRTC(webrtcDataChannelRef, {
+      type: 'conversation.item.create',
+      item: {
+        type: 'function_call_output',
+        call_id: callId,
+        output: JSON.stringify({ success: false, error: 'tool_execution_failed' }),
+      },
+    });
+    sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
   }
 }
