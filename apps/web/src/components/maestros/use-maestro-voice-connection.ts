@@ -16,6 +16,16 @@ interface UseMaestroVoiceConnectionProps {
   onQuestionAsked: () => void;
   /** Current messages to provide context when starting voice */
   currentMessages?: ChatMessage[];
+  /**
+   * Called when the assistant requests a webcam capture (capture_homework tool)
+   * during a voice call. Without this, the realtime model would wait forever for
+   * a tool result and stop responding.
+   */
+  onWebcamRequest?: (request: {
+    purpose: string;
+    instructions?: string;
+    callId: string;
+  }) => void;
 }
 
 export function useMaestroVoiceConnection({
@@ -24,6 +34,7 @@ export function useMaestroVoiceConnection({
   onTranscript,
   onQuestionAsked,
   currentMessages = [],
+  onWebcamRequest,
 }: UseMaestroVoiceConnectionProps) {
   const t = useTranslations('voice');
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
@@ -63,7 +74,9 @@ export function useMaestroVoiceConnection({
     disconnect,
     toggleMute,
     sessionId: voiceSessionId,
+    sendWebcamResult,
   } = useVoiceSession({
+    onWebcamRequest,
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
       if (shouldEscalateVoiceError(error)) {
@@ -204,5 +217,6 @@ export function useMaestroVoiceConnection({
     handleVoiceCall,
     setIsVoiceActive,
     disconnect,
+    sendWebcamResult,
   };
 }

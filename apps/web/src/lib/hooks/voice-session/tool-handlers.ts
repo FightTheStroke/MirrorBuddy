@@ -87,14 +87,42 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     };
     addToolCall(toolCall);
 
-    // Handle webcam/homework capture request
+    // Handle webcam/homework capture request.
+    // The webcam flow is asynchronous: we open the camera here and the
+    // function_call_output is sent later via sendWebcamResult() once the
+    // student captures (or cancels). This ONLY works when a webcam handler
+    // is wired up. If it is not (e.g. a surface that never registered
+    // onWebcamRequest), deferring would leave the realtime model waiting
+    // forever for a tool result that never arrives — the assistant goes
+    // permanently silent mid-conversation. Guard against that by resolving
+    // the tool call immediately so the conversation can continue.
     if (toolName === 'capture_homework') {
-      options.onWebcamRequest?.({
-        purpose: args.purpose || 'homework',
-        instructions: args.instructions,
-        callId: callId,
+      if (options.onWebcamRequest) {
+        options.onWebcamRequest({
+          purpose: args.purpose || 'homework',
+          instructions: args.instructions,
+          callId: callId,
+        });
+        updateToolCall(toolCall.id, { status: 'pending' });
+        return;
+      }
+
+      logger.warn('[VoiceSession] capture_homework called but no webcam handler is wired', {
+        callId,
       });
-      updateToolCall(toolCall.id, { status: 'pending' });
+      updateToolCall(toolCall.id, { status: 'error' });
+      sendViaWebRTC(webrtcDataChannelRef, {
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify({
+            success: false,
+            error: 'camera_unavailable',
+          }),
+        },
+      });
+      sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
       return;
     }
 
