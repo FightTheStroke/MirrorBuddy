@@ -36,6 +36,13 @@ export function useMaestroSessionLogic({
   } | null>(null);
   const [sessionEnded, setSessionEnded] = useState(false);
 
+  // Tracks the realtime call_id when the webcam was opened by the assistant's
+  // capture_homework tool during a voice call. While set, capture/cancel must
+  // be reported back to the realtime model (function_call_output) rather than
+  // routed through the chat vision path — otherwise the model waits forever and
+  // the maestro stops responding.
+  const voiceWebcamCallIdRef = useRef<string | null>(null);
+
   const sessionStartTimeRef = useRef<number | null>(null);
   if (sessionStartTimeRef.current === null) {
     // eslint-disable-next-line react-hooks/purity -- Intentional lazy initialization
@@ -66,6 +73,22 @@ export function useMaestroSessionLogic({
     setMessages((prev) => [...prev, message]);
   }, []);
 
+  // Assistant asked to see the student's homework during a voice call.
+  // Open the webcam and remember the realtime call_id so the capture result is
+  // sent back to the model (see handleWebcamCaptureWithClose / handleWebcamClose).
+  const onVoiceWebcamRequest = useCallback(
+    (request: { purpose: string; instructions?: string; callId: string }) => {
+      voiceWebcamCallIdRef.current = request.callId;
+      setWebcamRequest({
+        purpose: request.purpose,
+        instructions: request.instructions,
+        callId: request.callId,
+      });
+      setShowWebcam(true);
+    },
+    [],
+  );
+
   const sessionMetrics = useSessionMetrics(maestro.id);
 
   const voiceConnection = useMaestroVoiceConnection({
@@ -74,6 +97,7 @@ export function useMaestroSessionLogic({
     onTranscript: onVoiceTranscript,
     onQuestionAsked,
     currentMessages: messages,
+    onWebcamRequest: onVoiceWebcamRequest,
   });
 
   const chatHandlers = useMaestroChatHandlers({
@@ -278,15 +302,37 @@ export function useMaestroSessionLogic({
     }
   }, []);
 
-  // Wrap webcam capture to also close the modal after processing
+  // Wrap webcam capture to also close the modal after processing.
+  // When the capture was initiated by the assistant during a voice call, the
+  // image result must be reported back to the realtime model so it resumes the
+  // conversation; otherwise route it through the chat vision path as usual.
   const handleWebcamCaptureWithClose = useCallback(
     (imageData: string) => {
-      chatHandlers.handleWebcamCapture(imageData);
+      const voiceCallId = voiceWebcamCallIdRef.current;
+      if (voiceCallId) {
+        voiceWebcamCallIdRef.current = null;
+        voiceConnection.sendWebcamResult(voiceCallId, imageData);
+      } else {
+        chatHandlers.handleWebcamCapture(imageData);
+      }
       setShowWebcam(false);
       setWebcamRequest(null);
     },
-    [chatHandlers],
+    [chatHandlers, voiceConnection],
   );
+
+  // Close/cancel the webcam. If it was opened by the assistant during a voice
+  // call, tell the realtime model the capture was cancelled so it stops waiting
+  // for a tool result and keeps responding.
+  const handleWebcamClose = useCallback(() => {
+    const voiceCallId = voiceWebcamCallIdRef.current;
+    if (voiceCallId) {
+      voiceWebcamCallIdRef.current = null;
+      voiceConnection.sendWebcamResult(voiceCallId, null);
+    }
+    setShowWebcam(false);
+    setWebcamRequest(null);
+  }, [voiceConnection]);
 
   return {
     // State
@@ -319,6 +365,7 @@ export function useMaestroSessionLogic({
     handleSubmit: chatHandlers.handleSubmit,
     clearChat: clearChatWithReset,
     handleWebcamCapture: handleWebcamCaptureWithClose,
+    handleWebcamClose,
     requestTool: chatHandlers.requestTool,
     handleRequestPhoto,
     setShowWebcam,

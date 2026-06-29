@@ -97,10 +97,9 @@ export function MaestroSession({
     handleSubmit,
     clearChat,
     handleWebcamCapture,
+    handleWebcamClose,
     requestTool,
     handleRequestPhoto,
-    setShowWebcam,
-    setWebcamRequest,
     loadConversation,
   } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType, contextMessage });
 
@@ -210,10 +209,7 @@ export function MaestroSession({
               showWebcam={showWebcam}
               webcamRequest={webcamRequest}
               onCapture={handleWebcamCapture}
-              onClose={() => {
-                setShowWebcam(false);
-                setWebcamRequest(null);
-              }}
+              onClose={handleWebcamClose}
             />
           ) : undefined
         }

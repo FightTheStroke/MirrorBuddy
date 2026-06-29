@@ -174,6 +174,13 @@ export function useSendWebcamResult(
             output: JSON.stringify({ success: true, image_captured: true }),
           },
         });
+        // Send the captured photo as visual input so the model can actually
+        // inspect the homework (input_image, per ADR 0122 — same channel as
+        // video frames). imageData is a full data URL from canvas.toDataURL.
+        // Without this the model resumes blind and cannot help with the exercise.
+        const imageUrl = imageData.startsWith('data:')
+          ? imageData
+          : `data:image/jpeg;base64,${imageData}`;
         sendViaWebRTC(webrtcDataChannelRef, {
           type: 'conversation.item.create',
           item: {
@@ -182,7 +189,11 @@ export function useSendWebcamResult(
             content: [
               {
                 type: 'input_text',
-                text: 'Ho scattato una foto. Chiedimi di descriverti cosa vedo.',
+                text: 'Ho fotografato il mio compito. Guarda l’immagine e aiutami con questo esercizio.',
+              },
+              {
+                type: 'input_image',
+                image_url: imageUrl,
               },
             ],
           },
