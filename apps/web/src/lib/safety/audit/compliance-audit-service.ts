@@ -17,15 +17,44 @@ import {
   ComplianceAuditExport,
   DEFAULT_COMPLIANCE_CONFIG,
 } from "./compliance-audit-types";
+import {
+  buildRegulatoryContext,
+  computeComplianceStatistics,
+} from "./compliance-audit-stats";
 
 const log = logger.child({ module: "compliance-audit" });
 
 /**
- * In-memory compliance audit buffer
+ * In-memory compliance audit buffer.
+ *
+ * D-07: This buffer is an in-process cache ONLY. On serverless it resets per
+ * instance/cold start, so every entry is also persisted immediately to the
+ * ComplianceAuditEntry table (see persistEntryToDb), which is the durable
+ * source of truth for the admin oversight dashboard.
  */
 const complianceBuffer: ComplianceAuditEntry[] = [];
-const BUFFER_FLUSH_SIZE = 50;
-const BUFFER_FLUSH_INTERVAL_MS = 60000; // 1 minute
+const BUFFER_TRIM_SIZE = 50;
+const BUFFER_MAX_ENTRIES = 500;
+const BUFFER_TRIM_INTERVAL_MS = 60000; // 1 minute
+
+/**
+ * Persist an entry to durable storage (server-only, lazy import).
+ * Fire-and-forget with error handling — recording must never block or throw.
+ */
+async function persistEntryToDb(entry: ComplianceAuditEntry): Promise<void> {
+  if (typeof window !== "undefined") {
+    return;
+  }
+  try {
+    const { persistComplianceEntry } = await import("./compliance-audit-db");
+    await persistComplianceEntry(entry);
+  } catch (error) {
+    log.error("Failed to persist compliance entry", {
+      auditId: entry.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
 
 /**
  * Record a compliance audit event
@@ -91,8 +120,12 @@ export function recordComplianceEvent(
     incidentReference: options.incidentReference,
   };
 
-  // Add to buffer
+  // Add to buffer (in-process cache)
   complianceBuffer.push(entry);
+
+  // D-07: persist immediately to the durable store — on serverless the
+  // buffer resets per instance, so the database is the source of truth.
+  void persistEntryToDb(entry);
 
   // Log based on severity and regulatory impact
   logComplianceEvent(entry, regulatoryContext);
@@ -105,9 +138,9 @@ export function recordComplianceEvent(
     escalateComplianceEvent(entry);
   }
 
-  // Flush if buffer is full
-  if (complianceBuffer.length >= BUFFER_FLUSH_SIZE) {
-    flushComplianceBuffer();
+  // Trim cache if it grows too large
+  if (complianceBuffer.length >= BUFFER_TRIM_SIZE) {
+    trimComplianceBuffer();
   }
 
   return entryId;
@@ -279,7 +312,8 @@ export function getComplianceEntries(options: {
 }
 
 /**
- * Generate compliance audit statistics
+ * Generate compliance audit statistics (from the in-process cache).
+ * For durable statistics use getComplianceStatisticsFromDb (server-only).
  */
 export function getComplianceStatistics(
   periodDays: number = 30,
@@ -290,92 +324,7 @@ export function getComplianceStatistics(
   ).toISOString();
   const periodEnd = now.toISOString();
 
-  const entries = complianceBuffer.filter(
-    (e) => e.timestamp >= periodStart && e.timestamp <= periodEnd,
-  );
-
-  const eventsByType: Record<string, number> = {};
-  const eventsBySeverity: Record<string, number> = {};
-  const eventsByOutcome: Record<string, number> = {};
-  const ageGroupDistribution: Record<string, number> = {};
-
-  let aiActCount = 0;
-  let gdprCount = 0;
-  let coppaCount = 0;
-  let italianL132Count = 0;
-
-  for (const entry of entries) {
-    eventsByType[entry.eventType] = (eventsByType[entry.eventType] || 0) + 1;
-    eventsBySeverity[entry.severity] =
-      (eventsBySeverity[entry.severity] || 0) + 1;
-    eventsByOutcome[entry.outcome] = (eventsByOutcome[entry.outcome] || 0) + 1;
-    ageGroupDistribution[entry.userContext.ageGroup] =
-      (ageGroupDistribution[entry.userContext.ageGroup] || 0) + 1;
-
-    if (entry.regulatoryContext.aiAct) aiActCount++;
-    if (entry.regulatoryContext.gdpr) gdprCount++;
-    if (entry.regulatoryContext.coppa) coppaCount++;
-    if (entry.regulatoryContext.italianL132Art4) italianL132Count++;
-  }
-
-  // Count mitigation outcomes
-  const blockedCount = entries.filter((e) => e.outcome === "blocked").length;
-  const modifiedCount = entries.filter((e) => e.outcome === "modified").length;
-  const escalatedCount = entries.filter(
-    (e) => e.outcome === "escalated",
-  ).length;
-  const allowedCount = entries.filter((e) => e.outcome === "allowed").length;
-  const monitoredCount = entries.filter(
-    (e) => e.outcome === "monitored",
-  ).length;
-
-  // Calculate trend
-  const midpoint = new Date(periodStart);
-  midpoint.setTime(
-    midpoint.getTime() + (now.getTime() - midpoint.getTime()) / 2,
-  );
-  const firstHalf = entries.filter(
-    (e) => new Date(e.timestamp) < midpoint,
-  ).length;
-  const secondHalf = entries.filter(
-    (e) => new Date(e.timestamp) >= midpoint,
-  ).length;
-
-  let trendDirection: "increasing" | "decreasing" | "stable" = "stable";
-  if (secondHalf > firstHalf * 1.2) {
-    trendDirection = "increasing";
-  } else if (secondHalf < firstHalf * 0.8) {
-    trendDirection = "decreasing";
-  }
-
-  const criticalEvents = entries.filter(
-    (e) => e.severity === "critical",
-  ).length;
-
-  return {
-    periodStart,
-    periodEnd,
-    totalEvents: entries.length,
-    eventsByType,
-    eventsBySeverity,
-    eventsByOutcome,
-    regulatoryImpact: {
-      aiActEvents: aiActCount,
-      gdprEvents: gdprCount,
-      coppaEvents: coppaCount,
-      italianL132Art4Events: italianL132Count,
-    },
-    ageGroupDistribution,
-    mitigationMetrics: {
-      blockedCount,
-      modifiedCount,
-      escalatedCount,
-      allowedCount,
-      monitoredCount,
-    },
-    trendDirection,
-    criticalEvents,
-  };
+  return computeComplianceStatistics(complianceBuffer, periodStart, periodEnd);
 }
 
 /**
@@ -453,26 +402,6 @@ function sanitizeEventDetails(
   }
 
   return sanitized;
-}
-
-function buildRegulatoryContext(
-  eventType: ComplianceAuditEntry["eventType"],
-  override?: Partial<RegulatoryContext>,
-): RegulatoryContext {
-  // Default context based on event type
-  const defaults: RegulatoryContext = {
-    aiAct: true, // All events are AI Act relevant
-    gdpr: true, // Data processing compliance
-    coppa: false, // Only for child-related events
-    italianL132Art4: true, // Italian education compliance
-  };
-
-  // Override with specific types that trigger COPPA
-  if (eventType === "crisis_detected" || eventType === "content_filtered") {
-    defaults.coppa = true;
-  }
-
-  return { ...defaults, ...override };
 }
 
 function determineMitigation(
@@ -577,12 +506,12 @@ function escalateComplianceEvent(entry: ComplianceAuditEntry): void {
   // In production, this would trigger alerts, notifications, etc.
 }
 
-function flushComplianceBuffer(): void {
-  log.debug("Flushing compliance audit buffer", {
-    entries: complianceBuffer.length,
-  });
-  // In production, this would write to persistent storage (database)
-  // For now, entries remain in buffer for retrieval
+function trimComplianceBuffer(): void {
+  // Entries are persisted individually at record time (persistEntryToDb).
+  // The buffer is only an in-process cache — trim so it cannot grow unbounded.
+  if (complianceBuffer.length > BUFFER_MAX_ENTRIES) {
+    complianceBuffer.splice(0, complianceBuffer.length - BUFFER_MAX_ENTRIES);
+  }
 }
 
 /**
@@ -624,7 +553,7 @@ function generateComplianceSummary(
   return summary;
 }
 
-// Set up periodic flush
+// Set up periodic cache trim
 if (typeof setInterval !== "undefined") {
-  setInterval(flushComplianceBuffer, BUFFER_FLUSH_INTERVAL_MS);
+  setInterval(trimComplianceBuffer, BUFFER_TRIM_INTERVAL_MS);
 }
