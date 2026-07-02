@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './fixtures/a11y-fixtures';
-import { mockOnboarding, mockHomePageAPIs, mockTracking } from './fixtures/api-mocks';
+import {
+  mockOnboarding,
+  mockHomePageAPIs,
+  mockTracking,
+  mockTrialTier,
+} from './fixtures/api-mocks';
 
 /**
  * Dedicated accessibility coverage for the intention-based home (A11Y-07).
@@ -24,6 +29,10 @@ test.beforeEach(async ({ page }) => {
   await mockOnboarding(page);
   await mockHomePageAPIs(page);
   await mockTracking(page);
+  // The global storageState authenticates every context as a registered
+  // (Base) user; these specs cover the anonymous Trial child UX, so force
+  // the Trial tier response (see mockTrialTier docs).
+  await mockTrialTier(page);
   // The trial usage dashboard renders an error box if /api/user/usage fails;
   // mock a healthy response so the axe scan reflects the real production UI
   // (not a DB-error fallback state).
