@@ -19,12 +19,12 @@
       "startVoiceCall": "Llamar por voz",
       "talkToCoach": "Hablar con el Entrenador",
       "talkToBuddy": "Hablar con un amigo",
-      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
-      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
-      "disableTTS": "[TRANSLATE] Disattiva lettura vocale",
-      "ttsDisabled": "[TRANSLATE] Lettura vocale disattivata",
-      "conversationHistory": "[TRANSLATE] Storico conversazioni",
-      "close": "[TRANSLATE] Chiudi"
+      "inVoiceCall": "En llamada de voz",
+      "voiceUnavailable": "Voz no disponible",
+      "disableTTS": "Desactivar lectura en voz alta",
+      "ttsDisabled": "Lectura en voz alta desactivada",
+      "conversationHistory": "Historial de conversaciones",
+      "close": "Cerrar"
     },
     "message": {
       "thinking": "{name} está pensando..."
@@ -91,12 +91,12 @@
         "speaking": "Hablando",
         "startingCall": "Iniciando llamada...",
         "unmuteLabel": "Activar sonido",
-        "newConversation": "[TRANSLATE] Nuova conversazione",
-        "closeEsc": "[TRANSLATE] Chiudi (Esc)",
-        "stopTTS": "[TRANSLATE] Ferma lettura vocale",
-        "enableTTS": "[TRANSLATE] Attiva lettura vocale",
-        "endCall": "[TRANSLATE] Termina chiamata",
-        "startCall": "[TRANSLATE] Avvia chiamata"
+        "newConversation": "Nueva conversación",
+        "closeEsc": "Cerrar (Esc)",
+        "stopTTS": "Detener lectura en voz alta",
+        "enableTTS": "Activar lectura en voz alta",
+        "endCall": "Finalizar llamada",
+        "startCall": "Iniciar llamada"
       },
       "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
       "permission": {
@@ -188,8 +188,8 @@
         "troubleshooting": "Solución de problemas: Verifique que el micrófono funcione en su navegador."
       },
       "safety": {
-        "warningTitle": "[TRANSLATE] Attenzione",
-        "interventionDetected": "[TRANSLATE] Intervento di sicurezza attivato"
+        "warningTitle": "Atención",
+        "interventionDetected": "Intervención de seguridad activada"
       }
     },
     "handoff": {
@@ -459,73 +459,73 @@
       "takeSnapshotAriaLabel": "Tomar una foto para mostrar al tutor"
     },
     "footer": {
-      "messageAriaLabel": "[TRANSLATE] Messaggio",
-      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio",
-      "keyboardHint": "[TRANSLATE] Premi Invio per inviare, Shift+Invio per andare a capo"
+      "messageAriaLabel": "Mensaje",
+      "sendMessageAriaLabel": "Enviar mensaje",
+      "keyboardHint": "Pulsa Intro para enviar, Mayús+Intro para salto de línea"
     },
     "chatHeader": {
-      "ttsActive": "[TRANSLATE] TTS attivo",
-      "ttsInactive": "[TRANSLATE] TTS disattivo",
-      "switchToVoiceMode": "[TRANSLATE] Passa alla modalità voce",
-      "newConversation": "[TRANSLATE] Nuova conversazione",
-      "close": "[TRANSLATE] Chiudi",
-      "back": "[TRANSLATE] Torna indietro",
-      "switchToCoach": "[TRANSLATE] Parla con il Coach",
-      "switchToBuddy": "[TRANSLATE] Parla con un amico",
-      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
-      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
-      "startVoiceCall": "[TRANSLATE] Chiama a voce"
+      "ttsActive": "TTS activo",
+      "ttsInactive": "TTS desactivado",
+      "switchToVoiceMode": "Cambiar al modo voz",
+      "newConversation": "Nueva conversación",
+      "close": "Cerrar",
+      "back": "Volver atrás",
+      "switchToCoach": "Habla con el Coach",
+      "switchToBuddy": "Habla con un amigo",
+      "inVoiceCall": "En llamada de voz",
+      "voiceUnavailable": "Voz no disponible",
+      "startVoiceCall": "Llamar por voz"
     },
     "audioDevices": {
-      "audioSettings": "[TRANSLATE] Impostazioni audio",
-      "microphoneSelected": "[TRANSLATE] Microfono selezionato",
-      "speakerSelected": "[TRANSLATE] Altoparlante selezionato",
-      "defaultDevice": "[TRANSLATE] Predefinito",
-      "microphone": "[TRANSLATE] Microfono",
-      "speakers": "[TRANSLATE] Altoparlanti",
-      "systemDefault": "[TRANSLATE] Predefinito di sistema",
-      "deviceChangeHint": "[TRANSLATE] Cambio dispositivo applicato al prossimo avvio"
+      "audioSettings": "Configuración de audio",
+      "microphoneSelected": "Micrófono seleccionado",
+      "speakerSelected": "Altavoz seleccionado",
+      "defaultDevice": "Predeterminado",
+      "microphone": "Micrófono",
+      "speakers": "Altavoces",
+      "systemDefault": "Predeterminado del sistema",
+      "deviceChangeHint": "Cambio de dispositivo aplicado en el próximo inicio"
     },
     "conversationHeader": {
-      "backAriaLabel": "[TRANSLATE] Torna indietro",
-      "defaultDescription": "[TRANSLATE] Sono qui per aiutarti",
-      "endCallAriaLabel": "[TRANSLATE] Termina chiamata",
-      "startCallAriaLabel": "[TRANSLATE] Chiama a voce",
-      "switchToCoachAriaLabel": "[TRANSLATE] Parla con il Coach",
-      "switchToBuddyAriaLabel": "[TRANSLATE] Parla con un amico"
+      "backAriaLabel": "Volver atrás",
+      "defaultDescription": "Estoy aquí para ayudarte",
+      "endCallAriaLabel": "Finalizar llamada",
+      "startCallAriaLabel": "Llamar por voz",
+      "switchToCoachAriaLabel": "Habla con el Coach",
+      "switchToBuddyAriaLabel": "Habla con un amigo"
     },
     "conversationInput": {
-      "placeholderTemplate": "[TRANSLATE] Scrivi a {name}...",
-      "ariaLabelTemplate": "[TRANSLATE] Scrivi un messaggio a {name}",
-      "enableAudioAriaLabel": "[TRANSLATE] Attiva audio",
-      "disableAudioAriaLabel": "[TRANSLATE] Disattiva audio",
-      "switchToTextAriaLabel": "[TRANSLATE] Passa al testo",
-      "switchToVoiceAriaLabel": "[TRANSLATE] Passa alla voce",
-      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio"
+      "placeholderTemplate": "Escribe a {name}...",
+      "ariaLabelTemplate": "Escribe un mensaje a {name}",
+      "enableAudioAriaLabel": "Activar audio",
+      "disableAudioAriaLabel": "Desactivar audio",
+      "switchToTextAriaLabel": "Cambiar a texto",
+      "switchToVoiceAriaLabel": "Cambiar a voz",
+      "sendMessageAriaLabel": "Enviar mensaje"
     },
     "conversationFlow": {
-      "startConversation": "[TRANSLATE] Inizia una conversazione"
+      "startConversation": "Iniciar una conversación"
     },
     "conversationFilter": {
-      "filter": "[TRANSLATE] Filtra",
-      "allMaestri": "[TRANSLATE] Tutti i maestri"
+      "filter": "Filtrar",
+      "allMaestri": "Todos los maestros"
     },
     "conversationPagination": {
-      "page": "[TRANSLATE] Pagina",
-      "of": "[TRANSLATE] di",
-      "conversation": "[TRANSLATE] conversazione",
-      "conversations": "[TRANSLATE] conversazioni",
-      "previousPageAriaLabel": "[TRANSLATE] Pagina precedente",
-      "nextPageAriaLabel": "[TRANSLATE] Pagina successiva"
+      "page": "Página",
+      "of": "de",
+      "conversation": "conversación",
+      "conversations": "conversaciones",
+      "previousPageAriaLabel": "Página anterior",
+      "nextPageAriaLabel": "Página siguiente"
     },
     "chatDrawer": {
-      "hideChat": "[TRANSLATE] Nascondi chat",
-      "showChat": "[TRANSLATE] Mostra chat",
-      "startConversation": "[TRANSLATE] Inizia una conversazione col Professore..."
+      "hideChat": "Ocultar chat",
+      "showChat": "Mostrar chat",
+      "startConversation": "Inicia una conversación con el Profesor..."
     },
     "maestros": {
-      "arialabelchiudiEsc": "[TRANSLATE] aria-label=\"Chiudi (Esc)\"",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
+      "arialabelchiudiEsc": "aria-label=\"Cerrar (Esc)\"",
+      "arialabelchiudi": "aria-label=\"Cerrar\""
     },
     "valutazioneSessione": "Valutazione Sessione",
     "da": "da",

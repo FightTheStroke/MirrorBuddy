@@ -30,34 +30,34 @@
       "takePhoto": "Foto aufnehmen",
       "errors": {
         "permission": {
-          "title": "[TRANSLATE] Permesso fotocamera negato",
-          "message": "[TRANSLATE] Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
-          "instruction1": "[TRANSLATE] Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
-          "instruction2": "[TRANSLATE] Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
-          "instruction3": "[TRANSLATE] Seleziona \"Consenti\"",
-          "instruction4": "[TRANSLATE] Ricarica la pagina o premi il pulsante Riprova"
+          "title": "Kamerazugriff verweigert",
+          "message": "Um die Webcam zu nutzen, muss der Kamerazugriff in den Browsereinstellungen aktiviert werden.",
+          "instruction1": "Klicke auf das Schloss-Symbol 🔒 in der Adressleiste",
+          "instruction2": "Finde „Kamera“ oder „Camera“ in den Einstellungen",
+          "instruction3": "Wähle „Zulassen“",
+          "instruction4": "Seite neu laden oder auf die Schaltfläche „Erneut versuchen“ klicken"
         },
         "unavailable": {
-          "title": "[TRANSLATE] Fotocamera non disponibile",
-          "message": "[TRANSLATE] Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+          "title": "Kamera nicht verfügbar",
+          "message": "Keine Kamera gefunden. Schließe eine Webcam an oder verwende ein Gerät mit integrierter Kamera."
         },
         "inUse": {
-          "title": "[TRANSLATE] Fotocamera in uso",
-          "message": "[TRANSLATE] La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app che potrebbero utilizzarla e riprova."
+          "title": "Kamera in Verwendung",
+          "message": "Die Kamera wird bereits von einer anderen Anwendung verwendet. Schließe andere Apps, die sie verwenden könnten, und versuche es erneut."
         },
         "timeout": {
-          "title": "[TRANSLATE] Timeout fotocamera",
-          "message": "[TRANSLATE] La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+          "title": "Kamera-Timeout",
+          "message": "Die Kamera reagiert nicht. Überprüfe, ob sie richtig angeschlossen ist, und versuche es erneut."
         },
         "generic": {
-          "title": "[TRANSLATE] Errore fotocamera",
-          "message": "[TRANSLATE] Impossibile accedere alla fotocamera. Verifica le impostazioni e riprova."
+          "title": "Kamerafehler",
+          "message": "Zugriff auf die Kamera nicht möglich. Überprüfe die Einstellungen und versuche es erneut."
         },
-        "retry": "[TRANSLATE] Riprova",
-        "close": "[TRANSLATE] Chiudi",
-        "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
+        "retry": "Erneut versuchen",
+        "close": "Schließen",
+        "howToEnable": "So aktivierst du die Kamera:"
       },
-      "selectCamera": "[TRANSLATE] Seleziona fotocamera",
+      "selectCamera": "Kamera auswählen",
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
@@ -205,10 +205,10 @@
       "unsaved": "Nicht gespeichert",
       "word": "Wort",
       "words": "Wörter",
-      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
-      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
-      "deleteSection": "[TRANSLATE] Elimina sezione",
-      "editTitle": "[TRANSLATE] Modifica titolo",
+      "addKeyPoint": "Punkt hinzufügen",
+      "deleteKeyPoint": "Punkt löschen",
+      "deleteSection": "Abschnitt löschen",
+      "editTitle": "Titel bearbeiten",
       "mappa": "Mappa",
       "flashcard": "Flashcard",
       "contenutoDellaSezione": "Contenuto della sezione",
@@ -381,12 +381,12 @@
       "ratingQuestion": "Bewertungsfrage",
       "label": "Lernkarte",
       "description": "Lernkarten für das Studium erstellen",
-      "completed": "[TRANSLATE] Completato!",
-      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
-      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
-      "continue": "[TRANSLATE] Continua",
-      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "[TRANSLATE] Premi o scorri per valutare",
+      "completed": "Abgeschlossen!",
+      "reviewedAllCards": "Du hast heute alle Karten wiederholt.",
+      "cardsReviewedCount": "Überprüfte Karten: {count}",
+      "continue": "Weiter",
+      "swipeHint": "Nach links wischen für schwer, nach rechts für einfach",
+      "navigationHint": "Drücken oder wischen zum Bewerten",
       "completato": "Completato!",
       "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
       "continua": "Continua",
@@ -445,10 +445,10 @@
         "ariaLabel": "Verkleinern",
         "title": "Verkleinern"
       },
-      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "nodesCount": "({count} Knoten)",
       "undo": {
-        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
-        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
+        "ariaLabel": "Letzte Änderung rückgängig machen",
+        "title": "Rückgängig (Strg+Z)"
       }
     },
     "print": {
@@ -518,7 +518,7 @@
       "capabilityHomework": "Dokumente für den Hausaufgaben-Assistenten importieren",
       "capabilityDocuments": "Auf Ihre Dokumente zugreifen, ohne sie herunterladen zu müssen",
       "privacyNotice": "MirrorBuddy greift nur mit Ihrer Genehmigung auf Dateien zu. Wir speichern Ihre Drive-Dateien nicht.",
-      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive",
+      "selezionaDaGoogleDrive": "Von Google Drive auswählen",
       "googleDrive": "Google Drive",
       "privacy": "Privacy:"
     },
@@ -607,7 +607,7 @@
       "instructions": "Rahmen Sie das Dokument oder die Tafel ein und fotografieren Sie"
     },
     "pomodoro": {
-      "iniziaFocus": "[TRANSLATE] Inizia Focus"
+      "iniziaFocus": "Fokus starten"
     },
     "passaggiDiCalcolo": "Passaggi di calcolo (",
     "label1": "Label",
@@ -660,9 +660,9 @@
     "toolResult": "Risultato strumento: {name}",
     "timerOption": "Timer {label}",
     "chartDefault": "grafico",
-    "statusBuilding": "[TRANSLATE] In costruzione...",
-    "statusCompleted": "[TRANSLATE] Completato!",
-    "statusError": "[TRANSLATE] Errore",
-    "statusCancelled": "[TRANSLATE] Annullato"
+    "statusBuilding": "Im Aufbau...",
+    "statusCompleted": "Abgeschlossen!",
+    "statusError": "Fehler",
+    "statusCancelled": "Abgebrochen"
   }
 }

@@ -26,46 +26,7 @@
         "requireNumber": "Password must contain at least one number",
         "requireSpecial": "Password must contain at least one special character",
         "mismatch": "Passwords do not match"
-      },
-      "add": "Add",
-      "auth": {
-        "login": "Login"
-      },
-      "back": "Back",
-      "breadcrumbs": {
-        "home": "Home"
-      },
-      "cancel": "Cancel",
-      "clear": "Cancella",
-      "close": "Close",
-      "common": {
-        "save": "Save"
-      },
-      "confirm": "Confirm",
-      "delete": "Delete",
-      "edit": "Edit",
-      "error": "Error",
-      "errors": {
-        "notFound": "Not Found"
-      },
-      "filter": "Filter",
-      "info": "Informazione",
-      "loading": "Loading...",
-      "next": "Next",
-      "no": "No",
-      "ok": "OK",
-      "previous": "Precedente",
-      "refresh": "Aggiorna",
-      "remove": "Remove",
-      "reset": "Reimposta",
-      "save": "Save",
-      "search": "Search",
-      "select": "Seleziona",
-      "sort": "Ordina",
-      "submit": "Submit",
-      "success": "Completato",
-      "warning": "Attenzione",
-      "yes": "Yes"
+      }
     },
     "required": "This field is required",
     "invalidFormat": "Invalid format",
@@ -89,19 +50,20 @@
       "description": "The page you are looking for does not exist or has been moved.",
       "backHome": "Back to Home"
     },
-    "erroreCritico": "Errore critico",
-    "siEVerificatoUnErroreImprevistoIlNostroTeamEStato": "Si è verificato un errore imprevisto. Il nostro team è stato",
-    "notificatoAutomaticamente": "notificato automaticamente.",
-    "riprova": "Riprova",
-    "tornaAllaHome": "Torna alla home",
-    "somethingWentWrong": "Something went wrong",
-    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
-    "retry": "Retry",
     "errorPage": {
       "title": "Something went wrong",
       "message": "An error occurred while loading the page. You can try again or go back to the previous page.",
       "retryButton": "Retry",
       "backButton": "Go back"
+    },
+    "somethingWentWrong": "Something went wrong",
+    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
+    "retry": "Retry",
+    "child": {
+      "generic": "Oops! Something didn't work. Shall we try again together?",
+      "network": "It looks like the internet connection isn't working well. Let's check it and try again?",
+      "retry": "Try again with me",
+      "voiceUnavailable": "I can't hear you well right now. Can we type instead?"
     }
   }
 }
