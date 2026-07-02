@@ -7,6 +7,10 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { stripeService } from "@/lib/stripe";
 import { prisma } from "@/lib/db";
+import {
+  assertNotUnconsentedMinor,
+  guardianRequiredResponse,
+} from "@/lib/compliance/server";
 
 
 export const revalidate = 0;
@@ -15,6 +19,16 @@ export const POST = pipe(
   withCSRF,
   withAuth,
 )(async (ctx) => {
+  // T1.6 (D-11): server-side guardian check. The client grown-up gate is
+  // NOT verifiable parental consent — block unconsented minors here.
+  const gate = await assertNotUnconsentedMinor(
+    ctx.userId!,
+    "/api/billing/portal",
+  );
+  if (!gate.allowed) {
+    return guardianRequiredResponse();
+  }
+
   const userSub = await prisma.userSubscription.findUnique({
     where: { userId: ctx.userId },
     select: { stripeCustomerId: true },

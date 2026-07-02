@@ -26,14 +26,14 @@
         "successDescription": "Nuestro equipo enterprise le contactará dentro de 24 horas hábiles.",
         "successTitle": "Solicitud enviada",
         "form": {
-          "namePlaceholder": "[TRANSLATE] Il tuo nome completo",
-          "emailPlaceholder": "[TRANSLATE] la-tua@azienda.com",
-          "rolePlaceholder": "[TRANSLATE] es. Director, Manager, CTO",
-          "companyPlaceholder": "[TRANSLATE] Nome della vostra azienda",
-          "messagePlaceholder": "[TRANSLATE] Condividi i tuoi requisiti specifici...",
-          "sectorPlaceholder": "[TRANSLATE] Seleziona un settore",
-          "employeeCountPlaceholder": "[TRANSLATE] Seleziona una fascia",
-          "submitButton": "[TRANSLATE] Invia Richiesta Enterprise"
+          "namePlaceholder": "Tu nombre completo",
+          "emailPlaceholder": "tu-empresa@empresa.com",
+          "rolePlaceholder": "ej. Director, Manager, CTO",
+          "companyPlaceholder": "Nombre de su empresa",
+          "messagePlaceholder": "Comparte tus requisitos específicos...",
+          "sectorPlaceholder": "Selecciona un sector",
+          "employeeCountPlaceholder": "Selecciona un rango",
+          "submitButton": "Enviar Solicitud Empresarial"
         },
         "tornaAllaHome": "Torna alla Home",
         "nome": "Nombre *",
@@ -226,15 +226,15 @@
     "aiTransparency": {
       "contact": {
         "text": "¿Tiene preguntas sobre cómo utilizamos la IA? Contáctenos en",
-        "emailAriaLabel": "[TRANSLATE] Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
+        "emailAriaLabel": "Envía un correo a compliance@mirrorbuddy.it para preguntas sobre la transparencia de la IA"
       },
       "page": {
         "backButton": "Volver al inicio",
         "lastUpdated": "Última actualización: {date}",
         "title": "Transparencia sobre Inteligencia Artificial",
         "version": "Versión {version}",
-        "backButtonAriaLabel": "[TRANSLATE] Torna alla home page di MirrorBuddy",
-        "navAriaLabel": "[TRANSLATE] Navigazione pagina"
+        "backButtonAriaLabel": "Volver a la página de inicio de MirrorBuddy",
+        "navAriaLabel": "Navegación de página"
       },
       "relatedDocs": {
         "heading": "Documentos Relacionados",
@@ -1030,7 +1030,7 @@
             "oppose": "Puede oponerse al tratamiento de sus datos para determinados fines"
           },
           "exerciseRights": "Para ejercer sus derechos, contáctenos en:",
-          "emailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per esercitare i tuoi diritti sulla privacy"
+          "emailAriaLabel": "Envía un correo a info@fightthestroke.org para ejercer tus derechos de privacidad"
         },
         "section11": {
           "title": "Cookies y análisis",
@@ -1156,7 +1156,7 @@
             }
           },
           "closing": "Apreciamos su confianza en la protección de su privacidad y estamos a su disposición para cualquier pregunta.",
-          "contactEmailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per domande sulla Privacy Policy",
+          "contactEmailAriaLabel": "Envía un correo a info@fightthestroke.org para preguntas sobre la Política de Privacidad",
           "vercelAnalytics": "Vercel Analytics",
           "sentryTitle": "Sentry (Monitoraggio Errori e Performance):"
         },
