@@ -19,12 +19,12 @@
       "startVoiceCall": "Sprachanruf starten",
       "talkToCoach": "Mit Coach sprechen",
       "talkToBuddy": "Mit einem Freund sprechen",
-      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
-      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
-      "disableTTS": "[TRANSLATE] Disattiva lettura vocale",
-      "ttsDisabled": "[TRANSLATE] Lettura vocale disattivata",
-      "conversationHistory": "[TRANSLATE] Storico conversazioni",
-      "close": "[TRANSLATE] Chiudi"
+      "inVoiceCall": "Im Sprachanruf",
+      "voiceUnavailable": "Stimme nicht verfügbar",
+      "disableTTS": "Sprachausgabe deaktivieren",
+      "ttsDisabled": "Sprachausgabe deaktiviert",
+      "conversationHistory": "Unterhaltungsverlauf",
+      "close": "Schließen"
     },
     "message": {
       "thinking": "{name} denkt nach..."
@@ -91,12 +91,12 @@
         "speaking": "Spricht",
         "startingCall": "Anruf wird gestartet...",
         "unmuteLabel": "Stummschaltung aufheben",
-        "newConversation": "[TRANSLATE] Nuova conversazione",
-        "closeEsc": "[TRANSLATE] Chiudi (Esc)",
-        "stopTTS": "[TRANSLATE] Ferma lettura vocale",
-        "enableTTS": "[TRANSLATE] Attiva lettura vocale",
-        "endCall": "[TRANSLATE] Termina chiamata",
-        "startCall": "[TRANSLATE] Avvia chiamata"
+        "newConversation": "Neue Unterhaltung",
+        "closeEsc": "Schließen (Esc)",
+        "stopTTS": "Sprachausgabe stoppen",
+        "enableTTS": "Sprachausgabe aktivieren",
+        "endCall": "Anruf beenden",
+        "startCall": "Anruf starten"
       },
       "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in den Browsereinstellungen.",
       "permission": {
@@ -188,8 +188,8 @@
         "troubleshooting": "Fehlerbehebung: Überprüfen Sie, dass das Mikrofon in Ihrem Browser funktioniert."
       },
       "safety": {
-        "warningTitle": "[TRANSLATE] Attenzione",
-        "interventionDetected": "[TRANSLATE] Intervento di sicurezza attivato"
+        "warningTitle": "Achtung",
+        "interventionDetected": "Sicherheitsmaßnahme aktiviert"
       }
     },
     "handoff": {
@@ -459,73 +459,73 @@
       "takeSnapshotAriaLabel": "Foto aufnehmen, um es dem Tutor zu zeigen"
     },
     "footer": {
-      "messageAriaLabel": "[TRANSLATE] Messaggio",
-      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio",
-      "keyboardHint": "[TRANSLATE] Premi Invio per inviare, Shift+Invio per andare a capo"
+      "messageAriaLabel": "Nachricht",
+      "sendMessageAriaLabel": "Nachricht senden",
+      "keyboardHint": "Eingabe drücken zum Senden, Umschalt+Eingabe für einen Zeilenumbruch"
     },
     "chatHeader": {
-      "ttsActive": "[TRANSLATE] TTS attivo",
-      "ttsInactive": "[TRANSLATE] TTS disattivo",
-      "switchToVoiceMode": "[TRANSLATE] Passa alla modalità voce",
-      "newConversation": "[TRANSLATE] Nuova conversazione",
-      "close": "[TRANSLATE] Chiudi",
-      "back": "[TRANSLATE] Torna indietro",
-      "switchToCoach": "[TRANSLATE] Parla con il Coach",
-      "switchToBuddy": "[TRANSLATE] Parla con un amico",
-      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
-      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
-      "startVoiceCall": "[TRANSLATE] Chiama a voce"
+      "ttsActive": "TTS aktiv",
+      "ttsInactive": "TTS inaktiv",
+      "switchToVoiceMode": "Zum Sprachmodus wechseln",
+      "newConversation": "Neue Unterhaltung",
+      "close": "Schließen",
+      "back": "Zurückgehen",
+      "switchToCoach": "Sprich mit dem Coach",
+      "switchToBuddy": "Sprich mit einem Freund",
+      "inVoiceCall": "Im Sprachanruf",
+      "voiceUnavailable": "Stimme nicht verfügbar",
+      "startVoiceCall": "Sprachanruf starten"
     },
     "audioDevices": {
-      "audioSettings": "[TRANSLATE] Impostazioni audio",
-      "microphoneSelected": "[TRANSLATE] Microfono selezionato",
-      "speakerSelected": "[TRANSLATE] Altoparlante selezionato",
-      "defaultDevice": "[TRANSLATE] Predefinito",
-      "microphone": "[TRANSLATE] Microfono",
-      "speakers": "[TRANSLATE] Altoparlanti",
-      "systemDefault": "[TRANSLATE] Predefinito di sistema",
-      "deviceChangeHint": "[TRANSLATE] Cambio dispositivo applicato al prossimo avvio"
+      "audioSettings": "Audioeinstellungen",
+      "microphoneSelected": "Ausgewähltes Mikrofon",
+      "speakerSelected": "Ausgewählter Lautsprecher",
+      "defaultDevice": "Standard",
+      "microphone": "Mikrofon",
+      "speakers": "Lautsprecher",
+      "systemDefault": "Systemstandard",
+      "deviceChangeHint": "Geräteänderung wird beim nächsten Start angewendet"
     },
     "conversationHeader": {
-      "backAriaLabel": "[TRANSLATE] Torna indietro",
-      "defaultDescription": "[TRANSLATE] Sono qui per aiutarti",
-      "endCallAriaLabel": "[TRANSLATE] Termina chiamata",
-      "startCallAriaLabel": "[TRANSLATE] Chiama a voce",
-      "switchToCoachAriaLabel": "[TRANSLATE] Parla con il Coach",
-      "switchToBuddyAriaLabel": "[TRANSLATE] Parla con un amico"
+      "backAriaLabel": "Zurückgehen",
+      "defaultDescription": "Ich bin hier, um dir zu helfen",
+      "endCallAriaLabel": "Anruf beenden",
+      "startCallAriaLabel": "Sprachanruf starten",
+      "switchToCoachAriaLabel": "Sprich mit dem Coach",
+      "switchToBuddyAriaLabel": "Sprich mit einem Freund"
     },
     "conversationInput": {
-      "placeholderTemplate": "[TRANSLATE] Scrivi a {name}...",
-      "ariaLabelTemplate": "[TRANSLATE] Scrivi un messaggio a {name}",
-      "enableAudioAriaLabel": "[TRANSLATE] Attiva audio",
-      "disableAudioAriaLabel": "[TRANSLATE] Disattiva audio",
-      "switchToTextAriaLabel": "[TRANSLATE] Passa al testo",
-      "switchToVoiceAriaLabel": "[TRANSLATE] Passa alla voce",
-      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio"
+      "placeholderTemplate": "Schreibe an {name}...",
+      "ariaLabelTemplate": "Schreibe eine Nachricht an {name}",
+      "enableAudioAriaLabel": "Audio aktivieren",
+      "disableAudioAriaLabel": "Audio deaktivieren",
+      "switchToTextAriaLabel": "Zu Text wechseln",
+      "switchToVoiceAriaLabel": "Zur Sprache wechseln",
+      "sendMessageAriaLabel": "Nachricht senden"
     },
     "conversationFlow": {
-      "startConversation": "[TRANSLATE] Inizia una conversazione"
+      "startConversation": "Unterhaltung beginnen"
     },
     "conversationFilter": {
-      "filter": "[TRANSLATE] Filtra",
-      "allMaestri": "[TRANSLATE] Tutti i maestri"
+      "filter": "Filtern",
+      "allMaestri": "Alle Maestri"
     },
     "conversationPagination": {
-      "page": "[TRANSLATE] Pagina",
-      "of": "[TRANSLATE] di",
-      "conversation": "[TRANSLATE] conversazione",
-      "conversations": "[TRANSLATE] conversazioni",
-      "previousPageAriaLabel": "[TRANSLATE] Pagina precedente",
-      "nextPageAriaLabel": "[TRANSLATE] Pagina successiva"
+      "page": "Seite",
+      "of": "von",
+      "conversation": "Unterhaltung",
+      "conversations": "Unterhaltungen",
+      "previousPageAriaLabel": "Vorherige Seite",
+      "nextPageAriaLabel": "Nächste Seite"
     },
     "chatDrawer": {
-      "hideChat": "[TRANSLATE] Nascondi chat",
-      "showChat": "[TRANSLATE] Mostra chat",
-      "startConversation": "[TRANSLATE] Inizia una conversazione col Professore..."
+      "hideChat": "Chat ausblenden",
+      "showChat": "Chat anzeigen",
+      "startConversation": "Beginne ein Gespräch mit dem Professor..."
     },
     "maestros": {
-      "arialabelchiudiEsc": "[TRANSLATE] aria-label=\"Chiudi (Esc)\"",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
+      "arialabelchiudiEsc": "aria-label=\"Schließen (Esc)\"",
+      "arialabelchiudi": "aria-label=\"Schließen\""
     },
     "valutazioneSessione": "Valutazione Sessione",
     "da": "da",
