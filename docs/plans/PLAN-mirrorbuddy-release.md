@@ -198,6 +198,56 @@ I quattro problemi che DEVONO essere risolti prima di un rilascio pubblico a bam
 
 ---
 
+# FASE 2-J — Rifare il funnel: landing → autenticazione → primo uso
+*Aggiunta post-audit dedicato al journey (mappa completa con evidenze in Appendice C). Verdetto: il layer proxy/routing è pulito; il caos è sopra — tre superfici di landing sovrapposte, un conflitto di route su `/`, codice morto di gate/acquisizione, e un onboarding che raccoglie i dati del BAMBINO mentre alla tastiera c'è il GENITORE. Modello: Opus per TJ.1/TJ.4/TJ.5, Sonnet per il resto.*
+
+**Journey target (definizione di fatto):**
+- **Bambino trial**: prima schermata → valore in **≤3 interazioni** (oggi ~5, o ~9-10 con l'onboarding vocale).
+- **Genitore invitato**: percorso ESPLICITAMENTE da adulto (login → setup profilo figlio → handoff "ora passa il dispositivo a…"), mai ambiguo chi è alla tastiera.
+- **Bambino di ritorno**: ≤2 interazioni (oggi già ~2-3, da preservare).
+- **UNA** superficie di landing pubblica; `/welcome` = solo onboarding.
+
+### TJ.1 — Risolvere il conflitto di route su `/[locale]` — **P0 · S · Opus**
+- **Problema:** `[locale]/page.tsx` (home bambino) E `[locale]/(marketing)/page.tsx` (hero marketing/pricing/FAQ) risolvono entrambe a `/[locale]` (i route group non cambiano il path). O il marketing non renderizza mai (codice morto) o il build è in conflitto. **Verifica runtime richiesta prima di tutto.**
+- **Passi:** builda e verifica quale vince; poi elimina il gruppo `(marketing)` o spostalo su un path reale (`/scopri` o dominio marketing separato).
+- **Accettazione:** una sola page per `/[locale]`; build senza ambiguità; decisione documentata.
+
+### TJ.2 — Una sola landing — **P1 · M · Sonnet**
+- **Problema:** tre superfici di landing: (a) `(marketing)/page.tsx`; (b) `welcome/components/landing-page.tsx` renderizzata DENTRO `/welcome` prima dell'onboarding (`welcome/page.tsx:39,118-122`); (c) `[locale]/landing/page.tsx` (fallback provider-not-configured, `proxy.ts:453-457`).
+- **Passi:** consolida su una landing pubblica; `/welcome` diventa solo onboarding; il fallback `landing` resta come pagina d'errore infra (rinominala, es. `/service-unavailable`).
+- **Accettazione:** grep: un solo componente landing; E2E del percorso anonimo aggiornato.
+
+### TJ.3 — Bonifica del codice morto del funnel — **P1 · S · Sonnet**
+- **Da eliminare (evidenze):** `TosGateProvider`, `TrialConsentGate`, `CookieConsentWall` (zero import non-test; l'app usa solo `UnifiedConsentWall`, `providers.tsx:10,170`) + riferimenti stantii in ADR 0098; duplicato non-localizzato `app/invite/request/page.tsx:11-13` (stub che redirige a `/landing`); vestigia waitlist/coming-soon (flag `coming_soon_overlay` OFF di default, `feature-flags-service.ts:174-180`; nessuna pagina root `/waitlist`; la logica proxy descritta nel CHANGELOG non esiste). Aggiorna anche `e2e/global-setup.ts` e le fixture che mockano i gate morti.
+- **Accettazione:** grep dei componenti morti = 0; `npm run ci:summary` verde; ADR aggiornati.
+
+### TJ.4 — Decidere il ruolo dell'onboarding (la CTA principale oggi lo azzera) — **P1 · M · Opus + decisione maintainer**
+- **Problema:** "Prova gratis" (CTA primaria) POSTa `hasCompletedOnboarding:true` e salta TUTTO l'onboarding (`landing-page.tsx:88-102`) → il bambino non dà mai nome/età/profilo e la personalizzazione (incl. età-appropriatezza, vedi T1.10) degrada. Il percorso vocale a 5 step esiste ma è opzionale-di-fatto.
+- **Passi:** ridisegna a **1 step essenziale** (nome + età, con opzione vocale) + resto opzionale/riprendibile da settings; la CTA non marca mai "completato" ciò che non è stato fatto (stato `skipped` esplicito). Sostituisce in parte T2.7.
+- **Accettazione:** trial → valore in ≤3 interazioni CON nome+età raccolti; stato onboarding veritiero in DB.
+
+### TJ.5 — Handoff genitore→bambino dopo il primo login — **P1 · M · Opus**
+- **Problema:** il genitore invitato fa login → cambio password → e finisce nell'onboarding vocale che chiede nome/età/differenze di apprendimento DEL FIGLIO senza cambio di contesto (Journey B, hop 4 in Appendice C). Audience ambigua nel momento più delicato (raccolta dati di un minore).
+- **Passi:** dopo il primo login da invito, branch esplicito: "Sei un genitore/tutor? Configura il profilo di tuo figlio" (form adulto, non vocale) → schermata handoff "Passa il dispositivo a {nome}" → home bambino. Riusa il grown-up gate per il rientro nell'area adulti.
+- **Accettazione:** E2E Journey B: nessuna schermata child-voice servita al genitore; dati minore raccolti in contesto dichiaratamente adulto (rilevante GDPR/COPPA).
+
+### TJ.6 — Sessione account scaduta → `/login`, non downgrade a trial — **P1 · S · Sonnet**
+- **Problema:** `proxy.ts:442-446`: hit su route protetta senza sessione → redirect a `/welcome` (crea trial). Un genitore col cookie scaduto finisce nel funnel trial anonimo invece che al login. (Verifica runtime, poi fixa.)
+- **Passi:** minimo: le route `AUTH_ONLY` (es. `/parent-dashboard`, `proxy.ts:85,431-438`) senza sessione → SEMPRE `/login`; per il resto, se c'è evidenza di account precedente → `/login`, altrimenti `/welcome`.
+- **Accettazione:** test proxy: route AUTH_ONLY senza sessione → `/login`.
+
+### TJ.7 — SSO e Google: esporre o potare — **P2 · S/M · decisione**
+- **Problema:** backend SSO MS365/Google-Workspace/OIDC (`api/auth/sso/*`, `lib/auth/sso/*`) senza NESSUN entry-point UI; `/login` è solo email+password. `lib/google/oauth.ts` sembra Drive-integration, non sign-in (verifica).
+- **Passi:** decisione maintainer: se le scuole servono nel breve → bottoni SSO su `/login`; altrimenti rimuovi le route (meno superficie d'attacco). Documenta Google=Drive se confermato.
+- **Accettazione:** o UI presente e testata, o route rimosse.
+
+### TJ.8 — "Richiedi accesso" fuori dalla sidebar del bambino — **P2 · S · Sonnet**
+- **Problema:** `home-sidebar.tsx:230-239` mette un link che porta a un form PII dentro la home del bambino (gruppo grown-ups, ma pur sempre nel suo spazio); i commenti nel codice (`page.tsx:41,291-294`, `home-sidebar.tsx:198-203`) mostrano che il team combatte questa leakage ad hoc da tempo.
+- **Passi:** sposta la CTA dietro il grown-up gate nell'area genitori; nella sidebar bambino al massimo "Chiedi a un grande" senza form.
+- **Accettazione:** nessun form PII raggiungibile dallo spazio bambino senza grown-up gate; E2E aggiornato.
+
+---
+
 # FASE 3 — Correttezza del core educativo
 *Feature promesse che oggi mentono silenziosamente.*
 
@@ -320,8 +370,10 @@ I quattro problemi che DEVONO essere risolti prima di un rilascio pubblico a bam
 | 0 | Deploy integrity + E2E verde + uptime | ~3-5 giorni-agente | Blocca GA |
 | 1 | Safety wiring completo | ~6-9 giorni-agente | Blocca GA |
 | 2 (IT) | T2.2, T2.3, T2.5, T2.6 | ~3-4 giorni-agente | Blocca GA-IT |
+| 2-J (core) | TJ.1, TJ.3, TJ.4, TJ.5, TJ.6 | ~4-5 giorni-agente | Blocca GA-IT (TJ.1 subito: possibile conflitto build) |
 | 4 (quick) | T4.1, T4.2, T4.4, T4.6 | ~2 giorni-agente | Consigliato pre-GA |
-| **→ GA web IT-first** | | **~2-3 settimane-agente** | |
+| **→ GA web IT-first** | | **~3-4 settimane-agente** | |
+| 2-J (resto) | TJ.2, TJ.7, TJ.8 | ~2 giorni | Qualità funnel |
 | 2 (resto) | TTS multilingua, [TRANSLATE], voice parity, onboarding | ~4 giorni | Multilingua |
 | 3 | FSRS, renderer, RAG voce, mini-KB | ~6-8 giorni | Qualità prodotto |
 | 5 | Alerting, perf gates, Sentry | ~3 giorni | Robustezza |
@@ -342,3 +394,44 @@ Parallelizzabile: Fase 0 e Fase 1 su worktree separati; Fase 4-quick in qualsias
 ## Appendice B — Cose sane da NON toccare (conferme degli audit)
 
 Crittografia PII (pii-middleware) · scrubbing RAG (privacy-aware-embedding) · GDPR delete/export · cron `withCron` fail-closed · gamification loop · learning-path e method-progress (vivi) · buddy/coach (vivi, non leftover) · env hygiene (91 var documentate, solo `SENTRY_DSN` mancante) · rate-limit fail-closed in prod · home intent chooser (design a11y solido) · separazione spazio bambino/adulto con grown-up gate (lato UI).
+
+---
+
+## Appendice C — Mappa del journey utente attuale (evidenze per la Fase 2-J)
+
+### Journey A — Bambino trial anonimo
+1. `GET /` → `proxy.ts:328-333` redirect locale → `/it` *(hop invisibile)*
+2. `/it` → route pubblica (`proxy.ts:56`) → home renderizza, ma `page.tsx:50-60`: onboarding non completo → `router.push('/welcome')` *(bounce)*
+3. `/welcome` → `welcome/page.tsx:39,118-122` mostra **LandingPage** (hero + QuickStart: "Beta Access/login" vs "Prova gratis")
+4. "Prova gratis" → `TrialEmailForm` opzionale (`quick-start.tsx:160-174`) → `landing-page.tsx:61-109`: `POST /api/trial/session` + **`POST /api/onboarding {hasCompletedOnboarding:true}`** (salta TUTTO l'onboarding marcandolo completo) → `/`
+   - *Alt:* "Inizia con la voce" → onboarding vocale 5 step (`onboarding-types.ts:26-32`)
+5. `/` → **UnifiedConsentWall** (banner bloccante + backdrop, `unified-consent-wall.tsx:105-121`)
+6. Intent chooser (Compiti aperto; Studia/Quiz tier-locked → dialog "chiedi a un grande") → subject picker → sessione maestro. **~5 interazioni al valore (9-10 con onboarding vocale). Il trial può fare una sessione compiti completa senza alcun account (10 chat / 300s voce / 10 tool — `use-trial-status.ts:44-49`).**
+
+### Journey B — Genitore invitato
+1. Acquisizione: `/invite/request` (grown-up gate aritmetico + form PII + autodichiarazione tutore, `invite/request/page.tsx:30-85,127-144`) con approvazione admin manuale, O invito diretto admin (`api/invites/direct` → password random via email)
+2. Email → `/login` (SOLO email+password) → `mustChangePassword` → `/change-password` (`login/page.tsx:47-51`)
+3. → `/` → onboarding non completo → `/welcome` → **onboarding vocale che chiede nome/età/scuola/differenze DEL FIGLIO al GENITORE** senza handoff → consent wall → intent chooser. **~10-11 interazioni + round-trip email.**
+
+### Journey C — Bambino di ritorno
+`/` → intent chooser diretto (~2-3 interazioni). OK, da preservare.
+
+### Anomalie chiave (mappate su TJ.*)
+| # | Anomalia | Evidenza | Task |
+|---|----------|----------|------|
+| 1 | Conflitto route: home E `(marketing)/page.tsx` entrambe su `/[locale]` | route group non cambia il path | TJ.1 |
+| 2 | Tre landing: `(marketing)`, `welcome/LandingPage`, `/landing` (fallback `proxy.ts:453-457`) | — | TJ.2 |
+| 3 | Gate morti: `TosGateProvider`, `TrialConsentGate`, `CookieConsentWall` (zero import non-test; vive solo `UnifiedConsentWall`, `providers.tsx:10,170`); ADR 0098 stantio | — | TJ.3 |
+| 4 | CTA primaria salta l'onboarding marcandolo completo | `landing-page.tsx:88-102` | TJ.4 |
+| 5 | Genitore compila l'identità del figlio senza handoff | Journey B hop 3 | TJ.5 |
+| 6 | Sessione scaduta → downgrade silenzioso a trial (non `/login`) | `proxy.ts:442-446` | TJ.6 |
+| 7 | SSO MS365/Google/OIDC senza entry-point UI; Google OAuth = probabilmente solo Drive | `api/auth/sso/*`; `lib/google/drive-client.ts` | TJ.7 |
+| 8 | Form PII raggiungibile dalla sidebar bambino | `home-sidebar.tsx:230-239` | TJ.8 |
+| 9 | Duplicato `app/invite/request/page.tsx` (stub → `/landing`) | `:11-13` | TJ.3 |
+| 10 | Waitlist/coming-soon vestigiale (flag OFF default, pagina inesistente, CHANGELOG mente) | `feature-flags-service.ts:174-180` | TJ.3 |
+
+### Verifiche runtime per la Fase 2-J
+- Il build con due `page.tsx` su `/[locale]`: chi vince? (TJ.1)
+- Comportamento reale sessione scaduta (TJ.6)
+- Qualche scuola usa davvero le route SSO? (TJ.7)
+- `lib/google/oauth.ts`: sign-in o solo Drive? (TJ.7)
