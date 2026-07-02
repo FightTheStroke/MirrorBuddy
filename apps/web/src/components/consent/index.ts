@@ -1,4 +1,3 @@
-export { CookieConsentWall } from "./cookie-consent-wall";
 export { UnifiedConsentWall } from "./unified-consent-wall";
 export { InlineConsent } from "./inline-consent";
 export {
