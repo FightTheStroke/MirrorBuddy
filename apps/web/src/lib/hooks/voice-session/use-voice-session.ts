@@ -106,6 +106,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     maestroRef: refs.maestroRef,
     sessionIdRef: refs.sessionIdRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    webrtcAudioElementRef: refs.webrtcAudioElementRef,
     hasActiveResponseRef: refs.hasActiveResponseRef,
     sessionReadyRef: refs.sessionReadyRef,
     audioQueueRef: refs.audioQueueRef,

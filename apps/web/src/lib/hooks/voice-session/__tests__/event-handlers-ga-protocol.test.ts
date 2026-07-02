@@ -33,6 +33,7 @@ describe('Event Handlers - GA Protocol Event Names', () => {
       connectionTimeoutRef: { current: null },
       greetingTimeoutsRef: { current: [] },
       webrtcDataChannelRef: { current: null },
+      webrtcAudioElementRef: { current: null },
       userSpeechEndTimeRef: { current: null },
       firstAudioPlaybackTimeRef: { current: null },
       voiceConnectStartTimeRef: { current: null },
