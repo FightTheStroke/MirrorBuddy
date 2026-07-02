@@ -105,6 +105,10 @@ vi.mock('@/lib/email', () => ({
   sendEmail: vi.fn().mockResolvedValue({ success: true, messageId: 'msg-1' }),
 }));
 
+vi.mock('@/lib/trial/trial-budget-service', () => ({
+  incrementTrialBudgetWithPublish: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Full manual mock (avoids loading the real prisma/email chain in the sandbox)
 vi.mock('@/lib/safety/server', () => ({
   logSafetyEvent: vi.fn(),
@@ -130,6 +134,26 @@ import { POST } from '../route';
 import { chatCompletion } from '@/lib/ai/server';
 import { detectBias, SAFE_RESPONSES } from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
+import { loadUserSettings, updateBudget } from '../budget-handler';
+import { extractUserIdWithCoppaCheck } from '../auth-handler';
+import { checkTrialForAnonymous, incrementTrialUsage } from '../trial-handler';
+
+const BIASED_RESULT = {
+  hasBias: true,
+  riskScore: 45,
+  detections: [
+    {
+      detected: true,
+      category: 'gender' as const,
+      severity: 'high' as const,
+      match: 'ragazze non sono brave',
+      reason: 'gender stereotype',
+      suggestion: 'neutral phrasing',
+    },
+  ],
+  safeForEducation: false,
+  analyzedLength: 40,
+};
 
 function makeRequest(body: Record<string, unknown>): NextRequest {
   return new NextRequest('http://localhost:3000/api/chat', {
@@ -158,22 +182,7 @@ describe('POST /api/chat bias output blocking (T1.4)', () => {
   });
 
   it('blocks biased output and returns the safe redirect instead of the biased text', async () => {
-    vi.mocked(detectBias).mockReturnValue({
-      hasBias: true,
-      riskScore: 45,
-      detections: [
-        {
-          detected: true,
-          category: 'gender',
-          severity: 'high',
-          match: 'ragazze non sono brave',
-          reason: 'gender stereotype',
-          suggestion: 'neutral phrasing',
-        },
-      ],
-      safeForEducation: false,
-      analyzedLength: 40,
-    });
+    vi.mocked(detectBias).mockReturnValue(BIASED_RESULT);
 
     const response = await POST(makeRequest(BENIGN_BODY));
     const data = await response.json();
@@ -206,5 +215,42 @@ describe('POST /api/chat bias output blocking (T1.4)', () => {
     expect(data.blocked).toBeUndefined();
     expect(data.content).toBe('Le ragazze non sono brave in matematica.');
     expect(vi.mocked(recordContentFiltered)).not.toHaveBeenCalled();
+  });
+
+  it('F2 #458: bias-blocked response still charges the user budget (no quota bypass)', async () => {
+    // Provider tokens were consumed by chatCompletion even though the output
+    // is replaced by the safety redirect — the budget must be charged.
+    vi.mocked(loadUserSettings).mockResolvedValueOnce({
+      provider: 'azure',
+      budgetLimit: 10,
+      totalSpent: 0,
+    } as never);
+    vi.mocked(detectBias).mockReturnValue(BIASED_RESULT);
+
+    const response = await POST(makeRequest(BENIGN_BODY));
+    const data = await response.json();
+
+    expect(data.blocked).toBe(true);
+    expect(data.category).toBe('bias');
+    expect(vi.mocked(updateBudget)).toHaveBeenCalledWith('user-123', 12, 0);
+  });
+
+  it('F2 #458: bias-blocked response still increments trial usage for anonymous users', async () => {
+    vi.mocked(extractUserIdWithCoppaCheck).mockResolvedValueOnce({
+      allowed: true,
+      userId: undefined,
+    } as never);
+    vi.mocked(checkTrialForAnonymous).mockResolvedValueOnce({
+      allowed: true,
+      sessionId: 'trial-session-1',
+    } as never);
+    vi.mocked(detectBias).mockReturnValue(BIASED_RESULT);
+
+    const response = await POST(makeRequest(BENIGN_BODY));
+    const data = await response.json();
+
+    expect(data.blocked).toBe(true);
+    expect(data.category).toBe('bias');
+    expect(vi.mocked(incrementTrialUsage)).toHaveBeenCalledWith('trial-session-1');
   });
 });

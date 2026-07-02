@@ -307,8 +307,11 @@ export const POST = pipe(
           actionTaken: 'blocked',
         });
 
-        // Crisis-specific: log safety event and escalate
-        if (filterResult.action === 'redirect') {
+        // Crisis-specific: log safety event and escalate.
+        // Gate on category === 'crisis' (NOT action === 'redirect'): filterInput
+        // also returns 'redirect' for jailbreak, which must not trigger crisis
+        // escalation or parent notification (review finding #458 F1).
+        if (filterResult.category === 'crisis') {
           try {
             void logSafetyEvent('crisis_detected', 'critical', {
               userId: userId || undefined,
@@ -574,6 +577,38 @@ export const POST = pipe(
         });
       }
 
+      // Update budget (non-blocking: failure must not crash the response)
+      // NOTE: accounting runs BEFORE the bias block below — provider tokens
+      // were consumed even when the response is replaced by a safety redirect,
+      // so quota must be charged either way (review finding #458 F2).
+      if (userId && userSettings && result.usage) {
+        try {
+          await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
+        } catch (budgetError) {
+          log.warn('Budget update failed (non-blocking)', { error: String(budgetError) });
+        }
+      }
+
+      // Increment trial usage and budget for anonymous users (ADR 0056, F-06)
+      if (trialSessionId && !userId) {
+        try {
+          await incrementTrialUsage(trialSessionId);
+        } catch (trialError) {
+          log.warn('Trial usage increment failed (non-blocking)', { error: String(trialError) });
+        }
+
+        // Also increment trial budget to track cumulative cost (F-06: admin counts push)
+        if (result.usage?.total_tokens) {
+          const estimatedCost = result.usage.total_tokens * TOKEN_COST_PER_UNIT;
+          incrementTrialBudgetWithPublish(estimatedCost).catch((err) => {
+            log.debug('Trial budget publish failed (non-blocking)', {
+              error: String(err),
+              cost: estimatedCost,
+            });
+          });
+        }
+      }
+
       // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
       // T1.4: when the model output carries high/critical bias (not safe for
       // education), do NOT return the biased text. Replace it with the same
@@ -611,35 +646,6 @@ export const POST = pipe(
         maestroId,
       };
       const transparency = assessResponseTransparency(transparencyContext);
-
-      // Update budget (non-blocking: failure must not crash the response)
-      if (userId && userSettings && result.usage) {
-        try {
-          await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
-        } catch (budgetError) {
-          log.warn('Budget update failed (non-blocking)', { error: String(budgetError) });
-        }
-      }
-
-      // Increment trial usage and budget for anonymous users (ADR 0056, F-06)
-      if (trialSessionId && !userId) {
-        try {
-          await incrementTrialUsage(trialSessionId);
-        } catch (trialError) {
-          log.warn('Trial usage increment failed (non-blocking)', { error: String(trialError) });
-        }
-
-        // Also increment trial budget to track cumulative cost (F-06: admin counts push)
-        if (result.usage?.total_tokens) {
-          const estimatedCost = result.usage.total_tokens * TOKEN_COST_PER_UNIT;
-          incrementTrialBudgetWithPublish(estimatedCost).catch((err) => {
-            log.debug('Trial budget publish failed (non-blocking)', {
-              error: String(err),
-              cost: estimatedCost,
-            });
-          });
-        }
-      }
 
       const response = NextResponse.json({
         content: sanitized.text,

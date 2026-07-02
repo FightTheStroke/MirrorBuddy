@@ -22,7 +22,7 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { StreamingSanitizer, checkSTEMSafety } from '@/lib/safety';
+import { StreamingSanitizer, checkSTEMSafety, normalizeUnicode } from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
@@ -175,6 +175,16 @@ export const POST = pipe(
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
     if (lastUserMessage) {
+      // SECURITY: normalize Unicode (zero-width chars, homoglyphs) BEFORE the
+      // safety checks, mirroring the non-streaming route — raw input would let
+      // e.g. 'T​NT' bypass the blocklists (review finding #458 F3).
+      // filterInput/checkSTEMSafety only lowercase/trim internally.
+      const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
+      if (wasModified) {
+        log.debug('Unicode normalized in user input', { clientId });
+        lastUserMessage.content = normalized;
+      }
+
       // T1.2: pass context so crisis escalation (logSafetyEvent +
       // escalateCrisisDetected + notifyParentOfCrisis) runs on the streaming
       // path, mirroring the non-streaming route. conversationId may be
