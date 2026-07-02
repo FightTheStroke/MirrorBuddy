@@ -36,6 +36,19 @@ describe("useTierFeatures", () => {
       expect(result.current.features).toEqual({});
     });
 
+    it("should fail closed (hasFeature false) while loading", () => {
+      // Tier gating protects the child space: until the tier is KNOWN,
+      // every gated feature must report locked.
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      const { result } = renderHook(() => useTierFeatures());
+
+      expect(result.current.isLoading).toBe(true);
+      expect(result.current.hasFeature("mindMaps")).toBe(false);
+      expect(result.current.hasFeature("quizzes")).toBe(false);
+      expect(result.current.hasFeature("chat")).toBe(false);
+    });
+
     it("should fetch tier features on mount", async () => {
       mockFetch.mockImplementation((url: string) => {
         if (url === "/api/user/tier-features") {
@@ -342,6 +355,47 @@ describe("useTierFeatures", () => {
 
       expect(result.current.tier).toBeUndefined();
       expect(result.current.features).toEqual({});
+    });
+
+    it("should fail closed on a 200 response missing the features object", async () => {
+      // Unexpected-but-valid JSON (e.g. an error body served with 200, or a
+      // response-shape drift). Gating must stay locked and hasFeature must
+      // not crash on an undefined features map.
+      mockFetch.mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ tier: "Trial" }),
+        }),
+      );
+
+      const { result } = renderHook(() => useTierFeatures());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.features).toEqual({});
+      expect(() => result.current.hasFeature("mindMaps")).not.toThrow();
+      expect(result.current.hasFeature("mindMaps")).toBe(false);
+      expect(result.current.hasFeature("quizzes")).toBe(false);
+    });
+
+    it("should fail closed when features is not an object", async () => {
+      mockFetch.mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ tier: "Trial", features: "corrupted" }),
+        }),
+      );
+
+      const { result } = renderHook(() => useTierFeatures());
+
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
+
+      expect(result.current.features).toEqual({});
+      expect(result.current.hasFeature("mindMaps")).toBe(false);
     });
   });
 

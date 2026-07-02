@@ -72,7 +72,7 @@
     "warning": "Warnung",
     "yes": "Ja",
     "parentAccess": {
-      "arialabelaccediAllaSezioneGenitori": "[TRANSLATE] aria-label=\"Accedi alla sezione genitori\""
+      "arialabelaccediAllaSezioneGenitori": "aria-label=\"Zum Elternbereich\""
     },
     "products": "Prodotti"
   }
