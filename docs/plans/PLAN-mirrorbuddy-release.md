@@ -88,7 +88,7 @@ Qualche scuola/tenant usa le route SSO? `lib/google/oauth.ts` è sign-in o solo 
 ### TV.8 — Backup e restore del DB — **P0 · S · umano+Sonnet**
 Supabase: backup automatici attivi? Point-in-time recovery? **Fai una prova di restore su un progetto scratch** e documenta la procedura in `docs/ops/RUNBOOK-RESTORE.md`. Un prodotto per bambini senza restore provato non si rilascia.
 
-### TV.9 — Decisioni del maintainer (default proposti, silenzio = default) — **P0 · S**
+### TV.9 — Decisioni del maintainer — **✅ CHIUSO il 2026-07-02: il maintainer ha ACCETTATO tutti i default D1–D7** (conferma esplicita in sessione). La tabella resta come riferimento.
 | # | Decisione | Default proposto |
 |---|-----------|------------------|
 | D1 | Trasparenza genitori: transcript o copy | **(b) copy onesto** ("un adulto può vedere un riassunto") + roadmap transcript opzionale |
