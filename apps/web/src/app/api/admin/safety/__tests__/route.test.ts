@@ -16,21 +16,25 @@ vi.mock('@/lib/api/middlewares', () => ({
   withAdminReadOnly: vi.fn((ctx: any, next: any) => next(ctx)),
 }));
 
-// Mock safety server functions
+// Mock safety server functions (D-07: route reads durable FromDb sources)
 vi.mock('@/lib/safety/server', () => ({
-  getComplianceStatistics: vi.fn(),
-  getComplianceEntries: vi.fn(),
-  getRecentEscalations: vi.fn(),
-  getUnresolvedEscalations: vi.fn(),
+  getComplianceStatisticsFromDb: vi.fn(),
+  getComplianceEntriesFromDb: vi.fn(),
+  getRecentEscalationsFromDb: vi.fn(),
+  getUnresolvedEscalationsFromDb: vi.fn(),
 }));
 
 import * as safetyServer from '@/lib/safety/server';
-const mockGetComplianceStatistics = safetyServer.getComplianceStatistics as ReturnType<
+const mockGetComplianceStatistics = safetyServer.getComplianceStatisticsFromDb as ReturnType<
   typeof vi.fn
 >;
-const mockGetComplianceEntries = safetyServer.getComplianceEntries as ReturnType<typeof vi.fn>;
-const mockGetRecentEscalations = safetyServer.getRecentEscalations as ReturnType<typeof vi.fn>;
-const mockGetUnresolvedEscalations = safetyServer.getUnresolvedEscalations as ReturnType<
+const mockGetComplianceEntries = safetyServer.getComplianceEntriesFromDb as ReturnType<
+  typeof vi.fn
+>;
+const mockGetRecentEscalations = safetyServer.getRecentEscalationsFromDb as ReturnType<
+  typeof vi.fn
+>;
+const mockGetUnresolvedEscalations = safetyServer.getUnresolvedEscalationsFromDb as ReturnType<
   typeof vi.fn
 >;
 

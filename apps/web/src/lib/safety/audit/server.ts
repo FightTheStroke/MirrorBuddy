@@ -26,6 +26,15 @@ export {
   exportComplianceAudit,
 } from "./compliance-audit-service";
 
+// ========== Durable Compliance Audit Reads (D-07) ==========
+// Source of truth for the admin oversight dashboard — in-memory buffers
+// reset per serverless instance and must never back API reads.
+export {
+  persistComplianceEntry,
+  getComplianceEntriesFromDb,
+  getComplianceStatisticsFromDb,
+} from "./compliance-audit-db";
+
 // ========== Knowledge Base Auditor (F-08) ==========
 export {
   auditKnowledgeBase,

@@ -35,6 +35,20 @@ export {
   clearEscalationBuffer,
 } from './escalation/escalation-service';
 
+// Server-only exports - Durable escalation reads (D-07: buffers reset per
+// serverless instance; the admin oversight dashboard reads from the DB)
+export {
+  getRecentEscalationsFromDb,
+  getUnresolvedEscalationsFromDb,
+  resolveEscalationInDb,
+} from './escalation/db-storage';
+
+// Server-only exports - Durable compliance audit reads (D-07)
+export {
+  getComplianceEntriesFromDb,
+  getComplianceStatisticsFromDb,
+} from './audit/compliance-audit-db';
+
 // Server-only exports - Safety event logging
 export { logSafetyEvent } from './monitoring/logging';
 
