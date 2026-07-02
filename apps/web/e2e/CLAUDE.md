@@ -25,6 +25,22 @@ Base fixtures auto-apply:
 
 Without fixtures = tests timeout.
 
+## Every test context is AUTHENTICATED (Base tier) by default
+
+`playwright.config.ts` applies a global `storageState` (`e2e/.auth/storage-state.json`,
+written by `global-setup.ts`) containing a SIGNED `mirrorbuddy-user-id` cookie for a
+registered E2E user. Consequences:
+
+- `/api/user/tier-features` resolves to the **Base** tier (registered, no
+  subscription) → `quizzes`/`mindMaps` ENABLED.
+- Specs asserting the **anonymous Trial** UX (e.g. `home-intent*` tier-locked
+  cards / `intent-locked-dialog`) MUST call `mockTrialTier(page)` from
+  `fixtures/api-mocks.ts` in `beforeEach`. To simulate Base explicitly, use
+  `mockBaseTier(page)` from `helpers/dsa-personas.ts` (later `page.route`
+  registrations win, so a per-test mock overrides the beforeEach one).
+- ADR 0059 predates this and needs updating (it documents only the consent
+  walls, not the storage-state auth).
+
 ## Production safety (F-03)
 
 `e2e/global-setup.ts` checks `NODE_ENV` — E2E blocked in production. NO workarounds.

@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './fixtures/a11y-fixtures';
-import { mockOnboarding, mockHomePageAPIs, mockTracking } from './fixtures/api-mocks';
+import {
+  mockOnboarding,
+  mockHomePageAPIs,
+  mockTracking,
+  mockTrialTier,
+} from './fixtures/api-mocks';
 import {
   seedPersonaProfile,
   mockHealthyUsage,
@@ -52,6 +57,10 @@ test.beforeEach(async ({ page }) => {
   await mockHomePageAPIs(page);
   await mockTracking(page);
   await mockHealthyUsage(page);
+  // The global storageState authenticates every context as a registered
+  // (Base) user; these scans cover the Trial child UX (incl. the tier-lock
+  // dialog), so force the Trial tier response (see mockTrialTier docs).
+  await mockTrialTier(page);
 });
 
 // ── axe scans: step 1 under every DSA profile ─────────────────────────────
