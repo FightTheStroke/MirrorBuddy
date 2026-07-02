@@ -189,8 +189,11 @@ export function checkInputSafety(
     !filterResult.safe &&
     (filterResult.action === 'block' || filterResult.action === 'redirect')
   ) {
-    // Crisis-specific logging
-    if (filterResult.action === 'redirect' && context) {
+    // Crisis-specific logging.
+    // Gate on category === 'crisis' (NOT action === 'redirect'): filterInput
+    // also returns 'redirect' for jailbreak, which must not trigger crisis
+    // escalation or parent notification (review finding #458 F1).
+    if (filterResult.category === 'crisis' && context) {
       try {
         void logSafetyEvent('crisis_detected', 'critical', {
           userId: context.userId || undefined,

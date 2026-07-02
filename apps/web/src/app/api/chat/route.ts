@@ -21,7 +21,7 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { filterInput, sanitizeOutput, detectBias } from '@/lib/safety';
+import { filterInput, sanitizeOutput, detectBias, SAFE_RESPONSES } from '@/lib/safety';
 import { checkSTEMSafety } from '@/lib/safety';
 import {
   recordMessage,
@@ -307,8 +307,11 @@ export const POST = pipe(
           actionTaken: 'blocked',
         });
 
-        // Crisis-specific: log safety event and escalate
-        if (filterResult.action === 'redirect') {
+        // Crisis-specific: log safety event and escalate.
+        // Gate on category === 'crisis' (NOT action === 'redirect'): filterInput
+        // also returns 'redirect' for jailbreak, which must not trigger crisis
+        // escalation or parent notification (review finding #458 F1).
+        if (filterResult.category === 'crisis') {
           try {
             void logSafetyEvent('crisis_detected', 'critical', {
               userId: userId || undefined,
@@ -574,28 +577,10 @@ export const POST = pipe(
         });
       }
 
-      // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
-      const biasResult = detectBias(sanitized.text);
-      if (biasResult.hasBias && !biasResult.safeForEducation) {
-        log.warn('Bias detected in AI response', {
-          clientId,
-          maestroId,
-          riskScore: biasResult.riskScore,
-          categories: biasResult.detections.map((d) => d.category),
-        });
-      }
-
-      // Transparency assessment
-      const transparencyContext: TransparencyContext = {
-        response: sanitized.text,
-        query: lastUserMessage?.content || '',
-        ragResults: contexts.ragResultsForTransparency,
-        usedKnowledgeBase: !!maestroId,
-        maestroId,
-      };
-      const transparency = assessResponseTransparency(transparencyContext);
-
       // Update budget (non-blocking: failure must not crash the response)
+      // NOTE: accounting runs BEFORE the bias block below — provider tokens
+      // were consumed even when the response is replaced by a safety redirect,
+      // so quota must be charged either way (review finding #458 F2).
       if (userId && userSettings && result.usage) {
         try {
           await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
@@ -623,6 +608,44 @@ export const POST = pipe(
           });
         }
       }
+
+      // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
+      // T1.4: when the model output carries high/critical bias (not safe for
+      // education), do NOT return the biased text. Replace it with the same
+      // safe redirect the content filter uses and short-circuit the response.
+      const biasResult = detectBias(sanitized.text);
+      if (biasResult.hasBias && !biasResult.safeForEducation) {
+        log.warn('Bias detected in AI response', {
+          clientId,
+          maestroId,
+          riskScore: biasResult.riskScore,
+          categories: biasResult.detections.map((d) => d.category),
+        });
+        recordContentFiltered('bias', {
+          userId,
+          maestroId,
+          actionTaken: 'blocked',
+        });
+        const response = NextResponse.json({
+          content: SAFE_RESPONSES.jailbreak,
+          provider: 'safety_filter',
+          model: 'bias-detector',
+          blocked: true,
+          category: 'bias',
+        });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
+      }
+
+      // Transparency assessment
+      const transparencyContext: TransparencyContext = {
+        response: sanitized.text,
+        query: lastUserMessage?.content || '',
+        ragResults: contexts.ragResultsForTransparency,
+        usedKnowledgeBase: !!maestroId,
+        maestroId,
+      };
+      const transparency = assessResponseTransparency(transparencyContext);
 
       const response = NextResponse.json({
         content: sanitized.text,
