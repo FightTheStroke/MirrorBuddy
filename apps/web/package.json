@@ -1,6 +1,6 @@
 {
   "name": "@mirrorbuddy/web",
-  "version": "0.20.1",
+  "version": "0.20.2",
   "private": true,
   "description": "MirrorBuddy Next.js web app (W2 #362). Workspace deps + scripts inherit from repo root via pnpm workspace; this manifest exists so Vercel rootDirectory='apps/web' can find a package.json.",
   "scripts": {
