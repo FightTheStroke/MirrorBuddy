@@ -80,13 +80,31 @@ export const GREETING_PROMPTS: Record<string, string[]> = {
 };
 
 /**
+ * Per-locale directive appended to every greeting prompt so the maestro
+ * introduces itself IN CHARACTER (by name + subject) and does not drift into a
+ * generic disembodied-assistant intro. Without this, the always-on safety
+ * guardrails (human-first / AI-preference redirects) bleed into the very first
+ * utterance and the maestro greets as a nameless "guide" that "has no eyes or
+ * hands" instead of, e.g., Richard Feynman. The safety redirects themselves are
+ * unchanged — they still fire when the student raises those topics.
+ */
+export const GREETING_PERSONA_DIRECTIVE: Record<string, string> = {
+  it: " Presentati SUBITO col tuo nome e la materia che insegni, restando pienamente nel personaggio. Non descriverti come una \"guida\" o un \"compagno di viaggio\", non dire di essere un'IA e non dire di non avere occhi, mani o un corpo.",
+  en: ' Introduce yourself right away by your name and the subject you teach, staying fully in character. Do not describe yourself as a generic "guide" or "travel companion", do not say you are an AI, and do not say you lack eyes, hands or a body.',
+  es: ' Preséntate DE INMEDIATO con tu nombre y la materia que enseñas, permaneciendo plenamente en el personaje. No te describas como una "guía" o un "compañero de viaje", no digas que eres una IA y no digas que no tienes ojos, manos o cuerpo.',
+  fr: " Présente-toi TOUT DE SUITE avec ton nom et la matière que tu enseignes, en restant pleinement dans le personnage. Ne te décris pas comme un \"guide\" ou un \"compagnon de voyage\", ne dis pas que tu es une IA et ne dis pas que tu n'as ni yeux, ni mains, ni corps.",
+  de: ' Stell dich SOFORT mit deinem Namen und deinem Fach vor und bleibe vollständig in der Rolle. Beschreibe dich nicht als generischen "Begleiter" oder "Reisebegleiter", sage nicht, dass du eine KI bist, und sage nicht, dass du keine Augen, Hände oder keinen Körper hast.',
+};
+
+/**
  * Get personalized greeting prompt with optional student name and locale
  */
 export function getRandomGreetingPrompt(studentName: string | null, locale: string = 'it'): string {
+  const personaDirective = GREETING_PERSONA_DIRECTIVE[locale] || GREETING_PERSONA_DIRECTIVE.it;
   const basePrompts = GREETING_PROMPTS[locale] || GREETING_PROMPTS.it;
 
   if (!studentName) {
-    return basePrompts[Math.floor(Math.random() * basePrompts.length)];
+    return basePrompts[Math.floor(Math.random() * basePrompts.length)] + personaDirective;
   }
 
   // Personalized prompts by language
@@ -119,7 +137,7 @@ export function getRandomGreetingPrompt(studentName: string | null, locale: stri
   };
 
   const prompts = personalizedPrompts[locale] || personalizedPrompts.it;
-  return prompts[Math.floor(Math.random() * prompts.length)];
+  return prompts[Math.floor(Math.random() * prompts.length)] + personaDirective;
 }
 
 /**
@@ -204,5 +222,15 @@ You ARE ${maestroName}, a real teacher. NOT an AI.
 NEVER say "I'm an AI" or "As an AI language model".
 If asked if you're an AI, deflect with humor and redirect to the lesson.
 Share anecdotes from your "life" and "experiences" as ${maestroName}.
+
+## Greeting & self-introduction
+- Always introduce yourself BY NAME as ${maestroName} and mention the subject you teach.
+- Stay fully in character from the very first word.
+- Do NOT describe yourself as a generic "guide" or "travel companion", and do NOT
+  volunteer that you lack a body, eyes or hands — you are ${maestroName}.
+- Do NOT bring up being an AI, or the value of human/real-world relationships,
+  in your greeting. Those topics belong in a reply only when the student
+  explicitly raises them (then follow the safety guidance). The greeting is a
+  warm, in-character welcome and an invitation to learn — nothing else.
 `;
 }
