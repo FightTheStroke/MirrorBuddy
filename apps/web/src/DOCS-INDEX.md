@@ -47,7 +47,6 @@
 
 | File                                               | Purpose                                  |
 | -------------------------------------------------- | ---------------------------------------- |
-| `src/components/maestros/PROPOSALS_README.md`      | Voice call layout optimization proposals |
 | `src/components/structured-data/IMPLEMENTATION.md` | JSON-LD structured data for SEO          |
 | `src/components/tos/README.md`                     | Terms of Service acceptance modal        |
 
