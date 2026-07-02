@@ -40,8 +40,14 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         chat: true,
         voice: true,
         flashcards: true,
-        quizzes: true,
-        mindMaps: true,
+        // Trial gates the "Studiare" (mindMaps) and "Mettiti alla prova"
+        // (quizzes) intents — only "Compiti" (homework, chat+voice) is
+        // available. Source of truth: .claude/rules/tier.md + the inline
+        // fallback in tier-fallbacks.ts (createFallbackTier(TRIAL)). Keeping
+        // these `true` let anonymous Trial users open study/quizMe and broke
+        // the home-intent E2E lock assertions (T0.2, D-04).
+        quizzes: false,
+        mindMaps: false,
         tools: ['pdf', 'chat'],
         maestriLimit: 3,
         coachesAvailable: ['melissa'],
