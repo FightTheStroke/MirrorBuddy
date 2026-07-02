@@ -26,46 +26,7 @@
         "requireNumber": "La password deve contenere almeno un numero",
         "requireSpecial": "La password deve contenere almeno un carattere speciale",
         "mismatch": "Le password non corrispondono"
-      },
-      "add": "Aggiungi",
-      "auth": {
-        "login": "Login"
-      },
-      "back": "Indietro",
-      "breadcrumbs": {
-        "home": "Home"
-      },
-      "cancel": "Annulla",
-      "clear": "Cancella",
-      "close": "Chiudi",
-      "common": {
-        "save": "Salva"
-      },
-      "confirm": "Conferma",
-      "delete": "Elimina",
-      "edit": "Modifica",
-      "error": "Errore",
-      "errors": {
-        "notFound": "Not Found"
-      },
-      "filter": "Filtra",
-      "info": "Informazione",
-      "loading": "Caricamento...",
-      "next": "Avanti",
-      "no": "No",
-      "ok": "OK",
-      "previous": "Precedente",
-      "refresh": "Aggiorna",
-      "remove": "Rimuovi",
-      "reset": "Reimposta",
-      "save": "Salva",
-      "search": "Cerca",
-      "select": "Seleziona",
-      "sort": "Ordina",
-      "submit": "Invia",
-      "success": "Completato",
-      "warning": "Attenzione",
-      "yes": "Sì"
+      }
     },
     "required": "Questo campo è obbligatorio",
     "invalidFormat": "Formato non valido",
@@ -89,19 +50,20 @@
       "description": "La pagina che stai cercando non esiste o è stata spostata.",
       "backHome": "Torna alla Home"
     },
-    "erroreCritico": "Errore critico",
-    "siEVerificatoUnErroreImprevistoIlNostroTeamEStato": "Si è verificato un errore imprevisto. Il nostro team è stato",
-    "notificatoAutomaticamente": "notificato automaticamente.",
-    "riprova": "Riprova",
-    "tornaAllaHome": "Torna alla home",
     "errorPage": {
       "title": "Qualcosa è andato storto",
       "message": "Si è verificato un errore durante il caricamento della pagina. Puoi riprovare o tornare alla pagina precedente.",
       "retryButton": "Riprova",
       "backButton": "Torna indietro"
     },
-    "somethingWentWrong": "Something went wrong",
-    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
-    "retry": "Retry"
+    "somethingWentWrong": "Qualcosa è andato storto",
+    "anUnexpectedErrorOccurredPleaseTryAgainLater": "Si è verificato un errore imprevisto. Riprova più tardi.",
+    "retry": "Riprova",
+    "child": {
+      "generic": "Ops! Qualcosa non ha funzionato. Riproviamo insieme?",
+      "network": "Sembra che la connessione a internet non funzioni bene. Controlliamo insieme e riproviamo?",
+      "retry": "Riprova con me",
+      "voiceUnavailable": "In questo momento non riesco a sentirti bene. Possiamo scrivere invece?"
+    }
   }
 }
