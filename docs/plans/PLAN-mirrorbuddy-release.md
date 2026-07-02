@@ -1,7 +1,18 @@
-# PLAN — MirrorBuddy: analisi completa e piano di rilascio
+# PLAN v2 — MirrorBuddy: rifondazione a debito zero e rilascio
 
 **Data:** 2026-07-02 · **Autore:** Claude (Fable 5) — sessione `claude/mirrorbuddy-voice-issue`
-**Base:** audit statico a 5 assi (architettura, core educativo, UX/a11y/i18n, safety/compliance, ops/CI/mobile) su `main` + verifiche runtime fatte in sessione (subsystem voce, gate CI, deploy path).
+**Base:** audit statico a 6 assi (architettura, core educativo, UX/a11y/i18n, safety/compliance, ops/CI/mobile, journey utente) su `main` + verifiche runtime fatte in sessione.
+**v2 (questo documento):** su mandato del maintainer il perimetro passa da "sbloccare il rilascio" a **rifondazione a qualità totale**: 0 debito tecnico non contabilizzato, esperienza utente pulita e adeguata all'audience, corrispondenza perfetta tra ciò che il prodotto promette e ciò che fa, tutto pronto per il rilascio. Aggiunte rispetto a v1: Fase V (validare la realtà), Fase C (contratto delle aspettative), Fase R (prova generale di rilascio), Appendice D (registro del debito), decisioni con default espliciti, perimetro esteso (refactor, packages, flags, docs) e stime riviste con onestà.
+
+---
+
+## I tre princìpi che governano tutto il piano
+
+1. **Verità.** Ogni affermazione che il sistema fa — nel CI, nei documenti, nei prompt, nella UI, nel CHANGELOG — deve essere vera. Se non lo è: si sistema il codice o si corregge l'affermazione. Mai lasciare le due cose divergenti.
+2. **Collegato.** "Implementato" non significa niente: conta **invocato nel percorso di produzione e coperto da un test d'integrazione che fallirebbe se scollegato**. È il pattern di rischio n.1 emerso dagli audit (safety vocale, escalation crisi, jailbreak, FSRS, age-gating: tutto costruito, niente collegato).
+3. **Una sola strada.** Una landing, un sistema di consenso, un FSRS, una copia per ogni modulo safety, un percorso di acquisizione per audience, una sola fonte di verità per ogni dominio. Ogni duplicato è debito: si sceglie il vivo e si demolisce il morto.
+
+**Regola d'oro per l'esecutore:** nessun task si chiude senza prova incollata (output dei comandi di accettazione). Ogni PR referenzia l'ID del task e aggiorna l'Appendice D (registro del debito) nella stessa PR. Un item di debito può chiudersi solo in due modi: **RISOLTO** (con prova) o **ACCETTATO** (con motivazione firmata dal maintainer nel registro). Nessuna terza via.
 
 ---
 
@@ -10,392 +21,436 @@
 1. **Leggi prima** `CLAUDE.md` (root), `.claude/rules/*.md`, e i `CLAUDE.md` annidati delle aree che tocchi. Le loro regole VINCONO su questo documento in caso di conflitto.
 2. **Disciplina di lavoro** (obbligatoria, dal repo):
    - Mai lavorare su `main`: `/worktree-start` → branch dedicato per ogni task.
-   - Prima di ogni commit: `npm run test:unit -- --reporter=dot`. Prima di dichiarare finito: `npm run ci:summary` (o `/verify-done`). Incolla l'output, non riassumerlo.
+   - Prima di ogni commit: `npm run test:unit -- --reporter=dot`. Prima di dichiarare finito: `npm run ci:summary` (o `/verify-done`). Incolla l'output.
    - Testo UI nuovo → chiavi i18n IT-first → `npx tsx scripts/i18n-sync-namespaces.ts --add-missing` → `npm run i18n:check`.
-   - Conventional commits; una PR per task (o per gruppo coeso); template PR del repo compilato onestamente.
-   - Squash merge è DISABILITATO sul repo: usa merge commit. Le PR non si mergiano finché ogni thread di review non è risolto (branch rule).
-3. **Ogni task qui sotto ha**: ID, priorità, effort (S ≤ mezza giornata · M ≤ 2 giorni · L > 2 giorni), file con riferimenti, passi, criteri di accettazione (comandi), e il modello suggerito (Sonnet = meccanico/ben specificato; Opus/Fable = giudizio, safety, refactor delicati).
-4. **Non fidarti ciecamente dei `file:line`**: il codice evolve; sono ancore, riverifica con grep prima di editare.
-5. **Ordine**: le fasi sono in ordine di esecuzione consigliato. Dentro una fase, i P0 prima dei P1.
+   - Conventional commits; una PR per task (o gruppo coeso); template PR compilato onestamente.
+   - Squash merge DISABILITATO: usa merge commit. Le PR non si mergiano finché ogni thread di review non è risolto (branch rule).
+3. **Ogni task ha**: ID, priorità, effort (S ≤ mezza giornata · M ≤ 2 giorni · L > 2 giorni), file di riferimento, passi, criteri di accettazione, modello suggerito (Sonnet = meccanico/ben specificato; Opus/Fable = giudizio, safety, refactor delicati).
+4. **Non fidarti ciecamente dei `file:line`**: sono ancore; riverifica con grep prima di editare.
+5. **Ordine**: Fase V per prima e bloccante. Poi le fasi in ordine; dentro una fase, P0 prima di P1. Parallelizza su worktree separati dove indicato.
 
 ---
 
-## Executive summary (IT)
+## Barra di qualità — definizione operativa di "0 tech debt"
 
-MirrorBuddy è più maturo di quanto il gate CI rosso faccia pensare: crittografia PII reale (AES-256-GCM via Prisma extension), scrubbing PII prima degli embedding, endpoint GDPR (delete/export) reali, cron protetti con `timingSafeEqual`, gamification coerente, home "intention-based" ben progettata per bambini DSA, 26 maestri consistenti. **Ma il pattern di rischio dominante, ripetuto in ogni area, è: "implementato e testato, ma non collegato".**
+"Zero debito" non significa zero `eslint-disable` nell'universo: significa **zero debito non contabilizzato**. Concretamente, al momento del rilascio:
 
-I quattro problemi che DEVONO essere risolti prima di un rilascio pubblico a bambini 8–14:
-
-1. **Safety vocale non applicata** — il contenuto flaggato (input del bambino O output del modello) viene solo loggato; l'audio continua a suonare. `triggerSafetyIntervention` esiste, è testato, e non è mai chiamato (doppia conferma da 2 audit indipendenti).
-2. **Escalation di crisi persa sul path streaming della chat** — un bambino che esprime intenti autolesivi sul path streaming riceve il redirect testuale ma **nessuna notifica al genitore e nessuna escalation** (context non passato a `checkInputSafety`).
-3. **Il deploy in produzione non passa dal gate** — niente nel repo disabilita l'auto-deploy Vercel `main`→prod; il commento in CI che afferma il contrario è falso. Ogni merge va in produzione ignorando 18 job bloccanti. (Conseguenza positiva: i fix voce/persona già mergiati sono quasi certamente live. Conseguenza negativa: anche qualsiasi regressione lo sarebbe.)
-4. **TTS hardcoded in italiano per tutte e 5 le lingue** — la funzione assistiva centrale per dislessia/CP legge inglese/francese/tedesco/spagnolo con fonemi italiani. (Non blocca un rilascio IT-only.)
-
-**Raccomandazione strategica:** rilascio **IT-first** (l'app è nata IT-default). Questo sposta quasi tutta la Fase 2-i18n fuori dal percorso critico e concentra il GA su: Fase 0 (deploy onesto) + Fase 1 (safety) + il sottoinsieme IT della Fase 2. Le locale en/fr/de/es si attivano in una release successiva quando TTS e traduzioni sono a posto.
-
-**Stato già sistemato in questa sessione** (mergiato su `main`): fix voce `capture_homework` che ammutoliva i professori (#449, incluso invio della foto compiti al modello e recovery su eccezioni), fix persona/greeting (#452), rimozione specs E2E morti `/coming-soon` (#453, in merge).
+- [ ] **Registro del debito (Appendice D) senza righe aperte**: ogni voce RISOLTA o ACCETTATA dal maintainer con motivazione.
+- [ ] **Zero codice morto**: nessun file/route/componente/flag/package non referenziato dal percorso di produzione (verificato con grep + knip/ts-prune dove applicabile).
+- [ ] **Zero commenti "will wire" / "deferred" / "stub"** nel codice di produzione: o si collega, o si rimuove la feature dalla UI.
+- [ ] **Zero moduli duplicati**: un solo FSRS, una sola copia per modulo safety, una sola landing, un solo sistema di consenso.
+- [ ] **Documentazione vera al 100%**: ADR con stato (active/superseded), CHANGELOG senza affermazioni false, documenti compliance allineati al codice, CLAUDE.md aggiornato.
+- [ ] **Soppressioni giustificate**: ogni `eslint-disable` / `@ts-ignore` residuo in prod ha un commento con motivazione, oppure non esiste. `any` in prod = 0 (test: fixture condivise tipizzate; il resto ratchet).
+- [ ] **Policy file-line onesta**: limite applicato in CI sui file nuovi/modificati (ratchet: mai peggiorare), burn-down dei top-5 monstre completato.
+- [ ] **Ogni feature visibile in UI funziona end-to-end** (create → render → persist → riapri) o è rimossa dalla UI. Nessuna feature "vetrina".
+- [ ] **Tutte le suite verdi senza retry-dipendenza**: unit, E2E, a11y, security-e2e, compliance-e2e, smoke, con gate CI autoritativo sulla produzione.
+- [ ] **Ogni promessa del prodotto verificata** (Fase C): prompt, UI copy, marketing, store metadata, README.
 
 ---
 
-## Definizione di rilascio (go/no-go)
+## Milestone
 
-**GA web (IT-first)** richiede TUTTI i seguenti:
+| Milestone | Contenuto | Uscita |
+|---|---|---|
+| **M0 — Realtà validata** | Fase V completa | Tutte le assunzioni verificate, decisioni prese |
+| **M1 — GA web IT-first** | Fasi 0, 1, 2 (IT), 2-J, 3, 4, C, 5, R complete | Rilascio pubblico italiano |
+| **M2 — Multilingua** | Fase 2 completa (TTS, traduzioni, parity) + Fase C sulle 4 locale | en/fr/de/es attive |
+| **M3 — Mobile** | Fase 6 completa | App Store / Play Store |
 
-- [ ] Fase 0 completa: gate CI autoritativo (o decisione esplicita e documentata di tenere l'auto-deploy), `main` E2E verde, uptime monitor attivo.
-- [ ] Fase 1 completa: tutti i P0/P1 safety collegati e coperti da test d'integrazione; `voice_transcript_safety` verificato ON in prod; run di `scripts/compliance-check.ts` aggiornato che fallirebbe se il wiring regredisse.
-- [ ] Fase 2 (sottoinsieme IT): promessa "dashboard genitori" resa vera o copy corretto; error copy child-friendly IT; date/orari via formatter.
-- [ ] Nessun P0 aperto in questo documento.
-- [ ] Verifiche runtime della sezione "Verifiche manuali" fatte e annotate.
+**Nota di onestà sulla stima:** la barra "debito zero" costa. M1 ≈ **6–9 settimane-agente** di lavoro seriale (era 2–3 per la versione minima). Con 3–4 worktree paralleli ben orchestrati: **~3–4 settimane di calendario**. Il grosso dell'aumento viene da: refactor in-scope, contratto delle aspettative, purge totale, prova generale. Tagliare è legittimo — ma si taglia spostando voci ad ACCETTATO nel registro, non ignorandole.
 
-**Release multilingua** = GA + Fase 2 completa (TTS multilingua, de/errors, [TRANSLATE] sweep, parity voice namespace).
-**Release iOS** = Fase 6 completa (traccia separata, post-GA web).
+---
+
+# FASE V — Validare la realtà (bloccante, prima di tutto)
+*"Non dare niente per scontato." Ogni assunzione degli audit va verificata a runtime prima di costruirci sopra. Un giorno di lavoro che evita settimane sbagliate. Molte richiedono accessi che solo il maintainer ha.*
+
+### TV.1 — Verità del deploy Vercel — **P0 · S · umano+Sonnet**
+Dashboard Vercel → Settings → Git: Production Branch? Ignored Build Step? L'ultimo deployment Production corrisponde all'ultimo merge su `main`? Documenta lo stato reale in `docs/ops/DEPLOY-REALITY.md`. Questo decide T0.1.
+
+### TV.2 — Conflitto di route su `/[locale]` — **P0 · S · Opus**
+Builda (`npm run build`) e determina chi vince tra `[locale]/page.tsx` e `[locale]/(marketing)/page.tsx`. Se il build fallisce o warnica: è il primo fix (TJ.1). Se il marketing è morto: va nel registro come demolizione.
+
+### TV.3 — Quale path chat usa la UI — **P0 · S · Sonnet**
+Grep dei call-site client (`/api/chat` vs `/api/chat/stream`) + verifica runtime con network tab su staging. Determina la severità operativa di T1.2 (comunque da fixare entrambi i path).
+
+### TV.4 — Stato flag di produzione — **P0 · S · umano+Sonnet**
+Dump dei feature flag in prod (via /admin o DB): `voice_transcript_safety` (se OFF: la voce non ha NESSUN filtro), `voice_full_prompt`, `voice_ga_protocol`, `coming_soon_overlay`, tutti gli altri. Tabella stato→atteso in `docs/ops/FLAGS.md`. Ogni flag senza consumer va nel registro (demolizione).
+
+### TV.5 — Comportamento sessione scaduta — **P1 · S · Sonnet**
+Verifica runtime del downgrade a trial (`proxy.ts:442-446`): con un cookie account scaduto, dove si atterra davvero? Decide la forma di TJ.6.
+
+### TV.6 — SSO e Google OAuth: usati da qualcuno? — **P1 · S · umano**
+Qualche scuola/tenant usa le route SSO? `lib/google/oauth.ts` è sign-in o solo Drive? Decide TJ.7 (esporre vs potare).
+
+### TV.7 — Accessi mancanti per l'esecuzione — **P0 · S · umano**
+(a) Token Sentry read-only (org `fightthestroke`, project `mirrorbuddy`) → sblocca T5.3; (b) conferma che l'ambiente dell'esecutore raggiunge `binaries.prisma.sh` e può buildare (nel sandbox di questa sessione era bloccato); (c) quota Sentry attuale.
+
+### TV.8 — Backup e restore del DB — **P0 · S · umano+Sonnet**
+Supabase: backup automatici attivi? Point-in-time recovery? **Fai una prova di restore su un progetto scratch** e documenta la procedura in `docs/ops/RUNBOOK-RESTORE.md`. Un prodotto per bambini senza restore provato non si rilascia.
+
+### TV.9 — Decisioni del maintainer (default proposti, silenzio = default) — **P0 · S**
+| # | Decisione | Default proposto |
+|---|-----------|------------------|
+| D1 | Trasparenza genitori: transcript o copy | **(b) copy onesto** ("un adulto può vedere un riassunto") + roadmap transcript opzionale |
+| D2 | Workspace packages | **(b) archiviare gli shell inutilizzati**, `apps/web/src/lib` è la casa (finché non esiste una seconda app) |
+| D3 | DEC-06 `maestriLimit` | **Deprecare**: rimuovere da features JSON, seeds, tipi; ADR di chiusura |
+| D4 | SSO | **Potare le route** se TV.6 dice "nessuno le usa"; si riaggiungono quando c'è un tenant |
+| D5 | Onboarding | **1 step essenziale** (nome+età) obbligatorio, resto opzionale (TJ.4) |
+| D6 | Classificazione AI Act | **Richiede legale** — nessun default tecnico possibile; nel frattempo il codice smette di autodefinirsi Art. 14 (coerenza interna, T1.12) |
+| D7 | Gate deploy | **Gate autoritativo** (T0.1 opzione ignoreCommand); l'alternativa "prod = main" è accettabile solo se dichiarata |
 
 ---
 
 # FASE 0 — Integrità del deploy e verità del CI
-*Obiettivo: quello che il CI dice deve essere vero; quello che va in prod deve passare dal gate. Senza questa fase, tutte le altre garanzie sono decorative.*
+*Quello che il CI dice deve essere vero; quello che va in prod deve passare dal gate. Senza questa fase, ogni altra garanzia è decorativa.*
 
-### T0.1 — Rendere il Deployment Gate autoritativo su Vercel — **P0 · S · Sonnet + decisione umana**
-- **Problema:** `vercel.json` non contiene `ignoreCommand` né config `git`; `.vercelignore` contiene solo `feature/`. Il commento in `.github/workflows/ci.yml:1900` ("Auto-deploy is disabled via ignoreCommand in vercel.json") è **falso**. Con Git integration default, ogni push su `main` deploya in produzione bypassando gate e promote workflow.
-- **Passi:**
-  1. (Umano, 1 min) Verifica su Vercel dashboard: Settings → Git → Production Branch e Ignored Build Step per il progetto `mirrorbuddy`.
-  2. Aggiungi a `vercel.json`: `"ignoreCommand": "exit 0"` — così i build Git-triggered vengono saltati e SOLO `deploy-to-staging` (CI) + `promote-to-production.yml` possono deployare. **Attenzione:** verifica che `vercel deploy --prebuilt` (ci.yml:1962) non sia affetto dall'ignoreCommand (non lo è: l'ignore vale per i build Git-triggered, non per deploy CLI prebuilt) — testa su un branch prima.
-  3. Correggi il commento in `ci.yml:1900` per riflettere la realtà.
-  4. In alternativa (se si preferisce mantenere l'auto-deploy): rimuovi il gate/promote workflow e documenta che prod = `main`. **Una delle due; lo stato attuale (entrambi, con il gate ignorato) è il peggiore dei mondi.**
-- **Accettazione:** push di un commit banale su un branch di test mergiato su `main` NON produce un deployment production su Vercel; il promote workflow sì. Commento CI corretto.
+### T0.1 — Rendere il Deployment Gate autoritativo su Vercel — **P0 · S · Sonnet (dopo TV.1)**
+- **Problema:** `vercel.json` non contiene `ignoreCommand` né config `git`; il commento in `.github/workflows/ci.yml:1900` ("Auto-deploy is disabled via ignoreCommand in vercel.json") è **falso**. Ogni push su `main` deploya in produzione bypassando gate e promote workflow.
+- **Passi:** (1) esito TV.1 alla mano, aggiungi `"ignoreCommand": "exit 0"` a `vercel.json` (i build Git-triggered vengono saltati; `vercel deploy --prebuilt` del CI non è affetto — testa su branch prima); (2) correggi il commento in `ci.yml:1900`; (3) documenta il flusso reale in `docs/ops/DEPLOY-REALITY.md`.
+- **Accettazione:** merge banale su `main` → NESSUN deployment production su Vercel; promote workflow → deployment production. Commento CI vero.
 
-### T0.2 — Portare `main` E2E al verde: fix dei 10 test `home-intent*` — **P0 · M · Opus**
-- **Contesto (verificato in sessione):** su `main` falliscono 18 spec E2E: 8 in `coming-soon.spec.ts` (pagina rimossa in #430 — spec eliminati con PR #453) e **10 tra `home-intent.spec.ts`, `home-intent-a11y.spec.ts`, `home-intent-dsa-a11y.spec.ts`, `home-intent-dsa-personas.spec.ts`**. I testid usati dagli spec esistono in `src/app/[locale]/home-intent-chooser.tsx`, quindi non sono spec obsoleti: la home non raggiunge lo stato atteso nel build prod in CI (fallimenti runtime, sopravvivono a 3 retry). NON sono flake e NON è il rumore `duplicate key User_pkey` nei log Postgres (quello è gestito da `session-auth.ts` con upsert+P2002-catch).
-- **Passi:**
-  1. Esegui localmente: `npx playwright test apps/web/e2e/home-intent.spec.ts --project=chromium` contro build prod (`npm run build && npm start`) — richiede rete per `prisma generate` (nel sandbox della sessione precedente era bloccata: `binaries.prisma.sh`; assicurati che l'ambiente esecutore la raggiunga).
-  2. Diagnosi probabile da verificare: mock mancanti in `e2e/fixtures/api-mocks.ts` per API che la home ora chiama al mount (l'elenco dei mock si ferma a ~14 route; confronta con le fetch reali della home), oppure race sul tier-loading che lascia le card in stato disabled.
-  3. Fixa la causa (mock o componente), NON allentare le assertion a11y: quelle proteggono i profili DSA.
-  4. Se un singolo spec è genuinamente irreparabile in tempi brevi: `test.fixme()` + issue GitHub (policy flake del repo, `e2e/CLAUDE.md`), MA i test axe/persona DSA non si quarantinano senza issue motivata.
-- **Accettazione:** run CI su `main` (o PR) con `e2e-tests` e `mobile-e2e` verdi; Deployment Gate verde end-to-end; `deploy-to-staging` esegue.
+### T0.2 — Portare `main` E2E al verde: i 10 test `home-intent*` + i 2 flaky — **P0 · M · Opus**
+- **Contesto (verificato in sessione):** falliscono 10 spec tra `home-intent.spec.ts`, `home-intent-a11y.spec.ts`, `home-intent-dsa-a11y.spec.ts`, `home-intent-dsa-personas.spec.ts` (i testid esistono in `home-intent-chooser.tsx`: fallimenti runtime, sopravvivono a 3 retry — NON flake, NON il rumore `duplicate key User_pkey` che è gestito da `session-auth.ts`). Più 2 flaky-su-retry da stabilizzare: `locale-switching.spec.ts:146`, `welcome-language-switcher.spec.ts:122`.
+- **Passi:** (1) riproduci localmente contro build prod (`npm run build && npm start` + `npx playwright test apps/web/e2e/home-intent.spec.ts --project=chromium`); (2) diagnosi probabile: mock mancanti in `e2e/fixtures/api-mocks.ts` per API chiamate al mount, o race sul tier-loading; (3) fixa la causa — NON allentare le assertion a11y (proteggono i profili DSA); (4) stabilizza i 2 flaky (attese esplicite, non timeout più lunghi).
+- **Accettazione:** `e2e-tests` e `mobile-e2e` verdi su `main`; 3 run consecutivi senza retry necessari sui 12 spec citati.
 
-### T0.3 — Uptime monitor su produzione — **P1 · S · Sonnet**
-- **Problema:** `/api/health` è chiamato solo post-deploy (`promote-to-production.yml:103`, `ci.yml:1971`); `infra-monitor.yml` è settimanale e non tocca la prod.
-- **Passi:** aggiungi un workflow schedulato (ogni 5-10 min, `schedule:` cron) che fa GET su `https://mirrorbuddy.org/api/health` e manda email via Resend (pattern già in `infra-monitor.yml`) su fallimento; oppure configura un monitor esterno (Better Uptime / Vercel Monitoring) — in tal caso documentalo in `SETUP-PRODUCTION.md`.
-- **Accettazione:** interruzione simulata (o health check su URL sbagliato in un test del workflow) produce una notifica.
+### T0.3 — Report Playwright come artifact CI — **P1 · S · Sonnet**
+- Oggi in caso di failure il CI carica solo screenshot; nessun report HTML/trace → il debugging (questa sessione ne ha sofferto) richiede scavare log grezzi. Aggiungi reporter `html` + upload artifact (report + trace) on-failure nel job E2E.
+- **Accettazione:** run fallito di prova → artifact scaricabile con report navigabile.
 
-### T0.4 — Correggere le bugie minori del CI — **P2 · S · Sonnet**
-- `nightly-benchmark.yml` gira trimestralmente (`0 2 1 */3 *`), non nightly: correggi schedule o nome. Cron orfani senza schedule in `vercel.json`: `api/cron/hierarchical-summary`, `api/cron/waitlist-cleanup` → aggiungi schedule o rimuovi le route.
+### T0.4 — Uptime monitor su produzione — **P1 · S · Sonnet**
+- `/api/health` è chiamato solo post-deploy; `infra-monitor.yml` è settimanale. Aggiungi poll schedulato (5-10 min) con notifica email (pattern Resend già in `infra-monitor.yml`) o monitor esterno documentato in `SETUP-PRODUCTION.md`.
+- **Accettazione:** health check fallito di prova → notifica ricevuta.
+
+### T0.5 — Verità minori del CI — **P2 · S · Sonnet**
+- `nightly-benchmark.yml` gira trimestralmente (`0 2 1 */3 *`): correggi schedule o nome. Cron orfani senza schedule: `api/cron/hierarchical-summary`, `api/cron/waitlist-cleanup` → schedule o rimozione.
 - **Accettazione:** ogni cron route ha schedule o non esiste; nomi workflow veritieri.
 
 ---
 
 # FASE 1 — Safety per bambini: collegare ciò che esiste
-*Obiettivo: chiudere il gap "defined-but-not-invoked". Ogni task qui produce anche un test d'integrazione che fallirebbe se il wiring regredisse. Modello consigliato: **Opus/Fable per tutti i task di questa fase** (safety-critical). Fai girare `npx tsx scripts/compliance-check.ts --category safety` prima e dopo per documentare che il check statico NON coglieva i gap (motivazione di T1.8).*
+*Chiudere il gap "defined-but-not-invoked". Ogni task produce anche un test d'integrazione che fallirebbe se il wiring regredisse. Modello: **Opus/Fable per tutta la fase**. Prima e dopo: `npx tsx scripts/compliance-check.ts --category safety` per documentare che il check statico non coglieva i gap.*
 
 ### T1.1 — Collegare l'intervento safety nel path vocale — **P0 · M**
-- **Problema (doppia conferma):** `apps/web/src/lib/hooks/voice-session/event-handlers.ts:170-180` (transcript utente) e `:225-239` (transcript assistente) eseguono i check ma su flag/`reject` fanno solo `logger.warn/error` (commenti "T2-06 will wire"). `triggerSafetyIntervention` (`safety-intervention.ts:114`) è implementato, testato, mai chiamato. Un bambino che dice contenuti di crisi in voce, o il modello che produce contenuto rejected, non viene interrotto.
-- **Passi:**
-  1. In `event-handlers.ts`, caso `conversation.item.input_audio_transcription.completed`: se `safetyResult.actionTaken !== 'allow'` → chiama `triggerSafetyIntervention(...)` passando il data channel (`deps.webrtcDataChannelRef.current`), che deve fare `response.cancel` + iniettare messaggio di redirect + audit. Segui la firma esistente della funzione.
-  2. Caso `response.output_audio_transcript.done`: se `actionTaken === 'reject'` → stop playback (pattern barge-in già presente a `:116-129`: `response.cancel`, clear audio queue, stop scheduled sources) + escalation ad admin audit.
-  3. Collega l'escalation di crisi vocale allo stesso percorso della chat non-streaming (`escalateCrisisDetected` + `notifyParentOfCrisis` — vedi `app/api/chat/route.ts:294-342` come riferimento): serve probabilmente una route API chiamata dal client, perché il voice gira nel browser (valuta `POST /api/safety/escalate` con `withAuth`+`withCSRF`).
-  4. Unit test sul nuovo wiring in `event-handlers` (mock del data channel, come i test esistenti in `__tests__/`) + test che il flusso NON scatta per `actionTaken === 'allow'`.
-- **Accettazione:** test unit/integrazione verdi che dimostrano: transcript utente flaggato → `response.cancel` inviato sul data channel + redirect + audit; transcript assistente rejected → playback fermato + escalation. `npm run test:unit -- voice-session --reporter=dot` verde.
+- **Problema (doppia conferma):** `lib/hooks/voice-session/event-handlers.ts:170-180` (transcript utente) e `:225-239` (transcript assistente) eseguono i check ma su flag/`reject` fanno solo log ("T2-06 will wire"). `triggerSafetyIntervention` (`safety-intervention.ts:114`) è implementato, testato, mai chiamato.
+- **Passi:** (1) transcript utente con `actionTaken !== 'allow'` → `triggerSafetyIntervention(...)` col data channel (`response.cancel` + redirect + audit); (2) transcript assistente `reject` → stop playback (riusa il pattern barge-in `:116-129`) + escalation; (3) escalation crisi vocale allo stesso percorso della chat non-streaming (probabile nuova route `POST /api/safety/escalate` con `withAuth`+`withCSRF`, il voice gira nel browser); (4) unit test del wiring + test che NON scatta su `allow`.
+- **Accettazione:** test verdi che dimostrano cancel+redirect+audit (utente) e stop+escalation (assistente); zero commenti "T2-06" residui (grep).
 
 ### T1.2 — Ripristinare l'escalation di crisi sul path chat streaming — **P0 · S**
-- **Problema:** `app/api/chat/stream/route.ts:176` chiama `checkInputSafety(lastUserMessage.content)` **senza** il context; il blocco di escalation in `stream/helpers.ts:193-223` è gated su `if (... && context)` → sul path streaming: redirect sì, ma **niente notifica genitori né escalation**.
-- **Passi:** passa `{ userId, conversationId, maestroId, locale }` alla chiamata in `stream/route.ts:176` (i valori sono già disponibili nello scope della route — verifica). Aggiungi un test d'integrazione: input con keyword di crisi sul path streaming → `escalateCrisisDetected` e `notifyParentOfCrisis` invocati (mock).
-- **Accettazione:** test verde; parità di comportamento crisi tra `/api/chat` e `/api/chat/stream`. **Determina e documenta quale path usa la UI di default** (grep dei call-site client: `csrfFetch('/api/chat'` vs `'/api/chat/stream'`) — annotalo nel PR body.
+- **Problema:** `app/api/chat/stream/route.ts:176` chiama `checkInputSafety` **senza** context; il blocco escalation in `stream/helpers.ts:193-223` è gated su `context` → niente notifica genitori né escalation sul path streaming.
+- **Passi:** passa `{ userId, conversationId, maestroId, locale }`; test d'integrazione: keyword di crisi su streaming → `escalateCrisisDetected` + `notifyParentOfCrisis` invocati.
+- **Accettazione:** parità di comportamento crisi tra i due path; test verde.
 
 ### T1.3 — Parità safety sul path streaming: STEM + bias + sanitizer — **P1 · M**
-- **Problema:** `checkSTEMSafety` (`chat/route.ts:357`) e `detectBias` (`:578-586`) esistono SOLO sul path non-streaming; lo streaming applica solo input-filter + `StreamingSanitizer`.
-- **Passi:** esegui `checkSTEMSafety` sull'input in `stream/route.ts` prima di aprire lo stream (è un check sull'input: nessun problema di streaming). Per il bias sull'output streamato: applica `detectBias` + `sanitizeOutput` nel flush finale (o su buffer completo a fine stream con sostituzione dell'ultimo chunk se flaggato) — documenta il compromesso scelto.
-- **Accettazione:** test: query STEM pericolosa → bloccata su entrambi i path; output con bias rilevato → non servito invariato sul path non-streaming (vedi T1.4).
+- `checkSTEMSafety` (`chat/route.ts:357`) e `detectBias` (`:578-586`) esistono solo sul non-streaming. Esegui STEM-check sull'input in `stream/route.ts` pre-stream; bias+sanitize sull'output nel flush finale (documenta il compromesso streaming scelto).
+- **Accettazione:** query STEM pericolosa bloccata su entrambi i path (test).
 
-### T1.4 — Il bias detection deve avere effetto, non solo log — **P1 · S**
-- **Problema:** `chat/route.ts:578-586`: `detectBias` → solo `log.warn`, il contenuto arriva comunque al bambino.
-- **Passi:** su `hasBias && !safeForEducation` → sostituisci con risposta rigenerata o messaggio di fallback educativo (esiste già pattern di redirect nel content filter). Mantieni il log per l'audit.
-- **Accettazione:** unit test con output biased mockato → il bambino non lo riceve.
+### T1.4 — Il bias detection deve avere effetto — **P1 · S**
+- `chat/route.ts:578-586`: solo `log.warn`. Su `hasBias && !safeForEducation` → rigenera o fallback educativo; log per audit resta.
+- **Accettazione:** test con output biased mockato → non servito al bambino.
 
-### T1.5 — Attivare il jailbreak detector nei request path — **P1 · M**
-- **Problema:** `detectJailbreak` / `escalateRepeatedJailbreak` (in `lib/safety/jailbreak-detector/`) hanno **zero call-site** nei percorsi live.
-- **Passi:** invoca `detectJailbreak` sull'input utente in `/api/chat`, `/api/chat/stream` e nel check transcript voce (`transcript-safety.ts`); su detection ripetuta, `escalateRepeatedJailbreak`. Attenzione ai falsi positivi con bambini: usa la soglia "obvious" (`isObviousJailbreak`) per il blocco duro e log-only per il resto, poi calibra.
-- **Accettazione:** test con prompt-injection nota → redirect + evento audit; frase innocua di un bambino → passa.
+### T1.5 — Attivare il jailbreak detector — **P1 · M**
+- `detectJailbreak`/`escalateRepeatedJailbreak` hanno zero call-site. Invocali su input in `/api/chat`, `/api/chat/stream`, e nel check transcript voce. Soglia `isObviousJailbreak` per il blocco duro, log-only per il resto (falsi positivi con bambini), poi calibra.
+- **Accettazione:** prompt-injection nota → redirect + audit; frase innocua → passa (test).
 
 ### T1.6 — Blocco server-side dei minori sul checkout Stripe — **P1 · S**
-- **Problema:** il grown-up gate è client-only (`grown-up-gate-state.ts:6-9`, sessionStorage + sfida aritmetica); `/api/checkout/route.ts:24-51` ha `withAuth` + kill-switch ma **nessun check età/consenso** → un account minore può POSTare `priceId` e ottenere una sessione Stripe.
-- **Passi:** in `/api/checkout` e `/api/billing/portal`: verifica server-side che l'account non sia flaggato minore senza consenso genitoriale (il modello dati ha `CoppaConsent` — usa quello; in assenza di segnale, nega con 403 e messaggio che rimanda al genitore). Aggiorna i test della route.
-- **Accettazione:** test: utente con profilo minore senza consenso → 403 su checkout; adulto/consenso → 200.
+- Grown-up gate è client-only (`grown-up-gate-state.ts:6-9`); `/api/checkout/route.ts:24-51` non ha check età/consenso. Aggiungi verifica server-side (usa `CoppaConsent`; in assenza di segnale → 403 con messaggio "chiedi a un genitore") su `/api/checkout` e `/api/billing/portal`.
+- **Accettazione:** test: minore senza consenso → 403; adulto → 200.
 
-### T1.7 — Dashboard admin safety: leggere dal DB, non da buffer volatili — **P1 · M**
-- **Problema:** `/api/admin/safety` legge array in-memory (`escalation-service.ts:43,272-281`; `compliance-audit-service.ts:26,233,284`) che su Vercel serverless si azzerano per istanza → la console di "human oversight" (Art. 14) mostra dati parziali/vuoti. I percorsi durevoli esistono già (`escalation/db-storage.ts`, tabella `ComplianceAuditEntry` usata correttamente da `/api/compliance/audit-log/route.ts:141`).
-- **Passi:** ripunta le letture di `/api/admin/safety` alle fonti DB; mantieni i buffer come cache locale se utile. Verifica che le SCRITTURE persistano già su DB (se anche le scritture sono solo-buffer, collegale a `db-storage`).
-- **Accettazione:** test API con Prisma mock: eventi scritti → visibili da una "istanza" pulita (nuovo import del modulo).
+### T1.7 — Dashboard admin safety: DB, non buffer volatili — **P1 · M**
+- `/api/admin/safety` legge array in-memory (`escalation-service.ts:43,272-281`; `compliance-audit-service.ts:26,233,284`) che si azzerano per istanza serverless. I percorsi durevoli esistono (`escalation/db-storage.ts`, `ComplianceAuditEntry`). Ripunta letture (e verifica le scritture) al DB.
+- **Accettazione:** eventi scritti → visibili da modulo re-importato (test con Prisma mock).
 
 ### T1.8 — `compliance-check.ts`: da presenza statica a verifica di wiring — **P1 · M**
-- **Problema:** i check fanno `fileExists`/`fileContains` (`compliance-checks/safety-systems.ts:12-124`) → avrebbero dato PASS con T1.1/T1.2/T1.5 rotti. Alcuni path controllati sono stantii (es. `content-filter/patterns.ts` vs reale `content-filter-patterns.ts`) → possibili falsi PASS/FAIL.
-- **Passi:** (1) correggi i path stantii; (2) aggiungi assertion di call-site: grep che `triggerSafetyIntervention` è invocato in `event-handlers.ts`, che `checkInputSafety` riceve context in `stream/route.ts`, che `detectJailbreak` ha call-site nei request path; (3) meglio ancora, aggiungi test d'integrazione vitest che importano le route e verificano il comportamento (i grep sono fallback).
-- **Accettazione:** `npx tsx scripts/compliance-check.ts --category safety` fallisce se uno qualsiasi dei wiring di T1.1-T1.5 viene rimosso (dimostralo con un revert locale temporaneo).
+- I check fanno `fileExists`/`fileContains` (`compliance-checks/safety-systems.ts:12-124`) e alcuni path sono stantii (es. `content-filter/patterns.ts` vs reale `content-filter-patterns.ts`) → false assurance. (1) Correggi i path; (2) aggiungi assertion di call-site per T1.1-T1.5; (3) preferisci test d'integrazione vitest ai grep.
+- **Accettazione:** revert locale temporaneo di un wiring → il check fallisce (dimostralo).
 
-### T1.9 — Consolidare i moduli safety "gemelli" — **P1 · M** *(struttura, prerequisito di manutenibilità della fase)*
-- **Problema:** 4 moduli esistono in doppia copia con vincitori INCOERENTI: content-filter → flat vivo/subdir morto; age-gating → flat vivo/subdir morto; output-sanitizer → subdir vivo/flat morto; jailbreak-detector → subdir vivo/flat morto (~1.571 LOC morte; evidenza in `lib/safety/index.ts`). Chi fa manutenzione può editare il gemello morto di una guardrail per bambini.
-- **Passi:** per ciascun modulo: identifica il vivo (dai barrel import di `safety/index.ts` + grep call-site), migra eventuali differenze utili dal morto, elimina il morto, ripunta i test. Rimuovi anche gli alias `_legacy` in `safety/index.ts` se i caller sono migrati.
-- **Accettazione:** un solo file/dir per modulo; `npm run test:unit -- safety --reporter=dot` verde; grep dei nomi morti = 0.
+### T1.9 — Consolidare i moduli safety "gemelli" — **P1 · M**
+- 4 moduli in doppia copia con vincitori incoerenti: content-filter (flat vivo), age-gating (flat vivo), output-sanitizer (subdir vivo), jailbreak-detector (subdir vivo); ~1.571 LOC morte (evidenza: import di `lib/safety/index.ts`). Per ciascuno: identifica il vivo, migra le differenze utili, elimina il morto, ripunta i test. Rimuovi gli alias `_legacy`.
+- **Accettazione:** una copia per modulo; grep dei nomi morti = 0; suite safety verde.
 
-### T1.10 — Collegare l'age-gating per fascia d'età — **P2 · M**
-- **Problema:** `checkAgeGate`/`filterForAge` definiti+testati, mai chiamati; l'unico controllo runtime è il blocco COPPA <13.
-- **Passi:** applica `getAgeGatePrompt`/`filterForAge` con l'età del profilo nel prompt-build di chat e voce (per la voce: `session-config.ts` assembla le instructions — aggiungi lì).
-- **Accettazione:** unit test: stessa domanda, età diverse → prompt istruzioni diverse.
+### T1.10 — Collegare l'age-gating per fascia d'età — **P1 · M** *(alzato da P2: con TJ.4 il sistema torna ad avere l'età — usarla)*
+- `checkAgeGate`/`filterForAge` definiti+testati, mai chiamati. Applica `getAgeGatePrompt`/`filterForAge` con l'età del profilo nel prompt-build di chat E voce (`session-config.ts`).
+- **Accettazione:** stessa domanda, età diverse → istruzioni diverse (test).
 
-### T1.11 — Verifiche runtime safety (umano o agente con accesso prod) — **P0 (verifica) · S**
-- [ ] `voice_transcript_safety` flag: ON in produzione? (Se OFF, la voce non ha NESSUN filtro contenuti — nemmeno log.) Con l'admin: `/admin` feature flags, o via DB.
-- [ ] Quale path chat usa la UI (streaming o no) — determina la severità effettiva di T1.2 (comunque da fixare).
-- [ ] `/api/admin/safety` mostra dati reali su istanza fredda (post T1.7).
-- [ ] Tasso di `[decryption-failed]`: verifica `lib/security/key-rotation.ts` e aggiungi alert se il rate di decrypt-failure supera soglia (il placeholder silenzioso maschererebbe una rotazione chiavi errata — `pii-middleware.ts:190-196`).
+### T1.11 — Alert su tasso di decrypt-failure — **P1 · S**
+- `pii-middleware.ts:190-196` degrada silenziosamente a `'[decryption-failed]'`: una rotazione chiavi sbagliata produrrebbe placeholder ovunque senza allarme. Aggiungi metrica + alert (canale di T5.1) su rate > soglia; verifica `lib/security/key-rotation.ts`.
+- **Accettazione:** decrypt-failure simulato → alert.
 
-### T1.12 — Allineare i documenti compliance alla realtà — **P2 · S · umano+agente**
-- `POST-MARKET-MONITORING-PLAN.md:85,125,242` promette moderatori umani e dashboard realtime (← buffer volatili, T1.7); il doc classifica il sistema "limited-risk Art. 52" (`:13`) mentre `api/admin/safety/route.ts:5` cita Art. 14 high-risk. Per un prodotto educativo usato da minori la classificazione va decisa con consulenza legale (Annex III). Aggiorna i doc DOPO T1.7 e la decisione.
+### T1.12 — Allineare i documenti compliance alla realtà — **P1 · S (dopo T1.7 e D6)**
+- `POST-MARKET-MONITORING-PLAN.md:85,125,242` promette moderazione umana e dashboard realtime (← buffer volatili); classificazione "limited-risk Art. 52" (`:13`) vs codice che cita Art. 14 (`api/admin/safety/route.ts:5`). Aggiorna i doc post-T1.7 e post-decisione D6. Confluisce nella Fase C.
 
 ---
 
-# FASE 2 — Accessibilità, i18n e fiducia per l'audience DSA
-*Il sottoinsieme marcato **[GA-IT]** blocca il rilascio italiano; il resto blocca solo il multilingua.*
+# FASE 2 — Esperienza utente: accessibilità, i18n, tono
+*Il sottoinsieme **[GA-IT]** blocca M1; il resto blocca M2.*
 
-### T2.1 — TTS multilingua — **P0 (multilingua) · S · Sonnet**
-- **Problema:** `components/accessibility/accessibility-provider.tsx:189-198`: `utterance.lang = "it-IT"` hardcoded + selezione voce solo italiana. I profili CP/visual auto-attivano TTS (`accessibility-store/profiles.ts:48,106`) → per bambini en/fr/de/es la feature assistiva primaria è inutilizzabile.
-- **Passi:** passa il locale attivo (`useLocale()` di next-intl) in `speak()`; seleziona la voce per prefisso `lang`; fallback ragionevole se nessuna voce disponibile. Unit test del mapping locale→lang.
-- **Accettazione:** test verdi; verifica manuale su 2 locale.
+### T2.1 — TTS multilingua — **P0 (M2) · S · Sonnet**
+- `accessibility-provider.tsx:189-198`: `utterance.lang = "it-IT"` hardcoded + voce solo italiana; i profili CP/visual auto-attivano TTS (`profiles.ts:48,106`). Passa il locale attivo in `speak()`; voce per prefisso `lang`; fallback documentato.
+- **Accettazione:** test mapping locale→lang; verifica manuale su 2 locale.
 
-### T2.2 — [GA-IT] Mantenere la promessa "i genitori vedono" — **P0 · decisione + M · Opus**
-- **Problema:** il safety prompt dice al bambino *"Tutto ciò che scriviamo qui è visibile ai tuoi genitori nella dashboard"* e *"Non posso mantenere segreti dai tuoi genitori"* (`lib/safety/safety-prompts-core.ts:220-222`), ma la parent dashboard (`app/[locale]/parent-dashboard/`, `components/profile/parent-dashboard/`) mostra solo aggregati (sessioni, quiz, streak, strategie, crisis alert) — **nessun transcript**. Promessa di sicurezza falsa = difetto di fiducia, e un deterrente anti-segretezza che il bambino può scoprire essere finto.
-- **Decisione per il maintainer (scegliere UNA):**
-  - **(a)** Aggiungere vista conversazioni/transcript alla parent dashboard (più forte per la safety; attenzione privacy-by-design: solo account genitore verificato).
-  - **(b)** Ammorbidire il copy del prompt: "un adulto di fiducia può vedere un riassunto di ciò di cui parliamo" (più rapido; coerente con ciò che la dashboard fa davvero).
-- **Passi (per (b), il default se non deciso):** aggiorna §8.3 in `safety-prompts-core.ts` (e gemelli, post T1.9); aggiorna i test safety che citano il copy.
-- **Accettazione:** copy e realtà coincidono; test aggiornati verdi.
+### T2.2 — [GA-IT] Mantenere la promessa "i genitori vedono" — **P0 · M · Opus (decisione D1)**
+- Il prompt dice *"Tutto ciò che scriviamo qui è visibile ai tuoi genitori nella dashboard"* (`safety-prompts-core.ts:220-222`); la parent dashboard mostra solo aggregati. Col default D1(b): copy onesto ("un adulto di fiducia può vedere un riassunto di ciò di cui parliamo") in §8.3 + test aggiornati. Se D1(a): vista transcript con accesso solo genitore verificato.
+- **Accettazione:** copy e realtà coincidono; test verdi.
 
 ### T2.3 — [GA-IT] Error copy child-friendly + namespace `errors` risanato — **P1 · M · Sonnet**
-- **Problemi:** (1) copy tecnico-adulto anche in IT ("Timeout richiesta", "Non autorizzato" — `messages/it/errors.json:3-9`); (2) struttura corrotta in tutte le locale: chiavi generiche annidate DENTRO `validation` (`it/errors.json:29-49`, con "Not Found" inglese dentro l'IT); (3) `de/errors.json` in gran parte inglese con perfino un residuo italiano (`"clear":"Cancella"`).
-- **Passi:** risana la struttura (sposta le chiavi mal annidate; rispetta ADR 0104 wrapper key e ADR 0091 camelCase); aggiungi varianti child-tone per gli errori child-facing ("Ops! Qualcosa non ha funzionato. Riproviamo insieme?") e usale nei componenti child-space; completa il tedesco; `npx tsx scripts/i18n-sync-namespaces.ts --add-missing` → `npm run i18n:check`.
-- **Accettazione:** `npm run i18n:check` verde; grep di "Not Found" nei json IT = 0; screenshot (o test) di un errore chat child-space con il nuovo copy.
+- Copy tecnico anche in IT ("Timeout richiesta" — `messages/it/errors.json:3-9`); struttura corrotta in tutte le locale (chiavi generiche annidate in `validation`, `it/errors.json:29-49`, con "Not Found" inglese nell'IT); `de/errors.json` in gran parte inglese + residuo italiano.
+- **Passi:** risana struttura (ADR 0104/0091); varianti child-tone per gli errori child-facing, usate nei componenti child-space; completa il tedesco; sync + check.
+- **Accettazione:** `npm run i18n:check` verde; zero stringhe inglesi nei json IT; errore chat child-space mostra il nuovo copy (test/screenshot).
 
-### T2.4 — Sweep `[TRANSLATE]` + parity namespace `voice` — **P1 · S · Sonnet**
-- **Problemi:** `messages/fr/home.json` → `"requestFullAccess":"[TRANSLATE] Clicca..."` visibile in UI francese. `it/voice.json` ha 115 chiavi vs 125 delle altre locale: mancano 9 sotto-namespace (`accessibility, chatUI, confirmations, errors, help, permission, settings, status, trialLimits`) — o l'IT (locale default!) è bucato a runtime, o le altre 4 hanno chiavi orfane. E il pre-commit `i18n:check` non l'ha colto: capire perché.
-- **Passi:** grep `\[TRANSLATE\]` su tutto `messages/` e traduci; riconcilia `voice.json` (determina con grep dei call-site `useTranslations('voice')` quali chiavi sono referenziate); investiga e fixa il buco di `i18n:check` (probabile che confronti solo le chiavi presenti in IT → le eccedenze delle altre locale non fanno fallire: aggiungi check bidirezionale).
-- **Accettazione:** zero `[TRANSLATE]`; parity 5-locale su `voice`; `i18n:check` esteso che fallisce su chiavi orfane (dimostralo).
+### T2.4 — Sweep `[TRANSLATE]` + parity namespace `voice` + fix del checker — **P1 · S · Sonnet**
+- `fr/home.json` ha `"[TRANSLATE] Clicca..."` visibile; `it/voice.json` manca di 9 sotto-namespace presenti nelle altre 4 locale (115 vs 125 chiavi) e `i18n:check` non l'ha colto (probabile check unidirezionale IT→altre). Traduci, riconcilia (grep dei call-site per capire le chiavi vive), rendi il check bidirezionale.
+- **Accettazione:** zero `[TRANSLATE]`; parity 5-locale; `i18n:check` esteso fallisce su chiavi orfane (dimostralo).
 
-### T2.5 — [GA-IT] Date/orari localizzati (e conformi alle regole del repo) — **P2 · S · Sonnet**
-- `components/profile/parent-dashboard/recent-sessions-list.tsx:22-25` ("Oggi"/"Ieri"/`toLocaleDateString("it-IT")`) e `components/chat/shared/message-bubble.tsx:122` (`toLocaleTimeString('it-IT')`) → usa `useFormatter()` di next-intl. Verifica perché la regola ESLint `no-hardcoded-italian` non li becca (stringhe in TS non-JSX?) e, se possibile, estendila.
-- **Accettazione:** lint + test verdi; nessun `it-IT` hardcoded nei componenti UI.
+### T2.5 — [GA-IT] Date/orari localizzati — **P1 · S · Sonnet**
+- `recent-sessions-list.tsx:22-25` ("Oggi"/"Ieri", `toLocaleDateString("it-IT")`), `message-bubble.tsx:122` (`toLocaleTimeString('it-IT')`) → `useFormatter()` di next-intl. Indaga perché `no-hardcoded-italian` non li becca ed estendi la regola se possibile.
+- **Accettazione:** zero `it-IT` hardcoded nei componenti; lint verde.
 
-### T2.6 — Profili DSA mutuamente esclusivi allo switch — **P1 · S · Opus**
-- **Problema:** `lib/accessibility/accessibility-store/profiles.ts`: ogni `apply*Profile` fa spread dei settings correnti senza azzerare i flag del profilo precedente → ADHD poi Visual = stato sovrapposto imprevedibile che nessun profilo descrive. Per bambini autistici/ADHD la prevedibilità È la feature.
-- **Passi:** reset a `defaultAccessibilitySettings` prima di applicare il profilo (preservando esplicitamente le preferenze utente non-profilo, es. `voicePreference` se voluto — decidi e documenta); unit test: ADHD→Visual non lascia `adhdMode`/`distractionFreeMode` attivi.
-- **Accettazione:** test dello store verdi (`npm run test:unit -- accessibility --reporter=dot`).
+### T2.6 — [GA-IT] Profili DSA mutuamente esclusivi — **P1 · S · Opus**
+- `accessibility-store/profiles.ts`: ogni `apply*Profile` fa spread senza azzerare i flag del precedente → stato sovrapposto imprevedibile (per bambini autistici/ADHD la prevedibilità È la feature). Reset a `defaultAccessibilitySettings` prima di applicare (preservando esplicitamente le preferenze non-profilo scelte — decidi e documenta quali).
+- **Accettazione:** test: ADHD→Visual non lascia `adhdMode`/`distractionFreeMode` attivi.
 
-### T2.7 — Onboarding: "salta e prova subito" — **P2 · M · Opus**
-- **Problema:** 5 step vocali sequenziali (welcome→info→principles→maestri→ready, `lib/stores/onboarding-types.ts:26-32`) con redirect forzato (`page.tsx:56-60`); solo `info` è skippabile. Latenza-al-valore alta proprio per i profili ADHD.
-- **Passi:** aggiungi CTA "Salta e prova subito" dal primo step che porta alla home intent con defaults sicuri (profilo minimale, onboarding riprendibile dopo); rendi `principles`/`maestri` opzionali. Coordina col flusso Melissa (`create-onboarding-melissa.ts`).
-- **Accettazione:** E2E: nuovo utente → home intent in ≤2 interazioni; onboarding riprendibile da settings.
+### T2.7 — [GA-IT] Stati di caricamento/errore/vuoto nello spazio bambino — **P1 · M · Opus** *(nuovo in v2)*
+- Censimento sistematico: per ogni superficie child-facing (home, chat, voce, tool, archivio) verifica che loading/errore/vuoto siano calmi, i18n, con azione chiara ("Riprova", "Chiama un grande") e TTS-leggibili. Il caso noto: "Caricamento..." bloccato = CSP (root CLAUDE.md) — lo stato d'errore deve dirlo in linguaggio da bambino, non restare muto.
+- **Accettazione:** tabella superfici×stati completata in `docs/UX-STATES.md`; fix applicati; E2E per i 3 stati sulla chat.
 
-### T2.8 — `syncWithSystem` reale + suggerimento profilo — **P2 · M · Sonnet**
-- `lib/accessibility/browser-detection.ts:41-57` mappa solo reduced-motion/contrast; `syncWithSystem()` è uno stub vuoto (`accessibility-provider.tsx:128-137`). Implementa il sync e un nudge non invasivo al primo accesso ("Ho notato che preferisci meno animazioni — vuoi il profilo calmo?").
-- **Accettazione:** unit test del mapping; nudge dismissibile e ricordato (no localStorage: cookie/DB come da regole).
+### T2.8 — Guida al tono di voce child-first — **P2 · S · Opus** *(nuovo in v2)*
+- Le regole implicite (frasi brevi, zero jargon, rassicurante, mai colpevolizzante, prezzo/commercio mai nel child-space) diventano `docs/UX-WRITING.md` con esempi giusto/sbagliato per: errori, limiti trial, lock di tier, onboarding, safety redirect. Diventa il riferimento per ogni PR con testo UI.
+- **Accettazione:** documento + linter di massima (lista parole vietate nel child-space, es. "errore del server", "non autorizzato", "9.99").
+
+### T2.9 — `syncWithSystem` reale + suggerimento profilo — **P2 · M · Sonnet**
+- `browser-detection.ts:41-57` mappa solo reduced-motion/contrast; `syncWithSystem()` è stub vuoto (`accessibility-provider.tsx:128-137`). Implementa + nudge dismissibile al primo accesso ("Ho notato che preferisci meno animazioni — vuoi il profilo calmo?"). Persistenza cookie/DB (no localStorage).
+- **Accettazione:** unit test mapping; nudge una-tantum verificato.
 
 ---
 
 # FASE 2-J — Rifare il funnel: landing → autenticazione → primo uso
-*Aggiunta post-audit dedicato al journey (mappa completa con evidenze in Appendice C). Verdetto: il layer proxy/routing è pulito; il caos è sopra — tre superfici di landing sovrapposte, un conflitto di route su `/`, codice morto di gate/acquisizione, e un onboarding che raccoglie i dati del BAMBINO mentre alla tastiera c'è il GENITORE. Modello: Opus per TJ.1/TJ.4/TJ.5, Sonnet per il resto.*
+*Mappa completa con evidenze in Appendice C. Il layer proxy/routing è pulito; il caos è sopra: tre landing sovrapposte, conflitto di route su `/`, gate morti, CTA primaria che azzera l'onboarding, genitore che compila l'identità del figlio senza handoff. Modello: Opus per TJ.1/TJ.4/TJ.5, Sonnet per il resto. **Tutta la fase è [GA-IT].***
 
 **Journey target (definizione di fatto):**
-- **Bambino trial**: prima schermata → valore in **≤3 interazioni** (oggi ~5, o ~9-10 con l'onboarding vocale).
-- **Genitore invitato**: percorso ESPLICITAMENTE da adulto (login → setup profilo figlio → handoff "ora passa il dispositivo a…"), mai ambiguo chi è alla tastiera.
-- **Bambino di ritorno**: ≤2 interazioni (oggi già ~2-3, da preservare).
-- **UNA** superficie di landing pubblica; `/welcome` = solo onboarding.
+- **Bambino trial**: prima schermata → valore in **≤3 interazioni** (oggi ~5, o ~9-10 con onboarding vocale).
+- **Genitore invitato**: percorso esplicitamente da adulto (login → setup profilo figlio → handoff "passa il dispositivo a…"), mai ambiguo chi è alla tastiera.
+- **Bambino di ritorno**: ≤2 interazioni (oggi ~2-3, preservare).
+- **UNA** landing pubblica; `/welcome` = solo onboarding.
 
-### TJ.1 — Risolvere il conflitto di route su `/[locale]` — **P0 · S · Opus**
-- **Problema:** `[locale]/page.tsx` (home bambino) E `[locale]/(marketing)/page.tsx` (hero marketing/pricing/FAQ) risolvono entrambe a `/[locale]` (i route group non cambiano il path). O il marketing non renderizza mai (codice morto) o il build è in conflitto. **Verifica runtime richiesta prima di tutto.**
-- **Passi:** builda e verifica quale vince; poi elimina il gruppo `(marketing)` o spostalo su un path reale (`/scopri` o dominio marketing separato).
-- **Accettazione:** una sola page per `/[locale]`; build senza ambiguità; decisione documentata.
+### TJ.1 — Risolvere il conflitto di route su `/[locale]` — **P0 · S · Opus (dopo TV.2)**
+- `[locale]/page.tsx` (home bambino) E `[locale]/(marketing)/page.tsx` risolvono entrambe a `/[locale]`. Esito TV.2 alla mano: elimina il gruppo `(marketing)` o spostalo su path reale (`/scopri`).
+- **Accettazione:** una sola page per `/[locale]`; build pulito; decisione nel registro.
 
 ### TJ.2 — Una sola landing — **P1 · M · Sonnet**
-- **Problema:** tre superfici di landing: (a) `(marketing)/page.tsx`; (b) `welcome/components/landing-page.tsx` renderizzata DENTRO `/welcome` prima dell'onboarding (`welcome/page.tsx:39,118-122`); (c) `[locale]/landing/page.tsx` (fallback provider-not-configured, `proxy.ts:453-457`).
-- **Passi:** consolida su una landing pubblica; `/welcome` diventa solo onboarding; il fallback `landing` resta come pagina d'errore infra (rinominala, es. `/service-unavailable`).
-- **Accettazione:** grep: un solo componente landing; E2E del percorso anonimo aggiornato.
+- Tre superfici: `(marketing)/page.tsx`; `welcome/components/landing-page.tsx` dentro `/welcome` (`welcome/page.tsx:39,118-122`); `[locale]/landing/page.tsx` (fallback provider, `proxy.ts:453-457`). Consolida su una landing pubblica; `/welcome` = solo onboarding; il fallback diventa `/service-unavailable`.
+- **Accettazione:** un solo componente landing (grep); E2E percorso anonimo aggiornato.
 
 ### TJ.3 — Bonifica del codice morto del funnel — **P1 · S · Sonnet**
-- **Da eliminare (evidenze):** `TosGateProvider`, `TrialConsentGate`, `CookieConsentWall` (zero import non-test; l'app usa solo `UnifiedConsentWall`, `providers.tsx:10,170`) + riferimenti stantii in ADR 0098; duplicato non-localizzato `app/invite/request/page.tsx:11-13` (stub che redirige a `/landing`); vestigia waitlist/coming-soon (flag `coming_soon_overlay` OFF di default, `feature-flags-service.ts:174-180`; nessuna pagina root `/waitlist`; la logica proxy descritta nel CHANGELOG non esiste). Aggiorna anche `e2e/global-setup.ts` e le fixture che mockano i gate morti.
-- **Accettazione:** grep dei componenti morti = 0; `npm run ci:summary` verde; ADR aggiornati.
+- Elimina: `TosGateProvider`, `TrialConsentGate`, `CookieConsentWall` (zero import non-test; vive solo `UnifiedConsentWall`, `providers.tsx:10,170`) + riferimenti in ADR 0098; duplicato `app/invite/request/page.tsx:11-13`; vestigia waitlist/coming-soon (flag OFF default `feature-flags-service.ts:174-180`, pagina inesistente, CHANGELOG che descrive redirect mai esistiti → correggi anche il CHANGELOG, vedi Fase C). Aggiorna `e2e/global-setup.ts` e fixture che mockano i gate morti.
+- **Accettazione:** grep componenti morti = 0; `ci:summary` verde; ADR/CHANGELOG corretti.
 
-### TJ.4 — Decidere il ruolo dell'onboarding (la CTA principale oggi lo azzera) — **P1 · M · Opus + decisione maintainer**
-- **Problema:** "Prova gratis" (CTA primaria) POSTa `hasCompletedOnboarding:true` e salta TUTTO l'onboarding (`landing-page.tsx:88-102`) → il bambino non dà mai nome/età/profilo e la personalizzazione (incl. età-appropriatezza, vedi T1.10) degrada. Il percorso vocale a 5 step esiste ma è opzionale-di-fatto.
-- **Passi:** ridisegna a **1 step essenziale** (nome + età, con opzione vocale) + resto opzionale/riprendibile da settings; la CTA non marca mai "completato" ciò che non è stato fatto (stato `skipped` esplicito). Sostituisce in parte T2.7.
-- **Accettazione:** trial → valore in ≤3 interazioni CON nome+età raccolti; stato onboarding veritiero in DB.
+### TJ.4 — Onboarding: 1 step essenziale, mai falsificato — **P1 · M · Opus (decisione D5)**
+- "Prova gratis" POSTa `hasCompletedOnboarding:true` saltando tutto (`landing-page.tsx:88-102`): il bambino non dà mai nome/età → personalizzazione e age-gating (T1.10) azzoppati; lo stato in DB è falso. Ridisegna: 1 step obbligatorio (nome+età, opzione vocale, TTS) + resto opzionale/riprendibile; stato `skipped` esplicito, mai `completed` fasullo. Sostituisce il vecchio T2.7-v1 ("salta e prova").
+- **Accettazione:** trial → valore in ≤3 interazioni CON nome+età raccolti; stato onboarding veritiero (test DB); E2E aggiornato.
 
 ### TJ.5 — Handoff genitore→bambino dopo il primo login — **P1 · M · Opus**
-- **Problema:** il genitore invitato fa login → cambio password → e finisce nell'onboarding vocale che chiede nome/età/differenze di apprendimento DEL FIGLIO senza cambio di contesto (Journey B, hop 4 in Appendice C). Audience ambigua nel momento più delicato (raccolta dati di un minore).
-- **Passi:** dopo il primo login da invito, branch esplicito: "Sei un genitore/tutor? Configura il profilo di tuo figlio" (form adulto, non vocale) → schermata handoff "Passa il dispositivo a {nome}" → home bambino. Riusa il grown-up gate per il rientro nell'area adulti.
-- **Accettazione:** E2E Journey B: nessuna schermata child-voice servita al genitore; dati minore raccolti in contesto dichiaratamente adulto (rilevante GDPR/COPPA).
+- Il genitore invitato fa login → cambio password → onboarding vocale che chiede i dati DEL FIGLIO senza cambio di contesto (Journey B). Aggiungi branch post-primo-login: "Sei un genitore/tutor? Configura il profilo di tuo figlio" (form adulto) → schermata handoff "Passa il dispositivo a {nome}" → home bambino. Riusa il grown-up gate per il rientro nell'area adulti.
+- **Accettazione:** E2E Journey B: nessuna schermata child-voice al genitore; dati minore raccolti in contesto dichiaratamente adulto.
 
-### TJ.6 — Sessione account scaduta → `/login`, non downgrade a trial — **P1 · S · Sonnet**
-- **Problema:** `proxy.ts:442-446`: hit su route protetta senza sessione → redirect a `/welcome` (crea trial). Un genitore col cookie scaduto finisce nel funnel trial anonimo invece che al login. (Verifica runtime, poi fixa.)
-- **Passi:** minimo: le route `AUTH_ONLY` (es. `/parent-dashboard`, `proxy.ts:85,431-438`) senza sessione → SEMPRE `/login`; per il resto, se c'è evidenza di account precedente → `/login`, altrimenti `/welcome`.
-- **Accettazione:** test proxy: route AUTH_ONLY senza sessione → `/login`.
+### TJ.6 — Sessione account scaduta → `/login`, non downgrade a trial — **P1 · S · Sonnet (dopo TV.5)**
+- `proxy.ts:442-446`: route protetta senza sessione → `/welcome` (crea trial). Minimo: route `AUTH_ONLY` (`/parent-dashboard`, `proxy.ts:85,431-438`) → SEMPRE `/login`; con evidenza di account precedente → `/login`, altrimenti `/welcome`.
+- **Accettazione:** test proxy: AUTH_ONLY senza sessione → `/login`.
 
-### TJ.7 — SSO e Google: esporre o potare — **P2 · S/M · decisione**
-- **Problema:** backend SSO MS365/Google-Workspace/OIDC (`api/auth/sso/*`, `lib/auth/sso/*`) senza NESSUN entry-point UI; `/login` è solo email+password. `lib/google/oauth.ts` sembra Drive-integration, non sign-in (verifica).
-- **Passi:** decisione maintainer: se le scuole servono nel breve → bottoni SSO su `/login`; altrimenti rimuovi le route (meno superficie d'attacco). Documenta Google=Drive se confermato.
-- **Accettazione:** o UI presente e testata, o route rimosse.
+### TJ.7 — SSO e Google: esporre o potare — **P1 · S/M · (decisione D4, dopo TV.6)**
+- Backend SSO MS365/Google-Workspace/OIDC senza entry-point UI; `/login` solo email+password; `lib/google/oauth.ts` probabilmente solo Drive. Default D4: pota le route; documenta Google=Drive.
+- **Accettazione:** o UI presente e testata, o route rimosse; registro aggiornato.
 
-### TJ.8 — "Richiedi accesso" fuori dalla sidebar del bambino — **P2 · S · Sonnet**
-- **Problema:** `home-sidebar.tsx:230-239` mette un link che porta a un form PII dentro la home del bambino (gruppo grown-ups, ma pur sempre nel suo spazio); i commenti nel codice (`page.tsx:41,291-294`, `home-sidebar.tsx:198-203`) mostrano che il team combatte questa leakage ad hoc da tempo.
-- **Passi:** sposta la CTA dietro il grown-up gate nell'area genitori; nella sidebar bambino al massimo "Chiedi a un grande" senza form.
-- **Accettazione:** nessun form PII raggiungibile dallo spazio bambino senza grown-up gate; E2E aggiornato.
+### TJ.8 — "Richiedi accesso" fuori dalla sidebar del bambino — **P1 · S · Sonnet**
+- `home-sidebar.tsx:230-239`: link a form PII nello spazio bambino; i commenti (`page.tsx:41,291-294`) mostrano leakage combattuta ad hoc. Sposta la CTA dietro il grown-up gate nell'area genitori; nella sidebar bambino al massimo "Chiedi a un grande" senza form.
+- **Accettazione:** nessun form PII raggiungibile dal child-space senza gate; E2E aggiornato.
+
+### TJ.9 — Misurare il funnel — **P2 · M · Sonnet** *(nuovo in v2)*
+- Esiste `lib/funnel` (tracking mockato negli E2E) ma nessuna misura dichiarata dei target di journey. Definisci i 5 eventi chiave (landing_view, trial_start, first_message, first_tool, return_visit), verifica che il tracking spari davvero (test), crea query/dashboard minima (Grafana già in stack) per verificare i target ≤3/≤2 interazioni dopo il rilascio.
+- **Accettazione:** eventi documentati in `docs/analytics/FUNNEL.md`; test tracking; dashboard con le 5 serie.
 
 ---
 
 # FASE 3 — Correttezza del core educativo
-*Feature promesse che oggi mentono silenziosamente.*
+*Regola v2: ogni feature visibile in UI funziona end-to-end (create → render → persist → riapri) o esce dalla UI. Nessuna feature vetrina.*
 
 ### T3.1 — Persistere il progresso flashcard (FSRS) — **P1 · M · Opus**
-- **Problema:** il review flow salva l'intero deck come JSON in `/api/materials` (`components/education/flashcards-view/hooks/use-flashcards-view.ts:97-110,122-154`) e non scrive MAI `FlashcardProgress` → `api/scheduler/check-due/route.ts:76-84` (notifiche push "Flashcard pronte!") e `api/dashboard/fsrs-stats/route.ts:25-89` (analytics admin) girano su tabella vuota per sempre.
-- **Passi:** dal review flow, POST per-card a `/api/flashcards/progress` (route già esistente e inutilizzata) oltre al salvataggio materiale; oppure (alternativa documentata) ripunta scheduler+dashboard allo store materiali. Prima opzione preferita: la tabella è progettata per questo.
-- **Accettazione:** test d'integrazione: review di 3 carte → 3 righe `FlashcardProgress` (Prisma mock); scheduler con carta due → notifica candidata.
+- Il review flow salva il deck come JSON in `/api/materials` (`use-flashcards-view.ts:97-110,122-154`) e non scrive MAI `FlashcardProgress` → `scheduler/check-due:76-84` (push "Flashcard pronte!") e `dashboard/fsrs-stats:25-89` girano su tabella vuota per sempre. POST per-card a `/api/flashcards/progress` (route esistente e inutilizzata) oltre al salvataggio materiale.
+- **Accettazione:** review di 3 carte → 3 righe `FlashcardProgress` (test); scheduler con carta due → notifica candidata.
 
 ### T3.2 — Un solo FSRS — **P1 · M · Opus**
-- **Problema:** due implementazioni divergenti: `packages/education/src/fsrs/core.ts` (documentata in CLAUDE.md, morta a runtime) vs `components/education/flashcards-view/utils/fsrs.ts:17` (`fsrs5Schedule`, quella vera).
-- **Passi:** scegli FSRS-5 (la live); sposta/consolida in `@/lib/education/fsrs` (o nel package se si decide la direzione package-first, vedi T4.3); elimina la morta; aggiorna CLAUDE.md; i test della morta migrano sulla viva.
-- **Accettazione:** un'unica implementazione; grep dell'altra = 0; test verdi.
+- Due implementazioni divergenti: `packages/education/src/fsrs/core.ts` (documentata, morta a runtime) vs `components/education/flashcards-view/utils/fsrs.ts:17` (`fsrs5Schedule`, viva). Consolida su FSRS-5 in `@/lib/education/fsrs`, elimina la morta, migra i test, aggiorna CLAUDE.md.
+- **Accettazione:** una sola implementazione; grep = 0; test verdi.
 
-### T3.3 — Renderer mancanti: timeline live + tool canvas completo + calculator archive — **P1 · M · Sonnet**
-- **Problemi:** timeline → JSON grezzo in chat inline (`components/tools/tool-content-renderers.tsx:73-141`, manca il case) e nel tool canvas (`tool-canvas/components/tool-renderer.tsx:121-131` fall-through); il canvas copre solo 5 tipi (mancano chart, formula, calculator, demo, timeline); calculator senza renderer archive (`knowledge-hub/renderers/index.tsx:52-84` senza chiave `calculator`) e senza plugin (`plugins/index.ts`).
-- **Passi:** aggiungi i case mancanti riusando i renderer esistenti (TimelineRenderer è già usato dall'archive: `renderers/index.tsx:69`); aggiungi `calculator` a `rendererImports`; valuta plugin calculator (bassa priorità, esegue già via Map-shim `tool-executor.ts:137`).
-- **Accettazione:** unit/snapshot test per ogni tipo nel canvas e nella chat inline: nessun tipo registrato renderizza JSON grezzo. E2E dove possibile.
+### T3.3 — Renderer completi: timeline live, tool canvas, calculator archive — **P1 · M · Sonnet**
+- Timeline → JSON grezzo in chat inline (`tool-content-renderers.tsx:73-141`, manca il case) e nel canvas (`tool-canvas/tool-renderer.tsx:121-131`); il canvas copre solo 5 tipi su 10+ (mancano chart, formula, calculator, demo, timeline); calculator senza renderer archive (`knowledge-hub/renderers/index.tsx:52-84`) né plugin. Aggiungi i case riusando i renderer esistenti; `calculator` in `rendererImports`.
+- **Accettazione:** test per OGNI tipo registrato su chat inline, canvas e archive: nessun JSON grezzo. Matrice tipi×superfici in `docs/UX-STATES.md`.
 
 ### T3.4 — Parità RAG voce/chat — **P1 · M · Opus**
-- **Problema:** la chat inietta memoria + RAG maestro-knowledge (`app/api/chat/context-builders.ts:7,12-14,219`); la voce solo summary/keyFacts (`lib/hooks/voice-session/memory-utils.ts:36-110`) → in voce il maestro non è grounded sul suo mini-KB/RAG.
-- **Passi:** nel builder delle instructions voce (`session-config.ts`, fetch parallela già presente a T1-10 style), aggiungi una chiamata a una route che espone `retrieveMaestroKnowledge` per subject/argomento corrente (attenzione al budget di lunghezza instructions — c'è già un limite; tronca con priorità al safety). Se il costo/latency non vale: documenta la divergenza intenzionale in CLAUDE.md e chiudi.
-- **Accettazione:** log/test che mostrano il KB nel prompt voce; latenza connessione voce non peggiorata oltre soglia (usa i timing log già presenti).
+- La chat inietta memoria + RAG maestro-knowledge (`context-builders.ts:7,12-14,219`); la voce solo summary/keyFacts (`memory-utils.ts:36-110`). Aggiungi retrieval nel builder instructions voce (`session-config.ts`, fetch già parallelizzate), con troncamento che dà priorità al safety. Se costo/latenza non valgono: documenta la divergenza in CLAUDE.md e chiudi ACCETTATO.
+- **Accettazione:** KB nel prompt voce (log/test); timing di connessione entro budget (T5.4).
 
 ### T3.5 — Mini-KB coerenti per tutti i maestri — **P2 · S · Sonnet**
-- `cassese.ts`, `ippocrate.ts`, `lovelace.ts`, `simone.ts` non interpolano il proprio `*_MINI_KB` (pattern corretto: `curie.ts:7,87`); `mascetti` registrato ma i suoi asset KB si chiamano `amici-miei-*` (orfani). Interpola i 4; rinomina/collega gli asset mascetti.
-- **Accettazione:** test di consistenza (già esiste una suite characters in compliance-check: `--category characters`) verde; grep: ogni maestro con mini-kb file lo importa.
+- `cassese`, `ippocrate`, `lovelace`, `simone` non interpolano il proprio `*_MINI_KB` (pattern: `curie.ts:7,87`); `mascetti` registrato ma asset KB chiamati `amici-miei-*`. Interpola i 4; riconcilia mascetti.
+- **Accettazione:** `compliance-check --category characters` verde; ogni maestro con mini-kb lo importa (grep).
 
-### T3.6 — Data-retention: cron vero, service stub — riconciliare — **P2 · M · Opus**
-- **Stato contraddittorio:** `api/cron/data-retention/route.ts` è reale e multi-fase (audit safety), ma `lib/privacy/data-retention-service.ts:13` si autodefinisce stub (mancano migrazioni: UserPrivacyPreferences, `markedForDeletion`, modello Embedding). Chiarisci cosa copre il cron e cosa lo stub avrebbe dovuto aggiungere; implementa il delta o rimuovi lo stub e aggiorna i claim F-02 nei doc.
-- **Accettazione:** nessun modulo che si dichiara stub in produzione; doc compliance coerenti.
+### T3.6 — Data-retention: riconciliare cron reale e service stub — **P1 · M · Opus**
+- `api/cron/data-retention/route.ts` è reale e multi-fase; `lib/privacy/data-retention-service.ts:13` si autodefinisce stub (mancano migrazioni: UserPrivacyPreferences, `markedForDeletion`, Embedding). Chiarisci il delta, implementalo o elimina lo stub e correggi i claim F-02 (→ Fase C).
+- **Accettazione:** zero moduli che si dichiarano stub in prod; doc coerenti.
+
+### T3.7 — Igiene DB e seeds — **P1 · S · Sonnet** *(nuovo in v2)*
+- `npx prisma migrate diff` tra schema e migrazioni = pulito; seeds coerenti con D3 (rimozione `maestriLimit` da `tier-fallbacks.ts`, `tier-seed.ts`, tipi — chiudi DEC-06 con mini-ADR); verifica che la migrazione drop-community (daa1268) sia stata applicata in prod (TV.8 aiuta).
+- **Accettazione:** diff vuoto; grep `maestriLimit` = 0; ADR DEC-06 chiuso.
 
 ---
 
-# FASE 4 — Igiene del codice e del repo
-*Tutta roba a rischio zero di regressione funzionale, alto valore di manutenibilità. Modello: Sonnet. Ideale come primo gruppo di PR per "scaldare" l'esecutore.*
+# FASE 4 — Purge totale e igiene del codice
+*In v2 tutto questo è in-scope pre-rilascio (era in parte post-GA). Modello: Sonnet salvo indicato. Ordine consigliato: prima le demolizioni (riducono la superficie di tutto il resto).*
 
 ### T4.1 — Eliminare le varianti UI morte (4.102 LOC) — **P1 · S**
-- 12 file `maestro-session-*` (v1-v4, proposal1/2, header+session) + `header-variants/` (a-e) + `PROPOSALS_README.md`: referenziati solo dal README. Il vivo è `maestro-session.tsx` (importato da `maestro-session-page.tsx:4`, `home-lazy.tsx`).
-- **Accettazione:** `npm run ci:summary` verde; grep dei nomi eliminati = 0 (fuori da git history).
+- 12 file `maestro-session-*` (v1-v4, proposal1/2) + `header-variants/` (a-e) + `PROPOSALS_README.md`: referenziati solo dal README; il vivo è `maestro-session.tsx`.
+- **Accettazione:** `ci:summary` verde; grep = 0.
 
-### T4.2 — Archiviare gli orfani: `backend/`, `testingcase/`, `reports/` stantio — **P1 · S**
-- `backend/` (FastAPI azure_costs, zero referenze da web), `testingcase/` (6 script Python PDF standalone), `reports/route-inventory.json` (generato 2026-01-19, obsoleto). Sposta in `docs-archive/` o elimina (decisione maintainer: proponi eliminazione, il git history conserva). Se `backend/` serve a qualcuno fuori repo, documentalo in README prima di toccarlo — chiedi al maintainer.
-- **Accettazione:** root del repo senza directory morte non documentate.
+### T4.2 — Archiviare/eliminare gli orfani — **P1 · S**
+- `backend/` (FastAPI azure_costs, zero referenze), `testingcase/` (6 script Python), `reports/route-inventory.json` (2026-01-19, stantio), e valuta `terraform/`, `monitoring/`, `grafana/`, `load-tests/` (tutti congelati da PR #348): per ciascuno → voce nel registro con decisione (wire+document / archive / delete; default: `load-tests` si RIATTIVA in Fase R, `grafana`+`monitoring` si verificano con TV.7/T5.x, il resto si archivia).
+- **Accettazione:** root senza directory non contabilizzate; registro aggiornato.
 
-### T4.3 — Decidere la direzione dei workspace packages — **P1 · decisione + L**
-- 7/14 packages mai importati dal web (`maestri, safety, tier, ai-providers, accessibility` + parte di `db`) e DUPLICANO logica viva in `apps/web/src/lib/*`. Due copie di logica safety/tier = rischio di editare quella morta (già successo coi gemelli safety).
-- **Opzioni:** (a) migrare web a consumare i packages (grosso, ma pulito per un futuro multi-app); (b) archiviare i package-shell e dichiarare `apps/web/src/lib` come home (rapido, onesto per una single-app). **Raccomando (b) fino a quando non esiste una seconda app.**
-- **Accettazione:** una sola copia per dominio; CLAUDE.md aggiornato.
+### T4.3 — Workspace packages: eseguire la decisione D2 — **P1 · L · Opus**
+- 7/14 packages mai importati (`maestri, safety, tier, ai-providers, accessibility` + parte di `db`) e duplicano logica viva in `apps/web/src/lib`. Default D2(b): archivia gli shell, dichiara `apps/web/src/lib` la casa, aggiorna CLAUDE.md e le import-map. Attenzione: `packages/db` contiene `pii-middleware.ts` VIVO — verifica import per import cosa è consumato prima di toccare.
+- **Accettazione:** una sola copia per dominio; build+test verdi; CLAUDE.md aggiornato.
 
-### T4.4 — Route igiene: endpoint ritirati e debug — **P2 · S**
-- Elimina `api/embeddings/route.ts` (stub "retired", unico mutante senza `pipe()`); verifica che `debug/`, `debug-cert/`, `debug-env/`, `test/` siano env-gated OFF in prod (o eliminali).
-- **Accettazione:** grep + test; nessuna route debug raggiungibile in prod build.
+### T4.4 — Route igiene: ritirati, debug, flags — **P1 · S**
+- Elimina `api/embeddings/route.ts` (stub "retired"); `debug/`, `debug-cert/`, `debug-env/`, `test/` → env-gated OFF in prod o eliminati; censimento feature flags: ogni flag senza consumer o permanentemente ON/OFF → rimuovi flag e ramo morto (incluso `coming_soon_overlay` post-TJ.3).
+- **Accettazione:** nessuna route debug in prod build; ogni flag ha un consumer vivo (tabella in `docs/ops/FLAGS.md`).
 
 ### T4.5 — Hardening route pubbliche mutanti — **P1 · M · Opus**
-- `homework/analyze/route.ts:24` e `search/route.ts:96` (POST con solo `withSentry`), più `contact`, `waitlist/signup`, `realtime/sdp-exchange`: verifica UNA per UNA che abbiano `withRateLimit` + validazione input (Zod); aggiungi dove manca. Estendi `compliance-check --category api` per asserire: ogni route mutante ha auth O (rate-limit + validazione) O firma webhook O cron secret. Verifica anche i 33 senza CSRF elencabili con grep (la maggior parte esente legittimamente — documenta le esenzioni nel check).
-- **Accettazione:** `npx tsx scripts/compliance-check.ts --category api` esteso, verde, e che fallisce se una route mutante nuda viene aggiunta (dimostralo).
+- `homework/analyze/route.ts:24`, `search/route.ts:96` (POST con solo `withSentry`), più `contact`, `waitlist/signup`, `realtime/sdp-exchange`: verifica una per una `withRateLimit` + validazione Zod; aggiungi dove manca. Estendi `compliance-check --category api`: ogni route mutante ha auth O (rate-limit+validazione) O firma webhook O cron secret; documenta le esenzioni dei 33 senza CSRF.
+- **Accettazione:** check esteso verde, e fallisce su una route nuda aggiunta ad arte (dimostralo).
 
-### T4.6 — Config igiene — **P2 · S**
-- Aggiungi `engines.node` a package.json; correggi il pin pnpm `lodash 4.18.1` (versione inesistente upstream — verifica resolution con install pulita) e verifica gli altri pin "futuristici" (`vite 8.0.16`, `eslint-plugin-react-hooks 7.0.1`); aggiungi `SENTRY_DSN` a `.env.example`; decidi sul limite file-line (245 violazioni del limite 250: o si applica in CI su nuovi file soltanto, o si alza a un valore onesto — proponi: enforcement solo su file nuovi/toccati).
-- **Accettazione:** install pulita OK; `validate-pre-deploy.ts` aggiornato se necessario.
+### T4.6 — Config e soppressioni — **P1 · S**
+- `engines.node` in package.json; pin pnpm sospetti (`lodash 4.18.1` inesistente upstream, `vite 8.0.16`, `eslint-plugin-react-hooks 7.0.1`) verificati con install pulita; `SENTRY_DSN` in `.env.example`; policy file-line: ratchet in CI (nessun nuovo file oltre soglia, nessun peggioramento dei file toccati); sweep dei 139 `eslint-disable` prod + 24 `@ts-ignore`: fix o commento di giustificazione; `: any` prod → 0; tipizza le fixture/mock condivise dei test (riduce i 1.072 `as any` senza inseguire ogni singolo test).
+- **Accettazione:** install pulita OK; CI con ratchet attivo; grep `@ts-ignore` senza giustificazione = 0; report prima/dopo dei conteggi nel registro.
 
-### T4.7 — Refactor dei top-5 file monstre — **P2 · L · Opus** *(post-GA)*
-- `lib/tier/tier-service.ts` (713), `app/api/chat/route.ts` (711), `lib/admin/user-trash-service.ts` (700), `lib/email/campaign-service.ts` (650), `lib/safety/audit/compliance-audit-service.ts` (630). Split per responsabilità, zero cambi di comportamento, test invariati prima/dopo.
+### T4.7 — Refactor dei top-5 file monstre — **P1 · L · Opus** *(in-scope in v2)*
+- `lib/tier/tier-service.ts` (713), `app/api/chat/route.ts` (711), `lib/admin/user-trash-service.ts` (700), `lib/email/campaign-service.ts` (650), `lib/safety/audit/compliance-audit-service.ts` (630). Split per responsabilità, zero cambi di comportamento; per `chat/route.ts` coordina con T1.3/T1.4 (fai PRIMA il wiring safety, POI il refactor, così i test d'integrazione proteggono lo split).
+- **Accettazione:** test invariati prima/dopo (stessa suite verde); nessun file >400 righe tra i 5.
+
+---
+
+# FASE C — Contratto delle aspettative (promesse vs realtà)
+*"Match con aspettative perfetto" reso operativo: censire OGNI promessa che il prodotto fa e verificarla. Ogni claim finisce in uno di tre stati: VERO (con prova) · SISTEMATO (codice adeguato) · RIMOSSO (claim corretto). Modello: Opus. Output: `docs/EXPECTATIONS-CONTRACT.md` con la tabella completa.*
+
+### TC.1 — Censimento delle superfici di promessa — **P0 · M**
+- Sorgenti da passare al setaccio: copy UI (messages/*), landing/marketing, `README.md`, `CHANGELOG.md`, `ARCHITECTURE.md`, ADR attivi, `docs/compliance/*` (DPIA, AI-POLICY, MODEL-CARD, PMM), prompt di sistema dei maestri e safety prompts, `store-metadata/`, pagine pubbliche (`/ai-transparency`, `/privacy`, `/terms`, `/accessibility`).
+- **Accettazione:** tabella claim→stato→prova in `docs/EXPECTATIONS-CONTRACT.md`; zero claim in stato "aperto".
+
+### TC.2 — Falsi noti da correggere subito (dagli audit) — **P0 · S**
+- CHANGELOG: redirect `/coming-soon` mai esistito; ADR 0098 descrive gate morti; PMM: moderazione umana/dashboard realtime (post T1.7); "visibile ai genitori" (post T2.2/D1); F-02 retention (post T3.6); commento CI ignoreCommand (post T0.1); CLAUDE.md: FSRS home sbagliata (post T3.2), "26 Maestri… voice, FSRS" — verifica ogni claim della prima riga.
+- **Accettazione:** ogni falso noto corretto; diff citati nella tabella TC.1.
+
+### TC.3 — Revisione età-appropriatezza dei 26 maestri — **P1 · M**
+- Passa i 26 systemPrompt con lente 8-14 DSA: linguaggio, aneddoti, "intensity dial" coerente, formal address (ADR 0064, `FORMAL_PROFESSORS`), niente contenuto che contraddica i safety prompt. `compliance-check --category characters` + revisione LLM documentata.
+- **Accettazione:** report per maestro (ok/fix) in `docs/EXPECTATIONS-CONTRACT.md`; fix applicati.
+
+### TC.4 — Stato ADR e documentazione — **P1 · S**
+- Ogni ADR riceve header di stato (active/superseded/rejected); `docs-archive/` dichiarato tale nel README; `ARCHITECTURE.md`/`ARCHITECTURE-DIAGRAMS.md` allineati alla realtà post-purge (packages, backend, community rimossa).
+- **Accettazione:** zero ADR senza stato; architettura descritta = architettura reale.
 
 ---
 
 # FASE 5 — Observability e performance con i denti
-*Modello: Sonnet, tranne T5.1.*
 
-### T5.1 — Collegare l'alerting a un canale reale — **P1 · M · Opus**
-- `lib/alerting/go-nogo-alerting.ts` calcola go/no-go ma non spedisce nulla (campi `webhookUrl`/`emailRecipients`/`slackChannel` in `types.ts:75-77` inutilizzati; history in-memory max 500). Implementa un notifier (Resend è già in stack per `infra-monitor.yml`; o Slack webhook) con dedupe/rate-limit degli alert; oppure elimina i campi morti e documenta che l'alerting è demandato a Sentry+uptime (T0.3). Decidi in coerenza con T1.11 (alert su decrypt-failure) e T1.7.
-- **Accettazione:** alert di test recapitato al canale scelto; runbook in `docs/`.
+### T5.1 — Alerting collegato a un canale reale — **P1 · M · Opus**
+- `lib/alerting/go-nogo-alerting.ts` calcola e non spedisce (campi canale inutilizzati in `types.ts:75-77`; history in-memory). Implementa notifier (Resend già in stack, o Slack webhook) con dedupe; consumatori: T0.4 (uptime), T1.11 (decrypt-failure), SLO (T5.4). Oppure elimina i campi morti e demanda tutto a Sentry+uptime — decisione nel registro.
+- **Accettazione:** alert di test recapitato; runbook in `docs/ops/`.
 
-### T5.2 — Budget di performance reali in CI — **P1 · S**
-- `bundlewatch.config.json` (limiti 250/50/150KB) non è mai invocato; il job CI fallisce solo su singolo chunk >2MB (`ci.yml:1639-1646`); `lhci autorun || echo` (`ci.yml:1684`) non può fallire. Aggiungi step `bundlewatch` reale; rimuovi il `|| echo` (gate sulle assertion di `lighthouserc.js`). Se all'attivazione i budget sono già sforati: prima tara i budget ai valori attuali+10%, poi stringi.
-- **Accettazione:** PR che gonfia artificialmente un bundle fallisce il CI (dimostralo e reverta).
+### T5.2 — Budget di performance reali in CI — **P1 · S · Sonnet**
+- `bundlewatch.config.json` mai invocato; il job CI fallisce solo su chunk >2MB (`ci.yml:1639-1646`); `lhci autorun || echo` (`ci.yml:1684`) non può fallire. Step bundlewatch reale; rimuovi `|| echo`; se i budget sono già sforati, tara ai valori attuali+10% e stringi dopo.
+- **Accettazione:** PR che gonfia un bundle ad arte fallisce il CI (dimostralo e reverta).
 
-### T5.3 — Sentry: sampling e triage — **P1 · S + accesso**
-- `tracesSampleRate: 1.0` client+server e `replaysOnErrorSampleRate: 1.0` esauriranno la quota a scala: porta a 0.1-0.2 con `tracesSampler` che tiene 1.0 su route critiche (voice, chat, checkout). **Triage errori prod:** richiede `SENTRY_AUTH_TOKEN` read-only (org `fightthestroke`, project `mirrorbuddy`) — task esplicitamente bloccato su credenziale dal maintainer; quando disponibile: esporta top-20 issue per volume, classifica (bug reale / rumore / già fixato da #449-#452), apri task puntuali.
-- **Accettazione:** sampling deployato; report di triage in `docs/plans/` con issue GitHub per i bug reali.
+### T5.3 — Sentry: sampling, DSN, triage — **P1 · S+M · Sonnet (dopo TV.7)**
+- `tracesSampleRate: 1.0` client+server e `replaysOnErrorSampleRate: 1.0` → 0.1-0.2 con `tracesSampler` a 1.0 sulle route critiche (voice, chat, checkout); `SENTRY_DSN` in `.env.example`. Col token (TV.7): triage top-20 issue per volume → classifica (bug reale / rumore / già fixato da #449-#452) → issue GitHub per i reali.
+- **Accettazione:** sampling deployato; report triage in `docs/plans/`; issue aperte.
 
----
-
-# FASE 6 — Traccia mobile/iOS (post-GA web)
-
-### T6.1 — Info.plist: permessi microfono/camera — **P0(mobile) · S · Sonnet**
-- `ios/App/App/Info.plist` NON contiene `NSMicrophoneUsageDescription` né `NSCameraUsageDescription` (grep=0) → `getUserMedia` fallisce silenzioso in WKWebView e Apple rigetta. Aggiungi le purpose string (in italiano+inglese, child-appropriate: "MirrorBuddy usa il microfono per farti parlare con i professori").
-- **Accettazione:** `npm run ios:check` verde; plist contiene le chiavi.
-
-### T6.2 — Backend per la shell nativa — **P0(mobile) · M · Opus**
-- `next.config.mobile.ts:19` è `output:'export'` ed esclude i route handler (`:22-40`); `capacitor.config.ts:7-11` ha `server.url` commentato; nessuna base URL assoluta nel layer fetch → nell'app nativa TUTTE le API 404ano. Scegli: (a) `server.url` → prod (shell remota, più semplice, richiede rete); (b) base `NEXT_PUBLIC_APP_URL` per le fetch quando `Capacitor.isNativePlatform()`. Poi verifica cookie/CSRF cross-origin (le API usano cookie httpOnly: servirà `credentials: 'include'` + CORS o la shell remota (a) che li evita).
-- **Accettazione:** app su simulatore: login, chat, un tool E2E.
-
-### T6.3 — Voce su iOS reale + submission — **P1(mobile) · L · umano+Opus**
-- WebRTC/getUserMedia in WKWebView: fattibile su iOS moderno ma da verificare SU DISPOSITIVO (nessun modo statico). Poi: `ios-release-check.sh` fixato per il version-check off-macOS (`:66`, `$(MARKETING_VERSION)` letterale), fastlane, store-metadata review, TestFlight.
+### T5.4 — SLO e budget di latenza voce — **P2 · M · Opus** *(nuovo in v2)*
+- Definisci SLO misurabili: disponibilità `/api/health`, p75 latenza prima-risposta chat, success-rate connessione voce, p75 connect→greeting (i timing log esistono già in `event-handlers.ts` "Connection timing"). Esponili (metrics-push → Grafana) e collega alert (T5.1).
+- **Accettazione:** dashboard con le 4 serie; alert su violazione simulata.
 
 ---
 
-## Verifiche manuali richieste al maintainer (non automatizzabili da qui)
+# FASE 6 — Traccia mobile (post-M1)
 
-| # | Cosa | Dove | Perché |
-|---|------|------|--------|
-| V1 | Production Branch + Ignored Build Step | Vercel → Settings → Git | Conferma P0 T0.1 (gate decorativo) |
-| V2 | Ultimo deployment Production = `main` di oggi? | Vercel → Deployments | Conferma che #449/#452 sono live |
-| V3 | Flag `voice_transcript_safety` ON in prod | /admin feature flags o DB | Se OFF: voce senza alcun filtro (T1.11) |
-| V4 | Token Sentry read-only | sentry.io org fightthestroke | Sblocca T5.3 (triage errori prod) |
-| V5 | Quota Sentry attuale | sentry.io | Dimensiona T5.3 sampling |
-| V6 | Monitor uptime esterno esistente? | provider/dashboard | Evita doppione con T0.3 |
-| V7 | Decisione T2.2 (transcript genitori vs copy) | — | Sblocca T2.2 |
-| V8 | Decisione T4.3 (packages: consumare o archiviare) | — | Sblocca T4.3 |
-| V9 | DEC-06: `maestriLimit` deprecare o enforce | `.claude/rules/tier.md` | Debito decisionale aperto nel repo |
-| V10 | Classificazione AI Act (limited vs high-risk) con legale | docs/compliance | Incoerenza doc vs codice (T1.12) |
+### T6.1 — Info.plist: permessi microfono/camera — **P0(M3) · S · Sonnet**
+- `ios/App/App/Info.plist` senza `NSMicrophoneUsageDescription`/`NSCameraUsageDescription` → getUserMedia muto in WKWebView + rigetto App Store. Purpose string child-appropriate IT+EN.
+- **Accettazione:** `npm run ios:check` verde.
+
+### T6.2 — Backend per la shell nativa — **P0(M3) · M · Opus**
+- `next.config.mobile.ts:19` è `output:'export'` senza route handler; `capacitor.config.ts:7-11` `server.url` commentato; nessuna base URL assoluta → nell'app nativa tutte le API 404ano. Scegli: shell remota (`server.url` → prod) o base `NEXT_PUBLIC_APP_URL` con `Capacitor.isNativePlatform()`; poi risolvi cookie/CSRF cross-origin (`credentials:'include'` + CORS, o shell remota che li evita).
+- **Accettazione:** simulatore: login, chat, un tool end-to-end.
+
+### T6.3 — Voce su device reale + submission — **P1(M3) · L · umano+Opus**
+- WebRTC in WKWebView da verificare SU DISPOSITIVO. Poi: `ios-release-check.sh:66` fixato (version-check `$(MARKETING_VERSION)` off-macOS), fastlane, store-metadata (passa da Fase C), TestFlight. Android: stessa trafila con `android/fastlane`.
 
 ---
 
-## Sequenza consigliata e stima
+# FASE R — Prova generale di rilascio
+*L'ultima fase non scrive feature: dimostra che tutto il resto è vero. Modello: Opus + maintainer.*
 
-| Fase | Contenuto | Effort totale stimato | Gate |
-|------|-----------|----------------------|------|
-| 0 | Deploy integrity + E2E verde + uptime | ~3-5 giorni-agente | Blocca GA |
-| 1 | Safety wiring completo | ~6-9 giorni-agente | Blocca GA |
-| 2 (IT) | T2.2, T2.3, T2.5, T2.6 | ~3-4 giorni-agente | Blocca GA-IT |
-| 2-J (core) | TJ.1, TJ.3, TJ.4, TJ.5, TJ.6 | ~4-5 giorni-agente | Blocca GA-IT (TJ.1 subito: possibile conflitto build) |
-| 4 (quick) | T4.1, T4.2, T4.4, T4.6 | ~2 giorni-agente | Consigliato pre-GA |
-| **→ GA web IT-first** | | **~3-4 settimane-agente** | |
-| 2-J (resto) | TJ.2, TJ.7, TJ.8 | ~2 giorni | Qualità funnel |
-| 2 (resto) | TTS multilingua, [TRANSLATE], voice parity, onboarding | ~4 giorni | Multilingua |
-| 3 | FSRS, renderer, RAG voce, mini-KB | ~6-8 giorni | Qualità prodotto |
-| 5 | Alerting, perf gates, Sentry | ~3 giorni | Robustezza |
-| 4 (resto) | Packages, refactor monstre | ~1-2 settimane | Manutenibilità |
-| 6 | iOS | ~1-2 settimane + device | Store |
+### TR.1 — Clean-room build — **P0 · S**
+- Da checkout pulito: `pnpm install --frozen-lockfile` → `npx prisma generate` → `npm run ci:summary` → `npm run test:unit` → suite E2E completa (`./scripts/ci-summary.sh --e2e --a11y`). Zero warning nuovi tollerati senza voce nel registro.
+- **Accettazione:** output incollati; tutto verde al primo colpo.
 
-Parallelizzabile: Fase 0 e Fase 1 su worktree separati; Fase 4-quick in qualsiasi momento.
+### TR.2 — Coverage matrix delle feature visibili — **P0 · M**
+- Tabella: ogni feature raggiungibile dalla UI (child e admin) × happy-path E2E esistente. Buchi → o si scrive il test o la feature esce dalla UI (regola Fase 3).
+- **Accettazione:** matrice in `docs/plans/RELEASE-COVERAGE.md` senza buchi non contabilizzati.
+
+### TR.3 — Deploy rehearsal + rollback — **P0 · M**
+- Staging deploy dal gate verde → smoke su staging → `promote-to-production.yml` → health check → **rollback provato** (promote del deployment precedente) → runbook `docs/ops/RUNBOOK-RELEASE.md` con: procedura, rollback, contatti, criteri di abort.
+- **Accettazione:** promote e rollback eseguiti davvero almeno una volta; runbook scritto da chi l'ha fatto.
+
+### TR.4 — Load smoke — **P1 · M**
+- Riattiva `load-tests/` (k6, congelato da PR #348) con uno scenario minimo su staging: 50 utenti concorrenti su home+chat; verifica rate-limit e degradazione pulita (`lib/degradation`).
+- **Accettazione:** report k6 in repo; nessun 5xx non previsto; rate-limit risponde 429 puliti.
+
+### TR.5 — Security review finale — **P0 · S**
+- Esegui la skill `/security-review` del repo sull'intero diff accumulato dal piano + `compliance-check` completo (tutte le categorie) + `weekly-security-audit` run manuale.
+- **Accettazione:** zero finding P0/P1 aperti; il resto nel registro.
+
+### TR.6 — Go/No-Go firmato — **P0 · S · maintainer**
+- Checklist finale: barra di qualità (sopra) tutta spuntata, registro senza righe aperte, verifiche V tutte fatte, contratto aspettative senza claim aperti. Firma del maintainer nel documento.
+
+---
+
+## Sequenza consigliata e stima (v2)
+
+| Ordine | Fase | Effort seriale | Parallelizzabile con |
+|---|---|---|---|
+| 1 | V — Validare la realtà | 1-2 giorni (molto umano) | — |
+| 2 | 0 — Deploy/CI | 3-5 giorni | 4 (purge) |
+| 3 | 1 — Safety | 6-9 giorni | 2-J |
+| 4 | 2-J — Funnel | 5-7 giorni | 1 |
+| 5 | 2 (IT) — UX/a11y | 4-5 giorni | 3 |
+| 6 | 3 — Core educativo | 6-8 giorni | 2 (IT) |
+| 7 | 4 — Purge totale | 5-8 giorni (T4.3/T4.7 i grossi) | quasi tutto |
+| 8 | C — Contratto aspettative | 3-4 giorni | dopo 1, 2-J, 3 |
+| 9 | 5 — Observability | 3-4 giorni | C |
+| 10 | R — Prova generale | 3-4 giorni | — (seriale, finale) |
+| | **M1 GA-IT totale** | **~6-9 settimane-agente seriali · ~3-4 settimane con 3-4 worktree** | |
+| 11 | 2 (resto) — Multilingua | ~4 giorni | post-M1 |
+| 12 | 6 — Mobile | 1-2 settimane + device | post-M1 |
 
 ---
 
 ## Appendice A — Stato verificato in questa sessione (non ripetere questo lavoro)
 
-- **Fix già mergiati su `main`:** #449 (voce: `capture_homework` senza handler ammutoliva il maestro; foto compiti ora inviata come `input_image`; recovery `function_call_output` su qualsiasi eccezione del tool handler), #452 (persona: `GREETING_PERSONA_DIRECTIVE` per-locale + guardia in `buildCharacterInstruction` — il maestro si presenta col suo nome, niente "compagno di viaggio senza occhi né mani"), #453 (rimozione spec E2E `/coming-soon` morti — verificare che sia mergiata, era in auto-merge).
-- **Il rumore `duplicate key User_pkey` nei log Postgres dei job E2E è GESTITO** (`session-auth.ts` upsert + P2002 catch + refetch): non è la causa dei fallimenti E2E, non "fixarlo".
-- **CI del repo:** 3 retry Playwright + wrapper retry già presenti; `trace: on-first-retry`; gli spec falliti sopravvivono ai retry (non flake). Nessun artifact con report Playwright viene caricato: valuta di aggiungere `reporter: [['html']]` + upload artifact nel job E2E (aiuterà T0.2).
-- **Sandbox limits incontrati:** `binaries.prisma.sh` e `mirrorbuddy.org` bloccati dall'egress della sessione remota — l'esecutore di questo piano deve avere rete per `prisma generate` e Playwright.
+- **Fix già mergiati su `main`:** #449 (voce: `capture_homework` senza handler ammutoliva il maestro; foto compiti come `input_image`; recovery `function_call_output` su eccezioni), #452 (persona: `GREETING_PERSONA_DIRECTIVE` per-locale + guardia in `buildCharacterInstruction`), #453 (rimozione spec E2E `/coming-soon` morti — verificare merge avvenuto).
+- **Il rumore `duplicate key User_pkey` nei log Postgres E2E è GESTITO** (`session-auth.ts` upsert + P2002 catch): non è la causa dei fallimenti, non "fixarlo".
+- **CI:** 3 retry Playwright + wrapper già presenti; `trace: on-first-retry`; gli spec falliti sopravvivono ai retry. Nessun report Playwright come artifact (→ T0.3).
+- **Sandbox limits di questa sessione:** `binaries.prisma.sh` e `mirrorbuddy.org` egress-blocked — l'esecutore deve avere rete (TV.7).
 
 ## Appendice B — Cose sane da NON toccare (conferme degli audit)
 
-Crittografia PII (pii-middleware) · scrubbing RAG (privacy-aware-embedding) · GDPR delete/export · cron `withCron` fail-closed · gamification loop · learning-path e method-progress (vivi) · buddy/coach (vivi, non leftover) · env hygiene (91 var documentate, solo `SENTRY_DSN` mancante) · rate-limit fail-closed in prod · home intent chooser (design a11y solido) · separazione spazio bambino/adulto con grown-up gate (lato UI).
-
----
+Crittografia PII (pii-middleware) · scrubbing RAG (privacy-aware-embedding) · GDPR delete/export · cron `withCron` fail-closed · gamification loop · learning-path e method-progress (vivi) · buddy/coach (vivi, non leftover) · env hygiene (91 var documentate) · rate-limit fail-closed in prod · home intent chooser (design a11y solido) · separazione bambino/adulto col grown-up gate (lato UI — il lato server si sistema con T1.6).
 
 ## Appendice C — Mappa del journey utente attuale (evidenze per la Fase 2-J)
 
@@ -406,7 +461,7 @@ Crittografia PII (pii-middleware) · scrubbing RAG (privacy-aware-embedding) · 
 4. "Prova gratis" → `TrialEmailForm` opzionale (`quick-start.tsx:160-174`) → `landing-page.tsx:61-109`: `POST /api/trial/session` + **`POST /api/onboarding {hasCompletedOnboarding:true}`** (salta TUTTO l'onboarding marcandolo completo) → `/`
    - *Alt:* "Inizia con la voce" → onboarding vocale 5 step (`onboarding-types.ts:26-32`)
 5. `/` → **UnifiedConsentWall** (banner bloccante + backdrop, `unified-consent-wall.tsx:105-121`)
-6. Intent chooser (Compiti aperto; Studia/Quiz tier-locked → dialog "chiedi a un grande") → subject picker → sessione maestro. **~5 interazioni al valore (9-10 con onboarding vocale). Il trial può fare una sessione compiti completa senza alcun account (10 chat / 300s voce / 10 tool — `use-trial-status.ts:44-49`).**
+6. Intent chooser (Compiti aperto; Studia/Quiz tier-locked → dialog "chiedi a un grande") → subject picker → sessione maestro. **~5 interazioni al valore (9-10 con onboarding vocale). Il trial può fare una sessione compiti completa senza account (10 chat / 300s voce / 10 tool — `use-trial-status.ts:44-49`).**
 
 ### Journey B — Genitore invitato
 1. Acquisizione: `/invite/request` (grown-up gate aritmetico + form PII + autodichiarazione tutore, `invite/request/page.tsx:30-85,127-144`) con approvazione admin manuale, O invito diretto admin (`api/invites/direct` → password random via email)
@@ -428,10 +483,69 @@ Crittografia PII (pii-middleware) · scrubbing RAG (privacy-aware-embedding) · 
 | 7 | SSO MS365/Google/OIDC senza entry-point UI; Google OAuth = probabilmente solo Drive | `api/auth/sso/*`; `lib/google/drive-client.ts` | TJ.7 |
 | 8 | Form PII raggiungibile dalla sidebar bambino | `home-sidebar.tsx:230-239` | TJ.8 |
 | 9 | Duplicato `app/invite/request/page.tsx` (stub → `/landing`) | `:11-13` | TJ.3 |
-| 10 | Waitlist/coming-soon vestigiale (flag OFF default, pagina inesistente, CHANGELOG mente) | `feature-flags-service.ts:174-180` | TJ.3 |
+| 10 | Waitlist/coming-soon vestigiale (flag OFF default, pagina inesistente, CHANGELOG mente) | `feature-flags-service.ts:174-180` | TJ.3 + TC.2 |
 
-### Verifiche runtime per la Fase 2-J
-- Il build con due `page.tsx` su `/[locale]`: chi vince? (TJ.1)
-- Comportamento reale sessione scaduta (TJ.6)
-- Qualche scuola usa davvero le route SSO? (TJ.7)
-- `lib/google/oauth.ts`: sign-in o solo Drive? (TJ.7)
+## Appendice D — Registro del debito (da tenere aggiornato in OGNI PR)
+
+*Stati: 🔴 aperto · 🟢 RISOLTO (PR#) · 🟡 ACCETTATO (motivazione + firma maintainer). Un item nasce qui per ogni scoperta nuova; niente si chiude fuori da questo registro.*
+
+| ID | Voce | Origine | Task | Stato |
+|----|------|---------|------|-------|
+| D-01 | Safety vocale non collegata (T2-06) | audit safety+edu | T1.1 | 🔴 |
+| D-02 | Crisi non escalata su chat streaming | audit safety | T1.2 | 🔴 |
+| D-03 | Gate deploy decorativo + commento CI falso | audit ops | T0.1 | 🔴 |
+| D-04 | 10 E2E home-intent rossi su main + 2 flaky | sessione | T0.2 | 🔴 |
+| D-05 | Jailbreak detector mai invocato | audit safety | T1.5 | 🔴 |
+| D-06 | Bias detection log-only; streaming senza STEM/bias | audit safety | T1.3, T1.4 | 🔴 |
+| D-07 | Admin safety su buffer volatili | audit safety | T1.7 | 🔴 |
+| D-08 | compliance-check statico con path stantii | audit safety | T1.8 | 🔴 |
+| D-09 | 4 moduli safety in doppia copia (~1.571 LOC morte) | audit arch | T1.9 | 🔴 |
+| D-10 | Age-gating definito e non applicato | audit safety | T1.10 | 🔴 |
+| D-11 | Checkout Stripe raggiungibile da minori (server-side) | audit safety | T1.6 | 🔴 |
+| D-12 | TTS hardcoded it-IT | audit UX | T2.1 | 🔴 |
+| D-13 | Promessa "genitori vedono tutto" falsa | audit UX | T2.2 (D1) | 🔴 |
+| D-14 | errors.json corrotto + de in inglese + copy adulto | audit UX | T2.3 | 🔴 |
+| D-15 | [TRANSLATE] in fr + voice.json parity (it -9 ns) + i18n:check unidirezionale | audit UX | T2.4 | 🔴 |
+| D-16 | Date it-IT hardcoded (2 componenti) | audit UX | T2.5 | 🔴 |
+| D-17 | Profili DSA stacking (switch non azzera) | audit UX | T2.6 | 🔴 |
+| D-18 | syncWithSystem stub | audit UX | T2.9 | 🔴 |
+| D-19 | Conflitto route /[locale] (home vs marketing) | audit journey | TJ.1 | 🔴 |
+| D-20 | Tre landing sovrapposte | audit journey | TJ.2 | 🔴 |
+| D-21 | Tre gate consenso morti + ADR 0098 stantio | audit journey | TJ.3 | 🔴 |
+| D-22 | CTA "Prova gratis" falsifica onboarding completato | audit journey | TJ.4 | 🔴 |
+| D-23 | Nessun handoff genitore→bambino | audit journey | TJ.5 | 🔴 |
+| D-24 | Sessione scaduta → trial anonimo | audit journey | TJ.6 | 🔴 |
+| D-25 | SSO senza UI / Google OAuth ambiguo | audit journey | TJ.7 (D4) | 🔴 |
+| D-26 | Form PII nella sidebar bambino | audit journey | TJ.8 | 🔴 |
+| D-27 | Duplicato invite/request non localizzato | audit journey | TJ.3 | 🔴 |
+| D-28 | Waitlist/coming-soon vestigiale + CHANGELOG falso | audit journey | TJ.3, TC.2 | 🔴 |
+| D-29 | FlashcardProgress mai scritto (reminder+dashboard morti) | audit edu | T3.1 | 🔴 |
+| D-30 | Due FSRS divergenti (quello documentato è morto) | audit edu | T3.2 | 🔴 |
+| D-31 | Timeline JSON grezzo live; canvas 5/10 tipi; calculator senza archive | audit edu | T3.3 | 🔴 |
+| D-32 | Voce senza RAG (parità chat) | audit edu | T3.4 | 🔴 |
+| D-33 | 4 maestri senza mini-KB + mascetti/amici-miei | audit edu | T3.5 | 🔴 |
+| D-34 | data-retention-service stub vs cron reale | audit edu+safety | T3.6 | 🔴 |
+| D-35 | DEC-06 maestriLimit non enforced | repo rules | T3.7 (D3) | 🔴 |
+| D-36 | 4.102 LOC varianti UI morte | audit arch | T4.1 | 🔴 |
+| D-37 | backend/ orfano; testingcase/; reports/ stantio; dirs congelate PR#348 | audit arch | T4.2 | 🔴 |
+| D-38 | 7/14 packages mai importati (logica duplicata) | audit arch | T4.3 (D2) | 🔴 |
+| D-39 | api/embeddings ritirato + route debug in tree | audit arch | T4.4 | 🔴 |
+| D-40 | Route pubbliche mutanti senza rate-limit/validazione verificata | audit arch | T4.5 | 🔴 |
+| D-41 | engines.node assente; pin pnpm sospetti; SENTRY_DSN non documentato | audit arch+ops | T4.6 | 🔴 |
+| D-42 | 139 eslint-disable prod; 24 ts-ignore; 167 :any; 1072 as-any test | audit arch | T4.6 | 🔴 |
+| D-43 | Policy file-line violata da 245 file; top-5 monstre | audit arch | T4.6, T4.7 | 🔴 |
+| D-44 | Alerting senza canale | audit ops | T5.1 | 🔴 |
+| D-45 | bundlewatch mai eseguito; lhci non può fallire | audit ops | T5.2 | 🔴 |
+| D-46 | Sentry sampling 1.0; triage mai fatto | audit ops | T5.3 | 🔴 |
+| D-47 | Nessun uptime monitor continuo | audit ops | T0.4 | 🔴 |
+| D-48 | nightly-benchmark trimestrale; 2 cron orfani | audit ops | T0.5 | 🔴 |
+| D-49 | iOS plist senza permessi mic/camera | audit ops | T6.1 | 🔴 |
+| D-50 | Shell mobile senza backend | audit ops | T6.2 | 🔴 |
+| D-51 | PMM overclaim + classificazione AI Act incoerente | audit safety | T1.12, TC.2 (D6) | 🔴 |
+| D-52 | Stati loading/error/empty child-space non censiti | v2 | T2.7 | 🔴 |
+| D-53 | Funnel non misurato | v2 | TJ.9 | 🔴 |
+| D-54 | SLO/latency voce non definiti | v2 | T5.4 | 🔴 |
+| D-55 | Backup/restore mai provato | v2 | TV.8 | 🔴 |
+| D-56 | load-tests congelato | v2 | TR.4 | 🔴 |
+| D-57 | Nessun report Playwright artifact | sessione | T0.3 | 🔴 |
+| D-58 | Feature flags senza censimento consumer | v2 | T4.4 | 🔴 |
