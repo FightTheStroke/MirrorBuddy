@@ -41,6 +41,7 @@ describe('Event Handlers - GA Protocol Event Names', () => {
       addTranscript: vi.fn(),
       setListening: vi.fn(),
       setSpeaking: vi.fn(),
+      setSafetyWarning: vi.fn(),
       isSpeaking: false,
       voiceBargeInEnabled: true,
       sendSessionConfig: vi.fn(),

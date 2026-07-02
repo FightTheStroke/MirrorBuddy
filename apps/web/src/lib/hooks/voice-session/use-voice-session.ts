@@ -125,6 +125,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     updateToolCall: store.updateToolCall,
     setListening: store.setListening,
     setSpeaking: store.setSpeaking,
+    // Adapt the intervention's rich warning state onto the store's
+    // message-based safety banner (auto-clears after its default timeout).
+    setSafetyWarning: (state) => store.setSafetyWarning(state.message ?? ''),
     isSpeaking: store.isSpeaking,
     voiceBargeInEnabled,
     options,
