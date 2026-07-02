@@ -135,3 +135,4 @@ feature/
 /output/
 testingcase/
 study-materials/
+.gstack/
