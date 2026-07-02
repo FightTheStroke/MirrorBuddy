@@ -53,7 +53,17 @@ export {
 export { logSafetyEvent } from './monitoring/logging';
 
 // Server-only exports - Compliance audit
-export { recordComplianceCrisisDetected } from './audit/compliance-audit-service';
+export {
+  recordComplianceEvent,
+  recordComplianceContentFiltered,
+  recordComplianceCrisisDetected,
+  recordComplianceJailbreakAttempt,
+  recordComplianceGuardrailTriggered,
+  getComplianceEntries,
+  getComplianceStatistics,
+  exportComplianceAudit,
+  clearComplianceBuffer,
+} from './audit/compliance-audit-service';
 
 // Server-only exports - Parent crisis notification
 export { notifyParentOfCrisis } from './escalation/parent-notifier';

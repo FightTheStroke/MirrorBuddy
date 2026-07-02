@@ -120,17 +120,9 @@ export { normalizeUnicode } from './versioning';
 
 // recordContentFiltered moved to ./server.ts (requires Prisma)
 
-export {
-  recordComplianceEvent,
-  recordComplianceContentFiltered,
-  recordComplianceCrisisDetected,
-  recordComplianceJailbreakAttempt,
-  recordComplianceGuardrailTriggered,
-  getComplianceEntries,
-  getComplianceStatistics,
-  exportComplianceAudit,
-  clearComplianceBuffer,
-} from './audit/compliance-audit-service';
+// compliance-audit-service exports moved to ./server.ts (persistComplianceEntry
+// requires Prisma; the module is reachable from client bundles via this barrel
+// otherwise, which trips Next.js's server-only build check) — T1.7
 
 // escalation-service exports moved to ./server.ts (chains to @/lib/email → prisma)
 
