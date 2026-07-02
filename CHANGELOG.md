@@ -185,7 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production compliance smoke tests** (`19-compliance-extended.spec.ts`): GDPR privacy/data rights, EU AI Act transparency, COPPA children's privacy, cookie policy categories, terms of service, data export/deletion endpoints
 - **Production safety smoke tests** (`20-safety.spec.ts`): AI disclaimers in chat, content safety APIs, professor metadata validation, bias detection, age-appropriate content, emergency conversation closure
 
-- **Coming Soon mode** with `coming_soon_overlay` feature flag toggle — proxy gating redirects unauthenticated users to `/coming-soon`
+- **Coming Soon mode** with `coming_soon_overlay` feature flag toggle — proxy gating redirects unauthenticated users to `/coming-soon` [correction 2026-07-02: this redirect was removed with the intent-based home; see PLAN task TJ.3]
 - **Waitlist signup** with GDPR double opt-in (email verification + consent version tracking)
 - **Promo code system** — verified waitlist leads get unique 8-char alphanumeric code for 1 month Pro free
 - **Promo redemption** via `POST /api/promo/redeem` with Stripe non-combinability guard
