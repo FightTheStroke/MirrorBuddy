@@ -3,7 +3,7 @@
  * Unit tests for Billing Portal API logic
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 
 // Mock stripeService
 const { mockCreateCustomerPortalSession } = vi.hoisted(() => ({
@@ -43,6 +43,32 @@ vi.mock('@/lib/db', async () => {
   const { createMockPrisma } = await import('@/test/mocks/prisma');
   return { prisma: createMockPrisma() };
 });
+
+// Route-level mocks (T1.6): bypass middleware pipeline, inject test userId
+vi.mock('@/lib/api/middlewares', () => ({
+  pipe:
+    (..._middlewares: unknown[]) =>
+    (handler: (ctx: Record<string, unknown>) => Promise<Response>) =>
+    async (req: unknown) =>
+      handler({ req, params: Promise.resolve({}), userId: 'user_route_test' }),
+  withSentry: () => vi.fn(),
+  withCSRF: vi.fn(),
+  withAuth: vi.fn(),
+}));
+
+// guardian-gate → coppa-service imports @/lib/email
+vi.mock('@/lib/email', () => ({
+  sendEmail: vi.fn(),
+  isEmailConfigured: () => false,
+}));
+
+// Compliance audit trail (guardian-gate refusals)
+const { mockRecordComplianceEvent } = vi.hoisted(() => ({
+  mockRecordComplianceEvent: vi.fn(),
+}));
+vi.mock('@/lib/safety/server', () => ({
+  recordComplianceEvent: mockRecordComplianceEvent,
+}));
 
 describe('Billing Portal API', () => {
   beforeEach(() => {
@@ -151,5 +177,92 @@ describe('Billing Portal API', () => {
       const hasValidSubscription = subscription?.stripeCustomerId != null;
       expect(hasValidSubscription).toBe(true);
     });
+  });
+});
+
+// ============================================================================
+// Route-level tests: guardian gate on POST /api/billing/portal (T1.6, D-11)
+// Invokes the actual route handler with mocked middleware pipeline.
+// ============================================================================
+
+type MockPrismaT = import('@/test/mocks/prisma').MockPrisma;
+
+function makePortalRequest() {
+  return {
+    method: 'POST',
+    url: 'https://example.com/api/billing/portal',
+    nextUrl: { origin: 'https://example.com', pathname: '/api/billing/portal' },
+  } as never;
+}
+
+describe('POST /api/billing/portal — server-side guardian gate (T1.6, D-11)', () => {
+  let mockPrisma: MockPrismaT;
+  let POST: (req: never) => Promise<Response>;
+
+  beforeAll(async () => {
+    mockPrisma = (await import('@/lib/db')).prisma as unknown as MockPrismaT;
+    POST = (await import('../route')).POST as unknown as (
+      req: never,
+    ) => Promise<Response>;
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 403 GUARDIAN_REQUIRED for a minor without parental consent and never calls Stripe', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 9 });
+    mockPrisma.coppaConsent.findUnique.mockResolvedValueOnce(null);
+
+    const res = await POST(makePortalRequest());
+
+    expect(res.status).toBe(403);
+    const body = await res.json();
+    expect(body.code).toBe('GUARDIAN_REQUIRED');
+    expect(mockCreateCustomerPortalSession).not.toHaveBeenCalled();
+    // Gate runs before any subscription lookup
+    expect(mockPrisma.userSubscription.findUnique).not.toHaveBeenCalled();
+    // Refusal is audited
+    expect(mockRecordComplianceEvent).toHaveBeenCalledWith(
+      'guardrail_triggered',
+      expect.objectContaining({ outcome: 'blocked' }),
+    );
+  });
+
+  it('allows an adult with a subscription through to the Stripe portal', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 40 });
+    mockPrisma.userSubscription.findUnique.mockResolvedValueOnce({
+      stripeCustomerId: 'cus_adult_1',
+    });
+    mockCreateCustomerPortalSession.mockResolvedValueOnce({
+      url: 'https://billing.stripe.com/session/ok',
+    });
+
+    const res = await POST(makePortalRequest());
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.url).toContain('billing.stripe.com');
+    expect(mockRecordComplianceEvent).not.toHaveBeenCalled();
+  });
+
+  it('allows a minor WITH granted parental consent through to the Stripe portal', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 12 });
+    mockPrisma.coppaConsent.findUnique.mockResolvedValueOnce({
+      consentGranted: true,
+      consentGrantedAt: new Date(),
+      verificationSentAt: new Date(),
+      verificationExpiresAt: null,
+    });
+    mockPrisma.userSubscription.findUnique.mockResolvedValueOnce({
+      stripeCustomerId: 'cus_minor_1',
+    });
+    mockCreateCustomerPortalSession.mockResolvedValueOnce({
+      url: 'https://billing.stripe.com/session/minor-ok',
+    });
+
+    const res = await POST(makePortalRequest());
+
+    expect(res.status).toBe(200);
   });
 });

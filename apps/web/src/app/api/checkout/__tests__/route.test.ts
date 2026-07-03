@@ -3,7 +3,7 @@
  * Unit tests for Checkout API logic
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { z } from 'zod';
 
 // Mock stripeService
@@ -44,6 +44,32 @@ vi.mock('@/lib/db', async () => {
   const { createMockPrisma } = await import('@/test/mocks/prisma');
   return { prisma: createMockPrisma() };
 });
+
+// Route-level mocks (T1.6): bypass middleware pipeline, inject test userId
+vi.mock('@/lib/api/middlewares', () => ({
+  pipe:
+    (..._middlewares: unknown[]) =>
+    (handler: (ctx: Record<string, unknown>) => Promise<Response>) =>
+    async (req: unknown) =>
+      handler({ req, params: Promise.resolve({}), userId: 'user_route_test' }),
+  withSentry: () => vi.fn(),
+  withCSRF: vi.fn(),
+  withAuth: vi.fn(),
+}));
+
+// guardian-gate → coppa-service imports @/lib/email
+vi.mock('@/lib/email', () => ({
+  sendEmail: vi.fn(),
+  isEmailConfigured: () => false,
+}));
+
+// Compliance audit trail (guardian-gate refusals)
+const { mockRecordComplianceEvent } = vi.hoisted(() => ({
+  mockRecordComplianceEvent: vi.fn(),
+}));
+vi.mock('@/lib/safety/server', () => ({
+  recordComplianceEvent: mockRecordComplianceEvent,
+}));
 
 // Test the checkout schema validation directly
 const CheckoutSchema = z.object({
@@ -156,5 +182,119 @@ describe('Checkout API', () => {
 
       expect(result).toBeNull();
     });
+  });
+});
+
+// ============================================================================
+// Route-level tests: guardian gate on POST /api/checkout (T1.6, D-11)
+// Invokes the actual route handler with mocked middleware pipeline.
+// ============================================================================
+
+type MockPrismaT = import('@/test/mocks/prisma').MockPrisma;
+
+function makeCheckoutRequest(body: unknown) {
+  return {
+    json: async () => body,
+    method: 'POST',
+    url: 'https://example.com/api/checkout',
+    nextUrl: { origin: 'https://example.com', pathname: '/api/checkout' },
+  } as never;
+}
+
+describe('POST /api/checkout — server-side guardian gate (T1.6, D-11)', () => {
+  let mockPrisma: MockPrismaT;
+  let POST: (req: never) => Promise<Response>;
+
+  beforeAll(async () => {
+    mockPrisma = (await import('@/lib/db')).prisma as unknown as MockPrismaT;
+    POST = (await import('../route')).POST as unknown as (
+      req: never,
+    ) => Promise<Response>;
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns 403 GUARDIAN_REQUIRED for a minor without parental consent and never calls Stripe', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 10 });
+    mockPrisma.coppaConsent.findUnique.mockResolvedValueOnce(null);
+
+    const res = await POST(makeCheckoutRequest({ priceId: 'price_123' }));
+
+    expect(res.status).toBe(403);
+    const body = await res.json();
+    expect(body.code).toBe('GUARDIAN_REQUIRED');
+    expect(mockCreateCheckoutSession).not.toHaveBeenCalled();
+    // Refusal is audited
+    expect(mockRecordComplianceEvent).toHaveBeenCalledWith(
+      'guardrail_triggered',
+      expect.objectContaining({ outcome: 'blocked' }),
+    );
+  });
+
+  it('allows an adult through to Stripe checkout', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 30 });
+    mockPrisma.globalConfig.findFirst.mockResolvedValueOnce({
+      paymentsEnabled: true,
+    });
+    mockPrisma.user.findUnique.mockResolvedValueOnce({
+      email: 'adult@example.com',
+    });
+    mockCreateCheckoutSession.mockResolvedValueOnce({
+      id: 'cs_test_ok',
+      url: 'https://checkout.stripe.com/pay/cs_test_ok',
+    });
+
+    const res = await POST(makeCheckoutRequest({ priceId: 'price_123' }));
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.sessionId).toBe('cs_test_ok');
+    expect(mockCreateCheckoutSession).toHaveBeenCalledTimes(1);
+    expect(mockRecordComplianceEvent).not.toHaveBeenCalled();
+  });
+
+  it('allows a minor WITH granted parental consent through to Stripe', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce({ age: 12 });
+    mockPrisma.coppaConsent.findUnique.mockResolvedValueOnce({
+      consentGranted: true,
+      consentGrantedAt: new Date(),
+      verificationSentAt: new Date(),
+      verificationExpiresAt: null,
+    });
+    mockPrisma.globalConfig.findFirst.mockResolvedValueOnce({
+      paymentsEnabled: true,
+    });
+    mockPrisma.user.findUnique.mockResolvedValueOnce({
+      email: 'consented-minor@example.com',
+    });
+    mockCreateCheckoutSession.mockResolvedValueOnce({
+      id: 'cs_test_minor_ok',
+      url: 'https://checkout.stripe.com/pay/cs_test_minor_ok',
+    });
+
+    const res = await POST(makeCheckoutRequest({ priceId: 'price_123' }));
+
+    expect(res.status).toBe(200);
+    expect(mockCreateCheckoutSession).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows unknown age (fail-open — mirrors checkCoppaStatus convention)', async () => {
+    mockPrisma.profile.findUnique.mockResolvedValueOnce(null);
+    mockPrisma.globalConfig.findFirst.mockResolvedValueOnce({
+      paymentsEnabled: true,
+    });
+    mockPrisma.user.findUnique.mockResolvedValueOnce({
+      email: 'unknown-age@example.com',
+    });
+    mockCreateCheckoutSession.mockResolvedValueOnce({
+      id: 'cs_test_unknown',
+      url: 'https://checkout.stripe.com/pay/cs_test_unknown',
+    });
+
+    const res = await POST(makeCheckoutRequest({ priceId: 'price_123' }));
+
+    expect(res.status).toBe(200);
   });
 });

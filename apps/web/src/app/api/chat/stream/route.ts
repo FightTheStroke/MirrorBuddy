@@ -22,7 +22,9 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { StreamingSanitizer } from '@/lib/safety';
+import { StreamingSanitizer, checkSTEMSafety, normalizeUnicode } from '@/lib/safety';
+import { recordContentFiltered } from '@/lib/safety/server';
+import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 
 import type { ChatRequest } from '../types';
@@ -173,13 +175,60 @@ export const POST = pipe(
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
     if (lastUserMessage) {
-      const safetyBlock = checkInputSafety(lastUserMessage.content);
+      // SECURITY: normalize Unicode (zero-width chars, homoglyphs) BEFORE the
+      // safety checks, mirroring the non-streaming route — raw input would let
+      // e.g. 'T​NT' bypass the blocklists (review finding #458 F3).
+      // filterInput/checkSTEMSafety only lowercase/trim internally.
+      const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
+      if (wasModified) {
+        log.debug('Unicode normalized in user input', { clientId });
+        lastUserMessage.content = normalized;
+      }
+
+      // T1.2: pass context so crisis escalation (logSafetyEvent +
+      // escalateCrisisDetected + notifyParentOfCrisis) runs on the streaming
+      // path, mirroring the non-streaming route. conversationId may be
+      // undefined for a brand-new conversation; the escalation helpers fall
+      // back to 'anonymous'/'' so escalation is never skipped for that reason.
+      const safetyBlock = checkInputSafety(lastUserMessage.content, {
+        userId,
+        conversationId,
+        maestroId,
+        locale: detectLocaleFromNextRequest(request),
+      });
       if (safetyBlock) {
         log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
           yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
           yield 'data: [DONE]\n\n';
         });
+      }
+
+      // T1.3: STEM safety check (Amodei 2026) - block dangerous STEM queries
+      // BEFORE starting the stream, mirroring the non-streaming route.
+      if (maestroId) {
+        const stemResult = checkSTEMSafety(lastUserMessage.content, maestroId);
+        if (stemResult.blocked) {
+          log.warn('STEM safety filter triggered', {
+            clientId,
+            subject: stemResult.subject,
+            category: stemResult.category,
+          });
+          recordContentFiltered('stem_safety', {
+            userId,
+            maestroId,
+            actionTaken: 'blocked',
+          });
+          return createSSEResponse(async function* () {
+            yield `data: ${JSON.stringify({
+              content: stemResult.safeResponse,
+              blocked: true,
+              category: `stem_${stemResult.category}`,
+              alternatives: stemResult.alternatives,
+            })}\n\n`;
+            yield 'data: [DONE]\n\n';
+          });
+        }
       }
     }
 

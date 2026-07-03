@@ -49,7 +49,7 @@
         "cancellaRicerca": "Cancella ricerca",
         "all": "All"
       },
-      "arialabelcancellaRicerca": "[TRANSLATE] aria-label=\"Cancella ricerca\""
+      "arialabelcancellaRicerca": "aria-label=\"Effacer la recherche\""
     },
     "supporti": {
       "allSupports": "All Supports",
@@ -223,54 +223,54 @@
         "webcam": "Webcam"
       },
       "demoRenderer": {
-        "closeDemo": "[TRANSLATE] Chiudi demo"
+        "closeDemo": "Fermer la démo"
       },
       "flashcardRenderer": {
-        "showAnswer": "[TRANSLATE] Mostra Risposta",
-        "hideAnswer": "[TRANSLATE] Nascondi Risposta",
-        "showQuestion": "[TRANSLATE] Mostra domanda",
-        "noFlashcardsAvailable": "[TRANSLATE] Nessuna flashcard disponibile"
+        "showAnswer": "Afficher la réponse",
+        "hideAnswer": "Masquer la réponse",
+        "showQuestion": "Afficher la question",
+        "noFlashcardsAvailable": "Aucune flashcard disponible"
       },
       "imageRenderer": {
-        "imageAlt": "[TRANSLATE] Immagine contenuto",
-        "downloadImage": "[TRANSLATE] Scarica immagine",
-        "fullscreen": "[TRANSLATE] Schermo intero"
+        "imageAlt": "Image du contenu",
+        "downloadImage": "Télécharger l'image",
+        "fullscreen": "Plein écran"
       },
       "pdfRenderer": {
-        "openPdf": "[TRANSLATE] Apri PDF in una nuova scheda",
-        "downloadPdf": "[TRANSLATE] Scarica PDF"
+        "openPdf": "Ouvrir le PDF dans un nouvel onglet",
+        "downloadPdf": "Télécharger le PDF"
       },
       "quizRenderer": {
-        "startQuiz": "[TRANSLATE] Inizia Quiz"
+        "startQuiz": "Démarrer le quiz"
       },
       "calendarView": {
-        "loadingEvents": "[TRANSLATE] Caricamento eventi..."
+        "loadingEvents": "Chargement des événements..."
       },
       "conversationInput": {
-        "typePlaceholder": "[TRANSLATE] Scrivi un messaggio..."
+        "typePlaceholder": "Écris un message..."
       },
       "maestroSelectionPanel": {
-        "selectMaestro": "[TRANSLATE] Seleziona un Maestro",
-        "noMaestrosAvailable": "[TRANSLATE] Nessun Maestro disponibile"
+        "selectMaestro": "Sélectionnez un Maestro",
+        "noMaestrosAvailable": "Aucun Maestro disponible"
       },
       "emptyState": {
-        "noDataYet": "[TRANSLATE] Nessun dato ancora"
+        "noDataYet": "Aucune donnée pour le moment"
       },
       "materialCard": {
-        "dragToReorder": "[TRANSLATE] Trascina per riordinare. Usa frecce su/giù per spostare."
+        "dragToReorder": "Faites glisser pour réordonner. Utilisez les flèches haut/bas pour déplacer."
       },
       "previewPanel": {
-        "title": "[TRANSLATE] Anteprima",
-        "closeAriaLabel": "[TRANSLATE] Chiudi anteprima"
+        "title": "Aperçu",
+        "closeAriaLabel": "Fermer l'aperçu"
       },
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\"",
-      "arialabelscarica": "[TRANSLATE] aria-label=\"Scarica\"",
-      "nessunaImmagineDisponibile": "[TRANSLATE] Nessuna immagine disponibile",
-      "arialabelscaricaPdf": "[TRANSLATE] aria-label=\"Scarica PDF\"",
-      "apri": "[TRANSLATE] Apri",
-      "nessunaDomandaDisponibile": "[TRANSLATE] Nessuna domanda disponibile",
-      "arialabelmesePrecedente": "[TRANSLATE] aria-label=\"Mese precedente\"",
-      "arialabelcartaPrecedente": "[TRANSLATE] aria-label=\"Carta precedente\"",
+      "arialabelchiudi": "aria-label=\"Fermer\"",
+      "arialabelscarica": "aria-label=\"Télécharger\"",
+      "nessunaImmagineDisponibile": "Aucune image disponible",
+      "arialabelscaricaPdf": "aria-label=\"Télécharger le PDF\"",
+      "apri": "Ouvrir",
+      "nessunaDomandaDisponibile": "Aucune question disponible",
+      "arialabelmesePrecedente": "aria-label=\"Mois précédent\"",
+      "arialabelcartaPrecedente": "aria-label=\"Carte précédente\"",
       "knowledgeHub": "Knowledge Hub",
       "scadenza": "Scadenza:",
       "note": "Note:",
@@ -373,7 +373,7 @@
       "tutti": "tutti"
     },
     "calendar": {
-      "maestriSuggestions": "[TRANSLATE] Maestri Consigliati",
+      "maestriSuggestions": "Maestri recommandés",
       "addButton": "Aggiungi",
       "cancelButton": "Annulla",
       "dateLabel": "Data",
@@ -416,8 +416,8 @@
     "characterSwitcher": {
       "noCharactersFound": "No Characters Found",
       "recent": "Recent",
-      "chooseStudyPartner": "[TRANSLATE] Scegli con chi studiare",
-      "close": "[TRANSLATE] Chiudi"
+      "chooseStudyPartner": "Choisissez avec qui étudier",
+      "close": "Fermer"
     },
     "emptyMetrics": {
       "description": "Descrizione",
@@ -440,7 +440,7 @@
       "tapToFlip": "Tap To Flip"
     },
     "flashcards": {
-      "studyButton": "[TRANSLATE] Studia ({count} carte)",
+      "studyButton": "Étudier ({count} cartes)",
       "addCardButton": "Aggiungi Carta",
       "cancelButton": "Annulla",
       "cardBackPlaceholder": "Retro della carta",
@@ -462,13 +462,13 @@
       "title": "Flashcard"
     },
     "htmlSnippetsView": {
-      "title": "[TRANSLATE] Demo Interattive",
-      "subtitle": "[TRANSLATE] Esempi HTML creati dai Professori",
-      "allSubjects": "[TRANSLATE] Tutti",
-      "emptyState": "[TRANSLATE] Nessuna demo salvata",
-      "noResults": "[TRANSLATE] Nessun risultato",
-      "emptyStateDescription": "[TRANSLATE] Chiedi a un Professore di creare una demo interattiva!",
-      "noResultsDescription": "[TRANSLATE] Prova a modificare i filtri di ricerca",
+      "title": "Démos interactives",
+      "subtitle": "Exemples HTML créés par les Professeurs",
+      "allSubjects": "Tous",
+      "emptyState": "Aucune démo enregistrée",
+      "noResults": "Aucun résultat",
+      "emptyStateDescription": "Demande à un Professeur de créer une démo interactive !",
+      "noResultsDescription": "Essayez de modifier les filtres de recherche",
       "demoInterattive": "Demo Interattive",
       "esempiHtmlCreatiDaiProfessori": "Esempi HTML creati dai Professori",
       "cercaDemo": "Cerca demo...",
@@ -514,7 +514,7 @@
     },
     "maestroSelectionStep": {
       "noSpecificProfessor": "No Specific Professor",
-      "chooseProfessorFor": "[TRANSLATE] Scegli il Professore per",
+      "chooseProfessorFor": "Choisissez le Professeur pour",
       "scegliIlProfessorePer": "Scegli il Professore per"
     },
     "materialViewer": {
@@ -787,61 +787,61 @@
         "save": "Enregistrer",
         "add": "Ajouter"
       },
-      "cliccaQuotaggiungiquotPerCreare": "[TRANSLATE] Clicca &quot;Aggiungi&quot; per creare il tuo piano di studio!",
-      "arialabelelimina": "[TRANSLATE] aria-label=\"Elimina\"",
-      "arialabelmodifica": "[TRANSLATE] aria-label=\"Modifica\"",
-      "aggiungi": "[TRANSLATE] Aggiungi",
+      "cliccaQuotaggiungiquotPerCreare": "Cliquez sur &quot;Ajouter&quot; pour créer votre plan d'étude !",
+      "arialabelelimina": "aria-label=\"Supprimer\"",
+      "arialabelmodifica": "aria-label=\"Modifier\"",
+      "aggiungi": "Ajouter",
       "today": "oggi"
     },
     "gamification": {
       "leaderboard": {
-        "title": "[TRANSLATE] I tuoi Progressi",
-        "previousSeasonDifference": "[TRANSLATE] Differenza dalla stagione precedente",
+        "title": "Vos progrès",
+        "previousSeasonDifference": "Différence par rapport à la période précédente",
         "lv": "Lv.",
         "min": "min",
         "progressToNextLevel": "Progresso al prossimo livello: {progress}%",
         "sessionTimerAriaLabel": "Timer sessione: {time}, {state}"
       },
       "progressCard": {
-        "level": "[TRANSLATE] Livello",
-        "student": "[TRANSLATE] Studente",
-        "totalXp": "[TRANSLATE] XP totali",
-        "nextLevel": "[TRANSLATE] Prossimo livello",
-        "xpRemaining": "[TRANSLATE] XP rimanenti"
+        "level": "Niveau",
+        "student": "Étudiant",
+        "totalXp": "XP totaux",
+        "nextLevel": "Niveau suivant",
+        "xpRemaining": "XP restants"
       },
       "streakDisplay": {
-        "currentStreak": "[TRANSLATE] Serie attuale",
-        "bestStreak": "[TRANSLATE] Record personale",
-        "consecutiveDays": "[TRANSLATE] giorni consecutivi",
-        "record": "[TRANSLATE] record",
-        "studyTodayToMaintain": "[TRANSLATE] per mantenere la tua serie!",
-        "studyToday": "[TRANSLATE] Studia oggi",
-        "weekOfStudy": "[TRANSLATE] Fantastico! Una settimana di studio!",
-        "greatJobToday": "[TRANSLATE] Ottimo lavoro oggi!"
+        "currentStreak": "Série actuelle",
+        "bestStreak": "Record personnel",
+        "consecutiveDays": "jours consécutifs",
+        "record": "record",
+        "studyTodayToMaintain": "pour maintenir ta série !",
+        "studyToday": "Étudier aujourd'hui",
+        "weekOfStudy": "Fantastique ! Une semaine d'étude !",
+        "greatJobToday": "Excellent travail aujourd'hui !"
       },
       "xpInfo": {
-        "title": "[TRANSLATE] Come guadagnare XP",
-        "maestriTitle": "[TRANSLATE] Sessioni con i Maestri",
-        "maestriPerMinute": "[TRANSLATE] XP al minuto di conversazione",
-        "maestriPerQuestion": "[TRANSLATE] XP per ogni domanda che fai",
-        "maestriMaxPerSession": "[TRANSLATE] Massimo {max} XP per sessione",
-        "flashcardsTitle": "[TRANSLATE] Flashcards",
-        "flashcardAgain": "[TRANSLATE] XP per \"Ancora\" (ripeti)",
-        "flashcardHard": "[TRANSLATE] XP per \"Difficile\"",
-        "flashcardGood": "[TRANSLATE] XP per \"Bene\"",
-        "flashcardEasy": "[TRANSLATE] XP per \"Facile\"",
-        "flashcardBonusDecks": "[TRANSLATE] Bonus XP per completare mazzi interi",
-        "pomodoroTitle": "[TRANSLATE] Timer Pomodoro",
-        "pomodoroSingle": "[TRANSLATE] XP per pomodoro completato",
-        "pomodoroFirst": "[TRANSLATE] XP primo pomodoro del giorno",
-        "pomodoroCycleBonus": "[TRANSLATE] XP bonus ogni 4 pomodoro (ciclo completo)",
-        "quizTitle": "[TRANSLATE] Quiz",
-        "quizScoreBased": "[TRANSLATE] XP basati sul punteggio ottenuto",
-        "quizMasteryBonus": "[TRANSLATE] Bonus per maestria raggiunta (70%+)",
-        "tipLabel": "[TRANSLATE] Suggerimento:",
-        "tipMessage": "[TRANSLATE] I Maestri ti ricorderanno quando guadagni XP durante le conversazioni! Fai domande e partecipa attivamente per massimizzare i tuoi punti.",
+        "title": "Comment gagner des XP",
+        "maestriTitle": "Sessions avec les Maestri",
+        "maestriPerMinute": "XP par minute de conversation",
+        "maestriPerQuestion": "XP pour chaque question posée",
+        "maestriMaxPerSession": "Maximum {max} XP par session",
+        "flashcardsTitle": "Flashcards",
+        "flashcardAgain": "XP pour « Encore » (répéter)",
+        "flashcardHard": "XP pour « Difficile »",
+        "flashcardGood": "XP pour « Bien »",
+        "flashcardEasy": "XP pour « Facile »",
+        "flashcardBonusDecks": "Bonus XP pour compléter des paquets entiers",
+        "pomodoroTitle": "Minuteur Pomodoro",
+        "pomodoroSingle": "XP par pomodoro complété",
+        "pomodoroFirst": "XP premier pomodoro du jour",
+        "pomodoroCycleBonus": "XP bonus tous les 4 pomodoros (cycle complet)",
+        "quizTitle": "Quiz",
+        "quizScoreBased": "XP basés sur le score obtenu",
+        "quizMasteryBonus": "Bonus pour maîtrise atteinte (70 % +)",
+        "tipLabel": "Conseil :",
+        "tipMessage": "Les Maestri te rappelleront quand tu gagnes des XP pendant les conversations ! Pose des questions et participe activement pour maximiser tes points.",
         "learning": {
-          "title": "[TRANSLATE] Imparare",
+          "title": "Apprendre",
           "items": [
             "Chattare con i Maestri: +10 XP per messaggio",
             "Completare esercizi: +50 XP",
@@ -849,7 +849,7 @@
           ]
         },
         "currency": {
-          "title": "[TRANSLATE] MirrorBucks",
+          "title": "MirrorBucks",
           "items": [
             "Completare sessioni di studio: +100 MB",
             "Streak giornalieri: bonus crescenti",
@@ -857,7 +857,7 @@
           ]
         },
         "streak": {
-          "title": "[TRANSLATE] Streak",
+          "title": "Série",
           "items": [
             "Studiare almeno 10 minuti al giorno",
             "Più giorni consecutivi = più bonus",
@@ -865,81 +865,81 @@
           ]
         },
         "goals": {
-          "title": "[TRANSLATE] Obiettivi",
+          "title": "Objectifs",
           "items": [
             "Obiettivi giornalieri: +50 XP",
             "Obiettivi settimanali: +200 XP",
             "Obiettivi mensili: +1000 XP"
           ]
         },
-        "tip": "[TRANSLATE] Consiglio: Studia un po' ogni giorno per mantenere il tuo streak e guadagnare più XP!"
+        "tip": "Conseil : étudiez un peu chaque jour pour maintenir votre série et gagner plus d'XP !"
       }
     },
     "subjectSelection": {
-      "question": "[TRANSLATE] Di quale materia vuoi fare {tool}?"
+      "question": "Pour quelle matière veux-tu faire {tool} ?"
     },
     "htmlPreview": {
-      "saved": "[TRANSLATE] Salvato",
-      "saveDemo": "[TRANSLATE] Salva demo",
-      "exitFullscreen": "[TRANSLATE] Esci da schermo intero",
-      "fullscreen": "[TRANSLATE] Schermo intero",
-      "closeDemo": "[TRANSLATE] Chiudi demo"
+      "saved": "Enregistré",
+      "saveDemo": "Enregistrer la démo",
+      "exitFullscreen": "Quitter le plein écran",
+      "fullscreen": "Plein écran",
+      "closeDemo": "Fermer la démo"
     },
     "studyKit": {
-      "tabSummary": "[TRANSLATE] Riassunto",
-      "tabMindmap": "[TRANSLATE] Mappa",
-      "tabDemo": "[TRANSLATE] Demo",
-      "tabQuiz": "[TRANSLATE] Quiz",
-      "summaryNotAvailable": "[TRANSLATE] Riassunto non disponibile",
-      "mindmapNotAvailable": "[TRANSLATE] Mappa mentale non disponibile",
-      "demoNotAvailable": "[TRANSLATE] Demo interattiva non disponibile",
-      "quizNotAvailable": "[TRANSLATE] Quiz non disponibile",
-      "interactiveDemo": "[TRANSLATE] Demo Interattiva",
-      "interactiveSimulation": "[TRANSLATE] Simulazione interattiva",
-      "launchDemo": "[TRANSLATE] Avvia Demo Interattiva",
+      "tabSummary": "Résumé",
+      "tabMindmap": "Carte",
+      "tabDemo": "Démo",
+      "tabQuiz": "Quiz",
+      "summaryNotAvailable": "Résumé non disponible",
+      "mindmapNotAvailable": "Carte mentale non disponible",
+      "demoNotAvailable": "Démo interactive non disponible",
+      "quizNotAvailable": "Quiz non disponible",
+      "interactiveDemo": "Démo interactive",
+      "interactiveSimulation": "Simulation interactive",
+      "launchDemo": "Lancer la démo interactive",
       "demoModal": {
-        "close": "[TRANSLATE] Chiudi"
+        "close": "Fermer"
       },
       "header": {
-        "quiz": "[TRANSLATE] Quiz",
-        "questions": "[TRANSLATE] domande",
-        "demo": "[TRANSLATE] Demo"
+        "quiz": "Quiz",
+        "questions": "questions",
+        "demo": "Démo"
       },
       "uploadArea": {
-        "dragDropHere": "[TRANSLATE] Trascina qui i file",
-        "or": "[TRANSLATE] oppure",
-        "browse": "[TRANSLATE] sfoglia",
-        "supportedFormats": "[TRANSLATE] Formati supportati: PDF"
+        "dragDropHere": "Glissez les fichiers ici",
+        "or": "ou",
+        "browse": "parcourir",
+        "supportedFormats": "Formats pris en charge : PDF"
       },
       "uploadForm": {
-        "selectMaestroPlaceholder": "[TRANSLATE] Seleziona un Maestro..."
+        "selectMaestroPlaceholder": "Sélectionnez un Maestro..."
       },
-      "arialabelchiudiDemo": "[TRANSLATE] aria-label=\"Chiudi demo\"",
-      "arialabeleliminaStudyKit": "[TRANSLATE] aria-label=\"Elimina Study Kit\"",
-      "titlescaricaPdfAccessibilePer": "[TRANSLATE] title=\"Scarica PDF accessibile per DSA\"",
-      "arialabelscaricaPdfAccessibile": "[TRANSLATE] aria-label=\"Scarica PDF accessibile\"",
-      "selezionaPdf": "[TRANSLATE] Seleziona PDF",
-      "rimuovi": "[TRANSLATE] Rimuovi",
-      "arialabelrimuoviFile": "[TRANSLATE] aria-label=\"Rimuovi file\"",
-      "arialabelcaricaFilePdf": "[TRANSLATE] aria-label=\"Carica file PDF\"",
-      "materiaOpzionale": "[TRANSLATE] Materia (opzionale)"
+      "arialabelchiudiDemo": "aria-label=\"Fermer la démo\"",
+      "arialabeleliminaStudyKit": "aria-label=\"Supprimer le Study Kit\"",
+      "titlescaricaPdfAccessibilePer": "title=\"Télécharger le PDF accessible pour DSA\"",
+      "arialabelscaricaPdfAccessibile": "aria-label=\"Télécharger le PDF accessible\"",
+      "selezionaPdf": "Sélectionner un PDF",
+      "rimuovi": "Supprimer",
+      "arialabelrimuoviFile": "aria-label=\"Supprimer le fichier\"",
+      "arialabelcaricaFilePdf": "aria-label=\"Télécharger un fichier PDF\"",
+      "materiaOpzionale": "Matière (optionnel)"
     },
     "conversationInput": {
-      "arialabelinviaMessaggio": "[TRANSLATE] aria-label=\"Invia messaggio\""
+      "arialabelinviaMessaggio": "aria-label=\"Envoyer le message\""
     },
     "progressView": {
-      "iniziaUnaSessioneDi": "[TRANSLATE] Inizia una sessione di studio per vedere la tua cronologia!",
-      "alProssimoLivello": "[TRANSLATE] % al prossimo livello"
+      "iniziaUnaSessioneDi": "Démarrez une session d'étude pour voir votre historique !",
+      "alProssimoLivello": "% jusqu'au niveau suivant"
     },
     "typing": {
-      "iniziaGioco": "[TRANSLATE] Inizia Gioco"
+      "iniziaGioco": "Démarrer le jeu"
     },
     "emptyState": {
-      "nessunaMetricaDisponibile": "[TRANSLATE] Nessuna metrica disponibile"
+      "nessunaMetricaDisponibile": "Aucune métrique disponible"
     },
     "maestroSelectionPanel": {
-      "tornaAllaSelezioneMateria": "[TRANSLATE] Torna alla selezione materia",
-      "continuaSenzaMaestro": "[TRANSLATE] Continua senza Maestro"
+      "tornaAllaSelezioneMateria": "Retour à la sélection de la matière",
+      "continuaSenzaMaestro": "Continuer sans Maestro"
     },
     "filtraPerTipo": "Filtra per tipo",
     "filtri": "Filtri:",

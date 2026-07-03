@@ -30,34 +30,34 @@
       "takePhoto": "Tomar foto",
       "errors": {
         "permission": {
-          "title": "[TRANSLATE] Permesso fotocamera negato",
-          "message": "[TRANSLATE] Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
-          "instruction1": "[TRANSLATE] Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
-          "instruction2": "[TRANSLATE] Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
-          "instruction3": "[TRANSLATE] Seleziona \"Consenti\"",
-          "instruction4": "[TRANSLATE] Ricarica la pagina o premi il pulsante Riprova"
+          "title": "Permiso de cámara denegado",
+          "message": "Para usar la webcam, es necesario habilitar el acceso a la cámara en la configuración del navegador.",
+          "instruction1": "Haz clic en el icono del candado 🔒 en la barra de direcciones",
+          "instruction2": "Busca \"Cámara\" o \"Camera\" en la configuración",
+          "instruction3": "Selecciona \"Permitir\"",
+          "instruction4": "Recarga la página o pulsa el botón Reintentar"
         },
         "unavailable": {
-          "title": "[TRANSLATE] Fotocamera non disponibile",
-          "message": "[TRANSLATE] Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+          "title": "Cámara no disponible",
+          "message": "No se encontró ninguna cámara. Conecta una webcam o usa un dispositivo con cámara integrada."
         },
         "inUse": {
-          "title": "[TRANSLATE] Fotocamera in uso",
-          "message": "[TRANSLATE] La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app che potrebbero utilizzarla e riprova."
+          "title": "Cámara en uso",
+          "message": "La cámara ya está siendo utilizada por otra aplicación. Cierra las otras aplicaciones que puedan estar usándola y vuelve a intentarlo."
         },
         "timeout": {
-          "title": "[TRANSLATE] Timeout fotocamera",
-          "message": "[TRANSLATE] La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+          "title": "Tiempo de espera de la cámara agotado",
+          "message": "La cámara no responde. Comprueba que esté conectada correctamente y vuelve a intentarlo."
         },
         "generic": {
-          "title": "[TRANSLATE] Errore fotocamera",
-          "message": "[TRANSLATE] Impossibile accedere alla fotocamera. Verifica le impostazioni e riprova."
+          "title": "Error de cámara",
+          "message": "No se puede acceder a la cámara. Comprueba la configuración y vuelve a intentarlo."
         },
-        "retry": "[TRANSLATE] Riprova",
-        "close": "[TRANSLATE] Chiudi",
-        "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
+        "retry": "Reintentar",
+        "close": "Cerrar",
+        "howToEnable": "Cómo habilitar la cámara:"
       },
-      "selectCamera": "[TRANSLATE] Seleziona fotocamera",
+      "selectCamera": "Seleccionar cámara",
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
@@ -205,10 +205,10 @@
       "unsaved": "No guardado",
       "word": "Palabra",
       "words": "Palabras",
-      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
-      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
-      "deleteSection": "[TRANSLATE] Elimina sezione",
-      "editTitle": "[TRANSLATE] Modifica titolo",
+      "addKeyPoint": "Añadir punto",
+      "deleteKeyPoint": "Eliminar punto",
+      "deleteSection": "Eliminar sección",
+      "editTitle": "Editar título",
       "mappa": "Mappa",
       "flashcard": "Flashcard",
       "contenutoDellaSezione": "Contenuto della sezione",
@@ -381,12 +381,12 @@
       "ratingQuestion": "Pregunta de calificación",
       "label": "Tarjeta",
       "description": "Estudia con tarjetas para memorizar mejor",
-      "completed": "[TRANSLATE] Completato!",
-      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
-      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
-      "continue": "[TRANSLATE] Continua",
-      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
-      "navigationHint": "[TRANSLATE] Premi o scorri per valutare",
+      "completed": "¡Completado!",
+      "reviewedAllCards": "Has repasado todas las tarjetas de hoy.",
+      "cardsReviewedCount": "Tarjetas repasadas: {count}",
+      "continue": "Continuar",
+      "swipeHint": "Desliza a la izquierda para difícil, a la derecha para fácil",
+      "navigationHint": "Pulsa o desliza para valorar",
       "completato": "Completato!",
       "haiRivistoTutteLeCarteDiOggi": "Hai rivisto tutte le carte di oggi.",
       "continua": "Continua",
@@ -445,10 +445,10 @@
         "ariaLabel": "Alejar",
         "title": "Alejar"
       },
-      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "nodesCount": "({count} nodos)",
       "undo": {
-        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
-        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
+        "ariaLabel": "Deshacer última modificación",
+        "title": "Deshacer (Ctrl+Z)"
       }
     },
     "print": {
@@ -518,7 +518,7 @@
       "capabilityHomework": "Importar documentos para el asistente de tareas",
       "capabilityDocuments": "Acceder a tus documentos sin tener que descargarlos",
       "privacyNotice": "MirrorBuddy accede a los archivos solo con tu autorización. No almacenamos tus archivos de Drive.",
-      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive",
+      "selezionaDaGoogleDrive": "Seleccionar desde Google Drive",
       "googleDrive": "Google Drive",
       "privacy": "Privacy:"
     },
@@ -607,7 +607,7 @@
       "instructions": "Encuadra el documento o la pizarra y toma la foto"
     },
     "pomodoro": {
-      "iniziaFocus": "[TRANSLATE] Inizia Focus"
+      "iniziaFocus": "Iniciar Enfoque"
     },
     "passaggiDiCalcolo": "Passaggi di calcolo (",
     "label1": "Label",
@@ -660,9 +660,9 @@
     "toolResult": "Risultato strumento: {name}",
     "timerOption": "Timer {label}",
     "chartDefault": "grafico",
-    "statusBuilding": "[TRANSLATE] In costruzione...",
-    "statusCompleted": "[TRANSLATE] Completato!",
-    "statusError": "[TRANSLATE] Errore",
-    "statusCancelled": "[TRANSLATE] Annullato"
+    "statusBuilding": "En construcción...",
+    "statusCompleted": "¡Completado!",
+    "statusError": "Error",
+    "statusCancelled": "Cancelado"
   }
 }

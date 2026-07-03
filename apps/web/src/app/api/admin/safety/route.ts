@@ -3,19 +3,20 @@
  * F-15 - Provides real-time AI system health and safety event data
  * Compliance: AI Act Art.14 (human oversight for high-risk systems)
  *
- * Data sources:
- * - Compliance audit events
- * - Escalation events (crisis, jailbreak, content filter)
- * - Safety metrics and trends
+ * Data sources (D-07: durable stores only — in-memory buffers reset per
+ * serverless instance/cold start and must never back this route):
+ * - Compliance audit events (ComplianceAuditEntry table)
+ * - Escalation events (SafetyEvent table: crisis, jailbreak, content filter)
+ * - Safety metrics and trends (computed from ComplianceAuditEntry)
  */
 
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import {
-  getComplianceEntries,
-  getComplianceStatistics,
-  getRecentEscalations,
-  getUnresolvedEscalations,
+  getComplianceEntriesFromDb,
+  getComplianceStatisticsFromDb,
+  getRecentEscalationsFromDb,
+  getUnresolvedEscalationsFromDb,
 } from '@/lib/safety/server';
 import { prisma } from '@/lib/db';
 
@@ -72,28 +73,28 @@ export const GET = pipe(
   withSentry('/api/admin/safety'),
   withAdminReadOnly,
 )(async (): Promise<NextResponse<SafetyDashboardResponse | { error: string }>> => {
-  // Get compliance audit statistics
-  const statistics = getComplianceStatistics(30); // Last 30 days
-
-  // Get recent compliance events (last 20)
-  const recentComplianceEvents = getComplianceEntries({
-    limit: 20,
-  });
-
-  // Get escalation events
-  const recentEscalations = getRecentEscalations(1440); // Last 24 hours
-  const unresolvedEscalations = getUnresolvedEscalations();
-
-  // Get recent SafetyEvent records with userId/sessionId for admin actions
-  const safetyEvents = await prisma.safetyEvent.findMany({
-    where: {
-      timestamp: {
-        gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+  // D-07: all reads come from durable stores (DB), never in-memory buffers.
+  const [
+    statistics, // Compliance audit statistics (last 30 days)
+    recentComplianceEvents, // Recent compliance events (last 20)
+    recentEscalations, // Escalation events (last 24 hours)
+    unresolvedEscalations,
+    safetyEvents, // Recent SafetyEvent records with userId/sessionId for admin actions
+  ] = await Promise.all([
+    getComplianceStatisticsFromDb(30),
+    getComplianceEntriesFromDb({ limit: 20 }),
+    getRecentEscalationsFromDb(1440),
+    getUnresolvedEscalationsFromDb(),
+    prisma.safetyEvent.findMany({
+      where: {
+        timestamp: {
+          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+        },
       },
-    },
-    orderBy: { timestamp: 'desc' },
-    take: 20,
-  });
+      orderBy: { timestamp: 'desc' },
+      take: 20,
+    }),
+  ]);
 
   // Create a map of safety events by type for quick lookup
   const safetyEventMap = new Map(safetyEvents.map((e) => [e.type, e]));

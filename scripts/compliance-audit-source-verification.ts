@@ -266,8 +266,8 @@ async function runAudit(): Promise<void> {
       name: "Accessibility Client",
     },
     {
-      file: "src/components/consent/cookie-consent-wall.tsx",
-      name: "Cookie Consent Wall",
+      file: "src/components/consent/unified-consent-wall.tsx",
+      name: "Unified Consent Wall",
     },
   ];
 

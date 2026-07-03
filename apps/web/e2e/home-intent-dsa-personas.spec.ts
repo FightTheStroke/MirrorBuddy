@@ -1,5 +1,10 @@
 import { test, expect, openA11yPanel } from './fixtures/a11y-fixtures';
-import { mockOnboarding, mockHomePageAPIs, mockTracking } from './fixtures/api-mocks';
+import {
+  mockOnboarding,
+  mockHomePageAPIs,
+  mockTracking,
+  mockTrialTier,
+} from './fixtures/api-mocks';
 import {
   seedPersonaProfile,
   stubSpeechSynthesis,
@@ -40,6 +45,11 @@ test.beforeEach(async ({ page }) => {
   await mockHomePageAPIs(page);
   await mockTracking(page);
   await mockHealthyUsage(page);
+  // The global storageState authenticates every context as a registered
+  // (Base) user; the personas are Trial children, so force the Trial tier
+  // response (see mockTrialTier docs). The Base test below overrides this
+  // with mockBaseTier (later page.route registrations win).
+  await mockTrialTier(page);
 });
 
 const htmlClasses = (page: import('@playwright/test').Page) =>
