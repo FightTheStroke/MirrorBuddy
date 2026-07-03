@@ -39,7 +39,7 @@ This matrix provides a comprehensive mapping of compliance requirements across a
 | **AI Act Compliance**     |                                                               |                                                               |                                                                |                                                                 |                                                            |
 | National Implementation   | L.132/2025                                                    | EU AI Act                                                     | EU AI Act                                                      | EU AI Act                                                       | UK AI Act (pending)                                        |
 | Authority                 | AgID                                                          | AEPD                                                          | CNIL                                                           | BfDI                                                            | ICO                                                        |
-| High-Risk Classification  | Yes                                                           | Yes                                                           | Yes                                                            | Yes                                                             | Yes                                                        |
+| High-Risk Classification  | Yes (precautionary)\*                                         | Yes (precautionary)\*                                         | Yes (precautionary)\*                                          | Yes (precautionary)\*                                           | Yes (precautionary)\*                                      |
 | Documentation             | `docs/compliance/AI-RISK-CLASSIFICATION.md`                   | `docs/compliance/AI-RISK-CLASSIFICATION.md`                   | `docs/compliance/AI-RISK-CLASSIFICATION.md`                    | `docs/compliance/AI-RISK-CLASSIFICATION.md`                     | `docs/compliance/AI-RISK-CLASSIFICATION.md`                |
 | **Data Protection**       |                                                               |                                                               |                                                                |                                                                 |                                                            |
 | Documentation             | `docs/compliance/countries/italy/data-protection.md`          | `docs/compliance/countries/spain/data-protection.md`          | `docs/compliance/countries/france/data-protection.md`          | `docs/compliance/countries/germany/data-protection.md`          | `docs/compliance/countries/uk/data-protection.md`          |
@@ -50,7 +50,10 @@ This matrix provides a comprehensive mapping of compliance requirements across a
 | Cookie Consent            | ✅ Implemented                                                | ✅ Implemented                                                | ✅ Implemented                                                 | ✅ Implemented                                                  | ✅ Implemented                                             |
 | Accessibility Statement   | ✅ Complete                                                   | ✅ Complete                                                   | ✅ Complete                                                    | ✅ Complete                                                     | ✅ Complete                                                |
 | Data Protection Docs      | ✅ Complete                                                   | ✅ Complete                                                   | ✅ Complete                                                    | ✅ Complete                                                     | ✅ Complete                                                |
-| AI Compliance Docs        | ✅ Complete                                                   | ✅ Complete                                                   | ✅ Complete                                                    | ✅ Complete                                                     | ✅ Complete                                                |
+| AI Compliance Docs†       | ✅ Complete                                                   | ✅ Complete                                                   | ✅ Complete                                                    | ✅ Complete                                                     | ✅ Complete                                                |
+
+\* High-risk classification is on a precautionary basis; final classification is deferred to legal review (direct-to-consumer deployment vs. Annex III(3)(b) institutional nexus; Article 6(3) filter). See `AI-ACT-REMEDIATION-TRACKER.md`.
+† "Complete" reflects that the required documents exist, not that substantive AI Act compliance is achieved — see the "AI Compliance" checklist below and `AI-ACT-REMEDIATION-TRACKER.md` for current status on CE marking, ISO 27001, notified body, bias-testing, and the PMM plan.
 
 ---
 
@@ -112,7 +115,7 @@ This matrix provides a comprehensive mapping of compliance requirements across a
 
 **Common Requirements (All Countries):**
 
-- High-risk classification
+- High-risk classification (precautionary; final classification deferred to legal review — see `AI-ACT-REMEDIATION-TRACKER.md`)
 - Technical documentation
 - Risk management system
 - Human oversight
@@ -195,8 +198,13 @@ docs/compliance/countries/
 ### AI Compliance
 
 - [x] AI Risk Classification documented
-- [x] High-risk classification verified
+- [x] High-risk classification documented (precautionary; final classification deferred to legal review — see `AI-ACT-REMEDIATION-TRACKER.md`)
 - [x] Regulatory contacts documented
+- [ ] CE marking affixed (planned)
+- [ ] ISO 27001 certified (roadmap only)
+- [ ] Notified body engaged (not yet engaged)
+- [ ] Student bias-testing conducted (planned / not yet conducted)
+- [ ] Post-Market Monitoring plan finalized (currently in DRAFT)
 
 ---
 
@@ -243,14 +251,14 @@ docs/compliance/countries/
 
 ## Compliance Status Summary
 
-| Category                 | Status                | Coverage                                                                                  |
-| ------------------------ | --------------------- | ----------------------------------------------------------------------------------------- |
-| **GDPR/Data Protection** | ✅ Complete           | Country-specific data protection docs created (5/5)                                       |
-| **Cookie Consent**       | ✅ Partial            | Implementation complete (5/5). Docs complete for IT/DE/UK/ES/FR (5/5, ES/FR from Plan 90) |
-| **Accessibility**        | ✅ Complete           | Accessibility compliance statements created (5/5)                                         |
-| **AI Act Compliance**    | In Progress (Q2 2026) | Risk classification and policy complete. CE conformity assessment planned Q2 2026         |
-| **Regulatory Contacts**  | ✅ Complete           | AI regulatory contact docs created (5/5)                                                  |
-| **Documentation**        | ✅ Complete           | DPIA, Model Card, AI Policy, country-specific docs all complete (W3)                      |
+| Category                 | Status      | Coverage                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **GDPR/Data Protection** | ✅ Complete | Country-specific data protection docs created (5/5)                                                                                                                                                                                                                                                                                                    |
+| **Cookie Consent**       | ✅ Partial  | Implementation complete (5/5). Docs complete for IT/DE/UK/ES/FR (5/5, ES/FR from Plan 90)                                                                                                                                                                                                                                                              |
+| **Accessibility**        | ✅ Complete | Accessibility compliance statements created (5/5)                                                                                                                                                                                                                                                                                                      |
+| **AI Act Compliance**    | In Progress | High-risk classification (precautionary) and policy documented; final classification deferred to legal review. CE conformity assessment planned Q2 2026; CE marking NOT affixed; ISO 27001 not certified (roadmap only); notified body NOT engaged; student bias-testing planned/not conducted; PMM plan in DRAFT. See `AI-ACT-REMEDIATION-TRACKER.md` |
+| **Regulatory Contacts**  | ✅ Complete | AI regulatory contact docs created (5/5)                                                                                                                                                                                                                                                                                                               |
+| **Documentation**        | ✅ Complete | DPIA, Model Card, AI Policy, country-specific docs all complete (W3)                                                                                                                                                                                                                                                                                   |
 
 ---
 

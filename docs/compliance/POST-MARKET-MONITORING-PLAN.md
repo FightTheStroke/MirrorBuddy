@@ -10,13 +10,13 @@
 
 ## 1. Scope and Objectives
 
-This Post-Market Monitoring Plan is established in accordance with **EU AI Act Article 72** (Regulation 2024/1689) for the MirrorBuddy educational platform, classified as a **limited-risk AI system** under Article 52.
+This Post-Market Monitoring Plan is established in accordance with **EU AI Act Article 72** (Regulation 2024/1689) for the MirrorBuddy educational platform. MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See [AI-ACT-REMEDIATION-TRACKER.md](AI-ACT-REMEDIATION-TRACKER.md).
 
 ### 1.1 System Identification
 
 - **System Name**: MirrorBuddy
 - **Provider**: Fightthestroke Foundation
-- **Classification**: Limited-risk AI system (educational AI for minors with learning differences)
+- **Classification**: High-risk AI system, precautionary basis under Article 6(2)/Annex III(3)(b) — final classification pending legal review (see Scope and Objectives above) (educational AI for minors with learning differences)
 - **Deployment Regions**: Italy, France, Germany, Spain, United Kingdom
 - **Target Users**: Students aged 8-18 with learning differences (dyslexia, ADHD, etc.)
 
