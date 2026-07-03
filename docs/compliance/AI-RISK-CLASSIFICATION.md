@@ -4,12 +4,17 @@
 
 ## Executive Summary
 
-MirrorBuddy is classified as a **HIGH-RISK AI system** under EU AI Act Article 6(1) and Annex III, point 3(b) because it:
+MirrorBuddy is treated as a **HIGH-RISK AI system** under EU AI Act Article 6(1) and Annex III, point 3(b) because it:
 
 1. Deploys AI in **education for minors** with learning differences
 2. Influences **educational decisions and learning pathways**
-3. Processes **sensitive data** (diagnoses of cognitive disabilities)
-4. Implements **biometric processing** (voice recognition)
+
+Treated as high-risk on a precautionary basis; final classification deferred to qualified legal review weighing (a) the direct-to-consumer deployment outside educational institutions and (b) the Article 6(3) filter (disapplied where performance profiling occurs).
+
+**Scope clarifications — data processing:**
+
+- Speech-to-text (transcription) and text-to-speech do not constitute biometric data processing within the meaning of Article 4(14) GDPR — they do not uniquely identify the person. The system performs no biometric identification or categorisation. (Note: a dormant prosodic emotion-inference module exists in the codebase and is scheduled for removal — see AI-ACT-REMEDIATION-TRACKER.md.)
+- No clinical diagnosis is stored as such; accessibility profiles are opt-in proxies that may qualify as health data (Art. 9 GDPR) by inference, processed on a consent basis. No special-category data is used for model training.
 
 This classification triggers **mandatory conformity assessment** requirements under Chapter III (Articles 8-15) of the EU AI Act.
 
@@ -26,11 +31,13 @@ An AI system is classified as high-risk if:
 (b) it is in one of the categories listed in Annex III
 ```
 
-MirrorBuddy meets criterion **(b)** via **Annex III, point 3(b)**: _"AI systems intended to be used in education or vocational training for determining or significantly influencing access to or placement within educational and vocational institutions."_
+MirrorBuddy meets criterion **(b)** via **Annex III, point 3(b)**: _"AI systems intended to be used to evaluate learning outcomes, including when those outcomes are used to steer the learning process of natural persons in education and vocational training institutions at all levels."_
 
 ### Annex III, Point 3(b) - Educational Classification
 
 MirrorBuddy qualifies under this point because:
+
+> **Note (pending legal review — see AI-ACT-REMEDIATION-TRACKER.md, P1-2):** the qualifying analysis below (table and "Legal Interpretation") was originally framed on the superseded 2021-draft "access/placement within institutions" wording. Under the enacted Annex III(3)(b) text — "evaluate learning outcomes … steer the learning process" — the legal theory shifts (and note the direct-to-consumer deployment, outside institutions). This section is retained for traceability and flagged for qualified legal re-assessment.
 
 | Criterion            | MirrorBuddy Implementation                                         | Assessment                     |
 | -------------------- | ------------------------------------------------------------------ | ------------------------------ |
@@ -129,15 +136,15 @@ Humans must retain **meaningful control** over AI decisions:
 
 **Applicable Law**: EU AI Act 2024/1689 (effective August 2025)
 
-| Requirement                            | Implementation                                | Status             |
-| -------------------------------------- | --------------------------------------------- | ------------------ |
-| **Article 6**: Risk classification     | HIGH-RISK determined                          | ✓ Complete         |
-| **Article 8**: Quality management      | Risk register, safety dashboard, QA protocols | ✓ Complete         |
-| **Article 11**: Technical docs         | Model cards, DPIA, architecture docs          | ✓ 80% Complete     |
-| **Article 13**: Transparency           | Banners, privacy policy, user disclosures     | ✓ 90% Complete     |
-| **Article 14**: Human oversight        | Teacher/parent dashboards, escalation         | ✓ Complete         |
-| **Article 17**: Conformity assessment  | CE marking procedure (pending)                | ⏳ Planned Q2 2026 |
-| **Article 49**: Post-market monitoring | Safety dashboard, incident logs               | ✓ Complete         |
+| Requirement                            | Implementation                                | Status                  |
+| -------------------------------------- | --------------------------------------------- | ----------------------- |
+| **Article 6**: Risk classification     | HIGH-RISK (precautionary basis)               | ⏳ Pending legal review |
+| **Article 8**: Quality management      | Risk register, safety dashboard, QA protocols | ✓ Complete              |
+| **Article 11**: Technical docs         | Model cards, DPIA, architecture docs          | ✓ 80% Complete          |
+| **Article 13**: Transparency           | Banners, privacy policy, user disclosures     | ✓ 90% Complete          |
+| **Article 14**: Human oversight        | Teacher/parent dashboards, escalation         | ✓ Complete              |
+| **Article 17**: Conformity assessment  | CE marking procedure (pending)                | ⏳ Planned Q2 2026      |
+| **Article 49**: Post-market monitoring | Safety dashboard, incident logs               | ✓ Complete              |
 
 **Timeline**:
 

@@ -70,7 +70,7 @@
 
 - Free-form text queries
 - Voice input (multilingual ASR)
-- User profile (age, diagnosed conditions)
+- User profile (age, self-declared accessibility needs — opt-in proxies possibly qualifying as Art. 9 health data by inference; no clinical diagnosis stored as such)
 - Session metadata (timestamp, duration, subject)
 
 ---
@@ -156,7 +156,7 @@
 
 **For Regulators & Authorities**:
 
-- This system is classified as **high-risk** under AI Act Article 6 (educational + minors)
+- This system is classified as **high-risk** under AI Act Article 6 (educational + minors), on a precautionary basis; final classification deferred to legal review (direct-to-consumer deployment vs. Annex III(3)(b) institutional nexus; Article 6(3) filter). See AI-ACT-REMEDIATION-TRACKER.md.
 - Compliance measures align with EU AI Act Chapter III (transparency, human oversight)
 - Full DPIA available in `/docs/compliance/DPIA.md`
 - Risk register available in `/docs/compliance/AI-RISK-REGISTER.md`

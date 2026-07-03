@@ -3,24 +3,25 @@
 **Document Type**: High-Risk AI System Conformity Assessment
 **Regulatory Basis**: EU AI Act 2024/1689 (Chapter III, Articles 8-15)
 **System**: MirrorBuddy AI Tutoring Platform
-**Classification**: HIGH-RISK (Annex III, Point 3)
+**Classification**: HIGH-RISK (Annex III, Point 3) — precautionary; final classification deferred to qualified legal review (see Executive Summary)
 **Assessment Date**: January 27, 2026
-**Status**: IN PROGRESS - Targeting Q2 2026 CE Certification
+**Status**: IN PROGRESS - Targeting Q2 2026 CE Certification (CE marking NOT yet affixed — planned; conformity assessment not concluded)
 
 ---
 
 ## Executive Summary
 
-MirrorBuddy is a **HIGH-RISK AI system** under EU AI Act Article 6(1) and Annex III, Point 3(b) because it:
+MirrorBuddy is treated as a **HIGH-RISK AI system** under EU AI Act Article 6(1) and Annex III, Point 3(b) — on a precautionary basis; final classification deferred to qualified legal review weighing (a) the direct-to-consumer deployment outside educational institutions — a nexus Annex III(3)(b) requires — and (b) the Article 6(3) filter (disapplied where FSRS/quiz performance profiling occurs). It is treated as high-risk because it:
 
 - Deploys AI in **education for minors** (ages 6-19) with learning differences
 - **Influences learning pathways** and content access via adaptive algorithms
-- Processes **sensitive personal data** (diagnoses of neurodevelopmental conditions)
-- Includes **biometric processing** (voice recognition for speech-to-text)
+- Processes **accessibility-related data**: No clinical diagnosis stored as such; accessibility profiles are opt-in proxies possibly qualifying as Art. 9 health data by inference, consent-based; not used for training
 
-This assessment confirms MirrorBuddy's compliance roadmap against all high-risk requirements (Articles 8-15) and identifies gaps requiring remediation before market notification.
+**Note on biometrics**: Speech-to-text is NOT biometric processing under Article 4(14) GDPR (no unique identification). No biometric identification or categorisation is performed. The applicable high-risk trigger is Annex III(3)(b) (evaluating/steering learning), not biometrics.
 
-**Conformity Status**: 78% Complete | Gaps: Risk management audit trail, Post-market monitoring plan formalization
+This assessment reviews MirrorBuddy's compliance roadmap against all high-risk requirements (Articles 8-15) and identifies gaps requiring remediation before market notification.
+
+**Conformity Status**: 78% Complete (self-assessed; see AI-ACT-REMEDIATION-TRACKER.md for honest per-item status) | Gaps: Risk management audit trail, Post-market monitoring plan formalization
 
 ---
 
@@ -28,13 +29,15 @@ This assessment confirms MirrorBuddy's compliance roadmap against all high-risk 
 
 ### Article 6 - Risk Assessment Framework
 
-**Criterion Met**: Annex III, Point 3(b) - Educational AI
+**Criterion (precautionary)**: Annex III, Point 3(b) - Educational AI — final classification deferred to qualified legal review
 
 MirrorBuddy qualifies under Annex III, Point 3(b):
 
-> _"AI systems intended to be used in education or vocational training for determining or significantly influencing access to or placement within educational and vocational institutions."_
+> _"AI systems intended to be used to evaluate learning outcomes, including when those outcomes are used to steer the learning process of natural persons in education and vocational training institutions at all levels."_
 
 **MirrorBuddy Application**:
+
+> **Note (pending legal review — see AI-ACT-REMEDIATION-TRACKER.md, P1-2):** the row labels below ("Influence Decision", "Access Placement") echo the superseded 2021-draft wording. Under the enacted 3(b) text (evaluate learning outcomes / steer the learning process) the theory shifts; retained for traceability and flagged for qualified legal re-assessment.
 
 | Criterion              | Implementation                     | Assessment  |
 | ---------------------- | ---------------------------------- | ----------- |
@@ -43,7 +46,7 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 | **Influence Decision** | Learning path recommendations      | ✓ Qualifies |
 | **Access Placement**   | Feature access by learning profile | ✓ Qualifies |
 
-**Italian Law 132/2025**: Confirmed as high-risk educational system. Supplier liability applies (Article 2).
+**Italian Law 132/2025**: Treated as a high-risk educational system on a precautionary basis, pending qualified legal review. Supplier liability applies (Article 2).
 
 ---
 
@@ -82,13 +85,13 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 
 **Requirement**: Document training data, quality measures, and bias mitigation.
 
-| Data Aspect             | Status            | Evidence                          |
-| ----------------------- | ----------------- | --------------------------------- |
-| Training data sourcing  | ✓ Documented      | MODEL-CARD.md, knowledge bases    |
-| Data quality validation | ✓ Implemented     | Subject expert reviews            |
-| Bias detection          | ✓ Quarterly audit | BIAS-AUDIT-REPORT.md              |
-| Data minimization       | ✓ Implemented     | DPIA.md, retention limits 90 days |
-| Encryption at rest      | ✓ Implemented     | AES-256-GCM, TOKEN_ENCRYPTION_KEY |
+| Data Aspect             | Status        | Evidence                                                                                |
+| ----------------------- | ------------- | --------------------------------------------------------------------------------------- |
+| Training data sourcing  | ✓ Documented  | MODEL-CARD.md, knowledge bases                                                          |
+| Data quality validation | ✓ Implemented | Subject expert reviews                                                                  |
+| Bias detection          | ⚠️ Planned    | BIAS-AUDIT-REPORT.md (framework only; student bias-testing planned / not yet conducted) |
+| Data minimization       | ✓ Implemented | DPIA.md, retention limits 90 days                                                       |
+| Encryption at rest      | ✓ Implemented | AES-256-GCM, TOKEN_ENCRYPTION_KEY                                                       |
 
 **Gap**: Formal data governance SOP not documented. **Action**: Create DATA-GOVERNANCE-SOP.md (Q1 2026).
 
@@ -96,17 +99,17 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 
 **Requirement**: Maintain comprehensive technical file for conformity assessment and post-market monitoring.
 
-| Document              | Status        | Path                             |
-| --------------------- | ------------- | -------------------------------- |
-| System architecture   | ✓ Complete    | CLAUDE.md (project overview)     |
-| Model cards           | ✓ Complete    | MODEL-CARD.md                    |
-| Risk assessment       | ✓ Complete    | AI-RISK-REGISTER.md              |
-| Testing protocols     | ✓ Complete    | E2E + unit test suites           |
-| Safety guidelines     | ✓ Complete    | SAFETY_GUIDELINES.ts (embedded)  |
-| Deployment procedures | ✓ Complete    | .claude/rules/vercel-\*.md       |
-| Version control       | ✓ Implemented | Git history, semantic versioning |
+| Document              | Status                 | Path                                                               |
+| --------------------- | ---------------------- | ------------------------------------------------------------------ |
+| System architecture   | ✓ Complete             | CLAUDE.md (project overview)                                       |
+| Model cards           | ⚠️ Metrics placeholder | MODEL-CARD.md (metrics are placeholders pending formal evaluation) |
+| Risk assessment       | ✓ Complete             | AI-RISK-REGISTER.md                                                |
+| Testing protocols     | ✓ Complete             | E2E + unit test suites                                             |
+| Safety guidelines     | ✓ Complete             | SAFETY_GUIDELINES.ts (embedded)                                    |
+| Deployment procedures | ✓ Complete             | .claude/rules/vercel-\*.md                                         |
+| Version control       | ✓ Implemented          | Git history, semantic versioning                                   |
 
-**Status**: 95% complete. Notified body audit will verify completeness.
+**Status**: 95% complete (self-assessed; see AI-ACT-REMEDIATION-TRACKER.md for honest per-item status). Notified body NOT engaged (planned); its audit will verify completeness.
 
 ### Article 12: Record-Keeping & Audit Trails
 
@@ -157,14 +160,14 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 
 **Requirement**: Maintain accuracy through testing, detect adversarial inputs, and protect against cyber attacks.
 
-| Control               | Status            | Details                          |
-| --------------------- | ----------------- | -------------------------------- |
-| Accuracy benchmarking | ✓ Baseline set    | MODEL-CARD.md performance        |
-| Adversarial testing   | ✓ Jailbreak tests | Quarterly security audits        |
-| Input validation      | ✓ Implemented     | Schema validation, length limits |
-| Encryption in transit | ✓ TLS 1.3         | Vercel deployment default        |
-| Dependency scanning   | ✓ npm audit       | Pre-push gate                    |
-| OWASP compliance      | ✓ 80%             | Security-hardening.md (ADR 0080) |
+| Control               | Status                 | Details                                                          |
+| --------------------- | ---------------------- | ---------------------------------------------------------------- |
+| Accuracy benchmarking | ⚠️ Pending formal eval | MODEL-CARD.md metrics are placeholders pending formal evaluation |
+| Adversarial testing   | ✓ Jailbreak tests      | Quarterly security audits                                        |
+| Input validation      | ✓ Implemented          | Schema validation, length limits                                 |
+| Encryption in transit | ✓ TLS 1.3              | Vercel deployment default                                        |
+| Dependency scanning   | ✓ npm audit            | Pre-push gate                                                    |
+| OWASP compliance      | ✓ 80%                  | Security-hardening.md (ADR 0080)                                 |
 
 ---
 
@@ -183,6 +186,8 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 | 14      | Human Oversight            | 100%       | Implemented  |
 | 15      | Accuracy & Cybersecurity   | 85%        | Monitoring   |
 | **SUM** | **Weighted Average**       | **90%**    | **On Track** |
+
+> **Note**: All percentages in this document are self-assessed; see AI-ACT-REMEDIATION-TRACKER.md for honest per-item status. Figures are internal estimates, not third-party-verified conformity.
 
 ---
 
@@ -223,7 +228,7 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 | **Legal Counsel**            | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
 | **CISO / Security Lead**     | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
 
-**Final Certification**: Pending notified body assessment (Q2 2026).
+**Final Certification**: Pending. Notified body NOT engaged (planned); CE marking NOT affixed; conformity assessment not concluded (target Q2 2026).
 
 ---
 
