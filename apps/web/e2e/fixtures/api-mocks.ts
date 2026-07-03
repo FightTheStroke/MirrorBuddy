@@ -103,6 +103,47 @@ export async function mockTrialSession(page: Page, visitorId: string) {
   });
 }
 
+/**
+ * Mock /api/user/tier-features with the ANONYMOUS Trial response.
+ *
+ * WHY THIS IS NEEDED: playwright.config.ts applies a global storageState
+ * (e2e/.auth/storage-state.json, written by global-setup.ts) that contains a
+ * SIGNED `mirrorbuddy-user-id` auth cookie for a registered E2E test user.
+ * Every test context is therefore AUTHENTICATED, and the real
+ * /api/user/tier-features route resolves getEffectiveTier(userId) → Base tier
+ * (registered, no subscription) → quizzes/mindMaps ENABLED. Specs that assert
+ * the Trial-locked child UX (home-intent*) must install this mock to simulate
+ * the anonymous Trial visitor the storage state otherwise hides.
+ *
+ * Shape mirrors the real route for an anonymous visitor with the seeded Trial
+ * tier (src/app/api/user/tier-features/route.ts converts every feature value
+ * with Boolean(): arrays/numbers → true). Keep in sync with
+ * src/lib/seeds/tier-seed.ts + src/lib/tier/tier-fallbacks.ts.
+ */
+export async function mockTrialTier(page: Page) {
+  await page.route('**/api/user/tier-features', (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        tier: 'Trial',
+        features: {
+          chat: true,
+          voice: true,
+          flashcards: true,
+          quizzes: false,
+          mindMaps: false,
+          tools: true, // Boolean(['pdf', 'chat'])
+          maestriLimit: true, // Boolean(3)
+          coachesAvailable: true, // Boolean(['melissa'])
+          buddiesAvailable: true, // Boolean(['mario'])
+        },
+        isSimulated: false,
+      }),
+    });
+  });
+}
+
 /** Mock /api/onboarding to return completed state (prevents /welcome redirect) */
 export async function mockOnboarding(page: Page) {
   await page.route('**/api/onboarding', (route) => {

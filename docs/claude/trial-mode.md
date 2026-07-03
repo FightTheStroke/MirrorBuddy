@@ -7,7 +7,7 @@
 | Key          | Value                                         |
 | ------------ | --------------------------------------------- |
 | Path         | `src/lib/trial/`                              |
-| Consent UI   | `src/components/trial/trial-consent-gate.tsx` |
+| Consent UI   | `src/components/consent/unified-consent-wall.tsx` |
 | Tier Service | `src/lib/tier/tier-service.ts`                |
 | Anti-Abuse   | `src/lib/trial/anti-abuse.ts`                 |
 | ADR          | 0056, 0057, 0098                              |
@@ -30,14 +30,16 @@
 - Cookie clearing alone does not reset limits (IP hash persists server-side)
 - Global budget cap: EUR 100/month across all trials (Redis-backed)
 
-## GDPR Consent Gate (ADR 0098)
+## GDPR Consent Gate (ADR 0098 — gate component superseded, TJ.3)
 
-Trial activation requires explicit consent before any data collection:
+Trial activation requires explicit consent before any data collection. The
+former `<TrialConsentGate>` component was replaced by the app-wide
+`UnifiedConsentWall` mounted in `src/components/providers.tsx`:
 
 ```typescript
-// Wraps trial UI -- blocks children until consent given
-<TrialConsentGate>{children}</TrialConsentGate>
-// Sets cookie: mirrorbuddy-trial-consent (365 days)
+// Wraps the whole app -- blocks children until consent given
+<UnifiedConsentWall>{children}</UnifiedConsentWall>
+// Consent cookie: mirrorbuddy-trial-consent (365 days)
 // API: POST /api/trial/session returns 403 without consent cookie
 ```
 

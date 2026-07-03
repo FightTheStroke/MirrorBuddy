@@ -76,8 +76,10 @@ describe("Tier Seeding", () => {
         chat: true,
         voice: true,
         flashcards: true,
-        quizzes: true,
-        mindMaps: true,
+        // Trial gates the mindMaps ("Studiare") and quizzes ("Mettiti alla
+        // prova") intents — see .claude/rules/tier.md + tier-fallbacks.ts.
+        quizzes: false,
+        mindMaps: false,
         tools: ["pdf", "chat"],
         maestriLimit: 3,
         coachesAvailable: ["melissa"],

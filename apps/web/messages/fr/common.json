@@ -170,30 +170,30 @@
       "logoutConfirm": "Êtes-vous sûr de vouloir vous déconnecter ?"
     },
     "notifications": {
-      "cancellaTutteLeNotifiche": "[TRANSLATE] Cancella tutte le notifiche",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\"",
-      "arialabeleliminaNotifica": "[TRANSLATE] aria-label=\"Elimina notifica\""
+      "cancellaTutteLeNotifiche": "Effacer toutes les notifications",
+      "arialabelchiudi": "aria-label=\"Fermer\"",
+      "arialabeleliminaNotifica": "aria-label=\"Supprimer la notification\""
     },
     "pwa": {
-      "selezionaQuotaggiungiAllaSchermata": "[TRANSLATE] Seleziona &quot;Aggiungi alla schermata Home&quot;",
-      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
+      "selezionaQuotaggiungiAllaSchermata": "Sélectionnez &quot;Ajouter à l'écran d'accueil&quot;",
+      "arialabelchiudi": "aria-label=\"Fermer\""
     },
     "tier": {
-      "allMaestri": "[TRANSLATE] All Maestri"
+      "allMaestri": "Tous les Maestri"
     },
     "trial": {
-      "continuaConLaProva": "[TRANSLATE] Continua con la prova limitata",
-      "tuttiI17Maestri": "[TRANSLATE] Tutti i 17 Maestri e 5 Coach",
-      "chatIllimitateConI": "[TRANSLATE] Chat illimitate con i Maestri",
-      "registratiPerAccessoIllimitato": "[TRANSLATE] Registrati per accesso illimitato",
-      "3Maestri": "[TRANSLATE] 3 Maestri",
-      "vuoiLaposaccessoCompletoRichiedi": "[TRANSLATE] Vuoi l&apos;accesso completo? Richiedi la beta",
-      "saltaIntroduzione": "[TRANSLATE] Salta introduzione",
-      "avanti": "[TRANSLATE] Avanti",
-      "accessoCompletoATutti": "[TRANSLATE] Accesso completo a tutti i Maestri e strumenti"
+      "continuaConLaProva": "Continuer avec l'essai limité",
+      "tuttiI17Maestri": "Les 17 Maestri et 5 Coach",
+      "chatIllimitateConI": "Chats illimités avec les Maestri",
+      "registratiPerAccessoIllimitato": "Inscrivez-vous pour un accès illimité",
+      "3Maestri": "3 Maestri",
+      "vuoiLaposaccessoCompletoRichiedi": "Vous voulez l&apos;accès complet ? Demandez la bêta",
+      "saltaIntroduzione": "Passer l'introduction",
+      "avanti": "Suivant",
+      "accessoCompletoATutti": "Accès complet à tous les Maestri et outils"
     },
     "toast": {
-      "arialabelchiudiNotifica": "[TRANSLATE] aria-label=\"Chiudi notifica\""
+      "arialabelchiudiNotifica": "aria-label=\"Fermer la notification\""
     },
     "registrationReceived": "Registration Received",
     "weWillContactYouWithin24HoursToSetUpYourSchoolPilo": "We will contact you within 24 hours to set up your school pilot.",

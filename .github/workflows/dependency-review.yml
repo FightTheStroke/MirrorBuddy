@@ -32,4 +32,9 @@ jobs:
           # SPDX expression that isn't in our allow-list, but the actual
           # license is BSD-3-Clause + Google's protobuf license — both
           # compatible with Apache-2.0.
-          allow-dependencies-licenses: 'pkg:npm/protobufjs'
+          # sharp prebuilt binaries bundle libvips, reported as a compound
+          # SPDX expression (Apache-2.0 AND BSD-2-Clause AND LGPL variants
+          # AND MIT AND MPL-2.0). sharp itself is Apache-2.0; libvips is
+          # LGPL-2.1+ and is dynamically linked, which is compatible with
+          # Apache-2.0 distribution.
+          allow-dependencies-licenses: 'pkg:npm/protobufjs, pkg:npm/sharp, pkg:npm/@img/sharp-win32-x64, pkg:npm/@img/sharp-darwin-x64, pkg:npm/@img/sharp-darwin-arm64, pkg:npm/@img/sharp-linux-x64, pkg:npm/@img/sharp-linux-arm64, pkg:npm/@img/sharp-linuxmusl-x64, pkg:npm/@img/sharp-linuxmusl-arm64, pkg:npm/@img/sharp-win32-ia32, pkg:npm/@img/sharp-linux-arm, pkg:npm/@img/sharp-libvips-darwin-x64, pkg:npm/@img/sharp-libvips-darwin-arm64, pkg:npm/@img/sharp-libvips-linux-x64, pkg:npm/@img/sharp-libvips-linux-arm64, pkg:npm/@img/sharp-libvips-linux-arm, pkg:npm/@img/sharp-libvips-linuxmusl-x64, pkg:npm/@img/sharp-libvips-linuxmusl-arm64'

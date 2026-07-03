@@ -7,6 +7,14 @@
 **Status**: COMPLETE
 **Overall Compliance**: VERIFIED
 
+> **Correction (2026-07-02, PLAN task TJ.3)**: `TrialConsentGate`
+> (`src/components/trial/trial-consent-gate.tsx`) referenced below was later
+> replaced by `UnifiedConsentWall` (`src/components/consent/unified-consent-wall.tsx`,
+> mounted in `src/components/providers.tsx`) and deleted. The consent guarantees
+> verified here (affirmative opt-in, consent cookie, `POST /api/trial/session`
+> 403 without consent) remain enforced by the unified consent system. File
+> references in this report are historical as of the verification date.
+
 ---
 
 ## Executive Summary
