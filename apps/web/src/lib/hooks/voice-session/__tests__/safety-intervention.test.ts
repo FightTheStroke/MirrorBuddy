@@ -262,6 +262,101 @@ describe('triggerSafetyIntervention', () => {
       ).not.toThrow();
     });
 
+    it('issue #469: still surfaces UI warning + audit log when channel is closed', async () => {
+      const { clientLogger } = await import('@/lib/logger/client');
+      mockDataChannel.readyState = 'closed';
+
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'critical',
+        flaggedPatterns: ['crisis'],
+        actionTaken: 'escalate',
+        checkDurationMs: 5,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-closed-channel',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+      });
+
+      expect(mockSetWarningState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          active: true,
+          severity: 'critical',
+          flaggedPatterns: ['crisis'],
+        }),
+      );
+      expect(clientLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('[SafetyIntervention]'),
+        expect.objectContaining({ eventId: 'VCE-004', channelUnavailable: true }),
+      );
+    });
+
+    it('issue #469: calls pauseAudio fallback when channel is closed', () => {
+      mockDataChannel.readyState = 'closed';
+      const pauseAudio = vi.fn();
+
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'high',
+        flaggedPatterns: ['explicit'],
+        actionTaken: 'block',
+        checkDurationMs: 5,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-pause-closed',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+        pauseAudio,
+      });
+
+      expect(pauseAudio).toHaveBeenCalledTimes(1);
+    });
+
+    it('issue #469: calls pauseAudio fallback even when channel is open', () => {
+      const pauseAudio = vi.fn();
+
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'high',
+        flaggedPatterns: ['explicit'],
+        actionTaken: 'block',
+        checkDurationMs: 5,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-pause-open',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+        pauseAudio,
+      });
+
+      expect(pauseAudio).toHaveBeenCalledTimes(1);
+    });
+
+    it('issue #469: does not call pauseAudio when action is allow', () => {
+      const pauseAudio = vi.fn();
+
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'none',
+        flaggedPatterns: [],
+        actionTaken: 'allow',
+        checkDurationMs: 2,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-pause-allow',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+        pauseAudio,
+      });
+
+      expect(pauseAudio).not.toHaveBeenCalled();
+    });
+
     it('should only intervene for non-allow actions', () => {
       const safetyResult: TranscriptSafetyResult = {
         severity: 'none',

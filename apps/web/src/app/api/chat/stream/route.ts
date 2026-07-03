@@ -22,7 +22,13 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { StreamingSanitizer, checkSTEMSafety, normalizeUnicode } from '@/lib/safety';
+import {
+  StreamingSanitizer,
+  checkSTEMSafety,
+  normalizeUnicode,
+  detectBias,
+  SAFE_RESPONSES,
+} from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
@@ -244,6 +250,11 @@ export const POST = pipe(
       async start(controller) {
         let totalTokens = 0;
         let budgetExceededMidStream = false;
+        // T1.4 (streaming): the full response text is accumulated so bias
+        // detection can run once the stream completes. Streaming means
+        // already-sent tokens cannot be un-sent — see the post-hoc audit +
+        // corrective-message compromise documented below (issue #467).
+        let fullResponseText = '';
 
         try {
           const generator = azureStreamingCompletion(
@@ -272,6 +283,7 @@ export const POST = pipe(
 
               const sanitized = sanitizer.processChunk(chunk.content);
               if (sanitized) {
+                fullResponseText += sanitized;
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ content: sanitized })}\n\n`),
                 );
@@ -296,8 +308,42 @@ export const POST = pipe(
           if (!budgetExceededMidStream) {
             const remaining = sanitizer.flush();
             if (remaining) {
+              fullResponseText += remaining;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ content: remaining })}\n\n`),
+              );
+            }
+          }
+
+          // T1.4 (streaming): bias detection on the full accumulated output.
+          // Unlike the non-streaming route, tokens already reached the client
+          // by the time this runs — full prevention would require buffering
+          // the entire response and losing the point of streaming. Instead:
+          // audit for compliance visibility (closes issue #467) and append a
+          // corrective message the student/parent will see, same shape as the
+          // existing content_filter mid-stream event.
+          if (!budgetExceededMidStream && fullResponseText) {
+            const biasResult = detectBias(fullResponseText);
+            if (biasResult.hasBias && !biasResult.safeForEducation) {
+              log.warn('Bias detected in streamed AI response (post-hoc)', {
+                clientId,
+                maestroId,
+                riskScore: biasResult.riskScore,
+                categories: biasResult.detections.map((d) => d.category),
+              });
+              recordContentFiltered('bias', {
+                userId,
+                maestroId,
+                actionTaken: 'flagged_post_stream',
+              });
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    content: `\n\n${SAFE_RESPONSES.jailbreak}`,
+                    biasCorrection: true,
+                    category: 'bias',
+                  })}\n\n`,
+                ),
               );
             }
           }

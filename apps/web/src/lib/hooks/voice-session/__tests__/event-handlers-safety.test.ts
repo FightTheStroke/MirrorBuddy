@@ -72,8 +72,30 @@ describe('Event Handlers - safety intervention wiring', () => {
           safetyResult: blockedUserResult,
           dataChannel: ctx.dataChannel,
           setWarningState: ctx.deps.setSafetyWarning,
+          pauseAudio: expect.any(Function),
         }),
       );
+    });
+
+    it('issue #469: pauseAudio fallback tears down local/remote audio regardless of channel state', async () => {
+      const { checkUserTranscript } = await import('../transcript-safety');
+      vi.mocked(checkUserTranscript).mockReturnValue(blockedUserResult);
+      const { triggerSafetyIntervention } = await import('../safety-intervention');
+      ctx.dataChannel.readyState = 'closed';
+
+      const { result } = renderHook(() => useHandleServerEvent(ctx.deps));
+      result.current({
+        type: 'conversation.item.input_audio_transcription.completed',
+        transcript: 'flagged user input',
+      });
+
+      const call = vi.mocked(triggerSafetyIntervention).mock.calls[0][0];
+      call.pauseAudio?.();
+
+      expect(ctx.audioElement.pause).toHaveBeenCalled();
+      expect(ctx.source.stop).toHaveBeenCalled();
+      expect(ctx.deps.scheduledSourcesRef.current.size).toBe(0);
+      expect(ctx.deps.setSpeaking).toHaveBeenCalledWith(false);
     });
 
     it('should still surface the user own words in the transcript', async () => {

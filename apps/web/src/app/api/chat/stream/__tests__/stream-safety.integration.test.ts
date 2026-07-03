@@ -47,12 +47,19 @@ vi.mock('@/lib/safety/server', () => ({
   recordContentFiltered: vi.fn(),
 }));
 
-// Keep the real safety module but let tests control checkSTEMSafety
+// Keep the real safety module but let tests control checkSTEMSafety/detectBias
 vi.mock('@/lib/safety', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/safety')>();
   return {
     ...actual,
     checkSTEMSafety: vi.fn(() => ({ blocked: false })),
+    detectBias: vi.fn(() => ({
+      hasBias: false,
+      safeForEducation: true,
+      riskScore: 0,
+      analyzedLength: 0,
+      detections: [],
+    })),
   };
 });
 
@@ -68,9 +75,7 @@ vi.mock('../helpers', () => {
   }
   return {
     getUserIdWithCoppaCheck: vi.fn().mockResolvedValue({ allowed: true, userId: 'user-123' }),
-    loadUserSettings: vi
-      .fn()
-      .mockResolvedValue({ settings: null, providerPreference: undefined }),
+    loadUserSettings: vi.fn().mockResolvedValue({ settings: null, providerPreference: undefined }),
     enhancePromptWithContext: vi.fn().mockResolvedValue('system prompt'),
     checkInputSafety: vi.fn().mockReturnValue(null),
     updateBudget: vi.fn(),
@@ -112,7 +117,7 @@ vi.mock('@/lib/api/middlewares', () => ({
 
 import { POST } from '../route';
 import * as helpers from '../helpers';
-import { checkSTEMSafety } from '@/lib/safety';
+import { checkSTEMSafety, detectBias } from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
 import { azureStreamingCompletion } from '@/lib/ai/server';
 
@@ -201,8 +206,9 @@ describe('POST /api/chat/stream safety wiring', () => {
     // Delegate to the REAL STEM filter: 'come fare la T<ZWSP>NT' must be
     // normalized to 'come fare la TNT' first, otherwise the blocklist regex
     // does not match and the dangerous query reaches the model.
-    const { checkSTEMSafety: realCheckSTEMSafety } =
-      await vi.importActual<typeof import('@/lib/safety/stem-safety')>('@/lib/safety/stem-safety');
+    const { checkSTEMSafety: realCheckSTEMSafety } = await vi.importActual<
+      typeof import('@/lib/safety/stem-safety')
+    >('@/lib/safety/stem-safety');
     vi.mocked(checkSTEMSafety).mockImplementationOnce(realCheckSTEMSafety);
 
     const response = await POST(
@@ -244,6 +250,73 @@ describe('POST /api/chat/stream safety wiring', () => {
     expect(body).toContain('[DONE]');
     expect(vi.mocked(checkSTEMSafety)).toHaveBeenCalledWith('spiegami la fotosintesi', 'curie');
     expect(vi.mocked(azureStreamingCompletion)).toHaveBeenCalled();
+    expect(vi.mocked(recordContentFiltered)).not.toHaveBeenCalled();
+  });
+
+  it('T1.4 (issue #467): runs bias detection on the full streamed output and appends a corrective message', async () => {
+    vi.mocked(checkSTEMSafety).mockReturnValueOnce({ blocked: false });
+    vi.mocked(detectBias).mockReturnValueOnce({
+      hasBias: true,
+      safeForEducation: false,
+      riskScore: 0.9,
+      analyzedLength: 4,
+      detections: [
+        {
+          detected: true,
+          category: 'gender',
+          severity: 'high',
+          match: 'ciao',
+          reason: 'test fixture',
+          suggestion: 'n/a',
+        },
+      ],
+    });
+
+    const response = await POST(
+      makeRequest({
+        messages: [{ role: 'user', content: 'raccontami una storia' }],
+        systemPrompt: 'You are MirrorBuddy',
+        maestroId: 'curie',
+        conversationId: 'conv-bias',
+      }),
+    );
+
+    const body = await readSSE(response);
+    // The already-streamed content is still present (can't be un-sent)...
+    expect(body).toContain('ciao');
+    // ...but a corrective message follows, flagged so the client can react
+    expect(body).toContain('"biasCorrection":true');
+    expect(body).toContain('"category":"bias"');
+    expect(body).toContain('[DONE]');
+
+    expect(vi.mocked(detectBias)).toHaveBeenCalledWith('ciao');
+    expect(vi.mocked(recordContentFiltered)).toHaveBeenCalledWith(
+      'bias',
+      expect.objectContaining({ maestroId: 'curie', actionTaken: 'flagged_post_stream' }),
+    );
+  });
+
+  it('T1.4 (issue #467): does not append a correction or audit when output is unbiased', async () => {
+    vi.mocked(checkSTEMSafety).mockReturnValueOnce({ blocked: false });
+    vi.mocked(detectBias).mockReturnValueOnce({
+      hasBias: false,
+      safeForEducation: true,
+      riskScore: 0,
+      analyzedLength: 0,
+      detections: [],
+    });
+
+    const response = await POST(
+      makeRequest({
+        messages: [{ role: 'user', content: 'spiegami la fotosintesi' }],
+        systemPrompt: 'You are MirrorBuddy',
+        maestroId: 'curie',
+        conversationId: 'conv-nobias',
+      }),
+    );
+
+    const body = await readSSE(response);
+    expect(body).not.toContain('biasCorrection');
     expect(vi.mocked(recordContentFiltered)).not.toHaveBeenCalled();
   });
 });
