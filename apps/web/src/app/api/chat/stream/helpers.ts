@@ -3,6 +3,7 @@
  * Business logic for streaming endpoint
  */
 
+import { after } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/server';
@@ -194,34 +195,47 @@ export function checkInputSafety(
     // also returns 'redirect' for jailbreak, which must not trigger crisis
     // escalation or parent notification (review finding #458 F1).
     if (filterResult.category === 'crisis' && context) {
-      try {
-        void logSafetyEvent('crisis_detected', 'critical', {
-          userId: context.userId || undefined,
-          sessionId: context.conversationId,
-          category: 'crisis',
-          contentSnippet: content.slice(0, 50),
-        });
-        void recordComplianceCrisisDetected('crisis_detected', {
-          sessionId: context.conversationId,
-          maestroId: context.maestroId,
-        });
-        void escalateCrisisDetected(context.userId || 'anonymous', context.conversationId || '', {
-          contentSnippet: content.slice(0, 50),
-          maestroId: context.maestroId,
-        });
-        // Notify parent/guardian of crisis
-        if (context.userId) {
-          void notifyParentOfCrisis({
-            userId: context.userId,
+      // issue #468/D-61: keep crisis logging/escalation/notification alive
+      // past the response via after() instead of bare `void` fire-and-forget,
+      // which risked losing them on a serverless freeze right after respond.
+      const runCrisisSideEffects = () =>
+        Promise.all([
+          logSafetyEvent('crisis_detected', 'critical', {
+            userId: context.userId || undefined,
+            sessionId: context.conversationId,
             category: 'crisis',
-            severity: 'critical',
+            contentSnippet: content.slice(0, 50),
+          }),
+          recordComplianceCrisisDetected('crisis_detected', {
+            sessionId: context.conversationId,
             maestroId: context.maestroId,
-            timestamp: new Date(),
-            locale: context.locale || 'it',
-          });
-        }
+          }),
+          escalateCrisisDetected(context.userId || 'anonymous', context.conversationId || '', {
+            contentSnippet: content.slice(0, 50),
+            maestroId: context.maestroId,
+          }),
+          // Notify parent/guardian of crisis
+          context.userId
+            ? notifyParentOfCrisis({
+                userId: context.userId,
+                category: 'crisis',
+                severity: 'critical',
+                maestroId: context.maestroId,
+                timestamp: new Date(),
+                locale: context.locale || 'it',
+              })
+            : Promise.resolve(),
+        ]);
+      try {
+        after(() =>
+          runCrisisSideEffects().catch(() => {
+            // Crisis logging must never crash main flow
+          }),
+        );
       } catch {
-        // Crisis logging must never crash main flow
+        // after() throws outside a request-scoped execution context
+        // (e.g. a test run) — fall back to fire-and-forget.
+        void runCrisisSideEffects().catch(() => {});
       }
     }
     return {

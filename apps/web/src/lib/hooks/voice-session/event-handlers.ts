@@ -47,6 +47,29 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
 }
 
 /**
+ * Stop any playing/queued assistant audio immediately, regardless of
+ * data-channel state. Used as the `pauseAudio` fallback for
+ * triggerSafetyIntervention (issue #469): when the channel is closed,
+ * response.cancel can't reach the model, but local/remote audio already in
+ * flight must still stop.
+ */
+function pauseVoiceAudio(deps: EventHandlerDeps): void {
+  deps.webrtcAudioElementRef.current?.pause();
+  deps.audioQueueRef.current.clear();
+  deps.isPlayingRef.current = false;
+  deps.isBufferingRef.current = true;
+  deps.scheduledSourcesRef.current.forEach((source) => {
+    try {
+      source.stop();
+    } catch {
+      /* already stopped */
+    }
+  });
+  deps.scheduledSourcesRef.current.clear();
+  deps.setSpeaking(false);
+}
+
+/**
  * Main server event handler for Azure Realtime API events (WebRTC)
  */
 export function useHandleServerEvent(deps: EventHandlerDeps) {
@@ -197,6 +220,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
                 safetyResult,
                 dataChannel: deps.webrtcDataChannelRef.current,
                 setWarningState: deps.setSafetyWarning,
+                pauseAudio: () => pauseVoiceAudio(deps),
               });
             }
 

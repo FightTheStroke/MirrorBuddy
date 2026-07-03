@@ -5,7 +5,7 @@
  * FEATURE: Function calling for tool execution (Issue #39)
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import {
   chatCompletion,
@@ -312,35 +312,49 @@ export const POST = pipe(
         // also returns 'redirect' for jailbreak, which must not trigger crisis
         // escalation or parent notification (review finding #458 F1).
         if (filterResult.category === 'crisis') {
-          try {
-            void logSafetyEvent('crisis_detected', 'critical', {
-              userId: userId || undefined,
-              sessionId: conversationId,
-              category: 'crisis',
-              contentSnippet: lastUserMessage.content.slice(0, 50),
-            });
-            void recordComplianceCrisisDetected('crisis_detected', {
-              sessionId: conversationId,
-              maestroId,
-            });
-            void escalateCrisisDetected(userId || 'anonymous', conversationId, {
-              contentSnippet: lastUserMessage.content.slice(0, 50),
-              maestroId,
-            });
-            // Notify parent/guardian of crisis
-            if (userId) {
-              const locale = detectLocaleFromNextRequest(request);
-              void notifyParentOfCrisis({
-                userId,
+          // issue #468/D-61: crisis logging/escalation/notification must not
+          // be bare fire-and-forget `void` calls — on serverless the function
+          // can freeze right after the response is sent, silently dropping
+          // exactly the safety-critical writes this block exists for.
+          // `after()` keeps them alive past the response.
+          const runCrisisSideEffects = () =>
+            Promise.all([
+              logSafetyEvent('crisis_detected', 'critical', {
+                userId: userId || undefined,
+                sessionId: conversationId,
                 category: 'crisis',
-                severity: 'critical',
+                contentSnippet: lastUserMessage.content.slice(0, 50),
+              }),
+              recordComplianceCrisisDetected('crisis_detected', {
+                sessionId: conversationId,
                 maestroId,
-                timestamp: new Date(),
-                locale,
-              });
-            }
+              }),
+              escalateCrisisDetected(userId || 'anonymous', conversationId, {
+                contentSnippet: lastUserMessage.content.slice(0, 50),
+                maestroId,
+              }),
+              // Notify parent/guardian of crisis
+              userId
+                ? notifyParentOfCrisis({
+                    userId,
+                    category: 'crisis',
+                    severity: 'critical',
+                    maestroId,
+                    timestamp: new Date(),
+                    locale: detectLocaleFromNextRequest(request),
+                  })
+                : Promise.resolve(),
+            ]);
+          try {
+            after(() =>
+              runCrisisSideEffects().catch(() => {
+                // Crisis logging must never crash the main flow
+              }),
+            );
           } catch {
-            // Crisis logging must never crash the main flow
+            // after() throws outside a request-scoped execution context
+            // (e.g. a test run) — fall back to fire-and-forget.
+            void runCrisisSideEffects().catch(() => {});
           }
         }
 
