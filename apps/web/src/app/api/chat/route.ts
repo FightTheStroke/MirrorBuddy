@@ -5,7 +5,7 @@
  * FEATURE: Function calling for tool execution (Issue #39)
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import * as Sentry from '@sentry/nextjs';
 import {
   chatCompletion,
@@ -21,8 +21,9 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { filterInput, sanitizeOutput, detectBias } from '@/lib/safety';
+import { filterInput, sanitizeOutput, detectBias, SAFE_RESPONSES } from '@/lib/safety';
 import { checkSTEMSafety } from '@/lib/safety';
+import { detectJailbreak, getJailbreakResponse, buildContext } from '@/lib/safety';
 import {
   recordMessage,
   recordSessionStart,
@@ -307,37 +308,54 @@ export const POST = pipe(
           actionTaken: 'blocked',
         });
 
-        // Crisis-specific: log safety event and escalate
-        if (filterResult.action === 'redirect') {
-          try {
-            void logSafetyEvent('crisis_detected', 'critical', {
-              userId: userId || undefined,
-              sessionId: conversationId,
-              category: 'crisis',
-              contentSnippet: lastUserMessage.content.slice(0, 50),
-            });
-            void recordComplianceCrisisDetected('crisis_detected', {
-              sessionId: conversationId,
-              maestroId,
-            });
-            void escalateCrisisDetected(userId || 'anonymous', conversationId, {
-              contentSnippet: lastUserMessage.content.slice(0, 50),
-              maestroId,
-            });
-            // Notify parent/guardian of crisis
-            if (userId) {
-              const locale = detectLocaleFromNextRequest(request);
-              void notifyParentOfCrisis({
-                userId,
+        // Crisis-specific: log safety event and escalate.
+        // Gate on category === 'crisis' (NOT action === 'redirect'): filterInput
+        // also returns 'redirect' for jailbreak, which must not trigger crisis
+        // escalation or parent notification (review finding #458 F1).
+        if (filterResult.category === 'crisis') {
+          // issue #468/D-61: crisis logging/escalation/notification must not
+          // be bare fire-and-forget `void` calls — on serverless the function
+          // can freeze right after the response is sent, silently dropping
+          // exactly the safety-critical writes this block exists for.
+          // `after()` keeps them alive past the response.
+          const runCrisisSideEffects = () =>
+            Promise.all([
+              logSafetyEvent('crisis_detected', 'critical', {
+                userId: userId || undefined,
+                sessionId: conversationId,
                 category: 'crisis',
-                severity: 'critical',
+                contentSnippet: lastUserMessage.content.slice(0, 50),
+              }),
+              recordComplianceCrisisDetected('crisis_detected', {
+                sessionId: conversationId,
                 maestroId,
-                timestamp: new Date(),
-                locale,
-              });
-            }
+              }),
+              escalateCrisisDetected(userId || 'anonymous', conversationId, {
+                contentSnippet: lastUserMessage.content.slice(0, 50),
+                maestroId,
+              }),
+              // Notify parent/guardian of crisis
+              userId
+                ? notifyParentOfCrisis({
+                    userId,
+                    category: 'crisis',
+                    severity: 'critical',
+                    maestroId,
+                    timestamp: new Date(),
+                    locale: detectLocaleFromNextRequest(request),
+                  })
+                : Promise.resolve(),
+            ]);
+          try {
+            after(() =>
+              runCrisisSideEffects().catch(() => {
+                // Crisis logging must never crash the main flow
+              }),
+            );
           } catch {
-            // Crisis logging must never crash the main flow
+            // after() throws outside a request-scoped execution context
+            // (e.g. a test run) — fall back to fire-and-forget.
+            void runCrisisSideEffects().catch(() => {});
           }
         }
 
@@ -347,6 +365,42 @@ export const POST = pipe(
           model: 'content-filter',
           blocked: true,
           category: filterResult.category,
+        });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
+      }
+
+      // T1.5: Advanced jailbreak / prompt-injection gate (Issue #30, S-04).
+      // filterInput above already blocks obvious JAILBREAK_PATTERNS; this runs
+      // the dedicated detector AFTER it, catching sophisticated attempts the
+      // regex misses (base64/leetspeak/homograph encoding, multi-turn buildup,
+      // crescendo, code injection, output hijacking). Context from the message
+      // history activates multi-turn/crescendo detection. Gate on the module's
+      // own action (block/terminate_session, i.e. threat >= high) — mirroring
+      // how STEM uses stemResult.blocked — so low/medium 'warn' scores (e.g.
+      // "pretend you are a pirate") do not over-block legitimate child play.
+      // This is an INPUT gate: it returns before chatCompletion, so no provider
+      // tokens are consumed and no budget/trial usage is charged.
+      const jailbreakResult = detectJailbreak(lastUserMessage.content, buildContext(messages));
+      if (jailbreakResult.action === 'block' || jailbreakResult.action === 'terminate_session') {
+        log.warn('Jailbreak attempt blocked by detector', {
+          clientId,
+          threatLevel: jailbreakResult.threatLevel,
+          categories: jailbreakResult.categories,
+          confidence: jailbreakResult.confidence,
+        });
+        recordContentFiltered('jailbreak', {
+          userId,
+          maestroId,
+          confidence: jailbreakResult.confidence,
+          actionTaken: 'blocked',
+        });
+        const response = NextResponse.json({
+          content: getJailbreakResponse(jailbreakResult),
+          provider: 'safety_filter',
+          model: 'jailbreak-detector',
+          blocked: true,
+          category: 'jailbreak',
         });
         response.headers.set('X-Request-ID', getRequestId(request));
         return response;
@@ -574,28 +628,10 @@ export const POST = pipe(
         });
       }
 
-      // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
-      const biasResult = detectBias(sanitized.text);
-      if (biasResult.hasBias && !biasResult.safeForEducation) {
-        log.warn('Bias detected in AI response', {
-          clientId,
-          maestroId,
-          riskScore: biasResult.riskScore,
-          categories: biasResult.detections.map((d) => d.category),
-        });
-      }
-
-      // Transparency assessment
-      const transparencyContext: TransparencyContext = {
-        response: sanitized.text,
-        query: lastUserMessage?.content || '',
-        ragResults: contexts.ragResultsForTransparency,
-        usedKnowledgeBase: !!maestroId,
-        maestroId,
-      };
-      const transparency = assessResponseTransparency(transparencyContext);
-
       // Update budget (non-blocking: failure must not crash the response)
+      // NOTE: accounting runs BEFORE the bias block below — provider tokens
+      // were consumed even when the response is replaced by a safety redirect,
+      // so quota must be charged either way (review finding #458 F2).
       if (userId && userSettings && result.usage) {
         try {
           await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
@@ -623,6 +659,44 @@ export const POST = pipe(
           });
         }
       }
+
+      // Bias detection on AI output (EU AI Act Art. 10, ADR 0004)
+      // T1.4: when the model output carries high/critical bias (not safe for
+      // education), do NOT return the biased text. Replace it with the same
+      // safe redirect the content filter uses and short-circuit the response.
+      const biasResult = detectBias(sanitized.text);
+      if (biasResult.hasBias && !biasResult.safeForEducation) {
+        log.warn('Bias detected in AI response', {
+          clientId,
+          maestroId,
+          riskScore: biasResult.riskScore,
+          categories: biasResult.detections.map((d) => d.category),
+        });
+        recordContentFiltered('bias', {
+          userId,
+          maestroId,
+          actionTaken: 'blocked',
+        });
+        const response = NextResponse.json({
+          content: SAFE_RESPONSES.jailbreak,
+          provider: 'safety_filter',
+          model: 'bias-detector',
+          blocked: true,
+          category: 'bias',
+        });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
+      }
+
+      // Transparency assessment
+      const transparencyContext: TransparencyContext = {
+        response: sanitized.text,
+        query: lastUserMessage?.content || '',
+        ragResults: contexts.ragResultsForTransparency,
+        usedKnowledgeBase: !!maestroId,
+        maestroId,
+      };
+      const transparency = assessResponseTransparency(transparencyContext);
 
       const response = NextResponse.json({
         content: sanitized.text,

@@ -2,7 +2,18 @@
 
 ## Status
 
-Accepted
+Accepted — partially superseded
+
+> **Status note (2026-07-02, PLAN task TJ.3):** The consent-gate components this
+> ADR describes (`TrialConsentGate`, and the related `TosGateProvider` /
+> `CookieConsentWall` walls) were replaced by the single `UnifiedConsentWall`
+> mounted in `apps/web/src/components/providers.tsx`, and the dead gate
+> components have been deleted from the codebase. The gate descriptions below
+> (F-02 implementation, file references to `trial-consent-gate.tsx`) are
+> historical. The other security features (salted IP hashing, abuse detection,
+> data retention, salt rotation) remain in force, and the
+> `mirrorbuddy-trial-consent` cookie check in `POST /api/trial/session` still
+> applies.
 
 ## Date
 

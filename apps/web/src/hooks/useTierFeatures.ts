@@ -100,16 +100,29 @@ export function useTierFeatures(): UseTierFeaturesReturn {
 
         const data = (await response.json()) as TierFeaturesData;
 
+        // Fail-closed on unexpected response shape: a 200 without a valid
+        // `features` object must behave like "no features" (locked), never
+        // crash hasFeature() or grant access. Tier gating protects the child
+        // space (quizzes/mindMaps), so defaults are always restrictive.
+        const safeData: TierFeaturesData = {
+          tier: data?.tier,
+          features:
+            data?.features && typeof data.features === "object"
+              ? data.features
+              : {},
+          isSimulated: data?.isSimulated ?? false,
+        };
+
         // Update cache
         featureCache.set(cacheKey, {
-          ...data,
+          ...safeData,
           timestamp: Date.now(),
         });
 
         if (isMounted) {
-          setTier(data.tier);
-          setFeatures(data.features);
-          setIsSimulated(data.isSimulated ?? false);
+          setTier(safeData.tier);
+          setFeatures(safeData.features);
+          setIsSimulated(safeData.isSimulated ?? false);
           setIsLoading(false);
         }
       } catch (_error) {

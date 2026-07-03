@@ -55,6 +55,28 @@ export type ComplianceOutcome =
   | "monitored"; // Event allowed but flagged for monitoring
 
 /**
+ * All compliance event types tracked by the compliance audit service.
+ * Used to scope durable-store queries to safety-relevant entries
+ * (the ComplianceAuditEntry table is shared with other audit writers).
+ */
+export const COMPLIANCE_EVENT_TYPES = [
+  "content_filtered",
+  "crisis_detected",
+  "jailbreak_attempt",
+  "escalation_triggered",
+  "guardrail_triggered",
+  "prompt_injection_attempt",
+  "safety_config_changed",
+  "knowledge_base_updated",
+  "rate_limit_triggered",
+  "user_reported_issue",
+  "false_positive_logged",
+] as const;
+
+/** Compliance event type union (derived from COMPLIANCE_EVENT_TYPES) */
+export type ComplianceEventType = (typeof COMPLIANCE_EVENT_TYPES)[number];
+
+/**
  * Complete compliance audit entry with regulatory fields
  */
 export interface ComplianceAuditEntry {
@@ -65,18 +87,7 @@ export interface ComplianceAuditEntry {
   timestamp: string;
 
   /** Event type for compliance classification */
-  eventType:
-    | "content_filtered"
-    | "crisis_detected"
-    | "jailbreak_attempt"
-    | "escalation_triggered"
-    | "guardrail_triggered"
-    | "prompt_injection_attempt"
-    | "safety_config_changed"
-    | "knowledge_base_updated"
-    | "rate_limit_triggered"
-    | "user_reported_issue"
-    | "false_positive_logged";
+  eventType: ComplianceEventType;
 
   /** Severity classification for regulatory reporting */
   severity: "critical" | "high" | "medium" | "low";

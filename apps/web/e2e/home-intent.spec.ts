@@ -1,5 +1,10 @@
 import { test, expect } from './fixtures/base-fixtures';
-import { mockOnboarding, mockHomePageAPIs, mockTracking } from './fixtures/api-mocks';
+import {
+  mockOnboarding,
+  mockHomePageAPIs,
+  mockTracking,
+  mockTrialTier,
+} from './fixtures/api-mocks';
 
 /**
  * E2E coverage for the intention-based home (PR #430).
@@ -22,6 +27,10 @@ test.beforeEach(async ({ page, context }) => {
   await mockOnboarding(page);
   await mockHomePageAPIs(page);
   await mockTracking(page);
+  // The global storageState authenticates every context as a registered
+  // (Base) user; these specs cover the anonymous Trial child UX, so force
+  // the Trial tier response (see mockTrialTier docs).
+  await mockTrialTier(page);
 });
 
 async function gotoHome(page: import('@playwright/test').Page, width = 1280) {

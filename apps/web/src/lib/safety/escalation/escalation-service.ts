@@ -237,7 +237,10 @@ export async function escalateSevereContentFilter(
 }
 
 /**
- * Mark escalation event as resolved by admin
+ * Mark escalation event as resolved by admin.
+ * Updates the in-process cache AND persists the resolution to the database
+ * (D-07: the buffer resets per serverless instance, so the DB is the source
+ * of truth for resolution state).
  */
 export async function resolveEscalation(
   eventId: string,
@@ -248,8 +251,21 @@ export async function resolveEscalation(
     event.resolved = true;
     event.resolvedAt = new Date();
     event.adminNotes = adminNotes;
-    log.info("Escalation resolved", { eventId });
   }
+
+  if (typeof window === "undefined" && escalationConfig.storeInDatabase) {
+    try {
+      const { resolveEscalationInDb } = await import("./db-storage");
+      await resolveEscalationInDb(eventId, adminNotes);
+    } catch (error) {
+      log.error("Failed to persist escalation resolution", {
+        eventId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  log.info("Escalation resolved", { eventId });
 }
 
 /**
@@ -267,7 +283,9 @@ export function getEscalationConfig(): EscalationConfig {
 }
 
 /**
- * Get recent escalation events
+ * Get recent escalation events from the in-process cache.
+ * D-07: NOT durable across serverless instances — dashboard/API reads must
+ * use getRecentEscalationsFromDb (./db-storage) instead.
  */
 export function getRecentEscalations(limitMinutes = 60): EscalationEvent[] {
   const cutoff = new Date(Date.now() - limitMinutes * 60000);
@@ -275,7 +293,9 @@ export function getRecentEscalations(limitMinutes = 60): EscalationEvent[] {
 }
 
 /**
- * Get unresolved escalations
+ * Get unresolved escalations from the in-process cache.
+ * D-07: NOT durable — dashboard/API reads must use
+ * getUnresolvedEscalationsFromDb (./db-storage) instead.
  */
 export function getUnresolvedEscalations(): EscalationEvent[] {
   return escalationBuffer.filter((e) => !e.resolved);
