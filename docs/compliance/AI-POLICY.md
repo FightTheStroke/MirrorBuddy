@@ -26,11 +26,13 @@ MirrorBuddy adheres to the following principles in the deployment of AI systems:
 
 ## 4. System Classification
 
-MirrorBuddy is classified as a **limited-risk AI system** (Art. 52, AI Act) because:
+MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See AI-ACT-REMEDIATION-TRACKER.md.
 
-- **Tutoring Role**: Assists learning but does NOT determine access to education or make assessment decisions (Annex III, point 3 applies only to admissions/grading systems)
+The following considerations and obligations apply:
+
+- **Classification Criterion**: The relevant criterion reads — Annex III, point 3(b): "AI systems intended to be used to evaluate learning outcomes, including when those outcomes are used to steer the learning process of natural persons in education and vocational training institutions at all levels."
 - **Transparency Obligations**: Users are clearly informed they interact with an AI system
-- **Minor Protection**: Despite limited-risk classification, we voluntarily implement high-risk safeguards for child safety
+- **Minor Protection**: Consistent with this precautionary high-risk posture, we implement heightened safeguards for child safety
 
 Consequently, we implement transparency, compliance, and oversight measures according to Chapter III of the AI Act.
 

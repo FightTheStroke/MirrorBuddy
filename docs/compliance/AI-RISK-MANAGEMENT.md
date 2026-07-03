@@ -54,7 +54,7 @@ MirrorBuddy is an **educational tutoring system** with:
 | **User Age**      | Minors (under 16)                                          | **HIGH-RISK MITIGATOR** |
 | **Criticality**   | Educational (not safety-critical)                          | Limited-Risk            |
 
-**Determination**: Primarily **Limited-Risk with HIGH-RISK elements** for child protection.
+**Determination**: MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See [AI-ACT-REMEDIATION-TRACKER.md](AI-ACT-REMEDIATION-TRACKER.md).
 
 ## Risk Categories
 
@@ -219,7 +219,7 @@ After applying all mitigations:
 | Availability  | Medium (8)    | Low (2)       | Yes         |
 | Bias          | Medium (9)    | Low (4)       | Yes         |
 
-**Conclusion**: All residual risks are at acceptable levels for a limited-risk AI system with child protection measures.
+**Conclusion**: All residual risks are at acceptable levels given the implemented child-protection measures, under the precautionary high-risk posture (see AI System Classification above).
 
 ## Review and Update Process
 
@@ -251,4 +251,4 @@ After applying all mitigations:
 - [ISO 31000 Risk Management](https://www.iso.org/iso-31000-risk-management.html)
 - [AI-RISK-REGISTER.md](AI-RISK-REGISTER.md) - Detailed risk assessment
 - [GDPR.md](GDPR.md) - Data protection
-- [DSA.md](DSA.md) - Digital Services Act compliance
+- Digital Services Act (DSA) compliance — documentation to be added
