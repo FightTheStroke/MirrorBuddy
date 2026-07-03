@@ -12,7 +12,8 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
-const ROOT = resolve(__dirname, '../../..');
+// __dirname is apps/web/src/lib/__tests__ — repo root is 5 levels up.
+const ROOT = resolve(__dirname, '../../../../..');
 const HAS_ENV_FILE = existsSync(resolve(ROOT, '.env'));
 
 /** Variables that are dev/test/iOS-only and should NOT be on Vercel */
