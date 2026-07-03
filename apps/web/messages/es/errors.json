@@ -26,46 +26,7 @@
         "requireNumber": "La contraseña debe contener al menos un número",
         "requireSpecial": "La contraseña debe contener al menos un carácter especial",
         "mismatch": "Las contraseñas no coinciden"
-      },
-      "add": "Añadir",
-      "auth": {
-        "login": "Iniciar sesión"
-      },
-      "back": "Atrás",
-      "breadcrumbs": {
-        "home": "Inicio"
-      },
-      "cancel": "Cancelar",
-      "clear": "Limpiar",
-      "close": "Cerrar",
-      "common": {
-        "save": "Guardar"
-      },
-      "confirm": "Confirmar",
-      "delete": "Eliminar",
-      "edit": "Editar",
-      "error": "Error",
-      "errors": {
-        "notFound": "No Encontrado"
-      },
-      "filter": "Filtrar",
-      "info": "Información",
-      "loading": "Cargando...",
-      "next": "Siguiente",
-      "no": "No",
-      "ok": "OK",
-      "previous": "Anterior",
-      "refresh": "Actualizar",
-      "remove": "Quitar",
-      "reset": "Restablecer",
-      "save": "Guardar",
-      "search": "Buscar",
-      "select": "Seleccionar",
-      "sort": "Ordenar",
-      "submit": "Enviar",
-      "success": "Completado",
-      "warning": "Advertencia",
-      "yes": "Sí"
+      }
     },
     "required": "Este campo es obligatorio",
     "invalidFormat": "Formato no válido",
@@ -89,19 +50,20 @@
       "description": "La página que estás buscando no existe o ha sido movida.",
       "backHome": "Volver al Inicio"
     },
-    "erroreCritico": "Errore critico",
-    "siEVerificatoUnErroreImprevistoIlNostroTeamEStato": "Si è verificato un errore imprevisto. Il nostro team è stato",
-    "notificatoAutomaticamente": "notificato automaticamente.",
-    "riprova": "Riprova",
-    "tornaAllaHome": "Torna alla home",
-    "somethingWentWrong": "Something went wrong",
-    "anUnexpectedErrorOccurredPleaseTryAgainLater": "An unexpected error occurred. Please try again later.",
-    "retry": "Retry",
     "errorPage": {
       "title": "Algo salió mal",
       "message": "Se produjo un error al cargar la página. Puedes intentarlo de nuevo o volver a la página anterior.",
       "retryButton": "Reintentar",
       "backButton": "Volver atrás"
+    },
+    "somethingWentWrong": "Algo salió mal",
+    "anUnexpectedErrorOccurredPleaseTryAgainLater": "Se ha producido un error inesperado. Inténtalo de nuevo más tarde.",
+    "retry": "Reintentar",
+    "child": {
+      "generic": "¡Vaya! Algo no ha funcionado. ¿Lo intentamos de nuevo juntos?",
+      "network": "Parece que la conexión a internet no funciona bien. ¿Lo comprobamos y lo intentamos de nuevo?",
+      "retry": "Inténtalo conmigo de nuevo",
+      "voiceUnavailable": "Ahora mismo no te oigo bien. ¿Podemos escribir en su lugar?"
     }
   }
 }

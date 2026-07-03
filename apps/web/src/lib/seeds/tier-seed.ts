@@ -23,9 +23,34 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
   pro: TierDefinition;
 }> {
   // Trial Tier - Free tier with limited features
+  //
+  // Trial gates the "Studiare" (mindMaps) and "Mettiti alla prova" (quizzes)
+  // intents — only "Compiti" (homework, chat+voice) is available. Source of
+  // truth: .claude/rules/tier.md + the inline fallback in tier-fallbacks.ts
+  // (createFallbackTier(TRIAL)). Keeping these `true` let anonymous Trial
+  // users open study/quizMe and broke the home-intent E2E lock assertions
+  // (T0.2, D-04).
+  //
+  // IMPORTANT: also applied in `update` (not just `create`) — upsert with
+  // `update: {}` would leave a pre-existing `trial` row's stale `features`
+  // untouched on every re-seed (dev/stage/CI DBs seeded before this fix),
+  // so Trial users could still reach the locked intents (review finding,
+  // PR #457). Production rows still need the separate backfill tracked as
+  // D-59 (seeds don't re-run automatically against live prod data).
+  const trialFeatures = {
+    chat: true,
+    voice: true,
+    flashcards: true,
+    quizzes: false,
+    mindMaps: false,
+    tools: ['pdf', 'chat'],
+    maestriLimit: 3,
+    coachesAvailable: ['melissa'],
+    buddiesAvailable: ['mario'],
+  };
   const trial = await prisma.tierDefinition.upsert({
     where: { code: 'trial' },
-    update: {},
+    update: { features: trialFeatures },
     create: {
       code: 'trial',
       name: 'Trial',
@@ -36,17 +61,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       docsLimitTotal: 1,
       chatModel: CHAT_MODEL,
       realtimeModel: 'gpt-realtime-mini',
-      features: {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        quizzes: true,
-        mindMaps: true,
-        tools: ['pdf', 'chat'],
-        maestriLimit: 3,
-        coachesAvailable: ['melissa'],
-        buddiesAvailable: ['mario'],
-      },
+      features: trialFeatures,
       availableMaestri: ['leonardo', 'galileo', 'curie'],
       availableCoaches: ['melissa'],
       availableBuddies: ['mario'],

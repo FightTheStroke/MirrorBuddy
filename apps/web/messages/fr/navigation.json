@@ -72,7 +72,7 @@
     "warning": "Attenzione",
     "yes": "Oui",
     "parentAccess": {
-      "arialabelaccediAllaSezioneGenitori": "[TRANSLATE] aria-label=\"Accedi alla sezione genitori\""
+      "arialabelaccediAllaSezioneGenitori": "aria-label=\"Accéder à la section parents\""
     },
     "products": "Prodotti"
   }

@@ -30,25 +30,27 @@ export async function runGdprPrivacyChecks(): Promise<CheckResult[]> {
     add('Data export API', 'PASS', 'Data export endpoint exists');
   }
 
-  // --- Cookie consent component ---
+  // --- Cookie consent component (UnifiedConsentWall replaced CookieConsentWall — TJ.3) ---
   if (!dirExists('src/components/consent')) {
     add('Cookie consent', 'FAIL', 'Missing: src/components/consent/');
-  } else if (
-    !fileExists('src/components/consent/cookie-consent-wall.tsx') &&
-    !fileExists('src/components/consent/unified-consent-wall.tsx')
-  ) {
+  } else if (!fileExists('src/components/consent/unified-consent-wall.tsx')) {
     add('Cookie consent wall', 'FAIL', 'No consent wall component found');
   } else {
-    add('Cookie consent wall', 'PASS', 'Cookie consent wall component exists');
+    add('Cookie consent wall', 'PASS', 'Unified consent wall component exists');
   }
 
-  // --- ToS gate ---
-  if (!dirExists('src/components/tos')) {
-    add('ToS gate', 'FAIL', 'Missing: src/components/tos/');
-  } else if (!fileExists('src/components/tos/tos-gate-provider.tsx')) {
-    add('ToS gate provider', 'FAIL', 'Missing: tos-gate-provider.tsx');
+  // --- ToS gate (UnifiedConsentWall + unified-consent-storage replaced TosGateProvider — TJ.3) ---
+  const tosApiPath = 'src/app/api/tos/route.ts';
+  const unifiedStoragePath = 'src/lib/consent/unified-consent-storage.ts';
+  if (!fileExists(tosApiPath)) {
+    add('ToS gate', 'FAIL', `Missing: ${tosApiPath}`);
+  } else if (
+    !fileExists(unifiedStoragePath) ||
+    !fileContains(unifiedStoragePath, 'TOS_VERSION')
+  ) {
+    add('ToS gate', 'FAIL', 'Unified consent storage missing ToS version enforcement');
   } else {
-    add('ToS gate provider', 'PASS', 'ToS gate provider exists');
+    add('ToS gate', 'PASS', 'ToS acceptance enforced via unified consent + /api/tos');
   }
 
   // --- Anonymization service ---
