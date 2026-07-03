@@ -1249,6 +1249,11 @@
     "achievementDate": "Data traguardo: {date}",
     "azioniPerElementi": "Azioni per {count} elementi selezionati",
     "fingerPlacement": "Posizionamento dito per tasto {key}",
-    "keyAriaLabel": "Tasto {key}"
+    "keyAriaLabel": "Tasto {key}",
+    "quizBreakTimer": {
+      "title": "Break time!",
+      "message": "You've been working for a while. Take a short break before continuing the quiz.",
+      "resumeButton": "Resume quiz"
+    }
   }
 }

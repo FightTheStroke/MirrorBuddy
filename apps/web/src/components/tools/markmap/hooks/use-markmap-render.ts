@@ -1,7 +1,10 @@
-import { useEffect, useCallback, useState, type RefObject } from "react";
+import { useEffect, useCallback, useRef, useState, type RefObject } from "react";
 import type { Markmap } from "markmap-view";
 import { logger } from "@/lib/logger";
-import type { AccessibilitySettings } from "@/lib/accessibility";
+import {
+  applyMindmapKeyboardAccessibility,
+  type AccessibilitySettings,
+} from "@/lib/accessibility";
 import type { MindmapNode } from "../types";
 import { nodesToMarkdown } from "../utils";
 import {
@@ -33,6 +36,7 @@ export function useMarkmapRender({
 }: UseMarkmapRenderProps) {
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
+  const keyboardNavCleanupRef = useRef<(() => void) | null>(null);
 
   // Get the markdown content - ADR 0020: Handle both parentId and children formats
   const getMarkdownContent = useCallback((): string => {
@@ -237,10 +241,22 @@ export function useMarkmapRender({
               svgRef.current.insertBefore(rect, svgRef.current.firstChild);
             }
           }
+          // T2.10: wire Tab/Enter/Space/Arrow/Escape keyboard navigation onto
+          // the node groups markmap-view just rendered (mouse-only by
+          // default). Re-applied on every render since nodes are recreated.
+          keyboardNavCleanupRef.current?.();
+          if (svgRef.current) {
+            keyboardNavCleanupRef.current = applyMindmapKeyboardAccessibility(
+              svgRef.current,
+              { isHighContrast },
+            );
+          }
         }, 100);
 
-        // Add ARIA attributes
-        svgRef.current.setAttribute("role", "img");
+        // Add ARIA attributes. role="tree": the SVG contains focusable
+        // role="treeitem" children (see applyMindmapKeyboardAccessibility),
+        // so it must not be exposed as a single flat role="img".
+        svgRef.current.setAttribute("role", "tree");
         svgRef.current.setAttribute("aria-label", `Mappa mentale: ${title}`);
 
         // Add title and desc for screen readers
@@ -274,6 +290,8 @@ export function useMarkmapRender({
     // Cleanup function - critical for React StrictMode and preventing double renders
     return () => {
       cancelled = true;
+      keyboardNavCleanupRef.current?.();
+      keyboardNavCleanupRef.current = null;
       if (markmapRef.current) {
         markmapRef.current.destroy();
         markmapRef.current = null;
