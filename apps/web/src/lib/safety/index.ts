@@ -38,6 +38,8 @@ export {
   type FilterAction,
 } from './content-filter-core';
 
+export { SAFE_RESPONSES } from './content-filter-patterns';
+
 export {
   sanitizeOutput,
   needsSanitization,
