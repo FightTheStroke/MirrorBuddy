@@ -8,7 +8,7 @@
 
 'use client';
 
-import { filterInput } from '@/lib/safety';
+import { filterInput, detectJailbreak } from '@/lib/safety';
 import type { FilterSeverity, FilterAction } from '@/lib/safety';
 import { isFeatureEnabled } from '@/lib/feature-flags/client';
 import { clientLogger as logger } from '@/lib/logger/client';
@@ -73,10 +73,10 @@ export function checkUserTranscript(
 
   // Run content filter
   const filterResult = filterInput(transcriptText);
-  const checkDurationMs = performance.now() - startTime;
 
   // Map filter action to VCE-002 action
-  const actionTaken = mapFilterAction(filterResult.action);
+  let actionTaken = mapFilterAction(filterResult.action);
+  let severity = filterResult.severity;
 
   // Extract flagged patterns
   const flaggedPatterns: string[] = [];
@@ -84,8 +84,49 @@ export function checkUserTranscript(
     flaggedPatterns.push(filterResult.category);
   }
 
+  // T1.5: Advanced jailbreak / prompt-injection detection on the transcript.
+  // filterInput above already flags obvious JAILBREAK_PATTERNS as
+  // category 'jailbreak'; the dedicated detector catches sophisticated
+  // attempts the regex misses (encoding, code injection, crescendo). Gate on
+  // the detector's own action (block/terminate_session, i.e. threat >= high),
+  // matching the chat/stream routes. When it fires we MUST elevate actionTaken
+  // and severity — not just append the pattern — because event-handlers only
+  // triggers the intervention (and triggerSafetyIntervention only acts) when
+  // actionTaken !== 'allow'. getRedirectMessage already has a 'jailbreak'
+  // branch, so the spoken redirect is correct once 'jailbreak' is flagged.
+  // NOTE: single-transcript detection only (no conversation history is passed
+  // here), so multi_turn/crescendo buildup across turns is not detected on the
+  // voice path — a known limitation vs the chat routes.
+  const jailbreakResult = detectJailbreak(transcriptText);
+  if (jailbreakResult.action === 'block' || jailbreakResult.action === 'terminate_session') {
+    if (!flaggedPatterns.includes('jailbreak')) {
+      flaggedPatterns.push('jailbreak');
+    }
+    // Elevate action: block -> 'block', terminate -> 'escalate'. Never
+    // downgrade an already-stronger action from filterInput (e.g. crisis
+    // 'escalate').
+    const elevated = jailbreakResult.action === 'terminate_session' ? 'escalate' : 'block';
+    if (actionTaken !== 'escalate') {
+      actionTaken = elevated;
+    }
+    // Elevate severity to the detector's threat level (high/critical) when it
+    // is stronger than the content-filter severity.
+    const rank: Record<FilterSeverity, number> = {
+      none: 0,
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+    };
+    if (rank[jailbreakResult.threatLevel] > rank[severity]) {
+      severity = jailbreakResult.threatLevel;
+    }
+  }
+
+  const checkDurationMs = performance.now() - startTime;
+
   const result: TranscriptSafetyResult = {
-    severity: filterResult.severity,
+    severity,
     flaggedPatterns,
     actionTaken,
     checkDurationMs,

@@ -28,6 +28,9 @@ import {
   normalizeUnicode,
   detectBias,
   SAFE_RESPONSES,
+  detectJailbreak,
+  getJailbreakResponse,
+  buildContext,
 } from '@/lib/safety';
 import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
@@ -206,6 +209,41 @@ export const POST = pipe(
         log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
           yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
+          yield 'data: [DONE]\n\n';
+        });
+      }
+
+      // T1.5: Advanced jailbreak / prompt-injection gate BEFORE the stream
+      // starts, mirroring the non-streaming route and the STEM gate below.
+      // checkInputSafety (filterInput) above already blocks obvious
+      // JAILBREAK_PATTERNS; the dedicated detector catches sophisticated
+      // attempts the regex misses (encoding, multi-turn, crescendo, code
+      // injection). Context from the message history activates multi-turn
+      // detection. Gate on the module's own action (block/terminate_session)
+      // so low/medium 'warn' scores do not over-block. Jailbreak detection is
+      // on USER INPUT, so it runs pre-stream (fail-closed, no LLM call) — NOT
+      // post-hoc like bias, which needs the full model response.
+      const jailbreakResult = detectJailbreak(lastUserMessage.content, buildContext(messages));
+      if (jailbreakResult.action === 'block' || jailbreakResult.action === 'terminate_session') {
+        log.warn('Jailbreak attempt blocked by detector (streaming)', {
+          clientId,
+          threatLevel: jailbreakResult.threatLevel,
+          categories: jailbreakResult.categories,
+          confidence: jailbreakResult.confidence,
+        });
+        recordContentFiltered('jailbreak', {
+          userId,
+          maestroId,
+          confidence: jailbreakResult.confidence,
+          actionTaken: 'blocked',
+        });
+        const safeResponse = getJailbreakResponse(jailbreakResult);
+        return createSSEResponse(async function* () {
+          yield `data: ${JSON.stringify({
+            content: safeResponse,
+            blocked: true,
+            category: 'jailbreak',
+          })}\n\n`;
           yield 'data: [DONE]\n\n';
         });
       }
