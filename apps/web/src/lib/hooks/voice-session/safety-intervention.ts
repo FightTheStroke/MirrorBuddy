@@ -41,6 +41,14 @@ export interface SafetyInterventionParams {
   dataChannel: RTCDataChannel | null;
   /** Callback to update UI warning state */
   setWarningState: (state: SafetyWarningState) => void;
+  /**
+   * Optional local/remote audio teardown, invoked unconditionally whenever an
+   * intervention fires — including when the data channel is closed. Mirrors
+   * the unconditional pause used on the assistant-reject path (issue #469):
+   * response.cancel can only reach the model over an open channel, but the
+   * audio already playing/queued locally must stop regardless.
+   */
+  pauseAudio?: () => void;
 }
 
 /**
@@ -112,7 +120,7 @@ function getRedirectMessage(flaggedPatterns: string[]): string {
  * }
  */
 export function triggerSafetyIntervention(params: SafetyInterventionParams): void {
-  const { sessionId, safetyResult, dataChannel, setWarningState } = params;
+  const { sessionId, safetyResult, dataChannel, setWarningState, pauseAudio } = params;
 
   // Check feature flag - if disabled, no intervention
   const flagResult = isFeatureEnabled('voice_transcript_safety');
@@ -127,11 +135,36 @@ export function triggerSafetyIntervention(params: SafetyInterventionParams): voi
     return;
   }
 
-  // Validate data channel
+  // Stop any playing/queued audio unconditionally, regardless of data-channel
+  // state — response.cancel below can only reach the model over an open
+  // channel, but audio already in flight locally must stop either way
+  // (issue #469).
+  pauseAudio?.();
+
+  // Validate data channel. response.cancel/response.create require an open
+  // channel to reach the model, but the intervention must still surface to
+  // the UI/audit trail even when it can't — a silent no-op here would leave
+  // a flagged conversation with no warning and no compliance record.
   if (!dataChannel || dataChannel.readyState !== 'open') {
-    logger.warn('[SafetyIntervention] Data channel not available, cannot send intervention', {
+    const interventionReason = getInterventionReason(safetyResult.flaggedPatterns);
+    const redirectMessage = getRedirectMessage(safetyResult.flaggedPatterns);
+    logger.warn('[SafetyIntervention] Data channel unavailable, applying audio-only fallback', {
+      component: 'voice-safety-intervention',
+      eventId: 'VCE-004',
+      eventName: 'Safety Intervention Activated',
       sessionId,
+      interventionReason,
+      flaggedPatterns: safetyResult.flaggedPatterns,
+      detectedSeverity: safetyResult.severity,
+      channelUnavailable: true,
       readyState: dataChannel?.readyState || 'null',
+      timestamp: Date.now(),
+    });
+    setWarningState({
+      active: true,
+      severity: safetyResult.severity,
+      flaggedPatterns: safetyResult.flaggedPatterns,
+      message: redirectMessage,
     });
     return;
   }

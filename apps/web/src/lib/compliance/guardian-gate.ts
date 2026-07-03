@@ -24,7 +24,7 @@
 
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import { recordComplianceEvent } from "@/lib/safety";
+import { recordComplianceEvent } from "@/lib/safety/server";
 import { checkCoppaStatus } from "./coppa-service";
 
 const log = logger.child({ module: "guardian-gate" });

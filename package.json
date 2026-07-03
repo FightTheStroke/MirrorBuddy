@@ -106,6 +106,8 @@
     "terser-webpack-plugin": "5.3.17",
     "protobufjs": "7.6.4",
     "fast-uri": "3.1.2",
+    "undici": "6.27.0",
+    "linkify-it": "5.0.2",
     "@opentelemetry/otlp-transformer": {
       "protobufjs": "8.6.4"
     },
@@ -153,7 +155,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie": "^1.1.1",
-    "dompurify": "^3.3.2",
+    "dompurify": "^3.4.11",
     "framer-motion": "^12.23.26",
     "function-plot": "^1.25.3",
     "fuse.js": "^7.1.0",
@@ -259,6 +261,8 @@
       "terser-webpack-plugin": "5.3.17",
       "protobufjs": "7.6.4",
       "fast-uri": "3.1.2",
+      "undici": "6.27.0",
+      "linkify-it": "5.0.2",
       "@opentelemetry/otlp-transformer>protobufjs": "8.6.4",
       "vite": "8.0.16",
       "@grpc/grpc-js": "1.14.4",

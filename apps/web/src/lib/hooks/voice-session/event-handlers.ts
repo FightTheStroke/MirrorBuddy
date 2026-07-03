@@ -12,6 +12,7 @@ import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
 import { computeVoiceTimingDurations } from './voice-timing';
 import { checkUserTranscript, checkAssistantTranscript } from './transcript-safety';
+import { triggerSafetyIntervention, type SafetyWarningState } from './safety-intervention';
 import type { AudioChunkQueue } from './audio-queue';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
@@ -25,6 +26,8 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
+  /** Remote-track audio element (WebRTC transport) — paused on safety reject. */
+  webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   voiceConnectStartTimeRef: React.MutableRefObject<number | null>;
@@ -33,12 +36,37 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   addTranscript: (role: 'user' | 'assistant', text: string) => void;
   setListening: (value: boolean) => void;
   setSpeaking: (value: boolean) => void;
+  /** Surface a safety-intervention warning in the UI (safe-response redirect). */
+  setSafetyWarning: (state: SafetyWarningState) => void;
   isSpeaking: boolean;
   voiceBargeInEnabled: boolean;
   sendSessionConfig: () => void;
   sendGreeting: () => void;
   unmuteAudioTracksRef: React.MutableRefObject<(() => void) | null>;
   startAudioCapture: () => Promise<void>;
+}
+
+/**
+ * Stop any playing/queued assistant audio immediately, regardless of
+ * data-channel state. Used as the `pauseAudio` fallback for
+ * triggerSafetyIntervention (issue #469): when the channel is closed,
+ * response.cancel can't reach the model, but local/remote audio already in
+ * flight must still stop.
+ */
+function pauseVoiceAudio(deps: EventHandlerDeps): void {
+  deps.webrtcAudioElementRef.current?.pause();
+  deps.audioQueueRef.current.clear();
+  deps.isPlayingRef.current = false;
+  deps.isBufferingRef.current = true;
+  deps.scheduledSourcesRef.current.forEach((source) => {
+    try {
+      source.stop();
+    } catch {
+      /* already stopped */
+    }
+  });
+  deps.scheduledSourcesRef.current.clear();
+  deps.setSpeaking(false);
 }
 
 /**
@@ -101,6 +129,15 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           // Azure has started generating a response - track this for proper cancellation
           deps.hasActiveResponseRef.current = true;
           logger.debug('[VoiceSession] Response created - hasActiveResponse = true');
+          // If a safety reject paused the WebRTC audio element (pause kills the
+          // unsafe tail even when response.cancel can't be delivered), resume it
+          // now so the NEXT response — e.g. the safe redirect injected by the
+          // intervention — is audible. Best-effort: autoplay policy may reject.
+          if (deps.webrtcAudioElementRef.current?.paused) {
+            deps.webrtcAudioElementRef.current.play().catch(() => {
+              logger.debug('[VoiceSession] Audio element resume blocked (autoplay policy)');
+            });
+          }
           break;
 
         case 'input_audio_buffer.speech_started':
@@ -167,8 +204,6 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
               event.transcript,
             );
 
-            // Safety intervention wiring deferred to T2-06
-            // For now, just log the result
             if (safetyResult.actionTaken !== 'allow') {
               logger.warn('[VoiceSession] Transcript safety check flagged content', {
                 sessionId: deps.sessionIdRef.current,
@@ -176,9 +211,21 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
                 actionTaken: safetyResult.actionTaken,
                 flaggedPatterns: safetyResult.flaggedPatterns,
               });
-              // T2-06 will wire: response.cancel + redirect message injection
+              // Safe-response redirect: cancel the in-flight response and inject
+              // an educational redirect over the data channel + VCE-004 audit.
+              // Internally guarded by the voice_transcript_safety flag and safe
+              // when the data channel is null/closed (no throw).
+              triggerSafetyIntervention({
+                sessionId: deps.sessionIdRef.current || 'unknown',
+                safetyResult,
+                dataChannel: deps.webrtcDataChannelRef.current,
+                setWarningState: deps.setSafetyWarning,
+                pauseAudio: () => pauseVoiceAudio(deps),
+              });
             }
 
+            // The user's own words are surfaced regardless — the redirect above
+            // handles the assistant's response. Behaviour for 'allow' is unchanged.
             deps.addTranscript('user', event.transcript);
             deps.options.onTranscript?.('user', event.transcript);
           } else {
@@ -220,17 +267,68 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
               event.transcript,
             );
 
-            // Log flagged assistant content for audit and escalation
-            // T2-06 will wire safety intervention (reject -> block playback)
             if (assistantSafetyResult.actionTaken === 'reject') {
+              // Audit log for escalation — a rejected assistant utterance
+              // indicates a prompt-engineering / model failure.
               logger.error('[VoiceSession] Assistant transcript rejected by safety check', {
                 sessionId: deps.sessionIdRef.current,
                 severity: assistantSafetyResult.severity,
                 flaggedPatterns: assistantSafetyResult.flaggedPatterns,
-                // This indicates a prompt engineering failure - should escalate
               });
-              // T2-06 will wire: stop audio playback + escalate to admin audit
-            } else if (assistantSafetyResult.actionTaken === 'sanitize') {
+
+              // Stop playback of the rejected utterance immediately, mirroring
+              // the barge-in teardown. Local teardown runs regardless of the
+              // data-channel state so queued/scheduled audio never reaches the
+              // student; response.cancel is only sent when a response is active
+              // and the channel is open.
+              if (
+                deps.hasActiveResponseRef.current &&
+                deps.webrtcDataChannelRef.current?.readyState === 'open'
+              ) {
+                deps.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+                deps.hasActiveResponseRef.current = false;
+              }
+              // WebRTC transport plays assistant audio via the remote track's
+              // audio element, NOT the local queue. Pause it unconditionally:
+              // this kills the unsafe tail even when response.cancel cannot be
+              // delivered (closed channel / late cancel). The next
+              // response.created (e.g. the safe redirect) resumes playback.
+              deps.webrtcAudioElementRef.current?.pause();
+              deps.audioQueueRef.current.clear();
+              deps.isPlayingRef.current = false;
+              deps.isBufferingRef.current = true;
+              deps.scheduledSourcesRef.current.forEach((source) => {
+                try {
+                  source.stop();
+                } catch {
+                  /* already stopped */
+                }
+              });
+              deps.scheduledSourcesRef.current.clear();
+              deps.setSpeaking(false);
+
+              // Fire the safe-response redirect + VCE-004 audit. Map the
+              // assistant 'reject' onto the intervention's 'escalate' action so
+              // it is treated as a serious violation requiring human oversight.
+              triggerSafetyIntervention({
+                sessionId: deps.sessionIdRef.current || 'unknown',
+                safetyResult: {
+                  severity: assistantSafetyResult.severity,
+                  flaggedPatterns: assistantSafetyResult.flaggedPatterns,
+                  actionTaken: 'escalate',
+                  checkDurationMs: assistantSafetyResult.checkDurationMs,
+                },
+                dataChannel: deps.webrtcDataChannelRef.current,
+                setWarningState: deps.setSafetyWarning,
+              });
+
+              // CRITICAL (child safety): never surface rejected assistant
+              // content in the transcript UI. It is logged above for audit;
+              // skip addTranscript/onTranscript entirely.
+              break;
+            }
+
+            if (assistantSafetyResult.actionTaken === 'sanitize') {
               logger.warn('[VoiceSession] Assistant transcript flagged but allowed', {
                 sessionId: deps.sessionIdRef.current,
                 severity: assistantSafetyResult.severity,

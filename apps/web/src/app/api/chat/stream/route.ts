@@ -22,7 +22,18 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from '@/lib/rate-limit';
-import { StreamingSanitizer } from '@/lib/safety';
+import {
+  StreamingSanitizer,
+  checkSTEMSafety,
+  normalizeUnicode,
+  detectBias,
+  SAFE_RESPONSES,
+  detectJailbreak,
+  getJailbreakResponse,
+  buildContext,
+} from '@/lib/safety';
+import { recordContentFiltered } from '@/lib/safety/server';
+import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 
 import type { ChatRequest } from '../types';
@@ -173,13 +184,95 @@ export const POST = pipe(
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
     if (lastUserMessage) {
-      const safetyBlock = checkInputSafety(lastUserMessage.content);
+      // SECURITY: normalize Unicode (zero-width chars, homoglyphs) BEFORE the
+      // safety checks, mirroring the non-streaming route — raw input would let
+      // e.g. 'T​NT' bypass the blocklists (review finding #458 F3).
+      // filterInput/checkSTEMSafety only lowercase/trim internally.
+      const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
+      if (wasModified) {
+        log.debug('Unicode normalized in user input', { clientId });
+        lastUserMessage.content = normalized;
+      }
+
+      // T1.2: pass context so crisis escalation (logSafetyEvent +
+      // escalateCrisisDetected + notifyParentOfCrisis) runs on the streaming
+      // path, mirroring the non-streaming route. conversationId may be
+      // undefined for a brand-new conversation; the escalation helpers fall
+      // back to 'anonymous'/'' so escalation is never skipped for that reason.
+      const safetyBlock = checkInputSafety(lastUserMessage.content, {
+        userId,
+        conversationId,
+        maestroId,
+        locale: detectLocaleFromNextRequest(request),
+      });
       if (safetyBlock) {
         log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
           yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
           yield 'data: [DONE]\n\n';
         });
+      }
+
+      // T1.5: Advanced jailbreak / prompt-injection gate BEFORE the stream
+      // starts, mirroring the non-streaming route and the STEM gate below.
+      // checkInputSafety (filterInput) above already blocks obvious
+      // JAILBREAK_PATTERNS; the dedicated detector catches sophisticated
+      // attempts the regex misses (encoding, multi-turn, crescendo, code
+      // injection). Context from the message history activates multi-turn
+      // detection. Gate on the module's own action (block/terminate_session)
+      // so low/medium 'warn' scores do not over-block. Jailbreak detection is
+      // on USER INPUT, so it runs pre-stream (fail-closed, no LLM call) — NOT
+      // post-hoc like bias, which needs the full model response.
+      const jailbreakResult = detectJailbreak(lastUserMessage.content, buildContext(messages));
+      if (jailbreakResult.action === 'block' || jailbreakResult.action === 'terminate_session') {
+        log.warn('Jailbreak attempt blocked by detector (streaming)', {
+          clientId,
+          threatLevel: jailbreakResult.threatLevel,
+          categories: jailbreakResult.categories,
+          confidence: jailbreakResult.confidence,
+        });
+        recordContentFiltered('jailbreak', {
+          userId,
+          maestroId,
+          confidence: jailbreakResult.confidence,
+          actionTaken: 'blocked',
+        });
+        const safeResponse = getJailbreakResponse(jailbreakResult);
+        return createSSEResponse(async function* () {
+          yield `data: ${JSON.stringify({
+            content: safeResponse,
+            blocked: true,
+            category: 'jailbreak',
+          })}\n\n`;
+          yield 'data: [DONE]\n\n';
+        });
+      }
+
+      // T1.3: STEM safety check (Amodei 2026) - block dangerous STEM queries
+      // BEFORE starting the stream, mirroring the non-streaming route.
+      if (maestroId) {
+        const stemResult = checkSTEMSafety(lastUserMessage.content, maestroId);
+        if (stemResult.blocked) {
+          log.warn('STEM safety filter triggered', {
+            clientId,
+            subject: stemResult.subject,
+            category: stemResult.category,
+          });
+          recordContentFiltered('stem_safety', {
+            userId,
+            maestroId,
+            actionTaken: 'blocked',
+          });
+          return createSSEResponse(async function* () {
+            yield `data: ${JSON.stringify({
+              content: stemResult.safeResponse,
+              blocked: true,
+              category: `stem_${stemResult.category}`,
+              alternatives: stemResult.alternatives,
+            })}\n\n`;
+            yield 'data: [DONE]\n\n';
+          });
+        }
       }
     }
 
@@ -195,6 +288,11 @@ export const POST = pipe(
       async start(controller) {
         let totalTokens = 0;
         let budgetExceededMidStream = false;
+        // T1.4 (streaming): the full response text is accumulated so bias
+        // detection can run once the stream completes. Streaming means
+        // already-sent tokens cannot be un-sent — see the post-hoc audit +
+        // corrective-message compromise documented below (issue #467).
+        let fullResponseText = '';
 
         try {
           const generator = azureStreamingCompletion(
@@ -223,6 +321,7 @@ export const POST = pipe(
 
               const sanitized = sanitizer.processChunk(chunk.content);
               if (sanitized) {
+                fullResponseText += sanitized;
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ content: sanitized })}\n\n`),
                 );
@@ -247,8 +346,42 @@ export const POST = pipe(
           if (!budgetExceededMidStream) {
             const remaining = sanitizer.flush();
             if (remaining) {
+              fullResponseText += remaining;
               controller.enqueue(
                 encoder.encode(`data: ${JSON.stringify({ content: remaining })}\n\n`),
+              );
+            }
+          }
+
+          // T1.4 (streaming): bias detection on the full accumulated output.
+          // Unlike the non-streaming route, tokens already reached the client
+          // by the time this runs — full prevention would require buffering
+          // the entire response and losing the point of streaming. Instead:
+          // audit for compliance visibility (closes issue #467) and append a
+          // corrective message the student/parent will see, same shape as the
+          // existing content_filter mid-stream event.
+          if (!budgetExceededMidStream && fullResponseText) {
+            const biasResult = detectBias(fullResponseText);
+            if (biasResult.hasBias && !biasResult.safeForEducation) {
+              log.warn('Bias detected in streamed AI response (post-hoc)', {
+                clientId,
+                maestroId,
+                riskScore: biasResult.riskScore,
+                categories: biasResult.detections.map((d) => d.category),
+              });
+              recordContentFiltered('bias', {
+                userId,
+                maestroId,
+                actionTaken: 'flagged_post_stream',
+              });
+              controller.enqueue(
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    content: `\n\n${SAFE_RESPONSES.jailbreak}`,
+                    biasCorrection: true,
+                    category: 'bias',
+                  })}\n\n`,
+                ),
               );
             }
           }
