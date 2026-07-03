@@ -41,7 +41,7 @@ const { mockRecordComplianceEvent } = vi.hoisted(() => ({
   mockRecordComplianceEvent: vi.fn(),
 }));
 
-vi.mock("@/lib/safety", () => ({
+vi.mock("@/lib/safety/server", () => ({
   recordComplianceEvent: mockRecordComplianceEvent,
 }));
 
