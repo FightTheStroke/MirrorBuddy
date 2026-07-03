@@ -123,7 +123,7 @@
 **Role**: Independent conformity assessment authority
 **Timeline**: Selection Q2 2026, engagement Q3 2026
 **Reporting**: Quarterly reports during Year 1, annual thereafter
-**Note**: MirrorBuddy is classified as limited-risk under EU AI Act Art. 52 (transparency obligations). Notified body engagement is precautionary, not mandatory.
+**Note**: MirrorBuddy is treated, on a precautionary basis, as a HIGH-RISK AI system under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. Under the precautionary high-risk posture, conformity-assessment obligations (primarily self-assessment under Annex VI) are treated as applicable; final scope pending legal confirmation. See [AI-ACT-REMEDIATION-TRACKER.md](AI-ACT-REMEDIATION-TRACKER.md).
 
 ---
 

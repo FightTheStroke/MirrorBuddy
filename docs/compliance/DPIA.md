@@ -29,7 +29,7 @@ This DPIA assesses high-risk data processing activities under GDPR Article 35, i
 
 **Key Data**: Conversations, learning preferences, accessibility settings, profile (name, age range, school level).
 
-**Not Collected**: Real name, DOB, disability diagnosis, school name, IP address (except audit logs).
+**Identifiers actually stored**: Certain identifiers ARE stored where required: profile display name, Google account identity (OAuth sign-in), and IP address in specific records (parental consent, ToS acceptance, compliance audit logs). These are processed under stated legal bases; conversational data is not otherwise linked to civil identity. **Not collected**: DOB, school name. **Health data**: No clinical diagnosis is stored as such; accessibility profiles are opt-in proxies that may qualify as health data (Art. 9 GDPR) by inference, processed on a consent basis. No special-category data is used for model training. See `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`.
 
 ---
 

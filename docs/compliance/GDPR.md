@@ -63,13 +63,15 @@ The job:
 
 ### Principle: Collect Only What's Needed
 
-| Collected            | Not Collected              |
-| -------------------- | -------------------------- |
-| Display name         | Real name                  |
-| Age range            | Date of birth              |
-| School level         | School name                |
-| Learning preferences | Disability diagnosis       |
-| Anonymous usage      | IP addresses (except logs) |
+| Collected              | Not Collected |
+| ---------------------- | ------------- |
+| Display name (profile) | Date of birth |
+| Age range              | School name   |
+| School level           | -             |
+| Learning preferences   | -             |
+| Anonymous usage        | -             |
+
+Certain identifiers ARE stored where required: profile display name, Google account identity (OAuth sign-in), and IP address in specific records (parental consent, ToS acceptance, compliance audit logs). These are processed under stated legal bases; conversational data is not otherwise linked to civil identity. No clinical diagnosis is stored as such; accessibility profiles are opt-in proxies that may qualify as health data (Art. 9 GDPR) by inference, processed on a consent basis. No special-category data is used for model training. See `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`.
 
 ### API Design
 
@@ -154,4 +156,4 @@ Run with: `npm run test -- --grep gdpr`
 - [GDPR Full Text](https://gdpr.eu/tag/gdpr/)
 - [Italian DPA Guidelines](https://www.garanteprivacy.it/)
 - [ADR-0045: Domain Boundaries](../adr/0045-domain-boundaries.md)
-- [Privacy Module](../../src/lib/privacy/index.ts)
+- [Privacy Module](../../apps/web/src/lib/privacy/index.ts)
