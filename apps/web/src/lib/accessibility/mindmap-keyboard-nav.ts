@@ -22,25 +22,29 @@
  *  - Escape: collapse the current node if expanded, else move to the parent.
  *  - Visible 3px focus outline (>= 3:1 contrast), color-adjusted for
  *    high-contrast mode.
+ *
+ * Expansion re-render: markmap-view renders a folded branch's children only
+ * when it is expanded, so a one-time snapshot would leave those later-inserted
+ * `g.markmap-node` elements un-wired — a keyboard user could open a branch but
+ * not navigate into it. A MutationObserver re-wires newly inserted nodes, and
+ * all navigation reads the LIVE DOM (not a stale snapshot) so parent/child/
+ * sibling movement stays correct across expand/collapse.
  */
 
-const FOCUS_OUTLINE_COLOR = "#1d4ed8"; // blue-700: >= 3:1 contrast on white and slate-900
-const FOCUS_OUTLINE_COLOR_HIGH_CONTRAST = "#ffff00";
+const FOCUS_OUTLINE_COLOR = '#1d4ed8'; // blue-700: >= 3:1 contrast on white and slate-900
+const FOCUS_OUTLINE_COLOR_HIGH_CONTRAST = '#ffff00';
 
 /** Direct child paths are `${parentPath}.N`; root paths have no dot. */
 function getParentPath(path: string): string | null {
-  const dotIndex = path.lastIndexOf(".");
+  const dotIndex = path.lastIndexOf('.');
   return dotIndex === -1 ? null : path.slice(0, dotIndex);
 }
 
 function isDirectChild(path: string, parentPath: string | null): boolean {
   if (parentPath === null) {
-    return !path.includes(".");
+    return !path.includes('.');
   }
-  return (
-    path.startsWith(`${parentPath}.`) &&
-    path.slice(parentPath.length + 1).indexOf(".") === -1
-  );
+  return path.startsWith(`${parentPath}.`) && path.slice(parentPath.length + 1).indexOf('.') === -1;
 }
 
 export interface MindmapKeyboardNavOptions {
@@ -49,83 +53,91 @@ export interface MindmapKeyboardNavOptions {
 
 /**
  * Wire keyboard navigation + a visible focus indicator onto every rendered
- * mindmap node inside `svg`. Returns a cleanup function that removes all
- * listeners — call it before the SVG content is destroyed / re-rendered.
+ * mindmap node inside `svg`, and keep wiring nodes that markmap-view inserts
+ * later (e.g. when a folded branch is expanded). Returns a cleanup function
+ * that removes all listeners and stops observing — call it before the SVG
+ * content is destroyed / re-rendered.
  */
 export function applyMindmapKeyboardAccessibility(
   svg: SVGSVGElement,
   options: MindmapKeyboardNavOptions = {},
 ): () => void {
-  const nodeGroups = Array.from(
-    svg.querySelectorAll<SVGGElement>("g.markmap-node"),
-  );
   const outlineColor = options.isHighContrast
     ? FOCUS_OUTLINE_COLOR_HIGH_CONTRAST
     : FOCUS_OUTLINE_COLOR;
 
-  const pathToGroup = new Map<string, SVGGElement>();
-  nodeGroups.forEach((group) => {
-    const path = group.getAttribute("data-path");
-    if (path) pathToGroup.set(path, group);
-  });
+  // Read the live DOM every time so navigation follows the CURRENT tree, not a
+  // snapshot taken before a branch was expanded.
+  const liveGroups = (): SVGGElement[] =>
+    Array.from(svg.querySelectorAll<SVGGElement>('g.markmap-node'));
 
-  const findSibling = (
-    path: string,
-    direction: 1 | -1,
-  ): SVGGElement | null => {
+  const groupByPath = (path: string): SVGGElement | null => {
+    for (const g of liveGroups()) {
+      if (g.getAttribute('data-path') === path) return g;
+    }
+    return null;
+  };
+
+  const findSibling = (path: string, direction: 1 | -1): SVGGElement | null => {
     const parentPath = getParentPath(path);
-    const siblings = nodeGroups
+    const siblings = liveGroups()
       .filter((g) => {
-        const p = g.getAttribute("data-path");
+        const p = g.getAttribute('data-path');
         return p !== null && isDirectChild(p, parentPath);
       })
       .sort((a, b) => {
-        const ai = Number(a.getAttribute("data-path")?.split(".").pop());
-        const bi = Number(b.getAttribute("data-path")?.split(".").pop());
+        const ai = Number(a.getAttribute('data-path')?.split('.').pop());
+        const bi = Number(b.getAttribute('data-path')?.split('.').pop());
         return ai - bi;
       });
-    const currentIndex = siblings.findIndex(
-      (g) => g.getAttribute("data-path") === path,
-    );
+    const currentIndex = siblings.findIndex((g) => g.getAttribute('data-path') === path);
     return siblings[currentIndex + direction] ?? null;
   };
 
-  const findFirstChild = (path: string): SVGGElement | null =>
-    pathToGroup.get(`${path}.0`) ?? null;
+  const findFirstChild = (path: string): SVGGElement | null => groupByPath(`${path}.0`);
 
-  const cleanups: Array<() => void> = [];
+  // Track wiring per node so re-runs (via the observer) never double-bind, and
+  // so cleanup can detach every listener.
+  const wired = new WeakSet<SVGGElement>();
+  const cleanupByNode = new WeakMap<SVGGElement, () => void>();
+  const wiredNodes = new Set<SVGGElement>();
 
-  nodeGroups.forEach((group, index) => {
-    group.setAttribute("tabindex", "0");
-    group.setAttribute("role", "treeitem");
-    group.style.cursor = "pointer";
+  const wireNode = (group: SVGGElement): void => {
+    if (wired.has(group)) return;
+    wired.add(group);
+    wiredNodes.add(group);
 
-    const label =
-      group.querySelector("text")?.textContent?.trim() ||
-      group.querySelector("foreignObject")?.textContent?.trim() ||
-      `Nodo ${index + 1}`;
-    group.setAttribute("aria-label", label);
+    group.setAttribute('tabindex', '0');
+    group.setAttribute('role', 'treeitem');
+    group.style.cursor = 'pointer';
 
-    const path = group.getAttribute("data-path");
-    const circle = group.querySelector("circle");
-    if (circle && path && pathToGroup.has(`${path}.0`)) {
-      group.setAttribute(
-        "aria-expanded",
-        String(!group.classList.contains("markmap-fold")),
-      );
+    if (!group.getAttribute('aria-label')) {
+      const label =
+        group.querySelector('text')?.textContent?.trim() ||
+        group.querySelector('foreignObject')?.textContent?.trim() ||
+        `Nodo ${wiredNodes.size}`;
+      group.setAttribute('aria-label', label);
+    }
+
+    const circle = group.querySelector('circle');
+    // markmap-view only draws an expand/collapse circle on nodes that have
+    // children — use it as the "expandable" signal so aria-expanded is set
+    // even while the branch is still folded (children not yet in the DOM).
+    if (circle) {
+      group.setAttribute('aria-expanded', String(!group.classList.contains('markmap-fold')));
     }
 
     const handleFocus = () => {
       group.style.outline = `3px solid ${outlineColor}`;
-      group.style.outlineOffset = "2px";
+      group.style.outlineOffset = '2px';
     };
     const handleBlur = () => {
-      group.style.outline = "none";
+      group.style.outline = 'none';
     };
 
     const toggle = (event: KeyboardEvent) => {
-      circle?.dispatchEvent(
-        new MouseEvent("click", {
+      group.querySelector('circle')?.dispatchEvent(
+        new MouseEvent('click', {
           bubbles: true,
           cancelable: true,
           ctrlKey: event.ctrlKey,
@@ -135,53 +147,54 @@ export function applyMindmapKeyboardAccessibility(
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      const currentPath = group.getAttribute("data-path");
+      const currentPath = group.getAttribute('data-path');
+      const hasCircle = !!group.querySelector('circle');
       switch (event.key) {
-        case "Enter":
-        case " ":
-        case "Spacebar":
+        case 'Enter':
+        case ' ':
+        case 'Spacebar':
           event.preventDefault();
           toggle(event);
           break;
-        case "ArrowRight": {
+        case 'ArrowRight': {
           event.preventDefault();
           if (!currentPath) break;
-          if (group.classList.contains("markmap-fold") && circle) {
+          if (group.classList.contains('markmap-fold') && hasCircle) {
             toggle(event);
           } else {
             findFirstChild(currentPath)?.focus();
           }
           break;
         }
-        case "ArrowLeft": {
+        case 'ArrowLeft': {
           event.preventDefault();
           if (!currentPath) break;
-          if (!group.classList.contains("markmap-fold") && circle) {
+          if (!group.classList.contains('markmap-fold') && hasCircle) {
             toggle(event);
           } else {
             const parentPath = getParentPath(currentPath);
-            if (parentPath !== null) pathToGroup.get(parentPath)?.focus();
+            if (parentPath !== null) groupByPath(parentPath)?.focus();
           }
           break;
         }
-        case "ArrowDown":
+        case 'ArrowDown':
           event.preventDefault();
           if (currentPath) findSibling(currentPath, 1)?.focus();
           break;
-        case "ArrowUp":
+        case 'ArrowUp':
           event.preventDefault();
           if (currentPath) findSibling(currentPath, -1)?.focus();
           break;
-        case "Escape": {
+        case 'Escape': {
           event.preventDefault();
           if (!currentPath) break;
-          if (!group.classList.contains("markmap-fold") && circle) {
+          if (!group.classList.contains('markmap-fold') && hasCircle) {
             // Collapse the current (expanded) node.
             toggle(event);
           } else {
             // Already collapsed / leaf: move focus up to the parent.
             const parentPath = getParentPath(currentPath);
-            if (parentPath !== null) pathToGroup.get(parentPath)?.focus();
+            if (parentPath !== null) groupByPath(parentPath)?.focus();
           }
           break;
         }
@@ -190,18 +203,34 @@ export function applyMindmapKeyboardAccessibility(
       }
     };
 
-    group.addEventListener("focus", handleFocus);
-    group.addEventListener("blur", handleBlur);
-    group.addEventListener("keydown", handleKeyDown);
+    group.addEventListener('focus', handleFocus);
+    group.addEventListener('blur', handleBlur);
+    group.addEventListener('keydown', handleKeyDown);
 
-    cleanups.push(() => {
-      group.removeEventListener("focus", handleFocus);
-      group.removeEventListener("blur", handleBlur);
-      group.removeEventListener("keydown", handleKeyDown);
+    cleanupByNode.set(group, () => {
+      group.removeEventListener('focus', handleFocus);
+      group.removeEventListener('blur', handleBlur);
+      group.removeEventListener('keydown', handleKeyDown);
     });
-  });
+  };
+
+  const wireAll = (): void => {
+    for (const group of liveGroups()) wireNode(group);
+  };
+
+  // Wire everything already rendered, then keep wiring nodes markmap-view
+  // inserts on expand (childList mutations anywhere under the svg).
+  wireAll();
+
+  let observer: MutationObserver | null = null;
+  if (typeof MutationObserver !== 'undefined') {
+    observer = new MutationObserver(() => wireAll());
+    observer.observe(svg, { childList: true, subtree: true });
+  }
 
   return () => {
-    cleanups.forEach((fn) => fn());
+    observer?.disconnect();
+    for (const group of wiredNodes) cleanupByNode.get(group)?.();
+    wiredNodes.clear();
   };
 }
