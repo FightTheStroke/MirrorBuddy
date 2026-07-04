@@ -134,6 +134,7 @@
       "selectAllow": "Sélectionnez 'Autoriser'",
       "reload": "Recharger la page"
     },
-    "switchToChat": "Passer au chat"
+    "switchToChat": "Passer au chat",
+    "transcriptLog": "Transcription de la conversation"
   }
 }

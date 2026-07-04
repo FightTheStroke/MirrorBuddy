@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 
@@ -15,14 +16,18 @@ interface SessionTranscriptProps {
 }
 
 export function SessionTranscript({ maestro, transcript }: SessionTranscriptProps) {
+  const t = useTranslations('voice');
   return (
     <div className="px-6 pb-4">
-      <div className="max-h-48 overflow-y-auto space-y-3 p-4 bg-slate-800/50 rounded-xl">
+      <div
+        className="max-h-48 overflow-y-auto space-y-3 p-4 bg-slate-800/50 rounded-xl"
+        role="log"
+        aria-live="polite"
+        aria-label={t('transcriptLog')}
+      >
         <AnimatePresence>
           {transcript.length === 0 ? (
-            <p className="text-center text-slate-500 text-sm italic">
-              {maestro.greeting}
-            </p>
+            <p className="text-center text-slate-500 text-sm italic">{maestro.greeting}</p>
           ) : (
             transcript.map((entry, index) => (
               <motion.div
@@ -33,7 +38,7 @@ export function SessionTranscript({ maestro, transcript }: SessionTranscriptProp
                   'p-3 rounded-lg max-w-[85%]',
                   entry.role === 'user'
                     ? 'bg-accent-themed/30 ml-auto text-right'
-                    : 'bg-slate-700/50 mr-auto'
+                    : 'bg-slate-700/50 mr-auto',
                 )}
               >
                 <p className="text-sm text-slate-200">{entry.content}</p>

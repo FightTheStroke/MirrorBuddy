@@ -134,6 +134,7 @@
       "selectAllow": "Select 'Allow'",
       "reload": "Reload the page"
     },
-    "switchToChat": "Switch to Chat"
+    "switchToChat": "Switch to Chat",
+    "transcriptLog": "Conversation transcript"
   }
 }
