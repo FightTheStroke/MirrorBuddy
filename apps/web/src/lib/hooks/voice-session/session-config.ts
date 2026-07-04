@@ -9,6 +9,8 @@ import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { useSettingsStore } from '@/lib/stores';
 import { useAccessibilityStore } from '@/lib/accessibility';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { buildAgeGateInstruction } from './age-gate-instruction';
 import type { Maestro } from '@/types';
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
 import { fetchConversationMemory, buildMemoryContext } from './memory-utils';
@@ -180,10 +182,16 @@ export function useSendSessionConfig(
       safetyInjected: useFullPrompt,
     });
 
+    // T1.10 (D-10): adapt language/topic guidance to the student's age when
+    // a real age is on record from onboarding. No-op (empty string) for
+    // anonymous Trial sessions or profiles that skipped this field.
+    const ageGateInstruction = buildAgeGateInstruction(useOnboardingStore.getState().data.age);
+
     const fullInstructions =
       languageInstruction +
       characterInstruction +
       safeVoicePrompt +
+      ageGateInstruction +
       memoryContext +
       adaptiveInstruction +
       voicePersonality +
@@ -200,7 +208,7 @@ export function useSendSessionConfig(
     // of the existing model deployment"). Falls back to whisper-1 when flag off.
     const useWhisperRealtime = isFeatureEnabled('voice_realtime_whisper_transcription').enabled;
     const transcriptionModel = useWhisperRealtime
-      ? (process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper')
+      ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper'
       : 'whisper-1';
 
     const transcriptionConfig = {

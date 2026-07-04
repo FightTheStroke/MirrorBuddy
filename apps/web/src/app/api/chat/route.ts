@@ -47,6 +47,7 @@ import '@/lib/tools/handlers';
 
 import { isSessionBlocked } from '@/lib/trial/anti-abuse';
 import { prisma } from '@/lib/db';
+import { applyAgeGatePrompt } from '@/lib/conversation/age-gate-injector';
 
 import { ChatRequest } from './types';
 import { TOOL_CONTEXT } from './constants';
@@ -283,6 +284,11 @@ export const POST = pipe(
       language,
     });
     enhancedSystemPrompt = contexts.enhancedPrompt;
+
+    // T1.10 (D-10): adapt language/topic guidance to the student's age when
+    // a real profile age is on record (no-op for anonymous Trial users or
+    // profiles still missing the field).
+    enhancedSystemPrompt = await applyAgeGatePrompt(enhancedSystemPrompt, userId);
 
     // SECURITY: Normalize unicode and filter input
     if (lastUserMessage) {
