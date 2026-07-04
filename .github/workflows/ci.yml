@@ -819,8 +819,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: smoke-test-report
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 5.5: Accessibility Tests - WCAG 2.1 AA compliance
   # BLOCKING: Gates deployment AND PR merge - ensures WCAG 2.1 AA compliance
@@ -943,8 +948,13 @@ jobs:
         if: always()
         with:
           name: accessibility-test-report-${{ matrix.shard }}
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 6a: Mobile Smoke - Fast PR feedback
   # Runs the smallest supported viewport to catch obvious mobile regressions early.
@@ -1055,8 +1065,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mobile-smoke-report
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 6a-bis: Mobile Build Pipeline - Capacitor build validation (PR only, informational)
   # Validates that the mobile build pipeline (Next.js export + Capacitor copy) works correctly
@@ -1383,8 +1398,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-test-failures
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 6c: Security E2E Tests - CSRF, cookie signing, authorization
   # BLOCKING: Ensures security controls are not regressed
@@ -1477,8 +1497,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: security-e2e-report
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 6d: Compliance E2E Tests - AI Act, GDPR, COPPA, data privacy
   # BLOCKING: Ensures regulatory compliance controls are not regressed
@@ -1571,8 +1596,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compliance-e2e-report
-          path: test-results/
+          path: |
+            test-results/
+            apps/web/test-results/
+            playwright-report/
+            apps/web/playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   # Lane 7: Docker Build Test (runs in parallel)
   docker:
@@ -1897,7 +1927,9 @@ jobs:
   # ============================================================================
   # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
   # Production promotion happens via promote-to-production.yml workflow.
-  # Auto-deploy is disabled via ignoreCommand in vercel.json.
+  # Git-triggered auto-deploy (push to main) is disabled via ignoreCommand in
+  # vercel.json (T0.1) — this job's explicit `vercel deploy --prebuilt` is the
+  # only path that reaches Vercel; production only via promote-to-production.yml.
   # ============================================================================
   deploy-to-staging:
     name: "🎪 Deploy to Staging"

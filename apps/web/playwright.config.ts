@@ -80,7 +80,11 @@ export default defineConfig({
   retries: process.env.CI ? 3 : 0,
   // Use 2 workers for mobile tests (CI_MOBILE_TESTS=1) to reduce resource contention
   workers: process.env.CI ? (process.env.CI_MOBILE_TESTS ? 2 : 4) : undefined,
-  reporter: [['list'], ['json', { outputFile: 'test-results/pw-results.json' }]],
+  reporter: [
+    ['list'],
+    ['json', { outputFile: 'test-results/pw-results.json' }],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+  ],
 
   // Global setup: sets onboarding as completed
   globalSetup: path.join(__dirname, 'e2e', 'global-setup.ts'),
