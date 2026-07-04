@@ -49,6 +49,31 @@ export interface SafetyInterventionParams {
    * audio already playing/queued locally must stop regardless.
    */
   pauseAudio?: () => void;
+  /** Current Maestro ID, for escalation/compliance correlation (crisis only). */
+  maestroId?: string;
+}
+
+/**
+ * T1.1 (D-01): the voice path detects a crisis exactly like non-streaming
+ * chat, but — unlike chat's `escalateCrisisDetected` + `notifyParentOfCrisis`
+ * — never told the server. A crisis flagged in a voice session produced a
+ * local redirect and a client-only log line: no compliance record, no parent
+ * notification. This fires the same server-side escalation chat uses,
+ * fire-and-forget from the client (the route itself keeps the DB/email work
+ * alive past its own response via `after()`); a failure here must never
+ * block or crash the voice session.
+ */
+function escalateVoiceCrisis(sessionId: string, maestroId?: string): void {
+  fetch('/api/safety/escalate-voice-crisis', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, maestroId }),
+  }).catch((error) => {
+    logger.error('[SafetyIntervention] Crisis escalation request failed', {
+      sessionId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 }
 
 /**
@@ -120,7 +145,7 @@ function getRedirectMessage(flaggedPatterns: string[]): string {
  * }
  */
 export function triggerSafetyIntervention(params: SafetyInterventionParams): void {
-  const { sessionId, safetyResult, dataChannel, setWarningState, pauseAudio } = params;
+  const { sessionId, safetyResult, dataChannel, setWarningState, pauseAudio, maestroId } = params;
 
   // Check feature flag - if disabled, no intervention
   const flagResult = isFeatureEnabled('voice_transcript_safety');
@@ -166,6 +191,9 @@ export function triggerSafetyIntervention(params: SafetyInterventionParams): voi
       flaggedPatterns: safetyResult.flaggedPatterns,
       message: redirectMessage,
     });
+    if (interventionReason === 'crisis_detected') {
+      escalateVoiceCrisis(sessionId, maestroId);
+    }
     return;
   }
 
@@ -218,6 +246,10 @@ export function triggerSafetyIntervention(params: SafetyInterventionParams): voi
       interventionReason,
       severity: safetyResult.severity,
     });
+
+    if (interventionReason === 'crisis_detected') {
+      escalateVoiceCrisis(sessionId, maestroId);
+    }
   } catch (error) {
     logger.error('[SafetyIntervention] Error during intervention', {
       sessionId,

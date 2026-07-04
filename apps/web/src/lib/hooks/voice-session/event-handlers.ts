@@ -221,6 +221,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
                 dataChannel: deps.webrtcDataChannelRef.current,
                 setWarningState: deps.setSafetyWarning,
                 pauseAudio: () => pauseVoiceAudio(deps),
+                maestroId: deps.maestroRef.current?.id,
               });
             }
 
@@ -320,6 +321,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
                 },
                 dataChannel: deps.webrtcDataChannelRef.current,
                 setWarningState: deps.setSafetyWarning,
+                maestroId: deps.maestroRef.current?.id,
               });
 
               // CRITICAL (child safety): never surface rejected assistant

@@ -10,7 +10,7 @@
  * 5. Feature flag guard
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { triggerSafetyIntervention } from '../safety-intervention';
 import type { SafetyWarningState } from '../safety-intervention';
 import type { TranscriptSafetyResult } from '../transcript-safety';
@@ -61,6 +61,17 @@ describe('triggerSafetyIntervention', () => {
     };
 
     mockSetWarningState = vi.fn();
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve(new Response(JSON.stringify({ success: true }), { status: 200 })),
+      ),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   describe('when feature flag is disabled', () => {
@@ -434,6 +445,71 @@ describe('triggerSafetyIntervention', () => {
           (call: unknown[]) => (call[1] as Record<string, unknown>)?.eventId === 'VCE-004',
         );
       expect((logCall![1] as Record<string, unknown>).timestamp).toBeGreaterThanOrEqual(timestamp);
+    });
+
+    it('T1.1/D-01: escalates crisis to the server (POST /api/safety/escalate-voice-crisis)', () => {
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'critical',
+        flaggedPatterns: ['crisis'],
+        actionTaken: 'escalate',
+        checkDurationMs: 4,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-crisis',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+        maestroId: 'euclide',
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/safety/escalate-voice-crisis',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ sessionId: 'test-session-crisis', maestroId: 'euclide' }),
+        }),
+      );
+    });
+
+    it('T1.1/D-01: escalates crisis even when the data channel is closed', () => {
+      mockDataChannel.readyState = 'closed';
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'critical',
+        flaggedPatterns: ['crisis'],
+        actionTaken: 'escalate',
+        checkDurationMs: 4,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-crisis-closed',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+      });
+
+      expect(fetch).toHaveBeenCalledWith(
+        '/api/safety/escalate-voice-crisis',
+        expect.objectContaining({ method: 'POST' }),
+      );
+    });
+
+    it('does NOT escalate to the server for non-crisis categories', () => {
+      const safetyResult: TranscriptSafetyResult = {
+        severity: 'high',
+        flaggedPatterns: ['explicit'],
+        actionTaken: 'block',
+        checkDurationMs: 4,
+      };
+
+      triggerSafetyIntervention({
+        sessionId: 'test-session-non-crisis',
+        safetyResult,
+        dataChannel: mockDataChannel as unknown as RTCDataChannel,
+        setWarningState: mockSetWarningState,
+      });
+
+      expect(fetch).not.toHaveBeenCalled();
     });
   });
 });
