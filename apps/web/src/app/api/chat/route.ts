@@ -23,6 +23,7 @@ import {
 } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput, detectBias, SAFE_RESPONSES } from '@/lib/safety';
 import { checkSTEMSafety } from '@/lib/safety';
+import { detectJailbreak, getJailbreakResponse, buildContext } from '@/lib/safety';
 import {
   recordMessage,
   recordSessionStart,
@@ -364,6 +365,42 @@ export const POST = pipe(
           model: 'content-filter',
           blocked: true,
           category: filterResult.category,
+        });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
+      }
+
+      // T1.5: Advanced jailbreak / prompt-injection gate (Issue #30, S-04).
+      // filterInput above already blocks obvious JAILBREAK_PATTERNS; this runs
+      // the dedicated detector AFTER it, catching sophisticated attempts the
+      // regex misses (base64/leetspeak/homograph encoding, multi-turn buildup,
+      // crescendo, code injection, output hijacking). Context from the message
+      // history activates multi-turn/crescendo detection. Gate on the module's
+      // own action (block/terminate_session, i.e. threat >= high) — mirroring
+      // how STEM uses stemResult.blocked — so low/medium 'warn' scores (e.g.
+      // "pretend you are a pirate") do not over-block legitimate child play.
+      // This is an INPUT gate: it returns before chatCompletion, so no provider
+      // tokens are consumed and no budget/trial usage is charged.
+      const jailbreakResult = detectJailbreak(lastUserMessage.content, buildContext(messages));
+      if (jailbreakResult.action === 'block' || jailbreakResult.action === 'terminate_session') {
+        log.warn('Jailbreak attempt blocked by detector', {
+          clientId,
+          threatLevel: jailbreakResult.threatLevel,
+          categories: jailbreakResult.categories,
+          confidence: jailbreakResult.confidence,
+        });
+        recordContentFiltered('jailbreak', {
+          userId,
+          maestroId,
+          confidence: jailbreakResult.confidence,
+          actionTaken: 'blocked',
+        });
+        const response = NextResponse.json({
+          content: getJailbreakResponse(jailbreakResult),
+          provider: 'safety_filter',
+          model: 'jailbreak-detector',
+          blocked: true,
+          category: 'jailbreak',
         });
         response.headers.set('X-Request-ID', getRequestId(request));
         return response;

@@ -8,8 +8,12 @@ set -euo pipefail
 # i18n validation (unconditional - ensures translation consistency)
 npm run i18n:check || exit 1
 
-# Check for duplicate commit messages in last 5 commits
-DUPLICATE_COMMITS=$(git log --oneline -5 | awk '{$1=""; print $0}' | sort | uniq -d)
+# Check for duplicate commit messages in last 5 commits. Excludes generic
+# "Merge branch 'main' into X" sync commits: GitHub's PR update-branch API
+# legitimately produces one of these per re-sync against a moving base, so
+# the same message repeating is expected noise, not an accidental duplicate
+# commit — the check's actual target.
+DUPLICATE_COMMITS=$(git log --oneline -5 | awk '{$1=""; print $0}' | grep -v "^ Merge branch '.*' into " | sort | uniq -d)
 if [ -n "$DUPLICATE_COMMITS" ]; then
   echo "ERROR: Duplicate commit messages found in last 5 commits:"
   echo "$DUPLICATE_COMMITS"
