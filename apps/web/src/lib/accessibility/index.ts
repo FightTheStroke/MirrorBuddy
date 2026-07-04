@@ -18,3 +18,6 @@ export type {
   ADHDSessionStats,
   A11yProfileId,
 } from "./accessibility-store";
+
+export { applyMindmapKeyboardAccessibility } from "./mindmap-keyboard-nav";
+export type { MindmapKeyboardNavOptions } from "./mindmap-keyboard-nav";

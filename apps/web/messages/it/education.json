@@ -769,6 +769,11 @@
       "correctCount": "Correct count",
       "questionCounter": "Question counter"
     },
+    "quizBreakTimer": {
+      "title": "Pausa!",
+      "message": "Hai lavorato per un bel po'. Fai una breve pausa prima di continuare il quiz.",
+      "resumeButton": "Riprendi il quiz"
+    },
     "stepContent": {
       "contentUnavailable": "Content unavailable",
       "flashcardDescription": "Flashcard description",

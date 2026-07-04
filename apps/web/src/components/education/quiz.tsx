@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import type { Quiz as QuizType, QuizResult } from "@/types";
 import { QuizHeader } from "./quiz/quiz-header";
 import { QuizCompletion } from "./quiz/quiz-completion";
+import { QuizBreakTimer } from "./quiz/quiz-break-timer";
 import { useTranslations } from "next-intl";
 
 interface QuizProps {
@@ -120,6 +121,9 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
 
   return (
     <Card className="w-full">
+      {/* T2.10: ADHD break reminder — visible/functional during the real quiz flow */}
+      <QuizBreakTimer />
+
       <QuizHeader
         currentIndex={currentIndex}
         totalQuestions={quiz.questions.length}
