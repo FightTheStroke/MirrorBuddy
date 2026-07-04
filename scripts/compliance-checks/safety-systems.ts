@@ -10,7 +10,10 @@ export async function runSafetySystemsChecks(): Promise<CheckResult[]> {
   }
 
   // --- Content filter patterns ---
-  const cfPatterns = 'src/lib/safety/content-filter/patterns.ts';
+  // Path fixed post-T1.9 (D-09): the content-filter/ subdirectory was the
+  // dead pre-refactor duplicate and was deleted; the live implementation
+  // (the one @/lib/safety/index.ts actually imports) is this flat file.
+  const cfPatterns = 'src/lib/safety/content-filter-patterns.ts';
   if (!fileExists(cfPatterns)) {
     add('Content filter patterns', 'FAIL', `Missing: ${cfPatterns}`);
   } else if (!fileMatches(cfPatterns, /export\s/)) {
@@ -36,7 +39,12 @@ export async function runSafetySystemsChecks(): Promise<CheckResult[]> {
   }
 
   // --- Age gating topic matrix ---
-  const topicMatrix = 'src/lib/safety/age-gating/topic-matrix.ts';
+  // Path fixed post-T1.9 (D-09): the age-gating/ subdirectory was the dead
+  // pre-refactor duplicate (this was the one case where the *subdirectory*
+  // was dead, not the flat files) and was deleted; the live implementation
+  // is this flat file, reached via the age-gating.ts shim @/lib/safety
+  // actually imports.
+  const topicMatrix = 'src/lib/safety/age-gating-matrix.ts';
   if (!fileExists(topicMatrix)) {
     add('Age gating topics', 'FAIL', `Missing: ${topicMatrix}`);
   } else if (!fileMatches(topicMatrix, /export\s/)) {
