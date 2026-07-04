@@ -16,7 +16,6 @@ import { ReadyStep } from './components/ready-step';
 import { LoadingState } from './components/loading-state';
 import { LandingPage } from './components/landing-page';
 import { ProgressIndicator } from './components/progress-indicator';
-import { VoiceFallbackBanner } from './components/voice-fallback-banner';
 import { useExistingUserData } from './hooks/use-existing-user-data';
 import { useVoiceConnection } from './hooks/use-voice-connection';
 import { useWelcomeVoice } from './hooks/use-welcome-voice';
@@ -139,14 +138,7 @@ function WelcomeContent() {
         onReset={handleReset}
       />
 
-      {useWebSpeechFallback && <VoiceFallbackBanner />}
-
-      <div
-        className={cn(
-          'pb-8 px-4 min-h-screen flex items-center justify-center',
-          useWebSpeechFallback ? 'pt-28' : 'pt-20',
-        )}
-      >
+      <div className={cn('pb-8 px-4 min-h-screen flex items-center justify-center', 'pt-20')}>
         <div className="w-full max-w-md">
           <AnimatePresence mode="wait">
             <motion.div
