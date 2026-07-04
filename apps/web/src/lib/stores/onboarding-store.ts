@@ -7,18 +7,18 @@
  * - Collected data during onboarding
  */
 
-import { create } from "zustand";
-import { csrfFetch } from "@/lib/auth";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+import { create } from 'zustand';
+import { csrfFetch } from '@/lib/auth';
+import { AUTH_COOKIE_NAME } from '@/lib/auth';
 import {
   type OnboardingStep,
   type OnboardingData,
   type VoiceTranscriptEntry,
   STEP_ORDER,
-} from "./onboarding-types";
+} from './onboarding-types';
 
 export type { OnboardingStep, OnboardingData, VoiceTranscriptEntry };
-export { getStepIndex, getTotalSteps } from "./onboarding-types";
+export { getStepIndex, getTotalSteps } from './onboarding-types';
 
 interface OnboardingState {
   // Flow state
@@ -46,7 +46,7 @@ interface OnboardingState {
   setVoiceMuted: (muted: boolean) => void;
   setVoiceSessionActive: (active: boolean) => void;
   setVoiceSessionConnecting: (connecting: boolean) => void;
-  addVoiceTranscript: (role: "user" | "assistant", text: string) => void;
+  addVoiceTranscript: (role: 'user' | 'assistant', text: string) => void;
   clearVoiceTranscript: () => void;
   setAzureAvailable: (available: boolean) => void;
   completeOnboarding: () => void;
@@ -59,7 +59,7 @@ interface OnboardingState {
 export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   hasCompletedOnboarding: false,
   onboardingCompletedAt: null,
-  currentStep: "welcome",
+  currentStep: 'welcome',
   isReplayMode: false,
   isVoiceMuted: false,
   isHydrated: false,
@@ -71,7 +71,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   azureAvailable: null,
 
   data: {
-    name: "",
+    name: '',
   },
 
   setStep: (step) => set({ currentStep: step }),
@@ -80,15 +80,11 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
 
   setVoiceSessionActive: (active) => set({ voiceSessionActive: active }),
 
-  setVoiceSessionConnecting: (connecting) =>
-    set({ voiceSessionConnecting: connecting }),
+  setVoiceSessionConnecting: (connecting) => set({ voiceSessionConnecting: connecting }),
 
   addVoiceTranscript: (role, text) =>
     set((state) => ({
-      voiceTranscript: [
-        ...state.voiceTranscript,
-        { role, text, timestamp: Date.now() },
-      ],
+      voiceTranscript: [...state.voiceTranscript, { role, text, timestamp: Date.now() }],
     })),
 
   clearVoiceTranscript: () => set({ voiceTranscript: [] }),
@@ -123,7 +119,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
 
   startReplay: () =>
     set({
-      currentStep: "welcome",
+      currentStep: 'welcome',
       isReplayMode: true,
     }),
 
@@ -131,7 +127,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
     set({
       hasCompletedOnboarding: false,
       onboardingCompletedAt: null,
-      currentStep: "welcome",
+      currentStep: 'welcome',
       isReplayMode: false,
       isVoiceMuted: false,
       isHydrated: false,
@@ -139,29 +135,29 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       voiceSessionConnecting: false,
       voiceTranscript: [],
       azureAvailable: null,
-      data: { name: "" },
+      data: { name: '' },
     }),
 
   resetAllData: async () => {
     // Delete all user data from database (primary data source)
     try {
-      await csrfFetch("/api/user/data", { method: "DELETE" });
+      await csrfFetch('/api/user/data', { method: 'DELETE' });
     } catch {
       // Continue with local cleanup even if API fails
     }
 
     // Clear any remaining localStorage (legacy/session data)
     const storeKeys = [
-      "mirrorbuddy-settings",
-      "mirrorbuddy-progress",
-      "mirrorbuddy-conversations",
-      "mirrorbuddy-learnings",
-      "mirrorbuddy-html-snippets",
-      "mirrorbuddy-calendar",
-      "mirrorbuddy-onboarding",
-      "mirrorbuddy-accessibility",
-      "mirrorbuddy-notifications",
-      "mirrorbuddy-pomodoro",
+      'mirrorbuddy-settings',
+      'mirrorbuddy-progress',
+      'mirrorbuddy-conversations',
+      'mirrorbuddy-learnings',
+      'mirrorbuddy-html-snippets',
+      'mirrorbuddy-calendar',
+      'mirrorbuddy-onboarding',
+      'mirrorbuddy-accessibility',
+      'mirrorbuddy-notifications',
+      'mirrorbuddy-pomodoro',
       AUTH_COOKIE_NAME,
     ];
 
@@ -170,7 +166,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
     });
 
     // Clear IndexedDB (legacy materials storage)
-    const databases = ["mirrorbuddy-materials", "mirrorbuddy-flashcards"];
+    const databases = ['mirrorbuddy-materials', 'mirrorbuddy-flashcards'];
     for (const dbName of databases) {
       try {
         indexedDB.deleteDatabase(dbName);
@@ -183,7 +179,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
     set({
       hasCompletedOnboarding: false,
       onboardingCompletedAt: null,
-      currentStep: "welcome",
+      currentStep: 'welcome',
       isReplayMode: false,
       isVoiceMuted: false,
       isHydrated: false,
@@ -191,11 +187,11 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       voiceSessionConnecting: false,
       voiceTranscript: [],
       azureAvailable: null,
-      data: { name: "" },
+      data: { name: '' },
     });
 
     // Reload the page to reinitialize everything
-    window.location.href = "/welcome";
+    window.location.href = '/welcome';
   },
 
   hydrateFromApi: async () => {
@@ -203,7 +199,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
     if (get().isHydrated) return;
 
     try {
-      const response = await fetch("/api/onboarding");
+      const response = await fetch('/api/onboarding');
       if (!response.ok) {
         // API error - mark as hydrated but don't update state
         set({ isHydrated: true });
@@ -212,26 +208,33 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
 
       const data = await response.json();
 
-      // If user has existing data (profile with name), consider them as onboarded
-      // This handles the case where OnboardingState record is missing but user exists
-      const isCompleted =
-        data.onboardingState?.hasCompletedOnboarding ??
-        data.hasExistingData ??
-        false;
+      // Decide whether onboarding is complete.
+      // A returning user who already has a real profile (a name) must go
+      // straight to the app — NOT be re-forced through onboarding by a stale
+      // OnboardingState row with hasCompletedOnboarding=false (e.g. an account
+      // created/seeded without the flag ever being set). The previous `??`
+      // logic let an explicit `false` win over the "has existing data" signal,
+      // which trapped real logged-in users in a /welcome bounce.
+      // Replay mode still intentionally forces onboarding (resetOnboarding /
+      // startReplay set hasCompletedOnboarding=false to redo the flow).
+      const state = data.onboardingState;
+      const hasProfileName = Boolean(data.data?.name);
+      const isCompleted = state?.isReplayMode
+        ? false
+        : Boolean(state?.hasCompletedOnboarding) || hasProfileName;
 
       // Update store with DB state
       set({
         isHydrated: true,
         hasCompletedOnboarding: isCompleted,
-        onboardingCompletedAt:
-          data.onboardingState?.onboardingCompletedAt ?? null,
+        onboardingCompletedAt: data.onboardingState?.onboardingCompletedAt ?? null,
         currentStep:
           (data.onboardingState?.currentStep as OnboardingStep) ??
-          (isCompleted ? "ready" : "welcome"),
+          (isCompleted ? 'ready' : 'welcome'),
         isReplayMode: data.onboardingState?.isReplayMode ?? false,
         ...(data.data && {
           data: {
-            name: data.data.name ?? "",
+            name: data.data.name ?? '',
             age: data.data.age,
             schoolLevel: data.data.schoolLevel,
             learningDifferences: data.data.learningDifferences,
