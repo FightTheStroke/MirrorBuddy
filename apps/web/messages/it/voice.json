@@ -10,6 +10,7 @@
     "webrtcDirect": "WebRTC Direct",
     "connessionePeerToPeer": "Connessione peer-to-peer a bassa latenza",
     "envLocal": ".env.local",
+    "transcriptLog": "Trascrizione della conversazione",
     "safety": {
       "warningTitle": "Attenzione alla Sicurezza"
     },

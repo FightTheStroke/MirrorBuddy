@@ -134,6 +134,7 @@
       "selectAllow": "Wähle 'Zulassen'",
       "reload": "Seite neu laden"
     },
-    "switchToChat": "Zum Chat wechseln"
+    "switchToChat": "Zum Chat wechseln",
+    "transcriptLog": "Gesprächsprotokoll"
   }
 }
