@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-MirrorBuddy is an AI-powered educational platform for students with learning differences (ages 6-19). It processes personal data of minors using large language models for tutoring and learning support.
+MirrorBuddy is an AI-powered educational platform for students with learning differences (ages 8-18). It processes personal data of minors using large language models for tutoring and learning support.
 
 ### Regulatory Landscape
 

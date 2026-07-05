@@ -12,7 +12,7 @@ import { VALID_LEARNING_DIFFERENCES } from './types';
 
 export async function executeOnboardingTool(
   toolName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<VoiceToolCallResult> {
   const store = useOnboardingStore.getState();
 
@@ -63,10 +63,10 @@ export async function executeOnboardingTool(
         };
       }
 
-      if (age < 6 || age > 19) {
+      if (age < 8 || age > 18) {
         return {
           success: false,
-          error: 'L\'età deve essere tra 6 e 19 anni. Chiedi di ripetere.',
+          error: "L'età deve essere tra 8 e 18 anni. Chiedi di ripetere.",
         };
       }
 
@@ -110,7 +110,7 @@ export async function executeOnboardingTool(
       }
 
       const validDifferences = differences.filter((d) =>
-        VALID_LEARNING_DIFFERENCES.includes(d as typeof VALID_LEARNING_DIFFERENCES[number])
+        VALID_LEARNING_DIFFERENCES.includes(d as (typeof VALID_LEARNING_DIFFERENCES)[number]),
       );
 
       store.updateData({ learningDifferences: validDifferences });
@@ -184,4 +184,3 @@ export async function executeOnboardingTool(
       };
   }
 }
-

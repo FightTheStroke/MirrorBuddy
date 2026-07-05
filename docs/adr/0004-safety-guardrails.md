@@ -1,14 +1,16 @@
 # ADR 0004: Safety Guardrails for Child Protection
 
 ## Status
+
 Accepted
 
 ## Date
+
 2025-12-29
 
 ## Context
 
-MirrorBuddy is an AI-powered educational platform for **minors** (ages 6-19) with learning differences. AI systems interacting with children require robust safety measures to:
+MirrorBuddy is an AI-powered educational platform for **minors** (ages 8-18) with learning differences. AI systems interacting with children require robust safety measures to:
 
 1. **Prevent harmful content** - No violence, sexual content, substance abuse
 2. **Protect privacy** - No collection of personal information
@@ -19,11 +21,13 @@ MirrorBuddy is an AI-powered educational platform for **minors** (ages 6-19) wit
 ### The Challenge
 
 The platform has **20+ AI characters** that need safety guardrails:
+
 - 17 Maestri (historical figures)
 - 2 Coaches (Melissa, Davide)
 - 2 Buddies (Mario, Maria)
 
 Each character has a unique personality and system prompt. We need a centralized safety layer that:
+
 - Cannot be bypassed by any character
 - Is injected automatically
 - Works with all AI providers (Azure OpenAI, Ollama)
@@ -32,31 +36,39 @@ Each character has a unique personality and system prompt. We need a centralized
 ### Options Considered
 
 #### Option 1: Per-Character Safety Rules
+
 Add safety rules to each character's system prompt manually.
 
 **Pros:**
+
 - Simple implementation
 - Character-specific tailoring
 
 **Cons:**
+
 - Easy to forget when adding new characters
 - No single source of truth
 - Hard to audit and update
 
 #### Option 2: API-Level Filtering Only
+
 Use Azure Content Safety API or similar for all I/O.
 
 **Pros:**
+
 - Provider-managed safety
 - Automatic updates
 
 **Cons:**
+
 - Not all providers support this
 - May be too generic for educational context
 - No control over behavior
 
 #### Option 3: Layered Defense (Chosen)
+
 Multiple layers of protection:
+
 1. System prompt injection (preventive)
 2. Input content filter (detective)
 3. Output sanitizer (corrective)
@@ -64,12 +76,14 @@ Multiple layers of protection:
 5. Adversarial test suite (verification)
 
 **Pros:**
+
 - Defense in depth
 - Centralized management
 - Testable and verifiable
 - Works across all providers
 
 **Cons:**
+
 - More code to maintain
 - Potential latency impact
 - False positives possible
@@ -88,6 +102,7 @@ const safePrompt = injectSafetyGuardrails(characterPrompt, { role: 'maestro' });
 ```
 
 The core safety prompt (`SAFETY_CORE_PROMPT`) covers:
+
 - Prohibited content categories
 - Privacy protection rules
 - Prompt injection defense
@@ -107,6 +122,7 @@ if (!filterResult.safe) {
 ```
 
 Categories:
+
 - **Severe**: Self-harm, explicit violence, drugs → Immediate block + crisis response
 - **Medium**: Mild profanity, age-inappropriate topics → Redirect
 - **Low**: Off-topic chatter → Gentle redirect to studying
@@ -120,6 +136,7 @@ const sanitizedResponse = sanitizeOutput(aiResponse, studentAge);
 ```
 
 Removes or replaces:
+
 - Accidentally generated inappropriate content
 - Personal information leaks
 - URLs and external links (prevent phishing)
@@ -137,6 +154,7 @@ if (jailbreakResult.isJailbreak) {
 ```
 
 Detected patterns:
+
 - "Ignore previous instructions"
 - "DAN mode" and variants
 - "Pretend you are [other character]"
@@ -172,6 +190,7 @@ if (containsCrisisKeywords(studentMessage)) {
 ```
 
 Crisis response includes:
+
 - Empathetic acknowledgment
 - Referral to trusted adults
 - Italian crisis helpline numbers
@@ -224,6 +243,7 @@ Crisis response includes:
 ## Consequences
 
 ### Positive
+
 - Centralized safety management
 - All characters inherit protection automatically
 - Testable and auditable
@@ -231,17 +251,20 @@ Crisis response includes:
 - Crisis response is pre-approved and consistent
 
 ### Negative
+
 - Added latency for filtering
 - False positives may frustrate students
 - Maintenance burden for pattern lists
 - Cannot catch 100% of edge cases
 
 ### Risks
+
 - Evolving jailbreak techniques may bypass patterns
 - Cultural/linguistic variations may cause false positives
 - Over-filtering may make AI seem "stupid" or unresponsive
 
 ### Mitigations
+
 - Regular pattern list updates
 - User feedback mechanism for false positives
 - Logging and monitoring of flagged content
@@ -249,15 +272,16 @@ Crisis response includes:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/lib/safety/safety-prompts.ts` | Core safety prompt injection |
-| `src/lib/safety/content-filter.ts` | Input filtering and classification |
-| `src/lib/safety/output-sanitizer.ts` | Response sanitization |
-| `src/lib/safety/jailbreak-detector.ts` | Jailbreak pattern detection |
-| `src/lib/safety/__tests__/` | Adversarial test suite |
+| File                                   | Purpose                            |
+| -------------------------------------- | ---------------------------------- |
+| `src/lib/safety/safety-prompts.ts`     | Core safety prompt injection       |
+| `src/lib/safety/content-filter.ts`     | Input filtering and classification |
+| `src/lib/safety/output-sanitizer.ts`   | Response sanitization              |
+| `src/lib/safety/jailbreak-detector.ts` | Jailbreak pattern detection        |
+| `src/lib/safety/__tests__/`            | Adversarial test suite             |
 
 ## References
+
 - GitHub Issue #30 - Safety Guardrails
 - COPPA (Children's Online Privacy Protection Act)
 - GDPR Article 8 (Child consent)

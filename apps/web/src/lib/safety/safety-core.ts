@@ -4,13 +4,13 @@
  * Extracted from safety-prompts.ts
  */
 
-import { isFormalProfessor } from "@/lib/greeting/templates";
+import { isFormalProfessor } from '@/lib/greeting/templates';
 
 // Core safety prompt - defined inline
 export const SAFETY_CORE_PROMPT = `
 # REGOLE DI SICUREZZA NON NEGOZIABILI
 
-Sei un'AI educativa per MINORI (età 6-19 anni). Devi SEMPRE comportarti in modo appropriato, protettivo e responsabile.
+Sei un'AI educativa per MINORI (età 8-18 anni). Devi SEMPRE comportarti in modo appropriato, protettivo e responsabile.
 
 ## 1. CONTENUTI PROIBITI (MAI discutere, descrivere o generare)
 
@@ -186,7 +186,7 @@ RICORDA: La sicurezza dello studente viene PRIMA di tutto, anche prima di essere
 
 export interface SafetyInjectionOptions {
   /** Character role: determines additional context */
-  role: "maestro" | "coach" | "buddy";
+  role: 'maestro' | 'coach' | 'buddy';
   /** Whether to include anti-cheating guidelines (default: true for maestro/coach) */
   includeAntiCheating?: boolean;
   /** Additional character-specific safety notes */
@@ -207,7 +207,7 @@ export function injectSafetyGuardrails(
 ): string {
   const {
     role,
-    includeAntiCheating = role !== "buddy",
+    includeAntiCheating = role !== 'buddy',
     additionalNotes,
     characterId,
     formalAddress,
@@ -216,14 +216,13 @@ export function injectSafetyGuardrails(
   // Determine formality: explicit override > auto-detection
   // Coaches and buddies are always informal
   const shouldUseFormalAddress =
-    role === "maestro" &&
-    (formalAddress ?? (characterId ? isFormalProfessor(characterId) : false));
+    role === 'maestro' && (formalAddress ?? (characterId ? isFormalProfessor(characterId) : false));
 
   // Build role-specific section
-  let roleSection = "";
+  let roleSection = '';
 
   switch (role) {
-    case "maestro":
+    case 'maestro':
       roleSection = `
 ## RUOLO SPECIFICO: MAESTRO (Tutore Storico)
 - Sei un personaggio storico che insegna la sua materia
@@ -233,7 +232,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case "coach":
+    case 'coach':
       roleSection = `
 ## RUOLO SPECIFICO: COACH (Docente di Sostegno)
 - Sei un adulto responsabile, ma giovane e accessibile
@@ -243,7 +242,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case "buddy":
+    case 'buddy':
       roleSection = `
 ## RUOLO SPECIFICO: BUDDY (Compagno di Studio)
 - Sei un PARI, non un adulto. Mantieni un tono amichevole e generazionale
@@ -297,7 +296,7 @@ IMPORTANTE: Come personaggio storico rispettabile, usi il registro FORMALE con l
 - NON essere freddo o distaccato - formale ma accogliente
 - NON essere rigido - la formalità è rispettosa, non intimidatoria
 `;
-  } else if (role === "maestro") {
+  } else if (role === 'maestro') {
     // Informal maestros get explicit permission to use "tu"
     fullPrompt += `
 ## REGISTRO INFORMALE (Tu)
@@ -341,10 +340,10 @@ ${characterPrompt}
  */
 export function hasSafetyGuardrails(prompt: string): boolean {
   const requiredPatterns = [
-    "REGOLE DI SICUREZZA NON NEGOZIABILI",
-    "CONTENUTI PROIBITI",
-    "PROTEZIONE PRIVACY",
-    "PROMPT INJECTION",
+    'REGOLE DI SICUREZZA NON NEGOZIABILI',
+    'CONTENUTI PROIBITI',
+    'PROTEZIONE PRIVACY',
+    'PROMPT INJECTION',
   ];
 
   return requiredPatterns.every((pattern) => prompt.includes(pattern));

@@ -54,7 +54,7 @@ MirrorBuddy provides AI tutoring to students with learning differences (dyslexia
 
 ### User Base
 
-- **Students**: Ages 6-19, with diagnosed learning disabilities
+- **Students**: Ages 8-18, with diagnosed learning disabilities
 - **Parents**: Consent management, activity monitoring
 - **Educators**: Supplementary teaching tool with transcript access
 
