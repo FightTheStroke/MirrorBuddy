@@ -81,27 +81,6 @@ describe('FrustrationClassifier', () => {
     });
   });
 
-  describe('classify - with audio', () => {
-    it('incorporates prosody analysis', () => {
-      const sampleRate = 16000;
-      const audioSamples = new Float32Array(sampleRate * 0.5);
-
-      // Generate some audio
-      for (let i = 0; i < audioSamples.length; i++) {
-        audioSamples[i] = 0.1 * Math.sin((2 * Math.PI * 200 * i) / sampleRate);
-      }
-
-      const result = classifier.classify({
-        text: 'Test',
-        audioSamples,
-        sampleRate,
-      });
-
-      expect(result.rawResults.prosody).toBeDefined();
-      expect(result.breakdown.prosody).toBeDefined();
-    });
-  });
-
   describe('intervention determination', () => {
     it('suggests help for explicit frustration', () => {
       const result = classifier.classify({

@@ -89,6 +89,38 @@ describe('tool-output-storage', () => {
       await expect(saveToolOutput(conversationId, 'mindmap', {})).rejects.toThrow('DB error');
     });
 
+    it('AI-Act P0-2: should strip imageBase64 before persisting (GDPR minimization)', async () => {
+      const mockData = {
+        imageBase64: 'data:image/jpeg;base64,/9j/4AAQSkZJRg==',
+        extractedText: 'Hello world',
+        imageDescription: 'A handwritten note',
+      };
+      const expectedPersisted = {
+        extractedText: 'Hello world',
+        imageDescription: 'A handwritten note',
+      };
+      const mockCreated = {
+        id: 'output-webcam',
+        conversationId,
+        toolType: 'webcam',
+        toolId: null,
+        data: JSON.stringify(expectedPersisted),
+        createdAt: new Date(),
+      };
+
+      vi.mocked(prisma.toolOutput.create).mockResolvedValue(mockCreated);
+
+      const result = await saveToolOutput(conversationId, 'webcam', mockData);
+
+      expect(prisma.toolOutput.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          data: JSON.stringify(expectedPersisted),
+        }),
+      });
+      expect(result.data).not.toHaveProperty('imageBase64');
+      expect(result.data).toEqual(expectedPersisted);
+    });
+
     it('should trigger RAG indexing when enabled with userId', async () => {
       const { indexToolOutput } = await import('../tool-rag-indexer');
       const mockData = { content: 'test' };
