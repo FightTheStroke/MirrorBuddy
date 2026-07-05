@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { test, expect } from './fixtures/a11y-fixtures';
+import { test, expect, waitForAnimationsToFinish } from './fixtures/a11y-fixtures';
 import {
   mockOnboarding,
   mockHomePageAPIs,
@@ -56,6 +56,10 @@ async function gotoHome(page: import('@playwright/test').Page) {
   await expect(page.locator('#intent-heading')).toBeVisible({ timeout: 20000 });
   // Wait for tier to settle so cards are in their final enabled/locked state.
   await expect(page.getByTestId('intent-card-homework')).toBeEnabled();
+  // Let the cards' Framer Motion fade-in settle before any axe scan — mid-
+  // animation the interpolated opacity can blend text toward the background
+  // and produce a false-positive contrast violation.
+  await waitForAnimationsToFinish(page);
 }
 
 test('step 1 (intent cards) has no axe violations', async ({ page }) => {

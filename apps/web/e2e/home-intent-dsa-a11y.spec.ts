@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { test, expect } from './fixtures/a11y-fixtures';
+import { test, expect, waitForAnimationsToFinish } from './fixtures/a11y-fixtures';
 import {
   mockOnboarding,
   mockHomePageAPIs,
@@ -144,6 +144,9 @@ test('tier-lock dialog has no axe violations (autism profile)', async ({ page, c
     await study.dispatchEvent('click');
     await expect(dialog).toBeVisible({ timeout: 1000 });
   }).toPass({ timeout: 10000 });
+  // Let the dialog's entrance animation settle before scanning — mid-animation
+  // opacity can blend text toward the background and false-positive on contrast.
+  await waitForAnimationsToFinish(page);
 
   const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   expect(
