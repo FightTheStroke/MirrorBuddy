@@ -115,4 +115,21 @@ export async function openA11yPanel(page: import('@playwright/test').Page) {
   return { button, panel };
 }
 
+/**
+ * Wait for all running CSS/Web Animations to finish before an axe-core scan.
+ *
+ * MirrorBuddy's home cards and dialogs fade/slide in via Framer Motion
+ * (opacity 0->1 over ~300ms). axe-core's color-contrast check measures
+ * computed style at the instant it runs — mid-animation, an interpolated
+ * partial opacity blends foreground text toward the background and can
+ * trip a contrast violation that doesn't exist in the settled UI (the real
+ * WCAG requirement is about the resting state, not an in-flight transition).
+ * Without this wait, a scan can race the animation and false-positive.
+ */
+export async function waitForAnimationsToFinish(page: import('@playwright/test').Page) {
+  await page.evaluate(() =>
+    Promise.all(document.getAnimations().map((animation) => animation.finished)).catch(() => {}),
+  );
+}
+
 export { expect };

@@ -93,9 +93,16 @@ test.describe('hreflang tags', () => {
     pages.forEach(({ url, name }) => {
       test(`should have hreflang tags on ${name} page`, async ({ page }) => {
         await page.goto(url);
-        await page.waitForTimeout(500);
 
-        const hreflangLinks = await page.locator('link[rel="alternate"][hreflang]').all();
+        // HreflangLinks is a client component that injects <link> tags via a
+        // useEffect after hydration — a fixed wait can race slower hydration
+        // (heavier pages take longer) and false-negative. Poll instead.
+        const hreflangLocator = page.locator('link[rel="alternate"][hreflang]');
+        await expect
+          .poll(async () => (await hreflangLocator.all()).length, { timeout: 5000 })
+          .toBeGreaterThanOrEqual(5);
+
+        const hreflangLinks = await hreflangLocator.all();
         expect(hreflangLinks.length).toBeGreaterThanOrEqual(5);
 
         // Verify each hreflang tag has valid attributes
