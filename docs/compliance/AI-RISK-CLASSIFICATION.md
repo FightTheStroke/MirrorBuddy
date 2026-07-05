@@ -41,7 +41,7 @@ MirrorBuddy qualifies under this point because:
 
 | Criterion            | MirrorBuddy Implementation                                         | Assessment                     |
 | -------------------- | ------------------------------------------------------------------ | ------------------------------ |
-| **Context**          | Educational platform for minors (ages 6-18)                        | ✓ Qualifies                    |
+| **Context**          | Educational platform for minors (ages 8-18)                        | ✓ Qualifies                    |
 | **Purpose**          | Tutoring in 20+ subjects; adaptive learning paths                  | ✓ Qualifies                    |
 | **Influence**        | Generates recommendations for lesson difficulty, next topics, pace | ✓ Influences learning pathways |
 | **Access/Placement** | Determines learning path progression, tool access by tier          | ✓ Affects access               |

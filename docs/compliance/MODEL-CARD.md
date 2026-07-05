@@ -26,7 +26,7 @@
 
 ## 2. Intended Use
 
-**Primary Use Case**: Educational tutoring for students with learning differences (ages 6-19)
+**Primary Use Case**: Educational tutoring for students with learning differences (ages 8-18)
 
 **Users**:
 
@@ -55,7 +55,7 @@
 
 **Demographics**:
 
-- Age: 6-19 years
+- Age: 8-18 years
 - Language: Italian (primary), with multilingual support
 - Disability Status: Neurodivergent, learning disabilities (primary), neurotypical (secondary)
 

@@ -13,7 +13,7 @@
 
 MirrorBuddy is treated as a **HIGH-RISK AI system** under EU AI Act Article 6(1) and Annex III, Point 3(b) — on a precautionary basis; final classification deferred to qualified legal review weighing (a) the direct-to-consumer deployment outside educational institutions — a nexus Annex III(3)(b) requires — and (b) the Article 6(3) filter (disapplied where FSRS/quiz performance profiling occurs). It is treated as high-risk because it:
 
-- Deploys AI in **education for minors** (ages 6-19) with learning differences
+- Deploys AI in **education for minors** (ages 8-18) with learning differences
 - **Influences learning pathways** and content access via adaptive algorithms
 - Processes **accessibility-related data**: No clinical diagnosis stored as such; accessibility profiles are opt-in proxies possibly qualifying as Art. 9 health data by inference, consent-based; not used for training
 
@@ -41,7 +41,7 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 
 | Criterion              | Implementation                     | Assessment  |
 | ---------------------- | ---------------------------------- | ----------- |
-| **User Population**    | Minors (6-19) with learning needs  | ✓ Qualifies |
+| **User Population**    | Minors (8-18) with learning needs  | ✓ Qualifies |
 | **Education Purpose**  | Tutoring in 20+ subjects           | ✓ Qualifies |
 | **Influence Decision** | Learning path recommendations      | ✓ Qualifies |
 | **Access Placement**   | Feature access by learning profile | ✓ Qualifies |

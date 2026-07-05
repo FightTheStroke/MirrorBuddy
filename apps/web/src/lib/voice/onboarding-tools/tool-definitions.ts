@@ -4,8 +4,7 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
   {
     type: 'function',
     name: 'set_student_name',
-    description:
-      'Imposta il nome dello studente. Usa quando lo studente dice il suo nome.',
+    description: 'Imposta il nome dello studente. Usa quando lo studente dice il suo nome.',
     parameters: {
       type: 'object',
       properties: {
@@ -20,14 +19,13 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
   {
     type: 'function',
     name: 'set_student_age',
-    description:
-      "Imposta l'età dello studente. Usa quando lo studente dice quanti anni ha.",
+    description: "Imposta l'età dello studente. Usa quando lo studente dice quanti anni ha.",
     parameters: {
       type: 'object',
       properties: {
         age: {
           type: 'number',
-          description: "Età dello studente (6-19)",
+          description: 'Età dello studente (8-18)',
         },
       },
       required: ['age'],
@@ -36,8 +34,7 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
   {
     type: 'function',
     name: 'set_school_level',
-    description:
-      'Imposta il livello scolastico. Usa quando lo studente dice che scuola frequenta.',
+    description: 'Imposta il livello scolastico. Usa quando lo studente dice che scuola frequenta.',
     parameters: {
       type: 'object',
       properties: {
@@ -111,7 +108,7 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
     type: 'function',
     name: 'next_onboarding_step',
     description:
-      'Avanza al prossimo step dell\'onboarding. Usa quando lo studente è pronto a continuare.',
+      "Avanza al prossimo step dell'onboarding. Usa quando lo studente è pronto a continuare.",
     parameters: {
       type: 'object',
       properties: {},
@@ -121,8 +118,7 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
   {
     type: 'function',
     name: 'prev_onboarding_step',
-    description:
-      'Torna allo step precedente. Usa quando lo studente vuole modificare qualcosa.',
+    description: 'Torna allo step precedente. Usa quando lo studente vuole modificare qualcosa.',
     parameters: {
       type: 'object',
       properties: {},
@@ -130,4 +126,3 @@ export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
     },
   },
 ];
-

@@ -1,6 +1,6 @@
 # Safety Guardrails
 
-> 5-layer child protection system for AI characters (ages 6-19)
+> 5-layer child protection system for AI characters (ages 8-18)
 
 ## Quick Reference
 
@@ -27,12 +27,12 @@
 **MANDATORY** for all AI characters:
 
 ```typescript
-import { injectSafetyGuardrails } from "@/lib/safety";
+import { injectSafetyGuardrails } from '@/lib/safety';
 
 const safePrompt = injectSafetyGuardrails(characterPrompt, {
-  role: "maestro", // or "coach" or "buddy"
+  role: 'maestro', // or "coach" or "buddy"
   includeAntiCheating: true, // false for buddies
-  characterId: "socrate", // for formality auto-detection
+  characterId: 'socrate', // for formality auto-detection
 });
 ```
 
