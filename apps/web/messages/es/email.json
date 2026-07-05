@@ -1,48 +1,39 @@
 {
   "email": {
     "unsubscribe": {
-      "pageNavigation": "Page navigation",
-      "backToHome": "Back To Home",
-      "title": "Title",
-      "description": "Description",
-      "loading": "Loading",
-      "invalidToken": "Invalid Token",
-      "invalidTokenDescription": "Invalid Token Description",
-      "errorTitle": "Error Title",
-      "errorMessage": "Error Message",
-      "categories.productUpdates.label": "Categories.product Updates.label",
-      "categories.productUpdates.description": "Categories.product Updates.description",
-      "categories.educationalNewsletter.label": "Categories.educational Newsletter.label",
-      "categories.educationalNewsletter.description": "Categories.educational Newsletter.description",
-      "categories.announcements.label": "Categories.announcements.label",
-      "categories.announcements.description": "Categories.announcements.description",
-      "saveButton": "Save Button",
-      "saving": "Saving",
-      "successTitle": "Success Title",
-      "successMessage": "Success Message",
-      "footer.privacy": "Footer.privacy",
-      "footer.contact": "Footer.contact",
-      "footer.resubscribe": "Footer.resubscribe",
-      "token": "Token",
+      "title": "Gestiona tus preferencias de email",
+      "description": "Personaliza las comunicaciones que deseas recibir de MirrorBuddy",
+      "loading": "Cargando preferencias...",
+      "invalidToken": "Token no válido o caducado",
+      "invalidTokenDescription": "El enlace que utilizaste no es válido o ha caducado. Si necesitas ayuda, contáctanos.",
       "categories": {
         "productUpdates": {
-          "label": "Aggiornamenti prodotto",
-          "description": "Novità, funzionalità e miglioramenti della piattaforma"
+          "label": "Novedades del producto",
+          "description": "Noticias, funciones y mejoras de la plataforma"
         },
         "educationalNewsletter": {
-          "label": "Newsletter educativa",
-          "description": "Contenuti didattici, risorse e consigli per l'apprendimento"
+          "label": "Boletín educativo",
+          "description": "Contenidos didácticos, recursos y consejos de aprendizaje"
         },
         "announcements": {
-          "label": "Annunci importanti",
-          "description": "Comunicazioni critiche sul servizio e sulla sicurezza"
+          "label": "Anuncios importantes",
+          "description": "Comunicaciones críticas sobre el servicio y la seguridad"
         }
       },
+      "saveButton": "Guardar preferencias",
+      "saving": "Guardando...",
+      "successTitle": "Preferencias guardadas",
+      "successMessage": "Tus preferencias de email se han actualizado correctamente",
+      "errorTitle": "Error",
+      "errorMessage": "No se pudieron guardar tus preferencias. Inténtalo de nuevo más tarde.",
+      "backToHome": "Volver al inicio",
       "footer": {
-        "privacy": "Rispettiamo la tua privacy e i tuoi dati secondo GDPR.",
-        "contact": "Hai domande? Contattaci all'indirizzo",
-        "resubscribe": "Puoi modificare queste preferenze in qualsiasi momento usando il link nelle nostre email."
-      }
+        "privacy": "Respetamos tu privacidad y tus datos conforme al RGPD.",
+        "contact": "¿Tienes preguntas? Contáctanos en",
+        "resubscribe": "Puedes modificar estas preferencias en cualquier momento usando el enlace en nuestros emails."
+      },
+      "pageNavigation": "Page navigation",
+      "token": "Token"
     }
   }
 }
