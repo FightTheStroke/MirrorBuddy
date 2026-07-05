@@ -37,12 +37,21 @@ export async function saveToolOutput(
   const { enableRAG = true, userId } = options;
 
   try {
+    // AI-Act P0-2 / GDPR data minimization: the webcam tool's raw imageBase64
+    // (a photo of a minor, potentially) must not be persisted indefinitely in
+    // ToolOutput.data. The live analysis response to the client (POST
+    // /api/image/analyze) is transient and unaffected; only this durable
+    // storage path strips it. Nothing reads imageBase64 back from a saved
+    // tool output (verified: no UI consumer of getToolOutputs/-ByType touches
+    // it), so this is a pure minimization with no functional loss.
+    const { imageBase64: _imageBase64, ...persistedData } = data;
+
     const toolOutput = await prisma.toolOutput.create({
       data: {
         conversationId,
         toolType,
         toolId: toolId || null,
-        data: JSON.stringify(data),
+        data: JSON.stringify(persistedData),
       },
     });
 

@@ -1,11 +1,18 @@
 /**
  * Unified Frustration Classifier
- * Combines all three phases for comprehensive frustration detection
+ * Combines text-pattern and timing-based signals for frustration detection.
+ *
+ * AI-Act P0-1: a third "Phase 3" here previously ran voice-prosody emotion
+ * inference (pitch/pause acoustic analysis -> labeled emotions like
+ * "frustration") on raw audio in an educational context. Emotion recognition
+ * in education is a prohibited practice under EU AI Act Art. 5(1)(f). The
+ * module (`./prosody`) was dormant (zero external importers) and has been
+ * removed rather than merely disabled, since re-adding it would require a
+ * fresh legal review, not a flag flip.
  */
 
 import { FrustrationTracker, type FrustrationState } from './tracker';
 import { analyzeTimings, type WordTiming, type TimingAnalysisResult } from './azure-timing';
-import { analyzeProsody, type ProsodyResult } from './prosody';
 import type { SupportedLocale } from './patterns';
 
 export interface ClassifierInput {
@@ -13,10 +20,6 @@ export interface ClassifierInput {
   text?: string;
   /** Word timings from Azure Speech */
   wordTimings?: WordTiming[];
-  /** Raw audio samples for prosody analysis */
-  audioSamples?: Float32Array;
-  /** Audio sample rate */
-  sampleRate?: number;
 }
 
 export interface ClassifierResult {
@@ -34,14 +37,12 @@ export interface ClassifierResult {
   breakdown: {
     textPattern: number;
     hesitation: number;
-    prosody: number;
     trend: number;
   };
   /** Raw results from each phase */
   rawResults: {
     text?: FrustrationState;
     timing?: TimingAnalysisResult;
-    prosody?: ProsodyResult;
   };
 }
 
@@ -54,15 +55,12 @@ export interface ClassifierConfig {
   textWeight: number;
   /** Weight for timing analysis (default: 0.3) */
   timingWeight: number;
-  /** Weight for prosody analysis (default: 0.3) */
-  prosodyWeight: number;
 }
 
 const DEFAULT_CONFIG: ClassifierConfig = {
   interventionThreshold: 0.6,
   textWeight: 0.4,
   timingWeight: 0.3,
-  prosodyWeight: 0.3,
 };
 
 export class FrustrationClassifier {
@@ -83,7 +81,6 @@ export class FrustrationClassifier {
     const breakdown = {
       textPattern: 0,
       hesitation: 0,
-      prosody: 0,
       trend: 0,
     };
 
@@ -115,17 +112,6 @@ export class FrustrationClassifier {
       totalWeight += this.config.timingWeight;
     }
 
-    // Phase 3: Prosody analysis
-    if (input.audioSamples && input.audioSamples.length > 0) {
-      const prosodyResult = analyzeProsody(input.audioSamples, {
-        sampleRate: input.sampleRate,
-      });
-      rawResults.prosody = prosodyResult;
-      breakdown.prosody = prosodyResult.emotions.frustration;
-      weightedScore += prosodyResult.emotions.frustration * this.config.prosodyWeight;
-      totalWeight += this.config.prosodyWeight;
-    }
-
     // Calculate final score
     const frustrationScore = totalWeight > 0 ? weightedScore / totalWeight : 0;
 
@@ -139,14 +125,13 @@ export class FrustrationClassifier {
     const { shouldIntervene, interventionType, reason } = this.determineIntervention(
       frustrationScore,
       breakdown,
-      rawResults
+      rawResults,
     );
 
     // Calculate confidence based on available data
     let confidence = 0;
     if (input.text) confidence += 0.4;
     if (input.wordTimings && input.wordTimings.length > 3) confidence += 0.3;
-    if (rawResults.prosody?.voiceDetected) confidence += 0.3;
 
     return {
       frustrationScore,
@@ -162,7 +147,7 @@ export class FrustrationClassifier {
   private determineIntervention(
     score: number,
     breakdown: ClassifierResult['breakdown'],
-    raw: ClassifierResult['rawResults']
+    raw: ClassifierResult['rawResults'],
   ): {
     shouldIntervene: boolean;
     interventionType: ClassifierResult['interventionType'];
@@ -190,14 +175,6 @@ export class FrustrationClassifier {
         shouldIntervene: true,
         interventionType: 'simplify',
         reason: 'Significant hesitation and pauses detected',
-      };
-    }
-
-    if (breakdown.prosody > 0.7) {
-      return {
-        shouldIntervene: true,
-        interventionType: 'break',
-        reason: 'Voice stress indicators elevated',
       };
     }
 
