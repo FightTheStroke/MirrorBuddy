@@ -14,14 +14,14 @@ Defensive: null/undefined on external input. Every async = error handling.
 
 ## Commands
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` / `build` | Dev :3000 / Prod build |
-| `npm run ci:summary` / `:full` | Lint+types+build / +unit |
-| `npm run test` / `test:unit` | Playwright E2E / Vitest |
-| `npm run release:fast` / `:gate` | Fast / Full 10/10 |
-| `npm run ios:check` | iOS readiness |
-| `npx prisma generate` | After schema changes |
+| Command                          | Purpose                  |
+| -------------------------------- | ------------------------ |
+| `npm run dev` / `build`          | Dev :3000 / Prod build   |
+| `npm run ci:summary` / `:full`   | Lint+types+build / +unit |
+| `npm run test` / `test:unit`     | Playwright E2E / Vitest  |
+| `npm run release:fast` / `:gate` | Fast / Full 10/10        |
+| `npm run ios:check`              | iOS readiness            |
+| `npx prisma generate`            | After schema changes     |
 
 ## Local Postgres (macOS dev only)
 
@@ -29,13 +29,13 @@ NOT auto-started. `brew services start postgresql@17` or `./scripts/ensure-test-
 
 ## Architecture
 
-| Component | Tech | Location |
-|---|---|---|
-| DB | PostgreSQL + pgvector | `prisma/schema/` |
-| AI | Azure OpenAI / Claude / Ollama | `src/lib/ai/providers/` |
-| State | Zustand + REST (NO localStorage) | `src/lib/stores/` |
-| Auth | `validateAuth()` / `ADMIN_EMAIL` | ADR 0075 |
-| Tiers | Trial/Base/Pro | `src/lib/tier/` |
+| Component | Tech                             | Location                |
+| --------- | -------------------------------- | ----------------------- |
+| DB        | PostgreSQL + pgvector            | `prisma/schema/`        |
+| AI        | Azure OpenAI / Claude / Ollama   | `src/lib/ai/providers/` |
+| State     | Zustand + REST (NO localStorage) | `src/lib/stores/`       |
+| Auth      | `validateAuth()` / `ADMIN_EMAIL` | ADR 0075                |
+| Tiers     | Trial/Base/Pro                   | `src/lib/tier/`         |
 
 Key: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs/` | Maestros `src/data/maestri/`
 
@@ -65,7 +65,7 @@ Never work directly on `main`. `/worktree-start` → `./worktrees/<id>` + branch
 
 ## Pre-Push Checklist (hook-enforced)
 
-Bash guard blocks: standalone `npm run lint|typecheck|build|test:unit`, `gh run view --log`, `git push --no-verify|--force`. Use `npm run ci:summary` + `~/.claude/scripts/ci-check.sh`. `gh pr merge` → ask (paste `gh pr checks <n>` + wait user yes).
+Bash guard blocks: standalone `npm run lint|typecheck|build|test:unit`, `gh run view --log`, `git push --no-verify|--force`. Use `npm run ci:summary` + `~/.claude/scripts/ci-check.sh`. `gh pr merge` → autonomous once CI is fully green and mergeable (matches global `~/.claude/rules/best-practices.md` § Merge Discipline: no asking per-PR). Still never merge with failing/pending checks, unresolved review comments, or on anything touching branch protection/security policy/release infra without flagging first.
 
 ## Verify-Before-Done
 
