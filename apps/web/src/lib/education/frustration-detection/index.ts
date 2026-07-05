@@ -1,10 +1,13 @@
 /**
  * Frustration Detection Module
  *
- * Multi-phase frustration detection system:
+ * Two-phase frustration detection system:
  * - Phase 1: i18n text patterns + repeated attempts + sentiment trend
  * - Phase 2: Azure Speech timing analysis + pause detection
- * - Phase 3: Web Audio prosody analysis + emotional inference
+ *
+ * (A former "Phase 3" ran voice-prosody emotion inference on raw audio.
+ * Removed for AI-Act P0-1: emotion recognition in education is a prohibited
+ * practice under Art. 5(1)(f). See classifier.ts's file comment.)
  *
  * Supports: Italian, English, Spanish, French, German
  *
@@ -14,15 +17,9 @@
  *
  * const classifier = createClassifier({ locale: 'it' });
  *
- * // Text-only analysis (Phase 1)
- * const result = classifier.classify({ text: "Non ce la faccio più!" });
- *
- * // Full analysis with audio (all phases)
- * const fullResult = classifier.classify({
+ * const result = classifier.classify({
  *   text: transcription,
  *   wordTimings: azureWordTimings,
- *   audioSamples: audioBuffer,
- *   sampleRate: 16000,
  * });
  *
  * if (result.shouldIntervene) {
@@ -73,18 +70,3 @@ export {
   type HesitationIndicators,
   type PauseInfo,
 } from './azure-timing';
-
-// Phase 3: Prosody
-export {
-  analyzeProsody,
-  detectPitch,
-  calculateRMS,
-  inferEmotions,
-  ProsodyMonitor,
-  getGlobalProsodyMonitor,
-  resetGlobalProsodyMonitor,
-  type ProsodyResult,
-  type ProsodyFeatures,
-  type EmotionalIndicators,
-  type RealTimeProbe,
-} from './prosody';
