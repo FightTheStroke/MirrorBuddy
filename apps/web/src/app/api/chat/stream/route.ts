@@ -35,6 +35,7 @@ import {
 import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { applyAgeGatePrompt } from '@/lib/conversation/age-gate-injector';
 
 import type { ChatRequest } from '../types';
 import {
@@ -173,13 +174,17 @@ export const POST = pipe(
     }
 
     // Enhance prompt with memory and RAG
-    const enhancedSystemPrompt = await enhancePromptWithContext(
+    let enhancedSystemPrompt = await enhancePromptWithContext(
       systemPrompt,
       userId,
       maestroId,
       messages,
       enableMemory,
     );
+
+    // T1.10 (D-10): adapt language/topic guidance to the student's age when
+    // a real profile age is on record, mirroring the non-streaming route.
+    enhancedSystemPrompt = await applyAgeGatePrompt(enhancedSystemPrompt, userId);
 
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
