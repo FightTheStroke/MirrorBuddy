@@ -8,21 +8,22 @@ E2E blocked in production (`e2e/global-setup.ts` NODE_ENV check). No workarounds
 
 ```ts
 // ✓ CORRECT
-import { test, expect } from "./fixtures/base-fixtures";
-import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
-import { test, expect, testAllLocales } from "./fixtures";     // locale
-import { test, expect } from "./fixtures/auth-fixtures";       // trial/admin
+import { test, expect } from './fixtures/base-fixtures';
+import { test, expect, toLocalePath } from './fixtures/a11y-fixtures';
+import { test, expect, testAllLocales } from './fixtures'; // locale
+import { test, expect } from './fixtures/auth-fixtures'; // trial/admin
 
 // ✗ WRONG — TOS modal blocks ALL interactions
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test';
 ```
 
 ## Wall bypass (ADR 0059)
 
-Base fixtures auto-apply:
-1. `/api/tos` route mock → bypasses TosGateProvider (returns `{accepted:true, version:"1.0"}`)
-2. `mirrorbuddy-consent` localStorage → bypasses CookieConsentWall
-3. `mirrorbuddy-trial-consent` cookie → bypasses TrialConsentGate
+All three checks below live in `UnifiedConsentWall` (`components/consent/unified-consent-wall.tsx`) — the older TosGateProvider/CookieConsentWall/TrialConsentGate components no longer exist, consolidated into it. Base fixtures auto-apply:
+
+1. `/api/tos` route mock → bypasses the ToS check (returns `{accepted:true, version:"1.0"}`)
+2. `mirrorbuddy-consent` localStorage → bypasses the cookie consent check
+3. `mirrorbuddy-trial-consent` cookie → bypasses the trial consent check
 
 Without fixtures = ToS modal blocks pointer events → tests timeout.
 

@@ -17,11 +17,11 @@ import { test, expect } from '@playwright/test';
 
 ## Wall bypass (ADR 0059)
 
-Base fixtures auto-apply:
+All three checks below live in `UnifiedConsentWall` (`components/consent/unified-consent-wall.tsx`) — the older TosGateProvider/CookieConsentWall/TrialConsentGate components no longer exist, consolidated into it. Base fixtures auto-apply:
 
-1. `/api/tos` route mock → bypasses TosGateProvider
-2. `mirrorbuddy-consent` localStorage → bypasses CookieConsentWall
-3. `mirrorbuddy-trial-consent` cookie → bypasses TrialConsentGate
+1. `/api/tos` route mock → bypasses the ToS check
+2. `mirrorbuddy-consent` localStorage → bypasses the cookie consent check
+3. `mirrorbuddy-trial-consent` cookie → bypasses the trial consent check
 
 Without fixtures = tests timeout.
 
