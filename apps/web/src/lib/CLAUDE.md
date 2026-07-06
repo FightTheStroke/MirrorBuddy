@@ -6,7 +6,7 @@ Shared modules under `src/lib/`. See root + `.claude/rules/` (tier, cookies, com
 
 | Dir                | Purpose                                                                   |
 | ------------------ | ------------------------------------------------------------------------- |
-| `ai/providers/`    | Azure OpenAI / Claude / Ollama adapters                                   |
+| `ai/providers/`    | Azure OpenAI / Ollama adapters                                            |
 | `auth/`            | Session, cookies, CSRF, admin. Use `validateAuth()` — no raw cookie reads |
 | `safety/`          | Bias detector, content filter, crisis detection                           |
 | `tier/`            | Trial/Base/Pro enforcement — `tierService`                                |
