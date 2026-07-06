@@ -87,6 +87,7 @@
 | 0151 | Anonymous User Auto-Creation Guard              | Block phantom user creation in production                                                       |
 | 0166 | Parental Gate level for "Per i grandi" (DEC-01) | PROPOSED — decision on gate strength for `/invite/request` (GDPR Art. 8, L. 132/2025)           |
 | 0167 | Buddy Identity Unification — Phase 2 (DEC-08)   | PROPOSED — options A/B/C for naming the handoff banner narrator; awaiting human decision        |
+| 0168 | `maestriLimit` Deprecation (DEC-06)             | ACCEPTED — per-Maestro cap removed, never enforced; intent model made it obsolete               |
 
 ## Observability & Operations
 
@@ -213,6 +214,6 @@
 
 ---
 
-**Total Active ADRs**: 129
+**Total Active ADRs**: 130
 **Archived ADRs**: 7
 **Last Updated**: 2026-06-13
