@@ -15,16 +15,15 @@ flags in `tier-fallbacks.ts` / seeds.
 
 Source of truth: `apps/web/src/lib/tier/tier-fallbacks.ts` (`features.{chat,voice,flashcards,quizzes,mindMaps,tools}`) + seeds in `apps/web/src/lib/seeds/tier-seed.ts`.
 
-### `maestriLimit` — set but NOT enforced (DEC-06 open)
+### `maestriLimit` — deprecated and removed (DEC-06 closed, see `docs/adr/0168-maestrilimit-deprecation-dec06.md`)
 
-`maestriLimit` (Trial 3 / Base 25 / Pro 26) is still present in `features` JSON,
-seeds, and `TierFeatures`/`TierLimits` types, but it is **never enforced**: the
-only consumer is `tier-helpers.ts:56` (`extractTierLimits` → `maxMaestri`), and
-`maxMaestri` is read nowhere in app/runtime code (verified by grep). The
-intent model made a per-Maestro cap semantically obsolete (the Maestro is
-auto-selected). Whether to formally deprecate `maestriLimit` or wire real
-enforcement is **DEC-06** (open) — until decided, leave the field and its seed
-values as-is; do not add blind enforcement (would break Trial auto-selection).
+Removed from `features`/`TierLimits` JSON, seeds, and the `TierFeatures`/
+`TierLimits` types (2026-07-06). It was never enforced — the only consumer,
+`extractTierLimits` → `maxMaestri`, was never read anywhere in app/runtime
+code — and the intent-based model made a per-Maestro cap semantically
+obsolete (the Maestro is auto-selected per subject, not chosen from a list).
+Do not reintroduce a Maestro count cap without a fresh product decision;
+availability is now governed entirely by the per-intent feature flags above.
 
 ## Fallback
 

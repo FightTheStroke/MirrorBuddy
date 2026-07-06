@@ -27,7 +27,6 @@ const mockLimits: TierLimits = {
   dailyVoiceMinutes: 999,
   dailyTools: 999,
   maxDocuments: 999,
-  maxMaestri: 26,
   videoVisionSecondsPerSession: 60,
   videoVisionMinutesMonthly: 10,
 };
