@@ -116,6 +116,14 @@ D-37/testingcase, D-38).
   3. P0-3 (monitoraggio emotivo da testo `emotionalVentCount`): documentare in DPIA/risk-register come misura di sicurezza/benessere con base giuridica; copertura eccezione art. 5(1)(f) = conferma legale.
   4. P2-3: creare `docs/compliance/DATA-GOVERNANCE-SOP.md` con provenienza/licenze delle 26 knowledge base.
   5. D-51 PMM: rimuovere l'overclaim "moderazione umana/dashboard realtime" (post D-07 già su store durevoli); allineare PMM/POST-MARKET.
+
+**Correzione post-scrittura (verificata con un agente dedicato prima di eseguire — 7° errore trovato in questa sessione):**
+
+- **Punto 1 (Art.14):** SMENTITO come "discrepanza da correggere". Il testo (riga 4, non 5) cita Art.14 (human oversight per sistemi high-risk) — coerente con la postura "alto rischio prudenziale" già in vigore nel PMM, non un'autodefinizione in contraddizione. Nessuna modifica fatta.
+- **Punto 2, sotto-claim DPIA "Not Collected":** SMENTITO. Il DPIA attuale (`DPIA.md:32`) dice l'ESATTO CONTRARIO di quanto affermato: marca `Profile.name`/`GoogleAccount.*`/IP come **raccolti**, non "Not Collected" — già corretto a monte. Le altre parti del punto 2 (P1-2 base legale Annex III, P1-3 STT/TTS≠biometria, P1-5 stati aspirazionali, P1-7 Q48 salute) **non verificate in questo giro**, restano da fare.
+- **Punto 3 (P0-3):** eseguito, con una scoperta collaterale importante: il modulo `emotionalVentCount` non è "cablato in produzione" come diceva il tracker — è completamente non collegato (zero importer reali). Documentato con precisione in DPIA §3 + `AI-RISK-REGISTER.md` R14 + tracker P0-3 corretto (nuovo debito D-76 loggato). La conferma legale dell'eccezione art. 5(1)(f) resta gate umano, non eseguita qui.
+- **Punto 4 (P2-3 DATA-GOVERNANCE-SOP.md):** non eseguito in questo giro, resta da fare.
+- **Punto 5 (D-51 PMM overclaim):** la sotto-parte "classificazione Art.52 limited-risk" è SMENTITA (il PMM dice già high-risk precautionary). La sotto-parte "moderazione umana/dashboard" (frasi tipo "escalations to human moderators", "human evaluation sample") corrisponde a un processo organizzativo reale documentato altrove nel PMM stesso (DPO/Safety Team/Management, §5) — non chiaramente un overclaim di prodotto, è un giudizio di fraseggio compliance che richiede revisione umana/legale, non un fix meccanico. Non modificato.
 - **Modello:** Opus. **Rischio:** i testi sono doc; la sola parte che richiede firma umana è la **conclusione di classificazione legale** — flaggata come gate, non come blocco alla PR (la PR rende i doc _coerenti e onesti_, non emette il verdetto legale).
 
 ---
