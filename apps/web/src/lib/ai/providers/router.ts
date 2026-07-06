@@ -3,18 +3,25 @@
  * @brief AI provider router with failover and health tracking
  * Selects provider based on health, feature support, and preference
  * Created for F-08: Multi-Provider AI Router
+ *
+ * P2-4 (AI-Act tracker): Claude/Anthropic removed from the fallback chain.
+ * It was never a real sub-processor in production traffic (getActiveProvider(),
+ * the actual selector used by /api/chat, only ever picks Azure or Ollama —
+ * this router's only real caller was the health-check endpoint), but keeping
+ * an unused Anthropic path registered here contradicted .env.example's
+ * explicit "Never use Anthropic" and would need a DPIA/legal update to
+ * justify wiring it for real. Azure/Ollama-only now, everywhere.
  */
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 import type {
   AIProviderInterface,
   AIProviderType,
   ProviderHealth,
   ChatOptions,
-} from "./provider-interface";
-import type { ChatCompletionResult } from "./types";
-import { AzureOpenAIProvider } from "./azure-openai";
-import { ClaudeProvider } from "./claude";
+} from './provider-interface';
+import type { ChatCompletionResult } from './types';
+import { AzureOpenAIProvider } from './azure-openai';
 
 interface RouterConfig {
   primaryProvider: AIProviderType;
@@ -23,8 +30,8 @@ interface RouterConfig {
 }
 
 const DEFAULT_CONFIG: RouterConfig = {
-  primaryProvider: "azure",
-  fallbackOrder: ["claude", "ollama"],
+  primaryProvider: 'azure',
+  fallbackOrder: ['ollama'],
   healthCheckIntervalMs: 60000,
 };
 
@@ -39,8 +46,7 @@ class AIProviderRouter {
   }
 
   private registerDefaultProviders(): void {
-    this.providers.set("azure", new AzureOpenAIProvider());
-    this.providers.set("claude", new ClaudeProvider());
+    this.providers.set('azure', new AzureOpenAIProvider());
   }
 
   getProvider(name: AIProviderType): AIProviderInterface | undefined {
@@ -48,14 +54,14 @@ class AIProviderRouter {
   }
 
   async selectProvider(options?: {
-    preference?: AIProviderType | "auto";
+    preference?: AIProviderType | 'auto';
     requireTools?: boolean;
     requireVoice?: boolean;
     model?: string;
   }): Promise<AIProviderInterface> {
     const preference = options?.preference;
 
-    if (preference && preference !== "auto") {
+    if (preference && preference !== 'auto') {
       const provider = this.providers.get(preference);
       if (provider) {
         const available = await provider.isAvailable();
@@ -65,9 +71,9 @@ class AIProviderRouter {
     }
 
     if (options?.requireVoice) {
-      const azure = this.providers.get("azure");
+      const azure = this.providers.get('azure');
       if (azure && (await azure.isAvailable())) return azure;
-      throw new Error("Voice requires Azure OpenAI, which is unavailable");
+      throw new Error('Voice requires Azure OpenAI, which is unavailable');
     }
 
     const order = [this.config.primaryProvider, ...this.config.fallbackOrder];
@@ -93,14 +99,14 @@ class AIProviderRouter {
       if (available) return provider;
     }
 
-    throw new Error("No AI provider available");
+    throw new Error('No AI provider available');
   }
 
   async chatWithFailover(
     messages: Array<{ role: string; content: string }>,
     systemPrompt: string,
     options?: ChatOptions & {
-      preference?: AIProviderType | "auto";
+      preference?: AIProviderType | 'auto';
       model?: string;
     },
   ): Promise<ChatCompletionResult> {
@@ -128,25 +134,19 @@ class AIProviderRouter {
       }
     }
 
-    throw lastError || new Error("No AI provider available");
+    throw lastError || new Error('No AI provider available');
   }
 
-  private getFailoverOrder(
-    preference?: AIProviderType | "auto",
-  ): AIProviderType[] {
-    if (preference && preference !== "auto") {
-      const rest = [
-        this.config.primaryProvider,
-        ...this.config.fallbackOrder,
-      ].filter((p) => p !== preference);
+  private getFailoverOrder(preference?: AIProviderType | 'auto'): AIProviderType[] {
+    if (preference && preference !== 'auto') {
+      const rest = [this.config.primaryProvider, ...this.config.fallbackOrder].filter(
+        (p) => p !== preference,
+      );
       return [preference, ...rest];
     }
     const seen = new Set<AIProviderType>();
     const order: AIProviderType[] = [];
-    for (const p of [
-      this.config.primaryProvider,
-      ...this.config.fallbackOrder,
-    ]) {
+    for (const p of [this.config.primaryProvider, ...this.config.fallbackOrder]) {
       if (!seen.has(p)) {
         seen.add(p);
         order.push(p);
@@ -155,11 +155,7 @@ class AIProviderRouter {
     return order;
   }
 
-  private updateHealth(
-    name: AIProviderType,
-    available: boolean,
-    error?: string,
-  ): void {
+  private updateHealth(name: AIProviderType, available: boolean, error?: string): void {
     this.healthStatus.set(name, {
       provider: name,
       available,

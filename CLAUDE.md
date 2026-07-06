@@ -29,13 +29,13 @@ NOT auto-started. `brew services start postgresql@17` or `./scripts/ensure-test-
 
 ## Architecture
 
-| Component | Tech                             | Location                |
-| --------- | -------------------------------- | ----------------------- |
-| DB        | PostgreSQL + pgvector            | `prisma/schema/`        |
-| AI        | Azure OpenAI / Claude / Ollama   | `src/lib/ai/providers/` |
-| State     | Zustand + REST (NO localStorage) | `src/lib/stores/`       |
-| Auth      | `validateAuth()` / `ADMIN_EMAIL` | ADR 0075                |
-| Tiers     | Trial/Base/Pro                   | `src/lib/tier/`         |
+| Component | Tech                                                        | Location                |
+| --------- | ----------------------------------------------------------- | ----------------------- |
+| DB        | PostgreSQL + pgvector                                       | `prisma/schema/`        |
+| AI        | Azure OpenAI / Ollama (Claude/Anthropic never wired — P2-4) | `src/lib/ai/providers/` |
+| State     | Zustand + REST (NO localStorage)                            | `src/lib/stores/`       |
+| Auth      | `validateAuth()` / `ADMIN_EMAIL`                            | ADR 0075                |
+| Tiers     | Trial/Base/Pro                                              | `src/lib/tier/`         |
 
 Key: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs/` | Maestros `src/data/maestri/`
 
