@@ -366,6 +366,21 @@ Detailed risk assessment for MirrorBuddy AI systems. Risk Score = Likelihood (1-
 3. **Parent Dashboard**: Parents see usage patterns, can set limits
 4. **Gamification Caps**: XP rewards taper after 2 hours/day
 5. **Offline Mode**: Encourage non-AI study time with resources
+6. **Emotional-venting detection** (`lib/safety/dependency/emotional-detector.ts`,
+   `emotionalVentCount` in the `UsagePattern` table): a **regex pattern-matcher**
+   over message text for known venting/AI-preference phrasings (e.g. "I feel
+   sad", "you're my only friend") — NOT an ML/biometric emotion-inference
+   model. **Currently unwired**: implemented and unit-tested, but nothing in
+   `apps/web/src/app` (routes, components, or scheduled jobs) calls
+   `recordMessage`/`getUsageMetrics`/`getUsageHistory` from
+   `dependency/usage-tracker.ts` — verified by grep, zero real importers
+   outside the module's own tests. Control #3 ("Parent Dashboard") therefore
+   does **not** currently benefit from this specific signal; it exists as
+   dormant capability, not an active mitigation. **Legal basis / Art. 5(1)(f)
+   exception status: not yet confirmed by legal review** — flagged for the
+   AI-Act legal classification gate (see `AI-ACT-REMEDIATION-TRACKER.md`
+   P0-3) rather than asserted here. Wiring this up (or removing it as dead
+   code) should happen only after that legal review, not before.
 
 **Residual Risk**: 3 (Low)
 
