@@ -44,7 +44,6 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
     quizzes: false,
     mindMaps: false,
     tools: ['pdf', 'chat'],
-    maestriLimit: 3,
     coachesAvailable: ['melissa'],
     buddiesAvailable: ['mario'],
   };
@@ -93,7 +92,6 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         quizzes: true,
         mindMaps: true,
         tools: ['pdf', 'chat', 'flashcards', 'mindmap'],
-        maestriLimit: 25,
         coachesAvailable: ['melissa', 'roberto', 'chiara'],
         buddiesAvailable: ['mario', 'noemi', 'enea'],
         parentDashboard: true,
@@ -165,7 +163,6 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
           'homework',
           'chart',
         ],
-        maestriLimit: 26,
         coachesAvailable: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
         buddiesAvailable: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
         parentDashboard: true,

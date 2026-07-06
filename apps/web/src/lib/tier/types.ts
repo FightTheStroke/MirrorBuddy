@@ -1,4 +1,4 @@
-import type { SubscriptionStatus } from "@prisma/client";
+import type { SubscriptionStatus } from '@prisma/client';
 
 /**
  * Tier subscription feature flags and configuration
@@ -10,7 +10,6 @@ export interface TierFeatures {
   quizzes: boolean;
   mindMaps: boolean;
   tools: string[];
-  maestriLimit: number;
   coachesAvailable: string[];
   buddiesAvailable: string[];
   parentDashboard?: boolean;
@@ -24,18 +23,18 @@ export interface TierFeatures {
  * Feature types for per-feature model selection (ADR 0073)
  */
 export type FeatureType =
-  | "chat"
-  | "realtime"
-  | "pdf"
-  | "mindmap"
-  | "quiz"
-  | "flashcards"
-  | "summary"
-  | "formula"
-  | "chart"
-  | "homework"
-  | "webcam"
-  | "demo";
+  | 'chat'
+  | 'realtime'
+  | 'pdf'
+  | 'mindmap'
+  | 'quiz'
+  | 'flashcards'
+  | 'summary'
+  | 'formula'
+  | 'chart'
+  | 'homework'
+  | 'webcam'
+  | 'demo';
 
 /**
  * Per-feature AI configuration (ADR 0073)
@@ -54,10 +53,7 @@ export interface FeatureAIConfig {
  * Default AI configurations per feature type
  * Used when tier doesn't specify custom values
  */
-export const DEFAULT_FEATURE_CONFIGS: Record<
-  FeatureType,
-  Omit<FeatureAIConfig, "model">
-> = {
+export const DEFAULT_FEATURE_CONFIGS: Record<FeatureType, Omit<FeatureAIConfig, 'model'>> = {
   chat: { temperature: 0.7, maxTokens: 2000 },
   realtime: { temperature: 0.7, maxTokens: 4096 },
   pdf: { temperature: 0.5, maxTokens: 4000 },
@@ -76,9 +72,7 @@ export const DEFAULT_FEATURE_CONFIGS: Record<
  * Feature config overrides stored in tier (JSON field)
  * Allows admin to customize temperature/maxTokens per feature per tier
  */
-export type TierFeatureConfigs = Partial<
-  Record<FeatureType, Partial<FeatureAIConfig>>
->;
+export type TierFeatureConfigs = Partial<Record<FeatureType, Partial<FeatureAIConfig>>>;
 
 /**
  * Tier definition - subscription tier configuration
@@ -209,17 +203,17 @@ export interface UserFeatureConfigInput {
  * Tier audit action types
  */
 export type TierAuditAction =
-  | "TIER_CREATE"
-  | "TIER_UPDATE"
-  | "TIER_DELETE"
-  | "SUBSCRIPTION_CREATE"
-  | "SUBSCRIPTION_UPDATE"
-  | "SUBSCRIPTION_DELETE"
-  | "TIER_CHANGE"
-  | "USER_STATUS_CHANGE"
-  | "USER_FEATURE_CONFIG_SET"
-  | "USER_FEATURE_CONFIG_DELETE"
-  | "USER_STATUS_CHANGE";
+  | 'TIER_CREATE'
+  | 'TIER_UPDATE'
+  | 'TIER_DELETE'
+  | 'SUBSCRIPTION_CREATE'
+  | 'SUBSCRIPTION_UPDATE'
+  | 'SUBSCRIPTION_DELETE'
+  | 'TIER_CHANGE'
+  | 'USER_STATUS_CHANGE'
+  | 'USER_FEATURE_CONFIG_SET'
+  | 'USER_FEATURE_CONFIG_DELETE'
+  | 'USER_STATUS_CHANGE';
 
 /**
  * Tier audit log entry
@@ -269,34 +263,27 @@ export interface EffectiveSubscriptionLimits {
 /**
  * Subscription status values
  */
-export type SubscriptionStatusType =
-  | "ACTIVE"
-  | "TRIAL"
-  | "EXPIRED"
-  | "CANCELLED"
-  | "PAUSED";
+export type SubscriptionStatusType = 'ACTIVE' | 'TRIAL' | 'EXPIRED' | 'CANCELLED' | 'PAUSED';
 
 /**
  * Tier codes (constants)
  */
 export enum TierCode {
-  TRIAL = "trial",
-  BASE = "base",
-  PRO = "pro",
+  TRIAL = 'trial',
+  BASE = 'base',
+  PRO = 'pro',
 }
 
 /**
  * Get display name for subscription status
  */
-export function getSubscriptionStatusDisplay(
-  status: SubscriptionStatus,
-): string {
+export function getSubscriptionStatusDisplay(status: SubscriptionStatus): string {
   const statusMap: Record<SubscriptionStatus, string> = {
-    ACTIVE: "Activo",
-    TRIAL: "Prueba",
-    EXPIRED: "Expirado",
-    CANCELLED: "Cancelado",
-    PAUSED: "Pausado",
+    ACTIVE: 'Activo',
+    TRIAL: 'Prueba',
+    EXPIRED: 'Expirado',
+    CANCELLED: 'Cancelado',
+    PAUSED: 'Pausado',
   };
   return statusMap[status] || status;
 }
@@ -305,7 +292,7 @@ export function getSubscriptionStatusDisplay(
  * Check if subscription is active
  */
 export function isSubscriptionActive(status: SubscriptionStatus): boolean {
-  return status === "ACTIVE" || status === "TRIAL";
+  return status === 'ACTIVE' || status === 'TRIAL';
 }
 
 /**
@@ -313,9 +300,7 @@ export function isSubscriptionActive(status: SubscriptionStatus): boolean {
  */
 export function isSubscriptionExpired(subscription: UserSubscription): boolean {
   if (!subscription.expiresAt) return false;
-  return (
-    new Date() > subscription.expiresAt && subscription.status === "ACTIVE"
-  );
+  return new Date() > subscription.expiresAt && subscription.status === 'ACTIVE';
 }
 
 /**
@@ -326,7 +311,6 @@ export interface TierLimits {
   dailyVoiceMinutes: number;
   dailyTools: number;
   maxDocuments: number;
-  maxMaestri: number;
   monthlyAiCalls?: number;
   videoVisionSecondsPerSession: number;
   videoVisionMinutesMonthly: number;

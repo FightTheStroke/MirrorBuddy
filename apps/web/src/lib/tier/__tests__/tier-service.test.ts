@@ -79,7 +79,7 @@ describe('TierService', () => {
       quizzes: false,
       mindMaps: false,
       tools: ['pdf', 'webcam'],
-      maestriLimit: 3,
+      testNumericFeature: 3,
       coachesAvailable: [],
       buddiesAvailable: [],
     },
@@ -116,7 +116,7 @@ describe('TierService', () => {
       quizzes: true,
       mindMaps: true,
       tools: ['pdf', 'webcam', 'homework', 'formula'],
-      maestriLimit: 10,
+      testNumericFeature: 10,
       coachesAvailable: ['melissa', 'roberto'],
       buddiesAvailable: ['mario', 'noemi'],
     },
@@ -153,7 +153,7 @@ describe('TierService', () => {
       quizzes: true,
       mindMaps: true,
       tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
-      maestriLimit: 20,
+      testNumericFeature: 20,
       coachesAvailable: ['melissa', 'roberto', 'chiara', 'andrea', 'favij'],
       buddiesAvailable: ['mario', 'noemi', 'enea', 'bruno', 'sofia'],
       parentDashboard: true,
@@ -573,10 +573,10 @@ describe('TierService', () => {
     });
 
     it('should handle features with numeric values', async () => {
-      // maestriLimit is numeric - should be truthy if > 0
-      const result = await tierService.checkFeatureAccess('user-pro', 'maestriLimit');
+      // testNumericFeature is numeric - should be truthy if > 0
+      const result = await tierService.checkFeatureAccess('user-pro', 'testNumericFeature');
 
-      expect(result).toBe(true); // maestriLimit: 20 is truthy
+      expect(result).toBe(true); // testNumericFeature: 20 is truthy
     });
 
     it('should return false for numeric 0 feature value', async () => {
@@ -584,7 +584,7 @@ describe('TierService', () => {
         ...mockTrialTier,
         features: {
           ...mockTrialTier.features,
-          maestriLimit: 0, // Zero is falsy
+          testNumericFeature: 0, // Zero is falsy
         },
       };
 
@@ -597,7 +597,7 @@ describe('TierService', () => {
         return Promise.resolve(null) as never;
       }) as never);
 
-      const result = await tierService.checkFeatureAccess(null, 'maestriLimit');
+      const result = await tierService.checkFeatureAccess(null, 'testNumericFeature');
 
       expect(result).toBe(false); // 0 is falsy
     });
@@ -642,7 +642,6 @@ describe('TierService', () => {
         dailyVoiceMinutes: 5,
         dailyTools: 10,
         maxDocuments: 1,
-        maxMaestri: 3,
         videoVisionSecondsPerSession: 0,
         videoVisionMinutesMonthly: 0,
       });
@@ -658,7 +657,6 @@ describe('TierService', () => {
         dailyVoiceMinutes: 15,
         dailyTools: 30,
         maxDocuments: 5,
-        maxMaestri: 10,
         videoVisionSecondsPerSession: 0,
         videoVisionMinutesMonthly: 0,
       });
@@ -690,7 +688,6 @@ describe('TierService', () => {
         dailyVoiceMinutes: 60,
         dailyTools: 100,
         maxDocuments: 50,
-        maxMaestri: 20,
         videoVisionSecondsPerSession: 60,
         videoVisionMinutesMonthly: 10,
       });
@@ -725,7 +722,6 @@ describe('TierService', () => {
         dailyVoiceMinutes: 15,
         dailyTools: 30,
         maxDocuments: 5,
-        maxMaestri: 10,
         videoVisionSecondsPerSession: 0,
         videoVisionMinutesMonthly: 0,
       });
@@ -742,7 +738,6 @@ describe('TierService', () => {
         dailyVoiceMinutes: 15,
         dailyTools: 30,
         maxDocuments: 5,
-        maxMaestri: 10,
         videoVisionSecondsPerSession: 0,
         videoVisionMinutesMonthly: 0,
       });
@@ -758,7 +753,6 @@ describe('TierService', () => {
       expect(limits).toHaveProperty('dailyVoiceMinutes');
       expect(limits).toHaveProperty('dailyTools');
       expect(limits).toHaveProperty('maxDocuments');
-      expect(limits).toHaveProperty('maxMaestri');
     });
   });
 
