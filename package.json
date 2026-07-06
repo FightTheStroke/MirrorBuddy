@@ -3,6 +3,9 @@
   "version": "0.21.6",
   "private": true,
   "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": "20.x"
+  },
   "description": "MirrorBuddy - La Scuola Che Vorrei: AI-powered educational platform for students with learning differences",
   "author": "Roberto D'Angelo <roberdan@fightthestroke.org>",
   "license": "Apache-2.0",
