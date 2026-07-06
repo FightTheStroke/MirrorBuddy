@@ -85,11 +85,24 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
 
 ## C4 — Parità safety sul path streaming + compliance-check reale
 
-**Voci:** D-06 (T1.3 STEM + T1.4 bias su streaming), D-08 resto (T1.8). **Stato:** [DA TABELLA] — D-06 aperto; D-08 parziale (i 2 path stantii sono corretti, ma i check restano presenza-statica). Coordinare con C13/T4.7 (refactor `chat/route.ts`): **prima il wiring safety, poi lo split**.
+**Voci:** D-06 (T1.3 STEM + T1.4 bias su streaming), D-08 resto (T1.8).
 
-- **Azione D-06:** eseguire `checkSTEMSafety` sull'input in `stream/route.ts` pre-stream; `detectBias`+sanitize sull'output nel flush finale; su `hasBias && !safeForEducation` → rigenera o fallback educativo (non solo `log.warn`). Test: query STEM pericolosa bloccata su entrambi i path; output biased mockato non servito.
-- **Azione D-08 resto:** convertire i check safety da `fileExists`/`fileContains` a test d'integrazione vitest con assertion di call-site (T1.1–T1.5); criterio: un revert temporaneo di un wiring fa fallire il check (dimostrarlo).
-- **Modello:** Opus (safety, giudizio sul compromesso streaming). **Rischio:** medio; migliora la safety → procedere.
+**Correzione post-scrittura (D-06, verificata a codice con un agente dedicato prima di eseguire):**
+D-06 è **già risolto**, la premessa era sbagliata. `apps/web/src/app/api/chat/stream/route.ts`
+applica GIÀ piena parità con il non-streaming: `checkSTEMSafety` pre-stream (riga 259, blocca via
+SSE), `detectBias` post-generazione su `fullResponseText` (riga 369). L'unica differenza è
+deliberata e documentata (commenti riga 361-367, issue #467): il non-streaming BLOCCA l'output
+biased prima che l'utente lo veda; lo streaming, non potendo "ritirare" token già inviati,
+CORREGGE post-hoc (audit compliance + messaggio correttivo SSE appeso) — è la scelta tecnica
+corretta per non introdurre un blocco a metà stream, non un gap dimenticato. Copertura test
+completa in `stream/__tests__/stream-safety.integration.test.ts`. Nessuna azione di codice
+necessaria. **5° errore corretto in questa sessione nello stesso registro** (dopo C1, C2,
+D-37/testingcase, D-38).
+
+- **D-08 resto (T1.8): non ancora verificato in questa sessione, resta da fare.** Azione originale:
+  convertire i check safety da `fileExists`/`fileContains` a test d'integrazione vitest con
+  assertion di call-site (T1.1–T1.5); criterio: un revert temporaneo di un wiring fa fallire il
+  check (dimostrarlo). **Modello:** Opus. Verificare a codice prima di eseguire, come sopra.
 
 ---
 
