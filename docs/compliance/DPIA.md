@@ -56,6 +56,13 @@ This DPIA assesses high-risk data processing activities under GDPR Article 35, i
 - Conversations → Azure OpenAI → Sanitized response (5-layer safety: jailbreak detector, content filter, output sanitizer, age-gating, audit trail)
 - Age-gating: Topic access restricted by age via `src/lib/safety/age-gating.ts`
 - Audit logging: All access logged without PII via `src/lib/safety/audit/audit-trail-service.ts`
+- Dependency monitoring (`src/lib/safety/dependency/`): a regex keyword-pattern
+  check (not ML/biometric emotion inference) on message text for
+  emotional-venting/AI-preference phrasings, feeding an aggregate
+  `emotionalVentCount` counter. **Currently unwired** — implemented and
+  tested but not called from any live route/UI (see `AI-RISK-REGISTER.md`
+  R14). Art. 5(1)(f) exception basis: pending legal review before wiring
+  it up (`AI-ACT-REMEDIATION-TRACKER.md` P0-3).
 
 **Storage**: Multi-layered encryption architecture (ADR 0126):
 

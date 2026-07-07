@@ -26,9 +26,9 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
 | ~~C1~~  | ~~Bug verificati ship-first (D-70, D-71, D-72)~~                         | —                 | —                | —      | **GIÀ RISOLTO — PR #504/#506 già mergiate, saltare**                                                                                                          |
 | ~~C2~~  | ~~Cleanup codice: rimuovere provider Claude morto da router.ts (P2-4)~~  | —                 | —                | —      | **GIÀ RISOLTO — `claude.ts`/`ClaudeProvider` rimossi, router.ts solo Azure+Ollama. Reperto collaterale D-74 (Ollama mai registrato) tracciato separatamente** |
 | C3      | Onboarding capture + age-gating knot (D-22, D-73) — **eseguire dopo C6** | M1                | Alto             | M      | Opus                                                                                                                                                          |
-| C4      | Safety parity streaming (D-06, D-08 resto)                               | M1                | Alto             | M      | Opus                                                                                                                                                          |
-| C5      | Compliance docs alignment (D-51, P0-3, P1-1..7, P2-3)                    | Messa in servizio | Alto (doc)       | M      | Opus                                                                                                                                                          |
-| C6      | Funnel/landing consolidation (D-19..21,23..28)                           | M1                | Medio            | L      | Opus+Sonnet                                                                                                                                                   |
+| ~~C4~~  | ~~Safety parity streaming (D-06, D-08 resto)~~                           | —                 | —                | —      | **D-06 GIÀ RISOLTO — streaming ha già piena parità (STEM pre-stream + bias post-stream con correzione deliberata). D-08 resto non verificato, resta aperto**  |
+| C5      | Compliance docs alignment (D-51, P0-3, P1-1..7, P2-3)                    | Messa in servizio | Alto (doc)       | M      | **Parziale — D-06/D-51-Art52/DPIA "Not Collected" smentiti, P0-3 documentato + corretto (nuovo debito D-76). P1-2/3/5/7, P2-3 non ancora eseguiti**           |
+| C6      | Funnel/landing consolidation (D-19..21,23..28)                           | M1                | Medio            | L      | **Parziale — D-21/26/27/28 già risolti, saltare. D-19/20/25 reali ma non ancora eseguiti (D-25 più esteso del previsto). D-23/24 non verificati**             |
 | C7      | Education core correctness (D-29..34)                                    | M1                | Medio            | L      | Opus+Sonnet                                                                                                                                                   |
 | C8      | i18n/locale UX (D-12,14,15,16)                                           | M1(IT)+M2         | Medio            | M      | Sonnet                                                                                                                                                        |
 | C9      | Accessibility behavior (D-17,18,52)                                      | M1                | Medio            | M      | Opus+Sonnet                                                                                                                                                   |
@@ -85,11 +85,24 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
 
 ## C4 — Parità safety sul path streaming + compliance-check reale
 
-**Voci:** D-06 (T1.3 STEM + T1.4 bias su streaming), D-08 resto (T1.8). **Stato:** [DA TABELLA] — D-06 aperto; D-08 parziale (i 2 path stantii sono corretti, ma i check restano presenza-statica). Coordinare con C13/T4.7 (refactor `chat/route.ts`): **prima il wiring safety, poi lo split**.
+**Voci:** D-06 (T1.3 STEM + T1.4 bias su streaming), D-08 resto (T1.8).
 
-- **Azione D-06:** eseguire `checkSTEMSafety` sull'input in `stream/route.ts` pre-stream; `detectBias`+sanitize sull'output nel flush finale; su `hasBias && !safeForEducation` → rigenera o fallback educativo (non solo `log.warn`). Test: query STEM pericolosa bloccata su entrambi i path; output biased mockato non servito.
-- **Azione D-08 resto:** convertire i check safety da `fileExists`/`fileContains` a test d'integrazione vitest con assertion di call-site (T1.1–T1.5); criterio: un revert temporaneo di un wiring fa fallire il check (dimostrarlo).
-- **Modello:** Opus (safety, giudizio sul compromesso streaming). **Rischio:** medio; migliora la safety → procedere.
+**Correzione post-scrittura (D-06, verificata a codice con un agente dedicato prima di eseguire):**
+D-06 è **già risolto**, la premessa era sbagliata. `apps/web/src/app/api/chat/stream/route.ts`
+applica GIÀ piena parità con il non-streaming: `checkSTEMSafety` pre-stream (riga 259, blocca via
+SSE), `detectBias` post-generazione su `fullResponseText` (riga 369). L'unica differenza è
+deliberata e documentata (commenti riga 361-367, issue #467): il non-streaming BLOCCA l'output
+biased prima che l'utente lo veda; lo streaming, non potendo "ritirare" token già inviati,
+CORREGGE post-hoc (audit compliance + messaggio correttivo SSE appeso) — è la scelta tecnica
+corretta per non introdurre un blocco a metà stream, non un gap dimenticato. Copertura test
+completa in `stream/__tests__/stream-safety.integration.test.ts`. Nessuna azione di codice
+necessaria. **5° errore corretto in questa sessione nello stesso registro** (dopo C1, C2,
+D-37/testingcase, D-38).
+
+- **D-08 resto (T1.8): non ancora verificato in questa sessione, resta da fare.** Azione originale:
+  convertire i check safety da `fileExists`/`fileContains` a test d'integrazione vitest con
+  assertion di call-site (T1.1–T1.5); criterio: un revert temporaneo di un wiring fa fallire il
+  check (dimostrarlo). **Modello:** Opus. Verificare a codice prima di eseguire, come sopra.
 
 ---
 
@@ -103,6 +116,14 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
   3. P0-3 (monitoraggio emotivo da testo `emotionalVentCount`): documentare in DPIA/risk-register come misura di sicurezza/benessere con base giuridica; copertura eccezione art. 5(1)(f) = conferma legale.
   4. P2-3: creare `docs/compliance/DATA-GOVERNANCE-SOP.md` con provenienza/licenze delle 26 knowledge base.
   5. D-51 PMM: rimuovere l'overclaim "moderazione umana/dashboard realtime" (post D-07 già su store durevoli); allineare PMM/POST-MARKET.
+
+**Correzione post-scrittura (verificata con un agente dedicato prima di eseguire — 7° errore trovato in questa sessione):**
+
+- **Punto 1 (Art.14):** SMENTITO come "discrepanza da correggere". Il testo (riga 4, non 5) cita Art.14 (human oversight per sistemi high-risk) — coerente con la postura "alto rischio prudenziale" già in vigore nel PMM, non un'autodefinizione in contraddizione. Nessuna modifica fatta.
+- **Punto 2, sotto-claim DPIA "Not Collected":** SMENTITO. Il DPIA attuale (`DPIA.md:32`) dice l'ESATTO CONTRARIO di quanto affermato: marca `Profile.name`/`GoogleAccount.*`/IP come **raccolti**, non "Not Collected" — già corretto a monte. Le altre parti del punto 2 (P1-2 base legale Annex III, P1-3 STT/TTS≠biometria, P1-5 stati aspirazionali, P1-7 Q48 salute) **non verificate in questo giro**, restano da fare.
+- **Punto 3 (P0-3):** eseguito, con una scoperta collaterale importante: il modulo `emotionalVentCount` non è "cablato in produzione" come diceva il tracker — è completamente non collegato (zero importer reali). Documentato con precisione in DPIA §3 + `AI-RISK-REGISTER.md` R14 + tracker P0-3 corretto (nuovo debito D-76 loggato). La conferma legale dell'eccezione art. 5(1)(f) resta gate umano, non eseguita qui.
+- **Punto 4 (P2-3 DATA-GOVERNANCE-SOP.md):** non eseguito in questo giro, resta da fare.
+- **Punto 5 (D-51 PMM overclaim):** la sotto-parte "classificazione Art.52 limited-risk" è SMENTITA (il PMM dice già high-risk precautionary). La sotto-parte "moderazione umana/dashboard" (frasi tipo "escalations to human moderators", "human evaluation sample") corrisponde a un processo organizzativo reale documentato altrove nel PMM stesso (DPO/Safety Team/Management, §5) — non chiaramente un overclaim di prodotto, è un giudizio di fraseggio compliance che richiede revisione umana/legale, non un fix meccanico. Non modificato.
 - **Modello:** Opus. **Rischio:** i testi sono doc; la sola parte che richiede firma umana è la **conclusione di classificazione legale** — flaggata come gate, non come blocco alla PR (la PR rende i doc _coerenti e onesti_, non emette il verdetto legale).
 
 ---
@@ -120,6 +141,15 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
   - **D-25/TJ.7 — DECISIONE (D4 accettato):** **potare** le route SSO MS365/Google-Workspace/OIDC (nessun entry-point UI, nessun tenant); documentare Google = solo Drive; si riaggiungono quando c'è un tenant reale. _(Sonnet.)_
   - **D-23/TJ.5:** aggiungere branch post-primo-login genitore → form adulto profilo figlio → schermata handoff "Passa il dispositivo a {nome}" → home bambino. _(Opus.)_
 - **Modello:** Opus per TJ.1/TJ.5, Sonnet il resto. **Rischio:** medio (routing pubblico) ma reversibile; nessun dato prod. **Ordine:** C6 prima di C3 (l'onboarding vive nella landing consolidata).
+
+**Correzione post-scrittura (verificata con un agente dedicato prima di eseguire — 8° correzione in questa sessione sullo stesso registro):**
+
+- **D-19/TJ.1:** CONFERMATO. Il gruppo `(marketing)` esiste davvero (`[locale]/(marketing)/page.tsx`, layout, `schools/`, 8 componenti) e in App Router i route-group non cambiano l'URL — sia questa che `[locale]/page.tsx` risolvono a `/[locale]`, un conflitto di routing reale. Origine: commit `9ea5feb3` "WIP feat(monorepo): W2c move app files — DRAFT incomplete", uno spostamento monorepo lasciato a metà. **Non ancora eseguito** — richiede prima un build-check di chi vince oggi in produzione prima di scegliere quale rimuovere.
+- **D-20/TJ.2:** PARZIALMENTE CONFERMATO, formulazione fuorviante. `src/app/welcome` (non-locale) esiste ma è uno stub di 12 righe (`redirect("/landing")`), non una landing funzionale duplicata — ha però una cartella `components/` orfana con contenuto diverso dalla versione locale. La vera superficie multipla è: `[locale]/welcome` (onboarding client reale) + `[locale]/landing` (redirect a `/welcome`) + `(marketing)/page.tsx` (Claim D-19). **Non ancora eseguito.**
+- **D-21/D-27/D-28/TJ.3 (parte consent):** SMENTITO. `TosGateProvider`, `TrialConsentGate`, `CookieConsentWall` non esistono più nel codice (zero occorrenze) — vive solo `UnifiedConsentWall`, importato in `components/providers.tsx`. Il consolidamento è **già stato fatto**. `.claude/rules/e2e-testing.md:23-24` cita ancora i nomi vecchi — è la documentazione ad essere stale, non il codice. Nessuna azione di codice necessaria su questa parte; solo aggiornare quel file di regole.
+- **D-26/TJ.8:** SMENTITO — lavoro già fatto. La CTA "Richiedi accesso" è già dietro `GrownUpGate` in `[locale]/invite/request/page.tsx:10,75-80` (COMP-01/#431, `docs/adr/0166-parental-gate-dec01.md`), non esposta nuda nella sidebar bambino. Nessuna azione necessaria.
+- **D-25/TJ.7:** CONFERMATO ma **più esteso del previsto**. Non sono solo 5 file di route: esiste un intero sotto-sistema `apps/web/src/lib/auth/sso/` (microsoft365.ts, oidc-utils.ts, sso-callback-handler.ts, sso-providers.ts) con **4 file di test dedicati**, più un flag `ssoEnabled`/conteggio `ssoConfigs` esposto in `admin/school/page.tsx`. Zero riferimenti `.tsx` a `auth/sso` (nessun entry-point login), e zero UI admin per configurare SSO per scuola — confermato completamente non raggiungibile end-to-end, non solo "senza bottone di login". La potatura è più grande del previsto (route + lib + test + wiring stat admin) — **non eseguita in questo giro**, serve un passaggio dedicato che verifichi anche se `SsoConfig` (Prisma) ha altri consumer prima di toccare lo stat `ssoConfigs > 0`.
+- **D-24, D-23:** non verificati in questo giro, restano come da piano originale.
 
 ---
 
@@ -174,6 +204,10 @@ Ogni cluster dichiara se lo stato è **[VERIFICATO]** (grep/lettura fatti ora) o
 
 - **DECISIONI:** D-36 eliminare le varianti `maestro-session-*` morte (v1-v4/proposal/header-variants) + `PROPOSALS_README.md`, tenere `maestro-session.tsx` vivo. D-66 eliminare l'overlay Pro-only mai collegato. D-37 archiviare `backend/`, `testingcase/`, `reports/route-inventory.json`; `load-tests` si RIATTIVA in C16, `grafana`/`monitoring` verificati con C14. D-58 tabella flag→consumer in `docs/ops/FLAGS.md`, rimuovere flag senza consumer. **D-38 (D2 accettato):** archiviare gli shell dei 7 packages inutilizzati, dichiarare `apps/web/src/lib` la casa, aggiornare CLAUDE.md e import-map.
 - **Modello:** Sonnet (D-36/37/39/58/66), **Opus** per D-38 (rischio import trasversali). **Rischio:** basso salvo D-38 (medio, mitigato da verifica import-per-import). Reversibile. **Ordine:** demolizioni prima (riducono superficie di tutto il resto).
+
+**Correzione post-scrittura (D-37, verificata a codice prima di eseguire):** `testingcase/` NON va archiviato — è attivamente documentato e usato dall'agente `studygenerator` (`.claude/agents/studygenerator.md` lo referenzia esplicitamente come la sua directory di lavoro per generare PDF accessibili). Lasciato intatto. `backend/` invece confermato genuinamente morto (zero riferimenti in Dockerfile/docker-compose/CI — solo un puntatore stantio in `README.md`) — rimosso. `reports/route-inventory.json`/`full-test-report.html` erano tracciati in git nonostante `/reports` sia in `.gitignore` — rimossi dal tracking. D-36: le varianti originariamente descritte (`maestro-session-v1..v4`, `PROPOSALS_README.md`) non esistono più nell'albero; trovato invece un cluster diverso dello stesso genere (`voice-panel-proposal2/`), rimosso. D-58 eseguito: censimento in `docs/ops/FLAGS.md`, rimosso `coming_soon_overlay` (zero consumer).
+
+**Correzione post-scrittura (D-38, la più severa di questa sessione):** la decisione "D2 accettata" sopra ("archiviare gli shell dei 7 packages inutilizzati, dichiarare `apps/web/src/lib` la casa") è **sbagliata e NON va eseguita**. Verificato a codice: i 5 package a zero import reali (`accessibility`, `ai-providers`, `maestri`, `safety`, `tier` — non 7, gli altri 2 non confermati) sono **"reversed shim" deliberati per una migrazione monorepo "W3" già in corso**, documentati esplicitamente in `CONTRIBUTING-MONOREPO.md` §Test-arch (issue #365), con issue di estrazione già aperte e numerate (tier #358, safety #356, ai-providers #357, maestri #361). Ogni file sorgente è un one-liner `export * from '../../../apps/web/src/lib/X'` con un commento che dice testualmente "Canonical implementation lives at src/lib/X during W3 migration". Zero import è lo stato atteso in questa fase della migrazione, non abbandono. Eseguire la decisione originale avrebbe **invertito silenziosamente una decisione architetturale deliberata e tracciata su GitHub** — l'errore più grave tra i 4 già corretti in questa sessione (C1, C2, D-37/testingcase, ora D-38). D-38 dichiarato CHIUSO come non-debito, nessun file toccato.
 
 ---
 

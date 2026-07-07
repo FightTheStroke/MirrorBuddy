@@ -567,7 +567,6 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 | [ARCHITECTURE-DIAGRAMS.md](ARCHITECTURE-DIAGRAMS.md) | Visual architecture (24 Mermaid diagrams) |
 | [CONTRIBUTING.md](CONTRIBUTING.md)                   | Contribution guidelines                   |
 | [CLAUDE.md](CLAUDE.md)                               | Developer quick reference                 |
-| [backend/.env.example](backend/.env.example)         | Azure Cost API configuration              |
 
 ---
 

@@ -136,3 +136,7 @@ feature/
 testingcase/
 study-materials/
 .gstack/
+kanban/todo/
+kanban/doing/
+kanban/done/
+handoff/latest.md

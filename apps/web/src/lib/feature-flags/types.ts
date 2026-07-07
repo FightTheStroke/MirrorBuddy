@@ -40,8 +40,7 @@ export type KnownFeatureFlag =
   | 'voice_calling_overlay' // New calling overlay UI
   | 'tts_audio_15' // Text-to-speech GPT-Audio 1.5 rollout
   | 'chat_unified_view' // Unified conversation view across character types
-  | 'consent_unified_model' // Unified consent storage model
-  | 'coming_soon_overlay'; // Coming soon overlay for waitlist feature
+  | 'consent_unified_model'; // Unified consent storage model
 
 export interface FeatureFlagUpdate {
   status?: FeatureFlagStatus;

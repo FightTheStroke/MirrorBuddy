@@ -2,10 +2,11 @@
  * Base E2E Test Fixtures
  *
  * Extends Playwright's test to automatically apply wall bypasses
- * required by ALL E2E tests:
- * - /api/tos mock (ADR 0059) - prevents TosGateProvider modal blocking
- * - Cookie consent localStorage - prevents CookieConsentWall
- * - Trial consent cookie - prevents TrialConsentGate blocking
+ * required by ALL E2E tests (all three checks now live in
+ * UnifiedConsentWall, components/consent/unified-consent-wall.tsx):
+ * - /api/tos mock (ADR 0059) - prevents the ToS modal blocking
+ * - Cookie consent localStorage - prevents the cookie consent wall
+ * - Trial consent cookie - prevents the trial consent gate blocking
  *
  * ALL E2E spec files MUST import test/expect from this file (or from
  * fixtures that chain from it). Direct import from @playwright/test
@@ -37,7 +38,7 @@ import {
  * Base test with automatic wall bypasses.
  *
  * Mocks /api/tos and sets consent cookies/localStorage before each test.
- * This prevents TosGateProvider, CookieConsentWall, and TrialConsentGate
+ * This prevents UnifiedConsentWall's ToS/cookie/trial-consent checks
  * from blocking test interactions.
  */
 export const test = base.extend({
