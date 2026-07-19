@@ -82,6 +82,17 @@ def run(
             logger.error("Missing required configuration: %s", ", ".join(missing))
             sys.exit(1)
 
+    # If paired to a logged-in child, fetch and apply their profile (name, accessibility,
+    # locale) before choosing the persona — so Buddy starts personalised for that child.
+    if config.DEVICE_TOKEN:
+        from .device import apply_device_profile, fetch_device_profile
+
+        profile = fetch_device_profile(config.API_BASE, config.DEVICE_TOKEN)
+        if profile is not None:
+            apply_device_profile(config, profile)
+        else:
+            logger.info("No paired profile applied; using local .env configuration.")
+
     # Fetch the Maestro persona live from MirrorBuddy.
     mb = MirrorBuddyClient(config.MIRRORBUDDY_URL, locale=config.LOCALE)
     try:

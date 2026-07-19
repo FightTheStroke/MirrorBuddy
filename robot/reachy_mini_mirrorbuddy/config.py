@@ -15,6 +15,9 @@ Optional:
     MIRRORBUDDY_MAESTRO_ID             which Maestro to embody (default: first Italian tutor)
     MIRRORBUDDY_DSA_PROFILE            one of the DSA profiles (see dsa.py); default "cerebral"
     MIRRORBUDDY_STUDENT_NAME           personalise the greeting (e.g. "Mario")
+    MIRRORBUDDY_DEVICE_TOKEN           pairing token; when set, the logged-in child's profile
+                                       (name, accessibility, locale) is fetched and applied
+    MIRRORBUDDY_API_BASE               where the pairing API lives (default: MIRRORBUDDY_URL)
 """
 
 from __future__ import annotations
@@ -53,6 +56,11 @@ class Config:
         self.MAESTRO_ID: str | None = (os.getenv("MIRRORBUDDY_MAESTRO_ID") or "").strip() or None
         self.DSA_PROFILE: str = (os.getenv("MIRRORBUDDY_DSA_PROFILE") or "cerebral").strip()
         self.STUDENT_NAME: str | None = (os.getenv("MIRRORBUDDY_STUDENT_NAME") or "").strip() or None
+        # Device pairing: a token bound to the logged-in child's account. When present, the
+        # robot fetches that child's profile (name, accessibility, locale) from the web app.
+        self.DEVICE_TOKEN: str | None = (os.getenv("MIRRORBUDDY_DEVICE_TOKEN") or "").strip() or None
+        api_base = (os.getenv("MIRRORBUDDY_API_BASE") or "").strip().rstrip("/")
+        self.API_BASE: str = api_base or self.MIRRORBUDDY_URL
         # Start neutrally as "Buddy" (organise the study session) instead of impersonating a
         # historical Maestro. A pinned MIRRORBUDDY_MAESTRO_ID always takes precedence.
         self.START_NEUTRAL: bool = _flag("MIRRORBUDDY_START_NEUTRAL", True)
