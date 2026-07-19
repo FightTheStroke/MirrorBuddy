@@ -19,7 +19,7 @@ vi.mock("@/lib/devices/device-service", () => ({
 import { GET } from "./route";
 import { getDeviceProfile } from "@/lib/devices/device-service";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const handler = GET as unknown as (ctx: any) => Promise<Response>;
 const mockProfile = getDeviceProfile as unknown as ReturnType<typeof vi.fn>;
 

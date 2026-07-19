@@ -22,7 +22,7 @@ vi.mock("@/lib/devices/device-service", () => ({
 import { POST } from "./route";
 import { createPairingCode } from "@/lib/devices/device-service";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const handler = POST as unknown as (ctx: any) => Promise<Response>;
 const mockCreate = createPairingCode as unknown as ReturnType<typeof vi.fn>;
 

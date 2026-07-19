@@ -422,6 +422,16 @@ export const RATE_LIMITS = {
     maxRequests: 5,
     windowMs: 15 * 60 * 1000,
   },
+  /**
+   * Global ceiling on code redemption across ALL clients. Belt-and-suspenders so the
+   * 6-digit brute-force bound does not depend solely on per-IP keying (which can be
+   * defeated by a spoofed X-Forwarded-For behind a naive proxy). Pairing is a rare
+   * action, so a low global cap is safe for legitimate use.
+   */
+  DEVICE_PAIR_GLOBAL: {
+    maxRequests: 100,
+    windowMs: 15 * 60 * 1000,
+  },
   /** Robot profile fetch (device token): 60 per minute */
   DEVICE_ME: {
     maxRequests: 60,

@@ -87,9 +87,11 @@ export async function createPairingCode(
       });
       return { code, expiresAt };
     } catch (error) {
-      // Unique collision on the hashed code: retry with a new code.
-      if (attempt === MAX_CODE_ATTEMPTS - 1) {
-        logger.error("Failed to allocate pairing code", { error });
+      // Retry ONLY on a unique-constraint collision of the hashed code (P2002);
+      // surface any other error (DB down, FK violation) immediately.
+      const code = (error as { code?: string }).code;
+      if (code !== "P2002" || attempt === MAX_CODE_ATTEMPTS - 1) {
+        logger.error("Failed to allocate pairing code", undefined, error);
         throw error;
       }
     }
@@ -104,29 +106,34 @@ export async function redeemPairingCode(
   const trimmed = code?.trim();
   if (!trimmed || !/^\d{6}$/.test(trimmed)) return null;
 
-  const device = await prisma.robotDevice.findUnique({
-    where: { pairCodeHash: sha256(trimmed) },
-  });
-  if (
-    !device ||
-    device.revokedAt ||
-    device.tokenHash ||
-    !device.pairCodeExpiresAt ||
-    device.pairCodeExpiresAt.getTime() < Date.now()
-  ) {
-    return null;
-  }
-
   const token = generateToken();
-  await prisma.robotDevice.update({
-    where: { id: device.id },
+  const tokenHash = sha256(token);
+  const now = new Date();
+
+  // Atomic redemption: a single guarded updateMany claims the code only if it is still
+  // unredeemed, unrevoked and unexpired. This closes the double-redeem (TOCTOU) race —
+  // concurrent requests for the same code cannot both succeed.
+  const claimed = await prisma.robotDevice.updateMany({
+    where: {
+      pairCodeHash: sha256(trimmed),
+      tokenHash: null,
+      revokedAt: null,
+      pairCodeExpiresAt: { gt: now },
+    },
     data: {
-      tokenHash: sha256(token),
-      pairedAt: new Date(),
+      tokenHash,
+      pairedAt: now,
       pairCodeHash: null,
       pairCodeExpiresAt: null,
     },
   });
+  if (claimed.count === 0) return null;
+
+  const device = await prisma.robotDevice.findUnique({
+    where: { tokenHash },
+    select: { id: true },
+  });
+  if (!device) return null;
   logger.info("Robot device paired", { deviceId: device.id });
   return { token, deviceId: device.id };
 }
@@ -175,7 +182,7 @@ export async function getDeviceProfile(
 /** List a user's paired devices (no secrets). */
 export async function listDevices(userId: string): Promise<DeviceSummary[]> {
   return prisma.robotDevice.findMany({
-    where: { userId, revokedAt: null },
+    where: { userId, revokedAt: null, pairedAt: { not: null } },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
