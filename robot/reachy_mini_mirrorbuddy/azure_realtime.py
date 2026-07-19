@@ -15,6 +15,8 @@ from collections.abc import Callable
 import websockets
 
 from . import rt_messages
+from . import session_flow
+from . import tools
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +47,8 @@ class AzureRealtimeClient:
         on_transcript: Callable[[str, bool], None] | None = None,
         on_ready: Callable[[], None] | None = None,
         on_tool_call: Callable[[str, dict, str], None] | None = None,
+        on_sleep: Callable[[], None] | None = None,
+        on_wake: Callable[[], None] | None = None,
     ) -> None:
         self.ws_url = ws_url
         self.api_key = api_key
@@ -59,6 +63,8 @@ class AzureRealtimeClient:
         self.on_transcript = on_transcript
         self.on_ready = on_ready
         self.on_tool_call = on_tool_call
+        self.on_sleep = on_sleep
+        self.on_wake = on_wake
         self._fc_names: dict[str, str] = {}
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
@@ -68,6 +74,9 @@ class AzureRealtimeClient:
         self._responding = False  # a model response is currently streaming
         self._suppress = False  # drop in-flight audio after a barge-in cancel
         self._quiet = False  # student asked for silence: keep model muted
+        self._asleep = False  # session ended: stay muted until the wake word
+        self._sleep_after = False  # go to sleep once the farewell response finishes
+        self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
@@ -165,6 +174,10 @@ class AzureRealtimeClient:
         )
         await self._safe_send(json.dumps({"type": "response.create", "response": {"instructions": instructions}}))
 
+    async def _request_response(self, instructions: str | None = None) -> None:
+        """Ask the model to speak now, optionally steering what it should say."""
+        await self._safe_send(json.dumps(rt_messages.response_create(instructions)))
+
     async def _handle_event(self, event: dict) -> None:
         etype = event.get("type", "")
 
@@ -185,23 +198,47 @@ class AzureRealtimeClient:
             return
 
         if etype == "response.created":
-            if self._quiet:
+            if self._quiet or self._asleep:
                 await self._safe_send(rt_messages.CANCEL)
                 self._suppress = True
                 return
+            if self._pending_farewell:  # the goodbye is now starting → sleep once it's done
+                self._pending_farewell = False
+                self._sleep_after = True
             self._responding = True
             self._suppress = False
             return
         if etype == "response.done":
             self._responding = False
+            if self._sleep_after:  # farewell just finished → go to sleep
+                self._sleep_after = False
+                self._asleep = True
+                if self.on_sleep:
+                    _safe_cb(self.on_sleep)
             return
 
-        # Student's speech transcribed: honour stop-intent deterministically.
+        # Student's speech transcribed: honour stop / end / wake intents deterministically.
         if etype.endswith("input_audio_transcription.completed"):
             text = (event.get("transcript") or "").strip()
             if not text:
                 return
-            self._quiet = rt_messages.is_stop(text)
+            action = session_flow.decide(text, self._asleep)
+            if action == session_flow.IGNORE:
+                return
+            if action == session_flow.WAKE:
+                self._asleep = self._quiet = False
+                if self.on_wake:
+                    _safe_cb(self.on_wake)
+                await self._request_response(rt_messages.WAKE_INSTR)
+                return
+            if action == session_flow.END:
+                self._pending_farewell = True
+                self._suppress = False
+                if self._responding:
+                    await self._safe_send(rt_messages.CANCEL)
+                await self._request_response(rt_messages.FAREWELL_INSTR)
+                return
+            self._quiet = action == session_flow.STOP
             if self._quiet:
                 self._suppress = True
                 if self._responding:
@@ -212,6 +249,8 @@ class AzureRealtimeClient:
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
         if etype == "input_audio_buffer.speech_started":
+            if self._asleep:
+                return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
             self._quiet = False
             if self._responding:
@@ -236,12 +275,7 @@ class AzureRealtimeClient:
 
         if etype == "response.function_call_arguments.done":
             call_id = event.get("call_id") or ""
-            name = event.get("name") or self._fc_names.get(call_id, "")
-            raw_args = event.get("arguments") or "{}"
-            try:
-                args = json.loads(raw_args) if isinstance(raw_args, str) else dict(raw_args)
-            except (ValueError, TypeError):
-                args = {}
+            name, args = tools.parse_call_arguments(event, self._fc_names.get(call_id, ""))
             self._fc_names.pop(call_id, None)
             logger.info("Tool call: %s(%s) call_id=%s", name, args, call_id)
             if name and self.on_tool_call:

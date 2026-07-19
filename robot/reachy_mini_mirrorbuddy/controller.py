@@ -19,7 +19,7 @@ from .audio_io import AudioIO
 from .azure_realtime import AzureRealtimeClient
 from .config import Config
 from .dsa import turn_detection_config
-from .mirrorbuddy_client import Maestro
+from .mirrorbuddy_client import Maestro, friend_buddy, neutral_buddy
 from .movements import Movements, temperament_for
 from .prompt_builder import build_instructions
 
@@ -89,7 +89,28 @@ class Controller:
             on_speech_started=self.audio.interrupt,
             on_transcript=_log_transcript,
             on_tool_call=self._on_tool_call,
+            on_sleep=self._on_sleep,
+            on_wake=self._on_wake,
         )
+
+    # ------------------------------------------------------------------ sleep / wake
+    def _on_sleep(self) -> None:
+        """Session ended: park the robot quietly until it is called back."""
+        try:
+            self.audio.interrupt()
+            self.movements.hold_still()  # freeze motion, antennas rest — a calm 'sleep'
+            logger.info("Session ended; robot is now asleep. Say 'Buddy' to wake it.")
+        except Exception as e:  # pragma: no cover - runtime robustness
+            logger.debug("sleep handling failed: %s", e)
+
+    def _on_wake(self) -> None:
+        """Called back by name: resume motion with a small wake gesture."""
+        try:
+            self.movements.release_hold()
+            self.movements.wake()
+            logger.info("Woken up; resuming the session.")
+        except Exception as e:  # pragma: no cover - runtime robustness
+            logger.debug("wake handling failed: %s", e)
 
     # ------------------------------------------------------------------ tools
     def _on_tool_call(self, name: str, args: dict, call_id: str) -> None:
@@ -104,6 +125,10 @@ class Controller:
                 self._handle_call_professor(client, args, call_id)
             elif name == "look_at_homework":
                 self._handle_look_at_homework(client, args, call_id)
+            elif name == "talk_as_friend":
+                self._switch_persona(client, call_id, friend=True)
+            elif name == "back_to_study":
+                self._switch_persona(client, call_id, friend=False)
             else:
                 client.send_function_result(call_id, "Ok.")
         except Exception as e:  # pragma: no cover - runtime robustness
@@ -121,6 +146,19 @@ class Controller:
         # Acknowledge without a spoken reply here; the new Maestro will greet.
         client.send_function_result(call_id, f"Passo la parola a {target.display_name}.", respond=False)
         threading.Thread(target=self._switch_to, args=(target,), name="MaestroSwitch", daemon=True).start()
+
+    def _switch_persona(self, client: AzureRealtimeClient, call_id: str, friend: bool) -> None:
+        """Swap between the friend companion and the study tutor (persona + voice)."""
+        target = (
+            friend_buddy(self.cfg.STUDENT_NAME, self.cfg.BUDDY_VOICE)
+            if friend
+            else neutral_buddy(self.cfg.STUDENT_NAME, self.cfg.BUDDY_VOICE)
+        )
+        if target.id == self.maestro.id:
+            client.send_function_result(call_id, "Certo, sono qui.")
+            return
+        client.send_function_result(call_id, "Va bene.", respond=False)
+        threading.Thread(target=self._switch_to, args=(target,), name="PersonaSwitch", daemon=True).start()
 
     def _handle_look_at_homework(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
         if not self.cfg.ENABLE_CAMERA:

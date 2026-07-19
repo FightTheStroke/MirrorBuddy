@@ -30,6 +30,54 @@ def is_stop(text: str | None) -> bool:
     return bool(text and _STOP_RE.search(text))
 
 
+# End-of-session intent: the student signals they are done for now. Unlike a stop
+# (be quiet a moment), this ends the session — the robot says a short goodbye and
+# goes to sleep until it hears its name again. Deterministic, like the stop word.
+_END_RE = re.compile(
+    r"\b("
+    r"(?:abbiamo|ho|hai)\s+(?:finito|terminato|concluso)|"
+    r"finito\s+per\s+oggi|basta\s+(?:studiare|compiti|per\s+oggi)|"
+    r"a\s+domani|ci\s+vediamo|arrivederci|buonanotte|buona\s+notte|"
+    r"(?:vai\s+a|puoi|vatti\s+a)\s+dormire|riposati|spegniti|"
+    r"abbiamo\s+finito"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Wake intent: while asleep, only the robot's name (or a clear call) brings it back.
+_WAKE_RE = re.compile(r"\b(buddy|svegliati|sei\s+sveglio|ci\s+sei|ehi\s+robot)\b", re.IGNORECASE)
+
+
+def is_end(text: str | None) -> bool:
+    """True if the student is ending the session ('abbiamo finito', 'a domani'...)."""
+    return bool(text and _END_RE.search(text))
+
+
+def is_wake(text: str | None) -> bool:
+    """True if the student is calling the robot back from sleep."""
+    return bool(text and _WAKE_RE.search(text))
+
+
+# Spoken cues driven by the model on session end / wake (kept here so the client
+# stays focused on socket I/O and the copy is easy to review/translate).
+FAREWELL_INSTR = (
+    "Lo studente ha detto che avete finito. Salutalo con UNA frase breve, calda e "
+    "rassicurante (es. «Bravo, per oggi basta così: riposati, ci vediamo presto!»). "
+    "Non fare altre domande, non proporre altro: è un congedo."
+)
+WAKE_INSTR = (
+    "Sei appena stato richiamato. Saluta di nuovo con UNA frase breve e allegra e "
+    "chiedi con calma cosa vuole fare adesso."
+)
+
+
+def response_create(instructions: str | None = None) -> dict:
+    """Build a ``response.create`` (optionally steering what the model should say)."""
+    if instructions:
+        return {"type": "response.create", "response": {"instructions": instructions}}
+    return {"type": "response.create"}
+
+
 def session_update(
     instructions: str,
     voice: str,
