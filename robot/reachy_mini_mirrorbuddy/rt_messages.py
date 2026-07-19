@@ -7,7 +7,27 @@ The event schema differs between the Realtime GA and Preview protocols, so
 
 from __future__ import annotations
 
+import json
+import re
+
 SAMPLE_RATE = 24000  # PCM sample rate (in and out)
+
+# Pre-serialised cancel of the model's current response (used on barge-in / stop).
+CANCEL = json.dumps({"type": "response.cancel"})
+
+# Stop-intent words. When the student says any of these the robot must go silent
+# immediately, deterministically — never relying on the model to choose to yield.
+# This is an accessibility requirement: insistence stresses the student.
+_STOP_RE = re.compile(
+    r"\b(basta|ferma(?:ti|te|lo)?|zitt[oaie]|silenzio|silence|aspetta|"
+    r"pausa|stop|taci|smettila|smetti|shh+|sh+t?)\b",
+    re.IGNORECASE,
+)
+
+
+def is_stop(text: str | None) -> bool:
+    """True if the user utterance is a command to stop / be quiet."""
+    return bool(text and _STOP_RE.search(text))
 
 
 def session_update(
