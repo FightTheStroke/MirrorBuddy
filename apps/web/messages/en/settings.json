@@ -1268,6 +1268,22 @@
       "saved": "Saved!",
       "saveError": "Error saving contacts",
       "privacyNote": "This data is used exclusively for safety notifications and will not be shared with third parties."
+    },
+    "robotPairing": {
+      "title": "Connect a robot",
+      "description": "Turn a Reachy Mini into MirrorBuddy's body: same voice, same teachers, now with eyes, ears and movement. The robot uses your child's profile, never their credentials.",
+      "generateCode": "Generate pairing code",
+      "codeHint": "Type this code on the robot to connect it:",
+      "codeExpires": "The code expires in 10 minutes.",
+      "copy": "Copy code",
+      "pairedRobots": "Paired robots",
+      "loading": "Loading…",
+      "noRobots": "No robots connected.",
+      "unnamedRobot": "Unnamed robot",
+      "pairedOn": "Paired on {date}",
+      "pendingPairing": "Waiting to pair",
+      "unpair": "Unpair",
+      "privacyNote": "The robot only receives a dedicated token and the learning profile (name, preferred teacher, accessibility settings). No password ever leaves this device. You can unpair the robot at any time."
     }
   }
 }

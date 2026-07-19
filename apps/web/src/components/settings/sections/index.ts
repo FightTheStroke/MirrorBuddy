@@ -10,3 +10,4 @@ export { AIProviderSettings } from './ai-provider-settings';
 export { DiagnosticsTab } from './diagnostics-tab';
 export { GuardianContactSection } from './guardian-contact-section';
 export { MobileToolsSection } from './mobile-tools-section';
+export { RobotPairingCard } from './robot-pairing-card';
