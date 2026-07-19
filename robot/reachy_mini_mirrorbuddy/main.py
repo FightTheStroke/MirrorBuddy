@@ -101,7 +101,10 @@ def run(
         student_name=config.STUDENT_NAME,
     )
 
-    # Initialize the robot if the host didn't hand us one.
+    # Initialize the robot if the host didn't hand us one. When the Reachy Mini host
+    # launches the app it opens (and will close) the robot for us, so only tear it
+    # down here if we created it.
+    owns_robot = robot is None
     if robot is None:
         robot = ReachyMini(**({"robot_name": args.robot_name} if args.robot_name else {}))
 
@@ -156,14 +159,15 @@ def run(
         client.stop()
         client.join()
         movements.stop()
-        try:
-            robot.media.close()
-        except Exception:
-            pass
-        try:
-            robot.client.disconnect()
-        except Exception:
-            pass
+        if owns_robot:
+            try:
+                robot.media.close()
+            except Exception:
+                pass
+            try:
+                robot.client.disconnect()
+            except Exception:
+                pass
         logger.info("Shutdown complete")
 
 
