@@ -70,7 +70,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
             return JSONResponse({"maestri": items})
         except Exception as e:
             logger.warning("maestri fetch failed: %s", e)
-            return JSONResponse({"maestri": [], "error": str(e)}, status_code=502)
+            return JSONResponse({"maestri": [], "error": "upstream unavailable"}, status_code=502)
 
     @app.post("/api/config")
     async def save_config(request: Request) -> JSONResponse:
@@ -86,8 +86,11 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
             _write_env(env_path, updates)
         except Exception as e:
             logger.error("failed to write .env: %s", e)
-            return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+            return JSONResponse({"ok": False, "error": "could not save configuration"}, status_code=500)
 
+        # Reload from the instance .env we just wrote (not the process cwd), so the
+        # first-run wait loop in main.py sees the new Azure keys without a restart.
+        config.env_path = str(env_path)
         config.reload()
         return JSONResponse({"ok": True, "ready": not config.missing(), "missing": config.missing()})
 
