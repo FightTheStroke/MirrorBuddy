@@ -31,12 +31,13 @@ class Config:
     """Runtime configuration loaded from environment / .env."""
 
     def __init__(self) -> None:
+        self.env_path: str | None = None
         load_dotenv()
         self.reload()
 
     def reload(self) -> None:
         """(Re)read all values from the environment."""
-        load_dotenv(override=True)
+        load_dotenv(self.env_path or None, override=True)
 
         # --- Azure OpenAI Realtime (the brain + voice) ---
         endpoint = (os.getenv("AZURE_OPENAI_REALTIME_ENDPOINT") or "").strip()
