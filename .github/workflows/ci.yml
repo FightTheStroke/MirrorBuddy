@@ -1927,15 +1927,19 @@ jobs:
   # DEPLOY TO STAGING (Vercel Preview)
   # ============================================================================
   # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
-  # Production promotion happens via promote-to-production.yml workflow.
+  # On main, the auto-promote-production job then promotes this exact staging
+  # build to production automatically (gated on deployment-gate success).
   # Git-triggered auto-deploy (push to main) is disabled via ignoreCommand in
   # vercel.json (T0.1) — this job's explicit `vercel deploy --prebuilt` is the
-  # only path that reaches Vercel; production only via promote-to-production.yml.
+  # only path that reaches Vercel. The promote-to-production.yml workflow remains
+  # available for manual re-promote / rollback.
   # ============================================================================
   deploy-to-staging:
     name: "🎪 Deploy to Staging"
     runs-on: ubuntu-latest
     needs: [deployment-gate]
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.deployment_url }}
     if: |
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
@@ -2024,7 +2028,9 @@ jobs:
                   '✅ Deployed'
                 ]
               ])
-              .addRaw('\n\n**To promote to production**, run the [Promote to Production](' +
+              .addRaw('\n\n**Auto-promote:** this staging build is promoted to ' +
+                'production automatically by the `auto-promote-production` job. ' +
+                'For manual re-promote / rollback, use the [Promote to Production](' +
                 `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/workflows/promote-to-production.yml` +
                 ') workflow.\n')
               .write();
@@ -2112,6 +2118,122 @@ jobs:
                 `This issue will be **closed automatically** when promotion completes.`,
               ].join('\n'),
             });
+
+  # ============================================================================
+  # AUTO-PROMOTE TO PRODUCTION (gated_auto)
+  # ============================================================================
+  # After staging deploys on main (all gates green), promote that exact build to
+  # production automatically. `vercel promote` rebuilds the deployment as
+  # production (~5min), so the production alias only flips once that build is
+  # Ready — we poll mirrorbuddy.org until it serves a FRESH ([Ns/Nm ago]) and
+  # healthy build before passing. A naive 15s wait would falsely pass against the
+  # OLD deployment. On success the staging reminder issue is closed; on failure it
+  # is left open as a signal to promote/rollback manually.
+  # ============================================================================
+  auto-promote-production:
+    name: "🚀 Auto-Promote to Production"
+    runs-on: ubuntu-latest
+    needs: [deploy-to-staging]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.deploy-to-staging.result == 'success'
+    env:
+      SCOPE: "--scope=team_nDwLfqx9JbVIs4C7Il79f4ln"
+      STAGING_URL: ${{ needs.deploy-to-staging.outputs.deployment_url }}
+    steps:
+      - name: Validate inputs
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not configured"; exit 1
+          fi
+          if [ -z "$STAGING_URL" ]; then
+            echo "::error::No staging deployment URL from deploy-to-staging"; exit 1
+          fi
+          echo "Staging URL: $STAGING_URL"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pre-promote staging health check
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/api/health")
+          if [ "$status" != "200" ]; then
+            echo "::error::Staging is not healthy (HTTP $status) — aborting promote"; exit 1
+          fi
+          echo "✅ Staging healthy (HTTP $status)"
+
+      - name: Promote staging → production
+        run: |
+          echo "🚀 Promoting $STAGING_URL to production..."
+          vercel promote "$STAGING_URL" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --yes
+          echo "✅ Promote command issued"
+
+      - name: Wait for production to go live (alias flip + health)
+        run: |
+          echo "Waiting for mirrorbuddy.org to serve the fresh build..."
+          deadline=$((SECONDS + 900))
+          while [ $SECONDS -lt $deadline ]; do
+            age=$(vercel inspect mirrorbuddy.org --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>&1 | grep -iE "created" | head -1)
+            health=$(curl -s -o /dev/null -w "%{http_code}" https://mirrorbuddy.org/api/health)
+            echo "  alias: $age | health: $health"
+            if [ "$health" = "200" ] && echo "$age" | grep -qE "\[[0-9]+(s|m) ago\]"; then
+              echo "✅ Production live and fresh"
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error::Production alias did not flip to a fresh healthy build within 15min"
+          echo "Rollback/inspect: run promote-to-production.yml manually or 'vercel ls --prod'"
+          exit 1
+
+      - name: Update GitHub Production deployment status
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: deployment } = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'Production',
+              auto_merge: false,
+              required_contexts: [],
+              description: `Auto-promoted from staging (${context.sha.slice(0, 7)})`,
+            });
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.id,
+              state: 'success',
+              environment_url: 'https://mirrorbuddy.org',
+              description: 'Auto-promoted staging → production',
+            });
+
+      - name: Close staging reminder issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'staging-pending-promotion';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const open = await github.rest.issues.listForRepo({ owner, repo, labels: label, state: 'open' });
+            for (const issue of open.data) {
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed', state_reason: 'completed' });
+              await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: '✅ Auto-promoted to production successfully.' });
+            }
+
+      - name: Post summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ok = '${{ job.status }}' === 'success';
+            await core.summary
+              .addHeading(`${ok ? '✅' : '❌'} Auto-Promote to Production`, 2)
+              .addRaw(ok ? 'Staging build promoted and verified live on https://mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
+              .write();
 
   # ============================================================================
   # RELEASE EVIDENCE PACK
