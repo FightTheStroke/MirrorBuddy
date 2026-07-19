@@ -182,6 +182,7 @@
 | 0126 | Unified Camera Architecture                            | Video/photo mode selector                    |
 | 0133 | PWA Offline Strategy                                   | Native Service Worker, offline-first caching |
 | 0134 | Gamification UI - Surface Backend Achievements         | Achievements page, streaks, XP progress      |
+| 0170 | Reachy Mini Robot Embodiment + Device Pairing          | Voice-first robot tutor, credential-free pairing |
 
 ## Tier & Business
 

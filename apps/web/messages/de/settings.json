@@ -1283,7 +1283,22 @@
       "pairedOn": "Gekoppelt am {date}",
       "pendingPairing": "Wartet auf Kopplung",
       "unpair": "Trennen",
-      "privacyNote": "Der Roboter erhält nur ein eigenes Token und das Lernprofil (Name, bevorzugter Lehrer, Barrierefreiheitseinstellungen). Kein Passwort verlässt dieses Gerät. Sie können den Roboter jederzeit trennen."
+      "privacyNote": "Der Roboter erhält nur ein eigenes Token und das Lernprofil (Name, bevorzugter Lehrer, Barrierefreiheitseinstellungen). Kein Passwort verlässt dieses Gerät. Sie können den Roboter jederzeit trennen.",
+      "whatIsTitle": "Was ist der Reachy-Mini-Roboter?",
+      "whatIsBody": "Reachy Mini ist ein kleiner Tischroboter von Hugging Face, der zum Körper von MirrorBuddy wird: derselbe Tutor, dieselbe Stimme und dieselben Lehrer, aber mit Augen, die dir folgen, Ohren, die zuhören, einer Stimme, die spricht, und ausdrucksstarken Bewegungen. Kein Bildschirm nötig: Er wird allein per Stimme bedient.",
+      "featuresTitle": "Was er kann",
+      "featureEyes": "Augen, die dem Gesicht des Kindes beim Zuhören folgen",
+      "featureVoice": "Echtzeit-Stimme, genau wie MirrorBuddy im Web",
+      "featureCamera": "Eine Kamera, um die Hausaufgaben auf dem Tisch anzusehen und zu helfen",
+      "featureMovement": "Ausdrucksstarke Bewegungen, an den Stil jedes Lehrers angepasst",
+      "featureStop": "Stoppt sofort, wenn du „Stopp“ sagst — kein Stress",
+      "howItWorksTitle": "So verbindest du deinen Roboter",
+      "step1": "Erzeuge unten einen Kopplungscode.",
+      "step2": "Gib den Code am Roboter auf seiner Einstellungsseite ein.",
+      "step3": "Der Roboter startet bereits mit dem Profil deines Kindes personalisiert.",
+      "noRobotYet": "Noch keinen Roboter?",
+      "buyCta": "Einen Reachy Mini kaufen",
+      "buyNote": "Reachy Mini Lite ab etwa 299 $, Wireless-Version ab etwa 449 $, auf reachy-mini.org."
     }
   }
 }

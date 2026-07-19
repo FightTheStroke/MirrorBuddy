@@ -310,6 +310,7 @@ no screen needed.
 (USB-tethered) or **Wireless $449** (on-board compute).
 
 **→ Robot app & setup guide: [robot/README.md](robot/README.md)**
+**→ Feature overview (also for families without a robot): [docs/reachy-mini-robot.md](docs/reachy-mini-robot.md)**
 
 ---
 
