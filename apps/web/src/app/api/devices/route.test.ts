@@ -23,9 +23,9 @@ import { GET } from "./route";
 import { DELETE } from "./[id]/route";
 import { listDevices, revokeDevice } from "@/lib/devices/device-service";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const listHandler = GET as unknown as (ctx: any) => Promise<Response>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const deleteHandler = DELETE as unknown as (ctx: any) => Promise<Response>;
 const mockList = listDevices as unknown as ReturnType<typeof vi.fn>;
 const mockRevoke = revokeDevice as unknown as ReturnType<typeof vi.fn>;

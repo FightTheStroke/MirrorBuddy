@@ -10,7 +10,18 @@ vi.mock("@/lib/db", async () => {
 });
 
 vi.mock("@/lib/logger", () => ({
-  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
+  },
 }));
 
 import { prisma } from "@/lib/db";
@@ -22,7 +33,7 @@ import {
   revokeDevice,
 } from "../device-service";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const db = prisma as any;
 
 beforeEach(() => {
@@ -44,9 +55,10 @@ describe("createPairingCode", () => {
     expect(data.pairCodeHash).not.toContain(result.code);
   });
 
-  it("retries on a hashed-code collision", async () => {
+  it("retries on a hashed-code collision (P2002)", async () => {
+    const collision = Object.assign(new Error("unique"), { code: "P2002" });
     db.robotDevice.create
-      .mockRejectedValueOnce(new Error("unique"))
+      .mockRejectedValueOnce(collision)
       .mockResolvedValueOnce({ id: "d2" });
 
     const result = await createPairingCode("user-1");
@@ -54,56 +66,49 @@ describe("createPairingCode", () => {
     expect(result.code).toMatch(/^\d{6}$/);
     expect(db.robotDevice.create).toHaveBeenCalledTimes(2);
   });
+
+  it("surfaces a non-collision error immediately without retrying", async () => {
+    db.robotDevice.create.mockRejectedValue(new Error("db down"));
+
+    await expect(createPairingCode("user-1")).rejects.toThrow("db down");
+    expect(db.robotDevice.create).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("redeemPairingCode", () => {
   it("rejects a malformed code without hitting the database", async () => {
     expect(await redeemPairingCode("abc")).toBeNull();
-    expect(db.robotDevice.findUnique).not.toHaveBeenCalled();
+    expect(db.robotDevice.updateMany).not.toHaveBeenCalled();
   });
 
-  it("returns null for an unknown code", async () => {
-    db.robotDevice.findUnique.mockResolvedValue(null);
+  it("returns null when no redeemable code matches (unknown/expired/already-paired)", async () => {
+    db.robotDevice.updateMany.mockResolvedValue({ count: 0 });
     expect(await redeemPairingCode("123456")).toBeNull();
+    // The guard lives in the atomic updateMany where-clause.
+    const where = db.robotDevice.updateMany.mock.calls[0][0].where;
+    expect(where.tokenHash).toBeNull();
+    expect(where.revokedAt).toBeNull();
+    expect(where.pairCodeExpiresAt.gt).toBeInstanceOf(Date);
   });
 
-  it("returns null for an expired code", async () => {
-    db.robotDevice.findUnique.mockResolvedValue({
-      id: "d1",
-      revokedAt: null,
-      tokenHash: null,
-      pairCodeExpiresAt: new Date(Date.now() - 1000),
-    });
-    expect(await redeemPairingCode("123456")).toBeNull();
-  });
-
-  it("returns null for an already-paired device", async () => {
-    db.robotDevice.findUnique.mockResolvedValue({
-      id: "d1",
-      revokedAt: null,
-      tokenHash: "existing",
-      pairCodeExpiresAt: new Date(Date.now() + 10000),
-    });
-    expect(await redeemPairingCode("123456")).toBeNull();
-  });
-
-  it("issues a token and clears the code on success", async () => {
-    db.robotDevice.findUnique.mockResolvedValue({
-      id: "d1",
-      revokedAt: null,
-      tokenHash: null,
-      pairCodeExpiresAt: new Date(Date.now() + 10000),
-    });
-    db.robotDevice.update.mockResolvedValue({});
+  it("issues a token atomically and clears the code on success", async () => {
+    db.robotDevice.updateMany.mockResolvedValue({ count: 1 });
+    db.robotDevice.findUnique.mockResolvedValue({ id: "d1" });
 
     const result = await redeemPairingCode("123456");
 
     expect(result?.token).toMatch(/^[a-f0-9]{64}$/);
     expect(result?.deviceId).toBe("d1");
-    const data = db.robotDevice.update.mock.calls[0][0].data;
+    const data = db.robotDevice.updateMany.mock.calls[0][0].data;
     expect(data.pairCodeHash).toBeNull();
     expect(data.tokenHash).toMatch(/^[a-f0-9]{64}$/);
     expect(data.tokenHash).not.toBe(result?.token);
+  });
+
+  it("returns null if the claimed row cannot be read back", async () => {
+    db.robotDevice.updateMany.mockResolvedValue({ count: 1 });
+    db.robotDevice.findUnique.mockResolvedValue(null);
+    expect(await redeemPairingCode("123456")).toBeNull();
   });
 });
 
@@ -164,6 +169,7 @@ describe("listDevices / revokeDevice", () => {
     expect(db.robotDevice.findMany.mock.calls[0][0].where).toEqual({
       userId: "user-1",
       revokedAt: null,
+      pairedAt: { not: null },
     });
   });
 
