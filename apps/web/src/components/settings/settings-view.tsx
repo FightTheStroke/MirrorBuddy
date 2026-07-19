@@ -30,6 +30,7 @@ import {
   AIProviderSettings,
   DiagnosticsTab,
   GuardianContactSection,
+  RobotPairingCard,
 } from './sections';
 import { GoogleAccountCard } from '@/components/google-drive';
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
@@ -206,6 +207,7 @@ export function SettingsView() {
         {activeTab === 'integrations' && (
           <div className="space-y-6">
             <GoogleAccountCard userId={getUserId()} />
+            <RobotPairingCard />
           </div>
         )}
 
