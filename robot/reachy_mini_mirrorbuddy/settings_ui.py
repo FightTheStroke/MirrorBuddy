@@ -133,7 +133,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
             _write_env(env_path, {"MIRRORBUDDY_DEVICE_TOKEN": token})
         except Exception as e:
             logger.error("failed to store device token: %s", e)
-            return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+            return JSONResponse({"ok": False, "error": "impossibile salvare il token"}, status_code=500)
 
         config.reload()
         return JSONResponse({"ok": True, "paired": True})
