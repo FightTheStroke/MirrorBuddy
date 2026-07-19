@@ -42,11 +42,13 @@ class TestEndIntent:
 
 class TestWakeIntent:
     def test_wake_words(self):
-        for t in ["buddy", "Buddy!", "svegliati", "sei sveglio", "ci sei", "ehi robot"]:
+        for t in ["buddy", "Buddy!", "ehi buddy", "buddi", "ok buddy ci sei?"]:
             assert rt_messages.is_wake(t), t
 
     def test_not_wake(self):
-        for t in ["ciao", "storia", "", None]:
+        # Only "Buddy" reactivates — generic calls must NOT wake it from rest.
+        for t in ["ciao", "storia", "", None, "svegliati", "sei sveglio",
+                  "ci sei", "ehi robot"]:
             assert not rt_messages.is_wake(t), t
 
 
