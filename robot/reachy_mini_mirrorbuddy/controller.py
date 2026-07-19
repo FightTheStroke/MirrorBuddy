@@ -52,6 +52,7 @@ class Controller:
         """Connect the first Maestro. Returns True once the session is ready."""
         self._client = self._build_client(self.maestro)
         self.audio.on_input_pcm16 = self._client.send_audio_pcm16
+        self.audio.on_local_barge_in = self._client.local_barge_in
         self._client.start()
         ready = self._client.wait_ready(timeout=25.0)
         if not ready:
@@ -202,6 +203,7 @@ class Controller:
                 new.join()
                 return
             self.audio.on_input_pcm16 = new.send_audio_pcm16
+            self.audio.on_local_barge_in = new.local_barge_in
             self._client = new
             self.maestro = target
             if old:
