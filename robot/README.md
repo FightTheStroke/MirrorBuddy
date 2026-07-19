@@ -1,4 +1,31 @@
+---
+title: MirrorBuddy on Reachy Mini
+emoji: 🤖
+license: apache-2.0
+tags:
+  - reachy-mini
+  - reachy_mini_app
+  - education
+  - accessibility
+  - tutoring
+  - azure-openai
+  - realtime
+short_description: A MirrorBuddy tutor with eyes, ears, mouth and movement — for kids with DSA.
+thumbnail: https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg
+---
+
+<!--
+Hugging Face app-store card (front-matter above). Reachy Mini discovers this app via the
+[project.entry-points.reachy_mini_apps] group in pyproject.toml.
+-->
+
 # MirrorBuddy on Reachy Mini 🤖
+
+[![Reachy Mini](https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg)](https://www.reachy-mini.org/)
+
+> 🛒 **Get the robot:** [Reachy Mini](https://www.reachy-mini.org/buy.html) by Hugging Face &
+> Pollen Robotics — **Lite $299** (USB-tethered) or **Wireless $449** (on-board compute).
+> See the [Hugging Face announcement](https://huggingface.co/blog/reachy-mini).
 
 The **physical embodiment of MirrorBuddy**: a Reachy Mini robot that becomes a
 MirrorBuddy Maestro with a body —
@@ -63,6 +90,23 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
   one camera frame and the model reads the exercise and helps step by step.
 - **Who is here** — `list_professors` enumerates the available Maestri and their subjects.
 
+## Pair with the child's MirrorBuddy profile
+
+The robot can bind to the **logged-in child's MirrorBuddy account** so it starts
+personalised for that child (name, preferred professor, accessibility settings, locale)
+instead of a generic default:
+
+1. In MirrorBuddy on the child's computer, open **Settings → Integrations → "Collega un
+   robot"** and tap **Genera codice** (a 6-digit code, valid 10 minutes).
+2. On the robot's settings page, under **"Profilo del bambino"**, type that code.
+3. The robot redeems it at `POST /api/devices/pair`, stores only a scoped **device token**
+   in its local `.env`, and fetches the child's profile from `GET /api/devices/me`.
+
+**Privacy by design:** the child's password never leaves their computer — the robot only
+ever holds a revocable device token and a non-sensitive learning profile. A parent can
+**unpair** the robot at any time from the same settings page. If the robot is not paired,
+it falls back to the local `.env` configuration.
+
 ## Eyes: face-follow & privacy
 
 While listening, the robot **follows the student's face** (daemon head tracking); when
@@ -72,10 +116,6 @@ Privacy by design: the camera **never streams** and captures a frame **only** on
 explicit `look_at_homework` request, always preceded by a spoken *"I'm going to look…"*.
 Nothing (audio or images) is persisted to disk. Face-follow and the camera can be turned
 off with `MIRRORBUDDY_FOLLOW_FACE=false` / `MIRRORBUDDY_ENABLE_CAMERA=false`.
-
-Identity: the robot is configured **per device** (`MIRRORBUDDY_STUDENT_NAME`,
-`MIRRORBUDDY_DSA_PROFILE`) rather than tied to a MirrorBuddy web login; secure
-device-to-account pairing is on the roadmap.
 
 ## Configuration
 
@@ -94,6 +134,16 @@ Useful optional:
 - `MIRRORBUDDY_MAESTRO_ID` — which professor to embody (empty = first Italian tutor)
 - `MIRRORBUDDY_DSA_PROFILE` — `cerebral` (default), `dyslexia`, `adhd`, …
 - `MIRRORBUDDY_STUDENT_NAME` — personalises the greeting (e.g. `Mario`)
+- `MIRRORBUDDY_DEVICE_TOKEN` — set automatically when you pair (see *Pair with the
+  child's MirrorBuddy profile* above); overrides the fields above with the live profile
+
+### Publishing to the Reachy Mini app store
+
+No secrets are baked into the package — the Azure credentials and the device token live
+only in the **instance `.env`**, entered by the user on the in-app settings page. So the
+package can be published to the Hugging Face Hub as-is: it self-declares under the
+`reachy_mini_apps` entry-point group and carries the app-card front-matter at the top of
+this README (title, emoji, tags, thumbnail).
 
 ## Install on the robot
 
