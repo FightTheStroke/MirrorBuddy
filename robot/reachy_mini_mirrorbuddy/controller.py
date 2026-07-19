@@ -126,7 +126,15 @@ class Controller:
         if not self.cfg.ENABLE_CAMERA:
             client.send_function_result(call_id, "La telecamera e' spenta nelle impostazioni, non posso guardare.")
             return
-        data_url = camera.capture_data_url(self.robot)
+        # Offload: freezing the head to get a sharp frame takes ~1s; never block the ws loop.
+        threading.Thread(target=self._capture_homework, args=(client, args, call_id), daemon=True).start()
+
+    def _capture_homework(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        self.movements.hold_still()
+        try:
+            data_url = camera.capture_data_url(self.robot)
+        finally:
+            self.movements.release_hold()
         if not data_url:
             client.send_function_result(call_id, "Non riesco a vedere bene, avvicina il foglio e riproviamo.")
             return
@@ -134,8 +142,8 @@ class Controller:
             "Guarda la foto del compito dello studente, leggi cosa c'e' scritto e aiutalo passo passo, "
             "senza dare la risposta pronta."
         )
-        # Privacy: announce we are looking, then hand the frame to the model.
-        client.send_function_result(call_id, "Sto guardando il tuo compito un momento.", respond=False)
+        # Privacy: we already announced verbally; hand the still frame to the model.
+        client.send_function_result(call_id, "Ho guardato il tuo compito.", respond=False)
         client.send_image(data_url, question)
 
     # ------------------------------------------------------------------ switching

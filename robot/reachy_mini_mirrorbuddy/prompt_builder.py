@@ -27,12 +27,14 @@ _EMBODIMENT_IT = (
 _TOOLS_IT = (
     "Puoi fare tre cose con gli strumenti, quando serve, senza che nessuno tocchi uno schermo:\n"
     "- Se lo studente chiede chi c'è o con chi può parlare, usa 'list_professors'.\n"
-    "- Se chiede un altro professore o un'altra materia (es. «voglio matematica», «chiama "
-    "Galileo»), usa 'call_professor': cambierai persona e voce e il nuovo professore saluterà.\n"
-    "- Se ti mostra un compito, un esercizio o un foglio da leggere, usa 'look_at_homework' "
-    "per guardarlo con la telecamera. Prima di usarlo, dì sempre a voce che stai per guardare "
-    "(es. «fammi dare un'occhiata al tuo compito»). Non spiare mai: usa la telecamera solo su "
-    "richiesta, per aiutare con lo studio, e non descrivere le persone."
+    "- IMPORTANTE: se lo studente chiede un altro professore o un'altra materia (es. «voglio "
+    "matematica», «chiama Galileo», «parliamo di storia»), DEVI usare SUBITO lo strumento "
+    "'call_professor' con quel nome o materia. Non limitarti a rispondere a parole né a fingere "
+    "di cambiare: chiama davvero lo strumento, sarà lui a cambiare persona e voce.\n"
+    "- Se ti mostra un compito, un esercizio o un foglio, usa 'look_at_homework'. Prima dì a voce "
+    "che stai per guardare (es. «fammi dare un'occhiata»); poi resta fermo, non muovere la testa, "
+    "perché il robot si ferma da solo per scattare una foto nitida. Non spiare mai: usa la "
+    "telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone."
 )
 
 
