@@ -1,11 +1,19 @@
-"""Lightweight, safe expressive movement for MirrorBuddy.
+"""Expressive full-body movement for MirrorBuddy.
 
-The robot's media pipeline already wobbles the head in sync with played speech.
-On top of that we add gentle **antenna** motion (bounded, low-risk) so Buddy feels
-alive: antennas perk up while speaking and sway slowly while idle.
+Layers, from the proven Reachy Mini conversation app:
 
-Head-pose control is intentionally avoided in v1 to keep motion safe and predictable;
-antennas are expressive enough and cannot send the head to an odd absolute pose.
+1. **Speech-reactive head** — the daemon's audio wobbler (``enable_wobbling``) moves the
+   head in real time while Buddy talks. This is the primary "lip-sync" and needs no
+   timing work from us.
+2. **Living idle** — a gentle base pose we set continuously: breathing (head z),
+   slow head drift, body rotation (``body_yaw``) and antenna sway. The wobbler overlays
+   speech motion on top of this base.
+3. **Speech energy -> antennas / body** — antennas perk up and the body engages slightly
+   while Buddy speaks, proportional to loudness.
+
+The intensity/speed of the idle + speech motion is scaled by a per-Maestro
+**temperament**, so a lively teacher moves more than a calm one (alignment with the
+MirrorBuddy persona).
 """
 
 from __future__ import annotations
@@ -14,32 +22,75 @@ import logging
 import math
 import threading
 import time
+from dataclasses import dataclass
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-_ANTENNA_MAX = 0.5  # radians, bounded so motion always stays gentle
+# Antennas are in radians. Neutral is a small offset to reduce servo shaking
+# (matches the conversation app's ~10deg rest).
+_ANTENNA_NEUTRAL = 0.1745  # ~10 deg
+_ANTENNA_MAX = 0.6
+
+
+@dataclass(frozen=True)
+class Temperament:
+    """How lively the Maestro moves. ``scale`` = amplitude, ``speed`` = frequency."""
+
+    scale: float = 1.0
+    speed: float = 1.0
+
+
+CALM = Temperament(scale=0.7, speed=0.8)
+NEUTRAL = Temperament(scale=1.0, speed=1.0)
+LIVELY = Temperament(scale=1.35, speed=1.25)
+
+
+def temperament_for(subject: str = "", teaching_style: str = "", voice_instructions: str = "") -> Temperament:
+    """Derive a movement temperament from a Maestro's persona (best-effort keywords)."""
+    text = f"{subject} {teaching_style} {voice_instructions}".lower()
+    lively_kw = ("energe", "vivac", "entusias", "playful", "dynamic", "passion", "espressiv", "teatral", "lively")
+    calm_kw = ("calm", "tranquil", "gentle", "paz", "serio", "riflessiv", "pacato", "soft", "measured", "sober")
+    if any(k in text for k in lively_kw):
+        return LIVELY
+    if any(k in text for k in calm_kw):
+        return CALM
+    return NEUTRAL
 
 
 class Movements:
-    """Background antenna animation driven by speech energy."""
+    """Background full-body animation driven by speech energy + idle liveliness."""
 
-    def __init__(self, robot, enabled: bool = True) -> None:
+    def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL) -> None:
         self.robot = robot
         self.enabled = enabled
+        self.temp = temperament
         self._energy = 0.0
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._create_head_pose = None
 
     def start(self) -> None:
         if not self.enabled:
             return
         try:
+            from reachy_mini.utils import create_head_pose
+
+            self._create_head_pose = create_head_pose
+        except Exception as e:
+            logger.warning("create_head_pose unavailable, head motion disabled: %s", e)
+        try:
             self.robot.enable_motors()
         except Exception as e:
             logger.debug("enable_motors not available/failed: %s", e)
+        # Daemon-driven, speech-reactive head motion (real-time lip-sync).
+        try:
+            self.robot.enable_wobbling()
+            logger.info("Audio wobbler enabled (speech-reactive head motion)")
+        except Exception as e:
+            logger.warning("enable_wobbling failed: %s", e)
         self._stop.clear()
         self._thread = threading.Thread(target=self._loop, name="MirrorBuddyMoves", daemon=True)
         self._thread.start()
@@ -49,7 +100,11 @@ class Movements:
         if self._thread:
             self._thread.join(timeout=1.5)
             self._thread = None
-        self._set_antennas(0.0, 0.0)
+        try:
+            self.robot.disable_wobbling()
+        except Exception:
+            pass
+        self._neutral()
 
     def reset(self) -> None:
         with self._lock:
@@ -61,39 +116,70 @@ class Movements:
             return
         rms = float(np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2)))
         with self._lock:
-            # Smooth so antennas don't jitter.
             self._energy = 0.6 * self._energy + 0.4 * min(1.0, rms * 4.0)
 
     # ------------------------------------------------------------------ internals
     def _loop(self) -> None:
         t0 = time.monotonic()
+        s = self.temp.scale
+        w = self.temp.speed
         while not self._stop.is_set():
             t = time.monotonic() - t0
             with self._lock:
                 energy = self._energy
-                # Natural decay when no fresh audio arrives.
                 self._energy *= 0.9
 
-            if energy > 0.05:
-                # Speaking: perk up + subtle flutter proportional to loudness.
-                base = _ANTENNA_MAX * min(1.0, 0.3 + energy)
-                flutter = 0.15 * math.sin(t * 12.0)
-                right = _clamp(base + flutter)
-                left = _clamp(base - flutter)
+            speaking = energy > 0.06
+
+            # --- base head pose: breathing + slow idle drift -----------------
+            z = 0.006 * s * math.sin(2 * math.pi * 0.1 * w * t)  # gentle breathing (m)
+            pitch = 2.5 * s * math.sin(2 * math.pi * 0.07 * w * t)  # deg
+            yaw_head = 3.0 * s * math.sin(2 * math.pi * 0.05 * w * t)  # deg
+            if speaking:
+                # Small extra nod while talking (wobbler adds the fast motion on top).
+                pitch += 3.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
+
+            # --- body rotation: slow sway, engages a bit while speaking ------
+            body_yaw = math.radians(6.0 * s * math.sin(2 * math.pi * 0.04 * w * t))
+            if speaking:
+                body_yaw += math.radians(4.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
+
+            # --- antennas: idle sway + perk up while speaking ----------------
+            sway = math.radians(12.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
+            if speaking:
+                perk = _ANTENNA_MAX * min(1.0, 0.3 + energy)
+                flutter = math.radians(9.0) * math.sin(2 * math.pi * 6.0 * t)
+                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.5 + flutter)
+                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.5 - flutter)
             else:
-                # Idle: slow, gentle, breathing-like sway.
-                sway = 0.12 * math.sin(t * 1.2)
-                right = _clamp(sway)
-                left = _clamp(-sway)
+                right = _clamp(_ANTENNA_NEUTRAL + sway)
+                left = _clamp(_ANTENNA_NEUTRAL - sway)
 
-            self._set_antennas(right, left)
-            time.sleep(0.05)
+            self._apply(z=z, pitch=pitch, yaw=yaw_head, body_yaw=body_yaw, antennas=(right, left))
+            time.sleep(0.033)  # ~30 Hz
 
-    def _set_antennas(self, right: float, left: float) -> None:
+    def _apply(self, z: float, pitch: float, yaw: float, body_yaw: float, antennas: tuple[float, float]) -> None:
+        head = None
+        if self._create_head_pose is not None:
+            try:
+                head = self._create_head_pose(x=0, y=0, z=z, roll=0, pitch=pitch, yaw=yaw, degrees=True)
+            except Exception as e:
+                logger.debug("create_head_pose failed: %s", e)
         try:
-            self.robot.set_target(antennas=[float(right), float(left)])
+            self.robot.set_target(
+                head=head,
+                antennas=[float(antennas[0]), float(antennas[1])],
+                body_yaw=float(body_yaw),
+            )
         except Exception as e:
-            logger.debug("set antennas failed: %s", e)
+            logger.debug("set_target failed: %s", e)
+
+    def _neutral(self) -> None:
+        try:
+            head = self._create_head_pose(0, 0, 0, 0, 0, 0, degrees=True) if self._create_head_pose else None
+            self.robot.set_target(head=head, antennas=[_ANTENNA_NEUTRAL, _ANTENNA_NEUTRAL], body_yaw=0.0)
+        except Exception:
+            pass
 
 
 def _clamp(v: float) -> float:

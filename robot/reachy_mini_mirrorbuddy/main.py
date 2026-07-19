@@ -22,7 +22,7 @@ from .audio_io import AudioIO
 from .config import config
 from .dsa import turn_detection_config
 from .mirrorbuddy_client import MirrorBuddyClient
-from .movements import Movements
+from .movements import Movements, temperament_for
 from .prompt_builder import build_instructions
 
 logger = logging.getLogger(__name__)
@@ -109,7 +109,8 @@ def run(
         robot = ReachyMini(**({"robot_name": args.robot_name} if args.robot_name else {}))
 
     # --- assemble the pipeline -------------------------------------------------
-    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS)
+    temperament = temperament_for(maestro.subject, maestro.teaching_style, maestro.voice_instructions)
+    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament)
 
     audio = AudioIO(robot, on_input_pcm16=lambda b: None, movements=movements)
 
