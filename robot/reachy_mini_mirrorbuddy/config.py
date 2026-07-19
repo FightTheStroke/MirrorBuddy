@@ -56,6 +56,7 @@ class Config:
         # --- feature toggles ---
         self.ENABLE_CAMERA: bool = _flag("MIRRORBUDDY_ENABLE_CAMERA", True)
         self.ENABLE_MOVEMENTS: bool = _flag("MIRRORBUDDY_ENABLE_MOVEMENTS", True)
+        self.FOLLOW_FACE: bool = _flag("MIRRORBUDDY_FOLLOW_FACE", True)
 
     def missing(self) -> list[str]:
         """Return the list of required config values that are absent."""

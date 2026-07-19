@@ -42,11 +42,40 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 | `prompt_builder.py` | Assemble the realtime `instructions` (persona + safety + embodiment) |
 | `safety.py` | Child-safety guardrails (aligned with MirrorBuddy) |
 | `dsa.py` | Accessibility → server-VAD turn-detection tuning |
-| `azure_realtime.py` | Azure OpenAI Realtime WebSocket client |
+| `azure_realtime.py` | Azure OpenAI Realtime WebSocket client (audio + tools + vision) |
+| `rt_messages.py` | Pure builders for the realtime protocol messages |
 | `audio_io.py` | Robot mic ↔ speaker bridge (resampling, playback, barge-in) |
-| `movements.py` | Safe expressive antenna motion driven by speech energy |
+| `movements.py` | Expressive full-body motion + daemon face-follow while listening |
+| `camera.py` | On-demand JPEG capture + daemon head/face tracking helpers |
+| `tools.py` | Voice tool schemas (list/change professor, look at homework) + resolver |
+| `controller.py` | Tool dispatch, live professor switching and vision |
 | `settings_ui.py` | Minimal in-app settings page (creds + Maestro/DSA selection) |
 | `main.py` | App entry point wiring everything together |
+
+## Everything by voice (no screen)
+
+Buddy is voice-only, so the model drives the robot through realtime **tools**:
+
+- **Change professor / subject** — say e.g. *«voglio matematica»* or *«chiama Galileo»*.
+  `call_professor` resolves the Maestro and reconnects the session with the new
+  **persona + voice**; the new professor greets. All 26 MirrorBuddy Maestri are available.
+- **Look at homework** — say e.g. *«guarda questo compito»*. `look_at_homework` captures
+  one camera frame and the model reads the exercise and helps step by step.
+- **Who is here** — `list_professors` enumerates the available Maestri and their subjects.
+
+## Eyes: face-follow & privacy
+
+While listening, the robot **follows the student's face** (daemon head tracking); when
+Buddy speaks, the head hands over to the audio wobbler for lip-sync-like motion.
+
+Privacy by design: the camera **never streams** and captures a frame **only** on an
+explicit `look_at_homework` request, always preceded by a spoken *"I'm going to look…"*.
+Nothing (audio or images) is persisted to disk. Face-follow and the camera can be turned
+off with `MIRRORBUDDY_FOLLOW_FACE=false` / `MIRRORBUDDY_ENABLE_CAMERA=false`.
+
+Identity: the robot is configured **per device** (`MIRRORBUDDY_STUDENT_NAME`,
+`MIRRORBUDDY_DSA_PROFILE`) rather than tied to a MirrorBuddy web login; secure
+device-to-account pairing is on the roadmap.
 
 ## Configuration
 
