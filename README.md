@@ -30,6 +30,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/AI%20Maestri-26-purple" alt="26 AI Maestri">
   <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
+  <a href="robot/README.md"><img src="https://img.shields.io/badge/Reachy%20Mini-Robot%20app-5b47e0?logo=huggingface" alt="Reachy Mini Robot"></a>
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
   <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
   <a href="docs/compliance/PROFESSORS-CONSTITUTION.md"><img src="https://img.shields.io/badge/Amodei%202026-Constitution%20Compliant-blueviolet" alt="Amodei Constitution"></a>
@@ -276,6 +277,39 @@ npx cap open android  # Opens Android Studio
 ```
 
 **→ Complete mobile build guide: [docs/mobile/BUILD-GUIDE.md](docs/mobile/BUILD-GUIDE.md)**
+
+---
+
+## Reachy Mini Robot 🤖
+
+MirrorBuddy also has a **body**. The [`robot/`](robot/) app turns a **Reachy Mini** — the
+open-source desktop robot by [Hugging Face](https://huggingface.co/blog/reachy-mini) &
+[Pollen Robotics](https://www.reachy-mini.org/) — into a MirrorBuddy Maestro with
+**👁️ eyes** (camera), **👂 ears** (microphone), **👄 mouth** (speaker) and **🤸 movement**.
+
+<p align="center">
+  <a href="https://www.reachy-mini.org/">
+    <img src="https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg" alt="Reachy Mini robot" width="520">
+  </a>
+</p>
+
+It reuses **MirrorBuddy's brain 1:1**: the same 26 Maestri (fetched live from
+`/api/maestri`), the same Azure OpenAI **Realtime** speech-to-speech voices, the same
+child-safety constitution and the 7 DSA accessibility profiles — everything by **voice**,
+no screen needed.
+
+- **Change professor/subject by voice** — _«voglio matematica»_, _«chiama Galileo»_.
+- **Look at homework** — _«guarda questo compito»_ captures one frame; Buddy reads it and helps.
+- **Accessibility-first** — deterministic _"basta / fermati"_ stop, calm motion, patient
+  turn-taking for children with dyslexia, dyscalculia or cerebral palsy.
+- **Device pairing** — from **Settings → Integrations → "Collega un robot"**, generate a
+  6-digit code and type it on the robot. It binds to the logged-in child's profile using a
+  scoped, revocable **device token** — the child's password never leaves their computer.
+
+**🛒 Get the robot:** [Reachy Mini](https://www.reachy-mini.org/buy.html) — **Lite $299**
+(USB-tethered) or **Wireless $449** (on-board compute).
+
+**→ Robot app & setup guide: [robot/README.md](robot/README.md)**
 
 ---
 
@@ -565,6 +599,7 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md)             | Common issues and solutions               |
 | [ARCHITECTURE.md](ARCHITECTURE.md)                   | Technical architecture details            |
 | [ARCHITECTURE-DIAGRAMS.md](ARCHITECTURE-DIAGRAMS.md) | Visual architecture (24 Mermaid diagrams) |
+| [robot/README.md](robot/README.md)                   | Reachy Mini robot app (voice + embodiment) |
 | [CONTRIBUTING.md](CONTRIBUTING.md)                   | Contribution guidelines                   |
 | [CLAUDE.md](CLAUDE.md)                               | Developer quick reference                 |
 
