@@ -238,13 +238,19 @@ class AzureRealtimeClient:
                     await self._safe_send(rt_messages.CANCEL)
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
-            self._quiet = action == session_flow.STOP
-            if self._quiet:
+            if action == session_flow.STOP:
+                # "basta / fermati" → go quiet AND park in a rest posture, staying put
+                # until called back by name. Insistence stresses the child, so a stop is
+                # a full stop, not a brief pause that resumes on the next sound.
+                self._asleep = True
+                self._quiet = True
                 self._suppress = True
                 if self._responding:
                     await self._safe_send(rt_messages.CANCEL)
                 if self.on_speech_started:
                     _safe_cb(self.on_speech_started)  # flush local playback now
+                if self.on_sleep:
+                    _safe_cb(self.on_sleep)  # settle into the rest position
             return
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.

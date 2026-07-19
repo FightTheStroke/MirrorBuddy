@@ -100,13 +100,13 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 Insistence is stressful for the child, so these are handled **deterministically and
 locally** — never left to the model:
 
-- **Stop / be quiet now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*.
-  Buddy goes silent immediately (local audio flush + turn cancel); it stays available and
-  the next thing you say resumes normally.
+- **Stop / rest now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*.
+  Buddy goes silent immediately (local audio flush + turn cancel), settles into a calm
+  **rest position** and **stays parked** — no fidgeting, no talking — until you call it back.
+  A stop is a full stop, not a brief pause that resumes on the next sound.
 - **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
-  *«vai a dormire»*. Buddy says **one** short goodbye, then **goes to sleep**: it stops
-  moving, stops talking and ignores ambient chatter — no nagging, no restart.
-- **Wake it back up** — while asleep, say its name *«Buddy»* (or *«svegliati»*, *«ci sei?»*).
+  *«vai a dormire»*. Buddy says **one** short goodbye, then rests the same way.
+- **Wake it back up** — while resting, say its name *«Buddy»* (or *«svegliati»*, *«ci sei?»*).
   Buddy wakes with a small gesture, greets again and asks what you'd like to do.
 
 These intents are detected in `session_flow.py`/`rt_messages.py` and enforced in

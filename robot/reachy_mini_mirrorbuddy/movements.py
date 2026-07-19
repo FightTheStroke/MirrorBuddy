@@ -208,13 +208,14 @@ class Movements:
             if speaking:
                 body_yaw += math.radians(8.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
 
-            # Antennas: idle sway + perk up while speaking.
+            # Antennas: idle sway + a gentle lift while speaking (kept small so the
+            # antennas don't flap distractingly for the student).
             sway = math.radians(18.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
             if speaking:
                 perk = _ANTENNA_MAX * min(1.0, 0.4 + energy)
-                flutter = math.radians(12.0) * math.sin(2 * math.pi * 6.0 * t)
-                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.6 + flutter)
-                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.6 - flutter)
+                flutter = math.radians(5.0 * s) * math.sin(2 * math.pi * 4.0 * t)
+                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.4 + flutter)
+                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.4 - flutter)
             else:
                 right = _clamp(_ANTENNA_NEUTRAL + sway)
                 left = _clamp(_ANTENNA_NEUTRAL - sway)

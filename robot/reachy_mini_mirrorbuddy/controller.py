@@ -95,11 +95,11 @@ class Controller:
 
     # ------------------------------------------------------------------ sleep / wake
     def _on_sleep(self) -> None:
-        """Session ended: park the robot quietly until it is called back."""
+        """Stop/end: settle into a calm rest posture and stay put until called back."""
         try:
             self.audio.interrupt()
-            self.movements.hold_still()  # freeze motion, antennas rest — a calm 'sleep'
-            logger.info("Session ended; robot is now asleep. Say 'Buddy' to wake it.")
+            self.movements.hold_still()  # rest position: head level, antennas calm, no motion
+            logger.info("Robot is resting. Say 'Buddy' to wake it up.")
         except Exception as e:  # pragma: no cover - runtime robustness
             logger.debug("sleep handling failed: %s", e)
 
