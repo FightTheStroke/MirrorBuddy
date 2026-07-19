@@ -121,7 +121,13 @@ def run(
     movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament,
                           follow_face=follow_face, calm=config.CALM_MOVEMENT)
 
-    audio = AudioIO(robot, on_input_pcm16=lambda b: None, movements=movements)
+    audio = AudioIO(
+        robot,
+        on_input_pcm16=lambda b: None,
+        movements=movements,
+        barge_rms_threshold=config.BARGE_RMS_THRESHOLD,
+        barge_sustain_frames=config.BARGE_SUSTAIN_FRAMES,
+    )
 
     controller = Controller(robot, config, maestri, maestro, audio, movements)
 

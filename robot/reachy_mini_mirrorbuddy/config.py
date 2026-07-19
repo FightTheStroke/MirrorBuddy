@@ -18,6 +18,10 @@ Optional:
     MIRRORBUDDY_DEVICE_TOKEN           pairing token; when set, the logged-in child's profile
                                        (name, accessibility, locale) is fetched and applied
     MIRRORBUDDY_API_BASE               where the pairing API lives (default: MIRRORBUDDY_URL)
+    MIRRORBUDDY_BARGE_RMS              local barge-in mic sensitivity, 0..1 (default 0.045);
+                                       lower = more sensitive (cuts sooner)
+    MIRRORBUDDY_BARGE_FRAMES           consecutive loud mic frames before cutting (default 3);
+                                       higher = more robust to background noise
 """
 
 from __future__ import annotations
@@ -74,6 +78,13 @@ class Config:
         # does not distract the student while speaking. Set to false for livelier motion.
         self.CALM_MOVEMENT: bool = _flag("MIRRORBUDDY_CALM_MOVEMENT", True)
 
+        # --- local barge-in (instant "basta") ---
+        # When the echo-cancelled mic hears a sustained voice over Buddy's own speech,
+        # playback is cut on-device instantly (no server round-trip). Field-tunable so
+        # sensitivity can be dialled in per environment without a redeploy.
+        self.BARGE_RMS_THRESHOLD: float = _float("MIRRORBUDDY_BARGE_RMS", 0.045)
+        self.BARGE_SUSTAIN_FRAMES: int = _int("MIRRORBUDDY_BARGE_FRAMES", 3, minimum=1)
+
     def missing(self) -> list[str]:
         """Return the list of required config values that are absent."""
         errors: list[str] = []
@@ -108,6 +119,31 @@ def _flag(name: str, default: bool) -> bool:
     if raw is None:
         return default
     return raw.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _float(name: str, default: float) -> float:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("Invalid %s=%r, using default %s", name, raw, default)
+        return default
+
+
+def _int(name: str, default: int, minimum: int | None = None) -> int:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        logger.warning("Invalid %s=%r, using default %s", name, raw, default)
+        return default
+    if minimum is not None and value < minimum:
+        return minimum
+    return value
 
 
 # Global singleton, mirrors the pattern used by the other Reachy Mini apps.
