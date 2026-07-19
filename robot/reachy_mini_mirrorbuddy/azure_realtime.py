@@ -1,8 +1,6 @@
-"""Azure OpenAI Realtime client over WebSocket.
+"""Azure OpenAI Realtime client over WebSocket (asyncio loop in its own thread).
 
-Runs an asyncio loop in its own thread and bridges the (threaded) robot audio I/O:
-microphone PCM in, model speech + transcripts + tool calls out. Audio is 16-bit PCM
-mono at :data:`SAMPLE_RATE` Hz. Payloads are built in :mod:`rt_messages`.
+Bridges robot audio I/O: mic PCM in, model speech + transcripts + tool calls out.
 """
 
 from __future__ import annotations
@@ -24,8 +22,6 @@ SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and 
 
 
 class AzureRealtimeClient:
-    """Minimal, resilient Azure OpenAI Realtime WebSocket client."""
-
     def __init__(
         self,
         ws_url: str,
@@ -50,14 +46,12 @@ class AzureRealtimeClient:
         self.greeting = greeting
         self.use_ga = use_ga
         self.tools = tools or []
-
         self.on_output_audio = on_output_audio
         self.on_speech_started = on_speech_started
         self.on_transcript = on_transcript
         self.on_ready = on_ready
         self.on_tool_call = on_tool_call
         self._fc_names: dict[str, str] = {}
-
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
         self._ws: websockets.WebSocketClientProtocol | None = None
@@ -65,6 +59,7 @@ class AzureRealtimeClient:
         self._ready = threading.Event()
         self._responding = False  # a model response is currently streaming
         self._suppress = False  # drop in-flight audio after a barge-in cancel
+        self._quiet = False  # student asked for silence: keep model muted
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
@@ -75,8 +70,7 @@ class AzureRealtimeClient:
 
     def stop(self) -> None:
         self._stop.set()
-        loop = self._loop
-        ws = self._ws
+        loop, ws = self._loop, self._ws
         if loop and ws:
             try:
                 asyncio.run_coroutine_threadsafe(ws.close(), loop)
@@ -88,22 +82,15 @@ class AzureRealtimeClient:
             self._thread.join(timeout)
 
     def send_audio_pcm16(self, pcm16: bytes) -> None:
-        if not pcm16 or self._ws is None or self._loop is None:
-            return
-        b64 = base64.b64encode(pcm16).decode("ascii")
-        try:
-            asyncio.run_coroutine_threadsafe(self._safe_send(json.dumps(rt_messages.audio_append(b64))), self._loop)
-        except Exception:
-            pass
+        if pcm16:
+            self._enqueue(json.dumps(rt_messages.audio_append(base64.b64encode(pcm16).decode("ascii"))))
 
     def send_function_result(self, call_id: str, output: str, respond: bool = True) -> None:
-        """Answer a function call, then let the model continue speaking."""
         self._enqueue(json.dumps(rt_messages.function_call_output(call_id, output)))
         if respond:
             self._enqueue(json.dumps({"type": "response.create"}))
 
     def send_image(self, data_url: str, prompt: str) -> None:
-        """Hand the model a camera frame plus a question about it."""
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
         self._enqueue(json.dumps({"type": "response.create"}))
 
@@ -137,11 +124,8 @@ class AzureRealtimeClient:
         headers = {"api-key": self.api_key}
         logger.info("Connecting to Azure Realtime: %s", self.ws_url.split("?")[0])
         async with websockets.connect(
-            self.ws_url,
-            additional_headers=headers,
-            max_size=None,
-            ping_interval=20,
-            ping_timeout=20,
+            self.ws_url, additional_headers=headers, max_size=None,
+            ping_interval=20, ping_timeout=20,
         ) as ws:
             self._ws = ws
             logger.info("WebSocket connected; configuring session")
@@ -163,7 +147,6 @@ class AzureRealtimeClient:
         logger.info("WebSocket closed")
 
     async def _greet(self) -> None:
-        """Have the Maestro speak first."""
         instructions = (
             f"Di' esattamente, con calore: «{self.greeting}»" if self.greeting
             else "Saluta calorosamente e presentati brevemente, poi chiedi da cosa vuole partire."
@@ -190,6 +173,10 @@ class AzureRealtimeClient:
             return
 
         if etype == "response.created":
+            if self._quiet:
+                await self._safe_send(rt_messages.CANCEL)
+                self._suppress = True
+                return
             self._responding = True
             self._suppress = False
             return
@@ -197,12 +184,26 @@ class AzureRealtimeClient:
             self._responding = False
             return
 
-        # User started speaking -> barge-in: cancel the model's turn server-side and
-        # suppress any audio still in flight, then stop local playback.
+        # Student's speech transcribed: honour stop-intent deterministically.
+        if etype.endswith("input_audio_transcription.completed"):
+            text = (event.get("transcript") or "").strip()
+            if not text:
+                return
+            self._quiet = rt_messages.is_stop(text)
+            if self._quiet:
+                self._suppress = True
+                if self._responding:
+                    await self._safe_send(rt_messages.CANCEL)
+                if self.on_speech_started:
+                    _safe_cb(self.on_speech_started)  # flush local playback now
+            return
+
+        # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
         if etype == "input_audio_buffer.speech_started":
             self._suppress = True
+            self._quiet = False
             if self._responding:
-                await self._safe_send(json.dumps({"type": "response.cancel"}))
+                await self._safe_send(rt_messages.CANCEL)
             if self.on_speech_started:
                 _safe_cb(self.on_speech_started)
             return
@@ -221,7 +222,6 @@ class AzureRealtimeClient:
                     self._fc_names[cid] = item.get("name") or ""
             return
 
-        # Function call arguments complete -> dispatch to the controller.
         if etype == "response.function_call_arguments.done":
             call_id = event.get("call_id") or ""
             name = event.get("name") or self._fc_names.get(call_id, "")
