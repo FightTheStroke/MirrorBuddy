@@ -74,8 +74,9 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 | `audio_io.py` | Robot mic ↔ speaker bridge (resampling, playback, barge-in) |
 | `movements.py` | Expressive full-body motion + daemon face-follow while listening |
 | `camera.py` | On-demand JPEG capture + daemon head/face tracking helpers |
-| `tools.py` | Voice tool schemas (list/change professor, look at homework) + resolver |
-| `controller.py` | Tool dispatch, live professor switching and vision |
+| `tools.py` | Voice tool schemas (list/change professor, look at homework, friend/study) + resolver |
+| `session_flow.py` | Pure stop / end / wake decisions for the live loop (accessibility-critical) |
+| `controller.py` | Tool dispatch, live professor switching, vision, sleep/wake |
 | `settings_ui.py` | Minimal in-app settings page (creds + Maestro/DSA selection) |
 | `main.py` | App entry point wiring everything together |
 
@@ -89,6 +90,27 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 - **Look at homework** — say e.g. *«guarda questo compito»*. `look_at_homework` captures
   one camera frame and the model reads the exercise and helps step by step.
 - **Who is here** — `list_professors` enumerates the available Maestri and their subjects.
+- **Just a friend (not school)** — say e.g. *«non voglio fare i compiti»* or *«parliamo un
+  po'»*. Buddy switches to **friend mode** (`talk_as_friend`): the peer‑companion Buddy of
+  MirrorBuddy's Support Triangle — a warm coetaneo you can talk to about anything, not a
+  tutor. Say *«torniamo ai compiti»* (`back_to_study`) to go back to studying.
+
+## Ending a session & interrupting (accessibility‑critical)
+
+Insistence is stressful for the child, so these are handled **deterministically and
+locally** — never left to the model:
+
+- **Stop / be quiet now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*.
+  Buddy goes silent immediately (local audio flush + turn cancel); it stays available and
+  the next thing you say resumes normally.
+- **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
+  *«vai a dormire»*. Buddy says **one** short goodbye, then **goes to sleep**: it stops
+  moving, stops talking and ignores ambient chatter — no nagging, no restart.
+- **Wake it back up** — while asleep, say its name *«Buddy»* (or *«svegliati»*, *«ci sei?»*).
+  Buddy wakes with a small gesture, greets again and asks what you'd like to do.
+
+These intents are detected in `session_flow.py`/`rt_messages.py` and enforced in
+`azure_realtime.py`, so they work even if the model would rather keep talking.
 
 ## Pair with the child's MirrorBuddy profile
 

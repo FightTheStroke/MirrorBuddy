@@ -10,6 +10,7 @@ The schemas are sent in ``session.update`` and the model calls them autonomously
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from .mirrorbuddy_client import Maestro
@@ -66,7 +67,40 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
             "required": [],
         },
     },
+    {
+        "type": "function",
+        "name": "talk_as_friend",
+        "description": (
+            "Passa alla modalita' AMICO: smetti di fare il tutor e diventa Buddy, un amico con cui "
+            "chiacchierare di qualsiasi cosa (la giornata, gli amici, i videogiochi, le passioni, le "
+            "emozioni), NON di scuola. Usalo quando lo studente non vuole studiare, vuole solo parlare, "
+            "sfogarsi o giocare (es. 'non voglio fare i compiti', 'parliamo un po'', 'raccontami qualcosa', "
+            "'sei mio amico?', 'modalita' amico')."
+        ),
+        "parameters": {"type": "object", "properties": {}, "required": []},
+    },
+    {
+        "type": "function",
+        "name": "back_to_study",
+        "description": (
+            "Torna alla modalita' STUDIO con Buddy tutor, che aiuta a organizzare i compiti e chiamare i "
+            "professori. Usalo quando lo studente vuole ricominciare a studiare o fare i compiti "
+            "(es. 'ok torniamo ai compiti', 'aiutami a studiare', 'modalita' studio')."
+        ),
+        "parameters": {"type": "object", "properties": {}, "required": []},
+    },
 ]
+
+
+def parse_call_arguments(event: dict, fallback_name: str = "") -> tuple[str, dict]:
+    """Extract (tool name, parsed args) from a ``function_call_arguments.done`` event."""
+    name = event.get("name") or fallback_name
+    raw = event.get("arguments") or "{}"
+    try:
+        args = json.loads(raw) if isinstance(raw, str) else dict(raw)
+    except (ValueError, TypeError):
+        args = {}
+    return name, args
 
 
 def _norm(s: str) -> str:
