@@ -409,6 +409,24 @@ export const RATE_LIMITS = {
     maxRequests: 5,
     windowMs: 60 * 60 * 1000,
   },
+
+  // ========== ROBOT DEVICE PAIRING ==========
+
+  /** Robot pairing-code generation: 10 per hour (authenticated user) */
+  DEVICE_PAIR_CODE: {
+    maxRequests: 10,
+    windowMs: 60 * 60 * 1000,
+  },
+  /** Robot code redemption: 5 per 15 minutes (anti brute-force of 6-digit code) */
+  DEVICE_PAIR: {
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  },
+  /** Robot profile fetch (device token): 60 per minute */
+  DEVICE_ME: {
+    maxRequests: 60,
+    windowMs: 60 * 1000,
+  },
 } as const;
 
 /**
