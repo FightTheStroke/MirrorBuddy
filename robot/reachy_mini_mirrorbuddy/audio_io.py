@@ -56,7 +56,20 @@ class AudioIO:
         self.robot.media.start_recording()
         self.robot.media.start_playing()
         time.sleep(1.0)  # let the gstreamer pipelines come up
+        self._probe_rates()
 
+        self._recording = True
+        self._stop.clear()
+        self._thread = threading.Thread(target=self._input_loop, name="MirrorBuddyMic", daemon=True)
+        self._thread.start()
+
+    def _probe_rates(self) -> None:
+        """Read the actual mic/speaker sample rates from the media server.
+
+        Must run before any playback: play() resamples from the realtime rate to
+        the speaker rate, and an unknown speaker rate makes the first audio chunks
+        play at the wrong pitch (a "ghost" voice) until the rate is known.
+        """
         try:
             self._in_rate = int(self.robot.media.get_input_audio_samplerate())
         except Exception:
@@ -67,11 +80,6 @@ class AudioIO:
             self._out_rate = 16000
         logger.info("Audio rates — mic: %s Hz, speaker: %s Hz, realtime: %s Hz",
                     self._in_rate, self._out_rate, SAMPLE_RATE)
-
-        self._recording = True
-        self._stop.clear()
-        self._thread = threading.Thread(target=self._input_loop, name="MirrorBuddyMic", daemon=True)
-        self._thread.start()
 
     def stop(self) -> None:
         self._recording = False
@@ -103,6 +111,11 @@ class AudioIO:
                 logger.debug("movement feed error: %s", e)
 
         out_rate = self._out_rate or SAMPLE_RATE
+        if self._out_rate is None:
+            # Playback started before rates were probed (e.g. an early greeting):
+            # probe now so we don't emit the first chunks at the wrong rate.
+            self._probe_rates()
+            out_rate = self._out_rate or SAMPLE_RATE
         if out_rate != SAMPLE_RATE and audio.size:
             audio = _resample(audio, SAMPLE_RATE, out_rate)
         audio_f32 = (np.asarray(audio, dtype=np.float32)) / 32768.0

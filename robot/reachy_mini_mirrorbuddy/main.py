@@ -137,8 +137,11 @@ def run(
 
     movements.start()
     movements.wake()
-    controller.start()
+    # Start the audio pipeline *before* the realtime client so the speaker sample
+    # rate is probed before any greeting audio arrives. Otherwise the first chunks
+    # play at the wrong rate (a "ghost" voice) until the rate is known.
     audio.start()
+    controller.start()
     logger.info("MirrorBuddy is live 🎙️  — say something!")
 
     try:
