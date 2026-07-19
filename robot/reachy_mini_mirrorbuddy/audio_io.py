@@ -29,9 +29,29 @@ logger = logging.getLogger(__name__)
 # the server's ``speech_started`` round-trip (~200-400ms). The server path (cancel +
 # stop/sleep classification) still runs a moment later. Thresholds are env-tunable so
 # they can be adjusted in the field without a redeploy.
-_BARGE_RMS_THRESHOLD = float(os.getenv("MIRRORBUDDY_BARGE_RMS", "0.045"))  # normalised 0..1
-_BARGE_SUSTAIN_FRAMES = int(os.getenv("MIRRORBUDDY_BARGE_FRAMES", "3"))  # consecutive loud frames
+_DEFAULT_BARGE_RMS_THRESHOLD = 0.045  # normalised 0..1
+_DEFAULT_BARGE_SUSTAIN_FRAMES = 3  # consecutive loud frames
 _PLAY_TTL_S = 0.25  # treat Buddy as "speaking" for this long after the last audio chunk
+
+
+def _barge_rms_threshold() -> float:
+    """Read the barge-in RMS threshold from the env at call time.
+
+    Read lazily (not at import) so values saved in the robot's ``.env`` — which
+    ``main.run()`` loads *after* this module is imported — take effect.
+    """
+    try:
+        return float(os.getenv("MIRRORBUDDY_BARGE_RMS", _DEFAULT_BARGE_RMS_THRESHOLD))
+    except (TypeError, ValueError):
+        return _DEFAULT_BARGE_RMS_THRESHOLD
+
+
+def _barge_sustain_frames() -> int:
+    """Read the barge-in sustain-frame count from the env at call time."""
+    try:
+        return max(1, int(os.getenv("MIRRORBUDDY_BARGE_FRAMES", _DEFAULT_BARGE_SUSTAIN_FRAMES)))
+    except (TypeError, ValueError):
+        return _DEFAULT_BARGE_SUSTAIN_FRAMES
 
 
 def _resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
@@ -69,6 +89,10 @@ class AudioIO:
         self._out_rate: int | None = None
         self._playing_until = 0.0  # monotonic deadline: Buddy is "speaking" until then
         self._loud_frames = 0  # consecutive over-threshold mic frames (barge-in debounce)
+        # Read env-tunable thresholds now — construction happens after main.run()
+        # has loaded the instance .env, so field overrides are honoured.
+        self._barge_rms_threshold = _barge_rms_threshold()
+        self._barge_sustain_frames = _barge_sustain_frames()
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
@@ -192,9 +216,9 @@ class AudioIO:
                 # while Buddy is speaking, cut playback instantly — no server round-trip.
                 if self.on_local_barge_in is not None and audio.size and time.monotonic() < self._playing_until:
                     rms = float(np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2)))
-                    if rms >= _BARGE_RMS_THRESHOLD:
+                    if rms >= self._barge_rms_threshold:
                         self._loud_frames += 1
-                        if self._loud_frames >= _BARGE_SUSTAIN_FRAMES:
+                        if self._loud_frames >= self._barge_sustain_frames:
                             self._loud_frames = 0
                             logger.info("Local barge-in (rms=%.3f) — cutting playback now", rms)
                             self.interrupt()  # flush our speaker immediately
