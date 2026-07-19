@@ -134,6 +134,11 @@ export function useMaestroSessionLogic({
   // Track if we've auto-triggered the requested tool
   const hasAutoTriggeredRef = useRef(false);
 
+  // Tracks which maestro this session was last initialized for, so a settings
+  // hydration (preferredCoach undefined → saved id, which changes coachOpener)
+  // reruns this effect WITHOUT wiping a conversation the child already started.
+  const initializedMaestroRef = useRef<string | null>(null);
+
   // Initialize session with contextual greeting based on requested tool
   useEffect(() => {
     const initialMessages: ChatMessage[] = [];
@@ -184,25 +189,38 @@ export function useMaestroSessionLogic({
       }
     }
 
-    setMessages(initialMessages);
+    // A fresh maestro (or first mount) starts a clean thread; a rerun for the SAME
+    // maestro — e.g. when preferredCoach hydrates and coachOpener changes — must not
+    // clobber messages the child has already exchanged.
+    const isFirstInitForMaestro = initializedMaestroRef.current !== maestro.id;
+    initializedMaestroRef.current = maestro.id;
 
-    // Pre-populate input with context message from URL param (e.g., from Astuccio)
-    if (contextMessage) {
-      setInput(contextMessage);
-    }
+    setMessages((prev) => {
+      if (isFirstInitForMaestro) return initialMessages;
+      return prev.some((m) => m.role === 'user') ? prev : initialMessages;
+    });
 
-    if (pendingToolRequest?.maestroId === maestro.id) {
-      const toolPrompts: Partial<Record<ToolType, string>> = {
-        mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
-        quiz: `Crea un quiz per verificare la mia comprensione`,
-        flashcard: `Crea delle flashcard per aiutarmi a memorizzare`,
-        demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
-      };
-      const pendingPrompt = toolPrompts[pendingToolRequest.tool];
-      if (pendingPrompt) {
-        setInput(pendingPrompt);
+    // Side effects that must run once per session, not on every hydration rerun
+    // (otherwise they'd overwrite what the child is currently typing).
+    if (isFirstInitForMaestro) {
+      // Pre-populate input with context message from URL param (e.g., from Astuccio)
+      if (contextMessage) {
+        setInput(contextMessage);
       }
-      clearPendingToolRequest();
+
+      if (pendingToolRequest?.maestroId === maestro.id) {
+        const toolPrompts: Partial<Record<ToolType, string>> = {
+          mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
+          quiz: `Crea un quiz per verificare la mia comprensione`,
+          flashcard: `Crea delle flashcard per aiutarmi a memorizzare`,
+          demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
+        };
+        const pendingPrompt = toolPrompts[pendingToolRequest.tool];
+        if (pendingPrompt) {
+          setInput(pendingPrompt);
+        }
+        clearPendingToolRequest();
+      }
     }
 
     const timeoutRef = closeTimeoutRef.current;

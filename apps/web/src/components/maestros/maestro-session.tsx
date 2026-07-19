@@ -277,8 +277,10 @@ export function MaestroSession({
         {/* UX-01/UX-07: child-first handoff banner. Only when arriving via an
             intent (grid entry passes no intent) and before the child has sent
             anything (it explains who they are talking to + the pre-filled
-            question). Lives above the first message; never steals focus. */}
-        {intent && messages.length === 0 && (
+            question). The neutral coach opener seeds an assistant message, so we
+            key off "no user message yet" rather than an empty thread. Tool intents
+            carry their own greeting/auto-trigger and never showed this banner. */}
+        {intent && !requestedToolType && !messages.some((m) => m.role === 'user') && (
           <MaestroSessionHandoff
             maestroName={maestro.displayName ?? maestro.name}
             intent={intent}
