@@ -62,6 +62,11 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // gpt-realtime-whisper:  used as input.transcription.model inside realtime session.
   // gpt-realtime-translate: PROVISIONED but Azure endpoint not yet enabled — see ADR 0165.
   'gpt-realtime-2': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 || 'gpt-realtime-2',
+
+  // 2026-07-07 wave (ADR 0169) — gpt-realtime-2.1: successor of 2.0 with better
+  // alphanumeric speech (dates/numbers/formulas — key for discalculia), noise
+  // robustness and lower latency. Adds the Cedar voice. Drop-in over v2.
+  'gpt-realtime-2.1': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 || 'gpt-realtime-2.1',
   'gpt-realtime-whisper':
     process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper',
   'gpt-realtime-translate':

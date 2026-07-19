@@ -630,4 +630,66 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       expect(data.deployment).toBe('gpt-realtime');
     });
   });
+
+  describe('voice_realtime_21 feature flag', () => {
+    it('should use V21 deployment and take precedence over V2 when enabled', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 = 'gpt-realtime-2.1';
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 = 'gpt-realtime-2';
+
+      vi.mocked(isFeatureEnabled).mockImplementation((flag: string) => ({
+        enabled:
+          flag === 'voice_ga_protocol' ||
+          flag === 'voice_realtime_2' ||
+          flag === 'voice_realtime_21',
+        reason: 'enabled',
+        flag: {
+          id: flag,
+          name: flag,
+          description: 'Test',
+          status: 'enabled' as const,
+          enabledPercentage: 100,
+          killSwitch: false,
+          updatedAt: new Date(),
+        },
+      }));
+
+      const request = new NextRequest('http://localhost:3000/api/realtime/token', {
+        method: 'GET',
+      });
+      const response = await GET(request as any);
+      const data = await response.json();
+
+      expect(data.deployment).toBe('gpt-realtime-2.1');
+    });
+
+    it('should fall back to V2 when V21 env var is not set', async () => {
+      delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21;
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 = 'gpt-realtime-2';
+
+      vi.mocked(isFeatureEnabled).mockImplementation((flag: string) => ({
+        enabled:
+          flag === 'voice_ga_protocol' ||
+          flag === 'voice_realtime_2' ||
+          flag === 'voice_realtime_21',
+        reason: 'enabled',
+        flag: {
+          id: flag,
+          name: flag,
+          description: 'Test',
+          status: 'enabled' as const,
+          enabledPercentage: 100,
+          killSwitch: false,
+          updatedAt: new Date(),
+        },
+      }));
+
+      const request = new NextRequest('http://localhost:3000/api/realtime/token', {
+        method: 'GET',
+      });
+      const response = await GET(request as any);
+      const data = await response.json();
+
+      expect(data.deployment).toBe('gpt-realtime-2');
+    });
+  });
 });

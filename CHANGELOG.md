@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Azure OpenAI Realtime 2026-07-07** — `gpt-realtime-2.1` production rollout (ADR 0169). Drop-in successor of `gpt-realtime-2` with better alphanumeric speech (dates/numbers/formulas — key for discalculia and STEM Maestri), noise robustness and lower latency. Enabled at 100% via the new `voice_realtime_21` flag, which takes precedence over `voice_realtime_2` with a graceful fallback chain `gpt-realtime-2.1 → gpt-realtime-2 → gpt-realtime-1.5 → gpt-realtime`.
+- **Cedar voice** — new premium realtime voice added to `RealtimeVoice` and surfaced (with `marin`) in the accessibility voice picker.
+- **New env var** — `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21` (documented in `.env.example`, `SETUP.md`, `.github/workflows/ci.yml`, `validate-pre-deploy.ts`).
+- **ADR 0169** — `docs/adr/0169-azure-voice-2026-07-realtime-21-cedar.md`.
+
 ## [0.17.0] - 2026-05-25
 
 ### Added

@@ -220,6 +220,8 @@ function validateOptionalEnvVars(): void {
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2', category: 'Voice v2' },
     { name: 'AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT', category: 'Voice v2' },
     { name: 'AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT', category: 'Voice v2' },
+    // ADR 0169 — Azure voice 2026-07 wave (optional - behind feature flag)
+    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21', category: 'Voice v2.1' },
   ];
 
   for (const envVar of optional) {

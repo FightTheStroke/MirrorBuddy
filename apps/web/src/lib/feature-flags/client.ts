@@ -38,6 +38,14 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  voice_realtime_21: {
+    name: 'Real-time Voice 2.1',
+    description:
+      'ADR 0169: gpt-realtime-2.1 (2026-07-07) + Cedar voice. Activated with graceful fallback to V2/V15.',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
   voice_realtime_whisper_transcription: {
     name: 'Realtime Whisper Transcription',
     description: 'ADR 0165: gpt-realtime-whisper as input.transcription.model.',

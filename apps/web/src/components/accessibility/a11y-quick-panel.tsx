@@ -14,7 +14,17 @@ interface A11yQuickPanelProps {
   onClose: () => void;
 }
 
-const VOICE_OPTIONS = ['alloy', 'ash', 'echo', 'fable', 'nova', 'onyx', 'shimmer'] as const;
+const VOICE_OPTIONS = [
+  'alloy',
+  'ash',
+  'echo',
+  'fable',
+  'nova',
+  'onyx',
+  'shimmer',
+  'marin',
+  'cedar',
+] as const;
 
 export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
   const t = useTranslations('settings.accessibility');

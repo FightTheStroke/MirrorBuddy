@@ -180,7 +180,8 @@ export type RealtimeVoice =
   | 'coral'
   | 'sage'
   | 'verse'
-  | 'marin';
+  | 'marin'
+  | 'cedar';
 
 /**
  * Audio format for input/output

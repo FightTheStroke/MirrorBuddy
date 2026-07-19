@@ -4,31 +4,33 @@
 
 ## Quick Reference
 
-| Key          | Value                                                                       |
-| ------------ | --------------------------------------------------------------------------- |
-| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                                           |
-| API          | `POST /api/realtime/ephemeral-token`                                                       |
-| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration), 0159 (v1.5+), **0165 (v2 / whisper / translate)** |
-| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)                            |
-| Audio Format | PCM16, 24kHz, mono, base64-encoded                                                         |
-| Model        | `gpt-realtime-2` (v2, preview, opt-in) / `gpt-realtime-1.5` (default) / `gpt-realtime` (fallback) |
+| Key          | Value                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Path         | `src/lib/voice/`, `src/lib/hooks/voice-session/`                                                                                                    |
+| API          | `POST /api/realtime/ephemeral-token`                                                                                                                |
+| ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration), 0159 (v1.5+), 0165 (v2 / whisper / translate), **0169 (v2.1 / Cedar)** |
+| Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)                                                                                     |
+| Audio Format | PCM16, 24kHz, mono, base64-encoded                                                                                                                  |
+| Model        | `gpt-realtime-2.1` (v2.1, GA, opt-in) / `gpt-realtime-2` (preview) / `gpt-realtime-1.5` (default) / `gpt-realtime` (fallback)                       |
 
 ## Models
 
-| Model                     | Version    | Purpose            | Feature Flag                            | Env Var                                              | Deployment Name           |
-| ------------------------- | ---------- | ------------------ | --------------------------------------- | ---------------------------------------------------- | ------------------------- |
-| `gpt-realtime-2`          | v2026-05-06| Voice (Preview)    | `voice_realtime_2`                      | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`                | `gpt-realtime-2`          |
-| `gpt-realtime-whisper`    | v2026-05-06| Live transcription | `voice_realtime_whisper_transcription`  | `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT`     | `gpt-realtime-whisper`    |
-| `gpt-realtime-translate`  | v2026-05-06| Live translation † | `voice_realtime_translate` (`degraded`) | `AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT`         | `gpt-realtime-translate`  |
-| `gpt-realtime-1.5`        | v2026-02-23| Voice (GA)         | `voice_realtime_15`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`               | `gpt-realtime-15`         |
-| `gpt-realtime`            | v2025-08-28| Voice (GA)         | -                                       | `AZURE_OPENAI_REALTIME_DEPLOYMENT`                   | `gpt-realtime`            |
-| `gpt-audio-1.5`           | v2026-02-23| TTS                | `tts_audio_15`                          | `AZURE_OPENAI_AUDIO_DEPLOYMENT`                      | `gpt-audio-15`            |
-| `tts-hd`                  | -          | TTS fallback       | -                                       | `AZURE_OPENAI_TTS_HD_DEPLOYMENT`                     | `tts-hd-deployment`       |
+| Model                    | Version     | Purpose            | Feature Flag                            | Env Var                                          | Deployment Name          |
+| ------------------------ | ----------- | ------------------ | --------------------------------------- | ------------------------------------------------ | ------------------------ |
+| `gpt-realtime-2.1`       | v2026-07-07 | Voice (GA)         | `voice_realtime_21`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21`           | `gpt-realtime-2.1`       |
+| `gpt-realtime-2`         | v2026-05-06 | Voice (Preview)    | `voice_realtime_2`                      | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`            | `gpt-realtime-2`         |
+| `gpt-realtime-whisper`   | v2026-05-06 | Live transcription | `voice_realtime_whisper_transcription`  | `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT` | `gpt-realtime-whisper`   |
+| `gpt-realtime-translate` | v2026-05-06 | Live translation † | `voice_realtime_translate` (`degraded`) | `AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT`     | `gpt-realtime-translate` |
+| `gpt-realtime-1.5`       | v2026-02-23 | Voice (GA)         | `voice_realtime_15`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15`           | `gpt-realtime-15`        |
+| `gpt-realtime`           | v2025-08-28 | Voice (GA)         | -                                       | `AZURE_OPENAI_REALTIME_DEPLOYMENT`               | `gpt-realtime`           |
+| `gpt-audio-1.5`          | v2026-02-23 | TTS                | `tts_audio_15`                          | `AZURE_OPENAI_AUDIO_DEPLOYMENT`                  | `gpt-audio-15`           |
+| `tts-hd`                 | -           | TTS fallback       | -                                       | `AZURE_OPENAI_TTS_HD_DEPLOYMENT`                 | `tts-hd-deployment`      |
 
 † Azure has provisioned `gpt-realtime-translate` (swedencentral) but `/openai/v1/realtime/translations` returns **404** as of 2026-05-25. Probe via `probeTranslateAvailability()` in `apps/web/src/lib/azure/realtime-translate-availability.ts`. Flag stays `degraded` until probe flips it.
 
-**Fallback chains** (ADR 0159 + ADR 0165):
-- **Realtime**: `gpt-realtime-2` (flag on) → `gpt-realtime-1.5` → `gpt-realtime`
+**Fallback chains** (ADR 0159 + ADR 0165 + ADR 0169):
+
+- **Realtime**: `gpt-realtime-2.1` (flag on) → `gpt-realtime-2` → `gpt-realtime-1.5` → `gpt-realtime`
 - **Live transcription**: `gpt-realtime-whisper` (flag on) → `whisper-1`
 - **TTS**: `gpt-audio-1.5` → `tts-hd` → OpenAI TTS API
 

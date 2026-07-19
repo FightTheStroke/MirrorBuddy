@@ -43,6 +43,14 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
     enabledPercentage: 100,
     killSwitch: false,
   },
+  voice_realtime_21: {
+    name: 'Real-time Voice 2.1',
+    description:
+      'ADR 0169: gpt-realtime-2.1 (2026-07-07) + Cedar voice. Better alphanumeric speech (dates/numbers/formulas), noise robustness, lower latency. Preferred over v2 when AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 is set (graceful fallback to V2/V15/legacy).',
+    status: 'enabled',
+    enabledPercentage: 100,
+    killSwitch: false,
+  },
   voice_realtime_whisper_transcription: {
     name: 'Realtime Whisper Transcription',
     description:

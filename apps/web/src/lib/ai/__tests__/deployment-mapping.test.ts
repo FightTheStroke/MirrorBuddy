@@ -96,6 +96,17 @@ describe('deployment-mapping', () => {
       expect(getDeploymentForModel('gpt-realtime-2')).toBe('custom-rt2');
     });
 
+    it('should map gpt-realtime-2.1 to GA deployment name when env is unset', async () => {
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-2.1')).toBe('gpt-realtime-2.1');
+    });
+
+    it('should respect env var override for gpt-realtime-2.1', async () => {
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 = 'custom-rt21';
+      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
+      expect(getDeploymentForModel('gpt-realtime-2.1')).toBe('custom-rt21');
+    });
+
     it('should map gpt-realtime-whisper to its deployment name', async () => {
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
       expect(getDeploymentForModel('gpt-realtime-whisper')).toBe('gpt-realtime-whisper');
