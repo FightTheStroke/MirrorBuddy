@@ -577,6 +577,10 @@
     "citazioneMotivazionale": "Citazione motivazionale",
     "quoteIndicators": "Quote indicators",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}"
+    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "coachOpener": {
+      "general": "Ciao! Sono {coach}, il tuo coach di studio. Prima di iniziare dimmi: di quale materia ti vuoi occupare, cosa vuoi fare e quanto tempo hai? Poi ti presento il Maestro giusto. 😊",
+      "withSubject": "Ciao! Sono {coach}, il tuo coach di studio. Oggi lavoriamo su {subject}: ti presento subito il Maestro giusto! 😊"
+    }
   }
 }

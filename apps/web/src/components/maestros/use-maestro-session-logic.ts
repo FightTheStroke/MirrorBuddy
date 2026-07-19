@@ -16,6 +16,14 @@ interface UseMaestroSessionLogicProps {
   initialMode: 'voice' | 'chat';
   requestedToolType?: ToolType;
   contextMessage?: string;
+  /**
+   * Neutral study-coach opener shown as the first assistant message so a session
+   * never starts by dropping the child straight into a subject Maestro's persona.
+   * Built (localized) by the caller from the profile's preferred coach. When the
+   * child starts a voice call this message is passed to the realtime model as
+   * conversation context, so voice inherits the same neutral framing.
+   */
+  coachOpener?: string;
 }
 
 export function useMaestroSessionLogic({
@@ -23,6 +31,7 @@ export function useMaestroSessionLogic({
   initialMode,
   requestedToolType,
   contextMessage,
+  coachOpener,
 }: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -125,9 +134,27 @@ export function useMaestroSessionLogic({
   // Track if we've auto-triggered the requested tool
   const hasAutoTriggeredRef = useRef(false);
 
+  // Tracks which maestro this session was last initialized for, so a settings
+  // hydration (preferredCoach undefined → saved id, which changes coachOpener)
+  // reruns this effect WITHOUT wiping a conversation the child already started.
+  const initializedMaestroRef = useRef<string | null>(null);
+
   // Initialize session with contextual greeting based on requested tool
   useEffect(() => {
     const initialMessages: ChatMessage[] = [];
+
+    // Neutral study-coach opener always comes first (when provided): it greets on
+    // behalf of the child's chosen coach and, if the subject isn't known yet,
+    // asks the organizing questions — instead of opening straight into a subject
+    // Maestro (e.g. Manzoni). The subject Maestro takes over on the next turn.
+    if (coachOpener) {
+      initialMessages.push({
+        id: `coach-opener-${Date.now()}`,
+        role: 'assistant',
+        content: coachOpener,
+        timestamp: new Date(),
+      });
+    }
 
     // Add contextual initial message if a tool was requested from the astuccio
     if (requestedToolType) {
@@ -162,32 +189,52 @@ export function useMaestroSessionLogic({
       }
     }
 
-    setMessages(initialMessages);
+    // A fresh maestro (or first mount) starts a clean thread; a rerun for the SAME
+    // maestro — e.g. when preferredCoach hydrates and coachOpener changes — must not
+    // clobber messages the child has already exchanged.
+    const isFirstInitForMaestro = initializedMaestroRef.current !== maestro.id;
+    initializedMaestroRef.current = maestro.id;
 
-    // Pre-populate input with context message from URL param (e.g., from Astuccio)
-    if (contextMessage) {
-      setInput(contextMessage);
-    }
+    setMessages((prev) => {
+      if (isFirstInitForMaestro) return initialMessages;
+      return prev.some((m) => m.role === 'user') ? prev : initialMessages;
+    });
 
-    if (pendingToolRequest?.maestroId === maestro.id) {
-      const toolPrompts: Partial<Record<ToolType, string>> = {
-        mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
-        quiz: `Crea un quiz per verificare la mia comprensione`,
-        flashcard: `Crea delle flashcard per aiutarmi a memorizzare`,
-        demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
-      };
-      const pendingPrompt = toolPrompts[pendingToolRequest.tool];
-      if (pendingPrompt) {
-        setInput(pendingPrompt);
+    // Side effects that must run once per session, not on every hydration rerun
+    // (otherwise they'd overwrite what the child is currently typing).
+    if (isFirstInitForMaestro) {
+      // Pre-populate input with context message from URL param (e.g., from Astuccio)
+      if (contextMessage) {
+        setInput(contextMessage);
       }
-      clearPendingToolRequest();
+
+      if (pendingToolRequest?.maestroId === maestro.id) {
+        const toolPrompts: Partial<Record<ToolType, string>> = {
+          mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
+          quiz: `Crea un quiz per verificare la mia comprensione`,
+          flashcard: `Crea delle flashcard per aiutarmi a memorizzare`,
+          demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
+        };
+        const pendingPrompt = toolPrompts[pendingToolRequest.tool];
+        if (pendingPrompt) {
+          setInput(pendingPrompt);
+        }
+        clearPendingToolRequest();
+      }
     }
 
     const timeoutRef = closeTimeoutRef.current;
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.id, requestedToolType, contextMessage, pendingToolRequest, clearPendingToolRequest]);
+  }, [
+    maestro.id,
+    requestedToolType,
+    contextMessage,
+    coachOpener,
+    pendingToolRequest,
+    clearPendingToolRequest,
+  ]);
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {

@@ -577,6 +577,10 @@
       },
       "listen": "Écouter le message",
       "dismiss": "Compris, fermer"
+    },
+    "coachOpener": {
+      "general": "Salut ! Je suis {coach}, ton coach d'étude. Avant de commencer, dis-moi : quelle matière veux-tu travailler, que veux-tu faire et combien de temps as-tu ? Ensuite je te présente le bon Maestro. 😊",
+      "withSubject": "Salut ! Je suis {coach}, ton coach d'étude. Aujourd'hui on travaille sur {subject} : je te présente tout de suite le bon Maestro ! 😊"
     }
   }
 }

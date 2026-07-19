@@ -577,6 +577,10 @@
       },
       "listen": "Escuchar el mensaje",
       "dismiss": "Entendido, cerrar"
+    },
+    "coachOpener": {
+      "general": "¡Hola! Soy {coach}, tu coach de estudio. Antes de empezar, dime: ¿de qué asignatura quieres ocuparte, qué quieres hacer y cuánto tiempo tienes? Luego te presento al Maestro adecuado. 😊",
+      "withSubject": "¡Hola! Soy {coach}, tu coach de estudio. Hoy trabajamos en {subject}: ¡te presento enseguida al Maestro adecuado! 😊"
     }
   }
 }

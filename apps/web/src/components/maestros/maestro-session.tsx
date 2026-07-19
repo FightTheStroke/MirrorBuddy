@@ -13,11 +13,13 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { useTTS } from '@/components/accessibility';
 import { ToolResultDisplay } from '@/components/tools';
-import { useUIStore } from '@/lib/stores';
+import { useUIStore, useSettingsStore } from '@/lib/stores';
+import { buildCoachOpener } from './coach-opener';
 import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
 import { MaestroSessionHandoff } from './maestro-session-handoff';
@@ -68,6 +70,12 @@ export function MaestroSession({
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
   const unifiedCharacter = maestroToUnified(maestro);
 
+  const t = useTranslations('chat');
+  const preferredCoach = useSettingsStore((s) => s.studentProfile.preferredCoach);
+  // Neutral opener on behalf of the child's chosen coach (falls back to Melissa)
+  // so a session never starts straight in a subject Maestro's persona.
+  const coachOpener = buildCoachOpener(preferredCoach, subjectLabel, t);
+
   // Prevent screen sleep during active sessions
   useWakeLock(true);
 
@@ -101,7 +109,13 @@ export function MaestroSession({
     requestTool,
     handleRequestPhoto,
     loadConversation,
-  } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType, contextMessage });
+  } = useMaestroSessionLogic({
+    maestro,
+    initialMode,
+    requestedToolType,
+    contextMessage,
+    coachOpener,
+  });
 
   // Build unified voice state and actions
   const voiceState: VoiceState = {
@@ -263,8 +277,10 @@ export function MaestroSession({
         {/* UX-01/UX-07: child-first handoff banner. Only when arriving via an
             intent (grid entry passes no intent) and before the child has sent
             anything (it explains who they are talking to + the pre-filled
-            question). Lives above the first message; never steals focus. */}
-        {intent && messages.length === 0 && (
+            question). The neutral coach opener seeds an assistant message, so we
+            key off "no user message yet" rather than an empty thread. Tool intents
+            carry their own greeting/auto-trigger and never showed this banner. */}
+        {intent && !requestedToolType && !messages.some((m) => m.role === 'user') && (
           <MaestroSessionHandoff
             maestroName={maestro.displayName ?? maestro.name}
             intent={intent}

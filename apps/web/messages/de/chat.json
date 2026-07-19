@@ -577,6 +577,10 @@
       },
       "listen": "Nachricht anhören",
       "dismiss": "Verstanden, schließen"
+    },
+    "coachOpener": {
+      "general": "Hallo! Ich bin {coach}, dein Lerncoach. Bevor wir starten, sag mir: An welchem Fach möchtest du arbeiten, was möchtest du tun und wie viel Zeit hast du? Dann stelle ich dir den richtigen Maestro vor. 😊",
+      "withSubject": "Hallo! Ich bin {coach}, dein Lerncoach. Heute arbeiten wir an {subject} – ich stelle dir gleich den richtigen Maestro vor! 😊"
     }
   }
 }
