@@ -1,10 +1,9 @@
 """Expressive full-body movement for MirrorBuddy.
 
-Layers (from the proven Reachy Mini conversation app): the daemon audio wobbler moves
-the head while Buddy talks; a living idle drives antennas + body (and head when not
-face-following); and while listening the head tracks the student's face. Intensity is
-scaled by a per-Maestro **temperament**. ``hold_still`` freezes everything so the camera
-can grab a sharp homework frame.
+A living idle drives antennas + body (and head when not face-following); while listening
+the head tracks the student's face. In *calm* mode the audio wobbler stays off and
+amplitudes are gentle. Intensity is scaled by a per-Maestro **temperament**.
+``hold_still`` freezes everything so the camera can grab a sharp homework frame.
 """
 
 from __future__ import annotations
@@ -55,11 +54,13 @@ def temperament_for(subject: str = "", teaching_style: str = "", voice_instructi
 class Movements:
     """Background full-body animation driven by speech energy + idle liveliness."""
 
-    def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL, follow_face: bool = True) -> None:
+    def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL,
+                 follow_face: bool = True, calm: bool = True) -> None:
         self.robot = robot
         self.enabled = enabled
         self.temp = temperament
         self.follow_face = follow_face
+        self.calm = calm  # calm: no audio wobbler, gentler amplitudes, softer face-follow
         self._energy = 0.0
         self._lock = threading.Lock()
         self._stop = threading.Event()
@@ -87,10 +88,11 @@ class Movements:
         """Resume normal motion after a camera capture."""
         if not self._hold.is_set():
             return
-        try:
-            self.robot.enable_wobbling()
-        except Exception:
-            pass
+        if not self.calm:
+            try:
+                self.robot.enable_wobbling()
+            except Exception:
+                pass
         if self.follow_face:
             camera.set_tracking_weight(self.robot, 1.0)
             self._track_weight = 1.0
@@ -114,13 +116,14 @@ class Movements:
             self.robot.enable_motors()
         except Exception as e:
             logger.debug("enable_motors not available/failed: %s", e)
-        # Daemon-driven, speech-reactive head motion (real-time lip-sync).
-        try:
-            self.robot.enable_wobbling()
-            logger.info("Audio wobbler enabled (speech-reactive head motion)")
-        except Exception as e:
-            logger.warning("enable_wobbling failed: %s", e)
-        # Daemon-driven face tracking: the head follows the student's face.
+        # Speech-reactive head wobbler. In calm mode we keep it OFF so the head does not
+        # jitter while talking (less distracting for the student).
+        if not self.calm:
+            try:
+                self.robot.enable_wobbling()
+                logger.info("Audio wobbler enabled (speech-reactive head motion)")
+            except Exception as e:
+                logger.warning("enable_wobbling failed: %s", e)
         if self.follow_face:
             camera.start_tracking(self.robot, 1.0)
             self._track_weight = 1.0
@@ -181,20 +184,19 @@ class Movements:
             with self._lock:
                 energy = self._energy
                 self._energy *= 0.9
-                s = self.temp.scale
+                s = self.temp.scale * (0.55 if self.calm else 1.0)
                 w = self.temp.speed
 
             speaking = energy > 0.06
 
-            # Face-follow handoff: hand the head to the wobbler while speaking (weight 0),
-            # track the student while listening (weight 1).
+            # Face-follow: while speaking keep a gentle track (calm) or hand off to the
+            # wobbler (0); while listening, full tracking (1).
             if self.follow_face:
-                target_weight = 0.0 if speaking else 1.0
+                target_weight = (0.5 if self.calm else 0.0) if speaking else 1.0
                 if target_weight != self._track_weight:
                     camera.set_tracking_weight(self.robot, target_weight)
                     self._track_weight = target_weight
 
-            # Base head pose: breathing + idle drift (amplitudes deliberately visible).
             z = 0.010 * s * math.sin(2 * math.pi * 0.12 * w * t)  # gentle breathing (m)
             pitch = 5.0 * s * math.sin(2 * math.pi * 0.09 * w * t)  # deg
             yaw_head = 8.0 * s * math.sin(2 * math.pi * 0.06 * w * t)  # deg
@@ -202,7 +204,6 @@ class Movements:
                 pitch += 6.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
                 yaw_head += 5.0 * s * energy * math.sin(2 * math.pi * 0.5 * t)
 
-            # Body: slow sway, engages more while speaking.
             body_yaw = math.radians(12.0 * s * math.sin(2 * math.pi * 0.05 * w * t))
             if speaking:
                 body_yaw += math.radians(8.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))

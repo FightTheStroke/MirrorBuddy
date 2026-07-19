@@ -99,3 +99,43 @@ class MirrorBuddyClient:
                 return m
 
         return maestri[0]
+
+
+def neutral_buddy(student_name: str | None = None, voice: str = DEFAULT_VOICE) -> Maestro:
+    """A neutral MirrorBuddy tutor used at start-up.
+
+    It does not impersonate a historical figure: it greets warmly, helps the student
+    plan the study session, then hands over to the right subject professor via the
+    ``call_professor`` tool. This is the default entry point on the child's device.
+    """
+    v = voice.strip().lower() if voice else DEFAULT_VOICE
+    if v not in VALID_VOICES:
+        v = DEFAULT_VOICE
+    name = (student_name or "").strip()
+    hello = f"Ciao {name}! " if name else "Ciao! "
+    greeting = (
+        f"{hello}Sono Buddy, il tuo tutor. Da cosa vuoi partire oggi? "
+        "Dimmi che compiti o materie hai e organizziamo insieme lo studio, un passo alla volta."
+    )
+    system_prompt = (
+        "Sei Buddy, il tutor personale di MirrorBuddy. NON sei un personaggio storico e non "
+        "interpreti nessuno: sei semplicemente Buddy, caldo, semplice e incoraggiante. "
+        "Il tuo primo compito e' aiutare lo studente a ORGANIZZARE la sessione di studio: "
+        "chiedi con calma cosa deve fare oggi, quali materie e quali compiti, e proponi un "
+        "piccolo piano concreto (una cosa alla volta, senza fretta). Quando si entra davvero "
+        "in una materia o lo studente chiede un professore, usa lo strumento 'call_professor' "
+        "per chiamare il Maestro giusto. Resta neutro e rassicurante, non fare lezione tu stesso "
+        "all'inizio: prima si organizza, poi si studia."
+    )
+    return Maestro(
+        id="buddy",
+        name="Buddy",
+        display_name="Buddy",
+        subject="",
+        specialty="organizzazione dello studio",
+        voice=v,
+        voice_instructions="Voce calda, calma e incoraggiante; ritmo tranquillo.",
+        teaching_style="organizzatore, paziente, incoraggiante",
+        system_prompt=system_prompt,
+        greeting=greeting,
+    )

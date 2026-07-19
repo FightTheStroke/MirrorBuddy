@@ -52,11 +52,18 @@ class Config:
         self.MAESTRO_ID: str | None = (os.getenv("MIRRORBUDDY_MAESTRO_ID") or "").strip() or None
         self.DSA_PROFILE: str = (os.getenv("MIRRORBUDDY_DSA_PROFILE") or "cerebral").strip()
         self.STUDENT_NAME: str | None = (os.getenv("MIRRORBUDDY_STUDENT_NAME") or "").strip() or None
+        # Start neutrally as "Buddy" (organise the study session) instead of impersonating a
+        # historical Maestro. A pinned MIRRORBUDDY_MAESTRO_ID always takes precedence.
+        self.START_NEUTRAL: bool = _flag("MIRRORBUDDY_START_NEUTRAL", True)
+        self.BUDDY_VOICE: str = (os.getenv("MIRRORBUDDY_BUDDY_VOICE") or "coral").strip().lower()
 
         # --- feature toggles ---
         self.ENABLE_CAMERA: bool = _flag("MIRRORBUDDY_ENABLE_CAMERA", True)
         self.ENABLE_MOVEMENTS: bool = _flag("MIRRORBUDDY_ENABLE_MOVEMENTS", True)
         self.FOLLOW_FACE: bool = _flag("MIRRORBUDDY_FOLLOW_FACE", True)
+        # Calm motion (default): no audio head wobbler + gentler amplitudes, so the robot
+        # does not distract the student while speaking. Set to false for livelier motion.
+        self.CALM_MOVEMENT: bool = _flag("MIRRORBUDDY_CALM_MOVEMENT", True)
 
     def missing(self) -> list[str]:
         """Return the list of required config values that are absent."""
