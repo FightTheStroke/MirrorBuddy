@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- keywords are sanitized to word chars by extractKeywords before RegExp construction. Reviewed in PR #541. */
 /**
  * Hybrid Retrieval Service
  * Combines semantic (vector) and keyword search for improved retrieval accuracy.
@@ -5,25 +6,22 @@
  * @module rag/hybrid-retrieval
  */
 
-import { Prisma } from "@prisma/client";
-import { logger } from "@/lib/logger";
-import { prisma } from "@/lib/db";
-import { generatePrivacyAwareEmbedding } from "./privacy-aware-embedding";
-import { searchSimilar, type VectorSearchResult } from "./vector-store";
-import { cosineSimilarity } from "./embedding-service";
-import { rerank } from "./reranker";
+import { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
+import { generatePrivacyAwareEmbedding } from './privacy-aware-embedding';
+import { searchSimilar, type VectorSearchResult } from './vector-store';
+import { cosineSimilarity } from './embedding-service';
+import { rerank } from './reranker';
 import type {
   HybridRetrievalResult,
   HybridSearchOptions,
   KeywordSearchOptions,
   KeywordMatch,
-} from "./hybrid-types";
+} from './hybrid-types';
 
 // Re-export types
-export type {
-  HybridRetrievalResult,
-  HybridSearchOptions,
-} from "./hybrid-types";
+export type { HybridRetrievalResult, HybridSearchOptions } from './hybrid-types';
 
 /**
  * Extract keywords from query for keyword search
@@ -31,65 +29,65 @@ export type {
  */
 function extractKeywords(query: string): string[] {
   const stopWords = new Set([
-    "il",
-    "lo",
-    "la",
-    "i",
-    "gli",
-    "le",
-    "un",
-    "uno",
-    "una",
-    "di",
-    "a",
-    "da",
-    "in",
-    "con",
-    "su",
-    "per",
-    "tra",
-    "fra",
-    "the",
-    "a",
-    "an",
-    "and",
-    "or",
-    "but",
-    "in",
-    "on",
-    "at",
-    "to",
-    "for",
-    "of",
-    "with",
-    "by",
-    "from",
-    "is",
-    "are",
-    "was",
-    "were",
-    "be",
-    "been",
-    "being",
-    "have",
-    "has",
-    "had",
-    "do",
-    "does",
-    "did",
-    "che",
-    "e",
-    "non",
-    "come",
-    "cosa",
-    "dove",
-    "quando",
-    "perché",
+    'il',
+    'lo',
+    'la',
+    'i',
+    'gli',
+    'le',
+    'un',
+    'uno',
+    'una',
+    'di',
+    'a',
+    'da',
+    'in',
+    'con',
+    'su',
+    'per',
+    'tra',
+    'fra',
+    'the',
+    'a',
+    'an',
+    'and',
+    'or',
+    'but',
+    'in',
+    'on',
+    'at',
+    'to',
+    'for',
+    'of',
+    'with',
+    'by',
+    'from',
+    'is',
+    'are',
+    'was',
+    'were',
+    'be',
+    'been',
+    'being',
+    'have',
+    'has',
+    'had',
+    'do',
+    'does',
+    'did',
+    'che',
+    'e',
+    'non',
+    'come',
+    'cosa',
+    'dove',
+    'quando',
+    'perché',
   ]);
 
   return query
     .toLowerCase()
-    .replace(/[^\w\s]/g, " ")
+    .replace(/[^\w\s]/g, ' ')
     .split(/\s+/)
     .filter((word) => word.length > 2 && !stopWords.has(word));
 }
@@ -97,9 +95,7 @@ function extractKeywords(query: string): string[] {
 /**
  * Perform keyword-based search on content embeddings
  */
-async function keywordSearch(
-  options: KeywordSearchOptions,
-): Promise<KeywordMatch[]> {
+async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatch[]> {
   const { userId, keywords, limit, sourceType, subject } = options;
 
   if (keywords.length === 0) {
@@ -118,12 +114,10 @@ async function keywordSearch(
   }
 
   // Build keyword ILIKE conditions (OR) - PostgreSQL uses ILIKE for case-insensitive
-  const keywordConditions = keywords.map(
-    (kw) => Prisma.sql`content ILIKE ${`%${kw}%`}`,
-  );
-  conditions.push(Prisma.sql`(${Prisma.join(keywordConditions, " OR ")})`);
+  const keywordConditions = keywords.map((kw) => Prisma.sql`content ILIKE ${`%${kw}%`}`);
+  conditions.push(Prisma.sql`(${Prisma.join(keywordConditions, ' OR ')})`);
 
-  const whereClause = Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`;
+  const whereClause = Prisma.sql`WHERE ${Prisma.join(conditions, ' AND ')}`;
 
   // Query using $queryRaw with template literals
   type RawEmbedding = {
@@ -147,7 +141,7 @@ async function keywordSearch(
   return results.map((row) => {
     const contentLower = row.content.toLowerCase();
     const matchCount = keywords.reduce((count, kw) => {
-      const regex = new RegExp(kw, "gi");
+      const regex = new RegExp(kw, 'gi');
       const matches = contentLower.match(regex);
       return count + (matches ? matches.length : 0);
     }, 0);
@@ -169,9 +163,7 @@ async function keywordSearch(
  * Perform hybrid search combining semantic and keyword approaches
  * Uses Reciprocal Rank Fusion (RRF) for score combination
  */
-export async function hybridSearch(
-  options: HybridSearchOptions,
-): Promise<HybridRetrievalResult[]> {
+export async function hybridSearch(options: HybridSearchOptions): Promise<HybridRetrievalResult[]> {
   const {
     userId,
     query,
@@ -183,7 +175,7 @@ export async function hybridSearch(
     excludeSourceIds = [],
   } = options;
 
-  logger.debug("[HybridRetrieval] Starting hybrid search", {
+  logger.debug('[HybridRetrieval] Starting hybrid search', {
     userId,
     queryLength: query.length,
     limit,
@@ -243,8 +235,7 @@ export async function hybridSearch(
     const keywordScore = keyword ? keyword.matchCount / maxMatchCount : 0;
 
     // Weighted combination
-    const combinedScore =
-      semanticWeight * semanticScore + (1 - semanticWeight) * keywordScore;
+    const combinedScore = semanticWeight * semanticScore + (1 - semanticWeight) * keywordScore;
 
     // Skip if below threshold
     if (combinedScore < minScore) continue;
@@ -275,7 +266,7 @@ export async function hybridSearch(
 
   // Apply reranking if enabled (P2 quality improvement)
   if (options.enableReranking && limited.length > 0) {
-    logger.debug("[HybridRetrieval] Applying reranker", {
+    logger.debug('[HybridRetrieval] Applying reranker', {
       candidateCount: limited.length,
     });
 
@@ -301,7 +292,7 @@ export async function hybridSearch(
       .sort((a, b) => (b.rerankedScore ?? 0) - (a.rerankedScore ?? 0));
   }
 
-  logger.debug("[HybridRetrieval] Search complete", {
+  logger.debug('[HybridRetrieval] Search complete', {
     semanticResultCount: semanticResults.length,
     keywordResultCount: keywordResults.length,
     combinedResultCount: limited.length,
@@ -315,10 +306,7 @@ export async function hybridSearch(
  * Calculate similarity between two texts using embeddings
  * Useful for comparing specific content pieces
  */
-export async function textSimilarity(
-  text1: string,
-  text2: string,
-): Promise<number> {
+export async function textSimilarity(text1: string, text2: string): Promise<number> {
   const [embedding1, embedding2] = await Promise.all([
     generatePrivacyAwareEmbedding(text1),
     generatePrivacyAwareEmbedding(text2),

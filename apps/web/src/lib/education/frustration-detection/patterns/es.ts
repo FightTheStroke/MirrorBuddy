@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Spanish frustration patterns
  * Handles Latin American and European Spanish variants
@@ -55,7 +56,17 @@ export const spanishPatterns: LocalePatterns = {
   ],
 
   fillers: [
-    'eh', 'este', 'pues', 'bueno', 'o sea', 'es que', 'tipo',
-    'como que', 'sabes', 'entonces', 'digamos', 'básicamente',
+    'eh',
+    'este',
+    'pues',
+    'bueno',
+    'o sea',
+    'es que',
+    'tipo',
+    'como que',
+    'sabes',
+    'entonces',
+    'digamos',
+    'básicamente',
   ],
 };

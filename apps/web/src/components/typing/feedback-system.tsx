@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { cn } from "@/lib/utils";
-import type { KeyMappingResult } from "@/lib/typing/key-mapping-engine";
-import { useTranslations } from "next-intl";
+import { useState, useCallback } from 'react';
+import { cn } from '@/lib/utils';
+import type { KeyMappingResult } from '@/lib/typing/key-mapping-engine';
+import { useTranslations } from 'next-intl';
 
 export interface FeedbackConfig {
   enableAudio: boolean;
@@ -26,7 +26,7 @@ export function FeedbackSystem({
   },
   onHint,
 }: FeedbackSystemProps) {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   const [showHint, setShowHint] = useState(false);
 
   const handleShowHint = useCallback(() => {
@@ -44,33 +44,33 @@ export function FeedbackSystem({
       {config.enableVisual && (
         <div
           className={cn(
-            "p-4 rounded-lg transition-all duration-200",
+            'p-4 rounded-lg transition-all duration-200',
             result.correct && result.actual
-              ? "bg-green-500/10 border border-green-500/30"
+              ? 'bg-green-500/10 border border-green-500/30'
               : result.isBackspace
-                ? "bg-muted/50 border border-muted"
-                : "bg-red-500/10 border border-red-500/30",
+                ? 'bg-muted/50 border border-muted'
+                : 'bg-red-500/10 border border-red-500/30',
           )}
         >
           <div className="flex items-center gap-4">
             {result.isBackspace ? (
-              <span className="text-muted-foreground">{t("backspace")}</span>
+              <span className="text-muted-foreground">{t('backspace')}</span>
             ) : result.correct ? (
               <span className="text-green-600 dark:text-green-400 font-semibold">
-                {t("correct")} {result.actual}
+                {t('correct')} {result.actual}
               </span>
             ) : (
               <div className="flex items-center gap-2">
                 <span className="text-red-600 dark:text-red-400">
-                  {t("expected")} {result.expected}
+                  {t('expected')} {result.expected}
                 </span>
                 {config.enableHints && (
                   <button
                     onClick={handleShowHint}
                     className="text-sm text-primary hover:underline"
-                    aria-label={t("showHint")}
+                    aria-label={t('showHint')}
                   >
-                    {t("hint")}
+                    {t('hint')}
                   </button>
                 )}
               </div>
@@ -79,26 +79,17 @@ export function FeedbackSystem({
 
           {showHint && !result.correct && config.enableHints && (
             <div className="mt-2 text-sm text-muted-foreground">
-              {t("hintPress")}{" "}
-              <kbd className="px-2 py-1 bg-muted rounded">
-                {result.expected}
-              </kbd>
+              {t('hintPress')} <kbd className="px-2 py-1 bg-muted rounded">{result.expected}</kbd>
             </div>
           )}
         </div>
       )}
 
       {config.enableAudio && result.correct && result.actual && (
-        // eslint-disable-next-line jsx-a11y/media-has-caption -- Decorative audio feedback for correct keystroke
-        <audio
-          src="/sounds/keystroke-correct.mp3"
-          autoPlay
-          className="hidden"
-        />
+        <audio src="/sounds/keystroke-correct.mp3" autoPlay className="hidden" />
       )}
 
       {config.enableAudio && !result.correct && !result.isBackspace && (
-        // eslint-disable-next-line jsx-a11y/media-has-caption -- Decorative audio feedback for incorrect keystroke
         <audio src="/sounds/keystroke-error.mp3" autoPlay className="hidden" />
       )}
     </div>

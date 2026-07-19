@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * French frustration patterns
  */
@@ -50,7 +51,17 @@ export const frenchPatterns: LocalePatterns = {
   ],
 
   fillers: [
-    'euh', 'heu', 'ben', 'bah', 'genre', 'en fait', 'du coup',
-    'voilà', 'quoi', 'tu vois', 'donc', 'enfin',
+    'euh',
+    'heu',
+    'ben',
+    'bah',
+    'genre',
+    'en fait',
+    'du coup',
+    'voilà',
+    'quoi',
+    'tu vois',
+    'donc',
+    'enfin',
   ],
 };

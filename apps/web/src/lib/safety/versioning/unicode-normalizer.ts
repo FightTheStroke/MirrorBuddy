@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- RegExp built from INVISIBLE_CHARS constant list, not user input. Reviewed in PR #541. */
 /**
  * Extended Unicode Normalizer
  * Part of Ethical Design Hardening (F-17)
@@ -15,83 +16,185 @@ const log = logger.child({ module: 'unicode-normalizer' });
  */
 const HOMOGLYPH_MAP: Record<string, string> = {
   // Cyrillic lookalikes
-  'а': 'a', 'А': 'A',  // Cyrillic a
-  'е': 'e', 'Е': 'E',  // Cyrillic e
-  'о': 'o', 'О': 'O',  // Cyrillic o
-  'р': 'p', 'Р': 'P',  // Cyrillic r (looks like p)
-  'с': 'c', 'С': 'C',  // Cyrillic s (looks like c)
-  'у': 'y', 'У': 'Y',  // Cyrillic u (looks like y)
-  'х': 'x', 'Х': 'X',  // Cyrillic h (looks like x)
-  'і': 'i', 'І': 'I',  // Ukrainian i
-  'ј': 'j', 'Ј': 'J',  // Serbian j
-  'ѕ': 's', 'Ѕ': 'S',  // Cyrillic dze
+  а: 'a',
+  А: 'A', // Cyrillic a
+  е: 'e',
+  Е: 'E', // Cyrillic e
+  о: 'o',
+  О: 'O', // Cyrillic o
+  р: 'p',
+  Р: 'P', // Cyrillic r (looks like p)
+  с: 'c',
+  С: 'C', // Cyrillic s (looks like c)
+  у: 'y',
+  У: 'Y', // Cyrillic u (looks like y)
+  х: 'x',
+  Х: 'X', // Cyrillic h (looks like x)
+  і: 'i',
+  І: 'I', // Ukrainian i
+  ј: 'j',
+  Ј: 'J', // Serbian j
+  ѕ: 's',
+  Ѕ: 'S', // Cyrillic dze
 
   // Greek lookalikes
-  'Α': 'A', 'α': 'a',  // Alpha
-  'Β': 'B', 'β': 'b',  // Beta
-  'Ε': 'E', 'ε': 'e',  // Epsilon
-  'Η': 'H', 'η': 'n',  // Eta
-  'Ι': 'I', 'ι': 'i',  // Iota
-  'Κ': 'K', 'κ': 'k',  // Kappa
-  'Μ': 'M', 'μ': 'u',  // Mu
-  'Ν': 'N', 'ν': 'v',  // Nu
-  'Ο': 'O', 'ο': 'o',  // Omicron
-  'Ρ': 'P', 'ρ': 'p',  // Rho
-  'Τ': 'T', 'τ': 't',  // Tau
-  'Υ': 'Y', 'υ': 'u',  // Upsilon
-  'Χ': 'X', 'χ': 'x',  // Chi
-  'Ζ': 'Z', 'ζ': 'z',  // Zeta
+  Α: 'A',
+  α: 'a', // Alpha
+  Β: 'B',
+  β: 'b', // Beta
+  Ε: 'E',
+  ε: 'e', // Epsilon
+  Η: 'H',
+  η: 'n', // Eta
+  Ι: 'I',
+  ι: 'i', // Iota
+  Κ: 'K',
+  κ: 'k', // Kappa
+  Μ: 'M',
+  μ: 'u', // Mu
+  Ν: 'N',
+  ν: 'v', // Nu
+  Ο: 'O',
+  ο: 'o', // Omicron
+  Ρ: 'P',
+  ρ: 'p', // Rho
+  Τ: 'T',
+  τ: 't', // Tau
+  Υ: 'Y',
+  υ: 'u', // Upsilon
+  Χ: 'X',
+  χ: 'x', // Chi
+  Ζ: 'Z',
+  ζ: 'z', // Zeta
 
   // Arabic numerals and letters that can look like Latin
-  '٠': '0', '۰': '0',  // Arabic-Indic zero
-  '١': '1', '۱': '1',  // Arabic-Indic one
-  '٢': '2', '۲': '2',  // Arabic-Indic two
-  'ا': 'l', 'أ': 'l',  // Alef (can look like l/I)
+  '٠': '0',
+  '۰': '0', // Arabic-Indic zero
+  '١': '1',
+  '۱': '1', // Arabic-Indic one
+  '٢': '2',
+  '۲': '2', // Arabic-Indic two
+  ا: 'l',
+  أ: 'l', // Alef (can look like l/I)
 
   // Mathematical and special symbols
-  'ℓ': 'l',           // Script small l
-  'ℐ': 'I',           // Script capital I
-  'ℑ': 'I',           // Black-letter I
-  'ℒ': 'L',           // Script capital L
-  'ℳ': 'M',           // Script capital M
-  'ℛ': 'R',           // Script capital R
-  'ℯ': 'e',           // Script small e
-  '℮': 'e',           // Estimated symbol
+  ℓ: 'l', // Script small l
+  ℐ: 'I', // Script capital I
+  ℑ: 'I', // Black-letter I
+  ℒ: 'L', // Script capital L
+  ℳ: 'M', // Script capital M
+  ℛ: 'R', // Script capital R
+  ℯ: 'e', // Script small e
+  '℮': 'e', // Estimated symbol
 
   // Fullwidth characters
-  'ａ': 'a', 'ｂ': 'b', 'ｃ': 'c', 'ｄ': 'd', 'ｅ': 'e',
-  'ｆ': 'f', 'ｇ': 'g', 'ｈ': 'h', 'ｉ': 'i', 'ｊ': 'j',
-  'ｋ': 'k', 'ｌ': 'l', 'ｍ': 'm', 'ｎ': 'n', 'ｏ': 'o',
-  'ｐ': 'p', 'ｑ': 'q', 'ｒ': 'r', 'ｓ': 's', 'ｔ': 't',
-  'ｕ': 'u', 'ｖ': 'v', 'ｗ': 'w', 'ｘ': 'x', 'ｙ': 'y',
-  'ｚ': 'z',
-  'Ａ': 'A', 'Ｂ': 'B', 'Ｃ': 'C', 'Ｄ': 'D', 'Ｅ': 'E',
-  'Ｆ': 'F', 'Ｇ': 'G', 'Ｈ': 'H', 'Ｉ': 'I', 'Ｊ': 'J',
-  'Ｋ': 'K', 'Ｌ': 'L', 'Ｍ': 'M', 'Ｎ': 'N', 'Ｏ': 'O',
-  'Ｐ': 'P', 'Ｑ': 'Q', 'Ｒ': 'R', 'Ｓ': 'S', 'Ｔ': 'T',
-  'Ｕ': 'U', 'Ｖ': 'V', 'Ｗ': 'W', 'Ｘ': 'X', 'Ｙ': 'Y',
-  'Ｚ': 'Z',
+  ａ: 'a',
+  ｂ: 'b',
+  ｃ: 'c',
+  ｄ: 'd',
+  ｅ: 'e',
+  ｆ: 'f',
+  ｇ: 'g',
+  ｈ: 'h',
+  ｉ: 'i',
+  ｊ: 'j',
+  ｋ: 'k',
+  ｌ: 'l',
+  ｍ: 'm',
+  ｎ: 'n',
+  ｏ: 'o',
+  ｐ: 'p',
+  ｑ: 'q',
+  ｒ: 'r',
+  ｓ: 's',
+  ｔ: 't',
+  ｕ: 'u',
+  ｖ: 'v',
+  ｗ: 'w',
+  ｘ: 'x',
+  ｙ: 'y',
+  ｚ: 'z',
+  Ａ: 'A',
+  Ｂ: 'B',
+  Ｃ: 'C',
+  Ｄ: 'D',
+  Ｅ: 'E',
+  Ｆ: 'F',
+  Ｇ: 'G',
+  Ｈ: 'H',
+  Ｉ: 'I',
+  Ｊ: 'J',
+  Ｋ: 'K',
+  Ｌ: 'L',
+  Ｍ: 'M',
+  Ｎ: 'N',
+  Ｏ: 'O',
+  Ｐ: 'P',
+  Ｑ: 'Q',
+  Ｒ: 'R',
+  Ｓ: 'S',
+  Ｔ: 'T',
+  Ｕ: 'U',
+  Ｖ: 'V',
+  Ｗ: 'W',
+  Ｘ: 'X',
+  Ｙ: 'Y',
+  Ｚ: 'Z',
 
   // Numbers fullwidth
-  '０': '0', '１': '1', '２': '2', '３': '3', '４': '4',
-  '５': '5', '６': '6', '７': '7', '８': '8', '９': '9',
+  '０': '0',
+  '１': '1',
+  '２': '2',
+  '３': '3',
+  '４': '4',
+  '５': '5',
+  '６': '6',
+  '７': '7',
+  '８': '8',
+  '９': '9',
 
   // Subscript and superscript
-  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4',
-  '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
-  '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
-  '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+  '⁰': '0',
+  '¹': '1',
+  '²': '2',
+  '³': '3',
+  '⁴': '4',
+  '⁵': '5',
+  '⁶': '6',
+  '⁷': '7',
+  '⁸': '8',
+  '⁹': '9',
+  '₀': '0',
+  '₁': '1',
+  '₂': '2',
+  '₃': '3',
+  '₄': '4',
+  '₅': '5',
+  '₆': '6',
+  '₇': '7',
+  '₈': '8',
+  '₉': '9',
 
   // Other common lookalikes
-  'ℹ': 'i',           // Information source
-  '∑': 'E',           // Sum (like E)
-  '∏': 'P',           // Product (like P)
-  '№': 'N',           // Numero sign
-  '℠': 'SM',          // Service mark
-  '™': 'TM',          // Trademark
-  '\u2010': '-', '\u2011': '-', '\u2012': '-', '\u2013': '-', '\u2014': '-',  // Various dashes
-  '\u2018': "'", '\u2019': "'", '\u201A': "'", '\u201B': "'",  // Various quotes
-  '\u201C': '"', '\u201D': '"', '\u201E': '"', '\u201F': '"',  // Various double quotes
+  ℹ: 'i', // Information source
+  '∑': 'E', // Sum (like E)
+  '∏': 'P', // Product (like P)
+  '№': 'N', // Numero sign
+  '℠': 'SM', // Service mark
+  '™': 'TM', // Trademark
+  '\u2010': '-',
+  '\u2011': '-',
+  '\u2012': '-',
+  '\u2013': '-',
+  '\u2014': '-', // Various dashes
+  '\u2018': "'",
+  '\u2019': "'",
+  '\u201A': "'",
+  '\u201B': "'", // Various quotes
+  '\u201C': '"',
+  '\u201D': '"',
+  '\u201E': '"',
+  '\u201F': '"', // Various double quotes
 };
 
 /**
@@ -280,11 +383,7 @@ export function analyzeUnicodeContent(text: string): {
  * Normalization change record
  */
 export interface NormalizationChange {
-  type:
-    | 'nfc_normalization'
-    | 'invisible_removed'
-    | 'homoglyph_replaced'
-    | 'spaces_collapsed';
+  type: 'nfc_normalization' | 'invisible_removed' | 'homoglyph_replaced' | 'spaces_collapsed';
   original: string;
   replacement: string;
   count?: number;

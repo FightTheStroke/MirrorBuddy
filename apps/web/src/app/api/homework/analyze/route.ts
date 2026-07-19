@@ -20,7 +20,7 @@ import { analyzeHomeworkWithAzure } from './helpers';
  * POST - Analyze homework image
  */
 export const revalidate = 0;
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public endpoint with rate limiting, no cookie auth
+
 export const POST = pipe(withSentry('/api/homework/analyze'))(async (ctx) => {
   const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`homework:${clientId}`, RATE_LIMITS.HOMEWORK);

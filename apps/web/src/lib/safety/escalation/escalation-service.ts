@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant redaction patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Human Escalation Service
  * F-06 - AI Act Article 14: Escalate critical safety events to human admins
@@ -5,37 +6,34 @@
  * Monitors for crisis/safety events and triggers admin notification pathway.
  */
 
-import { logger } from "@/lib/logger";
-import { notifyAdmin } from "./admin-notifier";
+import { logger } from '@/lib/logger';
+import { notifyAdmin } from './admin-notifier';
 import {
   trackJailbreakAttempt,
   clearSessionTracking,
   getJailbreakAttemptCount,
   setJailbreakThreshold,
-} from "./escalation-tracker";
+} from './escalation-tracker';
 import type {
   EscalationEvent,
   EscalationTrigger,
   EscalationMetadata,
   EscalationConfig,
-} from "./types";
-import { DEFAULT_ESCALATION_CONFIG } from "./types";
+} from './types';
+import { DEFAULT_ESCALATION_CONFIG } from './types';
 
 /**
  * Lazy import for DB storage (server-only)
  */
-async function storeEscalationEvent(
-  event: EscalationEvent,
-  storeInDb: boolean,
-): Promise<void> {
-  if (typeof window !== "undefined" || !storeInDb) {
+async function storeEscalationEvent(event: EscalationEvent, storeInDb: boolean): Promise<void> {
+  if (typeof window !== 'undefined' || !storeInDb) {
     return;
   }
-  const { storeEscalationEvent: store } = await import("./db-storage");
+  const { storeEscalationEvent: store } = await import('./db-storage');
   return store(event, storeInDb);
 }
 
-const log = logger.child({ module: "escalation-service" });
+const log = logger.child({ module: 'escalation-service' });
 
 /**
  * In-memory buffer of escalation events
@@ -50,12 +48,10 @@ let escalationConfig = { ...DEFAULT_ESCALATION_CONFIG };
 /**
  * Initialize escalation service with custom config
  */
-export function initializeEscalationService(
-  config: Partial<EscalationConfig> = {},
-): void {
+export function initializeEscalationService(config: Partial<EscalationConfig> = {}): void {
   escalationConfig = { ...DEFAULT_ESCALATION_CONFIG, ...config };
   setJailbreakThreshold(escalationConfig.jailbreakThreshold);
-  log.info("Escalation service initialized", {
+  log.info('Escalation service initialized', {
     threshold: escalationConfig.jailbreakThreshold,
     autoNotify: escalationConfig.autoNotifyAdmin,
   });
@@ -72,41 +68,38 @@ function generateEscalationId(): string {
  * Anonymize user ID
  */
 function anonymizeUserId(userId: string): string {
-  return userId && userId.length >= 8 ? userId.substring(0, 8) : "";
+  return userId && userId.length >= 8 ? userId.substring(0, 8) : '';
 }
 
 /**
  * Hash session ID for audit trail
  */
 function hashSessionId(sessionId: string): string {
-  return sessionId ? `hash_${sessionId.substring(0, 12)}` : "";
+  return sessionId ? `hash_${sessionId.substring(0, 12)}` : '';
 }
 
 /**
  * Sanitize content snippet to remove PII
  * Redacts: email addresses, phone numbers, names patterns
  */
-function sanitizeContentSnippet(
-  content: string | undefined,
-  maxLength = 200,
-): string | undefined {
+function sanitizeContentSnippet(content: string | undefined, maxLength = 200): string | undefined {
   if (!content) return undefined;
 
   // Redact email addresses
   let sanitized = content.replace(
     /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi,
-    "[EMAIL_REDACTED]",
+    '[EMAIL_REDACTED]',
   );
 
   // Redact phone numbers (various formats)
   sanitized = sanitized.replace(
     /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
-    "[PHONE_REDACTED]",
+    '[PHONE_REDACTED]',
   );
 
   // Truncate to max length
   if (sanitized.length > maxLength) {
-    sanitized = sanitized.substring(0, maxLength - 3) + "...";
+    sanitized = sanitized.substring(0, maxLength - 3) + '...';
   }
 
   return sanitized;
@@ -127,14 +120,10 @@ function createEscalationEvent(
   const event: EscalationEvent = {
     id: generateEscalationId(),
     trigger,
-    severity: trigger === "crisis_detected" ? "critical" : "high",
+    severity: trigger === 'crisis_detected' ? 'critical' : 'high',
     timestamp: new Date(),
-    anonymizedUserId: options.userId
-      ? anonymizeUserId(options.userId)
-      : undefined,
-    sessionHash: options.sessionId
-      ? hashSessionId(options.sessionId)
-      : undefined,
+    anonymizedUserId: options.userId ? anonymizeUserId(options.userId) : undefined,
+    sessionHash: options.sessionId ? hashSessionId(options.sessionId) : undefined,
     maestroId: options.maestroId,
     metadata: options.metadata || {},
     adminNotified: false,
@@ -151,13 +140,13 @@ export async function escalateCrisisDetected(
   sessionId?: string,
   options: { contentSnippet?: string; maestroId?: string } = {},
 ): Promise<EscalationEvent> {
-  const event = createEscalationEvent("crisis_detected", {
+  const event = createEscalationEvent('crisis_detected', {
     userId,
     sessionId,
     maestroId: options.maestroId,
     metadata: {
-      reason: "Crisis keywords detected (self-harm, suicide ideation)",
-      contextType: "user_input",
+      reason: 'Crisis keywords detected (self-harm, suicide ideation)',
+      contextType: 'user_input',
       contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       confidence: 1.0,
     },
@@ -167,7 +156,7 @@ export async function escalateCrisisDetected(
   await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
-  log.warn("CRISIS ESCALATION", { eventId: event.id });
+  log.warn('CRISIS ESCALATION', { eventId: event.id });
   return event;
 }
 
@@ -180,13 +169,13 @@ export async function escalateRepeatedJailbreak(
   sessionId?: string,
   options: { contentSnippet?: string; maestroId?: string } = {},
 ): Promise<EscalationEvent> {
-  const event = createEscalationEvent("repeated_jailbreak", {
+  const event = createEscalationEvent('repeated_jailbreak', {
     userId,
     sessionId,
     maestroId: options.maestroId,
     metadata: {
       reason: `${attemptCount} jailbreak attempts (threshold: ${escalationConfig.jailbreakThreshold})`,
-      contextType: "user_input",
+      contextType: 'user_input',
       contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       jailbreakAttemptCount: attemptCount,
     },
@@ -196,7 +185,7 @@ export async function escalateRepeatedJailbreak(
   await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
-  log.warn("JAILBREAK ESCALATION", { eventId: event.id, attemptCount });
+  log.warn('JAILBREAK ESCALATION', { eventId: event.id, attemptCount });
   return event;
 }
 
@@ -213,13 +202,13 @@ export async function escalateSevereContentFilter(
     maestroId?: string;
   } = {},
 ): Promise<EscalationEvent> {
-  const event = createEscalationEvent("severe_content_filter", {
+  const event = createEscalationEvent('severe_content_filter', {
     userId,
     sessionId,
     maestroId: options.maestroId,
     metadata: {
       reason: `Critical filter violation: ${filterCategory}`,
-      contextType: "user_input",
+      contextType: 'user_input',
       contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       confidence: options.confidence || 0.95,
     },
@@ -229,7 +218,7 @@ export async function escalateSevereContentFilter(
   await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
-  log.warn("CONTENT FILTER ESCALATION", {
+  log.warn('CONTENT FILTER ESCALATION', {
     eventId: event.id,
     category: filterCategory,
   });
@@ -242,10 +231,7 @@ export async function escalateSevereContentFilter(
  * (D-07: the buffer resets per serverless instance, so the DB is the source
  * of truth for resolution state).
  */
-export async function resolveEscalation(
-  eventId: string,
-  adminNotes?: string,
-): Promise<void> {
+export async function resolveEscalation(eventId: string, adminNotes?: string): Promise<void> {
   const event = escalationBuffer.find((e) => e.id === eventId);
   if (event) {
     event.resolved = true;
@@ -253,19 +239,19 @@ export async function resolveEscalation(
     event.adminNotes = adminNotes;
   }
 
-  if (typeof window === "undefined" && escalationConfig.storeInDatabase) {
+  if (typeof window === 'undefined' && escalationConfig.storeInDatabase) {
     try {
-      const { resolveEscalationInDb } = await import("./db-storage");
+      const { resolveEscalationInDb } = await import('./db-storage');
       await resolveEscalationInDb(eventId, adminNotes);
     } catch (error) {
-      log.error("Failed to persist escalation resolution", {
+      log.error('Failed to persist escalation resolution', {
         eventId,
         error: error instanceof Error ? error.message : String(error),
       });
     }
   }
 
-  log.info("Escalation resolved", { eventId });
+  log.info('Escalation resolved', { eventId });
 }
 
 /**

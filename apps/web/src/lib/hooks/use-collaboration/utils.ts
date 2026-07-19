@@ -3,10 +3,10 @@
  * Handles mindmap refresh and SSE connection setup
  */
 
-import { logger } from "@/lib/logger";
-import type { MindmapData } from "@/lib/tools/mindmap-export/index";
-import type { CollabSSEEvent } from "@/app/api/collab/sse/route";
-import type { CollaborationState } from "./types";
+import { logger } from '@/lib/logger';
+import type { MindmapData } from '@/lib/tools/mindmap-export/index';
+import type { CollabSSEEvent } from '@/app/api/collab/sse/route';
+import type { CollaborationState } from './types';
 
 /**
  * Refresh mindmap from server
@@ -24,7 +24,7 @@ export async function refreshMindmapFromServer(
       }
     }
   } catch (error) {
-    logger.warn("Failed to refresh mindmap", { error, roomId });
+    logger.warn('Failed to refresh mindmap', { error, roomId });
   }
 }
 
@@ -37,10 +37,7 @@ export function setupSSEConnection(
   eventHandler: (event: CollabSSEEvent, roomId: string) => void,
   setState: React.Dispatch<React.SetStateAction<CollaborationState>>,
 ): EventSource {
-  // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: caller (main.ts) stores ref and closes in useEffect cleanup (line 52-56)
-  const es = new EventSource(
-    `/api/collab/sse?roomId=${roomId}&userId=${userId}`,
-  );
+  const es = new EventSource(`/api/collab/sse?roomId=${roomId}&userId=${userId}`);
 
   es.onopen = () => {
     setState((prev) => ({
@@ -49,15 +46,15 @@ export function setupSSEConnection(
       isConnecting: false,
       roomId,
     }));
-    logger.info("Connected to collaboration room", { roomId });
+    logger.info('Connected to collaboration room', { roomId });
   };
 
   es.onerror = () => {
-    logger.error("Collaboration SSE error", { roomId });
+    logger.error('Collaboration SSE error', { roomId });
     setState((prev) => ({
       ...prev,
       isConnected: false,
-      error: "Connection lost",
+      error: 'Connection lost',
     }));
   };
 
@@ -66,7 +63,7 @@ export function setupSSEConnection(
       const data: CollabSSEEvent = JSON.parse(event.data);
       eventHandler(data, roomId);
     } catch (error) {
-      logger.warn("Failed to parse collab event", { error });
+      logger.warn('Failed to parse collab event', { error });
     }
   };
 

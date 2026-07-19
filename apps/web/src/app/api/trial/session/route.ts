@@ -12,7 +12,6 @@ import { VISITOR_COOKIE_NAME, TRIAL_CONSENT_COOKIE } from '@/lib/auth/server';
 import { checkAbuse, incrementAbuseScore } from '@/lib/trial/anti-abuse';
 import { prisma } from '@/lib/db';
 
-
 export const revalidate = 0;
 const log = logger.child({ module: 'api/trial/session' });
 
@@ -23,7 +22,7 @@ const log = logger.child({ module: 'api/trial/session' });
  * Uses IP hash + visitor cookie for session tracking (ADR 0056).
  * Requires explicit consent to privacy policy (F-02: GDPR compliance).
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial endpoint, visitor cookie only, no session auth to protect
+
 export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
   // F-02: Check GDPR consent before creating trial session
   const cookieStore = await cookies();
@@ -135,7 +134,7 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
     verificationPending: isTrialVerificationPending(session),
   });
 
-  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 
   if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
     response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {

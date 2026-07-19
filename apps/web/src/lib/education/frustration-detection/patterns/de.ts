@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * German frustration patterns
  */
@@ -35,7 +36,11 @@ export const germanPatterns: LocalePatterns = {
     { pattern: /ich\s+hab(e)?\s+(das\s+)?nicht\s+verstanden/i, weight: 0.7, category: 'repeat' },
     { pattern: /kannst\s+du\s+(das\s+)?wiederholen/i, weight: 0.6, category: 'repeat' },
     { pattern: /noch\s+(ein)?mal/i, weight: 0.5, category: 'repeat' },
-    { pattern: /kannst\s+du\s+(das\s+)?(noch\s+mal\s+)?erklären/i, weight: 0.65, category: 'repeat' },
+    {
+      pattern: /kannst\s+du\s+(das\s+)?(noch\s+mal\s+)?erklären/i,
+      weight: 0.65,
+      category: 'repeat',
+    },
     { pattern: /(das\s+)?ist\s+(mir\s+)?nicht\s+klar/i, weight: 0.6, category: 'repeat' },
     { pattern: /ich\s+versteh(e)?\s+(das\s+)?nicht/i, weight: 0.65, category: 'repeat' },
     { pattern: /was\s+(be)?deutet\s+das/i, weight: 0.4, category: 'repeat' },
@@ -50,7 +55,17 @@ export const germanPatterns: LocalePatterns = {
   ],
 
   fillers: [
-    'äh', 'ähm', 'hm', 'also', 'halt', 'sozusagen', 'irgendwie',
-    'na ja', 'weißt du', 'quasi', 'eigentlich', 'ja',
+    'äh',
+    'ähm',
+    'hm',
+    'also',
+    'halt',
+    'sozusagen',
+    'irgendwie',
+    'na ja',
+    'weißt du',
+    'quasi',
+    'eigentlich',
+    'ja',
   ],
 };

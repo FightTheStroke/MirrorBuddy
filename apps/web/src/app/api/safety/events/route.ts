@@ -6,13 +6,12 @@
  * Persists safety events to database for compliance tracking.
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { validateAuth } from "@/lib/auth/server";
-import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
-import type { SafetyEventType, EventSeverity } from "@/lib/safety";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { validateAuth } from '@/lib/auth/server';
+import { triggerAdminCountsUpdate } from '@/lib/helpers/publish-admin-counts';
+import type { SafetyEventType, EventSeverity } from '@/lib/safety';
 
 export const revalidate = 0;
 interface SafetyEventBody {
@@ -23,8 +22,7 @@ interface SafetyEventBody {
   category?: string;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- accepts both authenticated and anonymous users for safety event logging
-export const POST = pipe(withSentry("/api/safety/events"))(async (ctx) => {
+export const POST = pipe(withSentry('/api/safety/events'))(async (ctx) => {
   const auth = await validateAuth();
   const userId = auth.authenticated && auth.userId ? auth.userId : null;
 
@@ -32,10 +30,7 @@ export const POST = pipe(withSentry("/api/safety/events"))(async (ctx) => {
   const { type, severity, sessionId, category } = body;
 
   if (!type || !severity) {
-    return NextResponse.json(
-      { error: "type and severity are required" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'type and severity are required' }, { status: 400 });
   }
 
   await prisma.safetyEvent.create({
@@ -51,7 +46,7 @@ export const POST = pipe(withSentry("/api/safety/events"))(async (ctx) => {
   });
 
   // Trigger admin counts push (F-32: non-blocking, rate-limited per event type)
-  triggerAdminCountsUpdate("safety");
+  triggerAdminCountsUpdate('safety');
 
   return NextResponse.json({ success: true });
 });

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useCallback, useMemo } from "react";
-import { cn } from "@/lib/utils";
-import type { DotMatrixVisualizerProps } from "./types";
+import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import type { DotMatrixVisualizerProps } from './types';
 
 const DEFAULT_ROWS = 8;
 const DEFAULT_COLS = 10;
@@ -21,7 +21,7 @@ export function DotMatrixVisualizer({
   analyser,
   isActive,
   isSpeaking = false,
-  color = "#22d3ee", // cyan-400
+  color = '#22d3ee', // cyan-400
   rows = DEFAULT_ROWS,
   cols = DEFAULT_COLS,
   dotSize = DEFAULT_DOT_SIZE,
@@ -38,14 +38,14 @@ export function DotMatrixVisualizer({
 
   // Check for reduced motion preference
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     prefersReducedMotion.current = mediaQuery.matches;
 
     const handler = (e: MediaQueryListEvent) => {
       prefersReducedMotion.current = e.matches;
     };
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
   // Initialize level grid
@@ -70,11 +70,7 @@ export function DotMatrixVisualizer({
   const parseColor = useCallback((hex: string): [number, number, number] => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (result) {
-      return [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16),
-      ];
+      return [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)];
     }
     return [34, 211, 238]; // fallback cyan
   }, []);
@@ -86,7 +82,7 @@ export function DotMatrixVisualizer({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     // Get frequency data if analyser available (reuse buffer to avoid GC)
@@ -119,9 +115,7 @@ export function DotMatrixVisualizer({
 
         if (frequencyData && isActive) {
           // Map columns to frequency bins
-          const binIndex = Math.floor(
-            (col / cols) * (frequencyData.length / 4),
-          );
+          const binIndex = Math.floor((col / cols) * (frequencyData.length / 4));
           const frequencyValue = frequencyData[binIndex] / 255;
 
           // Map rows to amplitude thresholds (bottom rows light up first)
@@ -129,10 +123,7 @@ export function DotMatrixVisualizer({
 
           if (frequencyValue > rowThreshold * 0.5) {
             // Calculate intensity based on how much frequency exceeds threshold
-            const intensity = Math.min(
-              (frequencyValue - rowThreshold * 0.5) * 2,
-              1,
-            );
+            const intensity = Math.min((frequencyValue - rowThreshold * 0.5) * 2, 1);
             targetLevel = minOpacity + intensity * (maxOpacity - minOpacity);
           }
         } else if (isSpeaking) {
@@ -141,10 +132,8 @@ export function DotMatrixVisualizer({
         }
 
         // Smooth transition
-        const currentLevel =
-          previousLevelsRef.current[row]?.[col] ?? minOpacity;
-        const newLevel =
-          currentLevel + (targetLevel - currentLevel) * (1 - smoothing);
+        const currentLevel = previousLevelsRef.current[row]?.[col] ?? minOpacity;
+        const newLevel = currentLevel + (targetLevel - currentLevel) * (1 - smoothing);
 
         if (previousLevelsRef.current[row]) {
           previousLevelsRef.current[row][col] = newLevel;
@@ -208,13 +197,12 @@ export function DotMatrixVisualizer({
       ref={canvasRef}
       width={dimensions.width}
       height={dimensions.height}
-      className={cn("rounded-lg", className)}
+      className={cn('rounded-lg', className)}
       style={{
         width: dimensions.width,
         height: dimensions.height,
       }}
       aria-hidden="true"
-      // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- Canvas is decorative visualization, not interactive
       role="presentation"
     />
   );

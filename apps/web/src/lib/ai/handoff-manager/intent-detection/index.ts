@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- RegExp built from hardcoded subjectPatterns constants, not user input. Reviewed in PR #541. */
 /**
  * Intent detection for handoff analysis
  */
@@ -17,7 +18,11 @@ export function detectIntent(message: string): DetectedIntent {
   const lowerMessage = message.toLowerCase();
 
   // Crisis detection - includes suicidal ideation
-  if (/(?:help|aiuto|crisis|disperato|emergency|nessuno|abbandonato|morire|suicid|farla finita|non ce la faccio|voglio sparire)/i.test(lowerMessage)) {
+  if (
+    /(?:help|aiuto|crisis|disperato|emergency|nessuno|abbandonato|morire|suicid|farla finita|non ce la faccio|voglio sparire)/i.test(
+      lowerMessage,
+    )
+  ) {
     return { type: 'crisis', confidence: 0.95 };
   }
 

@@ -4,25 +4,24 @@
 // F-05: Real-time client-side performance monitoring
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   RATE_LIMITS,
   rateLimitResponse,
-} from "@/lib/rate-limit";
-
+} from '@/lib/rate-limit';
 
 export const revalidate = 0;
 interface WebVitalMetric {
-  name: "CLS" | "FCP" | "INP" | "LCP" | "TTFB";
+  name: 'CLS' | 'FCP' | 'INP' | 'LCP' | 'TTFB';
   value: number;
-  rating: "good" | "needs-improvement" | "poor";
+  rating: 'good' | 'needs-improvement' | 'poor';
   route: string;
-  deviceType: "mobile" | "tablet" | "desktop";
-  connectionType?: "4g" | "wifi" | "unknown";
+  deviceType: 'mobile' | 'tablet' | 'desktop';
+  connectionType?: '4g' | 'wifi' | 'unknown';
   userId?: string;
 }
 
@@ -34,22 +33,22 @@ interface WebVitalsPayload {
  * Validate Web Vitals payload
  */
 function validatePayload(data: unknown): data is WebVitalsPayload {
-  if (!data || typeof data !== "object") return false;
+  if (!data || typeof data !== 'object') return false;
 
   const payload = data as Partial<WebVitalsPayload>;
   if (!Array.isArray(payload.metrics)) return false;
 
   return payload.metrics.every((m) => {
     return (
-      typeof m === "object" &&
-      typeof m.name === "string" &&
-      ["CLS", "FCP", "INP", "LCP", "TTFB"].includes(m.name) &&
-      typeof m.value === "number" &&
-      typeof m.rating === "string" &&
-      ["good", "needs-improvement", "poor"].includes(m.rating) &&
-      typeof m.route === "string" &&
-      typeof m.deviceType === "string" &&
-      ["mobile", "tablet", "desktop"].includes(m.deviceType)
+      typeof m === 'object' &&
+      typeof m.name === 'string' &&
+      ['CLS', 'FCP', 'INP', 'LCP', 'TTFB'].includes(m.name) &&
+      typeof m.value === 'number' &&
+      typeof m.rating === 'string' &&
+      ['good', 'needs-improvement', 'poor'].includes(m.rating) &&
+      typeof m.route === 'string' &&
+      typeof m.deviceType === 'string' &&
+      ['mobile', 'tablet', 'desktop'].includes(m.deviceType)
     );
   });
 }
@@ -64,22 +63,22 @@ function formatMetricForGrafana(metric: WebVitalMetric): {
 } {
   // Convert metric name to Grafana metric name
   const nameMap: Record<string, string> = {
-    LCP: "web_vitals_lcp_seconds",
-    CLS: "web_vitals_cls_score",
-    INP: "web_vitals_inp_seconds",
-    TTFB: "web_vitals_ttfb_seconds",
-    FCP: "web_vitals_fcp_seconds",
+    LCP: 'web_vitals_lcp_seconds',
+    CLS: 'web_vitals_cls_score',
+    INP: 'web_vitals_inp_seconds',
+    TTFB: 'web_vitals_ttfb_seconds',
+    FCP: 'web_vitals_fcp_seconds',
   };
 
   // Convert milliseconds to seconds for time-based metrics
-  const needsConversion = ["LCP", "INP", "TTFB", "FCP"].includes(metric.name);
+  const needsConversion = ['LCP', 'INP', 'TTFB', 'FCP'].includes(metric.name);
   const value = needsConversion ? metric.value / 1000 : metric.value;
 
   // Build labels
   const labels: Record<string, string> = {
     route: metric.route,
     device_type: metric.deviceType,
-    connection_type: metric.connectionType || "unknown",
+    connection_type: metric.connectionType || 'unknown',
     rating: metric.rating,
   };
 
@@ -112,16 +111,16 @@ function formatInfluxLineProtocol(
         .map(([k, v]) => {
           // Influx Line Protocol requires escaping: backslash first, then comma/space/equals
           const escaped = v
-            .replace(/\\/g, "\\\\") // Escape backslashes first
-            .replace(/,/g, "\\,") // Escape commas
-            .replace(/ /g, "\\ ") // Escape spaces
-            .replace(/=/g, "\\="); // Escape equals
+            .replace(/\\/g, '\\\\') // Escape backslashes first
+            .replace(/,/g, '\\,') // Escape commas
+            .replace(/ /g, '\\ ') // Escape spaces
+            .replace(/=/g, '\\='); // Escape equals
           return `${k}=${escaped}`;
         })
-        .join(",");
+        .join(',');
       return `${m.name},${tags} value=${m.value} ${timestamp * 1000000}`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -133,7 +132,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
   const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
 
   if (!url || !user || !apiKey) {
-    throw new Error("Grafana Cloud not configured");
+    throw new Error('Grafana Cloud not configured');
   }
 
   // Convert all metrics to Grafana format
@@ -145,10 +144,10 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
 
   // Push to Grafana Cloud
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "text/plain",
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString("base64")}`,
+      'Content-Type': 'text/plain',
+      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
     },
     body,
   });
@@ -158,7 +157,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
     throw new Error(`Grafana push failed: ${response.status} ${text}`);
   }
 
-  logger.debug("Web Vitals pushed to Grafana", {
+  logger.debug('Web Vitals pushed to Grafana', {
     count: grafanaMetrics.length,
     metrics: grafanaMetrics.map((m) => m.name),
   });
@@ -169,19 +168,15 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * Accept Web Vitals data and push to Grafana Cloud
  */
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public metrics endpoint, no session auth, rate-limited by IP
-export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
+export const POST = pipe(withSentry('/api/metrics/web-vitals'))(async (ctx) => {
   // Rate limiting: 60 req/min per IP (F-05 protection)
   const clientId = getClientIdentifier(ctx.req);
-  const rateLimit = await checkRateLimitAsync(
-    `web-vitals:${clientId}`,
-    RATE_LIMITS.WEB_VITALS,
-  );
+  const rateLimit = await checkRateLimitAsync(`web-vitals:${clientId}`, RATE_LIMITS.WEB_VITALS);
 
   if (!rateLimit.success) {
-    logger.warn("Web Vitals rate limit exceeded", {
+    logger.warn('Web Vitals rate limit exceeded', {
       clientId,
-      endpoint: "/api/metrics/web-vitals",
+      endpoint: '/api/metrics/web-vitals',
     });
     return rateLimitResponse(rateLimit);
   }
@@ -190,27 +185,18 @@ export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
 
   // Validate payload
   if (!validatePayload(body)) {
-    return NextResponse.json(
-      { error: "Invalid payload format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid payload format' }, { status: 400 });
   }
 
   // Push to Grafana immediately (no batching)
   try {
     await pushToGrafana(body);
   } catch (error) {
-    logger.error("Failed to push Web Vitals to Grafana", {
+    logger.error('Failed to push Web Vitals to Grafana', {
       error: error instanceof Error ? error.message : String(error),
     });
-    return NextResponse.json(
-      { error: "Failed to process metrics" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to process metrics' }, { status: 500 });
   }
 
-  return NextResponse.json(
-    { success: true, count: body.metrics.length },
-    { status: 201 },
-  );
+  return NextResponse.json({ success: true, count: body.metrics.length }, { status: 201 });
 });

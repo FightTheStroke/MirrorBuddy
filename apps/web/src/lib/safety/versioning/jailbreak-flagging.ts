@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Jailbreak Flagging Service
  * Part of Ethical Design Hardening (F-15)
@@ -39,7 +40,7 @@ export function flagJailbreakAttempt(
   sessionId: string,
   content: string,
   detectedPattern: string,
-  confidence: number
+  confidence: number,
 ): JailbreakAttempt {
   const contentHash = hashContent(content);
   const isNovel = !KNOWN_PATTERNS.has(detectedPattern);
@@ -84,9 +85,7 @@ export function getPendingReviews(options: {
   minConfidence?: number;
   limit?: number;
 }): JailbreakAttempt[] {
-  let attempts = Array.from(flaggedAttempts.values()).filter(
-    (a) => a.reviewStatus === 'pending'
-  );
+  let attempts = Array.from(flaggedAttempts.values()).filter((a) => a.reviewStatus === 'pending');
 
   if (options.novelOnly) {
     attempts = attempts.filter((a) => a.isNovel);
@@ -115,7 +114,7 @@ export function getPendingReviews(options: {
 export function markReviewed(
   attemptId: string,
   status: 'false_positive' | 'confirmed',
-  addToKnownPatterns: boolean = false
+  addToKnownPatterns: boolean = false,
 ): void {
   const attempt = flaggedAttempts.get(attemptId);
   if (!attempt) {
@@ -153,14 +152,11 @@ export function getJailbreakStatistics(periodDays: number = 30): {
   topPatterns: Array<{ pattern: string; count: number }>;
 } {
   const cutoff = new Date(Date.now() - periodDays * 24 * 60 * 60 * 1000);
-  const recentAttempts = Array.from(flaggedAttempts.values()).filter(
-    (a) => a.timestamp >= cutoff
-  );
+  const recentAttempts = Array.from(flaggedAttempts.values()).filter((a) => a.timestamp >= cutoff);
 
   const patternCounts: Record<string, number> = {};
   for (const attempt of recentAttempts) {
-    patternCounts[attempt.patternType] =
-      (patternCounts[attempt.patternType] || 0) + 1;
+    patternCounts[attempt.patternType] = (patternCounts[attempt.patternType] || 0) + 1;
   }
 
   const topPatterns = Object.entries(patternCounts)
@@ -225,10 +221,11 @@ function hashContent(content: string): string {
 
 function sanitizeContent(content: string): string {
   // Remove any potential PII, keep first 100 chars
-  return content
-    .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi, '[EMAIL]')
-    .replace(/\b(?:\+39\s?)?(?:0[0-9]{1,4}[-\s]?)?[0-9]{6,10}\b/g, '[PHONE]')
-    .replace(/\b[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]\b/gi, '[CF]')
-    .slice(0, 100)
-    + (content.length > 100 ? '...' : '');
+  return (
+    content
+      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi, '[EMAIL]')
+      .replace(/\b(?:\+39\s?)?(?:0[0-9]{1,4}[-\s]?)?[0-9]{6,10}\b/g, '[PHONE]')
+      .replace(/\b[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]\b/gi, '[CF]')
+      .slice(0, 100) + (content.length > 100 ? '...' : '')
+  );
 }

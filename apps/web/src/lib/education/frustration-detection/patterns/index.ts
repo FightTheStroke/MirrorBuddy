@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- filler is regex-escaped before RegExp construction. Reviewed in PR #541. */
 /**
  * i18n-ready frustration pattern detection
  * Supports: Italian, English, Spanish, French, German
@@ -10,12 +11,7 @@ export { spanishPatterns } from './es';
 export { frenchPatterns } from './fr';
 export { germanPatterns } from './de';
 
-import type {
-  SupportedLocale,
-  LocalePatterns,
-  TextAnalysisResult,
-  PatternMatch,
-} from './types';
+import type { SupportedLocale, LocalePatterns, TextAnalysisResult, PatternMatch } from './types';
 import { italianPatterns } from './it';
 import { englishPatterns } from './en';
 import { spanishPatterns } from './es';
@@ -80,10 +76,7 @@ export function getPatterns(locale: SupportedLocale): LocalePatterns {
   return ALL_PATTERNS[locale];
 }
 
-export function analyzeText(
-  text: string,
-  locale?: SupportedLocale
-): TextAnalysisResult {
+export function analyzeText(text: string, locale?: SupportedLocale): TextAnalysisResult {
   const detectedLocale = locale || detectLocale(text);
   const matches: PatternMatch[] = [];
 
@@ -92,7 +85,9 @@ export function analyzeText(
   let confusionScore = 0;
 
   // If no locale detected, try all patterns
-  const localesToCheck = detectedLocale ? [detectedLocale] : Object.keys(ALL_PATTERNS) as SupportedLocale[];
+  const localesToCheck = detectedLocale
+    ? [detectedLocale]
+    : (Object.keys(ALL_PATTERNS) as SupportedLocale[]);
 
   for (const loc of localesToCheck) {
     const patterns = ALL_PATTERNS[loc];

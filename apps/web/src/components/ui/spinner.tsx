@@ -14,7 +14,6 @@ const sizeClasses = {
 
 export function Spinner({ className, size = 'md' }: SpinnerProps) {
   return (
-    // eslint-disable-next-line local-rules/no-literal-strings-in-jsx -- ARIA label, not user-visible text
     <Loader2 className={cn('animate-spin', sizeClasses[size], className)} aria-label="Loading" />
   );
 }

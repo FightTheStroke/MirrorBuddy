@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- RegExp built from .source of constant PII patterns (only to add the g flag), not user input. Reviewed in PR #541. */
 /**
  * Anonymization Service
  * Part of Ethical Design Hardening (F-01)
@@ -12,8 +13,8 @@ import {
   DEFAULT_ANONYMIZATION_OPTIONS,
   PIIType,
   PseudonymizationResult,
-} from "./types";
-import { getCombinedPatterns } from "./pii-patterns";
+} from './types';
+import { getCombinedPatterns } from './pii-patterns';
 import {
   EMAIL_PATTERN,
   DATE_PATTERN,
@@ -25,18 +26,13 @@ import {
   generateRandomPseudonym,
   anonymizeUserId,
   detectPII,
-} from "./anonymization-helpers";
+} from './anonymization-helpers';
 
 // Get combined patterns from all locales
 const PII_PATTERNS = getCombinedPatterns();
 
 // Re-export helper functions for public API
-export {
-  generatePseudonym,
-  generateRandomPseudonym,
-  anonymizeUserId,
-  detectPII,
-};
+export { generatePseudonym, generateRandomPseudonym, anonymizeUserId, detectPII };
 
 /**
  * Anonymize content by replacing PII with placeholders
@@ -55,13 +51,13 @@ export function anonymizeContent(
     // Create global version of name pattern for matching all occurrences
     const globalNamePattern = new RegExp(
       PII_PATTERNS.name.source,
-      PII_PATTERNS.name.flags.includes("g")
+      PII_PATTERNS.name.flags.includes('g')
         ? PII_PATTERNS.name.flags
-        : PII_PATTERNS.name.flags + "g",
+        : PII_PATTERNS.name.flags + 'g',
     );
     const matches = result.match(globalNamePattern) || [];
     if (matches.length > 0) {
-      piiTypesFound.push("name");
+      piiTypesFound.push('name');
       totalReplacements += matches.length;
       result = result.replace(globalNamePattern, PLACEHOLDERS.name);
     }
@@ -72,13 +68,11 @@ export function anonymizeContent(
     // Create global version of email pattern
     const globalEmailPattern = new RegExp(
       EMAIL_PATTERN.source,
-      EMAIL_PATTERN.flags.includes("g")
-        ? EMAIL_PATTERN.flags
-        : EMAIL_PATTERN.flags + "g",
+      EMAIL_PATTERN.flags.includes('g') ? EMAIL_PATTERN.flags : EMAIL_PATTERN.flags + 'g',
     );
     const matches = result.match(globalEmailPattern) || [];
     if (matches.length > 0) {
-      piiTypesFound.push("email");
+      piiTypesFound.push('email');
       totalReplacements += matches.length;
       result = result.replace(globalEmailPattern, PLACEHOLDERS.email);
     }
@@ -86,13 +80,9 @@ export function anonymizeContent(
 
   // Process phones
   if (opts.anonymizePhones) {
-    const phoneResult = replaceWithPatterns(
-      result,
-      PII_PATTERNS.phone,
-      PLACEHOLDERS.phone,
-    );
+    const phoneResult = replaceWithPatterns(result, PII_PATTERNS.phone, PLACEHOLDERS.phone);
     if (phoneResult.count > 0) {
-      piiTypesFound.push("phone");
+      piiTypesFound.push('phone');
       totalReplacements += phoneResult.count;
       result = phoneResult.result;
     }
@@ -103,13 +93,11 @@ export function anonymizeContent(
     // Create global version of date pattern
     const globalDatePattern = new RegExp(
       DATE_PATTERN.source,
-      DATE_PATTERN.flags.includes("g")
-        ? DATE_PATTERN.flags
-        : DATE_PATTERN.flags + "g",
+      DATE_PATTERN.flags.includes('g') ? DATE_PATTERN.flags : DATE_PATTERN.flags + 'g',
     );
     const matches = result.match(globalDatePattern) || [];
     if (matches.length > 0) {
-      piiTypesFound.push("date");
+      piiTypesFound.push('date');
       totalReplacements += matches.length;
       result = result.replace(globalDatePattern, PLACEHOLDERS.date);
     }
@@ -118,13 +106,9 @@ export function anonymizeContent(
   // Process IDs
   if (opts.anonymizeIds) {
     // Fiscal IDs first (more specific)
-    const fiscalResult = replaceWithPatterns(
-      result,
-      PII_PATTERNS.fiscalId,
-      PLACEHOLDERS.id,
-    );
+    const fiscalResult = replaceWithPatterns(result, PII_PATTERNS.fiscalId, PLACEHOLDERS.id);
     if (fiscalResult.count > 0) {
-      piiTypesFound.push("id");
+      piiTypesFound.push('id');
       totalReplacements += fiscalResult.count;
       result = fiscalResult.result;
     }
@@ -132,26 +116,22 @@ export function anonymizeContent(
     // Generic IDs
     const globalGenericIdPattern = new RegExp(
       GENERIC_ID_PATTERN.source,
-      GENERIC_ID_PATTERN.flags.includes("g")
+      GENERIC_ID_PATTERN.flags.includes('g')
         ? GENERIC_ID_PATTERN.flags
-        : GENERIC_ID_PATTERN.flags + "g",
+        : GENERIC_ID_PATTERN.flags + 'g',
     );
     const idMatches = result.match(globalGenericIdPattern) || [];
     if (idMatches.length > 0) {
-      if (!piiTypesFound.includes("id")) piiTypesFound.push("id");
+      if (!piiTypesFound.includes('id')) piiTypesFound.push('id');
       totalReplacements += idMatches.length;
       result = result.replace(globalGenericIdPattern, PLACEHOLDERS.id);
     }
   }
 
   // Always anonymize addresses
-  const addressResult = replaceWithPatterns(
-    result,
-    PII_PATTERNS.address,
-    PLACEHOLDERS.address,
-  );
+  const addressResult = replaceWithPatterns(result, PII_PATTERNS.address, PLACEHOLDERS.address);
   if (addressResult.count > 0) {
-    piiTypesFound.push("address");
+    piiTypesFound.push('address');
     totalReplacements += addressResult.count;
     result = addressResult.result;
   }
@@ -162,11 +142,11 @@ export function anonymizeContent(
       // Create global version of custom pattern
       const globalCustomPattern = new RegExp(
         pattern.source,
-        pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+        pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g',
       );
       const matches = result.match(globalCustomPattern) || [];
       if (matches.length > 0) {
-        if (!piiTypesFound.includes("custom")) piiTypesFound.push("custom");
+        if (!piiTypesFound.includes('custom')) piiTypesFound.push('custom');
         totalReplacements += matches.length;
         result = result.replace(globalCustomPattern, PLACEHOLDERS.custom);
       }
@@ -184,10 +164,7 @@ export function anonymizeContent(
  * Pseudonymize content - replace PII with consistent pseudonyms
  * Allows for reversibility if mapping is stored securely
  */
-export function pseudonymizeContent(
-  content: string,
-  salt?: string,
-): PseudonymizationResult {
+export function pseudonymizeContent(content: string, salt?: string): PseudonymizationResult {
   const mapping = new Map<string, string>();
   let result = content;
   let replacementCount = 0;
@@ -204,7 +181,7 @@ export function pseudonymizeContent(
     // Create global version of pattern for matching all occurrences
     const globalPattern = new RegExp(
       pattern.source,
-      pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+      pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g',
     );
     const matches = content.match(globalPattern) || [];
     for (const match of matches) {
@@ -212,10 +189,7 @@ export function pseudonymizeContent(
         const pseudonym = generatePseudonym(match, salt);
         mapping.set(match, pseudonym);
       }
-      result = result.replace(
-        new RegExp(escapeRegex(match), "g"),
-        mapping.get(match)!,
-      );
+      result = result.replace(new RegExp(escapeRegex(match), 'g'), mapping.get(match)!);
       replacementCount++;
     }
   }
@@ -243,8 +217,6 @@ export function anonymizeConversationMessage(
 export function containsSensitivePII(content: string): boolean {
   const piiTypes = detectPII(content);
   // Name + email/phone/address is high risk
-  const highRiskTypes: PIIType[] = ["email", "phone", "address"];
-  return (
-    piiTypes.includes("name") && piiTypes.some((t) => highRiskTypes.includes(t))
-  );
+  const highRiskTypes: PIIType[] = ['email', 'phone', 'address'];
+  return piiTypes.includes('name') && piiTypes.some((t) => highRiskTypes.includes(t));
 }

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- paths are system-generated/sanitized (separators stripped, type whitelisted); local dev-only provider. Reviewed in PR #541. */
 /**
  * Local Provider Metadata Operations
  * Metadata read/write and helper functions
@@ -45,7 +46,7 @@ export async function readMetadata(basePath: string, storagePath: string): Promi
     throw new StorageError(
       `Failed to read metadata: ${storagePath}`,
       'FILE_NOT_FOUND',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }
@@ -53,7 +54,11 @@ export async function readMetadata(basePath: string, storagePath: string): Promi
 /**
  * Write metadata to sidecar file
  */
-export async function writeMetadata(basePath: string, storagePath: string, meta: FileMetadata): Promise<void> {
+export async function writeMetadata(
+  basePath: string,
+  storagePath: string,
+  meta: FileMetadata,
+): Promise<void> {
   const metaPath = getMetaPath(basePath, storagePath);
   await ensureDir(metaPath);
   await writeFile(metaPath, JSON.stringify(meta, null, 2));
