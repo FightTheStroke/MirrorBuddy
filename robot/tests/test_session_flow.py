@@ -19,7 +19,9 @@ from reachy_mini_mirrorbuddy.mirrorbuddy_client import friend_buddy, neutral_bud
 class TestStopIntent:
     def test_stop_words(self):
         for t in ["basta", "Basta!", "zitto", "stai zitto", "fermati", "silenzio",
-                  "aspetta", "pausa", "stop", "taci", "smettila"]:
+                  "aspetta", "pausa", "stop", "taci", "smettila",
+                  "dormi", "dormire", "vai a dormire", "riposati", "spegniti",
+                  "mettiti a riposo"]:
             assert rt_messages.is_stop(t), t
 
     def test_not_stop(self):
@@ -30,8 +32,7 @@ class TestStopIntent:
 class TestEndIntent:
     def test_end_words(self):
         for t in ["abbiamo finito", "ho finito", "finito per oggi", "basta per oggi",
-                  "a domani", "ci vediamo", "arrivederci", "buonanotte", "buona notte",
-                  "vai a dormire", "spegniti", "riposati"]:
+                  "a domani", "ci vediamo", "arrivederci", "buonanotte", "buona notte"]:
             assert rt_messages.is_end(t), t
 
     def test_not_end(self):
@@ -61,6 +62,14 @@ class TestDecide:
 
     def test_awake_stop(self):
         assert session_flow.decide("basta", asleep=False) == session_flow.STOP
+
+    def test_awake_sleep_command_is_stop(self):
+        # "dormi" is a sleep command: rest immediately, no reply, wake only on "buddy".
+        for t in ["dormi", "vai a dormire", "mettiti a riposo", "riposati"]:
+            assert session_flow.decide(t, asleep=False) == session_flow.STOP, t
+
+    def test_asleep_stays_asleep_on_sleep_command(self):
+        assert session_flow.decide("dormi", asleep=True) == session_flow.IGNORE
 
     def test_awake_normal_turn(self):
         assert session_flow.decide("spiegami le frazioni", asleep=False) == session_flow.SPEAK

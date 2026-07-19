@@ -251,6 +251,12 @@ class AzureRealtimeClient:
                     _safe_cb(self.on_speech_started)  # flush local playback now
                 if self.on_sleep:
                     _safe_cb(self.on_sleep)  # settle into the rest position
+                return
+            if action == session_flow.SPEAK:
+                # The server no longer auto-creates a response (create_response=False),
+                # so we ask for one only once we've classified the turn as ordinary.
+                # This guarantees a stop/sleep word never produces a spoken reply.
+                await self._request_response()
             return
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
