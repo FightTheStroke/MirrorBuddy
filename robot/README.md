@@ -106,6 +106,12 @@ locally** — never left to the model:
   and the server is configured **not** to auto-reply — a response is only ever requested
   after an ordinary turn), settles into a calm **rest position** and **stays parked** — no
   fidgeting, no talking — until you call it back. A stop is a full stop, never a reply.
+- **Instant on-device barge-in** — the moment the child speaks *over* Buddy, playback is
+  cut on the robot itself, without waiting for the server. The Reachy Mini mic array is
+  echo-cancelled in hardware, so voice energy on the mic while Buddy is speaking is a real
+  nearby voice (not the robot hearing itself) — `audio_io.py` flushes the speaker and the
+  realtime client drops any in-flight audio right away. Sensitivity is tunable via
+  `MIRRORBUDDY_BARGE_RMS` (default `0.045`) and `MIRRORBUDDY_BARGE_FRAMES` (default `3`).
 - **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
   *«ci vediamo»*. Buddy says **one** short goodbye, then rests the same way.
 - **Wake it back up** — while resting it ignores everything **except its name**: say

@@ -111,6 +111,17 @@ class AzureRealtimeClient:
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
         self._enqueue(json.dumps({"type": "response.create"}))
 
+    def local_barge_in(self) -> None:
+        """On-device barge-in (called from the mic thread when a real voice is heard
+        over Buddy's speech). Drops in-flight model audio immediately and asks the
+        server to cancel the active response, without waiting for the server's own
+        ``speech_started``. Thread-safe: only flag writes + a queued cancel. The
+        stop/sleep/wake classification still runs on the transcript that follows."""
+        self._suppress = True  # drop any audio deltas already in flight
+        self._quiet = False  # a normal turn stays un-muted; a stop word re-mutes below
+        if self._responding:
+            self._enqueue(rt_messages.CANCEL)
+
     def _enqueue(self, msg: str) -> None:
         if self._ws is None or self._loop is None:
             return

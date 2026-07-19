@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import threading
 import time
 from collections.abc import Callable
@@ -20,6 +21,17 @@ from scipy.signal import resample_poly
 from .azure_realtime import SAMPLE_RATE
 
 logger = logging.getLogger(__name__)
+
+# On-device ("local") barge-in. The Reachy Mini mic array is echo-cancelled in
+# hardware (AEC removes the robot's own speaker audio from the mic), so energy on the
+# mic *while Buddy is speaking* means a real nearby voice — not the robot hearing
+# itself. That lets us cut playback the instant the child speaks, without waiting for
+# the server's ``speech_started`` round-trip (~200-400ms). The server path (cancel +
+# stop/sleep classification) still runs a moment later. Thresholds are env-tunable so
+# they can be adjusted in the field without a redeploy.
+_BARGE_RMS_THRESHOLD = float(os.getenv("MIRRORBUDDY_BARGE_RMS", "0.045"))  # normalised 0..1
+_BARGE_SUSTAIN_FRAMES = int(os.getenv("MIRRORBUDDY_BARGE_FRAMES", "3"))  # consecutive loud frames
+_PLAY_TTL_S = 0.25  # treat Buddy as "speaking" for this long after the last audio chunk
 
 
 def _resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
@@ -40,16 +52,23 @@ class AudioIO:
         robot,
         on_input_pcm16: Callable[[bytes], None],
         movements=None,
+        on_local_barge_in: Callable[[], None] | None = None,
     ) -> None:
         self.robot = robot
         self.on_input_pcm16 = on_input_pcm16
         self.movements = movements
+        # Called from the mic thread the instant a real voice is heard over Buddy's
+        # own speech (local barge-in). Wired by the controller to the realtime client
+        # so in-flight model audio is suppressed immediately.
+        self.on_local_barge_in = on_local_barge_in
 
         self._recording = False
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._in_rate: int | None = None
         self._out_rate: int | None = None
+        self._playing_until = 0.0  # monotonic deadline: Buddy is "speaking" until then
+        self._loud_frames = 0  # consecutive over-threshold mic frames (barge-in debounce)
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
@@ -101,6 +120,8 @@ class AudioIO:
         """Play model speech (PCM16 @ realtime rate) through the robot speaker."""
         if not pcm16:
             return
+        # Mark Buddy as speaking so the mic loop knows to watch for a barge-in.
+        self._playing_until = time.monotonic() + _PLAY_TTL_S
         audio = np.frombuffer(pcm16, dtype=np.int16)
 
         # Lip-sync / head movement is driven by the raw speech signal.
@@ -126,6 +147,9 @@ class AudioIO:
 
     def interrupt(self) -> None:
         """Stop current playback (barge-in) and reset movement state."""
+        # Playback is being cut: stop watching for a barge-in until the next chunk.
+        self._playing_until = 0.0
+        self._loud_frames = 0
         # clear_output_buffer() is deprecated and a no-op on this firmware; clear_player()
         # actually flushes the queued speaker audio so speech stops immediately.
         try:
@@ -163,6 +187,25 @@ class AudioIO:
                         audio = (np.clip(audio, -1.0, 1.0) * 32767).astype(np.int16)
                     else:
                         audio = audio.astype(np.int16)
+
+                # Local barge-in: if the (echo-cancelled) mic hears a sustained voice
+                # while Buddy is speaking, cut playback instantly — no server round-trip.
+                if self.on_local_barge_in is not None and audio.size and time.monotonic() < self._playing_until:
+                    rms = float(np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2)))
+                    if rms >= _BARGE_RMS_THRESHOLD:
+                        self._loud_frames += 1
+                        if self._loud_frames >= _BARGE_SUSTAIN_FRAMES:
+                            self._loud_frames = 0
+                            logger.info("Local barge-in (rms=%.3f) — cutting playback now", rms)
+                            self.interrupt()  # flush our speaker immediately
+                            try:
+                                self.on_local_barge_in()  # tell the client to drop in-flight audio
+                            except Exception as e:  # pragma: no cover - runtime robustness
+                                logger.debug("local barge-in callback error: %s", e)
+                    else:
+                        self._loud_frames = 0
+                else:
+                    self._loud_frames = 0
 
                 # Resample microphone -> realtime rate.
                 if needs_resample and audio.size:
