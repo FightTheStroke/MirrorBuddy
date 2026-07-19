@@ -94,6 +94,7 @@ export function createMockPrisma() {
     rateLimitEvent: createModelMock(),
     researchExperiment: createModelMock(),
     researchResult: createModelMock(),
+    robotDevice: createModelMock(),
     sSOSession: createModelMock(),
     safetyEvent: createModelMock(),
     scheduledSession: createModelMock(),
