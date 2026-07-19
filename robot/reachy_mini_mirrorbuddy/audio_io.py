@@ -73,6 +73,8 @@ class AudioIO:
         on_input_pcm16: Callable[[bytes], None],
         movements=None,
         on_local_barge_in: Callable[[], None] | None = None,
+        barge_rms_threshold: float | None = None,
+        barge_sustain_frames: int | None = None,
     ) -> None:
         self.robot = robot
         self.on_input_pcm16 = on_input_pcm16
@@ -89,10 +91,14 @@ class AudioIO:
         self._out_rate: int | None = None
         self._playing_until = 0.0  # monotonic deadline: Buddy is "speaking" until then
         self._loud_frames = 0  # consecutive over-threshold mic frames (barge-in debounce)
-        # Read env-tunable thresholds now — construction happens after main.run()
-        # has loaded the instance .env, so field overrides are honoured.
-        self._barge_rms_threshold = _barge_rms_threshold()
-        self._barge_sustain_frames = _barge_sustain_frames()
+        # Barge-in thresholds: prefer values passed by the caller (from Config, read
+        # after the instance .env loads); fall back to the env/defaults for standalone use.
+        self._barge_rms_threshold = (
+            barge_rms_threshold if barge_rms_threshold is not None else _barge_rms_threshold()
+        )
+        self._barge_sustain_frames = (
+            barge_sustain_frames if barge_sustain_frames is not None else _barge_sustain_frames()
+        )
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:

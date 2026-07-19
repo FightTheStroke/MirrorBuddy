@@ -110,8 +110,9 @@ locally** — never left to the model:
   cut on the robot itself, without waiting for the server. The Reachy Mini mic array is
   echo-cancelled in hardware, so voice energy on the mic while Buddy is speaking is a real
   nearby voice (not the robot hearing itself) — `audio_io.py` flushes the speaker and the
-  realtime client drops any in-flight audio right away. Sensitivity is tunable via
-  `MIRRORBUDDY_BARGE_RMS` (default `0.045`) and `MIRRORBUDDY_BARGE_FRAMES` (default `3`).
+  realtime client drops any in-flight audio right away. Sensitivity is configurable from
+  the robot's **settings page** ("Sensibilità basta") — or via `MIRRORBUDDY_BARGE_RMS`
+  (default `0.045`, lower = more sensitive) and `MIRRORBUDDY_BARGE_FRAMES` (default `3`).
 - **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
   *«ci vediamo»*. Buddy says **one** short goodbye, then rests the same way.
 - **Wake it back up** — while resting it ignores everything **except its name**: say
