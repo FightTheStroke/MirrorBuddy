@@ -45,6 +45,7 @@ const EXPECTED_SCHEMA_FILES = [
   'communications.prisma', // EmailTemplate, EmailCampaign, EmailRecipient, EmailPreference, EmailEvent
   'maintenance.prisma', // MaintenanceWindow (planned outages/maintenance)
   'waitlist.prisma', // WaitlistEntry (coming soon waitlist)
+  'robot-device.prisma', // RobotDevice (Reachy Mini device pairing)
 ];
 
 // Expected models that should be present across all schema files
@@ -145,6 +146,8 @@ const EXPECTED_MODELS = [
   'MaintenanceWindow',
   // waitlist.prisma
   'WaitlistEntry',
+  // robot-device.prisma
+  'RobotDevice',
 ];
 
 describe('Prisma Schema Split', () => {
