@@ -2166,7 +2166,11 @@ jobs:
       - name: Promote staging → production
         run: |
           echo "🚀 Promoting $STAGING_URL to production..."
-          vercel promote "$STAGING_URL" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --yes
+          # --timeout=0: return immediately after requesting the promotion. vercel
+          # promote otherwise waits for completion with a 3m default, but the
+          # production rebuild takes ~5min, so without this the command would fail
+          # before the polling loop below runs. Readiness is verified by the poll.
+          vercel promote "$STAGING_URL" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --timeout=0 --yes
           echo "✅ Promote command issued"
 
       - name: Wait for production to go live (alias flip + health)
