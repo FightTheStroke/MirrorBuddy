@@ -28,6 +28,8 @@ _EDITABLE_KEYS = (
     "MIRRORBUDDY_MAESTRO_ID",
     "MIRRORBUDDY_DSA_PROFILE",
     "MIRRORBUDDY_STUDENT_NAME",
+    "MIRRORBUDDY_DEVICE_TOKEN",
+    "MIRRORBUDDY_API_BASE",
 )
 
 
@@ -54,6 +56,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
                 "studentName": config.STUDENT_NAME,
                 "mirrorbuddyUrl": config.MIRRORBUDDY_URL,
                 "locale": config.LOCALE,
+                "paired": bool(config.DEVICE_TOKEN),
             }
         )
 
@@ -94,6 +97,47 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
         config.reload()
         return JSONResponse({"ok": True, "ready": not config.missing(), "missing": config.missing()})
 
+    @app.post("/api/pair")
+    async def pair(request: Request) -> JSONResponse:
+        """Redeem a pairing code from the parent's MirrorBuddy settings for a device token."""
+        import httpx
+
+        try:
+            body = await request.json()
+            code = str((body or {}).get("code") or "").strip()
+        except Exception:
+            return JSONResponse({"ok": False, "error": "invalid JSON"}, status_code=400)
+        if not code:
+            return JSONResponse({"ok": False, "error": "codice mancante"}, status_code=400)
+
+        api_base = config.API_BASE.rstrip("/")
+        try:
+            resp = httpx.post(
+                f"{api_base}/api/devices/pair",
+                json={"code": code},
+                timeout=15.0,
+                headers={"accept": "application/json"},
+            )
+        except Exception as e:
+            logger.error("pair request failed: %s", e)
+            return JSONResponse({"ok": False, "error": "robot non connesso a internet"}, status_code=502)
+
+        if resp.status_code != 200:
+            return JSONResponse({"ok": False, "error": "codice non valido o scaduto"}, status_code=400)
+
+        token = str((resp.json() or {}).get("token") or "").strip()
+        if not token:
+            return JSONResponse({"ok": False, "error": "risposta non valida"}, status_code=502)
+
+        try:
+            _write_env(env_path, {"MIRRORBUDDY_DEVICE_TOKEN": token})
+        except Exception as e:
+            logger.error("failed to store device token: %s", e)
+            return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+
+        config.reload()
+        return JSONResponse({"ok": True, "paired": True})
+
 
 def _write_env(env_path: Path, updates: dict[str, str]) -> None:
     """Merge ``updates`` into the .env file, preserving existing keys."""
@@ -132,6 +176,15 @@ _PAGE = """<!doctype html>
 <body>
 <h1>🤖 MirrorBuddy Robot</h1>
 <div id="status" class="status warn">Carico…</div>
+
+<h2 style="font-size:1.1rem;margin-top:1.4rem">👤 Profilo del bambino</h2>
+<div id="pairState" class="status warn">Non collegato a nessun profilo.</div>
+<label>Codice di collegamento (dalle Impostazioni di MirrorBuddy del genitore)</label>
+<input id="pairCode" inputmode="numeric" maxlength="6" placeholder="123456"/>
+<button onclick="pair()">Collega al profilo</button>
+<p><small>Il robot userà nome, materie e impostazioni di accessibilità del bambino loggato. Nessuna password lascia il computer del genitore.</small></p>
+
+<h2 style="font-size:1.1rem;margin-top:1.4rem">🔧 Configurazione robot</h2>
 <label>Endpoint Azure Realtime</label>
 <input id="AZURE_OPENAI_REALTIME_ENDPOINT" placeholder="https://<risorsa>.openai.azure.com/"/>
 <label>Azure API key</label>
@@ -162,6 +215,9 @@ async function load(){
  const box=document.getElementById('status');
  if(s.ready){box.className='status ok';box.textContent='✅ Pronto';}
  else{box.className='status warn';box.textContent='⚠️ Manca: '+(s.missing||[]).join(', ');}
+ const ps=document.getElementById('pairState');
+ if(s.paired){ps.className='status ok';ps.textContent='✅ Collegato al profilo del bambino.';}
+ else{ps.className='status warn';ps.textContent='Non collegato a nessun profilo.';}
  for(const k of ['MIRRORBUDDY_DSA_PROFILE','MIRRORBUDDY_STUDENT_NAME']){
   if(s[k==='MIRRORBUDDY_DSA_PROFILE'?'dsaProfile':'studentName']) document.getElementById(k).value=s[k==='MIRRORBUDDY_DSA_PROFILE'?'dsaProfile':'studentName'];
  }
@@ -178,6 +234,14 @@ async function save(){
  const r=await (await fetch('./api/config',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)})).json();
  load();
  alert(r.ok?'Salvato!':'Errore: '+(r.error||'?'));
+}
+async function pair(){
+ const code=document.getElementById('pairCode').value.trim();
+ if(!code){alert('Inserisci il codice');return;}
+ const r=await (await fetch('./api/pair',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code})})).json();
+ if(r.ok){document.getElementById('pairCode').value='';}
+ load();
+ alert(r.ok?'Collegato al profilo del bambino!':'Errore: '+(r.error||'?'));
 }
 load();
 </script>
