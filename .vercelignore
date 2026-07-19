@@ -1,1 +1,15 @@
 feature/
+# --- local-only artifacts (manual CLI deploy) ---
+.git
+node_modules
+**/node_modules
+.next
+**/.next
+.codegraph
+worktrees
+coverage
+playwright-report
+test-results
+blob-report
+*.log
+.turbo
