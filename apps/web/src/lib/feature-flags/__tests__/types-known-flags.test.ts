@@ -22,6 +22,10 @@ const _whisperRtCheck: AssertWhisperRtInUnion = true;
 type AssertTranslateInUnion = 'voice_realtime_translate' extends KnownFeatureFlag ? true : never;
 const _translateCheck: AssertTranslateInUnion = true;
 
+// ADR 0169: Azure voice 2026-07 wave
+type AssertVoiceRealtime21InUnion = 'voice_realtime_21' extends KnownFeatureFlag ? true : never;
+const _voiceRealtime21Check: AssertVoiceRealtime21InUnion = true;
+
 describe('KnownFeatureFlag type', () => {
   it('includes all expected flags in the known flag string values', () => {
     const knownFlags: KnownFeatureFlag[] = [
@@ -44,14 +48,16 @@ describe('KnownFeatureFlag type', () => {
       'chat_unified_view',
       'consent_unified_model',
       'voice_realtime_2',
+      'voice_realtime_21',
       'voice_realtime_whisper_transcription',
       'voice_realtime_translate',
     ];
     expect(knownFlags).toContain('voice_realtime_15');
     expect(knownFlags).toContain('tts_audio_15');
     expect(knownFlags).toContain('voice_realtime_2');
+    expect(knownFlags).toContain('voice_realtime_21');
     expect(knownFlags).toContain('voice_realtime_whisper_transcription');
     expect(knownFlags).toContain('voice_realtime_translate');
-    expect(knownFlags.length).toBe(21);
+    expect(knownFlags.length).toBe(22);
   });
 });

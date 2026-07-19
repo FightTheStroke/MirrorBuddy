@@ -40,19 +40,26 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
   const useV15 = isFeatureEnabled('voice_realtime_15')?.enabled ?? false;
   // ADR 0165: voice_realtime_2 takes precedence over V15.
   const useV2 = isFeatureEnabled('voice_realtime_2')?.enabled ?? false;
+  // ADR 0169: voice_realtime_21 takes precedence over V2.
+  const useV21 = isFeatureEnabled('voice_realtime_21')?.enabled ?? false;
 
   // Azure OpenAI Realtime configuration (required)
   // Use .trim() to handle env vars with trailing whitespace/newlines
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
-  const azureDeployment = useV2
-    ? (process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim() ||
+  const azureDeployment = useV21
+    ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21?.trim() ||
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim() ||
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
+      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
+    : useV2
+      ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim() ||
         process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
-        process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim())
-    : useV15
-      ? (process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
-          process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim())
-      : process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
+        process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
+      : useV15
+        ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
+          process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
+        : process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
 
   // Validate Azure configuration
   const missingConfig: string[] = [];

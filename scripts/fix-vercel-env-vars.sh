@@ -33,6 +33,7 @@ done
 
 # Variables that are dev/test/iOS only — NEVER sync to Vercel
 SKIP_VARS=(
+	"AZURE_OPENAI_REALTIME_DEPLOYMENT_V21"
 	"DEV_DATABASE_URL"
 	"TEST_DATABASE_URL"
 	"TEST_DIRECT_URL"

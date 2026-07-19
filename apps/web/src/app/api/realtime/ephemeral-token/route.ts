@@ -96,6 +96,8 @@ export const POST = pipe(
   const azureDeploymentV15 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim();
   // ADR 0165: gpt-realtime-2 Preview deployment — wins over V15/legacy when flag on
   const azureDeploymentV2 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim();
+  // ADR 0169: gpt-realtime-2.1 deployment — wins over V2/V15/legacy when flag on
+  const azureDeploymentV21 = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21?.trim();
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
   const rateLimit = await checkRateLimitAsync(
@@ -118,11 +120,15 @@ export const POST = pipe(
   const useRealtime15 = await isFeatureEnabled('voice_realtime_15');
   // ADR 0165: voice_realtime_2 takes precedence over V15 and legacy.
   const useRealtime2 = await isFeatureEnabled('voice_realtime_2');
-  const azureDeployment = useRealtime2.enabled
-    ? azureDeploymentV2 || azureDeploymentV15 || azureDeploymentLegacy
-    : useRealtime15.enabled
-      ? azureDeploymentV15 || azureDeploymentLegacy
-      : azureDeploymentLegacy;
+  // ADR 0169: voice_realtime_21 takes precedence over V2/V15/legacy.
+  const useRealtime21 = await isFeatureEnabled('voice_realtime_21');
+  const azureDeployment = useRealtime21.enabled
+    ? azureDeploymentV21 || azureDeploymentV2 || azureDeploymentV15 || azureDeploymentLegacy
+    : useRealtime2.enabled
+      ? azureDeploymentV2 || azureDeploymentV15 || azureDeploymentLegacy
+      : useRealtime15.enabled
+        ? azureDeploymentV15 || azureDeploymentLegacy
+        : azureDeploymentLegacy;
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
@@ -130,11 +136,13 @@ export const POST = pipe(
   if (!azureApiKey) missingConfig.push('AZURE_OPENAI_REALTIME_API_KEY');
   if (!azureDeployment) {
     missingConfig.push(
-      useRealtime2.enabled
-        ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2'
-        : useRealtime15.enabled
-          ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15'
-          : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
+      useRealtime21.enabled
+        ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21'
+        : useRealtime2.enabled
+          ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2'
+          : useRealtime15.enabled
+            ? 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15'
+            : 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
     );
   }
 
