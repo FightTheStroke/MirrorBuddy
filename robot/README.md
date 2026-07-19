@@ -100,12 +100,14 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 Insistence is stressful for the child, so these are handled **deterministically and
 locally** — never left to the model:
 
-- **Stop / rest now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*.
-  Buddy goes silent immediately (local audio flush + turn cancel), settles into a calm
-  **rest position** and **stays parked** — no fidgeting, no talking — until you call it back.
-  A stop is a full stop, not a brief pause that resumes on the next sound.
+- **Stop / rest now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*, or
+  the explicit sleep command *«dormi»* / *«vai a dormire»* / *«riposati»*.
+  Buddy goes silent **immediately and says nothing back** (local audio flush + turn cancel,
+  and the server is configured **not** to auto-reply — a response is only ever requested
+  after an ordinary turn), settles into a calm **rest position** and **stays parked** — no
+  fidgeting, no talking — until you call it back. A stop is a full stop, never a reply.
 - **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
-  *«vai a dormire»*. Buddy says **one** short goodbye, then rests the same way.
+  *«ci vediamo»*. Buddy says **one** short goodbye, then rests the same way.
 - **Wake it back up** — while resting, say its name *«Buddy»* (or *«svegliati»*, *«ci sei?»*).
   Buddy wakes with a small gesture, greets again and asks what you'd like to do.
 

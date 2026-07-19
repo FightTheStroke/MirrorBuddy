@@ -54,6 +54,6 @@ def turn_detection_config(name: str | None) -> dict:
         "threshold": p.threshold,
         "prefix_padding_ms": p.prefix_padding_ms,
         "silence_duration_ms": p.silence_duration_ms,
-        "create_response": True,
+        "create_response": False,
         "interrupt_response": True,
     }

@@ -20,7 +20,8 @@ CANCEL = json.dumps({"type": "response.cancel"})
 # This is an accessibility requirement: insistence stresses the student.
 _STOP_RE = re.compile(
     r"\b(basta|ferma(?:ti|te|lo)?|zitt[oaie]|silenzio|silence|aspetta|"
-    r"pausa|stop|taci|smettila|smetti|shh+|sh+t?)\b",
+    r"pausa|stop|taci|smettila|smetti|shh+|sh+t?|"
+    r"dormi|dormire|riposati|riposa|spegniti|mettiti\s+a\s+riposo)\b",
     re.IGNORECASE,
 )
 
@@ -38,7 +39,6 @@ _END_RE = re.compile(
     r"(?:abbiamo|ho|hai)\s+(?:finito|terminato|concluso)|"
     r"finito\s+per\s+oggi|basta\s+(?:studiare|compiti|per\s+oggi)|"
     r"a\s+domani|ci\s+vediamo|arrivederci|buonanotte|buona\s+notte|"
-    r"(?:vai\s+a|puoi|vatti\s+a)\s+dormire|riposati|spegniti|"
     r"abbiamo\s+finito"
     r")\b",
     re.IGNORECASE,
