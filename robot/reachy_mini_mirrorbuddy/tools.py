@@ -47,15 +47,20 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "type": "function",
         "name": "look_at_homework",
         "description": (
-            "Scatta una foto con la telecamera per guardare il compito o l'esercizio che lo studente mostra, "
-            "poi leggilo e aiuta. Annuncia sempre a voce che stai guardando prima di usarlo."
+            "Scatta una foto con la telecamera per guardare cio' che lo studente mostra e aiutarlo: "
+            "un compito o esercizio, la pagina di un quaderno o di un libro appoggiato sul tavolo, "
+            "lo schermo del computer, una mappa o una figura. Leggi cosa c'e' scritto e aiuta. "
+            "Annuncia sempre a voce che stai guardando prima di usarlo."
         ),
         "parameters": {
             "type": "object",
             "properties": {
                 "question": {
                     "type": "string",
-                    "description": "Cosa guardare o su cosa aiutare (es. 'leggi il problema', 'controlla l'operazione').",
+                    "description": (
+                        "Cosa guardare o su cosa aiutare (es. 'leggi il problema', 'che pagina e' del libro', "
+                        "'controlla l'operazione', 'cosa c'e' sullo schermo')."
+                    ),
                 }
             },
             "required": [],

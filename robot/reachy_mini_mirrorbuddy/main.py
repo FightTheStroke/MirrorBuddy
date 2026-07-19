@@ -20,7 +20,7 @@ from reachy_mini import ReachyMini, ReachyMiniApp
 from .audio_io import AudioIO
 from .config import config
 from .controller import Controller
-from .mirrorbuddy_client import MirrorBuddyClient
+from .mirrorbuddy_client import MirrorBuddyClient, neutral_buddy
 from .movements import Movements, temperament_for
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,12 @@ def run(
     mb = MirrorBuddyClient(config.MIRRORBUDDY_URL, locale=config.LOCALE)
     try:
         maestri = mb.fetch_maestri()
-        maestro = mb.pick(maestri, config.MAESTRO_ID)
+        if config.MAESTRO_ID:
+            maestro = mb.pick(maestri, config.MAESTRO_ID)  # profile pinned this Maestro
+        elif config.START_NEUTRAL:
+            maestro = neutral_buddy(config.STUDENT_NAME, config.BUDDY_VOICE)  # neutral organiser
+        else:
+            maestro = mb.pick(maestri, None)
     except Exception as e:
         logger.error("Could not load Maestri from MirrorBuddy (%s): %s", config.MIRRORBUDDY_URL, e)
         sys.exit(1)
@@ -102,7 +107,8 @@ def run(
     # --- assemble the pipeline -------------------------------------------------
     follow_face = config.FOLLOW_FACE and config.ENABLE_CAMERA and not args.no_camera
     temperament = temperament_for(maestro.subject, maestro.teaching_style, maestro.voice_instructions)
-    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament, follow_face=follow_face)
+    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament,
+                          follow_face=follow_face, calm=config.CALM_MOVEMENT)
 
     audio = AudioIO(robot, on_input_pcm16=lambda b: None, movements=movements)
 

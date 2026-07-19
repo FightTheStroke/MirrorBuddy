@@ -139,8 +139,9 @@ class Controller:
             client.send_function_result(call_id, "Non riesco a vedere bene, avvicina il foglio e riproviamo.")
             return
         question = str(args.get("question") or "").strip() or (
-            "Guarda la foto del compito dello studente, leggi cosa c'e' scritto e aiutalo passo passo, "
-            "senza dare la risposta pronta."
+            "Guarda la foto: puo' essere un compito, la pagina di un quaderno o di un libro, "
+            "o lo schermo. Leggi cosa c'e' scritto e aiuta lo studente passo passo, senza dare "
+            "la risposta pronta."
         )
         # Privacy: we already announced verbally; hand the still frame to the model.
         client.send_function_result(call_id, "Ho guardato il tuo compito.", respond=False)

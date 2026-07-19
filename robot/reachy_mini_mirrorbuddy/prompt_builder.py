@@ -31,10 +31,19 @@ _TOOLS_IT = (
     "matematica», «chiama Galileo», «parliamo di storia»), DEVI usare SUBITO lo strumento "
     "'call_professor' con quel nome o materia. Non limitarti a rispondere a parole né a fingere "
     "di cambiare: chiama davvero lo strumento, sarà lui a cambiare persona e voce.\n"
-    "- Se ti mostra un compito, un esercizio o un foglio, usa 'look_at_homework'. Prima dì a voce "
-    "che stai per guardare (es. «fammi dare un'occhiata»); poi resta fermo, non muovere la testa, "
-    "perché il robot si ferma da solo per scattare una foto nitida. Non spiare mai: usa la "
-    "telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone."
+    "- Se ti mostra qualcosa da guardare — un compito, un esercizio, un foglio, la pagina di un "
+    "quaderno o di un libro sul tavolo, oppure lo schermo del computer — usa 'look_at_homework'. "
+    "Prima dì a voce che stai per guardare (es. «fammi dare un'occhiata»); poi resta fermo, non "
+    "muovere la testa, perché il robot si ferma da solo per scattare una foto nitida. Non spiare "
+    "mai: usa la telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone."
+)
+
+_CONTROL_IT = (
+    "Regole di conversazione: tieni ogni risposta corta e poi lascia parlare lo studente. "
+    "Lo studente può interromperti in qualsiasi momento: se inizia a parlare, fermati subito e "
+    "ascolta. Se dice «basta», «aspetta», «pausa», «fermati», «zitto» o «un momento», smetti "
+    "immediatamente di parlare, resta in silenzio e aspetta con calma che riprenda lui. "
+    "Non riprendere finché non te lo chiede."
 )
 
 
@@ -66,9 +75,10 @@ def build_instructions(
     if persona:
         parts.append("\n".join(persona))
 
-    # 4. Robot embodiment + voice-driven tools.
+    # 4. Robot embodiment + voice-driven tools + conversation control.
     parts.append(_EMBODIMENT_IT)
     parts.append(_TOOLS_IT)
+    parts.append(_CONTROL_IT)
 
     # 5. Student personalisation + DSA sensitivity.
     student_bits: list[str] = []

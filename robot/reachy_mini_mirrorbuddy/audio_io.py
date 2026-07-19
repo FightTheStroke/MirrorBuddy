@@ -113,10 +113,15 @@ class AudioIO:
 
     def interrupt(self) -> None:
         """Stop current playback (barge-in) and reset movement state."""
+        # clear_output_buffer() is deprecated and a no-op on this firmware; clear_player()
+        # actually flushes the queued speaker audio so speech stops immediately.
         try:
-            self.robot.media.audio.clear_output_buffer()
+            self.robot.media.audio.clear_player()
         except Exception:
-            pass
+            try:
+                self.robot.media.audio.clear_output_buffer()
+            except Exception:
+                pass
         if self.movements is not None:
             try:
                 self.movements.reset()

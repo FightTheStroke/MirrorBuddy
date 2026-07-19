@@ -1,9 +1,8 @@
 """Azure OpenAI Realtime client over WebSocket.
 
-Runs an asyncio event loop in its own thread and bridges to the (threaded) robot
-audio I/O: microphone PCM in, model speech + transcripts + tool calls out. Audio is
-16-bit PCM mono at :data:`SAMPLE_RATE` Hz. Both Realtime GA and Preview event names
-are handled. Message payloads are built in :mod:`rt_messages`.
+Runs an asyncio loop in its own thread and bridges the (threaded) robot audio I/O:
+microphone PCM in, model speech + transcripts + tool calls out. Audio is 16-bit PCM
+mono at :data:`SAMPLE_RATE` Hz. Payloads are built in :mod:`rt_messages`.
 """
 
 from __future__ import annotations
@@ -64,19 +63,17 @@ class AzureRealtimeClient:
         self._ws: websockets.WebSocketClientProtocol | None = None
         self._stop = threading.Event()
         self._ready = threading.Event()
+        self._responding = False  # a model response is currently streaming
+        self._suppress = False  # drop in-flight audio after a barge-in cancel
 
-    # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
-        """Start the client (connects in a background thread)."""
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
         self._thread.start()
 
     def wait_ready(self, timeout: float = 20.0) -> bool:
-        """Block until the session is configured (or timeout)."""
         return self._ready.wait(timeout)
 
     def stop(self) -> None:
-        """Signal shutdown and close the socket."""
         self._stop.set()
         loop = self._loop
         ws = self._ws
@@ -90,9 +87,7 @@ class AzureRealtimeClient:
         if self._thread:
             self._thread.join(timeout)
 
-    # ------------------------------------------------------------------ send API
     def send_audio_pcm16(self, pcm16: bytes) -> None:
-        """Thread-safe: append a chunk of microphone PCM16 audio."""
         if not pcm16 or self._ws is None or self._loop is None:
             return
         b64 = base64.b64encode(pcm16).decode("ascii")
@@ -102,13 +97,13 @@ class AzureRealtimeClient:
             pass
 
     def send_function_result(self, call_id: str, output: str, respond: bool = True) -> None:
-        """Thread-safe: answer a function call, then let the model continue speaking."""
+        """Answer a function call, then let the model continue speaking."""
         self._enqueue(json.dumps(rt_messages.function_call_output(call_id, output)))
         if respond:
             self._enqueue(json.dumps({"type": "response.create"}))
 
     def send_image(self, data_url: str, prompt: str) -> None:
-        """Thread-safe: hand the model a camera frame plus a question about it."""
+        """Hand the model a camera frame plus a question about it."""
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
         self._enqueue(json.dumps({"type": "response.create"}))
 
@@ -120,7 +115,6 @@ class AzureRealtimeClient:
         except Exception:
             pass
 
-    # ------------------------------------------------------------------ internals
     def _run(self) -> None:
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
@@ -140,7 +134,6 @@ class AzureRealtimeClient:
                 logger.debug("send failed: %s", e)
 
     async def _connect_and_listen(self) -> None:
-        # GA uses the api-key header; keep the same header for Preview too.
         headers = {"api-key": self.api_key}
         logger.info("Connecting to Azure Realtime: %s", self.ws_url.split("?")[0])
         async with websockets.connect(
@@ -171,10 +164,10 @@ class AzureRealtimeClient:
 
     async def _greet(self) -> None:
         """Have the Maestro speak first."""
-        if not self.greeting:
-            instructions = "Saluta calorosamente e presentati brevemente, poi chiedi da cosa vuole partire."
-        else:
-            instructions = f"Di' esattamente, con calore: «{self.greeting}»"
+        instructions = (
+            f"Di' esattamente, con calore: «{self.greeting}»" if self.greeting
+            else "Saluta calorosamente e presentati brevemente, poi chiedi da cosa vuole partire."
+        )
         await self._safe_send(json.dumps({"type": "response.create", "response": {"instructions": instructions}}))
 
     async def _handle_event(self, event: dict) -> None:
@@ -188,31 +181,38 @@ class AzureRealtimeClient:
                 await self._greet()
             return
 
-        # Assistant speech audio (GA + Preview event names).
         if etype in ("response.output_audio.delta", "response.audio.delta"):
+            if self._suppress:
+                return  # dropped: user barged in, this response is being cancelled
             b64 = event.get("delta") or event.get("audio")
             if b64 and self.on_output_audio:
                 _safe_cb(self.on_output_audio, base64.b64decode(b64))
             return
 
-        # User started speaking -> barge-in / interrupt current playback.
-        if etype == "input_audio_buffer.speech_started" and self.on_speech_started:
-            _safe_cb(self.on_speech_started)
+        if etype == "response.created":
+            self._responding = True
+            self._suppress = False
+            return
+        if etype == "response.done":
+            self._responding = False
             return
 
-        # Assistant transcript (for logs / captions).
-        if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
-            delta = event.get("delta") or ""
-            if delta and self.on_transcript:
-                _safe_cb(self.on_transcript, delta, False)
+        # User started speaking -> barge-in: cancel the model's turn server-side and
+        # suppress any audio still in flight, then stop local playback.
+        if etype == "input_audio_buffer.speech_started":
+            self._suppress = True
+            if self._responding:
+                await self._safe_send(json.dumps({"type": "response.cancel"}))
+            if self.on_speech_started:
+                _safe_cb(self.on_speech_started)
             return
+
         if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):
             text = event.get("transcript") or ""
             if text and self.on_transcript:
                 _safe_cb(self.on_transcript, text, True)
             return
 
-        # Function call: capture the tool name when the item is announced.
         if etype == "response.output_item.added":
             item = event.get("item") or {}
             if item.get("type") == "function_call":
