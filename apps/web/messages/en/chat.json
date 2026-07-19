@@ -577,6 +577,10 @@
       },
       "listen": "Listen to the message",
       "dismiss": "Got it, close"
+    },
+    "coachOpener": {
+      "general": "Hi! I'm {coach}, your study coach. Before we start, tell me: which subject do you want to work on, what do you want to do, and how much time do you have? Then I'll introduce the right Maestro. 😊",
+      "withSubject": "Hi! I'm {coach}, your study coach. Today we're working on {subject} — let me introduce the right Maestro! 😊"
     }
   }
 }

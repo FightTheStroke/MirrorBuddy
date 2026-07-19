@@ -13,11 +13,13 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { useTTS } from '@/components/accessibility';
 import { ToolResultDisplay } from '@/components/tools';
-import { useUIStore } from '@/lib/stores';
+import { useUIStore, useSettingsStore } from '@/lib/stores';
+import { buildCoachOpener } from './coach-opener';
 import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
 import { MaestroSessionHandoff } from './maestro-session-handoff';
@@ -68,6 +70,12 @@ export function MaestroSession({
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
   const unifiedCharacter = maestroToUnified(maestro);
 
+  const t = useTranslations('chat');
+  const preferredCoach = useSettingsStore((s) => s.studentProfile.preferredCoach);
+  // Neutral opener on behalf of the child's chosen coach (falls back to Melissa)
+  // so a session never starts straight in a subject Maestro's persona.
+  const coachOpener = buildCoachOpener(preferredCoach, subjectLabel, t);
+
   // Prevent screen sleep during active sessions
   useWakeLock(true);
 
@@ -101,7 +109,13 @@ export function MaestroSession({
     requestTool,
     handleRequestPhoto,
     loadConversation,
-  } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType, contextMessage });
+  } = useMaestroSessionLogic({
+    maestro,
+    initialMode,
+    requestedToolType,
+    contextMessage,
+    coachOpener,
+  });
 
   // Build unified voice state and actions
   const voiceState: VoiceState = {

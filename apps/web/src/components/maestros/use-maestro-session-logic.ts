@@ -16,6 +16,14 @@ interface UseMaestroSessionLogicProps {
   initialMode: 'voice' | 'chat';
   requestedToolType?: ToolType;
   contextMessage?: string;
+  /**
+   * Neutral study-coach opener shown as the first assistant message so a session
+   * never starts by dropping the child straight into a subject Maestro's persona.
+   * Built (localized) by the caller from the profile's preferred coach. When the
+   * child starts a voice call this message is passed to the realtime model as
+   * conversation context, so voice inherits the same neutral framing.
+   */
+  coachOpener?: string;
 }
 
 export function useMaestroSessionLogic({
@@ -23,6 +31,7 @@ export function useMaestroSessionLogic({
   initialMode,
   requestedToolType,
   contextMessage,
+  coachOpener,
 }: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -129,6 +138,19 @@ export function useMaestroSessionLogic({
   useEffect(() => {
     const initialMessages: ChatMessage[] = [];
 
+    // Neutral study-coach opener always comes first (when provided): it greets on
+    // behalf of the child's chosen coach and, if the subject isn't known yet,
+    // asks the organizing questions — instead of opening straight into a subject
+    // Maestro (e.g. Manzoni). The subject Maestro takes over on the next turn.
+    if (coachOpener) {
+      initialMessages.push({
+        id: `coach-opener-${Date.now()}`,
+        role: 'assistant',
+        content: coachOpener,
+        timestamp: new Date(),
+      });
+    }
+
     // Add contextual initial message if a tool was requested from the astuccio
     if (requestedToolType) {
       const contextualGreetings: Record<ToolType, string> = {
@@ -187,7 +209,14 @@ export function useMaestroSessionLogic({
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.id, requestedToolType, contextMessage, pendingToolRequest, clearPendingToolRequest]);
+  }, [
+    maestro.id,
+    requestedToolType,
+    contextMessage,
+    coachOpener,
+    pendingToolRequest,
+    clearPendingToolRequest,
+  ]);
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {
