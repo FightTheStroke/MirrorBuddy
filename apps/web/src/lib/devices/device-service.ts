@@ -10,7 +10,7 @@
  * - Only SHA-256 hashes of the code and token are ever stored — never plaintext.
  */
 
-import { createHash, randomBytes, randomInt } from "crypto";
+import { createHash, createHmac, randomBytes, randomInt } from "crypto";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
@@ -19,8 +19,26 @@ const CODE_DIGITS = 6;
 const MAX_CODE_ATTEMPTS = 5; // retries on the (rare) hashed-code collision
 const MAX_LABEL_LEN = 80;
 
+// Pepper for the low-entropy pairing code (used only when DEVICE_PAIRING_PEPPER
+// is unset). A 6-digit code has just 10^6 possibilities, so a bare hash could be
+// brute-forced from a DB leak; a server-side HMAC key makes the stored verifier
+// useless without the secret.
+const FALLBACK_PEPPER = "mirrorbuddy-device-pairing-fallback-pepper";
+
 function sha256(value: string): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+/** Keyed hash for the low-entropy pairing code (HMAC with a server pepper). */
+function hashCode(code: string): string {
+  let pepper = process.env.DEVICE_PAIRING_PEPPER || process.env.ENCRYPTION_KEY;
+  if (!pepper) {
+    logger.warn(
+      "DEVICE_PAIRING_PEPPER is not set, using fallback pepper for pairing codes",
+    );
+    pepper = FALLBACK_PEPPER;
+  }
+  return createHmac("sha256", pepper).update(code).digest("hex");
 }
 
 function generateCode(): string {
@@ -81,7 +99,7 @@ export async function createPairingCode(
         data: {
           userId,
           label: safeLabel,
-          pairCodeHash: sha256(code),
+          pairCodeHash: hashCode(code),
           pairCodeExpiresAt: expiresAt,
         },
       });
@@ -115,7 +133,7 @@ export async function redeemPairingCode(
   // concurrent requests for the same code cannot both succeed.
   const claimed = await prisma.robotDevice.updateMany({
     where: {
-      pairCodeHash: sha256(trimmed),
+      pairCodeHash: hashCode(trimmed),
       tokenHash: null,
       revokedAt: null,
       pairCodeExpiresAt: { gt: now },
