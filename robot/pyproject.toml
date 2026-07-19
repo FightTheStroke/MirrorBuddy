@@ -1,0 +1,30 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "reachy-mini-mirrorbuddy"
+version = "0.1.0"
+description = "MirrorBuddy on Reachy Mini — the physical embodiment of MirrorBuddy (eyes, ears, mouth, movements) powered by Azure OpenAI Realtime and the MirrorBuddy Maestri."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "FightTheStroke / MirrorBuddy" }]
+dependencies = [
+    "websockets>=12.0",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
+
+# reachy_mini, fastapi and uvicorn are provided by the Reachy Mini host runtime.
+
+[project.scripts]
+reachy-mini-mirrorbuddy = "reachy_mini_mirrorbuddy.main:main"
+
+[project.entry-points.reachy_mini_apps]
+reachy_mini_mirrorbuddy = "reachy_mini_mirrorbuddy.main:ReachyMiniMirrorBuddy"
+
+[tool.hatch.build.targets.wheel]
+packages = ["reachy_mini_mirrorbuddy"]
