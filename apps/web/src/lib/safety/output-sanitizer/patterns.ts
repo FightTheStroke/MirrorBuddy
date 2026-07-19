@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant sanitizer patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Output Sanitizer Patterns
  * RegExp patterns for detecting and sanitizing unsafe AI output

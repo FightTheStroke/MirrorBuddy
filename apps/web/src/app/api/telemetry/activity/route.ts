@@ -16,7 +16,7 @@ import { safeReadJson } from '@/lib/api/safe-json';
 import { AUTH_COOKIE_NAME, VISITOR_COOKIE_NAME } from '@/lib/auth';
 
 export const revalidate = 0;
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
+
 export const POST = pipe(withSentry('/api/telemetry/activity'))(async (ctx) => {
   // E2E tests generate a lot of navigation events. Writing each one to the DB can
   // exhaust the connection pool and cause unrelated tests to fail.
@@ -37,7 +37,7 @@ export const POST = pipe(withSentry('/api/telemetry/activity'))(async (ctx) => {
   // Get user identification from cookies for classification (not authentication)
   // This endpoint accepts all users (logged, trial, anonymous) and classifies them
   const cookieStore = await cookies();
-  // eslint-disable-next-line local-rules/prefer-validate-auth -- Classification only, not authentication. Accepts all user types.
+
   const userCookie = cookieStore.get(AUTH_COOKIE_NAME);
   const visitorCookie = cookieStore.get(VISITOR_COOKIE_NAME);
 

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- paths are system-generated/sanitized (separators stripped, type whitelisted); local dev-only provider. Reviewed in PR #541. */
 /**
  * Local Provider Operations
  * File upload, download, delete, and list operations
@@ -24,12 +25,7 @@ import {
   type ListResult,
   StorageError,
 } from '../types';
-import {
-  validateFile,
-  generateStoragePath,
-  calculateChecksum,
-  toBuffer,
-} from '../storage-utils';
+import { validateFile, generateStoragePath, calculateChecksum, toBuffer } from '../storage-utils';
 
 /**
  * Upload a file to local storage
@@ -37,7 +33,7 @@ import {
 export async function uploadFile(
   basePath: string,
   data: Buffer | Blob | ReadableStream<Uint8Array>,
-  options: UploadOptions
+  options: UploadOptions,
 ): Promise<StoredFile> {
   const buffer = await toBuffer(data);
 
@@ -84,7 +80,7 @@ export async function uploadFile(
     throw new StorageError(
       `Failed to upload file: ${options.filename}`,
       'UPLOAD_FAILED',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }
@@ -105,7 +101,7 @@ export async function downloadFile(basePath: string, fileId: string): Promise<Bu
     throw new StorageError(
       `Failed to download file: ${fileId}`,
       'DOWNLOAD_FAILED',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }
@@ -113,7 +109,11 @@ export async function downloadFile(basePath: string, fileId: string): Promise<Bu
 /**
  * Get URL for a file
  */
-export async function getFileUrl(basePath: string, fileId: string, options?: UrlOptions): Promise<string> {
+export async function getFileUrl(
+  basePath: string,
+  fileId: string,
+  options?: UrlOptions,
+): Promise<string> {
   const file = await findById(basePath, fileId);
   if (!file) {
     throw new StorageError(`File not found: ${fileId}`, 'FILE_NOT_FOUND');
@@ -144,7 +144,7 @@ export async function deleteFile(basePath: string, fileId: string): Promise<void
     throw new StorageError(
       `Failed to delete file: ${fileId}`,
       'DELETE_FAILED',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }
@@ -191,7 +191,7 @@ export async function listFiles(basePath: string, options?: ListOptions): Promis
     throw new StorageError(
       'Failed to list files',
       'PROVIDER_ERROR',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }

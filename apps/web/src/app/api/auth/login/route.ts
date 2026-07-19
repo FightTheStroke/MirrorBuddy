@@ -24,7 +24,6 @@ function isValidRedirectUrl(url: string | undefined): boolean {
   return typeof url === 'string' && url.startsWith('/') && !url.startsWith('//');
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public login endpoint, uses rate limiting
 export const POST = pipe(
   withSentry('/api/auth/login'),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),

@@ -1,16 +1,15 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { sendEmail } from "@/lib/email";
-import { getPasswordResetEmail } from "@/lib/email/templates/password-reset-template";
-import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { hashPII } from "@/lib/security";
-import crypto from "crypto";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { sendEmail } from '@/lib/email';
+import { getPasswordResetEmail } from '@/lib/email/templates/password-reset-template';
+import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
+import { RATE_LIMITS } from '@/lib/rate-limit';
+import { hashPII } from '@/lib/security';
+import crypto from 'crypto';
 
 export const revalidate = 0;
-const log = logger.child({ module: "auth/forgot-password" });
+const log = logger.child({ module: 'auth/forgot-password' });
 
 // Rate limit: 3 requests per email per hour
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -29,35 +28,31 @@ function isValidEmail(email: string): boolean {
  * Generate secure random token
  */
 function generateSecureToken(): string {
-  return crypto.randomBytes(32).toString("hex");
+  return crypto.randomBytes(32).toString('hex');
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public forgot-password endpoint, uses rate limiting
 export const POST = pipe(
-  withSentry("/api/auth/forgot-password"),
+  withSentry('/api/auth/forgot-password'),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),
 )(async (ctx) => {
   const body = await ctx.req.json();
   const { email } = body;
 
   // Validate email presence
-  if (!email || typeof email !== "string") {
-    log.warn("Forgot password: missing email");
-    return NextResponse.json({ error: "Email is required" }, { status: 400 });
+  if (!email || typeof email !== 'string') {
+    log.warn('Forgot password: missing email');
+    return NextResponse.json({ error: 'Email is required' }, { status: 400 });
   }
 
   // Validate email format
   if (!isValidEmail(email)) {
-    log.warn("Forgot password: invalid email format", { email });
-    return NextResponse.json(
-      { error: "Invalid email format" },
-      { status: 400 },
-    );
+    log.warn('Forgot password: invalid email format', { email });
+    return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
   }
 
   const normalizedEmail = email.toLowerCase().trim();
   const securityMessage =
-    "If an account exists with this email, you will receive a password reset link";
+    'If an account exists with this email, you will receive a password reset link';
 
   try {
     // Find user by emailHash (PII-encrypted lookup)
@@ -73,7 +68,7 @@ export const POST = pipe(
 
     // If user doesn't exist, return success for security (no user enumeration)
     if (!user) {
-      log.info("Forgot password: user not found (security response)", {
+      log.info('Forgot password: user not found (security response)', {
         email: normalizedEmail,
       });
       return NextResponse.json({ message: securityMessage }, { status: 200 });
@@ -90,9 +85,9 @@ export const POST = pipe(
     });
 
     if (recentTokens >= RATE_LIMIT_MAX) {
-      log.warn("Forgot password: rate limit exceeded", { userId: user.id });
+      log.warn('Forgot password: rate limit exceeded', { userId: user.id });
       return NextResponse.json(
-        { error: "Too many password reset requests. Please try again later." },
+        { error: 'Too many password reset requests. Please try again later.' },
         { status: 429 },
       );
     }
@@ -112,10 +107,10 @@ export const POST = pipe(
     });
 
     // Get user's locale (default to 'en')
-    const locale = user.settings?.language || "en";
+    const locale = user.settings?.language || 'en';
 
     // Generate reset URL
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/${locale}/reset-password?token=${token}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/${locale}/reset-password?token=${token}`;
 
     // Generate email content
     const { subject, html } = getPasswordResetEmail(resetUrl, locale);
@@ -128,7 +123,7 @@ export const POST = pipe(
     });
 
     if (!emailResult.success) {
-      log.error("Forgot password: email send failed", {
+      log.error('Forgot password: email send failed', {
         userId: user.id,
         error: emailResult.error,
       });
@@ -136,19 +131,19 @@ export const POST = pipe(
       return NextResponse.json({ message: securityMessage }, { status: 200 });
     }
 
-    log.info("Forgot password: reset email sent", {
+    log.info('Forgot password: reset email sent', {
       userId: user.id,
       messageId: emailResult.messageId,
     });
 
     return NextResponse.json({ message: securityMessage }, { status: 200 });
   } catch (error) {
-    log.error("Forgot password: unexpected error", {
+    log.error('Forgot password: unexpected error', {
       error: String(error),
       email: normalizedEmail,
     });
     return NextResponse.json(
-      { error: "An error occurred. Please try again later." },
+      { error: 'An error occurred. Please try again later.' },
       { status: 500 },
     );
   }

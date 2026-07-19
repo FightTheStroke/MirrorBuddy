@@ -1,18 +1,17 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { extractFormData, sendAdminNotification } from "./helpers";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { extractFormData, sendAdminNotification } from './helpers';
+import { logger } from '@/lib/logger';
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from "@/lib/rate-limit";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-
+} from '@/lib/rate-limit';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
-const log = logger.child({ module: "contact-api" });
+const log = logger.child({ module: 'contact-api' });
 
 /**
  * Validate email format using string parsing (ReDoS-safe alternative to regex)
@@ -20,48 +19,31 @@ const log = logger.child({ module: "contact-api" });
  */
 function isValidEmail(email: string): boolean {
   if (!email || email.length > 254) return false;
-  const parts = email.split("@");
+  const parts = email.split('@');
   if (parts.length !== 2) return false;
   const [local, domain] = parts;
-  return (
-    local.length > 0 &&
-    domain.length > 0 &&
-    domain.includes(".") &&
-    !email.includes(" ")
-  );
+  return local.length > 0 && domain.length > 0 && domain.includes('.') && !email.includes(' ');
 }
 
 // Valid enum values for form fields (must match frontend constants)
-const VALID_SCHOOL_ROLES = ["dirigente", "docente", "segreteria", "altro"];
-const VALID_SCHOOL_TYPES = [
-  "primaria",
-  "secondaria-i",
-  "secondaria-ii",
-  "università",
-];
-const VALID_STUDENT_COUNTS = ["100", "100-500", "500-1000", "1000+"];
-const VALID_SECTORS = [
-  "technology",
-  "finance",
-  "manufacturing",
-  "healthcare",
-  "retail",
-  "other",
-];
-const VALID_EMPLOYEE_COUNTS = ["under-50", "50-200", "200-1000", "over-1000"];
+const VALID_SCHOOL_ROLES = ['dirigente', 'docente', 'segreteria', 'altro'];
+const VALID_SCHOOL_TYPES = ['primaria', 'secondaria-i', 'secondaria-ii', 'università'];
+const VALID_STUDENT_COUNTS = ['100', '100-500', '500-1000', '1000+'];
+const VALID_SECTORS = ['technology', 'finance', 'manufacturing', 'healthcare', 'retail', 'other'];
+const VALID_EMPLOYEE_COUNTS = ['under-50', '50-200', '200-1000', 'over-1000'];
 const VALID_TOPICS = [
-  "leadership",
-  "ai-innovation",
-  "soft-skills",
-  "onboarding",
-  "compliance",
-  "other",
+  'leadership',
+  'ai-innovation',
+  'soft-skills',
+  'onboarding',
+  'compliance',
+  'other',
 ];
 
 interface ContactRequest {
   name: string;
   email: string;
-  type: "general" | "schools" | "enterprise";
+  type: 'general' | 'schools' | 'enterprise';
   subject?: string;
   message?: string;
   role?: string;
@@ -85,8 +67,7 @@ interface ContactResponse {
   emailSent?: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public contact form, uses rate limiting
-export const POST = pipe(withSentry("/api/contact"))(async (
+export const POST = pipe(withSentry('/api/contact'))(async (
   ctx,
 ): Promise<NextResponse<ContactResponse>> => {
   try {
@@ -97,10 +78,8 @@ export const POST = pipe(withSentry("/api/contact"))(async (
       RATE_LIMITS.CONTACT_FORM,
     );
     if (!rateLimitResult.success) {
-      log.warn("Contact form rate limited", { clientId });
-      return rateLimitResponse(
-        rateLimitResult,
-      ) as NextResponse<ContactResponse>;
+      log.warn('Contact form rate limited', { clientId });
+      return rateLimitResponse(rateLimitResult) as NextResponse<ContactResponse>;
     }
 
     const body = (await ctx.req.json()) as ContactRequest;
@@ -108,16 +87,16 @@ export const POST = pipe(withSentry("/api/contact"))(async (
     // Validate required fields
     if (!body.name || !body.email || !body.type) {
       return NextResponse.json(
-        { success: false, message: "Missing required fields" },
+        { success: false, message: 'Missing required fields' },
         { status: 400 },
       );
     }
 
     // Validate contact type
-    const validTypes = ["general", "schools", "enterprise"] as const;
+    const validTypes = ['general', 'schools', 'enterprise'] as const;
     if (!validTypes.includes(body.type)) {
       return NextResponse.json(
-        { success: false, message: "Invalid contact type" },
+        { success: false, message: 'Invalid contact type' },
         { status: 400 },
       );
     }
@@ -136,7 +115,7 @@ export const POST = pipe(withSentry("/api/contact"))(async (
 
     for (const [field, maxLen] of Object.entries(maxLengths)) {
       const value = body[field];
-      if (typeof value === "string" && value.length > maxLen) {
+      if (typeof value === 'string' && value.length > maxLen) {
         return NextResponse.json(
           { success: false, message: `Field ${field} exceeds maximum length` },
           { status: 400 },
@@ -147,23 +126,18 @@ export const POST = pipe(withSentry("/api/contact"))(async (
     // Validate email format using string parsing (ReDoS-safe)
     if (!isValidEmail(body.email)) {
       return NextResponse.json(
-        { success: false, message: "Invalid email format" },
+        { success: false, message: 'Invalid email format' },
         { status: 400 },
       );
     }
 
     // Type-specific validation
-    if (body.type === "schools") {
-      if (
-        !body.role ||
-        !body.schoolName ||
-        !body.schoolType ||
-        !body.studentCount
-      ) {
+    if (body.type === 'schools') {
+      if (!body.role || !body.schoolName || !body.schoolType || !body.studentCount) {
         return NextResponse.json(
           {
             success: false,
-            message: "Missing required fields for schools contact",
+            message: 'Missing required fields for schools contact',
           },
           { status: 400 },
         );
@@ -171,23 +145,23 @@ export const POST = pipe(withSentry("/api/contact"))(async (
       // Validate enum values
       if (!VALID_SCHOOL_ROLES.includes(body.role)) {
         return NextResponse.json(
-          { success: false, message: "Invalid role value" },
+          { success: false, message: 'Invalid role value' },
           { status: 400 },
         );
       }
       if (!VALID_SCHOOL_TYPES.includes(body.schoolType)) {
         return NextResponse.json(
-          { success: false, message: "Invalid school type value" },
+          { success: false, message: 'Invalid school type value' },
           { status: 400 },
         );
       }
       if (!VALID_STUDENT_COUNTS.includes(body.studentCount)) {
         return NextResponse.json(
-          { success: false, message: "Invalid student count value" },
+          { success: false, message: 'Invalid student count value' },
           { status: 400 },
         );
       }
-    } else if (body.type === "enterprise") {
+    } else if (body.type === 'enterprise') {
       if (
         !body.role ||
         !body.company ||
@@ -199,7 +173,7 @@ export const POST = pipe(withSentry("/api/contact"))(async (
         return NextResponse.json(
           {
             success: false,
-            message: "Missing required fields for enterprise contact",
+            message: 'Missing required fields for enterprise contact',
           },
           { status: 400 },
         );
@@ -207,30 +181,28 @@ export const POST = pipe(withSentry("/api/contact"))(async (
       // Validate enum values
       if (!VALID_SECTORS.includes(body.sector)) {
         return NextResponse.json(
-          { success: false, message: "Invalid sector value" },
+          { success: false, message: 'Invalid sector value' },
           { status: 400 },
         );
       }
       if (!VALID_EMPLOYEE_COUNTS.includes(body.employeeCount)) {
         return NextResponse.json(
-          { success: false, message: "Invalid employee count value" },
+          { success: false, message: 'Invalid employee count value' },
           { status: 400 },
         );
       }
       // Validate all topics are valid
-      const invalidTopics = body.topics.filter(
-        (t) => !VALID_TOPICS.includes(t),
-      );
+      const invalidTopics = body.topics.filter((t) => !VALID_TOPICS.includes(t));
       if (invalidTopics.length > 0) {
         return NextResponse.json(
-          { success: false, message: "Invalid topic values" },
+          { success: false, message: 'Invalid topic values' },
           { status: 400 },
         );
       }
-    } else if (body.type === "general") {
+    } else if (body.type === 'general') {
       if (!body.subject || !body.message) {
         return NextResponse.json(
-          { success: false, message: "Missing required fields" },
+          { success: false, message: 'Missing required fields' },
           { status: 400 },
         );
       }
@@ -246,18 +218,18 @@ export const POST = pipe(withSentry("/api/contact"))(async (
           name: body.name,
           email: body.email,
           data: formData,
-          status: "pending",
+          status: 'pending',
         },
       });
 
-      log.info("Contact request saved", {
+      log.info('Contact request saved', {
         id: contactRequest.id,
         type: body.type,
       });
     } catch (dbError) {
-      log.error("Database error saving contact request", { error: dbError });
+      log.error('Database error saving contact request', { error: dbError });
       return NextResponse.json(
-        { success: false, message: "Failed to save contact request" },
+        { success: false, message: 'Failed to save contact request' },
         { status: 500 },
       );
     }
@@ -271,23 +243,20 @@ export const POST = pipe(withSentry("/api/contact"))(async (
     );
 
     if (!emailResult.success) {
-      log.warn("Email notification failed", { error: emailResult.error });
+      log.warn('Email notification failed', { error: emailResult.error });
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Contact message received",
+        message: 'Contact message received',
         id: contactRequest.id,
         emailSent: emailResult.success,
       },
       { status: 200 },
     );
   } catch (error) {
-    log.error("Contact form error", { error });
-    return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 },
-    );
+    log.error('Contact form error', { error });
+    return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
 });

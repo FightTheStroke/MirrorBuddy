@@ -32,7 +32,7 @@ export const dynamic = 'force-dynamic';
  * - tool:error - Error occurred
  * - mindmap:modify - Mindmap modification (voice commands)
  */
-// eslint-disable-next-line local-rules/require-pipe-handler -- SSE endpoint requires direct ReadableStream and request.signal access
+
 export async function GET(request: NextRequest) {
   try {
     // #86: Authentication check - SSE requires authenticated user

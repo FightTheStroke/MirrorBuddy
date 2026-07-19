@@ -5,26 +5,22 @@
  * Part of Issue #70: Collaborative summary writing with maieutic method
  */
 
-import { useEffect, useCallback, useRef, useState } from "react";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import type {
-  StudentSummaryData,
-  InlineComment,
-  StudentSummarySection,
-} from "@/types/tools";
+import { useEffect, useCallback, useRef, useState } from 'react';
+import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth';
+import type { StudentSummaryData, InlineComment, StudentSummarySection } from '@/types/tools';
 
 export type StudentSummaryCommand =
-  | "student_summary_add_comment"
-  | "student_summary_remove_comment"
-  | "student_summary_update_content"
-  | "student_summary_request_content"
-  | "student_summary_save"
-  | "student_summary_complete";
+  | 'student_summary_add_comment'
+  | 'student_summary_remove_comment'
+  | 'student_summary_update_content'
+  | 'student_summary_request_content'
+  | 'student_summary_save'
+  | 'student_summary_complete';
 
 export interface StudentSummaryEvent {
   id: string;
-  type: "student_summary:modify";
+  type: 'student_summary:modify';
   sessionId: string;
   maestroId?: string;
   timestamp: number;
@@ -58,10 +54,7 @@ export interface UpdateContentArgs {
 }
 
 export interface StudentSummaryCallbacks {
-  onAddComment?: (
-    sectionId: string,
-    comment: Omit<InlineComment, "id" | "createdAt">,
-  ) => void;
+  onAddComment?: (sectionId: string, comment: Omit<InlineComment, 'id' | 'createdAt'>) => void;
   onRemoveComment?: (sectionId: string, commentId: string) => void;
   onContentUpdate?: (sectionId: string, content: string) => void;
   onContentRequested?: () => StudentSummaryData | null;
@@ -104,50 +97,49 @@ export function useStudentSummarySync({
 
   const handleEvent = useCallback((event: MessageEvent) => {
     try {
-      if (event.data.startsWith(":")) return;
+      if (event.data.startsWith(':')) return;
       const data = JSON.parse(event.data);
-      if (data.type !== "student_summary:modify") return;
+      if (data.type !== 'student_summary:modify') return;
 
       const modifyEvent = data as StudentSummaryEvent;
       setLastEvent(modifyEvent);
       const { command, args } = modifyEvent.data;
 
-      logger.info("[StudentSummarySync] Received", { command });
+      logger.info('[StudentSummarySync] Received', { command });
 
       switch (command) {
-        case "student_summary_add_comment": {
-          const { sectionId, startOffset, endOffset, text } =
-            args as AddCommentArgs;
+        case 'student_summary_add_comment': {
+          const { sectionId, startOffset, endOffset, text } = args as AddCommentArgs;
           callbacksRef.current.onAddComment?.(sectionId, {
             startOffset,
             endOffset,
             text,
-            maestroId: modifyEvent.maestroId || "unknown",
+            maestroId: modifyEvent.maestroId || 'unknown',
           });
           break;
         }
-        case "student_summary_remove_comment": {
+        case 'student_summary_remove_comment': {
           const { sectionId, commentId } = args as RemoveCommentArgs;
           callbacksRef.current.onRemoveComment?.(sectionId, commentId);
           break;
         }
-        case "student_summary_update_content": {
+        case 'student_summary_update_content': {
           const { sectionId, content } = args as UpdateContentArgs;
           callbacksRef.current.onContentUpdate?.(sectionId, content);
           break;
         }
-        case "student_summary_request_content":
+        case 'student_summary_request_content':
           callbacksRef.current.onContentRequested?.();
           break;
-        case "student_summary_save":
+        case 'student_summary_save':
           callbacksRef.current.onSave?.();
           break;
-        case "student_summary_complete":
+        case 'student_summary_complete':
           callbacksRef.current.onComplete?.();
           break;
       }
     } catch (error) {
-      logger.error("[StudentSummarySync] Parse error", {
+      logger.error('[StudentSummarySync] Parse error', {
         error: String(error),
       });
     }
@@ -159,23 +151,21 @@ export function useStudentSummarySync({
 
     const params = new URLSearchParams({
       sessionId,
-      toolType: "student_summary",
+      toolType: 'student_summary',
     });
-    if (summaryId) params.set("summaryId", summaryId);
+    if (summaryId) params.set('summaryId', summaryId);
 
-    // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: eventSourceRef.current?.close() in useEffect return (line 235)
     const eventSource = new EventSource(`/api/tools/stream?${params}`);
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
-      logger.info("[StudentSummarySync] Connected");
+      logger.info('[StudentSummarySync] Connected');
       setIsConnected(true);
     };
     eventSource.onmessage = handleEvent;
     eventSource.onerror = () => {
       setIsConnected(false);
-      if (reconnectTimeoutRef.current)
-        clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = setTimeout(connectRef.current, 3000);
     };
   }, [sessionId, summaryId, enabled, handleEvent]);
@@ -193,17 +183,17 @@ export function useStudentSummarySync({
     async (sectionId: string, content: string) => {
       if (!sessionId) return;
       try {
-        await csrfFetch("/api/tools/stream/modify", {
-          method: "POST",
+        await csrfFetch('/api/tools/stream/modify', {
+          method: 'POST',
           body: JSON.stringify({
             sessionId,
-            toolType: "student_summary",
-            command: "student_summary_update_content",
+            toolType: 'student_summary',
+            command: 'student_summary_update_content',
             args: { sectionId, content },
           }),
         });
       } catch (error) {
-        logger.error("[StudentSummarySync] Broadcast failed", undefined, error);
+        logger.error('[StudentSummarySync] Broadcast failed', undefined, error);
       }
     },
     [sessionId],
@@ -212,21 +202,17 @@ export function useStudentSummarySync({
   const broadcastSave = useCallback(async () => {
     if (!sessionId) return;
     try {
-      await csrfFetch("/api/tools/stream/modify", {
-        method: "POST",
+      await csrfFetch('/api/tools/stream/modify', {
+        method: 'POST',
         body: JSON.stringify({
           sessionId,
-          toolType: "student_summary",
-          command: "student_summary_save",
+          toolType: 'student_summary',
+          command: 'student_summary_save',
           args: {},
         }),
       });
     } catch (error) {
-      logger.error(
-        "[StudentSummarySync] Broadcast save failed",
-        undefined,
-        error,
-      );
+      logger.error('[StudentSummarySync] Broadcast save failed', undefined, error);
     }
   }, [sessionId]);
 
@@ -235,8 +221,7 @@ export function useStudentSummarySync({
     return () => {
       eventSourceRef.current?.close();
       eventSourceRef.current = null;
-      if (reconnectTimeoutRef.current)
-        clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       setIsConnected(false);
     };
   }, [sessionId, enabled, connect]);
@@ -253,15 +238,13 @@ export function useStudentSummarySync({
 export function countWords(content: string): number {
   if (!content) return 0;
   return content
-    .replace(/[#*_`~\[\]()]/g, "")
-    .replace(/\s+/g, " ")
+    .replace(/[#*_`~\[\]()]/g, '')
+    .replace(/\s+/g, ' ')
     .trim()
-    .split(" ")
+    .split(' ')
     .filter(Boolean).length;
 }
 
-export function calculateTotalWordCount(
-  sections: StudentSummarySection[],
-): number {
+export function calculateTotalWordCount(sections: StudentSummarySection[]): number {
   return sections.reduce((t, s) => t + countWords(s.content), 0);
 }

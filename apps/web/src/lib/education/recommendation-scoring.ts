@@ -7,10 +7,9 @@
  * Plan 104 - Wave 4: Pro Features [T4-05]
  */
 
-// eslint-disable-next-line local-rules/enforce-dependency-direction -- Pro tier gating (ADR 0065)
-import { tierService } from "@/lib/tier/server";
-import { chatCompletion, getDeploymentForModel } from "@/lib/ai/server";
-import type { StudentInsights } from "./recommendation-insights";
+import { tierService } from '@/lib/tier/server';
+import { chatCompletion, getDeploymentForModel } from '@/lib/ai/server';
+import type { StudentInsights } from './recommendation-insights';
 
 /**
  * AI-scored learning recommendation
@@ -21,7 +20,7 @@ export interface LearningRecommendation {
   recommendedTopics: string[];
   focusAreas: string[];
   overallScore: number;
-  confidenceLevel: "low" | "medium" | "high";
+  confidenceLevel: 'low' | 'medium' | 'high';
 }
 
 /**
@@ -36,12 +35,12 @@ export async function generateAIRecommendations(
 DATI STUDENTE:
 - Conversazioni totali: ${insights.conversationCount}
 - Durata media sessione: ${insights.averageSessionLength} minuti
-- Materie principali: ${insights.topSubjects.join(", ")}
+- Materie principali: ${insights.topSubjects.join(', ')}
 - Progresso learning path: ${insights.learningPathProgress}%
 - Accuratezza flashcard (FSRS): ${insights.fsrsAccuracy}%
 - Review totali: ${insights.totalReviews}
-- Aree di forza: ${insights.strengthAreas.join(", ") || "nessuna"}
-- Aree deboli: ${insights.weakAreas.join(", ") || "nessuna"}
+- Aree di forza: ${insights.strengthAreas.join(', ') || 'nessuna'}
+- Aree deboli: ${insights.weakAreas.join(', ') || 'nessuna'}
 
 ISTRUZIONI:
 1. Identifica 2-4 punti di forza (strengths)
@@ -65,12 +64,12 @@ Rispondi SOLO con JSON valido in questo formato:
   "confidenceLevel": "high"
 }`;
 
-  const aiConfig = await tierService.getFeatureAIConfigForUser(userId, "chat");
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId, 'chat');
   const deploymentName = getDeploymentForModel(aiConfig.model);
 
   const result = await chatCompletion(
-    [{ role: "user", content: prompt }],
-    "Sei un pedagogista esperto in didattica personalizzata. Rispondi SOLO con JSON valido.",
+    [{ role: 'user', content: prompt }],
+    'Sei un pedagogista esperto in didattica personalizzata. Rispondi SOLO con JSON valido.',
     {
       temperature: aiConfig.temperature,
       maxTokens: aiConfig.maxTokens,
@@ -81,7 +80,7 @@ Rispondi SOLO con JSON valido in questo formato:
   // Parse AI response
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error("Failed to parse AI recommendation response");
+    throw new Error('Failed to parse AI recommendation response');
   }
 
   const parsed = JSON.parse(jsonMatch[0]);
@@ -92,7 +91,7 @@ Rispondi SOLO con JSON valido in questo formato:
     recommendedTopics: parsed.recommendedTopics || [],
     focusAreas: parsed.focusAreas || [],
     overallScore: parsed.overallScore || scoreLearningPattern(insights),
-    confidenceLevel: parsed.confidenceLevel || "low",
+    confidenceLevel: parsed.confidenceLevel || 'low',
   };
 }
 
@@ -129,6 +128,6 @@ export function createEmptyRecommendation(): LearningRecommendation {
     recommendedTopics: [],
     focusAreas: [],
     overallScore: 0,
-    confidenceLevel: "low",
+    confidenceLevel: 'low',
   };
 }

@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { maestri, SUBJECT_NAMES } from "@/data/maestri";
+import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { maestri, SUBJECT_NAMES } from '@/data/maestri';
 
 /**
  * Professori Showcase Section - Horizontal Carousel
@@ -18,7 +18,7 @@ import { maestri, SUBJECT_NAMES } from "@/data/maestri";
  * Auto-scrolls to show all professors.
  */
 export function MaestriShowcaseSection() {
-  const t = useTranslations("welcome.maestri");
+  const t = useTranslations('welcome.maestri');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -29,12 +29,12 @@ export function MaestriShowcaseSection() {
   const CARD_WIDTH = 192;
   const SCROLL_INTERVAL = 3000; // 3 seconds
 
-  const scroll = useCallback((direction: "left" | "right") => {
+  const scroll = useCallback((direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = CARD_WIDTH;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
       });
     }
   }, []);
@@ -51,9 +51,9 @@ export function MaestriShowcaseSection() {
 
       // If at the end, reset to start
       if (scrollLeft >= maxScroll - 10) {
-        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
       } else {
-        scroll("right");
+        scroll('right');
       }
     }, SCROLL_INTERVAL);
 
@@ -79,17 +79,17 @@ export function MaestriShowcaseSection() {
           id="maestri-heading"
           className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          {t("heading")}{" "}
+          {t('heading')}{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-            {t("headingHighlight")}
+            {t('headingHighlight')}
           </span>
         </h2>
 
         <p className="text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-2 font-medium">
-          {t("introText")}
+          {t('introText')}
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-          {t("educationalDisclaimer")}
+          {t('educationalDisclaimer')}
         </p>
       </motion.div>
 
@@ -101,25 +101,21 @@ export function MaestriShowcaseSection() {
       >
         {/* Left Arrow */}
         <button
-          onClick={() => scroll("left")}
+          onClick={() => scroll('left')}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -ml-2"
-          aria-label={t("scrollLeft")}
+          aria-label={t('scrollLeft')}
         >
           <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
         {/* Scrollable Container - Fixed width to show exactly 5 cards */}
-        <div
-          className="overflow-hidden mx-auto"
-          style={{ width: "min(100%, 960px)" }}
-        >
+        <div className="overflow-hidden mx-auto" style={{ width: 'min(100%, 960px)' }}>
           <div
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             role="region"
-            aria-label={t("carouselLabel")}
-            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
+            aria-label={t('carouselLabel')}
             tabIndex={0}
           >
             {displayedMaestri.map((maestro, i) => (
@@ -129,7 +125,7 @@ export function MaestriShowcaseSection() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{
                   delay: 0.6 + i * 0.03,
-                  type: "spring",
+                  type: 'spring',
                   stiffness: 150,
                   damping: 15,
                 }}
@@ -167,9 +163,9 @@ export function MaestriShowcaseSection() {
 
         {/* Right Arrow */}
         <button
-          onClick={() => scroll("right")}
+          onClick={() => scroll('right')}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -mr-2"
-          aria-label={t("scrollRight")}
+          aria-label={t('scrollRight')}
         >
           <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
@@ -177,17 +173,17 @@ export function MaestriShowcaseSection() {
 
       {/* Scroll hint for mobile */}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
-        {t("scrollHint")}
+        {t('scrollHint')}
       </p>
 
       {/* Disclaimer */}
       <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 max-w-2xl mx-auto">
-        {t("disclaimer")}{" "}
+        {t('disclaimer')}{' '}
         <Link
           href="/ai-transparency"
           className="underline hover:text-gray-600 dark:hover:text-gray-400"
         >
-          {t("disclaimerLink")}
+          {t('disclaimerLink')}
         </Link>
       </p>
     </motion.section>

@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
-import { logger } from "@/lib/logger";
-import { hashPII } from "@/lib/security";
+import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { logger } from '@/lib/logger';
+import { hashPII } from '@/lib/security';
 
 const GRACE_PERIOD_DAYS = 30;
 
@@ -61,14 +61,12 @@ export interface UserBackupPayload {
   userActivity: Record<string, unknown>[];
 }
 
-const log = logger.child({ module: "admin-user-trash" });
+const log = logger.child({ module: 'admin-user-trash' });
 
-export async function buildUserBackup(
-  userId: string,
-): Promise<UserBackupPayload> {
+export async function buildUserBackup(userId: string): Promise<UserBackupPayload> {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 
   const [
@@ -198,9 +196,7 @@ export async function buildUserBackup(
   ]);
 
   const toJson = <T>(value: T): T =>
-    value === undefined
-      ? (null as T)
-      : (JSON.parse(JSON.stringify(value)) as T);
+    value === undefined ? (null as T) : (JSON.parse(JSON.stringify(value)) as T);
 
   return {
     user: toJson(user),
@@ -259,16 +255,12 @@ export async function buildUserBackup(
   };
 }
 
-export async function createDeletedUserBackup(
-  userId: string,
-  adminId: string,
-  reason?: string,
-) {
+export async function createDeletedUserBackup(userId: string, adminId: string, reason?: string) {
   const existing = await prisma.deletedUserBackup.findUnique({
     where: { userId },
   });
   if (existing) {
-    throw new Error("Backup already exists for user");
+    throw new Error('Backup already exists for user');
   }
 
   const payload = await buildUserBackup(userId);
@@ -280,7 +272,7 @@ export async function createDeletedUserBackup(
       userId,
       email: (payload.user.email as string | null) || null,
       username: (payload.user.username as string | null) || null,
-      role: payload.user.role as "USER" | "ADMIN",
+      role: payload.user.role as 'USER' | 'ADMIN',
       backup: payload as unknown as Prisma.InputJsonValue,
       deletedAt: new Date(),
       purgeAt,
@@ -289,7 +281,7 @@ export async function createDeletedUserBackup(
     },
   });
 
-  log.info("User backup stored", { userId, adminId });
+  log.info('User backup stored', { userId, adminId });
   return backup;
 }
 
@@ -298,28 +290,25 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     where: { userId },
   });
   if (!backup) {
-    throw new Error("Backup not found");
+    throw new Error('Backup not found');
   }
 
   const payload = backup.backup as unknown as UserBackupPayload;
   const existingUser = await prisma.user.findUnique({ where: { id: userId } });
   if (existingUser) {
-    throw new Error("User already exists");
+    throw new Error('User already exists');
   }
 
   if (payload.user.email) {
     const emailHashValue = await hashPII(payload.user.email as string);
     const emailOwner = await prisma.user.findFirst({
       where: {
-        OR: [
-          { emailHash: emailHashValue },
-          { email: payload.user.email as string }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
-        ],
+        OR: [{ emailHash: emailHashValue }, { email: payload.user.email as string }],
       },
       select: { id: true },
     });
     if (emailOwner) {
-      throw new Error("Email already in use");
+      throw new Error('Email already in use');
     }
   }
 
@@ -329,7 +318,7 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
       select: { id: true },
     });
     if (usernameOwner) {
-      throw new Error("Username already in use");
+      throw new Error('Username already in use');
     }
   }
 
@@ -358,72 +347,52 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.accessibility) {
       await tx.accessibilitySettings.create({
-        data: asData<Prisma.AccessibilitySettingsUncheckedCreateInput>(
-          payload.accessibility,
-        ),
+        data: asData<Prisma.AccessibilitySettingsUncheckedCreateInput>(payload.accessibility),
       });
     }
     if (payload.onboarding) {
       await tx.onboardingState.create({
-        data: asData<Prisma.OnboardingStateUncheckedCreateInput>(
-          payload.onboarding,
-        ),
+        data: asData<Prisma.OnboardingStateUncheckedCreateInput>(payload.onboarding),
       });
     }
     if (payload.pomodoroStats) {
       await tx.pomodoroStats.create({
-        data: asData<Prisma.PomodoroStatsUncheckedCreateInput>(
-          payload.pomodoroStats,
-        ),
+        data: asData<Prisma.PomodoroStatsUncheckedCreateInput>(payload.pomodoroStats),
       });
     }
     if (payload.methodProgress) {
       await tx.methodProgress.create({
-        data: asData<Prisma.MethodProgressUncheckedCreateInput>(
-          payload.methodProgress,
-        ),
+        data: asData<Prisma.MethodProgressUncheckedCreateInput>(payload.methodProgress),
       });
     }
     if (payload.privacyPreferences) {
       await tx.userPrivacyPreferences.create({
-        data: asData<Prisma.UserPrivacyPreferencesUncheckedCreateInput>(
-          payload.privacyPreferences,
-        ),
+        data: asData<Prisma.UserPrivacyPreferencesUncheckedCreateInput>(payload.privacyPreferences),
       });
     }
     if (payload.coppaConsent) {
       await tx.coppaConsent.create({
-        data: asData<Prisma.CoppaConsentUncheckedCreateInput>(
-          payload.coppaConsent,
-        ),
+        data: asData<Prisma.CoppaConsentUncheckedCreateInput>(payload.coppaConsent),
       });
     }
     if (payload.googleAccount) {
       await tx.googleAccount.create({
-        data: asData<Prisma.GoogleAccountUncheckedCreateInput>(
-          payload.googleAccount,
-        ),
+        data: asData<Prisma.GoogleAccountUncheckedCreateInput>(payload.googleAccount),
       });
     }
     if (payload.subscription) {
       await tx.userSubscription.create({
-        data: asData<Prisma.UserSubscriptionUncheckedCreateInput>(
-          payload.subscription,
-        ),
+        data: asData<Prisma.UserSubscriptionUncheckedCreateInput>(payload.subscription),
       });
     }
     if (payload.gamification) {
       await tx.userGamification.create({
-        data: asData<Prisma.UserGamificationUncheckedCreateInput>(
-          payload.gamification,
-        ),
+        data: asData<Prisma.UserGamificationUncheckedCreateInput>(payload.gamification),
       });
     }
     if (payload.dailyStreak) {
       await tx.dailyStreak.create({
-        data: asData<Prisma.DailyStreakUncheckedCreateInput>(
-          payload.dailyStreak,
-        ),
+        data: asData<Prisma.DailyStreakUncheckedCreateInput>(payload.dailyStreak),
       });
     }
 
@@ -432,37 +401,27 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
 
     if (payload.userAchievements.length) {
       await tx.userAchievement.createMany({
-        data: asArr<Prisma.UserAchievementUncheckedCreateInput>(
-          payload.userAchievements,
-        ),
+        data: asArr<Prisma.UserAchievementUncheckedCreateInput>(payload.userAchievements),
       });
     }
     if (payload.pointsHistory.length) {
       await tx.pointsTransaction.createMany({
-        data: asArr<Prisma.PointsTransactionUncheckedCreateInput>(
-          payload.pointsHistory,
-        ),
+        data: asArr<Prisma.PointsTransactionUncheckedCreateInput>(payload.pointsHistory),
       });
     }
     if (payload.tosAcceptances.length) {
       await tx.tosAcceptance.createMany({
-        data: asArr<Prisma.TosAcceptanceUncheckedCreateInput>(
-          payload.tosAcceptances,
-        ),
+        data: asArr<Prisma.TosAcceptanceUncheckedCreateInput>(payload.tosAcceptances),
       });
     }
     if (payload.studySessions.length) {
       await tx.studySession.createMany({
-        data: asArr<Prisma.StudySessionUncheckedCreateInput>(
-          payload.studySessions,
-        ),
+        data: asArr<Prisma.StudySessionUncheckedCreateInput>(payload.studySessions),
       });
     }
     if (payload.flashcards.length) {
       await tx.flashcardProgress.createMany({
-        data: asArr<Prisma.FlashcardProgressUncheckedCreateInput>(
-          payload.flashcards,
-        ),
+        data: asArr<Prisma.FlashcardProgressUncheckedCreateInput>(payload.flashcards),
       });
     }
     if (payload.quizResults.length) {
@@ -482,16 +441,12 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.learningPaths.length) {
       await tx.learningPath.createMany({
-        data: asArr<Prisma.LearningPathUncheckedCreateInput>(
-          payload.learningPaths,
-        ),
+        data: asArr<Prisma.LearningPathUncheckedCreateInput>(payload.learningPaths),
       });
     }
     if (payload.learningPathTopics.length) {
       await tx.learningPathTopic.createMany({
-        data: asArr<Prisma.LearningPathTopicUncheckedCreateInput>(
-          payload.learningPathTopics,
-        ),
+        data: asArr<Prisma.LearningPathTopicUncheckedCreateInput>(payload.learningPathTopics),
       });
     }
     if (payload.topicSteps.length) {
@@ -501,30 +456,22 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.topicAttempts.length) {
       await tx.topicAttempt.createMany({
-        data: asArr<Prisma.TopicAttemptUncheckedCreateInput>(
-          payload.topicAttempts,
-        ),
+        data: asArr<Prisma.TopicAttemptUncheckedCreateInput>(payload.topicAttempts),
       });
     }
     if (payload.studySchedules.length) {
       await tx.studySchedule.createMany({
-        data: asArr<Prisma.StudyScheduleUncheckedCreateInput>(
-          payload.studySchedules,
-        ),
+        data: asArr<Prisma.StudyScheduleUncheckedCreateInput>(payload.studySchedules),
       });
     }
     if (payload.scheduledSessions.length) {
       await tx.scheduledSession.createMany({
-        data: asArr<Prisma.ScheduledSessionUncheckedCreateInput>(
-          payload.scheduledSessions,
-        ),
+        data: asArr<Prisma.ScheduledSessionUncheckedCreateInput>(payload.scheduledSessions),
       });
     }
     if (payload.customReminders.length) {
       await tx.customReminder.createMany({
-        data: asArr<Prisma.CustomReminderUncheckedCreateInput>(
-          payload.customReminders,
-        ),
+        data: asArr<Prisma.CustomReminderUncheckedCreateInput>(payload.customReminders),
       });
     }
     if (payload.collections.length) {
@@ -549,30 +496,22 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.materialTags.length) {
       await tx.materialTag.createMany({
-        data: asArr<Prisma.MaterialTagUncheckedCreateInput>(
-          payload.materialTags,
-        ),
+        data: asArr<Prisma.MaterialTagUncheckedCreateInput>(payload.materialTags),
       });
     }
     if (payload.materialEdges.length) {
       await tx.materialEdge.createMany({
-        data: asArr<Prisma.MaterialEdgeUncheckedCreateInput>(
-          payload.materialEdges,
-        ),
+        data: asArr<Prisma.MaterialEdgeUncheckedCreateInput>(payload.materialEdges),
       });
     }
     if (payload.materialConcepts.length) {
       await tx.materialConcept.createMany({
-        data: asArr<Prisma.MaterialConceptUncheckedCreateInput>(
-          payload.materialConcepts,
-        ),
+        data: asArr<Prisma.MaterialConceptUncheckedCreateInput>(payload.materialConcepts),
       });
     }
     if (payload.conversations.length) {
       await tx.conversation.createMany({
-        data: asArr<Prisma.ConversationUncheckedCreateInput>(
-          payload.conversations,
-        ),
+        data: asArr<Prisma.ConversationUncheckedCreateInput>(payload.conversations),
       });
     }
     if (payload.messages.length) {
@@ -587,37 +526,27 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.notifications.length) {
       await tx.notification.createMany({
-        data: asArr<Prisma.NotificationUncheckedCreateInput>(
-          payload.notifications,
-        ),
+        data: asArr<Prisma.NotificationUncheckedCreateInput>(payload.notifications),
       });
     }
     if (payload.calendarEvents.length) {
       await tx.calendarEvent.createMany({
-        data: asArr<Prisma.CalendarEventUncheckedCreateInput>(
-          payload.calendarEvents,
-        ),
+        data: asArr<Prisma.CalendarEventUncheckedCreateInput>(payload.calendarEvents),
       });
     }
     if (payload.htmlSnippets.length) {
       await tx.htmlSnippet.createMany({
-        data: asArr<Prisma.HtmlSnippetUncheckedCreateInput>(
-          payload.htmlSnippets,
-        ),
+        data: asArr<Prisma.HtmlSnippetUncheckedCreateInput>(payload.htmlSnippets),
       });
     }
     if (payload.homeworkSessions.length) {
       await tx.homeworkSession.createMany({
-        data: asArr<Prisma.HomeworkSessionUncheckedCreateInput>(
-          payload.homeworkSessions,
-        ),
+        data: asArr<Prisma.HomeworkSessionUncheckedCreateInput>(payload.homeworkSessions),
       });
     }
     if (payload.pushSubscriptions.length) {
       await tx.pushSubscription.createMany({
-        data: asArr<Prisma.PushSubscriptionUncheckedCreateInput>(
-          payload.pushSubscriptions,
-        ),
+        data: asArr<Prisma.PushSubscriptionUncheckedCreateInput>(payload.pushSubscriptions),
       });
     }
     if (payload.parentNotes.length) {
@@ -627,16 +556,12 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.sessionMetrics.length) {
       await tx.sessionMetrics.createMany({
-        data: asArr<Prisma.SessionMetricsUncheckedCreateInput>(
-          payload.sessionMetrics,
-        ),
+        data: asArr<Prisma.SessionMetricsUncheckedCreateInput>(payload.sessionMetrics),
       });
     }
     if (payload.contentEmbeddings.length) {
       await tx.contentEmbedding.createMany({
-        data: asArr<Prisma.ContentEmbeddingUncheckedCreateInput>(
-          payload.contentEmbeddings,
-        ),
+        data: asArr<Prisma.ContentEmbeddingUncheckedCreateInput>(payload.contentEmbeddings),
       });
     }
     if (payload.studentInsightProfile) {
@@ -648,44 +573,34 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
     }
     if (payload.profileAccessLogs.length) {
       await tx.profileAccessLog.createMany({
-        data: asArr<Prisma.ProfileAccessLogUncheckedCreateInput>(
-          payload.profileAccessLogs,
-        ),
+        data: asArr<Prisma.ProfileAccessLogUncheckedCreateInput>(payload.profileAccessLogs),
       });
     }
     if (payload.telemetryEvents.length) {
       await tx.telemetryEvent.createMany({
-        data: asArr<Prisma.TelemetryEventUncheckedCreateInput>(
-          payload.telemetryEvents,
-        ),
+        data: asArr<Prisma.TelemetryEventUncheckedCreateInput>(payload.telemetryEvents),
       });
     }
     if (payload.rateLimitEvents.length) {
       await tx.rateLimitEvent.createMany({
-        data: asArr<Prisma.RateLimitEventUncheckedCreateInput>(
-          payload.rateLimitEvents,
-        ),
+        data: asArr<Prisma.RateLimitEventUncheckedCreateInput>(payload.rateLimitEvents),
       });
     }
     if (payload.safetyEvents.length) {
       await tx.safetyEvent.createMany({
-        data: asArr<Prisma.SafetyEventUncheckedCreateInput>(
-          payload.safetyEvents,
-        ),
+        data: asArr<Prisma.SafetyEventUncheckedCreateInput>(payload.safetyEvents),
       });
     }
     if (payload.userActivity.length) {
       await tx.userActivity.createMany({
-        data: asArr<Prisma.UserActivityUncheckedCreateInput>(
-          payload.userActivity,
-        ),
+        data: asArr<Prisma.UserActivityUncheckedCreateInput>(payload.userActivity),
       });
     }
   });
 
   await prisma.deletedUserBackup.delete({ where: { userId } });
 
-  log.info("User restored from backup", { userId, adminId });
+  log.info('User restored from backup', { userId, adminId });
 }
 
 export async function purgeExpiredUserBackups() {
@@ -694,7 +609,7 @@ export async function purgeExpiredUserBackups() {
     where: { purgeAt: { lte: now } },
   });
   if (result.count > 0) {
-    log.info("Expired user backups purged", { count: result.count });
+    log.info('Expired user backups purged', { count: result.count });
   }
   return result.count;
 }

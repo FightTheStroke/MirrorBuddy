@@ -10,40 +10,34 @@
  *   - dryRun=true: Preview what would be deleted
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { withRateLimit } from "@/lib/api/middlewares/with-rate-limit";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
-import { hashPII } from "@/lib/security";
-
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
+import { withRateLimit } from '@/lib/api/middlewares/with-rate-limit';
+import { RATE_LIMITS } from '@/lib/rate-limit';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { getProtectedUsers } from '@/lib/test-isolation/protected-users';
+import { hashPII } from '@/lib/security';
 
 export const revalidate = 0;
 export const DELETE = pipe(
-  withSentry("/api/admin/cleanup-users"),
+  withSentry('/api/admin/cleanup-users'),
   withCSRF,
   withAdmin,
   withRateLimit(RATE_LIMITS.ADMIN_DESTRUCTIVE),
 )(async (ctx) => {
-  const isDryRun = ctx.req.nextUrl.searchParams.get("dryRun") === "true";
+  const isDryRun = ctx.req.nextUrl.searchParams.get('dryRun') === 'true';
 
   // Get protected emails from environment variable
   const protectedEmails = getProtectedUsers();
 
   // Hash protected emails for lookup
-  const protectedEmailHashes = await Promise.all(
-    protectedEmails.map((email) => hashPII(email)),
-  );
+  const protectedEmailHashes = await Promise.all(protectedEmails.map((email) => hashPII(email)));
 
   // Find protected users (search by hash and plain email for backward compat)
   const protectedUsers = await prisma.user.findMany({
     where: {
-      OR: [
-        { emailHash: { in: protectedEmailHashes } },
-        { email: { in: protectedEmails } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
-      ],
+      OR: [{ emailHash: { in: protectedEmailHashes } }, { email: { in: protectedEmails } }],
     },
     select: { id: true, email: true },
   });
@@ -87,16 +81,16 @@ export const DELETE = pipe(
           createdAt: Date;
         }): { id: string; email: string; createdAt: Date } => ({
           id: u.id,
-          email: u.email || "no-email",
+          email: u.email || 'no-email',
           createdAt: u.createdAt,
         }),
       ),
-      note: "Only isTestData=true users will be deleted (safety filter)",
+      note: 'Only isTestData=true users will be deleted (safety filter)',
     });
   }
 
   // LIVE DELETE - only test data users (safety: never delete production users)
-  logger.warn("Admin cleanup: deleting test data users except protected", {
+  logger.warn('Admin cleanup: deleting test data users except protected', {
     adminId: ctx.userId,
     usersToDelete,
     protectedEmails,
@@ -140,7 +134,7 @@ export const DELETE = pipe(
   // Final count
   const remainingUsers = await prisma.user.count();
 
-  logger.info("Admin cleanup complete", {
+  logger.info('Admin cleanup complete', {
     deletedUsers: userResult.count,
     deletedActivity: activityResult.count,
     deletedInvites: inviteResult.count,
@@ -156,6 +150,6 @@ export const DELETE = pipe(
     },
     remainingUsers,
     protectedEmails,
-    note: "Only isTestData=true users were deleted (safety filter)",
+    note: 'Only isTestData=true users were deleted (safety filter)',
   });
 });

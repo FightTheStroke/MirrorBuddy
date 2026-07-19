@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant safety patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Content Filter Patterns
  * Profanity and explicit content patterns for child safety

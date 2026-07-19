@@ -1,22 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import { motion, AnimatePresence } from "framer-motion";
-import { Code, Search } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useDemos, type SavedDemo } from "@/lib/hooks/use-saved-materials";
-import { HTMLPreview } from "./html-preview";
-import { SnippetCard } from "./html-snippets-view/snippet-card";
-import {
-  getMaestroName,
-  handleOpenInNewTab,
-} from "./html-snippets-view/snippets-utils";
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Code, Search } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useDemos, type SavedDemo } from '@/lib/hooks/use-saved-materials';
+import { HTMLPreview } from './html-preview';
+import { SnippetCard } from './html-snippets-view/snippet-card';
+import { getMaestroName, handleOpenInNewTab } from './html-snippets-view/snippets-utils';
 
 export function HTMLSnippetsView() {
-  const t = useTranslations("education.htmlSnippetsView");
-  const [searchQuery, setSearchQuery] = useState("");
+  const t = useTranslations('education.htmlSnippetsView');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [previewSnippet, setPreviewSnippet] = useState<SavedDemo | null>(null);
 
@@ -35,12 +32,9 @@ export function HTMLSnippetsView() {
         !searchQuery ||
         demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         demo.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        demo.tags.some((t) =>
-          t.toLowerCase().includes(searchQuery.toLowerCase()),
-        );
+        demo.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchesSubject =
-        !selectedSubject || demo.subject === selectedSubject;
+      const matchesSubject = !selectedSubject || demo.subject === selectedSubject;
 
       return matchesSearch && matchesSubject;
     });
@@ -55,12 +49,12 @@ export function HTMLSnippetsView() {
     if (!previewSnippet) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         closePreview();
       }
     };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
   }, [previewSnippet, closePreview]);
 
   return (
@@ -70,10 +64,10 @@ export function HTMLSnippetsView() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <Code className="w-8 h-8 text-purple-500" />
-            {t("demoInterattive")}
+            {t('demoInterattive')}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {t("esempiHtmlCreatiDaiProfessori")}
+            {t('esempiHtmlCreatiDaiProfessori')}
           </p>
         </div>
       </div>
@@ -87,7 +81,7 @@ export function HTMLSnippetsView() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t("cercaDemo")}
+            placeholder={t('cercaDemo')}
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
@@ -95,21 +89,19 @@ export function HTMLSnippetsView() {
         {/* Subject filter */}
         <div className="flex gap-2 flex-wrap">
           <Button
-            variant={selectedSubject === null ? "default" : "outline"}
+            variant={selectedSubject === null ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedSubject(null)}
           >
-            {t("tutti")}
+            {t('tutti')}
           </Button>
           {subjects.map((subject) => (
             <Button
               key={subject}
-              variant={selectedSubject === subject ? "default" : "outline"}
+              variant={selectedSubject === subject ? 'default' : 'outline'}
               size="sm"
               onClick={() =>
-                setSelectedSubject(
-                  subject === selectedSubject ? null : (subject ?? null),
-                )
+                setSelectedSubject(subject === selectedSubject ? null : (subject ?? null))
               }
             >
               {subject}
@@ -124,7 +116,7 @@ export function HTMLSnippetsView() {
           <CardContent className="p-12 text-center">
             <Code className="w-16 h-16 text-slate-300 mx-auto mb-4 animate-pulse" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-              {t("loading")}
+              {t('loading')}
             </h3>
           </CardContent>
         </Card>
@@ -133,12 +125,12 @@ export function HTMLSnippetsView() {
           <CardContent className="p-12 text-center">
             <Code className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-              {demos.length === 0 ? "Nessuna demo salvata" : "Nessun risultato"}
+              {demos.length === 0 ? 'Nessuna demo salvata' : 'Nessun risultato'}
             </h3>
             <p className="text-sm text-slate-500 mt-2">
               {demos.length === 0
-                ? "Chiedi a un Professore di creare una demo interattiva!"
-                : "Prova a modificare i filtri di ricerca"}
+                ? 'Chiedi a un Professore di creare una demo interattiva!'
+                : 'Prova a modificare i filtri di ricerca'}
             </p>
           </CardContent>
         </Card>
@@ -170,12 +162,12 @@ export function HTMLSnippetsView() {
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => setPreviewSnippet(null)}
             onKeyDown={(e) => {
-              if (e.key === "Escape") {
+              if (e.key === 'Escape') {
                 setPreviewSnippet(null);
               }
             }}
           >
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
+            {}
             <div onClick={(e) => e.stopPropagation()}>
               <HTMLPreview
                 code={previewSnippet.code}

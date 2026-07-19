@@ -97,7 +97,7 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
         }
       }}
     >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
+      {}
       <div
         className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}

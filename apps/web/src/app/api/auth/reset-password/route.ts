@@ -1,42 +1,32 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { hashPassword, validatePasswordStrength } from "@/lib/auth/server";
-import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
-import { RATE_LIMITS } from "@/lib/rate-limit";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { hashPassword, validatePasswordStrength } from '@/lib/auth/server';
+import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
+import { RATE_LIMITS } from '@/lib/rate-limit';
 
 export const revalidate = 0;
-const log = logger.child({ module: "auth/reset-password" });
+const log = logger.child({ module: 'auth/reset-password' });
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public reset-password endpoint, uses rate limiting
 export const POST = pipe(
-  withSentry("/api/auth/reset-password"),
+  withSentry('/api/auth/reset-password'),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),
 )(async (ctx) => {
   const body = await ctx.req.json();
   const { token, password } = body;
 
   // Validate required fields
-  if (
-    !token ||
-    typeof token !== "string" ||
-    !password ||
-    typeof password !== "string"
-  ) {
-    log.warn("Reset password: missing token or password");
-    return NextResponse.json(
-      { error: "Token and password are required" },
-      { status: 400 },
-    );
+  if (!token || typeof token !== 'string' || !password || typeof password !== 'string') {
+    log.warn('Reset password: missing token or password');
+    return NextResponse.json({ error: 'Token and password are required' }, { status: 400 });
   }
 
   // Validate password strength
   const validation = validatePasswordStrength(password);
   if (!validation.valid) {
-    log.warn("Reset password: weak password", { errors: validation.errors });
+    log.warn('Reset password: weak password', { errors: validation.errors });
     return NextResponse.json(
-      { error: "Password not strong enough", details: validation.errors },
+      { error: 'Password not strong enough', details: validation.errors },
       { status: 400 },
     );
   }
@@ -58,32 +48,23 @@ export const POST = pipe(
 
     // Check if token exists
     if (!resetToken) {
-      log.warn("Reset password: token not found", { token });
-      return NextResponse.json(
-        { error: "Invalid or expired token" },
-        { status: 400 },
-      );
+      log.warn('Reset password: token not found', { token });
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
     }
 
     // Check if token is expired
     if (resetToken.expiresAt < new Date()) {
-      log.warn("Reset password: token expired", {
+      log.warn('Reset password: token expired', {
         token,
         expiresAt: resetToken.expiresAt,
       });
-      return NextResponse.json(
-        { error: "Invalid or expired token" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
     }
 
     // Check if token was already used
     if (resetToken.used) {
-      log.warn("Reset password: token already used", { token });
-      return NextResponse.json(
-        { error: "Invalid or expired token" },
-        { status: 400 },
-      );
+      log.warn('Reset password: token already used', { token });
+      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
     }
 
     // Hash the new password
@@ -101,23 +82,23 @@ export const POST = pipe(
       }),
     ]);
 
-    log.info("Reset password: password updated successfully", {
+    log.info('Reset password: password updated successfully', {
       userId: resetToken.userId,
     });
 
     return NextResponse.json(
       {
         success: true,
-        message: "Password reset successfully",
+        message: 'Password reset successfully',
       },
       { status: 200 },
     );
   } catch (error) {
-    log.error("Reset password: unexpected error", {
+    log.error('Reset password: unexpected error', {
       error: String(error),
     });
     return NextResponse.json(
-      { error: "An error occurred. Please try again later." },
+      { error: 'An error occurred. Please try again later.' },
       { status: 500 },
     );
   }

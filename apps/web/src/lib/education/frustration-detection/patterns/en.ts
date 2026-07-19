@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * English frustration patterns
  */
@@ -56,7 +57,18 @@ export const englishPatterns: LocalePatterns = {
   ],
 
   fillers: [
-    'um', 'uh', 'hmm', 'like', 'you know', 'basically', 'actually',
-    'so', 'well', 'i mean', 'kind of', 'sort of', 'whatever',
+    'um',
+    'uh',
+    'hmm',
+    'like',
+    'you know',
+    'basically',
+    'actually',
+    'so',
+    'well',
+    'i mean',
+    'kind of',
+    'sort of',
+    'whatever',
   ],
 };

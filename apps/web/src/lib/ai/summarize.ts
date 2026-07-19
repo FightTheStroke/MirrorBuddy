@@ -4,11 +4,11 @@
 // Supports per-feature AI config (ADR 0073)
 // ============================================================================
 
-import { chatCompletion, getActiveProvider } from "./providers";
-import { getDeploymentForModel } from "./providers/deployment-mapping";
-// eslint-disable-next-line local-rules/enforce-dependency-direction -- tier check needed for model selection
-import { tierService } from "@/lib/tier/server";
-import { logger } from "@/lib/logger";
+import { chatCompletion, getActiveProvider } from './providers';
+import { getDeploymentForModel } from './providers/deployment-mapping';
+
+import { tierService } from '@/lib/tier/server';
+import { logger } from '@/lib/logger';
 
 interface Message {
   role: string;
@@ -22,7 +22,7 @@ interface KeyFacts {
 }
 
 interface Learning {
-  category: "preference" | "strength" | "weakness" | "interest" | "style";
+  category: 'preference' | 'strength' | 'weakness' | 'interest' | 'style';
   insight: string;
   confidence: number;
 }
@@ -39,7 +39,7 @@ export async function generateConversationSummary(
 ): Promise<string> {
   const provider = getActiveProvider();
   if (!provider) {
-    throw new Error("No AI provider available for summarization");
+    throw new Error('No AI provider available for summarization');
   }
 
   const systemPrompt = `Sei un assistente che riassume conversazioni educative.
@@ -54,24 +54,17 @@ Usa un linguaggio chiaro e diretto.`;
 
   const userPrompt = `Riassumi questa conversazione:
 
-${messages.map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`).join("\n\n")}`;
+${messages.map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`).join('\n\n')}`;
 
   // Get AI config from tier (ADR 0073)
-  const aiConfig = await tierService.getFeatureAIConfigForUser(
-    userId ?? null,
-    "summary",
-  );
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId ?? null, 'summary');
   const deploymentName = getDeploymentForModel(aiConfig.model);
 
-  const result = await chatCompletion(
-    [{ role: "user", content: userPrompt }],
-    systemPrompt,
-    {
-      temperature: aiConfig.temperature,
-      maxTokens: aiConfig.maxTokens,
-      model: deploymentName,
-    },
-  );
+  const result = await chatCompletion([{ role: 'user', content: userPrompt }], systemPrompt, {
+    temperature: aiConfig.temperature,
+    maxTokens: aiConfig.maxTokens,
+    model: deploymentName,
+  });
 
   return result.content;
 }
@@ -82,10 +75,7 @@ ${messages.map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.conten
  * @param messages - Messages to analyze
  * @param userId - User ID for tier-based AI config (ADR 0073)
  */
-export async function extractKeyFacts(
-  messages: Message[],
-  userId?: string,
-): Promise<KeyFacts> {
+export async function extractKeyFacts(messages: Message[], userId?: string): Promise<KeyFacts> {
   const provider = getActiveProvider();
   if (!provider) {
     return { decisions: [], preferences: [], learned: [] };
@@ -104,26 +94,19 @@ Se non ci sono informazioni per una categoria, usa un array vuoto.
 Max 3 elementi per categoria.`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
-    .join("\n\n");
+    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
+    .join('\n\n');
 
   // Get AI config from tier (ADR 0073)
-  const aiConfig = await tierService.getFeatureAIConfigForUser(
-    userId ?? null,
-    "summary",
-  );
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId ?? null, 'summary');
   const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
-    const result = await chatCompletion(
-      [{ role: "user", content: userPrompt }],
-      systemPrompt,
-      {
-        temperature: aiConfig.temperature,
-        maxTokens: aiConfig.maxTokens,
-        model: deploymentName,
-      },
-    );
+    const result = await chatCompletion([{ role: 'user', content: userPrompt }], systemPrompt, {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    });
 
     // Parse JSON from response
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
@@ -131,7 +114,7 @@ Max 3 elementi per categoria.`;
       return JSON.parse(jsonMatch[0]);
     }
   } catch (error) {
-    logger.error("Failed to extract key facts", { error: String(error) });
+    logger.error('Failed to extract key facts', { error: String(error) });
   }
 
   return { decisions: [], preferences: [], learned: [] };
@@ -143,10 +126,7 @@ Max 3 elementi per categoria.`;
  * @param messages - Messages to analyze
  * @param userId - User ID for tier-based AI config (ADR 0073)
  */
-export async function extractTopics(
-  messages: Message[],
-  userId?: string,
-): Promise<string[]> {
+export async function extractTopics(messages: Message[], userId?: string): Promise<string[]> {
   const provider = getActiveProvider();
   if (!provider) {
     return [];
@@ -160,26 +140,19 @@ Esempio: ["Matematica - Frazioni", "Geometria - Perimetro", "Esercizi pratici"]
 Usa termini brevi e chiari.`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
-    .join("\n\n");
+    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
+    .join('\n\n');
 
   // Get AI config from tier (ADR 0073)
-  const aiConfig = await tierService.getFeatureAIConfigForUser(
-    userId ?? null,
-    "summary",
-  );
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId ?? null, 'summary');
   const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
-    const result = await chatCompletion(
-      [{ role: "user", content: userPrompt }],
-      systemPrompt,
-      {
-        temperature: aiConfig.temperature,
-        maxTokens: aiConfig.maxTokens,
-        model: deploymentName,
-      },
-    );
+    const result = await chatCompletion([{ role: 'user', content: userPrompt }], systemPrompt, {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    });
 
     // Parse JSON array from response
     const arrayMatch = result.content.match(/\[[\s\S]*\]/);
@@ -187,7 +160,7 @@ Usa termini brevi e chiari.`;
       return JSON.parse(arrayMatch[0]);
     }
   } catch (error) {
-    logger.error("Failed to extract topics", { error: String(error) });
+    logger.error('Failed to extract topics', { error: String(error) });
   }
 
   return [];
@@ -234,26 +207,19 @@ Regole:
 - Se non ci sono insights chiari, rispondi con []`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
-    .join("\n\n");
+    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
+    .join('\n\n');
 
   // Get AI config from tier (ADR 0073)
-  const aiConfig = await tierService.getFeatureAIConfigForUser(
-    userId ?? null,
-    "summary",
-  );
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId ?? null, 'summary');
   const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
-    const result = await chatCompletion(
-      [{ role: "user", content: userPrompt }],
-      systemPrompt,
-      {
-        temperature: aiConfig.temperature,
-        maxTokens: aiConfig.maxTokens,
-        model: deploymentName,
-      },
-    );
+    const result = await chatCompletion([{ role: 'user', content: userPrompt }], systemPrompt, {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    });
 
     // Parse JSON array from response
     const arrayMatch = result.content.match(/\[[\s\S]*\]/);
@@ -263,13 +229,7 @@ Regole:
       return learnings
         .filter(
           (l) =>
-            [
-              "preference",
-              "strength",
-              "weakness",
-              "interest",
-              "style",
-            ].includes(l.category) &&
+            ['preference', 'strength', 'weakness', 'interest', 'style'].includes(l.category) &&
             l.insight &&
             l.confidence >= 0.3 &&
             l.confidence <= 1,
@@ -277,7 +237,7 @@ Regole:
         .slice(0, 3);
     }
   } catch (error) {
-    logger.error("Failed to extract learnings", { error: String(error) });
+    logger.error('Failed to extract learnings', { error: String(error) });
   }
 
   return [];
@@ -286,19 +246,17 @@ Regole:
 /**
  * Generate a title for a conversation from its first messages
  */
-export async function generateConversationTitle(
-  messages: Message[],
-): Promise<string> {
+export async function generateConversationTitle(messages: Message[]): Promise<string> {
   if (messages.length === 0) {
-    return "Nuova conversazione";
+    return 'Nuova conversazione';
   }
 
   // If there's a user message, use it directly (truncated)
-  const firstUserMsg = messages.find((m) => m.role === "user");
+  const firstUserMsg = messages.find((m) => m.role === 'user');
   if (firstUserMsg) {
     const title = firstUserMsg.content.slice(0, 50);
     return title.length < firstUserMsg.content.length ? `${title}...` : title;
   }
 
-  return "Nuova conversazione";
+  return 'Nuova conversazione';
 }

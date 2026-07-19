@@ -10,8 +10,8 @@
  * - F-25: SSE cleanup on unmount component React
  */
 
-import { useState, useEffect } from "react";
-import { logger } from "@/lib/logger";
+import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 /**
  * Admin dashboard counts structure
@@ -28,11 +28,11 @@ export interface AdminCounts {
  * Connection status states
  */
 export type ConnectionStatus =
-  | "idle" // Initial state, not yet connected
-  | "connecting" // First connection attempt
-  | "connected" // Successfully connected and receiving data
-  | "reconnecting" // Attempting to reconnect after disconnect
-  | "error"; // Permanent failure after max retries
+  | 'idle' // Initial state, not yet connected
+  | 'connecting' // First connection attempt
+  | 'connected' // Successfully connected and receiving data
+  | 'reconnecting' // Attempting to reconnect after disconnect
+  | 'error'; // Permanent failure after max retries
 
 /**
  * Hook return value
@@ -77,7 +77,7 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
     systemAlerts: 0,
     timestamp: new Date().toISOString(),
   });
-  const [status, setStatus] = useState<ConnectionStatus>("idle");
+  const [status, setStatus] = useState<ConnectionStatus>('idle');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,14 +91,13 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
     const connect = () => {
       // Set appropriate status based on retry count
       if (retryCount === 0) {
-        setStatus("connecting");
+        setStatus('connecting');
         setError(null);
       } else {
-        setStatus("reconnecting"); // F-22: Show "Reconnecting..." during disconnect
+        setStatus('reconnecting'); // F-22: Show "Reconnecting..." during disconnect
       }
 
-      // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: close() called in onerror (line 126) and useEffect return (line 154)
-      eventSource = new EventSource("/api/admin/counts/stream");
+      eventSource = new EventSource('/api/admin/counts/stream');
 
       /**
        * Handle incoming SSE messages
@@ -107,13 +106,13 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
         try {
           const data = JSON.parse(event.data) as AdminCounts;
           setCounts(data);
-          setStatus("connected");
+          setStatus('connected');
           retryCount = 0; // Reset retry counter on successful message
           setError(null);
         } catch (err) {
           logger.error(
-            "[useAdminCountsSSE] Failed to parse SSE data",
-            { component: "useAdminCountsSSE" },
+            '[useAdminCountsSSE] Failed to parse SSE data',
+            { component: 'useAdminCountsSSE' },
             err,
           );
           // Continue listening - parsing error doesn't close connection
@@ -137,11 +136,9 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
           retryTimeout = setTimeout(connect, backoff);
         } else {
           // F-07: After 3 retries → permanent error state
-          logger.error(
-            "[useAdminCountsSSE] Max retries reached. Connection failed.",
-          );
-          setStatus("error");
-          setError("Connection failed. Refresh page.");
+          logger.error('[useAdminCountsSSE] Max retries reached. Connection failed.');
+          setStatus('error');
+          setError('Connection failed. Refresh page.');
         }
       };
     };

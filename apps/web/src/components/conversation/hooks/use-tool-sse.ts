@@ -4,24 +4,20 @@
  * Extracted from conversation-flow.tsx
  */
 
-import { useEffect } from "react";
-import { logger } from "@/lib/logger";
-import type { ToolState } from "@/types/tools";
-import type { ToolEvent } from "@/lib/realtime/tool-events";
+import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
+import type { ToolState } from '@/types/tools';
+import type { ToolEvent } from '@/lib/realtime/tool-events';
 
 type SetToolState = React.Dispatch<React.SetStateAction<ToolState | null>>;
 
 /**
  * Hook to listen for tool creation/update events via SSE
  */
-export function useToolSSE(
-  sessionId: string | null,
-  setActiveTool: SetToolState,
-) {
+export function useToolSSE(sessionId: string | null, setActiveTool: SetToolState) {
   useEffect(() => {
     if (!sessionId) return;
 
-    // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: eventSource.close() called in useEffect return (line 116)
     const eventSource = new EventSource(
       `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`,
     );
@@ -44,78 +40,73 @@ export function useToolSSE(
         const toolId = data.id || data.toolId;
 
         switch (data.type) {
-          case "tool:created":
+          case 'tool:created':
             if (!toolId) return;
             setActiveTool({
               id: toolId,
               type: data.toolType,
-              status: "initializing",
+              status: 'initializing',
               progress: 0,
               content: data.data,
               createdAt: new Date(),
             });
             break;
 
-          case "tool:update":
+          case 'tool:update':
             if (!toolId) return;
             setActiveTool((prev) => {
               if (!prev || prev.id !== toolId) return prev;
-              const nextProgress = normalizeProgress(
-                data.data?.progress ?? data.progress,
-              );
+              const nextProgress = normalizeProgress(data.data?.progress ?? data.progress);
               return {
                 ...prev,
-                status: "building",
+                status: 'building',
                 progress: nextProgress ?? prev.progress,
                 content: data.data?.content ?? prev.content,
               };
             });
             break;
 
-          case "tool:complete":
+          case 'tool:complete':
             if (!toolId) return;
             setActiveTool((prev) => {
               if (!prev || prev.id !== toolId) return prev;
               return {
                 ...prev,
-                status: "completed",
+                status: 'completed',
                 progress: 1,
                 content: data.data?.content ?? prev.content,
               };
             });
             break;
 
-          case "tool:error":
+          case 'tool:error':
             if (!toolId) return;
             setActiveTool((prev) => {
               if (!prev || prev.id !== toolId) return prev;
               return {
                 ...prev,
-                status: "error",
-                error:
-                  data.data?.error ||
-                  data.error ||
-                  "Errore durante la creazione",
+                status: 'error',
+                error: data.data?.error || data.error || 'Errore durante la creazione',
               };
             });
             break;
 
           default:
-            logger.debug("Unknown SSE event type", { type: data.type });
+            logger.debug('Unknown SSE event type', { type: data.type });
         }
       } catch (error) {
-        logger.error("SSE message parse error", { error: String(error) });
+        logger.error('SSE message parse error', { error: String(error) });
       }
     };
 
     eventSource.onerror = (error) => {
-      logger.error("SSE connection error", { error: String(error) });
+      logger.error('SSE connection error', { error: String(error) });
       // EventSource will automatically try to reconnect
     };
 
     return () => {
       eventSource.close();
-      logger.debug("SSE connection closed", { sessionId });
+      logger.debug('SSE connection closed', { sessionId });
     };
   }, [sessionId, setActiveTool]);
 }

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant jailbreak patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 /**
  * Jailbreak Detection Patterns
  * Pattern definitions for detecting prompt injection attempts
@@ -68,17 +69,16 @@ export const SYSTEM_EXTRACTION_PATTERNS: Array<{
 /**
  * Hypothetical framing patterns
  */
-export const HYPOTHETICAL_PATTERNS: Array<{ pattern: RegExp; weight: number }> =
-  [
-    { pattern: /in\s+a\s+fictional\s+(world|story)/gi, weight: 0.6 },
-    { pattern: /in\s+un\s+mondo\s+immaginario/gi, weight: 0.6 },
-    { pattern: /for\s+a\s+novel\s+i'?m\s+writing/gi, weight: 0.5 },
-    { pattern: /per\s+un\s+romanzo/gi, weight: 0.5 },
-    { pattern: /hypothetically\s+speaking/gi, weight: 0.5 },
-    { pattern: /ipoteticamente/gi, weight: 0.5 },
-    { pattern: /just\s+for\s+educational\s+purposes/gi, weight: 0.6 },
-    { pattern: /solo\s+per\s+scopi\s+educativi/gi, weight: 0.6 },
-  ];
+export const HYPOTHETICAL_PATTERNS: Array<{ pattern: RegExp; weight: number }> = [
+  { pattern: /in\s+a\s+fictional\s+(world|story)/gi, weight: 0.6 },
+  { pattern: /in\s+un\s+mondo\s+immaginario/gi, weight: 0.6 },
+  { pattern: /for\s+a\s+novel\s+i'?m\s+writing/gi, weight: 0.5 },
+  { pattern: /per\s+un\s+romanzo/gi, weight: 0.5 },
+  { pattern: /hypothetically\s+speaking/gi, weight: 0.5 },
+  { pattern: /ipoteticamente/gi, weight: 0.5 },
+  { pattern: /just\s+for\s+educational\s+purposes/gi, weight: 0.6 },
+  { pattern: /solo\s+per\s+scopi\s+educativi/gi, weight: 0.6 },
+];
 
 /**
  * Emotional manipulation patterns

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Flashcard UI Components
@@ -6,16 +6,10 @@
  */
 
 import { useState, useMemo } from 'react';
-import {
-  reviewCard,
-  isDue,
-  getDueCards,
-  calculateStats,
-  type Quality,
-} from './fsrs';
+import { reviewCard, isDue, getDueCards, calculateStats, type Quality } from './fsrs';
 import type { Flashcard, FlashcardSessionProps, StatCardProps } from './example-flashcard-types';
 import { formatInterval, formatNextReview } from './example-flashcard-helpers';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 // ============================================================================
 // FLASHCARD SESSION COMPONENT
@@ -26,26 +20,25 @@ export function FlashcardSession({
   onCardUpdate,
   onSessionComplete,
 }: FlashcardSessionProps) {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
   const sessionCards = useMemo(() => {
-    const due = getDueCards(cards.map(c => c.fsrs), 20);
-    const dueCardIds = new Set(
-      due.map(d => cards.find(c => c.fsrs === d)?.id).filter(Boolean)
+    const due = getDueCards(
+      cards.map((c) => c.fsrs),
+      20,
     );
-    return cards.filter(c => dueCardIds.has(c.id));
+    const dueCardIds = new Set(due.map((d) => cards.find((c) => c.fsrs === d)?.id).filter(Boolean));
+    return cards.filter((c) => dueCardIds.has(c.id));
   }, [cards]);
 
   if (sessionCards.length === 0) {
     return (
       <div className="text-center p-8">
-        <h2 className="text-2xl font-bold mb-4">{t("allCaughtUp")}</h2>
-        <p className="text-gray-600">{t("noCardsAreDueForReviewRightNow")}</p>
-        <p className="text-sm text-gray-500 mt-2">
-          {t("comeBackLaterForYourNextReviewSession")}
-        </p>
+        <h2 className="text-2xl font-bold mb-4">{t('allCaughtUp')}</h2>
+        <p className="text-gray-600">{t('noCardsAreDueForReviewRightNow')}</p>
+        <p className="text-sm text-gray-500 mt-2">{t('comeBackLaterForYourNextReviewSession')}</p>
       </div>
     );
   }
@@ -69,8 +62,13 @@ export function FlashcardSession({
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span>{t("card")} {currentIndex + 1} {t("of")} {sessionCards.length}</span>
-          <span>{Math.round(progress)}{t("complete")}</span>
+          <span>
+            {t('card')} {currentIndex + 1} {t('of')} {sessionCards.length}
+          </span>
+          <span>
+            {Math.round(progress)}
+            {t('complete')}
+          </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
@@ -82,17 +80,12 @@ export function FlashcardSession({
 
       <div className="bg-white rounded-lg shadow-lg p-8 min-h-[300px] flex flex-col justify-center">
         <div className="text-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            {currentCard.front}
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">{currentCard.front}</h3>
 
           {currentCard.tags && currentCard.tags.length > 0 && (
             <div className="flex gap-2 justify-center flex-wrap">
-              {currentCard.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                >
+              {currentCard.tags.map((tag) => (
+                <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
                   {tag}
                 </span>
               ))}
@@ -111,7 +104,7 @@ export function FlashcardSession({
             onClick={() => setShowAnswer(true)}
             className="mx-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            {t("showAnswer")}
+            {t('showAnswer')}
           </button>
         )}
       </div>
@@ -122,21 +115,21 @@ export function FlashcardSession({
             onClick={() => handleQuality(1)}
             className="px-4 py-3 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium"
           >
-            {t("again")}
+            {t('again')}
             <span className="block text-xs text-red-600 mt-1">&lt; 1m</span>
           </button>
           <button
             onClick={() => handleQuality(2)}
             className="px-4 py-3 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-medium"
           >
-            {t("hard")}
+            {t('hard')}
             <span className="block text-xs text-orange-600 mt-1">&lt; 10m</span>
           </button>
           <button
             onClick={() => handleQuality(3)}
             className="px-4 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
           >
-            {t("good")}
+            {t('good')}
             <span className="block text-xs text-green-600 mt-1">
               {formatInterval(currentCard.fsrs)}
             </span>
@@ -145,7 +138,7 @@ export function FlashcardSession({
             onClick={() => handleQuality(4)}
             className="px-4 py-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
           >
-            {t("easy")}
+            {t('easy')}
             <span className="block text-xs text-blue-600 mt-1">
               {formatInterval(currentCard.fsrs, 1.5)}
             </span>
@@ -154,7 +147,7 @@ export function FlashcardSession({
       )}
 
       <div className="mt-4 text-center text-sm text-gray-500">
-        {/* eslint-disable-next-line local-rules/no-literal-strings-in-jsx */}
+        {}
         <p>Keyboard: 1 (Again) • 2 (Hard) • 3 (Good) • 4 (Easy) • Space (Show)</p>
       </div>
     </div>
@@ -166,31 +159,14 @@ export function FlashcardSession({
 // ============================================================================
 
 export function FlashcardStats({ cards }: { cards: Flashcard[] }) {
-  const stats = calculateStats(cards.map(c => c.fsrs));
+  const stats = calculateStats(cards.map((c) => c.fsrs));
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-6">
-      <StatCard
-        label="Total Cards"
-        value={stats.totalCards}
-        icon="📚"
-      />
-      <StatCard
-        label="Due Today"
-        value={stats.cardsDue}
-        icon="⏰"
-        highlight={stats.cardsDue > 0}
-      />
-      <StatCard
-        label="Mastered"
-        value={stats.cardsMastered}
-        icon="⭐"
-      />
-      <StatCard
-        label="Avg Stability"
-        value={`${stats.avgStability.toFixed(1)}d`}
-        icon="📈"
-      />
+      <StatCard label="Total Cards" value={stats.totalCards} icon="📚" />
+      <StatCard label="Due Today" value={stats.cardsDue} icon="⏰" highlight={stats.cardsDue > 0} />
+      <StatCard label="Mastered" value={stats.cardsMastered} icon="⭐" />
+      <StatCard label="Avg Stability" value={`${stats.avgStability.toFixed(1)}d`} icon="📈" />
       <StatCard
         label="Avg Difficulty"
         value={`${(stats.avgDifficulty * 100).toFixed(0)}%`}
@@ -206,25 +182,12 @@ export function FlashcardStats({ cards }: { cards: Flashcard[] }) {
   );
 }
 
-function StatCard({
-  label,
-  value,
-  icon,
-  highlight = false,
-}: StatCardProps) {
+function StatCard({ label, value, icon, highlight = false }: StatCardProps) {
   return (
-    <div
-      className={`bg-white rounded-lg shadow p-4 ${
-        highlight ? 'ring-2 ring-blue-500' : ''
-      }`}
-    >
+    <div className={`bg-white rounded-lg shadow p-4 ${highlight ? 'ring-2 ring-blue-500' : ''}`}>
       <div className="flex items-center justify-between mb-2">
         <span className="text-2xl">{icon}</span>
-        <span
-          className={`text-2xl font-bold ${
-            highlight ? 'text-blue-600' : 'text-gray-900'
-          }`}
-        >
+        <span className={`text-2xl font-bold ${highlight ? 'text-blue-600' : 'text-gray-900'}`}>
           {value}
         </span>
       </div>
@@ -238,10 +201,10 @@ function StatCard({
 // ============================================================================
 
 export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   const [filter, setFilter] = useState<'all' | 'due' | 'mastered'>('all');
 
-  const filteredCards = cards.filter(card => {
+  const filteredCards = cards.filter((card) => {
     if (filter === 'due') return isDue(card.fsrs);
     if (filter === 'mastered') return card.fsrs.stability > 30;
     return true;
@@ -250,55 +213,44 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
   return (
     <div className="p-6">
       <div className="flex gap-2 mb-6">
-        <FilterButton
-          active={filter === 'all'}
-          onClick={() => setFilter('all')}
-        >
-          {t("allCards")}
+        <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>
+          {t('allCards')}
         </FilterButton>
-        <FilterButton
-          active={filter === 'due'}
-          onClick={() => setFilter('due')}
-        >
-          {t("due")}{cards.filter(c => isDue(c.fsrs)).length})
+        <FilterButton active={filter === 'due'} onClick={() => setFilter('due')}>
+          {t('due')}
+          {cards.filter((c) => isDue(c.fsrs)).length})
         </FilterButton>
-        <FilterButton
-          active={filter === 'mastered'}
-          onClick={() => setFilter('mastered')}
-        >
-          {t("mastered")}{cards.filter(c => c.fsrs.stability > 30).length})
+        <FilterButton active={filter === 'mastered'} onClick={() => setFilter('mastered')}>
+          {t('mastered')}
+          {cards.filter((c) => c.fsrs.stability > 30).length})
         </FilterButton>
       </div>
 
       <div className="space-y-3">
-        {filteredCards.map(card => (
+        {filteredCards.map((card) => (
           <div
             key={card.id}
             className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  {card.front}
-                </h4>
+                <h4 className="font-semibold text-gray-900 mb-1">{card.front}</h4>
                 <p className="text-sm text-gray-600">{card.back}</p>
               </div>
 
               <div className="text-right ml-4">
                 <div className="text-sm font-medium text-gray-900">
                   {isDue(card.fsrs) ? (
-                    <span className="text-red-600">{t("dueNow")}</span>
+                    <span className="text-red-600">{t('dueNow')}</span>
                   ) : (
-                    <span className="text-gray-500">
-                      {formatNextReview(card.fsrs.nextReview)}
-                    </span>
+                    <span className="text-gray-500">{formatNextReview(card.fsrs.nextReview)}</span>
                   )}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  {t("stability")} {card.fsrs.stability.toFixed(1)}d
+                  {t('stability')} {card.fsrs.stability.toFixed(1)}d
                 </div>
                 <div className="text-xs text-gray-500">
-                  {t("reviews")} {card.fsrs.reps}
+                  {t('reviews')} {card.fsrs.reps}
                   {card.fsrs.lapses > 0 && ` • Lapses: ${card.fsrs.lapses}`}
                 </div>
               </div>
@@ -307,9 +259,7 @@ export function FlashcardBrowser({ cards }: { cards: Flashcard[] }) {
         ))}
 
         {filteredCards.length === 0 && (
-          <div className="text-center text-gray-500 py-8">
-            {t("noCardsInThisCategory")}
-          </div>
+          <div className="text-center text-gray-500 py-8">{t('noCardsInThisCategory')}</div>
         )}
       </div>
     </div>
@@ -329,9 +279,7 @@ function FilterButton({
     <button
       onClick={onClick}
       className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-        active
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+        active ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
       }`}
     >
       {children}

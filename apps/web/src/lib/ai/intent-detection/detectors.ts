@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
 import type { Subject, ToolType } from '@/types';
 import type { EmotionalIndicator } from './types';
 import {
@@ -46,7 +47,9 @@ export function isMethodRequest(message: string): boolean {
   }
 
   // Fallback keywords to catch wording variations for method/coaching needs
-  return /\b(metodo\s+di\s+studio|organizzarmi|organizz\w*|concentrarmi|concentrar[ei]|gestire\s+(meglio\s+)?(il\s+)?tempo|strategia(\s+di\s+studio)?|tecnica(\s+di\s+studio)?|non\s+so\s+da\s+dove\s+iniziare|studiare\s+meglio|consiglio\s+.*studiare|come\s+(devo|posso)\s+studiare)\b/i.test(message);
+  return /\b(metodo\s+di\s+studio|organizzarmi|organizz\w*|concentrarmi|concentrar[ei]|gestire\s+(meglio\s+)?(il\s+)?tempo|strategia(\s+di\s+studio)?|tecnica(\s+di\s+studio)?|non\s+so\s+da\s+dove\s+iniziare|studiare\s+meglio|consiglio\s+.*studiare|come\s+(devo|posso)\s+studiare)\b/i.test(
+    message,
+  );
 }
 
 export function isToolRequest(message: string): boolean {
@@ -70,4 +73,3 @@ export function detectToolType(message: string): ToolType | null {
 
   return null;
 }
-

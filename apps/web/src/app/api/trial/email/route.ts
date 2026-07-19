@@ -1,20 +1,16 @@
-import { NextResponse } from "next/server";
-import {
-  requestTrialEmailVerification,
-  updateTrialEmail,
-} from "@/lib/trial/trial-service";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { requestTrialEmailVerification, updateTrialEmail } from '@/lib/trial/trial-service';
+import { logger } from '@/lib/logger';
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from "@/lib/rate-limit";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-
+} from '@/lib/rate-limit';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
-const log = logger.child({ module: "api/trial/email" });
+const log = logger.child({ module: 'api/trial/email' });
 
 /**
  * PATCH /api/trial/email
@@ -23,15 +19,14 @@ const log = logger.child({ module: "api/trial/email" });
  * Email capture is optional and can be triggered after X messages or at limit.
  */
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial email capture, public endpoint with rate limiting
-export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
+export const PATCH = pipe(withSentry('/api/trial/email'))(async (ctx) => {
   const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(
     `trial:email:${clientId}`,
     RATE_LIMITS.CONTACT_FORM,
   );
   if (!rateLimitResult.success) {
-    log.warn("Trial email rate limited", { clientId });
+    log.warn('Trial email rate limited', { clientId });
     return rateLimitResponse(rateLimitResult);
   }
 
@@ -41,29 +36,23 @@ export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
 
     // Validate input
     if (!sessionId) {
-      return NextResponse.json(
-        { error: "sessionId is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
     }
 
     if (!email) {
-      return NextResponse.json({ error: "email is required" }, { status: 400 });
+      return NextResponse.json({ error: 'email is required' }, { status: 400 });
     }
 
     // Basic email validation - simple pattern to avoid ReDoS
     // RFC 5322 compliant validation should happen server-side with proper library
     if (
-      typeof email !== "string" ||
+      typeof email !== 'string' ||
       email.length > 254 ||
-      !email.includes("@") ||
-      email.indexOf("@") === 0 ||
-      email.indexOf("@") === email.length - 1
+      !email.includes('@') ||
+      email.indexOf('@') === 0 ||
+      email.indexOf('@') === email.length - 1
     ) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
     }
 
     // Update session with email
@@ -72,7 +61,7 @@ export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
     // Request verification email
     const verificationResult = await requestTrialEmailVerification(sessionId);
 
-    log.info("[TrialEmail] Email captured", {
+    log.info('[TrialEmail] Email captured', {
       sessionId,
       hasEmail: !!updatedSession.email,
     });
@@ -91,21 +80,18 @@ export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
     });
   } catch (error) {
     // Handle session not found error
-    if (error instanceof Error && error.message.includes("Session not found")) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    if (error instanceof Error && error.message.includes('Session not found')) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    if (error instanceof Error && error.message.includes("Email not set")) {
-      return NextResponse.json({ error: "Email not set" }, { status: 400 });
+    if (error instanceof Error && error.message.includes('Email not set')) {
+      return NextResponse.json({ error: 'Email not set' }, { status: 400 });
     }
 
-    log.error("[TrialEmail] Failed to save email", {
+    log.error('[TrialEmail] Failed to save email', {
       error: String(error),
     });
 
-    return NextResponse.json(
-      { error: "Failed to save email" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'Failed to save email' }, { status: 500 });
   }
 });

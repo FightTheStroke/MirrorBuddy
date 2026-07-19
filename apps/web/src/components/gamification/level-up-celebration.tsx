@@ -3,11 +3,11 @@
  * Fullscreen overlay with celebration animation
  */
 
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
-import { useTranslations } from "next-intl";
+import React, { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 
 // Pre-generate confetti positions at module load to avoid hydration issues
 // Uses seeded randomization based on index for reproducibility across SSR/client
@@ -43,7 +43,7 @@ export function LevelUpCelebration({
   coachMessage,
   onDismiss,
 }: LevelUpCelebrationProps) {
-  const t = useTranslations("achievements");
+  const t = useTranslations('achievements');
   const [isVisible, setIsVisible] = useState(false);
   const mountedRef = React.useRef(false);
 
@@ -72,17 +72,16 @@ export function LevelUpCelebration({
   }, [handleDismiss]);
 
   // SSR check
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
 
   const content = (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Dialog backdrop with click-to-dismiss is standard UX pattern
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
-        isVisible ? "opacity-100" : "opacity-0"
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={handleDismiss}
       onKeyDown={(e) => {
-        if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+        if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           handleDismiss();
         }
@@ -107,10 +106,10 @@ export function LevelUpCelebration({
         ))}
       </div>
 
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
+      {}
       <div
         className={`relative max-w-md space-y-6 rounded-2xl bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-cyan-500/20 p-8 text-center backdrop-blur-xl transition-transform duration-500 ${
-          isVisible ? "scale-100" : "scale-75"
+          isVisible ? 'scale-100' : 'scale-75'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -125,10 +124,10 @@ export function LevelUpCelebration({
             id="level-up-title"
             className="text-4xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 bg-clip-text text-transparent"
           >
-            {t("levelUp")}
+            {t('levelUp')}
           </h2>
           <p className="text-xl font-semibold text-white">
-            {t("livello")} {level} {t("raggiunto")}
+            {t('livello')} {level} {t('raggiunto')}
           </p>
         </div>
 
@@ -146,7 +145,7 @@ export function LevelUpCelebration({
               <div className="flex items-center justify-center gap-2 rounded-lg bg-blue-500/20 py-2 px-4">
                 <span className="text-2xl">💎</span>
                 <span className="text-lg font-semibold text-white">
-                  +{rewards.mirrorBucks} {t("mirrorbucks")}
+                  +{rewards.mirrorBucks} {t('mirrorbucks')}
                 </span>
               </div>
             )}
@@ -154,7 +153,7 @@ export function LevelUpCelebration({
             {rewards.achievements && rewards.achievements.length > 0 && (
               <div className="space-y-1">
                 <p className="text-xs uppercase tracking-wide text-white/70">
-                  {t("nuoviAchievement")}
+                  {t('nuoviAchievement')}
                 </p>
                 <div className="flex flex-wrap justify-center gap-2">
                   {rewards.achievements.map((achievement, i) => (
@@ -172,7 +171,7 @@ export function LevelUpCelebration({
         )}
 
         {/* Dismiss hint */}
-        <p className="text-xs text-white/50">{t("cliccaOvunquePerContinuare")}</p>
+        <p className="text-xs text-white/50">{t('cliccaOvunquePerContinuare')}</p>
       </div>
 
       <style jsx>{`
@@ -180,15 +179,7 @@ export function LevelUpCelebration({
           position: absolute;
           width: 10px;
           height: 10px;
-          background: linear-gradient(
-            45deg,
-            #fbbf24,
-            #f97316,
-            #ec4899,
-            #8b5cf6,
-            #3b82f6,
-            #10b981
-          );
+          background: linear-gradient(45deg, #fbbf24, #f97316, #ec4899, #8b5cf6, #3b82f6, #10b981);
           border-radius: 50%;
           animation: confetti-fall linear forwards;
           opacity: 0.8;

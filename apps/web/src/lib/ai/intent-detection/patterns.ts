@@ -1,5 +1,6 @@
-import type { Subject, ToolType } from "@/types";
-import type { EmotionalIndicator } from "./types";
+/* eslint-disable security/detect-unsafe-regex -- hand-audited constant patterns; no nested quantifiers over user input (no ReDoS). Reviewed in PR #541. */
+import type { Subject, ToolType } from '@/types';
+import type { EmotionalIndicator } from './types';
 
 export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
   mathematics: [
@@ -30,10 +31,7 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /\b(italiano|grammatica|sintassi|analisi|letteratura|poesia|divina\s+commedia|promessi\s+sposi|manzoni|dante)\b/i,
     /\b(verbo|sostantivo|aggettivo|analisi\s+grammaticale|analisi\s+del\s+periodo)\b/i,
   ],
-  english: [
-    /\b(inglese|english|grammar|verb|noun|adjective)\b/i,
-    /\b(translation|traduzione)\b/i,
-  ],
+  english: [/\b(inglese|english|grammar|verb|noun|adjective)\b/i, /\b(translation|traduzione)\b/i],
   art: [
     /\b(arte|artistico|disegno|pittura|scultura|storia\s+dell'arte)\b/i,
     /\b(artista|opera|quadro)\b/i,
@@ -75,14 +73,8 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /scappellamento/i,
     /tapioca/i,
   ],
-  french: [
-    /\b(francese|franc[eé]s|français)\b/i,
-    /\b(molière|moliere|parigi|francia)\b/i,
-  ],
-  german: [
-    /\b(tedesco|deutsch|german[oa]?)\b/i,
-    /\b(goethe|germania|berlin[oa]?)\b/i,
-  ],
+  french: [/\b(francese|franc[eé]s|français)\b/i, /\b(molière|moliere|parigi|francia)\b/i],
+  german: [/\b(tedesco|deutsch|german[oa]?)\b/i, /\b(goethe|germania|berlin[oa]?)\b/i],
   sport: [
     /\bsport\b/i,
     /\bnuot[oa]|nuotar/i,
@@ -119,10 +111,7 @@ export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {
     /\b(eccitat[oa]|entusiasta|felice|content[oa]|evviva)\b/i,
     /\b(bello|fantastico|meraviglioso|ce\s+l'ho\s+fatta|finalmente)\b/i,
   ],
-  confidence: [
-    /\b(sicuro|fiducioso|capace|bravo)\b/i,
-    /\b(ce\s+la\s+posso\s+fare|riesco)\b/i,
-  ],
+  confidence: [/\b(sicuro|fiducioso|capace|bravo)\b/i, /\b(ce\s+la\s+posso\s+fare|riesco)\b/i],
 };
 
 export const METHOD_PATTERNS: RegExp[] = [
@@ -183,9 +172,9 @@ export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   pdf: [],
   homework: [],
   webcam: [],
-  "webcam-standalone": [],
+  'webcam-standalone': [],
   typing: [],
-  "study-kit": [],
+  'study-kit': [],
 };
 
 export const CRISIS_PATTERNS: RegExp[] = [

@@ -91,6 +91,7 @@ const eslintConfig = defineConfig([
     // Git worktree directories (local only)
     "feat/**",
     "feature/**",
+    "worktrees/**",
   ]),
   // Custom rules
   {
