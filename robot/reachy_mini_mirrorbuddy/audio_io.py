@@ -14,11 +14,22 @@ import time
 from collections.abc import Callable
 
 import numpy as np
-from scipy.signal import resample
+from math import gcd
+from scipy.signal import resample_poly
 
 from .azure_realtime import SAMPLE_RATE
 
 logger = logging.getLogger(__name__)
+
+
+def _resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
+    """Low-latency polyphase resampling (faster + cleaner than FFT resample)."""
+    if src_rate == dst_rate or audio.size == 0:
+        return audio
+    g = gcd(src_rate, dst_rate)
+    up = dst_rate // g
+    down = src_rate // g
+    return resample_poly(audio, up, down)
 
 
 class AudioIO:
@@ -93,8 +104,7 @@ class AudioIO:
 
         out_rate = self._out_rate or SAMPLE_RATE
         if out_rate != SAMPLE_RATE and audio.size:
-            target = max(1, int(audio.size * out_rate / SAMPLE_RATE))
-            audio = resample(audio, target)
+            audio = _resample(audio, SAMPLE_RATE, out_rate)
         audio_f32 = (np.asarray(audio, dtype=np.float32)) / 32768.0
         try:
             self.robot.media.push_audio_sample(audio_f32)
@@ -138,8 +148,7 @@ class AudioIO:
 
                 # Resample microphone -> realtime rate.
                 if needs_resample and audio.size:
-                    target = max(1, int(audio.size * SAMPLE_RATE / in_rate))
-                    audio = resample(audio, target).astype(np.int16)
+                    audio = _resample(audio, in_rate, SAMPLE_RATE).astype(np.int16)
 
                 self.on_input_pcm16(audio.tobytes())
             except Exception as e:

@@ -24,16 +24,18 @@ class VadProfile:
     noise_reduction: str | None = "near_field"
 
 
-# Longer silence windows = more patient robot (won't cut the child off).
+# Snappier turn-taking (Roberto: "più veloce, in tempo reale") while still giving
+# slower/less-regular speakers enough room not to be cut off. Silence windows are
+# roughly half the earlier, very-patient values.
 _PROFILES: dict[str, VadProfile] = {
-    "default": VadProfile(0.5, 300, 700),
-    "dyslexia": VadProfile(0.45, 400, 1100),
-    "adhd": VadProfile(0.55, 250, 600),
-    "autism": VadProfile(0.5, 400, 1200),
-    "motor": VadProfile(0.4, 500, 1500),
-    "cerebral": VadProfile(0.4, 500, 1600),
-    "visual": VadProfile(0.5, 300, 900),
-    "auditory": VadProfile(0.5, 300, 900),
+    "default": VadProfile(0.5, 200, 450),
+    "dyslexia": VadProfile(0.45, 250, 650),
+    "adhd": VadProfile(0.55, 150, 400),
+    "autism": VadProfile(0.5, 250, 700),
+    "motor": VadProfile(0.4, 300, 800),
+    "cerebral": VadProfile(0.4, 300, 800),
+    "visual": VadProfile(0.5, 200, 550),
+    "auditory": VadProfile(0.5, 200, 550),
 }
 
 
