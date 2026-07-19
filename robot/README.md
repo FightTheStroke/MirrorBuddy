@@ -108,8 +108,9 @@ locally** — never left to the model:
   fidgeting, no talking — until you call it back. A stop is a full stop, never a reply.
 - **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
   *«ci vediamo»*. Buddy says **one** short goodbye, then rests the same way.
-- **Wake it back up** — while resting, say its name *«Buddy»* (or *«svegliati»*, *«ci sei?»*).
-  Buddy wakes with a small gesture, greets again and asks what you'd like to do.
+- **Wake it back up** — while resting it ignores everything **except its name**: say
+  *«Buddy»* and it wakes with a small gesture, greets again and asks what you'd like to do.
+  Nothing else brings it back, so a rest really lasts until you call it.
 
 These intents are detected in `session_flow.py`/`rt_messages.py` and enforced in
 `azure_realtime.py`, so they work even if the model would rather keep talking.

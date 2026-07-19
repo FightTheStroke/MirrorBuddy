@@ -44,8 +44,10 @@ _END_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Wake intent: while asleep, only the robot's name (or a clear call) brings it back.
-_WAKE_RE = re.compile(r"\b(buddy|svegliati|sei\s+sveglio|ci\s+sei|ehi\s+robot)\b", re.IGNORECASE)
+# Wake intent: while asleep, ONLY the robot's name "Buddy" brings it back — so a
+# stop/rest really lasts until the child deliberately calls it again. A few ASR
+# spellings of the name are accepted (whisper sometimes drops a letter).
+_WAKE_RE = re.compile(r"\bbudd?(?:y|i|ie)\b", re.IGNORECASE)
 
 
 def is_end(text: str | None) -> bool:
