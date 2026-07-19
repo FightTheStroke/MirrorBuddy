@@ -17,13 +17,11 @@ from pathlib import Path
 
 from reachy_mini import ReachyMini, ReachyMiniApp
 
-from .azure_realtime import AzureRealtimeClient
 from .audio_io import AudioIO
 from .config import config
-from .dsa import turn_detection_config
+from .controller import Controller
 from .mirrorbuddy_client import MirrorBuddyClient
 from .movements import Movements, temperament_for
-from .prompt_builder import build_instructions
 
 logger = logging.getLogger(__name__)
 
@@ -94,13 +92,6 @@ def run(
         sys.exit(1)
     logger.info("Embodying Maestro: %s (%s), voice=%s", maestro.display_name, maestro.id, maestro.voice)
 
-    instructions = build_instructions(
-        maestro,
-        locale=config.LOCALE,
-        dsa_profile=config.DSA_PROFILE,
-        student_name=config.STUDENT_NAME,
-    )
-
     # Initialize the robot if the host didn't hand us one. When the Reachy Mini host
     # launches the app it opens (and will close) the robot for us, so only tear it
     # down here if we created it.
@@ -109,47 +100,33 @@ def run(
         robot = ReachyMini(**({"robot_name": args.robot_name} if args.robot_name else {}))
 
     # --- assemble the pipeline -------------------------------------------------
+    follow_face = config.FOLLOW_FACE and config.ENABLE_CAMERA and not args.no_camera
     temperament = temperament_for(maestro.subject, maestro.teaching_style, maestro.voice_instructions)
-    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament)
+    movements = Movements(robot, enabled=config.ENABLE_MOVEMENTS, temperament=temperament, follow_face=follow_face)
 
     audio = AudioIO(robot, on_input_pcm16=lambda b: None, movements=movements)
 
-    client = AzureRealtimeClient(
-        ws_url=config.realtime_ws_url(),
-        api_key=config.AZURE_API_KEY or "",
-        instructions=instructions,
-        voice=maestro.voice,
-        turn_detection=turn_detection_config(config.DSA_PROFILE),
-        greeting=maestro.greeting or None,
-        use_ga=config.use_ga_protocol,
-        on_output_audio=audio.play,
-        on_speech_started=audio.interrupt,
-        on_transcript=_log_transcript,
-    )
-    # Now that the client exists, route microphone audio into it.
-    audio.on_input_pcm16 = client.send_audio_pcm16
+    controller = Controller(robot, config, maestri, maestro, audio, movements)
 
     # Graceful shutdown on the host stop event.
     def _watch_stop() -> None:
         if app_stop_event is not None:
             app_stop_event.wait()
             logger.info("Stop event received; shutting down")
-            client.stop()
+            controller.stop()
 
     if app_stop_event is not None:
         threading.Thread(target=_watch_stop, daemon=True).start()
 
     movements.start()
     movements.wake()
-    client.start()
-    if not client.wait_ready(timeout=25.0):
-        logger.warning("Realtime session not confirmed ready; continuing anyway")
+    controller.start()
     audio.start()
     logger.info("MirrorBuddy is live 🎙️  — say something!")
 
     try:
         # Block until the realtime client thread ends (stop or disconnect).
-        while client._thread and client._thread.is_alive():
+        while controller.is_alive():
             if app_stop_event is not None and app_stop_event.is_set():
                 break
             time.sleep(0.2)
@@ -158,8 +135,7 @@ def run(
     finally:
         logger.info("Cleaning up...")
         audio.stop()
-        client.stop()
-        client.join()
+        controller.stop()
         movements.stop()
         if owns_robot:
             try:
@@ -171,11 +147,6 @@ def run(
             except Exception:
                 pass
         logger.info("Shutdown complete")
-
-
-def _log_transcript(text: str, final: bool) -> None:
-    if final:
-        logger.info("Buddy: %s", text)
 
 
 def main() -> None:

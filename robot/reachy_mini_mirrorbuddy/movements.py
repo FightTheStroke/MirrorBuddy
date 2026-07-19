@@ -26,6 +26,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from . import camera
+
 logger = logging.getLogger(__name__)
 
 # Antennas are in radians. Neutral is a small offset to reduce servo shaking
@@ -62,15 +64,22 @@ def temperament_for(subject: str = "", teaching_style: str = "", voice_instructi
 class Movements:
     """Background full-body animation driven by speech energy + idle liveliness."""
 
-    def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL) -> None:
+    def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL, follow_face: bool = True) -> None:
         self.robot = robot
         self.enabled = enabled
         self.temp = temperament
+        self.follow_face = follow_face
         self._energy = 0.0
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._create_head_pose = None
+        self._track_weight = -1.0  # unset; managed on speaking transitions
+
+    def set_temperament(self, temperament: Temperament) -> None:
+        """Update liveliness when the Maestro changes (kept in sync with the persona)."""
+        with self._lock:
+            self.temp = temperament
 
     def start(self) -> None:
         if not self.enabled:
@@ -91,6 +100,10 @@ class Movements:
             logger.info("Audio wobbler enabled (speech-reactive head motion)")
         except Exception as e:
             logger.warning("enable_wobbling failed: %s", e)
+        # Daemon-driven face tracking: the head follows the student's face.
+        if self.follow_face:
+            camera.start_tracking(self.robot, 1.0)
+            self._track_weight = 1.0
         self._stop.clear()
         self._thread = threading.Thread(target=self._loop, name="MirrorBuddyMoves", daemon=True)
         self._thread.start()
@@ -122,6 +135,8 @@ class Movements:
             self.robot.disable_wobbling()
         except Exception:
             pass
+        if self.follow_face:
+            camera.stop_tracking(self.robot)
         self._neutral()
 
     def reset(self) -> None:
@@ -139,15 +154,23 @@ class Movements:
     # ------------------------------------------------------------------ internals
     def _loop(self) -> None:
         t0 = time.monotonic()
-        s = self.temp.scale
-        w = self.temp.speed
         while not self._stop.is_set():
             t = time.monotonic() - t0
             with self._lock:
                 energy = self._energy
                 self._energy *= 0.9
+                s = self.temp.scale
+                w = self.temp.speed
 
             speaking = energy > 0.06
+
+            # Face-follow handoff: while Buddy speaks, hand the head to the wobbler
+            # (weight 0); when idle/listening, let the head track the student (weight 1).
+            if self.follow_face:
+                target_weight = 0.0 if speaking else 1.0
+                if target_weight != self._track_weight:
+                    camera.set_tracking_weight(self.robot, target_weight)
+                    self._track_weight = target_weight
 
             # --- base head pose: breathing + slow idle drift -----------------
             # Amplitudes are intentionally clearly visible (a still robot reads as broken).
@@ -180,7 +203,9 @@ class Movements:
 
     def _apply(self, z: float, pitch: float, yaw: float, body_yaw: float, antennas: tuple[float, float]) -> None:
         head = None
-        if self._create_head_pose is not None:
+        # When face-follow is on, the daemon owns the head (track + wobble); we only
+        # animate antennas and body so we never fight the tracker.
+        if not self.follow_face and self._create_head_pose is not None:
             try:
                 head = self._create_head_pose(x=0, y=0, z=z, roll=0, pitch=pitch, yaw=yaw, degrees=True)
             except Exception as e:

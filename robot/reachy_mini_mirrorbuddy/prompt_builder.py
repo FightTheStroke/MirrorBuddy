@@ -24,6 +24,17 @@ _EMBODIMENT_IT = (
     "ma resta sempre un tutor: il tuo scopo è aiutare a studiare e capire."
 )
 
+_TOOLS_IT = (
+    "Puoi fare tre cose con gli strumenti, quando serve, senza che nessuno tocchi uno schermo:\n"
+    "- Se lo studente chiede chi c'è o con chi può parlare, usa 'list_professors'.\n"
+    "- Se chiede un altro professore o un'altra materia (es. «voglio matematica», «chiama "
+    "Galileo»), usa 'call_professor': cambierai persona e voce e il nuovo professore saluterà.\n"
+    "- Se ti mostra un compito, un esercizio o un foglio da leggere, usa 'look_at_homework' "
+    "per guardarlo con la telecamera. Prima di usarlo, dì sempre a voce che stai per guardare "
+    "(es. «fammi dare un'occhiata al tuo compito»). Non spiare mai: usa la telecamera solo su "
+    "richiesta, per aiutare con lo studio, e non descrivere le persone."
+)
+
 
 def build_instructions(
     maestro: Maestro,
@@ -53,8 +64,9 @@ def build_instructions(
     if persona:
         parts.append("\n".join(persona))
 
-    # 4. Robot embodiment.
+    # 4. Robot embodiment + voice-driven tools.
     parts.append(_EMBODIMENT_IT)
+    parts.append(_TOOLS_IT)
 
     # 5. Student personalisation + DSA sensitivity.
     student_bits: list[str] = []

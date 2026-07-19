@@ -1,17 +1,9 @@
 """Azure OpenAI Realtime client over WebSocket.
 
 Runs an asyncio event loop in its own thread and bridges to the (threaded) robot
-audio I/O:
-
-- ``send_audio_pcm16(bytes)``      push microphone audio to the model (thread-safe)
-- ``on_output_audio(bytes)``       callback invoked with model speech (PCM16)
-- ``on_speech_started()``          callback when the user starts talking (barge-in)
-- ``on_transcript(text, final)``   callback with the assistant transcript (for logs/UI)
-
-Audio is exchanged as 16-bit PCM mono at :data:`SAMPLE_RATE` Hz.
-
-The event schema differs slightly between the Azure Realtime GA and Preview
-protocols, so both variants of the relevant event names are handled.
+audio I/O: microphone PCM in, model speech + transcripts + tool calls out. Audio is
+16-bit PCM mono at :data:`SAMPLE_RATE` Hz. Both Realtime GA and Preview event names
+are handled. Message payloads are built in :mod:`rt_messages`.
 """
 
 from __future__ import annotations
@@ -25,9 +17,11 @@ from collections.abc import Callable
 
 import websockets
 
+from . import rt_messages
+
 logger = logging.getLogger(__name__)
 
-SAMPLE_RATE = 24000  # Azure Realtime PCM sample rate (in and out)
+SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and out)
 
 
 class AzureRealtimeClient:
@@ -42,10 +36,12 @@ class AzureRealtimeClient:
         turn_detection: dict,
         greeting: str | None = None,
         use_ga: bool = True,
+        tools: list[dict] | None = None,
         on_output_audio: Callable[[bytes], None] | None = None,
         on_speech_started: Callable[[], None] | None = None,
         on_transcript: Callable[[str, bool], None] | None = None,
         on_ready: Callable[[], None] | None = None,
+        on_tool_call: Callable[[str, dict, str], None] | None = None,
     ) -> None:
         self.ws_url = ws_url
         self.api_key = api_key
@@ -54,11 +50,14 @@ class AzureRealtimeClient:
         self.turn_detection = turn_detection
         self.greeting = greeting
         self.use_ga = use_ga
+        self.tools = tools or []
 
         self.on_output_audio = on_output_audio
         self.on_speech_started = on_speech_started
         self.on_transcript = on_transcript
         self.on_ready = on_ready
+        self.on_tool_call = on_tool_call
+        self._fc_names: dict[str, str] = {}
 
         self._loop: asyncio.AbstractEventLoop | None = None
         self._thread: threading.Thread | None = None
@@ -97,7 +96,25 @@ class AzureRealtimeClient:
         if not pcm16 or self._ws is None or self._loop is None:
             return
         b64 = base64.b64encode(pcm16).decode("ascii")
-        msg = json.dumps({"type": "input_audio_buffer.append", "audio": b64})
+        try:
+            asyncio.run_coroutine_threadsafe(self._safe_send(json.dumps(rt_messages.audio_append(b64))), self._loop)
+        except Exception:
+            pass
+
+    def send_function_result(self, call_id: str, output: str, respond: bool = True) -> None:
+        """Thread-safe: answer a function call, then let the model continue speaking."""
+        self._enqueue(json.dumps(rt_messages.function_call_output(call_id, output)))
+        if respond:
+            self._enqueue(json.dumps({"type": "response.create"}))
+
+    def send_image(self, data_url: str, prompt: str) -> None:
+        """Thread-safe: hand the model a camera frame plus a question about it."""
+        self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
+        self._enqueue(json.dumps({"type": "response.create"}))
+
+    def _enqueue(self, msg: str) -> None:
+        if self._ws is None or self._loop is None:
+            return
         try:
             asyncio.run_coroutine_threadsafe(self._safe_send(msg), self._loop)
         except Exception:
@@ -135,7 +152,10 @@ class AzureRealtimeClient:
         ) as ws:
             self._ws = ws
             logger.info("WebSocket connected; configuring session")
-            await ws.send(json.dumps(self._session_update_payload()))
+            payload = rt_messages.session_update(
+                self.instructions, self.voice, self.turn_detection, self.tools, self.use_ga
+            )
+            await ws.send(json.dumps(payload))
 
             async for raw in ws:
                 if self._stop.is_set():
@@ -148,39 +168,6 @@ class AzureRealtimeClient:
 
         self._ws = None
         logger.info("WebSocket closed")
-
-    def _session_update_payload(self) -> dict:
-        """Build the ``session.update`` message (GA nested-audio shape)."""
-        if self.use_ga:
-            session = {
-                "type": "realtime",
-                "instructions": self.instructions,
-                "output_modalities": ["audio"],
-                "audio": {
-                    "input": {
-                        "format": {"type": "audio/pcm", "rate": SAMPLE_RATE},
-                        "turn_detection": self.turn_detection,
-                        "transcription": {"model": "whisper-1"},
-                        "noise_reduction": {"type": "near_field"},
-                    },
-                    "output": {
-                        "format": {"type": "audio/pcm", "rate": SAMPLE_RATE},
-                        "voice": self.voice,
-                    },
-                },
-            }
-        else:
-            # Preview (deprecated) flat shape.
-            session = {
-                "modalities": ["audio", "text"],
-                "instructions": self.instructions,
-                "voice": self.voice,
-                "input_audio_format": "pcm16",
-                "output_audio_format": "pcm16",
-                "input_audio_transcription": {"model": "whisper-1"},
-                "turn_detection": self.turn_detection,
-            }
-        return {"type": "session.update", "session": session}
 
     async def _greet(self) -> None:
         """Have the Maestro speak first."""
@@ -205,34 +192,48 @@ class AzureRealtimeClient:
         if etype in ("response.output_audio.delta", "response.audio.delta"):
             b64 = event.get("delta") or event.get("audio")
             if b64 and self.on_output_audio:
-                try:
-                    _safe_cb(self.on_output_audio, base64.b64decode(b64))
-                except Exception:
-                    pass
+                _safe_cb(self.on_output_audio, base64.b64decode(b64))
             return
 
         # User started speaking -> barge-in / interrupt current playback.
-        if etype == "input_audio_buffer.speech_started":
-            if self.on_speech_started:
-                _safe_cb(self.on_speech_started)
+        if etype == "input_audio_buffer.speech_started" and self.on_speech_started:
+            _safe_cb(self.on_speech_started)
             return
 
         # Assistant transcript (for logs / captions).
-        if etype in (
-            "response.output_audio_transcript.delta",
-            "response.audio_transcript.delta",
-        ):
+        if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
             delta = event.get("delta") or ""
             if delta and self.on_transcript:
                 _safe_cb(self.on_transcript, delta, False)
             return
-        if etype in (
-            "response.output_audio_transcript.done",
-            "response.audio_transcript.done",
-        ):
+        if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):
             text = event.get("transcript") or ""
             if text and self.on_transcript:
                 _safe_cb(self.on_transcript, text, True)
+            return
+
+        # Function call: capture the tool name when the item is announced.
+        if etype == "response.output_item.added":
+            item = event.get("item") or {}
+            if item.get("type") == "function_call":
+                cid = item.get("call_id") or item.get("id") or ""
+                if cid:
+                    self._fc_names[cid] = item.get("name") or ""
+            return
+
+        # Function call arguments complete -> dispatch to the controller.
+        if etype == "response.function_call_arguments.done":
+            call_id = event.get("call_id") or ""
+            name = event.get("name") or self._fc_names.get(call_id, "")
+            raw_args = event.get("arguments") or "{}"
+            try:
+                args = json.loads(raw_args) if isinstance(raw_args, str) else dict(raw_args)
+            except (ValueError, TypeError):
+                args = {}
+            self._fc_names.pop(call_id, None)
+            logger.info("Tool call: %s(%s) call_id=%s", name, args, call_id)
+            if name and self.on_tool_call:
+                _safe_cb(self.on_tool_call, name, args, call_id)
             return
 
         if etype == "error":
