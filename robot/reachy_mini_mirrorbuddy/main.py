@@ -140,6 +140,7 @@ def run(
         threading.Thread(target=_watch_stop, daemon=True).start()
 
     movements.start()
+    movements.wake()
     client.start()
     if not client.wait_ready(timeout=25.0):
         logger.warning("Realtime session not confirmed ready; continuing anyway")
