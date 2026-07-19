@@ -95,6 +95,24 @@ class Movements:
         self._thread = threading.Thread(target=self._loop, name="MirrorBuddyMoves", daemon=True)
         self._thread.start()
 
+    def wake(self) -> None:
+        """A short, clearly visible greeting gesture (look around + nod + antennas up)."""
+        if not self.enabled or self._create_head_pose is None:
+            return
+        cp = self._create_head_pose
+        seq = [
+            (cp(yaw=22, degrees=True), [0.5, -0.5], 0.28),
+            (cp(yaw=-22, degrees=True), [-0.5, 0.5], -0.28),
+            (cp(pitch=16, degrees=True), [0.45, 0.45], 0.0),
+            (cp(0, 0, 0, 0, 0, 0, degrees=True), [_ANTENNA_NEUTRAL, _ANTENNA_NEUTRAL], 0.0),
+        ]
+        for pose, ant, byaw in seq:
+            try:
+                self.robot.goto_target(head=pose, antennas=ant, body_yaw=byaw, duration=0.55)
+            except Exception as e:
+                logger.debug("wake goto failed: %s", e)
+            time.sleep(0.6)
+
     def stop(self) -> None:
         self._stop.set()
         if self._thread:
@@ -132,25 +150,27 @@ class Movements:
             speaking = energy > 0.06
 
             # --- base head pose: breathing + slow idle drift -----------------
-            z = 0.006 * s * math.sin(2 * math.pi * 0.1 * w * t)  # gentle breathing (m)
-            pitch = 2.5 * s * math.sin(2 * math.pi * 0.07 * w * t)  # deg
-            yaw_head = 3.0 * s * math.sin(2 * math.pi * 0.05 * w * t)  # deg
+            # Amplitudes are intentionally clearly visible (a still robot reads as broken).
+            z = 0.010 * s * math.sin(2 * math.pi * 0.12 * w * t)  # gentle breathing (m)
+            pitch = 5.0 * s * math.sin(2 * math.pi * 0.09 * w * t)  # deg
+            yaw_head = 8.0 * s * math.sin(2 * math.pi * 0.06 * w * t)  # deg
             if speaking:
-                # Small extra nod while talking (wobbler adds the fast motion on top).
-                pitch += 3.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
+                # Extra nod while talking (wobbler adds the fast motion on top).
+                pitch += 6.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
+                yaw_head += 5.0 * s * energy * math.sin(2 * math.pi * 0.5 * t)
 
-            # --- body rotation: slow sway, engages a bit while speaking ------
-            body_yaw = math.radians(6.0 * s * math.sin(2 * math.pi * 0.04 * w * t))
+            # --- body rotation: slow sway, engages more while speaking -------
+            body_yaw = math.radians(12.0 * s * math.sin(2 * math.pi * 0.05 * w * t))
             if speaking:
-                body_yaw += math.radians(4.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
+                body_yaw += math.radians(8.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
 
             # --- antennas: idle sway + perk up while speaking ----------------
-            sway = math.radians(12.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
+            sway = math.radians(18.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
             if speaking:
-                perk = _ANTENNA_MAX * min(1.0, 0.3 + energy)
-                flutter = math.radians(9.0) * math.sin(2 * math.pi * 6.0 * t)
-                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.5 + flutter)
-                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.5 - flutter)
+                perk = _ANTENNA_MAX * min(1.0, 0.4 + energy)
+                flutter = math.radians(12.0) * math.sin(2 * math.pi * 6.0 * t)
+                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.6 + flutter)
+                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.6 - flutter)
             else:
                 right = _clamp(_ANTENNA_NEUTRAL + sway)
                 left = _clamp(_ANTENNA_NEUTRAL - sway)
