@@ -107,6 +107,13 @@ ever holds a revocable device token and a non-sensitive learning profile. A pare
 **unpair** the robot at any time from the same settings page. If the robot is not paired,
 it falls back to the local `.env` configuration.
 
+**Security model.** The redeem endpoint is protected by per-IP **and** a global
+brute-force ceiling; codes are 6-digit, single-use, expire in 10 minutes, and are claimed
+atomically (no double-redeem). Two hardening follow-ups are tracked on the roadmap: (1) the
+robot's local settings server binds to the LAN — run the robot on a trusted home network or
+restrict it to loopback + a PIN; (2) device tokens are revocable but do not yet auto-rotate
+on a TTL (`lastSeenAt` is recorded for future idle-expiry).
+
 ## Eyes: face-follow & privacy
 
 While listening, the robot **follows the student's face** (daemon head tracking); when
