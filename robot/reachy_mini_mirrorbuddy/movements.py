@@ -213,9 +213,9 @@ class Movements:
             sway = math.radians(18.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
             if speaking:
                 perk = _ANTENNA_MAX * min(1.0, 0.4 + energy)
-                flutter = math.radians(5.0 * s) * math.sin(2 * math.pi * 4.0 * t)
-                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.4 + flutter)
-                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.4 - flutter)
+                flutter = math.radians(2.0 * s) * math.sin(2 * math.pi * 2.5 * t)
+                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.22 + flutter)
+                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.22 - flutter)
             else:
                 right = _clamp(_ANTENNA_NEUTRAL + sway)
                 left = _clamp(_ANTENNA_NEUTRAL - sway)
