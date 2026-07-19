@@ -1,0 +1,29 @@
+/// Robot Device Pairing
+/// Binds a physical Reachy Mini (MirrorBuddy Robot) to a MirrorBuddy account so
+/// the voice-only robot can load the logged-in child's profile without a screen.
+/// A short-lived 6-digit code (hashed) is exchanged for a long-lived, revocable
+/// device token (hashed). No plaintext secret is ever stored.
+
+model RobotDevice {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  label String? // Human label, e.g. "Reachy in cameretta"
+
+  // Pairing handshake: 6-digit code, hashed, short expiry, cleared after pairing.
+  pairCodeHash      String?   @unique
+  pairCodeExpiresAt DateTime?
+  pairedAt          DateTime?
+
+  // Long-lived device credential: random token, stored hashed, revocable.
+  tokenHash String?   @unique
+  lastSeenAt DateTime?
+  revokedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([revokedAt])
+}

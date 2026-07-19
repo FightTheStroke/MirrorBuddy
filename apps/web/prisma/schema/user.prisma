@@ -108,6 +108,9 @@ model User {
   // Password Reset Tokens (Plan 125)
   passwordResetTokens PasswordResetToken[]
 
+  // Paired Reachy Mini robots (voice embodiment)
+  robotDevices RobotDevice[]
+
   @@index([emailHash])
 }
 
