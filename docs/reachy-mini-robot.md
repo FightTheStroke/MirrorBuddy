@@ -78,10 +78,11 @@ The sensitivity of this "basta" detection is adjustable from the robot's
 settings page (**"Sensibilità basta"**), or via `MIRRORBUDDY_BARGE_RMS` /
 `MIRRORBUDDY_BARGE_FRAMES`.
 
-Saying **"dormi" / "riposati"** (or ending words like **"a domani" /
-"buonanotte"**) sends Buddy into a calm **rest position** where it stays parked —
-no fidgeting, no talking. While resting it ignores everything **except its
-name**: say **"Buddy"** and it wakes with a small gesture and greets again.
+Saying **"dormi" / "riposati"** sends Buddy straight into a calm **rest
+position** where it stays parked — no fidgeting, no talking. The ending phrases
+**"a domani" / "buonanotte" / "abbiamo finito"** let it say **one** short goodbye
+first, then it rests the same way. While resting it ignores everything **except
+its name**: say **"Buddy"** and it wakes with a small gesture and greets again.
 
 All of this is enforced on the robot itself, independently of the AI model, so
 the child is always obeyed immediately.
