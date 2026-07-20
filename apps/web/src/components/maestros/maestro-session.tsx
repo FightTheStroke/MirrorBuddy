@@ -306,20 +306,17 @@ export function MaestroSession({
             anything (it explains who they are talking to + the pre-filled
             question). The opener seeds an assistant message, so we key off "no
             user message yet" rather than an empty thread. Tool intents carry their
-            own greeting/auto-trigger and never showed this banner. Suppressed for
-            the generalist host (unknownSubject): naming an arbitrary Maestro there
-            would contradict the coach asking which subject to work on. */}
-        {intent &&
-          !requestedToolType &&
-          !unknownSubject &&
-          !messages.some((m) => m.role === 'user') && (
-            <MaestroSessionHandoff
-              maestroName={maestro.displayName ?? maestro.name}
-              intent={intent}
-              subjectLabel={subjectLabel}
-              hasContextMessage={Boolean(contextMessage)}
-            />
-          )}
+            own greeting/auto-trigger and never showed this banner. Shown for the
+            generalist host too (accessibility: the banner is the text announcement
+            of the handoff, which DSA/Deaf personas rely on). */}
+        {intent && !requestedToolType && !messages.some((m) => m.role === 'user') && (
+          <MaestroSessionHandoff
+            maestroName={maestro.displayName ?? maestro.name}
+            intent={intent}
+            subjectLabel={subjectLabel}
+            hasContextMessage={Boolean(contextMessage)}
+          />
+        )}
 
         {/* Messages area - scrollable */}
         <MaestroSessionMessages
