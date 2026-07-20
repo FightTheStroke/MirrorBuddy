@@ -34,6 +34,13 @@ export interface ChatMessage {
   evaluation?: SessionEvaluation;
   /** Indicates this was from voice transcript */
   isVoice?: boolean;
+  /**
+   * Optional per-message speaker override (display name + avatar). Set only for
+   * assistant messages spoken by someone other than the session's Maestro — e.g.
+   * the neutral study-coach opener, which is the coach (Melissa) speaking, not
+   * the Maestro. When unset, the UI attributes the message to the session Maestro.
+   */
+  speaker?: { name: string; avatar: string };
 }
 
 export interface Conversation {

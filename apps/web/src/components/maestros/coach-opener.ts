@@ -26,6 +26,22 @@ export function resolveCoachName(preferredCoach: string | null | undefined): str
 }
 
 /**
+ * Resolve the display identity (name + avatar) of the child's chosen study coach,
+ * falling back to the default coach (Melissa). Used to attribute the neutral
+ * coach opener to the coach — never to the subject Maestro — so the child never
+ * sees the Maestro's face paired with the coach's words.
+ */
+export function resolveCoachIdentity(preferredCoach: string | null | undefined): {
+  name: string;
+  avatar: string;
+} {
+  const coach =
+    (preferredCoach && getSupportTeacherById(preferredCoach as CoachId)) ||
+    getDefaultSupportTeacher();
+  return { name: coach.name, avatar: coach.avatar };
+}
+
+/**
  * Build the localized neutral opener. Uses the short `withSubject` variant when the
  * subject is already known (so it doesn't block the subject Maestro / tool
  * auto-trigger), otherwise the guided-questions `general` variant.
