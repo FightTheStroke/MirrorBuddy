@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { Volume2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { ChatMessage, Maestro } from "@/types";
-import { useTranslations } from "next-intl";
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { Volume2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { ChatMessage, Maestro } from '@/types';
+import { useTranslations } from 'next-intl';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -17,27 +17,27 @@ interface MessageBubbleProps {
 /**
  * Message bubble component matching CharacterChatView style.
  */
-export function MessageBubble({
-  message,
-  maestro,
-  ttsEnabled,
-  speak,
-}: MessageBubbleProps) {
-  const t = useTranslations("chat");
-  const isUser = message.role === "user";
+export function MessageBubble({ message, maestro, ttsEnabled, speak }: MessageBubbleProps) {
+  const t = useTranslations('chat');
+  const isUser = message.role === 'user';
   const isVoice = message.isVoice;
+  // Assistant messages default to the session Maestro's identity, but a message
+  // may carry its own speaker (e.g. the neutral study-coach opener spoken by
+  // Melissa) — never show the Maestro's face paired with another voice's words.
+  const speakerName = message.speaker?.name ?? maestro.displayName;
+  const speakerAvatar = message.speaker?.avatar ?? maestro.avatar;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn("flex gap-3", isUser ? "justify-end" : "justify-start")}
+      className={cn('flex gap-3', isUser ? 'justify-end' : 'justify-start')}
     >
       {!isUser && (
         <div className="flex-shrink-0">
           <Image
-            src={maestro.avatar}
-            alt={maestro.displayName}
+            src={speakerAvatar}
+            alt={speakerName}
             width={36}
             height={36}
             className="rounded-full object-cover"
@@ -46,16 +46,16 @@ export function MessageBubble({
       )}
       <div
         className={cn(
-          "max-w-[70%] xs:max-w-[85%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3",
+          'max-w-[70%] xs:max-w-[85%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3',
           isUser
-            ? "text-white rounded-br-md"
-            : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm",
+            ? 'text-white rounded-br-md'
+            : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm',
         )}
         style={isUser ? { backgroundColor: maestro.color } : undefined}
       >
         {isVoice && (
           <span className="text-xs opacity-60 mb-1 flex items-center gap-1">
-            <Volume2 className="w-3 h-3" /> {t("trascrizioneVocale")}
+            <Volume2 className="w-3 h-3" /> {t('trascrizioneVocale')}
           </span>
         )}
         <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">
@@ -63,16 +63,16 @@ export function MessageBubble({
         </p>
         <div className="flex items-center justify-between mt-1 gap-2">
           <span className="text-xs opacity-60">
-            {new Date(message.timestamp).toLocaleTimeString("it-IT", {
-              hour: "2-digit",
-              minute: "2-digit",
+            {new Date(message.timestamp).toLocaleTimeString('it-IT', {
+              hour: '2-digit',
+              minute: '2-digit',
             })}
           </span>
           {!isUser && ttsEnabled && (
             <button
               onClick={() => speak(message.content)}
               className="text-xs opacity-60 hover:opacity-100 ml-auto"
-              title={t("leggiAdAltaVoce")}
+              title={t('leggiAdAltaVoce')}
             >
               <Volume2 className="w-3 h-3" />
             </button>

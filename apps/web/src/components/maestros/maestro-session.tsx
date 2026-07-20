@@ -19,7 +19,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { useTTS } from '@/components/accessibility';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore, useSettingsStore } from '@/lib/stores';
-import { buildCoachOpener } from './coach-opener';
+import { buildCoachOpener, resolveCoachIdentity } from './coach-opener';
 import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
 import { MaestroSessionHandoff } from './maestro-session-handoff';
@@ -72,9 +72,19 @@ export function MaestroSession({
 
   const t = useTranslations('chat');
   const preferredCoach = useSettingsStore((s) => s.studentProfile.preferredCoach);
-  // Neutral opener on behalf of the child's chosen coach (falls back to Melissa)
-  // so a session never starts straight in a subject Maestro's persona.
-  const coachOpener = buildCoachOpener(preferredCoach, subjectLabel, t);
+  // Session opener. When the child already chose the subject, the picked Maestro
+  // is the deliberate host, so he greets in first person (matching the header +
+  // avatar — no identity clash). When the subject is unknown (the generalist
+  // "a bit of everything" path) we must NOT fake a Maestro persona: the child's
+  // study coach (falls back to Melissa) opens and asks the organizing questions,
+  // attributed to the coach's own name + avatar via `speaker`.
+  const sessionOpener: { content: string; speaker?: { name: string; avatar: string } } =
+    subjectLabel
+      ? { content: maestro.greeting }
+      : {
+          content: buildCoachOpener(preferredCoach, undefined, t),
+          speaker: resolveCoachIdentity(preferredCoach),
+        };
 
   // Prevent screen sleep during active sessions
   useWakeLock(true);
@@ -114,7 +124,7 @@ export function MaestroSession({
     initialMode,
     requestedToolType,
     contextMessage,
-    coachOpener,
+    opener: sessionOpener,
   });
 
   // Build unified voice state and actions

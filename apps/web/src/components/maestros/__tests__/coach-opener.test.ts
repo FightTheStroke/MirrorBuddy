@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { resolveCoachName, buildCoachOpener } from '../coach-opener';
+import { resolveCoachName, resolveCoachIdentity, buildCoachOpener } from '../coach-opener';
 
 describe('resolveCoachName', () => {
   it('returns the chosen coach name for a valid preference', () => {
@@ -24,6 +24,26 @@ describe('resolveCoachName', () => {
 
     // Assert
     expect(name).toBe('Melissa');
+  });
+});
+
+describe('resolveCoachIdentity', () => {
+  it('returns the chosen coach name and avatar for a valid preference', () => {
+    // Arrange / Act
+    const identity = resolveCoachIdentity('melissa');
+
+    // Assert
+    expect(identity.name).toBe('Melissa');
+    expect(identity.avatar).toBe('/avatars/melissa.webp');
+  });
+
+  it('falls back to the default coach (Melissa) identity when preference is unknown', () => {
+    // Arrange / Act
+    const identity = resolveCoachIdentity('does-not-exist');
+
+    // Assert
+    expect(identity.name).toBe('Melissa');
+    expect(identity.avatar).toBe('/avatars/melissa.webp');
   });
 });
 

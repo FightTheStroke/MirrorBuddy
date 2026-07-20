@@ -17,13 +17,15 @@ interface UseMaestroSessionLogicProps {
   requestedToolType?: ToolType;
   contextMessage?: string;
   /**
-   * Neutral study-coach opener shown as the first assistant message so a session
-   * never starts by dropping the child straight into a subject Maestro's persona.
-   * Built (localized) by the caller from the profile's preferred coach. When the
-   * child starts a voice call this message is passed to the realtime model as
-   * conversation context, so voice inherits the same neutral framing.
+   * Session opener shown as the first assistant message so a session never starts
+   * by dropping the child straight into a fake Maestro persona. Built by the caller:
+   * when the subject is known it's the picked Maestro's own greeting (default
+   * attribution); when unknown it's the study coach's neutral opener, carrying a
+   * `speaker` (name + avatar) so it's attributed to the coach, not the Maestro.
+   * When the child starts a voice call the opener's text is passed to the realtime
+   * model as conversation context, so voice inherits the same framing.
    */
-  coachOpener?: string;
+  opener?: { content: string; speaker?: { name: string; avatar: string } };
 }
 
 export function useMaestroSessionLogic({
@@ -31,8 +33,14 @@ export function useMaestroSessionLogic({
   initialMode,
   requestedToolType,
   contextMessage,
-  coachOpener,
+  opener,
 }: UseMaestroSessionLogicProps) {
+  // Destructure the opener into stable primitives so the init effect keeps the
+  // same rerun semantics it had when the opener was a plain string (the `opener`
+  // object identity changes every render).
+  const openerContent = opener?.content;
+  const openerSpeakerName = opener?.speaker?.name;
+  const openerSpeakerAvatar = opener?.speaker?.avatar;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +143,7 @@ export function useMaestroSessionLogic({
   const hasAutoTriggeredRef = useRef(false);
 
   // Tracks which maestro this session was last initialized for, so a settings
-  // hydration (preferredCoach undefined → saved id, which changes coachOpener)
+  // hydration (preferredCoach undefined → saved id, which changes the opener)
   // reruns this effect WITHOUT wiping a conversation the child already started.
   const initializedMaestroRef = useRef<string | null>(null);
 
@@ -143,16 +151,19 @@ export function useMaestroSessionLogic({
   useEffect(() => {
     const initialMessages: ChatMessage[] = [];
 
-    // Neutral study-coach opener always comes first (when provided): it greets on
-    // behalf of the child's chosen coach and, if the subject isn't known yet,
-    // asks the organizing questions — instead of opening straight into a subject
-    // Maestro (e.g. Manzoni). The subject Maestro takes over on the next turn.
-    if (coachOpener) {
+    // Session opener always comes first (when provided). When the subject is known
+    // it's the picked Maestro greeting in first person; when unknown it's the study
+    // coach's neutral opener, attributed to the coach via `speaker` so the child
+    // never sees the Maestro's face paired with the coach's words.
+    if (openerContent) {
       initialMessages.push({
-        id: `coach-opener-${Date.now()}`,
+        id: `session-opener-${Date.now()}`,
         role: 'assistant',
-        content: coachOpener,
+        content: openerContent,
         timestamp: new Date(),
+        ...(openerSpeakerName && openerSpeakerAvatar
+          ? { speaker: { name: openerSpeakerName, avatar: openerSpeakerAvatar } }
+          : {}),
       });
     }
 
@@ -190,7 +201,7 @@ export function useMaestroSessionLogic({
     }
 
     // A fresh maestro (or first mount) starts a clean thread; a rerun for the SAME
-    // maestro — e.g. when preferredCoach hydrates and coachOpener changes — must not
+    // maestro — e.g. when preferredCoach hydrates and the opener changes — must not
     // clobber messages the child has already exchanged.
     const isFirstInitForMaestro = initializedMaestroRef.current !== maestro.id;
     initializedMaestroRef.current = maestro.id;
@@ -231,7 +242,9 @@ export function useMaestroSessionLogic({
     maestro.id,
     requestedToolType,
     contextMessage,
-    coachOpener,
+    openerContent,
+    openerSpeakerName,
+    openerSpeakerAvatar,
     pendingToolRequest,
     clearPendingToolRequest,
   ]);
