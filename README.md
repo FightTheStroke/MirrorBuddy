@@ -306,9 +306,10 @@ no screen needed.
   **on the robot itself** (echo-cancelled mic + local audio flush), no server round-trip. A
   stop is a full stop — it goes silent and says nothing back. Sensitivity is adjustable from
   the robot's settings page (_"Sensibilità basta"_).
-- **Sleep & rest** — say _«dormi»_ / _«riposati»_ (or _«a domani»_, _«buonanotte»_) and Buddy
-  settles into a calm rest position and **stays parked** — no fidgeting, no talking — until
-  you call it back with _«Buddy»_.
+- **Sleep & rest** — say _«dormi»_ / _«riposati»_ and Buddy settles straight into a calm
+  rest position; ending phrases _«a domani»_ / _«buonanotte»_ let it say **one** short
+  goodbye first. Either way it then **stays parked** — no fidgeting — until you call it back
+  with _«Buddy»_.
 - **Accessibility-first** — deterministic, **locally enforced** stop/sleep/wake and calm
   motion for children with dyslexia, dyscalculia or cerebral palsy — never left to the model.
 - **Device pairing** — from **Settings → Integrations → "Collega un robot"**, generate a
