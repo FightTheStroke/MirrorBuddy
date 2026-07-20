@@ -32,7 +32,8 @@ is complete on its own. The robot is an optional, delightful add-on.
 | 👂 **Ears / 🗣 Voice** | Real-time speech-to-speech (Azure OpenAI Realtime) — same voices as web. |
 | 📷 **Homework camera** | On request, it **looks at the homework** on the desk and helps.      |
 | 🤸 **Movement**     | Expressive head/antenna motion adapted to each teacher's style.         |
-| ✋ **Deterministic stop** | Say **"basta"** and it goes silent **immediately** — no stress.    |
+| ✋ **Instant stop** | Say **"basta"** and it goes silent **immediately** — on-device, no stress. |
+| 🌙 **Sleep & wake** | Say **"dormi"** to rest; call **"Buddy"** to wake it back up.            |
 | 🎓 **All 26 Maestri** | Switch professor or subject **by voice**; no screen required.         |
 
 Everything is voice-first: there is no on-robot UI to read. The child talks; Buddy
@@ -65,13 +66,25 @@ A parent can **unpair** the robot at any time from the same settings card.
 architecture and security model, and [ADR 0008](adr/0008-parent-dashboard-gdpr.md)
   for the parental-consent model.
 
-### Safety: the stop word
+### Safety: stop, sleep and wake
 
 For a child with additional needs, an insistent robot is stressful. Saying
 **"basta", "zitto", "fermati", "aspetta"** or **"pausa"** triggers a **hard local
 audio interrupt** — the robot stops speaking instantly and does **not**
-auto-resume. This is enforced on the robot itself, independently of the AI model,
-so the child is always obeyed immediately.
+auto-resume. It even cuts itself off **the moment the child talks over it**
+(**instant on-device barge-in**): the Reachy Mini mic is echo-cancelled in
+hardware, so playback is flushed on the robot without waiting for the server.
+The sensitivity of this "basta" detection is adjustable from the robot's
+settings page (**"Sensibilità basta"**), or via `MIRRORBUDDY_BARGE_RMS` /
+`MIRRORBUDDY_BARGE_FRAMES`.
+
+Saying **"dormi" / "riposati"** (or ending words like **"a domani" /
+"buonanotte"**) sends Buddy into a calm **rest position** where it stays parked —
+no fidgeting, no talking. While resting it ignores everything **except its
+name**: say **"Buddy"** and it wakes with a small gesture and greets again.
+
+All of this is enforced on the robot itself, independently of the AI model, so
+the child is always obeyed immediately.
 
 ## Configuring the app
 
@@ -84,7 +97,8 @@ own README:
 - Example environment: [`robot/.env.example`](../robot/.env.example)
 
 Key toggles: `MIRRORBUDDY_ENABLE_CAMERA`, `MIRRORBUDDY_FOLLOW_FACE`,
-`MIRRORBUDDY_DEVICE_TOKEN`, `MIRRORBUDDY_API_BASE`.
+`MIRRORBUDDY_DEVICE_TOKEN`, `MIRRORBUDDY_API_BASE`, `MIRRORBUDDY_BARGE_RMS`,
+`MIRRORBUDDY_BARGE_FRAMES`.
 
 ## Publishing to the Reachy Mini app store
 
