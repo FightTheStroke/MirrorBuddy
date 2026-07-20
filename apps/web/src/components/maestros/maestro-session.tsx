@@ -13,14 +13,15 @@
  */
 
 import { useRef, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { AnimatePresence } from 'framer-motion';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { useTTS } from '@/components/accessibility';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore, useSettingsStore } from '@/lib/stores';
 import { buildCoachOpener, resolveCoachIdentity } from './coach-opener';
-import type { Maestro, ToolType } from '@/types';
+import { generateMaestroGreeting } from '@/lib/greeting';
+import type { Maestro, ToolType, SupportedLanguage } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
 import { MaestroSessionHandoff } from './maestro-session-handoff';
 import { MaestroSessionMessages } from './maestro-session-messages';
@@ -49,6 +50,13 @@ interface MaestroSessionProps {
   intent?: Intent;
   /** Localized subject label chosen by the child, for the handoff banner. */
   subjectLabel?: string;
+  /**
+   * True only for the generalist "a bit of everything" homework host, where no
+   * subject (and thus no real Maestro persona) was chosen. Direct Maestro entry
+   * points (grid, /maestri/[id]) leave this false even though subjectLabel is
+   * absent — they DID pick a concrete Maestro, so he should greet, not the coach.
+   */
+  unknownSubject?: boolean;
 }
 
 export function MaestroSession({
@@ -59,6 +67,7 @@ export function MaestroSession({
   contextMessage,
   intent,
   subjectLabel,
+  unknownSubject = false,
 }: MaestroSessionProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -71,19 +80,27 @@ export function MaestroSession({
   const unifiedCharacter = maestroToUnified(maestro);
 
   const t = useTranslations('chat');
+  const locale = useLocale();
   const preferredCoach = useSettingsStore((s) => s.studentProfile.preferredCoach);
-  // Session opener. When the child already chose the subject, the picked Maestro
-  // is the deliberate host, so he greets in first person (matching the header +
-  // avatar — no identity clash). When the subject is unknown (the generalist
-  // "a bit of everything" path) we must NOT fake a Maestro persona: the child's
-  // study coach (falls back to Melissa) opens and asks the organizing questions,
-  // attributed to the coach's own name + avatar via `speaker`.
+  // Session opener. Only the generalist "a bit of everything" host (no subject,
+  // no concrete Maestro persona chosen) opens under the study coach, who asks the
+  // organizing questions — attributed to the coach's own name + avatar via
+  // `speaker`. Every deliberate Maestro session (subject chosen, grid entry,
+  // /maestri/[id]) opens with the Maestro greeting in first person, localized to
+  // the active UI language so /en · /fr · /de · /es don't start in Italian.
   const sessionOpener: { content: string; speaker?: { name: string; avatar: string } } =
-    subjectLabel
-      ? { content: maestro.greeting }
-      : {
+    unknownSubject
+      ? {
           content: buildCoachOpener(preferredCoach, undefined, t),
           speaker: resolveCoachIdentity(preferredCoach),
+        }
+      : {
+          content: generateMaestroGreeting(
+            maestro.id,
+            maestro.displayName ?? maestro.name,
+            locale as SupportedLanguage,
+            maestro.greeting,
+          ),
         };
 
   // Prevent screen sleep during active sessions
@@ -287,17 +304,22 @@ export function MaestroSession({
         {/* UX-01/UX-07: child-first handoff banner. Only when arriving via an
             intent (grid entry passes no intent) and before the child has sent
             anything (it explains who they are talking to + the pre-filled
-            question). The neutral coach opener seeds an assistant message, so we
-            key off "no user message yet" rather than an empty thread. Tool intents
-            carry their own greeting/auto-trigger and never showed this banner. */}
-        {intent && !requestedToolType && !messages.some((m) => m.role === 'user') && (
-          <MaestroSessionHandoff
-            maestroName={maestro.displayName ?? maestro.name}
-            intent={intent}
-            subjectLabel={subjectLabel}
-            hasContextMessage={Boolean(contextMessage)}
-          />
-        )}
+            question). The opener seeds an assistant message, so we key off "no
+            user message yet" rather than an empty thread. Tool intents carry their
+            own greeting/auto-trigger and never showed this banner. Suppressed for
+            the generalist host (unknownSubject): naming an arbitrary Maestro there
+            would contradict the coach asking which subject to work on. */}
+        {intent &&
+          !requestedToolType &&
+          !unknownSubject &&
+          !messages.some((m) => m.role === 'user') && (
+            <MaestroSessionHandoff
+              maestroName={maestro.displayName ?? maestro.name}
+              intent={intent}
+              subjectLabel={subjectLabel}
+              hasContextMessage={Boolean(contextMessage)}
+            />
+          )}
 
         {/* Messages area - scrollable */}
         <MaestroSessionMessages

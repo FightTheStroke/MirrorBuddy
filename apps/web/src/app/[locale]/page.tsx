@@ -78,6 +78,9 @@ export default function Home() {
   // is opened directly from the grown-ups Maestri grid (no handoff to explain).
   const [sessionIntent, setSessionIntent] = useState<Intent | undefined>(undefined);
   const [sessionSubjectLabel, setSessionSubjectLabel] = useState<string | undefined>(undefined);
+  // True only for the generalist "I don't know" homework host, so the session
+  // opens under the study coach instead of the arbitrary host Maestro's voice.
+  const [sessionUnknownSubject, setSessionUnknownSubject] = useState(false);
   // COMP-01 (#432): the grown-up view the child is trying to reach, held until
   // an adult passes the gate (null = no gate pending).
   const [pendingGrownUpView, setPendingGrownUpView] = useState<View | null>(null);
@@ -165,6 +168,7 @@ export default function Home() {
     setSessionContextMessage(start.contextMessage);
     setSessionIntent(start.intent);
     setSessionSubjectLabel(start.subjectLabel);
+    setSessionUnknownSubject(Boolean(start.unknownSubject));
     setMaestroSessionKey((prev) => prev + 1);
     setCurrentView('maestro-session');
   };
@@ -240,12 +244,14 @@ export default function Home() {
               setSessionContextMessage(undefined);
               setSessionIntent(undefined);
               setSessionSubjectLabel(undefined);
+              setSessionUnknownSubject(false);
             }}
             initialMode={maestroSessionMode}
             requestedToolType={requestedToolType}
             contextMessage={sessionContextMessage}
             intent={sessionIntent}
             subjectLabel={sessionSubjectLabel}
+            unknownSubject={sessionUnknownSubject}
           />
         </div>
       )}
@@ -310,6 +316,7 @@ export default function Home() {
                     // Grid (grown-ups) entry: no intent handoff to explain.
                     setSessionIntent(undefined);
                     setSessionSubjectLabel(undefined);
+                    setSessionUnknownSubject(false);
                     setMaestroSessionKey((prev) => prev + 1);
                     setCurrentView('maestro-session');
                   }}
