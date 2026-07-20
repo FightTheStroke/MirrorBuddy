@@ -15,6 +15,13 @@ interface MaestroSessionHandoffProps {
   subjectLabel?: string;
   /** Whether the input was pre-filled with a context message (UX-07). */
   hasContextMessage: boolean;
+  /**
+   * Generalist "a bit of everything" path: no concrete Maestro was chosen, so
+   * `maestroName` carries the study coach's name and the banner greets AS the
+   * coach (no "Prof.", no arbitrary host) to stay consistent with the coach
+   * opener the child actually hears/reads.
+   */
+  generalist?: boolean;
 }
 
 /**
@@ -35,6 +42,7 @@ export function MaestroSessionHandoff({
   intent,
   subjectLabel,
   hasContextMessage,
+  generalist = false,
 }: MaestroSessionHandoffProps) {
   const t = useTranslations('chat');
   const { speak, enabled: ttsEnabled } = useTTS();
@@ -43,9 +51,11 @@ export function MaestroSessionHandoff({
   if (dismissed) return null;
 
   const intentLabel = t(`intentHandoff.intent.${intent}`);
-  const headline = subjectLabel
-    ? t('intentHandoff.headlineSubject', { name: maestroName, subject: subjectLabel })
-    : t('intentHandoff.headline', { name: maestroName, intent: intentLabel });
+  const headline = generalist
+    ? t('intentHandoff.headlineGeneralist', { name: maestroName })
+    : subjectLabel
+      ? t('intentHandoff.headlineSubject', { name: maestroName, subject: subjectLabel })
+      : t('intentHandoff.headline', { name: maestroName, intent: intentLabel });
   const hint = hasContextMessage ? t('intentHandoff.contextHint') : null;
 
   const spokenText = [headline, hint].filter(Boolean).join('. ');
