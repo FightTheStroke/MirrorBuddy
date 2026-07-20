@@ -569,6 +569,7 @@
     "intentHandoff": {
       "headline": "Ich habe dich zu Prof. {name} für {intent} gebracht.",
       "headlineSubject": "Ich habe dich zu Prof. {name} für {subject} gebracht.",
+      "headlineGeneralist": "Ich bin {name} und helfe dir bei den Hausaufgaben. Mit welchem Fach möchtest du anfangen?",
       "contextHint": "Ich habe die Frage schon für dich geschrieben: Drück Enter, wenn du bereit bist, oder ändere sie, wie du willst.",
       "intent": {
         "homework": "die Hausaufgaben",

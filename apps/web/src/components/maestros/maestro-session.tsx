@@ -311,10 +311,15 @@ export function MaestroSession({
             of the handoff, which DSA/Deaf personas rely on). */}
         {intent && !requestedToolType && !messages.some((m) => m.role === 'user') && (
           <MaestroSessionHandoff
-            maestroName={maestro.displayName ?? maestro.name}
+            maestroName={
+              unknownSubject
+                ? (sessionOpener.speaker?.name ?? maestro.displayName ?? maestro.name)
+                : (maestro.displayName ?? maestro.name)
+            }
             intent={intent}
             subjectLabel={subjectLabel}
             hasContextMessage={Boolean(contextMessage)}
+            generalist={unknownSubject}
           />
         )}
 

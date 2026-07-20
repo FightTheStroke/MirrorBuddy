@@ -200,6 +200,7 @@
     "intentHandoff": {
       "headline": "Ti ho portato dal Prof. {name} per {intent}.",
       "headlineSubject": "Ti ho portato dal Prof. {name} per {subject}.",
+      "headlineGeneralist": "Sono {name} e ti do una mano con i compiti. Da quale materia vuoi partire?",
       "contextHint": "Ho già scritto la domanda per te: premi invio quando sei pronto, oppure cambiala come vuoi.",
       "intent": {
         "homework": "i compiti",
