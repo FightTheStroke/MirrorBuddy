@@ -30,6 +30,12 @@ export interface IntentStart {
   subject?: Subject;
   /** Localized subject label for the handoff banner (UX-01). */
   subjectLabel?: string;
+  /**
+   * True only for the generalist "I don't know / a bit of everything" homework
+   * host, where no concrete Maestro persona was chosen. Lets the session open
+   * under the study coach instead of faking the arbitrary host Maestro's voice.
+   */
+  unknownSubject?: boolean;
 }
 
 /**
@@ -200,7 +206,12 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
     setPendingIntent(card.intent);
   };
 
-  const openSession = (intent: Intent, maestro: Maestro, subject?: Subject) => {
+  const openSession = (
+    intent: Intent,
+    maestro: Maestro,
+    subject?: Subject,
+    unknownSubject = false,
+  ) => {
     const requestedToolType: ToolType | undefined =
       intent === 'study' ? 'mindmap' : intent === 'quizMe' ? 'quiz' : undefined;
     onStart({
@@ -211,6 +222,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
       contextMessage: t(`intent.${intent}.contextMessage`),
       subject,
       subjectLabel: subject ? t(`subjects.${subject}`) : undefined,
+      unknownSubject,
     });
   };
 
@@ -225,7 +237,7 @@ export function HomeIntentChooser({ userName, onStart }: HomeIntentChooserProps)
   const handleAnySubject = () => {
     const host = getAllMaestriHost();
     if (!host || pendingIntent !== 'homework') return;
-    openSession('homework', host);
+    openSession('homework', host, undefined, true);
   };
 
   // UX-02: read a card aloud on demand. Only wired when the child's profile has
