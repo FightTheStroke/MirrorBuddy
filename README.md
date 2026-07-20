@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo-mirrorbuddy-full.png" alt="MirrorBuddy Logo" width="200">
+  <img src="apps/web/public/logo-mirrorbuddy-full.png" alt="MirrorBuddy Logo" width="200">
 </p>
 
 <h1 align="center">MirrorBuddy</h1>
@@ -43,7 +43,7 @@
 </p>
 
 <p align="center">
-  <img src="public/screenshots/welcome.png" alt="MirrorBuddy Welcome Page" width="800">
+  <img src="apps/web/public/screenshots/welcome.png" alt="MirrorBuddy Welcome Page" width="800">
 </p>
 
 ---
@@ -300,8 +300,17 @@ no screen needed.
 
 - **Change professor/subject by voice** — _«voglio matematica»_, _«chiama Galileo»_.
 - **Look at homework** — _«guarda questo compito»_ captures one frame; Buddy reads it and helps.
-- **Accessibility-first** — deterministic _"basta / fermati"_ stop, calm motion, patient
-  turn-taking for children with dyslexia, dyscalculia or cerebral palsy.
+- **Wake word «Buddy»** — while resting, the robot ignores everything **except its name**:
+  say _«Buddy»_ and it wakes with a small gesture, greets and asks what to do.
+- **Instant «basta» / «zitto»** — the moment the child speaks over Buddy, playback is cut
+  **on the robot itself** (echo-cancelled mic + local audio flush), no server round-trip. A
+  stop is a full stop — it goes silent and says nothing back. Sensitivity is adjustable from
+  the robot's settings page (_"Sensibilità basta"_).
+- **Sleep & rest** — say _«dormi»_ / _«riposati»_ (or _«a domani»_, _«buonanotte»_) and Buddy
+  settles into a calm rest position and **stays parked** — no fidgeting, no talking — until
+  you call it back with _«Buddy»_.
+- **Accessibility-first** — deterministic, **locally enforced** stop/sleep/wake and calm
+  motion for children with dyslexia, dyscalculia or cerebral palsy — never left to the model.
 - **Device pairing** — from **Settings → Integrations → "Collega un robot"**, generate a
   6-digit code and type it on the robot. It binds to the logged-in child's profile using a
   scoped, revocable **device token** — the child's password never leaves their computer.
