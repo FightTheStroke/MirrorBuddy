@@ -11,8 +11,8 @@
  *   PROD_URL=https://mirrorbuddy.org npx playwright test --config playwright.config.production-smoke.ts
  *
  * Authenticated student tests use PROD_TEST_USER_ID and the pre-signed
- * PROD_TEST_USER_COOKIE_VALUE. The isolated login-flow regression additionally
- * uses the local-only PROD_TEST_USER_EMAIL/USERNAME/PASSWORD credentials.
+ * PROD_TEST_USER_COOKIE_VALUE. Credential login verification runs separately
+ * via `pnpm verify:smoke:prod:login`, outside the Playwright test runner.
  *
  * Admin tests:
  *   Without ADMIN_READONLY_COOKIE_VALUE, admin panel tests are SKIPPED.
@@ -39,8 +39,8 @@ const browserUse = {
 export default defineConfig({
   testDir: './e2e/production-smoke',
   fullyParallel: false,
-  // Keep production load predictable. Authenticated coverage uses pre-signed
-  // storage state; only the isolated login-flow regression calls login.
+  // Keep production load predictable. Test-runner coverage uses only
+  // pre-signed storage state and never submits login credentials.
   workers: 1,
   forbidOnly: !!process.env.CI,
   timeout: 30000,

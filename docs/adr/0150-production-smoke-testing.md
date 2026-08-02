@@ -58,6 +58,9 @@ PROD_URL=https://mirrorbuddy.vercel.app npx playwright test \
 
 # Microsoft Edge (Chromium engine, desktop project)
 PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop
+
+# Isolated credential login verification (no Playwright test/report artifacts)
+PLAYWRIGHT_CHANNEL=msedge pnpm verify:smoke:prod:login
 ```
 
 `PLAYWRIGHT_CHANNEL` is optional. When unset, Playwright uses its bundled
@@ -80,12 +83,11 @@ while retaining `browserName: chromium`.
 - **Authenticated UI tests** inject `PROD_TEST_USER_COOKIE_VALUE` as the
   `mirrorbuddy-user-id` cookie, then verify `PROD_TEST_USER_ID` and
   `isTestData=true` through `/api/user`. Shared fixtures do not call the login
-  endpoint or require `SESSION_SECRET`. The isolated login-flow regression uses
-  credentials once only after the cookie-authenticated ID, username, email, and
-  `isTestData` marker match the configured identity. It validates the login's
-  returned user ID and may emit deduplicated `FIRST_LOGIN` funnel telemetry. Its
-  spec disables traces, screenshots, and video so credential input cannot enter
-  retained Playwright artifacts.
+  endpoint or require `SESSION_SECRET`. A standalone Playwright-library script,
+  outside the test runner and HTML reporter, uses credentials once only after
+  the cookie-authenticated ID, username, email, and `isTestData` marker match the
+  configured identity. It validates the login and session user IDs, emits only
+  redacted pass/fail output, and may emit deduplicated `FIRST_LOGIN` telemetry.
 - **Production authorization checks do not call mutating maintenance actions.**
   ADMIN_READONLY coverage inspects the UI without activating controls; the
   cleanup authorization probe is limited to `DELETE ?dryRun=true`.

@@ -18,7 +18,7 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
-import type { APIRequestContext, BrowserContext, StorageState } from '@playwright/test';
+import type { BrowserContext, StorageState } from '@playwright/test';
 import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
   mockTOS,
@@ -33,48 +33,9 @@ export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app'
 export const ADMIN_READONLY_COOKIE_NAME = AUTH_COOKIE_NAME;
 export const ADMIN_READONLY_COOKIE_VALUE = process.env.ADMIN_READONLY_COOKIE_VALUE;
 const PROD_TEST_USER_ID = process.env.PROD_TEST_USER_ID;
-const PROD_TEST_USER_EMAIL = process.env.PROD_TEST_USER_EMAIL;
-const PROD_TEST_USER_USERNAME = process.env.PROD_TEST_USER_USERNAME;
-const PROD_TEST_USER_PASSWORD = process.env.PROD_TEST_USER_PASSWORD;
 const PROD_TEST_USER_COOKIE_VALUE = process.env.PROD_TEST_USER_COOKIE_VALUE;
 
-export const hasProdTestCredentials = Boolean(
-  PROD_TEST_USER_ID && PROD_TEST_USER_EMAIL && PROD_TEST_USER_USERNAME && PROD_TEST_USER_PASSWORD,
-);
 export const hasProdTestAuthCookie = Boolean(PROD_TEST_USER_ID && PROD_TEST_USER_COOKIE_VALUE);
-
-export async function verifyProdTestUserCookie(request: APIRequestContext) {
-  if (!hasProdTestAuthCookie) {
-    throw new Error('Production test auth cookie is not available');
-  }
-
-  const response = await request.get('/api/user', {
-    headers: { Cookie: `${AUTH_COOKIE_NAME}=${PROD_TEST_USER_COOKIE_VALUE}` },
-    timeout: 30000,
-  });
-  if (response.status() !== 200) {
-    throw new Error(
-      `Production test auth cookie verification failed with status ${response.status()}`,
-    );
-  }
-
-  const user = (await response.json()) as {
-    id?: string;
-    username?: string | null;
-    email?: string | null;
-    isTestData?: boolean;
-  };
-  if (
-    user.id !== PROD_TEST_USER_ID ||
-    user.username !== PROD_TEST_USER_USERNAME ||
-    user.email?.toLowerCase() !== PROD_TEST_USER_EMAIL?.toLowerCase() ||
-    user.isTestData !== true
-  ) {
-    throw new Error(
-      'Production test auth cookie does not match the configured dedicated isTestData identity',
-    );
-  }
-}
 
 export async function addAdminReadOnlyCookie(context: BrowserContext) {
   if (!ADMIN_READONLY_COOKIE_VALUE) {
