@@ -8,11 +8,8 @@ import {
 
 const adminPages = [
   '/admin',
-  '/admin/characters',
   '/admin/analytics',
-  '/admin/audit',
   '/admin/safety',
-  '/admin/knowledge',
   '/admin/funnel',
   '/admin/mission-control/infra',
 ];

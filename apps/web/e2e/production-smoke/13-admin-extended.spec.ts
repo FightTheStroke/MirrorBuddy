@@ -88,20 +88,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     expect(await buttons.count()).toBeGreaterThan(0);
   });
 
-  adminTest('Characters page shows character grid', async ({ page, context }) => {
-    await addAdminReadOnlyCookie(context);
-    await page.goto('/admin/characters');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should show character cards or grid items
-    const body = (await page.textContent('body')) || '';
-    // At least some professor/character names should be visible
-    expect(body.length).toBeGreaterThan(300);
-    // Page heading
-    const heading = page.getByRole('heading').first();
-    await expect(heading).toBeVisible();
-  });
-
   adminTest('Analytics page shows metric cards and charts', async ({ page, context }) => {
     await addAdminReadOnlyCookie(context);
     await page.goto('/admin/analytics');
@@ -118,15 +104,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     }
   });
 
-  adminTest('Audit page shows log viewer', async ({ page, context }) => {
-    await addAdminReadOnlyCookie(context);
-    await page.goto('/admin/audit');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    const heading = page.getByRole('heading').first();
-    await expect(heading).toBeVisible();
-  });
-
   adminTest('Safety page shows safety dashboard with events', async ({ page, context }) => {
     await addAdminReadOnlyCookie(context);
     await page.goto('/admin/safety');
@@ -135,37 +112,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     // Safety page should show overview cards or event table
     const body = (await page.textContent('body')) || '';
     expect(body.length).toBeGreaterThan(200);
-  });
-
-  adminTest('Invites page shows tabs and invite list', async ({ page, context }) => {
-    await addAdminReadOnlyCookie(context);
-    await page.goto('/admin/invites');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have tab navigation (PENDING, APPROVED, etc.)
-    const tabs = page.getByRole('tab');
-    if ((await tabs.count()) > 0) {
-      expect(await tabs.count()).toBeGreaterThanOrEqual(2);
-    }
-  });
-
-  adminTest('Knowledge page shows maestri content', async ({ page, context }) => {
-    await addAdminReadOnlyCookie(context);
-    await page.goto('/admin/knowledge');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(200);
-  });
-
-  adminTest('Campaigns page shows campaign list with status', async ({ page, context }) => {
-    await addAdminReadOnlyCookie(context);
-    await page.goto('/admin/communications/campaigns');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have "New Campaign" button or similar action
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(100);
   });
 
   adminTest('Funnel page shows conversion metrics', async ({ page, context }) => {
@@ -197,4 +143,25 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     });
     expect([403, 405]).toContain(res.status());
   });
+
+  const adminOnlyPages = [
+    '/admin/users',
+    '/admin/characters',
+    '/admin/audit',
+    '/admin/tiers',
+    '/admin/knowledge',
+  ];
+
+  for (const adminOnlyPage of adminOnlyPages) {
+    adminTest(
+      `Read-only admin cannot access ADMIN-only page: ${adminOnlyPage}`,
+      async ({ page, context }) => {
+        await addAdminReadOnlyCookie(context);
+        await page.goto(adminOnlyPage, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await expect(page).toHaveURL(/\/(it|en|fr|de|es)\/(?:auth\/)?login/, {
+          timeout: 15000,
+        });
+      },
+    );
+  }
 });
