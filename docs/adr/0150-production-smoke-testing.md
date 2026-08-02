@@ -89,6 +89,9 @@ while retaining `browserName: chromium`.
 - **Production authorization checks do not call mutating maintenance actions.**
   ADMIN_READONLY coverage inspects the UI without activating controls; the
   cleanup authorization probe is limited to `DELETE ?dryRun=true`.
+- **Production smoke disables Playwright traces and video globally** so
+  authenticated cookies cannot enter retained browser artifacts. Failure
+  screenshots remain enabled; the credential-bearing login spec disables them.
 - **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 

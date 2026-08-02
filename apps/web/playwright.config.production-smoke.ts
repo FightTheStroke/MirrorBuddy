@@ -51,9 +51,10 @@ export default defineConfig({
   ],
   use: {
     baseURL: PROD_URL,
-    trace: 'retain-on-failure',
+    // Authenticated cookies must never be serialized into retained artifacts.
+    trace: 'off',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'off',
     actionTimeout: 10000,
     navigationTimeout: 15000,
     launchOptions: {
