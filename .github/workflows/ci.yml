@@ -23,6 +23,7 @@ concurrency:
 
 env:
   NODE_VERSION: "20"
+  VERCEL_CLI_VERSION: "56.3.2"
 
 jobs:
   # =========================================================================
@@ -616,7 +617,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install -g "vercel@${VERCEL_CLI_VERSION}"
 
       - name: Validate VERCEL_TOKEN is set
         id: vercel_token_check
@@ -1981,7 +1982,7 @@ jobs:
           echo "✅ VERCEL_TOKEN is configured (length: ${{ secrets.VERCEL_TOKEN && 'present' || 'missing' }})"
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install -g "vercel@${VERCEL_CLI_VERSION}"
 
       - name: Pull Vercel Environment
         run: |
@@ -2153,7 +2154,7 @@ jobs:
           echo "Staging URL: $STAGING_URL"
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install -g "vercel@${VERCEL_CLI_VERSION}"
 
       - name: Pre-promote staging health check
         run: |
