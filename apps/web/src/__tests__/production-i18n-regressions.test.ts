@@ -19,102 +19,240 @@ const localeMessages = {
   it: { auth: itAuth.auth, settings: itSettings.settings },
 };
 
-describe('production i18n regressions', () => {
-  it('uses complete invite-request copy in every supported locale', () => {
-    const placeholderValues = new Set([
-      'Titolo della pagina',
-      'Descrizione della pagina',
-      'Minimo caratteri',
-      'Testo di conferma',
-      'Page Title',
-      'Page Description',
-      'Minimum Characters',
-      'Confirmation Text',
-    ]);
-
-    Object.entries(localeMessages).forEach(([locale, messages]) => {
-      const invite = messages.auth.invite;
-
-      ['pageTitle', 'pageDescription', 'minimumCharacters', 'confirmationText'].forEach((key) => {
-        const value = invite[key as keyof typeof invite];
-        expect(value, `${locale} auth.invite.${key}`).toBeTypeOf('string');
-        expect(placeholderValues, `${locale} auth.invite.${key}`).not.toContain(value);
-      });
-    });
-  });
-
-  it('provides every Parent Area profile label in every supported locale', () => {
-    const requiredKeys = [
-      'professorFallback',
-      'dataDeletionRequestConfirm',
-      'studentLabel',
-      'activityOverview',
-      'updateButton',
-      'deleteButton',
-      'confidenceNote',
-      'settingsNote',
-    ] as const;
-
-    Object.entries(localeMessages).forEach(([locale, messages]) => {
-      requiredKeys.forEach((key) => {
-        expect(messages.settings.profile[key], `${locale} settings.profile.${key}`).toBeTypeOf(
-          'string',
-        );
-      });
-      expect(
-        messages.settings.leOsservazioniSonoGenerate,
-        `${locale} settings.leOsservazioniSonoGenerate`,
-      ).toBeTypeOf('string');
-    });
-  });
-
-  it('does not expose English placeholder labels in the Italian Parent Area', () => {
-    expect(itSettings.settings.profile.genitori.retry).toBe('Riprova');
-    expect(itSettings.settings.profile.parentChat).toMatchObject({
+const expectedLocaleCopy = {
+  de: {
+    invite: {
+      pageTitle: 'Beta-Zugang anfordern',
+      pageDescription:
+        'MirrorBuddy befindet sich in privater Betaversion. Füllen Sie das Formular aus, um Zugang anzufordern.',
+      minimumCharacters: 'Mindestens 20 Zeichen',
+      confirmationText:
+        'Sie erhalten eine Bestätigungs-E-Mail und, falls genehmigt, Ihre Zugangsdaten.',
+    },
+    profile: {
+      professorFallback: 'Professor',
+      dataDeletionRequestConfirm:
+        'Sind Sie sicher, dass Sie die Löschung von Daten anfordern möchten?',
+      studentLabel: 'Schüler:',
+      activityOverview: 'Überblick über Lernaktivitäten',
+      updateButton: 'Aktualisieren',
+      deleteButton: 'Löschen',
+      confidenceNote: 'Zuverlässigkeit {score}%. Mehr Sitzungen verbessern die Beobachtungen.',
+      settingsNote: 'Diese Einstellungen gelten nur für die Ansicht des Eltern-Dashboards.',
+    },
+    retry: 'Erneut versuchen',
+    parentChat: {
+      askAbout: 'Nach den Fortschritten von {studentName} fragen',
+      messagesSaved: 'Nachrichten werden sicher gespeichert',
+      observationsStudySessions: 'Beobachtungen basieren auf Lernsitzungen',
+      startConversation: 'Gespräch mit {maestroName} starten',
+      understood: 'Verstanden, weiter',
+    },
+    notices: {
+      nota1: 'Hinweis:',
+      nota: 'Hinweis:',
+      disclaimerAi: 'KI-Hinweis:',
+      leOsservazioniSonoGenerate:
+        'Die Beobachtungen werden von KI erstellt und ersetzen keine professionellen Beurteilungen.',
+    },
+    composed: {
+      confidence: 'Hinweis: Zuverlässigkeit 42%. Mehr Sitzungen verbessern die Beobachtungen.',
+      settings: 'Hinweis: Diese Einstellungen gelten nur für die Ansicht des Eltern-Dashboards.',
+      disclaimer:
+        'KI-Hinweis: Die Beobachtungen werden von KI erstellt und ersetzen keine professionellen Beurteilungen.',
+    },
+  },
+  en: {
+    invite: {
+      pageTitle: 'Request Beta Access',
+      pageDescription: 'MirrorBuddy is in private beta. Fill out the form to request access.',
+      minimumCharacters: 'Minimum 20 characters',
+      confirmationText:
+        'You will receive a confirmation email and, if approved, your access credentials.',
+    },
+    profile: {
+      professorFallback: 'Professor',
+      dataDeletionRequestConfirm: 'Are you sure you want to request data deletion?',
+      studentLabel: 'Student:',
+      activityOverview: 'Overview of study activities',
+      updateButton: 'Update',
+      deleteButton: 'Delete',
+      confidenceNote: 'Reliability {score}%. More sessions will improve the observations.',
+      settingsNote: 'These settings apply only to the Parent Dashboard view.',
+    },
+    retry: 'Retry',
+    parentChat: {
+      askAbout: 'Ask About',
+      messagesSaved: 'Messages Saved',
+      observationsStudySessions: 'Observations Study Sessions',
+      startConversation: 'Start conversation',
+      understood: 'Understood',
+    },
+    notices: {
+      nota1: 'Note:',
+      nota: 'Note:',
+      disclaimerAi: 'AI disclaimer:',
+      leOsservazioniSonoGenerate:
+        'Observations are generated by AI and do not replace professional evaluations.',
+    },
+    composed: {
+      confidence: 'Note: Reliability 42%. More sessions will improve the observations.',
+      settings: 'Note: These settings apply only to the Parent Dashboard view.',
+      disclaimer:
+        'AI disclaimer: Observations are generated by AI and do not replace professional evaluations.',
+    },
+  },
+  es: {
+    invite: {
+      pageTitle: 'Solicitar Acceso a Beta',
+      pageDescription:
+        'MirrorBuddy está en beta privada. Complete el formulario para solicitar acceso.',
+      minimumCharacters: 'Mínimo 20 caracteres',
+      confirmationText:
+        'Recibirás un correo de confirmación y, si se aprueba, tus credenciales de acceso.',
+    },
+    profile: {
+      professorFallback: 'Profesor',
+      dataDeletionRequestConfirm: '¿Está seguro de que desea solicitar la eliminación de datos?',
+      studentLabel: 'Estudiante:',
+      activityOverview: 'Descripción general de actividades de estudio',
+      updateButton: 'Actualizar',
+      deleteButton: 'Eliminar',
+      confidenceNote: 'Confiabilidad {score}%. Más sesiones mejorarán las observaciones.',
+      settingsNote:
+        'Estas configuraciones se aplican solo a la vista del Panel de control de padres.',
+    },
+    retry: 'Reintentar',
+    parentChat: {
+      askAbout: 'Preguntar sobre el progreso de {studentName}',
+      messagesSaved: 'Los mensajes se guardan de forma segura',
+      observationsStudySessions: 'Las observaciones se basan en sesiones de estudio',
+      startConversation: 'Iniciar conversación con {maestroName}',
+      understood: 'Entendido, continuar',
+    },
+    notices: {
+      nota1: 'Nota:',
+      nota: 'Nota:',
+      disclaimerAi: 'Aviso de IA:',
+      leOsservazioniSonoGenerate:
+        'Las observaciones son generadas por IA y no sustituyen las evaluaciones profesionales.',
+    },
+    composed: {
+      confidence: 'Nota: Confiabilidad 42%. Más sesiones mejorarán las observaciones.',
+      settings:
+        'Nota: Estas configuraciones se aplican solo a la vista del Panel de control de padres.',
+      disclaimer:
+        'Aviso de IA: Las observaciones son generadas por IA y no sustituyen las evaluaciones profesionales.',
+    },
+  },
+  fr: {
+    invite: {
+      pageTitle: "Demander l'Accès Bêta",
+      pageDescription:
+        "MirrorBuddy est en bêta privée. Remplissez le formulaire pour demander l'accès.",
+      minimumCharacters: 'Minimum 20 caractères',
+      confirmationText:
+        "Vous recevrez un email de confirmation et, s'il est approuvé, vos identifiants d'accès.",
+    },
+    profile: {
+      professorFallback: 'Professeur',
+      dataDeletionRequestConfirm: 'Êtes-vous sûr de vouloir demander la suppression des données ?',
+      studentLabel: 'Élève :',
+      activityOverview: "Aperçu des activités d'étude",
+      updateButton: 'Mettre à jour',
+      deleteButton: 'Supprimer',
+      confidenceNote: 'Fiabilité {score}%. Plus de sessions amélioreront les observations.',
+      settingsNote:
+        "Ces paramètres s'appliquent uniquement à l'affichage du Tableau de bord des parents.",
+    },
+    retry: 'Réessayer',
+    parentChat: {
+      askAbout: 'Demander des informations sur les progrès de {studentName}',
+      messagesSaved: 'Les messages sont enregistrés de manière sécurisée',
+      observationsStudySessions: "Les observations sont basées sur les séances d'étude",
+      startConversation: 'Commencer la conversation avec {maestroName}',
+      understood: "J'ai compris, continuer",
+    },
+    notices: {
+      nota1: 'Remarque :',
+      nota: 'Remarque :',
+      disclaimerAi: "Avertissement sur l'IA :",
+      leOsservazioniSonoGenerate:
+        "Les observations sont générées par l'IA et ne remplacent pas les évaluations professionnelles.",
+    },
+    composed: {
+      confidence: 'Remarque : Fiabilité 42%. Plus de sessions amélioreront les observations.',
+      settings:
+        "Remarque : Ces paramètres s'appliquent uniquement à l'affichage du Tableau de bord des parents.",
+      disclaimer:
+        "Avertissement sur l'IA : Les observations sont générées par l'IA et ne remplacent pas les évaluations professionnelles.",
+    },
+  },
+  it: {
+    invite: {
+      pageTitle: 'Richiedi Accesso Beta',
+      pageDescription: "MirrorBuddy è in beta privata. Compila il form per richiedere l'accesso.",
+      minimumCharacters: 'Minimo 20 caratteri',
+      confirmationText:
+        'Riceverai una email di conferma e, se approvato, le credenziali di accesso.',
+    },
+    profile: {
+      professorFallback: 'Professore',
+      dataDeletionRequestConfirm: 'Sei sicuro di voler richiedere la cancellazione dei dati?',
+      studentLabel: 'Studente:',
+      activityOverview: 'Panoramica delle attività di studio',
+      updateButton: 'Aggiorna',
+      deleteButton: 'Cancella',
+      confidenceNote: 'Affidabilità {score}%. Più sessioni miglioreranno le osservazioni.',
+      settingsNote:
+        'Queste impostazioni si applicano solo alla visualizzazione del Dashboard Genitori.',
+    },
+    retry: 'Riprova',
+    parentChat: {
       askAbout: 'Chieda informazioni sui progressi di {studentName}',
       messagesSaved: 'I messaggi vengono salvati in modo sicuro',
       observationsStudySessions: 'Le osservazioni si basano sulle sessioni di studio',
+      startConversation: 'Inizia la conversazione con {maestroName}',
       understood: 'Ho capito, continua',
+    },
+    notices: {
+      nota1: 'Nota:',
+      nota: 'Nota:',
+      disclaimerAi: 'Avviso IA:',
+      leOsservazioniSonoGenerate:
+        "Le osservazioni sono generate dall'IA e non sostituiscono valutazioni professionali.",
+    },
+    composed: {
+      confidence: 'Nota: Affidabilità 42%. Più sessioni miglioreranno le osservazioni.',
+      settings:
+        'Nota: Queste impostazioni si applicano solo alla visualizzazione del Dashboard Genitori.',
+      disclaimer:
+        "Avviso IA: Le osservazioni sono generate dall'IA e non sostituiscono valutazioni professionali.",
+    },
+  },
+} as const;
+
+describe('production i18n regressions', () => {
+  it('uses the exact invite-request copy in every supported locale', () => {
+    Object.entries(localeMessages).forEach(([locale, messages]) => {
+      const expected = expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy];
+      expect(messages.auth.invite).toMatchObject(expected.invite);
+    });
+  });
+
+  it('uses the exact Parent Area copy in every supported locale', () => {
+    Object.entries(localeMessages).forEach(([locale, messages]) => {
+      const expected = expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy];
+      expect(messages.settings.profile).toMatchObject({
+        ...expected.profile,
+        genitori: { retry: expected.retry },
+        parentChat: expected.parentChat,
+      });
+      expect(messages.settings).toMatchObject(expected.notices);
     });
   });
 
   it('composes Parent Area notices without duplicated or mixed-language prefixes', () => {
-    const expectedCopy = {
-      de: {
-        confidence: 'Hinweis: Zuverlässigkeit 42%. Mehr Sitzungen verbessern die Beobachtungen.',
-        settings: 'Hinweis: Diese Einstellungen gelten nur für die Ansicht des Eltern-Dashboards.',
-        disclaimer:
-          'KI-Hinweis: Die Beobachtungen werden von KI erstellt und ersetzen keine professionellen Beurteilungen.',
-      },
-      en: {
-        confidence: 'Note: Reliability 42%. More sessions will improve the observations.',
-        settings: 'Note: These settings apply only to the Parent Dashboard view.',
-        disclaimer:
-          'AI disclaimer: Observations are generated by AI and do not replace professional evaluations.',
-      },
-      es: {
-        confidence: 'Nota: Confiabilidad 42%. Más sesiones mejorarán las observaciones.',
-        settings:
-          'Nota: Estas configuraciones se aplican solo a la vista del Panel de control de padres.',
-        disclaimer:
-          'Aviso de IA: Las observaciones son generadas por IA y no sustituyen las evaluaciones profesionales.',
-      },
-      fr: {
-        confidence: 'Remarque : Fiabilité 42%. Plus de sessions amélioreront les observations.',
-        settings:
-          "Remarque : Ces paramètres s'appliquent uniquement à l'affichage du Tableau de bord des parents.",
-        disclaimer:
-          "Avertissement sur l'IA : Les observations sont générées par l'IA et ne remplacent pas les évaluations professionnelles.",
-      },
-      it: {
-        confidence: 'Nota: Affidabilità 42%. Più sessioni miglioreranno le osservazioni.',
-        settings:
-          'Nota: Queste impostazioni si applicano solo alla visualizzazione del Dashboard Genitori.',
-        disclaimer:
-          "Avviso IA: Le osservazioni sono generate dall'IA e non sostituiscono valutazioni professionali.",
-      },
-    };
-
     Object.entries(localeMessages).forEach(([locale, messages]) => {
       const profile = messages.settings.profile;
       const composed = {
@@ -123,7 +261,9 @@ describe('production i18n regressions', () => {
         disclaimer: `${messages.settings.disclaimerAi} ${messages.settings.leOsservazioniSonoGenerate}`,
       };
 
-      expect(composed).toEqual(expectedCopy[locale as keyof typeof expectedCopy]);
+      expect(composed).toEqual(
+        expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy].composed,
+      );
     });
   });
 });
