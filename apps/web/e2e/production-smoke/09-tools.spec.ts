@@ -10,7 +10,7 @@ import {
   authenticatedTest,
   expect,
   PROD_URL,
-  hasProdTestCredentials,
+  hasProdTestAuthCookie,
   openHomeworkSession,
 } from './fixtures';
 import { request as pwRequest } from '@playwright/test';
@@ -56,10 +56,7 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
   });
 
   authenticatedTest('Tool buttons are visible in the current session UI', async ({ page }) => {
-    authenticatedTest.skip(
-      !hasProdTestCredentials,
-      'Local production test credentials are not available',
-    );
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await openHomeworkSession(page);
 
     const toolNames = ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto'];

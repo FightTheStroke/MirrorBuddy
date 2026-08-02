@@ -10,8 +10,9 @@
  *   PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop
  *   PROD_URL=https://mirrorbuddy.org npx playwright test --config playwright.config.production-smoke.ts
  *
- * Authenticated student tests use the local-only PROD_TEST_USER_* variables.
- * Without them, authenticated UI coverage is skipped.
+ * Authenticated student tests use PROD_TEST_USER_ID and the pre-signed
+ * PROD_TEST_USER_COOKIE_VALUE. The isolated login-flow regression additionally
+ * uses the local-only PROD_TEST_USER_EMAIL/USERNAME/PASSWORD credentials.
  *
  * Admin tests:
  *   Without ADMIN_READONLY_COOKIE_VALUE, admin panel tests are SKIPPED.
@@ -38,8 +39,8 @@ const browserUse = {
 export default defineConfig({
   testDir: './e2e/production-smoke',
   fullyParallel: false,
-  // Keep production load predictable. Authenticated coverage uses locally
-  // signed storage state; only the isolated login-flow regression calls login.
+  // Keep production load predictable. Authenticated coverage uses pre-signed
+  // storage state; only the isolated login-flow regression calls login.
   workers: 1,
   forbidOnly: !!process.env.CI,
   timeout: 30000,

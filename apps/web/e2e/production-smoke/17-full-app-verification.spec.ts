@@ -7,13 +7,10 @@
  */
 
 import { request as pwRequest } from '@playwright/test';
-import { authenticatedTest, test, expect, PROD_URL, hasProdTestCredentials } from './fixtures';
+import { authenticatedTest, test, expect, PROD_URL, hasProdTestAuthCookie } from './fixtures';
 
 authenticatedTest.describe('PROD: Current authenticated home', () => {
-  authenticatedTest.skip(
-    !hasProdTestCredentials,
-    'Local production test credentials are not available',
-  );
+  authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
 
   authenticatedTest('Loads directly into the intent chooser', async ({ page }) => {
     await page.goto('/it');

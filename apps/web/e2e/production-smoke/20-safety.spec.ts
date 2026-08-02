@@ -9,7 +9,7 @@ import {
   authenticatedTest,
   expect,
   PROD_URL,
-  hasProdTestCredentials,
+  hasProdTestAuthCookie,
   openHomeworkSession,
 } from './fixtures';
 import { request as pwRequest } from '@playwright/test';
@@ -57,10 +57,7 @@ async function getMaestri(): Promise<MaestroSafetyPayload[]> {
 
 test.describe('PROD-SMOKE: Safety & Transparency', () => {
   authenticatedTest('Session UI shows AI disclaimer footer', async ({ page }) => {
-    authenticatedTest.skip(
-      !hasProdTestCredentials,
-      'Local production test credentials are not available',
-    );
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await openHomeworkSession(page);
     await expect(page.getByRole('textbox').first()).toBeVisible({ timeout: 10000 });
     const content = (await page.textContent('body')) ?? '';
@@ -75,10 +72,7 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
   });
 
   authenticatedTest('Intent home avoids inappropriate content', async ({ page }) => {
-    authenticatedTest.skip(
-      !hasProdTestCredentials,
-      'Local production test credentials are not available',
-    );
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await page.goto('/it');
     const content = (await page.textContent('body')) ?? '';
     expect(content).not.toMatch(INAPPROPRIATE_PATTERN);
@@ -163,10 +157,7 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
   });
 
   authenticatedTest('Session UI has visible close action (Chiudi)', async ({ page }) => {
-    authenticatedTest.skip(
-      !hasProdTestCredentials,
-      'Local production test credentials are not available',
-    );
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await openHomeworkSession(page);
     await expect(page.getByRole('button', { name: 'Chiudi', exact: true })).toBeVisible({
       timeout: 10000,

@@ -8,12 +8,12 @@
 import {
   authenticatedTest as test,
   expect,
-  hasProdTestCredentials,
+  hasProdTestAuthCookie,
   openHomeworkSession,
 } from './fixtures';
 
 test.describe('PROD-SMOKE: Session UI', () => {
-  test.skip(!hasProdTestCredentials, 'Local production test credentials are not available');
+  test.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
 
   test('Homework flow opens a Maestro session', async ({ page }) => {
     await openHomeworkSession(page);

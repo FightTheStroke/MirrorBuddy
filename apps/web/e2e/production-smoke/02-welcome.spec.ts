@@ -5,7 +5,7 @@
  * available after login and no longer exposes the legacy 26-professor grid.
  */
 
-import { test, authenticatedTest, expect, hasProdTestCredentials } from './fixtures';
+import { test, authenticatedTest, expect, hasProdTestAuthCookie } from './fixtures';
 
 test.describe('PROD-SMOKE: Public welcome', () => {
   test('Localized welcome page renders from /it', async ({ page }) => {
@@ -22,10 +22,7 @@ test.describe('PROD-SMOKE: Public welcome', () => {
 });
 
 authenticatedTest.describe('PROD-SMOKE: Authenticated intent home', () => {
-  authenticatedTest.skip(
-    !hasProdTestCredentials,
-    'Local production test credentials are not available',
-  );
+  authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
 
   authenticatedTest('Home renders the three current learning actions', async ({ page }) => {
     await page.goto('/it');

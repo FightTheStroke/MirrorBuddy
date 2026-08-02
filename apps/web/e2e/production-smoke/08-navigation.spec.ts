@@ -5,12 +5,12 @@
 import {
   authenticatedTest as test,
   expect,
-  hasProdTestCredentials,
+  hasProdTestAuthCookie,
   openMobileMenu,
 } from './fixtures';
 
 test.describe('PROD-SMOKE: Navigation', () => {
-  test.skip(!hasProdTestCredentials, 'Local production test credentials are not available');
+  test.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/it');

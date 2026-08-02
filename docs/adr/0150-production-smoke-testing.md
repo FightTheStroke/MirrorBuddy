@@ -77,11 +77,12 @@ while retaining `browserName: chromium`.
 - **Fixtures mock mutable user-state APIs** (including accessibility settings and
   `/api/tos`) and set consent cookies client-side — no server state changed
 - **No authentication by default** — public tests run as anonymous visitors
-- **Authenticated UI tests** create signed storage state locally from
-  `PROD_TEST_USER_ID` and `SESSION_SECRET`, then verify the configured user ID and
+- **Authenticated UI tests** inject `PROD_TEST_USER_COOKIE_VALUE` as the
+  `mirrorbuddy-user-id` cookie, then verify `PROD_TEST_USER_ID` and
   `isTestData=true` through `/api/user`. Shared fixtures do not call the login
-  endpoint. The isolated login-flow regression performs one verified login and may
-  emit deduplicated `FIRST_LOGIN` funnel telemetry.
+  endpoint or require `SESSION_SECRET`. The isolated login-flow regression uses
+  credentials once, validates the returned user ID, and may emit deduplicated
+  `FIRST_LOGIN` funnel telemetry.
 - **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 

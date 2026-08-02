@@ -10,7 +10,7 @@ import {
   test,
   authenticatedTest,
   expect,
-  hasProdTestCredentials,
+  hasProdTestAuthCookie,
   openHomeworkSession,
 } from './fixtures';
 
@@ -40,10 +40,7 @@ test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
   });
 
   authenticatedTest('Intent flow selects a professor and renders the session', async ({ page }) => {
-    authenticatedTest.skip(
-      !hasProdTestCredentials,
-      'Local production test credentials are not available',
-    );
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await openHomeworkSession(page);
     await expect(page.getByRole('textbox').first()).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('maestro-session-handoff')).toBeVisible();
