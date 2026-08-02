@@ -18,6 +18,9 @@ permissions:
   deployments: write
   issues: write
 
+env:
+  VERCEL_CLI_VERSION: "56.3.2"
+
 jobs:
   promote:
     name: "🚀 Promote Staging → Production"
@@ -37,7 +40,7 @@ jobs:
           node-version: "20"
 
       - name: Install Vercel CLI
-        run: npm install -g vercel@latest
+        run: npm install -g "vercel@${VERCEL_CLI_VERSION}"
 
       - name: Validate VERCEL_TOKEN
         run: |
