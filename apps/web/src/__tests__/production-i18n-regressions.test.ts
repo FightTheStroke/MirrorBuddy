@@ -82,10 +82,10 @@ const expectedLocaleCopy = {
     },
     retry: 'Retry',
     parentChat: {
-      askAbout: 'Ask About',
+      askAbout: "Ask about {studentName}'s progress",
       messagesSaved: 'Messages Saved',
       observationsStudySessions: 'Observations Study Sessions',
-      startConversation: 'Start conversation',
+      startConversation: 'Start conversation with {maestroName}',
       understood: 'Understood',
     },
     notices: {

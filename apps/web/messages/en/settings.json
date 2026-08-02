@@ -103,7 +103,7 @@
         "iDatiVerrannoEliminatiEntro30GiorniComePrevistoDal": "I dati verranno eliminati entro 30 giorni, come previsto dal GDPR."
       },
       "parentChat": {
-        "askAbout": "Ask About",
+        "askAbout": "Ask about {studentName}'s progress",
         "cancel": "Cancel",
         "conversationTitle": "Conversation with parent assistant",
         "description": "Chat with the assistant for guidance and updates.",
@@ -113,7 +113,7 @@
         "loadingConversation": "Loading conversation...",
         "messagesSaved": "Messages Saved",
         "observationsStudySessions": "Observations Study Sessions",
-        "startConversation": "Start conversation",
+        "startConversation": "Start conversation with {maestroName}",
         "title": "Parent assistant chat",
         "understood": "Understood"
       },
