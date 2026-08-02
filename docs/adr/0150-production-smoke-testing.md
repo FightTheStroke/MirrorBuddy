@@ -4,7 +4,7 @@ Status: Accepted | Date: 15 Feb 2026
 
 ## Context
 
-MirrorBuddy is deployed on Vercel at `mirrorbuddy.vercel.app`. We needed a way to validate production deployments without leaving traces in the database or affecting real users. Manual testing is slow and error-prone, and we had no automated production validation until now.
+MirrorBuddy is deployed on Vercel at `mirrorbuddy.org`. We needed a way to validate production deployments without leaving traces in the database or affecting real users. Manual testing is slow and error-prone, and we had no automated production validation until now.
 
 ## Decision
 
@@ -14,13 +14,15 @@ We created a dedicated Playwright-based production smoke test suite that:
 2. **Does not create, modify, or delete learning data** — shared authenticated
    coverage uses locally signed storage state for a dedicated `isTestData` account
 3. **Uses client-side mocks** to bypass consent walls without touching the server
-4. **Covers 16 test areas** across 80+ test cases
+4. **Covers 22 test areas** across the desktop and mobile production profiles
 
 ### Test Suite Structure
 
 ```
 e2e/production-smoke/
 ├── fixtures.ts                    # Base fixture with consent wall bypasses
+├── 00-config.spec.ts              # Browser artifact and channel safety
+├── 00-routing.spec.ts             # Anonymous and authenticated route contracts
 ├── 01-infrastructure.spec.ts      # API health, CSP headers, static assets
 ├── 02-welcome.spec.ts             # Landing page, UI elements
 ├── 03-chat.spec.ts                # Chat interface accessibility
@@ -36,7 +38,11 @@ e2e/production-smoke/
 ├── 13-admin-extended.spec.ts      # Admin extended panels, ADMIN_READONLY GET access
 ├── 14-professor-safety.spec.ts    # Professor safety guardrails
 ├── 15-tier-system.spec.ts         # Trial/Base/Pro tier enforcement
-└── 16-admin-health.spec.ts        # Admin health checks, Redis/Resend status
+├── 16-admin-health.spec.ts        # Admin health checks, Redis/Resend status
+├── 17-full-app-verification.spec.ts # Astuccio and Study Kit coverage
+├── 18-security.spec.ts            # Security headers and access controls
+├── 19-compliance-extended.spec.ts # Extended compliance checks
+└── 20-safety.spec.ts              # Production safety invariants
 ```
 
 ### Running the Tests
@@ -53,7 +59,7 @@ e2e/production-smoke/
 ./scripts/smoke-prod.sh --debug     # Playwright inspector
 
 # Direct Playwright command
-PROD_URL=https://mirrorbuddy.vercel.app npx playwright test \
+PROD_URL=https://mirrorbuddy.org npx playwright test \
   --config=playwright.config.production-smoke.ts
 
 # Microsoft Edge (Chromium engine, desktop project)
@@ -93,13 +99,16 @@ while retaining `browserName: chromium`.
   cleanup authorization probe is limited to `DELETE ?dryRun=true`.
 - **Production smoke disables Playwright traces and video globally** so
   authenticated cookies cannot enter retained browser artifacts. Failure
-  screenshots remain enabled; the credential-bearing login spec disables them.
-- **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
+  screenshots remain enabled.
+- **Admin tests are opt-in** (`--admin` flag) and inject the signed
+  `ADMIN_READONLY_COOKIE_VALUE` as the standard `mirrorbuddy-user-id` session cookie.
+- **Anonymous route contract** — `/it` resolves to `/it/welcome`; `/admin` resolves to
+  the localized login route without a valid session.
 - **Reports** saved to `playwright-report/production-smoke/`
 
 ## Consequences
 
-- Every deployment can be validated in ~30 seconds
+- Every deployment can be validated through repeatable desktop/mobile checks
 - Regressions in compliance pages, i18n, or infrastructure are caught immediately
 - Admin panel functionality can be verified without manual login flows
 - Tests must be maintained when UI changes (selectors, page structure)
