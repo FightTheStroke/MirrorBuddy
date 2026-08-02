@@ -54,7 +54,14 @@ e2e/production-smoke/
 # Direct Playwright command
 PROD_URL=https://mirrorbuddy.vercel.app npx playwright test \
   --config=playwright.config.production-smoke.ts
+
+# Microsoft Edge (Chromium engine, desktop project)
+PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop
 ```
+
+`PLAYWRIGHT_CHANNEL` is optional. When unset, Playwright uses its bundled
+Chromium; setting it to `msedge` launches the locally installed Microsoft Edge
+while retaining `browserName: chromium`.
 
 ### How to Add New Tests
 

@@ -7,6 +7,7 @@
  * Usage:
  *   npm run test:smoke:prod
  *   npm run test:smoke:prod -- --headed   # watch in browser
+ *   PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop
  *   PROD_URL=https://mirrorbuddy.org npx playwright test --config playwright.config.production-smoke.ts
  *
  * Authenticated student tests use the local-only PROD_TEST_USER_* variables.
@@ -28,6 +29,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
+const PLAYWRIGHT_CHANNEL = process.env.PLAYWRIGHT_CHANNEL;
+const browserUse = {
+  browserName: 'chromium' as const,
+  ...(PLAYWRIGHT_CHANNEL ? { channel: PLAYWRIGHT_CHANNEL } : {}),
+};
 
 export default defineConfig({
   testDir: './e2e/production-smoke',
@@ -58,16 +64,14 @@ export default defineConfig({
       name: 'desktop',
       use: {
         ...devices['Desktop Chrome'],
-        browserName: 'chromium',
-        channel: 'msedge',
+        ...browserUse,
       },
     },
     {
       name: 'mobile',
       use: {
         ...devices['iPhone 13'],
-        browserName: 'chromium',
-        channel: 'msedge',
+        ...browserUse,
       },
     },
   ],

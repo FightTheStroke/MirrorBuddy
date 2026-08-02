@@ -18,5 +18,5 @@ Adopt one NightMaintenance workflow: PR checks -> merge -> main CI -> staging-to
 ## Enforcement
 
 - Rule: `NightMaintenance requires PR+main CI green before production promotion and issue closure.`
-- Check: `gh pr view <n> --json statusCheckRollup && gh run view <run> --json status,conclusion && npm run test:smoke:prod && npm run production:status && sentry-cli issues list --query "is:unresolved" && npm audit --audit-level=high`
+- Check: `gh pr view <n> --json statusCheckRollup && gh run view <run> --json status,conclusion && PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop && npm run production:status && sentry-cli issues list --query "is:unresolved" && npm audit --audit-level=high`
 - Ref: ADR 0070, ADR 0073, ADR 0150
