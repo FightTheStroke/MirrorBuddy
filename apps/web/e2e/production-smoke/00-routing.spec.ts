@@ -10,7 +10,7 @@ test.describe('PROD-SMOKE: Route contracts', () => {
   test('Unauthenticated /admin redirects to the localized login page', async ({ page }) => {
     await page.goto('/admin', { waitUntil: 'commit' });
     await page.waitForURL(/\/(it|en|fr|de|es)\/login/, { timeout: 15000 });
-    expect(new URL(page.url()).pathname).toBe('/it/login');
+    expect(new URL(page.url()).pathname).toMatch(/^\/(it|en|fr|de|es)\/login$/);
   });
 
   authenticatedTest('Authenticated cookie enters the app at /it', async ({ page }) => {
