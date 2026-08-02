@@ -8,9 +8,11 @@
  * - ARIA landmarks present
  */
 
-import { test, expect } from './fixtures';
+import { authenticatedTest as test, expect, hasProdTestAuthCookie } from './fixtures';
 
 test.describe('PROD-SMOKE: Accessibility', () => {
+  test.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/it');
   });

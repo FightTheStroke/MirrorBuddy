@@ -50,6 +50,7 @@
     "pretest": "./scripts/ensure-test-db.sh --check || echo 'Warning: PostgreSQL not running, tests may fail'",
     "test:e2e:smoke": "E2E_TESTS=1 playwright test --config apps/web/playwright.config.iteration.ts --project=chromium apps/web/e2e/smoke apps/web/e2e/full-app-smoke.spec.ts",
     "test:smoke:prod": "playwright test --config apps/web/playwright.config.production-smoke.ts",
+    "verify:smoke:prod:login": "tsx scripts/verify-production-login.ts",
     "test:e2e:admin": "E2E_TESTS=1 playwright test --config apps/web/playwright.config.iteration.ts --project=chromium apps/web/e2e/admin*.spec.ts",
     "test:e2e:i18n": "E2E_TESTS=1 playwright test --workers=2 --config playwright.config.iteration.ts --project=chromium apps/web/e2e/locale-fixtures-basic.spec.ts apps/web/e2e/locale-fixtures-integration.spec.ts apps/web/e2e/locale-switching.spec.ts apps/web/e2e/a11y-locales.spec.ts apps/web/e2e/hreflang.spec.ts apps/web/e2e/maestri-greetings-i18n.spec.ts apps/web/e2e/welcome-hero-translations.spec.ts apps/web/e2e/welcome-i18n.spec.ts apps/web/e2e/welcome-i18n-advanced.spec.ts apps/web/e2e/welcome-language-switcher.spec.ts",
     "test:e2e:compliance": "E2E_TESTS=1 playwright test --config apps/web/playwright.config.iteration.ts --project=chromium apps/web/e2e/compliance.spec.ts apps/web/e2e/gdpr-compliance.spec.ts apps/web/e2e/legal-ai-act.spec.ts apps/web/e2e/legal-data-privacy.spec.ts",

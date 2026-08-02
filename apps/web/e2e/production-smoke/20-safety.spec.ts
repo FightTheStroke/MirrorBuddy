@@ -4,7 +4,14 @@
  * Verifies public safety signals, compliance pages, and read-only safety APIs.
  */
 
-import { test, expect, PROD_URL } from './fixtures';
+import {
+  test,
+  authenticatedTest,
+  expect,
+  PROD_URL,
+  hasProdTestAuthCookie,
+  openHomeworkSession,
+} from './fixtures';
 import { request as pwRequest } from '@playwright/test';
 
 interface MaestroSafetyPayload {
@@ -49,12 +56,9 @@ async function getMaestri(): Promise<MaestroSafetyPayload[]> {
 }
 
 test.describe('PROD-SMOKE: Safety & Transparency', () => {
-  test('Chat UI shows AI disclaimer footer', async ({ page }) => {
-    await page.goto('/it');
-    await page
-      .getByRole('button', { name: /Studia con /i })
-      .first()
-      .click();
+  authenticatedTest('Session UI shows AI disclaimer footer', async ({ page }) => {
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
+    await openHomeworkSession(page);
     await expect(page.getByRole('textbox').first()).toBeVisible({ timeout: 10000 });
     const content = (await page.textContent('body')) ?? '';
     expect(content).toMatch(AI_DISCLAIMER_PATTERN);
@@ -67,20 +71,21 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     expect(content.length).toBeGreaterThan(500);
   });
 
-  test('Professor cards area shows AI-generated disclaimer text', async ({ page }) => {
+  authenticatedTest('Intent home avoids inappropriate content', async ({ page }) => {
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
     await page.goto('/it');
     const content = (await page.textContent('body')) ?? '';
-    expect(content).toMatch(AI_DISCLAIMER_PATTERN);
+    expect(content).not.toMatch(INAPPROPRIATE_PATTERN);
   });
 
-  test('/api/safety/check rejects requests without auth', async () => {
+  test('Legacy /api/safety/check endpoint is not exposed', async () => {
     const status = await getApiStatus('/api/safety/check');
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 
-  test('/api/safety/report rejects requests without auth', async () => {
+  test('Legacy /api/safety/report endpoint is not exposed', async () => {
     const status = await getApiStatus('/api/safety/report');
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 
   test('GET /api/maestri returns valid character records', async () => {
@@ -112,13 +117,10 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     page,
   }) => {
     const status = await getApiStatus('/api/safety/bias');
-    if (status === 404) {
-      await page.goto('/it/ai-transparency');
-      const content = (await page.textContent('body')) ?? '';
-      expect(content).toMatch(BIAS_PATTERN);
-      return;
-    }
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
+    await page.goto('/it/ai-transparency');
+    const content = (await page.textContent('body')) ?? '';
+    expect(content).toMatch(BIAS_PATTERN);
   });
 
   test('AI transparency page mentions human oversight or escalation', async ({ page }) => {
@@ -128,7 +130,7 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
   });
 
   test('Terms page mentions limitations of AI responses', async ({ page }) => {
-    await page.goto('/it/terms');
+    await page.goto('/it/terms', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const content = (await page.textContent('body')) ?? '';
     expect(content).toMatch(TERMS_LIMITATION_PATTERN);
@@ -151,12 +153,9 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     }
   });
 
-  test('Chat UI has visible close action (Chiudi)', async ({ page }) => {
-    await page.goto('/it');
-    await page
-      .getByRole('button', { name: /Studia con /i })
-      .first()
-      .click();
+  authenticatedTest('Session UI has visible close action (Chiudi)', async ({ page }) => {
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
+    await openHomeworkSession(page);
     await expect(page.getByRole('button', { name: 'Chiudi', exact: true })).toBeVisible({
       timeout: 10000,
     });
@@ -164,12 +163,9 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
 
   test('Crisis endpoint exists or transparency page mentions crisis handling', async ({ page }) => {
     const status = await getApiStatus('/api/safety/crisis');
-    if (status === 404) {
-      await page.goto('/it/ai-transparency');
-      const content = (await page.textContent('body')) ?? '';
-      expect(content).toMatch(CRISIS_PATTERN);
-      return;
-    }
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
+    await page.goto('/it/ai-transparency');
+    const content = (await page.textContent('body')) ?? '';
+    expect(content).toMatch(CRISIS_PATTERN);
   });
 });

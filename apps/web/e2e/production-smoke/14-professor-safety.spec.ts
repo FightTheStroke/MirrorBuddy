@@ -6,7 +6,13 @@
  * Read-only, no AI interactions.
  */
 
-import { test, expect } from './fixtures';
+import {
+  test,
+  authenticatedTest,
+  expect,
+  hasProdTestAuthCookie,
+  openHomeworkSession,
+} from './fixtures';
 
 test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
   test('Maestri API returns all 26 with correct structure', async ({ request }) => {
@@ -33,16 +39,11 @@ test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
     expect(subjects.size).toBeGreaterThanOrEqual(5);
   });
 
-  test('Character detail page renders for a professor', async ({ page }) => {
-    await page.goto('/it');
-
-    // Click on any available professor
-    const professorButton = page.getByRole('button', { name: /Studia con/i }).first();
-    await expect(professorButton).toBeVisible({ timeout: 10000 });
-    await professorButton.click();
-
-    // Chat interface should appear
+  authenticatedTest('Intent flow selects a professor and renders the session', async ({ page }) => {
+    authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
+    await openHomeworkSession(page);
     await expect(page.getByRole('textbox').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('maestro-session-handoff')).toBeVisible();
   });
 
   test('AI transparency page is accessible', async ({ page }) => {
@@ -55,6 +56,6 @@ test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
 
   test('Safety endpoint rejects unauthenticated', async ({ request }) => {
     const res = await request.get('/api/admin/safety');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(401);
   });
 });
