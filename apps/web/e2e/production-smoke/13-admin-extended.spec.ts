@@ -7,8 +7,13 @@
  * Read-only, no data mutations even with valid auth.
  */
 
-import { test, expect, PROD_URL } from './fixtures';
-import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
+import {
+  test,
+  expect,
+  ADMIN_READONLY_COOKIE_VALUE,
+  addAdminReadOnlyCookie,
+  adminReadOnlyCookieHeader,
+} from './fixtures';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
   const adminGetEndpoints = [
@@ -58,22 +63,7 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
 });
 
 test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
-  const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || AUTH_COOKIE_NAME;
-  const adminTest = ADMIN_COOKIE ? test : test.skip;
-
-  const setAdminCookie = async (context: import('@playwright/test').BrowserContext) => {
-    await context.addCookies([
-      {
-        name: ADMIN_COOKIE_NAME,
-        value: ADMIN_COOKIE!,
-        domain: new URL(PROD_URL).hostname,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-      },
-    ]);
-  };
+  const adminTest = ADMIN_READONLY_COOKIE_VALUE ? test : test.skip;
 
   /** Checks no error boundaries, stack traces, or crash indicators */
   const assertNoErrors = async (page: import('@playwright/test').Page) => {
@@ -86,7 +76,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   };
 
   adminTest('Dashboard shows KPI cards and panels', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -99,7 +89,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Characters page shows character grid', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/characters');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -113,7 +103,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Analytics page shows metric cards and charts', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/analytics');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -129,7 +119,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Audit page shows log viewer', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/audit');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -138,7 +128,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Safety page shows safety dashboard with events', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/safety');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -148,7 +138,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Invites page shows tabs and invite list', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/invites');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -160,7 +150,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Knowledge page shows maestri content', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/knowledge');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -169,7 +159,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Campaigns page shows campaign list with status', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/communications/campaigns');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -179,7 +169,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Funnel page shows conversion metrics', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/funnel');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -191,7 +181,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Infrastructure page shows service health', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/mission-control/infra');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -202,9 +192,8 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Read-only admin cannot execute destructive mutations', async ({ request }) => {
-    const cookieHeader = `${ADMIN_COOKIE_NAME}=${ADMIN_COOKIE}`;
     const res = await request.post('/api/admin/cleanup-users', {
-      headers: { Cookie: cookieHeader },
+      headers: { Cookie: adminReadOnlyCookieHeader() },
     });
     expect([403, 405]).toContain(res.status());
   });

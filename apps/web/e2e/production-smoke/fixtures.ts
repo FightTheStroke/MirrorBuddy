@@ -14,7 +14,8 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
-import type { APIResponse, StorageState } from '@playwright/test';
+import type { APIResponse, BrowserContext, StorageState } from '@playwright/test';
+import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
   mockTOS,
   mockConsentStorage,
@@ -24,6 +25,8 @@ import {
 } from '../fixtures/api-mocks';
 
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
+export const ADMIN_READONLY_COOKIE_NAME = AUTH_COOKIE_NAME;
+export const ADMIN_READONLY_COOKIE_VALUE = process.env.ADMIN_READONLY_COOKIE_VALUE;
 const PROD_TEST_USER_ID = process.env.PROD_TEST_USER_ID;
 const PROD_TEST_USER_EMAIL = process.env.PROD_TEST_USER_EMAIL;
 const PROD_TEST_USER_USERNAME = process.env.PROD_TEST_USER_USERNAME;
@@ -32,6 +35,29 @@ const PROD_TEST_USER_PASSWORD = process.env.PROD_TEST_USER_PASSWORD;
 export const hasProdTestCredentials = Boolean(
   PROD_TEST_USER_ID && PROD_TEST_USER_EMAIL && PROD_TEST_USER_USERNAME && PROD_TEST_USER_PASSWORD,
 );
+
+export async function addAdminReadOnlyCookie(context: BrowserContext) {
+  if (!ADMIN_READONLY_COOKIE_VALUE) {
+    throw new Error('ADMIN_READONLY_COOKIE_VALUE is not available');
+  }
+  await context.addCookies([
+    {
+      name: ADMIN_READONLY_COOKIE_NAME,
+      value: ADMIN_READONLY_COOKIE_VALUE,
+      domain: new URL(PROD_URL).hostname,
+      path: '/',
+      httpOnly: true,
+      secure: true,
+    },
+  ]);
+}
+
+export function adminReadOnlyCookieHeader() {
+  if (!ADMIN_READONLY_COOKIE_VALUE) {
+    throw new Error('ADMIN_READONLY_COOKIE_VALUE is not available');
+  }
+  return `${ADMIN_READONLY_COOKIE_NAME}=${ADMIN_READONLY_COOKIE_VALUE}`;
+}
 
 const IOS_INSTALL_BANNER_DISMISSED_KEY = 'ios-install-banner-dismissed';
 

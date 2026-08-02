@@ -1,8 +1,10 @@
-import { test, expect, PROD_URL } from './fixtures';
-import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
-
-const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || AUTH_COOKIE_NAME;
+import {
+  test,
+  expect,
+  ADMIN_READONLY_COOKIE_VALUE,
+  addAdminReadOnlyCookie,
+  adminReadOnlyCookieHeader,
+} from './fixtures';
 
 const adminPages = [
   '/admin',
@@ -16,19 +18,10 @@ const adminPages = [
 ];
 
 test.describe('PROD-SMOKE: Admin Health', () => {
-  test.skip(!ADMIN_COOKIE, 'ADMIN_READONLY_COOKIE_VALUE not set');
+  test.skip(!ADMIN_READONLY_COOKIE_VALUE, 'ADMIN_READONLY_COOKIE_VALUE not set');
 
   test.beforeEach(async ({ context }) => {
-    await context.addCookies([
-      {
-        name: ADMIN_COOKIE_NAME,
-        value: ADMIN_COOKIE!,
-        domain: new URL(PROD_URL).hostname,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-      },
-    ]);
+    await addAdminReadOnlyCookie(context);
   });
 
   for (const pagePath of adminPages) {
@@ -50,10 +43,9 @@ test.describe('PROD-SMOKE: Admin Health', () => {
     const body = (await page.textContent('body')) || '';
     expect(body).toMatch(/healthy|degraded|down|unknown/i);
 
-    const cookieHeader = `${ADMIN_COOKIE_NAME}=${ADMIN_COOKIE}`;
     const res = await request.post('/api/admin/maintenance/toggle', {
       data: { enabled: true, message: 'Smoke readonly check' },
-      headers: { Cookie: cookieHeader },
+      headers: { Cookie: adminReadOnlyCookieHeader() },
     });
     expect(res.status()).toBe(403);
   });

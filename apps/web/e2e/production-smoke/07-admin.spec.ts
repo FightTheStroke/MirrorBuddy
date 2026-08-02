@@ -10,11 +10,13 @@
  * Without credentials, tests verify access is properly blocked.
  */
 
-import { test, expect, PROD_URL } from './fixtures';
-import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
-
-const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || AUTH_COOKIE_NAME;
+import {
+  test,
+  expect,
+  ADMIN_READONLY_COOKIE_NAME,
+  ADMIN_READONLY_COOKIE_VALUE,
+  addAdminReadOnlyCookie,
+} from './fixtures';
 
 test.describe('PROD-SMOKE: Admin Panel', () => {
   test('Admin routes redirect unauthenticated users', async ({ page }) => {
@@ -25,21 +27,14 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
   });
 
   // Authenticated admin tests — only run if ADMIN_COOKIE is set
-  const adminTest = ADMIN_COOKIE ? test : test.skip;
+  const adminTest = ADMIN_READONLY_COOKIE_VALUE ? test : test.skip;
 
-  adminTest('Admin dashboard loads with navigation', async ({ page, context }) => {
-    // Set admin auth cookie
-    await context.addCookies([
-      {
-        name: ADMIN_COOKIE_NAME,
-        value: ADMIN_COOKIE!,
-        domain: new URL(PROD_URL).hostname,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-      },
-    ]);
+  adminTest('Read-only admin cookie uses the standard auth cookie name', async () => {
+    expect(ADMIN_READONLY_COOKIE_NAME).toBe('mirrorbuddy-user-id');
+  });
 
+  adminTest('Admin dashboard loads with read-only authentication', async ({ page, context }) => {
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin');
     await expect(page).toHaveURL(/\/admin\/?$/);
     await expect(page.getByText('Dashboard', { exact: true }).first()).toBeVisible({
