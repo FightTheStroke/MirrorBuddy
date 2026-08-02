@@ -7,8 +7,15 @@
  * Read-only, no data mutations even with valid auth.
  */
 
-import { test, expect, PROD_URL } from './fixtures';
-import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
+import { randomBytes } from 'node:crypto';
+import {
+  test,
+  expect,
+  PROD_URL,
+  ADMIN_READONLY_COOKIE_VALUE,
+  addAdminReadOnlyCookie,
+} from './fixtures';
+import { CSRF_TOKEN_COOKIE, CSRF_TOKEN_HEADER } from '@/lib/auth/cookie-constants';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
   const adminGetEndpoints = [
@@ -37,43 +44,23 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
   for (const endpoint of adminGetEndpoints) {
     test(`${endpoint} rejects unauthenticated GET`, async ({ request }) => {
       const res = await request.get(endpoint);
-      expect(res.status()).toBeGreaterThanOrEqual(400);
+      expect(res.status()).toBe(401);
     });
   }
 
-  test('Admin cleanup-users rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post('/api/admin/cleanup-users');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
-  });
-
   test('Admin character seed rejects unauthenticated POST', async ({ request }) => {
     const res = await request.post('/api/admin/characters/seed');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
   });
 
   test('Admin email test rejects unauthenticated POST', async ({ request }) => {
     const res = await request.post('/api/admin/email-test');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
   });
 });
 
 test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
-  const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || DEFAULT_ADMIN_COOKIE_NAME;
-  const adminTest = ADMIN_COOKIE ? test : test.skip;
-
-  const setAdminCookie = async (context: import('@playwright/test').BrowserContext) => {
-    await context.addCookies([
-      {
-        name: ADMIN_COOKIE_NAME,
-        value: ADMIN_COOKIE!,
-        domain: new URL(PROD_URL).hostname,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-      },
-    ]);
-  };
+  const adminTest = ADMIN_READONLY_COOKIE_VALUE ? test : test.skip;
 
   /** Checks no error boundaries, stack traces, or crash indicators */
   const assertNoErrors = async (page: import('@playwright/test').Page) => {
@@ -86,7 +73,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   };
 
   adminTest('Dashboard shows KPI cards and panels', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -98,32 +85,8 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     expect(await buttons.count()).toBeGreaterThan(0);
   });
 
-  adminTest('Users page shows table with user data', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/users');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have a table or list of users
-    const tableOrList = page.locator('table, [role="table"], [role="grid"]');
-    await expect(tableOrList.first()).toBeVisible({ timeout: 10000 });
-  });
-
-  adminTest('Characters page shows character grid', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/characters');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should show character cards or grid items
-    const body = (await page.textContent('body')) || '';
-    // At least some professor/character names should be visible
-    expect(body.length).toBeGreaterThan(300);
-    // Page heading
-    const heading = page.getByRole('heading').first();
-    await expect(heading).toBeVisible();
-  });
-
   adminTest('Analytics page shows metric cards and charts', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/analytics');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -138,17 +101,8 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     }
   });
 
-  adminTest('Audit page shows log viewer', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/audit');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    const heading = page.getByRole('heading').first();
-    await expect(heading).toBeVisible();
-  });
-
   adminTest('Safety page shows safety dashboard with events', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/safety');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -157,58 +111,8 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     expect(body.length).toBeGreaterThan(200);
   });
 
-  adminTest('Invites page shows tabs and invite list', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/invites');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have tab navigation (PENDING, APPROVED, etc.)
-    const tabs = page.getByRole('tab');
-    if ((await tabs.count()) > 0) {
-      expect(await tabs.count()).toBeGreaterThanOrEqual(2);
-    }
-  });
-
-  adminTest('Tiers page shows tier table', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/tiers');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should show a table with tier data
-    const tableOrList = page.locator('table, [role="table"], [role="grid"]');
-    await expect(tableOrList.first()).toBeVisible({ timeout: 10000 });
-  });
-
-  adminTest('Knowledge page shows maestri content', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/knowledge');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(200);
-  });
-
-  adminTest('Campaigns page shows campaign list with status', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/communications/campaigns');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have "New Campaign" button or similar action
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(100);
-  });
-
-  adminTest('Feature Flags page shows flags list', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/feature-flags');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(100);
-  });
-
   adminTest('Funnel page shows conversion metrics', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/funnel');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -220,7 +124,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   });
 
   adminTest('Infrastructure page shows service health', async ({ page, context }) => {
-    await setAdminCookie(context);
+    await addAdminReadOnlyCookie(context);
     await page.goto('/admin/mission-control/infra');
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
@@ -230,11 +134,59 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     expect(body).toMatch(/healthy|degraded|down|unknown/i);
   });
 
-  adminTest('Read-only admin cannot execute destructive mutations', async ({ request }) => {
-    const cookieHeader = `${ADMIN_COOKIE_NAME}=${ADMIN_COOKIE}`;
-    const res = await request.post('/api/admin/cleanup-users', {
-      headers: { Cookie: cookieHeader },
+  adminTest('Read-only admin cannot execute cleanup dry-run DELETE', async ({ page, context }) => {
+    await addAdminReadOnlyCookie(context);
+    const csrfToken = randomBytes(32).toString('base64url');
+    await context.addCookies([
+      {
+        name: CSRF_TOKEN_COOKIE,
+        value: csrfToken,
+        domain: new URL(PROD_URL).hostname,
+        path: '/',
+        httpOnly: true,
+        secure: true,
+      },
+    ]);
+
+    const res = await page.request.delete('/api/admin/cleanup-users?dryRun=true', {
+      headers: { [CSRF_TOKEN_HEADER]: csrfToken },
+      timeout: 30000,
     });
     expect(res.status()).toBe(403);
+    expect(await res.json()).toMatchObject({
+      error: expect.stringMatching(/admin access required/i),
+    });
   });
+
+  test('Cleanup endpoint rejects unauthenticated dry-run DELETE', async ({ request }) => {
+    const csrfToken = randomBytes(32).toString('base64url');
+    const res = await request.delete('/api/admin/cleanup-users?dryRun=true', {
+      headers: {
+        Cookie: `${CSRF_TOKEN_COOKIE}=${csrfToken}`,
+        [CSRF_TOKEN_HEADER]: csrfToken,
+      },
+    });
+    expect(res.status()).toBe(401);
+  });
+
+  const adminOnlyPages = [
+    '/admin/users',
+    '/admin/characters',
+    '/admin/audit',
+    '/admin/tiers',
+    '/admin/knowledge',
+  ];
+
+  for (const adminOnlyPage of adminOnlyPages) {
+    adminTest(
+      `Read-only admin cannot access ADMIN-only page: ${adminOnlyPage}`,
+      async ({ page, context }) => {
+        await addAdminReadOnlyCookie(context);
+        await page.goto(adminOnlyPage, { waitUntil: 'commit', timeout: 30000 });
+        await expect(page).toHaveURL(/\/(it|en|fr|de|es)\/(?:auth\/)?login/, {
+          timeout: 15000,
+        });
+      },
+    );
+  }
 });

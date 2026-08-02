@@ -14,6 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **New env var** — `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21` (documented in `.env.example`, `SETUP.md`, `.github/workflows/ci.yml`, `validate-pre-deploy.ts`).
 - **ADR 0169** — `docs/adr/0169-azure-voice-2026-07-realtime-21-cedar.md`.
 
+## [0.22.4] - 2026-08-02
+
+### Fixed
+
+- **Italian production translations** — replaced raw localization keys and placeholder copy in
+  the beta invite request and Parent Area with complete user-facing Italian text.
+- **Read-only admin smoke authentication** — production smoke tests now inject the valid signed
+  session into `mirrorbuddy-user-id`; the previous `mirrorbuddy-admin` cookie name never
+  authenticated production, making a valid credential look expired.
+- **Production smoke expectations** — aligned routes, selectors and landing-page assertions with
+  the current `/it/welcome` anonymous flow and the authenticated action-based home.
+
+### Changed
+
+- **Post-deploy browser coverage** — documented Microsoft Edge execution and the current
+  production-smoke suite shape so release verification matches the deployed application.
+
 ## [0.17.0] - 2026-05-25
 
 ### Added
