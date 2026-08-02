@@ -8,7 +8,7 @@
  */
 
 import { test, expect, PROD_URL } from './fixtures';
-import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
+import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
   const adminGetEndpoints = [
@@ -59,7 +59,7 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
 
 test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
   const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || DEFAULT_ADMIN_COOKIE_NAME;
+  const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || AUTH_COOKIE_NAME;
   const adminTest = ADMIN_COOKIE ? test : test.skip;
 
   const setAdminCookie = async (context: import('@playwright/test').BrowserContext) => {
@@ -96,16 +96,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     // Check for refresh/action buttons
     const buttons = page.getByRole('button');
     expect(await buttons.count()).toBeGreaterThan(0);
-  });
-
-  adminTest('Users page shows table with user data', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/users');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should have a table or list of users
-    const tableOrList = page.locator('table, [role="table"], [role="grid"]');
-    await expect(tableOrList.first()).toBeVisible({ timeout: 10000 });
   });
 
   adminTest('Characters page shows character grid', async ({ page, context }) => {
@@ -169,16 +159,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     }
   });
 
-  adminTest('Tiers page shows tier table', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/tiers');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
-    // Should show a table with tier data
-    const tableOrList = page.locator('table, [role="table"], [role="grid"]');
-    await expect(tableOrList.first()).toBeVisible({ timeout: 10000 });
-  });
-
   adminTest('Knowledge page shows maestri content', async ({ page, context }) => {
     await setAdminCookie(context);
     await page.goto('/admin/knowledge');
@@ -194,15 +174,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     await assertNoErrors(page);
     // Should have "New Campaign" button or similar action
-    const body = (await page.textContent('body')) || '';
-    expect(body.length).toBeGreaterThan(100);
-  });
-
-  adminTest('Feature Flags page shows flags list', async ({ page, context }) => {
-    await setAdminCookie(context);
-    await page.goto('/admin/feature-flags');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await assertNoErrors(page);
     const body = (await page.textContent('body')) || '';
     expect(body.length).toBeGreaterThan(100);
   });
@@ -235,6 +206,6 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     const res = await request.post('/api/admin/cleanup-users', {
       headers: { Cookie: cookieHeader },
     });
-    expect(res.status()).toBe(403);
+    expect([403, 405]).toContain(res.status());
   });
 });

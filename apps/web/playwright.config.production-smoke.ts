@@ -9,7 +9,10 @@
  *   npm run test:smoke:prod -- --headed   # watch in browser
  *   PROD_URL=https://mirrorbuddy.org npx playwright test --config playwright.config.production-smoke.ts
  *
- * Admin tests (54 tests):
+ * Authenticated student tests use the local-only PROD_TEST_USER_* variables.
+ * Without them, authenticated UI coverage is skipped.
+ *
+ * Admin tests:
  *   Without ADMIN_READONLY_COOKIE_VALUE, admin panel tests are SKIPPED.
  *   Set it from .env to run full coverage:
  *
@@ -29,6 +32,9 @@ const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 export default defineConfig({
   testDir: './e2e/production-smoke',
   fullyParallel: false,
+  // Production auth is rate-limited. A single worker reuses one authenticated
+  // storage state instead of creating concurrent login bursts.
+  workers: 1,
   forbidOnly: !!process.env.CI,
   timeout: 30000,
   retries: 1,
@@ -50,11 +56,19 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        browserName: 'chromium',
+        channel: 'msedge',
+      },
     },
     {
       name: 'mobile',
-      use: { ...devices['iPhone 13'] },
+      use: {
+        ...devices['iPhone 13'],
+        browserName: 'chromium',
+        channel: 'msedge',
+      },
     },
   ],
 });

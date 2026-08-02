@@ -1,71 +1,43 @@
 /**
- * Production Smoke Tests — Welcome & Trial Dashboard
+ * Production Smoke Tests — Welcome & Authenticated Home
  *
- * Verifies the welcome/trial page renders correctly with professors,
- * sidebar, and trial limits. Consent walls bypassed via fixtures.
- * Read-only, no data mutations.
+ * The public route is the welcome experience. The intent-based home is only
+ * available after login and no longer exposes the legacy 26-professor grid.
  */
 
-import { test, expect, openMobileMenu } from './fixtures';
+import { test, authenticatedTest, expect, hasProdTestCredentials } from './fixtures';
 
-test.describe('PROD-SMOKE: Welcome & Trial Dashboard', () => {
-  test('Trial dashboard loads with professors heading', async ({ page }) => {
+test.describe('PROD-SMOKE: Public welcome', () => {
+  test('Localized welcome page renders from /it', async ({ page }) => {
     await page.goto('/it');
-    await expect(page).toHaveURL(/\/it/);
-
-    // Main title and professors section
-    await expect(page.getByRole('heading', { name: /MirrorBuddy/i, level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Professori', level: 1 })).toBeVisible();
+    await expect(page).toHaveURL(/\/it\/welcome\/?$/, { timeout: 15000 });
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/MirrorBuddy/i);
   });
 
-  test('All 26 professors render as study buttons', async ({ page }) => {
+  test('Welcome page exposes its current public actions', async ({ page }) => {
+    await page.goto('/it/welcome');
+    await expect(page.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /Scopri di più/i }).first()).toBeVisible();
+  });
+});
+
+authenticatedTest.describe('PROD-SMOKE: Authenticated intent home', () => {
+  authenticatedTest.skip(
+    !hasProdTestCredentials,
+    'Local production test credentials are not available',
+  );
+
+  authenticatedTest('Home renders the three current learning actions', async ({ page }) => {
     await page.goto('/it');
-
-    // Sample of key professors across subjects
-    const professors = [
-      'Euclide',
-      'Leonardo da Vinci',
-      'Galileo Galilei',
-      'Madam Curie',
-      'Socrate',
-      'Ada Lovelace',
-      'William Shakespeare',
-      'Richard Feynman',
-    ];
-    for (const name of professors) {
-      await expect(
-        page.getByRole('button', { name: new RegExp(`Studia con ${name}`) }),
-      ).toBeVisible();
-    }
-
-    // Verify total count: 26 "Studia con" buttons
-    const studyButtons = page.getByRole('button', { name: /Studia con /i });
-    await expect(studyButtons).toHaveCount(26);
+    await expect(page).toHaveURL(/\/it\/?$/);
+    await expect(page.getByTestId('intent-card-homework')).toContainText('Fare i compiti');
+    await expect(page.getByTestId('intent-card-study')).toContainText('Studiare');
+    await expect(page.getByTestId('intent-card-quizMe')).toContainText('Mettiti alla prova');
   });
 
-  test('Coaches Melissa and Mario are in sidebar', async ({ page }) => {
+  authenticatedTest('Home does not render the retired professor landing grid', async ({ page }) => {
     await page.goto('/it');
-    const nav = page.getByRole('navigation');
-    await expect(nav.getByRole('button', { name: /Melissa/i })).toBeVisible();
-    await expect(nav.getByRole('button', { name: /Mario/i })).toBeVisible();
-  });
-
-  test('Trial mode shows no commercial badge in the child header (COMP-01)', async ({ page }) => {
-    await page.goto('/it');
-    await openMobileMenu(page);
-
-    // COMP-01: the header trial badge ("Prova 7/10" → /invite/request) was
-    // removed from the child space; trial status lives in the grown-ups
-    // sidebar group only.
-    await expect(page.getByTestId('trial-badge')).toHaveCount(0);
-  });
-
-  test('Login and request access live inside the grown-ups sidebar group', async ({ page }) => {
-    await page.goto('/it');
-    await openMobileMenu(page);
-    // COMP-01: account CTAs render only inside the "for grown-ups" group.
-    const grownUps = page.getByTestId('sidebar-grownups-group');
-    await expect(grownUps.getByRole('link', { name: /Accedi/i }).first()).toBeVisible();
-    await expect(grownUps.getByRole('link', { name: /Richiedi accesso/i }).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Studia con /i })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Professori', level: 1 })).toHaveCount(0);
   });
 });

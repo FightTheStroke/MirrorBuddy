@@ -8,16 +8,17 @@ import { test, expect } from './fixtures';
 
 test.describe('PROD-SMOKE: Internationalization', () => {
   const locales = [
-    { code: 'it', lang: 'it', text: /Professori|Benvenuto/i },
-    { code: 'en', lang: 'en', text: /Professors|Welcome/i },
-    { code: 'fr', lang: 'fr', text: /Professeurs|Bienvenue/i },
-    { code: 'de', lang: 'de', text: /Professoren|Willkommen/i },
-    { code: 'es', lang: 'es', text: /Profesores|Bienvenido/i },
+    { code: 'it', lang: 'it', text: /Benvenuto/i },
+    { code: 'en', lang: 'en', text: /Welcome/i },
+    { code: 'fr', lang: 'fr', text: /Bienvenue/i },
+    { code: 'de', lang: 'de', text: /Willkommen/i },
+    { code: 'es', lang: 'es', text: /Bienvenido/i },
   ];
 
   for (const { code, lang, text } of locales) {
     test(`/${code} loads with correct lang attribute`, async ({ page }) => {
       await page.goto(`/${code}`);
+      await expect(page).toHaveURL(new RegExp(`/${code}/welcome/?$`), { timeout: 15000 });
       const html = page.locator('html');
       await expect(html).toHaveAttribute('lang', lang);
 

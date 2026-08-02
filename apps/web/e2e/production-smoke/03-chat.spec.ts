@@ -1,59 +1,42 @@
 /**
- * Production Smoke Tests — Chat & AI Professors
+ * Production Smoke Tests — Intent Session UI
  *
- * Verifies chat opens, professor info renders, tools are available,
- * and voice panel loads. Does NOT send messages to avoid consuming
- * trial quota. Read-only, no data mutations.
+ * Opens the current homework → subject → Maestro session without sending a
+ * message or consuming AI quota.
  */
 
-import { test, expect, openMobileMenu } from './fixtures';
+import {
+  authenticatedTest as test,
+  expect,
+  hasProdTestCredentials,
+  openHomeworkSession,
+} from './fixtures';
 
-test.describe('PROD-SMOKE: Chat & AI', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/it');
+test.describe('PROD-SMOKE: Session UI', () => {
+  test.skip(!hasProdTestCredentials, 'Local production test credentials are not available');
+
+  test('Homework flow opens a Maestro session', async ({ page }) => {
+    await openHomeworkSession(page);
+    await expect(page.getByRole('textbox', { name: /Scrivi un messaggio/i })).toBeVisible();
+    await expect(page.getByTestId('maestro-session-handoff')).toContainText(/Matematica/i);
   });
 
-  test('Chat with Euclide opens with correct info', async ({ page }) => {
-    await page.getByRole('button', { name: /Studia con Euclide/i }).click();
-
-    // Verify chat panel opens with professor info
-    await expect(page.getByRole('heading', { name: 'Euclide', level: 2 }).first()).toBeVisible();
-    await expect(page.getByText('Geometria').first()).toBeVisible();
-
-    // Formal greeting with Lei (pre-1900 figure)
-    await expect(page.getByText(/esserLe/i)).toBeVisible();
-
-    // Text input ready
-    await expect(page.getByRole('textbox', { name: /Parla o scrivi/i })).toBeVisible();
-  });
-
-  test('Chat tools are visible', async ({ page }) => {
-    await page.getByRole('button', { name: /Studia con Euclide/i }).click();
-
-    const tools = ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto'];
-    for (const tool of tools) {
+  test('Session tools are visible', async ({ page }) => {
+    await openHomeworkSession(page);
+    for (const tool of ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto']) {
       await expect(page.getByRole('button', { name: tool })).toBeVisible();
     }
   });
 
-  test('Voice panel shows for professor', async ({ page }) => {
-    await openMobileMenu(page);
-    await page.getByRole('button', { name: /Studia con Euclide/i }).click();
-
-    // On mobile, professor info is inline (no separate voice panel sidebar)
-    // Verify professor heading and audio button are accessible somewhere on page
-    await expect(page.getByRole('heading', { name: 'Euclide', level: 2 }).first()).toBeVisible();
+  test('Voice control is available in the session', async ({ page }) => {
+    await openHomeworkSession(page);
     await expect(page.getByRole('button', { name: /Lettura vocale|audio/i }).first()).toBeVisible();
   });
 
-  test('Chat close returns to professor list', async ({ page }) => {
-    await page.getByRole('button', { name: /Studia con Euclide/i }).click();
-    await expect(page.getByRole('heading', { name: 'Euclide', level: 2 }).first()).toBeVisible();
-
-    // Close button in chat header
+  test('Close returns to the intent chooser', async ({ page }) => {
+    await openHomeworkSession(page);
     await page.getByRole('button', { name: 'Chiudi', exact: true }).click();
-
-    // Back to professor list
-    await expect(page.getByRole('heading', { name: 'Professori', level: 1 })).toBeVisible();
+    await expect(page.locator('#intent-heading')).toBeVisible();
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible();
   });
 });

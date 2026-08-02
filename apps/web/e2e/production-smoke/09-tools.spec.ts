@@ -5,7 +5,14 @@
  * Read-only, no data mutations. Does NOT create tools or consume quota.
  */
 
-import { test, expect, PROD_URL } from './fixtures';
+import {
+  test,
+  authenticatedTest,
+  expect,
+  PROD_URL,
+  hasProdTestCredentials,
+  openHomeworkSession,
+} from './fixtures';
 import { request as pwRequest } from '@playwright/test';
 
 test.describe('PROD-SMOKE: Tools & Study Kit', () => {
@@ -13,6 +20,7 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
     const ctx = await pwRequest.newContext({ baseURL: PROD_URL });
     const res = await ctx.post('/api/tools/create', {
       data: { type: 'mindmap', characterId: 'test' },
+      timeout: 30000,
     });
     expect(res.status()).toBeGreaterThanOrEqual(400);
     await ctx.dispose();
@@ -47,9 +55,12 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
     await ctx.dispose();
   });
 
-  test('Tool buttons are visible in chat UI', async ({ page }) => {
-    await page.goto('/it');
-    await page.getByRole('button', { name: /Studia con Euclide/i }).click();
+  authenticatedTest('Tool buttons are visible in the current session UI', async ({ page }) => {
+    authenticatedTest.skip(
+      !hasProdTestCredentials,
+      'Local production test credentials are not available',
+    );
+    await openHomeworkSession(page);
 
     const toolNames = ['Crea mappa mentale', 'Crea quiz', 'Crea flashcard', 'Crea riassunto'];
     for (const name of toolNames) {

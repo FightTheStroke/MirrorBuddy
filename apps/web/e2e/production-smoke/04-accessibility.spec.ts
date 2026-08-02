@@ -8,9 +8,11 @@
  * - ARIA landmarks present
  */
 
-import { test, expect } from './fixtures';
+import { authenticatedTest as test, expect, hasProdTestCredentials } from './fixtures';
 
 test.describe('PROD-SMOKE: Accessibility', () => {
+  test.skip(!hasProdTestCredentials, 'Local production test credentials are not available');
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/it');
   });

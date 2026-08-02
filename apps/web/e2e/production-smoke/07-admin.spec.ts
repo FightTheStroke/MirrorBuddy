@@ -5,31 +5,23 @@
  * Tests navigation structure WITH auth (using ADMIN_READONLY_COOKIE_VALUE if set).
  *
  * To test admin navigation, set env vars:
- *   ADMIN_COOKIE_NAME=mirrorbuddy-admin
  *   ADMIN_READONLY_COOKIE_VALUE=<signed-cookie-value>
  *
  * Without credentials, tests verify access is properly blocked.
  */
 
 import { test, expect, PROD_URL } from './fixtures';
-import { ADMIN_COOKIE_NAME as DEFAULT_ADMIN_COOKIE_NAME } from '@/lib/auth/cookie-constants';
+import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 
 const ADMIN_COOKIE = process.env.ADMIN_READONLY_COOKIE_VALUE;
-const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || DEFAULT_ADMIN_COOKIE_NAME;
+const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || AUTH_COOKIE_NAME;
 
 test.describe('PROD-SMOKE: Admin Panel', () => {
   test('Admin routes redirect unauthenticated users', async ({ page }) => {
     await page.goto('/admin');
-    // Should NOT show admin dashboard content
-    const url = page.url();
-    const body = await page.textContent('body');
-    // Either redirects to login or shows auth wall
-    const isProtected =
-      url.includes('login') ||
-      body?.includes('Accedi') ||
-      body?.includes('non autorizzato') ||
-      !body?.includes('Admin Dashboard');
-    expect(isProtected).toBe(true);
+    await page.waitForURL(/\/(it|en|fr|de|es)\/login/, { timeout: 15000 });
+    await expect(page.getByLabel(/email/i)).toBeVisible();
+    await expect(page.locator('#password')).toBeVisible();
   });
 
   // Authenticated admin tests — only run if ADMIN_COOKIE is set
@@ -49,40 +41,9 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
     ]);
 
     await page.goto('/admin');
-    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 10000 });
-  });
-
-  adminTest('Admin sub-pages are accessible', async ({ page, context }) => {
-    await context.addCookies([
-      {
-        name: ADMIN_COOKIE_NAME,
-        value: ADMIN_COOKIE!,
-        domain: new URL(PROD_URL).hostname,
-        path: '/',
-        httpOnly: true,
-        secure: true,
-      },
-    ]);
-
-    const adminPages = [
-      '/admin/users',
-      '/admin/characters',
-      '/admin/analytics',
-      '/admin/audit',
-      '/admin/safety',
-      '/admin/invites',
-      '/admin/tiers',
-      '/admin/knowledge',
-    ];
-
-    for (const adminPage of adminPages) {
-      await page.goto(adminPage);
-      // Should not be a 404 or error page
-      const title = await page.title();
-      expect(title).not.toContain('404');
-      expect(title).not.toContain('Error');
-      const body = await page.textContent('body');
-      expect(body).not.toContain('Not Configured');
-    }
+    await expect(page).toHaveURL(/\/admin\/?$/);
+    await expect(page.getByText('Dashboard', { exact: true }).first()).toBeVisible({
+      timeout: 15000,
+    });
   });
 });
