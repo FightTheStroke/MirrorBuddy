@@ -75,9 +75,13 @@ Never claim done without `/verify-done` (or `./scripts/health-check.sh` + `npm r
 
 <!-- gstack-gbrain-search-guidance:start -->
 
-GBrain is set up and synced on this machine. The agent should prefer gbrain
-over Grep when the question is semantic or when you don't know the exact
-identifier yet.
+Use this section only when both `command -v gbrain` succeeds and a readable
+`.gbrain-source` file exists in the repository root. If either prerequisite is
+missing, ignore this section and use the repository's normal search tools;
+do not install or configure gbrain automatically.
+
+When those prerequisites are present, prefer gbrain over Grep when the question
+is semantic or when you don't know the exact identifier yet.
 
 **This worktree is pinned to a worktree-scoped code source** via the
 `.gbrain-source` file in the repo root (kubectl-style context).
@@ -94,11 +98,11 @@ built first — run `/sync-gbrain --dream` (or `--full`) if they return
 symbols; on a non-code-aware pack `--dream` completes but the graph stays empty
 and reports a WARN. `code-def`/`code-refs` need the same extraction.
 
-Two indexed corpora available via the `gbrain` CLI:
+Indexed corpora may include:
 
 - This worktree's code (auto-pinned via `.gbrain-source`).
-- `~/.gstack/` curated memory (registered as `gstack-brain-<user>` source via
-  the existing federation pipeline).
+- `~/.gstack/` curated memory, when `gbrain sources list` shows a
+  `gstack-brain-<user>` source registered by the federation pipeline.
 
 Prefer gbrain when:
 
@@ -121,14 +125,5 @@ orchestrator refuses destructive source ops when it detects a running autopilot
 to avoid racing it (#1734). Prefer registering user repos with `gbrain sources
 add --path <dir>` (no `--url`): URL-managed sources can auto-reclone, and the
 sync code walk for them requires an explicit `--allow-reclone` opt-in.
-
-**Known local limitation (this machine):** on repos where the gbrain source
-was registered under a custom name before the `gstack-code-<slug>` convention
-existed (most of Roberto's repos), `/sync-gbrain`'s own code-import stage
-fails with a path-overlap error even though the `.gbrain-source` pin above
-works fine for reads. Use `/sync-gbrain --no-code` on those repos to skip the
-broken stage cleanly; code freshness is handled separately by a nightly
-`gbrain-refresh-code` launchd job. Rebuild the call graph manually with
-`gbrain dream --source $(cat .gbrain-source)` when needed.
 
 <!-- gstack-gbrain-search-guidance:end -->
