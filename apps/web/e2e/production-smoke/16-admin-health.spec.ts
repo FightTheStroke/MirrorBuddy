@@ -1,10 +1,4 @@
-import {
-  test,
-  expect,
-  ADMIN_READONLY_COOKIE_VALUE,
-  addAdminReadOnlyCookie,
-  adminReadOnlyCookieHeader,
-} from './fixtures';
+import { test, expect, ADMIN_READONLY_COOKIE_VALUE, addAdminReadOnlyCookie } from './fixtures';
 
 interface BrowserError {
   text: string;
@@ -76,20 +70,15 @@ test.describe('PROD-SMOKE: Admin Health', () => {
     });
   }
 
-  test('Infrastructure page renders status badges and blocks destructive maintenance action', async ({
+  test('Infrastructure page renders status without exposing a destructive confirmation', async ({
     page,
-    request,
   }) => {
     await page.goto('/admin/mission-control/infra');
     await expect(page.getByText('Service Health Summary')).toBeVisible();
 
     const body = (await page.textContent('body')) || '';
     expect(body).toMatch(/healthy|degraded|down|unknown/i);
-
-    const res = await request.post('/api/admin/maintenance/toggle', {
-      data: { enabled: true, message: 'Smoke readonly check' },
-      headers: { Cookie: adminReadOnlyCookieHeader() },
-    });
-    expect(res.status()).toBe(403);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /conferma/i })).toHaveCount(0);
   });
 });

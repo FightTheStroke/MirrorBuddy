@@ -58,9 +58,21 @@ export async function verifyProdTestUserCookie(request: APIRequestContext) {
     );
   }
 
-  const user = (await response.json()) as { id?: string; isTestData?: boolean };
-  if (user.id !== PROD_TEST_USER_ID || user.isTestData !== true) {
-    throw new Error('Production test auth cookie does not identify the dedicated isTestData user');
+  const user = (await response.json()) as {
+    id?: string;
+    username?: string | null;
+    email?: string | null;
+    isTestData?: boolean;
+  };
+  if (
+    user.id !== PROD_TEST_USER_ID ||
+    user.username !== PROD_TEST_USER_USERNAME ||
+    user.email?.toLowerCase() !== PROD_TEST_USER_EMAIL?.toLowerCase() ||
+    user.isTestData !== true
+  ) {
+    throw new Error(
+      'Production test auth cookie does not match the configured dedicated isTestData identity',
+    );
   }
 }
 

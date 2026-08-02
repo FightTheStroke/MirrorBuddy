@@ -81,9 +81,14 @@ while retaining `browserName: chromium`.
   `mirrorbuddy-user-id` cookie, then verify `PROD_TEST_USER_ID` and
   `isTestData=true` through `/api/user`. Shared fixtures do not call the login
   endpoint or require `SESSION_SECRET`. The isolated login-flow regression uses
-  credentials once, validates the returned user ID, and may emit deduplicated
-  `FIRST_LOGIN` funnel telemetry. Its spec disables traces, screenshots, and
-  video so credential input cannot enter retained Playwright artifacts.
+  credentials once only after the cookie-authenticated ID, username, email, and
+  `isTestData` marker match the configured identity. It validates the login's
+  returned user ID and may emit deduplicated `FIRST_LOGIN` funnel telemetry. Its
+  spec disables traces, screenshots, and video so credential input cannot enter
+  retained Playwright artifacts.
+- **Production authorization checks do not call mutating maintenance actions.**
+  ADMIN_READONLY coverage inspects the UI without activating controls; the
+  cleanup authorization probe is limited to `DELETE ?dryRun=true`.
 - **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 
