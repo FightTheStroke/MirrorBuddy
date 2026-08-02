@@ -78,14 +78,14 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     expect(content).not.toMatch(INAPPROPRIATE_PATTERN);
   });
 
-  test('/api/safety/check rejects requests without auth', async () => {
+  test('Legacy /api/safety/check endpoint is not exposed', async () => {
     const status = await getApiStatus('/api/safety/check');
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 
-  test('/api/safety/report rejects requests without auth', async () => {
+  test('Legacy /api/safety/report endpoint is not exposed', async () => {
     const status = await getApiStatus('/api/safety/report');
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
   });
 
   test('GET /api/maestri returns valid character records', async () => {
@@ -117,13 +117,10 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
     page,
   }) => {
     const status = await getApiStatus('/api/safety/bias');
-    if (status === 404) {
-      await page.goto('/it/ai-transparency');
-      const content = (await page.textContent('body')) ?? '';
-      expect(content).toMatch(BIAS_PATTERN);
-      return;
-    }
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
+    await page.goto('/it/ai-transparency');
+    const content = (await page.textContent('body')) ?? '';
+    expect(content).toMatch(BIAS_PATTERN);
   });
 
   test('AI transparency page mentions human oversight or escalation', async ({ page }) => {
@@ -166,12 +163,9 @@ test.describe('PROD-SMOKE: Safety & Transparency', () => {
 
   test('Crisis endpoint exists or transparency page mentions crisis handling', async ({ page }) => {
     const status = await getApiStatus('/api/safety/crisis');
-    if (status === 404) {
-      await page.goto('/it/ai-transparency');
-      const content = (await page.textContent('body')) ?? '';
-      expect(content).toMatch(CRISIS_PATTERN);
-      return;
-    }
-    expect(status).toBeGreaterThanOrEqual(400);
+    expect(status).toBe(404);
+    await page.goto('/it/ai-transparency');
+    const content = (await page.textContent('body')) ?? '';
+    expect(content).toMatch(CRISIS_PATTERN);
   });
 });

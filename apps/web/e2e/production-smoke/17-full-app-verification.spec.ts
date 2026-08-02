@@ -88,8 +88,8 @@ test.describe('PROD: Public API endpoints', () => {
     const ctx = await pwRequest.newContext({ baseURL: PROD_URL });
     const upload = await ctx.post('/api/study-kit/upload');
     const list = await ctx.get('/api/study-kit');
-    expect(upload.status()).toBeGreaterThanOrEqual(400);
-    expect(list.status()).toBeGreaterThanOrEqual(400);
+    expect(upload.status()).toBe(403);
+    expect(list.status()).toBe(401);
     await ctx.dispose();
   });
 });

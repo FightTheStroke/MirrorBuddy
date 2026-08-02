@@ -82,7 +82,8 @@ while retaining `browserName: chromium`.
   `isTestData=true` through `/api/user`. Shared fixtures do not call the login
   endpoint or require `SESSION_SECRET`. The isolated login-flow regression uses
   credentials once, validates the returned user ID, and may emit deduplicated
-  `FIRST_LOGIN` funnel telemetry.
+  `FIRST_LOGIN` funnel telemetry. Its spec disables traces, screenshots, and
+  video so credential input cannot enter retained Playwright artifacts.
 - **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 

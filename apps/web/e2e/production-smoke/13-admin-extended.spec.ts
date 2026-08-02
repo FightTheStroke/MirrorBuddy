@@ -44,18 +44,18 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
   for (const endpoint of adminGetEndpoints) {
     test(`${endpoint} rejects unauthenticated GET`, async ({ request }) => {
       const res = await request.get(endpoint);
-      expect(res.status()).toBeGreaterThanOrEqual(400);
+      expect(res.status()).toBe(401);
     });
   }
 
   test('Admin character seed rejects unauthenticated POST', async ({ request }) => {
     const res = await request.post('/api/admin/characters/seed');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
   });
 
   test('Admin email test rejects unauthenticated POST', async ({ request }) => {
     const res = await request.post('/api/admin/email-test');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
   });
 });
 

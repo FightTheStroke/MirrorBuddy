@@ -56,6 +56,6 @@ test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
 
   test('Safety endpoint rejects unauthenticated', async ({ request }) => {
     const res = await request.get('/api/admin/safety');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(401);
   });
 });

@@ -22,7 +22,7 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
       data: { type: 'mindmap', characterId: 'test' },
       timeout: 30000,
     });
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
     await ctx.dispose();
   });
 
@@ -37,21 +37,21 @@ test.describe('PROD-SMOKE: Tools & Study Kit', () => {
   test('Saved tools endpoint rejects unauthenticated requests', async () => {
     const ctx = await pwRequest.newContext({ baseURL: PROD_URL });
     const res = await ctx.get('/api/tools/saved');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(401);
     await ctx.dispose();
   });
 
   test('Study kit upload rejects unauthenticated requests', async () => {
     const ctx = await pwRequest.newContext({ baseURL: PROD_URL });
     const res = await ctx.post('/api/study-kit/upload');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(403);
     await ctx.dispose();
   });
 
   test('Study kit list rejects unauthenticated requests', async () => {
     const ctx = await pwRequest.newContext({ baseURL: PROD_URL });
     const res = await ctx.get('/api/study-kit');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
+    expect(res.status()).toBe(401);
     await ctx.dispose();
   });
 

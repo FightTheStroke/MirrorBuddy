@@ -18,7 +18,7 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
-import type { BrowserContext, StorageState } from '@playwright/test';
+import type { APIRequestContext, BrowserContext, StorageState } from '@playwright/test';
 import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
   mockTOS,
@@ -42,6 +42,27 @@ export const hasProdTestCredentials = Boolean(
   PROD_TEST_USER_ID && PROD_TEST_USER_EMAIL && PROD_TEST_USER_USERNAME && PROD_TEST_USER_PASSWORD,
 );
 export const hasProdTestAuthCookie = Boolean(PROD_TEST_USER_ID && PROD_TEST_USER_COOKIE_VALUE);
+
+export async function verifyProdTestUserCookie(request: APIRequestContext) {
+  if (!hasProdTestAuthCookie) {
+    throw new Error('Production test auth cookie is not available');
+  }
+
+  const response = await request.get('/api/user', {
+    headers: { Cookie: `${AUTH_COOKIE_NAME}=${PROD_TEST_USER_COOKIE_VALUE}` },
+    timeout: 30000,
+  });
+  if (response.status() !== 200) {
+    throw new Error(
+      `Production test auth cookie verification failed with status ${response.status()}`,
+    );
+  }
+
+  const user = (await response.json()) as { id?: string; isTestData?: boolean };
+  if (user.id !== PROD_TEST_USER_ID || user.isTestData !== true) {
+    throw new Error('Production test auth cookie does not identify the dedicated isTestData user');
+  }
+}
 
 export async function addAdminReadOnlyCookie(context: BrowserContext) {
   if (!ADMIN_READONLY_COOKIE_VALUE) {
