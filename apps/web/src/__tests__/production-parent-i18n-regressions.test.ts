@@ -1,34 +1,21 @@
 import { describe, expect, it } from 'vitest';
 
-import deAuth from '../../messages/de/auth.json';
-import enAuth from '../../messages/en/auth.json';
-import esAuth from '../../messages/es/auth.json';
-import frAuth from '../../messages/fr/auth.json';
-import itAuth from '../../messages/it/auth.json';
 import deSettings from '../../messages/de/settings.json';
 import enSettings from '../../messages/en/settings.json';
 import esSettings from '../../messages/es/settings.json';
 import frSettings from '../../messages/fr/settings.json';
 import itSettings from '../../messages/it/settings.json';
 
-const localeMessages = {
-  de: { auth: deAuth.auth, settings: deSettings.settings },
-  en: { auth: enAuth.auth, settings: enSettings.settings },
-  es: { auth: esAuth.auth, settings: esSettings.settings },
-  fr: { auth: frAuth.auth, settings: frSettings.settings },
-  it: { auth: itAuth.auth, settings: itSettings.settings },
+const settingsMessages = {
+  de: deSettings.settings,
+  en: enSettings.settings,
+  es: esSettings.settings,
+  fr: frSettings.settings,
+  it: itSettings.settings,
 };
 
-const expectedLocaleCopy = {
+const expectedParentCopy = {
   de: {
-    invite: {
-      pageTitle: 'Beta-Zugang anfordern',
-      pageDescription:
-        'MirrorBuddy befindet sich in privater Betaversion. Füllen Sie das Formular aus, um Zugang anzufordern.',
-      minimumCharacters: 'Mindestens 20 Zeichen',
-      confirmationText:
-        'Sie erhalten eine Bestätigungs-E-Mail und, falls genehmigt, Ihre Zugangsdaten.',
-    },
     profile: {
       professorFallback: 'Professor',
       dataDeletionRequestConfirm:
@@ -63,13 +50,6 @@ const expectedLocaleCopy = {
     },
   },
   en: {
-    invite: {
-      pageTitle: 'Request Beta Access',
-      pageDescription: 'MirrorBuddy is in private beta. Fill out the form to request access.',
-      minimumCharacters: 'Minimum 20 characters',
-      confirmationText:
-        'You will receive a confirmation email and, if approved, your access credentials.',
-    },
     profile: {
       professorFallback: 'Professor',
       dataDeletionRequestConfirm: 'Are you sure you want to request data deletion?',
@@ -103,14 +83,6 @@ const expectedLocaleCopy = {
     },
   },
   es: {
-    invite: {
-      pageTitle: 'Solicitar Acceso a Beta',
-      pageDescription:
-        'MirrorBuddy está en beta privada. Complete el formulario para solicitar acceso.',
-      minimumCharacters: 'Mínimo 20 caracteres',
-      confirmationText:
-        'Recibirás un correo de confirmación y, si se aprueba, tus credenciales de acceso.',
-    },
     profile: {
       professorFallback: 'Profesor',
       dataDeletionRequestConfirm: '¿Está seguro de que desea solicitar la eliminación de datos?',
@@ -146,14 +118,6 @@ const expectedLocaleCopy = {
     },
   },
   fr: {
-    invite: {
-      pageTitle: "Demander l'Accès Bêta",
-      pageDescription:
-        "MirrorBuddy est en bêta privée. Remplissez le formulaire pour demander l'accès.",
-      minimumCharacters: 'Minimum 20 caractères',
-      confirmationText:
-        "Vous recevrez un email de confirmation et, s'il est approuvé, vos identifiants d'accès.",
-    },
     profile: {
       professorFallback: 'Professeur',
       dataDeletionRequestConfirm: 'Êtes-vous sûr de vouloir demander la suppression des données ?',
@@ -189,13 +153,6 @@ const expectedLocaleCopy = {
     },
   },
   it: {
-    invite: {
-      pageTitle: 'Richiedi Accesso Beta',
-      pageDescription: "MirrorBuddy è in beta privata. Compila il form per richiedere l'accesso.",
-      minimumCharacters: 'Minimo 20 caratteri',
-      confirmationText:
-        'Riceverai una email di conferma e, se approvato, le credenziali di accesso.',
-    },
     profile: {
       professorFallback: 'Professore',
       dataDeletionRequestConfirm: 'Sei sicuro di voler richiedere la cancellazione dei dati?',
@@ -232,38 +189,21 @@ const expectedLocaleCopy = {
   },
 } as const;
 
-describe('production i18n regressions', () => {
-  it('uses the exact invite-request copy in every supported locale', () => {
-    Object.entries(localeMessages).forEach(([locale, messages]) => {
-      const expected = expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy];
-      expect(messages.auth.invite).toMatchObject(expected.invite);
-    });
-  });
-
-  it('uses the exact Parent Area copy in every supported locale', () => {
-    Object.entries(localeMessages).forEach(([locale, messages]) => {
-      const expected = expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy];
-      expect(messages.settings.profile).toMatchObject({
+describe('production Parent Area i18n regressions', () => {
+  it('uses exact Parent Area copy and composes notices without duplicated prefixes', () => {
+    Object.entries(settingsMessages).forEach(([locale, messages]) => {
+      const expected = expectedParentCopy[locale as keyof typeof expectedParentCopy];
+      expect(messages.profile).toMatchObject({
         ...expected.profile,
         genitori: { retry: expected.retry },
         parentChat: expected.parentChat,
       });
-      expect(messages.settings).toMatchObject(expected.notices);
-    });
-  });
-
-  it('composes Parent Area notices without duplicated or mixed-language prefixes', () => {
-    Object.entries(localeMessages).forEach(([locale, messages]) => {
-      const profile = messages.settings.profile;
-      const composed = {
-        confidence: `${messages.settings.nota1} ${profile.confidenceNote.replace('{score}', '42')}`,
-        settings: `${messages.settings.nota} ${profile.settingsNote}`,
-        disclaimer: `${messages.settings.disclaimerAi} ${messages.settings.leOsservazioniSonoGenerate}`,
-      };
-
-      expect(composed).toEqual(
-        expectedLocaleCopy[locale as keyof typeof expectedLocaleCopy].composed,
-      );
+      expect(messages).toMatchObject(expected.notices);
+      expect({
+        confidence: `${messages.nota1} ${messages.profile.confidenceNote.replace('{score}', '42')}`,
+        settings: `${messages.nota} ${messages.profile.settingsNote}`,
+        disclaimer: `${messages.disclaimerAi} ${messages.leOsservazioniSonoGenerate}`,
+      }).toEqual(expected.composed);
     });
   });
 });

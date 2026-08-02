@@ -152,6 +152,9 @@ const authenticatedBase = base.extend<Record<string, never>, AuthWorkerFixtures>
     await mockConsentStorage(context);
     await mockOnboarding(page);
     await mockTracking(page);
+    await page.route('**/api/telemetry/activity', async (route) => {
+      await route.fulfill({ status: 204 });
+    });
     await mockHomePageAPIs(page);
     await mockAccessibilitySettings(
       page,

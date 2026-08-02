@@ -82,6 +82,9 @@ async function verifyProductionLogin() {
       locale: 'it-IT',
     });
     const page = await context.newPage();
+    await page.route('**/api/telemetry/activity', async (route) => {
+      await route.fulfill({ status: 204 });
+    });
 
     stage = 'credential submission';
     await page.goto('/it/login', { waitUntil: 'domcontentloaded', timeout: 30000 });
