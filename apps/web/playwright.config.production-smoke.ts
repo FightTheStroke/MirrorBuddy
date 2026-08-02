@@ -38,8 +38,8 @@ const browserUse = {
 export default defineConfig({
   testDir: './e2e/production-smoke',
   fullyParallel: false,
-  // Production auth is rate-limited. A single worker reuses one authenticated
-  // storage state instead of creating concurrent login bursts.
+  // Keep production load predictable. Authenticated coverage uses locally
+  // signed storage state; only the isolated login-flow regression calls login.
   workers: 1,
   forbidOnly: !!process.env.CI,
   timeout: 30000,

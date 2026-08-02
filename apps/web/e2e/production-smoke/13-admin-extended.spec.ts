@@ -7,13 +7,15 @@
  * Read-only, no data mutations even with valid auth.
  */
 
+import { randomBytes } from 'node:crypto';
 import {
   test,
   expect,
+  PROD_URL,
   ADMIN_READONLY_COOKIE_VALUE,
   addAdminReadOnlyCookie,
-  adminReadOnlyCookieHeader,
 } from './fixtures';
+import { CSRF_TOKEN_COOKIE, CSRF_TOKEN_HEADER } from '@/lib/auth/cookie-constants';
 
 test.describe('PROD-SMOKE: Admin API Security', () => {
   const adminGetEndpoints = [
@@ -45,11 +47,6 @@ test.describe('PROD-SMOKE: Admin API Security', () => {
       expect(res.status()).toBeGreaterThanOrEqual(400);
     });
   }
-
-  test('Admin cleanup-users rejects unauthenticated POST', async ({ request }) => {
-    const res = await request.post('/api/admin/cleanup-users');
-    expect(res.status()).toBeGreaterThanOrEqual(400);
-  });
 
   test('Admin character seed rejects unauthenticated POST', async ({ request }) => {
     const res = await request.post('/api/admin/characters/seed');
@@ -137,11 +134,39 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
     expect(body).toMatch(/healthy|degraded|down|unknown/i);
   });
 
-  adminTest('Read-only admin cannot execute destructive mutations', async ({ request }) => {
-    const res = await request.post('/api/admin/cleanup-users', {
-      headers: { Cookie: adminReadOnlyCookieHeader() },
+  adminTest('Read-only admin cannot execute cleanup dry-run DELETE', async ({ page, context }) => {
+    await addAdminReadOnlyCookie(context);
+    const csrfToken = randomBytes(32).toString('base64url');
+    await context.addCookies([
+      {
+        name: CSRF_TOKEN_COOKIE,
+        value: csrfToken,
+        domain: new URL(PROD_URL).hostname,
+        path: '/',
+        httpOnly: true,
+        secure: true,
+      },
+    ]);
+
+    const res = await page.request.delete('/api/admin/cleanup-users?dryRun=true', {
+      headers: { [CSRF_TOKEN_HEADER]: csrfToken },
+      timeout: 30000,
     });
-    expect([403, 405]).toContain(res.status());
+    expect(res.status()).toBe(403);
+    expect(await res.json()).toMatchObject({
+      error: expect.stringMatching(/admin access required/i),
+    });
+  });
+
+  test('Cleanup endpoint rejects unauthenticated dry-run DELETE', async ({ request }) => {
+    const csrfToken = randomBytes(32).toString('base64url');
+    const res = await request.delete('/api/admin/cleanup-users?dryRun=true', {
+      headers: {
+        Cookie: `${CSRF_TOKEN_COOKIE}=${csrfToken}`,
+        [CSRF_TOKEN_HEADER]: csrfToken,
+      },
+    });
+    expect(res.status()).toBe(401);
   });
 
   const adminOnlyPages = [
@@ -157,7 +182,7 @@ test.describe('PROD-SMOKE: Admin Pages Content Verification', () => {
       `Read-only admin cannot access ADMIN-only page: ${adminOnlyPage}`,
       async ({ page, context }) => {
         await addAdminReadOnlyCookie(context);
-        await page.goto(adminOnlyPage, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(adminOnlyPage, { waitUntil: 'commit', timeout: 30000 });
         await expect(page).toHaveURL(/\/(it|en|fr|de|es)\/(?:auth\/)?login/, {
           timeout: 15000,
         });

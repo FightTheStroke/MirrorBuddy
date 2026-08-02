@@ -2,8 +2,8 @@
  * Production Smoke Tests — Full App Verification
  *
  * Focused verification of the current authenticated child home and public,
- * read-only APIs. Legacy professor-grid and Astuccio landing assertions were
- * removed when the home changed to the intent-based experience.
+ * read-only APIs. Legacy professor-grid assertions remain removed; current
+ * Astuccio and Study Kit routes are covered with their active UI.
  */
 
 import { request as pwRequest } from '@playwright/test';
@@ -41,6 +41,30 @@ authenticatedTest.describe('PROD: Current authenticated home', () => {
     await page.goto('/it');
     await expect(page.getByRole('searchbox', { name: /Cerca professore/i })).toHaveCount(0);
     await expect(page.getByRole('button', { name: /^Studia con /i })).toHaveCount(0);
+  });
+
+  authenticatedTest('Astuccio route renders current tool categories', async ({ page }) => {
+    const response = await page.goto('/it/astuccio', { waitUntil: 'domcontentloaded' });
+    expect(response?.status()).toBe(200);
+    await expect(page).toHaveURL(/\/it\/astuccio\/?$/);
+    await expect(page.getByRole('heading', { name: 'Astuccio', level: 1 })).toBeVisible();
+    for (const category of ['Carica', 'Crea', 'Cerca']) {
+      await expect(page.getByRole('heading', { name: category, level: 2 })).toBeVisible();
+    }
+  });
+
+  authenticatedTest('Study Kit opens from the active Astuccio tool card', async ({ page }) => {
+    await page.goto('/it/astuccio');
+    await page.getByRole('button', { name: /^Kit di Studio:/i }).click();
+    await expect(page.getByRole('heading', { name: 'Kit di Studio' }).first()).toBeVisible();
+    await expect(page.getByText(/I miei Kit|Nessun documento/i).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: /Nuovo Kit/i })).toBeVisible();
+  });
+
+  authenticatedTest('Legacy Study Kit route redirects to Astuccio', async ({ page }) => {
+    await page.goto('/it/study-kit');
+    await expect(page).toHaveURL(/\/it\/astuccio\/?$/);
+    await expect(page.getByRole('heading', { name: 'Astuccio', level: 1 })).toBeVisible();
   });
 });
 

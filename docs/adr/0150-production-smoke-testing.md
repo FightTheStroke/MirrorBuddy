@@ -11,7 +11,8 @@ MirrorBuddy is deployed on Vercel at `mirrorbuddy.vercel.app`. We needed a way t
 We created a dedicated Playwright-based production smoke test suite that:
 
 1. **Runs against the live production URL** (configurable via `PROD_URL` env var)
-2. **Never creates, modifies, or deletes data** — read-only verification only
+2. **Does not create, modify, or delete learning data** — shared authenticated
+   coverage uses locally signed storage state for a dedicated `isTestData` account
 3. **Uses client-side mocks** to bypass consent walls without touching the server
 4. **Covers 16 test areas** across 80+ test cases
 
@@ -73,8 +74,14 @@ while retaining `browserName: chromium`.
 
 ### Safety Guarantees
 
-- **Fixtures mock `/api/tos`** and set consent cookies client-side — no server state changed
-- **No authentication by default** — tests run as anonymous visitors
+- **Fixtures mock mutable user-state APIs** (including accessibility settings and
+  `/api/tos`) and set consent cookies client-side — no server state changed
+- **No authentication by default** — public tests run as anonymous visitors
+- **Authenticated UI tests** create signed storage state locally from
+  `PROD_TEST_USER_ID` and `SESSION_SECRET`, then verify the configured user ID and
+  `isTestData=true` through `/api/user`. Shared fixtures do not call the login
+  endpoint. The isolated login-flow regression performs one verified login and may
+  emit deduplicated `FIRST_LOGIN` funnel telemetry.
 - **Admin tests are opt-in** (`--admin` flag) and read-only (dashboard viewing only, ADMIN_READONLY role verification)
 - **Reports** saved to `playwright-report/production-smoke/`
 

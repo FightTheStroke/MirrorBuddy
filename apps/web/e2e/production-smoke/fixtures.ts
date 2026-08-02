@@ -2,26 +2,32 @@
  * Production Smoke Test Fixtures
  *
  * Lightweight fixtures for production read-only tests.
- * Public tests use unmodified production routing. Authenticated tests log in
- * with local-only credentials and mock mutable user-state APIs.
+ * Public tests use unmodified production routing. Authenticated tests create a
+ * signed cookie locally for a dedicated isTestData user, then verify it against
+ * the read-only /api/user endpoint before mocking mutable user-state APIs.
  *
- * These tests NEVER write data to production. They only:
+ * Shared authenticated fixtures do not write production data. They only:
  * - Navigate pages
  * - Verify UI renders
  * - Check API responses (GET only)
  * - Validate accessibility features
+ *
+ * The isolated login-flow regression performs one real login and may emit
+ * bounded, deduplicated FIRST_LOGIN telemetry.
  */
 
 /* eslint-disable react-hooks/rules-of-hooks */
+import { createHmac } from 'node:crypto';
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
-import type { APIResponse, BrowserContext, StorageState } from '@playwright/test';
-import { AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
+import type { BrowserContext, StorageState } from '@playwright/test';
+import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
   mockTOS,
   mockConsentStorage,
   mockOnboarding,
   mockTracking,
   mockHomePageAPIs,
+  mockAccessibilitySettings,
 } from '../fixtures/api-mocks';
 
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
@@ -31,6 +37,7 @@ const PROD_TEST_USER_ID = process.env.PROD_TEST_USER_ID;
 const PROD_TEST_USER_EMAIL = process.env.PROD_TEST_USER_EMAIL;
 const PROD_TEST_USER_USERNAME = process.env.PROD_TEST_USER_USERNAME;
 const PROD_TEST_USER_PASSWORD = process.env.PROD_TEST_USER_PASSWORD;
+const SESSION_SECRET = process.env.SESSION_SECRET;
 
 export const hasProdTestCredentials = Boolean(
   PROD_TEST_USER_ID && PROD_TEST_USER_EMAIL && PROD_TEST_USER_USERNAME && PROD_TEST_USER_PASSWORD,
@@ -89,40 +96,56 @@ const authenticatedBase = base.extend<Record<string, never>, AuthWorkerFixtures>
         await use({ cookies: [], origins: [] });
         return;
       }
-
-      const api = await playwrightRequest.newContext({ baseURL: PROD_URL });
-      let response: APIResponse | undefined;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-          response = await api.post('/api/auth/login', {
-            data: {
-              email: PROD_TEST_USER_EMAIL,
-              password: PROD_TEST_USER_PASSWORD,
-            },
-            timeout: 30000,
-          });
-          break;
-        } catch (error) {
-          if (attempt === 1) throw error;
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-      }
-      if (!response) {
-        await api.dispose();
-        throw new Error('Production test login did not return a response');
-      }
-      if (!response.ok()) {
-        await api.dispose();
-        throw new Error(`Production test login failed with status ${response.status()}`);
+      if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+        throw new Error('SESSION_SECRET is required to create production smoke auth state');
       }
 
-      const body = (await response.json()) as { user?: { id?: string } };
-      if (body.user?.id !== PROD_TEST_USER_ID) {
+      const signature = createHmac('sha256', SESSION_SECRET)
+        .update(PROD_TEST_USER_ID!)
+        .digest('hex');
+      const hostname = new URL(PROD_URL).hostname;
+      const storageState: StorageState = {
+        cookies: [
+          {
+            name: AUTH_COOKIE_NAME,
+            value: `${PROD_TEST_USER_ID}.${signature}`,
+            domain: hostname,
+            path: '/',
+            expires: -1,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Lax',
+          },
+          {
+            name: AUTH_COOKIE_CLIENT,
+            value: PROD_TEST_USER_ID!,
+            domain: hostname,
+            path: '/',
+            expires: -1,
+            httpOnly: false,
+            secure: true,
+            sameSite: 'Lax',
+          },
+        ],
+        origins: [],
+      };
+
+      const api = await playwrightRequest.newContext({ baseURL: PROD_URL, storageState });
+      const userResponse = await api.get('/api/user', { timeout: 30000 });
+      if (!userResponse.ok()) {
         await api.dispose();
-        throw new Error('Production test login returned an unexpected user');
+        throw new Error(
+          `Production test user verification failed with status ${userResponse.status()}`,
+        );
+      }
+      const user = (await userResponse.json()) as { id?: string; isTestData?: boolean };
+      if (user.id !== PROD_TEST_USER_ID || user.isTestData !== true) {
+        await api.dispose();
+        throw new Error(
+          'Production test authentication is not using the dedicated isTestData user',
+        );
       }
 
-      const storageState = await api.storageState();
       await api.dispose();
       await use(storageState);
     },
@@ -142,6 +165,11 @@ const authenticatedBase = base.extend<Record<string, never>, AuthWorkerFixtures>
     await mockOnboarding(page);
     await mockTracking(page);
     await mockHomePageAPIs(page);
+    await mockAccessibilitySettings(
+      page,
+      PROD_TEST_USER_ID ?? 'production-smoke-user',
+      'production-smoke-accessibility',
+    );
 
     await use(page);
   },

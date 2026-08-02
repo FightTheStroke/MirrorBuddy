@@ -17,7 +17,7 @@ test.describe('PROD-SMOKE: Internationalization', () => {
 
   for (const { code, lang, text } of locales) {
     test(`/${code} loads with correct lang attribute`, async ({ page }) => {
-      await page.goto(`/${code}`);
+      await page.goto(`/${code}`, { waitUntil: 'commit' });
       await expect(page).toHaveURL(new RegExp(`/${code}/welcome/?$`), { timeout: 15000 });
       const html = page.locator('html');
       await expect(html).toHaveAttribute('lang', lang);
@@ -29,7 +29,7 @@ test.describe('PROD-SMOKE: Internationalization', () => {
 
   test('Default redirect goes to a locale path', async ({ page }) => {
     // Server-side locale detection varies by CDN/edge — accept any valid locale
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'commit' });
     await expect(page).toHaveURL(/\/(it|en|fr|de|es)/);
   });
 

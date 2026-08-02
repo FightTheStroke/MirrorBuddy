@@ -17,7 +17,7 @@ test.describe('PROD-SMOKE: Compliance Pages', () => {
 
   for (const { path, heading } of compliancePages) {
     test(`${path} loads with correct heading`, async ({ page }) => {
-      await page.goto(path);
+      await page.goto(path, { waitUntil: 'commit' });
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       const h1Text = await page.getByRole('heading', { level: 1 }).textContent();
       expect(h1Text).toMatch(heading);
@@ -41,7 +41,7 @@ test.describe('PROD-SMOKE: Compliance Pages', () => {
   });
 
   test('Compliance pages are available in English', async ({ page }) => {
-    await page.goto('/en/ai-transparency');
+    await page.goto('/en/ai-transparency', { waitUntil: 'commit' });
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const content = await page.textContent('body');
     expect(content).toContain('AI Transparency');

@@ -8,7 +8,7 @@ test.describe('PROD-SMOKE: Route contracts', () => {
   });
 
   test('Unauthenticated /admin redirects to the localized login page', async ({ page }) => {
-    await page.goto('/admin');
+    await page.goto('/admin', { waitUntil: 'commit' });
     await page.waitForURL(/\/(it|en|fr|de|es)\/login/, { timeout: 15000 });
     expect(new URL(page.url()).pathname).toBe('/it/login');
   });
@@ -19,9 +19,23 @@ test.describe('PROD-SMOKE: Route contracts', () => {
     await page.goto('/it/login');
     await page.getByLabel(/email/i).fill(process.env.PROD_TEST_USER_EMAIL!);
     await page.locator('#password').fill(process.env.PROD_TEST_USER_PASSWORD!);
+    const loginResponsePromise = page.waitForResponse(
+      (response) =>
+        response.url().endsWith('/api/auth/login') && response.request().method() === 'POST',
+    );
     await page.getByRole('button', { name: /accedi/i }).click();
+    const loginResponse = await loginResponsePromise;
+    expect(loginResponse.status()).toBe(200);
+    const loginBody = (await loginResponse.json()) as { user?: { id?: string } };
+    expect(loginBody.user?.id).toBe(process.env.PROD_TEST_USER_ID);
 
     await expect(page).toHaveURL(/\/it\/?$/, { timeout: 15000 });
+    const userResponse = await page.request.get('/api/user');
+    expect(userResponse.status()).toBe(200);
+    expect(await userResponse.json()).toMatchObject({
+      id: process.env.PROD_TEST_USER_ID,
+      isTestData: true,
+    });
     await expect(page.getByTestId('intent-card-homework')).toContainText('Fare i compiti');
     await expect(page.getByTestId('intent-card-study')).toContainText('Studiare');
     await expect(page.getByTestId('intent-card-quizMe')).toContainText('Mettiti alla prova');
