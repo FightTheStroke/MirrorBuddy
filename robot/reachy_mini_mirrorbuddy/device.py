@@ -82,10 +82,19 @@ def apply_device_profile(config, profile: DeviceProfile) -> None:
     dsa = _dsa_from_accessibility(profile.accessibility)
     if dsa:
         config.DSA_PROFILE = dsa
+    # The child already chose who should help them, in the app. Booting as a generic
+    # assistant and making them ask again throws that choice away — so the paired
+    # coach is who the robot wakes up as. The buddy is the fallback; an explicit
+    # local MAESTRO_ID always wins, because someone set that on this robot on purpose.
+    preferred = profile.preferred_coach or profile.preferred_buddy
+    if preferred and not config.MAESTRO_ID:
+        config.MAESTRO_ID = preferred
+        config.START_NEUTRAL = False
     # Reduced-motion is accessibility-critical: keep the robot calm for this child.
     if profile.accessibility.get("reducedMotion"):
         config.CALM_MOVEMENT = True
     logger.info(
-        "Applied paired profile: name=%s locale=%s dsa=%s calm=%s",
+        "Applied paired profile: name=%s locale=%s dsa=%s calm=%s persona=%s",
         config.STUDENT_NAME, config.LOCALE, config.DSA_PROFILE, config.CALM_MOVEMENT,
+        config.MAESTRO_ID or "(neutral buddy)",
     )

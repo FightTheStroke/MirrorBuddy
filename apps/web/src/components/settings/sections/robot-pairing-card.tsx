@@ -9,7 +9,7 @@
  * redeeming the code. Serves the "MirrorBuddy with a body" flow.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Bot, Loader2, Trash2, KeyRound, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,10 @@ interface PairCode {
   expiresAt: string;
 }
 
+// A parent types the code on the robot and looks back at the screen: a few seconds
+// is the window in which "did it work?" is still an open question.
+const PAIRING_POLL_MS = 3000;
+
 export function RobotPairingCard() {
   const t = useTranslations('settings.robotPairing');
   const [devices, setDevices] = useState<DeviceSummary[]>([]);
@@ -39,6 +43,7 @@ export function RobotPairingCard() {
   const [code, setCode] = useState<PairCode | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const knownDeviceIds = useRef<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     try {
@@ -58,10 +63,36 @@ export function RobotPairingCard() {
     void load();
   }, [load]);
 
+  // While a code is outstanding the robot is about to pair, and nothing pushes that
+  // event to the browser: the list was read once at mount, so the page kept saying
+  // "no robot connected" long after the robot was, in fact, connected. Poll until
+  // the pairing lands or the code expires.
+  useEffect(() => {
+    if (!code) return;
+    const expiresAt = new Date(code.expiresAt).getTime();
+    const timer = setInterval(() => {
+      if (Date.now() >= expiresAt) {
+        setCode(null);
+        return;
+      }
+      void load();
+    }, PAIRING_POLL_MS);
+    return () => clearInterval(timer);
+  }, [code, load]);
+
+  // The robot appeared: the code has served its purpose, so stop showing it. Compare
+  // against the robots known when the code was issued — a household with a robot
+  // already paired must still see the code until the *new* one shows up.
+  useEffect(() => {
+    if (!code) return;
+    if (devices.some((d) => !knownDeviceIds.current.has(d.id))) setCode(null);
+  }, [devices, code]);
+
   const generate = useCallback(async () => {
     setGenerating(true);
     setCode(null);
     setError(null);
+    knownDeviceIds.current = new Set(devices.map((d) => d.id));
     try {
       const res = await csrfFetch('/api/devices/pair-code', {
         method: 'POST',
@@ -85,7 +116,7 @@ export function RobotPairingCard() {
     } finally {
       setGenerating(false);
     }
-  }, [t]);
+  }, [t, devices]);
 
   const revoke = useCallback(async (id: string) => {
     try {

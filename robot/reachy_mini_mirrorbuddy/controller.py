@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from . import camera, tools
+from . import camera, presence, tools
 from .audio_io import AudioIO
 from .azure_realtime import AzureRealtimeClient
 from .config import Config
@@ -48,6 +48,7 @@ class Controller:
         self._switch_lock = threading.Lock()
         self._partial = ""  # transcript of the reply in flight, used to read the mood
         self._expressed = False
+        self._presence: presence.PresenceWatcher | None = None
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> bool:
@@ -56,6 +57,9 @@ class Controller:
         self.audio.on_input_pcm16 = self._client.send_audio_pcm16
         self.audio.on_local_barge_in = self._client.local_barge_in
         self._client.start()
+        if self.cfg.ENABLE_CAMERA:
+            self._presence = presence.PresenceWatcher(self.robot, self._on_presence)
+            self._presence.start()
         ready = self._client.wait_ready(timeout=25.0)
         if not ready:
             logger.warning("Realtime session not confirmed ready; continuing anyway")
@@ -66,6 +70,9 @@ class Controller:
         return bool(c and c._thread and c._thread.is_alive())
 
     def stop(self) -> None:
+        if self._presence:
+            self._presence.stop()
+            self._presence = None
         c = self._client
         if c:
             c.stop()
@@ -95,6 +102,33 @@ class Controller:
             on_sleep=self._on_sleep,
             on_wake=self._on_wake,
         )
+
+    # ------------------------------------------------------------------ seeing
+    def _on_presence(self, event: str) -> None:
+        """The student appeared or disappeared from view: behave accordingly.
+
+        Deliberately quiet. A robot that comments every time a child shifts in his
+        chair is a robot a child stops wanting at the desk, so leaving is silent —
+        only the body settles — and only a real return is worth a word.
+        """
+        client = self._client
+        if event == presence.LEFT:
+            self.movements.set_emotion("calm")
+            self.audio.interrupt()  # stop talking to an empty chair
+            return
+        self.movements.set_emotion("happy")
+        if client is None:
+            return
+        if event == presence.ARRIVED:
+            client.speak_now(
+                "Lo studente si e' appena seduto davanti a te: salutalo brevemente per nome "
+                "e chiedi da cosa vuole partire. Una frase soltanto."
+            )
+        elif event == presence.RETURNED:
+            client.speak_now(
+                "Lo studente e' tornato dopo una pausa: fai un bentornato molto breve e "
+                "riprendi da dove eravate. Una frase soltanto."
+            )
 
     # ------------------------------------------------------------------ expression
     def _on_speech_started(self) -> None:

@@ -122,6 +122,17 @@ class AzureRealtimeClient:
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
         self._enqueue(json.dumps({"type": "response.create"}))
 
+    def speak_now(self, instructions: str) -> None:
+        """Ask the model to say something on its own initiative (thread-safe).
+
+        Used when the world changed rather than the conversation: the student sat
+        down, or came back. Refused while asleep or muted — "zitto" outranks
+        anything the robot noticed by itself.
+        """
+        if self._asleep or self._quiet or self._responding:
+            return
+        self._enqueue(json.dumps(rt_messages.response_create(instructions)))
+
     def local_barge_in(self) -> None:
         """On-device barge-in (called from the mic thread when a real voice is heard
         over Buddy's speech). Drops in-flight model audio immediately and asks the
