@@ -1307,7 +1307,13 @@
       "step3": "Le robot démarre déjà personnalisé avec le profil de votre enfant.",
       "noRobotYet": "Vous n'avez pas encore de robot ?",
       "buyCta": "Acheter un Reachy Mini",
-      "buyNote": "Reachy Mini Lite à partir d'environ 299 $, version Wireless à partir d'environ 449 $, sur reachy-mini.org."
+      "buyNote": "Reachy Mini Lite à partir d'environ 299 $, version Wireless à partir d'environ 449 $, sur reachy-mini.org.",
+      "errorTitle": "Impossible de générer le code",
+      "errorAuth": "Votre session a expiré : reconnectez-vous et réessayez.",
+      "errorRateLimit": "Trop de codes générés. Réessayez dans une heure.",
+      "errorGeneric": "Une erreur est survenue (erreur {status}). Réessayez bientôt.",
+      "errorNetwork": "Aucune connexion au serveur. Vérifiez votre réseau et réessayez.",
+      "retry": "Réessayer"
     }
   }
 }
