@@ -10,6 +10,7 @@ import base64
 import json
 import logging
 import threading
+import time
 from collections.abc import Callable
 
 import websockets
@@ -19,6 +20,14 @@ from . import session_flow
 from . import tools
 
 logger = logging.getLogger(__name__)
+
+# How long an utterance must be before we answer without waiting for its transcript.
+# Sized against the phrases that must never produce a reply — "zitto", "basta",
+# "fermati", "hey buddy" — spoken slowly by a child with a motor impairment. Above
+# this, a turn cannot be a bare stop word, so the transcript adds latency and nothing
+# else. Any stop word inside a longer sentence is still caught: the transcript lands a
+# moment later and cancels the response in flight.
+_FAST_PATH_MIN_SPEECH_S = 1.8
 
 SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and out)
 
@@ -74,6 +83,8 @@ class AzureRealtimeClient:
         self._responding = False  # a model response is currently streaming
         self._suppress = False  # drop in-flight audio after a barge-in cancel
         self._quiet = False  # student asked for silence: keep model muted
+        self._speech_started_at = 0.0  # monotonic time the student began this turn
+        self._fast_requested = False  # response already asked for before the transcript
         self._asleep = False  # session ended: stay muted until the wake word
         self._sleep_after = False  # go to sleep once the farewell response finishes
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
@@ -246,7 +257,7 @@ class AzureRealtimeClient:
             if action == session_flow.END:
                 self._pending_farewell = True
                 self._suppress = False
-                if self._responding:
+                if self._responding or self._fast_requested:
                     await self._safe_send(rt_messages.CANCEL)
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
@@ -257,7 +268,9 @@ class AzureRealtimeClient:
                 self._asleep = True
                 self._quiet = True
                 self._suppress = True
-                if self._responding:
+                # Also cancels a fast-path response requested before the transcript
+                # arrived: "zitto" must win even when it ends a long sentence.
+                if self._responding or self._fast_requested:
                     await self._safe_send(rt_messages.CANCEL)
                 if self.on_speech_started:
                     _safe_cb(self.on_speech_started)  # flush local playback now
@@ -265,10 +278,10 @@ class AzureRealtimeClient:
                     _safe_cb(self.on_sleep)  # settle into the rest position
                 return
             if action == session_flow.SPEAK:
-                # The server no longer auto-creates a response (create_response=False),
-                # so we ask for one only once we've classified the turn as ordinary.
-                # This guarantees a stop/sleep word never produces a spoken reply.
-                await self._request_response()
+                # Ordinary turn. If the fast path already asked for the response when
+                # speech ended, asking again would make Buddy answer twice.
+                if not self._fast_requested:
+                    await self._request_response()
             return
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
@@ -277,10 +290,37 @@ class AzureRealtimeClient:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
             self._quiet = False
+            self._speech_started_at = time.monotonic()
+            self._fast_requested = False
             if self._responding:
                 await self._safe_send(rt_messages.CANCEL)
             if self.on_speech_started:
                 _safe_cb(self.on_speech_started)
+            return
+
+        if etype == "input_audio_buffer.speech_stopped":
+            # The server no longer auto-creates responses, so we normally wait for the
+            # transcript before asking for one — that is a whole extra Whisper pass in
+            # series on every single turn, and the child feels every millisecond of it.
+            #
+            # We only need the transcript to catch "zitto"/"basta"/"buddy", and those
+            # are always brief. So a clearly long utterance can't be one: ask for the
+            # answer straight away. Anything short keeps the safe, slower path.
+            if self._asleep or self._quiet:
+                return
+            spoken = time.monotonic() - self._speech_started_at
+            if self._speech_started_at and spoken >= _FAST_PATH_MIN_SPEECH_S:
+                self._fast_requested = True
+                await self._request_response()
+            return
+
+        if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
+            # The final transcript only lands once the sentence is already spoken —
+            # far too late to colour the body language. The opening words carry the
+            # mood ("Bravo!", "Fammi pensare..."), so react to the first delta.
+            delta = event.get("delta") or ""
+            if delta and self.on_transcript:
+                _safe_cb(self.on_transcript, delta, False)
             return
 
         if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):

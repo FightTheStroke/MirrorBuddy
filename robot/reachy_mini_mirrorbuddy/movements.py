@@ -17,6 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from . import camera
+from .emotions import NEUTRAL as EMOTION_NEUTRAL, Emotion, infer as infer_emotion
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +25,22 @@ logger = logging.getLogger(__name__)
 # (matches the conversation app's ~10deg rest).
 _ANTENNA_NEUTRAL = 0.1745  # ~10 deg
 _ANTENNA_MAX = 0.6
+
+# Motion smoothing. The loop runs faster than before and every value is eased
+# toward its target instead of being written directly: a servo asked to jump
+# stutters, a servo led there glides. TAU is the time constant in seconds — how
+# long a value takes to cover ~63% of the distance to its target.
+_LOOP_HZ = 50.0
+_POSE_TAU = 0.09  # head/body: quick enough to feel alive, slow enough to be smooth
+_MOOD_TAU = 0.65  # mood changes arrive as a movement, not as a jump
+
+
+def _ease(current: float, target: float, tau: float, dt: float) -> float:
+    """Exponential approach of ``current`` toward ``target`` (frame-rate independent)."""
+    if tau <= 0.0:
+        return target
+    alpha = 1.0 - math.exp(-dt / tau)
+    return current + (target - current) * alpha
 
 
 @dataclass(frozen=True)
@@ -69,6 +86,30 @@ class Movements:
         self._create_head_pose = None
         self._track_weight = -1.0  # unset; managed on speaking transitions
         self._hold = threading.Event()  # when set, freeze all motion (e.g. camera capture)
+        # Current mood and the eased values that actually reach the servos. Emotions
+        # are blended in gradually (see _MOOD_TAU) so a change of mood is itself a
+        # movement rather than a snap to a new posture.
+        self._emotion: Emotion = EMOTION_NEUTRAL
+        self._mood = {"scale": 1.0, "speed": 1.0, "pitch": 0.0, "antenna": 0.0, "sway": 1.0}
+        self._out = {"z": 0.0, "pitch": 0.0, "yaw": 0.0, "body": 0.0, "ant_r": _ANTENNA_NEUTRAL,
+                     "ant_l": _ANTENNA_NEUTRAL}
+        self._speak_env = 0.0  # smoothed "is speaking" envelope, 0..1
+
+    def set_emotion(self, emotion: Emotion | str | None) -> None:
+        """Set the current mood. Blended in smoothly by the animation loop."""
+        target = emotion if isinstance(emotion, Emotion) else None
+        if target is None:
+            from .emotions import get as _get
+
+            target = _get(emotion if isinstance(emotion, str) else None)
+        with self._lock:
+            if target.name != self._emotion.name:
+                logger.debug("Emotion: %s -> %s", self._emotion.name, target.name)
+            self._emotion = target
+
+    def express(self, text: str | None) -> None:
+        """Colour the body language from what Buddy is about to say."""
+        self.set_emotion(infer_emotion(text))
 
     def hold_still(self) -> None:
         """Freeze head/body and pause tracking + wobbler so the camera gets a sharp frame."""
@@ -180,58 +221,91 @@ class Movements:
 
     def _loop(self) -> None:
         t0 = time.monotonic()
+        last = t0
+        period = 1.0 / _LOOP_HZ
         while not self._stop.is_set():
             if self._hold.is_set():
                 time.sleep(0.05)  # frozen for camera capture; drive nothing
                 continue
-            t = time.monotonic() - t0
+            now = time.monotonic()
+            dt = min(0.2, max(1e-3, now - last))  # cap dt so a stall can't cause a lurch
+            last = now
+            t = now - t0
             with self._lock:
                 energy = self._energy
-                self._energy *= 0.9
+                # Decay is time-based now that the loop rate can vary.
+                self._energy *= math.exp(-dt / 0.32)
                 s = self.temp.scale * (0.55 if self.calm else 1.0)
                 w = self.temp.speed
+                emotion = self._emotion
 
-            speaking = energy > 0.06
+            # Blend the mood in gradually: the child sees Buddy *become* happy.
+            m = self._mood
+            m["scale"] = _ease(m["scale"], emotion.scale, _MOOD_TAU, dt)
+            m["speed"] = _ease(m["speed"], emotion.speed, _MOOD_TAU, dt)
+            m["pitch"] = _ease(m["pitch"], emotion.pitch_offset, _MOOD_TAU, dt)
+            m["antenna"] = _ease(m["antenna"], emotion.antenna_offset, _MOOD_TAU, dt)
+            m["sway"] = _ease(m["sway"], emotion.sway, _MOOD_TAU, dt)
+            s *= m["scale"]
+            w *= m["speed"]
+
+            # A smoothed envelope instead of a boolean: speech starting and stopping
+            # used to switch whole motion patterns on and off between two frames,
+            # which is exactly what read as "jerky".
+            raw = 1.0 if energy > 0.06 else 0.0
+            self._speak_env = _ease(self._speak_env, raw, 0.12 if raw else 0.30, dt)
+            env = self._speak_env
+            speaking = env > 0.5
 
             # Face-follow: while speaking keep a gentle track (calm) or hand off to the
             # wobbler (0); while listening, full tracking (1).
             if self.follow_face:
-                target_weight = (0.5 if self.calm else 0.0) if speaking else 1.0
+                # Listening: the tracker follows the student's face. Speaking: hand the
+                # head over to our own animation, which is now smoothed — the earlier
+                # half-weight compromise existed only to hide the jitter.
+                target_weight = 0.0 if speaking else 1.0
                 if target_weight != self._track_weight:
                     camera.set_tracking_weight(self.robot, target_weight)
                     self._track_weight = target_weight
 
             z = 0.010 * s * math.sin(2 * math.pi * 0.12 * w * t)  # gentle breathing (m)
-            pitch = 5.0 * s * math.sin(2 * math.pi * 0.09 * w * t)  # deg
+            pitch = 5.0 * s * math.sin(2 * math.pi * 0.09 * w * t) + m["pitch"]  # deg
             yaw_head = 8.0 * s * math.sin(2 * math.pi * 0.06 * w * t)  # deg
-            if speaking:
-                pitch += 6.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
-                yaw_head += 5.0 * s * energy * math.sin(2 * math.pi * 0.5 * t)
+            pitch += env * 6.0 * s * energy * math.sin(2 * math.pi * 1.1 * t)
+            yaw_head += env * 5.0 * s * energy * math.sin(2 * math.pi * 0.5 * t)
 
-            body_yaw = math.radians(12.0 * s * math.sin(2 * math.pi * 0.05 * w * t))
-            if speaking:
-                body_yaw += math.radians(8.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
+            body_yaw = math.radians(12.0 * s * m["sway"] * math.sin(2 * math.pi * 0.05 * w * t))
+            body_yaw += env * math.radians(8.0 * s * energy * math.sin(2 * math.pi * 0.6 * t))
 
-            # Antennas: idle sway + a gentle lift while speaking (kept small so the
-            # antennas don't flap distractingly for the student).
+            # Antennas: idle sway plus a gentle lift while speaking, cross-faded by the
+            # same envelope so they rise and settle instead of snapping.
             sway = math.radians(18.0 * s) * math.sin(2 * math.pi * 0.5 * w * t)
-            if speaking:
-                perk = _ANTENNA_MAX * min(1.0, 0.4 + energy)
-                flutter = math.radians(2.0 * s) * math.sin(2 * math.pi * 2.5 * t)
-                right = _clamp(_ANTENNA_NEUTRAL + perk * 0.22 + flutter)
-                left = _clamp(_ANTENNA_NEUTRAL + perk * 0.22 - flutter)
-            else:
-                right = _clamp(_ANTENNA_NEUTRAL + sway)
-                left = _clamp(_ANTENNA_NEUTRAL - sway)
+            perk = _ANTENNA_MAX * min(1.0, 0.4 + energy) * 0.22
+            flutter = math.radians(2.0 * s) * math.sin(2 * math.pi * 2.5 * t)
+            base = _ANTENNA_NEUTRAL + m["antenna"]
+            right = _clamp(base + (1.0 - env) * sway + env * (perk + flutter))
+            left = _clamp(base - (1.0 - env) * sway + env * (perk - flutter))
 
-            self._apply(z=z, pitch=pitch, yaw=yaw_head, body_yaw=body_yaw, antennas=(right, left))
-            time.sleep(0.033)  # ~30 Hz
+            # Final smoothing pass: whatever the maths produced, the servos are led
+            # there rather than commanded there.
+            o = self._out
+            o["z"] = _ease(o["z"], z, _POSE_TAU, dt)
+            o["pitch"] = _ease(o["pitch"], pitch, _POSE_TAU, dt)
+            o["yaw"] = _ease(o["yaw"], yaw_head, _POSE_TAU, dt)
+            o["body"] = _ease(o["body"], body_yaw, _POSE_TAU, dt)
+            o["ant_r"] = _ease(o["ant_r"], right, _POSE_TAU, dt)
+            o["ant_l"] = _ease(o["ant_l"], left, _POSE_TAU, dt)
+
+            self._apply(z=o["z"], pitch=o["pitch"], yaw=o["yaw"], body_yaw=o["body"],
+                        antennas=(o["ant_r"], o["ant_l"]))
+            time.sleep(max(0.0, period - (time.monotonic() - now)))
 
     def _apply(self, z: float, pitch: float, yaw: float, body_yaw: float, antennas: tuple[float, float]) -> None:
         head = None
-        # When face-follow is on, the daemon owns the head (track + wobble); we only
-        # animate antennas and body so we never fight the tracker.
-        if not self.follow_face and self._create_head_pose is not None:
+        # The daemon's face tracker owns the head whenever it is weighted in; we only
+        # drive the head when the tracker is handed off, so we never fight it.
+        tracker_owns_head = self.follow_face and self._track_weight > 0.0
+        if not tracker_owns_head and self._create_head_pose is not None:
             try:
                 head = self._create_head_pose(x=0, y=0, z=z, roll=0, pitch=pitch, yaw=yaw, degrees=True)
             except Exception as e:

@@ -46,6 +46,8 @@ class Controller:
         self.movements = movements
         self._client: AzureRealtimeClient | None = None
         self._switch_lock = threading.Lock()
+        self._partial = ""  # transcript of the reply in flight, used to read the mood
+        self._expressed = False
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> bool:
@@ -87,12 +89,37 @@ class Controller:
             use_ga=self.cfg.use_ga_protocol,
             tools=tools.TOOL_SCHEMAS,
             on_output_audio=self.audio.play,
-            on_speech_started=self.audio.interrupt,
-            on_transcript=_log_transcript,
+            on_speech_started=self._on_speech_started,
+            on_transcript=self._on_transcript,
             on_tool_call=self._on_tool_call,
             on_sleep=self._on_sleep,
             on_wake=self._on_wake,
         )
+
+    # ------------------------------------------------------------------ expression
+    def _on_speech_started(self) -> None:
+        """The student is talking: stop the audio and listen with an open posture."""
+        self.audio.interrupt()
+        self.reset_expression()
+        self.movements.set_emotion("curious")
+
+    def _on_transcript(self, text: str, final: bool) -> None:
+        """Log the finished line; colour the body language from the first words."""
+        if final:
+            logger.info("Buddy: %s", text)
+            return
+        self._partial += text
+        # One reading per response: the opening clause sets the mood, and re-reading
+        # every delta would make Buddy twitch between moods mid-sentence.
+        if not self._expressed and len(self._partial) >= 12:
+            self._expressed = True
+            self.movements.express(self._partial)
+
+    def reset_expression(self) -> None:
+        """Start a fresh response: clear the partial transcript and ease back to neutral."""
+        self._partial = ""
+        self._expressed = False
+        self.movements.set_emotion(None)
 
     # ------------------------------------------------------------------ sleep / wake
     def _on_sleep(self) -> None:
@@ -176,11 +203,13 @@ class Controller:
         threading.Thread(target=self._capture_homework, args=(client, args, call_id), daemon=True).start()
 
     def _capture_homework(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        self.movements.set_emotion("focused")
         self.movements.hold_still()
         try:
             data_url = camera.capture_data_url(self.robot)
         finally:
             self.movements.release_hold()
+            self.movements.set_emotion("thinking")
         if not data_url:
             client.send_function_result(call_id, "Non riesco a vedere bene, avvicina il foglio e riproviamo.")
             return
@@ -219,6 +248,3 @@ class Controller:
             logger.info("Switched to Maestro %s (%s), voice=%s", target.display_name, target.id, target.voice)
 
 
-def _log_transcript(text: str, final: bool) -> None:
-    if final:
-        logger.info("Buddy: %s", text)

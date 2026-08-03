@@ -77,6 +77,27 @@ class MirrorBuddyClient:
         logger.info("Fetched %d Maestri", len(maestri))
         return maestri
 
+    def fetch_coaches(self) -> list[Maestro]:
+        """Return the learning coaches (Melissa, Roberto, Chiara, Andrea, Favij, Laura).
+
+        Coaches are companions rather than subject experts: they help the student find
+        a method, keep going and stay motivated. They share the Maestro shape, so the
+        rest of the robot treats them exactly like a professor. Best-effort: an older
+        backend without this endpoint simply means no coaches, never a failed start-up.
+        """
+        url = f"{self.base_url}/api/coaches?locale={self.locale}"
+        try:
+            resp = httpx.get(url, timeout=self.timeout, headers={"accept": "application/json"})
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception as e:
+            logger.warning("Coaches unavailable (%s); continuing with professors only", e)
+            return []
+        items = data if isinstance(data, list) else data.get("coaches") or data.get("data") or []
+        coaches = [Maestro.from_json(it) for it in items if isinstance(it, dict)]
+        logger.info("Fetched %d coaches", len(coaches))
+        return coaches
+
     def pick(self, maestri: list[Maestro], maestro_id: str | None) -> Maestro:
         """Choose the Maestro to embody.
 

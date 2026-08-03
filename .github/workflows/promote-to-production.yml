@@ -89,6 +89,20 @@ jobs:
           fi
           echo "✅ Staging is healthy (HTTP $status)"
 
+      - name: Verify database schema is up to date
+        env:
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: |
+          # The "generate pairing code" button returned 500 for weeks because the
+          # RobotDevice table had never been created in production: the code shipped,
+          # the migration did not, and nothing said so. Promotion is the last moment
+          # where that is still cheap to catch.
+          if [ -z "$DIRECT_URL" ]; then
+            echo "::error::DIRECT_URL secret is not set — cannot verify schema drift"
+            exit 1
+          fi
+          pnpm dlx tsx scripts/check-migrations-applied.ts
+
       - name: Promote to Production
         id: promote
         run: |

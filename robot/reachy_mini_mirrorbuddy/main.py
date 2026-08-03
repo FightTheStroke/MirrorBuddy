@@ -131,6 +131,9 @@ def run(
     mb = MirrorBuddyClient(config.MIRRORBUDDY_URL, locale=config.LOCALE)
     try:
         maestri = mb.fetch_maestri()
+        # Coaches join the same roster, so "chiama Andrea" works exactly like
+        # "chiama Galileo" without any special case downstream.
+        maestri += mb.fetch_coaches()
         if config.MAESTRO_ID:
             maestro = mb.pick(maestri, config.MAESTRO_ID)  # profile pinned this Maestro
         elif config.START_NEUTRAL:

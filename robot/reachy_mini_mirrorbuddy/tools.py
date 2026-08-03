@@ -11,6 +11,7 @@ The schemas are sent in ``session.update`` and the model calls them autonomously
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from .mirrorbuddy_client import Maestro
@@ -20,7 +21,8 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "type": "function",
         "name": "list_professors",
         "description": (
-            "Elenca i professori (Maestri) MirrorBuddy disponibili con la loro materia. "
+            "Elenca chi c'e' su MirrorBuddy: i professori (Maestri) con la loro materia "
+            "e i coach dello studio (Melissa, Roberto, Chiara, Andrea, Favij, Laura). "
             "Usalo quando lo studente chiede chi c'e' o con chi puo' parlare."
         ),
         "parameters": {"type": "object", "properties": {}, "required": []},
@@ -29,16 +31,22 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         "type": "function",
         "name": "call_professor",
         "description": (
-            "Passa la conversazione a un altro professore MirrorBuddy, cambiando persona e voce. "
-            "Usalo quando lo studente chiede un altro professore o un'altra materia "
-            "(es. 'voglio matematica', 'chiama Galileo', 'parliamo di arte')."
+            "Passa la conversazione a un altro professore o coach MirrorBuddy, cambiando persona e voce. "
+            "Usalo quando lo studente chiede un'altra persona o un'altra materia "
+            "(es. 'voglio matematica', 'chiama Galileo', 'parliamo di arte'), "
+            "e anche quando chiede aiuto sul metodo, l'organizzazione o la motivazione "
+            "(es. 'chiama Andrea', 'non riesco a studiare', 'mi serve un metodo'): "
+            "in quel caso passa a un coach."
         ),
         "parameters": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Nome del professore o materia richiesta (es. 'Galileo', 'matematica', 'storia').",
+                    "description": (
+                        "Nome della persona o materia richiesta "
+                        "(es. 'Galileo', 'matematica', 'storia', 'Andrea', 'metodo di studio')."
+                    ),
                 }
             },
             "required": ["query"],
@@ -133,7 +141,29 @@ SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
     "health": ("salute", "benessere", "educazione alla salute"),
     "internationalLaw": ("diritto internazionale",),
     "storytelling": ("storytelling", "public speaking", "raccontare"),
+    # Coaches: not a school subject. A child asks for them by what they need
+    # ("non riesco a studiare", "mi serve un metodo"), not by a discipline.
+    "coaching": (
+        "coach", "tutor", "sostegno", "metodo", "metodo di studio", "studiare",
+        "organizzarmi", "concentrarmi", "motivazione", "compiti", "ansia",
+    ),
 }
+
+
+def _alias_hit(m: Maestro, q: str) -> int:
+    """Length of the longest alias of ``m`` spoken verbatim in ``q`` (0 if none).
+
+    A child rarely names the subject on its own: they say "mi serve un metodo di
+    studio". Requiring every spoken word to match would reject that, so a verbatim
+    alias counts as a strong hit — and the *longest* alias wins, which is what keeps
+    "scienze motorie" with the sport teacher instead of the biology one.
+    """
+    best = 0
+    for alias in SUBJECT_ALIASES.get(str(m.subject or ""), ()):
+        a = _norm(alias)
+        if a and re.search(rf"(?<!\w){re.escape(a)}(?!\w)", q):
+            best = max(best, len(a))
+    return best
 
 
 def _alias_haystack(m: Maestro) -> str:
@@ -165,14 +195,15 @@ def resolve_maestro(maestri: list[Maestro], query: str) -> Maestro | None:
         # A whole-phrase hit ("scienze motorie") beats loose token overlap, which is
         # what previously let a single shared word send the child to the wrong teacher.
         phrase = 1 if q in hay else 0
+        alias = _alias_hit(m, q)
         score = sum(1 for t in tokens if t in hay)
-        if not phrase and score < len(tokens):
+        if not phrase and not alias and score < len(tokens):
             # Partial overlap only: not good enough to switch teacher on.
             continue
-        cand = (phrase, score, m)
-        if best is None or cand[:2] > best[:2]:
+        cand = (phrase, alias, score, m)
+        if best is None or cand[:3] > best[:3]:
             best = cand
-    return best[2] if best else None
+    return best[3] if best else None
 
 
 def professors_summary(maestri: list[Maestro], limit: int = 26) -> str:
