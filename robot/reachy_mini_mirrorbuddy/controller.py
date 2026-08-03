@@ -121,14 +121,26 @@ class Controller:
             return
         if event == presence.ARRIVED:
             client.speak_now(
-                "Lo studente si e' appena seduto davanti a te: salutalo brevemente per nome "
-                "e chiedi da cosa vuole partire. Una frase soltanto."
+                "Lo studente si e' appena seduto davanti a te: salutalo brevemente "
+                f"{self._name_clause()} e chiedi da cosa vuole partire. Una frase soltanto."
             )
         elif event == presence.RETURNED:
             client.speak_now(
-                "Lo studente e' tornato dopo una pausa: fai un bentornato molto breve e "
-                "riprendi da dove eravate. Una frase soltanto."
+                f"Lo studente e' tornato dopo una pausa: fai un bentornato molto breve "
+                f"{self._name_clause()} e riprendi da dove eravate. Una frase soltanto."
             )
+
+    def _name_clause(self) -> str:
+        """How to address the child — never an open invitation to invent a name.
+
+        "Greet him by name" without supplying one is exactly how the robot ended up
+        calling Mario "Luca". If we don't have a usable name (the server encrypts
+        names, and a decryption miss puts ciphertext on the wire), we say so.
+        """
+        name = (self.cfg.STUDENT_NAME or "").strip()
+        if name and not name.startswith(("pii:", "[")):
+            return f"chiamandolo per nome ({name})"
+        return "senza usare nomi propri"
 
     # ------------------------------------------------------------------ expression
     def _on_speech_started(self) -> None:

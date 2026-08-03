@@ -89,3 +89,30 @@ class TestComingBack:
     def test_away_for_is_zero_while_present(self, tracker):
         feed(tracker, True, 0.0, 2.0)
         assert tracker.away_for(5.0) == 0.0
+
+
+class TestHowTheGreetingAddressesTheChild:
+    """Being called by a stranger's name is a small betrayal a child remembers."""
+
+    @staticmethod
+    def _clause(name):
+        from reachy_mini_mirrorbuddy.controller import Controller
+
+        c = Controller.__new__(Controller)
+        c.cfg = type("Cfg", (), {"STUDENT_NAME": name})()
+        return c._name_clause()
+
+    def test_a_known_name_is_handed_to_the_model(self):
+        assert "Mario" in self._clause("Mario")
+
+    def test_no_name_means_an_explicit_ban_on_inventing_one(self):
+        clause = self._clause(None)
+        assert "senza usare nomi" in clause
+
+    def test_ciphertext_never_reaches_the_greeting(self):
+        clause = self._clause("pii:v1:yO6kRLN95WvcdZfsME")
+        assert "pii" not in clause
+        assert "senza usare nomi" in clause
+
+    def test_a_failed_decryption_placeholder_is_refused(self):
+        assert "senza usare nomi" in self._clause("[decryption-failed]")

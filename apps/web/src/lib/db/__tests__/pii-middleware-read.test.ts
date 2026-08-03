@@ -366,3 +366,69 @@ describe('Error Handling', () => {
     expect(result.email).toBe('[decryption-failed]');
   });
 });
+
+/**
+ * Regression: the robot asked "who am I tutoring?" via RobotDevice.findUnique with
+ * the child's profile included, and got back `pii:v1:...` instead of "Mario" —
+ * so it greeted him by an invented name. RobotDevice itself holds no PII, and the
+ * decryptor gave up before it ever looked at the relations it was carrying.
+ */
+describe('PII decryption reaches nested relations', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const deviceWithChild = () =>
+    vi.fn(() =>
+      Promise.resolve({
+        id: 'device1',
+        tokenHash: 'abc',
+        user: {
+          id: 'user1',
+          email: 'pii:v1:encrypted_parent@example.com',
+          profile: { id: 'p1', name: 'pii:v1:encrypted_Mario', preferredCoach: 'andrea' },
+        },
+      }),
+    );
+
+  it('decrypts a nested profile even when the root model has no PII of its own', async () => {
+    const middleware = createPIIMiddleware() as any;
+
+    const result = await middleware.query.$allModels.findUnique({
+      model: 'RobotDevice',
+      operation: 'findUnique',
+      args: { where: { tokenHash: 'abc' } },
+      query: deviceWithChild(),
+    });
+
+    expect(result.user.profile.name).toBe('Mario');
+    expect(result.user.email).toBe('parent@example.com');
+  });
+
+  it('leaves non-PII fields of the nested record untouched', async () => {
+    const middleware = createPIIMiddleware() as any;
+
+    const result = await middleware.query.$allModels.findUnique({
+      model: 'RobotDevice',
+      operation: 'findUnique',
+      args: { where: { tokenHash: 'abc' } },
+      query: deviceWithChild(),
+    });
+
+    expect(result.user.profile.preferredCoach).toBe('andrea');
+    expect(result.id).toBe('device1');
+  });
+
+  it('handles a PII-free root with no relations at all', async () => {
+    const middleware = createPIIMiddleware() as any;
+
+    const result = await middleware.query.$allModels.findMany({
+      model: 'RobotDevice',
+      operation: 'findMany',
+      args: {},
+      query: vi.fn(() => Promise.resolve([{ id: 'device1' }, { id: 'device2' }])),
+    });
+
+    expect(result).toEqual([{ id: 'device1' }, { id: 'device2' }]);
+  });
+});

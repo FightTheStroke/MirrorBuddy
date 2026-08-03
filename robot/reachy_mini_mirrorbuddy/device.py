@@ -73,10 +73,26 @@ def _dsa_from_accessibility(acc: dict[str, Any]) -> str | None:
     return None
 
 
+def _usable_name(name: str | None) -> bool:
+    """Is this a name a child would recognise being called by?
+
+    The server encrypts names at rest, and a decryption miss can put ciphertext or a
+    placeholder on the wire. Feeding that to the model does not produce silence — it
+    produces a *confident invented name*, which is worse than using none at all.
+    """
+    if not name:
+        return False
+    n = name.strip()
+    return bool(n) and not n.startswith("pii:") and not n.startswith("[")
+
+
 def apply_device_profile(config, profile: DeviceProfile) -> None:
     """Overlay a paired child's profile onto the runtime config (in place)."""
     if profile.name:
-        config.STUDENT_NAME = profile.name
+        if _usable_name(profile.name):
+            config.STUDENT_NAME = profile.name
+        else:
+            logger.warning("Ignoring unreadable name from paired profile; keeping local name.")
     if profile.language:
         config.LOCALE = profile.language
     dsa = _dsa_from_accessibility(profile.accessibility)

@@ -109,3 +109,24 @@ class TestPersonaFollowsTheChildsChoice:
     def test_preferred_coach_is_parsed_from_the_api_payload(self):
         p = DeviceProfile.from_json({"preferredCoach": "andrea"})
         assert p.preferred_coach == "andrea"
+
+
+class TestUnreadableNames:
+    """The server encrypts names; ciphertext on the wire must not reach the child."""
+
+    def test_ciphertext_is_not_adopted_as_a_name(self):
+        cfg = _FakeConfig()
+        cfg.STUDENT_NAME = "Mario"
+        apply_device_profile(cfg, DeviceProfile(name="pii:v1:yO6kRLN95WvcdZfsME"))
+        assert cfg.STUDENT_NAME == "Mario"
+
+    def test_decryption_placeholder_is_not_adopted_either(self):
+        cfg = _FakeConfig()
+        cfg.STUDENT_NAME = "Mario"
+        apply_device_profile(cfg, DeviceProfile(name="[decryption-failed]"))
+        assert cfg.STUDENT_NAME == "Mario"
+
+    def test_a_real_name_is_still_applied(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(name="Noemi"))
+        assert cfg.STUDENT_NAME == "Noemi"
