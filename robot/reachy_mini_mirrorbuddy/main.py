@@ -22,6 +22,7 @@ from .config import config
 from .controller import Controller
 from .mirrorbuddy_client import MirrorBuddyClient, neutral_buddy
 from .movements import Movements, temperament_for
+from .startup import wait_for_config
 
 logger = logging.getLogger(__name__)
 
@@ -71,13 +72,16 @@ def run(
             logger.warning("Failed to mount settings UI: %s", e)
 
     # Wait for required configuration (Azure creds) if a settings UI is available.
+    # The wait MUST stay interruptible: the daemon asks the app to stop by setting
+    # app_stop_event, and an app that ignores it hangs in "stopping" forever — which
+    # then blocks every other app on the robot from starting.
     missing = config.missing()
     if missing:
         if settings_app is not None:
             logger.info("Waiting for configuration via settings UI: %s", ", ".join(missing))
-            while config.missing():
-                time.sleep(0.5)
-                config.reload()
+            if not wait_for_config(config, app_stop_event):
+                logger.info("Stop requested while waiting for configuration; exiting.")
+                return
         else:
             logger.error("Missing required configuration: %s", ", ".join(missing))
             sys.exit(1)
