@@ -160,7 +160,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie": "^1.1.1",
-    "dompurify": "^3.4.11",
+    "dompurify": "^3.4.12",
     "framer-motion": "^12.23.26",
     "function-plot": "^1.25.3",
     "fuse.js": "^7.1.0",
