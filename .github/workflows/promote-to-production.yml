@@ -89,6 +89,12 @@ jobs:
           fi
           echo "✅ Staging is healthy (HTTP $status)"
 
+      # The check below imports `pg`, which only exists once the workspace is
+      # installed. Without this step the gate fails on a missing module and
+      # looks exactly like real schema drift.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Verify database schema is up to date
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -101,7 +107,7 @@ jobs:
             echo "::error::DIRECT_URL secret is not set — cannot verify schema drift"
             exit 1
           fi
-          pnpm dlx tsx scripts/check-migrations-applied.ts
+          pnpm exec tsx scripts/check-migrations-applied.ts
 
       - name: Promote to Production
         id: promote
