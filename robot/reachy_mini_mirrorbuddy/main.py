@@ -63,11 +63,15 @@ def _set_system_volume(config) -> None:
         except Exception:
             pass
 
-        httpx.post(
+        resp = httpx.post(
             f"{config.DAEMON_URL}/api/volume/set",
             json={"volume": target},
             timeout=5.0,
         )
+        # httpx does not raise on 4xx/5xx: without this check a rejected request
+        # would be reported as a volume change that never happened, and the next
+        # person to debug "the robot is too quiet" would start from a false log.
+        resp.raise_for_status()
         logger.info("System volume set to %s", target)
     except Exception as e:
         logger.warning("Could not set system volume: %s", e)

@@ -12,7 +12,8 @@ import json
 import pytest
 
 from reachy_mini_mirrorbuddy import rt_messages
-from reachy_mini_mirrorbuddy.azure_realtime import _FAST_PATH_MIN_SPEECH_S, AzureRealtimeClient
+from reachy_mini_mirrorbuddy.azure_realtime import AzureRealtimeClient
+from reachy_mini_mirrorbuddy.rt_events import _FAST_PATH_MIN_SPEECH_S
 
 
 class FakeClock:
@@ -39,7 +40,7 @@ def client(monkeypatch):
 
     c._safe_send = capture
     clock = FakeClock()
-    monkeypatch.setattr("reachy_mini_mirrorbuddy.azure_realtime.time.monotonic", clock)
+    monkeypatch.setattr("reachy_mini_mirrorbuddy.rt_events.time.monotonic", clock)
     c.clock = clock
     return c
 

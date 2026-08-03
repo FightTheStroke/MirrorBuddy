@@ -197,8 +197,11 @@ def resolve_maestro(maestri: list[Maestro], query: str) -> Maestro | None:
         phrase = 1 if q in hay else 0
         alias = _alias_hit(m, q)
         score = sum(1 for t in tokens if t in hay)
-        if not phrase and not alias and score < len(tokens):
-            # Partial overlap only: not good enough to switch teacher on.
+        # No phrase, no alias, and nothing meaningful matched: a query like "ai" has
+        # no tokens at all, and `score < len(tokens)` would read 0 < 0 and quietly
+        # elect the first professor in the roster. Switching a child's teacher on
+        # noise is worse than doing nothing.
+        if not phrase and not alias and (not tokens or score < len(tokens)):
             continue
         cand = (phrase, alias, score, m)
         if best is None or cand[:3] > best[:3]:

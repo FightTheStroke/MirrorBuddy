@@ -73,6 +73,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
                 "paired": bool(config.DEVICE_TOKEN),
                 "bargeRms": config.BARGE_RMS_THRESHOLD,
                 "outputGain": config.OUTPUT_GAIN,
+                "volume": config.VOLUME,
                 "bargeFrames": config.BARGE_SUSTAIN_FRAMES,
             }
         )

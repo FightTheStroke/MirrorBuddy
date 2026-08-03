@@ -15,6 +15,8 @@ Two ideas here:
 
 from __future__ import annotations
 
+import math
+
 import re
 from dataclasses import dataclass
 
@@ -121,3 +123,21 @@ def infer(text: str | None) -> Emotion:
         if any(_matches(cue, lowered) for cue in cues):
             return emotion
     return NEUTRAL
+
+
+def blend_mood(mood: dict[str, float], target: "Emotion", tau: float, dt: float) -> dict[str, float]:
+    """Ease the live mood values toward ``target`` in place, and return them.
+
+    Moods are never applied as a jump: a child watching should see Buddy *become*
+    happy over a beat, the way a face changes, not switch posture between frames.
+    """
+    alpha = 1.0 if tau <= 0.0 else 1.0 - math.exp(-dt / tau)
+    for key, want in (
+        ("scale", target.scale),
+        ("speed", target.speed),
+        ("pitch", target.pitch_offset),
+        ("antenna", target.antenna_offset),
+        ("sway", target.sway),
+    ):
+        mood[key] += (want - mood[key]) * alpha
+    return mood

@@ -62,3 +62,23 @@ def test_status_is_served(client: TestClient) -> None:
     r = client.get("/api/status")
     assert r.status_code == 200
     assert "outputGain" in r.json()
+
+
+def test_status_exposes_the_speaker_volume(client: TestClient) -> None:
+    """A parent tuning loudness needs the mixer value, not only the software gain."""
+    body = client.get("/api/status").json()
+    assert "volume" in body
+
+
+def test_speaker_volume_can_be_saved(client: TestClient, tmp_path: Path) -> None:
+    r = client.post("/api/config", json={"MIRRORBUDDY_VOLUME": "70"})
+    assert r.status_code == 200, r.text
+    assert "MIRRORBUDDY_VOLUME=70" in (tmp_path / ".env").read_text()
+
+
+def test_the_settings_page_offers_the_speaker_volume_control() -> None:
+    """Exposed in the payload but absent from the form would still be unreachable."""
+    from reachy_mini_mirrorbuddy.settings_page import PAGE
+
+    assert 'id="MIRRORBUDDY_VOLUME"' in PAGE
+    assert "MIRRORBUDDY_VOLUME" in PAGE.split("const ids=")[1][:400]

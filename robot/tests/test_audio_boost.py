@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from reachy_mini_mirrorbuddy.audio_io import _boost
+from reachy_mini_mirrorbuddy.audio_dsp import boost as _boost
 
 
 def test_boost_makes_speech_louder() -> None:

@@ -73,3 +73,18 @@ class TestNoGuessing:
 
     def test_empty_roster(self):
         assert resolve_maestro([], "matematica") is None
+
+
+class TestNoiseNeverSwitchesTeacher:
+    """Silence is the right answer when the child said nothing matchable."""
+
+    def test_a_query_of_only_short_words_matches_nobody(self):
+        # No token survives the length filter, so nothing can legitimately match.
+        assert resolve_maestro(ROSTER, "ai") is None
+        assert resolve_maestro(ROSTER, "e la") is None
+
+    def test_an_unrelated_word_matches_nobody(self):
+        assert resolve_maestro(ROSTER, "frigorifero") is None
+
+    def test_real_requests_still_resolve(self):
+        assert resolve_maestro(ROSTER, "scienze motorie").id == "simone"
