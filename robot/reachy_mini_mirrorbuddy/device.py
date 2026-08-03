@@ -73,19 +73,44 @@ def _dsa_from_accessibility(acc: dict[str, Any]) -> str | None:
     return None
 
 
+def _usable_name(name: str | None) -> bool:
+    """Is this a name a child would recognise being called by?
+
+    The server encrypts names at rest, and a decryption miss can put ciphertext or a
+    placeholder on the wire. Feeding that to the model does not produce silence — it
+    produces a *confident invented name*, which is worse than using none at all.
+    """
+    if not name:
+        return False
+    n = name.strip()
+    return bool(n) and not n.startswith("pii:") and not n.startswith("[")
+
+
 def apply_device_profile(config, profile: DeviceProfile) -> None:
     """Overlay a paired child's profile onto the runtime config (in place)."""
     if profile.name:
-        config.STUDENT_NAME = profile.name
+        if _usable_name(profile.name):
+            config.STUDENT_NAME = profile.name
+        else:
+            logger.warning("Ignoring unreadable name from paired profile; keeping local name.")
     if profile.language:
         config.LOCALE = profile.language
     dsa = _dsa_from_accessibility(profile.accessibility)
     if dsa:
         config.DSA_PROFILE = dsa
+    # The child already chose who should help them, in the app. Booting as a generic
+    # assistant and making them ask again throws that choice away — so the paired
+    # coach is who the robot wakes up as. The buddy is the fallback; an explicit
+    # local MAESTRO_ID always wins, because someone set that on this robot on purpose.
+    preferred = profile.preferred_coach or profile.preferred_buddy
+    if preferred and not config.MAESTRO_ID:
+        config.MAESTRO_ID = preferred
+        config.START_NEUTRAL = False
     # Reduced-motion is accessibility-critical: keep the robot calm for this child.
     if profile.accessibility.get("reducedMotion"):
         config.CALM_MOVEMENT = True
     logger.info(
-        "Applied paired profile: name=%s locale=%s dsa=%s calm=%s",
+        "Applied paired profile: name=%s locale=%s dsa=%s calm=%s persona=%s",
         config.STUDENT_NAME, config.LOCALE, config.DSA_PROFILE, config.CALM_MOVEMENT,
+        config.MAESTRO_ID or "(neutral buddy)",
     )

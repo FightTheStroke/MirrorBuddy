@@ -15,8 +15,7 @@ from collections.abc import Callable
 import websockets
 
 from . import rt_messages
-from . import session_flow
-from . import tools
+from .rt_events import RealtimeEventsMixin
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ def _ws_major() -> int:
         return 0
 
 
-class AzureRealtimeClient:
+class AzureRealtimeClient(RealtimeEventsMixin):
     def __init__(
         self,
         ws_url: str,
@@ -74,6 +73,8 @@ class AzureRealtimeClient:
         self._responding = False  # a model response is currently streaming
         self._suppress = False  # drop in-flight audio after a barge-in cancel
         self._quiet = False  # student asked for silence: keep model muted
+        self._speech_started_at = 0.0  # monotonic time the student began this turn
+        self._fast_requested = False  # response already asked for before the transcript
         self._asleep = False  # session ended: stay muted until the wake word
         self._sleep_after = False  # go to sleep once the farewell response finishes
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
@@ -111,6 +112,17 @@ class AzureRealtimeClient:
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
         self._enqueue(json.dumps({"type": "response.create"}))
 
+    def speak_now(self, instructions: str) -> None:
+        """Ask the model to say something on its own initiative (thread-safe).
+
+        Used when the world changed rather than the conversation: the student sat
+        down, or came back. Refused while asleep or muted — "zitto" outranks
+        anything the robot noticed by itself.
+        """
+        if self._asleep or self._quiet or self._responding:
+            return
+        self._enqueue(json.dumps(rt_messages.response_create(instructions)))
+
     def local_barge_in(self) -> None:
         """On-device barge-in (called from the mic thread when a real voice is heard
         over Buddy's speech). Drops in-flight model audio immediately and asks the
@@ -120,6 +132,7 @@ class AzureRealtimeClient:
         self._suppress = True  # drop any audio deltas already in flight
         self._quiet = False  # a normal turn stays un-muted; a stop word re-mutes below
         if self._responding:
+            self._responding = False  # one CANCEL per response: avoid a pile-up of no-op cancels
             self._enqueue(rt_messages.CANCEL)
 
     def _enqueue(self, msg: str) -> None:
@@ -188,132 +201,3 @@ class AzureRealtimeClient:
     async def _request_response(self, instructions: str | None = None) -> None:
         """Ask the model to speak now, optionally steering what it should say."""
         await self._safe_send(json.dumps(rt_messages.response_create(instructions)))
-
-    async def _handle_event(self, event: dict) -> None:
-        etype = event.get("type", "")
-
-        if etype in ("session.created", "session.updated"):
-            if not self._ready.is_set():
-                self._ready.set()
-                if self.on_ready:
-                    _safe_cb(self.on_ready)
-                await self._greet()
-            return
-
-        if etype in ("response.output_audio.delta", "response.audio.delta"):
-            if self._suppress:
-                return  # dropped: user barged in, this response is being cancelled
-            b64 = event.get("delta") or event.get("audio")
-            if b64 and self.on_output_audio:
-                _safe_cb(self.on_output_audio, base64.b64decode(b64))
-            return
-
-        if etype == "response.created":
-            if self._quiet or self._asleep:
-                await self._safe_send(rt_messages.CANCEL)
-                self._suppress = True
-                return
-            if self._pending_farewell:  # the goodbye is now starting → sleep once it's done
-                self._pending_farewell = False
-                self._sleep_after = True
-            self._responding = True
-            self._suppress = False
-            return
-        if etype == "response.done":
-            self._responding = False
-            if self._sleep_after:  # farewell just finished → go to sleep
-                self._sleep_after = False
-                self._asleep = True
-                if self.on_sleep:
-                    _safe_cb(self.on_sleep)
-            return
-
-        # Student's speech transcribed: honour stop / end / wake intents deterministically.
-        if etype.endswith("input_audio_transcription.completed"):
-            text = (event.get("transcript") or "").strip()
-            if not text:
-                return
-            action = session_flow.decide(text, self._asleep)
-            if action == session_flow.IGNORE:
-                return
-            if action == session_flow.WAKE:
-                self._asleep = self._quiet = False
-                if self.on_wake:
-                    _safe_cb(self.on_wake)
-                await self._request_response(rt_messages.WAKE_INSTR)
-                return
-            if action == session_flow.END:
-                self._pending_farewell = True
-                self._suppress = False
-                if self._responding:
-                    await self._safe_send(rt_messages.CANCEL)
-                await self._request_response(rt_messages.FAREWELL_INSTR)
-                return
-            if action == session_flow.STOP:
-                # "basta / fermati" → go quiet AND park in a rest posture, staying put
-                # until called back by name. Insistence stresses the child, so a stop is
-                # a full stop, not a brief pause that resumes on the next sound.
-                self._asleep = True
-                self._quiet = True
-                self._suppress = True
-                if self._responding:
-                    await self._safe_send(rt_messages.CANCEL)
-                if self.on_speech_started:
-                    _safe_cb(self.on_speech_started)  # flush local playback now
-                if self.on_sleep:
-                    _safe_cb(self.on_sleep)  # settle into the rest position
-                return
-            if action == session_flow.SPEAK:
-                # The server no longer auto-creates a response (create_response=False),
-                # so we ask for one only once we've classified the turn as ordinary.
-                # This guarantees a stop/sleep word never produces a spoken reply.
-                await self._request_response()
-            return
-
-        # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
-        if etype == "input_audio_buffer.speech_started":
-            if self._asleep:
-                return  # ignore ambient speech while asleep; wake word handles it
-            self._suppress = True
-            self._quiet = False
-            if self._responding:
-                await self._safe_send(rt_messages.CANCEL)
-            if self.on_speech_started:
-                _safe_cb(self.on_speech_started)
-            return
-
-        if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):
-            text = event.get("transcript") or ""
-            if text and self.on_transcript:
-                _safe_cb(self.on_transcript, text, True)
-            return
-
-        if etype == "response.output_item.added":
-            item = event.get("item") or {}
-            if item.get("type") == "function_call":
-                cid = item.get("call_id") or item.get("id") or ""
-                if cid:
-                    self._fc_names[cid] = item.get("name") or ""
-            return
-
-        if etype == "response.function_call_arguments.done":
-            call_id = event.get("call_id") or ""
-            name, args = tools.parse_call_arguments(event, self._fc_names.get(call_id, ""))
-            self._fc_names.pop(call_id, None)
-            logger.info("Tool call: %s(%s) call_id=%s", name, args, call_id)
-            if name and self.on_tool_call:
-                _safe_cb(self.on_tool_call, name, args, call_id)
-            return
-
-        if etype == "error":
-            logger.error("Azure Realtime error event: %s", json.dumps(event.get("error", event)))
-            return
-
-        logger.debug("Unhandled event: %s", etype)
-
-
-def _safe_cb(cb: Callable, *args) -> None:
-    try:
-        cb(*args)
-    except Exception as e:  # pragma: no cover
-        logger.debug("callback error: %s", e)

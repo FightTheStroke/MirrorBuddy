@@ -9,59 +9,18 @@
 from __future__ import annotations
 
 import logging
-import os
 import threading
 import time
 from collections.abc import Callable
 
 import numpy as np
-from math import gcd
-from scipy.signal import resample_poly
 
+from .audio_dsp import boost, resample
 from .azure_realtime import SAMPLE_RATE
 
 logger = logging.getLogger(__name__)
 
-# On-device ("local") barge-in. The Reachy Mini mic array is echo-cancelled in
-# hardware (AEC removes the robot's own speaker audio from the mic), so energy on the
-# mic *while Buddy is speaking* means a real nearby voice — not the robot hearing
-# itself. That lets us cut playback the instant the child speaks, without waiting for
-# the server's ``speech_started`` round-trip (~200-400ms). The server path (cancel +
-# stop/sleep classification) still runs a moment later. Thresholds are env-tunable so
-# they can be adjusted in the field without a redeploy.
-_DEFAULT_BARGE_RMS_THRESHOLD = 0.045  # normalised 0..1
-_DEFAULT_BARGE_SUSTAIN_FRAMES = 3  # consecutive loud frames
 _PLAY_TTL_S = 0.25  # treat Buddy as "speaking" for this long after the last audio chunk
-
-
-def _barge_rms_threshold() -> float:
-    """Read the barge-in RMS threshold from the env at call time.
-
-    Read lazily (not at import) so values saved in the robot's ``.env`` — which
-    ``main.run()`` loads *after* this module is imported — take effect.
-    """
-    try:
-        return float(os.getenv("MIRRORBUDDY_BARGE_RMS", _DEFAULT_BARGE_RMS_THRESHOLD))
-    except (TypeError, ValueError):
-        return _DEFAULT_BARGE_RMS_THRESHOLD
-
-
-def _barge_sustain_frames() -> int:
-    """Read the barge-in sustain-frame count from the env at call time."""
-    try:
-        return max(1, int(os.getenv("MIRRORBUDDY_BARGE_FRAMES", _DEFAULT_BARGE_SUSTAIN_FRAMES)))
-    except (TypeError, ValueError):
-        return _DEFAULT_BARGE_SUSTAIN_FRAMES
-
-
-def _resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
-    """Low-latency polyphase resampling (faster + cleaner than FFT resample)."""
-    if src_rate == dst_rate or audio.size == 0:
-        return audio
-    g = gcd(src_rate, dst_rate)
-    up = dst_rate // g
-    down = src_rate // g
-    return resample_poly(audio, up, down)
 
 
 class AudioIO:
@@ -75,6 +34,7 @@ class AudioIO:
         on_local_barge_in: Callable[[], None] | None = None,
         barge_rms_threshold: float | None = None,
         barge_sustain_frames: int | None = None,
+        output_gain: float = 1.0,
     ) -> None:
         self.robot = robot
         self.on_input_pcm16 = on_input_pcm16
@@ -94,11 +54,18 @@ class AudioIO:
         # Barge-in thresholds: prefer values passed by the caller (from Config, read
         # after the instance .env loads); fall back to the env/defaults for standalone use.
         self._barge_rms_threshold = (
-            barge_rms_threshold if barge_rms_threshold is not None else _barge_rms_threshold()
+            barge_rms_threshold if barge_rms_threshold is not None else barge_rms_threshold()
         )
         self._barge_sustain_frames = (
-            barge_sustain_frames if barge_sustain_frames is not None else _barge_sustain_frames()
+            barge_sustain_frames if barge_sustain_frames is not None else barge_sustain_frames()
         )
+        # Software make-up gain on Buddy's voice, on top of the system volume. The
+        # robot speaker is small: in a room with a child around, the hardware maximum
+        # alone is often not enough to be comfortably intelligible.
+        self.output_gain = max(0.1, min(8.0, float(output_gain)))
+        # A louder voice also leaks more into the mic, so the barge-in threshold has
+        # to rise with it — otherwise Buddy's own speech would cut Buddy off.
+        self._barge_rms_threshold *= max(1.0, self.output_gain / 1.6)
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
@@ -168,8 +135,10 @@ class AudioIO:
             self._probe_rates()
             out_rate = self._out_rate or SAMPLE_RATE
         if out_rate != SAMPLE_RATE and audio.size:
-            audio = _resample(audio, SAMPLE_RATE, out_rate)
+            audio = resample(audio, SAMPLE_RATE, out_rate)
         audio_f32 = (np.asarray(audio, dtype=np.float32)) / 32768.0
+        if self.output_gain != 1.0 and audio_f32.size:
+            audio_f32 = boost(audio_f32, self.output_gain)
         try:
             self.robot.media.push_audio_sample(audio_f32)
         except Exception as e:
@@ -239,7 +208,7 @@ class AudioIO:
 
                 # Resample microphone -> realtime rate.
                 if needs_resample and audio.size:
-                    audio = _resample(audio, in_rate, SAMPLE_RATE).astype(np.int16)
+                    audio = resample(audio, in_rate, SAMPLE_RATE).astype(np.int16)
 
                 self.on_input_pcm16(audio.tobytes())
             except Exception as e:

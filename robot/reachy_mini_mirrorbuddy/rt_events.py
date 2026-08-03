@@ -1,0 +1,198 @@
+"""Handling of Azure Realtime protocol events.
+
+Split from the connection itself: :mod:`azure_realtime` owns the socket, the
+thread and the sending side; this is the reading side — what each event from the
+model means for a child in the room, which is where all the judgement calls live
+(when to stop talking, when to answer without waiting, what counts as silence).
+"""
+
+from __future__ import annotations
+
+import base64
+import json
+import logging
+import time
+from collections.abc import Callable
+
+from . import rt_messages, session_flow, tools
+
+logger = logging.getLogger(__name__)
+
+# How long an utterance must be before we answer without waiting for its transcript.
+# Sized against the phrases that must never produce a reply — "zitto", "basta",
+# "fermati", "hey buddy" — spoken slowly by a child with a motor impairment. Above
+# this, a turn cannot be a bare stop word, so the transcript adds latency and nothing
+# else. Any stop word inside a longer sentence is still caught: the transcript lands a
+# moment later and cancels the response in flight.
+_FAST_PATH_MIN_SPEECH_S = 1.8
+
+
+def _safe_cb(cb: Callable, *args) -> None:
+    try:
+        cb(*args)
+    except Exception as e:  # pragma: no cover
+        logger.debug("callback error: %s", e)
+
+
+class RealtimeEventsMixin:
+    """Event handling for :class:`~reachy_mini_mirrorbuddy.azure_realtime.AzureRealtimeClient`."""
+
+    async def _handle_event(self, event: dict) -> None:
+        etype = event.get("type", "")
+
+        if etype in ("session.created", "session.updated"):
+            if not self._ready.is_set():
+                self._ready.set()
+                if self.on_ready:
+                    _safe_cb(self.on_ready)
+                await self._greet()
+            return
+
+        if etype in ("response.output_audio.delta", "response.audio.delta"):
+            if self._suppress:
+                return  # dropped: user barged in, this response is being cancelled
+            b64 = event.get("delta") or event.get("audio")
+            if b64 and self.on_output_audio:
+                _safe_cb(self.on_output_audio, base64.b64decode(b64))
+            return
+
+        if etype == "response.created":
+            if self._quiet or self._asleep:
+                await self._safe_send(rt_messages.CANCEL)
+                self._suppress = True
+                return
+            if self._pending_farewell:  # the goodbye is now starting → sleep once it's done
+                self._pending_farewell = False
+                self._sleep_after = True
+            self._responding = True
+            self._suppress = False
+            return
+        if etype == "response.done":
+            self._responding = False
+            if self._sleep_after:  # farewell just finished → go to sleep
+                self._sleep_after = False
+                self._asleep = True
+                if self.on_sleep:
+                    _safe_cb(self.on_sleep)
+            return
+
+        # Student's speech transcribed: honour stop / end / wake intents deterministically.
+        if etype.endswith("input_audio_transcription.completed"):
+            text = (event.get("transcript") or "").strip()
+            if not text:
+                return
+            action = session_flow.decide(text, self._asleep)
+            if action == session_flow.IGNORE:
+                return
+            if action == session_flow.WAKE:
+                self._asleep = self._quiet = False
+                if self.on_wake:
+                    _safe_cb(self.on_wake)
+                await self._request_response(rt_messages.WAKE_INSTR)
+                return
+            if action == session_flow.END:
+                self._pending_farewell = True
+                self._suppress = False
+                if self._responding or self._fast_requested:
+                    await self._safe_send(rt_messages.CANCEL)
+                await self._request_response(rt_messages.FAREWELL_INSTR)
+                return
+            if action == session_flow.STOP:
+                # "basta / fermati" → go quiet AND park in a rest posture, staying put
+                # until called back by name. Insistence stresses the child, so a stop is
+                # a full stop, not a brief pause that resumes on the next sound.
+                self._asleep = True
+                self._quiet = True
+                self._suppress = True
+                # Also cancels a fast-path response requested before the transcript
+                # arrived: "zitto" must win even when it ends a long sentence.
+                if self._responding or self._fast_requested:
+                    await self._safe_send(rt_messages.CANCEL)
+                if self.on_speech_started:
+                    _safe_cb(self.on_speech_started)  # flush local playback now
+                if self.on_sleep:
+                    _safe_cb(self.on_sleep)  # settle into the rest position
+                return
+            if action == session_flow.SPEAK:
+                # Ordinary turn. If the fast path already asked for the response when
+                # speech ended, asking again would make Buddy answer twice.
+                if not self._fast_requested:
+                    await self._request_response()
+            return
+
+        # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
+        if etype == "input_audio_buffer.speech_started":
+            if self._asleep:
+                return  # ignore ambient speech while asleep; wake word handles it
+            self._suppress = True
+            self._quiet = False
+            self._speech_started_at = time.monotonic()
+            self._fast_requested = False
+            if self._responding:
+                await self._safe_send(rt_messages.CANCEL)
+            if self.on_speech_started:
+                _safe_cb(self.on_speech_started)
+            return
+
+        if etype == "input_audio_buffer.speech_stopped":
+            # The server no longer auto-creates responses, so we normally wait for the
+            # transcript before asking for one — that is a whole extra Whisper pass in
+            # series on every single turn, and the child feels every millisecond of it.
+            #
+            # We only need the transcript to catch "zitto"/"basta"/"buddy", and those
+            # are always brief. So a clearly long utterance can't be one: ask for the
+            # answer straight away. Anything short keeps the safe, slower path.
+            if self._asleep or self._quiet:
+                return
+            spoken = time.monotonic() - self._speech_started_at
+            if self._speech_started_at and spoken >= _FAST_PATH_MIN_SPEECH_S:
+                self._fast_requested = True
+                await self._request_response()
+            return
+
+        if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
+            # The final transcript only lands once the sentence is already spoken —
+            # far too late to colour the body language. The opening words carry the
+            # mood ("Bravo!", "Fammi pensare..."), so react to the first delta.
+            delta = event.get("delta") or ""
+            if delta and self.on_transcript:
+                _safe_cb(self.on_transcript, delta, False)
+            return
+
+        if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):
+            text = event.get("transcript") or ""
+            if text and self.on_transcript:
+                _safe_cb(self.on_transcript, text, True)
+            return
+
+        if etype == "response.output_item.added":
+            item = event.get("item") or {}
+            if item.get("type") == "function_call":
+                cid = item.get("call_id") or item.get("id") or ""
+                if cid:
+                    self._fc_names[cid] = item.get("name") or ""
+            return
+
+        if etype == "response.function_call_arguments.done":
+            call_id = event.get("call_id") or ""
+            name, args = tools.parse_call_arguments(event, self._fc_names.get(call_id, ""))
+            self._fc_names.pop(call_id, None)
+            logger.info("Tool call: %s(%s) call_id=%s", name, args, call_id)
+            if name and self.on_tool_call:
+                _safe_cb(self.on_tool_call, name, args, call_id)
+            return
+
+        if etype == "error":
+            err = event.get("error", event)
+            # Benign race: we ask to cancel the response the instant the child speaks
+            # over Buddy, but the response may have finished on its own just before the
+            # CANCEL lands. Nothing is broken, so it must not look like a failure in
+            # the logs — real errors have to stay visible.
+            if isinstance(err, dict) and err.get("code") == "response_cancel_not_active":
+                self._responding = False
+                logger.debug("Cancel arrived after the response ended (harmless)")
+                return
+            logger.error("Azure Realtime error event: %s", json.dumps(err))
+            return
+
+        logger.debug("Unhandled event: %s", etype)

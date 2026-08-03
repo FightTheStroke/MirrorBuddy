@@ -59,6 +59,20 @@ PAGE = """<!doctype html>
  <option value="0.045">Media (consigliata)</option>
  <option value="0.060">Bassa — serve una voce più decisa (ambienti rumorosi)</option>
 </select>
+<label>Volume dell'altoparlante</label>
+<select id="MIRRORBUDDY_VOLUME">
+ <option value="70">Basso</option>
+ <option value="85">Medio</option>
+ <option value="92">Alto (consigliato)</option>
+ <option value="100">Massimo</option>
+</select>
+<label>Volume della voce di Buddy</label>
+<select id="MIRRORBUDDY_OUTPUT_GAIN">
+ <option value="1.6">Basso — stanza silenziosa</option>
+ <option value="3.2">Normale (consigliato)</option>
+ <option value="4.5">Alto — stanza rumorosa o ascolto difficoltoso</option>
+ <option value="6.0">Massimo</option>
+</select>
 <button onclick="save()">Salva</button>
 <p><small>La chiave Azure resta solo su questo robot (file .env locale).</small></p>
 <script>
@@ -72,6 +86,18 @@ async function load(){
  else{ps.className='status warn';ps.textContent='Non collegato a nessun profilo.';}
  for(const k of ['MIRRORBUDDY_DSA_PROFILE','MIRRORBUDDY_STUDENT_NAME']){
   if(s[k==='MIRRORBUDDY_DSA_PROFILE'?'dsaProfile':'studentName']) document.getElementById(k).value=s[k==='MIRRORBUDDY_DSA_PROFILE'?'dsaProfile':'studentName'];
+ }
+ if(typeof s.outputGain==='number'){
+  const sel=document.getElementById('MIRRORBUDDY_OUTPUT_GAIN');
+  let best=sel.options[0].value,bd=1e9;
+  for(const o of sel.options){const d=Math.abs(parseFloat(o.value)-s.outputGain);if(d<bd){bd=d;best=o.value;}}
+  sel.value=best;
+ }
+ if(typeof s.volume==='number'){
+  const sel=document.getElementById('MIRRORBUDDY_VOLUME');
+  let best=sel.options[0].value,bd=1e9;
+  for(const o of sel.options){const d=Math.abs(parseFloat(o.value)-s.volume);if(d<bd){bd=d;best=o.value;}}
+  sel.value=best;
  }
  if(typeof s.bargeRms==='number'){
   const sel=document.getElementById('MIRRORBUDDY_BARGE_RMS');
@@ -87,7 +113,7 @@ async function load(){
  }catch(e){}
 }
 async function save(){
- const ids=['AZURE_OPENAI_REALTIME_ENDPOINT','AZURE_OPENAI_REALTIME_API_KEY','AZURE_OPENAI_REALTIME_DEPLOYMENT','MIRRORBUDDY_MAESTRO_ID','MIRRORBUDDY_DSA_PROFILE','MIRRORBUDDY_STUDENT_NAME','MIRRORBUDDY_BARGE_RMS'];
+ const ids=['AZURE_OPENAI_REALTIME_ENDPOINT','AZURE_OPENAI_REALTIME_API_KEY','AZURE_OPENAI_REALTIME_DEPLOYMENT','MIRRORBUDDY_MAESTRO_ID','MIRRORBUDDY_DSA_PROFILE','MIRRORBUDDY_STUDENT_NAME','MIRRORBUDDY_BARGE_RMS','MIRRORBUDDY_OUTPUT_GAIN','MIRRORBUDDY_VOLUME'];
  const body={};ids.forEach(i=>{const v=document.getElementById(i).value.trim();if(v)body[i]=v;});
  const r=await (await fetch('./api/config',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)})).json();
  load();

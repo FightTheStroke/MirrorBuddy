@@ -123,11 +123,15 @@ export async function encryptPIIFields(
  * Failed fields get a placeholder value instead of crashing the entire query.
  */
 export async function decryptPIIFields(model: string, result: unknown): Promise<unknown> {
-  if (!result || !hasPIIFields(model)) {
+  if (!result) {
     return result;
   }
 
-  const piiFields = PII_FIELD_MAP[model];
+  // A model with no PII of its own can still be *carrying* someone's PII in an
+  // included relation — RobotDevice.findUnique({ include: { user: { profile } } })
+  // handed the robot an encrypted name, so it greeted the child by an invented one.
+  // Walk on, with an empty field list.
+  const piiFields = PII_FIELD_MAP[model] ?? [];
 
   // Handle array of results
   if (Array.isArray(result)) {

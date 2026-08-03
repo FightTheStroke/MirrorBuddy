@@ -19,6 +19,8 @@ class _FakeConfig:
     LOCALE = "it"
     DSA_PROFILE = "cerebral"
     CALM_MOVEMENT = False
+    MAESTRO_ID = ""
+    START_NEUTRAL = True
 
 
 def test_from_json_parses_fields():
@@ -70,3 +72,61 @@ def test_apply_keeps_config_when_profile_empty():
     apply_device_profile(cfg, DeviceProfile())
     assert cfg.STUDENT_NAME == "Existing"
     assert cfg.DSA_PROFILE == "cerebral"
+
+
+class TestPersonaFollowsTheChildsChoice:
+    """The child already picked a coach in the app; the robot should honour it."""
+
+    def test_chosen_coach_becomes_the_starting_persona(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(name="Mario", preferred_coach="andrea"))
+        assert cfg.MAESTRO_ID == "andrea"
+        assert cfg.START_NEUTRAL is False
+
+    def test_buddy_is_used_when_no_coach_was_chosen(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(preferred_buddy="sofia"))
+        assert cfg.MAESTRO_ID == "sofia"
+
+    def test_coach_wins_over_buddy(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(preferred_buddy="sofia", preferred_coach="melissa"))
+        assert cfg.MAESTRO_ID == "melissa"
+
+    def test_explicit_local_override_is_respected(self):
+        # Someone set MAESTRO_ID in .env on this robot on purpose: don't fight them.
+        cfg = _FakeConfig()
+        cfg.MAESTRO_ID = "galileo"
+        apply_device_profile(cfg, DeviceProfile(preferred_coach="andrea"))
+        assert cfg.MAESTRO_ID == "galileo"
+
+    def test_no_preference_leaves_the_neutral_buddy(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(name="Mario"))
+        assert cfg.MAESTRO_ID == ""
+        assert cfg.START_NEUTRAL is True
+
+    def test_preferred_coach_is_parsed_from_the_api_payload(self):
+        p = DeviceProfile.from_json({"preferredCoach": "andrea"})
+        assert p.preferred_coach == "andrea"
+
+
+class TestUnreadableNames:
+    """The server encrypts names; ciphertext on the wire must not reach the child."""
+
+    def test_ciphertext_is_not_adopted_as_a_name(self):
+        cfg = _FakeConfig()
+        cfg.STUDENT_NAME = "Mario"
+        apply_device_profile(cfg, DeviceProfile(name="pii:v1:yO6kRLN95WvcdZfsME"))
+        assert cfg.STUDENT_NAME == "Mario"
+
+    def test_decryption_placeholder_is_not_adopted_either(self):
+        cfg = _FakeConfig()
+        cfg.STUDENT_NAME = "Mario"
+        apply_device_profile(cfg, DeviceProfile(name="[decryption-failed]"))
+        assert cfg.STUDENT_NAME == "Mario"
+
+    def test_a_real_name_is_still_applied(self):
+        cfg = _FakeConfig()
+        apply_device_profile(cfg, DeviceProfile(name="Noemi"))
+        assert cfg.STUDENT_NAME == "Noemi"

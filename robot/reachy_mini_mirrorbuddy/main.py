@@ -43,6 +43,40 @@ def _setup_logging(debug: bool) -> None:
     )
 
 
+def _set_system_volume(config) -> None:
+    """Push the system mixer to the configured level via the daemon.
+
+    Best-effort: if the daemon isn't reachable the app still runs, just at
+    whatever level the mixer happened to be left at.
+    """
+    try:
+        import httpx
+
+        target = int(config.VOLUME)
+        # /api/volume/set plays a test beep. Skip the call when the mixer is already
+        # where we want it, so Buddy doesn't beep at the child on every single launch.
+        try:
+            current = httpx.get(f"{config.DAEMON_URL}/api/volume/current", timeout=3.0).json()
+            if int(current.get("volume", -1)) == target:
+                logger.info("System volume already at %s", target)
+                return
+        except Exception:
+            pass
+
+        resp = httpx.post(
+            f"{config.DAEMON_URL}/api/volume/set",
+            json={"volume": target},
+            timeout=5.0,
+        )
+        # httpx does not raise on 4xx/5xx: without this check a rejected request
+        # would be reported as a volume change that never happened, and the next
+        # person to debug "the robot is too quiet" would start from a false log.
+        resp.raise_for_status()
+        logger.info("System volume set to %s", target)
+    except Exception as e:
+        logger.warning("Could not set system volume: %s", e)
+
+
 def run(
     args: argparse.Namespace,
     robot: ReachyMini | None = None,
@@ -101,6 +135,9 @@ def run(
     mb = MirrorBuddyClient(config.MIRRORBUDDY_URL, locale=config.LOCALE)
     try:
         maestri = mb.fetch_maestri()
+        # Coaches join the same roster, so "chiama Andrea" works exactly like
+        # "chiama Galileo" without any special case downstream.
+        maestri += mb.fetch_coaches()
         if config.MAESTRO_ID:
             maestro = mb.pick(maestri, config.MAESTRO_ID)  # profile pinned this Maestro
         elif config.START_NEUTRAL:
@@ -131,7 +168,9 @@ def run(
         movements=movements,
         barge_rms_threshold=config.BARGE_RMS_THRESHOLD,
         barge_sustain_frames=config.BARGE_SUSTAIN_FRAMES,
+        output_gain=config.OUTPUT_GAIN,
     )
+    _set_system_volume(config)
 
     controller = Controller(robot, config, maestri, maestro, audio, movements)
 

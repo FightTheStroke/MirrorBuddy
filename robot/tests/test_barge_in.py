@@ -55,3 +55,43 @@ class TestLocalBargeIn:
         c._responding = True
         c.local_barge_in()
         assert sent == [rt_messages.CANCEL]  # cancel the active response
+
+    def test_cancel_is_sent_once_per_response(self):
+        """Two quick barge-ins on one response must not queue two cancels: the second
+        would come back as a spurious 'no active response' error."""
+        sent: list[str] = []
+        c = _client()
+        c._enqueue = lambda msg: sent.append(msg)  # type: ignore[assignment]
+
+        c._responding = True
+        c.local_barge_in()
+        c.local_barge_in()
+        assert sent == [rt_messages.CANCEL]
+
+
+class TestCancelRaceIsNotAnError:
+    """Cancelling a response that just ended is normal, not a failure."""
+
+    def _dispatch(self, client, event):
+        import asyncio
+
+        asyncio.run(client._handle_event(event))
+
+    def test_late_cancel_is_not_logged_as_error(self, caplog):
+        import logging
+
+        c = _client()
+        with caplog.at_level(logging.ERROR, logger="reachy_mini_mirrorbuddy.azure_realtime"):
+            self._dispatch(
+                c,
+                {"type": "error", "error": {"code": "response_cancel_not_active", "message": "x"}},
+            )
+        assert caplog.records == []
+
+    def test_real_errors_are_still_logged(self, caplog):
+        import logging
+
+        c = _client()
+        with caplog.at_level(logging.ERROR, logger="reachy_mini_mirrorbuddy.azure_realtime"):
+            self._dispatch(c, {"type": "error", "error": {"code": "invalid_api_key"}})
+        assert any("invalid_api_key" in r.getMessage() for r in caplog.records)

@@ -85,6 +85,14 @@ class Config:
         self.BARGE_RMS_THRESHOLD: float = _float("MIRRORBUDDY_BARGE_RMS", 0.045)
         self.BARGE_SUSTAIN_FRAMES: int = _int("MIRRORBUDDY_BARGE_FRAMES", 3, minimum=1)
 
+        # --- loudness ---
+        # System mixer level pushed to the daemon at startup, and a software make-up
+        # gain applied to Buddy's voice on top of it. The robot speaker is small, and
+        # a tutor that can't be heard clearly is a tutor that doesn't work.
+        self.VOLUME: int = _int("MIRRORBUDDY_VOLUME", 92, minimum=0)
+        self.OUTPUT_GAIN: float = _float("MIRRORBUDDY_OUTPUT_GAIN", 3.2)
+        self.DAEMON_URL: str = os.getenv("MIRRORBUDDY_DAEMON_URL", "http://localhost:8000").rstrip("/")
+
     def missing(self) -> list[str]:
         """Return the list of required config values that are absent."""
         errors: list[str] = []
