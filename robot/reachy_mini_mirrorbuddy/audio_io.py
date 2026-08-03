@@ -54,6 +54,22 @@ def _barge_sustain_frames() -> int:
         return _DEFAULT_BARGE_SUSTAIN_FRAMES
 
 
+def _boost(audio: np.ndarray, gain: float) -> np.ndarray:
+    """Raise the voice level by compressing the peaks instead of clipping them.
+
+    The robot speaker is already near its hardware maximum, so the only headroom
+    left is here. Plain multiplication would slam the peaks against ±1.0 and the
+    voice would rasp — unpleasant, and for a child with an auditory processing
+    difficulty, unusable.
+
+    ``tanh`` is the valve curve: below the knee it is almost linear, above it it
+    bends gently. On speech — few peaks, plenty of body — it sounds markedly louder
+    without turning harsh.
+    """
+    # 0.85 keeps the linear part below the knee of the curve.
+    return np.tanh(audio * gain * 0.85).astype(np.float32)
+
+
 def _resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
     """Low-latency polyphase resampling (faster + cleaner than FFT resample)."""
     if src_rate == dst_rate or audio.size == 0:
@@ -75,6 +91,7 @@ class AudioIO:
         on_local_barge_in: Callable[[], None] | None = None,
         barge_rms_threshold: float | None = None,
         barge_sustain_frames: int | None = None,
+        output_gain: float = 1.0,
     ) -> None:
         self.robot = robot
         self.on_input_pcm16 = on_input_pcm16
@@ -99,6 +116,13 @@ class AudioIO:
         self._barge_sustain_frames = (
             barge_sustain_frames if barge_sustain_frames is not None else _barge_sustain_frames()
         )
+        # Software make-up gain on Buddy's voice, on top of the system volume. The
+        # robot speaker is small: in a room with a child around, the hardware maximum
+        # alone is often not enough to be comfortably intelligible.
+        self.output_gain = max(0.1, min(8.0, float(output_gain)))
+        # A louder voice also leaks more into the mic, so the barge-in threshold has
+        # to rise with it — otherwise Buddy's own speech would cut Buddy off.
+        self._barge_rms_threshold *= max(1.0, self.output_gain / 1.6)
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
@@ -170,6 +194,8 @@ class AudioIO:
         if out_rate != SAMPLE_RATE and audio.size:
             audio = _resample(audio, SAMPLE_RATE, out_rate)
         audio_f32 = (np.asarray(audio, dtype=np.float32)) / 32768.0
+        if self.output_gain != 1.0 and audio_f32.size:
+            audio_f32 = _boost(audio_f32, self.output_gain)
         try:
             self.robot.media.push_audio_sample(audio_f32)
         except Exception as e:

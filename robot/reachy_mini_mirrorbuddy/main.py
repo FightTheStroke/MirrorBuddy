@@ -43,6 +43,36 @@ def _setup_logging(debug: bool) -> None:
     )
 
 
+def _set_system_volume(config) -> None:
+    """Push the system mixer to the configured level via the daemon.
+
+    Best-effort: if the daemon isn't reachable the app still runs, just at
+    whatever level the mixer happened to be left at.
+    """
+    try:
+        import httpx
+
+        target = int(config.VOLUME)
+        # /api/volume/set plays a test beep. Skip the call when the mixer is already
+        # where we want it, so Buddy doesn't beep at the child on every single launch.
+        try:
+            current = httpx.get(f"{config.DAEMON_URL}/api/volume/current", timeout=3.0).json()
+            if int(current.get("volume", -1)) == target:
+                logger.info("System volume already at %s", target)
+                return
+        except Exception:
+            pass
+
+        httpx.post(
+            f"{config.DAEMON_URL}/api/volume/set",
+            json={"volume": target},
+            timeout=5.0,
+        )
+        logger.info("System volume set to %s", target)
+    except Exception as e:
+        logger.warning("Could not set system volume: %s", e)
+
+
 def run(
     args: argparse.Namespace,
     robot: ReachyMini | None = None,
@@ -131,7 +161,9 @@ def run(
         movements=movements,
         barge_rms_threshold=config.BARGE_RMS_THRESHOLD,
         barge_sustain_frames=config.BARGE_SUSTAIN_FRAMES,
+        output_gain=config.OUTPUT_GAIN,
     )
+    _set_system_volume(config)
 
     controller = Controller(robot, config, maestri, maestro, audio, movements)
 

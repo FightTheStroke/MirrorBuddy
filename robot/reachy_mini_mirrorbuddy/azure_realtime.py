@@ -120,6 +120,7 @@ class AzureRealtimeClient:
         self._suppress = True  # drop any audio deltas already in flight
         self._quiet = False  # a normal turn stays un-muted; a stop word re-mutes below
         if self._responding:
+            self._responding = False  # one CANCEL per response: avoid a pile-up of no-op cancels
             self._enqueue(rt_messages.CANCEL)
 
     def _enqueue(self, msg: str) -> None:
@@ -306,7 +307,16 @@ class AzureRealtimeClient:
             return
 
         if etype == "error":
-            logger.error("Azure Realtime error event: %s", json.dumps(event.get("error", event)))
+            err = event.get("error", event)
+            # Benign race: we ask to cancel the response the instant the child speaks
+            # over Buddy, but the response may have finished on its own just before the
+            # CANCEL lands. Nothing is broken, so it must not look like a failure in
+            # the logs — real errors have to stay visible.
+            if isinstance(err, dict) and err.get("code") == "response_cancel_not_active":
+                self._responding = False
+                logger.debug("Cancel arrived after the response ended (harmless)")
+                return
+            logger.error("Azure Realtime error event: %s", json.dumps(err))
             return
 
         logger.debug("Unhandled event: %s", etype)

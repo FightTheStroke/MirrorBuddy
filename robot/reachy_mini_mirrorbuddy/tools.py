@@ -107,6 +107,41 @@ def _norm(s: str) -> str:
     return " ".join(str(s or "").lower().split())
 
 
+# The child speaks the Italian school-subject name; the Maestro record carries an
+# English code ("sport", "biology"). Without this bridge, "scienze motorie" matched
+# Darwin on the single word "scienze" and Buddy handed the lesson to the wrong
+# professor — then looped, apologising, while the child waited.
+SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
+    "sport": ("scienze motorie", "educazione fisica", "motoria", "ginnastica", "sport", "movimento"),
+    "biology": ("scienze", "scienze naturali", "biologia", "natura"),
+    "physics": ("fisica", "astronomia"),
+    "chemistry": ("chimica",),
+    "mathematics": ("matematica", "geometria", "algebra", "mate"),
+    "italian": ("italiano", "letteratura", "grammatica", "epica"),
+    "english": ("inglese",),
+    "french": ("francese",),
+    "german": ("tedesco",),
+    "spanish": ("spagnolo",),
+    "history": ("storia",),
+    "geography": ("geografia",),
+    "art": ("arte", "disegno", "immagine"),
+    "music": ("musica",),
+    "philosophy": ("filosofia",),
+    "civics": ("educazione civica", "civica", "diritto"),
+    "computerScience": ("informatica", "programmazione", "coding", "tecnologia"),
+    "economics": ("economia",),
+    "health": ("salute", "benessere", "educazione alla salute"),
+    "internationalLaw": ("diritto internazionale",),
+    "storytelling": ("storytelling", "public speaking", "raccontare"),
+}
+
+
+def _alias_haystack(m: Maestro) -> str:
+    """Everything a child might plausibly say to mean this Maestro."""
+    aliases = SUBJECT_ALIASES.get(str(m.subject or ""), ())
+    return _norm(f"{m.subject} {m.specialty} {m.teaching_style} {' '.join(aliases)}")
+
+
 def resolve_maestro(maestri: list[Maestro], query: str) -> Maestro | None:
     """Best-effort match of a spoken query to a Maestro by name/subject/specialty."""
     q = _norm(query)
@@ -122,15 +157,22 @@ def resolve_maestro(maestri: list[Maestro], query: str) -> Maestro | None:
         name = _norm(m.display_name) or _norm(m.name)
         if name and (name in q or q in name):
             return m
-    # 3) subject / specialty contains the query token(s).
+    # 3) subject / specialty / spoken aliases.
     tokens = [t for t in q.split() if len(t) > 2]
-    best: tuple[int, Maestro] | None = None
+    best: tuple[int, int, Maestro] | None = None
     for m in maestri:
-        hay = f"{_norm(m.subject)} {_norm(m.specialty)} {_norm(m.teaching_style)}"
+        hay = _alias_haystack(m)
+        # A whole-phrase hit ("scienze motorie") beats loose token overlap, which is
+        # what previously let a single shared word send the child to the wrong teacher.
+        phrase = 1 if q in hay else 0
         score = sum(1 for t in tokens if t in hay)
-        if score and (best is None or score > best[0]):
-            best = (score, m)
-    return best[1] if best else None
+        if not phrase and score < len(tokens):
+            # Partial overlap only: not good enough to switch teacher on.
+            continue
+        cand = (phrase, score, m)
+        if best is None or cand[:2] > best[:2]:
+            best = cand
+    return best[2] if best else None
 
 
 def professors_summary(maestri: list[Maestro], limit: int = 26) -> str:

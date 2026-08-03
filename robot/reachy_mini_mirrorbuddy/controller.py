@@ -139,7 +139,14 @@ class Controller:
     def _handle_call_professor(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
         target = tools.resolve_maestro(self.maestri, str(args.get("query") or ""))
         if target is None:
-            client.send_function_result(call_id, "Non ho trovato quel professore, puoi ripetere il nome o la materia?")
+            # Give the model the real roster: without it, it retried the same failing
+            # request over and over while the child listened to apologies.
+            client.send_function_result(
+                call_id,
+                "Non ho un professore per quella materia. Ecco chi c'e': "
+                f"{tools.professors_summary(self.maestri)}. "
+                "Proponi tu l'alternativa piu' vicina, senza richiamare questo strumento con la stessa richiesta.",
+            )
             return
         if target.id == self.maestro.id:
             client.send_function_result(call_id, f"Sono gia' io, {self.maestro.display_name}. Andiamo avanti.")

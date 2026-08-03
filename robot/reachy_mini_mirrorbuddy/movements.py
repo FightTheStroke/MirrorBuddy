@@ -65,6 +65,7 @@ class Movements:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._apply_errors = 0  # consecutive failed motion frames (see _apply)
         self._create_head_pose = None
         self._track_weight = -1.0  # unset; managed on speaking transitions
         self._hold = threading.Event()  # when set, freeze all motion (e.g. camera capture)
@@ -114,8 +115,11 @@ class Movements:
             logger.warning("create_head_pose unavailable, head motion disabled: %s", e)
         try:
             self.robot.enable_motors()
+            logger.info("Motors enabled")
         except Exception as e:
-            logger.debug("enable_motors not available/failed: %s", e)
+            # Not debug: if the motors never come on, the robot sits there mute-bodied
+            # and there was no trace anywhere explaining why.
+            logger.warning("enable_motors failed — the robot will not move: %s", e)
         # Speech-reactive head wobbler. In calm mode we keep it OFF so the head does not
         # jitter while talking (less distracting for the student).
         if not self.calm:
@@ -236,8 +240,17 @@ class Movements:
             self.robot.set_target(
                 head=head, antennas=[float(antennas[0]), float(antennas[1])], body_yaw=float(body_yaw)
             )
+            if self._apply_errors:
+                logger.info("Motion recovered after %d failed frames", self._apply_errors)
+                self._apply_errors = 0
         except Exception as e:
-            logger.debug("set_target failed: %s", e)
+            # This runs ~30x/second, so it can't shout every frame — but staying silent
+            # is how "the robot doesn't move" stayed unexplained. Report the first one.
+            self._apply_errors += 1
+            if self._apply_errors == 1:
+                logger.warning("set_target failed — no body motion: %s", e)
+            elif self._apply_errors % 300 == 0:
+                logger.warning("set_target still failing (%d frames)", self._apply_errors)
 
     def _neutral(self) -> None:
         try:

@@ -16,6 +16,18 @@ from pathlib import Path
 from .config import config
 from .settings_page import PAGE
 
+# Imported at module level on purpose. With ``from __future__ import annotations``
+# every annotation is a string, and FastAPI resolves route annotations against the
+# *module* namespace. While these were imported inside the mount function, FastAPI
+# could not resolve "Request", mistook it for a query parameter, and every save
+# came back as "Field required" — the settings page silently never persisted
+# anything. Guarded so the module still imports on a laptop without FastAPI.
+try:  # pragma: no cover - trivial import guard
+    from fastapi import Request
+    from fastapi.responses import HTMLResponse, JSONResponse
+except ImportError:  # pragma: no cover - only on machines without the robot deps
+    Request = HTMLResponse = JSONResponse = None  # type: ignore[assignment,misc]
+
 logger = logging.getLogger(__name__)
 
 # Keys we allow the UI to persist into the instance .env file.
@@ -33,14 +45,13 @@ _EDITABLE_KEYS = (
     "MIRRORBUDDY_API_BASE",
     "MIRRORBUDDY_BARGE_RMS",
     "MIRRORBUDDY_BARGE_FRAMES",
+    "MIRRORBUDDY_VOLUME",
+    "MIRRORBUDDY_OUTPUT_GAIN",
 )
 
 
 def mount_settings_routes(app, instance_path: str | None) -> None:
     """Attach the settings routes to the app's FastAPI ``settings_app``."""
-    from fastapi import Request
-    from fastapi.responses import HTMLResponse, JSONResponse
-
     env_path = Path(instance_path) / ".env" if instance_path else Path(".env")
 
     @app.get("/", response_class=HTMLResponse)
@@ -61,6 +72,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
                 "locale": config.LOCALE,
                 "paired": bool(config.DEVICE_TOKEN),
                 "bargeRms": config.BARGE_RMS_THRESHOLD,
+                "outputGain": config.OUTPUT_GAIN,
                 "bargeFrames": config.BARGE_SUSTAIN_FRAMES,
             }
         )
