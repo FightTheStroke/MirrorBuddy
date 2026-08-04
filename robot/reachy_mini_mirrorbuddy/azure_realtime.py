@@ -78,6 +78,8 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._asleep = False  # session ended: stay muted until the wake word
         self._sleep_after = False  # go to sleep once the farewell response finishes
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
+        self._partial_user = ""  # transcript of the turn being spoken, read for stop words
+        self._stopped_on_partial = False  # a stop word already fired for this turn
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)

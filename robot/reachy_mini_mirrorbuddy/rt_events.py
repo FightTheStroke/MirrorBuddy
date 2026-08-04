@@ -76,11 +76,25 @@ class RealtimeEventsMixin:
                     _safe_cb(self.on_sleep)
             return
 
+        # "Zitto" cannot wait for the full transcription pass. A child who asks for
+        # silence and is answered anyway is a child being talked over, so the partial
+        # transcript is read as it streams and the stop fires on the first words.
+        if etype.endswith("input_audio_transcription.delta"):
+            if self._asleep or self._stopped_on_partial:
+                return
+            self._partial_user += event.get("delta") or ""
+            if rt_messages.is_stop(self._partial_user):
+                self._stopped_on_partial = True
+                await self._apply_stop()
+            return
+
         # Student's speech transcribed: honour stop / end / wake intents deterministically.
         if etype.endswith("input_audio_transcription.completed"):
             text = (event.get("transcript") or "").strip()
             if not text:
                 return
+            if self._stopped_on_partial:
+                return  # already silenced while the student was still speaking
             action = session_flow.decide(text, self._asleep)
             if action == session_flow.IGNORE:
                 return
@@ -98,20 +112,7 @@ class RealtimeEventsMixin:
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
             if action == session_flow.STOP:
-                # "basta / fermati" → go quiet AND park in a rest posture, staying put
-                # until called back by name. Insistence stresses the child, so a stop is
-                # a full stop, not a brief pause that resumes on the next sound.
-                self._asleep = True
-                self._quiet = True
-                self._suppress = True
-                # Also cancels a fast-path response requested before the transcript
-                # arrived: "zitto" must win even when it ends a long sentence.
-                if self._responding or self._fast_requested:
-                    await self._cancel_response()
-                if self.on_speech_started:
-                    _safe_cb(self.on_speech_started)  # flush local playback now
-                if self.on_sleep:
-                    _safe_cb(self.on_sleep)  # settle into the rest position
+                await self._apply_stop()
                 return
             if action == session_flow.SPEAK:
                 # Ordinary turn. If the fast path already asked for the response when
@@ -128,6 +129,8 @@ class RealtimeEventsMixin:
             self._quiet = False
             self._speech_started_at = time.monotonic()
             self._fast_requested = False
+            self._partial_user = ""
+            self._stopped_on_partial = False
             if self._responding:
                 await self._cancel_response()
             if self.on_speech_started:
@@ -206,3 +209,21 @@ class RealtimeEventsMixin:
         """
         self._responding = False
         await self._safe_send(rt_messages.CANCEL)
+
+    async def _apply_stop(self) -> None:
+        """Go silent now and stay silent until called back by name.
+
+        "basta / fermati / zitto" → quiet AND parked in a rest posture. Insistence
+        stresses the child, so a stop is a full stop, not a brief pause that resumes
+        on the next sound. It also cancels a fast-path response requested before the
+        transcript arrived: the stop word wins even when it ends a long sentence.
+        """
+        self._asleep = True
+        self._quiet = True
+        self._suppress = True
+        if self._responding or self._fast_requested:
+            await self._cancel_response()
+        if self.on_speech_started:
+            _safe_cb(self.on_speech_started)  # flush local playback now
+        if self.on_sleep:
+            _safe_cb(self.on_sleep)  # settle into the rest position
