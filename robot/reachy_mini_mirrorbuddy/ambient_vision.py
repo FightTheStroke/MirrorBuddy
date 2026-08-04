@@ -51,6 +51,11 @@ class AmbientVision:
         self._stop.clear()
         self._thread = threading.Thread(target=self._run, name="AmbientVision", daemon=True)
         self._thread.start()
+        logger.info(
+            "Ambient vision on: a frame every %.0fs at most, %spx wide",
+            self.interval_s,
+            self.max_width,
+        )
 
     def stop(self) -> None:
         self._stop.set()
