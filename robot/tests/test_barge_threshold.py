@@ -74,3 +74,55 @@ def test_floor_tracks_measured_frames():
         ) * io._noise_floor + audio_io._NOISE_EMA_ALPHA * rms
 
     assert io._noise_floor < 0.001
+
+
+class TestMicFrameDecision:
+    """The mic loop's decision, isolated from hardware."""
+
+    def test_a_soft_voice_cuts_in_after_the_debounce(self):
+        io = _io()
+        io._noise_floor = 0.004
+
+        assert io.note_mic_frame(0.02, speaking=True) is False  # 1st loud frame
+        assert io.note_mic_frame(0.02, speaking=True) is False  # 2nd
+        assert io.note_mic_frame(0.02, speaking=True) is True  # 3rd → cut
+
+    def test_an_isolated_bump_does_not_take_the_turn_away(self):
+        io = _io()
+        io._noise_floor = 0.004
+
+        io.note_mic_frame(0.02, speaking=True)
+        io.note_mic_frame(0.001, speaking=True)  # back to quiet: debounce resets
+        assert io.note_mic_frame(0.02, speaking=True) is False
+
+    def test_nothing_fires_while_buddy_is_silent(self):
+        io = _io()
+
+        for _ in range(10):
+            assert io.note_mic_frame(0.5, speaking=False) is False
+
+    def test_buddys_own_echo_never_teaches_the_floor(self):
+        io = _io()
+        io._noise_floor = 0.004
+
+        for _ in range(50):
+            io.note_mic_frame(0.4, speaking=True)  # loud echo while he speaks
+
+        assert io._noise_floor == 0.004
+
+    def test_the_room_teaches_the_floor_while_he_is_silent(self):
+        io = _io()
+        io._noise_floor = 0.004
+
+        for _ in range(200):
+            io.note_mic_frame(0.02, speaking=False)
+
+        assert io._noise_floor > 0.015
+
+
+def test_defaults_do_not_crash_when_no_thresholds_are_passed():
+    """The parameters shadow the audio_dsp helpers; the fallback must still work."""
+    io = AudioIO(robot=object(), on_input_pcm16=lambda _b: None)
+
+    assert io._barge_rms_threshold > 0
+    assert io._barge_sustain_frames >= 1
