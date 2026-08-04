@@ -71,3 +71,21 @@ def test_grab_loop_stores_the_newest_frame(monkeypatch):
     v._run()
 
     assert v._frame is not None and v._frame.shape == (4, 4, 3)
+
+
+def test_ambient_vision_is_opt_in(monkeypatch):
+    """Continuous framing of a child is a parent's choice, never a silent default."""
+    from reachy_mini_mirrorbuddy.config import Config
+
+    monkeypatch.delenv("MIRRORBUDDY_AMBIENT_VISION", raising=False)
+    monkeypatch.delenv("MIRRORBUDDY_AMBIENT_VISION_INTERVAL_S", raising=False)
+
+    assert Config().AMBIENT_VISION is False
+
+
+def test_a_broken_interval_does_not_stop_the_robot(monkeypatch):
+    from reachy_mini_mirrorbuddy.config import Config
+
+    monkeypatch.setenv("MIRRORBUDDY_AMBIENT_VISION_INTERVAL_S", "not-a-number")
+
+    assert Config().AMBIENT_VISION_INTERVAL_S == 20.0
