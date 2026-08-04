@@ -25,6 +25,8 @@ import numpy as np
 
 from reachy_mini import ReachyMini
 from reachy_mini_mirrorbuddy.audio_io import AudioIO
+from reachy_mini_mirrorbuddy.barge_detector import BargeDetector
+from reachy_mini_mirrorbuddy.config import Config
 
 CALIBRATE_S = 3.0
 LISTEN_S = 20.0
@@ -36,7 +38,11 @@ def _read(robot) -> float | None:
     if sample is None:
         time.sleep(0.005)
         return None
-    audio = sample if isinstance(sample, np.ndarray) else np.frombuffer(sample, dtype=np.int16)
+    audio = (
+        sample
+        if isinstance(sample, np.ndarray)
+        else np.frombuffer(sample, dtype=np.int16)
+    )
     if audio.ndim == 2:
         audio = audio.mean(axis=1)
     if audio.dtype != np.int16:
@@ -46,7 +52,17 @@ def _read(robot) -> float | None:
 
 def main() -> None:
     robot = ReachyMini()
-    io = AudioIO(robot=robot, on_input_pcm16=lambda _b: None, on_local_barge_in=lambda: None)
+    # Same construction as main.py: the make-up gain scales the ceiling, so measuring
+    # at gain 1.0 would report a threshold the running app never uses.
+    config = Config()
+    io = AudioIO(
+        robot=robot,
+        on_input_pcm16=lambda _b: None,
+        on_local_barge_in=lambda: None,
+        barge_rms_threshold=config.BARGE_RMS_THRESHOLD,
+        barge_sustain_frames=config.BARGE_SUSTAIN_FRAMES,
+        output_gain=config.OUTPUT_GAIN,
+    )
     robot.media.start_recording()
 
     print(f"Calibrating the room — stay quiet for {CALIBRATE_S:.0f}s...")
@@ -60,12 +76,16 @@ def main() -> None:
 
     threshold = io.barge_threshold()
     print(
-        f"Noise floor: {io._noise_floor:.4f}   ambient peak: {ambient_peak:.4f}"
+        f"Noise floor: {io.barge.noise_floor:.4f}   ambient peak: {ambient_peak:.4f}"
         f"   threshold: {threshold:.4f}"
+        f"   (ceiling {io.barge.ceiling:.4f} at output gain {config.OUTPUT_GAIN:.1f})"
     )
     print(f"Now speak normally from the child's seat for {LISTEN_S:.0f}s.\n")
 
-    peak, over = 0.0, 0
+    # Ask the production decision itself, pretending Buddy is mid-sentence: a single
+    # loud frame is not enough, it takes BARGE_SUSTAIN_FRAMES in a row. Counting bare
+    # over-threshold frames would call a transient a success the real robot ignores.
+    peak, over, cuts = 0.0, 0, 0
     deadline = time.monotonic() + LISTEN_S
     while time.monotonic() < deadline:
         rms = _read(robot)
@@ -74,12 +94,24 @@ def main() -> None:
         peak = max(peak, rms)
         if rms >= threshold:
             over += 1
-            print(f"  OVER  rms={rms:.4f}")
+        if io.note_mic_frame(rms, speaking=True):
+            cuts += 1
+            print(f"  CUT  rms={rms:.4f}")
     robot.media.stop_recording()
 
-    print(f"\nVoice peak {peak:.4f}, {over} frames over {threshold:.4f}.")
-    if over:
+    print(
+        f"\nVoice peak {peak:.4f}, {over} frames over {threshold:.4f}, "
+        f"{cuts} sustained cuts ({io.barge.sustain_frames} frames in a row needed)."
+    )
+    if cuts:
         print("A voice at this level cuts Buddy off. Nothing to change.")
+        return
+    if over:
+        print(
+            "Loud frames, but never long enough in a row to count as speech.\n"
+            "Speak a full word rather than a syllable, or lower "
+            "MIRRORBUDDY_BARGE_FRAMES in the robot's .env."
+        )
         return
 
     # Somewhere between the room and the voice, closer to the room so a tired child
@@ -92,9 +124,13 @@ def main() -> None:
             "Move the robot away from noise, or rely on the spoken stop word instead."
         )
         return
+    # The setting is scaled by the output gain at startup, so hand back the value
+    # that *becomes* the intended threshold rather than the threshold itself.
+    setting = suggested / BargeDetector.scale_for_gain(config.OUTPUT_GAIN)
     print(
         "This voice would NOT stop Buddy. In the robot's .env set:\n"
-        f"    MIRRORBUDDY_BARGE_RMS={suggested:.3f}\n"
+        f"    MIRRORBUDDY_BARGE_RMS={setting:.3f}\n"
+        f"(becomes {suggested:.3f} once the {config.OUTPUT_GAIN:.1f}x output gain is applied)\n"
         "then restart the app."
     )
 
