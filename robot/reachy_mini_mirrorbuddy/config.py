@@ -74,6 +74,15 @@ class Config:
         self.ENABLE_CAMERA: bool = _flag("MIRRORBUDDY_ENABLE_CAMERA", True)
         self.ENABLE_MOVEMENTS: bool = _flag("MIRRORBUDDY_ENABLE_MOVEMENTS", True)
         self.FOLLOW_FACE: bool = _flag("MIRRORBUDDY_FOLLOW_FACE", True)
+        # Ambient vision: hand the model a frame from the video stream at the start of a
+        # turn, so Buddy sees what the student is doing without being asked to look.
+        # Off by default and deliberately so: the documented camera contract is "a photo
+        # on explicit request only", and continuous framing of a child is a decision a
+        # parent takes, not an upgrade that arrives silently.
+        self.AMBIENT_VISION: bool = _flag("MIRRORBUDDY_AMBIENT_VISION", False)
+        self.AMBIENT_VISION_INTERVAL_S: float = _float(
+            "MIRRORBUDDY_AMBIENT_VISION_INTERVAL_S", 20.0
+        )
         # Calm motion (default): no audio head wobbler + gentler amplitudes, so the robot
         # does not distract the student while speaking. Set to false for livelier motion.
         self.CALM_MOVEMENT: bool = _flag("MIRRORBUDDY_CALM_MOVEMENT", True)

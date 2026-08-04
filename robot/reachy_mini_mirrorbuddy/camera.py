@@ -12,8 +12,14 @@ from __future__ import annotations
 import base64
 import logging
 import os
+import time
+
+from .jpeg_encoder import encode_jpeg
 
 logger = logging.getLogger(__name__)
+
+_RAW_FRAME_ATTEMPTS = 10
+_RAW_FRAME_RETRY_S = 0.2
 
 
 def _jpeg_size(data: bytes) -> tuple[int, int] | None:
@@ -36,13 +42,34 @@ def _jpeg_size(data: bytes) -> tuple[int, int] | None:
     return None
 
 
-def capture_data_url(robot) -> str | None:
-    """Capture one JPEG frame and return it as a ``data:`` URL (or None)."""
+def _capture_jpeg(robot) -> bytes | None:
+    """Return one JPEG frame, encoding it ourselves when the SDK path fails."""
     try:
         jpeg = robot.media.get_frame_jpeg()
     except Exception as e:
         logger.warning("get_frame_jpeg failed: %s", e)
-        return None
+        jpeg = None
+    if jpeg:
+        return jpeg
+
+    # The SDK encoder is broken on the wireless unit: read() delivers frames but
+    # read_jpeg() always returns None. Fall back to the raw frame + our encoder.
+    logger.info("SDK jpeg path returned nothing, encoding the raw frame")
+    for _ in range(_RAW_FRAME_ATTEMPTS):
+        try:
+            frame = robot.media.get_frame()
+        except Exception as e:
+            logger.warning("get_frame failed: %s", e)
+            return None
+        if frame is not None:
+            return encode_jpeg(frame)
+        time.sleep(_RAW_FRAME_RETRY_S)
+    return None
+
+
+def capture_data_url(robot) -> str | None:
+    """Capture one JPEG frame and return it as a ``data:`` URL (or None)."""
+    jpeg = _capture_jpeg(robot)
     if not jpeg:
         logger.warning("camera returned no frame")
         return None

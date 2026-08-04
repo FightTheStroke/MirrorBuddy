@@ -113,3 +113,25 @@ class TestFastPath:
     async def test_threshold_is_longer_than_any_stop_word(self, client):
         # Sanity on the constant itself: a child saying "fermati" slowly is ~1s.
         assert 1.5 <= _FAST_PATH_MIN_SPEECH_S <= 2.5
+
+
+@pytest.mark.asyncio
+async def test_no_second_response_while_one_is_streaming(client):
+    """The server rejects a concurrent response; asking anyway only logs an error."""
+    client._responding = True
+
+    await client._request_response()
+
+    assert client.sent == []
+
+
+@pytest.mark.asyncio
+async def test_barge_in_then_fast_path_still_answers(client):
+    """Cancelling a reply must not leave the client believing it is still speaking."""
+    client._responding = True
+    await client._handle_event({"type": "input_audio_buffer.speech_started"})
+    client.clock.advance(_FAST_PATH_MIN_SPEECH_S + 0.5)
+    await client._handle_event({"type": "input_audio_buffer.speech_stopped"})
+
+    assert rt_messages.CANCEL in client.sent
+    assert any(json.loads(m).get("type") == "response.create" for m in client.sent)

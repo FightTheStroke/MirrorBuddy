@@ -1,0 +1,21 @@
+[Unit]
+# The wireless unit boots asleep and only starts its app on the first wake-up,
+# which normally requires touching the antennas. Without this, turning the robot
+# on is not enough for a child to be able to talk to it.
+Description=Wake Reachy Mini after boot so the startup app runs
+After=reachy-mini-daemon.service network-online.target
+Wants=reachy-mini-daemon.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/mirrorbuddy-autostart.sh
+# The daemon can take a while on a cold boot; the script has its own budget.
+TimeoutStartSec=600
+RemainAfterExit=yes
+# A failed wake-up should not leave the robot unusable for the rest of the boot.
+Restart=no
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
