@@ -120,14 +120,17 @@ jobs:
           # for a broken deploy that did not exist.
           # A build triggered by the merge may still be running when this starts:
           # Vercel then refuses with "is not ready", which is a matter of waiting.
+          promoted=false
           for attempt in $(seq 1 10); do
             if out=$(vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes 2>&1); then
               echo "$out"
+              promoted=true
               break
             fi
             echo "$out"
             if echo "$out" | grep -q "already the current production deployment"; then
               echo "✅ Already in production — nothing to promote"
+              promoted=true
               break
             fi
             if echo "$out" | grep -q "is not ready"; then
@@ -137,6 +140,13 @@ jobs:
             fi
             exit 1
           done
+          # Running out of attempts is a failure, not a promotion: without this
+          # the loop would fall through to the success line below and report a
+          # deploy that never went live.
+          if [ "$promoted" != "true" ]; then
+            echo "::error::Deployment was still not ready after 10 attempts (5 minutes)"
+            exit 1
+          fi
           echo "✅ Promotion complete"
           echo "promoted_url=$url" >> $GITHUB_OUTPUT
 
