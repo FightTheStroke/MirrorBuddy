@@ -114,7 +114,29 @@ jobs:
         run: |
           url="${{ steps.find-staging.outputs.deployment_url }}"
           echo "🚀 Promoting $url to production..."
-          vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes
+          # Vercel already promotes the latest main build on its own, so by the
+          # time this runs the chosen deployment is often already live. That is
+          # the desired end state, not a failure — a red run here sent us looking
+          # for a broken deploy that did not exist.
+          # A build triggered by the merge may still be running when this starts:
+          # Vercel then refuses with "is not ready", which is a matter of waiting.
+          for attempt in $(seq 1 10); do
+            if out=$(vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes 2>&1); then
+              echo "$out"
+              break
+            fi
+            echo "$out"
+            if echo "$out" | grep -q "already the current production deployment"; then
+              echo "✅ Already in production — nothing to promote"
+              break
+            fi
+            if echo "$out" | grep -q "is not ready"; then
+              echo "Deployment still building; retrying in 30s (attempt $attempt/10)"
+              sleep 30
+              continue
+            fi
+            exit 1
+          done
           echo "✅ Promotion complete"
           echo "promoted_url=$url" >> $GITHUB_OUTPUT
 
