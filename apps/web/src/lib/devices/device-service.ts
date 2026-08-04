@@ -10,9 +10,10 @@
  * - Only SHA-256 hashes of the code and token are ever stored — never plaintext.
  */
 
-import { createHash, createHmac, randomBytes, randomInt } from "crypto";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { createHash, createHmac, randomBytes, randomInt } from 'crypto';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { DEFAULT_BUDDY_ID, DEFAULT_COACH_ID } from '@/lib/characters/defaults';
 
 const CODE_TTL_MS = 10 * 60 * 1000; // pairing code valid for 10 minutes
 const CODE_DIGITS = 6;
@@ -23,30 +24,28 @@ const MAX_LABEL_LEN = 80;
 // is unset). A 6-digit code has just 10^6 possibilities, so a bare hash could be
 // brute-forced from a DB leak; a server-side HMAC key makes the stored verifier
 // useless without the secret.
-const FALLBACK_PEPPER = "mirrorbuddy-device-pairing-fallback-pepper";
+const FALLBACK_PEPPER = 'mirrorbuddy-device-pairing-fallback-pepper';
 
 function sha256(value: string): string {
-  return createHash("sha256").update(value).digest("hex");
+  return createHash('sha256').update(value).digest('hex');
 }
 
 /** Keyed hash for the low-entropy pairing code (HMAC with a server pepper). */
 function hashCode(code: string): string {
   let pepper = process.env.DEVICE_PAIRING_PEPPER || process.env.ENCRYPTION_KEY;
   if (!pepper) {
-    logger.warn(
-      "DEVICE_PAIRING_PEPPER is not set, using fallback pepper for pairing codes",
-    );
+    logger.warn('DEVICE_PAIRING_PEPPER is not set, using fallback pepper for pairing codes');
     pepper = FALLBACK_PEPPER;
   }
-  return createHmac("sha256", pepper).update(code).digest("hex");
+  return createHmac('sha256', pepper).update(code).digest('hex');
 }
 
 function generateCode(): string {
-  return String(randomInt(0, 10 ** CODE_DIGITS)).padStart(CODE_DIGITS, "0");
+  return String(randomInt(0, 10 ** CODE_DIGITS)).padStart(CODE_DIGITS, '0');
 }
 
 function generateToken(): string {
-  return randomBytes(32).toString("hex"); // 256-bit device token
+  return randomBytes(32).toString('hex'); // 256-bit device token
 }
 
 export interface PairingCode {
@@ -85,10 +84,7 @@ export interface DeviceSummary {
 }
 
 /** Generate a fresh pairing code for a user, storing only its hash. */
-export async function createPairingCode(
-  userId: string,
-  label?: string,
-): Promise<PairingCode> {
+export async function createPairingCode(userId: string, label?: string): Promise<PairingCode> {
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
   const safeLabel = label?.trim().slice(0, MAX_LABEL_LEN) || null;
 
@@ -108,13 +104,13 @@ export async function createPairingCode(
       // Retry ONLY on a unique-constraint collision of the hashed code (P2002);
       // surface any other error (DB down, FK violation) immediately.
       const code = (error as { code?: string }).code;
-      if (code !== "P2002" || attempt === MAX_CODE_ATTEMPTS - 1) {
-        logger.error("Failed to allocate pairing code", undefined, error);
+      if (code !== 'P2002' || attempt === MAX_CODE_ATTEMPTS - 1) {
+        logger.error('Failed to allocate pairing code', undefined, error);
         throw error;
       }
     }
   }
-  throw new Error("Unable to allocate pairing code");
+  throw new Error('Unable to allocate pairing code');
 }
 
 /** Redeem a pairing code, returning a one-time device token (hash stored). */
@@ -152,14 +148,12 @@ export async function redeemPairingCode(
     select: { id: true },
   });
   if (!device) return null;
-  logger.info("Robot device paired", { deviceId: device.id });
+  logger.info('Robot device paired', { deviceId: device.id });
   return { token, deviceId: device.id };
 }
 
 /** Resolve a device token to the owner's robot-facing profile scope. */
-export async function getDeviceProfile(
-  token: string,
-): Promise<DeviceProfile | null> {
+export async function getDeviceProfile(token: string): Promise<DeviceProfile | null> {
   const trimmed = token?.trim();
   if (!trimmed) return null;
 
@@ -178,15 +172,15 @@ export async function getDeviceProfile(
   const settings = device.user.settings;
   return {
     name: profile?.name ?? null,
-    preferredBuddy: profile?.preferredBuddy ?? null,
-    preferredCoach: profile?.preferredCoach ?? null,
+    preferredBuddy: profile?.preferredBuddy ?? DEFAULT_BUDDY_ID,
+    preferredCoach: profile?.preferredCoach ?? DEFAULT_COACH_ID,
     schoolLevel: profile?.schoolLevel ?? null,
     gradeLevel: profile?.gradeLevel ?? null,
     age: profile?.age ?? null,
-    language: settings?.language ?? "it",
+    language: settings?.language ?? 'it',
     subjects: parseSubjects(profile?.learningGoals),
     accessibility: {
-      fontSize: settings?.fontSize ?? "medium",
+      fontSize: settings?.fontSize ?? 'medium',
       highContrast: settings?.highContrast ?? false,
       dyslexiaFont: settings?.dyslexiaFont ?? false,
       reducedMotion: settings?.reducedMotion ?? false,
@@ -201,7 +195,7 @@ export async function getDeviceProfile(
 export async function listDevices(userId: string): Promise<DeviceSummary[]> {
   return prisma.robotDevice.findMany({
     where: { userId, revokedAt: null, pairedAt: { not: null } },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
     select: {
       id: true,
       label: true,
@@ -213,10 +207,7 @@ export async function listDevices(userId: string): Promise<DeviceSummary[]> {
 }
 
 /** Revoke a device the user owns. Returns false if not found / not theirs. */
-export async function revokeDevice(
-  userId: string,
-  deviceId: string,
-): Promise<boolean> {
+export async function revokeDevice(userId: string, deviceId: string): Promise<boolean> {
   const result = await prisma.robotDevice.updateMany({
     where: { id: deviceId, userId, revokedAt: null },
     data: { revokedAt: new Date(), tokenHash: null, pairCodeHash: null },
@@ -229,11 +220,11 @@ function parseSubjects(raw: string | null | undefined): string[] {
   try {
     const parsed: unknown = JSON.parse(raw);
     if (Array.isArray(parsed)) {
-      return parsed.filter((s): s is string => typeof s === "string");
+      return parsed.filter((s): s is string => typeof s === 'string');
     }
   } catch {
     return raw
-      .split(",")
+      .split(',')
       .map((s) => s.trim())
       .filter(Boolean);
   }

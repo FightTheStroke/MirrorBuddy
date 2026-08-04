@@ -86,12 +86,16 @@ const eslintConfig = defineConfig([
     // Coverage reports
     "coverage/**",
     // Playwright reports (generated files)
-    "playwright-report/**",
-    "test-results/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
     // Git worktree directories (local only)
     "feat/**",
     "feature/**",
     "worktrees/**",
+    // Local tooling output: gitignored, but ESLint still walked into the
+    // bundled Playwright trace viewer and reported thousands of errors in
+    // minified vendor code, which made `npm run lint` unusable locally.
+    ".gstack/**",
   ]),
   // Custom rules
   {
