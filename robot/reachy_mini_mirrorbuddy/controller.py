@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from . import presence, tools
+from . import ambient_vision, presence, tools
 from .audio_io import AudioIO
 from .azure_realtime import AzureRealtimeClient
 from .config import Config
@@ -50,6 +50,7 @@ class Controller(ToolCallMixin):
         self._partial = ""  # transcript of the reply in flight, used to read the mood
         self._expressed = False
         self._presence: presence.PresenceWatcher | None = None
+        self._vision: ambient_vision.AmbientVision | None = None
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> bool:
@@ -61,6 +62,11 @@ class Controller(ToolCallMixin):
         if self.cfg.ENABLE_CAMERA:
             self._presence = presence.PresenceWatcher(self.robot, self._on_presence)
             self._presence.start()
+            if self.cfg.AMBIENT_VISION:
+                self._vision = ambient_vision.AmbientVision(
+                    self.robot, interval_s=self.cfg.AMBIENT_VISION_INTERVAL_S
+                )
+                self._vision.start()
         ready = self._client.wait_ready(timeout=25.0)
         if not ready:
             logger.warning("Realtime session not confirmed ready; continuing anyway")
@@ -74,6 +80,9 @@ class Controller(ToolCallMixin):
         if self._presence:
             self._presence.stop()
             self._presence = None
+        if self._vision:
+            self._vision.stop()
+            self._vision = None
         c = self._client
         if c:
             c.stop()
@@ -149,6 +158,10 @@ class Controller(ToolCallMixin):
         self.audio.interrupt()
         self.reset_expression()
         self.movements.set_emotion("curious")
+        if self._vision and self._client:
+            threading.Thread(
+                target=self._vision.attach, args=(self._client,), name="AmbientFrame", daemon=True
+            ).start()
 
     def _on_transcript(self, text: str, final: bool) -> None:
         """Log the finished line; colour the body language from the first words."""

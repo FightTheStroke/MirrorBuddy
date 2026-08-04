@@ -108,9 +108,10 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         if respond:
             self._enqueue(json.dumps({"type": "response.create"}))
 
-    def send_image(self, data_url: str, prompt: str) -> None:
+    def send_image(self, data_url: str, prompt: str, respond: bool = True) -> None:
         self._enqueue(json.dumps(rt_messages.image_message(data_url, prompt)))
-        self._enqueue(json.dumps({"type": "response.create"}))
+        if respond:
+            self._enqueue(json.dumps({"type": "response.create"}))
 
     def speak_now(self, instructions: str) -> None:
         """Ask the model to say something on its own initiative (thread-safe).
@@ -199,5 +200,12 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         await self._safe_send(json.dumps({"type": "response.create", "response": {"instructions": instructions}}))
 
     async def _request_response(self, instructions: str | None = None) -> None:
-        """Ask the model to speak now, optionally steering what it should say."""
+        """Ask the model to speak now, optionally steering what it should say.
+
+        The server rejects a second response while one is streaming
+        (``conversation_already_has_active_response``), so a turn that is already
+        being answered is left alone.
+        """
+        if self._responding:
+            return
         await self._safe_send(json.dumps(rt_messages.response_create(instructions)))

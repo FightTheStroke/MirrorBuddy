@@ -58,7 +58,7 @@ class RealtimeEventsMixin:
 
         if etype == "response.created":
             if self._quiet or self._asleep:
-                await self._safe_send(rt_messages.CANCEL)
+                await self._cancel_response()
                 self._suppress = True
                 return
             if self._pending_farewell:  # the goodbye is now starting → sleep once it's done
@@ -94,7 +94,7 @@ class RealtimeEventsMixin:
                 self._pending_farewell = True
                 self._suppress = False
                 if self._responding or self._fast_requested:
-                    await self._safe_send(rt_messages.CANCEL)
+                    await self._cancel_response()
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
             if action == session_flow.STOP:
@@ -107,7 +107,7 @@ class RealtimeEventsMixin:
                 # Also cancels a fast-path response requested before the transcript
                 # arrived: "zitto" must win even when it ends a long sentence.
                 if self._responding or self._fast_requested:
-                    await self._safe_send(rt_messages.CANCEL)
+                    await self._cancel_response()
                 if self.on_speech_started:
                     _safe_cb(self.on_speech_started)  # flush local playback now
                 if self.on_sleep:
@@ -129,7 +129,7 @@ class RealtimeEventsMixin:
             self._speech_started_at = time.monotonic()
             self._fast_requested = False
             if self._responding:
-                await self._safe_send(rt_messages.CANCEL)
+                await self._cancel_response()
             if self.on_speech_started:
                 _safe_cb(self.on_speech_started)
             return
@@ -196,3 +196,13 @@ class RealtimeEventsMixin:
             return
 
         logger.debug("Unhandled event: %s", etype)
+
+    async def _cancel_response(self) -> None:
+        """Cancel the response in flight and forget it.
+
+        The server will not accept a new response while it believes one is still
+        streaming, and a cancelled response never emits ``response.done``, so the
+        flag has to be cleared here or the next turn would stay silent.
+        """
+        self._responding = False
+        await self._safe_send(rt_messages.CANCEL)
