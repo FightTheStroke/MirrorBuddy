@@ -17,19 +17,11 @@ import numpy as np
 
 from .audio_dsp import boost, resample
 from .azure_realtime import SAMPLE_RATE
+from .barge_detector import BargeDetector
 
 logger = logging.getLogger(__name__)
 
 _PLAY_TTL_S = 0.25  # treat Buddy as "speaking" for this long after the last audio chunk
-
-# The configured threshold is an upper bound, not the target: a quiet room measures
-# ~0.004 RMS, and a child who does not project (cerebral palsy, shyness, tiredness)
-# never reaches a fixed 0.045 — so "zitto" would go unheard exactly when it matters.
-# We track the room's noise floor while Buddy is silent and trigger at a multiple of
-# it, never below _BARGE_MIN_RMS (so a silent room cannot arm on nothing).
-_NOISE_EMA_ALPHA = 0.05
-_BARGE_NOISE_RATIO = 4.0
-_BARGE_MIN_RMS = 0.012
 
 
 class AudioIO:
@@ -59,28 +51,26 @@ class AudioIO:
         self._in_rate: int | None = None
         self._out_rate: int | None = None
         self._playing_until = 0.0  # monotonic deadline: Buddy is "speaking" until then
-        self._loud_frames = 0  # consecutive over-threshold mic frames (barge-in debounce)
-        self._noise_floor = 0.004  # room RMS while Buddy is silent, adapted continuously
-        # Barge-in thresholds: prefer values passed by the caller (from Config, read
-        # after the instance .env loads); fall back to the env/defaults for standalone use.
-        self._barge_rms_threshold = (
-            barge_rms_threshold if barge_rms_threshold is not None else barge_rms_threshold()
-        )
-        self._barge_sustain_frames = (
-            barge_sustain_frames if barge_sustain_frames is not None else barge_sustain_frames()
-        )
         # Software make-up gain on Buddy's voice, on top of the system volume. The
         # robot speaker is small: in a room with a child around, the hardware maximum
         # alone is often not enough to be comfortably intelligible.
         self.output_gain = max(0.1, min(8.0, float(output_gain)))
         # A louder voice also leaks more into the mic, so the barge-in threshold has
         # to rise with it — otherwise Buddy's own speech would cut Buddy off.
-        self._barge_rms_threshold *= max(1.0, self.output_gain / 1.6)
+        self.barge = BargeDetector(
+            rms_threshold=barge_rms_threshold,
+            sustain_frames=barge_sustain_frames,
+            output_gain=self.output_gain,
+        )
+
+    def note_mic_frame(self, rms: float, speaking: bool) -> bool:
+        """Feed one mic frame in; True means cut Buddy off right now."""
+        cut = self.barge.note_frame(rms, speaking)
+        return cut and self.on_local_barge_in is not None
 
     def barge_threshold(self) -> float:
         """RMS a voice must reach to cut Buddy off, adapted to the room."""
-        adaptive = max(_BARGE_MIN_RMS, self._noise_floor * _BARGE_NOISE_RATIO)
-        return min(self._barge_rms_threshold, adaptive)
+        return self.barge.threshold()
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> None:
@@ -91,7 +81,9 @@ class AudioIO:
 
         self._recording = True
         self._stop.clear()
-        self._thread = threading.Thread(target=self._input_loop, name="MirrorBuddyMic", daemon=True)
+        self._thread = threading.Thread(
+            target=self._input_loop, name="MirrorBuddyMic", daemon=True
+        )
         self._thread.start()
 
     def _probe_rates(self) -> None:
@@ -109,8 +101,12 @@ class AudioIO:
             self._out_rate = int(self.robot.media.get_output_audio_samplerate())
         except Exception:
             self._out_rate = 16000
-        logger.info("Audio rates — mic: %s Hz, speaker: %s Hz, realtime: %s Hz",
-                    self._in_rate, self._out_rate, SAMPLE_RATE)
+        logger.info(
+            "Audio rates — mic: %s Hz, speaker: %s Hz, realtime: %s Hz",
+            self._in_rate,
+            self._out_rate,
+            SAMPLE_RATE,
+        )
 
     def stop(self) -> None:
         self._recording = False
@@ -163,7 +159,7 @@ class AudioIO:
         """Stop current playback (barge-in) and reset movement state."""
         # Playback is being cut: stop watching for a barge-in until the next chunk.
         self._playing_until = 0.0
-        self._loud_frames = 0
+        self.barge.reset()
         # clear_output_buffer() is deprecated and a no-op on this firmware; clear_player()
         # actually flushes the queued speaker audio so speech stops immediately.
         try:
@@ -189,7 +185,11 @@ class AudioIO:
                 if sample is None:
                     time.sleep(0.001)
                     continue
-                audio = sample if isinstance(sample, np.ndarray) else np.frombuffer(sample, dtype=np.int16)
+                audio = (
+                    sample
+                    if isinstance(sample, np.ndarray)
+                    else np.frombuffer(sample, dtype=np.int16)
+                )
 
                 # Downmix to mono.
                 if audio.ndim == 2:
@@ -204,34 +204,18 @@ class AudioIO:
 
                 # Local barge-in: if the (echo-cancelled) mic hears a sustained voice
                 # while Buddy is speaking, cut playback instantly — no server round-trip.
-                speaking = time.monotonic() < self._playing_until
-                if audio.size and not speaking:
-                    # Learn the room, not Buddy's echo: only sample while he is silent.
-                    rms = float(np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2)))
-                    self._noise_floor = (
-                        1 - _NOISE_EMA_ALPHA
-                    ) * self._noise_floor + _NOISE_EMA_ALPHA * rms
-                if self.on_local_barge_in is not None and audio.size and speaking:
-                    rms = float(np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2)))
-                    if rms >= self.barge_threshold():
-                        self._loud_frames += 1
-                        if self._loud_frames >= self._barge_sustain_frames:
-                            self._loud_frames = 0
-                            logger.info(
-                                "Local barge-in (rms=%.3f, threshold=%.3f, floor=%.4f) — cutting playback now",
-                                rms,
-                                self.barge_threshold(),
-                                self._noise_floor,
-                            )
-                            self.interrupt()  # flush our speaker immediately
-                            try:
-                                self.on_local_barge_in()  # tell the client to drop in-flight audio
-                            except Exception as e:  # pragma: no cover - runtime robustness
-                                logger.debug("local barge-in callback error: %s", e)
-                    else:
-                        self._loud_frames = 0
-                else:
-                    self._loud_frames = 0
+                if audio.size:
+                    rms = float(
+                        np.sqrt(np.mean((audio.astype(np.float32) / 32768.0) ** 2))
+                    )
+                    if self.note_mic_frame(
+                        rms, speaking=time.monotonic() < self._playing_until
+                    ):
+                        self.interrupt()  # flush our speaker immediately
+                        try:
+                            self.on_local_barge_in()  # tell the client to drop in-flight audio
+                        except Exception as e:  # pragma: no cover - runtime robustness
+                            logger.debug("local barge-in callback error: %s", e)
 
                 # Resample microphone -> realtime rate.
                 if needs_resample and audio.size:
