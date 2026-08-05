@@ -58,7 +58,7 @@ class RealtimeEventsMixin:
 
         if etype == "response.created":
             if self._quiet or self._asleep:
-                await self._safe_send(rt_messages.CANCEL)
+                await self._cancel_response()
                 self._suppress = True
                 return
             if self._pending_farewell:  # the goodbye is now starting → sleep once it's done
@@ -76,12 +76,35 @@ class RealtimeEventsMixin:
                     _safe_cb(self.on_sleep)
             return
 
+        # "Zitto" cannot wait for the full transcription pass. A child who asks for
+        # silence and is answered anyway is a child being talked over, so the partial
+        # transcript is read as it streams and the hush fires on the first words.
+        if etype.endswith("input_audio_transcription.delta"):
+            if self._asleep or self._stopped_on_partial:
+                return
+            self._partial_user += event.get("delta") or ""
+            if rt_messages.is_stop(self._partial_user):
+                self._stopped_on_partial = True
+                await self._apply_stop(rest=rt_messages.is_rest(self._partial_user))
+            return
+
         # Student's speech transcribed: honour stop / end / wake intents deterministically.
         if etype.endswith("input_audio_transcription.completed"):
             text = (event.get("transcript") or "").strip()
             if not text:
                 return
             action = session_flow.decide(text, self._asleep)
+            # The hush belongs to the turn that triggered it. Deployments that emit
+            # partials but no speech_started have nothing else to clear it, and a
+            # flag that outlives its turn silences every turn after it.
+            hushed, self._stopped_on_partial, self._partial_user = (
+                self._stopped_on_partial, False, "",
+            )
+            # The wake word is never swallowed: being called by name outranks any
+            # hush already applied for this turn.
+            _still_matters = (session_flow.END, session_flow.REST, session_flow.WAKE)
+            if hushed and action not in _still_matters:
+                return  # already hushed while the student was still speaking
             if action == session_flow.IGNORE:
                 return
             if action == session_flow.WAKE:
@@ -92,28 +115,18 @@ class RealtimeEventsMixin:
                 return
             if action == session_flow.END:
                 self._pending_farewell = True
-                self._suppress = False
+                self._suppress = self._quiet = False
                 if self._responding or self._fast_requested:
-                    await self._safe_send(rt_messages.CANCEL)
+                    await self._cancel_response()
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
-            if action == session_flow.STOP:
-                # "basta / fermati" → go quiet AND park in a rest posture, staying put
-                # until called back by name. Insistence stresses the child, so a stop is
-                # a full stop, not a brief pause that resumes on the next sound.
-                self._asleep = True
-                self._quiet = True
-                self._suppress = True
-                # Also cancels a fast-path response requested before the transcript
-                # arrived: "zitto" must win even when it ends a long sentence.
-                if self._responding or self._fast_requested:
-                    await self._safe_send(rt_messages.CANCEL)
-                if self.on_speech_started:
-                    _safe_cb(self.on_speech_started)  # flush local playback now
-                if self.on_sleep:
-                    _safe_cb(self.on_sleep)  # settle into the rest position
+            if action in (session_flow.REST, session_flow.PAUSE):
+                await self._apply_stop(rest=action == session_flow.REST)
                 return
             if action == session_flow.SPEAK:
+                # A pause lifts on the next thing the student says, even where the
+                # deployment never emits speech_started to clear the flag for us.
+                self._quiet = False
                 # Ordinary turn. If the fast path already asked for the response when
                 # speech ended, asking again would make Buddy answer twice.
                 if not self._fast_requested:
@@ -122,6 +135,12 @@ class RealtimeEventsMixin:
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
         if etype == "input_audio_buffer.speech_started":
+            # Clear the per-turn hush flags first, asleep or not: they used to
+            # survive a rest, and the next transcript — even "Buddy" — was then
+            # dropped before the wake word was ever read. The robot could only be
+            # revived by restarting the app.
+            self._partial_user = ""
+            self._stopped_on_partial = False
             if self._asleep:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
@@ -129,7 +148,7 @@ class RealtimeEventsMixin:
             self._speech_started_at = time.monotonic()
             self._fast_requested = False
             if self._responding:
-                await self._safe_send(rt_messages.CANCEL)
+                await self._cancel_response()
             if self.on_speech_started:
                 _safe_cb(self.on_speech_started)
             return
@@ -196,3 +215,37 @@ class RealtimeEventsMixin:
             return
 
         logger.debug("Unhandled event: %s", etype)
+
+    async def _cancel_response(self) -> None:
+        """Cancel the response in flight and forget it.
+
+        The server will not accept a new response while it believes one is still
+        streaming, and a cancelled response never emits ``response.done``, so the
+        flag has to be cleared here or the next turn would stay silent.
+        """
+        self._responding = False
+        await self._safe_send(rt_messages.CANCEL)
+
+    async def _apply_stop(self, rest: bool) -> None:
+        """Stop talking now; go to sleep only if the silence was asked for deliberately.
+
+        ``rest=True`` ("zitto", "dormi") parks the robot: quiet, in the rest posture,
+        and awake again only when the child calls it by name. ``rest=False``
+        ("aspetta") just drops the current sentence — the next turn is answered
+        normally, because everyday filler must not cost the wake word.
+
+        Either way the in-flight response is cancelled, including one requested by
+        the fast path before the transcript arrived: the hush wins even when it ends
+        a long sentence.
+        """
+        self._quiet = True
+        self._suppress = True
+        if self._responding or self._fast_requested:
+            await self._cancel_response()
+        if self.on_speech_started:
+            _safe_cb(self.on_speech_started)  # flush local playback now
+        if not rest:
+            return
+        self._asleep = True
+        if self.on_sleep:
+            _safe_cb(self.on_sleep)  # settle into the rest position

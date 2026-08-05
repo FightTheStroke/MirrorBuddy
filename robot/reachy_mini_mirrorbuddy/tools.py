@@ -97,6 +97,42 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         ),
         "parameters": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "type": "function",
+        "name": "remember_person",
+        "description": (
+            "Registra il nome di una persona che si e' appena presentata o che ti ha detto come "
+            "si chiama (un amico dello studente, un fratello, un genitore, o lo studente stesso). "
+            "Usalo SUBITO dopo aver sentito il nome, cosi' te lo ricordi per tutta la conversazione "
+            "e puoi rivolgerti alla persona giusta. Non usarlo con nomi che non hai sentito dire."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Il nome proprio cosi' come la persona lo ha detto (es. 'Giulia').",
+                },
+                "is_student": {
+                    "type": "boolean",
+                    "description": (
+                        "true se e' lo studente che segui a dirti il proprio nome; "
+                        "false o assente se e' un'altra persona (un amico, un fratello, un genitore)."
+                    ),
+                },
+            },
+            "required": ["name"],
+        },
+    },
+    {
+        "type": "function",
+        "name": "who_is_here",
+        "description": (
+            "Ricorda chi c'e' in questo momento davanti a te: lo studente e le persone che si sono "
+            "presentate. Usalo se non ricordi o non sei sicuro di come si chiama chi ti sta parlando."
+        ),
+        "parameters": {"type": "object", "properties": {}, "required": []},
+    },
 ]
 
 

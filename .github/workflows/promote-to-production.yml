@@ -89,6 +89,12 @@ jobs:
           fi
           echo "✅ Staging is healthy (HTTP $status)"
 
+      # The check below imports `pg`, which only exists once the workspace is
+      # installed. Without this step the gate fails on a missing module and
+      # looks exactly like real schema drift.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
       - name: Verify database schema is up to date
         env:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -101,14 +107,46 @@ jobs:
             echo "::error::DIRECT_URL secret is not set — cannot verify schema drift"
             exit 1
           fi
-          pnpm dlx tsx scripts/check-migrations-applied.ts
+          pnpm exec tsx scripts/check-migrations-applied.ts
 
       - name: Promote to Production
         id: promote
         run: |
           url="${{ steps.find-staging.outputs.deployment_url }}"
           echo "🚀 Promoting $url to production..."
-          vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes
+          # Vercel already promotes the latest main build on its own, so by the
+          # time this runs the chosen deployment is often already live. That is
+          # the desired end state, not a failure — a red run here sent us looking
+          # for a broken deploy that did not exist.
+          # A build triggered by the merge may still be running when this starts:
+          # Vercel then refuses with "is not ready", which is a matter of waiting.
+          promoted=false
+          for attempt in $(seq 1 10); do
+            if out=$(vercel promote "$url" --token=${{ secrets.VERCEL_TOKEN }} --scope=team_nDwLfqx9JbVIs4C7Il79f4ln --yes 2>&1); then
+              echo "$out"
+              promoted=true
+              break
+            fi
+            echo "$out"
+            if echo "$out" | grep -q "already the current production deployment"; then
+              echo "✅ Already in production — nothing to promote"
+              promoted=true
+              break
+            fi
+            if echo "$out" | grep -q "is not ready"; then
+              echo "Deployment still building; retrying in 30s (attempt $attempt/10)"
+              sleep 30
+              continue
+            fi
+            exit 1
+          done
+          # Running out of attempts is a failure, not a promotion: without this
+          # the loop would fall through to the success line below and report a
+          # deploy that never went live.
+          if [ "$promoted" != "true" ]; then
+            echo "::error::Deployment was still not ready after 10 attempts (5 minutes)"
+            exit 1
+          fi
           echo "✅ Promotion complete"
           echo "promoted_url=$url" >> $GITHUB_OUTPUT
 

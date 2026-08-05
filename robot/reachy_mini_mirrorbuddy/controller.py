@@ -14,13 +14,14 @@ from __future__ import annotations
 import logging
 import threading
 
-from . import presence, tools
+from . import ambient_vision, presence, tools
 from .audio_io import AudioIO
 from .azure_realtime import AzureRealtimeClient
 from .config import Config
 from .dsa import turn_detection_config
 from .mirrorbuddy_client import Maestro
 from .movements import Movements, temperament_for
+from .people import Roster
 from .prompt_builder import build_instructions
 from .tool_handlers import ToolCallMixin
 
@@ -45,11 +46,14 @@ class Controller(ToolCallMixin):
         self.maestro = maestro
         self.audio = audio
         self.movements = movements
+        # Who is in the room, for this power cycle only (see people.Roster).
+        self.people = Roster(cfg.STUDENT_NAME)
         self._client: AzureRealtimeClient | None = None
         self._switch_lock = threading.Lock()
         self._partial = ""  # transcript of the reply in flight, used to read the mood
         self._expressed = False
         self._presence: presence.PresenceWatcher | None = None
+        self._vision: ambient_vision.AmbientVision | None = None
 
     # ------------------------------------------------------------------ lifecycle
     def start(self) -> bool:
@@ -61,6 +65,11 @@ class Controller(ToolCallMixin):
         if self.cfg.ENABLE_CAMERA:
             self._presence = presence.PresenceWatcher(self.robot, self._on_presence)
             self._presence.start()
+            if self.cfg.AMBIENT_VISION:
+                self._vision = ambient_vision.AmbientVision(
+                    self.robot, interval_s=self.cfg.AMBIENT_VISION_INTERVAL_S
+                )
+                self._vision.start()
         ready = self._client.wait_ready(timeout=25.0)
         if not ready:
             logger.warning("Realtime session not confirmed ready; continuing anyway")
@@ -74,6 +83,9 @@ class Controller(ToolCallMixin):
         if self._presence:
             self._presence.stop()
             self._presence = None
+        if self._vision:
+            self._vision.stop()
+            self._vision = None
         c = self._client
         if c:
             c.stop()
@@ -86,6 +98,7 @@ class Controller(ToolCallMixin):
             locale=self.cfg.LOCALE,
             dsa_profile=self.cfg.DSA_PROFILE,
             student_name=self.cfg.STUDENT_NAME,
+            roster=self.people,
         )
         return AzureRealtimeClient(
             ws_url=self.cfg.realtime_ws_url(),
@@ -127,19 +140,27 @@ class Controller(ToolCallMixin):
             )
         elif event == presence.RETURNED:
             client.speak_now(
-                f"Lo studente e' tornato dopo una pausa: fai un bentornato molto breve "
-                f"{self._name_clause()} e riprendi da dove eravate. Una frase soltanto."
+                "Lo studente e' tornato dopo una pausa: fai un bentornato molto breve "
+                f"{self._name_clause(use_name=False)} e riprendi da dove eravate. Una frase soltanto."
             )
 
-    def _name_clause(self) -> str:
-        """How to address the child — never an open invitation to invent a name.
+    def _name_clause(self, use_name: bool = True) -> str:
+        """How to address the room — never an open invitation to invent a name.
 
         "Greet him by name" without supplying one is exactly how the robot ended up
         calling Mario "Luca". If we don't have a usable name (the server encrypts
         names, and a decryption miss puts ciphertext on the wire), we say so.
+
+        ``use_name=False`` is the sparing half of the fix: the opening hello may use
+        the name, a welcome-back two minutes later should not — repeating it every
+        single time is the tic Roberto asked us to remove.
         """
-        name = (self.cfg.STUDENT_NAME or "").strip()
-        if name and not name.startswith(("pii:", "[")):
+        if self.people.guests:
+            # More than one person at the table: a single name would address the
+            # wrong one, so greet the room and let the model pick who is speaking.
+            return "salutando chi c'e' senza ripetere i nomi"
+        name = self.people.primary
+        if use_name and name:
             return f"chiamandolo per nome ({name})"
         return "senza usare nomi propri"
 
@@ -149,6 +170,10 @@ class Controller(ToolCallMixin):
         self.audio.interrupt()
         self.reset_expression()
         self.movements.set_emotion("curious")
+        if self._vision and self._client:
+            threading.Thread(
+                target=self._vision.attach, args=(self._client,), name="AmbientFrame", daemon=True
+            ).start()
 
     def _on_transcript(self, text: str, final: bool) -> None:
         """Log the finished line; colour the body language from the first words."""

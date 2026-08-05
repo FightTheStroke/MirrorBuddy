@@ -1,35 +1,27 @@
-"use client";
+'use client';
 
-import { Sparkles, Heart, GraduationCap, Palette } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CharacterSelector } from "./character-selector";
-import { ColorPicker, ColorPreview } from "./color-picker";
-import { BORDER_COLORS, COACHES, BUDDIES } from "./character-settings-data";
-import { useTranslations } from "next-intl";
+import { Sparkles, Heart, GraduationCap, Palette } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CharacterSelector } from './character-selector';
+import { ColorPicker, ColorPreview } from './color-picker';
+import { BORDER_COLORS, COACHES, BUDDIES } from './character-settings-data';
+import { useTranslations } from 'next-intl';
+import { DEFAULT_COACH_ID, DEFAULT_BUDDY_ID } from '@/lib/characters/defaults';
 
 interface CharacterSettingsProps {
   profile: {
-    preferredCoach?:
-      | "melissa"
-      | "roberto"
-      | "chiara"
-      | "andrea"
-      | "favij"
-      | "laura";
-    preferredBuddy?: "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta";
+    preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij' | 'laura';
+    preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia' | 'marta';
     coachBorderColor?: string;
     buddyBorderColor?: string;
   };
-  onUpdate: (updates: Partial<CharacterSettingsProps["profile"]>) => void;
+  onUpdate: (updates: Partial<CharacterSettingsProps['profile']>) => void;
 }
 
-export function CharacterSettings({
-  profile,
-  onUpdate,
-}: CharacterSettingsProps) {
-  const t = useTranslations("settings");
-  const selectedCoach = profile.preferredCoach || "melissa";
-  const selectedBuddy = profile.preferredBuddy || "mario";
+export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
+  const t = useTranslations('settings');
+  const selectedCoach = profile.preferredCoach || DEFAULT_COACH_ID;
+  const selectedBuddy = profile.preferredBuddy || DEFAULT_BUDDY_ID;
   const coachData = COACHES.find((c) => c.id === selectedCoach);
   const buddyData = BUDDIES.find((b) => b.id === selectedBuddy);
 
@@ -39,11 +31,11 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-amber-500" />
-            {t("ilTuoCoachDiApprendimento")}
+            {t('ilTuoCoachDiApprendimento')}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {t("ilCoachTiAiutaASviluppareIlTuoMetodoDiStudioEDiven")}
-            {t("autonomo")}
+            {t('ilCoachTiAiutaASviluppareIlTuoMetodoDiStudioEDiven')}
+            {t('autonomo')}
           </p>
         </CardHeader>
         <CardContent>
@@ -53,12 +45,12 @@ export function CharacterSettings({
             onSelect={(id) =>
               onUpdate({
                 preferredCoach: id as
-                  | "melissa"
-                  | "roberto"
-                  | "chiara"
-                  | "andrea"
-                  | "favij"
-                  | "laura",
+                  | 'melissa'
+                  | 'roberto'
+                  | 'chiara'
+                  | 'andrea'
+                  | 'favij'
+                  | 'laura',
               })
             }
             title=""
@@ -71,11 +63,11 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Heart className="w-5 h-5 text-rose-500" />
-            {t("ilTuoMirrorbuddy")}
+            {t('ilTuoMirrorbuddy')}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {t("ilBuddyEUnAmicoDellaTuaEtaCheCapisceLeTueDifficolt")}
-            {t("supporta")}
+            {t('ilBuddyEUnAmicoDellaTuaEtaCheCapisceLeTueDifficolt')}
+            {t('supporta')}
           </p>
         </CardHeader>
         <CardContent>
@@ -84,13 +76,7 @@ export function CharacterSettings({
             selectedId={selectedBuddy}
             onSelect={(id) =>
               onUpdate({
-                preferredBuddy: id as
-                  | "mario"
-                  | "noemi"
-                  | "enea"
-                  | "bruno"
-                  | "sofia"
-                  | "marta",
+                preferredBuddy: id as 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia' | 'marta',
               })
             }
             title=""
@@ -103,10 +89,10 @@ export function CharacterSettings({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-violet-500" />
-            {t("personalizzaIColori")}
+            {t('personalizzaIColori')}
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            {t("scegliIColoriDeiBordiPerRiconoscereCoachEBuddyNegl")}
+            {t('scegliIColoriDeiBordiPerRiconoscereCoachEBuddyNegl')}
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -144,11 +130,11 @@ export function CharacterSettings({
           </div>
           <div>
             <h4 className="font-medium text-amber-900 dark:text-amber-100">
-              {t("ilTriangoloDelSupporto")}
+              {t('ilTriangoloDelSupporto')}
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              {t("ilCoachTiInsegnaIlMetodoIlBuddyTiSupportaEmotivame")}
-              {t("characterSettingsTeamDescription")}
+              {t('ilCoachTiInsegnaIlMetodoIlBuddyTiSupportaEmotivame')}
+              {t('characterSettingsTeamDescription')}
             </p>
           </div>
         </div>

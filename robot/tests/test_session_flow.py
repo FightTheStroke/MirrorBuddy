@@ -63,12 +63,13 @@ class TestDecide:
         assert session_flow.decide("abbiamo finito, a domani", asleep=False) == session_flow.END
 
     def test_awake_stop(self):
-        assert session_flow.decide("basta", asleep=False) == session_flow.STOP
+        # "basta" is everyday filler: hush this sentence, stay awake.
+        assert session_flow.decide("basta", asleep=False) == session_flow.PAUSE
 
-    def test_awake_sleep_command_is_stop(self):
+    def test_awake_sleep_command_is_rest(self):
         # "dormi" is a sleep command: rest immediately, no reply, wake only on "buddy".
         for t in ["dormi", "vai a dormire", "mettiti a riposo", "riposati"]:
-            assert session_flow.decide(t, asleep=False) == session_flow.STOP, t
+            assert session_flow.decide(t, asleep=False) == session_flow.REST, t
 
     def test_asleep_stays_asleep_on_sleep_command(self):
         assert session_flow.decide("dormi", asleep=True) == session_flow.IGNORE
