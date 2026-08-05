@@ -28,7 +28,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/AI%20Maestri-26-purple" alt="26 AI Maestri">
+  <img src="https://img.shields.io/badge/AI%20Maestri-27-purple" alt="27 AI Maestri">
   <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
   <a href="robot/README.md"><img src="https://img.shields.io/badge/Reachy%20Mini-Robot%20app-5b47e0?logo=huggingface" alt="Reachy Mini Robot"></a>
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
@@ -87,7 +87,7 @@ Every student in MirrorBuddy has access to three types of AI support:
               v             v             v
         +-----------+ +-----------+ +-----------+
         |   COACH   | |   BUDDY   | |  MAESTRI  |
-        |  (6 AI)   | |  (6 AI)   | |  (26 AI)  |
+        |  (6 AI)   | |  (6 AI)   | |  (27 AI)  |
         |           | |           | |           |
         |  Method   | |   Peer    | |  Content  |
         |  Support  | |  Support  | |  Experts  |
@@ -96,7 +96,7 @@ Every student in MirrorBuddy has access to three types of AI support:
 
 | Type        | Characters                                     | Relationship              | Goal                                |
 | ----------- | ---------------------------------------------- | ------------------------- | ----------------------------------- |
-| **Maestri** | 26 historical & modern figures                 | Mentor (vertical)         | Teach subjects with passion         |
+| **Maestri** | 27 historical & modern figures                 | Mentor (vertical)         | Teach subjects with passion         |
 | **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij, Laura | Learning coach (vertical) | Develop METHOD and autonomy         |
 | **Buddies** | Mario, Noemi, Enea, Bruno, Sofia, Marta        | Peer friend (horizontal)  | Emotional support, shared struggles |
 
@@ -106,7 +106,7 @@ Instead of reading _about_ Euclid in a textbook, students learn mathematics **wi
 
 Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**26 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law), Moliere (French), Goethe (German), Cervantes (Spanish), Levi-Montalcini (Biology)
+**27 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law), Moliere (French), Goethe (German), Cervantes (Spanish), Levi-Montalcini (Biology), Fratello Loto (Mindfulness)
 
 ---
 
@@ -293,7 +293,7 @@ open-source desktop robot by [Hugging Face](https://huggingface.co/blog/reachy-m
   </a>
 </p>
 
-It reuses **MirrorBuddy's brain 1:1**: the same 26 Maestri (fetched live from
+It reuses **MirrorBuddy's brain 1:1**: the same 27 Maestri (fetched live from
 `/api/maestri`), the same Azure OpenAI **Realtime** speech-to-speech voices, the same
 child-safety constitution and the 7 DSA accessibility profiles — everything by **voice**,
 no screen needed.
@@ -356,7 +356,7 @@ MirrorBuddy offers three tiers to meet different needs:
 | **Chat messages/day**          | 10        | 50          | Unlimited |
 | **Voice time/day**             | 5 min     | 30 min      | Unlimited |
 | **Tools/day** (mind maps, etc) | 10        | 30          | Unlimited |
-| **Maestri access**             | 3 random  | 25          | All 26    |
+| **Maestri access**             | 3 random  | 25          | All 27    |
 | **Flashcards (FSRS)**          | ✓         | ✓           | ✓         |
 | **Progress analytics**         | —         | ✓           | ✓         |
 | **Homework help (PDF/photos)** | —         | ✓           | ✓         |

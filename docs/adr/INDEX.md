@@ -183,6 +183,7 @@
 | 0133 | PWA Offline Strategy                                   | Native Service Worker, offline-first caching |
 | 0134 | Gamification UI - Surface Backend Achievements         | Achievements page, streaks, XP progress      |
 | 0170 | Reachy Mini Robot Embodiment + Device Pairing          | Voice-first robot tutor, credential-free pairing |
+| 0171 | Guided meditation as an imposed silence                | Session owns the clock; voice always restored     |
 
 ## Tier & Business
 
@@ -215,6 +216,6 @@
 
 ---
 
-**Total Active ADRs**: 130
+**Total Active ADRs**: 131
 **Archived ADRs**: 7
-**Last Updated**: 2026-06-13
+**Last Updated**: 2026-08-05
