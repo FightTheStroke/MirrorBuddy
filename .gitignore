@@ -142,3 +142,6 @@ kanban/todo/
 kanban/doing/
 kanban/done/
 handoff/latest.md
+
+# graphify knowledge graph output (regenerable, ~30k nodes)
+graphify-out/
