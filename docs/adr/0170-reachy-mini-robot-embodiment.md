@@ -96,6 +96,15 @@ child's account via a short-lived code exchanged for a scoped token:
 The child's credentials never leave the computer; the robot only ever holds a
 revocable token and a learning profile.
 
+### Bystanders (friends, siblings, parents)
+
+A robot on a kitchen table is used in front of people who never paired anything. Buddy
+may therefore learn a bystander's **first name only**, and only because they said it
+out loud (`remember_person`). That roster is **in-memory for one power cycle**: never
+written to disk, never sent to the server, gone when the robot is switched off. There
+is no voice or face recognition — identifying a third party biometrically would need
+its own ADR and its own consent, and we are not doing it.
+
 ### Security model (reviewed — see Consequences)
 
 - Codes are 6-digit, single-use, 10-min TTL.
