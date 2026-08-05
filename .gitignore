@@ -2,6 +2,9 @@
 
 # dependencies
 node_modules/
+# no trailing slash: worktrees symlink node_modules, and 'node_modules/'
+# does not match a symlink (a committed one breaks the Turbopack build)
+node_modules
 /.pnp
 .pnp.*
 .yarn/*

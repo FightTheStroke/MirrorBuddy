@@ -15,6 +15,8 @@ import {
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
 import type { ToolType as MethodToolType, HelpLevel } from '@/lib/method-progress/types';
 import type { Maestro } from '@/types';
+import { buildPlan } from '@/lib/meditation/session';
+import { armBrowserMeditation } from '@/lib/meditation/browser';
 import type { UseVoiceSessionOptions } from './types';
 
 export interface ToolHandlerParams {
@@ -22,6 +24,8 @@ export interface ToolHandlerParams {
   maestroRef: React.MutableRefObject<Maestro | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
+  /** The sink the model's voice comes out of — a meditation mutes it directly. */
+  webrtcAudioElementRef?: React.MutableRefObject<HTMLAudioElement | null>;
   addToolCall: (toolCall: {
     id: string;
     type: import('@/types').ToolType;
@@ -57,6 +61,7 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     maestroRef,
     sessionIdRef,
     webrtcDataChannelRef,
+    webrtcAudioElementRef,
     addToolCall,
     updateToolCall,
     options,
@@ -124,6 +129,42 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
             success: false,
             error: 'camera_unavailable',
           }),
+        },
+      });
+      sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
+      return;
+    }
+
+    // A guided meditation is mostly silence, and the silence has to be real.
+    // A model asked to "pause" fills the gap, so the silence is imposed here:
+    // the voice is muted for the interval, whatever the model decides to say.
+    if (toolName === 'guided_meditation') {
+      const plan = buildPlan(
+        typeof args.practice === 'string' ? args.practice : '',
+        typeof args.minutes === 'number' ? args.minutes : 2,
+      );
+      // Armed, not started: the maestro introduces the practice first, and the
+      // bell rings only once he has finished speaking.
+      armBrowserMeditation(plan, {
+        audioElement: webrtcAudioElementRef?.current ?? null,
+        cancelResponse: () => {
+          sendViaWebRTC(webrtcDataChannelRef, { type: 'response.cancel' });
+        },
+        onEnd: (ended) => {
+          // The closing words are asked for only once the silence is over.
+          sendViaWebRTC(webrtcDataChannelRef, {
+            type: 'response.create',
+            response: { instructions: ended.closing },
+          });
+        },
+      });
+      updateToolCall(toolCall.id, { status: 'completed' });
+      sendViaWebRTC(webrtcDataChannelRef, {
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify({ success: true, instructions: plan.opening }),
         },
       });
       sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });

@@ -133,6 +133,34 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         ),
         "parameters": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "type": "function",
+        "name": "guided_meditation",
+        "description": (
+            "Conduci una vera sessione di meditazione: suona la campana, poi il robot resta "
+            "DAVVERO in silenzio per il tempo richiesto, poi la campana chiude. Usalo quando "
+            "lo studente accetta di meditare o lo chiede (es. 'meditiamo', 'facciamo un minuto "
+            "di silenzio', 'mi aiuti a calmarmi'). Dopo averlo chiamato non parlare: al "
+            "silenzio ci pensa il robot."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "practice": {
+                    "type": "string",
+                    "description": (
+                        "Quale pratica: 'respiro' (respiro consapevole), 'campana' (ascolto del "
+                        "suono), 'corpo' (saluto al corpo), 'sassolino' (le quattro immagini)."
+                    ),
+                },
+                "minutes": {
+                    "type": "number",
+                    "description": "Durata del silenzio in minuti (tipicamente 1-5).",
+                },
+            },
+            "required": ["practice"],
+        },
+    },
 ]
 
 
@@ -168,6 +196,12 @@ SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
     "spanish": ("spagnolo",),
     "history": ("storia",),
     "geography": ("geografia",),
+    # A child who wants to calm down does not know there is a "Fratello Loto":
+    # he says he wants to meditate, or to relax.
+    "mindfulness": (
+        "meditazione", "meditare", "medito", "mindfulness", "consapevolezza",
+        "rilassamento", "rilassarmi", "respirazione", "calma", "silenzio",
+    ),
     "art": ("arte", "disegno", "immagine"),
     "music": ("musica",),
     "philosophy": ("filosofia",),

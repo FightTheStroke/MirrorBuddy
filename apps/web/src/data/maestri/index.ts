@@ -30,12 +30,14 @@ import { moliere } from "./moliere";
 import { goethe } from "./goethe";
 import { cervantes } from "./cervantes";
 import { leviMontalcini } from "./levi-montalcini";
+import { loto } from "./loto";
 
 export type { MaestroFull } from "./types";
 export { SAFETY_GUIDELINES } from "./types";
 
 export const maestri: MaestroFull[] = [
   leonardo,
+  loto,
   galileo,
   curie,
   cicerone,
@@ -110,4 +112,5 @@ export const SUBJECT_NAMES: Record<string, string> = {
   internationalLaw: "Diritto Internazionale",
   supercazzola: "Supercazzola",
   sport: "Sport",
+  mindfulness: "Meditazione e Consapevolezza",
 };

@@ -1,6 +1,6 @@
 # MirrorBuddy — Cross-Agent Instructions
 
-AI education platform: 26 Maestri, voice, FSRS, mind maps, quizzes, gamification. Students with learning differences.
+AI education platform: 27 Maestri, voice, FSRS, mind maps, quizzes, gamification. Students with learning differences.
 
 ## Language
 

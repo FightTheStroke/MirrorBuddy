@@ -7,7 +7,7 @@
 | Key        | Value                                                       |
 | ---------- | ----------------------------------------------------------- |
 | Stack      | Next.js 16 + Zustand + Azure OpenAI + PostgreSQL + pgvector |
-| Characters | 26 Maestri + 6 Coaches + 6 Buddies (38 total)               |
+| Characters | 27 Maestri + 6 Coaches + 6 Buddies (39 total)               |
 | Compliance | EU AI Act, Italian Law 132/2025, GDPR, COPPA                |
 | ADRs       | 0015 (State), 0028 (DB), 0033 (RAG), 0064 (Formality)       |
 
@@ -17,7 +17,7 @@ Every student has access to three types of AI support:
 
 | Role        | Count | Relationship              | Purpose                             | Data Path                    |
 | ----------- | ----- | ------------------------- | ----------------------------------- | ---------------------------- |
-| **Maestri** | 26    | Mentor (vertical)         | Teach subjects with passion         | `src/data/maestri/`          |
+| **Maestri** | 27    | Mentor (vertical)         | Teach subjects with passion         | `src/data/maestri/`          |
 | **Coaches** | 6     | Learning coach (vertical) | Develop METHOD and autonomy         | `src/data/support-teachers/` |
 | **Buddies** | 6     | Peer friend (horizontal)  | Emotional support, shared struggles | `src/data/buddy-profiles/`   |
 
@@ -52,7 +52,7 @@ User Login → Character Selection → Conversation Start → Tool Proposals →
 
 | File                                  | Purpose                               |
 | ------------------------------------- | ------------------------------------- |
-| `src/data/maestri/index.ts`           | 26 Maestri definitions + knowledge    |
+| `src/data/maestri/index.ts`           | 27 Maestri definitions + knowledge    |
 | `src/data/support-teachers/index.ts`  | 6 Coaches with learning methods       |
 | `src/data/buddy-profiles/index.ts`    | 6 Buddies for peer support            |
 | `src/lib/ai/character-routing.ts`     | Character selection logic             |

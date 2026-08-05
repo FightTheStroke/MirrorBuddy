@@ -26,6 +26,7 @@ import {
   Drama,
   Waves,
 } from "lucide-react";
+import { Flower2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { MaestroCard } from "./maestro-card";
 import { PageHeader } from "@/components/ui/page-header";
@@ -57,6 +58,7 @@ const subjectLucideIcons: Record<Subject, LucideIcon> = {
   storytelling: Mic,
   supercazzola: Drama,
   sport: Waves,
+  mindfulness: Flower2,
 };
 
 type SessionMode = "voice" | "chat";

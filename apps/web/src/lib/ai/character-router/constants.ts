@@ -31,4 +31,5 @@ export const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
   storytelling: "chris",
   supercazzola: "mascetti",
   sport: "simone",
+  mindfulness: "loto",
 };
