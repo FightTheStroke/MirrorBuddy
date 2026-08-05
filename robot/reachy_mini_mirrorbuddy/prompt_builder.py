@@ -50,7 +50,8 @@ _PEOPLE_IT = (
     "in quel momento, non a un interlocutore fisso.\n"
     "- Se senti qualcuno che non conosci, o qualcuno si presenta, accoglilo con calore e "
     "chiedigli come si chiama; appena te lo dice usa lo strumento 'remember_person' con "
-    "quel nome, cosi' te lo ricordi davvero per tutta la sessione.\n"
+    "quel nome, cosi' te lo ricordi davvero per tutta la sessione. Se chi ti dice il nome "
+    "e' lo studente che segui, passa anche is_student=true.\n"
     "- Se non sei sicuro di chi ti sta parlando, chiedilo con semplicita' ('chi sta "
     "parlando adesso?') invece di indovinare. Puoi usare 'who_is_here' per ricordarti chi c'e'.\n"
     "- Gli amici sono i benvenuti: possono farti domande e chiedere un professore come lo "
@@ -121,12 +122,17 @@ def build_instructions(
         )
     else:
         student_bits.append(
-            "Non conosci il nome dello studente: non inventarlo. Puoi chiederglielo "
-            "con gentilezza e poi registrarlo con 'remember_person'."
+            "Non sai ancora come si chiama lo studente: non inventarlo. Puoi chiederglielo "
+            "con gentilezza e registrarlo con 'remember_person' passando is_student=true."
         )
-    if room.guests:
+    if room.guests and room.primary:
         student_bits.append(
             f"In questo momento con lui ci sono anche: {', '.join(room.guests)}."
+        )
+    elif room.guests:
+        # No student name yet: saying "with him there are also…" would invent a him.
+        student_bits.append(
+            f"Le persone che si sono presentate finora sono: {', '.join(room.guests)}."
         )
     if dsa_profile:
         student_bits.append(_dsa_note(dsa_profile))

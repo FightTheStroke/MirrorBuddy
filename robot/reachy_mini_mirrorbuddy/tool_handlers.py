@@ -76,7 +76,14 @@ class ToolCallMixin:
         are designing against is Buddy smoothing over a misheard name and then
         addressing a child by something nobody in the room is called.
         """
-        stored = self.people.add_guest(str(args.get("name") or ""))
+        raw = str(args.get("name") or "")
+        # The paired child is not a guest: when the robot boots without a usable
+        # STUDENT_NAME, the child answering "mi chiamo Mario" has to land as the
+        # student, or every prompt rebuilt afterwards keeps calling them unknown.
+        if args.get("is_student"):
+            stored = self.people.set_primary(raw)
+        else:
+            stored = self.people.add_guest(raw)
         if stored is None:
             client.send_function_result(
                 call_id,

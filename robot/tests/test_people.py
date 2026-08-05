@@ -67,6 +67,9 @@ class TestRoster:
             "pii:8f3a2b",  # a decryption miss must never become a person
             "[encrypted]",
             "12345",
+            "Mario2",  # ASR digits: `\w` used to let these through
+            "Giulia_",
+            "M4rio",
             "!!!",
             "x" * 41,  # a whole sentence mistaken for a name
         ],
@@ -95,6 +98,32 @@ class TestRoster:
         r.clear_guests()
         assert r.guests == ()
         assert r.primary == "Mario"  # the paired child stays
+
+    def test_the_paired_child_can_introduce_themselves(self):
+        # No STUDENT_NAME configured: the child says their own name out loud, and it
+        # must land as the student — not as a guest standing next to a nobody.
+        r = people.Roster(None)
+        assert r.set_primary("mario") == "Mario"
+        assert r.primary == "Mario"
+        assert r.guests == ()
+
+    def test_introducing_the_student_twice_does_not_duplicate_them(self):
+        r = people.Roster(None)
+        r.set_primary("Mario")
+        r.add_guest("Mario")
+        assert r.everyone() == ["Mario"]
+
+    def test_a_promoted_guest_stops_being_a_guest(self):
+        r = people.Roster(None)
+        r.add_guest("Mario")
+        assert r.set_primary("Mario") == "Mario"
+        assert r.guests == ()
+        assert r.everyone() == ["Mario"]
+
+    def test_junk_never_becomes_the_student(self):
+        r = people.Roster(None)
+        assert r.set_primary("pii:8f3a2b") is None
+        assert r.primary is None
 
     def test_a_compound_name_survives_intact(self):
         r = people.Roster(None)
@@ -133,3 +162,10 @@ class TestInstructions:
     def test_the_safety_rules_still_come_first(self, maestro):
         text = build_instructions(maestro, student_name="Mario", roster=people.Roster("Mario"))
         assert text.index("REGOLE DI SICUREZZA") < text.lower().index("parsimonia")
+
+    def test_once_someone_introduced_themselves_buddy_is_not_told_the_room_is_unknown(self, maestro):
+        r = people.Roster(None)
+        r.add_guest("Giulia")
+        text = build_instructions(maestro, roster=r)
+        assert "Giulia" in text
+        assert "Non conosci il nome dello studente" not in text

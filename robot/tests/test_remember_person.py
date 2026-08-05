@@ -76,6 +76,31 @@ class TestRememberPerson:
         assert buddy._client.results  # the model always gets an answer back
 
 
+class TestTheStudentsOwnName:
+    def test_the_child_introducing_themselves_becomes_the_student(self):
+        # Codex caught this: with no STUDENT_NAME configured, the prompt asks the
+        # child for their name, and storing it as a guest left every rebuilt prompt
+        # still insisting the student was unknown.
+        b = Buddy(primary=None)
+
+        b._on_tool_call("remember_person", {"name": "Mario", "is_student": True}, "c1")
+
+        assert b.people.primary == "Mario"
+        assert b.people.guests == ()
+
+    def test_a_friend_is_still_only_a_friend(self, buddy):
+        buddy._on_tool_call("remember_person", {"name": "Giulia", "is_student": False}, "c1")
+
+        assert buddy.people.primary == "Mario"
+        assert buddy.people.guests == ("Giulia",)
+
+    def test_a_digit_bearing_mishearing_is_refused(self, buddy):
+        buddy._on_tool_call("remember_person", {"name": "Mario2"}, "c1")
+
+        assert buddy.people.guests == ()
+        assert "chiedi" in _said(buddy).lower()
+
+
 class TestWhoIsHere:
     def test_buddy_can_recall_the_room(self, buddy):
         buddy.people.add_guest("Giulia")

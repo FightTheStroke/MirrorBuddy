@@ -112,7 +112,14 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
                 "name": {
                     "type": "string",
                     "description": "Il nome proprio cosi' come la persona lo ha detto (es. 'Giulia').",
-                }
+                },
+                "is_student": {
+                    "type": "boolean",
+                    "description": (
+                        "true se e' lo studente che segui a dirti il proprio nome; "
+                        "false o assente se e' un'altra persona (un amico, un fratello, un genitore)."
+                    ),
+                },
             },
             "required": ["name"],
         },

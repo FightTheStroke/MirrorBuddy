@@ -25,9 +25,11 @@ MAX_NAME_LEN = 40
 
 # A decryption miss or a placeholder must never be spoken as if it were a person.
 _NOT_A_NAME_PREFIXES = ("pii:", "[", "{", "<")
-# Letters (accented included), apostrophes, hyphens and spaces. Nothing else is a
-# name a child says out loud; digits and punctuation mean we misheard a sentence.
-_NAME_RE = re.compile(r"^[^\W\d_][\w' -]*$", re.UNICODE)
+# Letters (accented included), apostrophes, hyphens and spaces — and nothing else.
+# `\w` was wrong here: it admits digits and underscores after the first character, so
+# an ASR mishearing like "Mario2" or "Giulia_" was stored and then read aloud as a
+# name. A name a child says out loud has no digits in it.
+_NAME_RE = re.compile(r"^[^\W\d_](?:[^\W\d_]|[ '-])*$", re.UNICODE)
 
 
 def clean_name(raw: str | None) -> str | None:
@@ -62,6 +64,22 @@ class Roster:
     @property
     def guests(self) -> tuple[str, ...]:
         return tuple(self._guests)
+
+    def set_primary(self, raw: str | None) -> str | None:
+        """Record the paired child's own name, said out loud.
+
+        The robot often starts with no ``STUDENT_NAME`` at all — no pairing token, or
+        a name the server could not decrypt. Without this, the child who answers "mi
+        chiamo Mario" was filed as a guest: every prompt rebuilt afterwards still
+        declared the student unknown, and then listed Mario as someone sitting next
+        to himself.
+        """
+        name = clean_name(raw)
+        if name is None:
+            return None
+        self._primary = name
+        self._guests = [g for g in self._guests if g.casefold() != name.casefold()]
+        return name
 
     def add_guest(self, raw: str | None) -> str | None:
         """Record someone who just introduced themselves.
