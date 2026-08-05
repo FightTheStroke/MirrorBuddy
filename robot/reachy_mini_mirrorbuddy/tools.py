@@ -196,6 +196,12 @@ SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
     "spanish": ("spagnolo",),
     "history": ("storia",),
     "geography": ("geografia",),
+    # A child who wants to calm down does not know there is a "Fratello Loto":
+    # he says he wants to meditate, or to relax.
+    "mindfulness": (
+        "meditazione", "meditare", "medito", "mindfulness", "consapevolezza",
+        "rilassamento", "rilassarmi", "respirazione", "calma", "silenzio",
+    ),
     "art": ("arte", "disegno", "immagine"),
     "music": ("musica",),
     "philosophy": ("filosofia",),

@@ -190,3 +190,43 @@ class TestNothingSlipsThroughTheSilence:
         session.join(timeout=5)
         assert not session.is_alive()
         assert client._meditating is False  # a crash must not leave a mute robot
+
+
+class TestAskingForTheMeditationTeacher:
+    @staticmethod
+    def _maestri():
+        from reachy_mini_mirrorbuddy.mirrorbuddy_client import Maestro
+
+        def make(mid, name, subject, specialty):
+            return Maestro(
+                id=mid, name=name, display_name=name, subject=subject, specialty=specialty,
+                voice="sage", voice_instructions="", teaching_style="",
+                system_prompt="", greeting="",
+            )
+
+        return [
+            make("loto", "Fratello Loto", "mindfulness", "meditazione e mindfulness"),
+            make("omero", "Omero", "italian", "poesia epica"),
+            make("euclide", "Euclide", "mathematics", "geometria"),
+        ]
+
+    def test_calling_a_maestro_by_name_works(self):
+        from reachy_mini_mirrorbuddy.tools import resolve_maestro
+
+        maestri = self._maestri()
+        for said, expected in [
+            ("voglio parlare con fratello loto", "Fratello Loto"),
+            ("chiama omero", "Omero"),
+            ("voglio parlare con euclide", "Euclide"),
+        ]:
+            assert resolve_maestro(maestri, said).display_name == expected, said
+
+    def test_asking_for_the_practice_finds_him_without_knowing_his_name(self):
+        # A child who wants to calm down does not know there is a "Fratello Loto".
+        from reachy_mini_mirrorbuddy.tools import resolve_maestro
+
+        maestri = self._maestri()
+        for said in ["voglio meditare", "un maestro di meditazione", "facciamo mindfulness",
+                     "vorrei fare rilassamento", "meditazione"]:
+            found = resolve_maestro(maestri, said)
+            assert found is not None and found.id == "loto", said
