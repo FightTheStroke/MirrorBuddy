@@ -116,7 +116,7 @@ OLLAMA_MODEL=llama3.2
 
 ## Showcase Mode (No API Required)
 
-Settings → "Modalità Showcase" or `/showcase`. Includes all 26 Maestri (simulated), demos (mind maps/flashcards/quizzes), voice UI preview (no actual voice), full accessibility.
+Settings → "Modalità Showcase" or `/showcase`. Includes all 27 Maestri (simulated), demos (mind maps/flashcards/quizzes), voice UI preview (no actual voice), full accessibility.
 
 **Perfect for:** Demos, presentations, trying before committing.
 
