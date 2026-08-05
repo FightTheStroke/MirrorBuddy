@@ -2,7 +2,7 @@
 
 <!-- v2.0.0 (2026-02-15): Compact format per ADR 0009 -->
 
-AI education platform: 26 tutor characters, voice, FSRS flashcards, mind maps, quizzes. Students with dyslexia, ADHD, autism, cerebral palsy.
+AI education platform: 27 tutor characters, voice, FSRS flashcards, mind maps, quizzes. Students with dyslexia, ADHD, autism, cerebral palsy.
 
 ## Pre-Commit Checklist (MANDATORY)
 

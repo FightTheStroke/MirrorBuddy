@@ -129,3 +129,75 @@ class TestHowTheGreetingAddressesTheChild:
     def test_with_a_friend_at_the_table_nobody_is_singled_out(self):
         clause = self._clause("Mario", guests=("Giulia",))
         assert "Mario" not in clause and "Giulia" not in clause
+
+
+class TestComingBackToADozingRobot:
+    """A rest must not survive the student physically coming back to the desk."""
+
+    @staticmethod
+    def _controller(asleep: bool):
+        from reachy_mini_mirrorbuddy.controller import Controller
+
+        class FakeClient:
+            def __init__(self):
+                self.resumed = 0
+                self.spoken = []
+                self._asleep = asleep
+
+            def resume_silently(self):
+                self.resumed += 1
+                self._asleep = False
+
+            def speak_now(self, instructions):
+                self.spoken.append(instructions)
+
+        c = Controller.__new__(Controller)
+        c._client = FakeClient()
+        class FakeMovements:
+            released = 0
+
+            def set_emotion(self, e):
+                pass
+
+            def release_hold(self):
+                FakeMovements.released += 1
+
+        FakeMovements.released = 0
+        c.movements = FakeMovements()
+        c.audio = type("A", (), {"interrupt": lambda self: None})()
+        c.cfg = type("Cfg", (), {"STUDENT_NAME": "Mario"})()
+        from reachy_mini_mirrorbuddy.people import Roster
+
+        c.people = Roster("Mario")
+        return c
+
+    def test_a_return_lifts_the_rest(self):
+        from reachy_mini_mirrorbuddy import presence
+
+        c = self._controller(asleep=True)
+        c._on_presence(presence.RETURNED)
+        assert c._client.resumed == 1
+
+    def test_a_rest_lifted_by_presence_stays_silent(self):
+        from reachy_mini_mirrorbuddy import presence
+
+        c = self._controller(asleep=True)
+        c._on_presence(presence.RETURNED)
+        # The child asked for quiet: give him back a listening robot, not a talking one.
+        assert c._client.spoken == []
+
+    def test_an_awake_robot_still_welcomes_him_back(self):
+        from reachy_mini_mirrorbuddy import presence
+
+        c = self._controller(asleep=False)
+        c._on_presence(presence.RETURNED)
+        assert len(c._client.spoken) == 1
+
+
+class TestTheBodyWakesUpToo:
+    def test_coming_back_to_the_desk_releases_the_rest_hold(self):
+        # Rest parks the body with hold_still(). A resume that only clears the
+        # software flags leaves a robot that listens, answers... and cannot move.
+        ctl = TestComingBackToADozingRobot._controller(asleep=True)
+        ctl._on_presence(presence.RETURNED)
+        assert ctl.movements.released >= 1

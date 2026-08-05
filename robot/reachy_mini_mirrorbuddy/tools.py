@@ -4,6 +4,7 @@ These tools let the student drive everything by voice — no screen needed:
 - ``list_professors``   → Buddy enumerates who is available.
 - ``call_professor``    → switch to another MirrorBuddy Maestro (persona + voice).
 - ``look_at_homework``  → capture one camera frame so Buddy can read the exercise.
+- ``move_body``         → real body actions any Maestro can play (antennas, peekaboo).
 
 The schemas are sent in ``session.update`` and the model calls them autonomously.
 """
@@ -14,7 +15,10 @@ import json
 import re
 from typing import Any
 
+from . import body_actions
 from .mirrorbuddy_client import Maestro
+
+_BODY_ACTIONS = set(body_actions.ACTIONS)
 
 TOOL_SCHEMAS: list[dict[str, Any]] = [
     {
@@ -133,6 +137,63 @@ TOOL_SCHEMAS: list[dict[str, Any]] = [
         ),
         "parameters": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "type": "function",
+        "name": "guided_meditation",
+        "description": (
+            "Conduci una vera sessione di meditazione: suona la campana, poi il robot resta "
+            "DAVVERO in silenzio per il tempo richiesto, poi la campana chiude. Usalo quando "
+            "lo studente accetta di meditare o lo chiede (es. 'meditiamo', 'facciamo un minuto "
+            "di silenzio', 'mi aiuti a calmarmi'). Dopo averlo chiamato non parlare: al "
+            "silenzio ci pensa il robot."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "practice": {
+                    "type": "string",
+                    "description": (
+                        "Quale pratica: 'respiro' (respiro consapevole), 'campana' (ascolto del "
+                        "suono), 'corpo' (saluto al corpo), 'sassolino' (le quattro immagini)."
+                    ),
+                },
+                "minutes": {
+                    "type": "number",
+                    "description": "Durata del silenzio in minuti (tipicamente 1-5).",
+                },
+            },
+            "required": ["practice"],
+        },
+    },
+    {
+        "type": "function",
+        "name": "move_body",
+        "description": (
+            "Muovi DAVVERO il corpo del robot. Usalo ogni volta che qualcuno ti chiede di "
+            "muoverti (es. «abbassa le antenne», «nasconditi», «facciamo cucu», «annuisci», "
+            "«guardati intorno»), e usalo anche di tua iniziativa per giocare, festeggiare "
+            "una risposta giusta o accompagnare quello che dici. Non fingere di muoverti: "
+            "chiama lo strumento. Le antenne restano dove le metti finche' non le rialzi o "
+            "non torni a 'riposo'."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "enum": sorted(_BODY_ACTIONS),
+                    "description": (
+                        "antenne_giu (antenne abbassate, restano giu'), antenne_su (antenne "
+                        "alzate, restano su'), nascondi (testa giu', ti nascondi), cucu (il "
+                        "gioco del cucu': ti nascondi e riappari), annuisci (si' con la testa), "
+                        "scuoti (no con la testa), guarda_intorno, festeggia, inchino, riposo "
+                        "(torna alla posizione normale)."
+                    ),
+                },
+            },
+            "required": ["action"],
+        },
+    },
 ]
 
 
@@ -168,6 +229,12 @@ SUBJECT_ALIASES: dict[str, tuple[str, ...]] = {
     "spanish": ("spagnolo",),
     "history": ("storia",),
     "geography": ("geografia",),
+    # A child who wants to calm down does not know there is a "Fratello Loto":
+    # he says he wants to meditate, or to relax.
+    "mindfulness": (
+        "meditazione", "meditare", "medito", "mindfulness", "consapevolezza",
+        "rilassamento", "rilassarmi", "respirazione", "calma", "silenzio",
+    ),
     "art": ("arte", "disegno", "immagine"),
     "music": ("musica",),
     "philosophy": ("filosofia",),

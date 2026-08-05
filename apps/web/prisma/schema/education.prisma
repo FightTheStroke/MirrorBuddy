@@ -192,3 +192,41 @@ model MethodProgress {
   @@index([userId])
   @@index([autonomyScore])
 }
+
+// ============================================================================
+// VOICE USAGE — what a spoken minute actually costs, per user
+// Azure bills the Realtime API by token, and audio tokens cost very differently
+// from text ones. One row per model turn, so cost can be attributed to a user,
+// a maestro and a day without ever storing what was said.
+// ============================================================================
+
+model VoiceUsageEvent {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation("VoiceUsageEvents", fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String
+  maestroId String?
+  model     String
+
+  audioInputTokens  Int @default(0)
+  audioOutputTokens Int @default(0)
+  textInputTokens   Int @default(0)
+  textOutputTokens  Int @default(0)
+  cachedInputTokens Int @default(0)
+
+  costEur Float @default(0)
+
+  // Pre-computed buckets: the admin console and the CLI both group by these,
+  // and a range scan over createdAt gets slow long before the bill does.
+  periodDay   String // "2026-08-05"
+  periodMonth String // "2026-08"
+
+  isTestData Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId, periodDay])
+  @@index([userId, periodMonth])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("voice_usage_events")
+}

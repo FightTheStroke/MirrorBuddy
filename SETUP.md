@@ -312,3 +312,21 @@ CMD ["npm", "start"]
 ---
 
 **See also:** [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Voice costs
+
+Every voice turn is priced from the usage block Azure returns and stored per
+user. Two ways to read the same number:
+
+- **Admin console** — `/admin/voice-costs`, with a day / week / month toggle
+  and a per-user breakdown.
+- **CLI** — `npx tsx scripts/voice-costs.ts --period month` (add `--user <id>`
+  for one child, `--json` to pipe it somewhere).
+
+Rates come from a built-in card and can be overridden with
+`AZURE_VOICE_RATES_JSON` when Azure changes prices before we do. Costs are
+computed **per token**, not per minute: audio tokens cost several times what
+text tokens cost, and wall-clock minutes would charge silence like speech.
+
+Note that data starts accumulating the day this is deployed — earlier usage
+was never recorded and cannot be reconstructed.

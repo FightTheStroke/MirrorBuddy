@@ -84,6 +84,13 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /\ballenament/i,
     /\besercizi/i,
   ],
+  // Only explicit requests for the practice. Feeling states like "sono
+  // agitato" deliberately stay out: a child saying that needs emotional
+  // support, and matching them here would route distress to a school subject.
+  mindfulness: [
+    /\b(meditaz\w*|meditare|medito|mindfulness|consapevolezza)\b/i,
+    /\b(esercizi\w*|sessione|pratica)\s+(di\s+)?(respiraz\w*|rilassament\w*)\b/i,
+  ],
 };
 
 export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {

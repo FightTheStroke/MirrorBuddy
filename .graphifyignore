@@ -1,0 +1,36 @@
+# graphify — pure-data JSON excluded from the knowledge graph.
+# These files parse fine but contain no code symbols, so they contribute
+# zero nodes and only produce "produced zero nodes" warnings (#1666).
+# package.json / tsconfig.json / turbo.json are deliberately NOT listed:
+# they do produce nodes and carry the dependency graph.
+
+# i18n message catalogs — translation data
+apps/web/messages/**/*.json
+apps/web/src/i18n/messages/*.json
+
+# focus-group stimulus payloads — generated text/tts data
+# (manifest.json in the same dirs DOES produce nodes: not excluded)
+docs/focus-group/**/s*.json
+
+# Grafana / monitoring dashboard definitions
+grafana/**/*.json
+docs/grafana/*.json
+monitoring/**/*.json
+apps/web/src/lib/observability/grafana-dashboards/*.json
+
+# editor, tooling and generated reports
+.copilot/*.json
+.cursor/mcp.local.example.json
+.openclaude/*.json
+.vscode/*.json
+.lighthouseci/*.json
+.file-line-limit.json
+.lintstagedrc.json
+apps/web/e2e/.auth/*.json
+
+# iOS asset catalog metadata
+ios/**/Contents.json
+
+# baseline snapshots
+scripts/azure-models-baseline.json
+scripts/vercel-baseline-snapshot.json

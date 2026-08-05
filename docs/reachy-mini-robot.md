@@ -34,7 +34,8 @@ is complete on its own. The robot is an optional, delightful add-on.
 | 🤸 **Movement**     | Expressive head/antenna motion adapted to each teacher's style.         |
 | ✋ **Instant stop** | Say **"basta"** and it goes silent **immediately** — on-device, no stress. |
 | 🌙 **Sleep & wake** | Say **"dormi"** to rest; call **"Buddy"** to wake it back up.            |
-| 🎓 **All 26 Maestri** | Switch professor or subject **by voice**; no screen required.         |
+| 🎓 **All 27 Maestri** | Switch professor or subject **by voice**; no screen required. Ask for one by name: *"voglio parlare con Omero"*. |
+| 🧘 **Guided meditation** | Ask **"voglio meditare"** and Fratello Loto runs a real session: a 432 Hz bell, spoken cues, and genuine silence in between. |
 
 Everything is voice-first: there is no on-robot UI to read. The child talks; Buddy
 answers, moves, and can look at what's on the table.

@@ -99,6 +99,7 @@ class Controller(ToolCallMixin):
             dsa_profile=self.cfg.DSA_PROFILE,
             student_name=self.cfg.STUDENT_NAME,
             roster=self.people,
+            maestri=self.maestri,
         )
         return AzureRealtimeClient(
             ws_url=self.cfg.realtime_ws_url(),
@@ -132,6 +133,17 @@ class Controller(ToolCallMixin):
             return
         self.movements.set_emotion("happy")
         if client is None:
+            return
+        if client._asleep:
+            # He is back at the desk, so the robot listens again — but he asked for
+            # quiet, so it does not celebrate its own return. The body has to come
+            # back too: rest parked it with hold_still(), and a robot that answers
+            # without ever moving again reads as broken.
+            client.resume_silently()
+            try:
+                self.movements.release_hold()
+            except Exception as e:  # pragma: no cover - runtime robustness
+                logger.debug("releasing the rest hold failed: %s", e)
             return
         if event == presence.ARRIVED:
             client.speak_now(

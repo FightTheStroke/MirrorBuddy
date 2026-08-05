@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from . import camera, tools
+from . import body_actions, camera, meditation, tools
 from .azure_realtime import AzureRealtimeClient
 from .mirrorbuddy_client import friend_buddy, neutral_buddy
 
@@ -42,13 +42,59 @@ class ToolCallMixin:
                 self._switch_persona(client, call_id, friend=False)
             elif name == "remember_person":
                 self._handle_remember_person(client, args, call_id)
+            elif name == "guided_meditation":
+                self._start_meditation(client, args, call_id)
             elif name == "who_is_here":
                 client.send_function_result(call_id, self._room_summary())
+            elif name == "move_body":
+                self._handle_move_body(client, args, call_id)
             else:
                 client.send_function_result(call_id, "Ok.")
         except Exception as e:  # pragma: no cover - runtime robustness
             logger.warning("tool %s failed: %s", name, e)
             client.send_function_result(call_id, "Scusa, non ci sono riuscito.")
+
+    def _handle_move_body(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        """Play a gesture off the websocket loop.
+
+        The gesture takes seconds and calls ``hold_still``, which sleeps; doing it
+        inline would stop Buddy hearing the child mid-game. The result is sent
+        with ``respond=True`` so the Maestro speaks while the body is still
+        moving — a child who says "abbassa le antenne" and gets silence assumes
+        nothing happened, and would be left waiting for a turn that never comes.
+        """
+        action = body_actions.normalise(args.get("action"))
+        if action not in body_actions.ACTIONS:
+            client.send_function_result(
+                call_id, f"Non conosco quel movimento. So fare: {body_actions.describe()}."
+            )
+            return
+        client.send_function_result(call_id, f"Fatto: {action}.")
+        threading.Thread(
+            target=self._run_body_action, args=(action,), daemon=True
+        ).start()
+
+    def _run_body_action(self, action: str) -> None:
+        try:
+            self.movements.play_body_action(action)
+        except Exception as e:  # pragma: no cover - hardware robustness
+            logger.warning("body action %s failed: %s", action, e)
+
+    def _start_meditation(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        """Run a real guided session: bell, imposed silence, bell.
+
+        Answering the tool call before the session starts matters: the model needs
+        its turn closed, or it will still be holding the floor when the silence
+        begins.
+        """
+        running = getattr(self, "_meditation", None)
+        if running is not None and running.is_alive():
+            client.send_function_result(call_id, "Una sessione e' gia' in corso.", respond=False)
+            return
+        plan = meditation.build_plan(str(args.get("practice") or ""), args.get("minutes") or 2)
+        client.send_function_result(call_id, plan.opening)
+        self._meditation = meditation.Session(client, self.audio.play, plan)
+        self._meditation.start()
 
     def _handle_call_professor(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
         target = tools.resolve_maestro(self.maestri, str(args.get("query") or ""))
