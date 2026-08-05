@@ -99,6 +99,7 @@ class Controller(ToolCallMixin):
             dsa_profile=self.cfg.DSA_PROFILE,
             student_name=self.cfg.STUDENT_NAME,
             roster=self.people,
+            maestri=self.maestri,
         )
         return AzureRealtimeClient(
             ws_url=self.cfg.realtime_ws_url(),

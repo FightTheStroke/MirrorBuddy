@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import threading
 
-from . import camera, meditation, tools
+from . import body_actions, camera, meditation, tools
 from .azure_realtime import AzureRealtimeClient
 from .mirrorbuddy_client import friend_buddy, neutral_buddy
 
@@ -46,11 +46,38 @@ class ToolCallMixin:
                 self._start_meditation(client, args, call_id)
             elif name == "who_is_here":
                 client.send_function_result(call_id, self._room_summary())
+            elif name == "move_body":
+                self._handle_move_body(client, args, call_id)
             else:
                 client.send_function_result(call_id, "Ok.")
         except Exception as e:  # pragma: no cover - runtime robustness
             logger.warning("tool %s failed: %s", name, e)
             client.send_function_result(call_id, "Scusa, non ci sono riuscito.")
+
+    def _handle_move_body(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        """Play a gesture off the websocket loop.
+
+        The gesture takes seconds and calls ``hold_still``, which sleeps; doing it
+        inline would stop Buddy hearing the child mid-game. The result is sent
+        immediately so the model can keep talking over its own movement, which is
+        what makes peekaboo feel alive rather than turn-based.
+        """
+        action = body_actions.normalise(args.get("action"))
+        if action not in body_actions.ACTIONS:
+            client.send_function_result(
+                call_id, f"Non conosco quel movimento. So fare: {body_actions.describe()}."
+            )
+            return
+        client.send_function_result(call_id, f"Fatto: {action}.", respond=False)
+        threading.Thread(
+            target=self._run_body_action, args=(action,), daemon=True
+        ).start()
+
+    def _run_body_action(self, action: str) -> None:
+        try:
+            self.movements.play_body_action(action)
+        except Exception as e:  # pragma: no cover - hardware robustness
+            logger.warning("body action %s failed: %s", action, e)
 
     def _start_meditation(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
         """Run a real guided session: bell, imposed silence, bell.
