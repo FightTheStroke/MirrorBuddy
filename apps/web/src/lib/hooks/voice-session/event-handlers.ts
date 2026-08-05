@@ -15,6 +15,11 @@ import {
   stopBrowserMeditation,
 } from '@/lib/meditation/browser';
 import { isStopIntent } from '@/lib/meditation/stop-intent';
+import {
+  modelFromResponseDone,
+  reportVoiceUsage,
+  usageFromResponseDone,
+} from './voice-usage-reporter';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
@@ -373,6 +378,14 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           // If a meditation is waiting for its introduction to end, this is it.
           openingFinished();
           deps.hasActiveResponseRef.current = false;
+          // Azure reports what this turn actually cost. It is the only honest
+          // source: wall-clock minutes would charge silence like speech.
+          reportVoiceUsage({
+            sessionId: deps.sessionIdRef.current,
+            maestroId: deps.maestroRef.current?.id,
+            model: modelFromResponseDone(event),
+            usage: usageFromResponseDone(event),
+          });
           logger.debug('[VoiceSession] Response complete - hasActiveResponse = false');
           break;
 

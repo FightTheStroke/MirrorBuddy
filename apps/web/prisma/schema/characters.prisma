@@ -13,15 +13,15 @@ model CharacterConfig {
   id String @id @default(cuid())
 
   // Character identification
-  characterId String       @unique // Matches the character ID from data files
+  characterId String        @unique // Matches the character ID from data files
   type        CharacterType
 
   // Configuration
   isEnabled Boolean @default(true)
 
   // Optional overrides for display
-  displayNameOverride  String?
-  descriptionOverride  String?
+  displayNameOverride String?
+  descriptionOverride String?
 
   // Audit tracking
   updatedBy String

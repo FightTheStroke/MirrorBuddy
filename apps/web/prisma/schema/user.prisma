@@ -104,6 +104,7 @@ model User {
 
   // Video Vision Usage Tracking (ADR 0122)
   videoVisionUsages VideoVisionUsage[] @relation("VideoVisionUsages")
+  voiceUsageEvents  VoiceUsageEvent[]  @relation("VoiceUsageEvents")
 
   // Password Reset Tokens (Plan 125)
   passwordResetTokens PasswordResetToken[]
