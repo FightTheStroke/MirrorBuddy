@@ -342,7 +342,9 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 
 **Admin Features (ADR 0061):** Collapsible sidebar, bulk invite actions, direct invite creation, real-time KPI dashboard.
 
-**→ Technical details: [docs/adr/0056-trial-mode-architecture.md](docs/adr/0056-trial-mode-architecture.md) | [docs/adr/0061-admin-section-redesign.md](docs/adr/0061-admin-section-redesign.md)**
+**Voice cost visibility:** Azure bills realtime voice per token, so `/admin/voice-costs` reports spend per user, per day, from the `usage` block Azure sends on every turn. The same numbers are available from the shell with `npm run voice:costs`.
+
+**→ Technical details: [docs/adr/0056-trial-mode-architecture.md](docs/adr/0056-trial-mode-architecture.md) | [docs/adr/0061-admin-section-redesign.md](docs/adr/0061-admin-section-redesign.md) | [docs/voice-costs.md](docs/voice-costs.md)**
 
 ---
 
@@ -602,17 +604,17 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 
 ## Documentation
 
-| Document                                             | Description                               |
-| ---------------------------------------------------- | ----------------------------------------- |
-| [docs/claude/](docs/claude/)                         | Comprehensive feature documentation       |
-| [SETUP.md](SETUP.md)                                 | Installation and configuration guide      |
-| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)           | Production deployment guide               |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)             | Common issues and solutions               |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                   | Technical architecture details            |
-| [ARCHITECTURE-DIAGRAMS.md](ARCHITECTURE-DIAGRAMS.md) | Visual architecture (24 Mermaid diagrams) |
+| Document                                             | Description                                |
+| ---------------------------------------------------- | ------------------------------------------ |
+| [docs/claude/](docs/claude/)                         | Comprehensive feature documentation        |
+| [SETUP.md](SETUP.md)                                 | Installation and configuration guide       |
+| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)           | Production deployment guide                |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)             | Common issues and solutions                |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                   | Technical architecture details             |
+| [ARCHITECTURE-DIAGRAMS.md](ARCHITECTURE-DIAGRAMS.md) | Visual architecture (24 Mermaid diagrams)  |
 | [robot/README.md](robot/README.md)                   | Reachy Mini robot app (voice + embodiment) |
-| [CONTRIBUTING.md](CONTRIBUTING.md)                   | Contribution guidelines                   |
-| [CLAUDE.md](CLAUDE.md)                               | Developer quick reference                 |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                   | Contribution guidelines                    |
+| [CLAUDE.md](CLAUDE.md)                               | Developer quick reference                  |
 
 ---
 

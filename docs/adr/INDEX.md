@@ -184,6 +184,7 @@
 | 0134 | Gamification UI - Surface Backend Achievements         | Achievements page, streaks, XP progress      |
 | 0170 | Reachy Mini Robot Embodiment + Device Pairing          | Voice-first robot tutor, credential-free pairing |
 | 0171 | Guided meditation as an imposed silence                | Session owns the clock; voice always restored     |
+| 0172 | Per-user voice cost attribution                       | Azure usage block, server-resolved model          |
 
 ## Tier & Business
 
@@ -216,6 +217,6 @@
 
 ---
 
-**Total Active ADRs**: 131
+**Total Active ADRs**: 132
 **Archived ADRs**: 7
 **Last Updated**: 2026-08-05
