@@ -15,32 +15,60 @@ SAMPLE_RATE = 24000  # PCM sample rate (in and out)
 # Pre-serialised cancel of the model's current response (used on barge-in / stop).
 CANCEL = json.dumps({"type": "response.cancel"})
 
-# Stop-intent words. When the student says any of these the robot must go silent
-# immediately, deterministically — never relying on the model to choose to yield.
-# This is an accessibility requirement: insistence stresses the student.
-_STOP_RE = re.compile(
-    r"\b(basta|ferma(?:ti|te|lo)?|zitt[oaie]|silenzio|silence|aspetta|"
-    r"pausa|stop|taci|smettila|smetti|shh+|sh+t?|"
+# Hush intents come in two tiers, because the cost of getting them wrong differs.
+#
+# REST is deliberate: "zitto", "dormi". The robot goes silent and stays asleep
+# until the child calls it by name. Honouring it instantly is an accessibility
+# requirement — insistence stresses the student.
+#
+# PAUSE is everyday filler: "aspetta", "basta", "un attimo". It stops the current
+# sentence and nothing more; the next thing the child says is answered normally.
+# These words are far too common in ordinary Italian ("aspetta che scrivo") to
+# cost the wake word — a robot that needs its name after "aspetta" reads as broken.
+_REST_RE = re.compile(
+    r"\b(zitt[oaie]|silenzio|silence|taci|smettila|smetti|shh+|sh+t?|"
     r"dormi|dormire|riposati|riposa|spegniti|mettiti\s+a\s+riposo)\b",
     re.IGNORECASE,
 )
 
+_PAUSE_RE = re.compile(
+    r"\b(basta|ferma(?:ti|te|lo)?|aspetta|attendi|pausa|stop|"
+    r"un\s+attimo|un\s+momento)\b",
+    re.IGNORECASE,
+)
+
+
+def is_rest(text: str | None) -> bool:
+    """True if the student deliberately asked for silence ('zitto', 'dormi')."""
+    return bool(text and _REST_RE.search(text))
+
+
+def is_pause(text: str | None) -> bool:
+    """True if the student asked the robot to hold on a moment ('aspetta')."""
+    return bool(text and not is_rest(text) and _PAUSE_RE.search(text))
+
 
 def is_stop(text: str | None) -> bool:
-    """True if the user utterance is a command to stop / be quiet."""
-    return bool(text and _STOP_RE.search(text))
+    """True for either tier: the robot must stop talking right now."""
+    return is_rest(text) or is_pause(text)
 
 
 # End-of-session intent: the student signals they are done for now. Unlike a stop
 # (be quiet a moment), this ends the session — the robot says a short goodbye and
 # goes to sleep until it hears its name again. Deterministic, like the stop word.
-_END_RE = re.compile(
+_DONE_RE = re.compile(
     r"\b("
     r"(?:abbiamo|ho|hai)\s+(?:finito|terminato|concluso)|"
-    r"finito\s+per\s+oggi|basta\s+(?:studiare|compiti|per\s+oggi)|"
-    r"a\s+domani|ci\s+vediamo|arrivederci|buonanotte|buona\s+notte|"
-    r"abbiamo\s+finito"
+    r"finito\s+per\s+oggi|basta\s+(?:studiare|compiti|per\s+oggi)"
     r")\b",
+    re.IGNORECASE,
+)
+
+# Farewells only end the session when they actually close the utterance: "ci
+# vediamo dopo pranzo" is a plan, not a goodbye.
+_BYE_RE = re.compile(
+    r"\b(a\s+domani|ci\s+vediamo|ci\s+sentiamo|arrivederci|"
+    r"buonanotte|buona\s+notte)\W*$",
     re.IGNORECASE,
 )
 
@@ -52,7 +80,9 @@ _WAKE_RE = re.compile(r"\bbudd?(?:y|i|ie)\b", re.IGNORECASE)
 
 def is_end(text: str | None) -> bool:
     """True if the student is ending the session ('abbiamo finito', 'a domani'...)."""
-    return bool(text and _END_RE.search(text))
+    if not text:
+        return False
+    return bool(_DONE_RE.search(text) or _BYE_RE.search(text))
 
 
 def is_wake(text: str | None) -> bool:

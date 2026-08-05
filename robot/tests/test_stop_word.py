@@ -84,7 +84,7 @@ async def test_a_new_turn_can_be_stopped_again(client):
     await client._handle_event({"type": DELTA, "delta": "zitto"})
     client._asleep = False  # woken by name
     await client._handle_event({"type": "input_audio_buffer.speech_started"})
-    await client._handle_event({"type": DELTA, "delta": "basta"})
+    await client._handle_event({"type": DELTA, "delta": "zitta"})
 
     assert client._quiet is True and client.slept == 2
 
@@ -92,7 +92,7 @@ async def test_a_new_turn_can_be_stopped_again(client):
 @pytest.mark.asyncio
 async def test_stop_still_works_from_the_final_transcript(client):
     """Deployments without partial transcription must keep the old guarantee."""
-    await client._handle_event({"type": DONE, "transcript": "basta"})
+    await client._handle_event({"type": DONE, "transcript": "zitto"})
 
     assert client._quiet and client._asleep
     assert client.slept == 1
