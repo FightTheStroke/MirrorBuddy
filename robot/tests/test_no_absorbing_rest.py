@@ -139,3 +139,20 @@ class TestSilentResumeIsNotAWakeGreeting:
         await client._handle_event(_said("Buddy"))
         assert client.woke == 1
         assert any(json.loads(m).get("type") == "response.create" for m in client.sent)
+
+
+class TestTheDoorIsNotJammedByTheLastTurn:
+    @pytest.mark.asyncio
+    async def test_a_hush_mid_sentence_does_not_mute_the_turn_after_the_rest(self, client):
+        # The child interrupted a long answer with "zitto": the fast path had
+        # already asked for that response, and that stale flag used to survive the
+        # rest — so the first sentence after waking up was silently dropped.
+        client._fast_requested = True
+        client._responding = True
+        await client._handle_event(_said("zitto"))
+        assert client._asleep is True
+
+        client._asleep_since = 0.0  # ten minutes pass
+        client.sent.clear()
+        await client._handle_event(_said("come si fa questo esercizio?"))
+        assert any(json.loads(m).get("type") == "response.create" for m in client.sent)

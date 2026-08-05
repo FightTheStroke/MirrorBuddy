@@ -272,6 +272,10 @@ class RealtimeEventsMixin:
         self._suppress = True
         if self._responding or self._fast_requested:
             await self._cancel_response()
+        # The fast path belongs to the turn that was just cancelled. Left standing,
+        # it makes the *next* turn think its answer was already requested — so the
+        # first thing said after waking up is answered by silence.
+        self._fast_requested = False
         if self.on_speech_started:
             _safe_cb(self.on_speech_started)  # flush local playback now
         if not rest:

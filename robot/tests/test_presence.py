@@ -153,7 +153,17 @@ class TestComingBackToADozingRobot:
 
         c = Controller.__new__(Controller)
         c._client = FakeClient()
-        c.movements = type("M", (), {"set_emotion": lambda self, e: None})()
+        class FakeMovements:
+            released = 0
+
+            def set_emotion(self, e):
+                pass
+
+            def release_hold(self):
+                FakeMovements.released += 1
+
+        FakeMovements.released = 0
+        c.movements = FakeMovements()
         c.audio = type("A", (), {"interrupt": lambda self: None})()
         c.cfg = type("Cfg", (), {"STUDENT_NAME": "Mario"})()
         from reachy_mini_mirrorbuddy.people import Roster
@@ -182,3 +192,12 @@ class TestComingBackToADozingRobot:
         c = self._controller(asleep=False)
         c._on_presence(presence.RETURNED)
         assert len(c._client.spoken) == 1
+
+
+class TestTheBodyWakesUpToo:
+    def test_coming_back_to_the_desk_releases_the_rest_hold(self):
+        # Rest parks the body with hold_still(). A resume that only clears the
+        # software flags leaves a robot that listens, answers... and cannot move.
+        ctl = TestComingBackToADozingRobot._controller(asleep=True)
+        ctl._on_presence(presence.RETURNED)
+        assert ctl.movements.released >= 1
