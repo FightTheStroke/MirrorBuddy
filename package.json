@@ -82,6 +82,7 @@
     "build:analyze": "ANALYZE=true npm run build",
     "check:bundle": "tsx scripts/check-bundle-size.ts",
     "i18n:check": "npx tsx scripts/i18n-check.ts",
+    "voice:costs": "npx tsx scripts/voice-costs.ts",
     "debt:check": "npx tsx scripts/debt-check.ts",
     "sentry:verify": "bash ./scripts/verify-sentry-config.sh",
     "sentry:smoke": "bash ./scripts/sentry-smoke-test.sh",
