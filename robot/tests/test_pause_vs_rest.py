@@ -13,7 +13,6 @@ from __future__ import annotations
 import json
 
 import pytest
-
 from reachy_mini_mirrorbuddy import rt_messages, session_flow
 from reachy_mini_mirrorbuddy.azure_realtime import AzureRealtimeClient
 

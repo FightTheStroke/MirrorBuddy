@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 
 import pytest
-
 from reachy_mini_mirrorbuddy.azure_realtime import AzureRealtimeClient
 
 
