@@ -10,6 +10,7 @@ import base64
 import json
 import logging
 import threading
+import time
 from collections.abc import Callable
 
 import websockets
@@ -20,6 +21,10 @@ from .rt_events import RealtimeEventsMixin
 logger = logging.getLogger(__name__)
 
 SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and out)
+
+_RECONNECT_MIN_S = 1.0  # a session that ran its course comes back immediately
+_RECONNECT_MAX_S = 30.0  # a robot deaf for more than half a minute is a broken robot
+_HEALTHY_SESSION_S = 30.0  # shorter than this counts as a failure, so we back off
 
 
 def _ws_major() -> int:
@@ -150,11 +155,51 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
         try:
-            self._loop.run_until_complete(self._connect_and_listen())
+            self._loop.run_until_complete(self._session_loop())
         except Exception as e:  # pragma: no cover - network runtime
             logger.error("Azure Realtime loop crashed: %s", e, exc_info=True)
         finally:
             self._loop.close()
+
+    async def _session_loop(self) -> None:
+        """Keep a live session for as long as the app runs.
+
+        Azure hard-closes every Realtime session at 60 minutes
+        ("session_expired"), and Wi-Fi drops happen. Either way this thread used
+        to end, which ended the app: the robot went deaf mid-homework and not even
+        the wake word could reach it. So a closed socket is a reconnect, not an
+        exit — only :meth:`stop` really stops.
+        """
+        delay = _RECONNECT_MIN_S
+        while not self._stop.is_set():
+            started = time.monotonic()
+            self._reset_session_state()
+            try:
+                await self._connect_and_listen()
+            except Exception as e:
+                logger.error("Realtime session dropped: %s", e)
+            if self._stop.is_set():
+                return
+            if time.monotonic() - started >= _HEALTHY_SESSION_S:
+                delay = _RECONNECT_MIN_S  # a real session ran: come back at once
+            logger.info("Realtime session ended; reconnecting in %.0fs", delay)
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, _RECONNECT_MAX_S)
+
+    def _reset_session_state(self) -> None:
+        """Clear per-session flags, keep what the child asked for.
+
+        A session that died mid-sentence leaves audio suppressed and a response
+        "in flight"; carrying that into the new session would mute it entirely.
+        ``_asleep`` / ``_quiet`` are deliberately preserved: if the child said
+        "zitto", coming back talking is exactly the insistence to avoid.
+        """
+        self._ws = None
+        self._suppress = False
+        self._responding = False
+        self._fast_requested = False
+        self._stopped_on_partial = False
+        self._partial_user = ""
 
     async def _safe_send(self, msg: str) -> None:
         ws = self._ws

@@ -62,24 +62,24 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 
 ## Modules
 
-| File | Responsibility |
-| --- | --- |
-| `config.py` | Environment / `.env` configuration + WS URL (GA vs Preview) |
-| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API |
-| `prompt_builder.py` | Assemble the realtime `instructions` (persona + safety + embodiment) |
-| `safety.py` | Child-safety guardrails (aligned with MirrorBuddy) |
-| `dsa.py` | Accessibility → server-VAD turn-detection tuning |
-| `azure_realtime.py` | Azure OpenAI Realtime WebSocket client (audio + tools + vision) |
-| `rt_messages.py` | Pure builders for the realtime protocol messages |
-| `audio_io.py` | Robot mic ↔ speaker bridge (resampling, playback, barge-in) |
-| `movements.py` | Expressive full-body motion + daemon face-follow while listening |
-| `camera.py` | On-demand JPEG capture + daemon head/face tracking helpers |
-| `people.py` | Who is in the room right now — session-only, never written to disk |
-| `tools.py` | Voice tool schemas (list/change professor, look at homework, friend/study, who is here) + resolver |
-| `session_flow.py` | Pure stop / end / wake decisions for the live loop (accessibility-critical) |
-| `controller.py` | Tool dispatch, live professor switching, vision, sleep/wake |
-| `settings_ui.py` | Minimal in-app settings page (creds + Maestro/DSA selection) |
-| `main.py` | App entry point wiring everything together |
+| File                    | Responsibility                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `config.py`             | Environment / `.env` configuration + WS URL (GA vs Preview)                                        |
+| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API                                               |
+| `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                               |
+| `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                                 |
+| `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                                   |
+| `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                                    |
+| `rt_messages.py`        | Pure builders for the realtime protocol messages                                                   |
+| `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                                        |
+| `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                   |
+| `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                         |
+| `people.py`             | Who is in the room right now — session-only, never written to disk                                 |
+| `tools.py`              | Voice tool schemas (list/change professor, look at homework, friend/study, who is here) + resolver |
+| `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                        |
+| `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                                        |
+| `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                                       |
+| `main.py`               | App entry point wiring everything together                                                         |
 
 ## Everything by voice (no screen)
 
@@ -150,6 +150,20 @@ locally** — never left to the model:
 
 These intents are detected in `session_flow.py`/`rt_messages.py` and enforced in
 `azure_realtime.py`, so they work even if the model would rather keep talking.
+
+## Staying alive (session resilience)
+
+Azure Realtime hard-closes **every** session at 60 minutes (`session_expired`),
+and home Wi-Fi drops. Either event closes the WebSocket, and the app used to end
+right there: the robot went silent for good, deaf even to its wake word, and only
+a manual restart brought it back.
+
+The session loop now treats a closed socket as a **reconnect, not an exit** — it
+comes back within a second, with an exponential backoff (max 30s) if Azure is
+genuinely unreachable. The resumed session is **silent**: no second greeting in
+the middle of homework. Per-session state (in-flight response, audio suppression)
+is reset, while what the child asked for — _rest_ after «zitto» — is preserved.
+Only closing the app really stops it.
 
 ## Pair with the child's MirrorBuddy profile
 
