@@ -18,6 +18,7 @@ import numpy as np
 from . import camera, gestures
 from .temperament import CALM, LIVELY, NEUTRAL, Temperament, temperament_for  # noqa: F401
 from .motion_shapes import idle_pose
+from .body_control import BodyControlMixin
 from .pose_writer import ANTENNA_NEUTRAL, PoseWriter
 from .emotions import NEUTRAL as EMOTION_NEUTRAL, Emotion, blend_mood, infer as infer_emotion
 
@@ -43,7 +44,7 @@ def _ease(current: float, target: float, tau: float, dt: float) -> float:
     return current + (target - current) * alpha
 
 
-class Movements:
+class Movements(BodyControlMixin):
     """Background full-body animation driven by speech energy + idle liveliness."""
 
     def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL,
@@ -58,6 +59,7 @@ class Movements:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._writer = PoseWriter(robot)
+        self._antenna_bias = 0.0
         self._track_weight = -1.0  # unset; managed on speaking transitions
         self._hold = threading.Event()  # when set, freeze all motion (e.g. camera capture)
         # Current mood and the eased values that actually reach the servos. Emotions
@@ -238,7 +240,8 @@ class Movements:
             # The daemon's face tracker owns the head whenever it is weighted in;
             # we only drive the head once it hands off, so we never fight it.
             drive_head = not (self.follow_face and self._track_weight > 0.0)
+            ant_r, ant_l = self.apply_antenna_bias(o["ant_r"], o["ant_l"])
             self._writer.write(z=o["z"], pitch=o["pitch"], yaw=o["yaw"], body_yaw=o["body"],
-                               antennas=(o["ant_r"], o["ant_l"]), drive_head=drive_head)
+                               antennas=(ant_r, ant_l), drive_head=drive_head)
             time.sleep(max(0.0, period - (time.monotonic() - now)))
 

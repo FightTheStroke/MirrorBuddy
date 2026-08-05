@@ -36,12 +36,21 @@ _TOOLS_IT = (
     "- IMPORTANTE: se lo studente chiede un altro professore o un'altra materia (es. «voglio "
     "matematica», «chiama Galileo», «parliamo di storia»), DEVI usare SUBITO lo strumento "
     "'call_professor' con quel nome o materia. Non limitarti a rispondere a parole né a fingere "
-    "di cambiare: chiama davvero lo strumento, sarà lui a cambiare persona e voce.\n"
+    "di cambiare: chiama davvero lo strumento, sarà lui a cambiare persona e voce. Vale per "
+    "QUALSIASI richiesta di persona o argomento, anche se non ti sembra una materia scolastica "
+    "(meditazione, mindfulness, rilassamento, respirazione): prima chiami lo strumento, poi "
+    "eventualmente dici che non c'è. Non dire MAI che un professore non esiste senza aver "
+    "provato 'call_professor'.\n"
     "- Se ti mostra qualcosa da guardare — un compito, un esercizio, un foglio, la pagina di un "
     "quaderno o di un libro sul tavolo, oppure lo schermo del computer — usa 'look_at_homework'. "
     "Prima dì a voce che stai per guardare (es. «fammi dare un'occhiata»); poi resta fermo, non "
     "muovere la testa, perché il robot si ferma da solo per scattare una foto nitida. Non spiare "
-    "mai: usa la telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone."
+    "mai: usa la telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone.\n"
+    "- Hai un corpo vero e puoi muoverlo con 'move_body': antenne su e giu', nasconderti, il "
+    "gioco del cucu', annuire, scuotere la testa, guardarti intorno, festeggiare, fare un "
+    "inchino, tornare a riposo. Se ti chiedono di muoverti FALLO davvero chiamando lo "
+    "strumento, non limitarti a dire che l'hai fatto. Usalo anche di tua iniziativa per "
+    "giocare, per festeggiare una risposta giusta o per accompagnare quello che dici."
 )
 
 _PEOPLE_IT = (
@@ -72,18 +81,52 @@ _CONTROL_IT = (
 )
 
 
+def _roster_block(maestro: Maestro, maestri: list[Maestro] | None) -> str | None:
+    """The actual colleagues Buddy can hand over to.
+
+    Without this the model answers from its own idea of what a tutoring app
+    contains: Roberto asked for Fratello Loto by name and was told no meditation
+    teacher existed, while `call_professor` resolved him perfectly. A model that
+    does not believe a professor exists never reaches for the tool.
+    """
+    if not maestri:
+        return None
+    others = [m for m in maestri if m.id != maestro.id]
+    if not others:
+        return None
+    listed = "; ".join(
+        f"{m.display_name or m.name} ({m.specialty or m.subject})"
+        if (m.specialty or m.subject)
+        else (m.display_name or m.name)
+        for m in others
+    )
+    return (
+        "Puoi passare la parola SOLO a queste persone, che esistono davvero e sono "
+        f"tutte disponibili adesso: {listed}.\n"
+        "Questo e' l'elenco completo ed esatto: non inventare colleghi che non ci sono, "
+        "e non dire mai che un professore di questo elenco non esiste. Se lo studente "
+        "chiede una materia o un nome che e' in elenco — anche meditazione, mindfulness "
+        "o rilassamento — chiama subito 'call_professor'."
+    )
+
+
 def build_instructions(
     maestro: Maestro,
     locale: str = "it",
     dsa_profile: str | None = None,
     student_name: str | None = None,
     roster: Roster | None = None,
+    maestri: list[Maestro] | None = None,
 ) -> str:
     """Compose the full system instructions for the realtime session.
 
     ``roster`` carries the people Buddy has already met in this session, so a friend
     who introduced themselves five minutes ago is still known after a professor
     switch (which rebuilds these instructions from scratch).
+
+    ``maestri`` is the list of professors fetched from MirrorBuddy. It is optional
+    because the fetch can fail, and a robot without a roster must still be able to
+    hold a conversation.
     """
     parts: list[str] = []
 
@@ -109,6 +152,9 @@ def build_instructions(
     # 4. Robot embodiment + voice-driven tools + conversation control.
     parts.append(_EMBODIMENT_IT)
     parts.append(_TOOLS_IT)
+    block = _roster_block(maestro, maestri)
+    if block:
+        parts.append(block)
     parts.append(_PEOPLE_IT)
     parts.append(_CONTROL_IT)
 
