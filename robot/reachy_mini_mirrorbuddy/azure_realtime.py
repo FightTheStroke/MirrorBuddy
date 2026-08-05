@@ -80,7 +80,8 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._quiet = False  # student asked for silence: keep model muted
         self._speech_started_at = 0.0  # monotonic time the student began this turn
         self._fast_requested = False  # response already asked for before the transcript
-        self._asleep = False  # session ended: stay muted until the wake word
+        self._asleep_flag = False  # session ended: stay muted until the wake word
+        self._asleep_since = 0.0  # monotonic time the rest began, for the timeout
         self._sleep_after = False  # go to sleep once the farewell response finishes
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
         self._partial_user = ""  # transcript of the turn being spoken, read for stop words
@@ -130,6 +131,35 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         if self._asleep or self._quiet or self._responding:
             return
         self._enqueue(json.dumps(rt_messages.response_create(instructions)))
+
+    @property
+    def _asleep(self) -> bool:
+        return self._asleep_flag
+
+    @_asleep.setter
+    def _asleep(self, value: bool) -> None:
+        """Falling asleep always stamps the clock.
+
+        The rest timeout is the safety net for a wake word that never lands, so it
+        must not depend on every future caller remembering to set the timestamp:
+        an unstamped rest would either never expire or expire instantly.
+        """
+        if value and not self._asleep_flag:
+            self._asleep_since = time.monotonic()
+        self._asleep_flag = bool(value)
+
+    def resume_silently(self) -> None:
+        """Lift a rest without saying anything (thread-safe).
+
+        Used when the world says the student is back — a face at the desk again —
+        which is a reason to start listening properly, not a reason to talk. The
+        robot simply becomes answerable again on the next question.
+        """
+        if not self._asleep:
+            return
+        self._asleep = False
+        self._quiet = False
+        logger.info("Rest lifted: the student is back at the desk")
 
     def local_barge_in(self) -> None:
         """On-device barge-in (called from the mic thread when a real voice is heard
