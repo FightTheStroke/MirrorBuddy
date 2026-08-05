@@ -15,10 +15,11 @@ import time
 
 import numpy as np
 
-from . import body_actions, camera, gestures
+from . import camera, gestures
 from .temperament import CALM, LIVELY, NEUTRAL, Temperament, temperament_for  # noqa: F401
 from .motion_shapes import idle_pose
-from .pose_writer import ANTENNA_NEUTRAL, PoseWriter, clamp_antenna
+from .body_control import BodyControlMixin
+from .pose_writer import ANTENNA_NEUTRAL, PoseWriter
 from .emotions import NEUTRAL as EMOTION_NEUTRAL, Emotion, blend_mood, infer as infer_emotion
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def _ease(current: float, target: float, tau: float, dt: float) -> float:
     return current + (target - current) * alpha
 
 
-class Movements:
+class Movements(BodyControlMixin):
     """Background full-body animation driven by speech energy + idle liveliness."""
 
     def __init__(self, robot, enabled: bool = True, temperament: Temperament = NEUTRAL,
@@ -85,51 +86,6 @@ class Movements:
     def express(self, text: str | None) -> None:
         """Colour the body language from what Buddy is about to say."""
         self.set_emotion(infer_emotion(text))
-
-    @property
-    def antenna_bias(self) -> float:
-        """A posture the animation keeps holding: negative is antennas down."""
-        return self._antenna_bias
-
-    def set_antenna_bias(self, value: float) -> None:
-        """Hold the antennas somewhere other than where the idle animation wants them.
-
-        A one-shot gesture is overwritten within one frame at 50Hz, so "keep your
-        antennas down" has to be an offset the loop itself respects. Non-numeric
-        arguments arrive from the model and are ignored rather than crashing the
-        animation thread.
-        """
-        try:
-            self._antenna_bias = clamp_antenna(float(value))
-        except (TypeError, ValueError):
-            logger.debug("Ignoring non-numeric antenna bias: %r", value)
-
-    def apply_antenna_bias(self, right: float, left: float) -> tuple[float, float]:
-        """Offset the animation's antenna values, still inside the mechanical limit."""
-        bias = self._antenna_bias
-        return clamp_antenna(right + bias), clamp_antenna(left + bias)
-
-    def play_body_action(self, name: str) -> bool:
-        """Perform a named gesture without the idle animation fighting it.
-
-        The animation writes every joint fifty times a second, so a scripted pose
-        has to own the body for its duration — the same mechanism the camera
-        capture uses. Sustained postures are handed to the animation afterwards
-        as a bias, so "keep your antennas down" actually keeps them down.
-        """
-        action = body_actions.normalise(name)
-        if action not in body_actions.ACTIONS:
-            logger.info("Unknown body action: %r", name)
-            return False
-        self.hold_still()
-        try:
-            body_actions.perform(action, self.robot, self._writer.create_head_pose)
-        finally:
-            bias = body_actions.SUSTAINED.get(action)
-            if bias is not None:
-                self.set_antenna_bias(bias)
-            self.release_hold()
-        return True
 
     def hold_still(self) -> None:
         """Freeze head/body and pause tracking + wobbler so the camera gets a sharp frame."""

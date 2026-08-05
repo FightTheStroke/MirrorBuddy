@@ -75,6 +75,7 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 | `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                   |
 | `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                         |
 | `body_actions.py`       | Named, clamped gestures any Maestro can play (antennas, peekaboo, nod, bow)                        |
+| `body_control.py`       | Gesture dispatch + sustained postures, mixed into `Movements`                                      |
 | `people.py`             | Who is in the room right now — session-only, never written to disk                                 |
 | `tools.py`              | Voice tool schemas (professors, homework, friend/study, who is here, meditation, body) + resolver  |
 | `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                        |

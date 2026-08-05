@@ -96,3 +96,39 @@ class TestThePostureSurvivesTheAnimation:
         m.play_body_action("cucu")
 
         assert not m._hold.is_set()
+
+
+class FakeClient:
+    def __init__(self):
+        self.results: list[tuple[str, str, bool]] = []
+
+    def send_function_result(self, call_id, output, respond=True):
+        self.results.append((call_id, output, respond))
+
+
+class Handler(__import__(
+    "reachy_mini_mirrorbuddy.tool_handlers", fromlist=["ToolCallMixin"]
+).ToolCallMixin):
+    def __init__(self, movements):
+        self.movements = movements
+
+
+class TestBuddyDoesNotGoSilentAfterMoving:
+    def test_the_maestro_gets_a_turn_to_acknowledge(self):
+        # respond=False here would leave the child staring at a robot that moved
+        # and then said nothing, waiting for a turn that never arrives.
+        client = FakeClient()
+        h = Handler(Movements(DummyRobot(), enabled=False))
+
+        h._handle_move_body(client, {"action": "annuisci"}, "call-1")
+
+        assert client.results, "no function result was sent at all"
+        assert client.results[0][2] is True
+
+    def test_an_unknown_gesture_is_reported_honestly(self):
+        client = FakeClient()
+        h = Handler(Movements(DummyRobot(), enabled=False))
+
+        h._handle_move_body(client, {"action": "teletrasporto"}, "call-2")
+
+        assert "Non conosco" in client.results[0][1]

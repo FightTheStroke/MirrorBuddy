@@ -59,8 +59,9 @@ class ToolCallMixin:
 
         The gesture takes seconds and calls ``hold_still``, which sleeps; doing it
         inline would stop Buddy hearing the child mid-game. The result is sent
-        immediately so the model can keep talking over its own movement, which is
-        what makes peekaboo feel alive rather than turn-based.
+        with ``respond=True`` so the Maestro speaks while the body is still
+        moving — a child who says "abbassa le antenne" and gets silence assumes
+        nothing happened, and would be left waiting for a turn that never comes.
         """
         action = body_actions.normalise(args.get("action"))
         if action not in body_actions.ACTIONS:
@@ -68,7 +69,7 @@ class ToolCallMixin:
                 call_id, f"Non conosco quel movimento. So fare: {body_actions.describe()}."
             )
             return
-        client.send_function_result(call_id, f"Fatto: {action}.", respond=False)
+        client.send_function_result(call_id, f"Fatto: {action}.")
         threading.Thread(
             target=self._run_body_action, args=(action,), daemon=True
         ).start()
