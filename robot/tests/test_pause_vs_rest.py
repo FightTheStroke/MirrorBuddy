@@ -187,3 +187,36 @@ class TestTheWakeWordAlwaysGetsThrough:
 
         assert client._stopped_on_partial is False
         assert client._partial_user == ""
+
+
+@pytest.mark.asyncio
+class TestAPauseIsConsumedByItsOwnTurn:
+    """Without speech_started events the hush flag had nothing to clear it.
+
+    A partial "aspetta" raised the per-turn flag; the completed transcript for
+    that same turn hit the "already hushed" guard and returned with the flag
+    still raised. Every later turn then hit the same guard before the SPEAK
+    branch could unmute — Buddy stayed silent for the rest of the session.
+    """
+
+    async def test_the_next_turn_is_answered_without_a_speech_started_event(self, client):
+        await client._handle_event({"type": DELTA, "delta": "aspetta"})
+        await client._handle_event({"type": DONE, "transcript": "aspetta"})
+
+        await client._handle_event({"type": DONE, "transcript": "quanto fa due più due"})
+
+        assert client._quiet is False
+        assert any(json.loads(m).get("type") == "response.create" for m in client.sent)
+
+    async def test_the_flag_does_not_outlive_its_turn(self, client):
+        await client._handle_event({"type": DELTA, "delta": "aspetta"})
+        await client._handle_event({"type": DONE, "transcript": "aspetta un attimo"})
+
+        assert client._stopped_on_partial is False
+        assert client._partial_user == ""
+
+    async def test_the_hush_is_still_applied_only_once(self, client):
+        await client._handle_event({"type": DELTA, "delta": "zitto"})
+        await client._handle_event({"type": DONE, "transcript": "zitto per favore"})
+
+        assert client.slept == 1  # not re-parked by the late transcript

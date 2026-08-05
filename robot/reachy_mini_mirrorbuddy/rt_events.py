@@ -94,10 +94,16 @@ class RealtimeEventsMixin:
             if not text:
                 return
             action = session_flow.decide(text, self._asleep)
+            # The hush belongs to the turn that triggered it. Deployments that emit
+            # partials but no speech_started have nothing else to clear it, and a
+            # flag that outlives its turn silences every turn after it.
+            hushed, self._stopped_on_partial, self._partial_user = (
+                self._stopped_on_partial, False, "",
+            )
             # The wake word is never swallowed: being called by name outranks any
             # hush already applied for this turn.
             _still_matters = (session_flow.END, session_flow.REST, session_flow.WAKE)
-            if self._stopped_on_partial and action not in _still_matters:
+            if hushed and action not in _still_matters:
                 return  # already hushed while the student was still speaking
             if action == session_flow.IGNORE:
                 return
