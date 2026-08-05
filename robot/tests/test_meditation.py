@@ -101,6 +101,41 @@ class TestTheChildEndsItWheneverHeWants:
         await client._handle_event({"type": DONE, "transcript": "abbiamo finito"})
         assert client._meditating is False
 
+    @pytest.mark.asyncio
+    async def test_stopping_also_stops_the_session_itself(self, client):
+        """Giving the voice back is not enough: the practice must actually end.
+
+        Otherwise the child asks to stop, is told he may, and then the bell
+        rings at him anyway two minutes later.
+        """
+        plan = meditation.build_plan("respiro", 2)
+        session = meditation.Session(client, lambda pcm: None, plan)
+        client._meditation = session
+        client.start_meditation()
+
+        await client._handle_event({"type": DONE, "transcript": "basta"})
+
+        assert session.cancelled is True
+
+    def test_no_bell_rings_at_a_child_who_asked_to_stop(self, client):
+        """The closing bell is a courtesy, not an obligation.
+
+        If he asked to stop, the practice is over: ringing anyway is the robot
+        having the last word over a child who said he had had enough.
+        """
+        import time as _t
+
+        rung = []
+        plan = meditation.build_plan("respiro", minutes=0)
+        session = meditation.Session(client, rung.append, plan)
+        session.start()
+        _t.sleep(0.2)
+        session.cancel()
+        session.join(timeout=2)
+
+        assert len(rung) <= 1  # the opening bell at most, never the closing one
+        assert client._meditating is False
+
 
 class TestSessionPlan:
     def test_a_practice_is_bell_silence_bell(self):

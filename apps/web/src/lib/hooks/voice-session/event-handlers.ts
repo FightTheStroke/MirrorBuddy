@@ -7,7 +7,14 @@
 
 import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
-import { openingFinished } from '@/lib/meditation/browser';
+import {
+  currentSession as currentMeditation,
+  meditationIsArmed,
+  openingFinished,
+  responseStarted as meditationResponseStarted,
+  stopBrowserMeditation,
+} from '@/lib/meditation/browser';
+import { isStopIntent } from '@/lib/meditation/stop-intent';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
@@ -129,6 +136,9 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
         case 'response.created':
           // Azure has started generating a response - track this for proper cancellation
           deps.hasActiveResponseRef.current = true;
+          // An armed meditation waits for a turn that actually starts: the turn
+          // that requested it closes before the maestro has said a word.
+          meditationResponseStarted();
           logger.debug('[VoiceSession] Response created - hasActiveResponse = true');
           // If a safety reject paused the WebRTC audio element (pause kills the
           // unsafe tail even when response.cancel can't be delivered), resume it
@@ -197,6 +207,17 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
             logger.info('[VoiceSession] User transcript received', {
               transcript: event.transcript.substring(0, 100),
             });
+
+            // A child in an imposed silence who asks to leave must be obeyed
+            // at once. Sitting through a session you have asked to end is the
+            // opposite of what a meditation is for.
+            if (
+              (currentMeditation() || meditationIsArmed()) &&
+              isStopIntent(event.transcript)
+            ) {
+              logger.info('[VoiceSession] Meditation ended by the student');
+              stopBrowserMeditation();
+            }
 
             // T2-04: Run transcript safety check (VCE-002 checkpoint)
             // Check is guarded by voice_transcript_safety feature flag

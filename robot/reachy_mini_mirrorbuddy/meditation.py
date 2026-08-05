@@ -109,10 +109,16 @@ class Session(threading.Thread):
         self._play = play_audio
         self._plan = plan
         self._bell = bell_pcm16(bell_seconds)
-        self._stop = threading.Event()
+        # Not `_stop`: threading.Thread already owns that name as an internal
+        # method, and shadowing it makes join() raise instead of joining.
+        self._cancelled = threading.Event()
 
     def cancel(self) -> None:
-        self._stop.set()
+        self._cancelled.set()
+
+    @property
+    def cancelled(self) -> bool:
+        return self._cancelled.is_set()
 
     def run(self) -> None:
         try:
@@ -121,7 +127,7 @@ class Session(threading.Thread):
             self._ring()
             logger.info("Meditation: %s, %.0fs of silence", self._plan.practice,
                         self._plan.silence_seconds)
-            self._stop.wait(self._plan.silence_seconds)
+            self._cancelled.wait(self._plan.silence_seconds)
             self._ring()
         except Exception as e:  # pragma: no cover - runtime audio/socket faults
             logger.error("Meditation session failed: %s", e, exc_info=True)
@@ -129,7 +135,7 @@ class Session(threading.Thread):
             # The voice always comes back, even if the session broke halfway:
             # a crash must never leave a child with a robot that stopped answering.
             self._client.end_meditation()
-            if not self._stop.is_set():
+            if not self._cancelled.is_set():
                 self._client.speak_now(self._plan.closing)
 
     def _wait_for_a_quiet_room(self, timeout: float = 25.0) -> None:
@@ -141,12 +147,12 @@ class Session(threading.Thread):
         """
         waited = 0.0
         while getattr(self._client, "_responding", False) and waited < timeout:
-            if self._stop.wait(0.1):
+            if self._cancelled.wait(0.1):
                 return
             waited += 0.1
 
     def _ring(self) -> None:
-        if self._stop.is_set():
+        if self._cancelled.is_set():
             return
         try:
             self._play(self._bell)

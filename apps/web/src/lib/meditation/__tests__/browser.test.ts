@@ -11,6 +11,7 @@ import {
   currentSession,
   meditationIsArmed,
   openingFinished,
+  responseStarted,
   startBrowserMeditation,
   stopBrowserMeditation,
 } from '../browser';
@@ -97,7 +98,8 @@ describe('armBrowserMeditation', () => {
     const audioElement = fakeAudioElement();
     armBrowserMeditation(buildPlan('respiro', 1), { audioElement, cancelResponse: vi.fn() });
 
-    openingFinished();
+    responseStarted(); // the maestro begins the introduction
+    openingFinished(); // ...and finishes it
 
     expect(audioElement.muted).toBe(true);
     expect(currentSession()?.isRunning).toBe(true);
@@ -113,5 +115,38 @@ describe('armBrowserMeditation', () => {
     openingFinished();
 
     expect(currentSession()).toBe(started);
+  });
+});
+
+describe('the opening must actually be spoken before the silence starts', () => {
+  const plan = () => buildPlan('respiro', 1);
+  const deps = () => ({ audioElement: fakeAudioElement(), cancelResponse: vi.fn() });
+
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => {
+    stopBrowserMeditation();
+    vi.useRealTimers();
+  });
+
+  it('ignores the response.done that carried the tool call itself', () => {
+    // The turn that asked for a meditation finishes before the maestro has
+    // said a word. Treating it as "the introduction is over" mutes the
+    // introduction and rings the bell over nothing.
+    armBrowserMeditation(plan(), deps());
+
+    openingFinished();
+
+    expect(meditationIsArmed()).toBe(true);
+    expect(currentSession()).toBeNull();
+  });
+
+  it('starts once the maestro has actually begun and finished speaking', () => {
+    armBrowserMeditation(plan(), deps());
+
+    responseStarted();
+    openingFinished();
+
+    expect(meditationIsArmed()).toBe(false);
+    expect(currentSession()).not.toBeNull();
   });
 });

@@ -53,7 +53,7 @@ export interface BrowserSessionDeps {
 }
 
 let current: MeditationSession | null = null;
-let pending: { plan: Plan; deps: BrowserSessionDeps } | null = null;
+let pending: { plan: Plan; deps: BrowserSessionDeps; introStarted: boolean } | null = null;
 
 /** The session currently running in this tab, if any — for a visible countdown. */
 export function currentSession(): MeditationSession | null {
@@ -100,7 +100,19 @@ export function startBrowserMeditation(plan: Plan, deps: BrowserSessionDeps): Me
  * over it. `openingFinished()` is called when the model's turn completes.
  */
 export function armBrowserMeditation(plan: Plan, deps: BrowserSessionDeps): void {
-  pending = { plan, deps };
+  pending = { plan, deps, introStarted: false };
+}
+
+/**
+ * Called when the model opens a new turn.
+ *
+ * Without this, the very turn that *requested* the meditation would close and
+ * be mistaken for the introduction ending — muting the maestro before he has
+ * said a word and ringing the bell over silence. The introduction only counts
+ * once a turn has actually begun after arming.
+ */
+export function responseStarted(): void {
+  if (pending) pending.introStarted = true;
 }
 
 /** True while a session is waiting for the introduction to end. */
@@ -110,7 +122,7 @@ export function meditationIsArmed(): boolean {
 
 /** Called when the model finishes a turn: the room is quiet, so the bell can ring. */
 export function openingFinished(): void {
-  if (!pending) return;
+  if (!pending || !pending.introStarted) return;
   const { plan, deps } = pending;
   pending = null;
   startBrowserMeditation(plan, deps);

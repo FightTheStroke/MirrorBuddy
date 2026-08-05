@@ -104,6 +104,12 @@ class RealtimeEventsMixin:
                 # Sitting in an imposed silence you have asked to leave is the
                 # opposite of what this is for.
                 logger.info("Meditation ended by the student: %r", text)
+                # Both halves matter. Clearing the flag gives the voice back;
+                # cancelling the session stops the bell that would otherwise
+                # ring at a child who has already asked to be left alone.
+                running = getattr(self, "_meditation", None)
+                if running is not None:
+                    running.cancel()
                 self.end_meditation()
             if self._asleep:
                 # The single most useful line in the journal: it says what the robot
