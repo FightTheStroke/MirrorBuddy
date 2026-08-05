@@ -1,12 +1,12 @@
 # ADR 0170: Reachy Mini as MirrorBuddy's Physical Embodiment + Device Pairing
 
-| Field          | Value                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------- |
-| Status         | **PROPOSED**                                                                              |
-| Date           | 2026-07-19                                                                                |
-| Branch         | feat/reachy-mini-mirrorbuddy · feat/reachy-mini-mirrorbuddy-pairing                       |
+| Field          | Value                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Status         | **PROPOSED**                                                                                                                                            |
+| Date           | 2026-07-19                                                                                                                                              |
+| Branch         | feat/reachy-mini-mirrorbuddy · feat/reachy-mini-mirrorbuddy-pairing                                                                                     |
 | Related ADRs   | ADR 0169 (Azure Realtime 2.1 Cedar), ADR 0122 (Realtime Vision), ADR 0126 (Unified Camera), ADR 0008 (Parent GDPR consent), ADR 0104 (i18n wrapper key) |
-| Related Issues | Reachy Mini embodiment, device pairing                                                     |
+| Related Issues | Reachy Mini embodiment, device pairing                                                                                                                  |
 
 ## Context
 
@@ -64,8 +64,11 @@ A self-contained app under `robot/` (`reachy_mini_mirrorbuddy`) that:
   calmer amplitude while speaking so movement does not distract the student.
 - Uses the camera on an **explicit** `look_at_homework` request only (single
   frame, never streamed, nothing persisted) — consistent with ADR 0122/0126.
-- Enforces a **hard local interrupt** on stop words ("basta/zitto/fermati/
-  aspetta/pausa") via `audio.clear_player()`, with **no auto-resume**.
+- Enforces a **hard local interrupt** on hush words via `audio.clear_player()`,
+  with **no auto-resume**. Two tiers: a _pause_ ("aspetta/basta/fermati")
+  stops the current sentence and stays awake, a _rest_ ("zitto/dormi/taci")
+  parks the robot until it is called by name. Everyday filler must silence
+  the robot without costing the child the wake word.
 - Exposes everything by voice tools (switch professor/subject, look at homework).
 
 **Pros:** low latency; safety is local and deterministic; robot survives web
