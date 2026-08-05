@@ -12,7 +12,10 @@ fi
 
 # Extract file path from stdin
 input="$(cat)"
-fp="$(printf '%s' "$input" | jq -r '.tool_input.file_path // ""')"
+# `file_path` is Claude Code's key; other hosts (Copilot CLI) send `path`. Reading
+# only the first one left `fp` empty, the lookup fell back to the CWD — which is the
+# main checkout — and every edit inside a feature worktree was denied.
+fp="$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_input.path // ""')"
 
 # Resolve the repo of the FILE (not CWD) — git worktrees live outside the main
 # project dir and have their own HEAD. Without this, edits on a feature branch
@@ -24,6 +27,15 @@ if [ -n "$fp" ]; then
   else
     lookup_dir="$(dirname "$fp")"
   fi
+  # Creating the first file in a new directory means the parent does not exist yet,
+  # and `git -C <missing dir>` fails: `repo_root` came back empty and the guard
+  # exited 0 — i.e. `mkdir`-ing your way onto `main` was an unlocked door. Walk up
+  # to the nearest existing ancestor before asking git anything.
+  while [ -n "$lookup_dir" ] && [ ! -d "$lookup_dir" ]; do
+    parent="$(dirname "$lookup_dir")"
+    [ "$parent" = "$lookup_dir" ] && break
+    lookup_dir="$parent"
+  done
 fi
 repo_root="$(git -C "${lookup_dir:-.}" rev-parse --show-toplevel 2>/dev/null || true)"
 if [ -z "$repo_root" ]; then
