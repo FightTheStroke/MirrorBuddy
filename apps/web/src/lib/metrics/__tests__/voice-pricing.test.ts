@@ -93,3 +93,57 @@ describe('parseRealtimeUsage', () => {
     }
   });
 });
+
+describe('cached input is discounted, not billed twice', () => {
+  it('does not charge a cached token at both the full and the cached rate', () => {
+    // Azure counts cached tokens inside input_token_details.audio_tokens. Adding
+    // the cached bucket on top bills the same token twice and inflates the
+    // dashboard the whole feature exists to make trustworthy.
+    const allCached = priceUsage('gpt-realtime', {
+      audioInputTokens: 1_000_000,
+      cachedInputTokens: 1_000_000,
+      cachedAudioTokens: 1_000_000,
+    });
+
+    // 1M cached audio tokens at $0.40/1M, not $32 + $0.40.
+    expect(allCached.totalCostEur).toBeCloseTo(0.4 / 1.08, 2);
+  });
+
+  it('charges the uncached remainder at the full rate', () => {
+    const half = priceUsage('gpt-realtime', {
+      audioInputTokens: 1_000_000,
+      cachedInputTokens: 500_000,
+      cachedAudioTokens: 500_000,
+    });
+
+    // 500k at $32/1M + 500k at $0.40/1M
+    expect(half.totalCostEur).toBeCloseTo((16 + 0.2) / 1.08, 2);
+  });
+
+  it('never credits money back when the cached count exceeds the input count', () => {
+    const odd = priceUsage('gpt-realtime', {
+      audioInputTokens: 100,
+      cachedInputTokens: 5_000,
+      cachedAudioTokens: 5_000,
+    });
+
+    expect(odd.totalCostEur).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('the parser splits cached audio from cached text', () => {
+  it('reads both halves of cached_tokens_details', () => {
+    const usage = parseRealtimeUsage({
+      input_token_details: {
+        audio_tokens: 900,
+        text_tokens: 100,
+        cached_tokens: 400,
+        cached_tokens_details: { audio_tokens: 300, text_tokens: 100 },
+      },
+      output_token_details: { audio_tokens: 500, text_tokens: 20 },
+    });
+
+    expect(usage.cachedAudioTokens).toBe(300);
+    expect(usage.cachedTextTokens).toBe(100);
+  });
+});

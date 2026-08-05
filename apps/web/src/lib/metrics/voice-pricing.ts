@@ -21,6 +21,10 @@ export interface TokenUsage {
   textInputTokens: number;
   textOutputTokens: number;
   cachedInputTokens: number;
+  /** The cached half of `audioInputTokens` — already counted there by Azure. */
+  cachedAudioTokens: number;
+  /** The cached half of `textInputTokens` — already counted there by Azure. */
+  cachedTextTokens: number;
 }
 
 export interface ModelRates {
@@ -92,12 +96,21 @@ export function priceUsage(model: string, usage: Partial<TokenUsage>): PricedUsa
   const perToken = (tokens: number, usdPerMillion: number): number =>
     (tokens / 1_000_000) * (usdPerMillion / USD_PER_EUR);
 
-  const audioInputCostEur = perToken(safe(usage.audioInputTokens), rates.audioIn);
+  // Azure counts cached tokens *inside* the input totals. Billing the cached
+  // bucket on top of them would charge the same token twice, which is exactly
+  // the kind of quiet inaccuracy that makes a cost dashboard worthless.
+  const cachedAudio = Math.min(safe(usage.cachedAudioTokens), safe(usage.audioInputTokens));
+  const cachedText = Math.min(safe(usage.cachedTextTokens), safe(usage.textInputTokens));
+  const uncachedAudioIn = Math.max(safe(usage.audioInputTokens) - cachedAudio, 0);
+  const uncachedTextIn = Math.max(safe(usage.textInputTokens) - cachedText, 0);
+
+  const audioInputCostEur =
+    perToken(uncachedAudioIn, rates.audioIn) + perToken(cachedAudio, rates.cachedIn);
   const audioOutputCostEur = perToken(safe(usage.audioOutputTokens), rates.audioOut);
   const textCostEur =
-    perToken(safe(usage.textInputTokens), rates.textIn) +
-    perToken(safe(usage.textOutputTokens), rates.textOut) +
-    perToken(safe(usage.cachedInputTokens), rates.cachedIn);
+    perToken(uncachedTextIn, rates.textIn) +
+    perToken(cachedText, rates.cachedIn) +
+    perToken(safe(usage.textOutputTokens), rates.textOut);
 
   return {
     audioInputCostEur: round6(audioInputCostEur),
@@ -121,6 +134,8 @@ export function parseRealtimeUsage(raw: unknown): TokenUsage {
     textInputTokens: 0,
     textOutputTokens: 0,
     cachedInputTokens: 0,
+    cachedAudioTokens: 0,
+    cachedTextTokens: 0,
   };
   if (typeof raw !== 'object' || raw === null) return empty;
 
@@ -145,5 +160,7 @@ export function parseRealtimeUsage(raw: unknown): TokenUsage {
     textInputTokens: num(input.text_tokens),
     textOutputTokens: num(output.text_tokens),
     cachedInputTokens: num(input.cached_tokens) || num(cachedDetails.audio_tokens),
+    cachedAudioTokens: num(cachedDetails.audio_tokens) || num(input.cached_tokens),
+    cachedTextTokens: num(cachedDetails.text_tokens),
   };
 }

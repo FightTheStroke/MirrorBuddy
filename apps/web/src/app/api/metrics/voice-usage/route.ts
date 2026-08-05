@@ -11,6 +11,7 @@ import { NextResponse } from 'next/server';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
 import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 import { recordVoiceUsage } from '@/lib/metrics/voice-usage-service';
+import { resolveVoiceModel } from '@/lib/metrics/voice-model';
 
 export const revalidate = 0;
 
@@ -36,15 +37,19 @@ export const POST = pipe(
     return NextResponse.json({ error: 'invalid JSON body' }, { status: 400, headers });
   }
 
-  if (!body.sessionId || !body.model) {
-    return NextResponse.json({ error: 'sessionId and model required' }, { status: 400, headers });
+  if (!body.sessionId) {
+    return NextResponse.json({ error: 'sessionId required' }, { status: 400, headers });
   }
+
+  // The browser does not get to name the model: `response.done` frequently
+  // omits it, and a client default would price every turn at the premium rate.
+  const model = await resolveVoiceModel(body.model ?? null);
 
   const recorded = await recordVoiceUsage({
     userId: ctx.userId!,
     sessionId: body.sessionId,
     maestroId: body.maestroId ?? null,
-    model: body.model,
+    model,
     usage: body.usage,
   });
 

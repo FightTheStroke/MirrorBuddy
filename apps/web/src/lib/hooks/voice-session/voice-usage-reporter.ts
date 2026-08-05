@@ -17,6 +17,7 @@ import { clientLogger as logger } from '@/lib/logger/client';
 export interface VoiceUsageReport {
   sessionId: string | null;
   maestroId?: string | null;
+  /** Only set when Azure named it on `response.done`; the server decides otherwise. */
   model?: string | null;
   usage: unknown;
 }
@@ -48,7 +49,7 @@ export async function sendVoiceUsage(report: VoiceUsageReport): Promise<boolean>
     body: JSON.stringify({
       sessionId: report.sessionId,
       maestroId: report.maestroId ?? null,
-      model: report.model || 'gpt-realtime',
+      model: report.model ?? null,
       usage: report.usage,
     }),
   })

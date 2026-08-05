@@ -11,8 +11,12 @@
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { parseRealtimeUsage, priceUsage, type TokenUsage } from './voice-pricing';
-
-export type Period = 'day' | 'week' | 'month';
+import {
+  queryUserVoiceSpend,
+  queryVoiceSpendByUser,
+  queryVoiceSpendSummary,
+} from './voice-usage-queries';
+import { dayKey, monthKey, windowStart, type Period, type UserVoiceSpend } from './voice-usage-types';
 
 export interface RecordVoiceUsageInput {
   userId: string;
@@ -21,40 +25,6 @@ export interface RecordVoiceUsageInput {
   model: string;
   usage: unknown;
   isTestData?: boolean;
-}
-
-export interface UserVoiceSpend {
-  userId: string;
-  email: string | null;
-  name: string | null;
-  sessions: number;
-  audioInputTokens: number;
-  audioOutputTokens: number;
-  costEur: number;
-  /** Roughly how long the maestro spoke, at ~10 audio tokens per second. */
-  spokenMinutes: number;
-}
-
-const AUDIO_TOKENS_PER_SECOND = 10;
-
-export function dayKey(when: Date): string {
-  return when.toISOString().slice(0, 10);
-}
-
-export function monthKey(when: Date): string {
-  return when.toISOString().slice(0, 7);
-}
-
-/** Start of the window, inclusive. Weeks are the last 7 days, not ISO weeks. */
-export function windowStart(period: Period, now: Date = new Date()): Date {
-  const start = new Date(now);
-  if (period === 'day') start.setUTCHours(0, 0, 0, 0);
-  if (period === 'week') start.setUTCDate(start.getUTCDate() - 7);
-  if (period === 'month') {
-    start.setUTCDate(1);
-    start.setUTCHours(0, 0, 0, 0);
-  }
-  return start;
 }
 
 /**
@@ -106,124 +76,23 @@ export async function recordVoiceUsage(
   }
 }
 
+export { dayKey, monthKey, windowStart };
+export type { Period, UserVoiceSpend };
+
 /** What one user has spent on voice in the window. */
-export async function getUserVoiceSpend(
+export const getUserVoiceSpend = (
   userId: string,
   period: Period = 'day',
   now: Date = new Date(),
-): Promise<UserVoiceSpend> {
-  const rows = await prisma.voiceUsageEvent.findMany({
-    where: { userId, isTestData: false, createdAt: { gte: windowStart(period, now) } },
-    select: {
-      sessionId: true,
-      audioInputTokens: true,
-      audioOutputTokens: true,
-      costEur: true,
-    },
-  });
-
-  return summarise(userId, null, null, rows);
-}
+): Promise<UserVoiceSpend> => queryUserVoiceSpend(prisma, userId, period, now);
 
 /** Every user with voice spend in the window, dearest first. */
-export async function getVoiceSpendByUser(
+export const getVoiceSpendByUser = (
   period: Period = 'day',
   now: Date = new Date(),
   limit = 100,
-): Promise<UserVoiceSpend[]> {
-  const rows = await prisma.voiceUsageEvent.findMany({
-    where: { isTestData: false, createdAt: { gte: windowStart(period, now) } },
-    select: {
-      userId: true,
-      sessionId: true,
-      audioInputTokens: true,
-      audioOutputTokens: true,
-      costEur: true,
-      user: { select: { email: true, username: true } },
-    },
-  });
-
-  const byUser = new Map<string, typeof rows>();
-  for (const row of rows) {
-    const bucket = byUser.get(row.userId) ?? [];
-    bucket.push(row);
-    byUser.set(row.userId, bucket);
-  }
-
-  return [...byUser.entries()]
-    .map(([userId, userRows]) =>
-      summarise(
-        userId,
-        userRows[0]?.user?.email ?? null,
-        userRows[0]?.user?.username ?? null,
-        userRows,
-      ),
-    )
-    .sort((a, b) => b.costEur - a.costEur)
-    .slice(0, limit);
-}
+): Promise<UserVoiceSpend[]> => queryVoiceSpendByUser(prisma, period, now, limit);
 
 /** Totals plus a per-day series, for the admin console chart. */
-export async function getVoiceSpendSummary(
-  period: Period = 'month',
-  now: Date = new Date(),
-): Promise<{
-  totalCostEur: number;
-  activeUsers: number;
-  costPerUserEur: number;
-  byDay: { day: string; costEur: number }[];
-}> {
-  const rows = await prisma.voiceUsageEvent.findMany({
-    where: { isTestData: false, createdAt: { gte: windowStart(period, now) } },
-    select: { userId: true, costEur: true, periodDay: true },
-  });
-
-  const perDay = new Map<string, number>();
-  const users = new Set<string>();
-  let totalCostEur = 0;
-
-  for (const row of rows) {
-    totalCostEur += row.costEur;
-    users.add(row.userId);
-    perDay.set(row.periodDay, (perDay.get(row.periodDay) ?? 0) + row.costEur);
-  }
-
-  return {
-    totalCostEur: round(totalCostEur),
-    activeUsers: users.size,
-    costPerUserEur: users.size ? round(totalCostEur / users.size) : 0,
-    byDay: [...perDay.entries()]
-      .map(([day, costEur]) => ({ day, costEur: round(costEur) }))
-      .sort((a, b) => a.day.localeCompare(b.day)),
-  };
-}
-
-function summarise(
-  userId: string,
-  email: string | null,
-  name: string | null,
-  rows: {
-    sessionId: string;
-    audioInputTokens: number;
-    audioOutputTokens: number;
-    costEur: number;
-  }[],
-): UserVoiceSpend {
-  const sessions = new Set(rows.map((row) => row.sessionId));
-  const audioInputTokens = rows.reduce((sum, row) => sum + row.audioInputTokens, 0);
-  const audioOutputTokens = rows.reduce((sum, row) => sum + row.audioOutputTokens, 0);
-  const costEur = rows.reduce((sum, row) => sum + row.costEur, 0);
-
-  return {
-    userId,
-    email,
-    name,
-    sessions: sessions.size,
-    audioInputTokens,
-    audioOutputTokens,
-    costEur: round(costEur),
-    spokenMinutes: round(audioOutputTokens / AUDIO_TOKENS_PER_SECOND / 60),
-  };
-}
-
-const round = (value: number): number => Math.round(value * 10000) / 10000;
+export const getVoiceSpendSummary = (period: Period = 'month', now: Date = new Date()) =>
+  queryVoiceSpendSummary(prisma, period, now);

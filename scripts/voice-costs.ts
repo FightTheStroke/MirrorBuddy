@@ -11,12 +11,16 @@
  * and a script that disagree about the bill are worse than either alone.
  */
 
+// Deliberately not the service module: that one imports the Next app's db
+// shim, which imports `server-only` and throws the moment a plain Node script
+// touches it. Same queries, same numbers, no Next.
+import { prisma } from '@mirrorbuddy/db';
 import {
-  getUserVoiceSpend,
-  getVoiceSpendByUser,
-  getVoiceSpendSummary,
-  type Period,
-} from '../apps/web/src/lib/metrics/voice-usage-service';
+  queryUserVoiceSpend,
+  queryVoiceSpendByUser,
+  queryVoiceSpendSummary,
+} from '../apps/web/src/lib/metrics/voice-usage-queries';
+import type { Period } from '../apps/web/src/lib/metrics/voice-usage-types';
 
 const PERIODS: Period[] = ['day', 'week', 'month'];
 
@@ -38,7 +42,7 @@ async function main(): Promise<void> {
   const userId = arg('user');
 
   if (userId) {
-    const spend = await getUserVoiceSpend(userId, period);
+    const spend = await queryUserVoiceSpend(prisma, userId, period);
     if (asJson) {
       console.log(JSON.stringify(spend, null, 2));
       return;
@@ -51,8 +55,8 @@ async function main(): Promise<void> {
   }
 
   const [summary, users] = await Promise.all([
-    getVoiceSpendSummary(period),
-    getVoiceSpendByUser(period),
+    queryVoiceSpendSummary(prisma, period),
+    queryVoiceSpendByUser(prisma, period),
   ]);
 
   if (asJson) {
@@ -90,5 +94,5 @@ main()
     process.exit(1);
   })
   .finally(() => {
-    void import('../apps/web/src/lib/db').then(({ prisma }) => prisma.$disconnect());
+    void prisma.$disconnect();
   });
