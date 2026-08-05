@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  Mic,
   LayoutDashboard,
   UserPlus,
   Users,
@@ -61,6 +62,12 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           icon: BarChart3,
         },
         { id: 'funnel', label: 'Funnel', href: '/admin/funnel', icon: Funnel },
+        {
+          id: 'voice-costs',
+          label: 'Voice costs',
+          href: '/admin/voice-costs',
+          icon: Mic,
+        },
       ],
     },
     {

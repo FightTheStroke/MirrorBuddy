@@ -17,7 +17,7 @@ model RobotDevice {
   pairedAt          DateTime?
 
   // Long-lived device credential: random token, stored hashed, revocable.
-  tokenHash String?   @unique
+  tokenHash  String?   @unique
   lastSeenAt DateTime?
   revokedAt  DateTime?
 

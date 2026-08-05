@@ -24,14 +24,14 @@ model ABExperiment {
 }
 
 model ABBucketConfig {
-  id           String       @id @default(cuid())
-  experimentId String
-  experiment   ABExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
-  bucketLabel  String
-  percentage   Float
+  id            String       @id @default(cuid())
+  experimentId  String
+  experiment    ABExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+  bucketLabel   String
+  percentage    Float
   modelProvider String
-  modelName    String
-  extraConfig  Json
+  modelName     String
+  extraConfig   Json
 
   @@index([experimentId])
 }
