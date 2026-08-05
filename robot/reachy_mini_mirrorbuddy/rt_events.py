@@ -94,7 +94,10 @@ class RealtimeEventsMixin:
             if not text:
                 return
             action = session_flow.decide(text, self._asleep)
-            if self._stopped_on_partial and action not in (session_flow.END, session_flow.REST):
+            # The wake word is never swallowed: being called by name outranks any
+            # hush already applied for this turn.
+            _still_matters = (session_flow.END, session_flow.REST, session_flow.WAKE)
+            if self._stopped_on_partial and action not in _still_matters:
                 return  # already hushed while the student was still speaking
             if action == session_flow.IGNORE:
                 return
@@ -126,14 +129,18 @@ class RealtimeEventsMixin:
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
         if etype == "input_audio_buffer.speech_started":
+            # Clear the per-turn hush flags first, asleep or not: they used to
+            # survive a rest, and the next transcript — even "Buddy" — was then
+            # dropped before the wake word was ever read. The robot could only be
+            # revived by restarting the app.
+            self._partial_user = ""
+            self._stopped_on_partial = False
             if self._asleep:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
             self._quiet = False
             self._speech_started_at = time.monotonic()
             self._fast_requested = False
-            self._partial_user = ""
-            self._stopped_on_partial = False
             if self._responding:
                 await self._cancel_response()
             if self.on_speech_started:

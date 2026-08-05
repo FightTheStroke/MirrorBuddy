@@ -150,3 +150,40 @@ class TestPauseKeepsTheRobotAwake:
         await client._handle_event({"type": DONE, "transcript": "aspetta, abbiamo finito"})
 
         assert client._pending_farewell is True
+
+
+@pytest.mark.asyncio
+class TestTheWakeWordAlwaysGetsThrough:
+    """After "zitto" the robot could never be woken again — the real freeze.
+
+    The hush fires on the streaming partial and raises a per-turn flag. That flag
+    was only cleared when speech started again, and that path returns early while
+    asleep — so the flag stayed raised for ever and the next transcript, even
+    "Buddy", hit a `return` before the wake word was ever considered. The only
+    cure was restarting the app.
+    """
+
+    async def test_buddy_wakes_a_robot_hushed_on_a_partial(self, client):
+        await client._handle_event({"type": DELTA, "delta": "zitto"})
+        assert client._asleep is True
+
+        await client._handle_event({"type": SPEECH})
+        await client._handle_event({"type": DONE, "transcript": "Buddy"})
+
+        assert client._asleep is False
+        assert any(json.loads(m).get("type") == "response.create" for m in client.sent)
+
+    async def test_buddy_wakes_it_even_without_a_speech_started_event(self, client):
+        await client._handle_event({"type": DELTA, "delta": "zitto"})
+
+        await client._handle_event({"type": DONE, "transcript": "ehi Buddy ci sei?"})
+
+        assert client._asleep is False
+
+    async def test_the_turn_flag_is_cleared_while_asleep(self, client):
+        await client._handle_event({"type": DELTA, "delta": "zitto"})
+
+        await client._handle_event({"type": SPEECH})
+
+        assert client._stopped_on_partial is False
+        assert client._partial_user == ""
