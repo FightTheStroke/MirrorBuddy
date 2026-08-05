@@ -17,6 +17,7 @@ from pathlib import Path
 
 from reachy_mini import ReachyMini, ReachyMiniApp
 
+from . import __version__
 from .audio_io import AudioIO
 from .config import config
 from .controller import Controller
@@ -85,7 +86,7 @@ def run(
     instance_path: str | None = None,
 ) -> None:
     _setup_logging(args.debug)
-    logger.info("Starting MirrorBuddy Reachy Mini app")
+    logger.info("Starting MirrorBuddy Reachy Mini app v%s", __version__)
 
     # Load instance .env (Azure creds + MirrorBuddy config live here on the robot).
     if instance_path:
