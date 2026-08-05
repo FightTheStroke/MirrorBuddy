@@ -34,7 +34,8 @@ export type Subject =
   | 'german'
   | 'storytelling'
   | 'supercazzola'
-  | 'sport';
+  | 'sport'
+  | 'mindfulness';
 
 export interface Maestro {
   id: string;

@@ -7,6 +7,7 @@
 
 import { useCallback } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { openingFinished } from '@/lib/meditation/browser';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
@@ -348,6 +349,8 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           break;
 
         case 'response.done':
+          // If a meditation is waiting for its introduction to end, this is it.
+          openingFinished();
           deps.hasActiveResponseRef.current = false;
           logger.debug('[VoiceSession] Response complete - hasActiveResponse = false');
           break;

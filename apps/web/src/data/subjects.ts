@@ -28,6 +28,7 @@ export const subjectColors: Record<Subject, string> = {
   storytelling: "#E63946", // Red (Chris)
   supercazzola: "#722F37", // Wine (Mascetti)
   sport: "#0077B6", // Ocean Blue (Simone)
+  mindfulness: "#7C9A92", // Sage green (Fratello Loto)
 };
 
 export const subjectNames: Record<Subject, string> = {
@@ -53,6 +54,7 @@ export const subjectNames: Record<Subject, string> = {
   storytelling: "Storytelling",
   supercazzola: "Supercazzola",
   sport: "Sport",
+  mindfulness: "Mindfulness",
 };
 
 export const subjectIcons: Record<Subject, string> = {
@@ -78,6 +80,7 @@ export const subjectIcons: Record<Subject, string> = {
   storytelling: "🎤",
   supercazzola: "🎭",
   sport: "🏊",
+  mindfulness: "🪷",
 };
 
 export const subjectLucideIconNames: Record<Subject, string> = {
@@ -103,4 +106,5 @@ export const subjectLucideIconNames: Record<Subject, string> = {
   storytelling: "Mic",
   supercazzola: "Drama",
   sport: "Waves",
+  mindfulness: "Flower2",
 };

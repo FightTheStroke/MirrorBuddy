@@ -99,6 +99,12 @@ class RealtimeEventsMixin:
             if not text:
                 return
             action = session_flow.decide(text, self._asleep, self._rest_expired())
+            if self._meditating and action != session_flow.SPEAK:
+                # Any request to stop, rest or leave ends the practice at once.
+                # Sitting in an imposed silence you have asked to leave is the
+                # opposite of what this is for.
+                logger.info("Meditation ended by the student: %r", text)
+                self.end_meditation()
             if self._asleep:
                 # The single most useful line in the journal: it says what the robot
                 # actually heard while it was silent, and what it made of it.

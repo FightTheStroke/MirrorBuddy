@@ -191,4 +191,26 @@ export const EDUCATIONAL_TOOLS: VoiceToolDefinition[] = [
       required: ['purpose'],
     },
   },
+  {
+    type: 'function',
+    name: 'guided_meditation',
+    description:
+      'Conduci una vera sessione di meditazione guidata: campana, silenzio reale, campana. ' +
+      'Usala quando lo studente chiede di meditare o di fare una pausa di consapevolezza. ' +
+      'Durante il silenzio non parlare: il silenzio e\' la pratica.',
+    parameters: {
+      type: 'object',
+      properties: {
+        practice: {
+          type: 'string',
+          description: 'Pratica: respiro, corpo, gentilezza o camminata',
+        },
+        minutes: {
+          type: 'number',
+          description: 'Durata del silenzio in minuti (minimo 0.5, massimo 10)',
+        },
+      },
+      required: ['practice'],
+    },
+  },
 ];

@@ -162,6 +162,7 @@ const TYPED_SUBJECT_MAP: Record<Subject, string> = {
   storytelling: "chris",
   supercazzola: "mascetti",
   sport: "simone",
+  mindfulness: "loto",
 };
 
 /**

@@ -82,6 +82,7 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._fast_requested = False  # response already asked for before the transcript
         self._asleep_flag = False  # session ended: stay muted until the wake word
         self._asleep_since = 0.0  # monotonic time the rest began, for the timeout
+        self._meditating = False  # a guided silence is running: nothing may speak
         self._sleep_after = False  # go to sleep once the farewell response finishes
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
         self._partial_user = ""  # transcript of the turn being spoken, read for stop words
@@ -128,7 +129,7 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         down, or came back. Refused while asleep or muted — "zitto" outranks
         anything the robot noticed by itself.
         """
-        if self._asleep or self._quiet or self._responding:
+        if self._asleep or self._quiet or self._responding or self._meditating:
             return
         self._enqueue(json.dumps(rt_messages.response_create(instructions)))
 
@@ -160,6 +161,19 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._asleep = False
         self._quiet = False
         logger.info("Rest lifted: the student is back at the desk")
+
+    def start_meditation(self) -> None:
+        """Enter a guided silence (thread-safe).
+
+        Unlike ``_quiet``, this is not cleared by the child breathing, coughing or
+        shifting in his chair: a silence that ends at the first sound is not a
+        silence. Only the end of the session, or the child asking, lifts it.
+        """
+        self._meditating = True
+
+    def end_meditation(self) -> None:
+        """Give the voice back. Safe to call twice; the session always calls it."""
+        self._meditating = False
 
     def local_barge_in(self) -> None:
         """On-device barge-in (called from the mic thread when a real voice is heard
@@ -283,6 +297,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         (``conversation_already_has_active_response``), so a turn that is already
         being answered is left alone.
         """
-        if self._responding:
+        if self._responding or self._meditating:
             return
         await self._safe_send(json.dumps(rt_messages.response_create(instructions)))
