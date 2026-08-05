@@ -12,7 +12,10 @@ fi
 
 # Extract file path from stdin
 input="$(cat)"
-fp="$(printf '%s' "$input" | jq -r '.tool_input.file_path // ""')"
+# `file_path` is Claude Code's key; other hosts (Copilot CLI) send `path`. Reading
+# only the first one left `fp` empty, the lookup fell back to the CWD — which is the
+# main checkout — and every edit inside a feature worktree was denied.
+fp="$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_input.path // ""')"
 
 # Resolve the repo of the FILE (not CWD) — git worktrees live outside the main
 # project dir and have their own HEAD. Without this, edits on a feature branch
