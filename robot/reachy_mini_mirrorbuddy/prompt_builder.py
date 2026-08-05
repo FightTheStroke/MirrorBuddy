@@ -8,6 +8,7 @@ so the Maestro knows it now has a physical body (eyes, ears, mouth, movements).
 from __future__ import annotations
 
 from .mirrorbuddy_client import Maestro
+from .people import Roster
 from .safety import get_safety_preamble
 
 _LANGUAGE_IT = (
@@ -30,7 +31,7 @@ _EMBODIMENT_IT = (
 )
 
 _TOOLS_IT = (
-    "Puoi fare tre cose con gli strumenti, quando serve, senza che nessuno tocchi uno schermo:\n"
+    "Con gli strumenti puoi agire davvero, quando serve, senza che nessuno tocchi uno schermo:\n"
     "- Se lo studente chiede chi c'è o con chi può parlare, usa 'list_professors'.\n"
     "- IMPORTANTE: se lo studente chiede un altro professore o un'altra materia (es. «voglio "
     "matematica», «chiama Galileo», «parliamo di storia»), DEVI usare SUBITO lo strumento "
@@ -41,6 +42,24 @@ _TOOLS_IT = (
     "Prima dì a voce che stai per guardare (es. «fammi dare un'occhiata»); poi resta fermo, non "
     "muovere la testa, perché il robot si ferma da solo per scattare una foto nitida. Non spiare "
     "mai: usa la telecamera solo su richiesta, per aiutare con lo studio, e non descrivere le persone."
+)
+
+_PEOPLE_IT = (
+    "Davanti a te puo' esserci piu' di una persona: oltre allo studente, un amico, un "
+    "fratello o un genitore che si siedono al tavolo. Rivolgiti sempre a chi sta parlando "
+    "in quel momento, non a un interlocutore fisso.\n"
+    "- Se senti qualcuno che non conosci, o qualcuno si presenta, accoglilo con calore e "
+    "chiedigli come si chiama; appena te lo dice usa lo strumento 'remember_person' con "
+    "quel nome, cosi' te lo ricordi davvero per tutta la sessione.\n"
+    "- Se non sei sicuro di chi ti sta parlando, chiedilo con semplicita' ('chi sta "
+    "parlando adesso?') invece di indovinare. Puoi usare 'who_is_here' per ricordarti chi c'e'.\n"
+    "- Gli amici sono i benvenuti: possono farti domande e chiedere un professore come lo "
+    "studente. Valgono per tutti le stesse regole di sicurezza.\n"
+    "- Usa i nomi propri con PARSIMONIA: al saluto, quando ti rivolgi a una persona precisa "
+    "per distinguerla dalle altre, o quando richiami l'attenzione. Non iniziare ogni frase "
+    "con un nome e non ripeterlo a ogni risposta: nessuno parla cosi'.\n"
+    "- Non inventare MAI un nome e non usarne uno di cui non sei sicuro: se non lo sai, "
+    "parla senza nomi propri."
 )
 
 _CONTROL_IT = (
@@ -57,8 +76,14 @@ def build_instructions(
     locale: str = "it",
     dsa_profile: str | None = None,
     student_name: str | None = None,
+    roster: Roster | None = None,
 ) -> str:
-    """Compose the full system instructions for the realtime session."""
+    """Compose the full system instructions for the realtime session.
+
+    ``roster`` carries the people Buddy has already met in this session, so a friend
+    who introduced themselves five minutes ago is still known after a professor
+    switch (which rebuilds these instructions from scratch).
+    """
     parts: list[str] = []
 
     # 1. Safety first — highest priority, non-negotiable.
@@ -83,18 +108,30 @@ def build_instructions(
     # 4. Robot embodiment + voice-driven tools + conversation control.
     parts.append(_EMBODIMENT_IT)
     parts.append(_TOOLS_IT)
+    parts.append(_PEOPLE_IT)
     parts.append(_CONTROL_IT)
 
-    # 5. Student personalisation + DSA sensitivity.
+    # 5. Who is in the room + DSA sensitivity.
+    room = roster if roster is not None else Roster(student_name)
     student_bits: list[str] = []
-    if student_name:
+    if room.primary:
         student_bits.append(
-            f"Stai facendo da tutor a {student_name}. Chiamalo per nome, con affetto."
+            f"Lo studente che segui si chiama {room.primary}. Usa il suo nome solo "
+            "ogni tanto, come faresti parlando con un amico."
+        )
+    else:
+        student_bits.append(
+            "Non conosci il nome dello studente: non inventarlo. Puoi chiederglielo "
+            "con gentilezza e poi registrarlo con 'remember_person'."
+        )
+    if room.guests:
+        student_bits.append(
+            f"In questo momento con lui ci sono anche: {', '.join(room.guests)}."
         )
     if dsa_profile:
         student_bits.append(_dsa_note(dsa_profile))
     if student_bits:
-        parts.append(" ".join(student_bits))
+        parts.append(" ".join(b for b in student_bits if b))
 
     return "\n\n".join(p.strip() for p in parts if p and p.strip())
 

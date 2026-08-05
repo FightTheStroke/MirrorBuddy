@@ -40,6 +40,10 @@ class ToolCallMixin:
                 self._switch_persona(client, call_id, friend=True)
             elif name == "back_to_study":
                 self._switch_persona(client, call_id, friend=False)
+            elif name == "remember_person":
+                self._handle_remember_person(client, args, call_id)
+            elif name == "who_is_here":
+                client.send_function_result(call_id, self._room_summary())
             else:
                 client.send_function_result(call_id, "Ok.")
         except Exception as e:  # pragma: no cover - runtime robustness
@@ -64,6 +68,34 @@ class ToolCallMixin:
         # Acknowledge without a spoken reply here; the new Maestro will greet.
         client.send_function_result(call_id, f"Passo la parola a {target.display_name}.", respond=False)
         threading.Thread(target=self._switch_to, args=(target,), name="MaestroSwitch", daemon=True).start()
+
+    def _handle_remember_person(self, client: AzureRealtimeClient, args: dict, call_id: str) -> None:
+        """Record a name someone just said out loud — nothing else ever gets in.
+
+        A rejected name is reported as a rejection, on purpose: the failure mode we
+        are designing against is Buddy smoothing over a misheard name and then
+        addressing a child by something nobody in the room is called.
+        """
+        stored = self.people.add_guest(str(args.get("name") or ""))
+        if stored is None:
+            client.send_function_result(
+                call_id,
+                "Non ho capito bene il nome. Chiedi di ripeterlo con gentilezza, "
+                "e non usare un nome di cui non sei sicuro.",
+            )
+            return
+        client.send_function_result(
+            call_id,
+            f"Ok, {stored} adesso lo conosco. {self._room_summary()} "
+            "Salutalo brevemente e vai avanti: usa i nomi solo quando servono.",
+        )
+
+    def _room_summary(self) -> str:
+        """Who Buddy can name right now, phrased for the model to read aloud."""
+        summary = self.people.summary()
+        if not summary:
+            return "Non so ancora come si chiama chi e' con te: se serve, chiedilo."
+        return f"In questo momento davanti a te ci sono: {summary}."
 
     def _switch_persona(self, client: AzureRealtimeClient, call_id: str, friend: bool) -> None:
         """Swap between the friend companion and the study tutor (persona + voice)."""
