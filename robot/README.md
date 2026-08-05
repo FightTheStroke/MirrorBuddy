@@ -62,23 +62,24 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 
 ## Modules
 
-| File                    | Responsibility                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `config.py`             | Environment / `.env` configuration + WS URL (GA vs Preview)                           |
-| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API                                  |
-| `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                  |
-| `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                    |
-| `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                      |
-| `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                       |
-| `rt_messages.py`        | Pure builders for the realtime protocol messages                                      |
-| `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                           |
-| `movements.py`          | Expressive full-body motion + daemon face-follow while listening                      |
-| `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                            |
-| `tools.py`              | Voice tool schemas (list/change professor, look at homework, friend/study) + resolver |
-| `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)           |
-| `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                           |
-| `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                          |
-| `main.py`               | App entry point wiring everything together                                            |
+| File | Responsibility |
+| --- | --- |
+| `config.py` | Environment / `.env` configuration + WS URL (GA vs Preview) |
+| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API |
+| `prompt_builder.py` | Assemble the realtime `instructions` (persona + safety + embodiment) |
+| `safety.py` | Child-safety guardrails (aligned with MirrorBuddy) |
+| `dsa.py` | Accessibility → server-VAD turn-detection tuning |
+| `azure_realtime.py` | Azure OpenAI Realtime WebSocket client (audio + tools + vision) |
+| `rt_messages.py` | Pure builders for the realtime protocol messages |
+| `audio_io.py` | Robot mic ↔ speaker bridge (resampling, playback, barge-in) |
+| `movements.py` | Expressive full-body motion + daemon face-follow while listening |
+| `camera.py` | On-demand JPEG capture + daemon head/face tracking helpers |
+| `people.py` | Who is in the room right now — session-only, never written to disk |
+| `tools.py` | Voice tool schemas (list/change professor, look at homework, friend/study, who is here) + resolver |
+| `session_flow.py` | Pure stop / end / wake decisions for the live loop (accessibility-critical) |
+| `controller.py` | Tool dispatch, live professor switching, vision, sleep/wake |
+| `settings_ui.py` | Minimal in-app settings page (creds + Maestro/DSA selection) |
+| `main.py` | App entry point wiring everything together |
 
 ## Everything by voice (no screen)
 
@@ -94,6 +95,29 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
   po'»_. Buddy switches to **friend mode** (`talk_as_friend`): the peer‑companion Buddy of
   MirrorBuddy's Support Triangle — a warm coetaneo you can talk to about anything, not a
   tutor. Say _«torniamo ai compiti»_ (`back_to_study`) to go back to studying.
+
+## More than one person at the table
+
+The robot sits on a kitchen table, so a friend, a sibling or a parent sits down and
+starts talking. Buddy is built for that:
+
+- **It asks.** A new voice is greeted and asked its name; `remember_person` stores it
+  for the rest of the session, so the friend is addressed as themselves, not as the
+  paired child. `who_is_here` lets Buddy recall the room when it is unsure.
+- **Guests are first-class.** They can ask questions and call a professor like the
+  paired child. The safety guardrails apply to everyone equally.
+- **Names are used sparingly.** At the greeting, when singling someone out, when
+  calling attention — not at the start of every sentence, which is the tic the earlier
+  "call him by name" instruction produced.
+- **Never invented.** A name only exists if a human said it out loud. Encrypted blobs
+  (`pii:…`), digits and sentence-length strings are refused rather than spoken.
+
+**Nothing is persisted.** The roster lives in memory for one power cycle: a friend's
+name is a third child's personal data, and keeping it past the power switch is a
+consent decision their parents never made. Turn the robot off, the room empties.
+
+There is no voice or face recognition, deliberately — Buddy knows who is speaking only
+because someone told it.
 
 ## Ending a session & interrupting (accessibility‑critical)
 
