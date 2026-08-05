@@ -26,6 +26,11 @@ logger = logging.getLogger(__name__)
 # moment later and cancels the response in flight.
 _FAST_PATH_MIN_SPEECH_S = 1.8
 
+# How long a deliberate rest lasts before ordinary conversation resumes. Long
+# enough to be a real silence, short enough that a forgotten wake word costs a
+# coffee break and not an adult with an SSH session.
+_REST_MAX_S = 600.0
+
 
 def _safe_cb(cb: Callable, *args) -> None:
     try:
@@ -93,7 +98,13 @@ class RealtimeEventsMixin:
             text = (event.get("transcript") or "").strip()
             if not text:
                 return
-            action = session_flow.decide(text, self._asleep)
+            action = session_flow.decide(text, self._asleep, self._rest_expired())
+            if self._asleep:
+                # The single most useful line in the journal: it says what the robot
+                # actually heard while it was silent, and what it made of it.
+                logger.info("Resting — heard %r → %s", text, action)
+                if action != session_flow.IGNORE:
+                    self._asleep = False
             # The hush belongs to the turn that triggered it. Deployments that emit
             # partials but no speech_started have nothing else to clear it, and a
             # flag that outlives its turn silences every turn after it.
@@ -121,6 +132,7 @@ class RealtimeEventsMixin:
                 await self._request_response(rt_messages.FAREWELL_INSTR)
                 return
             if action in (session_flow.REST, session_flow.PAUSE):
+                logger.info("%s requested by %r", action.upper(), text)
                 await self._apply_stop(rest=action == session_flow.REST)
                 return
             if action == session_flow.SPEAK:
@@ -211,10 +223,28 @@ class RealtimeEventsMixin:
                 self._responding = False
                 logger.debug("Cancel arrived after the response ended (harmless)")
                 return
+            if isinstance(err, dict) and err.get("code") == "conversation_already_has_active_response":
+                # The server is still streaming a response we thought was over.
+                # Believe it and wait for its response.done, rather than firing
+                # requests it will keep rejecting while the child hears nothing.
+                self._responding = True
+                logger.info("Server still has a response in flight; waiting for it")
+                return
             logger.error("Azure Realtime error event: %s", json.dumps(err))
             return
 
         logger.debug("Unhandled event: %s", etype)
+
+    def _rest_expired(self) -> bool:
+        """True when the robot has been resting longer than the silence was worth.
+
+        A rest is a request for quiet, not a lock. Past the timeout the next thing
+        the student says is answered normally — no child should have to remember a
+        magic word to get his robot back.
+        """
+        if not self._asleep:
+            return False
+        return (time.monotonic() - self._asleep_since) > _REST_MAX_S
 
     async def _cancel_response(self) -> None:
         """Cancel the response in flight and forget it.

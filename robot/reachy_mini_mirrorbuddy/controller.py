@@ -133,6 +133,11 @@ class Controller(ToolCallMixin):
         self.movements.set_emotion("happy")
         if client is None:
             return
+        if client._asleep:
+            # He is back at the desk, so the robot listens again — but he asked for
+            # quiet, so it does not celebrate its own return.
+            client.resume_silently()
+            return
         if event == presence.ARRIVED:
             client.speak_now(
                 "Lo studente si e' appena seduto davanti a te: salutalo brevemente "

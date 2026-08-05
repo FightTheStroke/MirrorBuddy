@@ -72,10 +72,20 @@ _BYE_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Wake intent: while asleep, ONLY the robot's name "Buddy" brings it back — so a
-# stop/rest really lasts until the child deliberately calls it again. A few ASR
-# spellings of the name are accepted (whisper sometimes drops a letter).
-_WAKE_RE = re.compile(r"\bbudd?(?:y|i|ie)\b", re.IGNORECASE)
+# Wake intent. Being generous here costs nothing: the pattern is only consulted
+# while the robot is already resting, where the worst case is answering a child
+# who wanted silence — against a child locked out of his robot altogether.
+# An Italian "Buddy" comes back from Whisper as badi, bady, baddy, boddy, buddi...
+_WAKE_RE = re.compile(r"\bb[uoae]dd?(?:y|i|ie)\b", re.IGNORECASE)
+
+# The name is not the only way back. A child who has forgotten the magic word
+# still says the obvious thing — "puoi parlare?", "ci sei?" — and that has to work.
+_RESUME_RE = re.compile(
+    r"\b(sveglia(?:ti)?|riprendi|ricominciamo|torna|ritorna|"
+    r"puoi\s+(?:parlare|rispondere|tornare)|parla\s+(?:pure|di\s+nuovo)|"
+    r"ci\s+sei|mi\s+senti|rispondimi)\b",
+    re.IGNORECASE,
+)
 
 
 def is_end(text: str | None) -> bool:
@@ -88,6 +98,11 @@ def is_end(text: str | None) -> bool:
 def is_wake(text: str | None) -> bool:
     """True if the student is calling the robot back from sleep."""
     return bool(text and _WAKE_RE.search(text))
+
+
+def is_resume(text: str | None) -> bool:
+    """True if the student asked the robot to speak again without using its name."""
+    return bool(text and _RESUME_RE.search(text))
 
 
 # Spoken cues driven by the model on session end / wake (kept here so the client
