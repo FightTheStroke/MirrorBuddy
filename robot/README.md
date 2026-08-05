@@ -62,65 +62,108 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 
 ## Modules
 
-| File | Responsibility |
-| --- | --- |
-| `config.py` | Environment / `.env` configuration + WS URL (GA vs Preview) |
-| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API |
-| `prompt_builder.py` | Assemble the realtime `instructions` (persona + safety + embodiment) |
-| `safety.py` | Child-safety guardrails (aligned with MirrorBuddy) |
-| `dsa.py` | Accessibility → server-VAD turn-detection tuning |
-| `azure_realtime.py` | Azure OpenAI Realtime WebSocket client (audio + tools + vision) |
-| `rt_messages.py` | Pure builders for the realtime protocol messages |
-| `audio_io.py` | Robot mic ↔ speaker bridge (resampling, playback, barge-in) |
-| `movements.py` | Expressive full-body motion + daemon face-follow while listening |
-| `camera.py` | On-demand JPEG capture + daemon head/face tracking helpers |
-| `tools.py` | Voice tool schemas (list/change professor, look at homework, friend/study) + resolver |
-| `session_flow.py` | Pure stop / end / wake decisions for the live loop (accessibility-critical) |
-| `controller.py` | Tool dispatch, live professor switching, vision, sleep/wake |
-| `settings_ui.py` | Minimal in-app settings page (creds + Maestro/DSA selection) |
-| `main.py` | App entry point wiring everything together |
+| File                    | Responsibility                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `config.py`             | Environment / `.env` configuration + WS URL (GA vs Preview)                                        |
+| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API                                               |
+| `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                               |
+| `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                                 |
+| `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                                   |
+| `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                                    |
+| `rt_messages.py`        | Pure builders for the realtime protocol messages                                                   |
+| `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                                        |
+| `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                   |
+| `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                         |
+| `people.py`             | Who is in the room right now — session-only, never written to disk                                 |
+| `tools.py`              | Voice tool schemas (list/change professor, look at homework, friend/study, who is here) + resolver |
+| `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                        |
+| `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                                        |
+| `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                                       |
+| `main.py`               | App entry point wiring everything together                                                         |
 
 ## Everything by voice (no screen)
 
 Buddy is voice-only, so the model drives the robot through realtime **tools**:
 
-- **Change professor / subject** — say e.g. *«voglio matematica»* or *«chiama Galileo»*.
+- **Change professor / subject** — say e.g. _«voglio matematica»_ or _«chiama Galileo»_.
   `call_professor` resolves the Maestro and reconnects the session with the new
   **persona + voice**; the new professor greets. All 26 MirrorBuddy Maestri are available.
-- **Look at homework** — say e.g. *«guarda questo compito»*. `look_at_homework` captures
+- **Look at homework** — say e.g. _«guarda questo compito»_. `look_at_homework` captures
   one camera frame and the model reads the exercise and helps step by step.
 - **Who is here** — `list_professors` enumerates the available Maestri and their subjects.
-- **Just a friend (not school)** — say e.g. *«non voglio fare i compiti»* or *«parliamo un
-  po'»*. Buddy switches to **friend mode** (`talk_as_friend`): the peer‑companion Buddy of
+- **Just a friend (not school)** — say e.g. _«non voglio fare i compiti»_ or _«parliamo un
+  po'»_. Buddy switches to **friend mode** (`talk_as_friend`): the peer‑companion Buddy of
   MirrorBuddy's Support Triangle — a warm coetaneo you can talk to about anything, not a
-  tutor. Say *«torniamo ai compiti»* (`back_to_study`) to go back to studying.
+  tutor. Say _«torniamo ai compiti»_ (`back_to_study`) to go back to studying.
+
+## More than one person at the table
+
+The robot sits on a kitchen table, so a friend, a sibling or a parent sits down and
+starts talking. Buddy is built for that:
+
+- **It asks.** A new voice is greeted and asked its name; `remember_person` stores it
+  for the rest of the session, so the friend is addressed as themselves, not as the
+  paired child. `who_is_here` lets Buddy recall the room when it is unsure.
+- **Guests are first-class.** They can ask questions and call a professor like the
+  paired child. The safety guardrails apply to everyone equally.
+- **Names are used sparingly.** At the greeting, when singling someone out, when
+  calling attention — not at the start of every sentence, which is the tic the earlier
+  "call him by name" instruction produced.
+- **Never invented.** A name only exists if a human said it out loud. Encrypted blobs
+  (`pii:…`), digits and sentence-length strings are refused rather than spoken.
+
+**Nothing is persisted.** The roster lives in memory for one power cycle: a friend's
+name is a third child's personal data, and keeping it past the power switch is a
+consent decision their parents never made. Turn the robot off, the room empties.
+
+There is no voice or face recognition, deliberately — Buddy knows who is speaking only
+because someone told it.
 
 ## Ending a session & interrupting (accessibility‑critical)
 
 Insistence is stressful for the child, so these are handled **deterministically and
 locally** — never left to the model:
 
-- **Stop / rest now** — say *«basta»*, *«zitto»*, *«fermati»*, *«aspetta»*, *«pausa»*, or
-  the explicit sleep command *«dormi»* / *«vai a dormire»* / *«riposati»*.
-  Buddy goes silent **immediately and says nothing back** (local audio flush + turn cancel,
-  and the server is configured **not** to auto-reply — a response is only ever requested
-  after an ordinary turn), settles into a calm **rest position** and **stays parked** — no
-  fidgeting, no talking — until you call it back. A stop is a full stop, never a reply.
-- **Instant on-device barge-in** — the moment the child speaks *over* Buddy, playback is
+- **Pause** — _«aspetta»_, _«basta»_, _«fermati»_, _«un attimo»_, _«pausa»_. Buddy stops
+  the sentence it is saying **immediately and says nothing back** (local audio flush + turn
+  cancel, and the server is configured **not** to auto-reply). It stays awake: the next
+  thing you say is answered normally. These words are everyday Italian — _«aspetta che
+  scrivo»_ must not cost you the wake word.
+- **Rest** — the deliberate _«zitto»_, _«silenzio»_, _«taci»_, _«dormi»_, _«vai a dormire»_,
+  _«riposati»_, _«spegniti»_. Buddy goes silent, settles into a calm **rest position** and
+  **stays parked** — no fidgeting, no talking — until you call it back **by name**
+  (_«Buddy»_). A rest is a full stop, never a reply.
+- **Goodbye** — _«abbiamo finito»_, _«a domani»_, _«ci vediamo»_ at the end of a sentence:
+  a short farewell, then rest. Mid-sentence (_«ci vediamo dopo pranzo»_) it is just talk.
+- **Instant on-device barge-in** — the moment the child speaks _over_ Buddy, playback is
   cut on the robot itself, without waiting for the server. The Reachy Mini mic array is
   echo-cancelled in hardware, so voice energy on the mic while Buddy is speaking is a real
   nearby voice (not the robot hearing itself) — `audio_io.py` flushes the speaker and the
   realtime client drops any in-flight audio right away. Sensitivity is configurable from
   the robot's **settings page** ("Sensibilità basta") — or via `MIRRORBUDDY_BARGE_RMS`
   (default `0.045`, lower = more sensitive) and `MIRRORBUDDY_BARGE_FRAMES` (default `3`).
-- **We're done for today** — say *«abbiamo finito»*, *«a domani»*, *«buonanotte»*,
-  *«ci vediamo»*. Buddy says **one** short goodbye, then rests the same way.
+- **We're done for today** — say _«abbiamo finito»_, _«a domani»_, _«buonanotte»_,
+  _«ci vediamo»_. Buddy says **one** short goodbye, then rests the same way.
 - **Wake it back up** — while resting it ignores everything **except its name**: say
-  *«Buddy»* and it wakes with a small gesture, greets again and asks what you'd like to do.
+  _«Buddy»_ and it wakes with a small gesture, greets again and asks what you'd like to do.
   Nothing else brings it back, so a rest really lasts until you call it.
 
 These intents are detected in `session_flow.py`/`rt_messages.py` and enforced in
 `azure_realtime.py`, so they work even if the model would rather keep talking.
+
+## Staying alive (session resilience)
+
+Azure Realtime hard-closes **every** session at 60 minutes (`session_expired`),
+and home Wi-Fi drops. Either event closes the WebSocket, and the app used to end
+right there: the robot went silent for good, deaf even to its wake word, and only
+a manual restart brought it back.
+
+The session loop now treats a closed socket as a **reconnect, not an exit** — it
+comes back within a second, with an exponential backoff (max 30s) if Azure is
+genuinely unreachable. The resumed session is **silent**: no second greeting in
+the middle of homework. Per-session state (in-flight response, audio suppression)
+is reset, while what the child asked for — _rest_ after «zitto» — is preserved.
+Only closing the app really stops it.
 
 ## Pair with the child's MirrorBuddy profile
 
@@ -152,7 +195,7 @@ While listening, the robot **follows the student's face** (daemon head tracking)
 Buddy speaks, the head hands over to the audio wobbler for lip-sync-like motion.
 
 Privacy by design: the camera **never streams** and captures a frame **only** on an
-explicit `look_at_homework` request, always preceded by a spoken *"I'm going to look…"*.
+explicit `look_at_homework` request, always preceded by a spoken _"I'm going to look…"_.
 Nothing (audio or images) is persisted to disk. Face-follow and the camera can be turned
 off with `MIRRORBUDDY_FOLLOW_FACE=false` / `MIRRORBUDDY_ENABLE_CAMERA=false`.
 
@@ -173,8 +216,8 @@ Useful optional:
 - `MIRRORBUDDY_MAESTRO_ID` — which professor to embody (empty = first Italian tutor)
 - `MIRRORBUDDY_DSA_PROFILE` — `cerebral` (default), `dyslexia`, `adhd`, …
 - `MIRRORBUDDY_STUDENT_NAME` — personalises the greeting (e.g. `Mario`)
-- `MIRRORBUDDY_DEVICE_TOKEN` — set automatically when you pair (see *Pair with the
-  child's MirrorBuddy profile* above); overrides the fields above with the live profile
+- `MIRRORBUDDY_DEVICE_TOKEN` — set automatically when you pair (see _Pair with the
+  child's MirrorBuddy profile_ above); overrides the fields above with the live profile
 
 ### Publishing to the Reachy Mini app store
 
@@ -200,5 +243,5 @@ The app registers under the `reachy_mini_apps` entry-point group as
 ## Roadmap
 
 - **Vision** — the camera hardware is available; sending frames to the realtime model
-  (so Buddy can actually *see* homework you show it) is the next enhancement.
+  (so Buddy can actually _see_ homework you show it) is the next enhancement.
 - **Emotion → richer movement** — map transcript sentiment to head gestures.

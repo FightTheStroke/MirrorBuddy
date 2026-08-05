@@ -95,12 +95,16 @@ class TestHowTheGreetingAddressesTheChild:
     """Being called by a stranger's name is a small betrayal a child remembers."""
 
     @staticmethod
-    def _clause(name):
+    def _clause(name, guests=(), use_name=True):
         from reachy_mini_mirrorbuddy.controller import Controller
+        from reachy_mini_mirrorbuddy.people import Roster
 
         c = Controller.__new__(Controller)
         c.cfg = type("Cfg", (), {"STUDENT_NAME": name})()
-        return c._name_clause()
+        c.people = Roster(name)
+        for g in guests:
+            c.people.add_guest(g)
+        return c._name_clause(use_name=use_name)
 
     def test_a_known_name_is_handed_to_the_model(self):
         assert "Mario" in self._clause("Mario")
@@ -116,3 +120,12 @@ class TestHowTheGreetingAddressesTheChild:
 
     def test_a_failed_decryption_placeholder_is_refused(self):
         assert "senza usare nomi" in self._clause("[decryption-failed]")
+
+    def test_a_welcome_back_does_not_repeat_the_name(self):
+        # Sparing use: the first hello may name the child, the one two minutes
+        # later should not. Repeating it every time is the tic we removed.
+        assert "senza usare nomi" in self._clause("Mario", use_name=False)
+
+    def test_with_a_friend_at_the_table_nobody_is_singled_out(self):
+        clause = self._clause("Mario", guests=("Giulia",))
+        assert "Mario" not in clause and "Giulia" not in clause
