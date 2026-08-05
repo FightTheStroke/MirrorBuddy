@@ -74,8 +74,10 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 | `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                                        |
 | `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                   |
 | `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                         |
+| `body_actions.py`       | Named, clamped gestures any Maestro can play (antennas, peekaboo, nod, bow)                        |
+| `body_control.py`       | Gesture dispatch + sustained postures, mixed into `Movements`                                      |
 | `people.py`             | Who is in the room right now — session-only, never written to disk                                 |
-| `tools.py`              | Voice tool schemas (list/change professor, look at homework, friend/study, who is here) + resolver |
+| `tools.py`              | Voice tool schemas (professors, homework, friend/study, who is here, meditation, body) + resolver  |
 | `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                        |
 | `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                                        |
 | `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                                       |
@@ -87,7 +89,18 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 
 - **Change professor / subject** — say e.g. _«voglio matematica»_ or _«chiama Galileo»_.
   `call_professor` resolves the Maestro and reconnects the session with the new
-  **persona + voice**; the new professor greets. All 26 MirrorBuddy Maestri are available.
+  **persona + voice**; the new professor greets. All 27 MirrorBuddy Maestri are available.
+  The roster is written into the system prompt, so Buddy knows exactly who exists and
+  never claims a professor is unavailable when they are — that is what made
+  _«passami Fratello Loto»_ fail before the roster was injected.
+- **Move the body** — say e.g. _«abbassa le antenne»_, _«nasconditi»_, _«facciamo cucù»_.
+  `move_body` plays a real gesture: `antenne_giu`, `antenne_su`, `nascondi`, `cucu`,
+  `annuisci`, `scuoti`, `guarda_intorno`, `festeggia`, `inchino`, `riposo`. Every Maestro
+  and coach can use it, both on request and on its own initiative — celebrating a right
+  answer, or playing peekaboo. **Antennas stay where you put them** (they are a bias the
+  idle animation honours, not a one-shot pose); head gestures are one-shot, because the
+  head is shared with the face tracker. All poses are clamped well inside the arms' reach,
+  and every action returns to neutral even if the hardware refuses a frame.
 - **Look at homework** — say e.g. _«guarda questo compito»_. `look_at_homework` captures
   one camera frame and the model reads the exercise and helps step by step.
 - **Who is here** — `list_professors` enumerates the available Maestri and their subjects.
