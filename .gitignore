@@ -141,6 +141,7 @@ worktrees/
 testingcase/
 study-materials/
 .gstack/
+.serena/
 kanban/todo/
 kanban/doing/
 kanban/done/
