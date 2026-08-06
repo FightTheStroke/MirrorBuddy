@@ -729,7 +729,18 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          # Deliberately a literal, not a secret. This container lives for the
+          # duration of the job, listens on localhost inside the runner, and holds
+          # nothing but test fixtures — the password protects nothing.
+          #
+          # It used to be `secrets.TEST_DB_PASSWORD`, and that had a real cost:
+          # secrets are withheld from Dependabot and fork pull requests, so the
+          # container failed to initialise ("Database is uninitialized and
+          # superuser password is not specified") and CI could not run at all on
+          # dependency bumps. We could not verify precisely the class of PR that
+          # exists to ship security patches. Guarding a value that guards nothing
+          # made us less safe, not more.
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -766,8 +777,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -783,8 +794,8 @@ jobs:
       - name: Regenerate Prisma client post-download
         run: pnpm exec prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -807,9 +818,9 @@ jobs:
           npm run test:e2e:smoke -- --reporter=list
         env:
           CI: true
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
@@ -848,7 +859,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -885,8 +896,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -902,8 +913,8 @@ jobs:
       - name: Regenerate Prisma client post-download
         run: pnpm exec prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -937,9 +948,9 @@ jobs:
           fi
         env:
           CI: true
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
@@ -974,7 +985,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -1011,8 +1022,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -1028,8 +1039,8 @@ jobs:
       - name: Regenerate Prisma client post-download
         run: pnpm exec prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1053,9 +1064,9 @@ jobs:
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
@@ -1173,7 +1184,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -1210,8 +1221,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -1227,8 +1238,8 @@ jobs:
       - name: Regenerate Prisma client post-download
         run: pnpm exec prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1252,9 +1263,9 @@ jobs:
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
@@ -1305,7 +1316,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -1342,8 +1353,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -1359,8 +1370,8 @@ jobs:
       - name: Regenerate Prisma client post-download
         run: pnpm exec prisma generate
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Cache Playwright browsers
         uses: actions/cache@v4
@@ -1386,9 +1397,9 @@ jobs:
           command: npx playwright test --config apps/web/playwright.config.ts --project=chromium --reporter=list
         env:
           CI: true
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
@@ -1422,7 +1433,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -1459,8 +1470,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -1487,9 +1498,9 @@ jobs:
         run: npm run test:e2e:security -- --reporter=list
         env:
           CI: true
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           OLLAMA_URL: http://localhost:11434
@@ -1521,7 +1532,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -1558,8 +1569,8 @@ jobs:
           npx prisma migrate deploy
           npx prisma db seed
         env:
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -1586,9 +1597,9 @@ jobs:
         run: npm run test:e2e:compliance -- --reporter=list
         env:
           CI: true
-          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
           PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           OLLAMA_URL: http://localhost:11434
