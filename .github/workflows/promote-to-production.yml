@@ -59,19 +59,7 @@ jobs:
             echo "deployment_url=${{ inputs.deployment_url }}" >> $GITHUB_OUTPUT
           else
             echo "Finding latest staging deployment..."
-            latest=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --meta gitSource=main 2>/dev/null | grep -v "Production" | head -5)
-            echo "Recent deployments:"
-            echo "$latest"
-
-            url=$(echo "$latest" | grep "https://" | head -1 | awk '{for(i=1;i<=NF;i++) if($i ~ /^https:\/\//) print $i}')
-            if [ -z "$url" ]; then
-              url=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>/dev/null | grep -v "Production" | grep "https://" | head -1 | awk '{for(i=1;i<=NF;i++) if($i ~ /^https:\/\//) print $i}')
-            fi
-            if [ -z "$url" ]; then
-              echo "::error::Could not find a staging deployment to promote"
-              echo "Please provide the staging deployment URL manually"
-              exit 1
-            fi
+            url=$(bash scripts/ci/find-ready-deployment.sh "${{ secrets.VERCEL_TOKEN }}" "$SCOPE")
             echo "deployment_url=$url" >> $GITHUB_OUTPUT
             echo "Found latest deployment: $url"
           fi
