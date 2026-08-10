@@ -38,7 +38,7 @@ const TIER_SCOPED =
  * study cohort, is describing a part and not the whole.
  */
 const SUBSET_PROSE =
-  /(\+|\b(trial|base|pro|free|tier|piano|plan|other|others|altri|optional|opzionali|remaining|sample|cohort|coorte)\b)/i;
+  /(\+|\b(trial|base|free|gratuito|other|others|altri|optional|opzionali|remaining|sample|cohort|coorte)\b)/i;
 
 /** Phrasings used for each roster across the five shipped locales. */
 const NOUNS: Record<keyof typeof ROSTER, string[]> = {
@@ -59,6 +59,13 @@ const NOUNS: Record<keyof typeof ROSTER, string[]> = {
     'professeurs',
     'AI professors',
     'AI Professors',
+    'virtual maestri',
+    'historic professors',
+    'historic Professors',
+    'Maîtres',
+    'maîtres',
+    'Meister',
+    'meister',
     'Insegnanti',
     'insegnanti',
   ],
@@ -84,18 +91,31 @@ const PATTERNS = Object.entries(NOUNS).map(
   ([key, nouns]) => [key as keyof typeof ROSTER, buildPattern(nouns)] as const,
 );
 
+/**
+ * How much text before a number is inspected to decide whether the number is
+ * scoped to a subset. A whole sentence is too much: the Pro tier description
+ * says "all 28 maestri" and then mentions the Base tier further along, and
+ * skipping the line for that lets a real claim drift.
+ */
+const SCOPE_WINDOW = 45;
+
 /** Rewrite stale counts in one line of text, recording anything that disagreed. */
 function reconcileLine(line: string, file: string, jsonPath: string, findings: Finding[]): string {
-  if (TIER_SCOPED.test(jsonPath) || SUBSET_PROSE.test(line)) return line;
+  if (TIER_SCOPED.test(jsonPath)) return line;
 
   let out = line;
   for (const [key, pattern] of PATTERNS) {
     const expected = ROSTER[key];
-    out = out.replace(pattern, (whole, digits: string, gap: string, noun: string) => {
-      if (Number(digits) === expected) return whole;
-      findings.push({ file, jsonPath, expected, snippet: whole });
-      return `${expected}${gap}${noun}`;
-    });
+    out = out.replace(
+      pattern,
+      (whole, digits: string, gap: string, noun: string, offset: number, whole_: string) => {
+        const lead = whole_.slice(Math.max(0, offset - SCOPE_WINDOW), offset);
+        if (SUBSET_PROSE.test(lead)) return whole;
+        if (Number(digits) === expected) return whole;
+        findings.push({ file, jsonPath, expected, snippet: whole });
+        return `${expected}${gap}${noun}`;
+      },
+    );
   }
   return out;
 }
@@ -150,6 +170,9 @@ const IGNORED = [
   // Verbatim transcripts of simulated user sessions: a record of what was
   // said, not a claim the product makes.
   'docs/focus-group/**',
+  // Point-in-time verification reports, dated in the filename. They record the
+  // roster that was actually verified on that date.
+  'docs/**/*-[0-9][0-9][0-9][0-9]-[0-9][0-9].md',
 ];
 
 function main(): void {

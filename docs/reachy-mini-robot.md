@@ -35,7 +35,7 @@ is complete on its own. The robot is an optional, delightful add-on.
 | 🙌 **Body on request**   | Ask it to move and it does: _"abbassa le antenne"_, _"nasconditi"_, _"facciamo cucù"_. Any Maestro can play a gesture mid-conversation, so games like peek-a-boo work by voice alone. |
 | ✋ **Instant stop**      | Say **"basta"** and it goes silent **immediately** — on-device, no stress.                                                                                                            |
 | 🌙 **Sleep & wake**      | Say **"dormi"** to rest; call **"Buddy"** to wake it back up.                                                                                                                         |
-| 🎓 **All 27 Maestri**    | Switch professor or subject **by voice**; no screen required. Ask for one by name: _"voglio parlare con Omero"_.                                                                      |
+| 🎓 **All 28 Maestri**    | Switch professor or subject **by voice**; no screen required. Ask for one by name: _"voglio parlare con Omero"_.                                                                      |
 | 🧘 **Guided meditation** | Ask **"voglio meditare"** and Fratello Loto runs a real session: a 432 Hz bell, spoken cues, and genuine silence in between.                                                          |
 
 Everything is voice-first: there is no on-robot UI to read. The child talks; Buddy

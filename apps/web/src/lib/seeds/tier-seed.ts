@@ -176,6 +176,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         'curie',
         'cicerone',
         'lovelace',
+        'turing',
         'smith',
         'shakespeare',
         'humboldt',

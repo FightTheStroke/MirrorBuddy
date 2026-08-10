@@ -112,7 +112,7 @@ MirrorBuddy's safety approach is informed by contemporary AI safety research, in
 
 ### 11.2 The Professors' Constitution
 
-Our 27 AI Professors operate under a philosophical constitution that prioritizes:
+Our 28 AI Professors operate under a philosophical constitution that prioritizes:
 
 1. **Autonomy First**: Every interaction leaves the student more capable of independent learning
 2. **Human Relationships Are Irreplaceable**: AI does not compete with parents, teachers, or friends
