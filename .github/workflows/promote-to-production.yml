@@ -59,44 +59,7 @@ jobs:
             echo "deployment_url=${{ inputs.deployment_url }}" >> $GITHUB_OUTPUT
           else
             echo "Finding latest staging deployment..."
-            # Pick the most recent deployment that is actually Ready.
-            #
-            # Two traps live here, both of which have bitten production:
-            #
-            # 1. Only a Ready deployment can be promoted. This step used to take
-            #    the newest deployment whatever its state: on 2026-08-08 it chose
-            #    a Canceled one, promoted it and reported success while production
-            #    silently stayed on the previous build. Canceled deployments are
-            #    normal for this project — vercel.json sets `ignoreCommand: exit 0`
-            #    so Vercel never builds from git, and every git push therefore
-            #    leaves an immediately-canceled deployment at the top of the list.
-            #
-            # 2. When stdout is not a TTY, `vercel list` prints *only bare URLs*
-            #    to stdout and sends the table — status and environment included —
-            #    to stderr. With `2>/dev/null` the old `grep -v Production` had
-            #    nothing to match on and silently filtered nothing. Status has to
-            #    come from `vercel inspect`, not from parsing the list output.
-            url=""
-            candidates=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --meta gitSource=main 2>/dev/null | grep '^https://' | head -10)
-            if [ -z "$candidates" ]; then
-              candidates=$(vercel list --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>/dev/null | grep '^https://' | head -10)
-            fi
-            for cand in $candidates; do
-              state=$(vercel inspect "$cand" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>&1 | grep -E "^[[:space:]]+status" | head -1 | awk '{print $NF}')
-              echo "  $cand -> $state"
-              if [ "$state" = "Ready" ]; then
-                url="$cand"
-                break
-              fi
-            done
-            if [ -z "$url" ]; then
-              echo "::error::No Ready deployment to promote."
-              echo "If the last merge changed no application code (a version-only"
-              echo "or chore release), CI produces no build and there is genuinely"
-              echo "nothing to promote — that is the expected outcome, not a bug."
-              echo "Otherwise pass the staging deployment URL manually."
-              exit 1
-            fi
+            url=$(bash scripts/ci/find-ready-deployment.sh "${{ secrets.VERCEL_TOKEN }}" "$SCOPE")
             echo "deployment_url=$url" >> $GITHUB_OUTPUT
             echo "Found latest deployment: $url"
           fi
