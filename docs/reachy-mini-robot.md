@@ -26,16 +26,17 @@ is complete on its own. The robot is an optional, delightful add-on.
 
 ## What the robot can do
 
-| Capability          | What it means for the child                                             |
-| ------------------- | ----------------------------------------------------------------------- |
-| 👀 **Eyes**         | The camera-driven head **follows the student's face** while listening.  |
-| 👂 **Ears / 🗣 Voice** | Real-time speech-to-speech (Azure OpenAI Realtime) — same voices as web. |
-| 📷 **Homework camera** | On request, it **looks at the homework** on the desk and helps.      |
-| 🤸 **Movement**     | Expressive head/antenna motion adapted to each teacher's style.         |
-| ✋ **Instant stop** | Say **"basta"** and it goes silent **immediately** — on-device, no stress. |
-| 🌙 **Sleep & wake** | Say **"dormi"** to rest; call **"Buddy"** to wake it back up.            |
-| 🎓 **All 27 Maestri** | Switch professor or subject **by voice**; no screen required. Ask for one by name: *"voglio parlare con Omero"*. |
-| 🧘 **Guided meditation** | Ask **"voglio meditare"** and Fratello Loto runs a real session: a 432 Hz bell, spoken cues, and genuine silence in between. |
+| Capability               | What it means for the child                                                                                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 👀 **Eyes**              | The camera-driven head **follows the student's face** while listening.                                                                                                                |
+| 👂 **Ears / 🗣 Voice**   | Real-time speech-to-speech (Azure OpenAI Realtime) — same voices as web.                                                                                                              |
+| 📷 **Homework camera**   | On request, it **looks at the homework** on the desk and helps.                                                                                                                       |
+| 🤸 **Movement**          | Expressive head/antenna motion adapted to each teacher's style.                                                                                                                       |
+| 🙌 **Body on request**   | Ask it to move and it does: _"abbassa le antenne"_, _"nasconditi"_, _"facciamo cucù"_. Any Maestro can play a gesture mid-conversation, so games like peek-a-boo work by voice alone. |
+| ✋ **Instant stop**      | Say **"basta"** and it goes silent **immediately** — on-device, no stress.                                                                                                            |
+| 🌙 **Sleep & wake**      | Say **"dormi"** to rest; call **"Buddy"** to wake it back up.                                                                                                                         |
+| 🎓 **All 27 Maestri**    | Switch professor or subject **by voice**; no screen required. Ask for one by name: _"voglio parlare con Omero"_.                                                                      |
+| 🧘 **Guided meditation** | Ask **"voglio meditare"** and Fratello Loto runs a real session: a 432 Hz bell, spoken cues, and genuine silence in between.                                                          |
 
 Everything is voice-first: there is no on-robot UI to read. The child talks; Buddy
 answers, moves, and can look at what's on the table.
@@ -61,10 +62,10 @@ A parent can **unpair** the robot at any time from the same settings card.
   (name, preferred buddy/coach, school/grade level, age, language, subjects,
   accessibility flags).
 - The camera **never streams**: it grabs a **single frame** only on an explicit
-  *"look at my homework"* request, always announced out loud, and **nothing is
+  _"look at my homework"_ request, always announced out loud, and **nothing is
   persisted** to disk.
 - See [ADR 0170](adr/0170-reachy-mini-robot-embodiment.md) for the full
-architecture and security model, and [ADR 0008](adr/0008-parent-dashboard-gdpr.md)
+  architecture and security model, and [ADR 0008](adr/0008-parent-dashboard-gdpr.md)
   for the parental-consent model.
 
 ### Safety: stop, sleep and wake
@@ -106,7 +107,7 @@ Key toggles: `MIRRORBUDDY_ENABLE_CAMERA`, `MIRRORBUDDY_FOLLOW_FACE`,
 
 The robot README ships with Hugging Face app-store front-matter (title, emoji,
 tags, thumbnail) so the app can be listed on the Reachy Mini store. See
-[`robot/README.md`](../robot/README.md) → *Publishing to the Reachy Mini app store*.
+[`robot/README.md`](../robot/README.md) → _Publishing to the Reachy Mini app store_.
 
 ## Localisation
 

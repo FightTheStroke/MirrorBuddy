@@ -11,6 +11,7 @@ import {
   AccessibilitySkeleton,
   FeaturesSkeleton,
   ComplianceSkeleton,
+  RobotSkeleton,
 } from "./welcome-skeletons";
 
 export const LazyMaestriShowcaseSection = dynamic(
@@ -64,6 +65,17 @@ export const LazyComplianceSection = dynamic(
     })),
   {
     loading: () => <ComplianceSkeleton />,
+    ssr: false,
+  },
+);
+
+export const LazyRobotSection = dynamic(
+  () =>
+    import("./robot-section").then((m) => ({
+      default: m.RobotSection,
+    })),
+  {
+    loading: () => <RobotSkeleton />,
     ssr: false,
   },
 );

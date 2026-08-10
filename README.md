@@ -298,7 +298,14 @@ It reuses **MirrorBuddy's brain 1:1**: the same 27 Maestri (fetched live from
 child-safety constitution and the 7 DSA accessibility profiles — everything by **voice**,
 no screen needed.
 
-- **Change professor/subject by voice** — _«voglio matematica»_, _«chiama Galileo»_.
+- **Change professor/subject by voice** — _«voglio matematica»_, _«chiama Galileo»_. You can
+  also ask for a Maestro by name — _«voglio parlare con Fratello Loto»_ — including for
+  things that aren't school subjects, like meditation or mindfulness.
+- **Move the body on request** — _«abbassa le antenne»_, _«nasconditi»_, _«facciamo cucù»_.
+  Every Maestro can play a real gesture mid-conversation, so games like peek-a-boo need
+  nothing but the child's voice.
+- **Guided meditation** — _«voglio meditare»_ hands over to **Fratello Loto**, who runs a
+  real session: a 432 Hz bell, spoken cues, and genuine silence in between.
 - **Look at homework** — _«guarda questo compito»_ captures one frame; Buddy reads it and helps.
 - **Wake word «Buddy»** — while resting, the robot ignores everything **except its name**:
   say _«Buddy»_ and it wakes with a small gesture, greets and asks what to do.

@@ -17,6 +17,7 @@ import {
   LazyAccessibilitySection,
   LazyFeaturesSection,
   LazyComplianceSection,
+  LazyRobotSection,
 } from './lazy';
 import { trackWelcomeVisit, trackTrialStartClick } from '@/lib/funnel/client';
 import type { ExistingUserData } from '../types';
@@ -152,6 +153,9 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
 
           {/* Platform features */}
           <LazyFeaturesSection />
+
+          {/* Optional Reachy Mini robot embodiment */}
+          <LazyRobotSection />
 
           {/* Compliance & Transparency */}
           <LazyComplianceSection />

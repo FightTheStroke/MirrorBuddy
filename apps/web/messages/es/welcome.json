@@ -6,7 +6,6 @@
     },
     "hero": {
       "betaBadge": "Beta Privada",
-
       "welcomeBack": "Bienvenido de nuevo,",
       "welcomeBackSubtitle": "¿Qué vamos a aprender de nuevo hoy?",
       "welcomeNew": "Bienvenido a MirrorBuddy",
@@ -652,6 +651,33 @@
     "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
     "madeWith": "Made with ♥ in Europe",
     "inEurope": "In Europe",
-    "switchTo": "Passa a {label}"
+    "switchTo": "Passa a {label}",
+    "robot": {
+      "heading": "¿Y si además tuviera un",
+      "headingHighlight": "cuerpo?",
+      "subheading": "MirrorBuddy puede vivir dentro de Reachy Mini, un pequeño robot de escritorio: los mismos Maestri, la misma voz, pero con ojos que miran los deberes y antenas que se mueven. Todo por voz, sin pantalla.",
+      "senses": {
+        "eyes": {
+          "label": "Ojos",
+          "description": "Mira la tarea y la lee contigo"
+        },
+        "ears": {
+          "label": "Oídos",
+          "description": "Te escucha y se para cuando dices basta"
+        },
+        "voice": {
+          "label": "Voz",
+          "description": "Habla con los mismos 27 Maestri"
+        },
+        "movement": {
+          "label": "Movimiento",
+          "description": "Se mueve, juega y te saluda"
+        }
+      },
+      "optionalNote": "El robot es totalmente opcional: MirrorBuddy ya funciona por completo en el navegador.",
+      "learnMore": "Descubre cómo funciona",
+      "aboutRobot": "Qué es Reachy Mini"
+    },
+    "loadingRobot": "Cargando la sección del robot"
   }
 }

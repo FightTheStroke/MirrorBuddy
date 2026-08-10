@@ -651,6 +651,33 @@
     "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
     "madeWith": "Made with ♥ in Europe",
     "inEurope": "In Europe",
-    "switchTo": "Passa a {label}"
+    "switchTo": "Passa a {label}",
+    "robot": {
+      "heading": "E se avesse anche un",
+      "headingHighlight": "corpo?",
+      "subheading": "MirrorBuddy può vivere dentro Reachy Mini, un piccolo robot da scrivania: gli stessi Maestri, la stessa voce, ma con occhi che guardano il compito e antenne che si muovono. Tutto a voce, senza schermo.",
+      "senses": {
+        "eyes": {
+          "label": "Occhi",
+          "description": "Guarda il compito e lo legge con te"
+        },
+        "ears": {
+          "label": "Orecchie",
+          "description": "Ti ascolta e si ferma quando dici basta"
+        },
+        "voice": {
+          "label": "Voce",
+          "description": "Parla con i 27 Maestri di sempre"
+        },
+        "movement": {
+          "label": "Movimento",
+          "description": "Si muove, gioca e saluta"
+        }
+      },
+      "optionalNote": "Il robot è del tutto facoltativo: MirrorBuddy funziona già completamente dal browser.",
+      "learnMore": "Scopri come funziona",
+      "aboutRobot": "Cos'è Reachy Mini"
+    },
+    "loadingRobot": "Caricamento sezione robot"
   }
 }
