@@ -200,6 +200,21 @@ run_i18n() {
 	rm -f "$tmp"
 }
 
+run_roster() {
+	local tmp
+	tmp=$(mktemp)
+	if npm run roster:check >"$tmp" 2>&1; then
+		result "[PASS] roster"
+	else
+		ERRORS=$((ERRORS + 1))
+		result "[FAIL] roster"
+		local d
+		d=$(strip_ansi "$tmp" | grep -E "should say|stale roster" | head -10 || true)
+		result_details "$d"
+	fi
+	rm -f "$tmp"
+}
+
 run_e2e() {
 	local tmp
 	tmp=$(mktemp)
@@ -322,6 +337,7 @@ case "$MODE" in
 --build) run_build ;;
 --unit) run_unit ;;
 --i18n) run_i18n ;;
+--roster) run_roster ;;
 --unsafe-queries) run_unsafe_query_check ;;
 --links) run_link_check ;;
 --migrations) run_migrations ;;
@@ -345,6 +361,7 @@ case "$MODE" in
 	run_unsafe_query_check
 	run_unit
 	run_i18n
+	run_roster
 	run_migrations
 	run_link_check
 	run_e2e

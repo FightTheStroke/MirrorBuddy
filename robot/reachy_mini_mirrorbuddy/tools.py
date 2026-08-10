@@ -312,10 +312,15 @@ def resolve_maestro(maestri: list[Maestro], query: str) -> Maestro | None:
     return best[3] if best else None
 
 
-def professors_summary(maestri: list[Maestro], limit: int = 26) -> str:
-    """A compact spoken-friendly list of professors and their subjects."""
+def professors_summary(maestri: list[Maestro], limit: int | None = None) -> str:
+    """A compact spoken-friendly list of professors and their subjects.
+
+    The cap used to default to the roster size of the day (26), so adding Loto
+    as the 27th professor silently dropped the last one from the list the robot
+    reads out. Default to the whole roster and let callers opt into a cap.
+    """
     parts = []
-    for m in maestri[:limit]:
+    for m in maestri if limit is None else maestri[:limit]:
         name = m.display_name or m.name
         subject = m.subject or m.specialty
         parts.append(f"{name} ({subject})" if subject else name)

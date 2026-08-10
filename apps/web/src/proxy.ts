@@ -229,11 +229,17 @@ export function buildCSPHeader(nonce: string): string {
   // Build connect-src with conditional localhost
   const connectSources = ["'self'", externalDomains, localhostSources].filter(Boolean).join(' ');
 
+  // React's development build calls eval() to reconstruct callstacks across
+  // environments. The strict policy blocks it and floods the console with
+  // errors. Production never needs it — React does not call eval() there — and
+  // allowing it would defeat script-src, so it stays strictly out of prod.
+  const devEvalSource = isProduction ? '' : " 'unsafe-eval'";
+
   return [
     "default-src 'self'",
     // 'unsafe-inline' ignored when nonce present (fallback for old browsers)
     // 'strict-dynamic' allows dynamically loaded scripts from trusted scripts
-    `script-src 'self' 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic' va.vercel-scripts.com`,
+    `script-src 'self' 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic'${devEvalSource} va.vercel-scripts.com`,
     "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
