@@ -7,7 +7,7 @@
 | Key        | Value                                                       |
 | ---------- | ----------------------------------------------------------- |
 | Stack      | Next.js 16 + Zustand + Azure OpenAI + PostgreSQL + pgvector |
-| Characters | 28 Maestri + 6 Coaches + 6 Buddies (39 total)               |
+| Characters | 28 Maestri + 6 Coaches + 6 Buddies (40 total)               |
 | Compliance | EU AI Act, Italian Law 132/2025, GDPR, COPPA                |
 | ADRs       | 0015 (State), 0028 (DB), 0033 (RAG), 0064 (Formality)       |
 

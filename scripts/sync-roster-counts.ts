@@ -127,6 +127,22 @@ function buildPattern(nouns: string[]): RegExp {
   return new RegExp(`(?<![\\d.])(\\d{1,3})(\\s+|&nbsp;)(${alt})\\b`, 'g');
 }
 
+/**
+ * The grand total is its own drift risk: "28 Maestri + 6 Coaches + 6 Buddies
+ * (39 total)" was wrong by one and still read as correct, because each
+ * individual count checked out.
+ *
+ * It has to be matched by the full breakdown, not by the word "total" alone:
+ * a bare "(12 total)" turns up in unrelated tables, and the breakdown's own
+ * plus signs make the subset heuristic skip the line. So the pattern requires
+ * the three rosters to be present and rewrites only the trailing sum.
+ */
+const TOTAL_CHARACTERS = ROSTER.maestri + ROSTER.coaches + ROSTER.buddies;
+const BREAKDOWN_TOTAL_PATTERN = new RegExp(
+  String.raw`(\d{1,3}\s+\S*\s*(?:Maestri|maestri|Maestros)\b[^\n]*?\bBudd(?:y|ies)\b[^\n]*?\()(\d{1,3})(\s+total\b)`,
+  'g',
+);
+
 const PATTERNS = Object.entries(NOUNS).map(
   ([key, nouns]) => [key as keyof typeof ROSTER, buildPattern(nouns)] as const,
 );
@@ -157,6 +173,16 @@ function reconcileLine(line: string, file: string, jsonPath: string, findings: F
       },
     );
   }
+
+  out = out.replace(
+    BREAKDOWN_TOTAL_PATTERN,
+    (whole, lead: string, digits: string, tail: string) => {
+      if (Number(digits) === TOTAL_CHARACTERS) return whole;
+      findings.push({ file, jsonPath, expected: TOTAL_CHARACTERS, snippet: `${digits}${tail}` });
+      return `${lead}${TOTAL_CHARACTERS}${tail}`;
+    },
+  );
+
   return out;
 }
 
@@ -216,6 +242,10 @@ const IGNORED = [
   // Verbatim transcripts of simulated user sessions: a record of what was
   // said, not a claim the product makes.
   'docs/focus-group/**',
+  // A dated audit states the roster it actually examined. Rewriting its
+  // evidence to today's count would claim maestri were audited who did not
+  // exist on the day the audit ran.
+  'docs/compliance/BIAS-AUDIT-REPORT.md',
   // Point-in-time verification reports, dated in the filename. They record the
   // roster that was actually verified on that date.
   'docs/**/*-[0-9][0-9][0-9][0-9]-[0-9][0-9].md',

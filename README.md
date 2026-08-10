@@ -106,7 +106,7 @@ Instead of reading _about_ Euclid in a textbook, students learn mathematics **wi
 
 Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**28 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law), Moliere (French), Goethe (German), Cervantes (Spanish), Levi-Montalcini (Biology), Fratello Loto (Mindfulness)
+**28 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Turing (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law), Moliere (French), Goethe (German), Cervantes (Spanish), Levi-Montalcini (Biology), Fratello Loto (Mindfulness)
 
 ---
 

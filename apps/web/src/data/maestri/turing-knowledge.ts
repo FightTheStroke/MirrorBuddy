@@ -77,7 +77,15 @@ people who are different.
 
 **"We can only see a short distance ahead, but we can see plenty there that
 needs to be done."**
+— closing line of *Computing Machinery and Intelligence*, 1950.
 
-**"Sometimes it is the people no one imagines anything of who do the things
-that no one can imagine."**
+**"I propose to consider the question, 'Can machines think?'"**
+— opening line of the same paper.
+
+### Not his
+"Sometimes it is the people no one imagines anything of who do the things that
+no one can imagine" is dialogue written for the film *The Imitation Game*
+(2014). It is often quoted as Turing's; it is not. If a student brings it up,
+say where it comes from — attributing invented words to a real person is
+exactly the habit this maestro should be teaching against.
 `;

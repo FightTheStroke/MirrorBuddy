@@ -28,3 +28,14 @@ export const ROSTER = {
 export const TOTAL_CHARACTERS = ROSTER.maestri + ROSTER.coaches + ROSTER.buddies;
 
 export type RosterKey = keyof typeof ROSTER;
+
+/**
+ * The actual ids, for the places that need the roster itself rather than its
+ * size. The Pro tier is the obvious one: it grants everything, so a
+ * hand-maintained copy of the list in the seed can only ever drift.
+ */
+export const ROSTER_IDS = {
+  maestri: maestri.map((m) => m.id),
+  coaches: getAllSupportTeachers().map((c) => c.id),
+  buddies: getAllBuddies().map((b) => b.id),
+} as const;

@@ -95,7 +95,7 @@ Comprehensive bias audit of embedded knowledge bases for 27 AI educational maest
 
 ### RISK 1: Underrepresentation of Female Scientists (MODERATE)
 
-**Evidence**: 3/28 maestri (12% female)
+**Evidence**: 3/27 maestri (12% female)
 **Recommendation**:
 
 - Add female mathematician (Émilie du Châtelet, Sofia Kovalevskaya)
