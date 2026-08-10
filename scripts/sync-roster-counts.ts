@@ -59,11 +59,50 @@ const NOUNS: Record<keyof typeof ROSTER, string[]> = {
     'professeurs',
     'AI professors',
     'AI Professors',
-    'Insegnanti',
-    'insegnanti',
+    // Multi-word forms from the meta descriptions, where the noun does not
+    // sit directly after the number.
+    'historical Maestros',
+    'historical maestros',
+    'maestri storici',
+    'maestros históricos',
+    'historische Meister',
+    // German declines in the dative ("mit 17 historischen Meistern"), so the
+    // inflected forms need listing or the check passes while the copy is wrong.
+    'historischen Meistern',
+    'Meistern',
+    'Meister',
+    'maîtres historiques',
   ],
-  coaches: ['Coach', 'coach', 'Coaches', 'coaches', 'Coachs', 'coachs', 'Entrenadores'],
-  buddies: ['Buddy', 'buddy', 'Buddies', 'buddies'],
+  coaches: [
+    'Coach',
+    'coach',
+    'Coaches',
+    'coaches',
+    'Coachs',
+    'coachs',
+    'Entrenadores',
+    'entrenadores',
+    'entraîneurs',
+    'Trainer',
+    'trainer',
+    'Trainern',
+    'trainern',
+    'insegnanti',
+    'Insegnanti',
+  ],
+  buddies: [
+    'Buddy',
+    'buddy',
+    'Buddies',
+    'buddies',
+    'compagni',
+    'Compagni',
+    'copains',
+    'Kumpel',
+    'compañeros',
+    'Lernpartner',
+    'Lernpartnern',
+  ],
 };
 
 interface Finding {
@@ -130,6 +169,12 @@ function reconcileJson(node: unknown, file: string, path: string, findings: Find
 
 const TARGETS = [
   'apps/web/messages/*/*.json',
+  // Meta descriptions are copy too: they reach Google and social cards.
+  'apps/web/src/app/layout.tsx',
+  'apps/web/src/lib/i18n/get-og-metadata.ts',
+  // The Organization JSON-LD is what Google actually reads for rich results,
+  // so a stale count here is published to search whether we notice or not.
+  'apps/web/src/components/structured-data/json-ld-organization.ts',
   'docs/**/*.md',
   'robot/**/*.py',
   'robot/**/*.html',
