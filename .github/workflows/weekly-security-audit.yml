@@ -34,7 +34,10 @@ jobs:
         run: |
           pnpm audit --audit-level=high > audit-report.txt 2>&1 || echo "AUDIT_FAILED=true" >> "$GITHUB_OUTPUT"
 
-      - name: Create issue on failure
+      # One tracking issue, updated in place. Opening a fresh issue every week
+      # produced #631, #581 and #573 for the same finding, which buried the
+      # root cause instead of surfacing it.
+      - name: Open or update the tracking issue
         if: steps.audit.outputs.AUDIT_FAILED == 'true'
         uses: actions/github-script@v7
         with:
@@ -45,22 +48,47 @@ jobs:
               ? report.substring(0, 3000) + '\n\n... (truncated)'
               : report;
 
-            await github.rest.issues.create({
+            const TITLE = 'Security: pnpm audit found high-severity vulnerabilities';
+            const body = [
+              '## Weekly Security Audit',
+              '',
+              `Last run: ${new Date().toISOString()} (${context.sha.substring(0, 7)})`,
+              '',
+              '`pnpm audit --audit-level=high` found vulnerabilities:',
+              '',
+              '```',
+              truncated,
+              '```',
+              '',
+              '**Action required**: Review and update affected packages.',
+              '',
+              'Run locally: `pnpm audit` for the full report.',
+            ].join('\n');
+
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Security: pnpm audit found high-severity vulnerabilities`,
-              body: [
-                '## Weekly Security Audit Failed',
-                '',
-                '`pnpm audit --audit-level=high` found vulnerabilities:',
-                '',
-                '```',
-                truncated,
-                '```',
-                '',
-                '**Action required**: Review and update affected packages.',
-                '',
-                'Run locally: `pnpm audit` for full report.',
-              ].join('\n'),
-              labels: ['security', 'dependencies'],
+              state: 'open',
+              labels: 'security,dependencies',
+              per_page: 100,
             });
+            const tracking = existing.find((i) => i.title === TITLE && !i.pull_request);
+
+            if (tracking) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: tracking.number,
+                body,
+              });
+              core.info(`Updated tracking issue #${tracking.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: TITLE,
+                body,
+                labels: ['security', 'dependencies'],
+              });
+              core.info(`Opened tracking issue #${created.data.number}`);
+            }
