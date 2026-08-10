@@ -17,7 +17,7 @@ desktop robot from Hugging Face (Raspberry Pi CM4, moving head and antennas, a
 microphone array, a speaker and a camera). MirrorBuddy runs as an app **on the
 robot** and turns it into a physical study companion.
 
-- **Buy it:** <https://www.reachy-mini.org/buy.html> — Reachy Mini **Lite** from
+- **Buy it:** <https://pollen-robotics.com/reachy-mini/> — Reachy Mini **Lite** from
   about **$299**, **Wireless** from about **$449**.
 - Announcement & specs: <https://huggingface.co/blog/reachy-mini>
 

@@ -21,9 +21,9 @@ Hugging Face app-store card (front-matter above). Reachy Mini discovers this app
 
 # MirrorBuddy on Reachy Mini 🤖
 
-[![Reachy Mini](https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg)](https://www.reachy-mini.org/)
+[![Reachy Mini](https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg)](https://reachymini.net/)
 
-> 🛒 **Get the robot:** [Reachy Mini](https://www.reachy-mini.org/buy.html) by Hugging Face &
+> 🛒 **Get the robot:** [Reachy Mini](https://pollen-robotics.com/reachy-mini/) by Hugging Face &
 > Pollen Robotics — **Lite $299** (USB-tethered) or **Wireless $449** (on-board compute).
 > See the [Hugging Face announcement](https://huggingface.co/blog/reachy-mini).
 
@@ -38,7 +38,7 @@ MirrorBuddy Maestro with a body —
 It reuses **MirrorBuddy's brain** end-to-end, so the robot stays 1:1 aligned with the
 web app at [mirrorbuddy.org](https://mirrorbuddy.org):
 
-- **Personas** — the 26 Maestri are fetched live from MirrorBuddy's public
+- **Personas** — the 27 Maestri are fetched live from MirrorBuddy's public
   `GET /api/maestri?locale=it` endpoint (same names, voices, system prompts, greetings).
 - **Voice + conversation** — Azure OpenAI **Realtime** (speech-to-speech), the same
   provider and the same 8 voices (`alloy, ash, ballad, coral, echo, sage, shimmer, verse`).

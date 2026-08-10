@@ -197,6 +197,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         'goethe',
         'cervantes',
         'levi-montalcini',
+        'loto',
       ],
       availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
       availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],

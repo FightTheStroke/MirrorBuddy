@@ -8,7 +8,9 @@
     "runSimulation": "Run simulation",
     "running": "Running...",
     "benchmarks": "Benchmarks",
-    "heatmap": "Score heatmap",
+    "heatmap": {
+      "unknownProfile": "Unknown profile"
+    },
     "scores": "Scores",
     "scaffolding": "Scaffolding",
     "hinting": "Hinting",
@@ -66,9 +68,6 @@
     "ranking": {
       "rank": "Rank",
       "average": "Average"
-    },
-    "heatmap": {
-      "unknownProfile": "Unknown profile"
     },
     "drillDown": {
       "title": "Benchmark Drill-down",

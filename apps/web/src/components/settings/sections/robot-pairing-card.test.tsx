@@ -53,7 +53,7 @@ describe('RobotPairingCard', () => {
     render(<RobotPairingCard />);
 
     const buy = screen.getByRole('link', { name: /buyCta/ });
-    expect(buy).toHaveAttribute('href', 'https://www.reachy-mini.org/buy.html');
+    expect(buy).toHaveAttribute('href', 'https://pollen-robotics.com/reachy-mini/');
     expect(buy).toHaveAttribute?.('target', '_blank');
     expect(buy).toHaveAttribute('rel', expect.stringContaining('noopener'));
   });

@@ -2,8 +2,15 @@
   "metadata": {
     "home": {
       "title": "Inicio | MirrorBuddy",
-      "description": "Descubre el aprendizaje basado en IA para estudiantes con dificultades de aprendizaje. Tutoría personalizada con 26 profesores, voz y aprendizaje adaptativo.",
-      "keywords": ["educación", "IA", "tutoría", "aprendizaje", "voz", "profesores"]
+      "description": "Descubre el aprendizaje basado en IA para estudiantes con dificultades de aprendizaje. Tutoría personalizada con 27 profesores, voz y aprendizaje adaptativo.",
+      "keywords": [
+        "educación",
+        "IA",
+        "tutoría",
+        "aprendizaje",
+        "voz",
+        "profesores"
+      ]
     },
     "settings": {
       "title": "Configuración | MirrorBuddy",
@@ -19,17 +26,35 @@
     "aiTransparency": {
       "title": "Transparencia IA | MirrorBuddy",
       "description": "Descubre cómo MirrorBuddy utiliza la IA responsablemente para educación: transparencia total, seguridad de datos y medidas de protección para estudiantes.",
-      "keywords": ["IA", "transparencia", "seguridad", "cumplimiento", "IA responsable"]
+      "keywords": [
+        "IA",
+        "transparencia",
+        "seguridad",
+        "cumplimiento",
+        "IA responsable"
+      ]
     },
     "privacy": {
       "title": "Política de Privacidad | MirrorBuddy",
       "description": "Comprende cómo MirrorBuddy protege los datos, respeta GDPR, gestiona información de manera segura y garantiza privacidad con comunicaciones cifradas aquí.",
-      "keywords": ["privacidad", "GDPR", "protección de datos", "seguridad", "cumplimiento"]
+      "keywords": [
+        "privacidad",
+        "GDPR",
+        "protección de datos",
+        "seguridad",
+        "cumplimiento"
+      ]
     },
     "terms": {
       "title": "Términos de Servicio | MirrorBuddy",
       "description": "Lee nuestros términos de servicio, acuerdos de usuario, políticas de uso aceptable e información legal para el uso de la plataforma educativa MirrorBuddy.",
-      "keywords": ["términos", "servicio", "legal", "acuerdo", "políticas"]
+      "keywords": [
+        "términos",
+        "servicio",
+        "legal",
+        "acuerdo",
+        "políticas"
+      ]
     },
     "title": "MirrorBuddy - Tu compañero de estudio",
     "description": "Plataforma educativa basada en IA para estudiantes con necesidades especiales",

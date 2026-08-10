@@ -1,8 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Eye, Ear, MessageCircle, Sparkles } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import type { LucideIcon } from 'lucide-react';
 
 interface SenseConfig {
@@ -10,6 +10,21 @@ interface SenseConfig {
   icon: LucideIcon;
   iconColor: string;
 }
+
+/**
+ * Vendor site, per locale. The English edition lives at the root, and
+ * reachy-mini.org — the address we used to link — resolves in DNS but never
+ * answers, so a visitor clicking it just waited for a timeout.
+ */
+const VENDOR_URL_BY_LOCALE: Record<string, string> = {
+  en: 'https://reachymini.net/',
+  it: 'https://reachymini.net/it/',
+  fr: 'https://reachymini.net/fr/',
+  de: 'https://reachymini.net/de/',
+  es: 'https://reachymini.net/es/',
+};
+
+const VENDOR_URL_FALLBACK = 'https://reachymini.net/';
 
 /** The four capabilities that make the robot a body rather than a screen. */
 const SENSES: SenseConfig[] = [
@@ -36,6 +51,10 @@ const SENSES: SenseConfig[] = [
  */
 export function RobotSection() {
   const t = useTranslations('welcome.robot');
+  const locale = useLocale();
+  const prefersReducedMotion = useReducedMotion();
+
+  const vendorUrl = VENDOR_URL_BY_LOCALE[locale] ?? VENDOR_URL_FALLBACK;
 
   return (
     <motion.section
@@ -59,6 +78,28 @@ export function RobotSection() {
           <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             {t('subheading')}
           </p>
+        </div>
+
+        <div className="mb-6 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-900 max-w-2xl mx-auto">
+          {/*
+            Self-hosted rather than hotlinked: the vendor GIF is 6.8MB and would
+            hand every visitor's IP to a third party. Re-encoded, it is 79KB.
+            autoPlay is withheld when the visitor asks for reduced motion, which
+            leaves a still frame instead of a perpetual loop.
+          */}
+          <video
+            className="w-full h-auto block"
+            poster="/robot/reachy-poster.webp"
+            aria-label={t('videoAlt')}
+            autoPlay={!prefersReducedMotion}
+            loop
+            muted
+            playsInline
+            preload="none"
+          >
+            <source src="/robot/reachy.webm" type="video/webm" />
+            <source src="/robot/reachy.mp4" type="video/mp4" />
+          </video>
         </div>
 
         <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 list-none">
@@ -100,7 +141,7 @@ export function RobotSection() {
             {t('learnMore')}
           </a>
           <a
-            href="https://www.reachy-mini.org/"
+            href={vendorUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"

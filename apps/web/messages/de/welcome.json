@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "VOLLZUGANG",
         "title": "Hast du ein Konto?",
-        "feature1": "26 KI-Professoren",
+        "feature1": "27 KI-Professoren",
         "feature2": "Alle Werkzeuge",
         "feature3": "Gespeicherte Fortschritte",
         "cta": "Anmelden"
@@ -99,7 +99,7 @@
           "price": "Auf Anfrage",
           "badge": "Empfohlen",
           "features": {
-            "maestri": "26 Professoren",
+            "maestri": "27 Professoren",
             "messagesUnlimited": "Unbegrenzte Nachrichten",
             "voiceUnlimited": "Unbegrenzte Sprache",
             "allTools": "Alle Werkzeuge"
@@ -333,7 +333,7 @@
           "description": "Jeder hat seine eigene Art zu lernen. Hier respektieren wir dein Tempo und deinen Stil."
         },
         "maestriCount": {
-          "title": "26 Meister an deiner Seite",
+          "title": "27 Meister an deiner Seite",
           "description": "Von Leonardo bis Marie Curie, die größten Genies der Geschichte erklären dir jedes Fach."
         },
         "neverAlone": {
@@ -496,7 +496,7 @@
       "title": "Warum MirrorBuddy wählen",
       "items": {
         "maestri": {
-          "title": "26 KI-Professoren",
+          "title": "27 KI-Professoren",
           "description": "Von Euklid bis Darwin, lerne von außergewöhnlichen Köpfen der Geschichte"
         },
         "accessibility": {
@@ -574,7 +574,7 @@
       "coachDesc": "für Lernmethoden",
       "buddyCount": "5 Buddies",
       "buddyDesc": "für emotionale Unterstützung",
-      "maestriCount": "26 Meister",
+      "maestriCount": "27 Meister",
       "maestriDesc": "Fachexperten",
       "teaser": "Galileo, Darwin, Manzoni, Herodot, Mozart, Sokrates, Feynman und viele mehr warten auf dich!",
       "categoryCoach": "Coach",
@@ -676,7 +676,8 @@
       },
       "optionalNote": "Der Roboter ist völlig optional: MirrorBuddy funktioniert im Browser bereits vollständig.",
       "learnMore": "So funktioniert es",
-      "aboutRobot": "Was ist Reachy Mini"
+      "aboutRobot": "Was ist Reachy Mini",
+      "videoAlt": "Reachy Mini, der kleine Tischroboter, bewegt Kopf und Antennen"
     },
     "loadingRobot": "Roboter-Abschnitt wird geladen"
   }

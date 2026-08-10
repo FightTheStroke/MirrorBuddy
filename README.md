@@ -284,11 +284,11 @@ npx cap open android  # Opens Android Studio
 
 MirrorBuddy also has a **body**. The [`robot/`](robot/) app turns a **Reachy Mini** — the
 open-source desktop robot by [Hugging Face](https://huggingface.co/blog/reachy-mini) &
-[Pollen Robotics](https://www.reachy-mini.org/) — into a MirrorBuddy Maestro with
+[Pollen Robotics](https://reachymini.net/) — into a MirrorBuddy Maestro with
 **👁️ eyes** (camera), **👂 ears** (microphone), **👄 mouth** (speaker) and **🤸 movement**.
 
 <p align="center">
-  <a href="https://www.reachy-mini.org/">
+  <a href="https://reachymini.net/">
     <img src="https://huggingface.co/blog/assets/reachy-mini/thumbnail.jpg" alt="Reachy Mini robot" width="520">
   </a>
 </p>
@@ -323,7 +323,7 @@ no screen needed.
   6-digit code and type it on the robot. It binds to the logged-in child's profile using a
   scoped, revocable **device token** — the child's password never leaves their computer.
 
-**🛒 Get the robot:** [Reachy Mini](https://www.reachy-mini.org/buy.html) — **Lite $299**
+**🛒 Get the robot:** [Reachy Mini](https://pollen-robotics.com/reachy-mini/) — **Lite $299**
 (USB-tethered) or **Wireless $449** (on-board compute).
 
 **→ Robot app & setup guide: [robot/README.md](robot/README.md)**
