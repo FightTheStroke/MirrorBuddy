@@ -28,3 +28,15 @@ export const ROSTER = {
 export const TOTAL_CHARACTERS = ROSTER.maestri + ROSTER.coaches + ROSTER.buddies;
 
 export type RosterKey = keyof typeof ROSTER;
+
+/**
+ * The actual ids, for the places that need the roster itself rather than its
+ * size. The Pro tier is the obvious one: it grants everything, so a
+ * hand-maintained copy of the list in the seed can only ever drift.
+ *
+ * The literals live in `./roster-ids` and are re-exported here, so app code has
+ * one place to import from. They are kept honest by `roster-ids.test.ts`. The
+ * split exists because the database seed must not import the character data —
+ * see the comment in that file.
+ */
+export { ROSTER_IDS } from './roster-ids';

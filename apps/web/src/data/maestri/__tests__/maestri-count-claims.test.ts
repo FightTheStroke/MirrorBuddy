@@ -99,22 +99,31 @@ describe('maestri count claims', () => {
     expect(wrong).toEqual([]);
   });
 
-  it('offers every Maestro on the Pro tier', () => {
-    // Pro is sold as full access. Loto shipped without being added here, so the
-    // top tier listed one Maestro fewer than the roster holds. The seed is an
-    // async Prisma routine rather than exported data, so we read the literal.
-    const seed = readFileSync(
-      join(process.cwd(), 'apps', 'web', 'src', 'lib', 'seeds', 'tier-seed.ts'),
-      'utf-8',
-    );
-    const lists = [...seed.matchAll(/availableMaestri:\s*\[([^\]]*)\]/g)].map((m) =>
-      [...m[1].matchAll(/'([^']+)'/g)].map((q) => q[1]),
-    );
+  it('offers every Maestro on the Pro tier, on create and on update', async () => {
+    // Pro is sold as full access. Loto shipped without being added to the seed,
+    // so the top tier silently listed one Maestro fewer than the roster held.
+    // The list is derived now, and this asserts the behaviour rather than the
+    // source text: both the create and the update path must carry the roster,
+    // because an already-seeded database only ever takes the update path.
+    const { seedTiers } = await import('@/lib/seeds/tier-seed');
 
-    // Pro is the last and largest list in the file.
-    const pro = lists[lists.length - 1] ?? [];
-    const missing = maestri.map((m) => m.id).filter((id) => !pro.includes(id));
+    const calls: Array<{ where: { code: string }; create: Record<string, unknown>; update: Record<string, unknown> }> = [];
+    const prisma = {
+      tierDefinition: {
+        upsert: (args: (typeof calls)[number]) => {
+          calls.push(args);
+          return Promise.resolve({ code: args.where.code });
+        },
+      },
+    };
 
-    expect(missing).toEqual([]);
+    await seedTiers(prisma as unknown as Parameters<typeof seedTiers>[0]);
+
+    const pro = calls.find((c) => c.where.code === 'pro');
+    expect(pro, 'the seed never upserted a pro tier').toBeDefined();
+
+    const everyId = maestri.map((m) => m.id);
+    expect(pro?.create.availableMaestri).toEqual(everyId);
+    expect(pro?.update.availableMaestri).toEqual(everyId);
   });
 });

@@ -8,6 +8,8 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { TierDefinition } from '@prisma/client';
 
+import { ROSTER_IDS } from '../../data/roster-ids';
+
 // Model defaults from env vars (change in .env to migrate without code changes)
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
 const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || 'gpt-5.2-edu';
@@ -133,9 +135,25 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
   });
 
   // Pro Tier - Paid tier with unlimited features
+  //
+  // Pro grants the whole roster, so the list is derived rather than typed:
+  // a hand-maintained copy drifts the moment a maestro is added, and the
+  // paid-tier copy promises "all the Maestri" in five languages.
+  const proMaestri = [...ROSTER_IDS.maestri];
+  const proCoaches = [...ROSTER_IDS.coaches];
+  const proBuddies = [...ROSTER_IDS.buddies];
+
+  // IMPORTANT: the roster is applied in `update` too, not just `create`.
+  // With `update: {}` an already-seeded database (dev/stage/CI, and prod once
+  // backfilled) keeps its stale row forever, so a newly added maestro would
+  // never reach paying users — the same bug fixed for Trial in PR #457.
   const pro = await prisma.tierDefinition.upsert({
     where: { code: 'pro' },
-    update: {},
+    update: {
+      availableMaestri: proMaestri,
+      availableCoaches: proCoaches,
+      availableBuddies: proBuddies,
+    },
     create: {
       code: 'pro',
       name: 'Pro',
@@ -163,44 +181,16 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
           'homework',
           'chart',
         ],
-        coachesAvailable: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-        buddiesAvailable: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
+        coachesAvailable: proCoaches,
+        buddiesAvailable: proBuddies,
         parentDashboard: true,
         prioritySupport: true,
         advancedAnalytics: true,
         unlimitedStorage: true,
       },
-      availableMaestri: [
-        'leonardo',
-        'galileo',
-        'curie',
-        'cicerone',
-        'lovelace',
-        'smith',
-        'shakespeare',
-        'humboldt',
-        'erodoto',
-        'manzoni',
-        'euclide',
-        'mozart',
-        'socrate',
-        'ippocrate',
-        'feynman',
-        'darwin',
-        'chris',
-        'omero',
-        'alex-pina',
-        'simone',
-        'cassese',
-        'mascetti',
-        'moliere',
-        'goethe',
-        'cervantes',
-        'levi-montalcini',
-        'loto',
-      ],
-      availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-      availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
+      availableMaestri: proMaestri,
+      availableCoaches: proCoaches,
+      availableBuddies: proBuddies,
       availableTools: [
         'pdf',
         'chat',

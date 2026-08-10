@@ -24,11 +24,11 @@ export interface EducationalOrganizationSchema extends OrganizationSchema {
 
 // Locale-specific descriptions
 const localeDescriptions: Record<Locale, string> = {
-  it: 'MirrorBuddy - La scuola che vorrei. Piattaforma educativa potenziata da IA per studenti con differenze di apprendimento, con 27 maestri storici, insegnanti, compagni e tutoraggio vocale personalizzato.',
-  en: 'MirrorBuddy - The school we wished existed. AI-powered educational platform for students with learning differences, featuring 27 historical maestros, coaches, buddies, and personalized voice tutoring.',
-  fr: "MirrorBuddy - L'école que nous avions souhaitée. Plateforme éducative alimentée par l'IA pour les étudiants ayant des troubles d'apprentissage, avec 27 maîtres historiques, entraîneurs, camarades et tutorat vocal personnalisé.",
-  de: 'MirrorBuddy - Die Schule, die wir uns gewünscht haben. KI-gestützte Bildungsplattform für Schüler mit Lernbehinderungen, mit 27 historischen Meistern, Trainern, Begleitern und personalisierter Sprachbetreuung.',
-  es: 'MirrorBuddy - La escuela que siempre deseamos. Plataforma educativa impulsada por IA para estudiantes con dificultades de aprendizaje, con 27 maestros históricos, entrenadores, compañeros y tutoría de voz personalizada.',
+  it: 'MirrorBuddy - La scuola che vorrei. Piattaforma educativa potenziata da IA per studenti con differenze di apprendimento, con 28 maestri storici, insegnanti, compagni e tutoraggio vocale personalizzato.',
+  en: 'MirrorBuddy - The school we wished existed. AI-powered educational platform for students with learning differences, featuring 28 historical maestros, coaches, buddies, and personalized voice tutoring.',
+  fr: "MirrorBuddy - L'école que nous avions souhaitée. Plateforme éducative alimentée par l'IA pour les étudiants ayant des troubles d'apprentissage, avec 28 maîtres historiques, entraîneurs, camarades et tutorat vocal personnalisé.",
+  de: 'MirrorBuddy - Die Schule, die wir uns gewünscht haben. KI-gestützte Bildungsplattform für Schüler mit Lernbehinderungen, mit 28 historischen Meistern, Trainern, Begleitern und personalisierter Sprachbetreuung.',
+  es: 'MirrorBuddy - La escuela que siempre deseamos. Plataforma educativa impulsada por IA para estudiantes con dificultades de aprendizaje, con 28 maestros históricos, entrenadores, compañeros y tutoría de voz personalizada.',
 };
 
 // Educational levels (locale-specific)

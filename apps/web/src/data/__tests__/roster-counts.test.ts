@@ -3,6 +3,9 @@
  * disagree, `npm run roster:check` would happily bless a wrong number — which
  * is exactly the failure mode the roster work set out to remove.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import { ROSTER, TOTAL_CHARACTERS } from '@/data/roster';
@@ -32,5 +35,20 @@ describe('roster counts', () => {
 
   it('adds up to the total offered to a student', () => {
     expect(TOTAL_CHARACTERS).toBe(ROSTER.maestri + ROSTER.coaches + ROSTER.buddies);
+  });
+});
+
+describe('the README enumerates every maestro it advertises', () => {
+  it('lists as many names as the count it claims', () => {
+    const readme = readFileSync(resolve(REPO_ROOT, 'README.md'), 'utf8');
+    const line = readme.split('\n').find((l) => l.startsWith('**') && l.includes('Maestri:**'));
+    expect(line, 'roster line not found in README').toBeDefined();
+
+    const claimed = Number(/(\d+) Maestri/.exec(line ?? '')?.[1]);
+    // Each entry is "Name (Subject)"; counting the subjects counts the names.
+    const listed = (line ?? '').match(/\([^)]+\)/g)?.length ?? 0;
+
+    expect(claimed).toBe(ROSTER.maestri);
+    expect(listed).toBe(ROSTER.maestri);
   });
 });

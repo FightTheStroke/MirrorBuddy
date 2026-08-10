@@ -246,14 +246,14 @@
       "tldr": {
         "heading": "In breve (TL;DR)",
         "point1": "MirrorBuddy usa IA (Azure OpenAI) per insegnare, non per decidere",
-        "point2": "I 27 Maestri IA hanno conoscenze verificate e controllate",
+        "point2": "I 28 Maestri IA hanno conoscenze verificate e controllate",
         "point3": "Gli insegnanti vedono sempre tutte le chat e possono intervenire",
         "point4": "Puoi rifiutare l'IA quando vuoi, senza conseguenze",
         "point5": "Rispettiamo il GDPR e la legge italiana sulla privacy"
       },
       "aiSystem": {
         "section1Title": "1. Divulgazione dei Sistemi di IA (Articolo 50 - Legge sull'IA dell'UE 2024/1689)",
-        "section1Para1": "In conformità all'Articolo 50 della Legge sull'IA dell'UE (Regolamento 2024/1689), MirrorBuddy divulga che i 27 maestri educativi disponibili sulla piattaforma utilizzano intelligenza artificiale generativa. Questi sistemi di IA sono progettati per personalizzare l'insegnamento e supportare studenti con difficoltà di apprendimento.",
+        "section1Para1": "In conformità all'Articolo 50 della Legge sull'IA dell'UE (Regolamento 2024/1689), MirrorBuddy divulga che i 28 maestri educativi disponibili sulla piattaforma utilizzano intelligenza artificiale generativa. Questi sistemi di IA sono progettati per personalizzare l'insegnamento e supportare studenti con difficoltà di apprendimento.",
         "section1Para2Intro": "I sistemi di IA in MirrorBuddy includono tre categorie principali:",
         "section1Para2Item1": "Sistemi di Personalizzazione Educativa - Azure OpenAI GPT per adattare il contenuto al livello e allo stile di apprendimento dello studente",
         "section1Para2Item2": "Sistemi di Analisi del Progresso - Algoritmi di apprendimento spaziale per la ripetizione spaziata (FSRS) che tracciare la ritenzione di conoscenze",
@@ -377,7 +377,7 @@
       },
       "sections": {
         "section1": {
-          "para1": "In conformità all'Articolo 50 della Legge sull'IA dell'UE (Regolamento 2024/1689), MirrorBuddy divulga che i 27 maestri educativi disponibili sulla piattaforma utilizzano intelligenza artificiale generativa. Questi sistemi di IA sono progettati per personalizzare l'insegnamento e supportare studenti con difficoltà di apprendimento.",
+          "para1": "In conformità all'Articolo 50 della Legge sull'IA dell'UE (Regolamento 2024/1689), MirrorBuddy divulga che i 28 maestri educativi disponibili sulla piattaforma utilizzano intelligenza artificiale generativa. Questi sistemi di IA sono progettati per personalizzare l'insegnamento e supportare studenti con difficoltà di apprendimento.",
           "para2": "I sistemi di IA in MirrorBuddy includono: Sistemi di Personalizzazione Educativa (Azure OpenAI GPT), Sistemi di Analisi del Progresso (algoritmi FSRS per ripetizione spaziata), e Sistemi di Supporto Emotivo (generazione di feedback personalizzato e incoraggiamento).",
           "title": "1. Divulgazione dei Sistemi di IA"
         },
@@ -1325,7 +1325,7 @@
           },
           "pro": {
             "title": "Livello Pro (Abbonamento a Pagamento)",
-            "description": "Gli utenti del livello Pro hanno un abbonamento a pagamento a €9,99/mese elaborato tramite Stripe. Questo livello fornisce accesso premium con tutte le funzionalità: messaggi di chat illimitati, interazione vocale illimitata, accesso a tutti i 27 maestri (insegnanti AI) inclusi maestri premium esclusivi, supporto prioritario e funzionalità avanzate. Raccogliamo tutti i dati del livello Base più: informazioni di pagamento elaborate da Stripe (non memorizzate direttamente da MirrorBuddy), indirizzo di fatturazione e cronologia fatture (per contabilità e conformità fiscale), stato dell'abbonamento e date di rinnovo. I dati di pagamento sono gestiti da Stripe secondo il loro Data Processing Agreement (DPA) conforme a GDPR."
+            "description": "Gli utenti del livello Pro hanno un abbonamento a pagamento a €9,99/mese elaborato tramite Stripe. Questo livello fornisce accesso premium con tutte le funzionalità: messaggi di chat illimitati, interazione vocale illimitata, accesso a tutti i 28 maestri (insegnanti AI) inclusi maestri premium esclusivi, supporto prioritario e funzionalità avanzate. Raccogliamo tutti i dati del livello Base più: informazioni di pagamento elaborate da Stripe (non memorizzate direttamente da MirrorBuddy), indirizzo di fatturazione e cronologia fatture (per contabilità e conformità fiscale), stato dell'abbonamento e date di rinnovo. I dati di pagamento sono gestiti da Stripe secondo il loro Data Processing Agreement (DPA) conforme a GDPR."
           },
           "dataNote": "Il tuo livello di abbonamento determina quali dati personali raccogliamo. Puoi visualizzare e controllare i tuoi dati in qualsiasi momento nelle impostazioni sulla privacy. L'aggiornamento o il downgrade del tuo livello modifica di conseguenza il tuo profilo di raccolta dati. Quando passi da Pro a Base o elimini il tuo account, la conservazione dei dati di pagamento segue la nostra policy di conservazione standard (registri di fatturazione conservati per 7 anni per conformità fiscale, poi eliminati permanentemente)."
         },
@@ -1373,7 +1373,7 @@
         "jurisdictions": "Giurisdizioni: Italia, Francia, Germania, Spagna, Regno Unito",
         "sections": {
           "section1": {
-            "content1": "MirrorBuddy è una piattaforma educativa basata sull'intelligenza artificiale, progettata per supportare studenti con difficoltà di apprendimento (DSA). La piattaforma offre 27 maestri virtuali (personaggi educativi con personalità e conoscenze uniche), flashcard con algoritmo di ripetizione spaziata (FSRS), quiz adattivi, mappe mentali e strumenti di gamification.",
+            "content1": "MirrorBuddy è una piattaforma educativa basata sull'intelligenza artificiale, progettata per supportare studenti con difficoltà di apprendimento (DSA). La piattaforma offre 28 maestri virtuali (personaggi educativi con personalità e conoscenze uniche), flashcard con algoritmo di ripetizione spaziata (FSRS), quiz adattivi, mappe mentali e strumenti di gamification.",
             "content2": "MirrorBuddy è sviluppata dalla Fightthestroke Foundation con l'obiettivo di rendere l'apprendimento inclusivo e accessibile a tutti. La piattaforma è conforme alle normative europee sulla protezione dei dati (GDPR), sull'intelligenza artificiale (EU AI Act 2024/1689) e sull'accessibilità (WCAG 2.1 AA).",
             "title": "1. Cos'è MirrorBuddy"
           },

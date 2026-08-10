@@ -38,7 +38,7 @@ MirrorBuddy Maestro with a body —
 It reuses **MirrorBuddy's brain** end-to-end, so the robot stays 1:1 aligned with the
 web app at [mirrorbuddy.org](https://mirrorbuddy.org):
 
-- **Personas** — the 27 Maestri are fetched live from MirrorBuddy's public
+- **Personas** — the 28 Maestri are fetched live from MirrorBuddy's public
   `GET /api/maestri?locale=it` endpoint (same names, voices, system prompts, greetings).
 - **Voice + conversation** — Azure OpenAI **Realtime** (speech-to-speech), the same
   provider and the same 8 voices (`alloy, ash, ballad, coral, echo, sage, shimmer, verse`).

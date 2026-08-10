@@ -38,7 +38,7 @@ const TIER_SCOPED =
  * study cohort, is describing a part and not the whole.
  */
 const SUBSET_PROSE =
-  /(\+|\b(trial|base|pro|free|tier|piano|plan|other|others|altri|optional|opzionali|remaining|sample|cohort|coorte)\b)/i;
+  /(\+|\b(trial|base|free|gratuito|other|others|altri|optional|opzionali|remaining|sample|cohort|coorte)\b)/i;
 
 /** Phrasings used for each roster across the five shipped locales. */
 const NOUNS: Record<keyof typeof ROSTER, string[]> = {
@@ -59,19 +59,25 @@ const NOUNS: Record<keyof typeof ROSTER, string[]> = {
     'professeurs',
     'AI professors',
     'AI Professors',
-    // Multi-word forms from the meta descriptions, where the noun does not
-    // sit directly after the number.
+    // Multi-word forms from the meta descriptions and the JSON-LD schema,
+    // where the noun does not sit directly after the number.
     'historical Maestros',
     'historical maestros',
+    'historic professors',
+    'historic Professors',
+    'virtual maestri',
     'maestri storici',
     'maestros históricos',
+    'maîtres historiques',
+    'Maîtres',
+    'maîtres',
     'historische Meister',
     // German declines in the dative ("mit 17 historischen Meistern"), so the
     // inflected forms need listing or the check passes while the copy is wrong.
     'historischen Meistern',
     'Meistern',
     'Meister',
-    'maîtres historiques',
+    'meister',
   ],
   coaches: [
     'Coach',
@@ -87,6 +93,8 @@ const NOUNS: Record<keyof typeof ROSTER, string[]> = {
     'trainer',
     'Trainern',
     'trainern',
+    // Italian "insegnanti" names the coaches, not the maestri. Listing it
+    // under maestri would rewrite a correct 6 into the maestri count.
     'insegnanti',
     'Insegnanti',
   ],
@@ -119,23 +127,62 @@ function buildPattern(nouns: string[]): RegExp {
   return new RegExp(`(?<![\\d.])(\\d{1,3})(\\s+|&nbsp;)(${alt})\\b`, 'g');
 }
 
+/**
+ * The grand total is its own drift risk: "28 Maestri + 6 Coaches + 6 Buddies
+ * (39 total)" was wrong by one and still read as correct, because each
+ * individual count checked out.
+ *
+ * It has to be matched by the full breakdown, not by the word "total" alone:
+ * a bare "(12 total)" turns up in unrelated tables, and the breakdown's own
+ * plus signs make the subset heuristic skip the line. So the pattern requires
+ * the three rosters to be present and rewrites only the trailing sum.
+ */
+const TOTAL_CHARACTERS = ROSTER.maestri + ROSTER.coaches + ROSTER.buddies;
+const BREAKDOWN_TOTAL_PATTERN = new RegExp(
+  String.raw`(\d{1,3}\s+\S*\s*(?:Maestri|maestri|Maestros)\b[^\n]*?\bBudd(?:y|ies)\b[^\n]*?\()(\d{1,3})(\s+total\b)`,
+  'g',
+);
+
 const PATTERNS = Object.entries(NOUNS).map(
   ([key, nouns]) => [key as keyof typeof ROSTER, buildPattern(nouns)] as const,
 );
 
+/**
+ * How much text before a number is inspected to decide whether the number is
+ * scoped to a subset. A whole sentence is too much: the Pro tier description
+ * says "all 28 maestri" and then mentions the Base tier further along, and
+ * skipping the line for that lets a real claim drift.
+ */
+const SCOPE_WINDOW = 45;
+
 /** Rewrite stale counts in one line of text, recording anything that disagreed. */
 function reconcileLine(line: string, file: string, jsonPath: string, findings: Finding[]): string {
-  if (TIER_SCOPED.test(jsonPath) || SUBSET_PROSE.test(line)) return line;
+  if (TIER_SCOPED.test(jsonPath)) return line;
 
   let out = line;
   for (const [key, pattern] of PATTERNS) {
     const expected = ROSTER[key];
-    out = out.replace(pattern, (whole, digits: string, gap: string, noun: string) => {
-      if (Number(digits) === expected) return whole;
-      findings.push({ file, jsonPath, expected, snippet: whole });
-      return `${expected}${gap}${noun}`;
-    });
+    out = out.replace(
+      pattern,
+      (whole, digits: string, gap: string, noun: string, offset: number, whole_: string) => {
+        const lead = whole_.slice(Math.max(0, offset - SCOPE_WINDOW), offset);
+        if (SUBSET_PROSE.test(lead)) return whole;
+        if (Number(digits) === expected) return whole;
+        findings.push({ file, jsonPath, expected, snippet: whole });
+        return `${expected}${gap}${noun}`;
+      },
+    );
   }
+
+  out = out.replace(
+    BREAKDOWN_TOTAL_PATTERN,
+    (whole, lead: string, digits: string, tail: string) => {
+      if (Number(digits) === TOTAL_CHARACTERS) return whole;
+      findings.push({ file, jsonPath, expected: TOTAL_CHARACTERS, snippet: `${digits}${tail}` });
+      return `${lead}${TOTAL_CHARACTERS}${tail}`;
+    },
+  );
+
   return out;
 }
 
@@ -195,6 +242,13 @@ const IGNORED = [
   // Verbatim transcripts of simulated user sessions: a record of what was
   // said, not a claim the product makes.
   'docs/focus-group/**',
+  // A dated audit states the roster it actually examined. Rewriting its
+  // evidence to today's count would claim maestri were audited who did not
+  // exist on the day the audit ran.
+  'docs/compliance/BIAS-AUDIT-REPORT.md',
+  // Point-in-time verification reports, dated in the filename. They record the
+  // roster that was actually verified on that date.
+  'docs/**/*-[0-9][0-9][0-9][0-9]-[0-9][0-9].md',
 ];
 
 function main(): void {
