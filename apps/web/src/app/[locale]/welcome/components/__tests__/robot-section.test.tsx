@@ -9,6 +9,8 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { RobotSection } from '../robot-section';
 import { getTranslation } from '@/test/i18n-helpers';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 describe('RobotSection', () => {
   it('renders the section heading', () => {
@@ -116,5 +118,33 @@ describe('RobotSection', () => {
 
     const section = screen.getByRole('region');
     expect(section).toHaveAttribute('aria-labelledby', 'robot-section-heading');
+  });
+});
+
+describe('RobotSection media delivery', () => {
+  /**
+   * The proxy rewrites unknown paths under a locale prefix, so /robot/x.mp4
+   * became a 307 to /it/robot/x.mp4 and the video silently failed to load.
+   * Rendering the markup correctly is not enough: the bytes have to be
+   * reachable, which depends on the proxy exempting the directory.
+   */
+  it('serves its media from a directory the proxy leaves alone', () => {
+    const componentSource = readFileSync(
+      join(process.cwd(), 'apps/web/src/app/[locale]/welcome/components/robot-section.tsx'),
+      'utf-8',
+    );
+    const proxySource = readFileSync(join(process.cwd(), 'apps/web/src/proxy.ts'), 'utf-8');
+
+    const assetPaths = [...componentSource.matchAll(/["'](\/[a-z0-9-]+\/[^"']+\.(?:mp4|webm|webp|png|jpg|svg))["']/gi)]
+      .map((m) => m[1]);
+
+    expect(assetPaths.length).toBeGreaterThan(0);
+
+    const unreachable = assetPaths.filter((assetPath) => {
+      const dir = `/${assetPath.split('/')[1]}`;
+      return !proxySource.includes(`'${dir}'`);
+    });
+
+    expect(unreachable).toEqual([]);
   });
 });

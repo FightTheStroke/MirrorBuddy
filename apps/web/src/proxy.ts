@@ -46,6 +46,7 @@ const I18N_EXCLUDE_PATHS = [
   '/sitemap',
   '/maestri', // Static avatar images
   '/avatars', // Static avatar images
+  '/robot', // Robot demo video and poster
   '/logo', // Logo images
   '/contact',
 ];
@@ -78,6 +79,7 @@ const AUTH_PUBLIC_ROUTES = [
   // Static assets (images)
   '/maestri',
   '/avatars',
+  '/robot',
 ];
 
 // Routes that MUST require a signed auth session (not a trial visitor session).
