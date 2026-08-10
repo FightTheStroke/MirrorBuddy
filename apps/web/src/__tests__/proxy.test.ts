@@ -64,6 +64,15 @@ describe('CSP Header Security', () => {
       vi.stubEnv('NODE_ENV', 'production');
     });
 
+    it("must never allow 'unsafe-eval' in production", () => {
+      // React's dev build calls eval() to rebuild callstacks, which the strict
+      // policy blocks and logs as a console error. Relaxing it for the dev
+      // server is fine; letting it reach production would undo script-src.
+      const csp = buildCSPHeader('test-nonce-123');
+
+      expect(csp).not.toContain('unsafe-eval');
+    });
+
     it('should NOT include ws://localhost in production', () => {
       const nonce = 'test-nonce-123';
       const csp = buildCSPHeader(nonce);
@@ -103,6 +112,12 @@ describe('CSP Header Security', () => {
       const csp = buildCSPHeader(nonce);
 
       expect(csp).toContain('wss://localhost:*');
+    });
+
+    it("allows 'unsafe-eval' so React's dev build can report errors", () => {
+      const csp = buildCSPHeader('test-nonce-123');
+
+      expect(csp).toContain("'unsafe-eval'");
     });
 
     it('should include http://localhost:11434 in development', () => {

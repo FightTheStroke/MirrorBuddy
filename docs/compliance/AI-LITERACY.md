@@ -26,7 +26,7 @@ When your child talks to a Master:
 
 **It's not magic**: it's advanced mathematics that recognizes patterns in data.
 
-## 3. Our 26 AI Masters
+## 3. Our 27 AI Masters
 
 MirrorBuddy contains 26 specialized Masters:
 

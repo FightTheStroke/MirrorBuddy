@@ -84,6 +84,32 @@ export function AccessibilitySkeleton() {
   );
 }
 
+export function RobotSkeleton() {
+  const t = useTranslations("welcome");
+  return (
+    <section
+      className="w-full max-w-4xl mx-auto px-4 mb-12"
+      aria-label={t("loadingRobot")}
+    >
+      <div className="rounded-2xl bg-white/80 dark:bg-gray-800/80 border border-gray-100 dark:border-gray-700 p-6 md:p-8">
+        <div className="text-center mb-6">
+          <SkeletonText className="h-7 w-56 mx-auto mb-3" />
+          <SkeletonText className="h-4 w-72 mx-auto" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="text-center">
+              <SkeletonCard className="w-10 h-10 rounded-lg mx-auto mb-2" />
+              <SkeletonText className="h-4 w-20 mx-auto mb-1" />
+              <SkeletonText className="h-3 w-24 mx-auto" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function SupportSkeleton() {
   const t = useTranslations("welcome");
   return (

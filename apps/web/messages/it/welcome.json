@@ -12,7 +12,7 @@
       "tagline": "La tua scuola su misura, con i maestri della storia",
       "taglineWith": "con i Grandi Professori",
       "taglineAbilities": "qualunque siano le tue abilità",
-      "description": "Studia matematica <strong>con Euclide</strong>, fisica <strong>con Feynman</strong>, chimica <strong>con Marie Curie</strong>. 26 Professori storici ti accompagnano personalmente.",
+      "description": "Studia matematica <strong>con Euclide</strong>, fisica <strong>con Feynman</strong>, chimica <strong>con Marie Curie</strong>. 27 Professori storici ti accompagnano personalmente.",
       "accessibility": {
         "introLine1": "Ogni persona impara in modo diverso.",
         "introLine2": "MirrorBuddy si adatta — non costringe.",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "ACCESSO COMPLETO",
         "title": "Hai un account?",
-        "feature1": "26 Professori AI",
+        "feature1": "27 Professori AI",
         "feature2": "Tutti gli strumenti",
         "feature3": "Progressi salvati",
         "cta": "Accedi"
@@ -99,7 +99,7 @@
           "price": "Su richiesta",
           "badge": "Consigliato",
           "features": {
-            "maestri": "26 Professori",
+            "maestri": "27 Professori",
             "messagesUnlimited": "Messaggi illimitati",
             "voiceUnlimited": "Voce illimitata",
             "allTools": "Tutti gli strumenti"
@@ -333,7 +333,7 @@
           "description": "Ognuno ha il suo modo di imparare. Qui rispettiamo il tuo ritmo e il tuo stile."
         },
         "maestriCount": {
-          "title": "26 Maestri al tuo fianco",
+          "title": "27 Maestri al tuo fianco",
           "description": "Da Leonardo a Marie Curie, i più grandi geni della storia ti spiegheranno ogni materia."
         },
         "neverAlone": {
@@ -496,7 +496,7 @@
       "title": "Perché scegliere MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "26 Professori AI",
+          "title": "27 Professori AI",
           "description": "Da Euclide a Darwin, impara da menti straordinarie della storia"
         },
         "accessibility": {
@@ -558,11 +558,11 @@
       "headingHighlight": "Compagni di Viaggio",
       "subtitle": "Coach, Buddies e Maestri pronti ad aiutarti in ogni momento",
       "teamTitle": "Un intero team al tuo servizio!",
-      "coachCount": "5 Coaches",
+      "coachCount": "6 Coaches",
       "coachDesc": "per il metodo di studio",
-      "buddyCount": "5 Buddies",
+      "buddyCount": "6 Buddies",
       "buddyDesc": "per il supporto emotivo",
-      "maestriCount": "26 Maestri",
+      "maestriCount": "27 Maestri",
       "maestriDesc": "esperti di materia",
       "teaser": "Galileo, Darwin, Manzoni, Erodoto, Mozart, Socrate, Feynman e tanti altri ti aspettano!",
       "categoryCoach": "Coach",
@@ -651,6 +651,34 @@
     "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
     "madeWith": "Made with ♥ in Europe",
     "inEurope": "In Europe",
-    "switchTo": "Passa a {label}"
+    "switchTo": "Passa a {label}",
+    "robot": {
+      "heading": "E se avesse anche un",
+      "headingHighlight": "corpo?",
+      "subheading": "MirrorBuddy può vivere dentro Reachy Mini, un piccolo robot da scrivania: gli stessi Maestri, la stessa voce, ma con occhi che guardano il compito e antenne che si muovono. Tutto a voce, senza schermo.",
+      "senses": {
+        "eyes": {
+          "label": "Occhi",
+          "description": "Guarda il compito e lo legge con te"
+        },
+        "ears": {
+          "label": "Orecchie",
+          "description": "Ti ascolta e si ferma quando dici basta"
+        },
+        "voice": {
+          "label": "Voce",
+          "description": "Parla con i 27 Maestri di sempre"
+        },
+        "movement": {
+          "label": "Movimento",
+          "description": "Si muove, gioca e saluta"
+        }
+      },
+      "optionalNote": "Il robot è del tutto facoltativo: MirrorBuddy funziona già completamente dal browser.",
+      "learnMore": "Scopri come funziona",
+      "aboutRobot": "Cos'è Reachy Mini",
+      "videoAlt": "Reachy Mini, il piccolo robot da scrivania, muove la testa e le antenne"
+    },
+    "loadingRobot": "Caricamento sezione robot"
   }
 }

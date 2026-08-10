@@ -6,14 +6,13 @@
     },
     "hero": {
       "betaBadge": "Private Beta",
-
       "welcomeBack": "Welcome back,",
       "welcomeBackSubtitle": "What are we learning new today?",
       "welcomeNew": "Welcome to MirrorBuddy",
       "tagline": "Your tailored school, with history's masters",
       "taglineWith": "with the Great Professors",
       "taglineAbilities": "whatever your abilities",
-      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 26 historic Professors accompany you personally.",
+      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 27 historic Professors accompany you personally.",
       "accessibility": {
         "title": "Tailored accessibility for you",
         "subtitle": "Dedicated support for learning differences",
@@ -41,7 +40,7 @@
       "betaAccess": {
         "badge": "FULL ACCESS",
         "title": "Have an account?",
-        "feature1": "26 AI Professors",
+        "feature1": "27 AI Professors",
         "feature2": "All tools",
         "feature3": "Saved progress",
         "cta": "Log in"
@@ -100,7 +99,7 @@
           "price": "On request",
           "badge": "Recommended",
           "features": {
-            "maestri": "26 Professors",
+            "maestri": "27 Professors",
             "messagesUnlimited": "Unlimited messages",
             "voiceUnlimited": "Unlimited voice",
             "allTools": "All tools"
@@ -334,7 +333,7 @@
           "description": "Everyone has their own way of learning. Here we respect your pace and your style."
         },
         "maestriCount": {
-          "title": "26 Maestri by your side",
+          "title": "27 Maestri by your side",
           "description": "From Leonardo to Marie Curie, the greatest geniuses in history will teach you every subject."
         },
         "neverAlone": {
@@ -497,7 +496,7 @@
       "title": "Why choose MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "26 AI Professors",
+          "title": "27 AI Professors",
           "description": "From Euclid to Darwin, learn from extraordinary minds of history"
         },
         "accessibility": {
@@ -571,11 +570,11 @@
       "headingHighlight": "Travel Companions",
       "subtitle": "Coaches, Buddies and Maestri ready to help you at every moment",
       "teamTitle": "An entire team at your service!",
-      "coachCount": "5 Coaches",
+      "coachCount": "6 Coaches",
       "coachDesc": "for study methods",
-      "buddyCount": "5 Buddies",
+      "buddyCount": "6 Buddies",
       "buddyDesc": "for emotional support",
-      "maestriCount": "26 Maestri",
+      "maestriCount": "27 Maestri",
       "maestriDesc": "subject experts",
       "teaser": "Galileo, Darwin, Manzoni, Herodotus, Mozart, Socrates, Feynman and many more are waiting for you!",
       "categoryCoach": "Coach",
@@ -652,6 +651,34 @@
     "mirrorbuddyProgettoOpenSourceSuGithub": "©  MirrorBuddy. Progetto open source su GitHub.",
     "madeWith": "Made with ♥ in Europe",
     "inEurope": "In Europe",
-    "switchTo": "Passa a {label}"
+    "switchTo": "Passa a {label}",
+    "robot": {
+      "heading": "What if it also had a",
+      "headingHighlight": "body?",
+      "subheading": "MirrorBuddy can live inside Reachy Mini, a small desktop robot: the same Maestri, the same voice, but with eyes that look at the homework and antennas that move. All by voice, no screen needed.",
+      "senses": {
+        "eyes": {
+          "label": "Eyes",
+          "description": "Looks at the homework and reads it with you"
+        },
+        "ears": {
+          "label": "Ears",
+          "description": "Listens, and stops the moment you say stop"
+        },
+        "voice": {
+          "label": "Voice",
+          "description": "Speaks with the same 27 Maestri"
+        },
+        "movement": {
+          "label": "Movement",
+          "description": "Moves, plays and says hello"
+        }
+      },
+      "optionalNote": "The robot is entirely optional: MirrorBuddy already works fully in the browser.",
+      "learnMore": "See how it works",
+      "aboutRobot": "What is Reachy Mini",
+      "videoAlt": "Reachy Mini, the small desktop robot, moving its head and antennas"
+    },
+    "loadingRobot": "Loading robot section"
   }
 }

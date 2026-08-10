@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import { Eye, Mic, Camera, Activity, Hand, ShoppingCart, ExternalLink } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
-const BUY_URL = "https://www.reachy-mini.org/buy.html";
+const BUY_URL = "https://pollen-robotics.com/reachy-mini/";
 
 const FEATURES = [
   { icon: Eye, key: "featureEyes" },
