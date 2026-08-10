@@ -144,6 +144,9 @@ const IGNORED = [
   'docs/adr/**',
   'docs/plans/**',
   'docs/archive/**',
+  // Dated financial analyses. A January valuation modelled the roster of that
+  // January; restating it with today's number would misreport the analysis.
+  'docs/busplan/**',
   // Verbatim transcripts of simulated user sessions: a record of what was
   // said, not a claim the product makes.
   'docs/focus-group/**',
