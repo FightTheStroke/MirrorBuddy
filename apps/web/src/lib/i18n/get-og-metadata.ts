@@ -14,27 +14,27 @@ const DEFAULT_METADATA: Record<Locale, { title: string; description: string }> =
   it: {
     title: 'MirrorBuddy - La scuola che desideravamo',
     description:
-      "Piattaforma educativa alimentata da IA con 17 maestri storici, 5 insegnanti, 5 compagni, tutoraggio vocale e apprendimento personalizzato per studenti con disturbi dell'apprendimento.",
+      "Piattaforma educativa alimentata da IA con 27 maestri storici, 6 insegnanti, 6 compagni, tutoraggio vocale e apprendimento personalizzato per studenti con disturbi dell'apprendimento.",
   },
   en: {
     title: 'MirrorBuddy - The School We Wished Existed',
     description:
-      'AI-powered educational platform with 17 historical Maestros, 5 Coaches, 5 Buddies, voice tutoring, and personalized learning for students with learning differences.',
+      'AI-powered educational platform with 27 historical Maestros, 6 Coaches, 6 Buddies, voice tutoring, and personalized learning for students with learning differences.',
   },
   fr: {
     title: "MirrorBuddy - L'école que nous aurions aimée",
     description:
-      "Plateforme éducative basée sur l'IA avec 17 maîtres historiques, 5 entraîneurs, 5 copains, tutorat vocal et apprentissage personnalisé pour les étudiants en difficulté d'apprentissage.",
+      "Plateforme éducative basée sur l'IA avec 27 maîtres historiques, 6 entraîneurs, 6 copains, tutorat vocal et apprentissage personnalisé pour les étudiants en difficulté d'apprentissage.",
   },
   de: {
     title: 'MirrorBuddy - Die Schule, die wir uns gewünscht haben',
     description:
-      'KI-gestützte Bildungsplattform mit 17 historischen Meistern, 5 Trainern, 5 Lernpartnern, Sprachtutoring und personalisiertem Lernen für Schüler mit Lernbehinderungen.',
+      'KI-gestützte Bildungsplattform mit 27 historischen Meistern, 6 Trainern, 6 Lernpartnern, Sprachtutoring und personalisiertem Lernen für Schüler mit Lernbehinderungen.',
   },
   es: {
     title: 'MirrorBuddy - La escuela que deseábamos',
     description:
-      'Plataforma educativa impulsada por IA con 17 maestros históricos, 5 entrenadores, 5 compañeros, tutoría de voz y aprendizaje personalizado para estudiantes con dificultades de aprendizaje.',
+      'Plataforma educativa impulsada por IA con 27 maestros históricos, 6 entrenadores, 6 compañeros, tutoría de voz y aprendizaje personalizado para estudiantes con dificultades de aprendizaje.',
   },
 };
 
