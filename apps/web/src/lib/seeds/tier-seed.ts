@@ -8,7 +8,7 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { TierDefinition } from '@prisma/client';
 
-import { ROSTER_IDS } from '../../data/roster';
+import { ROSTER_IDS } from '../../data/roster-ids';
 
 // Model defaults from env vars (change in .env to migrate without code changes)
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
