@@ -102,6 +102,10 @@ export function RobotSection() {
           </video>
         </div>
 
+        <p className="text-xs text-center text-gray-500 dark:text-gray-500 mb-6 -mt-4">
+          {t('videoCredit')}
+        </p>
+
         <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 list-none">
           {SENSES.map((sense, i) => {
             const Icon = sense.icon;

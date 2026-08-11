@@ -677,7 +677,8 @@
       "optionalNote": "The robot is entirely optional: MirrorBuddy already works fully in the browser.",
       "learnMore": "See how it works",
       "aboutRobot": "What is Reachy Mini",
-      "videoAlt": "Reachy Mini, the small desktop robot, moving its head and antennas"
+      "videoAlt": "Reachy Mini, the small desktop robot, moving its head and antennas",
+      "videoCredit": "Footage: Reachy Mini by Pollen Robotics / Hugging Face, used with permission."
     },
     "loadingRobot": "Loading robot section"
   }

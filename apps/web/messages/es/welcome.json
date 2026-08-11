@@ -677,7 +677,8 @@
       "optionalNote": "El robot es totalmente opcional: MirrorBuddy ya funciona por completo en el navegador.",
       "learnMore": "Descubre cómo funciona",
       "aboutRobot": "Qué es Reachy Mini",
-      "videoAlt": "Reachy Mini, el pequeño robot de escritorio, mueve la cabeza y las antenas"
+      "videoAlt": "Reachy Mini, el pequeño robot de escritorio, mueve la cabeza y las antenas",
+      "videoCredit": "Vídeo: Reachy Mini de Pollen Robotics / Hugging Face, usado con autorización."
     },
     "loadingRobot": "Cargando la sección del robot"
   }
