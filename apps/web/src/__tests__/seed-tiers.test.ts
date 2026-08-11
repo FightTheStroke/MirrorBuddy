@@ -1,310 +1,181 @@
 /**
  * Tier Seeding Tests
  *
- * Tests for the tier definition seeding functionality.
- * Plan 073: T1-04 - Create seed data: Trial, Base, Pro defaults
+ * These tests used to assert on literals declared inside the test itself —
+ * `expect(999999).toBeGreaterThan(100000)`, `expect(3).toBeLessThan(25)`,
+ * and a hand-copied roster of maestro IDs. They passed no matter what the
+ * seed did, and indeed kept passing while the roster grew and while a second
+ * seed entry point drifted away with stale IDs like 'leonardo-art'.
+ *
+ * They now call seedTiers() against a fake Prisma client and assert on the
+ * arguments it actually sends to the database.
  */
-
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { PrismaClient } from '@prisma/client';
 
-// Mock Prisma client
-const mockPrisma = {
-  tierDefinition: {
-    upsert: vi.fn(),
-    findMany: vi.fn(),
-    findFirst: vi.fn(),
-  },
-  $disconnect: vi.fn(),
+import { seedTiers } from '../lib/seeds/tier-seed';
+import { BASE_TIER_MAESTRI, ROSTER_IDS } from '../data/roster-ids';
+
+type UpsertCall = {
+  where: { code: string };
+  update: Record<string, unknown>;
+  create: Record<string, unknown>;
+};
+
+const upsert = vi.fn();
+const prisma = {
+  tierDefinition: { upsert },
 } as unknown as PrismaClient;
 
-describe('Tier Seeding', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+/** The arguments seedTiers passed for one tier code. */
+function seededTier(code: 'trial' | 'base' | 'pro'): UpsertCall {
+  const call = upsert.mock.calls
+    .map(([arg]) => arg as UpsertCall)
+    .find((a) => a.where.code === code);
+  if (!call) throw new Error(`seedTiers never upserted the ${code} tier`);
+  return call;
+}
+
+beforeEach(async () => {
+  upsert.mockReset();
+  upsert.mockImplementation(({ create }: UpsertCall) => Promise.resolve(create));
+  await seedTiers(prisma);
+});
+
+describe('seedTiers', () => {
+  it('seeds exactly the three tiers', () => {
+    const codes = upsert.mock.calls.map(([a]) => (a as UpsertCall).where.code);
+    expect(codes).toEqual(['trial', 'base', 'pro']);
+  });
+});
+
+describe('Base tier roster', () => {
+  it('is derived from BASE_TIER_MAESTRI, not hand-copied', () => {
+    expect(seededTier('base').create.availableMaestri).toEqual([...BASE_TIER_MAESTRI]);
   });
 
-  afterEach(async () => {
-    if (mockPrisma.$disconnect) {
-      await mockPrisma.$disconnect();
+  it('is 20 maestri', () => {
+    expect(seededTier('base').create.availableMaestri).toHaveLength(20);
+  });
+
+  it('reaches databases that were already seeded, via update', () => {
+    expect(seededTier('base').update.availableMaestri).toEqual([...BASE_TIER_MAESTRI]);
+  });
+
+  it('uses maestro ids that actually exist in the roster', () => {
+    for (const id of seededTier('base').create.availableMaestri as string[]) {
+      expect(ROSTER_IDS.maestri).toContain(id);
+    }
+  });
+});
+
+describe('Pro tier roster', () => {
+  it('grants the whole roster, however large it currently is', () => {
+    const pro = seededTier('pro');
+    expect(pro.create.availableMaestri).toEqual([...ROSTER_IDS.maestri]);
+    expect(pro.create.availableCoaches).toEqual([...ROSTER_IDS.coaches]);
+    expect(pro.create.availableBuddies).toEqual([...ROSTER_IDS.buddies]);
+  });
+
+  it('is a strict superset of Base', () => {
+    const proIds = seededTier('pro').create.availableMaestri as string[];
+    for (const id of BASE_TIER_MAESTRI) expect(proIds).toContain(id);
+    expect(proIds.length).toBeGreaterThan(BASE_TIER_MAESTRI.length);
+  });
+
+  it('reaches already-seeded databases, so a new maestro is not withheld from paying users', () => {
+    expect(seededTier('pro').update.availableMaestri).toEqual([...ROSTER_IDS.maestri]);
+  });
+});
+
+describe('Per-feature models (ADR 0073)', () => {
+  const FEATURE_MODEL_FIELDS = [
+    'chatModel',
+    'realtimeModel',
+    'pdfModel',
+    'mindmapModel',
+    'quizModel',
+    'flashcardsModel',
+    'summaryModel',
+    'formulaModel',
+    'chartModel',
+    'homeworkModel',
+    'webcamModel',
+    'demoModel',
+  ];
+
+  it.each(['trial', 'base', 'pro'] as const)('%s sets every per-feature model', (code) => {
+    const tier = seededTier(code);
+    for (const field of FEATURE_MODEL_FIELDS) {
+      expect(tier.create[field], `${code}.${field}`).toBeTruthy();
     }
   });
 
-  describe('seedTiers function', () => {
-    it('should export a seedTiers function', async () => {
-      // This test verifies that the seed-tiers.ts file exports a seedTiers function
-      // Import will fail if the function doesn't exist
-      const seedModule = await import('../lib/seeds/tier-seed');
-      expect(seedModule.seedTiers).toBeDefined();
-      expect(typeof seedModule.seedTiers).toBe('function');
-    });
+  it.each(['trial', 'base', 'pro'] as const)(
+    '%s applies the models on update too, or a re-seed silently keeps stale ones',
+    (code) => {
+      const tier = seededTier(code);
+      for (const field of FEATURE_MODEL_FIELDS) {
+        expect(tier.update[field], `${code}.${field}`).toBeTruthy();
+      }
+    },
+  );
+
+  it('keeps Base on the cheap realtime model, matching tier-fallbacks', () => {
+    const base = seededTier('base');
+    expect(base.create.realtimeModel).toBe('gpt-realtime-mini');
+    expect(base.update.realtimeModel).toBe('gpt-realtime-mini');
   });
 
-  describe('Trial Tier', () => {
-    it('should create or update trial tier with correct properties', async () => {
-      const expectedTrial = {
-        code: 'trial',
-        name: 'Trial',
-        description: 'Free trial tier with limited access',
-        chatLimitDaily: 10,
-        voiceMinutesDaily: 5,
-        toolsLimitDaily: 10,
-        docsLimitTotal: 1,
-        sortOrder: 1,
-        isActive: true,
-      };
+  it('gives full realtime only to Pro', () => {
+    expect(seededTier('pro').create.realtimeModel).toBe('gpt-realtime');
+    expect(seededTier('trial').create.realtimeModel).toBe('gpt-realtime-mini');
+  });
+});
 
-      // Mock the upsert call to return the expected trial tier
-      (mockPrisma.tierDefinition.upsert as any).mockResolvedValueOnce(expectedTrial);
-
-      const result = await mockPrisma.tierDefinition.upsert({
-        where: { code: 'trial' },
-        update: {},
-        create: expectedTrial,
-      });
-
-      expect(result.code).toBe('trial');
-      expect(result.chatLimitDaily).toBe(10);
-      expect(result.voiceMinutesDaily).toBe(5);
-      expect(result.toolsLimitDaily).toBe(10);
-      expect(result.docsLimitTotal).toBe(1);
-    });
-
-    it('should define trial tier features correctly', async () => {
-      const expectedFeatures = {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        // Trial gates the mindMaps ("Studiare") and quizzes ("Mettiti alla
-        // prova") intents — see .claude/rules/tier.md + tier-fallbacks.ts.
-        quizzes: false,
-        mindMaps: false,
-        tools: ['pdf', 'chat'],
-        coachesAvailable: ['melissa'],
-        buddiesAvailable: ['mario'],
-      };
-
-      // In the actual seed function, features should be exactly like this
-      expect(expectedFeatures.tools).toHaveLength(2);
-    });
-
-    it('should limit trial tier to 3 maestri', async () => {
-      // Trial should have exactly 3 maestri
-      const expectedMaestri = ['leonardo-art', 'galileo-physics', 'curie-chemistry'];
-      expect(expectedMaestri).toHaveLength(3);
-    });
+describe('Trial tier stays locked down', () => {
+  it('gates the study and quiz intents', () => {
+    const features = seededTier('trial').create.features as Record<string, unknown>;
+    expect(features.quizzes).toBe(false);
+    expect(features.mindMaps).toBe(false);
   });
 
-  describe('Base Tier', () => {
-    it('should create or update base tier with correct properties', async () => {
-      const expectedBase = {
-        code: 'base',
-        name: 'Base',
-        description: 'Freemium tier with access to all maestri',
-        chatLimitDaily: 50,
-        voiceMinutesDaily: 30,
-        toolsLimitDaily: 30,
-        docsLimitTotal: 5,
-        sortOrder: 2,
-        isActive: true,
-      };
-
-      (mockPrisma.tierDefinition.upsert as any).mockResolvedValueOnce(expectedBase);
-
-      const result = await mockPrisma.tierDefinition.upsert({
-        where: { code: 'base' },
-        update: {},
-        create: expectedBase,
-      });
-
-      expect(result.code).toBe('base');
-      expect(result.chatLimitDaily).toBe(50);
-      expect(result.voiceMinutesDaily).toBe(30);
-      expect(result.toolsLimitDaily).toBe(30);
-      expect(result.docsLimitTotal).toBe(5);
-    });
-
-    it('should provide access to all 20 maestri for base tier', async () => {
-      const baseMaestri = [
-        'leonardo-art',
-        'galileo-physics',
-        'curie-chemistry',
-        'cicerone-civic-education',
-        'lovelace-computer-science',
-        'smith-economics',
-        'shakespeare-english',
-        'humboldt-geography',
-        'erodoto-history',
-        'manzoni-italian',
-        'euclide-mathematics',
-        'mozart-music',
-        'socrate-philosophy',
-        'ippocrate-health',
-        'feynman-physics',
-        'darwin-biology',
-        'chris-physical-education',
-        'omero-storytelling',
-        'alex-pina-spanish',
-        'simone-sport',
-      ];
-
-      expect(baseMaestri).toHaveLength(20);
-    });
-
-    it('should provide expanded coaches and buddies for base tier', async () => {
-      const baseCoaches = ['melissa', 'roberto', 'chiara', 'andrea', 'favij'];
-      const baseBuddies = ['mario', 'noemi', 'enea', 'bruno', 'sofia'];
-
-      expect(baseCoaches).toHaveLength(5);
-      expect(baseBuddies).toHaveLength(5);
-    });
+  it('re-applies those gates on update, the PR #457 regression', () => {
+    const features = seededTier('trial').update.features as Record<string, unknown>;
+    expect(features.quizzes).toBe(false);
+    expect(features.mindMaps).toBe(false);
   });
 
-  describe('Pro Tier', () => {
-    it('should create or update pro tier with correct properties', async () => {
-      const expectedPro = {
-        code: 'pro',
-        name: 'Pro',
-        description: 'Professional tier with unlimited access and priority support',
-        chatLimitDaily: 999999,
-        voiceMinutesDaily: 999999,
-        toolsLimitDaily: 999999,
-        docsLimitTotal: 999999,
-        sortOrder: 3,
-        isActive: true,
-        monthlyPriceEur: 9.99,
-      };
+  it('offers far fewer maestri than Base', () => {
+    const ids = seededTier('trial').create.availableMaestri as string[];
+    expect(ids.length).toBeLessThan(BASE_TIER_MAESTRI.length);
+    for (const id of ids) expect(ROSTER_IDS.maestri).toContain(id);
+  });
+});
 
-      (mockPrisma.tierDefinition.upsert as any).mockResolvedValueOnce(expectedPro);
-
-      const result = await mockPrisma.tierDefinition.upsert({
-        where: { code: 'pro' },
-        update: {},
-        create: expectedPro,
-      });
-
-      expect(result.code).toBe('pro');
-      expect(result.monthlyPriceEur).toBe(9.99);
-    });
-
-    it('should provide unlimited limits for pro tier', async () => {
-      // Pro tier should have very high limits (999999)
-      expect(999999).toBeGreaterThan(100000);
-    });
-
-    it('should include all maestri for pro tier (26 total)', async () => {
-      const proMaestri = [
-        'leonardo-art',
-        'galileo-physics',
-        'curie-chemistry',
-        'cicerone-civic-education',
-        'lovelace-computer-science',
-        'smith-economics',
-        'shakespeare-english',
-        'humboldt-geography',
-        'erodoto-history',
-        'manzoni-italian',
-        'euclide-mathematics',
-        'mozart-music',
-        'socrate-philosophy',
-        'ippocrate-health',
-        'feynman-physics',
-        'darwin-biology',
-        'chris-physical-education',
-        'omero-storytelling',
-        'alex-pina-spanish',
-        'simone-sport',
-        'cassese-international-law',
-        'moliere-french',
-        'goethe-german',
-        'cervantes-literature',
-        'levi-montalcini-biology',
-        'mascetti-supercazzola',
-      ];
-
-      expect(proMaestri).toHaveLength(26);
-    });
-
-    it('should provide all coaches and buddies for pro tier', async () => {
-      const proCoaches = ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'];
-      const proBuddies = ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'];
-
-      expect(proCoaches).toHaveLength(6);
-      expect(proBuddies).toHaveLength(6);
-    });
-
-    it('should include premium features for pro tier', async () => {
-      const proFeatures = {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        quizzes: true,
-        mindMaps: true,
-        parentDashboard: true,
-        prioritySupport: true,
-        advancedAnalytics: true,
-        unlimitedStorage: true,
-      };
-
-      expect(proFeatures.prioritySupport).toBe(true);
-      expect(proFeatures.advancedAnalytics).toBe(true);
-      expect(proFeatures.unlimitedStorage).toBe(true);
-    });
-
-    it('should include all tools for pro tier', async () => {
-      const proTools = [
-        'pdf',
-        'chat',
-        'flashcards',
-        'mindmap',
-        'quiz',
-        'formula',
-        'webcam',
-        'homework',
-        'chart',
-      ];
-
-      expect(proTools).toHaveLength(9);
-      expect(proTools).toContain('webcam');
-      expect(proTools).toContain('homework');
-      expect(proTools).toContain('chart');
-    });
+describe('Tier hierarchy', () => {
+  it('escalates limits from trial to base to pro', () => {
+    const [trial, base, pro] = [seededTier('trial'), seededTier('base'), seededTier('pro')];
+    expect(Number(trial.create.chatLimitDaily)).toBeLessThan(Number(base.create.chatLimitDaily));
+    expect(Number(base.create.chatLimitDaily)).toBeLessThan(Number(pro.create.chatLimitDaily));
+    expect(Number(trial.create.voiceMinutesDaily)).toBeLessThan(
+      Number(base.create.voiceMinutesDaily),
+    );
+    expect(Number(base.create.voiceMinutesDaily)).toBeLessThan(
+      Number(pro.create.voiceMinutesDaily),
+    );
   });
 
-  describe('Tier Hierarchy', () => {
-    it('should order tiers correctly by sortOrder', async () => {
-      const sortOrders = { trial: 1, base: 2, pro: 3 };
-      expect(sortOrders.trial).toBeLessThan(sortOrders.base);
-      expect(sortOrders.base).toBeLessThan(sortOrders.pro);
-    });
-
-    it('should escalate limits from trial to base to pro', async () => {
-      const limits = {
-        trial: { chat: 10, voice: 5, tools: 10, docs: 1 },
-        base: { chat: 50, voice: 30, tools: 30, docs: 5 },
-        pro: { chat: 999999, voice: 999999, tools: 999999, docs: 999999 },
-      };
-
-      expect(limits.trial.chat).toBeLessThan(limits.base.chat);
-      expect(limits.base.chat).toBeLessThan(limits.pro.chat);
-      expect(limits.trial.voice).toBeLessThan(limits.base.voice);
-      expect(limits.base.voice).toBeLessThan(limits.pro.voice);
-    });
-
-    it('should escalate maestri access from trial to base to pro', async () => {
-      expect(3).toBeLessThan(25); // trial < base
-      expect(25).toBeLessThan(26); // base < pro
-    });
+  it('orders the tiers for display', () => {
+    const [trial, base, pro] = [seededTier('trial'), seededTier('base'), seededTier('pro')];
+    expect(Number(trial.create.sortOrder)).toBeLessThan(Number(base.create.sortOrder));
+    expect(Number(base.create.sortOrder)).toBeLessThan(Number(pro.create.sortOrder));
   });
 
-  describe('Seed Function Integration', () => {
-    it('should return all three tiers when seeding completes', async () => {
-      const tiers = { trial: 'trial', base: 'base', pro: 'pro' };
-      expect(Object.keys(tiers)).toHaveLength(3);
-    });
-
-    it('should make tiers active by default', async () => {
-      const allActive = [true, true, true];
-      expect(allActive.every((active) => active)).toBe(true);
-    });
+  it('charges only for Pro', () => {
+    const [trial, base, pro] = [seededTier('trial'), seededTier('base'), seededTier('pro')];
+    expect(trial.create.monthlyPriceEur).toBeNull();
+    expect(base.create.monthlyPriceEur).toBeNull();
+    expect(String(pro.create.monthlyPriceEur)).toBe('9.99');
   });
 });
