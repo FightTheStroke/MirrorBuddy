@@ -1,26 +1,39 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
-import type { ProcessedPage } from "@/lib/pdf";
-import { usePDFPreview } from "./use-pdf-preview";
-import { PDFPreviewHeader } from "./pdf-preview-header";
-import { PDFPreviewContent } from "./pdf-preview-content";
-import { PDFPreviewFooter } from "./pdf-preview-footer";
+import { motion } from 'framer-motion';
+import { Card } from '@/components/ui/card';
+import type { ProcessedPage } from '@/lib/pdf';
+import { usePDFPreview, type PDFPreviewMode } from './use-pdf-preview';
+import { PDFPreviewHeader } from './pdf-preview-header';
+import { PDFPreviewContent } from './pdf-preview-content';
+import { PDFPreviewFooter } from './pdf-preview-footer';
+
+/** Stable empty set: a fresh Set() each render would churn the content tree. */
+const EMPTY_SELECTION: Set<number> = new Set<number>();
 
 interface PDFPreviewProps {
   file: File;
-  onPagesSelected: (pages: ProcessedPage[]) => void;
   onClose: () => void;
+  /**
+   * "select" (default) — the student chooses which pages to analyse.
+   * "confirm" — the student is only checking that this is the right document
+   * before uploading it whole; selection is hidden and `onConfirm` fires.
+   */
+  mode?: PDFPreviewMode;
+  onPagesSelected?: (pages: ProcessedPage[]) => void;
+  onConfirm?: () => void;
   allowMultiSelect?: boolean;
 }
 
 export function PDFPreview({
   file,
   onPagesSelected,
+  onConfirm,
   onClose,
+  mode = 'select',
   allowMultiSelect = true,
 }: PDFPreviewProps) {
+  const selectable = mode === 'select';
   const {
     viewMode,
     error,
@@ -38,8 +51,10 @@ export function PDFPreview({
     setCurrentPage,
   } = usePDFPreview({
     file,
+    mode,
     allowMultiSelect,
     onPagesSelected,
+    onConfirm,
     onClose,
   });
 
@@ -67,10 +82,10 @@ export function PDFPreview({
           error={error}
           pdfData={pdfData}
           currentPage={currentPage}
-          selectedPages={selectedPages}
+          selectedPages={selectable ? selectedPages : EMPTY_SELECTION}
           zoom={zoom}
           currentPageData={currentPageData}
-          allowMultiSelect={allowMultiSelect}
+          allowMultiSelect={selectable && allowMultiSelect}
           onClose={onClose}
           onConfirm={handleConfirm}
           onPrevPage={goToPrevPage}
@@ -79,10 +94,11 @@ export function PDFPreview({
           onTogglePageSelection={togglePageSelection}
         />
 
-        {viewMode === "preview" && (
+        {viewMode === 'preview' && (
           <PDFPreviewFooter
+            mode={mode}
             selectedCount={selectedPages.size}
-            allowMultiSelect={allowMultiSelect}
+            allowMultiSelect={selectable && allowMultiSelect}
             onClose={onClose}
             onConfirm={handleConfirm}
           />
