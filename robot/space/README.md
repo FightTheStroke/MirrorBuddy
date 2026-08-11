@@ -26,7 +26,7 @@ independently and needing an adult beside you.
 
 - **Talks and listens.** Natural spoken conversation in Italian, powered by Azure
   OpenAI Realtime. Short answers, one thing at a time.
-- **28 professors, by voice.** Say "voglio matematica" or "chiama Galileo" and the
+- **29 professors, by voice.** Say "voglio matematica" or "chiama Galileo" and the
   persona and voice change. Learning coaches are there too, for when the problem is
   the method rather than the subject.
 - **Looks at homework.** Show it an exercise, a notebook page or the screen, and it

@@ -1325,7 +1325,7 @@
           },
           "pro": {
             "title": "Pro Tier (Paid Subscription)",
-            "description": "Pro tier users have a paid subscription at €9.99/month processed via Stripe. This tier provides premium access with all features: unlimited chat messages, unlimited voice interaction, access to all 28 maestri (AI teachers) including exclusive premium teachers, priority support and advanced features. We collect all Base tier data plus: payment information processed by Stripe (not stored directly by MirrorBuddy), billing address and invoice history (for accounting and tax compliance), subscription status and renewal dates. Payment data is handled by Stripe under their own Data Processing Agreement (DPA) compliant with GDPR."
+            "description": "Pro tier users have a paid subscription at €9.99/month processed via Stripe. This tier provides premium access with all features: unlimited chat messages, unlimited voice interaction, access to all 29 maestri (AI teachers) including exclusive premium teachers, priority support and advanced features. We collect all Base tier data plus: payment information processed by Stripe (not stored directly by MirrorBuddy), billing address and invoice history (for accounting and tax compliance), subscription status and renewal dates. Payment data is handled by Stripe under their own Data Processing Agreement (DPA) compliant with GDPR."
           },
           "dataNote": "Your subscription tier determines what personal data we collect. You can view and control your data at any time in your privacy settings. Upgrading or downgrading your tier changes your data collection profile accordingly. When you downgrade from Pro to Base or delete your account, payment data retention follows our standard retention policy (billing records retained for 7 years for tax compliance, then permanently deleted)."
         },
@@ -1373,7 +1373,7 @@
         "jurisdictions": "Jurisdictions: Italy, France, Germany, Spain, United Kingdom",
         "sections": {
           "section1": {
-            "content1": "MirrorBuddy is an AI-powered educational platform designed to support students with learning differences (SLD). The platform offers 28 virtual maestri (educational characters with unique personalities and knowledge), flashcards with spaced repetition algorithm (FSRS), adaptive quizzes, mind maps and gamification tools.",
+            "content1": "MirrorBuddy is an AI-powered educational platform designed to support students with learning differences (SLD). The platform offers 29 virtual maestri (educational characters with unique personalities and knowledge), flashcards with spaced repetition algorithm (FSRS), adaptive quizzes, mind maps and gamification tools.",
             "content2": "MirrorBuddy is developed by the Fightthestroke Foundation with the goal of making learning inclusive and accessible to all. The platform complies with European data protection regulations (GDPR), artificial intelligence regulations (EU AI Act 2024/1689) and accessibility standards (WCAG 2.1 AA).",
             "title": "1. What is MirrorBuddy"
           },

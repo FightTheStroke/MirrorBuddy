@@ -23,6 +23,7 @@ export const ROSTER_IDS = {
     'cicerone',
     'lovelace',
     'turing',
+    'noether',
     'smith',
     'shakespeare',
     'humboldt',

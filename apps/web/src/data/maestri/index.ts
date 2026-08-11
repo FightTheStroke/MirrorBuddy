@@ -32,6 +32,7 @@ import { cervantes } from "./cervantes";
 import { leviMontalcini } from "./levi-montalcini";
 import { loto } from "./loto";
 import { turing } from "./turing";
+import { noether } from "./noether";
 
 export type { MaestroFull } from "./types";
 export { SAFETY_GUIDELINES } from "./types";
@@ -44,6 +45,7 @@ export const maestri: MaestroFull[] = [
   cicerone,
   lovelace,
   turing,
+  noether,
   smith,
   shakespeare,
   humboldt,
