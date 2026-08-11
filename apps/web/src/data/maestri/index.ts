@@ -34,6 +34,7 @@ import { loto } from "./loto";
 import { turing } from "./turing";
 import { noether } from "./noether";
 import { austen } from "./austen";
+import { nightingale } from "./nightingale";
 
 export type { MaestroFull } from "./types";
 export { SAFETY_GUIDELINES } from "./types";
@@ -48,6 +49,7 @@ export const maestri: MaestroFull[] = [
   turing,
   noether,
   austen,
+  nightingale,
   smith,
   shakespeare,
   humboldt,

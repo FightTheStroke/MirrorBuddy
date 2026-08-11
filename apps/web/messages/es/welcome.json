@@ -12,7 +12,7 @@
       "tagline": "Tu escuela a medida, con los maestros de la historia",
       "taglineWith": "con los Grandes Profesores",
       "taglineAbilities": "sean cuales sean tus habilidades",
-      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 30 Profesores históricos te acompañan personalmente.",
+      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 31 Profesores históricos te acompañan personalmente.",
       "accessibility": {
         "title": "Accesibilidad a tu medida",
         "subtitle": "Soporte dedicado para dificultades de aprendizaje",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "ACCESO COMPLETO",
         "title": "¿Tienes una cuenta?",
-        "feature1": "30 Profesores IA",
+        "feature1": "31 Profesores IA",
         "feature2": "Todas las herramientas",
         "feature3": "Progreso guardado",
         "cta": "Iniciar sesión"
@@ -99,7 +99,7 @@
           "price": "A solicitud",
           "badge": "Recomendado",
           "features": {
-            "maestri": "30 Profesores",
+            "maestri": "31 Profesores",
             "messagesUnlimited": "Mensajes ilimitados",
             "voiceUnlimited": "Voz ilimitada",
             "allTools": "Todas las herramientas"
@@ -333,7 +333,7 @@
           "description": "Cada uno tiene su forma de aprender. Aquí respetamos tu ritmo y tu estilo."
         },
         "maestriCount": {
-          "title": "30 Maestros a tu lado",
+          "title": "31 Maestros a tu lado",
           "description": "De Leonardo a Marie Curie, los más grandes genios de la historia te enseñarán cada materia."
         },
         "neverAlone": {
@@ -496,7 +496,7 @@
       "title": "Por qué elegir MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "30 Profesores IA",
+          "title": "31 Profesores IA",
           "description": "De Euclides a Darwin, aprende de mentes extraordinarias de la historia"
         },
         "accessibility": {
@@ -574,7 +574,7 @@
       "coachDesc": "para métodos de estudio",
       "buddyCount": "6 Buddies",
       "buddyDesc": "para apoyo emocional",
-      "maestriCount": "30 Maestros",
+      "maestriCount": "31 Maestros",
       "maestriDesc": "expertos en materias",
       "teaser": "¡Galileo, Darwin, Manzoni, Heródoto, Mozart, Sócrates, Feynman y muchos más te esperan!",
       "categoryCoach": "Coach",
@@ -667,7 +667,7 @@
         },
         "voice": {
           "label": "Voz",
-          "description": "Habla con los mismos 30 Maestri"
+          "description": "Habla con los mismos 31 Maestri"
         },
         "movement": {
           "label": "Movimiento",

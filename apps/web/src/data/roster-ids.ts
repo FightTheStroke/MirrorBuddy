@@ -25,6 +25,7 @@ export const ROSTER_IDS = {
     'turing',
     'noether',
     'austen',
+    'nightingale',
     'smith',
     'shakespeare',
     'humboldt',

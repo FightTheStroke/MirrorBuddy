@@ -7,7 +7,7 @@
 | Key        | Value                                                       |
 | ---------- | ----------------------------------------------------------- |
 | Stack      | Next.js 16 + Zustand + Azure OpenAI + PostgreSQL + pgvector |
-| Characters | 30 Maestri + 6 Coaches + 6 Buddies (42 total)               |
+| Characters | 31 Maestri + 6 Coaches + 6 Buddies (43 total)               |
 | Compliance | EU AI Act, Italian Law 132/2025, GDPR, COPPA                |
 | ADRs       | 0015 (State), 0028 (DB), 0033 (RAG), 0064 (Formality)       |
 
@@ -52,7 +52,7 @@ User Login → Character Selection → Conversation Start → Tool Proposals →
 
 | File                                  | Purpose                               |
 | ------------------------------------- | ------------------------------------- |
-| `src/data/maestri/index.ts`           | 30 Maestri definitions + knowledge    |
+| `src/data/maestri/index.ts`           | 31 Maestri definitions + knowledge    |
 | `src/data/support-teachers/index.ts`  | 6 Coaches with learning methods       |
 | `src/data/buddy-profiles/index.ts`    | 6 Buddies for peer support            |
 | `src/lib/ai/character-routing.ts`     | Character selection logic             |
