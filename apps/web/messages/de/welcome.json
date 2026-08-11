@@ -99,7 +99,7 @@
           "price": "Auf Anfrage",
           "badge": "Empfohlen",
           "features": {
-            "maestri": "31 Professoren",
+            "maestri": "32 Professoren",
             "messagesUnlimited": "Unbegrenzte Nachrichten",
             "voiceUnlimited": "Unbegrenzte Sprache",
             "allTools": "Alle Werkzeuge"
@@ -333,7 +333,7 @@
           "description": "Jeder hat seine eigene Art zu lernen. Hier respektieren wir dein Tempo und deinen Stil."
         },
         "maestriCount": {
-          "title": "31 Meister an deiner Seite",
+          "title": "32 Meister an deiner Seite",
           "description": "Von Leonardo bis Marie Curie, die größten Genies der Geschichte erklären dir jedes Fach."
         },
         "neverAlone": {
@@ -574,7 +574,7 @@
       "coachDesc": "für Lernmethoden",
       "buddyCount": "6 Buddies",
       "buddyDesc": "für emotionale Unterstützung",
-      "maestriCount": "31 Meister",
+      "maestriCount": "32 Meister",
       "maestriDesc": "Fachexperten",
       "teaser": "Galileo, Darwin, Manzoni, Herodot, Mozart, Sokrates, Feynman und viele mehr warten auf dich!",
       "categoryCoach": "Coach",
@@ -667,7 +667,7 @@
         },
         "voice": {
           "label": "Stimme",
-          "description": "Spricht mit denselben 31 Maestri"
+          "description": "Spricht mit denselben 32 Maestri"
         },
         "movement": {
           "label": "Bewegung",
