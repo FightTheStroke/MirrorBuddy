@@ -8,7 +8,7 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { TierDefinition } from '@prisma/client';
 
-import { ROSTER_IDS } from '../../data/roster-ids';
+import { BASE_TIER_MAESTRI, ROSTER_IDS } from '../../data/roster-ids';
 
 // Model defaults from env vars (change in .env to migrate without code changes)
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
@@ -73,10 +73,18 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
     },
   });
 
-  // Base Tier - Freemium tier with most maestri
+  // Base Tier - free tier, a curriculum-complete subset of the roster
+  //
+  // Same reasoning as Pro below: the list is applied in `update` too, because
+  // with `update: {}` an already-seeded database keeps its old row forever and
+  // a change here would never reach the students already using the product.
+  const baseMaestri = [...BASE_TIER_MAESTRI];
+
   const base = await prisma.tierDefinition.upsert({
     where: { code: 'base' },
-    update: {},
+    update: {
+      availableMaestri: baseMaestri,
+    },
     create: {
       code: 'base',
       name: 'Base',
@@ -98,33 +106,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         buddiesAvailable: ['mario', 'noemi', 'enea'],
         parentDashboard: true,
       },
-      availableMaestri: [
-        'leonardo',
-        'galileo',
-        'curie',
-        'cicerone',
-        'lovelace',
-        'smith',
-        'shakespeare',
-        'humboldt',
-        'erodoto',
-        'manzoni',
-        'euclide',
-        'mozart',
-        'socrate',
-        'ippocrate',
-        'feynman',
-        'darwin',
-        'chris',
-        'omero',
-        'alex-pina',
-        'simone',
-        'cassese',
-        'moliere',
-        'goethe',
-        'cervantes',
-        'levi-montalcini',
-      ],
+      availableMaestri: baseMaestri,
       availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij'],
       availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia'],
       availableTools: ['pdf', 'chat', 'flashcards', 'mindmap', 'quiz', 'formula'],

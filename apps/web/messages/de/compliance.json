@@ -1251,7 +1251,7 @@
           },
           "base": {
             "title": "Base-Stufe (Kostenloses registriertes Konto)",
-            "description": "Nutzer der Base-Stufe müssen ein kostenloses registriertes Konto mit E-Mail und Name erstellen. Diese Stufe bietet vollen Zugang zu den Kernbildungsfunktionen mit unbegrenzten Chat-Nachrichten und unbegrenzter Sprachinteraktion. Zugang zu 25 Maestri (KI-Lehrer). Wir erheben und speichern: E-Mail-Adresse (für Anmeldung und Benachrichtigungen), Name (für personalisierte Begrüßungen), Gesprächsverlauf (für Fortsetzung der Lernsitzungen), Flashcard-Daten und Lernfortschritt (für Spaced-Repetition-Algorithmus), Nutzereinstellungen und Barrierefreiheitsoptionen. Keine Zahlungsinformationen für diese Stufe erhoben."
+            "description": "Nutzer der Base-Stufe müssen ein kostenloses registriertes Konto mit E-Mail und Name erstellen. Diese Stufe bietet vollen Zugang zu den Kernbildungsfunktionen mit unbegrenzten Chat-Nachrichten und unbegrenzter Sprachinteraktion. Zugang zu 20 Maestri (KI-Lehrer). Wir erheben und speichern: E-Mail-Adresse (für Anmeldung und Benachrichtigungen), Name (für personalisierte Begrüßungen), Gesprächsverlauf (für Fortsetzung der Lernsitzungen), Flashcard-Daten und Lernfortschritt (für Spaced-Repetition-Algorithmus), Nutzereinstellungen und Barrierefreiheitsoptionen. Keine Zahlungsinformationen für diese Stufe erhoben."
           },
           "pro": {
             "title": "Pro-Stufe (Kostenpflichtiges Abonnement)",

@@ -48,3 +48,38 @@ export const ROSTER_IDS = {
   coaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
   buddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
 } as const;
+
+/**
+ * The maestri included in the free Base tier.
+ *
+ * Base is a subset, so it is chosen rather than derived — but it is chosen on a
+ * rule, not by truncating a list: **every school subject stays covered**. Where
+ * two maestri teach the same subject, Base gets one of them and the other
+ * becomes a reason to upgrade. That way a free student is never left without a
+ * teacher for something they actually study.
+ *
+ * `base-tier.test.ts` enforces exactly that: it fails if the list changes size,
+ * names a maestro who does not exist, or drops a subject to zero teachers.
+ */
+export const BASE_TIER_MAESTRI = [
+  'leonardo', // art
+  'galileo', // physics
+  'curie', // chemistry
+  'cicerone', // civics
+  'lovelace', // computer science
+  'turing', // computer science
+  'smith', // economics
+  'shakespeare', // english
+  'humboldt', // geography
+  'erodoto', // history
+  'manzoni', // italian
+  'euclide', // mathematics
+  'mozart', // music
+  'socrate', // philosophy
+  'ippocrate', // health
+  'levi-montalcini', // biology
+  'cervantes', // spanish
+  'moliere', // french
+  'goethe', // german
+  'loto', // mindfulness
+] as const;

@@ -1321,7 +1321,7 @@
           },
           "base": {
             "title": "Base Tier (Free Registered Account)",
-            "description": "Base tier users must create a free registered account with email and name. This tier provides full access to core educational features with unlimited chat messages and unlimited voice interaction time. Access to 25 maestri (AI teachers). We collect and store: email address (for login and notifications), name (for personalized greetings), conversation history (to continue learning sessions), flashcard data and learning progress (for spaced repetition algorithm), user preferences and accessibility settings. No payment information collected for this tier."
+            "description": "Base tier users must create a free registered account with email and name. This tier provides full access to core educational features with unlimited chat messages and unlimited voice interaction time. Access to 20 maestri (AI teachers). We collect and store: email address (for login and notifications), name (for personalized greetings), conversation history (to continue learning sessions), flashcard data and learning progress (for spaced repetition algorithm), user preferences and accessibility settings. No payment information collected for this tier."
           },
           "pro": {
             "title": "Pro Tier (Paid Subscription)",
@@ -1364,7 +1364,7 @@
         "tldrHeading": "Quick Summary (TL;DR)",
         "tldrItems": {
           "feedback": "Your feedback helps us improve MirrorBuddy. Report problems or suggestions to roberdan@fightthestroke.org",
-          "free": "MirrorBuddy offers a free Base tier with access to 25 maestri and full educational features",
+          "free": "MirrorBuddy offers a free Base tier with access to 20 maestri and full educational features",
           "notSchool": "MirrorBuddy does not replace school, teachers or healthcare professionals. It is a study support tool",
           "respect": "Respect other users and use MirrorBuddy responsibly. Content is protected by copyright",
           "supervised": "Minors must use MirrorBuddy under the supervision of a parent or legal guardian"

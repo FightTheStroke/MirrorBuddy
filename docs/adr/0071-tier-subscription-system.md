@@ -365,6 +365,14 @@ Pre-defined tier codes (never change):
 - `BASE`: Default for registered users (50 chats, 30 min voice, 30 tools, 5 docs, 25 maestri)
 - `PRO`: Premium subscription (unlimited chats/voice/tools/docs, all 26 maestri + priority)
 
+> **Amendment (2026-08-11).** The maestri counts above are what they were when
+> this decision was taken; the roster has grown since. Base is now **20**
+> maestri, chosen so that every school subject keeps a teacher on the free tier,
+> and Pro is the whole roster. Both are defined in
+> `apps/web/src/data/roster-ids.ts` (`BASE_TIER_MAESTRI`, `ROSTER_IDS`) and
+> enforced by `base-tier.test.ts` — read those, not this paragraph, for the
+> current numbers.
+
 ### Fallback Tiers
 
 If tier not in database (corruption or misconfiguration), `TierService.getTierByCode()` creates inline fallback:

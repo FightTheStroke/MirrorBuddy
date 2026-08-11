@@ -1321,7 +1321,7 @@
           },
           "base": {
             "title": "Livello Base (Account Registrato Gratuito)",
-            "description": "Gli utenti del livello Base devono creare un account registrato gratuito con email e nome. Questo livello fornisce accesso completo alle funzionalità educative principali con messaggi di chat illimitati e tempo di interazione vocale illimitato. Accesso a 25 maestri (insegnanti AI). Raccogliamo e conserviamo: indirizzo email (per login e notifiche), nome (per saluti personalizzati), cronologia delle conversazioni (per continuare le sessioni di apprendimento), dati delle flashcard e progressi di apprendimento (per algoritmo di ripetizione dilazionata), preferenze utente e impostazioni di accessibilità. Nessuna informazione di pagamento raccolta per questo livello."
+            "description": "Gli utenti del livello Base devono creare un account registrato gratuito con email e nome. Questo livello fornisce accesso completo alle funzionalità educative principali con messaggi di chat illimitati e tempo di interazione vocale illimitato. Accesso a 20 maestri (insegnanti AI). Raccogliamo e conserviamo: indirizzo email (per login e notifiche), nome (per saluti personalizzati), cronologia delle conversazioni (per continuare le sessioni di apprendimento), dati delle flashcard e progressi di apprendimento (per algoritmo di ripetizione dilazionata), preferenze utente e impostazioni di accessibilità. Nessuna informazione di pagamento raccolta per questo livello."
           },
           "pro": {
             "title": "Livello Pro (Abbonamento a Pagamento)",
@@ -1364,7 +1364,7 @@
         "tldrHeading": "Riassunto Rapido (TL;DR)",
         "tldrItems": {
           "feedback": "Il tuo feedback ci aiuta a migliorare MirrorBuddy. Segnalaci problemi o suggerimenti a roberdan@fightthestroke.org",
-          "free": "MirrorBuddy offre un livello Base gratuito con accesso a 25 maestri e funzionalità educative complete",
+          "free": "MirrorBuddy offre un livello Base gratuito con accesso a 20 maestri e funzionalità educative complete",
           "notSchool": "MirrorBuddy non sostituisce la scuola, gli insegnanti o i professionisti sanitari. È uno strumento di supporto allo studio",
           "respect": "Rispetta gli altri utenti e usa MirrorBuddy in modo responsabile. I contenuti sono protetti da copyright",
           "supervised": "I minori devono usare MirrorBuddy sotto la supervisione di un genitore o tutore legale"
