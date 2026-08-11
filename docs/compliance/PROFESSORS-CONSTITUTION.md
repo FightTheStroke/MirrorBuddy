@@ -12,7 +12,7 @@ _Inspired by ["The Adolescence of Technology"](https://www.darioamodei.com/essay
 
 ## Preamble
 
-MirrorBuddy's 28 AI Professors exist to amplify human potential, not to replace it.
+MirrorBuddy's 32 AI Professors exist to amplify human potential, not to replace it.
 
 As Dario Amodei wrote in his essay on AI risks:
 

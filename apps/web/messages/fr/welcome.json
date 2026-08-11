@@ -12,7 +12,7 @@
       "tagline": "Ton école sur mesure, avec les maîtres de l'histoire",
       "taglineWith": "avec les Grands Professeurs",
       "taglineAbilities": "quelles que soient tes capacités",
-      "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 28 Professeurs historiques t'accompagnent personnellement.",
+      "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 32 Professeurs historiques t'accompagnent personnellement.",
       "accessibility": {
         "title": "Une accessibilité sur mesure pour toi",
         "subtitle": "Support dédié pour les difficultés d'apprentissage",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "ACCÈS COMPLET",
         "title": "Tu as un compte ?",
-        "feature1": "28 Professeurs IA",
+        "feature1": "32 Professeurs IA",
         "feature2": "Tous les outils",
         "feature3": "Progrès sauvegardés",
         "cta": "Se connecter"
@@ -99,7 +99,7 @@
           "price": "Sur demande",
           "badge": "Recommandé",
           "features": {
-            "maestri": "28 Professeurs",
+            "maestri": "32 Professeurs",
             "messagesUnlimited": "Messages illimités",
             "voiceUnlimited": "Voix illimitée",
             "allTools": "Tous les outils"
@@ -333,7 +333,7 @@
           "description": "Chacun a sa façon d'apprendre. Ici, nous respectons ton rythme et ton style."
         },
         "maestriCount": {
-          "title": "28 Maîtres à tes côtés",
+          "title": "32 Maîtres à tes côtés",
           "description": "De Léonard à Marie Curie, les plus grands génies de l'histoire t'enseigneront chaque matière."
         },
         "neverAlone": {
@@ -496,7 +496,7 @@
       "title": "Pourquoi choisir MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "28 Professeurs IA",
+          "title": "32 Professeurs IA",
           "description": "D'Euclide à Darwin, apprends auprès d'esprits extraordinaires de l'histoire"
         },
         "accessibility": {
@@ -574,7 +574,7 @@
       "coachDesc": "pour les méthodes d'étude",
       "buddyCount": "6 Buddies",
       "buddyDesc": "pour le soutien émotionnel",
-      "maestriCount": "28 Maîtres",
+      "maestriCount": "32 Maîtres",
       "maestriDesc": "experts en matières",
       "teaser": "Galilée, Darwin, Manzoni, Hérodote, Mozart, Socrate, Feynman et bien d'autres t'attendent !",
       "categoryCoach": "Coach",
@@ -667,7 +667,7 @@
         },
         "voice": {
           "label": "Voix",
-          "description": "Parle avec les 28 Maestri habituels"
+          "description": "Parle avec les 32 Maestri habituels"
         },
         "movement": {
           "label": "Mouvement",
@@ -677,7 +677,8 @@
       "optionalNote": "Le robot est entièrement facultatif : MirrorBuddy fonctionne déjà pleinement dans le navigateur.",
       "learnMore": "Voir comment ça marche",
       "aboutRobot": "Qu'est-ce que Reachy Mini",
-      "videoAlt": "Reachy Mini, le petit robot de bureau, bouge la tête et les antennes"
+      "videoAlt": "Reachy Mini, le petit robot de bureau, bouge la tête et les antennes",
+      "videoCredit": "Vidéo : Reachy Mini de Pollen Robotics / Hugging Face, utilisée avec autorisation."
     },
     "loadingRobot": "Chargement de la section robot"
   }

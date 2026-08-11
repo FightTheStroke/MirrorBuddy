@@ -3097,7 +3097,7 @@ graph TD
     subgraph User_Journey["User Journey"]
         Anon["Anonymous Visitor"]
         Trial["Trial Tier<br/>10 chats, 3 maestri"]
-        Base["Base Tier<br/>50 chats, 25 maestri"]
+        Base["Base Tier<br/>50 chats, 20 maestri"]
         Pro["Pro Tier<br/>Unlimited, 26 maestri"]
     end
 

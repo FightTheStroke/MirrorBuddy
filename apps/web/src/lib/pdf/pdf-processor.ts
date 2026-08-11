@@ -10,22 +10,17 @@
 
 import * as pdfjsLib from 'pdfjs-dist';
 import { logger } from '@/lib/logger';
-import {
-  ProcessedPage,
-  ProcessedPDF,
-  PDFProcessingError,
-  PDFProcessOptions,
-} from './pdf-types';
+import { ProcessedPage, ProcessedPDF, PDFProcessingError, PDFProcessOptions } from './pdf-types';
 import { isPDF, getPDFInfo, resizeImageToThumbnail } from './pdf-utils';
+import { PDF_WORKER_SRC } from './pdf-worker';
 
 export { isPDF, getPDFInfo };
+export { PDF_WORKER_SRC };
 export type { ProcessedPage, ProcessedPDF, PDFProcessOptions };
 export { PDFProcessingError };
 
-// Configure pdf.js worker
-// The worker is loaded from CDN for optimal bundle size
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDF_WORKER_SRC;
 }
 
 /**
@@ -49,7 +44,7 @@ export const DEFAULT_SCALE = 2.0;
  */
 export async function processPDF(
   file: File,
-  options: PDFProcessOptions = {}
+  options: PDFProcessOptions = {},
 ): Promise<ProcessedPDF> {
   const {
     scale = DEFAULT_SCALE,
@@ -110,7 +105,7 @@ export async function processPDF(
     if (pages.length === 0) {
       throw new PDFProcessingError(
         'Impossibile elaborare nessuna pagina del PDF.',
-        'RENDER_FAILED'
+        'RENDER_FAILED',
       );
     }
 
@@ -131,22 +126,18 @@ export async function processPDF(
         throw new PDFProcessingError(
           'Il PDF è protetto da password. Rimuovi la protezione e riprova.',
           'ENCRYPTED',
-          error
+          error,
         );
       }
       if (error.message.includes('Invalid PDF')) {
-        throw new PDFProcessingError(
-          'Il file non è un PDF valido.',
-          'INVALID',
-          error
-        );
+        throw new PDFProcessingError('Il file non è un PDF valido.', 'INVALID', error);
       }
     }
 
     throw new PDFProcessingError(
-      'Errore durante l\'elaborazione del PDF. Riprova.',
+      "Errore durante l'elaborazione del PDF. Riprova.",
       'LOAD_FAILED',
-      error instanceof Error ? error : undefined
+      error instanceof Error ? error : undefined,
     );
   }
 }
@@ -158,10 +149,7 @@ export async function processPDF(
  * @param thumbnailWidth - Desired thumbnail width (default: 200)
  * @returns Base64 data URL of the thumbnail
  */
-export async function generatePDFThumbnail(
-  file: File,
-  thumbnailWidth = 200
-): Promise<string> {
+export async function generatePDFThumbnail(file: File, thumbnailWidth = 200): Promise<string> {
   const result = await processPDF(file, {
     maxPages: 1,
     scale: 1.0,
@@ -169,10 +157,7 @@ export async function generatePDFThumbnail(
   });
 
   if (result.pages.length === 0) {
-    throw new PDFProcessingError(
-      'Impossibile generare la miniatura del PDF.',
-      'RENDER_FAILED'
-    );
+    throw new PDFProcessingError('Impossibile generare la miniatura del PDF.', 'RENDER_FAILED');
   }
 
   const page = result.pages[0];
