@@ -1,19 +1,23 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import {
-  processPDF,
-  PDFProcessingError,
-  type ProcessedPDF,
-  type ProcessedPage,
-} from "@/lib/pdf";
+import { useState, useEffect, useCallback } from 'react';
+import { processPDF, PDFProcessingError, type ProcessedPDF, type ProcessedPage } from '@/lib/pdf';
 
-export type ViewMode = "loading" | "preview" | "error";
+export type ViewMode = 'loading' | 'preview' | 'error';
+
+/**
+ * "select" — the student picks which pages to analyse (the original use).
+ * "confirm" — the student is only checking that this is the right document
+ * before uploading it whole, so page selection is meaningless and hidden.
+ */
+export type PDFPreviewMode = 'select' | 'confirm';
 
 export interface UsePDFPreviewOptions {
   file: File;
+  mode?: PDFPreviewMode;
   allowMultiSelect?: boolean;
-  onPagesSelected: (pages: ProcessedPage[]) => void;
+  onPagesSelected?: (pages: ProcessedPage[]) => void;
+  onConfirm?: () => void;
   onClose: () => void;
 }
 
@@ -34,13 +38,25 @@ export interface UsePDFPreviewReturn {
   setCurrentPage: (page: number) => void;
 }
 
+/** True for controls that handle Enter/Space themselves. */
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  return Boolean(
+    target.closest('button, a[href], input, select, textarea, [role="button"]')
+  );
+}
+
 export function usePDFPreview({
   file,
+  mode = 'select',
   allowMultiSelect = true,
   onPagesSelected,
+  onConfirm,
   onClose,
 }: UsePDFPreviewOptions): UsePDFPreviewReturn {
-  const [viewMode, setViewMode] = useState<ViewMode>("loading");
+  const selectable = mode === 'select';
+  const [viewMode, setViewMode] = useState<ViewMode>('loading');
   const [error, setError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<ProcessedPDF | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -58,7 +74,7 @@ export function usePDFPreview({
 
         if (!cancelled) {
           setPdfData(result);
-          setViewMode("preview");
+          setViewMode('preview');
 
           // Auto-select first page
           if (result.pages.length > 0) {
@@ -70,9 +86,9 @@ export function usePDFPreview({
           if (err instanceof PDFProcessingError) {
             setError(err.message);
           } else {
-            setError("processing-error");
+            setError('processing-error');
           }
-          setViewMode("error");
+          setViewMode('error');
         }
       }
     }
@@ -97,6 +113,7 @@ export function usePDFPreview({
   // Page selection
   const togglePageSelection = useCallback(
     (pageIndex: number) => {
+      if (!selectable) return;
       setSelectedPages((prev) => {
         const next = new Set(prev);
         if (next.has(pageIndex)) {
@@ -115,18 +132,23 @@ export function usePDFPreview({
         return next;
       });
     },
-    [allowMultiSelect],
+    [allowMultiSelect, selectable],
   );
 
-  // Confirm selection
+  // Confirm: in "confirm" mode the whole document is being accepted, so there
+  // is nothing to hand back — the caller already holds the File.
   const handleConfirm = useCallback(() => {
+    if (!selectable) {
+      onConfirm?.();
+      return;
+    }
     if (!pdfData) return;
     const pages = Array.from(selectedPages)
       .sort((a, b) => a - b)
       .map((i) => pdfData.pages[i])
       .filter(Boolean);
-    onPagesSelected(pages);
-  }, [pdfData, selectedPages, onPagesSelected]);
+    onPagesSelected?.(pages);
+  }, [pdfData, selectedPages, onPagesSelected, onConfirm, selectable]);
 
   // Zoom controls
   const handleZoomIn = useCallback(() => {
@@ -140,30 +162,38 @@ export function usePDFPreview({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (viewMode !== "preview") return;
+      if (viewMode !== 'preview') return;
+
+      // A keyboard user tabbing through the zoom and page buttons presses
+      // Enter/Space to activate them. Those keys bubble to this window
+      // listener, so without this guard "next page" would instead accept the
+      // document and close the preview. Escape is deliberately still handled:
+      // it must always get you out, whatever holds focus.
+      if (e.key !== 'Escape' && isInteractiveTarget(e.target)) return;
 
       switch (e.key) {
-        case "ArrowLeft":
+        case 'ArrowLeft':
           goToPrevPage();
           break;
-        case "ArrowRight":
+        case 'ArrowRight':
           goToNextPage();
           break;
-        case "Escape":
+        case 'Escape':
           onClose();
           break;
-        case "Enter":
+        case 'Enter':
           handleConfirm();
           break;
-        case " ":
+        case ' ':
+          if (!selectable) break;
           e.preventDefault();
           togglePageSelection(currentPage);
           break;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
     viewMode,
     currentPage,
@@ -172,6 +202,7 @@ export function usePDFPreview({
     onClose,
     handleConfirm,
     togglePageSelection,
+    selectable,
   ]);
 
   const currentPageData = pdfData?.pages[currentPage];
