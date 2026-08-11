@@ -253,7 +253,7 @@
       },
       "aiSystem": {
         "section1Title": "1. Divulgación de Sistemas de IA (Artículo 50 - Ley de IA de la UE 2024/1689)",
-        "section1Para1": "En conformidad con el Artículo 50 de la Ley de IA de la UE (Reglamento 2024/1689), MirrorBuddy divulga que los 29 maestros educativos disponibles en la plataforma utilizan inteligencia artificial generativa. Estos sistemas de IA están diseñados para personalizar la enseñanza y apoyar a estudiantes con dificultades de aprendizaje.",
+        "section1Para1": "En conformidad con el Artículo 50 de la Ley de IA de la UE (Reglamento 2024/1689), MirrorBuddy divulga que los 30 maestros educativos disponibles en la plataforma utilizan inteligencia artificial generativa. Estos sistemas de IA están diseñados para personalizar la enseñanza y apoyar a estudiantes con dificultades de aprendizaje.",
         "section1Para2Intro": "Los sistemas de IA en MirrorBuddy incluyen tres categorías principales:",
         "section1Para2Item1": "Sistemas de Personalización Educativa - Azure OpenAI GPT para adaptar el contenido al nivel y estilo de aprendizaje del estudiante",
         "section1Para2Item2": "Sistemas de Análisis del Progreso - Algoritmos de aprendizaje espacial para la repetición espaciada (FSRS) que rastrean la retención de conocimientos",
@@ -1255,7 +1255,7 @@
           },
           "pro": {
             "title": "Nivel Pro (Suscripción de Pago)",
-            "description": "Los usuarios del nivel Pro tienen una suscripción de pago de 9,99 €/mes procesada a través de Stripe. Este nivel proporciona acceso premium con todas las funciones: mensajes de chat ilimitados, interacción vocal ilimitada, acceso a los 29 maestri (profesores IA) incluyendo profesores premium exclusivos, soporte prioritario y funciones avanzadas. Recopilamos todos los datos del nivel Base más: información de pago procesada por Stripe (no almacenada directamente por MirrorBuddy), dirección de facturación e historial de facturas (para contabilidad y cumplimiento fiscal), estado de suscripción y fechas de renovación. Los datos de pago son gestionados por Stripe según su Acuerdo de Tratamiento de Datos (DPA) conforme al RGPD."
+            "description": "Los usuarios del nivel Pro tienen una suscripción de pago de 9,99 €/mes procesada a través de Stripe. Este nivel proporciona acceso premium con todas las funciones: mensajes de chat ilimitados, interacción vocal ilimitada, acceso a los 30 maestri (profesores IA) incluyendo profesores premium exclusivos, soporte prioritario y funciones avanzadas. Recopilamos todos los datos del nivel Base más: información de pago procesada por Stripe (no almacenada directamente por MirrorBuddy), dirección de facturación e historial de facturas (para contabilidad y cumplimiento fiscal), estado de suscripción y fechas de renovación. Los datos de pago son gestionados por Stripe según su Acuerdo de Tratamiento de Datos (DPA) conforme al RGPD."
           },
           "dataNote": "Su nivel de suscripción determina qué datos personales recopilamos. Puede consultar y controlar sus datos en cualquier momento en su configuración de privacidad. Actualizar o degradar su nivel cambia correspondientemente su perfil de recopilación de datos. Cuando degrada de Pro a Base o elimina su cuenta, la retención de datos de pago sigue nuestra política de retención estándar (registros de facturación conservados durante 7 años para cumplimiento fiscal, luego eliminados definitivamente)."
         }
