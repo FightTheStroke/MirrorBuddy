@@ -117,6 +117,7 @@ const ROUTES = {
   '/': [HARNESS_HTML, 'text/html; charset=utf-8'],
   '/harness.mjs': [HARNESS_SCRIPT, 'text/javascript; charset=utf-8'],
   '/vendor/pdf.min.mjs': [
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- dev-only harness; path is derived from a resolved node_modules root, never from input
     readFileSync(join(pdfjsRoot, 'build', 'pdf.min.mjs')),
     'text/javascript; charset=utf-8',
   ],
@@ -127,6 +128,7 @@ const ROUTES = {
 // where the CSP refuses it. Leaving the route out reproduces that failure.
 if (isSameOrigin) {
   ROUTES[workerSrc] = [
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- dev-only harness; workerSrc is a same-origin literal asserted above
     readFileSync(join(webRoot, 'public', workerSrc.replace(/^\//, ''))),
     'text/javascript; charset=utf-8',
   ];
