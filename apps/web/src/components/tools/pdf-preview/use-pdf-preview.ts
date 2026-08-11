@@ -38,6 +38,15 @@ export interface UsePDFPreviewReturn {
   setCurrentPage: (page: number) => void;
 }
 
+/** True for controls that handle Enter/Space themselves. */
+function isInteractiveTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  return Boolean(
+    target.closest('button, a[href], input, select, textarea, [role="button"]')
+  );
+}
+
 export function usePDFPreview({
   file,
   mode = 'select',
@@ -154,6 +163,13 @@ export function usePDFPreview({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (viewMode !== 'preview') return;
+
+      // A keyboard user tabbing through the zoom and page buttons presses
+      // Enter/Space to activate them. Those keys bubble to this window
+      // listener, so without this guard "next page" would instead accept the
+      // document and close the preview. Escape is deliberately still handled:
+      // it must always get you out, whatever holds focus.
+      if (e.key !== 'Escape' && isInteractiveTarget(e.target)) return;
 
       switch (e.key) {
         case 'ArrowLeft':

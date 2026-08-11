@@ -3,8 +3,15 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Eye } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
-import { PDFPreview } from '@/components/tools/pdf-preview';
+
+// pdfjs is ~800KB before minification and most visitors never open the
+// preview, so it must not sit in the Study Kit's initial client bundle.
+const PDFPreview = dynamic(
+  () => import('@/components/tools/pdf-preview').then((m) => m.PDFPreview),
+  { ssr: false }
+);
 
 interface StudyKitPdfConfirmProps {
   /** Local PDF only — Google Drive picks are not File objects yet. */

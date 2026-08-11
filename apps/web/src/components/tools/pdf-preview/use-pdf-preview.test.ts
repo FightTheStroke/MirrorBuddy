@@ -112,6 +112,53 @@ describe('usePDFPreview', () => {
       expect(result.current.selectedPages.size).toBe(1);
     });
 
+    it('does not confirm when Enter activates a focused button', async () => {
+      const onConfirm = vi.fn();
+      const { result } = await renderReady({ mode: 'confirm', onConfirm });
+      expect(result.current.viewMode).toBe('preview');
+
+      const button = document.createElement('button');
+      document.body.appendChild(button);
+      button.focus();
+
+      act(() => {
+        button.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+        );
+      });
+
+      expect(onConfirm).not.toHaveBeenCalled();
+      button.remove();
+    });
+
+    it('still confirms on Enter when nothing interactive has focus', async () => {
+      const onConfirm = vi.fn();
+      await renderReady({ mode: 'confirm', onConfirm });
+
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      });
+
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes on Escape even while a button has focus', async () => {
+      const onClose = vi.fn();
+      await renderReady({ mode: 'confirm', onConfirm: vi.fn(), onClose });
+
+      const button = document.createElement('button');
+      document.body.appendChild(button);
+
+      act(() => {
+        button.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+        );
+      });
+
+      expect(onClose).toHaveBeenCalled();
+      button.remove();
+    });
+
     it('still closes on Escape', async () => {
       const onClose = vi.fn();
       const { result } = await renderReady({ mode: 'confirm', onConfirm: vi.fn(), onClose });
