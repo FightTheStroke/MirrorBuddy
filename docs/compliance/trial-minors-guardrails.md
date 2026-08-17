@@ -7,7 +7,7 @@ UX-03 ("ask a grown-up" tier-lock dialog), A11Y-05 (distractionFreeMode).
 
 ## 1. Problem
 
-MirrorBuddy's primary users are children 6–14 with learning differences. The
+MirrorBuddy's primary users are children 8–18 with learning differences. The
 anonymous **Trial** flow rendered adult/commercial surfaces directly in the
 child space (the intention-based home):
 
@@ -98,7 +98,7 @@ this guardrail review first.
       in `/api/invites/request` joins a child's pseudonymous usage data to an
       adult's PII. Confirm lawful basis + retention in the DPIA.
 - [ ] ⚑ **Login under "Per i grandi"**: we assume account management is the
-      adult's job (Italy: digital consent age 14; the product targets 6–14).
+      adult's job (Italy: digital consent age 14; the product targets 8–18).
       Confirm policy for 14-year-olds who may self-register.
 - [ ] ⚑ **Telemetry toward minors** (`trackBetaCtaShown/Clicked`,
       `trackTrialChat`, `trackTrialLimitHit` on the anonymous visitor):
