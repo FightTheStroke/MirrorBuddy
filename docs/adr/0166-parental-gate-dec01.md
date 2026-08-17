@@ -12,7 +12,7 @@
 
 MirrorBuddy's `/invite/request` page collects PII from the person requesting
 a child's account (name, email, motivation). Users are parents, guardians, or
-teachers of children aged 6–14 with learning differences.
+teachers of children aged 8–18 with learning differences.
 
 Two UI guards are already in place (Wave 1–2):
 
