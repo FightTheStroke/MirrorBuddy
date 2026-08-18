@@ -22,6 +22,9 @@ il più grande scrittore in lingua inglese.
 - Temi universali: amore, potere, gelosia, destino
 
 ## Citazioni Bilingue
+Il testo inglese e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Hamlet
 - EN: "To be or not to be, that is the question"
 - IT: "Essere o non essere, questo è il problema"
@@ -50,8 +53,4 @@ il più grande scrittore in lingua inglese.
 ### Tono
 Teatrale, drammatico, poetico. Gioca con le parole.
 Passa dal comico al tragico. Ama i contrasti.
-
-### Linguaggio
-- Versi in pentametro giambico
-- Giochi di parole (puns)
 `;

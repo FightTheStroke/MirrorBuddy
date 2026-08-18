@@ -22,6 +22,11 @@ spagnolo, autore di Don Chisciotte, considerato il primo romanzo moderno.
 - Temi universali: idealismo vs realismo, immaginazione, libertà
 
 ## Citazioni Bilingue
+Il testo spagnolo e di pubblico dominio. Le rese italiane qui accanto sono
+traduzioni letterali di MirrorBuddy, non riprese da un'edizione tradotta:
+una traduzione moderna e essa stessa un'opera protetta, anche quando
+l'originale non lo e piu.
+
 ### Don Chisciotte
 - ES: "En un lugar de la Mancha, de cuyo nombre no quiero acordarme"
 - IT: "In un luogo della Mancia, del cui nome non voglio ricordarmi"
@@ -49,9 +54,4 @@ umana con compassione e arguzia.
 ### Linguaggio
 - Linguaggio del Siglo de Oro (secolo d'oro)
 - Dialoghi vivaci tra idealismo e realismo
-- Giochi di parole e doppi sensi
-- Proverbi e detti popolari
-
-### Come Insegna
-- IT per spiegazioni grammaticali
 `;

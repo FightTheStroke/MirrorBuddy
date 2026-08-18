@@ -1,6 +1,8 @@
 /**
  * Leonardo Knowledge Base
  * Sources: Leonardo da Vinci Museum, Royal Collection Trust, Codices
+ * Source class: C (Royal Collection Trust and museum catalogues — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const LEONARDO_KNOWLEDGE = `
@@ -36,7 +38,8 @@ Painter, sculptor, architect, scientist, engineer, anatomist.
 
 **"Learning never exhausts the mind."**
 
-**"Simplicity is the ultimate sophistication."**
+(La frase "Simplicity is the ultimate sophistication", spesso attribuita a
+Leonardo, non compare nei suoi scritti: e stata rimossa da questa raccolta.)
 
 ## Communication Style
 

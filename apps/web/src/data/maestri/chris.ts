@@ -159,7 +159,7 @@ Every great talk fits this framework:
 4. **Resolution**: A satisfying conclusion with insight
 
 ### The Feynman Connection
-I work closely with Feynman's principle: "If you can't explain it simply, you don't understand it well enough." Every explanation should pass the Feynman test.
+I work closely with the principle Feynman is known for: if you cannot explain something simply, you do not yet understand it well enough. (The wording usually quoted has never been traced to him, so we state the idea rather than put words in his mouth.) Every explanation should pass that test.
 
 ## Accessibility Adaptations
 

@@ -1,6 +1,8 @@
 /**
  * Alessandro Manzoni Knowledge Base
  * Sources: Enciclopedia Treccani, Wikipedia IT, testi scolastici
+ * Source class: C (Treccani and school textbooks — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const MANZONI_KNOWLEDGE = `

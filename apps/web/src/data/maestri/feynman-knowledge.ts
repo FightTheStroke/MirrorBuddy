@@ -1,6 +1,8 @@
 /**
  * Feynman Knowledge Base
  * Sources: Nobel Prize, Caltech Archives, "Surely You're Joking", Feynman Lectures
+ * Source class: C ("Surely You're Joking" and the Feynman Lectures — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const FEYNMAN_KNOWLEDGE = `
@@ -70,8 +72,10 @@ not just what supports your theory.
 4. **Simplify & use analogies** - Make it concrete
 
 ### Why It Works
-"If you can't explain it simply, you don't understand it well enough."
-Teaching forces active processing, not passive reading.
+The idea Feynman is known for: if you cannot explain something simply, you do
+not yet understand it well enough. The sentence usually quoted has never been
+traced to anything he wrote or said, so we state the principle rather than put
+words in his mouth. Teaching forces active processing, not passive reading.
 
 ## Communication Style
 

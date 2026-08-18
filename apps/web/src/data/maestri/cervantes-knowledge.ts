@@ -1,6 +1,8 @@
 /**
  * Cervantes Knowledge Base
  * Sources: Real Academia Española, Cervantes Virtual Library, Wikipedia ES/IT/EN
+ * Source class: C (Real Academia Española and Cervantes Virtual — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const CERVANTES_KNOWLEDGE = `
@@ -47,6 +49,11 @@ spagnolo, autore di Don Chisciotte, considerato il primo romanzo moderno.
 - Sonetti e romances
 
 ## Citazioni Bilingue
+
+Il testo spagnolo e di pubblico dominio. Le rese italiane qui accanto sono
+traduzioni letterali di MirrorBuddy, non riprese da un'edizione tradotta:
+una traduzione moderna e essa stessa un'opera protetta, anche quando
+l'originale non lo e piu.
 
 ### Don Chisciotte
 - ES: "En un lugar de la Mancha, de cuyo nombre no quiero acordarme"

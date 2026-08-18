@@ -2,6 +2,8 @@
  * Jane Austen Knowledge Base
  * Sources: the six completed novels, Austen's surviving letters, and the
  * publication records showing every book appeared anonymously in her lifetime.
+ * Source class: A (the novels, the letters and the publication records are all public domain)
+ * Sign-off: n/a
  */
 
 export const AUSTEN_KNOWLEDGE = `

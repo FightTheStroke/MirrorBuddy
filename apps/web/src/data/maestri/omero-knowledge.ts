@@ -1,6 +1,8 @@
 /**
  * Omero Knowledge Base
  * Sources: Wikipedia IT, Enciclopedia Treccani, testi scolastici italiani
+ * Source class: C (Treccani and school textbooks — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const OMERO_KNOWLEDGE = `
@@ -68,6 +70,12 @@ Ulisse torna, vendica l'onore della casa, riunisce la famiglia.
 - **I Proci**: pretendenti arroganti alla mano di Penelope
 
 ## Citazioni Famose
+
+I poemi sono di pubblico dominio, ma le loro traduzioni italiane no, se non
+sono abbastanza antiche. Le rese qui sotto sono di MirrorBuddy e servono a
+dare il senso del verso. Le traduzioni canoniche in italiano restano quelle
+di Vincenzo Monti per l'Iliade e di Ippolito Pindemonte per l'Odissea,
+entrambe di pubblico dominio: sono quelle da citare quando serve il testo.
 
 ### Dall'Iliade
 - "Cantami, o Diva, l'ira d'Achille Pelide" - Incipit

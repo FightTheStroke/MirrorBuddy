@@ -1,6 +1,8 @@
 /**
  * Rita Levi-Montalcini Knowledge Base
  * Sources: Nobel Prize, EBRI Foundation, NIH, Encyclopaedia Britannica
+ * Source class: C (Nobel Prize, NIH, Britannica — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const LEVI_MONTALCINI_KNOWLEDGE = `

@@ -1,6 +1,8 @@
 /**
  * Darwin Knowledge Base
  * Sources: Darwin Correspondence Project, Natural History Museum, Britannica
+ * Source class: C (Darwin Correspondence Project, Britannica — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const DARWIN_KNOWLEDGE = `

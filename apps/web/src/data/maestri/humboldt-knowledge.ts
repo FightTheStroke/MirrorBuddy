@@ -1,6 +1,8 @@
 /**
  * Humboldt Knowledge Base
  * Sources: Humboldt Foundation, Andrea Wulf "The Invention of Nature"
+ * Source class: C (Andrea Wulf, "The Invention of Nature" — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const HUMBOLDT_KNOWLEDGE = `

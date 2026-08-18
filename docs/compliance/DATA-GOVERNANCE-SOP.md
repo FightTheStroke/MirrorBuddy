@@ -80,9 +80,14 @@ misrepresentation. It is the class that most needs a human decision, not a rule.
 
 1. **Write it yourself.** A knowledge file states facts in MirrorBuddy's own words. Never
    paste a source's sentences, not even "temporarily".
-2. **Quotation is deliberate and short.** A quotation is allowed when the _wording itself_
-   is the teaching object (a famous line, an aphorism). It must be attributed inline, kept
-   to what the point requires, and never used to substitute for our own explanation.
+2. **Quotation is deliberate, short and attributed.** A quotation is allowed when the
+   _wording itself_ is the teaching object (a famous line, an aphorism). It must be
+   attributed inline, kept to what the point requires, and never used to substitute for
+   our own explanation. An unattributed quotation has no defence under art. 70 LdA or the
+   EU quotation exception, however short it is. In **class D** files — in-copyright works,
+   living persons, characters — a collected list of quotations is forbidden outright and
+   is blocked by `knowledge-provenance.test.ts`; this rule was broken by four files until
+   the G-4b review in §6.1, so it is now enforced rather than trusted.
 3. **Name every source in the file header**, using the format in §5. A file with no
    provenance cannot be seeded.
 4. **No Class B expression, ever.** Wikipedia is a starting point for facts, never a
@@ -119,6 +124,9 @@ introduced by this SOP and are backfilled per the roadmap in §6.
 
 ## 6. Findings from the 17 Aug 2026 audit
 
+**G-1 to G-5 were closed on 18 August 2026.** The findings are kept below as the record of
+what was wrong; the resolution of each is in §6.1.
+
 | #   | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Action                                                                                                                                                                                                         | Owner    | Due                                                                                                                                                                                                           |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | G-1 | `loto-knowledge.ts` has **no `Sources:` header**, and its content rests on Thich Nhat Hanh (d. 2022 — works in copyright, Plum Village is a trademark). Class D, unsigned.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Add provenance header; confirm the text is our own expression; obtain class-D sign-off                                                                                                                         | Roberdan | 15 Sep 2026                                                                                                                                                                                                   |
@@ -127,6 +135,167 @@ introduced by this SOP and are backfilled per the roadmap in §6.
 | G-4 | Wikipedia (CC BY-SA) is named as a source in ~10 files; no verification that no phrasing was carried over.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Spot-check those files against the rule in §4.4                                                                                                                                                                | Roberdan | 15 Sep 2026                                                                                                                                                                                                   |
 | G-5 | No automated check prevents seeding a file without provenance.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Consider a lint rule or a guard in `seed-maestri-knowledge-vectors.ts`                                                                                                                                         | Roberdan | 31 Oct 2026                                                                                                                                                                                                   |
 | G-6 | The seeding pipeline for the corpus this SOP governs was **broken end to end**: nothing in `*-knowledge.ts` ever reached pgvector. The audit originally recorded two defects; verifying it against a live database uncovered five more, each of which alone was enough to keep the index empty. (a) `extract-mini-kb.ts` resolved `../src/data/maestri`, a pre-monorepo path. (b) `seed-maestri-knowledge-vectors.ts` chunked, embedded and **counted**, but never persisted. (c) `StoreEmbeddingInput.sourceType` did not include `'maestro_knowledge'` — the very value the retriever queries — so a correct seeder could not even typecheck. (d) `ContentEmbedding.userId` is a foreign key to `User.id` and the `SYSTEM_MAESTRO_KB` owner row was never created, so every insert violated the constraint. (e) `storeEmbedding` populates the native pgvector column fire-and-forget; a script exits before it lands, and the SQL search function filters `vectorNative IS NOT NULL`, so the rows would have been invisible. (f) `storeEmbedding` anonymised all content, and the PII heuristics rewrite the historical names the didactic content is _about_ («Il metodo Feynman» → «Il metodo [NOME]»), so the corpus would have been corrupted on the way in. (g) `MIN_SIMILARITY` was 0.5, but measured on-topic similarities run 0.30–0.63 (median 0.44), so even a correctly populated index returned nothing for 7 of 8 test questions. Consequence throughout: `maestro-knowledge-retriever.ts` degrades silently to an empty string per ADR 0033, so an unpopulated index was indistinguishable from a working one. | Repoint the extractor, add persistence, widen the source type, create the system owner row, await the native vector, exempt system-authored content from anonymisation, and set the threshold from measurement | Roberdan | ✅ RISOLTO 2026-08-18 — verificato end-to-end contro Postgres locale: 241 chunk, 30 maestri, 0 vettori nativi mancanti; il retriever restituisce contenuto reale e scarta le query fuori tema. Runbook in §8. |
+
+### 6.1 Resolution, 18 August 2026
+
+**G-1, G-2 — provenance headers.** All 32 files now carry `Source class:` and `Sign-off:`
+per §5, and `loto-knowledge.ts` names its sources. Classification records the **most
+restrictive** class among a file's sources, naming the reference that drives it, because
+that is the class that governs what may be taken. Two files are class A, twenty-four are
+class C, six are class D. No file is class B: Wikipedia is used for facts only, never as
+the governing source of a file.
+
+**G-3 — class D sign-off.** The six class D Maestri (`alex-pina`, `amici-miei`, `cassese`,
+`chris`, `loto`, `simone`) now record a sign-off from the IP risk owner dated 18 August 2026. It is recorded for what it is: a **bulk delegation covering the whole roster on the
+basis of this audit, not a per-file review**. That distinction is in the header of every
+one of those files, so a future reader is not misled into thinking each Maestro was
+individually examined.
+
+**G-4 — Wikipedia phrasing.** The eleven files naming Wikipedia were checked sentence by
+sentence against the article in the language edition each header names. Eight were clean:
+facts taken, expression independent. Three were not, and were rewritten:
+
+| File                      | What was found                                                                                                                                                                                                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `simone-knowledge.ts`     | The medical-history paragraph followed Wikipedia's selection, order and phrasing; the 2014 paratriathlon sentence was a verbatim compression of a Wikipedia clause; the Polha Varese sentence drew the same three proper nouns from the same sentence. Biography rewritten. |
+| `amici-miei-knowledge.ts` | "Architetto impiegato al comune" reproduced Wikipedia's character description word for word; the Sassaroli description reused its structure and choice of attributes. Both rewritten.                                                                                       |
+| `cassese-knowledge.ts`    | The academic-career list mirrored Wikipedia's selection and sequence. Bare institutional facts are not expressive, but the arrangement was; rewritten as our own narrative.                                                                                                 |
+
+Limits of that check, stated plainly: it is a targeted spot-check of the sentences most
+likely to have been carried over, not an exhaustive comparison, and a few passages could
+not be retrieved from the live articles for direct comparison and were judged on the
+strongest evidence available. It does not establish that no phrasing anywhere derives
+from Wikipedia; it establishes that the passages most at risk were examined and the
+derivative ones removed.
+
+**G-4b — reproduction of third-party works.** The G-4 check above asked only
+"was phrasing carried over from Wikipedia?". That was the wrong question for the
+files that carried the most risk, and the first review of this work rejected it
+for exactly that reason. Wikipedia was never the issue for a Maestro built on a
+television series: the series was.
+
+Re-run with "does this file reproduce a third party's protected expression?" as
+the criterion, five files failed:
+
+| File                                                 | What was reproduced                                                                                                                                                                                                          | Action                                                                                                                                                                                                         |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `alex-pina`                                          | A curated list of _La Casa de Papel_ dialogue in Spanish and Italian, the named character roster with in-character descriptions, grammar examples voiced by those characters, and instructions to the model to speak as them | Dialogue and character voicing removed. Facts about Pina and his series kept — naming a work is not taking it. The Spanish itself is ordinary Spanish and stays                                                |
+| `amici-miei`                                         | Verbatim dialogue from the 1975 Monicelli film, including the supercazzola lines, plus detailed plot and character relationships                                                                                             | Quotations replaced with an explanation of how the device is built, which is the part that actually teaches Italian syntax. The film's lexicon that entered the Zingarelli dictionary stays: it is now Italian |
+| `cassese`                                            | Seven unattributed verbatim quotations from a jurist who died in 2011                                                                                                                                                        | Replaced with his positions in our words                                                                                                                                                                       |
+| `simone`                                             | Six unattributed quotations from a living athlete, presented as his voice                                                                                                                                                    | Replaced with the themes he has expressed publicly, in our words                                                                                                                                               |
+| `chris`                                              | Brene Brown's "stories are data with a soul" and a line from Chris Anderson's TED book, presented under "Famous Advice" as this Maestro's own                                                                                | Replaced with principles in our words, with the misattribution stated                                                                                                                                          |
+| `alex-pina.ts` (persona prompt, outside this corpus) | Series catchphrases as the Maestro's own, in three separate places                                                                                                                                                           | Replaced. Fixing the knowledge file alone would have left the same output reachable                                                                                                                            |
+
+Quotation is not forbidden. Italian law (art. 70 LdA) and the EU InfoSoc
+directive allow it when it is short, serves explanation or criticism, and
+**names the work it comes from**. What these files did was quote at length
+with no attribution at all, which is the one form that has no defence. Where the
+quotations were worth keeping, the SOP's answer is to source them properly, not
+to launder them into paraphrase; that path is recorded in each file.
+
+**Class C quotation sections, and the translations beside them.** Six class C
+files carry quotation sections — `cervantes`, `goethe`, `manzoni`, `moliere`,
+`omero`, `shakespeare`. Every one quotes an author whose works are in the public
+domain, so quoting them is lawful and is the substance of teaching literature.
+The C/D boundary is the right line for the quotations rule, which is why the
+guard draws it there.
+
+The originals were not the exposure; the Italian renderings printed next to them
+were. A modern translation is its own protected work even when the original is
+free, which §3 already said. Five of the six now state that their Italian
+renderings are MirrorBuddy's own literal translations rather than an edition's.
+`omero` additionally names Monti and Pindemonte as the canonical public-domain
+translations to cite when the text itself is needed. `manzoni` needed nothing:
+it quotes Italian originals.
+
+**The failure mode worth remembering.** Both rounds of this work failed the same
+way, and the second time it was caught by review rather than by me: the section
+being edited got fixed while an untouched section a few lines away carried the
+identical exposure. `alex-pina.ts` was declared fixed with two of its three
+occurrences still live; `simone` had a quotation removed from one section and an
+almost identical one left standing two sections below. The discipline this
+demands is mechanical — grep the whole file, and then the whole corpus, for the
+pattern, and never trust that a fix is complete because the part you were
+looking at is clean.
+
+**G-7 — quote attribution has never been verified (OPEN).** Sweeping the whole
+corpus for quoted strings, rather than only quotation sections, turned up a
+different problem from the one this card was closing: quotations attributed to
+the wrong person. Two were found incidentally and fixed — the "if you can't
+explain it simply" aphorism, which has never been traced to Feynman, and
+"Simplicity is the ultimate sophistication", which does not appear in Leonardo's
+writings. `chris-knowledge.ts` also presented Brene Brown's "stories are data
+with a soul" as its own Maestro's advice.
+
+This is a content-accuracy finding, not an IP one, and **it is not closed**. No
+systematic verification of the corpus's quotations has been done; three were
+found by accident while looking for something else, which is a poor basis for
+assuming the rest are sound. Owner: to be assigned. It should be a pass in its
+own right, not folded into an IP review.
+
+The gate on this card widened G-7 by demonstration. Both guards fire on a
+heading — `knowledge-provenance.test.ts` looks for a quotations _section_ in a
+class D file — so in-character dialogue written into ordinary prose passes
+untouched. Proven by mutation: fabricated speaker-attributed dialogue inserted
+under `## Stile Comunicativo` in `alex-pina-knowledge.ts`, propagated into the
+mini-KB with `npm run kb:extract`, left both guards green and would have shipped
+to the model. Nothing in the corpus exploits this today — the mutation had to be
+injected — and the guard's own comment already disclaims coverage here. But the
+blind spot is now measured rather than assumed, and closing it needs full-text
+scanning (named speaker adjacent to a quoted string) across class D files, not a
+heading regex. Same owner, same pass.
+
+Also for that pass: `cassese-knowledge.ts` carries the fragment
+`"non ancora disillusi"` attributed to Cassese outside any quotation heading.
+De minimis, and precisely the shape this rule cannot see.
+
+**G-8 — the removals were not reaching the model (CLOSED).** Every sanitisation
+on this card edited `*-knowledge.ts`. But each knowledge file has a second,
+committed derivative: `mini-kb/<slug>.ts`, generated by
+`scripts/extract-mini-kb.ts`, and it is the mini-KB — not the knowledge file —
+that the persona prompt inlines. Nobody re-ran the generator. So after two
+rounds of removals, `mini-kb/alex-pina.ts` still carried the series dialogue,
+the character-attributed lines and the catchphrases, and was still sending them
+to the model. The removals were real in the source of truth and fictional in the
+artefact that ships.
+
+Regenerating exposed a second hazard: six mini-KBs — `austen`, `kahlo`, `loto`,
+`nightingale`, `noether`, `turing` — are written by hand, in a first-person
+voice no section-picking heuristic can produce, and `npm run kb:extract`
+overwrote all six without a word. Anyone who fixed an IP problem correctly would
+have destroyed them. The extractor now recognises hand-authored files by the
+absence of its own generated-by marker and leaves them alone, naming them in its
+output.
+
+`mini-kb-sync.test.ts` fails the build when a generated mini-KB no longer matches
+what the extractor would produce from its knowledge file, and when the
+hand-authored roster changes without being declared. Proven by mutation:
+restoring the pre-sanitisation `mini-kb/alex-pina.ts` fails the build with the
+instruction to re-run the extractor.
+
+This is the third instance of the failure mode recorded above, and the sharpest:
+the fix was correct, complete within the file being looked at, and did not take
+effect. **A corpus change is not done when the source file is clean — it is done
+when every derived artefact has been regenerated and committed.**
+
+**G-5 — automated check.** `apps/web/src/lib/compliance/__tests__/knowledge-provenance.test.ts`
+fails the build when a knowledge file has no sources, no source class, a class D file
+carries no named sign-off, the class D roster changes without being declared, or a class D
+file collects quotations from its source. Proven by mutation on all four evasions:
+removing a `Sources:` line, downgrading a class D sign-off to `n/a`, relabelling a class D
+file as class C to dodge the sign-off requirement, and adding a quotations section to a
+class D file.
+
+The quotations rule earns its place: it was written after the G-4b review and immediately
+found two files — `cassese` and `simone` — that the human review had not flagged.
+
+It does not prove a file is free of reproduced expression. Quotations scattered through
+prose under no heading pass it. It removes the specific blind spot that got past a human
+audit, and claims nothing more.
+
+The rule the test cannot enforce is §4: that the words are ours. That still rests on
+review, which is why the cadence in §7 exists — and G-4b is the evidence that the review
+has to ask the right question, not merely be performed.
 
 G-6 was an operational break, not an IP one — but it means the provenance controls in this SOP currently govern content that is not being served from the vector store; the rest are **documentation and review gaps, not known infringements**: the corpus is
 authored in-house and every file but one names its references.

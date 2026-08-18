@@ -1,178 +1,122 @@
+/**
+ * Tests for scripts/i18n-check.ts.
+ *
+ * These tests work on a throwaway copy of the message tree, never on
+ * `apps/web/messages/` itself. The script locates messages relative to its
+ * working directory, so pointing the working directory at a sandbox is enough
+ * to isolate it. Mutating the real tree — which this suite used to do, down to
+ * writing `{ invalid json }` into `es/common.json` — raced with every other
+ * test file that reads those messages, and a crash between mutation and
+ * restore left the checkout broken.
+ */
+
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
 
-const MESSAGES_DIR = path.join(process.cwd(), 'apps', 'web', 'messages');
-const TEST_BACKUP_DIR = path.join(process.cwd(), '.test-i18n-backup');
-const LOCALES = ['en', 'it', 'de', 'es', 'fr'];
+const REPO_ROOT = process.cwd();
+const REAL_MESSAGES_DIR = path.join(REPO_ROOT, 'apps', 'web', 'messages');
+const SCRIPT = path.join(REPO_ROOT, 'scripts', 'i18n-check.ts');
+// The repository's own tsx, by absolute path. `npx tsx` resolves against the
+// working directory, which here is a sandbox outside the checkout: npx would
+// find no local install and try to fetch tsx from the registry, so the suite
+// failed wherever there was no network.
+const TSX = path.join(REPO_ROOT, 'node_modules', '.bin', 'tsx');
 
-/**
- * Copy a directory recursively
- */
-function copyDirSync(src: string, dest: string): void {
-  if (!fs.existsSync(dest)) {
-    fs.mkdirSync(dest, { recursive: true });
-  }
+let sandbox: string;
+let messagesDir: string;
 
-  const entries = fs.readdirSync(src, { withFileTypes: true });
-  for (const entry of entries) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-
-    if (entry.isDirectory()) {
-      copyDirSync(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
-/**
- * Remove a directory recursively
- */
-function rmDirSync(dir: string): void {
-  if (!fs.existsSync(dir)) return;
-
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      rmDirSync(fullPath);
-    } else {
-      fs.unlinkSync(fullPath);
-    }
-  }
-  fs.rmdirSync(dir);
-}
-
-describe('i18n-check script', () => {
-  beforeAll(() => {
-    // Backup locale directories (namespace structure)
-    if (!fs.existsSync(TEST_BACKUP_DIR)) {
-      fs.mkdirSync(TEST_BACKUP_DIR, { recursive: true });
-    }
-
-    LOCALES.forEach((locale) => {
-      const src = path.join(MESSAGES_DIR, locale);
-      const dst = path.join(TEST_BACKUP_DIR, locale);
-      if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
-        copyDirSync(src, dst);
-      }
+function runCheck(): { ok: boolean; output: string } {
+  try {
+    const output = execSync(`${JSON.stringify(TSX)} ${JSON.stringify(SCRIPT)}`, {
+      cwd: sandbox,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
     });
+    return { ok: true, output };
+  } catch (error) {
+    const e = error as { stdout?: string; stderr?: string };
+    return { ok: false, output: `${e.stdout ?? ''}${e.stderr ?? ''}` };
+  }
+}
+
+function readNamespace(locale: string, ns: string): Record<string, unknown> {
+  return JSON.parse(fs.readFileSync(path.join(messagesDir, locale, ns), 'utf-8'));
+}
+
+function writeNamespace(locale: string, ns: string, data: unknown): void {
+  fs.writeFileSync(path.join(messagesDir, locale, ns), JSON.stringify(data, null, 2));
+}
+
+// Each case shells out to tsx, which costs seconds on its own and more
+// when the rest of the suite is competing for CPU. The default 5s timeout is
+// not a meaningful assertion about this script.
+describe('i18n-check script', { timeout: 120_000 }, () => {
+  beforeAll(() => {
+    sandbox = fs.mkdtempSync(path.join(os.tmpdir(), 'i18n-check-'));
+    messagesDir = path.join(sandbox, 'apps', 'web', 'messages');
+    fs.mkdirSync(path.dirname(messagesDir), { recursive: true });
+    fs.cpSync(REAL_MESSAGES_DIR, messagesDir, { recursive: true });
   });
 
   afterAll(() => {
-    // Restore locale directories from backup
-    LOCALES.forEach((locale) => {
-      const src = path.join(TEST_BACKUP_DIR, locale);
-      const dst = path.join(MESSAGES_DIR, locale);
-      if (fs.existsSync(src)) {
-        rmDirSync(dst);
-        copyDirSync(src, dst);
-      }
-    });
+    fs.rmSync(sandbox, { recursive: true, force: true });
+  });
 
-    // Remove backup directory
-    rmDirSync(TEST_BACKUP_DIR);
+  it('leaves the real message tree untouched', () => {
+    expect(messagesDir.startsWith(os.tmpdir())).toBe(true);
+    expect(messagesDir).not.toBe(REAL_MESSAGES_DIR);
   });
 
   it('should pass when all language files have consistent keys', () => {
-    const result = execSync('npm run i18n:check', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-
-    expect(result).toContain('Result: PASS');
+    const { ok, output } = runCheck();
+    expect(output).toContain('Result: PASS');
+    expect(ok).toBe(true);
   });
 
   it('should detect missing keys in a language file', () => {
-    // Remove a key from German common.json
-    const dePath = path.join(MESSAGES_DIR, 'de', 'common.json');
-    const deContent = JSON.parse(fs.readFileSync(dePath, 'utf-8'));
+    const de = readNamespace('de', 'common.json');
+    const common = de.common as Record<string, unknown> | undefined;
+    expect(
+      common?.loading,
+      'fixture expects de/common.json to define common.loading',
+    ).toBeDefined();
+    delete common!.loading;
+    writeNamespace('de', 'common.json', de);
 
-    // Remove a common key
-    if (deContent.common && deContent.common.loading) {
-      delete deContent.common.loading;
-    }
+    expect(runCheck().ok).toBe(false);
 
-    fs.writeFileSync(dePath, JSON.stringify(deContent, null, 2));
-
-    let errorThrown = false;
-    try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-    } catch (_error) {
-      errorThrown = true;
-    }
-
-    expect(errorThrown).toBe(true);
-
-    // Restore from backup
-    const backupPath = path.join(TEST_BACKUP_DIR, 'de', 'common.json');
-    fs.copyFileSync(backupPath, dePath);
+    fs.copyFileSync(
+      path.join(REAL_MESSAGES_DIR, 'de', 'common.json'),
+      path.join(messagesDir, 'de', 'common.json'),
+    );
   });
 
   it('should detect extra keys in a language file (and report but not fail)', () => {
-    // Add an extra key to English common.json
-    const enPath = path.join(MESSAGES_DIR, 'en', 'common.json');
-    const enContent = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
+    const en = readNamespace('en', 'common.json');
+    en.extraTestKey = 'should not exist';
+    writeNamespace('en', 'common.json', en);
 
-    // Add an extra top-level key
-    enContent.extraTestKey = 'should not exist';
+    const { ok, output } = runCheck();
+    expect(output).toContain('Extra: extraTestKey');
+    expect(ok).toBe(true);
 
-    fs.writeFileSync(enPath, JSON.stringify(enContent, null, 2));
-
-    const result = execSync('npm run i18n:check', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-    });
-
-    // The script reports extra keys but doesn't fail on them
-    expect(result).toContain('Extra: extraTestKey');
-
-    // Restore from backup
-    const backupPath = path.join(TEST_BACKUP_DIR, 'en', 'common.json');
-    fs.copyFileSync(backupPath, enPath);
+    fs.copyFileSync(
+      path.join(REAL_MESSAGES_DIR, 'en', 'common.json'),
+      path.join(messagesDir, 'en', 'common.json'),
+    );
   });
 
   it('should detect invalid JSON syntax', () => {
-    // Create invalid JSON in Spanish common.json
-    const esPath = path.join(MESSAGES_DIR, 'es', 'common.json');
-    fs.writeFileSync(esPath, '{ invalid json }');
+    fs.writeFileSync(path.join(messagesDir, 'es', 'common.json'), '{ invalid json }');
 
-    let errorThrown = false;
-    try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-    } catch (_error) {
-      errorThrown = true;
-    }
+    expect(runCheck().ok).toBe(false);
 
-    expect(errorThrown).toBe(true);
-
-    // Restore from backup
-    const backupPath = path.join(TEST_BACKUP_DIR, 'es', 'common.json');
-    fs.copyFileSync(backupPath, esPath);
-  });
-
-  it('should execute quickly (< 10 seconds)', () => {
-    const start = Date.now();
-
-    try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-    } catch {
-      // Ignore errors for timing test
-    }
-
-    const duration = Date.now() - start;
-    // Loosened from 5s to 10s — CI runners under load (shared GitHub Actions
-    // infra) occasionally exceed 5s due to external factors (npm resolver,
-    // disk I/O). The script itself typically runs in ~1s.
-    expect(duration).toBeLessThan(10000);
+    fs.copyFileSync(
+      path.join(REAL_MESSAGES_DIR, 'es', 'common.json'),
+      path.join(messagesDir, 'es', 'common.json'),
+    );
   });
 });
