@@ -53,8 +53,11 @@ describe('knowledge base provenance headers', () => {
 
   it('declares a source class of A, B, C or D in every file', () => {
     for (const h of headers) {
-      expect(h.sourceClass?.[0], `${h.slug}: missing or invalid "Source class:"`).toMatch(
-        /^[ABCD]$/,
+      // Match the whole value, not its first character: "Classified" starts
+      // with a C and would otherwise pass as class C. Only a bare letter, or a
+      // letter followed by the parenthesised reason the SOP asks for, is valid.
+      expect(h.sourceClass, `${h.slug}: missing or invalid "Source class:"`).toMatch(
+        /^[ABCD](\s+\(.*)?$/,
       );
     }
   });

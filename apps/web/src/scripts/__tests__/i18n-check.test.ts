@@ -19,13 +19,18 @@ import { execSync } from 'child_process';
 const REPO_ROOT = process.cwd();
 const REAL_MESSAGES_DIR = path.join(REPO_ROOT, 'apps', 'web', 'messages');
 const SCRIPT = path.join(REPO_ROOT, 'scripts', 'i18n-check.ts');
+// The repository's own tsx, by absolute path. `npx tsx` resolves against the
+// working directory, which here is a sandbox outside the checkout: npx would
+// find no local install and try to fetch tsx from the registry, so the suite
+// failed wherever there was no network.
+const TSX = path.join(REPO_ROOT, 'node_modules', '.bin', 'tsx');
 
 let sandbox: string;
 let messagesDir: string;
 
 function runCheck(): { ok: boolean; output: string } {
   try {
-    const output = execSync(`npx tsx ${JSON.stringify(SCRIPT)}`, {
+    const output = execSync(`${JSON.stringify(TSX)} ${JSON.stringify(SCRIPT)}`, {
       cwd: sandbox,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -45,7 +50,7 @@ function writeNamespace(locale: string, ns: string, data: unknown): void {
   fs.writeFileSync(path.join(messagesDir, locale, ns), JSON.stringify(data, null, 2));
 }
 
-// Each case shells out to `npx tsx`, which costs seconds on its own and more
+// Each case shells out to tsx, which costs seconds on its own and more
 // when the rest of the suite is competing for CPU. The default 5s timeout is
 // not a meaningful assertion about this script.
 describe('i18n-check script', { timeout: 120_000 }, () => {
@@ -74,7 +79,10 @@ describe('i18n-check script', { timeout: 120_000 }, () => {
   it('should detect missing keys in a language file', () => {
     const de = readNamespace('de', 'common.json');
     const common = de.common as Record<string, unknown> | undefined;
-    expect(common?.loading, 'fixture expects de/common.json to define common.loading').toBeDefined();
+    expect(
+      common?.loading,
+      'fixture expects de/common.json to define common.loading',
+    ).toBeDefined();
     delete common!.loading;
     writeNamespace('de', 'common.json', de);
 
