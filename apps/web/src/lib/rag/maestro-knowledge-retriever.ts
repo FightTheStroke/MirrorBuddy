@@ -14,7 +14,27 @@ import { searchSimilar } from './vector-store';
 
 const SYSTEM_USER_ID = 'SYSTEM_MAESTRO_KB';
 const DEFAULT_LIMIT = 3;
-const MIN_SIMILARITY = 0.5;
+
+/**
+ * Cosine-similarity floor for accepting a chunk.
+ *
+ * Measured 2026-08-18 against the full seeded corpus (241 chunks, 30 maestri,
+ * text-embedding-3-small) with 8 on-topic Italian questions and an off-topic
+ * control ("ricetta della carbonara"):
+ *
+ *   threshold  on-topic retrieved  off-topic leaked
+ *   0.50       1/8                 0/8
+ *   0.40       6/8                 0/8
+ *   0.30       8/8                 0/8
+ *   0.25       8/8                 1/8
+ *
+ * The previous value of 0.50 admitted almost nothing: on-topic top scores ran
+ * 0.30-0.63 (median 0.44), so the retriever returned '' even against a fully
+ * populated index. 0.30 is the lowest floor that still leaked no off-topic
+ * chunk. Caveat: 8 queries in one language is a smoke measurement, not a
+ * benchmark; revisit if the embedding model changes.
+ */
+const MIN_SIMILARITY = 0.3;
 
 export interface MaestroKnowledgeResult {
   content: string;

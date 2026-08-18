@@ -147,3 +147,6 @@ handoff/latest.md
 
 # graphify knowledge graph output (regenerable, ~30k nodes)
 graphify-out/
+
+# Generated didactic content for KB seeding (npm run kb:extract)
+.tmp/

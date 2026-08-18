@@ -6,14 +6,19 @@
  * - didactic content (bulk for RAG seeding)
  *
  * Usage:
- *   npx tsx scripts/extract-mini-kb.ts           # generate files
- *   npx tsx scripts/extract-mini-kb.ts --dry-run  # preview only
+ *   npm run kb:extract                 # regenerate mini-kb + didactic content
+ *   npx tsx scripts/extract-mini-kb.ts --dry-run       # preview only
+ *   npx tsx scripts/extract-mini-kb.ts --didactic-only # leave committed mini-kb untouched
+ *
+ * `--didactic-only` is what the seeding pipeline uses: the mini-kb files are
+ * committed source imported by the maestro definitions, so a seed run must not
+ * silently rewrite them.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
-const MAESTRI_DIR = path.join(__dirname, '../src/data/maestri');
+const MAESTRI_DIR = path.join(__dirname, '../apps/web/src/data/maestri');
 const MINI_KB_DIR = path.join(MAESTRI_DIR, 'mini-kb');
 const DIDACTIC_DIR = path.join(__dirname, '../.tmp/didactic-content');
 const MAX_MINI_KB_LINES = 50;
@@ -173,14 +178,25 @@ ${content}
 
 function main() {
   const dryRun = process.argv.includes('--dry-run');
+  const didacticOnly = process.argv.includes('--didactic-only');
+
+  if (!fs.existsSync(MAESTRI_DIR)) {
+    console.error(`❌ Maestri directory not found: ${MAESTRI_DIR}`);
+    process.exit(1);
+  }
 
   const knowledgeFiles = fs
     .readdirSync(MAESTRI_DIR)
     .filter((f) => f.endsWith('-knowledge.ts'))
     .sort();
 
+  if (knowledgeFiles.length === 0) {
+    console.error(`❌ No *-knowledge.ts files in ${MAESTRI_DIR}`);
+    process.exit(1);
+  }
+
   if (!dryRun) {
-    fs.mkdirSync(MINI_KB_DIR, { recursive: true });
+    if (!didacticOnly) fs.mkdirSync(MINI_KB_DIR, { recursive: true });
     fs.mkdirSync(DIDACTIC_DIR, { recursive: true });
   }
 
@@ -211,8 +227,10 @@ function main() {
     );
 
     if (!dryRun) {
-      const miniKBPath = path.join(MINI_KB_DIR, `${slug}.ts`);
-      fs.writeFileSync(miniKBPath, generateMiniKBFile(slug, miniKB));
+      if (!didacticOnly) {
+        const miniKBPath = path.join(MINI_KB_DIR, `${slug}.ts`);
+        fs.writeFileSync(miniKBPath, generateMiniKBFile(slug, miniKB));
+      }
 
       const didacticPath = path.join(DIDACTIC_DIR, `${slug}.ts`);
       fs.writeFileSync(didacticPath, generateDidacticFile(slug, originalConst || '', didactic));
@@ -225,7 +243,9 @@ function main() {
     `\n${dryRun ? '[DRY RUN] ' : ''}${generated}/${knowledgeFiles.length} maestri processed`,
   );
   if (!dryRun) {
-    console.log(`Mini-KB files: ${MINI_KB_DIR}`);
+    console.log(
+      didacticOnly ? 'Mini-KB files: skipped (--didactic-only)' : `Mini-KB files: ${MINI_KB_DIR}`,
+    );
     console.log(`Didactic files: ${DIDACTIC_DIR}`);
   }
 }
