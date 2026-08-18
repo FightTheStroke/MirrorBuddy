@@ -226,7 +226,7 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Privacy Policy**: Localized for all 5 languages
 - [x] **Cookie Policy**: Localized for all 5 languages (all 9 cookies documented) (all 9 cookies documented)
 - [x] **Accessibility Statement**: Implemented for all 5 languages
-- [x] **AI Transparency Policy**: Localized for all 5 languages (Anthropic Claude + Azure Voice disclosed) (Anthropic Claude + Azure Voice disclosed)
+- [x] **AI Transparency Policy**: Localized for all 5 languages (Azure OpenAI + Azure Voice disclosed; Anthropic Claude disclosure removed 2026-08-18 — see AI-Act tracker P2-4b, no Anthropic code path exists)
 - [x] **DPIA**: Complete and up-to-date
 - [x] **Data Flow Mapping**: Complete
 - [ ] **DPAs**: Processor agreements — NOT YET VERIFIED

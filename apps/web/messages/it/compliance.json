@@ -1333,13 +1333,6 @@
           "title": "Fornitori di Servizi AI e Processori di Dati",
           "intro": "MirrorBuddy utilizza i seguenti fornitori certificati di servizi di intelligenza artificiale per elaborare i dati conversazionali:",
           "vendors": {
-            "anthropic": {
-              "name": "Anthropic (Claude AI)",
-              "dataProcessed": "Testo delle conversazioni educative, contesto delle lezioni, domande e risposte degli studenti",
-              "legalBasis": "Necessità contrattuale (Art. 6.1.b GDPR) - elaborazione necessaria per fornire il servizio educativo personalizzato",
-              "dpaStatus": "Clausole Contrattuali Standard (Standard Contractual Clauses - SCC) approvate dalla Commissione Europea per trasferimenti extra-UE",
-              "dataLocation": "Stati Uniti (USA) con garanzie SCC conformi a GDPR Art. 46"
-            },
             "azureRealtimeVoice": {
               "name": "Microsoft Azure Realtime Voice API",
               "dataProcessed": "Dati audio vocali trasmessi in tempo reale per conversione text-to-speech e speech-to-text. L'audio viene elaborato in modo effimero senza memorizzazione persistente.",
@@ -1483,7 +1476,7 @@
             "item1": "Raccogliamo solo i dati necessari per fornirti il servizio educativo (email, nome, conversazioni, progressi)",
             "item2": "Non vendiamo mai i tuoi dati a terzi e non utilizziamo cookie di tracciamento pubblicitario",
             "item3": "I tuoi dati sono protetti dal GDPR e puoi esercitare i tuoi diritti (accesso, rettifica, cancellazione) in qualsiasi momento",
-            "item4": "I modelli di IA non vengono addestrati sui tuoi dati personali. Microsoft e Anthropic non utilizzano i tuoi dati per il training dei modelli",
+            "item4": "I modelli di IA non vengono addestrati sui tuoi dati personali. Microsoft non utilizza i tuoi dati per il training dei modelli",
             "privacyLink": "Leggi l'Informativa sulla Privacy completa",
             "title": "8. Privacy in Breve"
           },

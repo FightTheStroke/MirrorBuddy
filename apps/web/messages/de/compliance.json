@@ -1223,13 +1223,6 @@
           "title": "KI-Dienstleister und Auftragsverarbeiter",
           "intro": "MirrorBuddy nutzt die folgenden zertifizierten Anbieter von Diensten der künstlichen Intelligenz zur Verarbeitung von Konversationsdaten:",
           "vendors": {
-            "anthropic": {
-              "name": "Anthropic (Claude AI)",
-              "dataProcessed": "Text der Bildungsgespräche, Unterrichtskontext, Fragen und Antworten der Schüler",
-              "legalBasis": "Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b DSGVO) - Verarbeitung notwendig zur Erbringung des personalisierten Bildungsdienstes",
-              "dpaStatus": "Standardvertragsklauseln (SCC), genehmigt von der Europäischen Kommission für Übermittlungen außerhalb der EU",
-              "dataLocation": "Vereinigte Staaten (USA) mit SCC-Garantien gemäß DSGVO Art. 46"
-            },
             "azureRealtimeVoice": {
               "name": "Microsoft Azure Realtime Voice API",
               "dataProcessed": "Sprachaudiodaten, die in Echtzeit für Text-zu-Sprache und Sprache-zu-Text übertragen werden. Audio wird ephemer verarbeitet, ohne dauerhafte Speicherung.",

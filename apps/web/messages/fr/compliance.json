@@ -1240,13 +1240,6 @@
           "title": "Fournisseurs de Services IA et Sous-traitants de Données",
           "intro": "MirrorBuddy utilise les fournisseurs certifiés suivants de services d'intelligence artificielle pour traiter les données conversationnelles :",
           "vendors": {
-            "anthropic": {
-              "name": "Anthropic (Claude AI)",
-              "dataProcessed": "Texte des conversations éducatives, contexte des leçons, questions et réponses des étudiants",
-              "legalBasis": "Nécessité contractuelle (Art. 6.1.b RGPD) - traitement nécessaire pour fournir le service éducatif personnalisé",
-              "dpaStatus": "Clauses Contractuelles Types (CCT) approuvées par la Commission européenne pour les transferts hors UE",
-              "dataLocation": "États-Unis (USA) avec garanties CCT conformes au RGPD Art. 46"
-            },
             "azureRealtimeVoice": {
               "name": "Microsoft Azure Realtime Voice API",
               "dataProcessed": "Données audio vocales transmises en temps réel pour conversion texte-parole et parole-texte. L'audio est traité de manière éphémère sans stockage persistant.",
@@ -1390,7 +1383,7 @@
             "item1": "Nous collectons uniquement les données nécessaires pour vous fournir le service éducatif (email, nom, conversations, progrès)",
             "item2": "Nous ne vendons jamais vos données à des tiers et nous n'utilisons pas de cookies de suivi publicitaire",
             "item3": "Vos données sont protégées par le RGPD et vous pouvez exercer vos droits (accès, rectification, suppression) à tout moment",
-            "item4": "Les modèles d'IA ne sont pas entraînés sur vos données personnelles. Microsoft et Anthropic n'utilisent pas vos données pour l'entraînement des modèles",
+            "item4": "Les modèles d'IA ne sont pas entraînés sur vos données personnelles. Microsoft n'utilise pas vos données pour l'entraînement des modèles",
             "privacyLink": "Lien Confidentialité",
             "title": "8. Confidentialité en Bref"
           },
