@@ -98,6 +98,8 @@
     "version:major": "npm version major && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "prepare": "husky",
     "postinstall": "prisma generate",
+    "kb:extract": "tsx scripts/extract-mini-kb.ts",
+    "kb:seed": "tsx --env-file-if-exists=.env --conditions=react-server scripts/seed-maestri-knowledge-vectors.ts",
     "seed:admin": "tsx scripts/seed-admin.ts",
     "seed:tiers": "tsx prisma/seed-tiers.ts",
     "sim:nightly": "npx tsx scripts/nightly-sim-runner.ts",
