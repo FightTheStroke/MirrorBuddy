@@ -120,62 +120,48 @@ Entrata nel vocabolario Zingarelli nel 2015.
 - **Per due** - chiusura tipica
 - **Blinda** - parola inventata
 
-### Citazioni
-- "Tarapia tapioco! Prematurata la supercazzola, o scherziamo? No, mi permetta,
-   alla fine scappellamento a destra per due!" (al vigile)
-- "Tarapia tapioco come se fosse antani con la supercazzola prematurata
-   con lo scappellamento a destra"
-- "Endovenosa, sorella? Eccomi pronto, grazie!"
-- "Sii astuto come un cervo!" - "Che bischerate tu dici? Il cervo non e' astuto,
-   semmai la volpe!"
+### Come si Costruisce
+Una supercazzola non si impara a memoria: si costruisce sul momento.
+La ricetta e sempre la stessa, e serve a tenere il tono di una conversazione
+mentre il contenuto evapora.
+
+1. Apri con sicurezza assoluta, come se stessi citando una norma
+2. Infila due o tre parole inventate ma dal suono tecnico
+3. Aggiungi un connettivo vero ("come se fosse", "o scherziamo")
+4. Chiudi con una precisazione numerica, che non precisa niente
+
+Il gioco funziona perche l'italiano regge la frase anche quando le parole
+non significano nulla: e una lezione di sintassi travestita da scherzo.
 
 ## Relazioni Chiave
 
-- **Titti** = giovane AMANTE del Mascetti (Silvia Dionisio)
-- **Alice** = MOGLIE del Mascetti (Milena Vukotic)
-- Il padre di Titti (colonnello) scopre la relazione e lo dice ad Alice
-- Alice tenta il suicidio col gas (ma il gas e finito)
-- Alice muore prima dell'Atto III
-- **Carmen** = moglie di Necchi (lo tradisce in Atto II)
-- **Donatella** = moglie "psicopatica" del Sassaroli
+I cinque amici hanno famiglie che restano ai margini della loro amicizia: e
+proprio quel disinteresse a rendere il gruppo insieme buffo e spietato. La
+trama sentimentale del film non serve a questo Maestro e non viene ripresa.
 
-## Citazioni Famose
+## Temi Ricorrenti
 
-### Perozzi sul Genio
-"Che cos'e' il genio? E' fantasia, intuizione, colpo d'occhio e velocita' d'esecuzione."
-(Giorgio Perozzi spiega il genio mentre prepara una zingarata)
+### Il Genio come Velocita
+Nel film il genio non e erudizione: e fantasia e prontezza, la capacita di
+vedere l'occasione un attimo prima degli altri. E la stessa qualita che serve
+a improvvisare uno scherzo e a rispondere a una domanda difficile.
 
-### Mascetti sull'Appartamento
-"L'appartamento? E' un bilocale in condizioni di estrema indigenza. Nell'entrare si
-nota un odore leggermente putrescente che tuttavia non contrasta con lo squallore
-dell'insieme."
+### La Poverta Raccontata con Eleganza
+Il personaggio del Conte ha perso tutto e descrive la propria miseria con il
+lessico di un catalogo immobiliare. Il divario fra le parole scelte e la realta
+che descrivono e il motore comico, e insegna quanto pesa il registro.
 
-### Sulla Vecchiaia
-"La vecchiaia e' una brutta bestia. Non risparmia nessuno."
+### La Vecchiaia
+La saga guarda l'invecchiare senza consolazione e senza disperazione: e una
+brutta cosa che capita a tutti, e l'unica risposta praticabile e restare in
+compagnia.
 
-### Sul Miracolo della Torre
-"E' un miracolo! Si raddrizza!" (Zingarata all'usuraio Capogreco a Pisa)
+## Cosa Resta alla Fine
 
-### Sull'Ospizio
-"Non e' un ospizio, e' un residence per la terza eta'."
-
-## Atto III - Dettagli Aggiuntivi
-
-### Il Finto Volo al Polo Nord
-Gli amici convincono i vecchietti dell'ospizio di essere su un aereo
-diretto al Polo Nord, usando un furgone frigorifero e ventilatori.
-
-### Melandri e Amalia
-Melandri si innamora di Amalia Pecci Bonetti (dalle "due cognomi e gli
-occhi azzurri"), scoprendo pero' che lei ha numerosi amanti nella struttura.
-
-### La Fuga al Mare
-Nel finale, Mascetti fugge dall'ospizio con gli amici per andare al mare.
-Momento di liberta' e amicizia prima della fine.
-
-### L'Ultimo Tentativo al Treno
-Mascetti, sulla sedia a rotelle, usa una siringa piena di inchiostro
-invece degli schiaffi. Ma i passeggeri si vendicano colpendo gli amici.
+L'ultimo capitolo della saga porta i personaggi alla vecchiaia e alla malattia
+senza cambiarli: continuano a organizzare scherzi con i mezzi ridotti che hanno.
+E questo, non la singola burla, il motivo per cui il gruppo e diventato
+proverbiale in Italia.
 
 ## Glossario
 
@@ -197,7 +183,6 @@ invece degli schiaffi. Ma i passeggeri si vendicano colpendo gli amici.
 
 ## Tema del Film
 
-"Ma poi e' proprio obbligatorio essere qualcuno?"
 Il film rappresenta la fase finale della commedia all'italiana.
 L'amicizia come rifugio dalla tristezza della vita, le zingarate
 come ribellione al grigiore quotidiano.

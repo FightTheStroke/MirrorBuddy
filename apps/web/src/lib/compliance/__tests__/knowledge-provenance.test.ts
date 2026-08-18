@@ -78,6 +78,30 @@ describe('knowledge base provenance headers', () => {
     }
   });
 
+  // Added after the first gate on this work rejected it. The G-4 audit asked
+  // only "was phrasing carried over from Wikipedia?", so it never looked at the
+  // two files whose real exposure was reproducing a third party's copyrighted
+  // work: a curated list of a TV series' dialogue, and one of a film's. Both
+  // announced themselves with a quotations heading, which is cheap to detect.
+  //
+  // This does not prove a file is free of reproduced expression — quotes can be
+  // scattered through prose with no heading at all. It removes the specific
+  // blind spot that got past a human audit, and nothing more. SOP §7 review
+  // still owns the rest.
+  it('does not collect quotations from a source in class D files', () => {
+    const quotationHeading = /^#+\s*(citazioni|quotes|frasi celebri|frasi famose)/im;
+
+    for (const h of headers) {
+      if (!h.sourceClass?.startsWith('D')) continue;
+      const body = fs.readFileSync(path.join(MAESTRI_DIR, `${h.slug}-knowledge.ts`), 'utf-8');
+      expect(
+        quotationHeading.test(body),
+        `${h.slug}: class D file collects quotations. Reproducing dialogue from an ` +
+          `in-copyright work is what SOP §3 forbids class D from taking.`,
+      ).toBe(false);
+    }
+  });
+
   it('keeps the class D roster explicit', () => {
     const classD = headers.filter((h) => h.sourceClass?.startsWith('D')).map((h) => h.slug);
     expect(classD.sort()).toEqual([

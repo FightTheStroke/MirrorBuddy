@@ -40,27 +40,32 @@ Riconoscimenti:
 - Co-fondatore e co-editore dell'European Journal of International Law
 - Fondatore del Journal of International Criminal Justice
 
-## Citazioni Famose
+## Idee Ricorrenti
 
-"I diritti umani sono una grande conquista dell'homo societatis sull'homo biologicus."
+Le sue posizioni, riassunte con parole nostre. Cassese e morto nel 2011 e i suoi
+scritti sono tutelati: citarlo alla lettera e legittimo se la citazione e breve,
+serve a spiegare o discutere, e indica l'opera da cui proviene. Finche non
+verifichiamo quelle fonti una per una, qui non riportiamo virgolettati.
 
-"I diritti umani si conquistano e riconquistano giorno per giorno.
-Ognuno facendo la propria parte."
+### I Diritti Umani come Conquista, non come Dato
+Per Cassese i diritti umani non discendono dalla natura biologica dell'uomo ma
+sono una costruzione della societa, ottenuta contro resistenze e mai acquisita
+una volta per tutte. Da qui la sua insistenza sul fatto che vadano difesi ogni
+giorno, e da chiunque, non solo dagli specialisti.
 
-"We are going to make mistakes, of course. But let them be new mistakes, not old ones."
+### La Responsabilita e Individuale
+La sua tesi piu influente nel diritto penale internazionale: chiamare a
+rispondere la singola persona, e non soltanto lo Stato, previene meglio le
+violazioni future e rende piu giustizia alle vittime. E il principio che ha
+guidato il suo lavoro come primo presidente del Tribunale per l'ex Jugoslavia.
 
-"I still believe that only those problems that dramatically affect the daily life
-of human beings are worth studying."
+### Studiare Cio che Incide sulla Vita delle Persone
+Rivendicava un criterio di rilevanza per la ricerca giuridica: vale la pena
+studiare i problemi che cambiano concretamente la vita quotidiana delle persone.
 
-"E' necessario un grande esercito, senza pero' generali, strateghi o condottieri.
-Un esercito composto da un popolo minuto, da persone che intervengano in mille modi,
-a piu' livelli, in una paziente e oscura azione quotidiana."
-
-"Guai a non urlare abbastanza forte da farsi sentire, a subire inerti."
-
-"Individual criminal liability is more effective than State responsibility
-for the purpose of both preventing future violations and alleviating
-the suffering of the victims."
+### L'Errore Nuovo
+Accettava l'errore come prezzo di un'istituzione che nasce, a una condizione:
+che fosse un errore nuovo, non la ripetizione di uno gia commesso.
 
 ## Sentenze Fondamentali (ICTY)
 

@@ -10,20 +10,21 @@
 export const SIMONE_KNOWLEDGE = `
 ## Biografia
 
-Simone Barlaam e nato a Milano il 12 luglio 2000 ed e uno dei nuotatori piu titolati
-del movimento paralimpico italiano.
+Simone Barlaam nuota per la nazionale italiana ed e uno degli atleti piu
+titolati del movimento paralimpico. Nasce a Milano il 12 luglio 2000.
 
-La sua gamba destra e piu corta per una malformazione congenita dell'anca e del femore.
-L'infanzia e stata scandita da una lunga serie di operazioni, la prima pochissimi giorni
-dopo la nascita, e da una seria infezione ossea che a cinque anni ha messo in pericolo
-l'arto. In quegli anni l'acqua e stato l'unico posto dove poteva muoversi senza rischiare
-di farsi male: e li che il nuoto e entrato nella sua vita, prima come terapia e poi come
-mestiere.
+Gareggia nella categoria S9, quella di chi ha una limitazione funzionale a un
+arto: nel suo caso la gamba destra, per una malformazione congenita. E un dato
+tecnico prima che clinico, perche e la classificazione che decide contro chi
+gareggia, e Simone stesso parla della sua disabilita in questi termini.
 
-Arriva allo sport agonistico passando dal paratriathlon, dove gareggia da ragazzino,
-e sceglie il nuoto poco dopo. La svolta e l'ingresso nella societa Polha Varese, dove si
-allena accanto ad atleti di vertice come Federico Morlacchi sotto la guida del tecnico
-federale Massimiliano Tosin.
+Quello che conta nel suo percorso e come si allena. Arriva al nuoto per via
+indiretta, passando dal paratriathlon da ragazzino, e sceglie la vasca poco
+dopo. Alla Polha Varese trova il gruppo che lo porta ai vertici: si allena
+accanto ad atleti come Federico Morlacchi, sotto la guida del tecnico federale
+Massimiliano Tosin. Da li in avanti la sua storia e fatta di volumi di
+allenamento, tempi di passaggio e finali, come quella di qualunque atleta di
+vertice.
 
 ## Palmarès
 
@@ -46,24 +47,28 @@ federale Massimiliano Tosin.
 - Ambrogino d'oro (2019)
 - Commendatore ordine al merito della Repubblica Italiana (2021)
 
-## Citazioni Famose
+## Idee che Porta in Vasca
 
-"Le mie gambe di cristallo mi hanno lasciato l'acqua come unica possibilita di sport
-e a me piace, e un elemento che mi fa sentire leggero e agile."
+Simone Barlaam e una persona vivente e queste non sono sue parole: sono i temi
+che ha espresso pubblicamente, riassunti da noi. Riportarlo fra virgolette
+richiederebbe indicare l'intervista da cui la frase proviene, e non le abbiamo
+verificate una per una.
 
-"Finalmente ho piu medaglie degli interventi che ho fatto."
+### L'acqua come elemento, non come ripiego
+Racconta il nuoto come il posto dove si sente leggero e agile. Non lo presenta
+come la scelta che gli restava, ma come quella che gli somiglia.
 
-"Il Nuoto e la mia Vita, mi ha aiutato ad essere quello che sono adesso."
+### Contare le medaglie, non gli interventi
+Uno dei suoi modi ricorrenti di raccontarsi e ribaltare il bilancio: gli anni di
+ospedale ci sono stati, ma non sono la voce principale del conto.
 
-"Aprirsi con il prossimo, non nascondersi, e chiedere aiuto se si ha bisogno."
+### Chiedere aiuto e una competenza
+Insiste sul non nascondersi e sul chiedere aiuto quando serve, e parla
+apertamente di quanto gli sia pesata la solitudine del lockdown.
 
-"Ti scalda il cuore, ti riempie d'orgoglio, condividere momenti speciali."
-
-"Quando ho visto persone sconosciute che credevano in me...
-Hanno riacceso una lampadina che si era spenta da un po'."
-
-Dopo una sconfitta, al vincitore: "Se l'e meritata. Gli mancava l'oro,
-ci sperava tanto e sono contento per lui."
+### Riconoscere l'avversario
+Dopo una sconfitta riconosce pubblicamente il merito di chi ha vinto, senza
+cercare attenuanti.
 
 ## Aneddoti
 

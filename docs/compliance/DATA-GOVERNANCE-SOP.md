@@ -80,9 +80,14 @@ misrepresentation. It is the class that most needs a human decision, not a rule.
 
 1. **Write it yourself.** A knowledge file states facts in MirrorBuddy's own words. Never
    paste a source's sentences, not even "temporarily".
-2. **Quotation is deliberate and short.** A quotation is allowed when the _wording itself_
-   is the teaching object (a famous line, an aphorism). It must be attributed inline, kept
-   to what the point requires, and never used to substitute for our own explanation.
+2. **Quotation is deliberate, short and attributed.** A quotation is allowed when the
+   _wording itself_ is the teaching object (a famous line, an aphorism). It must be
+   attributed inline, kept to what the point requires, and never used to substitute for
+   our own explanation. An unattributed quotation has no defence under art. 70 LdA or the
+   EU quotation exception, however short it is. In **class D** files — in-copyright works,
+   living persons, characters — a collected list of quotations is forbidden outright and
+   is blocked by `knowledge-provenance.test.ts`; this rule was broken by four files until
+   the G-4b review in §6.1, so it is now enforced rather than trusted.
 3. **Name every source in the file header**, using the format in §5. A file with no
    provenance cannot be seeded.
 4. **No Class B expression, ever.** Wikipedia is a starting point for facts, never a
@@ -163,14 +168,55 @@ strongest evidence available. It does not establish that no phrasing anywhere de
 from Wikipedia; it establishes that the passages most at risk were examined and the
 derivative ones removed.
 
+**G-4b — reproduction of third-party works.** The G-4 check above asked only
+"was phrasing carried over from Wikipedia?". That was the wrong question for the
+files that carried the most risk, and the first review of this work rejected it
+for exactly that reason. Wikipedia was never the issue for a Maestro built on a
+television series: the series was.
+
+Re-run with "does this file reproduce a third party's protected expression?" as
+the criterion, five files failed:
+
+| File                                                 | What was reproduced                                                                                                                                                                                                          | Action                                                                                                                                                                                                         |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `alex-pina`                                          | A curated list of _La Casa de Papel_ dialogue in Spanish and Italian, the named character roster with in-character descriptions, grammar examples voiced by those characters, and instructions to the model to speak as them | Dialogue and character voicing removed. Facts about Pina and his series kept — naming a work is not taking it. The Spanish itself is ordinary Spanish and stays                                                |
+| `amici-miei`                                         | Verbatim dialogue from the 1975 Monicelli film, including the supercazzola lines, plus detailed plot and character relationships                                                                                             | Quotations replaced with an explanation of how the device is built, which is the part that actually teaches Italian syntax. The film's lexicon that entered the Zingarelli dictionary stays: it is now Italian |
+| `cassese`                                            | Seven unattributed verbatim quotations from a jurist who died in 2011                                                                                                                                                        | Replaced with his positions in our words                                                                                                                                                                       |
+| `simone`                                             | Six unattributed quotations from a living athlete, presented as his voice                                                                                                                                                    | Replaced with the themes he has expressed publicly, in our words                                                                                                                                               |
+| `alex-pina.ts` (persona prompt, outside this corpus) | Series catchphrases as the Maestro's own                                                                                                                                                                                     | Replaced. Fixing the knowledge file alone would have left the same output reachable                                                                                                                            |
+
+Quotation is not forbidden. Italian law (art. 70 LdA) and the EU InfoSoc
+directive allow it when it is short, serves explanation or criticism, and
+**names the work it comes from**. What these four files did was quote at length
+with no attribution at all, which is the one form that has no defence. Where the
+quotations were worth keeping, the SOP's answer is to source them properly, not
+to launder them into paraphrase; that path is recorded in each file.
+
+**Why class C files were left alone.** Six class C files carry quotation
+sections — `cervantes`, `goethe`, `manzoni`, `moliere`, `omero`, `shakespeare`.
+Every one quotes an author whose works are in the public domain. Quoting them is
+lawful and is the substance of teaching literature. The C/D boundary turned out
+to be exactly the right line for this rule, which is why the automated guard
+draws it there.
+
 **G-5 — automated check.** `apps/web/src/lib/compliance/__tests__/knowledge-provenance.test.ts`
 fails the build when a knowledge file has no sources, no source class, a class D file
-carries no named sign-off, or the class D roster changes without being declared. Proven by
-mutation on all three evasions: removing a `Sources:` line, downgrading a class D sign-off
-to `n/a`, and relabelling a class D file as class C to dodge the sign-off requirement.
+carries no named sign-off, the class D roster changes without being declared, or a class D
+file collects quotations from its source. Proven by mutation on all four evasions:
+removing a `Sources:` line, downgrading a class D sign-off to `n/a`, relabelling a class D
+file as class C to dodge the sign-off requirement, and adding a quotations section to a
+class D file.
+
+The quotations rule earns its place: it was written after the G-4b review and immediately
+found two files — `cassese` and `simone` — that the human review had not flagged.
+
+It does not prove a file is free of reproduced expression. Quotations scattered through
+prose under no heading pass it. It removes the specific blind spot that got past a human
+audit, and claims nothing more.
 
 The rule the test cannot enforce is §4: that the words are ours. That still rests on
-review, which is why the cadence in §7 exists.
+review, which is why the cadence in §7 exists — and G-4b is the evidence that the review
+has to ask the right question, not merely be performed.
 
 G-6 was an operational break, not an IP one — but it means the provenance controls in this SOP currently govern content that is not being served from the vector store; the rest are **documentation and review gaps, not known infringements**: the corpus is
 authored in-house and every file but one names its references.
