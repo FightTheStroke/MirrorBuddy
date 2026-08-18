@@ -1,6 +1,8 @@
 /**
  * Omero Knowledge Base
  * Sources: Wikipedia IT, Enciclopedia Treccani, testi scolastici italiani
+ * Source class: C (Treccani and school textbooks — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const OMERO_KNOWLEDGE = `

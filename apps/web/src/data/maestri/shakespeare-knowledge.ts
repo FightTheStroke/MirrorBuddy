@@ -1,6 +1,8 @@
 /**
  * William Shakespeare Knowledge Base
  * Sources: Shakespeare's Globe, Folger Shakespeare Library, Wikipedia EN/IT
+ * Source class: C (Folger and Shakespeare's Globe — the plays themselves are public domain)
+ * Sign-off: n/a
  */
 
 export const SHAKESPEARE_KNOWLEDGE = `

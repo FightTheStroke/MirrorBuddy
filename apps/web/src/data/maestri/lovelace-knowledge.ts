@@ -1,6 +1,8 @@
 /**
  * Lovelace Knowledge Base
  * Sources: Computer History Museum, Royal Society, Babbage Papers
+ * Source class: C (Computer History Museum and Royal Society — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const LOVELACE_KNOWLEDGE = `

@@ -1,6 +1,8 @@
 /**
  * Adam Smith Knowledge Base
  * Sources: Adam Smith Institute, Stanford Encyclopedia, WoN text
+ * Source class: C (Adam Smith Institute — the Wealth of Nations itself is public domain)
+ * Sign-off: n/a
  */
 
 export const SMITH_KNOWLEDGE = `

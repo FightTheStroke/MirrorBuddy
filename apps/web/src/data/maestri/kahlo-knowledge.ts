@@ -2,6 +2,8 @@
  * Frida Kahlo Knowledge Base
  * Sources: Herrera's biography, Kahlo's own diary and letters, and the
  * catalogue of the 143 surviving paintings.
+ * Source class: C (Herrera's biography — facts re-expressed only)
+ * Sign-off: n/a
  *
  * Deliberately omitted: the clinical detail of her injuries and operations,
  * her miscarriages, and her marital history. None of it is needed to teach a

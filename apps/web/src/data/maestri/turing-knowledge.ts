@@ -2,6 +2,8 @@
  * Turing Knowledge Base
  * Sources: Turing's 1936 and 1950 papers, Hodges' biography, the 2013 royal
  * pardon and the 2017 "Turing's Law".
+ * Source class: C (Hodges' biography — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const TURING_KNOWLEDGE = `

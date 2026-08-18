@@ -1,6 +1,8 @@
 /**
  * Leonardo Knowledge Base
  * Sources: Leonardo da Vinci Museum, Royal Collection Trust, Codices
+ * Source class: C (Royal Collection Trust and museum catalogues — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const LEONARDO_KNOWLEDGE = `

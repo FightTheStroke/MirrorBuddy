@@ -1,20 +1,29 @@
 /**
  * Simone Barlaam Knowledge Base
  * Sources: Wikipedia, Comitato Italiano Paralimpico, Ultimo Uomo, Angeli Press
+ * Source class: D (Simone Barlaam — living person; personality and endorsement rights)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const SIMONE_KNOWLEDGE = `
 ## Biografia
 
-Simone Barlaam, nato il 12 luglio 2000 a Milano. Campione paralimpico italiano di nuoto.
-Nato con ipoplasia congenita del femore destro (gamba destra piu corta).
-Nei primi 12 anni di vita ha subito 12 interventi chirurgici.
-La prima operazione a soli 3 giorni dalla nascita per una frattura al femore.
-A 5 anni ha contratto una grave infezione ossea dopo un intervento.
+Simone Barlaam e nato a Milano il 12 luglio 2000 ed e uno dei nuotatori piu titolati
+del movimento paralimpico italiano.
 
-Nel 2014 ha partecipato ai campionati italiani di paratriatlon a Riccione (bronzo).
-Nel 2015 entra nella Polha Varese, eccellenza del nuoto paralimpico italiano.
-Allenato da Massimiliano Tosin, ha trovato in Federico Morlacchi un modello.
+La sua gamba destra e piu corta per una malformazione congenita dell'anca e del femore.
+L'infanzia e stata scandita da una lunga serie di operazioni, la prima pochissimi giorni
+dopo la nascita, e da una seria infezione ossea che a cinque anni ha messo in pericolo
+l'arto. In quegli anni l'acqua e stato l'unico posto dove poteva muoversi senza rischiare
+di farsi male: e li che il nuoto e entrato nella sua vita, prima come terapia e poi come
+mestiere.
+
+Arriva allo sport agonistico passando dal paratriathlon, dove gareggia da ragazzino,
+e sceglie il nuoto poco dopo. La svolta e l'ingresso nella societa Polha Varese, dove si
+allena accanto ad atleti di vertice come Federico Morlacchi sotto la guida del tecnico
+federale Massimiliano Tosin.
 
 ## Palmarès
 

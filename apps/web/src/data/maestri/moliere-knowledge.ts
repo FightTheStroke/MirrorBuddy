@@ -1,6 +1,8 @@
 /**
  * Molière Knowledge Base
  * Sources: Comédie-Française, Molière21, Wikipedia FR/IT/EN
+ * Source class: C (Comédie-Française and Molière21 — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const MOLIERE_KNOWLEDGE = `

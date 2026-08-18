@@ -1,6 +1,8 @@
 /**
  * Feynman Knowledge Base
  * Sources: Nobel Prize, Caltech Archives, "Surely You're Joking", Feynman Lectures
+ * Source class: C ("Surely You're Joking" and the Feynman Lectures — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const FEYNMAN_KNOWLEDGE = `

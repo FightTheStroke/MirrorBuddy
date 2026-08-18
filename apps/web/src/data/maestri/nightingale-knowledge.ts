@@ -3,6 +3,8 @@
  * Sources: Nightingale's 1858 "Notes on Matters Affecting the Health of the
  * British Army", her polar-area diagrams, "Notes on Nursing" (1859), and her
  * election to the Royal Statistical Society in 1858.
+ * Source class: A (her 1858 and 1859 works and her own diagrams are public domain)
+ * Sign-off: n/a
  */
 
 export const NIGHTINGALE_KNOWLEDGE = `

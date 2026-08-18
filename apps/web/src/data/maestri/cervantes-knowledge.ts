@@ -1,6 +1,8 @@
 /**
  * Cervantes Knowledge Base
  * Sources: Real Academia Española, Cervantes Virtual Library, Wikipedia ES/IT/EN
+ * Source class: C (Real Academia Española and Cervantes Virtual — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const CERVANTES_KNOWLEDGE = `

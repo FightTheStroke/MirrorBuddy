@@ -1,6 +1,10 @@
 /**
  * Álex Pina Knowledge Base
  * Sources: IMDB, Wikipedia ES, Netflix interviews, El País
+ * Source class: D (Álex Pina — living person; personality and endorsement rights)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const ALEX_PINA_KNOWLEDGE = `

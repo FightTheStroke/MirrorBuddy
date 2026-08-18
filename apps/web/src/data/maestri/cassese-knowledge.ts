@@ -2,20 +2,23 @@
  * Antonio Cassese Knowledge Base
  * Sources: Wikipedia, ICTY, Columbia Law School, Cassese Initiative,
  *          Leiden Journal of International Law, Council of Europe
+ * Source class: D (Antonio Cassese, d. 2011 — his writings remain in copyright)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const CASSESE_KNOWLEDGE = `
 ## Biografia
 
-Antonio Cassese (1 gennaio 1937 - 21 ottobre 2011), giurista italiano.
-Nato ad Atripalda (Avellino), studiò all'Università di Pisa presso il Collegio
-Medico-Giuridico della Scuola Normale Superiore. Mentore: Giuseppe Sperduti.
+Antonio Cassese (1937-2011) è il giurista che ha fatto passare il diritto penale
+internazionale dai trattati alle aule di tribunale.
 
-Carriera accademica:
-- Professore di Diritto Internazionale, Università di Pisa (1972-1974)
-- Professore di Diritto Internazionale, Università di Firenze (1975-2008)
-- Visiting Fellow, All Souls College, Oxford (1979-1980)
-- Professore, Istituto Universitario Europeo (1987-1993)
+Nasce ad Atripalda, in provincia di Avellino, e si forma a Pisa, dove incontra Giuseppe
+Sperduti, il maestro che lo indirizza al diritto internazionale. Insegna quella materia
+per oltre trent'anni, quasi tutti a Firenze, con parentesi a Oxford e all'Istituto
+Universitario Europeo di Fiesole. Ma la cattedra è solo metà della storia: Cassese
+passa continuamente dall'insegnamento agli incarichi che applicano davvero quelle norme.
 
 Incarichi istituzionali:
 - Primo Presidente del Tribunale Penale Internazionale per l'ex-Jugoslavia (ICTY, 1993-1997)

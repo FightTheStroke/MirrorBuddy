@@ -1,6 +1,10 @@
 /**
  * Chris Knowledge Base
  * Sources: TED Talks, Carmine Gallo, Nancy Duarte, Garr Reynolds
+ * Source class: D (TED speakers and authors who are living people)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const CHRIS_KNOWLEDGE = `

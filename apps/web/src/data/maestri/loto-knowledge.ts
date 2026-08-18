@@ -3,6 +3,13 @@
  *
  * The practices he can actually guide, written so that every one of them works
  * for a student who cannot sit upright, cannot walk, or cannot speak on cue.
+ * Sources: plumvillage.org, the public teachings of the Plum Village tradition,
+ *          and MirrorBuddy's own adaptation of those practices for students with
+ *          limited mobility or speech.
+ * Source class: D (Thich Nhat Hanh, d. 2022 — works in copyright, Plum Village is a trademark)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const LOTO_KNOWLEDGE = `

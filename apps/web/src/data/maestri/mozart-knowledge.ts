@@ -1,6 +1,8 @@
 /**
  * Mozart Knowledge Base
  * Sources: Mozart Museum Salzburg, Grove Music Online, Letters
+ * Source class: C (Grove Music Online — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const MOZART_KNOWLEDGE = `

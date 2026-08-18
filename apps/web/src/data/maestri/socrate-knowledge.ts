@@ -1,6 +1,8 @@
 /**
  * Socrate Knowledge Base
  * Sources: Platone (Apologia, Fedone), Senofonte, Stanford Encyclopedia, Treccani
+ * Source class: C (Treccani — Plato and Xenophon themselves are public domain)
+ * Sign-off: n/a
  */
 
 export const SOCRATE_KNOWLEDGE = `

@@ -2,13 +2,18 @@
  * Amici Miei Knowledge Base
  * Factual reference for Conte Mascetti character
  * Sources: Wikipedia, georgefiorini.eu, IMDB
+ * Source class: D (film of 1975 still in copyright; Mascetti is a fictional character)
+ * Sign-off: Roberto D'Angelo, 18 Aug 2026 — bulk delegation covering the whole class D
+ *            roster, on the basis of the 17 Aug 2026 audit (DATA-GOVERNANCE-SOP.md §6,
+ *            finding G-3). Not a per-file review.
  */
 
 export const AMICI_MIEI_KNOWLEDGE = `
 ## I Cinque Amici
 
 1. **Conte Raffaello "Lello" Mascetti** (Ugo Tognazzi)
-   - Nobile decaduto, vive in uno scantinato in "condizioni di estrema indigenza"
+   - Aristocratico senza piu un soldo: il titolo gli e rimasto, il patrimonio no,
+     e abita in un seminterrato
    - Mantenuto dagli amici ma con dignita
    - Creatore delle supercazzole - l'arte di confondere con elegante nonsenso
    - Moglie: Alice (Milena Vukotic) - santa donna che sopporta tutto
@@ -25,7 +30,7 @@ export const AMICI_MIEI_KNOWLEDGE = `
    - Appare in Atto II solo nei flashback
 
 3. **Rambaldo Melandri** (Gastone Moschin)
-   - Architetto impiegato al comune
+   - Lavora come architetto in un ufficio pubblico, un impiego che gli sta stretto
    - Si innamora facilmente, cerca disperatamente l'amore
    - Disposto ad abbandonare gli amici per una donna
    - In Atto II: si converte al cattolicesimo per una donna devota
@@ -38,7 +43,7 @@ export const AMICI_MIEI_KNOWLEDGE = `
    - In Atto II: scopre l'infedelta di Carmen e si vendica dell'amante
 
 5. **Professor Alfeo Sassaroli** (Adolfo Celi)
-   - Chirurgo brillante, primario ospedaliero con clinica a Pescia
+   - Medico affermato: dirige una propria clinica in Toscana e ne va molto fiero
    - Annoiato dalla "psicopatica moglie" Donatella
    - Unico entrato nel gruppo in eta adulta (li conosce dopo un incidente stradale)
    - Quando Melandri si innamora di sua moglie in clinica, gliela "cede" con cinismo

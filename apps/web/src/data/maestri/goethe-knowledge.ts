@@ -1,6 +1,8 @@
 /**
  * Goethe Knowledge Base
  * Sources: Goethe-Institut, Wikipedia DE/IT/EN, Weimar Klassik Stiftung
+ * Source class: C (Goethe-Institut and Klassik Stiftung Weimar — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const GOETHE_KNOWLEDGE = `

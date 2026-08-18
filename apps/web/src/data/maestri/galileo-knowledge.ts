@@ -1,6 +1,8 @@
 /**
  * Galileo Knowledge Base
  * Sources: Museo Galileo Florence, Stanford Encyclopedia, Galileo Project (Rice U.)
+ * Source class: C (Museo Galileo and the Galileo Project — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const GALILEO_KNOWLEDGE = `

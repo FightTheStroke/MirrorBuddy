@@ -3,6 +3,8 @@
  * Sources: Noether's 1918 paper on invariant variational problems, Dick's
  * biography, Einstein's 1935 letter to the New York Times, and the records of
  * her unpaid years at Göttingen.
+ * Source class: C (Dick's biography — the 1918 paper itself is public domain)
+ * Sign-off: n/a
  */
 
 export const NOETHER_KNOWLEDGE = `
