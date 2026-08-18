@@ -160,22 +160,47 @@ npm run kb:extract -- --didactic-only
 # 2. Chunk, embed and persist into pgvector.
 npm run kb:seed -- --dry-run     # counts chunks, no embeddings, no writes
 npm run kb:seed                  # local database
-npm run kb:seed -- --yes         # required for any non-local host
 npm run kb:seed -- --maestro=feynman
+
+# Production. NODE_ENV=production is not optional: without it the client rewrites a
+# Supabase URL to local PostgreSQL, and the run would report success having written
+# nothing to production. The seeder refuses that combination rather than let it pass.
+NODE_ENV=production npm run kb:seed -- --yes
 ```
 
 Requirements: `DATABASE_URL`, plus `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_API_KEY` and
-`AZURE_OPENAI_EMBEDDING_DEPLOYMENT`. The seeder refuses a non-local database without
-`--yes`, because the repo's `.env` points at production Supabase.
+`AZURE_OPENAI_EMBEDDING_DEPLOYMENT`. `npm run kb:seed` reads `.env` if one is present.
 
-The run is idempotent per maestro: it deletes that maestro's rows before re-inserting, so
-re-running updates the corpus instead of duplicating it. It ends with a verification pass
-that fails the run if no rows were written or if any row lacks a native vector — the two
-states that previously produced a silent empty index.
+Three targeting guards run before anything is written, because a seed run that quietly
+writes to the wrong database is worse than one that refuses to start:
+
+1. The **effective** target is resolved the same way `packages/db/src/client.ts` resolves
+   it, and both the declared and the effective host are printed.
+2. A non-local effective host is refused without `--yes`.
+3. `--yes` together with a remote `DATABASE_URL` that would be rewritten to local is
+   refused outright — that is the failure mode where production looks seeded and is not.
+   The open connection is then confirmed against the approved target before the first
+   write.
+
+The run is idempotent per maestro. Every chunk is embedded **before** any row is deleted,
+so a provider timeout or rate limit leaves the existing corpus untouched instead of
+half-replaced. Rows stored under a `sourceId` that is not a registered maestro are pruned:
+the retriever can never return them, and they are the fingerprint of a knowledge file
+seeded under its file slug instead of its runtime ID.
+
+It ends with a verification pass that fails the run if no rows were written or if any row
+lacks a native vector — the two states that previously produced a silent empty index.
+
+**Slug is not always the maestro ID.** `amici-miei-knowledge.ts` carries the Conte
+Mascetti persona, which the runtime serves as `mascetti`; the retriever matches
+`sourceId` against the runtime ID, so seeding under the slug stores rows nothing can
+retrieve. The mapping lives in `scripts/lib/maestri-kb/corpus.ts` and a unit test fails if
+any committed knowledge file resolves to no registered maestro.
 
 **Verified on 18 Aug 2026** against local PostgreSQL 17 + pgvector 0.8.6: 241 chunks
 across 30 maestri, 0 rows missing a native vector, retrieval returning real content and
-rejecting off-topic queries.
+rejecting off-topic queries. Re-verified after review: the 13 Mascetti chunks now land
+under `mascetti`, and the stale `amici-miei` rows were pruned automatically.
 
 Two maestri (`chris`, `simone`) produce zero didactic chunks because every section of
 their knowledge file matches an identity pattern in `extract-mini-kb.ts`. They are not
