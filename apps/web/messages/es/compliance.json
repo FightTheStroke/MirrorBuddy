@@ -1223,13 +1223,6 @@
           "title": "Proveedores de Servicios de IA y Encargados del Tratamiento",
           "intro": "MirrorBuddy utiliza los siguientes proveedores certificados de servicios de inteligencia artificial para procesar los datos conversacionales:",
           "vendors": {
-            "anthropic": {
-              "name": "Anthropic (Claude AI)",
-              "dataProcessed": "Texto de las conversaciones educativas, contexto de las lecciones, preguntas y respuestas de los estudiantes",
-              "legalBasis": "Necesidad contractual (Art. 6.1.b RGPD) - tratamiento necesario para proporcionar el servicio educativo personalizado",
-              "dpaStatus": "Cláusulas Contractuales Tipo (CCT) aprobadas por la Comisión Europea para transferencias fuera de la UE",
-              "dataLocation": "Estados Unidos (EE.UU.) con garantías CCT conformes al RGPD Art. 46"
-            },
             "azureRealtimeVoice": {
               "name": "Microsoft Azure Realtime Voice API",
               "dataProcessed": "Datos de audio vocal transmitidos en tiempo real para conversión texto-a-voz y voz-a-texto. El audio se procesa de forma efímera sin almacenamiento persistente.",

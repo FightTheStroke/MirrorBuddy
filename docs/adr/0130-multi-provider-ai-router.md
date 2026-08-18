@@ -1,8 +1,16 @@
 # ADR-0130: Multi-Provider AI Router
 
-**Status:** Accepted
+**Status:** Accepted — partially superseded (2026-08-18)
 **Date:** 2026-02-06
 **Context:** Plan 125 W3-AI-Multi
+
+> **Superseded in part.** The `ClaudeProvider` leg of this router was removed by
+> AI-Act tracker item **P2-4**: `.env.example` forbids Anthropic, and an unused
+> provider in the chain would have required Anthropic as a sub-processor in the
+> DPIA and data-flow mapping. The router keeps its interface and failover
+> design; the active providers are Azure OpenAI (primary) and Ollama.
+> The `@anthropic-ai/sdk` dependency listed below is still in `package.json`
+> with zero imports — its removal is tracked separately (P2-4c).
 
 ## Decision
 

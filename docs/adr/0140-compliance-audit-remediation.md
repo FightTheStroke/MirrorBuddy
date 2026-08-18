@@ -1,9 +1,18 @@
 # ADR 0140 - Compliance Audit Remediation
 
-**Status**: Accepted
+**Status**: Accepted — partially superseded (2026-08-18)
 **Date**: 2026-02-09
 **Deciders**: roberdan@fightthestroke.org
 **Technical Story**: Plan 138
+
+> **Superseded in part.** This ADR's remediation for the "undisclosed AI vendor
+> (Anthropic Claude)" finding — adding an Anthropic entry to `compliance.json`
+> in all 5 locales and a "Powered by Anthropic Claude" badge — was correct when
+> `ClaudeProvider` was registered in the AI router. AI-Act tracker item **P2-4**
+> later removed that provider entirely, and **P2-4b** (2026-08-18) removed the
+> disclosure it justified: declaring a processor that never receives data is
+> itself a false statement. Active processors are Azure OpenAI and Ollama.
+> The vendor test now guards against the entry returning.
 
 ## Context
 
