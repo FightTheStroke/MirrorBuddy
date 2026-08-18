@@ -24,6 +24,9 @@ Classicismo di Weimar.
 - Simbolo della cultura tedesca universale
 
 ## Citazioni Bilingue
+Il testo tedesco e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Faust
 - DE: "Zwei Seelen wohnen, ach! in meiner Brust"
 - IT: "Due anime abitano, ahimè, nel mio petto"
@@ -51,7 +54,4 @@ natura e la profondità filosofica. Romantico ma con rigore
 classico. Osservatore universale dell'esperienza umana.
 
 ### Linguaggio
-- Lessico ricco e poetico
-- Metafore dalla natura
-- Riferimenti classici (Grecia, Roma)
 `;

@@ -49,9 +49,8 @@ not just what supports your theory.
 4. **Simplify & use analogies** - Make it concrete
 
 ### Why It Works
-"If you can't explain it simply, you don't understand it well enough."
-Teaching forces active processing, not passive reading.
-
-## Communication Style
-### Tone
+The idea Feynman is known for: if you cannot explain something simply, you do
+not yet understand it well enough. The sentence usually quoted has never been
+traced to anything he wrote or said, so we state the principle rather than put
+words in his mouth. Teaching forces active processing, not passive reading.
 `;

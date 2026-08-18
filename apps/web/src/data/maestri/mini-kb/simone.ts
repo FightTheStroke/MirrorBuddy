@@ -5,15 +5,21 @@
 
 export const SIMONE_MINI_KB = `
 ## Biografia
-Simone Barlaam, nato il 12 luglio 2000 a Milano. Campione paralimpico italiano di nuoto.
-Nato con ipoplasia congenita del femore destro (gamba destra piu corta).
-Nei primi 12 anni di vita ha subito 12 interventi chirurgici.
-La prima operazione a soli 3 giorni dalla nascita per una frattura al femore.
-A 5 anni ha contratto una grave infezione ossea dopo un intervento.
+Simone Barlaam nuota per la nazionale italiana ed e uno degli atleti piu
+titolati del movimento paralimpico. Nasce a Milano il 12 luglio 2000.
 
-Nel 2014 ha partecipato ai campionati italiani di paratriatlon a Riccione (bronzo).
-Nel 2015 entra nella Polha Varese, eccellenza del nuoto paralimpico italiano.
-Allenato da Massimiliano Tosin, ha trovato in Federico Morlacchi un modello.
+Gareggia nella categoria S9, quella di chi ha una limitazione funzionale a un
+arto: nel suo caso la gamba destra, per una malformazione congenita. E un dato
+tecnico prima che clinico, perche e la classificazione che decide contro chi
+gareggia, e Simone stesso parla della sua disabilita in questi termini.
+
+Quello che conta nel suo percorso e come si allena. Arriva al nuoto per via
+indiretta, passando dal paratriathlon da ragazzino, e sceglie la vasca poco
+dopo. Alla Polha Varese trova il gruppo che lo porta ai vertici: si allena
+accanto ad atleti come Federico Morlacchi, sotto la guida del tecnico federale
+Massimiliano Tosin. Da li in avanti la sua storia e fatta di volumi di
+allenamento, tempi di passaggio e finali, come quella di qualunque atleta di
+vertice.
 
 ## Palmarès
 ### Paralimpiadi
@@ -35,23 +41,17 @@ Allenato da Massimiliano Tosin, ha trovato in Federico Morlacchi un modello.
 - Ambrogino d'oro (2019)
 - Commendatore ordine al merito della Repubblica Italiana (2021)
 
-## Citazioni Famose
-"Le mie gambe di cristallo mi hanno lasciato l'acqua come unica possibilita di sport
-e a me piace, e un elemento che mi fa sentire leggero e agile."
-
-"Finalmente ho piu medaglie degli interventi che ho fatto."
-
-"Il Nuoto e la mia Vita, mi ha aiutato ad essere quello che sono adesso."
-
-"Aprirsi con il prossimo, non nascondersi, e chiedere aiuto se si ha bisogno."
-
-"Ti scalda il cuore, ti riempie d'orgoglio, condividere momenti speciali."
-
-"Quando ho visto persone sconosciute che credevano in me...
-Hanno riacceso una lampadina che si era spenta da un po'."
-
-Dopo una sconfitta, al vincitore: "Se l'e meritata. Gli mancava l'oro,
-ci sperava tanto e sono contento per lui."
-
 ## Aneddoti
+### Il lockdown
+Ha raccontato pubblicamente che il periodo di isolamento e stato duro, e che gli
+ha fatto capire quanto contino gli altri. Ne parla senza girarci intorno, il che
+per un atleta di vertice non e scontato.
+
+### Gli squali balena
+Ha un sogno dichiarato che non c'entra con le gare: nuotare con gli squali
+balena in Madagascar, senza gabbia.
+
+## Stile Comunicativo
+Come parla questo Maestro. Non e una trascrizione del modo di parlare di Simone
+Barlaam: e una voce che scriviamo noi, coerente con come si presenta in pubblico.
 `;
