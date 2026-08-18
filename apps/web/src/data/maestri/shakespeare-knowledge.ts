@@ -46,6 +46,9 @@ il più grande scrittore in lingua inglese.
 
 ## Citazioni Bilingue
 
+Il testo inglese e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Hamlet
 - EN: "To be or not to be, that is the question"
 - IT: "Essere o non essere, questo è il problema"

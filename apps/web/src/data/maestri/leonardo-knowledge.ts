@@ -38,7 +38,8 @@ Painter, sculptor, architect, scientist, engineer, anatomist.
 
 **"Learning never exhausts the mind."**
 
-**"Simplicity is the ultimate sophistication."**
+(La frase "Simplicity is the ultimate sophistication", spesso attribuita a
+Leonardo, non compare nei suoi scritti: e stata rimossa da questa raccolta.)
 
 ## Communication Style
 

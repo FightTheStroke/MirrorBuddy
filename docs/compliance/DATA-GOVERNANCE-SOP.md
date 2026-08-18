@@ -183,21 +183,55 @@ the criterion, five files failed:
 | `amici-miei`                                         | Verbatim dialogue from the 1975 Monicelli film, including the supercazzola lines, plus detailed plot and character relationships                                                                                             | Quotations replaced with an explanation of how the device is built, which is the part that actually teaches Italian syntax. The film's lexicon that entered the Zingarelli dictionary stays: it is now Italian |
 | `cassese`                                            | Seven unattributed verbatim quotations from a jurist who died in 2011                                                                                                                                                        | Replaced with his positions in our words                                                                                                                                                                       |
 | `simone`                                             | Six unattributed quotations from a living athlete, presented as his voice                                                                                                                                                    | Replaced with the themes he has expressed publicly, in our words                                                                                                                                               |
-| `alex-pina.ts` (persona prompt, outside this corpus) | Series catchphrases as the Maestro's own                                                                                                                                                                                     | Replaced. Fixing the knowledge file alone would have left the same output reachable                                                                                                                            |
+| `chris`                                              | Brene Brown's "stories are data with a soul" and a line from Chris Anderson's TED book, presented under "Famous Advice" as this Maestro's own                                                                                | Replaced with principles in our words, with the misattribution stated                                                                                                                                          |
+| `alex-pina.ts` (persona prompt, outside this corpus) | Series catchphrases as the Maestro's own, in three separate places                                                                                                                                                           | Replaced. Fixing the knowledge file alone would have left the same output reachable                                                                                                                            |
 
 Quotation is not forbidden. Italian law (art. 70 LdA) and the EU InfoSoc
 directive allow it when it is short, serves explanation or criticism, and
-**names the work it comes from**. What these four files did was quote at length
+**names the work it comes from**. What these files did was quote at length
 with no attribution at all, which is the one form that has no defence. Where the
 quotations were worth keeping, the SOP's answer is to source them properly, not
 to launder them into paraphrase; that path is recorded in each file.
 
-**Why class C files were left alone.** Six class C files carry quotation
-sections — `cervantes`, `goethe`, `manzoni`, `moliere`, `omero`, `shakespeare`.
-Every one quotes an author whose works are in the public domain. Quoting them is
-lawful and is the substance of teaching literature. The C/D boundary turned out
-to be exactly the right line for this rule, which is why the automated guard
-draws it there.
+**Class C quotation sections, and the translations beside them.** Six class C
+files carry quotation sections — `cervantes`, `goethe`, `manzoni`, `moliere`,
+`omero`, `shakespeare`. Every one quotes an author whose works are in the public
+domain, so quoting them is lawful and is the substance of teaching literature.
+The C/D boundary is the right line for the quotations rule, which is why the
+guard draws it there.
+
+The originals were not the exposure; the Italian renderings printed next to them
+were. A modern translation is its own protected work even when the original is
+free, which §3 already said. Five of the six now state that their Italian
+renderings are MirrorBuddy's own literal translations rather than an edition's.
+`omero` additionally names Monti and Pindemonte as the canonical public-domain
+translations to cite when the text itself is needed. `manzoni` needed nothing:
+it quotes Italian originals.
+
+**The failure mode worth remembering.** Both rounds of this work failed the same
+way, and the second time it was caught by review rather than by me: the section
+being edited got fixed while an untouched section a few lines away carried the
+identical exposure. `alex-pina.ts` was declared fixed with two of its three
+occurrences still live; `simone` had a quotation removed from one section and an
+almost identical one left standing two sections below. The discipline this
+demands is mechanical — grep the whole file, and then the whole corpus, for the
+pattern, and never trust that a fix is complete because the part you were
+looking at is clean.
+
+**G-7 — quote attribution has never been verified (OPEN).** Sweeping the whole
+corpus for quoted strings, rather than only quotation sections, turned up a
+different problem from the one this card was closing: quotations attributed to
+the wrong person. Two were found incidentally and fixed — the "if you can't
+explain it simply" aphorism, which has never been traced to Feynman, and
+"Simplicity is the ultimate sophistication", which does not appear in Leonardo's
+writings. `chris-knowledge.ts` also presented Brene Brown's "stories are data
+with a soul" as its own Maestro's advice.
+
+This is a content-accuracy finding, not an IP one, and **it is not closed**. No
+systematic verification of the corpus's quotations has been done; three were
+found by accident while looking for something else, which is a poor basis for
+assuming the rest are sound. Owner: to be assigned. It should be a pass in its
+own right, not folded into an IP review.
 
 **G-5 — automated check.** `apps/web/src/lib/compliance/__tests__/knowledge-provenance.test.ts`
 fails the build when a knowledge file has no sources, no source class, a class D file

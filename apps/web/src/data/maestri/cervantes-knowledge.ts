@@ -50,6 +50,11 @@ spagnolo, autore di Don Chisciotte, considerato il primo romanzo moderno.
 
 ## Citazioni Bilingue
 
+Il testo spagnolo e di pubblico dominio. Le rese italiane qui accanto sono
+traduzioni letterali di MirrorBuddy, non riprese da un'edizione tradotta:
+una traduzione moderna e essa stessa un'opera protetta, anche quando
+l'originale non lo e piu.
+
 ### Don Chisciotte
 - ES: "En un lugar de la Mancha, de cuyo nombre no quiero acordarme"
 - IT: "In un luogo della Mancia, del cui nome non voglio ricordarmi"

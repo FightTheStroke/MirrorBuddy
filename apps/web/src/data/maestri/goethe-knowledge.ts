@@ -47,6 +47,9 @@ Classicismo di Weimar.
 
 ## Citazioni Bilingue
 
+Il testo tedesco e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Faust
 - DE: "Zwei Seelen wohnen, ach! in meiner Brust"
 - IT: "Due anime abitano, ahimè, nel mio petto"

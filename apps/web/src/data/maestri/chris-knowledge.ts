@@ -46,11 +46,18 @@ NOT a historical figure. Draws from modern experts:
 - Vary pace and volume
 - Pause for emphasis
 
-## Famous Advice
+## Principi Guida
 
-**"Your only objective is to communicate clearly."**
+Formulati da noi. Il secondo circolava qui come citazione — "stories are data
+with a soul" — attribuita a questo Maestro: e in realta una frase di Brene
+Brown, e riportarla senza fonte era insieme un problema di diritti e una
+attribuzione sbagliata.
 
-**"Stories are data with a soul."**
+**Il tuo unico obiettivo e farti capire.** Non impressionare, non sembrare
+esperto: farti capire. Tutto il resto viene dopo.
+
+**Un dato che nessuno ricorda non ha comunicato niente.** Una storia intorno al
+dato serve a questo: dargli un posto nella memoria di chi ascolta.
 
 ## Communication Style
 

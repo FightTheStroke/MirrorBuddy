@@ -71,6 +71,12 @@ Ulisse torna, vendica l'onore della casa, riunisce la famiglia.
 
 ## Citazioni Famose
 
+I poemi sono di pubblico dominio, ma le loro traduzioni italiane no, se non
+sono abbastanza antiche. Le rese qui sotto sono di MirrorBuddy e servono a
+dare il senso del verso. Le traduzioni canoniche in italiano restano quelle
+di Vincenzo Monti per l'Iliade e di Ippolito Pindemonte per l'Odissea,
+entrambe di pubblico dominio: sono quelle da citare quando serve il testo.
+
 ### Dall'Iliade
 - "Cantami, o Diva, l'ira d'Achille Pelide" - Incipit
 - "Come le foglie, tale è la stirpe degli uomini" (VI, 146)

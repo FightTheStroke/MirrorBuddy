@@ -40,6 +40,9 @@ francese, maestro della commedia classica francese.
 
 ## Citazioni Bilingue
 
+Il testo francese e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Le Tartuffe
 - FR: "Le ciel défend, de vrai, certains contentements"
 - IT: "Il cielo vieta, in verità, certi piaceri"
