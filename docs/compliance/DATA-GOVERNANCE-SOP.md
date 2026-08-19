@@ -327,12 +327,25 @@ string rather than an error. The model answered from the persona prompt alone
 and the gap was invisible from the outside.
 
 `chris` now carries didactic content as a consequence of the G-9 fix — his
-identity overflow is routed to RAG — so the corpus seeds 32 of 32, 281 chunks.
-Two controls keep it that way: `rag-coverage.test.ts` fails the build if any
-Maestro yields zero chunks, and the seeder now exits non-zero naming the empty
-Maestri instead of reporting success. If a Maestro ever legitimately must not be
-retrievable, that decision has to be recorded here and excluded in the test
-explicitly — not achieved by silence.
+identity overflow is routed to RAG — so the corpus seeds 32 of 32, 291 chunks
+(measured from a clean regeneration on 19 Aug 2026; the 281 first recorded here
+predated the hand-authored fix in G-9 and was wrong by ten). Two controls keep
+it that way: `rag-coverage.test.ts` fails the build if any Maestro yields zero
+chunks, and the seeder now exits non-zero naming the empty Maestri instead of
+reporting success. If a Maestro ever legitimately must not be retrievable, that
+decision has to be recorded here and excluded in the test explicitly — not
+achieved by silence.
+
+**These two findings are closed in the corpus, not yet in production.** The
+guards prove the corpus is seedable; they cannot prove it has been seeded.
+Embeddings are written only by an explicit `npm run kb:seed` run, which no
+workflow performs automatically, so until someone runs it against production the
+vector store still holds the pre-fix index: 31 sourceIds, without the 376 lines
+G-9 recovered and without `chris` at all. The test suite will stay green
+throughout, because it measures the corpus and not the store.
+
+Whoever runs it should record the date and the resulting chunk count here. Until
+that line exists, assume production is still serving the old index.
 
 ---
 
