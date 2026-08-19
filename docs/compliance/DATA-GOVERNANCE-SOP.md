@@ -218,7 +218,7 @@ demands is mechanical — grep the whole file, and then the whole corpus, for th
 pattern, and never trust that a fix is complete because the part you were
 looking at is clean.
 
-**G-7 — quote attribution has never been verified (OPEN).** Sweeping the whole
+**G-7 — quote attribution has never been verified (PARTIALLY CLOSED).** Sweeping the whole
 corpus for quoted strings, rather than only quotation sections, turned up a
 different problem from the one this card was closing: quotations attributed to
 the wrong person. Two were found incidentally and fixed — the "if you can't
@@ -233,21 +233,42 @@ found by accident while looking for something else, which is a poor basis for
 assuming the rest are sound. Owner: to be assigned. It should be a pass in its
 own right, not folded into an IP review.
 
-The gate on this card widened G-7 by demonstration. Both guards fire on a
-heading — `knowledge-provenance.test.ts` looks for a quotations _section_ in a
-class D file — so in-character dialogue written into ordinary prose passes
+The gate on this card widened G-7 by demonstration. Both guards fired on a
+heading — `knowledge-provenance.test.ts` looked for a quotations _section_ in a
+class D file — so in-character dialogue written into ordinary prose passed
 untouched. Proven by mutation: fabricated speaker-attributed dialogue inserted
 under `## Stile Comunicativo` in `alex-pina-knowledge.ts`, propagated into the
 mini-KB with `npm run kb:extract`, left both guards green and would have shipped
-to the model. Nothing in the corpus exploits this today — the mutation had to be
-injected — and the guard's own comment already disclaims coverage here. But the
-blind spot is now measured rather than assumed, and closing it needs full-text
-scanning (named speaker adjacent to a quoted string) across class D files, not a
-heading regex. Same owner, same pass.
+to the model.
 
-Also for that pass: `cassese-knowledge.ts` carries the fragment
-`"non ancora disillusi"` attributed to Cassese outside any quotation heading.
-De minimis, and precisely the shape this rule cannot see.
+**That half is now closed.** `attributed-quotes.ts` reads the full text and
+looks for the shape that carries the risk — a quoted string presented as a named
+person's or character's own words — in four forms: a verb of speech before the
+quote, after it, script form at the start of a line, and an em-dash attribution.
+`knowledge-provenance.test.ts` fails the build on any hit in a class D file.
+Both mutations go red and name file, line and speaker.
+
+Calibrating it against the corpus decided its shape. A bare quoted-string sweep
+returns 64 hits in class D alone, nearly all work titles (`"La Casa de Papel"`),
+coined terms (`"la banda"`) and the Maestro's own coaching prompts — flagging
+those would have trained everyone to ignore the guard. Requiring an attribution
+cuts the whole corpus to 6. Five are public-domain works quoted legitimately
+(Manzoni's Don Abbondio and Lucia, Homer's two incipits, Herodotus at
+Thermopylae) and sit in class C files, where the rule does not fire — the guard
+runs on class D only. The sixth
+was the real one: `cassese-knowledge.ts` presenting `"non ancora disillusi"` as
+Cassese's own words outside any quotation heading, now rewritten as indirect
+speech.
+
+Locale codes and layout markers (`ES:`, `Student:`, `Inizio:`) are excluded by
+name in `STRUCTURAL_LABELS`; without that list the script form reads `ES: "el
+plan"` as a person quoting Spanish.
+
+**What remains open in G-7 is the accuracy half**, and it is the larger one: no
+systematic verification that the corpus's quotations are correctly attributed.
+The new guard says nothing about this — it asks whether a quote is presented as
+someone's words, never whether they actually said them. The three known
+misattributions were all found by accident. Owner: to be assigned.
 
 **G-8 — the removals were not reaching the model (CLOSED).** Every sanitisation
 on this card edited `*-knowledge.ts`. But each knowledge file has a second,
