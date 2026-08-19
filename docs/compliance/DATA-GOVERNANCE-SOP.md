@@ -300,6 +300,40 @@ has to ask the right question, not merely be performed.
 G-6 was an operational break, not an IP one — but it means the provenance controls in this SOP currently govern content that is not being served from the vector store; the rest are **documentation and review gaps, not known infringements**: the corpus is
 authored in-house and every file but one names its references.
 
+**G-9 — content that reached no runtime path (CLOSED).** A knowledge file feeds
+the model through two channels and only two: the mini-KB inlined into the persona
+prompt, and the didactic text embedded for RAG. Identity sections went to the
+first, everything else to the second — and the mini-KB is capped at 50 lines, so
+the tail of a long identity section landed in neither. 305 lines across 17 of the
+32 Maestri existed in this repository and nowhere in the running system. A
+further 71 lines were stranded differently: for the six hand-authored mini-KBs
+the generated one is computed and discarded, taking its identity content with it.
+
+The cap stays — it is paid for on every prompt. The overflow is appended to the
+didactic text instead, so it is retrieved when relevant rather than carried
+always. Committed mini-KBs are byte-identical after regeneration: the prompt did
+not change. `knowledge-reachability.test.ts` asserts line by line across the
+corpus that nothing falls outside both channels, and reads the _committed_
+mini-KB for hand-authored Maestri rather than a recomputed one — the first
+version of the guard did recompute it, and passed while Austen's identity facts
+were reachable from nowhere.
+
+**G-10 — a Maestro absent from the index, silently (CLOSED).** All six of
+`chris`'s sections matched the identity patterns, so his didactic text was empty,
+the seeder produced no chunks for him, and the store held 31 distinct sourceIds
+for 32 files. Nothing failed: an empty file chunks to an empty list, which is
+indistinguishable from a successful no-op, and the retriever returns an empty
+string rather than an error. The model answered from the persona prompt alone
+and the gap was invisible from the outside.
+
+`chris` now carries didactic content as a consequence of the G-9 fix — his
+identity overflow is routed to RAG — so the corpus seeds 32 of 32, 281 chunks.
+Two controls keep it that way: `rag-coverage.test.ts` fails the build if any
+Maestro yields zero chunks, and the seeder now exits non-zero naming the empty
+Maestri instead of reporting success. If a Maestro ever legitimately must not be
+retrievable, that decision has to be recorded here and excluded in the test
+explicitly — not achieved by silence.
+
 ---
 
 ## 7. Review cadence

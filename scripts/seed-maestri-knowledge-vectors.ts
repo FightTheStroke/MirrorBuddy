@@ -164,6 +164,7 @@ async function main() {
 
   let totalChunks = 0;
   let totalTokens = 0;
+  const empty: string[] = [];
 
   for (const file of files) {
     const data = loadDidacticContent(path.join(DIDACTIC_DIR, file));
@@ -178,17 +179,30 @@ async function main() {
     if (dryRun) {
       const chunks = chunkDidactic(data.content).length;
       console.log(`  ${label}: ${chunks} chunks`);
+      if (chunks === 0) empty.push(label);
       totalChunks += chunks;
       continue;
     }
 
     const result = await seedMaestro(data);
     console.log(`  ${label}: ${result.chunks} chunks, ${result.tokens} tokens`);
+    if (result.chunks === 0) empty.push(label);
     totalChunks += result.chunks;
     totalTokens += result.tokens;
   }
 
   console.log(`\n${dryRun ? '[DRY RUN] ' : ''}Total: ${totalChunks} chunks, ${totalTokens} tokens`);
+
+  // An empty didactic file chunks to an empty list, which reads exactly like a
+  // successful no-op. That is how chris stayed out of the index unnoticed while
+  // the run reported success: say it out loud instead.
+  if (empty.length > 0) {
+    console.error(
+      `\n❌ ${empty.length} maestro(s) produced no chunks and will not be retrievable: ${empty.join(', ')}\n` +
+        `   Run 'npm run kb:extract' first, or check their sections are not all identity.`,
+    );
+    process.exit(1);
+  }
 
   if (dryRun) return;
 
