@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import { chunkDidactic } from '../../../../../../scripts/lib/maestri-kb/corpus';
+import {
+  chunkDidactic,
+  registeredMaestroIds,
+  resolveMaestroId,
+} from '../../../../../../scripts/lib/maestri-kb/corpus';
 import { runtimeArtefacts, MAESTRI_DIR } from '../../../../../../scripts/extract-mini-kb';
 
 /**
@@ -31,8 +35,27 @@ function knowledgeFiles(): string[] {
 describe('every Maestro reaches the RAG index', () => {
   const files = knowledgeFiles();
 
-  it('finds the whole corpus', () => {
-    expect(files.length).toBeGreaterThanOrEqual(32);
+  /**
+   * Anchored to the runtime registry rather than a fixed floor. A hardcoded
+   * `>= 32` is satisfied by the files that already exist, so a Maestro added to
+   * the registry without a knowledge file would be served with no corpus at all
+   * while every assertion below stayed green — the same silence this guard
+   * exists to break, one level up.
+   */
+  it('has a knowledge file for every registered Maestro', () => {
+    // Slugs are not ids: `amici-miei-knowledge.ts` serves the Maestro
+    // registered as `mascetti`. Resolve through the same alias table the seeder
+    // uses, or the check invents gaps that are not there.
+    const covered = new Set(
+      files.map((f) => resolveMaestroId(f.replace(/-knowledge\.ts$/, ''))),
+    );
+    const missing = registeredMaestroIds().filter((id) => !covered.has(id));
+
+    expect(
+      missing,
+      `registered in the runtime but with no knowledge file, so nothing can be ` +
+        `seeded or retrieved for them: ${missing.join(', ')}`,
+    ).toEqual([]);
   });
 
   it.each(files)('%s yields at least one retrievable chunk', (file) => {

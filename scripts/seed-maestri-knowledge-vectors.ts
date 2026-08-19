@@ -83,7 +83,17 @@ async function embedAll(chunks: string[]): Promise<EmbeddedChunk[]> {
 
 async function seedMaestro(file: DidacticFile): Promise<SeedResult> {
   const { maestroId, subject } = file;
-  const embedded = await embedAll(chunkDidactic(file.content));
+  const chunks = chunkDidactic(file.content);
+
+  // Refuse before touching the index, not after. The delete below is
+  // unconditional, so an empty didactic file would wipe this Maestro's existing
+  // embeddings and write nothing back — turning a stale corpus into no corpus,
+  // and reporting the problem only once the damage was done.
+  if (chunks.length === 0) {
+    return { maestroId, chunks: 0, tokens: 0 };
+  }
+
+  const embedded = await embedAll(chunks);
 
   // Idempotency: a re-run replaces this maestro's corpus rather than
   // duplicating it. `@@unique([sourceType, sourceId, chunkIndex])` rules out

@@ -418,10 +418,14 @@ across 30 maestri, 0 rows missing a native vector, retrieval returning real cont
 rejecting off-topic queries. Re-verified after review: the 13 Mascetti chunks now land
 under `mascetti`, and the stale `amici-miei` rows were pruned automatically.
 
-Two maestri (`chris`, `simone`) produce zero didactic chunks because every section of
-their knowledge file matches an identity pattern in `extract-mini-kb.ts`. They are not
-broken — they contribute identity only — but they get no RAG augmentation. Recorded here
-rather than silently accepted.
+That run predates G-9 and G-10. Two maestri (`chris`, `simone`) produced zero
+didactic chunks then, because every section of their knowledge file matched an
+identity pattern in `extract-mini-kb.ts`. It was recorded here as acceptable —
+they contribute identity only — which was the wrong call: the identity content
+past the mini-KB cap was reaching no runtime path at all, so they were not
+contributing it either. Both now carry didactic content, the corpus seeds 32 of
+32, and a Maestro producing zero chunks is a build failure rather than a note in
+this document. See G-9 and G-10.
 
 ## 9. Related documents
 
