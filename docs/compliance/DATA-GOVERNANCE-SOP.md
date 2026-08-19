@@ -254,7 +254,8 @@ coined terms (`"la banda"`) and the Maestro's own coaching prompts — flagging
 those would have trained everyone to ignore the guard. Requiring an attribution
 cuts the whole corpus to 6. Five are public-domain works quoted legitimately
 (Manzoni's Don Abbondio and Lucia, Homer's two incipits, Herodotus at
-Thermopylae) and sit in class A/B files, where the rule does not fire. The sixth
+Thermopylae) and sit in class C files, where the rule does not fire — the guard
+runs on class D only. The sixth
 was the real one: `cassese-knowledge.ts` presenting `"non ancora disillusi"` as
 Cassese's own words outside any quotation heading, now rewritten as indirect
 speech.

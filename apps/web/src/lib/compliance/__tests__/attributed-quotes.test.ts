@@ -81,4 +81,37 @@ describe('findAttributedQuotes', () => {
       expect(findAttributedQuotes('Nessuna citazione in questo paragrafo.')).toHaveLength(0);
     });
   });
+
+  /**
+   * Both from Codex review on #661. The first version scanned line by line, so
+   * a wrapped quotation with a textbook attribution was invisible; and the verb
+   * list held only present and imperfect forms, so the commonest way Italian
+   * prose reports speech walked straight past it.
+   */
+  describe('attributions Codex found the first version blind to', () => {
+    it('sees a quotation wrapped across a hard line break', () => {
+      const wrapped = 'Cassese diceva che i giovani erano\n"non ancora disillusi" e andavano ascoltati.';
+      const found = findAttributedQuotes(wrapped);
+      expect(found).toHaveLength(1);
+      expect(found[0].speaker).toBe('Cassese');
+      expect(found[0].quote).toBe('non ancora disillusi');
+    });
+
+    it.each([
+      ['ha detto', 'Cassese ha detto "non ancora disillusi"'],
+      ['disse', 'Manzoni disse "questo matrimonio non s\u2019ha da fare"'],
+      ['spiegò', 'Feynman spieg\u00f2 "se non sai spiegarlo, non l\u2019hai capito"'],
+      ['ha scritto', 'Levi ha scritto "considerate se questo \u00e8 un uomo"'],
+    ])('recognises the past-tense attribution %s', (_form, text) => {
+      const found = findAttributedQuotes(text);
+      expect(found).toHaveLength(1);
+    });
+
+    it('still refuses to invent a speaker from a bullet on the next line', () => {
+      // The wrap-healing must not rejoin across a list marker: a leading `-`
+      // read as an em-dash attribution once conjured a speaker out of layout.
+      const layout = 'Frasi tipiche:\n"Qual \u00e8 la tua idea centrale?"\n- Socrate';
+      expect(findAttributedQuotes(layout)).toEqual([]);
+    });
+  });
 });

@@ -17,10 +17,21 @@ const CLOSE_QUOTE = '[»"”]';
 
 /** Verbs that present the following text as someone's own words, it + en. */
 const SPEECH_VERB =
-  '(?:dice|diceva|dicono|dicevano|afferma|affermava|sostiene|sosteneva|ripete|ripeteva|' +
+  '(?:' +
+  // Compound perfect forms first: the alternation is ordered, so `ha detto`
+  // must be offered before any bare participle could win the match.
+  'ha[ \\t]+(?:detto|scritto|affermato|dichiarato|spiegato|raccontato|osservato|risposto)|' +
+  'hanno[ \\t]+(?:detto|scritto|affermato|dichiarato|spiegato|raccontato|osservato|risposto)|' +
+  'aveva[ \\t]+(?:detto|scritto|affermato|dichiarato|spiegato|raccontato)|' +
+  // Simple past: the ordinary way Italian prose attributes speech.
+  'disse|dissero|scrisse|scrissero|spiegò|affermò|sostenne|dichiarò|raccontò|' +
+  'rispose|risposero|chiese|chiesero|esclamò|osservò|ammonì|ripeté|' +
+  // Present and imperfect.
+  'dice|diceva|dicono|dicevano|afferma|affermava|sostiene|sosteneva|ripete|ripeteva|' +
   'racconta|raccontava|scrive|scriveva|osserva|osservava|dichiara|dichiarava|esclama|' +
-  'esclamava|risponde|rispondeva|chiede|chiedeva|ammonisce|ammoniva|says|said|writes|' +
-  'wrote|tells|told|asks|asked|replies|replied|observes|observed|declares|declared)';
+  'esclamava|risponde|rispondeva|chiede|chiedeva|ammonisce|ammoniva|spiega|spiegava|' +
+  'says|said|writes|wrote|tells|told|asks|asked|replies|replied|observes|observed|' +
+  'declares|declared|explains|explained)';
 
 /** A capitalised name, optionally multi-word: "Cassese", "Alex Pina". */
 const NAME = "[A-ZÀ-Þ][\\p{L}'’-]+(?:[ \\t]+[A-ZÀ-Þ][\\p{L}'’-]+){0,2}";
@@ -99,7 +110,7 @@ function rules(): Rule[] {
     // Cassese ripeteva spesso che i giovani, "non ancora disillusi", ...
     {
       regex: new RegExp(
-        `(${NAME})\\s+${SPEECH_VERB}\\b${FILLER}?${OPEN_QUOTE}([^«»"“”\\n]{4,200})${CLOSE_QUOTE}`,
+        `(${NAME})\\s+${SPEECH_VERB}(?!\\p{L})${FILLER}?${OPEN_QUOTE}([^«»"“”\\n]{4,200})${CLOSE_QUOTE}`,
         'gu',
       ),
       speakerGroup: 1,
@@ -135,6 +146,36 @@ function rules(): Rule[] {
   ];
 }
 
+/**
+ * A line that continues the previous sentence rather than starting something
+ * new. Knowledge files are hard-wrapped, so a quotation with a perfectly
+ * ordinary attribution can straddle the wrap and be invisible to a scan that
+ * treats a newline as a boundary.
+ */
+const STARTS_NEW_BLOCK = /^[ \t]*(?:[-*+>|]|#|\d+[.)]|$)/;
+
+/**
+ * The text as prose, with hard wraps healed: a newline joining two halves of a
+ * sentence becomes a space, so a wrapped quotation reads as one line.
+ *
+ * The substitution is one character for one, so every index still points at the
+ * same place in the original and line numbers stay honest.
+ *
+ * Wraps before a bullet, heading, table row or list item are left alone. That
+ * boundary is load-bearing: joining across it once made a leading `-` read as
+ * an em-dash attribution, inventing a speaker that was not there.
+ */
+function healWraps(text: string): string {
+  const lines = text.split('\n');
+  return lines
+    .map((line, i) => {
+      const next = lines[i + 1];
+      if (i === lines.length - 1) return line;
+      return next !== undefined && STARTS_NEW_BLOCK.test(next) ? `${line}\n` : `${line} `;
+    })
+    .join('');
+}
+
 function lineOf(text: string, index: number): number {
   let line = 1;
   for (let i = 0; i < index; i += 1) {
@@ -149,9 +190,10 @@ function lineOf(text: string, index: number): number {
  */
 export function findAttributedQuotes(text: string): AttributedQuote[] {
   const found = new Map<string, AttributedQuote>();
+  const scanned = healWraps(text);
 
   for (const rule of rules()) {
-    for (const match of text.matchAll(rule.regex)) {
+    for (const match of scanned.matchAll(rule.regex)) {
       const speaker = match[rule.speakerGroup]?.trim();
       const quote = match[rule.quoteGroup]?.trim();
       if (speaker === undefined || quote === undefined) continue;
