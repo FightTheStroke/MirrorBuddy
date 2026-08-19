@@ -805,16 +805,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -930,16 +932,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -1063,16 +1067,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -1269,16 +1275,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -1407,16 +1415,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -1519,16 +1529,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
@@ -1624,16 +1636,18 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
 
+      # Browser download only. `--with-deps` would fold an apt-get run into this
+      # required step, and a stuck dpkg lock would then take the job down with it.
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
 
-      # Best-effort: on a cache miss the browsers are installed with --with-deps
-      # above, so this only refreshes OS packages. It shells out to apt-get, which
-      # can hang on a dpkg lock; without these guards the hang consumes the whole
-      # job (see docs/ci/known-failure-modes.md).
-      - name: Install Playwright deps (if cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+      # The apt half, isolated and best-effort: the runner image already ships
+      # these packages, so a stuck dpkg lock costs five minutes instead of the
+      # job. If they are genuinely missing, Playwright fails at browser launch
+      # with a readable error (see docs/ci/known-failure-modes.md).
+      - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium

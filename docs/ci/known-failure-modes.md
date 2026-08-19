@@ -26,21 +26,31 @@ hunt through the diff.
 
 `npx playwright install-deps chromium` shells out to `apt-get`, which can block
 indefinitely on a dpkg/apt lock held by the runner's background package jobs.
-The step only runs when the browser cache **hit**, so it is a best-effort
-refresh: on a cache miss the browsers are installed with `--with-deps` a few
-lines above, which already pulls the OS packages.
+
+The same apt call used to be hidden inside the _required_ browser install as
+`npx playwright install --with-deps chromium`, so the exposure had two faces
+depending on the cache:
+
+- **cache hit** — the standalone `install-deps` step hangs;
+- **cache miss** — `install --with-deps` hangs instead (this is how PR #652 died,
+  with step 12 `cancelled` and step 13 `skipped`).
+
+Fixing only the first one leaves the second untouched, which is exactly what
+happened on the first attempt at this fix.
 
 ### Containment
 
-Every Playwright job now carries a job-level `timeout-minutes`, and the
-install-deps step is bounded at 5 minutes and marked `continue-on-error`, so a
-stuck apt costs five minutes instead of the run. If the OS packages really are
-missing, Playwright fails at browser launch with a clear message rather than a
-silent hang.
+The two halves are now separate steps. The browser download is required and
+bounded at 10 minutes; the apt call is its own best-effort step, bounded at 5
+minutes and marked `continue-on-error`, since the runner image already ships
+those packages. Every Playwright job also carries a job-level `timeout-minutes`.
+A stuck apt costs five minutes instead of the run, and if the OS packages really
+are missing Playwright fails at browser launch with a clear message rather than
+a silent hang.
 
-Guarded by `apps/web/src/__tests__/workflows/playwright-job-timeouts.test.ts`:
-the build fails if a Playwright job is added without a timeout, or if the
-install-deps step loses its bounds.
+Guarded by `apps/web/src/__tests__/workflows/playwright-job-timeouts.test.ts`,
+which fails the build if a Playwright job is added without a timeout, if either
+step loses its bounds, or if `--with-deps` reappears in a required step.
 
 ### What to do when you see it
 

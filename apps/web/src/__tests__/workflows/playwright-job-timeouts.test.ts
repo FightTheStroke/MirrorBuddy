@@ -15,7 +15,8 @@ import { describe, expect, it } from 'vitest';
  * the step, and no Playwright job may run without a job-level ceiling.
  */
 
-const PLAYWRIGHT_DEPS_STEP = 'Install Playwright deps (if cached)';
+const PLAYWRIGHT_DEPS_STEP = 'Install Playwright OS deps';
+const PLAYWRIGHT_BROWSERS_STEP = 'Install Playwright browsers';
 
 interface WorkflowStep {
   name?: string;
@@ -70,5 +71,26 @@ describe('Playwright CI jobs cannot hang', () => {
     );
 
     expect(offenders).toEqual([]);
+  });
+
+  it('bounds the browser install too', () => {
+    const offenders = jobsRunningPlaywright(readCiWorkflow()).flatMap(([name, job]) =>
+      (job.steps ?? [])
+        .filter((step) => step.name === PLAYWRIGHT_BROWSERS_STEP)
+        .filter((step) => typeof step['timeout-minutes'] !== 'number')
+        .map(() => name),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('keeps apt out of the required browser install', () => {
+    const withDeps = jobsRunningPlaywright(readCiWorkflow()).flatMap(([name, job]) =>
+      (job.steps ?? [])
+        .filter((step) => step.run?.includes('--with-deps') === true)
+        .map(() => name),
+    );
+
+    expect(withDeps).toEqual([]);
   });
 });
