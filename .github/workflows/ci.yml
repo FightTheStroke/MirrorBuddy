@@ -722,6 +722,7 @@ jobs:
   smoke-tests:
     name: Smoke Tests (BLOCKING)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs: [build]
 
     services:
@@ -808,8 +809,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Smoke Tests
@@ -927,8 +934,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Accessibility Tests (smart)
@@ -975,6 +988,7 @@ jobs:
   mobile-smoke:
     name: Mobile Smoke (PR)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     needs: [build, detect-changes]
     if: >
       github.event_name == 'pull_request' &&
@@ -1053,8 +1067,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Mobile Smoke tests
@@ -1176,6 +1196,7 @@ jobs:
   mobile-e2e:
     name: Mobile E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [build]
     if: github.event_name != 'pull_request'
 
@@ -1252,8 +1273,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Mobile E2E tests
@@ -1384,8 +1411,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run E2E tests (with retries)
@@ -1490,8 +1523,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Security E2E tests
@@ -1589,8 +1628,14 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
 
+      # Best-effort: on a cache miss the browsers are installed with --with-deps
+      # above, so this only refreshes OS packages. It shells out to apt-get, which
+      # can hang on a dpkg lock; without these guards the hang consumes the whole
+      # job (see docs/ci/known-failure-modes.md).
       - name: Install Playwright deps (if cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
+        timeout-minutes: 5
+        continue-on-error: true
         run: npx playwright install-deps chromium
 
       - name: Run Compliance E2E tests
