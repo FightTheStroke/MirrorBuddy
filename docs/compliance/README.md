@@ -23,6 +23,14 @@ MirrorBuddy complies with:
 | [DPIA-appendices.md](DPIA-appendices.md) | DPIA - Technical Appendices and Details      |
 | [GDPR.md](GDPR.md)                       | GDPR Compliance Summary                      |
 
+### Data Governance
+
+| Document                                             | Description                                                  |
+| ---------------------------------------------------- | ------------------------------------------------------------ |
+| [DATA-GOVERNANCE-SOP.md](DATA-GOVERNANCE-SOP.md)     | Knowledge base sources - IP, copyright, and provenance rules |
+| [DATA-RETENTION-POLICY.md](DATA-RETENTION-POLICY.md) | Retention schedules per country and data category            |
+| [DATA-FLOW-MAPPING.md](DATA-FLOW-MAPPING.md)         | Where data goes - processors, transfers, and sub-processors  |
+
 ### AI Systems
 
 | Document                         | Description                                                          |

@@ -8,10 +8,73 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { TierDefinition } from '@prisma/client';
 
+import { BASE_TIER_MAESTRI, ROSTER_IDS } from '../../data/roster-ids';
+
 // Model defaults from env vars (change in .env to migrate without code changes)
 const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
 const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || 'gpt-5.2-edu';
 const CHAT_MODEL_PRO = process.env.DEFAULT_CHAT_MODEL_PRO || 'gpt-5.2-chat';
+const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
+
+/**
+ * Per-feature model assignments (ADR 0073).
+ *
+ * These used to live only in the standalone `prisma/seed-tiers.ts`, which
+ * duplicated this whole file. A database initialised through that entry point
+ * got per-feature models but a stale maestri list; one seeded through here got
+ * the right roster but no per-feature models. Both are now defined once, and
+ * the standalone script is a thin wrapper around this function.
+ *
+ * Values match `createFallbackTier()` in tier-fallbacks.ts, which is what the
+ * app serves when the database row is missing — the two must not disagree.
+ * Note Base uses `gpt-realtime-mini`, not `gpt-realtime`: the old standalone
+ * seed said otherwise and would have quietly upgraded every Base user to the
+ * expensive realtime model on the next re-seed.
+ */
+const TRIAL_MODELS = {
+  chatModel: CHAT_MODEL,
+  realtimeModel: 'gpt-realtime-mini',
+  pdfModel: CHAT_MODEL,
+  mindmapModel: CHAT_MODEL,
+  quizModel: CHAT_MODEL,
+  flashcardsModel: CHAT_MODEL,
+  summaryModel: CHAT_MODEL,
+  formulaModel: CHAT_MODEL,
+  chartModel: CHAT_MODEL,
+  homeworkModel: CHAT_MODEL,
+  webcamModel: CHAT_MODEL,
+  demoModel: DEMO_MODEL,
+} as const;
+
+const BASE_MODELS = {
+  chatModel: CHAT_MODEL_EDU,
+  realtimeModel: 'gpt-realtime-mini',
+  pdfModel: CHAT_MODEL,
+  mindmapModel: CHAT_MODEL,
+  quizModel: CHAT_MODEL_EDU,
+  flashcardsModel: CHAT_MODEL,
+  summaryModel: CHAT_MODEL,
+  formulaModel: CHAT_MODEL_EDU,
+  chartModel: CHAT_MODEL,
+  homeworkModel: CHAT_MODEL_EDU,
+  webcamModel: CHAT_MODEL_EDU,
+  demoModel: DEMO_MODEL,
+} as const;
+
+const PRO_MODELS = {
+  chatModel: CHAT_MODEL_PRO,
+  realtimeModel: 'gpt-realtime',
+  pdfModel: CHAT_MODEL_PRO,
+  mindmapModel: CHAT_MODEL_PRO,
+  quizModel: CHAT_MODEL_PRO,
+  flashcardsModel: CHAT_MODEL_PRO,
+  summaryModel: CHAT_MODEL_PRO,
+  formulaModel: CHAT_MODEL_PRO,
+  chartModel: CHAT_MODEL_PRO,
+  homeworkModel: CHAT_MODEL_PRO,
+  webcamModel: CHAT_MODEL_PRO,
+  demoModel: DEMO_MODEL,
+} as const;
 
 /**
  * Seed tier definitions into the database
@@ -49,7 +112,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
   };
   const trial = await prisma.tierDefinition.upsert({
     where: { code: 'trial' },
-    update: { features: trialFeatures },
+    update: { features: trialFeatures, ...TRIAL_MODELS },
     create: {
       code: 'trial',
       name: 'Trial',
@@ -58,8 +121,9 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
-      chatModel: CHAT_MODEL,
-      realtimeModel: 'gpt-realtime-mini',
+      videoVisionSecondsPerSession: 0,
+      videoVisionMinutesMonthly: 0,
+      ...TRIAL_MODELS,
       features: trialFeatures,
       availableMaestri: ['leonardo', 'galileo', 'curie'],
       availableCoaches: ['melissa'],
@@ -71,10 +135,19 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
     },
   });
 
-  // Base Tier - Freemium tier with most maestri
+  // Base Tier - free tier, a curriculum-complete subset of the roster
+  //
+  // Same reasoning as Pro below: the list is applied in `update` too, because
+  // with `update: {}` an already-seeded database keeps its old row forever and
+  // a change here would never reach the students already using the product.
+  const baseMaestri = [...BASE_TIER_MAESTRI];
+
   const base = await prisma.tierDefinition.upsert({
     where: { code: 'base' },
-    update: {},
+    update: {
+      availableMaestri: baseMaestri,
+      ...BASE_MODELS,
+    },
     create: {
       code: 'base',
       name: 'Base',
@@ -83,8 +156,9 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       voiceMinutesDaily: 30,
       toolsLimitDaily: 30,
       docsLimitTotal: 5,
-      chatModel: CHAT_MODEL_EDU,
-      realtimeModel: 'gpt-realtime-mini',
+      videoVisionSecondsPerSession: 0,
+      videoVisionMinutesMonthly: 0,
+      ...BASE_MODELS,
       features: {
         chat: true,
         voice: true,
@@ -96,33 +170,7 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
         buddiesAvailable: ['mario', 'noemi', 'enea'],
         parentDashboard: true,
       },
-      availableMaestri: [
-        'leonardo',
-        'galileo',
-        'curie',
-        'cicerone',
-        'lovelace',
-        'smith',
-        'shakespeare',
-        'humboldt',
-        'erodoto',
-        'manzoni',
-        'euclide',
-        'mozart',
-        'socrate',
-        'ippocrate',
-        'feynman',
-        'darwin',
-        'chris',
-        'omero',
-        'alex-pina',
-        'simone',
-        'cassese',
-        'moliere',
-        'goethe',
-        'cervantes',
-        'levi-montalcini',
-      ],
+      availableMaestri: baseMaestri,
       availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij'],
       availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia'],
       availableTools: ['pdf', 'chat', 'flashcards', 'mindmap', 'quiz', 'formula'],
@@ -133,9 +181,26 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
   });
 
   // Pro Tier - Paid tier with unlimited features
+  //
+  // Pro grants the whole roster, so the list is derived rather than typed:
+  // a hand-maintained copy drifts the moment a maestro is added, and the
+  // paid-tier copy promises "all the Maestri" in five languages.
+  const proMaestri = [...ROSTER_IDS.maestri];
+  const proCoaches = [...ROSTER_IDS.coaches];
+  const proBuddies = [...ROSTER_IDS.buddies];
+
+  // IMPORTANT: the roster is applied in `update` too, not just `create`.
+  // With `update: {}` an already-seeded database (dev/stage/CI, and prod once
+  // backfilled) keeps its stale row forever, so a newly added maestro would
+  // never reach paying users — the same bug fixed for Trial in PR #457.
   const pro = await prisma.tierDefinition.upsert({
     where: { code: 'pro' },
-    update: {},
+    update: {
+      availableMaestri: proMaestri,
+      availableCoaches: proCoaches,
+      availableBuddies: proBuddies,
+      ...PRO_MODELS,
+    },
     create: {
       code: 'pro',
       name: 'Pro',
@@ -144,8 +209,9 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
       voiceMinutesDaily: 999999,
       toolsLimitDaily: 999999,
       docsLimitTotal: 999999,
-      chatModel: CHAT_MODEL_PRO,
-      realtimeModel: 'gpt-realtime',
+      videoVisionSecondsPerSession: 60,
+      videoVisionMinutesMonthly: 10,
+      ...PRO_MODELS,
       features: {
         chat: true,
         voice: true,
@@ -163,44 +229,16 @@ export async function seedTiers(prisma: PrismaClient): Promise<{
           'homework',
           'chart',
         ],
-        coachesAvailable: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-        buddiesAvailable: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
+        coachesAvailable: proCoaches,
+        buddiesAvailable: proBuddies,
         parentDashboard: true,
         prioritySupport: true,
         advancedAnalytics: true,
         unlimitedStorage: true,
       },
-      availableMaestri: [
-        'leonardo',
-        'galileo',
-        'curie',
-        'cicerone',
-        'lovelace',
-        'smith',
-        'shakespeare',
-        'humboldt',
-        'erodoto',
-        'manzoni',
-        'euclide',
-        'mozart',
-        'socrate',
-        'ippocrate',
-        'feynman',
-        'darwin',
-        'chris',
-        'omero',
-        'alex-pina',
-        'simone',
-        'cassese',
-        'mascetti',
-        'moliere',
-        'goethe',
-        'cervantes',
-        'levi-montalcini',
-        'loto',
-      ],
-      availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-      availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
+      availableMaestri: proMaestri,
+      availableCoaches: proCoaches,
+      availableBuddies: proBuddies,
       availableTools: [
         'pdf',
         'chat',

@@ -18,11 +18,40 @@ import { anonymizeConversationMessage } from '@/lib/privacy';
 const EXPECTED_DIMENSIONS = 1536;
 
 /**
+ * Owner of system-authored corpora (maestro knowledge base).
+ *
+ * Rows owned by this pseudo-user are not user content: they are didactic
+ * material authored in-house and governed by DATA-GOVERNANCE-SOP.md.
+ */
+export const SYSTEM_KB_USER_ID = 'SYSTEM_MAESTRO_KB';
+
+/**
+ * Anonymization exists to keep user PII out of the vector store (C-06).
+ * System-authored didactic content contains no user PII, and anonymizing it
+ * actively corrupts it — the PII heuristics rewrite the historical names the
+ * content is *about* ("Il metodo Feynman" -> "Il metodo [NOME]"), which would
+ * then be fed back into the maestro prompt.
+ *
+ * The exemption is deliberately narrow: it requires both the system owner and
+ * the system source type, so no user-owned row can ever take this path.
+ */
+function isSystemAuthoredCorpus(input: StoreEmbeddingInput): boolean {
+  return input.userId === SYSTEM_KB_USER_ID && input.sourceType === 'maestro_knowledge';
+}
+
+/**
  * Input for storing an embedding
  */
 export interface StoreEmbeddingInput {
   userId: string;
-  sourceType: 'material' | 'flashcard' | 'studykit' | 'message' | 'tool' | 'conversation_summary';
+  sourceType:
+    | 'material'
+    | 'flashcard'
+    | 'studykit'
+    | 'message'
+    | 'tool'
+    | 'conversation_summary'
+    | 'maestro_knowledge';
   sourceId: string;
   chunkIndex?: number;
   content: string;
@@ -86,7 +115,9 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
   });
 
   // Anonymize content before storing to ensure no PII in vector DB
-  const anonymizedContent = anonymizeConversationMessage(input.content);
+  const anonymizedContent = isSystemAuthoredCorpus(input)
+    ? input.content
+    : anonymizeConversationMessage(input.content);
 
   const embedding = await prisma.contentEmbedding.create({
     data: {

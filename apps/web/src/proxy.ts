@@ -115,7 +115,14 @@ function isValidVisitorId(visitorId: string | undefined): boolean {
   return UUID_V4_REGEX.test(visitorId);
 }
 
-// Static file extensions to skip
+// Static file extensions to skip.
+//
+// Anything served straight out of public/ must be listed here, or the i18n
+// layer treats it as a page and 307s it to /<locale>/... . That is how the
+// self-hosted pdf.js worker broke in production: /pdf/pdf.worker.min.mjs
+// redirected to /it/welcome, so the browser got an HTML page where it
+// expected a worker script. Keep .mjs and .wasm listed even if today only
+// the pdf.js worker uses them.
 const STATIC_EXTENSIONS = [
   '.ico',
   '.png',
@@ -130,6 +137,9 @@ const STATIC_EXTENSIONS = [
   '.otf',
   '.css',
   '.js',
+  '.mjs',
+  '.wasm',
+  '.map',
 ];
 
 function pathMatchesRoute(pathname: string, route: string): boolean {
@@ -258,7 +268,7 @@ export function buildCSPHeader(nonce: string): string {
  * Check if path should skip i18n middleware entirely
  * These paths are not localized and should not be redirected
  */
-function shouldSkipI18n(pathname: string): boolean {
+export function shouldSkipI18n(pathname: string): boolean {
   // Skip paths that start with excluded prefixes
   if (I18N_EXCLUDE_PATHS.some((prefix) => pathname.startsWith(prefix))) {
     return true;

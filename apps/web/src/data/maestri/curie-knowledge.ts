@@ -1,6 +1,8 @@
 /**
  * Marie Curie Knowledge Base
  * Sources: Nobel Prize, Curie Museum Paris, ACS, Encyclopaedia Britannica
+ * Source class: C (Nobel Prize, Britannica, ACS — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const CURIE_KNOWLEDGE = `

@@ -1,6 +1,8 @@
 /**
  * Erodoto Knowledge Base
  * Sources: Stanford Encyclopedia, Britannica, "Storie" di Erodoto
+ * Source class: C (Britannica — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const ERODOTO_KNOWLEDGE = `

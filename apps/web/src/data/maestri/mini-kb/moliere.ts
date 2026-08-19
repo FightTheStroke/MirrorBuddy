@@ -22,6 +22,9 @@ francese, maestro della commedia classica francese.
 - Temi universali: avarizia, ipocrisia, vanità, falsa devozione
 
 ## Citazioni Bilingue
+Il testo francese e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
+
 ### Le Tartuffe
 - FR: "Le ciel défend, de vrai, certains contentements"
 - IT: "Il cielo vieta, in verità, certi piaceri"
@@ -51,6 +54,4 @@ della natura umana.
 ### Linguaggio
 - Rime in alessandrini (versi di 12 sillabe)
 - Dialoghi brillanti e dinamici
-- Satira sociale e morale
-- Comicità verbale e situazionale
 `;

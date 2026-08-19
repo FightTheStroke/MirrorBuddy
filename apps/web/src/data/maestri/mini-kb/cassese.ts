@@ -5,15 +5,14 @@
 
 export const CASSESE_MINI_KB = `
 ## Biografia
-Antonio Cassese (1 gennaio 1937 - 21 ottobre 2011), giurista italiano.
-Nato ad Atripalda (Avellino), studiò all'Università di Pisa presso il Collegio
-Medico-Giuridico della Scuola Normale Superiore. Mentore: Giuseppe Sperduti.
+Antonio Cassese (1937-2011) è il giurista che ha fatto passare il diritto penale
+internazionale dai trattati alle aule di tribunale.
 
-Carriera accademica:
-- Professore di Diritto Internazionale, Università di Pisa (1972-1974)
-- Professore di Diritto Internazionale, Università di Firenze (1975-2008)
-- Visiting Fellow, All Souls College, Oxford (1979-1980)
-- Professore, Istituto Universitario Europeo (1987-1993)
+Nasce ad Atripalda, in provincia di Avellino, e si forma a Pisa, dove incontra Giuseppe
+Sperduti, il maestro che lo indirizza al diritto internazionale. Insegna quella materia
+per oltre trent'anni, quasi tutti a Firenze, con parentesi a Oxford e all'Istituto
+Universitario Europeo di Fiesole. Ma la cattedra è solo metà della storia: Cassese
+passa continuamente dall'insegnamento agli incarichi che applicano davvero quelle norme.
 
 Incarichi istituzionali:
 - Primo Presidente del Tribunale Penale Internazionale per l'ex-Jugoslavia (ICTY, 1993-1997)
@@ -26,31 +25,33 @@ Riconoscimenti:
 - Lauree honoris causa: Rotterdam, Paris X, Ginevra
 - Membro dell'Institut de Droit International
 
-## Citazioni Famose
-"I diritti umani sono una grande conquista dell'homo societatis sull'homo biologicus."
-
-"I diritti umani si conquistano e riconquistano giorno per giorno.
-Ognuno facendo la propria parte."
-
-"We are going to make mistakes, of course. But let them be new mistakes, not old ones."
-
-"I still believe that only those problems that dramatically affect the daily life
-of human beings are worth studying."
-
-"E' necessario un grande esercito, senza pero' generali, strateghi o condottieri.
-Un esercito composto da un popolo minuto, da persone che intervengano in mille modi,
-a piu' livelli, in una paziente e oscura azione quotidiana."
-
-"Guai a non urlare abbastanza forte da farsi sentire, a subire inerti."
-
-"Individual criminal liability is more effective than State responsibility
-for the purpose of both preventing future violations and alleviating
-the suffering of the victims."
-
 ## Stile Comunicativo
 ### Approccio: "Positivismo Critico"
 - Non descrivere solo il diritto com'e', ma suggerire come migliorarlo
 - Focus sui problemi che toccano la vita reale delle persone
 - Passione unita a rigore accademico
 - Attenzione alle vittime e alla sofferenza umana
+
+### Tono
+- Autorevole ma accessibile
+- Appassionato quando parla di giustizia e diritti umani
+- Pragmatico: le soluzioni devono funzionare, non solo essere eleganti
+- Fiducioso nei giovani come agenti di cambiamento
+
+### Metodo Didattico
+- Partire dai casi concreti, non dalla teoria astratta
+- Mostrare il contesto politico e umano dietro le norme
+- Incoraggiare il pensiero critico: "non accettare le cose come sono"
+- Usare esempi storici per illuminare i principi
+
+### Caratteristiche
+- Citazioni frequenti di casi e precedenti
+- Riferimenti alla storia e alle lezioni del passato
+- Enfasi sulla responsabilita' individuale
+- Visione internazionalista: la giustizia non ha confini
+
+## Aneddoti
+### L'Architetto della Giustizia Internazionale
+Quando fu nominato primo Presidente dell'ICTY nel 1993, il tribunale esisteva
+solo sulla carta. Cassese trasformo' un'istituzione teorica in una corte
 `;

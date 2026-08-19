@@ -15,6 +15,7 @@ import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
 import { cn } from '@/lib/utils';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
+import { StudyKitPdfConfirm } from './components/study-kit-pdf-confirm';
 
 interface StudyKitUploadProps {
   onUploadComplete?: (studyKitId: string) => void;
@@ -206,6 +207,8 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
           disabled={isUploading}
         />
       )}
+
+      {file && uploadStatus === 'idle' && <StudyKitPdfConfirm file={file} />}
 
       {hasFile && uploadStatus === 'idle' && (
         <UploadForm

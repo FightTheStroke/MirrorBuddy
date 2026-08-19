@@ -96,6 +96,11 @@ const eslintConfig = defineConfig([
     // bundled Playwright trace viewer and reported thousands of errors in
     // minified vendor code, which made `npm run lint` unusable locally.
     ".gstack/**",
+    // Vendored, minified pdf.js worker. It is a build artefact copied from
+    // node_modules by `npm run pdf:worker` and committed so the viewer is
+    // served same-origin (the CSP forbids CDN scripts). Linting vendor
+    // minified output is meaningless and it is not ours to fix.
+    "apps/web/public/pdf/**",
   ]),
   // Custom rules
   {

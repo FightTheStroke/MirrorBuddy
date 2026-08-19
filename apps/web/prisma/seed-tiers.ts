@@ -1,283 +1,34 @@
+/**
+ * Standalone tier seed entry point — `npm run seed:tiers`.
+ *
+ * This file used to contain its own full copy of the tier definitions, which
+ * drifted badly from `src/lib/seeds/tier-seed.ts`: it seeded maestro IDs that
+ * no longer exist ('leonardo-art' instead of 'leonardo'), a hand-maintained
+ * roster that never grew when maestri were added, and it would have upgraded
+ * Base users to the expensive realtime model. A database refreshed through
+ * this script therefore contradicted one seeded through the shared module.
+ *
+ * It is now a thin wrapper. There is one definition of a tier, in one place;
+ * this only supplies a PrismaClient and a process exit code.
+ */
 import { PrismaClient } from '@prisma/client';
+
+import { seedTiers } from '../src/lib/seeds/tier-seed';
 
 const prisma = new PrismaClient();
 
-// Model defaults from env vars (change here or in .env to migrate without code changes)
-const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || 'gpt-5-mini';
-const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || 'gpt-5.2-edu';
-const CHAT_MODEL_PRO = process.env.DEFAULT_CHAT_MODEL_PRO || 'gpt-5.2-chat';
-const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
-
 async function main() {
-  console.log('Seeding tier definitions with per-feature models (ADR 0073)...');
-  console.log(
-    `Models: chat=${CHAT_MODEL}, edu=${CHAT_MODEL_EDU}, pro=${CHAT_MODEL_PRO}, demo=${DEMO_MODEL}`,
-  );
+  console.log('Seeding tier definitions (ADR 0073)...');
+  const { trial, base, pro } = await seedTiers(prisma);
 
-  // Trial Tier - Cost-effective model for all features
-  const trial = await prisma.tierDefinition.upsert({
-    where: { code: 'trial' },
-    update: {
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL,
-      realtimeModel: 'gpt-realtime-mini',
-      pdfModel: CHAT_MODEL,
-      mindmapModel: CHAT_MODEL,
-      quizModel: CHAT_MODEL,
-      flashcardsModel: CHAT_MODEL,
-      summaryModel: CHAT_MODEL,
-      formulaModel: CHAT_MODEL,
-      chartModel: CHAT_MODEL,
-      homeworkModel: CHAT_MODEL,
-      webcamModel: CHAT_MODEL,
-      demoModel: DEMO_MODEL,
-    },
-    create: {
-      code: 'trial',
-      name: 'Trial',
-      description: 'Free trial tier with limited access',
-      chatLimitDaily: 10,
-      voiceMinutesDaily: 5,
-      toolsLimitDaily: 10,
-      docsLimitTotal: 1,
-      videoVisionSecondsPerSession: 0,
-      videoVisionMinutesMonthly: 0,
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL,
-      realtimeModel: 'gpt-realtime-mini',
-      pdfModel: CHAT_MODEL,
-      mindmapModel: CHAT_MODEL,
-      quizModel: CHAT_MODEL,
-      flashcardsModel: CHAT_MODEL,
-      summaryModel: CHAT_MODEL,
-      formulaModel: CHAT_MODEL,
-      chartModel: CHAT_MODEL,
-      homeworkModel: CHAT_MODEL,
-      webcamModel: CHAT_MODEL,
-      demoModel: DEMO_MODEL,
-      features: {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        quizzes: true,
-        mindMaps: true,
-        tools: ['pdf', 'chat'],
-        coachesAvailable: ['melissa'],
-        buddiesAvailable: ['mario'],
-      },
-      availableMaestri: ['leonardo-art', 'galileo-physics', 'curie-chemistry'],
-      availableCoaches: ['melissa'],
-      availableBuddies: ['mario'],
-      availableTools: ['pdf', 'chat'],
-      monthlyPriceEur: null,
-      sortOrder: 1,
-      isActive: true,
-    },
+  // availableMaestri is a JSON column, so its type is not an array here.
+  const count = (v: unknown) => (Array.isArray(v) ? v.length : '?');
+
+  console.log('Tier seed completed:', {
+    trial: trial.code,
+    base: `${base.code} (${count(base.availableMaestri)} maestri)`,
+    pro: `${pro.code} (${count(pro.availableMaestri)} maestri)`,
   });
-
-  // Base Tier - Education-optimized models for registered users
-  const base = await prisma.tierDefinition.upsert({
-    where: { code: 'base' },
-    update: {
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL_EDU,
-      realtimeModel: 'gpt-realtime',
-      pdfModel: CHAT_MODEL,
-      mindmapModel: CHAT_MODEL,
-      quizModel: CHAT_MODEL_EDU,
-      flashcardsModel: CHAT_MODEL,
-      summaryModel: CHAT_MODEL,
-      formulaModel: CHAT_MODEL_EDU,
-      chartModel: CHAT_MODEL,
-      homeworkModel: CHAT_MODEL_EDU,
-      webcamModel: CHAT_MODEL_EDU,
-      demoModel: DEMO_MODEL,
-    },
-    create: {
-      code: 'base',
-      name: 'Base',
-      description: 'Freemium tier with access to all maestri',
-      chatLimitDaily: 50,
-      voiceMinutesDaily: 30,
-      toolsLimitDaily: 30,
-      docsLimitTotal: 5,
-      videoVisionSecondsPerSession: 0,
-      videoVisionMinutesMonthly: 0,
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL_EDU,
-      realtimeModel: 'gpt-realtime',
-      pdfModel: CHAT_MODEL,
-      mindmapModel: CHAT_MODEL,
-      quizModel: CHAT_MODEL_EDU,
-      flashcardsModel: CHAT_MODEL,
-      summaryModel: CHAT_MODEL,
-      formulaModel: CHAT_MODEL_EDU,
-      chartModel: CHAT_MODEL,
-      homeworkModel: CHAT_MODEL_EDU,
-      webcamModel: CHAT_MODEL_EDU,
-      demoModel: DEMO_MODEL,
-      features: {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        quizzes: true,
-        mindMaps: true,
-        tools: ['pdf', 'chat', 'flashcards', 'mindmap'],
-        coachesAvailable: ['melissa', 'roberto', 'chiara'],
-        buddiesAvailable: ['mario', 'noemi', 'enea'],
-        parentDashboard: true,
-      },
-      availableMaestri: [
-        'leonardo-art',
-        'galileo-physics',
-        'curie-chemistry',
-        'cicerone-civic-education',
-        'lovelace-computer-science',
-        'smith-economics',
-        'shakespeare-english',
-        'humboldt-geography',
-        'erodoto-history',
-        'manzoni-italian',
-        'euclide-mathematics',
-        'mozart-music',
-        'socrate-philosophy',
-        'ippocrate-health',
-        'feynman-physics',
-        'darwin-biology',
-        'chris-physical-education',
-        'omero-storytelling',
-        'alex-pina-spanish',
-        'simone-sport',
-        'cassese-international-law',
-        'moliere-french',
-        'goethe-german',
-        'cervantes-spanish',
-        'levi-montalcini-biology',
-      ],
-      availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij'],
-      availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia'],
-      availableTools: ['pdf', 'chat', 'flashcards', 'mindmap', 'quiz', 'formula'],
-      monthlyPriceEur: null,
-      sortOrder: 2,
-      isActive: true,
-    },
-  });
-
-  // Pro Tier - Best models for all features
-  const pro = await prisma.tierDefinition.upsert({
-    where: { code: 'pro' },
-    update: {
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL_PRO,
-      realtimeModel: 'gpt-realtime',
-      pdfModel: CHAT_MODEL_PRO,
-      mindmapModel: CHAT_MODEL_PRO,
-      quizModel: CHAT_MODEL_PRO,
-      flashcardsModel: CHAT_MODEL_PRO,
-      summaryModel: CHAT_MODEL_PRO,
-      formulaModel: CHAT_MODEL_PRO,
-      chartModel: CHAT_MODEL_PRO,
-      homeworkModel: CHAT_MODEL_PRO,
-      webcamModel: CHAT_MODEL_PRO,
-      demoModel: DEMO_MODEL,
-    },
-    create: {
-      code: 'pro',
-      name: 'Pro',
-      description: 'Professional tier with unlimited access and priority support',
-      chatLimitDaily: 999999,
-      voiceMinutesDaily: 999999,
-      toolsLimitDaily: 999999,
-      docsLimitTotal: 999999,
-      videoVisionSecondsPerSession: 60,
-      videoVisionMinutesMonthly: 10,
-      // Per-feature models (ADR 0073) - env-driven defaults
-      chatModel: CHAT_MODEL_PRO,
-      realtimeModel: 'gpt-realtime',
-      pdfModel: CHAT_MODEL_PRO,
-      mindmapModel: CHAT_MODEL_PRO,
-      quizModel: CHAT_MODEL_PRO,
-      flashcardsModel: CHAT_MODEL_PRO,
-      summaryModel: CHAT_MODEL_PRO,
-      formulaModel: CHAT_MODEL_PRO,
-      chartModel: CHAT_MODEL_PRO,
-      homeworkModel: CHAT_MODEL_PRO,
-      webcamModel: CHAT_MODEL_PRO,
-      demoModel: DEMO_MODEL,
-      features: {
-        chat: true,
-        voice: true,
-        flashcards: true,
-        quizzes: true,
-        mindMaps: true,
-        tools: [
-          'pdf',
-          'chat',
-          'flashcards',
-          'mindmap',
-          'quiz',
-          'formula',
-          'webcam',
-          'homework',
-          'chart',
-        ],
-        coachesAvailable: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-        buddiesAvailable: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
-        parentDashboard: true,
-        prioritySupport: true,
-        advancedAnalytics: true,
-        unlimitedStorage: true,
-        video_vision: true,
-      },
-      availableMaestri: [
-        'leonardo-art',
-        'galileo-physics',
-        'curie-chemistry',
-        'cicerone-civic-education',
-        'lovelace-computer-science',
-        'smith-economics',
-        'shakespeare-english',
-        'humboldt-geography',
-        'erodoto-history',
-        'manzoni-italian',
-        'euclide-mathematics',
-        'mozart-music',
-        'socrate-philosophy',
-        'ippocrate-health',
-        'feynman-physics',
-        'darwin-biology',
-        'chris-physical-education',
-        'omero-storytelling',
-        'alex-pina-spanish',
-        'simone-sport',
-        'cassese-international-law',
-        'mascetti-supercazzola',
-        'moliere-french',
-        'goethe-german',
-        'cervantes-spanish',
-        'levi-montalcini-biology',
-      ],
-      availableCoaches: ['melissa', 'roberto', 'chiara', 'andrea', 'favij', 'laura'],
-      availableBuddies: ['mario', 'noemi', 'enea', 'bruno', 'sofia', 'marta'],
-      availableTools: [
-        'pdf',
-        'chat',
-        'flashcards',
-        'mindmap',
-        'quiz',
-        'formula',
-        'webcam',
-        'homework',
-        'chart',
-      ],
-      stripePriceId: process.env.STRIPE_PRICE_PRO || undefined,
-      monthlyPriceEur: 9.99,
-      sortOrder: 3,
-      isActive: true,
-    },
-  });
-
-  console.log('Tier seed completed:', { trial, base, pro });
 }
 
 main()

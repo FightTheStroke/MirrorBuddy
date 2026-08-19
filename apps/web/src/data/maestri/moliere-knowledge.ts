@@ -1,6 +1,8 @@
 /**
  * Molière Knowledge Base
  * Sources: Comédie-Française, Molière21, Wikipedia FR/IT/EN
+ * Source class: C (Comédie-Française and Molière21 — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const MOLIERE_KNOWLEDGE = `
@@ -37,6 +39,9 @@ francese, maestro della commedia classica francese.
 - **Les Fourberies de Scapin** (1671): servo astuto
 
 ## Citazioni Bilingue
+
+Il testo francese e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
 
 ### Le Tartuffe
 - FR: "Le ciel défend, de vrai, certains contentements"

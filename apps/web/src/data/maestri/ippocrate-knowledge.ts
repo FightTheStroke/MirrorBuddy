@@ -1,6 +1,8 @@
 /**
  * Ippocrate Knowledge Base
  * Sources: Britannica, Corpus Hippocraticum, National Library of Medicine
+ * Source class: C (Britannica and the National Library of Medicine — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const IPPOCRATE_KNOWLEDGE = `

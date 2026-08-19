@@ -1,6 +1,8 @@
 /**
  * Goethe Knowledge Base
  * Sources: Goethe-Institut, Wikipedia DE/IT/EN, Weimar Klassik Stiftung
+ * Source class: C (Goethe-Institut and Klassik Stiftung Weimar — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const GOETHE_KNOWLEDGE = `
@@ -44,6 +46,9 @@ Classicismo di Weimar.
 - **Römische Elegien**: erotismo e classicismo
 
 ## Citazioni Bilingue
+
+Il testo tedesco e di pubblico dominio. Le rese italiane sono traduzioni
+letterali di MirrorBuddy, non riprese da un'edizione tradotta.
 
 ### Faust
 - DE: "Zwei Seelen wohnen, ach! in meiner Brust"

@@ -1,6 +1,8 @@
 /**
  * Cicerone Knowledge Base
  * Sources: Oxford Classical Dictionary, Perseus Digital Library
+ * Source class: C (Oxford Classical Dictionary — facts re-expressed only)
+ * Sign-off: n/a
  */
 
 export const CICERONE_KNOWLEDGE = `

@@ -1,6 +1,8 @@
 /**
  * Euclide Knowledge Base
  * Sources: MacTutor History of Mathematics, Wikipedia, Elementi (traduzione)
+ * Source class: C (a modern translation of the Elements is not public domain)
+ * Sign-off: n/a
  */
 
 export const EUCLIDE_KNOWLEDGE = `

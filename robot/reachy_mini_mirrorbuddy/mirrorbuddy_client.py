@@ -2,7 +2,7 @@
 
 MirrorBuddy exposes an unauthenticated JSON endpoint ``GET /api/maestri?locale=it``
 that returns the same Maestro data the web app uses. By fetching it here we keep the
-robot fully aligned with MirrorBuddy: the exact same 27 professors, voices, system
+robot fully aligned with MirrorBuddy: the exact same 32 professors, voices, system
 prompts and greetings, with zero duplication.
 """
 

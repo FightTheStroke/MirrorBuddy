@@ -2,27 +2,16 @@
  * Constants for GenitoriView
  */
 
+import { maestri } from '@/data/maestri';
 import type { ParentDashboardActivity } from '@/types';
 
-export const MAESTRO_NAMES: Record<string, string> = {
-  leonardo: 'Leonardo',
-  galileo: 'Galileo',
-  curie: 'Marie Curie',
-  cicerone: 'Cicerone',
-  lovelace: 'Ada Lovelace',
-  smith: 'Adam Smith',
-  shakespeare: 'Shakespeare',
-  humboldt: 'Humboldt',
-  erodoto: 'Erodoto',
-  manzoni: 'Manzoni',
-  euclide: 'Euclide',
-  mozart: 'Mozart',
-  socrate: 'Socrate',
-  ippocrate: 'Ippocrate',
-  feynman: 'Feynman',
-  darwin: 'Darwin',
-  chris: 'Chris',
-};
+/**
+ * Display names, derived from the roster so a newly added maestro cannot
+ * appear in a parent's dashboard as a raw lowercase id.
+ */
+export const MAESTRO_NAMES: Record<string, string> = Object.fromEntries(
+  maestri.map((m) => [m.id, m.displayName || m.name]),
+);
 
 /**
  * Empty activity data for when no profile exists yet.
