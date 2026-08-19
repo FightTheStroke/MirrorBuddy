@@ -15,12 +15,23 @@ import { describe, expect, it } from 'vitest';
  * the step, and no Playwright job may run without a job-level ceiling.
  */
 
-const PLAYWRIGHT_DEPS_STEP = 'Install Playwright OS deps';
-const PLAYWRIGHT_BROWSERS_STEP = 'Install Playwright browsers';
+/**
+ * Jobs are recognised by what they run, not by what a step is called. Keying
+ * off the display name meant a new job could run Playwright under a renamed
+ * step, escape the filter entirely, and still leave the count assertion
+ * satisfied by the seven jobs that already comply — the guard would stay green
+ * while reintroducing the exact unbounded-job hang it exists to prevent.
+ */
+const RUNS_PLAYWRIGHT = /playwright\s+(install|test)|test:e2e|test:smoke/;
+const INSTALLS_OS_DEPS = /playwright\s+install-deps/;
+const INSTALLS_BROWSERS = /playwright\s+install(?!-deps)/;
+const WITH_DEPS = /--with-deps/;
 
 interface WorkflowStep {
   name?: string;
   run?: string;
+  uses?: string;
+  with?: Record<string, unknown>;
   'timeout-minutes'?: number;
   'continue-on-error'?: boolean;
 }
@@ -42,8 +53,12 @@ function readCiWorkflow(): Workflow {
 
 function jobsRunningPlaywright(workflow: Workflow): [string, WorkflowJob][] {
   return Object.entries(workflow.jobs).filter(([, job]) =>
-    (job.steps ?? []).some((step) => step.name === PLAYWRIGHT_DEPS_STEP),
+    (job.steps ?? []).some((step) => RUNS_PLAYWRIGHT.test(step.run ?? '')),
   );
+}
+
+function stepsMatching(job: WorkflowJob, pattern: RegExp): WorkflowStep[] {
+  return (job.steps ?? []).filter((step) => pattern.test(step.run ?? ''));
 }
 
 describe('Playwright CI jobs cannot hang', () => {
@@ -61,8 +76,7 @@ describe('Playwright CI jobs cannot hang', () => {
 
   it('bounds the install-deps step itself and never lets it fail the job', () => {
     const offenders = jobsRunningPlaywright(readCiWorkflow()).flatMap(([name, job]) =>
-      (job.steps ?? [])
-        .filter((step) => step.name === PLAYWRIGHT_DEPS_STEP)
+      stepsMatching(job, INSTALLS_OS_DEPS)
         .filter(
           (step) =>
             typeof step['timeout-minutes'] !== 'number' || step['continue-on-error'] !== true,
@@ -75,8 +89,7 @@ describe('Playwright CI jobs cannot hang', () => {
 
   it('bounds the browser install too', () => {
     const offenders = jobsRunningPlaywright(readCiWorkflow()).flatMap(([name, job]) =>
-      (job.steps ?? [])
-        .filter((step) => step.name === PLAYWRIGHT_BROWSERS_STEP)
+      stepsMatching(job, INSTALLS_BROWSERS)
         .filter((step) => typeof step['timeout-minutes'] !== 'number')
         .map(() => name),
     );
@@ -86,9 +99,7 @@ describe('Playwright CI jobs cannot hang', () => {
 
   it('keeps apt out of the required browser install', () => {
     const withDeps = jobsRunningPlaywright(readCiWorkflow()).flatMap(([name, job]) =>
-      (job.steps ?? [])
-        .filter((step) => step.run?.includes('--with-deps') === true)
-        .map(() => name),
+      stepsMatching(job, WITH_DEPS).map(() => name),
     );
 
     expect(withDeps).toEqual([]);

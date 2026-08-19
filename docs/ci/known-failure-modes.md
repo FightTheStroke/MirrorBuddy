@@ -62,9 +62,18 @@ gh run rerun <run-id> --failed
 ```
 
 Then confirm the tests actually executed — a green job is not enough, since the
-failure mode produces a green run with `skipped` test steps:
+failure mode produces a green run with `skipped` test steps. Read the _step_
+conclusions, not the job's: the job is what lies to you here.
 
 ```bash
 gh api "repos/FightTheStroke/MirrorBuddy/actions/runs/<run-id>/attempts/<n>/jobs?per_page=100" \
-  --jq '.jobs[] | select(.name|test("Smoke|Accessibility")) | "\(.name) → \(.conclusion)"'
+  --jq '.jobs[]
+        | select(.name|test("Smoke|Accessibility"))
+        | . as $job
+        | .steps[]
+        | select(.name|test("test|Test"))
+        | "\($job.name) → \(.name): \(.conclusion)"'
 ```
+
+Every line must read `success`. A `skipped` there is the failure mode, whatever
+colour the job shows.
