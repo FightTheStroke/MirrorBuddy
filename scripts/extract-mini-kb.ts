@@ -194,6 +194,55 @@ function isHandAuthored(miniKBPath: string): boolean {
   return !header.includes(GENERATED_MARKER);
 }
 
+/**
+ * For a hand-authored mini-KB the generated one is computed and thrown away, so
+ * the cap is not what strands identity content — the discard is. Whatever the
+ * human rewrite happens not to carry has to reach RAG instead.
+ *
+ * Compared line by line against the real committed file rather than assumed:
+ * the rewrite is in a different voice, so it covers some source lines verbatim
+ * and paraphrases others, and only the file itself knows which.
+ */
+function identityNotCarriedBy(sections: Section[], realMiniKB: string): string {
+  return sections
+    .filter((s) => s.isIdentity)
+    .flatMap((s) => [s.heading, s.content].filter(Boolean).join('\n').split('\n'))
+    .filter((line) => line.trim() && !realMiniKB.includes(line.trim()))
+    .join('\n')
+    .trim();
+}
+
+/**
+ * What the two runtime paths actually carry for a knowledge file: the mini-KB
+ * the persona prompt inlines, and the didactic text the RAG seeding embeds.
+ *
+ * This reads the committed mini-KB for hand-authored Maestri instead of the
+ * generated one, because that is the file that ships. Recomputing it here was
+ * how the first version of the guard came to pass while Austen's identity facts
+ * were reachable from nowhere: the test and production disagreed about which
+ * artefact was real. Both now come through this one function.
+ */
+export function runtimeArtefacts(knowledgeFilePath: string): {
+  source: string;
+  miniKB: string;
+  didactic: string;
+  handAuthored: boolean;
+} | null {
+  const markdown = extractKnowledgeContent(knowledgeFilePath);
+  if (!markdown) return null;
+
+  const slug = getMaestroSlug(path.basename(knowledgeFilePath));
+  const miniKBPath = path.join(MINI_KB_DIR, `${slug}.ts`);
+  const sections = parseSections(markdown);
+  const built = buildMiniKB(sections);
+  const handAuthored = isHandAuthored(miniKBPath);
+
+  const miniKB = handAuthored ? fs.readFileSync(miniKBPath, 'utf-8') : built.content;
+  const overflow = handAuthored ? identityNotCarriedBy(sections, miniKB) : built.overflow;
+
+  return { source: markdown, miniKB, didactic: buildDidactic(sections, overflow), handAuthored };
+}
+
 function generateMiniKBFile(slug: string, content: string): string {
   const constName = `${toConstName(slug)}_MINI_KB`;
   return `/**
@@ -260,14 +309,21 @@ function main() {
     }
 
     const sections = parseSections(markdown);
-    const { content: miniKB, overflow } = buildMiniKB(sections);
+    const { content: miniKB, overflow: capOverflow } = buildMiniKB(sections);
+    const miniKBPath = path.join(MINI_KB_DIR, `${slug}.ts`);
+    const handAuthored = isHandAuthored(miniKBPath);
+    const overflow = handAuthored
+      ? identityNotCarriedBy(sections, fs.readFileSync(miniKBPath, 'utf-8'))
+      : capOverflow;
     const didactic = buildDidactic(sections, overflow);
 
     const miniKBLines = miniKB.split('\n').length;
     const didacticLines = didactic.split('\n').length;
     const identityCount = sections.filter((s) => s.isIdentity).length;
     const didacticCount = sections.filter((s) => !s.isIdentity && s.heading).length;
-    const overflowNote = overflow ? ` + ${overflow.split('\n').length} overflow → RAG` : '';
+    const overflowNote = overflow
+      ? ` + ${overflow.split('\n').length} overflow → RAG${handAuthored ? ' (hand-authored)' : ''}`
+      : '';
 
     console.log(
       `${slug}: ${identityCount} identity (${miniKBLines} lines) + ${didacticCount} didactic (${didacticLines} lines)${overflowNote}`,
@@ -275,8 +331,7 @@ function main() {
 
     if (!dryRun) {
       if (!didacticOnly) {
-        const miniKBPath = path.join(MINI_KB_DIR, `${slug}.ts`);
-        if (isHandAuthored(miniKBPath)) {
+        if (handAuthored) {
           skippedHandAuthored.push(slug);
         } else {
           fs.writeFileSync(miniKBPath, generateMiniKBFile(slug, miniKB));
@@ -318,23 +373,6 @@ export function expectedMiniKBFile(knowledgeFilePath: string): string | null {
   if (!markdown) return null;
   const slug = getMaestroSlug(path.basename(knowledgeFilePath));
   return generateMiniKBFile(slug, buildMiniKB(parseSections(markdown)).content);
-}
-
-/**
- * What the two runtime paths would carry for a knowledge file: the mini-KB the
- * persona prompt inlines, and the didactic text the RAG seeding embeds.
- * Exported so a guard can assert that no authored line falls outside both.
- */
-export function runtimeArtefacts(knowledgeFilePath: string): {
-  source: string;
-  miniKB: string;
-  didactic: string;
-} | null {
-  const markdown = extractKnowledgeContent(knowledgeFilePath);
-  if (!markdown) return null;
-  const sections = parseSections(markdown);
-  const { content, overflow } = buildMiniKB(sections);
-  return { source: markdown, miniKB: content, didactic: buildDidactic(sections, overflow) };
 }
 
 export { isHandAuthored, getMaestroSlug, MAESTRI_DIR, MINI_KB_DIR };

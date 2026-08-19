@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import { runtimeArtefacts, MAESTRI_DIR } from '../../../../../../scripts/extract-mini-kb';
+import { runtimeArtefacts, MAESTRI_DIR, MINI_KB_DIR } from '../../../../../../scripts/extract-mini-kb';
 
 /**
  * Nothing an author writes may be unreachable at runtime.
@@ -71,5 +71,42 @@ describe('no knowledge line is unreachable at runtime', () => {
 
     expect(artefacts.miniKB.split('\n').length).toBeLessThanOrEqual(50);
     expect(artefacts.didactic).toContain('Approfondimento');
+  });
+
+  /**
+   * Six mini-KBs are written by hand and the generated one is discarded. The
+   * first version of this guard recomputed the generated artefact for them too,
+   * so it compared the source against a file that never ships — and stayed green
+   * while Austen's identity facts were reachable from nowhere. These assert the
+   * guard reads what production reads.
+   */
+  describe('hand-authored mini-KBs are measured against the file that ships', () => {
+    it('finds the hand-authored Maestri', () => {
+      const handAuthored = files
+        .map((f) => ({ f, a: runtimeArtefacts(path.join(MAESTRI_DIR, f)) }))
+        .filter(({ a }) => a?.handAuthored);
+      expect(handAuthored.length).toBeGreaterThan(0);
+    });
+
+    it('reads the committed file, not a recomputed one', () => {
+      const artefacts = runtimeArtefacts(path.join(MAESTRI_DIR, 'austen-knowledge.ts'));
+      expect(artefacts).not.toBeNull();
+      if (!artefacts) return;
+
+      expect(artefacts.handAuthored).toBe(true);
+      const onDisk = fs.readFileSync(path.join(MINI_KB_DIR, 'austen.ts'), 'utf-8');
+      expect(artefacts.miniKB).toBe(onDisk);
+    });
+
+    it('sends identity content the human rewrite does not carry to RAG', () => {
+      const artefacts = runtimeArtefacts(path.join(MAESTRI_DIR, 'austen-knowledge.ts'));
+      expect(artefacts).not.toBeNull();
+      if (!artefacts) return;
+
+      // Biographical detail present in the source and absent from the rewrite.
+      const inRewrite = artefacts.miniKB.includes('Steventon');
+      const reachable = `${artefacts.miniKB}\n${artefacts.didactic}`;
+      expect(inRewrite || reachable.includes('Steventon')).toBe(true);
+    });
   });
 });
