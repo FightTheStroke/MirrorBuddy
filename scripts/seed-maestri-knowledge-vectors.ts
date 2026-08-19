@@ -83,7 +83,17 @@ async function embedAll(chunks: string[]): Promise<EmbeddedChunk[]> {
 
 async function seedMaestro(file: DidacticFile): Promise<SeedResult> {
   const { maestroId, subject } = file;
-  const embedded = await embedAll(chunkDidactic(file.content));
+  const chunks = chunkDidactic(file.content);
+
+  // Refuse before touching the index, not after. The delete below is
+  // unconditional, so an empty didactic file would wipe this Maestro's existing
+  // embeddings and write nothing back — turning a stale corpus into no corpus,
+  // and reporting the problem only once the damage was done.
+  if (chunks.length === 0) {
+    return { maestroId, chunks: 0, tokens: 0 };
+  }
+
+  const embedded = await embedAll(chunks);
 
   // Idempotency: a re-run replaces this maestro's corpus rather than
   // duplicating it. `@@unique([sourceType, sourceId, chunkIndex])` rules out
@@ -164,6 +174,7 @@ async function main() {
 
   let totalChunks = 0;
   let totalTokens = 0;
+  const empty: string[] = [];
 
   for (const file of files) {
     const data = loadDidacticContent(path.join(DIDACTIC_DIR, file));
@@ -178,17 +189,30 @@ async function main() {
     if (dryRun) {
       const chunks = chunkDidactic(data.content).length;
       console.log(`  ${label}: ${chunks} chunks`);
+      if (chunks === 0) empty.push(label);
       totalChunks += chunks;
       continue;
     }
 
     const result = await seedMaestro(data);
     console.log(`  ${label}: ${result.chunks} chunks, ${result.tokens} tokens`);
+    if (result.chunks === 0) empty.push(label);
     totalChunks += result.chunks;
     totalTokens += result.tokens;
   }
 
   console.log(`\n${dryRun ? '[DRY RUN] ' : ''}Total: ${totalChunks} chunks, ${totalTokens} tokens`);
+
+  // An empty didactic file chunks to an empty list, which reads exactly like a
+  // successful no-op. That is how chris stayed out of the index unnoticed while
+  // the run reported success: say it out loud instead.
+  if (empty.length > 0) {
+    console.error(
+      `\n❌ ${empty.length} maestro(s) produced no chunks and will not be retrievable: ${empty.join(', ')}\n` +
+        `   Run 'npm run kb:extract' first, or check their sections are not all identity.`,
+    );
+    process.exit(1);
+  }
 
   if (dryRun) return;
 
