@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import { findAttributedQuotes } from '../attributed-quotes';
 
 const MAESTRI_DIR = path.join(__dirname, '../../../data/maestri');
 
@@ -102,6 +103,30 @@ describe('knowledge base provenance headers', () => {
         `${h.slug}: class D file collects quotations. Reproducing dialogue from an ` +
           `in-copyright work is what SOP §3 forbids class D from taking.`,
       ).toBe(false);
+    }
+  });
+
+  // G-7. The rule above fires on a heading, so the same material written into
+  // ordinary prose walked straight past it — demonstrated by mutation during
+  // the gate on the provenance card, where fabricated speaker-attributed
+  // dialogue inserted under a normal section left every guard green and would
+  // have shipped to the model. This reads the full text instead, and looks for
+  // the shape that carries the risk: a quoted string presented as a named
+  // person's or character's own words.
+  it('does not put words in a named mouth anywhere in a class D file', () => {
+    for (const h of headers) {
+      if (!h.sourceClass?.startsWith('D')) continue;
+      const body = fs.readFileSync(path.join(MAESTRI_DIR, `${h.slug}-knowledge.ts`), 'utf-8');
+      const attributed = findAttributedQuotes(body);
+
+      expect(
+        attributed,
+        `${h.slug}: quotes attributed to a named speaker outside any quotations ` +
+          `heading:\n` +
+          attributed.map((a) => `  L${a.line} ${a.speaker} → "${a.quote}"`).join('\n') +
+          `\nSOP §3 does not let class D reproduce a third party's expression. ` +
+          `Rewrite it as indirect speech.`,
+      ).toEqual([]);
     }
   });
 
