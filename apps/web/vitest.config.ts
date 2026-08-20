@@ -12,10 +12,10 @@ export default defineConfig({
       'scripts/__tests__/**/*.test.ts',
       // The repo-root scripts/ has its own test folder, and `--root apps/web`
       // resolved the pattern above to apps/web/scripts/, which does not exist.
-      // Seven test files had therefore never run — including the ones covering
-      // key rotation and backup encryption. Four of them cannot run yet: they
-      // still import pre-monorepo paths such as `../src/lib/db`. They are
-      // excluded by name rather than by silence, and tracked as a card.
+      // Those files sit above the vite root, so each one must declare
+      // `@vitest-environment node`: under jsdom vitest cannot load a file above
+      // its root and fails collection with `Cannot find module '/@fs/...'`.
+      // root-tests-environment.test.ts enforces that.
       '../../scripts/__tests__/**/*.test.ts',
     ],
     exclude: [
@@ -23,10 +23,6 @@ export default defineConfig({
       'e2e/**',
       'apps/web/e2e/**',
       'feat/**',
-      '../../scripts/__tests__/lint-redirect-metadata.test.ts',
-      '../../scripts/__tests__/nightly-benchmark.test.ts',
-      '../../scripts/__tests__/nightly-benchmark-workflow.test.ts',
-      '../../scripts/__tests__/verify-backup-encryption.test.ts',
     ],
     setupFiles: ['./src/test/setup.ts'],
     // Retry flaky tests on CI (F-07)

@@ -1,4 +1,11 @@
 /**
+ * Lives outside the vite root (apps/web), so it must run in the node
+ * environment: under jsdom vitest cannot load a file above the root and
+ * fails with "Cannot find module '/@fs/...'".
+ *
+ * @vitest-environment node
+ */
+/**
  * Test for verify-backup-encryption script
  */
 
@@ -64,6 +71,16 @@ describe('verify-backup-encryption', () => {
     });
 
     expect(result).toMatch(/Encrypt.*Decrypt.*PASS/i);
+  });
+
+  it('resolves the configuration flags instead of printing promises', () => {
+    const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
+      encoding: 'utf8',
+      env: TEST_ENV,
+    });
+
+    expect(result).toContain('PII: true, Token: true');
+    expect(result).not.toContain('[object Promise]');
   });
 
   it('should verify key-rotation-helpers import', { timeout: 30000, retry: 2 }, () => {

@@ -10,18 +10,18 @@ import {
   encryptPII,
   decryptPII,
   isPIIEncryptionConfigured,
-} from "../src/lib/security/pii-encryption";
+} from "../apps/web/src/lib/security/pii-encryption";
 import {
   encryptToken,
   decryptToken,
   isEncryptionConfigured,
-} from "../src/lib/security/encryption";
+} from "../apps/web/src/lib/security/encryption";
 import {
   encryptPIIWithKey,
   decryptPIIWithKey,
   encryptTokenWithKey,
   decryptTokenWithKey,
-} from "../src/lib/security/key-rotation-helpers";
+} from "../apps/web/src/lib/security/key-rotation-helpers";
 
 interface CheckResult {
   name: string;
@@ -84,8 +84,8 @@ async function checkEncryptionKeyAvailability(): Promise<void> {
       : "TOKEN_ENCRYPTION_KEY not set or too short (min 32)",
   );
 
-  const piiConfigured = isPIIEncryptionConfigured();
-  const tokenConfigured = isEncryptionConfigured();
+  const piiConfigured = await isPIIEncryptionConfigured();
+  const tokenConfigured = await isEncryptionConfigured();
   addResult(
     "Encryption Configuration",
     piiConfigured && tokenConfigured ? "PASS" : "FAIL",
