@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { pathToFileURL } from 'node:url';
-import { prisma } from '../src/lib/db';
-import { getAllMaestri } from '../src/data/maestri';
-import { createExperiment, runExperiment } from '../src/lib/research/experiment-service';
-import { recordBenchmarkTrend, detectRegression } from '../src/lib/research/trend-service';
+import { prisma } from '../apps/web/src/lib/db';
+import { getAllMaestri } from '../apps/web/src/data/maestri';
+import { createExperiment, runExperiment } from '../apps/web/src/lib/research/experiment-service';
+import { recordBenchmarkTrend, detectRegression } from '../apps/web/src/lib/research/trend-service';
 
 interface ActiveSyntheticProfile {
   id: string;

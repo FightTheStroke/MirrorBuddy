@@ -1,3 +1,10 @@
+/**
+ * Lives outside the vite root (apps/web), so it must run in the node
+ * environment: under jsdom vitest cannot load a file above the root and
+ * fails with "Cannot find module '/@fs/...'".
+ *
+ * @vitest-environment node
+ */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";

@@ -1,4 +1,11 @@
 /**
+ * Lives outside the vite root (apps/web), so it must run in the node
+ * environment: under jsdom vitest cannot load a file above the root and
+ * fails with "Cannot find module '/@fs/...'".
+ *
+ * @vitest-environment node
+ */
+/**
  * Unit tests for lint-redirect-metadata script
  * Validates the regex patterns used to detect metadata exports
  */

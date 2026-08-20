@@ -22,7 +22,7 @@ const {
   mockDetectRegression: vi.fn(),
 }));
 
-vi.mock('../../src/lib/db', () => ({
+vi.mock('../../apps/web/src/lib/db', () => ({
   prisma: {
     syntheticProfile: {
       findMany: mockFindMany,
@@ -31,16 +31,16 @@ vi.mock('../../src/lib/db', () => ({
   },
 }));
 
-vi.mock('../../src/data/maestri', () => ({
+vi.mock('../../apps/web/src/data/maestri', () => ({
   getAllMaestri: mockGetAllMaestri,
 }));
 
-vi.mock('../../src/lib/research/experiment-service', () => ({
+vi.mock('../../apps/web/src/lib/research/experiment-service', () => ({
   createExperiment: mockCreateExperiment,
   runExperiment: mockRunExperiment,
 }));
 
-vi.mock('../../src/lib/research/trend-service', () => ({
+vi.mock('../../apps/web/src/lib/research/trend-service', () => ({
   recordBenchmarkTrend: mockRecordBenchmarkTrend,
   detectRegression: mockDetectRegression,
 }));
