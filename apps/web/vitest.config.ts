@@ -10,8 +10,24 @@ export default defineConfig({
       'src/**/*.test.tsx',
       'src/**/*.spec.ts',
       'scripts/__tests__/**/*.test.ts',
+      // The repo-root scripts/ has its own test folder, and `--root apps/web`
+      // resolved the pattern above to apps/web/scripts/, which does not exist.
+      // Seven test files had therefore never run — including the ones covering
+      // key rotation and backup encryption. Four of them cannot run yet: they
+      // still import pre-monorepo paths such as `../src/lib/db`. They are
+      // excluded by name rather than by silence, and tracked as a card.
+      '../../scripts/__tests__/**/*.test.ts',
     ],
-    exclude: ['node_modules', 'e2e/**', 'apps/web/e2e/**', 'feat/**'],
+    exclude: [
+      'node_modules',
+      'e2e/**',
+      'apps/web/e2e/**',
+      'feat/**',
+      '../../scripts/__tests__/lint-redirect-metadata.test.ts',
+      '../../scripts/__tests__/nightly-benchmark.test.ts',
+      '../../scripts/__tests__/nightly-benchmark-workflow.test.ts',
+      '../../scripts/__tests__/verify-backup-encryption.test.ts',
+    ],
     setupFiles: ['./src/test/setup.ts'],
     // Retry flaky tests on CI (F-07)
     retry: process.env.CI ? 2 : 0,
