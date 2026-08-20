@@ -33,6 +33,19 @@ RETURNS TABLE (
   tags TEXT
 )
 LANGUAGE plpgsql
+-- Filtering an approximate index is not the same as filtering a table. When
+-- the planner picks the HNSW index, pgvector draws a candidate set bounded by
+-- `hnsw.ef_search` (40 by default) and applies the predicates afterwards, so a
+-- narrow filter — one Maestro out of 32 — can come back under-filled or empty
+-- while plenty of matching chunks exist. That would reintroduce, through the
+-- index, the very failure this migration exists to remove.
+--
+-- `iterative_scan` (pgvector 0.8+) lets the scan keep pulling candidates until
+-- the limit is satisfied; `strict_order` keeps results in true distance order,
+-- which matters because the caller feeds them to a model as ranked context.
+-- Set on the function so every caller inherits it and no call site can forget.
+SET hnsw.iterative_scan = 'strict_order'
+SET hnsw.ef_search = 100
 AS $$
 BEGIN
   RETURN QUERY
