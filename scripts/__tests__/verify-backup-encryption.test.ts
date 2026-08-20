@@ -73,6 +73,16 @@ describe('verify-backup-encryption', () => {
     expect(result).toMatch(/Encrypt.*Decrypt.*PASS/i);
   });
 
+  it('resolves the configuration flags instead of printing promises', () => {
+    const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
+      encoding: 'utf8',
+      env: TEST_ENV,
+    });
+
+    expect(result).toContain('PII: true, Token: true');
+    expect(result).not.toContain('[object Promise]');
+  });
+
   it('should verify key-rotation-helpers import', { timeout: 30000, retry: 2 }, () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
       encoding: 'utf8',
