@@ -348,25 +348,63 @@ string rather than an error. The model answered from the persona prompt alone
 and the gap was invisible from the outside.
 
 `chris` now carries didactic content as a consequence of the G-9 fix — his
-identity overflow is routed to RAG — so the corpus seeds 32 of 32, 291 chunks
-(measured from a clean regeneration on 19 Aug 2026; the 281 first recorded here
-predated the hand-authored fix in G-9 and was wrong by ten). Two controls keep
+identity overflow is routed to RAG — so the corpus seeds 32 of 32, 292 chunks
+(measured from a clean regeneration on 20 Aug 2026 against `main`; the 291
+recorded on 19 Aug was measured on the G-9 branch before the G-7 fix to
+`cassese-knowledge.ts` merged, and the 281 before it predated the hand-authored
+fix in G-9 — both were counts taken on a branch that was not yet what ships,
+which is the recurring error here: measure on `main`). Two controls keep
 it that way: `rag-coverage.test.ts` fails the build if any Maestro yields zero
 chunks, and the seeder now exits non-zero naming the empty Maestri instead of
 reporting success. If a Maestro ever legitimately must not be retrievable, that
 decision has to be recorded here and excluded in the test explicitly — not
 achieved by silence.
 
-**These two findings are closed in the corpus, not yet in production.** The
-guards prove the corpus is seedable; they cannot prove it has been seeded.
-Embeddings are written only by an explicit `npm run kb:seed` run, which no
-workflow performs automatically, so until someone runs it against production the
-vector store still holds the pre-fix index: 31 sourceIds, without the 376 lines
-G-9 recovered and without `chris` at all. The test suite will stay green
-throughout, because it measures the corpus and not the store.
+**These two findings are now closed in production as well.** The guards prove
+the corpus is seedable; they cannot prove it has been seeded. Embeddings are
+written only by an explicit `npm run kb:seed` run, which no workflow performs
+automatically, so until the run below the production vector store did not serve
+the fixed index.
 
-Whoever runs it should record the date and the resulting chunk count here. Until
-that line exists, assume production is still serving the old index.
+**Production seed — 20 Aug 2026, 292 chunks across 32 of 32 Maestri**
+(`NODE_ENV=production npm run kb:seed -- --yes`, target
+`aws-1-eu-west-1.pooler.supabase.com`, 32 771 embedding tokens). Verification
+reported 292 rows, 32 Maestri covered and 0 rows with a NULL `vectorNative`.
+
+That run also corrected the record. This section previously stated that
+production held a pre-fix index of 31 sourceIds; it did not. The seeder had to
+create the `SYSTEM_MAESTRO_KB` owner row, which means no seed had ever persisted
+in production and the Maestro RAG store was **empty**, not stale — the runtime
+consequence of G-6, whose corpus-side fix could never have reached production on
+its own. Retrieval returned nothing for every Maestro, and every answer came
+from the persona prompt alone. Assume nothing about the store from a green
+suite: only a recorded run like this one is evidence.
+
+Whoever re-seeds should append the date and the resulting chunk count here.
+
+**G-11 — the retriever ranks every Maestro against every other (OPEN).**
+`retrieveMaestroKnowledge` asks `searchSimilar` for the top 3 chunks filtered
+only by `sourceType`, then discards the ones whose `sourceId` is a different
+Maestro. `SearchOptions` does not expose `sourceId` at all, in the SQL function
+or in the JS fallback, so a Maestro's own material has to outrank the other 31
+before it can be read. Measured against production on 20 Aug 2026 in the most
+favourable case — the query lifted verbatim from the Maestro's own chunk — 69
+chunks were retrieved where 83 were available (−17%), with 11 of 32 Maestri
+degraded and three down to one chunk of three. With an ordinary question the
+floor is zero: "spiegami la fisica in modo semplice" returns nothing for
+`feynman`. This is the same failure shape as G-10 — content present in the store
+and absent from the prompt — one layer further out. Card `260820-122631`.
+
+**G-12 — the pgvector search function is missing in production (OPEN).**
+`_prisma_migrations` records `20260117183800_pgvector` as applied on 20 Jan
+2026, but `pg_proc` in production holds no `search_similar_embeddings`: every
+vector search raises `42883`, logs `Native search failed, falling back to JS`
+and scans in JavaScript instead. The fallback reads `take: 1000` rows in no
+particular order and computes cosine in memory, so past 1000 rows for a
+`userId` + `sourceType` the search silently becomes partial, and no HNSW index
+is ever used. This affects all RAG, not only the Maestri corpus, and nothing
+detects the gap between a migration recorded as applied and the object it was
+supposed to create. Card `260820-122649`.
 
 ---
 
