@@ -85,6 +85,14 @@ export interface SearchOptions {
   minSimilarity?: number;
   sourceType?: string;
   subject?: string;
+  /**
+   * Restrict the search to a single source.
+   *
+   * Filtering here rather than after the call is the whole point: `limit` is
+   * applied while ranking, so a caller that narrows afterwards is really asking
+   * every other source to score lower than the one it wants.
+   */
+  sourceId?: string;
 }
 
 /**
@@ -152,7 +160,15 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
  * Fallback Mode: Fetches all embeddings and computes similarity in JavaScript
  */
 export async function searchSimilar(options: SearchOptions): Promise<VectorSearchResult[]> {
-  const { userId, vector, limit = 10, minSimilarity = 0.5, sourceType, subject } = options;
+  const {
+    userId,
+    vector,
+    limit = 10,
+    minSimilarity = 0.5,
+    sourceType,
+    subject,
+    sourceId,
+  } = options;
 
   logger.debug('[VectorStore] Searching similar', {
     userId,
@@ -160,6 +176,7 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     minSimilarity,
     sourceType,
     subject,
+    sourceId,
   });
 
   // Try native pgvector search first
@@ -173,6 +190,7 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
         minSimilarity,
         sourceType,
         subject,
+        sourceId,
       });
 
       logger.debug('[VectorStore] Native pgvector search used', {
@@ -201,6 +219,7 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
   const where: Record<string, unknown> = { userId, vector: { not: null } };
   if (sourceType) where.sourceType = sourceType;
   if (subject) where.subject = subject;
+  if (sourceId) where.sourceId = sourceId;
 
   const embeddings = await prisma.contentEmbedding.findMany({
     where,
