@@ -8,6 +8,8 @@
 import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import { probeHnswIndex, probeVectorSearchFunction } from './lib/vector-search-probe';
+import { createPgClient } from './lib/pg-connection';
 
 config();
 
@@ -348,6 +350,102 @@ function validateVercelRegionCompliance(): void {
   );
 }
 
+/**
+ * Calls the pgvector search function against the target database.
+ *
+ * A recorded migration is not evidence that its body ran: production carried
+ * `20260117183800_pgvector` as applied for seven months while
+ * `search_similar_embeddings` did not exist, and every vector search silently
+ * degraded to an unordered JavaScript scan (finding G-12). Nothing in the test
+ * suite could see it, because tests measure the corpus and the code, never the
+ * deployed database.
+ */
+async function validateVectorSearch(): Promise<void> {
+  const connectionString = process.env.DIRECT_URL?.trim() || process.env.DATABASE_URL?.trim();
+
+  if (!connectionString) {
+    addResult(
+      'Database',
+      'Vector Search Function',
+      'WARN',
+      'No DATABASE_URL/DIRECT_URL available - vector search not verified',
+      false,
+    );
+    return;
+  }
+
+  const client = createPgClient(connectionString);
+
+  try {
+    await client.connect();
+  } catch (error) {
+    addResult(
+      'Database',
+      'Vector Search Function',
+      'WARN',
+      `Could not connect to verify vector search (${error instanceof Error ? error.message : String(error)})`,
+      false,
+    );
+    return;
+  }
+
+  try {
+    const executor = async (sql: string, params: unknown[]): Promise<unknown[]> => {
+      const result = await client.query(sql, params);
+      return result.rows;
+    };
+
+    const probe = await probeVectorSearchFunction(executor);
+
+    if (probe.status === 'ok') {
+      addResult(
+        'Database',
+        'Vector Search Function',
+        'PASS',
+        'search_similar_embeddings is present and callable with the source id argument',
+        true,
+      );
+    } else if (probe.status === 'missing') {
+      addResult(
+        'Database',
+        'Vector Search Function',
+        'FAIL',
+        'search_similar_embeddings is missing or has a stale signature - every vector search will degrade to an unordered JS scan',
+        true,
+      );
+    } else {
+      addResult(
+        'Database',
+        'Vector Search Function',
+        'WARN',
+        `Could not verify search_similar_embeddings (${probe.message})`,
+        false,
+      );
+    }
+
+    const index = await probeHnswIndex(executor);
+    addResult(
+      'Database',
+      'Vector Index',
+      index.status === 'present' ? 'PASS' : 'WARN',
+      index.status === 'present'
+        ? 'HNSW index present on ContentEmbedding.vectorNative'
+        : 'No HNSW index on ContentEmbedding.vectorNative - vector search runs as a sequential scan',
+      false,
+    );
+  } catch (error) {
+    addResult(
+      'Database',
+      'Vector Search Function',
+      'WARN',
+      `Vector search verification failed to run (${error instanceof Error ? error.message : String(error)})`,
+      false,
+    );
+  } finally {
+    await client.end().catch(() => undefined);
+  }
+}
+
 function printResults(): void {
   console.log('\n🔍 Pre-Deploy Validation\n');
   console.log('='.repeat(70));
@@ -415,6 +513,9 @@ async function main(): Promise<void> {
 
   // Validate optional environment variables
   validateOptionalEnvVars();
+
+  // Validate the pgvector search function against the target database
+  await validateVectorSearch();
 
   // Print results and exit
   printResults();
