@@ -5,7 +5,7 @@
  * Tests the Azure Monitor Metrics API integration for real-time TPM/RPM usage.
  *
  * Usage:
- *   npx tsx scripts/test-azure-openai-limits.ts
+ *   npm run script -- scripts/test-azure-openai-limits.ts
  *
  * Requirements:
  *   - AZURE_OPENAI_ENDPOINT configured

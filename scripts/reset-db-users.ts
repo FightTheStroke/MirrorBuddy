@@ -4,7 +4,7 @@
  * - roberdan@fightthestroke.org (ADMIN)
  * - Mariodanfts@gmail.com (USER)
  *
- * Run with: npx tsx scripts/reset-db-users.ts --confirm
+ * Run with: npm run script -- scripts/reset-db-users.ts --confirm
  *
  * WARNING: This is destructive! Without --confirm it reports and exits.
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts

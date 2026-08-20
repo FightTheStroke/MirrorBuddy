@@ -81,7 +81,7 @@ async function main() {
   }
 
   console.log('\n\nTo delete these orphan records, run:');
-  console.log('npx tsx scripts/cleanup-orphan-activity.ts');
+  console.log('npm run script -- scripts/cleanup-orphan-activity.ts');
 }
 
 main()

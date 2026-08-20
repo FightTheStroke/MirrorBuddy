@@ -1,6 +1,6 @@
 /**
  * Test script for Grafana Cloud push - sends all V1 metrics
- * Run with: npx tsx scripts/test-grafana-push.ts
+ * Run with: npm run script -- scripts/test-grafana-push.ts
  *
  * This pushes example data to verify dashboard connectivity.
  * Real metrics come from /api/metrics via prometheus-push-service.ts

@@ -18,7 +18,26 @@ import { join } from 'node:path';
 
 const SCRIPTS_DIR = join(process.cwd(), 'scripts');
 
-const DELETES = /prisma\.\w+\.delete(Many)?\(|\$executeRaw[\s\S]{0,80}(DELETE|TRUNCATE|DROP)/i;
+const DELETES =
+  /\b\w+\.\w+\.delete(Many)?\(|\$executeRaw[\s\S]{0,80}(DELETE|TRUNCATE|DROP)/i;
+
+/**
+ * The scripts that must be protected. Listed by name rather than only
+ * discovered, so that a detector that quietly stops matching one of them
+ * fails here instead of shrinking the suite in silence.
+ */
+const KNOWN_DESTRUCTIVE = [
+  'cleanup-all-users.ts',
+  'cleanup-anonymous-users.ts',
+  'cleanup-orphan-activity.ts',
+  'cleanup-orphan-users.ts',
+  'cleanup-test-data.ts',
+  'cleanup-test-users.ts',
+  'emergency-cleanup-final.ts',
+  'emergency-cleanup.ts',
+  'emergency-delete-test-users-v2.ts',
+  'reset-db-users.ts',
+];
 
 function destructiveScripts(): Array<{ name: string; source: string }> {
   return readdirSync(SCRIPTS_DIR)
@@ -31,7 +50,12 @@ describe('destructive root scripts', () => {
   const scripts = destructiveScripts();
 
   it('finds the destructive scripts it is meant to protect', () => {
-    expect(scripts.length).toBeGreaterThan(0);
+    const found = scripts.map(({ name }) => name).sort();
+
+    expect(
+      KNOWN_DESTRUCTIVE.filter((name) => !found.includes(name)),
+      'a known destructive script is no longer detected, so its rail is silently gone',
+    ).toEqual([]);
   });
 
   it.each(scripts)('$name never executes on import', ({ source }) => {

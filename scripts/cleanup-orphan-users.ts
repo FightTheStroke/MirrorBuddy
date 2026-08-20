@@ -9,8 +9,8 @@
  * These are trial sessions where users visited but never engaged.
  *
  * Usage:
- *   npx tsx scripts/cleanup-orphan-users.ts --dry-run    # Preview (recommended first)
- *   npx tsx scripts/cleanup-orphan-users.ts              # Execute cleanup
+ *   npm run script -- scripts/cleanup-orphan-users.ts --dry-run    # Preview (recommended first)
+ *   npm run script -- scripts/cleanup-orphan-users.ts              # Execute cleanup
  *
  * Safety Features:
  * - Protected users list prevents accidental deletion
@@ -99,7 +99,7 @@ async function main() {
 
   if (isDryRun) {
     console.log("DRY RUN complete. To delete these users, run:");
-    console.log("  npx tsx scripts/cleanup-orphan-users.ts\n");
+    console.log("  npm run script -- scripts/cleanup-orphan-users.ts\n");
     return;
   }
 

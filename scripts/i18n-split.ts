@@ -5,7 +5,7 @@
  * Splits monolithic messages/{locale}.json files into namespace-based structure:
  * messages/{locale}/{namespace}.json
  *
- * Usage: npx tsx scripts/i18n-split.ts [--dry-run]
+ * Usage: npm run script -- scripts/i18n-split.ts [--dry-run]
  */
 
 import * as fs from 'fs';

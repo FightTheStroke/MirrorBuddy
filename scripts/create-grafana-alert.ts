@@ -10,7 +10,7 @@
  *   - GRAFANA_CLOUD_PROMETHEUS_USER: Instance ID
  *
  * Usage:
- *   npx tsx scripts/create-grafana-alert.ts
+ *   npm run script -- scripts/create-grafana-alert.ts
  *
  * Alert Details:
  *   - Title: MirrorBuddy - Azure OpenAI Tokens/min High Usage

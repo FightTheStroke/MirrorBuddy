@@ -254,19 +254,19 @@ async function runAudit(): Promise<void> {
 
   const implementationFiles = [
     {
-      file: "src/lib/compliance/cookie-consent-config.ts",
+      file: "apps/web/src/lib/compliance/cookie-consent-config.ts",
       name: "Cookie Consent Config",
     },
     {
-      file: "src/app/[locale]/accessibility/page.tsx",
+      file: "apps/web/src/app/[locale]/accessibility/page.tsx",
       name: "Accessibility Page",
     },
     {
-      file: "src/app/[locale]/accessibility/accessibility-client.tsx",
+      file: "apps/web/src/app/[locale]/accessibility/accessibility-client.tsx",
       name: "Accessibility Client",
     },
     {
-      file: "src/components/consent/unified-consent-wall.tsx",
+      file: "apps/web/src/components/consent/unified-consent-wall.tsx",
       name: "Unified Consent Wall",
     },
   ];

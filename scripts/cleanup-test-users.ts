@@ -6,7 +6,7 @@
  *   - e2e-test-user-*
  *   - admin-test-session-*
  *
- * Usage: npx tsx scripts/cleanup-test-users.ts [--confirm]
+ * Usage: npm run script -- scripts/cleanup-test-users.ts [--confirm]
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 

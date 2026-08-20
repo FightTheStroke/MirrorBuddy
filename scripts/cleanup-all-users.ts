@@ -4,7 +4,7 @@
  * Removes ALL users except specified emails.
  * Also cleans up orphaned data (UserActivity, etc.)
  *
- * Usage: npx tsx scripts/cleanup-all-users.ts [--confirm]
+ * Usage: npm run script -- scripts/cleanup-all-users.ts [--confirm]
  *
  * WARNING: This is destructive! It only deletes when given --confirm.
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts

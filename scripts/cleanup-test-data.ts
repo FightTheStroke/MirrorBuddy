@@ -9,8 +9,8 @@
  * PROTECTED_USERS=roberdan@fightthestroke.org,mariodanfts@gmail.com
  *
  * Usage:
- *   npx tsx scripts/cleanup-test-data.ts              # LIVE DELETE
- *   npx tsx scripts/cleanup-test-data.ts --dry-run    # Show what would be deleted
+ *   npm run script -- scripts/cleanup-test-data.ts              # LIVE DELETE
+ *   npm run script -- scripts/cleanup-test-data.ts --dry-run    # Show what would be deleted
  *
  * Safety Features:
  * - Requires explicit --dry-run for preview mode
@@ -169,7 +169,7 @@ async function main() {
     }
 
     console.log("\n\nDry run complete. To DELETE these records, run:");
-    console.log("  npx tsx scripts/cleanup-test-data.ts\n");
+    console.log("  npm run script -- scripts/cleanup-test-data.ts\n");
     return;
   }
 

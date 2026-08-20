@@ -7,8 +7,8 @@
  *
  * Usage:
  *   npm run kb:extract                 # regenerate mini-kb + didactic content
- *   npx tsx scripts/extract-mini-kb.ts --dry-run       # preview only
- *   npx tsx scripts/extract-mini-kb.ts --didactic-only # leave committed mini-kb untouched
+ *   npm run script -- scripts/extract-mini-kb.ts --dry-run       # preview only
+ *   npm run script -- scripts/extract-mini-kb.ts --didactic-only # leave committed mini-kb untouched
  *
  * `--didactic-only` is what the seeding pipeline uses: the mini-kb files are
  * committed source imported by the maestro definitions, so a seed run must not

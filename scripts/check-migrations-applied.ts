@@ -9,7 +9,7 @@
  * code is silent until a child hits it.
  *
  * Run against production with:
- *   DIRECT_URL=... npx tsx scripts/check-migrations-applied.ts
+ *   DIRECT_URL=... npm run script -- scripts/check-migrations-applied.ts
  */
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';

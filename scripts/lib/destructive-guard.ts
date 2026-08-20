@@ -43,7 +43,7 @@ export function announceMode(scriptName: string): boolean {
 
   console.log(
     dryRun
-      ? `Mode: DRY RUN (no changes) — re-run with: npx tsx scripts/${scriptName}.ts --confirm`
+      ? `Mode: DRY RUN (no changes) — re-run with: npm run script -- scripts/${scriptName}.ts --confirm`
       : 'Mode: LIVE DELETE (--confirm given)\n',
   );
 

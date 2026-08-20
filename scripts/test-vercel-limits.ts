@@ -1,7 +1,7 @@
 /**
  * Test script for Vercel Limits API
  *
- * Usage: npx tsx scripts/test-vercel-limits.ts
+ * Usage: npm run script -- scripts/test-vercel-limits.ts
  *
  * Requires environment variables:
  *   - VERCEL_TOKEN

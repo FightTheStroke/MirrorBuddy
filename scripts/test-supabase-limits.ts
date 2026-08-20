@@ -1,7 +1,7 @@
 /**
  * Test script for Supabase limits module
  *
- * Run: npx tsx scripts/test-supabase-limits.ts
+ * Run: npm run script -- scripts/test-supabase-limits.ts
  */
 
 import {

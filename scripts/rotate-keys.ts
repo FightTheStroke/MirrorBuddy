@@ -5,9 +5,9 @@
  * Re-encrypts existing data with new keys while maintaining data integrity.
  *
  * Usage:
- *   npx tsx scripts/rotate-keys.ts --type=token --old-key=xxx --new-key=yyy
- *   npx tsx scripts/rotate-keys.ts --type=session --old-key=xxx --new-key=yyy
- *   npx tsx scripts/rotate-keys.ts --type=pii --old-key=xxx --new-key=yyy
+ *   npm run script -- scripts/rotate-keys.ts --type=token --old-key=xxx --new-key=yyy
+ *   npm run script -- scripts/rotate-keys.ts --type=session --old-key=xxx --new-key=yyy
+ *   npm run script -- scripts/rotate-keys.ts --type=pii --old-key=xxx --new-key=yyy
  *
  * Options:
  *   --type=<type>        Rotation type: token, session, or pii (REQUIRED)
@@ -18,10 +18,10 @@
  *
  * Examples:
  *   # Dry run to preview changes
- *   npx tsx scripts/rotate-keys.ts --type=pii --old-key=old123 --new-key=new456 --dry-run
+ *   npm run script -- scripts/rotate-keys.ts --type=pii --old-key=old123 --new-key=new456 --dry-run
  *
  *   # Rotate PII encryption key with custom batch size
- *   npx tsx scripts/rotate-keys.ts --type=pii --old-key=old123 --new-key=new456 --batch-size=50
+ *   npm run script -- scripts/rotate-keys.ts --type=pii --old-key=old123 --new-key=new456 --batch-size=50
  *
  * Security:
  *   - Keys are not logged to console (shown as ***)
