@@ -1,14 +1,14 @@
 /**
  * Test script for Supabase limits module
  *
- * Run: npx tsx scripts/test-supabase-limits.ts
+ * Run: npm run script -- scripts/test-supabase-limits.ts
  */
 
 import {
   getSupabaseLimits,
   isResourceStressed,
   getStressReport,
-} from "../src/lib/observability/supabase-limits";
+} from "../apps/web/src/lib/observability/supabase-limits";
 
 async function main() {
   console.log("Testing Supabase Limits Module\n");

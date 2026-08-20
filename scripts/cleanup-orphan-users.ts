@@ -9,8 +9,8 @@
  * These are trial sessions where users visited but never engaged.
  *
  * Usage:
- *   npx tsx scripts/cleanup-orphan-users.ts --dry-run    # Preview (recommended first)
- *   npx tsx scripts/cleanup-orphan-users.ts              # Execute cleanup
+ *   npm run script -- scripts/cleanup-orphan-users.ts --dry-run    # Preview (recommended first)
+ *   npm run script -- scripts/cleanup-orphan-users.ts              # Execute cleanup
  *
  * Safety Features:
  * - Protected users list prevents accidental deletion
@@ -20,13 +20,14 @@
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 const prisma = createPrismaClient();
 
 async function main() {
-  const isDryRun = process.argv.includes("--dry-run");
+  const isDryRun = announceMode("cleanup-orphan-users");
 
   console.log(
     "\n╔════════════════════════════════════════════════════════════╗",
@@ -35,8 +36,6 @@ async function main() {
   console.log(
     "╚════════════════════════════════════════════════════════════╝\n",
   );
-
-  console.log(`Mode: ${isDryRun ? "DRY RUN (no changes)" : "LIVE DELETE"}\n`);
 
   // Get protected users
   const protectedEmails = getProtectedUsers();
@@ -100,7 +99,7 @@ async function main() {
 
   if (isDryRun) {
     console.log("DRY RUN complete. To delete these users, run:");
-    console.log("  npx tsx scripts/cleanup-orphan-users.ts\n");
+    console.log("  npm run script -- scripts/cleanup-orphan-users.ts\n");
     return;
   }
 
@@ -160,11 +159,13 @@ async function main() {
   }
 }
 
-main()
-  .catch((e) => {
-    console.error("Fatal error:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (isDirectInvocation(import.meta.url)) {
+  main()
+    .catch((e) => {
+      console.error("Fatal error:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

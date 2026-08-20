@@ -8,7 +8,7 @@
  * Usage:
  *   GRAFANA_URL=https://mirrorbuddy.grafana.net \
  *   GRAFANA_API_KEY=glc_xxxx \
- *   npx tsx scripts/provision-alert-rules.ts
+ *   npm run script -- scripts/provision-alert-rules.ts
  *
  * Required Environment Variables:
  *   - GRAFANA_URL: Grafana Cloud instance URL

@@ -2,7 +2,8 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 import { config } from "dotenv";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
 
 config();
 
@@ -15,6 +16,10 @@ const prisma = createPrismaClient();
 const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
 
 async function emergencyCleanup() {
+  if (announceMode("emergency-delete-test-users-v2")) {
+    return;
+  }
+
   console.log("🚨 EMERGENCY CLEANUP - DELETING TEST USERS");
 
   // Find users to delete (null email/username OR not in KEEP list)
@@ -73,4 +78,6 @@ async function emergencyCleanup() {
   await prisma.$disconnect();
 }
 
-emergencyCleanup().catch(console.error);
+if (isDirectInvocation(import.meta.url)) {
+  emergencyCleanup().catch(console.error);
+}

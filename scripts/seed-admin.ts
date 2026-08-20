@@ -2,7 +2,7 @@
  * MIRRORBUDDY - Admin Seed Script
  *
  * Creates the initial admin user from environment variables.
- * Run on first deploy or manually: npx tsx scripts/seed-admin.ts
+ * Run on first deploy or manually: npm run script -- scripts/seed-admin.ts
  *
  * Required env vars:
  * - DATABASE_URL: PostgreSQL connection string
@@ -14,7 +14,7 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
-import { createPrismaClient } from '../src/lib/ssl-config';
+import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
 import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;

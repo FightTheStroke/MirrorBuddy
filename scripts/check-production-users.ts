@@ -2,7 +2,7 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 import { config } from "dotenv";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
 
 config();
 

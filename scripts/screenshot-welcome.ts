@@ -4,7 +4,7 @@
  * Captures a full-page screenshot of the welcome landing page
  * for use in README and documentation.
  *
- * Usage: npx tsx scripts/screenshot-welcome.ts
+ * Usage: npm run script -- scripts/screenshot-welcome.ts
  */
 
 import { chromium } from '@playwright/test';

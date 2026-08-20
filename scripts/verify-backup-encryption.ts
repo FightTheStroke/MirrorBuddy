@@ -2,7 +2,7 @@
 /**
  * Backup Encryption Verification Script
  * Verifies encryption keys, functionality, rotation helpers, and Supabase backups.
- * Usage: npx tsx scripts/verify-backup-encryption.ts [--dry-run]
+ * Usage: npm run script -- scripts/verify-backup-encryption.ts [--dry-run]
  * Exit: 0=pass, 1=fail
  */
 

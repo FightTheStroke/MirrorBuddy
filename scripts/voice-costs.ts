@@ -2,10 +2,10 @@
 /**
  * Voice costs from the command line.
  *
- *   npx tsx scripts/voice-costs.ts                 # today, every user
- *   npx tsx scripts/voice-costs.ts --period month  # this month
- *   npx tsx scripts/voice-costs.ts --user <id>     # one user
- *   npx tsx scripts/voice-costs.ts --json          # for piping
+ *   npm run script -- scripts/voice-costs.ts                 # today, every user
+ *   npm run script -- scripts/voice-costs.ts --period month  # this month
+ *   npm run script -- scripts/voice-costs.ts --user <id>     # one user
+ *   npm run script -- scripts/voice-costs.ts --json          # for piping
  *
  * Reads the same functions the admin console reads, on purpose: a dashboard
  * and a script that disagree about the bill are worse than either alone.

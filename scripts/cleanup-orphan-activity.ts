@@ -8,15 +8,15 @@
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 const prisma = createPrismaClient();
 
 async function main() {
-  const isDryRun = process.argv.includes("--dry-run");
+  const isDryRun = announceMode("cleanup-orphan-activity");
 
   console.log("=== Cleanup Orphan UserActivity Records ===\n");
-  console.log(`Mode: ${isDryRun ? "DRY RUN (no changes)" : "LIVE"}\n`);
 
   // Get all active identifiers
   const allActivity = await prisma.userActivity.groupBy({
@@ -68,11 +68,13 @@ async function main() {
   console.log(`Remaining UserActivity records: ${remaining}`);
 }
 
-main()
-  .catch((e) => {
-    console.error("Error:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (isDirectInvocation(import.meta.url)) {
+  main()
+    .catch((e) => {
+      console.error("Error:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

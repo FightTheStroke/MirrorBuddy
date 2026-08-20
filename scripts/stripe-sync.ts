@@ -5,7 +5,7 @@
  * Idempotent - can be run multiple times safely.
  *
  * Usage:
- *   npx tsx scripts/stripe-sync.ts
+ *   npm run script -- scripts/stripe-sync.ts
  *
  * Environment:
  *   STRIPE_SECRET_KEY required

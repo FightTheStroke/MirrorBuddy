@@ -4,7 +4,7 @@
  * Alert configuration for monitoring Supabase database size exceeding 85%
  * of free tier limit (500 MB -> 425 MB threshold).
  *
- * Run with: npx tsx scripts/create-grafana-alert-supabase-db.ts
+ * Run with: npm run script -- scripts/create-grafana-alert-supabase-db.ts
  *
  * Prerequisites:
  * - GRAFANA_CLOUD_API_URL: https://grafana.com/api

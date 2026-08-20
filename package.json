@@ -29,6 +29,7 @@
     "voice-ai"
   ],
   "scripts": {
+    "script": "tsx --conditions=react-server",
     "dev": "cd apps/web && next dev",
     "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; cd apps/web && next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) bash -c 'cd apps/web && next build'",

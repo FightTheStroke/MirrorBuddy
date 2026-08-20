@@ -2,7 +2,7 @@
 
 /**
  * Nightly Simulation Runner - Tests maestri system prompts against Ollama model tiers
- * Usage: npx tsx scripts/nightly-sim-runner.ts [options]
+ * Usage: npm run script -- scripts/nightly-sim-runner.ts [options]
  * Options:
  *   --models 3b,8b,12b    Test specific tiers (default: all)
  *   --maestri id1,id2      Test specific maestri (default: all)
@@ -12,7 +12,7 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { getAllMaestri } from "../src/data/maestri";
+import { getAllMaestri } from "../apps/web/src/data/maestri";
 import type {
   ModelTier,
   NightlyReport,

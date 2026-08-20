@@ -5,7 +5,7 @@
  * Tests the Azure Monitor Metrics API integration for real-time TPM/RPM usage.
  *
  * Usage:
- *   npx tsx scripts/test-azure-openai-limits.ts
+ *   npm run script -- scripts/test-azure-openai-limits.ts
  *
  * Requirements:
  *   - AZURE_OPENAI_ENDPOINT configured
@@ -24,7 +24,7 @@ import {
   getAzureOpenAILimits,
   isAzureOpenAIStressed,
   getAzureOpenAIStressReport,
-} from '../src/lib/observability/azure-openai-limits';
+} from '../apps/web/src/lib/observability/azure-openai-limits';
 
 async function main() {
   console.log('=== Azure OpenAI Limits Test ===\n');

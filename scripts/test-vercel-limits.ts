@@ -1,7 +1,7 @@
 /**
  * Test script for Vercel Limits API
  *
- * Usage: npx tsx scripts/test-vercel-limits.ts
+ * Usage: npm run script -- scripts/test-vercel-limits.ts
  *
  * Requires environment variables:
  *   - VERCEL_TOKEN
@@ -9,7 +9,7 @@
  *   - VERCEL_TEAM_ID (optional)
  */
 
-import { getVercelLimits } from "../src/lib/observability/vercel-limits";
+import { getVercelLimits } from "../apps/web/src/lib/observability/vercel-limits";
 
 async function main() {
   console.log("Testing Vercel Limits API...\n");

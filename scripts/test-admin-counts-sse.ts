@@ -1,6 +1,6 @@
 /**
  * Test script for SSE admin counts endpoint
- * Usage: npx tsx scripts/test-admin-counts-sse.ts
+ * Usage: npm run script -- scripts/test-admin-counts-sse.ts
  */
 
 console.log("SSE Admin Counts Test");

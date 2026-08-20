@@ -5,12 +5,17 @@
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
 
 const prisma = createPrismaClient();
 const PROTECTED_IDS = ["roberdan", "mariodanfts3k02"];
 
 async function cleanup() {
+  if (announceMode("cleanup-anonymous-users")) {
+    return;
+  }
+
   console.log("=== Cleaning up anonymous users ===\n");
 
   // Count before
@@ -40,4 +45,6 @@ async function cleanup() {
   await prisma.$disconnect();
 }
 
-cleanup().catch(console.error);
+if (isDirectInvocation(import.meta.url)) {
+  cleanup().catch(console.error);
+}

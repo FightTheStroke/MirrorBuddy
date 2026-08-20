@@ -5,7 +5,7 @@
  * Ensures all locales have the same namespace files and keys as Italian (reference).
  * Missing keys are added with Italian value as placeholder.
  *
- * Usage: npx tsx scripts/i18n-sync-namespaces.ts [--dry-run] [--add-missing]
+ * Usage: npm run script -- scripts/i18n-sync-namespaces.ts [--dry-run] [--add-missing]
  */
 
 import * as fs from 'fs';

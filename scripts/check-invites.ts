@@ -2,7 +2,7 @@
  * Quick script to check invite requests in DB
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
 
 const prisma = createPrismaClient();
 

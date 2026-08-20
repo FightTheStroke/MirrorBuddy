@@ -5,8 +5,8 @@
  * using AES-256-GCM encryption. Computes emailHash for indexed lookups.
  *
  * Usage:
- *   npx tsx scripts/migrate-encrypt-pii.ts          # DRY RUN (default)
- *   npx tsx scripts/migrate-encrypt-pii.ts --execute # LIVE RUN
+ *   npm run script -- scripts/migrate-encrypt-pii.ts          # DRY RUN (default)
+ *   npm run script -- scripts/migrate-encrypt-pii.ts --execute # LIVE RUN
  *
  * Part of Plan 124: Security & Encryption Hardening
  */
@@ -16,7 +16,7 @@ import {
   encryptPII,
   hashPII,
   isPIIEncryptionConfigured,
-} from "../src/lib/security/pii-encryption";
+} from "../apps/web/src/lib/security/pii-encryption";
 
 const prisma = new PrismaClient();
 const BATCH_SIZE = 100;
