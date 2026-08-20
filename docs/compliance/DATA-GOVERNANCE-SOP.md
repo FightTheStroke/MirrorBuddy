@@ -406,6 +406,28 @@ is ever used. This affects all RAG, not only the Maestri corpus, and nothing
 detects the gap between a migration recorded as applied and the object it was
 supposed to create. Card `260820-122649`.
 
+**G-12 resolved (20 August 2026).** The function was created in production
+(seven-argument signature, `hnsw.iterative_scan = strict_order`,
+`hnsw.ef_search = 100`), together with the HNSW index on
+`ContentEmbedding.vectorNative` and the two supporting indexes that the same
+migration had never created either. Native vector search now runs in
+production; no probe reports the JS fallback.
+
+The lasting part is the check, not the repair. `scripts/check-migrations-applied.ts`
+previously printed "Database schema matches the migrations in the repo" over
+exactly this database, because a row in `_prisma_migrations` is a statement
+about what was run, not evidence of what exists. It now *calls*
+`search_similar_embeddings` — a `pg_proc` lookup would also have passed against
+a stale six-argument body — and fails the run when the call raises `42883`. It
+runs in the production promotion gate (`promote-to-production.yml`), so a
+database that cannot answer a vector search can no longer be promoted to.
+`scripts/validate-pre-deploy.ts` performs the same probe and additionally
+reports a missing HNSW index as a warning.
+
+Proven in both directions against a real database on 20 August 2026: with the
+function dropped, the checker reported `46 applied, 0 pending` and still exited
+1; with the migration re-applied it exited 0.
+
 ---
 
 ## 7. Review cadence
