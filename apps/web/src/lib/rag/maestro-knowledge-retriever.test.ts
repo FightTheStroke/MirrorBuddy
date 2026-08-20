@@ -207,3 +207,58 @@ describe('retrieveMaestroKnowledgeRaw', () => {
     });
   });
 });
+
+describe('maestro scoping', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(isEmbeddingConfigured).mockReturnValue(true);
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
+      vector: new Array(1536).fill(0.1),
+      model: 'text-embedding-3-small',
+      usage: { tokens: 5 },
+    });
+    vi.mocked(searchSimilar).mockResolvedValue([]);
+  });
+
+  // The store ranks and truncates to `limit` before the caller sees anything,
+  // so asking for the global top-N and discarding the other maestri afterwards
+  // means a maestro has to outrank all the others to be read at all. Measured
+  // against production on 20 Aug 2026: 69 chunks recovered of 83 available,
+  // and nothing at all for feynman on an ordinary question (finding G-11).
+  it('asks the store for one maestro rather than narrowing afterwards', async () => {
+    await retrieveMaestroKnowledge('feynman', 'spiegami la fisica in modo semplice');
+
+    expect(searchSimilar).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceType: 'maestro_knowledge', sourceId: 'feynman' }),
+    );
+  });
+
+  it('scopes the raw variant to the same maestro', async () => {
+    await retrieveMaestroKnowledgeRaw('curie', 'radioattivita');
+
+    expect(searchSimilar).toHaveBeenCalledWith(
+      expect.objectContaining({ sourceType: 'maestro_knowledge', sourceId: 'curie' }),
+    );
+  });
+
+  // Defence in depth: a database still carrying the six-argument search
+  // function falls back to the JS path, and the persona boundary must hold
+  // whichever path answered.
+  it('still drops a foreign maestro if one reaches the caller', async () => {
+    vi.mocked(searchSimilar).mockResolvedValue([
+      {
+        id: '1',
+        sourceType: 'maestro_knowledge',
+        sourceId: 'mascetti',
+        chunkIndex: 0,
+        content: 'supercazzola',
+        similarity: 0.9,
+        subject: 'italiano',
+        tags: [],
+      },
+    ]);
+
+    const result = await retrieveMaestroKnowledge('feynman', 'fisica');
+    expect(result).toBe('');
+  });
+});
