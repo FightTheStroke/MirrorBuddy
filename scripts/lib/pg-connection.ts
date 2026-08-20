@@ -14,7 +14,10 @@ const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '0.0.0.0']);
 
 export function isLocalConnection(url: string): boolean {
   try {
-    return LOCAL_HOSTS.has(new URL(url).hostname);
+    // URL.hostname keeps the brackets around an IPv6 literal, so `[::1]` would
+    // never match the bare form and a local IPv6 database would be treated as
+    // remote — failing on SSL a local server does not speak.
+    return LOCAL_HOSTS.has(new URL(url).hostname.replace(/^\[|\]$/g, ''));
   } catch {
     return false;
   }

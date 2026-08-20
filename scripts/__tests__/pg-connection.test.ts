@@ -15,6 +15,10 @@ describe('isLocalConnection', () => {
     },
   );
 
+  it('treats a bracketed IPv6 loopback as local', () => {
+    expect(isLocalConnection('postgresql://user@[::1]:5432/db')).toBe(true);
+  });
+
   it('treats a Supabase pooler host as remote', () => {
     expect(
       isLocalConnection('postgres://u:p@aws-1-eu-west-1.pooler.supabase.com:6543/postgres'),
