@@ -8,7 +8,7 @@ import {
   getSupabaseLimits,
   isResourceStressed,
   getStressReport,
-} from "../src/lib/observability/supabase-limits";
+} from "../apps/web/src/lib/observability/supabase-limits";
 
 async function main() {
   console.log("Testing Supabase Limits Module\n");

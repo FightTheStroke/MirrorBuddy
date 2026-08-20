@@ -16,7 +16,7 @@ import {
   encryptPII,
   hashPII,
   isPIIEncryptionConfigured,
-} from "../src/lib/security/pii-encryption";
+} from "../apps/web/src/lib/security/pii-encryption";
 
 const prisma = new PrismaClient();
 const BATCH_SIZE = 100;

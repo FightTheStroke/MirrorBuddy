@@ -9,7 +9,7 @@
  *   - VERCEL_TEAM_ID (optional)
  */
 
-import { getVercelLimits } from "../src/lib/observability/vercel-limits";
+import { getVercelLimits } from "../apps/web/src/lib/observability/vercel-limits";
 
 async function main() {
   console.log("Testing Vercel Limits API...\n");

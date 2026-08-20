@@ -6,12 +6,13 @@
  *   - e2e-test-user-*
  *   - admin-test-session-*
  *
- * Usage: npx tsx scripts/cleanup-test-users.ts [--dry-run]
+ * Usage: npx tsx scripts/cleanup-test-users.ts [--confirm]
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 const TEST_USER_PATTERNS = [
   "e2e-test-user-%",
@@ -22,10 +23,9 @@ const TEST_USER_PATTERNS = [
 const prisma = createPrismaClient();
 
 async function main() {
-  const isDryRun = process.argv.includes("--dry-run");
+  const isDryRun = announceMode("cleanup-test-users");
 
   console.log("=== MirrorBuddy Test User Cleanup ===\n");
-  console.log(`Mode: ${isDryRun ? "DRY RUN (no changes)" : "LIVE"}\n`);
 
   // Count test users matching patterns
   let totalCount = 0;
@@ -99,11 +99,13 @@ async function main() {
   console.log(`\nRemaining users in database: ${remainingUsers}`);
 }
 
-main()
-  .catch((e) => {
-    console.error("Error:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (isDirectInvocation(import.meta.url)) {
+  main()
+    .catch((e) => {
+      console.error("Error:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

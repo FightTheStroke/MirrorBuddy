@@ -10,7 +10,7 @@ import {
   broadcastAdminCounts,
   getSubscriberCount,
   type AdminCounts,
-} from "../src/lib/redis/admin-counts/index";
+} from "../apps/web/src/lib/redis/admin-counts/index";
 
 // Colors for output
 const colors = {

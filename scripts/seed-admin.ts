@@ -14,7 +14,7 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
-import { createPrismaClient } from '../src/lib/ssl-config';
+import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
 import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;

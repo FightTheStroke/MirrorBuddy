@@ -37,7 +37,7 @@ import {
   rotateTokenKey,
   rotateSessionKey,
   rotatePIIKey,
-} from "../src/lib/security/key-rotation";
+} from "../apps/web/src/lib/security/key-rotation";
 
 /**
  * CLI argument parser

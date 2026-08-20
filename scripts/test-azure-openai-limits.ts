@@ -24,7 +24,7 @@ import {
   getAzureOpenAILimits,
   isAzureOpenAIStressed,
   getAzureOpenAIStressReport,
-} from '../src/lib/observability/azure-openai-limits';
+} from '../apps/web/src/lib/observability/azure-openai-limits';
 
 async function main() {
   console.log('=== Azure OpenAI Limits Test ===\n');

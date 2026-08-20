@@ -24,8 +24,9 @@
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 const prisma = createPrismaClient();
 
@@ -33,7 +34,7 @@ const prisma = createPrismaClient();
  * Main cleanup function
  */
 async function main() {
-  const isDryRun = process.argv.includes("--dry-run");
+  const isDryRun = announceMode("cleanup-test-data");
 
   console.log(
     "\n╔════════════════════════════════════════════════════════════╗",
@@ -50,8 +51,6 @@ async function main() {
     );
     process.exit(1);
   }
-
-  console.log(`Mode: ${isDryRun ? "DRY RUN (no changes)" : "LIVE DELETE"}\n`);
 
   // Get protected users from environment
   const protectedEmails = getProtectedUsers();
@@ -253,11 +252,13 @@ async function main() {
 }
 
 // Execute and handle errors
-main()
-  .catch((e) => {
-    console.error("Fatal error:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (isDirectInvocation(import.meta.url)) {
+  main()
+    .catch((e) => {
+      console.error("Fatal error:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

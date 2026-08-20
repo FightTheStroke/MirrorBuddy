@@ -1,7 +1,7 @@
 /**
  * Test Service Limits Metrics Collection
  */
-import { collectServiceLimitsSamples } from '../src/lib/observability/service-limits-metrics';
+import { collectServiceLimitsSamples } from '../apps/web/src/lib/observability/service-limits-metrics';
 
 async function test() {
   console.log('Testing service limits metrics collection...\n');

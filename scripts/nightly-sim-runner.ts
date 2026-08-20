@@ -12,7 +12,7 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { getAllMaestri } from "../src/data/maestri";
+import { getAllMaestri } from "../apps/web/src/data/maestri";
 import type {
   ModelTier,
   NightlyReport,

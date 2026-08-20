@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./apps/web/src/*"]
     }
   },
   "include": ["scripts/**/*.ts", "scripts/**/*.tsx"],

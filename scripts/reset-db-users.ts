@@ -4,14 +4,17 @@
  * - roberdan@fightthestroke.org (ADMIN)
  * - Mariodanfts@gmail.com (USER)
  *
- * Run with: npx tsx scripts/reset-db-users.ts
+ * Run with: npx tsx scripts/reset-db-users.ts --confirm
+ *
+ * WARNING: This is destructive! Without --confirm it reports and exits.
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import { config } from 'dotenv';
 config({ path: '.env' });
 
-import { createPrismaClient } from '../src/lib/ssl-config';
+import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL not set');
@@ -26,6 +29,11 @@ const KEEP_EMAILS = [
 ];
 
 async function main() {
+  if (announceMode('reset-db-users')) {
+    console.log('No changes made. This script has no partial mode: it either resets or it does not.');
+    return;
+  }
+
   console.log('🔄 Starting database reset...\n');
 
   // 1. Find users to keep
@@ -163,9 +171,11 @@ async function main() {
   );
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Error:', e);
-    process.exit(1);
-  })
-  .finally(() => prisma.$disconnect());
+if (isDirectInvocation(import.meta.url)) {
+  main()
+    .catch((e) => {
+      console.error('❌ Error:', e);
+      process.exit(1);
+    })
+    .finally(() => prisma.$disconnect());
+}

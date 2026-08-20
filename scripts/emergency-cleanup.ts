@@ -1,9 +1,14 @@
 // EMERGENCY: Clean production database keeping only 2 accounts
-import { prisma } from "../src/lib/db.js";
+import { prisma } from "../apps/web/src/lib/db.js";
+import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
 
 const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
 
 async function emergencyCleanup() {
+  if (announceMode("emergency-cleanup")) {
+    return;
+  }
+
   console.log("🚨 EMERGENCY CLEANUP - Production Database");
   console.log(`Keeping only: ${KEEP_EMAILS.join(", ")}`);
 
@@ -106,12 +111,14 @@ async function emergencyCleanup() {
   }
 }
 
-emergencyCleanup()
-  .then(() => {
-    console.log("\n✅ Emergency cleanup completed successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("\n❌ Emergency cleanup failed:", error);
-    process.exit(1);
-  });
+if (isDirectInvocation(import.meta.url)) {
+  emergencyCleanup()
+    .then(() => {
+      console.log("\n✅ Emergency cleanup completed successfully");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("\n❌ Emergency cleanup failed:", error);
+      process.exit(1);
+    });
+}

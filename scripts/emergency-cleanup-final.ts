@@ -2,7 +2,8 @@
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 import { config } from "dotenv";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
 
 config();
 
@@ -15,6 +16,10 @@ const prisma = createPrismaClient();
 const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
 
 async function emergencyCleanup() {
+  if (announceMode("emergency-cleanup-final")) {
+    return;
+  }
+
   console.log("🚨 EMERGENCY CLEANUP - Production Database");
   console.log(`Keeping only: ${KEEP_EMAILS.join(", ")}\n`);
 
@@ -113,12 +118,14 @@ async function emergencyCleanup() {
   }
 }
 
-emergencyCleanup()
-  .then(() => {
-    console.log("\n✅ Emergency cleanup completed successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("\n❌ Emergency cleanup failed:", error);
-    process.exit(1);
-  });
+if (isDirectInvocation(import.meta.url)) {
+  emergencyCleanup()
+    .then(() => {
+      console.log("\n✅ Emergency cleanup completed successfully");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("\n❌ Emergency cleanup failed:", error);
+      process.exit(1);
+    });
+}
