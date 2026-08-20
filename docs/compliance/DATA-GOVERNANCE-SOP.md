@@ -218,7 +218,7 @@ demands is mechanical — grep the whole file, and then the whole corpus, for th
 pattern, and never trust that a fix is complete because the part you were
 looking at is clean.
 
-**G-7 — quote attribution has never been verified (OPEN).** Sweeping the whole
+**G-7 — quote attribution has never been verified (PARTIALLY CLOSED).** Sweeping the whole
 corpus for quoted strings, rather than only quotation sections, turned up a
 different problem from the one this card was closing: quotations attributed to
 the wrong person. Two were found incidentally and fixed — the "if you can't
@@ -233,21 +233,42 @@ found by accident while looking for something else, which is a poor basis for
 assuming the rest are sound. Owner: to be assigned. It should be a pass in its
 own right, not folded into an IP review.
 
-The gate on this card widened G-7 by demonstration. Both guards fire on a
-heading — `knowledge-provenance.test.ts` looks for a quotations _section_ in a
-class D file — so in-character dialogue written into ordinary prose passes
+The gate on this card widened G-7 by demonstration. Both guards fired on a
+heading — `knowledge-provenance.test.ts` looked for a quotations _section_ in a
+class D file — so in-character dialogue written into ordinary prose passed
 untouched. Proven by mutation: fabricated speaker-attributed dialogue inserted
 under `## Stile Comunicativo` in `alex-pina-knowledge.ts`, propagated into the
 mini-KB with `npm run kb:extract`, left both guards green and would have shipped
-to the model. Nothing in the corpus exploits this today — the mutation had to be
-injected — and the guard's own comment already disclaims coverage here. But the
-blind spot is now measured rather than assumed, and closing it needs full-text
-scanning (named speaker adjacent to a quoted string) across class D files, not a
-heading regex. Same owner, same pass.
+to the model.
 
-Also for that pass: `cassese-knowledge.ts` carries the fragment
-`"non ancora disillusi"` attributed to Cassese outside any quotation heading.
-De minimis, and precisely the shape this rule cannot see.
+**That half is now closed.** `attributed-quotes.ts` reads the full text and
+looks for the shape that carries the risk — a quoted string presented as a named
+person's or character's own words — in four forms: a verb of speech before the
+quote, after it, script form at the start of a line, and an em-dash attribution.
+`knowledge-provenance.test.ts` fails the build on any hit in a class D file.
+Both mutations go red and name file, line and speaker.
+
+Calibrating it against the corpus decided its shape. A bare quoted-string sweep
+returns 64 hits in class D alone, nearly all work titles (`"La Casa de Papel"`),
+coined terms (`"la banda"`) and the Maestro's own coaching prompts — flagging
+those would have trained everyone to ignore the guard. Requiring an attribution
+cuts the whole corpus to 6. Five are public-domain works quoted legitimately
+(Manzoni's Don Abbondio and Lucia, Homer's two incipits, Herodotus at
+Thermopylae) and sit in class C files, where the rule does not fire — the guard
+runs on class D only. The sixth
+was the real one: `cassese-knowledge.ts` presenting `"non ancora disillusi"` as
+Cassese's own words outside any quotation heading, now rewritten as indirect
+speech.
+
+Locale codes and layout markers (`ES:`, `Student:`, `Inizio:`) are excluded by
+name in `STRUCTURAL_LABELS`; without that list the script form reads `ES: "el
+plan"` as a person quoting Spanish.
+
+**What remains open in G-7 is the accuracy half**, and it is the larger one: no
+systematic verification that the corpus's quotations are correctly attributed.
+The new guard says nothing about this — it asks whether a quote is presented as
+someone's words, never whether they actually said them. The three known
+misattributions were all found by accident. Owner: to be assigned.
 
 **G-8 — the removals were not reaching the model (CLOSED).** Every sanitisation
 on this card edited `*-knowledge.ts`. But each knowledge file has a second,
@@ -299,6 +320,53 @@ has to ask the right question, not merely be performed.
 
 G-6 was an operational break, not an IP one — but it means the provenance controls in this SOP currently govern content that is not being served from the vector store; the rest are **documentation and review gaps, not known infringements**: the corpus is
 authored in-house and every file but one names its references.
+
+**G-9 — content that reached no runtime path (CLOSED).** A knowledge file feeds
+the model through two channels and only two: the mini-KB inlined into the persona
+prompt, and the didactic text embedded for RAG. Identity sections went to the
+first, everything else to the second — and the mini-KB is capped at 50 lines, so
+the tail of a long identity section landed in neither. 305 lines across 17 of the
+32 Maestri existed in this repository and nowhere in the running system. A
+further 71 lines were stranded differently: for the six hand-authored mini-KBs
+the generated one is computed and discarded, taking its identity content with it.
+
+The cap stays — it is paid for on every prompt. The overflow is appended to the
+didactic text instead, so it is retrieved when relevant rather than carried
+always. Committed mini-KBs are byte-identical after regeneration: the prompt did
+not change. `knowledge-reachability.test.ts` asserts line by line across the
+corpus that nothing falls outside both channels, and reads the _committed_
+mini-KB for hand-authored Maestri rather than a recomputed one — the first
+version of the guard did recompute it, and passed while Austen's identity facts
+were reachable from nowhere.
+
+**G-10 — a Maestro absent from the index, silently (CLOSED).** All six of
+`chris`'s sections matched the identity patterns, so his didactic text was empty,
+the seeder produced no chunks for him, and the store held 31 distinct sourceIds
+for 32 files. Nothing failed: an empty file chunks to an empty list, which is
+indistinguishable from a successful no-op, and the retriever returns an empty
+string rather than an error. The model answered from the persona prompt alone
+and the gap was invisible from the outside.
+
+`chris` now carries didactic content as a consequence of the G-9 fix — his
+identity overflow is routed to RAG — so the corpus seeds 32 of 32, 291 chunks
+(measured from a clean regeneration on 19 Aug 2026; the 281 first recorded here
+predated the hand-authored fix in G-9 and was wrong by ten). Two controls keep
+it that way: `rag-coverage.test.ts` fails the build if any Maestro yields zero
+chunks, and the seeder now exits non-zero naming the empty Maestri instead of
+reporting success. If a Maestro ever legitimately must not be retrievable, that
+decision has to be recorded here and excluded in the test explicitly — not
+achieved by silence.
+
+**These two findings are closed in the corpus, not yet in production.** The
+guards prove the corpus is seedable; they cannot prove it has been seeded.
+Embeddings are written only by an explicit `npm run kb:seed` run, which no
+workflow performs automatically, so until someone runs it against production the
+vector store still holds the pre-fix index: 31 sourceIds, without the 376 lines
+G-9 recovered and without `chris` at all. The test suite will stay green
+throughout, because it measures the corpus and not the store.
+
+Whoever runs it should record the date and the resulting chunk count here. Until
+that line exists, assume production is still serving the old index.
 
 ---
 
@@ -371,10 +439,14 @@ across 30 maestri, 0 rows missing a native vector, retrieval returning real cont
 rejecting off-topic queries. Re-verified after review: the 13 Mascetti chunks now land
 under `mascetti`, and the stale `amici-miei` rows were pruned automatically.
 
-Two maestri (`chris`, `simone`) produce zero didactic chunks because every section of
-their knowledge file matches an identity pattern in `extract-mini-kb.ts`. They are not
-broken — they contribute identity only — but they get no RAG augmentation. Recorded here
-rather than silently accepted.
+That run predates G-9 and G-10. Two maestri (`chris`, `simone`) produced zero
+didactic chunks then, because every section of their knowledge file matched an
+identity pattern in `extract-mini-kb.ts`. It was recorded here as acceptable —
+they contribute identity only — which was the wrong call: the identity content
+past the mini-KB cap was reaching no runtime path at all, so they were not
+contributing it either. Both now carry didactic content, the corpus seeds 32 of
+32, and a Maestro producing zero chunks is a build failure rather than a note in
+this document. See G-9 and G-10.
 
 ## 9. Related documents
 

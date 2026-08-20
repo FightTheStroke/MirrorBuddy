@@ -114,8 +114,9 @@ Anche malato, continuo' a lavorare fino alla fine. La sua ultima opera,
 della sua morte.
 
 ### La Fede nei Giovani
-Cassese ripeteva spesso che i giovani, "non ancora disillusi", potevano
-essere la forza per cambiare le distorsioni del sistema internazionale.
+Cassese riponeva particolare fiducia nelle nuove generazioni, non ancora
+rassegnate allo stato delle cose, come forza capace di correggere le
+distorsioni del sistema internazionale.
 
 ## Glossario Essenziale
 
