@@ -11,20 +11,27 @@ import { isHandAuthored, MINI_KB_DIR } from '../../../../../../scripts/extract-m
 
 interface SubstanceMeasurement {
   slug: string;
-  uniqueSubstantiveLines: number;
+  uniqueSentences: number;
   normalizedCharacters: number;
 }
 
 /*
- * Measured on 2026-08-20 across the six hand-authored mini-KBs:
- * loto=15 lines/990 chars, turing=19/1192, noether=19/1260,
- * kahlo=20/1228, austen=21/1239, nightingale=24/1433.
- * The guard uses 8 lines because it is well above the two-line stub regression
- * this test exists to catch, while the current shortest file can still lose
- * seven unique lines before failing. That keeps ordinary persona edits from
- * tripping the build while still rejecting a flattened mini-KB.
+ * The threshold is set on characters of normalized prose, not on source lines.
+ * Line counts are controlled by the author's wrapping: reflowing an unchanged
+ * mini-KB into fewer long lines would fail the guard, while a short stub broken
+ * across many short lines would pass it. Both are wrong answers about persona
+ * substance, so the metric ignores line breaks entirely and measures how much
+ * distinct prose survives normalization.
+ *
+ * Measured on 2026-08-20 across the six hand-authored mini-KBs (unique
+ * sentences / normalized characters): loto=18/978, turing=15/1192,
+ * austen=19/1240, kahlo=20/1247, noether=19/1260, nightingale=17/1433.
+ * 500 is roughly half the shortest file, so ordinary persona edits have room,
+ * and it is well above the few-hundred-character stub this guard exists to
+ * reject. If a mini-KB is deliberately shortened below it, lower this number in
+ * the same commit and say why.
  */
-const MIN_UNIQUE_SUBSTANTIVE_LINES = 8;
+const MIN_NORMALIZED_CHARACTERS = 500;
 
 function miniKBFiles(): string[] {
   return fs
@@ -39,34 +46,41 @@ function templateBody(raw: string): string {
   return start >= 0 && end > start ? raw.slice(start + 1, end) : raw;
 }
 
-function normalizeSubstantiveLine(line: string): string | null {
-  const trimmed = line.trim();
-  if (trimmed.length < 12) return null;
-  if (/^#+\s+/.test(trimmed)) return null;
-  if (/^[-*_=]{3,}$/.test(trimmed)) return null;
-
-  const normalized = trimmed
+function normalizeProse(text: string): string {
+  return text
     .toLowerCase()
     .replace(/[`*_>#[\]().,;:!?"'’“”«»—–-]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
 
-  return normalized.length >= 12 ? normalized : null;
+/**
+ * Split on sentence enders rather than on newlines, so the measurement does not
+ * change when an author rewraps the same prose.
+ */
+function substantiveSentences(body: string): string[] {
+  return body
+    .split('\n')
+    .filter((line) => !/^\s*[-*_=]{3,}\s*$/.test(line))
+    // Strip the heading marker rather than dropping the whole line. Dropping by
+    // line makes the measurement depend on where the line breaks fall: once a
+    // file is reflowed, a heading and the prose after it share one physical
+    // line and the prose would vanish with it.
+    .map((line) => line.replace(/^\s*#+\s+/, ''))
+    .join(' ')
+    .split(/(?<=[.!?])\s+/)
+    .map(normalizeProse)
+    .filter((sentence) => sentence.length >= 12);
 }
 
 function measureSubstance(file: string): SubstanceMeasurement {
   const raw = fs.readFileSync(path.join(MINI_KB_DIR, file), 'utf-8');
-  const uniqueLines = new Set(
-    templateBody(raw)
-      .split('\n')
-      .map(normalizeSubstantiveLine)
-      .filter((line): line is string => line !== null),
-  );
+  const unique = new Set(substantiveSentences(templateBody(raw)));
 
   return {
     slug: file.replace(/\.ts$/, ''),
-    uniqueSubstantiveLines: uniqueLines.size,
-    normalizedCharacters: [...uniqueLines].join('\n').length,
+    uniqueSentences: unique.size,
+    normalizedCharacters: [...unique].join(' ').length,
   };
 }
 
@@ -86,11 +100,12 @@ describe('hand-authored mini-KBs keep enough authored persona substance', () => 
     const measurement = measureSubstance(file);
 
     expect(
-      measurement.uniqueSubstantiveLines,
-      `${measurement.slug} has only ${measurement.uniqueSubstantiveLines} unique substantive ` +
-        `line(s) (${measurement.normalizedCharacters} normalized characters). Headings, ` +
-        `whitespace-only padding, short fragments, and repeated boilerplate are ignored, ` +
-        `because they do not preserve the Maestro voice injected into the system prompt.`,
-    ).toBeGreaterThanOrEqual(MIN_UNIQUE_SUBSTANTIVE_LINES);
+      measurement.normalizedCharacters,
+      `${measurement.slug} keeps only ${measurement.normalizedCharacters} characters of unique ` +
+        `normalized prose across ${measurement.uniqueSentences} distinct sentence(s). Headings, ` +
+        `separators, short fragments, and repeated boilerplate are ignored, because they do not ` +
+        `preserve the Maestro voice injected into the system prompt. Line breaks are ignored too, ` +
+        `so rewrapping the same text cannot change this number.`,
+    ).toBeGreaterThanOrEqual(MIN_NORMALIZED_CHARACTERS);
   });
 });
