@@ -78,8 +78,8 @@ describe('hand-authored mini-KBs keep enough authored persona substance', () => 
   it('finds the hand-authored persona files', () => {
     expect(
       handAuthoredFiles.length,
-      'hand-authored mini-KB discovery returned no files; it.each would otherwise register no persona substance assertions',
-    ).toBeGreaterThanOrEqual(1);
+      'hand-authored mini-KB discovery dropped below the known floor of six files, so discovery itself is broken and some personas are unguarded. If a hand-authored mini-KB is intentionally deleted, lower this floor deliberately in the same commit and explain why.',
+    ).toBeGreaterThanOrEqual(6);
   });
 
   it.each(handAuthoredFiles)('%s has more than a stub of unique authored prose', (file) => {
