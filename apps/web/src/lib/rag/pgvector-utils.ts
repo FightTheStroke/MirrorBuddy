@@ -143,6 +143,8 @@ export interface NativeSearchOptions {
   minSimilarity?: number;
   sourceType?: string;
   subject?: string;
+  /** Restrict to a single source. Applied in SQL, not after ranking. */
+  sourceId?: string;
 }
 
 /**
@@ -179,6 +181,7 @@ export async function nativeVectorSearch(
     minSimilarity = 0.5,
     sourceType = null,
     subject = null,
+    sourceId = null,
   } = options;
 
   const vectorStr = formatVectorForPg(vector);
@@ -190,7 +193,8 @@ export async function nativeVectorSearch(
       ${limit}::INTEGER,
       ${minSimilarity}::FLOAT,
       ${sourceType}::TEXT,
-      ${subject}::TEXT
+      ${subject}::TEXT,
+      ${sourceId}::TEXT
     )
   `) as NativeSearchResult[];
 
@@ -198,6 +202,7 @@ export async function nativeVectorSearch(
     resultCount: results.length,
     limit,
     minSimilarity,
+    sourceId,
   });
 
   return results;

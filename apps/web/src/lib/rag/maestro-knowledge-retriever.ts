@@ -69,9 +69,14 @@ export async function retrieveMaestroKnowledge(
       limit,
       minSimilarity: MIN_SIMILARITY,
       sourceType: 'maestro_knowledge',
+      sourceId: maestroId,
       subject: undefined,
     });
 
+    // The store filters by maestro now, so nothing foreign should arrive here.
+    // Kept as a belt: a database still on the six-argument search function
+    // falls back to the JS path, and this guarantees the persona boundary holds
+    // whichever path served the query.
     const filtered = results.filter((r) => r.sourceId === maestroId);
 
     if (filtered.length === 0) {
@@ -118,6 +123,7 @@ export async function retrieveMaestroKnowledgeRaw(
       limit,
       minSimilarity: MIN_SIMILARITY,
       sourceType: 'maestro_knowledge',
+      sourceId: maestroId,
     });
 
     return results

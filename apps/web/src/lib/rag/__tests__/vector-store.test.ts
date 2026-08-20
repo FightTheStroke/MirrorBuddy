@@ -237,6 +237,50 @@ describe('Vector Store Service', () => {
       );
     });
 
+    // Narrowing to one source has to happen while ranking. A caller that
+    // narrows after the call is asking every other source to score lower than
+    // the one it wants, and `limit` is applied before it ever sees the rows.
+    it('should push sourceId into the native query rather than filtering after', async () => {
+      vi.mocked(nativeVectorSearch).mockResolvedValueOnce([] as any);
+
+      await searchSimilar({
+        userId: 'user-123',
+        vector: Array(1536).fill(0.1),
+        sourceType: 'maestro_knowledge',
+        sourceId: 'feynman',
+      });
+
+      expect(nativeVectorSearch).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          sourceType: 'maestro_knowledge',
+          sourceId: 'feynman',
+        }),
+      );
+    });
+
+    it('should apply sourceId in the JS fallback too', async () => {
+      vi.mocked(nativeVectorSearch).mockRejectedValueOnce(new Error('function does not exist'));
+      vi.mocked(prisma.contentEmbedding.findMany).mockResolvedValueOnce([] as any);
+
+      await searchSimilar({
+        userId: 'user-123',
+        vector: Array(1536).fill(0.1),
+        sourceType: 'maestro_knowledge',
+        sourceId: 'feynman',
+      });
+
+      expect(prisma.contentEmbedding.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            userId: 'user-123',
+            sourceType: 'maestro_knowledge',
+            sourceId: 'feynman',
+          }),
+        }),
+      );
+    });
+
     it('should respect minSimilarity threshold', async () => {
       const queryVector = Array(1536).fill(0.1);
 
