@@ -12,14 +12,15 @@ import {
   expect,
   hasProdTestAuthCookie,
   openHomeworkSession,
+  EXPECTED_MAESTRI_COUNT,
 } from './fixtures';
 
 test.describe('PROD-SMOKE: Professor Safety & Characters', () => {
-  test('Maestri API returns all 26 with correct structure', async ({ request }) => {
+  test('Maestri API returns the complete roster with correct structure', async ({ request }) => {
     const res = await request.get('/api/maestri');
     expect(res.status()).toBe(200);
     const maestri = await res.json();
-    expect(maestri).toHaveLength(26);
+    expect(maestri).toHaveLength(EXPECTED_MAESTRI_COUNT);
 
     // Each maestro should have required fields
     for (const m of maestri) {
