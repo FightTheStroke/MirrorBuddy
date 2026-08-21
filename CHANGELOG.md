@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Progress view WCAG AA contrast** — adjusted light/dark progress tabs, helper labels, chart axes, achievement states and custom accent backgrounds so the “I miei premi” view meets WCAG 2.1 AA color-contrast thresholds, with Playwright regression coverage for light, dark, hover/focus and locked states.
+- **Custom accent colors are now measured, not assumed** — `resolveAccessibleAccentColor()` (which drags a user-picked accent up to the 4.5:1 AA floor) gained 31 unit tests covering both themes, non-color input, short-form hex, already-conforming colors left untouched, and the worst case a color picker actually allows: yellow on white, 1.07:1. The tests re-implement the WCAG relative-luminance formula from the spec rather than importing the module's own helpers, so they measure readability instead of confirming the module agrees with itself.
 
 ### Added
 
