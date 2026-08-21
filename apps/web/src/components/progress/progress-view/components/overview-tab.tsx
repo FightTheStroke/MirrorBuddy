@@ -64,7 +64,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
               {level}
             </div>
             <div className="flex-1">
-              <p className="text-sm text-slate-500 mb-1">
+              <p className="text-sm text-slate-700 dark:text-slate-300 mb-1">
                 {xp.toLocaleString()} {t("xpTotali")}
               </p>
               <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -75,7 +75,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
                   transition={{ duration: 0.5 }}
                 />
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">
                 {(1000 - (xp % 1000)).toLocaleString()} {t("xpPerIlLivello")} {level + 1}
               </p>
             </div>
@@ -101,7 +101,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
                   transition={{ duration: 0.5, delay: i * 0.05 }}
                   style={{ minHeight: day.minutes > 0 ? '8px' : '0px' }}
                 />
-                <span className="text-xs text-slate-500">{day.day}</span>
+                <span className="text-xs text-slate-700 dark:text-slate-300">{day.day}</span>
               </div>
             ))}
           </div>
@@ -127,8 +127,8 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
             ))}
           </div>
           <div className="flex items-center justify-between mt-4 text-sm">
-            <span className="text-slate-500">{t("k4SettimaneFa")}</span>
-            <span className="text-slate-500">{t("oggi")}</span>
+            <span className="text-slate-700 dark:text-slate-300">{t("k4SettimaneFa")}</span>
+            <span className="text-slate-700 dark:text-slate-300">{t("oggi")}</span>
           </div>
         </CardContent>
       </Card>
@@ -147,7 +147,7 @@ export function OverviewTab({ xp, level, levelProgress, streak, masteries }: Ove
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-medium text-sm">{subjectNames[subject as Subject]}</span>
-                  <span className="text-xs text-slate-500">{data?.tier || 'beginner'}</span>
+                  <span className="text-xs text-slate-700 dark:text-slate-300">{data?.tier || 'beginner'}</span>
                 </div>
                 <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div

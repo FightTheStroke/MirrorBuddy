@@ -19,7 +19,7 @@ export function AchievementsTab({ unlocked, allAchievements }: AchievementsTabPr
               'transition-all',
               isUnlocked
                 ? 'bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-amber-200 dark:border-amber-800'
-                : 'opacity-60'
+                : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
             )}
           >
             <CardContent className="p-4">
@@ -40,14 +40,14 @@ export function AchievementsTab({ unlocked, allAchievements }: AchievementsTabPr
                     {achievement.desc}
                   </p>
                   <div className="flex items-center gap-1 mt-2">
-                    <Zap className="w-4 h-4 text-amber-500" />
-                    <span className="text-sm font-medium text-amber-600">
+                    <Zap className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+                    <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
                       +{achievement.xp} XP
                     </span>
                   </div>
                 </div>
                 {isUnlocked && (
-                  <Award className="w-6 h-6 text-amber-500" />
+                  <Award className="w-6 h-6 text-amber-700 dark:text-amber-400" />
                 )}
               </div>
             </CardContent>

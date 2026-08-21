@@ -87,8 +87,8 @@ export function MaestroUsageChart({ sessions, className }: MaestroUsageChartProp
                 aria-label={t('chartAriaLabel')}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-                <YAxis type="category" dataKey="name" stroke="#94a3b8" fontSize={12} width={80} />
+                <XAxis type="number" stroke="var(--chart-axis-color)" fontSize={12} />
+                <YAxis type="category" dataKey="name" stroke="var(--chart-axis-color)" fontSize={12} width={80} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: '#1e293b',

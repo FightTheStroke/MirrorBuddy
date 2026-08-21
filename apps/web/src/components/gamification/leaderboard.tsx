@@ -185,7 +185,7 @@ export function Leaderboard({
           <p className="text-sm text-muted-foreground">{t('previousSeasonDifference')}</p>
           <p
             className={`text-2xl font-bold ${
-              entries[0].change >= 0 ? 'text-green-500' : 'text-red-500'
+              entries[0].change >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
             }`}
           >
             {entries[0].change >= 0 ? '+' : ''}

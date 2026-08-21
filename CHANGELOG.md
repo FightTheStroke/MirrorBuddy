@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Progress view WCAG AA contrast** — adjusted light/dark progress tabs, helper labels, chart axes, achievement states and custom accent backgrounds so the “I miei premi” view meets WCAG 2.1 AA color-contrast thresholds, with Playwright regression coverage for light, dark, hover/focus and locked states.
+
 ### Added
 
 - **Azure OpenAI Realtime 2026-07-07** — `gpt-realtime-2.1` production rollout (ADR 0169). Drop-in successor of `gpt-realtime-2` with better alphanumeric speech (dates/numbers/formulas — key for discalculia and STEM Maestri), noise robustness and lower latency. Enabled at 100% via the new `voice_realtime_21` flag, which takes precedence over `voice_realtime_2` with a graceful fallback chain `gpt-realtime-2.1 → gpt-realtime-2 → gpt-realtime-1.5 → gpt-realtime`.

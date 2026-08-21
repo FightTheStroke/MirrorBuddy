@@ -130,7 +130,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                 className={cn(
                   'px-3 py-1 text-xs font-medium rounded-md transition-colors',
                   period === p
-                    ? 'bg-purple-500 text-white'
+                    ? 'bg-purple-700 text-white'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700',
                 )}
                 aria-pressed={period === p}
@@ -157,7 +157,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="date"
-                  stroke="#94a3b8"
+                  stroke="var(--chart-axis-color)"
                   fontSize={12}
                   tickFormatter={(value) => {
                     const date = new Date(value);
@@ -165,7 +165,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                   }}
                 />
                 <YAxis
-                  stroke="#94a3b8"
+                  stroke="var(--chart-axis-color)"
                   fontSize={12}
                   label={{ value: 'Minuti', angle: -90, position: 'insideLeft' }}
                 />

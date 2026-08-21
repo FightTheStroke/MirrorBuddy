@@ -19,7 +19,7 @@ export function XPInfo({ className }: XPInfoProps) {
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center gap-2 mb-4">
-        <Trophy className="w-5 h-5 text-purple-500" />
+        <Trophy className="w-5 h-5 text-purple-700 dark:text-purple-400" />
         <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('title')}</h3>
       </div>
 
@@ -107,7 +107,7 @@ export function XPInfo({ className }: XPInfoProps) {
       {/* Tip */}
       <div className="mt-4 p-3 rounded-lg bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-900">
         <div className="flex items-start gap-2">
-          <MessageCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+          <MessageCircle className="w-4 h-4 text-yellow-700 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-yellow-800 dark:text-yellow-200">
             <strong>{t('tipLabel')}</strong> {t('tipMessage')}
           </p>

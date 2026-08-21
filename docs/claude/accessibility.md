@@ -80,7 +80,7 @@ import { getAdjustedTimeout, shouldUseVoiceInput } from "@/lib/education";
 
 | Criterion         | Implementation                     |
 | ----------------- | ---------------------------------- |
-| 1.4.3 Contrast    | 4.5:1 minimum on all text          |
+| 1.4.3 Contrast    | 4.5:1 minimum on all normal text; progress view accent/hover/locked states are pinned by `apps/web/e2e/home-intent-a11y.spec.ts` |
 | 2.1.1 Keyboard    | Tab/Enter/Escape navigation        |
 | 2.4.7 Focus       | ring-2 visible focus indicators    |
 | 2.5.5 Target Size | 44x44px minimum on all buttons     |

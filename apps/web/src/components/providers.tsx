@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider, useTheme } from 'next-themes';
 import { AccessibilityProvider, MotionConfigBridge } from '@/components/accessibility';
 import { StagingBanner } from '@/components/ui/staging-banner';
 import { ToastContainer } from '@/components/ui/toast';
@@ -15,6 +15,7 @@ import { initializeTelemetry } from '@/lib/telemetry';
 import { ActivityTracker } from '@/lib/telemetry/use-activity-tracker';
 import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';
 import { registerOfflineServiceWorker } from '@/lib/pwa/offline-sw-registration';
+import { resolveAccessibleAccentColor } from '@/lib/accessibility/accent-contrast';
 
 // Debug logger - captures all browser errors to file (dev only)
 import '@/lib/client-error-logger';
@@ -31,12 +32,24 @@ interface ProvidersProps {
 // Component to apply accent color from settings
 function AccentColorApplier() {
   const { appearance } = useSettingsStore();
+  const { resolvedTheme, theme } = useTheme();
 
   useEffect(() => {
     // Apply accent color to document root (default to 'blue' if not set)
     const accentColor = appearance?.accentColor || 'blue';
+    const isDarkTheme = resolvedTheme === 'dark' || theme === 'dark';
+    const resolvedAccent = resolveAccessibleAccentColor(accentColor, isDarkTheme);
     document.documentElement.setAttribute('data-accent', accentColor);
-  }, [appearance?.accentColor]);
+
+    if (resolvedAccent.kind === 'custom') {
+      document.documentElement.style.setProperty('--accent-color', resolvedAccent.foreground);
+      document.documentElement.style.setProperty('--accent-bg-color', resolvedAccent.background);
+      return;
+    }
+
+    document.documentElement.style.removeProperty('--accent-color');
+    document.documentElement.style.removeProperty('--accent-bg-color');
+  }, [appearance?.accentColor, resolvedTheme, theme]);
 
   // Set default on mount before store hydrates
   useEffect(() => {

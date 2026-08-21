@@ -6,6 +6,7 @@ import {
   mockTracking,
   mockTrialTier,
 } from './fixtures/api-mocks';
+import { contrastRatio, sampledContrast } from './fixtures/contrast';
 
 /**
  * Dedicated accessibility coverage for the intention-based home (A11Y-07).
@@ -133,13 +134,6 @@ test('keyboard-only path: step1 → step2 → session opens', async ({ page }) =
   await expect(page.locator('#intent-heading')).toHaveCount(0);
 });
 
-/**
- * A11Y-06 follow-up: axe + zoom-200% coverage for the two child sub-views
- * reachable from the bambino nav — "I miei lavori" (view `supporti`,
- * LazyZainoView) and "I miei premi" (view `progress`, LazyProgressView).
- * These were ☐ in the original A11Y-06 audit (home only).
- */
-
 async function gotoChildView(page: import('@playwright/test').Page, view: 'supporti' | 'progress') {
   await gotoHome(page);
   // The sidebar nav button is rendered (icon-only when collapsed on desktop);
@@ -178,6 +172,43 @@ test('child view "I miei premi" (progress) has no axe violations', async ({ page
       .map((v) => v.id)
       .join(', ')}`,
   ).toHaveLength(0);
+});
+
+test('child view "I miei premi" contrast tokens meet WCAG AA in light, dark, and interactive states', async ({
+  page,
+}) => {
+  await gotoChildView(page, 'progress');
+  await expect(page.getByTestId('progress-view')).toBeVisible({ timeout: 20000 });
+
+  const inactiveTab = page.getByRole('button', { name: 'Traguardi' });
+
+  for (const theme of ['light', 'dark'] as const) {
+    await page.evaluate((nextTheme) => {
+      document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+      document.documentElement.classList.toggle('light', nextTheme === 'light');
+      document.body.style.backgroundColor = nextTheme === 'dark' ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+    }, theme);
+
+    const tabColors = await sampledContrast(page, '[data-testid="progress-view"] button:has-text("Panoramica")');
+    expect(contrastRatio(tabColors.color, tabColors.background), `${theme} active tab`).toBeGreaterThanOrEqual(4.5);
+
+    await inactiveTab.hover();
+    await page.waitForTimeout(100);
+    const hoverColors = await sampledContrast(page, '[data-testid="progress-view"] button:has-text("Traguardi")');
+    expect(contrastRatio(hoverColors.color, hoverColors.background), `${theme} inactive tab hover`).toBeGreaterThanOrEqual(4.5);
+
+    await inactiveTab.focus();
+    const focusRingWidth = await inactiveTab.evaluate((element) => window.getComputedStyle(element).outlineWidth);
+    expect(focusRingWidth, `${theme} inactive tab remains focusable`).not.toBe('0px');
+
+    const helperText = await sampledContrast(page, '[data-testid="progress-view"] .text-slate-700, [data-testid="progress-view"] .dark\\:text-slate-300');
+    expect(contrastRatio(helperText.color, helperText.background), `${theme} helper text`).toBeGreaterThanOrEqual(4.5);
+  }
+
+  await page.getByRole('button', { name: 'Traguardi' }).click();
+  const lockedCard = page.locator('[data-testid="progress-view"] [aria-label*="bloccato"]').first();
+  await expect(lockedCard).toBeVisible();
+  await expect(lockedCard).toHaveCSS('opacity', '1');
 });
 
 /**
