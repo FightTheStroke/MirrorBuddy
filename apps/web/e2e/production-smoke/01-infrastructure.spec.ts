@@ -5,7 +5,7 @@
  * Run: npm run test:smoke:prod
  */
 
-import { test, expect } from './fixtures';
+import { test, expect, EXPECTED_MAESTRI_COUNT } from './fixtures';
 
 test.describe('PROD-SMOKE: Infrastructure', () => {
   test('Health endpoint returns healthy', async ({ request }) => {
@@ -69,10 +69,10 @@ test.describe('PROD-SMOKE: Infrastructure', () => {
     expect(tts.status()).toBeGreaterThanOrEqual(400);
   });
 
-  test('Maestri API returns 26 professors', async ({ request }) => {
+  test('Maestri API returns the complete roster', async ({ request }) => {
     const res = await request.get('/api/maestri');
     expect(res.status()).toBe(200);
     const maestri = await res.json();
-    expect(maestri).toHaveLength(26);
+    expect(maestri).toHaveLength(EXPECTED_MAESTRI_COUNT);
   });
 });

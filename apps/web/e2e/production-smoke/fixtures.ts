@@ -19,6 +19,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
 import type { BrowserContext, StorageState } from '@playwright/test';
+import { resolve } from 'node:path';
 import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
   mockTOS,
@@ -28,8 +29,11 @@ import {
   mockHomePageAPIs,
   mockAccessibilitySettings,
 } from '../fixtures/api-mocks';
+import { readRosterCounts } from '../../../../scripts/lib/roster-counts';
 
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
+const REPO_ROOT = resolve(__dirname, '../../../..');
+export const EXPECTED_MAESTRI_COUNT = readRosterCounts(REPO_ROOT).maestri;
 export const ADMIN_READONLY_COOKIE_NAME = AUTH_COOKIE_NAME;
 export const ADMIN_READONLY_COOKIE_VALUE = process.env.ADMIN_READONLY_COOKIE_VALUE;
 const PROD_TEST_USER_ID = process.env.PROD_TEST_USER_ID;
