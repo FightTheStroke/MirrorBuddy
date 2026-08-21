@@ -73,6 +73,7 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
   --radius: 0.75rem;
+  --accent-bg-color: #2563eb;
   --chart-axis-color: #475569;
 }
 
@@ -99,6 +100,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+    --accent-bg-color: #2563eb;
     --chart-axis-color: #94a3b8;
   }
 }
@@ -126,6 +128,7 @@ html.light,
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 221.2 83.2% 53.3%;
+  --accent-bg-color: #2563eb;
   --chart-axis-color: #475569;
 }
 
@@ -150,6 +153,7 @@ html.light,
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 224.3 76.3% 48%;
+  --accent-bg-color: #2563eb;
   --chart-axis-color: #94a3b8;
 }
 
@@ -172,13 +176,13 @@ html.light,
 .bg-accent-themed { background-color: var(--accent-bg-color, hsl(var(--primary))); }
 .text-accent-themed { color: var(--accent-color, hsl(var(--primary))); }
 .border-accent-themed { border-color: var(--accent-bg-color, hsl(var(--primary))); }
-.ring-accent-themed { --tw-ring-color: var(--accent-bg-color, hsl(var(--ring))); }
+.ring-accent-themed { --tw-ring-color: var(--accent-color, hsl(var(--ring))); }
 
 /* Hover and focus states for accent color */
 .hover\:bg-accent-themed:hover { background-color: var(--accent-bg-color, hsl(var(--primary))); }
 .hover\:text-accent-themed:hover { color: var(--accent-color, hsl(var(--primary))); }
 .hover\:border-accent-themed:hover { border-color: var(--accent-bg-color, hsl(var(--primary))); }
-.focus\:ring-accent-themed:focus { --tw-ring-color: var(--accent-bg-color, hsl(var(--ring))); }
+.focus\:ring-accent-themed:focus { --tw-ring-color: var(--accent-color, hsl(var(--ring))); }
 
 /* Accent background with opacity variants */
 .bg-accent-themed\/10 { background-color: color-mix(in srgb, var(--accent-bg-color, hsl(var(--primary))) 10%, transparent); }
