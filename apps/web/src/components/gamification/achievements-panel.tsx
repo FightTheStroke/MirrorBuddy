@@ -84,7 +84,7 @@ const AchievementCard = memo(function AchievementCard({ achievement, compact = f
         className={`relative aspect-square rounded-lg border-2 p-2 transition-all ${
           isUnlocked
             ? 'border-yellow-500/50 bg-yellow-500/10'
-            : 'border-muted bg-muted/50 grayscale opacity-50'
+            : 'border-muted bg-muted/50 grayscale'
         }`}
         title={`${achievement.name}: ${achievement.description}`}
         role="button"
@@ -106,7 +106,7 @@ const AchievementCard = memo(function AchievementCard({ achievement, compact = f
       className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-all ${
         isUnlocked
           ? 'border-yellow-500/50 bg-yellow-500/10 hover:border-yellow-500'
-          : 'border-muted bg-muted/50 grayscale opacity-50'
+          : 'border-muted bg-muted/50 grayscale'
       }`}
       role="article"
       aria-label={`${achievement.name}${isUnlocked ? ' (sbloccato)' : ' (bloccato)'}`}
@@ -121,7 +121,7 @@ const AchievementCard = memo(function AchievementCard({ achievement, compact = f
         </p>
       </div>
       {isUnlocked ? (
-        <div className="mt-auto flex items-center gap-1 text-xs text-green-500">
+        <div className="mt-auto flex items-center gap-1 text-xs text-green-700 dark:text-green-400">
           <span>✓</span>
           <span>{t("sbloccato")}</span>
         </div>

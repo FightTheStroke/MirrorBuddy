@@ -56,7 +56,7 @@ export function HistoryTab() {
       <Card>
         <CardContent className="p-8 text-center">
           <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
+          <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
             {t("nessunaSessioneRegistrata")}
           </h3>
           <p className="text-sm text-slate-500 mt-2">

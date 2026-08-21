@@ -28,6 +28,65 @@ interface ProvidersProps {
   nonce?: string;
 }
 
+type Rgb = { r: number; g: number; b: number };
+
+const NAMED_ACCENTS = new Set(['blue', 'green', 'purple', 'orange', 'pink']);
+const MIN_NORMAL_TEXT_CONTRAST = 4.5;
+
+function parseHexColor(color: string): Rgb | null {
+  const match = color.trim().match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
+  if (!match) return null;
+
+  const hex = match[1].length === 3
+    ? match[1].split('').map((char) => char + char).join('')
+    : match[1];
+
+  return {
+    r: Number.parseInt(hex.slice(0, 2), 16),
+    g: Number.parseInt(hex.slice(2, 4), 16),
+    b: Number.parseInt(hex.slice(4, 6), 16),
+  };
+}
+
+function channelLuminance(channel: number) {
+  const normalized = channel / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance({ r, g, b }: Rgb) {
+  return 0.2126 * channelLuminance(r) + 0.7152 * channelLuminance(g) + 0.0722 * channelLuminance(b);
+}
+
+function contrastWithWhite(color: Rgb) {
+  return 1.05 / (relativeLuminance(color) + 0.05);
+}
+
+function toHex({ r, g, b }: Rgb) {
+  return `#${[r, g, b].map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function aaAccentBackground(color: string) {
+  const rgb = parseHexColor(color);
+  if (!rgb) return null;
+
+  let factor = 1;
+  while (contrastWithWhite({
+    r: Math.round(rgb.r * factor),
+    g: Math.round(rgb.g * factor),
+    b: Math.round(rgb.b * factor),
+  }) < MIN_NORMAL_TEXT_CONTRAST && factor > 0) {
+    factor -= 0.02;
+  }
+
+  return toHex({
+    r: Math.round(rgb.r * factor),
+    g: Math.round(rgb.g * factor),
+    b: Math.round(rgb.b * factor),
+  });
+}
+
 // Component to apply accent color from settings
 function AccentColorApplier() {
   const { appearance } = useSettingsStore();
@@ -36,6 +95,22 @@ function AccentColorApplier() {
     // Apply accent color to document root (default to 'blue' if not set)
     const accentColor = appearance?.accentColor || 'blue';
     document.documentElement.setAttribute('data-accent', accentColor);
+
+    if (NAMED_ACCENTS.has(accentColor)) {
+      document.documentElement.style.removeProperty('--accent-color');
+      document.documentElement.style.removeProperty('--accent-bg-color');
+      return;
+    }
+
+    const accentBackground = aaAccentBackground(accentColor);
+    if (accentBackground) {
+      document.documentElement.style.setProperty('--accent-color', accentColor);
+      document.documentElement.style.setProperty('--accent-bg-color', accentBackground);
+      return;
+    }
+
+    document.documentElement.style.removeProperty('--accent-color');
+    document.documentElement.style.removeProperty('--accent-bg-color');
   }, [appearance?.accentColor]);
 
   // Set default on mount before store hydrates
