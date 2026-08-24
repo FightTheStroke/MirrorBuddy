@@ -266,31 +266,8 @@ EOF
     done
 
     # Reachy Mini is published separately to Hugging Face Spaces, but it is
-    # still the physical MirrorBuddy client. Keep its package and runtime
-    # version on the same release number as the web app.
-    python3 - "$new_version" <<'PY'
-from pathlib import Path
-import re
-import sys
-
-version = sys.argv[1]
-replacements = (
-    (Path("robot/pyproject.toml"), r'(?m)^version = "[^"]+"$', f'version = "{version}"'),
-    (
-        Path("robot/reachy_mini_mirrorbuddy/__init__.py"),
-        r'(?m)^__version__ = "[^"]+"$',
-        f'__version__ = "{version}"',
-    ),
-)
-
-for path, pattern, replacement in replacements:
-    content = path.read_text()
-    updated, count = re.subn(pattern, replacement, content, count=1)
-    if count != 1:
-        raise SystemExit(f"Expected one version declaration in {path}, found {count}")
-    path.write_text(updated)
-    print(f"✓ {path} updated to {version}")
-PY
+    # still the physical MirrorBuddy client.
+    python3 scripts/update-robot-version.py "$new_version"
 
     echo ""
     echo -e "Next steps:"
