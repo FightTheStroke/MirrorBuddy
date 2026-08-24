@@ -264,10 +264,38 @@ EOF
         echo -e "${YELLOW}⚠ $pkg not found, skipping${NC}"
       fi
     done
+
+    # Reachy Mini is published separately to Hugging Face Spaces, but it is
+    # still the physical MirrorBuddy client. Keep its package and runtime
+    # version on the same release number as the web app.
+    python3 - "$new_version" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+version = sys.argv[1]
+replacements = (
+    (Path("robot/pyproject.toml"), r'(?m)^version = "[^"]+"$', f'version = "{version}"'),
+    (
+        Path("robot/reachy_mini_mirrorbuddy/__init__.py"),
+        r'(?m)^__version__ = "[^"]+"$',
+        f'__version__ = "{version}"',
+    ),
+)
+
+for path, pattern, replacement in replacements:
+    content = path.read_text()
+    updated, count = re.subn(pattern, replacement, content, count=1)
+    if count != 1:
+        raise SystemExit(f"Expected one version declaration in {path}, found {count}")
+    path.write_text(updated)
+    print(f"✓ {path} updated to {version}")
+PY
+
     echo ""
     echo -e "Next steps:"
     echo -e "  1. Review CHANGELOG.md"
-    echo -e "  2. git add VERSION package.json pnpm-lock.yaml"
+    echo -e "  2. git add VERSION package.json apps/web/package.json robot/pyproject.toml robot/reachy_mini_mirrorbuddy/__init__.py"
     echo -e "  3. git commit -m \"chore(release): bump version to $new_version\""
     echo -e "  4. git tag -a v$new_version -m \"Release $new_version\""
     echo -e "  5. git push origin main --tags"

@@ -32,6 +32,11 @@ class TestTheBuildIdentifiesItself:
 
         assert reachy_mini_mirrorbuddy.__version__ == declared
 
+    def test_it_matches_the_mirrorbuddy_release(self):
+        release = (ROOT.parent / "VERSION").read_text().strip()
+
+        assert reachy_mini_mirrorbuddy.__version__ == release
+
     def test_it_is_no_longer_the_placeholder(self):
         assert reachy_mini_mirrorbuddy.__version__ != "0.1.0"
 
