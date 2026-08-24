@@ -264,10 +264,15 @@ EOF
         echo -e "${YELLOW}⚠ $pkg not found, skipping${NC}"
       fi
     done
+
+    # Reachy Mini is published separately to Hugging Face Spaces, but it is
+    # still the physical MirrorBuddy client.
+    python3 scripts/update-robot-version.py "$new_version"
+
     echo ""
     echo -e "Next steps:"
     echo -e "  1. Review CHANGELOG.md"
-    echo -e "  2. git add VERSION package.json pnpm-lock.yaml"
+    echo -e "  2. git add VERSION package.json apps/web/package.json robot/pyproject.toml robot/reachy_mini_mirrorbuddy/__init__.py"
     echo -e "  3. git commit -m \"chore(release): bump version to $new_version\""
     echo -e "  4. git tag -a v$new_version -m \"Release $new_version\""
     echo -e "  5. git push origin main --tags"
