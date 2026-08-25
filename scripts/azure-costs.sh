@@ -12,6 +12,7 @@ DAYS="${1:-30}"
 OUTPUT_FORMAT="${2:-table}"
 MONTHS=""
 SERVICE_FILTER=""
+BY_DIM=""
 
 # Colors
 RED='\033[0;31m'
@@ -185,6 +186,8 @@ service_filter_fragment() {
 get_monthly_costs() {
 	local months="$1"
 	local filter=$(service_filter_fragment)
+	local grouping=""
+	[ -n "$BY_DIM" ] && grouping=$(printf ',"grouping":[{"type":"Dimension","name":"%s"}]' "$BY_DIM")
 	local start_date=$(date -v-$((months - 1))m -v1d +%Y-%m-01 2>/dev/null ||
 		date -d "$(date +%Y-%m-01) -$((months - 1)) months" +%Y-%m-01)
 	local end_date=$(date +%Y-%m-%d)
@@ -199,7 +202,7 @@ get_monthly_costs() {
     "timePeriod": {"from": "${start_date}", "to": "${end_date}"},
     "dataset": {
         "granularity": "Monthly",
-        "aggregation": {"totalCost": {"name": "Cost", "function": "Sum"}}${filter}
+        "aggregation": {"totalCost": {"name": "Cost", "function": "Sum"}}${grouping}${filter}
     }
 }
 EOF
@@ -207,6 +210,23 @@ EOF
 
 	local result
 	result=$(cm_query "$body") || return 1
+
+	# Grouped mode: emit "month<TAB>group<TAB>cost" rows for downstream pivoting.
+	if [ -n "$BY_DIM" ]; then
+		echo "$result" | jq -r --arg dim "$BY_DIM" '
+            (.properties.columns | map(.name)) as $cols
+            | ($cols | index("Cost")) as $ci
+            | ((($cols | index("BillingMonth")) // ($cols | index("UsageDate")))) as $di
+            | ($cols | index($dim)) as $gi
+            | .properties.rows
+            | map(select(.[$ci] > 0))
+            | sort_by(-.[$ci])
+            | .[]
+            | (((.[$di] | tostring) | if test("^[0-9]{8}$") then .[0:7] else .[0:7] end)) as $m
+            | "\($m)\t\(.[$gi] // "-")\t\(.[$ci] | . * 100 | round / 100)"
+        '
+		return 0
+	fi
 
 	echo "$result" | jq -r '
         (.properties.columns | map(.name)) as $cols
@@ -339,6 +359,7 @@ usage() {
 	echo "  $0 30 json      # JSON output"
 	echo "  $0 --months 6   # Last 6 months, month by month"
 	echo "  $0 --months 6 --service \"Foundry Models\"   # AI spend only"
+	echo "  $0 --months 6 --by ResourceGroupName        # month/group/cost rows"
 }
 
 case "$1" in
@@ -348,8 +369,12 @@ case "$1" in
 	;;
 --months)
 	MONTHS="${2:-6}"
-	SERVICE_FILTER="${4:-}"
-	[ "${3:-}" = "--service" ] || SERVICE_FILTER=""
+	SERVICE_FILTER=""
+	BY_DIM=""
+	case "${3:-}" in
+	--service) SERVICE_FILTER="${4:-}" ;;
+	--by) BY_DIM="${4:-ResourceGroupName}" ;;
+	esac
 	if ! [[ "$MONTHS" =~ ^[0-9]+$ ]] || [ "$MONTHS" -lt 1 ] || [ "$MONTHS" -gt 12 ]; then
 		echo "Error: --months requires an integer between 1 and 12" >&2
 		exit 1
