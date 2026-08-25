@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Professors are reachable without the grown-up gate** — the Maestri grid no longer sits behind the child-resistant arithmetic gate. It exposes no PII and collects no personal data, so ADR 0166 (verifiable parental consent) never applied to it; students can now browse the 27 professors directly. The gate stays on `/invite/request` and on the account/adult surfaces (calendar, settings, parent area).
+
 ### Fixed
 
 - **Progress view WCAG AA contrast** — adjusted light/dark progress tabs, helper labels, chart axes, achievement states and custom accent backgrounds so the “I miei premi” view meets WCAG 2.1 AA color-contrast thresholds, with Playwright regression coverage for light, dark, hover/focus and locked states.

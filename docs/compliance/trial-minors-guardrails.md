@@ -133,7 +133,13 @@ on the basis of this acceptance; reopen if the risk posture changes.
 Decisione presa (opzione "media"): aggiunto un **GrownUpGate** child-resistant (sfida aritmetica 2 cifre + framing "per i grandi", `@/components/safety/grown-up-gate.tsx`) PRIMA di:
 
 - **`/invite/request`** — il form PII non si renderizza finché un adulto non supera il gate (un bambino non può auto-inviare i propri dati);
-- **le viste "Per i grandi"** della home (maestri/calendar/settings/genitori) — gate al primo ingresso per sessione.
+- **le viste "Per i grandi"** della home (calendar/settings/genitori) — gate al primo ingresso per sessione.
+
+**Aggiornamento (2026-08-25)**: la griglia **Maestri** non è più dietro il gate. Non
+raccoglie né espone PII (è solo l'elenco dei professori), quindi non ricade
+nell'ambito di ADR 0166 / GDPR Art. 8: gli studenti possono sfogliare i
+professori direttamente. Il gate resta su `/invite/request` e sulle superfici
+account/adulto (calendar/settings/genitori).
 
 Stato "verified" per-sessione (`sessionStorage`, ADR 0015). Test: 3 unit + 2 E2E.
 
