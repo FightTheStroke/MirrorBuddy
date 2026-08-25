@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-08-25
+
 ### Changed
 
 - **Professors are reachable without the grown-up gate** — the Maestri grid no longer sits behind the child-resistant arithmetic gate. It exposes no PII and collects no personal data, so ADR 0166 (verifiable parental consent) never applied to it; students can now browse the 27 professors directly. The gate stays on `/invite/request` and on the account/adult surfaces (calendar, settings, parent area).
