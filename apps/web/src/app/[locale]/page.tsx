@@ -38,10 +38,13 @@ import { LazyMaestroSession, LazyZainoView, HomeShellSkeleton } from './home-laz
 
 const MB_PER_LEVEL = 1000;
 
-// COMP-01 (#432): the "Per i grandi" destinations are adult/account surfaces.
-// First entry into any of them in a session requires the grown-up gate; passing
-// once covers the whole session (the gate marks sessionStorage verified).
-const GROWN_UP_VIEWS = new Set<View>(['maestri', 'calendar', 'settings', 'genitori']);
+// COMP-01 (#432): the account/admin destinations are adult surfaces. First
+// entry into any of them in a session requires the grown-up gate; passing once
+// covers the whole session (the gate marks sessionStorage verified).
+// The Maestri grid is deliberately NOT gated: it exposes no PII and collects no
+// personal data, so ADR 0166 (verifiable parental consent) does not apply to it
+// and students may browse the professors directly.
+const GROWN_UP_VIEWS = new Set<View>(['calendar', 'settings', 'genitori']);
 
 export default function Home() {
   const router = useRouter();
@@ -196,7 +199,8 @@ export default function Home() {
   ];
 
   // Grown-up space: shown under a clearly separated "for grown-ups" group so a
-  // child does not wander into the professor grid, the planner or settings.
+  // child does not wander into the planner or settings. The professor grid sits
+  // here for discoverability only — it is not gated (see GROWN_UP_VIEWS).
   const grownUpNavItems = [
     {
       id: 'maestri' as const,
