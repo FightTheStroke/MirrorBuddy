@@ -9,7 +9,7 @@
 export const APP_VERSION = {
   version: '2.0.0',
   lastUpdated: '2026-01',
-  releaseNotes: 'https://github.com/MirrorBuddy/mirrorbuddy/releases',
+  releaseNotes: 'https://github.com/fightthestroke/mirrorbuddy/releases',
 };
 
 // ============================================================================
