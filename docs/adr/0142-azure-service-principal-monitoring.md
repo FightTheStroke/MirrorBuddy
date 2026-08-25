@@ -1,10 +1,64 @@
 # ADR 0142: Azure Service Principal for Monitoring
 
-**Status**: Proposed
+**Status**: Rejected (25 August 2026) — superseded by local `az` CLI reporting
 **Date**: 10 February 2026
 **Context**: Azure OpenAI TPM/RPM monitoring in admin dashboard
 
-## Context
+## Decision (25 August 2026)
+
+**Do not provision the Service Principal.** Cost and usage reporting stays on the
+local `scripts/azure-costs.sh` path, which authenticates with the operator's own
+`az login` and requires no stored secret.
+
+### Verification performed (25 August 2026)
+
+| Check                                                  | Result                                                         |
+| ------------------------------------------------------ | -------------------------------------------------------------- |
+| Role assignments on subscription `8015083b-…`          | No `Cost Management Reader` / `Monitoring Reader` at any scope |
+| App registrations matching `mirrorbuddy*`              | None in tenant `72f988bf-…`                                    |
+| `AZURE_CLIENT_ID` / `_SECRET` / `_TENANT_ID` in Vercel | Absent in production, preview and development                  |
+
+The Service Principal was never created; nothing is broken in production. The
+admin widget degrades gracefully (`api/azure/costs/route.ts:32` → HTTP 503).
+
+### Rationale
+
+1. **The number would be wrong.** Subscription `8015083b-…` is shared with
+   VirtualBPM. Measured 6-month spend (Mar–Aug 2026) is **$3 071**, of which
+   Azure Container Apps alone is **$2 518** — VirtualBPM, not MirrorBuddy.
+   MirrorBuddy's AI spend (`Foundry Models`) is **$42.80** over the same period.
+   A subscription-scoped reader would surface a figure that is ~98% unrelated
+   to MirrorBuddy.
+2. **Secret-less by default.** Adding a client secret to Vercel introduces a
+   rotation obligation for a read-only convenience feature.
+3. **The operator path already works.** `scripts/azure-costs.sh` covers the same
+   questions on demand.
+
+### Prerequisite for reconsidering
+
+Per-app cost attribution requires **separating the AOAI resources** (dedicated
+resource group, or resource-level tags plus a query filter) — not a Service
+Principal. Reopen this ADR only after that separation exists.
+
+## Operator runbook
+
+```bash
+az login                                          # Owner on the subscription
+./scripts/azure-costs.sh                          # Last 30 days + forecast
+./scripts/azure-costs.sh --months 6               # Month-by-month + by service
+./scripts/azure-costs.sh --months 6 --service "Foundry Models"   # AI spend only
+```
+
+The Cost Management query API throttles aggressively on this subscription
+(HTTP 429). The script retries with exponential backoff and **fails loudly**;
+prior to 25 August 2026 it swallowed errors and rendered throttled queries as
+`$0.00`, which silently produced false cost reports.
+
+---
+
+## Original proposal (not implemented — kept for reference)
+
+### Context
 
 The admin dashboard displays real-time Azure OpenAI usage metrics (Tokens Per Minute,
 Requests Per Minute) via Azure Monitor Metrics API. This API requires Azure AD
@@ -17,7 +71,7 @@ configured in `.env` locally nor on Vercel production.
 **Impact**: Only the admin monitoring widget is affected. All user-facing features
 (chat, voice, RAG, flashcards) use `AZURE_OPENAI_API_KEY` directly and work correctly.
 
-## Decision
+### Proposed architecture (superseded)
 
 ### Authentication Architecture
 
@@ -105,7 +159,7 @@ echo "<password>" | npx vercel env add AZURE_CLIENT_SECRET production
 echo "8015083b-adad-42ff-922d-feaed61c5d62" | npx vercel env add AZURE_SUBSCRIPTION_ID production
 ```
 
-## Code References
+### Code references
 
 | File                                            | Purpose                                                  |
 | ----------------------------------------------- | -------------------------------------------------------- |
@@ -133,14 +187,14 @@ When credentials are missing, the system degrades gracefully:
 - Admin dashboard shows the error message, no crash
 - `isAzureOpenAIStressed()` returns `false` (fail-open)
 
-## Security Considerations
+### Security considerations (superseded)
 
 - **Least privilege**: `Monitoring Reader` is read-only, cannot modify resources
 - **Secret rotation**: `AZURE_CLIENT_SECRET` expires per Azure AD policy (max 24 months)
 - **No PII exposure**: metrics API returns aggregate counts, not user data
 - **Same SP for costs**: this SP also serves Azure Cost Management queries (both need ARM scope)
 
-## Consequences
+### Consequences (superseded)
 
 ### Positive
 
