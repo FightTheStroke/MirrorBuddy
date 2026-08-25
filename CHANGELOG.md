@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-08-25
+
+### Changed
+
+- **Professors moved to the main navigation** — the Maestri entry left the "for grown-ups" sidebar group and now sits in the primary nav next to Home, My Work and My Rewards, so any user reaches the 27 professors in one click. Follows the removal of the grown-up gate on that view in 0.25.0; the "for grown-ups" group keeps calendar and settings.
+
 ## [0.25.0] - 2026-08-25
 
 ### Changed

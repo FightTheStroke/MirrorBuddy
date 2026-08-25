@@ -184,8 +184,10 @@ export default function Home() {
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
   const seasonName = currentSeason?.name || t('seasonDefault');
 
-  // Child space: only three friendly destinations. The 26-Maestri grid, the
-  // coach/buddy character chats and the standalone tools launcher are
+  // Everyone's space: the intention-based home plus the destinations any user —
+  // child or grown-up — may open directly. The Maestri grid lives here: it is
+  // ungated (see GROWN_UP_VIEWS) and browsing the professors collects no data.
+  // The coach/buddy character chats and the standalone tools launcher are
   // intentionally NOT here — they would re-introduce the choice overload the
   // intention-based home is meant to remove.
   const childNavItems = [
@@ -194,19 +196,18 @@ export default function Home() {
       label: t('navigation.home'),
       icon: HomeIcon,
     },
-    { id: 'supporti' as const, label: t('navigation.myWork'), icon: Backpack },
-    { id: 'progress' as const, label: t('navigation.myRewards'), icon: Trophy },
-  ];
-
-  // Grown-up space: shown under a clearly separated "for grown-ups" group so a
-  // child does not wander into the planner or settings. The professor grid sits
-  // here for discoverability only — it is not gated (see GROWN_UP_VIEWS).
-  const grownUpNavItems = [
     {
       id: 'maestri' as const,
       label: t('navigation.professors'),
       icon: GraduationCap,
     },
+    { id: 'supporti' as const, label: t('navigation.myWork'), icon: Backpack },
+    { id: 'progress' as const, label: t('navigation.myRewards'), icon: Trophy },
+  ];
+
+  // Grown-up space: shown under a clearly separated "for grown-ups" group so a
+  // child does not wander into the planner or settings.
+  const grownUpNavItems = [
     {
       id: 'calendar' as const,
       label: t('navigation.calendar'),

@@ -135,11 +135,12 @@ Decisione presa (opzione "media"): aggiunto un **GrownUpGate** child-resistant (
 - **`/invite/request`** — il form PII non si renderizza finché un adulto non supera il gate (un bambino non può auto-inviare i propri dati);
 - **le viste "Per i grandi"** della home (calendar/settings/genitori) — gate al primo ingresso per sessione.
 
-**Aggiornamento (2026-08-25)**: la griglia **Maestri** non è più dietro il gate. Non
-raccoglie né espone PII (è solo l'elenco dei professori), quindi non ricade
-nell'ambito di ADR 0166 / GDPR Art. 8: gli studenti possono sfogliare i
-professori direttamente. Il gate resta su `/invite/request` e sulle superfici
-account/adulto (calendar/settings/genitori).
+**Update (2026-08-25)**: the **Maestri** grid is no longer behind the gate, and it
+has left the "Per i grandi" group: it is now a primary navigation entry, open to
+anyone. It neither collects nor exposes PII (it is just the list of professors),
+so it falls outside the scope of ADR 0166 / GDPR Art. 8. The gate and the
+"Per i grandi" framing remain on `/invite/request` and on the account/adult
+surfaces (calendar/settings/genitori).
 
 Stato "verified" per-sessione (`sessionStorage`, ADR 0015). Test: 3 unit + 2 E2E.
 
