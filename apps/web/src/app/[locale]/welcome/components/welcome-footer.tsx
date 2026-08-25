@@ -6,7 +6,7 @@ import { Shield, Bot, Lock, AlertTriangle, Github, Brain } from 'lucide-react';
 import { InlineConsent } from '@/components/consent/inline-consent';
 import { useTranslations } from 'next-intl';
 
-const GITHUB_REPO_URL = 'https://github.com/robdll/mirrorbuddy';
+const GITHUB_REPO_URL = 'https://github.com/fightthestroke/mirrorbuddy';
 
 interface ComplianceBadge {
   icon: React.ReactNode;
