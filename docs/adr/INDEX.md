@@ -88,7 +88,7 @@
 | 0166 | Parental Gate level for "Per i grandi" (DEC-01) | PROPOSED — decision on gate strength for `/invite/request` (GDPR Art. 8, L. 132/2025)           |
 | 0167 | Buddy Identity Unification — Phase 2 (DEC-08)   | PROPOSED — options A/B/C for naming the handoff banner narrator; awaiting human decision        |
 | 0168 | `maestriLimit` Deprecation (DEC-06)             | ACCEPTED — per-Maestro cap removed, never enforced; intent model made it obsolete               |
-| 0173 | MirrorBuddy resta sulle chiavi API Azure        | ACCEPTED — OIDC Vercel vietato dalla policy del tenant; rotazione, raggio del danno, rischio residuo |
+| 0173 | MirrorBuddy stays on Azure API keys           | ACCEPTED — Vercel OIDC forbidden by tenant policy; rotation, blast radius, residual risk |
 
 ## Observability & Operations
 
