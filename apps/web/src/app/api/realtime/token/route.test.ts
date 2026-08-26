@@ -354,7 +354,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
   });
 
   describe('Transport mode', () => {
-    it('should return webrtc transport when VOICE_TRANSPORT=webrtc', async () => {
+    it('returns the webrtc transport', async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue({
         enabled: true,
         reason: 'enabled',
@@ -381,8 +381,7 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       expect(data.transport).toBe('webrtc');
     });
 
-    it('should return websocket transport when VOICE_TRANSPORT=websocket', async () => {
-      // Websocket mode doesn't need feature flag, but mock it to prevent undefined errors
+    it('ignores a request for the websocket transport, which no longer exists', async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue({
         enabled: false,
         reason: 'disabled',
@@ -397,6 +396,9 @@ describe('GET /api/realtime/token - GA Protocol', () => {
         },
       });
 
+      // An operator can still set this. The route must not obey it: the proxy
+      // it named was deleted, so answering `websocket` would hand a child's
+      // browser a port nothing listens on.
       process.env.VOICE_TRANSPORT = 'websocket';
       process.env.WS_PROXY_PORT = '3001';
 
@@ -407,14 +409,12 @@ describe('GET /api/realtime/token - GA Protocol', () => {
       const response = await GET(request as any);
       const data = await response.json();
 
-      expect(data.transport).toBe('websocket');
-      expect(data.proxyPort).toBe(3001);
-      expect(data).not.toHaveProperty('endpoint');
-      expect(data).not.toHaveProperty('azureResource');
-      expect(data).not.toHaveProperty('webrtcEndpoint');
+      expect(data.transport).toBe('webrtc');
+      expect(data).not.toHaveProperty('proxyPort');
+      expect(data).toHaveProperty('endpoint');
     });
 
-    it('should default to webrtc if VOICE_TRANSPORT not set', async () => {
+    it('returns the webrtc transport with no env set at all', async () => {
       vi.mocked(isFeatureEnabled).mockReturnValue({
         enabled: true,
         reason: 'enabled',

@@ -22,7 +22,6 @@ import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classi
 
 interface VoiceConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 

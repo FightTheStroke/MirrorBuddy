@@ -14,7 +14,7 @@ export function useVoiceConnection() {
         if (cached) {
           try {
             const data = JSON.parse(cached);
-            if (data.provider && data.proxyPort !== undefined) {
+            if (data.provider && data.configured) {
               setConnectionInfo(data as VoiceConnectionInfo);
               setHasCheckedAzure(true);
               return;
@@ -62,4 +62,3 @@ export function useVoiceConnection() {
     setUseWebSpeechFallback,
   };
 }
-

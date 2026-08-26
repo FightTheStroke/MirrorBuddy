@@ -10,7 +10,6 @@ import type { Maestro, VoiceSessionHandle } from '@/types';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 

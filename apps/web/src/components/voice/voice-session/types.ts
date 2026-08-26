@@ -2,7 +2,6 @@ import type { Maestro } from '@/types';
 
 export interface ConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 
