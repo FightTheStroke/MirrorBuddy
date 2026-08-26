@@ -18,7 +18,6 @@ import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 // WebSocket proxy port (must match instrumentation.ts)
 
 export const revalidate = 0;
-const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
 export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
   const log = getRequestLogger(ctx.req);
@@ -80,8 +79,10 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
     return response;
   }
 
-  // Transport mode: webrtc or websocket (from env, defaults to webrtc)
-  const transport = (process.env.VOICE_TRANSPORT || 'webrtc') as 'webrtc' | 'websocket';
+  // WebRTC is the only transport. The WebSocket proxy it used to fall back to
+  // was deleted, so an environment asking for `websocket` would have pointed a
+  // child's browser at a port nothing listens on.
+  const transport = 'webrtc' as const;
 
   // Check if GA protocol is enabled
   const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
@@ -95,27 +96,19 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
   const response = NextResponse.json({
     provider: 'azure',
     transport,
-    // WebRTC mode: client uses ephemeral token + regional endpoint for direct Azure connection
-    // WebSocket mode: client connects to local proxy
-    ...(transport === 'webrtc'
+    endpoint: azureEndpoint.replace(/\/$/, ''), // For session creation
+    // GA protocol: provide resource name for deterministic endpoint
+    // Preview: provide full webrtcEndpoint URL
+    ...(useGAProtocol
       ? {
-          endpoint: azureEndpoint.replace(/\/$/, ''), // For session creation
-          // GA protocol: provide resource name for deterministic endpoint
-          // Preview: provide full webrtcEndpoint URL
-          ...(useGAProtocol
-            ? {
-                azureResource,
-                deployment: azureDeployment,
-              }
-            : {
-                // Preview fallback keeps a fixed regional host while GA is the default protocol.
-                // CRITICAL: model parameter is REQUIRED by Azure WebRTC endpoint
-                webrtcEndpoint: `https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
-                deployment: azureDeployment,
-              }),
+          azureResource,
+          deployment: azureDeployment,
         }
       : {
-          proxyPort: WS_PROXY_PORT,
+          // Preview fallback keeps a fixed regional host while GA is the default protocol.
+          // CRITICAL: model parameter is REQUIRED by Azure WebRTC endpoint
+          webrtcEndpoint: `https://swedencentral.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
+          deployment: azureDeployment,
         }),
     configured: true,
   });

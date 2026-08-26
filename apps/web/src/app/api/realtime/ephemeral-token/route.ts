@@ -4,6 +4,7 @@
 // SECURITY: API key is NEVER exposed to client
 // ============================================================================
 
+import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import {
@@ -229,11 +230,11 @@ export const POST = pipe(
   // Handle Azure API errors
   if (!response.ok) {
     const errorData = await response.text();
+    const sanitized = sanitizeUpstreamError(response.status, errorData);
     const azureRequestMs = Date.now() - azureRequestStartMs;
     const totalMs = Date.now() - requestStartMs;
     log.error('Azure ephemeral token request failed', {
-      status: response.status,
-      errorDetails: errorData,
+      ...sanitized,
       protocol: useGAProtocol.enabled ? 'GA' : 'preview',
       deployment: azureDeployment,
       azureRequestMs,
@@ -251,7 +252,7 @@ export const POST = pipe(
         error: 'Failed to get ephemeral token from Azure',
         code: 'AZURE_ERROR',
         status: response.status,
-        details: errorData.slice(0, 200),
+        details: describeUpstreamError(sanitized),
       },
       outStatus,
     );

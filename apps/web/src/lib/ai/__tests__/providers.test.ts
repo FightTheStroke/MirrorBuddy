@@ -536,19 +536,23 @@ describe('providers', () => {
         );
       });
 
-      it('should handle API errors', async () => {
-        // Mock all fetch calls to return 429 (will be retried by circuit breaker)
+      it('should handle API errors without repeating the upstream body', async () => {
+        // The body is what Azure says, and Azure can quote the prompt back. It
+        // must reach the status and the category, and nothing else.
         global.fetch = vi.fn().mockResolvedValue({
           ok: false,
           status: 429,
-          text: async () => 'Rate limit exceeded',
+          text: async () => 'Rate limit exceeded for prompt: la capitale della Francia',
         });
 
         // Increased timeout to account for retry/circuit breaker delays
         await expect(chatCompletion(mockMessages, mockSystemPrompt)).rejects.toThrow(
-          'Azure OpenAI error (429): Rate limit exceeded',
+          'Azure OpenAI error (429) [rate_limit]',
         );
-      }, 30000); // 30 second timeout for retries
+        await expect(chatCompletion(mockMessages, mockSystemPrompt)).rejects.not.toThrow(
+          /capitale della Francia/,
+        );
+      }, 60000); // 60 second timeout for retries
 
       it('should use custom temperature and maxTokens', async () => {
         global.fetch = vi.fn().mockResolvedValue({

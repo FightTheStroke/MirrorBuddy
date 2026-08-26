@@ -3,70 +3,37 @@ import {
   isWebRTCSupported,
   getWebRTCSupportReport,
 } from '@/lib/hooks/voice-session/webrtc-detection';
-import { isFeatureEnabled } from '@/lib/feature-flags/client';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
+/**
+ * What this diagnostic checks, and what it deliberately does not.
+ *
+ * It used to open a WebSocket to a local proxy, speak, and wait for audio back.
+ * That proxy has been deleted: voice runs over WebRTC straight to Azure. The
+ * old test would now always fail, and it would fail with the wrong sentence —
+ * "check that the WebSocket proxy is running" sends an operator looking for a
+ * process that no longer exists, which is worse than saying nothing.
+ *
+ * So this checks the three things that must be true BEFORE a voice session can
+ * start, and says plainly that the audio round-trip is not among them. A
+ * diagnostic that overstates its coverage is how a real fault gets dismissed.
+ */
 export async function runVoiceTest(): Promise<DiagnosticResult> {
-  // Audio playback setup
-  let playbackContext: AudioContext | null = null;
-  const audioQueue: Float32Array[] = [];
-  let isPlaying = false;
-  let audioReceived = false;
-
-  const initPlayback = () => {
-    if (!playbackContext) {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      playbackContext = new AudioCtx({ sampleRate: 24000 });
-    }
-    return playbackContext;
-  };
-
-  const playNextAudio = () => {
-    if (!playbackContext || audioQueue.length === 0) {
-      isPlaying = false;
-      return;
-    }
-    isPlaying = true;
-    const samples = audioQueue.shift()!;
-    const buffer = playbackContext.createBuffer(1, samples.length, 24000);
-    buffer.getChannelData(0).set(samples);
-    const source = playbackContext.createBufferSource();
-    source.buffer = buffer;
-    source.connect(playbackContext.destination);
-    source.onended = () => playNextAudio();
-    source.start();
-  };
-
-  const queueAudio = (base64Audio: string) => {
-    initPlayback();
-    if (playbackContext?.state === 'suspended') {
-      playbackContext.resume();
-    }
-    const binaryString = atob(base64Audio);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    const pcm16 = new Int16Array(bytes.buffer);
-    const float32 = new Float32Array(pcm16.length);
-    for (let i = 0; i < pcm16.length; i++) {
-      float32[i] = pcm16[i] / 32768;
-    }
-    audioQueue.push(float32);
-    audioReceived = true;
-    if (!isPlaying) {
-      playNextAudio();
-    }
-  };
-
   try {
-    // 0. Check WebRTC support
     const webrtcSupported = isWebRTCSupported();
-    // Call getWebRTCSupportReport for availability (could be used for extended diagnostics)
-    getWebRTCSupportReport();
+    const support = getWebRTCSupportReport();
 
-    // 1. Check realtime config
+    if (!webrtcSupported) {
+      return {
+        status: 'error',
+        message: 'Questo browser non supporta WebRTC',
+        details:
+          "Voice richiede WebRTC e non esiste piu' un fallback WebSocket. " +
+          `RTCPeerConnection: ${support.rtcPeerConnection}, getUserMedia: ${support.getUserMedia}, mediaDevices: ${support.mediaDevices}`,
+      };
+    }
+
+    // 1. Is the realtime resource configured at all?
     const statusRes = await fetch('/api/provider/status');
     const status = await statusRes.json();
 
@@ -78,173 +45,56 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
       };
     }
 
-    // 2. Get proxy info and transport mode
+    // 2. Does the token route answer, and does it describe the only transport?
     const tokenRes = await fetch('/api/realtime/token');
     const tokenData = await tokenRes.json();
 
-    // Determine actual transport (WebRTC if supported, otherwise WebSocket)
-    let transportMode = tokenData.transport || 'websocket';
-    if (transportMode === 'webrtc' && !webrtcSupported) {
-      transportMode = 'websocket';
-    }
-
-    if (!tokenData.configured || !tokenData.proxyPort) {
+    if (!tokenRes.ok || !tokenData.configured) {
       return {
         status: 'error',
-        message: 'Voice proxy non configurato',
-        details: `Verifica che il proxy WebSocket sia in esecuzione. Transport: ${transportMode}`,
+        message: 'Voice non configurato',
+        details: `/api/realtime/token ha risposto ${tokenRes.status}: ${tokenData.error ?? 'nessun dettaglio'}`,
       };
     }
 
-    // 3. Connect to WebSocket and do full voice test
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = window.location.hostname;
-    const wsUrl = `${wsProtocol}//${wsHost}:${tokenData.proxyPort}?maestroId=diagnostics`;
-
-    await new Promise<void>((resolve, reject) => {
-      const ws = new WebSocket(wsUrl);
-      let responseDone = false;
-
-      const timeout = setTimeout(() => {
-        ws.close();
-        if (audioReceived) {
-          resolve(); // Got audio, test passed even with timeout
-        } else {
-          reject(new Error('Timeout 20s - nessun audio ricevuto'));
-        }
-      }, 20000);
-
-      ws.onopen = () => {
-        // WebSocket connected
+    if (tokenData.transport !== 'webrtc') {
+      return {
+        status: 'error',
+        message: 'Transport inatteso',
+        details: `Atteso "webrtc", ricevuto "${String(tokenData.transport)}". WebRTC e' l'unico transport rimasto.`,
       };
+    }
 
-      ws.onmessage = async (event) => {
-        try {
-          let msgText: string;
-          if (event.data instanceof Blob) {
-            msgText = await event.data.text();
-          } else {
-            msgText = event.data;
-          }
+    // 3. Does Azure actually issue an ephemeral secret right now? This is the
+    //    step that fails when a key is expired or a deployment is wrong, and it
+    //    is the last one we can check without taking the microphone.
+    // csrfFetch, not fetch: that route is wrapped in withCSRF, so a bare POST
+    // gets a 403 and this diagnostic would blame Azure for refusing a token it
+    // was never asked for — the exact kind of misdirection this file exists to
+    // stop.
+    const ephemeralRes = await csrfFetch('/api/realtime/ephemeral-token', { method: 'POST' });
+    const ephemeral = await ephemeralRes.json().catch(() => ({}));
 
-          const data = JSON.parse(msgText);
-
-          // Wait for proxy.ready, then send session.update
-          if (data.type === 'proxy.ready') {
-            const useGA = isFeatureEnabled('voice_ga_protocol').enabled;
-            const instructions =
-              'Sei un assistente di test. Rispondi brevemente in italiano con una frase.';
-            const turnDetection = {
-              type: 'server_vad',
-              threshold: 0.5,
-              prefix_padding_ms: 300,
-              silence_duration_ms: 500,
-              create_response: true,
-            };
-            ws.send(
-              JSON.stringify({
-                type: 'session.update',
-                session: useGA
-                  ? {
-                      instructions,
-                      audio: {
-                        output: { voice: 'alloy' },
-                        input: { turn_detection: turnDetection },
-                      },
-                    }
-                  : {
-                      voice: 'alloy',
-                      instructions,
-                      input_audio_format: 'pcm16',
-                      turn_detection: turnDetection,
-                    },
-              }),
-            );
-          }
-
-          if (data.type === 'session.updated') {
-            ws.send(
-              JSON.stringify({
-                type: 'conversation.item.create',
-                item: {
-                  type: 'message',
-                  role: 'user',
-                  content: [
-                    { type: 'input_text', text: 'Ciao! Dimmi OK per confermare che funzioni.' },
-                  ],
-                },
-              }),
-            );
-            // Trigger response
-            setTimeout(() => {
-              if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'response.create' }));
-              }
-            }, 100);
-          }
-
-          // Handle audio - both Preview and GA API formats
-          if (
-            (data.type === 'response.audio.delta' || data.type === 'response.output_audio.delta') &&
-            data.delta
-          ) {
-            queueAudio(data.delta);
-          }
-
-          if (data.type === 'response.done') {
-            responseDone = true;
-            clearTimeout(timeout);
-            ws.close();
-            resolve();
-          }
-
-          if (data.type === 'error') {
-            clearTimeout(timeout);
-            ws.close();
-            reject(new Error(JSON.stringify(data.error)));
-          }
-        } catch {
-          // Parse error, ignore
-        }
+    if (!ephemeralRes.ok) {
+      return {
+        status: 'error',
+        message: 'Azure non rilascia il token effimero',
+        details: `HTTP ${ephemeralRes.status}${ephemeral?.details ? ` — ${ephemeral.details}` : ''}`,
       };
+    }
 
-      ws.onerror = () => {
-        clearTimeout(timeout);
-        reject(new Error('Errore connessione WebSocket'));
-      };
-
-      ws.onclose = (event) => {
-        clearTimeout(timeout);
-        if (!audioReceived && !responseDone) {
-          reject(
-            new Error(`WebSocket chiuso: code=${event.code}, reason=${event.reason || 'none'}`),
-          );
-        }
-      };
-    });
-
-    // Success - audio was played!
-    const webrtcInfo = webrtcSupported
-      ? 'WebRTC supportato'
-      : 'WebRTC non supportato (fallback a WebSocket)';
     return {
       status: 'success',
-      message: 'Voice funzionante! Hai sentito la risposta?',
-      details: `Transport: ${transportMode} | ${webrtcInfo} | Proxy: ${wsUrl} | Audio ricevuto e riprodotto`,
+      message: 'Voice pronto: configurazione e token verificati',
+      details:
+        'WebRTC supportato, /api/realtime/token risponde webrtc, Azure rilascia il token effimero. ' +
+        "Il giro completo dell'audio NON e' coperto da questo test: va provato parlando.",
     };
   } catch (error) {
-    const webrtcInfo = isWebRTCSupported() ? 'WebRTC supportato' : 'WebRTC non supportato';
     return {
       status: 'error',
       message: 'Voice test fallito',
-      details: `${webrtcInfo} | Errore: ${String(error)}`,
+      details: String(error),
     };
-  } finally {
-    // Cleanup
-    try {
-      (playbackContext as AudioContext | null)?.close();
-    } catch {
-      // Ignore close errors
-    }
   }
 }

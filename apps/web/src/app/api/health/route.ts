@@ -4,10 +4,10 @@
 // ISE Engineering Fundamentals: https://microsoft.github.io/code-with-engineering-playbook/
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { getAppVersion } from "@/lib/version";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { getAppVersion } from '@/lib/version';
+import { pipe, withSentry } from '@/lib/api/middlewares';
 
 // Track server start time for uptime calculation
 
@@ -15,7 +15,7 @@ export const revalidate = 0;
 const startTime = Date.now();
 
 interface HealthCheck {
-  status: "healthy" | "degraded" | "unhealthy";
+  status: 'healthy' | 'degraded' | 'unhealthy';
   version: string;
   timestamp: string;
   uptime: number;
@@ -27,7 +27,7 @@ interface HealthCheck {
 }
 
 interface CheckResult {
-  status: "pass" | "fail" | "warn";
+  status: 'pass' | 'fail' | 'warn';
   message: string;
   latency_ms?: number;
 }
@@ -43,36 +43,57 @@ async function checkDatabase(): Promise<CheckResult> {
     // (TLS handshake + connection pooling can take 300-800ms on first request)
     // Increased from 500ms to 1000ms to avoid false warnings (ADR 0065)
     return {
-      status: latency < 1000 ? "pass" : "warn",
-      message: latency < 1000 ? "Connected" : "Slow response",
+      status: latency < 1000 ? 'pass' : 'warn',
+      message: latency < 1000 ? 'Connected' : 'Slow response',
       latency_ms: latency,
     };
   } catch (error) {
     return {
-      status: "fail",
-      message: error instanceof Error ? error.message : "Connection failed",
+      status: 'fail',
+      message: error instanceof Error ? error.message : 'Connection failed',
       latency_ms: Date.now() - start,
     };
   }
 }
 
+/**
+ * Is a model provider reachable?
+ *
+ * This used to probe `http://localhost:11434` whenever Azure was unconfigured,
+ * defaulting the URL when OLLAMA_URL was unset. On a Vercel function localhost
+ * is the function itself: nothing has ever listened on 11434 there, so the probe
+ * could only ever time out. It cost the health check up to two seconds per call
+ * to learn something already known, and it reported "No AI provider configured
+ * or available" — which reads as an outage when the real state is "Ollama was
+ * never configured here".
+ *
+ * So Ollama is probed only when OLLAMA_URL says it is genuinely a provider on
+ * this deployment. An unset OLLAMA_URL is not a fallback to guess at; it is an
+ * answer.
+ */
 async function checkAIProvider(): Promise<CheckResult> {
-  const azureConfigured = !!(
-    process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY
-  );
+  const azureConfigured = !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY);
 
-  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
-  const isTestEnv =
-    process.env.NODE_ENV === "test" || process.env.CI === "true";
+  const ollamaUrl = process.env.OLLAMA_URL;
+  const isTestEnv = process.env.NODE_ENV === 'test' || process.env.CI === 'true';
 
   if (azureConfigured) {
     return {
-      status: "pass",
-      message: "Azure OpenAI configured",
+      status: 'pass',
+      message: 'Azure OpenAI configured',
     };
   }
 
-  // Check if Ollama is available as fallback
+  const noProvider = (): CheckResult =>
+    // In test/CI no AI provider is acceptable: the app is still exercisable.
+    isTestEnv
+      ? { status: 'warn', message: 'No AI provider (test environment)' }
+      : { status: 'fail', message: 'No AI provider configured' };
+
+  if (!ollamaUrl) {
+    return noProvider();
+  }
+
   try {
     const start = Date.now();
     const response = await fetch(`${ollamaUrl}/api/tags`, {
@@ -81,38 +102,22 @@ async function checkAIProvider(): Promise<CheckResult> {
 
     if (response.ok) {
       return {
-        status: "pass",
-        message: "Ollama available",
+        status: 'pass',
+        message: 'Ollama available',
         latency_ms: Date.now() - start,
       };
     }
 
-    // In test/CI environment, no AI provider is acceptable (warn, not fail)
-    // AI features won't work but the app is still functional for testing
-    if (isTestEnv) {
-      return {
-        status: "warn",
-        message: "No AI provider (test environment)",
-      };
-    }
-
-    return {
-      status: "fail",
-      message: "No AI provider configured or available",
-    };
+    return isTestEnv
+      ? { status: 'warn', message: 'No AI provider (test environment)' }
+      : {
+          status: 'fail',
+          message: `Ollama configured but returned ${response.status}`,
+        };
   } catch {
-    // In test/CI environment, no AI provider is acceptable (warn, not fail)
-    if (isTestEnv) {
-      return {
-        status: "warn",
-        message: "No AI provider (test environment)",
-      };
-    }
-
-    return {
-      status: "fail",
-      message: "No AI provider configured or available",
-    };
+    return isTestEnv
+      ? { status: 'warn', message: 'No AI provider (test environment)' }
+      : { status: 'fail', message: 'Ollama configured but unreachable' };
   }
 }
 
@@ -122,7 +127,7 @@ function checkMemory(): CheckResult {
   const heapTotalMB = Math.round(used.heapTotal / 1024 / 1024);
   const usagePercent = Math.round((used.heapUsed / used.heapTotal) * 100);
 
-  let status: "pass" | "warn" | "fail" = "pass";
+  let status: 'pass' | 'warn' | 'fail' = 'pass';
 
   // Vercel serverless functions start with small heap (~30MB)
   // Use absolute thresholds for small heaps, percentage for larger ones
@@ -131,16 +136,16 @@ function checkMemory(): CheckResult {
   if (isServerlessSmallHeap) {
     // For serverless: warn at 200MB, fail at 400MB absolute
     if (heapUsedMB > 400) {
-      status = "fail";
+      status = 'fail';
     } else if (heapUsedMB > 200) {
-      status = "warn";
+      status = 'warn';
     }
   } else {
     // For larger heaps: use percentage thresholds
     if (usagePercent > 90) {
-      status = "fail";
+      status = 'fail';
     } else if (usagePercent > 70) {
-      status = "warn";
+      status = 'warn';
     }
   }
 
@@ -150,25 +155,20 @@ function checkMemory(): CheckResult {
   };
 }
 
-function getOverallStatus(
-  checks: HealthCheck["checks"],
-): HealthCheck["status"] {
+function getOverallStatus(checks: HealthCheck['checks']): HealthCheck['status'] {
   const results = Object.values(checks);
 
-  if (results.some((c) => c.status === "fail")) {
-    return "unhealthy";
+  if (results.some((c) => c.status === 'fail')) {
+    return 'unhealthy';
   }
-  if (results.some((c) => c.status === "warn")) {
-    return "degraded";
+  if (results.some((c) => c.status === 'warn')) {
+    return 'degraded';
   }
-  return "healthy";
+  return 'healthy';
 }
 
-export const GET = pipe(withSentry("/api/health"))(async () => {
-  const [database, ai_provider] = await Promise.all([
-    checkDatabase(),
-    checkAIProvider(),
-  ]);
+export const GET = pipe(withSentry('/api/health'))(async () => {
+  const [database, ai_provider] = await Promise.all([checkDatabase(), checkAIProvider()]);
 
   const memory = checkMemory();
 
@@ -184,12 +184,12 @@ export const GET = pipe(withSentry("/api/health"))(async () => {
   };
 
   // Return 503 if unhealthy (for load balancer health checks)
-  const httpStatus = status === "unhealthy" ? 503 : 200;
+  const httpStatus = status === 'unhealthy' ? 503 : 200;
 
   return NextResponse.json(health, { status: httpStatus });
 });
 
 // HEAD request for simple alive check (used by load balancers)
-export const HEAD = pipe(withSentry("/api/health"))(async () => {
+export const HEAD = pipe(withSentry('/api/health'))(async () => {
   return new NextResponse(null, { status: 200 });
 });

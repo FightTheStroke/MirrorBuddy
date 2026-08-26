@@ -138,18 +138,16 @@ jobs:
           echo "✅ Promotion complete"
           echo "promoted_url=$url" >> $GITHUB_OUTPUT
 
+      # This step used to curl the Vercel alias — not mirrorbuddy.org, the domain
+      # people actually open — and, on a bad answer, print ::warning:: and let
+      # the job go green with "check manually". Nobody checks manually a run
+      # that reported success, so a broken promotion had no consequence.
+      # The decision now lives in a module with tests, probes the canonical
+      # domain, retries the cold start, and FAILS the job when production is not
+      # healthy: that failure is the signal to roll back.
       - name: Post-promotion Health Check
         if: ${{ !inputs.skip_health_check }}
-        run: |
-          echo "Waiting 15s for production to stabilize..."
-          sleep 15
-          status=$(curl -s -o /dev/null -w "%{http_code}" "https://mirrorbuddy.vercel.app/api/health")
-          if [ "$status" = "200" ]; then
-            echo "✅ Production health check passed (HTTP $status)"
-          else
-            echo "::warning::Production health check returned HTTP $status"
-            echo "The deployment may still be warming up. Check manually."
-          fi
+        run: pnpm exec tsx scripts/ci/check-production-health.ts
 
       - name: Update GitHub Deployment Status
         if: success()

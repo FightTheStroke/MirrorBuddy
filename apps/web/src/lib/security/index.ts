@@ -14,7 +14,7 @@ export {
 } from './csrf';
 export { encryptToken, decryptToken, isEncryptionConfigured } from './encryption';
 export { encryptPII, decryptPII, hashPII } from './pii-encryption';
-export { getSecret, clearAllCachedSecrets } from './azure-key-vault';
+export { getSecret, clearAllCachedSecrets } from './secrets';
 export { logDecryptAccess, logBulkDecryptAccess } from './decrypt-audit';
 export { getCorsHeaders } from './cors-config';
 export { validateServerActionCSRF, requireServerActionCSRF } from './csrf-server-action';

@@ -3,6 +3,7 @@
 // Handles CORS issues by proxying the SDP exchange server-side
 // ============================================================================
 
+import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { NextResponse } from 'next/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
@@ -57,16 +58,16 @@ export const POST = pipe(withSentry('/api/realtime/sdp-exchange'))(async (ctx) =
     const errorText = await response.text();
     const azureRequestMs = Date.now() - azureRequestStartMs;
     const totalMs = Date.now() - requestStartMs;
+    const sanitized = sanitizeUpstreamError(response.status, errorText);
     log.error('[SDP Proxy] Azure SDP exchange failed', {
-      status: response.status,
-      errorDetails: errorText,
+      ...sanitized,
       azureRequestMs,
       totalMs,
     });
     const proxyResponse = NextResponse.json(
       {
         error: `SDP exchange failed: ${response.status}`,
-        details: errorText,
+        details: describeUpstreamError(sanitized),
       },
       { status: response.status },
     );

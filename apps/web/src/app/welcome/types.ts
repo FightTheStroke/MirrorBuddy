@@ -1,6 +1,5 @@
 export interface VoiceConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 
@@ -11,4 +10,3 @@ export interface ExistingUserData {
   learningDifferences?: string[];
   gender?: 'male' | 'female' | 'other';
 }
-
