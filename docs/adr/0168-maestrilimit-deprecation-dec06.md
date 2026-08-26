@@ -53,3 +53,20 @@ Removed entirely:
   `features` column, not a dedicated column — `prisma migrate diff` is
   empty for this change.
 - `docs/plans/PLAN-mirrorbuddy-release.md` D-35 marked resolved.
+
+---
+
+## Addendum — 2026-08-25: the "no browse-all surface" premise no longer holds
+
+The decision above leans on there being "no user-facing 'browse all Maestri'
+surface for a cap to gate". That is no longer true. In v0.25.0 the Maestri grid
+lost its grown-up gate, and in v0.26.0 it moved out of the "for grown-ups"
+sidebar group into the primary navigation: browsing all 27 professors is now a
+one-click, first-class destination for every user.
+
+The decision itself stands — `maestriLimit` remains removed, and
+`MaestriGrid` renders the full catalogue with no tier filtering, so nothing
+regressed. What changed is that a per-Maestro cap is now _implementable_ where
+it previously had nowhere to attach. Whether it is _desirable_ is an open
+product question, deliberately not decided here: reintroducing one still
+requires the fresh design this ADR asks for.
