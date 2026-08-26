@@ -193,14 +193,34 @@ echo -e "${BLUE}[5/5] Vercel remote env vars...${NC}"
 if [ "${SKIP_VERCEL_ENV_CHECK:-}" = "1" ]; then
 	echo -e "${YELLOW}⚠ Vercel env check skipped (SKIP_VERCEL_ENV_CHECK=1)${NC}"
 elif command -v vercel &>/dev/null; then
-	VERCEL_VARS=$(vercel env ls 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
-	MISSING_VARS=""
-
-	for var in "${REQUIRED_VARS[@]}"; do
-		if ! echo "$VERCEL_VARS" | /usr/bin/grep -q "^$var$"; then
-			MISSING_VARS="$MISSING_VARS $var"
+	# `vercel env ls` needs the .vercel project link, which lives only in the
+	# main working tree. Git worktrees (the repo's mandated workflow) do not
+	# get a copy, and an unlinked directory returns an empty list — making
+	# every required variable look missing. Resolve the main tree explicitly.
+	VERCEL_CWD="$PWD"
+	if [ ! -d "$VERCEL_CWD/.vercel" ]; then
+		MAIN_TREE="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "")"
+		MAIN_TREE="${MAIN_TREE%/.git}"
+		if [ -n "$MAIN_TREE" ] && [ -d "$MAIN_TREE/.vercel" ]; then
+			VERCEL_CWD="$MAIN_TREE"
 		fi
-	done
+	fi
+
+	if [ ! -d "$VERCEL_CWD/.vercel" ]; then
+		echo -e "${YELLOW}⚠ No .vercel project link found, skipping remote env check${NC}"
+		echo -e "${YELLOW}  Run 'vercel link' to enable it${NC}"
+		VERCEL_VARS=""
+		MISSING_VARS=""
+	else
+		VERCEL_VARS=$(vercel env ls --cwd "$VERCEL_CWD" 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
+		MISSING_VARS=""
+
+		for var in "${REQUIRED_VARS[@]}"; do
+			if ! echo "$VERCEL_VARS" | /usr/bin/grep -q "^$var$"; then
+				MISSING_VARS="$MISSING_VARS $var"
+			fi
+		done
+	fi
 
 	if [ -n "$MISSING_VARS" ]; then
 		echo -e "${RED}✗ Missing Vercel env vars:${NC}$MISSING_VARS"
@@ -210,7 +230,7 @@ elif command -v vercel &>/dev/null; then
 	echo -e "${GREEN}✓ Vercel env vars OK${NC}"
 
 	# Check for corrupted env vars (literal \n at end)
-	vercel env pull "$TEMP_DIR/vercel-env.txt" --environment=production >/dev/null 2>&1 || true
+	vercel env pull "$TEMP_DIR/vercel-env.txt" --environment=production --cwd "$VERCEL_CWD" >/dev/null 2>&1 || true
 	if [ -f "$TEMP_DIR/vercel-env.txt" ]; then
 		CORRUPTED_VARS=$(/usr/bin/grep '\\n"$' "$TEMP_DIR/vercel-env.txt" | cut -d'=' -f1 || true)
 		if [ -n "$CORRUPTED_VARS" ]; then

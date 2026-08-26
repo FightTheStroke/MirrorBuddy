@@ -1428,6 +1428,78 @@ npm run reboot
 
 ---
 
+#### Problem: `pnpm install` fails with `ERR_PNPM_FETCH_404` on a package that exists
+
+**Symptom:**
+
+```text
+ERR_PNPM_FETCH_404  GET https://packagefeedproxy.microsoft.io/npm/electron-to-chromium/-/electron-to-chromium-1.5.411.tgz: Not Found - 404
+No authorization header was set for the request.
+```
+
+The package version is real and published on npmjs.com, and the lockfile is
+untouched. Only some packages fail — typically fast-moving browserslist data
+(`electron-to-chromium`, `baseline-browser-mapping`, `caniuse-lite`).
+
+**Cause:** this is a machine/network problem, not a repository one. A global
+`~/.npmrc` can redirect every install to a corporate mirror:
+
+```bash
+npm config get registry   # e.g. https://packagefeedproxy.microsoft.io/npm/
+```
+
+The mirror only proxies what it has already cached (or what your credentials
+let it fetch upstream), and its auth token is bound to a different host entry,
+so uncached packages come back as 404 with "No authorization header was set".
+Off VPN, the same setup fails with `ENOTCONN` / `network` errors instead.
+
+The repository `.npmrc` now pins `registry=https://registry.npmjs.org/`, so this
+should no longer happen here — if it does, something is overriding that pin
+(an env var, a `--registry` flag, or a workspace-level config).
+
+**Diagnosis:**
+
+```bash
+# 1. Which registry is actually in use?
+npm config get registry
+
+# 2. Is that registry reachable at all right now?
+npm view lodash version
+
+# 3. How much is already local? (uses the pnpm store, no network)
+pnpm install --frozen-lockfile --offline
+```
+
+Step 3 is the useful one: it lists exactly which packages are missing from the
+content-addressable store. If it succeeds, you can work fully offline.
+
+**Solutions**, in order of preference:
+
+1. **Use the public registry for this repo** — the lockfile pins packages by
+   integrity hash, not by URL, so switching mirrors cannot change what gets
+   installed. This is what the repository `.npmrc` already does; to force it
+   explicitly:
+
+   ```bash
+   npm_config_registry=https://registry.npmjs.org/ pnpm install --frozen-lockfile
+   ```
+
+   Requires direct access to `registry.npmjs.org` (check with
+   `curl -sSf https://registry.npmjs.org/lodash -o /dev/null`).
+
+2. **Authenticate to the mirror** — add an `_authToken` entry for the mirror's
+   own host in `~/.npmrc` (a token scoped to `//registry.npmjs.org/` does not
+   apply to it). Note that `~/.npmrc` stores tokens in clear text.
+
+3. **Connect to the corporate VPN** and retry — an uncached package usually
+   resolves on the second attempt, once the mirror has fetched it upstream.
+
+Do not "fix" this by pinning or overriding the failing dependency in
+`package.json`: it would change the dependency graph for CI and for every other
+developer to work around one machine's network configuration.
+
+---
+
 ### Build Errors
 
 #### Problem: `npm run build` fails with TypeScript errors
