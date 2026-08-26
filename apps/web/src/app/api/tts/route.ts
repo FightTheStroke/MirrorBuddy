@@ -195,6 +195,21 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
  * Generate speech from text using OpenAI TTS.
  * Returns audio/mpeg stream.
  */
+type TTSResidency = 'azure-eu' | 'openai-global';
+
+interface TTSOutcome {
+  audio: ArrayBuffer;
+  /** The provider that actually produced this audio. */
+  servedBy: Exclude<TTSProviderType, null>;
+  /** The provider we set out to use. Differs from servedBy after a fallback. */
+  requested: Exclude<TTSProviderType, null>;
+  residency: TTSResidency;
+}
+
+function residencyOf(provider: Exclude<TTSProviderType, null>): TTSResidency {
+  return provider === 'openai' ? 'openai-global' : 'azure-eu';
+}
+
 /**
  * Generate speech with graceful degradation.
  *
@@ -202,12 +217,21 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
  * next available one (gpt-audio-1.5 → tts-hd → OpenAI). This makes enabling the
  * advanced Azure EU model (gpt-audio-1.5) safe: a single advanced-model outage
  * or misconfiguration degrades quality but never breaks TTS for the student.
+ *
+ * The last rung of that ladder is NOT a quality degradation. Azure serves this
+ * app from the EU; api.openai.com does not. Falling through to it sends a
+ * child's sentence out of the EU, and until now it did so with a 200, an
+ * audio/mpeg body, and nothing anywhere saying which provider spoke. The caller
+ * could not tell, the operator could not tell after the fact, and a residency
+ * question had no answer. So every outcome carries who served it and where that
+ * is — the fallback stays (silence is worse for the student), but it stops
+ * being invisible.
  */
 async function generateSpeechWithFallback(
   provider: Exclude<TTSProviderType, null>,
   text: string,
   voice: TTSVoice,
-): Promise<ArrayBuffer> {
+): Promise<TTSOutcome> {
   const azureTtsConfigured = Boolean(
     process.env.AZURE_OPENAI_ENDPOINT &&
     process.env.AZURE_OPENAI_API_KEY &&
@@ -215,32 +239,46 @@ async function generateSpeechWithFallback(
   );
   const openaiConfigured = Boolean(process.env.OPENAI_API_KEY);
 
+  const served = (servedBy: Exclude<TTSProviderType, null>, audio: ArrayBuffer): TTSOutcome => {
+    const residency = residencyOf(servedBy);
+    if (servedBy !== provider) {
+      const leftTheEu = residency === 'openai-global' && residencyOf(provider) === 'azure-eu';
+      logger[leftTheEu ? 'error' : 'warn'](
+        leftTheEu
+          ? '[TTS] fell back OUT of the EU: text was sent to api.openai.com'
+          : '[TTS] fell back to a different Azure deployment',
+        { requested: provider, servedBy, residency },
+      );
+    }
+    return { audio, servedBy, requested: provider, residency };
+  };
+
   if (provider === 'azure-audio-1.5') {
     try {
-      return await generateAzureAudio15TTS(text, voice);
+      return served('azure-audio-1.5', await generateAzureAudio15TTS(text, voice));
     } catch (error) {
       logger.warn('[TTS] gpt-audio-1.5 unavailable, falling back to tts-hd', {
         error: String(error),
       });
-      if (azureTtsConfigured) return generateAzureTTS(text, voice);
-      if (openaiConfigured) return generateOpenAITTS(text, voice);
+      if (azureTtsConfigured) return served('azure', await generateAzureTTS(text, voice));
+      if (openaiConfigured) return served('openai', await generateOpenAITTS(text, voice));
       throw error;
     }
   }
 
   if (provider === 'azure') {
     try {
-      return await generateAzureTTS(text, voice);
+      return served('azure', await generateAzureTTS(text, voice));
     } catch (error) {
       logger.warn('[TTS] Azure tts-hd unavailable, falling back to OpenAI', {
         error: String(error),
       });
-      if (openaiConfigured) return generateOpenAITTS(text, voice);
+      if (openaiConfigured) return served('openai', await generateOpenAITTS(text, voice));
       throw error;
     }
   }
 
-  return generateOpenAITTS(text, voice);
+  return served('openai', await generateOpenAITTS(text, voice));
 }
 
 export const POST = pipe(
@@ -279,10 +317,10 @@ export const POST = pipe(
     return NextResponse.json({ error: 'Text too long (max 4096 characters)' }, { status: 400 });
   }
 
-  let audioData: ArrayBuffer;
+  let outcome: TTSOutcome;
 
   try {
-    audioData = await generateSpeechWithFallback(provider, text, voice);
+    outcome = await generateSpeechWithFallback(provider, text, voice);
   } catch (error) {
     logger.error('[TTS] All configured providers failed', {
       error: String(error),
@@ -290,12 +328,15 @@ export const POST = pipe(
     return NextResponse.json({ error: 'TTS generation failed', fallback: true }, { status: 502 });
   }
 
-  return new NextResponse(audioData, {
+  return new NextResponse(outcome.audio, {
     status: 200,
     headers: {
       'Content-Type': 'audio/mpeg',
-      'Content-Length': audioData.byteLength.toString(),
+      'Content-Length': outcome.audio.byteLength.toString(),
       'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+      'X-TTS-Provider': outcome.servedBy,
+      'X-TTS-Requested-Provider': outcome.requested,
+      'X-TTS-Data-Residency': outcome.residency,
     },
   });
 });
@@ -311,6 +352,7 @@ export const GET = pipe(withSentry('/api/tts'))(async () => {
   return NextResponse.json({
     available: provider !== null,
     provider: provider,
+    residency: provider ? residencyOf(provider) : null,
     voices: provider ? ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'] : [],
   });
 });
