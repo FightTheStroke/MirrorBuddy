@@ -76,3 +76,25 @@ describe('realtime proxy cleanup', () => {
     }
   });
 });
+
+/**
+ * The diagnostic must reach a CSRF-guarded route the way the app does.
+ *
+ * A bare `fetch` POST to /api/realtime/ephemeral-token gets a 403 from
+ * withCSRF, and the diagnostic would then report that Azure refuses to issue a
+ * token — blaming the upstream for a request it never received. That is the
+ * exact misdirection this diagnostic was rewritten to stop, so it is pinned.
+ */
+describe('the voice diagnostic sends a CSRF-bearing request', () => {
+  const root = path.resolve(__dirname, '../../../../..');
+
+  it('uses csrfFetch for the ephemeral-token POST', () => {
+    const source = fs.readFileSync(
+      path.join(root, 'src/components/settings/sections/diagnostics/voice-test.ts'),
+      'utf8',
+    );
+
+    expect(source).toContain("csrfFetch('/api/realtime/ephemeral-token'");
+    expect(source).not.toContain("fetch('/api/realtime/ephemeral-token', { method: 'POST' })");
+  });
+});

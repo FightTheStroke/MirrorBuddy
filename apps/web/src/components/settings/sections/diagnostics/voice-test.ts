@@ -3,6 +3,7 @@ import {
   isWebRTCSupported,
   getWebRTCSupportReport,
 } from '@/lib/hooks/voice-session/webrtc-detection';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 /**
  * What this diagnostic checks, and what it deliberately does not.
@@ -67,7 +68,11 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
     // 3. Does Azure actually issue an ephemeral secret right now? This is the
     //    step that fails when a key is expired or a deployment is wrong, and it
     //    is the last one we can check without taking the microphone.
-    const ephemeralRes = await fetch('/api/realtime/ephemeral-token', { method: 'POST' });
+    // csrfFetch, not fetch: that route is wrapped in withCSRF, so a bare POST
+    // gets a 403 and this diagnostic would blame Azure for refusing a token it
+    // was never asked for — the exact kind of misdirection this file exists to
+    // stop.
+    const ephemeralRes = await csrfFetch('/api/realtime/ephemeral-token', { method: 'POST' });
     const ephemeral = await ephemeralRes.json().catch(() => ({}));
 
     if (!ephemeralRes.ok) {
