@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Il corpo dell'errore upstream non sopravvive alla lettura** — una risposta di
+  errore di Azure OpenAI veniva letta con `response.text()` e portata avanti
+  intera: nel messaggio dell'eccezione, nei log, e in due casi fino alla
+  risposta HTTP. Quel corpo può contenere il prompt che l'ha provocato, cioè la
+  frase di un minore. Ora un solo punto (`sanitizeUpstreamError`) lo riduce a
+  ciò che serve per diagnosticare — status, codice se ha una forma innocua, e le
+  categorie di content filter scattate — e il corpo non viene né restituito né
+  memorizzato: un valore che esiste, prima o poi finisce in un log. Nove punti di
+  fuga sanati (il piano ne aveva individuati quattro); due test che asseritavano
+  la fuga sono diventati guardie contro di essa.
+
+### Fixed
+
+- **Il TTS dice chi ha parlato, e dove** — la catena di fallback finisce su
+  `api.openai.com`, che non è in EU, e fin qui rispondeva `200` con un body
+  audio e nessuna indicazione del provider: né il chiamante, né chi rilegge i
+  log, né chi riceve una domanda sulla data residency poteva sapere se la frase
+  di un bambino fosse rimasta su Azure EU. Il fallback resta — il silenzio è
+  peggio per lo studente — ma smette di essere invisibile: ogni risposta porta
+  `X-TTS-Provider`, `X-TTS-Requested-Provider` e `X-TTS-Data-Residency`, e
+  l'uscita dall'EU si registra a livello _error_, non come warning di routine.
+- **Il controllo post-promozione può fallire, e guarda il dominio giusto** —
+  interrogava l'alias `mirrorbuddy.vercel.app` invece di `mirrorbuddy.org`, che
+  è ciò che le persone aprono, e su risposta negativa stampava `::warning::`
+  lasciando il job verde con "controlla a mano". Nessuno controlla a mano una
+  run che ha riportato successo. La decisione esce dallo YAML
+  (`scripts/ci/check-production-health.ts`, dieci test), sonda anche il dominio
+  canonico, ritenta il cold start e **fa fallire il job**: quel fallimento è il
+  segnale per il rollback.
+- **`/api/health` non cerca più Ollama su Vercel** — sondava
+  `http://localhost:11434` ogni volta che Azure non era configurato, dove
+  localhost è la function stessa e su quella porta non ha mai ascoltato nulla:
+  fino a due secondi di timeout per un fatto già noto, e un verdetto che si
+  legge come guasto. Ora si sonda solo se `OLLAMA_URL` lo dichiara, e
+  "irraggiungibile" è distinto da "non configurato".
+
+### Removed
+
+- **Il transport WebSocket e il proxy che lo serviva** — i moduli proxy sotto
+  `apps/web/src/server/` erano codice morto (nessun import) e la voce passa da
+  tempo per WebRTC verso Azure. A tenerli vivi erano uno switch `VOICE_TRANSPORT`
+  e un `proxyPort` che attraversava quindici file per arrivare a una porta su cui
+  nessuno ascoltava. Rimossi. Due test che mentivano sono stati riscritti invece
+  che cancellati: uno verificava l'assenza di una cartella mai esistita, l'altro
+  — la diagnostica voce — avrebbe mandato l'operatore a controllare un processo
+  che non esiste, e ora verifica ciò che deve essere vero prima di una sessione
+  dicendo apertamente che il giro completo dell'audio **non** è coperto.
+
+### Changed
+
+- **`azure-key-vault.ts` diventa `secrets.ts`** — non ha mai parlato con un Key
+  Vault: l'SDK Azure non è una dipendenza di questo repo e `AZURE_KEY_VAULT_URL`
+  non è impostato in nessun ambiente, quindi ogni chiamata cadeva su
+  `process.env[name]`. Ciò che girava era una lettura di variabile d'ambiente con
+  cache, travestita da vault — peggio del non avere un vault, perché al punto di
+  chiamata `getSecret` si legge come un confine indurito. `setSecret`,
+  `getSecretWithRetry`, `isAzureKeyVaultAvailable` e `getCacheStats` non avevano
+  chiamanti fuori dal proprio test: rimossi. Se un Key Vault vero verrà creato,
+  questa è la cucitura dove metterlo, con la dipendenza dichiarata.
+
 ## [0.26.0] - 2026-08-25
 
 ### Changed
