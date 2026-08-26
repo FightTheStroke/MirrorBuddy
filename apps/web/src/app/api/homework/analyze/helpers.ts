@@ -2,6 +2,7 @@
  * Homework analysis helpers
  */
 
+import { sanitizeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { logger } from '@/lib/logger';
 
 export interface HomeworkStep {
@@ -20,35 +21,48 @@ export interface AnalysisResult {
 }
 
 const VALID_SUBJECTS = [
-  'mathematics', 'physics', 'chemistry', 'biology', 'history', 'geography',
-  'italian', 'english', 'art', 'music', 'civics', 'economics',
-  'computerScience', 'health', 'philosophy', 'internationalLaw'
+  'mathematics',
+  'physics',
+  'chemistry',
+  'biology',
+  'history',
+  'geography',
+  'italian',
+  'english',
+  'art',
+  'music',
+  'civics',
+  'economics',
+  'computerScience',
+  'health',
+  'philosophy',
+  'internationalLaw',
 ] as const;
 
 const SUBJECT_MAP: Record<string, string> = {
-  'math': 'mathematics',
-  'maths': 'mathematics',
-  'science': 'biology',
-  'cs': 'computerScience',
-  'pe': 'health',
-  'law': 'internationalLaw',
-  'matematica': 'mathematics',
-  'fisica': 'physics',
-  'chimica': 'chemistry',
-  'biologia': 'biology',
-  'scienze': 'biology',
-  'storia': 'history',
-  'geografia': 'geography',
-  'italiano': 'italian',
-  'inglese': 'english',
-  'arte': 'art',
-  'musica': 'music',
+  math: 'mathematics',
+  maths: 'mathematics',
+  science: 'biology',
+  cs: 'computerScience',
+  pe: 'health',
+  law: 'internationalLaw',
+  matematica: 'mathematics',
+  fisica: 'physics',
+  chimica: 'chemistry',
+  biologia: 'biology',
+  scienze: 'biology',
+  storia: 'history',
+  geografia: 'geography',
+  italiano: 'italian',
+  inglese: 'english',
+  arte: 'art',
+  musica: 'music',
   'educazione civica': 'civics',
-  'economia': 'economics',
-  'informatica': 'computerScience',
-  'salute': 'health',
-  'filosofia': 'philosophy',
-  'diritto': 'internationalLaw',
+  economia: 'economics',
+  informatica: 'computerScience',
+  salute: 'health',
+  filosofia: 'philosophy',
+  diritto: 'internationalLaw',
 };
 
 /**
@@ -58,7 +72,7 @@ export function normalizeSubject(subject: string): string {
   if (!subject) return 'other';
   const lower = subject.toLowerCase().trim();
 
-  if (VALID_SUBJECTS.includes(lower as typeof VALID_SUBJECTS[number])) {
+  if (VALID_SUBJECTS.includes(lower as (typeof VALID_SUBJECTS)[number])) {
     return lower;
   }
 
@@ -115,12 +129,13 @@ export function getDefaultAnalysis(): AnalysisResult {
 export function parseAnalysisResponse(content: string): AnalysisResult {
   try {
     const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) ||
-      content.match(/```\s*([\s\S]*?)\s*```/) ||
-      [null, content];
+      content.match(/```\s*([\s\S]*?)\s*```/) || [null, content];
     const jsonStr = jsonMatch[1] || content;
     return JSON.parse(jsonStr.trim());
   } catch {
-    logger.warn('Failed to parse homework analysis, using default', { content: content.slice(0, 100) });
+    logger.warn('Failed to parse homework analysis, using default', {
+      content: content.slice(0, 100),
+    });
     return getDefaultAnalysis();
   }
 }
@@ -131,7 +146,7 @@ export function parseAnalysisResponse(content: string): AnalysisResult {
 export async function analyzeHomeworkWithAzure(
   image: string,
   systemPrompt: string | undefined,
-  provider: { provider: string; endpoint: string; apiKey?: string; model: string }
+  provider: { provider: string; endpoint: string; apiKey?: string; model: string },
 ): Promise<{ success: boolean; analysis?: AnalysisResult; error?: string }> {
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const visionModel = process.env.AZURE_OPENAI_VISION_DEPLOYMENT || provider.model;
@@ -189,7 +204,9 @@ Crea 3-5 passaggi maieutici che guidino lo studente a trovare la soluzione da so
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('Azure Vision API error', { response: errorText });
+      logger.error('Azure Vision API error', {
+        ...sanitizeUpstreamError(response.status, errorText),
+      });
       return { success: false, error: 'Failed to analyze image' };
     }
 

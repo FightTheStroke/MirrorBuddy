@@ -17,6 +17,7 @@ import {
   RATE_LIMITS,
 } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { sanitizeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { pipe } from '@/lib/api/pipe';
 import { withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
@@ -94,8 +95,7 @@ async function generateAzureTTS(text: string, voice: TTSVoice): Promise<ArrayBuf
   if (!response.ok) {
     const errorText = await response.text();
     logger.error('[TTS] Azure API error', {
-      status: response.status,
-      errorMessage: errorText,
+      ...sanitizeUpstreamError(response.status, errorText),
     });
     throw new Error(`Azure TTS failed: ${response.status}`);
   }
@@ -142,8 +142,7 @@ async function generateAzureAudio15TTS(text: string, voice: TTSVoice): Promise<A
   if (!response.ok) {
     const errorText = await response.text();
     logger.error('[TTS] Azure Audio 1.5 API error', {
-      status: response.status,
-      errorMessage: errorText,
+      ...sanitizeUpstreamError(response.status, errorText),
     });
     throw new Error(`Azure Audio 1.5 TTS failed: ${response.status}`);
   }
@@ -182,8 +181,7 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
   if (!response.ok) {
     const errorText = await response.text();
     logger.error('[TTS] OpenAI API error', {
-      status: response.status,
-      errorMessage: errorText,
+      ...sanitizeUpstreamError(response.status, errorText),
     });
     throw new Error(`OpenAI TTS failed: ${response.status}`);
   }

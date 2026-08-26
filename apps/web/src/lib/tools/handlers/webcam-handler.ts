@@ -4,15 +4,12 @@
 // F-02: All tools available during conversations
 // ============================================================================
 
-import { registerToolHandler } from "../tool-executor";
-import { nanoid } from "nanoid";
-import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/server";
-import type {
-  ToolExecutionResult,
-  WebcamData,
-  ToolContext,
-} from "@/types/tools";
+import { sanitizeUpstreamError, AzureHttpError } from '@/lib/ai/providers/azure-errors';
+import { registerToolHandler } from '../tool-executor';
+import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
+import { tierService } from '@/lib/tier/server';
+import type { ToolExecutionResult, WebcamData, ToolContext } from '@/types/tools';
 
 /**
  * Call Azure OpenAI Vision API for multimodal analysis
@@ -25,45 +22,40 @@ async function analyzeImageWithVision(
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const deployment =
-    process.env.AZURE_OPENAI_VISION_DEPLOYMENT ||
-    process.env.AZURE_OPENAI_DEPLOYMENT;
-  const apiVersion =
-    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
+    process.env.AZURE_OPENAI_VISION_DEPLOYMENT || process.env.AZURE_OPENAI_DEPLOYMENT;
+  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
 
   if (!apiKey || !endpoint || !deployment) {
-    throw new Error("Azure OpenAI configuration missing for vision analysis");
+    throw new Error('Azure OpenAI configuration missing for vision analysis');
   }
 
   // Get AI config from tier (ADR 0073)
-  const aiConfig = await tierService.getFeatureAIConfigForUser(
-    userId ?? null,
-    "webcam",
-  );
+  const aiConfig = await tierService.getFeatureAIConfigForUser(userId ?? null, 'webcam');
 
   const url = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
 
   // Format: data:image/jpeg;base64,{base64_data}
-  const imageUrl = imageBase64.startsWith("data:")
+  const imageUrl = imageBase64.startsWith('data:')
     ? imageBase64
     : `data:image/jpeg;base64,${imageBase64}`;
 
-  logger.debug("[Webcam Handler] Calling Azure Vision API", {
-    endpoint: endpoint.replace(/api-key=[^&]+/gi, "api-key=***"),
+  logger.debug('[Webcam Handler] Calling Azure Vision API', {
+    endpoint: endpoint.replace(/api-key=[^&]+/gi, 'api-key=***'),
     deployment,
     temperature: aiConfig.temperature,
     maxTokens: aiConfig.maxTokens,
   });
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "api-key": apiKey,
-      "Content-Type": "application/json",
+      'api-key': apiKey,
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       messages: [
         {
-          role: "system",
+          role: 'system',
           content: `You are an AI assistant specialized in analyzing educational images.
 Your task is to:
 1. Extract ALL text visible in the image (OCR) - include handwritten and printed text
@@ -76,14 +68,14 @@ Format your response as JSON with two fields:
 Be thorough and accurate. For educational content, note mathematical formulas, diagrams, and key visual elements.`,
         },
         {
-          role: "user",
+          role: 'user',
           content: [
             {
-              type: "text",
-              text: "Analyze this image and extract both text and visual description:",
+              type: 'text',
+              text: 'Analyze this image and extract both text and visual description:',
             },
             {
-              type: "image_url",
+              type: 'image_url',
               image_url: {
                 url: imageUrl,
               },
@@ -93,41 +85,35 @@ Be thorough and accurate. For educational content, note mathematical formulas, d
       ],
       temperature: aiConfig.temperature,
       max_tokens: aiConfig.maxTokens,
-      response_format: { type: "json_object" },
+      response_format: { type: 'json_object' },
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error("[Webcam Handler] Azure Vision API error", {
-      status: response.status,
-      errorDetails: errorText,
+    const sanitized = sanitizeUpstreamError(response.status, errorText);
+    logger.error('[Webcam Handler] Azure Vision API error', {
+      ...sanitized,
     });
-    throw new Error(
-      `Azure Vision API error (${response.status}): ${errorText}`,
-    );
+    throw new AzureHttpError(sanitized);
   }
 
   const data = await response.json();
   const content = data.choices?.[0]?.message?.content;
 
   if (!content) {
-    throw new Error("No content in Azure Vision API response");
+    throw new Error('No content in Azure Vision API response');
   }
 
   try {
     const parsed = JSON.parse(content);
     return {
-      text: parsed.text || "",
-      description: parsed.description || "",
+      text: parsed.text || '',
+      description: parsed.description || '',
     };
   } catch (error) {
-    logger.error(
-      "[Webcam Handler] Failed to parse Vision API response",
-      { content },
-      error,
-    );
-    throw new Error("Invalid JSON response from Vision API");
+    logger.error('[Webcam Handler] Failed to parse Vision API response', { content }, error);
+    throw new Error('Invalid JSON response from Vision API');
   }
 }
 
@@ -135,7 +121,7 @@ Be thorough and accurate. For educational content, note mathematical formulas, d
  * Register the webcam capture handler
  */
 registerToolHandler(
-  "capture_webcam",
+  'capture_webcam',
   async (args, context: ToolContext): Promise<ToolExecutionResult> => {
     const { imageBase64 } = args as {
       imageBase64: string;
@@ -143,12 +129,12 @@ registerToolHandler(
     const userId = context?.userId;
 
     // Validate input
-    if (!imageBase64 || typeof imageBase64 !== "string") {
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
       return {
         success: false,
         toolId: nanoid(),
-        toolType: "webcam",
-        error: "imageBase64 is required and must be a base64 string",
+        toolType: 'webcam',
+        error: 'imageBase64 is required and must be a base64 string',
       };
     }
 
@@ -160,13 +146,13 @@ registerToolHandler(
       return {
         success: false,
         toolId: nanoid(),
-        toolType: "webcam",
-        error: "Invalid base64 image format",
+        toolType: 'webcam',
+        error: 'Invalid base64 image format',
       };
     }
 
     try {
-      logger.info("[Webcam Handler] Starting image analysis");
+      logger.info('[Webcam Handler] Starting image analysis');
 
       // Call Azure OpenAI Vision API
       const analysis = await analyzeImageWithVision(imageBase64, userId);
@@ -178,7 +164,7 @@ registerToolHandler(
         analysisTimestamp: new Date(),
       };
 
-      logger.info("[Webcam Handler] Analysis complete", {
+      logger.info('[Webcam Handler] Analysis complete', {
         hasText: !!analysis.text,
         hasDescription: !!analysis.description,
         textLength: analysis.text.length,
@@ -187,24 +173,17 @@ registerToolHandler(
       return {
         success: true,
         toolId: nanoid(),
-        toolType: "webcam",
+        toolType: 'webcam',
         data,
       };
     } catch (error) {
-      logger.error(
-        "[Webcam Handler] Error during image analysis",
-        undefined,
-        error,
-      );
+      logger.error('[Webcam Handler] Error during image analysis', undefined, error);
 
       return {
         success: false,
         toolId: nanoid(),
-        toolType: "webcam",
-        error:
-          error instanceof Error
-            ? error.message
-            : "Unknown error during image analysis",
+        toolType: 'webcam',
+        error: error instanceof Error ? error.message : 'Unknown error during image analysis',
       };
     }
   },

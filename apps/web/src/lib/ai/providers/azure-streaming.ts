@@ -5,7 +5,12 @@
 
 import { logger } from '@/lib/logger';
 import type { ProviderConfig } from './types';
-import { type TokenParamName, isDeploymentNotFound, isUnsupportedTokenParam } from './azure-errors';
+import {
+  type TokenParamName,
+  sanitizeUpstreamError,
+  describeUpstreamError,
+  filteredCategoryNames,
+} from './azure-errors';
 
 export type StreamChunkType = 'content' | 'content_filter' | 'usage' | 'error' | 'done';
 
@@ -29,12 +34,6 @@ export interface StreamingOptions {
 
 function hasFilteredContent(filterResult: Record<string, { filtered?: boolean }>): boolean {
   return Object.values(filterResult).some((v) => v?.filtered === true);
-}
-
-function getFilteredCategories(filterResult: Record<string, { filtered?: boolean }>): string[] {
-  return Object.entries(filterResult)
-    .filter(([, v]) => v?.filtered === true)
-    .map(([k]) => k);
 }
 
 /** Perform streaming chat completion using Azure OpenAI */
@@ -93,14 +92,15 @@ export async function* azureStreamingCompletion(
       response = first;
     } else {
       const firstErrorText = await first.text();
+      const firstSanitized = sanitizeUpstreamError(first.status, firstErrorText);
       logger.error(`[Azure Streaming] Error ${first.status}`, {
         deployment: config.model,
         tokenParamName: 'max_completion_tokens',
-        errorDetails: firstErrorText,
+        ...firstSanitized,
       });
 
-      const unsupported = isUnsupportedTokenParam(first.status, firstErrorText);
-      const deploymentNotFound = isDeploymentNotFound(first.status, firstErrorText);
+      const unsupported = firstSanitized.tokenParam ?? null;
+      const deploymentNotFound = firstSanitized.category === 'deployment_not_found';
 
       if (deploymentNotFound && fallbackDeployment && fallbackDeployment !== config.model) {
         const second = await doFetch(fallbackDeployment, 'max_completion_tokens');
@@ -111,7 +111,7 @@ export async function* azureStreamingCompletion(
           logger.error(`[Azure Streaming] Error ${second.status}`, {
             deployment: fallbackDeployment,
             tokenParamName: 'max_completion_tokens',
-            errorDetails: secondErrorText,
+            ...sanitizeUpstreamError(second.status, secondErrorText),
           });
           const third = await doFetch(fallbackDeployment, 'max_tokens');
           response = third;
@@ -139,26 +139,19 @@ export async function* azureStreamingCompletion(
   // Handle HTTP errors
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error(`[Azure Streaming] Error ${response.status}`, { errorDetails: errorText });
+    const sanitized = sanitizeUpstreamError(response.status, errorText);
+    logger.error(`[Azure Streaming] Error ${response.status}`, { ...sanitized });
 
-    if (response.status === 400) {
-      try {
-        const errorData = JSON.parse(errorText);
-        if (errorData.error?.code === 'content_filter') {
-          const filterResult = errorData.error?.innererror?.content_filter_result;
-          yield {
-            type: 'content_filter',
-            filteredCategories: filterResult ? getFilteredCategories(filterResult) : [],
-          };
-          yield { type: 'done' };
-          return;
-        }
-      } catch {
-        // Not JSON, fall through
-      }
+    if (sanitized.category === 'content_filter') {
+      yield {
+        type: 'content_filter',
+        filteredCategories: sanitized.filteredCategories ?? [],
+      };
+      yield { type: 'done' };
+      return;
     }
 
-    yield { type: 'error', error: `Azure OpenAI error (${response.status}): ${errorText}` };
+    yield { type: 'error', error: describeUpstreamError(sanitized) };
     yield { type: 'done' };
     return;
   }
@@ -204,7 +197,7 @@ export async function* azureStreamingCompletion(
             if (filterResult && hasFilteredContent(filterResult)) {
               yield {
                 type: 'content_filter',
-                filteredCategories: getFilteredCategories(filterResult),
+                filteredCategories: filteredCategoryNames(filterResult),
               };
               continue;
             }

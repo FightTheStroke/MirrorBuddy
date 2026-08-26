@@ -5,6 +5,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { sanitizeUpstreamError, AzureHttpError } from '@/lib/ai/providers/azure-errors';
 
 /**
  * Result from embedding generation
@@ -99,8 +100,9 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[Embedding] API error', { status: response.status, errorDetails: errorText });
-    throw new Error(`Azure Embedding error (${response.status}): ${errorText}`);
+    const sanitized = sanitizeUpstreamError(response.status, errorText);
+    logger.error('[Embedding] API error', { ...sanitized });
+    throw new AzureHttpError(sanitized);
   }
 
   const data = await response.json();
@@ -152,8 +154,9 @@ export async function generateEmbeddings(texts: string[]): Promise<EmbeddingResu
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[Embedding] Batch API error', { status: response.status, errorDetails: errorText });
-    throw new Error(`Azure Embedding error (${response.status}): ${errorText}`);
+    const sanitized = sanitizeUpstreamError(response.status, errorText);
+    logger.error('[Embedding] Batch API error', { ...sanitized });
+    throw new AzureHttpError(sanitized);
   }
 
   const data = await response.json();
