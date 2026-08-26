@@ -10,7 +10,7 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import { logger } from '@/lib/logger';
-import { getSecret } from '@/lib/security/azure-key-vault';
+import { getSecret } from '@/lib/security/secrets';
 
 const scryptAsync = promisify(scrypt);
 
