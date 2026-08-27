@@ -36,6 +36,11 @@ import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import { applyAgeGatePrompt } from '@/lib/conversation/age-gate-injector';
+import {
+  compressConversationHistory,
+  type ConversationMessage,
+} from '@/lib/conversation/conversation-window';
+import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
 
 import type { ChatRequest } from '../types';
 import {
@@ -123,13 +128,19 @@ export const POST = pipe(
     // Settings, tier model and A/B override are independent reads that used to
     // run one after another. Serialising them added two database round trips of
     // dead time before the student's first token.
-    const [{ settings: userSettings, providerPreference }, tierModel, abModelOverride] =
+    const [{ settings: userSettings, providerPreference }, tierModel, abModelOverride, userTier] =
       await Promise.all([
         userId
           ? loadUserSettings(userId)
           : Promise.resolve({ settings: null, providerPreference: undefined }),
         tierService.getModelForUserFeature(userId ?? null, 'chat'),
         getABModelOverride(userId, conversationId),
+        userId
+          ? tierService
+              .getEffectiveTier(userId)
+              .then((t) => t.code)
+              .catch(() => 'base')
+          : Promise.resolve('trial'),
       ]);
 
     // Budget check
@@ -290,6 +301,18 @@ export const POST = pipe(
     // Create streaming response with mid-stream budget tracking (F-13)
     const sanitizer = new StreamingSanitizer();
     const encoder = new TextEncoder();
+    // The client sends the whole conversation on every turn, so a long session
+    // kept growing the payload the model had to read before answering - the
+    // "it gets slower the longer I use it" complaint. The non-streaming route
+    // already trimmed old turns into a summary (ADR 0034); the streaming route
+    // did not. Same tier-aware window, applied here too. This runs after the
+    // safety gates so the Unicode-normalised content is what the model receives.
+    const tierLimits = getTierMemoryLimits(userTier as 'trial' | 'base' | 'pro');
+    const compressedMessages = compressConversationHistory(
+      messages.map((m) => ({ role: m.role, content: m.content })) as ConversationMessage[],
+      { maxTokens: tierLimits.conversationWindowTokens },
+    );
+
     const budgetTracker =
       userId && userSettings
         ? new MidStreamBudgetTracker(userSettings.budgetLimit, userSettings.totalSpent, userId)
@@ -308,7 +331,7 @@ export const POST = pipe(
         try {
           const generator = azureStreamingCompletion(
             config,
-            messages.map((m) => ({ role: m.role, content: m.content })),
+            compressedMessages,
             enhancedSystemPrompt,
             { signal: request.signal },
           );

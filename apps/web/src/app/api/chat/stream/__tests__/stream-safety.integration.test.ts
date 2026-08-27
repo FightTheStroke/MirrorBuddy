@@ -36,6 +36,7 @@ vi.mock('@/lib/rate-limit', () => ({
 vi.mock('@/lib/tier/server', () => ({
   tierService: {
     getModelForUserFeature: vi.fn().mockResolvedValue('gpt-5-mini'),
+    getEffectiveTier: vi.fn().mockResolvedValue({ code: 'base' }),
   },
 }));
 
@@ -319,6 +320,32 @@ describe('POST /api/chat/stream safety wiring', () => {
     expect(vi.mocked(checkSTEMSafety)).toHaveBeenCalledWith('spiegami la fotosintesi', 'curie');
     expect(vi.mocked(azureStreamingCompletion)).toHaveBeenCalled();
     expect(vi.mocked(recordContentFiltered)).not.toHaveBeenCalled();
+  });
+
+  it('trims a long conversation before sending it to the model', async () => {
+    vi.mocked(checkSTEMSafety).mockReturnValue({ blocked: false });
+
+    // A long session: the client resends the whole history every turn, so
+    // without trimming the model re-reads all of it before answering.
+    const longHistory = Array.from({ length: 60 }, (_, i) => ({
+      role: i % 2 === 0 ? 'user' : 'assistant',
+      content:
+        `messaggio numero ${i} con abbastanza testo da pesare sulla finestra di contesto`.repeat(
+          20,
+        ),
+    }));
+
+    await POST(
+      makeRequest({
+        messages: longHistory,
+        systemPrompt: 'You are MirrorBuddy',
+        maestroId: 'curie',
+        conversationId: 'conv-long',
+      }),
+    );
+
+    const sentMessages = vi.mocked(azureStreamingCompletion).mock.calls[0]?.[1] as unknown[];
+    expect(sentMessages.length).toBeLessThan(longHistory.length);
   });
 
   it('T1.4 (issue #467): runs bias detection on the full streamed output and appends a corrective message', async () => {
