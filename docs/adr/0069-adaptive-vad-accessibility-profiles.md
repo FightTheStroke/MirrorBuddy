@@ -180,3 +180,19 @@ This is Phase 1 of voice accessibility improvements. Phase 2 may include:
 - Semantic turn detection for edge cases
 - Per-session feedback learning
 - Voice command to extend silence timeout ("aspetta...")
+
+## Update (2026-02) — the toggle is now reachable
+
+This ADR assumed students could turn adaptive VAD off. In practice
+`adaptiveVadEnabled` existed in the accessibility store but was never rendered in
+any UI, so the extra silence window could not be disabled by the person paying
+its latency cost. A toggle labelled "extra speaking time" now appears in the
+accessibility quick panel (`src/components/accessibility/a11y-quick-panel.tsx`),
+localised in all five locales.
+
+The per-profile delay values are unchanged: they are the documented intent of
+this ADR, and no evidence yet justifies retuning them. The web values are still
+roughly double the robot values, which were halved manually in `ff29359b`; that
+divergence is deliberate for now and should be resolved with data from the new
+chat-latency instrumentation rather than by guesswork. See
+`docs/performance/latency-remediation-2026-02.md`.
