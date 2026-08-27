@@ -120,9 +120,17 @@ export const POST = pipe(
     }
     const userId = coppaCheck.userId;
 
-    const { settings: userSettings, providerPreference } = userId
-      ? await loadUserSettings(userId)
-      : { settings: null, providerPreference: undefined };
+    // Settings, tier model and A/B override are independent reads that used to
+    // run one after another. Serialising them added two database round trips of
+    // dead time before the student's first token.
+    const [{ settings: userSettings, providerPreference }, tierModel, abModelOverride] =
+      await Promise.all([
+        userId
+          ? loadUserSettings(userId)
+          : Promise.resolve({ settings: null, providerPreference: undefined }),
+        tierService.getModelForUserFeature(userId ?? null, 'chat'),
+        getABModelOverride(userId, conversationId),
+      ]);
 
     // Budget check
     if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
@@ -139,8 +147,6 @@ export const POST = pipe(
     }
 
     // Tier-based model selection for streaming (ADR 0073)
-    const tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
-    const abModelOverride = await getABModelOverride(userId, conversationId);
     const selectedModel = abModelOverride ?? tierModel;
     const deploymentName = getDeploymentForModel(selectedModel);
 

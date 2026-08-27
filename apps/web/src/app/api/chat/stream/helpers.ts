@@ -11,8 +11,7 @@ import { canAccessFullFeatures } from '@/lib/compliance/server';
 import { filterInput } from '@/lib/safety';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/server';
-import { resolveQueryEmbedding } from '../query-embedding';
+import { buildRAGFragment } from './rag-context';
 import { injectABMetadata } from '@/lib/ab-testing/session-injector';
 import type { AIProvider } from '@/lib/ai/server';
 import {
@@ -124,63 +123,35 @@ export async function enhancePromptWithContext(
   messages: ChatRequest['messages'],
   enableMemory: boolean,
 ): Promise<string> {
+  const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
+
+  // Memory and retrieval are independent lookups. Running them together halves
+  // the wait the student sits through before the answer starts.
+  const [memory, ragFragment] = await Promise.all([
+    enableMemory && userId && maestroId
+      ? loadPreviousContext(userId, maestroId).catch((memoryError) => {
+          logger.warn('Failed to load memory', { error: String(memoryError) });
+          return null;
+        })
+      : Promise.resolve(null),
+    userId && lastUserMessage
+      ? buildRAGFragment(userId, lastUserMessage.content)
+      : Promise.resolve(''),
+  ]);
+
+  // Assembly order stays fixed regardless of which lookup finished first.
   let enhanced = basePrompt;
 
-  // Inject conversation memory if enabled
-  if (enableMemory && userId && maestroId) {
-    try {
-      const memory = await loadPreviousContext(userId, maestroId);
-      if (memory.recentSummary || memory.keyFacts.length > 0) {
-        enhanced = enhanceSystemPrompt({
-          basePrompt: enhanced,
-          memory,
-          // ADR 0064: Pass characterId for automatic formal/informal address detection
-          safetyOptions: { role: 'maestro', characterId: maestroId },
-        });
-      }
-    } catch (memoryError) {
-      logger.warn('Failed to load memory', { error: String(memoryError) });
-    }
+  if (memory && (memory.recentSummary || memory.keyFacts.length > 0)) {
+    enhanced = enhanceSystemPrompt({
+      basePrompt: enhanced,
+      memory,
+      // ADR 0064: Pass characterId for automatic formal/informal address detection
+      safetyOptions: { role: 'maestro', characterId: maestroId },
+    });
   }
 
-  // RAG context injection - search materials and study kits
-  const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
-  if (userId && lastUserMessage) {
-    try {
-      const embedding = await resolveQueryEmbedding(lastUserMessage.content);
-
-      // Search in materials (generated content)
-      const relevantMaterials = await findSimilarMaterials({
-        userId,
-        query: lastUserMessage.content,
-        embedding,
-        limit: 3,
-        minSimilarity: 0.6,
-      });
-
-      // Search in study kits (original document content)
-      const relatedStudyKits = await findRelatedConcepts({
-        userId,
-        query: lastUserMessage.content,
-        embedding,
-        limit: 3,
-        minSimilarity: 0.5,
-        includeFlashcards: false,
-        includeStudykits: true,
-      });
-
-      const allResults = [...relevantMaterials, ...relatedStudyKits];
-
-      if (allResults.length > 0) {
-        const ragContext = allResults.map((m) => `- ${m.content}`).join('\n');
-        enhanced = `${enhanced}\n\n[Materiali rilevanti]\n${ragContext}`;
-      }
-    } catch (ragError) {
-      logger.warn('Failed to load RAG context', { error: String(ragError) });
-    }
-  }
-
-  return enhanced;
+  return `${enhanced}${ragFragment}`;
 }
 
 /**
