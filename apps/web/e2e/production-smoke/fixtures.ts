@@ -183,20 +183,52 @@ export async function openHomeworkSession(page: import('@playwright/test').Page)
 }
 
 /**
- * Open the mobile sidebar hamburger menu if present.
- * On desktop viewports the sidebar is always visible, so this is a no-op.
+ * Open the mobile sidebar hamburger menu.
+ *
+ * On desktop viewports (>= the `lg` breakpoint the sidebar itself uses) the
+ * sidebar is always expanded and there is no hamburger, so this is correctly a
+ * no-op. On mobile it must actually open the menu, and say so if it cannot.
+ *
+ * Do NOT reach for `isVisible()` here. `isVisible()` performs an immediate
+ * check and never waits — its `timeout` option does nothing — so on a cold load
+ * it returns `false` before the button has rendered, the caller skips the click,
+ * and the menu stays shut. The test then asserts against a closed sidebar,
+ * which renders its nav labels as empty strings, and fails with a confusing
+ * "expected /Casa/i, received ''". A check that reports "nothing to do" when it
+ * simply looked too early is worse than no check: it does not merely miss the
+ * problem, it authorises the assertions that follow. Use the auto-waiting
+ * `waitFor`, and let a genuine failure surface.
  */
+const MOBILE_BREAKPOINT = 1024;
+
 export async function openMobileMenu(page: import('@playwright/test').Page) {
-  const menuButton = page.getByRole('button', { name: /Apri menu/i }).first();
-  if (await menuButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await menuButton.click();
-    // Wait for sidebar animation and verify it opened
-    await page
-      .locator('aside, nav')
-      .first()
-      .waitFor({ state: 'visible', timeout: 3000 })
-      .catch(() => {});
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width >= MOBILE_BREAKPOINT) return;
+
+  // Two buttons carry this label: the header hamburger, and the sidebar's own
+  // toggle, which sits inside the off-screen drawer while it is closed. An
+  // off-screen element still has a bounding box, so it reads as "visible" —
+  // pick by position rather than by DOM order.
+  const menuButtons = page.getByRole('button', { name: /Apri menu/i });
+  await menuButtons.first().waitFor({ state: 'visible', timeout: 30000 });
+
+  const count = await menuButtons.count();
+  let target = menuButtons.first();
+  for (let i = 0; i < count; i++) {
+    const candidate = menuButtons.nth(i);
+    const box = await candidate.boundingBox();
+    if (box && box.x >= 0 && box.y >= 0) {
+      target = candidate;
+      break;
+    }
   }
+
+  await target.click();
+
+  // The menu is open only once the drawer renders its labels; the sidebar omits
+  // the label span entirely while collapsed, so a non-empty label is the honest
+  // signal that it opened, and an animation delay is not.
+  await expect(page.getByTestId('home-nav-intent')).not.toBeEmpty({ timeout: 15000 });
 }
 
 export { expect };

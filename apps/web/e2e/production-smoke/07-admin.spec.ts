@@ -37,8 +37,13 @@ test.describe('PROD-SMOKE: Admin Panel', () => {
     await addAdminReadOnlyCookie(context);
     await page.goto('/admin');
     await expect(page).toHaveURL(/\/admin\/?$/);
-    await expect(page.getByText('Dashboard', { exact: true }).first()).toBeVisible({
-      timeout: 15000,
-    });
+    // The admin shell shows its "Dashboard" identity in a different element per
+    // viewport: an `sm:hidden` <h1> in the mobile header, and the expanded
+    // sidebar item on desktop. The previous `.first()` picked by DOM order and
+    // so selected the sidebar item even on mobile, where it is hidden — failing
+    // on a page that had in fact loaded. Ask for the visible one instead.
+    await expect(
+      page.getByText('Dashboard', { exact: true }).filter({ visible: true }).first(),
+    ).toBeVisible({ timeout: 15000 });
   });
 });
