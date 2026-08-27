@@ -20,7 +20,6 @@ import { shouldEscalateVoiceError } from '@/lib/hooks/voice-session/error-classi
 
 interface VoiceConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 
@@ -170,7 +169,7 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
           try {
             const data = JSON.parse(cached);
             // Verify it's still valid (has required fields)
-            if (data.provider && data.proxyPort !== undefined) {
+            if (data.provider && data.configured) {
               setConnectionInfo(data as VoiceConnectionInfo);
               return;
             }

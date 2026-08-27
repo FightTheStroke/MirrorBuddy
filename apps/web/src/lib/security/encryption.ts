@@ -7,15 +7,15 @@
  * @module security/encryption
  */
 
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from "crypto";
-import { promisify } from "util";
-import { logger } from "@/lib/logger";
-import { getSecret } from "@/lib/security/azure-key-vault";
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
+import { logger } from '@/lib/logger';
+import { getSecret } from '@/lib/security/secrets';
 
 const scryptAsync = promisify(scrypt);
 
 // AES-256-GCM configuration
-const ALGORITHM = "aes-256-gcm";
+const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 12; // 96 bits recommended for GCM
 const AUTH_TAG_LENGTH = 16; // 128 bits
 const SALT_LENGTH = 16;
@@ -35,7 +35,7 @@ async function getEncryptionKey(): Promise<string> {
   }
 
   if (!keyPromise) {
-    keyPromise = getSecret("TOKEN_ENCRYPTION_KEY").then((key) => {
+    keyPromise = getSecret('TOKEN_ENCRYPTION_KEY').then((key) => {
       ENCRYPTION_KEY = key;
       return key;
     });
@@ -63,7 +63,7 @@ export async function isEncryptionConfigured(): Promise<boolean> {
 async function deriveKey(salt: Buffer): Promise<Buffer> {
   const key = await getEncryptionKey();
   if (!key) {
-    throw new Error("TOKEN_ENCRYPTION_KEY not configured");
+    throw new Error('TOKEN_ENCRYPTION_KEY not configured');
   }
   return (await scryptAsync(key, salt, KEY_LENGTH)) as Buffer;
 }
@@ -80,11 +80,11 @@ export async function encryptToken(plaintext: string): Promise<string> {
 
   // In development without key, return plaintext with marker
   if (!isEncryptionConfigured()) {
-    if (process.env.NODE_ENV === "production") {
-      logger.error("[Encryption] TOKEN_ENCRYPTION_KEY not set in production!");
-      throw new Error("Encryption key not configured");
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[Encryption] TOKEN_ENCRYPTION_KEY not set in production!');
+      throw new Error('Encryption key not configured');
     }
-    logger.warn("[Encryption] Using unencrypted storage (dev mode)");
+    logger.warn('[Encryption] Using unencrypted storage (dev mode)');
     return plaintext;
   }
 
@@ -97,10 +97,7 @@ export async function encryptToken(plaintext: string): Promise<string> {
       authTagLength: AUTH_TAG_LENGTH,
     });
 
-    const encrypted = Buffer.concat([
-      cipher.update(plaintext, "utf8"),
-      cipher.final(),
-    ]);
+    const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
 
     const authTag = cipher.getAuthTag();
 
@@ -108,12 +105,12 @@ export async function encryptToken(plaintext: string): Promise<string> {
     const combined = Buffer.concat([salt, iv, authTag, encrypted]);
 
     // Prefix with version marker for future-proofing
-    return `enc:v1:${combined.toString("base64")}`;
+    return `enc:v1:${combined.toString('base64')}`;
   } catch (error) {
-    logger.error("[Encryption] Failed to encrypt token", {
+    logger.error('[Encryption] Failed to encrypt token', {
       error: String(error),
     });
-    throw new Error("Token encryption failed");
+    throw new Error('Token encryption failed');
   }
 }
 
@@ -127,24 +124,24 @@ export async function decryptToken(encrypted: string): Promise<string> {
   if (!encrypted) return encrypted;
 
   // Check if this is an encrypted value
-  if (!encrypted.startsWith("enc:v1:")) {
+  if (!encrypted.startsWith('enc:v1:')) {
     // Return as-is (legacy unencrypted or dev mode)
     return encrypted;
   }
 
   if (!isEncryptionConfigured()) {
-    if (process.env.NODE_ENV === "production") {
-      logger.error("[Encryption] Cannot decrypt: key not configured");
-      throw new Error("Encryption key not configured");
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[Encryption] Cannot decrypt: key not configured');
+      throw new Error('Encryption key not configured');
     }
     // In dev, if we see encrypted data but have no key, that's an error
-    throw new Error("Encrypted token found but no encryption key available");
+    throw new Error('Encrypted token found but no encryption key available');
   }
 
   try {
     // Remove version prefix
     const data = encrypted.slice(7); // Remove 'enc:v1:'
-    const combined = Buffer.from(data, "base64");
+    const combined = Buffer.from(data, 'base64');
 
     // Extract components
     const salt = combined.subarray(0, SALT_LENGTH);
@@ -153,9 +150,7 @@ export async function decryptToken(encrypted: string): Promise<string> {
       SALT_LENGTH + IV_LENGTH,
       SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH,
     );
-    const ciphertext = combined.subarray(
-      SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH,
-    );
+    const ciphertext = combined.subarray(SALT_LENGTH + IV_LENGTH + AUTH_TAG_LENGTH);
 
     const key = await deriveKey(salt);
 
@@ -164,17 +159,14 @@ export async function decryptToken(encrypted: string): Promise<string> {
     });
     decipher.setAuthTag(authTag);
 
-    const decrypted = Buffer.concat([
-      decipher.update(ciphertext),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
 
-    return decrypted.toString("utf8");
+    return decrypted.toString('utf8');
   } catch (error) {
-    logger.error("[Encryption] Failed to decrypt token", {
+    logger.error('[Encryption] Failed to decrypt token', {
       error: String(error),
     });
-    throw new Error("Token decryption failed - data may be corrupted");
+    throw new Error('Token decryption failed - data may be corrupted');
   }
 }
 

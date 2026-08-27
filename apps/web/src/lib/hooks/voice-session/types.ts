@@ -16,7 +16,6 @@ export interface UseVoiceSessionOptions {
 
 export interface ConnectionInfo {
   provider: 'azure' | 'openai';
-  proxyPort?: number;
   configured?: boolean;
   wsUrl?: string;
   token?: string;

@@ -7,7 +7,7 @@
  */
 
 import { request as pwRequest } from '@playwright/test';
-import { authenticatedTest, test, expect, PROD_URL, hasProdTestAuthCookie } from './fixtures';
+import { authenticatedTest, test, expect, PROD_URL, hasProdTestAuthCookie, openMobileMenu } from './fixtures';
 
 authenticatedTest.describe('PROD: Current authenticated home', () => {
   authenticatedTest.skip(!hasProdTestAuthCookie, 'Production test auth cookie is not available');
@@ -29,6 +29,9 @@ authenticatedTest.describe('PROD: Current authenticated home', () => {
 
   authenticatedTest('Uses the current child navigation labels', async ({ page }) => {
     await page.goto('/it');
+    // On mobile the sidebar starts collapsed and renders no label text at all,
+    // so the labels can only be asserted once the drawer is open.
+    await openMobileMenu(page);
     await expect(page.getByTestId('home-nav-intent')).toContainText('Casa');
     await expect(page.getByTestId('home-nav-supporti')).toContainText('I miei lavori');
     await expect(page.getByTestId('home-nav-progress')).toContainText('I miei premi');

@@ -106,14 +106,21 @@ describe('Embedding Service', () => {
       await expect(generateEmbedding('test')).rejects.toThrow('Embedding service not configured');
     });
 
-    it('should handle API errors', async () => {
+    it('should handle API errors without repeating the upstream body', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 429,
-        text: async () => 'Rate limit exceeded',
+        text: async () => 'Rate limit exceeded for input: la capitale della Francia',
       });
 
-      await expect(generateEmbedding('test')).rejects.toThrow('Azure Embedding error (429)');
+      await expect(generateEmbedding('test')).rejects.toThrow('(429) [rate_limit]');
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        text: async () => 'Rate limit exceeded for input: la capitale della Francia',
+      });
+      await expect(generateEmbedding('test')).rejects.not.toThrow(/capitale della Francia/);
     });
   });
 
@@ -129,11 +136,7 @@ describe('Embedding Service', () => {
     });
 
     it('should generate embeddings for multiple texts', async () => {
-      const mockVectors = [
-        Array(1536).fill(0.1),
-        Array(1536).fill(0.2),
-        Array(1536).fill(0.3),
-      ];
+      const mockVectors = [Array(1536).fill(0.1), Array(1536).fill(0.2), Array(1536).fill(0.3)];
 
       mockFetch.mockResolvedValueOnce({
         ok: true,

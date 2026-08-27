@@ -5,6 +5,7 @@
 
 'use client';
 
+import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
 import {
@@ -493,11 +494,12 @@ export class WebRTCConnection {
     });
     if (!response.ok) {
       const errorText = await response.text();
+      const sanitized = sanitizeUpstreamError(response.status, errorText);
       logVoiceError('SDPExchangeFailed', `Status: ${response.status}`, {
         statusText: response.statusText,
-        errorDetails: errorText.substring(0, 200),
+        ...sanitized,
       });
-      throw new Error(`SDP exchange failed: ${response.status} - ${errorText}`);
+      throw new Error(`SDP exchange failed: ${describeUpstreamError(sanitized)}`);
     }
     const answerSdp = await response.text();
     logSDPExchange('answer', answerSdp.length);

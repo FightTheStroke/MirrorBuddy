@@ -30,7 +30,6 @@ import { ConnectedState } from './voice-onboarding-panel/connected-state';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
-  proxyPort: number;
   configured: boolean;
 }
 

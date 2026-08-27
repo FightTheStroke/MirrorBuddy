@@ -9,9 +9,7 @@ import type { ProviderConfig, ChatCompletionResult, ToolCall, ToolDefinition } f
 import {
   type TokenParamName,
   AzureHttpError,
-  parseAzureError,
-  isDeploymentNotFound,
-  isUnsupportedTokenParam,
+  sanitizeUpstreamError,
   isRetryableAzureError,
 } from './azure-errors';
 
@@ -112,34 +110,22 @@ export async function azureChatCompletion(
     }
 
     const errorText = await fetchResponse.text();
+    const sanitized = sanitizeUpstreamError(fetchResponse.status, errorText);
     logger.error(`[Azure Chat] Error ${fetchResponse.status}`, {
       deployment,
       tokenParamName,
-      errorDetails: errorText,
+      ...sanitized,
     });
 
     // Handle Azure content filter (400 with content_filter code)
     // Content filter errors should NOT be retried
-    if (fetchResponse.status === 400) {
-      try {
-        const errorData = JSON.parse(errorText);
-        if (errorData.error?.code === 'content_filter') {
-          const filterResult = errorData.error?.innererror?.content_filter_result;
-          const triggeredFilters = filterResult
-            ? Object.entries(filterResult)
-                .filter(([, v]) => (v as { filtered: boolean }).filtered)
-                .map(([k]) => k)
-            : [];
-          logger.warn('[Azure Chat] Content filter triggered', { filters: triggeredFilters });
-          return { kind: 'content_filtered', deployment, filteredCategories: triggeredFilters };
-        }
-      } catch {
-        // Not a JSON error, fall through to throw
-      }
+    if (sanitized.category === 'content_filter') {
+      const triggeredFilters = sanitized.filteredCategories ?? [];
+      logger.warn('[Azure Chat] Content filter triggered', { filters: triggeredFilters });
+      return { kind: 'content_filtered', deployment, filteredCategories: triggeredFilters };
     }
 
-    const parsed = parseAzureError(errorText);
-    throw new AzureHttpError(fetchResponse.status, errorText, parsed.code);
+    throw new AzureHttpError(sanitized);
   }
 
   async function fetchWithCompatibility(): Promise<FetchResult> {
@@ -173,7 +159,7 @@ export async function azureChatCompletion(
           throw error;
         }
 
-        if (isDeploymentNotFound(error.status, error.errorText)) {
+        if (error.category === 'deployment_not_found') {
           logger.warn('[Azure Chat] DeploymentNotFound; trying fallback deployment if available', {
             deployment: attempt.deployment,
             fallbackDeployment,
@@ -181,7 +167,7 @@ export async function azureChatCompletion(
           continue;
         }
 
-        const unsupportedParam = isUnsupportedTokenParam(error.status, error.errorText);
+        const unsupportedParam = error.tokenParam;
         if (unsupportedParam) {
           logger.warn('[Azure Chat] Unsupported token param; trying alternative param', {
             deployment: attempt.deployment,

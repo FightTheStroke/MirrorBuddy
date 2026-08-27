@@ -21,11 +21,7 @@ interface UseMaestroVoiceConnectionProps {
    * during a voice call. Without this, the realtime model would wait forever for
    * a tool result and stop responding.
    */
-  onWebcamRequest?: (request: {
-    purpose: string;
-    instructions?: string;
-    callId: string;
-  }) => void;
+  onWebcamRequest?: (request: { purpose: string; instructions?: string; callId: string }) => void;
 }
 
 export function useMaestroVoiceConnection({
@@ -56,7 +52,6 @@ export function useMaestroVoiceConnection({
   );
   const [connectionInfo, setConnectionInfo] = useState<{
     provider: 'azure';
-    proxyPort: number;
     configured: boolean;
   } | null>(null);
 
@@ -120,7 +115,7 @@ export function useMaestroVoiceConnection({
         if (cached) {
           try {
             const data = JSON.parse(cached);
-            if (data.provider && data.proxyPort !== undefined) {
+            if (data.provider && data.configured) {
               setConnectionInfo(data);
               return;
             }
