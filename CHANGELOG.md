@@ -69,6 +69,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   chiamanti fuori dal proprio test: rimossi. Se un Key Vault vero verrà creato,
   questa è la cucitura dove metterlo, con la dipendenza dichiarata.
 
+## [0.26.1] - 2026-08-26
+
+### Fixed
+
+- **Pre-push hook no longer fails inside git worktrees** — the Vercel gate ran `vercel env ls` in the current directory, but worktrees carry no `.vercel` project link, so the command returned an empty list and every required environment variable looked missing. It now resolves the main working tree via `git-common-dir`, and skips with a warning when no link exists anywhere instead of reporting a false negative.
+
+### Changed
+
+- **npm registry pinned to the public registry** — `.npmrc` now sets `registry=https://registry.npmjs.org/` so installs no longer depend on user-level mirror configuration, which caused `ERR_PNPM_FETCH_404` for any package missing from the local store. The lockfile resolves by integrity hash, so the pin cannot change what is installed; override with `npm_config_registry=<url>`.
+- **ADR 0168 addendum** — records that the "no user-facing browse-all Maestri surface" premise stopped holding in 0.26.0. The decision to deprecate `maestriLimit` still stands.
+
 ## [0.26.0] - 2026-08-25
 
 ### Changed
