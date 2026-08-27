@@ -177,6 +177,15 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                     checked={settings.dyslexiaFont}
                     onChange={(v) => updateSettings({ dyslexiaFont: v })}
                   />
+                  {/* ADR 0069 promised students could turn this off; until now
+                      only the code could. On, MirrorBuddy waits longer before
+                      deciding you have finished speaking, so it does not cut you
+                      off - which also makes it slower to answer. */}
+                  <QuickToggle
+                    label={t('extraSpeakingTime')}
+                    checked={settings.adaptiveVadEnabled}
+                    onChange={(v) => updateSettings({ adaptiveVadEnabled: v })}
+                  />
                 </div>
                 <div className="mt-4 space-y-2">
                   <label
