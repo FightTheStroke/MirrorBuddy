@@ -45,13 +45,19 @@ export interface MaestroKnowledgeResult {
 /**
  * Retrieve relevant didactic knowledge for a maestro based on the user's query.
  * Falls back to empty string if pgvector is unavailable (graceful degradation).
+ *
+ * @param embedding - Optional pre-computed query vector. A single chat request
+ *   asks several retrievers about the same question; passing the vector in avoids
+ *   paying for the identical embedding call more than once, which is pure latency
+ *   in front of the student's first token.
  */
 export async function retrieveMaestroKnowledge(
   maestroId: string,
   query: string,
   limit = DEFAULT_LIMIT,
+  embedding?: number[],
 ): Promise<string> {
-  if (!isEmbeddingConfigured()) {
+  if (!embedding && !isEmbeddingConfigured()) {
     logger.debug('[MaestroKB] Embedding not configured, graceful fallback');
     return '';
   }
@@ -61,11 +67,11 @@ export async function retrieveMaestroKnowledge(
   }
 
   try {
-    const embeddingResult = await generatePrivacyAwareEmbedding(query);
+    const vector = embedding ?? (await generatePrivacyAwareEmbedding(query)).vector;
 
     const results = await searchSimilar({
       userId: SYSTEM_USER_ID,
-      vector: embeddingResult.vector,
+      vector,
       limit,
       minSimilarity: MIN_SIMILARITY,
       sourceType: 'maestro_knowledge',

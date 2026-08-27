@@ -12,6 +12,7 @@ import { filterInput } from '@/lib/safety';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
 import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/server';
+import { resolveQueryEmbedding } from '../query-embedding';
 import { injectABMetadata } from '@/lib/ab-testing/session-injector';
 import type { AIProvider } from '@/lib/ai/server';
 import {
@@ -146,10 +147,13 @@ export async function enhancePromptWithContext(
   const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
   if (userId && lastUserMessage) {
     try {
+      const embedding = await resolveQueryEmbedding(lastUserMessage.content);
+
       // Search in materials (generated content)
       const relevantMaterials = await findSimilarMaterials({
         userId,
         query: lastUserMessage.content,
+        embedding,
         limit: 3,
         minSimilarity: 0.6,
       });
@@ -158,6 +162,7 @@ export async function enhancePromptWithContext(
       const relatedStudyKits = await findRelatedConcepts({
         userId,
         query: lastUserMessage.content,
+        embedding,
         limit: 3,
         minSimilarity: 0.5,
         includeFlashcards: false,

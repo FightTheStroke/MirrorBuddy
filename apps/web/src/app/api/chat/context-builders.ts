@@ -16,6 +16,7 @@ import { getMaestroById } from '@/data/maestri';
 import { buildAdaptiveInstruction } from '@/lib/education';
 import { getAdaptiveContextForUser } from '@/lib/education/server';
 import { getLanguageInstruction } from '@/lib/i18n/language-instructions';
+import { resolveQueryEmbedding } from './query-embedding';
 import type { SupportedLanguage } from './types';
 
 export interface ContextResult {
@@ -112,6 +113,7 @@ export async function injectRAGContext(
   systemPrompt: string,
   userId: string,
   query: string,
+  embedding?: number[],
 ): Promise<{
   enhancedPrompt: string;
   hasRAG: boolean;
@@ -125,6 +127,7 @@ export async function injectRAGContext(
     const relevantMaterials = await findSimilarMaterials({
       userId,
       query,
+      embedding,
       limit: 3,
       minSimilarity: 0.6,
     });
@@ -132,6 +135,7 @@ export async function injectRAGContext(
     const relatedStudyKits = await findRelatedConcepts({
       userId,
       query,
+      embedding,
       limit: 3,
       minSimilarity: 0.5,
       includeFlashcards: false,
@@ -214,9 +218,10 @@ export async function injectMaestroKnowledgeContext(
   systemPrompt: string,
   maestroId: string,
   query: string,
+  embedding?: number[],
 ): Promise<{ enhancedPrompt: string; hasMaestroKB: boolean }> {
   try {
-    const knowledge = await retrieveMaestroKnowledge(maestroId, query);
+    const knowledge = await retrieveMaestroKnowledge(maestroId, query, undefined, embedding);
     if (knowledge) {
       logger.debug('Maestro knowledge injected', { maestroId });
       return {
@@ -256,6 +261,12 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
     maestroId: options.maestroId,
   });
 
+  // One embedding for the whole request: the maestro knowledge base, the
+  // student's materials and their study kits all ask about the same question.
+  const queryEmbedding = options.lastUserMessage
+    ? await resolveQueryEmbedding(options.lastUserMessage)
+    : undefined;
+
   // Memory context
   if (options.enableMemory && options.userId && options.maestroId) {
     const memoryResult = await injectMemoryContext(
@@ -273,6 +284,7 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
       enhancedPrompt,
       options.maestroId,
       options.lastUserMessage,
+      queryEmbedding,
     );
     enhancedPrompt = maestroKBResult.enhancedPrompt;
   }
@@ -294,6 +306,7 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
       enhancedPrompt,
       options.userId,
       options.lastUserMessage,
+      queryEmbedding,
     );
     enhancedPrompt = ragResult.enhancedPrompt;
     hasRAG = ragResult.hasRAG;

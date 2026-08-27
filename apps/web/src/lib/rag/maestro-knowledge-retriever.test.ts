@@ -262,3 +262,45 @@ describe('maestro scoping', () => {
     expect(result).toBe('');
   });
 });
+
+describe('retrieveMaestroKnowledge embedding reuse', () => {
+  const precomputed = new Array(1536).fill(0.42);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(isEmbeddingConfigured).mockReturnValue(true);
+    vi.mocked(searchSimilar).mockResolvedValue([]);
+  });
+
+  it('does not regenerate the embedding when one is supplied', async () => {
+    await retrieveMaestroKnowledge('feynman', 'spiegami la fisica', undefined, precomputed);
+
+    expect(generatePrivacyAwareEmbedding).not.toHaveBeenCalled();
+  });
+
+  it('searches with the supplied vector', async () => {
+    await retrieveMaestroKnowledge('feynman', 'spiegami la fisica', undefined, precomputed);
+
+    expect(searchSimilar).toHaveBeenCalledWith(expect.objectContaining({ vector: precomputed }));
+  });
+
+  it('still generates the embedding when none is supplied', async () => {
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
+      vector: new Array(1536).fill(0.1),
+      model: 'text-embedding-3-small',
+      usage: { tokens: 5 },
+    });
+
+    await retrieveMaestroKnowledge('feynman', 'spiegami la fisica');
+
+    expect(generatePrivacyAwareEmbedding).toHaveBeenCalledTimes(1);
+  });
+
+  it('works with a supplied vector even when the embedding service is unconfigured', async () => {
+    vi.mocked(isEmbeddingConfigured).mockReturnValue(false);
+
+    await retrieveMaestroKnowledge('feynman', 'spiegami la fisica', undefined, precomputed);
+
+    expect(searchSimilar).toHaveBeenCalledTimes(1);
+  });
+});
