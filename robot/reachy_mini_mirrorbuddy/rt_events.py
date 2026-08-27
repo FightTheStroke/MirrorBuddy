@@ -18,12 +18,14 @@ from . import rt_messages, session_flow, tools
 
 logger = logging.getLogger(__name__)
 
-# How long an utterance must be before we answer without waiting for its transcript.
-# Sized against the phrases that must never produce a reply — "zitto", "basta",
-# "fermati", "hey buddy" — spoken slowly by a child with a motor impairment. Above
-# this, a turn cannot be a bare stop word, so the transcript adds latency and nothing
-# else. Any stop word inside a longer sentence is still caught: the transcript lands a
-# moment later and cancels the response in flight.
+# How long an utterance must be before its answer plays as it arrives, without
+# waiting for the transcript to clear it. Sized against the phrases that must never
+# produce a reply — "zitto", "basta", "fermati", "hey buddy" — spoken slowly by a
+# child with a motor impairment. Above this, a turn cannot be a bare stop word, so
+# holding the audio back would add delay and nothing else. Below it the answer is
+# still requested immediately, but stays silent until the transcript arrives. Any
+# stop word inside a longer sentence is still caught: the transcript lands a moment
+# later and cancels the response in flight.
 _FAST_PATH_MIN_SPEECH_S = 1.8
 
 # How long a deliberate rest lasts before ordinary conversation resumes. Long
@@ -57,7 +59,15 @@ class RealtimeEventsMixin:
             if self._suppress:
                 return  # dropped: user barged in, this response is being cancelled
             b64 = event.get("delta") or event.get("audio")
-            if b64 and self.on_output_audio:
+            if not b64:
+                return
+            if self._gated:
+                # Prepared, not yet permitted. The transcript has not said whether
+                # this turn was a question or "basta"; until it does, nothing is
+                # heard. Kept in order so the sentence plays back intact.
+                self._gated_audio.append(base64.b64decode(b64))
+                return
+            if self.on_output_audio:
                 _safe_cb(self.on_output_audio, base64.b64decode(b64))
             return
 
@@ -127,16 +137,20 @@ class RealtimeEventsMixin:
             # hush already applied for this turn.
             _still_matters = (session_flow.END, session_flow.REST, session_flow.WAKE)
             if hushed and action not in _still_matters:
+                await self._drop_speculative()
                 return  # already hushed while the student was still speaking
             if action == session_flow.IGNORE:
+                await self._drop_speculative()
                 return
             if action == session_flow.WAKE:
+                await self._drop_speculative()
                 self._asleep = self._quiet = False
                 if self.on_wake:
                     _safe_cb(self.on_wake)
                 await self._request_response(rt_messages.WAKE_INSTR)
                 return
             if action == session_flow.END:
+                self._clear_gate()
                 self._pending_farewell = True
                 self._suppress = self._quiet = False
                 if self._responding or self._fast_requested:
@@ -151,6 +165,8 @@ class RealtimeEventsMixin:
                 # A pause lifts on the next thing the student says, even where the
                 # deployment never emits speech_started to clear the flag for us.
                 self._quiet = False
+                # The turn was ordinary speech: whatever was prepared may be heard.
+                self._release_gate()
                 # Ordinary turn. If the fast path already asked for the response when
                 # speech ended, asking again would make Buddy answer twice.
                 if not self._fast_requested:
@@ -165,6 +181,7 @@ class RealtimeEventsMixin:
             # revived by restarting the app.
             self._partial_user = ""
             self._stopped_on_partial = False
+            self._clear_gate()
             if self._asleep:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
@@ -188,9 +205,14 @@ class RealtimeEventsMixin:
             if self._asleep or self._quiet:
                 return
             spoken = time.monotonic() - self._speech_started_at
-            if self._speech_started_at and spoken >= _FAST_PATH_MIN_SPEECH_S:
-                self._fast_requested = True
-                await self._request_response()
+            # Either way the answer is asked for now, so the model's own latency
+            # runs alongside the transcription instead of after it. A turn long
+            # enough that it cannot be a stop word plays as it arrives; a short one
+            # is held back until the transcript clears it.
+            if not (self._speech_started_at and spoken >= _FAST_PATH_MIN_SPEECH_S):
+                self._hold_output()
+            self._fast_requested = True
+            await self._request_response()
             return
 
         if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
@@ -268,6 +290,39 @@ class RealtimeEventsMixin:
         self._responding = False
         await self._safe_send(rt_messages.CANCEL)
 
+    def _hold_output(self) -> None:
+        """Start preparing an answer that may not be wanted; hold back its voice."""
+        self._gated = True
+        self._gated_audio = []
+
+    def _clear_gate(self) -> None:
+        """Forget a held answer without ever playing it."""
+        self._gated = False
+        self._gated_audio = []
+
+    def _release_gate(self) -> None:
+        """Let a held answer be heard, in the order it arrived."""
+        held = self._gated_audio
+        self._gated = False
+        self._gated_audio = []
+        if self.on_output_audio:
+            for chunk in held:
+                _safe_cb(self.on_output_audio, chunk)
+
+    async def _drop_speculative(self) -> None:
+        """Throw away an answer prepared before the transcript said it was wanted.
+
+        The response is still being generated, so it is cancelled as well as
+        silenced: without that, clearing the gate would let the rest of it through.
+        """
+        if not self._gated:
+            return
+        self._clear_gate()
+        self._suppress = True
+        if self._responding or self._fast_requested:
+            await self._cancel_response()
+        self._fast_requested = False
+
     async def _apply_stop(self, rest: bool) -> None:
         """Stop talking now; go to sleep only if the silence was asked for deliberately.
 
@@ -282,6 +337,7 @@ class RealtimeEventsMixin:
         """
         self._quiet = True
         self._suppress = True
+        self._clear_gate()
         if self._responding or self._fast_requested:
             await self._cancel_response()
         # The fast path belongs to the turn that was just cancelled. Left standing,
