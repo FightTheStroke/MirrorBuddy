@@ -41,6 +41,7 @@ import {
   type ConversationMessage,
 } from '@/lib/conversation/conversation-window';
 import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
+import { RequestTimeline } from './timings';
 
 import type { ChatRequest } from '../types';
 import {
@@ -75,6 +76,9 @@ export const POST = pipe(
   }
 
   const log = getRequestLogger(request);
+  // Until now the only recorded figure was how long a whole answer took. What
+  // students describe is the wait before the first word, which nothing measured.
+  const timeline = new RequestTimeline();
 
   const clientId = getClientIdentifier(request);
   const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);
@@ -124,6 +128,7 @@ export const POST = pipe(
       return response;
     }
     const userId = coppaCheck.userId;
+    timeline.mark('auth');
 
     // Settings, tier model and A/B override are independent reads that used to
     // run one after another. Serialising them added two database round trips of
@@ -142,6 +147,8 @@ export const POST = pipe(
               .catch(() => 'base')
           : Promise.resolve('trial'),
       ]);
+
+    timeline.mark('settings');
 
     // Budget check
     if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
@@ -202,6 +209,7 @@ export const POST = pipe(
     // T1.10 (D-10): adapt language/topic guidance to the student's age when
     // a real profile age is on record, mirroring the non-streaming route.
     enhancedSystemPrompt = await applyAgeGatePrompt(enhancedSystemPrompt, userId);
+    timeline.mark('context');
 
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
@@ -307,6 +315,8 @@ export const POST = pipe(
     // already trimmed old turns into a summary (ADR 0034); the streaming route
     // did not. Same tier-aware window, applied here too. This runs after the
     // safety gates so the Unicode-normalised content is what the model receives.
+    timeline.mark('safety');
+
     const tierLimits = getTierMemoryLimits(userTier as 'trial' | 'base' | 'pro');
     const compressedMessages = compressConversationHistory(
       messages.map((m) => ({ role: m.role, content: m.content })) as ConversationMessage[],
@@ -338,6 +348,11 @@ export const POST = pipe(
 
           for await (const chunk of generator) {
             if (chunk.type === 'content' && chunk.content) {
+              timeline.reportFirstToken({
+                maestroId,
+                model: selectedModel,
+                historyMessages: compressedMessages.length,
+              });
               // Mid-stream budget check (F-13)
               if (budgetTracker && budgetTracker.trackChunk(chunk.content)) {
                 budgetExceededMidStream = true;
