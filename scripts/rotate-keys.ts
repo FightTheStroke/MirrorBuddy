@@ -32,18 +32,18 @@
  * Plan 124: Security & Encryption Hardening
  */
 
-import "dotenv/config";
+import 'dotenv/config';
 import {
-  rotateTokenKey,
+  rotateTokenEncryptionKey,
   rotateSessionKey,
-  rotatePIIKey,
-} from "../apps/web/src/lib/security/key-rotation";
+  rotatePIIEncryptionKey,
+} from '../apps/web/src/lib/security/key-rotation';
 
 /**
  * CLI argument parser
  */
 function parseArgs(): {
-  type: "token" | "session" | "pii";
+  type: 'token' | 'session' | 'pii';
   oldKey: string;
   newKey: string;
   dryRun: boolean;
@@ -51,52 +51,48 @@ function parseArgs(): {
 } {
   const args = process.argv.slice(2);
 
-  const type = args.find((arg) => arg.startsWith("--type="))?.split("=")[1] as
-    | "token"
-    | "session"
-    | "pii"
+  const type = args.find((arg) => arg.startsWith('--type='))?.split('=')[1] as
+    | 'token'
+    | 'session'
+    | 'pii'
     | undefined;
 
-  const oldKey = args
-    .find((arg) => arg.startsWith("--old-key="))
-    ?.split("=")[1];
-  const newKey = args
-    .find((arg) => arg.startsWith("--new-key="))
-    ?.split("=")[1];
-  const dryRun = args.includes("--dry-run");
-  const batchSizeArg = args.find((arg) => arg.startsWith("--batch-size="));
-  const batchSize = batchSizeArg ? parseInt(batchSizeArg.split("=")[1]) : 100;
+  const oldKey = args.find((arg) => arg.startsWith('--old-key='))?.split('=')[1];
+  const newKey = args.find((arg) => arg.startsWith('--new-key='))?.split('=')[1];
+  const dryRun = args.includes('--dry-run');
+  const batchSizeArg = args.find((arg) => arg.startsWith('--batch-size='));
+  const batchSize = batchSizeArg ? parseInt(batchSizeArg.split('=')[1]) : 100;
 
   // Validate required arguments
   if (!type) {
-    console.error("ERROR: --type flag is required");
-    console.error("Valid types: token, session, pii");
-    console.error("Example: --type=pii");
+    console.error('ERROR: --type flag is required');
+    console.error('Valid types: token, session, pii');
+    console.error('Example: --type=pii');
     process.exit(1);
   }
 
-  if (!["token", "session", "pii"].includes(type)) {
+  if (!['token', 'session', 'pii'].includes(type)) {
     console.error(`ERROR: Invalid type "${type}"`);
-    console.error("Valid types: token, session, pii");
+    console.error('Valid types: token, session, pii');
     process.exit(1);
   }
 
   if (!oldKey) {
-    console.error("ERROR: --old-key flag is required");
-    console.error("Example: --old-key=your-current-key");
+    console.error('ERROR: --old-key flag is required');
+    console.error('Example: --old-key=your-current-key');
     process.exit(1);
   }
 
   if (!newKey) {
-    console.error("ERROR: --new-key flag is required");
-    console.error("Example: --new-key=your-new-key");
+    console.error('ERROR: --new-key flag is required');
+    console.error('Example: --new-key=your-new-key');
     process.exit(1);
   }
 
   // Validate batch size
   if (isNaN(batchSize) || batchSize <= 0) {
     console.error(`ERROR: Invalid batch size "${batchSize}"`);
-    console.error("Batch size must be a positive integer");
+    console.error('Batch size must be a positive integer');
     process.exit(1);
   }
 
@@ -108,7 +104,7 @@ function parseArgs(): {
  */
 function maskKey(key: string): string {
   if (key.length <= 8) {
-    return "***";
+    return '***';
   }
   return `${key.substring(0, 4)}...${key.substring(key.length - 4)}`;
 }
@@ -117,34 +113,28 @@ function maskKey(key: string): string {
  * Main execution function
  */
 async function main() {
-  console.log(
-    "\n╔════════════════════════════════════════════════════════════╗",
-  );
-  console.log("║              MirrorBuddy Key Rotation Tool                 ║");
-  console.log(
-    "╚════════════════════════════════════════════════════════════╝\n",
-  );
+  console.log('\n╔════════════════════════════════════════════════════════════╗');
+  console.log('║              MirrorBuddy Key Rotation Tool                 ║');
+  console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   // Parse and validate arguments
   const { type, oldKey, newKey, dryRun, batchSize } = parseArgs();
 
   // Log configuration (mask keys for security)
-  console.log("Configuration:");
+  console.log('Configuration:');
   console.log(`  Type:       ${type}`);
   console.log(`  Old Key:    ${maskKey(oldKey)}`);
   console.log(`  New Key:    ${maskKey(newKey)}`);
-  console.log(
-    `  Mode:       ${dryRun ? "DRY RUN (no changes)" : "LIVE ROTATION"}`,
-  );
+  console.log(`  Mode:       ${dryRun ? 'DRY RUN (no changes)' : 'LIVE ROTATION'}`);
   console.log(`  Batch Size: ${batchSize}`);
-  console.log("");
+  console.log('');
 
   if (dryRun) {
-    console.log("⚠️  DRY RUN: No changes will be made to the database");
-    console.log("");
+    console.log('⚠️  DRY RUN: No changes will be made to the database');
+    console.log('');
   } else {
-    console.log("⚠️  LIVE MODE: Database will be updated");
-    console.log("");
+    console.log('⚠️  LIVE MODE: Database will be updated');
+    console.log('');
   }
 
   // Execute appropriate rotation function
@@ -154,22 +144,22 @@ async function main() {
     let result;
 
     switch (type) {
-      case "token":
-        result = await rotateTokenKey(oldKey, newKey, {
+      case 'token':
+        result = await rotateTokenEncryptionKey(oldKey, newKey, {
           dryRun,
           batchSize,
         });
         break;
 
-      case "session":
+      case 'session':
         result = await rotateSessionKey(oldKey, newKey, {
           dryRun,
           batchSize,
         });
         break;
 
-      case "pii":
-        result = await rotatePIIKey(oldKey, newKey, {
+      case 'pii':
+        result = await rotatePIIEncryptionKey(oldKey, newKey, {
           dryRun,
           batchSize,
         });
@@ -177,48 +167,40 @@ async function main() {
     }
 
     // Log results
-    console.log(
-      "\n╔════════════════════════════════════════════════════════════╗",
-    );
-    console.log(
-      "║                    Rotation Complete                       ║",
-    );
-    console.log(
-      "╚════════════════════════════════════════════════════════════╝\n",
-    );
+    console.log('\n╔════════════════════════════════════════════════════════════╗');
+    console.log('║                    Rotation Complete                       ║');
+    console.log('╚════════════════════════════════════════════════════════════╝\n');
 
-    console.log("Statistics:");
+    console.log('Statistics:');
     console.log(`  Records Processed: ${result.recordsProcessed}`);
     console.log(`  Records Updated:   ${result.recordsUpdated}`);
     console.log(`  Records Skipped:   ${result.recordsSkipped}`);
     console.log(`  Errors:            ${result.errors}`);
-    console.log("");
+    console.log('');
 
     if (result.errors > 0) {
-      console.log("⚠️  Some records encountered errors during rotation");
-      console.log("   Check logs for details");
-      console.log("");
+      console.log('⚠️  Some records encountered errors during rotation');
+      console.log('   Check logs for details');
+      console.log('');
       process.exit(1);
     }
 
     if (dryRun) {
-      console.log(
-        "✓ Dry run complete. Run without --dry-run to apply changes.\n",
-      );
+      console.log('✓ Dry run complete. Run without --dry-run to apply changes.\n');
     } else {
-      console.log("✓ Key rotation successful!\n");
+      console.log('✓ Key rotation successful!\n');
     }
 
     process.exit(0);
   } catch (error) {
-    console.error("\n✗ Error during key rotation:");
+    console.error('\n✗ Error during key rotation:');
     console.error(error instanceof Error ? error.message : String(error));
-    console.error("");
+    console.error('');
 
     if (error instanceof Error && error.stack) {
-      console.error("Stack trace:");
+      console.error('Stack trace:');
       console.error(error.stack);
-      console.error("");
+      console.error('');
     }
 
     process.exit(1);
@@ -227,6 +209,6 @@ async function main() {
 
 // Execute with error handling
 main().catch((error) => {
-  console.error("Fatal error:", error);
+  console.error('Fatal error:', error);
   process.exit(1);
 });
