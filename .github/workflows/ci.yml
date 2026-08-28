@@ -483,25 +483,6 @@ jobs:
         working-directory: robot
         run: pytest tests/ -q
 
-  # The robots install MirrorBuddy from the Hugging Face app store, not from this
-  # repository. Publishing used to be a script someone had to remember, and the
-  # store quietly fell three versions behind — children kept running old code.
-  # This publishes on every push to main and fails loudly if the store is behind.
-  robot-store:
-    name: Robot App Store
-    runs-on: ubuntu-latest
-    needs: [robot-tests]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    env:
-      HF_TOKEN: ${{ secrets.HF_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish to the app store
-        if: env.HF_TOKEN != ''
-        run: ./robot/publish-space.sh
-      - name: Verify the robots would install this version
-        run: ./robot/publish-space.sh --check
-
   # Lane 4b: Migration Consistency
   # Conditional: skipped on PR when no prisma/ files changed
   migrations:
@@ -2355,6 +2336,44 @@ jobs:
               .addHeading(`${ok ? '✅' : '❌'} Auto-Promote to Production`, 2)
               .addRaw(ok ? 'Staging build promoted and verified live on https://mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
               .write();
+
+  # ============================================================================
+  # ROBOT APP STORE — the robot's equivalent of promoting to production
+  # ============================================================================
+  # The web app goes live from this same push; the robots must go live with it.
+  # They install MirrorBuddy from the Hugging Face app store, so unless the store
+  # is refreshed here, "released" means released for the website only. Publishing
+  # used to be a script someone had to remember, and the store silently fell three
+  # releases behind while every robot in the field kept running old code.
+  #
+  # Runs only after the website is actually promoted, so a robot is never sent
+  # code that the web release refused.
+  # ============================================================================
+  robot-store:
+    name: "🤖 Publish to Robot App Store"
+    runs-on: ubuntu-latest
+    needs: [robot-tests, auto-promote-production]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.auto-promote-production.result == 'success'
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish this release to the app store
+        if: env.HF_TOKEN != ''
+        run: ./robot/publish-space.sh
+
+      - name: Warn when publishing is not configured
+        if: env.HF_TOKEN == ''
+        run: |
+          echo "::warning::HF_TOKEN secret is not set — the robot app store was not"\
+            " refreshed. Robots stay on the previously published version."
+
+      - name: Verify the robots would install this release
+        run: ./robot/publish-space.sh --check
 
   # ============================================================================
   # RELEASE EVIDENCE PACK
