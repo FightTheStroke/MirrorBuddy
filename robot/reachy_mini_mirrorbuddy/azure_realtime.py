@@ -305,8 +305,15 @@ class AzureRealtimeClient(RealtimeEventsMixin):
 
         The server rejects a second response while one is streaming
         (``conversation_already_has_active_response``), so a turn that is already
-        being answered is left alone.
+        being answered is left alone — unless that answer has been "streaming"
+        for longer than any answer can last, which means it was cancelled and its
+        end will never be announced. Then the child's question wins.
         """
-        if self._responding or self._meditating:
+        if self._meditating:
             return
+        if self._responding:
+            if not self._responding_is_stale():
+                return
+            logger.warning("Answer never reported as finished; answering anyway")
+            self._responding = False
         await self._safe_send(json.dumps(rt_messages.response_create(instructions)))
