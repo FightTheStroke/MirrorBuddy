@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import threading
 import time
 import urllib.request
 
@@ -121,3 +122,25 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover - process entry point
     raise SystemExit(main())
+
+
+def start_background_check(enabled: bool = True, runner=run) -> threading.Thread | None:
+    """Check for a published update without ever delaying the robot's start.
+
+    The check runs on a daemon thread: a slow or unreachable app store must not
+    keep a child waiting, and an update that lands simply takes effect the next
+    time MirrorBuddy starts. Returns ``None`` when the check is switched off.
+    """
+    if not enabled:
+        logger.info("Automatic updates are disabled on this robot")
+        return None
+
+    def _guarded() -> None:
+        try:
+            runner()
+        except Exception as e:  # noqa: BLE001 - deliberate: the app must keep running
+            logger.warning("Background update check failed (%s); carrying on", e)
+
+    thread = threading.Thread(target=_guarded, name="mirrorbuddy-self-update", daemon=True)
+    thread.start()
+    return thread

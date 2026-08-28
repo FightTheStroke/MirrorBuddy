@@ -114,3 +114,73 @@ def apply_device_profile(config, profile: DeviceProfile) -> None:
         config.STUDENT_NAME, config.LOCALE, config.DSA_PROFILE, config.CALM_MOVEMENT,
         config.MAESTRO_ID or "(neutral buddy)",
     )
+
+
+@dataclass(frozen=True)
+class RealtimeCredentials:
+    """Azure Realtime voice credentials served to a paired robot at runtime."""
+
+    endpoint: str
+    api_key: str
+    deployment: str | None = None
+    api_version: str | None = None
+
+
+def fetch_realtime_credentials(
+    api_base: str, token: str, timeout: float = 15.0
+) -> RealtimeCredentials | None:
+    """GET /api/devices/realtime-credentials with the device token.
+
+    Returns ``None`` on any failure so the caller can fall back to whatever is
+    configured locally: a temporary backend problem must never leave a child
+    with a mute robot.
+    """
+    url = f"{api_base.rstrip('/')}/api/devices/realtime-credentials"
+    try:
+        resp = httpx.get(
+            url,
+            timeout=timeout,
+            headers={"authorization": f"Bearer {token}", "accept": "application/json"},
+        )
+        if resp.status_code == 401:
+            logger.warning(
+                "Device token rejected while fetching voice credentials. "
+                "Re-pair the robot from the parent's settings."
+            )
+            return None
+        if resp.status_code == 503:
+            logger.warning("MirrorBuddy has no voice credentials configured right now.")
+            return None
+        resp.raise_for_status()
+        data = resp.json()
+        if not isinstance(data, dict):
+            return None
+        endpoint = (data.get("endpoint") or "").strip()
+        api_key = (data.get("apiKey") or "").strip()
+        if not endpoint or not api_key:
+            logger.warning("Voice credentials response was incomplete; keeping local config.")
+            return None
+        return RealtimeCredentials(
+            endpoint=endpoint,
+            api_key=api_key,
+            deployment=(data.get("deployment") or "").strip() or None,
+            api_version=(data.get("apiVersion") or "").strip() or None,
+        )
+    except Exception as e:  # network / parse — degrade to local config
+        logger.warning("Could not fetch voice credentials from %s: %s", url, e)
+        return None
+
+
+def apply_realtime_credentials(config, creds: RealtimeCredentials) -> None:
+    """Apply server-provided voice credentials to the in-memory config.
+
+    Nothing is written to disk: the key lives only for this run, so a rotation
+    on the server reaches the robot on its next start with no manual step.
+    """
+    config.AZURE_ENDPOINT = creds.endpoint
+    config.AZURE_API_KEY = creds.api_key
+    if creds.deployment:
+        config.AZURE_DEPLOYMENT = creds.deployment
+    if creds.api_version:
+        config.AZURE_API_VERSION = creds.api_version
+    logger.info("Voice credentials loaded from MirrorBuddy (endpoint=%s)", creds.endpoint)

@@ -108,3 +108,35 @@ class TestItIsUsableFromTheBootScript:
 
         assert self_update.main([]) == 0
         assert capsys.readouterr().out.strip() != ""
+
+
+def test_background_check_is_skipped_when_disabled():
+    from reachy_mini_mirrorbuddy.self_update import start_background_check
+
+    calls = []
+    thread = start_background_check(enabled=False, runner=lambda: calls.append(1))
+    assert thread is None
+    assert calls == []
+
+
+def test_background_check_runs_off_the_startup_path():
+    from reachy_mini_mirrorbuddy.self_update import start_background_check
+
+    calls = []
+    thread = start_background_check(enabled=True, runner=lambda: calls.append(1))
+    assert thread is not None
+    assert thread.daemon is True
+    thread.join(timeout=5)
+    assert calls == [1]
+
+
+def test_background_check_never_raises_into_the_app():
+    from reachy_mini_mirrorbuddy.self_update import start_background_check
+
+    def boom():
+        raise RuntimeError("store unreachable")
+
+    thread = start_background_check(enabled=True, runner=boom)
+    assert thread is not None
+    thread.join(timeout=5)
+    assert not thread.is_alive()

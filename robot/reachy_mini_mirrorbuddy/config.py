@@ -65,6 +65,9 @@ class Config:
         self.DEVICE_TOKEN: str | None = (os.getenv("MIRRORBUDDY_DEVICE_TOKEN") or "").strip() or None
         api_base = (os.getenv("MIRRORBUDDY_API_BASE") or "").strip().rstrip("/")
         self.API_BASE: str = api_base or self.MIRRORBUDDY_URL
+        # Families do not read release notes. The robot takes published updates by
+        # itself, off the start-up path; set this to 0 to pin the current version.
+        self.AUTO_UPDATE: bool = _flag("MIRRORBUDDY_AUTO_UPDATE", True)
         # Start neutrally as "Buddy" (organise the study session) instead of impersonating a
         # historical Maestro. A pinned MIRRORBUDDY_MAESTRO_ID always takes precedence.
         self.START_NEUTRAL: bool = _flag("MIRRORBUDDY_START_NEUTRAL", True)
