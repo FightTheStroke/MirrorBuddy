@@ -49,6 +49,17 @@ until curl -sf -m 5 "$API/api/daemon/status" >/dev/null 2>&1; do
 done
 log "daemon API is up after ${waited}s"
 
+# Take the newest published version before the app starts. Nobody in a family is
+# going to open a dashboard to press Update, and a robot that never updates is
+# a robot running whatever it shipped with, for years. Safe to do here because the
+# family's settings no longer live inside the package an update replaces, and
+# because the updater never fails the boot: worst case the robot starts on the
+# version it already has.
+if [ -x /venvs/apps_venv/bin/python ]; then
+  /venvs/apps_venv/bin/python -m reachy_mini_mirrorbuddy.self_update 2>&1 |
+    while IFS= read -r line; do log "$line"; done
+fi
+
 configured="$(startup_app)"
 if [ -z "$configured" ]; then
   log "no startup app configured — nothing to wake for"

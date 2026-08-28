@@ -240,12 +240,13 @@ user on the in-app settings page. So the package can be published to the Hugging
 as-is: it self-declares under the `reachy_mini_apps` entry-point group and carries the
 app-card front-matter at the top of this README (title, emoji, tags, thumbnail).
 
-**CI publishes it.** Every push to `main` runs the `Robot App Store` job, which publishes
-the current tree and then verifies that the store really serves this version. Publishing
-by hand was the reason the store once fell three releases behind the repository while
-everyone assumed robots were current. The job needs an `HF_TOKEN` repository secret with
-write access to the Space; without it the job fails as soon as the store drifts, which is
-the intended loud signal. To publish manually:
+**CI publishes it, as part of going live.** The `🤖 Publish to Robot App Store` job runs
+right after the website is promoted to production, on the same push to `main` — so the
+robots and mirrorbuddy.org always carry the same release, and "we shipped" never again
+means "we shipped for the website". It then verifies the store really serves that version.
+Publishing by hand was the reason the store once fell three releases behind while everyone
+assumed robots were current. The job needs an `HF_TOKEN` repository secret with write
+access to the Space. To publish manually:
 
 ```bash
 ./robot/publish-space.sh          # publish this working tree
@@ -288,6 +289,18 @@ came back mute until an adult retyped them. A robot configured before this chang
 is migrated automatically the first time the new version starts.
 
 Override the location with `MIRRORBUDDY_CONFIG_DIR`.
+
+### Staying up to date
+
+Robots update themselves at boot. `mirrorbuddy-autostart` asks the daemon whether a
+newer version is published in the app store and installs it before MirrorBuddy
+starts, so a family gets fixes without opening anything. Two things make that safe:
+
+- the configuration lives outside the package, so an install cannot erase it;
+- the updater never fails the boot — no network, a slow store or a refused install
+  are logged and stepped over, and the robot starts on the version it already has.
+
+An update must never be the reason a child has no robot today.
 
 ### Checking a robot in the field
 
