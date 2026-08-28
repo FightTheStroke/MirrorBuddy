@@ -111,11 +111,20 @@ Adopting it would have looked like a change while changing nothing.
 - ADR 0069 cites no clinical study and its manual validation checklist is
   unticked.
 
-## Operational gap
+## Operational gap — closed
 
-The robot test suite runs in **no** CI workflow. The P7 safety guarantee — that a
-stop word is never spoken over — is currently protected only by running
-`pytest robot/tests/ --asyncio-mode=auto` locally.
+The robot test suite used to run in **no** CI workflow, which meant the P7 safety
+guarantee — that a stop word is never spoken over — was protected only by a
+developer remembering to run pytest locally.
+
+A `Robot Tests` job now runs in `ci.yml`, on every push to `main` and on any pull
+request touching `robot/**`. `robot/pyproject.toml` declares a `test` extra and
+sets `asyncio_mode = "auto"`, so CI and a laptop run the suite identically with
+`pip install -e ".[test]" && pytest tests/ -q`.
+
+Remaining decision: the job is not in the repository's required status checks, so
+a red result is visible but not blocking. Making it required is a branch-protection
+change and is left as an explicit human decision.
 
 ## Review follow-up (PR #734)
 
