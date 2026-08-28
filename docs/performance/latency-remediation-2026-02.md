@@ -116,3 +116,25 @@ Adopting it would have looked like a change while changing nothing.
 The robot test suite runs in **no** CI workflow. The P7 safety guarantee — that a
 stop word is never spoken over — is currently protected only by running
 `pytest robot/tests/ --asyncio-mode=auto` locally.
+
+## Review follow-up (PR #734)
+
+Automated review found two real races opened by the speculative path, both fixed
+before merge:
+
+1. **Barge-in before the answer exists.** Asking for the answer immediately opens
+   a window where the request is in flight but `response.created` has not
+   returned, so `_responding` is still false. `speech_started` therefore skipped
+   the cancel, and the late `response.created` cleared `_suppress` and played the
+   abandoned answer over the new turn. `speech_started` now cancels when
+   `_fast_requested` is set as well, and a cancel issued against an unconfirmed
+   response is remembered (`_cancelled_unconfirmed`) so `response.created` cancels
+   it again instead of treating it as wanted. The flag is cleared when the server
+   refuses the request outright, so a refusal can never silence the next answer.
+2. **Held audio surviving a reconnect.** `_reset_session_state` cleared the other
+   response flags but left `_gated` / `_gated_audio` intact, so buffered bytes
+   from a dead session could be released into the new one. The session reset now
+   clears the gate.
+
+Covered by 5 additional tests in `robot/tests/test_speculative_response.py`
+(13 total).

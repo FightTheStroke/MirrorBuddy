@@ -72,7 +72,18 @@ class RealtimeEventsMixin:
             return
 
         if etype == "response.created":
+            if self._cancelled_unconfirmed:
+                # This confirms an answer the child already walked away from: it was
+                # asked for, then abandoned before the server said it existed, so the
+                # CANCEL was rejected as "not active". Now it is active — cancel it
+                # for real, and do not let this event un-mute it on the way past.
+                self._cancelled_unconfirmed = False
+                self._responding = True
+                self._suppress = True
+                await self._cancel_response()
+                return
             if self._quiet or self._asleep:
+                self._responding = True  # it exists now: the CANCEL will be accepted
                 await self._cancel_response()
                 self._suppress = True
                 return
@@ -187,9 +198,12 @@ class RealtimeEventsMixin:
             self._suppress = True
             self._quiet = False
             self._speech_started_at = time.monotonic()
-            self._fast_requested = False
-            if self._responding:
+            if self._responding or self._fast_requested:
+                # The fast path may have asked for an answer that the server has not
+                # confirmed yet. Left alone it is created after this barge-in and
+                # spoken over the turn the child has just started.
                 await self._cancel_response()
+            self._fast_requested = False
             if self.on_speech_started:
                 _safe_cb(self.on_speech_started)
             return
@@ -262,6 +276,9 @@ class RealtimeEventsMixin:
                 # Believe it and wait for its response.done, rather than firing
                 # requests it will keep rejecting while the child hears nothing.
                 self._responding = True
+                # Our request was refused, so no response.created is coming for it.
+                # A note left standing here would silence the next real answer.
+                self._cancelled_unconfirmed = False
                 logger.info("Server still has a response in flight; waiting for it")
                 return
             logger.error("Azure Realtime error event: %s", json.dumps(err))
@@ -286,7 +303,14 @@ class RealtimeEventsMixin:
         The server will not accept a new response while it believes one is still
         streaming, and a cancelled response never emits ``response.done``, so the
         flag has to be cleared here or the next turn would stay silent.
+
+        Cancelling an answer that has been asked for but not yet confirmed is
+        remembered: the server rejects that CANCEL and creates the answer anyway,
+        so ``response.created`` has to cancel it a second time instead of treating
+        it as wanted.
         """
+        if not self._responding:
+            self._cancelled_unconfirmed = True
         self._responding = False
         await self._safe_send(rt_messages.CANCEL)
 
