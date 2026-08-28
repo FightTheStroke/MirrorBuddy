@@ -43,7 +43,12 @@ export const GET = pipe(
 
   const endpoint = cleaned('AZURE_OPENAI_REALTIME_ENDPOINT');
   const apiKey = cleaned('AZURE_OPENAI_REALTIME_API_KEY');
-  const deployment = cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT');
+  // Same preference order as the web voice session: the robot and the browser
+  // must talk to the same model, or a child hears two different tutors.
+  const deployment =
+    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT_V21') ||
+    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT_V2') ||
+    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT');
   if (!endpoint || !apiKey || !deployment) {
     return NextResponse.json(
       { error: 'Voice credentials are not configured on the server' },
@@ -56,7 +61,10 @@ export const GET = pipe(
       endpoint,
       apiKey,
       deployment,
-      apiVersion: cleaned('AZURE_OPENAI_REALTIME_API_VERSION'),
+      // Deliberately always null: an api-version switches the robot to the
+      // deprecated preview realtime protocol. The robot picks the stable GA
+      // protocol precisely when no version is set, so we never send one.
+      apiVersion: null,
     },
     { headers: NO_STORE },
   );

@@ -39,6 +39,12 @@ token as `Authorization: Bearer <token>` — the same token, and the same
 start-up when `MIRRORBUDDY_DEVICE_TOKEN` is set and holds the result **in memory
 only**. A rotation therefore reaches the robot on its next start, with no human step.
 
+`deployment` follows the same preference order as the browser voice session
+(`…_V21` → `…_V2` → base), so robot and web always speak to the same model.
+`apiVersion` is **always `null`**: the robot selects the stable GA realtime protocol
+exactly when no version is set, and sending the server's own value would silently
+push the hardware back onto the deprecated preview protocol.
+
 **Updates.** `self_update.start_background_check()` runs the existing update check on
 a daemon thread at start-up. Anything it installs takes effect at the following
 start. The check can never delay a session and can never fail into the app.
