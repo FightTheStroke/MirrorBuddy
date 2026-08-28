@@ -2367,6 +2367,7 @@ jobs:
   post-deploy-smoke:
     name: "🔬 Post-Deploy Production Smoke"
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [auto-promote-production]
     if: |
       github.event_name == 'push' &&
@@ -2384,7 +2385,15 @@ jobs:
         run: npm ci --prefer-offline --no-audit
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        timeout-minutes: 10
+        run: npx playwright install chromium
+
+      # Best-effort apt half: the runner image already ships these packages, so
+      # a stuck dpkg lock costs five minutes instead of the whole job.
+      - name: Install Playwright OS deps
+        timeout-minutes: 5
+        continue-on-error: true
+        run: npx playwright install-deps chromium
 
       - name: Smoke the live site
         run: npm run test:smoke:prod
