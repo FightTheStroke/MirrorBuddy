@@ -152,6 +152,33 @@ vercel --prod
 vercel env pull
 ```
 
+### Secrets Must Be `sensitive`, Not `encrypted`
+
+Vercel stores an environment variable either as `encrypted` (readable back by any
+project member, by the CLI and by Vercel staff tooling) or as `sensitive`
+(write-only: the value can be replaced but never read again).
+
+Following the Vercel April 2026 security incident — where an attacker reached
+environment variables that were **not** marked sensitive — every MirrorBuddy
+variable holding a credential is stored as `sensitive`. This covers API keys,
+tokens, signing and encryption keys, database and Redis connection strings,
+passwords, salts and admin cookie values. Plain configuration (endpoints, model
+deployment names, public URLs) stays `encrypted` so it remains inspectable.
+
+Convert an existing variable without changing its value:
+
+```bash
+# id from: GET /v9/projects/{projectId}/env
+curl -X PATCH -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H 'Content-Type: application/json' -d '{"type":"sensitive"}' \
+  "https://api.vercel.com/v9/projects/$PROJECT_ID/env/$ENV_ID?teamId=$TEAM_ID"
+```
+
+Consequence: `vercel env pull` writes `VAR="[SENSITIVE]"` for these variables.
+Presence checks still work; **value** checks (see the trailing-`\n` section
+below) no longer apply to secrets. The conversion is one-way — to undo it the
+value must be re-entered.
+
 ### CRITICAL: Trailing `\n` in Environment Variables
 
 **Problem**: When adding env vars via Vercel CLI, trailing newlines can corrupt values,
