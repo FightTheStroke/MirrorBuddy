@@ -70,13 +70,11 @@ class TestFastPath:
         assert len(_response_creates(client)) == 1
         assert client._fast_requested is True
 
-    async def test_a_short_utterance_is_prepared_but_not_yet_heard(self, client):
-        # This is the safe path: "zitto" lives here. The answer is now prepared
-        # straight away so the two waits overlap, but it is held silent until the
-        # transcript says the turn was not a stop word.
+    async def test_a_short_utterance_still_waits(self, client):
+        # This is the safe path: "zitto" lives here.
         await _speak(client, 0.6)
-        assert len(_response_creates(client)) == 1
-        assert client._gated is True
+        assert _response_creates(client) == []
+        assert client._fast_requested is False
 
     async def test_the_short_path_still_answers_once_the_transcript_arrives(self, client):
         await _speak(client, 0.6)
