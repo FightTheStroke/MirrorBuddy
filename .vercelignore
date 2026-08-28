@@ -13,3 +13,7 @@ test-results
 blob-report
 *.log
 .turbo
+
+# local-only agent hooks (absolute symlinks, not deployable)
+.copilot
+.claude
