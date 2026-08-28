@@ -14,9 +14,18 @@ vercel env pull "$TEMP_FILE" --environment production 2>/dev/null
 
 # Check for trailing \n in values
 ISSUES=0
+SKIPPED=0
 while IFS='=' read -r key value; do
   # Skip empty lines and comments
   [[ -z "$key" || "$key" =~ ^# ]] && continue
+
+  # Secrets are stored as sensitive: their value is never returned, so the
+  # format check below cannot see them. Count them instead of silently
+  # reporting "all good" for values we never inspected.
+  if [[ "$value" == '"[SENSITIVE]"' ]]; then
+    SKIPPED=$((SKIPPED + 1))
+    continue
+  fi
 
   # Check for literal \n at end of value
   if [[ "$value" =~ \\n\"$ ]]; then
@@ -25,6 +34,10 @@ while IFS='=' read -r key value; do
     ISSUES=$((ISSUES + 1))
   fi
 done < "$TEMP_FILE"
+
+if [ "$SKIPPED" -gt 0 ]; then
+  echo "NOTE: $SKIPPED sensitive variable(s) not inspected (values are write-only by design)."
+fi
 
 # Check required Sentry variables
 REQUIRED_VARS=("NEXT_PUBLIC_SENTRY_DSN" "SENTRY_AUTH_TOKEN" "SENTRY_ORG" "SENTRY_PROJECT")
