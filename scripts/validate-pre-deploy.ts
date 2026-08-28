@@ -141,8 +141,8 @@ function validateCriticalEnvVars(): void {
     { name: 'VAPID_PRIVATE_KEY', sensitive: true },
     { name: 'VAPID_SUBJECT', sensitive: false },
     // Rate limiting
-    { name: 'UPSTASH_REDIS_REST_URL', sensitive: false },
-    { name: 'UPSTASH_REDIS_REST_TOKEN', sensitive: true },
+    { name: 'KV_REST_API_URL', sensitive: false },
+    { name: 'KV_REST_API_TOKEN', sensitive: true },
     // Supabase
     { name: 'NEXT_PUBLIC_SUPABASE_URL', sensitive: false },
     { name: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', sensitive: false },
