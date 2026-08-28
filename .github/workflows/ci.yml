@@ -483,6 +483,25 @@ jobs:
         working-directory: robot
         run: pytest tests/ -q
 
+  # The robots install MirrorBuddy from the Hugging Face app store, not from this
+  # repository. Publishing used to be a script someone had to remember, and the
+  # store quietly fell three versions behind — children kept running old code.
+  # This publishes on every push to main and fails loudly if the store is behind.
+  robot-store:
+    name: Robot App Store
+    runs-on: ubuntu-latest
+    needs: [robot-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to the app store
+        if: env.HF_TOKEN != ''
+        run: ./robot/publish-space.sh
+      - name: Verify the robots would install this version
+        run: ./robot/publish-space.sh --check
+
   # Lane 4b: Migration Consistency
   # Conditional: skipped on PR when no prisma/ files changed
   migrations:

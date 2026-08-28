@@ -13,7 +13,6 @@ import logging
 import sys
 import threading
 import time
-from pathlib import Path
 
 from reachy_mini import ReachyMini, ReachyMiniApp
 
@@ -88,14 +87,17 @@ def run(
     _setup_logging(args.debug)
     logger.info("Starting MirrorBuddy Reachy Mini app v%s", __version__)
 
-    # Load instance .env (Azure creds + MirrorBuddy config live here on the robot).
-    if instance_path:
-        env_path = Path(instance_path) / ".env"
-        if env_path.exists():
-            from dotenv import load_dotenv
+    # Load the robot's configuration (Azure creds + MirrorBuddy settings). It is
+    # deliberately kept outside the installed package: see ``paths`` — an app
+    # update replaces that folder and used to take the credentials with it.
+    from .paths import env_file
 
-            load_dotenv(dotenv_path=str(env_path), override=True)
-            config.reload()
+    env_path = env_file(instance_path)
+    if env_path.exists():
+        from dotenv import load_dotenv
+
+        load_dotenv(dotenv_path=str(env_path), override=True)
+        config.reload()
 
     # Optional in-app settings UI (lets you pick the Maestro / enter creds).
     if settings_app is not None:
