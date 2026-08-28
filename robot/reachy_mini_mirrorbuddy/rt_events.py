@@ -28,6 +28,12 @@ logger = logging.getLogger(__name__)
 # later and cancels the response in flight.
 _FAST_PATH_MIN_SPEECH_S = 1.8
 
+# How long the robot believes the server when it says an answer is still
+# streaming. A cancelled response never reports that it ended, so without a bound
+# the robot would wait for ever and answer nothing again until it was restarted.
+# Longer than any real answer, short enough that a child does not give up.
+_RESPONSE_STUCK_S = 20.0
+
 # How long a deliberate rest lasts before ordinary conversation resumes. Long
 # enough to be a real silence, short enough that a forgotten wake word costs a
 # coffee break and not an adult with an SSH session.
@@ -285,6 +291,28 @@ class RealtimeEventsMixin:
             return
 
         logger.debug("Unhandled event: %s", etype)
+
+    @property
+    def _responding(self) -> bool:
+        return getattr(self, "_responding_flag", False)
+
+    @_responding.setter
+    def _responding(self, value: bool) -> None:
+        """Remember when an answer started, so a wait for it can be given up on."""
+        if value and not getattr(self, "_responding_flag", False):
+            self._responding_since = time.monotonic()
+        self._responding_flag = bool(value)
+
+    def _responding_is_stale(self) -> bool:
+        """True when the answer we are waiting for cannot still be arriving.
+
+        A cancelled response is never reported as finished, so believing the
+        server for ever leaves the child talking to a robot that has quietly
+        stopped answering. Past the bound the next question wins.
+        """
+        if not self._responding:
+            return False
+        return (time.monotonic() - getattr(self, "_responding_since", 0.0)) > _RESPONSE_STUCK_S
 
     def _rest_expired(self) -> bool:
         """True when the robot has been resting longer than the silence was worth.
