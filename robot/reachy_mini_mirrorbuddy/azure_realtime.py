@@ -87,9 +87,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
         self._partial_user = ""  # transcript of the turn being spoken, read for stop words
         self._stopped_on_partial = False  # a stop word already fired for this turn
-        self._gated = False  # answer prepared before the transcript cleared the turn
-        self._gated_audio: list[bytes] = []  # its audio, held until the turn is cleared
-        self._cancelled_unconfirmed = False  # an answer was abandoned before it existed
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
@@ -240,10 +237,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         "in flight"; carrying that into the new session would mute it entirely.
         ``_asleep`` / ``_quiet`` are deliberately preserved: if the child said
         "zitto", coming back talking is exactly the insistence to avoid.
-
-        A held answer dies with the session that was generating it: its buffered
-        audio belongs to a response the new session knows nothing about, so it is
-        dropped rather than carried across and played into the wrong conversation.
         """
         self._ws = None
         self._suppress = False
@@ -251,9 +244,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._fast_requested = False
         self._stopped_on_partial = False
         self._partial_user = ""
-        self._gated = False
-        self._gated_audio = []
-        self._cancelled_unconfirmed = False
 
     async def _safe_send(self, msg: str) -> None:
         ws = self._ws
@@ -305,15 +295,8 @@ class AzureRealtimeClient(RealtimeEventsMixin):
 
         The server rejects a second response while one is streaming
         (``conversation_already_has_active_response``), so a turn that is already
-        being answered is left alone — unless that answer has been "streaming"
-        for longer than any answer can last, which means it was cancelled and its
-        end will never be announced. Then the child's question wins.
+        being answered is left alone.
         """
-        if self._meditating:
+        if self._responding or self._meditating:
             return
-        if self._responding:
-            if not self._responding_is_stale():
-                return
-            logger.warning("Answer never reported as finished; answering anyway")
-            self._responding = False
         await self._safe_send(json.dumps(rt_messages.response_create(instructions)))
