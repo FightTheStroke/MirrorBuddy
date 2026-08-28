@@ -231,6 +231,21 @@ Useful optional:
 - `MIRRORBUDDY_STUDENT_NAME` — personalises the greeting (e.g. `Mario`)
 - `MIRRORBUDDY_DEVICE_TOKEN` — set automatically when you pair (see _Pair with the
   child's MirrorBuddy profile_ above); overrides the fields above with the live profile
+- `MIRRORBUDDY_AUTO_UPDATE` — `true` by default: the robot takes published updates on
+  its own, in the background, and runs them from the next start. Set to `0` to pin it.
+
+### Credentials and updates take care of themselves
+
+Once the robot is paired, nobody has to touch the hardware again:
+
+- **Voice credentials** are fetched from MirrorBuddy at every start
+  (`GET /api/devices/realtime-credentials`, authenticated with the device token). Rotate
+  the Azure key on the server and the robot picks it up on its next start. The key is
+  never written to the robot's disk. The local `AZURE_OPENAI_REALTIME_*` values remain a
+  fallback for an unpaired robot or an unreachable backend — a child is never left with a
+  mute robot because a network call failed.
+- **App updates** are checked in the background at every start and applied silently; the
+  new version runs from the following start. The check never delays a session.
 
 ### Publishing to the Reachy Mini app store
 

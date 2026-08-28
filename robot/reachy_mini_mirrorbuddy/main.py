@@ -108,6 +108,26 @@ def run(
         except Exception as e:
             logger.warning("Failed to mount settings UI: %s", e)
 
+    # Take any published update in the background: nobody in a home will open a
+    # dashboard to press Update, and the check must never delay a child's session.
+    # What lands here takes effect the next time MirrorBuddy starts.
+    from .self_update import start_background_check
+
+    start_background_check(enabled=config.AUTO_UPDATE)
+
+    # A paired robot gets its voice credentials from MirrorBuddy at run time. That
+    # way a key rotation on the server reaches the robot on its next start, nobody
+    # has to walk over and paste a key, and no long-lived key sits on the robot's
+    # disk. Best-effort: on failure we fall back to whatever the .env holds.
+    if config.DEVICE_TOKEN:
+        from .device import apply_realtime_credentials, fetch_realtime_credentials
+
+        creds = fetch_realtime_credentials(config.API_BASE, config.DEVICE_TOKEN)
+        if creds is not None:
+            apply_realtime_credentials(config, creds)
+        else:
+            logger.info("Using locally configured voice credentials.")
+
     # Wait for required configuration (Azure creds) if a settings UI is available.
     # The wait MUST stay interruptible: the daemon asks the app to stop by setting
     # app_stop_event, and an app that ignores it hangs in "stopping" forever — which
