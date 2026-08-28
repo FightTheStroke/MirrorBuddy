@@ -133,10 +133,7 @@ export default function InfrastructurePage() {
               ) : (
                 <NotConfiguredCard
                   serviceName="Redis"
-                  envVars={[
-                    { name: 'UPSTASH_REDIS_REST_URL' },
-                    { name: 'UPSTASH_REDIS_REST_TOKEN' },
-                  ]}
+                  envVars={[{ name: 'KV_REST_API_URL' }, { name: 'KV_REST_API_TOKEN' }]}
                 />
               )}
             </CardContent>

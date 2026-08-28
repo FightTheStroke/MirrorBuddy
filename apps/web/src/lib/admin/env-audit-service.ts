@@ -110,10 +110,7 @@ export function getEnvAudit(): ServiceEnvAudit[] {
     {
       service: 'Redis/KV',
       configured: false,
-      vars: [
-        checkEnvVar('UPSTASH_REDIS_REST_URL', true),
-        checkEnvVar('UPSTASH_REDIS_REST_TOKEN', true),
-      ],
+      vars: [checkEnvVar('KV_REST_API_URL', true), checkEnvVar('KV_REST_API_TOKEN', true)],
     },
 
     // Vercel (deployment/health check)
