@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { isUndeliveredRequest } from './undelivered-request';
 import type { Theme, AIProvider } from '@/types';
 import { csrfFetch } from '@/lib/auth';
 import {
@@ -268,6 +269,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
 
       set({ lastSyncedAt: new Date(), pendingSync: false });
     } catch (error) {
+      if (isUndeliveredRequest(error)) return;
       logger.error('Settings load failed', { error: String(error) });
     }
   },
