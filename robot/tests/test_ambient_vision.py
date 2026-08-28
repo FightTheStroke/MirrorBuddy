@@ -50,6 +50,18 @@ def test_rate_limited_between_turns(monkeypatch):
     assert len(client.sent) == 1
 
 
+def test_shares_the_first_frame_on_a_freshly_booted_robot(monkeypatch):
+    # The clock we rate-limit on counts from boot, and "never sent yet" used to be
+    # written as zero on that clock. On a robot switched on a moment ago that reads
+    # as "sent just now", so the child got no ambient frame for the first interval.
+    clock = type("T", (), {"monotonic": staticmethod(lambda: 3.0)})
+    monkeypatch.setattr(ambient_vision, "time", clock)
+    v = _vision(monkeypatch)
+    v.interval_s = 60.0
+
+    assert v.attach(_Client()) is True
+
+
 def test_skips_stale_frames(monkeypatch):
     v = _vision(monkeypatch)
     v._frame_at = ambient_vision.time.monotonic() - (ambient_vision._STALE_AFTER_S + 1)

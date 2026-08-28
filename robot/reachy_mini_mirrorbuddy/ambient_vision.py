@@ -43,7 +43,9 @@ class AmbientVision:
         self._lock = threading.Lock()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
-        self._last_sent = 0.0
+        # Not "zero seconds after boot" — never. The clock below counts from boot,
+        # so a real zero would read as "just sent" on a robot switched on a moment ago.
+        self._last_sent = float("-inf")
 
     def start(self) -> None:
         if self._thread is not None:
