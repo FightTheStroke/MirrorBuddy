@@ -14,6 +14,7 @@ import logging
 from pathlib import Path
 
 from .config import config
+from .paths import env_file
 from .settings_page import PAGE
 
 # Imported at module level on purpose. With ``from __future__ import annotations``
@@ -52,7 +53,7 @@ _EDITABLE_KEYS = (
 
 def mount_settings_routes(app, instance_path: str | None) -> None:
     """Attach the settings routes to the app's FastAPI ``settings_app``."""
-    env_path = Path(instance_path) / ".env" if instance_path else Path(".env")
+    env_path = env_file(instance_path)
 
     @app.get("/", response_class=HTMLResponse)
     async def index() -> str:  # noqa: D401 - route

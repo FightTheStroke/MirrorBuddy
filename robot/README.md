@@ -62,26 +62,26 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 
 ## Modules
 
-| File                    | Responsibility                                                                                     |
-| ----------------------- | -------------------------------------------------------------------------------------------------- |
-| `config.py`             | Environment / `.env` configuration + WS URL (GA vs Preview)                                        |
-| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API                                               |
-| `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                               |
-| `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                                 |
-| `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                                   |
-| `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                                    |
-| `rt_messages.py`        | Pure builders for the realtime protocol messages                                                   |
-| `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                                        |
-| `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                   |
-| `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                         |
-| `body_actions.py`       | Named, clamped gestures any Maestro can play (antennas, peekaboo, nod, bow)                        |
-| `body_control.py`       | Gesture dispatch + sustained postures, mixed into `Movements`                                      |
-| `people.py`             | Who is in the room right now — session-only, never written to disk                                 |
-| `tools.py`              | Voice tool schemas (professors, homework, friend/study, who is here, meditation, body) + resolver  |
-| `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                        |
-| `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                                        |
-| `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                                       |
-| `main.py`               | App entry point wiring everything together                                                         |
+| File                    | Responsibility                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `config.py`             | Environment / `.env` configuration + WS URL (GA vs Preview)                                       |
+| `mirrorbuddy_client.py` | Fetch + pick a Maestro from MirrorBuddy's public API                                              |
+| `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                              |
+| `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                                |
+| `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                                  |
+| `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                                   |
+| `rt_messages.py`        | Pure builders for the realtime protocol messages                                                  |
+| `audio_io.py`           | Robot mic ↔ speaker bridge (resampling, playback, barge-in)                                       |
+| `movements.py`          | Expressive full-body motion + daemon face-follow while listening                                  |
+| `camera.py`             | On-demand JPEG capture + daemon head/face tracking helpers                                        |
+| `body_actions.py`       | Named, clamped gestures any Maestro can play (antennas, peekaboo, nod, bow)                       |
+| `body_control.py`       | Gesture dispatch + sustained postures, mixed into `Movements`                                     |
+| `people.py`             | Who is in the room right now — session-only, never written to disk                                |
+| `tools.py`              | Voice tool schemas (professors, homework, friend/study, who is here, meditation, body) + resolver |
+| `session_flow.py`       | Pure stop / end / wake decisions for the live loop (accessibility-critical)                       |
+| `controller.py`         | Tool dispatch, live professor switching, vision, sleep/wake                                       |
+| `settings_ui.py`        | Minimal in-app settings page (creds + Maestro/DSA selection)                                      |
+| `main.py`               | App entry point wiring everything together                                                        |
 
 ## Everything by voice (no screen)
 
@@ -235,23 +235,70 @@ Useful optional:
 ### Publishing to the Reachy Mini app store
 
 No secrets are baked into the package — the Azure credentials and the device token live
-only in the **instance `.env`**, entered by the user on the in-app settings page. So the
-package can be published to the Hugging Face Hub as-is: it self-declares under the
-`reachy_mini_apps` entry-point group and carries the app-card front-matter at the top of
-this README (title, emoji, tags, thumbnail).
+only in the robot's own config file (see _Where the configuration lives_), entered by the
+user on the in-app settings page. So the package can be published to the Hugging Face Hub
+as-is: it self-declares under the `reachy_mini_apps` entry-point group and carries the
+app-card front-matter at the top of this README (title, emoji, tags, thumbnail).
+
+**CI publishes it.** Every push to `main` runs the `Robot App Store` job, which publishes
+the current tree and then verifies that the store really serves this version. Publishing
+by hand was the reason the store once fell three releases behind the repository while
+everyone assumed robots were current. The job needs an `HF_TOKEN` repository secret with
+write access to the Space; without it the job fails as soon as the store drifts, which is
+the intended loud signal. To publish manually:
+
+```bash
+./robot/publish-space.sh          # publish this working tree
+./robot/publish-space.sh --check  # only compare, change nothing
+```
 
 ## Install on the robot
 
+**Install it from the app store, not from a folder.** Both work, but only a
+store install is ever offered an update: an app installed from a local path has no
+Space behind it, so the daemon skips it in `check-updates` for ever. A robot in a
+family's home that never updates is the failure mode this project cannot afford.
+
+On the robot dashboard: _Apps → MirrorBuddy → Install_. Or over the daemon API:
+
+```bash
+curl -X POST http://<robot>:8000/api/apps/install -H 'Content-Type: application/json' \
+  -d '{"name":"reachy_mini_mirrorbuddy","source_kind":"hf_space",
+       "url":"https://huggingface.co/spaces/Roberdan/mirrorbuddy",
+       "extra":{"id":"Roberdan/mirrorbuddy"}}'
+```
+
+For development on the unit, a local install still works:
+
 ```bash
 # on the Reachy Mini (ssh pollen@<robot-ip>)
-uv pip install --python /path/to/mini_daemon /path/to/robot   # installs this package
-# then set the instance .env and start it from the Reachy Mini dashboard,
-# or run directly:
+uv pip install --python /path/to/mini_daemon /path/to/robot
 python -m reachy_mini_mirrorbuddy.main --debug
 ```
 
 The app registers under the `reachy_mini_apps` entry-point group as
 `reachy_mini_mirrorbuddy`, so the Reachy Mini daemon discovers it automatically.
+
+### Where the configuration lives
+
+`~/.config/mirrorbuddy/.env` on the robot — **outside** the installed package, on
+purpose. It used to live inside the package folder, which an app update replaces:
+every update therefore erased the Azure key and the pairing token, and the robot
+came back mute until an adult retyped them. A robot configured before this change
+is migrated automatically the first time the new version starts.
+
+Override the location with `MIRRORBUDDY_CONFIG_DIR`.
+
+### Checking a robot in the field
+
+```bash
+./robot/tools/robot-doctor.sh <robot-host>
+```
+
+Answers in one screen: is it running, can it still see the app store, is it
+tracked for updates, and which version the store would give it. It exists because
+the previous failure was silent — the robot worked, it had simply stopped being
+updated months earlier.
 
 ## Roadmap
 

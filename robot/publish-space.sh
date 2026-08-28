@@ -14,10 +14,40 @@
 
 set -euo pipefail
 
+# --check compares the published Space with this working tree and changes nothing.
+# CI uses it to fail loudly when the app store is serving an older MirrorBuddy than
+# the one we released, which is how the store silently fell three versions behind.
+CHECK_ONLY=0
+if [ "${1:-}" = "--check" ]; then
+  CHECK_ONLY=1
+  shift
+fi
+
 SPACE="${1:-Roberdan/mirrorbuddy}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
+
+local_version() { sed -n 's/^version = "\(.*\)"/\1/p' "$HERE/pyproject.toml" | head -1; }
+published_version() {
+  curl -sf -m 30 "https://huggingface.co/spaces/$SPACE/raw/main/pyproject.toml" 2>/dev/null |
+    sed -n 's/^version = "\(.*\)"/\1/p' | head -1
+}
+
+if [ "$CHECK_ONLY" = "1" ]; then
+  HAVE="$(local_version)"
+  THERE="$(published_version || true)"
+  echo "  repository: ${HAVE:-unknown}"
+  echo "  app store:  ${THERE:-not published}"
+  if [ "$HAVE" = "$THERE" ]; then
+    echo "✓ The app store is serving the version in this repository."
+    exit 0
+  fi
+  echo "✗ The robots would install ${THERE:-nothing}, not $HAVE." >&2
+  echo "  Publish with: HF_TOKEN=<write token> ./robot/publish-space.sh" >&2
+  echo "  In CI this means the HF_TOKEN secret is missing or the publish step failed." >&2
+  exit 1
+fi
 
 echo "→ Staging the Space in $STAGE"
 cp -R "$HERE/reachy_mini_mirrorbuddy" "$STAGE/"
@@ -41,8 +71,20 @@ cp "$HERE/space/README.md" "$STAGE/README.md"
 echo "→ Pushing to https://huggingface.co/spaces/$SPACE"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$STAGE" "$WORK"' EXIT
-git clone -q "https://huggingface.co/spaces/$SPACE" "$WORK/repo"
+# On a laptop the stored Hugging Face credential is used; in CI there is no
+# interactive login, so HF_TOKEN is injected. It is kept out of the log and out of
+# the committed remote by never echoing the URL and by clearing the remote after.
+REMOTE="https://huggingface.co/spaces/$SPACE"
+if [ -n "${HF_TOKEN:-}" ]; then
+  REMOTE="https://user:${HF_TOKEN}@huggingface.co/spaces/$SPACE"
+fi
+git clone -q "$REMOTE" "$WORK/repo" 2>/dev/null || {
+  echo "✗ Could not reach the Space. Check HF_TOKEN, or run: hf auth login" >&2
+  exit 1
+}
 cd "$WORK/repo"
+git config user.email "bot@mirrorbuddy.org"
+git config user.name "MirrorBuddy release"
 # Mirror the staged tree exactly, so a file removed here disappears from the store.
 find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 cp -R "$STAGE"/. .
@@ -52,7 +94,11 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git commit -q -m "Publish MirrorBuddy for Reachy Mini"
-git push -q origin HEAD
+git push -q origin HEAD 2>/dev/null || {
+  echo "✗ Push refused. The token needs write access to $SPACE." >&2
+  exit 1
+}
+git remote set-url origin "https://huggingface.co/spaces/$SPACE"
 
 echo "✓ Published: https://huggingface.co/spaces/$SPACE"
 echo "  It appears in the robot's app store under the reachy_mini tag."
