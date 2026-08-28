@@ -254,6 +254,13 @@ onComplete: (fullResponse) => {
 | Memory usage             | Full response buffered | Incremental       |
 | Network requests         | 1                      | 1 (same)          |
 
+> **Correction (2026-02).** The "~100-200ms" figure above was never achievable and
+> should be read as the SSE connection opening, not as the first word of the answer.
+> A time-to-first-token benchmark against the production Azure deployments measured
+> ~900-1000 ms for the model's first token alone, before any application work.
+> Realistic first visible content is ~1.2-1.6 s. See
+> `docs/performance/latency-remediation-2026-02.md`.
+
 ### Rollback
 
 If issues arise:

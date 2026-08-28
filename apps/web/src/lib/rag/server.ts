@@ -59,6 +59,8 @@ export {
 } from './hybrid-retrieval';
 
 // Server-only exports - privacy-aware embedding (uses @/lib/privacy)
+export { isEmbeddingConfigured } from './embedding-service';
+
 export {
   generatePrivacyAwareEmbedding,
   generatePrivacyAwareEmbeddings,

@@ -36,6 +36,12 @@ import { recordContentFiltered } from '@/lib/safety/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import { applyAgeGatePrompt } from '@/lib/conversation/age-gate-injector';
+import {
+  compressConversationHistory,
+  type ConversationMessage,
+} from '@/lib/conversation/conversation-window';
+import { getTierMemoryLimits } from '@/lib/conversation/tier-memory-config';
+import { RequestTimeline } from './timings';
 
 import type { ChatRequest } from '../types';
 import {
@@ -70,6 +76,9 @@ export const POST = pipe(
   }
 
   const log = getRequestLogger(request);
+  // Until now the only recorded figure was how long a whole answer took. What
+  // students describe is the wait before the first word, which nothing measured.
+  const timeline = new RequestTimeline();
 
   const clientId = getClientIdentifier(request);
   const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);
@@ -119,10 +128,27 @@ export const POST = pipe(
       return response;
     }
     const userId = coppaCheck.userId;
+    timeline.mark('auth');
 
-    const { settings: userSettings, providerPreference } = userId
-      ? await loadUserSettings(userId)
-      : { settings: null, providerPreference: undefined };
+    // Settings, tier model and A/B override are independent reads that used to
+    // run one after another. Serialising them added two database round trips of
+    // dead time before the student's first token.
+    const [{ settings: userSettings, providerPreference }, tierModel, abModelOverride, userTier] =
+      await Promise.all([
+        userId
+          ? loadUserSettings(userId)
+          : Promise.resolve({ settings: null, providerPreference: undefined }),
+        tierService.getModelForUserFeature(userId ?? null, 'chat'),
+        getABModelOverride(userId, conversationId),
+        userId
+          ? tierService
+              .getEffectiveTier(userId)
+              .then((t) => t.code)
+              .catch(() => 'base')
+          : Promise.resolve('trial'),
+      ]);
+
+    timeline.mark('settings');
 
     // Budget check
     if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
@@ -139,8 +165,6 @@ export const POST = pipe(
     }
 
     // Tier-based model selection for streaming (ADR 0073)
-    const tierModel = await tierService.getModelForUserFeature(userId ?? null, 'chat');
-    const abModelOverride = await getABModelOverride(userId, conversationId);
     const selectedModel = abModelOverride ?? tierModel;
     const deploymentName = getDeploymentForModel(selectedModel);
 
@@ -185,6 +209,7 @@ export const POST = pipe(
     // T1.10 (D-10): adapt language/topic guidance to the student's age when
     // a real profile age is on record, mirroring the non-streaming route.
     enhancedSystemPrompt = await applyAgeGatePrompt(enhancedSystemPrompt, userId);
+    timeline.mark('context');
 
     // Safety filter on input
     const lastUserMessage = messages.filter((m) => m.role === 'user').pop();
@@ -284,6 +309,20 @@ export const POST = pipe(
     // Create streaming response with mid-stream budget tracking (F-13)
     const sanitizer = new StreamingSanitizer();
     const encoder = new TextEncoder();
+    // The client sends the whole conversation on every turn, so a long session
+    // kept growing the payload the model had to read before answering - the
+    // "it gets slower the longer I use it" complaint. The non-streaming route
+    // already trimmed old turns into a summary (ADR 0034); the streaming route
+    // did not. Same tier-aware window, applied here too. This runs after the
+    // safety gates so the Unicode-normalised content is what the model receives.
+    timeline.mark('safety');
+
+    const tierLimits = getTierMemoryLimits(userTier as 'trial' | 'base' | 'pro');
+    const compressedMessages = compressConversationHistory(
+      messages.map((m) => ({ role: m.role, content: m.content })) as ConversationMessage[],
+      { maxTokens: tierLimits.conversationWindowTokens },
+    );
+
     const budgetTracker =
       userId && userSettings
         ? new MidStreamBudgetTracker(userSettings.budgetLimit, userSettings.totalSpent, userId)
@@ -302,13 +341,18 @@ export const POST = pipe(
         try {
           const generator = azureStreamingCompletion(
             config,
-            messages.map((m) => ({ role: m.role, content: m.content })),
+            compressedMessages,
             enhancedSystemPrompt,
             { signal: request.signal },
           );
 
           for await (const chunk of generator) {
             if (chunk.type === 'content' && chunk.content) {
+              timeline.reportFirstToken({
+                maestroId,
+                model: selectedModel,
+                historyMessages: compressedMessages.length,
+              });
               // Mid-stream budget check (F-13)
               if (budgetTracker && budgetTracker.trackChunk(chunk.content)) {
                 budgetExceededMidStream = true;

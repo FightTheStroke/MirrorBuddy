@@ -5,11 +5,15 @@
  * @see ADR 0034 for streaming architecture
  */
 
-import type { Message } from "./types";
-import type { CharacterInfo } from "../../utils/character-utils";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import type { ChatUsage } from "./message-handler";
+import type { Message } from './types';
+import type { CharacterInfo } from '../../utils/character-utils';
+import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth';
+import type { ChatUsage } from './message-handler';
+
+// Re-exported so existing importers keep working; the detection itself lives in
+// tool-intent.ts to keep this file within the repo's file-size budget.
+export { messageRequiresTool, TOOL_KEYWORDS } from './tool-intent';
 
 /** Streaming result with REAL usage data from API */
 export interface StreamingResult {
@@ -27,63 +31,10 @@ export interface StreamingMessageOptions {
   character: CharacterInfo;
   characterId: string;
   onChunk: (chunk: string, accumulated: string) => void;
-  onComplete: (
-    fullResponse: string,
-    usage: ChatUsage | null,
-    latencyMs: number,
-  ) => void;
+  onComplete: (fullResponse: string, usage: ChatUsage | null, latencyMs: number) => void;
   onError: (error: Error) => void;
   signal?: AbortSignal;
-  language?: "it" | "en" | "es" | "fr" | "de";
-}
-
-/**
- * Tool-triggering keywords in Italian
- * If message contains these, skip streaming and use /api/chat for tool support
- */
-const TOOL_KEYWORDS = [
-  // Mindmap
-  "mappa",
-  "mappe",
-  "schema",
-  "schemi",
-  "diagramma",
-  // Quiz
-  "quiz",
-  "domande",
-  "verifica",
-  "test",
-  "interroga",
-  // Flashcard
-  "flashcard",
-  "flash card",
-  "carte",
-  "schede",
-  // Summary
-  "riassunto",
-  "riassumi",
-  "sintesi",
-  "sintetizza",
-  // Demo
-  "demo",
-  "dimostra",
-  "esempio",
-  "simulazione",
-  // General tool requests
-  "crea",
-  "genera",
-  "prepara",
-  "fammi",
-  "fai",
-];
-
-/**
- * Check if message likely requires a tool
- * Returns true if we should skip streaming and use non-streaming endpoint
- */
-export function messageRequiresTool(input: string): boolean {
-  const lowerInput = input.toLowerCase();
-  return TOOL_KEYWORDS.some((keyword) => lowerInput.includes(keyword));
+  language?: 'it' | 'en' | 'es' | 'fr' | 'de';
 }
 
 /**
@@ -92,9 +43,9 @@ export function messageRequiresTool(input: string): boolean {
  */
 export async function isStreamingAvailable(): Promise<boolean> {
   try {
-    const response = await fetch("/api/chat/stream", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/chat/stream', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
     });
 
     if (!response.ok) return false;
@@ -111,9 +62,7 @@ export async function isStreamingAvailable(): Promise<boolean> {
  * Returns true if streaming was used, false if fallback was needed
  * Extracts REAL usage data from SSE stream for metrics
  */
-export async function sendStreamingMessage(
-  options: StreamingMessageOptions,
-): Promise<boolean> {
+export async function sendStreamingMessage(options: StreamingMessageOptions): Promise<boolean> {
   const {
     input,
     messages,
@@ -123,19 +72,19 @@ export async function sendStreamingMessage(
     onComplete,
     onError,
     signal,
-    language = "it",
+    language = 'it',
   } = options;
 
   const startTime = performance.now();
   let streamUsage: ChatUsage | null = null;
 
   try {
-    const response = await csrfFetch("/api/chat/stream", {
-      method: "POST",
+    const response = await csrfFetch('/api/chat/stream', {
+      method: 'POST',
       body: JSON.stringify({
         messages: [
           ...messages.map((m) => ({ role: m.role, content: m.content })),
-          { role: "user", content: input },
+          { role: 'user', content: input },
         ],
         systemPrompt: character.systemPrompt,
         maestroId: characterId,
@@ -149,24 +98,24 @@ export async function sendStreamingMessage(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       if (errorData.fallback) {
-        logger.debug("[Streaming] Not available, needs fallback");
+        logger.debug('[Streaming] Not available, needs fallback');
         return false; // Signal to use fallback
       }
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
 
     // Verify SSE content type
-    const contentType = response.headers.get("Content-Type");
-    if (!contentType?.includes("text/event-stream")) {
-      logger.debug("[Streaming] Not SSE response, needs fallback");
+    const contentType = response.headers.get('Content-Type');
+    if (!contentType?.includes('text/event-stream')) {
+      logger.debug('[Streaming] Not SSE response, needs fallback');
       return false;
     }
 
     // Process SSE stream
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
-    let accumulated = "";
-    let buffer = "";
+    let accumulated = '';
+    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
@@ -176,16 +125,16 @@ export async function sendStreamingMessage(
       buffer += decoder.decode(value, { stream: true });
 
       // Process complete lines
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
 
       for (const line of lines) {
         const trimmedLine = line.trim();
-        if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
+        if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
 
         const data = trimmedLine.slice(6);
 
-        if (data === "[DONE]") {
+        if (data === '[DONE]') {
           const latencyMs = Math.round(performance.now() - startTime);
           onComplete(accumulated, streamUsage, latencyMs);
           return true;
@@ -214,11 +163,11 @@ export async function sendStreamingMessage(
 
           // Log content filter but continue
           if (parsed.filtered) {
-            logger.warn("[Streaming] Content filtered by Azure");
+            logger.warn('[Streaming] Content filtered by Azure');
           }
         } catch (parseError) {
           // Ignore parse errors for individual chunks
-          if ((parseError as Error).message.includes("filtered")) {
+          if ((parseError as Error).message.includes('filtered')) {
             throw parseError;
           }
         }
@@ -230,12 +179,12 @@ export async function sendStreamingMessage(
     onComplete(accumulated, streamUsage, latencyMs);
     return true;
   } catch (error) {
-    if ((error as Error).name === "AbortError") {
-      logger.debug("[Streaming] Aborted by user");
+    if ((error as Error).name === 'AbortError') {
+      logger.debug('[Streaming] Aborted by user');
       return true; // Abort is handled, don't fallback
     }
 
-    logger.error("[Streaming] Error", { error: String(error) });
+    logger.error('[Streaming] Error', { error: String(error) });
     onError(error as Error);
     return true; // Error is handled, don't fallback
   }

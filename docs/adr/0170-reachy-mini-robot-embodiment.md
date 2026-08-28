@@ -166,3 +166,24 @@ distressed child is always obeyed instantly.
    `lastSeenAt`?
 3. Publishing to the Hugging Face Reachy Mini app store — packaging cadence and
    who owns the listing.
+
+## Update (2026-02) — speculative response with a playback gate
+
+The guarantee that a stop word produces zero spoken reply is unchanged, but it is
+now enforced at playback rather than at request time.
+
+Previously an utterance shorter than `_FAST_PATH_MIN_SPEECH_S` (1.8 s) blocked the
+model request until the transcript arrived, because only the transcript can tell a
+question from "basta". The model is now asked immediately on `speech_stopped`, and
+for short utterances the output audio is **held** instead of played. When the
+transcript resolves the turn: `SPEAK` releases the buffer in order; `IGNORE`,
+hushed and `WAKE` discard it and cancel the in-flight response; `END` clears an
+already-cancelled gate; `REST` and `PAUSE` clear it via the stop path. A new turn
+clears the gate.
+
+Net latency becomes `max(model_start, transcript)` instead of
+`transcript + model_start`. Nothing is ever heard before the transcript has
+cleared the turn. Pinned by `robot/tests/test_speculative_response.py`.
+
+Caveat: the robot test suite runs in no CI workflow, so this guarantee is
+currently protected only by local test runs.
