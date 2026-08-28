@@ -13,6 +13,13 @@
 import { test, expect } from './fixtures';
 import type { APIRequestContext } from '@playwright/test';
 
+/**
+ * How long a child may wait between pressing the microphone and the Maestro
+ * being able to hear them. A warm function answers in well under a second;
+ * the budget leaves room for one cold start without hiding a real slowdown.
+ */
+const VOICE_START_BUDGET_MS = 15_000;
+
 async function obtainCsrfToken(request: APIRequestContext): Promise<string | undefined> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const response = await request.get('/api/session');
@@ -35,10 +42,17 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     const csrfToken = await obtainCsrfToken(request);
     expect(csrfToken, 'no CSRF token was issued').toBeTruthy();
 
+    const startedAt = Date.now();
     const res = await request.post('/api/realtime/ephemeral-token', {
       headers: { 'X-CSRF-Token': csrfToken },
       data: {},
+      // A function that has not been used for hours takes far longer than a warm
+      // one — 12.7s was measured on 28 August against 0.6s once warm. Allow the
+      // slow case through and judge it on the measurement below, so a cold start
+      // reads as a slow start rather than an unexplained timeout.
+      timeout: 30_000,
     });
+    const elapsedMs = Date.now() - startedAt;
 
     expect(
       res.status(),
@@ -52,6 +66,12 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     expect(body.expiresAt * 1000, 'the session token is already expired').toBeGreaterThan(
       Date.now(),
     );
+
+    expect(
+      elapsedMs,
+      `opening a voice session took ${(elapsedMs / 1000).toFixed(1)}s. ` +
+        'A child pressing the microphone waits this long before the Maestro can hear them.',
+    ).toBeLessThan(VOICE_START_BUDGET_MS);
   });
 
   test('Realtime token endpoint returns transport config', async ({ request }) => {

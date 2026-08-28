@@ -2350,6 +2350,61 @@ jobs:
   # Runs only after the website is actually promoted, so a robot is never sent
   # code that the web release refused.
   # ============================================================================
+  # ============================================================================
+  # POST-DEPLOY PRODUCTION SMOKE — does the site actually work for a child?
+  # ============================================================================
+  # Until 28 August 2026 nothing ran against production after a promotion. The
+  # suite existed, and the credentials for its authenticated half had been in
+  # GitHub secrets since 2 August, but no workflow ever passed them in — so the
+  # 94 tests covering the signed-in experience, the ones that walk the screens
+  # where children actually meet the Maestri, never ran anywhere. A voice outage
+  # lasted a full day with every check green.
+  #
+  # This job runs the suite against the live site once the promotion succeeds,
+  # with those credentials supplied, so a broken production fails loudly here
+  # rather than in a child's session.
+  # ============================================================================
+  post-deploy-smoke:
+    name: "🔬 Post-Deploy Production Smoke"
+    runs-on: ubuntu-latest
+    needs: [auto-promote-production]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.auto-promote-production.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke the live site
+        run: npm run test:smoke:prod
+        env:
+          PROD_TEST_USER_ID: ${{ secrets.PROD_TEST_USER_ID }}
+          PROD_TEST_USER_COOKIE_VALUE: ${{ secrets.PROD_TEST_USER_COOKIE_VALUE }}
+          PROD_TEST_USER_EMAIL: ${{ secrets.PROD_TEST_USER_EMAIL }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+          ADMIN_READONLY_COOKIE_VALUE: ${{ secrets.ADMIN_READONLY_COOKIE_VALUE }}
+
+      - name: Keep the evidence when the live site misbehaves
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-smoke-report
+          path: |
+            apps/web/test-results/
+            playwright-report/
+          retention-days: 7
+
   robot-store:
     name: "🤖 Publish to Robot App Store"
     runs-on: ubuntu-latest
