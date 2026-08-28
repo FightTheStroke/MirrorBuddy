@@ -123,6 +123,8 @@ Thor gates: per-task (1-4, 8, 9) + per-wave (all 9 + build).
 
 - Domain rules (path-matched, auto-load): `.github/instructions/` — cookies, tier, testing,
   compliance, accessibility, admin, proxy, i18n, e2e.
+- Claude rules (auto-load): `.claude/rules/` — accessibility, auth-api, ci-verification,
+  compliance, e2e-testing, i18n, proxy-architecture, tier.
 - Agent personas: `.github/agents/` · NightMaintenance runbook:
   `.github/agents/night-maintenance.agent.md`.
 - On-demand docs: `@docs/claude/<name>.md`; nested `CLAUDE.md` files in subfolders
