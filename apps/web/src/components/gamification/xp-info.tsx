@@ -31,7 +31,7 @@ export function XPInfo({ className }: XPInfoProps) {
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
               {t('maestriTitle')}
             </h4>
-            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
+            <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-0.5">
               <li>
                 • {MAESTRI_XP.PER_MINUTE} {t('maestriPerMinute')}
               </li>
@@ -50,7 +50,7 @@ export function XPInfo({ className }: XPInfoProps) {
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
               {t('flashcardsTitle')}
             </h4>
-            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
+            <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-0.5">
               <li>
                 • {FLASHCARD_XP.AGAIN} {t('flashcardAgain')}
               </li>
@@ -75,7 +75,7 @@ export function XPInfo({ className }: XPInfoProps) {
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
               {t('pomodoroTitle')}
             </h4>
-            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
+            <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-0.5">
               <li>
                 • {POMODORO_XP.SINGLE} {t('pomodoroSingle')}
               </li>
@@ -96,7 +96,7 @@ export function XPInfo({ className }: XPInfoProps) {
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
               {t('quizTitle')}
             </h4>
-            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
+            <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-0.5">
               <li>• {t('quizScoreBased')}</li>
               <li>• {t('quizMasteryBonus')}</li>
             </ul>

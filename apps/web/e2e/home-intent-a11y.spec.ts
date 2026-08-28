@@ -142,6 +142,14 @@ async function gotoChildView(page: import('@playwright/test').Page, view: 'suppo
   await navButton.click();
   // The lazy view replaces the intent chooser; wait for the chooser to unmount.
   await expect(page.locator('#intent-heading')).toHaveCount(0);
+  // The view is lazy-loaded (dynamic import, ssr: false). Wait for the real content
+  // to replace the skeleton, then wait for all Framer Motion / CSS animations to
+  // settle. Without this, axe may sample text at partial opacity (e.g. initial: 0 →
+  // animate: 1 over 200 ms) and report false-positive color-contrast violations.
+  if (view === 'progress') {
+    await expect(page.getByTestId('progress-view')).toBeVisible({ timeout: 20000 });
+  }
+  await waitForAnimationsToFinish(page);
 }
 
 test('child view "I miei lavori" (supporti) has no axe violations', async ({ page }) => {
@@ -186,23 +194,44 @@ test('child view "I miei premi" contrast tokens meet WCAG AA in light, dark, and
     await page.evaluate((nextTheme) => {
       document.documentElement.classList.toggle('dark', nextTheme === 'dark');
       document.documentElement.classList.toggle('light', nextTheme === 'light');
-      document.body.style.backgroundColor = nextTheme === 'dark' ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
+      document.body.style.backgroundColor =
+        nextTheme === 'dark' ? 'rgb(15, 23, 42)' : 'rgb(255, 255, 255)';
     }, theme);
 
-    const tabColors = await sampledContrast(page, '[data-testid="progress-view"] button:has-text("Panoramica")');
-    expect(contrastRatio(tabColors.color, tabColors.background), `${theme} active tab`).toBeGreaterThanOrEqual(4.5);
+    const tabColors = await sampledContrast(
+      page,
+      '[data-testid="progress-view"] button:has-text("Panoramica")',
+    );
+    expect(
+      contrastRatio(tabColors.color, tabColors.background),
+      `${theme} active tab`,
+    ).toBeGreaterThanOrEqual(4.5);
 
     await inactiveTab.hover();
     await page.waitForTimeout(100);
-    const hoverColors = await sampledContrast(page, '[data-testid="progress-view"] button:has-text("Traguardi")');
-    expect(contrastRatio(hoverColors.color, hoverColors.background), `${theme} inactive tab hover`).toBeGreaterThanOrEqual(4.5);
+    const hoverColors = await sampledContrast(
+      page,
+      '[data-testid="progress-view"] button:has-text("Traguardi")',
+    );
+    expect(
+      contrastRatio(hoverColors.color, hoverColors.background),
+      `${theme} inactive tab hover`,
+    ).toBeGreaterThanOrEqual(4.5);
 
     await inactiveTab.focus();
-    const focusRingWidth = await inactiveTab.evaluate((element) => window.getComputedStyle(element).outlineWidth);
+    const focusRingWidth = await inactiveTab.evaluate(
+      (element) => window.getComputedStyle(element).outlineWidth,
+    );
     expect(focusRingWidth, `${theme} inactive tab remains focusable`).not.toBe('0px');
 
-    const helperText = await sampledContrast(page, '[data-testid="progress-view"] .text-slate-700, [data-testid="progress-view"] .dark\\:text-slate-300');
-    expect(contrastRatio(helperText.color, helperText.background), `${theme} helper text`).toBeGreaterThanOrEqual(4.5);
+    const helperText = await sampledContrast(
+      page,
+      '[data-testid="progress-view"] .text-slate-700, [data-testid="progress-view"] .dark\\:text-slate-300',
+    );
+    expect(
+      contrastRatio(helperText.color, helperText.background),
+      `${theme} helper text`,
+    ).toBeGreaterThanOrEqual(4.5);
   }
 
   await page.getByRole('button', { name: 'Traguardi' }).click();
