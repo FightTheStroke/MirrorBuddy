@@ -35,6 +35,8 @@ const ENV_KEYS = [
   'AZURE_OPENAI_REALTIME_ENDPOINT',
   'AZURE_OPENAI_REALTIME_API_KEY',
   'AZURE_OPENAI_REALTIME_DEPLOYMENT',
+  'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21',
+  'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2',
   'AZURE_OPENAI_REALTIME_API_VERSION',
 ] as const;
 
@@ -46,6 +48,8 @@ beforeEach(() => {
   process.env.AZURE_OPENAI_REALTIME_ENDPOINT = 'https://example.openai.azure.com/';
   process.env.AZURE_OPENAI_REALTIME_API_KEY = 'azure-secret';
   process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
+  delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21;
+  delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2;
   delete process.env.AZURE_OPENAI_REALTIME_API_VERSION;
 });
 
@@ -92,12 +96,20 @@ describe('GET /api/devices/realtime-credentials', () => {
     expect(body.apiKey).toBe('azure-secret');
   });
 
-  it('passes through the api version when the legacy protocol is configured', async () => {
+  it('never hands the robot an api version, so it stays on the stable protocol', async () => {
     process.env.AZURE_OPENAI_REALTIME_API_VERSION = '2024-10-01-preview';
     mockProfile.mockResolvedValue({ name: 'Mario' });
     const res = await handler(ctxWith('Bearer good-token'));
     const body = await res.json();
-    expect(body.apiVersion).toBe('2024-10-01-preview');
+    expect(body.apiVersion).toBeNull();
+  });
+
+  it('serves the same modern deployment the web app uses', async () => {
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 = 'gpt-realtime-2.1';
+    mockProfile.mockResolvedValue({ name: 'Mario' });
+    const res = await handler(ctxWith('Bearer good-token'));
+    const body = await res.json();
+    expect(body.deployment).toBe('gpt-realtime-2.1');
   });
 
   it('returns 503 when the server itself has no voice credentials', async () => {
