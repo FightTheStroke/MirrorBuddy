@@ -185,5 +185,5 @@ Net latency becomes `max(model_start, transcript)` instead of
 `transcript + model_start`. Nothing is ever heard before the transcript has
 cleared the turn. Pinned by `robot/tests/test_speculative_response.py`.
 
-Caveat: the robot test suite runs in no CI workflow, so this guarantee is
-currently protected only by local test runs.
+This guarantee is enforced in CI by the `Robot Tests` job in `ci.yml`, which runs
+on every push to `main` and on any pull request touching `robot/**`.

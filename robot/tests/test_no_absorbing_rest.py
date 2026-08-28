@@ -152,7 +152,7 @@ class TestTheDoorIsNotJammedByTheLastTurn:
         await client._handle_event(_said("zitto"))
         assert client._asleep is True
 
-        client._asleep_since = 0.0  # ten minutes pass
+        client._asleep_since = -10_000.0  # rested far longer than the timeout
         client.sent.clear()
         await client._handle_event(_said("come si fa questo esercizio?"))
         assert any(json.loads(m).get("type") == "response.create" for m in client.sent)

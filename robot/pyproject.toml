@@ -20,6 +20,9 @@ dependencies = [
 
 # reachy_mini, fastapi and uvicorn are provided by the Reachy Mini host runtime.
 
+[project.optional-dependencies]
+test = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+
 [project.scripts]
 reachy-mini-mirrorbuddy = "reachy_mini_mirrorbuddy.main:main"
 
@@ -28,3 +31,10 @@ reachy_mini_mirrorbuddy = "reachy_mini_mirrorbuddy.main:ReachyMiniMirrorBuddy"
 
 [tool.hatch.build.targets.wheel]
 packages = ["reachy_mini_mirrorbuddy"]
+
+[tool.pytest.ini_options]
+# The suite is almost entirely async. Declaring the mode here means the tests
+# run the same way in CI and on a laptop, without anyone having to remember
+# --asyncio-mode=auto.
+asyncio_mode = "auto"
+testpaths = ["tests"]

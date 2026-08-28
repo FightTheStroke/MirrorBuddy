@@ -45,6 +45,7 @@ jobs:
       config: ${{ steps.filter.outputs.config }}
       docs: ${{ steps.filter.outputs.docs }}
       e2e: ${{ steps.filter.outputs.e2e }}
+      robot: ${{ steps.filter.outputs.robot }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -111,6 +112,8 @@ jobs:
               - 'playwright.config*.ts'
               - 'apps/web/playwright.config*.ts'
               - '.github/**'
+            robot:
+              - 'robot/**'
             docs:
               - 'docs/**'
               - '*.md'
@@ -124,6 +127,7 @@ jobs:
           echo "  i18n=${{ steps.filter.outputs.i18n }}"
           echo "  safety=${{ steps.filter.outputs.safety }}"
           echo "  e2e=${{ steps.filter.outputs.e2e }}"
+          echo "  robot=${{ steps.filter.outputs.robot }}"
           echo "  config=${{ steps.filter.outputs.config }}"
           echo "  docs=${{ steps.filter.outputs.docs }}"
 
@@ -455,6 +459,29 @@ jobs:
           for f in README.md CONTRIBUTING.md CHANGELOG.md LICENSE .env.example; do
             [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
           done
+
+  # Lane 4c: Reachy Mini robot
+  # The robot code enforces a child-safety guarantee — a stop word ("basta")
+  # must produce zero spoken reply. That guarantee lives entirely in these
+  # tests, so they have to run somewhere other than a developer's laptop.
+  robot-tests:
+    name: Robot Tests
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: >
+      github.event_name != 'pull_request' ||
+      needs.detect-changes.outputs.robot == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install robot package with test extras
+        working-directory: robot
+        run: pip install -e ".[test]"
+      - name: Run robot tests
+        working-directory: robot
+        run: pytest tests/ -q
 
   # Lane 4b: Migration Consistency
   # Conditional: skipped on PR when no prisma/ files changed
