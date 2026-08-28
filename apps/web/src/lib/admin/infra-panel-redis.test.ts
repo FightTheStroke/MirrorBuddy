@@ -33,8 +33,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return null when Redis is not configured', async () => {
-    delete process.env.UPSTASH_REDIS_REST_URL;
-    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
 
     const result = await getRedisMetrics();
 
@@ -42,8 +42,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return null when only URL is configured', async () => {
-    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
-    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    process.env.KV_REST_API_URL = 'https://redis.example.com';
+    delete process.env.KV_REST_API_TOKEN;
 
     const result = await getRedisMetrics();
 
@@ -51,8 +51,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return null when only TOKEN is configured', async () => {
-    delete process.env.UPSTASH_REDIS_REST_URL;
-    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+    delete process.env.KV_REST_API_URL;
+    process.env.KV_REST_API_TOKEN = 'test-token';
 
     const result = await getRedisMetrics();
 
@@ -60,8 +60,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return null when API call fails', async () => {
-    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
-    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+    process.env.KV_REST_API_URL = 'https://redis.example.com';
+    process.env.KV_REST_API_TOKEN = 'test-token';
 
     global.fetch = vi.fn().mockRejectedValue(new Error('Connection error'));
 
@@ -71,8 +71,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return null when API returns non-ok response', async () => {
-    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
-    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+    process.env.KV_REST_API_URL = 'https://redis.example.com';
+    process.env.KV_REST_API_TOKEN = 'test-token';
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
@@ -85,8 +85,8 @@ describe('getRedisMetrics', () => {
   });
 
   it('should return real data when Redis is configured and API succeeds', async () => {
-    process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example.com';
-    process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+    process.env.KV_REST_API_URL = 'https://redis.example.com';
+    process.env.KV_REST_API_TOKEN = 'test-token';
 
     const mockRedisInfo = `
 used_memory:10485760

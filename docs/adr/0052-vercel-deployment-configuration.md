@@ -346,6 +346,42 @@ Vercel automatically adds these when Supabase integration is enabled:
 **Note**: The app uses `DATABASE_URL` and `DIRECT_URL`, so these must be set
 manually pointing to the Supabase pooler/direct URLs.
 
+### NEVER Use the Vercel "Rotate secrets" Button on the Supabase Store
+
+On 2026-08-28 that button caused a production outage. Vercel rotated the
+credentials on the Supabase side but failed to write the new values back into
+the project's environment variables. Result: every request failed with
+`28P01 password authentication failed for user "postgres"`, and the site was
+down until the credentials were rebuilt by hand.
+
+The same run also created new-format API keys on Supabase
+(`sb_publishable_*` / `sb_secret_*`) that Vercel never stored, leaving
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` pointing at the old
+values.
+
+**Rotate the database this way instead:**
+
+1. Supabase dashboard → Project Settings → Database → _Reset database password_
+   (or `supabase` CLI).
+2. Verify the new password with a real connection before writing it anywhere.
+3. Write `DATABASE_URL`, `DIRECT_URL`, `POSTGRES_PASSWORD`, `POSTGRES_URL`,
+   `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING` via the Vercel API.
+4. Read the current API keys with
+   `supabase projects api-keys --project-ref <ref> --reveal -o json` and write
+   them to `SUPABASE_*` / `NEXT_PUBLIC_SUPABASE_*`.
+5. Redeploy production, then confirm `/api/health` reports `database: pass`.
+
+### Redis: Do Not Duplicate the Vercel-Managed Variables
+
+`src/lib/redis/index.ts` prefers `UPSTASH_REDIS_REST_URL` / `_TOKEN` and falls
+back to `KV_REST_API_URL` / `KV_REST_API_TOKEN`. Only the `KV_*` pair is
+managed by the Vercel storage integration, so a manually added `UPSTASH_*`
+pair silently shadows it and goes stale on the next rotation — the app keeps
+using a retired token with no error until Redis starts refusing it.
+
+The `UPSTASH_*` duplicates were removed on 2026-08-28. Keep only the
+integration-managed `KV_*` variables so rotations propagate automatically.
+
 ### Cost Optimization: Preview Builds
 
 **Problem**: Every PR push triggers a Vercel preview build, incurring costs even before

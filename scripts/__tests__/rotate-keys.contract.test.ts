@@ -1,4 +1,6 @@
 /**
+ * @vitest-environment node
+ *
  * Contract test for the key rotation CLI.
  *
  * scripts/rotate-keys.ts imports its rotation functions from the security

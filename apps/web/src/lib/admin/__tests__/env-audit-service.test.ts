@@ -158,13 +158,13 @@ describe('env-audit-service', () => {
       expect(secretVar!.required).toBe(true);
     });
 
-    it('Redis/KV includes both Upstash env vars', () => {
+    it('Redis/KV includes both Vercel-managed KV env vars', () => {
       const result = getEnvAudit();
       const redisService = result.find((s) => s.service === 'Redis/KV');
       expect(redisService).toBeDefined();
 
-      const urlVar = redisService!.vars.find((v) => v.name === 'UPSTASH_REDIS_REST_URL');
-      const tokenVar = redisService!.vars.find((v) => v.name === 'UPSTASH_REDIS_REST_TOKEN');
+      const urlVar = redisService!.vars.find((v) => v.name === 'KV_REST_API_URL');
+      const tokenVar = redisService!.vars.find((v) => v.name === 'KV_REST_API_TOKEN');
 
       expect(urlVar).toBeDefined();
       expect(urlVar!.required).toBe(true);
