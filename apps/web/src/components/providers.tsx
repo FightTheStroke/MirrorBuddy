@@ -19,6 +19,8 @@ import { resolveAccessibleAccentColor } from '@/lib/accessibility/accent-contras
 
 // Debug logger - captures all browser errors to file (dev only)
 import '@/lib/client-error-logger';
+// Keeps Zod from probing `Function("")`, which our CSP blocks and reports
+import '@/lib/validation/zod-csp-config';
 
 interface ProvidersProps {
   children: React.ReactNode;
