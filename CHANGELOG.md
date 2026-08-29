@@ -9,183 +9,182 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Pro esiste come pagina, non come vicolo cieco** — dalla schermata analytics
-  un ragazzo poteva toccare "Pro" e finire su un 404: una pagina che non
-  esisteva. Pro non è ancora acquistabile, quindi al suo posto c'è una pagina
-  che raccoglie un indirizzo e promette un solo messaggio, il giorno in cui
-  aprirà. Riusa il servizio waitlist già esistente (doppio opt-in, consenso
-  GDPR registrato, link di disiscrizione) e avvisa
-  `info@fightthestroke.org` a ogni iscrizione. Quel 404 è anche ciò che teneva
-  rossa la catena di rilascio, e con essa bloccati in `main` i correttivi alla
-  voce.
-- **Un controllo che la versione e il changelog siano d'accordo** — fra 0.26.1
-  e 0.29.1 i file di versione si sono mossi e `CHANGELOG.md` no: tre rilasci
-  usciti senza traccia di cosa contenessero. Ora `auto-version.sh --apply`
-  promuove da solo la sezione `[Unreleased]`, e
-  `scripts/ci/check-version-consistency.ts` fa fallire la CI se una delle
-  cinque copie della versione o la voce di changelog manca. Le voci 0.27.0 →
-  0.29.1 sono state ricostruite dai commit.
-- **Un controllo settimanale sulle chiavi Azure** — la chiave vive in quattro
-  posti. Il 28 agosto è stata rigenerata e i posti si sono disallineati: la
-  copia in `kv-virtualbpm-prod` era morta dal 29 novembre 2025 e nessuno se ne
-  era accorto, perché nessuno guardava. `scripts/check-azure-key-drift.sh`
-  chiede ad Azure se ogni copia funziona ancora, ogni settimana, e la procedura
-  di rotazione è scritta in `docs/operations/AZURE-KEY-ROTATION.md`.
-
-### Fixed
-
-- **La verifica browser smette di bocciare una scelta deliberata** — il job E2E
-  non ha credenziali voce apposta (ogni run costerebbe denaro reale e
-  porterebbe una chiave di produzione in un job di test), e i 503 che le rotte
-  voce restituiscono per progetto venivano contati come errori di pagina. Ora
-  l'eccezione esiste ma è dichiarata a voce alta da `E2E_VOICE_UNCONFIGURED`:
-  lo smoke contro il sito vivo non la imposta, quindi lì un 503 vero continua a
-  far fallire.
-- **`.env.example` dice i nomi che la produzione usa davvero** — indicava
-  `UPSTASH_REDIS_REST_*`, mentre Vercel inietta `KV_REST_API_*`: seguire
-  l'esempio creava una seconda copia non ruotata della stessa credenziale.
-  Allineati anche `SETUP-PRODUCTION.md`, `docs/operations/REDIS-FAILURE.md` e
-  il monitoraggio infrastrutturale.
-- **Rimossa la copia orfana di `pre-push-vercel.sh` nella radice** — nessuno la
-  eseguiva e conteneva regole diverse da quella vera in `scripts/`.
+- **Pro is a page now, not a dead end** — from the analytics screen a student
+  could tap "Pro" and land on a 404: a page that did not exist. Pro cannot be
+  bought yet, so in its place there is a page that collects an address and
+  promises exactly one message, the day it opens. It reuses the existing
+  waitlist service (double opt-in, GDPR consent recorded, unsubscribe link),
+  asks separately and optionally for consent to be written to, and notifies
+  `info@fightthestroke.org` on every signup. That 404 is also what kept the
+  release chain red, and with it the voice fixes stuck in `main`.
+- **A check that the version and the changelog agree** — between 0.26.1 and
+  0.29.1 the version files moved and `CHANGELOG.md` did not: three releases
+  shipped with no record of what was in them. `auto-version.sh --apply` now
+  promotes the `[Unreleased]` section by itself, and
+  `scripts/ci/check-version-consistency.ts` fails CI when one of the five
+  copies of the version, or the changelog entry, is missing. The 0.27.0 →
+  0.29.1 entries were reconstructed from the commits.
+- **A weekly check on the Azure keys** — the key lives in four places. On 28
+  August it was regenerated and those places drifted apart: the copy in
+  `kv-virtualbpm-prod` had been dead since 29 November 2025 and nobody knew,
+  because nobody was looking. `scripts/check-azure-key-drift.sh` asks Azure
+  whether every copy still works. The weekly CI job reaches the GitHub Actions
+  secrets; the nightly maintenance run, where `az` is logged in, also opens the
+  Key Vault. The rotation procedure is written down in
+  `docs/operations/AZURE-KEY-ROTATION.md`.
 
 ### Security
 
-- **Il corpo dell'errore upstream non sopravvive alla lettura** — una risposta di
-  errore di Azure OpenAI veniva letta con `response.text()` e portata avanti
-  intera: nel messaggio dell'eccezione, nei log, e in due casi fino alla
-  risposta HTTP. Quel corpo può contenere il prompt che l'ha provocato, cioè la
-  frase di un minore. Ora un solo punto (`sanitizeUpstreamError`) lo riduce a
-  ciò che serve per diagnosticare — status, codice se ha una forma innocua, e le
-  categorie di content filter scattate — e il corpo non viene né restituito né
-  memorizzato: un valore che esiste, prima o poi finisce in un log. Nove punti di
-  fuga sanati (il piano ne aveva individuati quattro); due test che asseritavano
-  la fuga sono diventati guardie contro di essa.
+- **The upstream error body does not survive being read** — an Azure OpenAI
+  error response was read with `response.text()` and carried on whole: into the
+  exception message, into the logs, and in two cases all the way into the HTTP
+  response. That body can contain the prompt that caused it, which is to say a
+  child's sentence. A single place (`sanitizeUpstreamError`) now reduces it to
+  what is needed to diagnose — status, code when it has a harmless shape, and
+  the content-filter categories that fired — and the body is neither returned
+  nor stored: a value that exists ends up in a log sooner or later. Nine escape
+  points closed (the plan had found four); two tests that asserted the leak
+  became guards against it.
 
 ### Fixed
 
-- **Il TTS dice chi ha parlato, e dove** — la catena di fallback finisce su
-  `api.openai.com`, che non è in EU, e fin qui rispondeva `200` con un body
-  audio e nessuna indicazione del provider: né il chiamante, né chi rilegge i
-  log, né chi riceve una domanda sulla data residency poteva sapere se la frase
-  di un bambino fosse rimasta su Azure EU. Il fallback resta — il silenzio è
-  peggio per lo studente — ma smette di essere invisibile: ogni risposta porta
-  `X-TTS-Provider`, `X-TTS-Requested-Provider` e `X-TTS-Data-Residency`, e
-  l'uscita dall'EU si registra a livello _error_, non come warning di routine.
-- **Il controllo post-promozione può fallire, e guarda il dominio giusto** —
-  interrogava l'alias `mirrorbuddy.vercel.app` invece di `mirrorbuddy.org`, che
-  è ciò che le persone aprono, e su risposta negativa stampava `::warning::`
-  lasciando il job verde con "controlla a mano". Nessuno controlla a mano una
-  run che ha riportato successo. La decisione esce dallo YAML
-  (`scripts/ci/check-production-health.ts`, dieci test), sonda anche il dominio
-  canonico, ritenta il cold start e **fa fallire il job**: quel fallimento è il
-  segnale per il rollback.
-- **`/api/health` non cerca più Ollama su Vercel** — sondava
-  `http://localhost:11434` ogni volta che Azure non era configurato, dove
-  localhost è la function stessa e su quella porta non ha mai ascoltato nulla:
-  fino a due secondi di timeout per un fatto già noto, e un verdetto che si
-  legge come guasto. Ora si sonda solo se `OLLAMA_URL` lo dichiara, e
-  "irraggiungibile" è distinto da "non configurato".
+- **The browser audit stops failing a deliberate choice** — the E2E job has no
+  voice credentials on purpose (every run would cost real money and would carry
+  a production key into a test job), and the 503s the voice routes return by
+  design were being counted as page errors. The exception now exists but is
+  declared out loud by `E2E_VOICE_UNCONFIGURED`: the smoke run against the live
+  site does not set it, so a real 503 still fails there.
+- **`.env.example` names the variables production actually uses** — it listed
+  `UPSTASH_REDIS_REST_*`, while Vercel injects `KV_REST_API_*`: following the
+  example created a second, unrotated copy of the same credential.
+  `SETUP-PRODUCTION.md`, `docs/operations/REDIS-FAILURE.md` and the
+  infrastructure monitor were aligned too.
+- **Removed the orphan copy of `pre-push-vercel.sh` in the repository root** —
+  nothing ran it and it carried different rules from the real one in
+  `scripts/`.
+- **TTS says who spoke, and where** — the fallback chain ends at
+  `api.openai.com`, which is not in the EU, and until now it answered `200`
+  with an audio body and no indication of the provider: neither the caller, nor
+  whoever reads the logs later, nor whoever fields a data-residency question
+  could tell whether a child's sentence had stayed on Azure EU. The fallback
+  stays — silence is worse for the student — but it stops being invisible:
+  every response carries `X-TTS-Provider`, `X-TTS-Requested-Provider` and
+  `X-TTS-Data-Residency`, and leaving the EU is recorded at _error_ level, not
+  as a routine warning.
+- **The post-promotion check can fail, and looks at the right domain** — it
+  queried the `mirrorbuddy.vercel.app` alias instead of `mirrorbuddy.org`,
+  which is what people open, and on a negative answer printed `::warning::`,
+  leaving the job green with "check by hand". Nobody checks by hand a run that
+  reported success. The decision moved out of the YAML
+  (`scripts/ci/check-production-health.ts`, ten tests), probes the canonical
+  domain as well, retries the cold start and **fails the job**: that failure is
+  the signal to roll back.
+- **`/api/health` no longer looks for Ollama on Vercel** — it probed
+  `http://localhost:11434` whenever Azure was unconfigured, where localhost is
+  the function itself and nothing has ever listened on that port: up to two
+  seconds of timeout for an already known fact, and a verdict that reads as a
+  fault. It now probes only if `OLLAMA_URL` says so, and "unreachable" is
+  distinct from "not configured".
 
 ### Removed
 
-- **Il transport WebSocket e il proxy che lo serviva** — i moduli proxy sotto
-  `apps/web/src/server/` erano codice morto (nessun import) e la voce passa da
-  tempo per WebRTC verso Azure. A tenerli vivi erano uno switch `VOICE_TRANSPORT`
-  e un `proxyPort` che attraversava quindici file per arrivare a una porta su cui
-  nessuno ascoltava. Rimossi. Due test che mentivano sono stati riscritti invece
-  che cancellati: uno verificava l'assenza di una cartella mai esistita, l'altro
-  — la diagnostica voce — avrebbe mandato l'operatore a controllare un processo
-  che non esiste, e ora verifica ciò che deve essere vero prima di una sessione
-  dicendo apertamente che il giro completo dell'audio **non** è coperto.
+- **The WebSocket transport and the proxy that served it** — the proxy modules
+  under `apps/web/src/server/` were dead code (no imports) and voice has long
+  gone over WebRTC to Azure. What kept them alive was a `VOICE_TRANSPORT`
+  switch and a `proxyPort` that crossed fifteen files to reach a port nobody
+  listened on. Removed. Two tests that lied were rewritten rather than deleted:
+  one asserted the absence of a folder that never existed, the other — the
+  voice diagnostics — would have sent the operator to check a process that does
+  not exist, and now verifies what must be true before a session while saying
+  openly that the full audio round trip is **not** covered.
 
 ### Changed
 
-- **`azure-key-vault.ts` diventa `secrets.ts`** — non ha mai parlato con un Key
-  Vault: l'SDK Azure non è una dipendenza di questo repo e `AZURE_KEY_VAULT_URL`
-  non è impostato in nessun ambiente, quindi ogni chiamata cadeva su
-  `process.env[name]`. Ciò che girava era una lettura di variabile d'ambiente con
-  cache, travestita da vault — peggio del non avere un vault, perché al punto di
-  chiamata `getSecret` si legge come un confine indurito. `setSecret`,
-  `getSecretWithRetry`, `isAzureKeyVaultAvailable` e `getCacheStats` non avevano
-  chiamanti fuori dal proprio test: rimossi. Se un Key Vault vero verrà creato,
-  questa è la cucitura dove metterlo, con la dipendenza dichiarata.
+- **`azure-key-vault.ts` becomes `secrets.ts`** — it never talked to a Key
+  Vault: the Azure SDK is not a dependency of this repository and
+  `AZURE_KEY_VAULT_URL` is not set in any environment, so every call fell
+  through to `process.env[name]`. What ran was a cached environment-variable
+  read dressed up as a vault — worse than having no vault, because at the call
+  site `getSecret` reads like a hardened boundary. `setSecret`,
+  `getSecretWithRetry`, `isAzureKeyVaultAvailable` and `getCacheStats` had no
+  callers outside their own test: removed. If a real Key Vault is ever wired
+  in, this is the seam to put it in, with the dependency declared.
 
 ## [0.29.1] - 2026-08-29
 
-Recostruita a posteriori dai commit: queste tre versioni sono uscite senza voce
-in changelog. `scripts/ci/check-version-consistency.ts` ora impedisce che
-succeda ancora.
-
-### Fixed
-
-- La cronologia dell'assistente viene etichettata `output_text`, così una
-  conversazione ripresa non viene rifiutata dal servizio voce.
-- Il robot torna al percorso di risposta che funzionava: la risposta anticipata
-  lo lasciava muto.
-- Il robot smette di aspettare una risposta che non arriverà.
-- Le credenziali voce del robot sono fissate al protocollo stabile e al
-  deployment `gpt-realtime-2.1`, allineato al sito.
-- Le variabili Redis gestite da Vercel (`KV_REST_API_*`) arrivano alla
-  validazione pre-deploy e alle guardie pre-push.
-- Riparati gli import rotti della CLI di rotazione chiavi.
+Reconstructed after the fact from the commits: these three releases shipped
+with no changelog entry. `scripts/ci/check-version-consistency.ts` now stops
+that from happening again.
 
 ### Added
 
-- Il robot recupera da solo credenziali voce e aggiornamenti.
+- The robot fetches its own voice credentials and updates.
+
+### Fixed
+
+- Assistant history is labelled `output_text`, so a resumed conversation is no
+  longer rejected by the voice service.
+- The robot returns to the answer path that worked: the speculative answer left
+  it mute.
+- The robot stops waiting for an answer that will never arrive.
+- The robot's voice credentials are pinned to the stable protocol and to the
+  `gpt-realtime-2.1` deployment, aligned with the site.
+- The Vercel-managed Redis variables (`KV_REST_API_*`) reach pre-deploy
+  validation and the pre-push guards.
+- Repaired the broken imports in the key-rotation CLI.
 
 ## [0.29.0] - 2026-08-28
 
 ### Added
 
-- Il robot viene rilasciato insieme all'app e si aggiorna da solo.
+- The robot is released together with the app and updates itself.
 
 ### Fixed
 
-- Contrasto della lista nella vista progressi XP.
-- La configurazione di una famiglia resta dove un aggiornamento non può
-  cancellarla.
+- List contrast in the XP progress view.
+- A family's configuration stays where an update cannot erase it.
 
 ## [0.28.1] - 2026-08-28
 
 ### Fixed
 
-- Il primo fotogramma ambientale viene condiviso anche su un robot appena acceso.
+- The first ambient frame is shared even with a robot that has just been turned
+  on.
 
 ## [0.28.0] - 2026-08-28
 
 ### Added
 
-- Gli studenti possono disattivare il tempo di parola aggiuntivo.
-- Viene misurata l'attesa prima della prima parola in chat.
+- Students can turn off the extra speaking time.
+- The wait before the first word in chat is measured.
 
 ### Changed
 
-- La risposta viene preparata mentre la trascrizione sta ancora arrivando.
-- Le conversazioni lunghe vengono ridotte anche sulla rotta in streaming.
-- Le ricerche indipendenti non si aspettano più a vicenda; la domanda dello
-  studente viene trasformata in embedding una sola volta per richiesta.
+- The answer is prepared while the transcription is still arriving.
+- Long conversations are trimmed on the streaming route too.
+- Independent lookups no longer wait for each other; the student's question is
+  embedded once per request.
 
 ### Fixed
 
-- Il robot non pronuncia una risposta a cui il bambino ha già rinunciato.
-- Le parole chiave degli strumenti vengono confrontate su parole intere.
+- The robot does not speak an answer the child has already given up on.
+- Tool keywords are matched on whole words.
 
 ## [0.27.1] - 2026-08-27
 
 ### Fixed
 
-- I controlli obbligatori girano davvero sulle PR di rilascio (RELEASE_PAT).
+- The required checks actually run on release pull requests (RELEASE_PAT).
 
 ## [0.27.0] - 2026-08-27
 
 ### Added
 
-- Raggruppamento per dimensione nella modalità mensile dello script costi Azure.
+- Grouping by dimension in the monthly mode of the Azure cost script.
 
 ### Fixed
 
-- Gli errori di Cost Management vengono mostrati invece di riportare $0.00.
+- Cost Management errors are surfaced instead of reporting $0.00.
 
 ## [0.26.1] - 2026-08-26
 

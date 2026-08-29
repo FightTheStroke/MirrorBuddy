@@ -18,6 +18,7 @@ import { ProWaitlistForm, errorKeyForStatus } from '../pro-waitlist-form';
 
 const messages = { ...itWaitlist, ...itPro };
 const submitLabel = itWaitlist.waitlist.submitButton;
+const emailLabel = itWaitlist.waitlist.emailLabel;
 
 function renderForm() {
   return render(
@@ -27,10 +28,12 @@ function renderForm() {
   );
 }
 
-async function fillAndSubmit(email: string, { consent = true } = {}) {
+async function fillAndSubmit(email: string, { consent = true, marketing = false } = {}) {
   const user = userEvent.setup();
-  await user.type(screen.getByLabelText(/email/i), email);
-  if (consent) await user.click(screen.getByRole('checkbox'));
+  await user.type(screen.getByLabelText(emailLabel), email);
+  const [gdprBox, marketingBox] = screen.getAllByRole('checkbox');
+  if (consent) await user.click(gdprBox);
+  if (marketing) await user.click(marketingBox);
   await user.click(screen.getByRole('button', { name: submitLabel }));
 }
 
@@ -52,6 +55,22 @@ describe('Pro waitlist form', () => {
     expect(body.email).toBe('parent@example.com');
     expect(body.gdprConsent).toBe(true);
     expect(body.locale).toBe('it');
+  });
+
+  it('does not claim consent to be written to unless it was given', async () => {
+    renderForm();
+    await fillAndSubmit('parent@example.com');
+
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string);
+    expect(body.marketingConsent).toBe(false);
+  });
+
+  it('records consent to be written to when it was given', async () => {
+    renderForm();
+    await fillAndSubmit('parent@example.com', { marketing: true });
+
+    const body = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string);
+    expect(body.marketingConsent).toBe(true);
   });
 
   it('confirms in words, not just by clearing the form', async () => {
@@ -82,7 +101,7 @@ describe('Pro waitlist form', () => {
     await fillAndSubmit('not-an-address');
 
     const alert = await screen.findByRole('alert');
-    const input = screen.getByLabelText(/email/i);
+    const input = screen.getByLabelText(emailLabel);
 
     expect(input).toHaveAttribute('aria-describedby', alert.id);
     expect(input).toHaveAttribute('aria-invalid', 'true');

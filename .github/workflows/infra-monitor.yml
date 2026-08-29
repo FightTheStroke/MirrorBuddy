@@ -19,8 +19,13 @@ jobs:
   # regenerated and they drifted: the Key Vault copy had been dead since
   # November 2025 and nobody knew, because nothing was looking. Now something
   # looks, every week.
+  # This job reaches two of the four stores: the GitHub Actions secrets it is
+  # handed. There is no Azure service principal here, so it cannot open the Key
+  # Vault — it says SKIP rather than pretending. The Key Vault and Vercel copies
+  # are covered by the nightly maintenance run, where `az` is logged in
+  # (docs/operations/AZURE-KEY-ROTATION.md).
   azure-key-drift:
-    name: Azure Key Drift
+    name: Azure Key Drift (GitHub secrets)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

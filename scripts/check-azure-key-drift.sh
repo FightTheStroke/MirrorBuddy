@@ -27,12 +27,18 @@ VAULT="${AZURE_KEY_VAULT_NAME:-kv-virtualbpm-prod}"
 SUBSCRIPTION="${AZURE_SUBSCRIPTION_ID:-8015083b-adad-42ff-922d-feaed61c5d62}"
 
 FAILURES=0
+SKIPPED=0
+# When set, a store that could not be checked is a failure rather than a note.
+# A green job that quietly skipped the store which was actually dead is how the
+# nine months happened.
+STRICT="${AZURE_KEY_DRIFT_STRICT:-false}"
 
 probe() {
   local label="$1" endpoint="$2" key="$3"
 
   if [[ -z "$key" || "$key" == "[SENSITIVE]" ]]; then
     echo "SKIP  $label — no readable value here"
+    SKIPPED=$((SKIPPED + 1))
     return 0
   fi
 
@@ -64,12 +70,14 @@ if command -v az >/dev/null 2>&1 && az account show --only-show-errors >/dev/nul
       --subscription "$SUBSCRIPTION" --query value -o tsv 2>/dev/null || true)
     if [[ -z "$value" ]]; then
       echo "SKIP  key vault: ${secret} — not readable from here"
+      SKIPPED=$((SKIPPED + 1))
     else
       probe "key vault: ${secret}" "$ENDPOINT" "$value"
     fi
   done
 else
   echo "SKIP  key vault — Azure CLI not logged in"
+  SKIPPED=$((SKIPPED + 2))
 fi
 
 echo ""
@@ -85,3 +93,11 @@ EOF
 fi
 
 echo "Every reachable store holds a key Azure accepts."
+
+if [[ $SKIPPED -gt 0 ]]; then
+  echo "${SKIPPED} store(s) could not be checked from here."
+  if [[ "$STRICT" == "true" ]]; then
+    echo "AZURE_KEY_DRIFT_STRICT=true — an unchecked store is not a pass."
+    exit 1
+  fi
+fi

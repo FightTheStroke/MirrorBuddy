@@ -33,6 +33,7 @@ export function ProWaitlistForm({ locale }: { locale: string }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [gdprConsent, setGdprConsent] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [status, setStatus] = useState<Status>('idle');
   const [errorKey, setErrorKey] = useState<string | null>(null);
 
@@ -56,6 +57,7 @@ export function ProWaitlistForm({ locale }: { locale: string }) {
           name: name.trim() || undefined,
           locale,
           gdprConsent: true,
+          marketingConsent,
           source: 'pro',
         }),
       });
@@ -143,6 +145,25 @@ export function ProWaitlistForm({ locale }: { locale: string }) {
         />
         <label htmlFor="pro-waitlist-gdpr" className="text-sm text-slate-800 dark:text-slate-200">
           {t('gdprConsent')}
+        </label>
+      </div>
+
+      {/* Separate and optional on purpose: the address is kept either way, but
+          consent to be written to has to be given, not assumed. */}
+      <div className="flex items-start gap-3">
+        <input
+          id="pro-waitlist-marketing"
+          name="marketingConsent"
+          type="checkbox"
+          checked={marketingConsent}
+          onChange={(event) => setMarketingConsent(event.target.checked)}
+          className="mt-1 h-5 w-5 rounded border-slate-400 text-indigo-700 focus:ring-2 focus:ring-indigo-700"
+        />
+        <label
+          htmlFor="pro-waitlist-marketing"
+          className="text-sm text-slate-800 dark:text-slate-200"
+        >
+          {t('marketingConsent')}
         </label>
       </div>
 
