@@ -269,10 +269,14 @@ EOF
     # still the physical MirrorBuddy client.
     python3 scripts/update-robot-version.py "$new_version"
 
+    # The changelog moves with the version, always. Leaving it to memory cost
+    # us three releases (0.27.0, 0.29.0, 0.29.1) with no record of what shipped.
+    npx --yes tsx scripts/ci/promote-changelog.ts "$new_version"
+
     echo ""
     echo -e "Next steps:"
     echo -e "  1. Review CHANGELOG.md"
-    echo -e "  2. git add VERSION package.json apps/web/package.json robot/pyproject.toml robot/reachy_mini_mirrorbuddy/__init__.py"
+    echo -e "  2. git add VERSION package.json apps/web/package.json CHANGELOG.md robot/pyproject.toml robot/reachy_mini_mirrorbuddy/__init__.py"
     echo -e "  3. git commit -m \"chore(release): bump version to $new_version\""
     echo -e "  4. git tag -a v$new_version -m \"Release $new_version\""
     echo -e "  5. git push origin main --tags"
