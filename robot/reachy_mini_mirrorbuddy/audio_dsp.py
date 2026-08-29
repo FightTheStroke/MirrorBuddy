@@ -26,6 +26,11 @@ _DEFAULT_BARGE_SUSTAIN_FRAMES = 3  # consecutive loud frames
 # needs the second number to decide a turn began, so the mic path needs a pre-amp.
 DEFAULT_INPUT_GAIN = 6.0
 
+# What the pre-amp aims for. A voice already this loud is left alone: applying the
+# full gain to a child leaning into the microphone would compress the life out of it
+# and the model would mishear every word.
+MIC_TARGET_RMS = 0.12
+
 
 def barge_rms_threshold() -> float:
     """Read the barge-in RMS threshold from the env at call time.
@@ -81,13 +86,24 @@ def amplify_mic(audio: np.ndarray, gain: float) -> np.ndarray:
 
     The Reachy Mini mic array is far quieter than a headset, and Azure server VAD
     judges an absolute level: too soft and no turn ever starts, so Buddy talks and
-    then waits forever. Peaks are folded with the same ``tanh`` curve used on the
-    speaker so a child shouting into the mic is compressed, not clipped into a rasp.
+    then waits forever.
+
+    The gain is a ceiling, not a setting: each frame is lifted only as far as
+    :data:`MIC_TARGET_RMS`, so a whisper across the room gets the full boost and a
+    child speaking straight into the microphone is passed through untouched. A flat
+    multiplier did the opposite — it squashed close speech until the model misheard
+    every word.
     """
     if audio.size == 0 or gain <= 1.0:
         return audio
-    scaled = boost(audio.astype(np.float32) / 32768.0, gain)
-    return (scaled * 32767.0).astype(np.int16)
+    samples = audio.astype(np.float32) / 32768.0
+    level = float(np.sqrt(np.mean(samples * samples)))
+    if level <= 0.0:
+        return audio
+    applied = min(gain, MIC_TARGET_RMS / level)
+    if applied <= 1.0:
+        return audio
+    return (boost(samples, applied) * 32767.0).astype(np.int16)
 
 
 def resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:

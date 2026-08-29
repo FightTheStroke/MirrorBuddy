@@ -31,9 +31,29 @@ def test_amplify_mic_keeps_int16() -> None:
 
 def test_loud_speech_is_compressed_not_clipped() -> None:
     """A shout must not come back as a square wave: that is what rasps in the ear."""
-    loud = np.full(512, 30000, dtype=np.int16)
-    out = audio_dsp.amplify_mic(loud, 8.0)
+    spiky = np.zeros(4800, dtype=np.int16)
+    spiky[::4] = 32000  # quiet overall, but with peaks already at the rail
+    out = audio_dsp.amplify_mic(spiky, 8.0)
     assert int(np.abs(out).max()) < 32768
+
+
+def test_a_voice_already_loud_enough_is_left_alone() -> None:
+    """The gain is a ceiling, not a setting.
+
+    Squashing a child who speaks straight into the microphone is what made the model
+    mishear every word — the whole point is to lift the quiet, not flatten the loud.
+    """
+    close = (np.random.default_rng(2).normal(0, 0.2, 4800) * 32768).astype(np.int16)
+    assert np.array_equal(audio_dsp.amplify_mic(close, 6.0), close)
+
+
+def test_the_boost_stops_at_the_target_level() -> None:
+    quiet = (np.random.default_rng(3).normal(0, 0.01, 4800) * 32768).astype(np.int16)
+    assert _rms(audio_dsp.amplify_mic(quiet, 20.0)) <= audio_dsp.MIC_TARGET_RMS * 1.1
+
+
+def test_silence_is_not_amplified_into_noise() -> None:
+    assert not audio_dsp.amplify_mic(np.zeros(480, dtype=np.int16), 6.0).any()
 
 
 def test_gain_of_one_is_a_no_op() -> None:
