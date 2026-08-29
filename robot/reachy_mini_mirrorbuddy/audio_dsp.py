@@ -21,6 +21,16 @@ from scipy.signal import resample_poly
 _DEFAULT_BARGE_RMS_THRESHOLD = 0.045  # normalised 0..1
 _DEFAULT_BARGE_SUSTAIN_FRAMES = 3  # consecutive loud frames
 
+# Measured on the device: a sentence spoken near the robot reaches the realtime
+# service at ~0.02 RMS, a clean recording of the same sentence at ~0.16. Server VAD
+# needs the second number to decide a turn began, so the mic path needs a pre-amp.
+DEFAULT_INPUT_GAIN = 6.0
+
+# What the pre-amp aims for. A voice already this loud is left alone: applying the
+# full gain to a child leaning into the microphone would compress the life out of it
+# and the model would mishear every word.
+MIC_TARGET_RMS = 0.12
+
 
 def barge_rms_threshold() -> float:
     """Read the barge-in RMS threshold from the env at call time.
@@ -56,6 +66,44 @@ def boost(audio: np.ndarray, gain: float) -> np.ndarray:
     """
     # 0.85 keeps the linear part below the knee of the curve.
     return np.tanh(audio * gain * 0.85).astype(np.float32)
+
+
+def input_gain() -> float:
+    """Read the microphone pre-amp gain from the env at call time.
+
+    Lazy for the same reason as the barge thresholds: ``main.run()`` loads the
+    robot's ``.env`` after this module is imported. Values below 1.0 are raised to
+    1.0 — nobody sets this field meaning "make the robot deafer".
+    """
+    try:
+        return max(1.0, float(os.getenv("MIRRORBUDDY_INPUT_GAIN", DEFAULT_INPUT_GAIN)))
+    except (TypeError, ValueError):
+        return DEFAULT_INPUT_GAIN
+
+
+def amplify_mic(audio: np.ndarray, gain: float) -> np.ndarray:
+    """Bring quiet speech up to a level the realtime server's VAD reacts to.
+
+    The Reachy Mini mic array is far quieter than a headset, and Azure server VAD
+    judges an absolute level: too soft and no turn ever starts, so Buddy talks and
+    then waits forever.
+
+    The gain is a ceiling, not a setting: each frame is lifted only as far as
+    :data:`MIC_TARGET_RMS`, so a whisper across the room gets the full boost and a
+    child speaking straight into the microphone is passed through untouched. A flat
+    multiplier did the opposite — it squashed close speech until the model misheard
+    every word.
+    """
+    if audio.size == 0 or gain <= 1.0:
+        return audio
+    samples = audio.astype(np.float32) / 32768.0
+    level = float(np.sqrt(np.mean(samples * samples)))
+    if level <= 0.0:
+        return audio
+    applied = min(gain, MIC_TARGET_RMS / level)
+    if applied <= 1.0:
+        return audio
+    return (boost(samples, applied) * 32767.0).astype(np.int16)
 
 
 def resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
