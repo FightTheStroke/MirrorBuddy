@@ -157,9 +157,10 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // API routes: NetworkOnly (never cache API calls)
+  // API routes: never cached, and never re-issued through the service worker.
+  // Returning without calling respondWith lets the browser perform the request
+  // itself, preserving credentials, redirect and CORS semantics exactly.
   if (url.pathname.startsWith("/api/")) {
-    event.respondWith(fetch(request));
     return;
   }
 

@@ -153,8 +153,6 @@ const nextConfig: NextConfig = {
 
   // Add security headers for proper permissions handling
   async headers() {
-    const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
-
     return [
       {
         // Global security headers for all routes
@@ -190,13 +188,12 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        // CORS headers for API routes only
+        // CORS headers for API routes only.
+        // Access-Control-Allow-Origin is deliberately NOT set here: a static
+        // value cannot serve both apex and www, and it silently contradicted
+        // the per-request whitelist in src/lib/security/cors-config.ts.
         source: '/api/:path*',
         headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: allowedOrigin,
-          },
           {
             key: 'Access-Control-Allow-Methods',
             value: 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
