@@ -10,15 +10,15 @@
  * accepts stop working, which is the failure that hurt.
  */
 
-import { test, expect } from './fixtures';
-import type { APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext } from './fixtures';
 
 /**
  * How long a child may wait between pressing the microphone and the Maestro
  * being able to hear them. A warm function answers in well under a second;
  * the budget leaves room for one cold start without hiding a real slowdown.
  */
-const VOICE_START_BUDGET_MS = 15_000;
+const TOKEN_START_BUDGET_MS = 15_000;
+const WEBRTC_HANDSHAKE_BUDGET_MS = 10_000;
 
 async function obtainCsrfToken(request: APIRequestContext): Promise<string | undefined> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -33,9 +33,9 @@ async function obtainCsrfToken(request: APIRequestContext): Promise<string | und
 }
 
 test.describe('PROD-SMOKE: Voice & Realtime', () => {
-  test('A voice session can actually be opened with live Azure credentials', async ({
-    request,
-  }) => {
+  test.describe.configure({ retries: 0 });
+
+  test('A voice session reaches a connected WebRTC data channel', async ({ request, page }) => {
     // The first call to /api/session on a cold visitor sometimes establishes the
     // visitor cookie without returning a token yet; ask again rather than
     // reporting a voice outage that isn't one.
@@ -52,8 +52,7 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
       // reads as a slow start rather than an unexplained timeout.
       timeout: 30_000,
     });
-    const elapsedMs = Date.now() - startedAt;
-
+    const tokenElapsedMs = Date.now() - startedAt;
     expect(
       res.status(),
       `Azure refused to open a voice session (HTTP ${res.status()}). ` +
@@ -66,12 +65,97 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     expect(body.expiresAt * 1000, 'the session token is already expired').toBeGreaterThan(
       Date.now(),
     );
+    expect(
+      tokenElapsedMs,
+      `opening a voice session took ${(tokenElapsedMs / 1000).toFixed(1)}s. ` +
+        'A child pressing the microphone waits this long before negotiation starts.',
+    ).toBeLessThan(TOKEN_START_BUDGET_MS);
+
+    const configResponse = await request.get('/api/realtime/token');
+    expect(configResponse.status(), 'realtime transport config is unavailable').toBe(200);
+    const config = await configResponse.json();
+    expect(config.azureResource, 'Azure resource name is missing').toBeTruthy();
+
+    await page.goto('/it/', { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    const handshakeStartedAt = Date.now();
+    const handshake = await page.evaluate(
+      async ({ token, callsUrl }) => {
+        const peerConnection = new RTCPeerConnection();
+        let stream: MediaStream | null = null;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          const audioTrack = stream.getAudioTracks()[0];
+          if (!audioTrack) throw new Error('Fake microphone returned no audio track');
+          audioTrack.enabled = false;
+          peerConnection.addTrack(audioTrack, stream);
+          const dataChannel = peerConnection.createDataChannel('realtime-channel');
+          const offer = await peerConnection.createOffer({ offerToReceiveAudio: true });
+          await peerConnection.setLocalDescription(offer);
+
+          const response = await fetch(callsUrl, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/sdp',
+            },
+            body: peerConnection.localDescription?.sdp,
+          });
+          const answer = await response.text();
+          if (!response.ok) {
+            return {
+              status: response.status,
+              connected: false,
+              error: answer.slice(0, 300),
+            };
+          }
+
+          await peerConnection.setRemoteDescription({ type: 'answer', sdp: answer });
+          const connected = await new Promise<boolean>((resolve) => {
+            if (dataChannel.readyState === 'open') {
+              resolve(true);
+              return;
+            }
+            const timeout = window.setTimeout(() => resolve(false), 10_000);
+            dataChannel.addEventListener(
+              'open',
+              () => {
+                window.clearTimeout(timeout);
+                resolve(true);
+              },
+              { once: true },
+            );
+          });
+          return {
+            status: response.status,
+            connected,
+            error: connected ? null : `data channel state: ${dataChannel.readyState}`,
+          };
+        } finally {
+          stream?.getTracks().forEach((track) => track.stop());
+          peerConnection.close();
+        }
+      },
+      {
+        token: body.token as string,
+        callsUrl: `https://${config.azureResource}.openai.azure.com/openai/v1/realtime/calls`,
+      },
+    );
 
     expect(
-      elapsedMs,
-      `opening a voice session took ${(elapsedMs / 1000).toFixed(1)}s. ` +
-        'A child pressing the microphone waits this long before the Maestro can hear them.',
-    ).toBeLessThan(VOICE_START_BUDGET_MS);
+      handshake.status,
+      `Azure rejected the browser SDP offer: ${handshake.error ?? 'no error body'}`,
+    ).toBe(201);
+    expect(
+      handshake.connected,
+      `Azure returned SDP but WebRTC did not connect: ${handshake.error ?? 'unknown state'}`,
+    ).toBe(true);
+
+    const handshakeElapsedMs = Date.now() - handshakeStartedAt;
+    expect(
+      handshakeElapsedMs,
+      `WebRTC negotiation took ${(handshakeElapsedMs / 1000).toFixed(1)}s. ` +
+        'The Maestro cannot hear the child until this finishes.',
+    ).toBeLessThan(WEBRTC_HANDSHAKE_BUDGET_MS);
   });
 
   test('Realtime token endpoint returns transport config', async ({ request }) => {

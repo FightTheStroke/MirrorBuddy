@@ -5,7 +5,9 @@
  * Requirements: F-06 (SDP exchange)
  */
 
+import { NextRequest } from 'next/server';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { POST } from './route';
 
 describe('/api/realtime/sdp-exchange', () => {
   beforeEach(() => {
@@ -26,12 +28,12 @@ describe('/api/realtime/sdp-exchange', () => {
       expect(gaUrl).not.toContain('/v1/realtimertc');
     });
 
-    it('should keep WebRTC filter OFF for data-channel tool calls', async () => {
+    it('should use the documented GA endpoint without preview query parameters', async () => {
       const azureEndpoint = 'https://test-resource.openai.azure.com';
-      const previewUrl = `${azureEndpoint}/openai/v1/realtime/calls?webrtcfilter=off`;
+      const gaUrl = `${azureEndpoint}/openai/v1/realtime/calls`;
 
-      expect(previewUrl).toContain('/openai/v1/realtime/calls');
-      expect(previewUrl).toContain('webrtcfilter=off');
+      expect(gaUrl).toContain('/openai/v1/realtime/calls');
+      expect(gaUrl).not.toContain('webrtcfilter');
     });
 
     it('should find realtime/calls endpoint in route code', async () => {
@@ -43,7 +45,33 @@ describe('/api/realtime/sdp-exchange', () => {
 
       // This should PASS even before implementation (already exists)
       expect(content).toMatch(/\/openai\/v1\/realtime\/calls/);
-      expect(content).toContain('webrtcfilter=off');
+      expect(content).not.toContain('webrtcfilter=off');
+    });
+
+    it('should require CSRF protection before relaying a browser token', async () => {
+      const { readFileSync } = await import('fs');
+      const { resolve } = await import('path');
+      const routePath = resolve(__dirname, 'route.ts');
+      const content = readFileSync(routePath, 'utf-8');
+
+      expect(content).toContain('withCSRF');
+      expect(content).toContain('withRateLimit');
+      expect(content).toMatch(
+        /pipe\(\s*withSentry\('\/api\/realtime\/sdp-exchange'\),\s*withCSRF,\s*withRateLimit/,
+      );
+    });
+
+    it('should reject relay requests without a valid CSRF token', async () => {
+      const request = new NextRequest('http://localhost/api/realtime/sdp-exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sdp: 'v=0\r\n', token: 'ek_test' }),
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(403);
+      await expect(response.json()).resolves.toEqual({ error: 'Invalid CSRF token' });
     });
   });
 

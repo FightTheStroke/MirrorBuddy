@@ -135,6 +135,93 @@ describe('WebRTC GA Protocol', () => {
       expect(mockFetch).toHaveBeenCalledTimes(2); // token + SDP exchange only
     });
 
+    it('should use the protected server relay after a transient direct Azure failure', async () => {
+      const azureFailure = {
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        text: async () => '{"error":{"message":"temporary"}}',
+        headers: new Headers({ 'x-request-id': 'azure-direct-request' }),
+      };
+      const mockFetch = global.fetch as ReturnType<typeof vi.fn>;
+      mockFetch.mockResolvedValueOnce(azureFailure);
+
+      const { csrfFetch } = await import('@/lib/auth');
+      const mockCsrfFetch = csrfFetch as ReturnType<typeof vi.fn>;
+      mockCsrfFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => 'relay-answer-sdp',
+        headers: new Headers(),
+      });
+
+      const connection = new WebRTCConnection({
+        maestro: { id: 'm1', name: 'Test' } as never,
+        connectionInfo: { characterType: 'maestro' } as never,
+      });
+      const peerConnection = {
+        setRemoteDescription: vi.fn(async () => undefined),
+      } as unknown as RTCPeerConnection;
+      const internals = connection as unknown as {
+        serverConfig: { azureResource: string };
+        peerConnection: RTCPeerConnection;
+        exchangeSDP: (token: string, offer: RTCSessionDescriptionInit) => Promise<void>;
+      };
+      internals.serverConfig = { azureResource: 'my-resource' };
+      internals.peerConnection = peerConnection;
+
+      await internals.exchangeSDP('mock-token', {
+        type: 'offer',
+        sdp: 'mock-offer',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/realtime/sdp-exchange', {
+        method: 'POST',
+        body: JSON.stringify({ sdp: 'mock-offer', token: 'mock-token' }),
+        signal: expect.any(AbortSignal),
+      });
+      expect(peerConnection.setRemoteDescription).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not amplify Azure capacity throttling through the relay', async () => {
+      const mockFetch = global.fetch as ReturnType<typeof vi.fn>;
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        statusText: 'Too Many Requests',
+        text: async () => '{"error":{"message":"capacity"}}',
+        headers: new Headers({ 'retry-after': '5' }),
+      });
+
+      const { csrfFetch } = await import('@/lib/auth');
+      const mockCsrfFetch = csrfFetch as ReturnType<typeof vi.fn>;
+
+      const connection = new WebRTCConnection({
+        maestro: { id: 'm1', name: 'Test' } as never,
+        connectionInfo: { characterType: 'maestro' } as never,
+      });
+      const internals = connection as unknown as {
+        serverConfig: { azureResource: string };
+        peerConnection: RTCPeerConnection;
+        exchangeSDP: (token: string, offer: RTCSessionDescriptionInit) => Promise<void>;
+      };
+      internals.serverConfig = { azureResource: 'my-resource' };
+      internals.peerConnection = {
+        setRemoteDescription: vi.fn(async () => undefined),
+      } as unknown as RTCPeerConnection;
+
+      await expect(
+        internals.exchangeSDP('mock-token', {
+          type: 'offer',
+          sdp: 'mock-offer',
+        }),
+      ).rejects.toThrow('SDP exchange failed');
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockCsrfFetch).not.toHaveBeenCalled();
+    });
+
     it('should use preview endpoint when voice_ga_protocol is disabled', async () => {
       mockIsFeatureEnabled.mockReturnValue({
         enabled: false,

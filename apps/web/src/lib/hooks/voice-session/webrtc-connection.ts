@@ -35,6 +35,31 @@ import { VoiceError, getVoiceErrorCode } from './voice-error-codes';
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
 
+const SDP_REQUEST_TIMEOUT_MS = 8_000;
+const FALLBACK_SDP_STATUSES = new Set([408, 500, 502, 503, 504]);
+
+function getUpstreamRequestId(response: Response): string | undefined {
+  return (
+    response.headers?.get('x-azure-request-id') ??
+    response.headers?.get('x-request-id') ??
+    response.headers?.get('apim-request-id') ??
+    response.headers?.get('x-ms-request-id') ??
+    undefined
+  );
+}
+
+async function withSDPTimeout(
+  request: (signal: AbortSignal) => Promise<Response>,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), SDP_REQUEST_TIMEOUT_MS);
+  try {
+    return await request(controller.signal);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 /**
  * Server token config shape (from /api/realtime/token).
  * GA mode returns azureResource + deployment.
@@ -484,19 +509,80 @@ export class WebRTCConnection {
       sdpEndpoint = webrtcEndpoint;
     }
 
-    const response = await fetch(sdpEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/sdp',
-        Authorization: `Bearer ${token}`,
-      },
-      body: offer.sdp,
-    });
+    let response: Response;
+    try {
+      response = await withSDPTimeout((signal) =>
+        fetch(sdpEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/sdp',
+            Authorization: `Bearer ${token}`,
+          },
+          body: offer.sdp,
+          signal,
+        }),
+      );
+    } catch (error) {
+      if (!this.isGAProtocol) {
+        const message = error instanceof Error ? error.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message);
+        throw new Error('SDP exchange failed: network request failed');
+      }
+      logger.warn('[WebRTC] Direct SDP request failed; trying server relay', {
+        error: error instanceof Error ? error.message : 'Network request failed',
+      });
+      try {
+        response = await withSDPTimeout((signal) =>
+          csrfFetch('/api/realtime/sdp-exchange', {
+              method: 'POST',
+              body: JSON.stringify({ sdp: offer.sdp, token }),
+            signal,
+          }),
+        );
+      } catch (relayError) {
+        const message =
+          relayError instanceof Error ? relayError.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message);
+        throw new Error('SDP exchange failed: network request failed');
+      }
+    }
+
+    if (this.isGAProtocol && !response.ok && FALLBACK_SDP_STATUSES.has(response.status)) {
+      let sanitized = sanitizeUpstreamError(response.status, '');
+      try {
+        const errorText = await response.text();
+        sanitized = sanitizeUpstreamError(response.status, errorText);
+      } catch {
+        logger.warn('[WebRTC] Could not read the direct SDP error response');
+      }
+      logger.warn('[WebRTC] Direct SDP exchange failed; trying server relay', {
+        ...sanitized,
+        azureRequestId: getUpstreamRequestId(response),
+      });
+      try {
+        response = await withSDPTimeout((signal) =>
+          csrfFetch('/api/realtime/sdp-exchange', {
+          method: 'POST',
+          body: JSON.stringify({ sdp: offer.sdp, token }),
+            signal,
+          }),
+        );
+      } catch (relayError) {
+        const message =
+          relayError instanceof Error ? relayError.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message, {
+          azureRequestId: getUpstreamRequestId(response),
+        });
+        throw new Error('SDP exchange failed: network request failed');
+      }
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       const sanitized = sanitizeUpstreamError(response.status, errorText);
       logVoiceError('SDPExchangeFailed', `Status: ${response.status}`, {
         statusText: response.statusText,
+        azureRequestId: getUpstreamRequestId(response),
         ...sanitized,
       });
       throw new Error(`SDP exchange failed: ${describeUpstreamError(sanitized)}`);

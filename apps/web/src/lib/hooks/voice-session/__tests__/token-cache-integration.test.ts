@@ -82,6 +82,34 @@ describe('Token Cache Integration', () => {
     expect(csrfFetchMock).toHaveBeenCalledTimes(1); // Still only 1 call
   });
 
+  it('should cache Unix-second expiry values returned by Azure', async () => {
+    const futureExpirySeconds = Math.floor((Date.now() + 120_000) / 1000);
+    const { csrfFetch } = await import('@/lib/auth');
+    const csrfFetchMock = csrfFetch as ReturnType<typeof vi.fn>;
+    csrfFetchMock.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          token: 'unix-seconds-token',
+          expiresAt: futureExpirySeconds,
+        }),
+    });
+
+    const { useTokenCache } = await import('../token-cache');
+    const { result } = renderHook(() => useTokenCache());
+
+    let first: string | null = null;
+    let second: string | null = null;
+    await act(async () => {
+      first = await result.current.getCachedToken();
+      second = await result.current.getCachedToken();
+    });
+
+    expect(first).toBe('unix-seconds-token');
+    expect(second).toBe('unix-seconds-token');
+    expect(csrfFetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('should refetch token if cache is expired', async () => {
     const { csrfFetch } = await import('@/lib/auth');
     const csrfFetchMock = csrfFetch as ReturnType<typeof vi.fn>;

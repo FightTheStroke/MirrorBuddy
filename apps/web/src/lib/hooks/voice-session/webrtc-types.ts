@@ -41,7 +41,7 @@ export interface WebRTCConnectionResult {
  */
 export interface EphemeralTokenResponse {
   token: string;
-  expiresAt: string;
+  expiresAt: string | number;
 }
 
 /**

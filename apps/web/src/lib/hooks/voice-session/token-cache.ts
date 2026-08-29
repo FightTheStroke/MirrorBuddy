@@ -22,6 +22,22 @@ interface CachedToken {
   fetchedAt: number;
 }
 
+function normalizeExpiry(expiresAt: unknown): number | null {
+  if (typeof expiresAt === 'number') {
+    if (!Number.isFinite(expiresAt) || expiresAt <= 0) return null;
+    return expiresAt < 10_000_000_000 ? expiresAt * 1000 : expiresAt;
+  }
+
+  if (typeof expiresAt !== 'string' || !expiresAt.trim()) return null;
+  const numericExpiry = Number(expiresAt);
+  if (Number.isFinite(numericExpiry) && numericExpiry > 0) {
+    return numericExpiry < 10_000_000_000 ? numericExpiry * 1000 : numericExpiry;
+  }
+
+  const parsedExpiry = Date.parse(expiresAt);
+  return Number.isFinite(parsedExpiry) ? parsedExpiry : null;
+}
+
 /**
  * Hook that pre-fetches and caches ephemeral tokens for voice sessions.
  * Returns `getCachedToken()` which resolves instantly if cache is valid,
@@ -52,13 +68,20 @@ export function useTokenCache() {
           return null;
         }
 
-        const data = await response.json();
+        const data: unknown = await response.json();
+        if (typeof data !== 'object' || data === null) {
+          logger.warn('[TokenCache] Token response was not an object');
+          return null;
+        }
+        const tokenResponse = data as { token?: unknown; expiresAt?: unknown };
+        const expiresAt = normalizeExpiry(tokenResponse.expiresAt);
+        if (typeof tokenResponse.token !== 'string' || !tokenResponse.token || !expiresAt) {
+          logger.warn('[TokenCache] Token response was missing required fields');
+          return null;
+        }
         const cached: CachedToken = {
-          token: data.token,
-          expiresAt:
-            typeof data.expiresAt === 'string'
-              ? new Date(data.expiresAt).getTime()
-              : data.expiresAt,
+          token: tokenResponse.token,
+          expiresAt,
           fetchedAt: Date.now(),
         };
 
