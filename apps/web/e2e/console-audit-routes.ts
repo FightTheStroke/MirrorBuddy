@@ -91,3 +91,15 @@ export function isIgnoredRequest(url: string, status?: number): boolean {
   if (IGNORED_REQUEST_PATTERNS.some((pattern) => pattern.test(url))) return true;
   return status === 503 && VOICE_ENDPOINT_PATTERN.test(url) && isVoiceDeliberatelyUnconfigured();
 }
+
+/**
+ * The browser logs a console error of its own for a failed subresource, with
+ * the status in the text and the URL only in the message location. Without
+ * this, a 503 accepted by `isIgnoredRequest` still fails the audit through the
+ * console channel.
+ */
+export function isIgnoredResourceFailure(text: string, url: string): boolean {
+  if (!/Failed to load resource/i.test(text)) return false;
+  const status = text.match(/status of (\d{3})/);
+  return isIgnoredRequest(url, status ? Number(status[1]) : undefined);
+}

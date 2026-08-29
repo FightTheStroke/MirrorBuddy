@@ -31,7 +31,11 @@ export function promoteChangelog(changelog: string, version: string, date: strin
     return { changelog, changed: false, reason: 'no [Unreleased] section' };
   }
 
-  if (new RegExp(`^## \\[${version.replace(/\./g, '\\.')}\\]`, 'm').test(changelog)) {
+  // A plain line scan, not a regular expression built from an argument: the
+  // version arrives from the command line, and a regex assembled from input is
+  // both a way in and a way to hang the process.
+  const heading = `## [${version}]`;
+  if (changelog.split('\n').some((line) => line.startsWith(heading))) {
     return { changelog, changed: false, reason: `[${version}] already present` };
   }
 
