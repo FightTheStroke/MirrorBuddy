@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { isUndeliveredRequest } from './undelivered-request';
 import { csrfFetch } from '@/lib/auth';
 
 // === TYPES ===
@@ -120,6 +121,7 @@ export const useLearningsStore = create<LearningsState>()((set, get) => ({
         });
       }
     } catch (error) {
+      if (isUndeliveredRequest(error)) return;
       logger.error('Learnings load failed', { error: String(error) });
     }
   },
