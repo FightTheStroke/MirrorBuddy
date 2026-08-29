@@ -21,6 +21,11 @@ from scipy.signal import resample_poly
 _DEFAULT_BARGE_RMS_THRESHOLD = 0.045  # normalised 0..1
 _DEFAULT_BARGE_SUSTAIN_FRAMES = 3  # consecutive loud frames
 
+# Measured on the device: a sentence spoken near the robot reaches the realtime
+# service at ~0.02 RMS, a clean recording of the same sentence at ~0.16. Server VAD
+# needs the second number to decide a turn began, so the mic path needs a pre-amp.
+DEFAULT_INPUT_GAIN = 6.0
+
 
 def barge_rms_threshold() -> float:
     """Read the barge-in RMS threshold from the env at call time.
@@ -56,6 +61,33 @@ def boost(audio: np.ndarray, gain: float) -> np.ndarray:
     """
     # 0.85 keeps the linear part below the knee of the curve.
     return np.tanh(audio * gain * 0.85).astype(np.float32)
+
+
+def input_gain() -> float:
+    """Read the microphone pre-amp gain from the env at call time.
+
+    Lazy for the same reason as the barge thresholds: ``main.run()`` loads the
+    robot's ``.env`` after this module is imported. Values below 1.0 are raised to
+    1.0 — nobody sets this field meaning "make the robot deafer".
+    """
+    try:
+        return max(1.0, float(os.getenv("MIRRORBUDDY_INPUT_GAIN", DEFAULT_INPUT_GAIN)))
+    except (TypeError, ValueError):
+        return DEFAULT_INPUT_GAIN
+
+
+def amplify_mic(audio: np.ndarray, gain: float) -> np.ndarray:
+    """Bring quiet speech up to a level the realtime server's VAD reacts to.
+
+    The Reachy Mini mic array is far quieter than a headset, and Azure server VAD
+    judges an absolute level: too soft and no turn ever starts, so Buddy talks and
+    then waits forever. Peaks are folded with the same ``tanh`` curve used on the
+    speaker so a child shouting into the mic is compressed, not clipped into a rasp.
+    """
+    if audio.size == 0 or gain <= 1.0:
+        return audio
+    scaled = boost(audio.astype(np.float32) / 32768.0, gain)
+    return (scaled * 32767.0).astype(np.int16)
 
 
 def resample(audio: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
