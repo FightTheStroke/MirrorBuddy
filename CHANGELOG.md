@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Pro esiste come pagina, non come vicolo cieco** — dalla schermata analytics
+  un ragazzo poteva toccare "Pro" e finire su un 404: una pagina che non
+  esisteva. Pro non è ancora acquistabile, quindi al suo posto c'è una pagina
+  che raccoglie un indirizzo e promette un solo messaggio, il giorno in cui
+  aprirà. Riusa il servizio waitlist già esistente (doppio opt-in, consenso
+  GDPR registrato, link di disiscrizione) e avvisa
+  `info@fightthestroke.org` a ogni iscrizione. Quel 404 è anche ciò che teneva
+  rossa la catena di rilascio, e con essa bloccati in `main` i correttivi alla
+  voce.
+- **Un controllo che la versione e il changelog siano d'accordo** — fra 0.26.1
+  e 0.29.1 i file di versione si sono mossi e `CHANGELOG.md` no: tre rilasci
+  usciti senza traccia di cosa contenessero. Ora `auto-version.sh --apply`
+  promuove da solo la sezione `[Unreleased]`, e
+  `scripts/ci/check-version-consistency.ts` fa fallire la CI se una delle
+  cinque copie della versione o la voce di changelog manca. Le voci 0.27.0 →
+  0.29.1 sono state ricostruite dai commit.
+- **Un controllo settimanale sulle chiavi Azure** — la chiave vive in quattro
+  posti. Il 28 agosto è stata rigenerata e i posti si sono disallineati: la
+  copia in `kv-virtualbpm-prod` era morta dal 29 novembre 2025 e nessuno se ne
+  era accorto, perché nessuno guardava. `scripts/check-azure-key-drift.sh`
+  chiede ad Azure se ogni copia funziona ancora, ogni settimana, e la procedura
+  di rotazione è scritta in `docs/operations/AZURE-KEY-ROTATION.md`.
+
+### Fixed
+
+- **La verifica browser smette di bocciare una scelta deliberata** — il job E2E
+  non ha credenziali voce apposta (ogni run costerebbe denaro reale e
+  porterebbe una chiave di produzione in un job di test), e i 503 che le rotte
+  voce restituiscono per progetto venivano contati come errori di pagina. Ora
+  l'eccezione esiste ma è dichiarata a voce alta da `E2E_VOICE_UNCONFIGURED`:
+  lo smoke contro il sito vivo non la imposta, quindi lì un 503 vero continua a
+  far fallire.
+- **`.env.example` dice i nomi che la produzione usa davvero** — indicava
+  `UPSTASH_REDIS_REST_*`, mentre Vercel inietta `KV_REST_API_*`: seguire
+  l'esempio creava una seconda copia non ruotata della stessa credenziale.
+  Allineati anche `SETUP-PRODUCTION.md`, `docs/operations/REDIS-FAILURE.md` e
+  il monitoraggio infrastrutturale.
+- **Rimossa la copia orfana di `pre-push-vercel.sh` nella radice** — nessuno la
+  eseguiva e conteneva regole diverse da quella vera in `scripts/`.
+
 ### Security
 
 - **Il corpo dell'errore upstream non sopravvive alla lettura** — una risposta di
@@ -68,6 +110,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `getSecretWithRetry`, `isAzureKeyVaultAvailable` e `getCacheStats` non avevano
   chiamanti fuori dal proprio test: rimossi. Se un Key Vault vero verrà creato,
   questa è la cucitura dove metterlo, con la dipendenza dichiarata.
+
+## [0.29.1] - 2026-08-29
+
+Recostruita a posteriori dai commit: queste tre versioni sono uscite senza voce
+in changelog. `scripts/ci/check-version-consistency.ts` ora impedisce che
+succeda ancora.
+
+### Fixed
+
+- La cronologia dell'assistente viene etichettata `output_text`, così una
+  conversazione ripresa non viene rifiutata dal servizio voce.
+- Il robot torna al percorso di risposta che funzionava: la risposta anticipata
+  lo lasciava muto.
+- Il robot smette di aspettare una risposta che non arriverà.
+- Le credenziali voce del robot sono fissate al protocollo stabile e al
+  deployment `gpt-realtime-2.1`, allineato al sito.
+- Le variabili Redis gestite da Vercel (`KV_REST_API_*`) arrivano alla
+  validazione pre-deploy e alle guardie pre-push.
+- Riparati gli import rotti della CLI di rotazione chiavi.
+
+### Added
+
+- Il robot recupera da solo credenziali voce e aggiornamenti.
+
+## [0.29.0] - 2026-08-28
+
+### Added
+
+- Il robot viene rilasciato insieme all'app e si aggiorna da solo.
+
+### Fixed
+
+- Contrasto della lista nella vista progressi XP.
+- La configurazione di una famiglia resta dove un aggiornamento non può
+  cancellarla.
+
+## [0.28.1] - 2026-08-28
+
+### Fixed
+
+- Il primo fotogramma ambientale viene condiviso anche su un robot appena acceso.
+
+## [0.28.0] - 2026-08-28
+
+### Added
+
+- Gli studenti possono disattivare il tempo di parola aggiuntivo.
+- Viene misurata l'attesa prima della prima parola in chat.
+
+### Changed
+
+- La risposta viene preparata mentre la trascrizione sta ancora arrivando.
+- Le conversazioni lunghe vengono ridotte anche sulla rotta in streaming.
+- Le ricerche indipendenti non si aspettano più a vicenda; la domanda dello
+  studente viene trasformata in embedding una sola volta per richiesta.
+
+### Fixed
+
+- Il robot non pronuncia una risposta a cui il bambino ha già rinunciato.
+- Le parole chiave degli strumenti vengono confrontate su parole intere.
+
+## [0.27.1] - 2026-08-27
+
+### Fixed
+
+- I controlli obbligatori girano davvero sulle PR di rilascio (RELEASE_PAT).
+
+## [0.27.0] - 2026-08-27
+
+### Added
+
+- Raggruppamento per dimensione nella modalità mensile dello script costi Azure.
+
+### Fixed
+
+- Gli errori di Cost Management vengono mostrati invece di riportare $0.00.
 
 ## [0.26.1] - 2026-08-26
 

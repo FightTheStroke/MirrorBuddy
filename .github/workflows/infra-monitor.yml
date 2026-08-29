@@ -15,6 +15,24 @@ jobs:
   # PUBLIC CHECKS → GitHub Issues (non-sensitive info)
   # =========================================================================
 
+  # The Azure OpenAI key lives in four stores. On 28 August 2026 it was
+  # regenerated and they drifted: the Key Vault copy had been dead since
+  # November 2025 and nobody knew, because nothing was looking. Now something
+  # looks, every week.
+  azure-key-drift:
+    name: Azure Key Drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check every reachable store holds a live key
+        env:
+          AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_REALTIME_ENDPOINT: ${{ secrets.AZURE_OPENAI_REALTIME_ENDPOINT }}
+          AZURE_OPENAI_REALTIME_API_KEY: ${{ secrets.AZURE_OPENAI_REALTIME_API_KEY }}
+        run: bash scripts/check-azure-key-drift.sh
+
   azure-models:
     name: Azure OpenAI Models
     runs-on: ubuntu-latest
@@ -260,8 +278,8 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
-          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
         run: |
           ALERTS=""
           REPORT=""
@@ -287,9 +305,9 @@ jobs:
           fi
 
           # --- Upstash Redis ---
-          if [ -n "$UPSTASH_REDIS_REST_URL" ] && [ -n "$UPSTASH_REDIS_REST_TOKEN" ]; then
-            REDIS_INFO=$(curl -sf "${UPSTASH_REDIS_REST_URL}/info" \
-              -H "Authorization: Bearer ${UPSTASH_REDIS_REST_TOKEN}" 2>/dev/null)
+          if [ -n "$KV_REST_API_URL" ] && [ -n "$KV_REST_API_TOKEN" ]; then
+            REDIS_INFO=$(curl -sf "${KV_REST_API_URL}/info" \
+              -H "Authorization: Bearer ${KV_REST_API_TOKEN}" 2>/dev/null)
 
             if [ -n "$REDIS_INFO" ]; then
               REDIS_MEMORY=$(echo "$REDIS_INFO" | jq -r '.result' 2>/dev/null | grep 'used_memory_human' | cut -d: -f2 | tr -d '[:space:]' || echo "N/A")

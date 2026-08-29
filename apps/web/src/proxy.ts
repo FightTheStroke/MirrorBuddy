@@ -76,6 +76,9 @@ const AUTH_PUBLIC_ROUTES = [
   '/trial',
   // Waitlist email-link landing pages (verify/unsubscribe) — public, no auth
   '/waitlist',
+  // Pro does not exist yet: this page only collects an address to warn people
+  // when it does. A parent must be able to reach it without an account.
+  '/pro',
   // Static assets (images)
   '/maestri',
   '/avatars',
@@ -92,6 +95,8 @@ const ADMIN_PREFIX = '/admin';
 // Routes that do NOT require a provider to be configured
 const PUBLIC_ROUTES = [
   '/landing',
+  // Asking to be told when Pro opens needs no AI provider at all.
+  '/pro',
   '/api',
   '/_next',
   '/favicon',

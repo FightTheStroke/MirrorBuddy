@@ -47,7 +47,7 @@ function watchForProblems(page: Page): PageProblem[] {
     const status = response.status();
     if (status < 400) return;
     const url = response.url();
-    if (isIgnoredRequest(url)) return;
+    if (isIgnoredRequest(url, status)) return;
     problems.push({ kind: 'request', detail: `${status} ${url}` });
   });
 

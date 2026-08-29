@@ -32,6 +32,7 @@ export const CONSOLE_AUDIT_ROUTES = [
   '/pdf',
   '/pricing',
   '/privacy',
+  '/pro',
   '/quiz',
   '/search',
   '/study-kit',
@@ -66,10 +67,27 @@ export const IGNORED_REQUEST_PATTERNS: readonly RegExp[] = [
   /vitals\.vercel-insights/i,
 ];
 
+/**
+ * Realtime voice endpoints answer 503 when the server holds no Azure voice
+ * credentials. That is the designed answer, not a defect — and CI holds no
+ * credentials on purpose, so that every run stays free and no production key
+ * travels into a test job.
+ *
+ * The exception is therefore gated on an environment that says so out loud.
+ * The production smoke run does not set it, so a 503 against the live site
+ * still fails the audit, which is the case that would actually hurt a child.
+ */
+const VOICE_ENDPOINT_PATTERN = /\/api\/realtime\//i;
+
+export function isVoiceDeliberatelyUnconfigured(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.E2E_VOICE_UNCONFIGURED === 'true';
+}
+
 export function isIgnoredConsoleMessage(text: string): boolean {
   return IGNORED_CONSOLE_PATTERNS.some((pattern) => pattern.test(text));
 }
 
-export function isIgnoredRequest(url: string): boolean {
-  return IGNORED_REQUEST_PATTERNS.some((pattern) => pattern.test(url));
+export function isIgnoredRequest(url: string, status?: number): boolean {
+  if (IGNORED_REQUEST_PATTERNS.some((pattern) => pattern.test(url))) return true;
+  return status === 503 && VOICE_ENDPOINT_PATTERN.test(url) && isVoiceDeliberatelyUnconfigured();
 }
