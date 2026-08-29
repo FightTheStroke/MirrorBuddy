@@ -25,6 +25,7 @@ const NAMESPACES = [
   'voice',
   'analytics',
   'waitlist',
+  'pro',
   'research',
   'email',
   'loading',

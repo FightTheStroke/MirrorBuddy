@@ -24,6 +24,13 @@ concurrency:
 env:
   NODE_VERSION: "20"
   VERCEL_CLI_VERSION: "56.3.2"
+  # This workflow holds no Azure voice credentials on purpose: every run would
+  # otherwise cost real money and carry a production key into a test job. The
+  # browser console audit reads this flag to accept the 503 the realtime voice
+  # endpoints are designed to return when no credentials exist. The post-deploy
+  # smoke run against the live site does not set it, so a real voice outage
+  # there still fails.
+  E2E_VOICE_UNCONFIGURED: "true"
 
 jobs:
   # =========================================================================
@@ -613,6 +620,17 @@ jobs:
 
       - name: Detect dead exports (informational)
         run: bash scripts/ci/check-dead-exports.sh apps/web/src/lib
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Between 0.26.1 and 0.29.1 the version files moved and CHANGELOG.md did
+      # not, so three releases shipped with no record of what was in them.
+      # Nothing failed, because nothing was checking. This checks.
+      - name: Version and changelog agree
+        run: npx --yes tsx scripts/ci/check-version-consistency.ts
 
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:

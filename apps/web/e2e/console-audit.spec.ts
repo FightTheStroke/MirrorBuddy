@@ -15,6 +15,7 @@ import {
   CONSOLE_AUDIT_ROUTES,
   isIgnoredConsoleMessage,
   isIgnoredRequest,
+  isIgnoredResourceFailure,
 } from './console-audit-routes';
 import type { Page } from '@playwright/test';
 
@@ -30,6 +31,10 @@ function watchForProblems(page: Page): PageProblem[] {
     if (message.type() !== 'error') return;
     const text = message.text();
     if (isIgnoredConsoleMessage(text)) return;
+    // The browser also logs "Failed to load resource" for a request the
+    // response handler above has already judged. Judge it the same way, or a
+    // 503 the voice endpoints return by design comes back as a console error.
+    if (isIgnoredResourceFailure(text, message.location().url)) return;
     const args = await Promise.all(
       message.args().map((arg) => arg.jsonValue().catch(() => undefined)),
     );
@@ -47,7 +52,7 @@ function watchForProblems(page: Page): PageProblem[] {
     const status = response.status();
     if (status < 400) return;
     const url = response.url();
-    if (isIgnoredRequest(url)) return;
+    if (isIgnoredRequest(url, status)) return;
     problems.push({ kind: 'request', detail: `${status} ${url}` });
   });
 

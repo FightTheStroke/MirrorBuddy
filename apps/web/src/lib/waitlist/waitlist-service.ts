@@ -7,6 +7,7 @@ import { customAlphabet } from 'nanoid';
 import { prisma } from '@/lib/db';
 import { recordFunnelEvent } from '@/lib/funnel';
 import { sendEmail } from '@/lib/email';
+import { notifyTeamOfSignup } from './waitlist-notification';
 import { logger } from '@/lib/logger';
 
 const log = logger.child({ module: 'waitlist-service' });
@@ -151,6 +152,12 @@ export async function signup(params: SignupParams): Promise<WaitlistEntry> {
       metadata: { email, source: params.source ?? 'coming-soon' },
     }),
     sendVerificationEmail(entry, params.locale),
+    notifyTeamOfSignup({
+      email,
+      name: entry.name,
+      locale: params.locale,
+      source: params.source ?? 'coming-soon',
+    }),
   ]);
 
   log.info('Waitlist signup created', { email });
