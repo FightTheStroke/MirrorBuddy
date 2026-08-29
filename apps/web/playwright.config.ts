@@ -63,6 +63,9 @@ const finalTestDb = testDatabaseUrl || 'postgresql://roberdan@localhost:5432/mir
 // Dynamic port for parallel agent isolation (separate worktrees use different ports)
 const appPort = process.env.MIRRORBUDDY_PORT || '3000';
 const appBaseURL = `http://localhost:${appPort}`;
+const webServerCommand = process.env.CI
+  ? 'node .next/standalone/apps/web/server.js'
+  : 'npm run dev';
 
 // Configure screenshot comparison settings
 export const screenshotComparisonOptions = {
@@ -331,8 +334,11 @@ export default defineConfig({
   ],
 
   webServer: {
-    // Use production server in CI (pre-built), dev server locally
-    command: process.env.CI ? 'npm run start' : 'npm run dev',
+    // Use the pre-built standalone server in CI, dev server locally.
+    // Playwright runs this from apps/web, so `npm run start` would resolve to
+    // apps/web/package.json (`next start`) instead of the root standalone script.
+    command: webServerCommand,
+    cwd: __dirname,
     url: appBaseURL,
     // Avoid reusing a manually-started dev server. The E2E webServer env overrides
     // (DATABASE_URL/SESSION_SECRET/E2E_TESTS) are critical for correctness and safety.

@@ -136,7 +136,7 @@ function TierCTA({
   if (!isPro) {
     return (
       <Link
-        href="/auth/signup"
+        href="/login"
         className="block w-full rounded-lg bg-gray-100 px-4 py-3 text-center text-sm font-semibold text-gray-900 hover:bg-gray-200"
       >
         {t(`tiers.${tierKey}.cta`)}
