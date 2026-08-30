@@ -4,18 +4,29 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getMaestroQuotes, quoteSource, quoteText } from '@/data/maestri/quotes';
 import { useLocale, useTranslations } from 'next-intl';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
 
 interface QuoteRotatorProps {
   maestroId: string;
   className?: string;
   rotationInterval?: number; // milliseconds
   pauseOnHover?: boolean;
-  compact?: boolean; // Single line, no dots
+  compact?: boolean; // Condensed layout, no dots
+  /**
+   * Auto-advance to the next line. Off means one stable line, which is the
+   * right default anywhere the reader cannot pause it with the keyboard.
+   */
+  rotate?: boolean;
+  /** Lines of text before truncation in the compact layout. */
+  clampLines?: 1 | 2 | 3;
 }
 
 /**
- * QuoteRotator - Displays rotating motivational quotes for a maestro
- * Respects prefers-reduced-motion for accessibility
+ * QuoteRotator - Displays a maestro's lines, optionally rotating.
+ *
+ * Auto-advancing text is movement: it is disabled under
+ * prefers-reduced-motion, and callers that cannot offer a keyboard-reachable
+ * pause control should pass rotate={false} (WCAG 2.2.2).
  */
 export function QuoteRotator({
   maestroId,
@@ -23,23 +34,28 @@ export function QuoteRotator({
   rotationInterval = 5000,
   pauseOnHover = true,
   compact = false,
+  rotate = true,
+  clampLines = 1,
 }: QuoteRotatorProps) {
   const t = useTranslations('chat');
   const locale = useLocale();
   const quotes = getMaestroQuotes(maestroId, locale);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
+
+  const autoRotate = rotate && !prefersReducedMotion;
 
   // Auto-rotate quotes
   useEffect(() => {
-    if (!quotes || quotes.length <= 1 || isPaused) return;
+    if (!autoRotate || !quotes || quotes.length <= 1 || isPaused) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % quotes.length);
     }, rotationInterval);
 
     return () => clearInterval(interval);
-  }, [quotes, rotationInterval, isPaused]);
+  }, [autoRotate, quotes, rotationInterval, isPaused]);
 
   // Handle mouse enter/leave for pause on hover
   const handleMouseEnter = () => {
@@ -72,10 +88,17 @@ export function QuoteRotator({
   const rendered = source === undefined ? text : `\u201C${text}\u201D`;
 
   if (compact) {
+    const clamp =
+      clampLines === 1 ? 'truncate' : clampLines === 2 ? 'line-clamp-2' : 'line-clamp-3';
     return (
-      <p className={`text-slate-500 dark:text-slate-400 italic truncate ${className}`}>
-        {rendered}
-      </p>
+      <div className={className} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <p className={`text-slate-500 dark:text-slate-400 italic ${clamp}`}>{rendered}</p>
+        {source !== undefined && (
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 not-italic truncate mt-0.5">
+            {source}
+          </p>
+        )}
+      </div>
     );
   }
 
@@ -91,10 +114,10 @@ export function QuoteRotator({
       <AnimatePresence mode="wait">
         <motion.p
           key={safeIndex}
-          initial={{ opacity: 0, y: 10 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.3 }}
+          exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+          transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
           className="text-sm text-slate-600 dark:text-slate-400 italic text-center line-clamp-2"
         >
           {rendered}
