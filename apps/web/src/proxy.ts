@@ -58,6 +58,11 @@ const AUTH_PUBLIC_ROUTES = [
   '/home',
   '/welcome',
   '/login',
+  // Password recovery: whoever needs these pages is by definition logged out.
+  // Leaving them behind the auth check redirected them to /welcome, which made
+  // the whole reset flow unreachable even though the routes worked.
+  '/forgot-password',
+  '/reset-password',
   '/landing',
   '/maintenance',
   // Legal pages (GDPR, EU AI Act - legally required to be public)
