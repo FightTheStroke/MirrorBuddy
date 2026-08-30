@@ -797,7 +797,9 @@
         "error": "Error loading stats",
         "loadingDetail": "Loading details...",
         "errorDetail": "Error loading campaign details",
-        "quotaApiError": "Unable to retrieve email quota data. Check the Resend API key configuration."
+        "quotaApiError": "Unable to retrieve email quota data. Check the Resend API key configuration.",
+        "dailyQuotaAriaLabel": "Daily quota: {used} of {limit}",
+        "monthlyQuotaAriaLabel": "Monthly quota: {used} of {limit}"
       },
       "editor": {
         "title": "Email Editor",
@@ -1807,8 +1809,6 @@
     "disableUser": "Disabilita utente",
     "demoteToUser": "Retrocedi a utente",
     "promoteToAdmin": "Promuovi ad admin",
-    "dailyQuota": "Quota giornaliera: {used} di {limit}",
-    "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
     "selezionaInvite": "Seleziona {name}",
     "modelComparison": {
@@ -1887,6 +1887,12 @@
       "completeSuccess": "Experiment completed successfully",
       "startDate": "Start date",
       "cancel": "Cancel"
-    }
+    },
+    "missionControlTitle": "Mission Control",
+    "missionControlDescription": "Infrastructure monitoring, key vault, service health and AI/email",
+    "infrastructureDescription": "Vercel, Supabase, Redis and maintenance controls",
+    "keyVaultDescription": "Secure management of API keys and secrets",
+    "serviceHealthDescription": "Real-time status of external services",
+    "aiEmailMonitoringDescription": "AI provider and email delivery monitoring"
   }
 }

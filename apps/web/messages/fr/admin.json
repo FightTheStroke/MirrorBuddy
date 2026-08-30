@@ -797,7 +797,9 @@
         "error": "Erreur de chargement des statistiques",
         "loadingDetail": "Chargement des détails...",
         "errorDetail": "Erreur de chargement des détails de la campagne",
-        "quotaApiError": "Impossible de récupérer les données de quota email. Vérifiez la configuration de la clé API Resend."
+        "quotaApiError": "Impossible de récupérer les données de quota email. Vérifiez la configuration de la clé API Resend.",
+        "dailyQuotaAriaLabel": "Quota quotidien : {used} sur {limit}",
+        "monthlyQuotaAriaLabel": "Quota mensuel : {used} sur {limit}"
       },
       "editor": {
         "title": "Éditeur d'Email",
@@ -1807,8 +1809,6 @@
     "disableUser": "Disabilita utente",
     "demoteToUser": "Retrocedi a utente",
     "promoteToAdmin": "Promuovi ad admin",
-    "dailyQuota": "Quota giornaliera: {used} di {limit}",
-    "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
     "selezionaInvite": "Seleziona {name}",
     "modelComparison": {
@@ -1887,6 +1887,12 @@
       "completeSuccess": "Expérience terminée avec succès",
       "startDate": "Date de début",
       "cancel": "Annuler"
-    }
+    },
+    "missionControlTitle": "Centre de contrôle",
+    "missionControlDescription": "Surveillance infrastructure, coffre de clés, santé des services et IA/email",
+    "infrastructureDescription": "Vercel, Supabase, Redis et contrôles de maintenance",
+    "keyVaultDescription": "Gestion sécurisée des clés API et des secrets",
+    "serviceHealthDescription": "État en temps réel des services externes",
+    "aiEmailMonitoringDescription": "Surveillance des fournisseurs IA et des emails"
   }
 }

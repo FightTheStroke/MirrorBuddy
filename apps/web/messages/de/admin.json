@@ -797,7 +797,9 @@
         "error": "Fehler beim Laden der Statistiken",
         "loadingDetail": "Details werden geladen...",
         "errorDetail": "Fehler beim Laden der Kampagnendetails",
-        "quotaApiError": "E-Mail-Kontingentdaten konnten nicht abgerufen werden. Überprüfen Sie die Resend-API-Schlüsselkonfiguration."
+        "quotaApiError": "E-Mail-Kontingentdaten konnten nicht abgerufen werden. Überprüfen Sie die Resend-API-Schlüsselkonfiguration.",
+        "dailyQuotaAriaLabel": "Tägliches Kontingent: {used} von {limit}",
+        "monthlyQuotaAriaLabel": "Monatliches Kontingent: {used} von {limit}"
       },
       "editor": {
         "title": "E-Mail-Editor",
@@ -1807,8 +1809,6 @@
     "disableUser": "Disabilita utente",
     "demoteToUser": "Retrocedi a utente",
     "promoteToAdmin": "Promuovi ad admin",
-    "dailyQuota": "Quota giornaliera: {used} di {limit}",
-    "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
     "selezionaInvite": "Seleziona {name}",
     "modelComparison": {
@@ -1887,6 +1887,12 @@
       "completeSuccess": "Experiment erfolgreich abgeschlossen",
       "startDate": "Startdatum",
       "cancel": "Abbrechen"
-    }
+    },
+    "missionControlTitle": "Kommandozentrale",
+    "missionControlDescription": "Infrastrukturüberwachung, Schlüsseltresor, Servicestatus und KI/E-Mail",
+    "infrastructureDescription": "Vercel, Supabase, Redis und Wartungssteuerungen",
+    "keyVaultDescription": "Sichere Verwaltung von API-Schlüsseln und Geheimnissen",
+    "serviceHealthDescription": "Echtzeitstatus der externen Dienste",
+    "aiEmailMonitoringDescription": "Überwachung von KI-Anbietern und E-Mail-Versand"
   }
 }
