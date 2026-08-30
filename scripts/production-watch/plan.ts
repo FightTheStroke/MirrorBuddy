@@ -17,6 +17,11 @@ export interface IssuePlan {
   close: number[];
 }
 
+/** Sources whose feed answered this run, so silence from them means "fixed". */
+export interface PlanOptions {
+  answered?: ProductionAlert['source'][];
+}
+
 export function markerFor(alert: ProductionAlert): string {
   return `<!-- ${MARKER_PREFIX} ${alert.key} -->`;
 }
@@ -48,8 +53,17 @@ export function issueBody(alert: ProductionAlert, observedAt: string): string {
 /**
  * Open an issue for anything new, add a comment to anything still happening,
  * and close what production has stopped complaining about.
+ *
+ * Silence only means "fixed" if the source that reported it actually answered.
+ * When a feed is down we must not read its missing alerts as good news, or one
+ * broken API call would close every issue that source ever opened.
  */
-export function planIssues(alerts: ProductionAlert[], existing: ExistingIssue[]): IssuePlan {
+export function planIssues(
+  alerts: ProductionAlert[],
+  existing: ExistingIssue[],
+  options: PlanOptions = {},
+): IssuePlan {
+  const answered = new Set(options.answered ?? (['sentry', 'vercel'] as const));
   const openIssues = existing.filter((issue) => issue.state === 'OPEN');
   const byKey = new Map<string, ExistingIssue>();
   for (const issue of openIssues) {
@@ -67,7 +81,9 @@ export function planIssues(alerts: ProductionAlert[], existing: ExistingIssue[])
     close: openIssues
       .filter((issue) => {
         const key = keyOf(issue);
-        return key !== null && !liveKeys.has(key);
+        if (key === null || liveKeys.has(key)) return false;
+        const source = key.split(':')[0] as ProductionAlert['source'];
+        return answered.has(source);
       })
       .map((issue) => issue.number),
   };

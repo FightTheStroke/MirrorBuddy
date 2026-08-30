@@ -85,6 +85,28 @@ describe('planning what to do about production alerts', () => {
 
     expect(plan.create).toHaveLength(1);
   });
+
+  it('keeps Sentry issues open when the Sentry feed did not answer', () => {
+    const plan = planIssues([], [issue()], { answered: ['vercel'] });
+
+    expect(plan.close).toEqual([]);
+  });
+
+  it('still closes Vercel issues when only the Sentry feed is down', () => {
+    const vercelIssue = issue({
+      number: 42,
+      body: markerFor(alert({ key: 'vercel:dpl_1', source: 'vercel' })),
+    });
+    const plan = planIssues([], [vercelIssue], { answered: ['vercel'] });
+
+    expect(plan.close).toEqual([42]);
+  });
+
+  it('closes both sources when both feeds answered', () => {
+    const plan = planIssues([], [issue()], { answered: ['sentry', 'vercel'] });
+
+    expect(plan.close).toEqual([10]);
+  });
 });
 
 describe('what the issue says', () => {
