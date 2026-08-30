@@ -19,10 +19,6 @@ describe('.env.example parity', () => {
     const keys = envKeys(envExample);
 
     const required = [
-      'LIVEKIT_URL',
-      'LIVEKIT_API_KEY',
-      'LIVEKIT_API_SECRET',
-      'NEXT_PUBLIC_LIVEKIT_URL',
       'SUPABASE_PUBLISHABLE_KEY',
       'SUPABASE_SECRET_KEY',
       'SUPABASE_JWT_SECRET',
@@ -39,5 +35,14 @@ describe('.env.example parity', () => {
     expect(keys.has('AZURE_CLIENT_ID')).toBe(false);
     expect(keys.has('AZURE_CLIENT_SECRET')).toBe(false);
     expect(keys.has('AZURE_OPENAI_API_VERSION')).toBe(false);
+
+    for (const key of [
+      'LIVEKIT_URL',
+      'LIVEKIT_API_KEY',
+      'LIVEKIT_API_SECRET',
+      'NEXT_PUBLIC_LIVEKIT_URL',
+    ]) {
+      expect(keys.has(key), `Unused ${key} must not be reintroduced`).toBe(false);
+    }
   });
 });

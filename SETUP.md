@@ -202,11 +202,6 @@ DIRECT_URL=                   # Direct DB connection for migrations (port 5432)
 STRIPE_SECRET_KEY=            # Stripe API key for Pro tier subscriptions
 STRIPE_WEBHOOK_SECRET=        # Webhook signature verification
 
-# Voice Rooms
-LIVEKIT_URL=                  # LiveKit server URL
-LIVEKIT_API_KEY=              # LiveKit API key
-LIVEKIT_API_SECRET=           # LiveKit API secret
-
 # Observability
 SENTRY_DSN=                   # Sentry error tracking
 SENTRY_AUTH_TOKEN=            # Sentry release management

@@ -193,11 +193,6 @@ function validateOptionalEnvVars(): void {
     { name: 'STRIPE_SECRET_KEY', category: 'Stripe' },
     { name: 'STRIPE_WEBHOOK_SECRET', category: 'Stripe' },
     { name: 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY', category: 'Stripe' },
-    // LiveKit
-    { name: 'LIVEKIT_URL', category: 'LiveKit' },
-    { name: 'LIVEKIT_API_KEY', category: 'LiveKit' },
-    { name: 'LIVEKIT_API_SECRET', category: 'LiveKit' },
-    { name: 'NEXT_PUBLIC_LIVEKIT_URL', category: 'LiveKit' },
     // Brave Search
     { name: 'BRAVE_SEARCH_API_KEY', category: 'Brave Search' },
     // Public URLs
