@@ -27,6 +27,7 @@
  */
 
 import DOMPurify from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 const SANITIZE_OPTIONS = {
   ALLOWED_TAGS: [
@@ -70,17 +71,28 @@ const SANITIZE_OPTIONS = {
   ],
 };
 
-function sanitizeFallback(html: string): string {
-  // Conservative SSR fallback: strip executable tags and inline event handlers.
-  return html
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, '')
-    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, '')
-    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, '')
-    .replace(/<form[\s\S]*?>[\s\S]*?<\/form>/gi, '')
-    .replace(/<input[\s\S]*?>/gi, '')
-    .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '')
-    .replace(/\s(href|src)\s*=\s*(['"])\s*javascript:[\s\S]*?\2/gi, '');
+/**
+ * Conservative SSR fallback: sanitizes with the same allowlist as the
+ * DOMPurify path above, using `sanitize-html` (a real HTML5 parser via
+ * `htmlparser2`, not a hand-rolled regex). A regex-based tag/attribute
+ * stripper — even looped to a fixed point — kept tripping CodeQL's
+ * js/incomplete-multi-character-sanitization and js/bad-tag-filter rules,
+ * because the tool has no way to prove the loop actually converges; a real
+ * parser removes that whole class of finding instead of trying to out-regex
+ * it. `sanitize-html` is pure JS (htmlparser2-based, no native bindings), so
+ * it's safe to run in the Vercel Node runtime without the jsdom bundling
+ * issues that rule out `isomorphic-dompurify` here.
+ */
+export function sanitizeFallback(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: SANITIZE_OPTIONS.ALLOWED_TAGS,
+    allowedAttributes: {
+      '*': SANITIZE_OPTIONS.ALLOWED_ATTR,
+    },
+    allowedSchemes: ['https', 'http', 'mailto'],
+    allowProtocolRelative: false,
+    disallowedTagsMode: 'discard',
+  });
 }
 
 /**

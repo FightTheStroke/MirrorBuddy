@@ -6,7 +6,11 @@
  */
 
 import { logger } from '@/lib/logger';
-import type { PrintOptions, PrintableContentType, DiagramPrintData } from './accessible-print/types';
+import type {
+  PrintOptions,
+  PrintableContentType,
+  DiagramPrintData,
+} from './accessible-print/types';
 import { getAccessibilityStyles } from './accessible-print/styles';
 import {
   renderMindmap,
@@ -44,7 +48,9 @@ function generateAccessibleHtml(options: PrintOptions): string {
       contentHtml = `<div role="tree" aria-label="Mappa mentale">${renderMindmap(content as MindmapNode[])}</div>`;
       break;
     case 'flashcard':
-      contentHtml = renderFlashcards((content as { cards: FlashcardItem[] }).cards || (content as FlashcardItem[]));
+      contentHtml = renderFlashcards(
+        (content as { cards: FlashcardItem[] }).cards || (content as FlashcardItem[]),
+      );
       break;
     case 'summary':
       contentHtml = renderSummary(content as SummaryData);
@@ -95,7 +101,7 @@ function generateAccessibleHtml(options: PrintOptions): string {
         <header>
           <h1>${escapeHtml(title)}</h1>
           <div class="meta">
-            ${contentTypeLabels[contentType] || contentType}
+            ${escapeHtml(contentTypeLabels[contentType] || contentType)}
             ${showDate ? ` | ${new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
           </div>
           ${a11yFeatures.length > 0 ? `<div class="a11y-indicator" aria-label="Impostazioni accessibilità attive">Accessibilità: ${a11yFeatures.join(', ')}</div>` : ''}
@@ -126,7 +132,9 @@ export async function printAccessible(options: PrintOptions): Promise<void> {
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
     logger.error('[AccessiblePrint] Could not open print window');
-    throw new Error('Impossibile aprire la finestra di stampa. Controlla le impostazioni popup del browser.');
+    throw new Error(
+      'Impossibile aprire la finestra di stampa. Controlla le impostazioni popup del browser.',
+    );
   }
 
   printWindow.document.write(html);

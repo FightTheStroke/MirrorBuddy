@@ -51,12 +51,18 @@ export const POST_GENERATION_BLOCKLIST: RegExp[] = [
 /**
  * Harmful URL patterns (phishing, malware, adult content)
  */
+// CodeQL js/polynomial-redos: unbounded `[^\s]*` on both sides of the same
+// literal creates O(n^2) backtracking on long non-matching input, since the
+// engine retries every split point between the two quantifiers. URLs are
+// bounded to 2000 chars (well past any realistic URL) so matching stays
+// linear in practice while every existing case (see output-sanitizer.test.ts
+// "Harmful URL detection") keeps matching unchanged.
 export const HARMFUL_URL_PATTERNS: RegExp[] = [
   // Adult content domains (partial list)
-  /https?:\/\/[^\s]*\b(porn|xxx|adult|nsfw)\b[^\s]*/gi,
+  /https?:\/\/[^\s]{0,2000}\b(porn|xxx|adult|nsfw)\b[^\s]{0,2000}/gi,
 
   // Suspicious download patterns
-  /https?:\/\/[^\s]*\.(exe|scr|bat|cmd|msi|dll)[^\s]*/gi,
+  /https?:\/\/[^\s]{0,2000}\.(exe|scr|bat|cmd|msi|dll)[^\s]{0,2000}/gi,
 
   // URL shorteners (can hide destination)
   /https?:\/\/(bit\.ly|goo\.gl|tinyurl|t\.co|ow\.ly)\/[^\s]+/gi,
