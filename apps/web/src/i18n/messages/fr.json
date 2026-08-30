@@ -1741,7 +1741,7 @@
       "termsDescription": "Règles d'utilisation de MirrorBuddy"
     },
     "contact": {
-      "text": "Des questions sur l'IA dans MirrorBuddy ? Écrivez-nous : compliance@mirrorbuddy.it"
+      "text": "Des questions sur l'IA dans MirrorBuddy ? Écrivez-nous : info@fightthestroke.org"
     },
     "sections": {
       "section1": {
@@ -1849,7 +1849,7 @@
         "title": "Signaler des Problèmes",
         "intro": "Si vous avez des préoccupations concernant l'utilisation de l'IA par MirrorBuddy, contactez-nous :",
         "emailLabel": "Email :",
-        "emailValue": "compliance@mirrorbuddy.it",
+        "emailValue": "info@fightthestroke.org",
         "formLabel": "Formulaire en Ligne :",
         "formValue": "Disponible dans le tableau de bord du compte",
         "authorityLabel": "Autorité de Régulation :",

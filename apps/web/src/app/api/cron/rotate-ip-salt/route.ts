@@ -15,6 +15,7 @@ import crypto from 'crypto';
 import { Redis } from '@upstash/redis';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
+import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 
 // Lazy initialization to avoid build-time errors
 let redis: ReturnType<typeof Redis.fromEnv> | null = null;
@@ -50,12 +51,12 @@ export const POST = pipe(
   });
 
   // Send admin notification email
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminRecipients = await getAdminRecipients();
   const resendClient = getResend();
-  if (adminEmail && resendClient) {
+  if (adminRecipients.length > 0 && resendClient) {
     await resendClient.emails.send({
       from: 'MirrorBuddy <noreply@mirrorbuddy.it>',
-      to: adminEmail,
+      to: adminRecipients,
       subject: '[Action Required] Monthly IP Salt Rotation',
       text: `New IP hash salt generated for monthly rotation.
 

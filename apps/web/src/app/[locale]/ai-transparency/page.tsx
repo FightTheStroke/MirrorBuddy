@@ -129,11 +129,11 @@ export default function AITransparencyPage() {
             <p className="text-slate-600 dark:text-gray-400 text-center">
               {t('contact.text')}{' '}
               <a
-                href="mailto:compliance@mirrorbuddy.it"
+                href="mailto:info@fightthestroke.org"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
                 aria-label={t('contact.emailAriaLabel')}
               >
-                compliance@mirrorbuddy.it
+                info@fightthestroke.org
               </a>
             </p>
           </footer>

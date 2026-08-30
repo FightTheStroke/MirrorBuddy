@@ -1750,7 +1750,7 @@
       "termsDescription": "MirrorBuddy usage rules"
     },
     "contact": {
-      "text": "Questions about AI in MirrorBuddy? Write to us: compliance@mirrorbuddy.it"
+      "text": "Questions about AI in MirrorBuddy? Write to us: info@fightthestroke.org"
     },
     "sections": {
       "section1": {
@@ -1858,7 +1858,7 @@
         "title": "Report Issues",
         "intro": "If you have concerns about how MirrorBuddy uses AI, contact us:",
         "emailLabel": "Email:",
-        "emailValue": "compliance@mirrorbuddy.it",
+        "emailValue": "info@fightthestroke.org",
         "formLabel": "Online Form:",
         "formValue": "Available in account dashboard",
         "authorityLabel": "Regulatory Authority:",

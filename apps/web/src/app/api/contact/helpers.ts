@@ -3,28 +3,29 @@
  * Email formatting and database operations
  */
 
-import { sendEmail } from "@/lib/email";
-import { logger } from "@/lib/logger";
+import { sendEmail } from '@/lib/email';
+import { logger } from '@/lib/logger';
+import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 
-const log = logger.child({ module: "contact-api" });
+const log = logger.child({ module: 'contact-api' });
 
 /**
  * Escape HTML special characters to prevent XSS in email templates
  */
 function escapeHtml(unsafe: string | undefined | null): string {
-  if (!unsafe) return "";
+  if (!unsafe) return '';
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 interface ContactFormData {
   name: string;
   email: string;
-  type: "general" | "schools" | "enterprise";
+  type: 'general' | 'schools' | 'enterprise';
   [key: string]: string | string[] | undefined;
 }
 
@@ -48,14 +49,14 @@ export function extractFormData(
  */
 function getContactTypeLabel(type: string): string {
   switch (type) {
-    case "general":
-      return "General Contact";
-    case "schools":
-      return "Schools Contact";
-    case "enterprise":
-      return "Enterprise Contact";
+    case 'general':
+      return 'General Contact';
+    case 'schools':
+      return 'Schools Contact';
+    case 'enterprise':
+      return 'Enterprise Contact';
     default:
-      return "Contact";
+      return 'Contact';
   }
 }
 
@@ -69,8 +70,8 @@ function formatEmailHtml(
   data: Record<string, string | string[] | undefined>,
 ): string {
   const typeLabel = getContactTypeLabel(type);
-  const timestamp = new Date().toLocaleString("it-IT", {
-    timeZone: "Europe/Rome",
+  const timestamp = new Date().toLocaleString('it-IT', {
+    timeZone: 'Europe/Rome',
   });
 
   let html = `
@@ -103,34 +104,34 @@ function formatEmailHtml(
   `;
 
   // Add type-specific fields (all user input is escaped to prevent XSS)
-  if (type === "general") {
+  if (type === 'general') {
     html += `
         <div class="field">
           <div class="label">Oggetto:</div>
-          <div class="value">${escapeHtml(data.subject as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.subject as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Messaggio:</div>
-          <div class="value">${escapeHtml(data.message as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.message as string) || 'N/A'}</div>
         </div>
     `;
-  } else if (type === "schools") {
+  } else if (type === 'schools') {
     html += `
         <div class="field">
           <div class="label">Ruolo:</div>
-          <div class="value">${escapeHtml(data.role as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.role as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Scuola:</div>
-          <div class="value">${escapeHtml(data.schoolName as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.schoolName as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Tipo Scuola:</div>
-          <div class="value">${escapeHtml(data.schoolType as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.schoolType as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Numero Studenti:</div>
-          <div class="value">${escapeHtml(data.studentCount as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.studentCount as string) || 'N/A'}</div>
         </div>
         ${
           data.specificNeeds
@@ -140,29 +141,29 @@ function formatEmailHtml(
           <div class="value">${escapeHtml(data.specificNeeds as string)}</div>
         </div>
         `
-            : ""
+            : ''
         }
     `;
-  } else if (type === "enterprise") {
+  } else if (type === 'enterprise') {
     const topics = Array.isArray(data.topics)
-      ? data.topics.map((t) => escapeHtml(t)).join(", ")
-      : escapeHtml(data.topics as string) || "N/A";
+      ? data.topics.map((t) => escapeHtml(t)).join(', ')
+      : escapeHtml(data.topics as string) || 'N/A';
     html += `
         <div class="field">
           <div class="label">Ruolo:</div>
-          <div class="value">${escapeHtml(data.role as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.role as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Azienda:</div>
-          <div class="value">${escapeHtml(data.company as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.company as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Settore:</div>
-          <div class="value">${escapeHtml(data.sector as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.sector as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Dipendenti:</div>
-          <div class="value">${escapeHtml(data.employeeCount as string) || "N/A"}</div>
+          <div class="value">${escapeHtml(data.employeeCount as string) || 'N/A'}</div>
         </div>
         <div class="field">
           <div class="label">Temi di interesse:</div>
@@ -176,7 +177,7 @@ function formatEmailHtml(
           <div class="value">${escapeHtml(data.message as string)}</div>
         </div>
         `
-            : ""
+            : ''
         }
     `;
   }
@@ -202,11 +203,11 @@ export async function sendAdminNotification(
   email: string,
   data: Record<string, string | string[] | undefined>,
 ): Promise<EmailResult> {
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const recipients = await getAdminRecipients();
 
-  if (!adminEmail) {
-    log.warn("ADMIN_EMAIL not configured - skipping notification");
-    return { success: false, error: "ADMIN_EMAIL not configured" };
+  if (recipients.length === 0) {
+    log.warn('No administrator can be notified - skipping notification');
+    return { success: false, error: 'No administrator recipient available' };
   }
 
   const typeLabel = getContactTypeLabel(type);
@@ -215,14 +216,14 @@ export async function sendAdminNotification(
 
   try {
     const result = await sendEmail({
-      to: adminEmail,
+      to: recipients,
       subject,
       html,
       replyTo: email,
     });
 
     if (!result.success) {
-      log.error("Failed to send admin notification", {
+      log.error('Failed to send admin notification', {
         error: result.error,
         type,
       });
@@ -230,8 +231,8 @@ export async function sendAdminNotification(
 
     return result;
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    log.error("Exception sending admin notification", { error: message, type });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    log.error('Exception sending admin notification', { error: message, type });
     return { success: false, error: message };
   }
 }

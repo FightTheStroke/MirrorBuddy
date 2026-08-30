@@ -10,6 +10,7 @@
 
 import { prisma } from '@/lib/db';
 import { sendEmail, isEmailConfigured } from '@/lib/email';
+import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 import { hashPassword, generateRandomPassword } from '@/lib/auth/server';
 import { logger } from '@/lib/logger';
 import { hashPII } from '@/lib/security';
@@ -94,8 +95,18 @@ export async function notifyAdminNewRequest(requestId: string): Promise<void> {
       trialStats,
     });
 
+    // Every administrator, not just the configured address: a beta request left
+    // in one person's inbox is a request nobody answers while they are away.
+    const recipients = await getAdminRecipients();
+    if (recipients.length === 0) {
+      logger.warn('No administrator can be notified of the beta request', {
+        requestId,
+      });
+      return;
+    }
+
     await sendEmail({
-      to: template.to,
+      to: recipients,
       subject: template.subject,
       html: template.html,
       text: template.text,
