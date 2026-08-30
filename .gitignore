@@ -152,3 +152,6 @@ graphify-out/
 .tmp/
 .aider*
 .gbrain-source
+
+# Playwright MCP session traces — local debugging noise
+.playwright-mcp/
