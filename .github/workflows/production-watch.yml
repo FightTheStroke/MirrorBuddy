@@ -1,0 +1,74 @@
+name: Production Watch
+
+# Every night, ask production what broke and put it on the board.
+# Sentry answers for runtime errors, Vercel for failed deployments, and the
+# live site answers for itself.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report only, do not touch issues"
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+  contents: read
+
+concurrency:
+  group: production-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    name: "🌙 Watch production"
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Ask the live site whether it is healthy
+        id: health
+        continue-on-error: true
+        run: |
+          STATUS=$(curl -s -o /tmp/health.json -w "%{http_code}" --max-time 30 \
+            https://www.mirrorbuddy.org/api/health)
+          echo "Health endpoint replied ${STATUS}"
+          cat /tmp/health.json | head -c 2000
+          test "$STATUS" = "200"
+
+      - name: Open an issue if the site is unhealthy
+        if: steps.health.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "[Production error] Health endpoint is not answering 200" \
+            --label production-watch \
+            --body "The nightly watch could not get a healthy answer from https://www.mirrorbuddy.org/api/health on $(date -u +%Y-%m-%dT%H:%M:%SZ)."
+
+      - name: Turn last night's failures into issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            npm run script scripts/production-error-watch.ts -- --dry-run
+          else
+            npm run script scripts/production-error-watch.ts
+          fi

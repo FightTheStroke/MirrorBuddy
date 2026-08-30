@@ -28,13 +28,12 @@ export function isEnabled(runtime: Runtime): boolean {
       ? process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true'
       : process.env.SENTRY_FORCE_ENABLE === 'true';
 
-  // Check if running on Vercel platform
-  // NEXT_PUBLIC_VERCEL_ENV may not be available in all build contexts,
-  // so also check NEXT_PUBLIC_VERCEL (always set by Vercel) as fallback
+  // Check if running on Vercel platform.
+  // NEXT_PUBLIC_VERCEL_ENV must be set explicitly in the project settings:
+  // Vercel only injects it when system variables are exposed to the client,
+  // and without it browser errors are never reported.
   const isVercel =
-    runtime === 'client'
-      ? !!(process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL)
-      : !!process.env.VERCEL;
+    runtime === 'client' ? !!process.env.NEXT_PUBLIC_VERCEL_ENV : !!process.env.VERCEL;
 
   return isVercel || forceEnable;
 }
