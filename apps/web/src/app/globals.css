@@ -75,6 +75,15 @@
   --radius: 0.75rem;
   --accent-bg-color: #2563eb;
   --chart-axis-color: #475569;
+  /* Height reserved by the maintenance banner (0 when no window is active).
+     The banner sets this at runtime; top bars and page content offset against
+     it so the banner never covers the site header. See MaintenanceBanner. */
+  --maintenance-banner-offset: 0px;
+}
+
+/* Reserve space for the maintenance banner above all in-flow page content. */
+#main-content {
+  padding-top: var(--maintenance-banner-offset);
 }
 
 /* Dark mode via system preference ONLY when theme="system" (no class set) */
