@@ -127,12 +127,6 @@ describe('voice-panel i18n', () => {
 
   describe('onboarding keys', () => {
     const requiredKeys = [
-      'welcome.onboarding.transcript.conversationTitle',
-      'welcome.onboarding.transcript.messageSingular',
-      'welcome.onboarding.transcript.messagePlural',
-      'welcome.onboarding.transcript.noConversation',
-      'welcome.onboarding.transcript.userLabel',
-      'welcome.onboarding.transcript.conversationActive',
       'chat.voice.microphoneUnauthorized',
       'chat.voice.connectionError',
       'welcome.onboarding.checklist.nameLabel',

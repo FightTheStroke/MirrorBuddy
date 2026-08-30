@@ -296,16 +296,6 @@
       "yourQuizzes": "Your Quizzes",
       "verifica": "Check answers"
     },
-    "quizReview": {
-      "failedSuggestions": "Failed Suggestions",
-      "highPriority": "High Priority",
-      "loadingSuggestions": "Loading suggestions...",
-      "needsReview": "Needs Review",
-      "reviewText": "Review your answers and retry the hardest topics.",
-      "suggestedMaterials": "Suggested Materials",
-      "suggestionsText": "Suggested materials to improve your weak areas.",
-      "suggestionsTitle": "Study suggestions"
-    },
     "toolSelection": {
       "back": "Back",
       "chooseProfessor": "Choose Professor for {tool}",

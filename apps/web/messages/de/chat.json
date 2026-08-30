@@ -319,29 +319,6 @@
         },
         "videoStopAriaLabel": "Video stoppen",
         "videoFramesLabel": "Bilder gesendet"
-      },
-      "rating": {
-        "close": "Schließen",
-        "feedbackLabel": "Ihr Feedback",
-        "feedbackPlaceholder": "Teilen Sie Ihre Meinung...",
-        "labels": {
-          "1": "Sehr schlecht",
-          "2": "Schlecht",
-          "3": "Okay",
-          "4": "Gut",
-          "5": "Ausgezeichnet"
-        },
-        "minutes": "Minuten",
-        "savingError": "Fehler beim Speichern",
-        "selectError": "Bitte wählen Sie eine Bewertung",
-        "selectPlaceholder": "Thema auswählen",
-        "sessionWith": "Sitzung mit",
-        "skip": "Überspringen",
-        "stars": "Sterne",
-        "submit": "Absenden",
-        "submitting": "Wird gesendet",
-        "title": "Bewerten Sie Ihre Sitzung",
-        "topics": "Besprochene Themen"
       }
     },
     "typing": {

@@ -332,29 +332,6 @@
         },
         "videoStopAriaLabel": "Ferma video",
         "videoFramesLabel": "frame inviati"
-      },
-      "rating": {
-        "close": "Chiudi",
-        "feedbackLabel": "Feedback",
-        "feedbackPlaceholder": "Inserisci il tuo feedback...",
-        "labels": {
-          "1": "1",
-          "2": "2",
-          "3": "3",
-          "4": "4",
-          "5": "5"
-        },
-        "minutes": "Minuti",
-        "savingError": "Errore durante il salvataggio",
-        "selectError": "Errore durante la selezione",
-        "selectPlaceholder": "Seleziona un'opzione...",
-        "sessionWith": "Sessione con",
-        "skip": "Salta",
-        "stars": "Stelle",
-        "submit": "Invia",
-        "submitting": "Invio in corso...",
-        "title": "Titolo",
-        "topics": "Argomenti"
       }
     },
     "typing": {

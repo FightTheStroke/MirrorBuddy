@@ -319,29 +319,6 @@
         },
         "videoStopAriaLabel": "Stop video",
         "videoFramesLabel": "frames sent"
-      },
-      "rating": {
-        "close": "Close",
-        "feedbackLabel": "Feedback Label",
-        "feedbackPlaceholder": "Feedback Placeholder",
-        "labels": {
-          "1": "1",
-          "2": "2",
-          "3": "3",
-          "4": "4",
-          "5": "5"
-        },
-        "minutes": "Minutes",
-        "savingError": "Saving Error",
-        "selectError": "Select Error",
-        "selectPlaceholder": "Select Placeholder",
-        "sessionWith": "Session With",
-        "skip": "Skip",
-        "stars": "Stars",
-        "submit": "Submit",
-        "submitting": "Submitting",
-        "title": "Titolo",
-        "topics": "Topics"
       }
     },
     "typing": {
