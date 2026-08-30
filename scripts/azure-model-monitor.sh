@@ -159,7 +159,8 @@ generate_issue_body() {
 
 	if [ -n "$new_models" ]; then
 		body+="### New Models Available\n\n"
-		echo "$new_models" | while IFS= read -r model; do
+		while IFS= read -r model; do
+			[ -n "$model" ] || continue
 			local tag=""
 			case "$model" in
 			*realtime* | *audio*) tag=" **[VOICE/AUDIO]**" ;;
@@ -170,16 +171,17 @@ generate_issue_body() {
 			o1* | o3* | o4*) tag=" **[REASONING]**" ;;
 			*sora*) tag=" **[VIDEO]**" ;;
 			esac
-			echo "- \`${model}\`${tag}"
-		done
+			body+="- \`${model}\`${tag}\n"
+		done <<<"$new_models"
 		body+="\n"
 	fi
 
 	if [ -n "$removed_models" ]; then
 		body+="### Models Removed\n\n"
-		echo "$removed_models" | while IFS= read -r model; do
-			echo "- ~~\`${model}\`~~"
-		done
+		while IFS= read -r model; do
+			[ -n "$model" ] || continue
+			body+="- ~~\`${model}\`~~\n"
+		done <<<"$removed_models"
 		body+="\n"
 	fi
 
