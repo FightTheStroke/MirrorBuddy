@@ -112,14 +112,17 @@ jobs:
         if: steps.check.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Via env, not ${{ }} inline: the body contains backticks that the shell
+          # would otherwise run as command substitution, blanking every model name.
+          ISSUE_BODY: ${{ steps.check.outputs.body }}
         run: |
           EXISTING=$(gh issue list --label "azure-models" --state open --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --body "${{ steps.check.outputs.body }}"
+            gh issue comment "$EXISTING" --body "$ISSUE_BODY"
           else
             gh issue create \
               --title "Azure OpenAI: new models available ($(date -u +%Y-%m-%d))" \
-              --body "${{ steps.check.outputs.body }}" \
+              --body "$ISSUE_BODY" \
               --label "azure-models,infra-monitor"
           fi
 
@@ -365,14 +368,15 @@ jobs:
         if: steps.check.outputs.has_updates == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_BODY: ${{ steps.check.outputs.body }}
         run: |
           EXISTING=$(gh issue list --label "dependency-update" --state open --json number --jq '.[0].number // empty')
           if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" --body "${{ steps.check.outputs.body }}"
+            gh issue comment "$EXISTING" --body "$ISSUE_BODY"
           else
             gh issue create \
               --title "Dependency updates available ($(date -u +%Y-%m-%d))" \
-              --body "${{ steps.check.outputs.body }}" \
+              --body "$ISSUE_BODY" \
               --label "dependency-update,infra-monitor"
           fi
 
