@@ -31,6 +31,8 @@ import {
 } from '../fixtures/api-mocks';
 import { readRosterCounts } from '../../../../scripts/lib/roster-counts';
 
+export type { APIRequestContext } from '@playwright/test';
+
 export const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
 const REPO_ROOT = resolve(__dirname, '../../../..');
 export const EXPECTED_MAESTRI_COUNT = readRosterCounts(REPO_ROOT).maestri;

@@ -214,6 +214,9 @@ async function connectWebRTC(
       }
     },
     onTrack: (event) => handleWebRTCTrack(event, refs),
+    registerCancel: (cancel) => {
+      refs.webrtcCleanupRef.current = cancel;
+    },
   });
 
   // Store cleanup, media stream, data channel, and unmute callback for later use

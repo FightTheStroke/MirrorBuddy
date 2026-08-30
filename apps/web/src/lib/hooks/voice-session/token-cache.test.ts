@@ -111,4 +111,31 @@ describe('useTokenCache', () => {
     const token = await getCachedToken();
     expect(token).toBe('date-token');
   });
+
+  it('rejects a freshly fetched token that would expire mid-negotiation', async () => {
+    // Negotiation can spend eight seconds direct plus eight on the relay. A
+    // token with three seconds left dies in the middle and the student waits
+    // for a call that was never going to connect.
+    csrfFetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ token: 'dying-token', expiresAt: Date.now() + 3_000 }),
+    });
+
+    const { useTokenCache } = await import('./token-cache');
+    const { getCachedToken } = useTokenCache();
+
+    expect(await getCachedToken()).toBeNull();
+  });
+
+  it('accepts a token with comfortably more life than the negotiation needs', async () => {
+    csrfFetchMock.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ token: 'healthy-token', expiresAt: Date.now() + 120_000 }),
+    });
+
+    const { useTokenCache } = await import('./token-cache');
+    const { getCachedToken } = useTokenCache();
+
+    expect(await getCachedToken()).toBe('healthy-token');
+  });
 });

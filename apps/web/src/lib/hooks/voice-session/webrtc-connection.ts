@@ -35,6 +35,28 @@ import { VoiceError, getVoiceErrorCode } from './voice-error-codes';
 // Re-export types for backwards compatibility
 export type { WebRTCConnectionConfig, WebRTCConnectionResult } from './webrtc-types';
 
+const SDP_REQUEST_TIMEOUT_MS = 8_000;
+const FALLBACK_SDP_STATUSES = new Set([408, 500, 502, 503, 504]);
+
+function getUpstreamRequestId(response: Response): string | undefined {
+  return (
+    response.headers?.get('x-azure-request-id') ??
+    response.headers?.get('x-request-id') ??
+    response.headers?.get('apim-request-id') ??
+    response.headers?.get('x-ms-request-id') ??
+    undefined
+  );
+}
+
+/**
+ * A 429 is capacity, and so is a 503 that names a retry delay. Relaying either
+ * one doubles the load on an upstream that just said it has none to spare.
+ */
+function isCapacitySignal(response: Response): boolean {
+  if (response.status === 429) return true;
+  return response.status === 503 && !!response.headers?.get('retry-after');
+}
+
 /**
  * Server token config shape (from /api/realtime/token).
  * GA mode returns azureResource + deployment.
@@ -55,6 +77,12 @@ export class WebRTCConnection {
   private dataChannel: RTCDataChannel | null = null;
   private config: WebRTCConnectionConfig;
   private connectionTimeout: NodeJS.Timeout | null = null;
+  /**
+   * Aborts whatever SDP request is in flight. Held on the instance so that a
+   * student who hangs up mid-negotiation actually cancels the call instead of
+   * leaving it to complete against a session that no longer exists.
+   */
+  private negotiationAbort: AbortController | null = null;
   /** Server-driven protocol config, fetched once per connect() */
   private serverConfig: ServerTokenConfig | null = null;
 
@@ -484,19 +512,80 @@ export class WebRTCConnection {
       sdpEndpoint = webrtcEndpoint;
     }
 
-    const response = await fetch(sdpEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/sdp',
-        Authorization: `Bearer ${token}`,
-      },
-      body: offer.sdp,
-    });
+    let response: Response;
+    // One alternate path, once. Tracked explicitly, because a relay that itself
+    // answers 5xx must not be mistaken for the direct attempt and relayed again.
+    let relayAttempted = false;
+    try {
+      response = await this.withSDPTimeout((signal) =>
+        fetch(sdpEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/sdp',
+            Authorization: `Bearer ${token}`,
+          },
+          body: offer.sdp,
+          signal,
+        }),
+      );
+    } catch (error) {
+      if (!this.isGAProtocol) {
+        const message = error instanceof Error ? error.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message);
+        throw new Error('SDP exchange failed: network request failed');
+      }
+      logger.warn('[WebRTC] Direct SDP request failed; trying server relay', {
+        error: error instanceof Error ? error.message : 'Network request failed',
+      });
+      relayAttempted = true;
+      try {
+        response = await this.relaySDPThroughServer(token, offer);
+      } catch (relayError) {
+        const message = relayError instanceof Error ? relayError.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message);
+        throw new Error('SDP exchange failed: network request failed');
+      }
+    }
+
+    if (
+      this.isGAProtocol &&
+      !relayAttempted &&
+      !response.ok &&
+      FALLBACK_SDP_STATUSES.has(response.status) &&
+      !isCapacitySignal(response)
+    ) {
+      let sanitized = sanitizeUpstreamError(response.status, '');
+      try {
+        const errorText = await response.text();
+        sanitized = sanitizeUpstreamError(response.status, errorText);
+      } catch {
+        logger.warn('[WebRTC] Could not read the direct SDP error response');
+      }
+      logger.warn('[WebRTC] Direct SDP exchange failed; trying server relay', {
+        ...sanitized,
+        azureRequestId: getUpstreamRequestId(response),
+      });
+      const directResponse = response;
+      // No `relayAttempted = true` here: this is the last point that can relay,
+      // so the flag would never be read again. It is set only in the catch path
+      // above, which is the one this block has to guard against.
+      try {
+        response = await this.relaySDPThroughServer(token, offer);
+      } catch (relayError) {
+        const message = relayError instanceof Error ? relayError.message : 'Network request failed';
+        logVoiceError('SDPExchangeFailed', message, {
+          azureRequestId: getUpstreamRequestId(directResponse),
+        });
+        throw new Error('SDP exchange failed: network request failed');
+      }
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       const sanitized = sanitizeUpstreamError(response.status, errorText);
       logVoiceError('SDPExchangeFailed', `Status: ${response.status}`, {
         statusText: response.statusText,
+        azureRequestId: getUpstreamRequestId(response),
         ...sanitized,
       });
       throw new Error(`SDP exchange failed: ${describeUpstreamError(sanitized)}`);
@@ -542,11 +631,52 @@ export class WebRTCConnection {
   }
 
   private cleanup(): void {
+    if (this.negotiationAbort) this.negotiationAbort.abort();
     if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
     if (this.dataChannel) this.dataChannel.close();
     if (this.mediaStream) this.mediaStream.getTracks().forEach((t) => t.stop());
     if (this.peerConnection) this.peerConnection.close();
+    this.negotiationAbort = null;
     this.connectionTimeout = this.dataChannel = this.mediaStream = this.peerConnection = null;
+  }
+
+  /**
+   * Tears the attempt down from outside — a student hanging up mid-negotiation.
+   * Public because it must be reachable before connect() resolves.
+   */
+  cancel(): void {
+    this.cleanup();
+  }
+
+  /**
+   * Runs one SDP request under both the eight-second budget and the
+   * instance-wide cancel signal, so a hang-up stops it immediately.
+   */
+  private async withSDPTimeout(
+    request: (signal: AbortSignal) => Promise<Response>,
+  ): Promise<Response> {
+    const controller = new AbortController();
+    this.negotiationAbort = controller;
+    const timeout = setTimeout(() => controller.abort(), SDP_REQUEST_TIMEOUT_MS);
+    try {
+      return await request(controller.signal);
+    } finally {
+      clearTimeout(timeout);
+      if (this.negotiationAbort === controller) this.negotiationAbort = null;
+    }
+  }
+
+  private async relaySDPThroughServer(
+    token: string,
+    offer: RTCSessionDescriptionInit,
+  ): Promise<Response> {
+    return this.withSDPTimeout((signal) =>
+      csrfFetch('/api/realtime/sdp-exchange', {
+        method: 'POST',
+        body: JSON.stringify({ sdp: offer.sdp, token }),
+        signal,
+      }),
+    );
   }
 }
 
@@ -557,5 +687,9 @@ export async function createWebRTCConnection(
   config: WebRTCConnectionConfig,
 ): Promise<WebRTCConnectionResult> {
   const connection = new WebRTCConnection(config);
+  // Hand the caller a way to stop the attempt before connect() resolves.
+  // Without this a hang-up during negotiation cancels nothing, and the request
+  // completes against a session the student already left.
+  config.registerCancel?.(() => connection.cancel());
   return connection.connect();
 }
