@@ -100,7 +100,9 @@ export async function fetchVercelAlerts(
   }
 
   const body = (await response.json()) as { deployments?: VercelDeployment[] };
+  // CANCELED is not a fault: Vercel cancels superseded builds routinely, and
+  // filing an issue for each one buries the deployments that really broke.
   return (body.deployments ?? [])
-    .filter((deployment) => deployment.state === 'ERROR' || deployment.state === 'CANCELED')
+    .filter((deployment) => deployment.state === 'ERROR')
     .map(vercelDeploymentToAlert);
 }

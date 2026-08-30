@@ -10,6 +10,7 @@ import {
   type ExistingIssue,
 } from '../production-watch/plan';
 import {
+  fetchVercelAlerts,
   sentryIssueToAlert,
   vercelDeploymentToAlert,
   type ProductionAlert,
@@ -160,5 +161,43 @@ describe('turning raw API payloads into alerts', () => {
     expect(converted.key).toBe('vercel:dpl_1');
     expect(converted.details.join(' ')).toContain('abcdef12');
     expect(converted.details.join(' ')).toContain('fix: something');
+  });
+});
+
+describe('which deployments count as production failures', () => {
+  function deploymentFeed(states: string[]): typeof fetch {
+    return (async () =>
+      new Response(
+        JSON.stringify({
+          deployments: states.map((state, index) => ({
+            uid: `dpl_${index}`,
+            name: 'mirrorbuddy',
+            url: 'mirrorbuddy.vercel.app',
+            state,
+            createdAt: 0,
+          })),
+        }),
+        { status: 200 },
+      )) as unknown as typeof fetch;
+  }
+
+  const config = { token: 't', projectId: 'p', since: 0 };
+
+  it('reports a deployment that errored', async () => {
+    const alerts = await fetchVercelAlerts(deploymentFeed(['ERROR']), config);
+
+    expect(alerts).toHaveLength(1);
+  });
+
+  it('ignores a canceled deployment — a superseded build is not a fault', async () => {
+    const alerts = await fetchVercelAlerts(deploymentFeed(['CANCELED', 'CANCELED']), config);
+
+    expect(alerts).toEqual([]);
+  });
+
+  it('ignores a healthy deployment', async () => {
+    const alerts = await fetchVercelAlerts(deploymentFeed(['READY']), config);
+
+    expect(alerts).toEqual([]);
   });
 });
