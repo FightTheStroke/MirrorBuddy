@@ -51,7 +51,13 @@ jobs:
           AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
         run: |
           ENDPOINT="${AZURE_OPENAI_ENDPOINT%/}"
-          CURRENT=$(curl -sf "${ENDPOINT}/openai/models?api-version=2024-10-21" \
+          if [[ ! "$ENDPOINT" =~ ^https://[A-Za-z0-9._-]+(:[0-9]+)?(/.*)?$ ]]; then
+            echo "::error::AZURE_OPENAI_ENDPOINT is not an https:// URL — fix the secret"
+            exit 1
+          fi
+
+          # --url keeps a malformed secret from being read as a curl option.
+          CURRENT=$(curl -sf --url "${ENDPOINT}/openai/models?api-version=2024-10-21" \
             -H "api-key: ${AZURE_OPENAI_API_KEY}" | jq -r '[.data[] | .id] | unique | sort | .[]')
 
           if [ -z "$CURRENT" ]; then
