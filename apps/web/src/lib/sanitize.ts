@@ -27,6 +27,7 @@
  */
 
 import DOMPurify from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 const SANITIZE_OPTIONS = {
   ALLOWED_TAGS: [
@@ -70,53 +71,28 @@ const SANITIZE_OPTIONS = {
   ],
 };
 
-const DANGEROUS_PROTOCOLS = ['javascript', 'vbscript', 'data'];
-
 /**
- * Removes an href/src attribute if its value resolves to a dangerous
- * protocol, tolerating the whitespace/control-character obfuscation
- * browsers themselves ignore (e.g. "java\tscript:") that a plain
- * `javascript:` substring check would miss (CodeQL js/bad-tag-filter).
- */
-function stripDangerousUrlAttribute(
-  _match: string,
-  attr: string,
-  quote: string,
-  value: string,
-): string {
-  // Deliberately matches control chars to normalize evasion attempts like "java\tscript:".
-  const normalized = value.replace(/[\s\u0000-\u001f]+/g, '').toLowerCase();
-  const isDangerous = DANGEROUS_PROTOCOLS.some((protocol) => normalized.startsWith(`${protocol}:`));
-  return isDangerous ? '' : ` ${attr}=${quote}${value}${quote}`;
-}
-
-/**
- * Conservative SSR fallback: strip executable tags and inline event handlers.
- *
- * Runs every removal to a fixed point (loop until no further change) rather
- * than a single pass, because a single `.replace()` only removes
- * non-overlapping matches once — a nested/overlapping construct such as
- * `<scr<script>ipt>` can still leave a live tag behind after one pass
- * (CodeQL js/incomplete-multi-character-sanitization).
+ * Conservative SSR fallback: sanitizes with the same allowlist as the
+ * DOMPurify path above, using `sanitize-html` (a real HTML5 parser via
+ * `htmlparser2`, not a hand-rolled regex). A regex-based tag/attribute
+ * stripper — even looped to a fixed point — kept tripping CodeQL's
+ * js/incomplete-multi-character-sanitization and js/bad-tag-filter rules,
+ * because the tool has no way to prove the loop actually converges; a real
+ * parser removes that whole class of finding instead of trying to out-regex
+ * it. `sanitize-html` is pure JS (htmlparser2-based, no native bindings), so
+ * it's safe to run in the Vercel Node runtime without the jsdom bundling
+ * issues that rule out `isomorphic-dompurify` here.
  */
 export function sanitizeFallback(html: string): string {
-  let previous: string;
-  let current = html;
-
-  do {
-    previous = current;
-    current = current
-      .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-      .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, '')
-      .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, '')
-      .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, '')
-      .replace(/<form[\s\S]*?>[\s\S]*?<\/form>/gi, '')
-      .replace(/<input[\s\S]*?>/gi, '')
-      .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '')
-      .replace(/\s(href|src)\s*=\s*(['"])([\s\S]*?)\2/gi, stripDangerousUrlAttribute);
-  } while (current !== previous);
-
-  return current;
+  return sanitizeHtml(html, {
+    allowedTags: SANITIZE_OPTIONS.ALLOWED_TAGS,
+    allowedAttributes: {
+      '*': SANITIZE_OPTIONS.ALLOWED_ATTR,
+    },
+    allowedSchemes: ['https', 'http', 'mailto'],
+    allowProtocolRelative: false,
+    disallowedTagsMode: 'discard',
+  });
 }
 
 /**
