@@ -270,6 +270,72 @@ The new guard says nothing about this — it asks whether a quote is presented a
 someone's words, never whether they actually said them. The three known
 misattributions were all found by accident. Owner: to be assigned.
 
+### 6.2 G-7 accuracy, 30 August 2026 — the card lines (PARTIALLY CLOSED)
+
+**Where the audit had not looked at all.** Every G-7 guard reads the knowledge
+corpus. `apps/web/src/data/maestri/quotes.ts` is not in the corpus: it is 168
+lines of code, six per maestro, rendered by `QuoteRotator` on every maestro card
+in quotation marks, in italics, announced to screen readers as _citazione
+motivazionale_. It has no `Citazioni` heading and no `X disse: "…"` form, so
+neither `knowledge-provenance` nor `attributed-quotes` could see it. It had
+never been reviewed by anything.
+
+**Seven false attributions were live on those cards**, each verified against an
+independent source on 30 Aug 2026:
+
+| Maestro     | Line shown                                                                | Actually                                                                                               |
+| ----------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Darwin      | «Non è il più forte che sopravvive, ma il più adattabile»                 | Leon C. Megginson, 1963 — the Darwin Correspondence Project lists it among things Darwin never said    |
+| Feynman     | «Se non riesci a spiegarlo in modo semplice, non l'hai capito abbastanza» | Undocumented in his lectures and writings; the traceable root is a remark of Rutherford's              |
+| Erodoto     | «La storia è maestra di vita»                                             | Cicero, _De Oratore_ II.36 — four centuries later                                                      |
+| Shakespeare | «The pen is mightier than the sword»                                      | Edward Bulwer-Lytton, _Richelieu_, 1839                                                                |
+| Shakespeare | «Language is the dress of thought»                                        | Samuel Johnson, _The Rambler_ 60, 1750                                                                 |
+| Shakespeare | «All the world's a stage, **and learning is your greatest role**»         | First half genuine (_As You Like It_ II.vii); the second was welded on inside the same quotation marks |
+| Ippocrate   | «Fa che il cibo sia la tua medicina»                                      | Absent from the whole Hippocratic Corpus (Cardenas, 2013)                                              |
+
+Two more were live in the corpus itself, and therefore in the model's prompt:
+`ippocrate-knowledge.ts` presented the same food/medicine line as a _Famous
+Quote_ (as well as `primum non nocere`, a later Latin maxim rather than the
+Corpus's «giovare, o almeno non nuocere»), and `mozart-knowledge.ts` gave «the
+music is not in the notes, but in the silence between» as Mozart's, when the
+idea is Debussy's. Both were corrected in the knowledge file _and_ regenerated
+through `npm run kb:extract`, so the correction reached `mini-kb/` — the G-8
+lesson applied rather than restated.
+
+**The larger finding is not the seven.** Of the 168 lines, the overwhelming
+majority are written by MirrorBuddy, not quoted from anyone — and they were
+displayed in quotation marks beneath a real person's face. That is not a
+copyright exposure; it is a truthfulness one, in a product used by children who
+are learning.
+
+**The fix is structural, not another detector.** A detector looks where a
+problem has already appeared, which is precisely how this file escaped three
+rounds of review. `quotes.ts` now admits exactly two kinds of entry:
+
+- a bare string — written by MirrorBuddy in that maestro's spirit. `QuoteRotator`
+  renders it **without quotation marks** and labels it `fraseDelMaestro`.
+- an object `{ text, source }` — a real quotation, which **must** name its work.
+  The card renders the source beneath it, labelled `citazioneMotivazionale`.
+
+There is no way to express "reads as a quotation but cites nothing".
+`data/maestri/__tests__/quote-attribution.test.ts` enforces the shape and holds
+a blocklist of the eight fragments above; it was proved by mutation on 30 Aug
+2026 (reinstating the Darwin line fails the build with the true author named).
+
+**What is still open.** This closes the _card lines_. It does not close the
+accuracy of the ~5000-line knowledge corpus: only the two mottos named above
+were verified there, prompted by a corpus-wide sweep for speaker-attributed
+quotations (41 hits, 30 of them structural labels). A quotation embedded in
+ordinary prose without an attributing verb remains unverified. Owner of the
+remaining corpus sweep: to be assigned.
+
+**Also recorded, not fixed here:** all 168 lines exist only in Italian, in a
+five-locale product; a French or German student reads the maestro card in
+Italian. The four `QuoteRotator` accessibility labels had the same defect — all
+five locale files carried the Italian string — and were translated as part of
+this change, because a screen-reader label in the wrong language is an
+accessibility failure, not a copy nit.
+
 **G-8 — the removals were not reaching the model (CLOSED).** Every sanitisation
 on this card edited `*-knowledge.ts`. But each knowledge file has a second,
 committed derivative: `mini-kb/<slug>.ts`, generated by
@@ -416,7 +482,7 @@ production; no probe reports the JS fallback.
 The lasting part is the check, not the repair. `scripts/check-migrations-applied.ts`
 previously printed "Database schema matches the migrations in the repo" over
 exactly this database, because a row in `_prisma_migrations` is a statement
-about what was run, not evidence of what exists. It now *calls*
+about what was run, not evidence of what exists. It now _calls_
 `search_similar_embeddings` — a `pg_proc` lookup would also have passed against
 a stale six-argument body — and fails the run when the call raises `42883`. It
 runs in the production promotion gate (`promote-to-production.yml`), so a

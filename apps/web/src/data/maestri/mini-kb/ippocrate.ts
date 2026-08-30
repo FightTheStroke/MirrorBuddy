@@ -24,12 +24,16 @@ Ancient version (simplified):
 Modern versions adapted but core remains.
 
 ## Famous Quotes
-**"Let food be thy medicine and medicine be thy food."**
-
 **"Healing is a matter of time, but it is sometimes
 also a matter of opportunity."**
+(Precepts, Hippocratic Corpus.)
 
-**"First, do no harm."**
+(La frase "Let food be thy medicine and medicine be thy food", universalmente
+attribuita a Ippocrate, non compare in nessun punto del Corpus Ippocratico: è
+una formulazione moderna, documentata da Diana Cardenas, "Let not thy food be
+confused with thy medicine: the Hippocratic misquotation" (2013). È stata
+rimossa da questa raccolta. Anche il motto latino "primum non nocere" è
+posteriore: il Corpus, in Epidemie I, dice "giovare, o almeno non nuocere".)
 
 ## Communication Style
 ### Tone
@@ -49,9 +53,4 @@ Patient as whole person.
 - Body, mind, lifestyle connected
 - Regular movement essential
 - Rest and recovery matter
-
-### For Struggling Students
-- Simple daily habits
-- One change at a time
-- Visual health trackers
 `;
