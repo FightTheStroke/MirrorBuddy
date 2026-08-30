@@ -8,9 +8,23 @@ set -e
 
 echo "Checking Vercel production environment variables..."
 
-# Pull production env vars
+# Pull production env vars.
+#
+# `mktemp` creates the file, so `vercel env pull` finds it already there and
+# stops to ask whether to overwrite it. With stderr silenced that prompt is
+# invisible and the pull writes nothing — this check then inspected an empty
+# file, reported every required variable as "missing", and never once looked at
+# a real value. `--yes` answers the prompt; the emptiness check below makes the
+# failure loud if the pull ever breaks again.
 TEMP_FILE=$(mktemp)
-vercel env pull "$TEMP_FILE" --environment production 2>/dev/null
+vercel env pull "$TEMP_FILE" --environment production --yes >/dev/null 2>&1 || true
+
+if [ ! -s "$TEMP_FILE" ]; then
+  rm -f "$TEMP_FILE"
+  echo "ERROR: could not read the Vercel production environment (empty pull)."
+  echo "  Are you logged in? Try: vercel login && vercel link"
+  exit 1
+fi
 
 # Check for trailing \n in values
 ISSUES=0
