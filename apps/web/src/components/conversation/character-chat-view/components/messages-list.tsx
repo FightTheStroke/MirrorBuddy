@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SafetyBlockExplanation } from '../../safety-block-explanation';
 import type { CharacterInfo } from '../utils/character-utils';
 
 interface Message {
@@ -15,6 +16,7 @@ interface Message {
   content: string;
   timestamp: Date;
   isVoice?: boolean;
+  safetyCategory?: string;
 }
 
 interface MessagesListProps {
@@ -23,11 +25,7 @@ interface MessagesListProps {
   isLoading: boolean;
 }
 
-export function MessagesList({
-  messages,
-  character,
-  isLoading,
-}: MessagesListProps) {
+export function MessagesList({ messages, character, isLoading }: MessagesListProps) {
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50">
       {messages.map((message) => (
@@ -35,10 +33,7 @@ export function MessagesList({
           key={message.id}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn(
-            'flex gap-3',
-            message.role === 'user' ? 'justify-end' : 'justify-start'
-          )}
+          className={cn('flex gap-3', message.role === 'user' ? 'justify-end' : 'justify-start')}
         >
           {message.role === 'assistant' && (
             <div className="flex-shrink-0">
@@ -62,14 +57,15 @@ export function MessagesList({
               'max-w-[75%] rounded-2xl px-4 py-3',
               message.role === 'user'
                 ? 'bg-accent-themed text-white rounded-br-md'
-                : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm'
+                : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm',
             )}
           >
             <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            {message.role === 'assistant' && message.safetyCategory && (
+              <SafetyBlockExplanation category={message.safetyCategory} />
+            )}
             <div className="flex items-center gap-2 mt-1">
-              {message.isVoice && (
-                <Volume2 className="w-3 h-3 opacity-60" />
-              )}
+              {message.isVoice && <Volume2 className="w-3 h-3 opacity-60" />}
               <p className="text-xs opacity-60">
                 {message.timestamp.toLocaleTimeString('it-IT', {
                   hour: '2-digit',
@@ -81,11 +77,7 @@ export function MessagesList({
         </motion.div>
       ))}
       {isLoading && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex gap-3"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
           <div className="flex-shrink-0">
             {character.avatar ? (
               <Image
@@ -122,4 +114,3 @@ export function MessagesList({
     </div>
   );
 }
-

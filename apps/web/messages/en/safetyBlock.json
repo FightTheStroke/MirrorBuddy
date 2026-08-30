@@ -1,0 +1,52 @@
+{
+  "safetyBlock": {
+    "heading": "Safety message",
+    "categories": {
+      "crisis": {
+        "title": "I care about you",
+        "message": "What you feel matters, and you are not alone.",
+        "action": "Please talk to a grown-up you trust right now: a parent, a teacher, or call your local emergency number."
+      },
+      "harmful": {
+        "title": "Let's stop here",
+        "message": "I can't help with things that could hurt someone.",
+        "action": "If you need help, talk to a grown-up you trust. We can study something safe together."
+      },
+      "explicit": {
+        "title": "Let's keep to schoolwork",
+        "message": "That topic isn't for us here.",
+        "action": "Ask me about your subjects instead: I'm really good with those!"
+      },
+      "privacy": {
+        "title": "Let's protect your details",
+        "message": "Personal details are best kept private: you don't need them to study with me.",
+        "action": "Ask me about your homework or your subjects instead."
+      },
+      "unclear": {
+        "title": "I didn't quite get that",
+        "message": "That request isn't clear to me.",
+        "action": "Try asking it in simpler words."
+      },
+      "fairness": {
+        "title": "Let's talk kindly",
+        "message": "I like to talk about people in a fair and kind way.",
+        "action": "Let's try again looking at the topic in a more balanced way."
+      },
+      "language": {
+        "title": "Let's use kind words",
+        "message": "Kind words help us understand each other better.",
+        "action": "Try writing your question in a calmer way."
+      },
+      "stem": {
+        "title": "I keep some details safe",
+        "message": "Some science can be dangerous, so I hold back a few details.",
+        "action": "I can explain how it works in general: just ask me!"
+      },
+      "generic": {
+        "title": "Let's try a different question",
+        "message": "I can't answer that one right now.",
+        "action": "Let's try something else: what would you like to learn today?"
+      }
+    }
+  }
+}

@@ -3,18 +3,18 @@
  * Handles sending messages with streaming or non-streaming flow
  */
 
-import { logger } from "@/lib/logger";
-import type { CharacterInfo } from "../../utils/character-utils";
-import type { Message } from "./types";
+import { logger } from '@/lib/logger';
+import type { CharacterInfo } from '../../utils/character-utils';
+import type { Message } from './types';
 import {
   sendChatMessage,
   createAssistantMessage,
   createErrorMessage,
   type ChatUsage,
   type SafetyBlockEvent,
-} from "./message-handler";
-import { sendStreamingMessage, messageRequiresTool } from "./streaming-handler";
-import type { ToolState } from "@/types/tools";
+} from './message-handler';
+import { sendStreamingMessage, messageRequiresTool } from './streaming-handler';
+import type { ToolState } from '@/types/tools';
 
 /** Metrics data from chat turn (REAL data from API) */
 export interface TurnMetricsData {
@@ -49,16 +49,14 @@ export interface SendMessageOptions {
   streamingEnabled: boolean;
   signal: AbortSignal;
   callbacks: SendMessageCallbacks;
-  language?: "it" | "en" | "es" | "fr" | "de";
+  language?: 'it' | 'en' | 'es' | 'fr' | 'de';
 }
 
 /**
  * Send a message with automatic streaming/non-streaming routing
  * Returns true if streaming was used, false if non-streaming
  */
-export async function handleSendMessage(
-  options: SendMessageOptions,
-): Promise<boolean> {
+export async function handleSendMessage(options: SendMessageOptions): Promise<boolean> {
   const {
     content,
     messages,
@@ -67,7 +65,7 @@ export async function handleSendMessage(
     streamingEnabled,
     signal,
     callbacks,
-    language = "it",
+    language = 'it',
   } = options;
 
   const needsTool = messageRequiresTool(content);
@@ -87,14 +85,15 @@ export async function handleSendMessage(
       onChunk: (_chunk, accumulated) => {
         callbacks.onStreamingChunk(streamingMsgId, accumulated);
       },
-      onComplete: (fullResponse, usage, latencyMs) => {
+      onComplete: (fullResponse, usage, latencyMs, safetyEvent) => {
         callbacks.onStreamingComplete(streamingMsgId, fullResponse, {
           usage,
           latencyMs,
+          safetyEvent,
         });
       },
       onError: (error) => {
-        logger.error("Streaming error", undefined, error);
+        logger.error('Streaming error', undefined, error);
         callbacks.onStreamingError(streamingMsgId);
       },
     });
@@ -107,17 +106,20 @@ export async function handleSendMessage(
 
   // Non-streaming path
   try {
-    const { responseContent, toolState, usage, latencyMs, safetyEvent } =
-      await sendChatMessage(
-        content,
-        messages,
-        character,
-        characterId,
-        true,
-        language,
-      );
+    const { responseContent, toolState, usage, latencyMs, safetyEvent } = await sendChatMessage(
+      content,
+      messages,
+      character,
+      characterId,
+      true,
+      language,
+    );
 
     const assistantMessage = createAssistantMessage(responseContent);
+    // F-06: carry the real safety category so the UI can explain the block.
+    if (safetyEvent?.blocked) {
+      assistantMessage.safetyCategory = safetyEvent.category;
+    }
     callbacks.onNonStreamingComplete(assistantMessage, toolState, {
       usage,
       latencyMs,
@@ -125,7 +127,7 @@ export async function handleSendMessage(
     });
     return false;
   } catch (error) {
-    logger.error("Chat error", undefined, error);
+    logger.error('Chat error', undefined, error);
     callbacks.onError();
     return false;
   }

@@ -10,6 +10,11 @@ export interface Message {
   content: string;
   timestamp: Date;
   isVoice?: boolean;
+  /**
+   * Raw internal safety-filter category when this message is a safety block
+   * (F-06). Drives the SafetyBlockExplanation shown to the student.
+   */
+  safetyCategory?: string;
 }
 
 export interface ChatState {
