@@ -186,6 +186,61 @@ jobs:
           )" \
             --label "claude-europe,infra-monitor"
 
+  merge-flow-drift:
+    name: Merge Flow Settings Drift
+    runs-on: ubuntu-latest
+    steps:
+      # These settings are what makes merged work reach production on its own.
+      # When they drift, green PRs silently pile up: with `strict` on and
+      # branch auto-update off, every merge knocks the other PRs out of date
+      # and auto-merge can never fire. That froze the version shown in
+      # production for two days in Aug 2026 while main kept shipping. The
+      # safety settings are asserted here too, so this guard can never be
+      # read as an excuse to loosen branch protection.
+      - name: Check merge flow settings
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
+        run: |
+          REPO=${{ github.repository }}
+          DRIFT=""
+
+          expect() {
+            local label="$1" actual="$2" want="$3"
+            if [ "$actual" != "$want" ]; then
+              DRIFT="${DRIFT}- \`${label}\` is \`${actual}\`, expected \`${want}\`"$'\n'
+            fi
+          }
+
+          REPO_JSON=$(gh api "repos/${REPO}")
+          PROT_JSON=$(gh api "repos/${REPO}/branches/main/protection")
+
+          expect "allow_auto_merge" "$(jq -r '.allow_auto_merge' <<<"$REPO_JSON")" "true"
+          expect "allow_update_branch" "$(jq -r '.allow_update_branch' <<<"$REPO_JSON")" "true"
+          expect "delete_branch_on_merge" "$(jq -r '.delete_branch_on_merge' <<<"$REPO_JSON")" "true"
+          expect "required_status_checks.strict" "$(jq -r '.required_status_checks.strict' <<<"$PROT_JSON")" "false"
+          expect "enforce_admins" "$(jq -r '.enforce_admins.enabled' <<<"$PROT_JSON")" "true"
+          expect "allow_force_pushes" "$(jq -r '.allow_force_pushes.enabled' <<<"$PROT_JSON")" "false"
+          expect "allow_deletions" "$(jq -r '.allow_deletions.enabled' <<<"$PROT_JSON")" "false"
+
+          if [ -z "$DRIFT" ]; then
+            echo "Merge flow settings OK"
+            exit 0
+          fi
+
+          echo "$DRIFT"
+          gh issue create \
+            --title "Merge flow settings drifted — releases will stall" \
+            --label "infra-monitor" \
+            --body "$(cat <<BODY
+          The settings that let merged work reach production on its own have drifted:
+
+          ${DRIFT}
+          Left uncorrected, green pull requests stop merging and the version in
+          production freezes while \`main\` keeps moving.
+          BODY
+          )"
+          exit 1
+
   dependency-updates:
     name: Critical Dependency Updates
     runs-on: ubuntu-latest
