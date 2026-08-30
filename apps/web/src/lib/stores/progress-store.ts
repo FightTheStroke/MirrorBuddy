@@ -8,6 +8,7 @@ import { getCurrentSeason } from '@/lib/gamification/seasons';
 import type { ProgressState, StudySession } from './progress-store-types';
 import { createProgressActions } from './progress-store-actions';
 import { csrfFetch } from '@/lib/auth';
+import { isUndeliveredRequest } from './undelivered-request';
 
 // Re-export types for convenience
 export type { StudySession, SessionGrade } from './progress-store-types';
@@ -76,24 +77,26 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
     }
   },
 
-  loadFromServer: async () => {
+  loadFromServer: async (signal?: AbortSignal) => {
     try {
       // Use allSettled for partial failure resilience
       const results = await Promise.allSettled([
-        fetch('/api/progress'),
-        fetch('/api/progress/sessions?limit=20'),
+        fetch('/api/progress', { signal }),
+        fetch('/api/progress/sessions?limit=20', { signal }),
       ]);
 
       const progressRes = results[0].status === 'fulfilled' ? results[0].value : null;
       const sessionsRes = results[1].status === 'fulfilled' ? results[1].value : null;
 
-      // Log failures but continue with partial data
-      if (results[0].status === 'rejected') {
+      // A request the browser never delivered is not a failure worth reporting:
+      // the screen keeps what it had and the next render asks again. Reporting
+      // it filled Sentry with warnings that looked like a broken app.
+      if (results[0].status === 'rejected' && !isUndeliveredRequest(results[0].reason)) {
         logger.warn('Progress fetch failed', {
           error: String(results[0].reason),
         });
       }
-      if (results[1].status === 'rejected') {
+      if (results[1].status === 'rejected' && !isUndeliveredRequest(results[1].reason)) {
         logger.warn('Sessions fetch failed', {
           error: String(results[1].reason),
         });
@@ -143,6 +146,7 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
 
       set({ lastSyncedAt: new Date(), pendingSync: false });
     } catch (error) {
+      if (isUndeliveredRequest(error)) return;
       logger.error('Progress load failed', { error: String(error) });
     }
   },
