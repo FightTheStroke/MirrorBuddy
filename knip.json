@@ -1,0 +1,45 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/**/*.{ts,tsx,js,mjs,cjs}",
+        "eslint-local-rules/**/*.{ts,js,mjs}",
+        "*.config.{ts,js,mjs}",
+        "prisma.config.ts",
+        "capacitor.config.ts"
+      ],
+      "project": ["scripts/**/*.{ts,tsx,js,mjs,cjs}"]
+    },
+    "apps/web": {
+      "entry": [
+        "src/proxy.ts",
+        "instrumentation.ts",
+        "instrumentation-client.ts",
+        "sentry.client.config.ts",
+        "sentry.server.config.ts",
+        "sentry.edge.config.ts",
+        "next.config.ts",
+        "next.config.mobile.ts",
+        "vitest.config.ts",
+        "playwright.config.ts",
+        "playwright.config.iteration.ts",
+        "playwright.config.production-smoke.ts",
+        "playwright.config.study-kit.ts",
+        "src/app/**/{page,layout,route,error,not-found,loading,template,default,global-error,sitemap,robots,manifest,opengraph-image,twitter-image,icon,apple-icon}.{ts,tsx}",
+        "e2e/**/*.spec.ts",
+        "e2e/**/fixtures/**/*.ts",
+        "prisma/seed.ts",
+        "prisma/seeds/**/*.ts",
+        "src/test/**/*.{ts,tsx}",
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.spec.{ts,tsx}",
+        "src/**/__tests__/**/*.{ts,tsx}"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  },
+  "ignore": ["**/*.d.ts"],
+  "ignoreDependencies": [],
+  "ignoreBinaries": ["cap"]
+}

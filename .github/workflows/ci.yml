@@ -292,6 +292,42 @@ jobs:
       - name: Run debt check
         run: npm run debt:check
 
+  # Lane 2a-ter: Reachability Guard
+  # Fails a PR that adds a new unreachable production file under apps/web/src, or
+  # edits one already on the baseline that is still unreachable. The systemic cure
+  # for the "273 disconnected files". See docs/ci/reachability-check.md.
+  # Conditional: skipped on PR when only docs/ci changed (no src or config).
+  reachability-check:
+    name: Reachability Guard
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: >
+      github.event_name != 'pull_request' ||
+      needs.detect-changes.outputs.src == 'true' ||
+      needs.detect-changes.outputs.config == 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so the guard can diff against the PR base branch and detect
+          # edits to files already on the baseline.
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - run: npx prisma generate
+
+      - name: Run reachability guard
+        run: npm run reachability:check
+
   # Lane 2b: SBOM & Env Safety
   # npm audit: covered by dependency-review.yml (PR) + weekly-security-audit.yml
   # Legacy secret regex: covered by TruffleHog (Lane 2a)
