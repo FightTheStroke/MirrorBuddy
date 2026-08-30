@@ -151,3 +151,4 @@ graphify-out/
 # Generated didactic content for KB seeding (npm run kb:extract)
 .tmp/
 .aider*
+.gbrain-source
