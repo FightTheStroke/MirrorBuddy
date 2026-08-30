@@ -566,7 +566,9 @@ export class WebRTCConnection {
         azureRequestId: getUpstreamRequestId(response),
       });
       const directResponse = response;
-      relayAttempted = true;
+      // No `relayAttempted = true` here: this is the last point that can relay,
+      // so the flag would never be read again. It is set only in the catch path
+      // above, which is the one this block has to guard against.
       try {
         response = await this.relaySDPThroughServer(token, offer);
       } catch (relayError) {
