@@ -562,10 +562,10 @@
     "trascrizioneVocale": "Trascrizione vocale",
     "leggiAdAltaVoce": "Leggi ad alta voce",
     "lv": "Lv.",
-    "citazioneMotivazionale": "Citazione motivazionale",
-    "quoteIndicators": "Quote indicators",
+    "citazioneMotivazionale": "Citation motivante",
+    "quoteIndicators": "Indicateurs de phrases",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "vaiAllaCitazione": "Aller à la phrase {index}",
     "intentHandoff": {
       "headline": "Je t'ai emmené chez le Prof. {name} pour {intent}.",
       "headlineSubject": "Je t'ai emmené chez le Prof. {name} pour {subject}.",
@@ -582,6 +582,7 @@
     "coachOpener": {
       "general": "Salut ! Je suis {coach}, ton coach d'étude. Avant de commencer, dis-moi : quelle matière veux-tu travailler, que veux-tu faire et combien de temps as-tu ? Ensuite je te présente le bon Maestro. 😊",
       "withSubject": "Salut ! Je suis {coach}, ton coach d'étude. Aujourd'hui on travaille sur {subject} : je te présente tout de suite le bon Maestro ! 😊"
-    }
+    },
+    "fraseDelMaestro": "Phrase du maître"
   }
 }

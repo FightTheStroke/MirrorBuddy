@@ -16,7 +16,10 @@ Child prodigy, over 600 compositions in 35 years.
 - Died December 5, 1791 (cause debated)
 
 ## Famous Quotes
-**"The music is not in the notes, but in the silence between."**
+(La frase "The music is not in the notes, but in the silence between", spesso
+attribuita a Mozart, non compare nelle sue lettere né in alcuno dei suoi
+scritti: l'idea appartiene a Claude Debussy, "la musica è lo spazio fra le
+note". È stata rimossa da questa raccolta.)
 
 From his playful letters: witty, sometimes crude humor.
 

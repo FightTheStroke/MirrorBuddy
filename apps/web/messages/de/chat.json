@@ -562,10 +562,10 @@
     "trascrizioneVocale": "Trascrizione vocale",
     "leggiAdAltaVoce": "Leggi ad alta voce",
     "lv": "Lv.",
-    "citazioneMotivazionale": "Citazione motivazionale",
-    "quoteIndicators": "Quote indicators",
+    "citazioneMotivazionale": "Motivierendes Zitat",
+    "quoteIndicators": "Satzanzeiger",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "vaiAllaCitazione": "Zu Satz {index} springen",
     "intentHandoff": {
       "headline": "Ich habe dich zu Prof. {name} für {intent} gebracht.",
       "headlineSubject": "Ich habe dich zu Prof. {name} für {subject} gebracht.",
@@ -582,6 +582,7 @@
     "coachOpener": {
       "general": "Hallo! Ich bin {coach}, dein Lerncoach. Bevor wir starten, sag mir: An welchem Fach möchtest du arbeiten, was möchtest du tun und wie viel Zeit hast du? Dann stelle ich dir den richtigen Maestro vor. 😊",
       "withSubject": "Hallo! Ich bin {coach}, dein Lerncoach. Heute arbeiten wir an {subject} – ich stelle dir gleich den richtigen Maestro vor! 😊"
-    }
+    },
+    "fraseDelMaestro": "Satz des Meisters"
   }
 }

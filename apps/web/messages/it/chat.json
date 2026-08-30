@@ -576,12 +576,13 @@
     "leggiAdAltaVoce": "Leggi ad alta voce",
     "lv": "Lv.",
     "citazioneMotivazionale": "Citazione motivazionale",
-    "quoteIndicators": "Quote indicators",
+    "quoteIndicators": "Indicatori delle frasi",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "vaiAllaCitazione": "Vai alla frase {index}",
     "coachOpener": {
       "general": "Ciao! Sono {coach}, il tuo coach di studio. Prima di iniziare dimmi: di quale materia ti vuoi occupare, cosa vuoi fare e quanto tempo hai? Poi ti presento il Maestro giusto. 😊",
       "withSubject": "Ciao! Sono {coach}, il tuo coach di studio. Oggi lavoriamo su {subject}: ti presento subito il Maestro giusto! 😊"
-    }
+    },
+    "fraseDelMaestro": "Frase del maestro"
   }
 }
