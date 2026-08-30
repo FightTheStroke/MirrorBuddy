@@ -419,10 +419,6 @@
       "chooseStudyPartner": "Wähle, mit wem du lernen möchtest",
       "close": "Schließen"
     },
-    "emptyMetrics": {
-      "description": "Descrizione",
-      "nessunaMetricaDisponibile": "Nessuna metrica disponibile"
-    },
     "flashcard": {
       "again": "Again",
       "answer": "Answer",
@@ -598,33 +594,6 @@
         "subtitle": "Fortschritte, Gewohnheiten und Unterstützungsbedarf im Blick behalten.",
         "title": "Eltern-Dashboard"
       },
-      "learningStyle": {
-        "approach": "Approach",
-        "bestTime": "Best time",
-        "channels": {
-          "auditory": "Auditory",
-          "kinesthetic": "Kinesthetic",
-          "reading_writing": "Reading writing",
-          "visual": "Visual"
-        },
-        "optimalSession": "Optimal session",
-        "preferences": {
-          "big_picture": "Big picture",
-          "mixed": "Mixed",
-          "step_by_step": "Step by step"
-        },
-        "preferredChannel": "Preferred channel",
-        "times": {
-          "afternoon": "Afternoon",
-          "evening": "Evening",
-          "morning": "Morning"
-        },
-        "min": "min"
-      },
-      "observation": {
-        "confidence": "Confidence",
-        "observed": "Observed"
-      },
       "quiz": {
         "noQuizzes": "No quizzes",
         "performanceQuiz1": "Performance quiz",
@@ -636,19 +605,6 @@
         "record": "Record",
         "perMateria": "Per materia",
         "quiz": "quiz"
-      },
-      "stats": {
-        "maestri": "Maestri",
-        "sessions": "Sessions",
-        "totalTime": "Total time"
-      },
-      "strategy": {
-        "priority": {
-          "high": "High",
-          "low": "Low",
-          "medium": "Medium"
-        },
-        "suggestedBy": "Suggested by"
       },
       "tabs": {
         "accessibility": "Accessibility",
@@ -716,19 +672,6 @@
         "selectCorrect": "Select Correct",
         "unrecognized": "Unrecognized"
       }
-    },
-    "successMetrics": {
-      "milestones": "Milestones",
-      "milestonesDescription": "Milestones Description",
-      "overallScore": "Overall Score",
-      "progressDescription": "Progress Description",
-      "quote": "Quote",
-      "quoteAuthor": "Quote Author",
-      "title": "Titolo",
-      "upcomingMilestones": "Upcoming Milestones",
-      "metricsSection": "Erfolgsmetriken",
-      "milestonesAchieved": "milestones achieved,",
-      "pending": "pending"
     },
     "summaries": {
       "createButton": "Erstellen",
