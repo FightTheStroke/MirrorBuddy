@@ -2364,6 +2364,52 @@ jobs:
   # code that the web release refused.
   # ============================================================================
   # ============================================================================
+  # SYNC ADMIN CREDENTIALS — make ADMIN_PASSWORD the password that actually works
+  # ============================================================================
+  # The login route only ever compares against the passwordHash stored in the
+  # database. ADMIN_PASSWORD reached that column solely through seed-admin.ts,
+  # which no workflow ran — so changing the secret changed nothing, and on
+  # 30 August 2026 the admin was locked out of production with a correct
+  # password in hand. Running the seed after every promotion keeps the secret
+  # and the database in step. The script is idempotent and never deletes.
+  # ============================================================================
+  sync-admin-credentials:
+    name: "🔑 Sync Admin Credentials"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [auto-promote-production]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.auto-promote-production.result == 'success'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Reconcile admin accounts
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+        run: npm run seed:admin
+
+  # ============================================================================
   # POST-DEPLOY PRODUCTION SMOKE — does the site actually work for a child?
   # ============================================================================
   # Until 28 August 2026 nothing ran against production after a promotion. The

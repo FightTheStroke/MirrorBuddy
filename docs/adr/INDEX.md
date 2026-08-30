@@ -90,6 +90,7 @@
 | 0168 | `maestriLimit` Deprecation (DEC-06)             | ACCEPTED — per-Maestro cap removed, never enforced; intent model made it obsolete               |
 | 0173 | MirrorBuddy stays on Azure API keys             | ACCEPTED — Vercel OIDC forbidden by tenant policy; rotation, blast radius, residual risk        |
 | 0174 | Robot self-managing credentials and updates     | ACCEPTED — paired robot fetches Azure creds per start and self-updates; no hardware visit       |
+| 0175 | Staging DB isolation + admin credential sync    | ACCEPTED — staging runs on its own EU Supabase project; every release re-applies ADMIN_PASSWORD |
 
 ## Observability & Operations
 
@@ -219,6 +220,6 @@
 
 ---
 
-**Total Active ADRs**: 134
+**Total Active ADRs**: 135
 **Archived ADRs**: 7
-**Last Updated**: 2026-08-29
+**Last Updated**: 2026-08-30
