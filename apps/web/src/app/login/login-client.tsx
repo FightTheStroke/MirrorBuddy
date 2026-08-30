@@ -1,18 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { LogoBrain } from "@/components/branding/logo-brain";
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { LogoBrain } from '@/components/branding/logo-brain';
 
 interface LoginResponse {
   user?: {
@@ -27,44 +22,44 @@ interface LoginResponse {
 export function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const t = useTranslations("auth");
+  const t = useTranslations('auth');
   const locale = useLocale();
-  const redirectParam = searchParams.get("redirect");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const redirectParam = searchParams.get('redirect');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, redirect: redirectParam }),
       });
 
       const data: LoginResponse = await response.json();
 
       if (!response.ok) {
-        setError(data.error || t("invalidCredentials"));
+        setError(data.error || t('invalidCredentials'));
         setIsLoading(false);
         return;
       }
 
       if (data.user?.mustChangePassword) {
-        router.push("/change-password");
+        router.push('/change-password');
       } else {
         // Use redirect from API if available, otherwise go to main maestri page
         const redirectTo = data.redirect || `/${locale}`;
         router.replace(redirectTo);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("connectionError"));
+      setError(err instanceof Error ? err.message : t('connectionError'));
       setIsLoading(false);
     }
   };
@@ -76,19 +71,15 @@ export function LoginClient() {
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <LogoBrain
-                alt={t("mirrorbuddyLogo")}
+                alt={t('mirrorbuddyLogo')}
                 size={64}
                 priority
                 wrapperClassName="bg-blue-100 dark:bg-blue-900/30 rounded-full p-2"
               />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                MirrorBuddy
-              </h1>
-              <p className="text-slate-600 dark:text-slate-300 mt-2">
-                {t("signInToAccount")}
-              </p>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">MirrorBuddy</h1>
+              <p className="text-slate-600 dark:text-slate-300 mt-2">{t('signInToAccount')}</p>
             </div>
           </CardHeader>
 
@@ -99,9 +90,7 @@ export function LoginClient() {
                 role="alert"
                 aria-live="polite"
               >
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {error}
-                </p>
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
 
@@ -111,7 +100,7 @@ export function LoginClient() {
                   htmlFor="email"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  {t("email")}
+                  {t('email')}
                 </label>
                 <input
                   id="email"
@@ -123,7 +112,7 @@ export function LoginClient() {
                   required
                   autoComplete="email"
                   className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder={t("yourEmail")}
+                  placeholder={t('yourEmail')}
                 />
               </div>
 
@@ -132,56 +121,54 @@ export function LoginClient() {
                   htmlFor="password"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  {t("password")}
+                  {t('password')}
                 </label>
                 <div className="relative">
                   <input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
                     aria-required="true"
                     required
                     className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                    placeholder={t("yourPassword")}
+                    placeholder={t('yourPassword')}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    aria-label={
-                      showPassword ? t("hidePassword") : t("showPassword")
-                    }
+                    aria-label={showPassword ? t('hidePassword') : t('showPassword')}
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full"
-                aria-busy={isLoading}
-              >
-                {isLoading ? t("signingIn") : t("login")}
+              <Button type="submit" disabled={isLoading} className="w-full" aria-busy={isLoading}>
+                {isLoading ? t('signingIn') : t('login')}
               </Button>
             </form>
+
+            <div className="mt-4 text-center">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {t('forgotPassword.linkLabel')}
+              </Link>
+            </div>
           </CardContent>
 
           <CardFooter className="flex-col space-y-3 border-t border-slate-200 dark:border-slate-700">
             <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
-              {t("noAccount")}
+              {t('noAccount')}
             </p>
             <Link href="/invite/request" className="w-full">
               <Button variant="outline" className="w-full">
                 <UserPlus className="w-4 h-4 mr-2" />
-                {t("requestBetaAccess")}
+                {t('requestBetaAccess')}
               </Button>
             </Link>
           </CardFooter>
