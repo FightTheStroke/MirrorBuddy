@@ -1195,7 +1195,7 @@
     "indizio": "Indizio: Guarda la tastiera qui sotto per trovare",
     "ilTastoColorato": "il tasto colorato.",
     "typingInputArea": "Typing input area",
-    "virtualKeyboard": "Virtual keyboard",
+    "virtualKeyboard": "Clavier virtuel",
     "study": "Study",
     "browse": "Browse",
     "stats": "Stats",
@@ -1249,7 +1249,7 @@
     "achievementDate": "Data traguardo: {date}",
     "azioniPerElementi": "Azioni per {count} elementi selezionati",
     "fingerPlacement": "Posizionamento dito per tasto {key}",
-    "keyAriaLabel": "Tasto {key}",
+    "keyAriaLabel": "Touche {key}",
     "quizBreakTimer": {
       "title": "C'est l'heure de la pause !",
       "message": "Tu travailles depuis un moment. Fais une courte pause avant de continuer le quiz.",
