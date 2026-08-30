@@ -47,11 +47,11 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [x] **National Implementation**: L.132/2025
 - [x] **Authority**: AgID
-- [x] **High-Risk Classification**: Verified
+- [~] **High-Risk Classification**: Precautionary — documented and high-risk obligations applied; final classification deferred to qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`, P1-2)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
 - [x] **Contacts**: `docs/compliance/countries/italy/ai-regulatory-contacts.md`
 
-**Status**: ✅ **COMPLETE** — all documentation and implementation complete
+**Status**: 🟡 **DOCUMENTATION COMPLETE** — country docs and implementation in place; AI Act high-risk classification is precautionary pending qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`)
 
 ---
 
@@ -88,11 +88,11 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [x] **National Implementation**: EU AI Act (direct application)
 - [x] **Authority**: AESIA (Agencia Española de Supervisión de la Inteligencia Artificial)
-- [x] **High-Risk Classification**: Verified
+- [~] **High-Risk Classification**: Precautionary — documented and high-risk obligations applied; final classification deferred to qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`, P1-2)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
 - [x] **Contacts**: `docs/compliance/countries/spain/ai-regulatory-contacts.md`
 
-**Status**: ✅ **COMPLETE** — all documentation and implementation complete
+**Status**: 🟡 **DOCUMENTATION COMPLETE** — country docs and implementation in place; AI Act high-risk classification is precautionary pending qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`)
 
 ---
 
@@ -129,11 +129,11 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [x] **National Implementation**: EU AI Act (direct application)
 - [x] **Authority**: CNIL (data protection) + Ministry of Economy (AI oversight)
-- [x] **High-Risk Classification**: Verified
+- [~] **High-Risk Classification**: Precautionary — documented and high-risk obligations applied; final classification deferred to qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`, P1-2)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
 - [x] **Contacts**: `docs/compliance/countries/france/ai-regulatory-contacts.md`
 
-**Status**: ✅ **COMPLETE** — all documentation and implementation complete
+**Status**: 🟡 **DOCUMENTATION COMPLETE** — country docs and implementation in place; AI Act high-risk classification is precautionary pending qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`)
 
 ---
 
@@ -170,11 +170,11 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [x] **National Implementation**: EU AI Act (direct application)
 - [x] **Authority**: BfDI (data protection aspects)
-- [x] **High-Risk Classification**: Verified
+- [~] **High-Risk Classification**: Precautionary — documented and high-risk obligations applied; final classification deferred to qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`, P1-2)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
 - [x] **Contacts**: `docs/compliance/countries/germany/ai-regulatory-contacts.md`
 
-**Status**: ✅ **COMPLETE** — all documentation and implementation complete
+**Status**: 🟡 **DOCUMENTATION COMPLETE** — country docs and implementation in place; AI Act high-risk classification is precautionary pending qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`)
 
 ---
 
@@ -211,11 +211,11 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [~] **National Framework**: UK has no AI-specific legislation yet; ICO and AI Safety Institute provide guidance
 - [x] **Authority**: ICO (data protection) + AI Safety Institute (safety evaluations)
-- [x] **High-Risk Classification**: Verified under EU AI Act framework (voluntary alignment)
+- [~] **High-Risk Classification**: Precautionary under EU AI Act framework (voluntary alignment) — documented; final classification deferred to qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`, P1-2)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
 - [x] **Contacts**: `docs/compliance/countries/uk/ai-regulatory-contacts.md`
 
-**Status**: ✅ **COMPLETE** — all documentation and implementation complete
+**Status**: 🟡 **DOCUMENTATION COMPLETE** — country docs and implementation in place; AI Act high-risk classification is precautionary pending qualified legal review (see `docs/compliance/AI-ACT-REMEDIATION-TRACKER.md`)
 
 ---
 

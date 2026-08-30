@@ -45,14 +45,16 @@ This document defines the risk management process for AI systems used in MirrorB
 
 MirrorBuddy is an **educational tutoring system** with:
 
-| Criterion         | Assessment                                                 | Classification          |
-| ----------------- | ---------------------------------------------------------- | ----------------------- |
-| **Purpose**       | Educational support for students with learning differences | Limited-Risk            |
-| **Training Data** | Curated knowledge bases (not web-scale)                    | Limited-Risk            |
-| **Output**        | Educational content (subject tutoring)                     | Limited-Risk            |
-| **Autonomy**      | Human-supervised (human makes final decisions)             | Limited-Risk            |
-| **User Age**      | Minors (under 16)                                          | **HIGH-RISK MITIGATOR** |
-| **Criticality**   | Educational (not safety-critical)                          | Limited-Risk            |
+| Criterion         | Assessment                                                                                                              | Weighs toward |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------- |
+| **Purpose**       | Educational support for students with learning differences                                                              | Limited-risk  |
+| **Training Data** | Curated knowledge bases (not web-scale)                                                                                 | Limited-risk  |
+| **Output**        | Educational content (subject tutoring); adaptive paths and quiz/FSRS performance signals may steer the learning process | High-risk     |
+| **Autonomy**      | Human-supervised (human makes final decisions)                                                                          | Limited-risk  |
+| **User Age**      | Minors (ages 8-18) with learning differences                                                                            | High-risk     |
+| **Criticality**   | Educational (not safety-critical)                                                                                       | Limited-risk  |
+
+No single criterion is dispositive; weighing them is exactly the analysis deferred to qualified legal review (see [AI-ACT-REMEDIATION-TRACKER.md](AI-ACT-REMEDIATION-TRACKER.md), P1-2). Pending that review:
 
 **Determination**: MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See [AI-ACT-REMEDIATION-TRACKER.md](AI-ACT-REMEDIATION-TRACKER.md).
 
