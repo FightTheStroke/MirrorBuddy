@@ -163,4 +163,190 @@ export const quotesEs: MaestroQuoteSet = {
     'No aceptes nada que no hayas comprendido.',
     'La virtud es conocimiento; la ignorancia es defecto.',
   ],
+
+  omero: [
+    {
+      text: 'Cuéntame, Musa, del hombre de mil astucias.',
+      source: 'Homero, Odisea, canto I verso 1',
+    },
+    'Todo viaje largo está hecho de días normales.',
+    {
+      text: 'Aguanta, corazón mío: ya has soportado cosas peores.',
+      source: 'Homero, Odisea, canto XX verso 18 — Odiseo se habla a sí mismo',
+    },
+    'Las historias se aprendían de memoria mucho antes de escribirse.',
+    'Un héroe tiene miedo. Y aun así sigue adelante.',
+    'Dilo en voz alta: así nacieron los poemas.',
+  ],
+
+  moliere: [
+    {
+      text: 'Vivo de buena sopa, no de bello lenguaje.',
+      source: 'Molière, Las mujeres sabias, acto II escena 7, 1672 — habla Crisalo',
+    },
+    'El francés se aprende mejor riendo.',
+    {
+      text: 'Hay que comer para vivir, y no vivir para comer.',
+      source:
+        'Molière, El avaro, acto III escena 1, 1668 — Valerio la cita como dicho de un antiguo',
+    },
+    'Fíjate en cómo habla la gente: de ahí nace el teatro.',
+    'Una palabra mal dicha hace reír, no hace daño.',
+    'Di la frase en voz alta, como en un escenario.',
+  ],
+
+  goethe: [
+    {
+      text: 'Quien no conoce lenguas extranjeras no sabe nada de la suya.',
+      source: 'Goethe, Máximas y reflexiones, n.º 91, publicada desde 1821',
+    },
+    'El alemán está hecho de piezas: aprende a ver dónde se unen.',
+    {
+      text: 'No basta con saber: hay que aplicar. No basta con querer: hay que hacer.',
+      source: 'Goethe, Los años de peregrinaje de Wilhelm Meister, «Del archivo de Makarie», 1829',
+    },
+    'Una palabra larga es solo varias palabras cortas juntas.',
+    'Lee un poema en voz alta antes incluso de entenderlo.',
+    'Aprende diez palabras al día, no cien en un solo día.',
+  ],
+
+  cervantes: [
+    {
+      text: 'El que lee mucho y anda mucho, ve mucho y sabe mucho.',
+      source: 'Cervantes, Don Quijote, segunda parte, capítulo 25, 1615 — habla don Quijote',
+    },
+    'Un libro puede ser una aventura, no solo un deber.',
+    {
+      text: 'La diligencia es madre de la buena ventura.',
+      source:
+        'Cervantes, Don Quijote, segunda parte, capítulo 43, 1615 — don Quijote aconseja a Sancho',
+    },
+    'Leer historias enseña a imaginar a las personas.',
+    'Hasta equivocarse de camino es una manera de conocer el mundo.',
+    'Las lenguas vecinas se parecen: fíate, pero comprueba siempre.',
+  ],
+
+  turing: [
+    {
+      text: 'Solo vemos un poco más allá, pero ya ahí hay mucho por hacer.',
+      source:
+        'Alan Turing, «Computing Machinery and Intelligence», revista Mind, 1950 — última frase',
+    },
+    'Un ordenador solo hace lo que le dices. Lo difícil es decírselo bien.',
+    'Haz primero la cuenta a mano y luego escribe la regla.',
+    'Un algoritmo es una receta: un paso, luego otro, luego otro.',
+    'Si el programa se equivoca, no eres tú quien está mal.',
+    'Prueba con un ejemplo pequeño antes que con uno grande.',
+  ],
+
+  austen: [
+    {
+      text: 'Tres o cuatro familias en un pueblo de campo: eso es justo lo que hay que trabajar.',
+      source: 'Jane Austen, carta a su sobrina Anna Austen, 9 de septiembre de 1814',
+    },
+    'Lee una sola frase, con calma: dice más de lo que parece.',
+    {
+      text: 'Todos tenemos dentro una guía mejor que cualquier otra persona, si quisiéramos escucharla.',
+      source: 'Jane Austen, Mansfield Park, capítulo 42, 1814 — habla Fanny Price',
+    },
+    'Pregunta siempre quién habla, y por qué con esas palabras.',
+    'A veces un personaje dice lo contrario de lo que piensa.',
+    'Las historias pequeñas cuentan las cosas grandes.',
+  ],
+
+  nightingale: [
+    {
+      text: 'La lección práctica más importante que se puede dar a las enfermeras es enseñarles qué observar, y cómo observar…',
+      source: 'Florence Nightingale, Notes on Nursing, cap. XIII, 1859 — frase abreviada',
+    },
+    'Antes de decidir, pregúntate: ¿cómo lo sé?',
+    {
+      text: 'Justo después de la necesidad de aire fresco viene, en los enfermos, la necesidad de luz.',
+      source: 'Florence Nightingale, Notes on Nursing, cap. IX, 1859 — frase abreviada',
+    },
+    'Contar las cosas ya es una forma de cuidarlas.',
+    'El aire y la luz hacen más de lo que parece.',
+    'Un número puesto en un dibujo se entiende mejor.',
+  ],
+
+  chris: [
+    'Una historia empieza siempre por una persona, no por una idea.',
+    'Habla despacio: quien te escucha necesita tiempo.',
+    'Si te tiembla la voz, es que te importa.',
+    'Cuenta una cosa pequeña y verdadera: funciona mejor que mil palabras grandes.',
+    'Mira a una persona cada vez, no a toda la sala.',
+    'No tienes que ser perfecto. Tienes que ser claro.',
+  ],
+
+  'alex-pina': [
+    'Una serie te enseña el idioma porque quieres saber cómo acaba.',
+    'Mira la misma escena dos veces: primero por la historia, luego por las palabras.',
+    'Aprende las frases que repiten los personajes: son las que vas a usar.',
+    'No traduzcas todo. Sigue la historia y el idioma te sigue a ti.',
+    'El español entra por los oídos antes que por los ojos.',
+    'Equivócate en voz alta: así se empieza a hablar.',
+  ],
+
+  mascetti: [
+    'Reír es cosa seria: se aprende mejor de buen humor.',
+    'Si una palabra te parece difícil, dila igual.',
+    'Con las palabras también se juega, no solo se estudia.',
+    'Un error dicho con elegancia casi es un acierto.',
+    'Quien se toma demasiado en serio no aprende nada.',
+    'Toma la vida como venga, pero tómala.',
+  ],
+
+  simone: [
+    'En el agua no importa cuánta fuerza tienes: importa cuánto insistes.',
+    'Tu cuerpo no es un problema que haya que arreglar.',
+    'Empieza por el largo que sabes hacer, no por el que querrías.',
+    'Cada entrenamiento parece inútil, hasta que un día deja de serlo.',
+    'Perder forma parte del entrenamiento. Eso también cuenta.',
+    'Muévete como puedes tú: esa es la forma correcta.',
+  ],
+
+  cassese: [
+    'El derecho sirve para proteger a quien no tiene poder.',
+    'Nadie está por encima de la ley. Nadie.',
+    'Un derecho escrito y nunca defendido se queda en papel.',
+    'Antes de juzgar, escucha a las dos partes.',
+    'Las reglas entre los pueblos nacen después de las guerras, para no repetirlas.',
+    'La justicia es lenta porque tiene que ser precisa.',
+  ],
+
+  'levi-montalcini': [
+    'Tu cerebro cambia mientras aprendes. Está pasando ahora mismo.',
+    'Las células se hablan entre sí: la biología está hecha de mensajes.',
+    'No hace falta un gran laboratorio: hace falta una pregunta precisa.',
+    'Un laboratorio cabe en una habitación, si la pregunta es buena.',
+    'Mira con calma algo vivo: te cuenta cómo funciona.',
+    'Pregunta por qué cada vez: así crece la mente.',
+  ],
+
+  loto: [
+    'Respira. Luego vuelve a empezar donde estabas.',
+    'Puedes parar un minuto. La tarea te espera.',
+    'No tienes que vaciar la cabeza: basta con darte cuenta de lo que hay.',
+    'Estarse quieto también se aprende.',
+    'Si la mente se va, tráela de vuelta. Cada vez está bien.',
+    'Una respiración cada vez ya es suficiente.',
+  ],
+
+  noether: [
+    'Dobla una hoja por la mitad: algo cambia, algo sigue igual.',
+    'Las matemáticas buscan lo que no cambia mientras todo se mueve.',
+    'Una simetría es algo que puedes mover sin estropearlo.',
+    'No importan los números: importan las reglas que los sostienen.',
+    'Si un camino está cerrado, cambia la pregunta, no el talento.',
+    'Mira qué sigue igual: ahí está la respuesta.',
+  ],
+
+  kahlo: [
+    'Dibuja lo que sientes, no lo que ves en el espejo.',
+    'El color dice lo que las palabras no dicen.',
+    'No hace falta saber dibujar para empezar.',
+    'Tu cuerpo cabe en un cuadro tal como es.',
+    'Un autorretrato es una pregunta: ¿quién soy hoy?',
+    'En el dibujo pon también los días difíciles: forman parte de ti.',
+  ],
 };

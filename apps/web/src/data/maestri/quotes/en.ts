@@ -167,4 +167,187 @@ export const quotesEn: MaestroQuoteSet = {
     'Accept nothing you have not understood.',
     'Virtue is knowledge; ignorance is vice.',
   ],
+
+  omero: [
+    {
+      text: 'Tell me, Muse, of the man of many turns.',
+      source: 'Homer, Odyssey, book I line 1',
+    },
+    'Every long journey is made of ordinary days.',
+    {
+      text: 'Endure, my heart: you have endured worse before.',
+      source: 'Homer, Odyssey, book XX line 18 — Odysseus speaking to himself',
+    },
+    'Stories were learned by heart long before they were written down.',
+    'A hero is afraid. Then goes on anyway.',
+    'Say it out loud: that is how the poems were born.',
+  ],
+
+  moliere: [
+    {
+      text: 'I live on good soup, not on fine language.',
+      source: 'Molière, The Learned Ladies, act II scene 7, 1672 — spoken by Chrysale',
+    },
+    'French is learned best while laughing.',
+    {
+      text: 'One must eat to live, not live to eat.',
+      source: 'Molière, The Miser, act III scene 1, 1668 — Valère quotes it as an ancient saying',
+    },
+    'Watch how people talk: that is where theatre comes from.',
+    'A word said badly gets a laugh; it does no harm.',
+    'Say the sentence out loud, as if on a stage.',
+  ],
+
+  goethe: [
+    {
+      text: 'Those who know no foreign language know nothing of their own.',
+      source: 'Goethe, Maxims and Reflections, no. 91, published from 1821',
+    },
+    'German is made of parts: learn to see where they join.',
+    {
+      text: 'It is not enough to know; you must also apply. It is not enough to want; you must also do.',
+      source: 'Goethe, Wilhelm Meister’s Journeyman Years, “From Makarie’s Archive”, 1829',
+    },
+    'A long word is only several short words put together.',
+    'Read a poem out loud before you even understand it.',
+    'Learn ten words a day, not a hundred in one day.',
+  ],
+
+  cervantes: [
+    {
+      text: 'Whoever reads much and walks much, sees much and knows much.',
+      source: 'Cervantes, Don Quixote, part II chapter 25, 1615 — spoken by Don Quixote',
+    },
+    'A book can be an adventure, not only homework.',
+    {
+      text: 'Diligence is the mother of good fortune.',
+      source: 'Cervantes, Don Quixote, part II chapter 43, 1615 — Don Quixote advising Sancho',
+    },
+    'Reading stories teaches you to imagine people.',
+    'Even taking the wrong road is a way of learning the world.',
+    'Neighbouring languages look alike: trust them, but always check.',
+  ],
+
+  turing: [
+    {
+      text: 'We can only see a short distance ahead, but we can see plenty there that needs to be done.',
+      source: 'Alan Turing, “Computing Machinery and Intelligence”, Mind, 1950 — closing sentence',
+    },
+    'A computer only does what you tell it. The hard part is telling it well.',
+    'Do the sum by hand first, then write down the rule.',
+    'An algorithm is a recipe: one step, then another, then another.',
+    'If the program is wrong, that does not make you wrong.',
+    'Try a small example before a big one.',
+  ],
+
+  austen: [
+    {
+      text: 'Three or four families in a country village is the very thing to work on.',
+      source: 'Jane Austen, letter to her niece Anna Austen, 9 September 1814',
+    },
+    'Read one sentence slowly: it says more than it seems.',
+    {
+      text: 'We have all a better guide in ourselves, if we would attend to it, than any other person can be.',
+      source: 'Jane Austen, Mansfield Park, chapter 42, 1814 — spoken by Fanny Price',
+    },
+    'Always ask who is speaking, and why in those particular words.',
+    'Sometimes a character says the opposite of what they think.',
+    'Small stories are how big things get told.',
+  ],
+
+  nightingale: [
+    {
+      text: 'The most important practical lesson that can be given to nurses is to teach them what to observe — how to observe…',
+      source: 'Florence Nightingale, Notes on Nursing, ch. XIII, 1859 — sentence shortened',
+    },
+    'Before you decide, ask yourself: how do I know?',
+    {
+      text: 'Second only to their need of fresh air is their need of light.',
+      source: 'Florence Nightingale, Notes on Nursing, ch. IX, 1859 — sentence shortened',
+    },
+    'Counting things is already a way of caring for them.',
+    'Air and light do more than they seem to.',
+    'A number put into a picture is easier to understand.',
+  ],
+
+  chris: [
+    'A story always starts with a person, not with an idea.',
+    'Speak slowly: the people listening need time.',
+    'If your voice shakes, it means you care.',
+    'Tell one small true thing: it works better than a thousand big words.',
+    'Look at one person at a time, not at the whole room.',
+    "You don't have to be perfect. You have to be clear.",
+  ],
+
+  'alex-pina': [
+    'A series teaches you the language because you want to know how it ends.',
+    'Watch the same scene twice: first for the story, then for the words.',
+    'Learn the lines the characters repeat: those are the ones you will use.',
+    "Don't translate everything. Follow the story and the language follows you.",
+    'Spanish comes in through your ears before your eyes.',
+    'Get it wrong out loud: that is how speaking starts.',
+  ],
+
+  mascetti: [
+    'Laughing is a serious business: you learn better in a good mood.',
+    'If a word looks hard, say it anyway.',
+    'Words can be played with, not only studied.',
+    'A mistake made with style is almost a flourish.',
+    'Nobody who takes himself too seriously ever learns a thing.',
+    'Take life as it comes — but do take it.',
+  ],
+
+  simone: [
+    'In the water it is not how strong you are: it is how long you keep going.',
+    'Your body is not a problem to be fixed.',
+    'Start from the lap you can do, not the one you wish you could.',
+    'Every training session feels useless, until one day it is not.',
+    'Losing is part of training. That part counts too.',
+    'Move the way you can move: that is the right way.',
+  ],
+
+  cassese: [
+    'The law is there to protect those who have no power.',
+    'No one is above the law. No one.',
+    'A right that is written down and never defended stays a piece of paper.',
+    'Before you judge, listen to both sides.',
+    'The rules between peoples are made after wars, so as not to repeat them.',
+    'Justice is slow because it has to be exact.',
+  ],
+
+  'levi-montalcini': [
+    'Your brain changes while you learn. It is happening right now.',
+    'Cells talk to each other: biology is made of messages.',
+    'You do not need a big laboratory: you need a precise question.',
+    'A laboratory can fit in one room, if the question is good.',
+    'Look at a living thing calmly: it tells you how it works.',
+    'Ask why every single time: that is how a mind grows.',
+  ],
+
+  loto: [
+    'Breathe. Then start again from where you were.',
+    'You can stop for a minute. The homework will wait.',
+    'You do not have to empty your head: just notice what is in it.',
+    'Sitting still is something you learn too.',
+    'If your mind wanders off, bring it back. Every time is fine.',
+    'One breath at a time is already enough.',
+  ],
+
+  noether: [
+    'Fold a sheet of paper in half: something changes, something stays the same.',
+    'Mathematics looks for what does not change while everything moves.',
+    'A symmetry is something you can move without spoiling it.',
+    'It is not the numbers that matter: it is the rules that hold them together.',
+    'If a road is closed, change the question, not your talent.',
+    'Look at what stays the same: the answer is there.',
+  ],
+
+  kahlo: [
+    'Draw what you feel, not what you see in the mirror.',
+    'Colour says what words do not.',
+    'You do not need to know how to draw in order to start.',
+    'Your body can be in a painting exactly as it is.',
+    'A self-portrait is a question: who am I today?',
+    'Put the hard days in the picture too: they are part of you.',
+  ],
 };

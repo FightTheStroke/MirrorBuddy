@@ -496,6 +496,61 @@ function dropped, the checker reported `46 applied, 0 pending` and still exited
 
 ---
 
+### 6.3 G-7 accuracy, 30 August 2026 — the sixteen empty cards (CLOSED)
+
+**The half-empty file.** §6.2 rebuilt the card lines for the sixteen maestri
+that had them. It did not notice that the other sixteen — `omero`, `moliere`,
+`goethe`, `cervantes`, `turing`, `noether`, `austen`, `nightingale`, `chris`,
+`alex-pina`, `mascetti`, `simone`, `cassese`, `levi-montalcini`, `loto`,
+`kahlo` — had no key in `quotes/` at all. `QuoteRotator` returns `null` for an
+unknown maestro, so half the roster shipped a silently blank card and nothing
+failed. The attribution guard could not see it either: it iterates the keys
+that exist, so an absent maestro is not a violation.
+
+Ninety-six lines were added, six per maestro, in all five locales. Each is
+either a quotation checked against a primary text, or a MirrorBuddy line
+carrying no attribution. Nothing in between, per §6.2.
+
+**Fifteen quotations shipped**, each read in a primary or scholarly text
+(Perseus/Scaife for Homer, theatre-classique and Wikisource for Molière,
+Project Gutenberg for Goethe, Cervantes, Austen and Nightingale, Centro Virtual
+Cervantes for _Don Quijote_ II.43, the original _Mind_ 1950 printing for
+Turing). Where the words belong to a character rather than the author, the
+source says so — Chrysale, Valère, Don Quijote, Fanny Price, Odysseus — because
+"Molière wrote it" and "Molière thought it" are different claims, and the
+August incident was made of exactly that difference.
+
+**Three candidates were verified and still dropped**, which is the part worth
+recording:
+
+| Candidate                                                | Verified? | Why it was dropped                                                                                   |
+| -------------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
+| Goethe, «Grau, teurer Freund, ist alle Theorie», Faust I | Yes       | **Mephistopheles** says it, wearing Faust's gown to fool a student. Genuine Goethe, false as advice. |
+| Austen, «there is no enjoyment like reading», P&P ch. 11 | Yes       | Caroline Bingley says it insincerely, having just yawned over a book she cannot read.                |
+| Homer, «αἰὲν ἀριστεύειν», Iliad VI.208                   | Yes       | "Always be best and above all others" — the wrong thing to put on a card read by disabled students.  |
+
+**Eight maestri carry no quotation at all, by decision.** Álex Pina and Simone
+Barlaam are alive; Conte Mascetti is a character from a 1975 film still in
+copyright; Chris and Fratello Loto are MirrorBuddy characters, not people;
+Antonio Cassese, Rita Levi-Montalcini and Frida Kahlo left writings recent
+enough to be protected, and Kahlo's estate enforces hers. For all eight, a
+quotation would be a legal exposure as well as a truthfulness one, in a product
+whose readers are minors.
+
+**Emmy Noether is the honest case.** She is public domain, so nothing prevented
+quoting her — but the primary record holds only a remark on mathematical method
+in her 1931 letter to Helmut Hasse and one on proof technique reported by
+Hermann Weyl in 1935, and neither means anything to a child. The inspirational
+Noether aphorisms in circulation have no traceable source. She therefore ships
+with six MirrorBuddy lines and a comment saying why. **"No verifiable quotation
+exists" is a finding, not a failure**; the failure mode is filling that silence
+with something that sounds right.
+
+**What this does not close.** The knowledge corpus sweep left open by §6.2 is
+still open: these ninety-six lines are card lines, not corpus text.
+
+---
+
 ## 7. Review cadence
 
 - **Per PR**: any change under `apps/web/src/data/maestri/` requires a provenance header
