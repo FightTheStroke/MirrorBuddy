@@ -16,6 +16,7 @@
 
 import { TOS_VERSION } from '@/lib/tos/constants';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
+import { isAuthenticated } from '@/lib/auth/client-auth';
 
 // =============================================================================
 // CONSTANTS
@@ -489,6 +490,12 @@ export async function syncConsentToServer(
  * Load consent from database (for authenticated users)
  */
 export async function loadConsentFromDB(): Promise<UnifiedConsentData | null> {
+  // The stored consent belongs to an account. A signed-out visitor has none,
+  // and asking earns a 401 the browser prints as a failed request.
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   try {
     // Check if already loaded this session
     if (sessionStorage.getItem(CONSENT_LOADED_KEY) === 'true') {
@@ -502,7 +509,7 @@ export async function loadConsentFromDB(): Promise<UnifiedConsentData | null> {
     });
 
     if (tosResponse.status === 401) {
-      // Not authenticated
+      // The cookie is present but the session expired
       return null;
     }
 

@@ -44,6 +44,29 @@ export const CONSOLE_AUDIT_ROUTES = [
 ] as const;
 
 /**
+ * The routes a person can reach before signing in.
+ *
+ * The audit above always runs signed in, which is why nobody noticed that the
+ * home page of a first-time visitor fired four requests that only an account
+ * can satisfy. They came back 401 and the browser printed each one as a failed
+ * request: the very first impression of the product was a console full of red.
+ *
+ * Signed out is the state every new visitor is in. It gets its own pass.
+ */
+export const PUBLIC_CONSOLE_AUDIT_ROUTES = [
+  '/',
+  '/welcome',
+  '/login',
+  '/pricing',
+  '/privacy',
+  '/terms',
+  '/accessibility',
+  '/ai-transparency',
+  '/cookies',
+  '/forgot-password',
+] as const;
+
+/**
  * Console noise that is expected and carries no user impact.
  *
  * Keep this list short and justified: every entry is a warning we chose to

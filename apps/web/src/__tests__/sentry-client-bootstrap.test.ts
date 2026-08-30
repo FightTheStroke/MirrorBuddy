@@ -22,6 +22,7 @@ describe('Sentry client bootstrap', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it('enables Sentry on Vercel when DSN is configured', async () => {
@@ -29,6 +30,9 @@ describe('Sentry client bootstrap', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'false');
+    // The test runner serves from localhost, which the rule treats as a
+    // developer's own machine and deliberately keeps quiet.
+    vi.stubGlobal('location', { hostname: 'www.mirrorbuddy.org' });
 
     await import('../../instrumentation-client');
 
@@ -36,6 +40,21 @@ describe('Sentry client bootstrap', () => {
     expect(Sentry.init).toHaveBeenCalledWith(
       expect.objectContaining({
         enabled: true,
+      }),
+    );
+  });
+
+  it('stays quiet for a production build served from localhost', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'false');
+    vi.stubGlobal('location', { hostname: 'localhost' });
+
+    await import('../../instrumentation-client');
+
+    expect(Sentry.init).toHaveBeenCalledWith(
+      expect.objectContaining({
+        enabled: false,
       }),
     );
   });

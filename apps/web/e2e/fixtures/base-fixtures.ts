@@ -25,6 +25,7 @@
 
 import { randomUUID } from 'crypto';
 import { test as base, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import {
   mockTOS,
   mockConsentStorage,
@@ -41,7 +42,12 @@ import {
  * This prevents UnifiedConsentWall's ToS/cookie/trial-consent checks
  * from blocking test interactions.
  */
-export const test = base.extend({
+export interface BaseFixtures {
+  /** A page in the state a first-time visitor is actually in. */
+  signedOutPage: Page;
+}
+
+export const test = base.extend<BaseFixtures>({
   page: async ({ page, context }, use) => {
     const runSuffix = randomUUID().replace(/-/g, '').slice(0, 8);
     const visitorId = `e2e-visitor-${Date.now()}-${runSuffix}`;
@@ -56,6 +62,25 @@ export const test = base.extend({
     await mockAccessibilitySettings(page, a11yUserId, `e2e-a11y-settings-${runSuffix}`);
 
     await use(page);
+  },
+
+  /**
+   * A page with none of the bypasses above: no cookies, no session, no mocked
+   * consent. This is the state a first-time visitor is actually in.
+   *
+   * Every other fixture hands the app a visitor cookie and a trial session, so
+   * nothing in the suite had ever loaded a page the way a stranger does — which
+   * is how four requests that only an account can satisfy kept firing on the
+   * home page, each one printed by the browser as a failed request.
+   *
+   * Use it to observe, not to interact: the consent wall is not bypassed here,
+   * because for a stranger the wall is part of the truth.
+   */
+  signedOutPage: async ({ browser }, use) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await use(page);
+    await context.close();
   },
 });
 

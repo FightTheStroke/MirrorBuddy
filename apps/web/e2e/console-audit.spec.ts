@@ -13,6 +13,7 @@
 import { test, expect } from './fixtures/auth-fixtures';
 import {
   CONSOLE_AUDIT_ROUTES,
+  PUBLIC_CONSOLE_AUDIT_ROUTES,
   isIgnoredConsoleMessage,
   isIgnoredRequest,
   isIgnoredResourceFailure,
@@ -74,6 +75,24 @@ test.describe('Browser console audit', () => {
       await trialPage.waitForTimeout(2500);
 
       expect(problems, `${route} produced browser errors:\n${describe(problems)}`).toEqual([]);
+    });
+  }
+});
+
+test.describe('Browser console audit — signed out', () => {
+  for (const route of PUBLIC_CONSOLE_AUDIT_ROUTES) {
+    test(`no browser errors on ${route} for a first-time visitor`, async ({ signedOutPage }) => {
+      const problems = watchForProblems(signedOutPage);
+
+      await signedOutPage.goto(`/it${route === '/' ? '' : route}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await signedOutPage.waitForTimeout(2500);
+
+      expect(
+        problems,
+        `${route} produced browser errors for a signed-out visitor:\n${describe(problems)}`,
+      ).toEqual([]);
     });
   }
 });
