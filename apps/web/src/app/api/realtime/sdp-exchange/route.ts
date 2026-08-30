@@ -5,8 +5,8 @@
 
 import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withCSRF, withRateLimit } from '@/lib/api/middlewares';
-import { RATE_LIMITS } from '@/lib/rate-limit';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { checkRateLimitAsync, getClientIdentifier, rateLimitResponse } from '@/lib/rate-limit';
 import { getRequestId, getRequestLogger } from '@/lib/tracing';
 
 export const revalidate = 0;
@@ -14,6 +14,20 @@ export const revalidate = 0;
 const MAX_SDP_LENGTH = 64_000;
 const MAX_TOKEN_LENGTH = 2_048;
 const AZURE_REQUEST_TIMEOUT_MS = 8_000;
+
+/**
+ * A whole classroom sits behind one school NAT, and this relay only runs when
+ * the direct path already failed — the moment every student retries at once.
+ * It therefore gets its own bucket instead of sharing the generic per-identifier
+ * one, so a fallback storm cannot exhaust the allowance of unrelated endpoints.
+ */
+const SDP_RELAY_RATE_LIMIT = { maxRequests: 60, windowMs: 60 * 1000 };
+
+/** Reject an oversized body before it is read into memory. */
+function declaredBodyTooLarge(request: Request): boolean {
+  const declared = Number(request.headers.get('content-length'));
+  return Number.isFinite(declared) && declared > MAX_SDP_LENGTH + MAX_TOKEN_LENGTH;
+}
 
 function getAzureRequestId(response: Response): string | undefined {
   return (
@@ -27,11 +41,25 @@ function getAzureRequestId(response: Response): string | undefined {
 export const POST = pipe(
   withSentry('/api/realtime/sdp-exchange'),
   withCSRF,
-  withRateLimit(RATE_LIMITS.REALTIME_TOKEN),
 )(async (ctx) => {
   const requestId = getRequestId(ctx.req);
   const log = getRequestLogger(ctx.req, requestId);
   const requestStartMs = Date.now();
+
+  const rateLimit = await checkRateLimitAsync(
+    `realtime-sdp-relay:${getClientIdentifier(ctx.req)}`,
+    SDP_RELAY_RATE_LIMIT,
+  );
+  if (!rateLimit.success) {
+    log.warn('Rate limit exceeded', { endpoint: '/api/realtime/sdp-exchange' });
+    return rateLimitResponse(rateLimit);
+  }
+
+  if (declaredBodyTooLarge(ctx.req)) {
+    const response = NextResponse.json({ error: 'SDP request is too large' }, { status: 413 });
+    response.headers.set('X-Request-ID', requestId);
+    return response;
+  }
 
   let body: unknown;
   try {
@@ -80,8 +108,12 @@ export const POST = pipe(
     return response;
   }
 
+  // Keep WebRTC filter OFF: tool/function calls travel on the data channel.
+  // Enabling filter can strip non-audio signaling and break tool execution.
+  // This relay is a fallback, not a redesign: it keeps main's documented
+  // behaviour rather than silently changing what the student's tools receive.
   const url = new URL(azureEndpoint);
-  const sdpUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/calls`;
+  const sdpUrl = `${url.protocol}//${url.hostname}/openai/v1/realtime/calls?webrtcfilter=off`;
 
   log.debug('[SDP Proxy] Exchanging SDP with Azure', { url: sdpUrl });
 

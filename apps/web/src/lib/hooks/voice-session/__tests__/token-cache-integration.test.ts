@@ -110,44 +110,32 @@ describe('Token Cache Integration', () => {
     expect(csrfFetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it('should refetch token if cache is expired', async () => {
+  it('refuses a token too close to expiry and refetches on the next call', async () => {
     const { csrfFetch } = await import('@/lib/auth');
     const csrfFetchMock = csrfFetch as ReturnType<typeof vi.fn>;
 
-    // First token expires very soon (within MIN_FETCH_INTERVAL_MS = 5000)
-    const nearExpiry = Date.now() + 3000;
+    // A token with three seconds of life cannot survive a negotiation that may
+    // spend eight seconds direct and eight more on the relay. Handing it back
+    // makes the student wait for a call that was never going to connect.
     csrfFetchMock.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ token: 'old-token', expiresAt: nearExpiry }),
+      json: () => Promise.resolve({ token: 'dying-token', expiresAt: Date.now() + 3000 }),
     });
-
-    // New token valid for 2 minutes
-    const futureExpiry = Date.now() + 120_000;
     csrfFetchMock.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve({ token: 'new-token', expiresAt: futureExpiry }),
+      json: () => Promise.resolve({ token: 'new-token', expiresAt: Date.now() + 120_000 }),
     });
 
     const { useTokenCache } = await import('../token-cache');
     const { result } = renderHook(() => useTokenCache());
 
-    // First call - gets old-token but it's within MIN_FETCH_INTERVAL_MS of expiry
-    // so getCachedToken will consider it invalid and refetch
     let token1: string | null = null;
     await act(async () => {
       token1 = await result.current.getCachedToken();
     });
-    // The token near expiry (within 5s buffer) triggers immediate refetch
-    // getCachedToken checks: expiresAt > Date.now() + MIN_FETCH_INTERVAL_MS (5000)
-    // nearExpiry = Date.now() + 3000, so 3000 < 5000 → cache miss → fetch
-    expect(token1).toBe('old-token');
+    expect(token1).toBeNull();
     expect(csrfFetchMock).toHaveBeenCalledTimes(1);
 
-    // Second call - old token should be cached (it was fetched < 5s ago)
-    // But we need to wait for the cache to consider it expired.
-    // The cache checks expiresAt > Date.now() + MIN_FETCH_INTERVAL_MS.
-    // Since nearExpiry is Date.now() + 3000 at creation, and MIN_FETCH_INTERVAL_MS is 5000,
-    // the token is already considered expired by getCachedToken immediately.
     let token2: string | null = null;
     await act(async () => {
       token2 = await result.current.getCachedToken();

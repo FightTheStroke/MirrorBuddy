@@ -18,6 +18,11 @@ export interface WebRTCConnectionConfig {
   onConnectionStateChange?: (state: RTCPeerConnectionState) => void;
   onICEConnectionStateChange?: (state: RTCIceConnectionState) => void;
   onTrack?: (event: RTCTrackEvent) => void;
+  /**
+   * Receives a cancel handle as soon as the attempt starts, so a hang-up during
+   * negotiation stops it instead of waiting for connect() to settle.
+   */
+  registerCancel?: (cancel: () => void) => void;
   onError?: (error: Error) => void;
   onDataChannelMessage?: (event: Record<string, unknown>) => void;
   onDataChannelOpen?: () => void;

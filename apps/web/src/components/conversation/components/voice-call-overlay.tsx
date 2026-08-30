@@ -320,7 +320,13 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
         </div>
       )}
 
-      <p className={cn('mt-2 text-sm', configError ? 'text-red-400' : 'text-slate-300')}>
+      {/* Announced: connecting can now span a second attempt, and a student who
+          cannot see the screen must still be told the call is still coming. */}
+      <p
+        role="status"
+        aria-live="polite"
+        className={cn('mt-2 text-sm', configError ? 'text-red-400' : 'text-slate-300')}
+      >
         {getStatusText()}
       </p>
 

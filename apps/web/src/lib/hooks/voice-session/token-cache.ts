@@ -16,6 +16,17 @@ const REFRESH_BUFFER_MS = 30_000;
 /** Minimum interval between fetch attempts (debounce) */
 const MIN_FETCH_INTERVAL_MS = 5_000;
 
+/**
+ * A negotiation can spend eight seconds on the direct path and eight more on
+ * the relay. A token must outlive that, with room for client clock skew, or it
+ * dies mid-handshake and the student waits for nothing.
+ */
+const MIN_TOKEN_LIFETIME_MS = 20_000;
+
+function hasEnoughLifetime(expiresAt: number): boolean {
+  return expiresAt > Date.now() + MIN_TOKEN_LIFETIME_MS;
+}
+
 interface CachedToken {
   token: string;
   expiresAt: number;
@@ -124,11 +135,20 @@ export function useTokenCache() {
    */
   const getCachedToken = useCallback(async (): Promise<string | null> => {
     const cached = cacheRef.current;
-    if (cached && cached.expiresAt > Date.now() + MIN_FETCH_INTERVAL_MS) {
+    if (cached && hasEnoughLifetime(cached.expiresAt)) {
       return cached.token;
     }
     const fresh = await fetchToken();
-    return fresh?.token ?? null;
+    // A token that expires mid-negotiation is worse than no token: the caller
+    // falls back to minting its own, whereas a dying one fails the SDP exchange
+    // after the student has already waited.
+    if (!fresh || !hasEnoughLifetime(fresh.expiresAt)) {
+      if (fresh) {
+        logger.debug('[TokenCache] Discarding a token too close to expiry to negotiate with');
+      }
+      return null;
+    }
+    return fresh.token;
   }, [fetchToken]);
 
   /**
