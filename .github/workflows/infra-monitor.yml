@@ -507,8 +507,11 @@ jobs:
           HTMLEOF
           )
 
-          # Send via Resend API
-          HTTP_CODE=$(curl -sf -o /dev/null -w "%{http_code}" \
+          # Not -f: a rejected send must report why. With --fail curl dies on a
+          # 4xx before anything is printed, and the job says only "exit 22" —
+          # which is how a wrong sender address stayed unreadable for weeks.
+          BODY_FILE=$(mktemp)
+          HTTP_CODE=$(curl -s -o "$BODY_FILE" -w "%{http_code}" \
             -X POST "https://api.resend.com/emails" \
             -H "Authorization: Bearer ${RESEND_API_KEY}" \
             -H "Content-Type: application/json" \
@@ -521,6 +524,13 @@ jobs:
 
           if [ "$HTTP_CODE" = "200" ]; then
             echo "Email sent successfully"
-          else
-            echo "::warning::Email send returned HTTP ${HTTP_CODE}"
+            exit 0
           fi
+
+          # The reply carries the reason (unverified domain, malformed sender,
+          # revoked key) and never the key itself.
+          echo "::error::Resend refused the report: HTTP ${HTTP_CODE} — $(jq -rc '.message // .name // .' "$BODY_FILE" 2>/dev/null || cat "$BODY_FILE")"
+          echo "FROM_EMAIL is $([ -n "$FROM_EMAIL" ] && echo "set (${#FROM_EMAIL} chars)" || echo "EMPTY")"
+          echo "ADMIN_EMAIL is $([ -n "$ADMIN_EMAIL" ] && echo "set (${#ADMIN_EMAIL} chars)" || echo "EMPTY")"
+          echo "RESEND_API_KEY is $([ -n "$RESEND_API_KEY" ] && echo "set (${#RESEND_API_KEY} chars)" || echo "EMPTY")"
+          exit 1
