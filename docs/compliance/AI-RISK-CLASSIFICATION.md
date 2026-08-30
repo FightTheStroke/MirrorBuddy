@@ -37,7 +37,7 @@ MirrorBuddy meets criterion **(b)** via **Annex III, point 3(b)**: _"AI systems 
 
 MirrorBuddy qualifies under this point because:
 
-> **Note (pending legal review — see AI-ACT-REMEDIATION-TRACKER.md, P1-2):** the qualifying analysis below (table and "Legal Interpretation") was originally framed on the superseded 2021-draft "access/placement within institutions" wording. Under the enacted Annex III(3)(b) text — "evaluate learning outcomes … steer the learning process" — the legal theory shifts (and note the direct-to-consumer deployment, outside institutions). This section is retained for traceability and flagged for qualified legal re-assessment.
+> **Note (pending legal review — see AI-ACT-REMEDIATION-TRACKER.md, P1-2, and ADR 0178):** the qualifying analysis below (table and "Legal Interpretation") was originally framed on the superseded 2021-draft "access/placement within institutions" wording. Under the enacted Annex III(3)(b) text — "evaluate learning outcomes … steer the learning process" — the legal theory shifts (and note the direct-to-consumer deployment, outside institutions). This section is retained for traceability and flagged for qualified legal re-assessment. ADR 0178 records the classification decision to be made and the two deciding elements.
 
 | Criterion            | MirrorBuddy Implementation                                         | Assessment                     |
 | -------------------- | ------------------------------------------------------------------ | ------------------------------ |

@@ -2,11 +2,11 @@
 
 **Status**: DRAFT
 **Version**: 1.0
-**Last Updated**: 09 February 2026
+**Last Updated**: 30 August 2026
 **Organization**: Fightthestroke Foundation
 **Contact**: roberdan@fightthestroke.org
 
-> **IMPORTANT**: This plan is in DRAFT status. Implementation tracking begins with first production release.
+> **IMPORTANT**: This plan is in DRAFT status. It remains DRAFT deliberately: MirrorBuddy has not yet been placed on the market or put into service (first production release targeted Q4 CY 2026), and the Article 72 post-market monitoring obligations attach at that point. The plan is finalized and its metrics baselined at first production release, when implementation tracking begins. This is not an aspirational-status gap — see `AI-ACT-REMEDIATION-TRACKER.md` (P1-5).
 
 ## 1. Scope and Objectives
 

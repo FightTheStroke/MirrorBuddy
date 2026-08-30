@@ -26,7 +26,7 @@ MirrorBuddy adheres to the following principles in the deployment of AI systems:
 
 ## 4. System Classification
 
-MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See AI-ACT-REMEDIATION-TRACKER.md.
+MirrorBuddy is treated, on a precautionary basis, as a **HIGH-RISK AI system** under Article 6(2) and Annex III, point 3(b) of Regulation (EU) 2024/1689 (AI systems intended to evaluate learning outcomes, including where those outcomes steer the learning process). The final classification is deferred to qualified legal review, which must weigh: (a) the direct-to-consumer deployment, outside education/vocational-training institutions — a nexus that Annex III(3)(b) requires; (b) the potential applicability of the Article 6(3) filter (noting that FSRS/quiz performance-based personalisation may amount to profiling, which disapplies that filter). Pending confirmation, the Foundation precautionarily applies high-risk obligations. See AI-ACT-REMEDIATION-TRACKER.md and ADR 0178 (EU AI Act risk classification).
 
 The following considerations and obligations apply:
 
@@ -45,6 +45,18 @@ All users are informed that:
 - A **transparency banner** informs students they are interacting with AI each time they access AI-driven features
 - Educational chats are always **human-reviewable** by teachers and parents
 - The **voice generation system** uses OpenAI models with quality monitoring
+
+### 5.1 Machine-readable marking of AI-generated content (Article 50(2))
+
+Article 50(2) of the AI Act requires providers of systems that generate synthetic audio, image, video or text content to mark that output in a machine-readable format detectable as artificially generated. MirrorBuddy's current posture:
+
+- **Scope is attenuated.** The system generates only conversational text and synthetic-voice (TTS) audio, in a context where the voice is openly declared as synthetic and does not impersonate a real person. It generates no images or video.
+- **Human-readable disclosure is already in place** — the transparency banner and the `AIDisclosureBadge` (ADR 0140) satisfy the Article 50(1)/(9) information duty toward the user.
+- **Machine-readable marking is deferred (DEFER decision, see ADR 0179).** Implementing provenance/marking (C2PA-style or export-metadata) on conversational text and audio has a high cost and legally uncertain benefit while no synthetic media is generated.
+- **Approach decision due by 30 September 2026** (owner: Roberdan). Options under consideration: (a) the existing visible disclosure is deemed sufficient for conversational text/audio; (b) marking in the metadata of exported artefacts (PDF/audio); (c) C2PA-style provenance.
+- **Reopen triggers:** (a) the product adds image or video generation; or (b) a qualified legal opinion concludes that Article 50(2) marking is required for conversational text/audio. Review milestone: M3, or the first generative-media feature.
+
+This posture is provisional and subject to the qualified legal review of Article 50(2) scope tracked in `AI-ACT-REMEDIATION-TRACKER.md` (P2-1).
 
 ## 6. Human Oversight
 
