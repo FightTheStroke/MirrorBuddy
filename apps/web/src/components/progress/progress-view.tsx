@@ -74,7 +74,9 @@ export function ProgressView() {
   } = useProgressStore();
 
   useEffect(() => {
-    loadFromServer();
+    const controller = new AbortController();
+    loadFromServer(controller.signal);
+    return () => controller.abort();
   }, [loadFromServer]);
 
   const today = new Date();

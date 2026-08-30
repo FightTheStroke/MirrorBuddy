@@ -70,5 +70,5 @@ export interface ProgressState {
   gradeCurrentSession: (grade: SessionGrade) => void;
   // Sync actions
   syncToServer: () => Promise<void>;
-  loadFromServer: () => Promise<void>;
+  loadFromServer: (signal?: AbortSignal) => Promise<void>;
 }
