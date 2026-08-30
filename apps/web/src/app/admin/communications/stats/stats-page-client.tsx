@@ -174,7 +174,7 @@ export function StatsPageClient({ quotaLimits }: StatsPageClientProps) {
                 aria-valuenow={quotaLimits.emailsToday.used}
                 aria-valuemin={0}
                 aria-valuemax={quotaLimits.emailsToday.limit}
-                aria-label={t('dailyQuota', {
+                aria-label={t('communications.stats.dailyQuotaAriaLabel', {
                   used: quotaLimits.emailsToday.used,
                   limit: quotaLimits.emailsToday.limit,
                 })}
@@ -207,7 +207,7 @@ export function StatsPageClient({ quotaLimits }: StatsPageClientProps) {
                 aria-valuenow={quotaLimits.emailsMonth.used}
                 aria-valuemin={0}
                 aria-valuemax={quotaLimits.emailsMonth.limit}
-                aria-label={t('monthlyQuota', {
+                aria-label={t('communications.stats.monthlyQuotaAriaLabel', {
                   used: quotaLimits.emailsMonth.used,
                   limit: quotaLimits.emailsMonth.limit,
                 })}

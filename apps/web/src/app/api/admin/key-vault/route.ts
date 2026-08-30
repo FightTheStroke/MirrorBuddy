@@ -5,6 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { encryptSecret, decryptSecret, maskValue } from '@/lib/admin/key-vault-encryption';
 import type { MaskedSecretVaultEntry, CreateSecretRequest } from '@/lib/admin/key-vault-types';
@@ -62,6 +63,10 @@ export const GET = pipe(
 
     // Check for encryption configuration issues
     if (errorMessage.includes('TOKEN_ENCRYPTION_KEY') || errorMessage.includes('32 char')) {
+      logger.error('Key vault GET failed: encryption not configured', {
+        component: 'keyVaultApi',
+        operation: 'GET',
+      });
       return NextResponse.json(
         {
           error: 'encryption_not_configured',
@@ -79,6 +84,11 @@ export const GET = pipe(
       errorMessage.includes('Prisma') ||
       errorMessage.includes("Can't reach")
     ) {
+      logger.error('Key vault GET failed: database error', {
+        component: 'keyVaultApi',
+        operation: 'GET',
+        errorMessage,
+      });
       return NextResponse.json(
         {
           error: 'database_error',
@@ -89,6 +99,11 @@ export const GET = pipe(
     }
 
     // Generic error fallback
+    logger.error('Key vault GET failed: unexpected error', {
+      component: 'keyVaultApi',
+      operation: 'GET',
+      errorMessage,
+    });
     return NextResponse.json(
       {
         error: 'internal_error',
@@ -145,6 +160,10 @@ export const POST = pipe(
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     if (errorMessage.includes('TOKEN_ENCRYPTION_KEY') || errorMessage.includes('32 char')) {
+      logger.error('Key vault POST failed: encryption not configured', {
+        component: 'keyVaultApi',
+        operation: 'POST',
+      });
       return NextResponse.json(
         {
           error: 'encryption_not_configured',
@@ -155,6 +174,11 @@ export const POST = pipe(
       );
     }
 
+    logger.error('Key vault POST failed: unexpected error', {
+      component: 'keyVaultApi',
+      operation: 'POST',
+      errorMessage,
+    });
     return NextResponse.json({ error: 'internal_error', message: errorMessage }, { status: 500 });
   }
 });

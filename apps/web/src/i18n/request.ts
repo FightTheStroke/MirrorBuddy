@@ -1,4 +1,5 @@
 import { getRequestConfig } from 'next-intl/server';
+import { logger } from '@/lib/logger';
 import { locales, defaultLocale } from './config';
 import type { Locale } from './config';
 
@@ -35,11 +36,24 @@ async function loadNamespace(locale: string, namespace: string): Promise<Record<
   try {
     // W2 app move (#362): messages/ relocated to apps/web/messages/.
     return (await import(`../../messages/${locale}/${namespace}.json`)).default;
-  } catch {
+  } catch (primaryError) {
     // Fallback to Italian if namespace missing
     try {
       return (await import(`../../messages/it/${namespace}.json`)).default;
-    } catch {
+    } catch (fallbackError) {
+      // Both loads failed: this namespace resolves to {} and every
+      // useTranslations(namespace) call downstream will throw
+      // INSUFFICIENT_PATH. Without this log the only visible symptom is
+      // that opaque error, with no indication of which namespace or why.
+      logger.error('i18n namespace failed to load (locale + it fallback both failed)', {
+        component: 'i18nRequestConfig',
+        operation: 'loadNamespace',
+        locale,
+        namespace,
+        primaryError: primaryError instanceof Error ? primaryError.message : String(primaryError),
+        fallbackError:
+          fallbackError instanceof Error ? fallbackError.message : String(fallbackError),
+      });
       return {};
     }
   }

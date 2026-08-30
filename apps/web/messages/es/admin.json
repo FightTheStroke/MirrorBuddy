@@ -797,7 +797,9 @@
         "error": "Error al cargar las estadísticas",
         "loadingDetail": "Cargando detalles...",
         "errorDetail": "Error al cargar los detalles de la campaña",
-        "quotaApiError": "No se pudieron recuperar los datos de cuota de email. Verifique la configuración de la clave API de Resend."
+        "quotaApiError": "No se pudieron recuperar los datos de cuota de email. Verifique la configuración de la clave API de Resend.",
+        "dailyQuotaAriaLabel": "Cuota diaria: {used} de {limit}",
+        "monthlyQuotaAriaLabel": "Cuota mensual: {used} de {limit}"
       },
       "editor": {
         "title": "Editor de Email",
@@ -1807,8 +1809,6 @@
     "disableUser": "Disabilita utente",
     "demoteToUser": "Retrocedi a utente",
     "promoteToAdmin": "Promuovi ad admin",
-    "dailyQuota": "Quota giornaliera: {used} di {limit}",
-    "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
     "selezionaInvite": "Seleziona {name}",
     "modelComparison": {
@@ -1887,6 +1887,12 @@
       "completeSuccess": "Experimento completado correctamente",
       "startDate": "Fecha de inicio",
       "cancel": "Cancelar"
-    }
+    },
+    "missionControlTitle": "Centro de control",
+    "missionControlDescription": "Monitoreo de infraestructura, bóveda de claves, salud de servicios e IA/email",
+    "infrastructureDescription": "Vercel, Supabase, Redis y controles de mantenimiento",
+    "keyVaultDescription": "Gestión segura de claves API y secretos",
+    "serviceHealthDescription": "Estado en tiempo real de los servicios externos",
+    "aiEmailMonitoringDescription": "Monitoreo de proveedores de IA y envío de emails"
   }
 }

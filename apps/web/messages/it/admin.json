@@ -801,7 +801,9 @@
         "errorDetail": "Errore caricamento dettagli campagna",
         "noStats": "Nessuna statistica disponibile",
         "timeline": "Timeline",
-        "quotaApiError": "Impossibile recuperare i dati di quota email. Verificare la configurazione della chiave API Resend."
+        "quotaApiError": "Impossibile recuperare i dati di quota email. Verificare la configurazione della chiave API Resend.",
+        "dailyQuotaAriaLabel": "Quota giornaliera: {used} di {limit}",
+        "monthlyQuotaAriaLabel": "Quota mensile: {used} di {limit}"
       },
       "editor": {
         "title": "Editor Email",
@@ -1807,8 +1809,6 @@
     "disableUser": "Disabilita utente",
     "demoteToUser": "Retrocedi a utente",
     "promoteToAdmin": "Promuovi ad admin",
-    "dailyQuota": "Quota giornaliera: {used} di {limit}",
-    "monthlyQuota": "Quota mensile: {used} di {limit}",
     "viewDetailsFor": "Vedi dettagli per {user}",
     "selezionaInvite": "Seleziona {name}",
     "modelComparison": {
@@ -1887,6 +1887,12 @@
       "completeSuccess": "Esperimento completato con successo",
       "startDate": "Data di inizio",
       "cancel": "Annulla"
-    }
+    },
+    "missionControlTitle": "Centro di missione",
+    "missionControlDescription": "Monitoraggio infrastruttura, chiavi API, salute servizi e AI/email",
+    "infrastructureDescription": "Vercel, Supabase, Redis e controlli di manutenzione",
+    "keyVaultDescription": "Gestione sicura delle chiavi API e dei segreti",
+    "serviceHealthDescription": "Stato dei servizi esterni in tempo reale",
+    "aiEmailMonitoringDescription": "Monitoraggio provider AI e invio email"
   }
 }
