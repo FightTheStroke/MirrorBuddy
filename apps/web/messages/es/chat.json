@@ -562,10 +562,10 @@
     "trascrizioneVocale": "Trascrizione vocale",
     "leggiAdAltaVoce": "Leggi ad alta voce",
     "lv": "Lv.",
-    "citazioneMotivazionale": "Citazione motivazionale",
-    "quoteIndicators": "Quote indicators",
+    "citazioneMotivazionale": "Cita motivacional",
+    "quoteIndicators": "Indicadores de frases",
     "tornaAllaConversazioneCon": "Torna alla conversazione con {name}",
-    "vaiAllaCitazione": "Vai alla citazione {index}",
+    "vaiAllaCitazione": "Ir a la frase {index}",
     "intentHandoff": {
       "headline": "Te he llevado con el Prof. {name} para {intent}.",
       "headlineSubject": "Te he llevado con el Prof. {name} para {subject}.",
@@ -582,6 +582,7 @@
     "coachOpener": {
       "general": "¡Hola! Soy {coach}, tu coach de estudio. Antes de empezar, dime: ¿de qué asignatura quieres ocuparte, qué quieres hacer y cuánto tiempo tienes? Luego te presento al Maestro adecuado. 😊",
       "withSubject": "¡Hola! Soy {coach}, tu coach de estudio. Hoy trabajamos en {subject}: ¡te presento enseguida al Maestro adecuado! 😊"
-    }
+    },
+    "fraseDelMaestro": "Frase del maestro"
   }
 }

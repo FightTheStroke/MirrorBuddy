@@ -113,6 +113,18 @@ file — reporting four present Sentry variables as missing, and never looking a
 real value. It now passes `--yes` and fails hard if the pulled file is empty
 (`scripts/__tests__/check-vercel-env.test.ts`).
 
+### The job also needed a working database secret
+
+`sync-admin-credentials` failed on its first two runs with a DNS error: the repository
+`DATABASE_URL` and `DIRECT_URL` secrets did not hold the production connection string.
+Nothing had noticed, because the only other consumers are read-only checks that were
+already tolerated as flaky. Both secrets were re-set from the production values; the
+job then succeeded and production admin login was confirmed working.
+
+The lesson is the same one this ADR is about: a credential that is only exercised by a
+job nobody watches is a credential nobody knows is broken. `sync-admin-credentials`
+runs on every release, so this one is now watched.
+
 ## References
 
 - `.github/workflows/ci.yml` — `deploy-to-staging`, `sync-admin-credentials`

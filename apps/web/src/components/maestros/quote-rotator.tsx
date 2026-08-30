@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getMaestroQuotes } from '@/data/maestri/quotes';
-import { useTranslations } from "next-intl";
+import { getMaestroQuotes, quoteSource, quoteText } from '@/data/maestri/quotes';
+import { useTranslations } from 'next-intl';
 
 interface QuoteRotatorProps {
   maestroId: string;
@@ -24,7 +24,7 @@ export function QuoteRotator({
   pauseOnHover = true,
   compact = false,
 }: QuoteRotatorProps) {
-  const t = useTranslations("chat");
+  const t = useTranslations('chat');
   const quotes = getMaestroQuotes(maestroId);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -58,11 +58,19 @@ export function QuoteRotator({
   }
 
   const currentQuote = quotes[currentIndex];
+  const text = quoteText(currentQuote);
+  const source = quoteSource(currentQuote);
+
+  // Quotation marks are a claim: someone said this. Only a line with a source
+  // earns them. The rest are MirrorBuddy writing in the maestro's spirit and
+  // are shown as such — that distinction is the point of this component's
+  // shape (DATA-GOVERNANCE-SOP.md, G-7).
+  const rendered = source === undefined ? text : `\u201C${text}\u201D`;
 
   if (compact) {
     return (
       <p className={`text-slate-500 dark:text-slate-400 italic truncate ${className}`}>
-        &ldquo;{currentQuote}&rdquo;
+        {rendered}
       </p>
     );
   }
@@ -74,7 +82,7 @@ export function QuoteRotator({
       onMouseLeave={handleMouseLeave}
       role="region"
       aria-live="polite"
-      aria-label={t("citazioneMotivazionale")}
+      aria-label={source === undefined ? t('fraseDelMaestro') : t('citazioneMotivazionale')}
     >
       <AnimatePresence mode="wait">
         <motion.p
@@ -85,15 +93,21 @@ export function QuoteRotator({
           transition={{ duration: 0.3 }}
           className="text-sm text-slate-600 dark:text-slate-400 italic text-center line-clamp-2"
         >
-          &ldquo;{currentQuote}&rdquo;
+          {rendered}
         </motion.p>
       </AnimatePresence>
+
+      {source !== undefined && (
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-1 not-italic">
+          {source}
+        </p>
+      )}
 
       {quotes.length > 1 && (
         <div
           className="flex justify-center gap-1 mt-2"
           role="tablist"
-          aria-label={t("quoteIndicators")}
+          aria-label={t('quoteIndicators')}
         >
           {quotes.map((_, index) => (
             <button
@@ -104,7 +118,7 @@ export function QuoteRotator({
                   ? 'bg-slate-400 dark:bg-slate-500 w-3'
                   : 'bg-slate-300 dark:bg-slate-600'
               }`}
-              aria-label={t("vaiAllaCitazione", { index: index + 1 })}
+              aria-label={t('vaiAllaCitazione', { index: index + 1 })}
               aria-selected={index === currentIndex}
               role="tab"
             />
