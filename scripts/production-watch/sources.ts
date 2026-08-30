@@ -100,7 +100,12 @@ export async function fetchVercelAlerts(
   }
 
   const body = (await response.json()) as { deployments?: VercelDeployment[] };
-  return (body.deployments ?? [])
-    .filter((deployment) => deployment.state === 'ERROR' || deployment.state === 'CANCELED')
-    .map(vercelDeploymentToAlert);
+  return (
+    (body.deployments ?? [])
+      // CANCELED is routine, not a failure: every push supersedes the deployment
+      // before it, so Vercel cancels the previous one. Counting those as outages
+      // buried the board in issues nobody could act on.
+      .filter((deployment) => deployment.state === 'ERROR')
+      .map(vercelDeploymentToAlert)
+  );
 }
