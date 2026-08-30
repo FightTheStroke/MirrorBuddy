@@ -2097,10 +2097,32 @@ jobs:
 
       - name: Pull Vercel Environment
         run: |
-          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-          # Copy production env vars to preview so `vercel build` (preview target)
-          # gets DATABASE_URL and other secrets, while deploy stays as preview
-          cp .vercel/.env.production.local .vercel/.env.preview.local 2>/dev/null || true
+          # Staging MUST build against the Preview environment, which carries its
+          # own DATABASE_URL (separate Supabase project). Copying the production
+          # env here — as this step used to do — made every staging deployment
+          # read and write the live production database.
+          # Promotion is unaffected: `vercel promote` rebuilds the deployment
+          # against the production environment, so production never inherits
+          # these values.
+          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Assert staging is not pointed at the production database
+        run: |
+          # Supabase projects in the same region share one pooler hostname, so the
+          # host alone cannot tell two databases apart. The connection user
+          # (postgres.<project-ref>) is what identifies the project.
+          env_file=.vercel/.env.preview.local
+          if [ ! -f "$env_file" ]; then
+            echo "::error::$env_file missing — vercel pull did not produce a preview env"; exit 1
+          fi
+          staging_db=$(grep -m1 '^DATABASE_URL=' "$env_file" | sed -E 's|^DATABASE_URL="?[^:]+://([^:]+):.*|\1|')
+          if [ -z "$staging_db" ] || [ "$staging_db" = "$(grep -m1 '^DATABASE_URL=' "$env_file")" ]; then
+            echo "::error::Preview environment has no usable DATABASE_URL"; exit 1
+          fi
+          if [ "$staging_db" = "${{ secrets.PRODUCTION_DB_ID }}" ]; then
+            echo "::error::Staging DATABASE_URL points at the production database — refusing to deploy"; exit 1
+          fi
+          echo "✅ Staging database is distinct from production"
 
       - name: Build Project
         run: vercel build --token=${{ secrets.VERCEL_TOKEN }}

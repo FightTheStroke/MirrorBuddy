@@ -241,7 +241,56 @@ jobs:
           )"
           exit 1
 
-  dependency-updates:
+  staging-db-isolation:
+    name: Staging Database Isolation
+    runs-on: ubuntu-latest
+    steps:
+      # Until Aug 2026 the staging deploy copied the production environment into
+      # the preview build, so every staging deployment read and wrote the live
+      # production database. Staging now has its own Supabase project. This guard
+      # asserts the separation still holds: the Preview environment must define
+      # its own DATABASE_URL, pointing at a different Supabase project.
+      - name: Install Vercel CLI
+        run: npm install -g vercel@59.10.0
+
+      - name: Compare preview and production database hosts
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          PRODUCTION_DB_ID: ${{ secrets.PRODUCTION_DB_ID }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
+        run: |
+          if [ -z "$PRODUCTION_DB_ID" ]; then
+            echo "::error::PRODUCTION_DB_ID secret is not set — the guard cannot run"; exit 1
+          fi
+
+          # Supabase projects in the same region share one pooler hostname, so the
+          # connection user (postgres.<project-ref>) is what identifies the project.
+          vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+          line=$(grep -m1 '^DATABASE_URL=' .vercel/.env.preview.local || true)
+          preview_db=$(sed -E 's|^DATABASE_URL="?[^:]+://([^:]+):.*|\1|' <<<"$line")
+
+          if [ -z "$line" ] || [ "$preview_db" = "$line" ]; then
+            REASON="The Preview environment has no usable \`DATABASE_URL\` of its own."
+          elif [ "$preview_db" = "$PRODUCTION_DB_ID" ]; then
+            REASON="The Preview environment points at the production database host."
+          else
+            echo "Staging database is isolated from production"
+            exit 0
+          fi
+
+          gh issue create \
+            --title "Staging is no longer isolated from the production database" \
+            --label "infra-monitor" \
+            --body "$(cat <<BODY
+          ${REASON}
+
+          Staging deployments would then read and write live user data. Restore a
+          dedicated \`DATABASE_URL\` and \`DIRECT_URL\` on the Vercel Preview
+          environment before deploying again.
+          BODY
+          )"
+          exit 1
+
     name: Critical Dependency Updates
     runs-on: ubuntu-latest
     steps:
