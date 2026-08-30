@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getMaestroQuotes, quoteSource, quoteText } from '@/data/maestri/quotes';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface QuoteRotatorProps {
   maestroId: string;
@@ -25,7 +25,8 @@ export function QuoteRotator({
   compact = false,
 }: QuoteRotatorProps) {
   const t = useTranslations('chat');
-  const quotes = getMaestroQuotes(maestroId);
+  const locale = useLocale();
+  const quotes = getMaestroQuotes(maestroId, locale);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -57,7 +58,10 @@ export function QuoteRotator({
     return null;
   }
 
-  const currentQuote = quotes[currentIndex];
+  // Switching language swaps the list underneath us; clamping here keeps the
+  // card showing a line instead of undefined, without a render-time setState.
+  const safeIndex = currentIndex % quotes.length;
+  const currentQuote = quotes[safeIndex];
   const text = quoteText(currentQuote);
   const source = quoteSource(currentQuote);
 
@@ -86,7 +90,7 @@ export function QuoteRotator({
     >
       <AnimatePresence mode="wait">
         <motion.p
-          key={currentIndex}
+          key={safeIndex}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
@@ -114,12 +118,12 @@ export function QuoteRotator({
               key={index}
               onClick={() => setCurrentIndex(index)}
               className={`w-1.5 h-1.5 rounded-full transition-all ${
-                index === currentIndex
+                index === safeIndex
                   ? 'bg-slate-400 dark:bg-slate-500 w-3'
                   : 'bg-slate-300 dark:bg-slate-600'
               }`}
               aria-label={t('vaiAllaCitazione', { index: index + 1 })}
-              aria-selected={index === currentIndex}
+              aria-selected={index === safeIndex}
               role="tab"
             />
           ))}

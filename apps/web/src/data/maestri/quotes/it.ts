@@ -1,34 +1,7 @@
-// ============================================================================
-// PROFESSORI QUOTES - lines shown on each maestro's card
-// ============================================================================
-//
-// Two kinds of line, and the difference is not cosmetic (DATA-GOVERNANCE-SOP.md,
-// G-7). A bare string is written by MirrorBuddy in that maestro's spirit; the
-// card shows it as the tutor speaking, without quotation marks, because nobody
-// ever said it. An object is a real quotation and must name where it comes
-// from; the card shows that source beside it.
-//
-// There is no third option. A line that reads as a historical quotation but
-// carries no source is what put "it is not the strongest that survives" in
-// Darwin's mouth on a card children read. `quote-attribution.test.ts` fails the
-// build rather than let one back in.
+import type { MaestroQuoteSet } from './types';
 
-/** A real quotation, with the work it comes from. */
-export interface AttributedQuote {
-  text: string;
-  /** Author and work, e.g. "Galileo Galilei, Il Saggiatore, 1623". */
-  source: string;
-}
-
-/** A bare string is authored by MirrorBuddy; an object is a real quotation. */
-export type MaestroQuote = string | AttributedQuote;
-
-export interface MaestroQuotes {
-  maestroId: string;
-  quotes: MaestroQuote[];
-}
-
-export const maestroQuotes: Record<string, MaestroQuote[]> = {
+/** Italian — the reference set. Every other locale mirrors these keys exactly. */
+export const quotesIt: MaestroQuoteSet = {
   euclide: [
     {
       text: 'Non ci sono vie regali per la geometria.',
@@ -123,18 +96,18 @@ export const maestroQuotes: Record<string, MaestroQuote[]> = {
     // first half is his; the second was welded on inside the same quotation
     // marks.
     {
-      text: "All the world's a stage.",
-      source: 'William Shakespeare, As You Like It, atto II scena VII',
+      text: 'Tutto il mondo è un palcoscenico.',
+      source: 'William Shakespeare, Come vi piace, atto II scena VII',
     },
-    'To study or not to study? The answer is always to study!',
+    'Studiare o non studiare? La risposta è sempre studiare!',
     // Was: "The pen is mightier than the sword." Edward Bulwer-Lytton,
     // Richelieu, 1839 — 223 years after Shakespeare.
     'Le parole restano più a lungo di chi le pronuncia.',
-    'Words are the wings of imagination.',
+    "Le parole sono le ali dell'immaginazione.",
     // Was: "Language is the dress of thought." Samuel Johnson, The Rambler
     // n. 60, 1750.
     'Ogni parola che impari è un modo nuovo di pensare.',
-    'In every word lies a universe of meaning.',
+    'In ogni parola vive un universo di significato.',
   ],
 
   leonardo: [
@@ -209,23 +182,3 @@ export const maestroQuotes: Record<string, MaestroQuote[]> = {
     "La virtù è conoscenza, l'ignoranza è vizio.",
   ],
 };
-
-/** The words to show, whoever wrote them. */
-export function quoteText(quote: MaestroQuote): string {
-  return typeof quote === 'string' ? quote : quote.text;
-}
-
-/**
- * Where a quotation comes from, or undefined when MirrorBuddy wrote the line.
- * Undefined is the signal to render it without quotation marks: no one said it.
- */
-export function quoteSource(quote: MaestroQuote): string | undefined {
-  return typeof quote === 'string' ? undefined : quote.source;
-}
-
-/**
- * Get all quotes for a professore
- */
-export function getMaestroQuotes(maestroId: string): MaestroQuote[] {
-  return maestroQuotes[maestroId] ?? [];
-}
