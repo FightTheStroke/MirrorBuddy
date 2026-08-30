@@ -67,13 +67,24 @@ function setValueByPath(obj: Record<string, unknown>, path: string, value: unkno
 
   for (let i = 0; i < parts.length - 1; i++) {
     const part = parts[i];
+    // Guard against prototype pollution: reject dangerous keys instead of
+    // assigning through them. Keys here come from JSON namespace files under
+    // our control, but CodeQL (correctly) can't prove that statically, and
+    // this guard costs nothing at runtime.
+    if (part === '__proto__' || part === 'constructor' || part === 'prototype') {
+      throw new Error(`Refusing to set unsafe path segment: ${part}`);
+    }
     if (!(part in current) || typeof current[part] !== 'object') {
       current[part] = {};
     }
     current = current[part] as Record<string, unknown>;
   }
 
-  current[parts[parts.length - 1]] = value;
+  const lastPart = parts[parts.length - 1];
+  if (lastPart === '__proto__' || lastPart === 'constructor' || lastPart === 'prototype') {
+    throw new Error(`Refusing to set unsafe path segment: ${lastPart}`);
+  }
+  current[lastPart] = value;
 }
 
 function compareNamespace(

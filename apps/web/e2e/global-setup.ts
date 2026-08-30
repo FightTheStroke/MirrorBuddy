@@ -8,7 +8,7 @@
 
 import path from 'path';
 import fs from 'fs';
-import { createHmac } from 'crypto';
+import { createHmac, randomUUID } from 'crypto';
 import { config } from 'dotenv';
 import { getPrismaClient, disconnectPrisma } from './helpers/prisma-setup';
 import { createE2ETestUser } from './helpers/e2e-user-factory';
@@ -89,7 +89,7 @@ async function globalSetup() {
   } catch (error) {
     console.error('⚠️ Failed to create test user (may already exist):', error);
     // Fallback: generate IDs locally so storage state can still be written
-    randomSuffix = Math.random().toString(36).substring(2, 11);
+    randomSuffix = randomUUID().replace(/-/g, '').substring(0, 9);
     testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
   } finally {
     await disconnectPrisma();
