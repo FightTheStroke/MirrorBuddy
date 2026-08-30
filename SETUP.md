@@ -254,6 +254,33 @@ For admin production smoke coverage, ensure these env vars are present in `.env`
 
 - `ADMIN_READONLY_EMAIL` (seeded read-only admin account)
 - `ADMIN_READONLY_COOKIE_VALUE` (signed cookie used by production admin smoke tests)
+- `PROD_TEST_USER_EMAIL` / `PROD_TEST_USER_PASSWORD` / `PROD_TEST_USER_ID` / `PROD_TEST_USER_COOKIE_VALUE`
+  (the single read-only `isTestData` account the production smoke suite signs in as)
+- `ALLOWED_ORIGINS` (every hostname the site is served on, apex included)
+
+GitHub Secrets additionally holds `PRODUCTION_DB_ID` — the Supabase project ref of the
+production database. Two guards compare the staging connection user against it so a
+staging deploy can never run on production data (ADR 0175).
+
+### Admin password
+
+`ADMIN_PASSWORD` is not read at login. Login compares only the hash stored in the
+database, and that hash is written by `npm run seed:admin`, which the
+`sync-admin-credentials` job runs after every production promotion. So: change the
+secret, and the next release applies it. To repair production immediately without
+waiting for a release, run `npm run script -- scripts/reset-admin-password.ts` (it
+refuses to act unless exactly one ADMIN account matches, and never deletes).
+
+### Test environments
+
+| Environment | Database                           | Notes                                    |
+| ----------- | ---------------------------------- | ---------------------------------------- |
+| Local / CI  | ephemeral `pgvector/pgvector:pg17` | `./scripts/ensure-test-db.sh`            |
+| Staging     | `mirrorbuddy-staging-eu` (Dublin)  | Vercel **preview** env; no personal data |
+| Production  | Supabase (Dublin)                  | read-only smoke suite only               |
+
+Never point tests that write at production. `./scripts/smoke-prod.sh` runs the
+175-test read-only suite against the live site.
 
 ---
 
