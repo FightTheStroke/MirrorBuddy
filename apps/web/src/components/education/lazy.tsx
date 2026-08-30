@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { ViewSkeleton } from "@/components/ui/skeleton";
+import dynamic from 'next/dynamic';
+import { ViewSkeleton } from '@/components/ui/skeleton';
 
 // Lazy load heavy education views
 export const LazyQuizView = dynamic(
-  () => import("./quiz-view").then((mod) => ({ default: mod.QuizView })),
+  () => import('./quiz-view').then((mod) => ({ default: mod.QuizView })),
   {
     loading: () => <ViewSkeleton />,
     ssr: false,
@@ -14,7 +14,7 @@ export const LazyQuizView = dynamic(
 
 export const LazyFlashcardsView = dynamic(
   () =>
-    import("./flashcards-view").then((mod) => ({
+    import('./flashcards-view').then((mod) => ({
       default: mod.FlashcardsView,
     })),
   {
@@ -24,8 +24,7 @@ export const LazyFlashcardsView = dynamic(
 );
 
 export const LazyMindmapsView = dynamic(
-  () =>
-    import("./mindmaps-view").then((mod) => ({ default: mod.MindmapsView })),
+  () => import('./mindmaps-view').then((mod) => ({ default: mod.MindmapsView })),
   {
     loading: () => <ViewSkeleton />,
     ssr: false,
@@ -33,8 +32,7 @@ export const LazyMindmapsView = dynamic(
 );
 
 export const LazySummariesView = dynamic(
-  () =>
-    import("./summaries-view").then((mod) => ({ default: mod.SummariesView })),
+  () => import('./summaries-view').then((mod) => ({ default: mod.SummariesView })),
   {
     loading: () => <ViewSkeleton />,
     ssr: false,
@@ -42,8 +40,7 @@ export const LazySummariesView = dynamic(
 );
 
 export const LazyCalendarView = dynamic(
-  () =>
-    import("./calendar-view").then((mod) => ({ default: mod.CalendarView })),
+  () => import('./calendar-view').then((mod) => ({ default: mod.CalendarView })),
   {
     loading: () => <ViewSkeleton />,
     ssr: false,
@@ -52,7 +49,7 @@ export const LazyCalendarView = dynamic(
 
 export const LazyHTMLSnippetsView = dynamic(
   () =>
-    import("./html-snippets-view").then((mod) => ({
+    import('./html-snippets-view').then((mod) => ({
       default: mod.HTMLSnippetsView,
     })),
   {
@@ -61,17 +58,9 @@ export const LazyHTMLSnippetsView = dynamic(
   },
 );
 
-export const LazyArchiveView = dynamic(
-  () => import("./archive-view").then((mod) => ({ default: mod.ArchiveView })),
-  {
-    loading: () => <ViewSkeleton />,
-    ssr: false,
-  },
-);
-
 export const LazyStudyKitView = dynamic(
   () =>
-    import("@/components/study-kit/StudyKitView").then((mod) => ({
+    import('@/components/study-kit/StudyKitView').then((mod) => ({
       default: mod.StudyKitView,
     })),
   {
@@ -82,7 +71,7 @@ export const LazyStudyKitView = dynamic(
 
 export const LazyGenitoriView = dynamic(
   () =>
-    import("@/components/profile/genitori-view").then((mod) => ({
+    import('@/components/profile/genitori-view').then((mod) => ({
       default: mod.GenitoriView,
     })),
   {

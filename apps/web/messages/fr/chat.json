@@ -518,11 +518,6 @@
       "previousPageAriaLabel": "Page précédente",
       "nextPageAriaLabel": "Page suivante"
     },
-    "chatDrawer": {
-      "hideChat": "Masquer le chat",
-      "showChat": "Afficher le chat",
-      "startConversation": "Démarrer une conversation avec le Professeur..."
-    },
     "maestros": {
       "arialabelchiudiEsc": "aria-label=\"Fermer (Échap)\"",
       "arialabelchiudi": "aria-label=\"Fermer\""
