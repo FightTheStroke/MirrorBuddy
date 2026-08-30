@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { usePrefersReducedMotion } from '@/lib/hooks/use-prefers-reduced-motion';
+import { QuoteRotator } from '@/components/maestros/quote-rotator';
 
 interface MaestroCard {
   id: string;
@@ -29,6 +31,7 @@ export function MaestriShowcaseSection() {
   const t = useTranslations('welcome.maestri');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [displayedMaestri, setDisplayedMaestri] = useState<MaestroCard[]>([]);
   const subjectsMap = t.raw('subjects') as Record<string, string>;
 
@@ -61,7 +64,7 @@ export function MaestriShowcaseSection() {
   }, []);
 
   useEffect(() => {
-    if (isPaused || !scrollRef.current) return;
+    if (prefersReducedMotion || isPaused || !scrollRef.current) return;
     const interval = setInterval(() => {
       if (!scrollRef.current) return;
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
@@ -72,7 +75,7 @@ export function MaestriShowcaseSection() {
       }
     }, SCROLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [isPaused, scroll]);
+  }, [prefersReducedMotion, isPaused, scroll]);
 
   const getSubjectName = (subject: string): string => {
     const key = subject.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
@@ -111,6 +114,8 @@ export function MaestriShowcaseSection() {
         className="relative overflow-hidden"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
+        onFocusCapture={() => setIsPaused(true)}
+        onBlurCapture={() => setIsPaused(false)}
       >
         <button
           onClick={() => scroll('left')}
@@ -164,6 +169,13 @@ export function MaestriShowcaseSection() {
                 <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
                   {getSubjectName(maestro.subject)}
                 </p>
+                <QuoteRotator
+                  maestroId={maestro.id}
+                  compact
+                  clampLines={3}
+                  rotate={false}
+                  className="mt-2 text-xs text-left"
+                />
               </motion.div>
             ))}
           </div>
