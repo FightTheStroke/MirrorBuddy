@@ -93,6 +93,8 @@
 | 0175 | Staging DB isolation + admin credential sync      | ACCEPTED — staging runs on its own EU Supabase project; every release re-applies ADMIN_PASSWORD          |
 | 0176 | Notification recipients come from the database    | ACCEPTED — internal alerts go to every ADMIN in the DB; public contact is always info@fightthestroke.org |
 | 0177 | Browser error monitoring is decided by the bundle | ACCEPTED — client Sentry keys off the production build, not NEXT_PUBLIC_VERCEL_ENV                       |
+| 0178 | EU AI Act risk classification                     | PROPOSED — Annex III(3)(b) vs Art. 6(3); interim posture precautionary high-risk, pending legal review   |
+| 0179 | AI-generated content marking — DEFER (Art. 50(2)) | ACCEPTED — DEFER with reopen triggers; marking-approach selection due 30 Sep 2026                        |
 
 ## Observability & Operations
 
@@ -222,6 +224,6 @@
 
 ---
 
-**Total Active ADRs**: 137
+**Total Active ADRs**: 139
 **Archived ADRs**: 7
 **Last Updated**: 2026-08-30

@@ -28,6 +28,14 @@ SUBSCRIPTION="${AZURE_SUBSCRIPTION_ID:-8015083b-adad-42ff-922d-feaed61c5d62}"
 
 FAILURES=0
 SKIPPED=0
+
+# An endpoint is what every probe is built on. When a store holds something that
+# is not a URL — the GitHub secret held a bare "-" from Feb to Aug 2026 — curl
+# read it as one of its own options and the job failed with a message that said
+# nothing about the real fault. Check the shape first and say so plainly.
+valid_endpoint() {
+  [[ "$1" =~ ^https://[A-Za-z0-9._-]+(:[0-9]+)?(/.*)?$ ]]
+}
 # When set, a store that could not be checked is a failure rather than a note.
 # A green job that quietly skipped the store which was actually dead is how the
 # nine months happened.
@@ -42,9 +50,17 @@ probe() {
     return 0
   fi
 
+  if ! valid_endpoint "$endpoint"; then
+    echo "BAD   $label — the endpoint for this store is not an https:// URL"
+    FAILURES=$((FAILURES + 1))
+    return 0
+  fi
+
   local url="${endpoint%/}/openai/models?api-version=${API_VERSION}"
   local code
-  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$url" -H "api-key: ${key}")
+  # --url keeps a malformed value from being read as a curl option: a store that
+  # holds "-" as its endpoint must report a bad endpoint, not "unknown option".
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 --url "$url" -H "api-key: ${key}")
 
   if [[ "$code" == "200" ]]; then
     echo "OK    $label — Azure accepts this key"
@@ -57,6 +73,12 @@ probe() {
 ENDPOINT="${AZURE_OPENAI_ENDPOINT:-}"
 if [[ -z "$ENDPOINT" ]]; then
   echo "AZURE_OPENAI_ENDPOINT is not set — cannot check anything."
+  exit 1
+fi
+if ! valid_endpoint "$ENDPOINT"; then
+  echo "AZURE_OPENAI_ENDPOINT is not an https:// URL — the store holding it is"
+  echo "misconfigured. Expected something like"
+  echo "  https://aoai-virtualbpm-prod.openai.azure.com/"
   exit 1
 fi
 

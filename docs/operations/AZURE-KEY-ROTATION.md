@@ -62,3 +62,25 @@ The check asks Azure whether each store's key still works — the only question
 that matters, and one that needs no permission to read the key itself. It runs
 weekly in `.github/workflows/infra-monitor.yml` (job **Azure Key Drift**), so a
 store left behind now surfaces within seven days instead of nine months.
+
+## The endpoint drifts too
+
+A live key against the wrong address is just as dead as a revoked one. The
+GitHub Actions secret `AZURE_OPENAI_ENDPOINT` held a bare `-` from February to
+August 2026: `curl` read the request URL as one of its own options, and the
+drift check reported a dead key — blaming the store that was fine. Both the
+check and the **Azure OpenAI Models** job now reject an endpoint that is not an
+`https://` URL and say so, instead of accusing the key.
+
+Every store holds the same address, and Azure is the source of truth for it:
+
+```bash
+az cognitiveservices account show \
+  --name aoai-virtualbpm-prod --resource-group rg-virtualbpm-prod \
+  --subscription 8015083b-adad-42ff-922d-feaed61c5d62 \
+  --query properties.endpoint -o tsv
+```
+
+The realtime traffic uses that same address — the resource exposes one endpoint
+for every API, realtime included — so `AZURE_OPENAI_REALTIME_ENDPOINT` is never
+a different host, only a different deployment name.

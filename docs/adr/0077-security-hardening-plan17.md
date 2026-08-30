@@ -25,7 +25,7 @@ Implement security hardening across 4 waves:
 - **Pattern**:
   ```typescript
   if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
   }
   ```
 
@@ -39,7 +39,7 @@ Implement security hardening across 4 waves:
     const match = document.cookie.match(/mirrorbuddy-user-id=([^;]+)/);
     if (match?.[1]) {
       const value = decodeURIComponent(match[1]);
-      const dotIndex = value.indexOf(".");
+      const dotIndex = value.indexOf('.');
       return dotIndex > 0 ? value.substring(0, dotIndex) : value;
     }
     return null;
@@ -60,6 +60,12 @@ Implement security hardening across 4 waves:
 - **Trace ID**: Logger now includes OpenTelemetry trace ID in all logs
 - **CI**: Added `dependency-review.yml` workflow for vulnerability scanning
 - **CI**: Added `codeql.yml` workflow for static analysis (JavaScript/TypeScript)
+
+> **Amendment (2026-08-30):** `.github/workflows/codeql.yml` was removed. CodeQL now runs
+> via code scanning **default setup**, with the same exclusions applied through the
+> `github-codeql-config-file` organization repository property pointing at
+> `.github/codeql/codeql-config.yml`. Coverage is unchanged
+> (javascript-typescript, python, actions); the workflow file is no longer maintained.
 
 ### Wave 5: CSRF Coverage Completion (2026-01-18)
 
