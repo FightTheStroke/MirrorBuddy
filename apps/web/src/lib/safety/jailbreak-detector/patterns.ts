@@ -112,11 +112,19 @@ export const AUTHORITY_PATTERNS: Array<{ pattern: RegExp; weight: number }> = [
 
 /**
  * Multi-turn buildup patterns
+ *
+ * CodeQL js/polynomial-redos: chaining multiple unbounded `.*` forces the
+ * engine to try every way of splitting the string between them — O(n^2) (or
+ * worse with more wildcards) on long non-matching input, and this pattern
+ * runs against the joined text of several recent messages, which can get
+ * long. Bounding each gap to 300 chars keeps detection working at
+ * conversational distance (see jailbreak-detector.test.ts "Multi-turn Attack
+ * Detection") while making the worst case linear instead of polynomial.
  */
 export const BUILDUP_PATTERNS: RegExp[] = [
-  /first.*then.*finally/gi,
-  /step\s*1.*step\s*2/gi,
-  /prima.*poi.*infine/gi,
+  /first[\s\S]{0,300}then[\s\S]{0,300}finally/gi,
+  /step\s*1[\s\S]{0,300}step\s*2/gi,
+  /prima[\s\S]{0,300}poi[\s\S]{0,300}infine/gi,
 ];
 
 /**

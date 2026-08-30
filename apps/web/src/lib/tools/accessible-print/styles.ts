@@ -1,8 +1,19 @@
-import type { AccessibilitySettings } from "@/lib/accessibility";
+import type { AccessibilitySettings } from '@/lib/accessibility';
 
-export function getAccessibilityStyles(
-  settings: Partial<AccessibilitySettings>,
-): string {
+// Matches CSS hex colors, rgb()/rgba()/hsl()/hsla() functions, and bare
+// alphabetic color keywords (e.g. "red", "steelblue"). Anything else
+// (in particular anything containing `}`, `<`, `;`, or `url(`) is rejected,
+// which prevents user-supplied accessibility settings from breaking out of
+// the generated `<style>` block (CSS/HTML injection).
+const SAFE_CSS_COLOR = /^(#[0-9a-fA-F]{3,8}|rgba?\([0-9.,%\s]+\)|hsla?\([0-9.,%\s]+\)|[a-zA-Z]+)$/;
+
+function sanitizeCssColor(value: string | undefined, fallback: string): string {
+  if (!value) return fallback;
+  const trimmed = value.trim();
+  return SAFE_CSS_COLOR.test(trimmed) ? trimmed : fallback;
+}
+
+export function getAccessibilityStyles(settings: Partial<AccessibilitySettings>): string {
   const fontFamily = settings.dyslexiaFont
     ? "'OpenDyslexic', 'Comic Sans MS', Arial, sans-serif"
     : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
@@ -16,15 +27,15 @@ export function getAccessibilityStyles(
     ? Math.max(settings.lineSpacing || 1.5, 1.8)
     : settings.lineSpacing || 1.5;
 
-  const letterSpacing = settings.extraLetterSpacing ? "0.05em" : "normal";
+  const letterSpacing = settings.extraLetterSpacing ? '0.05em' : 'normal';
 
   const backgroundColor = settings.highContrast
-    ? "#000000"
-    : settings.customBackgroundColor || "#ffffff";
+    ? '#000000'
+    : sanitizeCssColor(settings.customBackgroundColor, '#ffffff');
 
   const textColor = settings.highContrast
-    ? "#ffff00"
-    : settings.customTextColor || "#1e293b";
+    ? '#ffff00'
+    : sanitizeCssColor(settings.customTextColor, '#1e293b');
 
   return `
     @import url('https://fonts.cdnfonts.com/css/opendyslexic');
@@ -59,14 +70,14 @@ export function getAccessibilityStyles(
       max-width: 800px;
       margin: 0 auto;
       padding: 40px 20px;
-      ${settings.dyslexiaFont ? "text-transform: uppercase;" : ""}
+      ${settings.dyslexiaFont ? 'text-transform: uppercase;' : ''}
     }
 
     h1 {
       font-size: 1.75em;
       margin-bottom: 0.5em;
-      color: ${settings.highContrast ? "#ffffff" : "#0f172a"};
-      border-bottom: 3px solid ${settings.highContrast ? "#ffff00" : "#3b82f6"};
+      color: ${settings.highContrast ? '#ffffff' : '#0f172a'};
+      border-bottom: 3px solid ${settings.highContrast ? '#ffff00' : '#3b82f6'};
       padding-bottom: 0.5em;
       page-break-after: avoid;
     }
@@ -75,7 +86,7 @@ export function getAccessibilityStyles(
       font-size: 1.4em;
       margin-top: 1.5em;
       margin-bottom: 0.5em;
-      color: ${settings.highContrast ? "#00ffff" : "#1e40af"};
+      color: ${settings.highContrast ? '#00ffff' : '#1e40af'};
       page-break-after: avoid;
     }
 
@@ -83,13 +94,13 @@ export function getAccessibilityStyles(
       font-size: 1.2em;
       margin-top: 1em;
       margin-bottom: 0.5em;
-      color: ${settings.highContrast ? "#00ff00" : "#334155"};
+      color: ${settings.highContrast ? '#00ff00' : '#334155'};
       page-break-after: avoid;
     }
 
     p {
       margin-bottom: 1em;
-      max-width: ${settings.dyslexiaFont ? "60ch" : "75ch"};
+      max-width: ${settings.dyslexiaFont ? '60ch' : '75ch'};
     }
 
     ul, ol {
@@ -102,29 +113,29 @@ export function getAccessibilityStyles(
     }
 
     li::marker {
-      color: ${settings.highContrast ? "#ffff00" : "#3b82f6"};
+      color: ${settings.highContrast ? '#ffff00' : '#3b82f6'};
     }
 
     .card {
       margin-bottom: 1.5em;
       padding: 1em;
-      background: ${settings.highContrast ? "#1a1a1a" : "#f8fafc"};
+      background: ${settings.highContrast ? '#1a1a1a' : '#f8fafc'};
       border-radius: 8px;
-      border-left: 4px solid ${settings.highContrast ? "#ffff00" : "#3b82f6"};
+      border-left: 4px solid ${settings.highContrast ? '#ffff00' : '#3b82f6'};
       page-break-inside: avoid;
     }
 
     .card-title {
       font-weight: 600;
       margin-bottom: 0.5em;
-      color: ${settings.highContrast ? "#ffffff" : "#1e293b"};
+      color: ${settings.highContrast ? '#ffffff' : '#1e293b'};
     }
 
     .flashcard {
       display: flex;
       flex-direction: column;
       margin-bottom: 1.5em;
-      border: 2px solid ${settings.highContrast ? "#ffff00" : "#e2e8f0"};
+      border: 2px solid ${settings.highContrast ? '#ffff00' : '#e2e8f0'};
       border-radius: 12px;
       overflow: hidden;
       page-break-inside: avoid;
@@ -132,36 +143,36 @@ export function getAccessibilityStyles(
 
     .flashcard-front {
       padding: 1em;
-      background: ${settings.highContrast ? "#1a1a1a" : "#f1f5f9"};
+      background: ${settings.highContrast ? '#1a1a1a' : '#f1f5f9'};
       font-weight: 600;
     }
 
     .flashcard-back {
       padding: 1em;
-      background: ${settings.highContrast ? "#0d0d0d" : "#ffffff"};
-      border-top: 1px dashed ${settings.highContrast ? "#666666" : "#cbd5e1"};
+      background: ${settings.highContrast ? '#0d0d0d' : '#ffffff'};
+      border-top: 1px dashed ${settings.highContrast ? '#666666' : '#cbd5e1'};
     }
 
     .flashcard-label {
       font-size: 0.75em;
       text-transform: uppercase;
       letter-spacing: 0.1em;
-      color: ${settings.highContrast ? "#00ffff" : "#64748b"};
+      color: ${settings.highContrast ? '#00ffff' : '#64748b'};
       margin-bottom: 0.25em;
     }
 
     .quiz-question {
       margin-bottom: 1.5em;
       padding: 1em;
-      background: ${settings.highContrast ? "#1a1a1a" : "#ffffff"};
-      border: 2px solid ${settings.highContrast ? "#ffff00" : "#e2e8f0"};
+      background: ${settings.highContrast ? '#1a1a1a' : '#ffffff'};
+      border: 2px solid ${settings.highContrast ? '#ffff00' : '#e2e8f0'};
       border-radius: 8px;
       page-break-inside: avoid;
     }
 
     .quiz-question-number {
       font-weight: 700;
-      color: ${settings.highContrast ? "#00ffff" : "#3b82f6"};
+      color: ${settings.highContrast ? '#00ffff' : '#3b82f6'};
       margin-bottom: 0.5em;
     }
 
@@ -180,8 +191,8 @@ export function getAccessibilityStyles(
     }
 
     .quiz-option.correct {
-      background: ${settings.highContrast ? "#003300" : "#dcfce7"};
-      border: 1px solid ${settings.highContrast ? "#00ff00" : "#22c55e"};
+      background: ${settings.highContrast ? '#003300' : '#dcfce7'};
+      border: 1px solid ${settings.highContrast ? '#00ff00' : '#22c55e'};
     }
 
     .quiz-option-marker {
@@ -198,21 +209,21 @@ export function getAccessibilityStyles(
       margin-left: 0;
       font-weight: 700;
       font-size: 1.2em;
-      color: ${settings.highContrast ? "#ffffff" : "#0f172a"};
+      color: ${settings.highContrast ? '#ffffff' : '#0f172a'};
     }
 
     .mindmap-node.level-1 {
-      color: ${settings.highContrast ? "#00ffff" : "#1e40af"};
+      color: ${settings.highContrast ? '#00ffff' : '#1e40af'};
       font-weight: 600;
     }
 
     .mindmap-node.level-2 {
-      color: ${settings.highContrast ? "#00ff00" : "#059669"};
+      color: ${settings.highContrast ? '#00ff00' : '#059669'};
     }
 
     .mindmap-node::before {
       content: '├─ ';
-      color: ${settings.highContrast ? "#666666" : "#94a3b8"};
+      color: ${settings.highContrast ? '#666666' : '#94a3b8'};
     }
 
     .mindmap-node.level-0::before {
@@ -220,7 +231,7 @@ export function getAccessibilityStyles(
     }
 
     .timeline {
-      border-left: 3px solid ${settings.highContrast ? "#ffff00" : "#3b82f6"};
+      border-left: 3px solid ${settings.highContrast ? '#ffff00' : '#3b82f6'};
       padding-left: 1.5em;
       margin-left: 0.5em;
     }
@@ -239,12 +250,12 @@ export function getAccessibilityStyles(
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      background: ${settings.highContrast ? "#ffff00" : "#3b82f6"};
+      background: ${settings.highContrast ? '#ffff00' : '#3b82f6'};
     }
 
     .timeline-date {
       font-weight: 600;
-      color: ${settings.highContrast ? "#00ffff" : "#3b82f6"};
+      color: ${settings.highContrast ? '#00ffff' : '#3b82f6'};
       margin-bottom: 0.25em;
     }
 
@@ -259,7 +270,7 @@ export function getAccessibilityStyles(
     }
 
     .summary-key-points {
-      background: ${settings.highContrast ? "#1a1a1a" : "#f0f9ff"};
+      background: ${settings.highContrast ? '#1a1a1a' : '#f0f9ff'};
       padding: 1em;
       border-radius: 8px;
       margin-top: 0.5em;
@@ -267,25 +278,25 @@ export function getAccessibilityStyles(
 
     .meta {
       font-size: 0.875em;
-      color: ${settings.highContrast ? "#999999" : "#64748b"};
+      color: ${settings.highContrast ? '#999999' : '#64748b'};
       margin-bottom: 1.5em;
     }
 
     .footer {
       margin-top: 2em;
       padding-top: 1em;
-      border-top: 1px solid ${settings.highContrast ? "#333333" : "#e2e8f0"};
+      border-top: 1px solid ${settings.highContrast ? '#333333' : '#e2e8f0'};
       font-size: 0.75em;
-      color: ${settings.highContrast ? "#666666" : "#94a3b8"};
+      color: ${settings.highContrast ? '#666666' : '#94a3b8'};
       text-align: center;
     }
 
     .a11y-indicator {
       font-size: 0.75em;
-      color: ${settings.highContrast ? "#00ffff" : "#6366f1"};
+      color: ${settings.highContrast ? '#00ffff' : '#6366f1'};
       margin-bottom: 1em;
       padding: 0.5em;
-      background: ${settings.highContrast ? "#1a1a1a" : "#f5f3ff"};
+      background: ${settings.highContrast ? '#1a1a1a' : '#f5f3ff'};
       border-radius: 4px;
     }
   `;
