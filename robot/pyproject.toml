@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "reachy-mini-mirrorbuddy"
-version = "0.30.0"
+version = "0.31.0"
 description = "MirrorBuddy on Reachy Mini — the physical embodiment of MirrorBuddy (eyes, ears, mouth, movements) powered by Azure OpenAI Realtime and the MirrorBuddy Maestri."
 readme = "README.md"
 requires-python = ">=3.11"
