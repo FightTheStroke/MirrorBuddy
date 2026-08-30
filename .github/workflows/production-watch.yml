@@ -30,13 +30,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: pnpm install --frozen-lockfile
 
       - name: Ask the live site whether it is healthy
         id: health
@@ -68,7 +73,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            npm run script scripts/production-error-watch.ts -- --dry-run
+            pnpm run script scripts/production-error-watch.ts -- --dry-run
           else
-            npm run script scripts/production-error-watch.ts
+            pnpm run script scripts/production-error-watch.ts
           fi
