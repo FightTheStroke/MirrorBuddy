@@ -291,6 +291,7 @@ jobs:
           )"
           exit 1
 
+  dependency-updates:
     name: Critical Dependency Updates
     runs-on: ubuntu-latest
     steps:
