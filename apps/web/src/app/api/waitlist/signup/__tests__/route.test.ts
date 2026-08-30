@@ -207,4 +207,31 @@ describe('POST /api/waitlist/signup', () => {
     expect(response.status).toBe(400);
     expect(data.error).toMatch(/invalid json/i);
   });
+
+  // The Pro page reuses this endpoint, so the endpoint has to know which page
+  // it is answering — and must not simply believe whatever the caller says,
+  // since the value ends up stored and printed in an email we read.
+  describe('signup source', () => {
+    async function sourcePassedToService(source: unknown): Promise<string> {
+      mockSignup.mockResolvedValueOnce(VALID_ENTRY);
+      await POST(makeRequest({ email: 'test@example.com', gdprConsent: true, source }));
+      return mockSignup.mock.calls[0][0].source;
+    }
+
+    it('records a Pro signup as coming from the Pro page', async () => {
+      expect(await sourcePassedToService('pro')).toBe('pro');
+    });
+
+    it('defaults to the coming-soon page when no source is given', async () => {
+      expect(await sourcePassedToService(undefined)).toBe('coming-soon');
+    });
+
+    it('refuses an unknown source instead of storing it', async () => {
+      expect(await sourcePassedToService('enterprise')).toBe('coming-soon');
+    });
+
+    it('refuses a source that is not text at all', async () => {
+      expect(await sourcePassedToService({ evil: true })).toBe('coming-soon');
+    });
+  });
 });

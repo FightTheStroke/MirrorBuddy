@@ -16,7 +16,7 @@ Client Request → API Route → Rate Limiter → Redis (Upstash)
 
 - Provider: Upstash (managed Redis)
 - SLA: 99.99% uptime
-- Environment: `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- Environment: `KV_REST_API_URL`, `KV_REST_API_TOKEN`
 
 ## Production Behavior
 
@@ -55,8 +55,8 @@ if (process.env.NODE_ENV === 'production' && !isRedisConfigured()) {
 open https://console.upstash.com
 
 # Test connection
-curl -X GET $UPSTASH_REDIS_REST_URL \
-  -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
+curl -X GET $KV_REST_API_URL \
+  -H "Authorization: Bearer $KV_REST_API_TOKEN" \
   -H "Content-Type: application/json"
 ```
 

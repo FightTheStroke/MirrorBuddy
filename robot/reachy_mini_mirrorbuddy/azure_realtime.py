@@ -87,9 +87,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
         self._partial_user = ""  # transcript of the turn being spoken, read for stop words
         self._stopped_on_partial = False  # a stop word already fired for this turn
-        self._gated = False  # answer prepared before the transcript cleared the turn
-        self._gated_audio: list[bytes] = []  # its audio, held until the turn is cleared
-        self._cancelled_unconfirmed = False  # an answer was abandoned before it existed
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
@@ -240,10 +237,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         "in flight"; carrying that into the new session would mute it entirely.
         ``_asleep`` / ``_quiet`` are deliberately preserved: if the child said
         "zitto", coming back talking is exactly the insistence to avoid.
-
-        A held answer dies with the session that was generating it: its buffered
-        audio belongs to a response the new session knows nothing about, so it is
-        dropped rather than carried across and played into the wrong conversation.
         """
         self._ws = None
         self._suppress = False
@@ -251,9 +244,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         self._fast_requested = False
         self._stopped_on_partial = False
         self._partial_user = ""
-        self._gated = False
-        self._gated_audio = []
-        self._cancelled_unconfirmed = False
 
     async def _safe_send(self, msg: str) -> None:
         ws = self._ws

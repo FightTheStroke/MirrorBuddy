@@ -65,7 +65,7 @@ Create accounts and have credentials ready:
 
 2. **Get REST Credentials**
    - Copy REST URL and REST Token
-   - Save as `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
+   - Save as `KV_REST_API_URL` and `KV_REST_API_TOKEN`
 
 ---
 
@@ -209,8 +209,8 @@ Create accounts and have credentials ready:
     vercel env add AZURE_OPENAI_EMBEDDING_DEPLOYMENT production <<< "text-embedding-3-small"
 
    # Upstash
-   vercel env add UPSTASH_REDIS_REST_URL production --sensitive <<< "https://..."
-   vercel env add UPSTASH_REDIS_REST_TOKEN production --sensitive <<< "..."
+   vercel env add KV_REST_API_URL production --sensitive <<< "https://..."
+   vercel env add KV_REST_API_TOKEN production --sensitive <<< "..."
 
    # Resend
    vercel env add RESEND_API_KEY production --sensitive <<< "re_..."
@@ -282,7 +282,7 @@ Create accounts and have credentials ready:
 
 **Email Not Sending**: Check `RESEND_API_KEY`, verify domain if using custom sender
 
-**Rate Limiting Issues**: Verify `UPSTASH_REDIS_REST_URL` and token are correct
+**Rate Limiting Issues**: Verify `KV_REST_API_URL` and token are correct
 
 **Database Connection Timeout**: Check Supabase firewall, ensure pgbouncer connection pooling enabled
 

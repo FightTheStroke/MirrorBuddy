@@ -20,6 +20,21 @@ interface SignupBody {
   locale?: unknown;
   gdprConsent: unknown;
   marketingConsent?: unknown;
+  source?: unknown;
+}
+
+/**
+ * Where the signup came from. An allow-list rather than free text: the value
+ * is stored, reported on and put in an email subject, so it must not be
+ * attacker-controlled.
+ */
+const ALLOWED_SOURCES = ['coming-soon', 'pro'] as const;
+const DEFAULT_SOURCE = 'coming-soon';
+
+function resolveSource(value: unknown): string {
+  if (typeof value !== 'string') return DEFAULT_SOURCE;
+  const trimmed = value.trim();
+  return (ALLOWED_SOURCES as readonly string[]).includes(trimmed) ? trimmed : DEFAULT_SOURCE;
 }
 
 export const POST = pipe(
@@ -34,7 +49,7 @@ export const POST = pipe(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { email, name, locale, gdprConsent, marketingConsent } = body;
+  const { email, name, locale, gdprConsent, marketingConsent, source } = body;
 
   // Validate email
   if (!email || typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
@@ -61,7 +76,7 @@ export const POST = pipe(
       locale: resolvedLocale,
       gdprConsentVersion: '1.0',
       marketingConsent: resolvedMarketing,
-      source: 'coming-soon',
+      source: resolveSource(source),
     });
 
     log.info('Waitlist signup via API', { email: email.trim() });

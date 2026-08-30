@@ -11,6 +11,7 @@ import { useSettingsStore } from '@/lib/stores';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { buildAgeGateInstruction } from './age-gate-instruction';
+import { historyItemEvent } from './history-item';
 import type { Maestro } from '@/types';
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
 import { fetchConversationMemory, buildMemoryContext } from './memory-utils';
@@ -279,16 +280,7 @@ export function useSendSessionConfig(
 
       // Send each message as a conversation item
       for (const msg of initialMessages) {
-        dataChannel.send(
-          JSON.stringify({
-            type: 'conversation.item.create',
-            item: {
-              type: 'message',
-              role: msg.role,
-              content: [{ type: 'input_text', text: msg.content }],
-            },
-          }),
-        );
+        dataChannel.send(JSON.stringify(historyItemEvent(msg)));
       }
 
       // Mark greeting as sent so we skip it (we're continuing a conversation)

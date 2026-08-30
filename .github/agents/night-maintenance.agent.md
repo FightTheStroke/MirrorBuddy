@@ -40,6 +40,7 @@ Run the NightMaintenance operational loop for MirrorBuddy.
 1. Use bounded polling only: check CI/deploy state every 30–60s; never leave unbounded watchers running without heartbeat output.
 2. If `gh workflow run .github/workflows/promote-to-production.yml` returns 403/permission errors, fallback to `vercel promote <staging-url>` and re-verify health/version immediately after.
 3. Closure is valid only with all evidence present: main CI green, production health/version aligned, post-prod smoke+status green, Sentry unresolved reviewed, and issue state synced.
+4. Once a week (or whenever a key was rotated), run `AZURE_KEY_DRIFT_STRICT=true bash scripts/check-azure-key-drift.sh` with `az login` active. The weekly CI job reaches only the GitHub Actions secrets; this run is the only one that can also open `kv-virtualbpm-prod`. A dead copy sat there unnoticed from November 2025 to August 2026 because nothing ever looked. See `docs/operations/AZURE-KEY-ROTATION.md`.
 
 ## Global Guardian Handoff
 
