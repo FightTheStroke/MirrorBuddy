@@ -2,17 +2,19 @@
  * Team notification for a waitlist signup.
  *
  * Roberto's requirement for the Pro page: the team must be told when somebody
- * asks to be warned, not only the person asking. The address is fixed on
- * purpose — it is the association's public inbox, not an operator's account,
- * so it cannot drift with an environment variable nobody sets.
+ * asks to be warned, not only the person asking.
+ *
+ * The address used to be written here, which meant a new administrator could
+ * not be added to the notification without a code change. Recipients are now
+ * the administrators recorded in the database, with the configured address
+ * always kept in the list.
  */
 
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 
 const log = logger.child({ module: 'waitlist-notification' });
-
-export const WAITLIST_NOTIFICATION_ADDRESS = 'info@fightthestroke.org';
 
 function escapeHtml(value: string): string {
   return value
@@ -30,10 +32,10 @@ export interface SignupNotification {
   source: string;
 }
 
-export function buildNotificationEmail(signup: SignupNotification) {
+export function buildNotificationEmail(signup: SignupNotification, recipients: string[]) {
   const subjectSource = signup.source === 'pro' ? 'MirrorBuddy Pro' : signup.source;
   return {
-    to: WAITLIST_NOTIFICATION_ADDRESS,
+    to: recipients,
     subject: `Waitlist — ${subjectSource}: ${signup.email}`,
     replyTo: signup.email,
     html: [
@@ -55,7 +57,15 @@ export function buildNotificationEmail(signup: SignupNotification) {
  */
 export async function notifyTeamOfSignup(signup: SignupNotification): Promise<void> {
   try {
-    const result = await sendEmail(buildNotificationEmail(signup));
+    const recipients = await getAdminRecipients();
+    if (recipients.length === 0) {
+      log.warn('No administrator can be notified of the signup', {
+        source: signup.source,
+      });
+      return;
+    }
+
+    const result = await sendEmail(buildNotificationEmail(signup, recipients));
     if (!result.success) {
       log.warn('Waitlist team notification failed to send', {
         source: signup.source,

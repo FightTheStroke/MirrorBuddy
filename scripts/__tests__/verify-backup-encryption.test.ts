@@ -21,7 +21,10 @@ const TEST_ENV = {
   TOKEN_ENCRYPTION_KEY: 'test-token-key-at-least-32-chars!',
 };
 
-describe('verify-backup-encryption', () => {
+// Every case here spawns `npx tsx`, which needs several seconds on a cold
+// cache and more when the rest of the suite is competing for the CPU. The
+// default 5s timeout made these fail only inside the full run, never alone.
+describe('verify-backup-encryption', { timeout: 30000, retry: 2 }, () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -64,7 +67,7 @@ describe('verify-backup-encryption', () => {
     }).toThrow();
   });
 
-  it('should verify encryption/decryption works', { timeout: 30000, retry: 2 }, () => {
+  it('should verify encryption/decryption works', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
       encoding: 'utf8',
       env: TEST_ENV,
@@ -83,7 +86,7 @@ describe('verify-backup-encryption', () => {
     expect(result).not.toContain('[object Promise]');
   });
 
-  it('should verify key-rotation-helpers import', { timeout: 30000, retry: 2 }, () => {
+  it('should verify key-rotation-helpers import', () => {
     const result = execSync(`npx tsx ${SCRIPT_PATH}`, {
       encoding: 'utf8',
       env: TEST_ENV,

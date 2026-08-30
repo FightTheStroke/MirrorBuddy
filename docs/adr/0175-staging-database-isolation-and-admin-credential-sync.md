@@ -94,6 +94,25 @@ Preview deployments of individual pull requests share the staging database. That
 acceptable while staging holds no personal data (it is seeded with tiers and locales
 only), and is the reason nothing in the smoke suite writes to it.
 
+## Addendum (2026-08-30) — a value a CI guard must read cannot be stored as a secret
+
+The first staging deploy failed with "Preview environment has no usable
+`DATABASE_URL`" even though the variable was set. `vercel env add` stores a value as
+type **Secret** by default, and `vercel env pull` returns secrets as the literal text
+`[SENSITIVE]`. The isolation guard was therefore comparing a placeholder, not a
+connection string.
+
+`DATABASE_URL` and `DIRECT_URL` for the preview environment are stored with
+`--type config` for that reason. The value is still not printed by CI; it is simply
+readable by the job that has to check it.
+
+A second, quieter version of the same problem: `scripts/check-vercel-env.sh` pulled
+into a `mktemp` file. `vercel env pull` asks before overwriting an existing file, and
+with stderr silenced it wrote nothing at all. The script had been inspecting an empty
+file — reporting four present Sentry variables as missing, and never looking at a
+real value. It now passes `--yes` and fails hard if the pulled file is empty
+(`scripts/__tests__/check-vercel-env.test.ts`).
+
 ## References
 
 - `.github/workflows/ci.yml` — `deploy-to-staging`, `sync-admin-credentials`

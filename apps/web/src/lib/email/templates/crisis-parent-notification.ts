@@ -44,7 +44,7 @@ const STRINGS: Record<string, Record<string, string>> = {
       'Nel dashboard puoi vedere i progressi di apprendimento e configurare le impostazioni di sicurezza.',
     footer:
       'Questo messaggio è stato inviato automaticamente dal sistema di sicurezza di MirrorBuddy. Non rispondere a questa email.',
-    footerSupport: 'Per assistenza: support@mirrorbuddy.it',
+    footerSupport: 'Per assistenza: info@fightthestroke.org',
     critical: 'Critico',
     high: 'Alto',
     medium: 'Medio',
@@ -69,7 +69,7 @@ const STRINGS: Record<string, Record<string, string>> = {
     dashboardNote: 'In the dashboard you can view learning progress and configure safety settings.',
     footer:
       "This message was sent automatically by MirrorBuddy's safety system. Do not reply to this email.",
-    footerSupport: 'For support: support@mirrorbuddy.it',
+    footerSupport: 'For support: info@fightthestroke.org',
     critical: 'Critical',
     high: 'High',
     medium: 'Medium',
@@ -96,7 +96,7 @@ const STRINGS: Record<string, Record<string, string>> = {
       "Dans le tableau de bord, vous pouvez voir les progrès d'apprentissage et configurer les paramètres de sécurité.",
     footer:
       'Ce message a été envoyé automatiquement par le système de sécurité de MirrorBuddy. Ne répondez pas à cet email.',
-    footerSupport: 'Pour assistance: support@mirrorbuddy.it',
+    footerSupport: 'Pour assistance: info@fightthestroke.org',
     critical: 'Critique',
     high: 'Élevé',
     medium: 'Moyen',
@@ -123,7 +123,7 @@ const STRINGS: Record<string, Record<string, string>> = {
       'Im Dashboard können Sie den Lernfortschritt sehen und Sicherheitseinstellungen konfigurieren.',
     footer:
       'Diese Nachricht wurde automatisch vom Sicherheitssystem von MirrorBuddy gesendet. Antworten Sie nicht auf diese E-Mail.',
-    footerSupport: 'Für Unterstützung: support@mirrorbuddy.it',
+    footerSupport: 'Für Unterstützung: info@fightthestroke.org',
     critical: 'Kritisch',
     high: 'Hoch',
     medium: 'Mittel',
@@ -149,7 +149,7 @@ const STRINGS: Record<string, Record<string, string>> = {
       'En el panel puede ver el progreso de aprendizaje y configurar ajustes de seguridad.',
     footer:
       'Este mensaje fue enviado automáticamente por el sistema de seguridad de MirrorBuddy. No responda a este correo.',
-    footerSupport: 'Para asistencia: support@mirrorbuddy.it',
+    footerSupport: 'Para asistencia: info@fightthestroke.org',
     critical: 'Crítico',
     high: 'Alto',
     medium: 'Medio',

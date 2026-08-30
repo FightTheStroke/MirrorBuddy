@@ -248,7 +248,7 @@ describe('POST /api/contact', () => {
 
       expect(mockSendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'admin@mirrorbuddy.com',
+          to: ['admin@mirrorbuddy.com'],
           subject: expect.stringContaining('General'),
           html: expect.stringContaining('John Doe'),
         }),
@@ -293,7 +293,7 @@ describe('POST /api/contact', () => {
 
       const emailCall = mockSendEmail.mock.calls[0][0];
       expect(emailCall).toMatchObject({
-        to: 'admin@mirrorbuddy.com',
+        to: ['admin@mirrorbuddy.com'],
         subject: expect.stringContaining('Schools'),
       });
       expect(emailCall.html).toContain('Test School');

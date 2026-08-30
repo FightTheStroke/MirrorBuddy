@@ -1,7 +1,7 @@
 /**
  * Operations Alert Email Service
  *
- * Sends email alerts to ADMIN_EMAIL when:
+ * Sends email alerts to every administrator when:
  * - Cost budgets breach warning/critical thresholds
  * - External service quotas reach critical levels
  *
@@ -13,6 +13,7 @@
 
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 import type { CostAlert } from './cost-tracker';
 
 const log = logger.child({ module: 'ops-alert' });
@@ -26,9 +27,9 @@ const COOLDOWN_MS = 60 * 60 * 1000; // 1 hour between duplicate alerts
  * Call this after getCostDashboardData() returns alerts.
  */
 export async function sendAlertEmails(alerts: CostAlert[]): Promise<number> {
-  const to = process.env.ADMIN_EMAIL;
-  if (!to) {
-    log.warn('ADMIN_EMAIL not set, skipping ops alerts');
+  const to = await getAdminRecipients();
+  if (to.length === 0) {
+    log.warn('No administrator can be notified, skipping ops alerts');
     return 0;
   }
 
