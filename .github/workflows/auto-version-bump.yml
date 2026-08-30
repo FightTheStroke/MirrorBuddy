@@ -106,6 +106,7 @@ jobs:
             VERSION \
             package.json \
             apps/web/package.json \
+            CHANGELOG.md \
             robot/pyproject.toml \
             robot/reachy_mini_mirrorbuddy/__init__.py
           git commit -m "chore(release): v${NEXT}" -m "Automated version bump from Conventional Commits since last tag."

@@ -15,7 +15,7 @@ from collections.abc import Callable
 
 import numpy as np
 
-from .audio_dsp import boost, resample
+from .audio_dsp import amplify_mic, boost, input_gain, resample
 from .azure_realtime import SAMPLE_RATE
 from .barge_detector import BargeDetector
 
@@ -179,6 +179,8 @@ class AudioIO:
     def _input_loop(self) -> None:
         in_rate = self._in_rate or 16000
         needs_resample = in_rate != SAMPLE_RATE
+        mic_gain = input_gain()
+        logger.info("Microphone pre-amp: x%.1f", mic_gain)
         while self._recording and not self._stop.is_set():
             try:
                 sample = self.robot.media.get_audio_sample()
@@ -220,6 +222,10 @@ class AudioIO:
                 # Resample microphone -> realtime rate.
                 if needs_resample and audio.size:
                     audio = resample(audio, in_rate, SAMPLE_RATE).astype(np.int16)
+
+                # Pre-amp last, so the barge thresholds above stay calibrated against
+                # the raw mic and only the server hears the louder copy.
+                audio = amplify_mic(audio, mic_gain)
 
                 self.on_input_pcm16(audio.tobytes())
             except Exception as e:

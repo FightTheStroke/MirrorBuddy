@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Student Analytics Dashboard
@@ -9,34 +9,26 @@
  * Plan 104 - Wave 4: Pro Features [T4-06]
  */
 
-import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  Target,
-  Lightbulb,
-  Brain,
-  Lock,
-} from "lucide-react";
-import { useTierFeatures } from "@/hooks/useTierFeatures";
-import { AnalyticsScoreCard } from "./components/analytics-score-card";
-import { AnalyticsListCard } from "./components/analytics-list-card";
-import type { LearningRecommendation } from "@/lib/education/server";
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2, RefreshCw, AlertCircle, Target, Lightbulb, Brain, Lock } from 'lucide-react';
+import { useTierFeatures } from '@/hooks/useTierFeatures';
+import { AnalyticsScoreCard } from './components/analytics-score-card';
+import { AnalyticsListCard } from './components/analytics-list-card';
+import type { LearningRecommendation } from '@/lib/education/server';
 
 export default function StudentAnalyticsPage() {
-  const t = useTranslations("analytics");
+  const t = useTranslations('analytics');
   const { tier, isSimulated } = useTierFeatures();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<LearningRecommendation | null>(null);
 
-  const isPro = tier === "pro" || isSimulated;
+  const isPro = tier === 'pro' || isSimulated;
 
   const fetchData = useCallback(
     async (isRefresh = false) => {
@@ -46,22 +38,22 @@ export default function StudentAnalyticsPage() {
       setError(null);
 
       try {
-        const response = await fetch("/api/analytics/student-insights");
+        const response = await fetch('/api/analytics/student-insights');
 
         if (response.status === 403) {
-          setError(t("proOnly"));
+          setError(t('proOnly'));
           setData(null);
           return;
         }
 
         if (!response.ok) {
-          throw new Error("Failed to fetch analytics");
+          throw new Error('Failed to fetch analytics');
         }
 
         const result = await response.json();
         setData(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : t("error"));
+        setError(err instanceof Error ? err.message : t('error'));
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -87,12 +79,12 @@ export default function StudentAnalyticsPage() {
             <div className="flex flex-col items-center gap-4 text-center">
               <Lock className="h-12 w-12 text-amber-600 dark:text-amber-400" />
               <div>
-                <h2 className="text-xl font-semibold mb-2">{t("proOnly")}</h2>
+                <h2 className="text-xl font-semibold mb-2">{t('proOnly')}</h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                  {t("upgradeToPro")}
+                  {t('upgradeToPro')}
                 </p>
                 <Button variant="default" asChild>
-                  <Link href="/settings/subscription">{t("upgradeToPro")}</Link>
+                  <Link href="/pro">{t('upgradeToPro')}</Link>
                 </Button>
               </div>
             </div>
@@ -107,7 +99,7 @@ export default function StudentAnalyticsPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
-        <span className="ml-2 text-sm text-slate-500">{t("loading")}</span>
+        <span className="ml-2 text-sm text-slate-500">{t('loading')}</span>
       </div>
     );
   }
@@ -131,10 +123,8 @@ export default function StudentAnalyticsPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <Brain className="h-12 w-12 mx-auto mb-4 text-slate-400" />
-            <h2 className="text-xl font-semibold mb-2">{t("noData")}</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {t("description")}
-            </p>
+            <h2 className="text-xl font-semibold mb-2">{t('noData')}</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{t('description')}</p>
           </CardContent>
         </Card>
       </div>
@@ -146,36 +136,24 @@ export default function StudentAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {t("description")}
-          </p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t('description')}</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-        >
-          <RefreshCw
-            className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
-          />
-          {t("refresh")}
+        <Button variant="outline" size="sm" onClick={() => fetchData(true)} disabled={refreshing}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          {t('refresh')}
         </Button>
       </div>
 
       {/* Overall Score */}
-      <AnalyticsScoreCard
-        score={data.overallScore}
-        confidenceLevel={data.confidenceLevel}
-      />
+      <AnalyticsScoreCard score={data.overallScore} confidenceLevel={data.confidenceLevel} />
 
       {/* Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AnalyticsListCard
-          title={t("strengths.title")}
-          description={t("strengths.description")}
-          emptyMessage={t("strengths.empty")}
+          title={t('strengths.title')}
+          description={t('strengths.description')}
+          emptyMessage={t('strengths.empty')}
           items={data.strengths}
           icon={Target}
           iconColor="text-green-600 dark:text-green-400"
@@ -184,9 +162,9 @@ export default function StudentAnalyticsPage() {
         />
 
         <AnalyticsListCard
-          title={t("weaknesses.title")}
-          description={t("weaknesses.description")}
-          emptyMessage={t("weaknesses.empty")}
+          title={t('weaknesses.title')}
+          description={t('weaknesses.description')}
+          emptyMessage={t('weaknesses.empty')}
           items={data.weaknesses}
           icon={AlertCircle}
           iconColor="text-amber-600 dark:text-amber-400"
@@ -195,9 +173,9 @@ export default function StudentAnalyticsPage() {
         />
 
         <AnalyticsListCard
-          title={t("recommendedTopics.title")}
-          description={t("recommendedTopics.description")}
-          emptyMessage={t("recommendedTopics.empty")}
+          title={t('recommendedTopics.title')}
+          description={t('recommendedTopics.description')}
+          emptyMessage={t('recommendedTopics.empty')}
           items={data.recommendedTopics}
           icon={Brain}
           iconColor="text-blue-600 dark:text-blue-400"
@@ -206,9 +184,9 @@ export default function StudentAnalyticsPage() {
         />
 
         <AnalyticsListCard
-          title={t("focusAreas.title")}
-          description={t("focusAreas.description")}
-          emptyMessage={t("focusAreas.empty")}
+          title={t('focusAreas.title')}
+          description={t('focusAreas.description')}
+          emptyMessage={t('focusAreas.empty')}
           items={data.focusAreas}
           icon={Lightbulb}
           iconColor="text-purple-600 dark:text-purple-400"

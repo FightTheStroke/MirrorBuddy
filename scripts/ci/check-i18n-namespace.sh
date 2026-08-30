@@ -4,7 +4,18 @@
 set -euo pipefail
 
 DIFF_BASE="${1:-origin/main}"
-I18N_CONFIG="src/i18n/request.ts"
+# The app moved to apps/web (#362) and this path did not follow it, so the
+# grep below has been reading a file that does not exist: every new namespace
+# was reported unregistered, correctly registered or not. The legacy location
+# is still accepted so the check keeps working on older branches.
+I18N_CONFIG="apps/web/src/i18n/request.ts"
+[[ -f "$I18N_CONFIG" ]] || I18N_CONFIG="src/i18n/request.ts"
+
+if [[ ! -f "$I18N_CONFIG" ]]; then
+  echo "❌ Cannot find the i18n configuration (looked in apps/web/src and src)."
+  exit 1
+fi
+
 ERRORS=0
 
 new_json_files=$(git diff "$DIFF_BASE"... --name-only --diff-filter=A -- 'messages/*/*.json' 'apps/web/messages/*/*.json' 2>/dev/null || true)
