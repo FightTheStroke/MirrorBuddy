@@ -10,6 +10,7 @@
 
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
+import { isAuthenticated } from '@/lib/auth/client-auth';
 import type { CharacterType } from '@/types';
 import type { ConversationSummary } from './types';
 
@@ -82,10 +83,16 @@ export async function saveMessageToDB(
  * We use summaries for context instead of restoring entire conversations.
  */
 export async function loadConversationSummariesFromDB(): Promise<ConversationSummary[]> {
+  // A signed-out visitor has no conversations. Asking anyway earns a 401 the
+  // browser prints as a failed request.
+  if (!isAuthenticated()) {
+    return [];
+  }
+
   try {
     const response = await fetch('/api/conversations?limit=20&active=true');
 
-    // 401 = no user cookie yet (first visit), not an error
+    // 401 = the cookie is present but the session expired
     if (response.status === 401) {
       return [];
     }

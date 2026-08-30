@@ -56,10 +56,19 @@ describe('Sentry Environment Detection', () => {
       expect(isEnabled('edge')).toBe(false);
     });
 
-    it('returns true for client on Vercel with DSN', () => {
+    // Browser reporting used to require NEXT_PUBLIC_VERCEL_ENV, a value baked
+    // into the bundle at build time. Production is served by promoting a build
+    // made in the preview environment, where that variable had never been set,
+    // so the bundle real users receive was built without it and reported
+    // nothing for months. Being a production bundle is the condition now.
+    it('reports from a production bundle even without NEXT_PUBLIC_VERCEL_ENV', () => {
       process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
-      process.env.NEXT_PUBLIC_VERCEL_ENV = 'production';
+      env.NODE_ENV = 'production';
+      // The test runner serves pages from localhost, which the rule treats as
+      // a developer's own machine.
+      vi.stubGlobal('window', { location: { hostname: 'www.mirrorbuddy.org' } });
       expect(isEnabled('client')).toBe(true);
+      vi.unstubAllGlobals();
     });
 
     it('returns true for server on Vercel with DSN', () => {
@@ -87,10 +96,23 @@ describe('Sentry Environment Detection', () => {
       expect(isEnabled('edge')).toBe(true);
     });
 
-    it('returns false in local builds without force enable', () => {
+    it('stays quiet on the client in development', () => {
+      process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
+      env.NODE_ENV = 'development';
+      expect(isEnabled('client')).toBe(false);
+    });
+
+    it('stays quiet for a production build served from localhost', () => {
+      process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
+      env.NODE_ENV = 'production';
+      vi.stubGlobal('window', { location: { hostname: 'localhost' } });
+      expect(isEnabled('client')).toBe(false);
+      vi.unstubAllGlobals();
+    });
+
+    it('keeps server and edge tied to running on Vercel', () => {
       process.env.SENTRY_DSN = 'https://example.com';
       env.NODE_ENV = 'production';
-      expect(isEnabled('client')).toBe(false);
       expect(isEnabled('server')).toBe(false);
       expect(isEnabled('edge')).toBe(false);
     });
@@ -144,8 +166,9 @@ describe('Sentry Environment Detection', () => {
   describe('Cross-runtime consistency', () => {
     it('all runtimes agree on enabled state with Vercel env', () => {
       process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
-      process.env.NEXT_PUBLIC_VERCEL_ENV = 'production';
+      env.NODE_ENV = 'production';
       process.env.VERCEL = '1';
+      vi.stubGlobal('window', { location: { hostname: 'www.mirrorbuddy.org' } });
 
       const clientEnabled = isEnabled('client');
       const serverEnabled = isEnabled('server');
@@ -154,6 +177,7 @@ describe('Sentry Environment Detection', () => {
       expect(clientEnabled).toBe(true);
       expect(serverEnabled).toBe(true);
       expect(edgeEnabled).toBe(true);
+      vi.unstubAllGlobals();
     });
 
     it('all runtimes agree on disabled state without Vercel', () => {

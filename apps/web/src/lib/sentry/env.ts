@@ -28,14 +28,33 @@ export function isEnabled(runtime: Runtime): boolean {
       ? process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true'
       : process.env.SENTRY_FORCE_ENABLE === 'true';
 
-  // Check if running on Vercel platform.
-  // NEXT_PUBLIC_VERCEL_ENV must be set explicitly in the project settings:
-  // Vercel only injects it when system variables are exposed to the client,
-  // and without it browser errors are never reported.
-  const isVercel =
-    runtime === 'client' ? !!process.env.NEXT_PUBLIC_VERCEL_ENV : !!process.env.VERCEL;
+  if (forceEnable) return true;
 
-  return isVercel || forceEnable;
+  if (runtime === 'client') {
+    // Browser error reporting was silently off on the live site for months.
+    // The rule used to require NEXT_PUBLIC_VERCEL_ENV, which is inlined at
+    // build time — and the builds that get promoted to production are made in
+    // the preview environment, where that variable had never been set. A
+    // variable missing in one environment turned off monitoring in another.
+    //
+    // A production bundle carrying a DSN is a deployed build, unless it is
+    // being served from a developer's own machine. Nothing about the
+    // deployment environment can quietly revoke it any more.
+    if (process.env.NODE_ENV !== 'production') return false;
+    return !isLocalhost();
+  }
+
+  return !!process.env.VERCEL;
+}
+
+/**
+ * A production build served from the developer's own machine
+ * (`next build && next start`) must not send its errors to the live project.
+ */
+function isLocalhost(): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = window.location?.hostname ?? '';
+  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
 }
 
 /**

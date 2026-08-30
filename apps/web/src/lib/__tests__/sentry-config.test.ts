@@ -61,7 +61,10 @@ describe('sentry.client.config', () => {
     expect(initCall.dsn).toBe('https://test@sentry.io/123');
   });
 
-  it('calls init with enabled=false when not on Vercel', async () => {
+  // Used to assert the opposite. Browser reporting keyed off a build-time
+  // variable that the promoted bundle never carried, so the live site reported
+  // nothing for months while this test called that the correct behaviour.
+  it('calls init with enabled=true for a production bundle carrying a DSN', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
 
@@ -70,7 +73,7 @@ describe('sentry.client.config', () => {
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
-    expect(initCall.enabled).toBe(false);
+    expect(initCall.enabled).toBe(true);
   });
 
   it('beforeSend returns event (never null) in production (F-08)', async () => {

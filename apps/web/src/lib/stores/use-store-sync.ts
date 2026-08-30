@@ -7,13 +7,21 @@ import { useProgressStore } from './progress-store';
 import { useConversationStore } from './conversation-store';
 import { useLearningsStore } from './learnings-store';
 import { useAccessibilityStore } from '@/lib/accessibility';
+import { isAuthenticated } from '@/lib/auth/client-auth';
 
 /**
  * Initialize all stores by loading data from server
  * Call this once on app startup
  */
 export async function initializeStores() {
-  // Check if user is authenticated (in production, 401 = guest/trial mode)
+  // A signed-out visitor has nothing to hydrate. Asking anyway earns a 401 that
+  // the browser prints as a failed request, so every guest opened the site to a
+  // console full of errors that were not errors.
+  if (!isAuthenticated()) {
+    return;
+  }
+
+  // Still handled: the cookie can be present but stale (expired session).
   const res = await fetch('/api/user');
 
   if (res.status === 401) {

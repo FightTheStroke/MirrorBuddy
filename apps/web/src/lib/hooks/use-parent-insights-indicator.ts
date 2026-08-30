@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { csrfFetch } from "@/lib/auth";
+import { useState, useEffect, useCallback } from 'react';
+import { csrfFetch } from '@/lib/auth';
+import { isAuthenticated } from '@/lib/auth/client-auth';
 
 const CHECK_INTERVAL_MS = 60000; // Check every minute
 
@@ -15,9 +16,17 @@ export function useParentInsightsIndicator() {
   const [isLoading, setIsLoading] = useState(true);
 
   const checkForNewInsights = useCallback(async () => {
+    // Nothing to check for a signed-out visitor, and asking earns a 401 the
+    // browser prints as a failed request.
+    if (!isAuthenticated()) {
+      setHasNewInsights(false);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       // Get last viewed timestamp from database
-      const lastViewedResponse = await fetch("/api/profile/last-viewed");
+      const lastViewedResponse = await fetch('/api/profile/last-viewed');
       let lastViewedDate = new Date(0);
       if (lastViewedResponse.ok) {
         const lastViewedData = await lastViewedResponse.json();
@@ -27,7 +36,7 @@ export function useParentInsightsIndicator() {
       }
 
       // Fetch latest learning entries
-      const response = await fetch("/api/learnings?limit=1");
+      const response = await fetch('/api/learnings?limit=1');
       if (!response.ok) {
         setHasNewInsights(false);
         return;
@@ -51,8 +60,8 @@ export function useParentInsightsIndicator() {
   // Mark as viewed - call this when user visits parent dashboard
   const markAsViewed = useCallback(async () => {
     try {
-      await csrfFetch("/api/profile/last-viewed", {
-        method: "POST",
+      await csrfFetch('/api/profile/last-viewed', {
+        method: 'POST',
         body: JSON.stringify({ timestamp: new Date().toISOString() }),
       });
       setHasNewInsights(false);

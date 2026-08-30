@@ -9,11 +9,12 @@
  * GDPR/COPPA compliant consent tracking.
  */
 
-import { TOS_VERSION } from "@/lib/tos/constants";
+import { TOS_VERSION } from '@/lib/tos/constants';
+import { isAuthenticated } from '@/lib/auth/client-auth';
 
-const UNIFIED_CONSENT_KEY = "mirrorbuddy-unified-consent";
-const UNIFIED_CONSENT_VERSION = "1.0";
-const CONSENT_LOADED_KEY = "mirrorbuddy-consent-loaded";
+const UNIFIED_CONSENT_KEY = 'mirrorbuddy-unified-consent';
+const UNIFIED_CONSENT_VERSION = '1.0';
+const CONSENT_LOADED_KEY = 'mirrorbuddy-consent-loaded';
 
 export interface UnifiedConsentData {
   /** Version of this consent structure */
@@ -36,7 +37,7 @@ export interface UnifiedConsentData {
  * Check if user has given all required consents (TOS + essential cookies)
  */
 export function hasUnifiedConsent(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === 'undefined') return false;
 
   try {
     const stored = localStorage.getItem(UNIFIED_CONSENT_KEY);
@@ -63,7 +64,7 @@ export function hasUnifiedConsent(): boolean {
  * Get current unified consent data
  */
 export function getUnifiedConsent(): UnifiedConsentData | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === 'undefined') return null;
 
   try {
     const stored = localStorage.getItem(UNIFIED_CONSENT_KEY);
@@ -78,9 +79,7 @@ export function getUnifiedConsent(): UnifiedConsentData | null {
 /**
  * Save unified consent to localStorage
  */
-export function saveUnifiedConsent(
-  analytics: boolean = true,
-): UnifiedConsentData {
+export function saveUnifiedConsent(analytics: boolean = true): UnifiedConsentData {
   const now = new Date().toISOString();
   const consent: UnifiedConsentData = {
     version: UNIFIED_CONSENT_VERSION,
@@ -96,7 +95,7 @@ export function saveUnifiedConsent(
     },
   };
 
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     localStorage.setItem(UNIFIED_CONSENT_KEY, JSON.stringify(consent));
 
     // Migrate old consent data for backward compatibility
@@ -113,15 +112,15 @@ export function saveUnifiedConsent(
 function migrateOldConsent(): void {
   try {
     // Mark old consent keys as migrated
-    const oldTosAccepted = sessionStorage.getItem("tos_accepted");
-    const oldCookieConsent = localStorage.getItem("mirrorbuddy-consent");
+    const oldTosAccepted = sessionStorage.getItem('tos_accepted');
+    const oldCookieConsent = localStorage.getItem('mirrorbuddy-consent');
 
-    if (oldTosAccepted === "true") {
-      sessionStorage.setItem("tos_migrated", "true");
+    if (oldTosAccepted === 'true') {
+      sessionStorage.setItem('tos_migrated', 'true');
     }
 
     if (oldCookieConsent) {
-      localStorage.setItem("mirrorbuddy-consent-migrated", "true");
+      localStorage.setItem('mirrorbuddy-consent-migrated', 'true');
     }
   } catch {
     // Silent fail - migration is best effort
@@ -132,26 +131,24 @@ function migrateOldConsent(): void {
  * Sync consent to server (for audit trail)
  * Uses csrfFetch for CSRF protection on POST requests
  */
-export async function syncUnifiedConsentToServer(
-  consent: UnifiedConsentData,
-): Promise<void> {
+export async function syncUnifiedConsentToServer(consent: UnifiedConsentData): Promise<void> {
   try {
     // Dynamic import to avoid SSR issues
-    const { csrfFetch } = await import("@/lib/auth");
+    const { csrfFetch } = await import('@/lib/auth');
 
     // Sync TOS acceptance (requires CSRF token)
-    await csrfFetch("/api/tos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await csrfFetch('/api/tos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         version: consent.tos.version,
       }),
     });
 
     // Sync cookie consent (does not require CSRF but using csrfFetch is harmless)
-    await csrfFetch("/api/user/consent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    await csrfFetch('/api/user/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         version: consent.version,
         acceptedAt: consent.cookies.acceptedAt,
@@ -169,12 +166,12 @@ export async function syncUnifiedConsentToServer(
  * Clear unified consent (for testing or user revocation)
  */
 export function clearUnifiedConsent(): void {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     localStorage.removeItem(UNIFIED_CONSENT_KEY);
     // Also clear old consent keys to force re-consent
-    sessionStorage.removeItem("tos_accepted");
-    sessionStorage.removeItem("tos_accepted_version");
-    localStorage.removeItem("mirrorbuddy-consent");
+    sessionStorage.removeItem('tos_accepted');
+    sessionStorage.removeItem('tos_accepted_version');
+    localStorage.removeItem('mirrorbuddy-consent');
   }
 }
 
@@ -202,14 +199,20 @@ export function needsReconsent(): boolean {
  * Returns null if not authenticated or no consent found
  */
 export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | null> {
+  // The stored consent belongs to an account. A signed-out visitor has none,
+  // and asking earns a 401 the browser prints as a failed request.
+  if (!isAuthenticated()) {
+    return null;
+  }
+
   try {
     // Load TOS acceptance
-    const tosResponse = await fetch("/api/tos", {
-      method: "GET",
-      credentials: "include",
+    const tosResponse = await fetch('/api/tos', {
+      method: 'GET',
+      credentials: 'include',
     });
 
-    // If 401, user is not authenticated
+    // If 401, the cookie is present but the session expired
     if (tosResponse.status === 401) {
       return null;
     }
@@ -221,15 +224,13 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
     const tosData = await tosResponse.json();
 
     // Load cookie consent
-    const cookieResponse = await fetch("/api/user/consent", {
-      method: "GET",
-      credentials: "include",
+    const cookieResponse = await fetch('/api/user/consent', {
+      method: 'GET',
+      credentials: 'include',
     });
 
     if (!cookieResponse.ok) {
-      throw new Error(
-        `Failed to load cookie consent: ${cookieResponse.status}`,
-      );
+      throw new Error(`Failed to load cookie consent: ${cookieResponse.status}`);
     }
 
     const cookieData = await cookieResponse.json();
@@ -250,9 +251,9 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
     };
 
     // Cache in localStorage for offline access
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       localStorage.setItem(UNIFIED_CONSENT_KEY, JSON.stringify(consent));
-      sessionStorage.setItem(CONSENT_LOADED_KEY, "true");
+      sessionStorage.setItem(CONSENT_LOADED_KEY, 'true');
     }
 
     return consent;
@@ -269,9 +270,9 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
  */
 export async function initializeConsent(): Promise<boolean> {
   // Check if already loaded in this session
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     const loaded = sessionStorage.getItem(CONSENT_LOADED_KEY);
-    if (loaded === "true") {
+    if (loaded === 'true') {
       // Already loaded, use localStorage cache
       return hasUnifiedConsent();
     }
@@ -297,8 +298,8 @@ export async function initializeConsent(): Promise<boolean> {
  * Mark consent as loaded from DB (to avoid redundant fetches)
  */
 export function markConsentLoaded(): void {
-  if (typeof window !== "undefined") {
-    sessionStorage.setItem(CONSENT_LOADED_KEY, "true");
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem(CONSENT_LOADED_KEY, 'true');
   }
 }
 
@@ -306,6 +307,6 @@ export function markConsentLoaded(): void {
  * Check if consent was loaded in this session
  */
 export function isConsentLoaded(): boolean {
-  if (typeof window === "undefined") return false;
-  return sessionStorage.getItem(CONSENT_LOADED_KEY) === "true";
+  if (typeof window === 'undefined') return false;
+  return sessionStorage.getItem(CONSENT_LOADED_KEY) === 'true';
 }
