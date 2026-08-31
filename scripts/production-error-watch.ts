@@ -38,12 +38,15 @@ function readOpenIssues(): ExistingIssue[] {
     '--limit',
     '200',
     '--json',
-    'number,body,state',
+    'number,body,state,closedAt',
   ]);
-  return (JSON.parse(raw) as { number: number; body: string; state: string }[]).map((issue) => ({
+  return (
+    JSON.parse(raw) as { number: number; body: string; state: string; closedAt?: string | null }[]
+  ).map((issue) => ({
     number: issue.number,
     body: issue.body ?? '',
     state: issue.state === 'OPEN' ? 'OPEN' : 'CLOSED',
+    closedAt: issue.closedAt ?? null,
   }));
 }
 

@@ -9,6 +9,8 @@ export interface ProductionAlert {
   url: string;
   /** How many times it happened in the observed window. */
   occurrences: number;
+  /** ISO timestamp of the most recent occurrence. */
+  lastSeen: string;
   source: 'sentry' | 'vercel';
 }
 
@@ -45,6 +47,7 @@ export function sentryIssueToAlert(issue: SentryIssue): ProductionAlert {
     ],
     url: issue.permalink,
     occurrences: Number(issue.count) || 0,
+    lastSeen: issue.lastSeen,
     source: 'sentry',
   };
 }
@@ -61,6 +64,7 @@ export function vercelDeploymentToAlert(deployment: VercelDeployment): Productio
     ],
     url: `https://${deployment.url}`,
     occurrences: 1,
+    lastSeen: new Date(deployment.createdAt).toISOString(),
     source: 'vercel',
   };
 }
