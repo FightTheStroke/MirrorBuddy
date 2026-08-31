@@ -14,6 +14,7 @@ import {
 } from '@/lib/rate-limit';
 import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
+import { resolveRealtimeDeployment } from '@/lib/ai/realtime-deployment';
 
 // WebSocket proxy port (must match instrumentation.ts)
 
@@ -46,19 +47,7 @@ export const GET = pipe(withSentry('/api/realtime/token'))(async (ctx) => {
   // Use .trim() to handle env vars with trailing whitespace/newlines
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
-  const azureDeployment = useV21
-    ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21?.trim() ||
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim() ||
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
-      process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
-    : useV2
-      ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2?.trim() ||
-        process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
-        process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
-      : useV15
-        ? process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15?.trim() ||
-          process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim()
-        : process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
+  const azureDeployment = resolveRealtimeDeployment({ useV15, useV2, useV21 });
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
