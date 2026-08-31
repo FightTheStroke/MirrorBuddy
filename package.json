@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "script": "tsx --conditions=react-server",
-    "dev": "cd apps/web && next dev",
+    "dev": "bash scripts/dev-server.sh",
     "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; cd apps/web && next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) bash -c 'cd apps/web && next build'",
     "start": "node apps/web/.next/standalone/apps/web/server.js",
