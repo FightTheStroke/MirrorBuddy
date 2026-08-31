@@ -389,10 +389,6 @@
       "ctaQuestion": "Vuoi accesso completo?",
       "ctaButton": "Richiedi Beta"
     },
-    "voiceFallback": {
-      "message": "Messaggio",
-      "title": "Titolo"
-    },
     "welcomeForm": {
       "age": "Età",
       "collectedData": "Dati raccolti",
@@ -544,56 +540,6 @@
       "heading": "Studenti con DSA stanno imparando meglio",
       "tagline": "Le famiglie scelgono MirrorBuddy per supporto inclusivo e divertente",
       "testimonialPrompt": "Leggi le storie di successo dei nostri studenti"
-    },
-    "guides": {
-      "heading": "Incontra i tuoi",
-      "headingHighlight": "Compagni di Viaggio",
-      "subtitle": "Coach, Buddies e Maestri pronti ad aiutarti in ogni momento",
-      "teamTitle": "Un intero team al tuo servizio!",
-      "coachCount": "6 Coaches",
-      "coachDesc": "per il metodo di studio",
-      "buddyCount": "6 Buddies",
-      "buddyDesc": "per il supporto emotivo",
-      "maestriCount": "32 Maestri",
-      "maestriDesc": "esperti di materia",
-      "teaser": "Galileo, Darwin, Manzoni, Erodoto, Mozart, Socrate, Feynman e tanti altri ti aspettano!",
-      "categoryCoach": "Coach",
-      "categoryBuddy": "Buddy",
-      "categoryMaestro": "Maestro",
-      "items": {
-        "melissa": {
-          "role": "Learning Coach",
-          "description": "Ti guida nel tuo metodo di studio personalizzato"
-        },
-        "enea": {
-          "role": "Peer Buddy",
-          "description": "Compagno allegro che sa tirare su il morale"
-        },
-        "euclide": {
-          "role": "Maestro di Matematica",
-          "description": "Esperto di algebra, geometria e aritmetica"
-        },
-        "curie": {
-          "role": "Maestra di Chimica",
-          "description": "Pioniera della scienza, due premi Nobel!"
-        },
-        "leonardo": {
-          "role": "Maestro di Arte",
-          "description": "Genio del Rinascimento, artista e inventore"
-        },
-        "shakespeare": {
-          "role": "Maestro di Inglese",
-          "description": "Il più grande drammaturgo di tutti i tempi"
-        },
-        "feynman": {
-          "role": "Maestro di Fisica",
-          "description": "Premio Nobel, spiega la fisica con passione"
-        },
-        "erodoto": {
-          "role": "Maestro di Storia",
-          "description": "Il padre della storia, racconta il passato"
-        }
-      }
     },
     "maestriStep": {
       "heading": "I tuoi Professori, {name}!",

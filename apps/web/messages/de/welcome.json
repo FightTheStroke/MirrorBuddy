@@ -389,10 +389,6 @@
       "ctaQuestion": "Möchtest du vollen Zugriff?",
       "ctaButton": "Beta anfordern"
     },
-    "voiceFallback": {
-      "message": "Nachricht",
-      "title": "Titel"
-    },
     "welcomeForm": {
       "age": "Alter",
       "collectedData": "Gesammelte Daten",
@@ -556,56 +552,6 @@
       "p5": "«Man muss ihn in einen Käfig sperren» sagte das Männchen. «Aber warum?» fragte der Vater. «Er hat kein Gehirn mehr, darum. Wenn Ihr ihn frei herumlaufen lasst, wird er in die Wälder fliegen wie ein Vögelchen, und in wenigen Tagen wird er verhungern!» Der Vater sperrte mich in einen Käfig, wie einen Kanarienvogel. Der Käfig war klein, eng, ich konnte mich nicht bewegen. Die Stäbe drückten mich so sehr, dass... schließlich wachte ich erschrocken auf. Zum Glück war es nur ein Traum gewesen!",
       "p6": "Ich versichere euch, dass ich mich sofort an die Hausaufgaben gemacht habe.",
       "connection": "MirrorBuddy macht deine Hausaufgaben nicht für dich. Es hilft dir zu verstehen, wie du sie selbst machen kannst."
-    },
-    "guides": {
-      "heading": "Triff deine",
-      "headingHighlight": "Reisebegleiter",
-      "subtitle": "Coaches, Buddies und Meister, die dir jederzeit helfen",
-      "teamTitle": "Ein ganzes Team für dich!",
-      "coachCount": "6 Coaches",
-      "coachDesc": "für Lernmethoden",
-      "buddyCount": "6 Buddies",
-      "buddyDesc": "für emotionale Unterstützung",
-      "maestriCount": "32 Meister",
-      "maestriDesc": "Fachexperten",
-      "teaser": "Galileo, Darwin, Manzoni, Herodot, Mozart, Sokrates, Feynman und viele mehr warten auf dich!",
-      "categoryCoach": "Coach",
-      "categoryBuddy": "Buddy",
-      "categoryMaestro": "Meister",
-      "items": {
-        "melissa": {
-          "role": "Lern-Coach",
-          "description": "Begleitet dich bei deiner persönlichen Lernmethode"
-        },
-        "enea": {
-          "role": "Peer Buddy",
-          "description": "Fröhlicher Begleiter, der dich aufmuntern kann"
-        },
-        "euclide": {
-          "role": "Mathematik-Meister",
-          "description": "Experte für Algebra, Geometrie und Arithmetik"
-        },
-        "curie": {
-          "role": "Chemie-Meisterin",
-          "description": "Pionierin der Wissenschaft, zwei Nobelpreise!"
-        },
-        "leonardo": {
-          "role": "Kunst-Meister",
-          "description": "Renaissance-Genie, Künstler und Erfinder"
-        },
-        "shakespeare": {
-          "role": "Englisch-Meister",
-          "description": "Der größte Dramatiker aller Zeiten"
-        },
-        "feynman": {
-          "role": "Physik-Meister",
-          "description": "Nobelpreisträger, erklärt Physik mit Leidenschaft"
-        },
-        "erodoto": {
-          "role": "Geschichte-Meister",
-          "description": "Der Vater der Geschichte, erzählt die Vergangenheit"
-        }
-      }
     },
     "maestriStep": {
       "heading": "Deine Professoren, {name}!",
