@@ -30,7 +30,7 @@ export function ProgressIndicator({
   const voiceMode = useVoiceModeInfo(hasCheckedAzure, useWebSpeechFallback, connectionInfo, t);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
+    <div className="fixed top-[var(--maintenance-banner-offset)] left-0 right-0 z-50 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-600 dark:text-gray-400">

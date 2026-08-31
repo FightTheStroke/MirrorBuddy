@@ -44,7 +44,7 @@ export interface PreparedContext {
   userSettings: UserSettings | null;
   providerPreference: AIProvider | 'auto' | undefined;
   enhancedSystemPrompt: string;
-  safetyBlock: { blocked: true; response: string } | null;
+  safetyBlock: { blocked: true; response: string; category?: string } | null;
   budgetExceeded: boolean;
 }
 
@@ -160,7 +160,7 @@ export async function enhancePromptWithContext(
 export function checkInputSafety(
   content: string,
   context?: { userId?: string; conversationId?: string; maestroId?: string; locale?: string },
-): { blocked: true; response: string } | null {
+): { blocked: true; response: string; category?: string } | null {
   const filterResult = filterInput(content);
   if (
     !filterResult.safe &&
@@ -217,6 +217,7 @@ export function checkInputSafety(
     return {
       blocked: true,
       response: filterResult.suggestedResponse || 'Content blocked.',
+      category: filterResult.category,
     };
   }
   return null;

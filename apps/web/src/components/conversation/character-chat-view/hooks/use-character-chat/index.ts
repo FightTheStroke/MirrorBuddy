@@ -2,55 +2,40 @@
  * Use-character-chat hook - main implementation
  */
 
-import { useState, useRef, useEffect, useCallback } from "react";
-import { logger } from "@/lib/logger";
-import { useConversationStore, useSettingsStore } from "@/lib/stores";
-import {
-  useVoiceSession,
-  type ConnectionInfo,
-} from "@/lib/hooks/use-voice-session";
-import { useSessionMetrics } from "@/hooks/useSessionMetrics";
-import type { ToolType, ToolState } from "@/types/tools";
-import type { CharacterInfo } from "../../utils/character-utils";
-import { characterToMaestro } from "../../utils/character-utils";
-import type { Message } from "./types";
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
+import { useConversationStore, useSettingsStore } from '@/lib/stores';
+import { useVoiceSession, type ConnectionInfo } from '@/lib/hooks/use-voice-session';
+import { useSessionMetrics } from '@/hooks/useSessionMetrics';
+import type { ToolType, ToolState } from '@/types/tools';
+import type { CharacterInfo } from '../../utils/character-utils';
+import { characterToMaestro } from '../../utils/character-utils';
+import type { Message } from './types';
 import {
   loadMessagesFromServer,
   convertStoreMessages,
   fetchContextualGreeting,
   createGreetingMessage,
-} from "./conversation-loader";
-import { createUserMessage, createErrorMessage } from "./message-handler";
-import { isStreamingAvailable } from "./streaming-handler";
-import { handleSendMessage } from "./send-handler";
-import {
-  requestTool,
-  createInitialToolState,
-  createErrorToolState,
-} from "./tool-handler";
-import {
-  fetchVoiceConnectionInfo,
-  handleMicrophoneError,
-} from "./voice-handler";
+} from './conversation-loader';
+import { createUserMessage, createErrorMessage } from './message-handler';
+import { isStreamingAvailable } from './streaming-handler';
+import { handleSendMessage } from './send-handler';
+import { requestTool, createInitialToolState, createErrorToolState } from './tool-handler';
+import { fetchVoiceConnectionInfo, handleMicrophoneError } from './voice-handler';
 
-export function useCharacterChat(
-  characterId: string,
-  character: CharacterInfo,
-) {
+export function useCharacterChat(characterId: string, character: CharacterInfo) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(
-    null,
-  );
+  const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
 
   // Streaming state
   const [streamingEnabled, setStreamingEnabled] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [streamedContent, setStreamedContent] = useState("");
+  const [streamedContent, setStreamedContent] = useState('');
   const streamAbortRef = useRef<AbortController | null>(null);
 
   // Session metrics tracking (REAL data from API)
@@ -76,22 +61,22 @@ export function useCharacterChat(
 
   // Get user's language preference from settings
   const language = useSettingsStore((state) => state.appearance.language) as
-    | "it"
-    | "en"
-    | "es"
-    | "fr"
-    | "de";
+    | 'it'
+    | 'en'
+    | 'es'
+    | 'fr'
+    | 'de';
   // Get student name for contextual greetings
   const studentName = useSettingsStore((state) => state.studentProfile.name);
 
   const voiceSession = useVoiceSession({
     onTranscript: (role, text) => {
-      if (role === "user") {
+      if (role === 'user') {
         setMessages((prev) => [
           ...prev,
           {
             id: `voice-${Date.now()}`,
-            role: "user",
+            role: 'user',
             content: text,
             timestamp: new Date(),
             isVoice: true,
@@ -105,10 +90,7 @@ export function useCharacterChat(
 
   // Reset messages when character changes
   useEffect(() => {
-    if (
-      lastCharacterIdRef.current !== null &&
-      lastCharacterIdRef.current !== characterId
-    ) {
+    if (lastCharacterIdRef.current !== null && lastCharacterIdRef.current !== characterId) {
       hasLoadedMessages.current = false;
       setMessages([]);
       conversationIdRef.current = null;
@@ -128,7 +110,7 @@ export function useCharacterChat(
   useEffect(() => {
     isStreamingAvailable().then((available) => {
       setStreamingEnabled(available);
-      if (available) logger.debug("[CharacterChat] Streaming enabled");
+      if (available) logger.debug('[CharacterChat] Streaming enabled');
     });
   }, []);
 
@@ -136,7 +118,7 @@ export function useCharacterChat(
   useEffect(() => {
     const startConnection = async () => {
       if (!isVoiceActive || hasAttemptedConnection.current) return;
-      if (!connectionInfo || isConnected || connectionState !== "idle") return;
+      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
 
       hasAttemptedConnection.current = true;
       setConfigError(null);
@@ -144,16 +126,16 @@ export function useCharacterChat(
       try {
         // Convert messages to format needed for voice context
         const initialMessages = messages
-          .filter((m) => m.role === "user" || m.role === "assistant")
+          .filter((m) => m.role === 'user' || m.role === 'assistant')
           .map((m) => ({
-            role: m.role as "user" | "assistant",
+            role: m.role as 'user' | 'assistant',
             content: m.content,
           }));
 
         const maestroLike = characterToMaestro(character, characterId);
         await connect(maestroLike, { ...connectionInfo, initialMessages });
       } catch (error) {
-        logger.error("Voice connection failed", { error: String(error) });
+        logger.error('Voice connection failed', { error: String(error) });
         setConfigError(handleMicrophoneError(error));
       }
     };
@@ -177,7 +159,7 @@ export function useCharacterChat(
 
   // Auto-scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   // Initialize conversation
@@ -186,9 +168,7 @@ export function useCharacterChat(
     hasLoadedMessages.current = true;
 
     async function initConversation() {
-      const existingConv = conversations.find(
-        (c) => c.maestroId === characterId,
-      );
+      const existingConv = conversations.find((c) => c.maestroId === characterId);
 
       let loadedMessages: Message[] = [];
 
@@ -221,8 +201,8 @@ export function useCharacterChat(
 
       const greetingMessage: Message = contextualResult
         ? {
-            id: "greeting",
-            role: "assistant",
+            id: 'greeting',
+            role: 'assistant',
             content: contextualResult.greeting,
             timestamp: new Date(),
           }
@@ -233,21 +213,14 @@ export function useCharacterChat(
       // Save greeting to store
       if (conversationIdRef.current) {
         addMessageToStore(conversationIdRef.current, {
-          role: "assistant",
+          role: 'assistant',
           content: greetingMessage.content,
         });
       }
     }
 
     initConversation();
-  }, [
-    characterId,
-    conversations,
-    createConversation,
-    character,
-    studentName,
-    addMessageToStore,
-  ]);
+  }, [characterId, conversations, createConversation, character, studentName, addMessageToStore]);
 
   // Handle send message
   const handleSend = useCallback(async () => {
@@ -255,13 +228,13 @@ export function useCharacterChat(
 
     const userMessage = createUserMessage(input);
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setInput('');
     setIsLoading(true);
-    setStreamedContent("");
+    setStreamedContent('');
 
     if (conversationIdRef.current) {
       addMessageToStore(conversationIdRef.current, {
-        role: "user",
+        role: 'user',
         content: userMessage.content,
       });
     }
@@ -282,7 +255,7 @@ export function useCharacterChat(
           setIsStreaming(true);
           setMessages((prev) => [
             ...prev,
-            { id, role: "assistant", content: "", timestamp: new Date() },
+            { id, role: 'assistant', content: '', timestamp: new Date() },
           ]);
         },
         onStreamingChunk: (id, accumulated) => {
@@ -294,16 +267,24 @@ export function useCharacterChat(
         onStreamingComplete: (id, fullResponse, metrics) => {
           setIsStreaming(false);
           streamAbortRef.current = null;
+          const safetyCategory = metrics?.safetyEvent?.blocked
+            ? metrics.safetyEvent.category
+            : undefined;
           setMessages((prev) =>
             prev.map((m) =>
               m.id === id
-                ? { ...m, id: `assistant-${Date.now()}`, content: fullResponse }
+                ? {
+                    ...m,
+                    id: `assistant-${Date.now()}`,
+                    content: fullResponse,
+                    safetyCategory,
+                  }
                 : m,
             ),
           );
           if (conversationIdRef.current)
             addMessageToStore(conversationIdRef.current, {
-              role: "assistant",
+              role: 'assistant',
               content: fullResponse,
             });
 
@@ -316,15 +297,17 @@ export function useCharacterChat(
             });
           }
 
+          // F-06: a streamed safety block is a correct refusal.
+          if (metrics?.safetyEvent?.blocked) {
+            recordRefusal(true);
+          }
+
           setIsLoading(false);
         },
         onStreamingError: (id) => {
           setIsStreaming(false);
           streamAbortRef.current = null;
-          setMessages((prev) => [
-            ...prev.filter((m) => m.id !== id),
-            createErrorMessage(),
-          ]);
+          setMessages((prev) => [...prev.filter((m) => m.id !== id), createErrorMessage()]);
           setIsLoading(false);
         },
         onStreamingFallback: (id) => {
@@ -335,7 +318,7 @@ export function useCharacterChat(
           setMessages((prev) => [...prev, assistantMessage]);
           if (conversationIdRef.current)
             addMessageToStore(conversationIdRef.current, {
-              role: "assistant",
+              role: 'assistant',
               content: assistantMessage.content,
             });
           if (toolState) setActiveTool(toolState);
@@ -353,7 +336,7 @@ export function useCharacterChat(
           if (metrics.safetyEvent?.blocked) {
             // Safety filter blocks are considered correct refusals
             recordRefusal(true);
-            logger.debug("Safety refusal recorded", {
+            logger.debug('Safety refusal recorded', {
               category: metrics.safetyEvent.category,
             });
           }
@@ -398,13 +381,12 @@ export function useCharacterChat(
           characterId,
           language,
         );
-        if (assistantMessage)
-          setMessages((prev) => [...prev, assistantMessage]);
+        if (assistantMessage) setMessages((prev) => [...prev, assistantMessage]);
         setActiveTool(toolState);
       } catch (error) {
-        logger.error("Tool request error", undefined, error);
+        logger.error('Tool request error', undefined, error);
         setMessages((prev) => [...prev, createErrorMessage()]);
-        setActiveTool(createErrorToolState(toolType, "Tool request failed"));
+        setActiveTool(createErrorToolState(toolType, 'Tool request failed'));
       } finally {
         setIsLoading(false);
       }

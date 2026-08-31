@@ -56,7 +56,7 @@ export function AdminHeader({
     <header
       className={cn(
         'h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800',
-        'flex items-center justify-between px-3 sm:px-4 sticky top-0 z-30',
+        'flex items-center justify-between px-3 sm:px-4 sticky top-[var(--maintenance-banner-offset)] z-30',
       )}
     >
       <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">

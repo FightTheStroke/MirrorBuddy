@@ -1,0 +1,52 @@
+{
+  "safetyBlock": {
+    "heading": "Sicherheitshinweis",
+    "categories": {
+      "crisis": {
+        "title": "Du bist mir wichtig",
+        "message": "Was du fühlst, ist wichtig, und du bist nicht allein.",
+        "action": "Sprich bitte sofort mit einer erwachsenen Person, der du vertraust: einem Elternteil, einer Lehrkraft, oder ruf den Notruf an."
+      },
+      "harmful": {
+        "title": "Hier hören wir lieber auf",
+        "message": "Bei Dingen, die jemandem wehtun könnten, kann ich nicht helfen.",
+        "action": "Wenn du Hilfe brauchst, sprich mit einer erwachsenen Person, der du vertraust. Wir können zusammen etwas Sicheres lernen."
+      },
+      "explicit": {
+        "title": "Bleiben wir bei den Aufgaben",
+        "message": "Dieses Thema ist hier nichts für uns.",
+        "action": "Frag mich lieber etwas zu deinen Fächern: darin bin ich richtig gut!"
+      },
+      "privacy": {
+        "title": "Schützen wir deine Daten",
+        "message": "Persönliche Daten bleiben besser privat: zum Lernen mit mir brauchst du sie nicht.",
+        "action": "Frag mich lieber etwas zu deinen Hausaufgaben oder deinen Fächern."
+      },
+      "unclear": {
+        "title": "Das habe ich nicht ganz verstanden",
+        "message": "Diese Anfrage ist mir nicht klar.",
+        "action": "Versuch es mit einfacheren Worten."
+      },
+      "fairness": {
+        "title": "Reden wir respektvoll",
+        "message": "Ich spreche gern fair und freundlich über Menschen.",
+        "action": "Versuchen wir es noch einmal und schauen das Thema ausgewogener an."
+      },
+      "language": {
+        "title": "Nutzen wir freundliche Worte",
+        "message": "Mit freundlichen Worten verstehen wir uns besser.",
+        "action": "Versuch, deine Frage ruhiger zu schreiben."
+      },
+      "stem": {
+        "title": "Manche Details behalte ich sicher für mich",
+        "message": "Manches in der Wissenschaft kann gefährlich sein, deshalb gebe ich einige Details nicht weiter.",
+        "action": "Ich kann dir allgemein erklären, wie es funktioniert: frag mich einfach!"
+      },
+      "generic": {
+        "title": "Versuchen wir eine andere Frage",
+        "message": "Diese kann ich gerade nicht beantworten.",
+        "action": "Versuchen wir etwas anderes: was möchtest du heute lernen?"
+      }
+    }
+  }
+}

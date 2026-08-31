@@ -495,11 +495,6 @@
       "previousPageAriaLabel": "Página anterior",
       "nextPageAriaLabel": "Página siguiente"
     },
-    "chatDrawer": {
-      "hideChat": "Ocultar chat",
-      "showChat": "Mostrar chat",
-      "startConversation": "Inicia una conversación con el Profesor..."
-    },
     "maestros": {
       "arialabelchiudiEsc": "aria-label=\"Cerrar (Esc)\"",
       "arialabelchiudi": "aria-label=\"Cerrar\""

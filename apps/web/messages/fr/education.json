@@ -324,10 +324,7 @@
       "emptyDescription": "Aucun support archivé pour le moment.",
       "emptyMaterials": "Empty Materials",
       "emptyPreferred": "Empty Preferred",
-      "gridView": "Vue grille",
-      "listView": "Vue liste",
       "searchPlaceholder": "Rechercher dans les supports archivés...",
-      "sortLabel": "Trier par",
       "startConversation": "Start Conversation",
       "subtitle": "Revois les supports enregistrés et continue à étudier.",
       "title": "Archive",
@@ -408,10 +405,6 @@
       "recent": "Recent",
       "chooseStudyPartner": "Choisissez avec qui étudier",
       "close": "Fermer"
-    },
-    "emptyMetrics": {
-      "description": "Descrizione",
-      "nessunaMetricaDisponibile": "Nessuna metrica disponibile"
     },
     "flashcard": {
       "again": "Again",
@@ -588,33 +581,6 @@
         "subtitle": "Suivez les progrès, les habitudes et les besoins de soutien.",
         "title": "Tableau de bord parents"
       },
-      "learningStyle": {
-        "approach": "Approach",
-        "bestTime": "Best time",
-        "channels": {
-          "auditory": "Auditory",
-          "kinesthetic": "Kinesthetic",
-          "reading_writing": "Reading writing",
-          "visual": "Visual"
-        },
-        "optimalSession": "Optimal session",
-        "preferences": {
-          "big_picture": "Big picture",
-          "mixed": "Mixed",
-          "step_by_step": "Step by step"
-        },
-        "preferredChannel": "Preferred channel",
-        "times": {
-          "afternoon": "Afternoon",
-          "evening": "Evening",
-          "morning": "Morning"
-        },
-        "min": "min"
-      },
-      "observation": {
-        "confidence": "Confidence",
-        "observed": "Observed"
-      },
       "quiz": {
         "noQuizzes": "No quizzes",
         "performanceQuiz1": "Performance quiz",
@@ -626,19 +592,6 @@
         "record": "Record",
         "perMateria": "Per materia",
         "quiz": "quiz"
-      },
-      "stats": {
-        "maestri": "Maestri",
-        "sessions": "Sessions",
-        "totalTime": "Total time"
-      },
-      "strategy": {
-        "priority": {
-          "high": "High",
-          "low": "Low",
-          "medium": "Medium"
-        },
-        "suggestedBy": "Suggested by"
       },
       "tabs": {
         "accessibility": "Accessibility",
@@ -686,39 +639,6 @@
       "quizDescription": "Quiz description",
       "startFlashcardButton": "Démarrer les flashcards",
       "startQuizButton": "Démarrer le quiz"
-    },
-    "subjectConfirmation": {
-      "chooseProfessor": "Choose Professor",
-      "photoAlt": "Photo Alt",
-      "selectSubject": "Select Subject",
-      "maestroPanel": {
-        "description": "Descrizione",
-        "vuoiStudiare": "Vuoi studiare",
-        "continuaSenzaMaestro": "Continua senza Maestro",
-        "usaISuggerimentiMaieuticiPerRisolvereDaSolo": "Usa i suggerimenti maieutici per risolvere da solo",
-        "tornaAllaSelezioneMateria": "Torna alla selezione materia"
-      },
-      "subjectPanel": {
-        "cancel": "Annuler",
-        "confirm": "Confirmer",
-        "confirmOrSelect": "Confirm Or Select",
-        "detected": "Detected",
-        "selectCorrect": "Select Correct",
-        "unrecognized": "Unrecognized"
-      }
-    },
-    "successMetrics": {
-      "milestones": "Milestones",
-      "milestonesDescription": "Milestones Description",
-      "overallScore": "Overall Score",
-      "progressDescription": "Progress Description",
-      "quote": "Quote",
-      "quoteAuthor": "Quote Author",
-      "title": "Titolo",
-      "upcomingMilestones": "Upcoming Milestones",
-      "metricsSection": "Métriques de succès",
-      "milestonesAchieved": "milestones achieved,",
-      "pending": "pending"
     },
     "summaries": {
       "createButton": "Créer",
@@ -1185,7 +1105,7 @@
     "indizio": "Indizio: Guarda la tastiera qui sotto per trovare",
     "ilTastoColorato": "il tasto colorato.",
     "typingInputArea": "Typing input area",
-    "virtualKeyboard": "Virtual keyboard",
+    "virtualKeyboard": "Clavier virtuel",
     "study": "Study",
     "browse": "Browse",
     "stats": "Stats",
@@ -1239,7 +1159,7 @@
     "achievementDate": "Data traguardo: {date}",
     "azioniPerElementi": "Azioni per {count} elementi selezionati",
     "fingerPlacement": "Posizionamento dito per tasto {key}",
-    "keyAriaLabel": "Tasto {key}",
+    "keyAriaLabel": "Touche {key}",
     "quizBreakTimer": {
       "title": "C'est l'heure de la pause !",
       "message": "Tu travailles depuis un moment. Fais une courte pause avant de continuer le quiz.",

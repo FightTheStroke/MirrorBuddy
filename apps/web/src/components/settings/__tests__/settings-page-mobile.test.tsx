@@ -167,7 +167,7 @@ describe('SettingsPageMobile', () => {
 
     const header = container.querySelector('header');
     expect(header?.className).toMatch(/sticky/);
-    expect(header?.className).toMatch(/top-0/);
+    expect(header?.className).toMatch(/top-\[var\(--maintenance-banner-offset\)\]/);
     expect(header?.className).toMatch(/z-40/);
   });
 

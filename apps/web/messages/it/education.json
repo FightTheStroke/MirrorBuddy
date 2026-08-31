@@ -406,10 +406,7 @@
       "emptyDescription": "Nessun materiale archiviato al momento.",
       "emptyMaterials": "Empty Materials",
       "emptyPreferred": "Empty Preferred",
-      "gridView": "Vista griglia",
-      "listView": "Vista elenco",
       "searchPlaceholder": "Cerca nei materiali archiviati...",
-      "sortLabel": "Ordina per",
       "startConversation": "Start Conversation",
       "subtitle": "Rivedi i materiali salvati e continua a studiare.",
       "title": "Archivio",
@@ -495,10 +492,6 @@
       "recent": "Recent",
       "chooseStudyPartner": "Scegli con chi studiare",
       "close": "Chiudi"
-    },
-    "emptyMetrics": {
-      "description": "Descrizione",
-      "nessunaMetricaDisponibile": "Nessuna metrica disponibile"
     },
     "flashcard": {
       "again": "Again",
@@ -670,33 +663,6 @@
         "subtitle": "Monitora progressi, abitudini e bisogni di supporto.",
         "title": "Dashboard genitori"
       },
-      "learningStyle": {
-        "approach": "Approach",
-        "bestTime": "Best time",
-        "channels": {
-          "auditory": "Auditory",
-          "kinesthetic": "Kinesthetic",
-          "reading_writing": "Reading writing",
-          "visual": "Visual"
-        },
-        "optimalSession": "Optimal session",
-        "preferences": {
-          "big_picture": "Big picture",
-          "mixed": "Mixed",
-          "step_by_step": "Step by step"
-        },
-        "preferredChannel": "Preferred channel",
-        "times": {
-          "afternoon": "Afternoon",
-          "evening": "Evening",
-          "morning": "Morning"
-        },
-        "min": "min"
-      },
-      "observation": {
-        "confidence": "Confidence",
-        "observed": "Observed"
-      },
       "quiz": {
         "noQuizzes": "No quizzes",
         "performanceQuiz1": "Performance quiz",
@@ -708,19 +674,6 @@
         "record": "Record",
         "perMateria": "Per materia",
         "quiz": "quiz"
-      },
-      "stats": {
-        "maestri": "Maestri",
-        "sessions": "Sessions",
-        "totalTime": "Total time"
-      },
-      "strategy": {
-        "priority": {
-          "high": "High",
-          "low": "Low",
-          "medium": "Medium"
-        },
-        "suggestedBy": "Suggested by"
       },
       "tabs": {
         "accessibility": "Accessibility",
@@ -773,39 +726,6 @@
       "quizDescription": "Quiz description",
       "startFlashcardButton": "Avvia flashcard",
       "startQuizButton": "Avvia quiz"
-    },
-    "subjectConfirmation": {
-      "chooseProfessor": "Choose Professor",
-      "photoAlt": "Photo Alt",
-      "selectSubject": "Select Subject",
-      "maestroPanel": {
-        "description": "Descrizione",
-        "vuoiStudiare": "Vuoi studiare",
-        "continuaSenzaMaestro": "Continua senza Maestro",
-        "usaISuggerimentiMaieuticiPerRisolvereDaSolo": "Usa i suggerimenti maieutici per risolvere da solo",
-        "tornaAllaSelezioneMateria": "Torna alla selezione materia"
-      },
-      "subjectPanel": {
-        "cancel": "Annulla",
-        "confirm": "Conferma",
-        "confirmOrSelect": "Confirm Or Select",
-        "detected": "Detected",
-        "selectCorrect": "Select Correct",
-        "unrecognized": "Unrecognized"
-      }
-    },
-    "successMetrics": {
-      "milestones": "Milestones",
-      "milestonesDescription": "Milestones Description",
-      "overallScore": "Overall Score",
-      "progressDescription": "Progress Description",
-      "quote": "Quote",
-      "quoteAuthor": "Quote Author",
-      "title": "Titolo",
-      "upcomingMilestones": "Upcoming Milestones",
-      "metricsSection": "Metriche di successo",
-      "milestonesAchieved": "milestones achieved,",
-      "pending": "pending"
     },
     "summaries": {
       "createButton": "Crea",
@@ -1190,7 +1110,7 @@
     "indizio": "Indizio: Guarda la tastiera qui sotto per trovare",
     "ilTastoColorato": "il tasto colorato.",
     "typingInputArea": "Typing input area",
-    "virtualKeyboard": "Virtual keyboard",
+    "virtualKeyboard": "Tastiera virtuale",
     "study": "Study",
     "browse": "Browse",
     "stats": "Stats",

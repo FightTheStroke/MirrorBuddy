@@ -136,7 +136,7 @@ export function HomeSidebar({
       )}
       <aside
         className={cn(
-          'fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 flex flex-col',
+          'fixed top-[var(--maintenance-banner-offset)] left-0 h-[calc(100%_-_var(--maintenance-banner-offset))] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 flex flex-col',
           'w-64 max-w-[85vw] lg:max-w-none lg:w-64',
           open ? 'translate-x-0 lg:w-64' : '-translate-x-full lg:translate-x-0 lg:w-20',
         )}

@@ -389,10 +389,6 @@
       "ctaQuestion": "¿Quieres acceso completo?",
       "ctaButton": "Solicitar beta"
     },
-    "voiceFallback": {
-      "message": "Mensaje",
-      "title": "Título"
-    },
     "welcomeForm": {
       "age": "Edad",
       "collectedData": "Datos recopilados",
@@ -556,56 +552,6 @@
       "p5": "«Habrá que tenerlo en una jaula» dijo el hombrecillo. «¿Pero por qué?» preguntó papá. «Ya no tiene cerebro, por eso. Si lo dejan andar por ahí, volará al bosque como un pajarillo, ¡y en pocos días morirá de hambre!» Papá me encerró en una jaula, como a un canario. La jaula era pequeña, estrecha, no podía moverme. Los barrotes me apretaban tanto que... al final me desperté asustado. ¡Menos mal que había sido solo un sueño!",
       "p6": "Os aseguro que me puse inmediatamente a hacer los deberes.",
       "connection": "MirrorBuddy no hace los deberes por ti. Te ayuda a entender cómo hacerlos."
-    },
-    "guides": {
-      "heading": "Conoce a tus",
-      "headingHighlight": "Compañeros de Viaje",
-      "subtitle": "Coaches, Buddies y Maestros listos para ayudarte en cada momento",
-      "teamTitle": "¡Un equipo entero a tu servicio!",
-      "coachCount": "6 Coaches",
-      "coachDesc": "para métodos de estudio",
-      "buddyCount": "6 Buddies",
-      "buddyDesc": "para apoyo emocional",
-      "maestriCount": "32 Maestros",
-      "maestriDesc": "expertos en materias",
-      "teaser": "¡Galileo, Darwin, Manzoni, Heródoto, Mozart, Sócrates, Feynman y muchos más te esperan!",
-      "categoryCoach": "Coach",
-      "categoryBuddy": "Buddy",
-      "categoryMaestro": "Maestro",
-      "items": {
-        "melissa": {
-          "role": "Coach de aprendizaje",
-          "description": "Te guía en tu método de estudio personalizado"
-        },
-        "enea": {
-          "role": "Peer Buddy",
-          "description": "Compañero alegre que sabe levantar el ánimo"
-        },
-        "euclide": {
-          "role": "Maestro de Matemáticas",
-          "description": "Experto en álgebra, geometría y aritmética"
-        },
-        "curie": {
-          "role": "Maestra de Química",
-          "description": "Pionera de la ciencia, ¡dos premios Nobel!"
-        },
-        "leonardo": {
-          "role": "Maestro de Arte",
-          "description": "Genio del Renacimiento, artista e inventor"
-        },
-        "shakespeare": {
-          "role": "Maestro de Inglés",
-          "description": "El mayor dramaturgo de todos los tiempos"
-        },
-        "feynman": {
-          "role": "Maestro de Física",
-          "description": "Premio Nobel, explica la física con pasión"
-        },
-        "erodoto": {
-          "role": "Maestro de Historia",
-          "description": "El padre de la historia, cuenta el pasado"
-        }
-      }
     },
     "maestriStep": {
       "heading": "¡Tus Profesores, {name}!",

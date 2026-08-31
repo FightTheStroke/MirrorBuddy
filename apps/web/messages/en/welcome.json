@@ -389,10 +389,6 @@
       "ctaQuestion": "Want full access?",
       "ctaButton": "Request Beta"
     },
-    "voiceFallback": {
-      "message": "Message",
-      "title": "Title"
-    },
     "welcomeForm": {
       "age": "Age",
       "collectedData": "Collected data",
@@ -556,56 +552,6 @@
       "p5": "'You'll have to keep him in a cage,' said the little man. 'But why?' asked my father. 'He has no brain anymore, that's why. If you let him go outside, he'll fly into the woods like a little bird, and in a few days he'll die of hunger!' My father shut me in a cage, like a canary. The cage was small, tight, I couldn't move. The bars squeezed me so much that... in the end I woke up frightened. Thank goodness it had only been a dream!",
       "p6": "I assure you I immediately got down to doing my homework.",
       "connection": "MirrorBuddy doesn't do your homework for you. It helps you understand how to do it."
-    },
-    "guides": {
-      "heading": "Meet your",
-      "headingHighlight": "Travel Companions",
-      "subtitle": "Coaches, Buddies and Maestri ready to help you at every moment",
-      "teamTitle": "An entire team at your service!",
-      "coachCount": "6 Coaches",
-      "coachDesc": "for study methods",
-      "buddyCount": "6 Buddies",
-      "buddyDesc": "for emotional support",
-      "maestriCount": "32 Maestri",
-      "maestriDesc": "subject experts",
-      "teaser": "Galileo, Darwin, Manzoni, Herodotus, Mozart, Socrates, Feynman and many more are waiting for you!",
-      "categoryCoach": "Coach",
-      "categoryBuddy": "Buddy",
-      "categoryMaestro": "Maestro",
-      "items": {
-        "melissa": {
-          "role": "Learning Coach",
-          "description": "Guides you through your personalized study method"
-        },
-        "enea": {
-          "role": "Peer Buddy",
-          "description": "Cheerful companion who knows how to lift your spirits"
-        },
-        "euclide": {
-          "role": "Math Maestro",
-          "description": "Expert in algebra, geometry and arithmetic"
-        },
-        "curie": {
-          "role": "Chemistry Maestro",
-          "description": "Pioneer of science, two Nobel Prizes!"
-        },
-        "leonardo": {
-          "role": "Art Maestro",
-          "description": "Renaissance genius, artist and inventor"
-        },
-        "shakespeare": {
-          "role": "English Maestro",
-          "description": "The greatest playwright of all time"
-        },
-        "feynman": {
-          "role": "Physics Maestro",
-          "description": "Nobel Prize winner, explains physics with passion"
-        },
-        "erodoto": {
-          "role": "History Maestro",
-          "description": "The father of history, tells the past"
-        }
-      }
     },
     "maestriStep": {
       "heading": "Your Professors, {name}!",

@@ -279,33 +279,33 @@
         "target": "Target:  WPM"
       },
       "oneHanded": {
+        "title": "Modalità di scrittura",
         "hideInfo": "Nascondi informazioni",
-        "info": {
-          "active": "Attivo",
-          "description": "Descrizione",
-          "tips": "Suggerimenti",
-          "tipItems": [
-            "Posiziona la tastiera comodamente davanti a te",
-            "Usa i tasti modificatori (Shift, Ctrl) se necessario",
-            "Fai pause regolari per evitare l'affaticamento"
-          ]
-        },
+        "showInfo": "Mostra informazioni",
         "modes": {
           "both": {
-            "description": "Descrizione",
-            "label": "Etichetta"
+            "label": "Due mani",
+            "description": "Scrittura standard con entrambe le mani"
           },
           "leftOnly": {
-            "description": "Descrizione",
-            "label": "Etichetta"
+            "label": "Solo mano sinistra",
+            "description": "Lezioni con i tasti raggiungibili con la mano sinistra"
           },
           "rightOnly": {
-            "description": "Descrizione",
-            "label": "Etichetta"
+            "label": "Solo mano destra",
+            "description": "Lezioni con i tasti raggiungibili con la mano destra"
           }
         },
-        "showInfo": "Mostra informazioni",
-        "title": "Titolo"
+        "info": {
+          "active": "Modalità attiva:",
+          "description": "Le lezioni mostrano solo i tasti raggiungibili con la mano scelta.",
+          "tips": "Consigli:",
+          "tipItems": [
+            "Posiziona la tastiera comodamente davanti a te",
+            "Usa i tasti modificatori (Maiusc, Ctrl) se necessario",
+            "Fai pause regolari per evitare l'affaticamento"
+          ]
+        }
       },
       "progressTracker": {
         "noBadges": "Nessun badge",
@@ -627,7 +627,6 @@
     "feedbackDelMaestro": "Feedback del Maestro",
     "risolto": "Risolto",
     "haiAffrontatoQuestoPunto": "Hai affrontato questo punto",
-    "espandiChat": "Espandi chat",
     "nuovaSezione": "Nuova sezione",
     "parole": "parole",
     "punti": "punti",

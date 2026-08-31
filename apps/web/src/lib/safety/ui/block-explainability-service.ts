@@ -2,237 +2,95 @@
  * Block Explainability Service
  * Part of Ethical Design Hardening (F-06)
  *
- * Provides child-friendly explanations for blocked content,
- * helping students understand why certain content is unavailable.
+ * When the safety layer stops an answer, the student deserves to know that
+ * something was stopped and what to try instead — without being told the exact
+ * trigger, which would double as a manual for evading the filter.
+ *
+ * This module is intentionally COPY-FREE. It maps the REAL categories the
+ * safety layer emits (FilterResult.category from content-filter-core, plus
+ * 'bias', 'jailbreak' and 'stem_*' from the chat routes) onto a small, closed
+ * set of explanation buckets. The child-facing wording lives in next-intl
+ * (messages/<locale>/safetyBlock.json) and is resolved by the UI component, so
+ * every bucket is localised in all five locales and none is hardcoded here.
  */
-
-import { logger } from '@/lib/logger';
-import {
-  BlockExplanation,
-  SafetyFilterResult,
-  SafetyFilterType,
-  SAFETY_LABELS,
-} from './types';
-
-const log = logger.child({ module: 'block-explainability' });
 
 /**
- * Educational topic suggestions based on subject context
+ * Closed set of explanation buckets shown to the student.
+ * Deliberately coarser than the internal filter categories: several distinct
+ * internal outcomes collapse into one bucket so the wording can never reveal
+ * which specific rule fired.
  */
-const EDUCATIONAL_ALTERNATIVES: Record<string, string[]> = {
-  science: [
-    'esperimenti sicuri da fare a casa',
-    'come funziona il corpo umano',
-    'il sistema solare',
-    'gli animali e i loro habitat',
-  ],
-  history: [
-    'le civiltà antiche',
-    'esploratori famosi',
-    'invenzioni che hanno cambiato il mondo',
-    'la vita quotidiana nel passato',
-  ],
-  literature: [
-    'storie di avventura',
-    'poesie famose',
-    'miti e leggende',
-    'biografie di scrittori',
-  ],
-  math: [
-    'giochi matematici',
-    'la matematica nella vita quotidiana',
-    'curiosità sui numeri',
-    'problemi divertenti',
-  ],
-  general: [
-    'curiosità sul mondo',
-    'come funzionano le cose',
-    'domande sui tuoi compiti',
-    'argomenti delle tue materie preferite',
-  ],
+export const BLOCK_EXPLANATION_CATEGORIES = [
+  'crisis', // distress / self-harm signal — route to a trusted adult
+  'harmful', // could hurt someone (violence, weapons, illegal harm)
+  'explicit', // not-for-children content
+  'privacy', // personal information should stay private
+  'unclear', // request could not be understood safely (incl. jailbreak)
+  'fairness', // unfair / biased framing about people
+  'language', // unkind or strong language
+  'stem', // dangerous scientific detail withheld
+  'generic', // anything unmapped — safe, honest fallback
+] as const;
+
+export type BlockExplanationCategory = (typeof BLOCK_EXPLANATION_CATEGORIES)[number];
+
+/**
+ * Normalised, copy-free description of how to explain a block to the student.
+ */
+export interface BlockExplanationDescriptor {
+  /** Which localised explanation bucket to show. */
+  category: BlockExplanationCategory;
+  /** Whether to gently point the student towards a trusted adult. */
+  suggestAskAdult: boolean;
+  /**
+   * Whether it is honest and safe to invite the student to rephrase.
+   * False for crisis (a distress signal is not a filter to route around) and
+   * for privacy (rewording does not make sharing personal data appropriate).
+   */
+  suggestRephrase: boolean;
+}
+
+/**
+ * Direct map from an internal filter category to an explanation bucket.
+ * Anything not listed here (and anything with the 'stem_' prefix, handled
+ * separately) resolves to 'generic'.
+ */
+const CATEGORY_TO_BUCKET: Record<string, BlockExplanationCategory> = {
+  crisis: 'crisis',
+  violence: 'harmful',
+  explicit: 'explicit',
+  pii: 'privacy',
+  jailbreak: 'unclear',
+  bias: 'fairness',
+  profanity: 'language',
+  stem: 'stem',
 };
 
-/**
- * Generate user-friendly explanation for blocked content
- */
-export function generateBlockExplanation(
-  result: SafetyFilterResult,
-  subjectContext?: string
-): BlockExplanation {
-  const filterType = result.filterType || 'unknown';
+/** Buckets that warrant pointing the student to a trusted adult. */
+const ASK_ADULT_BUCKETS = new Set<BlockExplanationCategory>(['crisis', 'harmful']);
 
-  const explanation = buildExplanation(filterType, subjectContext);
-
-  log.debug('Generated block explanation', {
-    filterType,
-    suggestAskParent: explanation.suggestAskParent,
-  });
-
-  return explanation;
-}
+/** Buckets where inviting a rephrase would be dishonest or unsafe. */
+const NO_REPHRASE_BUCKETS = new Set<BlockExplanationCategory>(['crisis', 'privacy']);
 
 /**
- * Build explanation based on filter type
+ * Resolve the raw internal filter category into a safe, localisable descriptor.
+ *
+ * Never throws and never echoes the raw internal category back to the caller:
+ * an unknown or malformed value degrades to the generic bucket.
  */
-function buildExplanation(
-  filterType: SafetyFilterType,
-  subjectContext?: string
-): BlockExplanation {
-  const subject = subjectContext || 'general';
-  const alternatives =
-    EDUCATIONAL_ALTERNATIVES[subject] || EDUCATIONAL_ALTERNATIVES.general;
+export function resolveBlockExplanation(rawCategory?: string | null): BlockExplanationDescriptor {
+  const normalized = (rawCategory ?? '').trim().toLowerCase();
 
-  switch (filterType) {
-    case 'content_inappropriate':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Questo argomento non è adatto per MirrorBuddy. ' +
-          'Sono qui per aiutarti a studiare e imparare cose nuove!',
-        suggestedAction: SAFETY_LABELS.actions.try_different,
-        suggestAskParent: true,
-        relatedAllowedTopics: alternatives,
-      };
-
-    case 'off_topic':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Questa domanda è un po\' fuori tema. ' +
-          'Come tuo tutor, sono specializzato nelle materie scolastiche.',
-        suggestedAction: SAFETY_LABELS.actions.stay_on_topic,
-        suggestAskParent: false,
-        relatedAllowedTopics: alternatives,
-      };
-
-    case 'personal_info_request':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Non ho bisogno delle tue informazioni personali per aiutarti. ' +
-          'La tua privacy è importante e va protetta!',
-        suggestedAction: SAFETY_LABELS.actions.ask_parent,
-        suggestAskParent: true,
-        relatedAllowedTopics: undefined,
-      };
-
-    case 'harmful_content':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Mi dispiace, ma non posso parlare di questo argomento. ' +
-          'Se hai bisogno di aiuto o ti senti in difficoltà, ' +
-          'parla con un adulto di fiducia.',
-        suggestedAction: SAFETY_LABELS.actions.ask_parent,
-        suggestAskParent: true,
-        relatedAllowedTopics: undefined,
-      };
-
-    case 'manipulation_attempt':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Non ho capito bene cosa mi stai chiedendo. ' +
-          'Puoi riformulare la domanda in modo più semplice?',
-        suggestedAction: SAFETY_LABELS.actions.rephrase,
-        suggestAskParent: false,
-        relatedAllowedTopics: alternatives,
-      };
-
-    case 'medical_advice':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Le domande sulla salute sono importanti, ma non sono un dottore. ' +
-          'I tuoi genitori o il medico possono aiutarti meglio.',
-        suggestedAction: SAFETY_LABELS.actions.ask_parent,
-        suggestAskParent: true,
-        relatedAllowedTopics: [
-          'come funziona il corpo umano (per studiare)',
-          'educazione alimentare',
-          'importanza dell\'attività fisica',
-        ],
-      };
-
-    case 'legal_advice':
-      return {
-        filterType,
-        friendlyExplanation:
-          'Le questioni legali sono complicate e ogni situazione è diversa. ' +
-          'I tuoi genitori possono aiutarti a trovare le risposte giuste.',
-        suggestedAction: SAFETY_LABELS.actions.ask_parent,
-        suggestAskParent: true,
-        relatedAllowedTopics: [
-          'educazione civica',
-          'come funziona lo Stato',
-          'i diritti dei bambini',
-        ],
-      };
-
-    default:
-      return {
-        filterType,
-        friendlyExplanation:
-          'Non posso rispondere a questa domanda in questo momento. ' +
-          'Proviamo con qualcos\'altro!',
-        suggestedAction: SAFETY_LABELS.actions.try_different,
-        suggestAskParent: false,
-        relatedAllowedTopics: alternatives,
-      };
-  }
-}
-
-/**
- * Get appropriate emoji for the explanation (for UI)
- */
-export function getExplanationEmoji(filterType: SafetyFilterType): string {
-  switch (filterType) {
-    case 'content_inappropriate':
-    case 'harmful_content':
-      return '🛡️';
-    case 'off_topic':
-      return '📚';
-    case 'personal_info_request':
-      return '🔒';
-    case 'manipulation_attempt':
-      return '🤔';
-    case 'medical_advice':
-      return '🏥';
-    case 'legal_advice':
-      return '⚖️';
-    default:
-      return 'ℹ️';
-  }
-}
-
-/**
- * Format explanation for display with optional emoji
- */
-export function formatExplanationForDisplay(
-  explanation: BlockExplanation,
-  includeEmoji: boolean = false
-): string {
-  const emoji = includeEmoji
-    ? getExplanationEmoji(explanation.filterType) + ' '
-    : '';
-
-  let display = `${emoji}${explanation.friendlyExplanation}\n\n`;
-  display += `💡 ${explanation.suggestedAction}`;
-
-  if (
-    explanation.relatedAllowedTopics &&
-    explanation.relatedAllowedTopics.length > 0
-  ) {
-    display += '\n\nPuoi chiedermi invece di:\n';
-    display += explanation.relatedAllowedTopics
-      .slice(0, 3)
-      .map((topic) => `• ${topic}`)
-      .join('\n');
+  let bucket: BlockExplanationCategory = 'generic';
+  if (normalized.startsWith('stem_')) {
+    bucket = 'stem';
+  } else if (normalized in CATEGORY_TO_BUCKET) {
+    bucket = CATEGORY_TO_BUCKET[normalized];
   }
 
-  if (explanation.suggestAskParent) {
-    display += '\n\n👨‍👩‍👧 Se hai dubbi, chiedi a un genitore.';
-  }
-
-  return display;
+  return {
+    category: bucket,
+    suggestAskAdult: ASK_ADULT_BUCKETS.has(bucket),
+    suggestRephrase: !NO_REPHRASE_BUCKETS.has(bucket),
+  };
 }

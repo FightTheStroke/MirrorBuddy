@@ -9,7 +9,7 @@ import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
-import type { ChatUsage } from './message-handler';
+import type { ChatUsage, SafetyBlockEvent } from './message-handler';
 
 // Re-exported so existing importers keep working; the detection itself lives in
 // tool-intent.ts to keep this file within the repo's file-size budget.
@@ -31,7 +31,12 @@ export interface StreamingMessageOptions {
   character: CharacterInfo;
   characterId: string;
   onChunk: (chunk: string, accumulated: string) => void;
-  onComplete: (fullResponse: string, usage: ChatUsage | null, latencyMs: number) => void;
+  onComplete: (
+    fullResponse: string,
+    usage: ChatUsage | null,
+    latencyMs: number,
+    safetyEvent?: SafetyBlockEvent | null,
+  ) => void;
   onError: (error: Error) => void;
   signal?: AbortSignal;
   language?: 'it' | 'en' | 'es' | 'fr' | 'de';
@@ -77,6 +82,7 @@ export async function sendStreamingMessage(options: StreamingMessageOptions): Pr
 
   const startTime = performance.now();
   let streamUsage: ChatUsage | null = null;
+  let safetyEvent: SafetyBlockEvent | null = null;
 
   try {
     const response = await csrfFetch('/api/chat/stream', {
@@ -136,7 +142,7 @@ export async function sendStreamingMessage(options: StreamingMessageOptions): Pr
 
         if (data === '[DONE]') {
           const latencyMs = Math.round(performance.now() - startTime);
-          onComplete(accumulated, streamUsage, latencyMs);
+          onComplete(accumulated, streamUsage, latencyMs, safetyEvent);
           return true;
         }
 
@@ -146,6 +152,11 @@ export async function sendStreamingMessage(options: StreamingMessageOptions): Pr
           if (parsed.content) {
             accumulated += parsed.content;
             onChunk(parsed.content, accumulated);
+          }
+
+          // F-06: capture a real safety block so the UI can explain it.
+          if (parsed.blocked) {
+            safetyEvent = { blocked: true, category: parsed.category || 'unknown' };
           }
 
           // Extract REAL usage data from stream
@@ -176,7 +187,7 @@ export async function sendStreamingMessage(options: StreamingMessageOptions): Pr
 
     // Stream ended normally
     const latencyMs = Math.round(performance.now() - startTime);
-    onComplete(accumulated, streamUsage, latencyMs);
+    onComplete(accumulated, streamUsage, latencyMs, safetyEvent);
     return true;
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
