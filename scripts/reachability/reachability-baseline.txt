@@ -181,7 +181,6 @@ apps/web/src/i18n/index.ts
 apps/web/src/lib/api/error-response.ts
 apps/web/src/lib/api/rate-limit-strategy.ts
 apps/web/src/lib/api/request-cache.ts
-apps/web/src/lib/api/streaming-auth.ts
 apps/web/src/lib/auth/middleware.ts
 apps/web/src/lib/auth/sso/microsoft365-utils.ts
 apps/web/src/lib/azure/gpt-audio-deployment.ts
@@ -216,8 +215,6 @@ apps/web/src/lib/email/campaign-waitlist.ts
 apps/web/src/lib/errors/base-error.ts
 apps/web/src/lib/export/material-export.ts
 apps/web/src/lib/helpers/index.ts
-apps/web/src/lib/hooks/sse-parser.ts
-apps/web/src/lib/hooks/streaming-types.ts
 apps/web/src/lib/hooks/use-collaboration.ts
 apps/web/src/lib/hooks/use-collaboration/event-handler.ts
 apps/web/src/lib/hooks/use-collaboration/index.ts
@@ -230,7 +227,6 @@ apps/web/src/lib/hooks/use-collaboration/utils.ts
 apps/web/src/lib/hooks/use-feature-flags.tsx
 apps/web/src/lib/hooks/use-material-content.ts
 apps/web/src/lib/hooks/use-permissions.ts
-apps/web/src/lib/hooks/use-streaming-chat.ts
 apps/web/src/lib/hooks/use-tool-stream.ts
 apps/web/src/lib/hooks/use-tool-stream/event-source-setup.ts
 apps/web/src/lib/hooks/use-tool-stream/reconnection-logic.ts
