@@ -1,8 +1,9 @@
+import { getSiteUrl } from '@/lib/config/site-url';
 /**
  * Email templates for waitlist signup and verification
  */
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
+const APP_URL = getSiteUrl();
 
 type Locale = 'it' | 'en' | 'fr' | 'de' | 'es';
 

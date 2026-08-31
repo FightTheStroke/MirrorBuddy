@@ -1,22 +1,20 @@
-import { prisma } from "@/lib/db";
-import crypto from "crypto";
-import { randomBytes, timingSafeEqual } from "crypto";
-import { sendEmail, isEmailConfigured } from "@/lib/email";
-import { getTrialEmailVerificationTemplate } from "@/lib/email/templates/trial-templates";
-import {
-  checkAndIncrementUsage,
-  getTierLimitsForTrial,
-} from "./trial-atomic-operations";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import crypto from 'crypto';
+import { randomBytes, timingSafeEqual } from 'crypto';
+import { sendEmail, isEmailConfigured } from '@/lib/email';
+import { getTrialEmailVerificationTemplate } from '@/lib/email/templates/trial-templates';
+import { checkAndIncrementUsage, getTierLimitsForTrial } from './trial-atomic-operations';
+import { logger } from '@/lib/logger';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 // Re-export atomic operations for backward compatibility
 export { checkAndIncrementUsage, getTierLimitsForTrial };
 
 // Available coaches from src/data/coaches/
-const COACHES = ["melissa", "laura"];
+const COACHES = ['melissa', 'laura'];
 
 // Fallback salt for IP hashing (used only when IP_HASH_SALT is not set)
-const FALLBACK_SALT = "mirrorbuddy-fallback-salt-32-chars";
+const FALLBACK_SALT = 'mirrorbuddy-fallback-salt-32-chars';
 
 /**
  * Trial limits (DEPRECATED - for backward compatibility only)
@@ -36,7 +34,7 @@ export const TRIAL_LIMITS = {
 } as const;
 
 const TRIAL_VERIFICATION_EXPIRY_MS = 24 * 60 * 60 * 1000;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = getSiteUrl();
 
 /**
  * Hash an IP address with a salt for privacy-preserving identification.
@@ -45,12 +43,10 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 function hashIp(ip: string): string {
   let salt = process.env.IP_HASH_SALT;
   if (!salt) {
-    logger.warn(
-      "IP_HASH_SALT environment variable is not set, using fallback salt",
-    );
+    logger.warn('IP_HASH_SALT environment variable is not set, using fallback salt');
     salt = FALLBACK_SALT;
   }
-  return crypto.createHash("sha256").update(`${salt}:${ip}`).digest("hex");
+  return crypto.createHash('sha256').update(`${salt}:${ip}`).digest('hex');
 }
 
 function getRandomItems<T>(arr: T[], count: number): T[] {
@@ -98,7 +94,7 @@ export async function getOrCreateTrialSession(
   return session;
 }
 
-export type TrialAction = "chat" | "doc" | "tool" | "voice";
+export type TrialAction = 'chat' | 'doc' | 'tool' | 'voice';
 
 export async function checkTrialLimits(
   sessionId: string,
@@ -110,14 +106,14 @@ export async function checkTrialLimits(
   });
 
   if (!session) {
-    return { allowed: false, reason: "Session not found" };
+    return { allowed: false, reason: 'Session not found' };
   }
 
   // Fetch limits from TierService
   const limits = await getTierLimitsForTrial();
 
   switch (action) {
-    case "chat":
+    case 'chat':
       if (session.chatsUsed >= limits.chat) {
         return {
           allowed: false,
@@ -126,7 +122,7 @@ export async function checkTrialLimits(
       }
       break;
 
-    case "doc":
+    case 'doc':
       if (session.docsUsed >= limits.docs) {
         return {
           allowed: false,
@@ -135,7 +131,7 @@ export async function checkTrialLimits(
       }
       break;
 
-    case "tool":
+    case 'tool':
       if (session.toolsUsed >= limits.tools) {
         return {
           allowed: false,
@@ -144,7 +140,7 @@ export async function checkTrialLimits(
       }
       break;
 
-    case "voice":
+    case 'voice':
       // Check if adding these seconds would exceed limit
       const newTotal = session.voiceSecondsUsed + (voiceSeconds || 0);
       if (newTotal > limits.voiceSeconds) {
@@ -162,18 +158,18 @@ export async function checkTrialLimits(
 
 export async function incrementUsage(
   sessionId: string,
-  action: "chat" | "doc" | "tool",
+  action: 'chat' | 'doc' | 'tool',
 ): Promise<void> {
   const updateData: Record<string, { increment: number }> = {};
 
   switch (action) {
-    case "chat":
+    case 'chat':
       updateData.chatsUsed = { increment: 1 };
       break;
-    case "doc":
+    case 'doc':
       updateData.docsUsed = { increment: 1 };
       break;
-    case "tool":
+    case 'tool':
       updateData.toolsUsed = { increment: 1 };
       break;
   }
@@ -190,10 +186,7 @@ export async function incrementUsage(
  * @param seconds Number of seconds to add
  * @returns Updated total voice seconds
  */
-export async function addVoiceSeconds(
-  sessionId: string,
-  seconds: number,
-): Promise<number> {
+export async function addVoiceSeconds(sessionId: string, seconds: number): Promise<number> {
   const session = await prisma.trialSession.update({
     where: { id: sessionId },
     data: {
@@ -216,7 +209,7 @@ export async function updateTrialEmail(sessionId: string, email: string) {
   });
 
   if (!session) {
-    throw new Error("Session not found");
+    throw new Error('Session not found');
   }
 
   return prisma.trialSession.update({
@@ -235,16 +228,14 @@ export async function getTrialSessionById(sessionId: string) {
 }
 
 function generateVerificationCode(): string {
-  return randomBytes(3).toString("hex").toUpperCase();
+  return randomBytes(3).toString('hex').toUpperCase();
 }
 
 function normalizeVerificationCode(code: string): string {
-  return code.replace(/\s+/g, "").toUpperCase();
+  return code.replace(/\s+/g, '').toUpperCase();
 }
 
-export function isTrialEmailVerified(session: {
-  emailVerifiedAt: Date | null;
-}): boolean {
+export function isTrialEmailVerified(session: { emailVerifiedAt: Date | null }): boolean {
   return Boolean(session.emailVerifiedAt);
 }
 
@@ -266,11 +257,11 @@ export async function requestTrialEmailVerification(sessionId: string) {
   });
 
   if (!session) {
-    throw new Error("Session not found");
+    throw new Error('Session not found');
   }
 
   if (!session.email) {
-    throw new Error("Email not set");
+    throw new Error('Email not set');
   }
 
   const verificationCode = generateVerificationCode();
@@ -306,7 +297,7 @@ export async function requestTrialEmailVerification(sessionId: string) {
 
     emailSent = result.success;
     if (!result.success) {
-      throw new Error(result.error || "Failed to send verification email");
+      throw new Error(result.error || 'Failed to send verification email');
     }
   }
 
@@ -314,8 +305,7 @@ export async function requestTrialEmailVerification(sessionId: string) {
     session: updatedSession,
     emailSent,
     expiresAt,
-    verificationCode:
-      process.env.NODE_ENV !== "production" ? verificationCode : undefined,
+    verificationCode: process.env.NODE_ENV !== 'production' ? verificationCode : undefined,
   };
 }
 
@@ -325,11 +315,11 @@ export async function verifyTrialEmailCode(sessionId: string, code: string) {
   });
 
   if (!session) {
-    throw new Error("Session not found");
+    throw new Error('Session not found');
   }
 
   if (!session.emailVerificationCode) {
-    throw new Error("Verification not requested");
+    throw new Error('Verification not requested');
   }
 
   if (session.emailVerifiedAt) {
@@ -338,14 +328,14 @@ export async function verifyTrialEmailCode(sessionId: string, code: string) {
 
   const expiresAt = session.emailVerificationExpiresAt;
   if (expiresAt && expiresAt < new Date()) {
-    throw new Error("Verification code expired");
+    throw new Error('Verification code expired');
   }
 
   const normalized = normalizeVerificationCode(code);
   const stored = normalizeVerificationCode(session.emailVerificationCode);
   const match = timingSafeEqual(Buffer.from(normalized), Buffer.from(stored));
   if (!match) {
-    throw new Error("Invalid verification code");
+    throw new Error('Invalid verification code');
   }
 
   const updatedSession = await prisma.trialSession.update({
@@ -372,10 +362,7 @@ export async function getTrialStatus(sessionId: string) {
   // Fetch limits from TierService
   const limits = await getTierLimitsForTrial();
 
-  const voiceSecondsRemaining = Math.max(
-    0,
-    limits.voiceSeconds - session.voiceSecondsUsed,
-  );
+  const voiceSecondsRemaining = Math.max(0, limits.voiceSeconds - session.voiceSecondsUsed);
 
   return {
     // Chat

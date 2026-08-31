@@ -102,6 +102,20 @@ const nextConfig: NextConfig = {
     // Minimize browser memory usage
     minimumCacheTTL: 60 * 60 * 24, // 24 hours
   },
+  // Send the bare apex domain to the canonical www host with a permanent
+  // redirect. Both used to answer 200, which splits SEO ranking between two
+  // identical sites. Scoped to the exact apex host so preview deployments and
+  // localhost are untouched.
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'mirrorbuddy.org' }],
+        destination: 'https://www.mirrorbuddy.org/:path*',
+        permanent: true,
+      },
+    ];
+  },
   // Rewrite localized static files to their root locations
   // Fix: i18n middleware redirects /manifest.json to /it/manifest.json which doesn't exist
   // This rewrite serves the root manifest.json for all localized paths

@@ -16,6 +16,7 @@ import { Redis } from '@upstash/redis';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { getAdminRecipients } from '@/lib/admin/admin-recipients';
+import { DEFAULT_EMAIL_FROM } from '@/lib/config/site-url';
 
 // Lazy initialization to avoid build-time errors
 let redis: ReturnType<typeof Redis.fromEnv> | null = null;
@@ -55,7 +56,7 @@ export const POST = pipe(
   const resendClient = getResend();
   if (adminRecipients.length > 0 && resendClient) {
     await resendClient.emails.send({
-      from: 'MirrorBuddy <noreply@mirrorbuddy.it>',
+      from: DEFAULT_EMAIL_FROM,
       to: adminRecipients,
       subject: '[Action Required] Monthly IP Salt Rotation',
       text: `New IP hash salt generated for monthly rotation.

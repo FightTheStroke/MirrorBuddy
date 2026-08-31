@@ -12,6 +12,7 @@
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { buildCrisisParentEmail } from '@/lib/email/templates/crisis-parent-notification';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 const log = logger.child({ module: 'parent-notifier' });
 
@@ -61,7 +62,7 @@ export async function notifyParentOfCrisis(params: CrisisNotificationParams): Pr
     }
 
     // Build email
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mirrorbuddy.it';
+    const baseUrl = getSiteUrl();
     const email = buildCrisisParentEmail({
       locale: locale || 'it',
       severity,

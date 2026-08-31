@@ -4,6 +4,7 @@
  */
 
 import type { Locale } from '@/i18n/config';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 export interface SoftwareApplicationSchema {
   '@context': string;
@@ -30,7 +31,7 @@ const appDescriptions: Record<Locale, string> = {
 };
 
 export function generateSoftwareApplicationSchema(locale: Locale): SoftwareApplicationSchema {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = getSiteUrl();
 
   return {
     '@context': 'https://schema.org',

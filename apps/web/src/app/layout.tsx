@@ -19,6 +19,7 @@ import {
 import { defaultLocale } from '@/i18n/config';
 import type { Locale } from '@/i18n/config';
 import { getLocale } from 'next-intl/server';
+import { getSiteUrl } from '@/lib/config/site-url';
 import './globals.css';
 import '@/styles/safe-area.css';
 
@@ -39,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+    metadataBase: new URL(getSiteUrl()),
     title: 'MirrorBuddy - The school we wished existed',
     description:
       'AI-powered educational platform with 32 historical Maestros, 6 Coaches, 6 Buddies, voice tutoring, and personalized learning for students with learning differences.',

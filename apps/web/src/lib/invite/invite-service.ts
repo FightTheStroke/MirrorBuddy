@@ -14,6 +14,7 @@ import { getAdminRecipients } from '@/lib/admin/admin-recipients';
 import { hashPassword, generateRandomPassword } from '@/lib/auth/server';
 import { logger } from '@/lib/logger';
 import { hashPII } from '@/lib/security';
+import { getSiteUrl } from '@/lib/config/site-url';
 import {
   getAdminNotificationTemplate,
   getRequestReceivedTemplate,
@@ -21,7 +22,7 @@ import {
   getRejectionTemplate,
 } from '@/lib/email/templates/invite-templates';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
+const APP_URL = getSiteUrl();
 
 export interface CreateInviteRequestResult {
   success: boolean;
