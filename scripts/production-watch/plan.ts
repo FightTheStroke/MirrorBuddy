@@ -9,6 +9,8 @@ export interface ExistingIssue {
   number: number;
   body: string;
   state: 'OPEN' | 'CLOSED';
+  /** ISO timestamp of when it was closed, when it is closed. */
+  closedAt?: string | null;
 }
 
 export interface IssuePlan {
@@ -71,10 +73,29 @@ export function planIssues(
     if (key) byKey.set(key, issue);
   }
 
+  // Sentry keeps reporting a failure for 24h after its last occurrence, so a
+  // failure we already investigated and closed would come straight back as a
+  // duplicate. Only re-file it if it actually happened again after we closed.
+  const settled = new Map<string, string>();
+  for (const issue of existing) {
+    const key = issue.state === 'CLOSED' && issue.closedAt ? keyOf(issue) : null;
+    if (!key) continue;
+    const previous = settled.get(key);
+    if (!previous || Date.parse(issue.closedAt!) > Date.parse(previous)) {
+      settled.set(key, issue.closedAt!);
+    }
+  }
+
+  const isStale = (alert: ProductionAlert): boolean => {
+    const closedAt = settled.get(alert.key);
+    if (!closedAt || !alert.lastSeen) return false;
+    return Date.parse(alert.lastSeen) <= Date.parse(closedAt);
+  };
+
   const liveKeys = new Set(alerts.map((alert) => alert.key));
 
   return {
-    create: alerts.filter((alert) => !byKey.has(alert.key)),
+    create: alerts.filter((alert) => !byKey.has(alert.key) && !isStale(alert)),
     update: alerts
       .filter((alert) => byKey.has(alert.key))
       .map((alert) => ({ number: byKey.get(alert.key)!.number, alert })),

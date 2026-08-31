@@ -87,6 +87,24 @@ describe('planning what to do about production alerts', () => {
     expect(plan.create).toHaveLength(1);
   });
 
+  it('does not re-file a failure that already stopped when we closed its issue', () => {
+    const plan = planIssues(
+      [alert({ lastSeen: '2026-08-30T18:13:07Z' })],
+      [issue({ state: 'CLOSED', closedAt: '2026-08-30T19:40:00Z' })],
+    );
+
+    expect(plan.create).toEqual([]);
+  });
+
+  it('files a fresh issue when the failure happened again after we closed it', () => {
+    const plan = planIssues(
+      [alert({ lastSeen: '2026-08-31T02:00:00Z' })],
+      [issue({ state: 'CLOSED', closedAt: '2026-08-30T19:40:00Z' })],
+    );
+
+    expect(plan.create).toHaveLength(1);
+  });
+
   it('keeps Sentry issues open when the Sentry feed did not answer', () => {
     const plan = planIssues([], [issue()], { answered: ['vercel'] });
 
