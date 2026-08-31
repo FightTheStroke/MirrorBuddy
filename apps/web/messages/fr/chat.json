@@ -319,29 +319,6 @@
         },
         "videoStopAriaLabel": "Arrêter la vidéo",
         "videoFramesLabel": "images envoyées"
-      },
-      "rating": {
-        "close": "Fermer",
-        "feedbackLabel": "Votre avis",
-        "feedbackPlaceholder": "Partagez vos commentaires...",
-        "labels": {
-          "1": "Très mauvais",
-          "2": "Mauvais",
-          "3": "Correct",
-          "4": "Bon",
-          "5": "Excellent"
-        },
-        "minutes": "minutes",
-        "savingError": "Erreur lors de l'enregistrement",
-        "selectError": "Veuillez sélectionner une note",
-        "selectPlaceholder": "Sélectionner un sujet",
-        "sessionWith": "Session avec",
-        "skip": "Passer",
-        "stars": "étoiles",
-        "submit": "Envoyer",
-        "submitting": "Envoi en cours",
-        "title": "Évaluez votre session",
-        "topics": "Sujets abordés"
       }
     },
     "typing": {

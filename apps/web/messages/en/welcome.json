@@ -443,14 +443,6 @@
       "melissaCoach": "Melissa - Coach"
     },
     "onboarding": {
-      "transcript": {
-        "conversationActive": "Active conversation",
-        "conversationTitle": "Conversation title",
-        "messagePlural": "messages",
-        "messageSingular": "message",
-        "noConversation": "No conversation",
-        "userLabel": "You"
-      },
       "checklist": {
         "nameLabel": "Name",
         "ageLabel": "Age",
