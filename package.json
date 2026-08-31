@@ -143,7 +143,12 @@
     "esbuild@<0.28.1": "0.28.1",
     "@babel/core@<7.29.6": "7.29.6",
     "@opentelemetry/core@<2.8.0": "2.8.0",
-    "@opentelemetry/propagator-jaeger@<2.9.0": "2.9.0"
+    "@opentelemetry/propagator-jaeger@<2.9.0": "2.9.0",
+    "deepmerge-ts@<8.0.0": "8.0.2",
+    "valibot@<1.4.2": "1.4.2",
+    "body-parser@<1.20.6": "1.20.6",
+    "puppeteer-core@<25.8.0": "25.8.0",
+    "proxy-agent@<8.0.2": "8.0.2"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.73.0",
@@ -313,7 +318,12 @@
       "esbuild@<0.28.1": "0.28.1",
       "@babel/core@<7.29.6": "7.29.6",
       "@opentelemetry/core@<2.8.0": "2.8.0",
-      "@opentelemetry/propagator-jaeger@<2.9.0": "2.9.0"
+      "@opentelemetry/propagator-jaeger@<2.9.0": "2.9.0",
+      "deepmerge-ts@<8.0.0": "8.0.2",
+      "valibot@<1.4.2": "1.4.2",
+      "body-parser@<1.20.6": "1.20.6",
+      "puppeteer-core@<25.8.0": "25.8.0",
+      "proxy-agent@<8.0.2": "8.0.2"
     }
   }
 }
