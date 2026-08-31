@@ -65,7 +65,6 @@ apps/web/src/components/maestros/lazy.tsx
 apps/web/src/components/nonce-script.tsx
 apps/web/src/components/profile/index.ts
 apps/web/src/components/progress/progress-view/components/stat-card.tsx
-apps/web/src/components/seo/hreflang-tags.tsx
 apps/web/src/components/settings/accessibility-panel-mobile/index.ts
 apps/web/src/components/structured-data/index.ts
 apps/web/src/components/structured-data/json-ld-script.tsx
