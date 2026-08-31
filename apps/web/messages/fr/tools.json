@@ -76,24 +76,50 @@
       "description": "Chargez un PDF et générez automatiquement des résumés, cartes, démos et quiz",
       "title": "Kit d'Étude",
       "exportModal": {
-        "title": "Titolo",
-        "format": "Format",
-        "export": "Export",
+        "title": "Exporter en PDF",
+        "export": "Exporter le PDF",
         "cancel": "Annuler",
-        "closeLabel": "Close Label",
-        "description": "Exportez le kit d'étude en PDF accessible",
-        "error": "Erreur",
-        "formatLabel": "Format Label",
-        "generating": "Generazione...",
-        "profileLabel": "Profile Label",
+        "closeLabel": "Fermer",
+        "description": "Créez un PDF accessible du kit d'étude",
+        "error": "Échec de l'exportation. Veuillez réessayer.",
+        "formatLabel": "Format de page",
+        "generating": "Génération en cours…",
+        "profileLabel": "Profil de lecture",
         "success": {
-          "default": "Default",
-          "withZaino": "With Zaino"
+          "default": "PDF téléchargé",
+          "withZaino": "PDF téléchargé et enregistré dans le sac"
         },
         "letterUs": "Letter (US)",
-        "a": "A",
-        "A4": "A4",
-        "Letter": "Letter"
+        "profiles": {
+          "dyslexia": {
+            "label": "Dyslexie",
+            "description": "Grande police, espacement accru, contraste élevé"
+          },
+          "dyscalculia": {
+            "label": "Dyscalculie",
+            "description": "Grands chiffres, opérateurs colorés, grille visuelle"
+          },
+          "dysgraphia": {
+            "label": "Dysgraphie",
+            "description": "Mise en page structurée, espacement large"
+          },
+          "dysorthography": {
+            "label": "Dysorthographie",
+            "description": "Motifs orthographiques mis en évidence, syllabes colorées"
+          },
+          "adhd": {
+            "label": "TOP/TDAH",
+            "description": "Distractions minimales, sections claires, termes surlignés"
+          },
+          "dyspraxia": {
+            "label": "Dyspraxie",
+            "description": "Texte fractionné, temps de lecture, pauses"
+          },
+          "stuttering": {
+            "label": "Bégaiement",
+            "description": "Phrases courtes, points de respiration, rythme fluide"
+          }
+        }
       },
       "list": {
         "empty": {

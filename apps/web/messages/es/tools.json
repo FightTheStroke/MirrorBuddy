@@ -76,24 +76,50 @@
       "description": "Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz",
       "title": "Kit de Estudio",
       "exportModal": {
-        "title": "Exportar",
-        "format": "Formato",
-        "export": "Exportar",
+        "title": "Exportar a PDF",
+        "export": "Exportar PDF",
         "cancel": "Cancelar",
         "closeLabel": "Cerrar",
-        "description": "Exporta el kit de estudio como PDF accesible",
-        "error": "Error",
-        "formatLabel": "Formato",
-        "generating": "Generando...",
-        "profileLabel": "Perfil",
+        "description": "Crea un PDF accesible del kit de estudio",
+        "error": "La exportación falló. Inténtalo de nuevo.",
+        "formatLabel": "Formato de página",
+        "generating": "Generando…",
+        "profileLabel": "Perfil de lectura",
         "success": {
-          "default": "Predeterminado",
-          "withZaino": "Con mochila"
+          "default": "PDF descargado",
+          "withZaino": "PDF descargado y guardado en la mochila"
         },
         "letterUs": "Letter (US)",
-        "a": "A",
-        "A4": "A4",
-        "Letter": "Letter"
+        "profiles": {
+          "dyslexia": {
+            "label": "Dislexia",
+            "description": "Fuente grande, mayor espaciado, alto contraste"
+          },
+          "dyscalculia": {
+            "label": "Discalculia",
+            "description": "Números grandes, operadores en color, cuadrícula visual"
+          },
+          "dysgraphia": {
+            "label": "Disgrafía",
+            "description": "Diseño estructurado, amplio espaciado"
+          },
+          "dysorthography": {
+            "label": "Disortografía",
+            "description": "Patrones ortográficos resaltados, sílabas en color"
+          },
+          "adhd": {
+            "label": "TND/TDAH",
+            "description": "Mínimas distracciones, secciones claras, términos resaltados"
+          },
+          "dyspraxia": {
+            "label": "Dispraxia",
+            "description": "Texto fragmentado, tiempo de lectura, pausas"
+          },
+          "stuttering": {
+            "label": "Tartamudez",
+            "description": "Frases cortas, puntos de respiración, ritmo fluido"
+          }
+        }
       },
       "list": {
         "empty": {

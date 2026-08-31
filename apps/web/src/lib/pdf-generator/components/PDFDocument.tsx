@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * PDFDocument Component
@@ -6,20 +6,14 @@
  */
 
 import React from 'react';
-import {
-  Document,
-  Page,
-  View,
-  StyleSheet,
-  Font,
-} from '@react-pdf/renderer';
-import type { ProfileConfig, ExtractedContent } from '../types';
+import { Document, Page, View, StyleSheet, Font } from '@react-pdf/renderer';
+import type { ProfileConfig, ExtractedContent, PDFLabels } from '../types';
 import { PDFTitle } from './PDFTitle';
 import { PDFText } from './PDFText';
 import { PDFList } from './PDFList';
 import { PDFImage } from './PDFImage';
 import { sanitizeNumber } from '../utils/style-utils';
-import { useTranslations } from "next-intl";
+import { DEFAULT_PDF_LABELS } from '../labels';
 
 // Register default fonts
 Font.register({
@@ -35,6 +29,7 @@ interface PDFDocumentProps {
   content: ExtractedContent;
   profile: ProfileConfig;
   format?: 'A4' | 'Letter';
+  labels?: PDFLabels;
 }
 
 /**
@@ -103,8 +98,8 @@ export function PDFDocumentComponent({
   content,
   profile,
   format = 'A4',
+  labels = DEFAULT_PDF_LABELS,
 }: PDFDocumentProps) {
-  const t = useTranslations("tools");
   const styles = createStyles(profile, format);
   const pageSize = format === 'A4' ? 'A4' : 'LETTER';
 
@@ -130,7 +125,7 @@ export function PDFDocumentComponent({
           </PDFTitle>
           {profile.options.readingTimeEstimate && (
             <PDFText style={styles.readingInfo} profile={profile}>
-              {t("tempoDiLetturaStimato")} {content.metadata.readingTime} {t("minuti")}
+              {labels.readingTimeEstimate} {content.metadata.readingTime} {labels.minutes}
             </PDFText>
           )}
         </View>
@@ -139,7 +134,7 @@ export function PDFDocumentComponent({
         <View style={styles.content}>
           {content.sections.map((section, index) => (
             <View key={index} style={styles.section}>
-              {renderSection(section, profile, index)}
+              {renderSection(section, profile, index, labels)}
             </View>
           ))}
         </View>
@@ -147,13 +142,13 @@ export function PDFDocumentComponent({
         {/* Footer with page numbers */}
         <View style={styles.footer} fixed>
           <PDFText profile={profile}>
-            {profile.nameIt} {t("generatoDaMirrorbuddy")}
+            {profile.nameIt} {labels.generatedBy}
           </PDFText>
           <PDFText
             style={styles.pageNumber}
             profile={profile}
             render={({ pageNumber, totalPages }) =>
-              `Pagina ${pageNumber} di ${totalPages}`
+              `${labels.page} ${pageNumber} ${labels.of} ${totalPages}`
             }
           />
         </View>
@@ -168,7 +163,8 @@ export function PDFDocumentComponent({
 function renderSection(
   section: ExtractedContent['sections'][0],
   profile: ProfileConfig,
-  index: number
+  index: number,
+  labels: PDFLabels,
 ) {
   switch (section.type) {
     case 'heading':
@@ -199,9 +195,10 @@ function renderSection(
         <PDFImage
           key={index}
           src={section.content}
-          alt={section.metadata?.alt as string || 'Image'}
+          alt={(section.metadata?.alt as string) || 'Image'}
           caption={section.metadata?.caption as string}
           profile={profile}
+          descriptionLabel={labels.imageDescription}
         />
       );
 
@@ -233,10 +230,7 @@ function renderSection(
             marginVertical: 8,
           }}
         >
-          <PDFText
-            profile={profile}
-            style={{ fontFamily: 'Courier', textAlign: 'center' }}
-          >
+          <PDFText profile={profile} style={{ fontFamily: 'Courier', textAlign: 'center' }}>
             {section.content}
           </PDFText>
         </View>

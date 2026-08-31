@@ -83,24 +83,50 @@
     "studyKit": {
       "title": "Kit di Studio",
       "exportModal": {
-        "title": "Esporta Kit",
-        "format": "Formato",
-        "export": "Esporta",
+        "title": "Esporta in PDF",
+        "export": "Esporta PDF",
         "cancel": "Annulla",
         "closeLabel": "Chiudi",
-        "description": "Esporta il kit di studio come PDF accessibile",
-        "error": "Errore",
-        "formatLabel": "Etichetta formato",
-        "generating": "Generazione...",
-        "profileLabel": "Etichetta profilo",
+        "description": "Crea un PDF accessibile del kit di studio",
+        "error": "Esportazione non riuscita. Riprova.",
+        "formatLabel": "Formato pagina",
+        "generating": "Generazione in corso…",
+        "profileLabel": "Profilo di lettura",
         "success": {
-          "default": "Predefinito",
-          "withZaino": "Con Zaino"
+          "default": "PDF scaricato",
+          "withZaino": "PDF scaricato e salvato nello Zaino"
         },
         "letterUs": "Letter (US)",
-        "a": "A",
-        "A4": "A4",
-        "Letter": "Letter"
+        "profiles": {
+          "dyslexia": {
+            "label": "Dislessia",
+            "description": "Font grande, spaziatura aumentata, alto contrasto"
+          },
+          "dyscalculia": {
+            "label": "Discalculia",
+            "description": "Numeri grandi, operatori colorati, griglia visiva"
+          },
+          "dysgraphia": {
+            "label": "Disgrafia",
+            "description": "Layout strutturato, spaziatura ampia"
+          },
+          "dysorthography": {
+            "label": "Disortografia",
+            "description": "Pattern ortografici evidenziati, sillabe colorate"
+          },
+          "adhd": {
+            "label": "DOP/ADHD",
+            "description": "Minime distrazioni, sezioni chiare, termini evidenziati"
+          },
+          "dyspraxia": {
+            "label": "Disprassia",
+            "description": "Testo suddiviso, tempo di lettura, pause"
+          },
+          "stuttering": {
+            "label": "Balbuzie",
+            "description": "Frasi brevi, punti di respirazione, ritmo fluido"
+          }
+        }
       },
       "list": {
         "empty": {

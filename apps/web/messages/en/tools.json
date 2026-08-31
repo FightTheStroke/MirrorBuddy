@@ -76,24 +76,50 @@
       "description": "Upload a PDF and automatically generate summaries, maps, demos, and quizzes",
       "title": "Study Kit",
       "exportModal": {
-        "title": "Titolo",
-        "format": "Format",
-        "export": "Export",
+        "title": "Export to PDF",
+        "export": "Export PDF",
         "cancel": "Cancel",
-        "closeLabel": "Close Label",
-        "description": "Export the study kit as an accessible PDF",
-        "error": "Error",
-        "formatLabel": "Format Label",
-        "generating": "Generazione...",
-        "profileLabel": "Profile Label",
+        "closeLabel": "Close",
+        "description": "Create an accessible PDF of the study kit",
+        "error": "Export failed. Please try again.",
+        "formatLabel": "Page format",
+        "generating": "Generating…",
+        "profileLabel": "Reading profile",
         "success": {
-          "default": "Default",
-          "withZaino": "With Zaino"
+          "default": "PDF downloaded",
+          "withZaino": "PDF downloaded and saved to your Backpack"
         },
         "letterUs": "Letter (US)",
-        "a": "A",
-        "A4": "A4",
-        "Letter": "Letter"
+        "profiles": {
+          "dyslexia": {
+            "label": "Dyslexia",
+            "description": "Large font, increased spacing, high contrast"
+          },
+          "dyscalculia": {
+            "label": "Dyscalculia",
+            "description": "Large numbers, coloured operators, visual grid"
+          },
+          "dysgraphia": {
+            "label": "Dysgraphia",
+            "description": "Structured layout, wide spacing"
+          },
+          "dysorthography": {
+            "label": "Dysorthography",
+            "description": "Highlighted spelling patterns, coloured syllables"
+          },
+          "adhd": {
+            "label": "ODD/ADHD",
+            "description": "Minimal distractions, clear sections, highlighted terms"
+          },
+          "dyspraxia": {
+            "label": "Dyspraxia",
+            "description": "Chunked text, reading time, pauses"
+          },
+          "stuttering": {
+            "label": "Stuttering",
+            "description": "Short sentences, breathing points, smooth rhythm"
+          }
+        }
       },
       "list": {
         "empty": {

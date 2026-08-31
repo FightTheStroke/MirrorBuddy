@@ -6,19 +6,17 @@
  * Supports 7 DSA profiles: dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import {
   generateAccessiblePDF,
   isValidProfile,
   getAvailableProfiles,
-} from "@/lib/pdf-generator";
-import type {
-  DSAProfile,
-  PDFGeneratorRequest,
-} from "@/lib/pdf-generator/types";
+  getPdfLabels,
+} from '@/lib/pdf-generator';
+import type { DSAProfile, PDFGeneratorRequest } from '@/lib/pdf-generator/types';
 
 /**
  * POST /api/pdf-generator
@@ -45,7 +43,7 @@ import type {
 
 export const revalidate = 0;
 export const POST = pipe(
-  withSentry("/api/pdf-generator"),
+  withSentry('/api/pdf-generator'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -57,22 +55,17 @@ export const POST = pipe(
     kitId,
     materialId,
     profile,
-    format = "A4",
-  } = body as PDFGeneratorRequest;
+    format = 'A4',
+    locale,
+  } = body as PDFGeneratorRequest & { locale?: string };
 
   // Validate required fields
   if (!kitId) {
-    return NextResponse.json(
-      { success: false, error: "Missing kitId" },
-      { status: 400 },
-    );
+    return NextResponse.json({ success: false, error: 'Missing kitId' }, { status: 400 });
   }
 
   if (!profile) {
-    return NextResponse.json(
-      { success: false, error: "Missing profile" },
-      { status: 400 },
-    );
+    return NextResponse.json({ success: false, error: 'Missing profile' }, { status: 400 });
   }
 
   if (!isValidProfile(profile)) {
@@ -91,20 +84,17 @@ export const POST = pipe(
   });
 
   if (!studyKit) {
-    return NextResponse.json(
-      { success: false, error: "Study Kit not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ success: false, error: 'Study Kit not found' }, { status: 404 });
   }
 
-  if (studyKit.status !== "ready") {
+  if (studyKit.status !== 'ready') {
     return NextResponse.json(
-      { success: false, error: "Study Kit is not ready for export" },
+      { success: false, error: 'Study Kit is not ready for export' },
       { status: 400 },
     );
   }
 
-  logger.info("Generating accessible PDF", {
+  logger.info('Generating accessible PDF', {
     userId,
     kitId,
     profile,
@@ -130,6 +120,7 @@ export const POST = pipe(
     format,
     studentId: userId,
     studyKit: studyKitData, // Pass directly to avoid server-side fetch
+    labels: getPdfLabels(locale), // Bake locale-correct strings into the PDF
   });
 
   // Save metadata to Zaino (student's materials)
@@ -140,7 +131,7 @@ export const POST = pipe(
       data: {
         userId,
         toolId: `pdf-${kitId}-${profile}-${Date.now()}`,
-        toolType: "pdf-export",
+        toolType: 'pdf-export',
         title: filename,
         content: JSON.stringify({
           sourceKitId: kitId,
@@ -156,7 +147,7 @@ export const POST = pipe(
     });
     savedToZaino = true;
   } catch (saveError) {
-    logger.warn("Failed to save PDF metadata to Zaino", {
+    logger.warn('Failed to save PDF metadata to Zaino', {
       error: String(saveError),
     });
     // Continue - PDF generation succeeded, just saving failed
@@ -164,12 +155,12 @@ export const POST = pipe(
 
   // Return PDF as download response
   const headers = new Headers();
-  headers.set("Content-Type", "application/pdf");
-  headers.set("Content-Disposition", `attachment; filename="${filename}"`);
-  headers.set("Content-Length", size.toString());
-  headers.set("X-Saved-To-Zaino", savedToZaino.toString());
+  headers.set('Content-Type', 'application/pdf');
+  headers.set('Content-Disposition', `attachment; filename="${filename}"`);
+  headers.set('Content-Length', size.toString());
+  headers.set('X-Saved-To-Zaino', savedToZaino.toString());
 
-  logger.info("PDF generated successfully", {
+  logger.info('PDF generated successfully', {
     userId,
     kitId,
     profile,
@@ -188,7 +179,7 @@ export const POST = pipe(
  * GET /api/pdf-generator
  * Get available DSA profiles for UI display
  */
-export const GET = pipe(withSentry("/api/pdf-generator"))(async () => {
+export const GET = pipe(withSentry('/api/pdf-generator'))(async () => {
   const profiles = getAvailableProfiles();
   return NextResponse.json({
     success: true,

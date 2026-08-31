@@ -12,6 +12,7 @@ import type {
   PDFGeneratorRequest,
   PDFGeneratorResponse as _PDFGeneratorResponse,
   ExtractedContent,
+  PDFLabels,
 } from './types';
 import React, { type ReactElement } from 'react';
 
@@ -22,9 +23,9 @@ import React, { type ReactElement } from 'react';
  * @returns Promise with PDF buffer and metadata
  */
 export async function generateAccessiblePDF(
-  request: PDFGeneratorRequest
+  request: PDFGeneratorRequest,
 ): Promise<{ buffer: Buffer; filename: string; size: number }> {
-  const { kitId, materialId, profile: profileType, format = 'A4', studyKit } = request;
+  const { kitId, materialId, profile: profileType, format = 'A4', studyKit, labels } = request;
 
   // Get profile configuration
   const profile = getProfile(profileType);
@@ -41,10 +42,9 @@ export async function generateAccessiblePDF(
     content,
     profile,
     format,
+    labels,
   });
-  const buffer = await renderToBuffer(
-    pdfElement as unknown as ReactElement<DocumentProps>
-  );
+  const buffer = await renderToBuffer(pdfElement as unknown as ReactElement<DocumentProps>);
 
   // Generate filename
   const sanitizedTitle = content.title
@@ -67,7 +67,8 @@ export async function generateAccessiblePDF(
 export async function generatePDFFromContent(
   content: ExtractedContent,
   profileType: DSAProfile,
-  format: 'A4' | 'Letter' = 'A4'
+  format: 'A4' | 'Letter' = 'A4',
+  labels?: PDFLabels,
 ): Promise<{ buffer: Buffer; filename: string; size: number }> {
   const profile = getProfile(profileType);
 
@@ -79,10 +80,9 @@ export async function generatePDFFromContent(
     content,
     profile,
     format,
+    labels,
   });
-  const buffer = await renderToBuffer(
-    pdfElement as unknown as ReactElement<DocumentProps>
-  );
+  const buffer = await renderToBuffer(pdfElement as unknown as ReactElement<DocumentProps>);
 
   const sanitizedTitle = content.title
     .replace(/[^a-zA-Z0-9\s-]/g, '')

@@ -76,24 +76,50 @@
       "description": "Laden Sie ein PDF hoch und generieren Sie automatisch Zusammenfassungen, Karten, Demos und Quiz",
       "title": "Lernkit",
       "exportModal": {
-        "title": "Titel",
-        "format": "Format",
-        "export": "Exportieren",
+        "title": "Als PDF exportieren",
+        "export": "PDF exportieren",
         "cancel": "Abbrechen",
         "closeLabel": "Schließen",
-        "description": "Exportiere das Lernpaket als barrierefreies PDF",
-        "error": "Fehler",
-        "formatLabel": "Format",
-        "generating": "Generierung...",
-        "profileLabel": "Profil",
+        "description": "Erstelle ein barrierefreies PDF des Lernpakets",
+        "error": "Export fehlgeschlagen. Bitte erneut versuchen.",
+        "formatLabel": "Seitenformat",
+        "generating": "Wird erstellt …",
+        "profileLabel": "Leseprofil",
         "success": {
-          "default": "Standard",
-          "withZaino": "Mit Rucksack"
+          "default": "PDF heruntergeladen",
+          "withZaino": "PDF heruntergeladen und im Rucksack gespeichert"
         },
         "letterUs": "Letter (US)",
-        "a": "A",
-        "A4": "A4",
-        "Letter": "Letter"
+        "profiles": {
+          "dyslexia": {
+            "label": "Legasthenie",
+            "description": "Große Schrift, größerer Abstand, hoher Kontrast"
+          },
+          "dyscalculia": {
+            "label": "Dyskalkulie",
+            "description": "Große Zahlen, farbige Operatoren, visuelles Raster"
+          },
+          "dysgraphia": {
+            "label": "Dysgrafie",
+            "description": "Strukturiertes Layout, breiter Abstand"
+          },
+          "dysorthography": {
+            "label": "Dysorthografie",
+            "description": "Hervorgehobene Rechtschreibmuster, farbige Silben"
+          },
+          "adhd": {
+            "label": "SSV/ADHS",
+            "description": "Minimale Ablenkungen, klare Abschnitte, hervorgehobene Begriffe"
+          },
+          "dyspraxia": {
+            "label": "Dyspraxie",
+            "description": "Unterteilter Text, Lesezeit, Pausen"
+          },
+          "stuttering": {
+            "label": "Stottern",
+            "description": "Kurze Sätze, Atempausen, fließender Rhythmus"
+          }
+        }
       },
       "list": {
         "empty": {
