@@ -101,7 +101,8 @@
       "notRecommended": "Nicht empfohlen",
       "selectModels": "Modelle auswählen",
       "modelliAi": "Modelli AI",
-      "strumenti": "Strumenti"
+      "strumenti": "Strumenti",
+      "globallyManaged": "Global verwaltet: verwendet immer das beste verfügbare Modell"
     },
     "create": "Erstellen",
     "update": "Aktualisieren",
