@@ -11,13 +11,13 @@
 | ADRs         | 0038 (WebRTC), 0050 (cost guards), 0069 (adaptive VAD), 0152 (GA migration), 0159 (v1.5+), 0165 (v2 / whisper / translate), **0169 (v2.1 / Cedar)** |
 | Transport    | WebRTC (primary, ~200ms latency) / WebSocket (fallback, ~500ms)                                                                                     |
 | Audio Format | PCM16, 24kHz, mono, base64-encoded                                                                                                                  |
-| Model        | `gpt-realtime-2.1` (v2.1, GA, opt-in) / `gpt-realtime-2` (preview) / `gpt-realtime-1.5` (default) / `gpt-realtime` (fallback)                       |
+| Model        | `gpt-realtime-2.1` (v2.1, **Public Preview**, 100% traffic) / `gpt-realtime-2` (preview) / `gpt-realtime-1.5` (GA) / `gpt-realtime` (GA fallback)   |
 
 ## Models
 
 | Model                    | Version     | Purpose            | Feature Flag                            | Env Var                                          | Deployment Name          |
 | ------------------------ | ----------- | ------------------ | --------------------------------------- | ------------------------------------------------ | ------------------------ |
-| `gpt-realtime-2.1`       | v2026-07-07 | Voice (GA)         | `voice_realtime_21`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21`           | `gpt-realtime-2.1`       |
+| `gpt-realtime-2.1`       | v2026-07-07 | Voice (Preview)    | `voice_realtime_21`                     | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21`           | `gpt-realtime-2.1`       |
 | `gpt-realtime-2`         | v2026-05-06 | Voice (Preview)    | `voice_realtime_2`                      | `AZURE_OPENAI_REALTIME_DEPLOYMENT_V2`            | `gpt-realtime-2`         |
 | `gpt-realtime-whisper`   | v2026-05-06 | Live transcription | `voice_realtime_whisper_transcription`  | `AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT` | `gpt-realtime-whisper`   |
 | `gpt-realtime-translate` | v2026-05-06 | Live translation † | `voice_realtime_translate` (`degraded`) | `AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT`     | `gpt-realtime-translate` |
