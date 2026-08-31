@@ -3,6 +3,46 @@
 ## Status
 
 Accepted — 2026-07-19
+Corrected — 2026-08-31 (lifecycle label: `gpt-realtime-2.1` is **Public Preview**, not GA)
+
+## Correction (2026-08-31) — lifecycle label was wrong
+
+The original decision below recorded `gpt-realtime-2.1` (and, by implication, the
+whole GPT Realtime 2.x line) as **GA**. This is factually incorrect. Microsoft
+classifies the entire 2.x line as **Public Preview**:
+
+- Overview page is literally titled _"GPT Realtime 2.x (preview)"_ and states
+  _"This feature is currently in public preview … provided without a service-level
+  agreement"_ —
+  <https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/realtime-2>
+- Retirement schedule (updated 2026-08-26) lists the lifecycle stage for each row —
+  <https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule>
+
+| Model              | Version    | Lifecycle   | Retirement date |
+| ------------------ | ---------- | ----------- | --------------- |
+| `gpt-realtime`     | 2025-08-28 | **GA**      | 2027-03-02      |
+| `gpt-realtime-1.5` | 2026-02-23 | **GA**      | 2027-08-24      |
+| `gpt-realtime-2`   | 2026-05-06 | **Preview** | 2026-08-31      |
+| `gpt-realtime-2.1` | 2026-07-07 | **Preview** | 2027-06-25      |
+
+### Accepted risk
+
+Running a Public Preview model in production is an **accepted, conscious risk**, not
+a bug. Preview carries **no SLA** and Microsoft does not recommend it for production.
+It is accepted here because 2.1 has genuinely better alphanumeric speech
+(dates/numbers/formulas), which materially helps students with discalculia and STEM
+Maestri. This risk must stay explicitly recorded — not mislabelled as GA.
+
+### Rollback reality
+
+The documented fallback chain is
+`gpt-realtime-2.1` → `gpt-realtime-2` → `gpt-realtime-1.5` → `gpt-realtime`. Note that
+**`gpt-realtime-2` is itself Preview and reaches retirement on 2026-08-31** — it is not
+a durable fallback. The **only GA rungs** of the chain are `gpt-realtime-1.5`
+(retires 2027-08-24) and `gpt-realtime` (retires 2027-03-02). A true rollback to a
+supported model must land on one of those two.
+
+---
 
 ## Context
 
@@ -17,9 +57,12 @@ Central (EU). It is a drop-in successor of `gpt-realtime-2` (ADR 0165) with:
 - **Cedar voice** — new premium voice introduced with the 2.x line, alongside
   `marin`. Both are the recommended high-naturalness voices for realtime agents.
 
-| Model              | Version    | Lifecycle | Purpose                       |
-| ------------------ | ---------- | --------- | ----------------------------- |
-| `gpt-realtime-2.1` | 2026-07-07 | GA        | Successor of `gpt-realtime-2` |
+| Model              | Version    | Lifecycle      | Purpose                       |
+| ------------------ | ---------- | -------------- | ----------------------------- |
+| `gpt-realtime-2.1` | 2026-07-07 | Public Preview | Successor of `gpt-realtime-2` |
+
+> Lifecycle corrected 2026-08-31 — see the Correction section at the top of this ADR.
+> This row originally read `GA`, which was wrong.
 
 ### EU-only Constraint
 
