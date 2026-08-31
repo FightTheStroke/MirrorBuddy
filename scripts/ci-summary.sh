@@ -17,6 +17,7 @@ set -euo pipefail
 #   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only (no build lock)
 #   ./scripts/ci-summary.sh --links         # markdown link check only (no build lock)
 #   ./scripts/ci-summary.sh --migrations    # schema drift check only (no build lock)
+#   ./scripts/ci-summary.sh --reachability  # unreachable-file guard only (no build lock)
 #   ./scripts/ci-summary.sh --e2e           # E2E tests (requires running app)
 #   ./scripts/ci-summary.sh --a11y          # Accessibility tests (requires running app)
 #   ./scripts/ci-summary.sh --help          # show multi-agent guidance
@@ -323,6 +324,23 @@ run_migrations() {
 	rm -f "$tmp"
 }
 
+run_reachability() {
+	local OUTPUT
+	OUTPUT=$(cd "$PROJECT_DIR" && npx tsx scripts/check-reachability.ts 2>&1)
+	local EXIT=$?
+	if [[ $EXIT -eq 0 ]]; then
+		local s
+		s=$(echo "$OUTPUT" | grep -oE 'unreachable \(scoped\): [0-9]+' | head -1 || true)
+		result "[PASS] Reachability${s:+ ($s)}"
+	else
+		ERRORS=$((ERRORS + 1))
+		result "[FAIL] Reachability"
+		local d
+		d=$(echo "$OUTPUT" | grep -E '^  apps/web|Newly unreachable|still unreachable' | head -15 || true)
+		result_details "$d"
+	fi
+}
+
 # --- Main ---
 if [[ "$MODE" == "--help" ]]; then
 	awk '/^# ci-summary/,/^[^#]/{if(/^#/) print substr($0,3)}' "${BASH_SOURCE[0]}"
@@ -341,6 +359,7 @@ case "$MODE" in
 --unsafe-queries) run_unsafe_query_check ;;
 --links) run_link_check ;;
 --migrations) run_migrations ;;
+--reachability) run_reachability ;;
 --e2e) run_e2e "${2:-}" ;;
 --a11y) run_a11y ;;
 --quick)
@@ -353,6 +372,7 @@ case "$MODE" in
 	run_build
 	run_unsafe_query_check
 	run_unit
+	run_reachability
 	;;
 --all)
 	run_lint
@@ -363,6 +383,7 @@ case "$MODE" in
 	run_i18n
 	run_roster
 	run_migrations
+	run_reachability
 	run_link_check
 	run_e2e
 	run_a11y

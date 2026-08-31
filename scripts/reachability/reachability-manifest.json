@@ -1,0 +1,12 @@
+{
+  "_documentation": {
+    "purpose": "Declares production files under apps/web/src that ARE reachable through a non-static consumer knip cannot see (fs.readdirSync discovery, string-configured entry points, dynamic import() from instrumentation.ts, generator inputs). Declaring a file here removes it from the unreachable set so the guard stops flagging it.",
+    "whenToUse": "Only when a file is genuinely reachable at runtime but knip reports it as unused. If it is NOT reachable, wire it in or delete it instead — do not declare dead code alive.",
+    "entryShape": {
+      "file": "repo-relative path, e.g. apps/web/src/foo/bar.ts",
+      "consumer": "the exact non-static consumer that reaches it, e.g. 'instrumentation.ts dynamic import()' or 'lib/x/discovery.ts fs.readdirSync'",
+      "reason": "one line explaining why the consumer is invisible to static analysis"
+    }
+  },
+  "entries": []
+}
