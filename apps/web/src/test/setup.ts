@@ -295,6 +295,7 @@ if (typeof globalThis.crypto === 'undefined') {
 // Mock ResizeObserver for components using it
 if (typeof global.ResizeObserver === 'undefined') {
   global.ResizeObserver = class ResizeObserver {
+    constructor(_callback: ResizeObserverCallback) {}
     observe() {}
     unobserve() {}
     disconnect() {}
