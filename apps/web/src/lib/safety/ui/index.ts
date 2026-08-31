@@ -26,7 +26,8 @@ export {
 
 // Block Explainability Service (F-06)
 export {
-  generateBlockExplanation,
-  getExplanationEmoji,
-  formatExplanationForDisplay,
+  resolveBlockExplanation,
+  BLOCK_EXPLANATION_CATEGORIES,
+  type BlockExplanationCategory,
+  type BlockExplanationDescriptor,
 } from './block-explainability-service';

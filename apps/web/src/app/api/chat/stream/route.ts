@@ -238,7 +238,7 @@ export const POST = pipe(
       if (safetyBlock) {
         log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
-          yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
+          yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true, category: safetyBlock.category })}\n\n`;
           yield 'data: [DONE]\n\n';
         });
       }

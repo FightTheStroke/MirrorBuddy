@@ -53,11 +53,7 @@ vi.mock('@/lib/safety/server', () => ({
 }));
 
 import { checkInputSafety } from '../helpers';
-import {
-  logSafetyEvent,
-  escalateCrisisDetected,
-  notifyParentOfCrisis,
-} from '@/lib/safety/server';
+import { logSafetyEvent, escalateCrisisDetected, notifyParentOfCrisis } from '@/lib/safety/server';
 
 const CONTEXT = {
   userId: 'user-123',
@@ -74,7 +70,11 @@ describe('checkInputSafety crisis gating (F1 #458)', () => {
   it('crisis input with context: blocks AND fires escalation + parent notification', () => {
     const result = checkInputSafety('non voglio più vivere', CONTEXT);
 
-    expect(result).toEqual({ blocked: true, response: expect.any(String) });
+    expect(result).toEqual({
+      blocked: true,
+      response: expect.any(String),
+      category: expect.any(String),
+    });
 
     expect(vi.mocked(logSafetyEvent)).toHaveBeenCalledWith(
       'crisis_detected',
@@ -105,7 +105,11 @@ describe('checkInputSafety crisis gating (F1 #458)', () => {
     );
 
     // Still blocked with the jailbreak redirect response
-    expect(result).toEqual({ blocked: true, response: expect.any(String) });
+    expect(result).toEqual({
+      blocked: true,
+      response: expect.any(String),
+      category: expect.any(String),
+    });
 
     // But NO crisis side effects
     expect(vi.mocked(escalateCrisisDetected)).not.toHaveBeenCalled();
@@ -119,7 +123,11 @@ describe('checkInputSafety crisis gating (F1 #458)', () => {
       maestroId: 'leonardo',
     });
 
-    expect(result).toEqual({ blocked: true, response: expect.any(String) });
+    expect(result).toEqual({
+      blocked: true,
+      response: expect.any(String),
+      category: expect.any(String),
+    });
     expect(vi.mocked(escalateCrisisDetected)).toHaveBeenCalledWith(
       'anonymous',
       'conv-1',

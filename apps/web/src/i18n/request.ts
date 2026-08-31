@@ -30,6 +30,7 @@ const NAMESPACES = [
   'research',
   'email',
   'loading',
+  'safetyBlock',
 ] as const;
 
 async function loadNamespace(locale: string, namespace: string): Promise<Record<string, unknown>> {

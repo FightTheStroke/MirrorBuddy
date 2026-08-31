@@ -1,0 +1,52 @@
+{
+  "safetyBlock": {
+    "heading": "Mensaje de seguridad",
+    "categories": {
+      "crisis": {
+        "title": "Me importas",
+        "message": "Lo que sientes es importante y no estás solo.",
+        "action": "Habla ahora mismo con una persona adulta de confianza: un familiar, un profesor, o llama al número de emergencias."
+      },
+      "harmful": {
+        "title": "Mejor paramos aquí",
+        "message": "No puedo ayudarte con cosas que podrían hacer daño a alguien.",
+        "action": "Si necesitas ayuda, habla con una persona adulta de confianza. Podemos estudiar algo seguro juntos."
+      },
+      "explicit": {
+        "title": "Sigamos con los deberes",
+        "message": "Ese tema no es para nosotros aquí.",
+        "action": "Pregúntame mejor sobre tus asignaturas: ¡se me dan muy bien!"
+      },
+      "privacy": {
+        "title": "Protejamos tus datos",
+        "message": "Los datos personales es mejor mantenerlos en privado: no los necesitas para estudiar conmigo.",
+        "action": "Pregúntame mejor sobre tus deberes o tus asignaturas."
+      },
+      "unclear": {
+        "title": "No lo he entendido bien",
+        "message": "Esta petición no me queda clara.",
+        "action": "Prueba a pedírmelo con palabras más sencillas."
+      },
+      "fairness": {
+        "title": "Hablemos con respeto",
+        "message": "Me gusta hablar de las personas de forma justa y amable.",
+        "action": "Volvamos a intentarlo mirando el tema de forma más equilibrada."
+      },
+      "language": {
+        "title": "Usemos palabras amables",
+        "message": "Con palabras amables nos entendemos mejor.",
+        "action": "Prueba a escribir tu pregunta de forma más tranquila."
+      },
+      "stem": {
+        "title": "Algunos detalles los guardo a salvo",
+        "message": "Algunas cosas de ciencia pueden ser peligrosas, así que me guardo algunos detalles.",
+        "action": "Puedo explicarte cómo funciona en general: ¡solo pídemelo!"
+      },
+      "generic": {
+        "title": "Probemos con otra pregunta",
+        "message": "A esta no puedo responder ahora mismo.",
+        "action": "Probemos con otra cosa: ¿qué te gustaría aprender hoy?"
+      }
+    }
+  }
+}

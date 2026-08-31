@@ -1,0 +1,52 @@
+{
+  "safetyBlock": {
+    "heading": "Message de sécurité",
+    "categories": {
+      "crisis": {
+        "title": "Je tiens à toi",
+        "message": "Ce que tu ressens est important, et tu n'es pas seul.",
+        "action": "Parles-en tout de suite à un adulte de confiance : un parent, un enseignant, ou appelle le numéro d'urgence."
+      },
+      "harmful": {
+        "title": "Arrêtons-nous là",
+        "message": "Je ne peux pas t'aider avec des choses qui pourraient faire du mal à quelqu'un.",
+        "action": "Si tu as besoin d'aide, parles-en à un adulte de confiance. On peut étudier quelque chose de sûr ensemble."
+      },
+      "explicit": {
+        "title": "Restons sur les devoirs",
+        "message": "Ce sujet n'est pas pour nous ici.",
+        "action": "Pose-moi plutôt une question sur tes matières : je suis très bon pour ça !"
+      },
+      "privacy": {
+        "title": "Protégeons tes données",
+        "message": "Les données personnelles, il vaut mieux les garder privées : tu n'en as pas besoin pour étudier avec moi.",
+        "action": "Pose-moi plutôt une question sur tes devoirs ou tes matières."
+      },
+      "unclear": {
+        "title": "Je n'ai pas bien compris",
+        "message": "Cette demande n'est pas claire pour moi.",
+        "action": "Essaie de me la poser avec des mots plus simples."
+      },
+      "fairness": {
+        "title": "Parlons avec respect",
+        "message": "J'aime parler des personnes de façon juste et gentille.",
+        "action": "Réessayons en regardant le sujet de façon plus équilibrée."
+      },
+      "language": {
+        "title": "Utilisons des mots gentils",
+        "message": "Les mots gentils nous aident à mieux nous comprendre.",
+        "action": "Réessaie d'écrire ta question de façon plus calme."
+      },
+      "stem": {
+        "title": "Je garde certains détails en sécurité",
+        "message": "Certaines choses en science peuvent être dangereuses, alors je garde quelques détails pour moi.",
+        "action": "Je peux t'expliquer comment ça marche en général : demande-moi !"
+      },
+      "generic": {
+        "title": "Essayons une autre question",
+        "message": "Je ne peux pas répondre à celle-ci pour le moment.",
+        "action": "Essayons autre chose : qu'aimerais-tu apprendre aujourd'hui ?"
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "safetyBlock": {
+    "heading": "Messaggio di sicurezza",
+    "categories": {
+      "crisis": {
+        "title": "Ci tengo a te",
+        "message": "Quello che provi è importante e non sei solo.",
+        "action": "Parlane subito con un adulto di cui ti fidi: un genitore, un insegnante o chiama il 112."
+      },
+      "harmful": {
+        "title": "Meglio fermarci qui",
+        "message": "Non posso aiutarti con cose che potrebbero far male a qualcuno.",
+        "action": "Se ti serve aiuto, parlane con un adulto di cui ti fidi. Possiamo studiare qualcosa di sicuro insieme."
+      },
+      "explicit": {
+        "title": "Restiamo sui compiti",
+        "message": "Questo argomento non fa per noi qui.",
+        "action": "Chiedimi pure qualcosa sulle tue materie: sono bravo con quelle!"
+      },
+      "privacy": {
+        "title": "Proteggiamo i tuoi dati",
+        "message": "I dati personali è meglio tenerli privati: non ti servono per studiare con me.",
+        "action": "Chiedimi pure dei tuoi compiti o delle tue materie."
+      },
+      "unclear": {
+        "title": "Non ho capito bene",
+        "message": "Questa richiesta non mi è chiara.",
+        "action": "Prova a chiedermela con parole più semplici."
+      },
+      "fairness": {
+        "title": "Parliamone con rispetto",
+        "message": "Mi piace parlare delle persone in modo giusto e gentile.",
+        "action": "Riproviamo guardando l'argomento da un punto di vista più equilibrato."
+      },
+      "language": {
+        "title": "Usiamo parole gentili",
+        "message": "Con le parole gentili ci capiamo meglio.",
+        "action": "Riprova a scrivermi la domanda in modo più tranquillo."
+      },
+      "stem": {
+        "title": "Alcuni dettagli li tengo al sicuro",
+        "message": "Certe cose di scienza possono essere pericolose, così alcuni dettagli non te li do.",
+        "action": "Posso spiegarti come funziona in generale: chiedimelo pure!"
+      },
+      "generic": {
+        "title": "Meglio cambiare domanda",
+        "message": "A questa non riesco a rispondere adesso.",
+        "action": "Proviamo con qualcos'altro: cosa vuoi imparare oggi?"
+      }
+    }
+  }
+}
