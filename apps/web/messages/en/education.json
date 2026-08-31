@@ -324,10 +324,7 @@
       "emptyDescription": "No archived materials yet.",
       "emptyMaterials": "Empty Materials",
       "emptyPreferred": "Empty Preferred",
-      "gridView": "Grid view",
-      "listView": "List view",
       "searchPlaceholder": "Search archived materials...",
-      "sortLabel": "Sort by",
       "startConversation": "Start Conversation",
       "subtitle": "Review saved materials and continue studying.",
       "title": "Archive",
@@ -642,26 +639,6 @@
       "quizDescription": "Quiz description",
       "startFlashcardButton": "Start flashcards",
       "startQuizButton": "Start quiz"
-    },
-    "subjectConfirmation": {
-      "chooseProfessor": "Choose Professor",
-      "photoAlt": "Photo Alt",
-      "selectSubject": "Select Subject",
-      "maestroPanel": {
-        "description": "Descrizione",
-        "vuoiStudiare": "Vuoi studiare",
-        "continuaSenzaMaestro": "Continua senza Maestro",
-        "usaISuggerimentiMaieuticiPerRisolvereDaSolo": "Usa i suggerimenti maieutici per risolvere da solo",
-        "tornaAllaSelezioneMateria": "Torna alla selezione materia"
-      },
-      "subjectPanel": {
-        "cancel": "Cancel",
-        "confirm": "Confirm",
-        "confirmOrSelect": "Confirm Or Select",
-        "detected": "Detected",
-        "selectCorrect": "Select Correct",
-        "unrecognized": "Unrecognized"
-      }
     },
     "summaries": {
       "createButton": "Create",
