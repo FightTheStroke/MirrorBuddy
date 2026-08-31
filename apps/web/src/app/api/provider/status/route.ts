@@ -6,6 +6,8 @@
 
 import { NextResponse } from 'next/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
+import { resolveRealtimeDeployment } from '@/lib/ai/realtime-deployment';
 
 export const revalidate = 0;
 interface EnvVarStatus {
@@ -91,7 +93,12 @@ export const GET = pipe(withSentry('/api/provider/status'))(async () => {
       configured: azureConfigured,
       model: azureModel || null,
       realtimeConfigured: azureRealtimeConfigured,
-      realtimeModel: azureRealtimeDeployment || null,
+      realtimeModel:
+        resolveRealtimeDeployment({
+          useV15: isFeatureEnabled('voice_realtime_15')?.enabled ?? false,
+          useV2: isFeatureEnabled('voice_realtime_2')?.enabled ?? false,
+          useV21: isFeatureEnabled('voice_realtime_21')?.enabled ?? false,
+        }) ?? null,
       realtimeV15Model: azureRealtimeV15Deployment || null,
       audioModel: azureAudioDeployment || null,
       envVars: [
