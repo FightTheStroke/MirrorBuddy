@@ -191,7 +191,7 @@ export function MobileAdminNav({
       {/* Drawer */}
       <aside
         className={cn(
-          'fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r',
+          'fixed top-[var(--maintenance-banner-offset)] left-0 h-[calc(100%_-_var(--maintenance-banner-offset))] bg-white dark:bg-slate-900 border-r',
           'border-slate-200 dark:border-slate-800 z-40 transition-all duration-300',
           'w-72 max-w-[85vw]',
           isOpen ? 'translate-x-0' : '-translate-x-full',

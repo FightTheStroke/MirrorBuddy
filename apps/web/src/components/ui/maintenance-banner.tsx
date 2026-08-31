@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 type MaintenanceApiResponse =
   | { status: 'none' }
@@ -21,6 +21,7 @@ type MaintenanceApiResponse =
     };
 
 const DISMISS_KEY = 'maintenance-banner-dismissed';
+const OFFSET_VAR = '--maintenance-banner-offset';
 const POLL_INTERVAL_MS = 5 * 60 * 1000;
 const CLOCK_REFRESH_MS = 60 * 1000;
 
@@ -43,6 +44,7 @@ function formatTimeRemaining(targetIso: string): string {
 
 export function MaintenanceBanner() {
   const t = useTranslations('maintenance');
+  const bannerRef = useRef<HTMLDivElement>(null);
   const [payload, setPayload] = useState<MaintenanceApiResponse>({ status: 'none' });
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window === 'undefined') {
@@ -102,12 +104,41 @@ export function MaintenanceBanner() {
     return payload.status === 'upcoming' || payload.status === 'active';
   }, [clockTick, dismissed, payload.status]);
 
-  if (!shouldShow) {
+  // Reserve vertical space for the fixed banner instead of covering the site
+  // header: expose its measured height as a CSS variable that the app's top
+  // bars offset against. The variable defaults to 0px (see globals.css), so
+  // layouts are unchanged whenever no window is active.
+  useEffect(() => {
+    const root = document.documentElement;
+
+    if (!shouldShow) {
+      root.style.setProperty(OFFSET_VAR, '0px');
+      return;
+    }
+
+    const element = bannerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const applyOffset = () => {
+      root.style.setProperty(OFFSET_VAR, `${element.offsetHeight}px`);
+    };
+
+    applyOffset();
+
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(applyOffset) : null;
+    observer?.observe(element);
+
+    return () => {
+      observer?.disconnect();
+      root.style.setProperty(OFFSET_VAR, '0px');
+    };
+  }, [shouldShow, payload, clockTick]);
+
+  if (!shouldShow || payload.status === 'none') {
     return null;
   }
-
-  // Type narrowing: after shouldShow check, payload is 'upcoming' | 'active'
-  if (payload.status === 'none') return null;
 
   const isHighSeverity = payload.severity === 'high';
   const bannerClasses = isHighSeverity ? 'bg-red-600 text-red-50' : 'bg-amber-500 text-amber-950';
@@ -128,12 +159,16 @@ export function MaintenanceBanner() {
 
   return (
     <div
-      role="banner"
+      ref={bannerRef}
+      role="region"
       aria-label={label}
-      className={`fixed top-0 left-0 right-0 z-50 px-4 py-2 text-sm font-medium ${bannerClasses}`}
+      data-testid="maintenance-banner"
+      className={`fixed top-0 left-0 right-0 z-[60] px-4 py-2 text-sm font-medium ${bannerClasses}`}
     >
       <div className="mx-auto flex max-w-5xl items-center justify-center gap-3 text-center">
-        <span>{message}</span>
+        {/* Static message announces once (polite) on appear; the countdown
+            updates silently so a screen reader is not re-interrupted. */}
+        <span aria-live="polite">{message}</span>
         {countdownText ? <span className="font-semibold">{countdownText}</span> : null}
         <Link
           href="/maintenance"

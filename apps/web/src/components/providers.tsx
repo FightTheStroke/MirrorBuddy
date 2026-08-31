@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { AccessibilityProvider, MotionConfigBridge } from '@/components/accessibility';
 import { StagingBanner } from '@/components/ui/staging-banner';
+import { MaintenanceBanner } from '@/components/ui/maintenance-banner';
 import { ToastContainer } from '@/components/ui/toast';
 import { IOSInstallBanner } from '@/components/pwa';
 import { UnifiedConsentWall } from '@/components/consent';
@@ -202,6 +203,7 @@ export function Providers({ children, nonce }: ProvidersProps) {
         <MotionConfigBridge>
           {/* A11yInstantAccess moved to [locale]/layout.tsx for i18n context */}
           <StagingBanner />
+          <MaintenanceBanner />
           <ConditionalUnifiedConsent>
             <StoreInitializer />
             <AccentColorApplier />
