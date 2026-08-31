@@ -17,14 +17,10 @@ import type { StudyKit } from '@/types/study-kit';
 import type { QuizResult } from '@/types/index';
 
 import { parseMarkdown, buildDemoCode, transformQuizData } from './StudyKitViewer/utils';
-import {
-  handleDelete,
-  handleDownloadPDF,
-  handlePrint,
-  handleGeneratePath,
-} from './StudyKitViewer/handlers';
+import { handleDelete, handlePrint, handleGeneratePath } from './StudyKitViewer/handlers';
 import { DemoModal } from './StudyKitViewer/DemoModal';
 import { StudyKitHeader } from './StudyKitViewer/Header';
+import { ExportPDFModal } from './ExportPDFModal';
 
 import { MindmapRenderer } from '@/components/education/knowledge-hub/renderers/mindmap-renderer';
 import { Quiz } from '@/components/education/quiz';
@@ -49,6 +45,7 @@ export function StudyKitViewer({
   const [isGeneratingPath, setIsGeneratingPath] = useState(false);
   const [generatedPathId, setGeneratedPathId] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [adaptiveDifficulty, setAdaptiveDifficulty] = useState<number | null>(null);
 
   const parsedSummary = useMemo(() => parseMarkdown(studyKit.summary || ''), [studyKit.summary]);
@@ -118,7 +115,7 @@ export function StudyKitViewer({
     () => handleDelete({ studyKit, setIsDeleting, onDelete }),
     [studyKit, onDelete],
   );
-  const onDownloadPDF = useCallback(() => handleDownloadPDF({ studyKit }), [studyKit]);
+  const onExportClick = useCallback(() => setShowExportModal(true), []);
   const onPrint = useCallback(() => handlePrint({ studyKit }), [studyKit]);
   const onGeneratePathClick = useCallback(() => {
     handleGeneratePath({
@@ -143,7 +140,7 @@ export function StudyKitViewer({
         isDeleting={isDeleting}
         onGeneratePath={onGeneratePath}
         onGeneratePathClick={onGeneratePathClick}
-        onDownloadPDF={onDownloadPDF}
+        onExportClick={onExportClick}
         onPrint={onPrint}
         onDeleteClick={onDeleteClick}
         showDelete={!!onDelete}
@@ -258,6 +255,12 @@ export function StudyKitViewer({
           demo={studyKit.demo as { title?: string; description?: string } | null}
         />
       )}
+
+      <ExportPDFModal
+        studyKit={studyKit}
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+      />
     </div>
   );
 }

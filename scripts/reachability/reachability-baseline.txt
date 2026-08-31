@@ -68,9 +68,7 @@ apps/web/src/components/progress/progress-view/components/stat-card.tsx
 apps/web/src/components/settings/accessibility-panel-mobile/index.ts
 apps/web/src/components/structured-data/index.ts
 apps/web/src/components/structured-data/json-ld-script.tsx
-apps/web/src/components/study-kit/ExportPDFModal.tsx
 apps/web/src/components/study-kit/components/upload-area.tsx
-apps/web/src/components/study-kit/dsa-profiles.ts
 apps/web/src/components/study-kit/index.ts
 apps/web/src/components/tools/pdf-preview/index.ts
 apps/web/src/components/tools/summary-editor/index.ts

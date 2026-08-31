@@ -1,15 +1,24 @@
 'use client';
 
 /**
- * ExportPDFModal Component
- * Modal for exporting Study Kit as accessible PDF with DSA profile selection
- * Wave 3: PDF-Accessibile-DSA UI Integration
+ * ExportPDFModal
+ * Lets a student export a Study Kit as an accessible, DSA-tuned PDF.
+ * Built on the shared Radix Dialog so focus trapping, Escape-to-close, focus
+ * return and `aria-modal` semantics come for free (WCAG 2.1 AA).
  */
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { X, Download, Loader2, FileText, Check } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Download, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
@@ -23,11 +32,14 @@ interface ExportPDFModalProps {
   onClose: () => void;
 }
 
+type PageFormat = 'A4' | 'Letter';
+
 export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProps) {
   const t = useTranslations('tools.studyKit.exportModal');
+  const locale = useLocale();
   const [selectedProfile, setSelectedProfile] = useState<DSAProfile>('dyslexia');
+  const [format, setFormat] = useState<PageFormat>('A4');
   const [isExporting, setIsExporting] = useState(false);
-  const [format, setFormat] = useState<'A4' | 'Letter'>('A4');
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -38,43 +50,31 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
           kitId: studyKit.id,
           profile: selectedProfile,
           format,
+          locale,
         }),
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Export failed' }));
-        throw new Error(error.error || 'Export failed');
+        const details = await response.json().catch(() => null);
+        throw new Error(details?.error ?? t('error'));
       }
 
-      // Get filename from header or generate one
-      const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = `${studyKit.title}_DSA.pdf`;
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+?)"/);
-        if (match) filename = match[1];
-      }
-
-      // Check if saved to Zaino
+      const disposition = response.headers.get('Content-Disposition');
+      const match = disposition?.match(/filename="(.+?)"/);
+      const filename = match?.[1] ?? `${studyKit.title}_DSA.pdf`;
       const savedToZaino = response.headers.get('X-Saved-To-Zaino') === 'true';
 
-      // Download the PDF
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
 
-      // Show success message
-      if (savedToZaino) {
-        toast.success(t('success.withZaino'));
-      } else {
-        toast.success(t('success.default'));
-      }
-
+      toast.success(savedToZaino ? t('success.withZaino') : t('success.default'));
       onClose();
     } catch (error) {
       logger.error('PDF export failed', { error: String(error) });
@@ -84,134 +84,96 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      role="presentation"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') {
-          onClose();
-        }
-      }}
-    >
-      {}
-      <div
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
-              <FileText className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{t('title')}</h2>
-              <p className="text-sm text-slate-500">{t('description')}</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label={t('closeLabel')}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl motion-reduce:animate-none motion-reduce:transition-none">
+        <DialogHeader>
+          <DialogTitle>{t('title')}</DialogTitle>
+          <DialogDescription>{t('description')}</DialogDescription>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
-          {/* Study Kit info */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+        <div className="space-y-6">
+          <div className="rounded-lg bg-slate-50 p-4 dark:bg-slate-800">
             <p className="font-medium text-slate-900 dark:text-white">{studyKit.title}</p>
             {studyKit.subject && <p className="text-sm text-slate-500">{studyKit.subject}</p>}
           </div>
 
-          {/* DSA Profile Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+          <fieldset>
+            <legend className="mb-3 block text-sm font-medium text-slate-700 dark:text-slate-300">
               {t('profileLabel')}
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {DSA_PROFILES.map((profile) => (
-                <button
-                  key={profile.value}
-                  type="button"
-                  onClick={() => setSelectedProfile(profile.value)}
-                  className={cn(
-                    'flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all',
-                    selectedProfile === profile.value
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
-                  )}
-                >
-                  <div
+            </legend>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {DSA_PROFILES.map((profile) => {
+                const selected = selectedProfile === profile.value;
+                return (
+                  <button
+                    key={profile.value}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => setSelectedProfile(profile.value)}
                     className={cn(
-                      'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm',
-                      selectedProfile === profile.value
-                        ? 'bg-green-500 text-white'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
+                      'flex items-start gap-3 rounded-lg border-2 p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed focus-visible:ring-offset-2 motion-reduce:transition-none',
+                      selected
+                        ? 'border-green-600 bg-green-50 dark:bg-green-900/20'
+                        : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600',
                     )}
                   >
-                    {profile.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-900 dark:text-white">
-                        {profile.label}
-                      </span>
-                      {selectedProfile === profile.value && (
-                        <Check className="w-4 h-4 text-green-500" />
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold',
+                        selected
+                          ? 'bg-green-600 text-white'
+                          : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
                       )}
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
-                      {profile.description}
-                    </p>
-                  </div>
+                    >
+                      {profile.icon}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        <span className="font-medium text-slate-900 dark:text-white">
+                          {t(`profiles.${profile.value}.label`)}
+                        </span>
+                        {selected && (
+                          <Check aria-hidden="true" className="h-4 w-4 text-green-600" />
+                        )}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-slate-600 dark:text-slate-400">
+                        {t(`profiles.${profile.value}.description`)}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend className="mb-3 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              {t('formatLabel')}
+            </legend>
+            <div className="flex gap-3">
+              {(['A4', 'Letter'] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={format === option}
+                  onClick={() => setFormat(option)}
+                  className={cn(
+                    'flex-1 rounded-lg border-2 px-4 py-3 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed focus-visible:ring-offset-2 motion-reduce:transition-none',
+                    format === option
+                      ? 'border-green-600 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                      : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:text-slate-400',
+                  )}
+                >
+                  {option === 'A4' ? 'A4' : t('letterUs')}
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Format Selection */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-              {t('formatLabel')}
-            </label>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setFormat('A4')}
-                className={cn(
-                  'flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all',
-                  format === 'A4'
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300',
-                )}
-              >
-                A4
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormat('Letter')}
-                className={cn(
-                  'flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all',
-                  format === 'Letter'
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300',
-                )}
-              >
-                {t('letterUs')}
-              </button>
-            </div>
-          </div>
+          </fieldset>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={isExporting}>
             {t('cancel')}
           </Button>
@@ -221,19 +183,17 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
             className="gap-2 bg-green-600 hover:bg-green-700"
           >
             {isExporting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t('generating')}
-              </>
+              <Loader2
+                aria-hidden="true"
+                className="h-4 w-4 animate-spin motion-reduce:animate-none"
+              />
             ) : (
-              <>
-                <Download className="w-4 h-4" />
-                {t('export')}
-              </>
+              <Download aria-hidden="true" className="h-4 w-4" />
             )}
+            {isExporting ? t('generating') : t('export')}
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,6 +3,8 @@
  * Type definitions for accessible PDF generation for DSA students
  */
 
+import type { PDFLabels } from './labels';
+
 // DSA Profile Types
 export type DSAProfile =
   | 'dyslexia'
@@ -108,6 +110,9 @@ export interface ContentMetadata {
   sourceMaterialId?: string;
 }
 
+// Re-export the locale-resolved PDF label contract from its owning module.
+export type { PDFLabels };
+
 // PDF Generation request/response
 export interface PDFGeneratorRequest {
   kitId: string;
@@ -116,6 +121,7 @@ export interface PDFGeneratorRequest {
   format?: 'A4' | 'Letter';
   studentId?: string;
   studyKit?: Record<string, unknown>; // Optional: pass studyKit directly to avoid fetch
+  labels?: PDFLabels; // Locale-resolved strings baked into the PDF
 }
 
 export interface PDFGeneratorResponse {

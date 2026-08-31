@@ -8,7 +8,7 @@
 import { Download, Trash2, Printer, Route, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { StudyKit } from '@/types/study-kit';
-import { useTranslations } from "next-intl";
+import { useTranslations } from 'next-intl';
 
 interface HeaderProps {
   studyKit: StudyKit;
@@ -18,7 +18,7 @@ interface HeaderProps {
   isDeleting: boolean;
   onGeneratePath?: (pathId: string) => void;
   onGeneratePathClick: () => void;
-  onDownloadPDF: () => void;
+  onExportClick: () => void;
   onPrint: () => void;
   onDeleteClick: () => void;
   showDelete: boolean;
@@ -32,27 +32,35 @@ export function StudyKitHeader({
   isDeleting,
   onGeneratePath,
   onGeneratePathClick,
-  onDownloadPDF,
+  onExportClick,
   onPrint,
   onDeleteClick,
   showDelete,
 }: HeaderProps) {
-  const t = useTranslations("education");
+  const t = useTranslations('education');
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          {studyKit.title}
-        </h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{studyKit.title}</h2>
         {studyKit.subject && (
           <p className="no-print text-sm text-slate-600 dark:text-slate-400 mt-1">
             {studyKit.subject}
           </p>
         )}
         <div className="no-print flex items-center gap-4 mt-2 text-xs text-slate-500">
-          {studyKit.pageCount && <span>{studyKit.pageCount} {t("pagine")}</span>}
-          {studyKit.wordCount && <span>{studyKit.wordCount.toLocaleString()} {t("parole")}</span>}
-          <span>{materialCount} {t("materialiGenerati")}</span>
+          {studyKit.pageCount && (
+            <span>
+              {studyKit.pageCount} {t('pagine')}
+            </span>
+          )}
+          {studyKit.wordCount && (
+            <span>
+              {studyKit.wordCount.toLocaleString()} {t('parole')}
+            </span>
+          )}
+          <span>
+            {materialCount} {t('materialiGenerati')}
+          </span>
         </div>
       </div>
 
@@ -62,10 +70,10 @@ export function StudyKitHeader({
             size="sm"
             onClick={() => onGeneratePath?.(generatedPathId)}
             className="gap-2 bg-green-600 hover:bg-green-700"
-            title={t("vaiAlPercorsoDiApprendimento")}
+            title={t('vaiAlPercorsoDiApprendimento')}
           >
             <Route className="w-4 h-4" />
-            <span className="hidden sm:inline">{t("vaiAlPercorso")}</span>
+            <span className="hidden sm:inline">{t('vaiAlPercorso')}</span>
           </Button>
         ) : (
           <Button
@@ -73,7 +81,7 @@ export function StudyKitHeader({
             onClick={onGeneratePathClick}
             disabled={isGeneratingPath || !studyKit.summary}
             className="gap-2"
-            title={t("titleGeneraUnPercorsoDiApprendimentoProgressivo")}
+            title={t('titleGeneraUnPercorsoDiApprendimentoProgressivo')}
           >
             {isGeneratingPath ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -88,9 +96,9 @@ export function StudyKitHeader({
         <Button
           variant="outline"
           size="sm"
-          onClick={onDownloadPDF}
-          aria-label={t("scaricaPdfAccessibile")}
-          title={t("scaricaPdfAccessibilePerDsa")}
+          onClick={onExportClick}
+          aria-label={t('scaricaPdfAccessibile')}
+          title={t('scaricaPdfAccessibilePerDsa')}
           className="no-print gap-1"
         >
           <Download className="w-4 h-4" />
@@ -100,12 +108,12 @@ export function StudyKitHeader({
           variant="outline"
           size="sm"
           onClick={onPrint}
-          aria-label={t("stampaPdf")}
-          title={t("stampaPdfAccessibile")}
+          aria-label={t('stampaPdf')}
+          title={t('stampaPdfAccessibile')}
           className="no-print"
         >
           <Printer className="w-4 h-4 mr-1" />
-          <span className="hidden sm:inline">{t("stampa")}</span>
+          <span className="hidden sm:inline">{t('stampa')}</span>
         </Button>
         {showDelete && (
           <Button
@@ -113,7 +121,7 @@ export function StudyKitHeader({
             size="sm"
             onClick={onDeleteClick}
             disabled={isDeleting}
-            aria-label={t("eliminaStudyKit")}
+            aria-label={t('eliminaStudyKit')}
             className="no-print"
           >
             <Trash2 className="w-4 h-4" />

@@ -20,7 +20,11 @@ export type {
   PDFHeaderStyle,
   PDFContentStyle,
   PDFFooterStyle,
+  PDFLabels,
 } from './types';
+
+// Export locale-resolved PDF labels
+export { getPdfLabels, DEFAULT_PDF_LABELS } from './labels';
 
 // Export profiles
 export {
@@ -39,13 +43,7 @@ export {
 } from './profiles';
 
 // Export components
-export {
-  PDFDocument,
-  PDFTitle,
-  PDFText,
-  PDFList,
-  PDFImage,
-} from './components';
+export { PDFDocument, PDFTitle, PDFText, PDFList, PDFImage } from './components';
 
 // Export utilities
 export {
