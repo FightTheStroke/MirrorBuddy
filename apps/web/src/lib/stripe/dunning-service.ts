@@ -6,16 +6,17 @@
  * After 7 days: Auto-downgrade to Base tier
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { Resend } from "resend";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { Resend } from 'resend';
+import { DEFAULT_EMAIL_FROM, getSiteUrl } from '@/lib/config/site-url';
 
 let resendInstance: Resend | null = null;
 
 function getResend(): Resend {
   if (!resendInstance) {
     if (!process.env.RESEND_API_KEY) {
-      throw new Error("RESEND_API_KEY environment variable is not set");
+      throw new Error('RESEND_API_KEY environment variable is not set');
     }
     resendInstance = new Resend(process.env.RESEND_API_KEY);
   }
@@ -44,7 +45,7 @@ export class DunningService {
     await prisma.userSubscription.update({
       where: { userId },
       data: {
-        status: "PAUSED",
+        status: 'PAUSED',
         expiresAt: gracePeriodEnd,
       },
     });
@@ -64,7 +65,7 @@ export class DunningService {
       });
     }
 
-    logger.info("Payment failure handled, grace period started", {
+    logger.info('Payment failure handled, grace period started', {
       userId,
       gracePeriodEnd,
     });
@@ -73,7 +74,7 @@ export class DunningService {
   async processGracePeriodExpired(): Promise<void> {
     const expiredSubs = await prisma.userSubscription.findMany({
       where: {
-        status: "PAUSED",
+        status: 'PAUSED',
         expiresAt: {
           lte: new Date(),
         },
@@ -84,13 +85,11 @@ export class DunningService {
     });
 
     const baseTier = await prisma.tierDefinition.findUnique({
-      where: { code: "base" },
+      where: { code: 'base' },
     });
 
     if (!baseTier) {
-      logger.error(
-        "Base tier not found, cannot downgrade expired subscriptions",
-      );
+      logger.error('Base tier not found, cannot downgrade expired subscriptions');
       return;
     }
 
@@ -99,7 +98,7 @@ export class DunningService {
         where: { id: sub.id },
         data: {
           tierId: baseTier.id,
-          status: "CANCELLED",
+          status: 'CANCELLED',
           expiresAt: new Date(),
         },
       });
@@ -108,7 +107,7 @@ export class DunningService {
         await this.sendDowngradeEmail(sub.user.email);
       }
 
-      logger.info("Subscription downgraded after grace period", {
+      logger.info('Subscription downgraded after grace period', {
         userId: sub.userId,
       });
     }
@@ -118,7 +117,7 @@ export class DunningService {
     const now = new Date();
     const pausedSubs = await prisma.userSubscription.findMany({
       where: {
-        status: "PAUSED",
+        status: 'PAUSED',
         expiresAt: {
           gt: now,
         },
@@ -139,7 +138,7 @@ export class DunningService {
         await this.sendDunningEmail({
           userId: sub.userId,
           email: sub.user.email,
-          subscriptionId: sub.stripeSubscriptionId || "",
+          subscriptionId: sub.stripeSubscriptionId || '',
           daysSinceFailure,
           amountDue: 999,
         });
@@ -152,32 +151,32 @@ export class DunningService {
 
     const subject =
       daysSinceFailure === 1
-        ? "Payment Failed - Action Required"
+        ? 'Payment Failed - Action Required'
         : daysSinceFailure === 3
-          ? "Reminder: Payment Failed - 4 Days Remaining"
-          : "Final Notice: Payment Failed - Grace Period Expiring Today";
+          ? 'Reminder: Payment Failed - 4 Days Remaining'
+          : 'Final Notice: Payment Failed - Grace Period Expiring Today';
 
     const html = `
       <h1>Payment Failed</h1>
       <p>Your recent payment of €${(amountDue / 100).toFixed(2)} failed.</p>
       <p>Days remaining in grace period: ${7 - daysSinceFailure}</p>
       <p>Please update your payment method to avoid service interruption.</p>
-      <a href="${process.env.NEXT_PUBLIC_BASE_URL}/dashboard">Update Payment Method</a>
+      <a href="${getSiteUrl()}/dashboard">Update Payment Method</a>
     `;
 
     try {
       await getResend().emails.send({
-        from: "MirrorBuddy <noreply@mirrorbuddy.app>",
+        from: DEFAULT_EMAIL_FROM,
         to: email,
         subject,
         html,
       });
 
-      logger.info("Dunning email sent", { email, daysSinceFailure });
+      logger.info('Dunning email sent', { email, daysSinceFailure });
     } catch (error) {
-      logger.error("Failed to send dunning email", {
+      logger.error('Failed to send dunning email', {
         email,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -187,20 +186,20 @@ export class DunningService {
       <h1>Subscription Downgraded</h1>
       <p>Your Pro subscription has been downgraded to Base due to payment failure.</p>
       <p>You can upgrade again anytime from your dashboard.</p>
-      <a href="${process.env.NEXT_PUBLIC_BASE_URL}/pricing">View Pricing</a>
+      <a href="${getSiteUrl()}/pricing">View Pricing</a>
     `;
 
     try {
       await getResend().emails.send({
-        from: "MirrorBuddy <noreply@mirrorbuddy.app>",
+        from: DEFAULT_EMAIL_FROM,
         to: email,
-        subject: "Subscription Downgraded",
+        subject: 'Subscription Downgraded',
         html,
       });
     } catch (error) {
-      logger.error("Failed to send downgrade email", {
+      logger.error('Failed to send downgrade email', {
         email,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

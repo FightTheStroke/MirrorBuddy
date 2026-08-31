@@ -6,6 +6,7 @@
 import { defaultLocale, type Locale } from '@/i18n/config';
 import { generateOGMetadata, type OGMetadataInput } from './og-metadata';
 import type { Metadata } from 'next';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 /**
  * Localized default metadata for each locale
@@ -56,7 +57,7 @@ export async function getLocalizedOGMetadata(
     };
   } = {},
 ): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = getSiteUrl();
 
   // Use provided values or fall back to defaults
   const defaultMetadata = DEFAULT_METADATA[locale] || DEFAULT_METADATA[defaultLocale];

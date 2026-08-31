@@ -1,9 +1,10 @@
+import { getSiteUrl } from '@/lib/config/site-url';
 /**
  * Email templates for the beta invite system
  */
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = getSiteUrl();
 
 export interface InviteRequestData {
   name: string;
@@ -42,7 +43,7 @@ export function getAdminNotificationTemplate(data: InviteRequestData): {
   to: string;
 } {
   if (!ADMIN_EMAIL) {
-    throw new Error("ADMIN_EMAIL environment variable is required");
+    throw new Error('ADMIN_EMAIL environment variable is required');
   }
 
   const adminUrl = `${APP_URL}/admin/invites`;
@@ -58,7 +59,7 @@ export function getAdminNotificationTemplate(data: InviteRequestData): {
     </ul>
   </div>
   `
-    : "";
+    : '';
 
   const trialUsageText = data.trialStats
     ? `
@@ -67,7 +68,7 @@ Trial Usage:
 - Voce: ${data.trialStats.voiceMinutesUsed}/5 min
 - Tool: ${data.trialStats.toolsUsed}/10
 `
-    : "";
+    : '';
 
   return {
     to: ADMIN_EMAIL,
@@ -85,7 +86,7 @@ Trial Usage:
   <div style="background: #f1f5f9; border-radius: 8px; padding: 16px; margin: 20px 0;">
     <p style="margin: 0 0 8px 0;"><strong>Nome:</strong> ${escapeHtml(data.name)}</p>
     <p style="margin: 0 0 8px 0;"><strong>Email:</strong> ${escapeHtml(data.email)}</p>
-    ${data.trialSessionId ? `<p style="margin: 0 0 8px 0;"><strong>Trial Session:</strong> ${escapeHtml(data.trialSessionId)}</p>` : ""}
+    ${data.trialSessionId ? `<p style="margin: 0 0 8px 0;"><strong>Trial Session:</strong> ${escapeHtml(data.trialSessionId)}</p>` : ''}
   </div>
 
   ${trialUsageHtml}
@@ -112,7 +113,7 @@ Nuova richiesta beta per MirrorBuddy
 
 Nome: ${data.name}
 Email: ${data.email}
-${data.trialSessionId ? `Trial Session: ${data.trialSessionId}` : ""}
+${data.trialSessionId ? `Trial Session: ${data.trialSessionId}` : ''}
 ${trialUsageText}
 Motivazione:
 ${data.motivation}
@@ -127,10 +128,7 @@ ID Richiesta: ${data.requestId}
 /**
  * User notification: request received
  */
-export function getRequestReceivedTemplate(data: {
-  name: string;
-  email: string;
-}): {
+export function getRequestReceivedTemplate(data: { name: string; email: string }): {
   subject: string;
   html: string;
   text: string;
@@ -138,7 +136,7 @@ export function getRequestReceivedTemplate(data: {
 } {
   return {
     to: data.email,
-    subject: "MirrorBuddy - Richiesta ricevuta",
+    subject: 'MirrorBuddy - Richiesta ricevuta',
     html: `
 <!DOCTYPE html>
 <html>
@@ -189,7 +187,7 @@ export function getApprovalTemplate(data: InviteApprovalData): {
 } {
   return {
     to: data.email,
-    subject: "MirrorBuddy - Benvenuto nella Beta!",
+    subject: 'MirrorBuddy - Benvenuto nella Beta!',
     html: `
 <!DOCTYPE html>
 <html>
@@ -252,13 +250,13 @@ export function getRejectionTemplate(data: InviteRejectionData): {
 } {
   const reasonBlock = data.reason
     ? `<p style="background: #f1f5f9; border-radius: 8px; padding: 12px; margin: 20px 0;">${escapeHtml(data.reason)}</p>`
-    : "";
+    : '';
 
-  const reasonText = data.reason ? `\nMotivo: ${data.reason}\n` : "";
+  const reasonText = data.reason ? `\nMotivo: ${data.reason}\n` : '';
 
   return {
     to: data.email,
-    subject: "MirrorBuddy - Aggiornamento sulla tua richiesta",
+    subject: 'MirrorBuddy - Aggiornamento sulla tua richiesta',
     html: `
 <!DOCTYPE html>
 <html>
@@ -301,11 +299,11 @@ Il team MirrorBuddy
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (char) => map[char] || char);
 }

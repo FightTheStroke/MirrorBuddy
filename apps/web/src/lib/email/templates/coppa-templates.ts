@@ -1,3 +1,4 @@
+import { getSiteUrl } from '@/lib/config/site-url';
 /**
  * Email templates for COPPA parental consent verification
  *
@@ -5,7 +6,7 @@
  * These templates support the consent verification flow.
  */
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = getSiteUrl();
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL;
 
 export interface ParentalConsentRequestData {
@@ -27,28 +28,23 @@ export interface ParentalConsentConfirmationData {
  * Parental consent request email
  * Sent to parent's email with verification code
  */
-export function getParentalConsentRequestTemplate(
-  data: ParentalConsentRequestData,
-): {
+export function getParentalConsentRequestTemplate(data: ParentalConsentRequestData): {
   subject: string;
   html: string;
   text: string;
   to: string;
 } {
-  const expiresFormatted = data.expiresAt.toLocaleDateString(
-    data.locale || "it-IT",
-    {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  );
+  const expiresFormatted = data.expiresAt.toLocaleDateString(data.locale || 'it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return {
     to: data.parentEmail,
-    subject: "MirrorBuddy - Richiesta Consenso Genitoriale (COPPA)",
+    subject: 'MirrorBuddy - Richiesta Consenso Genitoriale (COPPA)',
     html: `
 <!DOCTYPE html>
 <html>
@@ -157,9 +153,7 @@ Se non hai richiesto questo account, puoi ignorare questa email.
  * Parental consent confirmation email
  * Sent after parent approves
  */
-export function getParentalConsentConfirmationTemplate(
-  data: ParentalConsentConfirmationData,
-): {
+export function getParentalConsentConfirmationTemplate(data: ParentalConsentConfirmationData): {
   subject: string;
   html: string;
   text: string;
@@ -167,7 +161,7 @@ export function getParentalConsentConfirmationTemplate(
 } {
   return {
     to: data.parentEmail,
-    subject: "MirrorBuddy - Consenso Confermato",
+    subject: 'MirrorBuddy - Consenso Confermato',
     html: `
 <!DOCTYPE html>
 <html>
@@ -236,11 +230,11 @@ Il team MirrorBuddy
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (char) => map[char] || char);
 }

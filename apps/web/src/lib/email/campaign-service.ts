@@ -6,6 +6,7 @@
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 /** Recipient source for campaign sending */
 export type CampaignSource = 'users' | 'waitlist' | 'both';
@@ -405,7 +406,7 @@ export async function sendCampaign(campaignId: string, source?: CampaignSource):
     let sentCount = 0;
     let failedCount = 0;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.com';
+    const appUrl = getSiteUrl();
     const currentDate = new Date().toLocaleDateString('it-IT');
     const currentYear = new Date().getFullYear().toString();
 

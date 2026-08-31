@@ -216,7 +216,7 @@ jobs:
           # Required for provider check during build - ensures correct page rendering
           OLLAMA_URL: http://localhost:11434
           # Required for canonical URL generation (no fallback — throws if missing)
-          NEXT_PUBLIC_SITE_URL: https://mirrorbuddy.org
+          NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
 
       # Share build output with E2E and Performance jobs
       - name: Verify and prepare build output
@@ -455,7 +455,7 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:unit -- --coverage
         env:
-          NEXT_PUBLIC_SITE_URL: https://mirrorbuddy.org
+          NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
 
       - name: Check coverage thresholds
         run: |
@@ -789,8 +789,11 @@ jobs:
           PROTECTED_USERS: ${{ secrets.PROTECTED_USERS }}
           TRIAL_BUDGET_LIMIT_EUR: ${{ secrets.TRIAL_BUDGET_LIMIT_EUR }}
           # Public URLs
-          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          # Public canonical URL: intentionally literal, not a secret, so the
+          # deployed bundle can never inline a stale value (see lib/config/site-url.ts)
+          NEXT_PUBLIC_SITE_URL: https://www.mirrorbuddy.org
+          NEXT_PUBLIC_APP_URL: https://www.mirrorbuddy.org
+          NEXT_PUBLIC_BASE_URL: https://www.mirrorbuddy.org
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
   # Lane 5b: SMOKE TESTS - Critical Path Validation (BLOCKING)

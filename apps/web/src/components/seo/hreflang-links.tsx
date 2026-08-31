@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { generateHreflangTags } from '@/lib/seo/hreflang';
 import type { Locale } from '@/lib/seo/hreflang.types';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 interface HreflangLinksProps {
   locales?: readonly Locale[];
@@ -23,7 +24,7 @@ export function HreflangLinks({
   locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangLinksProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const resolvedBaseUrl = baseUrl ?? getSiteUrl();
   const rawPathname = usePathname();
 
   // Strip locale prefix from pathname since usePathname() returns /it/welcome

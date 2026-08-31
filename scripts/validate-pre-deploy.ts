@@ -198,6 +198,7 @@ function validateOptionalEnvVars(): void {
     // Public URLs
     { name: 'NEXT_PUBLIC_SITE_URL', category: 'SEO' },
     { name: 'NEXT_PUBLIC_APP_URL', category: 'App' },
+    { name: 'NEXT_PUBLIC_BASE_URL', category: 'App' },
     // Model defaults - optional, have code fallbacks
     { name: 'DEFAULT_CHAT_MODEL', category: 'AI Models' },
     { name: 'DEFAULT_CHAT_MODEL_EDU', category: 'AI Models' },

@@ -5,6 +5,7 @@
 
 import { generateHreflangTags } from '@/lib/seo/hreflang';
 import type { Locale } from '@/lib/seo/hreflang.types';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 interface HreflangTagsProps {
   pathname: string;
@@ -31,7 +32,7 @@ export function HreflangTags({
   locales = ['it', 'en', 'fr', 'de', 'es'] as const,
   baseUrl,
 }: HreflangTagsProps) {
-  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const resolvedBaseUrl = baseUrl ?? getSiteUrl();
   const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
   return (

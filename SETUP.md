@@ -182,6 +182,10 @@ DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+# In production all three are https://www.mirrorbuddy.org (the canonical host).
+# They are inlined at build time; CI sets them in .github/workflows/ci.yml.
 ```
 
 ### Production-Critical Variables

@@ -17,9 +17,10 @@ import { sendEmail } from '@/lib/email';
 import { getApprovalTemplate } from '@/lib/email/templates/invite-templates';
 import { logger } from '@/lib/logger';
 import type { Prisma } from '@prisma/client';
+import { getSiteUrl } from '@/lib/config/site-url';
 
 export const revalidate = 0;
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mirrorbuddy.app';
+const APP_URL = getSiteUrl();
 
 interface DirectInviteBody {
   email: string;

@@ -1,9 +1,10 @@
+import { getSiteUrl } from '@/lib/config/site-url';
 /**
  * Email templates for trial usage nudges and reminders
  * Plan 069 - Conversion Funnel Email Automation
  */
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
+const APP_URL = getSiteUrl();
 
 export interface TrialUsageNudgeData {
   email: string;
@@ -24,28 +25,23 @@ export interface TrialEmailVerificationData {
   locale?: string;
 }
 
-export function getTrialEmailVerificationTemplate(
-  data: TrialEmailVerificationData,
-): {
+export function getTrialEmailVerificationTemplate(data: TrialEmailVerificationData): {
   subject: string;
   html: string;
   text: string;
   to: string;
 } {
-  const expiresFormatted = data.expiresAt.toLocaleDateString(
-    data.locale || "it-IT",
-    {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  );
+  const expiresFormatted = data.expiresAt.toLocaleDateString(data.locale || 'it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return {
     to: data.email,
-    subject: "MirrorBuddy - Verifica la tua email di prova",
+    subject: 'MirrorBuddy - Verifica la tua email di prova',
     html: `
 <!DOCTYPE html>
 <html>
@@ -125,7 +121,7 @@ export function getTrialUsageNudgeTemplate(data: TrialUsageNudgeData): {
 
   return {
     to: data.email,
-    subject: "Hai quasi esaurito la tua prova gratuita di MirrorBuddy! 🎯",
+    subject: 'Hai quasi esaurito la tua prova gratuita di MirrorBuddy! 🎯',
     html: `
 <!DOCTYPE html>
 <html>
@@ -257,7 +253,7 @@ export function getTrialUsageWarningTemplate(data: TrialUsageNudgeData): {
 
   return {
     to: data.email,
-    subject: "Ultima prova gratuita di MirrorBuddy - Agisci ora!",
+    subject: 'Ultima prova gratuita di MirrorBuddy - Agisci ora!',
     html: `
 <!DOCTYPE html>
 <html>
@@ -341,11 +337,11 @@ Non perdere l'accesso. Agisci entro le prossime ore!
  */
 function escapeHtml(text: string): string {
   const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
   };
   return text.replace(/[&<>"']/g, (char) => map[char] || char);
 }
