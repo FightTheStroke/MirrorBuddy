@@ -390,7 +390,11 @@ describe('getRecipientPreview', () => {
 describe('sendCampaign', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    // Stub every variable getSiteUrl() consults, in precedence order, so the
+    // assertion holds regardless of what CI exports for the real site URL.
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://test.com');
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://test.com');
+    vi.stubEnv('NEXT_PUBLIC_BASE_URL', 'https://test.com');
   });
 
   const mockCampaign = {
