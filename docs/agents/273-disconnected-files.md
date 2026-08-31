@@ -43,7 +43,7 @@ Cost: **S** under half a day · **M** 1–3 days · **L** more than 3 days.
 
 | Cluster                             | What it gives the student                                              | Verdict   | Cost | Action                                |
 | ----------------------------------- | ---------------------------------------------------------------------- | --------- | ---: | ------------------------------------- |
-| One-handed typing mode              | Type with only the left or only the right half of the keyboard         | **READY** |    S | Wire first                            |
+| One-handed typing mode              | Type with only the left or only the right half of the keyboard         | **WIRED** |    S | Done — `feat/one-handed-typing-mode`  |
 | Other DSA typing adaptations        | Per-profile typing UI (dyslexia, ADHD, autism, vision, hearing, motor) | SKELETON  |  M–L | Finish persistence + one profile      |
 | Maintenance banner                  | Warns before the service is suspended                                  | **READY** |    S | Wire now                              |
 | Supporti advanced filters           | Filter materials by subject and maestro                                | NEARLY    |  S–M | Restore filters, not voice search     |
@@ -84,18 +84,33 @@ Cost: **S** under half a day · **M** 1–3 days · **L** more than 3 days.
 
 ## Do these first
 
-### 1. One-handed typing mode → TypingView (S) — highest priority
+### 1. One-handed typing mode → TypingView (S) — **WIRED, PR pending**
 
 A student with hemiplegia or limited hand function picks full keyboard, left hand
 only, or right hand only. This is the closest thing in the codebase to the reason
-Fight the Stroke exists, and it has been sitting unused since January 2026. No
+Fight the Stroke exists, and it had been sitting unused since January 2026. No
 commit ever removed it from the UI: it was never wired in the first place.
 
 - `components/typing/one-handed-mode.tsx:8-94` is complete, localised, uses
   `aria-pressed`.
 - `TypingView.tsx:56,206` already passes `currentHandMode` to the keyboard.
 - `virtual-keyboard.tsx:94-98` already applies the selection.
-- Missing: mount the control and hand it `setHandMode`.
+- ~~Missing: mount the control and hand it `setHandMode`.~~ Done on branch
+  `feat/one-handed-typing-mode`: the control is mounted in the lessons view of
+  `TypingView` (live at `/[locale]/astuccio`) and bound to `setHandMode`.
+
+Two things the audit did not catch, found while wiring:
+
+- The Italian strings for `tools.typing.oneHanded` were sync placeholders
+  ("Etichetta" / "Descrizione"). Real Italian copy written; en/fr/de/es were
+  already correct.
+- The three toggles had no group semantics. The grid is now
+  `role="group"` + `aria-labelledby` on the section heading, so a screen reader
+  announces the choice as one control with three states.
+
+Selection lives in the Zustand store for the session only. It is **not**
+persisted, and must not be until the typing API is real — see the trap below:
+`app/api/typing/route.ts:103-111` saves nothing.
 
 **Done means:** the control renders next to the level/layout pickers; switching
 hand mode visibly changes the keyboard; reachable and operable by keyboard alone;
