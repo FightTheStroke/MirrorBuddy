@@ -72,8 +72,11 @@ export async function azureChatCompletion(
 
   const baseRequestBody: Record<string, unknown> = {
     messages: allMessages,
-    temperature,
   };
+
+  // GPT-5 class deployments reject a custom temperature; dropped on first refusal
+  // and kept dropped for every later compatibility attempt.
+  let includeTemperature = true;
 
   if (tools && tools.length > 0) {
     baseRequestBody.tools = tools;
@@ -88,6 +91,7 @@ export async function azureChatCompletion(
   async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<FetchResult> {
     const requestBody: Record<string, unknown> = {
       ...baseRequestBody,
+      ...(includeTemperature ? { temperature } : {}),
       [tokenParamName]: maxTokens,
     };
 
@@ -147,36 +151,47 @@ export async function azureChatCompletion(
 
     const seen = new Set<string>();
 
-    for (const attempt of attempts) {
+    attemptLoop: for (const attempt of attempts) {
       const key = `${attempt.deployment}:${attempt.tokenParamName}`;
       if (seen.has(key)) continue;
       seen.add(key);
 
-      try {
-        return await doFetch(attempt.deployment, attempt.tokenParamName);
-      } catch (error) {
-        if (!(error instanceof AzureHttpError)) {
+      // Inner loop only re-runs the SAME attempt after temperature is dropped.
+      for (;;) {
+        try {
+          return await doFetch(attempt.deployment, attempt.tokenParamName);
+        } catch (error) {
+          if (!(error instanceof AzureHttpError)) {
+            throw error;
+          }
+
+          if (error.unsupportedTemperature && includeTemperature) {
+            includeTemperature = false;
+            logger.warn('[Azure Chat] Deployment rejects a custom temperature; using its default', {
+              deployment: attempt.deployment,
+            });
+            continue;
+          }
+
+          if (error.category === 'deployment_not_found') {
+            logger.warn(
+              '[Azure Chat] DeploymentNotFound; trying fallback deployment if available',
+              { deployment: attempt.deployment, fallbackDeployment },
+            );
+            continue attemptLoop;
+          }
+
+          const unsupportedParam = error.tokenParam;
+          if (unsupportedParam) {
+            logger.warn('[Azure Chat] Unsupported token param; trying alternative param', {
+              deployment: attempt.deployment,
+              unsupportedParam,
+            });
+            continue attemptLoop;
+          }
+
           throw error;
         }
-
-        if (error.category === 'deployment_not_found') {
-          logger.warn('[Azure Chat] DeploymentNotFound; trying fallback deployment if available', {
-            deployment: attempt.deployment,
-            fallbackDeployment,
-          });
-          continue;
-        }
-
-        const unsupportedParam = error.tokenParam;
-        if (unsupportedParam) {
-          logger.warn('[Azure Chat] Unsupported token param; trying alternative param', {
-            deployment: attempt.deployment,
-            unsupportedParam,
-          });
-          continue;
-        }
-
-        throw error;
       }
     }
 

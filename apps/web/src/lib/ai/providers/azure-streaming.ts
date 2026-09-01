@@ -6,11 +6,11 @@
 import { logger } from '@/lib/logger';
 import type { ProviderConfig } from './types';
 import {
-  type TokenParamName,
   sanitizeUpstreamError,
   describeUpstreamError,
   filteredCategoryNames,
 } from './azure-errors';
+import { fetchStreamWithCompatibility } from './azure-stream-request';
 
 export type StreamChunkType = 'content' | 'content_filter' | 'usage' | 'error' | 'done';
 
@@ -68,66 +68,17 @@ export async function* azureStreamingCompletion(
 
   let response: Response;
 
-  async function doFetch(deployment: string, tokenParamName: TokenParamName): Promise<Response> {
-    return fetch(buildUrl(deployment), {
-      method: 'POST',
-      headers: {
-        'api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages: allMessages,
-        temperature,
-        [tokenParamName]: maxTokens,
-        stream: true,
-        stream_options: { include_usage: true },
-      }),
+  try {
+    response = await fetchStreamWithCompatibility({
+      endpointUrl: buildUrl,
+      apiKey,
+      body: { messages: allMessages, stream: true, stream_options: { include_usage: true } },
+      temperature,
+      maxTokens,
+      deployment: config.model,
+      fallbackDeployment,
       signal,
     });
-  }
-
-  try {
-    const first = await doFetch(config.model, 'max_completion_tokens');
-    if (first.ok) {
-      response = first;
-    } else {
-      const firstErrorText = await first.text();
-      const firstSanitized = sanitizeUpstreamError(first.status, firstErrorText);
-      logger.error(`[Azure Streaming] Error ${first.status}`, {
-        deployment: config.model,
-        tokenParamName: 'max_completion_tokens',
-        ...firstSanitized,
-      });
-
-      const unsupported = firstSanitized.tokenParam ?? null;
-      const deploymentNotFound = firstSanitized.category === 'deployment_not_found';
-
-      if (deploymentNotFound && fallbackDeployment && fallbackDeployment !== config.model) {
-        const second = await doFetch(fallbackDeployment, 'max_completion_tokens');
-        if (second.ok) {
-          response = second;
-        } else {
-          const secondErrorText = await second.text();
-          logger.error(`[Azure Streaming] Error ${second.status}`, {
-            deployment: fallbackDeployment,
-            tokenParamName: 'max_completion_tokens',
-            ...sanitizeUpstreamError(second.status, secondErrorText),
-          });
-          const third = await doFetch(fallbackDeployment, 'max_tokens');
-          response = third;
-        }
-      } else if (unsupported) {
-        const second = await doFetch(config.model, 'max_tokens');
-        response = second;
-      } else {
-        response = {
-          ok: false,
-          status: first.status,
-          text: async () => firstErrorText,
-          body: null,
-        } as unknown as Response;
-      }
-    }
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
       logger.debug('[Azure Streaming] Aborted by user');

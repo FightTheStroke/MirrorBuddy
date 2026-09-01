@@ -10,6 +10,7 @@ export type TokenParamName = 'max_completion_tokens' | 'max_tokens';
 export type ParsedAzureError = {
   code?: string;
   message?: string;
+  param?: string;
 };
 
 /**
@@ -39,6 +40,8 @@ export type SanitizedUpstreamError = {
   filteredCategories?: string[];
   /** Which token parameter the deployment refused, when that is the failure. */
   tokenParam?: TokenParamName;
+  /** The deployment accepts only its default temperature (GPT-5 class reasoning models). */
+  unsupportedTemperature?: boolean;
 };
 
 /** Azure codes are enum-like. Anything longer or stranger is free text wearing a code's name. */
@@ -57,6 +60,7 @@ function categorize(
   if (code === 'content_filter') return 'content_filter';
   if (isDeploymentNotFound(status, errorText)) return 'deployment_not_found';
   if (isUnsupportedTokenParam(status, errorText)) return 'unsupported_parameter';
+  if (isUnsupportedTemperature(status, errorText)) return 'unsupported_parameter';
   if (status === 401 || status === 403) return 'auth';
   if (status === 429) return 'rate_limit';
   if (status >= 500 && status < 600) return 'server';
@@ -87,6 +91,7 @@ export function sanitizeUpstreamError(status: number, errorText: string): Saniti
   if (sanitized.category === 'unsupported_parameter') {
     const tokenParam = isUnsupportedTokenParam(status, errorText);
     if (tokenParam) sanitized.tokenParam = tokenParam;
+    if (isUnsupportedTemperature(status, errorText)) sanitized.unsupportedTemperature = true;
   }
 
   return sanitized;
@@ -128,6 +133,7 @@ export class AzureHttpError extends Error {
   public readonly category: UpstreamErrorCategory;
   public readonly filteredCategories?: string[];
   public readonly tokenParam?: TokenParamName;
+  public readonly unsupportedTemperature?: boolean;
 
   constructor(sanitized: SanitizedUpstreamError) {
     super(describeUpstreamError(sanitized));
@@ -137,6 +143,7 @@ export class AzureHttpError extends Error {
     this.category = sanitized.category;
     this.filteredCategories = sanitized.filteredCategories;
     this.tokenParam = sanitized.tokenParam;
+    this.unsupportedTemperature = sanitized.unsupportedTemperature;
   }
 
   /** What may be attached to a log line. Never spread the raw error into metadata. */
@@ -147,6 +154,7 @@ export class AzureHttpError extends Error {
       ...(this.code ? { code: this.code } : {}),
       ...(this.filteredCategories ? { filteredCategories: this.filteredCategories } : {}),
       ...(this.tokenParam ? { tokenParam: this.tokenParam } : {}),
+      ...(this.unsupportedTemperature ? { unsupportedTemperature: true } : {}),
     };
   }
 }
@@ -168,10 +176,13 @@ export function extractStatusFromError(error: Error): number | null {
 
 export function parseAzureError(errorText: string): ParsedAzureError {
   try {
-    const data = JSON.parse(errorText) as { error?: { code?: string; message?: string } };
+    const data = JSON.parse(errorText) as {
+      error?: { code?: string; message?: string; param?: string };
+    };
     return {
       code: data.error?.code,
       message: data.error?.message,
+      param: data.error?.param,
     };
   } catch {
     return {};
@@ -194,6 +205,18 @@ export function isUnsupportedTokenParam(status: number, errorText: string): Toke
   if (errorText.includes("Unsupported parameter: 'max_completion_tokens'"))
     return 'max_completion_tokens';
   return null;
+}
+
+/**
+ * GPT-5 class deployments accept only their default temperature and answer a
+ * custom one with 400 `unsupported_value`. The wording is upstream free text —
+ * it is matched here but never carried out of this module.
+ */
+export function isUnsupportedTemperature(status: number, errorText: string): boolean {
+  if (status !== 400) return false;
+  const parsed = parseAzureError(errorText);
+  if (parsed.param === 'temperature' && parsed.code === 'unsupported_value') return true;
+  return errorText.includes("Unsupported value: 'temperature'");
 }
 
 /**
