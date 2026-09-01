@@ -21,7 +21,7 @@ const ok = () => ({ status: 200 }) as Response;
 
 describe('production health check', () => {
   it('probes the canonical domain, not only the Vercel alias', () => {
-    expect(PRODUCTION_URLS).toContain('https://mirrorbuddy.org');
+    expect(PRODUCTION_URLS).toContain('https://www.mirrorbuddy.org');
   });
 
   it('is healthy when every URL answers 200', async () => {
@@ -36,7 +36,7 @@ describe('production health check', () => {
 
   it('fails when the canonical domain is broken even though the alias is fine', async () => {
     const fetchImpl = vi.fn(async (url: string) =>
-      url.startsWith('https://mirrorbuddy.org')
+      url.startsWith('https://www.mirrorbuddy.org')
         ? ({ status: 503 } as Response)
         : ({ status: 200 } as Response),
     );
@@ -49,7 +49,7 @@ describe('production health check', () => {
 
     expect(verdict.healthy).toBe(false);
     expect(verdict.failures).toHaveLength(1);
-    expect(verdict.failures[0]).toContain('https://mirrorbuddy.org');
+    expect(verdict.failures[0]).toContain('https://www.mirrorbuddy.org');
     expect(verdict.failures[0]).toContain('503');
   });
 
@@ -120,8 +120,8 @@ describe('production health check', () => {
   it('says "roll back" out loud, at error level', () => {
     const output = formatVerdict({
       healthy: false,
-      results: [{ url: 'https://mirrorbuddy.org', status: 503, attempts: 5 }],
-      failures: ['https://mirrorbuddy.org/api/health returned HTTP 503 after 5 attempts'],
+      results: [{ url: 'https://www.mirrorbuddy.org', status: 503, attempts: 5 }],
+      failures: ['https://www.mirrorbuddy.org/api/health returned HTTP 503 after 5 attempts'],
     });
 
     expect(output).toContain('::error::');
@@ -132,7 +132,7 @@ describe('production health check', () => {
   it('does not annotate a healthy run with an error', () => {
     const output = formatVerdict({
       healthy: true,
-      results: [{ url: 'https://mirrorbuddy.org', status: 200, attempts: 1 }],
+      results: [{ url: 'https://www.mirrorbuddy.org', status: 200, attempts: 1 }],
       failures: [],
     });
 

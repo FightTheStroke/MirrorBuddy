@@ -23,8 +23,9 @@
 /** The addresses that must answer after a promotion. */
 export const PRODUCTION_URLS = [
   // The canonical domain — what a user types. This is the one whose absence
-  // from the old check was the defect.
-  'https://mirrorbuddy.org',
+  // from the old check was the defect. Use the www host directly: the apex
+  // 308-redirects here, and probing a redirect proves nothing about the app.
+  'https://www.mirrorbuddy.org',
   // The Vercel alias, kept because it is what the promotion step manipulates.
   'https://mirrorbuddy.vercel.app',
 ] as const;

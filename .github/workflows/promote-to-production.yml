@@ -169,7 +169,7 @@ jobs:
               repo: context.repo.repo,
               deployment_id: deployment.id,
               state: 'success',
-              environment_url: 'https://mirrorbuddy.vercel.app',
+              environment_url: 'https://www.mirrorbuddy.org',
               description: 'Promoted from staging to production',
             });
 
