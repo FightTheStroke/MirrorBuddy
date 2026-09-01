@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/Roberdan/GitHub/MirrorBuddy/.codex/hooks/bash-guard.sh'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/Roberdan/GitHub/MirrorBuddy/.codex/hooks/main-guard.sh'",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/Users/Roberdan/GitHub/MirrorBuddy/.codex/hooks/post-edit-ts.sh'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
