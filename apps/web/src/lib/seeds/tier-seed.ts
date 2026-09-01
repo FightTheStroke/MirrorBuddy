@@ -11,13 +11,13 @@ import type { TierDefinition } from '@prisma/client';
 import { BASE_TIER_MAESTRI, ROSTER_IDS } from '../../data/roster-ids';
 
 // Model defaults from env vars (change in .env to migrate without code changes)
-// Every tier chats on the flagship: tutoring quality is not rationed by plan.
+// Every tier chats on the same model: tutoring quality is not rationed by plan.
 // The three names are kept so the env vars stay meaningful, but they default
 // to the same model on purpose.
-const CHAT_FLAGSHIP = 'gpt-5.6-sol';
-const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_FLAGSHIP;
-const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_FLAGSHIP;
-const CHAT_MODEL_PRO = process.env.DEFAULT_CHAT_MODEL_PRO || CHAT_FLAGSHIP;
+const CHAT_DEFAULT = 'gpt-5.6-terra';
+const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_DEFAULT;
+const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_DEFAULT;
+const CHAT_MODEL_PRO = process.env.DEFAULT_CHAT_MODEL_PRO || CHAT_DEFAULT;
 const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
 
 /**

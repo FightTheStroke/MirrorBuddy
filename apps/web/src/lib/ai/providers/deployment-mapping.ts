@@ -24,11 +24,14 @@
 import { logger } from '@/lib/logger';
 
 /**
- * Azure deployment serving the current flagship chat model (gpt-5.6-sol, GA).
- * Named after the model by convention, like the realtime deployments.
+ * Azure deployment serving the default chat model (gpt-5.6-terra, GA).
+ *
+ * Terra is the balanced member of the 5.6 line: same context window and
+ * tooling as the Sol flagship at half the token price and lower latency,
+ * which is the right trade for tutoring turns. Sol stays deployed and
+ * mapped below, so raising the bar is a one-line change.
  */
-const CHAT_FLAGSHIP_DEPLOYMENT =
-  process.env.AZURE_OPENAI_CHAT_FLAGSHIP_DEPLOYMENT?.trim() || 'gpt-5.6-sol';
+const CHAT_DEFAULT_DEPLOYMENT = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim() || 'gpt-5.6-terra';
 
 function getChatDeploymentFallback(): string | undefined {
   const fallback = process.env.AZURE_OPENAI_CHAT_DEPLOYMENT?.trim();
@@ -46,9 +49,9 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // Azure resource, so the old identity fallbacks ('gpt-4o', 'gpt-4-turbo')
   // resolved to a DeploymentNotFound. Any tier row still carrying a retired
   // name now lands on the current flagship instead of failing.
-  'gpt-4o': process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || CHAT_FLAGSHIP_DEPLOYMENT,
+  'gpt-4o': process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || CHAT_DEFAULT_DEPLOYMENT,
   'gpt-4o-mini': process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || 'gpt4o-mini-deployment',
-  'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || CHAT_FLAGSHIP_DEPLOYMENT,
+  'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || CHAT_DEFAULT_DEPLOYMENT,
 
   // GPT-5 family (new models)
   // IMPORTANT: In production, `AZURE_OPENAI_CHAT_DEPLOYMENT` should always point
@@ -59,9 +62,11 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
   'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || getChatDeploymentFallback(),
 
-  // 2026-07-09 wave — GPT-5.6 flagship. Every tier chats on this: the quality
-  // of the tutor is not something to ration by price plan.
-  'gpt-5.6-sol': CHAT_FLAGSHIP_DEPLOYMENT,
+  // 2026-07-09 wave — GPT-5.6 line. Every tier chats on the same model: the
+  // quality of the tutor is not something to ration by price plan. Terra is
+  // the default; Sol is kept mapped as the deliberate upgrade path.
+  'gpt-5.6-terra': CHAT_DEFAULT_DEPLOYMENT,
+  'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || 'gpt-5.6-sol',
 
   // Realtime models (voice) — GA deployments (Feb 2026+)
   // Pro tier uses gpt-realtime (best quality), Base/Trial use gpt-realtime-mini (cost-effective)

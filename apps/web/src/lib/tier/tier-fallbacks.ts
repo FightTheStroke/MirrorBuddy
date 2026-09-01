@@ -10,10 +10,10 @@ import { TierCode } from './types';
 
 // Model defaults from env vars (change in .env to migrate without code changes)
 // Must agree with tier-seed.ts: this is what the app serves when the database
-// row is missing. Every tier chats on the flagship.
-const CHAT_FLAGSHIP = 'gpt-5.6-sol';
-const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_FLAGSHIP;
-const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_FLAGSHIP;
+// row is missing. Every tier chats on the same model.
+const CHAT_DEFAULT = 'gpt-5.6-terra';
+const CHAT_MODEL = process.env.DEFAULT_CHAT_MODEL || CHAT_DEFAULT;
+const CHAT_MODEL_EDU = process.env.DEFAULT_CHAT_MODEL_EDU || CHAT_DEFAULT;
 const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
 
 /**
