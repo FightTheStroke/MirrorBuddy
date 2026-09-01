@@ -175,6 +175,27 @@ const models: ModelSeedData[] = [
     notRecommendedFor: [],
     notes: 'Education-optimized, excellent pedagogical awareness',
   },
+  {
+    name: 'gpt-5.6-sol',
+    displayName: 'GPT-5.6 Sol (flagship)',
+    provider: 'azure',
+    deploymentName: 'gpt-5.6-sol',
+    category: 'chat',
+    inputCostPer1k: 0.005,
+    outputCostPer1k: 0.03,
+    maxTokens: 16384,
+    contextWindow: 1050000,
+    supportsVision: true,
+    supportsTools: true,
+    supportsJson: true,
+    qualityScore: 5,
+    speedScore: 3,
+    educationScore: 5,
+    recommendedFor: ['chat', 'homework', 'quiz', 'formula', 'webcam', 'summary'],
+    notRecommendedFor: [],
+    notes:
+      'GA flagship of the 5.6 line. Served to every tier - tutoring quality is not rationed by plan.',
+  },
 
   // Realtime models (voice)
   {
