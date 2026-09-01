@@ -99,6 +99,22 @@ describe('sanitizeUpstreamError', () => {
     expect(sanitized.category).toBe('unsupported_parameter');
     expect(sanitized.tokenParam).toBe('max_tokens');
   });
+
+  it('recognises a refused temperature without quoting the upstream sentence', () => {
+    const body = JSON.stringify({
+      error: {
+        message: `Unsupported value: 'temperature' does not support 0.7 with this model. ${SECRET}`,
+        param: 'temperature',
+        code: 'unsupported_value',
+      },
+    });
+    const sanitized = sanitizeUpstreamError(400, body);
+
+    expect(sanitized.category).toBe('unsupported_parameter');
+    expect(sanitized.unsupportedTemperature).toBe(true);
+    expect(sanitized.tokenParam).toBeUndefined();
+    expect(JSON.stringify(sanitized)).not.toContain(SECRET);
+  });
 });
 
 describe('describeUpstreamError', () => {
