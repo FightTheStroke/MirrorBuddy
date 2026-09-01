@@ -22,9 +22,9 @@ describe('tier chat model policy', () => {
     expect(models.size).toBe(1);
   });
 
-  it('serves the current flagship', () => {
+  it('serves the current default chat model', () => {
     for (const tier of tiers) {
-      expect(tier.chatModel).toBe('gpt-5.6-sol');
+      expect(tier.chatModel).toBe('gpt-5.6-terra');
     }
   });
 

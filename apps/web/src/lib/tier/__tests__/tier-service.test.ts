@@ -856,9 +856,9 @@ describe('TierService', () => {
 
       const model = await tierService.getAIModelForUser(null, 'chat');
 
-      // The inline fallback serves the flagship, like every tier: a database
+      // The inline fallback serves the same model as every tier: a database
       // outage must not silently downgrade the tutor.
-      expect(model).toBe('gpt-5.6-sol');
+      expect(model).toBe('gpt-5.6-terra');
     });
 
     it('should handle all model types correctly', async () => {
