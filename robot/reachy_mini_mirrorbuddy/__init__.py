@@ -9,4 +9,4 @@ It reuses MirrorBuddy's brain end-to-end:
 - Child-safety guardrails and DSA (accessibility) tuning mirror the MirrorBuddy web app.
 """
 
-__version__ = "0.37.0"
+__version__ = "0.38.0"
