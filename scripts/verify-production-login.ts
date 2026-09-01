@@ -2,7 +2,8 @@ import { chromium, request as playwrightRequest } from '@playwright/test';
 
 const AUTH_COOKIE_NAME = 'mirrorbuddy-user-id';
 const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
-const PLAYWRIGHT_CHANNEL = process.env.PLAYWRIGHT_CHANNEL;
+const PLAYWRIGHT_CHANNEL =
+  process.env.PLAYWRIGHT_CHANNEL ?? (process.env.CI ? undefined : 'msedge');
 
 type ExpectedIdentity = {
   id: string;

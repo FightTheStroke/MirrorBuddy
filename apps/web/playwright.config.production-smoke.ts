@@ -30,7 +30,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PROD_URL = process.env.PROD_URL || 'https://mirrorbuddy.vercel.app';
-const PLAYWRIGHT_CHANNEL = process.env.PLAYWRIGHT_CHANNEL;
+// Locally we drive the installed Microsoft Edge (same Chromium engine) so a
+// developer machine never needs Playwright's ~130MB bundled browser download.
+// CI runners have no Edge, so they keep the bundled Chromium.
+const PLAYWRIGHT_CHANNEL =
+  process.env.PLAYWRIGHT_CHANNEL ?? (process.env.CI ? undefined : 'msedge');
 const browserUse = {
   browserName: 'chromium' as const,
   ...(PLAYWRIGHT_CHANNEL ? { channel: PLAYWRIGHT_CHANNEL } : {}),
