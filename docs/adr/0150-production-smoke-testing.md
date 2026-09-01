@@ -69,9 +69,10 @@ PLAYWRIGHT_CHANNEL=msedge pnpm test:smoke:prod --project=desktop
 PLAYWRIGHT_CHANNEL=msedge pnpm verify:smoke:prod:login
 ```
 
-`PLAYWRIGHT_CHANNEL` is optional. When unset, Playwright uses its bundled
-Chromium; setting it to `msedge` launches the locally installed Microsoft Edge
-while retaining `browserName: chromium`.
+`PLAYWRIGHT_CHANNEL` defaults to `msedge` on developer machines (locally installed
+Microsoft Edge, same Chromium engine, `browserName: chromium` retained) so no
+bundled-browser download is needed. In CI (`CI=1`) it stays unset and Playwright
+uses its bundled Chromium. Set it explicitly to override either default.
 
 ### How to Add New Tests
 

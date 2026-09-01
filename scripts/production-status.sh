@@ -17,13 +17,13 @@ NC='\033[0m'
 LOCAL_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "unknown")
 
 # Get production version
-PROD_RESPONSE=$(curl -sf "${PROD_URL}/api/version" 2>/dev/null || echo '{"error":"unreachable"}')
+PROD_RESPONSE=$(curl -sfL "${PROD_URL}/api/version" 2>/dev/null || echo '{"error":"unreachable"}')
 PROD_VERSION=$(echo "$PROD_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('version','unknown'))" 2>/dev/null || echo "unreachable")
 PROD_ENV=$(echo "$PROD_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('environment','unknown'))" 2>/dev/null || echo "unknown")
 BUILD_TIME=$(echo "$PROD_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('buildTime','unknown'))" 2>/dev/null || echo "unknown")
 
 # Get health status
-HEALTH_RESPONSE=$(curl -sf "${PROD_URL}/api/health" 2>/dev/null || echo '{"status":"unreachable"}')
+HEALTH_RESPONSE=$(curl -sfL "${PROD_URL}/api/health" 2>/dev/null || echo '{"status":"unreachable"}')
 HEALTH_STATUS=$(echo "$HEALTH_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','unknown'))" 2>/dev/null || echo "unreachable")
 DB_STATUS=$(echo "$HEALTH_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('checks',{}).get('database',{}).get('status','unknown'))" 2>/dev/null || echo "unknown")
 DB_LATENCY=$(echo "$HEALTH_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('checks',{}).get('database',{}).get('latency_ms','?'))" 2>/dev/null || echo "?")
