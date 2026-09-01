@@ -1,0 +1,14 @@
+[mcp_servers.codegraph]
+command = "npx"
+args = [
+    "-y",
+    "@colbymchenry/codegraph",
+    "serve",
+    "--mcp",
+    "--path",
+    "/Users/roberdan/GitHub/MirrorBuddy",
+]
+
+[mcp_servers.codegraph.env]
+npm_config_registry = "https://packagefeedproxy.microsoft.io/npm/"
+npm_config_loglevel = "error"
