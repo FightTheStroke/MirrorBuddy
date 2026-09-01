@@ -2348,11 +2348,14 @@ jobs:
 
       - name: Wait for production to go live (alias flip + health)
         run: |
-          echo "Waiting for mirrorbuddy.org to serve the fresh build..."
+          echo "Waiting for www.mirrorbuddy.org to serve the fresh build..."
           deadline=$((SECONDS + 900))
           while [ $SECONDS -lt $deadline ]; do
             age=$(vercel inspect mirrorbuddy.org --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>&1 | grep -iE "created" | head -1)
-            health=$(curl -s -o /dev/null -w "%{http_code}" https://mirrorbuddy.org/api/health)
+            # -L: the apex 308-redirects to www (next.config.ts redirects()).
+            # Probing the apex without following it returns 308, never 200, and
+            # this loop would time out on a perfectly healthy production.
+            health=$(curl -sL -o /dev/null -w "%{http_code}" https://www.mirrorbuddy.org/api/health)
             echo "  alias: $age | health: $health"
             if [ "$health" = "200" ] && echo "$age" | grep -qE "\[[0-9]+(s|m) ago\]"; then
               echo "✅ Production live and fresh"
@@ -2383,7 +2386,7 @@ jobs:
               repo: context.repo.repo,
               deployment_id: deployment.id,
               state: 'success',
-              environment_url: 'https://mirrorbuddy.org',
+              environment_url: 'https://www.mirrorbuddy.org',
               description: 'Auto-promoted staging → production',
             });
 
@@ -2409,7 +2412,7 @@ jobs:
             const ok = '${{ job.status }}' === 'success';
             await core.summary
               .addHeading(`${ok ? '✅' : '❌'} Auto-Promote to Production`, 2)
-              .addRaw(ok ? 'Staging build promoted and verified live on https://mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
+              .addRaw(ok ? 'Staging build promoted and verified live on https://www.mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
               .write();
 
   # ============================================================================
