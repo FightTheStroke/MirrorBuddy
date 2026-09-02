@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { motion } from 'framer-motion';
 import {
@@ -47,7 +46,7 @@ const MB_PER_LEVEL = 1000;
 const GROWN_UP_VIEWS = new Set<View>(['calendar', 'settings', 'genitori']);
 
 export default function Home() {
-  const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('home');
   const mainContentRef = useRef<HTMLDivElement>(null);
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } = useOnboardingStore();
@@ -58,9 +57,10 @@ export default function Home() {
 
   useEffect(() => {
     if (isHydrated && !hasCompletedOnboarding) {
-      router.push('/welcome');
+      // Avoid the streamed RSC redirect path when onboarding is mandatory.
+      window.location.replace(`/${locale}/welcome`);
     }
-  }, [isHydrated, hasCompletedOnboarding, router]);
+  }, [isHydrated, hasCompletedOnboarding, locale]);
 
   const [currentView, setCurrentView] = useState<View>('intent');
   // Start collapsed on narrow viewports (incl. 200% zoom ≈ 640px CSS) so the
