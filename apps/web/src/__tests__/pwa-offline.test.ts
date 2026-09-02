@@ -41,6 +41,14 @@ describe('PWA Offline Support', () => {
       expect(swContent).toContain('offline.html');
     });
 
+    it('should reject uncached failed requests instead of resolving an undefined response', () => {
+      const swContent = fs.readFileSync(swPath, 'utf-8');
+      const defaultStrategy = swContent.slice(swContent.indexOf('// Default:'));
+
+      expect(defaultStrategy).not.toContain('fetch(request).catch(() => caches.match(request))');
+      expect(defaultStrategy).toContain('throw error');
+    });
+
     it('should precache offline.html in install event', () => {
       const swContent = fs.readFileSync(swPath, 'utf-8');
       expect(swContent).toContain('offline.html');
