@@ -4,7 +4,7 @@
 // Provides offline caching for static assets and pages
 // ============================================================================
 
-const SW_VERSION = "1.0.0";
+const SW_VERSION = "1.0.1";
 const STATIC_CACHE_V1 = "mirrorbuddy-static-v1";
 const PAGE_CACHE_V1 = "mirrorbuddy-pages-v1";
 const PRECACHE_ASSETS = ["/offline.html"];
@@ -210,7 +210,13 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Default: try network, fallback to cache
-  event.respondWith(fetch(request).catch(() => caches.match(request)));
+  event.respondWith(
+    fetch(request).catch(async (error) => {
+      const cached = await caches.match(request);
+      if (cached) return cached;
+      throw error;
+    }),
+  );
 });
 
 console.log(`[SW ${SW_VERSION}] Service Worker loaded`);
