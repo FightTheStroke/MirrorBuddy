@@ -35,15 +35,18 @@ async function obtainCsrfToken(request: APIRequestContext): Promise<string | und
 test.describe('PROD-SMOKE: Voice & Realtime', () => {
   test.describe.configure({ retries: 0 });
 
-  test('A voice session reaches a connected WebRTC data channel', async ({ request, page }) => {
+  test('Voice connects when the browser cannot reach Azure directly', async ({ page }) => {
+    await page.goto('/it/welcome', { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    const browserRequest = page.context().request;
+
     // The first call to /api/session on a cold visitor sometimes establishes the
     // visitor cookie without returning a token yet; ask again rather than
     // reporting a voice outage that isn't one.
-    const csrfToken = await obtainCsrfToken(request);
+    const csrfToken = await obtainCsrfToken(browserRequest);
     expect(csrfToken, 'no CSRF token was issued').toBeTruthy();
 
     const startedAt = Date.now();
-    const res = await request.post('/api/realtime/ephemeral-token', {
+    const res = await browserRequest.post('/api/realtime/ephemeral-token', {
       headers: { 'X-CSRF-Token': csrfToken },
       data: {},
       // A function that has not been used for hours takes far longer than a warm
@@ -71,15 +74,14 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
         'A child pressing the microphone waits this long before negotiation starts.',
     ).toBeLessThan(TOKEN_START_BUDGET_MS);
 
-    const configResponse = await request.get('/api/realtime/token');
+    const configResponse = await browserRequest.get('/api/realtime/token');
     expect(configResponse.status(), 'realtime transport config is unavailable').toBe(200);
     const config = await configResponse.json();
     expect(config.azureResource, 'Azure resource name is missing').toBeTruthy();
 
-    await page.goto('/it/', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     const handshakeStartedAt = Date.now();
     const handshake = await page.evaluate(
-      async ({ token, callsUrl }) => {
+      async ({ token, callsUrl, csrfToken }) => {
         const peerConnection = new RTCPeerConnection();
         let stream: MediaStream | null = null;
         try {
@@ -92,14 +94,35 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
           const offer = await peerConnection.createOffer({ offerToReceiveAudio: true });
           await peerConnection.setLocalDescription(offer);
 
-          const response = await fetch(callsUrl, {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/sdp',
-            },
-            body: peerConnection.localDescription?.sdp,
-          });
+          const relay = () =>
+            fetch('/api/realtime/sdp-exchange', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+              body: JSON.stringify({ sdp: peerConnection.localDescription?.sdp, token }),
+            });
+          let response: Response;
+          let relayAttempted = false;
+          try {
+            response = await fetch(callsUrl, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/sdp',
+              },
+              body: peerConnection.localDescription?.sdp,
+            });
+          } catch {
+            relayAttempted = true;
+            response = await relay();
+          }
+          if (
+            !relayAttempted &&
+            !response.ok &&
+            [408, 500, 502, 503, 504].includes(response.status) &&
+            !(response.status === 503 && response.headers.get('retry-after'))
+          ) {
+            response = await relay();
+          }
           const answer = await response.text();
           if (!response.ok) {
             return {
@@ -128,6 +151,7 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
           return {
             status: response.status,
             connected,
+            transport: response.url.startsWith(window.location.origin) ? 'relay' : 'direct',
             error: connected ? null : `data channel state: ${dataChannel.readyState}`,
           };
         } finally {
@@ -137,14 +161,17 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
       },
       {
         token: body.token as string,
-        callsUrl: `https://${config.azureResource}.openai.azure.com/openai/v1/realtime/calls`,
+        csrfToken,
+        callsUrl: 'https://voice-direct-path.invalid/openai/v1/realtime/calls',
       },
     );
 
     expect(
       handshake.status,
       `Azure rejected the browser SDP offer: ${handshake.error ?? 'no error body'}`,
-    ).toBe(201);
+    ).toBeGreaterThanOrEqual(200);
+    expect(handshake.status).toBeLessThan(300);
+    expect(handshake.transport).toBe('relay');
     expect(
       handshake.connected,
       `Azure returned SDP but WebRTC did not connect: ${handshake.error ?? 'unknown state'}`,
