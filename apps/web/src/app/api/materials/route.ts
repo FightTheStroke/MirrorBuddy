@@ -4,19 +4,21 @@
  * Part of T-20: Persist tools to database + API.
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { generateSearchableText } from "@/lib/search/searchable-text";
-import type { ToolType } from "@/types/tools";
-import { CreateMaterialRequest, UpdateMaterialRequest } from "./types";
-import { VALID_MATERIAL_TYPES } from "./constants";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
+import { CreateMaterialRequest, UpdateMaterialRequest } from './types';
+import { VALID_MATERIAL_TYPES } from './constants';
+import { getMaterialsList, buildUpdateData, updateMaterialTags } from './helpers';
 import {
-  getMaterialsList,
-  buildUpdateData,
-  updateMaterialTags,
-} from "./helpers";
+  findOwnedMaterial,
+  findOwnedMaterialWithRelations,
+  materialNotFound,
+  saveOwnedMaterial,
+  updateOwnedMaterial,
+  updateOwnedMaterialWithRelations,
+  validateRelatedOwnership,
+} from './ownership';
 
 /**
  * GET /api/materials
@@ -25,21 +27,21 @@ import {
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/materials"),
+  withSentry('/api/materials'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
 
   const { searchParams } = new URL(ctx.req.url);
   const result = await getMaterialsList(userId, {
-    toolType: searchParams.get("toolType") || undefined,
-    status: searchParams.get("status") || "active",
-    limit: parseInt(searchParams.get("limit") || "50", 10),
-    offset: parseInt(searchParams.get("offset") || "0", 10),
-    collectionId: searchParams.get("collectionId") || undefined,
-    tagId: searchParams.get("tagId") || undefined,
-    search: searchParams.get("search") || undefined,
-    subject: searchParams.get("subject") || undefined,
+    toolType: searchParams.get('toolType') || undefined,
+    status: searchParams.get('status') || 'active',
+    limit: parseInt(searchParams.get('limit') || '50', 10),
+    offset: parseInt(searchParams.get('offset') || '0', 10),
+    collectionId: searchParams.get('collectionId') || undefined,
+    tagId: searchParams.get('tagId') || undefined,
+    search: searchParams.get('search') || undefined,
+    subject: searchParams.get('subject') || undefined,
   });
 
   return NextResponse.json(result);
@@ -50,31 +52,20 @@ export const GET = pipe(
  * Create a new material (persist tool output)
  */
 export const POST = pipe(
-  withSentry("/api/materials"),
+  withSentry('/api/materials'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
 
   const body: CreateMaterialRequest = await ctx.req.json();
-  const {
-    toolId,
-    toolType,
-    title,
-    content,
-    maestroId,
-    sessionId,
-    subject,
-    preview,
-    collectionId,
-    tagIds,
-  } = body;
+  const { toolId, toolType, title, content } = body;
 
   if (!toolId || !toolType || !title || !content) {
     return NextResponse.json(
       {
-        error: "Missing required fields",
-        required: ["toolId", "toolType", "title", "content"],
+        error: 'Missing required fields',
+        required: ['toolId', 'toolType', 'title', 'content'],
       },
       { status: 400 },
     );
@@ -83,88 +74,14 @@ export const POST = pipe(
   if (!VALID_MATERIAL_TYPES.includes(toolType)) {
     return NextResponse.json(
       {
-        error: "Invalid tool type",
+        error: 'Invalid tool type',
         validTypes: VALID_MATERIAL_TYPES,
       },
       { status: 400 },
     );
   }
 
-  const existing = await prisma.material.findUnique({
-    where: { toolId },
-  });
-
-  const searchableText = generateSearchableText(toolType as ToolType, content);
-
-  if (existing) {
-    const updated = await prisma.material.update({
-      where: { toolId },
-      data: {
-        title,
-        content: JSON.stringify(content),
-        searchableText,
-        preview,
-        updatedAt: new Date(),
-      },
-    });
-
-    logger.info("Material updated", { toolId, toolType });
-
-    return NextResponse.json({
-      success: true,
-      material: {
-        ...updated,
-        content,
-      },
-      updated: true,
-    });
-  }
-
-  const material = await prisma.material.create({
-    data: {
-      userId,
-      toolId,
-      toolType,
-      title,
-      content: JSON.stringify(content),
-      searchableText,
-      maestroId,
-      sessionId,
-      subject,
-      preview,
-      collectionId,
-      ...(tagIds &&
-        tagIds.length > 0 && {
-          tags: {
-            create: tagIds.map((tagId) => ({ tagId })),
-          },
-        }),
-    },
-    include: {
-      collection: { select: { id: true, name: true, color: true } },
-      tags: {
-        include: { tag: { select: { id: true, name: true, color: true } } },
-      },
-    },
-  });
-
-  logger.info("Material created", {
-    toolId,
-    toolType,
-    userId,
-    collectionId,
-    tagCount: tagIds?.length,
-  });
-
-  return NextResponse.json({
-    success: true,
-    material: {
-      ...material,
-      content,
-      tags: material.tags.map((mt) => mt.tag),
-    },
-    created: true,
-  });
+  return saveOwnedMaterial(userId, body);
 });
 
 /**
@@ -172,32 +89,31 @@ export const POST = pipe(
  * Update a material (title, content, or status)
  */
 export const PATCH = pipe(
-  withSentry("/api/materials"),
+  withSentry('/api/materials'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
+  const userId = ctx.userId!;
+
   const body: UpdateMaterialRequest & { toolId: string } = await ctx.req.json();
-  const {
-    toolId,
-    title,
-    content,
-    status,
-    userRating,
-    isBookmarked,
-    collectionId,
-    tagIds,
-  } = body;
+  const { toolId, title, content, status, userRating, isBookmarked, collectionId, tagIds } = body;
 
   if (!toolId) {
-    return NextResponse.json({ error: "Missing toolId" }, { status: 400 });
+    return NextResponse.json({ error: 'Missing toolId' }, { status: 400 });
   }
 
-  const existing = await prisma.material.findUnique({
-    where: { toolId },
-  });
+  const existing = await findOwnedMaterial(toolId, userId);
 
   if (!existing) {
-    return NextResponse.json({ error: "Material not found" }, { status: 404 });
+    return materialNotFound();
+  }
+
+  const relatedError = await validateRelatedOwnership(userId, {
+    collectionId,
+    tagIds,
+  });
+  if (relatedError) {
+    return relatedError;
   }
 
   const updateData = buildUpdateData(existing, {
@@ -208,20 +124,21 @@ export const PATCH = pipe(
     isBookmarked,
     collectionId,
   });
-  await updateMaterialTags(existing.id, tagIds);
 
-  const updated = await prisma.material.update({
-    where: { toolId },
-    data: updateData,
-    include: {
-      collection: { select: { id: true, name: true, color: true } },
-      tags: {
-        include: { tag: { select: { id: true, name: true, color: true } } },
-      },
-    },
-  });
+  // The owner-scoped write runs before the tag write, so a request that no
+  // longer owns the material cannot reach the MaterialTag rows at all.
+  let updated = await updateOwnedMaterialWithRelations(toolId, userId, updateData);
 
-  logger.info("Material patched", {
+  if (!updated) {
+    return materialNotFound();
+  }
+
+  if (tagIds !== undefined) {
+    await updateMaterialTags(existing.id, tagIds, userId);
+    updated = (await findOwnedMaterialWithRelations(toolId, userId)) ?? updated;
+  }
+
+  logger.info('Material patched', {
     toolId,
     fields: Object.keys(updateData),
     tagCount: tagIds?.length,
@@ -242,34 +159,28 @@ export const PATCH = pipe(
  * Soft-delete a material (sets status to 'deleted')
  */
 export const DELETE = pipe(
-  withSentry("/api/materials"),
+  withSentry('/api/materials'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
+  const userId = ctx.userId!;
+
   const { searchParams } = new URL(ctx.req.url);
-  const toolId = searchParams.get("toolId");
+  const toolId = searchParams.get('toolId');
 
   if (!toolId) {
-    return NextResponse.json(
-      { error: "Missing toolId parameter" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Missing toolId parameter' }, { status: 400 });
   }
 
-  const existing = await prisma.material.findUnique({
-    where: { toolId },
+  const deleted = await updateOwnedMaterial(toolId, userId, {
+    status: 'deleted',
   });
 
-  if (!existing) {
-    return NextResponse.json({ error: "Material not found" }, { status: 404 });
+  if (!deleted) {
+    return materialNotFound();
   }
 
-  await prisma.material.update({
-    where: { toolId },
-    data: { status: "deleted" },
-  });
-
-  logger.info("Material deleted", { toolId });
+  logger.info('Material deleted', { toolId });
 
   return NextResponse.json({
     success: true,

@@ -24,9 +24,18 @@ export async function getMaterialsList(
     tagId?: string;
     search?: string;
     subject?: string;
-  }
+  },
 ) {
-  const { toolType, status = 'active', limit, offset, collectionId, tagId, search, subject } = filters;
+  const {
+    toolType,
+    status = 'active',
+    limit,
+    offset,
+    collectionId,
+    tagId,
+    search,
+    subject,
+  } = filters;
 
   // PostgreSQL full-text search optimization
   if (search && isPostgreSQL()) {
@@ -69,7 +78,7 @@ async function getMaterialsPostgresSearch(
     tagId?: string;
     search: string;
     subject?: string;
-  }
+  },
 ) {
   const { toolType, status, limit, offset, collectionId, tagId, search, subject } = filters;
   const conditions: Prisma.Sql[] = [
@@ -90,36 +99,42 @@ async function getMaterialsPostgresSearch(
 
   const whereClause = Prisma.join(conditions, ' AND ');
 
-  const materials = await prisma.$queryRaw<Array<{
-    id: string;
-    userId: string;
-    toolId: string;
-    toolType: string;
-    title: string;
-    content: string;
-    searchableText: string | null;
-    maestroId: string | null;
-    sessionId: string | null;
-    subject: string | null;
-    preview: string | null;
-    status: string;
-    userRating: number | null;
-    isBookmarked: boolean;
-    viewCount: number;
-    collectionId: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    rank: number;
-  }>>`
+  const materials = await prisma.$queryRaw<
+    Array<{
+      id: string;
+      userId: string;
+      toolId: string;
+      toolType: string;
+      title: string;
+      content: string;
+      searchableText: string | null;
+      maestroId: string | null;
+      sessionId: string | null;
+      subject: string | null;
+      preview: string | null;
+      status: string;
+      userRating: number | null;
+      isBookmarked: boolean;
+      viewCount: number;
+      collectionId: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+      rank: number;
+    }>
+  >`
     SELECT
       m.*,
       ts_rank(m."searchableTextVector", websearch_to_tsquery('english', ${search})) as rank
     FROM "Material" m
     WHERE ${whereClause}
-    ${tagId ? Prisma.sql`AND EXISTS (
+    ${
+      tagId
+        ? Prisma.sql`AND EXISTS (
       SELECT 1 FROM "MaterialTag" mt
       WHERE mt."materialId" = m.id AND mt."tagId" = ${tagId}
-    )` : Prisma.empty}
+    )`
+        : Prisma.empty
+    }
     ORDER BY rank DESC, m."createdAt" DESC
     LIMIT ${Math.min(limit, 100)}
     OFFSET ${offset}
@@ -129,32 +144,38 @@ async function getMaterialsPostgresSearch(
     SELECT COUNT(*) as count
     FROM "Material" m
     WHERE ${whereClause}
-    ${tagId ? Prisma.sql`AND EXISTS (
+    ${
+      tagId
+        ? Prisma.sql`AND EXISTS (
       SELECT 1 FROM "MaterialTag" mt
       WHERE mt."materialId" = m.id AND mt."tagId" = ${tagId}
-    )` : Prisma.empty}
+    )`
+        : Prisma.empty
+    }
   `;
   const total = Number(countResult[0]?.count || 0);
 
   // Fetch related data
-  const materialIds = materials.map(m => m.id);
-  const collectionIds = materials.map(m => m.collectionId).filter(Boolean) as string[];
+  const materialIds = materials.map((m) => m.id);
+  const collectionIds = materials.map((m) => m.collectionId).filter(Boolean) as string[];
 
-  const collections = collectionIds.length > 0
-    ? await prisma.collection.findMany({
-        where: { id: { in: collectionIds } },
-        select: { id: true, name: true, color: true },
-      })
-    : [];
+  const collections =
+    collectionIds.length > 0
+      ? await prisma.collection.findMany({
+          where: { id: { in: collectionIds } },
+          select: { id: true, name: true, color: true },
+        })
+      : [];
 
-  const materialTags = materialIds.length > 0
-    ? await prisma.materialTag.findMany({
-        where: { materialId: { in: materialIds } },
-        include: { tag: { select: { id: true, name: true, color: true } } },
-      })
-    : [];
+  const materialTags =
+    materialIds.length > 0
+      ? await prisma.materialTag.findMany({
+          where: { materialId: { in: materialIds } },
+          include: { tag: { select: { id: true, name: true, color: true } } },
+        })
+      : [];
 
-  const collectionMap = new Map(collections.map(c => [c.id, c]));
+  const collectionMap = new Map(collections.map((c) => [c.id, c]));
   const tagsMap = new Map<string, Array<{ id: string; name: string; color: string | null }>>();
   for (const mt of materialTags) {
     if (!tagsMap.has(mt.materialId)) {
@@ -190,7 +211,7 @@ async function getMaterialsStandardQuery(
     tagId?: string;
     search?: string;
     subject?: string;
-  }
+  },
 ) {
   const { toolType, status, limit, offset, collectionId, tagId, search, subject } = filters;
 
@@ -252,7 +273,7 @@ export function buildUpdateData(
     userRating?: number;
     isBookmarked?: boolean;
     collectionId?: string | null;
-  }
+  },
 ): Record<string, unknown> {
   const updateData: Record<string, unknown> = {};
 
@@ -262,13 +283,17 @@ export function buildUpdateData(
     updateData.content = JSON.stringify(updates.content);
     updateData.searchableText = generateSearchableText(
       existing.toolType as ToolType,
-      updates.content
+      updates.content,
     );
   }
 
   if (updates.status) updateData.status = updates.status;
 
-  if (typeof updates.userRating === 'number' && updates.userRating >= 1 && updates.userRating <= 5) {
+  if (
+    typeof updates.userRating === 'number' &&
+    updates.userRating >= 1 &&
+    updates.userRating <= 5
+  ) {
     updateData.userRating = updates.userRating;
   }
 
@@ -284,18 +309,23 @@ export function buildUpdateData(
 }
 
 /**
- * Update material tags in a transaction
+ * Replace the tags of a material, scoped to its owner.
+ *
+ * The delete is filtered through the Material relation so the statement itself
+ * carries the owner, rather than trusting an earlier ownership check. Callers
+ * must have validated tag ownership (see `validateRelatedOwnership`).
  */
 export async function updateMaterialTags(
   materialId: string,
-  tagIds?: string[]
+  tagIds: string[] | undefined,
+  userId: string,
 ) {
   if (tagIds !== undefined) {
     await prisma.$transaction([
-      prisma.materialTag.deleteMany({ where: { materialId } }),
-      ...tagIds.map(tagId =>
-        prisma.materialTag.create({ data: { materialId, tagId } })
-      ),
+      prisma.materialTag.deleteMany({
+        where: { materialId, material: { userId } },
+      }),
+      ...tagIds.map((tagId) => prisma.materialTag.create({ data: { materialId, tagId } })),
     ]);
   }
 }
