@@ -1,27 +1,22 @@
 // ============================================================================
 // API ROUTE: Session Metrics Analytics
 // GET: Session cost, safety, and behavioral metrics for dashboard
-// SECURITY: Requires authentication
+// SECURITY: Requires admin read access (ADMIN or ADMIN_READONLY)
 // DATA: All metrics from REAL API responses, not estimates
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
-import {
-  getCostStats,
-  PRICING,
-  THRESHOLDS,
-} from "@/lib/metrics/cost-tracking-service";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getCostStats, PRICING, THRESHOLDS } from '@/lib/metrics/cost-tracking-service';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/dashboard/session-metrics"),
-  withAuth,
+  withSentry('/api/dashboard/session-metrics'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get("days") ?? "7", 10);
+  const days = parseInt(searchParams.get('days') ?? '7', 10);
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
 
@@ -50,14 +45,14 @@ export const GET = pipe(
 
   // Get outcome distribution (F-06: exclude test data)
   const outcomes = await prisma.sessionMetrics.groupBy({
-    by: ["outcome"],
+    by: ['outcome'],
     where: { createdAt: { gte: startDate }, isTestData: false },
     _count: true,
   });
 
   // Get severity distribution (F-06: exclude test data)
   const severities = await prisma.sessionMetrics.groupBy({
-    by: ["incidentSeverity"],
+    by: ['incidentSeverity'],
     where: {
       createdAt: { gte: startDate },
       incidentSeverity: { not: null },
@@ -69,7 +64,7 @@ export const GET = pipe(
   // Get daily metrics using Prisma groupBy instead of raw SQL for portability
   // F-06: exclude test data
   const dailyGrouped = await prisma.sessionMetrics.groupBy({
-    by: ["createdAt"],
+    by: ['createdAt'],
     where: { createdAt: { gte: startDate }, isTestData: false },
     _count: true,
     _sum: { costEur: true, tokensIn: true, tokensOut: true },
@@ -81,7 +76,7 @@ export const GET = pipe(
     { sessions: number; totalCost: number; totalTokens: number }
   >();
   for (const row of dailyGrouped) {
-    const dateKey = row.createdAt.toISOString().split("T")[0];
+    const dateKey = row.createdAt.toISOString().split('T')[0];
     const existing = dailyMetricsMap.get(dateKey) || {
       sessions: 0,
       totalCost: 0,
@@ -90,20 +85,15 @@ export const GET = pipe(
     dailyMetricsMap.set(dateKey, {
       sessions: existing.sessions + row._count,
       totalCost: existing.totalCost + (row._sum.costEur || 0),
-      totalTokens:
-        existing.totalTokens +
-        (row._sum.tokensIn || 0) +
-        (row._sum.tokensOut || 0),
+      totalTokens: existing.totalTokens + (row._sum.tokensIn || 0) + (row._sum.tokensOut || 0),
     });
   }
-  const dailyMetrics = Array.from(dailyMetricsMap.entries()).map(
-    ([date, data]) => ({
-      date,
-      sessions: data.sessions,
-      totalCost: data.totalCost,
-      totalTokens: data.totalTokens,
-    }),
-  );
+  const dailyMetrics = Array.from(dailyMetricsMap.entries()).map(([date, data]) => ({
+    date,
+    sessions: data.sessions,
+    totalCost: data.totalCost,
+    totalTokens: data.totalTokens,
+  }));
 
   // Get cost stats with P95
   const costStats = await getCostStats(startDate, new Date());
@@ -123,15 +113,12 @@ export const GET = pipe(
   }
 
   // Build daily breakdown
-  const dailyBreakdown: Record<
-    string,
-    { sessions: number; cost: number; tokens: number }
-  > = {};
+  const dailyBreakdown: Record<string, { sessions: number; cost: number; tokens: number }> = {};
   for (const d of dailyMetrics) {
     const day =
-      typeof d.date === "string"
-        ? d.date.split("T")[0]
-        : new Date(d.date).toISOString().split("T")[0];
+      typeof d.date === 'string'
+        ? d.date.split('T')[0]
+        : new Date(d.date).toISOString().split('T')[0];
     dailyBreakdown[day] = {
       sessions: d.sessions,
       cost: Math.round(d.totalCost * 1000) / 1000,
@@ -143,9 +130,7 @@ export const GET = pipe(
   const totalRefusals = aggregates._sum.refusalCount || 0;
   const correctRefusals = aggregates._sum.refusalCorrect || 0;
   const refusalAccuracy =
-    totalRefusals > 0
-      ? Math.round((correctRefusals / totalRefusals) * 100)
-      : 100;
+    totalRefusals > 0 ? Math.round((correctRefusals / totalRefusals) * 100) : 100;
 
   return NextResponse.json({
     period: { days, startDate: startDate.toISOString() },

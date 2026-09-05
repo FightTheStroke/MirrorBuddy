@@ -1,28 +1,24 @@
 // ============================================================================
 // API ROUTE: External Services Metrics
 // GET: API usage and quota metrics for Azure OpenAI, Google Drive, Brave Search
-// SECURITY: Requires authentication
+// SECURITY: Requires admin read access (ADMIN or ADMIN_READONLY)
 // PURPOSE: Monitor external service usage to prevent quota exceeded errors
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import {
   getAllExternalServiceUsage,
   getServiceAlerts,
   EXTERNAL_SERVICE_QUOTAS,
-} from "@/lib/metrics/external-service-metrics";
-
+} from '@/lib/metrics/external-service-metrics';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/dashboard/external-services"),
-  withAuth,
+  withSentry('/api/dashboard/external-services'),
+  withAdminReadOnly,
 )(async (_ctx) => {
-  const [allUsage, alerts] = await Promise.all([
-    getAllExternalServiceUsage(),
-    getServiceAlerts(),
-  ]);
+  const [allUsage, alerts] = await Promise.all([getAllExternalServiceUsage(), getServiceAlerts()]);
 
   // Group by service
   const byService: Record<
@@ -54,9 +50,9 @@ export const GET = pipe(
   // Check if any service needs attention
   const hasAlerts = alerts.length > 0;
   const criticalCount = alerts.filter(
-    (a) => a.status === "critical" || a.status === "exceeded",
+    (a) => a.status === 'critical' || a.status === 'exceeded',
   ).length;
-  const warningCount = alerts.filter((a) => a.status === "warning").length;
+  const warningCount = alerts.filter((a) => a.status === 'warning').length;
 
   return NextResponse.json({
     summary: {
