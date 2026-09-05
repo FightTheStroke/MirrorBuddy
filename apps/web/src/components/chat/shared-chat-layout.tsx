@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { MobileVoiceOverlay } from "./mobile-voice-overlay";
+import { cn } from '@/lib/utils';
+import { MobileVoiceOverlay } from './mobile-voice-overlay';
 
 interface SharedChatLayoutProps {
   /** Character header/banner - fixed at top */
@@ -59,18 +59,18 @@ export function SharedChatLayout({
       <div
         className={cn(
           // Full viewport height with fallback
-          "h-screen h-dvh",
+          'h-screen h-dvh',
           // Flex column layout
-          "flex flex-col",
+          'flex flex-col',
           // No overflow on outer container
-          "overflow-hidden",
+          'overflow-hidden',
           className,
         )}
       >
         {/* Inner flex container with right panel */}
         <div className="flex flex-1 min-h-0 overflow-hidden">
           {/* Main column */}
-          <div className="flex flex-col flex-1 min-h-0">
+          <div className="flex flex-col flex-1 min-h-0 min-w-0">
             {/* Header - fixed at top */}
             <div className="flex-shrink-0">{header}</div>
 
@@ -81,12 +81,12 @@ export function SharedChatLayout({
             <main
               role="main"
               className={cn(
-                "flex-1 overflow-y-auto overscroll-contain",
+                'flex-1 overflow-y-auto overscroll-contain',
                 // iOS momentum scrolling
-                "[&]:[-webkit-overflow-scrolling:touch]",
+                '[&]:[-webkit-overflow-scrolling:touch]',
               )}
               style={{
-                WebkitOverflowScrolling: "touch",
+                WebkitOverflowScrolling: 'touch',
               }}
             >
               {children}
@@ -101,15 +101,15 @@ export function SharedChatLayout({
             <aside
               className={cn(
                 // Hidden on mobile
-                "hidden",
+                'hidden',
                 // Visible on desktop (lg+)
-                "lg:flex lg:flex-col",
+                'lg:flex lg:flex-col',
                 // Fixed width
-                "lg:w-72 xl:w-80",
+                'lg:w-72 xl:w-80',
                 // Prevent shrinking
-                "flex-shrink-0",
+                'flex-shrink-0',
                 // Visual separation
-                "border-l border-slate-200 dark:border-slate-800",
+                'border-l border-slate-200 dark:border-slate-800',
               )}
             >
               {rightPanel}
@@ -120,10 +120,7 @@ export function SharedChatLayout({
 
       {/* Mobile voice overlay - mobile only */}
       {showRightPanel && rightPanel && onCloseRightPanel && (
-        <MobileVoiceOverlay
-          isVisible={showRightPanel}
-          onClose={onCloseRightPanel}
-        >
+        <MobileVoiceOverlay isVisible={showRightPanel} onClose={onCloseRightPanel}>
           {rightPanel}
         </MobileVoiceOverlay>
       )}

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Volume2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { resolveReadableTextOnColor } from '@/lib/accessibility/accent-contrast';
 import type { ChatMessage, Maestro } from '@/types';
 import { useTranslations } from 'next-intl';
 
@@ -26,6 +27,11 @@ export function MessageBubble({ message, maestro, ttsEnabled, speak }: MessageBu
   // Melissa) — never show the Maestro's face paired with another voice's words.
   const speakerName = message.speaker?.name ?? maestro.displayName;
   const speakerAvatar = message.speaker?.avatar ?? maestro.avatar;
+  // The user bubble is filled with the Maestro's own colour, which ranges from
+  // near-black indigo to pale gold, so fixed white ink cannot hold 4.5:1 — and
+  // dimming the timestamp to 60% opacity measured 2.95:1 on Emmy Noether's
+  // purple. Pick the ink from the actual background and keep it opaque.
+  const userInk = isUser ? resolveReadableTextOnColor(maestro.color) : undefined;
 
   return (
     <motion.div
@@ -48,13 +54,13 @@ export function MessageBubble({ message, maestro, ttsEnabled, speak }: MessageBu
         className={cn(
           'max-w-[70%] xs:max-w-[85%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3',
           isUser
-            ? 'text-white rounded-br-md'
+            ? 'rounded-br-md'
             : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm',
         )}
-        style={isUser ? { backgroundColor: maestro.color } : undefined}
+        style={isUser ? { backgroundColor: maestro.color, color: userInk } : undefined}
       >
         {isVoice && (
-          <span className="text-xs opacity-60 mb-1 flex items-center gap-1">
+          <span className={cn('text-xs mb-1 flex items-center gap-1', !isUser && 'opacity-60')}>
             <Volume2 className="w-3 h-3" /> {t('trascrizioneVocale')}
           </span>
         )}
@@ -62,7 +68,7 @@ export function MessageBubble({ message, maestro, ttsEnabled, speak }: MessageBu
           {message.content}
         </p>
         <div className="flex items-center justify-between mt-1 gap-2">
-          <span className="text-xs opacity-60">
+          <span className={cn('text-xs', !isUser && 'opacity-60')}>
             {new Date(message.timestamp).toLocaleTimeString('it-IT', {
               hour: '2-digit',
               minute: '2-digit',
