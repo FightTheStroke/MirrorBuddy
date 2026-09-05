@@ -5,6 +5,12 @@
 
 import type { ConversationMemory } from './types';
 import { clientLogger as logger } from '@/lib/logger/client';
+import {
+  decodeConversationKeyFacts,
+  decodeConversationListResponse,
+  decodeConversationTopics,
+  type ConversationListItem,
+} from '@/lib/validation/schemas/conversations';
 
 /**
  * Sanitize text by removing HTML comments completely.
@@ -31,41 +37,85 @@ export function sanitizeHtmlComments(text: string): string {
 }
 
 /**
- * Fetch conversation memory for a maestro from the API
+ * Build conversation memory from one decoded conversation item.
+ * Fields that cannot be decoded are dropped with an explicit warning instead of
+ * failing the whole recall; diagnostics carry field names only, never content.
+ */
+function toConversationMemory(
+  conversation: ConversationListItem,
+  maestroId: string,
+): ConversationMemory | null {
+  const keyFacts = decodeConversationKeyFacts(conversation.keyFacts);
+  const topics = decodeConversationTopics(conversation.topics);
+
+  if (!keyFacts.ok) {
+    logger.warn('[VoiceSession] Discarded malformed conversation memory field', {
+      maestroId,
+      field: 'keyFacts',
+      error: keyFacts.error,
+    });
+  }
+  if (!topics.ok) {
+    logger.warn('[VoiceSession] Discarded malformed conversation memory field', {
+      maestroId,
+      field: 'topics',
+      error: topics.error,
+    });
+  }
+
+  const memory: ConversationMemory = {};
+  if (conversation.summary) memory.summary = conversation.summary;
+  if (keyFacts.ok && keyFacts.data) memory.keyFacts = keyFacts.data;
+  if (topics.ok && topics.data?.length) memory.recentTopics = topics.data;
+
+  return Object.keys(memory).length > 0 ? memory : null;
+}
+
+/**
+ * Fetch conversation memory for a maestro from the API.
+ * Reads the actual `{ items, pagination }` envelope of GET /api/conversations.
  */
 export async function fetchConversationMemory(
   maestroId: string,
 ): Promise<ConversationMemory | null> {
+  let payload: unknown;
+
   try {
-    const response = await fetch(`/api/conversations?maestroId=${maestroId}&limit=1`);
-    if (!response.ok) return null;
-
-    const conversations = await response.json();
-    if (!conversations || conversations.length === 0) return null;
-
-    const conv = conversations[0];
-    return {
-      summary: conv.summary,
-      keyFacts: conv.keyFacts
-        ? typeof conv.keyFacts === 'string'
-          ? JSON.parse(conv.keyFacts)
-          : conv.keyFacts
-        : undefined,
-      recentTopics: conv.topics
-        ? typeof conv.topics === 'string'
-          ? JSON.parse(conv.topics)
-          : conv.topics
-        : undefined,
-    };
+    const response = await fetch(
+      `/api/conversations?maestroId=${encodeURIComponent(maestroId)}&limit=1`,
+    );
+    if (!response.ok) {
+      // Optional memory recall — degrade gracefully on transient failures.
+      // Logged at info to avoid Sentry noise (MIRRORBUDDY-1K).
+      logger.info('[VoiceSession] Conversation memory request rejected', {
+        maestroId,
+        status: response.status,
+      });
+      return null;
+    }
+    payload = await response.json();
   } catch (error) {
-    // Optional memory recall — degrade gracefully on transient failures.
-    // Logged at info to avoid Sentry noise (MIRRORBUDDY-1K).
     logger.info('[VoiceSession] Failed to fetch conversation memory', {
       maestroId,
       error: error instanceof Error ? error.message : String(error),
     });
     return null;
   }
+
+  const decoded = decodeConversationListResponse(payload);
+  if (!decoded.ok) {
+    // A shape mismatch is a contract break, not a transient failure: surface it.
+    logger.warn('[VoiceSession] Unexpected conversations response shape', {
+      maestroId,
+      error: decoded.error,
+    });
+    return null;
+  }
+
+  const conversation = decoded.data.items[0];
+  if (!conversation) return null;
+
+  return toConversationMemory(conversation, maestroId);
 }
 
 /**

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { AccessibilityProvider, MotionConfigBridge } from '@/components/accessibility';
+import { DocumentLocaleSync } from '@/components/i18n/document-locale-sync';
 import { StagingBanner } from '@/components/ui/staging-banner';
 import { MaintenanceBanner } from '@/components/ui/maintenance-banner';
 import { ToastContainer } from '@/components/ui/toast';
@@ -198,6 +199,8 @@ export function Providers({ children, nonce }: ProvidersProps) {
       // CSP nonce for inline theme script (prevents flash of unstyled content)
       nonce={nonce}
     >
+      {/* Keeps <html lang> aligned with the locale route across soft navigation (R4) */}
+      <DocumentLocaleSync />
       <AccessibilityProvider>
         {/* Bridge prefers-reduced-motion + a11y profile flag into framer-motion (A11Y-01) */}
         <MotionConfigBridge>

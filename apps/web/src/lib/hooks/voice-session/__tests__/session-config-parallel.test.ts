@@ -43,7 +43,26 @@ describe('Session Config Parallel Fetches', () => {
           } else if (urlStr.includes('/api/conversations')) {
             resolve({
               ok: true,
-              json: async () => [{ summary: 'test summary' }],
+              // Actual GET /api/conversations envelope (items + pagination).
+              json: async () => ({
+                items: [
+                  {
+                    id: 'conv_1',
+                    maestroId: 'test-maestro',
+                    summary: 'test summary',
+                    keyFacts: null,
+                    topics: [],
+                  },
+                ],
+                pagination: {
+                  page: 1,
+                  limit: 1,
+                  total: 1,
+                  totalPages: 1,
+                  hasNextPage: false,
+                  hasPrevPage: false,
+                },
+              }),
             } as Response);
           } else {
             resolve({
