@@ -2,21 +2,13 @@
  * Production Smoke Tests — Voice & Realtime API
  *
  * Verifies voice GA endpoints, the ephemeral token flow and feature flags.
- *
- * The token exchange below is deliberately a positive check. Until 28 August
- * 2026 every voice test here only asserted that endpoints *refuse* bad
- * requests, so an expired Azure key left the whole suite green while no child
- * could talk to a Maestro. This test fails when the credentials Azure actually
- * accepts stop working, which is the failure that hurt.
+ * The positive handshake prevents expired Azure credentials or a broken relay
+ * from leaving every refusal-only voice check green.
  */
 
 import { test, expect, type APIRequestContext } from './fixtures';
+import { connectVoiceThroughRelay } from './voice-realtime-probe';
 
-/**
- * How long a child may wait between pressing the microphone and the Maestro
- * being able to hear them. A warm function answers in well under a second;
- * the budget leaves room for one cold start without hiding a real slowdown.
- */
 const TOKEN_START_BUDGET_MS = 15_000;
 const WEBRTC_HANDSHAKE_BUDGET_MS = 10_000;
 
@@ -35,13 +27,10 @@ async function obtainCsrfToken(request: APIRequestContext): Promise<string | und
 test.describe('PROD-SMOKE: Voice & Realtime', () => {
   test.describe.configure({ retries: 0 });
 
-  test('Voice connects when the browser cannot reach Azure directly', async ({ page }) => {
+  test('Voice relay establishes a connected WebRTC data channel', async ({ page }) => {
     await page.goto('/it/welcome', { waitUntil: 'domcontentloaded', timeout: 30_000 });
     const browserRequest = page.context().request;
 
-    // The first call to /api/session on a cold visitor sometimes establishes the
-    // visitor cookie without returning a token yet; ask again rather than
-    // reporting a voice outage that isn't one.
     const csrfToken = await obtainCsrfToken(browserRequest);
     expect(csrfToken, 'no CSRF token was issued').toBeTruthy();
 
@@ -49,10 +38,6 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     const res = await browserRequest.post('/api/realtime/ephemeral-token', {
       headers: { 'X-CSRF-Token': csrfToken },
       data: {},
-      // A function that has not been used for hours takes far longer than a warm
-      // one — 12.7s was measured on 28 August against 0.6s once warm. Allow the
-      // slow case through and judge it on the measurement below, so a cold start
-      // reads as a slow start rather than an unexplained timeout.
       timeout: 30_000,
     });
     const tokenElapsedMs = Date.now() - startedAt;
@@ -80,98 +65,12 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     expect(config.azureResource, 'Azure resource name is missing').toBeTruthy();
 
     const handshakeStartedAt = Date.now();
-    const handshake = await page.evaluate(
-      async ({ token, callsUrl, csrfToken }) => {
-        const peerConnection = new RTCPeerConnection();
-        let stream: MediaStream | null = null;
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-          const audioTrack = stream.getAudioTracks()[0];
-          if (!audioTrack) throw new Error('Fake microphone returned no audio track');
-          audioTrack.enabled = false;
-          peerConnection.addTrack(audioTrack, stream);
-          const dataChannel = peerConnection.createDataChannel('realtime-channel');
-          const offer = await peerConnection.createOffer({ offerToReceiveAudio: true });
-          await peerConnection.setLocalDescription(offer);
-
-          const relay = () =>
-            fetch('/api/realtime/sdp-exchange', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-              body: JSON.stringify({ sdp: peerConnection.localDescription?.sdp, token }),
-            });
-          let response: Response;
-          let relayAttempted = false;
-          try {
-            response = await fetch(callsUrl, {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/sdp',
-              },
-              body: peerConnection.localDescription?.sdp,
-            });
-          } catch {
-            relayAttempted = true;
-            response = await relay();
-          }
-          if (
-            !relayAttempted &&
-            !response.ok &&
-            [408, 500, 502, 503, 504].includes(response.status) &&
-            !(response.status === 503 && response.headers.get('retry-after'))
-          ) {
-            response = await relay();
-          }
-          const answer = await response.text();
-          if (!response.ok) {
-            return {
-              status: response.status,
-              connected: false,
-              error: answer.slice(0, 300),
-            };
-          }
-
-          await peerConnection.setRemoteDescription({ type: 'answer', sdp: answer });
-          const connected = await new Promise<boolean>((resolve) => {
-            if (dataChannel.readyState === 'open') {
-              resolve(true);
-              return;
-            }
-            const timeout = window.setTimeout(() => resolve(false), 10_000);
-            dataChannel.addEventListener(
-              'open',
-              () => {
-                window.clearTimeout(timeout);
-                resolve(true);
-              },
-              { once: true },
-            );
-          });
-          return {
-            status: response.status,
-            connected,
-            transport: response.url.startsWith(window.location.origin) ? 'relay' : 'direct',
-            error: connected ? null : `data channel state: ${dataChannel.readyState}`,
-          };
-        } finally {
-          stream?.getTracks().forEach((track) => track.stop());
-          peerConnection.close();
-        }
-      },
-      {
-        token: body.token as string,
-        csrfToken,
-        callsUrl: 'https://voice-direct-path.invalid/openai/v1/realtime/calls',
-      },
-    );
-
+    const handshake = await connectVoiceThroughRelay(page, body.token as string);
     expect(
       handshake.status,
       `Azure rejected the browser SDP offer: ${handshake.error ?? 'no error body'}`,
     ).toBeGreaterThanOrEqual(200);
     expect(handshake.status).toBeLessThan(300);
-    expect(handshake.transport).toBe('relay');
     expect(
       handshake.connected,
       `Azure returned SDP but WebRTC did not connect: ${handshake.error ?? 'unknown state'}`,
@@ -187,16 +86,13 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
 
   test('Realtime token endpoint returns transport config', async ({ request }) => {
     const res = await request.get('/api/realtime/token');
-    // Should return 200 with provider info (no auth required for config)
     if (res.status() === 200) {
       const body = await res.json();
       expect(body.provider).toBe('azure');
       expect(body.transport).toBe('webrtc');
       expect(body.configured).toBe(true);
-      // GA protocol: should have azureResource, not webrtcEndpoint
       expect(body.azureResource).toBeTruthy();
     } else {
-      // If auth required, that's also acceptable
       expect(res.status()).toBeGreaterThanOrEqual(400);
     }
   });
@@ -205,7 +101,6 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     const res = await request.post('/api/realtime/ephemeral-token', {
       data: { model: 'gpt-4o-realtime', voice: 'alloy' },
     });
-    // Should reject without CSRF token
     expect(res.status()).toBeGreaterThanOrEqual(400);
   });
 
@@ -220,11 +115,8 @@ test.describe('PROD-SMOKE: Voice & Realtime', () => {
     const res = await request.get('/api/feature-flags');
     if (res.status() === 200) {
       const body = await res.json();
-      // Voice GA protocol should be enabled
-      const gaFlag = body.find?.((f: { id: string }) => f.id === 'voice_ga_protocol');
-      if (gaFlag) {
-        expect(gaFlag.status).toBe('enabled');
-      }
+      const gaFlag = body.find?.((flag: { id: string }) => flag.id === 'voice_ga_protocol');
+      if (gaFlag) expect(gaFlag.status).toBe('enabled');
     }
   });
 
