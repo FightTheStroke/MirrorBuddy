@@ -7,10 +7,8 @@ import type { AuthenticatedSession } from './session-auth';
 import { AuthenticationError } from './auth-error';
 import { revalidateSession } from './session-reader';
 
-function serializationConflict(error: unknown): boolean {
-  const cause = error instanceof SessionReadError ? error.cause : error;
+function driverAdapterConflict(cause: unknown): boolean {
   if (typeof cause !== 'object' || cause === null) return false;
-  if ('code' in cause && cause.code === 'P2034') return true;
   if (!('name' in cause) || cause.name !== 'DriverAdapterError' || !('cause' in cause))
     return false;
   const detail = cause.cause;
@@ -21,6 +19,21 @@ function serializationConflict(error: unknown): boolean {
     detail.kind === 'TransactionWriteConflict' &&
     'originalCode' in detail &&
     (detail.originalCode === '40001' || detail.originalCode === '40P01')
+  );
+}
+
+function serializationConflict(error: unknown): boolean {
+  const cause = error instanceof SessionReadError ? error.cause : error;
+  if (typeof cause !== 'object' || cause === null) return false;
+  if ('code' in cause && cause.code === 'P2034') return true;
+  if (driverAdapterConflict(cause)) return true;
+  if (!('code' in cause) || cause.code !== 'P2010' || !('meta' in cause)) return false;
+  const meta = cause.meta;
+  return (
+    typeof meta === 'object' &&
+    meta !== null &&
+    'driverAdapterError' in meta &&
+    driverAdapterConflict(meta.driverAdapterError)
   );
 }
 
