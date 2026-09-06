@@ -14,8 +14,8 @@ Language — code, comments and docs in English; UI strings via next-intl (it/en
 
 1. `npm run test:unit -- --reporter=dot` before EVERY commit.
 2. After ANY UI text change: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`.
-3. Run `npm run i18n:check` before commit even if `messages/` is not staged.
-4. New env var → update ALL of: `.env.example`, `validate-pre-deploy.ts`,
+3. Run `npm run i18n:check` before commit even if `apps/web/messages/` is not staged.
+4. New env var → update ALL of: `.env.example`, `scripts/validate-pre-deploy.ts`,
    `.github/workflows/*.yml`, `SETUP.md`.
 5. Every function accepting external input (API params, DB results, env vars) MUST
    handle null/undefined.
@@ -33,20 +33,27 @@ PostgreSQL 17 + Prisma + pgvector · Playwright (E2E) + Vitest (unit).
 - AI: Azure OpenAI (primary) → Claude (fallback) → Ollama (local) → Showcase (demo).
   Note: Claude/Anthropic is not wired yet (P2-4).
 - RAG: query → Azure embed (1536d) → pgvector cosine → top 3 → prompt → response
-  (`src/lib/rag/`)
+  (`apps/web/src/lib/rag/`)
 
-| Component | Tech                             | Location                |
-| --------- | -------------------------------- | ----------------------- |
-| DB        | PostgreSQL + pgvector            | `prisma/schema/`        |
-| AI        | Azure OpenAI / Ollama            | `src/lib/ai/providers/` |
-| State     | Zustand + REST (NO localStorage) | `src/lib/stores/`       |
-| Auth      | `validateAuth()` / `ADMIN_EMAIL` | ADR 0075                |
-| Tiers     | Trial / Base / Pro               | `src/lib/tier/`         |
+| Component | Tech                             | Location                         |
+| --------- | -------------------------------- | -------------------------------- |
+| DB        | PostgreSQL + pgvector            | `apps/web/prisma/schema/`        |
+| AI        | Azure OpenAI / Ollama            | `apps/web/src/lib/ai/providers/` |
+| State     | Zustand + REST (NO localStorage) | `apps/web/src/lib/stores/`       |
+| Auth      | `validateAuth()` / `ADMIN_EMAIL` | ADR 0075                         |
+| Tiers     | Trial / Base / Pro               | `apps/web/src/lib/tier/`         |
 
-Key paths: types `src/types/index.ts` · safety `src/lib/safety/` ·
-FSRS `src/lib/education/fsrs/` · maestri `src/data/maestri/`.
+Key paths: types `apps/web/src/types/index.ts` · safety `apps/web/src/lib/safety/` ·
+FSRS `apps/web/src/lib/education/fsrs/` · maestri `apps/web/src/data/maestri/`.
+Shared implementations and compatibility exports live in `packages/`.
 
 ## Commands
+
+Run from the repository/worktree root using Node 20.x and pnpm 10.33.0
+(`package.json`; tooling evidence: Node 20.20.2). Install with pnpm, not npm.
+The root scripts below remain available; they do not automatically invoke Turbo.
+Next runs in `apps/web/`; environment loading differs for root CLI tools
+(see `SETUP.md`, especially the direct tier-seed database warning).
 
 | Task           | Command                                          |
 | -------------- | ------------------------------------------------ |
@@ -68,35 +75,38 @@ Never in CI/prod (Supabase there).
 
 ## Critical paths
 
-| Area           | Rule                                                                                                                                                |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Proxy          | `src/proxy.ts` ONLY. Root `proxy.ts`/`middleware.ts` breaks the app (307→404). Pre-push hook blocks this.                                           |
-| CSP            | `src/proxy.ts` headers ↔ `src/components/providers.tsx` nonces. Test: `npm run test:unit -- csp-validation`. "Caricamento..." stuck = CSP blocking. |
-| i18n           | 5 locales (it/en/fr/de/es). camelCase keys. No hardcoded text. JSON wraps under filename key (ADR 0104)                                             |
-| E2E fixtures   | Import from `./fixtures/` (base/a11y/auth/locale), NEVER `@playwright/test`                                                                         |
-| API middleware | Pipe pattern: `pipe(withSentry, withCSRF, withAuth)(handler)`. CSRF before auth on mutations                                                        |
-| Tier system    | Use `tierService.getLimits(userId)` / `useTierFeatures()`, never hardcode limits                                                                    |
-| Auth           | Session cookies. `validateAuth()` / `validateAdminAuth()`. `csrfFetch()` client, `requireCSRF()` server                                             |
-| State          | Zustand stores (`src/lib/stores/`). NO localStorage for user data (GDPR)                                                                            |
-| Prisma schema  | 25+ files in `prisma/schema/`. Run `npx prisma generate` after changes                                                                              |
-| Safety         | `src/lib/safety/`: bias, filtering, age enforcement                                                                                                 |
-| A11y           | 7 DSA profiles, WCAG 2.1 AA (4.5:1 contrast, keyboard, screen readers, `prefers-reduced-motion`)                                                    |
-| Admin          | `withCSRF` before `withAdmin`. Audit: `auditService.log('VERB_ENTITY')`                                                                             |
-| Compliance     | EU AI Act + GDPR + COPPA. Parameterized queries. No PII logs. Pages: `/ai-transparency`, `/privacy`                                                 |
+| Area           | Rule                                                                                                                                                                                                                        |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proxy          | `apps/web/src/proxy.ts` ONLY. No `proxy.ts`/`middleware.ts` at the repository or app root; competing proxy placement breaks routing (307→404). Preserve the pre-push guard.                                                 |
+| CSP            | `apps/web/src/proxy.ts` headers ↔ `apps/web/src/components/providers.tsx` nonces. Test: `npm run test:unit -- csp-validation`. "Caricamento..." stuck = CSP blocking.                                                       |
+| i18n           | 5 locales (it/en/fr/de/es). camelCase keys. No hardcoded text. JSON wraps under filename key (ADR 0104)                                                                                                                     |
+| E2E fixtures   | Specs in `apps/web/e2e/` import from `./fixtures/` (base/a11y/auth/locale), NEVER `@playwright/test`; adjust relative depth for nested specs.                                                                               |
+| API middleware | Pipe pattern: `pipe(withSentry('/api/...'), withCSRF, withAuth)(handler)`. CSRF before auth on mutations                                                                                                                    |
+| Tier system    | Use `tierService.getLimits(userId)` / `useTierFeatures()`, never hardcode limits                                                                                                                                            |
+| Auth           | Session cookies. `validateAuth()` / `validateAdminAuth()`. `csrfFetch()` client, `requireCSRF()` server                                                                                                                     |
+| State          | Zustand stores (`apps/web/src/lib/stores/`). NO localStorage for user data (GDPR)                                                                                                                                           |
+| Prisma schema  | 25+ files in `apps/web/prisma/schema/`. Run `npx prisma generate` from root after changes                                                                                                                                   |
+| Safety         | `apps/web/src/lib/safety/` and `packages/safety/src/`: bias, filtering, age enforcement                                                                                                                                     |
+| A11y           | 7 DSA profiles, WCAG 2.1 AA (4.5:1 contrast, keyboard, screen readers, `prefers-reduced-motion`)                                                                                                                            |
+| Admin          | Mutations: `withCSRF` before `withAdmin` (ADMIN). Read endpoints may use `withAdminReadOnly` (ADMIN / ADMIN_READONLY). Preserve resource ownership checks. Audit: `logAdminAction({...})` from `@/lib/admin/audit-service`. |
+| Compliance     | EU AI Act + GDPR + COPPA. Parameterized queries. No PII logs. Pages: `/ai-transparency`, `/privacy`                                                                                                                         |
 
-Other constraints: Prisma only (no raw clients) · `@/` import aliases.
+Other constraints: Prisma only (no raw clients) · `@/` import aliases resolve to `apps/web/src/`.
 
 ## Workflow enforcement (3+ tasks)
 
-| Step      | Action                                             | Skip = REJECTED                  |
-| --------- | -------------------------------------------------- | -------------------------------- |
-| Plan      | `@planner` / structured plan before coding         | No direct plan creation          |
-| Execute   | `@execute {id}` / follow plan tasks in order       | No direct file edits during plan |
-| Task done | `plan-db-safe.sh update-task {id} done`            | No skipping DB update            |
-| Validate  | `@validate {task_id}` / verify before marking done | No self-declaring done           |
-| Merge     | After all tasks validated                          | No merge with pending tasks      |
+| Step       | Action                                                                                | Skip = REJECTED                    |
+| ---------- | ------------------------------------------------------------------------------------- | ---------------------------------- |
+| Plan       | `@planner` / approved structured plan in session artifacts before coding              | No unplanned implementation        |
+| Execute    | Follow approved tasks in dependency order with an executor that has write/shell tools | No out-of-plan edits               |
+| Checkpoint | Record evidence and pending review in session SQLite/task artifacts                   | No skipping state/evidence updates |
+| Validate   | Independent `@validate` / Thor review before the parent marks completion              | No self-declaring done             |
+| Merge      | After all tasks validated                                                             | No merge with pending tasks        |
 
 After every task: checkpoint → validate → next task. Single fixes: direct edit is fine.
+Use available session SQLite tracking and session artifacts, not retired planning
+tools. Do not create Markdown planning files in the repository. The parent owns
+task-state transitions and the global checkpoint; implementation alone is not acceptance.
 
 ## Execution & merge discipline
 
@@ -111,7 +121,7 @@ After every task: checkpoint → validate → next task. Single fixes: direct ed
   `git push --no-verify|--force`. Use `npm run ci:summary` instead.
   `gh pr merge` is autonomous once CI is fully green and mergeable — never merge with
   failing/pending checks, unresolved review comments, or changes touching branch
-  protection / security policy / release infra without flagging first.
+  protection / security policy / release infra without explicit human approval.
 
 ## Verify-before-done
 
@@ -127,8 +137,9 @@ Thor gates: per-task (1-4, 8, 9) + per-wave (all 9 + build).
   compliance, e2e-testing, i18n, proxy-architecture, tier.
 - Agent personas: `.github/agents/` · NightMaintenance runbook:
   `.github/agents/night-maintenance.agent.md`.
-- On-demand docs: `@docs/claude/<name>.md`; nested `CLAUDE.md` files in subfolders
-  (api/components/lib/prisma/e2e/messages) load when editing those areas.
+- On-demand docs: `@docs/claude/<name>.md`; nested `CLAUDE.md` files under
+  `apps/web/` (src/app/api, src/components, src/lib, prisma, e2e, messages)
+  load when editing those areas.
 - gbrain semantic search guidance: `docs/agents/gbrain-search.md` (load on demand).
 
 <!-- roberdan-os:begin -->

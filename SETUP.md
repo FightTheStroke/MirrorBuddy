@@ -4,26 +4,56 @@
 
 ## Prerequisites
 
-- **Node.js 20+** (LTS recommended — Docker uses `node:20-alpine`)
-- **npm 10+**
+- **Node.js 20.x** (root `engines.node`; Docker uses `node:20-alpine`)
+- **pnpm 10.33.0** (pinned in root `package.json`)
 - **PostgreSQL 17** with pgvector extension (or Supabase)
+
+Tooling execution evidence uses Node 20.20.2 and pnpm 10.33.0; newer Node
+majors are outside the declared engine range.
 
 ---
 
 ## Quick Start
 
+Run commands from the repository/worktree root. The application is in
+`apps/web/`, its source in `apps/web/src/`, and shared packages in `packages/`.
+
 ```bash
 git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
-npm install
+corepack enable
+pnpm install --frozen-lockfile
 cp .env.example .env
-# Edit .env with your API keys
-npx prisma generate
-npx prisma migrate dev
-npm run dev
+cp .env.example apps/web/.env.local
+# Configure both files for your intended LOCAL database and development credentials.
+# Read "Environment file scope" below before any database command.
+pnpm exec prisma generate
+DEV_DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy" pnpm exec prisma migrate dev
+pnpm dev
 ```
 
-Open http://localhost:3000
+Replace `user` with your local database role before migration. Open the URL printed
+by the dev server (normally http://localhost:3000).
+
+### Environment file scope
+
+- **Next.js:** `scripts/dev-server.sh` changes to `apps/web/`; root `build` does
+  too. Next loads app-directory `.env*` files (for example `apps/web/.env.local`)
+  and inherited environment variables. The dev wrapper does not copy or source
+  the root `.env`; configuring only that file does not configure Next.
+- **Prisma CLI from root:** `prisma.config.ts` loads the root `.env` with
+  `dotenv/config`. Database selection is `DEV_DATABASE_URL`, then `DIRECT_URL`,
+  then `DATABASE_URL`. Its schema and migrations are in `apps/web/prisma/`.
+- **Direct tier seed:** `pnpm seed:tiers` runs
+  `tsx --env-file-if-exists=.env apps/web/prisma/seed-tiers.ts`. It loads the
+  **optional root `.env`**, with an already-set environment value taking
+  precedence, and uses **`DATABASE_URL` directly**. It does **not** run Prisma CLI
+  configuration or apply its `DEV_DATABASE_URL` / `DIRECT_URL` overrides.
+
+Root `.env` may point to a shared or production Supabase instance, including after
+a vault restore. Before any write, explicitly select and confirm the intended
+safe local database host, database and role; do not assume an override used by one
+command protects another. Never paste connection secrets into logs or documentation.
 
 ---
 
@@ -45,7 +75,7 @@ Open http://localhost:3000
    - `gpt-realtime` (voice, premium)
    - `gpt-realtime-mini` (voice, cheaper default)
    - `text-embedding-3-small` (RAG semantic search, recommended)
-3. Configure `.env`:
+3. Configure the app environment (`apps/web/.env.local` for local Next.js):
 
 ```bash
 # Chat
@@ -105,7 +135,7 @@ curl -fsSL https://ollama.com/install.sh | sh  # Linux
 ollama serve
 ollama pull llama3.2  # Recommended (~2GB)
 
-# Configure .env
+# Configure apps/web/.env.local for local Next.js
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 ```
@@ -129,7 +159,7 @@ az login
 az ad sp create-for-rbac --name "MirrorBuddy-CostReader" \
   --role "Cost Management Reader" --scopes /subscriptions/{subscription-id}
 
-# .env
+# apps/web/.env.local for local Next.js
 AZURE_TENANT_ID=your-tenant-id
 AZURE_CLIENT_ID=your-client-id
 AZURE_CLIENT_SECRET=your-secret
@@ -154,13 +184,35 @@ psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
 DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 ```
 
-**Migrations:** `npx prisma generate` | `npx prisma migrate dev` (local) | `npx prisma migrate deploy` (prod/CI) | `npx prisma migrate reset` (deletes data)
+**Migrations (from root):** `pnpm exec prisma generate` |
+`pnpm exec prisma migrate dev` (local) | `pnpm exec prisma migrate deploy`
+(prod/CI, existing release approvals required) | `pnpm exec prisma migrate reset`
+(deletes data; confirm the target and obtain approval before irreversible deletion).
+
+### Tier definitions
+
+**Before seeding, explicitly select and confirm a safe local target.**
+Setting only `DEV_DATABASE_URL` or `DIRECT_URL` is **not sufficient** for this
+command: a root `.env` `DATABASE_URL` could still target shared/production Supabase.
+
+```bash
+# From root; replace user with the confirmed local role. Do not use a shared/prod URL.
+DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy" pnpm seed:tiers
+```
+
+The entry point uses the existing configured `createPrismaClient` and the sole
+`seedTiers` definition in `apps/web/src/lib/seeds/tier-seed.ts`. It awaits client
+cleanup before reporting success/failure, sets a nonzero exit status on failure,
+and recognizes symlinked CLI invocation. These properties are not a production
+target guard. No real seed was run to validate this documentation.
 
 ---
 
 ## Environment Variables
 
-See `.env.example` for all options. Key variables:
+See root `.env.example` for all options and the file-scope rules above.
+Use app-directory environment files for Next and root configuration for CLI tools.
+Key variables:
 
 ```bash
 # Azure OpenAI (Chat + Voice)
@@ -240,9 +292,12 @@ git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
 az login                          # Authenticate with Azure
 ./scripts/env-vault.sh restore    # Restore .env from Key Vault
-npm ci                            # Install dependencies
-npx prisma generate               # Generate Prisma client
-npm run dev                       # Start development server
+corepack enable
+pnpm install --frozen-lockfile     # Install workspace dependencies
+pnpm exec prisma generate         # Generate Prisma client
+# Restored .env may target production; do not migrate or seed it.
+# Configure apps/web/.env.local explicitly for safe local development.
+pnpm dev                          # Start development server
 ```
 
 **Where secrets are stored** (4 copies):
@@ -307,11 +362,16 @@ npm run test         # Run Playwright E2E tests
 
 **Voice Not Working:** Verify Azure Realtime credentials, check deployment name, ensure `gpt-realtime` in region, check mic permissions, Settings → Diagnostics.
 
-**Build Errors:** `rm -rf .next node_modules package-lock.json && npm install && npx prisma generate && npm run build`
+**Build Errors:** From root, use `pnpm exec prisma generate` and
+`pnpm ci:summary` to retain actionable failure output. If dependencies are missing,
+restore them with `pnpm install --frozen-lockfile`; do not delete the lockfile.
+Application build output is in `apps/web/.next/`.
 
 **Ollama Failed:** Verify `ollama serve` running, check `OLLAMA_URL`, test `curl http://localhost:11434/api/tags`, ensure `ollama pull llama3.2`.
 
-**Database Errors:** `npx prisma generate && npx prisma migrate dev` (or `npx prisma migrate reset` if needed)
+**Database Errors:** Confirm the intended local target using the environment
+selection rules above before `pnpm exec prisma migrate dev`. `pnpm exec prisma
+generate` regenerates the client; a reset deletes data and requires explicit approval.
 
 **→ For detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 
@@ -323,15 +383,9 @@ npm run test         # Run Playwright E2E tests
 
 **Docker:**
 
-```dockerfile
-FROM node:24-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npx prisma generate && npm run build
-CMD ["npm", "start"]
-```
+Use the repository [Dockerfile](Dockerfile): its multi-stage build uses
+`node:20-alpine`, pinned pnpm workspace installation and the standalone server at
+`apps/web/server.js` inside the image. Do not substitute a root-only npm install.
 
 `docker build -t mirrorbuddy . && docker run -p 3000:3000 --env-file .env mirrorbuddy`
 

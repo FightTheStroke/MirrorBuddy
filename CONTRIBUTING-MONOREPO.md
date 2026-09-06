@@ -6,16 +6,16 @@ decision and migration waves.
 
 ## Prerequisites
 
-- Node.js ≥ 20
-- pnpm ≥ 10.33.0 (pinned via the `packageManager` field in root
-  `package.json` — `corepack enable` will install the right version)
+- Node.js 20.x (`engines.node`; tooling evidence uses 20.20.2)
+- pnpm 10.33.0 (pinned via the `packageManager` field in root
+  `package.json`; enable the Corepack shims with `corepack enable`)
 
 ## Layout
 
 ```
 MirrorBuddy/
 ├── apps/
-│   └── web/             (Next.js app — post-W2, currently still at root)
+│   └── web/             (Next.js app: src/, messages/, e2e/, prisma/)
 ├── packages/
 │   └── types/           (@mirrorbuddy/types — shared TS contracts)
 ├── pnpm-workspace.yaml  (workspace glob config)
@@ -23,28 +23,44 @@ MirrorBuddy/
 └── …
 ```
 
-W3 adds: `packages/{db,ai-providers,safety,tools,education,i18n,ui}`.
+Other existing packages: `accessibility`, `ai-providers`, `db`, `education`,
+`greeting`, `i18n`, `logger`, `maestri`, `safety`, `tier`, `tools`, `ui`, `utils`.
 
 ## Common commands
 
-| Command                                  | Purpose                                             |
-| ---------------------------------------- | --------------------------------------------------- |
-| `pnpm install`                           | Install deps for root + every workspace             |
-| `pnpm dev`                               | Start the dev server (Turbo runs the right targets) |
-| `pnpm build`                             | Production build                                    |
-| `pnpm test:unit`                         | Vitest across all packages                          |
-| `pnpm --filter @mirrorbuddy/types <cmd>` | Run a script inside a specific workspace            |
+Run these from the repository/worktree root. Root scripts do not automatically
+invoke Turbo; `turbo.json` is available for explicit Turbo task orchestration.
+
+| Command                                  | Purpose                                                  |
+| ---------------------------------------- | -------------------------------------------------------- |
+| `pnpm install`                           | Install deps for root + every workspace                  |
+| `pnpm dev`                               | Run `scripts/dev-server.sh` in `apps/web`                |
+| `pnpm build`                             | Run Next production build in `apps/web`                  |
+| `pnpm test:unit`                         | Vitest rooted at `apps/web`, including root script tests |
+| `pnpm --filter @mirrorbuddy/types <cmd>` | Run a script inside a specific workspace                 |
+
+`apps/web/vitest.config.ts` includes app tests and
+`../../scripts/__tests__/**/*.test.ts`; root script tests must declare
+`@vitest-environment node`. There is no all-packages test glob. App tests can
+exercise shared implementations through their imports (for example FSRS).
+
+`pnpm test:e2e:i18n --list --reporter=list` uses
+`apps/web/playwright.config.iteration.ts` to **collect** tests, not execute
+browsers or access a database. See [SETUP.md](SETUP.md#environment-file-scope)
+before running commands that use database configuration.
 
 ## Adding a dep to a specific workspace
 
 ```bash
 pnpm --filter @mirrorbuddy/types add -D typescript
-pnpm --filter mirrorbuddy add lodash  # "mirrorbuddy" is the root app
+pnpm --filter @mirrorbuddy/web add lodash  # Web workspace dependency
 ```
 
 Do NOT run `pnpm add` at the repo root without `--filter` — it adds the
-dep to the root `package.json`, which is almost never what you want
-post-W2.
+dep to the root `package.json`. The root is named `mirrorbuddy`; the web workspace
+is `@mirrorbuddy/web`. Existing tooling and many shared app dependencies still
+live in the root manifest; choose the intended owner rather than moving them
+incidentally.
 
 ## Creating a new package
 
@@ -77,7 +93,7 @@ update `main`/`types`/`exports` accordingly.
 ## Next.js `transpilePackages`
 
 Internal workspace packages that ship TS sources (no dist) must be
-declared in `next.config.ts`:
+declared in `apps/web/next.config.ts`:
 
 ```ts
 const nextConfig: NextConfig = {
@@ -88,33 +104,57 @@ const nextConfig: NextConfig = {
 
 ## CI / lockfiles
 
-During the W1 → W4 transition both `pnpm-lock.yaml` (authoritative)
-and `package-lock.json` (for legacy npm-based workflows) are committed.
-After W4 we drop `package-lock.json`.
+`pnpm-lock.yaml` is the committed workspace lockfile; `package-lock.json` is no
+longer tracked. The workspace dependencies use `workspace:*`; do not substitute
+an npm install or regenerate an npm compatibility lockfile.
 
-If you change `package.json` deps, regenerate both locks:
+If you change manifest dependencies, regenerate the pnpm lockfile:
 
 ```bash
 pnpm install --lockfile-only
-npm install --package-lock-only --no-audit --no-fund
-git add package.json pnpm-lock.yaml package-lock.json
+git add package.json pnpm-lock.yaml  # Also include any changed workspace manifest
 ```
 
 ## Reviewing cross-workspace imports
 
 Imports from `packages/X` into `packages/Y` are fine if `Y` declares
 `X` in its dependencies. Imports from `packages/*` into `apps/web` are
-fine. Imports from `apps/web` **into** `packages/*` are forbidden (it
-creates a dependency cycle; W3 adds an eslint rule to enforce).
+fine. New imports from `apps/web` into `packages/*` are forbidden; the existing
+reversed compatibility shims below are not permission to introduce arbitrary
+app/package cycles.
+`pnpm lint:boundaries` scans `apps/web/src/` and reports a violation count.
+It is a diagnostic counter, **not an enforced failure gate**, and does not
+establish that shared packages have been scanned.
 
-## Running a single package's tests
+## Targeted checks
 
 ```bash
 pnpm --filter @mirrorbuddy/types run typecheck
-pnpm --filter @mirrorbuddy/types exec vitest run
+pnpm exec vitest run --root apps/web src/lib/education/fsrs.test.ts --retry=0
 ```
 
+`@mirrorbuddy/types` defines a typecheck script, not a package-local test suite.
+The FSRS command runs the existing app test, which imports the shared code.
+
+`scripts/smart-test.sh` selects staged changes using NUL-delimited filenames and
+absolute related-test paths with `--passWithNoTests=false`. Deleted unit inputs
+and configuration changes run full units. A genuine zero-related selection falls
+back to full units only after the exact failure status, fresh private JSON report
+and empty-selection diagnostics agree; operational failures propagate. A passing
+fallback is required, but is not proof that the changed source has coverage.
+Fixture changes collect importing E2E specs, not fixture files as specs.
+
+`scripts/test-affected.sh` retains safety/accessibility baselines and selects
+app/shared-package checks; `--dry-run` executes no suites. `scripts/ci-summary.sh`
+uses actual command exit statuses, retains private uniquely named failed logs
+at the printed paths, and scans `apps/web/src` for unsafe queries, not packages
+or the whole repository. These targeted commands do not replace mandatory
+independent acceptance, pre-commit or release checks.
+
 ## Test-arch: module identity across shims (#365)
+
+In this section only, `src/...` is relative to `apps/web/`; `packages/...` is
+relative to the worktree root. `@/` resolves to `apps/web/src/`.
 
 When a file in `src/lib/X` (app) and a file in `packages/X` (workspace
 package) co-exist, two module IDs coexist: `@/lib/X` (via tsconfig
@@ -144,7 +184,7 @@ path:
 
 ```ts
 // packages/tier/src/index.ts
-export * from '../../../src/lib/tier';
+export * from '../../../apps/web/src/lib/tier';
 ```
 
 With reversed shims, a test `vi.mock('@/lib/tier', …)` transparently
@@ -173,7 +213,7 @@ lives at the single canonical module ID.
 - **`@types/*` version conflicts** between nested workspaces: pnpm
   hoists differently than npm. Use an `overrides` entry in root
   `package.json` to pin the version, or add a precise cast at the
-  interop point (see `src/lib/db.ts` for the `@types/pg` example).
+  interop point (see `packages/db/src/client.ts` for the `@types/pg` example).
 - **`spawn pnpm ENOENT`** on Vercel or a GitHub runner: pnpm isn't on
 PATH. Add `pnpm/action-setup@v4` to the workflow (see ADR 0164 and
 PR #320 for precedent).
