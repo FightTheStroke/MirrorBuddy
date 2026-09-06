@@ -39,12 +39,12 @@ const sidebarOf = (page: Page): Locator =>
 const headerOpener = (page: Page): Locator =>
   page.getByRole('banner').getByRole('button', { name: 'Apri menu' });
 
-// Consent completion remounts the home shell. Its first hydrated render is not
-// yet stable: a click can open the drawer, then the remount resets it closed.
+// These navigation tests start after consent; consent-child-state.spec.ts
+// separately exercises a drawer opened before the real consent read completes.
 async function waitForSettledHome(page: Page) {
   await page.waitForFunction(
     () =>
-      sessionStorage.getItem('mirrorbuddy-consent-loaded') === 'true' &&
+      ['guest', 'account'].includes(sessionStorage.getItem('mirrorbuddy-consent-loaded') ?? '') &&
       document.querySelector('[data-testid="consent-banner"]') === null,
     undefined,
     { timeout: HYDRATION_TIMEOUT },

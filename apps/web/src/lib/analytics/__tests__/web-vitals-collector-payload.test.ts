@@ -17,7 +17,6 @@ describe('Web Vitals Collector - Payload Format', () => {
         name: 'LCP' as MetricName,
         value: 2500,
         rating: 'good' as MetricRating,
-        userId: 'user-123',
         sessionId: 'session-abc',
         route: '/dashboard',
         navigationType: 'navigate',
@@ -29,7 +28,7 @@ describe('Web Vitals Collector - Payload Format', () => {
       expect(event.name).toBe('LCP');
       expect(event.value).toBe(2500);
       expect(event.rating).toBe('good');
-      expect(event.userId).toBe('user-123');
+      expect(event).not.toHaveProperty('userId');
       expect(event.sessionId).toBe('session-abc');
       expect(event.route).toBe('/dashboard');
       expect(event.navigationType).toBe('navigate');
@@ -46,7 +45,6 @@ describe('Web Vitals Collector - Payload Format', () => {
           name,
           value: 100,
           rating: 'good' as MetricRating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType: 'navigate',
@@ -67,7 +65,6 @@ describe('Web Vitals Collector - Payload Format', () => {
           name: 'LCP' as MetricName,
           value: 2500,
           rating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType: 'navigate',
@@ -81,18 +78,17 @@ describe('Web Vitals Collector - Payload Format', () => {
     });
 
     it('should support all device types', () => {
-      const deviceTypes = ['mobile', 'tablet', 'desktop'];
+      const deviceTypes: WebVitalsEvent['deviceType'][] = ['mobile', 'tablet', 'desktop'];
 
       deviceTypes.forEach((deviceType) => {
         const event: WebVitalsEvent = {
           name: 'LCP' as MetricName,
           value: 2500,
           rating: 'good' as MetricRating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType: 'navigate',
-          deviceType: deviceType as any,
+          deviceType,
           connectionType: 'unknown',
           timestamp: Date.now(),
         };
@@ -101,12 +97,11 @@ describe('Web Vitals Collector - Payload Format', () => {
       });
     });
 
-    it('should accept null userId for anonymous users', () => {
+    it('should omit user identity rather than send an anonymous identity field', () => {
       const event: WebVitalsEvent = {
         name: 'LCP' as MetricName,
         value: 2500,
         rating: 'good' as MetricRating,
-        userId: null,
         sessionId: 'session-abc',
         route: '/dashboard',
         navigationType: 'navigate',
@@ -115,7 +110,7 @@ describe('Web Vitals Collector - Payload Format', () => {
         timestamp: Date.now(),
       };
 
-      expect(event.userId).toBeNull();
+      expect(event).not.toHaveProperty('userId');
     });
 
     it('should be JSON serializable', () => {
@@ -123,7 +118,6 @@ describe('Web Vitals Collector - Payload Format', () => {
         name: 'LCP' as MetricName,
         value: 2500,
         rating: 'good' as MetricRating,
-        userId: 'user-123',
         sessionId: 'session-abc',
         route: '/dashboard',
         navigationType: 'navigate',
@@ -137,7 +131,7 @@ describe('Web Vitals Collector - Payload Format', () => {
 
       expect(deserialized.name).toBe('LCP');
       expect(deserialized.value).toBe(2500);
-      expect(deserialized.userId).toBe('user-123');
+      expect(deserialized).not.toHaveProperty('userId');
     });
 
     it('should handle various connection types', () => {
@@ -148,7 +142,6 @@ describe('Web Vitals Collector - Payload Format', () => {
           name: 'LCP' as MetricName,
           value: 2500,
           rating: 'good' as MetricRating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType: 'navigate',
@@ -169,7 +162,6 @@ describe('Web Vitals Collector - Payload Format', () => {
           name: 'LCP' as MetricName,
           value: 2500,
           rating: 'good' as MetricRating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType,
@@ -190,7 +182,6 @@ describe('Web Vitals Collector - Payload Format', () => {
           name: 'LCP' as MetricName,
           value,
           rating: 'good' as MetricRating,
-          userId: 'user-123',
           sessionId: 'session-abc',
           route: '/test',
           navigationType: 'navigate',

@@ -6,7 +6,13 @@
 
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { z } from 'zod';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
+import { safeReadJson } from '@/lib/api/safe-json';
+import {
+  canCollectOptionalAnalytics,
+  optionalAnalyticsDenied,
+} from '@/lib/telemetry/optional-analytics-server';
 import {
   checkRateLimitAsync,
   getClientIdentifier,
@@ -15,43 +21,17 @@ import {
 } from '@/lib/rate-limit';
 
 export const revalidate = 0;
-interface WebVitalMetric {
-  name: 'CLS' | 'FCP' | 'INP' | 'LCP' | 'TTFB';
-  value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
-  route: string;
-  deviceType: 'mobile' | 'tablet' | 'desktop';
-  connectionType?: '4g' | 'wifi' | 'unknown';
-  userId?: string;
-}
-
-interface WebVitalsPayload {
-  metrics: WebVitalMetric[];
-}
-
-/**
- * Validate Web Vitals payload
- */
-function validatePayload(data: unknown): data is WebVitalsPayload {
-  if (!data || typeof data !== 'object') return false;
-
-  const payload = data as Partial<WebVitalsPayload>;
-  if (!Array.isArray(payload.metrics)) return false;
-
-  return payload.metrics.every((m) => {
-    return (
-      typeof m === 'object' &&
-      typeof m.name === 'string' &&
-      ['CLS', 'FCP', 'INP', 'LCP', 'TTFB'].includes(m.name) &&
-      typeof m.value === 'number' &&
-      typeof m.rating === 'string' &&
-      ['good', 'needs-improvement', 'poor'].includes(m.rating) &&
-      typeof m.route === 'string' &&
-      typeof m.deviceType === 'string' &&
-      ['mobile', 'tablet', 'desktop'].includes(m.deviceType)
-    );
-  });
-}
+const metricSchema = z.object({
+  name: z.enum(['CLS', 'FCP', 'INP', 'LCP', 'TTFB']),
+  value: z.number().finite().nonnegative(),
+  rating: z.enum(['good', 'needs-improvement', 'poor']),
+  route: z.string().max(2048),
+  deviceType: z.enum(['mobile', 'tablet', 'desktop']),
+  connectionType: z.string().max(128).optional(),
+});
+const payloadSchema = z.object({ metrics: z.array(metricSchema).max(100) });
+type WebVitalMetric = z.infer<typeof metricSchema>;
+type WebVitalsPayload = z.infer<typeof payloadSchema>;
 
 /**
  * Convert metric to Grafana format
@@ -81,11 +61,6 @@ function formatMetricForGrafana(metric: WebVitalMetric): {
     connection_type: metric.connectionType || 'unknown',
     rating: metric.rating,
   };
-
-  // Add user_id if provided (for debugging)
-  if (metric.userId) {
-    labels.user_id = metric.userId;
-  }
 
   return {
     name: nameMap[metric.name],
@@ -168,7 +143,11 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * Accept Web Vitals data and push to Grafana Cloud
  */
 
-export const POST = pipe(withSentry('/api/metrics/web-vitals'))(async (ctx) => {
+export const POST = pipe(
+  withSentry('/api/metrics/web-vitals'),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
   // Rate limiting: 60 req/min per IP (F-05 protection)
   const clientId = getClientIdentifier(ctx.req);
   const rateLimit = await checkRateLimitAsync(`web-vitals:${clientId}`, RATE_LIMITS.WEB_VITALS);
@@ -181,16 +160,17 @@ export const POST = pipe(withSentry('/api/metrics/web-vitals'))(async (ctx) => {
     return rateLimitResponse(rateLimit);
   }
 
-  const body = await ctx.req.json();
+  if (!(await canCollectOptionalAnalytics(ctx.userId))) return optionalAnalyticsDenied();
+  const parsed = payloadSchema.safeParse(await safeReadJson(ctx.req));
 
   // Validate payload
-  if (!validatePayload(body)) {
+  if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload format' }, { status: 400 });
   }
 
   // Push to Grafana immediately (no batching)
   try {
-    await pushToGrafana(body);
+    await pushToGrafana(parsed.data);
   } catch (error) {
     logger.error('Failed to push Web Vitals to Grafana', {
       error: error instanceof Error ? error.message : String(error),
@@ -198,5 +178,5 @@ export const POST = pipe(withSentry('/api/metrics/web-vitals'))(async (ctx) => {
     return NextResponse.json({ error: 'Failed to process metrics' }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true, count: body.metrics.length }, { status: 201 });
+  return NextResponse.json({ success: true, count: parsed.data.metrics.length }, { status: 201 });
 });

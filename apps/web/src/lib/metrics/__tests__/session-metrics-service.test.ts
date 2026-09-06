@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { permitOptionalAnalytics } from '@/lib/telemetry/__tests__/analytics-fixtures';
 
 // Mock prisma before importing the service
 vi.mock('@/lib/db', async () => {
@@ -38,6 +39,7 @@ import {
 describe('session-metrics-service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    permitOptionalAnalytics();
   });
 
   describe('startSession', () => {

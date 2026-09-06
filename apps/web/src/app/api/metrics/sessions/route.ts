@@ -8,6 +8,13 @@
 import { NextResponse } from 'next/server';
 import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
+import { safeReadJson } from '@/lib/api/safe-json';
+import { sessionMetricSchema } from '@/lib/telemetry/ingestion-contract';
+import {
+  canCollectOptionalAnalytics,
+  optionalAnalyticsDenied,
+} from '@/lib/telemetry/optional-analytics-server';
+import { getSessionState, discardSessionsForUser } from '@/lib/metrics/session-metrics-service';
 import {
   startSession,
   recordTurn,
@@ -17,38 +24,28 @@ import {
   endSession,
 } from '@/lib/metrics';
 
-
 export const revalidate = 0;
-type MetricsAction = 'start' | 'end' | 'turn' | 'voice' | 'refusal' | 'incident';
-
-interface MetricsRequest {
-  action: MetricsAction;
-  sessionId: string;
-  turn?: {
-    latencyMs: number;
-    intent?: string;
-    tokensIn: number;
-    tokensOut: number;
-  };
-  minutes?: number;
-  wasCorrect?: boolean;
-  severity?: 'S0' | 'S1' | 'S2' | 'S3';
-}
-
 export const POST = pipe(
   withSentry('/api/metrics/sessions'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
   const log = getRequestLogger(ctx.req);
-  const body: MetricsRequest = await ctx.req.json();
+  if (!(await canCollectOptionalAnalytics(ctx.userId))) {
+    discardSessionsForUser(ctx.userId);
+    return optionalAnalyticsDenied();
+  }
+  const parsed = sessionMetricSchema.safeParse(await safeReadJson(ctx.req));
+  if (!parsed.success)
+    return NextResponse.json({ error: 'Invalid session metric' }, { status: 400 });
+  const body = parsed.data;
   const { action, sessionId } = body;
-
-  if (!sessionId) {
-    return NextResponse.json(
-      { error: 'sessionId required' },
-      { status: 400, headers: { 'X-Request-ID': getRequestId(ctx.req) } },
-    );
+  const existing = getSessionState(sessionId);
+  if (existing && existing.userId !== ctx.userId) {
+    return NextResponse.json({ error: 'Session owner mismatch' }, { status: 403 });
+  }
+  if (!existing && action !== 'start') {
+    return NextResponse.json({ error: 'Unknown metrics session' }, { status: 404 });
   }
 
   switch (action) {
@@ -58,42 +55,18 @@ export const POST = pipe(
       break;
 
     case 'turn':
-      if (!body.turn) {
-        return NextResponse.json(
-          { error: 'turn data required' },
-          { status: 400, headers: { 'X-Request-ID': getRequestId(ctx.req) } },
-        );
-      }
       recordTurn(sessionId, body.turn);
       break;
 
     case 'voice':
-      if (typeof body.minutes !== 'number') {
-        return NextResponse.json(
-          { error: 'minutes required for voice' },
-          { status: 400, headers: { 'X-Request-ID': getRequestId(ctx.req) } },
-        );
-      }
       recordVoiceUsage(sessionId, body.minutes);
       break;
 
     case 'refusal':
-      if (typeof body.wasCorrect !== 'boolean') {
-        return NextResponse.json(
-          { error: 'wasCorrect required for refusal' },
-          { status: 400, headers: { 'X-Request-ID': getRequestId(ctx.req) } },
-        );
-      }
       recordRefusal(sessionId, body.wasCorrect);
       break;
 
     case 'incident':
-      if (!body.severity) {
-        return NextResponse.json(
-          { error: 'severity required for incident' },
-          { status: 400, headers: { 'X-Request-ID': getRequestId(ctx.req) } },
-        );
-      }
       recordIncident(sessionId, body.severity);
       break;
 

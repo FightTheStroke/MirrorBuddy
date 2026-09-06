@@ -1,33 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import {
-  Shield,
-  BarChart3,
-  LogOut,
-  User,
-  FileText,
-  Cookie,
-  CheckCircle,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth";
-import { getUserIdFromCookie } from "@/lib/auth";
-import {
-  getUnifiedConsent,
-  saveUnifiedConsent,
-  syncUnifiedConsentToServer,
-  clearUnifiedConsent,
-  type UnifiedConsentData,
-} from "@/lib/consent/unified-consent-storage";
-import { updateConsentSnapshot } from "@/lib/consent/consent-store";
-import { CrossMaestroMemorySettings } from "./cross-maestro-memory-settings";
+import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { Shield, LogOut, User } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { csrfFetch } from '@/lib/auth';
+import { getUserIdFromCookie } from '@/lib/auth';
+import { PrivacyConsentSettings } from './privacy-consent-settings';
+import { CrossMaestroMemorySettings } from './cross-maestro-memory-settings';
 
 // Privacy Settings
 export function PrivacySettings() {
-  const t = useTranslations("settings.privacy");
+  const t = useTranslations('settings.privacy');
   const [version, setVersion] = useState<{
     version: string;
     buildTime: string;
@@ -35,26 +20,14 @@ export function PrivacySettings() {
   } | null>(null);
   // Use lazy initialization to check auth state
   const [isAuthenticated] = useState(() => {
-    if (typeof window === "undefined") return false;
+    if (typeof window === 'undefined') return false;
     const userId = getUserIdFromCookie();
     return !!userId;
   });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  // Use lazy initialization to read unified consent from localStorage
-  const [consentData, setConsentData] = useState<UnifiedConsentData | null>(
-    () => {
-      if (typeof window === "undefined") return null;
-      return getUnifiedConsent();
-    },
-  );
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(() => {
-    if (typeof window === "undefined") return true;
-    const consent = getUnifiedConsent();
-    return consent?.cookies.analytics ?? true;
-  });
 
   useEffect(() => {
-    fetch("/api/version")
+    fetch('/api/version')
       .then((res) => res.json())
       .then(setVersion)
       .catch(() => null);
@@ -63,38 +36,22 @@ export function PrivacySettings() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await csrfFetch("/api/auth/logout", { method: "POST" });
+      await csrfFetch('/api/auth/logout', { method: 'POST' });
       // Clear local storage
       const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key?.startsWith("mirrorbuddy")) {
+        if (key?.startsWith('mirrorbuddy')) {
           keysToRemove.push(key);
         }
       }
       keysToRemove.forEach((key) => localStorage.removeItem(key));
       // Force full page reload to /welcome to reset all state
       // This ensures Zustand stores are cleared and hydration happens fresh
-      window.location.href = "/welcome";
+      window.location.href = '/welcome';
     } catch {
       setIsLoggingOut(false);
     }
-  };
-
-  const handleAnalyticsToggle = async () => {
-    const newValue = !analyticsEnabled;
-    setAnalyticsEnabled(newValue);
-    const consent = saveUnifiedConsent(newValue);
-    setConsentData(consent);
-    await syncUnifiedConsentToServer(consent);
-  };
-
-  const handleReviewConsents = () => {
-    // Clear consent to trigger wall again
-    clearUnifiedConsent();
-    updateConsentSnapshot(false);
-    // Reload to show consent wall
-    window.location.reload();
   };
 
   return (
@@ -105,12 +62,12 @@ export function PrivacySettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="w-5 h-5 text-blue-500" />
-              {t("account")}
+              {t('account')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              {t("seiConnessoAlTuoAccountMirrorbuddy")}
+              {t('seiConnessoAlTuoAccountMirrorbuddy')}
             </p>
             <Button
               variant="outline"
@@ -120,113 +77,36 @@ export function PrivacySettings() {
               disabled={isLoggingOut}
             >
               <LogOut className="w-4 h-4 mr-2" />
-              {isLoggingOut ? "Disconnessione..." : "Disconnetti"}
+              {isLoggingOut ? 'Disconnessione...' : 'Disconnetti'}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Consent Management Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5 text-blue-500" />
-            {t("consensiETermini")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {consentData ? (
-            <>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                {t("statoDeiTuoiConsensiETerminiAccettati")}
-              </p>
-
-              {/* TOS Status */}
-              <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    {t("terminiDiServizio")}
-                  </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    {t("accettatiIl1")}{" "}
-                    {new Date(consentData.tos.acceptedAt).toLocaleDateString(
-                      "it-IT",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      },
-                    )}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    {t("versione1")} {consentData.tos.version}
-                  </p>
-                </div>
-              </div>
-
-              {/* Cookie Status */}
-              <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <Cookie className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">
-                    {t("cookieEPrivacy")}
-                  </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    {t("accettatiIl")}{" "}
-                    {new Date(
-                      consentData.cookies.acceptedAt,
-                    ).toLocaleDateString("it-IT", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    {t("cookieEssenzialiCookieAnalitici")}{" "}
-                    {consentData.cookies.analytics ? "✓" : "✗"}
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleReviewConsents}
-              >
-                {t("reviewAndModifyConsents")}
-              </Button>
-            </>
-          ) : (
-            <p className="text-sm text-amber-600 dark:text-amber-400">
-              {t("noConsentFound")}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <PrivacyConsentSettings />
 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-500" />
-            {t("privacyESicurezza")}
+            {t('privacyESicurezza')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
-            {t("iTuoiDatiSonoAlSicuroMirrorbuddyEProgettatoPensand")}
-            {t("privacyDeiBambiniERispettaLeNormativeCoppaEGdpr")}
+            {t('iTuoiDatiSonoAlSicuroMirrorbuddyEProgettatoPensand')}
+            {t('privacyDeiBambiniERispettaLeNormativeCoppaEGdpr')}
           </p>
 
           <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
             <h4 className="font-medium text-green-700 dark:text-green-300 mb-2">
-              {t("iTuoiDatiSonoProtetti")}
+              {t('iTuoiDatiSonoProtetti')}
             </h4>
             <ul className="text-sm text-green-600 dark:text-green-400 space-y-1">
-              <li>{t("dataStoredLocally")}</li>
-              <li>{t("noDataShared")}</li>
-              <li>{t("conversationsNotRecorded")}</li>
-              <li>{t("deleteDataAnytime")}</li>
+              <li>{t('dataStoredLocally')}</li>
+              <li>{t('noDataShared')}</li>
+              <li>{t('conversationsNotRecorded')}</li>
+              <li>{t('deleteDataAnytime')}</li>
             </ul>
           </div>
 
@@ -235,26 +115,26 @@ export function PrivacySettings() {
             className="w-full text-red-600 border-red-200 hover:bg-red-50"
             onClick={async () => {
               const confirmed = window.confirm(
-                "Sei sicuro di voler eliminare tutti i tuoi dati? Questa azione non può essere annullata.",
+                'Sei sicuro di voler eliminare tutti i tuoi dati? Questa azione non può essere annullata.',
               );
               if (confirmed) {
                 // Clear all localStorage data
                 const keysToRemove = [];
                 for (let i = 0; i < localStorage.length; i++) {
                   const key = localStorage.key(i);
-                  if (key?.startsWith("mirrorbuddy")) {
+                  if (key?.startsWith('mirrorbuddy')) {
                     keysToRemove.push(key);
                   }
                 }
                 keysToRemove.forEach((key) => localStorage.removeItem(key));
 
                 // Also clear any other app-specific keys
-                localStorage.removeItem("voice-session");
-                localStorage.removeItem("accessibility-settings");
+                localStorage.removeItem('voice-session');
+                localStorage.removeItem('accessibility-settings');
 
                 // Delete all data from database (primary data source)
                 try {
-                  await csrfFetch("/api/user/data", { method: "DELETE" });
+                  await csrfFetch('/api/user/data', { method: 'DELETE' });
                 } catch {
                   // Continue even if API fails - user will be logged out anyway
                 }
@@ -264,52 +144,8 @@ export function PrivacySettings() {
               }
             }}
           >
-            {t("deleteAllData")}
+            {t('deleteAllData')}
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Telemetry Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-blue-500" />
-            {t("telemetriaEAnalisi")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {t("anonymousDataHelps")}
-          </p>
-
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
-            <div>
-              <p className="font-medium text-slate-900 dark:text-white text-sm">
-                {t("inviaDatiAnonimi")}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t("statisticheDiUtilizzoAnonime")}
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-label={t("toggleAnalytics")}
-              aria-checked={analyticsEnabled}
-              onClick={handleAnalyticsToggle}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
-                analyticsEnabled
-                  ? "bg-blue-600"
-                  : "bg-slate-300 dark:bg-slate-600"
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                  analyticsEnabled ? "translate-x-5" : ""
-                }`}
-              />
-            </button>
-          </div>
         </CardContent>
       </Card>
 
@@ -319,20 +155,18 @@ export function PrivacySettings() {
       {/* Version Info */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("informazioniApp")}</CardTitle>
+          <CardTitle>{t('informazioniApp')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-500">{t("versione")}</span>
-            <span className="font-mono">
-              {version ? `v${version.version}` : "Loading..."}
-            </span>
+            <span className="text-slate-500">{t('versione')}</span>
+            <span className="font-mono">{version ? `v${version.version}` : 'Loading...'}</span>
           </div>
-          {version?.environment === "development" && (
+          {version?.environment === 'development' && (
             <div className="mt-2 flex items-center justify-between text-sm">
-              <span className="text-slate-500">{t("ambiente")}</span>
+              <span className="text-slate-500">{t('ambiente')}</span>
               <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs">
-                {t("development")}
+                {t('development')}
               </span>
             </div>
           )}

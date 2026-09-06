@@ -1,188 +1,133 @@
-/**
- * Unit Tests: UnifiedConsentWall - Prominent Banner
- *
- * Tests the prominent bottom banner design for consent:
- * - Fixed bottom positioning with backdrop overlay
- * - Cookie category toggles (essential locked, analytics optional)
- * - "Reject All" / "Accept All" buttons (GDPR compliant)
- * - Respects prefers-reduced-motion
- * - WCAG AA compliance
- */
-
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { UnifiedConsentWall } from './unified-consent-wall';
+import { installConsentUITransport } from './__tests__/consent-ui-fixture';
+import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
+import { resetConsentSnapshot } from '@/lib/consent/consent-store';
+import { getTranslation as t } from '@/test/i18n-helpers';
 
-// Mock next-intl
-vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      loading: 'Caricamento...',
-      bannerTitle: 'Informativa',
-      titleUpdated: 'Termini Aggiornati',
-      bannerDescription: 'Noi utilizziamo cookie e tecnologie simili...',
-      bannerRights: 'Puoi liberamente prestare o rifiutare...',
-      'categories.essential': 'Necessari',
-      'categories.analytics': 'Analytics (opzionale)',
-      'buttons.learnMore': 'Scopri di più',
-      'buttons.rejectAll': 'Rifiuta tutto',
-      'buttons.acceptAll': 'Accetta tutto',
-      'buttons.submitting': 'Salvataggio...',
-      'links.cookies': 'cookie policy',
-      'screenReader.submitting': 'Salvataggio del consenso in corso...',
-    };
-    return translations[key] || key;
-  },
-}));
-
-// Mock consent storage
-vi.mock('@/lib/consent/unified-consent-storage', () => ({
-  saveUnifiedConsent: vi.fn(),
-  syncUnifiedConsentToServer: vi.fn(() => Promise.resolve()),
-  needsReconsent: vi.fn(() => false),
-  getUnifiedConsent: vi.fn(() => null),
-  initializeConsent: vi.fn(() => Promise.resolve(false)),
-  markConsentLoaded: vi.fn(),
-}));
-
-// Mock consent store
-vi.mock('@/lib/consent/consent-store', () => ({
-  subscribeToConsent: vi.fn(() => () => {}),
-  getConsentSnapshot: vi.fn(() => false),
-  getServerConsentSnapshot: vi.fn(() => false),
-  updateConsentSnapshot: vi.fn(),
-}));
-
-// Mock client logger
-vi.mock('@/lib/logger/client', () => ({
-  clientLogger: {
-    error: vi.fn(),
-  },
-}));
-
-describe('UnifiedConsentWall - Prominent Banner', () => {
+describe('consent dialog uses real modal infrastructure', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-
-    // Mock window.matchMedia for prefers-reduced-motion detection
-    Object.defineProperty(window, 'matchMedia', {
-      writable: true,
-      value: vi.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      })),
-    });
+    installConsentUITransport();
+  });
+  afterEach(() => {
+    cleanup();
+    resetConsentSnapshot();
+    setConsentTestAccount(false);
+    vi.restoreAllMocks();
   });
 
-  it('renders as fixed bottom banner with backdrop overlay', async () => {
-    const { container } = render(
-      <UnifiedConsentWall>
-        <div>App Content</div>
-      </UnifiedConsentWall>,
-    );
-
-    await waitFor(() => {
-      const banner = container.querySelector('[data-testid="consent-banner"]');
-      if (banner) {
-        expect(banner).toHaveClass('fixed');
-        expect(banner).toHaveClass('bottom-0');
-        expect(banner).toHaveClass('z-50');
-      }
+  it('has an accessible name and reachable reading preferences during loading', async () => {
+    setConsentTestAccount(true);
+    const transport = vi.mocked(fetch).getMockImplementation()!;
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
     });
-  });
-
-  it('has reject all and accept all buttons', async () => {
+    vi.mocked(fetch).mockImplementation(async (input, init) => {
+      if (input === '/api/tos') await held;
+      return transport(input, init);
+    });
     render(
       <UnifiedConsentWall>
-        <div>App Content</div>
+        <main>Study</main>
       </UnifiedConsentWall>,
     );
-
-    await waitFor(() => {
-      const rejectButton = screen.queryByRole('button', {
-        name: /Rifiuta tutto/i,
-      });
-      const acceptButton = screen.queryByRole('button', {
-        name: /Accetta tutto/i,
-      });
-      if (rejectButton) expect(rejectButton).toBeInTheDocument();
-      if (acceptButton) expect(acceptButton).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: t('consent.unified.loading') })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: t('settings.accessibility.panelTitle') }),
+    ).toBeEnabled();
+    await act(async () => {
+      release();
+      await held;
     });
+    await screen.findByRole('checkbox', { name: t('consent.unified.tosCheckbox.label') });
   });
 
-  it('has essential cookies toggle locked on', async () => {
+  it('keeps the bottom panel scrollable and excludes background controls', async () => {
+    const view = render(
+      <UnifiedConsentWall>
+        <button>Background</button>
+      </UnifiedConsentWall>,
+    );
+    const panel = await screen.findByTestId('consent-banner');
+    expect(panel).toHaveClass('bottom-0', 'overflow-y-auto', 'max-h-[90dvh]');
+    expect(view.container).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.queryByRole('button', { name: 'Background' })).not.toBeInTheDocument();
+  });
+
+  it('locks essential cookies and starts optional analytics off', async () => {
     render(
       <UnifiedConsentWall>
-        <div>App Content</div>
+        <main>Study</main>
       </UnifiedConsentWall>,
     );
-
-    await waitFor(() => {
-      const essentialToggle = screen.queryByRole('switch', {
-        name: /Necessari/i,
-      });
-      if (essentialToggle) {
-        expect(essentialToggle).toBeDisabled();
-        expect(essentialToggle).toHaveAttribute('aria-checked', 'true');
-      }
+    const essential = await screen.findByRole('switch', {
+      name: t('consent.unified.categories.essential'),
     });
+    expect(essential).toBeDisabled();
+    expect(essential).toHaveAttribute('aria-checked', 'true');
+    expect(
+      screen.getByRole('switch', { name: t('consent.unified.categories.analytics') }),
+    ).toHaveAttribute('aria-checked', 'false');
   });
 
-  it('renders children when consent is given', async () => {
-    const { getConsentSnapshot } = await import('@/lib/consent/consent-store');
-    vi.mocked(getConsentSnapshot).mockReturnValue(true);
-
-    render(
-      <UnifiedConsentWall>
-        <div>App Content</div>
-      </UnifiedConsentWall>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('App Content')).toBeInTheDocument();
-    });
-  });
-
-  it('is keyboard accessible', async () => {
+  it('contains keyboard focus and cannot dismiss mandatory terms with Escape', async () => {
     const user = userEvent.setup();
-
     render(
       <UnifiedConsentWall>
-        <div>App Content</div>
+        <button>Background</button>
       </UnifiedConsentWall>,
     );
-
-    await waitFor(async () => {
-      const acceptButton = screen.queryByRole('button', {
-        name: /Accetta e Continua/i,
-      });
-
-      if (acceptButton) {
-        await user.tab();
-        expect(document.activeElement).toBeTruthy();
-      }
-    });
+    const panel = await screen.findByRole('dialog', { name: t('consent.unified.titleWelcome') });
+    await waitFor(() => expect(panel).toContainElement(document.activeElement as HTMLElement));
+    for (let index = 0; index < 18; index++) {
+      await user.tab({ shift: index > 9 });
+      expect(panel).toContainElement(document.activeElement as HTMLElement);
+    }
+    await user.keyboard('{Escape}');
+    expect(panel).toBeInTheDocument();
   });
 
-  it('has proper z-index for layering', async () => {
-    const { container } = render(
+  it('nests existing accessibility controls and restores focus to their opener', async () => {
+    const user = userEvent.setup();
+    render(
       <UnifiedConsentWall>
-        <div>App Content</div>
+        <main>Study</main>
       </UnifiedConsentWall>,
     );
-
-    await waitFor(() => {
-      const banner = container.querySelector('[data-testid="consent-banner"]');
-      if (banner) {
-        expect(banner.className).toMatch(/z-\d+/);
-      }
+    const trigger = screen.getByRole('button', { name: t('settings.accessibility.panelTitle') });
+    await user.click(trigger);
+    const preferences = screen.getByRole('dialog', {
+      name: t('settings.accessibility.panelTitle'),
     });
+    expect(
+      within(preferences).getByRole('button', { name: t('settings.accessibility.closeSettings') }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('checkbox', { name: t('consent.unified.tosCheckbox.label') }),
+    ).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(preferences).not.toBeInTheDocument());
+    expect(trigger).toHaveFocus();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('restores prior focus after mandatory terms acceptance', async () => {
+    const user = userEvent.setup();
+    render(<button>Previous</button>);
+    const previous = screen.getByRole('button', { name: 'Previous' });
+    previous.focus();
+    render(
+      <UnifiedConsentWall>
+        <main>Study</main>
+      </UnifiedConsentWall>,
+    );
+    await user.click(
+      await screen.findByRole('checkbox', { name: t('consent.unified.tosCheckbox.label') }),
+    );
+    await user.click(screen.getByRole('button', { name: t('consent.terms.modal.buttons.accept') }));
+    await waitFor(() => expect(previous).toHaveFocus());
   });
 });

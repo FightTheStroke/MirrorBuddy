@@ -98,16 +98,43 @@
       "consequencesText": "Le retrait de certains consentements peut empêcher l'accès à des fonctionnalités spécifiques de la plateforme.",
       "contactSupport": "Contacter le Support"
     },
+    "sync": {
+      "cannotRetry": "Cette tentative ne peut pas être répétée. Recharge la page pour revoir tes choix.",
+      "reload": "Recharger la page",
+      "startingTrial": "Démarrage de l'essai...",
+      "trialStartFailed": "Nous n'avons pas pu terminer le démarrage de l'essai. Réessaie de le démarrer.",
+      "retryTrial": "Réessayer de démarrer l'essai",
+      "reloading": "Rechargement de la page...",
+      "reloadFailed": "Les choix sur cet appareil ont été effacés, mais la page n'a pas pu se recharger. Recharge-la pour continuer.",
+      "saving": "Enregistrement de ton choix...",
+      "failed": "Ton choix n'a pas pu être enregistré ou synchronisé. Réessaie sans répondre à nouveau.",
+      "changed": "Ta session ou ton choix a changé. Le choix précédent ne peut pas être renvoyé : fais un nouveau choix explicite.",
+      "newDecision": "Nouveau choix pour cette session",
+      "saveNewChoice": "Enregistrer le nouveau choix",
+      "pending": "Ton choix est en attente de synchronisation.",
+      "retry": "Réessayer l'enregistrement",
+      "dateUnavailable": "Date non enregistrée",
+      "decisionDate": "Date du choix :",
+      "termsAccepted": "Conditions acceptées",
+      "termsRequired": "L'acceptation des conditions reste nécessaire",
+      "unanswered": "Analyses facultatives : aucun choix enregistré",
+      "optedIn": "Analyses facultatives : accord demandé",
+      "refused": "Analyses facultatives : refusées",
+      "analyticsDescription": "Tu peux autoriser les analyses d'utilisation pour améliorer l'application. Ce choix est distinct des conditions et n'est pas nécessaire pour étudier.",
+      "collectionOff": "La collecte des analyses facultatives est désactivée, même si ton choix est activé.",
+      "persisted": "Choix enregistré dans ton compte.",
+      "received": "Choix reçu par le serveur, mais non enregistré dans un compte."
+    },
     "inline": {
-      "acceptedText": "Consentement accepté",
+      "acceptedText": "Choix des cookies enregistré",
       "manage": "Gérer les préférences",
-      "acceptButton": "Accepter les cookies",
+      "acceptButton": "Enregistrer le choix des cookies",
       "info": "Informations",
       "title": "Cookies et Confidentialité",
       "description": "Nous utilisons des cookies essentiels pour le fonctionnement du site",
       "learnMore": "En savoir plus",
       "analyticsLabel": "Analytics (facultatif)",
-      "submitButton": "Accepter"
+      "submitButton": "Enregistrer le choix"
     },
     "unified": {
       "loading": "Chargement...",
@@ -145,15 +172,15 @@
       },
       "analytics": {
         "label": "Analytics facultatifs",
-        "description": "Aidez-nous à améliorer l'application (anonyme)"
+        "description": "Aidez-nous à améliorer l'application avec les statistiques d'utilisation"
       },
       "buttons": {
         "disabled": "Acceptez les conditions pour continuer",
         "accept": "Accepter et Continuer",
         "submitting": "Enregistrement...",
         "learnMore": "En savoir plus",
-        "rejectAll": "Tout refuser",
-        "acceptAll": "Tout accepter"
+        "rejectAll": "Refuser les analyses facultatives",
+        "acceptAll": "Autoriser les analyses facultatives"
       },
       "coppa": "Si vous avez moins de 13 ans, le consentement parental est requis",
       "screenReader": {
@@ -161,7 +188,7 @@
         "submitting": "Enregistrement du consentement en cours..."
       },
       "bannerTitle": "Information sur les cookies",
-      "bannerRights": "Vous pouvez librement donner, refuser ou retirer votre consentement à tout moment. Utilisez le bouton \"Tout accepter\" pour consentir. Utilisez le bouton \"Tout refuser\" pour continuer sans accepter.",
+      "bannerRights": "Les analyses sont facultatives et désactivées au départ. Tu peux les refuser ou changer ton choix dans les paramètres. Ce choix n'accepte pas les conditions : tu dois les accepter séparément pour étudier.",
       "categories": {
         "essential": "Nécessaires",
         "analytics": "Analytiques (facultatif)"
