@@ -11,6 +11,12 @@ import { create } from 'zustand';
 import { csrfFetch } from '@/lib/auth';
 import { AUTH_COOKIE_NAME } from '@/lib/auth';
 import {
+  getUserIdFromCookie,
+  requireClientUserId,
+  setClientIdentity,
+} from '@/lib/auth/client-auth';
+import { logger } from '@/lib/logger';
+import {
   type OnboardingStep,
   type OnboardingData,
   type VoiceTranscriptEntry,
@@ -28,6 +34,7 @@ interface OnboardingState {
   isReplayMode: boolean;
   isVoiceMuted: boolean;
   isHydrated: boolean; // True after we've checked the DB
+  hydratedUserId: string | null | undefined;
 
   // Voice session state
   voiceSessionActive: boolean;
@@ -63,6 +70,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   isReplayMode: false,
   isVoiceMuted: false,
   isHydrated: false,
+  hydratedUserId: undefined,
 
   // Voice session state
   voiceSessionActive: false,
@@ -140,11 +148,19 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
 
   resetAllData: async () => {
     // Delete all user data from database (primary data source)
-    try {
-      await csrfFetch('/api/user/data', { method: 'DELETE' });
-    } catch {
-      // Continue with local cleanup even if API fails
+    requireClientUserId();
+    const response = await csrfFetch('/api/user/data', { method: 'DELETE' });
+    if (!response.ok) throw new Error(`Account reset failed (${response.status})`);
+    const result: unknown = await response.json();
+    if (
+      !result ||
+      typeof result !== 'object' ||
+      !('success' in result) ||
+      result.success !== true
+    ) {
+      throw new Error('Account reset acknowledgement missing');
     }
+    setClientIdentity({ status: 'anonymous' });
 
     // Clear any remaining localStorage (legacy/session data)
     const storeKeys = [
@@ -175,38 +191,27 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       }
     }
 
-    // Reset this store to initial state
-    set({
-      hasCompletedOnboarding: false,
-      onboardingCompletedAt: null,
-      currentStep: 'welcome',
-      isReplayMode: false,
-      isVoiceMuted: false,
-      isHydrated: false,
-      voiceSessionActive: false,
-      voiceSessionConnecting: false,
-      voiceTranscript: [],
-      azureAvailable: null,
-      data: { name: '' },
-    });
+    get().resetOnboarding();
 
     // Reload the page to reinitialize everything
     window.location.href = '/welcome';
   },
 
   hydrateFromApi: async () => {
-    // Skip if already hydrated
-    if (get().isHydrated) return;
-
     try {
+      const userId = getUserIdFromCookie();
+      if (get().isHydrated && get().hydratedUserId === userId) return;
+      if (userId === null) {
+        set({ isHydrated: true, hydratedUserId: null });
+        return;
+      }
       const response = await fetch('/api/onboarding');
       if (!response.ok) {
-        // API error - mark as hydrated but don't update state
-        set({ isHydrated: true });
-        return;
+        throw new Error(`Onboarding hydration failed (${response.status})`);
       }
 
       const data = await response.json();
+      if (getUserIdFromCookie() !== userId) throw new Error('Onboarding identity changed');
 
       // Decide whether onboarding is complete.
       // A returning user who already has a real profile (a name) must go
@@ -226,6 +231,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       // Update store with DB state
       set({
         isHydrated: true,
+        hydratedUserId: userId,
         hasCompletedOnboarding: isCompleted,
         onboardingCompletedAt: data.onboardingState?.onboardingCompletedAt ?? null,
         currentStep:
@@ -242,9 +248,9 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
           },
         }),
       });
-    } catch {
-      // Network error - mark as hydrated to avoid infinite loop
-      set({ isHydrated: true });
+    } catch (error) {
+      logger.warn('Onboarding hydration failed; prior state retained');
+      throw error;
     }
   },
 }));

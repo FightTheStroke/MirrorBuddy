@@ -10,7 +10,7 @@ import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { subscribeToAdminCounts } from '@/lib/redis/admin-counts-subscriber';
 import { type AdminCounts } from '@/lib/redis/admin-counts-types';
 import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
+import { getAdminCounts } from '@/lib/admin/admin-counts-service';
 
 const log = logger.child({ module: 'admin-counts-sse' });
 
@@ -59,7 +59,7 @@ export const GET = pipe(
 
         // Always fetch fresh data from database for initial connection
         // Prevents stale Redis cache from showing incorrect badge counts
-        const initialCounts = await fetchCountsFromDatabase();
+        const initialCounts = await getAdminCounts();
 
         // Send initial data immediately (<500ms target)
         const initialData = `data: ${JSON.stringify(initialCounts)}\n\n`;
@@ -160,34 +160,3 @@ export const GET = pipe(
     },
   });
 });
-
-// ============================================================================
-// HELPER: Fetch counts from database (fallback when Redis cache is empty)
-// ============================================================================
-
-async function fetchCountsFromDatabase(): Promise<AdminCounts> {
-  const now = new Date();
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-  const [pendingInvites, totalUsers, activeUsersResult, criticalSafetyEvents] = await Promise.all([
-    prisma.inviteRequest.count({ where: { status: 'PENDING' } }),
-    prisma.user.count({ where: { isTestData: false } }),
-    prisma.userActivity.groupBy({
-      by: ['identifier'],
-      where: { timestamp: { gte: yesterday }, isTestData: false },
-    }),
-    prisma.safetyEvent
-      .count({
-        where: { resolvedAt: null, severity: 'critical' },
-      })
-      .catch(() => 0),
-  ]);
-
-  return {
-    pendingInvites,
-    totalUsers,
-    activeUsers24h: activeUsersResult.length,
-    systemAlerts: criticalSafetyEvents,
-    timestamp: new Date().toISOString(),
-  };
-}

@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { getUserIdFromCookie } from '@/lib/auth';
+import { subscribeClientIdentity } from '@/lib/auth/client-auth';
 import { readStoredConsent } from './consent-migration';
 import {
   UNIFIED_CONSENT_KEY,
@@ -72,11 +73,12 @@ export function getConsentIdentity(): ConsentIdentity {
   let account: string | null;
   try {
     account = getUserIdFromCookie();
-  } catch (error) {
-    identity = undefined;
+  } catch {
+    // An unresolved read is not a new visitor/account. Keep exact intents bound
+    // to their prior generation so a retry on the same confirmed account works.
     analyticsIdentity = null;
     denied = true;
-    throw error;
+    throw new ConsentSyncError('identity');
   }
   if (identity && identity.account === account) return identity;
   const previous = identity;
@@ -240,3 +242,13 @@ export function denyConsent(): void {
 export function allowConfirmedRead(): void {
   if (!clearing) denied = false;
 }
+
+subscribeClientIdentity(() => {
+  try {
+    getConsentIdentity();
+  } catch {
+    analyticsIdentity = null;
+    denied = true;
+  }
+  updateConsentState({});
+});

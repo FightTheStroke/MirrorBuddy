@@ -1,5 +1,5 @@
-import { validateAdminAuth } from "@/lib/auth/server";
-import type { Middleware } from "./types";
+import { validateAdminAuth } from '@/lib/auth/server';
+import type { Middleware } from './types';
 
 /**
  * Admin authentication middleware
@@ -24,25 +24,23 @@ export const withAdmin: Middleware = async (ctx, next) => {
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.userId) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: 'Unauthorized', code: 'AUTH_ABSENT' }), {
       status: 401,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
   if (!auth.isAdmin) {
-    return new Response(
-      JSON.stringify({ error: "Forbidden: admin access required" }),
-      {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ error: 'Forbidden: admin access required' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   // Inject userId and isAdmin into context
   ctx.userId = auth.userId;
   ctx.isAdmin = auth.isAdmin;
+  ctx.authSession = auth.session;
 
   return next();
 };

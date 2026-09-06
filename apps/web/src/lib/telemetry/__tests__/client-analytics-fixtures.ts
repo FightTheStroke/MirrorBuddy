@@ -4,14 +4,15 @@ import {
   saveAnalyticsConsent,
   syncUnifiedConsentToServer,
 } from '@/lib/consent/unified-consent-storage';
-import { AUTH_COOKIE_CLIENT, clearCSRFToken } from '@/lib/auth';
+import { clearCSRFToken } from '@/lib/auth';
+import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
 
 export function prepareAnalyticsClient() {
   localStorage.clear();
   sessionStorage.clear();
   clearUnifiedConsent();
   clearCSRFToken();
-  document.cookie = `${AUTH_COOKIE_CLIENT}=eligible-user; path=/`;
+  setConsentTestAccount('eligible-user');
   return vi.fn<typeof fetch>().mockImplementation(async (url, init) => {
     if (url === '/api/session') return Response.json({ csrfToken: 'csrf' });
     if (url === '/api/user/consent') {
@@ -31,6 +32,6 @@ export async function grantAnalyticsClient() {
 }
 export function clearAnalyticsClient() {
   clearUnifiedConsent();
-  document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; Max-Age=0`;
+  setConsentTestAccount(false);
   clearCSRFToken();
 }

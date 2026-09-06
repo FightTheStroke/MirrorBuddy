@@ -10,7 +10,8 @@ import { checkTrialLimits, incrementUsage } from '@/lib/trial/trial-service';
 import { recordExternalApiCall } from '@/lib/metrics/external-service-metrics';
 import { assertNotUnconsentedMinor } from '@/lib/compliance/server';
 import { sendVoiceUsage } from '@/lib/hooks/voice-session/voice-usage-reporter';
-import { AUTH_COOKIE_CLIENT, clearCSRFToken } from '@/lib/auth';
+import { clearCSRFToken } from '@/lib/auth';
+import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
 import { checkInputSafety } from '@/app/api/chat/stream/helpers';
 const db = vi.hoisted(() => ({
   trial: vi.fn(),
@@ -52,7 +53,7 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   clearUnifiedConsent();
-  document.cookie = `${AUTH_COOKIE_CLIENT}=; Max-Age=0; path=/`;
+  setConsentTestAccount(false);
   saveAnalyticsConsent(false);
   db.update.mockResolvedValue({});
   db.telemetry.mockResolvedValue({});

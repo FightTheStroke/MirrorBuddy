@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
+import ts from 'typescript';
 import { buildCSPHeader } from '@/proxy';
 import { _resetForTesting, setFlagStatus } from '@/lib/feature-flags/feature-flags-service';
 
@@ -136,8 +137,25 @@ describe('Third-Party Provider CSP Compliance', () => {
     // _nonce would indicate the prop is ignored
     expect(providersContent).not.toMatch(/nonce:\s*_nonce/);
 
-    // Should have proper destructuring
-    expect(providersContent).toMatch(/\{\s*children,\s*nonce\s*\}/);
+    const source = ts.createSourceFile(
+      'providers.tsx',
+      providersContent,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TSX,
+    );
+    const providers = source.statements.find(
+      (node): node is ts.FunctionDeclaration =>
+        ts.isFunctionDeclaration(node) && node.name?.text === 'Providers',
+    );
+    const props = providers?.parameters[0]?.name;
+    if (!props || !ts.isObjectBindingPattern(props)) {
+      throw new Error('Providers must destructure its props');
+    }
+    const nonce = props.elements.find(
+      (binding) => (binding.propertyName ?? binding.name).getText(source) === 'nonce',
+    );
+    expect(nonce?.name.getText(source)).toBe('nonce');
   });
 
   it('should document nonce usage in ProvidersProps', () => {

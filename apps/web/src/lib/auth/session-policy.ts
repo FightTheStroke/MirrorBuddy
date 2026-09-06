@@ -2,7 +2,9 @@ import { z } from 'zod';
 import { getSessionActivation } from '@/lib/auth/activation';
 import type { SessionTokenResult } from '@/lib/auth/session-token';
 
-type VerifiedCredential = Extract<SessionTokenResult, { valid: true }>;
+export type VerifiedCredential =
+  | Extract<SessionTokenResult, { valid: true; kind: 'legacy' }>
+  | Omit<Extract<SessionTokenResult, { valid: true; kind: 'modern' }>, 'handle'>;
 type AuthorizedSession =
   | { kind: 'legacy'; legacyOrigin: true }
   | {

@@ -2,45 +2,49 @@
  * Types for Admin Analytics page
  */
 
-export interface TokenUsageData {
+import type { AnalyticsMetricPayload } from '@/lib/admin/analytics-metric-truth';
+import type { MetricTruth } from '@/lib/admin/metric-truth';
+
+export interface TokenUsageData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   summary: {
-    totalTokens: number;
+    totalTokens: number | null;
     totalCalls: number;
-    avgTokensPerCall: number;
-    estimatedCostUsd: number;
+    avgTokensPerCall: number | null;
+    totalCostEur: number | null;
   };
-  byAction: Record<string, { count: number; totalTokens: number }>;
+  byAction?: Record<string, { count: number; totalTokens: number }>;
   dailyUsage: Record<string, number>;
+  dailyCost: Record<string, number | null>;
 }
 
-export interface VoiceMetricsData {
+export interface VoiceMetricsData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   voice: {
     totalSessions: number;
     totalMinutes: number;
-    avgSessionMinutes: number;
+    avgSessionMinutes: number | null;
   };
-  tts: {
+  tts?: {
     totalGenerations: number;
     totalCharacters: number;
     avgCharactersPerGeneration: number;
   };
-  realtime: {
+  realtime?: {
     totalSessions: number;
     totalMinutes: number;
   };
   dailySessions: Record<string, number>;
 }
 
-export interface FsrsStatsData {
+export interface FsrsStatsData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   summary: {
     totalCards: number;
     totalReviews: number;
     correctReviews: number;
-    accuracy: number;
-    avgDifficulty: number;
+    accuracy: number | null;
+    avgDifficulty: number | null;
     cardsDueToday: number;
   };
   stateDistribution: Record<string, number>;
@@ -65,7 +69,7 @@ export interface RateLimitsData {
   }>;
 }
 
-export interface SafetyEventsData {
+export interface SafetyEventsData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   summary: {
     totalEvents: number;
@@ -85,27 +89,27 @@ export interface SafetyEventsData {
 }
 
 /**
- * Session metrics data from REAL API responses.
- * Cost and token data are actual values, not estimates.
+ * Recorded optional session telemetry; costs are pricing-based estimates.
  */
-export interface SessionMetricsData {
+export interface SessionMetricsData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   summary: {
     totalSessions: number;
-    totalTurns: number;
-    avgTurnsPerSession: number;
-    avgLatencyMs: number;
+    totalTurns: number | null;
+    avgTurnsPerSession: number | null;
+    avgLatencyMs: number | null;
   };
   tokens: {
-    totalIn: number;
-    totalOut: number;
-    total: number;
+    totalIn: number | null;
+    totalOut: number | null;
+    total: number | null;
   };
   cost: {
-    totalEur: number;
-    avgPerSession: number;
-    p95PerSession: number;
-    voiceMinutes: number;
+    totalEur: number | null;
+    avgPerSession: number | null;
+    p95PerSession: number | null;
+    voiceMinutes: number | null;
+    voiceCostEur?: number | null;
     thresholds: {
       textWarn: number;
       textLimit: number;
@@ -118,25 +122,22 @@ export interface SessionMetricsData {
     };
   };
   safety: {
-    totalRefusals: number;
-    correctRefusals: number;
-    refusalAccuracy: number;
-    jailbreakAttempts: number;
-    stuckLoops: number;
+    totalRefusals: number | null;
+    correctRefusals: number | null;
+    refusalAccuracy: number | null;
+    jailbreakAttempts: number | null;
+    stuckLoops: number | null;
     severityDistribution: Record<string, number>;
   };
   outcomes: Record<string, number>;
-  dailyBreakdown: Record<
-    string,
-    { sessions: number; cost: number; tokens: number }
-  >;
+  dailyBreakdown: Record<string, { sessions: number; cost: number | null; tokens: number }>;
 }
 
 /**
  * External services API usage metrics.
  * Monitors Azure OpenAI, Google Drive, Brave Search quotas.
  */
-export interface ExternalServicesData {
+export interface ExternalServicesData extends AnalyticsMetricPayload {
   summary: {
     totalServices: number;
     hasAlerts: boolean;
@@ -158,6 +159,7 @@ export interface ExternalServicesData {
       usagePercent: number;
       status: string;
       period: string;
+      truth?: MetricTruth;
     }>
   >;
   quotas: {

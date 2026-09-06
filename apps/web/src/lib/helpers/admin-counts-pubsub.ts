@@ -21,13 +21,8 @@ const log = logger.child({ module: 'admin-counts-pubsub' });
 // TYPES
 // ============================================================================
 
-export interface AdminCounts {
-  pendingInvites: number;
-  totalUsers: number;
-  activeUsers24h: number;
-  systemAlerts: number;
-  timestamp: string;
-}
+import type { AdminCounts } from '@/lib/admin/admin-counts-service';
+export type { AdminCounts } from '@/lib/admin/admin-counts-service';
 
 export interface AdminCountsMessage {
   type: 'admin:counts';

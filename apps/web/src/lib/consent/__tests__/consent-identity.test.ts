@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
+import { setClientIdentity } from '@/lib/auth';
 import { useTelemetryStore } from '@/lib/telemetry/telemetry-store';
 import {
   getUnifiedConsent,
@@ -33,7 +33,7 @@ describe('consent auth identity generations', () => {
       const choice = getUnifiedConsent();
       const listener = vi.fn();
       const unsubscribe = subscribeToAnalyticsConsent(listener);
-      document.cookie = `${AUTH_COOKIE_CLIENT}=${next}; path=/`;
+      setConsentTestAccount(next || false);
       expect(hasAnalyticsConsent()).toBe(false);
       expect(listener).toHaveBeenLastCalledWith(false);
       setConsentTestAccount(true);
@@ -97,7 +97,8 @@ describe('consent auth identity generations', () => {
       );
       await initializeConsent();
       expect(hasAnalyticsConsent()).toBe(true);
-      document.cookie = `${AUTH_COOKIE_CLIENT}=${next}; path=/`;
+      if (next === '%') setClientIdentity({ status: 'unavailable', reason: 'SESSION_REJECTED' });
+      else setConsentTestAccount(false);
       expect(hasAnalyticsConsent()).toBe(false);
       setConsentTestAccount(true);
       expect(hasAnalyticsConsent()).toBe(false);
@@ -125,7 +126,7 @@ describe('consent auth identity generations', () => {
     });
     const sending = store().flushEvents();
     await vi.waitFor(() => expect(signal).toBeDefined());
-    document.cookie = `${AUTH_COOKIE_CLIENT}=different-account; path=/`;
+    setConsentTestAccount('different-account');
     expect(hasAnalyticsConsent()).toBe(false);
     expect(signal?.aborted).toBe(true);
     expect(store().eventQueue).toEqual([]);

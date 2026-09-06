@@ -4,7 +4,13 @@ import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { createDeletedUserBackup } from '@/lib/admin/user-trash-service';
 import { executeUserDataDeletion } from '@/app/api/privacy/delete-my-data/helpers';
-
+import { invalidateAllSessions } from '@/lib/auth/session-revocation';
+import {
+  sessionTransaction,
+  sessionDatabaseNow,
+  assertAdminSession,
+  requireActiveSession,
+} from '@/lib/auth/session-transaction';
 
 export const revalidate = 0;
 export const PATCH = pipe(
@@ -14,25 +20,30 @@ export const PATCH = pipe(
 )(async (ctx) => {
   const params = await ctx.params;
   const targetId = params.id;
-  if (!targetId) {
+  if (!targetId || typeof targetId !== 'string') {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
-  const body = (await ctx.req.json()) as {
-    disabled?: boolean;
-    role?: string;
-  };
+  const body: unknown = await ctx.req.json();
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return NextResponse.json({ error: 'Request body must be an object' }, { status: 400 });
+  }
+  const disabled = 'disabled' in body ? body.disabled : undefined;
+  const role = 'role' in body ? body.role : undefined;
 
-  if (body.disabled === undefined && body.role === undefined) {
+  if (disabled === undefined && role === undefined) {
     return NextResponse.json({ error: 'disabled or role field is required' }, { status: 400 });
   }
 
-  if (body.role !== undefined && body.role !== 'USER' && body.role !== 'ADMIN') {
+  if (disabled !== undefined && typeof disabled !== 'boolean') {
+    return NextResponse.json({ error: 'disabled must be a boolean' }, { status: 400 });
+  }
+  if (role !== undefined && role !== 'USER' && role !== 'ADMIN') {
     return NextResponse.json({ error: 'role must be USER or ADMIN' }, { status: 400 });
   }
 
   // Prevent admin from demoting themselves
-  if (body.role === 'USER' && targetId === ctx.userId) {
+  if (role === 'USER' && targetId === ctx.userId) {
     return NextResponse.json({ error: 'Cannot remove your own admin role' }, { status: 403 });
   }
 
@@ -43,12 +54,20 @@ export const PATCH = pipe(
   }
 
   const updateData: { disabled?: boolean; role?: 'USER' | 'ADMIN' } = {};
-  if (body.disabled !== undefined) updateData.disabled = body.disabled;
-  if (body.role !== undefined) updateData.role = body.role as 'USER' | 'ADMIN';
+  if (disabled !== undefined) updateData.disabled = disabled;
+  if (role !== undefined) updateData.role = role;
 
-  const updated = await prisma.user.update({
-    where: { id: targetId },
-    data: updateData,
+  const updated = await sessionTransaction(async (tx) => {
+    await assertAdminSession(tx, requireActiveSession(ctx.authSession));
+    if (disabled === true) {
+      const revoked = await invalidateAllSessions(tx, targetId, await sessionDatabaseNow(tx), {
+        disabled: true,
+      });
+      return role === undefined
+        ? revoked
+        : tx.user.update({ where: { id: targetId }, data: { role } });
+    }
+    return tx.user.update({ where: { id: targetId }, data: updateData });
   });
 
   // Create audit log
@@ -104,7 +123,12 @@ export const DELETE = pipe(
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
-  await createDeletedUserBackup(targetId, ctx.userId!, body.reason);
+  await createDeletedUserBackup(
+    targetId,
+    ctx.userId!,
+    body.reason,
+    requireActiveSession(ctx.authSession),
+  );
   await executeUserDataDeletion(targetId);
 
   logger.info('Admin deleted user with backup', {

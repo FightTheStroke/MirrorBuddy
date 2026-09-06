@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import { expect, describe, it, vi } from 'vitest';
 import { UsersTableRow } from '../users/users-table-row';
 import { PendingActions } from '../invites/pending-actions';
+import type { ListedUser } from '@/lib/admin/user-list-types';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
@@ -10,27 +11,21 @@ vi.mock('next/navigation', () => ({
 describe('Admin Button Groups - Mobile Responsive', () => {
   describe('UsersTableRow Button Group', () => {
     it('should have flex-wrap on button container for mobile responsiveness', () => {
-      const mockUser = {
+      const mockUser: ListedUser = {
         id: 'user-1',
         username: 'test-user',
         email: 'test@example.com',
         role: 'USER' as const,
         disabled: false,
-        createdAt: new Date(),
+        isTestData: false,
+        createdAt: new Date().toISOString(),
         subscription: {
           id: 'sub-1',
           tier: {
             id: 'tier-1',
             code: 'BASE',
             name: 'Base',
-            chatLimitDaily: 10,
-            voiceMinutesDaily: 30,
-            toolsLimitDaily: 10,
-            docsLimitTotal: 5,
-            features: {},
           },
-          overrideLimits: null,
-          overrideFeatures: null,
         },
       };
 
@@ -38,6 +33,7 @@ describe('Admin Button Groups - Mobile Responsive', () => {
         <table>
           <tbody>
             <UsersTableRow
+              canManage
               user={mockUser}
               isSelected={false}
               isLoading={false}
@@ -58,27 +54,21 @@ describe('Admin Button Groups - Mobile Responsive', () => {
     });
 
     it('should maintain 44px minimum touch target for buttons', () => {
-      const mockUser = {
+      const mockUser: ListedUser = {
         id: 'user-1',
         username: 'test-user',
         email: 'test@example.com',
         role: 'USER' as const,
         disabled: false,
-        createdAt: new Date(),
+        isTestData: false,
+        createdAt: new Date().toISOString(),
         subscription: {
           id: 'sub-1',
           tier: {
             id: 'tier-1',
             code: 'BASE',
             name: 'Base',
-            chatLimitDaily: 10,
-            voiceMinutesDaily: 30,
-            toolsLimitDaily: 10,
-            docsLimitTotal: 5,
-            features: {},
           },
-          overrideLimits: null,
-          overrideFeatures: null,
         },
       };
 
@@ -86,6 +76,7 @@ describe('Admin Button Groups - Mobile Responsive', () => {
         <table>
           <tbody>
             <UsersTableRow
+              canManage
               user={mockUser}
               isSelected={false}
               isLoading={false}

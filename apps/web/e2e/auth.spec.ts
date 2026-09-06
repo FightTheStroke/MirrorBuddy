@@ -5,8 +5,13 @@
  */
 
 import { test, expect } from './fixtures/base-fixtures';
+import { authenticateTestUser, createCredentialedTestUser } from './helpers/auth-session';
+import { cleanupTestData } from './helpers/test-data';
 
 test.describe('Login/Logout Authentication Flow', () => {
+  test.afterEach(async () => {
+    await cleanupTestData();
+  });
   test.beforeEach(async ({ context }) => {
     // Clear cookies for fresh login tests (skip stored auth)
     await context.clearCookies();
@@ -45,14 +50,8 @@ test.describe('Login/Logout Authentication Flow', () => {
     expect(page.url()).toContain('/login');
   });
 
-  test('Login with valid credentials redirects to home', async ({ page, request: _request }) => {
-    // This test requires a seeded test user in the database
-    // In CI, test user is created via prisma seed or fixture
-    // Skip if no test user environment is configured
-    const testUser = {
-      email: process.env.TEST_USER_EMAIL || 'test@example.com',
-      password: process.env.TEST_USER_PASSWORD || 'TestPassword123!',
-    };
+  test('Login with valid credentials redirects to home', async ({ page }) => {
+    const testUser = await createCredentialedTestUser();
 
     await page.goto('/login');
 
@@ -61,40 +60,18 @@ test.describe('Login/Logout Authentication Flow', () => {
     await page.fill('input[type="password"]', testUser.password);
     await page.click('button[type="submit"]');
 
-    // Should redirect to home or show error (depending on user existence)
-    // Wait for navigation or error
-    await Promise.race([
-      page.waitForURL(/\/(home|welcome|$)/, { timeout: 5000 }),
-      page.waitForSelector('[role="alert"]', { timeout: 5000 }),
-    ]);
-
-    // If we got an error, the test user doesn't exist - skip gracefully
-    const hasError = await page.locator('[role="alert"]').isVisible();
-    if (hasError) {
-      test.skip(true, 'Test user not seeded in database');
-      return;
-    }
-
-    expect(
-      [
-        'http://localhost:3000/',
-        'http://localhost:3000/home',
-        'http://localhost:3000/welcome',
-      ].some((url) => page.url().startsWith(url)),
-    ).toBeTruthy();
+    await expect(page).not.toHaveURL(/\/login/);
+    const me = await page.request.get('/api/auth/me');
+    expect(me.status()).toBe(200);
+    expect((await me.json()).user.id).toBe(testUser.id);
+    const authCookie = (await page.context().cookies()).find(
+      (cookie) => cookie.name === 'mirrorbuddy-user-id',
+    );
+    expect(authCookie?.value).toMatch(/^s2:[\w-]{43}\.[a-f0-9]{64}$/);
   });
 
   test('Logout from settings redirects to welcome page', async ({ page }) => {
-    // This test requires an authenticated session
-    // Set up auth cookie to simulate logged-in user
-    await page.context().addCookies([
-      {
-        name: 'mirrorbuddy-user-id',
-        value: 'test-user-id.signature', // Simulated signed cookie
-        domain: 'localhost',
-        path: '/',
-      },
-    ]);
+    await authenticateTestUser(page.context());
 
     // Navigate to settings where logout is available
     await page.goto('/');
@@ -109,13 +86,7 @@ test.describe('Login/Logout Authentication Flow', () => {
 
     // If user-menu (account section) is visible, we can logout
     const userMenu = page.locator('[data-testid="user-menu"]');
-    const isUserMenuVisible = await userMenu.isVisible({ timeout: 3000 }).catch(() => false);
-
-    if (!isUserMenuVisible) {
-      // User not authenticated or account section not shown
-      test.skip(true, 'User not authenticated - account section not visible');
-      return;
-    }
+    await expect(userMenu).toBeVisible();
 
     // Click logout
     await page.click('[data-testid="logout-button"]');
@@ -131,21 +102,7 @@ test.describe('Login/Logout Authentication Flow', () => {
   });
 
   test('Logout from sidebar redirects to welcome page', async ({ page }) => {
-    // Set up auth cookie to simulate logged-in user
-    await page.context().addCookies([
-      {
-        name: 'mirrorbuddy-user-id',
-        value: 'test-user-id.signature',
-        domain: 'localhost',
-        path: '/',
-      },
-      {
-        name: 'mirrorbuddy-user-id-client',
-        value: 'test-user-id',
-        domain: 'localhost',
-        path: '/',
-      },
-    ]);
+    await authenticateTestUser(page.context());
 
     // Navigate to home page where sidebar is available
     await page.goto('/home');
@@ -153,13 +110,7 @@ test.describe('Login/Logout Authentication Flow', () => {
 
     // Find and click the logout button in sidebar (has aria-label="Esci")
     const logoutButton = page.locator('button[aria-label="Esci"]');
-    const isLogoutVisible = await logoutButton.isVisible({ timeout: 3000 }).catch(() => false);
-
-    if (!isLogoutVisible) {
-      // Sidebar might be collapsed or user in trial mode (no logout shown)
-      test.skip(true, 'Logout button not visible in sidebar');
-      return;
-    }
+    await expect(logoutButton).toBeVisible();
 
     // Click logout
     await logoutButton.click();

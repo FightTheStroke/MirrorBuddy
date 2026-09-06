@@ -3,7 +3,7 @@
 // Tests for persistent data storage and retrieval
 // ============================================================================
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 
 test.describe('Backend API: User & Settings', () => {
   test('GET /api/user - creates user with cookie', async ({ request }) => {

@@ -1,5 +1,14 @@
 {
   "common": {
+    "session": {
+      "logoutCurrent": "Esci da questa sessione",
+      "logoutAll": "Esci da tutti i dispositivi",
+      "loggingOut": "Disconnessione in corso…",
+      "logoutFailed": "Disconnessione non riuscita. I tuoi dati non sono stati cancellati. Riprova.",
+      "legacyFamily": "Questa sessione deriva da un accesso precedente: uscire disconnette anche gli altri accessi precedenti dello stesso account. Le sessioni con un nuovo accesso restano attive.",
+      "unavailable": "Non possiamo verificare il tuo accesso. Le operazioni sul tuo account sono sospese; le tue scelte sono conservate.",
+      "retry": "Riprova a verificare l’accesso"
+    },
     "loading": "Caricamento...",
     "error": "Errore",
     "success": "Operazione completata",

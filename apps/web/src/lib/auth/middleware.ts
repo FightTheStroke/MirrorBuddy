@@ -1,5 +1,20 @@
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth, validateAdminAuth } from "@/lib/auth/session-auth";
+import { NextRequest, NextResponse } from 'next/server';
+import { validateAuth, validateAdminAuth } from '@/lib/auth/session-auth';
+import type { AuthenticatedSession } from '@/lib/auth/session-auth';
+import { AuthenticationError } from './auth-error';
+
+async function authenticationBoundary(work: () => Promise<Response>): Promise<Response> {
+  try {
+    return await work();
+  } catch (error) {
+    if (error instanceof AuthenticationError)
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    throw error;
+  }
+}
 
 /**
  * Wraps an API route handler to require authentication
@@ -13,18 +28,19 @@ import { validateAuth, validateAdminAuth } from "@/lib/auth/session-auth";
 export function withAuth(
   handler: (
     request: NextRequest,
-    context: { userId: string },
+    context: { userId: string; authSession: AuthenticatedSession },
   ) => Promise<Response | NextResponse>,
 ) {
-  return async (request: NextRequest) => {
-    const auth = await validateAuth();
+  return async (request: NextRequest) =>
+    authenticationBoundary(async () => {
+      const auth = await validateAuth();
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+      if (!auth.authenticated || !auth.userId) {
+        return NextResponse.json({ error: 'Unauthorized', code: 'AUTH_ABSENT' }, { status: 401 });
+      }
 
-    return handler(request, { userId: auth.userId });
-  };
+      return handler(request, { userId: auth.userId, authSession: auth.session });
+    });
 }
 
 /**
@@ -50,28 +66,28 @@ export function withAdmin(
     context: {
       userId: string;
       isAdmin: boolean;
+      authSession: AuthenticatedSession;
       params: Promise<Record<string, string>>;
     },
   ) => Promise<Response | NextResponse>,
 ) {
-  return async (request: NextRequest, routeContext: RouteContext) => {
-    const auth = await validateAdminAuth();
+  return async (request: NextRequest, routeContext: RouteContext) =>
+    authenticationBoundary(async () => {
+      const auth = await validateAdminAuth();
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+      if (!auth.authenticated || !auth.userId) {
+        return NextResponse.json({ error: 'Unauthorized', code: 'AUTH_ABSENT' }, { status: 401 });
+      }
 
-    if (!auth.isAdmin) {
-      return NextResponse.json(
-        { error: "Forbidden: admin access required" },
-        { status: 403 },
-      );
-    }
+      if (!auth.isAdmin) {
+        return NextResponse.json({ error: 'Forbidden: admin access required' }, { status: 403 });
+      }
 
-    return handler(request, {
-      userId: auth.userId,
-      isAdmin: auth.isAdmin,
-      params: routeContext?.params ?? Promise.resolve({}),
+      return handler(request, {
+        userId: auth.userId,
+        isAdmin: auth.isAdmin,
+        authSession: auth.session,
+        params: routeContext?.params ?? Promise.resolve({}),
+      });
     });
-  };
 }

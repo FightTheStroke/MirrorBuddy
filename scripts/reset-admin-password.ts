@@ -1,18 +1,19 @@
 /**
  * Targeted admin password reset.
  *
- * Updates ONLY the passwordHash of the single user whose id is passed in,
- * after re-checking that the user is the expected ADMIN_EMAIL admin.
- * No creates, no deletes, no other fields touched.
+ * Resets the expected ADMIN_EMAIL administrator and revokes all prior sessions
+ * and reset tokens before reenabling the account. No creates or deletes.
  *
  * Usage: npm run script -- scripts/reset-admin-password.ts
+ * For Supabase, explicitly set NODE_ENV=production to retain the intended target.
  */
-import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
+import { prisma } from '../apps/web/src/lib/db';
+import { resetUserPassword } from '../apps/web/src/lib/auth/session-revocation';
+import { assertAuthScriptTarget } from './lib/auth-script-target';
 import { createHash } from 'node:crypto';
 import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
-const prisma = createPrismaClient();
 
 const sha = (s: string) => createHash('sha256').update(s, 'utf8').digest('hex');
 
@@ -22,6 +23,7 @@ async function main() {
   if (!email || password.length < 8)
     throw new Error('ADMIN_EMAIL / ADMIN_PASSWORD missing or weak');
 
+  assertAuthScriptTarget();
   const emailHash = sha(email);
   const matches = await prisma.user.findMany({
     where: { emailHash },
@@ -37,9 +39,10 @@ async function main() {
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  await resetUserPassword(user.id, passwordHash, false);
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash, mustChangePassword: false, disabled: false },
+    data: { disabled: false },
   });
 
   const after = await prisma.user.findUniqueOrThrow({

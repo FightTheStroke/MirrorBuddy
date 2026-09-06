@@ -7,13 +7,16 @@
  *
  * Env: PROD_TEST_USER_EMAIL, PROD_TEST_USER_PASSWORD
  * Usage: npm run script -- scripts/provision-prod-test-user.ts
+ * For Supabase, explicitly set NODE_ENV=production to retain the intended target.
  */
-import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
+import { prisma } from '../apps/web/src/lib/db';
+import { resetUserPassword } from '../apps/web/src/lib/auth/session-revocation';
+import { issuePasswordSession } from '../apps/web/src/lib/auth/session-issuance';
+import { assertAuthScriptTarget } from './lib/auth-script-target';
 import { createHash } from 'node:crypto';
 import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
-const prisma = createPrismaClient();
 
 const sha = (s: string) => createHash('sha256').update(s, 'utf8').digest('hex');
 
@@ -21,9 +24,12 @@ async function main() {
   const email = (process.env.PROD_TEST_USER_EMAIL ?? '').trim().toLowerCase();
   const password = process.env.PROD_TEST_USER_PASSWORD ?? '';
   if (!email || password.length < 12) {
-    throw new Error('PROD_TEST_USER_EMAIL / PROD_TEST_USER_PASSWORD missing (password min 12 chars)');
+    throw new Error(
+      'PROD_TEST_USER_EMAIL / PROD_TEST_USER_PASSWORD missing (password min 12 chars)',
+    );
   }
 
+  assertAuthScriptTarget();
   const emailHash = sha(email);
   const username = email.split('@')[0].replace(/[^a-z0-9._-]/gi, '') + '-test';
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -43,16 +49,15 @@ async function main() {
     if (existing[0].role !== 'USER') {
       throw new Error(`Refusing to modify ${existing[0].id}: role is ${existing[0].role}`);
     }
+    await resetUserPassword(existing[0].id, passwordHash, false);
     const updated = await prisma.user.update({
       where: { id: existing[0].id },
       data: {
         email,
         emailHash,
-        passwordHash,
         role: 'USER',
         isTestData: true,
         disabled: false,
-        mustChangePassword: false,
       },
       select: { id: true },
     });
@@ -79,11 +84,21 @@ async function main() {
     console.log('created new test user');
   }
 
-  const { signCookieValue } = await import('../apps/web/src/lib/auth/cookie-signing');
-  const signed = signCookieValue(userId);
+  const current = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { passwordHash: true, authVersion: true },
+  });
+  if (current.passwordHash !== passwordHash) {
+    throw new Error('Credentials changed during provisioning; aborting session issuance');
+  }
+  const issued = await issuePasswordSession(userId, {
+    passwordHash,
+    authVersion: current.authVersion,
+  });
 
   console.log('PROD_TEST_USER_ID=' + userId);
-  console.log('PROD_TEST_USER_COOKIE_VALUE=' + signed.signed);
+  console.log('PROD_TEST_USER_COOKIE_VALUE=' + issued.token);
+  console.log('PROD_TEST_USER_COOKIE_EXPIRES_AT=' + issued.expiresAt.toISOString());
   console.log('username=' + username);
 }
 

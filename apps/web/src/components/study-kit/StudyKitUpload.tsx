@@ -12,9 +12,10 @@ import { UploadForm } from './components/upload-form';
 import { UploadProgress } from './components/upload-progress';
 import { UnifiedFilePicker, type SelectedFile } from '@/components/google-drive';
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 import { cn } from '@/lib/utils';
 import { clientLogger as logger } from '@/lib/logger/client';
-import { csrfFetch } from '@/lib/auth';
+import { csrfFetch, getClientIdentity } from '@/lib/auth';
 import { StudyKitPdfConfirm } from './components/study-kit-pdf-confirm';
 
 interface StudyKitUploadProps {
@@ -23,6 +24,7 @@ interface StudyKitUploadProps {
 }
 
 export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadProps) {
+  const identity = useClientIdentity();
   const [file, setFile] = useState<File | null>(null);
   const [selectedDriveFile, setSelectedDriveFile] = useState<SelectedFile | null>(null);
   const [title, setTitle] = useState('');
@@ -65,6 +67,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
   const pollStatus = async (id: string) => {
     try {
+      getUserId();
       const response = await fetch(`/api/study-kit/${id}`);
       if (!response.ok) {
         throw new Error('Failed to check status');
@@ -98,6 +101,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
   };
 
   const handleUpload = async () => {
+    if (getClientIdentity().status !== 'authenticated') return;
     if ((!file && !selectedDriveFile) || !title) {
       setErrorMessage('File e titolo sono richiesti');
       return;
@@ -109,12 +113,12 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
     setErrorMessage('');
 
     try {
+      const userId = getUserId();
       let uploadFile: File;
 
       // If Google Drive file, download it first
       if (selectedDriveFile?.source === 'google-drive' && selectedDriveFile.driveFile) {
         setUploadProgress(20);
-        const userId = getUserId();
         const downloadResponse = await fetch(
           `/api/google-drive/files/${selectedDriveFile.driveFile.id}/download?userId=${userId}`,
         );
@@ -142,6 +146,12 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       }
 
       // Upload
+      if (getClientIdentity().status === 'pending') {
+        setUploadStatus('idle');
+        setIsUploading(false);
+        return;
+      }
+      if (getUserId() !== userId) throw new Error('Study Kit identity changed');
       setUploadProgress(40);
       const response = await csrfFetch('/api/study-kit/upload', {
         method: 'POST',
@@ -193,11 +203,13 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
   const hasFile = file !== null || selectedDriveFile !== null;
 
+  if (identity.status !== 'authenticated') return null;
+
   return (
     <div className={cn('space-y-6', className)}>
       {uploadStatus === 'idle' && (
         <UnifiedFilePicker
-          userId={getUserId()}
+          userId={identity.userId}
           onFileSelect={handleFileSelect}
           accept=".pdf"
           acceptedMimeTypes={['application/pdf']}

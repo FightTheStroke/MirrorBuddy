@@ -252,6 +252,23 @@ export async function saveGoogleAccount(
   tokens: GoogleTokenResponse,
   profile: GoogleUserProfile,
 ): Promise<void> {
+  if (
+    !userId ||
+    !tokens ||
+    !profile ||
+    typeof tokens.scope !== 'string' ||
+    typeof tokens.access_token !== 'string' ||
+    !Number.isFinite(tokens.expires_in) ||
+    tokens.expires_in <= 0 ||
+    !profile.id ||
+    !profile.email
+  )
+    throw new Error('Valid OAuth owner, tokens and profile are required');
+  const owner = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, disabled: true },
+  });
+  if (!owner || owner.disabled) throw new Error('OAuth owner is no longer available');
   const scopes = tokens.scope.split(' ');
   const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
@@ -260,13 +277,6 @@ export async function saveGoogleAccount(
   const encryptedRefreshToken = tokens.refresh_token
     ? await encryptToken(tokens.refresh_token)
     : null;
-
-  // Ensure user exists before creating GoogleAccount (foreign key constraint)
-  await prisma.user.upsert({
-    where: { id: userId },
-    create: { id: userId },
-    update: {},
-  });
 
   await prisma.googleAccount.upsert({
     where: { userId },

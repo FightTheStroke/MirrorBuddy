@@ -6,7 +6,7 @@ import { TrialEmailForm } from '@/app/[locale]/welcome/components/trial-email-fo
 import * as consentStorage from '@/lib/consent/unified-consent-storage';
 import { getConsentSyncSnapshot, resetConsentSnapshot } from '@/lib/consent/consent-store';
 import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
-import { AUTH_COOKIE_CLIENT, TRIAL_CONSENT_COOKIE } from '@/lib/auth';
+import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 import { TOS_VERSION } from '@/lib/tos/constants';
 import { installConsentUITransport } from './consent-ui-fixture';
 import { getTranslation as t } from '@/test/i18n-helpers';
@@ -176,7 +176,7 @@ describe('welcome separates recorded terms from trial completion', () => {
     const complete = vi.fn();
     const user = await submit(complete);
     expect(await screen.findByRole('alert')).toBeInTheDocument();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=different-account; path=/`;
+    act(() => setConsentTestAccount('different-account'));
     failing = false;
     await user.click(screen.getByRole('button', { name: t('consent.sync.retry') }));
     const fresh = await screen.findByTestId('consent-reanswer-terms');

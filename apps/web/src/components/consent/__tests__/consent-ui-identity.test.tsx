@@ -4,7 +4,7 @@ import { renderToString } from 'react-dom/server';
 import { userEvent } from '@testing-library/user-event';
 import * as consentStorage from '@/lib/consent/unified-consent-storage';
 import { resetConsentSnapshot } from '@/lib/consent/consent-store';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
+import { setClientIdentity } from '@/lib/auth';
 import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
 import { PrivacyConsentSettings } from '@/components/settings/sections/privacy-consent-settings';
 import { UnifiedConsentWall } from '../unified-consent-wall';
@@ -80,7 +80,7 @@ describe('UI recovery at consent identity boundaries', () => {
         );
       }
       await started;
-      document.cookie = `${AUTH_COOKIE_CLIENT}=different-account; path=/`;
+      act(() => setConsentTestAccount('different-account'));
       await act(async () => {
         release();
         await held;
@@ -101,9 +101,9 @@ describe('UI recovery at consent identity boundaries', () => {
     },
   );
 
-  it('shows a malformed client hint as a recoverable initialization error, not a guest grant', async () => {
+  it('shows unavailable identity as a recoverable initialization error, not a guest grant', async () => {
     consentStorage.saveTermsConsent(true);
-    document.cookie = `${AUTH_COOKIE_CLIENT}=%; path=/`;
+    setClientIdentity({ status: 'unavailable', reason: 'SESSION_REJECTED' });
     const user = userEvent.setup();
     render(
       <UnifiedConsentWall>
@@ -114,7 +114,7 @@ describe('UI recovery at consent identity boundaries', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(consentStorage.hasUnifiedConsent()).toBe(false);
     expect(fetch).not.toHaveBeenCalled();
-    setConsentTestAccount(false);
+    act(() => setConsentTestAccount(false));
     await user.click(screen.getByRole('button', { name: t('consent.sync.retry') }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(consentStorage.hasUnifiedConsent()).toBe(true);
@@ -133,7 +133,7 @@ describe('UI recovery at consent identity boundaries', () => {
     render(<PrivacyConsentSettings />);
     await user.click(screen.getByRole('switch', { name: t('settings.privacy.toggleAnalytics') }));
     expect(await screen.findByRole('alert')).toHaveTextContent(t('consent.sync.failed'));
-    document.cookie = `${AUTH_COOKIE_CLIENT}=different-account; path=/`;
+    act(() => setConsentTestAccount('different-account'));
     vi.mocked(fetch).mockImplementation(transport);
     await user.click(screen.getByRole('button', { name: t('consent.sync.retry') }));
     expect(await screen.findByTestId('consent-reanswer-analytics')).toBeInTheDocument();

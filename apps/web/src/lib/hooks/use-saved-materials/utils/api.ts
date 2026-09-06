@@ -7,6 +7,15 @@ import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import type { SavedMaterial } from '../types';
 import { csrfFetch } from '@/lib/auth';
+import {
+  getClientIdentity,
+  getUserIdFromCookie,
+  requireClientUserId,
+} from '@/lib/auth/client-auth';
+
+function assertOwner(userId: string | null): void {
+  if (requireClientUserId() !== userId) throw new Error('Material identity changed');
+}
 
 function isTransientNetworkError(error: unknown): boolean {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -29,8 +38,14 @@ function toError(error: unknown, fallbackMessage: string): Error {
   }
 }
 
-export async function fetchMaterials(toolType: ToolType, userId: string): Promise<SavedMaterial[]> {
+export async function fetchMaterials(
+  toolType: ToolType,
+  userId: string | null,
+): Promise<SavedMaterial[]> {
   try {
+    if (getUserIdFromCookie() === null) return [];
+    assertOwner(userId);
+    const identity = getClientIdentity();
     const response = await fetch(
       `/api/materials?userId=${userId}&toolType=${toolType}&status=active`,
     );
@@ -38,15 +53,16 @@ export async function fetchMaterials(toolType: ToolType, userId: string): Promis
       throw new Error(`API error: ${response.status}`);
     }
     const data = await response.json();
+    if (getClientIdentity() !== identity) throw new Error('Material identity changed');
     return data.materials || [];
   } catch (error) {
     logger.error('Failed to fetch materials', { toolType }, error);
-    return [];
+    throw error;
   }
 }
 
 export async function saveMaterialToAPI(
-  userId: string,
+  userId: string | null,
   toolType: ToolType,
   title: string,
   content: Record<string, unknown>,
@@ -57,6 +73,7 @@ export async function saveMaterialToAPI(
   },
 ): Promise<SavedMaterial | null> {
   try {
+    assertOwner(userId);
     const toolId = crypto.randomUUID();
     const response = await csrfFetch('/api/materials', {
       method: 'POST',
@@ -73,6 +90,7 @@ export async function saveMaterialToAPI(
       throw new Error(`API error: ${response.status}`);
     }
     const data = await response.json();
+    assertOwner(userId);
     return data.material;
   } catch (error) {
     if (isTransientNetworkError(error)) {
@@ -94,6 +112,7 @@ export async function saveMaterialToAPI(
 
 export async function deleteMaterialFromAPI(toolId: string): Promise<boolean> {
   try {
+    requireClientUserId();
     const response = await csrfFetch(`/api/materials?toolId=${toolId}`, {
       method: 'DELETE',
     });
@@ -110,6 +129,7 @@ export async function updateMaterialInAPI(
   title?: string,
 ): Promise<boolean> {
   try {
+    requireClientUserId();
     const response = await csrfFetch('/api/materials', {
       method: 'PATCH',
       body: JSON.stringify({ toolId, content, title }),
@@ -137,7 +157,7 @@ export function generateContentHash(
 }
 
 export async function saveMaterialToAPIWithId(
-  userId: string,
+  userId: string | null,
   toolId: string,
   toolType: ToolType,
   title: string,
@@ -145,6 +165,7 @@ export async function saveMaterialToAPIWithId(
   options?: { subject?: string; maestroId?: string; preview?: string },
 ): Promise<SavedMaterial | null> {
   try {
+    assertOwner(userId);
     const requestBody = {
       userId,
       toolId,
@@ -177,6 +198,7 @@ export async function saveMaterialToAPIWithId(
     }
 
     const data = await response.json();
+    assertOwner(userId);
     if (!data.material) {
       logger.warn('Save material response missing material field', {
         toolType,

@@ -9,6 +9,11 @@ import {
 } from './unified-consent';
 import { migrateConsent } from './consent-migration';
 import {
+  getClientIdentity,
+  subscribeClientIdentity,
+  type ClientIdentity,
+} from '@/lib/auth/client-auth';
+import {
   allowConfirmedRead,
   confirmAnalyticsPermission,
   consentClearing,
@@ -26,6 +31,7 @@ let initialization: Promise<boolean> | undefined;
 let initializingIdentity: ConsentIdentity | undefined;
 let generation = 0;
 let initializedIdentity: ConsentIdentity | undefined;
+let initializedClientIdentity: ClientIdentity | undefined;
 
 export function consentFromServer(
   terms: unknown,
@@ -84,7 +90,15 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
 }
 export async function initializeConsent(): Promise<boolean> {
   if (consentClearing()) return false;
-  const identity = getConsentIdentity();
+  let identity: ConsentIdentity;
+  try {
+    identity = getConsentIdentity();
+  } catch {
+    const error = new ConsentSyncError('identity');
+    failConsent(error, 'initialization');
+    updateConsentState({ ready: true });
+    throw error;
+  }
   if (initialization && initializingIdentity === identity) return initialization;
   const current = ++generation;
   initializingIdentity = identity;
@@ -111,7 +125,13 @@ export async function initializeConsent(): Promise<boolean> {
       return hasAcceptedTerms(consent);
     } catch (error) {
       const failure = error instanceof ConsentSyncError ? error : new ConsentSyncError('storage');
-      if (generation === current && identity === getConsentIdentity()) {
+      let sameIdentity = false;
+      try {
+        sameIdentity = identity === getConsentIdentity();
+      } catch {
+        sameIdentity = failure.code === 'identity';
+      }
+      if (generation === current && sameIdentity) {
         failConsent(failure, 'initialization');
         updateConsentState({ ready: true });
       }
@@ -127,6 +147,7 @@ export function markConsentLoaded(): void {
     const identity = getConsentIdentity();
     sessionStorage.setItem(CONSENT_LOADED_KEY, identity.account === null ? 'guest' : 'account');
     initializedIdentity = identity;
+    initializedClientIdentity = getClientIdentity();
   }
 }
 export function isConsentLoaded(): boolean {
@@ -135,11 +156,15 @@ export function isConsentLoaded(): boolean {
     return (
       typeof window !== 'undefined' &&
       initializedIdentity === identity &&
+      initializedClientIdentity === getClientIdentity() &&
       sessionStorage.getItem(CONSENT_LOADED_KEY) ===
         (identity.account === null ? 'guest' : 'account')
     );
-  } catch {
-    failConsent(new ConsentSyncError('storage'), 'initialization');
+  } catch (error) {
+    failConsent(
+      error instanceof ConsentSyncError ? error : new ConsentSyncError('storage'),
+      'initialization',
+    );
     return false;
   }
 }
@@ -148,4 +173,20 @@ export function resetConsentInitialization(): void {
   initialization = undefined;
   initializingIdentity = undefined;
   initializedIdentity = undefined;
+  initializedClientIdentity = undefined;
 }
+
+subscribeClientIdentity(() => {
+  const next = getClientIdentity();
+  if (!initializedIdentity || next.status === 'pending' || next.status === 'unavailable') return;
+  queueMicrotask(() => {
+    if (!initializedIdentity || getClientIdentity() !== next) return;
+    void initializeConsent().catch((error: unknown) => {
+      if (error instanceof ConsentSyncError && error.code === 'superseded') return;
+      failConsent(
+        error instanceof ConsentSyncError ? error : new ConsentSyncError('network'),
+        'initialization',
+      );
+    });
+  });
+});

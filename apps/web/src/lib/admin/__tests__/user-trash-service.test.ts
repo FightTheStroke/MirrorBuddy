@@ -25,10 +25,12 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 import { prisma } from '@/lib/db';
+import { mockSessionTransaction } from '@/test/fixtures/session-compat';
 
 describe('user-trash-service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSessionTransaction(prisma);
   });
 
   it('creates backup with 30-day purge', async () => {
@@ -54,6 +56,14 @@ describe('user-trash-service', () => {
     await createDeletedUserBackup('user-1', 'admin-1', 'test');
 
     expect(prisma.deletedUserBackup.create).toHaveBeenCalled();
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      data: { authVersion: { increment: 1 }, legacyRevoked: true },
+    });
+    expect(prisma.authSession.updateMany).toHaveBeenCalledWith({
+      where: { userId: 'user-1', revokedAt: null },
+      data: { revokedAt: new Date('2026-09-06T00:00:00Z') },
+    });
   });
 
   it('purges expired backups', async () => {

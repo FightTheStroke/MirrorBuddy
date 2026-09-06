@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { POST } from '../route';
 import * as password from '@/lib/auth/server';
 import { prisma } from '@/lib/db';
+import { mockSessionTransaction } from '@/test/fixtures/session-compat';
 
 // Centralized Prisma mock
 vi.mock('@/lib/db', async () => {
@@ -30,12 +31,9 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-// Mock pipe middlewares to pass through
-vi.mock('@/lib/api/middlewares', () => ({
-  pipe: () => (handler: (ctx: { req: Request }) => Promise<Response>) => (req: Request) =>
-    handler({ req }),
-  withSentry: () => {},
-  withRateLimit: () => {},
+vi.mock('@/lib/api/middlewares', async (original) => ({
+  ...(await original<typeof import('@/lib/api/middlewares')>()),
+  withRateLimit: () => async (_ctx: unknown, next: () => Promise<Response>) => next(),
 }));
 
 vi.mock('@/lib/rate-limit', () => ({
@@ -45,6 +43,9 @@ vi.mock('@/lib/rate-limit', () => ({
 describe('POST /api/auth/reset-password', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSessionTransaction(prisma);
+    vi.mocked(password.hashPassword).mockResolvedValue('hashed-password');
+    vi.mocked(prisma.passwordResetToken.updateMany).mockResolvedValue({ count: 1 });
   });
 
   it('should return 400 if token is missing', async () => {
@@ -96,7 +97,7 @@ describe('POST /api/auth/reset-password', () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(null);
+    vi.mocked(prisma.passwordResetToken.findUnique).mockResolvedValue(null);
 
     const req = new Request('http://localhost/api/auth/reset-password', {
       method: 'POST',
@@ -118,7 +119,7 @@ describe('POST /api/auth/reset-password', () => {
       id: 'token-123',
       token: 'valid-token',
       userId: 'user-123',
-      expiresAt: new Date(Date.now() - 1000),
+      expiresAt: new Date('2026-09-05T23:59:59Z'),
       used: false,
       createdAt: new Date(Date.now() - 3600000),
     };
@@ -127,7 +128,7 @@ describe('POST /api/auth/reset-password', () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(expiredToken);
+    vi.mocked(prisma.passwordResetToken.findUnique).mockResolvedValue(expiredToken);
 
     const req = new Request('http://localhost/api/auth/reset-password', {
       method: 'POST',
@@ -158,7 +159,7 @@ describe('POST /api/auth/reset-password', () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(usedToken);
+    vi.mocked(prisma.passwordResetToken.findUnique).mockResolvedValue(usedToken);
 
     const req = new Request('http://localhost/api/auth/reset-password', {
       method: 'POST',
@@ -180,7 +181,7 @@ describe('POST /api/auth/reset-password', () => {
       id: 'token-123',
       token: 'valid-token',
       userId: 'user-123',
-      expiresAt: new Date(Date.now() + 3600000),
+      expiresAt: new Date('2026-09-06T01:00:00Z'),
       used: false,
       createdAt: new Date(),
     };
@@ -189,9 +190,8 @@ describe('POST /api/auth/reset-password', () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(validToken);
+    vi.mocked(prisma.passwordResetToken.findUnique).mockResolvedValue(validToken);
     vi.mocked(password.hashPassword).mockResolvedValue('hashed-password');
-    vi.mocked(prisma.$transaction).mockResolvedValue([{}, {}]);
 
     const req = new Request('http://localhost/api/auth/reset-password', {
       method: 'POST',
@@ -212,5 +212,15 @@ describe('POST /api/auth/reset-password', () => {
     expect(password.hashPassword).toHaveBeenCalledWith('NewPassword123!');
     // Verify $transaction was called
     expect(prisma.$transaction).toHaveBeenCalledTimes(1);
+    expect(prisma.user.update).toHaveBeenCalledWith({
+      where: { id: 'user-123' },
+      data: {
+        passwordHash: 'hashed-password',
+        mustChangePassword: false,
+        authVersion: { increment: 1 },
+        legacyRevoked: true,
+      },
+    });
+    expect(response.headers.get('set-cookie')).toBeNull();
   });
 });

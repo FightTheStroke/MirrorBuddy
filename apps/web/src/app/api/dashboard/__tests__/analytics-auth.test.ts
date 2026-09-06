@@ -11,7 +11,7 @@ import {
   setCookie,
   type Caller,
 } from './analytics-auth-fixtures';
-import { signCookieValue } from '@/lib/auth/server';
+import { nativeSessionFixture } from '@/test/fixtures/session-compat';
 
 const callers: Caller[] = [null, 'USER', 'ADMIN_READONLY', 'ADMIN'];
 
@@ -49,17 +49,28 @@ describe.each(routes)('$path authorization through exported handlers', ({ path, 
     setCookie(cookie);
     const response = await handlers.GET(new NextRequest(`http://localhost${path}`));
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: 'Unauthorized' });
+    expect(await response.json()).toMatchObject(
+      cookie ? { code: 'SESSION_REJECTED' } : { error: 'Unauthorized', code: 'AUTH_ABSENT' },
+    );
     expect(mocks.findUser).not.toHaveBeenCalled();
     expectNoDataReads();
   });
 
   it('does not disclose whether the signed-cookie user still exists', async () => {
-    setCookie(signCookieValue('missing-analytics-user').signed);
-    mocks.findUser.mockResolvedValue(null);
+    const issued = nativeSessionFixture('missing-analytics-user');
+    setCookie(issued.token);
+    mocks.query.mockResolvedValue([
+      {
+        ...issued.row,
+        userId: null,
+        userDisabled: null,
+        userAuthVersion: null,
+        userLegacyRevoked: null,
+      },
+    ]);
     const response = await handlers.GET(new NextRequest(`http://localhost${path}`));
     expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: 'Unauthorized' });
+    expect(await response.json()).toMatchObject({ code: 'SESSION_REJECTED' });
     expectNoDataReads();
   });
 
@@ -91,22 +102,22 @@ describe.each(routes)('$path authorization through exported handlers', ({ path, 
     'fails closed when the role lookup returns %j',
     async (roleRecord) => {
       setCaller('ADMIN');
-      mocks.findUser.mockResolvedValueOnce({ id: 'analytics-operator' });
       mocks.findUser.mockResolvedValueOnce(roleRecord);
       const response = await handlers.GET(new NextRequest(`http://localhost${path}`));
-      expect(response.status).toBe(403);
-      expect(await response.json()).toEqual({ error: 'Forbidden: admin access required' });
+      expect(response.status).toBe(roleRecord ? 403 : 401);
+      expect(await response.json()).toMatchObject(
+        roleRecord ? { error: 'Forbidden: admin access required' } : { code: 'SESSION_REJECTED' },
+      );
       expectNoDataReads();
     },
   );
 
   it('fails closed on role lookup failure without exposing the database error', async () => {
     setCaller('ADMIN');
-    mocks.findUser.mockResolvedValueOnce({ id: 'analytics-operator' });
     mocks.findUser.mockRejectedValueOnce(new Error('private role database details'));
     const response = await handlers.GET(new NextRequest(`http://localhost${path}`));
-    expect(response.status).toBe(403);
-    expect(await response.json()).toEqual({ error: 'Forbidden: admin access required' });
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ code: 'SESSION_UNAVAILABLE' });
     expectNoDataReads();
   });
 

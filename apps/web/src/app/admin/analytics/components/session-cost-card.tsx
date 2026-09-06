@@ -4,12 +4,7 @@ import { Euro } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { SessionMetricsData } from '../types';
 import { useTranslations } from 'next-intl';
-
-function formatNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toString();
-}
+import { AnalyticsValue } from './analytics-truth';
 
 export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
   const t = useTranslations('admin');
@@ -18,29 +13,37 @@ export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm">
           <Euro className="h-4 w-4 text-emerald-500" />
-          {t('sessionCostMetricsReal')}
+          {t('sessionCost')}
         </CardTitle>
         <CardDescription className="text-xs">
-          {t('actualCostsFromAzureOpenaiApiResponses')}
+          {t('metricTruth.estimates.tokenPricing')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-emerald-600">
-              &euro;{data?.cost.totalEur.toFixed(2) ?? '0.00'}
+              <AnalyticsValue
+                data={data}
+                path="cost.totalEur"
+                format={(value) => `€${value.toFixed(2)}`}
+              />
             </p>
             <p className="text-[10px] text-slate-500">{t('totalCost')}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-blue-600">
-              &euro;{data?.cost.p95PerSession.toFixed(3) ?? '0.000'}
+              <AnalyticsValue
+                data={data}
+                path="cost.p95PerSession"
+                format={(value) => `€${value.toFixed(3)}`}
+              />
             </p>
             <p className="text-[10px] text-slate-500">{t('p95Session')}</p>
           </div>
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-slate-900 dark:text-white">
-              {formatNumber(data?.tokens.total ?? 0)}
+              <AnalyticsValue data={data} path="tokens.total" />
             </p>
             <p className="text-[10px] text-slate-500">{t('totalTokens')}</p>
           </div>
@@ -71,8 +74,8 @@ export function SessionCostCard({ data }: { data: SessionMetricsData | null }) {
         <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
           {}
           <p className="text-[10px] text-slate-400">
-            €{data?.cost.pricing.textPer1kTokens ?? 0.002}/1K tokens · €
-            {data?.cost.pricing.voicePerMin ?? 0.04}
+            €{data?.cost.pricing.textPer1kTokens ?? t('metricTruth.unknown')}/1K tokens · €
+            {data?.cost.pricing.voicePerMin ?? t('metricTruth.unknown')}
             {t('minVoice')}
           </p>
           {}

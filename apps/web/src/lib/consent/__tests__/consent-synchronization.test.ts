@@ -14,26 +14,25 @@ import {
 } from '../unified-consent-storage';
 import { getConsentSnapshot, getConsentSyncSnapshot, resetConsentSnapshot } from '../consent-store';
 import { clearTrialConsent } from '../trial-consent';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
-import { installConsentTransportMock } from './consent-test-transport';
+import { installConsentTransportMock, setConsentTestAccount } from './consent-test-transport';
 
 const account = '00000000-0000-4000-8000-000000000001';
 const date = '2026-09-01T00:00:00.000Z';
 function signIn() {
-  document.cookie = `${AUTH_COOKIE_CLIENT}=${account}; path=/`;
+  setConsentTestAccount(account);
 }
 
 describe('T6 synchronization races and readiness', () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
     installConsentTransportMock();
   });
   afterEach(() => {
     vi.restoreAllMocks();
     resetConsentSnapshot();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
   });
 
   it('confirms authenticated terms only from their versioned acknowledgement', async () => {

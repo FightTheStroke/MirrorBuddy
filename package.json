@@ -103,11 +103,11 @@
     "postinstall": "prisma generate",
     "kb:extract": "tsx scripts/extract-mini-kb.ts",
     "kb:seed": "tsx --env-file-if-exists=.env --conditions=react-server scripts/seed-maestri-knowledge-vectors.ts",
-    "seed:admin": "tsx scripts/seed-admin.ts",
+    "seed:admin": "npm run script -- scripts/seed-admin.ts",
     "seed:tiers": "tsx --env-file-if-exists=.env apps/web/prisma/seed-tiers.ts",
     "sim:nightly": "npx tsx scripts/nightly-sim-runner.ts",
     "sim:quick": "npx tsx scripts/nightly-sim-runner.ts --models 3b --dry-run",
-    "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run seed:admin || echo 'Admin seed skipped'",
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run build",
     "production:status": "./scripts/production-status.sh",
     "db:check-migrations": "tsx scripts/check-migrations-applied.ts"
   },

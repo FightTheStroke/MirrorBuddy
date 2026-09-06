@@ -18,7 +18,8 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect, request as playwrightRequest } from '@playwright/test';
-import type { BrowserContext, StorageState } from '@playwright/test';
+import type { BrowserContext } from '@playwright/test';
+type StorageState = Awaited<ReturnType<BrowserContext['storageState']>>;
 import { resolve } from 'node:path';
 import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME } from '@/lib/auth/cookie-constants';
 import {
@@ -30,6 +31,7 @@ import {
   mockAccessibilitySettings,
 } from '../fixtures/api-mocks';
 import { readRosterCounts } from '../../../../scripts/lib/roster-counts';
+import { requireNativeFixtureCookie } from '../helpers/session-cookie-format';
 
 export type { APIRequestContext, Page } from '@playwright/test';
 
@@ -47,6 +49,7 @@ export async function addAdminReadOnlyCookie(context: BrowserContext) {
   if (!ADMIN_READONLY_COOKIE_VALUE) {
     throw new Error('ADMIN_READONLY_COOKIE_VALUE is not available');
   }
+  requireNativeFixtureCookie(ADMIN_READONLY_COOKIE_VALUE);
   await context.addCookies([
     {
       name: ADMIN_READONLY_COOKIE_NAME,
@@ -63,6 +66,7 @@ export function adminReadOnlyCookieHeader() {
   if (!ADMIN_READONLY_COOKIE_VALUE) {
     throw new Error('ADMIN_READONLY_COOKIE_VALUE is not available');
   }
+  requireNativeFixtureCookie(ADMIN_READONLY_COOKIE_VALUE);
   return `${ADMIN_READONLY_COOKIE_NAME}=${ADMIN_READONLY_COOKIE_VALUE}`;
 }
 
@@ -89,13 +93,14 @@ type AuthWorkerFixtures = {
   prodAuthStorageState: StorageState;
 };
 
-const authenticatedBase = base.extend<Record<string, never>, AuthWorkerFixtures>({
+const authenticatedBase = base.extend<object, AuthWorkerFixtures>({
   prodAuthStorageState: [
     async ({}, use) => {
       if (!hasProdTestAuthCookie) {
         await use({ cookies: [], origins: [] });
         return;
       }
+      requireNativeFixtureCookie(PROD_TEST_USER_COOKIE_VALUE);
 
       const hostname = new URL(PROD_URL).hostname;
       const storageState: StorageState = {

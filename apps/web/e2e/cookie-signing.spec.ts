@@ -6,6 +6,8 @@
 
 import { test, expect } from './fixtures/base-fixtures';
 import type { APIRequestContext } from '@playwright/test';
+import { authenticateTestUser } from './helpers/auth-session';
+import { cleanupTestData } from './helpers/test-data';
 
 async function getCsrfToken(request: APIRequestContext): Promise<string> {
   const res = await request.get('/api/session');
@@ -132,14 +134,11 @@ test.describe('Signed Cookie Authentication', () => {
     // Navigate to a page that requires authentication
     await page.goto('/');
 
-    // The app should handle invalid cookie gracefully
-    // Either by creating new user or showing appropriate error
-    // At minimum, it shouldn't crash
     await page.waitForLoadState('domcontentloaded');
-
-    // Check that page loaded (error handling works)
-    const title = await page.title();
-    expect(title).toBeDefined();
+    const rejected = await page.request.get('/api/user');
+    expect(rejected.status()).toBe(401);
+    expect(await rejected.json()).toMatchObject({ code: 'SESSION_REJECTED' });
+    expect(rejected.headers()['set-cookie']).toBeUndefined();
   });
 
   test('Tampered value - API request fails', async ({ page, context }) => {
@@ -176,10 +175,8 @@ test.describe('Signed Cookie Authentication', () => {
     // Navigate and check response via page
     const response = await page.goto('/api/user/settings');
 
-    // Either returns 401/403, or GET /api/user auto-creates and succeeds
-    // Both are acceptable security responses
     expect(response).not.toBeNull();
-    expect([200, 401, 403]).toContain(response!.status());
+    expect(response!.status()).toBe(401);
   });
 
   test('Legacy unsigned cookie - rejected for security (F-07)', async ({ page, context }) => {
@@ -192,9 +189,11 @@ test.describe('Signed Cookie Authentication', () => {
     const userCookie = cookies.find((c) => c.name === 'mirrorbuddy-user-id');
     expect(userCookie).toBeDefined();
 
-    const signedValue = userCookie!.value;
-    const lastDotIndex = signedValue.lastIndexOf('.');
-    const unsignedUserId = signedValue.substring(0, lastDotIndex);
+    const me = await page.request.get('/api/auth/me');
+    expect(me.status()).toBe(200);
+    const { user: owner } = await me.json();
+    const unsignedUserId = owner.id;
+    expect(typeof unsignedUserId).toBe('string');
 
     // Set legacy unsigned cookie (just the UUID without signature)
     await context.clearCookies();
@@ -239,6 +238,12 @@ test.describe('Signed Cookie Authentication', () => {
 });
 
 test.describe('Cookie Security Properties', () => {
+  test.beforeEach(async ({ context }) => {
+    await authenticateTestUser(context);
+  });
+  test.afterEach(async () => {
+    await cleanupTestData();
+  });
   test('Cookie has correct security flags', async ({ page, context }) => {
     // Create user via browser navigation
     await page.goto('/api/user');

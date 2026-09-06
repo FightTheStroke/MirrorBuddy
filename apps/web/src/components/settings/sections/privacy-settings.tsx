@@ -2,29 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Shield, LogOut, User } from 'lucide-react';
+import { Shield, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { csrfFetch } from '@/lib/auth';
-import { getUserIdFromCookie } from '@/lib/auth';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { LogoutActions } from '@/components/ui/logout-actions';
 import { PrivacyConsentSettings } from './privacy-consent-settings';
 import { CrossMaestroMemorySettings } from './cross-maestro-memory-settings';
 
 // Privacy Settings
 export function PrivacySettings() {
   const t = useTranslations('settings.privacy');
+  const tSession = useTranslations('common.session');
+  const [deleteFailed, setDeleteFailed] = useState(false);
   const [version, setVersion] = useState<{
     version: string;
     buildTime: string;
     environment: string;
   } | null>(null);
-  // Use lazy initialization to check auth state
-  const [isAuthenticated] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const userId = getUserIdFromCookie();
-    return !!userId;
-  });
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const identity = useClientIdentity();
 
   useEffect(() => {
     fetch('/api/version')
@@ -33,31 +30,10 @@ export function PrivacySettings() {
       .catch(() => null);
   }, []);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await csrfFetch('/api/auth/logout', { method: 'POST' });
-      // Clear local storage
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key?.startsWith('mirrorbuddy')) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach((key) => localStorage.removeItem(key));
-      // Force full page reload to /welcome to reset all state
-      // This ensures Zustand stores are cleared and hydration happens fresh
-      window.location.href = '/welcome';
-    } catch {
-      setIsLoggingOut(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Account Section - shows when authenticated */}
-      {isAuthenticated && (
+      {identity.status !== 'anonymous' && (
         <Card data-testid="user-menu">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -67,18 +43,11 @@ export function PrivacySettings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              {t('seiConnessoAlTuoAccountMirrorbuddy')}
+              {identity.status === 'authenticated'
+                ? t('seiConnessoAlTuoAccountMirrorbuddy')
+                : tSession('unavailable')}
             </p>
-            <Button
-              variant="outline"
-              data-testid="logout-button"
-              className="w-full"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {isLoggingOut ? 'Disconnessione...' : 'Disconnetti'}
-            </Button>
+            <LogoutActions />
           </CardContent>
         </Card>
       )}
@@ -113,39 +82,24 @@ export function PrivacySettings() {
           <Button
             variant="outline"
             className="w-full text-red-600 border-red-200 hover:bg-red-50"
+            disabled={identity.status !== 'authenticated'}
             onClick={async () => {
               const confirmed = window.confirm(
                 'Sei sicuro di voler eliminare tutti i tuoi dati? Questa azione non può essere annullata.',
               );
               if (confirmed) {
-                // Clear all localStorage data
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                  const key = localStorage.key(i);
-                  if (key?.startsWith('mirrorbuddy')) {
-                    keysToRemove.push(key);
-                  }
-                }
-                keysToRemove.forEach((key) => localStorage.removeItem(key));
-
-                // Also clear any other app-specific keys
-                localStorage.removeItem('voice-session');
-                localStorage.removeItem('accessibility-settings');
-
-                // Delete all data from database (primary data source)
+                setDeleteFailed(false);
                 try {
-                  await csrfFetch('/api/user/data', { method: 'DELETE' });
+                  await useOnboardingStore.getState().resetAllData();
                 } catch {
-                  // Continue even if API fails - user will be logged out anyway
+                  setDeleteFailed(true);
                 }
-
-                // Reload to reset state
-                window.location.reload();
               }
             }}
           >
             {t('deleteAllData')}
           </Button>
+          {deleteFailed && <p role="alert">{tSession('unavailable')}</p>}
         </CardContent>
       </Card>
 

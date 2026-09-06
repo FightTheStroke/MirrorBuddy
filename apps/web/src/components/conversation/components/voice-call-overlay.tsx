@@ -258,9 +258,9 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
 
     // C-2 FIX: End conversation and generate summary for memory persistence
     if (conversationIdRef.current && transcript.length > 0) {
-      const userId = getUserId();
-      if (userId) {
-        try {
+      try {
+        const userId = getUserId();
+        if (userId) {
           const response = await csrfFetch(`/api/conversations/${conversationIdRef.current}/end`, {
             method: 'POST',
             body: JSON.stringify({ userId, reason: 'explicit' }),
@@ -270,11 +270,9 @@ export function VoiceCallOverlay({ character, onEnd, onSessionIdChange }: VoiceC
               conversationId: conversationIdRef.current,
             });
           }
-        } catch (error) {
-          logger.error('[VoiceCallOverlay] Failed to end conversation', {
-            error: String(error),
-          });
         }
+      } catch (error) {
+        logger.error('[VoiceCallOverlay] Failed to end conversation', { error: String(error) });
       }
     }
 

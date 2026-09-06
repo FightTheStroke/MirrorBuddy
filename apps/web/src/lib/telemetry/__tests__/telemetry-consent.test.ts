@@ -6,7 +6,8 @@ import {
 } from '@/lib/consent/unified-consent-storage';
 import { useTelemetryStore } from '../telemetry-store';
 import { initializeTelemetry } from '../telemetry-store/initialize';
-import { AUTH_COOKIE_CLIENT, clearCSRFToken } from '@/lib/auth';
+import { clearCSRFToken } from '@/lib/auth';
+import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
 
 const fetchMock = vi.fn<typeof fetch>();
 const store = () => useTelemetryStore.getState();
@@ -20,7 +21,7 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   clearUnifiedConsent();
-  document.cookie = 'mirrorbuddy-user-id-client=eligible-user; path=/';
+  setConsentTestAccount('eligible-user');
   clearCSRFToken();
   vi.stubGlobal('fetch', fetchMock);
   fetchMock.mockReset().mockImplementation(async (url, init) => {
@@ -43,7 +44,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
-  document.cookie = 'mirrorbuddy-user-id-client=; Max-Age=0; path=/';
+  setConsentTestAccount(false);
 });
 
 describe('optional telemetry permission', () => {
@@ -129,7 +130,7 @@ describe('optional telemetry permission', () => {
     'does not reuse eligibility after the account changes to %s',
     async (account) => {
       await optIn();
-      document.cookie = `${AUTH_COOKIE_CLIENT}=${account}; path=/`;
+      setConsentTestAccount(account || false);
       store().trackEvent('navigation', 'page_view');
       expect(store().eventQueue).toEqual([]);
     },

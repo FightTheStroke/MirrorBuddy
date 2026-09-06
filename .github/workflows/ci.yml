@@ -22,15 +22,15 @@ concurrency:
 # https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
 
 env:
-  NODE_VERSION: "20"
-  VERCEL_CLI_VERSION: "56.3.2"
+  NODE_VERSION: '20'
+  VERCEL_CLI_VERSION: '56.3.2'
   # This workflow holds no Azure voice credentials on purpose: every run would
   # otherwise cost real money and carry a production key into a test job. The
   # browser console audit reads this flag to accept the 503 the realtime voice
   # endpoints are designed to return when no credentials exist. The post-deploy
   # smoke run against the live site does not set it, so a real voice outage
   # there still fails.
-  E2E_VOICE_UNCONFIGURED: "true"
+  E2E_VOICE_UNCONFIGURED: 'true'
 
 jobs:
   # =========================================================================
@@ -270,7 +270,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for accurate scanning
+          fetch-depth: 0 # Full history for accurate scanning
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
@@ -533,7 +533,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
       - name: Install robot package with test extras
         working-directory: robot
         run: pip install -e ".[test]"
@@ -1184,7 +1184,7 @@ jobs:
           npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --reporter=list
         env:
           CI: true
-          CI_MOBILE_TESTS: "1"
+          CI_MOBILE_TESTS: '1'
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
@@ -1230,12 +1230,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -1392,7 +1392,7 @@ jobs:
           npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
         env:
           CI: true
-          CI_MOBILE_TESTS: "1"
+          CI_MOBILE_TESTS: '1'
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
@@ -1896,7 +1896,7 @@ jobs:
   # accessibility-tests is ALWAYS required (WCAG 2.1 AA blocking).
   # ==========================================================================
   pr-gate:
-    name: "PR Gate"
+    name: 'PR Gate'
     runs-on: ubuntu-latest
     needs:
       - detect-changes
@@ -1974,7 +1974,7 @@ jobs:
   # Configure in Vercel: Settings → Git → "Wait for Deployment Checks"
   # ==========================================================================
   deployment-gate:
-    name: "✅ Deployment Gate"
+    name: '✅ Deployment Gate'
     runs-on: ubuntu-latest
     needs:
       - build
@@ -2101,7 +2101,7 @@ jobs:
   # available for manual re-promote / rollback.
   # ============================================================================
   deploy-to-staging:
-    name: "🎪 Deploy to Staging"
+    name: '🎪 Deploy to Staging'
     runs-on: ubuntu-latest
     needs: [deployment-gate]
     outputs:
@@ -2122,7 +2122,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
       - name: Validate VERCEL_TOKEN is set
         run: |
@@ -2319,7 +2319,7 @@ jobs:
   # is left open as a signal to promote/rollback manually.
   # ============================================================================
   auto-promote-production:
-    name: "🚀 Auto-Promote to Production"
+    name: '🚀 Auto-Promote to Production'
     runs-on: ubuntu-latest
     needs: [deploy-to-staging]
     if: |
@@ -2327,7 +2327,7 @@ jobs:
       github.ref == 'refs/heads/main' &&
       needs.deploy-to-staging.result == 'success'
     env:
-      SCOPE: "--scope=team_nDwLfqx9JbVIs4C7Il79f4ln"
+      SCOPE: '--scope=team_nDwLfqx9JbVIs4C7Il79f4ln'
       STAGING_URL: ${{ needs.deploy-to-staging.outputs.deployment_url }}
     steps:
       - name: Validate inputs
@@ -2453,9 +2453,11 @@ jobs:
   # and the database in step. The script is idempotent and never deletes.
   # ============================================================================
   sync-admin-credentials:
-    name: "🔑 Sync Admin Credentials"
+    name: '🔑 Sync Admin Credentials'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Setup precedes issuance; the browser has a separate 30-minute ceiling,
+    # leaving time for scoped cleanup even when it fails or times out.
+    timeout-minutes: 90
     needs: [auto-promote-production]
     if: |
       github.event_name == 'push' &&
@@ -2463,106 +2465,141 @@ jobs:
       needs.auto-promote-production.result == 'success'
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 3
 
       - name: Setup pnpm
+        timeout-minutes: 2
         uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
 
       - uses: actions/setup-node@v4
+        timeout-minutes: 2
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
+        timeout-minutes: 10
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
+        timeout-minutes: 3
         run: npx prisma generate
-
-      - name: Reconcile admin accounts
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
-        run: npm run seed:admin
-
-  # ============================================================================
-  # POST-DEPLOY PRODUCTION SMOKE — does the site actually work for a child?
-  # ============================================================================
-  # Until 28 August 2026 nothing ran against production after a promotion. The
-  # suite existed, and the credentials for its authenticated half had been in
-  # GitHub secrets since 2 August, but no workflow ever passed them in — so the
-  # 94 tests covering the signed-in experience, the ones that walk the screens
-  # where children actually meet the Maestri, never ran anywhere. A voice outage
-  # lasted a full day with every check green.
-  #
-  # This job runs the suite against the live site once the promotion succeeds,
-  # with those credentials supplied, so a broken production fails loudly here
-  # rather than in a child's session.
-  # ============================================================================
-  post-deploy-smoke:
-    name: "🔬 Post-Deploy Production Smoke"
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [auto-promote-production]
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      needs.auto-promote-production.result == 'success'
-    steps:
-      - uses: actions/checkout@v4
-
-      # This repository installs with pnpm (workspace: protocol). Asking
-      # setup-node to cache npm makes it look for a package-lock.json that has
-      # never existed here, and the job dies before it can smoke anything —
-      # which is how a promotion could report success with production
-      # unverified.
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         timeout-minutes: 10
         run: npx playwright install chromium
 
-      # Best-effort apt half: the runner image already ships these packages, so
-      # a stuck dpkg lock costs five minutes instead of the whole job.
       - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
 
+      - name: Reconcile admin accounts
+        id: reconcile
+        timeout-minutes: 3
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # Issuance must not create/re-enable an account or manufacture its role.
+          # Readonly provisioning/conversion remains an explicit prerequisite.
+          ADMIN_READONLY_EMAIL: ''
+        run: npm run seed:admin
+
+      - name: Issue temporary readonly smoke access
+        id: issue
+        timeout-minutes: 2
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+        run: pnpm run script -- scripts/readonly-smoke-session.ts issue --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
       - name: Smoke the live site
-        run: npm run test:smoke:prod
+        id: smoke
+        timeout-minutes: 30
+        run: |
+          set +x
+          unset DATABASE_URL DIRECT_URL DEV_DATABASE_URL TEST_DATABASE_URL TEST_DIRECT_URL
+          unset SESSION_SECRET SESSION_SECRET_PREVIOUS ADMIN_PASSWORD PGPASSWORD PII_ENCRYPTION_KEY
+          directory="$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if [[ ! -s "$directory/token" ]]; then
+            echo "::error::Readonly smoke credential is missing"
+            exit 1
+          fi
+          ADMIN_READONLY_COOKIE_VALUE="$(cat "$directory/token")"
+          if [[ -z "$ADMIN_READONLY_COOKIE_VALUE" || "$ADMIN_READONLY_COOKIE_VALUE" =~ [[:space:]] ]]; then
+            echo "::error::Readonly smoke credential is invalid"
+            exit 1
+          fi
+          export ADMIN_READONLY_COOKIE_VALUE
+          exec npm run test:smoke:prod
         env:
           PROD_TEST_USER_ID: ${{ secrets.PROD_TEST_USER_ID }}
           PROD_TEST_USER_COOKIE_VALUE: ${{ secrets.PROD_TEST_USER_COOKIE_VALUE }}
           PROD_TEST_USER_EMAIL: ${{ secrets.PROD_TEST_USER_EMAIL }}
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
-          ADMIN_READONLY_COOKIE_VALUE: ${{ secrets.ADMIN_READONLY_COOKIE_VALUE }}
 
-      - name: Keep the evidence when the live site misbehaves
-        if: failure()
+      - name: Revoke temporary readonly smoke access
+        id: revoke
+        timeout-minutes: 5
+        if: |
+          always() &&
+          (steps.issue.outcome == 'success' ||
+           steps.issue.outcome == 'failure' ||
+           steps.issue.outcome == 'cancelled')
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+        run: pnpm run script -- scripts/readonly-smoke-session.ts revoke --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      # Revoking this session does not sanitize screenshots or revoke the
+      # separate student cookie. Never upload raw authenticated browser reports.
+      - name: Prepare sanitized smoke outcome
+        id: diagnostic
+        timeout-minutes: 1
+        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure'
+        run: |
+          umask 077
+          set -o noclobber
+          printf '%s\n' '{"smoke":"failure","revocation":"success"}' > "$RUNNER_TEMP/readonly-smoke-outcome-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+
+      - name: Keep only the sanitized failure outcome
+        id: upload
+        timeout-minutes: 2
+        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure' && steps.diagnostic.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: post-deploy-smoke-report
-          path: |
-            apps/web/test-results/
-            playwright-report/
+          path: ${{ runner.temp }}/readonly-smoke-outcome-${{ github.run_id }}-${{ github.run_attempt }}.json
+          if-no-files-found: error
           retention-days: 7
 
+  # Preserve the existing status check, without a second credential-bearing job.
+  post-deploy-smoke:
+    name: '🔬 Post-Deploy Production Smoke'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [auto-promote-production, sync-admin-credentials]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.auto-promote-production.result == 'success'
+    steps:
+      - name: Require successful reconciliation, smoke and cleanup
+        run: test "${{ needs.sync-admin-credentials.result }}" = "success"
+
   robot-store:
-    name: "🤖 Publish to Robot App Store"
+    name: '🤖 Publish to Robot App Store'
     runs-on: ubuntu-latest
     needs: [robot-tests, auto-promote-production]
     if: |

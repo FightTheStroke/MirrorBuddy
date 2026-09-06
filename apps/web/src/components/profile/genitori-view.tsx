@@ -16,7 +16,7 @@ import type { StudentInsights, ObservationCategory, ParentDashboardActivity } fr
 import { useAccessibilityStore } from '@/lib/accessibility';
 import type { ProfileMeta, PageState, LearningEntry } from './genitori-view/types';
 import { MAESTRO_NAMES, EMPTY_ACTIVITY } from './genitori-view/constants';
-import { getUserIdFromCookie } from '@/lib/auth/client-auth';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 import {
   fetchConsentStatus,
   fetchProfile,
@@ -64,11 +64,8 @@ export function GenitoriView() {
   // Real authenticated student id (parent and child share one account; the
   // parent dashboard inspects the signed-in user's data). Replaces the former
   // hardcoded demo-student-1 (BUG-03).
-  const [studentId, setStudentId] = useState<string | null>(null);
-
-  useEffect(() => {
-    setStudentId(getUserIdFromCookie());
-  }, []);
+  const identity = useClientIdentity();
+  const studentId = identity.status === 'authenticated' ? identity.userId : null;
 
   const setContext = useAccessibilityStore((state) => state.setContext);
   const parentSettings = useAccessibilityStore((state) => state.parentSettings);
@@ -144,10 +141,15 @@ export function GenitoriView() {
     const load = async () => {
       setPageState('loading');
       setError(null);
-      const uid = getUserIdFromCookie();
+      const uid = studentId;
       if (!uid) {
-        // Not signed in: cannot inspect any student profile.
-        setPageState('no-profile');
+        setPageState(
+          identity.status === 'anonymous'
+            ? 'no-profile'
+            : identity.status === 'pending'
+              ? 'loading'
+              : 'error',
+        );
         return;
       }
       try {
@@ -173,7 +175,7 @@ export function GenitoriView() {
       }
     };
     load();
-  }, [handleFetchProfile, fetchDiaryEntries, fetchActivity]);
+  }, [handleFetchProfile, fetchDiaryEntries, fetchActivity, studentId, identity]);
 
   const handleGenerateProfile = async () => {
     const uid = studentId;

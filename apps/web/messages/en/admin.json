@@ -1,5 +1,57 @@
 {
   "admin": {
+    "metricTruth": {
+      "averageTurns": "Average turns per recorded session",
+      "averageSessionCost": "Average cost per recorded session",
+      "voiceCost": "Estimated voice cost",
+      "states": {
+        "measured": "Recorded value",
+        "estimated": "Estimate",
+        "unavailable": "Unavailable",
+        "disabled": "Optional collection off",
+        "failed": "Collection failed",
+        "stale": "Stale data"
+      },
+      "reasons": {
+        "retentionWindow": "Activity is retained for about 10 minutes; daily or longer activity cannot be measured.",
+        "optionalDisabled": "Optional analytics is explicitly disabled.",
+        "collectionFailed": "The source could not be read; this is not zero.",
+        "missingData": "Data or its provenance is missing.",
+        "notPermitted": "You do not have permission to view this metric.",
+        "zeroDenominator": "No observations support this rate or average.",
+        "notConfigured": "This optional integration is not configured.",
+        "unsupportedCohort": "The required population or historical baseline is not recorded."
+      },
+      "populations": {
+        "records": "Recorded population only.",
+        "recordedTelemetry": "Recorded telemetry only; historical consent eligibility is not established for all rows.",
+        "eligibleOptIn": "Eligible users with explicit opt-in only; not all users."
+      },
+      "estimates": {
+        "tokenPricing": "Estimate from recorded usage and configured pricing; not invoiced cost.",
+        "subscriptionPrice": "Estimate from active subscriptions and listed monthly prices; not collected revenue.",
+        "annualized": "Annualized listed subscription price; not collected revenue.",
+        "languageProxy": "Language preference is a geographic proxy, not a known country."
+      },
+      "source": "Source",
+      "window": "Window",
+      "computedAt": "Computed at",
+      "snapshot": "Retained-record snapshot",
+      "unknown": "Unknown",
+      "coverageKnown": "Coverage: {observed} of {total}.",
+      "coverageUnknown": "Coverage of all users is unknown; no denominator is available.",
+      "readiness": {
+        "ready": "Capability ready",
+        "notReady": "Capability not ready",
+        "notConfigured": "Capability not configured",
+        "unknown": "Capability readiness unknown"
+      },
+      "quotaEstimate": "Usage is compared with configured quota assumptions, not verified provider limits.",
+      "voiceSessions": "Recorded voice sessions",
+      "ttsGenerations": "TTS generations",
+      "realtimeSessions": "Realtime sessions",
+      "voiceMinutes": "Recorded voice minutes"
+    },
     "betaRequests": "Beta Requests",
     "collapseMenu": "Collapse Menu",
     "dashboard": {
@@ -283,6 +335,20 @@
       "deselectAll": "Deselect all"
     },
     "users": {
+      "pagination": {
+        "label": "User list pagination",
+        "summary": "Users {start}–{end} of {total}",
+        "pageSize": "Rows per page",
+        "page": "Page {page} of {pages}",
+        "selectPage": "Select this page",
+        "selectMatching": "{count, plural, =1 {Select the matching user} other {Select all # matching users}}",
+        "selectUser": "Select {username}",
+        "search": "Search",
+        "clearSearch": "Clear search",
+        "loadFailed": "Unable to load the user list. Please retry.",
+        "exportFiltered": "Export all users matching these filters",
+        "exportFailed": "Export failed or the user list changed. Please retry."
+      },
       "table": {
         "username": "Username",
         "email": "Email",

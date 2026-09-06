@@ -33,7 +33,7 @@ vi.mock('@/lib/logger', () => ({
 
 describe('business-kpi-service', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     clearCache();
   });
 
@@ -112,11 +112,12 @@ describe('business-kpi-service', () => {
       const result = await getBusinessKPIs();
 
       // Verify: Should return null/zero values, NOT mock data
-      expect(result.revenue.mrr).toBe(0);
-      expect(result.revenue.arr).toBe(0);
+      expect(result.revenue.mrr).toBeNull();
+      expect(result.revenue.arr).toBeNull();
+      expect(result.metrics.mrr.status).toBe('failed');
       expect(result.revenue.growthRate).toBeNull();
       expect(result.revenue.totalRevenue).toBeNull();
-      expect(result.users.totalUsers).toBe(0);
+      expect(result.users.totalUsers).toBeNull();
       expect(result.users.churnRate).toBeNull();
       expect(result.topCountries).toEqual([]);
       expect(result.topMaestri).toEqual([]);
@@ -128,7 +129,7 @@ describe('business-kpi-service', () => {
   // ========================================================================
 
   describe('getBusinessKPIs - user metrics', () => {
-    it('returns churnRate 0 when no cancellations exist', async () => {
+    it('returns unavailable churn without a period-start cohort', async () => {
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([]);
       vi.mocked(prisma.user.count)
         .mockResolvedValueOnce(100) // totalUsers
@@ -144,12 +145,12 @@ describe('business-kpi-service', () => {
 
       const result = await getBusinessKPIs();
 
-      // churnRate = 0 when no cancellations (not null)
-      expect(result.users.churnRate).toBe(0);
+      // Cancellation counts do not establish the historical population at risk.
+      expect(result.users.churnRate).toBeNull();
       expect(result.users.totalUsers).toBe(100);
     });
 
-    it('computes trialConversionRate from actual data', async () => {
+    it('does not label a paid-to-trial stock ratio as a conversion cohort', async () => {
       vi.mocked(prisma.userSubscription.findMany).mockResolvedValueOnce([]);
       vi.mocked(prisma.user.count).mockResolvedValueOnce(100).mockResolvedValueOnce(80);
       vi.mocked(prisma.userSubscription.count)
@@ -163,7 +164,8 @@ describe('business-kpi-service', () => {
 
       const result = await getBusinessKPIs();
 
-      expect(result.users.trialConversionRate).toBe(50); // 25/50 * 100 = 50%
+      expect(result.users.trialConversionRate).toBeNull();
+      expect(result.metrics.trialConversionRate.unavailabilityReason).toBe('unsupportedCohort');
     });
   });
 

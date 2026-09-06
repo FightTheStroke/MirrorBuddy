@@ -1,11 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
+import mainConfig from './playwright.config';
 
 /**
  * Study Kit E2E Test Configuration
- * Uses existing dev server (no webServer)
+ * Reuses the guarded test server and native-session configuration.
  */
 export default defineConfig({
+  ...mainConfig,
   testDir: './e2e',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -31,6 +33,4 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-
-  // NO webServer - assume dev server is already running
 });

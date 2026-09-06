@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
 import { getUnifiedConsent, hasUnifiedConsent } from '@/lib/consent/unified-consent-storage';
 import { resetConsentSnapshot } from '@/lib/consent/consent-store';
 import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
@@ -69,7 +68,7 @@ describe('superseded mandatory terms are not replayed for another identity', () 
         );
       }
       await started;
-      document.cookie = `${AUTH_COOKIE_CLIENT}=different-account; path=/`;
+      act(() => setConsentTestAccount('different-account'));
       await act(async () => {
         release();
         await held;

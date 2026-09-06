@@ -1,5 +1,57 @@
 {
   "admin": {
+    "metricTruth": {
+      "averageTurns": "Durchschnittliche Dialogschritte pro erfasster Sitzung",
+      "averageSessionCost": "Durchschnittskosten pro erfasster Sitzung",
+      "voiceCost": "Geschätzte Sprachkosten",
+      "states": {
+        "measured": "Erfasster Wert",
+        "estimated": "Schätzung",
+        "unavailable": "Nicht verfügbar",
+        "disabled": "Optionale Erfassung deaktiviert",
+        "failed": "Erfassung fehlgeschlagen",
+        "stale": "Veraltete Daten"
+      },
+      "reasons": {
+        "retentionWindow": "Aktivität wird etwa 10 Minuten gespeichert; tägliche oder längere Aktivität lässt sich nicht messen.",
+        "optionalDisabled": "Optionale Analysen sind ausdrücklich deaktiviert.",
+        "collectionFailed": "Die Quelle konnte nicht gelesen werden; das bedeutet nicht null.",
+        "missingData": "Daten oder Herkunft fehlen.",
+        "notPermitted": "Sie haben keine Berechtigung, diese Kennzahl anzuzeigen.",
+        "zeroDenominator": "Keine Beobachtungen stützen diese Quote oder diesen Durchschnitt.",
+        "notConfigured": "Diese optionale Integration ist nicht konfiguriert.",
+        "unsupportedCohort": "Die erforderliche Grundgesamtheit oder historische Vergleichsbasis ist nicht erfasst."
+      },
+      "populations": {
+        "records": "Nur erfasste Grundgesamtheit.",
+        "recordedTelemetry": "Nur erfasste Telemetrie; die historische Einwilligungsberechtigung ist nicht für alle Datensätze belegt.",
+        "eligibleOptIn": "Nur berechtigte Nutzer mit ausdrücklicher Einwilligung; nicht alle Nutzer."
+      },
+      "estimates": {
+        "tokenPricing": "Schätzung aus erfasster Nutzung und konfigurierten Preisen; keine abgerechneten Kosten.",
+        "subscriptionPrice": "Schätzung aus aktiven Abonnements und monatlichen Listenpreisen; keine vereinnahmten Umsätze.",
+        "annualized": "Auf ein Jahr hochgerechneter Abonnement-Listenpreis; keine vereinnahmten Umsätze.",
+        "languageProxy": "Die Spracheinstellung ist ein geografischer Näherungswert, kein bekanntes Land."
+      },
+      "source": "Quelle",
+      "window": "Zeitraum",
+      "computedAt": "Berechnet am",
+      "snapshot": "Momentaufnahme gespeicherter Datensätze",
+      "unknown": "Unbekannt",
+      "coverageKnown": "Abdeckung: {observed} von {total}.",
+      "coverageUnknown": "Die Abdeckung aller Nutzer ist unbekannt; ein Nenner ist nicht verfügbar.",
+      "readiness": {
+        "ready": "Funktion bereit",
+        "notReady": "Funktion nicht bereit",
+        "notConfigured": "Funktion nicht konfiguriert",
+        "unknown": "Funktionsbereitschaft unbekannt"
+      },
+      "quotaEstimate": "Die Nutzung wird mit konfigurierten Quotenannahmen verglichen, nicht mit bestätigten Anbietergrenzen.",
+      "voiceSessions": "Erfasste Sprachsitzungen",
+      "ttsGenerations": "Sprachausgaben",
+      "realtimeSessions": "Echtzeitsitzungen",
+      "voiceMinutes": "Erfasste Sprachminuten"
+    },
     "betaRequests": "Beta Requests",
     "collapseMenu": "Collapse Menu",
     "dashboard": {
@@ -283,6 +335,20 @@
       "deselectAll": "Alle abwählen"
     },
     "users": {
+      "pagination": {
+        "label": "Seitennavigation der Benutzerliste",
+        "summary": "Benutzer {start}–{end} von {total}",
+        "pageSize": "Zeilen pro Seite",
+        "page": "Seite {page} von {pages}",
+        "selectPage": "Diese Seite auswählen",
+        "selectMatching": "{count, plural, =1 {Den passenden Benutzer auswählen} other {Alle # passenden Benutzer auswählen}}",
+        "selectUser": "{username} auswählen",
+        "search": "Suchen",
+        "clearSearch": "Suche löschen",
+        "loadFailed": "Die Benutzerliste konnte nicht geladen werden. Bitte erneut versuchen.",
+        "exportFiltered": "Alle Benutzer exportieren, die den Filtern entsprechen",
+        "exportFailed": "Export fehlgeschlagen oder Benutzerliste geändert. Bitte erneut versuchen."
+      },
       "table": {
         "username": "Benutzername",
         "email": "E-Mail",

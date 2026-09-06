@@ -7,7 +7,7 @@
  * 3. Error handling is proper
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest, NextResponse } from 'next/server';
 import { POST } from '../route';
 
@@ -28,7 +28,6 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
   return {
     ...actual,
     verifyPassword: vi.fn(),
-    signCookieValue: vi.fn(),
   };
 });
 
@@ -66,15 +65,25 @@ vi.mock('@/lib/security', async (importOriginal) => {
 
 import { prisma } from '@/lib/db';
 import { verifyPassword } from '@/lib/auth/server';
-import { signCookieValue } from '@/lib/auth/server';
+import { expectNativeSessionCookie } from '@/test/fixtures/session-credentials';
+import { mockSessionTransaction } from '@/test/fixtures/session-compat';
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }) }));
 
 const mockPrismaFindFirst = prisma.user.findFirst as ReturnType<typeof vi.fn>;
 const mockVerifyPassword = verifyPassword as ReturnType<typeof vi.fn>;
-const mockSignCookieValue = signCookieValue as ReturnType<typeof vi.fn>;
+let sessionWrites: ReturnType<typeof mockSessionTransaction>;
 
 describe('POST /api/auth/login', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('SESSION_SECRET', 'synthetic-login-fixture-secret-at-least-32-characters');
+    sessionWrites = mockSessionTransaction(prisma);
+    vi.mocked(prisma.user.findUnique).mockImplementation(
+      () => mockPrismaFindFirst.mock.results.at(-1)?.value,
+    );
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it('sets both httpOnly and client-readable cookies on successful login', async () => {
@@ -82,6 +91,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -89,7 +99,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -114,7 +123,17 @@ describe('POST /api/auth/login', () => {
     // Verify httpOnly cookie properties
     const httpOnlyCookie = cookies.find((c: ResponseCookie) => c.name === 'mirrorbuddy-user-id');
     expect(httpOnlyCookie?.httpOnly).toBe(true);
-    expect(httpOnlyCookie?.value).toBe('signed-cookie-value');
+    const credential = expectNativeSessionCookie(httpOnlyCookie?.value);
+    expect(sessionWrites.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        userId: 'user-123',
+        authVersion: 4,
+        legacyOrigin: false,
+        issuedAt: new Date('2026-09-06T00:00:00Z'),
+        expiresAt: new Date('2026-09-13T00:00:00Z'),
+      }),
+    });
+    expect(sessionWrites.create.mock.calls[0][0].data.handleHash).toBe(credential.handleHash);
 
     // Verify client-readable cookie properties
     const clientCookie = cookies.find(
@@ -141,11 +160,35 @@ describe('POST /api/auth/login', () => {
     expect(cookies).toHaveLength(0);
   });
 
+  it('does not emit cookies when durable session insertion fails after password proof', async () => {
+    mockPrismaFindFirst.mockResolvedValueOnce({
+      id: 'user-123',
+      username: 'testuser',
+      passwordHash: 'hashed-password',
+      authVersion: 4,
+      disabled: false,
+      mustChangePassword: false,
+      role: 'USER',
+    });
+    mockVerifyPassword.mockResolvedValueOnce(true);
+    sessionWrites.create.mockRejectedValue(new Error('session insertion failed'));
+    const response = await POST(
+      new NextRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'test@example.com', password: 'password' }),
+      }),
+      { params: Promise.resolve({}) },
+    );
+    expect(response.status).toBe(500);
+    expect(response.headers.get('set-cookie')).toBeNull();
+  });
+
   it('returns 401 for wrong password', async () => {
     const mockUser = {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -176,6 +219,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: true,
       mustChangePassword: false,
       role: 'USER',
@@ -202,6 +246,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: true,
       role: 'USER',
@@ -209,7 +254,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -229,6 +273,7 @@ describe('POST /api/auth/login', () => {
       id: 'admin-123',
       username: 'admin',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'ADMIN',
@@ -236,7 +281,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -259,6 +303,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -266,7 +311,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -290,6 +334,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -297,7 +342,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -322,6 +366,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -329,7 +374,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',
@@ -354,6 +398,7 @@ describe('POST /api/auth/login', () => {
       id: 'user-123',
       username: 'testuser',
       passwordHash: 'hashed-password',
+      authVersion: 4,
       disabled: false,
       mustChangePassword: false,
       role: 'USER',
@@ -361,7 +406,6 @@ describe('POST /api/auth/login', () => {
 
     mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
     mockVerifyPassword.mockResolvedValueOnce(true);
-    mockSignCookieValue.mockReturnValueOnce({ signed: 'signed-cookie-value' });
 
     const request = new NextRequest('http://localhost:3000/api/auth/login', {
       method: 'POST',

@@ -309,13 +309,33 @@ pnpm dev                          # Start development server
 | Vercel          | Production env vars     | Vercel team access  |
 | Local `.env`    | Source of truth         | This machine only   |
 
-For admin production smoke coverage, ensure these env vars are present in `.env`, GitHub Secrets, and Vercel:
+Production admin smoke uses an existing enabled read-only account, not a permanent
+cookie secret. Configure `ADMIN_READONLY_EMAIL` and the existing `DATABASE_URL`,
+`DIRECT_URL`, and `SESSION_SECRET` in GitHub Secrets for the trusted issuance and
+revocation steps only. The browser receives a private, run-specific
+`ADMIN_READONLY_COOKIE_VALUE` with a fixed 60-minute lifetime; it receives no database
+or signing credentials. Do not copy this bearer into Vercel, workflow outputs or logs.
 
-- `ADMIN_READONLY_EMAIL` (seeded read-only admin account)
-- `ADMIN_READONLY_COOKIE_VALUE` (signed cookie used by production admin smoke tests)
+The combined promotion job reconciles the owner account with
+`ADMIN_READONLY_EMAIL` explicitly empty, then issues access only if the separate
+read-only account already satisfies the required role and password-marker checks.
+The build command does not reconcile privileged accounts; generation, migration
+and build failures remain failures rather than becoming a skipped-seed message.
+Provisioning, marker conversion and session activation are separate prerequisites,
+not side effects of a smoke run. Fresh read-only accounts can still block activation.
+See [Read-only smoke access](docs/readonly-smoke-access.md) before rollout.
+
+Other existing smoke/application configuration remains separate:
+
 - `PROD_TEST_USER_EMAIL` / `PROD_TEST_USER_PASSWORD` / `PROD_TEST_USER_ID` / `PROD_TEST_USER_COOKIE_VALUE`
-  (the single read-only `isTestData` account the production smoke suite signs in as)
+  (the dedicated `isTestData` account used by read-only student smoke tests; this
+  account's credentials are not issued or revoked by the admin helper)
 - `ALLOWED_ORIGINS` (every hostname the site is served on, apex included)
+
+Cleanup runs after an issuance attempt even if the browser fails. Only confirmed
+revocation permits uploading a sanitized failure outcome; raw browser reports,
+screenshots, storage state and credential files are not uploaded. A runner loss
+cannot guarantee immediate revocation, and expiry is not reported as cleanup.
 
 GitHub Secrets additionally holds `PRODUCTION_DB_ID` — the Supabase project ref of the
 production database. Two guards compare the staging connection user against it so a

@@ -1,9 +1,9 @@
-import { useCallback } from "react";
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import { getUserId } from "./helpers";
-import type { WebcamRequest } from "./types";
-import type { StudySession } from "@/lib/stores/progress-store";
+import { useCallback } from 'react';
+import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth';
+import { getUserId } from './helpers';
+import type { WebcamRequest } from './types';
+import type { StudySession } from '@/lib/stores/progress-store';
 
 interface HandlersProps {
   disconnect: () => void;
@@ -74,37 +74,30 @@ export function useSessionHandlers({
 
     // End conversation and generate summary
     if (conversationIdRef.current && transcript.length > 0) {
-      const userId = getUserId();
-      if (userId) {
-        try {
-          const response = await csrfFetch(
-            `/api/conversations/${conversationIdRef.current}/end`,
-            {
-              method: "POST",
-              body: JSON.stringify({ userId, reason: "explicit" }),
-            },
-          );
+      try {
+        const userId = getUserId();
+        if (userId) {
+          const response = await csrfFetch(`/api/conversations/${conversationIdRef.current}/end`, {
+            method: 'POST',
+            body: JSON.stringify({ userId, reason: 'explicit' }),
+          });
           if (response.ok) {
             const result = await response.json();
             setSessionSummary(result.summary || null);
-            logger.info("[VoiceSession] Conversation ended", {
+            logger.info('[VoiceSession] Conversation ended', {
               conversationId: conversationIdRef.current,
               summaryLength: result.summary?.length || 0,
             });
           }
-        } catch (error) {
-          logger.error("[VoiceSession] Failed to end conversation", {
-            error: String(error),
-          });
         }
+      } catch (error) {
+        logger.error('[VoiceSession] Failed to end conversation', { error: String(error) });
       }
     }
 
     // Show grade if session was active
     if (currentSession || transcript.length > 0) {
-      const durationMinutes = Math.round(
-        (Date.now() - sessionStartTime.current.getTime()) / 60000,
-      );
+      const durationMinutes = Math.round((Date.now() - sessionStartTime.current.getTime()) / 60000);
       setFinalSessionDuration(durationMinutes);
       setFinalQuestionCount(questionCount.current);
       setShowGrade(true);
@@ -145,10 +138,10 @@ export function useSessionHandlers({
       setWebcamRequest: (req: WebcamRequest) => void,
       setShowWebcam: (show: boolean) => void,
     ) => {
-      if (toolName === "capture_homework") {
+      if (toolName === 'capture_homework') {
         setWebcamRequest({
-          purpose: "homework",
-          instructions: "Mostra il tuo compito o libro",
+          purpose: 'homework',
+          instructions: 'Mostra il tuo compito o libro',
           callId: `manual-${Date.now()}`,
         });
         setShowWebcam(true);
@@ -158,7 +151,7 @@ export function useSessionHandlers({
             "Usa lo strumento create_mindmap per creare ORA una mappa mentale visiva sull'argomento che stiamo discutendo. Genera i nodi e mostrala.",
           quiz: "Usa lo strumento create_quiz per creare ORA un quiz interattivo con domande a scelta multipla sull'argomento. Genera le domande.",
           flashcard:
-            "Usa lo strumento create_flashcards per creare ORA delle flashcard interattive sugli argomenti trattati. Genera le card.",
+            'Usa lo strumento create_flashcards per creare ORA delle flashcard interattive sugli argomenti trattati. Genera le card.',
           search:
             "Usa lo strumento web_search per cercare ORA informazioni aggiornate sull'argomento.",
         };

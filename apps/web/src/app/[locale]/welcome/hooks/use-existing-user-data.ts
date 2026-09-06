@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import type { ExistingUserData } from '../types';
+import { getClientIdentity } from '@/lib/auth/client-auth';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 
 function isTransientFetchError(error: unknown): boolean {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -29,23 +31,27 @@ function isTransientFetchError(error: unknown): boolean {
 }
 
 export function useExistingUserData() {
+  const identity = useClientIdentity();
   const [existingUserData, setExistingUserData] = useState<ExistingUserData | null>(null);
   const [hasCheckedExistingData, setHasCheckedExistingData] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { updateData } = useOnboardingStore();
 
   useEffect(() => {
     async function fetchExistingData() {
       try {
+        if (identity.status === 'anonymous') {
+          setExistingUserData(null);
+          setHasCheckedExistingData(true);
+          return;
+        }
+        if (identity.status !== 'authenticated') return;
         const response = await fetch('/api/onboarding');
         if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            // Anonymous visitor — expected, no Sentry noise
-            setHasCheckedExistingData(true);
-            return;
-          }
           throw new Error(`/api/onboarding ${response.status}`);
         }
         const data = await response.json();
+        if (getClientIdentity() !== identity) return;
 
         if (data.hasExistingData && data.data) {
           setExistingUserData(data.data);
@@ -55,6 +61,7 @@ export function useExistingUserData() {
         }
 
         setHasCheckedExistingData(true);
+        setError(null);
       } catch (error) {
         if (isTransientFetchError(error)) {
           logger.debug('[WelcomePage] Existing-data fetch aborted (transient)', {
@@ -67,14 +74,17 @@ export function useExistingUserData() {
             error instanceof Error ? error : new Error(String(error)),
           );
         }
-        setHasCheckedExistingData(true);
+        setError('ONBOARDING_UNAVAILABLE');
       }
     }
     fetchExistingData();
-  }, [updateData]);
+  }, [updateData, identity]);
 
   return {
     existingUserData,
-    hasCheckedExistingData,
+    hasCheckedExistingData:
+      (identity.status === 'authenticated' || identity.status === 'anonymous') &&
+      hasCheckedExistingData,
+    error: identity.status === 'unavailable' ? identity.reason : error,
   };
 }

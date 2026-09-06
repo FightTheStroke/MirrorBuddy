@@ -4,7 +4,9 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/server';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from '@/lib/auth/server';
+import { createGuestSession } from '@/lib/auth/session-issuance';
+import { setSessionCookies } from '@/lib/auth/session-cookies';
+import { AuthenticationError } from '@/lib/auth/auth-error';
 import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
 import {
   COPPA_AGE_THRESHOLD,
@@ -35,7 +37,7 @@ export const GET = pipe(withSentry('/api/onboarding'))(async () => {
   });
 
   if (!user) {
-    return NextResponse.json(emptyResponse);
+    throw new AuthenticationError('SESSION_REJECTED');
   }
 
   const existingData = buildExistingData(user.onboarding?.data, user.profile);
@@ -76,9 +78,7 @@ export const POST = pipe(
 
   if (!userId) {
     logger.info('Creating new user for onboarding');
-    const user = await prisma.user.create({
-      data: {},
-    });
+    const { user, issued } = await createGuestSession({});
     userId = user.id;
     logger.info('User created', { userId });
 
@@ -93,26 +93,8 @@ export const POST = pipe(
     );
 
     try {
-      const { signCookieValue } = await import('@/lib/auth/server');
-      const signedCookie = signCookieValue(user.id);
       const cookieStore = await cookies();
-      // Server-side auth cookie (httpOnly, signed)
-      cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 365,
-        path: '/',
-      });
-
-      // Client-readable cookie (for client-side userId access)
-      cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 365,
-        path: '/',
-      });
+      setSessionCookies(cookieStore, issued);
 
       logger.info('User cookies set successfully', { userId });
     } catch (cookieError) {

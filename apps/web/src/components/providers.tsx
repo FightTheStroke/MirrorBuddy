@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { AccessibilityProvider, MotionConfigBridge } from '@/components/accessibility';
@@ -18,6 +18,11 @@ import { ActivityTracker } from '@/lib/telemetry/use-activity-tracker';
 import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';
 import { registerOfflineServiceWorker } from '@/lib/pwa/offline-sw-registration';
 import { resolveAccessibleAccentColor } from '@/lib/accessibility/accent-contrast';
+import { IdentityProvider, useClientIdentity } from '@/lib/auth/identity-provider';
+import type { ClientIdentity } from '@/lib/auth/identity-types';
+import { getClientIdentity } from '@/lib/auth/client-auth';
+import { logger } from '@/lib/logger';
+import { IdentityNotice } from '@/components/ui/identity-notice';
 
 // Debug logger - captures all browser errors to file (dev only)
 import '@/lib/client-error-logger';
@@ -26,6 +31,7 @@ import '@/lib/validation/zod-csp-config';
 
 interface ProvidersProps {
   children: React.ReactNode;
+  initialIdentity?: ClientIdentity;
   /**
    * CSP nonce for inline scripts
    * Next.js automatically uses this for hydration scripts
@@ -67,41 +73,45 @@ function AccentColorApplier() {
 
 // Component to initialize stores and sync with database
 function StoreInitializer() {
-  const initialized = useRef(false);
+  const identity = useClientIdentity();
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
     // Migrate old session key (convergio → mirrorbuddy) for existing users
     migrateSessionStorageKey();
 
-    // Initialize stores from database
-    initializeStores().catch(() => {
-      // Silent fail - stores will use in-memory defaults
+    registerOfflineServiceWorker().catch(() => {
+      logger.warn('Offline service worker registration failed');
     });
+    return initializeTelemetry();
+  }, []);
+
+  useEffect(() => {
+    if (identity.status !== 'authenticated') return;
+    let active = true;
+    let hydrated = false;
+    let syncInterval: ReturnType<typeof setupAutoSync> | undefined;
+    // Initialize stores from database
+    initializeStores()
+      .then(() => {
+        if (!active || getClientIdentity() !== identity) return;
+        hydrated = true;
+        syncInterval = setupAutoSync(30000);
+      })
+      .catch(() => {
+        logger.warn('Store hydration failed; retry when identity is refreshed');
+      });
 
     // Load conversation summaries for context
     useConversationFlowStore
       .getState()
       .loadFromServer()
       .catch(() => {
-        // Silent fail - conversations will start fresh
+        logger.warn('Conversation hydration failed; existing state retained');
       });
-
-    // Register service worker for offline support (separate from push notifications)
-    registerOfflineServiceWorker().catch(() => {
-      // Silent fail - offline caching won't work but app still functional
-    });
-
-    // Initialize telemetry
-    const cleanupTelemetry = initializeTelemetry();
-
-    // Setup auto-sync every 30 seconds
-    const syncInterval = setupAutoSync(30000);
 
     // Sync on page unload
     const handleUnload = () => {
+      if (!hydrated || getClientIdentity() !== identity) return;
       const settings = useSettingsStore.getState();
       if (settings.pendingSync) {
         // Use sendBeacon for reliable sync on close (Blob ensures application/json content-type)
@@ -124,11 +134,11 @@ function StoreInitializer() {
     window.addEventListener('beforeunload', handleUnload);
 
     return () => {
-      clearInterval(syncInterval);
-      cleanupTelemetry();
+      active = false;
+      if (syncInterval !== undefined) clearInterval(syncInterval);
       window.removeEventListener('beforeunload', handleUnload);
     };
-  }, []);
+  }, [identity]);
 
   return null;
 }
@@ -187,36 +197,39 @@ function ConditionalUnifiedConsent({ children }: { children: React.ReactNode }) 
   return <UnifiedConsentWall>{children}</UnifiedConsentWall>;
 }
 
-export function Providers({ children, nonce }: ProvidersProps) {
+export function Providers({ children, nonce, initialIdentity }: ProvidersProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      // Fix #4: Explicitly map themes to class names so .light class is added
-      value={{ light: 'light', dark: 'dark' }}
-      // CSP nonce for inline theme script (prevents flash of unstyled content)
-      nonce={nonce}
-    >
-      {/* Keeps <html lang> aligned with the locale route across soft navigation (R4) */}
-      <DocumentLocaleSync />
-      <AccessibilityProvider>
-        {/* Bridge prefers-reduced-motion + a11y profile flag into framer-motion (A11Y-01) */}
-        <MotionConfigBridge>
-          {/* A11yInstantAccess moved to [locale]/layout.tsx for i18n context */}
-          <StagingBanner />
-          <MaintenanceBanner />
-          <ConditionalUnifiedConsent>
-            <StoreInitializer />
-            <AccentColorApplier />
-            <ActivityTracker />
-            {children}
-            <ToastContainer />
-            <IOSInstallBanner />
-          </ConditionalUnifiedConsent>
-        </MotionConfigBridge>
-      </AccessibilityProvider>
-    </ThemeProvider>
+    <IdentityProvider initialIdentity={initialIdentity}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+        // Fix #4: Explicitly map themes to class names so .light class is added
+        value={{ light: 'light', dark: 'dark' }}
+        // CSP nonce for inline theme script (prevents flash of unstyled content)
+        nonce={nonce}
+      >
+        {/* Keeps <html lang> aligned with the locale route across soft navigation (R4) */}
+        <DocumentLocaleSync />
+        <AccessibilityProvider>
+          {/* Bridge prefers-reduced-motion + a11y profile flag into framer-motion (A11Y-01) */}
+          <MotionConfigBridge>
+            {/* A11yInstantAccess moved to [locale]/layout.tsx for i18n context */}
+            <StagingBanner />
+            <MaintenanceBanner />
+            <IdentityNotice />
+            <ConditionalUnifiedConsent>
+              <StoreInitializer />
+              <AccentColorApplier />
+              <ActivityTracker />
+              {children}
+              <ToastContainer />
+              <IOSInstallBanner />
+            </ConditionalUnifiedConsent>
+          </MotionConfigBridge>
+        </AccessibilityProvider>
+      </ThemeProvider>
+    </IdentityProvider>
   );
 }

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { Trash2, Lock, Unlock, X, RefreshCw, Loader2 } from "lucide-react";
-import { csrfFetch } from "@/lib/auth";
-import { BulkTierChangeModal } from "@/components/admin/bulk-tier-change-modal";
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { Trash2, Lock, Unlock, X, RefreshCw, Loader2 } from 'lucide-react';
+import { csrfFetch } from '@/lib/auth';
+import { BulkTierChangeModal } from '@/components/admin/bulk-tier-change-modal';
 
 interface Tier {
   id: string;
@@ -41,7 +41,7 @@ export function UsersBulkActions({
   users = [],
   availableTiers = [],
 }: UsersBulkActionsProps) {
-  const t = useTranslations("admin.users.bulkActions");
+  const t = useTranslations('admin.users.bulkActions');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState<BulkProgress | null>(null);
   const [showTierModal, setShowTierModal] = useState(false);
@@ -85,7 +85,7 @@ export function UsersBulkActions({
 
     if (failed > 0) {
       alert(
-        t("partialFailure", {
+        t('partialFailure', {
           failed: String(failed),
           total: String(ids.length),
         }),
@@ -97,36 +97,36 @@ export function UsersBulkActions({
   };
 
   const handleBulkDisable = async () => {
-    if (!confirm(t("confirmDisable", { count: String(count) }))) return;
+    if (!confirm(t('confirmDisable', { count: String(count) }))) return;
     const ids = Array.from(selectedIds);
-    await executeBulkAction(t("disabling"), ids, (id) =>
-      fetch(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+    await executeBulkAction(t('disabling'), ids, (id) =>
+      csrfFetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ disabled: true }),
       }),
     );
   };
 
   const handleBulkEnable = async () => {
-    if (!confirm(t("confirmEnable", { count: String(count) }))) return;
+    if (!confirm(t('confirmEnable', { count: String(count) }))) return;
     const ids = Array.from(selectedIds);
-    await executeBulkAction(t("enabling"), ids, (id) =>
-      fetch(`/api/admin/users/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+    await executeBulkAction(t('enabling'), ids, (id) =>
+      csrfFetch(`/api/admin/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ disabled: false }),
       }),
     );
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(t("confirmDelete", { count: String(count) }))) return;
+    if (!confirm(t('confirmDelete', { count: String(count) }))) return;
     const ids = Array.from(selectedIds);
-    await executeBulkAction(t("deleting"), ids, (id) =>
+    await executeBulkAction(t('deleting'), ids, (id) =>
       csrfFetch(`/api/admin/users/${id}`, {
-        method: "DELETE",
-        body: JSON.stringify({ reason: "bulk_admin_delete" }),
+        method: 'DELETE',
+        body: JSON.stringify({ reason: 'bulk_admin_delete' }),
       }),
     );
   };
@@ -146,9 +146,7 @@ export function UsersBulkActions({
                 <span>
                   {progress.current} / {progress.total}
                 </span>
-                <span>
-                  {Math.round((progress.current / progress.total) * 100)}%
-                </span>
+                <span>{Math.round((progress.current / progress.total) * 100)}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div
@@ -160,7 +158,7 @@ export function UsersBulkActions({
               </div>
               {progress.failed > 0 && (
                 <p className="text-xs text-destructive mt-2">
-                  {progress.failed} {t("failed")}
+                  {progress.failed} {t('failed')}
                 </p>
               )}
             </div>
@@ -171,7 +169,7 @@ export function UsersBulkActions({
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div className="flex items-center gap-3 px-4 py-3 bg-popover text-popover-foreground border border-border rounded-xl shadow-xl">
           <span className="text-sm font-medium">
-            {count} {t("selected")}
+            {count} {t('selected')}
           </span>
           <div className="h-4 w-px bg-border" />
           <Button
@@ -180,10 +178,10 @@ export function UsersBulkActions({
             onClick={() => setShowTierModal(true)}
             disabled={isLoading}
             className="hover:bg-accent"
-            aria-label={t("changeTierForSelectedUsers")}
+            aria-label={t('changeTierForSelectedUsers')}
           >
             <RefreshCw className="w-4 h-4 mr-1" />
-            {t("changeTier")}
+            {t('changeTier')}
           </Button>
           <Button
             size="sm"
@@ -193,7 +191,7 @@ export function UsersBulkActions({
             className="hover:bg-accent"
           >
             <Unlock className="w-4 h-4 mr-1" />
-            {t("enable")}
+            {t('enable')}
           </Button>
           <Button
             size="sm"
@@ -203,7 +201,7 @@ export function UsersBulkActions({
             className="hover:bg-accent"
           >
             <Lock className="w-4 h-4 mr-1" />
-            {t("disable")}
+            {t('disable')}
           </Button>
           <Button
             size="sm"
@@ -213,7 +211,7 @@ export function UsersBulkActions({
             className="text-destructive hover:bg-destructive/10"
           >
             <Trash2 className="w-4 h-4 mr-1" />
-            {t("delete")}
+            {t('delete')}
           </Button>
           <div className="h-4 w-px bg-border" />
           <Button

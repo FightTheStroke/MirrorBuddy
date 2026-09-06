@@ -7,7 +7,20 @@
  */
 
 // Client-side auth
-export { getUserIdFromCookie, isAuthenticated } from './client-auth';
+export {
+  getUserIdFromCookie,
+  isAuthenticated,
+  getClientIdentity,
+  setClientIdentity,
+  refreshClientIdentity,
+  requireIdentityRefresh,
+  requireClientUserId,
+  subscribeClientIdentity,
+  logoutClient,
+  IdentityUnavailableError,
+  type ClientIdentity,
+  type LogoutScope,
+} from './client-auth';
 
 // CSRF protection (client)
 export { csrfFetch, getCSRFToken, clearCSRFToken } from './csrf-client';

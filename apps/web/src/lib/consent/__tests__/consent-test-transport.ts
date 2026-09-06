@@ -1,8 +1,23 @@
 import { vi } from 'vitest';
 import { AUTH_COOKIE_CLIENT, clearCSRFToken, isAuthenticated } from '@/lib/auth';
 import { resetConsentSnapshot } from '../consent-store';
+import { setClientIdentity } from '@/lib/auth';
 
-export function setConsentTestAccount(authenticated = false): void {
+export function setConsentTestAccount(authenticated: boolean | string = false): void {
+  setClientIdentity(
+    authenticated
+      ? {
+          status: 'authenticated',
+          userId:
+            typeof authenticated === 'string'
+              ? authenticated
+              : '00000000-0000-4000-8000-000000000001',
+          role: 'USER',
+          legacyOrigin: false,
+          needsLegacyUpgrade: false,
+        }
+      : { status: 'anonymous' },
+  );
   document.cookie = authenticated
     ? `${AUTH_COOKIE_CLIENT}=00000000-0000-4000-8000-000000000001; path=/`
     : `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;

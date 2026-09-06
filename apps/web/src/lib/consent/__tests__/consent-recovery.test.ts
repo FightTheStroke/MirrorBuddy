@@ -13,9 +13,8 @@ import {
   syncUnifiedConsentToServer,
 } from '../unified-consent-storage';
 import { getConsentSyncSnapshot, resetConsentSnapshot } from '../consent-store';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
 import { UNIFIED_CONSENT_KEY } from '../unified-consent';
-import { installConsentTransportMock } from './consent-test-transport';
+import { installConsentTransportMock, setConsentTestAccount } from './consent-test-transport';
 
 const date = '2026-09-01T00:00:00.000Z';
 const cookies = {
@@ -29,7 +28,7 @@ const serverTerms = { accepted: true, version: '1.0', acceptedAt: date };
 const cookieEnvelope = { consent: cookies, analyticsAllowed: true };
 const emptyEnvelope = { consent: null, analyticsAllowed: false };
 function signIn() {
-  document.cookie = `${AUTH_COOKIE_CLIENT}=00000000-0000-4000-8000-000000000001; path=/`;
+  setConsentTestAccount(true);
 }
 
 describe('T6 recovery boundaries', () => {
@@ -37,13 +36,13 @@ describe('T6 recovery boundaries', () => {
     localStorage.clear();
     sessionStorage.clear();
     resetConsentSnapshot();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
     installConsentTransportMock();
   });
   afterEach(() => {
     vi.restoreAllMocks();
     resetConsentSnapshot();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
   });
 
   it('retains an explicit terms decision through a failed read without changing analytics', async () => {
@@ -225,7 +224,7 @@ describe('T6 recovery boundaries', () => {
       (error: unknown) => error,
     );
     clearUnifiedConsent();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
     resolve(Response.json(serverTerms));
     await expect(loading).resolves.toMatchObject({ code: 'superseded' });
     expect(getUnifiedConsent()).toBeNull();

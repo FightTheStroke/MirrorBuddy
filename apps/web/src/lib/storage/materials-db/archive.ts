@@ -3,9 +3,9 @@
 // Unified material record for Archive View
 // ============================================================================
 
-import { logger } from "@/lib/logger";
-import { getUserIdFromCookie } from "@/lib/auth";
-import type { ToolType } from "@/types/tools";
+import { logger } from '@/lib/logger';
+import { getUserIdFromCookie } from '@/lib/auth/client-auth';
+import type { ToolType } from '@/types/tools';
 
 // ============================================================================
 // UNIFIED MATERIAL RECORD (for Archive View)
@@ -22,7 +22,7 @@ export interface MaterialRecord {
   sessionId?: string;
   subject?: string;
   preview?: string;
-  status: "active" | "archived" | "deleted";
+  status: 'active' | 'archived' | 'deleted';
   // User interaction (Issue #37 - Archive features)
   userRating?: number; // 1-5 stars
   isBookmarked: boolean;
@@ -36,26 +36,26 @@ export interface MaterialRecord {
  * Fetches from the /api/materials endpoint which queries Prisma
  */
 export async function getActiveMaterials(): Promise<MaterialRecord[]> {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     return [];
   }
 
   try {
     // Get userId from cookie
-    const userId = getUserIdFromCookie() || "default-user";
+    const userId = getUserIdFromCookie();
+    if (userId === null) return [];
 
-    const response = await fetch(
-      `/api/materials?userId=${userId}&status=active`,
-    );
+    const response = await fetch(`/api/materials?userId=${userId}&status=active`);
     if (!response.ok) {
-      logger.error("Failed to fetch materials", { status: response.status });
-      return [];
+      logger.error('Failed to fetch materials', { status: response.status });
+      throw new Error(`Materials request failed (${response.status})`);
     }
 
     const data = await response.json();
+    if (getUserIdFromCookie() !== userId) throw new Error('Material identity changed');
     return data.materials || [];
   } catch (error) {
-    logger.error("Error fetching active materials", undefined, error);
-    return [];
+    logger.error('Error fetching active materials', undefined, error);
+    throw error;
   }
 }

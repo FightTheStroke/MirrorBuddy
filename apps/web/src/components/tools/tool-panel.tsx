@@ -16,17 +16,10 @@ import { LiveSummary } from './live-summary';
 import { StudentSummaryEditor } from './student-summary-editor';
 import { cn } from '@/lib/utils';
 import { clientLogger as logger } from '@/lib/logger/client';
-import { getUserIdFromCookie } from '@/lib/auth';
+import { requireClientUserId as getUserId } from '@/lib/auth/client-auth';
 import { csrfFetch } from '@/lib/auth';
 import type { ToolState, SummaryData, StudentSummaryData } from '@/types/tools';
 import type { QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
-
-// Get user ID from cookie (secure, server-set authentication)
-function getUserId(): string {
-  if (typeof window === 'undefined') return 'default-user';
-  const userId = getUserIdFromCookie();
-  return userId ?? 'default-user';
-}
 
 interface ToolPanelProps {
   tool: ToolState | null;

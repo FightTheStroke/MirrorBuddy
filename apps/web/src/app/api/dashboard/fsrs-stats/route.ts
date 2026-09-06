@@ -7,6 +7,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import { analyticsContext, withMetricTruth } from '@/lib/admin/analytics-metric-truth';
+import { snapshotContext } from '@/lib/admin/metric-truth';
 
 export const revalidate = 0;
 export const GET = pipe(
@@ -14,8 +16,12 @@ export const GET = pipe(
   withAdmin,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get('days') ?? '7', 10);
-  const startDate = new Date();
+  const days = Number(searchParams.get('days') ?? '7');
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return NextResponse.json({ error: 'Invalid days' }, { status: 400 });
+  }
+  const endDate = new Date();
+  const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
 
   // Admin dashboard: system-wide stats (not filtered by admin's own userId)
@@ -31,7 +37,7 @@ export const GET = pipe(
       where: {
         category: 'flashcard',
         action: 'review',
-        timestamp: { gte: startDate },
+        timestamp: { gte: startDate, lte: endDate },
         isTestData: false,
       },
       select: {
@@ -62,9 +68,9 @@ export const GET = pipe(
     totalDifficulty += review.value || 0;
   }
 
-  const accuracy = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0;
+  const accuracy = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : null;
   const avgDifficulty =
-    totalReviews > 0 ? Math.round((totalDifficulty / totalReviews) * 10) / 10 : 0;
+    totalReviews > 0 ? Math.round((totalDifficulty / totalReviews) * 10) / 10 : null;
 
   // State distribution
   const stateDistribution: Record<string, number> = {};
@@ -80,7 +86,7 @@ export const GET = pipe(
   }
 
   // F-06: Cards due today system-wide (exclude test data)
-  const now = new Date();
+  const now = endDate;
   const cardsDueToday = await prisma.flashcardProgress.count({
     where: {
       nextReview: { lte: now },
@@ -88,17 +94,38 @@ export const GET = pipe(
     },
   });
 
-  return NextResponse.json({
-    period: { days, startDate: startDate.toISOString() },
-    summary: {
-      totalCards,
-      totalReviews,
-      correctReviews,
-      accuracy,
-      avgDifficulty,
-      cardsDueToday,
-    },
-    stateDistribution,
-    dailyReviews,
-  });
+  const cardsContext = {
+    ...snapshotContext('FlashcardProgress (isTestData=false)', now.toISOString()),
+    population: 'records' as const,
+  };
+  return NextResponse.json(
+    withMetricTruth(
+      {
+        period: { days, startDate: startDate.toISOString() },
+        summary: {
+          totalCards,
+          totalReviews,
+          correctReviews,
+          accuracy,
+          avgDifficulty,
+          cardsDueToday,
+        },
+        stateDistribution,
+        dailyReviews,
+      },
+      analyticsContext('TelemetryEvent (flashcard review, isTestData=false)', startDate, now),
+      {
+        'summary.totalCards': cardsContext,
+        'summary.cardsDueToday': cardsContext,
+        'summary.accuracy': { reason: totalReviews === 0 ? 'zeroDenominator' : null },
+        'summary.avgDifficulty': { reason: totalReviews === 0 ? 'zeroDenominator' : null },
+        ...Object.fromEntries(
+          Object.keys(stateDistribution).map((state) => [
+            `stateDistribution.${state}`,
+            cardsContext,
+          ]),
+        ),
+      },
+    ),
+  );
 });

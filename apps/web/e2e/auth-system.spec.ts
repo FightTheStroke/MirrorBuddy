@@ -4,7 +4,8 @@
  * F-10: Auth System Tests
  */
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
+import { loginTestUser } from './helpers/auth-session';
 
 test.describe('OAuth Flow - Google Integration', () => {
   test('GET /api/auth/google - handles OAuth configuration check', async ({ request }) => {
@@ -84,10 +85,7 @@ test.describe('OAuth Flow - Google Integration', () => {
 
 test.describe('CSRF Protection', () => {
   test('Session cookies use SameSite=Lax', async ({ request }) => {
-    // Create fresh request to get Set-Cookie header
-    const response = await request.get('/api/user', {
-      headers: { Cookie: '' }, // Clear cookies to get fresh Set-Cookie
-    });
+    const { response } = await loginTestUser(request);
     expect(response.ok()).toBeTruthy();
 
     // Get Set-Cookie header (may be split or combined)
@@ -99,9 +97,7 @@ test.describe('CSRF Protection', () => {
   });
 
   test('Session cookies are HttpOnly', async ({ request }) => {
-    const response = await request.get('/api/user', {
-      headers: { Cookie: '' },
-    });
+    const { response } = await loginTestUser(request);
     expect(response.ok()).toBeTruthy();
 
     const setCookie = response.headers()['set-cookie'] || '';
@@ -198,16 +194,9 @@ test.describe('Session Security', () => {
     const userResponse = await request.get('/api/user');
     expect(userResponse.ok()).toBeTruthy();
 
-    const setCookie = userResponse.headers()['set-cookie'];
-    const signedValue = setCookie
-      ?.split(', ')
-      .find((c: string) => c.startsWith('mirrorbuddy-user-id='))
-      ?.split('=')[1]
-      ?.split(';')[0];
-
-    // Extract unsigned userId (without signature)
-    const lastDot = signedValue?.lastIndexOf('.') ?? -1;
-    const unsignedUserId = signedValue?.substring(0, lastDot) ?? 'test-user';
+    // Deliberate unsigned-identity rejection: never derive a userId from an opaque handle.
+    const { id: unsignedUserId } = await userResponse.json();
+    expect(typeof unsignedUserId).toBe('string');
 
     // Try to access protected endpoint with unsigned cookie directly in header
     const settingsResponse = await request.get('/api/user/settings', {

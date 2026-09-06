@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { validateAdminAuth } from '@/lib/auth/server';
+import { authenticatedFixture } from '@/test/fixtures/session-compat';
 import { prisma } from '@/lib/db';
 
 // Mock Sentry
@@ -44,9 +45,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should reject non-admin users', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('user1'),
       isAdmin: false,
-      userId: 'user1',
     });
 
     const request = new NextRequest('http://localhost/api/admin/users/bulk/tier', {
@@ -67,9 +67,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should validate required fields', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('admin1'),
       isAdmin: true,
-      userId: 'admin1',
     });
 
     const request = new NextRequest('http://localhost/api/admin/users/bulk/tier', {
@@ -90,9 +89,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should validate tierId is provided', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('admin1'),
       isAdmin: true,
-      userId: 'admin1',
     });
 
     const request = new NextRequest('http://localhost/api/admin/users/bulk/tier', {
@@ -112,9 +110,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should check if tier exists', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('admin1'),
       isAdmin: true,
-      userId: 'admin1',
     });
 
     vi.mocked(prisma.tierDefinition.findUnique).mockResolvedValue(null);
@@ -137,9 +134,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should successfully change tier for multiple users', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('admin1'),
       isAdmin: true,
-      userId: 'admin1',
     });
 
     const mockTier = {
@@ -206,9 +202,8 @@ describe('POST /api/admin/users/bulk/tier', () => {
 
   it('should handle partial failures gracefully', async () => {
     vi.mocked(validateAdminAuth).mockResolvedValue({
-      authenticated: true,
+      ...authenticatedFixture('admin1'),
       isAdmin: true,
-      userId: 'admin1',
     });
 
     const mockTier = {

@@ -12,7 +12,7 @@ import {
   syncUnifiedConsentToServer,
 } from '../unified-consent-storage';
 import { getConsentSyncSnapshot, resetConsentSnapshot } from '../consent-store';
-import { AUTH_COOKIE_CLIENT, AUTH_COOKIE_NAME, clearCSRFToken, isAuthenticated } from '@/lib/auth';
+import { AUTH_COOKIE_NAME, clearCSRFToken, isAuthenticated } from '@/lib/auth';
 import { setConsentTestAccount } from './consent-test-transport';
 
 function respond(input: RequestInfo | URL, init?: RequestInit): Response {
@@ -38,7 +38,7 @@ describe('T6 honest consent writes', () => {
     sessionStorage.clear();
     resetConsentSnapshot();
     clearCSRFToken();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
     document.cookie = `${AUTH_COOKIE_NAME}=; path=/; max-age=0`;
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => respond(input, init));
   });

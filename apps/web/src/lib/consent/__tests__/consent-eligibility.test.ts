@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AUTH_COOKIE_CLIENT } from '@/lib/auth';
+import { setClientIdentity } from '@/lib/auth';
 import {
   getUnifiedConsent,
   hasAnalyticsConsent,
@@ -13,7 +13,7 @@ import {
 } from '../unified-consent-storage';
 import { getConsentSyncSnapshot, resetConsentSnapshot } from '../consent-store';
 import { UNIFIED_CONSENT_KEY } from '../unified-consent';
-import { installConsentTransportMock } from './consent-test-transport';
+import { installConsentTransportMock, setConsentTestAccount } from './consent-test-transport';
 
 const account = '00000000-0000-4000-8000-000000000001';
 const otherAccount = '00000000-0000-4000-8000-000000000002';
@@ -27,7 +27,7 @@ const cookies = {
 };
 const terms = { accepted: true, version: '1.0', acceptedAt: date };
 function signIn(userId = account) {
-  document.cookie = `${AUTH_COOKIE_CLIENT}=${userId}; path=/`;
+  setConsentTestAccount(userId);
 }
 function httpPermission(analyticsAllowed: boolean, persisted = true) {
   vi.mocked(fetch).mockImplementation(async (input, init) => {
@@ -47,13 +47,13 @@ describe('server-confirmed optional-processing eligibility', () => {
   beforeEach(() => {
     localStorage.clear();
     sessionStorage.clear();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
     installConsentTransportMock();
   });
   afterEach(() => {
     vi.restoreAllMocks();
     resetConsentSnapshot();
-    document.cookie = `${AUTH_COOKIE_CLIENT}=; path=/; max-age=0`;
+    setConsentTestAccount(false);
   });
 
   it('guest receipt preserves study and choice but cannot permit collection', async () => {
@@ -177,12 +177,12 @@ describe('server-confirmed optional-processing eligibility', () => {
     unsubscribe();
   });
 
-  it('denies rather than throwing from the permission getter for malformed auth context', async () => {
+  it('denies rather than throwing from the permission getter for unavailable auth context', async () => {
     signIn();
     httpPermission(true);
     await syncUnifiedConsentToServer(saveAnalyticsConsent(true));
-    document.cookie = `${AUTH_COOKIE_CLIENT}=%; path=/`;
+    setClientIdentity({ status: 'unavailable', reason: 'SESSION_UNAVAILABLE' });
     expect(hasAnalyticsConsent()).toBe(false);
-    expect(getConsentSyncSnapshot().error?.code).toBe('invalid-response');
+    expect(getConsentSyncSnapshot().confirmations.analytics).toBe('persisted');
   });
 });

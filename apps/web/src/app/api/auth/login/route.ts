@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-import {
-  verifyPassword,
-  signCookieValue,
-  AUTH_COOKIE_NAME,
-  AUTH_COOKIE_CLIENT,
-} from '@/lib/auth/server';
+import { verifyPassword } from '@/lib/auth/server';
+import { issuePasswordSession } from '@/lib/auth/session-issuance';
+import { setSessionCookies } from '@/lib/auth/session-cookies';
+import { safeReadJson } from '@/lib/api/safe-json';
+import { getPresentedSessionToken } from '@/lib/auth/session-auth';
 import { RATE_LIMITS } from '@/lib/rate-limit';
 import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
 import { hashPII } from '@/lib/security';
@@ -17,7 +16,7 @@ const log = logger.child({ module: 'auth/login' });
 /**
  * Validate redirect URL - must be relative (start with /) to prevent open redirect
  */
-function isValidRedirectUrl(url: string | undefined): boolean {
+function isValidRedirectUrl(url: unknown): boolean {
   if (!url) return false;
   // Only allow relative URLs starting with /
   // Prevent open redirects (e.g., https://evil.com, //evil.com, \/\/evil.com)
@@ -28,7 +27,13 @@ export const POST = pipe(
   withSentry('/api/auth/login'),
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),
 )(async (ctx) => {
-  const { username, email, password, redirect } = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  if (!body || typeof body !== 'object')
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  const username = 'username' in body ? body.username : undefined;
+  const email = 'email' in body ? body.email : undefined;
+  const password = 'password' in body ? body.password : undefined;
+  const redirect = 'redirect' in body ? body.redirect : undefined;
 
   // Accept either email or username (email preferred)
   const identifier = email || username;
@@ -69,6 +74,7 @@ export const POST = pipe(
       disabled: true,
       mustChangePassword: true,
       role: true,
+      authVersion: true,
     },
   });
 
@@ -87,7 +93,14 @@ export const POST = pipe(
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  const signed = signCookieValue(user.id);
+  const issued = await issuePasswordSession(
+    user.id,
+    {
+      passwordHash: user.passwordHash,
+      authVersion: user.authVersion,
+    },
+    await getPresentedSessionToken(),
+  );
   log.info('User logged in successfully', { userId: user.id });
 
   // Funnel: FIRST_LOGIN (non-blocking, with deduplication)
@@ -97,7 +110,7 @@ export const POST = pipe(
     await recordStageTransition({ userId: user.id }, 'FIRST_LOGIN', {
       source: 'password_login',
     });
-  })().catch(() => {});
+  })().catch(() => log.warn('Login funnel update failed'));
 
   const responseData: Record<string, unknown> = {
     user: {
@@ -115,23 +128,7 @@ export const POST = pipe(
 
   const response = NextResponse.json(responseData, { status: 200 });
 
-  // Server-side auth cookie (httpOnly, signed)
-  response.cookies.set(AUTH_COOKIE_NAME, signed.signed, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60,
-    path: '/',
-  });
-
-  // Client-readable cookie (for client-side userId access)
-  response.cookies.set(AUTH_COOKIE_CLIENT, user.id, {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60,
-    path: '/',
-  });
+  setSessionCookies(response.cookies, issued);
 
   return response;
 });

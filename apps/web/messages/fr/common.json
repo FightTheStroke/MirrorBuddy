@@ -1,5 +1,14 @@
 {
   "common": {
+    "session": {
+      "logoutCurrent": "Se déconnecter de cette session",
+      "logoutAll": "Se déconnecter de tous les appareils",
+      "loggingOut": "Déconnexion en cours…",
+      "logoutFailed": "La déconnexion a échoué. Vos données n’ont pas été effacées. Réessayez.",
+      "legacyFamily": "Cette session provient d’une ancienne connexion : la déconnexion termine aussi les autres anciennes connexions de ce compte. Les sessions issues d’une nouvelle connexion restent actives.",
+      "unavailable": "Nous ne pouvons pas vérifier votre connexion. Les opérations sur votre compte sont suspendues ; vos choix sont conservés.",
+      "retry": "Vérifier à nouveau la connexion"
+    },
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

@@ -11,6 +11,7 @@ export type ConsentErrorCode =
   | 'http'
   | 'invalid-response'
   | 'invalid-intent'
+  | 'identity'
   | 'superseded';
 export class ConsentSyncError extends Error {
   readonly retryable: boolean;

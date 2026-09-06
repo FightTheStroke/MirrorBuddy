@@ -7,6 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { metricTruth, snapshotContext, type MetricTruth } from '@/lib/admin/metric-truth';
 import {
   getAllExternalServiceUsage,
   getServiceAlerts,
@@ -30,6 +31,7 @@ export const GET = pipe(
       usagePercent: number;
       status: string;
       period: string;
+      truth: MetricTruth;
     }>
   > = {};
 
@@ -44,6 +46,13 @@ export const GET = pipe(
       usagePercent: usage.usagePercent,
       status: usage.status,
       period: usage.period,
+      truth: metricTruth(usage.usagePercent, {
+        source: 'TelemetryEvent (external_api) / configured quota',
+        computedAt: usage.computedAt ?? null,
+        window: usage.window ?? { start: null, end: null },
+        population: 'recordedTelemetry',
+        estimate: 'quotaAssumption',
+      }),
     });
   }
 
@@ -55,6 +64,10 @@ export const GET = pipe(
   const warningCount = alerts.filter((a) => a.status === 'warning').length;
 
   return NextResponse.json({
+    provenance: metricTruth(Object.keys(byService).length, {
+      ...snapshotContext('TelemetryEvent (external_api)', new Date().toISOString()),
+      population: 'recordedTelemetry',
+    }),
     summary: {
       totalServices: Object.keys(byService).length,
       hasAlerts,

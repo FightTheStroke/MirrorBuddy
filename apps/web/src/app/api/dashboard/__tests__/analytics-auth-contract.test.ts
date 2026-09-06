@@ -54,17 +54,26 @@ describe.each(['ADMIN_READONLY', 'ADMIN'] as const)(
           dailyBreakdown: { '2026-09-05': { sessions: 2, cost: 0.125, tokens: 150 } },
         };
         expect(response.status).toBe(200);
-        expect(await response.json()).toEqual(expected);
+        const actual = await response.json();
+        expect(actual).toMatchObject(expected);
+        expect(actual.metrics['summary.totalSessions']).toMatchObject({
+          value: 2,
+          population: 'recordedTelemetry',
+          coverage: null,
+        });
         expect(mocks.aggregate).toHaveBeenCalledWith(
           expect.objectContaining({
-            where: { createdAt: { gte: startDate }, isTestData: false },
+            where: { createdAt: { gte: startDate, lte: new Date() }, isTestData: false },
           }),
         );
         expect(mocks.groupBy).toHaveBeenCalledTimes(3);
         for (const [args] of mocks.groupBy.mock.calls) {
-          expect(args.where).toMatchObject({ createdAt: { gte: startDate }, isTestData: false });
+          expect(args.where).toMatchObject({
+            createdAt: { gte: startDate, lte: new Date() },
+            isTestData: false,
+          });
         }
-        expect(mocks.costStats).toHaveBeenCalledWith(startDate, new Date());
+        expect(mocks.costStats).toHaveBeenCalledWith(startDate, new Date(), true);
       },
     );
 
@@ -129,7 +138,7 @@ describe.each(['ADMIN_READONLY', 'ADMIN'] as const)(
         },
       };
       expect(response.status).toBe(200);
-      expect(await response.json()).toEqual(expected);
+      expect(await response.json()).toMatchObject(expected);
       expect(mocks.usage).toHaveBeenCalledOnce();
       expect(mocks.alerts).toHaveBeenCalledOnce();
     });

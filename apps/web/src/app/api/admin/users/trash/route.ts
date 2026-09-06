@@ -2,28 +2,32 @@ import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { getUserList } from '@/lib/admin/user-list-service';
+import { UserListQueryError } from '@/lib/admin/user-list-query';
 
 export const revalidate = 0;
 export const GET = pipe(
   withSentry('/api/admin/users/trash'),
   withAdminReadOnly,
-)(async () => {
-  const backups = await prisma.deletedUserBackup.findMany({
-    orderBy: { deletedAt: 'desc' },
-    take: 500,
-    select: {
-      userId: true,
-      email: true,
-      username: true,
-      role: true,
-      deletedAt: true,
-      purgeAt: true,
-      deletedBy: true,
-      reason: true,
-    },
-  });
-
-  return NextResponse.json({ backups });
+)(async (ctx) => {
+  try {
+    const params = new URL(ctx.req.url).searchParams;
+    params.set('tab', 'trash');
+    const page = await getUserList(params);
+    return NextResponse.json({
+      backups: page.backups,
+      pagination: {
+        page: page.query.page,
+        pageSize: page.query.pageSize,
+        total: page.total,
+        totalPages: page.totalPages,
+      },
+    });
+  } catch (error) {
+    if (error instanceof UserListQueryError)
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    throw error;
+  }
 });
 
 export const DELETE = pipe(

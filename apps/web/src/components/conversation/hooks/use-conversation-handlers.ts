@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
-import { getOrCreateUserId, endConversationWithSummary } from '../utils/conversation-helpers';
+import { endConversationWithSummary } from '../utils/conversation-helpers';
 import type { ExtendedStudentProfile } from '@/types';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 
@@ -34,11 +34,10 @@ export function useConversationHandlers({
       setIsVoiceActive(false);
       setMode('text');
 
-      const userId = getOrCreateUserId();
       const conversationId = activeCharacter
         ? conversationsByCharacter[activeCharacter.id]?.conversationId
         : null;
-      if (userId && conversationId) {
+      if (conversationId) {
         logger.info('Ending voice call, generating summary', { conversationId });
         await endConversationWithSummary(conversationId);
       }
@@ -72,4 +71,3 @@ export function useConversationHandlers({
     handleGoBack,
   };
 }
-

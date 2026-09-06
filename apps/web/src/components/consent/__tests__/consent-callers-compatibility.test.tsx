@@ -21,6 +21,7 @@ import {
   clearCSRFToken,
 } from '@/lib/auth';
 import { getTranslation } from '@/test/i18n-helpers';
+import { setConsentTestAccount } from '@/lib/consent/__tests__/consent-test-transport';
 
 const t = getTranslation;
 const unexpectedRequests: string[] = [];
@@ -30,6 +31,7 @@ describe('T5 actual consent caller compatibility', () => {
     localStorage.clear();
     sessionStorage.clear();
     resetConsentSnapshot();
+    setConsentTestAccount(false);
     clearCSRFToken();
     unexpectedRequests.length = 0;
     vi.stubGlobal(

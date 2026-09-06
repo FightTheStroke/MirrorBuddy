@@ -3,13 +3,17 @@
  * Aggregates telemetry events with category='accessibility'
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
+import {
+  analyticsContext,
+  withMetricTruth,
+  type AnalyticsMetricPayload,
+} from '@/lib/admin/analytics-metric-truth';
 
 export const revalidate = 0;
-export interface A11yStatsData {
+export interface A11yStatsData extends AnalyticsMetricPayload {
   period: { days: number; startDate: string };
   summary: {
     totalActivations: number;
@@ -22,12 +26,16 @@ export interface A11yStatsData {
 }
 
 export const GET = pipe(
-  withSentry("/api/dashboard/a11y-stats"),
+  withSentry('/api/dashboard/a11y-stats'),
   withAdmin,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get("days") ?? "7", 10);
-  const startDate = new Date();
+  const days = Number(searchParams.get('days') ?? '7');
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return NextResponse.json({ error: 'Invalid days' }, { status: 400 });
+  }
+  const endDate = new Date();
+  const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
   startDate.setHours(0, 0, 0, 0);
 
@@ -35,8 +43,8 @@ export const GET = pipe(
   // Query accessibility events
   const events = await prisma.telemetryEvent.findMany({
     where: {
-      category: "accessibility",
-      timestamp: { gte: startDate },
+      category: 'accessibility',
+      timestamp: { gte: startDate, lte: endDate },
       isTestData: false,
     },
     select: {
@@ -62,20 +70,20 @@ export const GET = pipe(
   for (const event of events) {
     uniqueSessions.add(event.sessionId);
 
-    if (event.action === "profile_activated" && event.label) {
+    if (event.action === 'profile_activated' && event.label) {
       totalActivations++;
       byProfile[event.label] = (byProfile[event.label] ?? 0) + 1;
 
       // Daily breakdown
-      const day = event.timestamp.toISOString().split("T")[0];
+      const day = event.timestamp.toISOString().split('T')[0];
       dailyActivations[day] = (dailyActivations[day] ?? 0) + 1;
     }
 
-    if (event.action === "setting_changed" && event.label) {
+    if (event.action === 'setting_changed' && event.label) {
       byToggle[event.label] = (byToggle[event.label] ?? 0) + 1;
     }
 
-    if (event.action === "reset_to_defaults") {
+    if (event.action === 'reset_to_defaults') {
       resetCount++;
     }
   }
@@ -95,5 +103,10 @@ export const GET = pipe(
     dailyActivations,
   };
 
-  return NextResponse.json(response);
+  return NextResponse.json(
+    withMetricTruth(
+      response,
+      analyticsContext('TelemetryEvent (accessibility, isTestData=false)', startDate, endDate),
+    ),
+  );
 });

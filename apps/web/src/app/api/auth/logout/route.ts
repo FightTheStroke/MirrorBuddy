@@ -1,43 +1,47 @@
-import { cookies } from "next/headers";
-import { logger } from "@/lib/logger";
-import {
-  AUTH_COOKIE_NAME,
-  AUTH_COOKIE_CLIENT,
-  VISITOR_COOKIE_NAME,
-  SIMULATED_TIER_COOKIE,
-} from "@/lib/auth";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-
+import { cookies } from 'next/headers';
+import { validateAuth, type AuthResult } from '@/lib/auth/session-auth';
+import { AuthenticationError } from '@/lib/auth/auth-error';
+import { revokeSession } from '@/lib/auth/session-revocation';
+import { clearSessionCookies } from '@/lib/auth/session-cookies';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
-const log = logger.child({ module: "api/auth/logout" });
-
 export const POST = pipe(
-  withSentry("/api/auth/logout"),
+  withSentry('/api/auth/logout'),
   withCSRF,
-)(async () => {
-  const cookieStore = await cookies();
-  const isProduction = process.env.NODE_ENV === "production";
-
-  // Cookie deletion options
-  const deleteCookie = (name: string, httpOnly: boolean) => {
-    cookieStore.set(name, "", {
-      maxAge: 0,
-      expires: new Date(0),
-      path: "/",
-      httpOnly,
-      secure: isProduction,
-      sameSite: "lax",
-    });
-  };
-
-  // Clear all auth-related cookies to allow fresh login as different user
-  deleteCookie(AUTH_COOKIE_NAME, true); // Server-side auth
-  deleteCookie(AUTH_COOKIE_CLIENT, false); // Client-side display
-  deleteCookie(VISITOR_COOKIE_NAME, true); // Trial session tracking
-  deleteCookie(SIMULATED_TIER_COOKIE, true); // Admin tier simulation
-
-  log.info("User logged out - all session cookies cleared");
-
+)(async (ctx) => {
+  const text = await ctx.req.text();
+  let body: unknown = {};
+  try {
+    if (text.trim()) body = JSON.parse(text);
+  } catch {
+    return Response.json({ error: 'Invalid logout request' }, { status: 400 });
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return Response.json({ error: 'Invalid logout request' }, { status: 400 });
+  const scope = 'scope' in body ? body.scope : 'current';
+  if (scope !== 'current' && scope !== 'all')
+    return Response.json({ error: 'Invalid logout scope' }, { status: 400 });
+  let auth: AuthResult;
+  try {
+    auth = await validateAuth();
+  } catch (error) {
+    if (
+      scope !== 'current' ||
+      !(error instanceof AuthenticationError) ||
+      error.code !== 'SESSION_REJECTED'
+    )
+      throw error;
+    clearSessionCookies(await cookies());
+    return Response.json({ success: true });
+  }
+  // A later revocation race must still fail; recovery requires a fresh credential read.
+  if (auth.authenticated) await revokeSession(auth.session, scope);
+  else if (scope === 'all')
+    return Response.json(
+      { error: 'Authentication required', code: 'AUTH_ABSENT' },
+      { status: 401 },
+    );
+  clearSessionCookies(await cookies());
   return Response.json({ success: true });
 });

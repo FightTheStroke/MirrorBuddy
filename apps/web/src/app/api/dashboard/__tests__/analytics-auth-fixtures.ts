@@ -3,6 +3,7 @@ import type { User } from '@prisma/client';
 
 const mocks = vi.hoisted(() => ({
   cookies: vi.fn(),
+  query: vi.fn(),
   findUser: vi.fn(),
   upsertUser: vi.fn(),
   aggregate: vi.fn(),
@@ -17,6 +18,7 @@ export { mocks };
 vi.mock('next/headers', () => ({ cookies: mocks.cookies }));
 vi.mock('@/lib/db', () => ({
   prisma: {
+    $queryRaw: mocks.query,
     user: { findUnique: mocks.findUser, upsert: mocks.upsertUser },
     sessionMetrics: { aggregate: mocks.aggregate, groupBy: mocks.groupBy },
   },
@@ -34,7 +36,8 @@ vi.mock('@/lib/observability/sentry-tier-context', () => ({
   setSentryTierContext: vi.fn().mockResolvedValue(undefined),
 }));
 
-import { AUTH_COOKIE_NAME, signCookieValue } from '@/lib/auth/server';
+import { AUTH_COOKIE_NAME } from '@/lib/auth/server';
+import { nativeSessionFixture } from '@/test/fixtures/session-compat';
 import type { ExternalServiceUsage } from '@/lib/metrics/external-service-metrics';
 import * as sessionMetrics from '../session-metrics/route';
 import * as externalServices from '../external-services/route';
@@ -59,7 +62,9 @@ export function setCookie(value?: string): void {
 }
 
 export function setCaller(role: Caller): void {
-  setCookie(role ? signCookieValue('analytics-operator').signed : undefined);
+  const issued = nativeSessionFixture('analytics-operator');
+  setCookie(role ? issued.token : undefined);
+  mocks.query.mockResolvedValue([issued.row]);
   mocks.findUser.mockResolvedValue(role ? { id: 'analytics-operator', role } : null);
 }
 

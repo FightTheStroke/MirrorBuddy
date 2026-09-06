@@ -214,9 +214,9 @@ export function VoiceCallPanel({
     disconnect();
 
     if (conversationIdRef.current) {
-      const userId = getUserIdFromCookie();
-      if (userId) {
-        try {
+      try {
+        const userId = getUserIdFromCookie();
+        if (userId) {
           await csrfFetch(`/api/conversations/${conversationIdRef.current}/end`, {
             method: 'POST',
             body: JSON.stringify({ userId, reason: 'explicit' }),
@@ -224,11 +224,9 @@ export function VoiceCallPanel({
           logger.info('[VoiceCallPanel] Conversation ended', {
             conversationId: conversationIdRef.current,
           });
-        } catch (error) {
-          logger.error('[VoiceCallPanel] Failed to end conversation', {
-            error: String(error),
-          });
         }
+      } catch (error) {
+        logger.error('[VoiceCallPanel] Failed to end conversation', { error: String(error) });
       }
     }
 
