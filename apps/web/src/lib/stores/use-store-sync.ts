@@ -44,17 +44,25 @@ export async function initializeStores() {
  * Returns interval ID that can be cleared
  */
 export function setupAutoSync(intervalMs = 30000) {
-  // Auto-sync every 30 seconds if there are pending changes
+  let syncing = false;
   return setInterval(async () => {
-    if (getClientIdentity().status !== 'authenticated') return;
+    const identity = getClientIdentity();
+    if (syncing || identity.status !== 'authenticated') return;
     const settings = useSettingsStore.getState();
     const progress = useProgressStore.getState();
+    syncing = true;
 
     try {
       if (settings.pendingSync) await settings.syncToServer();
       if (progress.pendingSync) await progress.syncToServer();
+      if (getClientIdentity() !== identity || getClientIdentity().status !== 'authenticated')
+        return;
+      const current = useProgressStore.getState();
+      if (current.needsHydration && !current.pendingSync) await current.loadFromServer();
     } catch {
       logger.warn('Store sync failed; pending changes retained');
+    } finally {
+      syncing = false;
     }
   }, intervalMs);
 }
