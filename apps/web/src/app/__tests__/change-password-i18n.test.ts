@@ -11,7 +11,7 @@ describe('change-password i18n compliance', () => {
   const files = ['src/app/change-password/page.tsx', 'src/app/[locale]/change-password/page.tsx'];
 
   // Files that must contain useTranslations hook (client components)
-  const filesWithTranslations = ['src/app/change-password/change-password-client.tsx'];
+  const filesWithTranslations = ['src/app/[locale]/change-password/page.tsx'];
 
   const hardcodedItalianStrings = [
     'Almeno 8 caratteri',
