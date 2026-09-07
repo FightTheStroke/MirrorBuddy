@@ -2093,11 +2093,11 @@ jobs:
   # DEPLOY TO STAGING (Vercel Preview)
   # ============================================================================
   # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
-  # On main, the auto-promote-production job then promotes this exact staging
-  # build to production automatically (gated on deployment-gate success).
+  # On main, auto-promote-production builds the same source with production
+  # values remotely, then verifies and promotes it (after deployment-gate success).
   # Git-triggered auto-deploy (push to main) is disabled via ignoreCommand in
-  # vercel.json (T0.1) — this job's explicit `vercel deploy --prebuilt` is the
-  # only path that reaches Vercel. The promote-to-production.yml workflow remains
+  # vercel.json (T0.1) — explicit CLI deployments below are the automated path.
+  # The promote-to-production.yml workflow remains
   # available for manual re-promote / rollback.
   # ============================================================================
   deploy-to-staging:
@@ -2106,6 +2106,8 @@ jobs:
     needs: [deployment-gate]
     outputs:
       deployment_url: ${{ steps.deploy.outputs.deployment_url }}
+      project_id: ${{ steps.deploy.outputs.project_id }}
+      org_id: ${{ steps.deploy.outputs.org_id }}
     if: |
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
@@ -2155,9 +2157,8 @@ jobs:
           # own DATABASE_URL (separate Supabase project). Copying the production
           # env here — as this step used to do — made every staging deployment
           # read and write the live production database.
-          # Promotion is unaffected: `vercel promote` rebuilds the deployment
-          # against the production environment, so production never inherits
-          # these values.
+          # Production is built separately from source in Vercel's production
+          # runtime; no production values are downloaded by the promotion job.
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Assert staging is not pointed at the production database
@@ -2179,7 +2180,11 @@ jobs:
           echo "✅ Staging database is distinct from production"
 
       - name: Build Project
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        # Local CLI builds do not inject Vercel system target variables.
+        env:
+          VERCEL_ENV: preview
+          VERCEL_TARGET_ENV: preview
+        run: vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Staging (Preview)
         id: deploy
@@ -2188,6 +2193,19 @@ jobs:
           echo "✅ Staging deployed to: $url"
           echo "DEPLOYMENT_URL=$url" >> $GITHUB_ENV
           echo "deployment_url=$url" >> $GITHUB_OUTPUT
+          # Transfer only non-secret project identity, never the preview env file.
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const link = JSON.parse(readFileSync('.vercel/project.json', 'utf8'));
+          if (typeof link?.projectId !== 'string' || link.projectId.trim() !== link.projectId ||
+              typeof link?.orgId !== 'string' || link.orgId.trim() !== link.orgId ||
+              !/^prj_[A-Za-z0-9_]+$/.test(link.projectId) ||
+              !/^team_[A-Za-z0-9_]+$/.test(link.orgId)) {
+            throw new Error('Invalid staging project metadata');
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT,
+            `project_id=${link.projectId}\norg_id=${link.orgId}\n`);
+          NODE
 
       - name: Verify Staging Health
         run: |
@@ -2310,13 +2328,10 @@ jobs:
   # ============================================================================
   # AUTO-PROMOTE TO PRODUCTION (gated_auto)
   # ============================================================================
-  # After staging deploys on main (all gates green), promote that exact build to
-  # production automatically. `vercel promote` rebuilds the deployment as
-  # production (~5min), so the production alias only flips once that build is
-  # Ready — we poll mirrorbuddy.org until it serves a FRESH ([Ns/Nm ago]) and
-  # healthy build before passing. A naive 15s wait would falsely pass against the
-  # OLD deployment. On success the staging reminder issue is closed; on failure it
-  # is left open as a signal to promote/rollback manually.
+  # After staging passes, build the exact source revision in Vercel's production
+  # runtime with aliases withheld. Validate READY + production + commit/run identity
+  # before promoting that ID, then verify both public aliases and health. A recent
+  # timestamp or the preview artifact is never accepted as production-build proof.
   # ============================================================================
   auto-promote-production:
     name: '🚀 Auto-Promote to Production'
@@ -2329,7 +2344,19 @@ jobs:
     env:
       SCOPE: '--scope=team_nDwLfqx9JbVIs4C7Il79f4ln'
       STAGING_URL: ${{ needs.deploy-to-staging.outputs.deployment_url }}
+      VERCEL_PROJECT_ID: ${{ needs.deploy-to-staging.outputs.project_id }}
+      VERCEL_ORG_ID: ${{ needs.deploy-to-staging.outputs.org_id }}
     steps:
+      - name: Checkout expected production source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Validate inputs
         run: |
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
@@ -2351,36 +2378,10 @@ jobs:
           fi
           echo "✅ Staging healthy (HTTP $status)"
 
-      - name: Promote staging → production
-        run: |
-          echo "🚀 Promoting $STAGING_URL to production..."
-          # --timeout=0: return immediately after requesting the promotion. vercel
-          # promote otherwise waits for completion with a 3m default, but the
-          # production rebuild takes ~5min, so without this the command would fail
-          # before the polling loop below runs. Readiness is verified by the poll.
-          vercel promote "$STAGING_URL" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --timeout=0 --yes
-          echo "✅ Promote command issued"
-
-      - name: Wait for production to go live (alias flip + health)
-        run: |
-          echo "Waiting for www.mirrorbuddy.org to serve the fresh build..."
-          deadline=$((SECONDS + 900))
-          while [ $SECONDS -lt $deadline ]; do
-            age=$(vercel inspect mirrorbuddy.org --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>&1 | grep -iE "created" | head -1)
-            # -L: the apex 308-redirects to www (next.config.ts redirects()).
-            # Probing the apex without following it returns 308, never 200, and
-            # this loop would time out on a perfectly healthy production.
-            health=$(curl -sL -o /dev/null -w "%{http_code}" https://www.mirrorbuddy.org/api/health)
-            echo "  alias: $age | health: $health"
-            if [ "$health" = "200" ] && echo "$age" | grep -qE "\[[0-9]+(s|m) ago\]"; then
-              echo "✅ Production live and fresh"
-              exit 0
-            fi
-            sleep 20
-          done
-          echo "::error::Production alias did not flip to a fresh healthy build within 15min"
-          echo "Rollback/inspect: run promote-to-production.yml manually or 'vercel ls --prod'"
-          exit 1
+      - name: Build production source, verify identity, promote and check live aliases
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node scripts/deploy-validated-production.mjs
 
       - name: Update GitHub Production deployment status
         if: success()
@@ -2394,7 +2395,7 @@ jobs:
               environment: 'Production',
               auto_merge: false,
               required_contexts: [],
-              description: `Auto-promoted from staging (${context.sha.slice(0, 7)})`,
+              description: `Validated production source build (${context.sha.slice(0, 7)})`,
             });
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
@@ -2402,7 +2403,7 @@ jobs:
               deployment_id: deployment.id,
               state: 'success',
               environment_url: 'https://www.mirrorbuddy.org',
-              description: 'Auto-promoted staging → production',
+              description: 'Production source build verified and promoted',
             });
 
       - name: Close staging reminder issue
@@ -2427,7 +2428,7 @@ jobs:
             const ok = '${{ job.status }}' === 'success';
             await core.summary
               .addHeading(`${ok ? '✅' : '❌'} Auto-Promote to Production`, 2)
-              .addRaw(ok ? 'Staging build promoted and verified live on https://www.mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
+              .addRaw(ok ? 'Production source build promoted and verified live on https://www.mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
               .write();
 
   # ============================================================================
