@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { logger } from '@/lib/logger';
 import { registerOfflineServiceWorker } from '../offline-sw-registration';
 
 // Mock logger to prevent console output during tests
@@ -26,6 +27,9 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 describe('registerOfflineServiceWorker', () => {
+  const originalServiceWorker = Object.getOwnPropertyDescriptor(navigator, 'serviceWorker');
+  const originalCaches = Object.getOwnPropertyDescriptor(window, 'caches');
+  const originalSecureContext = Object.getOwnPropertyDescriptor(window, 'isSecureContext');
   let mockServiceWorker: {
     register: ReturnType<typeof vi.fn>;
     ready: Promise<ServiceWorkerRegistration>;
@@ -73,7 +77,16 @@ describe('registerOfflineServiceWorker', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
+    for (const [target, key, descriptor] of [
+      [navigator, 'serviceWorker', originalServiceWorker],
+      [window, 'caches', originalCaches],
+      [window, 'isSecureContext', originalSecureContext],
+    ] as const) {
+      if (descriptor) Object.defineProperty(target, key, descriptor);
+      else Reflect.deleteProperty(target, key);
+    }
   });
 
   // ============================================================================
@@ -100,6 +113,29 @@ describe('registerOfflineServiceWorker', () => {
   // ============================================================================
   // Error handling
   // ============================================================================
+  it.each([undefined, null])('reports an unavailable registration result: %s', async (value) => {
+    mockServiceWorker.register.mockResolvedValueOnce(value);
+
+    expect(await registerOfflineServiceWorker()).toBe(false);
+    expect(logger.info).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration unavailable');
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, null, {}, { register: true }])(
+    'treats a non-callable service worker API as unsupported: %s',
+    async (value) => {
+      Object.defineProperty(window.navigator, 'serviceWorker', {
+        value,
+        configurable: true,
+      });
+
+      expect(await registerOfflineServiceWorker()).toBe(false);
+      expect(logger.debug).toHaveBeenCalledWith('[Offline SW] Service workers not supported');
+      expect(logger.error).not.toHaveBeenCalled();
+    },
+  );
+
   it('should return false when service worker is not supported', async () => {
     // Remove serviceWorker from navigator
     Object.defineProperty(window.navigator, 'serviceWorker', {
@@ -114,28 +150,38 @@ describe('registerOfflineServiceWorker', () => {
   });
 
   it('should return false when registration fails', async () => {
-    mockServiceWorker.register.mockRejectedValueOnce(new Error('Registration failed'));
+    const error = new Error('Registration failed');
+    mockServiceWorker.register.mockRejectedValueOnce(error);
 
     const result = await registerOfflineServiceWorker();
 
     expect(result).toBe(false);
+    expect(logger.error).toHaveBeenCalledWith('[Offline SW] Registration failed', undefined, error);
   });
 
   // ============================================================================
   // Browser support
   // ============================================================================
   it('should not attempt registration in non-browser environment', async () => {
-    // Simulate SSR (no window)
-    const originalWindow = global.window;
-    // @ts-expect-error - Testing SSR scenario
-    delete global.window;
+    vi.stubGlobal('window', undefined);
 
     const result = await registerOfflineServiceWorker();
 
     expect(result).toBe(false);
 
-    // Restore window
-    global.window = originalWindow;
+    expect(mockServiceWorker.register).not.toHaveBeenCalled();
+  });
+
+  it('does not register in an insecure context', async () => {
+    vi.stubGlobal('isSecureContext', false);
+    expect(await registerOfflineServiceWorker()).toBe(false);
+    expect(mockServiceWorker.register).not.toHaveBeenCalled();
+  });
+
+  it('does not register when navigator is unavailable', async () => {
+    vi.stubGlobal('navigator', undefined);
+    expect(await registerOfflineServiceWorker()).toBe(false);
+    expect(mockServiceWorker.register).not.toHaveBeenCalled();
   });
 
   it('should handle registration during page load', async () => {

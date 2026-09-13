@@ -9,7 +9,13 @@
 
 import { execFileSync } from 'node:child_process';
 
-import { issueBody, issueTitle, planIssues, type ExistingIssue } from './production-watch/plan';
+import {
+  issueBody,
+  issueTitle,
+  occurrenceSummary,
+  planIssues,
+  type ExistingIssue,
+} from './production-watch/plan';
 import {
   fetchSentryAlerts,
   fetchVercelAlerts,
@@ -128,7 +134,7 @@ async function main(): Promise<void> {
     for (const { number, alert } of plan.update) {
       gh(
         ['issue', 'comment', String(number), '--body-file', '-'],
-        `Still happening: ${alert.occurrences} time(s) in the last 24 hours (${observedAt}).`,
+        `Recent activity: ${occurrenceSummary(alert)} (observed ${observedAt}).`,
       );
     }
 

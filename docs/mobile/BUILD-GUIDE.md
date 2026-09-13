@@ -4,7 +4,7 @@
 
 ## 1. Prerequisites
 
-**Common**: Node.js 20+, npm 10+, Capacitor CLI (`npm i -g @capacitor/cli`)
+**Common**: Node.js 24.x, npm 10+, Capacitor CLI (`npm i -g @capacitor/cli`)
 
 **iOS**: macOS, Xcode 15+, CocoaPods (`sudo gem install cocoapods`), Apple Developer Account
 

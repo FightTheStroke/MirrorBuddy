@@ -1,19 +1,22 @@
-import { expect, describe, it } from 'vitest';
+import { expect, describe, it, vi } from 'vitest';
+import AdminWaitlistPage, { dynamic } from '../waitlist/page';
+import { WaitlistAdminClient } from '../waitlist/waitlist-admin-client';
+
+vi.mock('@/lib/auth/server', () => ({
+  validateAdminAuth: vi.fn(),
+}));
 
 describe('Waitlist Admin Page - Structure', () => {
-  it('should export a default function component', async () => {
-    const mod = await import('../waitlist/page');
-    expect(typeof mod.default).toBe('function');
+  it('should export a default function component', () => {
+    expect(typeof AdminWaitlistPage).toBe('function');
   });
 
-  it('should export force-dynamic constant', async () => {
-    const mod = await import('../waitlist/page');
-    expect(mod.dynamic).toBe('force-dynamic');
+  it('should export force-dynamic constant', () => {
+    expect(dynamic).toBe('force-dynamic');
   });
 
-  it('should export WaitlistAdminClient component', async () => {
-    const mod = await import('../waitlist/waitlist-admin-client');
-    expect(typeof mod.WaitlistAdminClient).toBe('function');
+  it('should export WaitlistAdminClient component', () => {
+    expect(typeof WaitlistAdminClient).toBe('function');
   });
 });
 

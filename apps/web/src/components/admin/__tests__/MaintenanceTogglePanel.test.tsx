@@ -38,14 +38,13 @@ describe('MaintenanceTogglePanel', () => {
   it('renders inactive status and opens confirmation dialog before toggle', async () => {
     render(<MaintenanceTogglePanel />);
 
-    await waitFor(() => {
-      expect(screen.getByText('Stato attuale')).toBeInTheDocument();
-    });
+    await screen.findByText(getTranslation('maintenance.admin.inactive'));
 
     expect(screen.getByText(getTranslation('maintenance.admin.inactive'))).toBeInTheDocument();
     const toggleButton = screen.getByRole('button', {
       name: getTranslation('maintenance.admin.activate'),
     });
+    expect(toggleButton).toBeEnabled();
     fireEvent.click(toggleButton);
 
     expect(screen.getByText("Confermi l'attivazione della manutenzione?")).toBeInTheDocument();
@@ -61,6 +60,8 @@ describe('MaintenanceTogglePanel', () => {
     const openDialogButton = await screen.findByRole('button', {
       name: getTranslation('maintenance.admin.activate'),
     });
+    await waitFor(() => expect(openDialogButton).toBeEnabled());
+    expect(mockCsrfFetch).not.toHaveBeenCalled();
     fireEvent.click(openDialogButton);
     fireEvent.click(
       screen.getByRole('button', { name: getTranslation('maintenance.admin.confirmCancel') }),
@@ -86,6 +87,7 @@ describe('MaintenanceTogglePanel', () => {
     const openDialogButton = await screen.findByRole('button', {
       name: getTranslation('maintenance.admin.activate'),
     });
+    await waitFor(() => expect(openDialogButton).toBeEnabled());
     fireEvent.click(openDialogButton);
     fireEvent.click(
       screen.getByRole('button', { name: getTranslation('maintenance.admin.confirmCancel') }),

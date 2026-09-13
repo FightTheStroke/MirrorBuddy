@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-- **Node.js 20+** (LTS recommended — Docker uses `node:20-alpine`)
+- **Node.js 24.x** (LTS — Docker and CI use Node 24)
 - **npm 10+**
 - **PostgreSQL 17** with pgvector extension (or Supabase)
 

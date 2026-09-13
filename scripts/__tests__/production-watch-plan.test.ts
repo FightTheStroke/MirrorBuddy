@@ -23,6 +23,7 @@ function alert(overrides: Partial<ProductionAlert> = {}): ProductionAlert {
     details: ['Where: app/page.tsx'],
     url: 'https://sentry.io/issue/1',
     occurrences: 12,
+    lastSeen: '2026-08-29T00:00:00Z',
     source: 'sentry',
     ...overrides,
   };
@@ -63,10 +64,10 @@ describe('planning what to do about production alerts', () => {
     expect(plan.update).toEqual([{ number: 10, alert: alert() }]);
   });
 
-  it('closes an issue once production stops reporting it', () => {
+  it('keeps an unresolved Sentry issue open when it ages out of the window', () => {
     const plan = planIssues([], [issue()]);
 
-    expect(plan.close).toEqual([10]);
+    expect(plan.close).toEqual([]);
   });
 
   it('never touches issues a human opened by hand', () => {
@@ -121,10 +122,10 @@ describe('planning what to do about production alerts', () => {
     expect(plan.close).toEqual([42]);
   });
 
-  it('closes both sources when both feeds answered', () => {
+  it('does not infer Sentry resolution even when both feeds answered', () => {
     const plan = planIssues([], [issue()], { answered: ['sentry', 'vercel'] });
 
-    expect(plan.close).toEqual([10]);
+    expect(plan.close).toEqual([]);
   });
 });
 

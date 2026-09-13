@@ -22,7 +22,7 @@ concurrency:
 # https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "24"
   VERCEL_CLI_VERSION: "56.3.2"
   # This workflow holds no Azure voice credentials on purpose: every run would
   # otherwise cost real money and carry a production key into a test job. The
@@ -2107,7 +2107,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Validate VERCEL_TOKEN is set
         run: |

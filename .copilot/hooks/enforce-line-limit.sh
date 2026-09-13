@@ -1,1 +1,0 @@
-/Users/roberdan/.claude/copilot-config/hooks/enforce-line-limit.sh

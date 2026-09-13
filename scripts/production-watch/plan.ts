@@ -19,7 +19,7 @@ export interface IssuePlan {
   close: number[];
 }
 
-/** Sources whose feed answered this run, so silence from them means "fixed". */
+/** Sources whose feed answered this run. Sentry silence is not resolution evidence. */
 export interface PlanOptions {
   answered?: ProductionAlert['source'][];
 }
@@ -38,11 +38,16 @@ export function issueTitle(alert: ProductionAlert): string {
   return `[${prefix}] ${alert.title}`.slice(0, 240);
 }
 
+export function occurrenceSummary(alert: ProductionAlert): string {
+  const period = alert.source === 'sentry' ? 'over the issue lifetime' : 'in the last 24 hours';
+  return `${alert.occurrences} time(s) ${period}; last seen ${alert.lastSeen}`;
+}
+
 export function issueBody(alert: ProductionAlert, observedAt: string): string {
   return [
     markerFor(alert),
     '',
-    `**Seen in production** — ${alert.occurrences} time(s) in the last 24 hours.`,
+    `**Seen in production** — ${occurrenceSummary(alert)}.`,
     '',
     ...alert.details.map((line) => `- ${line}`),
     '',
@@ -56,9 +61,9 @@ export function issueBody(alert: ProductionAlert, observedAt: string): string {
  * Open an issue for anything new, add a comment to anything still happening,
  * and close what production has stopped complaining about.
  *
- * Silence only means "fixed" if the source that reported it actually answered.
- * When a feed is down we must not read its missing alerts as good news, or one
- * broken API call would close every issue that source ever opened.
+ * An absent Sentry issue may merely have aged out of the observation window.
+ * Leave its GitHub record open until resolution is verified independently.
+ * Unavailable feeds cannot close records from either source.
  */
 export function planIssues(
   alerts: ProductionAlert[],
@@ -104,6 +109,7 @@ export function planIssues(
         const key = keyOf(issue);
         if (key === null || liveKeys.has(key)) return false;
         const source = key.split(':')[0] as ProductionAlert['source'];
+        if (source === 'sentry') return false;
         return answered.has(source);
       })
       .map((issue) => issue.number),

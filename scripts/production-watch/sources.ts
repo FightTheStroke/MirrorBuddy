@@ -1,5 +1,7 @@
 // Fetches what production is actually failing on, from Sentry and Vercel.
 
+import { z } from 'zod';
+
 export interface ProductionAlert {
   /** Stable identifier used to recognise an alert we already filed. */
   key: string;
@@ -7,7 +9,7 @@ export interface ProductionAlert {
   /** Human-readable lines describing the failure. */
   details: string[];
   url: string;
-  /** How many times it happened in the observed window. */
+  /** Sentry: lifetime count. Vercel: count in the requested window. */
   occurrences: number;
   /** ISO timestamp of the most recent occurrence. */
   lastSeen: string;
@@ -26,6 +28,20 @@ export interface SentryIssue {
   lastSeen: string;
 }
 
+const sentryIssueSchema = z.object({
+  id: z.string().min(1),
+  shortId: z.string().min(1),
+  title: z.string().min(1),
+  culprit: z.string().optional(),
+  count: z
+    .union([z.string().regex(/^\d+$/), z.number().int().nonnegative()])
+    .refine((value) => Number.isSafeInteger(Number(value)), 'Invalid lifetime count'),
+  userCount: z.number().int().nonnegative().optional(),
+  permalink: z.string().url(),
+  firstSeen: z.string().datetime({ offset: true }),
+  lastSeen: z.string().datetime({ offset: true }),
+});
+
 export interface VercelDeployment {
   uid: string;
   name: string;
@@ -35,7 +51,8 @@ export interface VercelDeployment {
   meta?: { githubCommitSha?: string; githubCommitMessage?: string };
 }
 
-export function sentryIssueToAlert(issue: SentryIssue): ProductionAlert {
+export function sentryIssueToAlert(input: SentryIssue): ProductionAlert {
+  const issue = sentryIssueSchema.parse(input);
   return {
     key: `sentry:${issue.shortId}`,
     title: issue.title,
@@ -43,10 +60,10 @@ export function sentryIssueToAlert(issue: SentryIssue): ProductionAlert {
       `Where: ${issue.culprit || 'unknown'}`,
       `First seen: ${issue.firstSeen}`,
       `Last seen: ${issue.lastSeen}`,
-      `Users affected: ${issue.userCount ?? 'unknown'}`,
+      `Users counted (lifetime): ${issue.userCount ?? 'unknown'}`,
     ],
     url: issue.permalink,
-    occurrences: Number(issue.count) || 0,
+    occurrences: Number(issue.count),
     lastSeen: issue.lastSeen,
     source: 'sentry',
   };
@@ -72,7 +89,9 @@ export function vercelDeploymentToAlert(deployment: VercelDeployment): Productio
 export async function fetchSentryAlerts(
   fetchImpl: typeof fetch,
   config: { org: string; project: string; token: string },
+  now = Date.now(),
 ): Promise<ProductionAlert[]> {
+  if (!Number.isFinite(now)) throw new Error('Invalid Sentry observation time');
   const url =
     `https://sentry.io/api/0/projects/${config.org}/${config.project}` +
     `/issues/?statsPeriod=24h&query=${encodeURIComponent('is:unresolved')}`;
@@ -84,8 +103,13 @@ export async function fetchSentryAlerts(
     throw new Error(`Sentry replied ${response.status}: ${await response.text()}`);
   }
 
-  const issues = (await response.json()) as SentryIssue[];
-  return issues.map(sentryIssueToAlert);
+  const issues = z.array(sentryIssueSchema).parse(await response.json());
+  if (issues.some((issue) => Date.parse(issue.lastSeen) > now)) {
+    throw new Error('Sentry feed contains a future lastSeen timestamp');
+  }
+  return issues
+    .filter((issue) => Date.parse(issue.lastSeen) >= now - 24 * 60 * 60 * 1000)
+    .map(sentryIssueToAlert);
 }
 
 export async function fetchVercelAlerts(

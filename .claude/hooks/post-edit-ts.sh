@@ -6,7 +6,7 @@
 set -euo pipefail
 
 input="$(cat)"
-fp="$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_response.filePath // ""')"
+fp="$(printf '%s' "$input" | bash "$(dirname "$0")/read-edit-path.sh")"
 
 if [ -z "$fp" ]; then
   exit 0

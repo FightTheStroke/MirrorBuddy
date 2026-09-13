@@ -8,23 +8,15 @@ import { NextRequest } from 'next/server';
 import type { MiddlewareContext } from '../types';
 
 // Mock dependencies
-vi.mock('@/lib/security', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/security')>();
-  return {
-    ...actual,
-    requireCSRF: vi.fn(),
-  };
-});
+vi.mock('@/lib/security', () => ({
+  requireCSRF: vi.fn(),
+}));
 
-vi.mock('@/lib/auth/server', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/auth/server')>();
-  return {
-    ...actual,
-    validateAuth: vi.fn(),
-    validateAdminAuth: vi.fn(),
-    validateAdminReadOnlyAuth: vi.fn(),
-  };
-});
+vi.mock('@/lib/auth/server', () => ({
+  validateAuth: vi.fn(),
+  validateAdminAuth: vi.fn(),
+  validateAdminReadOnlyAuth: vi.fn(),
+}));
 
 vi.mock('@/lib/rate-limit', () => ({
   checkRateLimitAsync: vi.fn(),

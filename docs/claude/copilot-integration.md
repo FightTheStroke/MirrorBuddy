@@ -22,13 +22,11 @@ gates. This document explains what works, what doesn't, and how to use it.
 
 ## What Copilot CLI CANNOT Do
 
-| Capability         | Why Not              | Workaround                       |
-| ------------------ | -------------------- | -------------------------------- |
-| Spawn subagents    | No Task tool         | Use bash scripts directly        |
-| Skills/commands    | Claude Code-specific | Rules in copilot-instructions.md |
-| Dashboard UI       | Separate service     | `plan-db.sh kanban` in terminal  |
-| Parallel execution | Single-threaded      | Sequential task execution        |
-| Auto-format hooks  | Claude Code-specific | Run prettier/eslint manually     |
+| Capability        | Why Not          | Workaround                                   |
+| ----------------- | ---------------- | -------------------------------------------- |
+| Skills/commands   | Host-specific    | Use `/skills` and repository instructions    |
+| Dashboard UI      | Separate service | Use the available task view or plan database |
+| Auto-format hooks | Not guaranteed   | Run Prettier and ESLint explicitly           |
 
 ## Setup
 

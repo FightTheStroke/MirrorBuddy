@@ -317,25 +317,21 @@ describe('Consent Revocation Consistency', () => {
   });
 
   describe('F-05: Timestamp consistency', () => {
-    it('should update timestamps on consent changes', () => {
+    it('should update timestamps on consent changes', async () => {
       const consent1 = saveConsent(true, false);
 
-      // Wait a small amount
-      const wait = new Promise((resolve) => setTimeout(resolve, 10));
-      wait.then(() => {
-        const consent2 = saveConsent(false, false);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const consent2 = saveConsent(false, false);
 
-        if ('cookies' in consent1 && 'cookies' in consent2) {
-          const unified1 = consent1 as UnifiedConsentData;
-          const unified2 = consent2 as UnifiedConsentData;
+      if ('cookies' in consent1 && 'cookies' in consent2) {
+        const unified1 = consent1 as UnifiedConsentData;
+        const unified2 = consent2 as UnifiedConsentData;
 
-          const timestamp1 = new Date(unified1.cookies.acceptedAt).getTime();
-          const timestamp2 = new Date(unified2.cookies.acceptedAt).getTime();
+        const timestamp1 = new Date(unified1.cookies.acceptedAt).getTime();
+        const timestamp2 = new Date(unified2.cookies.acceptedAt).getTime();
 
-          // Second consent should have later or equal timestamp
-          expect(timestamp2).toBeGreaterThanOrEqual(timestamp1);
-        }
-      });
+        expect(timestamp2).toBeGreaterThanOrEqual(timestamp1);
+      }
     });
 
     it('should preserve ToS timestamp when only changing cookie consent', () => {

@@ -151,6 +151,39 @@ describe('Key Rotation Service', () => {
       expect(result.failed).toBe(0);
     });
 
+    it('should continue concurrent rotation when one record fails', async () => {
+      const mockToken = await encryptTokenWithKey('token123', oldTokenKey);
+      const records = Array.from({ length: 6 }, (_, index) => ({
+        id: `int${index + 1}`,
+        accessToken: mockToken,
+        refreshToken: null,
+      }));
+
+      vi.mocked(prisma.googleAccount.count).mockResolvedValue(records.length);
+      vi.mocked(prisma.googleAccount.findMany).mockResolvedValue(records as never);
+      vi.mocked(prisma.googleAccount.update)
+        .mockResolvedValueOnce({} as never)
+        .mockResolvedValueOnce({} as never)
+        .mockRejectedValueOnce(new Error('database update failed'))
+        .mockResolvedValueOnce({} as never)
+        .mockResolvedValueOnce({} as never)
+        .mockResolvedValueOnce({} as never);
+
+      const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
+
+      expect(result).toMatchObject({
+        total: 6,
+        processed: 6,
+        succeeded: 5,
+        failed: 1,
+        phase: 'complete',
+      });
+      expect(prisma.googleAccount.update).toHaveBeenCalledTimes(6);
+      expect(
+        vi.mocked(prisma.googleAccount.update).mock.calls.map(([call]) => call.where.id),
+      ).toEqual(expect.arrayContaining(records.map(({ id }) => id)));
+    });
+
     it('should batch process records', async () => {
       const mockToken = await encryptTokenWithKey('token123', oldTokenKey);
 
