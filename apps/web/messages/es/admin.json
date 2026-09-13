@@ -1,5 +1,57 @@
 {
   "admin": {
+    "metricTruth": {
+      "averageTurns": "Turnos medios por sesión registrada",
+      "averageSessionCost": "Coste medio por sesión registrada",
+      "voiceCost": "Coste de voz estimado",
+      "states": {
+        "measured": "Valor registrado",
+        "estimated": "Estimación",
+        "unavailable": "No disponible",
+        "disabled": "Recopilación opcional desactivada",
+        "failed": "Error de recopilación",
+        "stale": "Datos desactualizados"
+      },
+      "reasons": {
+        "retentionWindow": "La actividad se conserva unos 10 minutos; no se puede medir la actividad diaria o de mayor duración.",
+        "optionalDisabled": "Los análisis opcionales están explícitamente desactivados.",
+        "collectionFailed": "No se pudo leer la fuente; esto no significa cero.",
+        "missingData": "Faltan los datos o su procedencia.",
+        "notPermitted": "No tienes permiso para ver esta métrica.",
+        "zeroDenominator": "Ninguna observación respalda esta tasa o este promedio.",
+        "notConfigured": "Esta integración opcional no está configurada.",
+        "unsupportedCohort": "La población requerida o la referencia histórica no están registradas."
+      },
+      "populations": {
+        "records": "Solo población registrada.",
+        "recordedTelemetry": "Solo telemetría registrada; no se ha establecido la validez del consentimiento histórico para todas las filas.",
+        "eligibleOptIn": "Solo usuarios aptos con consentimiento explícito; no todos los usuarios."
+      },
+      "estimates": {
+        "tokenPricing": "Estimación según el uso registrado y los precios configurados; no es el coste facturado.",
+        "subscriptionPrice": "Estimación según las suscripciones activas y los precios mensuales de catálogo; no son ingresos cobrados.",
+        "annualized": "Precio de catálogo de suscripción anualizado; no son ingresos cobrados.",
+        "languageProxy": "La preferencia de idioma es una aproximación geográfica, no un país conocido."
+      },
+      "source": "Fuente",
+      "window": "Periodo",
+      "computedAt": "Calculado el",
+      "snapshot": "Instantánea de registros conservados",
+      "unknown": "Desconocido",
+      "coverageKnown": "Cobertura: {observed} de {total}.",
+      "coverageUnknown": "La cobertura de todos los usuarios es desconocida; no hay denominador disponible.",
+      "readiness": {
+        "ready": "Función lista",
+        "notReady": "Función no lista",
+        "notConfigured": "Función no configurada",
+        "unknown": "Disponibilidad de la función desconocida"
+      },
+      "quotaEstimate": "El uso se compara con supuestos de cuotas configurados, no con límites verificados del proveedor.",
+      "voiceSessions": "Sesiones de voz registradas",
+      "ttsGenerations": "Generaciones de síntesis de voz",
+      "realtimeSessions": "Sesiones en tiempo real",
+      "voiceMinutes": "Minutos de voz registrados"
+    },
     "betaRequests": "Solicitudes Beta",
     "collapseMenu": "Contraer menú",
     "dashboard": {
@@ -283,6 +335,20 @@
       "deselectAll": "Deseleccionar todos"
     },
     "users": {
+      "pagination": {
+        "label": "Paginación de usuarios",
+        "summary": "Usuarios {start}–{end} de {total}",
+        "pageSize": "Filas por página",
+        "page": "Página {page} de {pages}",
+        "selectPage": "Seleccionar esta página",
+        "selectMatching": "{count, plural, =1 {Seleccionar el usuario coincidente} other {Seleccionar los # usuarios coincidentes}}",
+        "selectUser": "Seleccionar {username}",
+        "search": "Buscar",
+        "clearSearch": "Borrar búsqueda",
+        "loadFailed": "No se pudo cargar la lista de usuarios. Inténtalo de nuevo.",
+        "exportFiltered": "Exportar todos los usuarios que coincidan con los filtros",
+        "exportFailed": "La exportación falló o la lista cambió. Inténtalo de nuevo."
+      },
       "table": {
         "username": "Nombre de usuario",
         "email": "Correo electrónico",

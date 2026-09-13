@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { ChevronRight, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Breadcrumb {
   label: string;
@@ -18,28 +18,21 @@ interface Breadcrumb {
  */
 export function AdminBreadcrumbs() {
   const pathname = usePathname();
-  const t = useTranslations("admin");
+  const t = useTranslations('admin');
 
   // Generate breadcrumbs from pathname
   const breadcrumbs = generateBreadcrumbs(pathname, t);
 
   // Don't show breadcrumbs on admin home
-  if (pathname === "/admin") {
+  if (pathname === '/admin') {
     return null;
   }
 
   return (
-    <nav
-      aria-label={t("breadcrumb")}
-      className="mb-4 px-1"
-      data-testid="admin-breadcrumbs"
-    >
+    <nav aria-label={t('breadcrumb')} className="mb-4 px-1" data-testid="admin-breadcrumbs">
       <ol className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs sm:text-sm">
         {breadcrumbs.map((crumb, index) => (
-          <li
-            key={crumb.href}
-            className="flex items-center gap-1 sm:gap-2 min-w-0"
-          >
+          <li key={crumb.href} className="flex items-center gap-1 sm:gap-2 min-w-0">
             {index > 0 && (
               <ChevronRight
                 className="h-3 w-3 sm:h-4 sm:w-4 text-slate-400 dark:text-slate-600 shrink-0"
@@ -57,14 +50,12 @@ export function AdminBreadcrumbs() {
               <Link
                 href={crumb.href}
                 className={cn(
-                  "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white",
-                  "transition-colors truncate",
-                  "flex items-center gap-1",
+                  'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white',
+                  'transition-colors truncate',
+                  'flex items-center gap-1',
                 )}
               >
-                {index === 0 && (
-                  <Home className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />
-                )}
+                {index === 0 && <Home className="h-3 w-3 sm:h-4 sm:w-4 shrink-0" />}
                 <span>{crumb.label}</span>
               </Link>
             )}
@@ -83,11 +74,11 @@ function generateBreadcrumbs(
   t: ReturnType<typeof useTranslations>,
 ): Breadcrumb[] {
   // Remove leading/trailing slashes and split
-  const parts = pathname.split("/").filter(Boolean);
+  const parts = pathname.split('/').filter(Boolean);
 
   // Build breadcrumbs array
   const breadcrumbs: Breadcrumb[] = [];
-  let currentPath = "";
+  let currentPath = '';
 
   for (let i = 0; i < parts.length; i++) {
     const part = parts[i];
@@ -117,25 +108,25 @@ function getBreadcrumbLabel(
 ): string {
   // Map of paths to translation keys
   const pathToTranslationKey: Record<string, string> = {
-    "/admin": "dashboardTitle",
-    "/admin/invites": "betaRequests",
-    "/admin/users": "sidebar.users",
-    "/admin/analytics": "sidebar.analytics",
-    "/admin/tos": "terms",
-    "/admin/settings": "sidebar.settings",
-    "/admin/tiers": "sidebar.tiers",
-    "/admin/locales": "sidebar.localization",
-    "/admin/safety": "sidebar.safety",
-    "/admin/risk-register": "sidebar.riskRegister",
-    "/admin/service-limits": "sidebar.serviceLimits",
-    "/admin/tiers/audit-log": "auditLog",
-    "/admin/tiers/definitions": "tierDefinitions",
-    "/admin/characters": "characters.title",
-    "/admin/audit": "audit.title",
-    "/admin/communications": "communications.title",
-    "/admin/communications/templates": "communications.templates",
-    "/admin/communications/campaigns": "communications.campaigns",
-    "/admin/communications/stats": "communications.stats",
+    '/admin': 'dashboardTitle',
+    '/admin/invites': 'betaRequests',
+    '/admin/users': 'sidebar.users',
+    '/admin/analytics': 'sidebar.analytics',
+    '/admin/tos': 'terms',
+    '/admin/settings': 'sidebar.settings',
+    '/admin/tiers': 'sidebar.tiers',
+    '/admin/locales': 'sidebar.localization',
+    '/admin/safety': 'sidebar.safety',
+    '/admin/risk-register': 'sidebar.riskRegister',
+    '/admin/service-limits': 'sidebar.serviceLimits',
+    '/admin/tiers/audit-log': 'auditLog',
+    '/admin/tiers/definitions': 'tierDefinitions',
+    '/admin/characters': 'characters.title',
+    '/admin/audit': 'audit.title',
+    '/admin/communications': 'communications.title',
+    '/admin/communications/templates': 'communications.templates.title',
+    '/admin/communications/campaigns': 'communications.campaigns.title',
+    '/admin/communications/stats': 'communications.stats.title',
   };
 
   // Try to get translated label
@@ -167,16 +158,16 @@ function humanizeSegment(segment: string): string {
 
   // Common admin segments
   const commonSegments: Record<string, string> = {
-    admin: "Admin",
-    edit: "Edit",
-    new: "New",
-    create: "Create",
-    view: "View",
-    delete: "Delete",
-    communications: "Communications",
-    templates: "Templates",
-    campaigns: "Campaigns",
-    stats: "Statistics",
+    admin: 'Admin',
+    edit: 'Edit',
+    new: 'New',
+    create: 'Create',
+    view: 'View',
+    delete: 'Delete',
+    communications: 'Communications',
+    templates: 'Templates',
+    campaigns: 'Campaigns',
+    stats: 'Statistics',
   };
 
   if (commonSegments[segment.toLowerCase()]) {
@@ -185,7 +176,7 @@ function humanizeSegment(segment: string): string {
 
   // Convert kebab-case to Title Case
   return segment
-    .split("-")
+    .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .join(' ');
 }

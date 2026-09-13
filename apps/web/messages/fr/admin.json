@@ -1,5 +1,57 @@
 {
   "admin": {
+    "metricTruth": {
+      "averageTurns": "Nombre moyen d'échanges par session enregistrée",
+      "averageSessionCost": "Coût moyen par session enregistrée",
+      "voiceCost": "Coût vocal estimé",
+      "states": {
+        "measured": "Valeur enregistrée",
+        "estimated": "Estimation",
+        "unavailable": "Indisponible",
+        "disabled": "Collecte facultative désactivée",
+        "failed": "Échec de la collecte",
+        "stale": "Données périmées"
+      },
+      "reasons": {
+        "retentionWindow": "L'activité est conservée environ 10 minutes ; l'activité quotidienne ou plus longue ne peut pas être mesurée.",
+        "optionalDisabled": "Les analyses facultatives sont explicitement désactivées.",
+        "collectionFailed": "La source n'a pas pu être lue ; cela ne signifie pas zéro.",
+        "missingData": "Les données ou leur provenance sont manquantes.",
+        "notPermitted": "Vous n'avez pas l'autorisation de consulter cette mesure.",
+        "zeroDenominator": "Aucune observation ne permet ce taux ou cette moyenne.",
+        "notConfigured": "Cette intégration facultative n'est pas configurée.",
+        "unsupportedCohort": "La population requise ou la référence historique n'est pas enregistrée."
+      },
+      "populations": {
+        "records": "Population enregistrée uniquement.",
+        "recordedTelemetry": "Télémétrie enregistrée uniquement ; l'éligibilité du consentement historique n'est pas établie pour toutes les lignes.",
+        "eligibleOptIn": "Utilisateurs éligibles ayant explicitement consenti uniquement ; pas tous les utilisateurs."
+      },
+      "estimates": {
+        "tokenPricing": "Estimation selon l'utilisation enregistrée et les tarifs configurés ; pas le coût facturé.",
+        "subscriptionPrice": "Estimation selon les abonnements actifs et les prix mensuels affichés ; pas les revenus encaissés.",
+        "annualized": "Prix affiché des abonnements annualisé ; pas les revenus encaissés.",
+        "languageProxy": "La préférence linguistique est un indicateur géographique indirect, pas un pays connu."
+      },
+      "source": "Source",
+      "window": "Période",
+      "computedAt": "Calculé le",
+      "snapshot": "Instantané des enregistrements conservés",
+      "unknown": "Inconnu",
+      "coverageKnown": "Couverture : {observed} sur {total}.",
+      "coverageUnknown": "La couverture de tous les utilisateurs est inconnue ; aucun dénominateur n'est disponible.",
+      "readiness": {
+        "ready": "Fonctionnalité prête",
+        "notReady": "Fonctionnalité non prête",
+        "notConfigured": "Fonctionnalité non configurée",
+        "unknown": "Disponibilité de la fonctionnalité inconnue"
+      },
+      "quotaEstimate": "L'utilisation est comparée à des quotas supposés dans la configuration, pas aux limites vérifiées du fournisseur.",
+      "voiceSessions": "Sessions vocales enregistrées",
+      "ttsGenerations": "Générations de synthèse vocale",
+      "realtimeSessions": "Sessions en temps réel",
+      "voiceMinutes": "Minutes vocales enregistrées"
+    },
     "betaRequests": "Beta Requests",
     "collapseMenu": "Collapse Menu",
     "dashboard": {
@@ -283,6 +335,20 @@
       "deselectAll": "Tout désélectionner"
     },
     "users": {
+      "pagination": {
+        "label": "Pagination des utilisateurs",
+        "summary": "Utilisateurs {start}–{end} sur {total}",
+        "pageSize": "Lignes par page",
+        "page": "Page {page} sur {pages}",
+        "selectPage": "Sélectionner cette page",
+        "selectMatching": "{count, plural, =1 {Sélectionner l'utilisateur correspondant} other {Sélectionner les # utilisateurs correspondants}}",
+        "selectUser": "Sélectionner {username}",
+        "search": "Rechercher",
+        "clearSearch": "Effacer la recherche",
+        "loadFailed": "Impossible de charger la liste des utilisateurs. Réessayez.",
+        "exportFiltered": "Exporter tous les utilisateurs correspondant aux filtres",
+        "exportFailed": "Échec de l'exportation ou liste modifiée. Réessayez."
+      },
       "table": {
         "username": "Nom d'utilisateur",
         "email": "E-mail",

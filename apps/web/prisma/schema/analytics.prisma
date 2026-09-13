@@ -92,12 +92,14 @@ model FeatureFlag {
 }
 
 model GlobalConfig {
-  id               String   @id @default("global")
-  killSwitch       Boolean  @default(false)
-  killSwitchReason String?
-  paymentsEnabled  Boolean  @default(false)
-  updatedAt        DateTime @updatedAt
-  updatedBy        String?
+  id                 String    @id @default("global")
+  killSwitch         Boolean   @default(false)
+  killSwitchReason   String?
+  paymentsEnabled    Boolean   @default(false)
+  // NULL means NOT_ACTIVATED; only a later manual rollout may set this once.
+  sessionActivatedAt DateTime?
+  updatedAt          DateTime  @updatedAt
+  updatedBy          String?
 }
 
 // ============================================================================

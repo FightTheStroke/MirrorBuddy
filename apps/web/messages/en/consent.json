@@ -98,16 +98,43 @@
       "consequencesText": "Withdrawing certain consents may prevent access to specific platform features.",
       "contactSupport": "Contact Support"
     },
+    "sync": {
+      "cannotRetry": "This attempt cannot be retried. Reload the page to review your choices.",
+      "reload": "Reload the page",
+      "startingTrial": "Starting the trial...",
+      "trialStartFailed": "We could not finish starting the trial. Try starting it again.",
+      "retryTrial": "Try starting the trial again",
+      "reloading": "Reloading the page...",
+      "reloadFailed": "Choices on this device were cleared, but the page could not reload. Reload it to continue.",
+      "saving": "Saving your choice...",
+      "failed": "We could not save or synchronize your choice. Retry without answering again.",
+      "changed": "Your session or choice has changed. The previous choice cannot be resent: make a new explicit choice.",
+      "newDecision": "New choice for this session",
+      "saveNewChoice": "Save new choice",
+      "pending": "Your choice is waiting to synchronize.",
+      "retry": "Retry saving",
+      "dateUnavailable": "Date not recorded",
+      "decisionDate": "Choice date:",
+      "termsAccepted": "Terms accepted",
+      "termsRequired": "Terms acceptance still required",
+      "unanswered": "Optional analytics: no choice recorded",
+      "optedIn": "Optional analytics: opt-in requested",
+      "refused": "Optional analytics: refused",
+      "analyticsDescription": "You can choose to allow usage analytics to help improve the app. This choice is separate from the terms and is not required to study.",
+      "collectionOff": "Optional analytics collection is off, even if your choice is on.",
+      "persisted": "Choice saved in your account.",
+      "received": "Choice received by the server, not saved in an account."
+    },
     "inline": {
-      "acceptedText": "Consent accepted",
+      "acceptedText": "Cookie choice recorded",
       "manage": "Manage preferences",
-      "acceptButton": "Accept cookies",
+      "acceptButton": "Save cookie choice",
       "info": "Information",
       "title": "Cookies and Privacy",
       "description": "We use essential cookies for the site to work",
       "learnMore": "Learn more",
       "analyticsLabel": "Analytics (optional)",
-      "submitButton": "Accept"
+      "submitButton": "Save choice"
     },
     "unified": {
       "loading": "Loading...",
@@ -145,15 +172,15 @@
       },
       "analytics": {
         "label": "Optional Analytics",
-        "description": "Help us improve the app (anonymous)"
+        "description": "Help us improve the app with usage statistics"
       },
       "buttons": {
         "disabled": "Accept the terms to continue",
         "accept": "Accept and Continue",
         "submitting": "Saving...",
         "learnMore": "Learn more",
-        "rejectAll": "Reject all",
-        "acceptAll": "Accept all"
+        "rejectAll": "Refuse optional analytics",
+        "acceptAll": "Allow optional analytics"
       },
       "coppa": "If you are under 13, parental consent is required",
       "screenReader": {
@@ -161,7 +188,7 @@
         "submitting": "Consent saving in progress..."
       },
       "bannerTitle": "Cookie Notice",
-      "bannerRights": "You can freely give, refuse or withdraw your consent at any time. Use the \"Accept all\" button to consent. Use the \"Reject all\" button to continue without accepting.",
+      "bannerRights": "Analytics are optional and initially off. You can refuse them or change your choice in settings. This choice does not accept the terms: you must accept those separately to study.",
       "categories": {
         "essential": "Essential",
         "analytics": "Analytics (optional)"

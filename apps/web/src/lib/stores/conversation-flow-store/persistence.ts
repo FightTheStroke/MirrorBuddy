@@ -10,7 +10,11 @@
 
 import { logger } from '@/lib/logger';
 import { csrfFetch } from '@/lib/auth';
-import { isAuthenticated } from '@/lib/auth/client-auth';
+import {
+  getClientIdentity,
+  getUserIdFromCookie,
+  requireClientUserId,
+} from '@/lib/auth/client-auth';
 import type { CharacterType } from '@/types';
 import type { ConversationSummary } from './types';
 
@@ -37,6 +41,7 @@ export async function createConversationInDB(
   characterName: string,
 ): Promise<string | null> {
   try {
+    if (getUserIdFromCookie() === null) return null;
     const response = await csrfFetch('/api/conversations', {
       method: 'POST',
       body: JSON.stringify({
@@ -66,6 +71,7 @@ export async function saveMessageToDB(
   content: string,
 ): Promise<void> {
   try {
+    requireClientUserId();
     const response = await csrfFetch(`/api/conversations/${conversationId}/messages`, {
       method: 'POST',
       body: JSON.stringify({ role, content }),
@@ -83,40 +89,33 @@ export async function saveMessageToDB(
  * We use summaries for context instead of restoring entire conversations.
  */
 export async function loadConversationSummariesFromDB(): Promise<ConversationSummary[]> {
+  const identity = getClientIdentity();
   // A signed-out visitor has no conversations. Asking anyway earns a 401 the
   // browser prints as a failed request.
-  if (!isAuthenticated()) {
+  if (getUserIdFromCookie() === null) {
     return [];
   }
 
   try {
     const response = await fetch('/api/conversations?limit=20&active=true');
 
-    // 401 = the cookie is present but the session expired
-    if (response.status === 401) {
-      return [];
-    }
-
     if (!response.ok) {
-      logger.warn('Conversations API returned error', { status: response.status });
-      return [];
+      throw new Error(`Conversations API returned ${response.status}`);
     }
 
     const data = await response.json();
+    if (getClientIdentity() !== identity) throw new Error('Conversation identity changed');
 
     // API might return error object instead of array
     if (!Array.isArray(data)) {
-      if (data.error) {
-        logger.warn('Conversations API error', { error: data.error });
-      }
-      return [];
+      throw new Error('Invalid conversations response');
     }
 
     return data;
   } catch (error) {
     // Network error or JSON parse error
     logger.debug('Error loading conversation summaries (non-critical)', { error: String(error) });
-    return [];
+    throw error;
   }
 }
 
@@ -132,6 +131,7 @@ export async function updateConversationSummary(
   topics: string[],
 ): Promise<void> {
   try {
+    requireClientUserId();
     await csrfFetch(`/api/conversations/${conversationId}`, {
       method: 'PUT',
       body: JSON.stringify({ summary, keyFacts: JSON.stringify(keyFacts), topics }),

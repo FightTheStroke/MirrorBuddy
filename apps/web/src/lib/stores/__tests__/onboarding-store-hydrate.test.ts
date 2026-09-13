@@ -9,6 +9,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useOnboardingStore } from '../onboarding-store';
+import { setClientIdentity } from '@/lib/auth';
 
 function mockOnboardingResponse(body: unknown) {
   vi.stubGlobal(
@@ -23,6 +24,13 @@ function mockOnboardingResponse(body: unknown) {
 
 describe('onboarding-store hydrateFromApi — completion resolution', () => {
   beforeEach(() => {
+    setClientIdentity({
+      status: 'authenticated',
+      userId: 'onboarding-account',
+      role: 'USER',
+      legacyOrigin: false,
+      needsLegacyUpgrade: false,
+    });
     // Reset the hydration guard so each test re-runs hydrateFromApi.
     useOnboardingStore.setState({ isHydrated: false, hasCompletedOnboarding: false });
   });
@@ -93,5 +101,21 @@ describe('onboarding-store hydrateFromApi — completion resolution', () => {
     await useOnboardingStore.getState().hydrateFromApi();
 
     expect(useOnboardingStore.getState().hasCompletedOnboarding).toBe(true);
+  });
+
+  it('unavailable identity preserves unhydrated state without an authenticated request', async () => {
+    mockOnboardingResponse({});
+    setClientIdentity({ status: 'unavailable', reason: 'SESSION_NOT_ACTIVATED' });
+    await expect(useOnboardingStore.getState().hydrateFromApi()).rejects.toThrow(
+      'SESSION_NOT_ACTIVATED',
+    );
+    expect(fetch).not.toHaveBeenCalled();
+    expect(useOnboardingStore.getState().isHydrated).toBe(false);
+  });
+
+  it('a rejected account read does not become a hydrated guest', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 401 })));
+    await expect(useOnboardingStore.getState().hydrateFromApi()).rejects.toThrow('401');
+    expect(useOnboardingStore.getState().isHydrated).toBe(false);
   });
 });

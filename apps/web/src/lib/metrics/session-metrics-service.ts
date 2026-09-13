@@ -9,19 +9,15 @@
  * - Safety events
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { canCollectOptionalAnalytics } from '@/lib/telemetry/optional-analytics-server';
 
 // Session outcome types from V1Plan
-export type SessionOutcome =
-  | "success"
-  | "dropped"
-  | "stuck_loop"
-  | "abandoned"
-  | "unknown";
+export type SessionOutcome = 'success' | 'dropped' | 'stuck_loop' | 'abandoned' | 'unknown';
 
 // Incident severity from V1Plan FASE 2.0.7
-export type IncidentSeverity = "S0" | "S1" | "S2" | "S3";
+export type IncidentSeverity = 'S0' | 'S1' | 'S2' | 'S3';
 
 interface TurnData {
   latencyMs: number;
@@ -71,7 +67,7 @@ export function startSession(sessionId: string, userId: string): void {
     voiceMinutes: 0,
   });
 
-  logger.debug("Session metrics tracking started", { sessionId, userId });
+  logger.debug('Session metrics tracking started', { sessionId, userId });
 }
 
 /**
@@ -80,7 +76,7 @@ export function startSession(sessionId: string, userId: string): void {
 export function recordTurn(sessionId: string, turn: TurnData): void {
   const session = activeSessions.get(sessionId);
   if (!session) {
-    logger.warn("Recording turn for unknown session", { sessionId });
+    logger.warn('Recording turn for unknown session', { sessionId });
     return;
   }
 
@@ -122,10 +118,7 @@ export function recordRefusal(sessionId: string, wasCorrect: boolean): void {
 /**
  * Record an incident
  */
-export function recordIncident(
-  sessionId: string,
-  severity: IncidentSeverity,
-): void {
+export function recordIncident(sessionId: string, severity: IncidentSeverity): void {
   const session = activeSessions.get(sessionId);
   if (!session) return;
 
@@ -137,8 +130,8 @@ export function recordIncident(
   }
 
   // S3 requires immediate logging
-  if (severity === "S3") {
-    logger.error("S3 incident detected", { sessionId, userId: session.userId });
+  if (severity === 'S3') {
+    logger.error('S3 incident detected', { sessionId, userId: session.userId });
   }
 }
 
@@ -149,7 +142,7 @@ export function recordJailbreakAttempt(sessionId: string): void {
   const session = activeSessions.get(sessionId);
   if (session) {
     session.jailbreakAttempts++;
-    logger.warn("Jailbreak attempt detected", { sessionId });
+    logger.warn('Jailbreak attempt detected', { sessionId });
   }
 }
 
@@ -182,22 +175,22 @@ function determineOutcome(session: SessionState): SessionOutcome {
 
   // Stuck loop takes priority
   if (stuckLoops > 0) {
-    return "stuck_loop";
+    return 'stuck_loop';
   }
 
   // Check for dropped (early abandonment)
   if (turnCount <= DROPPED_TURN_THRESHOLD) {
-    return "dropped";
+    return 'dropped';
   }
 
   // Check for abandoned (inactivity)
   const inactiveMs = Date.now() - session.lastActivityTime;
   if (inactiveMs > INACTIVITY_TIMEOUT_MS) {
-    return "abandoned";
+    return 'abandoned';
   }
 
   // Default to success if none of the above
-  return "success";
+  return 'success';
 }
 
 /**
@@ -209,11 +202,7 @@ function determineOutcome(session: SessionState): SessionOutcome {
  *
  * INPUT: Real data from Azure API (tokensIn/Out from response, voiceMinutes from session)
  */
-function calculateCost(
-  tokensIn: number,
-  tokensOut: number,
-  voiceMinutes: number,
-): number {
+function calculateCost(tokensIn: number, tokensOut: number, voiceMinutes: number): number {
   // €0.002 per 1K tokens (GPT-4o-mini average of input+output)
   const TOKEN_COST_EUR = 0.002 / 1000;
   // €0.04 per minute (gpt-realtime-mini)
@@ -231,7 +220,7 @@ function calculateCost(
 export async function endSession(sessionId: string): Promise<void> {
   const session = activeSessions.get(sessionId);
   if (!session) {
-    logger.warn("Ending unknown session", { sessionId });
+    logger.warn('Ending unknown session', { sessionId });
     return;
   }
 
@@ -240,17 +229,13 @@ export async function endSession(sessionId: string): Promise<void> {
   const totalTokensIn = session.turns.reduce((sum, t) => sum + t.tokensIn, 0);
   const totalTokensOut = session.turns.reduce((sum, t) => sum + t.tokensOut, 0);
   const totalLatencyMs = session.turns.reduce((sum, t) => sum + t.latencyMs, 0);
-  const avgLatencyMs =
-    turnCount > 0 ? Math.round(totalLatencyMs / turnCount) : null;
+  const avgLatencyMs = turnCount > 0 ? Math.round(totalLatencyMs / turnCount) : null;
   const stuckLoopCount = detectStuckLoop(session.recentIntents);
   const outcome = determineOutcome(session);
-  const costEur = calculateCost(
-    totalTokensIn,
-    totalTokensOut,
-    session.voiceMinutes,
-  );
+  const costEur = calculateCost(totalTokensIn, totalTokensOut, session.voiceMinutes);
 
   try {
+    if (!(await canCollectOptionalAnalytics(session.userId))) return;
     await prisma.sessionMetrics.create({
       data: {
         sessionId,
@@ -270,18 +255,14 @@ export async function endSession(sessionId: string): Promise<void> {
       },
     });
 
-    logger.info("Session metrics saved", {
+    logger.info('Session metrics saved', {
       sessionId,
       outcome,
       turnCount,
       costEur,
     });
   } catch (error) {
-    logger.error(
-      "Failed to save session metrics",
-      { sessionId },
-      error as Error,
-    );
+    logger.error('Failed to save session metrics', { sessionId }, error as Error);
   } finally {
     activeSessions.delete(sessionId);
   }
@@ -292,6 +273,13 @@ export async function endSession(sessionId: string): Promise<void> {
  */
 export function getSessionState(sessionId: string): SessionState | undefined {
   return activeSessions.get(sessionId);
+}
+
+export function discardSessionsForUser(userId: string | null | undefined): void {
+  if (!userId) return;
+  for (const [id, session] of activeSessions) {
+    if (session.userId === userId) activeSessions.delete(id);
+  }
 }
 
 /**
@@ -309,7 +297,7 @@ export async function cleanupAbandonedSessions(): Promise<number> {
   }
 
   if (cleanedCount > 0) {
-    logger.info("Cleaned up abandoned sessions", { count: cleanedCount });
+    logger.info('Cleaned up abandoned sessions', { count: cleanedCount });
   }
 
   return cleanedCount;

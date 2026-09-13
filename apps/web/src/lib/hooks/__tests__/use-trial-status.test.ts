@@ -1,271 +1,108 @@
-/**
- * MIRRORBUDDY - Use Trial Status Hook Tests
- *
- * @vitest-environment jsdom
- */
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
+import { setClientIdentity } from '@/lib/auth';
+import { useTrialStatus } from '../use-trial-status';
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+const track = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/telemetry/trial-events', () => ({ trackTrialStart: track }));
+const session = {
+  sessionId: 'visitor-valid',
+  chatsUsed: 3,
+  chatsRemaining: 7,
+  maxChats: 10,
+  voiceSecondsUsed: 120,
+  voiceSecondsRemaining: 180,
+  maxVoiceSeconds: 300,
+  toolsUsed: 2,
+  toolsRemaining: 8,
+  maxTools: 10,
+};
+const account = {
+  status: 'authenticated' as const,
+  userId: 'account',
+  role: 'USER' as const,
+  legacyOrigin: false,
+  needsLegacyUpgrade: false,
+};
+const fetchMock = vi.fn<typeof fetch>();
+beforeEach(() => {
+  vi.clearAllMocks();
+  setClientIdentity(account);
+  vi.stubGlobal('fetch', fetchMock);
+});
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
-// Mock telemetry before importing hook
-const mockTrackTrialStart = vi.fn();
-vi.mock("@/lib/telemetry/trial-events", () => ({
-  trackTrialStart: (...args: unknown[]) => mockTrackTrialStart(...args),
-}));
-
-import { useTrialStatus } from "../use-trial-status";
-
-// Mock fetch globally
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
-
-describe("useTrialStatus", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockFetch.mockReset();
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("starts in loading state", () => {
-    mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
-
+describe('useTrialStatus authoritative separation', () => {
+  it('starts with pending identity and does not issue trial requests', () => {
+    setClientIdentity({ status: 'pending' });
     const { result } = renderHook(() => useTrialStatus());
-
     expect(result.current.isLoading).toBe(true);
     expect(result.current.isTrialMode).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
   });
-
-  it("returns trial=false for authenticated users", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: false }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
+  it('authenticated credential-bearing users are not trial', async () => {
+    fetchMock.mockResolvedValue(Response.json({ isTrialUser: false }));
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isTrialMode).toBe(false);
-    expect(result.current.maxChats).toBe(10);
-    expect(result.current.maxVoiceSeconds).toBe(300);
-    expect(result.current.maxTools).toBe(10);
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/user/trial-status');
+    expect(track).not.toHaveBeenCalled();
   });
-
-  it("returns trial status for trial users", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: true }),
-        });
-      }
-      if (url === "/api/trial/session") {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              sessionId: "visitor-abc-123",
-              chatsUsed: 3,
-              chatsRemaining: 7,
-              maxChats: 10,
-              voiceSecondsUsed: 120,
-              voiceSecondsRemaining: 180,
-              maxVoiceSeconds: 300,
-              toolsUsed: 2,
-              toolsRemaining: 8,
-              maxTools: 10,
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
+  it('authenticated credentialless users keep real trial quotas', async () => {
+    fetchMock.mockImplementation(async (url) =>
+      Response.json(url === '/api/user/trial-status' ? { isTrialUser: true } : session),
+    );
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.isTrialMode).toBe(true);
-    expect(result.current.chatsUsed).toBe(3);
-    expect(result.current.chatsRemaining).toBe(7);
-    expect(result.current.voiceSecondsUsed).toBe(120);
-    expect(result.current.voiceSecondsRemaining).toBe(180);
-    expect(result.current.toolsUsed).toBe(2);
-    expect(result.current.toolsRemaining).toBe(8);
-    expect(result.current.visitorId).toBe("visitor-abc-123");
+    await waitFor(() => expect(result.current.isTrialMode).toBe(true));
+    expect(result.current).toMatchObject({ ...session, visitorId: session.sessionId });
+    expect(track).toHaveBeenCalledExactlyOnceWith(session.sessionId);
   });
-
-  it("tracks trial start for trial users", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: true }),
-        });
-      }
-      if (url === "/api/trial/session") {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              sessionId: "visitor-xyz",
-              chatsRemaining: 10,
-              maxChats: 10,
-              voiceSecondsRemaining: 300,
-              maxVoiceSeconds: 300,
-              toolsRemaining: 10,
-              maxTools: 10,
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
+  it('confirmed anonymous visitors use the actual trial session, not the account API', async () => {
+    setClientIdentity({ status: 'anonymous' });
+    fetchMock.mockResolvedValue(Response.json(session));
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(mockTrackTrialStart).toHaveBeenCalledWith("visitor-xyz");
-    expect(mockTrackTrialStart).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(result.current.isTrialMode).toBe(true));
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/trial/session');
   });
-
-  it("does not track trial start for authenticated users", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: false }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
+  it.each([401, 503])('account status HTTP %s never falls through to trial', async (status) => {
+    fetchMock.mockResolvedValue(new Response('{}', { status }));
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(mockTrackTrialStart).not.toHaveBeenCalled();
+    await waitFor(() => expect(result.current.error).toBe('TRIAL_STATUS_UNAVAILABLE'));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.current.isTrialMode).toBe(false);
+    expect(result.current.chatsRemaining).toBe(0);
   });
-
-  it("falls back to trial mode on API error", async () => {
-    mockFetch.mockRejectedValue(new Error("Network error"));
-
+  it('network failure does not mint default quotas', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Offline'));
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.isTrialMode).toBe(true);
-    expect(result.current.chatsRemaining).toBe(10);
-    expect(result.current.voiceSecondsRemaining).toBe(300);
-    expect(result.current.toolsRemaining).toBe(10);
+    await waitFor(() => expect(result.current.error).toBeTruthy());
+    expect(result.current.toolsRemaining).toBe(0);
+    expect(track).not.toHaveBeenCalled();
   });
-
-  it("falls back to trial mode when session API returns error", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: true }),
-        });
-      }
-      if (url === "/api/trial/session") {
-        return Promise.resolve({ ok: false, status: 500 });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
+  it.each([{}, { ...session, sessionId: undefined }, { sessionId: 'partial', chatsUsed: 5 }])(
+    'malformed trial response is unavailable rather than fabricated success',
+    async (data) => {
+      setClientIdentity({ status: 'anonymous' });
+      fetchMock.mockResolvedValue(Response.json(data));
+      const { result } = renderHook(() => useTrialStatus());
+      await waitFor(() => expect(result.current.error).toBeTruthy());
+      expect(result.current.visitorId).toBeUndefined();
+      expect(result.current.isTrialMode).toBe(false);
+      expect(track).not.toHaveBeenCalled();
+    },
+  );
+  it('revocation/unavailability hides old trial data and sends no new request', async () => {
+    setClientIdentity({ status: 'anonymous' });
+    fetchMock.mockResolvedValue(Response.json(session));
     const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.isTrialMode).toBe(true);
-    expect(result.current.chatsRemaining).toBe(10);
-  });
-
-  it("uses default values for missing response fields", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: true }),
-        });
-      }
-      if (url === "/api/trial/session") {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              sessionId: "visitor-partial",
-              // Only partial data returned
-              chatsUsed: 5,
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
-    const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.chatsUsed).toBe(5);
-    expect(result.current.chatsRemaining).toBe(10); // Default
-    expect(result.current.maxChats).toBe(10); // Default
-    expect(result.current.voiceSecondsUsed).toBe(0); // Default
-    expect(result.current.voiceSecondsRemaining).toBe(300); // Default
-    expect(result.current.toolsUsed).toBe(0); // Default
-    expect(result.current.toolsRemaining).toBe(10); // Default
-  });
-
-  it("uses 'unknown' for missing sessionId", async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/user/trial-status") {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ isTrialUser: true }),
-        });
-      }
-      if (url === "/api/trial/session") {
-        return Promise.resolve({
-          ok: true,
-          json: () =>
-            Promise.resolve({
-              // No sessionId
-              chatsRemaining: 10,
-            }),
-        });
-      }
-      return Promise.reject(new Error("Unexpected fetch"));
-    });
-
-    const { result } = renderHook(() => useTrialStatus());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.visitorId).toBe("unknown");
-    expect(mockTrackTrialStart).toHaveBeenCalledWith("unknown");
+    await waitFor(() => expect(result.current.isTrialMode).toBe(true));
+    act(() => setClientIdentity({ status: 'unavailable', reason: 'SESSION_REJECTED' }));
+    expect(result.current.error).toBe('SESSION_REJECTED');
+    expect(result.current.visitorId).toBeUndefined();
+    expect(result.current.isTrialMode).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });

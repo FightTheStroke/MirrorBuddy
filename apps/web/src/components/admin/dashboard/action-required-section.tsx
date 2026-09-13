@@ -1,14 +1,24 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useId } from 'react';
 import { Mail, ShieldAlert, Bug, ServerCrash } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MetricProvenance } from '@/components/admin/metric-truth';
+import type { MetricTruth } from '@/lib/admin/metric-truth';
+import { normalizeCountMetric } from '@/lib/admin/metric-count';
 
 interface ActionRequiredProps {
-  pendingInvites: number;
-  safetyUnresolved: number;
-  sentryErrors: number;
-  servicesDown: number;
+  pendingInvites: number | null;
+  safetyUnresolved: number | null;
+  sentryErrors: number | null;
+  servicesDown: number | null;
+  metrics?: Partial<
+    Record<
+      'pendingInvites' | 'safetyUnresolved' | 'sentryErrors' | 'servicesDown',
+      MetricTruth | null
+    >
+  >;
 }
 
 const ITEMS = [
@@ -35,13 +45,20 @@ const ITEMS = [
 ] as const;
 
 export function ActionRequiredSection(props: ActionRequiredProps) {
-  const { safetyUnresolved, servicesDown } = props;
   const t = useTranslations('admin.dashboard');
+  const descriptionId = useId();
 
-  const activeItems = ITEMS.filter((item) => props[item.prop] > 0);
+  const activeItems = ITEMS.map((item) => ({
+    ...item,
+    metric: normalizeCountMetric(props.metrics?.[item.prop]),
+  })).filter((item) => item.metric.value === null || item.metric.value > 0);
   if (activeItems.length === 0) return null;
 
-  const hasCritical = servicesDown > 0 || safetyUnresolved > 0;
+  const hasCritical = activeItems.some(
+    (item) =>
+      (item.prop === 'servicesDown' || item.prop === 'safetyUnresolved') &&
+      (item.metric.value ?? 0) > 0,
+  );
   const borderColor = hasCritical
     ? 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950'
     : 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950';
@@ -55,7 +72,7 @@ export function ActionRequiredSection(props: ActionRequiredProps) {
       <div className="flex flex-wrap gap-2">
         {activeItems.map((item) => {
           const Icon = item.icon;
-          const count = props[item.prop];
+          const count = item.metric.value ?? t('noDataAvailable');
           const label = t(`actionRequired.${item.key}`);
           return (
             <a
@@ -64,12 +81,14 @@ export function ActionRequiredSection(props: ActionRequiredProps) {
               {...('external' in item ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 text-sm hover:shadow-sm transition-shadow"
               aria-label={`${label}: ${count}`}
+              aria-describedby={`${descriptionId}-${item.prop}`}
             >
               <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{label}</span>
               <span className="inline-flex items-center justify-center h-5 min-w-5 px-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 text-xs font-bold">
                 {count}
               </span>
+              <MetricProvenance metric={item.metric} id={`${descriptionId}-${item.prop}`} />
             </a>
           );
         })}

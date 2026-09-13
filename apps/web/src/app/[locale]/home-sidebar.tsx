@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { ActiveMaestroAvatar } from '@/components/conversation';
 import { TrialStatusIndicator } from '@/components/trial';
 import { useAdminStatus } from '@/lib/hooks/use-admin-status';
+import { useMediaQuery } from '@/lib/hooks/use-media-query';
 import type { View } from '@/app/[locale]/types';
 import { LogoBrain } from '@/components/branding/logo-brain';
 
@@ -59,6 +60,13 @@ export function HomeSidebar({
 }: HomeSidebarProps) {
   const t = useTranslations('home');
   const { isAdmin } = useAdminStatus();
+  // R2: below `lg` the closed sidebar is only translated off-canvas, so it kept
+  // its place in the keyboard order and the accessibility tree (Shift+Tab landed
+  // on "Area Genitori" at x = -240 on a 375px viewport). `inert` removes it for
+  // real. At `lg` the closed state is the visible collapsed rail (lg:w-20):
+  // genuine navigation that must stay operable, so it is never excluded.
+  const isDesktopViewport = useMediaQuery('(min-width: 1024px)');
+  const isClosedMobileDrawer = !open && !isDesktopViewport;
   const handleViewChange = async (view: View) => {
     await onViewChange(view);
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
@@ -101,7 +109,7 @@ export function HomeSidebar({
           >
             <Image
               src={avatarSrc}
-              alt={item.label}
+              alt=""
               width={32}
               height={32}
               className="w-8 h-8 rounded-full object-cover"
@@ -120,7 +128,10 @@ export function HomeSidebar({
             <item.icon className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')} />
           </div>
         )}
-        {open && <span className="font-medium">{item.label}</span>}
+        {/* R2: the label is the button's only accessible name (the icon is
+            decorative and the avatar is now alt=""), so it is always rendered —
+            visually hidden while collapsed instead of dropped. */}
+        <span className={cn('font-medium', !open && 'sr-only')}>{item.label}</span>
       </button>
     );
   };
@@ -135,6 +146,7 @@ export function HomeSidebar({
         />
       )}
       <aside
+        inert={isClosedMobileDrawer}
         className={cn(
           'fixed top-[var(--maintenance-banner-offset)] left-0 h-[calc(100%_-_var(--maintenance-banner-offset))] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 flex flex-col',
           'w-64 max-w-[85vw] lg:max-w-none lg:w-64',

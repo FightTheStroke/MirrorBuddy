@@ -22,12 +22,21 @@ import type { Page, BrowserContext } from '@playwright/test';
 /** Mock /api/tos to bypass TosGateProvider (ADR 0059) */
 export async function mockTOS(page: Page) {
   await page.route('**/api/tos', (route) => {
-    route.fulfill({
+    return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ accepted: true, version: '1.0' }),
+      body: JSON.stringify({
+        accepted: true,
+        version: '1.0',
+        acceptedAt: new Date().toISOString(),
+      }),
     });
   });
+  await page.route('**/api/user/consent', (route) =>
+    route.request().method() === 'GET'
+      ? route.fulfill({ json: { consent: null, analyticsAllowed: false } })
+      : route.continue(),
+  );
 }
 
 /** Set consent localStorage to bypass CookieConsentWall */
@@ -45,9 +54,14 @@ export async function mockConsentStorage(context: BrowserContext) {
       localStorage.setItem(
         'mirrorbuddy-unified-consent',
         JSON.stringify({
+          version: '1.0',
           tos: { accepted: true, version: '1.0', acceptedAt: new Date().toISOString() },
-          cookies: { essential: true, analytics: false, acceptedAt: new Date().toISOString() },
-          trial: { accepted: true, version: '1.0' },
+          cookies: {
+            essential: true,
+            analytics: false,
+            version: '1.0',
+            acceptedAt: new Date().toISOString(),
+          },
         }),
       );
     } catch {

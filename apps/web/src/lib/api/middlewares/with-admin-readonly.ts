@@ -10,7 +10,7 @@ export const withAdminReadOnly: Middleware = async (ctx, next) => {
   const auth = await validateAdminReadOnlyAuth();
 
   if (!auth.authenticated || !auth.userId) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+    return new Response(JSON.stringify({ error: 'Unauthorized', code: 'AUTH_ABSENT' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });
@@ -25,6 +25,7 @@ export const withAdminReadOnly: Middleware = async (ctx, next) => {
 
   ctx.userId = auth.userId;
   ctx.isAdmin = true;
+  ctx.authSession = auth.session;
 
   return next();
 };

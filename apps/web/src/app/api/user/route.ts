@@ -9,8 +9,9 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/server';
-import { signCookieValue } from '@/lib/auth/server';
-import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from '@/lib/auth/server';
+import { createGuestSession } from '@/lib/auth/session-issuance';
+import { setSessionCookies } from '@/lib/auth/session-cookies';
+import { AuthenticationError } from '@/lib/auth/auth-error';
 import { calculateAndPublishAdminCounts } from '@/lib/helpers/publish-admin-counts';
 import { assignBaseTierToNewUser } from '@/lib/tier/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
@@ -36,6 +37,7 @@ export const GET = pipe(withSentry('/api/user'))(async () => {
 
     // User authenticated but not found (shouldn't happen in normal flow)
     logger.warn('Authenticated user not found', { userId: auth.userId });
+    throw new AuthenticationError('SESSION_REJECTED');
   }
 
   // In production, require authentication — never auto-create users
@@ -45,17 +47,10 @@ export const GET = pipe(withSentry('/api/user'))(async () => {
   }
 
   // Dev/local mode: create new user automatically
-  const user = await prisma.user.create({
-    data: {
-      profile: { create: {} },
-      settings: { create: {} },
-      progress: { create: {} },
-    },
-    include: {
-      profile: true,
-      settings: true,
-      progress: true,
-    },
+  const { user, issued } = await createGuestSession({
+    profile: { create: {} },
+    settings: { create: {} },
+    progress: { create: {} },
   });
 
   // Assign Base tier to new user (Plan 073: T4-07)
@@ -69,27 +64,12 @@ export const GET = pipe(withSentry('/api/user'))(async () => {
   );
 
   // Set cookies (1 year expiry)
-  const signedCookie = signCookieValue(user.id);
   const cookieStore = await cookies();
-
-  // Server-side auth cookie (httpOnly, signed)
-  // This path only runs in dev/local mode (production returns 401 above)
-  cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 365,
-    path: '/',
+  setSessionCookies(cookieStore, issued);
+  const result = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: { profile: true, settings: true, progress: true },
   });
-
-  // Client-readable cookie (for client-side userId access)
-  cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
-    httpOnly: false,
-    secure: false,
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 365,
-    path: '/',
-  });
-
-  return NextResponse.json(user);
+  if (!result) throw new AuthenticationError('SESSION_REJECTED');
+  return NextResponse.json(result);
 });

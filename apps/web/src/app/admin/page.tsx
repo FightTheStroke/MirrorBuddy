@@ -22,6 +22,8 @@ import { PurgeStagingButton } from '@/components/admin/purge-staging-button';
 import { cn } from '@/lib/utils';
 import { useAdminCountsSSE } from '@/hooks/use-admin-counts-sse';
 import type { DashboardSummary } from '@/lib/admin/dashboard-summary-types';
+import { metricTruth, snapshotContext, type MetricTruth } from '@/lib/admin/metric-truth';
+import { MetricValue, MetricProvenance } from '@/components/admin/metric-truth';
 
 const GRAFANA_URL = 'https://mirrorbuddy.grafana.net/d/dashboard/';
 const POLL_INTERVAL = 60_000;
@@ -29,7 +31,7 @@ const POLL_INTERVAL = 60_000;
 export default function AdminDashboardPage() {
   const t = useTranslations('admin.dashboard');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [sentryErrorCount, setSentryErrorCount] = useState(0);
+  const [sentryMetric, setSentryMetric] = useState<MetricTruth | null>(null);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const { counts, status, error } = useAdminCountsSSE();
 
@@ -38,26 +40,45 @@ export default function AdminDashboardPage() {
     async function loadData() {
       try {
         const res = await fetch('/api/admin/dashboard-summary');
-        if (res.ok && !cancelled) setSummary(await res.json());
+        if (!cancelled) setSummary(res.ok ? await res.json() : null);
       } catch {
-        // Non-blocking
+        if (!cancelled) setSummary(null);
       }
       try {
         const res = await fetch('/api/admin/sentry/issues?limit=25');
         if (res.ok && !cancelled) {
           const data = await res.json();
-          setSentryErrorCount(data.issues?.length || 0);
+          setSentryMetric(data.metric ?? null);
+        } else if (!cancelled) {
+          setSentryMetric(
+            metricTruth<number>(null, {
+              ...snapshotContext('Sentry issues', null),
+              reason: 'collectionFailed',
+            }),
+          );
         }
       } catch {
-        // Non-blocking
+        if (!cancelled)
+          setSentryMetric(
+            metricTruth<number>(null, {
+              ...snapshotContext('Sentry issues', null),
+              reason: 'collectionFailed',
+            }),
+          );
       }
     }
     loadData();
     const interval = setInterval(loadData, POLL_INTERVAL);
-    return () => { cancelled = true; clearInterval(interval); };
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
-  const handleRefresh = () => { setIsRefreshing(true); window.location.reload(); };
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    window.location.reload();
+  };
 
   if (status === 'idle' || status === 'connecting') {
     return (
@@ -68,7 +89,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const dailyCostAvg = summary ? summary.cost.totalEur / 7 : null;
+  const dailyCostAvg = summary?.metrics?.dailyCost.value ?? null;
 
   return (
     <ErrorBoundary>
@@ -80,7 +101,9 @@ export default function AdminDashboardPage() {
         )}
         {status === 'error' && (
           <div className="p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-xs text-red-700 dark:text-red-300">{error || t('connectionFailed')}</p>
+            <p className="text-xs text-red-700 dark:text-red-300">
+              {error || t('connectionFailed')}
+            </p>
           </div>
         )}
 
@@ -89,17 +112,20 @@ export default function AdminDashboardPage() {
             healthStatus={summary?.health.overallStatus ?? null}
             safetyUnresolved={summary?.safety.unresolvedCount ?? null}
             dailyCostEur={dailyCostAvg}
+            metrics={summary?.metrics}
           />
           <div className="flex flex-wrap items-center gap-2">
             <PurgeStagingButton />
             <Button variant="outline" size="sm" asChild>
               <a href="/api/admin/reports/summary" download>
-                <FileDown className="h-4 w-4 mr-1.5" />{t('reportPdf')}
+                <FileDown className="h-4 w-4 mr-1.5" />
+                {t('reportPdf')}
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
               <a href={GRAFANA_URL} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-1.5" />{t('grafana')}
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                {t('grafana')}
               </a>
             </Button>
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
@@ -111,15 +137,25 @@ export default function AdminDashboardPage() {
 
         <ActionRequiredSection
           pendingInvites={counts.pendingInvites}
-          safetyUnresolved={summary?.safety.unresolvedCount ?? 0}
-          sentryErrors={sentryErrorCount}
-          servicesDown={summary?.health.servicesDownCount ?? 0}
+          safetyUnresolved={summary?.safety.unresolvedCount ?? null}
+          sentryErrors={sentryMetric?.value ?? null}
+          servicesDown={summary?.health.servicesDownCount ?? null}
+          metrics={{
+            pendingInvites: counts.metrics?.pendingInvites,
+            safetyUnresolved: summary?.metrics?.safety,
+            sentryErrors: sentryMetric,
+            servicesDown: summary?.metrics?.servicesDown,
+          }}
         />
 
-        <DashboardKpiGrid counts={counts} sentryErrorCount={sentryErrorCount} summary={summary} />
+        <DashboardKpiGrid counts={counts} sentryMetric={sentryMetric} summary={summary} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <DashboardPanel title={t('healthMonitoring')} detailHref="/admin/mission-control/health" span={2}>
+          <DashboardPanel
+            title={t('healthMonitoring')}
+            detailHref="/admin/mission-control/health"
+            span={2}
+          >
             <SLOMonitoringPanel />
           </DashboardPanel>
 
@@ -129,9 +165,8 @@ export default function AdminDashboardPage() {
 
           <DashboardPanel title={t('safetyEvents')} detailHref="/admin/safety">
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {summary?.safety.unresolvedCount
-                ? `${summary.safety.unresolvedCount} ${t('actionRequired.safetyEvents')}`
-                : t('noDataAvailable')}
+              <MetricValue metric={summary?.metrics?.safety} /> {t('actionRequired.safetyEvents')}
+              <MetricProvenance metric={summary?.metrics?.safety} />
             </p>
           </DashboardPanel>
 
@@ -143,7 +178,10 @@ export default function AdminDashboardPage() {
             <FeatureFlagsPanel />
           </DashboardPanel>
 
-          <DashboardPanel title={t('sentryErrorsPanel')} detailHref="https://fightthestroke.sentry.io/issues/">
+          <DashboardPanel
+            title={t('sentryErrorsPanel')}
+            detailHref="https://fightthestroke.sentry.io/issues/"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
               <SentryQuotaCard />
             </div>

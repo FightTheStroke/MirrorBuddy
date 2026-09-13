@@ -4,16 +4,16 @@
 // DELETE: Deprecated - redirects to /api/privacy/delete-my-data
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
 import {
   executeUserDataDeletion,
   logDeletionAudit,
-} from "@/app/api/privacy/delete-my-data/helpers";
-import { cookies } from "next/headers";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
+} from '@/app/api/privacy/delete-my-data/helpers';
+import { cookies } from 'next/headers';
+import { clearSessionCookies } from '@/lib/auth/session-cookies';
 
 /**
  * GET /api/user/data - Export all user data (GDPR portability)
@@ -22,7 +22,7 @@ import { AUTH_COOKIE_NAME } from "@/lib/auth";
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/user/data"),
+  withSentry('/api/user/data'),
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
@@ -51,7 +51,7 @@ export const GET = pipe(
   });
 
   if (!user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
   }
 
   // Format for export
@@ -97,7 +97,7 @@ interface DeleteRequestBody {
  * Uses the comprehensive GDPR deletion logic from /api/privacy/delete-my-data
  */
 export const DELETE = pipe(
-  withSentry("/api/user/data"),
+  withSentry('/api/user/data'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -109,21 +109,18 @@ export const DELETE = pipe(
     body = await ctx.req.json();
   } catch {
     return NextResponse.json(
-      { error: "Request body required with confirmDeletion: true" },
+      { error: 'Request body required with confirmDeletion: true' },
       { status: 400 },
     );
   }
 
   if (!body.confirmDeletion) {
-    return NextResponse.json(
-      { error: "Deletion must be explicitly confirmed" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Deletion must be explicitly confirmed' }, { status: 400 });
   }
 
-  logger.info("GDPR deletion via /api/user/data", {
+  logger.info('GDPR deletion via /api/user/data', {
     userId: userId.slice(0, 8),
-    reason: body.reason || "not provided",
+    reason: body.reason || 'not provided',
   });
 
   // Execute comprehensive deletion (same logic as /api/privacy/delete-my-data)
@@ -132,9 +129,8 @@ export const DELETE = pipe(
   // Audit log
   logDeletionAudit(userId, body.reason);
 
-  // Clear user cookie
   const cookieStore = await cookies();
-  cookieStore.delete(AUTH_COOKIE_NAME);
+  clearSessionCookies(cookieStore);
 
   return NextResponse.json(result);
 });

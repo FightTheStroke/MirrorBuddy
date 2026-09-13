@@ -1,7 +1,16 @@
-import { prisma } from '@/lib/db';
+import { prisma as database } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import { hashPII } from '@/lib/security';
+import { invalidateAllSessions } from '@/lib/auth/session-revocation';
+import {
+  sessionTransaction,
+  sessionDatabaseNow,
+  requireUserId,
+  assertAdminSession,
+} from '@/lib/auth/session-transaction';
+import type { AuthenticatedSession } from '@/lib/auth/session-auth';
+import { restoredUserData } from './user-trash-auth';
 
 const GRACE_PERIOD_DAYS = 30;
 
@@ -63,7 +72,11 @@ export interface UserBackupPayload {
 
 const log = logger.child({ module: 'admin-user-trash' });
 
-export async function buildUserBackup(userId: string): Promise<UserBackupPayload> {
+export async function buildUserBackup(
+  userId: string,
+  prisma: Prisma.TransactionClient = database,
+): Promise<UserBackupPayload> {
+  requireUserId(userId);
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
     throw new Error('User not found');
@@ -255,79 +268,106 @@ export async function buildUserBackup(userId: string): Promise<UserBackupPayload
   };
 }
 
-export async function createDeletedUserBackup(userId: string, adminId: string, reason?: string) {
-  const existing = await prisma.deletedUserBackup.findUnique({
-    where: { userId },
-  });
-  if (existing) {
-    throw new Error('Backup already exists for user');
-  }
+export async function createDeletedUserBackup(
+  userId: string,
+  adminId: string,
+  reason?: string,
+  actor?: AuthenticatedSession,
+) {
+  requireUserId(userId);
+  requireUserId(adminId);
+  const backup = await sessionTransaction(async (prisma) => {
+    if (actor !== undefined) await assertAdminSession(prisma, actor);
+    const existing = await prisma.deletedUserBackup.findUnique({
+      where: { userId },
+    });
+    if (existing) {
+      throw new Error('Backup already exists for user');
+    }
 
-  const payload = await buildUserBackup(userId);
-  const purgeAt = new Date();
-  purgeAt.setDate(purgeAt.getDate() + GRACE_PERIOD_DAYS);
+    const now = await sessionDatabaseNow(prisma);
+    await invalidateAllSessions(prisma, userId, now);
+    const payload = await buildUserBackup(userId, prisma);
+    const purgeAt = new Date(now.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
 
-  const backup = await prisma.deletedUserBackup.create({
-    data: {
-      userId,
-      email: (payload.user.email as string | null) || null,
-      username: (payload.user.username as string | null) || null,
-      role: payload.user.role as 'USER' | 'ADMIN',
-      backup: payload as unknown as Prisma.InputJsonValue,
-      deletedAt: new Date(),
-      purgeAt,
-      deletedBy: adminId,
-      reason: reason || null,
-    },
+    return prisma.deletedUserBackup.create({
+      data: {
+        userId,
+        email: (payload.user.email as string | null) || null,
+        username: (payload.user.username as string | null) || null,
+        role: payload.user.role as 'USER' | 'ADMIN',
+        backup: payload as unknown as Prisma.InputJsonValue,
+        deletedAt: now,
+        purgeAt,
+        deletedBy: adminId,
+        reason: reason || null,
+      },
+    });
   });
 
   log.info('User backup stored', { userId, adminId });
   return backup;
 }
 
-export async function restoreUserFromBackup(userId: string, adminId: string) {
-  const backup = await prisma.deletedUserBackup.findUnique({
-    where: { userId },
-  });
-  if (!backup) {
-    throw new Error('Backup not found');
-  }
-
-  const payload = backup.backup as unknown as UserBackupPayload;
-  const existingUser = await prisma.user.findUnique({ where: { id: userId } });
-  if (existingUser) {
-    throw new Error('User already exists');
-  }
-
-  if (payload.user.email) {
-    const emailHashValue = await hashPII(payload.user.email as string);
-    const emailOwner = await prisma.user.findFirst({
-      where: {
-        OR: [{ emailHash: emailHashValue }, { email: payload.user.email as string }],
-      },
-      select: { id: true },
+export async function restoreUserFromBackup(
+  userId: string,
+  adminId: string,
+  actor?: AuthenticatedSession,
+) {
+  requireUserId(userId);
+  requireUserId(adminId);
+  await sessionTransaction(async (tx) => {
+    if (actor !== undefined) await assertAdminSession(tx, actor);
+    const backup = await tx.deletedUserBackup.findUnique({
+      where: { userId },
     });
-    if (emailOwner) {
-      throw new Error('Email already in use');
+    if (!backup) {
+      throw new Error('Backup not found');
     }
-  }
-
-  if (payload.user.username) {
-    const usernameOwner = await prisma.user.findUnique({
-      where: { username: payload.user.username as string },
-      select: { id: true },
-    });
-    if (usernameOwner) {
-      throw new Error('Username already in use');
+    const now = await sessionDatabaseNow(tx);
+    if (
+      !(backup.purgeAt instanceof Date) ||
+      !Number.isFinite(backup.purgeAt.getTime()) ||
+      backup.purgeAt <= now
+    ) {
+      throw new Error('Backup expired');
     }
-  }
 
-  // Type assertion helper for backup restore (data was originally from Prisma)
-  const asData = <T>(d: Record<string, unknown>): T => d as unknown as T;
+    const payload = backup.backup as unknown as UserBackupPayload;
+    const userData = restoredUserData(payload?.user, userId);
+    const existingUser = await tx.user.findUnique({ where: { id: userId } });
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
 
-  await prisma.$transaction(async (tx) => {
+    if (payload.user.email) {
+      const emailHashValue = await hashPII(payload.user.email as string);
+      const emailOwner = await tx.user.findFirst({
+        where: {
+          OR: [{ emailHash: emailHashValue }, { email: payload.user.email as string }],
+        },
+        select: { id: true },
+      });
+      if (emailOwner) {
+        throw new Error('Email already in use');
+      }
+    }
+
+    if (payload.user.username) {
+      const usernameOwner = await tx.user.findUnique({
+        where: { username: payload.user.username as string },
+        select: { id: true },
+      });
+      if (usernameOwner) {
+        throw new Error('Username already in use');
+      }
+    }
+
+    // Type assertion helper for backup restore (data was originally from Prisma)
+    const asData = <T>(d: Record<string, unknown>): T => d as unknown as T;
+
     await tx.user.create({
-      data: asData<Prisma.UserUncheckedCreateInput>(payload.user),
+      data: userData,
     });
 
     if (payload.profile) {
@@ -596,16 +636,15 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
         data: asArr<Prisma.UserActivityUncheckedCreateInput>(payload.userActivity),
       });
     }
+    await tx.deletedUserBackup.delete({ where: { userId } });
   });
-
-  await prisma.deletedUserBackup.delete({ where: { userId } });
 
   log.info('User restored from backup', { userId, adminId });
 }
 
 export async function purgeExpiredUserBackups() {
   const now = new Date();
-  const result = await prisma.deletedUserBackup.deleteMany({
+  const result = await database.deletedUserBackup.deleteMany({
     where: { purgeAt: { lte: now } },
   });
   if (result.count > 0) {

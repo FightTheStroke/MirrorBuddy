@@ -23,6 +23,10 @@ model User {
   passwordHash       String? // bcrypt hash, null for legacy users
   mustChangePassword Boolean @default(false)
   disabled           Boolean @default(false)
+  authVersion        Int     @default(0)
+  legacyRevoked      Boolean @default(false)
+
+  authSessions AuthSession[]
 
   // F-17: Test data isolation
   isTestData Boolean @default(false)
@@ -113,6 +117,21 @@ model User {
   robotDevices RobotDevice[]
 
   @@index([emailHash])
+}
+
+model AuthSession {
+  handleHash   String    @id @db.VarChar(64)
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  issuedAt     DateTime  @default(now())
+  // No shared default: callers preserve each issuance family's intended lifetime.
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  authVersion  Int
+  legacyOrigin Boolean   @default(false)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model Profile {

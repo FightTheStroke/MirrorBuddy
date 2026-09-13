@@ -37,7 +37,7 @@ export async function checkDatabase(): Promise<ServiceHealth> {
 export async function checkRedis(): Promise<ServiceHealth> {
   const kvUrl = getRedisUrl();
   const kvToken = getRedisToken();
-  const configured = !!kvUrl;
+  const configured = !!(kvUrl || kvToken);
 
   if (!kvUrl || !kvToken) {
     log.warn('Redis not configured — health check skipped');

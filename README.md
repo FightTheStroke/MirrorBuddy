@@ -225,22 +225,30 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 # Clone and install (pnpm required; see below)
 git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
-pnpm install      # npm install still works during W1–W3 transition
+corepack enable
+pnpm install --frozen-lockfile
 
 # Configure environment
 cp .env.example .env
-# Edit .env with your Azure OpenAI or Ollama credentials
+cp .env.example apps/web/.env.local
+# Configure both files for safe LOCAL development; see SETUP.md for file scope.
+# Next reads app-directory .env* files, not the root .env automatically.
 
-# Initialize database
-pnpm prisma generate
-pnpm prisma migrate dev
+# Initialize the explicitly selected local database (replace user with your local role)
+pnpm exec prisma generate
+DEV_DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy" pnpm exec prisma migrate dev
 
 # Start development server
 pnpm dev
 ```
 
-**Prerequisites:** Node ≥ 20, pnpm ≥ 10.33.0 (pinned via the `packageManager` field).
-Turborepo handles cross-package task orchestration; `pnpm dev` / `pnpm build` / `pnpm lint` run through Turbo automatically.
+**Prerequisites:** Node **20.x** (`engines.node`), pnpm **10.33.0** (`packageManager`);
+tooling execution evidence uses Node 20.20.2. Run these scripts from the worktree
+root: `dev` delegates to `scripts/dev-server.sh`, `build` runs Next in `apps/web`,
+and `lint` runs the root checks directly, not through Turbo automatically.
+Application source is in `apps/web/src/`; shared packages are in `packages/`.
+Before seeding, read [SETUP.md](SETUP.md#tier-definitions): direct `seed:tiers` uses
+`DATABASE_URL`, not Prisma CLI's local/direct overrides.
 
 Open http://localhost:3000 and start learning.
 
@@ -415,17 +423,17 @@ To add a new language (e.g., Portuguese):
 
 ```bash
 # 1. Create translation file (next-intl namespace-based structure)
-cp -r messages/it/ messages/pt/
+cp -r apps/web/messages/it/ apps/web/messages/pt/
 
 # 2. Update config
-# Edit src/lib/i18n/config.ts
-export const SUPPORTED_LOCALES = ['it', 'en', 'fr', 'de', 'es', 'pt'];
+# Edit locales in packages/i18n/src/config.ts.
+# apps/web/src/i18n/config.ts re-exports the shared configuration.
 
 # 3. Validate translations
-npm run i18n:validate
+pnpm i18n:check
 
-# 4. Deploy
-git add messages/pt/ src/lib/i18n/config.ts
+# 4. Submit through the existing contribution and release checks
+git add apps/web/messages/pt/ packages/i18n/src/config.ts
 git commit -m "i18n: add Portuguese language support"
 git push
 ```

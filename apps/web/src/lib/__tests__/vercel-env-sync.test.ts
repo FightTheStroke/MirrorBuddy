@@ -11,6 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
+import { criticalProductionEnv } from '../../../../../scripts/lib/production-env-policy';
 
 // __dirname is apps/web/src/lib/__tests__ — repo root is 5 levels up.
 const ROOT = resolve(__dirname, '../../../../..');
@@ -99,14 +100,9 @@ describe.skipIf(!HAS_ENV_FILE)('Vercel environment variable alignment', () => {
     const content = readFileSync(resolve(ROOT, 'scripts/validate-pre-deploy.ts'), 'utf-8');
 
     // Parse both critical and optional lists
-    const criticalBlock = content.match(/const critical = \[([\s\S]*?)\];/);
     const optionalBlock = content.match(/const optional = \[([\s\S]*?)\];/);
 
-    const criticalNames = criticalBlock
-      ? (criticalBlock[1].match(/name:\s*["']([A-Z_]+)["']/g) || []).map((m) =>
-          m.replace(/name:\s*["']|["']/g, ''),
-        )
-      : [];
+    const criticalNames = criticalProductionEnv.map(({ name }) => name);
     const optionalNames = optionalBlock
       ? (optionalBlock[1].match(/name:\s*["']([A-Z_]+)["']/g) || []).map((m) =>
           m.replace(/name:\s*["']|["']/g, ''),

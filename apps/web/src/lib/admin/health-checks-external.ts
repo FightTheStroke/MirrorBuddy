@@ -12,7 +12,7 @@ import { fetchWithTimeout, buildHealthResponse } from './health-checks-utils';
 export async function checkAzureOpenAI(): Promise<ServiceHealth> {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
   const apiKey = process.env.AZURE_OPENAI_API_KEY;
-  const configured = !!endpoint;
+  const configured = !!(endpoint || apiKey);
 
   if (!endpoint || !apiKey) {
     return buildHealthResponse('Azure OpenAI', 'unknown', configured, undefined, 'Not configured');
@@ -99,9 +99,9 @@ export async function checkSentry(): Promise<ServiceHealth> {
   const authToken = process.env.SENTRY_AUTH_TOKEN;
   const org = process.env.SENTRY_ORG;
   const project = process.env.SENTRY_PROJECT;
-  const configured = !!(authToken && org && project);
+  const configured = !!(authToken || org || project);
 
-  if (!configured) {
+  if (!authToken || !org || !project) {
     return buildHealthResponse('Sentry', 'unknown', configured, undefined, 'Not configured');
   }
 

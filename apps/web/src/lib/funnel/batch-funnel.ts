@@ -1,15 +1,14 @@
-/**
- * Batch Funnel Processing
- * Detects ACTIVE and CHURNED users for cron-based funnel event recording.
- * Called from metrics-push cron to write FunnelEvent records.
- */
-
 import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 import { recordStageTransition, hasStage } from './index';
 import { logger } from '@/lib/logger';
+import {
+  hasStoredAnalyticsOptIn,
+  isOptionalAnalyticsEligible,
+} from '@/lib/telemetry/optional-analytics-server';
 
 const log = logger.child({ module: 'batch-funnel' });
-
+const BATCH_SIZE = 200;
 const ACTIVE_THRESHOLD = 3;
 const ACTIVE_WINDOW_DAYS = 7;
 const CHURN_INACTIVITY_DAYS = 14;
@@ -20,121 +19,137 @@ export interface BatchFunnelResult {
   errors: number;
 }
 
-/**
- * Detect and record ACTIVE users (>=3 study sessions in 7 days)
- */
-export async function processActiveUsers(): Promise<number> {
-  const windowStart = new Date(Date.now() - ACTIVE_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+async function* permittedUserBatches(): AsyncGenerator<string[]> {
+  let after: string | undefined;
+  for (;;) {
+    const settings = await prisma.settings.findMany({
+      select: { userId: true, azureCostConfig: true },
+      orderBy: { userId: 'asc' },
+      take: BATCH_SIZE,
+      ...(after ? { where: { userId: { gt: after } } } : {}),
+    });
+    if (!Array.isArray(settings)) throw new Error('Invalid analytics consent page');
+    if (!settings.length) return;
+    const lastUserId = settings.at(-1)?.userId;
+    if (!lastUserId || (after && lastUserId <= after))
+      throw new Error('Invalid analytics consent cursor');
+    const permitted: string[] = [];
+    for (const setting of settings) {
+      if (
+        hasStoredAnalyticsOptIn(setting?.azureCostConfig) &&
+        (await isOptionalAnalyticsEligible(setting?.userId))
+      )
+        permitted.push(setting.userId);
+    }
+    if (permitted.length) yield permitted;
+    if (settings.length < BATCH_SIZE) return;
+    after = lastUserId;
+  }
+}
 
+async function processActiveBatch(permitted: string[]): Promise<number> {
+  const windowStart = new Date(Date.now() - ACTIVE_WINDOW_DAYS * 24 * 60 * 60 * 1000);
   const activeUsers = await prisma.$queryRaw<Array<{ userId: string; sessionCount: bigint }>>`
     SELECT "userId", COUNT(DISTINCT id) as "sessionCount"
     FROM "StudySession"
     WHERE "startedAt" >= ${windowStart}
       AND "isTestData" = false
+      AND "userId" IN (${Prisma.join(permitted)})
     GROUP BY "userId"
     HAVING COUNT(DISTINCT id) >= ${ACTIVE_THRESHOLD}
   `;
-
   let recorded = 0;
   for (const user of activeUsers) {
-    const alreadyActive = await hasStage({ userId: user.userId }, 'ACTIVE');
-    if (alreadyActive) continue;
-
+    if (await hasStage({ userId: user.userId }, 'ACTIVE')) continue;
     try {
-      await recordStageTransition({ userId: user.userId }, 'ACTIVE', {
+      const stored = await recordStageTransition({ userId: user.userId }, 'ACTIVE', {
         sessionCount: Number(user.sessionCount),
         windowDays: ACTIVE_WINDOW_DAYS,
         source: 'cron',
       });
-      recorded++;
-    } catch (err) {
-      log.warn('Failed to record ACTIVE event', {
-        userId: user.userId,
-        error: String(err),
-      });
+      if (stored) recorded++;
+    } catch (error) {
+      log.warn('Failed to record ACTIVE event', { error: String(error) });
     }
   }
   return recorded;
 }
 
-/**
- * Detect and record CHURNED users (no activity > 14 days)
- */
-export async function processChurnedUsers(): Promise<number> {
+async function processChurnedBatch(permitted: string[]): Promise<number> {
   const churnCutoff = new Date(Date.now() - CHURN_INACTIVITY_DAYS * 24 * 60 * 60 * 1000);
-
-  const churnCandidates = await prisma.$queryRaw<
+  const candidates = await prisma.$queryRaw<
     Array<{
-      user_key: string;
+      userId: string;
       stage: string;
       last_activity: Date;
-      is_user: boolean;
     }>
   >`
     WITH latest AS (
-      SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
-        COALESCE("userId", "visitorId") as user_key,
-        stage,
-        "createdAt" as last_activity,
-        "userId" IS NOT NULL as is_user
+      SELECT DISTINCT ON ("userId") "userId", stage, "createdAt" as last_activity
       FROM "FunnelEvent"
       WHERE "isTestData" = false
-      ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC
+        AND "userId" IN (${Prisma.join(permitted)})
+      ORDER BY "userId", "createdAt" DESC
     )
-    SELECT user_key, stage, last_activity, is_user
+    SELECT "userId", stage, last_activity
     FROM latest
     WHERE last_activity < ${churnCutoff}
       AND stage NOT IN ('CHURNED', 'VISITOR')
   `;
-
   let recorded = 0;
-  for (const candidate of churnCandidates) {
-    const identifier = candidate.is_user
-      ? { userId: candidate.user_key }
-      : { visitorId: candidate.user_key };
-
-    const alreadyChurned = await hasStage(identifier, 'CHURNED');
-    if (alreadyChurned) continue;
-
+  for (const candidate of candidates) {
+    const identifier = { userId: candidate.userId };
+    if (await hasStage(identifier, 'CHURNED')) continue;
     try {
-      await recordStageTransition(identifier, 'CHURNED', {
+      const stored = await recordStageTransition(identifier, 'CHURNED', {
         previousStage: candidate.stage,
         lastActivity: candidate.last_activity.toISOString(),
         inactivityDays: CHURN_INACTIVITY_DAYS,
         source: 'cron',
       });
-      recorded++;
-    } catch (err) {
-      log.warn('Failed to record CHURNED event', {
-        userKey: candidate.user_key,
-        error: String(err),
-      });
+      if (stored) recorded++;
+    } catch (error) {
+      log.warn('Failed to record CHURNED event', { error: String(error) });
     }
   }
   return recorded;
 }
 
-/**
- * Run all batch funnel processing
- */
+export async function processActiveUsers(): Promise<number> {
+  let recorded = 0;
+  for await (const permitted of permittedUserBatches())
+    recorded += await processActiveBatch(permitted);
+  return recorded;
+}
+
+export async function processChurnedUsers(): Promise<number> {
+  let recorded = 0;
+  for await (const permitted of permittedUserBatches())
+    recorded += await processChurnedBatch(permitted);
+  return recorded;
+}
+
+/** One bounded consent scan per cron run; the recorder still rechecks permission before each write. */
 export async function processBatchFunnelEvents(): Promise<BatchFunnelResult> {
-  let activeRecorded = 0;
-  let churnedRecorded = 0;
-  let errors = 0;
-
+  const result: BatchFunnelResult = { activeRecorded: 0, churnedRecorded: 0, errors: 0 };
   try {
-    activeRecorded = await processActiveUsers();
-  } catch (err) {
-    log.error('processActiveUsers failed', { error: String(err) });
-    errors++;
+    for await (const permitted of permittedUserBatches()) {
+      try {
+        result.activeRecorded += await processActiveBatch(permitted);
+      } catch (error) {
+        log.error('Active funnel batch failed', { error: String(error) });
+        result.errors++;
+      }
+      try {
+        result.churnedRecorded += await processChurnedBatch(permitted);
+      } catch (error) {
+        log.error('Churned funnel batch failed', { error: String(error) });
+        result.errors++;
+      }
+    }
+  } catch (error) {
+    log.error('Funnel consent pagination failed', { error: String(error) });
+    result.errors++;
   }
-
-  try {
-    churnedRecorded = await processChurnedUsers();
-  } catch (err) {
-    log.error('processChurnedUsers failed', { error: String(err) });
-    errors++;
-  }
-
-  return { activeRecorded, churnedRecorded, errors };
+  return result;
 }

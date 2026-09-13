@@ -28,7 +28,9 @@ const SUBJECT_MAP: Record<string, import('@/lib/method-progress/types').Subject>
   music: 'musica',
 };
 
-function mapToMethodSubject(subject?: Subject): import('@/lib/method-progress/types').Subject | undefined {
+function mapToMethodSubject(
+  subject?: Subject,
+): import('@/lib/method-progress/types').Subject | undefined {
   if (!subject) return undefined;
   return SUBJECT_MAP[subject] ?? 'other';
 }
@@ -45,7 +47,10 @@ interface UseMessageSenderProps {
   extendedProfile: ExtendedStudentProfile;
   conversationsByCharacter: Record<string, { conversationId?: string; messages: unknown[] }>;
   pendingHandoff: HandoffSuggestion | null;
-  routeMessage: (message: string, profile: ExtendedStudentProfile) => {
+  routeMessage: (
+    message: string,
+    profile: ExtendedStudentProfile,
+  ) => {
     characterType: 'maestro' | 'coach' | 'buddy';
     character: unknown;
     reason: string;
@@ -80,113 +85,134 @@ export function useMessageSender({
     sessionStartTimeRef.current = Date.now();
   }, []);
 
-  const sendMessage = useCallback(async (userMessage: string) => {
-    if (!activeCharacter) return;
+  const sendMessage = useCallback(
+    async (userMessage: string) => {
+      if (!activeCharacter) return;
+      // Resolve before adaptive writes or routing. Unknown identity must retain the input.
+      const userId = getOrCreateUserId();
 
-    const subject = (activeCharacter.character as { subject?: string }).subject;
-    const lastAssistantMessage = [...messages].reverse().find((m) => m.role === 'assistant');
-    const responseTimeMs = lastAssistantMessage
-      ? Date.now() - lastAssistantMessage.timestamp.getTime()
-      : undefined;
-    const signals = buildSignalsFromText(userMessage, 'chat', subject);
-    if (responseTimeMs !== undefined) {
-      signals.push({
-        type: 'response_time_ms',
-        source: 'chat',
-        subject,
-        responseTimeMs,
-      });
-    }
-    if (signals.length > 0) {
-      sendAdaptiveSignals(signals);
-    }
+      const subject = (activeCharacter.character as { subject?: string }).subject;
+      const lastAssistantMessage = [...messages].reverse().find((m) => m.role === 'assistant');
+      const responseTimeMs = lastAssistantMessage
+        ? Date.now() - lastAssistantMessage.timestamp.getTime()
+        : undefined;
+      const signals = buildSignalsFromText(userMessage, 'chat', subject);
+      if (responseTimeMs !== undefined) {
+        signals.push({
+          type: 'response_time_ms',
+          source: 'chat',
+          subject,
+          responseTimeMs,
+        });
+      }
+      if (signals.length > 0) {
+        sendAdaptiveSignals(signals);
+      }
 
-    // Reset inactivity timer
-    const userId = getOrCreateUserId();
-    const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
-    if (userId && conversationId) {
-      inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
-    }
+      // Reset inactivity timer
+      const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
+      if (userId && conversationId) {
+        inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
+      }
 
-    // Route the message to determine if we need to switch characters
-    const routingResult = routeMessage(userMessage, extendedProfile);
+      // Route the message to determine if we need to switch characters
+      const routingResult = routeMessage(userMessage, extendedProfile);
 
-    // Track method progress based on intent (autonomy tracking - Issue #28)
-    const methodProgressStore = useMethodProgressStore.getState();
+      // Track method progress based on intent (autonomy tracking - Issue #28)
+      const methodProgressStore = useMethodProgressStore.getState();
 
-    if (routingResult.intent.type === 'method_help' ||
-        routingResult.intent.type === 'emotional_support') {
-      const timeElapsed = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
-      methodProgressStore.recordHelpRequest(
-        routingResult.reason,
-        timeElapsed,
-        mapToMethodSubject(routingResult.intent.subject)
-      );
-    } else if (routingResult.intent.type === 'academic_help' &&
-               activeCharacter?.type === 'maestro') {
-      if (messages.length > 4) {
-        methodProgressStore.recordProblemSolvedAlone(
-          userMessage.slice(0, 100),
-          mapToMethodSubject(routingResult.intent.subject)
+      if (
+        routingResult.intent.type === 'method_help' ||
+        routingResult.intent.type === 'emotional_support'
+      ) {
+        const timeElapsed = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
+        methodProgressStore.recordHelpRequest(
+          routingResult.reason,
+          timeElapsed,
+          mapToMethodSubject(routingResult.intent.subject),
+        );
+      } else if (
+        routingResult.intent.type === 'academic_help' &&
+        activeCharacter?.type === 'maestro'
+      ) {
+        if (messages.length > 4) {
+          methodProgressStore.recordProblemSolvedAlone(
+            userMessage.slice(0, 100),
+            mapToMethodSubject(routingResult.intent.subject),
+          );
+        }
+      }
+
+      // Check if we should suggest a handoff
+      if (
+        routingResult.characterType !== activeCharacter.type &&
+        routingResult.intent.confidence >= 0.7
+      ) {
+        await handleHandoffSuggestion(
+          routingResult,
+          activeCharacter,
+          extendedProfile,
+          suggestHandoff,
         );
       }
-    }
 
-    // Check if we should suggest a handoff
-    if (
-      routingResult.characterType !== activeCharacter.type &&
-      routingResult.intent.confidence >= 0.7
-    ) {
-      await handleHandoffSuggestion(
-        routingResult,
-        activeCharacter,
-        extendedProfile,
-        suggestHandoff
-      );
-    }
-
-    // Send to AI for response with memory context (ADR 0021)
-    const response = await csrfFetch('/api/chat', {
-      method: 'POST',
-      body: JSON.stringify({
-        messages: [
-          { role: 'system', content: activeCharacter.systemPrompt },
-          ...messages
-            .filter((m) => m.role !== 'system')
-            .map((m) => ({ role: m.role, content: m.content })),
-          { role: 'user', content: userMessage },
-        ],
-        maestroId: activeCharacter.id,
-        enableMemory: true,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get response');
-    }
-
-    const data = await response.json();
-    const assistantContent = data.content || data.message || '';
-    addMessage({ role: 'assistant', content: assistantContent });
-
-    // Check AI response for handoff signals (reactive detection)
-    if (!pendingHandoff) {
-      const handoffAnalysis = analyzeHandoff({
-        message: userMessage,
-        aiResponse: assistantContent,
-        activeCharacter,
-        studentProfile: extendedProfile,
-        recentMessages: messages.slice(-5).map((m) => ({
-          role: m.role === 'system' ? 'assistant' : (m.role as 'user' | 'assistant'),
-          content: m.content,
-        })),
+      // Send to AI for response with memory context (ADR 0021)
+      const response = await csrfFetch('/api/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: activeCharacter.systemPrompt },
+            ...messages
+              .filter((m) => m.role !== 'system')
+              .map((m) => ({ role: m.role, content: m.content })),
+            { role: 'user', content: userMessage },
+          ],
+          maestroId: activeCharacter.id,
+          enableMemory: true,
+        }),
       });
 
-      if (handoffAnalysis.shouldHandoff && handoffAnalysis.suggestion && handoffAnalysis.confidence > 0.7) {
-        suggestHandoff(handoffAnalysis.suggestion);
+      if (!response.ok) {
+        throw new Error('Failed to get response');
       }
-    }
-  }, [activeCharacter, messages, extendedProfile, conversationsByCharacter, pendingHandoff, routeMessage, addMessage, suggestHandoff]);
+
+      const data = await response.json();
+      const assistantContent = data.content || data.message || '';
+      addMessage({ role: 'assistant', content: assistantContent });
+
+      // Check AI response for handoff signals (reactive detection)
+      if (!pendingHandoff) {
+        const handoffAnalysis = analyzeHandoff({
+          message: userMessage,
+          aiResponse: assistantContent,
+          activeCharacter,
+          studentProfile: extendedProfile,
+          recentMessages: messages.slice(-5).map((m) => ({
+            role: m.role === 'system' ? 'assistant' : (m.role as 'user' | 'assistant'),
+            content: m.content,
+          })),
+        });
+
+        if (
+          handoffAnalysis.shouldHandoff &&
+          handoffAnalysis.suggestion &&
+          handoffAnalysis.confidence > 0.7
+        ) {
+          suggestHandoff(handoffAnalysis.suggestion);
+        }
+      }
+    },
+    [
+      activeCharacter,
+      messages,
+      extendedProfile,
+      conversationsByCharacter,
+      pendingHandoff,
+      routeMessage,
+      addMessage,
+      suggestHandoff,
+    ],
+  );
 
   return { sendMessage, sessionStartTimeRef };
 }
@@ -203,7 +229,7 @@ async function handleHandoffSuggestion(
   },
   activeCharacter: ActiveCharacter,
   extendedProfile: ExtendedStudentProfile,
-  suggestHandoff: (suggestion: HandoffSuggestion) => void
+  suggestHandoff: (suggestion: HandoffSuggestion) => void,
 ): Promise<void> {
   const { getSupportTeacherById } = await import('@/data/support-teachers');
   const { getBuddyById } = await import('@/data/buddy-profiles');

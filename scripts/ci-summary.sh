@@ -1,354 +1,92 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ci-summary.sh - Compact CI diagnostics (token-efficient)
-# ALL output captured silently. Only structured summary printed.
-# Target: ~10-30 lines output regardless of codebase size.
+# ci-summary.sh - Compact CI diagnostics with retained failure logs.
 #
 # Usage:
 #   ./scripts/ci-summary.sh                 # lint + typecheck + build + unsafe queries
-#   ./scripts/ci-summary.sh --quick         # lint + typecheck ONLY (no build lock)
-#   ./scripts/ci-summary.sh --full          # + unit tests
-#   ./scripts/ci-summary.sh --lint          # lint only (no build lock)
-#   ./scripts/ci-summary.sh --types         # typecheck only (no build lock)
+#   ./scripts/ci-summary.sh --quick         # lint + typecheck (no build lock)
+#   ./scripts/ci-summary.sh --full          # default + units + reachability
+#   ./scripts/ci-summary.sh --all           # all checks, including browser tests
+#   ./scripts/ci-summary.sh --lint          # lint only
+#   ./scripts/ci-summary.sh --types         # typecheck only
 #   ./scripts/ci-summary.sh --build         # build only
-#   ./scripts/ci-summary.sh --unit          # unit tests only (no build lock)
-#   ./scripts/ci-summary.sh --i18n          # i18n check only (no build lock)
-#   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only (no build lock)
-#   ./scripts/ci-summary.sh --links         # markdown link check only (no build lock)
-#   ./scripts/ci-summary.sh --migrations    # schema drift check only (no build lock)
-#   ./scripts/ci-summary.sh --reachability  # unreachable-file guard only (no build lock)
-#   ./scripts/ci-summary.sh --e2e           # E2E tests (requires running app)
-#   ./scripts/ci-summary.sh --a11y          # Accessibility tests (requires running app)
-#   ./scripts/ci-summary.sh --help          # show multi-agent guidance
+#   ./scripts/ci-summary.sh --unit          # unit tests only
+#   ./scripts/ci-summary.sh --i18n          # locale check only
+#   ./scripts/ci-summary.sh --roster        # character roster check
+#   ./scripts/ci-summary.sh --unsafe-queries # application raw SQL check
+#   ./scripts/ci-summary.sh --links         # markdown link check
+#   ./scripts/ci-summary.sh --migrations    # schema drift check
+#   ./scripts/ci-summary.sh --reachability  # unreachable-file guard
+#   ./scripts/ci-summary.sh --e2e [args...] # Playwright tests (local test runtime)
+#   ./scripts/ci-summary.sh --a11y          # accessibility browser project
 #
-# MULTI-AGENT BUILD LOCK:
-#   Modes that include a build (default, --full, --build, --all) acquire an
-#   exclusive lock via mkdir on /tmp/mirrorbuddy-build-lock-{PWD-hash}.
-#   This prevents concurrent `next build` from corrupting .next/.
-#
-#   - Lock is per-directory: agents in DIFFERENT worktrees do NOT block each other.
-#   - Agents in the SAME directory wait up to BUILD_LOCK_TIMEOUT (default 120s).
-#   - After timeout the script exits with error.
-#   - Stale locks (dead PID) are auto-cleaned.
-#
-#   To avoid blocking:
-#     1. Work in separate worktrees (recommended — each gets its own lock)
-#     2. Use --quick/--lint/--types during development (no lock needed)
-#     3. Reserve --build/--full for Thor validation and pre-commit
-#     4. Override timeout: BUILD_LOCK_TIMEOUT=300 ./scripts/ci-summary.sh
-#
-# For AI agents: use --quick during development, default/--full for Thor/pre-commit.
+# Only build modes acquire the existing per-directory build lock.
+# Prefer --quick or targeted modes while another agent owns the browser server.
+# The default lock timeout is 120 seconds; BUILD_LOCK_TIMEOUT can override it.
+# Failed output stays in a private, uniquely named local log printed in the
+# summary; successful temporary logs are removed. No logs are uploaded here.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_DIR"
 
-# Build lock: prevents parallel next build conflicts across agents/terminals
 # shellcheck source=lib/build-lock.sh
 source "$SCRIPT_DIR/lib/build-lock.sh"
+# shellcheck source=lib/ci-summary-diagnostics.sh
+source "$SCRIPT_DIR/lib/ci-summary-diagnostics.sh"
 
 MODE="${1:---default}"
 ERRORS=0
 WARNINGS=0
 RESULTS=""
 
-strip_ansi() { perl -pe 's/\e\[[0-9;]*m//g' "$1"; }
-
-result() { RESULTS+="$1"$'\n'; }
-
-# Append indented detail lines from a variable (avoids subshell pipe issue)
-result_details() {
-	local details="$1"
-	if [[ -n "$details" ]]; then
-		while IFS= read -r line; do result "  $line"; done <<<"$details"
-	fi
-}
-
-# Parse Playwright JSON report for failed test details (max 10 failures, 3 lines each)
-parse_pw_json() {
-	local json_file="$1"
-	[[ -f "$json_file" ]] || return 0
-	node -e '
-const fs = require("fs");
-const r = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-const failed = (r.suites || []).flatMap(function gather(s) {
-  const own = (s.specs || []).flatMap(sp =>
-    sp.tests.filter(t => t.status === "unexpected" || t.status === "flaky")
-      .map(t => ({
-        title: sp.title,
-        file: sp.file + ":" + sp.line,
-        error: (t.results[0]?.error?.message || "").split("\n")[0].slice(0, 120)
-      }))
-  );
-  return own.concat((s.suites || []).flatMap(gather));
-});
-failed.slice(0, 10).forEach(f => {
-  console.log(f.file + " " + f.title);
-  if (f.error) console.log("  " + f.error);
-});
-' "$json_file" 2>/dev/null || true
-}
-
-run_lint() {
-	local tmp
-	tmp=$(mktemp)
-	if npm run lint >"$tmp" 2>&1; then
-		local wc
-		wc=$(strip_ansi "$tmp" | grep -c " warning " || true)
-		if [[ "$wc" -gt 0 ]]; then
-			WARNINGS=$((WARNINGS + wc))
-			result "[WARN] Lint ($wc warnings)"
-			local d
-			d=$(strip_ansi "$tmp" | grep " warning " |
-				sed 's/.*warning  //' | sort | uniq -c | sort -rn | head -5 || true)
-			result_details "$d"
-		else
-			result "[PASS] Lint"
-		fi
-	else
-		local ec
-		ec=$(strip_ansi "$tmp" | grep -c " error " || true)
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Lint ($ec errors)"
-		local d
-		d=$(strip_ansi "$tmp" | grep " error " | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
-
-run_typecheck() {
-	local tmp
-	tmp=$(mktemp)
-	if npm run typecheck >"$tmp" 2>&1; then
-		result "[PASS] Typecheck"
-	else
-		local ec
-		ec=$(strip_ansi "$tmp" | grep -c "error TS" || true)
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Typecheck ($ec errors)"
-		local d
-		d=$(strip_ansi "$tmp" | grep "error TS" |
-			sed 's/.*\(error TS[0-9]*:.*\)/\1/' | sort | uniq -c | sort -rn | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
+run_lint() { run_logged "Lint" npm run lint; }
+run_typecheck() { run_logged "Typecheck" npm run typecheck; }
+run_unit() { run_logged "Unit" npm run test:unit; }
+run_i18n() { run_logged "i18n" npm run i18n:check; }
+run_roster() { run_logged "roster" npm run roster:check; }
+run_unsafe_query_check() { run_logged "Unsafe queries" scan_unsafe_queries; }
+run_link_check() { run_logged "Links" "$SCRIPT_DIR/check-links.sh"; }
+run_migrations() { run_logged "Migrations" "$SCRIPT_DIR/check-schema-drift.sh"; }
+run_reachability() { run_logged "Reachability" npx tsx scripts/check-reachability.ts; }
 
 run_build() {
 	acquire_build_lock
-	local tmp
-	tmp=$(mktemp)
-	if npm run build >"$tmp" 2>&1; then
-		local wc
-		wc=$(strip_ansi "$tmp" | grep -ciE "^warn" || true)
-		if [[ "$wc" -gt 0 ]]; then
-			WARNINGS=$((WARNINGS + wc))
-			result "[WARN] Build ($wc warnings)"
-			local d
-			d=$(strip_ansi "$tmp" | grep -iE "^warn" | head -5 || true)
-			result_details "$d"
-		else
-			result "[PASS] Build"
-		fi
-	else
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Build"
-		local d
-		d=$(strip_ansi "$tmp" |
-			grep -iE "^error|Error:|Type error|Module not found" | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
+	run_logged "Build" npm run build
 	release_build_lock
 }
 
-run_unit() {
-	local tmp
-	tmp=$(mktemp)
-	if npm run test:unit >"$tmp" 2>&1; then
-		local s
-		s=$(strip_ansi "$tmp" | grep -E "Test(s| Files).*passed" | tail -1 || true)
-		result "[PASS] Unit${s:+ ($s)}"
-	else
-		ERRORS=$((ERRORS + 1))
-		local fc
-		fc=$(strip_ansi "$tmp" | grep -cE "^ *(FAIL|×)" || true)
-		result "[FAIL] Unit ($fc failures)"
-		# Only actual failures - skip act() warnings, HTMLMediaElement noise
-		local d
-		d=$(strip_ansi "$tmp" |
-			grep -E "^ *FAIL |^ *× |AssertionError|Expected.*Received" |
-			grep -v "act()" | grep -v "HTMLMediaElement" | head -15 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
-
-run_i18n() {
-	local tmp
-	tmp=$(mktemp)
-	if npm run i18n:check >"$tmp" 2>&1; then
-		result "[PASS] i18n"
-	else
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] i18n"
-		local d
-		d=$(strip_ansi "$tmp" | grep -iE "missing|mismatch|error" | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
-
-run_roster() {
-	local tmp
-	tmp=$(mktemp)
-	if npm run roster:check >"$tmp" 2>&1; then
-		result "[PASS] roster"
-	else
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] roster"
-		local d
-		d=$(strip_ansi "$tmp" | grep -E "should say|stale roster" | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
-
 run_e2e() {
-	local tmp
-	tmp=$(mktemp)
-	local args="${1:-}"
-	if E2E_TESTS=1 npx playwright test $args >"$tmp" 2>&1; then
-		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1 || true)
-		result "[PASS] E2E${s:+ ($s)}"
-	else
-		ERRORS=$((ERRORS + 1))
-		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1 || true)
-		result "[FAIL] E2E${s:+ ($s)}"
-		local d
-		d=$(parse_pw_json "test-results/pw-results.json")
-		if [[ -z "$d" ]]; then
-			d=$(strip_ansi "$tmp" |
-				grep -E "^\s+[0-9]+\)|Error:|expect\(|Timeout|\.spec\.ts:" |
-				sed 's/^\s*//' | head -15 || true)
-		fi
-		result_details "$d"
+	# Retain the old single-string option form, without pathname expansion.
+	if [[ $# -eq 1 && "$1" == --* && "$1" == *" "* ]]; then
+		local legacy_args
+		read -r -a legacy_args <<<"$1"
+		run_e2e "${legacy_args[@]}"
+		return
 	fi
-	rm -f "$tmp"
+	run_logged "E2E" env E2E_TESTS=1 npx playwright test \
+		--config "$PROJECT_DIR/apps/web/playwright.config.iteration.ts" "$@"
 }
 
 run_a11y() {
-	local tmp
-	tmp=$(mktemp)
-	if E2E_TESTS=1 npx playwright test --project=a11y >"$tmp" 2>&1; then
-		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1 || true)
-		result "[PASS] A11y${s:+ ($s)}"
-	else
-		ERRORS=$((ERRORS + 1))
-		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1 || true)
-		result "[FAIL] A11y${s:+ ($s)}"
-		local d
-		d=$(parse_pw_json "test-results/pw-results.json")
-		if [[ -z "$d" ]]; then
-			d=$(strip_ansi "$tmp" |
-				grep -E "^\s+[0-9]+\)|violation|critical|serious|moderate|\[wcag" |
-				sed 's/^\s*//' | head -15 || true)
-		fi
-		result_details "$d"
-	fi
-	rm -f "$tmp"
+	run_logged "A11y" env E2E_TESTS=1 npx playwright test \
+		--config "$PROJECT_DIR/apps/web/playwright.config.iteration.ts" --project=a11y
 }
 
-run_unsafe_query_check() {
-	local ALLOWLIST="$SCRIPT_DIR/.queryraw-allowlist"
-	local EXCLUDE_ARGS=()
-
-	if [[ -f "$ALLOWLIST" ]]; then
-		while IFS= read -r excl; do
-			[[ -n "$excl" && "$excl" != \#* ]] && EXCLUDE_ARGS+=(--exclude="$excl")
-		done <"$ALLOWLIST"
-	fi
-
-	local FOUND
-	if [[ ${#EXCLUDE_ARGS[@]} -gt 0 ]]; then
-		FOUND=$(grep -r --include='*.ts' '\$queryRawUnsafe' "${EXCLUDE_ARGS[@]}" src/ 2>/dev/null || true)
-	else
-		FOUND=$(grep -r --include='*.ts' '\$queryRawUnsafe' src/ 2>/dev/null || true)
-	fi
-
-	if [[ -n "$FOUND" ]]; then
-		local fc
-		fc=$(echo "$FOUND" | wc -l | tr -d ' ')
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Unsafe queries ($fc files with \$queryRawUnsafe)"
-		result_details "$FOUND"
-	else
-		result "[PASS] Unsafe queries"
-	fi
+run_default() {
+	run_lint
+	run_typecheck
+	run_build
+	run_unsafe_query_check
 }
 
-run_link_check() {
-	local OUTPUT
-	OUTPUT=$("$SCRIPT_DIR/check-links.sh" 2>&1) || true
-	local EXIT=$?
-
-	if [[ $EXIT -eq 0 ]]; then
-		result "[PASS] Links"
-	else
-		result "[FAIL] Links"
-		result_details "$OUTPUT"
-		((ERRORS++))
-	fi
-}
-
-run_migrations() {
-	local tmp
-	tmp=$(mktemp)
-	if "$SCRIPT_DIR/check-schema-drift.sh" >"$tmp" 2>&1; then
-		local s
-		s=$(grep -oE 'all [0-9]+ models' "$tmp" || true)
-		result "[PASS] Migrations${s:+ ($s)}"
-	else
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Migrations"
-		local d
-		d=$(grep "MISSING:" "$tmp" | head -10 || true)
-		result_details "$d"
-	fi
-	rm -f "$tmp"
-}
-
-run_reachability() {
-	local OUTPUT
-	OUTPUT=$(cd "$PROJECT_DIR" && npx tsx scripts/check-reachability.ts 2>&1)
-	local EXIT=$?
-	if [[ $EXIT -eq 0 ]]; then
-		local s
-		s=$(echo "$OUTPUT" | grep -oE 'unreachable \(scoped\): [0-9]+' | head -1 || true)
-		result "[PASS] Reachability${s:+ ($s)}"
-	else
-		ERRORS=$((ERRORS + 1))
-		result "[FAIL] Reachability"
-		local d
-		d=$(echo "$OUTPUT" | grep -E '^  apps/web|Newly unreachable|still unreachable' | head -15 || true)
-		result_details "$d"
-	fi
-}
-
-# --- Main ---
 if [[ "$MODE" == "--help" ]]; then
 	awk '/^# ci-summary/,/^[^#]/{if(/^#/) print substr($0,3)}' "${BASH_SOURCE[0]}"
 	exit 0
 fi
 
 echo "=== CI Summary ==="
-
 case "$MODE" in
 --lint) run_lint ;;
 --types) run_typecheck ;;
@@ -360,25 +98,12 @@ case "$MODE" in
 --links) run_link_check ;;
 --migrations) run_migrations ;;
 --reachability) run_reachability ;;
---e2e) run_e2e "${2:-}" ;;
+--e2e) shift; run_e2e "$@" ;;
 --a11y) run_a11y ;;
---quick)
-	run_lint
-	run_typecheck
-	;;
---full)
-	run_lint
-	run_typecheck
-	run_build
-	run_unsafe_query_check
-	run_unit
-	run_reachability
-	;;
+--quick) run_lint; run_typecheck ;;
+--full) run_default; run_unit; run_reachability ;;
 --all)
-	run_lint
-	run_typecheck
-	run_build
-	run_unsafe_query_check
+	run_default
 	run_unit
 	run_i18n
 	run_roster
@@ -388,12 +113,7 @@ case "$MODE" in
 	run_e2e
 	run_a11y
 	;;
-*)
-	run_lint
-	run_typecheck
-	run_build
-	run_unsafe_query_check
-	;;
+*) run_default ;;
 esac
 
 echo "$RESULTS"
@@ -402,8 +122,6 @@ if [[ "$ERRORS" -gt 0 ]]; then
 	exit 1
 elif [[ "$WARNINGS" -gt 0 ]]; then
 	echo "OK with $WARNINGS warning(s)"
-	exit 0
 else
 	echo "ALL CLEAN"
-	exit 0
 fi

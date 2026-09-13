@@ -10,11 +10,11 @@
  * ISE Engineering Fundamentals: Observability, Error handling with graceful degradation
  */
 
-import { prisma } from "@/lib/db";
-import { publishAdminCounts, type AdminCounts } from "./admin-counts-pubsub";
-import { logger } from "@/lib/logger";
+import { getAdminCounts } from '@/lib/admin/admin-counts-service';
+import { publishAdminCounts, type AdminCounts } from './admin-counts-pubsub';
+import { logger } from '@/lib/logger';
 
-const log = logger.child({ module: "publish-admin-counts" });
+const log = logger.child({ module: 'publish-admin-counts' });
 
 // ============================================================================
 // RATE LIMITING (F-32)
@@ -60,7 +60,7 @@ export interface AdminCountsResult {
  * Queries run in parallel for performance:
  * - Pending invite requests (PENDING status)
  * - Total registered users (excluding test data per F-06)
- * - Active users in last 24 hours (from UserActivity table)
+ * - Daily activity remains unavailable because its source is retained for only ten minutes
  * - Critical unresolved safety events
  *
  * Gracefully handles Redis failures - function returns success even if
@@ -74,7 +74,7 @@ export interface AdminCountsResult {
  * @returns Promise<AdminCountsResult> with success flag, counts, and timing
  */
 export async function calculateAndPublishAdminCounts(
-  eventType: string = "manual",
+  eventType: string = 'manual',
 ): Promise<AdminCountsResult> {
   const startTime = Date.now();
 
@@ -86,7 +86,7 @@ export async function calculateAndPublishAdminCounts(
 
     if (timeSinceLastPublish < RATE_LIMIT_MS) {
       const cooldownMs = RATE_LIMIT_MS - timeSinceLastPublish;
-      log.debug("Rate limited admin counts publish", {
+      log.debug('Rate limited admin counts publish', {
         eventType,
         cooldownMs,
         timeSinceLastPublish,
@@ -100,58 +100,9 @@ export async function calculateAndPublishAdminCounts(
     // Update timestamp for this event type
     lastPublishTimestamp.set(eventType, now);
 
-    log.debug("Starting admin counts calculation", { eventType });
+    log.debug('Starting admin counts calculation', { eventType });
 
-    const nowDate = new Date();
-    const yesterday = new Date(nowDate.getTime() - 24 * 60 * 60 * 1000);
-
-    // Run all database queries in parallel for performance
-    // Same logic as GET /api/admin/counts endpoint
-    const [
-      pendingInvites,
-      totalUsers,
-      activeUsersResult,
-      criticalSafetyEvents,
-    ] = await Promise.all([
-      // Pending invite requests
-      prisma.inviteRequest.count({
-        where: { status: "PENDING" },
-      }),
-
-      // Total users (F-06: exclude test data)
-      prisma.user.count({
-        where: { isTestData: false },
-      }),
-
-      // Active users in last 24h (F-06: exclude test data)
-      prisma.userActivity.groupBy({
-        by: ["identifier"],
-        where: {
-          timestamp: { gte: yesterday },
-          isTestData: false,
-        },
-      }),
-
-      // Critical safety events (unresolved = resolvedAt is null)
-      prisma.safetyEvent
-        .count({
-          where: {
-            resolvedAt: null,
-            severity: "critical",
-          },
-        })
-        .catch(() => 0), // May not exist in schema
-    ]);
-
-    const activeUsers24h = activeUsersResult.length;
-
-    const counts: AdminCounts = {
-      pendingInvites,
-      totalUsers,
-      activeUsers24h,
-      systemAlerts: criticalSafetyEvents,
-      timestamp: nowDate.toISOString(),
-    };
+    const counts = await getAdminCounts();
 
     // Publish to Redis pub/sub
     // This is non-blocking and won't throw even if Redis is down
@@ -159,15 +110,10 @@ export async function calculateAndPublishAdminCounts(
 
     const duration = Date.now() - startTime;
 
-    log.info("Admin counts calculated and published successfully", {
+    log.info('Admin counts calculated and published successfully', {
       eventType,
       duration,
-      counts: {
-        pendingInvites,
-        totalUsers,
-        activeUsers24h,
-        systemAlerts: criticalSafetyEvents,
-      },
+      counts,
     });
 
     return {
@@ -180,7 +126,7 @@ export async function calculateAndPublishAdminCounts(
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     // Log error but don't throw - graceful degradation
-    log.error("Failed to calculate and publish admin counts", {
+    log.error('Failed to calculate and publish admin counts', {
       eventType,
       error: errorMessage,
       duration,
@@ -210,10 +156,10 @@ export async function calculateAndPublishAdminCounts(
  *
  * Non-blocking: Returns immediately without waiting for publication to complete
  */
-export function triggerAdminCountsUpdate(eventType: string = "manual"): void {
+export function triggerAdminCountsUpdate(eventType: string = 'manual'): void {
   // Fire and forget - don't await
   calculateAndPublishAdminCounts(eventType).catch((error) => {
-    log.error("Unhandled error in async admin counts trigger", {
+    log.error('Unhandled error in async admin counts trigger', {
       eventType,
       error,
     });

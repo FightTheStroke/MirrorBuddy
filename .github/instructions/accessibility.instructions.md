@@ -1,6 +1,6 @@
 ---
 description: 'WCAG 2.1 AA accessibility rules and 7 DSA profiles'
-applyTo: 'src/lib/accessibility/**/*,src/components/**/*.tsx'
+applyTo: 'apps/web/src/lib/accessibility/**/*,apps/web/src/components/**/*.tsx,packages/accessibility/src/**/*,packages/ui/src/**/*'
 ---
 
 # Accessibility Rules

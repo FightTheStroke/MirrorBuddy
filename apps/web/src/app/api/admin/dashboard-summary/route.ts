@@ -3,87 +3,13 @@ import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { aggregateHealth } from '@/lib/admin/health-aggregator';
 import { getBusinessKPIs } from '@/lib/admin/business-kpi-service';
+import { metricTruth, snapshotContext } from '@/lib/admin/metric-truth';
+import { readMetric } from '@/lib/admin/metric-truth-reader';
 import type { DashboardSummary } from '@/lib/admin/dashboard-summary-types';
 
 const CACHE_TTL_MS = 30_000;
-const COST_WINDOW_DAYS = 7;
-
-type SessionCostAggregateResult = {
-  _sum: { totalEur: number | null };
-};
-
-type SessionCostDelegate = {
-  aggregate: (args: {
-    where: { createdAt: { gte: Date } };
-    _sum: { totalEur: true };
-  }) => Promise<SessionCostAggregateResult>;
-};
-
-type SessionMetricsDelegate = {
-  aggregate: (args: {
-    where: { createdAt: { gte: Date } };
-    _sum: { costEur: true };
-  }) => Promise<{ _sum: { costEur: number | null } }>;
-};
-
-interface CachedDashboardSummary {
-  data: DashboardSummary;
-  timestamp: number;
-}
-
-let cache: CachedDashboardSummary | null = null;
-
-async function getSessionCostTotalEur(): Promise<number> {
-  const startDate = new Date(Date.now() - COST_WINDOW_DAYS * 24 * 60 * 60 * 1000);
-  const prismaWithCostModels = prisma as unknown as {
-    sessionCost?: SessionCostDelegate;
-    sessionMetrics?: SessionMetricsDelegate;
-  };
-
-  if (prismaWithCostModels.sessionCost) {
-    const result = await prismaWithCostModels.sessionCost.aggregate({
-      where: { createdAt: { gte: startDate } },
-      _sum: { totalEur: true },
-    });
-    return result._sum.totalEur ?? 0;
-  }
-
-  if (prismaWithCostModels.sessionMetrics) {
-    const fallback = await prismaWithCostModels.sessionMetrics.aggregate({
-      where: { createdAt: { gte: startDate } },
-      _sum: { costEur: true },
-    });
-    return fallback._sum.costEur ?? 0;
-  }
-
-  throw new Error('No session cost model is available on Prisma client');
-}
-
-function buildSummary(data: {
-  health: Awaited<ReturnType<typeof aggregateHealth>>;
-  unresolvedSafetyCount: number;
-  sessionCostTotalEur: number;
-  businessKPIs: Awaited<ReturnType<typeof getBusinessKPIs>>;
-}): DashboardSummary {
-  return {
-    health: {
-      overallStatus: data.health.overallStatus,
-      servicesDownCount: data.health.services.filter((service) => service.status === 'down').length,
-    },
-    safety: {
-      unresolvedCount: data.unresolvedSafetyCount,
-    },
-    cost: {
-      totalEur: Math.round(data.sessionCostTotalEur * 100) / 100,
-    },
-    business: {
-      mrr: data.businessKPIs.revenue.mrr,
-      trialConversionRate: data.businessKPIs.users.trialConversionRate,
-      churnRate: data.businessKPIs.users.churnRate,
-    },
-    generatedAt: new Date().toISOString(),
-  };
-}
+const COST_WINDOW_MS = 7 * 86_400_000;
+let cache: { data: DashboardSummary; timestamp: number } | null = null;
 
 export function clearDashboardSummaryCache(): void {
   cache = null;
@@ -95,24 +21,63 @@ export const GET = pipe(
   withAdminReadOnly,
 )(async () => {
   const now = Date.now();
-  if (cache && now - cache.timestamp < CACHE_TTL_MS) {
-    return NextResponse.json(cache.data);
-  }
-
-  const [health, unresolvedSafetyCount, sessionCostTotalEur, businessKPIs] = await Promise.all([
+  if (cache && now - cache.timestamp < CACHE_TTL_MS) return NextResponse.json(cache.data);
+  const computedAt = new Date(now).toISOString();
+  const startDate = new Date(now - COST_WINDOW_MS);
+  const [health, safety, cost, business] = await Promise.all([
     aggregateHealth(),
-    prisma.safetyEvent.count({ where: { resolvedAt: null } }),
-    getSessionCostTotalEur(),
+    readMetric(
+      () => prisma.safetyEvent.count({ where: { resolvedAt: null } }),
+      snapshotContext('SafetyEvent (unresolved)', computedAt),
+    ),
+    readMetric(
+      async () => {
+        const result = await prisma.sessionMetrics.aggregate({
+          where: { createdAt: { gte: startDate, lte: new Date(now) }, isTestData: false },
+          _sum: { costEur: true },
+          _count: true,
+        });
+        return result?._count === 0 ? 0 : result?._sum.costEur;
+      },
+      {
+        source: 'SessionMetrics.costEur',
+        window: { start: startDate.toISOString(), end: computedAt },
+        computedAt,
+        population: 'recordedTelemetry',
+        estimate: 'tokenPricing',
+      },
+    ),
     getBusinessKPIs(),
   ]);
-
-  const summary = buildSummary({
-    health,
-    unresolvedSafetyCount,
-    sessionCostTotalEur,
-    businessKPIs,
-  });
+  const healthContext = snapshotContext('Service health checks', health.checkedAt.toISOString());
+  const dailyCost = { ...cost, value: cost.value === null ? null : cost.value / 7 };
+  const summary: DashboardSummary = {
+    health: {
+      overallStatus: health.overallStatus,
+      servicesDownCount: health.services.filter((service) => service.status === 'down').length,
+    },
+    safety: { unresolvedCount: safety.value },
+    cost: { totalEur: cost.value },
+    business: {
+      mrr: business.revenue.mrr,
+      trialConversionRate: business.users.trialConversionRate,
+      churnRate: business.users.churnRate,
+    },
+    metrics: {
+      health: metricTruth(health.overallStatus, healthContext),
+      servicesDown: metricTruth(
+        health.services.filter((service) => service.status === 'down').length,
+        healthContext,
+      ),
+      safety,
+      cost,
+      dailyCost,
+      mrr: business.metrics.mrr,
+      trialConversionRate: business.metrics.trialConversionRate,
+      churnRate: business.metrics.churnRate,
+    },
+    generatedAt: computedAt,
+  };
   cache = { data: summary, timestamp: now };
-
   return NextResponse.json(summary);
 });

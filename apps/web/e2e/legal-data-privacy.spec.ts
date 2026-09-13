@@ -9,7 +9,7 @@
  * Run: npx playwright test e2e/legal-data-privacy.spec.ts
  */
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 
 // ============================================================================
 // GDPR DATA PORTABILITY (ART. 20)

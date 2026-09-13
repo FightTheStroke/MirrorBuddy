@@ -12,6 +12,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_DIR"
+
 DRY_RUN=false
 RUN_ALL=false
 
@@ -22,14 +26,19 @@ for arg in "$@"; do
 	esac
 done
 
-# Detect changed files
-if git rev-parse --verify main &>/dev/null && [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
-	CHANGED=$(git diff --name-only main...HEAD 2>/dev/null || echo "")
-else
-	CHANGED=$(git diff --name-only HEAD~1 2>/dev/null || echo "")
-fi
+changes_file=$(mktemp)
+trap 'rm -f "$changes_file"' EXIT
 
-if [ -z "$CHANGED" ]; then
+# Include the branch delta and local work; Git failures are not empty changes.
+if git rev-parse --verify main &>/dev/null && [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+	git diff --name-only -z main...HEAD >"$changes_file"
+else
+	git diff --name-only -z HEAD~1 >"$changes_file"
+fi
+git diff --name-only -z HEAD >>"$changes_file"
+git ls-files --others --exclude-standard -z >>"$changes_file"
+
+if [[ ! -s "$changes_file" ]]; then
 	echo "No changes detected, running baseline only."
 fi
 
@@ -42,34 +51,41 @@ HAS_SAFETY=false
 HAS_E2E=false
 HAS_CONFIG=false
 
-while IFS= read -r file; do
+while IFS= read -r -d '' file; do
+	file="${file#apps/web/}"
 	case "$file" in
-	src/app/* | src/components/* | src/styles/* | public/* | messages/*)
+	src/* | packages/*/src/*) HAS_SRC=true ;;
+	esac
+	case "$file" in
+	src/app/* | src/components/* | src/styles/* | public/* | messages/* | packages/ui/src/* | packages/accessibility/src/* | packages/ui/package.json | packages/accessibility/package.json)
 		HAS_UI=true
 		HAS_SRC=true
 		;;
-	src/lib/native/* | src/components/mobile/* | ios/* | android/* | capacitor.config.ts)
+	esac
+	case "$file" in
+	src/lib/native/* | src/components/mobile/* | ios/* | android/* | capacitor.config.ts | packages/ui/src/* | packages/accessibility/src/* | packages/ui/package.json | packages/accessibility/package.json)
 		HAS_MOBILE=true
 		HAS_SRC=true
 		;;
-	src/lib/safety/* | src/lib/ai/* | src/lib/privacy/* | src/lib/compliance/* | src/data/maestri/*)
+	esac
+	case "$file" in
+	src/lib/safety/* | src/lib/ai/* | src/lib/privacy/* | src/lib/compliance/* | src/data/maestri/* | packages/safety/src/* | packages/ai-providers/src/* | packages/maestri/src/*)
 		HAS_SAFETY=true
 		HAS_SRC=true
 		;;
+	esac
+	case "$file" in
 	e2e/* | playwright.config*.ts)
 		HAS_E2E=true
 		;;
-	prisma/*)
+	prisma/* | prisma.config.ts)
 		HAS_PRISMA=true
 		;;
-	package.json | pnpm-lock.yaml | tsconfig*.json | eslint.config.mjs | eslint-local-rules/* | next.config.ts | vitest.config.ts)
+	package.json | packages/*/package.json | pnpm-lock.yaml | tsconfig*.json | eslint.config.mjs | eslint-local-rules/* | next.config.ts | vitest.config.ts | .github/*)
 		HAS_CONFIG=true
 		;;
-	src/*)
-		HAS_SRC=true
-		;;
 	esac
-done <<<"$CHANGED"
+done <"$changes_file"
 
 echo "=== Affected Areas ==="
 echo "  src:    $HAS_SRC"
@@ -105,8 +121,8 @@ run_suite() {
 # BASELINE (always runs) — mandatory regression check
 # ==========================================================
 echo "=== Baseline Regression Tests ==="
-run_suite "Unit tests (safety)" npm run test:unit -- safety --reporter=verbose
-run_suite "Unit tests (accessibility)" npm run test:unit -- accessibility --reporter=verbose
+run_suite "Unit tests (safety)" npm run test:unit -- safety --reporter=verbose --retry=0
+run_suite "Unit tests (accessibility)" npm run test:unit -- accessibility --reporter=verbose --retry=0
 
 # ==========================================================
 # TARGETED (conditional) — run only affected suites
@@ -115,7 +131,7 @@ echo ""
 echo "=== Targeted Tests ==="
 
 if $RUN_ALL || $HAS_SRC || $HAS_CONFIG; then
-	run_suite "Full unit tests" npm run test:unit
+	run_suite "Full unit tests" npm run test:unit -- --retry=0
 fi
 
 if $RUN_ALL || $HAS_UI; then
@@ -123,7 +139,7 @@ if $RUN_ALL || $HAS_UI; then
 fi
 
 if $RUN_ALL || $HAS_SAFETY; then
-	run_suite "LLM safety tests" npm run test:unit -- jailbreak-detector content-filter safety.test --reporter=verbose
+	run_suite "LLM safety tests" npm run test:unit -- jailbreak-detector content-filter safety.test --reporter=verbose --retry=0
 fi
 
 if $RUN_ALL || $HAS_PRISMA; then
@@ -135,7 +151,8 @@ if $RUN_ALL || $HAS_MOBILE; then
 fi
 
 if $RUN_ALL || $HAS_E2E; then
-	echo "  [INFO] E2E test files changed — consider running: npm run test:e2e"
+	run_suite "E2E collection" env E2E_TESTS=1 npx playwright test \
+		--config "$PROJECT_DIR/apps/web/playwright.config.iteration.ts" --list --reporter=list
 fi
 
 # ==========================================================
@@ -145,6 +162,11 @@ echo ""
 echo "=== Results ==="
 echo "  Passed: $PASS"
 echo "  Failed: $FAIL"
+
+if $DRY_RUN; then
+	echo "Dry run only: no test suites were executed."
+	exit 0
+fi
 
 if [ "$FAIL" -gt 0 ]; then
 	echo ""

@@ -12,6 +12,8 @@ import { Loader2, Activity, AlertCircle, RefreshCw } from 'lucide-react';
 import { StatusBadge, StatusIcon } from './status-utils';
 import type { HealthAggregatorResponse, ServiceHealth } from '@/lib/admin/health-aggregator-types';
 import { useTranslations } from 'next-intl';
+import { MetricProvenance } from '@/components/admin/metric-truth';
+import { metricTruth, snapshotContext } from '@/lib/admin/metric-truth';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +34,7 @@ export default function ServiceHealthPage() {
       }
       const data = await response.json();
       setHealthData(data);
-      setLastRefresh(new Date());
+      setLastRefresh(data.checkedAt ? new Date(data.checkedAt) : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch health data');
     } finally {
@@ -57,13 +59,24 @@ export default function ServiceHealthPage() {
 
   const localizeDetails = (service: ServiceHealth) => {
     if (service.status === 'healthy') return t('healthDetails.connected');
-    if (service.status === 'unknown') return t('healthDetails.notConfigured');
+    if (service.status === 'unknown') return t('metricTruth.readiness.unknown');
     if (service.status === 'degraded') return service.details ?? '';
     return t('healthDetails.serviceUnavailable');
   };
 
   return (
     <div className="space-y-6">
+      {healthData &&
+        healthData.services.every(
+          (service) => !service.required && !service.configured && service.status !== 'down',
+        ) && (
+          <div className="rounded-lg border border-dashed p-8 text-center">
+            <h3 className="text-lg font-semibold mb-2">{t('noServicesConfiguredYet')}</h3>
+            <p className="text-muted-foreground">
+              {t('configureYourServicesToStartMonitoringTheirHealthS')}
+            </p>
+          </div>
+        )}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('serviceHealth')}</h1>
@@ -94,6 +107,15 @@ export default function ServiceHealthPage() {
               <StatusIcon status={healthData.overallStatus} className="h-8 w-8" />
               <StatusBadge status={healthData.overallStatus} className="text-lg px-4 py-2" />
             </div>
+            <MetricProvenance
+              metric={metricTruth(
+                healthData.overallStatus,
+                snapshotContext(
+                  'Service health checks',
+                  healthData.checkedAt ? new Date(healthData.checkedAt).toISOString() : null,
+                ),
+              )}
+            />
             <p className="mt-2 text-sm text-muted-foreground">
               {t('basedOn')} {healthData.configuredCount} {t('configured')}{' '}
               {healthData.configuredCount === 1 ? 'service' : 'services'}
@@ -119,8 +141,12 @@ export default function ServiceHealthPage() {
         !error &&
         healthData &&
         (() => {
-          const configuredServices = healthData.services.filter((s) => s.configured);
-          const unconfiguredServices = healthData.services.filter((s) => !s.configured);
+          const configuredServices = healthData.services.filter(
+            (s) => s.required || s.configured || s.status === 'down',
+          );
+          const unconfiguredServices = healthData.services.filter(
+            (s) => !s.required && !s.configured && s.status !== 'down',
+          );
 
           const renderServiceCard = (service: ServiceHealth) => (
             <Card key={service.name}>
@@ -131,6 +157,18 @@ export default function ServiceHealthPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
+                <p className="text-sm">
+                  {t(`metricTruth.readiness.${service.readiness ?? 'unknown'}`)}
+                </p>
+                <MetricProvenance
+                  metric={metricTruth(
+                    service.status,
+                    snapshotContext(
+                      service.name,
+                      service.lastChecked ? new Date(service.lastChecked).toISOString() : null,
+                    ),
+                  )}
+                />
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">{t('status1')}</span>
                   <StatusBadge status={service.status} />
@@ -163,17 +201,6 @@ export default function ServiceHealthPage() {
             </Card>
           );
 
-          if (configuredServices.length === 0) {
-            return (
-              <div className="rounded-lg border border-dashed p-8 text-center">
-                <h3 className="text-lg font-semibold mb-2">{t('noServicesConfiguredYet')}</h3>
-                <p className="text-muted-foreground">
-                  {t('configureYourServicesToStartMonitoringTheirHealthS')}
-                </p>
-              </div>
-            );
-          }
-
           return (
             <div className="space-y-6">
               {configuredServices.length > 0 && (
@@ -201,12 +228,23 @@ export default function ServiceHealthPage() {
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">{t('status')}</span>
                             <span className="text-sm text-muted-foreground">
-                              {t('notConfigured')}
+                              {t('metricTruth.readiness.notConfigured')}
                             </span>
                           </div>
                           {service.details && (
                             <p className="text-sm text-muted-foreground">{service.details}</p>
                           )}
+                          <MetricProvenance
+                            metric={metricTruth<number>(null, {
+                              ...snapshotContext(
+                                service.name,
+                                service.lastChecked
+                                  ? new Date(service.lastChecked).toISOString()
+                                  : null,
+                              ),
+                              reason: 'notConfigured',
+                            })}
+                          />
                         </CardContent>
                       </Card>
                     ))}

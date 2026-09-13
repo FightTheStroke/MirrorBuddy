@@ -16,13 +16,8 @@ import { logger } from '@/lib/logger';
 /**
  * Admin dashboard counts structure
  */
-export interface AdminCounts {
-  pendingInvites: number;
-  totalUsers: number;
-  activeUsers24h: number;
-  systemAlerts: number;
-  timestamp: string;
-}
+import type { AdminCounts } from '@/lib/admin/admin-counts-service';
+export type { AdminCounts } from '@/lib/admin/admin-counts-service';
 
 /**
  * Connection status states
@@ -71,11 +66,11 @@ const BACKOFF_BASE = 1000; // 1 second
  */
 export function useAdminCountsSSE(): UseAdminCountsSSEResult {
   const [counts, setCounts] = useState<AdminCounts>({
-    pendingInvites: 0,
-    totalUsers: 0,
-    activeUsers24h: 0,
-    systemAlerts: 0,
-    timestamp: new Date().toISOString(),
+    pendingInvites: null,
+    totalUsers: null,
+    activeUsers24h: null,
+    systemAlerts: null,
+    timestamp: '',
   });
   const [status, setStatus] = useState<ConnectionStatus>('idle');
   const [error, setError] = useState<string | null>(null);

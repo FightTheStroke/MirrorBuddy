@@ -5,14 +5,14 @@
  * A user is NOT trial if they have username/password credentials.
  */
 
-import { NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry } from "@/lib/api/middlewares";
-
+import { NextResponse } from 'next/server';
+import { validateAuth } from '@/lib/auth/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry } from '@/lib/api/middlewares';
+import { AuthenticationError } from '@/lib/auth/auth-error';
 
 export const revalidate = 0;
-export const GET = pipe(withSentry("/api/user/trial-status"))(async () => {
+export const GET = pipe(withSentry('/api/user/trial-status'))(async () => {
   const auth = await validateAuth();
 
   // No session = trial user
@@ -26,9 +26,8 @@ export const GET = pipe(withSentry("/api/user/trial-status"))(async () => {
     select: { username: true, passwordHash: true },
   });
 
-  // No user found = trial
   if (!user) {
-    return NextResponse.json({ isTrialUser: true });
+    throw new AuthenticationError('SESSION_REJECTED');
   }
 
   // User has credentials = not trial

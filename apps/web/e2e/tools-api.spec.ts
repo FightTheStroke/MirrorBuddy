@@ -4,7 +4,7 @@
 // T-22: Integration test - full tool flow
 // ============================================================================
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 
 test.describe('Tools API: Materials Persistence', () => {
   let testUserId: string;

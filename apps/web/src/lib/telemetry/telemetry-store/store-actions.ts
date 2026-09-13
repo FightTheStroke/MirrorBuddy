@@ -5,7 +5,11 @@
 
 import { nanoid } from 'nanoid';
 import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth';
+import {
+  hasAnalyticsConsent,
+  sendOptionalAnalytics,
+  withOptionalAnalyticsRequest,
+} from '../optional-analytics-client';
 import type { TelemetryEvent, TelemetryConfig, TelemetryCategory } from '../types';
 import type { TelemetryState } from './types';
 import { isSameDay } from './utils';
@@ -22,8 +26,8 @@ export function handleTrackEvent(
   metadata: Record<string, string | number | boolean> | undefined,
 ): { eventQueue: TelemetryEvent[]; localStats: TelemetryState['localStats'] } {
   // Check if telemetry is enabled
-  if (!state.config.enabled) {
-    return { eventQueue: state.eventQueue, localStats: state.localStats };
+  if (!hasAnalyticsConsent() || !state.config.enabled) {
+    return { eventQueue: [], localStats: state.localStats };
   }
 
   // Check if category is excluded
@@ -125,39 +129,31 @@ export function handleEndSession(sessionStartedAt: Date | null): number {
  */
 export async function handleFlushEvents(
   eventQueue: TelemetryEvent[],
-  _config: TelemetryConfig,
+  config: TelemetryConfig,
 ): Promise<void> {
-  if (eventQueue.length === 0) return;
-
-  const eventsToSend = [...eventQueue];
-
-  try {
-    await csrfFetch('/api/telemetry/events', {
-      method: 'POST',
-      body: JSON.stringify({ events: eventsToSend }),
-    });
-  } catch (error) {
-    logger.debug('Telemetry flush failed (non-critical)', { error });
-  }
+  if (!hasAnalyticsConsent() || !config.enabled || eventQueue.length === 0) return;
+  await sendOptionalAnalytics('/api/telemetry/events', { events: eventQueue });
 }
 
 /**
  * Handle fetch usage stats from server
  */
 export async function handleFetchUsageStats(): Promise<TelemetryState['usageStats']> {
+  if (!hasAnalyticsConsent()) return null;
   try {
-    const response = await fetch('/api/telemetry/stats', {
-      credentials: 'same-origin',
-      mode: 'same-origin',
-    });
-
-    if (response.ok) {
+    return await withOptionalAnalyticsRequest(async (signal) => {
+      const response = await fetch('/api/telemetry/stats', {
+        credentials: 'same-origin',
+        mode: 'same-origin',
+        signal,
+      });
+      if (!response.ok) throw new Error(`Optional usage stats request failed: ${response.status}`);
       const stats = await response.json();
       return {
         ...stats,
         lastUpdated: new Date(stats.lastUpdated),
       };
-    }
+    });
   } catch (error) {
     logger.error('Failed to fetch usage stats', undefined, error);
   }

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Link, useRouter } from '@/i18n/navigation';
+import { Link } from '@/i18n/navigation';
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import { requireIdentityRefresh } from '@/lib/auth/client-auth';
 
 interface LoginResponse {
   user?: {
@@ -16,7 +17,7 @@ interface LoginResponse {
 }
 
 export default function LoginPage() {
-  const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations('auth');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,13 +45,14 @@ export default function LoginPage() {
         return;
       }
 
+      await requireIdentityRefresh('authenticated');
       if (data.user?.mustChangePassword) {
-        router.push('/change-password');
+        window.location.assign(`/${locale}/change-password`);
       } else {
-        router.push('/');
+        window.location.assign(`/${locale}`);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('connectionError'));
+    } catch {
+      setError(t('connectionError'));
       setIsLoading(false);
     }
   };

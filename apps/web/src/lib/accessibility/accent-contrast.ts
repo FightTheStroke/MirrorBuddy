@@ -14,9 +14,13 @@ function parseHexColor(color: string): Rgb | null {
   const match = color.trim().match(/^#?([a-f\d]{3}|[a-f\d]{6})$/i);
   if (!match) return null;
 
-  const hex = match[1].length === 3
-    ? match[1].split('').map((char) => char + char).join('')
-    : match[1];
+  const hex =
+    match[1].length === 3
+      ? match[1]
+          .split('')
+          .map((char) => char + char)
+          .join('')
+      : match[1];
 
   return {
     r: Number.parseInt(hex.slice(0, 2), 16),
@@ -27,9 +31,7 @@ function parseHexColor(color: string): Rgb | null {
 
 function channelLuminance(channel: number) {
   const normalized = channel / 255;
-  return normalized <= 0.03928
-    ? normalized / 12.92
-    : ((normalized + 0.055) / 1.055) ** 2.4;
+  return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
 }
 
 function relativeLuminance({ r, g, b }: Rgb) {
@@ -39,8 +41,10 @@ function relativeLuminance({ r, g, b }: Rgb) {
 function contrastRatio(first: Rgb, second: Rgb) {
   const firstLuminance = relativeLuminance(first);
   const secondLuminance = relativeLuminance(second);
-  return (Math.max(firstLuminance, secondLuminance) + 0.05) /
-    (Math.min(firstLuminance, secondLuminance) + 0.05);
+  return (
+    (Math.max(firstLuminance, secondLuminance) + 0.05) /
+    (Math.min(firstLuminance, secondLuminance) + 0.05)
+  );
 }
 
 function toHex({ r, g, b }: Rgb) {
@@ -65,7 +69,27 @@ function adjustToward(color: Rgb, target: Rgb, background: Rgb, minimumRatio: nu
   return adjusted;
 }
 
-export function resolveAccessibleAccentColor(accentColor: string, isDarkTheme: boolean): AccentResolution {
+/**
+ * Ink to paint on top of an arbitrary accent background (e.g. a Maestro colour
+ * filling a chat bubble). Pure black and pure white are the two extremes of the
+ * luminance range, so whichever of them is farther from the background always
+ * clears 4.5:1 — the worst case, a background of relative luminance ~0.179,
+ * still yields 4.58:1. Reduced-opacity ink cannot make that guarantee: MB-360
+ * measured white at 60% over `#7E57C2` at 2.95:1.
+ */
+export function resolveReadableTextOnColor(background: string): '#ffffff' | '#000000' {
+  const rgb = parseHexColor(background);
+  if (!rgb) return '#000000';
+
+  return contrastRatio(WHITE, rgb) >= contrastRatio({ r: 0, g: 0, b: 0 }, rgb)
+    ? '#ffffff'
+    : '#000000';
+}
+
+export function resolveAccessibleAccentColor(
+  accentColor: string,
+  isDarkTheme: boolean,
+): AccentResolution {
   if (NAMED_ACCENTS.has(accentColor)) return { kind: 'named' };
 
   const rgb = parseHexColor(accentColor);

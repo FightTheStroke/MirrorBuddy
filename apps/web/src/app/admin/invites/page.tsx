@@ -1,32 +1,29 @@
-"use client";
+'use client';
 
 // Mark as dynamic to avoid static generation issues with i18n
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useCallback } from "react";
-import { Loader2, RefreshCw, UserPlus } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { ExportDropdown } from "@/components/admin/export-dropdown";
-import { csrfFetch } from "@/lib/auth";
-import {
-  InvitesTable,
-  type InviteRequest,
-} from "@/components/admin/invites-table";
-import { BulkActionBar } from "@/components/admin/bulk-action-bar";
-import { DirectInviteModal } from "@/components/admin/direct-invite-modal";
-import { RejectModal } from "@/components/admin/invites/reject-modal";
-import { InvitePendingActions } from "@/components/admin/invites/invite-pending-actions";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, useCallback } from 'react';
+import { Loader2, RefreshCw, UserPlus } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { ExportDropdown } from '@/components/admin/export-dropdown';
+import { csrfFetch } from '@/lib/auth';
+import { InvitesTable, type InviteRequest } from '@/components/admin/invites-table';
+import { BulkActionBar } from '@/components/admin/bulk-action-bar';
+import { DirectInviteModal } from '@/components/admin/direct-invite-modal';
+import { RejectModal } from '@/components/admin/invites/reject-modal';
+import { InvitePendingActions } from '@/components/admin/invites/invite-pending-actions';
+import { cn } from '@/lib/utils';
 
-type TabStatus = "PENDING" | "APPROVED" | "REJECTED" | "ALL" | "DIRECT";
+type TabStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'ALL' | 'DIRECT';
 
 export default function AdminInvitesPage() {
-  const t = useTranslations("admin.invites");
+  const t = useTranslations('admin.invites');
   const [invites, setInvites] = useState<InviteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<TabStatus>("PENDING");
+  const [activeTab, setActiveTab] = useState<TabStatus>('PENDING');
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDirectInvite, setShowDirectInvite] = useState(false);
@@ -36,30 +33,32 @@ export default function AdminInvitesPage() {
     setLoading(true);
     setError(null);
     try {
-      const adminRes = await fetch("/api/admin/session");
-      const adminData = adminRes.ok ? await adminRes.json() : null;
-      const adminId = adminData?.userId as string | undefined;
+      const adminRes = await fetch('/api/admin/session');
+      if (!adminRes.ok) throw new Error(t('loadingError'));
+      const adminData = await adminRes.json();
+      const adminId = adminData?.userId;
+      if (typeof adminId !== 'string' || !adminId) throw new Error(t('loadingError'));
 
       const url =
-        activeTab === "ALL"
-          ? "/api/invites"
-          : activeTab === "DIRECT"
-            ? `/api/invites?isDirect=true${adminId ? `&reviewedBy=${adminId}` : ""}`
+        activeTab === 'ALL'
+          ? '/api/invites'
+          : activeTab === 'DIRECT'
+            ? `/api/invites?isDirect=true${adminId ? `&reviewedBy=${adminId}` : ''}`
             : `/api/invites?status=${activeTab}`;
 
       const response = await fetch(url);
       if (!response.ok) {
         if (response.status === 401) {
-          setError(t("unauthorized"));
+          setError(t('unauthorized'));
           return;
         }
-        throw new Error("Failed to fetch invites");
+        throw new Error('Failed to fetch invites');
       }
       const data = await response.json();
       setInvites(data.invites);
       setSelectedIds(new Set());
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("loadingError"));
+      setError(err instanceof Error ? err.message : t('loadingError'));
     } finally {
       setLoading(false);
     }
@@ -72,17 +71,17 @@ export default function AdminInvitesPage() {
   const handleApprove = async (id: string) => {
     setProcessingId(id);
     try {
-      const res = await csrfFetch("/api/invites/approve", {
-        method: "POST",
+      const res = await csrfFetch('/api/invites/approve', {
+        method: 'POST',
         body: JSON.stringify({ requestId: id }),
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || t("approvalError"));
+        throw new Error(data.error || t('approvalError'));
       }
       await fetchInvites();
     } catch (err) {
-      alert(err instanceof Error ? err.message : t("error"));
+      alert(err instanceof Error ? err.message : t('error'));
     } finally {
       setProcessingId(null);
     }
@@ -91,18 +90,18 @@ export default function AdminInvitesPage() {
   const handleReject = async (id: string, reason: string) => {
     setProcessingId(id);
     try {
-      const res = await csrfFetch("/api/invites/reject", {
-        method: "POST",
+      const res = await csrfFetch('/api/invites/reject', {
+        method: 'POST',
         body: JSON.stringify({ requestId: id, reason: reason || undefined }),
       });
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || t("rejectionError"));
+        throw new Error(data.error || t('rejectionError'));
       }
       setRejectingId(null);
       await fetchInvites();
     } catch (err) {
-      alert(err instanceof Error ? err.message : t("error"));
+      alert(err instanceof Error ? err.message : t('error'));
     } finally {
       setProcessingId(null);
     }
@@ -110,39 +109,35 @@ export default function AdminInvitesPage() {
 
   const tabs: { status: TabStatus; label: string; count?: number }[] = [
     {
-      status: "PENDING",
-      label: t("pending"),
-      count: invites.filter((i) => i.status === "PENDING").length,
+      status: 'PENDING',
+      label: t('pending'),
+      count: invites.filter((i) => i.status === 'PENDING').length,
     },
-    { status: "APPROVED", label: t("approved") },
-    { status: "REJECTED", label: t("rejected") },
-    { status: "DIRECT", label: t("direct") },
-    { status: "ALL", label: t("all") },
+    { status: 'APPROVED', label: t('approved') },
+    { status: 'REJECTED', label: t('rejected') },
+    { status: 'DIRECT', label: t('direct') },
+    { status: 'ALL', label: t('all') },
   ];
 
-  const showCheckboxes = activeTab === "PENDING" || activeTab === "ALL";
-  const pendingInvites = invites.filter((i) => i.status === "PENDING");
+  const showCheckboxes = activeTab === 'PENDING' || activeTab === 'ALL';
+  const pendingInvites = invites.filter((i) => i.status === 'PENDING');
 
   return (
     <div className="max-w-4xl mx-auto pb-20">
       <div className="flex items-center justify-between mb-6">
-        <Button
-          onClick={() => setShowDirectInvite(true)}
-          size="sm"
-          className="gap-2"
-        >
+        <Button onClick={() => setShowDirectInvite(true)} size="sm" className="gap-2">
           <UserPlus className="w-4 h-4" />
-          {t("directInvite")}
+          {t('directInvite')}
         </Button>
         <div className="flex gap-2">
           <ExportDropdown
             data={invites}
             columns={[
-              { key: "email", label: "Email" },
-              { key: "name", label: "Name" },
-              { key: "status", label: "Status" },
-              { key: "createdAt", label: "Date" },
-              { key: "motivation", label: "Motivation" },
+              { key: 'email', label: 'Email' },
+              { key: 'name', label: 'Name' },
+              { key: 'status', label: 'Status' },
+              { key: 'createdAt', label: 'Date' },
+              { key: 'motivation', label: 'Motivation' },
             ]}
             filenamePrefix="invites"
           />
@@ -153,8 +148,8 @@ export default function AdminInvitesPage() {
             className="gap-2"
             disabled={loading}
           >
-            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-            {t("refresh")}
+            <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+            {t('refresh')}
           </Button>
         </div>
       </div>
@@ -165,10 +160,10 @@ export default function AdminInvitesPage() {
             key={tab.status}
             onClick={() => setActiveTab(tab.status)}
             className={cn(
-              "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+              'px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
               activeTab === tab.status
-                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
-                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300",
+                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300',
             )}
           >
             {tab.label}

@@ -11,13 +11,12 @@
  * Non-blocking: Errors are logged but don't interrupt calling code
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { publishAdminCounts } from "@/lib/redis/admin-counts-storage";
-import { broadcastAdminCounts } from "@/lib/redis/admin-counts-subscriber";
-import type { AdminCounts } from "@/lib/redis/admin-counts-types";
+import { getAdminCounts } from './admin-counts-service';
+import { logger } from '@/lib/logger';
+import { publishAdminCounts } from '@/lib/redis/admin-counts-storage';
+import { broadcastAdminCounts } from '@/lib/redis/admin-counts-subscriber';
 
-const log = logger.child({ module: "calculate-and-publish-admin-counts" });
+const log = logger.child({ module: 'calculate-and-publish-admin-counts' });
 
 /**
  * Calculate current admin KPI metrics
@@ -25,63 +24,6 @@ const log = logger.child({ module: "calculate-and-publish-admin-counts" });
  *
  * F-06: Excludes test data (isTestData = false) from all counts
  */
-async function calculateAdminCounts(): Promise<AdminCounts> {
-  const now = new Date();
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-  try {
-    // Run all queries in parallel for performance
-    const [
-      pendingInvites,
-      totalUsers,
-      activeUsersResult,
-      criticalSafetyEvents,
-    ] = await Promise.all([
-      // Pending invite requests
-      prisma.inviteRequest.count({
-        where: { status: "PENDING" },
-      }),
-
-      // Total users (F-06: exclude test data)
-      prisma.user.count({
-        where: { isTestData: false },
-      }),
-
-      // Active users in last 24h (F-06: exclude test data)
-      prisma.userActivity.groupBy({
-        by: ["identifier"],
-        where: {
-          timestamp: { gte: yesterday },
-          isTestData: false,
-        },
-      }),
-
-      // Critical safety events (unresolved = resolvedAt is null)
-      prisma.safetyEvent
-        .count({
-          where: {
-            resolvedAt: null,
-            severity: "critical",
-          },
-        })
-        .catch(() => 0), // May not exist in schema
-    ]);
-
-    const activeUsers24h = activeUsersResult.length;
-
-    return {
-      pendingInvites,
-      totalUsers,
-      activeUsers24h,
-      systemAlerts: criticalSafetyEvents,
-      timestamp: new Date().toISOString(),
-    };
-  } catch (error) {
-    log.error("Failed to calculate admin counts", { error: String(error) });
-    throw error;
-  }
-}
-
 /**
  * Calculate and publish admin counts to all connected admins via SSE
  *
@@ -95,14 +37,12 @@ async function calculateAdminCounts(): Promise<AdminCounts> {
  * - Cron jobs
  * - Direct admin actions
  */
-export async function calculateAndPublishAdminCounts(
-  source?: string,
-): Promise<void> {
+export async function calculateAndPublishAdminCounts(source?: string): Promise<void> {
   try {
-    log.debug("Publishing admin counts", { source });
+    log.debug('Publishing admin counts', { source });
 
     // Calculate current metrics
-    const counts = await calculateAdminCounts();
+    const counts = await getAdminCounts();
 
     // 1. Store in Redis for initial SSE data
     await publishAdminCounts(counts);
@@ -110,7 +50,7 @@ export async function calculateAndPublishAdminCounts(
     // 2. Broadcast to all connected SSE clients
     broadcastAdminCounts(counts);
 
-    log.info("Admin counts published successfully", {
+    log.info('Admin counts published successfully', {
       source,
       pendingInvites: counts.pendingInvites,
       totalUsers: counts.totalUsers,
@@ -119,7 +59,7 @@ export async function calculateAndPublishAdminCounts(
     });
   } catch (error) {
     // Non-blocking error handling: log but don't throw
-    log.warn("Failed to publish admin counts (non-blocking)", {
+    log.warn('Failed to publish admin counts (non-blocking)', {
       source,
       error: String(error),
     });

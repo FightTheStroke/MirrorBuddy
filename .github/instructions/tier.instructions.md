@@ -1,6 +1,6 @@
 ---
 description: 'Tier system rules for Trial/Base/Pro subscription logic'
-applyTo: 'src/lib/tier/**/*.ts,src/lib/tier/**/*.tsx,src/lib/seeds/tier-seed.ts'
+applyTo: 'apps/web/src/lib/tier/**/*.ts,apps/web/src/lib/tier/**/*.tsx,apps/web/src/lib/seeds/tier-seed.ts,apps/web/prisma/seed-tiers.ts,packages/tier/src/**/*'
 ---
 
 # Tier System

@@ -1,34 +1,34 @@
 // ============================================================================
 // API ROUTE: Session Metrics Analytics
 // GET: Session cost, safety, and behavioral metrics for dashboard
-// SECURITY: Requires authentication
-// DATA: All metrics from REAL API responses, not estimates
+// SECURITY: Requires admin read access (ADMIN or ADMIN_READONLY)
+// Recorded optional telemetry; cost uses pricing estimates, not a billing ledger.
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
-import {
-  getCostStats,
-  PRICING,
-  THRESHOLDS,
-} from "@/lib/metrics/cost-tracking-service";
-
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
+import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { getCostStats, PRICING, THRESHOLDS } from '@/lib/metrics/cost-tracking-service';
+import { analyticsContext, withMetricTruth } from '@/lib/admin/analytics-metric-truth';
 
 export const revalidate = 0;
 export const GET = pipe(
-  withSentry("/api/dashboard/session-metrics"),
-  withAuth,
+  withSentry('/api/dashboard/session-metrics'),
+  withAdminReadOnly,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get("days") ?? "7", 10);
-  const startDate = new Date();
+  const days = Number(searchParams.get('days') ?? '7');
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return NextResponse.json({ error: 'Invalid days' }, { status: 400 });
+  }
+  const endDate = new Date();
+  const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
 
   // F-06: Exclude test data from statistics
   // Get aggregate session metrics (only real data)
   const aggregates = await prisma.sessionMetrics.aggregate({
-    where: { createdAt: { gte: startDate }, isTestData: false },
+    where: { createdAt: { gte: startDate, lte: endDate }, isTestData: false },
     _sum: {
       turnCount: true,
       tokensIn: true,
@@ -50,16 +50,16 @@ export const GET = pipe(
 
   // Get outcome distribution (F-06: exclude test data)
   const outcomes = await prisma.sessionMetrics.groupBy({
-    by: ["outcome"],
-    where: { createdAt: { gte: startDate }, isTestData: false },
+    by: ['outcome'],
+    where: { createdAt: { gte: startDate, lte: endDate }, isTestData: false },
     _count: true,
   });
 
   // Get severity distribution (F-06: exclude test data)
   const severities = await prisma.sessionMetrics.groupBy({
-    by: ["incidentSeverity"],
+    by: ['incidentSeverity'],
     where: {
-      createdAt: { gte: startDate },
+      createdAt: { gte: startDate, lte: endDate },
       incidentSeverity: { not: null },
       isTestData: false,
     },
@@ -69,8 +69,8 @@ export const GET = pipe(
   // Get daily metrics using Prisma groupBy instead of raw SQL for portability
   // F-06: exclude test data
   const dailyGrouped = await prisma.sessionMetrics.groupBy({
-    by: ["createdAt"],
-    where: { createdAt: { gte: startDate }, isTestData: false },
+    by: ['createdAt'],
+    where: { createdAt: { gte: startDate, lte: endDate }, isTestData: false },
     _count: true,
     _sum: { costEur: true, tokensIn: true, tokensOut: true },
   });
@@ -78,10 +78,10 @@ export const GET = pipe(
   // Aggregate by date
   const dailyMetricsMap = new Map<
     string,
-    { sessions: number; totalCost: number; totalTokens: number }
+    { sessions: number; totalCost: number | null; totalTokens: number }
   >();
   for (const row of dailyGrouped) {
-    const dateKey = row.createdAt.toISOString().split("T")[0];
+    const dateKey = row.createdAt.toISOString().split('T')[0];
     const existing = dailyMetricsMap.get(dateKey) || {
       sessions: 0,
       totalCost: 0,
@@ -89,24 +89,22 @@ export const GET = pipe(
     };
     dailyMetricsMap.set(dateKey, {
       sessions: existing.sessions + row._count,
-      totalCost: existing.totalCost + (row._sum.costEur || 0),
-      totalTokens:
-        existing.totalTokens +
-        (row._sum.tokensIn || 0) +
-        (row._sum.tokensOut || 0),
+      totalCost:
+        existing.totalCost === null || row._sum.costEur == null
+          ? null
+          : existing.totalCost + row._sum.costEur,
+      totalTokens: existing.totalTokens + (row._sum.tokensIn || 0) + (row._sum.tokensOut || 0),
     });
   }
-  const dailyMetrics = Array.from(dailyMetricsMap.entries()).map(
-    ([date, data]) => ({
-      date,
-      sessions: data.sessions,
-      totalCost: data.totalCost,
-      totalTokens: data.totalTokens,
-    }),
-  );
+  const dailyMetrics = Array.from(dailyMetricsMap.entries()).map(([date, data]) => ({
+    date,
+    sessions: data.sessions,
+    totalCost: data.totalCost,
+    totalTokens: data.totalTokens,
+  }));
 
   // Get cost stats with P95
-  const costStats = await getCostStats(startDate, new Date());
+  const costStats = await getCostStats(startDate, endDate, true);
 
   // Build outcome distribution map
   const outcomeDistribution: Record<string, number> = {};
@@ -123,48 +121,65 @@ export const GET = pipe(
   }
 
   // Build daily breakdown
-  const dailyBreakdown: Record<
-    string,
-    { sessions: number; cost: number; tokens: number }
-  > = {};
+  const dailyBreakdown: Record<string, { sessions: number; cost: number | null; tokens: number }> =
+    {};
   for (const d of dailyMetrics) {
     const day =
-      typeof d.date === "string"
-        ? d.date.split("T")[0]
-        : new Date(d.date).toISOString().split("T")[0];
+      typeof d.date === 'string'
+        ? d.date.split('T')[0]
+        : new Date(d.date).toISOString().split('T')[0];
     dailyBreakdown[day] = {
       sessions: d.sessions,
-      cost: Math.round(d.totalCost * 1000) / 1000,
+      cost: d.totalCost === null ? null : Math.round(d.totalCost * 1000) / 1000,
       tokens: d.totalTokens,
     };
   }
 
   // Calculate refusal accuracy
-  const totalRefusals = aggregates._sum.refusalCount || 0;
-  const correctRefusals = aggregates._sum.refusalCorrect || 0;
+  const sum = (value: number | null) => (aggregates._count === 0 ? 0 : value);
+  const rounded = (value: number | null, factor: number) =>
+    value === null ? null : Math.round(value * factor) / factor;
+  const totalRefusals = sum(aggregates._sum.refusalCount);
+  const correctRefusals = sum(aggregates._sum.refusalCorrect);
   const refusalAccuracy =
-    totalRefusals > 0
+    totalRefusals !== null && totalRefusals > 0 && correctRefusals !== null
       ? Math.round((correctRefusals / totalRefusals) * 100)
-      : 100;
+      : null;
+  const tokensIn = sum(aggregates._sum.tokensIn);
+  const tokensOut = sum(aggregates._sum.tokensOut);
 
-  return NextResponse.json({
+  const payload = {
     period: { days, startDate: startDate.toISOString() },
     summary: {
       totalSessions: aggregates._count,
-      totalTurns: aggregates._sum.turnCount || 0,
-      avgTurnsPerSession: Math.round(aggregates._avg.turnCount || 0),
-      avgLatencyMs: Math.round(aggregates._avg.avgTurnLatencyMs || 0),
+      totalTurns: sum(aggregates._sum.turnCount),
+      avgTurnsPerSession:
+        aggregates._avg.turnCount == null ? null : Math.round(aggregates._avg.turnCount),
+      avgLatencyMs:
+        aggregates._avg.avgTurnLatencyMs == null
+          ? null
+          : Math.round(aggregates._avg.avgTurnLatencyMs),
     },
     tokens: {
-      totalIn: aggregates._sum.tokensIn || 0,
-      totalOut: aggregates._sum.tokensOut || 0,
-      total: (aggregates._sum.tokensIn || 0) + (aggregates._sum.tokensOut || 0),
+      totalIn: tokensIn,
+      totalOut: tokensOut,
+      total: tokensIn === null || tokensOut === null ? null : tokensIn + tokensOut,
     },
     cost: {
-      totalEur: Math.round((aggregates._sum.costEur || 0) * 100) / 100,
-      avgPerSession: Math.round((aggregates._avg.costEur || 0) * 1000) / 1000,
-      p95PerSession: costStats.p95Cost,
-      voiceMinutes: Math.round((aggregates._sum.voiceMinutes || 0) * 10) / 10,
+      totalEur: rounded(sum(aggregates._sum.costEur), 100),
+      avgPerSession:
+        aggregates._avg.costEur == null ? null : Math.round(aggregates._avg.costEur * 1000) / 1000,
+      p95PerSession:
+        aggregates._count === 0 || costStats.sessionCount === 0 ? null : costStats.p95Cost,
+      voiceMinutes: rounded(sum(aggregates._sum.voiceMinutes), 10),
+      voiceCostEur: rounded(
+        aggregates._sum.voiceMinutes === null
+          ? aggregates._count === 0
+            ? 0
+            : null
+          : aggregates._sum.voiceMinutes * PRICING.VOICE_REALTIME_PER_MIN,
+        100,
+      ),
       thresholds: {
         textWarn: THRESHOLDS.SESSION_TEXT_WARN,
         textLimit: THRESHOLDS.SESSION_TEXT_LIMIT,
@@ -180,11 +195,35 @@ export const GET = pipe(
       totalRefusals,
       correctRefusals,
       refusalAccuracy,
-      jailbreakAttempts: aggregates._sum.jailbreakAttempts || 0,
-      stuckLoops: aggregates._sum.stuckLoopCount || 0,
+      jailbreakAttempts: sum(aggregates._sum.jailbreakAttempts),
+      stuckLoops: sum(aggregates._sum.stuckLoopCount),
       severityDistribution,
     },
     outcomes: outcomeDistribution,
     dailyBreakdown,
-  });
+  };
+  const costContext = { estimate: 'tokenPricing' as const };
+  return NextResponse.json(
+    withMetricTruth(
+      payload,
+      analyticsContext('SessionMetrics (isTestData=false)', startDate, endDate),
+      {
+        ...Object.fromEntries(
+          Object.keys(dailyBreakdown).map((date) => [`dailyBreakdown.${date}.cost`, costContext]),
+        ),
+        'cost.totalEur': costContext,
+        'cost.voiceCostEur': costContext,
+        'cost.avgPerSession': {
+          ...costContext,
+          reason: aggregates._count === 0 ? 'zeroDenominator' : null,
+        },
+        'cost.p95PerSession': {
+          ...costContext,
+          reason:
+            aggregates._count === 0 || costStats.sessionCount === 0 ? 'zeroDenominator' : null,
+        },
+        'safety.refusalAccuracy': { reason: totalRefusals === 0 ? 'zeroDenominator' : null },
+      },
+    ),
+  );
 });

@@ -3,7 +3,7 @@
 // F-04: End-to-end GDPR compliance verification
 // ============================================================================
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 import type { APIRequestContext } from '@playwright/test';
 
 async function getCsrfToken(request: APIRequestContext): Promise<string> {

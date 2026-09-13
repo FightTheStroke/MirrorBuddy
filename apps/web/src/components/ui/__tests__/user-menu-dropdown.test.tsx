@@ -4,27 +4,22 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getTranslation, getTranslationRegex } from '@/test/i18n-helpers';
 import { UserMenuDropdown } from '../user-menu-dropdown';
+import { clearCSRFToken, setClientIdentity } from '@/lib/auth';
+import { installLogoutTransportMock, logoutCSRFToken } from '@/test/fixtures/logout-transport';
 
-// Mock csrfFetch
-const mockCsrfFetch = vi.fn();
-vi.mock('@/lib/auth', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/auth')>();
-  return {
-    ...actual,
-    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-  };
-});
+const mockLogoutFetch = vi.fn<typeof fetch>();
 
 // Mock next/navigation
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
+    refresh: vi.fn(),
   }),
 }));
 
@@ -37,6 +32,8 @@ vi.mock('next-intl', () => ({
       'userMenu.changePassword': 'Cambia Password',
       'userMenu.settings': 'Impostazioni',
       'userMenu.logout': 'Esci',
+      'session.logoutCurrent': 'Esci da questa sessione',
+      'session.logoutAll': 'Esci da tutti i dispositivi',
     };
     return translations[key] || key;
   },
@@ -45,9 +42,19 @@ vi.mock('next-intl', () => ({
 describe('UserMenuDropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockCsrfFetch.mockResolvedValue({
-      ok: true,
+    setClientIdentity({
+      status: 'authenticated',
+      userId: 'user-test',
+      role: 'USER',
+      legacyOrigin: false,
+      needsLegacyUpgrade: false,
     });
+    mockLogoutFetch.mockResolvedValue(Response.json({ success: true }));
+    installLogoutTransportMock(mockLogoutFetch);
+  });
+  afterEach(() => {
+    clearCSRFToken();
+    vi.unstubAllGlobals();
   });
 
   describe('Rendering', () => {
@@ -87,7 +94,7 @@ describe('UserMenuDropdown', () => {
       expect(svg).toBeInTheDocument();
     });
 
-    it('opens menu and shows all 4 menu items', async () => {
+    it('opens menu and shows both distinct logout controls', async () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
@@ -96,14 +103,16 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      // All 4 menu items should be visible
+      // Profile, password, settings and two explicit logout scopes.
       await waitFor(() => {
         expect(screen.getByText(getTranslation('common.userMenu.profile'))).toBeInTheDocument();
         expect(
           screen.getByText(getTranslation('common.userMenu.changePassword')),
         ).toBeInTheDocument();
         expect(screen.getByText(getTranslation('common.userMenu.settings'))).toBeInTheDocument();
-        expect(screen.getByText(getTranslation('common.userMenu.logout'))).toBeInTheDocument();
+        expect(
+          screen.getByText(getTranslation('common.session.logoutCurrent')),
+        ).toBeInTheDocument();
       });
     });
 
@@ -183,7 +192,7 @@ describe('UserMenuDropdown', () => {
   });
 
   describe('Logout Functionality', () => {
-    it('calls csrfFetch with /api/auth/logout when logout is clicked', async () => {
+    it('uses real csrfFetch for /api/auth/logout when logout is clicked', async () => {
       const user = userEvent.setup();
       render(<UserMenuDropdown userName="Mario" />);
 
@@ -192,13 +201,19 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       await user.click(logoutItem);
 
       await waitFor(() => {
-        expect(mockCsrfFetch).toHaveBeenCalledWith('/api/auth/logout', {
+        expect(mockLogoutFetch).toHaveBeenCalledWith('/api/auth/logout', {
           method: 'POST',
+          body: JSON.stringify({ scope: 'current' }),
+          credentials: 'include',
+          headers: expect.any(Headers),
         });
+        expect(new Headers(mockLogoutFetch.mock.calls[0][1]?.headers).get('X-CSRF-Token')).toBe(
+          logoutCSRFToken,
+        );
       });
     });
 
@@ -211,17 +226,17 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       await user.click(logoutItem);
 
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith('/login');
       });
     });
 
     it('does not redirect if logout API fails', async () => {
       const user = userEvent.setup();
-      mockCsrfFetch.mockResolvedValueOnce({ ok: false });
+      mockLogoutFetch.mockResolvedValueOnce(new Response('{}', { status: 503 }));
 
       render(<UserMenuDropdown userName="Mario" />);
 
@@ -230,24 +245,24 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       await user.click(logoutItem);
 
       await waitFor(() => {
-        expect(mockCsrfFetch).toHaveBeenCalled();
+        expect(mockLogoutFetch).toHaveBeenCalled();
       });
 
       // Should not navigate on failure
-      expect(mockPush).not.toHaveBeenCalledWith('/login');
+      expect(window.location.assign).not.toHaveBeenCalled();
     });
 
     it('disables logout button while logging out', async () => {
       const user = userEvent.setup();
-      // Delay the csrfFetch to simulate loading
-      mockCsrfFetch.mockImplementation(
+      // Delay HTTP acknowledgement while real logout state remains pending.
+      mockLogoutFetch.mockImplementation(
         () =>
           new Promise((resolve) => {
-            setTimeout(() => resolve({ ok: true }), 100);
+            setTimeout(() => resolve(Response.json({ success: true })), 100);
           }),
       );
 
@@ -258,7 +273,7 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       const menuItem = logoutItem.closest('[role="menuitem"]');
 
       await user.click(logoutItem);
@@ -271,17 +286,17 @@ describe('UserMenuDropdown', () => {
 
       // Wait for the delayed response to fully resolve (prevents leaking into next test)
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith('/login');
       });
     });
 
     it('prevents multiple logout requests when clicked multiple times', async () => {
       const user = userEvent.setup();
-      // Delay the csrfFetch to allow multiple clicks
-      mockCsrfFetch.mockImplementation(
+      // Delay HTTP acknowledgement to allow multiple clicks.
+      mockLogoutFetch.mockImplementation(
         () =>
           new Promise((resolve) => {
-            setTimeout(() => resolve({ ok: true }), 100);
+            setTimeout(() => resolve(Response.json({ success: true })), 100);
           }),
       );
 
@@ -292,7 +307,7 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
 
       // Click multiple times rapidly
       await user.click(logoutItem);
@@ -301,18 +316,18 @@ describe('UserMenuDropdown', () => {
 
       await waitFor(() => {
         // Should only be called once
-        expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
+        expect(mockLogoutFetch).toHaveBeenCalledTimes(1);
       });
 
       // Wait for the delayed response to fully resolve (prevents leaking into next test)
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith('/login');
       });
     });
 
     it('handles logout network error gracefully', async () => {
       const user = userEvent.setup();
-      mockCsrfFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockLogoutFetch.mockRejectedValueOnce(new Error('Network error'));
 
       render(<UserMenuDropdown userName="Mario" />);
 
@@ -321,15 +336,15 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       await user.click(logoutItem);
 
       await waitFor(() => {
-        expect(mockCsrfFetch).toHaveBeenCalled();
+        expect(mockLogoutFetch).toHaveBeenCalled();
       });
 
       // Should not navigate on error
-      expect(mockPush).not.toHaveBeenCalledWith('/login');
+      expect(window.location.assign).not.toHaveBeenCalled();
     });
   });
 
@@ -402,7 +417,7 @@ describe('UserMenuDropdown', () => {
 
       // Focus and press Enter on profile item
       if (menuItem) {
-        menuItem.focus();
+        act(() => menuItem.focus());
         await user.keyboard('{Enter}');
       }
 
@@ -433,7 +448,7 @@ describe('UserMenuDropdown', () => {
 
       await waitFor(() => {
         const menuItems = screen.getAllByRole('menuitem');
-        expect(menuItems.length).toBe(4);
+        expect(menuItems.length).toBe(5);
 
         menuItems.forEach((item) => {
           expect(item).toHaveAttribute('role', 'menuitem');
@@ -480,7 +495,7 @@ describe('UserMenuDropdown', () => {
       });
       await user.click(trigger);
 
-      const logoutItem = await screen.findByText(getTranslation('common.userMenu.logout'));
+      const logoutItem = await screen.findByText(getTranslation('common.session.logoutCurrent'));
       const menuItem = logoutItem.closest('[role="menuitem"]');
 
       // Logout should have red/danger styling

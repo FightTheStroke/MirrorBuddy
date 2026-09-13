@@ -232,7 +232,7 @@ describe('Admin Form Inputs - Mobile Responsiveness (F-47)', () => {
     it('should render search input full-width', () => {
       const mockOnChange = vi.fn();
 
-      render(<UsersSearch value="" onChange={mockOnChange} />);
+      render(<UsersSearch value="" onChange={mockOnChange} onSubmit={vi.fn()} />);
 
       const searchInput = screen.getByPlaceholderText(
         'Cerca per email o username...',
@@ -243,7 +243,7 @@ describe('Admin Form Inputs - Mobile Responsiveness (F-47)', () => {
     it('should have touch-friendly height', () => {
       const mockOnChange = vi.fn();
 
-      render(<UsersSearch value="" onChange={mockOnChange} />);
+      render(<UsersSearch value="" onChange={mockOnChange} onSubmit={vi.fn()} />);
 
       const searchInput = screen.getByPlaceholderText(
         'Cerca per email o username...',

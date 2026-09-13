@@ -19,7 +19,26 @@ export {
   type AuthResult,
   type AdminAuthResult,
   type AdminReadOnlyAuthResult,
+  type AuthenticatedSession,
 } from './session-auth';
+
+export { resolveSessionToken } from './session-reader';
+export { AuthenticationError } from './auth-error';
+export { SessionReadError, type SessionResolution } from './session-policy';
+export {
+  issuePasswordSession,
+  createGuestSession,
+  upgradeLegacySession,
+  type IssuedSession,
+} from './session-issuance';
+export {
+  revokeSession,
+  changeSessionPassword,
+  resetUserPassword,
+  consumePasswordReset,
+  setUserDisabled,
+} from './session-revocation';
+export { setSessionCookies, clearSessionCookies } from './session-cookies';
 
 // Cookie signing (uses azure key vault)
 export { signCookieValue, verifyCookieValue, isSignedCookie } from './cookie-signing';

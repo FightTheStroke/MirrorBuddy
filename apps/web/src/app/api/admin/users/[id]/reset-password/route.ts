@@ -3,6 +3,8 @@ import { logger } from '@/lib/logger';
 import { pipe, withSentry, withCSRF, withAdmin } from '@/lib/api/middlewares';
 import { prisma } from '@/lib/db';
 import { generateRandomPassword, hashPassword } from '@/lib/auth/server';
+import { resetUserPassword } from '@/lib/auth/session-revocation';
+import { requireActiveSession } from '@/lib/auth/session-transaction';
 import { sendEmail } from '@/lib/email';
 import { logAdminAction, getClientIp } from '@/lib/admin/audit-service';
 
@@ -39,10 +41,7 @@ export const POST = pipe(
   const tempPassword = generateRandomPassword(16);
   const passwordHash = await hashPassword(tempPassword);
 
-  const updated = await prisma.user.update({
-    where: { id: targetId },
-    data: { passwordHash, mustChangePassword: true },
-  });
+  await resetUserPassword(targetId, passwordHash, true, requireActiveSession(ctx.authSession));
 
   await sendEmail({
     to: user.email,
@@ -68,9 +67,9 @@ export const POST = pipe(
     success: true,
     tempPassword,
     user: {
-      id: updated.id,
-      username: updated.username,
-      email: updated.email,
+      id: user.id,
+      username: user.username,
+      email: user.email,
     },
   });
 });

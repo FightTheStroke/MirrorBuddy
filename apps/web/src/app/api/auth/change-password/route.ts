@@ -10,6 +10,9 @@ import { logger } from '@/lib/logger';
 import { hashPassword, verifyPassword, validatePasswordStrength } from '@/lib/auth/server';
 import { RATE_LIMITS } from '@/lib/rate-limit';
 import { pipe, withSentry, withCSRF, withRateLimit, withAuth } from '@/lib/api/middlewares';
+import { changeSessionPassword } from '@/lib/auth/session-revocation';
+import { setSessionCookies } from '@/lib/auth/session-cookies';
+import { safeReadJson } from '@/lib/api/safe-json';
 
 export const revalidate = 0;
 const log = logger.child({ module: 'auth/change-password' });
@@ -21,9 +24,20 @@ export const POST = pipe(
   withRateLimit(RATE_LIMITS.AUTH_PASSWORD),
 )(async (ctx) => {
   // Parse request body
-  const { currentPassword, newPassword } = await ctx.req.json();
+  const body = await safeReadJson(ctx.req);
+  const currentPassword =
+    body && typeof body === 'object' && 'currentPassword' in body
+      ? body.currentPassword
+      : undefined;
+  const newPassword =
+    body && typeof body === 'object' && 'newPassword' in body ? body.newPassword : undefined;
 
-  if (!currentPassword || !newPassword) {
+  if (
+    typeof currentPassword !== 'string' ||
+    typeof newPassword !== 'string' ||
+    !currentPassword ||
+    !newPassword
+  ) {
     return NextResponse.json(
       { error: 'Current password and new password are required' },
       { status: 400 },
@@ -71,18 +85,14 @@ export const POST = pipe(
   // Hash new password and update
   const newHash = await hashPassword(newPassword);
 
-  await prisma.user.update({
-    where: { id: ctx.userId },
-    data: {
-      passwordHash: newHash,
-      mustChangePassword: false, // Clear the flag
-    },
-  });
+  const issued = await changeSessionPassword(ctx.authSession, user.passwordHash, newHash);
 
   log.info('Password changed successfully', { userId: ctx.userId });
 
-  return NextResponse.json(
+  const response = NextResponse.json(
     { success: true, message: 'Password changed successfully' },
     { status: 200 },
   );
+  setSessionCookies(response.cookies, issued);
+  return response;
 });

@@ -7,7 +7,7 @@ import { logger } from '@/lib/logger';
 import { getCurrentSeason } from '@/lib/gamification/seasons';
 import type { ProgressState, StudySession } from './progress-store-types';
 import { createProgressActions } from './progress-store-actions';
-import { csrfFetch } from '@/lib/auth';
+import { createProgressSync } from './progress-store-sync';
 import { isUndeliveredRequest } from './undelivered-request';
 
 // Re-export types for convenience
@@ -33,64 +33,54 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
   sessionHistory: [],
   lastSyncedAt: null,
   pendingSync: false,
+  needsHydration: false,
 
   // Actions
   ...createProgressActions(set, get),
 
-  // Server sync
-  syncToServer: async () => {
-    const state = get();
-    if (!state.pendingSync) return;
-
-    try {
-      // Sync main progress
-      await csrfFetch('/api/progress', {
-        method: 'PUT',
-        body: JSON.stringify({
-          xp: state.xp,
-          mirrorBucks: state.mirrorBucks,
-          level: state.level,
-          streak: state.streak,
-          totalStudyMinutes: state.totalStudyMinutes,
-          questionsAsked: state.questionsAsked,
-          sessionsThisWeek: state.sessionsThisWeek,
-          masteries: state.masteries,
-          achievements: state.achievements,
-        }),
-      });
-
-      // Sync recent sessions
-      const unsyncedSessions = state.sessionHistory
-        .filter((s) => s.endedAt && !s.id.startsWith('synced-'))
-        .slice(0, 10);
-
-      for (const session of unsyncedSessions) {
-        await csrfFetch('/api/progress/sessions', {
-          method: 'POST',
-          body: JSON.stringify(session),
-        });
-      }
-
-      set({ lastSyncedAt: new Date(), pendingSync: false });
-    } catch (error) {
-      logger.error('Progress sync failed', { error: String(error) });
-    }
-  },
+  ...createProgressSync(set, get),
 
   loadFromServer: async (signal?: AbortSignal) => {
+    set({ needsHydration: true });
+    const snapshot = get();
     try {
-      // Use allSettled for partial failure resilience
       const results = await Promise.allSettled([
-        fetch('/api/progress', { signal }),
-        fetch('/api/progress/sessions?limit=20', { signal }),
+        fetch('/api/progress', { signal }).then(async (response) => {
+          if (!response.ok) throw new Error(`Progress read failed (${response.status})`);
+          const data = await response.json();
+          if (!data || typeof data !== 'object' || Array.isArray(data)) {
+            throw new TypeError('Invalid progress response');
+          }
+          return data;
+        }),
+        fetch('/api/progress/sessions?limit=20', { signal }).then(async (response) => {
+          if (!response.ok) throw new Error(`Sessions read failed (${response.status})`);
+          const data = await response.json();
+          if (
+            !Array.isArray(data) ||
+            data.some(
+              (session) =>
+                !session ||
+                typeof session.id !== 'string' ||
+                typeof session.startedAt !== 'string' ||
+                Number.isNaN(new Date(session.startedAt).getTime()) ||
+                (session.endedAt != null &&
+                  (typeof session.endedAt !== 'string' ||
+                    Number.isNaN(new Date(session.endedAt).getTime()))),
+            )
+          ) {
+            throw new TypeError('Invalid sessions response');
+          }
+          return data.map((s: StudySession) => ({
+            ...s,
+            id: `synced-${s.id}`,
+            startedAt: new Date(s.startedAt),
+            endedAt: s.endedAt ? new Date(s.endedAt) : undefined,
+          }));
+        }),
       ]);
 
-      const progressRes = results[0].status === 'fulfilled' ? results[0].value : null;
-      const sessionsRes = results[1].status === 'fulfilled' ? results[1].value : null;
-
-      // A request the browser never delivered is not a failure worth reporting:
-      // the screen keeps what it had and the next render asks again. Reporting
-      // it filled Sentry with warnings that looked like a broken app.
+      // Failed reads remain pending for auto-sync, including undelivered requests.
       if (results[0].status === 'rejected' && !isUndeliveredRequest(results[0].reason)) {
         logger.warn('Progress fetch failed', {
           error: String(results[0].reason),
@@ -102,49 +92,43 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
         });
       }
 
-      if (progressRes?.ok) {
-        const data = await progressRes.json();
-        set((state) => ({
+      // Neither hydration nor an older response may acknowledge unsaved edits.
+      if (signal?.aborted || get() !== snapshot || snapshot.pendingSync) return;
+      const patch: Partial<ProgressState> = {};
+      if (results[0].status === 'fulfilled') {
+        const data = results[0].value;
+        Object.assign(patch, {
           // Legacy fields
-          xp: data.xp ?? state.xp,
-          level: data.level ?? state.level,
-          streak: data.streak ?? state.streak,
-          masteries: data.masteries ?? state.masteries,
-          achievements: data.achievements ?? state.achievements,
-          totalStudyMinutes: data.totalStudyMinutes ?? state.totalStudyMinutes,
-          questionsAsked: data.questionsAsked ?? state.questionsAsked,
+          xp: data.xp ?? snapshot.xp,
+          level: data.level ?? snapshot.level,
+          streak: data.streak ?? snapshot.streak,
+          masteries: data.masteries ?? snapshot.masteries,
+          achievements: data.achievements ?? snapshot.achievements,
+          totalStudyMinutes: data.totalStudyMinutes ?? snapshot.totalStudyMinutes,
+          questionsAsked: data.questionsAsked ?? snapshot.questionsAsked,
           // MirrorBucks/Season fields
-          mirrorBucks: data.mirrorBucks ?? state.mirrorBucks,
-          seasonMirrorBucks: data.seasonMirrorBucks ?? state.seasonMirrorBucks,
-          seasonLevel: data.seasonLevel ?? state.seasonLevel,
-          allTimeLevel: data.allTimeLevel ?? state.allTimeLevel,
-          currentSeason: data.currentSeason ?? state.currentSeason,
-          seasonHistory: data.seasonHistory ?? state.seasonHistory,
-        }));
+          mirrorBucks: data.mirrorBucks ?? snapshot.mirrorBucks,
+          seasonMirrorBucks: data.seasonMirrorBucks ?? snapshot.seasonMirrorBucks,
+          seasonLevel: data.seasonLevel ?? snapshot.seasonLevel,
+          allTimeLevel: data.allTimeLevel ?? snapshot.allTimeLevel,
+          currentSeason: data.currentSeason ?? snapshot.currentSeason,
+          seasonHistory: data.seasonHistory ?? snapshot.seasonHistory,
+        });
       }
 
-      if (sessionsRes?.ok) {
-        const sessions = await sessionsRes.json();
-        if (Array.isArray(sessions)) {
-          // Calculate sessionsThisWeek from DB sessions
-          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          const recentCount = sessions.filter(
-            (s: StudySession) => new Date(s.startedAt) > weekAgo,
-          ).length;
-
-          set({
-            sessionHistory: sessions.map((s: StudySession) => ({
-              ...s,
-              id: `synced-${s.id}`, // Mark as synced
-              startedAt: new Date(s.startedAt),
-              endedAt: s.endedAt ? new Date(s.endedAt) : undefined,
-            })),
-            sessionsThisWeek: recentCount,
-          });
-        }
+      if (results[1].status === 'fulfilled') {
+        const sessions = results[1].value;
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        patch.sessionHistory = sessions;
+        patch.sessionsThisWeek = sessions.filter((s) => s.startedAt > weekAgo).length;
       }
 
-      set({ lastSyncedAt: new Date(), pendingSync: false });
+      const complete = results.every((result) => result.status === 'fulfilled');
+      set({
+        ...patch,
+        needsHydration: !complete,
+        ...(complete ? { lastSyncedAt: new Date() } : {}),
+      });
     } catch (error) {
       if (isUndeliveredRequest(error)) return;
       logger.error('Progress load failed', { error: String(error) });

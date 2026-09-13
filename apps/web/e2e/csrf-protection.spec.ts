@@ -8,7 +8,7 @@
  * ADR 0053: Vercel Runtime Constraints documents CSRF requirements.
  */
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 
 test.describe('CSRF Protection', () => {
   test('POST without CSRF token returns 403', async ({ request }) => {

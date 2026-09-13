@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve unsaved progress and sessions after failed reads, retry hydration automatically,
+  and acknowledge writes only after successful responses. Session uploads now follow the
+  existing create/complete API contract and retain acknowledged IDs across retries.
+- Correct communications breadcrumb translations for statistics, templates, and campaigns.
+- Show safe, accessible Key Vault error feedback with a working retry action, including
+  database failures. This does not identify the historical server-side failure.
 - PWA: offline service-worker registration no longer throws a secondary error when
   the Service Worker API or its registration result is missing (Sentry).
 - Study materials: title/topic normalisation for flashcards, summaries, quizzes and

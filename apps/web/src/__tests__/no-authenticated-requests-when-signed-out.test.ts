@@ -27,14 +27,24 @@ vi.mock('@/lib/logger', () => ({
 
 const AUTH_COOKIE = 'mirrorbuddy-user-id-client';
 
-function setSignedOut(): void {
+async function setSignedOut(): Promise<void> {
+  const { setClientIdentity } = await import('@/lib/auth');
+  setClientIdentity({ status: 'anonymous' });
   Object.defineProperty(document, 'cookie', {
     configurable: true,
     get: () => 'some-other-cookie=1',
   });
 }
 
-function setSignedIn(): void {
+async function setSignedIn(): Promise<void> {
+  const { setClientIdentity } = await import('@/lib/auth');
+  setClientIdentity({
+    status: 'authenticated',
+    userId: 'user-123',
+    role: 'USER',
+    legacyOrigin: false,
+    needsLegacyUpgrade: false,
+  });
   Object.defineProperty(document, 'cookie', {
     configurable: true,
     get: () => `${AUTH_COOKIE}=user-123`,
@@ -59,7 +69,7 @@ describe('signed-out visitors make no authenticated requests', () => {
   });
 
   it('does not hydrate the stores', async () => {
-    setSignedOut();
+    await setSignedOut();
     const { initializeStores } = await import('@/lib/stores/use-store-sync');
 
     await initializeStores();
@@ -67,17 +77,17 @@ describe('signed-out visitors make no authenticated requests', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('does hydrate the stores once a session cookie exists', async () => {
-    setSignedIn();
+  it('does not turn an authenticated hydration failure into a guest success', async () => {
+    await setSignedIn();
     const { initializeStores } = await import('@/lib/stores/use-store-sync');
 
-    await initializeStores();
+    await expect(initializeStores()).rejects.toThrow('401');
 
     expect(fetchMock).toHaveBeenCalledWith('/api/user');
   });
 
   it('does not ask for conversation summaries', async () => {
-    setSignedOut();
+    await setSignedOut();
     const { loadConversationSummariesFromDB } =
       await import('@/lib/stores/conversation-flow-store/persistence');
 
@@ -86,7 +96,7 @@ describe('signed-out visitors make no authenticated requests', () => {
   });
 
   it('does not ask for the stored consent', async () => {
-    setSignedOut();
+    await setSignedOut();
     const { loadUnifiedConsentFromDB } = await import('@/lib/consent/unified-consent-storage');
 
     await expect(loadUnifiedConsentFromDB()).resolves.toBeNull();
@@ -94,7 +104,7 @@ describe('signed-out visitors make no authenticated requests', () => {
   });
 
   it('does not ask for the stored consent through the consent service either', async () => {
-    setSignedOut();
+    await setSignedOut();
     const { loadConsentFromDB } = await import('@/lib/consent/consent-service');
 
     await expect(loadConsentFromDB()).resolves.toBeNull();

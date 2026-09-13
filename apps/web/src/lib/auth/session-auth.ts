@@ -1,310 +1,101 @@
-// ============================================================================
-// SESSION AUTHENTICATION HELPER
-// Reusable auth checks for API endpoints
-// Created for issues #83, #84, #85, #86
-// Updated for #013: Cryptographically signed session cookies
-// Updated for ADR 0075: Centralized cookie constants
-// ============================================================================
-
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
-import {
-  AUTH_COOKIE_NAME,
-  LEGACY_AUTH_COOKIE,
-  ADMIN_COOKIE_NAME,
-} from '@/lib/auth/cookie-constants';
+import { resolveSessionToken } from './session-reader';
+import { SessionReadError, type SessionResolution } from './session-policy';
+import { AuthenticationError } from './auth-error';
+import { AUTH_COOKIE_NAME, LEGACY_AUTH_COOKIE } from './cookie-constants';
 
-export interface AuthResult {
-  authenticated: boolean;
-  userId: string | null;
-  error?: string;
+export type AuthenticatedSession = Extract<SessionResolution, { status: 'AUTHENTICATED' }>;
+export type AuthResult =
+  | { authenticated: true; userId: string; session: AuthenticatedSession; error?: never }
+  | { authenticated: false; userId: null; error: string; session?: never };
+export type AdminAuthResult = AuthResult & { isAdmin: boolean };
+export type AdminReadOnlyAuthResult = AuthResult & { canAccessAdminReadOnly: boolean };
+
+async function readRole(userId: string) {
+  try {
+    return await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+  } catch {
+    throw new AuthenticationError('SESSION_UNAVAILABLE');
+  }
 }
 
-export interface AdminAuthResult extends AuthResult {
-  isAdmin: boolean;
-}
-
-export interface AdminReadOnlyAuthResult extends AuthResult {
-  canAccessAdminReadOnly: boolean;
-}
-
-/**
- * Validate user authentication from cookie
- * Use this at the start of any protected API endpoint
- *
- * Supports both signed cookies (new) and unsigned cookies (legacy).
- * Signed cookies use HMAC-SHA256 for tamper protection.
- */
+/** Only absent credentials return anonymous. Rejected/unavailable credentials are failures. */
 export async function validateAuth(): Promise<AuthResult> {
-  try {
-    const cookieStore = await cookies();
-    // Check new cookie first, fallback to legacy cookie for existing users
-    const cookieValue =
-      cookieStore.get(AUTH_COOKIE_NAME)?.value || cookieStore.get(LEGACY_AUTH_COOKIE)?.value;
-
-    if (!cookieValue) {
-      return {
-        authenticated: false,
-        userId: null,
-        error: 'No authentication cookie',
-      };
-    }
-
-    // Only accept signed cookies - unsigned cookies are rejected for security
-    if (!isSignedCookie(cookieValue)) {
-      logger.warn('Unsigned cookie rejected', {
-        hint: 'Cookie must be cryptographically signed',
-      });
-      return {
-        authenticated: false,
-        userId: null,
-        error: 'Invalid cookie format',
-      };
-    }
-
-    const verification = verifyCookieValue(cookieValue);
-
-    if (!verification.valid) {
-      logger.warn('Cookie signature verification failed', {
-        error: verification.error,
-      });
-      return {
-        authenticated: false,
-        userId: null,
-        error: 'Invalid cookie signature',
-      };
-    }
-
-    const userId = verification.value!;
-    logger.debug('Signed cookie verified', { userId });
-
-    // Verify user exists in database
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { id: true },
-    });
-
-    if (!user) {
-      if (process.env.E2E_TESTS === '1' || process.env.NODE_ENV !== 'production') {
-        // E2E/dev mode: auto-create test users
-        // Check if this is an admin session (indicated by admin cookie)
-        const adminCookie = cookieStore.get(ADMIN_COOKIE_NAME);
-        const isAdminSession = !!adminCookie;
-
-        // Use try-catch to handle race conditions where concurrent requests
-        // may try to create the same user simultaneously
-        try {
-          const created = await prisma.user.upsert({
-            where: { id: userId },
-            update: {},
-            create: {
-              id: userId,
-              role: isAdminSession ? 'ADMIN' : 'USER',
-              profile: { create: {} },
-              settings: { create: {} },
-              progress: { create: {} },
-            },
-            select: { id: true },
-          });
-
-          return {
-            authenticated: true,
-            userId: created.id,
-          };
-        } catch (createError) {
-          // P2002 = unique constraint violation (user was created by another request)
-          // Check for both Prisma error code and various message formats
-          const isPrismaP2002 =
-            createError &&
-            typeof createError === 'object' &&
-            'code' in createError &&
-            createError.code === 'P2002';
-          const isUniqueConstraintMessage =
-            createError instanceof Error &&
-            (createError.message.includes('Unique constraint') ||
-              createError.message.includes('unique constraint') ||
-              createError.message.includes('duplicate key'));
-
-          if (isPrismaP2002 || isUniqueConstraintMessage) {
-            // User was created by another concurrent request, fetch and return
-            const existingUser = await prisma.user.findUnique({
-              where: { id: userId },
-              select: { id: true },
-            });
-            if (existingUser) {
-              return {
-                authenticated: true,
-                userId: existingUser.id,
-              };
-            }
-          }
-          // Re-throw other errors
-          throw createError;
-        }
-      }
-
-      return {
-        authenticated: false,
-        userId: null,
-        error: 'User not found',
-      };
-    }
-
-    return {
-      authenticated: true,
-      userId,
-    };
-  } catch (error) {
-    logger.error('Auth validation error', { error: String(error) });
-    return {
-      authenticated: false,
-      userId: null,
-      error: 'Auth validation failed',
-    };
+  const token = await getPresentedSessionToken();
+  if (typeof token === 'undefined') {
+    return { authenticated: false, userId: null, error: 'No authentication cookie' };
   }
+  return validatePresentedToken(token);
 }
 
-/**
- * Validate that a session belongs to the authenticated user
- * Use for SSE endpoints that need session ownership verification
- *
- * Voice sessions (starting with 'voice-') are ephemeral and don't have
- * a database record, so we allow them for authenticated users.
- */
+/** Opaque transport only, for fresh-proof replacement; never interpret this as identity. */
+export async function getPresentedSessionToken(): Promise<string | undefined> {
+  const store = await cookies();
+  const cookie = store.get(AUTH_COOKIE_NAME) ?? store.get(LEGACY_AUTH_COOKIE);
+  if (!cookie) return undefined;
+  if (typeof cookie.value !== 'string') throw new AuthenticationError('SESSION_REJECTED');
+  return cookie.value;
+}
+
+async function validatePresentedToken(token: unknown): Promise<AuthResult> {
+  let resolution: SessionResolution;
+  try {
+    resolution = await resolveSessionToken(token);
+  } catch (error) {
+    if (error instanceof SessionReadError) throw new AuthenticationError('SESSION_UNAVAILABLE');
+    throw error;
+  }
+  if (resolution.status === 'NOT_ACTIVATED') throw new AuthenticationError('SESSION_NOT_ACTIVATED');
+  if (resolution.status === 'DENIED') throw new AuthenticationError('SESSION_REJECTED');
+  return { authenticated: true, userId: resolution.userId, session: resolution };
+}
+
 export async function validateSessionOwnership(
-  sessionId: string,
-  userId: string,
+  sessionId: string | null | undefined,
+  userId: string | null | undefined,
 ): Promise<boolean> {
-  try {
-    // Voice sessions are ephemeral - allow for authenticated users
-    // Format: voice-{maestroId}-{timestamp}
-    if (sessionId.startsWith('voice-')) {
-      logger.debug('Voice session validated', { sessionId, userId });
-      return true;
-    }
-
-    // Sessions are stored as Conversations in our schema
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id: sessionId,
-        userId,
-      },
-      select: { id: true },
-    });
-
-    return !!conversation;
-  } catch (error) {
-    logger.error('Session ownership check failed', { error: String(error) });
-    return false;
-  }
+  if (!sessionId || !userId) throw new TypeError('Session and user identity are required');
+  if (sessionId.startsWith('voice-')) return true;
+  const conversation = await prisma.conversation.findFirst({
+    where: { id: sessionId, userId },
+    select: { id: true },
+  });
+  return conversation !== null;
 }
 
-/**
- * Validate admin authentication from cookie
- * Returns authenticated + isAdmin status
- *
- * Use this at the start of admin-only API endpoints
- */
 export async function validateAdminAuth(): Promise<AdminAuthResult> {
   const auth = await validateAuth();
-
-  if (!auth.authenticated || !auth.userId) {
-    return {
-      ...auth,
-      isAdmin: false,
-    };
-  }
-
-  try {
-    // Check user role in database
-    const user = await prisma.user.findUnique({
-      where: { id: auth.userId },
-      select: { role: true },
-    });
-
-    return {
-      ...auth,
-      isAdmin: user?.role === 'ADMIN',
-    };
-  } catch (error) {
-    logger.error('Admin role check failed', {
-      error: String(error),
-      userId: auth.userId,
-    });
-    return {
-      ...auth,
-      isAdmin: false,
-    };
-  }
+  if (!auth.authenticated) return { ...auth, isAdmin: false };
+  const user = await readRole(auth.userId);
+  if (!user) throw new AuthenticationError('SESSION_REJECTED');
+  return { ...auth, isAdmin: user.role === 'ADMIN' };
 }
 
-/**
- * Validate admin read-only authentication from cookie
- * Returns authenticated + read-only admin access status
- */
 export async function validateAdminReadOnlyAuth(): Promise<AdminReadOnlyAuthResult> {
   const auth = await validateAuth();
-
-  if (!auth.authenticated || !auth.userId) {
-    return {
-      ...auth,
-      canAccessAdminReadOnly: false,
-    };
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: auth.userId },
-      select: { role: true },
-    });
-
-    return {
-      ...auth,
-      canAccessAdminReadOnly: user?.role === 'ADMIN' || user?.role === 'ADMIN_READONLY',
-    };
-  } catch (error) {
-    logger.error('Admin read-only role check failed', {
-      error: String(error),
-      userId: auth.userId,
-    });
-    return {
-      ...auth,
-      canAccessAdminReadOnly: false,
-    };
-  }
+  if (!auth.authenticated) return { ...auth, canAccessAdminReadOnly: false };
+  const user = await readRole(auth.userId);
+  if (!user) throw new AuthenticationError('SESSION_REJECTED');
+  return {
+    ...auth,
+    canAccessAdminReadOnly: user.role === 'ADMIN' || user.role === 'ADMIN_READONLY',
+  };
 }
 
-// Rate limiting is in @/lib/rate-limit with Redis support
-// Import directly from there for full functionality
-
-/**
- * Require authenticated user or return 401 response
- * Security: NEVER trust userId from query params or request body
- * Always use this helper to get userId from the validated session
- *
- * @returns userId string if authenticated, null if not (caller should return the error response)
- */
 export async function requireAuthenticatedUser(): Promise<{
   userId: string | null;
   errorResponse: Response | null;
 }> {
   const auth = await validateAuth();
-
-  if (!auth.authenticated || !auth.userId) {
-    const { NextResponse } = await import('next/server');
+  if (!auth.authenticated) {
     return {
       userId: null,
-      errorResponse: NextResponse.json(
-        { error: auth.error || 'Authentication required' },
+      errorResponse: Response.json(
+        { error: 'Authentication required', code: 'AUTH_ABSENT' },
         { status: 401 },
       ),
     };
   }
-
-  return {
-    userId: auth.userId,
-    errorResponse: null,
-  };
+  return { userId: auth.userId, errorResponse: null };
 }

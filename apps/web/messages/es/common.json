@@ -1,5 +1,14 @@
 {
   "common": {
+    "session": {
+      "logoutCurrent": "Cerrar esta sesión",
+      "logoutAll": "Cerrar sesión en todos los dispositivos",
+      "loggingOut": "Cerrando sesión…",
+      "logoutFailed": "No se pudo cerrar la sesión. Tus datos no se han borrado. Inténtalo de nuevo.",
+      "legacyFamily": "Esta sesión procede de un acceso anterior: al cerrarla también se cierran los otros accesos anteriores de esta cuenta. Las sesiones de un nuevo acceso siguen activas.",
+      "unavailable": "No podemos verificar tu acceso. Las operaciones de tu cuenta están en pausa; tus decisiones se conservan.",
+      "retry": "Volver a verificar el acceso"
+    },
     "loading": "Caricamento...",
     "error": "Errore",
     "success": "Operazione completata",

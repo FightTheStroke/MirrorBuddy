@@ -4,6 +4,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { validateAdminAuth, validateAdminReadOnlyAuth } from '@/lib/auth/server';
+import { anonymousFixture, authenticatedFixture } from '@/test/fixtures/session-compat';
 
 // Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
@@ -14,16 +16,8 @@ vi.mock('@/lib/auth/server', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/auth/server')>();
   return {
     ...actual,
-    validateAdminAuth: vi.fn().mockResolvedValue({
-      authenticated: true,
-      isAdmin: true,
-      userId: 'admin-1',
-    }),
-    validateAdminReadOnlyAuth: vi.fn().mockResolvedValue({
-      authenticated: true,
-      canAccessAdminReadOnly: true,
-      userId: 'admin-1',
-    }),
+    validateAdminAuth: vi.fn(),
+    validateAdminReadOnlyAuth: vi.fn(),
   };
 });
 
@@ -61,6 +55,14 @@ import { prisma } from '@/lib/db';
 describe('admin purge-staging-data API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(validateAdminAuth).mockResolvedValue({
+      ...authenticatedFixture('admin-1'),
+      isAdmin: true,
+    });
+    vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
+      ...authenticatedFixture('admin-1'),
+      canAccessAdminReadOnly: true,
+    });
 
     // Default mock return values for GET (preview counts)
     vi.mocked(prisma.user.count).mockResolvedValue(5 as never);
@@ -127,9 +129,8 @@ describe('admin purge-staging-data API', () => {
     it('returns 401 if not authenticated', async () => {
       const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminReadOnlyAuth).mockResolvedValueOnce({
-        authenticated: false,
+        ...anonymousFixture,
         canAccessAdminReadOnly: false,
-        userId: null,
       });
 
       const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
@@ -144,9 +145,8 @@ describe('admin purge-staging-data API', () => {
     it('returns 403 if not admin', async () => {
       const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminReadOnlyAuth).mockResolvedValueOnce({
-        authenticated: true,
+        ...authenticatedFixture('user-1'),
         canAccessAdminReadOnly: false,
-        userId: 'user-1',
       });
 
       const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
@@ -190,9 +190,8 @@ describe('admin purge-staging-data API', () => {
     it('returns 401 if not authenticated', async () => {
       const { validateAdminAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
-        authenticated: false,
+        ...anonymousFixture,
         isAdmin: false,
-        userId: null,
       });
 
       const request = new NextRequest('http://localhost/api/admin/purge-staging-data');
@@ -207,9 +206,8 @@ describe('admin purge-staging-data API', () => {
     it('returns 403 if not admin', async () => {
       const { validateAdminAuth } = await import('@/lib/auth/server');
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
-        authenticated: true,
+        ...authenticatedFixture('user-1'),
         isAdmin: false,
-        userId: 'user-1',
       });
 
       const request = new NextRequest('http://localhost/api/admin/purge-staging-data');

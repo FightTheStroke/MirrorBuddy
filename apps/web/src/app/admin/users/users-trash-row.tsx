@@ -16,9 +16,10 @@ interface UsersTrashRowProps {
   backup: DeletedUserBackup;
   isLoading: boolean;
   onRestore: () => void;
+  canManage: boolean;
 }
 
-export function UsersTrashRow({ backup, isLoading, onRestore }: UsersTrashRowProps) {
+export function UsersTrashRow({ backup, isLoading, onRestore, canManage }: UsersTrashRowProps) {
   const t = useTranslations('admin');
 
   return (
@@ -29,7 +30,7 @@ export function UsersTrashRow({ backup, isLoading, onRestore }: UsersTrashRowPro
         {new Date(backup.deletedAt).toLocaleDateString()}
       </TableCell>
       <TableCell>
-        <Button size="sm" variant="outline" onClick={onRestore} disabled={isLoading}>
+        <Button size="sm" variant="outline" onClick={onRestore} disabled={isLoading || !canManage}>
           <ArchiveRestore className="w-3 h-3 mr-1" />
           {t('users.restore')}
         </Button>

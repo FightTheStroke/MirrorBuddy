@@ -33,9 +33,10 @@ import {
   RobotPairingCard,
 } from './sections';
 import { GoogleAccountCard } from '@/components/google-drive';
-import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 
 export function SettingsView() {
+  const identity = useClientIdentity();
   const t = useTranslations('settings.view');
   const SETTINGS_TABS = useSettingsTabs();
 
@@ -206,7 +207,7 @@ export function SettingsView() {
 
         {activeTab === 'integrations' && (
           <div className="space-y-6">
-            <GoogleAccountCard userId={getUserId()} />
+            {identity.status === 'authenticated' && <GoogleAccountCard userId={identity.userId} />}
             <RobotPairingCard />
           </div>
         )}

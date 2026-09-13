@@ -98,16 +98,43 @@
       "consequencesText": "Retirar ciertos consentimientos puede prevenir el acceso a características específicas de la plataforma.",
       "contactSupport": "Contacta al Soporte"
     },
+    "sync": {
+      "cannotRetry": "Este intento no se puede repetir. Recarga la página para revisar tus elecciones.",
+      "reload": "Recargar la página",
+      "startingTrial": "Iniciando la prueba...",
+      "trialStartFailed": "No se pudo completar el inicio de la prueba. Intenta iniciarla de nuevo.",
+      "retryTrial": "Volver a iniciar la prueba",
+      "reloading": "Recargando la página...",
+      "reloadFailed": "Se borraron las elecciones en este dispositivo, pero la página no pudo recargarse. Recárgala para continuar.",
+      "saving": "Guardando tu elección...",
+      "failed": "No se ha podido guardar o sincronizar tu elección. Reintenta sin responder de nuevo.",
+      "changed": "Tu sesión o elección ha cambiado. La elección anterior no se puede reenviar: haz una nueva elección explícita.",
+      "newDecision": "Nueva elección para esta sesión",
+      "saveNewChoice": "Guardar nueva elección",
+      "pending": "Tu elección está pendiente de sincronización.",
+      "retry": "Reintentar guardado",
+      "dateUnavailable": "Fecha no registrada",
+      "decisionDate": "Fecha de la elección:",
+      "termsAccepted": "Términos aceptados",
+      "termsRequired": "Todavía es necesario aceptar los términos",
+      "unanswered": "Análisis opcionales: ninguna elección registrada",
+      "optedIn": "Análisis opcionales: consentimiento solicitado",
+      "refused": "Análisis opcionales: rechazados",
+      "analyticsDescription": "Puedes permitir los análisis de uso para mejorar la aplicación. Esta elección es independiente de los términos y no es necesaria para estudiar.",
+      "collectionOff": "La recopilación de análisis opcionales está desactivada, aunque tu elección esté activada.",
+      "persisted": "Elección guardada en tu cuenta.",
+      "received": "Elección recibida por el servidor, pero no guardada en una cuenta."
+    },
     "inline": {
-      "acceptedText": "Consentimiento aceptado",
+      "acceptedText": "Elección de cookies registrada",
       "manage": "Gestionar preferencias",
-      "acceptButton": "Aceptar cookies",
+      "acceptButton": "Guardar elección de cookies",
       "info": "Información",
       "title": "Cookies y Privacidad",
       "description": "Usamos cookies esenciales para el funcionamiento del sitio",
       "learnMore": "Más información",
       "analyticsLabel": "Analíticas (opcional)",
-      "submitButton": "Aceptar"
+      "submitButton": "Guardar elección"
     },
     "unified": {
       "loading": "Cargando...",
@@ -145,15 +172,15 @@
       },
       "analytics": {
         "label": "Analíticas opcionales",
-        "description": "Ayúdanos a mejorar la app (anónimo)"
+        "description": "Ayúdanos a mejorar la app con estadísticas de uso"
       },
       "buttons": {
         "disabled": "Acepta los términos para continuar",
         "accept": "Aceptar y Continuar",
         "submitting": "Guardando...",
         "learnMore": "Saber más",
-        "rejectAll": "Rechazar todo",
-        "acceptAll": "Aceptar todo"
+        "rejectAll": "Rechazar los análisis opcionales",
+        "acceptAll": "Permitir los análisis opcionales"
       },
       "coppa": "Si tienes menos de 13 años, se requiere el consentimiento de los padres",
       "screenReader": {
@@ -161,7 +188,7 @@
         "submitting": "Guardando el consentimiento..."
       },
       "bannerTitle": "Aviso de cookies",
-      "bannerRights": "Puedes dar, rechazar o revocar libremente tu consentimiento en cualquier momento. Usa el botón \"Aceptar todo\" para consentir. Usa el botón \"Rechazar todo\" para continuar sin aceptar.",
+      "bannerRights": "Los análisis son opcionales y están desactivados inicialmente. Puedes rechazarlos o cambiar tu elección en los ajustes. Esta elección no acepta los términos: debes aceptarlos por separado para estudiar.",
       "categories": {
         "essential": "Necesarias",
         "analytics": "Analíticas (opcional)"

@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
+import { getUserIdFromCookie, requireIdentityRefresh } from '@/lib/auth/client-auth';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useRouter } from '@/i18n/navigation';
 import { HeroSection } from './hero-section';
@@ -29,6 +31,8 @@ interface LandingPageProps {
 
 export function LandingPage({ existingUserData, onStartOnboarding }: LandingPageProps) {
   const router = useRouter();
+  const tSession = useTranslations('common.session');
+  const [failed, setFailed] = useState(false);
   const isReturningUser = Boolean(existingUserData?.name);
   const hasTrackedVisit = useRef(false);
 
@@ -43,6 +47,7 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
   // Create trial session via API before granting access
   const createTrialSession = async () => {
     try {
+      getUserIdFromCookie();
       const response = await csrfFetch('/api/trial/session', {
         method: 'POST',
       });
@@ -50,43 +55,47 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
         logger.warn('[LandingPage] Failed to create trial session', {
           status: response.status,
         });
+        throw new Error('Trial session unavailable');
       }
     } catch (error) {
       logger.warn('[LandingPage] Trial session creation failed', {
         error: String(error),
       });
+      throw error;
     }
   };
 
   // Handle skip - create trial session and go to app
   const handleSkip = async () => {
-    logger.info('[WelcomePage] Skip clicked, creating trial session');
-
-    // Track TRIAL_START funnel event
-    await trackTrialStartClick();
-
-    // Only create trial session for new users (returning users already have auth)
-    if (!isReturningUser) {
-      await createTrialSession();
-    }
-
-    // Save trial email if provided via TrialEmailForm
-    const trialEmail =
-      typeof window !== 'undefined' ? sessionStorage.getItem('mirrorbuddy-trial-email') : null;
-    if (trialEmail) {
-      try {
-        await csrfFetch('/api/trial/email', {
-          method: 'PATCH',
-          body: JSON.stringify({ email: trialEmail }),
-        });
-      } catch (error) {
-        logger.warn('[WelcomePage] Failed to save trial email', {
-          error: String(error),
-        });
-      }
-    }
-
+    setFailed(false);
     try {
+      getUserIdFromCookie();
+      logger.info('[WelcomePage] Skip clicked, creating trial session');
+
+      // Track TRIAL_START funnel event
+      await trackTrialStartClick();
+
+      // Only create trial session for new users (returning users already have auth)
+      if (!isReturningUser) {
+        await createTrialSession();
+      }
+
+      // Save trial email if provided via TrialEmailForm
+      const trialEmail =
+        typeof window !== 'undefined' ? sessionStorage.getItem('mirrorbuddy-trial-email') : null;
+      if (trialEmail) {
+        try {
+          await csrfFetch('/api/trial/email', {
+            method: 'PATCH',
+            body: JSON.stringify({ email: trialEmail }),
+          });
+        } catch (error) {
+          logger.warn('[WelcomePage] Failed to save trial email', {
+            error: String(error),
+          });
+        }
+      }
+
       const response = await csrfFetch('/api/onboarding', {
         method: 'POST',
         body: JSON.stringify({ hasCompletedOnboarding: true }),
@@ -96,8 +105,10 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
         logger.error('[WelcomePage] Failed to persist onboarding completion', {
           status: response.status,
         });
+        throw new Error('Onboarding completion failed');
       }
 
+      await requireIdentityRefresh('authenticated');
       useOnboardingStore.getState().completeOnboarding();
       logger.info('[WelcomePage] Redirecting to dashboard');
       router.push('/');
@@ -105,15 +116,20 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
       logger.error('[WelcomePage] Error completing onboarding', {
         error: String(error),
       });
-      router.push('/');
+      setFailed(true);
     }
   };
 
   // Handle start with onboarding - create trial session and start flow
   const handleStartWithOnboarding = async () => {
     logger.info('[WelcomePage] Start clicked, creating trial session');
-    await createTrialSession();
-    onStartOnboarding();
+    setFailed(false);
+    try {
+      await createTrialSession();
+      onStartOnboarding();
+    } catch {
+      setFailed(true);
+    }
   };
 
   return (
@@ -124,6 +140,11 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
       </div>
 
       <main className="min-h-screen flex flex-col items-center px-4 py-12">
+        {failed && (
+          <p role="alert" className="text-red-700 dark:text-red-300">
+            {tSession('unavailable')}
+          </p>
+        )}
         <motion.div
           initial={{ y: 20 }}
           animate={{ y: 0 }}

@@ -5,62 +5,41 @@
  * Called by client-side tracking hook on page navigation.
  *
  * POST /api/telemetry/activity
- * Body: { route: string }
+ * Body: { route: string, activityId: string }
  */
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { cookies } from 'next/headers';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
 import { safeReadJson } from '@/lib/api/safe-json';
-import { AUTH_COOKIE_NAME, VISITOR_COOKIE_NAME } from '@/lib/auth';
+import { activityPayloadSchema } from '@/lib/telemetry/ingestion-contract';
+import {
+  canCollectOptionalAnalytics,
+  optionalAnalyticsDenied,
+} from '@/lib/telemetry/optional-analytics-server';
 
 export const revalidate = 0;
 
-export const POST = pipe(withSentry('/api/telemetry/activity'))(async (ctx) => {
-  // E2E tests generate a lot of navigation events. Writing each one to the DB can
-  // exhaust the connection pool and cause unrelated tests to fail.
-  if (process.env.E2E_TESTS === '1') {
-    return NextResponse.json({ ok: true }, { status: 200 });
-  }
-
-  const body = await safeReadJson(ctx.req);
-
-  const route =
-    body &&
-    typeof body === 'object' &&
-    'route' in body &&
-    typeof (body as { route?: unknown }).route === 'string'
-      ? (body as { route: string }).route
-      : '/';
-
-  // Get user identification from cookies for classification (not authentication)
-  // This endpoint accepts all users (logged, trial, anonymous) and classifies them
-  const cookieStore = await cookies();
-
-  const userCookie = cookieStore.get(AUTH_COOKIE_NAME);
-  const visitorCookie = cookieStore.get(VISITOR_COOKIE_NAME);
-
-  // Determine user type and identifier
-  const isAuthenticated = !!userCookie?.value;
-  const hasTrialSession = !!visitorCookie?.value;
-
-  const userType = isAuthenticated ? 'logged' : hasTrialSession ? 'trial' : 'anonymous';
-
-  const identifier =
-    userCookie?.value || visitorCookie?.value || ctx.req.headers.get('x-request-id') || 'unknown';
-
-  // F-06: Detect test sessions (ADR 0065)
-  // E2E tests use identifiers starting with "e2e-test-"
-  const isTestData = identifier.startsWith('e2e-test-');
+export const POST = pipe(
+  withSentry('/api/telemetry/activity'),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  if (!(await canCollectOptionalAnalytics(ctx.userId))) return optionalAnalyticsDenied();
+  const parsed = activityPayloadSchema.safeParse(await safeReadJson(ctx.req));
+  if (!parsed.success)
+    return NextResponse.json({ error: 'Invalid activity payload' }, { status: 400 });
+  const { route, activityId } = parsed.data;
+  // An ephemeral, consent-scoped random ID; never read or copy authentication cookies.
+  const identifier = `activity_${activityId}`;
 
   // Record activity in database
   await prisma.userActivity.create({
     data: {
       identifier,
-      userType,
+      userType: 'logged',
       route,
-      isTestData,
+      isTestData: process.env.E2E_TESTS === '1' || ctx.userId?.startsWith('e2e-test-') === true,
     },
   });
 

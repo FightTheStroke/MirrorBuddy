@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { setClientIdentity } from '@/lib/auth';
 import userEvent from '@testing-library/user-event';
 import { StudyKitUpload } from '../StudyKitUpload';
 
@@ -7,11 +8,10 @@ vi.mock('next-intl', () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-vi.mock('@/lib/hooks/use-saved-materials/utils/user-id', () => ({
-  getUserId: () => 'user-1',
+vi.mock('@/lib/auth', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/auth')>()),
+  csrfFetch: vi.fn(),
 }));
-
-vi.mock('@/lib/auth', () => ({ csrfFetch: vi.fn() }));
 
 // The preview mounts pdfjs, which needs browser globals jsdom lacks.
 vi.mock('@/components/tools/pdf-preview', () => ({
@@ -54,7 +54,20 @@ vi.mock('@/components/google-drive', () => ({
 }));
 
 describe('StudyKitUpload - PDF preview offer', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    setClientIdentity({
+      status: 'authenticated',
+      userId: 'user-1',
+      role: 'USER',
+      legacyOrigin: false,
+      needsLegacyUpgrade: false,
+    });
+  });
+  afterEach(() => {
+    cleanup();
+    setClientIdentity({ status: 'pending' });
+  });
 
   it('offers the preview once a local PDF is chosen', async () => {
     render(<StudyKitUpload />);

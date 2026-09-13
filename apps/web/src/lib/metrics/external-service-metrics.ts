@@ -49,6 +49,8 @@ export const EXTERNAL_SERVICE_QUOTAS = {
 
 /** External service usage snapshot */
 export interface ExternalServiceUsage {
+  computedAt?: string;
+  window?: { start: string; end: string };
   service: string;
   metric: string;
   currentValue: number;
@@ -140,6 +142,8 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
       '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      minuteAgo,
+      now,
     ),
     createUsageMetric(
       'Azure OpenAI',
@@ -149,6 +153,8 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
       '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      minuteAgo,
+      now,
     ),
     createUsageMetric(
       'Azure OpenAI',
@@ -158,6 +164,8 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
       '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      minuteAgo,
+      now,
     ),
     createUsageMetric(
       'Azure OpenAI',
@@ -167,6 +175,8 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
       '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      minuteAgo,
+      now,
     ),
   );
 
@@ -211,6 +221,8 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
       '1m',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      minuteAgo,
+      now,
     ),
     createUsageMetric(
       'Google Drive',
@@ -220,6 +232,8 @@ export async function getGoogleDriveUsage(): Promise<ExternalServiceUsage[]> {
       '24h',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      dayAgo,
+      now,
     ),
   );
 
@@ -253,6 +267,8 @@ export async function getBraveSearchUsage(): Promise<ExternalServiceUsage[]> {
       'month',
       quotas.WARN_THRESHOLD,
       quotas.CRITICAL_THRESHOLD,
+      monthStart,
+      now,
     ),
   ];
 }
@@ -323,6 +339,8 @@ function createUsageMetric(
   period: string,
   warnThreshold: number,
   criticalThreshold: number,
+  start: Date,
+  end: Date,
 ): ExternalServiceUsage {
   const usagePercent = limit > 0 ? current / limit : 0;
 
@@ -356,6 +374,8 @@ function createUsageMetric(
   }
 
   return {
+    computedAt: end.toISOString(),
+    window: { start: start.toISOString(), end: end.toISOString() },
     service,
     metric,
     currentValue: current,

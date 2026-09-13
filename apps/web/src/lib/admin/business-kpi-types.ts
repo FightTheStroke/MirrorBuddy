@@ -2,9 +2,11 @@
  * Business KPI types for Mission Control dashboard
  */
 
+import type { MetricTruth } from './metric-truth';
+
 export interface RevenueMetrics {
-  mrr: number;
-  arr: number;
+  mrr: number | null;
+  arr: number | null;
   growthRate: number | null;
   totalRevenue: number | null;
   currency: string;
@@ -12,12 +14,12 @@ export interface RevenueMetrics {
 }
 
 export interface UserMetrics {
-  totalUsers: number;
-  activeUsers: number;
-  trialUsers: number;
-  paidUsers: number;
+  totalUsers: number | null;
+  activeUsers: number | null;
+  trialUsers: number | null;
+  paidUsers: number | null;
   churnRate: number | null;
-  trialConversionRate: number;
+  trialConversionRate: number | null;
   isEstimated?: boolean;
 }
 
@@ -36,6 +38,20 @@ export interface MaestroMetric {
 }
 
 export interface BusinessKPIResponse {
+  metrics: {
+    mrr: MetricTruth;
+    arr: MetricTruth;
+    totalUsers: MetricTruth;
+    activeUsers: MetricTruth;
+    trialUsers: MetricTruth;
+    paidUsers: MetricTruth;
+    churnRate: MetricTruth;
+    trialConversionRate: MetricTruth;
+    growthRate: MetricTruth;
+    totalRevenue: MetricTruth;
+    topCountries: MetricTruth<CountryMetric[]>;
+    topMaestri: MetricTruth<MaestroMetric[]>;
+  };
   revenue: RevenueMetrics;
   users: UserMetrics;
   topCountries: CountryMetric[];

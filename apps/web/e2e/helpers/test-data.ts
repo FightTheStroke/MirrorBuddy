@@ -16,6 +16,7 @@
  */
 
 import { getPrismaClient } from './prisma-setup';
+import { randomUUID } from 'node:crypto';
 import {
   trackTestRecord,
   getTestDataRegistry,
@@ -56,8 +57,9 @@ interface TestUser {
 export async function createTestUser(input?: CreateTestUserInput): Promise<TestUser> {
   const prisma = getPrismaClient();
 
-  const email = input?.email || `test-${Date.now()}@example.com`;
-  const username = input?.username || `testuser_${Date.now()}`;
+  const suffix = randomUUID();
+  const email = input?.email || `test-${suffix}@example.com`;
+  const username = input?.username || `testuser_${suffix}`;
 
   const user = await prisma.user.create({
     data: {
@@ -224,11 +226,12 @@ export async function cleanupTestData(): Promise<void> {
         });
       }
 
-      // Delete users (cascade will handle Profile, Settings, and other relations)
+      // Deleting the owned users also cascades their hashed-handle AuthSession records.
       if (registry.userIds.size > 0) {
         await tx.user.deleteMany({
           where: {
             id: { in: Array.from(registry.userIds) },
+            isTestData: true,
           },
         });
       }

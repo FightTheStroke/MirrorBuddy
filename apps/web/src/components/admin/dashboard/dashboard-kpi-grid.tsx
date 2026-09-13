@@ -12,42 +12,40 @@ import {
   Percent,
 } from 'lucide-react';
 import { KpiCard } from '@/components/admin/kpi-card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { metricTruth, snapshotContext, type MetricTruth } from '@/lib/admin/metric-truth';
+import type { AdminCounts } from '@/lib/admin/admin-counts-service';
 import type { DashboardSummary } from '@/lib/admin/dashboard-summary-types';
-
-interface AdminCounts {
-  pendingInvites: number;
-  totalUsers: number;
-  activeUsers24h: number;
-  systemAlerts: number;
-}
 
 interface DashboardKpiGridProps {
   counts: AdminCounts;
-  sentryErrorCount: number;
+  sentryMetric?: MetricTruth | null;
   summary: DashboardSummary | null;
 }
 
-const SENTRY_ISSUES_URL = 'https://fightthestroke.sentry.io/issues/?query=is%3Aunresolved';
-
-export function DashboardKpiGrid({ counts, sentryErrorCount, summary }: DashboardKpiGridProps) {
+export function DashboardKpiGrid({ counts, sentryMetric, summary }: DashboardKpiGridProps) {
   const t = useTranslations('admin.dashboard');
-
+  const missing = (source: string) => metricTruth<number>(null, snapshotContext(source, null));
+  const activity =
+    counts.metrics?.activeUsers24h ??
+    metricTruth<number>(null, {
+      ...snapshotContext('UserActivity', counts.timestamp || null),
+      reason: 'retentionWindow',
+    });
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
       <KpiCard
         title={t('betaRequests')}
-        value={counts.pendingInvites}
+        value=""
+        metric={counts.metrics?.pendingInvites ?? missing('InviteRequest')}
         subValue={t('pendingApproval')}
         icon={UserPlus}
         href="/admin/invites"
-        badge={counts.pendingInvites}
-        badgeColor="amber"
         color="purple"
       />
       <KpiCard
         title={t('totalUsers')}
-        value={counts.totalUsers}
+        value=""
+        metric={counts.metrics?.totalUsers ?? missing('User')}
         subValue={t('registeredUsers')}
         icon={Users}
         href="/admin/users"
@@ -55,7 +53,8 @@ export function DashboardKpiGrid({ counts, sentryErrorCount, summary }: Dashboar
       />
       <KpiCard
         title={t('activeUsers')}
-        value={counts.activeUsers24h}
+        value=""
+        metric={activity}
         subValue={t('last24h')}
         icon={Activity}
         href="/admin/analytics"
@@ -63,56 +62,50 @@ export function DashboardKpiGrid({ counts, sentryErrorCount, summary }: Dashboar
       />
       <KpiCard
         title={t('systemAlerts')}
-        value={counts.systemAlerts}
+        value=""
+        metric={counts.metrics?.systemAlerts ?? missing('SafetyEvent')}
         subValue={t('unresolvedCritical')}
         icon={AlertTriangle}
-        badge={counts.systemAlerts}
-        badgeColor={counts.systemAlerts ? 'red' : 'green'}
-        color={counts.systemAlerts ? 'red' : 'green'}
+        color="amber"
       />
       <KpiCard
         title={t('sentryErrors')}
-        value={sentryErrorCount}
+        value=""
+        metric={sentryMetric ?? missing('Sentry issues')}
         subValue={t('unresolved')}
         icon={Bug}
-        href={SENTRY_ISSUES_URL}
-        badge={sentryErrorCount}
-        badgeColor={sentryErrorCount > 0 ? 'red' : 'green'}
-        color={sentryErrorCount > 0 ? 'orange' : 'green'}
+        color="orange"
         external
+        href="https://fightthestroke.sentry.io/issues/?query=is%3Aunresolved"
       />
-      {summary ? (
-        <>
-          <KpiCard
-            title={t('kpi.mrr')}
-            value={`€${summary.business.mrr.toFixed(0)}`}
-            icon={TrendingUp}
-            href="/admin/revenue"
-            color="green"
-          />
-          <KpiCard
-            title={t('kpi.dailyCost')}
-            value={`€${(summary.cost.totalEur / 7).toFixed(2)}`}
-            subValue={t('dailyAvgEur')}
-            icon={DollarSign}
-            href="/admin/analytics"
-            color={summary.cost.totalEur / 7 > 3 ? 'amber' : 'green'}
-          />
-          <KpiCard
-            title={t('kpi.trialConversion')}
-            value={`${summary.business.trialConversionRate.toFixed(1)}%`}
-            icon={Percent}
-            href="/admin/tiers/conversion-funnel"
-            color="blue"
-          />
-        </>
-      ) : (
-        <>
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-[104px] rounded-xl" />
-          ))}
-        </>
-      )}
+      <KpiCard
+        title={t('kpi.mrr')}
+        value=""
+        metric={summary?.metrics?.mrr ?? missing('UserSubscription')}
+        format={(value) => `€${value.toFixed(0)}`}
+        icon={TrendingUp}
+        href="/admin/revenue"
+        color="green"
+      />
+      <KpiCard
+        title={t('kpi.dailyCost')}
+        value=""
+        metric={summary?.metrics?.dailyCost ?? missing('SessionMetrics')}
+        format={(value) => `€${value.toFixed(2)}`}
+        subValue={t('dailyAvgEur')}
+        icon={DollarSign}
+        href="/admin/analytics"
+        color="amber"
+      />
+      <KpiCard
+        title={t('kpi.trialConversion')}
+        value=""
+        metric={summary?.metrics?.trialConversionRate ?? missing('UserSubscription')}
+        format={(value) => `${value.toFixed(1)}%`}
+        icon={Percent}
+        href="/admin/tiers/conversion-funnel"
+        color="blue"
+      />
     </div>
   );
 }

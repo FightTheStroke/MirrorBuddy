@@ -3,12 +3,23 @@
  * Tests valid payload acceptance
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { POST } from "../route";
-import { NextRequest } from "next/server";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { POST } from '../route';
+import {
+  AnalyticsRequest as NextRequest,
+  permitOptionalAnalytics,
+} from '@/lib/telemetry/__tests__/analytics-fixtures';
+
+vi.mock('@/lib/auth/server', () => ({
+  validateAuth: async () => ({ authenticated: true, userId: 'eligible-user' }),
+}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger with child method for rate-limit.ts
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -27,7 +38,7 @@ vi.mock("@/lib/logger", () => ({
 global.fetch = vi.fn();
 
 // Mock Buffer.from for base64 encoding
-if (typeof Buffer === "undefined") {
+if (typeof Buffer === 'undefined') {
   global.Buffer = {
     from: (str: string) => ({
       toString: (_encoding: string) => str,
@@ -35,13 +46,13 @@ if (typeof Buffer === "undefined") {
   } as any;
 }
 
-describe("POST /api/metrics/web-vitals", () => {
+describe('POST /api/metrics/web-vitals', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.GRAFANA_CLOUD_PROMETHEUS_URL =
-      "https://prometheus.grafana.com/api/v1/write";
-    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = "test-user";
-    process.env.GRAFANA_CLOUD_API_KEY = "test-api-key";
+    permitOptionalAnalytics();
+    process.env.GRAFANA_CLOUD_PROMETHEUS_URL = 'https://prometheus.grafana.com/api/v1/write';
+    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = 'test-user';
+    process.env.GRAFANA_CLOUD_API_KEY = 'test-api-key';
   });
 
   afterEach(() => {
@@ -54,82 +65,76 @@ describe("POST /api/metrics/web-vitals", () => {
   // VALID PAYLOAD
   // ============================================================================
 
-  describe("Valid Payload", () => {
-    it("should accept valid web vitals payload", async () => {
+  describe('Valid Payload', () => {
+    it('should accept valid web vitals payload', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
-            connectionType: "4g",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
+            connectionType: '4g',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       const response = await POST(request);
       const data = await response.json();
 
       expect(response.status).toBe(201);
-      expect(data).toHaveProperty("success", true);
-      expect(data).toHaveProperty("count", 1);
+      expect(data).toHaveProperty('success', true);
+      expect(data).toHaveProperty('count', 1);
     });
 
-    it("should accept multiple metrics in single request", async () => {
+    it('should accept multiple metrics in single request', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
           },
           {
-            name: "CLS",
+            name: 'CLS',
             value: 0.1,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
           },
           {
-            name: "INP",
+            name: 'INP',
             value: 150,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "mobile",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'mobile',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       const response = await POST(request);
@@ -139,40 +144,37 @@ describe("POST /api/metrics/web-vitals", () => {
       expect(data.count).toBe(3);
     });
 
-    it("should accept optional userId field", async () => {
+    it('should accept optional userId field', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
-            userId: "user-123",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
+            userId: 'user-123',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       const response = await POST(request);
       expect(response.status).toBe(201);
     });
 
-    it("should accept all metric names", async () => {
-      const metricNames = ["LCP", "CLS", "INP", "TTFB", "FCP"];
+    it('should accept all metric names', async () => {
+      const metricNames = ['LCP', 'CLS', 'INP', 'TTFB', 'FCP'];
 
       for (const name of metricNames) {
         const payload = {
@@ -180,25 +182,22 @@ describe("POST /api/metrics/web-vitals", () => {
             {
               name,
               value: 100,
-              rating: "good",
-              route: "/test",
-              deviceType: "desktop",
+              rating: 'good',
+              route: '/test',
+              deviceType: 'desktop',
             },
           ],
         };
 
-        const request = new NextRequest(
-          "http://localhost:3000/api/metrics/web-vitals",
-          {
-            method: "POST",
-            body: JSON.stringify(payload),
-          },
-        );
+        const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
 
         (global.fetch as any).mockResolvedValueOnce({
           ok: true,
           status: 200,
-          text: async () => "success",
+          text: async () => 'success',
         });
 
         const response = await POST(request);
@@ -206,34 +205,31 @@ describe("POST /api/metrics/web-vitals", () => {
       }
     });
 
-    it("should accept all device types", async () => {
-      const deviceTypes = ["mobile", "tablet", "desktop"];
+    it('should accept all device types', async () => {
+      const deviceTypes = ['mobile', 'tablet', 'desktop'];
 
       for (const deviceType of deviceTypes) {
         const payload = {
           metrics: [
             {
-              name: "LCP",
+              name: 'LCP',
               value: 2500,
-              rating: "good",
-              route: "/test",
+              rating: 'good',
+              route: '/test',
               deviceType,
             },
           ],
         };
 
-        const request = new NextRequest(
-          "http://localhost:3000/api/metrics/web-vitals",
-          {
-            method: "POST",
-            body: JSON.stringify(payload),
-          },
-        );
+        const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
 
         (global.fetch as any).mockResolvedValueOnce({
           ok: true,
           status: 200,
-          text: async () => "success",
+          text: async () => 'success',
         });
 
         const response = await POST(request);
@@ -241,34 +237,31 @@ describe("POST /api/metrics/web-vitals", () => {
       }
     });
 
-    it("should accept all rating values", async () => {
-      const ratings = ["good", "needs-improvement", "poor"];
+    it('should accept all rating values', async () => {
+      const ratings = ['good', 'needs-improvement', 'poor'];
 
       for (const rating of ratings) {
         const payload = {
           metrics: [
             {
-              name: "LCP",
+              name: 'LCP',
               value: 2500,
               rating,
-              route: "/test",
-              deviceType: "desktop",
+              route: '/test',
+              deviceType: 'desktop',
             },
           ],
         };
 
-        const request = new NextRequest(
-          "http://localhost:3000/api/metrics/web-vitals",
-          {
-            method: "POST",
-            body: JSON.stringify(payload),
-          },
-        );
+        const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
 
         (global.fetch as any).mockResolvedValueOnce({
           ok: true,
           status: 200,
-          text: async () => "success",
+          text: async () => 'success',
         });
 
         const response = await POST(request);

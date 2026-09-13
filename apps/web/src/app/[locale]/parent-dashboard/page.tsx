@@ -7,6 +7,7 @@
 
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { getTranslations } from 'next-intl/server';
 import { validateAuth } from '@/lib/auth/server';
 import { ParentDashboard } from '@/components/profile/parent-dashboard';
@@ -36,6 +37,8 @@ export default async function ParentDashboardPage({ params }: PageProps) {
   }
 
   const userId = auth.userId;
+  const credentialHeader = (await headers()).get('cookie');
+  if (!credentialHeader) return <ErrorState locale={locale} />;
 
   // Fetch consent status
   const consentResponse = await fetch(
@@ -44,6 +47,7 @@ export default async function ParentDashboardPage({ params }: PageProps) {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
+        Cookie: credentialHeader,
       },
     },
   );
@@ -71,7 +75,7 @@ export default async function ParentDashboardPage({ params }: PageProps) {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
-        Cookie: `mirrorbuddy-user-id=${userId}`,
+        Cookie: credentialHeader,
       },
     },
   );

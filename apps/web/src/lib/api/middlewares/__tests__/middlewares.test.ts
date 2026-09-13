@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import type { MiddlewareContext } from '../types';
+import { authenticatedFixture, anonymousFixture } from '@/test/fixtures/session-compat';
 
 // Mock dependencies
 vi.mock('@/lib/security', () => ({
@@ -106,14 +107,14 @@ describe('Middleware modules', () => {
       const { withAuth } = await import('../with-auth');
 
       vi.mocked(validateAuth).mockResolvedValue({
-        authenticated: true,
-        userId: 'user-123',
+        ...authenticatedFixture('user-123'),
       });
 
       const response = await withAuth(mockContext, mockNext);
 
       expect(validateAuth).toHaveBeenCalled();
       expect(mockContext.userId).toBe('user-123');
+      expect(mockContext.authSession).toEqual(authenticatedFixture('user-123').session);
       expect(mockNext).toHaveBeenCalled();
       expect(response.status).toBe(200);
     });
@@ -123,8 +124,7 @@ describe('Middleware modules', () => {
       const { withAuth } = await import('../with-auth');
 
       vi.mocked(validateAuth).mockResolvedValue({
-        authenticated: false,
-        userId: null,
+        ...anonymousFixture,
       });
 
       const response = await withAuth(mockContext, mockNext);
@@ -135,7 +135,7 @@ describe('Middleware modules', () => {
       expect(response.status).toBe(401);
 
       const data = await response.json();
-      expect(data).toEqual({ error: 'Unauthorized' });
+      expect(data).toEqual({ error: 'Unauthorized', code: 'AUTH_ABSENT' });
     });
   });
 
@@ -145,8 +145,7 @@ describe('Middleware modules', () => {
       const { withAdmin } = await import('../with-admin');
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
-        authenticated: true,
-        userId: 'admin-123',
+        ...authenticatedFixture('admin-123'),
         isAdmin: true,
       });
 
@@ -164,8 +163,7 @@ describe('Middleware modules', () => {
       const { withAdmin } = await import('../with-admin');
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
-        authenticated: false,
-        userId: null,
+        ...anonymousFixture,
         isAdmin: false,
       });
 
@@ -181,8 +179,7 @@ describe('Middleware modules', () => {
       const { withAdmin } = await import('../with-admin');
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
-        authenticated: true,
-        userId: 'user-123',
+        ...authenticatedFixture('user-123'),
         isAdmin: false,
       });
 
@@ -198,13 +195,24 @@ describe('Middleware modules', () => {
   });
 
   describe('F-04b: withAdminReadOnly', () => {
+    it('returns the explicit absent-auth contract before read-only authorization', async () => {
+      const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
+      const { withAdminReadOnly } = await import('../with-admin-readonly');
+      vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
+        ...anonymousFixture,
+        canAccessAdminReadOnly: false,
+      });
+      const response = await withAdminReadOnly(mockContext, mockNext);
+      expect(response.status).toBe(401);
+      expect(await response.json()).toMatchObject({ code: 'AUTH_ABSENT' });
+      expect(mockNext).not.toHaveBeenCalled();
+    });
     it('should allow readonly admin access', async () => {
       const { validateAdminReadOnlyAuth } = await import('@/lib/auth/server');
       const { withAdminReadOnly } = await import('../with-admin-readonly');
 
       vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
-        authenticated: true,
-        userId: 'readonly-admin-123',
+        ...authenticatedFixture('readonly-admin-123'),
         canAccessAdminReadOnly: true,
       });
 
@@ -221,8 +229,7 @@ describe('Middleware modules', () => {
       const { withAdminReadOnly } = await import('../with-admin-readonly');
 
       vi.mocked(validateAdminReadOnlyAuth).mockResolvedValue({
-        authenticated: true,
-        userId: 'user-123',
+        ...authenticatedFixture('user-123'),
         canAccessAdminReadOnly: false,
       });
 

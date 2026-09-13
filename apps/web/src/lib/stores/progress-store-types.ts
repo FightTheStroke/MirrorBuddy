@@ -15,6 +15,7 @@ export interface SessionGrade {
 
 export interface StudySession {
   id: string;
+  serverId?: string;
   maestroId: string;
   subject: string;
   startedAt: Date;
@@ -55,6 +56,7 @@ export interface ProgressState {
   // Sync state
   lastSyncedAt: Date | null;
   pendingSync: boolean;
+  needsHydration: boolean;
   // Actions
   addXP: (amount: number) => void; // Backward compatibility
   addMirrorBucks: (amount: number, reason?: string, sourceId?: string, sourceType?: string) => void;

@@ -1,6 +1,6 @@
 ---
 description: 'Regulatory compliance: EU AI Act, GDPR, COPPA, WCAG 2.1 AA'
-applyTo: 'docs/compliance/**/*,src/lib/safety/**/*,src/lib/privacy/**/*'
+applyTo: 'docs/compliance/**/*,apps/web/src/lib/safety/**/*,apps/web/src/lib/privacy/**/*,packages/safety/src/**/*'
 ---
 
 # Compliance
@@ -20,7 +20,7 @@ No hardcoded secrets | No PII in logs/vector | Input validation | Prisma paramet
 
 ## Safety
 
-Bias detection (`src/lib/safety/bias-detector.ts`) | content filtering | disclaimers | human fallback
+Bias detection (`apps/web/src/lib/safety/bias-detector.ts`) | content filtering | disclaimers | human fallback
 
 Verify: `npx tsx scripts/compliance-check.ts`
 
