@@ -34,6 +34,7 @@ import {
   mockAccessibilitySettings,
   setVisitorCookie,
 } from './api-mocks';
+import { createE2EVisitorId } from './visitor-id';
 
 /**
  * Base test with automatic wall bypasses.
@@ -50,7 +51,7 @@ export interface BaseFixtures {
 export const test = base.extend<BaseFixtures>({
   page: async ({ page, context }, use) => {
     const runSuffix = randomUUID().replace(/-/g, '').slice(0, 8);
-    const visitorId = `e2e-visitor-${Date.now()}-${runSuffix}`;
+    const visitorId = createE2EVisitorId();
     const a11yUserId = `e2e-a11y-user-${Date.now()}-${runSuffix}`;
 
     // ADR 0059: Bypass all consent walls
