@@ -349,6 +349,7 @@ export default defineConfig({
     env: {
       // Override PORT to match MIRRORBUDDY_PORT (default 3000)
       PORT: appPort,
+      NEXT_PUBLIC_BASE_URL: appBaseURL,
       // CRITICAL: OVERRIDE DATABASE_URL with test database
       // This prevents accidental contamination of production Supabase database
       // BOTH values set to same test DB to ensure no fallback to production

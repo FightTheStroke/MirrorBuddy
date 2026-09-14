@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { ThemeProvider, useTheme } from 'next-themes';
 import { AccessibilityProvider, MotionConfigBridge } from '@/components/accessibility';
 import { DocumentLocaleSync } from '@/components/i18n/document-locale-sync';
@@ -9,10 +8,9 @@ import { StagingBanner } from '@/components/ui/staging-banner';
 import { MaintenanceBanner } from '@/components/ui/maintenance-banner';
 import { ToastContainer } from '@/components/ui/toast';
 import { IOSInstallBanner } from '@/components/pwa';
-import { UnifiedConsentWall } from '@/components/consent';
+import { ConditionalUnifiedConsent } from '@/components/consent/conditional-unified-consent';
 import { useSettingsStore, initializeStores, setupAutoSync } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { initializeTelemetry } from '@/lib/telemetry';
 import { ActivityTracker } from '@/lib/telemetry/use-activity-tracker';
 import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';
@@ -141,60 +139,6 @@ function StoreInitializer() {
   }, [identity]);
 
   return null;
-}
-
-// Pages where unified consent wall should be skipped
-// Legal pages MUST be accessible without accepting cookies (GDPR requirement)
-const PUBLIC_PATHS = [
-  '/welcome',
-  '/landing',
-  '/login',
-  '/change-password',
-  '/invite',
-  '/privacy',
-  '/cookies',
-  '/terms',
-  '/ai-transparency',
-  '/legal/data-request',
-];
-
-/**
- * Conditional Unified Consent - DB-first TOS + Cookie consent
- * Skips blocking wall on:
- * - Public/legal pages (GDPR requirement)
- * - Before onboarding is completed (so user can see landing/welcome)
- * Shows wall only when user has completed onboarding and is using the app
- */
-function ConditionalUnifiedConsent({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const { hasCompletedOnboarding } = useOnboardingStore();
-
-  const normalizedPathname = (() => {
-    if (!pathname) return '';
-    const segments = pathname.split('/').filter(Boolean);
-    const localeCandidate = segments[0];
-    const hasLocalePrefix = ['it', 'en', 'fr', 'de', 'es'].includes(localeCandidate);
-    if (!hasLocalePrefix) return pathname;
-    const withoutLocale = `/${segments.slice(1).join('/')}`;
-    return withoutLocale === '/' ? '/' : withoutLocale;
-  })();
-
-  const isPublicPath = PUBLIC_PATHS.some(
-    (p) => normalizedPathname === p || normalizedPathname.startsWith(`${p}/`),
-  );
-
-  // On public/legal pages, skip blocking wall (users must access legal docs)
-  if (isPublicPath) {
-    return <>{children}</>;
-  }
-
-  // If onboarding not completed, skip consent wall (let onboarding redirect happen)
-  if (!hasCompletedOnboarding) {
-    return <>{children}</>;
-  }
-
-  // User has completed onboarding and is using the app - show consent wall
-  return <UnifiedConsentWall>{children}</UnifiedConsentWall>;
 }
 
 export function Providers({ children, nonce, initialIdentity }: ProvidersProps) {

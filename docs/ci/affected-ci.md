@@ -82,6 +82,17 @@ the deployment gate has complete verification before deploying to production.
   retries only exhausted failures using Playwright's own test identities. Missing
   identities after an infrastructure failure trigger an explicitly logged full retry;
   invalid metadata fails closed. Both attempts remain bounded at 20 minutes each.
+- **Browser fixtures:** child-home scenarios require a real student session, not an
+  anonymous context that redirects to welcome. Visitor cookies use the production UUID
+  format; session-token generation runs outside database transactions after owner
+  validation. Consent scenarios use fresh contexts without consent bypasses and exercise
+  the actual dialog, persisted acceptance, keyboard controls, and measured contrast.
+  A missing dialog fails the test instead of silently skipping its assertions.
+  Public-route audits use Playwright's configured base URL, including isolated worktree
+  ports set through `MIRRORBUDDY_PORT`; each checkout must use its own local test database.
+  Where a fixture requires an allowlisted database name, isolate the PostgreSQL instance
+  instead of relaxing its safety guard. Match CI's explicit voice-unconfigured setting
+  when no Azure voice credentials are provisioned; this is not a production smoke test.
 - **Python:** `setup-python` caches pip downloads against `robot/pyproject.toml`.
   Every job still installs the current editable package and runs `python -m pytest`.
   Workflow changes also select this job; robot results block the PR when selected

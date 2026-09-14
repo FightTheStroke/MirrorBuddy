@@ -17,10 +17,13 @@
  */
 
 import { test, expect } from './fixtures/auth-fixtures';
+import { mockTrialTier } from './fixtures/api-mocks';
+import type { Page } from '@playwright/test';
 
-// IMPORTANT: These tests check trial mode (unauthenticated)
-// Override global storageState to start without authentication
-test.use({ storageState: undefined });
+// A real trial child reaches the home with a guest session issued by the
+// welcome flow, so the context keeps the global storage state and the Trial
+// tier is forced below. Dropping the session only ever reached /welcome, where
+// every "must not render" assertion passes without proving anything.
 
 test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
   // Large screen: the old badge and the usage-dashboard aside only rendered on lg+.
@@ -28,7 +31,7 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
   test.setTimeout(60000);
 
   async function setupTrialMocks(
-    page: typeof test.trialPage,
+    page: Page,
     trialData: Partial<{
       chatsUsed: number;
       chatsRemaining: number;
@@ -72,7 +75,13 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(defaults),
+        body: JSON.stringify({
+          // useTrialStatus only enters trial mode when the session parses, and
+          // the schema requires an identifier: without it the sidebar trial
+          // block never renders and the guardrail assertions prove nothing.
+          sessionId: 'e2e-trial-dashboard-session',
+          ...defaults,
+        }),
       });
     });
 
@@ -130,70 +139,63 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       });
     });
 
-    // Mock ToS API call
-    await page.route('**/api/tos', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ accepted: true, version: '1.0' }),
-      });
-    });
+    // The session belongs to a registered context, so the Trial tier must be
+    // forced for the guardrails to be exercised under trial conditions.
+    await mockTrialTier(page);
   }
 
-  test('child home header has no trial badge and no invite link', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage, { chatsUsed: 3, chatsRemaining: 7, maxChats: 10 });
+  test('child home header has no trial badge and no invite link', async ({ page }) => {
+    await setupTrialMocks(page, { chatsUsed: 3, chatsRemaining: 7, maxChats: 10 });
 
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
+    await page.goto('/it');
+    await page.waitForLoadState('domcontentloaded');
 
     // The intent home (child space) is rendered.
-    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
 
     // The old commercial badge is gone for good.
-    await expect(trialPage.locator('[data-testid="trial-badge"]')).toHaveCount(0);
+    await expect(page.locator('[data-testid="trial-badge"]')).toHaveCount(0);
 
     // No header link to the PII-collecting invite-request form.
-    const headerInviteLinks = trialPage.locator('header a[href*="invite"]');
+    const headerInviteLinks = page.locator('header a[href*="invite"]');
     await expect(headerInviteLinks).toHaveCount(0);
   });
 
-  test('trial usage dashboard never renders next to the child learning flow', async ({
-    trialPage,
-  }) => {
+  test('trial usage dashboard never renders next to the child learning flow', async ({ page }) => {
     // Default profile (NOT distraction-free): the guardrail must hold anyway.
-    await setupTrialMocks(trialPage, { chatsUsed: 9, chatsRemaining: 1, maxChats: 10 });
+    await setupTrialMocks(page, { chatsUsed: 9, chatsRemaining: 1, maxChats: 10 });
 
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
+    await page.goto('/it');
+    await page.waitForLoadState('domcontentloaded');
 
-    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
-    await expect(trialPage.getByTestId('trial-usage-dashboard')).toHaveCount(0);
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('trial-usage-dashboard')).toHaveCount(0);
   });
 
-  test('invite/login CTAs live only inside the grown-ups sidebar group', async ({ trialPage }) => {
-    await setupTrialMocks(trialPage);
+  test('invite/login CTAs live only inside the grown-ups sidebar group', async ({ page }) => {
+    await setupTrialMocks(page);
 
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
+    await page.goto('/it');
+    await page.waitForLoadState('domcontentloaded');
 
-    await expect(trialPage.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
 
     // The adult flow is preserved: trial status + request access exist…
-    const grownUpsTrialBlock = trialPage.getByTestId('sidebar-trial-grownups');
+    const grownUpsTrialBlock = page.getByTestId('sidebar-trial-grownups');
     await expect(grownUpsTrialBlock).toBeVisible();
 
     // …but every invite link on the page sits inside the grown-ups group.
-    const allInviteLinks = trialPage.locator('a[href*="invite"]');
-    const groupedInviteLinks = trialPage.locator(
+    const allInviteLinks = page.locator('a[href*="invite"]');
+    const groupedInviteLinks = page.locator(
       '[data-testid="sidebar-grownups-group"] a[href*="invite"]',
     );
     expect(await allInviteLinks.count()).toBe(await groupedInviteLinks.count());
     expect(await groupedInviteLinks.count()).toBeGreaterThan(0);
   });
 
-  test('trial surfaces are absent for authenticated users', async ({ trialPage }) => {
+  test('trial surfaces are absent for authenticated users', async ({ page }) => {
     // Mock as non-trial user (authenticated)
-    await trialPage.route('**/api/user/trial-status', (route) => {
+    await page.route('**/api/user/trial-status', (route) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -201,7 +203,7 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       });
     });
 
-    await trialPage.route('**/api/onboarding', (route) => {
+    await page.route('**/api/onboarding', (route) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -224,20 +226,12 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       });
     });
 
-    await trialPage.route('**/api/tos', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ accepted: true, version: '1.0' }),
-      });
-    });
+    await page.goto('/it');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
 
-    await trialPage.goto('/it');
-    await trialPage.waitForLoadState('domcontentloaded');
-    await trialPage.waitForTimeout(3000);
-
-    await expect(trialPage.locator('[data-testid="trial-badge"]')).toHaveCount(0);
-    await expect(trialPage.getByTestId('sidebar-trial-grownups')).toHaveCount(0);
-    await expect(trialPage.getByTestId('trial-usage-dashboard')).toHaveCount(0);
+    await expect(page.locator('[data-testid="trial-badge"]')).toHaveCount(0);
+    await expect(page.getByTestId('sidebar-trial-grownups')).toHaveCount(0);
+    await expect(page.getByTestId('trial-usage-dashboard')).toHaveCount(0);
   });
 });
