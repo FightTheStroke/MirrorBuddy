@@ -1,4 +1,6 @@
 import { createTestUser } from '../helpers/test-data';
+import { trackTestRecord } from '../helpers/test-data-registry';
+import { createE2ETestUser } from '../helpers/e2e-user-factory';
 import { getPrismaClient } from '../helpers/prisma-setup';
 import { issueTestSession, testSessionCookies } from '../helpers/durable-session';
 
@@ -59,6 +61,27 @@ export function getTrialStorageState() {
         ],
       },
     ],
+  };
+}
+
+/**
+ * A trial student in production is not anonymous: the welcome flow issues a guest
+ * session (see `createGuestSession` in the onboarding route), and the onboarding
+ * store only hydrates for a user it can identify. A cookie-less context therefore
+ * bounces off the child home to /welcome, which is correct behaviour and not what
+ * the trial specs mean to exercise. Use `signedOutPage` for a first-time visitor.
+ */
+export async function getTrialUserStorageState(origin = 'http://localhost:3000') {
+  const prisma = getPrismaClient();
+  // The shared factory also records onboarding and the ToS acceptance, without
+  // which the unified consent wall covers the page under test.
+  const { testUserId } = await createE2ETestUser(prisma);
+  trackTestRecord('userIds', testUserId);
+  const issued = await issueTestSession(prisma, testUserId);
+  const state = getTrialStorageState();
+  return {
+    cookies: [...testSessionCookies(issued, origin), ...state.cookies],
+    origins: state.origins.map((item) => ({ ...item, origin })),
   };
 }
 

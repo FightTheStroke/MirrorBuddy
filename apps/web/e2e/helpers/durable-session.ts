@@ -20,7 +20,11 @@ export async function issueTestSession(
   ) {
     throw new TypeError('A test owner and bounded fixture lifetime are required');
   }
-  return prisma.$transaction(
+  // The owner and the database clock are validated first, so an invalid owner
+  // never reaches token minting. Minting then happens outside any transaction:
+  // it spawns a subprocess that took seconds, which blew the Serializable
+  // transaction's 5s timeout and made every session-backed fixture flaky.
+  const verified = await prisma.$transaction(
     async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: userId },
@@ -46,19 +50,25 @@ export async function issueTestSession(
       ) {
         throw new Error('A valid database clock is required for fixture issuance');
       }
-      const expiresAt = new Date(issuedAt.getTime() + lifetime * 1000);
-      const created = await createFixtureToken();
+      return { userId: user.id, authVersion: user.authVersion, issuedAt };
+    },
+    { isolationLevel: 'Serializable' },
+  );
+  const expiresAt = new Date(verified.issuedAt.getTime() + lifetime * 1000);
+  const created = await createFixtureToken();
+  return prisma.$transaction(
+    async (tx) => {
       await tx.authSession.create({
         data: {
           handleHash: created.handleHash,
-          userId: user.id,
-          issuedAt,
+          userId: verified.userId,
+          issuedAt: verified.issuedAt,
           expiresAt,
-          authVersion: user.authVersion,
+          authVersion: verified.authVersion,
           legacyOrigin: false,
         },
       });
-      return { ...created, userId: user.id, issuedAt, expiresAt };
+      return { ...created, userId: verified.userId, issuedAt: verified.issuedAt, expiresAt };
     },
     { isolationLevel: 'Serializable' },
   );

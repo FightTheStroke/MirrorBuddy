@@ -1,11 +1,17 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as base, expect } from './user-fixtures';
 import type { Page, APIRequestContext } from '@playwright/test';
-import { getTrialStorageState, getAdminStorageState } from './auth-fixtures-helpers';
+import {
+  getTrialStorageState,
+  getTrialUserStorageState,
+  getAdminStorageState,
+} from './auth-fixtures-helpers';
 import { cleanupTestData } from '../helpers/test-data';
 
 interface AuthFixtures {
   trialPage: Page;
+  /** A trial student that already owns a guest session, as production issues one. */
+  trialHomePage: Page;
   adminPage: Page;
   adminRequest: APIRequestContext;
 }
@@ -16,6 +22,14 @@ export const test = base.extend<AuthFixtures>({
       name: /^(mirrorbuddy-user-id|mirrorbuddy-user-id-client|convergio-user-id)$/,
     });
     const state = getTrialStorageState();
+    await page.context().addCookies(state.cookies);
+    await page.context().addInitScript((entries) => {
+      for (const item of entries) localStorage.setItem(item.name, item.value);
+    }, state.origins[0].localStorage);
+    await use(page);
+  },
+  trialHomePage: async ({ page, baseURL }, use) => {
+    const state = await getTrialUserStorageState(baseURL);
     await page.context().addCookies(state.cookies);
     await page.context().addInitScript((entries) => {
       for (const item of entries) localStorage.setItem(item.name, item.value);
@@ -49,4 +63,4 @@ export const test = base.extend<AuthFixtures>({
   },
 });
 
-export { expect, getTrialStorageState, getAdminStorageState };
+export { expect, getTrialStorageState, getTrialUserStorageState, getAdminStorageState };
