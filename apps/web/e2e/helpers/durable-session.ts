@@ -20,6 +20,10 @@ export async function issueTestSession(
   ) {
     throw new TypeError('A test owner and bounded fixture lifetime are required');
   }
+  // Minting the token spawns a subprocess and takes seconds; doing it inside the
+  // transaction kept a Serializable transaction open past its 5s timeout and made
+  // every session-backed fixture flaky.
+  const created = await createFixtureToken();
   return prisma.$transaction(
     async (tx) => {
       const user = await tx.user.findUnique({
@@ -47,7 +51,6 @@ export async function issueTestSession(
         throw new Error('A valid database clock is required for fixture issuance');
       }
       const expiresAt = new Date(issuedAt.getTime() + lifetime * 1000);
-      const created = await createFixtureToken();
       await tx.authSession.create({
         data: {
           handleHash: created.handleHash,
