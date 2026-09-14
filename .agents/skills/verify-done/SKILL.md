@@ -1,6 +1,6 @@
 ---
 name: verify-done
-description: Gate before claiming any task complete. Runs health-check.sh + ci:summary, pastes output, only then allows "done" claim.
+description: Gate before claiming any task complete. Runs health-check.sh including CI once, pastes output, only then allows "done" claim.
 allowed-tools:
   - Bash
   - Read
@@ -27,13 +27,13 @@ Anti-premature-completion gate. Run BEFORE saying "done", "completed", "finished
 
 Expect: no critical red. If red, NOT done.
 
-### 2. CI summary
+### 2. Inspect the embedded CI summary
 
-```bash
-npm run ci:summary
-```
-
-Expect: lint + types + build all pass.
+`health-check.sh` already runs `ci-summary.sh` and prints its complete output.
+Expect: lint + types + build all pass. Do not immediately repeat those same checks.
+If code, configuration, dependencies, or environment changed after that run,
+rerun health-check before claiming completion. Reuse only this fresh execution,
+not an earlier session's output. Mandatory unit tests and task-specific checks still apply.
 
 ### 3. Task-specific verification
 
@@ -62,7 +62,7 @@ Only after all four steps. If any step failed → task NOT done → keep working
 
 ## Forbidden
 
-- Claiming done without running health-check or ci:summary
+- Claiming done without a fresh health-check including a passing CI summary
 - "I think it works" — either prove it or keep working
 - Skipping i18n / env / CSRF checks when they apply
 - Marking TaskUpdate completed before verification run

@@ -125,8 +125,10 @@ task-state transitions and the global checkpoint; implementation alone is not ac
 
 ## Verify-before-done
 
-Never claim done without `/verify-done` (or `./scripts/health-check.sh` +
-`npm run ci:summary`). Paste the output. Red = not done. Same for marking a task completed.
+Never claim done without `/verify-done` (or `./scripts/health-check.sh`, which runs
+and prints `ci:summary` internally). Do not repeat that same CI run when inputs are
+unchanged; rerun after code, configuration, dependency, or environment changes.
+Paste the output. Red = not done. Same for marking a task completed.
 Thor gates: per-task (1-4, 8, 9) + per-wave (all 9 + build).
 
 ## References

@@ -43,15 +43,13 @@ WARNINGS=0
 # 1. Build (lint + typecheck + build)
 ci_tmp=$(mktemp)
 if ./scripts/ci-summary.sh >"$ci_tmp" 2>&1; then
+	cat "$ci_tmp"
 	ci_warns=$(grep -c '\[WARN\]' "$ci_tmp" || true)
 	if [[ "$ci_warns" -gt 0 ]]; then
-		grep '\[WARN\]' "$ci_tmp"
 		WARNINGS=$((WARNINGS + ci_warns))
-	else
-		echo "[PASS] Build (lint + typecheck + build)"
 	fi
 else
-	grep '\[FAIL\]' "$ci_tmp" || echo "[FAIL] Build"
+	cat "$ci_tmp"
 	ERRORS=$((ERRORS + 1))
 fi
 rm -f "$ci_tmp"

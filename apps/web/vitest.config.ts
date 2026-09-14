@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
+import { availableParallelism } from 'node:os';
 
 export default defineConfig({
   test: {
@@ -18,18 +19,13 @@ export default defineConfig({
       // root-tests-environment.test.ts enforces that.
       '../../scripts/__tests__/**/*.test.ts',
     ],
-    exclude: [
-      'node_modules',
-      'e2e/**',
-      'apps/web/e2e/**',
-      'feat/**',
-    ],
+    exclude: ['node_modules', 'e2e/**', 'apps/web/e2e/**', 'feat/**'],
     setupFiles: ['./src/test/setup.ts'],
     // Retry flaky tests on CI (F-07)
     retry: process.env.CI ? 2 : 0,
     // JSON reporter for flaky test tracking
     reporters: process.env.CI ? ['default', 'json'] : ['default'],
-    outputFile: process.env.CI ? './coverage/test-results.json' : undefined,
+    outputFile: process.env.CI ? { json: './coverage/test-results.json' } : undefined,
     // Tests that modify i18n files should run with proper isolation
     // Using hooks: "list" ensures beforeAll/afterAll run in correct order
     // fileParallelism: false prevents cross-file race conditions with i18n files
@@ -37,6 +33,8 @@ export default defineConfig({
       hooks: 'list',
     },
     fileParallelism: true,
+    // Leave capacity for other local tools; CI retains its runner-native worker count.
+    maxWorkers: process.env.CI ? undefined : Math.min(4, availableParallelism()),
     server: {
       deps: {
         inline: ['next-intl'],
@@ -65,12 +63,10 @@ export default defineConfig({
         '**/*.spec.ts',
       ],
       thresholds: {
-        global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
-        },
+        branches: 80,
+        functions: 80,
+        lines: 80,
+        statements: 80,
       },
     },
   },
