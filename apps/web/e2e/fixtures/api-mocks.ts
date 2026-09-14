@@ -187,9 +187,6 @@ export async function mockTracking(page: Page) {
   await page.route('**/api/funnel/track', (route) => {
     route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
   });
-  await page.route('**/api/user/consent', (route) => {
-    route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
-  });
 }
 
 /** Mock home page data APIs (settings, profile, progress, etc.) */
