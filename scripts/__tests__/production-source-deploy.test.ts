@@ -102,6 +102,8 @@ describe('production source-build promotion boundary', () => {
       '--force',
       '--yes',
       '--format=json',
+      '--build-env',
+      `VERCEL_GIT_COMMIT_SHA=${sha}`,
       '--meta',
       `verifiedSourceCommit=${sha}`,
       '--meta',
@@ -133,9 +135,12 @@ describe('production source-build promotion boundary', () => {
       '--scope',
       env.VERCEL_ORG_ID,
     ]);
-    expect(JSON.stringify(commands())).not.toMatch(
-      /prebuilt|pull|--build-env|--env|rollback|alias set/,
-    );
+    expect(JSON.stringify(commands())).not.toMatch(/prebuilt|pull|--env|rollback|alias set/);
+    expect(
+      commands()
+        .flat()
+        .filter((arg) => arg === '--build-env'),
+    ).toHaveLength(1);
     expect(
       commands()
         .filter((args) => args[0] === 'inspect')
