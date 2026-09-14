@@ -108,6 +108,11 @@ export async function deployValidatedProduction(input) {
         '--force',
         '--yes',
         '--format=json',
+        // CLI source deployments do not inherit Git integration metadata. Pass
+        // only the already-validated clean HEAD so the remote proof can bind
+        // the build to this exact source; no credential or runtime value crosses.
+        '--build-env',
+        `VERCEL_GIT_COMMIT_SHA=${sha}`,
         '--meta',
         `verifiedSourceCommit=${sha}`,
         '--meta',
