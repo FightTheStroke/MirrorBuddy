@@ -57,7 +57,10 @@ export function buildFixture() {
         `tsx() { "${process.execPath}" --import tsx "$@"; }\n${buildCommand}`,
       ],
       {
-        cwd: directory,
+        // Vercel executes buildCommand from the configured apps/web project root,
+        // not from the repository root. Keep the process test faithful to that
+        // boundary so path regressions fail before a production deployment.
+        cwd: join(directory, 'apps/web'),
         env: { ...env, ...values, PATH: env.PATH },
         encoding: 'utf8',
         timeout: 15_000,
