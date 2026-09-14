@@ -17,9 +17,10 @@ function requireLocalRuntime(baseURL: string | undefined) {
   }
   const url = new URL(database);
   const local = ['localhost', '127.0.0.1'];
+  const allowedDatabases = ['/mirrorbuddy_remediation_47ba2c29', '/mirrorbuddy_test'];
   if (
     !local.includes(url.hostname) ||
-    url.pathname !== '/mirrorbuddy_remediation_47ba2c29' ||
+    !allowedDatabases.includes(url.pathname) ||
     !local.includes(new URL(baseURL).hostname)
   ) {
     throw new Error('Consent fixtures are restricted to the local remediation runtime');
