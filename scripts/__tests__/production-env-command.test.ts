@@ -121,7 +121,7 @@ describe('existing publication and deployment wiring', () => {
 
   it('checks injected values before the existing Vercel build pipeline', () => {
     const config = JSON.parse(source('vercel.json')) as { buildCommand?: string };
-    expect(config.buildCommand).toBe('tsx scripts/build-with-production-proof.ts');
+    expect(config.buildCommand).toBe('tsx ../../scripts/build-with-production-proof.ts');
     const wrapper = source('scripts/build-with-production-proof.ts');
     expect(wrapper.indexOf("checkProductionEnvironment(['build'], process.env)")).toBeLessThan(
       wrapper.indexOf("spawnSync('npm', ['run', 'vercel-build']"),

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const productionBuildCommand = 'tsx scripts/build-with-production-proof.ts';
+export const productionBuildCommand = 'tsx ../../scripts/build-with-production-proof.ts';
 export const proofRoute = '/production-build-proof.js';
 export const proofFile = `apps/web/public${proofRoute}`;
 export const nextBuildIdFile = 'apps/web/.next/BUILD_ID';
