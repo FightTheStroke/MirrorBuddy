@@ -1,5 +1,14 @@
 {
   "common": {
+    "session": {
+      "logoutCurrent": "Diese Sitzung abmelden",
+      "logoutAll": "Auf allen Geräten abmelden",
+      "loggingOut": "Abmeldung läuft…",
+      "logoutFailed": "Abmeldung fehlgeschlagen. Deine Daten wurden nicht gelöscht. Bitte versuche es erneut.",
+      "legacyFamily": "Diese Sitzung stammt aus einer älteren Anmeldung: Beim Abmelden enden auch die anderen älteren Anmeldungen dieses Kontos. Sitzungen aus einer neuen Anmeldung bleiben aktiv.",
+      "unavailable": "Wir können deine Anmeldung nicht prüfen. Kontoaktionen sind pausiert; deine Entscheidungen bleiben gespeichert.",
+      "retry": "Anmeldung erneut prüfen"
+    },
     "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolgreich",

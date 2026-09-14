@@ -16,7 +16,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { generateNonce, CSP_NONCE_HEADER } from '@/lib/security';
 import { metricsStore } from '@/lib/observability/metrics-store';
-import { AUTH_COOKIE_NAME, VISITOR_COOKIE_NAME } from '@/lib/auth';
+import { AUTH_COOKIE_NAME, LEGACY_AUTH_COOKIE, VISITOR_COOKIE_NAME } from '@/lib/auth';
 import { routing } from '@/i18n/routing';
 import { detectLocaleFromRequest, extractLocaleFromUrl } from '@/lib/i18n/locale-detection';
 import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
@@ -425,7 +425,8 @@ export default function proxy(request: NextRequest) {
   // ==========================================================================
 
   // Check for authentication cookies
-  const userCookie = request.cookies.get(AUTH_COOKIE_NAME);
+  const userCookie =
+    request.cookies.get(AUTH_COOKIE_NAME) ?? request.cookies.get(LEGACY_AUTH_COOKIE);
   const visitorCookie = request.cookies.get(VISITOR_COOKIE_NAME);
   const isAuthenticated = !!userCookie?.value;
   // Validate visitor ID is a proper UUID v4 (prevents trivial forgery)

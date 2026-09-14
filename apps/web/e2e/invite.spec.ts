@@ -1,7 +1,11 @@
 import { test, expect } from './fixtures/base-fixtures';
-import { signCookieValue } from './fixtures/auth-fixtures-helpers';
+import { getAdminStorageState } from './fixtures/auth-fixtures-helpers';
+import { cleanupTestData } from './helpers/test-data';
 
 test.describe('Beta Invite System', () => {
+  test.afterEach(async () => {
+    await cleanupTestData();
+  });
   test.describe('Beta Request Form', () => {
     test('should show validation errors for empty form', async ({ page }) => {
       // Navigate to a page with the beta request form
@@ -52,29 +56,10 @@ test.describe('Beta Invite System', () => {
 
   test.describe('Admin Invites Page', () => {
     test.beforeEach(async ({ page }) => {
-      // Mock admin authentication using Playwright's cookie API
-      // IMPORTANT: Cookie must be signed for session-auth.ts validation
-      // Add random component to prevent collision when parallel workers start at same millisecond
-      const randomSuffix = crypto.randomUUID().replace(/-/g, '').substring(0, 9);
-      const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
-      const signedCookie = signCookieValue(adminSessionId);
+      const state = await getAdminStorageState();
 
       await page.context().addCookies([
-        {
-          name: 'mirrorbuddy-user-id',
-          value: signedCookie,
-          domain: 'localhost',
-          path: '/',
-          sameSite: 'Lax',
-        },
-        {
-          // Client-readable cookie (for JS access)
-          name: 'mirrorbuddy-user-id-client',
-          value: adminSessionId,
-          domain: 'localhost',
-          path: '/',
-          sameSite: 'Lax',
-        },
+        ...state.cookies,
         {
           // Accessibility settings bypass (ADR 0060)
           name: 'mirrorbuddy-a11y',
@@ -285,29 +270,10 @@ test.describe('Beta Invite System', () => {
 
   test.describe('Invite Approval Flow', () => {
     test('should approve invite and show success', async ({ page }) => {
-      // Mock admin authentication using Playwright's cookie API
-      // IMPORTANT: Cookie must be signed for session-auth.ts validation
-      // Add random component to prevent collision when parallel workers start at same millisecond
-      const randomSuffix2 = crypto.randomUUID().replace(/-/g, '').substring(0, 9);
-      const adminSessionId = `admin-approval-session-${Date.now()}-${randomSuffix2}`;
-      const signedCookie = signCookieValue(adminSessionId);
+      const state = await getAdminStorageState();
 
       await page.context().addCookies([
-        {
-          name: 'mirrorbuddy-user-id',
-          value: signedCookie,
-          domain: 'localhost',
-          path: '/',
-          sameSite: 'Lax',
-        },
-        {
-          // Client-readable cookie (for JS access)
-          name: 'mirrorbuddy-user-id-client',
-          value: adminSessionId,
-          domain: 'localhost',
-          path: '/',
-          sameSite: 'Lax',
-        },
+        ...state.cookies,
         {
           // Accessibility settings bypass (ADR 0060)
           name: 'mirrorbuddy-a11y',

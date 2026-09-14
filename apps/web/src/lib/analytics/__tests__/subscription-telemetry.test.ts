@@ -1,133 +1,142 @@
 /**
- * @vitest-environment node
+ * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi, type Mock } from 'vitest';
+import {
+  prepareAnalyticsClient,
+  grantAnalyticsClient,
+  clearAnalyticsClient,
+} from '@/lib/telemetry/__tests__/client-analytics-fixtures';
 import {
   trackSubscriptionEvent,
   type SubscriptionEvent,
   type SubscriptionEventType,
   emitSubscriptionEventToApi,
-} from "../subscription-telemetry";
-import { logger } from "@/lib/logger";
+} from '../subscription-telemetry';
+import { logger } from '@/lib/logger';
 
 // Mock the logger and fetch
-vi.mock("@/lib/logger");
-vi.stubGlobal("fetch", vi.fn());
+vi.mock('@/lib/logger');
+vi.stubGlobal('fetch', vi.fn());
 
-describe("Subscription Telemetry", () => {
-  beforeEach(() => {
+describe('Subscription Telemetry', () => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    vi.mocked(fetch).mockReset().mockImplementation(prepareAnalyticsClient());
+    await grantAnalyticsClient();
+    vi.mocked(fetch).mockClear();
   });
+  afterEach(() => clearAnalyticsClient());
 
-  describe("trackSubscriptionEvent", () => {
-    it("creates a subscription.created event with correct properties", () => {
+  describe('trackSubscriptionEvent', () => {
+    it('creates a subscription.created event with correct properties', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
-        timestamp: new Date("2026-01-24T10:00:00Z"),
+        timestamp: new Date('2026-01-24T10:00:00Z'),
         metadata: {
-          subscriptionId: "sub-123",
-          status: "ACTIVE",
+          subscriptionId: 'sub-123',
+          status: 'ACTIVE',
         },
       };
 
       const tracked = trackSubscriptionEvent(event);
 
       expect(tracked).toBeDefined();
-      expect(tracked.type).toBe("subscription.created");
-      expect(tracked.userId).toBe("user-123");
-      expect(tracked.tierId).toBe("tier-free");
+      expect(tracked.type).toBe('subscription.created');
+      expect(tracked.userId).toBe('user-123');
+      expect(tracked.tierId).toBe('tier-free');
       expect(tracked.previousTierId).toBeNull();
-      expect(tracked.timestamp).toEqual(new Date("2026-01-24T10:00:00Z"));
+      expect(tracked.timestamp).toEqual(new Date('2026-01-24T10:00:00Z'));
     });
 
-    it("creates a subscription.upgraded event when moving to higher tier", () => {
+    it('creates a subscription.upgraded event when moving to higher tier', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.upgraded",
-        userId: "user-123",
-        tierId: "tier-pro",
-        previousTierId: "tier-free",
-        timestamp: new Date("2026-01-24T11:00:00Z"),
+        type: 'subscription.upgraded',
+        userId: 'user-123',
+        tierId: 'tier-pro',
+        previousTierId: 'tier-free',
+        timestamp: new Date('2026-01-24T11:00:00Z'),
         metadata: {
-          subscriptionId: "sub-123",
-          status: "ACTIVE",
+          subscriptionId: 'sub-123',
+          status: 'ACTIVE',
         },
       };
 
       const tracked = trackSubscriptionEvent(event);
 
-      expect(tracked.type).toBe("subscription.upgraded");
-      expect(tracked.previousTierId).toBe("tier-free");
-      expect(tracked.tierId).toBe("tier-pro");
+      expect(tracked.type).toBe('subscription.upgraded');
+      expect(tracked.previousTierId).toBe('tier-free');
+      expect(tracked.tierId).toBe('tier-pro');
     });
 
-    it("creates a subscription.downgraded event", () => {
+    it('creates a subscription.downgraded event', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.downgraded",
-        userId: "user-123",
-        tierId: "tier-free",
-        previousTierId: "tier-pro",
-        timestamp: new Date("2026-01-24T12:00:00Z"),
+        type: 'subscription.downgraded',
+        userId: 'user-123',
+        tierId: 'tier-free',
+        previousTierId: 'tier-pro',
+        timestamp: new Date('2026-01-24T12:00:00Z'),
         metadata: {
-          subscriptionId: "sub-123",
-          status: "ACTIVE",
+          subscriptionId: 'sub-123',
+          status: 'ACTIVE',
         },
       };
 
       const tracked = trackSubscriptionEvent(event);
 
-      expect(tracked.type).toBe("subscription.downgraded");
-      expect(tracked.previousTierId).toBe("tier-pro");
-      expect(tracked.tierId).toBe("tier-free");
+      expect(tracked.type).toBe('subscription.downgraded');
+      expect(tracked.previousTierId).toBe('tier-pro');
+      expect(tracked.tierId).toBe('tier-free');
     });
 
-    it("creates a subscription.cancelled event", () => {
+    it('creates a subscription.cancelled event', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.cancelled",
-        userId: "user-123",
-        tierId: "tier-pro",
+        type: 'subscription.cancelled',
+        userId: 'user-123',
+        tierId: 'tier-pro',
         previousTierId: null,
-        timestamp: new Date("2026-01-24T13:00:00Z"),
+        timestamp: new Date('2026-01-24T13:00:00Z'),
         metadata: {
-          subscriptionId: "sub-123",
-          status: "CANCELLED",
-          reason: "user_request",
+          subscriptionId: 'sub-123',
+          status: 'CANCELLED',
+          reason: 'user_request',
         },
       };
 
       const tracked = trackSubscriptionEvent(event);
 
-      expect(tracked.type).toBe("subscription.cancelled");
-      expect(tracked.metadata?.reason).toBe("user_request");
+      expect(tracked.type).toBe('subscription.cancelled');
+      expect(tracked.metadata?.reason).toBe('user_request');
     });
 
-    it("creates a subscription.expired event", () => {
+    it('creates a subscription.expired event', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.expired",
-        userId: "user-123",
-        tierId: "tier-pro",
+        type: 'subscription.expired',
+        userId: 'user-123',
+        tierId: 'tier-pro',
         previousTierId: null,
-        timestamp: new Date("2026-01-24T14:00:00Z"),
+        timestamp: new Date('2026-01-24T14:00:00Z'),
         metadata: {
-          subscriptionId: "sub-123",
-          status: "EXPIRED",
+          subscriptionId: 'sub-123',
+          status: 'EXPIRED',
         },
       };
 
       const tracked = trackSubscriptionEvent(event);
 
-      expect(tracked.type).toBe("subscription.expired");
-      expect(tracked.metadata?.status).toBe("EXPIRED");
+      expect(tracked.type).toBe('subscription.expired');
+      expect(tracked.metadata?.status).toBe('EXPIRED');
     });
 
-    it("logs event at info level", () => {
+    it('logs event at info level', () => {
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
         timestamp: new Date(),
         metadata: {},
@@ -136,20 +145,20 @@ describe("Subscription Telemetry", () => {
       trackSubscriptionEvent(event);
 
       expect(logger.info).toHaveBeenCalledWith(
-        expect.stringContaining("[Subscription Telemetry]"),
+        expect.stringContaining('[Subscription Telemetry]'),
         expect.objectContaining({
-          eventType: "subscription.created",
-          userId: "user-123",
+          eventType: 'subscription.created',
+          userId: 'user-123',
         }),
       );
     });
 
-    it("sets timestamp to now if not provided", () => {
+    it('sets timestamp to now if not provided', () => {
       const beforeTime = new Date();
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
         timestamp: undefined,
         metadata: {},
@@ -158,58 +167,54 @@ describe("Subscription Telemetry", () => {
       const tracked = trackSubscriptionEvent(event);
       const afterTime = new Date();
 
-      expect(tracked.timestamp.getTime()).toBeGreaterThanOrEqual(
-        beforeTime.getTime(),
-      );
-      expect(tracked.timestamp.getTime()).toBeLessThanOrEqual(
-        afterTime.getTime(),
-      );
+      expect(tracked.timestamp.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
+      expect(tracked.timestamp.getTime()).toBeLessThanOrEqual(afterTime.getTime());
     });
   });
 
-  describe("emitSubscriptionEventToApi", () => {
+  describe('emitSubscriptionEventToApi', () => {
     const mockFetch = fetch as unknown as Mock;
 
-    it("sends event to /api/metrics/subscription-events endpoint", async () => {
+    it('sends event to /api/metrics/subscription-events endpoint', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 200,
         ok: true,
       });
 
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
-        timestamp: new Date("2026-01-24T10:00:00Z"),
+        timestamp: new Date('2026-01-24T10:00:00Z'),
         metadata: {},
       };
 
       await emitSubscriptionEventToApi(event);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        "/api/metrics/subscription-events",
+        '/api/metrics/subscription-events',
         expect.objectContaining({
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: expect.stringContaining("subscription.created"),
+          method: 'POST',
+          headers: expect.any(Headers),
+          body: expect.stringContaining('subscription.created'),
         }),
       );
     });
 
-    it("includes all required fields in API payload", async () => {
+    it('includes all required fields in API payload', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 200,
         ok: true,
       });
 
       const event: SubscriptionEvent = {
-        type: "subscription.upgraded",
-        userId: "user-123",
-        tierId: "tier-pro",
-        previousTierId: "tier-free",
-        timestamp: new Date("2026-01-24T11:00:00Z"),
-        metadata: { subscriptionId: "sub-123" },
+        type: 'subscription.upgraded',
+        userId: 'user-123',
+        tierId: 'tier-pro',
+        previousTierId: 'tier-free',
+        timestamp: new Date('2026-01-24T11:00:00Z'),
+        metadata: { subscriptionId: 'sub-123' },
       };
 
       await emitSubscriptionEventToApi(event);
@@ -217,20 +222,20 @@ describe("Subscription Telemetry", () => {
       const callArgs = (mockFetch as Mock).mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
 
-      expect(body.type).toBe("subscription.upgraded");
-      expect(body.userId).toBe("user-123");
-      expect(body.tierId).toBe("tier-pro");
-      expect(body.previousTierId).toBe("tier-free");
+      expect(body.type).toBe('subscription.upgraded');
+      expect(body.userId).toBe('user-123');
+      expect(body.tierId).toBe('tier-pro');
+      expect(body.previousTierId).toBe('tier-free');
       expect(body.timestamp).toBeDefined();
     });
 
-    it("handles API errors gracefully without throwing", async () => {
-      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+    it('handles API errors gracefully without throwing', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
         timestamp: new Date(),
         metadata: {},
@@ -240,16 +245,16 @@ describe("Subscription Telemetry", () => {
       await expect(emitSubscriptionEventToApi(event)).resolves.not.toThrow();
     });
 
-    it("logs debug message on successful emission", async () => {
+    it('logs debug message on successful emission', async () => {
       mockFetch.mockResolvedValueOnce({
         status: 200,
         ok: true,
       });
 
       const event: SubscriptionEvent = {
-        type: "subscription.created",
-        userId: "user-123",
-        tierId: "tier-free",
+        type: 'subscription.created',
+        userId: 'user-123',
+        tierId: 'tier-free',
         previousTierId: null,
         timestamp: new Date(),
         metadata: {},
@@ -258,18 +263,18 @@ describe("Subscription Telemetry", () => {
       await emitSubscriptionEventToApi(event);
 
       expect(logger.debug).toHaveBeenCalledWith(
-        expect.stringContaining("[Subscription Telemetry]"),
+        expect.stringContaining('[Subscription Telemetry]'),
         expect.anything(),
       );
     });
 
-    it("logs error when API emission fails", async () => {
-      mockFetch.mockRejectedValueOnce(new Error("API error"));
+    it('logs error when API emission fails', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('API error'));
 
       const event: SubscriptionEvent = {
-        type: "subscription.cancelled",
-        userId: "user-123",
-        tierId: "tier-pro",
+        type: 'subscription.cancelled',
+        userId: 'user-123',
+        tierId: 'tier-pro',
         previousTierId: null,
         timestamp: new Date(),
         metadata: {},
@@ -278,28 +283,28 @@ describe("Subscription Telemetry", () => {
       await emitSubscriptionEventToApi(event);
 
       expect(logger.error).toHaveBeenCalledWith(
-        expect.stringContaining("[Subscription Telemetry]"),
+        expect.stringContaining('[Subscription Telemetry]'),
         expect.anything(),
         expect.any(Error),
       );
     });
   });
 
-  describe("Event Type Support", () => {
-    it("supports all required event types", () => {
+  describe('Event Type Support', () => {
+    it('supports all required event types', () => {
       const eventTypes: SubscriptionEventType[] = [
-        "subscription.created",
-        "subscription.upgraded",
-        "subscription.downgraded",
-        "subscription.cancelled",
-        "subscription.expired",
+        'subscription.created',
+        'subscription.upgraded',
+        'subscription.downgraded',
+        'subscription.cancelled',
+        'subscription.expired',
       ];
 
       for (const eventType of eventTypes) {
         const event: SubscriptionEvent = {
           type: eventType,
-          userId: "user-123",
-          tierId: "tier-free",
+          userId: 'user-123',
+          tierId: 'tier-free',
           previousTierId: null,
           timestamp: new Date(),
           metadata: {},

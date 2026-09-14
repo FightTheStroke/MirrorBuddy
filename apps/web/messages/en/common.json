@@ -1,5 +1,14 @@
 {
   "common": {
+    "session": {
+      "logoutCurrent": "Sign out of this session",
+      "logoutAll": "Sign out of all devices",
+      "loggingOut": "Signing out…",
+      "logoutFailed": "Sign-out failed. Your data has not been cleared. Please retry.",
+      "legacyFamily": "This session comes from an older sign-in: signing out also ends other older sign-ins for this account. Sessions from a fresh sign-in stay active.",
+      "unavailable": "We cannot verify your sign-in. Account operations are paused; your choices are preserved.",
+      "retry": "Retry sign-in verification"
+    },
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",

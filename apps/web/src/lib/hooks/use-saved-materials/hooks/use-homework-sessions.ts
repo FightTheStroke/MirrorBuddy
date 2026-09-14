@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Subject } from '@/types';
-import { getUserId } from '../utils/user-id';
+import { isCurrentOwner, useMaterialOwner } from '../utils/use-material-owner';
 import {
   fetchMaterials,
   saveMaterialToAPI,
@@ -17,38 +17,46 @@ import type { SavedHomework, HomeworkStep } from '../types';
 export function useHomeworkSessions() {
   const [sessions, setSessions] = useState<SavedHomework[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = getUserId();
+  const { userId, identity, identityError } = useMaterialOwner();
+  const [error, setError] = useState<string | null>(null);
+  const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
 
   const loadSessions = useCallback(async () => {
     setLoading(true);
-    const materials = await fetchMaterials('homework', userId);
-    const mapped: SavedHomework[] = materials.map((m) => {
-      const content = m.content as {
-        steps?: HomeworkStep[];
-        problemType?: string;
-        photoUrl?: string;
-        completedAt?: string;
-      };
-      return {
-        id: m.toolId,
-        title: m.title,
-        subject: (m.subject || 'mathematics') as Subject,
-        problemType: content.problemType || 'Esercizio',
-        photoUrl: content.photoUrl,
-        steps: content.steps || [],
-        createdAt: new Date(m.createdAt),
-        completedAt: content.completedAt ? new Date(content.completedAt) : undefined,
-      };
-    });
-    setSessions(mapped);
-    setLoading(false);
-  }, [userId]);
+    try {
+      const materials = await fetchMaterials('homework', userId);
+      if (!isCurrentOwner(identity)) return;
+      const mapped: SavedHomework[] = materials.map((m) => {
+        const content = m.content as {
+          steps?: HomeworkStep[];
+          problemType?: string;
+          photoUrl?: string;
+          completedAt?: string;
+        };
+        return {
+          id: m.toolId,
+          title: m.title,
+          subject: (m.subject || 'mathematics') as Subject,
+          problemType: content.problemType || 'Esercizio',
+          photoUrl: content.photoUrl,
+          steps: content.steps || [],
+          createdAt: new Date(m.createdAt),
+          completedAt: content.completedAt ? new Date(content.completedAt) : undefined,
+        };
+      });
+      setSessions(mapped);
+      setLoadedOwner(userId);
+      setError(null);
+    } catch {
+      if (isCurrentOwner(identity)) setError('MATERIALS_UNAVAILABLE');
+    } finally {
+      if (isCurrentOwner(identity)) setLoading(false);
+    }
+  }, [userId, identity]);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadSessions();
   }, [loadSessions]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const saveSession = useCallback(
     async (homework: Omit<SavedHomework, 'id' | 'createdAt'>) => {
@@ -62,14 +70,14 @@ export function useHomeworkSessions() {
           photoUrl: homework.photoUrl,
           completedAt: homework.completedAt?.toISOString(),
         },
-        { subject: homework.subject }
+        { subject: homework.subject },
       );
       if (saved) {
         await loadSessions();
       }
       return saved;
     },
-    [userId, loadSessions]
+    [userId, loadSessions],
   );
 
   const updateSession = useCallback(async (homework: SavedHomework) => {
@@ -81,12 +89,10 @@ export function useHomeworkSessions() {
         photoUrl: homework.photoUrl,
         completedAt: homework.completedAt?.toISOString(),
       },
-      homework.title
+      homework.title,
     );
     if (success) {
-      setSessions((prev) =>
-        prev.map((s) => (s.id === homework.id ? homework : s))
-      );
+      setSessions((prev) => prev.map((s) => (s.id === homework.id ? homework : s)));
     }
     return success;
   }, []);
@@ -100,7 +106,8 @@ export function useHomeworkSessions() {
   }, []);
 
   return {
-    sessions,
+    sessions: userId && loadedOwner === userId ? sessions : [],
+    error: identityError || error,
     loading,
     saveSession,
     updateSession,
@@ -108,4 +115,3 @@ export function useHomeworkSessions() {
     reload: loadSessions,
   };
 }
-

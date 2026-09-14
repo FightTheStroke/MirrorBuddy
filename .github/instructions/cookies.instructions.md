@@ -1,13 +1,14 @@
 ---
 description: 'Cookie handling, auth patterns, and CSRF rules'
-applyTo: 'src/lib/auth/**/*.ts,src/app/api/**/*.ts'
+applyTo: 'apps/web/src/lib/auth/**/*,apps/web/src/app/api/**/*.ts'
 ---
 
 # Cookie & Auth
 
 ## Cookie Constants
 
-ALWAYS import from `src/lib/auth/cookie-constants.ts` — NEVER hardcode
+ALWAYS import from `@/lib/auth/cookie-constants`
+(`apps/web/src/lib/auth/cookie-constants.ts`) — NEVER hardcode
 
 ## Auth
 

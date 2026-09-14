@@ -614,6 +614,12 @@
         },
         "descriptions": {
           "step1": "Step1",
+          "step1Items": {
+            "profile": "Profil",
+            "settings": "Einstellungen",
+            "progress": "Lernfortschritt",
+            "conversations": "Gespräche"
+          },
           "step2": "Step2",
           "step3": "Step3"
         },

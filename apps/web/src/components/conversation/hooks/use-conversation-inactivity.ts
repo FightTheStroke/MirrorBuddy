@@ -7,7 +7,9 @@
 import { useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
-import { getOrCreateUserId, endConversationWithSummary } from '../utils/conversation-helpers';
+import { endConversationWithSummary } from '../utils/conversation-helpers';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
+import { getClientIdentity } from '@/lib/auth/client-auth';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 
 interface ConversationsByCharacter {
@@ -26,8 +28,9 @@ interface ConversationsByCharacter {
 export function useConversationInactivity(
   isActive: boolean,
   activeCharacter: ActiveCharacter | null,
-  conversationsByCharacter: ConversationsByCharacter
+  conversationsByCharacter: ConversationsByCharacter,
 ) {
+  const identity = useClientIdentity();
   // Register inactivity timeout callback on mount
   useEffect(() => {
     inactivityMonitor.setTimeoutCallback(async (conversationId: string) => {
@@ -44,36 +47,39 @@ export function useConversationInactivity(
   useEffect(() => {
     if (!isActive || !activeCharacter) return;
 
-    const userId = getOrCreateUserId();
-    if (!userId) return;
+    if (identity.status !== 'authenticated') return;
+    const userId = identity.userId;
 
     const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
     if (!conversationId) return;
 
     // Start/reset inactivity timer
     inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
-    logger.debug('Tracking conversation activity', { conversationId, characterId: activeCharacter.id });
-  }, [isActive, activeCharacter, conversationsByCharacter]);
+    logger.debug('Tracking conversation activity', {
+      conversationId,
+      characterId: activeCharacter.id,
+    });
+  }, [isActive, activeCharacter, conversationsByCharacter, identity]);
 
   // Auto-generate summary when user closes browser/tab
   useEffect(() => {
     if (!isActive || !activeCharacter) return;
 
-    const userId = getOrCreateUserId();
-    if (!userId) return;
+    if (identity.status !== 'authenticated') return;
+    const userId = identity.userId;
 
     const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
     if (!conversationId) return;
 
     const handleBeforeUnload = () => {
+      if (getClientIdentity() !== identity) return;
       // Best-effort: sendBeacon may not complete before browser closes.
       // Inactivity timeout (INACTIVITY_TIMEOUT_MS) serves as fallback for summary generation.
       navigator.sendBeacon(
         `/api/conversations/${conversationId}/end`,
-        new Blob(
-          [JSON.stringify({ userId, reason: 'browser_close' })],
-          { type: 'application/json' }
-        )
+        new Blob([JSON.stringify({ userId, reason: 'browser_close' })], {
+          type: 'application/json',
+        }),
       );
     };
 
@@ -82,5 +88,5 @@ export function useConversationInactivity(
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [isActive, activeCharacter, conversationsByCharacter]);
+  }, [isActive, activeCharacter, conversationsByCharacter, identity]);
 }

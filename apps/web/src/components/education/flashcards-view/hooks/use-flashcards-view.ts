@@ -4,17 +4,13 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type {
-  FlashcardDeck,
-  Flashcard,
-  Subject,
-  Rating,
-  Maestro,
-} from '@/types';
+import type { FlashcardDeck, Flashcard, Subject, Rating, Maestro } from '@/types';
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
 import { sendAdaptiveSignals } from '@/lib/education';
 import { csrfFetch } from '@/lib/auth';
+import { getClientIdentity } from '@/lib/auth/client-auth';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 
 interface UseFlashcardsViewOptions {
   initialMaestroId?: string | null;
@@ -22,6 +18,8 @@ interface UseFlashcardsViewOptions {
 }
 
 export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
+  const identity = useClientIdentity();
+  const [error, setError] = useState<string | null>(null);
   const { initialMaestroId, initialMode } = options;
   const initialProcessed = useRef(false);
 
@@ -44,21 +42,23 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
     }
   }, [initialMaestroId, initialMode]);
 
-  const handleMaestroConfirm = useCallback(
-    (_maestro: Maestro, _mode: 'voice' | 'chat') => {
-      setShowMaestroDialog(false);
-      // Focus mode has been removed
-    },
-    []
-  );
+  const handleMaestroConfirm = useCallback((_maestro: Maestro, _mode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    // Focus mode has been removed
+  }, []);
 
   const loadDecks = useCallback(async () => {
     setLoading(true);
     try {
+      if (identity.status === 'anonymous') {
+        setDecks([]);
+        return;
+      }
       const userId = getUserId();
       const response = await fetch(
-        `/api/materials?userId=${userId}&toolType=flashcard&status=active`
+        `/api/materials?userId=${userId}&toolType=flashcard&status=active`,
       );
+      if (!response.ok) throw new Error('FLASHCARDS_UNAVAILABLE');
       if (response.ok) {
         const data = await response.json();
         const loadedDecks: FlashcardDeck[] = (data.materials || []).map(
@@ -78,25 +78,25 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
               lastReview: c.lastReview ? new Date(c.lastReview) : undefined,
             })),
             createdAt: new Date(m.createdAt),
-          })
+          }),
         );
-        setDecks(loadedDecks);
+        if (getClientIdentity() === identity) setDecks(loadedDecks);
       }
+      setError(null);
     } catch {
-      // Silent failure
+      setError('FLASHCARDS_UNAVAILABLE');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, []);
+  }, [identity]);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const saveDeckToAPI = useCallback(async (deck: FlashcardDeck) => {
     const userId = getUserId();
-    await csrfFetch('/api/materials', {
+    const response = await csrfFetch('/api/materials', {
       method: 'POST',
       body: JSON.stringify({
         userId,
@@ -107,16 +107,22 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
         subject: deck.subject,
       }),
     });
+    if (!response.ok) throw new Error('FLASHCARDS_SAVE_FAILED');
   }, []);
 
   const saveDecks = useCallback(
     async (newDecks: FlashcardDeck[]) => {
-      setDecks(newDecks);
-      for (const deck of newDecks) {
-        await saveDeckToAPI(deck);
+      try {
+        for (const deck of newDecks) {
+          await saveDeckToAPI(deck);
+        }
+        setDecks(newDecks);
+        setError(null);
+      } catch {
+        setError('FLASHCARDS_SAVE_FAILED');
       }
     },
-    [saveDeckToAPI]
+    [saveDeckToAPI],
   );
 
   const handleRating = useCallback(
@@ -138,9 +144,7 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
       });
 
       saveDecks(updatedDecks);
-      setSelectedDeck(
-        updatedDecks.find((d) => d.id === selectedDeck.id) || null
-      );
+      setSelectedDeck(updatedDecks.find((d) => d.id === selectedDeck.id) || null);
 
       sendAdaptiveSignals([
         {
@@ -151,7 +155,7 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
         },
       ]);
     },
-    [selectedDeck, decks, saveDecks]
+    [selectedDeck, decks, saveDecks],
   );
 
   const handleStudyComplete = useCallback(() => {
@@ -161,16 +165,18 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   const deleteDeck = useCallback(
     async (deckId: string) => {
       try {
-        await csrfFetch(`/api/materials?toolId=${deckId}`, { method: 'DELETE' });
+        getUserId();
+        const response = await csrfFetch(`/api/materials?toolId=${deckId}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('FLASHCARDS_DELETE_FAILED');
         setDecks(decks.filter((d) => d.id !== deckId));
         if (selectedDeck?.id === deckId) {
           setSelectedDeck(null);
         }
       } catch {
-        // Silent failure
+        setError('FLASHCARDS_DELETE_FAILED');
       }
     },
-    [decks, selectedDeck]
+    [decks, selectedDeck],
   );
 
   const closeStudyModal = useCallback(() => {
@@ -199,7 +205,8 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   }, [isStudying, showCreateModal, closeStudyModal, closeCreateModal]);
 
   return {
-    decks,
+    decks: identity.status === 'authenticated' ? decks : [],
+    error,
     loading,
     selectedDeck,
     isStudying,

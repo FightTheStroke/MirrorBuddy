@@ -296,10 +296,10 @@ describe('publish-admin-counts helper', () => {
       const result = await calculateAndPublishAdminCounts();
 
       expect(result.success).toBe(true);
-      expect(result.counts).toEqual({
+      expect(result.counts).toMatchObject({
         pendingInvites: 5,
         totalUsers: 100,
-        activeUsers24h: 3,
+        activeUsers24h: null,
         systemAlerts: 2,
         timestamp: expect.any(String),
       });
@@ -316,9 +316,9 @@ describe('publish-admin-counts helper', () => {
 
       const result = await calculateAndPublishAdminCounts();
 
-      expect(result.success).toBe(false);
-      expect(result.error).toBeTruthy();
-      expect(result.counts).toBeUndefined();
+      expect(result.success).toBe(true);
+      expect(result.counts?.pendingInvites).toBeNull();
+      expect(result.counts?.metrics?.pendingInvites.status).toBe('failed');
     });
 
     it('includes duration in result', async () => {

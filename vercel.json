@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "ignoreCommand": "exit 0",
+  "git": { "deploymentEnabled": false },
+  "ignoreCommand": null,
+  "buildCommand": "tsx scripts/build-with-production-proof.ts",
   "regions": ["fra1"],
   "crons": [
     {

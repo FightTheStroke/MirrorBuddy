@@ -7,12 +7,14 @@ vi.mock('@/lib/db', async () => {
 
 import { prisma } from '@/lib/db';
 import { hasStage, recordFunnelEvent, recordStageTransition } from '../index';
+import { permitOptionalAnalytics } from '@/lib/telemetry/__tests__/analytics-fixtures';
 
 const mockCreate = vi.mocked(prisma.funnelEvent.create);
 const mockFindFirst = vi.mocked(prisma.funnelEvent.findFirst);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  permitOptionalAnalytics();
 });
 
 describe('hasStage', () => {

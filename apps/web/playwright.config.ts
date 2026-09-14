@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 import { config } from 'dotenv';
 import { isSupabaseUrl } from './src/lib/utils/url-validation';
+import { E2E_SESSION_SECRET } from './e2e/helpers/session-token-factory';
 
 // Load .env file for TEST_DATABASE_URL
 config();
@@ -361,7 +362,7 @@ export default defineConfig({
       NODE_ENV: process.env.CI ? 'production' : 'development',
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match
-      SESSION_SECRET: 'e2e-test-session-secret-32-characters-min',
+      SESSION_SECRET: E2E_SESSION_SECRET,
       // CRON_SECRET for data-retention tests (ensures 401 when missing auth header)
       CRON_SECRET: 'e2e-test-cron-secret',
       // Enable Ollama provider flag to bypass /landing redirect (no actual Ollama needed)

@@ -5,14 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { DailyChart } from './daily-chart';
 import type { VoiceMetricsData } from '../types';
 import { useTranslations } from 'next-intl';
+import { AnalyticsValue } from './analytics-truth';
 
-function formatNumber(n: number): string {
-  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return n.toString();
-}
-
-function MetricBox({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+function MetricBox({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: React.ReactNode;
+  sub?: React.ReactNode;
+}) {
   return (
     <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
       <p className="text-[10px] text-slate-500">{label}</p>
@@ -24,9 +27,6 @@ function MetricBox({ label, value, sub }: { label: string; value: string | numbe
 
 export function VoiceMetricsCard({ data }: { data: VoiceMetricsData | null }) {
   const t = useTranslations('admin');
-  const voice = data?.voice;
-  const tts = data?.tts;
-  const realtime = data?.realtime;
 
   return (
     <Card>
@@ -40,21 +40,36 @@ export function VoiceMetricsCard({ data }: { data: VoiceMetricsData | null }) {
       <CardContent className="space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <MetricBox
-            label="Voice Sessions"
-            value={voice?.totalSessions ?? 0}
-            sub={`${(voice?.avgSessionMinutes ?? 0).toFixed(1)} min avg`}
+            label={t('metricTruth.voiceSessions')}
+            value={<AnalyticsValue data={data} path="voice.totalSessions" />}
+            sub={
+              <AnalyticsValue
+                data={data}
+                path="voice.avgSessionMinutes"
+                format={(value) => value.toFixed(1)}
+              />
+            }
           />
           <MetricBox
-            label="TTS Generations"
-            value={tts?.totalGenerations ?? 0}
-            sub={`${formatNumber(tts?.totalCharacters ?? 0)} chars`}
+            label={t('metricTruth.ttsGenerations')}
+            value={<AnalyticsValue data={data} path="tts.totalGenerations" />}
+            sub={<AnalyticsValue data={data} path="tts.totalCharacters" />}
           />
           <MetricBox
-            label="Realtime Sessions"
-            value={realtime?.totalSessions ?? 0}
-            sub={`${(realtime?.totalMinutes ?? 0).toFixed(1)} min`}
+            label={t('metricTruth.realtimeSessions')}
+            value={<AnalyticsValue data={data} path="realtime.totalSessions" />}
+            sub={<AnalyticsValue data={data} path="realtime.totalMinutes" />}
           />
-          <MetricBox label="Total Voice Minutes" value={(voice?.totalMinutes ?? 0).toFixed(0)} />
+          <MetricBox
+            label={t('metricTruth.voiceMinutes')}
+            value={
+              <AnalyticsValue
+                data={data}
+                path="voice.totalMinutes"
+                format={(value) => value.toFixed(1)}
+              />
+            }
+          />
         </div>
         {data?.dailySessions && (
           <DailyChart data={data.dailySessions} label="Daily Sessions" color="green" />

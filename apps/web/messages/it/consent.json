@@ -98,16 +98,43 @@
       "consequencesText": "Il ritiro di determinati consensi potrebbe impedire l'accesso a specifiche funzioni della piattaforma.",
       "contactSupport": "Contatta il Supporto"
     },
+    "sync": {
+      "cannotRetry": "Questo tentativo non può essere ripetuto. Ricarica la pagina per rivedere le tue scelte.",
+      "reload": "Ricarica la pagina",
+      "startingTrial": "Avvio della prova in corso...",
+      "trialStartFailed": "Non siamo riusciti a completare l'avvio della prova. Riprova ad avviarla.",
+      "retryTrial": "Riprova ad avviare la prova",
+      "reloading": "Ricaricamento della pagina in corso...",
+      "reloadFailed": "Le scelte su questo dispositivo sono state cancellate, ma la pagina non si è ricaricata. Ricaricala per continuare.",
+      "saving": "Salvataggio della scelta in corso...",
+      "failed": "Non siamo riusciti a salvare o sincronizzare la scelta. Riprova senza rispondere di nuovo.",
+      "changed": "La sessione o la scelta è cambiata. La scelta precedente non può essere reinviata: fai una nuova scelta esplicita.",
+      "newDecision": "Nuova scelta per questa sessione",
+      "saveNewChoice": "Salva la nuova scelta",
+      "pending": "La scelta è in attesa di sincronizzazione.",
+      "retry": "Riprova il salvataggio",
+      "dateUnavailable": "Data non registrata",
+      "decisionDate": "Data della scelta:",
+      "termsAccepted": "Termini accettati",
+      "termsRequired": "Accettazione dei termini ancora necessaria",
+      "unanswered": "Analisi facoltative: nessuna scelta registrata",
+      "optedIn": "Analisi facoltative: consenso richiesto dall'utente",
+      "refused": "Analisi facoltative: rifiutate",
+      "analyticsDescription": "Puoi scegliere se consentire l'analisi dell'utilizzo per migliorare l'app. Questa scelta è separata dai termini e non è necessaria per studiare.",
+      "collectionOff": "La raccolta delle analisi facoltative è disattivata, anche se la tua scelta è attiva.",
+      "persisted": "Scelta salvata nel tuo account.",
+      "received": "Scelta ricevuta dal server, non salvata in un account."
+    },
     "inline": {
-      "acceptedText": "Consenso accettato",
+      "acceptedText": "Scelta dei cookie registrata",
       "manage": "Gestisci preferenze",
-      "acceptButton": "Accetta Cookie",
+      "acceptButton": "Salva scelta dei cookie",
       "info": "Informazioni",
       "title": "Cookie e Privacy",
       "description": "Utilizziamo cookie essenziali per il funzionamento del sito",
       "learnMore": "Scopri di più",
       "analyticsLabel": "Analytics (opzionale)",
-      "submitButton": "Accetta"
+      "submitButton": "Salva scelta"
     },
     "unified": {
       "loading": "Caricamento...",
@@ -145,15 +172,15 @@
       },
       "analytics": {
         "label": "Analytics Opzionali",
-        "description": "Aiutaci a migliorare l'app (anonimo)"
+        "description": "Aiutaci a migliorare l'app con le statistiche di utilizzo"
       },
       "buttons": {
         "disabled": "Accetta per continuare",
         "accept": "Accetta e Continua",
         "submitting": "Salvataggio...",
         "learnMore": "Scopri di più",
-        "rejectAll": "Rifiuta tutto",
-        "acceptAll": "Accetta tutto"
+        "rejectAll": "Rifiuta le analisi facoltative",
+        "acceptAll": "Consenti le analisi facoltative"
       },
       "coppa": "Se hai meno di 13 anni, è necessario il consenso dei genitori",
       "screenReader": {
@@ -161,7 +188,7 @@
         "submitting": "Salvataggio del consenso in corso..."
       },
       "bannerTitle": "Informativa",
-      "bannerRights": "Puoi liberamente prestare, rifiutare o revocare il tuo consenso, in qualsiasi momento. Usa il pulsante \"Accetta tutto\" per acconsentire. Usa il pulsante \"Rifiuta tutto\" per continuare senza accettare.",
+      "bannerRights": "Le analisi sono facoltative e disattivate inizialmente. Puoi rifiutarle o cambiare scelta nelle impostazioni. Questa scelta non accetta i termini: per studiare devi accettarli separatamente.",
       "categories": {
         "essential": "Necessari",
         "analytics": "Analytics (opzionale)"

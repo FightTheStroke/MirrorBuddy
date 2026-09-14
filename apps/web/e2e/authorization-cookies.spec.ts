@@ -4,7 +4,9 @@
 // Related: ADR 0075 Cookie Handling Standards
 // ============================================================================
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
+import { authenticateTestUser } from './helpers/auth-session';
+import { cleanupTestData } from './helpers/test-data';
 
 test.describe('Visitor ID Validation (UUID v4)', () => {
   test('Invalid visitor ID format - should be rejected', async ({ page, context }) => {
@@ -172,6 +174,9 @@ test.describe('Protected API Routes', () => {
 });
 
 test.describe('Cookie Consistency', () => {
+  test.afterEach(async () => {
+    await cleanupTestData();
+  });
   // /api/user auto-creates users only in dev mode (ADR 0151).
   // In CI, the server runs in production mode (next start), so these tests
   // are skipped — cookie signing is covered by unit tests and auth-fixtures.
@@ -203,14 +208,17 @@ test.describe('Cookie Consistency', () => {
     // Client cookie should NOT be httpOnly
     expect(clientCookie!.httpOnly).toBe(false);
 
-    // Both should have same user ID (before signature)
-    const serverUserId = serverCookie!.value.split('.')[0];
-    const clientUserId = clientCookie!.value;
-    expect(serverUserId).toBe(clientUserId);
+    // The opaque handle is not an identity claim; /me resolves its durable owner.
+    expect(serverCookie!.value).toMatch(/^s2:[\w-]{43}\.[a-f0-9]{64}$/);
+    const me = await page.request.get('/api/auth/me');
+    expect(me.status()).toBe(200);
+    const identity = await me.json();
+    expect(identity.user.id).toBe(clientCookie!.value);
+    expect(serverCookie!.value.split('.')[0]).not.toBe(clientCookie!.value);
   });
 
   test('Cookies cleared on logout', async ({ page, context }) => {
-    // First create a user
+    await authenticateTestUser(context);
     await page.goto('/api/user');
     await page.waitForLoadState('domcontentloaded');
 

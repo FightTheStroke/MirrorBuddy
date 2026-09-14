@@ -6,20 +6,14 @@
 /**
  * Admin KPI metrics sent via pub/sub to SSE clients
  */
-export interface AdminCounts {
-  pendingInvites: number;
-  totalUsers: number;
-  activeUsers24h: number;
-  systemAlerts: number;
-  timestamp: string;
-}
+export type { AdminCounts } from '@/lib/admin/admin-counts-service';
 
 /**
  * Redis pub/sub channel for admin counts updates
  */
-export const CHANNEL = "admin:counts:update";
+export const CHANNEL = 'admin:counts:update';
 
 /**
  * Redis storage key for latest admin counts (for initial SSE data)
  */
-export const STORAGE_KEY = "admin:counts:latest";
+export const STORAGE_KEY = 'admin:counts:latest';

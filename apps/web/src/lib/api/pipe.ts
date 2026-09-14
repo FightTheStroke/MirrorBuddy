@@ -20,6 +20,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import type { AuthenticatedSession } from '@/lib/auth/session-auth';
 
 /**
  * Custom API Error with status code
@@ -46,6 +47,7 @@ export interface MiddlewareContext {
   // Extended by middlewares:
   userId?: string;
   isAdmin?: boolean;
+  authSession?: AuthenticatedSession;
   [key: string]: unknown;
 }
 
@@ -183,6 +185,12 @@ export function pipe(...middlewares: Middleware[]) {
 
         if (error instanceof ApiError && error.details) {
           response.details = String(error.details);
+          if (
+            typeof error.details === 'object' &&
+            'code' in error.details &&
+            typeof error.details.code === 'string'
+          )
+            response.code = error.details.code;
         }
 
         return NextResponse.json(response, { status: statusCode });

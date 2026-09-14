@@ -4,7 +4,7 @@
  * F-12: Critical API Routes Tests
  */
 
-import { test, expect } from './fixtures/base-fixtures';
+import { test, expect } from './fixtures/user-fixtures';
 
 test.describe('Chat Stream API - Validation', () => {
   test('POST /api/chat/stream - returns 400 without messages', async ({ request }) => {

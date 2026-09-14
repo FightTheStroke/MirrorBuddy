@@ -22,15 +22,15 @@ concurrency:
 # https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
 
 env:
-  NODE_VERSION: "20"
-  VERCEL_CLI_VERSION: "56.3.2"
+  NODE_VERSION: '24'
+  VERCEL_CLI_VERSION: '56.3.2'
   # This workflow holds no Azure voice credentials on purpose: every run would
   # otherwise cost real money and carry a production key into a test job. The
   # browser console audit reads this flag to accept the 503 the realtime voice
   # endpoints are designed to return when no credentials exist. The post-deploy
   # smoke run against the live site does not set it, so a real voice outage
   # there still fails.
-  E2E_VOICE_UNCONFIGURED: "true"
+  E2E_VOICE_UNCONFIGURED: 'true'
 
 jobs:
   # =========================================================================
@@ -62,6 +62,7 @@ jobs:
             src:
               - 'src/**'
               - 'apps/web/src/**'
+              - 'packages/*/src/**'
               - 'public/**'
               - 'apps/web/public/**'
             ui:
@@ -74,6 +75,10 @@ jobs:
               - 'public/**'
               - 'apps/web/public/**'
               - 'apps/web/messages/**'
+              - 'packages/ui/src/**'
+              - 'packages/accessibility/src/**'
+              - 'packages/ui/package.json'
+              - 'packages/accessibility/package.json'
             mobile:
               - 'ios/**'
               - 'android/**'
@@ -82,6 +87,10 @@ jobs:
               - 'src/components/mobile/**'
               - 'apps/web/src/lib/native/**'
               - 'apps/web/src/components/mobile/**'
+              - 'packages/ui/src/**'
+              - 'packages/accessibility/src/**'
+              - 'packages/ui/package.json'
+              - 'packages/accessibility/package.json'
             prisma:
               - 'apps/web/prisma/**'
               - 'prisma.config.ts'
@@ -91,6 +100,7 @@ jobs:
               - 'src/lib/i18n/**'
               - 'apps/web/src/i18n/**'
               - 'apps/web/src/lib/i18n/**'
+              - 'packages/i18n/src/**'
             safety:
               - 'src/lib/safety/**'
               - 'src/lib/ai/**'
@@ -102,12 +112,17 @@ jobs:
               - 'apps/web/src/lib/privacy/**'
               - 'apps/web/src/lib/compliance/**'
               - 'apps/web/src/data/maestri/**'
+              - 'packages/safety/src/**'
+              - 'packages/ai-providers/src/**'
+              - 'packages/maestri/src/**'
             e2e:
               - 'apps/web/e2e/**'
               - 'apps/web/playwright.config*.ts'
               - 'playwright.config*.ts'
             config:
               - 'package.json'
+              - 'apps/web/package.json'
+              - 'packages/*/package.json'
               - 'pnpm-lock.yaml'
               - 'tsconfig*.json'
               - 'eslint.config.mjs'
@@ -255,7 +270,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for accurate scanning
+          fetch-depth: 0 # Full history for accurate scanning
 
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@main
@@ -518,7 +533,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
       - name: Install robot package with test extras
         working-directory: robot
         run: pip install -e ".[test]"
@@ -1169,7 +1184,7 @@ jobs:
           npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --reporter=list
         env:
           CI: true
-          CI_MOBILE_TESTS: "1"
+          CI_MOBILE_TESTS: '1'
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
@@ -1215,12 +1230,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: '17'
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -1377,7 +1392,7 @@ jobs:
           npx playwright test --config apps/web/playwright.config.ts --project=iphone-se --project=pixel-7 --project=ipad-mini --reporter=list
         env:
           CI: true
-          CI_MOBILE_TESTS: "1"
+          CI_MOBILE_TESTS: '1'
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
@@ -1881,7 +1896,7 @@ jobs:
   # accessibility-tests is ALWAYS required (WCAG 2.1 AA blocking).
   # ==========================================================================
   pr-gate:
-    name: "PR Gate"
+    name: 'PR Gate'
     runs-on: ubuntu-latest
     needs:
       - detect-changes
@@ -1959,7 +1974,7 @@ jobs:
   # Configure in Vercel: Settings → Git → "Wait for Deployment Checks"
   # ==========================================================================
   deployment-gate:
-    name: "✅ Deployment Gate"
+    name: '✅ Deployment Gate'
     runs-on: ubuntu-latest
     needs:
       - build
@@ -2078,19 +2093,21 @@ jobs:
   # DEPLOY TO STAGING (Vercel Preview)
   # ============================================================================
   # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
-  # On main, the auto-promote-production job then promotes this exact staging
-  # build to production automatically (gated on deployment-gate success).
+  # On main, auto-promote-production builds the same source with production
+  # values remotely, then verifies and promotes it (after deployment-gate success).
   # Git-triggered auto-deploy (push to main) is disabled via ignoreCommand in
-  # vercel.json (T0.1) — this job's explicit `vercel deploy --prebuilt` is the
-  # only path that reaches Vercel. The promote-to-production.yml workflow remains
+  # vercel.json (T0.1) — explicit CLI deployments below are the automated path.
+  # The promote-to-production.yml workflow remains
   # available for manual re-promote / rollback.
   # ============================================================================
   deploy-to-staging:
-    name: "🎪 Deploy to Staging"
+    name: '🎪 Deploy to Staging'
     runs-on: ubuntu-latest
     needs: [deployment-gate]
     outputs:
       deployment_url: ${{ steps.deploy.outputs.deployment_url }}
+      project_id: ${{ steps.deploy.outputs.project_id }}
+      org_id: ${{ steps.deploy.outputs.org_id }}
     if: |
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
@@ -2107,7 +2124,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '24'
 
       - name: Validate VERCEL_TOKEN is set
         run: |
@@ -2140,9 +2157,8 @@ jobs:
           # own DATABASE_URL (separate Supabase project). Copying the production
           # env here — as this step used to do — made every staging deployment
           # read and write the live production database.
-          # Promotion is unaffected: `vercel promote` rebuilds the deployment
-          # against the production environment, so production never inherits
-          # these values.
+          # Production is built separately from source in Vercel's production
+          # runtime; no production values are downloaded by the promotion job.
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Assert staging is not pointed at the production database
@@ -2164,7 +2180,11 @@ jobs:
           echo "✅ Staging database is distinct from production"
 
       - name: Build Project
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        # Local CLI builds do not inject Vercel system target variables.
+        env:
+          VERCEL_ENV: preview
+          VERCEL_TARGET_ENV: preview
+        run: vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Staging (Preview)
         id: deploy
@@ -2173,6 +2193,19 @@ jobs:
           echo "✅ Staging deployed to: $url"
           echo "DEPLOYMENT_URL=$url" >> $GITHUB_ENV
           echo "deployment_url=$url" >> $GITHUB_OUTPUT
+          # Transfer only non-secret project identity, never the preview env file.
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const link = JSON.parse(readFileSync('.vercel/project.json', 'utf8'));
+          if (typeof link?.projectId !== 'string' || link.projectId.trim() !== link.projectId ||
+              typeof link?.orgId !== 'string' || link.orgId.trim() !== link.orgId ||
+              !/^prj_[A-Za-z0-9_]+$/.test(link.projectId) ||
+              !/^team_[A-Za-z0-9_]+$/.test(link.orgId)) {
+            throw new Error('Invalid staging project metadata');
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT,
+            `project_id=${link.projectId}\norg_id=${link.orgId}\n`);
+          NODE
 
       - name: Verify Staging Health
         run: |
@@ -2295,16 +2328,13 @@ jobs:
   # ============================================================================
   # AUTO-PROMOTE TO PRODUCTION (gated_auto)
   # ============================================================================
-  # After staging deploys on main (all gates green), promote that exact build to
-  # production automatically. `vercel promote` rebuilds the deployment as
-  # production (~5min), so the production alias only flips once that build is
-  # Ready — we poll mirrorbuddy.org until it serves a FRESH ([Ns/Nm ago]) and
-  # healthy build before passing. A naive 15s wait would falsely pass against the
-  # OLD deployment. On success the staging reminder issue is closed; on failure it
-  # is left open as a signal to promote/rollback manually.
+  # After staging passes, build the exact source revision in Vercel's production
+  # runtime with aliases withheld. Validate READY + production + commit/run identity
+  # before promoting that ID, then verify both public aliases and health. A recent
+  # timestamp or the preview artifact is never accepted as production-build proof.
   # ============================================================================
   auto-promote-production:
-    name: "🚀 Auto-Promote to Production"
+    name: '🚀 Auto-Promote to Production'
     runs-on: ubuntu-latest
     needs: [deploy-to-staging]
     if: |
@@ -2312,9 +2342,21 @@ jobs:
       github.ref == 'refs/heads/main' &&
       needs.deploy-to-staging.result == 'success'
     env:
-      SCOPE: "--scope=team_nDwLfqx9JbVIs4C7Il79f4ln"
+      SCOPE: '--scope=team_nDwLfqx9JbVIs4C7Il79f4ln'
       STAGING_URL: ${{ needs.deploy-to-staging.outputs.deployment_url }}
+      VERCEL_PROJECT_ID: ${{ needs.deploy-to-staging.outputs.project_id }}
+      VERCEL_ORG_ID: ${{ needs.deploy-to-staging.outputs.org_id }}
     steps:
+      - name: Checkout expected production source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
       - name: Validate inputs
         run: |
           if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
@@ -2336,36 +2378,10 @@ jobs:
           fi
           echo "✅ Staging healthy (HTTP $status)"
 
-      - name: Promote staging → production
-        run: |
-          echo "🚀 Promoting $STAGING_URL to production..."
-          # --timeout=0: return immediately after requesting the promotion. vercel
-          # promote otherwise waits for completion with a 3m default, but the
-          # production rebuild takes ~5min, so without this the command would fail
-          # before the polling loop below runs. Readiness is verified by the poll.
-          vercel promote "$STAGING_URL" --token=${{ secrets.VERCEL_TOKEN }} $SCOPE --timeout=0 --yes
-          echo "✅ Promote command issued"
-
-      - name: Wait for production to go live (alias flip + health)
-        run: |
-          echo "Waiting for www.mirrorbuddy.org to serve the fresh build..."
-          deadline=$((SECONDS + 900))
-          while [ $SECONDS -lt $deadline ]; do
-            age=$(vercel inspect mirrorbuddy.org --token=${{ secrets.VERCEL_TOKEN }} $SCOPE 2>&1 | grep -iE "created" | head -1)
-            # -L: the apex 308-redirects to www (next.config.ts redirects()).
-            # Probing the apex without following it returns 308, never 200, and
-            # this loop would time out on a perfectly healthy production.
-            health=$(curl -sL -o /dev/null -w "%{http_code}" https://www.mirrorbuddy.org/api/health)
-            echo "  alias: $age | health: $health"
-            if [ "$health" = "200" ] && echo "$age" | grep -qE "\[[0-9]+(s|m) ago\]"; then
-              echo "✅ Production live and fresh"
-              exit 0
-            fi
-            sleep 20
-          done
-          echo "::error::Production alias did not flip to a fresh healthy build within 15min"
-          echo "Rollback/inspect: run promote-to-production.yml manually or 'vercel ls --prod'"
-          exit 1
+      - name: Build production source, verify identity, promote and check live aliases
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: node scripts/deploy-validated-production.mjs
 
       - name: Update GitHub Production deployment status
         if: success()
@@ -2379,7 +2395,7 @@ jobs:
               environment: 'Production',
               auto_merge: false,
               required_contexts: [],
-              description: `Auto-promoted from staging (${context.sha.slice(0, 7)})`,
+              description: `Validated production source build (${context.sha.slice(0, 7)})`,
             });
             await github.rest.repos.createDeploymentStatus({
               owner: context.repo.owner,
@@ -2387,7 +2403,7 @@ jobs:
               deployment_id: deployment.id,
               state: 'success',
               environment_url: 'https://www.mirrorbuddy.org',
-              description: 'Auto-promoted staging → production',
+              description: 'Production source build verified and promoted',
             });
 
       - name: Close staging reminder issue
@@ -2412,7 +2428,7 @@ jobs:
             const ok = '${{ job.status }}' === 'success';
             await core.summary
               .addHeading(`${ok ? '✅' : '❌'} Auto-Promote to Production`, 2)
-              .addRaw(ok ? 'Staging build promoted and verified live on https://www.mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
+              .addRaw(ok ? 'Production source build promoted and verified live on https://www.mirrorbuddy.org' : 'Promotion failed — reminder issue left open for manual action')
               .write();
 
   # ============================================================================
@@ -2438,9 +2454,11 @@ jobs:
   # and the database in step. The script is idempotent and never deletes.
   # ============================================================================
   sync-admin-credentials:
-    name: "🔑 Sync Admin Credentials"
+    name: '🔑 Sync Admin Credentials'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Setup precedes issuance; the browser has a separate 30-minute ceiling,
+    # leaving time for scoped cleanup even when it fails or times out.
+    timeout-minutes: 90
     needs: [auto-promote-production]
     if: |
       github.event_name == 'push' &&
@@ -2448,106 +2466,141 @@ jobs:
       needs.auto-promote-production.result == 'success'
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 3
 
       - name: Setup pnpm
+        timeout-minutes: 2
         uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
 
       - uses: actions/setup-node@v4
+        timeout-minutes: 2
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
+        timeout-minutes: 10
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
+        timeout-minutes: 3
         run: npx prisma generate
-
-      - name: Reconcile admin accounts
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          DIRECT_URL: ${{ secrets.DIRECT_URL }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
-        run: npm run seed:admin
-
-  # ============================================================================
-  # POST-DEPLOY PRODUCTION SMOKE — does the site actually work for a child?
-  # ============================================================================
-  # Until 28 August 2026 nothing ran against production after a promotion. The
-  # suite existed, and the credentials for its authenticated half had been in
-  # GitHub secrets since 2 August, but no workflow ever passed them in — so the
-  # 94 tests covering the signed-in experience, the ones that walk the screens
-  # where children actually meet the Maestri, never ran anywhere. A voice outage
-  # lasted a full day with every check green.
-  #
-  # This job runs the suite against the live site once the promotion succeeds,
-  # with those credentials supplied, so a broken production fails loudly here
-  # rather than in a child's session.
-  # ============================================================================
-  post-deploy-smoke:
-    name: "🔬 Post-Deploy Production Smoke"
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [auto-promote-production]
-    if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      needs.auto-promote-production.result == 'success'
-    steps:
-      - uses: actions/checkout@v4
-
-      # This repository installs with pnpm (workspace: protocol). Asking
-      # setup-node to cache npm makes it look for a package-lock.json that has
-      # never existed here, and the job dies before it can smoke anything —
-      # which is how a promotion could report success with production
-      # unverified.
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         timeout-minutes: 10
         run: npx playwright install chromium
 
-      # Best-effort apt half: the runner image already ships these packages, so
-      # a stuck dpkg lock costs five minutes instead of the whole job.
       - name: Install Playwright OS deps
         timeout-minutes: 5
         continue-on-error: true
         run: npx playwright install-deps chromium
 
+      - name: Reconcile admin accounts
+        id: reconcile
+        timeout-minutes: 3
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # Issuance must not create/re-enable an account or manufacture its role.
+          # Readonly provisioning/conversion remains an explicit prerequisite.
+          ADMIN_READONLY_EMAIL: ''
+        run: npm run seed:admin
+
+      - name: Issue temporary readonly smoke access
+        id: issue
+        timeout-minutes: 2
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+        run: pnpm run script -- scripts/readonly-smoke-session.ts issue --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
       - name: Smoke the live site
-        run: npm run test:smoke:prod
+        id: smoke
+        timeout-minutes: 30
+        run: |
+          set +x
+          unset DATABASE_URL DIRECT_URL DEV_DATABASE_URL TEST_DATABASE_URL TEST_DIRECT_URL
+          unset SESSION_SECRET SESSION_SECRET_PREVIOUS ADMIN_PASSWORD PGPASSWORD PII_ENCRYPTION_KEY
+          directory="$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if [[ ! -s "$directory/token" ]]; then
+            echo "::error::Readonly smoke credential is missing"
+            exit 1
+          fi
+          ADMIN_READONLY_COOKIE_VALUE="$(cat "$directory/token")"
+          if [[ -z "$ADMIN_READONLY_COOKIE_VALUE" || "$ADMIN_READONLY_COOKIE_VALUE" =~ [[:space:]] ]]; then
+            echo "::error::Readonly smoke credential is invalid"
+            exit 1
+          fi
+          export ADMIN_READONLY_COOKIE_VALUE
+          exec npm run test:smoke:prod
         env:
           PROD_TEST_USER_ID: ${{ secrets.PROD_TEST_USER_ID }}
           PROD_TEST_USER_COOKIE_VALUE: ${{ secrets.PROD_TEST_USER_COOKIE_VALUE }}
           PROD_TEST_USER_EMAIL: ${{ secrets.PROD_TEST_USER_EMAIL }}
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
-          ADMIN_READONLY_COOKIE_VALUE: ${{ secrets.ADMIN_READONLY_COOKIE_VALUE }}
 
-      - name: Keep the evidence when the live site misbehaves
-        if: failure()
+      - name: Revoke temporary readonly smoke access
+        id: revoke
+        timeout-minutes: 5
+        if: |
+          always() &&
+          (steps.issue.outcome == 'success' ||
+           steps.issue.outcome == 'failure' ||
+           steps.issue.outcome == 'cancelled')
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+        run: pnpm run script -- scripts/readonly-smoke-session.ts revoke --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+      # Revoking this session does not sanitize screenshots or revoke the
+      # separate student cookie. Never upload raw authenticated browser reports.
+      - name: Prepare sanitized smoke outcome
+        id: diagnostic
+        timeout-minutes: 1
+        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure'
+        run: |
+          umask 077
+          set -o noclobber
+          printf '%s\n' '{"smoke":"failure","revocation":"success"}' > "$RUNNER_TEMP/readonly-smoke-outcome-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.json"
+
+      - name: Keep only the sanitized failure outcome
+        id: upload
+        timeout-minutes: 2
+        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure' && steps.diagnostic.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: post-deploy-smoke-report
-          path: |
-            apps/web/test-results/
-            playwright-report/
+          path: ${{ runner.temp }}/readonly-smoke-outcome-${{ github.run_id }}-${{ github.run_attempt }}.json
+          if-no-files-found: error
           retention-days: 7
 
+  # Preserve the existing status check, without a second credential-bearing job.
+  post-deploy-smoke:
+    name: '🔬 Post-Deploy Production Smoke'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    needs: [auto-promote-production, sync-admin-credentials]
+    if: |
+      always() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.auto-promote-production.result == 'success'
+    steps:
+      - name: Require successful reconciliation, smoke and cleanup
+        run: test "${{ needs.sync-admin-credentials.result }}" = "success"
+
   robot-store:
-    name: "🤖 Publish to Robot App Store"
+    name: '🤖 Publish to Robot App Store'
     runs-on: ubuntu-latest
     needs: [robot-tests, auto-promote-production]
     if: |

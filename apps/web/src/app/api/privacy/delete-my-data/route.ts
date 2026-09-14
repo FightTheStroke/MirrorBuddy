@@ -6,17 +6,12 @@
  * Allows users to request complete deletion of their personal data.
  */
 
-import { NextResponse } from "next/server";
-import { cookies as getCookies } from "next/headers";
-import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
-import { getRequestLogger, getRequestId } from "@/lib/tracing";
-import { AUTH_COOKIE_NAME } from "@/lib/auth";
-import {
-  executeUserDataDeletion,
-  getUserDataSummary,
-  logDeletionAudit,
-} from "./helpers";
-
+import { NextResponse } from 'next/server';
+import { cookies as getCookies } from 'next/headers';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
+import { clearSessionCookies } from '@/lib/auth/session-cookies';
+import { executeUserDataDeletion, getUserDataSummary, logDeletionAudit } from './helpers';
 
 export const revalidate = 0;
 interface DeleteRequestBody {
@@ -45,7 +40,7 @@ interface DeleteResult {
  * This is irreversible and complies with GDPR Art. 17.
  */
 export const POST = pipe(
-  withSentry("/api/privacy/delete-my-data"),
+  withSentry('/api/privacy/delete-my-data'),
   withCSRF,
   withAuth,
 )(async (ctx): Promise<Response> => {
@@ -56,16 +51,16 @@ export const POST = pipe(
 
   if (!body.confirmDeletion) {
     const response = NextResponse.json(
-      { error: "Deletion must be explicitly confirmed" },
+      { error: 'Deletion must be explicitly confirmed' },
       { status: 400 },
     );
-    response.headers.set("X-Request-ID", getRequestId(ctx.req));
+    response.headers.set('X-Request-ID', getRequestId(ctx.req));
     return response;
   }
 
-  log.info("GDPR deletion request initiated", {
+  log.info('GDPR deletion request initiated', {
     userId: userId.slice(0, 8),
-    reason: body.reason || "not provided",
+    reason: body.reason || 'not provided',
   });
 
   // Execute deletion in transaction for atomicity
@@ -74,17 +69,16 @@ export const POST = pipe(
   // Log the deletion for audit (without PII)
   logDeletionAudit(userId, body.reason);
 
-  // Clear the user cookie
   const cookieStore = await getCookies();
-  cookieStore.delete(AUTH_COOKIE_NAME);
+  clearSessionCookies(cookieStore);
 
-  log.info("GDPR deletion completed", {
+  log.info('GDPR deletion completed', {
     userId: userId.slice(0, 8),
     ...result.deletedData,
   });
 
   const response = NextResponse.json(result as DeleteResult);
-  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;
 });
 
@@ -95,18 +89,18 @@ export const POST = pipe(
  * Helps users understand what deletion will remove.
  */
 export const GET = pipe(
-  withSentry("/api/privacy/delete-my-data"),
+  withSentry('/api/privacy/delete-my-data'),
   withAuth,
 )(async (ctx): Promise<Response> => {
   const userId = ctx.userId!;
 
   const summary = await getUserDataSummary(userId);
   const response = NextResponse.json({
-    userId: userId.slice(0, 8) + "...",
+    userId: userId.slice(0, 8) + '...',
     dataToBeDeleted: summary,
     warning:
-      "This action is irreversible. All your learning progress, conversations, and preferences will be permanently deleted.",
+      'This action is irreversible. All your learning progress, conversations, and preferences will be permanently deleted.',
   });
-  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  response.headers.set('X-Request-ID', getRequestId(ctx.req));
   return response;
 });

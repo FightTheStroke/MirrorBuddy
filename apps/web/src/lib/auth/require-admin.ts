@@ -23,6 +23,7 @@
 
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { AuthenticationError } from './auth-error';
 
 interface AdminCheckResult {
   authorized: boolean;
@@ -35,6 +36,7 @@ interface AdminCheckResult {
  * @returns Authorization result with error message if denied
  */
 export async function requireAdmin(userId: string): Promise<AdminCheckResult> {
+  if (!userId || typeof userId !== 'string') throw new AuthenticationError('SESSION_REJECTED');
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -55,7 +57,7 @@ export async function requireAdmin(userId: string): Promise<AdminCheckResult> {
     return { authorized: true };
   } catch (error) {
     logger.error('Admin check error', { userId, error: String(error) });
-    return { authorized: false, error: 'Authorization check failed' };
+    throw new AuthenticationError('SESSION_UNAVAILABLE');
   }
 }
 
@@ -64,6 +66,7 @@ export async function requireAdmin(userId: string): Promise<AdminCheckResult> {
  * For conditional UI rendering in server components
  */
 export async function isAdmin(userId: string): Promise<boolean> {
+  if (!userId || typeof userId !== 'string') throw new AuthenticationError('SESSION_REJECTED');
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -71,6 +74,6 @@ export async function isAdmin(userId: string): Promise<boolean> {
     });
     return user?.role === 'ADMIN';
   } catch {
-    return false;
+    throw new AuthenticationError('SESSION_UNAVAILABLE');
   }
 }

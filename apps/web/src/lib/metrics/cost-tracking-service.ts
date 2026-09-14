@@ -171,6 +171,7 @@ export async function checkUserDailyBudget(
 export async function getCostStats(
   from: Date,
   to: Date,
+  excludeTestData = false,
 ): Promise<{
   totalCost: number;
   avgCostPerSession: number;
@@ -178,7 +179,7 @@ export async function getCostStats(
   p95Cost: number;
 }> {
   const metrics = await prisma.sessionMetrics.findMany({
-    where: { createdAt: { gte: from, lte: to } },
+    where: { createdAt: { gte: from, lte: to }, ...(excludeTestData ? { isTestData: false } : {}) },
     select: { costEur: true },
     orderBy: { costEur: 'asc' },
   });

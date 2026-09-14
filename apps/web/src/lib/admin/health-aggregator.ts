@@ -10,12 +10,12 @@ import {
   checkResend,
   checkSentry,
   checkVercel,
-} from "./health-checks";
+} from './health-checks';
 import type {
   HealthAggregatorResponse,
   ServiceHealth,
   ServiceStatus,
-} from "./health-aggregator-types";
+} from './health-aggregator-types';
 
 const CACHE_TTL_MS = 30000; // 30 seconds
 
@@ -28,36 +28,37 @@ let cache: CachedHealth | null = null;
 
 /**
  * Determine overall status from individual service statuses
- * Only considers configured services in the calculation
+ * Required services and failed checks cannot disappear behind missing configuration.
  */
 function getOverallStatus(services: ServiceHealth[]): ServiceStatus {
-  // Filter to only configured services
-  const configuredServices = services.filter((s) => s.configured);
+  const configuredServices = services.filter(
+    (s) => s.required || s.configured || s.status === 'down',
+  );
 
   // If no services are configured, status is unknown
   if (configuredServices.length === 0) {
-    return "unknown";
+    return 'unknown';
   }
 
   const statuses = configuredServices.map((s) => s.status);
 
   // If any configured service is down, overall is down
-  if (statuses.includes("down")) {
-    return "down";
+  if (statuses.includes('down')) {
+    return 'down';
   }
 
   // If any configured service is degraded, overall is degraded
-  if (statuses.includes("degraded")) {
-    return "degraded";
+  if (statuses.includes('degraded')) {
+    return 'degraded';
   }
 
-  // If any configured service is unknown, overall is degraded (not fully healthy)
-  if (statuses.includes("unknown")) {
-    return "degraded";
+  // Unknown health is not a measured degradation or an optional integration being off.
+  if (statuses.includes('unknown')) {
+    return 'unknown';
   }
 
   // All configured services healthy
-  return "healthy";
+  return 'healthy';
 }
 
 /**
@@ -83,25 +84,32 @@ export async function aggregateHealth(): Promise<HealthAggregatorResponse> {
 
   // Extract successful results, use fallback for failures
   const services: ServiceHealth[] = results.map((result, index) => {
-    if (result.status === "fulfilled") {
-      return result.value;
+    const required = index === 0;
+    if (result.status === 'fulfilled' && result.value) {
+      return {
+        ...result.value,
+        required,
+        readiness: !result.value.configured
+          ? 'notConfigured'
+          : result.value.status === 'healthy'
+            ? 'ready'
+            : result.value.status === 'down' || result.value.status === 'degraded'
+              ? 'notReady'
+              : 'unknown',
+      };
     }
 
     // Fallback for rejected promises
-    const serviceNames = [
-      "Database",
-      "Redis/KV",
-      "Azure OpenAI",
-      "Resend",
-      "Sentry",
-      "Vercel",
-    ];
+    const serviceNames = ['Database', 'Redis/KV', 'Azure OpenAI', 'Resend', 'Sentry', 'Vercel'];
     return {
-      name: serviceNames[index] || "Unknown",
-      status: "down" as const,
+      name: serviceNames[index] || 'Unknown',
+      status: result.status === 'rejected' ? ('down' as const) : ('unknown' as const),
       configured: false,
+      required,
+      readiness: 'unknown',
       lastChecked: new Date(),
-      details: "Health check failed",
+      details:
+        result.status === 'rejected' ? 'Health check failed' : 'Health check returned no data',
     };
   });
 

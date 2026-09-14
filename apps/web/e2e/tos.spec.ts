@@ -17,6 +17,8 @@
  */
 
 import { test, expect } from './fixtures/base-fixtures';
+import { authenticateTestUser } from './helpers/auth-session';
+import { cleanupTestData } from './helpers/test-data';
 
 // ============================================================================
 // API ENDPOINTS (F-12)
@@ -99,39 +101,28 @@ test.describe('Terms of Service - Rate Limiting', () => {
 // ============================================================================
 
 test.describe('Terms of Service - Modal UI', () => {
+  test.afterEach(async () => {
+    await cleanupTestData();
+  });
   test('ToS modal appears for user who has not accepted', async ({ context }) => {
     const freshContext = await context.browser()?.newContext();
     if (!freshContext) throw new Error('Failed to create new context');
 
-    const freshPage = await freshContext.newPage();
-    const cookies = [
-      {
-        name: 'mirrorbuddy-user-id',
-        value: 'e2e-test-user-unsigned.sig123',
-        domain: 'localhost',
-        path: '/',
-        httpOnly: true,
-        sameSite: 'Lax' as const,
-      },
-    ];
-    await freshContext.addCookies(cookies);
-
-    await freshPage.goto('/');
-    await freshPage.waitForLoadState('domcontentloaded');
-
-    const modalHeading = freshPage.getByRole('heading', {
-      name: /Benvenuto in MirrorBuddy/i,
-    });
-    const isModalVisible = await modalHeading.isVisible().catch(() => false);
-
-    if (isModalVisible) {
+    try {
+      const freshPage = await freshContext.newPage();
+      await authenticateTestUser(freshContext, false);
+      await freshPage.goto('/');
+      await freshPage.waitForLoadState('domcontentloaded');
+      const modalHeading = freshPage.getByRole('heading', {
+        name: /Benvenuto in MirrorBuddy/i,
+      });
       await expect(modalHeading).toBeVisible();
       await expect(
         freshPage.getByText(/Prima di iniziare, leggi i nostri Termini di Servizio/i),
       ).toBeVisible();
+    } finally {
+      await freshContext.close();
     }
-
-    await freshContext.close();
   });
 
   test('ToS modal displays all key information', async ({ page }) => {

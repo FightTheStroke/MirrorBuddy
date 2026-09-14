@@ -13,6 +13,7 @@
 
 import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
+import { functionNameToToolType } from '@/lib/tools/constants';
 import type { ToolCall, ToolCallRef } from '@/types/tools';
 
 interface MaterialContent {
@@ -30,6 +31,40 @@ interface UseMaterialContentResult {
   error: string | null;
 }
 
+function withMaterialTitle(
+  type: string,
+  content: Record<string, unknown> | null | undefined,
+  material?: MaterialContent,
+): Record<string, unknown> | null {
+  if (!content) {
+    logger.warn('Material content unavailable', { toolType: type });
+    return null;
+  }
+  const toolType = functionNameToToolType(type) || type;
+  const titleKey =
+    toolType === 'flashcard'
+      ? 'name'
+      : toolType === 'summary'
+        ? 'topic'
+        : ['quiz', 'mindmap', 'demo'].includes(toolType)
+          ? 'title'
+          : null;
+  if (!titleKey) return content;
+
+  const title = [content[titleKey], material?.title, content.topic].find(
+    (value): value is string => typeof value === 'string' && value.trim().length > 0,
+  );
+  if (!title) {
+    logger.warn('Material title unavailable', { toolType });
+    return content;
+  }
+  return {
+    ...content,
+    [titleKey]: title,
+    ...(content.subject == null && material?.subject ? { subject: material.subject } : {}),
+  };
+}
+
 /**
  * Type guard to check if toolCall has full data or just a ref
  */
@@ -43,9 +78,7 @@ function hasFullData(toolCall: ToolCall | ToolCallRef): toolCall is ToolCall {
  * @param toolCall - ToolCall with full data or ToolCallRef with just metadata
  * @returns Object with data, loading state, and error
  */
-export function useMaterialContent(
-  toolCall: ToolCall | ToolCallRef
-): UseMaterialContentResult {
+export function useMaterialContent(toolCall: ToolCall | ToolCallRef): UseMaterialContentResult {
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +86,7 @@ export function useMaterialContent(
   useEffect(() => {
     // If we have full data from result, use it directly
     if (hasFullData(toolCall)) {
-      setData(toolCall.result?.data as Record<string, unknown>);
+      setData(withMaterialTitle(toolCall.type, toolCall.result?.data as Record<string, unknown>));
       setIsLoading(false);
       setError(null);
       return;
@@ -61,7 +94,7 @@ export function useMaterialContent(
 
     // If we have arguments (for tools in progress), use those
     if ('arguments' in toolCall && toolCall.arguments) {
-      setData(toolCall.arguments as Record<string, unknown>);
+      setData(withMaterialTitle(toolCall.type, toolCall.arguments as Record<string, unknown>));
       setIsLoading(false);
       setError(null);
       return;
@@ -88,10 +121,16 @@ export function useMaterialContent(
         const json = await response.json();
         const material = json.material as MaterialContent;
 
-        setData(material.content);
+        if (!material?.content) {
+          throw new Error('Material response missing content');
+        }
+        setData(withMaterialTitle(toolCall.type, material.content, material));
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load material';
-        logger.error('Error loading material content', { toolId: toolCall.id, errorMessage: message });
+        logger.error('Error loading material content', {
+          toolId: toolCall.id,
+          errorMessage: message,
+        });
         setError(message);
       } finally {
         setIsLoading(false);

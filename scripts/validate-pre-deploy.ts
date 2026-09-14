@@ -10,6 +10,7 @@ import fs from 'fs';
 import path from 'path';
 import { probeHnswIndex, probeVectorSearchFunction } from './lib/vector-search-probe';
 import { createPgClient } from './lib/pg-connection';
+import { criticalProductionEnv, validateProductionValues } from './lib/production-env-policy';
 
 config();
 
@@ -104,67 +105,10 @@ function validateVercelToken(token: string | undefined): void {
 }
 
 function validateCriticalEnvVars(): void {
-  // All production vars — available as GitHub secrets in CI (ADR 0138)
-  const critical = [
-    // Core
-    { name: 'DATABASE_URL', sensitive: true },
-    { name: 'DIRECT_URL', sensitive: true },
-    { name: 'SESSION_SECRET', sensitive: true },
-    { name: 'ADMIN_EMAIL', sensitive: false },
-    { name: 'ADMIN_PASSWORD', sensitive: true },
-    { name: 'ADMIN_READONLY_EMAIL', sensitive: false },
-    { name: 'ADMIN_READONLY_COOKIE_VALUE', sensitive: true },
-    { name: 'CRON_SECRET', sensitive: true },
-    { name: 'TOKEN_ENCRYPTION_KEY', sensitive: true },
-    { name: 'PII_ENCRYPTION_KEY', sensitive: true },
-    { name: 'IP_HASH_SALT', sensitive: true },
-    // Azure AI
-    { name: 'AZURE_OPENAI_API_KEY', sensitive: true },
-    { name: 'AZURE_OPENAI_ENDPOINT', sensitive: false },
-    { name: 'AZURE_OPENAI_CHAT_DEPLOYMENT', sensitive: false },
-    { name: 'AZURE_OPENAI_EMBEDDING_DEPLOYMENT', sensitive: false },
-    { name: 'AZURE_OPENAI_REALTIME_ENDPOINT', sensitive: false },
-    { name: 'AZURE_OPENAI_REALTIME_API_KEY', sensitive: true },
-    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT', sensitive: false },
-    { name: 'AZURE_OPENAI_TTS_DEPLOYMENT', sensitive: false },
-    // Email
-    { name: 'RESEND_API_KEY', sensitive: true },
-    { name: 'FROM_EMAIL', sensitive: false },
-    { name: 'SUPPORT_EMAIL', sensitive: false },
-    // Auth
-    { name: 'GOOGLE_CLIENT_ID', sensitive: false },
-    { name: 'GOOGLE_CLIENT_SECRET', sensitive: true },
-    { name: 'NEXT_PUBLIC_GOOGLE_CLIENT_ID', sensitive: false },
-    { name: 'NEXTAUTH_URL', sensitive: false },
-    // Push notifications
-    { name: 'NEXT_PUBLIC_VAPID_PUBLIC_KEY', sensitive: false },
-    { name: 'VAPID_PRIVATE_KEY', sensitive: true },
-    { name: 'VAPID_SUBJECT', sensitive: false },
-    // Rate limiting
-    { name: 'KV_REST_API_URL', sensitive: false },
-    { name: 'KV_REST_API_TOKEN', sensitive: true },
-    // Supabase
-    { name: 'NEXT_PUBLIC_SUPABASE_URL', sensitive: false },
-    { name: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', sensitive: false },
-    { name: 'SUPABASE_SERVICE_ROLE_KEY', sensitive: true },
-    // Misc
-    { name: 'PROTECTED_USERS', sensitive: false },
-    { name: 'TRIAL_BUDGET_LIMIT_EUR', sensitive: false },
-  ];
-
-  for (const envVar of critical) {
+  for (const envVar of criticalProductionEnv) {
     const value = process.env[envVar.name];
     if (value) {
-      const displayValue = envVar.sensitive
-        ? value.substring(0, 3) + '*'.repeat(Math.max(0, value.length - 6))
-        : value;
-      addResult(
-        'Environment',
-        envVar.name,
-        'PASS',
-        `${envVar.name} is set (${displayValue})`,
-        false,
-      );
+      addResult('Environment', envVar.name, 'PASS', `${envVar.name} is set`, false);
     } else {
       addResult(
         'Environment',
@@ -491,6 +435,13 @@ function getExitCode(): number {
 
 async function main(): Promise<void> {
   console.log('Starting pre-deploy validation...');
+
+  const valueFailures = validateProductionValues(process.env);
+  if (valueFailures.length) {
+    for (const failure of valueFailures) console.error(failure);
+    process.exit(1);
+    return;
+  }
 
   // Validate Sentry DSN
   validateSentryDSN(process.env.NEXT_PUBLIC_SENTRY_DSN?.trim());

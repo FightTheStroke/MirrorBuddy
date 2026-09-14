@@ -55,11 +55,11 @@ describe('i18n Validation Workflow', () => {
       expect(checkoutStep).toBeDefined();
     });
 
-    it('should setup Node.js with version 20', () => {
+    it('should setup Node.js with version 24', () => {
       const job = workflowContent.jobs['i18n-check'];
       const setupStep = job.steps.find((step: any) => step.uses?.includes('actions/setup-node'));
       expect(setupStep).toBeDefined();
-      expect(setupStep['with']['node-version']).toBe('20');
+      expect(setupStep['with']['node-version']).toBe('24');
     });
 
     it('should install dependencies with pnpm install --frozen-lockfile', () => {

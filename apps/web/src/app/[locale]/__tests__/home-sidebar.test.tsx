@@ -10,7 +10,7 @@
  */
 
 import { render } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { Home as HomeIcon, GraduationCap } from 'lucide-react';
 import { HomeSidebar } from '../home-sidebar';
 
@@ -45,6 +45,21 @@ vi.mock('@/components/branding/logo-brain', () => ({
 vi.mock('@/lib/hooks/use-admin-status', () => ({
   useAdminStatus: () => ({ isAdmin: false }),
 }));
+
+// jsdom ships no matchMedia; the sidebar reads the `lg` breakpoint to decide
+// whether the closed state is an off-canvas drawer or the visible desktop rail.
+beforeAll(() => {
+  window.matchMedia = ((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia;
+});
 
 const trialStatus = {
   isTrialMode: true,

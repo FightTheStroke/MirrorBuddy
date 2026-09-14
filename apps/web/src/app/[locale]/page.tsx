@@ -20,6 +20,7 @@ import { useTrialStatus } from '@/lib/hooks/use-trial-status';
 import { useTrialToasts } from '@/lib/hooks/use-trial-toasts';
 import { useAccessibilityStore } from '@/lib/accessibility';
 import { getUserIdFromCookie } from '@/lib/auth';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
 import { cn } from '@/lib/utils';
 import type { Maestro, ToolType } from '@/types';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -49,18 +50,25 @@ export default function Home() {
   const locale = useLocale();
   const t = useTranslations('home');
   const mainContentRef = useRef<HTMLDivElement>(null);
-  const { hasCompletedOnboarding, isHydrated, hydrateFromApi } = useOnboardingStore();
+  const identity = useClientIdentity();
+  const { hasCompletedOnboarding, isHydrated, hydratedUserId, hydrateFromApi } =
+    useOnboardingStore();
 
   useEffect(() => {
-    hydrateFromApi();
-  }, [hydrateFromApi]);
+    if (identity.status === 'pending' || identity.status === 'unavailable') return;
+    void hydrateFromApi().catch(() =>
+      logger.warn('Onboarding could not be loaded; retry identity verification'),
+    );
+  }, [hydrateFromApi, identity]);
 
   useEffect(() => {
-    if (isHydrated && !hasCompletedOnboarding) {
+    const resolved = identity.status === 'authenticated' || identity.status === 'anonymous';
+    const userId = identity.status === 'authenticated' ? identity.userId : null;
+    if (resolved && isHydrated && hydratedUserId === userId && !hasCompletedOnboarding) {
       // Avoid the streamed RSC redirect path when onboarding is mandatory.
       window.location.replace(`/${locale}/welcome`);
     }
-  }, [isHydrated, hasCompletedOnboarding, locale]);
+  }, [isHydrated, hasCompletedOnboarding, locale, hydratedUserId, identity]);
 
   const [currentView, setCurrentView] = useState<View>('intent');
   // Start collapsed on narrow viewports (incl. 200% zoom ≈ 640px CSS) so the
@@ -146,15 +154,14 @@ export default function Home() {
     if (isConversationActive && activeCharacter) {
       const characterConvo = conversationsByCharacter[activeCharacter.id];
       if (characterConvo?.conversationId) {
-        const userId = getUserIdFromCookie();
-        if (userId) {
-          try {
+        try {
+          const userId = getUserIdFromCookie();
+          if (userId) {
             await endConversationWithSummary(characterConvo.conversationId, userId);
-          } catch (error) {
-            logger.error('Failed to close conversation', {
-              error: String(error),
-            });
           }
+        } catch (error) {
+          logger.error('Failed to close conversation', { error: String(error) });
+          return;
         }
       }
     }

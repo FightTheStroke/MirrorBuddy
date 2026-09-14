@@ -12,7 +12,8 @@ import { logger } from '@/lib/logger';
 function isServiceWorkerSupported(): boolean {
   return (
     typeof window !== 'undefined' &&
-    'serviceWorker' in navigator &&
+    typeof navigator !== 'undefined' &&
+    typeof navigator.serviceWorker?.register === 'function' &&
     'caches' in window &&
     window.isSecureContext
   );
@@ -36,6 +37,11 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });
+
+    if (!registration) {
+      logger.warn('[Offline SW] Registration unavailable');
+      return false;
+    }
 
     logger.info('[Offline SW] Registered successfully', {
       scope: registration.scope,

@@ -1,175 +1,115 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef } from "react";
-import { trackTrialStart } from "@/lib/telemetry/trial-events";
+import { useState, useEffect, useRef } from 'react';
+import { z } from 'zod';
+import { trackTrialStart } from '@/lib/telemetry/trial-events';
+import { useClientIdentity } from '@/lib/auth/identity-provider';
+import { refreshClientIdentity } from '@/lib/auth/client-auth';
 
 interface TrialStatus {
   isTrialMode: boolean;
   isLoading: boolean;
-  // Chat limits
+  error: string | null;
   chatsUsed: number;
   chatsRemaining: number;
   maxChats: number;
-  // Voice limits
   voiceSecondsUsed: number;
   voiceSecondsRemaining: number;
   maxVoiceSeconds: number;
-  // Tool limits
   toolsUsed: number;
   toolsRemaining: number;
   maxTools: number;
-  // Session info
   visitorId?: string;
   email?: string | null;
   emailCollectedAt?: string | null;
   emailVerifiedAt?: string | null;
   verificationPending?: boolean;
 }
+const count = z.number().finite().nonnegative();
+const sessionSchema = z.object({
+  sessionId: z.string().min(1),
+  chatsUsed: count,
+  chatsRemaining: count,
+  maxChats: count,
+  voiceSecondsUsed: count,
+  voiceSecondsRemaining: count,
+  maxVoiceSeconds: count,
+  toolsUsed: count,
+  toolsRemaining: count,
+  maxTools: count,
+  email: z.string().nullable().optional(),
+  emailCollectedAt: z.string().nullable().optional(),
+  emailVerifiedAt: z.string().nullable().optional(),
+  verificationPending: z.boolean().optional(),
+});
+const initial = (): TrialStatus => ({
+  isTrialMode: false,
+  isLoading: true,
+  error: null,
+  chatsUsed: 0,
+  chatsRemaining: 0,
+  maxChats: 0,
+  voiceSecondsUsed: 0,
+  voiceSecondsRemaining: 0,
+  maxVoiceSeconds: 0,
+  toolsUsed: 0,
+  toolsRemaining: 0,
+  maxTools: 0,
+});
 
-/**
- * Get initial trial status synchronously.
- * Always start as loading - let the API determine trial status.
- */
-function getInitialStatus(): TrialStatus {
-  return {
-    isTrialMode: false,
-    isLoading: true,
-    // Chat
-    chatsUsed: 0,
-    chatsRemaining: 10,
-    maxChats: 10,
-    // Voice (5 min = 300 sec)
-    voiceSecondsUsed: 0,
-    voiceSecondsRemaining: 300,
-    maxVoiceSeconds: 300,
-    // Tools
-    toolsUsed: 0,
-    toolsRemaining: 10,
-    maxTools: 10,
-  };
-}
-
-/**
- * Hook to get trial status for the current user.
- * A user is in trial mode if they don't have login credentials (username/password).
- * Cookie-only users created via "Skip" are still trial users.
- */
-export function useTrialStatus(): TrialStatus {
-  const [status, setStatus] = useState<TrialStatus>(getInitialStatus);
-  const hasTrackedRef = useRef(false);
-
+/** Credentialless authenticated accounts can be trial-tier, but are never anonymous identities. */
+export function useTrialStatus() {
+  const identity = useClientIdentity();
+  const [status, setStatus] = useState<TrialStatus>(initial);
+  const tracked = useRef<string | null>(null);
   useEffect(() => {
-    let isMounted = true;
-
+    let active = true;
+    if (identity.status === 'pending' || identity.status === 'unavailable') return;
     async function checkStatus() {
+      setStatus(initial());
       try {
-        // Check if user has credentials (not trial)
-        const userRes = await fetch("/api/user/trial-status");
-        if (userRes.ok && isMounted) {
-          const userData = await userRes.json();
-          if (!userData.isTrialUser) {
-            // User has credentials - not in trial mode
-            setStatus({
-              isTrialMode: false,
-              isLoading: false,
-              chatsUsed: 0,
-              chatsRemaining: 10,
-              maxChats: 10,
-              voiceSecondsUsed: 0,
-              voiceSecondsRemaining: 300,
-              maxVoiceSeconds: 300,
-              toolsUsed: 0,
-              toolsRemaining: 10,
-              maxTools: 10,
-            });
+        if (identity.status === 'authenticated') {
+          const response = await fetch('/api/user/trial-status');
+          if (!response.ok) throw new Error('TRIAL_STATUS_UNAVAILABLE');
+          const data = z.object({ isTrialUser: z.boolean() }).parse(await response.json());
+          if (!data.isTrialUser) {
+            if (active) setStatus({ ...initial(), isLoading: false });
             return;
           }
         }
-
-        // User is trial - fetch trial session for all limits
-        const res = await fetch("/api/trial/session");
-        if (res.ok && isMounted) {
-          const data = await res.json();
-          const visitorId = data.sessionId || "unknown";
-
-          // Track trial start (only once per session)
-          if (!hasTrackedRef.current) {
-            trackTrialStart(visitorId);
-            hasTrackedRef.current = true;
-          }
-
-          setStatus({
-            isTrialMode: true,
-            isLoading: false,
-            // Chat
-            chatsUsed: data.chatsUsed || 0,
-            chatsRemaining: data.chatsRemaining ?? 10,
-            maxChats: data.maxChats ?? 10,
-            // Voice
-            voiceSecondsUsed: data.voiceSecondsUsed || 0,
-            voiceSecondsRemaining: data.voiceSecondsRemaining ?? 300,
-            maxVoiceSeconds: data.maxVoiceSeconds ?? 300,
-            // Tools
-            toolsUsed: data.toolsUsed || 0,
-            toolsRemaining: data.toolsRemaining ?? 10,
-            maxTools: data.maxTools ?? 10,
-            // Session
-            visitorId,
-            email: data.email ?? null,
-            emailCollectedAt: data.emailCollectedAt ?? null,
-            emailVerifiedAt: data.emailVerifiedAt ?? null,
-            verificationPending: Boolean(data.verificationPending),
-          });
-        } else if (isMounted) {
-          // API error - assume trial with defaults
-          setStatus({
-            isTrialMode: true,
-            isLoading: false,
-            chatsUsed: 0,
-            chatsRemaining: 10,
-            maxChats: 10,
-            voiceSecondsUsed: 0,
-            voiceSecondsRemaining: 300,
-            maxVoiceSeconds: 300,
-            toolsUsed: 0,
-            toolsRemaining: 10,
-            maxTools: 10,
-            email: null,
-            emailCollectedAt: null,
-            emailVerifiedAt: null,
-            verificationPending: false,
-          });
+        if (!active) return;
+        const response = await fetch('/api/trial/session');
+        if (!response.ok) throw new Error('TRIAL_SESSION_UNAVAILABLE');
+        const data = sessionSchema.parse(await response.json());
+        if (!active) return;
+        if (tracked.current !== data.sessionId) {
+          trackTrialStart(data.sessionId);
+          tracked.current = data.sessionId;
         }
+        setStatus({
+          ...data,
+          visitorId: data.sessionId,
+          isTrialMode: true,
+          isLoading: false,
+          error: null,
+        });
       } catch {
-        // On error, assume trial mode with default values
-        if (isMounted) {
-          setStatus({
-            isTrialMode: true,
-            isLoading: false,
-            chatsUsed: 0,
-            chatsRemaining: 10,
-            maxChats: 10,
-            voiceSecondsUsed: 0,
-            voiceSecondsRemaining: 300,
-            maxVoiceSeconds: 300,
-            toolsUsed: 0,
-            toolsRemaining: 10,
-            maxTools: 10,
-            email: null,
-            emailCollectedAt: null,
-            emailVerifiedAt: null,
-            verificationPending: false,
-          });
-        }
+        if (active)
+          setStatus({ ...initial(), isLoading: false, error: 'TRIAL_STATUS_UNAVAILABLE' });
       }
     }
-
-    checkStatus();
-
+    void checkStatus();
     return () => {
-      isMounted = false;
+      active = false;
     };
-  }, []);
-
-  return status;
+  }, [identity]);
+  if (identity.status === 'pending' || identity.status === 'unavailable') {
+    return {
+      ...initial(),
+      isLoading: identity.status === 'pending',
+      error: identity.status === 'unavailable' ? identity.reason : null,
+      refresh: refreshClientIdentity,
+    };
+  }
+  return { ...status, refresh: refreshClientIdentity };
 }

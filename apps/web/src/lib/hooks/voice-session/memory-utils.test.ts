@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sanitizeHtmlComments, fetchConversationMemory, buildMemoryContext } from './memory-utils';
+import { routeConversationItem, routeEnvelope } from './__tests__/memory-utils-fixtures';
 
 // Mock clientLogger
 vi.mock('@/lib/logger/client', () => ({
@@ -27,22 +28,20 @@ describe('sanitizeHtmlComments', () => {
   });
 });
 
+function mockJsonResponse(body: unknown, ok = true) {
+  return vi
+    .fn()
+    .mockResolvedValue({ ok, status: ok ? 200 : 500, json: () => Promise.resolve(body) });
+}
+
 describe('fetchConversationMemory', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
-  it('should return parsed memory on success', async () => {
-    const mockConv = {
-      summary: 'Previous lesson on algebra',
-      keyFacts: JSON.stringify({ learned: ['quadratics'], preferences: ['visual'] }),
-      topics: JSON.stringify(['equations', 'graphs']),
-    };
-
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve([mockConv]),
-    });
+  it('should return parsed memory from the actual items/pagination envelope', async () => {
+    global.fetch = mockJsonResponse(routeEnvelope([routeConversationItem()]));
 
     const result = await fetchConversationMemory('test-maestro');
     expect(result).toEqual({
@@ -52,8 +51,67 @@ describe('fetchConversationMemory', () => {
     });
   });
 
+  it('should decode string-encoded keyFacts and topics', async () => {
+    global.fetch = mockJsonResponse(
+      routeEnvelope([
+        routeConversationItem({
+          keyFacts: JSON.stringify({ learned: ['quadratics'], preferences: ['visual'] }),
+          topics: JSON.stringify(['equations', 'graphs']),
+        }),
+      ]),
+    );
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result).toEqual({
+      summary: 'Previous lesson on algebra',
+      keyFacts: { learned: ['quadratics'], preferences: ['visual'] },
+      recentTopics: ['equations', 'graphs'],
+    });
+  });
+
+  it('should keep the summary when keyFacts are null', async () => {
+    global.fetch = mockJsonResponse(
+      routeEnvelope([routeConversationItem({ keyFacts: null, topics: [] })]),
+    );
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result).toEqual({ summary: 'Previous lesson on algebra' });
+  });
+
+  it('should discard malformed keyFacts with an explicit warning and keep the rest', async () => {
+    const { clientLogger } = await import('@/lib/logger/client');
+    global.fetch = mockJsonResponse(
+      routeEnvelope([routeConversationItem({ keyFacts: '{not valid json' })]),
+    );
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result).toEqual({
+      summary: 'Previous lesson on algebra',
+      recentTopics: ['equations', 'graphs'],
+    });
+    expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('conversation memory field'),
+      expect.objectContaining({ maestroId: 'test-maestro', field: 'keyFacts' }),
+    );
+  });
+
+  it('should discard topics that are not a string list', async () => {
+    const { clientLogger } = await import('@/lib/logger/client');
+    global.fetch = mockJsonResponse(
+      routeEnvelope([routeConversationItem({ topics: [{ name: 'equations' }] })]),
+    );
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result?.recentTopics).toBeUndefined();
+    expect(result?.summary).toBe('Previous lesson on algebra');
+    expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('conversation memory field'),
+      expect.objectContaining({ maestroId: 'test-maestro', field: 'topics' }),
+    );
+  });
+
   it('should return null on API error', async () => {
-    global.fetch = vi.fn().mockResolvedValue({ ok: false });
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 });
     const result = await fetchConversationMemory('test-maestro');
     expect(result).toBeNull();
   });
@@ -70,13 +128,45 @@ describe('fetchConversationMemory', () => {
     );
   });
 
-  it('should return null for empty conversations array', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve([]),
-    });
+  it('should return null without warning for an empty items list', async () => {
+    const { clientLogger } = await import('@/lib/logger/client');
+    global.fetch = mockJsonResponse(routeEnvelope([]));
+
     const result = await fetchConversationMemory('test-maestro');
     expect(result).toBeNull();
+    expect(clientLogger.warn).not.toHaveBeenCalled();
+  });
+
+  it('should return null and warn when the payload is null', async () => {
+    const { clientLogger } = await import('@/lib/logger/client');
+    global.fetch = mockJsonResponse(null);
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result).toBeNull();
+    expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('conversations response'),
+      expect.objectContaining({ maestroId: 'test-maestro' }),
+    );
+  });
+
+  it('should not silently swallow an unexpected response shape', async () => {
+    const { clientLogger } = await import('@/lib/logger/client');
+    global.fetch = mockJsonResponse([routeConversationItem()]);
+
+    const result = await fetchConversationMemory('test-maestro');
+    expect(result).toBeNull();
+    expect(clientLogger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('conversations response'),
+      expect.objectContaining({ maestroId: 'test-maestro' }),
+    );
+  });
+
+  it('should return null when the conversation carries no usable memory', async () => {
+    global.fetch = mockJsonResponse(
+      routeEnvelope([routeConversationItem({ summary: null, keyFacts: null, topics: [] })]),
+    );
+
+    expect(await fetchConversationMemory('test-maestro')).toBeNull();
   });
 });
 

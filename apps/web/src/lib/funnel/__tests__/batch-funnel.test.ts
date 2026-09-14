@@ -1,8 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Prisma } from '@prisma/client';
+
+type ConsentSettings = Prisma.SettingsGetPayload<{
+  select: { userId: true; azureCostConfig: true };
+}>;
+const mockSettingsFindMany = vi.hoisted(() =>
+  vi.fn<(args?: Prisma.SettingsFindManyArgs) => Promise<ConsentSettings[]>>(),
+);
 
 vi.mock('@/lib/db', async () => {
   const { createMockPrisma } = await import('@/test/mocks/prisma');
-  return { prisma: createMockPrisma() };
+  const mock = createMockPrisma();
+  return {
+    prisma: {
+      ...mock,
+      settings: { ...mock.settings, findMany: mockSettingsFindMany },
+    },
+  };
 });
 
 vi.mock('@/lib/logger', () => ({
@@ -22,13 +36,24 @@ vi.mock('@/lib/logger', () => ({
 
 import { prisma } from '@/lib/db';
 import { processActiveUsers, processChurnedUsers, processBatchFunnelEvents } from '../batch-funnel';
+import {
+  analyticsConsentFixture,
+  permitOptionalAnalytics,
+} from '@/lib/telemetry/__tests__/analytics-fixtures';
 
 const mockQueryRaw = vi.mocked(prisma.$queryRaw);
 const mockFindFirst = vi.mocked(prisma.funnelEvent.findFirst);
 const mockCreate = vi.mocked(prisma.funnelEvent.create);
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.resetAllMocks();
+  permitOptionalAnalytics();
+  mockSettingsFindMany.mockResolvedValue([
+    {
+      userId: 'user-1',
+      azureCostConfig: JSON.stringify({ consent: analyticsConsentFixture }),
+    },
+  ]);
 });
 
 describe('processActiveUsers', () => {
@@ -73,10 +98,9 @@ describe('processChurnedUsers', () => {
     const oldDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     mockQueryRaw.mockResolvedValueOnce([
       {
-        user_key: 'user-1',
+        userId: 'user-1',
         stage: 'FIRST_LOGIN',
         last_activity: oldDate,
-        is_user: true,
       },
     ]);
     mockFindFirst.mockResolvedValueOnce(null); // hasStage = false
@@ -98,10 +122,9 @@ describe('processChurnedUsers', () => {
     const oldDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     mockQueryRaw.mockResolvedValueOnce([
       {
-        user_key: 'user-1',
+        userId: 'user-1',
         stage: 'FIRST_LOGIN',
         last_activity: oldDate,
-        is_user: true,
       },
     ]);
     mockFindFirst.mockResolvedValueOnce({ id: 'existing' } as never); // hasStage = true
@@ -112,29 +135,14 @@ describe('processChurnedUsers', () => {
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('handles visitor-based identifiers', async () => {
-    const oldDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-    mockQueryRaw.mockResolvedValueOnce([
-      {
-        user_key: 'visitor-abc',
-        stage: 'TRIAL_ENGAGED',
-        last_activity: oldDate,
-        is_user: false,
-      },
-    ]);
-    mockFindFirst.mockResolvedValueOnce(null); // hasStage = false
-    mockFindFirst.mockResolvedValueOnce({ stage: 'TRIAL_ENGAGED' } as never); // getLatestStage
-    mockCreate.mockResolvedValueOnce({} as never);
+  it('does not profile visitor-only identifiers without age/consent evidence', async () => {
+    mockSettingsFindMany.mockResolvedValue([]);
 
     const count = await processChurnedUsers();
 
-    expect(count).toBe(1);
-    expect(mockCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        visitorId: 'visitor-abc',
-        stage: 'CHURNED',
-      }),
-    });
+    expect(count).toBe(0);
+    expect(mockQueryRaw).not.toHaveBeenCalled();
+    expect(mockCreate).not.toHaveBeenCalled();
   });
 });
 

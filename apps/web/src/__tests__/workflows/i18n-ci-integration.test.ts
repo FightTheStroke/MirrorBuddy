@@ -172,10 +172,10 @@ describe('i18n CI Integration', () => {
       expect(job.steps.some((step: any) => step.uses?.includes('setup-node'))).toBe(true);
     });
 
-    it('should use Node.js 20 for consistency', () => {
+    it('should use Node.js 24 for consistency', () => {
       const job = workflowContent.jobs['i18n-check'];
       const setupNode = job.steps.find((step: any) => step.uses?.includes('setup-node'));
-      expect(setupNode['with']['node-version']).toBe('20');
+      expect(setupNode['with']['node-version']).toBe('24');
     });
 
     it('should use pnpm install --frozen-lockfile in CI', () => {

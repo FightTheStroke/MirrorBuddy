@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 import { logger } from '@/lib/logger';
+import { metricTruth, snapshotContext, type MetricTruth } from '@/lib/admin/metric-truth';
 
 export const revalidate = 0;
 const SENTRY_API_BASE = 'https://sentry.io/api/0';
@@ -38,6 +39,7 @@ interface SentryIssueResponse {
   issues: SentryIssue[];
   total: number;
   hasMore: boolean;
+  metric: MetricTruth;
 }
 
 export const GET = pipe(
@@ -45,8 +47,16 @@ export const GET = pipe(
   withAdminReadOnly,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const limit = Math.min(parseInt(searchParams.get('limit') || '10'), 25);
+  const requestedLimit = Number(searchParams.get('limit') ?? '10');
+  if (!Number.isInteger(requestedLimit) || requestedLimit < 1) {
+    return NextResponse.json({ error: 'Invalid limit' }, { status: 400 });
+  }
+  const limit = Math.min(requestedLimit, 25);
   const query = searchParams.get('query') || 'is:unresolved';
+  const context = snapshotContext(
+    `Sentry issues (first ${limit}; ${query})`,
+    new Date().toISOString(),
+  );
 
   // Check required env vars
   const authToken = process.env.SENTRY_AUTH_TOKEN;
@@ -58,8 +68,9 @@ export const GET = pipe(
       {
         error: 'Sentry not configured',
         issues: [],
-        total: 0,
+        total: null,
         hasMore: false,
+        metric: metricTruth<number>(null, { ...context, reason: 'notConfigured' }),
       },
       { status: 200 },
     );
@@ -73,7 +84,7 @@ export const GET = pipe(
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/json',
       },
-      next: { revalidate: 60 }, // Cache for 1 minute
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -84,7 +95,12 @@ export const GET = pipe(
         errorText,
       });
       return NextResponse.json(
-        { error: 'Failed to fetch Sentry issues', issues: [], total: 0 },
+        {
+          error: 'Failed to fetch Sentry issues',
+          issues: [],
+          total: null,
+          metric: metricTruth<number>(null, { ...context, reason: 'collectionFailed' }),
+        },
         { status: 200 },
       );
     }
@@ -111,13 +127,19 @@ export const GET = pipe(
       })),
       total: issues.length,
       hasMore,
+      metric: metricTruth(issues.length, context),
     };
 
     return NextResponse.json(result);
   } catch (error) {
     logger.error('Sentry API request failed', { component: 'sentry-issues' }, error);
     return NextResponse.json(
-      { error: 'Sentry API request failed', issues: [], total: 0 },
+      {
+        error: 'Sentry API request failed',
+        issues: [],
+        total: null,
+        metric: metricTruth<number>(null, { ...context, reason: 'collectionFailed' }),
+      },
       { status: 200 },
     );
   }

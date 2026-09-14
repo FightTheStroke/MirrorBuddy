@@ -31,9 +31,9 @@ const log = logger.child({ module: 'api/trial/voice' });
  */
 
 export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
+  const auth = await validateAuth();
   try {
     // Check if authenticated user (skip trial tracking)
-    const auth = await validateAuth();
     if (auth.authenticated && auth.userId) {
       return NextResponse.json({ skipped: true, reason: 'authenticated' });
     }
@@ -127,9 +127,9 @@ export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
  * Check if voice is allowed for trial users and get remaining time.
  */
 export const GET = pipe(withSentry('/api/trial/voice'))(async () => {
+  const auth = await validateAuth();
   try {
     // Check if authenticated user (no trial limits)
-    const auth = await validateAuth();
     if (auth.authenticated && auth.userId) {
       return NextResponse.json({
         allowed: true,

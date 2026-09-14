@@ -1,6 +1,6 @@
-import { getUserIdFromCookie } from "@/lib/auth";
+import { getUserIdFromCookie } from '@/lib/auth';
 
-// Get userId from cookie
+// The compatibility helper reads only server-confirmed identity, never the hint.
 export function getUserId(): string | null {
   return getUserIdFromCookie();
 }
@@ -9,5 +9,5 @@ export function getUserId(): string | null {
 export function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }

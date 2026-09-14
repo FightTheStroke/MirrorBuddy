@@ -8,30 +8,15 @@
 
 import path from 'path';
 import fs from 'fs';
-import { createHmac, randomUUID } from 'crypto';
 import { config } from 'dotenv';
 import { getPrismaClient, disconnectPrisma } from './helpers/prisma-setup';
 import { createE2ETestUser } from './helpers/e2e-user-factory';
+import { issueTestSession } from './helpers/durable-session';
 
 // Load .env so we can read SESSION_SECRET (must match running dev server)
 config();
 
 const STORAGE_STATE_PATH = path.join(__dirname, '.auth', 'storage-state.json');
-
-// CRITICAL: E2E tests must not depend on the developer's real SESSION_SECRET from .env.
-// The Playwright webServer always overrides SESSION_SECRET to this test value.
-// Cookie signatures must match between global setup and the running server.
-const SESSION_SECRET = 'e2e-test-session-secret-32-characters-min';
-
-/**
- * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
- */
-function signCookieValue(value: string): string {
-  const hmac = createHmac('sha256', SESSION_SECRET);
-  hmac.update(value);
-  const signature = hmac.digest('hex');
-  return `${value}.${signature}`;
-}
 
 async function globalSetup() {
   // PRODUCTION BLOCKER #1: Block if NODE_ENV is production
@@ -79,24 +64,28 @@ async function globalSetup() {
 
   // Create the test user via factory (ADR 0081: isTestData=true, ADR 0059: bypass walls)
   const prisma = getPrismaClient();
-  let testUserId: string;
+  let testUserId: string | undefined;
   let randomSuffix: string;
+  let session: Awaited<ReturnType<typeof issueTestSession>>;
   try {
     const result = await createE2ETestUser(prisma);
     testUserId = result.testUserId;
     randomSuffix = result.randomSuffix;
+    session = await issueTestSession(prisma, testUserId);
     console.log('✅ Test user created in database:', testUserId);
   } catch (error) {
-    console.error('⚠️ Failed to create test user (may already exist):', error);
-    // Fallback: generate IDs locally so storage state can still be written
-    randomSuffix = randomUUID().replace(/-/g, '').substring(0, 9);
-    testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
+    if (testUserId) {
+      await prisma.user.deleteMany({ where: { id: testUserId, isTestData: true } });
+    }
+    throw new Error('E2E owner/session setup failed; no storage state was issued', {
+      cause: error,
+    });
   } finally {
     await disconnectPrisma();
   }
 
   // Sign the test user cookie
-  const signedCookie = signCookieValue(testUserId);
+  const signedCookie = session.token;
 
   // Create storage state with onboarding completed
   const storageState = {
@@ -106,17 +95,17 @@ async function globalSetup() {
         value: signedCookie,
         domain: 'localhost',
         path: '/',
-        expires: -1,
+        expires: Math.floor(session.expiresAt.getTime() / 1000),
         httpOnly: true,
         secure: false,
         sameSite: 'Lax',
       },
       {
         name: 'mirrorbuddy-user-id-client',
-        value: testUserId,
+        value: session.userId,
         domain: 'localhost',
         path: '/',
-        expires: -1,
+        expires: Math.floor(session.expiresAt.getTime() / 1000),
         httpOnly: false,
         secure: false,
         sameSite: 'Lax',

@@ -6,13 +6,14 @@
  * @module hooks/__tests__/use-saved-materials.test
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act, cleanup, waitFor } from '@testing-library/react';
+import { setClientIdentity } from '@/lib/auth';
 
 // Mock csrfFetch before importing - used for mutations (POST/PATCH/DELETE)
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@/lib/auth")>();
+vi.mock('@/lib/auth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/auth')>();
   return {
     ...actual,
     csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
@@ -25,21 +26,21 @@ import {
   useFlashcardDecks,
   useHomeworkSessions,
   autoSaveMaterial,
-} from "../use-saved-materials";
+} from '../use-saved-materials';
 
 // Mock fetch globally - used for GET operations (fetching materials)
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 // Mock crypto.randomUUID
-const mockUUID = "test-uuid-12345";
-vi.stubGlobal("crypto", {
+const mockUUID = 'test-uuid-12345';
+vi.stubGlobal('crypto', {
   randomUUID: () => mockUUID,
 });
 
 // Mock sessionStorage
 const mockSessionStorage: Record<string, string> = {};
-vi.stubGlobal("sessionStorage", {
+vi.stubGlobal('sessionStorage', {
   getItem: (key: string) => mockSessionStorage[key] || null,
   setItem: (key: string, value: string) => {
     mockSessionStorage[key] = value;
@@ -55,7 +56,7 @@ vi.stubGlobal("sessionStorage", {
 });
 
 // Mock logger
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -70,38 +71,73 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-describe("use-saved-materials", () => {
+describe('use-saved-materials', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
     mockCsrfFetch.mockReset();
     sessionStorage.clear();
+    setClientIdentity({
+      status: 'authenticated',
+      userId: 'materials-user',
+      role: 'USER',
+      legacyOrigin: false,
+      needsLegacyUpgrade: false,
+    });
   });
 
   afterEach(() => {
+    cleanup();
+    setClientIdentity({ status: 'pending' });
     vi.clearAllMocks();
   });
+
+  it.each(['pending', 'unavailable'] as const)(
+    'does not load or save materials while identity is %s',
+    async (status) => {
+      setClientIdentity(status === 'pending' ? { status } : { status, reason: 'SESSION_REJECTED' });
+      const { result } = renderHook(() => useMindmaps());
+
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.mindmaps).toEqual([]);
+      expect(result.current.error).toBe(
+        status === 'pending' ? 'MATERIALS_UNAVAILABLE' : 'SESSION_REJECTED',
+      );
+
+      await act(async () => {
+        expect(
+          await result.current.saveMindmap({
+            title: 'Unresolved owner',
+            nodes: [],
+            subject: 'mathematics',
+          }),
+        ).toBeNull();
+      });
+      expect(mockFetch).not.toHaveBeenCalled();
+      expect(mockCsrfFetch).not.toHaveBeenCalled();
+    },
+  );
 
   // ============================================================================
   // useMindmaps
   // ============================================================================
-  describe("useMindmaps", () => {
+  describe('useMindmaps', () => {
     const mockMindmapMaterial = {
-      id: "1",
-      toolId: "mindmap-1",
-      toolType: "mindmap",
-      title: "Test Mindmap",
-      content: { nodes: [{ id: "root", label: "Root" }] },
-      subject: "mathematics",
-      maestroId: "archimede",
-      status: "active",
+      id: '1',
+      toolId: 'mindmap-1',
+      toolType: 'mindmap',
+      title: 'Test Mindmap',
+      content: { nodes: [{ id: 'root', label: 'Root' }] },
+      subject: 'mathematics',
+      maestroId: 'archimede',
+      status: 'active',
       isBookmarked: false,
       viewCount: 0,
-      createdAt: "2026-01-01T00:00:00Z",
-      updatedAt: "2026-01-01T00:00:00Z",
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
     };
 
-    it("should load mindmaps from API on mount", async () => {
+    it('should load mindmaps from API on mount', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockMindmapMaterial] }),
@@ -116,13 +152,14 @@ describe("use-saved-materials", () => {
       });
 
       expect(result.current.mindmaps).toHaveLength(1);
-      expect(result.current.mindmaps[0].title).toBe("Test Mindmap");
-      expect(result.current.mindmaps[0].nodes).toEqual([
-        { id: "root", label: "Root" },
-      ]);
+      expect(result.current.mindmaps[0].title).toBe('Test Mindmap');
+      expect(result.current.mindmaps[0].nodes).toEqual([{ id: 'root', label: 'Root' }]);
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/materials?userId=materials-user&toolType=mindmap&status=active',
+      );
     });
 
-    it("should return empty array when API fails", async () => {
+    it('should return empty array when API fails', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -135,9 +172,10 @@ describe("use-saved-materials", () => {
       });
 
       expect(result.current.mindmaps).toEqual([]);
+      expect(result.current.error).toBe('MATERIALS_UNAVAILABLE');
     });
 
-    it("should save mindmap and reload list", async () => {
+    it('should save mindmap and reload list', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -164,22 +202,23 @@ describe("use-saved-materials", () => {
 
       await act(async () => {
         await result.current.saveMindmap({
-          title: "Test Mindmap",
-          nodes: [{ id: "root", label: "Root" }],
-          subject: "mathematics",
-          maestroId: "archimede",
+          title: 'Test Mindmap',
+          nodes: [{ id: 'root', label: 'Root' }],
+          subject: 'mathematics',
+          maestroId: 'archimede',
         });
       });
 
       expect(mockCsrfFetch).toHaveBeenCalledWith(
-        "/api/materials",
+        '/api/materials',
         expect.objectContaining({
-          method: "POST",
+          method: 'POST',
+          body: expect.stringContaining('"userId":"materials-user"'),
         }),
       );
     });
 
-    it("should delete mindmap and update local state", async () => {
+    it('should delete mindmap and update local state', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -196,7 +235,7 @@ describe("use-saved-materials", () => {
       mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
-        const success = await result.current.deleteMindmap("mindmap-1");
+        const success = await result.current.deleteMindmap('mindmap-1');
         expect(success).toBe(true);
       });
 
@@ -207,26 +246,24 @@ describe("use-saved-materials", () => {
   // ============================================================================
   // useQuizzes
   // ============================================================================
-  describe("useQuizzes", () => {
+  describe('useQuizzes', () => {
     const mockQuizMaterial = {
-      id: "2",
-      toolId: "quiz-1",
-      toolType: "quiz",
-      title: "Math Quiz",
+      id: '2',
+      toolId: 'quiz-1',
+      toolType: 'quiz',
+      title: 'Math Quiz',
       content: {
-        questions: [
-          { question: "2+2?", options: ["3", "4", "5"], correctIndex: 1 },
-        ],
+        questions: [{ question: '2+2?', options: ['3', '4', '5'], correctIndex: 1 }],
       },
-      subject: "mathematics",
-      status: "active",
+      subject: 'mathematics',
+      status: 'active',
       isBookmarked: false,
       viewCount: 0,
-      createdAt: "2026-01-01T00:00:00Z",
-      updatedAt: "2026-01-01T00:00:00Z",
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
     };
 
-    it("should load quizzes from API on mount", async () => {
+    it('should load quizzes from API on mount', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockQuizMaterial] }),
@@ -239,11 +276,11 @@ describe("use-saved-materials", () => {
       });
 
       expect(result.current.quizzes).toHaveLength(1);
-      expect(result.current.quizzes[0].title).toBe("Math Quiz");
+      expect(result.current.quizzes[0].title).toBe('Math Quiz');
       expect(result.current.quizzes[0].questions).toHaveLength(1);
     });
 
-    it("should save quiz and reload list", async () => {
+    it('should save quiz and reload list', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -269,23 +306,21 @@ describe("use-saved-materials", () => {
 
       await act(async () => {
         await result.current.saveQuiz({
-          title: "Math Quiz",
-          subject: "mathematics",
-          questions: [
-            { question: "2+2?", options: ["3", "4", "5"], correctIndex: 1 },
-          ],
+          title: 'Math Quiz',
+          subject: 'mathematics',
+          questions: [{ question: '2+2?', options: ['3', '4', '5'], correctIndex: 1 }],
         });
       });
 
       expect(mockCsrfFetch).toHaveBeenCalledWith(
-        "/api/materials",
+        '/api/materials',
         expect.objectContaining({
-          method: "POST",
+          method: 'POST',
         }),
       );
     });
 
-    it("should delete quiz and update state", async () => {
+    it('should delete quiz and update state', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -302,7 +337,7 @@ describe("use-saved-materials", () => {
       mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
-        const success = await result.current.deleteQuiz("quiz-1");
+        const success = await result.current.deleteQuiz('quiz-1');
         expect(success).toBe(true);
       });
 
@@ -313,24 +348,24 @@ describe("use-saved-materials", () => {
   // ============================================================================
   // useFlashcardDecks
   // ============================================================================
-  describe("useFlashcardDecks", () => {
+  describe('useFlashcardDecks', () => {
     const mockDeckMaterial = {
-      id: "3",
-      toolId: "deck-1",
-      toolType: "flashcard",
-      title: "Vocabulary Deck",
+      id: '3',
+      toolId: 'deck-1',
+      toolType: 'flashcard',
+      title: 'Vocabulary Deck',
       content: {
-        cards: [{ front: "Hello", back: "Ciao" }],
+        cards: [{ front: 'Hello', back: 'Ciao' }],
       },
-      subject: "english",
-      status: "active",
+      subject: 'english',
+      status: 'active',
       isBookmarked: false,
       viewCount: 0,
-      createdAt: "2026-01-01T00:00:00Z",
-      updatedAt: "2026-01-01T00:00:00Z",
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
     };
 
-    it("should load decks from API on mount", async () => {
+    it('should load decks from API on mount', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockDeckMaterial] }),
@@ -343,11 +378,11 @@ describe("use-saved-materials", () => {
       });
 
       expect(result.current.decks).toHaveLength(1);
-      expect(result.current.decks[0].name).toBe("Vocabulary Deck");
+      expect(result.current.decks[0].name).toBe('Vocabulary Deck');
       expect(result.current.decks[0].cards).toHaveLength(1);
     });
 
-    it("should save deck and reload list", async () => {
+    it('should save deck and reload list', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -373,21 +408,21 @@ describe("use-saved-materials", () => {
 
       await act(async () => {
         await result.current.saveDeck({
-          name: "Vocabulary Deck",
-          subject: "english",
-          cards: [{ front: "Hello", back: "Ciao" }],
+          name: 'Vocabulary Deck',
+          subject: 'english',
+          cards: [{ front: 'Hello', back: 'Ciao' }],
         });
       });
 
       expect(mockCsrfFetch).toHaveBeenCalledWith(
-        "/api/materials",
+        '/api/materials',
         expect.objectContaining({
-          method: "POST",
+          method: 'POST',
         }),
       );
     });
 
-    it("should delete deck and update state", async () => {
+    it('should delete deck and update state', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -404,7 +439,7 @@ describe("use-saved-materials", () => {
       mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
-        const success = await result.current.deleteDeck("deck-1");
+        const success = await result.current.deleteDeck('deck-1');
         expect(success).toBe(true);
       });
 
@@ -415,34 +450,34 @@ describe("use-saved-materials", () => {
   // ============================================================================
   // useHomeworkSessions
   // ============================================================================
-  describe("useHomeworkSessions", () => {
+  describe('useHomeworkSessions', () => {
     const mockHomeworkMaterial = {
-      id: "4",
-      toolId: "homework-1",
-      toolType: "homework",
-      title: "Math Homework",
+      id: '4',
+      toolId: 'homework-1',
+      toolType: 'homework',
+      title: 'Math Homework',
       content: {
         steps: [
           {
-            id: "s1",
-            description: "Step 1",
+            id: 's1',
+            description: 'Step 1',
             hints: [],
-            studentNotes: "",
+            studentNotes: '',
             completed: false,
           },
         ],
-        problemType: "Esercizio",
-        photoUrl: "https://example.com/photo.jpg",
+        problemType: 'Esercizio',
+        photoUrl: 'https://example.com/photo.jpg',
       },
-      subject: "mathematics",
-      status: "active",
+      subject: 'mathematics',
+      status: 'active',
       isBookmarked: false,
       viewCount: 0,
-      createdAt: "2026-01-01T00:00:00Z",
-      updatedAt: "2026-01-01T00:00:00Z",
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: '2026-01-01T00:00:00Z',
     };
 
-    it("should load homework sessions from API on mount", async () => {
+    it('should load homework sessions from API on mount', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockHomeworkMaterial] }),
@@ -455,11 +490,11 @@ describe("use-saved-materials", () => {
       });
 
       expect(result.current.sessions).toHaveLength(1);
-      expect(result.current.sessions[0].title).toBe("Math Homework");
+      expect(result.current.sessions[0].title).toBe('Math Homework');
       expect(result.current.sessions[0].steps).toHaveLength(1);
     });
 
-    it("should update homework session", async () => {
+    it('should update homework session', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -480,10 +515,10 @@ describe("use-saved-materials", () => {
           ...result.current.sessions[0],
           steps: [
             {
-              id: "s1",
-              description: "Step 1 Updated",
+              id: 's1',
+              description: 'Step 1 Updated',
               hints: [],
-              studentNotes: "Done!",
+              studentNotes: 'Done!',
               completed: true,
             },
           ],
@@ -492,14 +527,14 @@ describe("use-saved-materials", () => {
       });
 
       expect(mockCsrfFetch).toHaveBeenCalledWith(
-        "/api/materials",
+        '/api/materials',
         expect.objectContaining({
-          method: "PATCH",
+          method: 'PATCH',
         }),
       );
     });
 
-    it("should delete homework session", async () => {
+    it('should delete homework session', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -516,7 +551,7 @@ describe("use-saved-materials", () => {
       mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
-        const success = await result.current.deleteSession("homework-1");
+        const success = await result.current.deleteSession('homework-1');
         expect(success).toBe(true);
       });
 
@@ -527,60 +562,62 @@ describe("use-saved-materials", () => {
   // ============================================================================
   // autoSaveMaterial
   // ============================================================================
-  describe("autoSaveMaterial", () => {
+  describe('autoSaveMaterial', () => {
     // C-14/C-15 FIX: autoSaveMaterial now uses upsert pattern (single POST call)
     // and returns boolean instead of void
-    it("should save material using upsert pattern", async () => {
+    it('should save material using upsert pattern', async () => {
       // autoSaveMaterial uses csrfFetch for POST
       mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ material: { id: "1" } }),
+        json: async () => ({ material: { id: '1' } }),
       });
 
-      const result = await autoSaveMaterial("mindmap", "New Mindmap", {
+      const result = await autoSaveMaterial('mindmap', 'New Mindmap', {
         nodes: [],
       });
 
       expect(result).toBe(true);
       expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
       expect(mockCsrfFetch).toHaveBeenCalledWith(
-        "/api/materials",
+        '/api/materials',
         expect.objectContaining({
-          method: "POST",
+          method: 'POST',
         }),
       );
     });
 
-    it("should return false when save fails", async () => {
+    it('should return false when save fails', async () => {
       mockCsrfFetch.mockResolvedValueOnce({
         ok: false,
-        json: async () => ({ error: "Failed to save" }),
+        json: async () => ({ error: 'Failed to save' }),
       });
 
-      const result = await autoSaveMaterial("mindmap", "Test Mindmap", {
+      const result = await autoSaveMaterial('mindmap', 'Test Mindmap', {
         nodes: [],
       });
 
       expect(result).toBe(false);
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
     });
 
-    it("should handle fetch errors and return false", async () => {
-      mockCsrfFetch.mockRejectedValueOnce(new Error("Network error"));
+    it('should handle fetch errors and return false', async () => {
+      mockCsrfFetch.mockRejectedValueOnce(new Error('Network error'));
 
       // Should not throw, returns false on error
-      const result = await autoSaveMaterial("quiz", "Test Quiz", {
+      const result = await autoSaveMaterial('quiz', 'Test Quiz', {
         questions: [],
       });
       expect(result).toBe(false);
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
     });
   });
 
   // ============================================================================
   // Error handling
   // ============================================================================
-  describe("error handling", () => {
-    it("should handle network errors gracefully", async () => {
-      mockFetch.mockRejectedValueOnce(new Error("Network error"));
+  describe('error handling', () => {
+    it('should handle network errors gracefully', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const { result } = renderHook(() => useMindmaps());
 
@@ -591,19 +628,19 @@ describe("use-saved-materials", () => {
       expect(result.current.mindmaps).toEqual([]);
     });
 
-    it("should return false when delete fails", async () => {
+    it('should return false when delete fails', async () => {
       // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           materials: [
             {
-              id: "1",
-              toolId: "test-1",
-              toolType: "mindmap",
-              title: "Test",
+              id: '1',
+              toolId: 'test-1',
+              toolType: 'mindmap',
+              title: 'Test',
               content: { nodes: [] },
-              status: "active",
+              status: 'active',
             },
           ],
         }),
@@ -619,7 +656,7 @@ describe("use-saved-materials", () => {
       mockCsrfFetch.mockResolvedValueOnce({ ok: false, status: 500 });
 
       await act(async () => {
-        const success = await result.current.deleteMindmap("test-1");
+        const success = await result.current.deleteMindmap('test-1');
         expect(success).toBe(false);
       });
     });

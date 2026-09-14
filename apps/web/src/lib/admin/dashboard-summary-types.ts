@@ -1,4 +1,5 @@
 import type { ServiceStatus } from './health-aggregator-types';
+import type { MetricTruth } from './metric-truth';
 
 export interface DashboardSummary {
   health: {
@@ -6,15 +7,25 @@ export interface DashboardSummary {
     servicesDownCount: number;
   };
   safety: {
-    unresolvedCount: number;
+    unresolvedCount: number | null;
   };
   cost: {
-    totalEur: number;
+    totalEur: number | null;
   };
   business: {
-    mrr: number;
-    trialConversionRate: number;
+    mrr: number | null;
+    trialConversionRate: number | null;
     churnRate: number | null;
+  };
+  metrics: {
+    health: MetricTruth<ServiceStatus>;
+    servicesDown: MetricTruth;
+    safety: MetricTruth;
+    cost: MetricTruth;
+    dailyCost: MetricTruth;
+    mrr: MetricTruth;
+    trialConversionRate: MetricTruth;
+    churnRate: MetricTruth;
   };
   generatedAt: string;
 }

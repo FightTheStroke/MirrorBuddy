@@ -10,18 +10,22 @@
  * - subscription.expired: Subscription expires (trial end, renewal failure)
  */
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
+import {
+  hasAnalyticsConsent,
+  sendOptionalAnalytics,
+} from '@/lib/telemetry/optional-analytics-client';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export type SubscriptionEventType =
-  | "subscription.created"
-  | "subscription.upgraded"
-  | "subscription.downgraded"
-  | "subscription.cancelled"
-  | "subscription.expired";
+  | 'subscription.created'
+  | 'subscription.upgraded'
+  | 'subscription.downgraded'
+  | 'subscription.cancelled'
+  | 'subscription.expired';
 
 export interface SubscriptionEvent {
   type: SubscriptionEventType;
@@ -45,16 +49,15 @@ export interface TrackedSubscriptionEvent extends SubscriptionEvent {
  * @param event - The subscription event to track
  * @returns The tracked event with timestamp normalized
  */
-export function trackSubscriptionEvent(
-  event: SubscriptionEvent,
-): TrackedSubscriptionEvent {
+export function trackSubscriptionEvent(event: SubscriptionEvent): TrackedSubscriptionEvent {
   const trackedEvent: TrackedSubscriptionEvent = {
     ...event,
     timestamp: event.timestamp || new Date(),
   };
+  if (!hasAnalyticsConsent()) return trackedEvent;
 
   // Log the event
-  logger.info("[Subscription Telemetry] Event tracked", {
+  logger.info('[Subscription Telemetry] Event tracked', {
     eventType: event.type,
     userId: event.userId,
     tierId: event.tierId,
@@ -63,8 +66,8 @@ export function trackSubscriptionEvent(
   });
 
   // Emit to API (fire and forget)
-  emitSubscriptionEventToApi(trackedEvent).catch(() => {
-    // Silently ignore API errors - telemetry should never break the app
+  emitSubscriptionEventToApi(trackedEvent).catch((error: unknown) => {
+    logger.warn('Optional subscription tracking failed', { error: String(error) });
   });
 
   return trackedEvent;
@@ -80,7 +83,7 @@ export function createSubscriptionCreatedEvent(
   metadata?: Record<string, unknown>,
 ): SubscriptionEvent {
   return {
-    type: "subscription.created",
+    type: 'subscription.created',
     userId,
     tierId,
     previousTierId: null,
@@ -100,7 +103,7 @@ export function createSubscriptionUpgradedEvent(
   metadata?: Record<string, unknown>,
 ): SubscriptionEvent {
   return {
-    type: "subscription.upgraded",
+    type: 'subscription.upgraded',
     userId,
     tierId,
     previousTierId,
@@ -120,7 +123,7 @@ export function createSubscriptionDowngradedEvent(
   metadata?: Record<string, unknown>,
 ): SubscriptionEvent {
   return {
-    type: "subscription.downgraded",
+    type: 'subscription.downgraded',
     userId,
     tierId,
     previousTierId,
@@ -139,7 +142,7 @@ export function createSubscriptionCancelledEvent(
   metadata?: Record<string, unknown>,
 ): SubscriptionEvent {
   return {
-    type: "subscription.cancelled",
+    type: 'subscription.cancelled',
     userId,
     tierId,
     previousTierId: null,
@@ -158,7 +161,7 @@ export function createSubscriptionExpiredEvent(
   metadata?: Record<string, unknown>,
 ): SubscriptionEvent {
   return {
-    type: "subscription.expired",
+    type: 'subscription.expired',
     userId,
     tierId,
     previousTierId: null,
@@ -178,10 +181,7 @@ export function createSubscriptionExpiredEvent(
 export async function emitSubscriptionEventToApi(
   event: SubscriptionEvent | TrackedSubscriptionEvent,
 ): Promise<void> {
-  if (typeof window === "undefined" && typeof fetch === "undefined") {
-    // Skip API call in non-browser environments without fetch
-    return;
-  }
+  if (!hasAnalyticsConsent()) return;
 
   try {
     // Normalize timestamp - handle both SubscriptionEvent and TrackedSubscriptionEvent
@@ -195,27 +195,17 @@ export async function emitSubscriptionEventToApi(
       metadata: event.metadata,
     };
 
-    const response = await fetch("/api/metrics/subscription-events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      keepalive: true,
-    });
+    const sent = await sendOptionalAnalytics('/api/metrics/subscription-events', payload);
 
-    if (response.ok) {
-      logger.debug("[Subscription Telemetry] Event emitted to API", {
+    if (sent) {
+      logger.debug('[Subscription Telemetry] Event emitted to API', {
         eventType: event.type,
         userId: event.userId,
-      });
-    } else {
-      logger.warn("[Subscription Telemetry] API returned non-OK status", {
-        status: response.status,
-        eventType: event.type,
       });
     }
   } catch (error) {
     logger.error(
-      "[Subscription Telemetry] Failed to emit event to API",
+      '[Subscription Telemetry] Failed to emit event to API',
       {
         eventType: event.type,
         userId: event.userId,

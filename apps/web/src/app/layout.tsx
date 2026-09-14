@@ -8,6 +8,7 @@ import * as Sentry from '@sentry/nextjs';
 // Only render Analytics on Vercel (VERCEL env var is set by Vercel)
 const isVercel = process.env.VERCEL === '1';
 import { Providers } from '@/components/providers';
+import { getServerIdentity } from '@/lib/auth/server-identity';
 import { getNonce } from '@/lib/security';
 import { getRootOGMetadata } from '@/lib/i18n/get-og-metadata';
 import { headers } from 'next/headers';
@@ -67,6 +68,7 @@ export default async function RootLayout({
   // Get CSP nonce for Next.js hydration scripts
   // Next.js will automatically add this nonce to inline scripts when available
   const nonce = await getNonce();
+  const initialIdentity = await getServerIdentity();
 
   let localeFromNextIntl: Locale | null = null;
   try {
@@ -116,7 +118,7 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <Providers nonce={nonce}>
+          <Providers nonce={nonce} initialIdentity={initialIdentity}>
             <div id="main-content" tabIndex={-1}>
               {children}
             </div>

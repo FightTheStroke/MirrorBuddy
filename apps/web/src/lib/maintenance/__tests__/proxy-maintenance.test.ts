@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { AUTH_COOKIE_NAME, LEGACY_AUTH_COOKIE } from '@/lib/auth';
 
 const { nextSpy, redirectSpy } = vi.hoisted(() => ({
   nextSpy: vi.fn(),
@@ -52,11 +53,6 @@ vi.mock('@/lib/observability/metrics-store', () => ({
   },
 }));
 
-vi.mock('@/lib/auth', () => ({
-  AUTH_COOKIE_NAME: 'mirrorbuddy-user-id',
-  VISITOR_COOKIE_NAME: 'mirrorbuddy-visitor-id',
-}));
-
 import proxy from '@/proxy';
 
 type MockRequest = {
@@ -100,15 +96,19 @@ describe('proxy maintenance redirect', () => {
     expect(response.redirectedTo).toBe('https://example.com/it/maintenance');
   });
 
-  it('passes through /admin/* during maintenance', () => {
-    const request = createRequest('/admin/users', {
-      'mirrorbuddy-user-id': 'test-user',
-    });
+  it.each([AUTH_COOKIE_NAME, LEGACY_AUTH_COOKIE])(
+    'passes through /admin/* during maintenance with %s present',
+    (cookieName) => {
+      const request = createRequest('/admin/users', {
+        [cookieName]: 'present-session-credential',
+      });
 
-    proxy(request as never);
+      proxy(request as never);
 
-    expect(nextSpy).toHaveBeenCalled();
-  });
+      expect(nextSpy).toHaveBeenCalled();
+      expect(redirectSpy).not.toHaveBeenCalled();
+    },
+  );
 
   it('passes through /api/* during maintenance', () => {
     const request = createRequest('/api/cron/cleanup');

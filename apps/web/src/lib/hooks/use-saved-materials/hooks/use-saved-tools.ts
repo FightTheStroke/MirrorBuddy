@@ -5,27 +5,35 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { ToolType } from '@/types/tools';
-import { getUserId } from '../utils/user-id';
+import { isCurrentOwner, useMaterialOwner } from '../utils/use-material-owner';
 import { fetchMaterials, deleteMaterialFromAPI } from '../utils/api';
 import type { SavedMaterial } from '../types';
 
 export function useSavedTools(toolType: ToolType) {
   const [tools, setTools] = useState<SavedMaterial[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = getUserId();
+  const { userId, identity, identityError } = useMaterialOwner();
+  const [error, setError] = useState<string | null>(null);
+  const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
 
   const loadTools = useCallback(async () => {
     setLoading(true);
-    const materials = await fetchMaterials(toolType, userId);
-    setTools(materials);
-    setLoading(false);
-  }, [userId, toolType]);
+    try {
+      const materials = await fetchMaterials(toolType, userId);
+      if (!isCurrentOwner(identity)) return;
+      setTools(materials);
+      setLoadedOwner(userId);
+      setError(null);
+    } catch {
+      if (isCurrentOwner(identity)) setError('MATERIALS_UNAVAILABLE');
+    } finally {
+      if (isCurrentOwner(identity)) setLoading(false);
+    }
+  }, [userId, identity, toolType]);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadTools();
   }, [loadTools]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const deleteTool = useCallback(async (id: string) => {
     const success = await deleteMaterialFromAPI(id);
@@ -35,6 +43,11 @@ export function useSavedTools(toolType: ToolType) {
     return success;
   }, []);
 
-  return { tools, loading, deleteTool, reload: loadTools };
+  return {
+    tools: userId && loadedOwner === userId ? tools : [],
+    loading,
+    error: identityError || error,
+    deleteTool,
+    reload: loadTools,
+  };
 }
-

@@ -6,8 +6,10 @@
  */
 
 import { type FunnelStage } from './constants';
-import { hasAnalyticsConsent } from '@/lib/consent/consent-storage';
-import { csrfFetch } from '@/lib/auth';
+import {
+  hasAnalyticsConsent,
+  sendOptionalAnalytics,
+} from '@/lib/telemetry/optional-analytics-client';
 import { clientLogger } from '@/lib/logger/client';
 
 export { type FunnelStage };
@@ -35,19 +37,14 @@ export async function trackFunnelEvent({
   }
 
   try {
-    const response = await csrfFetch('/api/funnel/track', {
-      method: 'POST',
-      body: JSON.stringify({
-        stage,
-        fromStage,
-        metadata: {
-          ...metadata,
-          clientTimestamp: new Date().toISOString(),
-        },
-      }),
+    return await sendOptionalAnalytics('/api/funnel/track', {
+      stage,
+      fromStage,
+      metadata: {
+        ...metadata,
+        clientTimestamp: new Date().toISOString(),
+      },
     });
-
-    return response.ok;
   } catch (error) {
     clientLogger.error('Failed to track event', { component: 'Funnel' }, error);
     return false;
@@ -58,6 +55,7 @@ export async function trackFunnelEvent({
  * Track visitor landing on welcome page
  */
 export function trackWelcomeVisit(): Promise<boolean> {
+  if (!hasAnalyticsConsent()) return Promise.resolve(false);
   return trackFunnelEvent({
     stage: 'VISITOR',
     metadata: {

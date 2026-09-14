@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve unsaved progress and sessions after failed reads, retry hydration automatically,
+  and acknowledge writes only after successful responses. Session uploads now follow the
+  existing create/complete API contract and retain acknowledged IDs across retries.
+- Correct communications breadcrumb translations for statistics, templates, and campaigns.
+- Show safe, accessible Key Vault error feedback with a working retry action, including
+  database failures. This does not identify the historical server-side failure.
+- PWA: offline service-worker registration no longer throws a secondary error when
+  the Service Worker API or its registration result is missing (Sentry).
+- Study materials: title/topic normalisation for flashcards, summaries, quizzes and
+  mindmaps, preserving the stored title instead of producing undefined reads (Sentry).
+- Production error watch: real 24-hour window, strict validation of missing, future and
+  malformed timestamps, cumulative counts labelled as such, and no automatic closure of
+  unresolved Sentry issues merely because they are old.
+- Key rotation: token and personal-data re-encryption now run with bounded concurrency
+  instead of fully serial processing, removing the batch slowdown.
+- Agent controls: edit-path parsing for both Claude and Copilot payload shapes, with a
+  structured denial for patches that target multiple files.
+
+### Security
+
+- Runtime upgraded to Node 24 across `package.json`, Docker images, CI workflows and docs.
+- Dependency updates resolving all open advisories (Next.js, sanitize-html, sharp,
+  js-yaml, xmldom, fast-uri, mysql2, qs, Hono, fflate, Vitest); dependency audit reports
+  no known vulnerabilities.
+
 ## [0.38.5] - 2026-09-05
 
 - No user-facing changes recorded.

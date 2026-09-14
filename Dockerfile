@@ -5,7 +5,7 @@
 # ==============================================================================
 # Stage 1: Dependencies
 # ==============================================================================
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 WORKDIR /app
 
 # Install dependencies for native modules (Prisma, sharp)
@@ -30,7 +30,7 @@ RUN pnpm exec prisma generate
 # ==============================================================================
 # Stage 2: Builder
 # ==============================================================================
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
 # Enable pnpm in builder stage too (corepack activation doesn't carry across
@@ -54,7 +54,7 @@ RUN BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) pnpm --dir apps/web build
 # ==============================================================================
 # Stage 3: Runner (Production)
 # ==============================================================================
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 # Security: Run as non-root user

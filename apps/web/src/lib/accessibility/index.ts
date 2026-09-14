@@ -9,7 +9,7 @@ export {
   defaultAccessibilitySettings,
   defaultADHDConfig,
   defaultADHDStats,
-} from "./accessibility-store";
+} from './accessibility-store';
 
 export type {
   AccessibilitySettings,
@@ -17,7 +17,10 @@ export type {
   ADHDSessionConfig,
   ADHDSessionStats,
   A11yProfileId,
-} from "./accessibility-store";
+} from './accessibility-store';
 
-export { applyMindmapKeyboardAccessibility } from "./mindmap-keyboard-nav";
-export type { MindmapKeyboardNavOptions } from "./mindmap-keyboard-nav";
+export { applyMindmapKeyboardAccessibility } from './mindmap-keyboard-nav';
+export type { MindmapKeyboardNavOptions } from './mindmap-keyboard-nav';
+
+export { resolveSpeechLanguage, selectSpeechVoice } from './speech-locale';
+export type { SpeechVoiceLike, SpeechVoiceMatch, SpeechVoiceSelection } from './speech-locale';

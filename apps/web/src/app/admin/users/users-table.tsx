@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { AlertCircle } from 'lucide-react';
-import { useStagingDataFilter } from '@/hooks/use-staging-data-filter';
-import { useUsersFilter } from '@/hooks/use-users-filter';
-import { useUsersTrash } from '@/hooks/use-users-trash';
 import { useUserActions } from '@/hooks/use-user-actions';
-import { StagingDataToggle } from '@/components/admin/staging-data-toggle';
-import { toast } from '@/components/ui/toast';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +14,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableHeader,
@@ -29,291 +23,175 @@ import {
   TableEmpty,
 } from '@/components/ui/table';
 import { ResponsiveTable } from '@/components/admin/responsive-table';
-import { ExportDropdown } from '@/components/admin/export-dropdown';
-import { UsersBulkActions } from './users-bulk-actions';
-import { UsersSearch } from './users-search';
-import { UsersTrashToolbar } from './users-trash-toolbar';
 import { ResetPasswordModal } from '@/components/admin/reset-password-modal';
+import type { ListedTier, ListedUser, UserListPage } from '@/lib/admin/user-list-types';
+import { UsersBulkActions } from './users-bulk-actions';
+import { UsersTrashToolbar } from './users-trash-toolbar';
 import { UsersTableRow } from './users-table-row';
 import { UsersTrashRow } from './users-trash-row';
+import { UsersListControls } from './users-list-controls';
+import { UsersPagination } from './users-pagination';
+import { useUserListNavigation } from './use-user-list-navigation';
+import { useUserListSelection } from './use-user-list-selection';
 
-interface User {
-  id: string;
-  username: string | null;
-  email: string | null;
-  role: 'USER' | 'ADMIN';
-  disabled: boolean;
-  isTestData: boolean;
-  createdAt: Date;
-  subscription: {
-    id: string;
-    tier: {
-      id: string;
-      code: string;
-      name: string;
-      chatLimitDaily: number;
-      voiceMinutesDaily: number;
-      toolsLimitDaily: number;
-      docsLimitTotal: number;
-      features: unknown;
-    };
-    overrideLimits: unknown;
-    overrideFeatures: unknown;
-  } | null;
-}
-
-interface Tier {
-  id: string;
-  code: string;
-  name: string;
-}
-
-type FilterTab = 'all' | 'active' | 'disabled' | 'trash';
-
-export function UsersTable({ users, availableTiers }: { users: User[]; availableTiers: Tier[] }) {
+export function UsersTable({
+  listing,
+  availableTiers,
+  canManage,
+  stagingSpecified = true,
+}: {
+  listing: UserListPage;
+  availableTiers: ListedTier[];
+  canManage: boolean;
+  stagingSpecified?: boolean;
+}) {
   const t = useTranslations('admin.users');
   const router = useRouter();
-  const [filter, setFilter] = useState<FilterTab>('all');
-  const [search, setSearch] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const { showStagingData, setShowStagingData } = useStagingDataFilter();
-  const { deletedBackups, error, loadTrash } = useUsersTrash();
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const navigation = useUserListNavigation(listing.query, stagingSpecified);
+  const selection = useUserListSelection(listing.query);
+  const selected = selection.selected;
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
-  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    if (filter === 'trash') void loadTrash();
-  }, [filter, loadTrash]);
-
-  const { filteredUsers, stagingDataCount } = useUsersFilter(
-    users,
-    filter,
-    search,
-    showStagingData,
-  );
-  const { isLoading: actionLoading, error: actionError, handleAction } = useUserActions();
-
-  // Use action error if it exists, otherwise use trash error
-  const displayError = actionError || error;
-
-  const handleDelete = (userId: string) => {
-    setUserToDelete(userId);
-    setDeleteConfirmOpen(true);
+  const [resetPasswordUser, setResetPasswordUser] = useState<ListedUser | null>(null);
+  const { isLoading: actionLoading, error, handleAction } = useUserActions();
+  const refresh = async () => {
+    router.refresh();
   };
+  const trash = listing.query.tab === 'trash';
+  const allPageSelected =
+    listing.users.length > 0 && listing.users.every((user) => selected.has(user.id));
 
   const confirmDelete = async () => {
     if (!userToDelete) return;
-    setDeleteConfirmOpen(false);
-    await handleAction(userToDelete, 'delete', undefined, loadTrash);
-    toast.success('User deleted', 'User has been deleted successfully');
-    router.refresh();
+    const id = userToDelete;
     setUserToDelete(null);
+    await handleAction(id, 'delete', undefined, refresh);
   };
 
-  const toggleSelect = (id: string) =>
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-
-  const toggleSelectAll = () =>
-    setSelectedIds(
-      selectedIds.size === filteredUsers.length
-        ? new Set()
-        : new Set(filteredUsers.map((u) => u.id)),
-    );
-
   return (
-    <div>
-      {displayError && (
-        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
+    <div aria-busy={navigation.pending}>
+      {selection.error && (
+        <p role="alert" className="text-red-700 dark:text-red-300">
+          {t('pagination.loadFailed')}
+        </p>
+      )}
+      {error && (
+        <div
+          role="alert"
+          className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2"
+        >
           <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-          <p className="text-red-700 dark:text-red-300 text-sm">{displayError}</p>
+          <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
         </div>
       )}
-
-      <div className="mb-4">
-        <StagingDataToggle
-          showStagingData={showStagingData}
-          onToggle={setShowStagingData}
-          hiddenCount={!showStagingData ? stagingDataCount : undefined}
-        />
-      </div>
-
-      <Tabs
-        value={filter}
-        onValueChange={(value) => {
-          setFilter(value as FilterTab);
-          setSelectedIds(new Set());
-        }}
-      >
-        <TabsList className="mb-4 overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none">
-          <TabsTrigger
-            value="all"
-            title={`${t('tabs.all')} (${users.length})`}
-            className="min-h-11 min-w-11 md:min-w-auto"
-          >
-            <span className="sr-only">
-              {t('tabs.all')} ({users.length})
-            </span>
-            <span className="md:hidden">&#x1F465;</span>
-            <span className="hidden md:inline">
-              {t('tabs.all')} ({users.length})
-            </span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="active"
-            title={t('tabs.active')}
-            className="min-h-11 min-w-11 md:min-w-auto"
-          >
-            <span className="sr-only">{t('tabs.active')}</span>
-            <span className="md:hidden">&#x2713;</span>
-            <span className="hidden md:inline">{t('tabs.active')}</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="disabled"
-            title={t('tabs.disabled')}
-            className="min-h-11 min-w-11 md:min-w-auto"
-          >
-            <span className="sr-only">{t('tabs.disabled')}</span>
-            <span className="md:hidden">&#x1F6AB;</span>
-            <span className="hidden md:inline">{t('tabs.disabled')}</span>
-          </TabsTrigger>
-          <TabsTrigger
-            value="trash"
-            title={`${t('tabs.trash')} (${deletedBackups.length})`}
-            className="min-h-11 min-w-11 md:min-w-auto"
-          >
-            <span className="sr-only">
-              {t('tabs.trash')} ({deletedBackups.length})
-            </span>
-            <span className="md:hidden">&#x1F5D1;&#xFE0F;</span>
-            <span className="hidden md:inline">
-              {t('tabs.trash')} ({deletedBackups.length})
-            </span>
-          </TabsTrigger>
-        </TabsList>
-
-        {filter !== 'trash' && (
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1">
-              <UsersSearch value={search} onChange={setSearch} />
-            </div>
-            <ExportDropdown
-              data={filteredUsers}
-              columns={[
-                { key: 'username', label: 'Username' },
-                { key: 'email', label: 'Email' },
-                { key: 'role', label: 'Role' },
-                { key: 'disabled', label: 'Disabled' },
-                { key: 'createdAt', label: 'Created' },
-              ]}
-              filenamePrefix="users"
-            />
-          </div>
-        )}
-        {filter === 'trash' && (
-          <UsersTrashToolbar count={deletedBackups.length} onEmptyComplete={loadTrash} />
-        )}
-
-        <ResponsiveTable caption="Users table">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {filter !== 'trash' && (
-                  <TableHead className="w-10">
-                    <input
-                      type="checkbox"
-                      checked={
-                        selectedIds.size === filteredUsers.length && filteredUsers.length > 0
-                      }
-                      onChange={toggleSelectAll}
-                      className="rounded"
-                    />
-                  </TableHead>
-                )}
-                <TableHead>{t('table.username')}</TableHead>
-                <TableHead>{t('table.email')}</TableHead>
-                {filter !== 'trash' && (
-                  <>
-                    <TableHead>{t('table.role')}</TableHead>
-                    <TableHead>{t('table.tier')}</TableHead>
-                    <TableHead>{t('table.status')}</TableHead>
-                  </>
-                )}
-                <TableHead>
-                  {filter === 'trash' ? t('table.deleted') : t('table.created')}
+      <UsersListControls
+        listing={listing}
+        {...navigation}
+        pending={navigation.pending || selection.loading}
+      />
+      {trash && canManage && (
+        <UsersTrashToolbar count={listing.trashTotal} onEmptyComplete={() => router.refresh()} />
+      )}
+      <UsersPagination
+        listing={listing}
+        pending={navigation.pending || selection.loading}
+        onPage={navigation.setPage}
+        onPageSize={navigation.setPageSize}
+      />
+      {canManage && !trash && (
+        <Button
+          className="mb-3"
+          variant="outline"
+          disabled={navigation.pending || selection.loading || listing.total === 0}
+          onClick={() => void selection.selectMatching()}
+        >
+          {t('pagination.selectMatching', { count: listing.total })}
+        </Button>
+      )}
+      <ResponsiveTable caption={t('pageTitle')}>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {!trash && canManage && (
+                <TableHead className="w-10">
+                  <input
+                    type="checkbox"
+                    checked={allPageSelected}
+                    onChange={() => selection.togglePage(listing.users)}
+                    disabled={navigation.pending || selection.loading}
+                    aria-label={t('pagination.selectPage')}
+                    className="rounded"
+                  />
                 </TableHead>
-                <TableHead>{t('table.actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filter === 'trash'
-                ? deletedBackups.map((b) => (
-                    <UsersTrashRow
-                      key={b.userId}
-                      backup={b}
-                      isLoading={actionLoading === b.userId}
-                      onRestore={() => handleAction(b.userId, 'restore', undefined, loadTrash)}
-                    />
-                  ))
-                : filteredUsers.map((user) => (
-                    <UsersTableRow
-                      key={user.id}
-                      user={user}
-                      isSelected={selectedIds.has(user.id)}
-                      isLoading={actionLoading === user.id}
-                      onSelect={() => toggleSelect(user.id)}
-                      onToggle={() => handleAction(user.id, 'toggle', user.disabled, loadTrash)}
-                      onRoleToggle={() => handleAction(user.id, 'roleToggle', user.role, loadTrash)}
-                      onResetPassword={() => setResetPasswordUser(user)}
-                      onDelete={() => handleDelete(user.id)}
-                      availableTiers={availableTiers}
-                    />
-                  ))}
-            </TableBody>
-          </Table>
-        </ResponsiveTable>
-
-        {filter !== 'trash' && filteredUsers.length === 0 && (
-          <TableEmpty>{t('emptyMessage')}</TableEmpty>
-        )}
-        {filter === 'trash' && deletedBackups.length === 0 && (
-          <TableEmpty>{t('trashEmpty')}</TableEmpty>
-        )}
-
+              )}
+              <TableHead>{t('table.username')}</TableHead>
+              <TableHead>{t('table.email')}</TableHead>
+              {!trash && (
+                <>
+                  <TableHead>{t('table.role')}</TableHead>
+                  <TableHead>{t('table.tier')}</TableHead>
+                  <TableHead>{t('table.status')}</TableHead>
+                </>
+              )}
+              <TableHead>{trash ? t('table.deleted') : t('table.created')}</TableHead>
+              <TableHead>{t('table.actions')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {trash
+              ? listing.backups.map((backup) => (
+                  <UsersTrashRow
+                    key={backup.userId}
+                    backup={backup}
+                    canManage={canManage}
+                    isLoading={actionLoading === backup.userId}
+                    onRestore={() => handleAction(backup.userId, 'restore', undefined, refresh)}
+                  />
+                ))
+              : listing.users.map((user) => (
+                  <UsersTableRow
+                    key={user.id}
+                    user={user}
+                    canManage={canManage}
+                    isSelected={selected.has(user.id)}
+                    isLoading={actionLoading === user.id || navigation.pending || selection.loading}
+                    onSelect={() => selection.toggle(user)}
+                    onToggle={() => handleAction(user.id, 'toggle', user.disabled, refresh)}
+                    onRoleToggle={() => handleAction(user.id, 'roleToggle', user.role, refresh)}
+                    onResetPassword={() => setResetPasswordUser(user)}
+                    onDelete={() => setUserToDelete(user.id)}
+                    availableTiers={availableTiers}
+                  />
+                ))}
+          </TableBody>
+        </Table>
+      </ResponsiveTable>
+      {!trash && listing.users.length === 0 && <TableEmpty>{t('emptyMessage')}</TableEmpty>}
+      {trash && listing.backups.length === 0 && <TableEmpty>{t('trashEmpty')}</TableEmpty>}
+      {canManage && !trash && (
         <UsersBulkActions
-          selectedIds={selectedIds}
-          onClearSelection={() => setSelectedIds(new Set())}
+          selectedIds={new Set(selected.keys())}
+          onClearSelection={selection.clear}
           onActionComplete={() => router.refresh()}
-          users={users}
+          users={[...selected.values()]}
           availableTiers={availableTiers}
         />
-      </Tabs>
-
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      )}
+      <Dialog
+        open={canManage && userToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setUserToDelete(null);
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t('confirmDelete')}</DialogTitle>
             <DialogDescription>
-              {t('areYouSureYouWantToDeleteThisUserThisActionCannotB')}
+              {t('areYouSureYouWantToDeleteThisUserThisActionCannotB')}{' '}
               {t('undoneTheUserWillBeMovedToTrashAndCanBeRestoredWit')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDeleteConfirmOpen(false);
-                setUserToDelete(null);
-              }}
-            >
+            <Button variant="outline" onClick={() => setUserToDelete(null)}>
               {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
@@ -322,10 +200,9 @@ export function UsersTable({ users, availableTiers }: { users: User[]; available
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      {resetPasswordUser && (
+      {canManage && resetPasswordUser && (
         <ResetPasswordModal
-          isOpen={!!resetPasswordUser}
+          isOpen
           onClose={() => setResetPasswordUser(null)}
           onSuccess={() => router.refresh()}
           user={{

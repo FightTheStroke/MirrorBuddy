@@ -184,64 +184,27 @@ else
 fi
 
 # =============================================================================
-# PHASE 5/5: VERCEL REMOTE ENV VARS
+# PHASE 5/5: VERCEL PRODUCTION ENV METADATA
 # =============================================================================
-echo -e "${BLUE}[5/5] Vercel remote env vars...${NC}"
+echo -e "${BLUE}[5/5] Vercel production environment names (no secret download)...${NC}"
 
-if [ "${SKIP_VERCEL_ENV_CHECK:-}" = "1" ]; then
-	echo -e "${YELLOW}⚠ Vercel env check skipped (SKIP_VERCEL_ENV_CHECK=1)${NC}"
-elif command -v vercel &>/dev/null; then
-	# `vercel env ls` needs the .vercel project link, which lives only in the
-	# main working tree. Git worktrees (the repo's mandated workflow) do not
-	# get a copy, and an unlinked directory returns an empty list — making
-	# every required variable look missing. Resolve the main tree explicitly.
-	VERCEL_CWD="$PWD"
-	if [ ! -d "$VERCEL_CWD/.vercel" ]; then
-		MAIN_TREE="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "")"
-		MAIN_TREE="${MAIN_TREE%/.git}"
-		if [ -n "$MAIN_TREE" ] && [ -d "$MAIN_TREE/.vercel" ]; then
-			VERCEL_CWD="$MAIN_TREE"
-		fi
+# Worktrees reuse the main tree's project link, never its environment files.
+VERCEL_CWD="$PWD"
+if [ ! -d "$VERCEL_CWD/.vercel" ]; then
+	MAIN_TREE="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "")"
+	MAIN_TREE="${MAIN_TREE%/.git}"
+	if [ -n "$MAIN_TREE" ] && [ -d "$MAIN_TREE/.vercel" ]; then
+		VERCEL_CWD="$MAIN_TREE"
 	fi
-
-	if [ ! -d "$VERCEL_CWD/.vercel" ]; then
-		echo -e "${YELLOW}⚠ No .vercel project link found, skipping remote env check${NC}"
-		echo -e "${YELLOW}  Run 'vercel link' to enable it${NC}"
-		VERCEL_VARS=""
-		MISSING_VARS=""
-	else
-		VERCEL_VARS=$(vercel env ls --cwd "$VERCEL_CWD" 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
-		MISSING_VARS=""
-
-		for var in "${REQUIRED_VARS[@]}"; do
-			if ! echo "$VERCEL_VARS" | /usr/bin/grep -q "^$var$"; then
-				MISSING_VARS="$MISSING_VARS $var"
-			fi
-		done
-	fi
-
-	if [ -n "$MISSING_VARS" ]; then
-		echo -e "${RED}✗ Missing Vercel env vars:${NC}$MISSING_VARS"
-		echo -e "${YELLOW}Fix: ./scripts/fix-vercel-env-vars.sh${NC}"
-		exit 1
-	fi
-	echo -e "${GREEN}✓ Vercel env vars OK${NC}"
-
-	# Check for corrupted env vars (literal \n at end)
-	vercel env pull "$TEMP_DIR/vercel-env.txt" --environment=production --cwd "$VERCEL_CWD" >/dev/null 2>&1 || true
-	if [ -f "$TEMP_DIR/vercel-env.txt" ]; then
-		CORRUPTED_VARS=$(/usr/bin/grep '\\n"$' "$TEMP_DIR/vercel-env.txt" | cut -d'=' -f1 || true)
-		if [ -n "$CORRUPTED_VARS" ]; then
-			echo -e "${RED}✗ Env vars with literal \\n (corrupted):${NC}"
-			echo "$CORRUPTED_VARS"
-			echo -e "${YELLOW}Fix: ./scripts/fix-vercel-env-vars.sh${NC}"
-			exit 1
-		fi
-		echo -e "${GREEN}✓ No corrupted env vars${NC}"
-	fi
-else
-	echo -e "${YELLOW}⚠ Vercel CLI not found, skipping remote check${NC}"
 fi
+if [ ! -d "$VERCEL_CWD/.vercel" ]; then
+	echo -e "${RED}✗ No .vercel project link; production metadata cannot be verified${NC}"
+	exit 1
+fi
+
+# Required names come from the pre-deploy critical policy, not optional fallbacks.
+# Value integrity is enforced in the trusted Vercel build and CI pre-deploy runtime.
+"$SCRIPT_DIR_PPV/../node_modules/.bin/tsx" "$SCRIPT_DIR_PPV/check-production-env.ts" metadata "$VERCEL_CWD"
 
 # =============================================================================
 # SUMMARY

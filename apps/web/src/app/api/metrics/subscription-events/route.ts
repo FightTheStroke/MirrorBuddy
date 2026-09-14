@@ -7,45 +7,39 @@
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
-
+import { z } from 'zod';
+import { safeReadJson } from '@/lib/api/safe-json';
+import {
+  canCollectOptionalAnalytics,
+  optionalAnalyticsDenied,
+} from '@/lib/telemetry/optional-analytics-server';
 
 export const revalidate = 0;
-interface SubscriptionEventPayload {
-  type: string;
-  tierId: string;
-  previousTierId?: string | null;
-  timestamp: string;
-  metadata?: Record<string, unknown>;
-}
+const payloadSchema = z.object({
+  type: z.enum([
+    'subscription.created',
+    'subscription.upgraded',
+    'subscription.downgraded',
+    'subscription.cancelled',
+    'subscription.expired',
+  ]),
+  tierId: z.string().min(1).max(128),
+  previousTierId: z.string().max(128).nullable().optional(),
+  timestamp: z.string().datetime({ offset: true }),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
 
 export const POST = pipe(
   withSentry('/api/metrics/subscription-events'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
-  const body: SubscriptionEventPayload = await ctx.req.json();
+  if (!(await canCollectOptionalAnalytics(ctx.userId))) return optionalAnalyticsDenied();
+  const parsed = payloadSchema.safeParse(await safeReadJson(ctx.req));
+  if (!parsed.success)
+    return NextResponse.json({ error: 'Invalid subscription event' }, { status: 400 });
+  const body = parsed.data;
   const userId = ctx.userId!;
-
-  // Validate required fields
-  if (!body.type || !body.tierId || !body.timestamp) {
-    return NextResponse.json(
-      { error: 'Missing required fields: type, tierId, timestamp' },
-      { status: 400 },
-    );
-  }
-
-  // Validate event type
-  const validEventTypes = [
-    'subscription.created',
-    'subscription.upgraded',
-    'subscription.downgraded',
-    'subscription.cancelled',
-    'subscription.expired',
-  ];
-
-  if (!validEventTypes.includes(body.type)) {
-    return NextResponse.json({ error: `Invalid event type: ${body.type}` }, { status: 400 });
-  }
 
   // Log the event
   logger.info('[Subscription Telemetry API] Event received', {

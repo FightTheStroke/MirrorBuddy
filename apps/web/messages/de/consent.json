@@ -98,16 +98,43 @@
       "consequencesText": "Der Widerruf bestimmter Zustimmungen kann den Zugriff auf spezifische Plattformfunktionen verhindern.",
       "contactSupport": "Kontaktiere Den Support"
     },
+    "sync": {
+      "cannotRetry": "Dieser Versuch kann nicht wiederholt werden. Lade die Seite neu, um deine Auswahl zu prüfen.",
+      "reload": "Seite neu laden",
+      "startingTrial": "Die Testphase wird gestartet...",
+      "trialStartFailed": "Der Start der Testphase konnte nicht abgeschlossen werden. Versuche den Start erneut.",
+      "retryTrial": "Testphase erneut starten",
+      "reloading": "Die Seite wird neu geladen...",
+      "reloadFailed": "Die Auswahl auf diesem Gerät wurde gelöscht, aber die Seite konnte nicht neu geladen werden. Lade sie neu, um fortzufahren.",
+      "saving": "Deine Auswahl wird gespeichert...",
+      "failed": "Deine Auswahl konnte nicht gespeichert oder synchronisiert werden. Versuche es erneut, ohne nochmals zu antworten.",
+      "changed": "Deine Sitzung oder Auswahl hat sich geändert. Die vorherige Auswahl kann nicht erneut gesendet werden: Triff eine neue ausdrückliche Auswahl.",
+      "newDecision": "Neue Auswahl für diese Sitzung",
+      "saveNewChoice": "Neue Auswahl speichern",
+      "pending": "Deine Auswahl wartet auf die Synchronisierung.",
+      "retry": "Speichern erneut versuchen",
+      "dateUnavailable": "Datum nicht erfasst",
+      "decisionDate": "Datum der Auswahl:",
+      "termsAccepted": "Nutzungsbedingungen akzeptiert",
+      "termsRequired": "Die Nutzungsbedingungen müssen noch akzeptiert werden",
+      "unanswered": "Optionale Analysen: keine Auswahl erfasst",
+      "optedIn": "Optionale Analysen: Zustimmung angefordert",
+      "refused": "Optionale Analysen: abgelehnt",
+      "analyticsDescription": "Du kannst Nutzungsanalysen erlauben, um die App zu verbessern. Diese Auswahl ist von den Nutzungsbedingungen getrennt und zum Lernen nicht erforderlich.",
+      "collectionOff": "Die Erfassung optionaler Analysen ist ausgeschaltet, auch wenn deine Auswahl eingeschaltet ist.",
+      "persisted": "Auswahl in deinem Konto gespeichert.",
+      "received": "Auswahl vom Server empfangen, aber nicht in einem Konto gespeichert."
+    },
     "inline": {
-      "acceptedText": "Zustimmung akzeptiert",
+      "acceptedText": "Cookie-Auswahl erfasst",
       "manage": "Einstellungen verwalten",
-      "acceptButton": "Cookies akzeptieren",
+      "acceptButton": "Cookie-Auswahl speichern",
       "info": "Informationen",
       "title": "Cookies und Datenschutz",
       "description": "Wir verwenden essenzielle Cookies, damit die Website funktioniert",
       "learnMore": "Mehr erfahren",
       "analyticsLabel": "Analysen (optional)",
-      "submitButton": "Akzeptieren"
+      "submitButton": "Auswahl speichern"
     },
     "unified": {
       "loading": "Laden...",
@@ -145,15 +172,15 @@
       },
       "analytics": {
         "label": "Optionale Analysen",
-        "description": "Hilf uns, die App zu verbessern (anonym)"
+        "description": "Hilf uns, die App mit Nutzungsstatistiken zu verbessern"
       },
       "buttons": {
         "disabled": "Akzeptiere die Bedingungen, um fortzufahren",
         "accept": "Akzeptieren und Fortfahren",
         "submitting": "Speichern...",
         "learnMore": "Mehr erfahren",
-        "rejectAll": "Alle ablehnen",
-        "acceptAll": "Alle akzeptieren"
+        "rejectAll": "Optionale Analysen ablehnen",
+        "acceptAll": "Optionale Analysen erlauben"
       },
       "coppa": "Wenn du unter 13 Jahre alt bist, ist die Zustimmung der Eltern erforderlich",
       "screenReader": {
@@ -161,7 +188,7 @@
         "submitting": "Speichern der Zustimmung läuft..."
       },
       "bannerTitle": "Cookie-Hinweis",
-      "bannerRights": "Sie können Ihre Zustimmung jederzeit frei erteilen, verweigern oder widerrufen. Verwenden Sie die Schaltfläche \"Alle akzeptieren\", um zuzustimmen. Verwenden Sie \"Alle ablehnen\", um ohne Zustimmung fortzufahren.",
+      "bannerRights": "Analysen sind optional und anfangs ausgeschaltet. Du kannst sie ablehnen oder deine Auswahl in den Einstellungen ändern. Damit akzeptierst du nicht die Nutzungsbedingungen: Diese musst du zum Lernen separat akzeptieren.",
       "categories": {
         "essential": "Erforderlich",
         "analytics": "Analysen (optional)"

@@ -9,14 +9,14 @@
       },
       {
         "type": "command",
-        "bash": ".copilot/hooks/worktree-guard.sh",
+        "bash": "bash .copilot/hooks/check-worktree.sh",
         "timeoutSec": 10
       }
     ],
     "postToolUse": [
       {
         "type": "command",
-        "bash": ".copilot/hooks/enforce-line-limit.sh",
+        "bash": "bash .copilot/hooks/check-line-limit.sh",
         "timeoutSec": 10
       }
     ]

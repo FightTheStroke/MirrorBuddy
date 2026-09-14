@@ -4,6 +4,7 @@ import { Cloud } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { ExternalServicesData } from '../types';
 import { useTranslations } from 'next-intl';
+import { MetricProvenance, MetricValue } from '@/components/admin/metric-truth';
 
 export function ExternalServicesCard({ data }: { data: ExternalServicesData | null }) {
   const t = useTranslations('admin');
@@ -20,7 +21,7 @@ export function ExternalServicesCard({ data }: { data: ExternalServicesData | nu
           )}
         </CardTitle>
         <CardDescription className="text-xs">
-          {t('apiUsageQuotasForAzureOpenaiGoogleDriveBraveSearch')}
+          {t('apiUsageQuotasForAzureOpenaiGoogleDriveBraveSearch')} {t('metricTruth.quotaEstimate')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -71,7 +72,8 @@ export function ExternalServicesCard({ data }: { data: ExternalServicesData | nu
                   </div>
                   <span className="text-[10px] text-slate-500 w-20 text-right">{m.metric}</span>
                   <span className="text-[10px] font-mono w-12 text-right">
-                    {m.usagePercent.toFixed(1)}%
+                    <MetricValue metric={m.truth} format={(value) => `${value.toFixed(1)}%`} />
+                    <MetricProvenance metric={m.truth} />
                   </span>
                 </div>
               ))}

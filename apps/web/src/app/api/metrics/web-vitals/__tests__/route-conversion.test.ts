@@ -3,12 +3,23 @@
  * Tests metric unit conversion and Grafana integration
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { POST } from "../route";
-import { NextRequest } from "next/server";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { POST } from '../route';
+import {
+  AnalyticsRequest as NextRequest,
+  permitOptionalAnalytics,
+} from '@/lib/telemetry/__tests__/analytics-fixtures';
+
+vi.mock('@/lib/auth/server', () => ({
+  validateAuth: async () => ({ authenticated: true, userId: 'eligible-user' }),
+}));
+vi.mock('@/lib/db', async () => {
+  const { createMockPrisma } = await import('@/test/mocks/prisma');
+  return { prisma: createMockPrisma() };
+});
 
 // Mock logger with child method for rate-limit.ts
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -26,13 +37,13 @@ vi.mock("@/lib/logger", () => ({
 // Mock fetch
 global.fetch = vi.fn();
 
-describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
+describe('POST /api/metrics/web-vitals - Conversion and Grafana', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.GRAFANA_CLOUD_PROMETHEUS_URL =
-      "https://prometheus.grafana.com/api/v1/write";
-    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = "test-user";
-    process.env.GRAFANA_CLOUD_API_KEY = "test-api-key";
+    permitOptionalAnalytics();
+    process.env.GRAFANA_CLOUD_PROMETHEUS_URL = 'https://prometheus.grafana.com/api/v1/write';
+    process.env.GRAFANA_CLOUD_PROMETHEUS_USER = 'test-user';
+    process.env.GRAFANA_CLOUD_API_KEY = 'test-api-key';
   });
 
   afterEach(() => {
@@ -45,12 +56,12 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
   // METRIC CONVERSION
   // ============================================================================
 
-  describe("Metric Conversion to Seconds", () => {
-    it("should convert time-based metrics to seconds", async () => {
+  describe('Metric Conversion to Seconds', () => {
+    it('should convert time-based metrics to seconds', async () => {
       const tests = [
-        { name: "LCP", value: 2500, expected: "2.5" },
-        { name: "FCP", value: 1800, expected: "1.8" },
-        { name: "TTFB", value: 800, expected: "0.8" },
+        { name: 'LCP', value: 2500, expected: '2.5' },
+        { name: 'FCP', value: 1800, expected: '1.8' },
+        { name: 'TTFB', value: 800, expected: '0.8' },
       ];
 
       for (const test of tests) {
@@ -59,25 +70,22 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
             {
               name: test.name,
               value: test.value,
-              rating: "good",
-              route: "/dashboard",
-              deviceType: "desktop",
+              rating: 'good',
+              route: '/dashboard',
+              deviceType: 'desktop',
             },
           ],
         };
 
-        const request = new NextRequest(
-          "http://localhost:3000/api/metrics/web-vitals",
-          {
-            method: "POST",
-            body: JSON.stringify(payload),
-          },
-        );
+        const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
 
         (global.fetch as any).mockResolvedValueOnce({
           ok: true,
           status: 200,
-          text: async () => "success",
+          text: async () => 'success',
         });
 
         await POST(request);
@@ -90,31 +98,28 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
       }
     });
 
-    it("should NOT convert CLS score (unitless)", async () => {
+    it('should NOT convert CLS score (unitless)', async () => {
       const payload = {
         metrics: [
           {
-            name: "CLS",
+            name: 'CLS',
             value: 0.15,
-            rating: "needs-improvement",
-            route: "/dashboard",
-            deviceType: "desktop",
+            rating: 'needs-improvement',
+            route: '/dashboard',
+            deviceType: 'desktop',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       await POST(request);
@@ -122,7 +127,7 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
       const callArgs = (global.fetch as any).mock.calls[0];
       const body = callArgs[1].body;
 
-      expect(body).toContain("0.15");
+      expect(body).toContain('0.15');
     });
   });
 
@@ -130,73 +135,67 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
   // GRAFANA INTEGRATION
   // ============================================================================
 
-  describe("Grafana Integration", () => {
-    it("should call Grafana Cloud with correct headers", async () => {
+  describe('Grafana Integration', () => {
+    it('should call Grafana Cloud with correct headers', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       await POST(request);
 
       expect(global.fetch).toHaveBeenCalledWith(
-        "https://prometheus.grafana.com/api/v1/write",
+        'https://prometheus.grafana.com/api/v1/write',
         expect.objectContaining({
-          method: "POST",
+          method: 'POST',
           headers: expect.objectContaining({
-            "Content-Type": "text/plain",
-            Authorization: expect.stringContaining("Basic "),
+            'Content-Type': 'text/plain',
+            Authorization: expect.stringContaining('Basic '),
           }),
         }),
       );
     });
 
-    it("should use Influx Line Protocol format", async () => {
+    it('should use Influx Line Protocol format', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       await POST(request);
@@ -204,38 +203,35 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
       const callArgs = (global.fetch as any).mock.calls[0];
       const body = callArgs[1].body;
 
-      expect(body).toContain("web_vitals_lcp_seconds");
-      expect(body).toContain("route=/dashboard");
-      expect(body).toContain("device_type=desktop");
-      expect(body).toContain("value=");
+      expect(body).toContain('web_vitals_lcp_seconds');
+      expect(body).toContain('route=/dashboard');
+      expect(body).toContain('device_type=desktop');
+      expect(body).toContain('value=');
     });
 
-    it("should include userId in labels when provided", async () => {
+    it('does not forward a client-provided userId in performance labels', async () => {
       const payload = {
         metrics: [
           {
-            name: "LCP",
+            name: 'LCP',
             value: 2500,
-            rating: "good",
-            route: "/dashboard",
-            deviceType: "desktop",
-            userId: "user-123",
+            rating: 'good',
+            route: '/dashboard',
+            deviceType: 'desktop',
+            userId: 'user-123',
           },
         ],
       };
 
-      const request = new NextRequest(
-        "http://localhost:3000/api/metrics/web-vitals",
-        {
-          method: "POST",
-          body: JSON.stringify(payload),
-        },
-      );
+      const request = new NextRequest('http://localhost:3000/api/metrics/web-vitals', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
 
       (global.fetch as any).mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: async () => "success",
+        text: async () => 'success',
       });
 
       await POST(request);
@@ -243,7 +239,7 @@ describe("POST /api/metrics/web-vitals - Conversion and Grafana", () => {
       const callArgs = (global.fetch as any).mock.calls[0];
       const body = callArgs[1].body;
 
-      expect(body).toContain("user_id=user-123");
+      expect(body).not.toContain('user_id=user-123');
     });
   });
 });

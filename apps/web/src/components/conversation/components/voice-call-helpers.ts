@@ -1,9 +1,9 @@
-import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
-import type { Maestro, MaestroVoice, Subject } from "@/types";
-import { CHARACTER_AVATARS } from "./constants";
-import { getUserIdFromCookie } from "@/lib/auth";
+import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
+import type { Maestro, MaestroVoice, Subject } from '@/types';
+import { CHARACTER_AVATARS } from './constants';
+import { getUserIdFromCookie } from '@/lib/auth';
 
-// Get userId from cookie
+// The compatibility helper reads only server-confirmed identity, never the hint.
 export function getUserId(): string | null {
   return getUserIdFromCookie();
 }
@@ -14,13 +14,12 @@ export function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
     id: character.id,
     name: character.id,
     displayName: character.name,
-    subject: "methodology" as Subject,
-    specialty:
-      character.type === "coach" ? "Metodo di studio" : "Supporto emotivo",
-    voice: (character.voice || "alloy") as MaestroVoice,
-    voiceInstructions: character.voiceInstructions || "",
-    teachingStyle: character.type === "coach" ? "scaffolding" : "peer-support",
-    avatar: CHARACTER_AVATARS[character.id] || "/avatars/default.webp",
+    subject: 'methodology' as Subject,
+    specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
+    voice: (character.voice || 'alloy') as MaestroVoice,
+    voiceInstructions: character.voiceInstructions || '',
+    teachingStyle: character.type === 'coach' ? 'scaffolding' : 'peer-support',
+    avatar: CHARACTER_AVATARS[character.id] || '/avatars/default.webp',
     color: character.color,
     systemPrompt: character.systemPrompt,
     greeting: character.greeting,

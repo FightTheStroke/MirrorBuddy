@@ -8,7 +8,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
-
+import { analyticsContext, withMetricTruth } from '@/lib/admin/analytics-metric-truth';
 
 export const revalidate = 0;
 export const GET = pipe(
@@ -16,15 +16,19 @@ export const GET = pipe(
   withAdmin,
 )(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
-  const days = parseInt(searchParams.get('days') ?? '7', 10);
-  const startDate = new Date();
+  const days = Number(searchParams.get('days') ?? '7');
+  if (!Number.isInteger(days) || days < 1 || days > 365) {
+    return NextResponse.json({ error: 'Invalid days' }, { status: 400 });
+  }
+  const endDate = new Date();
+  const startDate = new Date(endDate);
   startDate.setDate(startDate.getDate() - days);
 
   // F-06: Exclude test data from voice metrics statistics
   // Query SessionMetrics for sessions with voice usage
   const voiceSessions = await prisma.sessionMetrics.findMany({
     where: {
-      createdAt: { gte: startDate },
+      createdAt: { gte: startDate, lte: endDate },
       isTestData: false,
       voiceMinutes: { gt: 0 },
     },
@@ -49,14 +53,22 @@ export const GET = pipe(
     dailyMinutes[day] = (dailyMinutes[day] || 0) + (session.voiceMinutes || 0);
   }
 
-  return NextResponse.json({
-    period: { days, startDate: startDate.toISOString() },
-    voice: {
-      totalSessions,
-      totalMinutes: Math.round(totalMinutes * 10) / 10,
-      avgSessionMinutes: Math.round(avgMinutes * 10) / 10,
-    },
-    dailySessions,
-    dailyMinutes,
-  });
+  return NextResponse.json(
+    withMetricTruth(
+      {
+        period: { days, startDate: startDate.toISOString() },
+        voice: {
+          totalSessions,
+          totalMinutes: Math.round(totalMinutes * 10) / 10,
+          avgSessionMinutes: totalSessions > 0 ? Math.round(avgMinutes * 10) / 10 : null,
+        },
+        dailySessions,
+        dailyMinutes,
+      },
+      analyticsContext('SessionMetrics (voiceMinutes>0, isTestData=false)', startDate, endDate),
+      {
+        'voice.avgSessionMinutes': { reason: totalSessions === 0 ? 'zeroDenominator' : null },
+      },
+    ),
+  );
 });

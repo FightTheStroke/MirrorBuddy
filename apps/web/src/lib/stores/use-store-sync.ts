@@ -7,7 +7,8 @@ import { useProgressStore } from './progress-store';
 import { useConversationStore } from './conversation-store';
 import { useLearningsStore } from './learnings-store';
 import { useAccessibilityStore } from '@/lib/accessibility';
-import { isAuthenticated } from '@/lib/auth/client-auth';
+import { getClientIdentity, getUserIdFromCookie } from '@/lib/auth/client-auth';
+import { logger } from '@/lib/logger';
 
 /**
  * Initialize all stores by loading data from server
@@ -17,21 +18,15 @@ export async function initializeStores() {
   // A signed-out visitor has nothing to hydrate. Asking anyway earns a 401 that
   // the browser prints as a failed request, so every guest opened the site to a
   // console full of errors that were not errors.
-  if (!isAuthenticated()) {
+  if (getUserIdFromCookie() === null) {
     return;
   }
 
   // Still handled: the cookie can be present but stale (expired session).
   const res = await fetch('/api/user');
 
-  if (res.status === 401) {
-    // Guest/trial mode — stores use defaults, no server sync needed
-    return;
-  }
-
   if (!res.ok) {
-    // Transient error (5xx, timeout) — skip hydration, retry on next load
-    return;
+    throw new Error(`Store hydration failed (${res.status})`);
   }
 
   // Authenticated user — load data from server
@@ -49,16 +44,25 @@ export async function initializeStores() {
  * Returns interval ID that can be cleared
  */
 export function setupAutoSync(intervalMs = 30000) {
-  // Auto-sync every 30 seconds if there are pending changes
+  let syncing = false;
   return setInterval(async () => {
+    const identity = getClientIdentity();
+    if (syncing || identity.status !== 'authenticated') return;
     const settings = useSettingsStore.getState();
     const progress = useProgressStore.getState();
+    syncing = true;
 
-    if (settings.pendingSync) {
-      await settings.syncToServer();
-    }
-    if (progress.pendingSync) {
-      await progress.syncToServer();
+    try {
+      if (settings.pendingSync) await settings.syncToServer();
+      if (progress.pendingSync) await progress.syncToServer();
+      if (getClientIdentity() !== identity || getClientIdentity().status !== 'authenticated')
+        return;
+      const current = useProgressStore.getState();
+      if (current.needsHydration && !current.pendingSync) await current.loadFromServer();
+    } catch {
+      logger.warn('Store sync failed; pending changes retained');
+    } finally {
+      syncing = false;
     }
   }, intervalMs);
 }

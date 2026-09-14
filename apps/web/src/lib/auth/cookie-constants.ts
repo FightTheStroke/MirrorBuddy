@@ -110,6 +110,7 @@ export const SECURE_COOKIE_OPTIONS = {
  * Session cookie max age (7 days in seconds)
  */
 export const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days
+export const GUEST_SESSION_MAX_AGE = 365 * 24 * 60 * 60;
 
 /**
  * CSRF token max age (30 minutes in seconds)

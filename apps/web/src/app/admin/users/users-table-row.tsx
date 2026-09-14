@@ -19,30 +19,8 @@ import {
 import { TierChangeModal } from '@/components/admin/tier-change-modal';
 import { UserLimitOverrideModal } from '@/components/admin/user-limit-override-modal';
 import { useTranslations } from 'next-intl';
-
-interface User {
-  id: string;
-  username: string | null;
-  email: string | null;
-  role: 'USER' | 'ADMIN';
-  disabled: boolean;
-  createdAt: Date;
-  subscription: {
-    id: string;
-    tier: {
-      id: string;
-      code: string;
-      name: string;
-      chatLimitDaily: number;
-      voiceMinutesDaily: number;
-      toolsLimitDaily: number;
-      docsLimitTotal: number;
-      features: unknown;
-    };
-    overrideLimits: unknown;
-    overrideFeatures: unknown;
-  } | null;
-}
+import type { ListedUser as User } from '@/lib/admin/user-list-types';
+import { useUserLimitDetails } from './use-user-limit-details';
 
 interface Tier {
   id: string;
@@ -51,6 +29,7 @@ interface Tier {
 }
 
 interface UsersTableRowProps {
+  canManage: boolean;
   user: User;
   isSelected: boolean;
   isLoading: boolean;
@@ -81,6 +60,7 @@ function getTierDisplay(user: User): {
 }
 
 export function UsersTableRow({
+  canManage,
   user,
   isSelected,
   isLoading,
@@ -94,7 +74,7 @@ export function UsersTableRow({
   const t = useTranslations('admin');
   const router = useRouter();
   const [showTierModal, setShowTierModal] = useState(false);
-  const [showLimitModal, setShowLimitModal] = useState(false);
+  const limits = useUserLimitDetails(user.subscription?.id);
   const tierDisplay = getTierDisplay(user);
 
   const handleRowClick = (e: React.MouseEvent) => {
@@ -108,9 +88,18 @@ export function UsersTableRow({
   return (
     <>
       <tr className="border-b hover:bg-accent cursor-pointer" onClick={handleRowClick}>
-        <TableCell className="px-3 py-3 w-10">
-          <input type="checkbox" checked={isSelected} onChange={onSelect} className="rounded" />
-        </TableCell>
+        {canManage && (
+          <TableCell className="px-3 py-3 w-10">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onSelect}
+              disabled={isLoading}
+              aria-label={t('users.pagination.selectUser', { username: user.username ?? user.id })}
+              className="rounded"
+            />
+          </TableCell>
+        )}
         <TableCell className="font-medium">{user.username || '—'}</TableCell>
         <TableCell className="text-muted-foreground">{user.email || '—'}</TableCell>
         <TableCell>
@@ -135,7 +124,7 @@ export function UsersTableRow({
               size="sm"
               variant="outline"
               onClick={() => setShowTierModal(true)}
-              disabled={isLoading}
+              disabled={isLoading || !canManage}
               className="text-xs h-11 px-3"
               aria-label={t('changeTier1')}
               title={t('changeTier')}
@@ -145,8 +134,8 @@ export function UsersTableRow({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => setShowLimitModal(true)}
-              disabled={isLoading || !user.subscription}
+              onClick={() => void limits.load()}
+              disabled={isLoading || limits.loading || !user.subscription || !canManage}
               className="text-xs h-11 px-3"
               aria-label={t('overrideLimits1')}
               title={t('overrideLimits')}
@@ -157,7 +146,7 @@ export function UsersTableRow({
               size="sm"
               variant="outline"
               onClick={onToggle}
-              disabled={isLoading}
+              disabled={isLoading || !canManage}
               className="text-xs h-11 px-3"
               aria-label={user.disabled ? t('enableUser') : t('disableUser')}
             >
@@ -167,7 +156,7 @@ export function UsersTableRow({
               size="sm"
               variant="outline"
               onClick={onRoleToggle}
-              disabled={isLoading}
+              disabled={isLoading || !canManage}
               className="text-xs h-11 px-3"
               aria-label={user.role === 'ADMIN' ? t('demoteToUser') : t('promoteToAdmin')}
               title={user.role === 'ADMIN' ? t('demoteToUser') : t('promoteToAdmin')}
@@ -182,7 +171,7 @@ export function UsersTableRow({
               size="sm"
               variant="outline"
               onClick={onResetPassword}
-              disabled={isLoading || !user.email}
+              disabled={isLoading || !user.email || !canManage}
               className="text-xs h-11 px-3"
               aria-label={t('resetPassword')}
               title={!user.email ? t('resetPasswordNoEmail') : t('resetPassword')}
@@ -193,7 +182,7 @@ export function UsersTableRow({
               size="sm"
               variant="outline"
               onClick={onDelete}
-              disabled={isLoading}
+              disabled={isLoading || !canManage}
               className="text-xs h-11 px-3 text-red-600"
               aria-label={t('deleteUser')}
             >
@@ -213,26 +202,28 @@ export function UsersTableRow({
         </TableCell>
       </tr>
 
-      <TierChangeModal
-        isOpen={showTierModal}
-        onClose={() => setShowTierModal(false)}
-        onSuccess={() => {
-          // Reload the page to show updated tier
-          window.location.reload();
-        }}
-        user={{
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          currentTier: user.subscription?.tier,
-        }}
-        availableTiers={availableTiers}
-      />
+      {canManage && (
+        <TierChangeModal
+          isOpen={showTierModal}
+          onClose={() => setShowTierModal(false)}
+          onSuccess={() => {
+            // Reload the page to show updated tier
+            window.location.reload();
+          }}
+          user={{
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            currentTier: user.subscription?.tier,
+          }}
+          availableTiers={availableTiers}
+        />
+      )}
 
-      {user.subscription && (
+      {canManage && limits.details && (
         <UserLimitOverrideModal
-          isOpen={showLimitModal}
-          onClose={() => setShowLimitModal(false)}
+          isOpen
+          onClose={limits.close}
           onSuccess={() => {
             // Reload the page to show updated overrides
             window.location.reload();
@@ -241,7 +232,7 @@ export function UsersTableRow({
             id: user.id,
             username: user.username,
             email: user.email,
-            subscription: user.subscription,
+            subscription: limits.details,
           }}
         />
       )}

@@ -7,6 +7,8 @@
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { FUNNEL_STAGES, type FunnelStage } from './constants';
+import { canCollectOptionalAnalytics } from '@/lib/telemetry/optional-analytics-server';
+import { logger } from '@/lib/logger';
 
 export { FUNNEL_STAGES, type FunnelStage };
 
@@ -32,10 +34,11 @@ export async function recordFunnelEvent({
   locale,
   metadata,
   isTestData = false,
-}: RecordFunnelEventParams): Promise<void> {
+}: RecordFunnelEventParams): Promise<boolean> {
   if (!visitorId && !userId) {
     throw new Error('Either visitorId or userId must be provided');
   }
+  if (!(await allowsFunnelAnalytics(userId))) return false;
 
   // Detect test data from identifier patterns (ADR 0065)
   const detectedTestData =
@@ -54,6 +57,16 @@ export async function recordFunnelEvent({
       isTestData: detectedTestData,
     },
   });
+  return true;
+}
+
+async function allowsFunnelAnalytics(userId: string | undefined): Promise<boolean> {
+  try {
+    return await canCollectOptionalAnalytics(userId);
+  } catch (error) {
+    logger.warn('Optional funnel recording denied: consent unavailable', { error: String(error) });
+    return false;
+  }
 }
 
 /**
@@ -104,10 +117,11 @@ export async function recordStageTransition(
   toStage: FunnelStage,
   metadata?: Record<string, unknown>,
   locale?: string,
-): Promise<void> {
+): Promise<boolean> {
+  if (!(await allowsFunnelAnalytics(identifier?.userId))) return false;
   const fromStage = await getLatestStage(identifier);
 
-  await recordFunnelEvent({
+  return recordFunnelEvent({
     ...identifier,
     stage: toStage,
     fromStage: fromStage ?? undefined,

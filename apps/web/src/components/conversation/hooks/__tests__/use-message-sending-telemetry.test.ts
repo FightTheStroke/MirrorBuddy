@@ -6,20 +6,21 @@
  * Plan 052 W1 T1-05: Add telemetry tracking for chat send
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { useMessageSending } from "../use-message-sending";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act, cleanup, waitFor } from '@testing-library/react';
+import { setClientIdentity } from '@/lib/auth';
+import { useMessageSending } from '../use-message-sending';
 
 // Mock telemetry store
 const mockTrackEvent = vi.fn();
-vi.mock("@/lib/telemetry/telemetry-store", () => ({
+vi.mock('@/lib/telemetry/telemetry-store', () => ({
   useTelemetryStore: vi.fn(() => ({
     trackEvent: mockTrackEvent,
   })),
 }));
 
 // Mock logger (complete mock required by ESLint rule)
-vi.mock("@/lib/logger", () => ({
+vi.mock('@/lib/logger', () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -34,17 +35,17 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-describe("useMessageSending - Telemetry Tracking", () => {
+describe('useMessageSending - Telemetry Tracking', () => {
   const mockActiveCharacter = {
-    id: "socrates",
-    name: "Socrates",
-    type: "coach" as const,
+    id: 'socrates',
+    name: 'Socrates',
+    type: 'coach' as const,
     character: {} as never,
-    greeting: "Welcome",
-    systemPrompt: "System prompt",
-    color: "#000000",
-    voice: "alloy",
-    voiceInstructions: "Speak clearly",
+    greeting: 'Welcome',
+    systemPrompt: 'System prompt',
+    color: '#000000',
+    voice: 'alloy',
+    voiceInstructions: 'Speak clearly',
   };
 
   const mockAddMessage = vi.fn();
@@ -52,9 +53,21 @@ describe("useMessageSending - Telemetry Tracking", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    setClientIdentity({
+      status: 'authenticated',
+      userId: 'message-sender',
+      role: 'USER',
+      legacyOrigin: false,
+      needsLegacyUpgrade: false,
+    });
   });
 
-  it("tracks chat_sent event when message is sent successfully", async () => {
+  afterEach(() => {
+    cleanup();
+    setClientIdentity({ status: 'pending' });
+  });
+
+  it('tracks chat_sent event when message is sent successfully', async () => {
     const { result } = renderHook(() =>
       useMessageSending({
         activeCharacter: mockActiveCharacter,
@@ -65,40 +78,41 @@ describe("useMessageSending - Telemetry Tracking", () => {
 
     // Set input value
     act(() => {
-      result.current.setInputValue("Ciao Socrate!");
+      result.current.setInputValue('Ciao Socrate!');
     });
 
     // Send message
     await act(async () => {
       await result.current.handleSend();
     });
+    expect(mockSendMessage).toHaveBeenCalledWith('Ciao Socrate!');
 
     // Wait for async operations
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith(
-        "conversation",
-        "chat_sent",
-        "socrates",
+        'conversation',
+        'chat_sent',
+        'socrates',
         expect.any(Number),
         expect.objectContaining({
-          characterType: "coach",
+          characterType: 'coach',
           messageLength: 13,
         }),
       );
     });
   });
 
-  it("tracks character name and type in metadata", async () => {
+  it('tracks character name and type in metadata', async () => {
     const buddyCharacter = {
-      id: "marco-polo",
-      name: "Marco Polo",
-      type: "buddy" as const,
+      id: 'marco-polo',
+      name: 'Marco Polo',
+      type: 'buddy' as const,
       character: {} as never,
-      greeting: "Welcome",
-      systemPrompt: "System prompt",
-      color: "#000000",
-      voice: "alloy",
-      voiceInstructions: "Speak clearly",
+      greeting: 'Welcome',
+      systemPrompt: 'System prompt',
+      color: '#000000',
+      voice: 'alloy',
+      voiceInstructions: 'Speak clearly',
     };
 
     const { result } = renderHook(() =>
@@ -110,28 +124,51 @@ describe("useMessageSending - Telemetry Tracking", () => {
     );
 
     act(() => {
-      result.current.setInputValue("Hello!");
+      result.current.setInputValue('Hello!');
     });
 
     await act(async () => {
       await result.current.handleSend();
     });
+    expect(mockSendMessage).toHaveBeenCalledWith('Hello!');
 
     await waitFor(() => {
       expect(mockTrackEvent).toHaveBeenCalledWith(
-        "conversation",
-        "chat_sent",
-        "marco-polo",
+        'conversation',
+        'chat_sent',
+        'marco-polo',
         expect.any(Number),
         expect.objectContaining({
-          characterType: "buddy",
+          characterType: 'buddy',
           messageLength: 6,
         }),
       );
     });
   });
 
-  it("does not track if message is empty", async () => {
+  it.each(['pending', 'unavailable'] as const)(
+    'retains the draft without sending or tracking while identity is %s',
+    async (status) => {
+      setClientIdentity(status === 'pending' ? { status } : { status, reason: 'SESSION_REJECTED' });
+      const { result } = renderHook(() =>
+        useMessageSending({
+          activeCharacter: mockActiveCharacter,
+          addMessage: mockAddMessage,
+          sendMessage: mockSendMessage,
+        }),
+      );
+      act(() => result.current.setInputValue('Keep this draft'));
+
+      await act(async () => result.current.handleSend());
+
+      expect(result.current.inputValue).toBe('Keep this draft');
+      expect(mockAddMessage).not.toHaveBeenCalled();
+      expect(mockSendMessage).not.toHaveBeenCalled();
+      expect(mockTrackEvent).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not track if message is empty', async () => {
     const { result } = renderHook(() =>
       useMessageSending({
         activeCharacter: mockActiveCharacter,
@@ -148,7 +185,7 @@ describe("useMessageSending - Telemetry Tracking", () => {
     expect(mockTrackEvent).not.toHaveBeenCalled();
   });
 
-  it("does not track if activeCharacter is null", async () => {
+  it('does not track if activeCharacter is null', async () => {
     const { result } = renderHook(() =>
       useMessageSending({
         activeCharacter: null,
@@ -158,7 +195,7 @@ describe("useMessageSending - Telemetry Tracking", () => {
     );
 
     act(() => {
-      result.current.setInputValue("Test message");
+      result.current.setInputValue('Test message');
     });
 
     await act(async () => {

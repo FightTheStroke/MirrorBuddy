@@ -14,17 +14,12 @@
  * PROD_TEST_USER_COOKIE_VALUE. Credential login verification runs separately
  * via `pnpm verify:smoke:prod:login`, outside the Playwright test runner.
  *
- * Admin tests:
- *   Without ADMIN_READONLY_COOKIE_VALUE, admin panel tests are SKIPPED.
- *   Set it from .env to run full coverage:
- *
- *   ADMIN_READONLY_COOKIE_VALUE="<value-from-.env>" \
- *   PROD_URL=https://mirrorbuddy.org \
- *   npx playwright test --config playwright.config.production-smoke.ts
- *
- *   The value is a signed cookie (HMAC-SHA256) for the read-only admin user.
- *   See .env line ADMIN_READONLY_COOKIE_VALUE for the current production value.
- *   Without it: ~193 tests run, ~57 skipped. With it: ~247 tests run, ~3 skipped.
+ * Admin tests require ADMIN_READONLY_COOKIE_VALUE; without it they are skipped.
+ * The trusted post-promotion job supplies a private, run-specific native session
+ * for the existing read-only account, with a fixed 60-minute lifetime. It revokes
+ * that session after smoke and uploads only sanitized failure outcomes.
+ * Local invocations must supply independently authorized access; never print or
+ * retain a bearer in browser artifacts. See docs/readonly-smoke-access.md.
  */
 
 import { defineConfig, devices } from '@playwright/test';

@@ -5,44 +5,52 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { Subject } from '@/types';
-import { getUserId } from '../utils/user-id';
+import { isCurrentOwner, useMaterialOwner } from '../utils/use-material-owner';
 import { fetchMaterials, saveMaterialToAPI, deleteMaterialFromAPI } from '../utils/api';
 import type { SavedMindmap, MindmapNode } from '../types';
 
 export function useMindmaps() {
   const [mindmaps, setMindmaps] = useState<SavedMindmap[]>([]);
   const [loading, setLoading] = useState(true);
-  const userId = getUserId();
+  const { userId, identity, identityError } = useMaterialOwner();
+  const [error, setError] = useState<string | null>(null);
+  const [loadedOwner, setLoadedOwner] = useState<string | null>(null);
 
   const loadMindmaps = useCallback(async () => {
     setLoading(true);
-    const materials = await fetchMaterials('mindmap', userId);
-    const mapped: SavedMindmap[] = materials.map((m) => {
-      const content = m.content as {
-        nodes?: MindmapNode[];
-        markdown?: string;
-        title?: string;
-        topic?: string;
-      };
-      return {
-        id: m.toolId,
-        title: m.title || content.title || content.topic || 'Untitled',
-        nodes: content.nodes || [],
-        markdown: content.markdown,
-        subject: (m.subject || 'general') as Subject,
-        createdAt: new Date(m.createdAt),
-        maestroId: m.maestroId,
-      };
-    });
-    setMindmaps(mapped);
-    setLoading(false);
-  }, [userId]);
+    try {
+      const materials = await fetchMaterials('mindmap', userId);
+      if (!isCurrentOwner(identity)) return;
+      const mapped: SavedMindmap[] = materials.map((m) => {
+        const content = m.content as {
+          nodes?: MindmapNode[];
+          markdown?: string;
+          title?: string;
+          topic?: string;
+        };
+        return {
+          id: m.toolId,
+          title: m.title || content.title || content.topic || 'Untitled',
+          nodes: content.nodes || [],
+          markdown: content.markdown,
+          subject: (m.subject || 'general') as Subject,
+          createdAt: new Date(m.createdAt),
+          maestroId: m.maestroId,
+        };
+      });
+      setMindmaps(mapped);
+      setLoadedOwner(userId);
+      setError(null);
+    } catch {
+      if (isCurrentOwner(identity)) setError('MATERIALS_UNAVAILABLE');
+    } finally {
+      if (isCurrentOwner(identity)) setLoading(false);
+    }
+  }, [userId, identity]);
 
-  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadMindmaps();
   }, [loadMindmaps]);
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   const saveMindmap = useCallback(
     async (mindmap: Omit<SavedMindmap, 'id' | 'createdAt'>) => {
@@ -55,14 +63,14 @@ export function useMindmaps() {
           markdown: mindmap.markdown,
           title: mindmap.title,
         },
-        { subject: mindmap.subject, maestroId: mindmap.maestroId }
+        { subject: mindmap.subject, maestroId: mindmap.maestroId },
       );
       if (saved) {
         await loadMindmaps();
       }
       return saved;
     },
-    [userId, loadMindmaps]
+    [userId, loadMindmaps],
   );
 
   const deleteMindmap = useCallback(async (id: string) => {
@@ -73,6 +81,12 @@ export function useMindmaps() {
     return success;
   }, []);
 
-  return { mindmaps, loading, saveMindmap, deleteMindmap, reload: loadMindmaps };
+  return {
+    mindmaps: userId && loadedOwner === userId ? mindmaps : [],
+    loading,
+    error: identityError || error,
+    saveMindmap,
+    deleteMindmap,
+    reload: loadMindmaps,
+  };
 }
-

@@ -1,5 +1,5 @@
-import { validateAuth } from "@/lib/auth/server";
-import type { Middleware } from "./types";
+import { validateAuth } from '@/lib/auth/server';
+import type { Middleware } from './types';
 
 /**
  * Authentication middleware
@@ -24,14 +24,15 @@ export const withAuth: Middleware = async (ctx, next) => {
   const auth = await validateAuth();
 
   if (!auth.authenticated || !auth.userId) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: 'Unauthorized', code: 'AUTH_ABSENT' }), {
       status: 401,
-      headers: { "Content-Type": "application/json" },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
   // Inject userId into context
   ctx.userId = auth.userId;
+  ctx.authSession = auth.session;
 
   return next();
 };
