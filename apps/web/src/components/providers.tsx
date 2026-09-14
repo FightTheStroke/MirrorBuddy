@@ -8,7 +8,7 @@ import { StagingBanner } from '@/components/ui/staging-banner';
 import { MaintenanceBanner } from '@/components/ui/maintenance-banner';
 import { ToastContainer } from '@/components/ui/toast';
 import { IOSInstallBanner } from '@/components/pwa';
-import { ConditionalUnifiedConsent } from '@/components/consent/conditional-unified-consent';
+import { ConditionalUnifiedConsent } from '@/components/consent';
 import { useSettingsStore, initializeStores, setupAutoSync } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { initializeTelemetry } from '@/lib/telemetry';
