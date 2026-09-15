@@ -2624,8 +2624,16 @@ jobs:
           PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
         run: npm run script -- scripts/inspect-pii-key-state.ts
 
+      - name: Fail when the PII key cannot read stored data
+        if: steps.pii_state.outputs.key_matches_data != 'true'
+        run: |
+          echo "::error::The configured PII_ENCRYPTION_KEY does not decrypt the stored user emails."
+          echo "Seeding with it would replace readable values with unreadable ones, so the seed was not run."
+          exit 1
+
       - name: Reconcile admin accounts
         id: reconcile
+        if: steps.pii_state.outputs.key_matches_data == 'true'
         timeout-minutes: 3
         env:
           NODE_ENV: production

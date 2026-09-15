@@ -42,6 +42,16 @@ describe('approved readonly production smoke workflow', () => {
     expect(step.env?.ADMIN_PASSWORD).toBeUndefined();
   });
 
+  it('runs the seed only when the key decrypts stored data, and fails loudly otherwise', () => {
+    expect(smokeStep('reconcile').if).toBe("steps.pii_state.outputs.key_matches_data == 'true'");
+    const steps = readSmokeWorkflow().execution.steps;
+    const guard = steps.find(
+      (step) => step.if === "steps.pii_state.outputs.key_matches_data != 'true'",
+    );
+    expect(guard?.run).toContain('exit 1');
+    expect(steps.indexOf(guard!)).toBeLessThan(steps.findIndex((step) => step.id === 'reconcile'));
+  });
+
   it('does not manufacture readonly eligibility during owner reconciliation', () => {
     expect(smokeStep('reconcile').env?.NODE_ENV).toBe('production');
     expect(smokeStep('reconcile').env?.ADMIN_READONLY_EMAIL).toBe('');
