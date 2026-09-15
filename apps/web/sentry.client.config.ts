@@ -141,7 +141,6 @@ if (dsn) {
       // Filter known iOS Safari transient errors (not app bugs)
       if (isIOSSafari) {
         if (errorMessage.includes('Load failed') && errorMessage.includes('TypeError')) return null;
-        if (errorMessage.includes('sw.js load failed')) return null;
       }
 
       // Fingerprint voice errors to group cascading events

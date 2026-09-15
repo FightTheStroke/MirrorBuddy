@@ -49,13 +49,6 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
 
     return true;
   } catch (error) {
-    if (
-      error instanceof TypeError &&
-      /^Script https:\/\/www\.mirrorbuddy\.org\/sw\.js load failed$/.test(error.message)
-    ) {
-      logger.warn('[Offline SW] Script load failed', { browserWillRetry: true });
-      return false;
-    }
     logger.error('[Offline SW] Registration failed', undefined, error);
     return false;
   }

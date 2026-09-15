@@ -11,19 +11,17 @@
  * Tested: 18 Jan 2026 - metrics visible in Grafana Cloud
  */
 
-import { logger } from "@/lib/logger";
-import { collectServiceLimitsSamples } from "./service-limits-metrics";
-import {
-  collectHttpMetrics,
-  type MetricSample,
-} from "./http-metrics-collector";
-import { collectTierMetrics } from "./tier-metrics-collector";
+import { logger } from '@/lib/logger';
+import { collectServiceLimitsSamples } from './service-limits-metrics';
+import { collectHttpMetrics, type MetricSample } from './http-metrics-collector';
+import { collectTierMetrics } from './tier-metrics-collector';
+import { collectMetricSource } from './collect-metric-source';
 import {
   collectFunnelMetrics,
   collectBudgetMetrics,
   collectAbuseMetrics,
   collectConversionMetrics,
-} from "./funnel-metrics-collectors";
+} from './funnel-metrics-collectors';
 
 interface PushConfig {
   url: string;
@@ -38,10 +36,10 @@ interface PushConfig {
  */
 function escapeInfluxTagValue(value: string): string {
   return value
-    .replace(/\\/g, "\\\\")
-    .replace(/,/g, "\\,")
-    .replace(/=/g, "\\=")
-    .replace(/ /g, "\\ ");
+    .replace(/\\/g, '\\\\')
+    .replace(/,/g, '\\,')
+    .replace(/=/g, '\\=')
+    .replace(/ /g, '\\ ');
 }
 
 class PrometheusPushService {
@@ -56,13 +54,10 @@ class PrometheusPushService {
     const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
     const user = process.env.GRAFANA_CLOUD_PROMETHEUS_USER;
     const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
-    const interval = parseInt(
-      process.env.GRAFANA_CLOUD_PUSH_INTERVAL || "60",
-      10,
-    );
+    const interval = parseInt(process.env.GRAFANA_CLOUD_PUSH_INTERVAL || '60', 10);
 
     if (!url || !user || !apiKey) {
-      logger.info("Grafana Cloud push disabled (missing config)");
+      logger.info('Grafana Cloud push disabled (missing config)');
       return false;
     }
 
@@ -73,8 +68,8 @@ class PrometheusPushService {
       intervalSeconds: Math.max(15, interval), // Minimum 15s
     };
 
-    logger.info("Grafana Cloud push initialized", {
-      url: url.replace(/\/\/.*@/, "//***@"), // Redact credentials
+    logger.info('Grafana Cloud push initialized', {
+      url: url.replace(/\/\/.*@/, '//***@'), // Redact credentials
       interval: this.config.intervalSeconds,
     });
 
@@ -87,8 +82,8 @@ class PrometheusPushService {
    */
   start(): void {
     // Skip in development - use local /api/metrics endpoint instead
-    if (process.env.NODE_ENV !== "production") {
-      logger.info("Grafana Cloud push disabled in development (cost savings)");
+    if (process.env.NODE_ENV !== 'production') {
+      logger.info('Grafana Cloud push disabled in development (cost savings)');
       return;
     }
 
@@ -97,7 +92,7 @@ class PrometheusPushService {
     }
 
     if (this.isRunning) {
-      logger.warn("Push service already running");
+      logger.warn('Push service already running');
       return;
     }
 
@@ -106,17 +101,17 @@ class PrometheusPushService {
 
     // Push immediately on start
     this.pushMetrics().catch((err) =>
-      logger.error("Initial metrics push failed", { error: String(err) }),
+      logger.error('Initial metrics push failed', { error: String(err) }),
     );
 
     // Then push periodically
     this.intervalId = setInterval(() => {
       this.pushMetrics().catch((err) =>
-        logger.error("Periodic metrics push failed", { error: String(err) }),
+        logger.error('Periodic metrics push failed', { error: String(err) }),
       );
     }, intervalMs);
 
-    logger.info("Prometheus push service started", {
+    logger.info('Prometheus push service started', {
       intervalSeconds: this.config!.intervalSeconds,
     });
   }
@@ -130,7 +125,7 @@ class PrometheusPushService {
       this.intervalId = null;
     }
     this.isRunning = false;
-    logger.info("Prometheus push service stopped");
+    logger.info('Prometheus push service stopped');
   }
 
   /**
@@ -138,22 +133,22 @@ class PrometheusPushService {
    */
   async pushMetrics(): Promise<void> {
     if (!this.config) {
-      throw new Error("Push service not initialized");
+      throw new Error('Push service not initialized');
     }
 
     const samples = await this.collectSamples();
     if (samples.length === 0) {
-      logger.debug("No metrics to push");
+      logger.debug('No metrics to push');
       return;
     }
 
     const body = this.formatInfluxLineProtocol(samples);
 
     const response = await fetch(this.config.url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "text/plain",
-        Authorization: `Basic ${Buffer.from(`${this.config.user}:${this.config.apiKey}`).toString("base64")}`,
+        'Content-Type': 'text/plain',
+        Authorization: `Basic ${Buffer.from(`${this.config.user}:${this.config.apiKey}`).toString('base64')}`,
       },
       body,
     });
@@ -163,7 +158,7 @@ class PrometheusPushService {
       throw new Error(`Push failed: ${response.status} ${text}`);
     }
 
-    logger.debug("Metrics pushed successfully", { count: samples.length });
+    logger.debug('Metrics pushed successfully', { count: samples.length });
   }
 
   /**
@@ -175,29 +170,29 @@ class PrometheusPushService {
 
     // Instance labels for all metrics
     const instanceLabels = {
-      instance: "mirrorbuddy",
-      env: process.env.NODE_ENV === "production" ? "production" : "development",
+      instance: 'mirrorbuddy',
+      env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     };
 
-    // Collect all metric types
-    samples.push(
-      ...collectHttpMetrics(instanceLabels, now),
-      ...collectFunnelMetrics(instanceLabels, now),
-      ...collectBudgetMetrics(instanceLabels, now),
-      ...collectAbuseMetrics(instanceLabels, now),
-      ...collectConversionMetrics(instanceLabels, now),
-    );
-
-    // Service limits metrics (F-21) - async collection
-    const serviceLimitsSamples = await collectServiceLimitsSamples(
-      instanceLabels,
-      now,
-    );
-    samples.push(...serviceLimitsSamples);
-
-    // Tier metrics (DAU/WAU/MAU per tier) - async collection
-    const tierMetricsSamples = await collectTierMetrics(instanceLabels, now);
-    samples.push(...tierMetricsSamples);
+    const collectors = {
+      http: collectHttpMetrics,
+      funnel: collectFunnelMetrics,
+      budget: collectBudgetMetrics,
+      abuse: collectAbuseMetrics,
+      conversion: collectConversionMetrics,
+      service_limits: collectServiceLimitsSamples,
+      tier: collectTierMetrics,
+    };
+    for (const [name, collect] of Object.entries(collectors)) {
+      samples.push(
+        ...(await collectMetricSource(
+          name,
+          () => collect(instanceLabels, now),
+          instanceLabels,
+          now,
+        )),
+      );
+    }
 
     return samples;
   }
@@ -210,10 +205,10 @@ class PrometheusPushService {
       .map((s) => {
         const tags = Object.entries(s.labels)
           .map(([k, v]) => `${k}=${escapeInfluxTagValue(v)}`)
-          .join(",");
+          .join(',');
         return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
       })
-      .join("\n");
+      .join('\n');
   }
 
   /**

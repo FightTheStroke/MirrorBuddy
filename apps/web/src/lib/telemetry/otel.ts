@@ -4,18 +4,31 @@
 // Server-side only - uses Node.js specific modules
 // ============================================================================
 
-import "server-only";
+import 'server-only';
 
-import { logger } from "@/lib/logger";
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
-import { AzureMonitorTraceExporter } from "@azure/monitor-opentelemetry-exporter";
-import { resourceFromAttributes } from "@opentelemetry/resources";
+import { logger } from '@/lib/logger';
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { AzureMonitorTraceExporter } from '@azure/monitor-opentelemetry-exporter';
+import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_SERVICE_VERSION,
-} from "@opentelemetry/semantic-conventions";
-import { metrics } from "@opentelemetry/api";
+} from '@opentelemetry/semantic-conventions';
+import { metrics } from '@opentelemetry/api';
+
+type AzureMonitorExporterStatus =
+  | 'NOT_INITIALIZED'
+  | 'NOT_CONFIGURED'
+  | 'INITIALIZED'
+  | 'STARTED'
+  | 'STOPPED'
+  | 'ERROR';
+let azureMonitorExporterStatus: AzureMonitorExporterStatus = 'NOT_INITIALIZED';
+
+export function getAzureMonitorExporterStatus(): AzureMonitorExporterStatus {
+  return azureMonitorExporterStatus;
+}
 
 /**
  * Initialize OpenTelemetry SDK with Azure Monitor exporter.
@@ -24,33 +37,21 @@ import { metrics } from "@opentelemetry/api";
  * Environment variables:
  * - APPLICATIONINSIGHTS_CONNECTION_STRING: Azure App Insights connection string
  *
- * PRODUCTION REQUIREMENT: OTel is mandatory in production.
- * The application will log an error if telemetry is not configured in production.
+ * Azure export is optional; Grafana and Sentry start independently (ADR 0047).
  *
  * @returns NodeSDK instance (or undefined if not configured)
  */
 export function initializeOpenTelemetry(): NodeSDK | undefined {
-  const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
-  const isProduction = process.env.NODE_ENV === "production";
+  const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING?.trim();
 
-  // In production, OTel is mandatory - log error if not configured
   if (!connectionString) {
-    if (isProduction) {
-      logger.error(
-        "CRITICAL: APPLICATIONINSIGHTS_CONNECTION_STRING not set in production. " +
-          "Observability is REQUIRED for production deployments. " +
-          "Set this environment variable to enable Azure Monitor telemetry.",
-      );
-    } else {
-      logger.warn(
-        "APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled in development.",
-      );
-    }
+    azureMonitorExporterStatus = 'NOT_CONFIGURED';
+    logger.info('Azure Monitor exporter not configured', { status: azureMonitorExporterStatus });
     return undefined;
   }
 
   // Read service version from package.json or VERSION file
-  const serviceVersion = process.env.npm_package_version || "2.0.0";
+  const serviceVersion = process.env.npm_package_version || '2.0.0';
 
   try {
     // Configure Azure Monitor exporter
@@ -61,24 +62,26 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
     // Create SDK with auto-instrumentations
     const sdk = new NodeSDK({
       resource: resourceFromAttributes({
-        [SEMRESATTRS_SERVICE_NAME]: "mirrorbuddy",
+        [SEMRESATTRS_SERVICE_NAME]: 'mirrorbuddy',
         [SEMRESATTRS_SERVICE_VERSION]: serviceVersion,
       }),
       traceExporter,
       instrumentations: [
         getNodeAutoInstrumentations({
           // Auto-instrument HTTP, Express, Next.js, Prisma, etc.
-          "@opentelemetry/instrumentation-http": { enabled: true },
-          "@opentelemetry/instrumentation-express": { enabled: true },
-          "@opentelemetry/instrumentation-fs": { enabled: false }, // Reduce noise
+          '@opentelemetry/instrumentation-http': { enabled: true },
+          '@opentelemetry/instrumentation-express': { enabled: true },
+          '@opentelemetry/instrumentation-fs': { enabled: false }, // Reduce noise
         }),
       ],
     });
 
-    logger.info("OpenTelemetry SDK initialized with Azure Monitor exporter");
+    azureMonitorExporterStatus = 'INITIALIZED';
+    logger.info('OpenTelemetry SDK initialized with Azure Monitor exporter');
     return sdk;
   } catch (error) {
-    logger.error("Failed to initialize OpenTelemetry SDK", undefined, error);
+    azureMonitorExporterStatus = 'ERROR';
+    logger.error('Failed to initialize OpenTelemetry SDK', undefined, error);
     return undefined;
   }
 }
@@ -90,20 +93,26 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
 export function startOpenTelemetry(sdk: NodeSDK): void {
   try {
     sdk.start();
-    logger.info("OpenTelemetry SDK started successfully");
+    azureMonitorExporterStatus = 'STARTED';
+    logger.info('OpenTelemetry SDK started successfully');
 
     // Graceful shutdown on process termination
-    process.on("SIGTERM", () => {
+    process.on('SIGTERM', () => {
       sdk
         .shutdown()
-        .then(() => logger.info("OpenTelemetry SDK shut down successfully"))
-        .catch((error) =>
-          logger.error("Error shutting down OpenTelemetry SDK", undefined, error),
-        )
+        .then(() => {
+          azureMonitorExporterStatus = 'STOPPED';
+          logger.info('OpenTelemetry SDK shut down successfully');
+        })
+        .catch((error) => {
+          azureMonitorExporterStatus = 'ERROR';
+          logger.error('Error shutting down OpenTelemetry SDK', undefined, error);
+        })
         .finally(() => process.exit(0));
     });
   } catch (error) {
-    logger.error("Failed to start OpenTelemetry SDK", undefined, error);
+    azureMonitorExporterStatus = 'ERROR';
+    logger.error('Failed to start OpenTelemetry SDK', undefined, error);
   }
 }
 
@@ -115,40 +124,31 @@ export function startOpenTelemetry(sdk: NodeSDK): void {
 /**
  * Create meter for custom MirrorBuddy metrics.
  */
-const meter = metrics.getMeter("mirrorbuddy");
+const meter = metrics.getMeter('mirrorbuddy');
 
 /**
  * Counter for AI tokens consumed across all chat interactions.
  * Increment with: tokenUsageCounter.add(tokens, { provider: 'azure' })
  */
-export const tokenUsageCounter = meter.createCounter(
-  "mirrorbuddy.tokens.used",
-  {
-    description: "Total AI tokens consumed",
-    unit: "tokens",
-  },
-);
+export const tokenUsageCounter = meter.createCounter('mirrorbuddy.tokens.used', {
+  description: 'Total AI tokens consumed',
+  unit: 'tokens',
+});
 
 /**
  * Counter for FSRS flashcard reviews completed.
  * Increment with: fsrsReviewCounter.add(1, { quality: 'good' })
  */
-export const fsrsReviewCounter = meter.createCounter(
-  "mirrorbuddy.fsrs.reviews",
-  {
-    description: "Total FSRS flashcard reviews",
-    unit: "reviews",
-  },
-);
+export const fsrsReviewCounter = meter.createCounter('mirrorbuddy.fsrs.reviews', {
+  description: 'Total FSRS flashcard reviews',
+  unit: 'reviews',
+});
 
 /**
  * Counter for chat API requests received.
  * Increment with: chatRequestCounter.add(1, { maestro: 'galileo' })
  */
-export const chatRequestCounter = meter.createCounter(
-  "mirrorbuddy.chat.requests",
-  {
-    description: "Total chat API requests",
-    unit: "requests",
-  },
-);
+export const chatRequestCounter = meter.createCounter('mirrorbuddy.chat.requests', {
+  description: 'Total chat API requests',
+  unit: 'requests',
+});

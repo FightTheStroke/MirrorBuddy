@@ -149,15 +149,13 @@ describe('registerOfflineServiceWorker', () => {
     expect(result).toBe(false);
   });
 
-  it('reports an iOS script load failure as a recoverable warning', async () => {
+  it('reports the original script load failure without promising an unimplemented retry', async () => {
     const error = new TypeError('Script https://www.mirrorbuddy.org/sw.js load failed');
     mockServiceWorker.register.mockRejectedValueOnce(error);
 
     expect(await registerOfflineServiceWorker()).toBe(false);
-    expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Script load failed', {
-      browserWillRetry: true,
-    });
-    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith('[Offline SW] Registration failed', undefined, error);
+    expect(logger.warn).not.toHaveBeenCalled();
   });
 
   it('should return false when registration fails', async () => {

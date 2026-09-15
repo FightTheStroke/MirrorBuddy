@@ -42,6 +42,10 @@ const sentryIssueSchema = z.object({
   lastSeen: z.string().datetime({ offset: true }),
 });
 
+const sentryEventSchema = z.object({
+  tags: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
+});
+
 export interface VercelDeployment {
   uid: string;
   name: string;
@@ -107,9 +111,33 @@ export async function fetchSentryAlerts(
   if (issues.some((issue) => Date.parse(issue.lastSeen) > now)) {
     throw new Error('Sentry feed contains a future lastSeen timestamp');
   }
-  return issues
-    .filter((issue) => Date.parse(issue.lastSeen) >= now - 24 * 60 * 60 * 1000)
-    .map(sentryIssueToAlert);
+  const alerts: ProductionAlert[] = [];
+  for (const issue of issues.filter(
+    (issue) => Date.parse(issue.lastSeen) >= now - 24 * 60 * 60 * 1000,
+  )) {
+    const alert = sentryIssueToAlert(issue);
+    let environment = 'unknown';
+    try {
+      const eventResponse = await fetchImpl(
+        `https://sentry.io/api/0/issues/${encodeURIComponent(issue.id)}/events/latest/`,
+        { headers: { Authorization: `Bearer ${config.token}` } },
+      );
+      if (!eventResponse.ok) throw new Error(`Sentry event replied ${eventResponse.status}`);
+      const event = sentryEventSchema.parse(await eventResponse.json());
+      environment = event.tags?.find((tag) => tag.key === 'environment')?.value || 'unknown';
+    } catch (error) {
+      // Classification failure must not discard the known, active issue.
+      alert.details.push(
+        `Environment lookup failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+    alert.details.push(
+      `Latest event environment tag: ${environment}`,
+      'Environment tags describe the build, not the current deployment target; promoted preview builds can serve production.',
+    );
+    alerts.push(alert);
+  }
+  return alerts;
 }
 
 export async function fetchVercelAlerts(

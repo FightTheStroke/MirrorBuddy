@@ -73,6 +73,22 @@ interface ServiceLimit {
 
 ### 2. Service Limit Metrics
 
+**Collector health (2026-09-15):** Each push includes
+`metric_collector_up{collector="http|funnel|budget|abuse|conversion|tier|service_limits|vercel|supabase|azure_openai"}`.
+`1` means the collector returned valid samples; `0` means collection failed,
+configuration was unavailable, or a child collector was degraded. An execution
+failure logs its original error and contributes no usage samples, never synthetic
+zero usage or refreshed stale success. Independent valid sources still reach Grafana.
+The `service_limits` aggregate is `0` when any child is unavailable. A successful
+HTTP push confirms delivery, not that every monitored service is healthy.
+Transport failures still reject the push. Azure Service Principal monitoring is
+intentionally absent (ADR 0142), not broken configuration: it returns
+`not_configured` / `NOT_CONFIGURED`, null usage, and
+`metric_collector_enabled{collector="azure_openai"}=0` alongside `up=0`, without
+repeated error logging or authentication attempts. Configured authentication
+failures still report errors. Database authentication timeouts remain separate
+infrastructure failures; collector isolation neither fixes nor hides them.
+
 **Push to Grafana Cloud** (Influx Line Protocol):
 
 ```
@@ -334,7 +350,7 @@ System: Attempt to send session summary notification
 
 ## References
 
-- [V1Plan: Production Hardening Track](../../V1Plan.md)
+- [Production Hardening (ADR 0046)](0046-production-hardening-plan46.md)
 - [Grafana Cloud Documentation](https://grafana.com/docs/grafana-cloud/)
 - [Circuit Breaker Pattern](https://martinfowler.com/bliki/CircuitBreaker.html)
 - [Graceful Degradation Best Practices](https://www.smashingmagazine.com/2019/09/mobile-design-practices/)

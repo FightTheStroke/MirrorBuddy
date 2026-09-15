@@ -34,7 +34,7 @@ export function keyOf(issue: ExistingIssue): string | null {
 }
 
 export function issueTitle(alert: ProductionAlert): string {
-  const prefix = alert.source === 'sentry' ? 'Production error' : 'Deployment failure';
+  const prefix = alert.source === 'sentry' ? 'Sentry error' : 'Deployment failure';
   return `[${prefix}] ${alert.title}`.slice(0, 240);
 }
 
@@ -47,7 +47,7 @@ export function issueBody(alert: ProductionAlert, observedAt: string): string {
   return [
     markerFor(alert),
     '',
-    `**Seen in production** — ${occurrenceSummary(alert)}.`,
+    `**${alert.source === 'sentry' ? 'Reported by Sentry' : 'Seen in production'}** — ${occurrenceSummary(alert)}.`,
     '',
     ...alert.details.map((line) => `- ${line}`),
     '',
