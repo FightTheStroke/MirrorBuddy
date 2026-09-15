@@ -10,8 +10,9 @@ process.once('SIGTERM', cancel);
 runReadonlySmokeCommand(process.argv.slice(2), controller.signal)
   .catch((error: unknown) => {
     const code = error instanceof SmokeCommandError ? error.code : 'COMMAND_FAILED';
+    const reason = error instanceof SmokeCommandError && error.reason ? `: ${error.reason}` : '';
     process.stderr.write(
-      `Readonly smoke failed (${code}); diagnostic upload must remain blocked.\n`,
+      `Readonly smoke failed (${code}${reason}); diagnostic upload must remain blocked.\n`,
     );
     process.exitCode = 1;
   })

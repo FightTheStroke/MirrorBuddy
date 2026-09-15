@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { readonlySmokeOptions } from '../lib/readonly-smoke-options';
+import { readonlySmokeOptions, SmokeCommandError } from '../lib/readonly-smoke-options';
 
 const directory = join(tmpdir(), 'readonly-smoke-unit');
 const args = ['issue', '--target', 'synthetic', '--directory', directory];
@@ -121,4 +121,35 @@ describe('readonly smoke command boundary (pure validation, no database)', () =>
   it.each(['26.0.0', '', '18.0.0'])('rejects unsupported Node %s', (version) => {
     expect(() => readonlySmokeOptions(args, localEnv, version)).toThrow();
   });
+
+  it.each([
+    [{ ADMIN_READONLY_EMAIL: 'private-invalid-email' }, 'ADMIN_READONLY_EMAIL'],
+    [{ SESSION_SECRET: 'private-short-secret' }, 'SESSION_SECRET'],
+    [{ E2E_TESTS: '1' }, 'E2E_TESTS'],
+    [{ GITHUB_JOB: 'other-job' }, 'GITHUB_CONTEXT'],
+    [{ RUNNER_TEMP: '' }, 'RUNNER_TEMP'],
+    [{ DATABASE_URL: 'private-invalid-url' }, 'DATABASE_URL'],
+    [{ DIRECT_URL: 'private-invalid-url' }, 'DIRECT_URL'],
+    [
+      { DIRECT_URL: production.DIRECT_URL.replace('db.example', 'db.different') },
+      'PROJECT_MISMATCH',
+    ],
+  ] satisfies Array<[Partial<NodeJS.ProcessEnv>, string]>)(
+    'identifies a rejected prerequisite without exposing its value %#',
+    (change, reason) => {
+      let failure: unknown;
+      try {
+        readonlySmokeOptions(
+          ['issue', '--target', 'production', '--directory', directory],
+          { ...production, ...change },
+          '24.20.0',
+        );
+      } catch (error) {
+        failure = error;
+      }
+      expect(failure).toBeInstanceOf(SmokeCommandError);
+      expect(failure).toMatchObject({ code: 'INVALID_TARGET', reason });
+      expect((failure as Error).message).toBe('INVALID_TARGET');
+    },
+  );
 });

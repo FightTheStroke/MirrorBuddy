@@ -84,6 +84,13 @@ backstop, **not a successful revocation acknowledgement**.
 
 ## Diagnostic boundary and handoff
 
+Target validation reports `INVALID_TARGET` with a fixed prerequisite name, such as
+`ADMIN_READONLY_EMAIL`, `SESSION_SECRET`, `DATABASE_URL` or `GITHUB_CONTEXT`. It never
+prints the rejected value. Check that prerequisite in the trusted job configuration;
+do not bypass validation or copy production secrets to a developer machine. A rejection
+happens before database imports and session issuance. The same rejection during cleanup
+does not imply a credential was issued, and must not be reported as successful revocation.
+
 Upload diagnostics only after the separate revocation/cleanup command exits zero.
 Revocation failure must block upload, not merely log a warning or continue on error.
 Never treat expiry, missing receipt files, cancellation or skipped cleanup as success.
