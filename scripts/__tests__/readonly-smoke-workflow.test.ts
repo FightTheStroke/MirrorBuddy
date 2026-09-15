@@ -23,7 +23,9 @@ describe('approved readonly production smoke workflow', () => {
       'pii_state',
       'reconcile',
       'issue',
+      'student_issue',
       'smoke',
+      'student_revoke',
       'revoke',
       'diagnostic',
       'upload',
@@ -55,7 +57,7 @@ describe('approved readonly production smoke workflow', () => {
   it('does not manufacture readonly eligibility during owner reconciliation', () => {
     expect(smokeStep('reconcile').env?.NODE_ENV).toBe('production');
     expect(smokeStep('reconcile').env?.ADMIN_READONLY_EMAIL).toBe('');
-    expect(smokeStep('reconcile').run).toBe('npm run seed:admin');
+    expect(smokeStep('reconcile').run).toContain('npm run seed:admin >/dev/null 2>&1');
     const scripts = readRootScripts();
     expect(scripts['seed:admin']).toBe('npm run script -- scripts/seed-admin.ts');
     expect(scripts.script).toContain('--conditions=react-server');
@@ -81,7 +83,6 @@ describe('approved readonly production smoke workflow', () => {
     const step = smokeStep('smoke');
     expect(Object.keys(step.env ?? {}).sort()).toEqual([
       'ADMIN_READONLY_EMAIL',
-      'PROD_TEST_USER_COOKIE_VALUE',
       'PROD_TEST_USER_EMAIL',
       'PROD_TEST_USER_ID',
     ]);
@@ -89,9 +90,10 @@ describe('approved readonly production smoke workflow', () => {
     expect(step.run).toContain('/token');
     expect(step.run).toContain('export ADMIN_READONLY_COOKIE_VALUE');
     expect(step.run).toContain('exec npm run test:smoke:prod');
-    expect(step.run).not.toMatch(
-      /GITHUB_ENV|GITHUB_OUTPUT|add-mask|echo.*ADMIN_READONLY_COOKIE_VALUE/,
-    );
+    expect(step.run).not.toMatch(/GITHUB_ENV|GITHUB_OUTPUT|echo.*ADMIN_READONLY_COOKIE_VALUE/);
+    expect(step.run).toContain('export PROD_TEST_USER_COOKIE_VALUE');
+    expect(step.run).toContain('::add-mask::');
+    expect(step.run).not.toContain('secrets.PROD_TEST_USER_COOKIE_VALUE');
   });
 
   it('attempts scoped cleanup after successful, failed or cancelled issuance', () => {
@@ -113,6 +115,7 @@ describe('approved readonly production smoke workflow', () => {
     for (const id of ['diagnostic', 'upload']) {
       expect(smokeStep(id).if).toContain('always()');
       expect(smokeStep(id).if).toContain("steps.revoke.outcome == 'success'");
+      expect(smokeStep(id).if).toContain("steps.student_revoke.outcome == 'success'");
       expect(smokeStep(id).if).toContain("steps.smoke.outcome == 'failure'");
     }
     const diagnostic = smokeStep('diagnostic').run;

@@ -17,6 +17,29 @@ and revocation. Reconciliation must not manufacture the issuer's eligibility. A 
 disabled, wrong-role or wrong-marker account fails closed; any prerequisite correction
 needs its own existing authorized process, not automatic widening of this capability.
 
+## Manual conversion of an existing technical account
+
+Dispatch **Readonly Auth Recovery** (`.github/workflows/readonly-recovery.yml`) from
+`main`. The existing `database-repair` protected environment remains the approval
+boundary; no environment, permission, key or account is created. The default `report`
+action does not change data. Both connection URLs must match the existing
+`PRODUCTION_DB_ID` secret. No database, origin, email or user-ID override is accepted.
+
+The operator requires the configured owner and readonly account to each match exactly
+one existing row by the same aliases used by the seed. It verifies their email hashes,
+enabled roles and the owner's unchanged, non-reset password against `ADMIN_PASSWORD`.
+Missing, ambiguous, wrong-role or unverified accounts fail closed. The proof and
+conversion share a serializable transaction with row locks.
+
+Only `convert` plus the exact confirmation `CONVERT_READONLY` permits a write.
+The recovery entrypoint shares `resetSeedCredential` with `seed-admin.ts`: it replaces
+the readonly bcrypt credential with the canonical disabled-password marker, increments
+its authentication version, revokes all its native/legacy sessions and consumes its
+unused password-reset tokens. It never calls broader owner reconciliation, creates an
+account, rewrites an email, changes a role or enables a disabled user. An already-ready
+marker is a no-op. Public logs contain only fixed status codes, not seed output or IDs.
+After conversion, run the normal deployment smoke; do not use this operator in CI.
+
 ## Activation is a separate unresolved prerequisite
 
 Native sessions need no legacy activation, so issuance itself is **not circular**.
@@ -66,7 +89,8 @@ Its `0600` files are:
 The browser reads `token` privately into its existing `ADMIN_READONLY_COOKIE_VALUE`
 input. Do not print it, enable shell tracing, write a job output/`GITHUB_ENV`, or upload
 the run directory. Do not pass database credentials or the signing secret to the browser.
-Ordinary student credentials remain separate and unchanged.
+The runner registers both raw and URL-encoded cookies through its masking command
+before browser execution; this is the only permitted log-protocol delivery.
 
 Run `revoke` unconditionally after issuance/browser attempts, including failures and
 cancellation. It removes the local bearer, verifies the receipt, and confirms revocation
@@ -82,6 +106,42 @@ unconditional cleanup step is still required. SIGKILL, runner loss, unavailable 
 or unavailable databases cannot guarantee immediate cleanup; the one-hour expiry is a
 backstop, **not a successful revocation acknowledgement**.
 
+## Fresh dedicated student login
+
+The separate `student-smoke-session.ts issue --directory ...` command first reads the
+existing GitHub `PROD_TEST_USER_ID`, `PROD_TEST_USER_EMAIL`, `PROD_TEST_USER_USERNAME`
+and `PROD_TEST_USER_PASSWORD` configuration. Prisma must resolve exactly one row across
+the ID/email-hash/username aliases, with every identity field matching, enabled `USER`,
+`isTestData=true`, and no required password change. It never selects a local `.env`
+identity, provisions a user or writes credentials. The database URLs must match
+`PRODUCTION_DB_ID`; all production context checks run before database access.
+
+It then performs a normal username/password login at the fixed
+`https://mirrorbuddy.vercel.app/api/auth/login`, without a previous cookie. Username
+login avoids the email-login historical backfill. Redirects are never followed.
+The response must contain a native `s2` cookie and the exact configured user, verified
+again through `/api/user` before browser handoff. Login can create the normal session
+and bounded, deduplicated login telemetry; it does not activate legacy sessions.
+The static `PROD_TEST_USER_COOKIE_VALUE` GitHub secret is neither used nor changed.
+
+Its exclusive `readonly-smoke-student-<run>-<attempt>` directory contains a private
+token and non-secret phase receipt. Request intent is persisted before login and the
+received native cookie before response-body validation. The browser gets only the
+masked run-scoped cookie through its own process environment, never the password,
+database credentials or a job output.
+
+The unconditional `revoke` command obtains CSRF normally from `/api/session`, logs out
+with `scope=current`, and requires the original cookie to receive HTTP 401
+`SESSION_REJECTED` from `/api/user`. It cannot revoke other sessions or change an account.
+Successful cleanup removes the bearer and keeps a non-secret idempotent receipt.
+Failed response/identity validation attempts the same cleanup immediately.
+
+A lost login response, runner loss or unavailable logout service cannot prove cleanup.
+The job remains red, no bearer/receipt is uploaded, and the receipt must not be treated
+as success. A normal student session has the normal session lifetime, **not** the
+readonly one-hour limit. A lost response may therefore require separately approved
+operator investigation; never silently revoke all of the account's sessions to hide it.
+
 ## Diagnostic boundary and handoff
 
 Target validation reports `INVALID_TARGET` with a fixed prerequisite name, such as
@@ -91,7 +151,7 @@ do not bypass validation or copy production secrets to a developer machine. A re
 happens before database imports and session issuance. The same rejection during cleanup
 does not imply a credential was issued, and must not be reported as successful revocation.
 
-Upload diagnostics only after the separate revocation/cleanup command exits zero.
+Upload diagnostics only after both separate revocation/cleanup commands exit zero.
 Revocation failure must block upload, not merely log a warning or continue on error.
 Never treat expiry, missing receipt files, cancellation or skipped cleanup as success.
 After successful deletion, rerunning against that missing directory intentionally fails

@@ -321,24 +321,38 @@ read-only account already satisfies the required role and password-marker checks
 The build command does not reconcile privileged accounts; generation, migration
 and build failures remain failures rather than becoming a skipped-seed message.
 Provisioning, marker conversion and session activation are separate prerequisites,
-not side effects of a smoke run. Fresh read-only accounts can still block activation.
+not side effects of a smoke run. The manual **Readonly Auth Recovery** workflow
+defaults to a report and uses the existing `database-repair` approval environment.
+Explicit conversion verifies the existing unique readonly account and unchanged
+owner password, then revokes only the readonly account's old sessions through the
+shared seed reset process. Fresh read-only accounts can still block activation.
 See [Read-only smoke access](docs/readonly-smoke-access.md) before rollout.
 
 Other existing smoke/application configuration remains separate:
 
-- `PROD_TEST_USER_EMAIL` / `PROD_TEST_USER_PASSWORD` / `PROD_TEST_USER_ID` / `PROD_TEST_USER_COOKIE_VALUE`
-  (the dedicated `isTestData` account used by read-only student smoke tests; this
-  account's credentials are not issued or revoked by the admin helper)
+- `PROD_TEST_USER_EMAIL` / `PROD_TEST_USER_USERNAME` / `PROD_TEST_USER_PASSWORD` /
+  `PROD_TEST_USER_ID`: the existing dedicated enabled `USER`, with `isTestData=true`.
+  Each trusted smoke run verifies all identity aliases in Prisma before a normal
+  password login at the fixed production origin. The native cookie is verified,
+  masked and privately injected as `PROD_TEST_USER_COOKIE_VALUE`; its old static
+  GitHub secret is no longer used or modified. Do not substitute local `.env` identities.
 - `ALLOWED_ORIGINS` (every hostname the site is served on, apex included)
 
-Cleanup runs after an issuance attempt even if the browser fails. Only confirmed
-revocation permits uploading a sanitized failure outcome; raw browser reports,
+Cleanup runs for both accounts after an issuance attempt even if the browser fails.
+The student cleanup uses normal CSRF-protected current-session logout and proves that
+the original cookie is rejected; no signing key or database authority reaches it.
+Only confirmed cleanup of both sessions permits a sanitized failure outcome; raw browser reports,
 screenshots, storage state and credential files are not uploaded. A runner loss
 cannot guarantee immediate revocation, and expiry is not reported as cleanup.
+Unlike the readonly credential, the normal student session does not expire after
+one hour. A lost login response leaves cleanup explicitly unresolved and requires
+operator investigation, not an automatic account-wide reset.
 
 GitHub Secrets additionally holds `PRODUCTION_DB_ID` — the Supabase project ref of the
 production database. Two guards compare the staging connection user against it so a
-staging deploy can never run on production data (ADR 0175).
+staging deploy can never run on production data (ADR 0175). The manual readonly
+recovery and student preflight also require both database URLs to match this existing
+secret; it is not a new credential or configurable recovery target.
 
 ### Admin password
 

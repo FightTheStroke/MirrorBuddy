@@ -90,7 +90,12 @@ uses its bundled Chromium. Set it explicitly to override either default.
 - **Authenticated UI tests** inject `PROD_TEST_USER_COOKIE_VALUE` as the
   `mirrorbuddy-user-id` cookie, then verify `PROD_TEST_USER_ID` and
   `isTestData=true` through `/api/user`. Shared fixtures do not call the login
-  endpoint or require `SESSION_SECRET`. A standalone Playwright-library script,
+  endpoint or require `SESSION_SECRET`. The deployment workflow now bootstraps this
+  cookie through a normal password login after a read-only, exact dedicated-account
+  Prisma preflight, not the static legacy cookie secret. It rejects redirects and
+  wrong identities and logs out only its own fresh session after smoke, proving
+  rejection of the original cookie. See [operator contract](../readonly-smoke-access.md).
+  A standalone Playwright-library script,
   outside the test runner and HTML reporter, uses credentials once only after
   the cookie-authenticated ID, username, email, and `isTestData` marker match the
   configured identity. It validates the login and session user IDs, emits only

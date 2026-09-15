@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { smokeStep } from './readonly-smoke-workflow-fixtures';
 
 const readonlyValue = 'synthetic-readonly-handoff-not-a-credential';
+const studentValue = `s2:${'s'.repeat(43)}.${'c'.repeat(64)}`;
 const databaseKeys = [
   'DATABASE_URL',
   'DIRECT_URL',
@@ -18,6 +19,7 @@ const databaseKeys = [
   'ADMIN_PASSWORD',
   'PGPASSWORD',
   'PII_ENCRYPTION_KEY',
+  'PROD_TEST_USER_PASSWORD',
 ];
 
 // Both spawnSync calls in this file previously had no `timeout`, so a stuck
@@ -28,13 +30,16 @@ const HANDOFF_TEST_TIMEOUT_MS = 75_000;
 const SEED_ADMIN_SPAWN_TIMEOUT_MS = 60_000;
 const SEED_ADMIN_TEST_TIMEOUT_MS = 75_000;
 
-function runHandoff(token: string | null, exitCode = 0) {
+function runHandoff(token: string | null, exitCode = 0, student: string | null = studentValue) {
   const directory = mkdtempSync(join(tmpdir(), 'mirrorbuddy-smoke-handoff-'));
   try {
     const runDirectory = join(directory, 'readonly-smoke-123-1');
     mkdirSync(runDirectory, { mode: 0o700 });
     if (typeof token === 'string')
       writeFileSync(join(runDirectory, 'token'), token, { mode: 0o600 });
+    const studentDirectory = join(directory, 'readonly-smoke-student-123-1');
+    mkdirSync(studentDirectory, { mode: 0o700 });
+    if (student !== null) writeFileSync(join(studentDirectory, 'token'), student, { mode: 0o600 });
     const runner = join(directory, 'npm');
     writeFileSync(
       runner,
@@ -42,7 +47,8 @@ function runHandoff(token: string | null, exitCode = 0) {
 const keys = ${JSON.stringify(databaseKeys)};
 console.log(JSON.stringify({
   readonlyMatches: process.env.ADMIN_READONLY_COOKIE_VALUE === ${JSON.stringify(readonlyValue)},
-  studentUnchanged: process.env.PROD_TEST_USER_COOKIE_VALUE === 'synthetic-student-value',
+  studentFresh: process.env.PROD_TEST_USER_COOKIE_VALUE === ${JSON.stringify(studentValue)},
+  origin: process.env.PROD_URL,
   forbiddenKeys: keys.filter(key => Object.hasOwn(process.env, key)),
   args: process.argv.slice(2)
 }));
@@ -54,6 +60,7 @@ process.exitCode = ${exitCode};
       encoding: 'utf8',
       timeout: HANDOFF_SPAWN_TIMEOUT_MS,
       env: {
+        NODE_ENV: 'test',
         PATH: `${directory}:/usr/bin:/bin`,
         RUNNER_TEMP: directory,
         GITHUB_RUN_ID: '123',
@@ -100,14 +107,32 @@ describe('actual workflow shell credential handoff', () => {
     () => {
       const result = runHandoff(readonlyValue);
       expect(result.status, result.stderr).toBe(0);
-      expect(JSON.parse(result.stdout)).toEqual({
+      const lines = result.stdout.split('\n');
+      expect(lines).toContain(`::add-mask::${studentValue}`);
+      expect(lines).toContain(`::add-mask::${encodeURIComponent(studentValue)}`);
+      expect(lines).toContain(`::add-mask::${readonlyValue}`);
+      const publicOutput = lines.filter((line) => !line.startsWith('::add-mask::')).join('\n');
+      expect(JSON.parse(publicOutput)).toEqual({
         readonlyMatches: true,
-        studentUnchanged: true,
+        studentFresh: true,
+        origin: 'https://mirrorbuddy.vercel.app',
         forbiddenKeys: [],
         args: ['run', 'test:smoke:prod'],
       });
-      expect(result.stdout + result.stderr).not.toContain(readonlyValue);
+      expect(publicOutput + result.stderr).not.toContain(readonlyValue);
       expect(result.stdout + result.stderr).not.toContain('synthetic-student-value');
+      expect(publicOutput + result.stderr).not.toContain(studentValue);
+    },
+    HANDOFF_TEST_TIMEOUT_MS,
+  );
+
+  it.each([null, '', 'legacy.signature', 'not-a-native-cookie\n'])(
+    'rejects missing or invalid fresh student credentials: %j',
+    (student) => {
+      const result = runHandoff(readonlyValue, 0, student);
+      expect(result.status).toBe(1);
+      expect(result.stdout).toContain('Student smoke credential');
+      expect(result.stdout).not.toContain('readonlyMatches');
     },
     HANDOFF_TEST_TIMEOUT_MS,
   );
