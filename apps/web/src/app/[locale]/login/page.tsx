@@ -46,10 +46,11 @@ export default function LoginPage() {
       }
 
       await requireIdentityRefresh('authenticated');
+      // Reload the document so providers and account-bound stores use the new session.
       if (data.user?.mustChangePassword) {
-        window.location.assign(`/${locale}/change-password`);
+        window.location.assign(new URL(`/${locale}/change-password`, window.location.origin).href);
       } else {
-        window.location.assign(`/${locale}`);
+        window.location.assign(new URL(`/${locale}`, window.location.origin).href);
       }
     } catch {
       setError(t('connectionError'));

@@ -5,7 +5,10 @@ try {
   if (!directory || extra.length) {
     throw new Error('Usage: node scripts/ci-unit-validate.mjs <report-directory>');
   }
-  const entries = readdirSync(directory, { withFileTypes: true });
+  // This standalone CLI operates only inside the caller-selected report directory.
+  // chdir rejects missing paths and non-directories before any reports are inspected.
+  process.chdir(directory);
+  const entries = readdirSync('.', { withFileTypes: true });
   const expected = ['shard-1.json', 'shard-2.json'];
   const names = entries.map((entry) => entry.name).sort();
   if (

@@ -22,7 +22,7 @@ export function LogoutActions({ testId = 'logout-button' }: { testId?: string })
     try {
       await logoutClient(scope);
       // A full navigation discards account-bound in-memory stores, not consent choices.
-      window.location.assign(`/${locale}/welcome`);
+      window.location.assign(new URL(`/${locale}/welcome`, window.location.origin).href);
     } catch {
       setFailed(true);
     } finally {

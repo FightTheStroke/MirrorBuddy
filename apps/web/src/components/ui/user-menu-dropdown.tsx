@@ -31,7 +31,8 @@ export function UserMenuDropdown({ userName, className }: UserMenuDropdownProps)
     try {
       await logoutClient(scope);
       setOpen(false);
-      window.location.assign('/login');
+      // Discard account-bound in-memory state after the session has been revoked.
+      window.location.assign(new URL('/login', window.location.origin).href);
     } catch {
       setLogoutFailed(true);
     } finally {

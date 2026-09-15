@@ -100,7 +100,11 @@ describe('cold-load identity alert provides truthful current logout recovery', (
 
       await userEvent.setup().click(currentButton());
 
-      await waitFor(() => expect(window.location.assign).toHaveBeenCalledWith('/en/welcome'));
+      await waitFor(() =>
+        expect(window.location.assign).toHaveBeenCalledWith(
+          new URL('/en/welcome', window.location.origin).href,
+        ),
+      );
       expect(getClientIdentity()).toEqual({ status: 'anonymous' });
       expectCleared();
       expect(transport.transaction).not.toHaveBeenCalled();
@@ -163,7 +167,11 @@ describe('cold-load identity alert provides truthful current logout recovery', (
       complete([issued.row]);
     });
 
-    await waitFor(() => expect(window.location.assign).toHaveBeenCalledWith('/en/welcome'));
+    await waitFor(() =>
+      expect(window.location.assign).toHaveBeenCalledWith(
+        new URL('/en/welcome', window.location.origin).href,
+      ),
+    );
     expectCleared();
   });
 

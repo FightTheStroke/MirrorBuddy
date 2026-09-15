@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useMemo } from "react";
-import { NextIntlClientProvider } from "next-intl";
-import { locales, defaultLocale, localeNames, localeFlags } from "./config";
-import type { Locale } from "./config";
+import { createContext, useContext, useMemo } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { useRouter } from 'next/navigation';
+import { locales, defaultLocale, localeNames, localeFlags } from './config';
+import type { Locale } from './config';
 
 interface LocaleContextValue {
   locale: Locale;
@@ -40,11 +41,8 @@ interface LocaleProviderProps {
  * </LocaleProvider>
  * ```
  */
-export function LocaleProvider({
-  children,
-  messages,
-  locale,
-}: LocaleProviderProps) {
+export function LocaleProvider({ children, messages, locale }: LocaleProviderProps) {
+  const router = useRouter();
   const contextValue = useMemo<LocaleContextValue>(
     () => ({
       locale: locale as Locale,
@@ -57,15 +55,15 @@ export function LocaleProvider({
         const currentPath = window.location.pathname;
         // Static regex for locale prefix - locales are compile-time constant
         // eslint-disable-next-line security/detect-non-literal-regexp
-        const localeRegex = new RegExp(`^/(${locales.join("|")})`);
-        const pathWithoutLocale = currentPath.replace(localeRegex, "");
+        const localeRegex = new RegExp(`^/(${locales.join('|')})`);
+        const pathWithoutLocale = currentPath.replace(localeRegex, '');
 
         // Navigate to new locale path
-        const newPath = `/${newLocale}${pathWithoutLocale || ""}`;
-        window.location.href = newPath;
+        const newPath = `/${newLocale}${pathWithoutLocale || ''}`;
+        router.push(newPath);
       },
     }),
-    [locale],
+    [locale, router],
   );
 
   return (
@@ -93,7 +91,7 @@ export function useLocaleContext() {
   const context = useContext(LocaleContext);
 
   if (!context) {
-    throw new Error("useLocaleContext must be used within LocaleProvider");
+    throw new Error('useLocaleContext must be used within LocaleProvider');
   }
 
   return context;

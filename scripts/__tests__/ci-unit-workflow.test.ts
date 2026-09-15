@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -101,5 +101,67 @@ describe('blob input validation fails closed', () => {
     });
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Usage:');
+  });
+
+  it.each(['reports', 'report directory with spaces', 'reports;not-a-command'])(
+    'reads exactly the requested relative or absolute directory: %s',
+    (name) => {
+      const root = mkdtempSync(join(tmpdir(), 'ci-unit-path-'));
+      roots.push(root);
+      const directory = join(root, name);
+      mkdirSync(directory);
+      for (const shard of ['shard-1.json', 'shard-2.json']) {
+        writeFileSync(join(directory, shard), '{}');
+      }
+      // Decoy files in the caller's directory must not be used as report input.
+      writeFileSync(join(root, 'shard-1.json'), '{}');
+      for (const argument of [name, directory]) {
+        const result = spawnSync(
+          process.execPath,
+          [join(repo, 'scripts/ci-unit-validate.mjs'), argument],
+          { cwd: root, encoding: 'utf8' },
+        );
+        expect(result.status, result.stderr).toBe(0);
+      }
+    },
+  );
+
+  it.each(['directory', 'symlink'])('rejects a shard that is a %s, not a regular file', (kind) => {
+    const root = mkdtempSync(join(tmpdir(), 'ci-unit-shape-'));
+    roots.push(root);
+    writeFileSync(join(root, 'shard-1.json'), '{}');
+    if (kind === 'directory') mkdirSync(join(root, 'shard-2.json'));
+    else symlinkSync(join(root, 'shard-1.json'), join(root, 'shard-2.json'));
+    const result = spawnSync(process.execPath, [join(repo, 'scripts/ci-unit-validate.mjs'), root], {
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('Expected exactly shard-1.json and shard-2.json');
+  });
+
+  it.each([[''], ['reports', 'extra'], ['file:///reports']])(
+    'rejects invalid CLI input without a success message: %j',
+    (...args) => {
+      const result = spawnSync(
+        process.execPath,
+        [join(repo, 'scripts/ci-unit-validate.mjs'), ...args],
+        { encoding: 'utf8' },
+      );
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain('Unit blob validation failed:');
+      expect(result.stdout).not.toContain('Both unit shard blobs present');
+    },
+  );
+
+  it('rejects a report filename passed instead of its directory', () => {
+    const root = mkdtempSync(join(tmpdir(), 'ci-unit-file-'));
+    roots.push(root);
+    const file = join(root, 'shard-1.json');
+    writeFileSync(file, '{}');
+    const result = spawnSync(process.execPath, [join(repo, 'scripts/ci-unit-validate.mjs'), file], {
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('Unit blob validation failed:');
   });
 });

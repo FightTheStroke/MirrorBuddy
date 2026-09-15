@@ -194,7 +194,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
     get().resetOnboarding();
 
     // Reload the page to reinitialize everything
-    window.location.href = '/welcome';
+    window.location.assign(new URL('/welcome', window.location.origin).href);
   },
 
   hydrateFromApi: async () => {
