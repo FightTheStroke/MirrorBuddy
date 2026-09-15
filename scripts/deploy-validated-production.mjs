@@ -147,8 +147,9 @@ export async function deployValidatedProduction(input) {
     throw new Error('Ambiguous source deployment');
   const candidate = record(entries[0]);
   const meta = record(candidate.meta);
+  // List entries expose no deployment id; the auto-generated host is unique per
+  // deployment, so host equality binds this entry to the build just created.
   if (
-    candidate.id !== id ||
     deploymentHost(candidate.url) !== host ||
     candidate.target !== 'production' ||
     candidate.customEnvironment ||

@@ -33,8 +33,10 @@ const deployment = () => ({
 const listing = () => ({
   deployments: [
     {
-      ...deployment(),
+      // `vercel list --format=json` returns no deployment id, unlike `deploy`
+      // and `inspect`; the fixture must not invent one.
       url: 'synthetic.vercel.app',
+      target: 'production',
       state: 'READY',
       meta: { verifiedSourceCommit: sha, productionBuildRun: '123-2' },
     },
@@ -183,7 +185,7 @@ describe('production source-build promotion boundary', () => {
     {},
     { deployments: [] },
     { deployments: [listing().deployments[0], listing().deployments[0]] },
-    { deployments: [{ ...listing().deployments[0], id: 'dpl_old' }] },
+    { deployments: [{ ...listing().deployments[0], url: 'https://other.vercel.app' }] },
     { deployments: [{ ...listing().deployments[0], state: 'ERROR' }] },
     { deployments: [{ ...listing().deployments[0], target: 'preview' }] },
     { deployments: [{ ...listing().deployments[0], customEnvironment: { slug: 'custom' } }] },
