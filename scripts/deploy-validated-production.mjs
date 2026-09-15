@@ -12,14 +12,18 @@ import {
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 
-/** @param {string} command @param {string[]} args @param {number} timeout */
-function execute(command, args, timeout = 60_000) {
+/**
+ * @param {string} command @param {string[]} args @param {number} timeout
+ * @param {Record<string, string>} [extraEnv]
+ */
+function execute(command, args, timeout = 60_000, extraEnv) {
   try {
     return execFileSync(command, args, {
       cwd: root,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
       timeout,
+      ...(extraEnv ? { env: { ...process.env, ...extraEnv } } : {}),
     }).trim();
   } catch {
     // Neither credentials nor remote build output belong in error diagnostics.
@@ -92,6 +96,15 @@ export async function deployValidatedProduction(input) {
     throw new Error('Production upload contains prior build output');
   /** @param {string[]} args @param {number} [timeout] */
   const vercel = (args, timeout) => {
+    // The `curl` subcommand forwards every argument it does not consume to curl
+    // itself, so `--token` and `--scope` must reach it through the environment.
+    if (args[0] === 'curl') {
+      return execute('vercel', args, timeout, {
+        VERCEL_TOKEN: token,
+        VERCEL_ORG_ID: org,
+        VERCEL_PROJECT_ID: project,
+      });
+    }
     const separator = args.includes('--') ? args.indexOf('--') : args.length;
     return execute(
       'vercel',
