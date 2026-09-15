@@ -81,7 +81,11 @@ Single dashboard with 8 rows organized by stakeholder priority:
 4. Cost Control
 5. Maestri & Learning
 
-**🛠️ TECHNICAL METRICS (Rows 6-8):** 6. Safety Metrics 7. Performance 8. External Services
+**🛠️ TECHNICAL METRICS (Rows 6-8):**
+
+6. Safety Metrics
+7. Performance
+8. External Services
 
 ### 4. Alert Rules
 
