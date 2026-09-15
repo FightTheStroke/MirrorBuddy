@@ -118,8 +118,10 @@ jobs:
             exit 1
           fi
 
+      # Runs after a failed resolve too: a red run with no state report is the situation
+      # this workflow exists to avoid, and the check prints no host.
       - name: Confirm the repair landed
-        if: inputs.action != 'status'
+        if: ${{ !cancelled() && inputs.action != 'status' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}

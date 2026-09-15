@@ -67,9 +67,14 @@ describe('production migration repair workflow', () => {
 
   it('lets no Prisma command write its datasource banner to the public log', () => {
     expect(workflow).not.toContain('prisma migrate status');
-    // Every `prisma migrate` subcommand prints the host, so each must be redirected.
-    for (const [, command] of workflow.matchAll(/(pnpm exec prisma migrate [^\n]+)/g)) {
-      expect(command).toContain('>/tmp/');
+    // `migrate` and `db` subcommands alike print the datasource host, and the
+    // redirect order matters: `2>&1 >file` would still send stderr to the log.
+    const commands = [...workflow.matchAll(/^.*\bprisma (?:migrate|db) .*$/gm)].map(
+      ([line]) => line,
+    );
+    expect(commands.length).toBeGreaterThan(0);
+    for (const command of commands) {
+      expect(command).toContain('>/tmp/resolve.log 2>&1');
     }
   });
 

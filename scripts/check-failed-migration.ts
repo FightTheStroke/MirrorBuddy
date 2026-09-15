@@ -71,8 +71,11 @@ async function main(): Promise<void> {
     console.error('Neither DIRECT_URL nor DATABASE_URL is set');
     process.exit(1);
   }
-  const client = createPgClient(url);
+  let client;
   try {
+    // pg parses the connection string in the constructor, so a malformed URL must
+    // throw inside the handler that reduces errors to a bare SQLSTATE.
+    client = createPgClient(url);
     await client.connect();
     const database = (await client.query<{ current_database: string }>('SELECT current_database()'))
       .rows[0]?.current_database;
@@ -102,7 +105,7 @@ async function main(): Promise<void> {
     console.error(`Verification failed: ${safeReason(error)}`);
     process.exit(1);
   } finally {
-    await client.end().catch(() => undefined);
+    await client?.end().catch(() => undefined);
   }
 }
 
