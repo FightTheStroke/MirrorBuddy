@@ -35,7 +35,7 @@ export function GooglePickerButton({
   children,
 }: GooglePickerButtonProps) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const { isConnected, isLoading: isCheckingConnection } = useGoogleDrive({ userId });
+  const { isConnected, isLoading: isCheckingConnection, connect } = useGoogleDrive({ userId });
 
   const handleSelect = useCallback(
     async (docs: GooglePickerDocument[]) => {
@@ -55,10 +55,15 @@ export function GooglePickerButton({
         setIsDownloading(false);
       }
     },
-    [onFileSelect]
+    [onFileSelect],
   );
 
-  const { openPicker, isLoading: isOpeningPicker, isReady, error } = useGooglePicker({
+  const {
+    openPicker,
+    isLoading: isOpeningPicker,
+    isReady,
+    error,
+  } = useGooglePicker({
     userId,
     onSelect: handleSelect,
     mimeTypes: acceptedTypes,
@@ -68,11 +73,11 @@ export function GooglePickerButton({
   const handleClick = useCallback(() => {
     if (!isConnected) {
       // Redirect to Google OAuth
-      window.location.href = `/api/auth/google?userId=${userId}&returnUrl=${window.location.pathname}`;
+      connect();
       return;
     }
     openPicker();
-  }, [isConnected, userId, openPicker]);
+  }, [isConnected, connect, openPicker]);
 
   const isLoading = isCheckingConnection || isOpeningPicker || isDownloading;
   const buttonDisabled = isLoading || (!isReady && isConnected);
@@ -85,11 +90,7 @@ export function GooglePickerButton({
       disabled={buttonDisabled}
       className={cn('gap-2', className)}
     >
-      {isLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <Cloud className="w-4 h-4" />
-      )}
+      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
       {children || (isConnected ? 'Da Google Drive' : 'Connetti Google Drive')}
       {error && <span className="text-red-500 text-xs ml-2">{error}</span>}
     </Button>

@@ -63,7 +63,9 @@ describe('durable logout controls', () => {
       expect(new Headers(transport.mock.calls[0][1]?.headers).get('X-CSRF-Token')).toBe(
         logoutCSRFToken,
       );
-      expect(window.location.assign).toHaveBeenCalledWith(`/${locale}/welcome`);
+      expect(window.location.assign).toHaveBeenCalledWith(
+        new URL(`/${locale}/welcome`, window.location.origin).href,
+      );
       expect(getClientIdentity()).toEqual({ status: 'anonymous' });
     },
   );

@@ -7,6 +7,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { getMaestroById, getAllSubjects, SUBJECT_NAMES } from '../index';
+import { detectIntent } from '@/lib/ai';
 
 const loto = () => getMaestroById('loto');
 
@@ -62,8 +63,7 @@ describe('What Loto must never claim', () => {
 });
 
 describe('distress is never routed to a school subject', () => {
-  it('feeling anxious asks for support, not for a mindfulness lesson', async () => {
-    const { SUBJECT_PATTERNS } = await import('@/lib/ai/intent-detection/patterns');
+  it('feeling anxious asks for support, not for a mindfulness lesson', () => {
     const distress = [
       'sono agitato',
       'sono ansiosa',
@@ -72,14 +72,18 @@ describe('distress is never routed to a school subject', () => {
       'non riesco a calmarmi',
     ];
     for (const said of distress) {
-      expect(SUBJECT_PATTERNS.mindfulness.some((p) => p.test(said))).toBe(false);
+      const intent = detectIntent(said);
+      expect(intent.subject).not.toBe('mindfulness');
+      expect(intent.recommendedCharacter).not.toBe('maestro');
     }
   });
 
-  it('but asking for the practice by name does reach Loto', async () => {
-    const { SUBJECT_PATTERNS } = await import('@/lib/ai/intent-detection/patterns');
+  it('but asking for the practice by name does reach Loto', () => {
     for (const said of ['voglio meditare', 'facciamo mindfulness', 'una meditazione guidata']) {
-      expect(SUBJECT_PATTERNS.mindfulness.some((p) => p.test(said))).toBe(true);
+      expect(detectIntent(said)).toMatchObject({
+        subject: 'mindfulness',
+        recommendedCharacter: 'maestro',
+      });
     }
   });
 });

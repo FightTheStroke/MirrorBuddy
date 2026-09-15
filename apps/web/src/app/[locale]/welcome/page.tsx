@@ -103,7 +103,8 @@ function WelcomeContent() {
       voiceSession.disconnect();
       resetOnboarding();
       setUseWebSpeechFallback(false);
-      window.location.href = `/${locale}/welcome`;
+      // Reinitialize voice and onboarding providers without replay/skip query flags.
+      window.location.assign(new URL(`/${locale}/welcome`, window.location.origin).href);
     }
   };
 

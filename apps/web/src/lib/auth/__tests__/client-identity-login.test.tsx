@@ -52,7 +52,7 @@ describe('real login form refresh seam', () => {
       submit();
       await waitFor(() =>
         expect(window.location.assign).toHaveBeenCalledWith(
-          mustChangePassword ? '/it/change-password' : '/it',
+          new URL(mustChangePassword ? '/it/change-password' : '/it', window.location.origin).href,
         ),
       );
       expect(getClientIdentity()).toEqual(account);

@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = resolve(root, 'apps/web/test-results/ci-e2e');
 const lastRun = resolve(output, '.last-run.json');
 const args = [

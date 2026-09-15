@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Send, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -123,7 +124,9 @@ export function EnterpriseForm() {
       <div className="text-center space-y-6">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{t('successTitle')}</h2>
         <p className="text-slate-600 dark:text-slate-300">{t('successDescription')}</p>
-        <Button onClick={() => (window.location.href = '/')}>{t('tornaAllaHome')}</Button>
+        <Button asChild>
+          <Link href="/">{t('tornaAllaHome')}</Link>
+        </Button>
       </div>
     );
   }

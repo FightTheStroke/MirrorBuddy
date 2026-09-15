@@ -101,8 +101,11 @@ export function useGoogleDrive({ userId }: UseGoogleDriveOptions): UseGoogleDriv
 
   // Connect to Google
   const connect = useCallback(() => {
-    const returnUrl = window.location.pathname;
-    window.location.href = `/api/auth/google?userId=${userId}&returnUrl=${encodeURIComponent(returnUrl)}`;
+    // OAuth must load as a document so the browser follows the external redirect.
+    const url = new URL('/api/auth/google', window.location.origin);
+    url.searchParams.set('userId', userId);
+    url.searchParams.set('returnUrl', window.location.pathname);
+    window.location.assign(url.href);
   }, [userId]);
 
   // Disconnect from Google

@@ -13,6 +13,7 @@ import * as path from 'path';
 import { findAttributedQuotes } from '../attributed-quotes';
 
 const MAESTRI_DIR = path.join(__dirname, '../../../data/maestri');
+const sourceClassPattern = /^(?:[ABCD]|[ABCD]\s+\(.*)$/;
 
 interface Header {
   slug: string;
@@ -58,9 +59,40 @@ describe('knowledge base provenance headers', () => {
       // with a C and would otherwise pass as class C. Only a bare letter, or a
       // letter followed by the parenthesised reason the SOP asks for, is valid.
       expect(h.sourceClass, `${h.slug}: missing or invalid "Source class:"`).toMatch(
-        /^[ABCD](\s+\(.*)?$/,
+        sourceClassPattern,
       );
     }
+  });
+
+  describe('source class field grammar', () => {
+    it.each([
+      'A',
+      'B',
+      'C',
+      'D',
+      'C (facts re-expressed)',
+      'D (reason continued on the next header line',
+    ])('accepts the declared class, including a multiline reason prefix: %s', (value) =>
+      expect(sourceClassPattern.test(value)).toBe(true),
+    );
+
+    it.each([
+      '',
+      'Classified',
+      'E',
+      'AB',
+      'D(reason)',
+      'D reason',
+      'A ',
+      ' C',
+      'D (reason\nunrelated text',
+    ])('rejects malformed class text rather than matching just its first letter: %j', (value) =>
+      expect(sourceClassPattern.test(value)).toBe(false),
+    );
+
+    it('rejects a long whitespace suffix without a reason', () => {
+      expect(sourceClassPattern.test(`D${' '.repeat(100_000)}invalid`)).toBe(false);
+    });
   });
 
   // The rule that actually carries risk. Class D is living persons,

@@ -5,6 +5,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -14,7 +15,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 const roots: string[] = [];
-function fixture(firstExit: number, secondExit: number, report: unknown) {
+function fixture(firstExit: number, secondExit: number, report: unknown, rawReport?: string) {
   const root = mkdtempSync(join(tmpdir(), 'ci-e2e-retry-'));
   roots.push(root);
   mkdirSync(join(root, 'scripts'));
@@ -34,15 +35,15 @@ history.push(args);
 fs.writeFileSync(calls, JSON.stringify(history));
 const output = args.find(arg => arg.startsWith('--output=')).slice('--output='.length);
 fs.mkdirSync(output, {recursive: true});
-if (${JSON.stringify(report)} !== null) {
-  fs.writeFileSync(path.join(output, '.last-run.json'), ${JSON.stringify(JSON.stringify(report))});
+if (${JSON.stringify(report)} !== null || ${rawReport !== undefined}) {
+  fs.writeFileSync(path.join(output, '.last-run.json'), ${JSON.stringify(rawReport ?? JSON.stringify(report))});
 }
 process.exit(history.length === 1 ? ${firstExit} : ${secondExit});
 `,
   );
-  const run = () =>
-    spawnSync(process.execPath, ['scripts/ci-e2e-retry.mjs'], {
-      cwd: root,
+  const run = (cwd = root) =>
+    spawnSync(process.execPath, [join(root, 'scripts/ci-e2e-retry.mjs')], {
+      cwd,
       encoding: 'utf8',
     });
   const calls = () => JSON.parse(readFileSync(join(root, 'calls.json'), 'utf8')) as string[][];
@@ -122,6 +123,21 @@ test('exhausted case', () => {
     expect(calls()[1].filter((arg) => arg !== '--last-failed')).toEqual(calls()[0]);
   });
 
+  it('reads the runner-owned report even when launched from another working directory', () => {
+    const { root, run, calls } = fixture(1, 0, { status: 'failed', failedTests: ['case-a'] });
+    const other = join(root, 'caller with spaces');
+    mkdirSync(other);
+    writeFileSync(join(other, '.last-run.json'), '{"status":"failed","failedTests":["decoy"]}');
+    const result = run(other);
+    expect(result.status, result.stderr).toBe(0);
+    expect(calls()).toHaveLength(2);
+    expect(calls()[1]).toContain('--last-failed');
+    expect(calls()[0]).toContain(
+      `--output=${join(realpathSync(root), 'apps/web/test-results/ci-e2e')}`,
+    );
+    expect(readFileSync(join(other, '.last-run.json'), 'utf8')).toContain('decoy');
+  });
+
   it('fails after the bounded second attempt still fails', () => {
     const { run, calls } = fixture(1, 1, { status: 'failed', failedTests: ['case-a'] });
     expect(run().status).toBe(1);
@@ -150,14 +166,28 @@ test('exhausted case', () => {
   });
 
   it.each([
+    {},
+    [],
+    'not-an-object',
     { status: 'failed', failedTests: 'not-an-array' },
     { status: 'failed', failedTests: [null] },
+    { status: 'failed', failedTests: [''] },
+    { status: 'failed', failedTests: [42] },
+    { status: 'failed', failedTests: [{ id: 'case-a' }] },
     { status: 'passed', failedTests: ['inconsistent'] },
   ])('rejects invalid retry metadata: %j', (report) => {
     const { run, calls } = fixture(1, 0, report);
     const result = run();
     expect(result.status).toBe(1);
     expect(result.stderr).toContain('Invalid Playwright last-run report');
+    expect(calls()).toHaveLength(1);
+  });
+
+  it.each(['{', '', 'null'])('refuses a retry on malformed or null report bytes: %j', (raw) => {
+    const { run, calls } = fixture(1, 0, null, raw);
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('E2E retry failed:');
     expect(calls()).toHaveLength(1);
   });
 });

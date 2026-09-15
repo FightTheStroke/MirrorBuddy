@@ -230,7 +230,9 @@ describe('UserMenuDropdown', () => {
       await user.click(logoutItem);
 
       await waitFor(() => {
-        expect(window.location.assign).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith(
+          new URL('/login', window.location.origin).href,
+        );
       });
     });
 
@@ -286,7 +288,9 @@ describe('UserMenuDropdown', () => {
 
       // Wait for the delayed response to fully resolve (prevents leaking into next test)
       await waitFor(() => {
-        expect(window.location.assign).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith(
+          new URL('/login', window.location.origin).href,
+        );
       });
     });
 
@@ -321,7 +325,9 @@ describe('UserMenuDropdown', () => {
 
       // Wait for the delayed response to fully resolve (prevents leaking into next test)
       await waitFor(() => {
-        expect(window.location.assign).toHaveBeenCalledWith('/login');
+        expect(window.location.assign).toHaveBeenCalledWith(
+          new URL('/login', window.location.origin).href,
+        );
       });
     });
 
