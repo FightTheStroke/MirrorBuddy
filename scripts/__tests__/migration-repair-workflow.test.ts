@@ -15,10 +15,11 @@ describe('production migration repair workflow', () => {
     }
   });
 
-  it('reads by default and offers only the two Prisma repair outcomes', () => {
+  it('reads by default and offers only the repair outcome Prisma needs here', () => {
     const action = workflow.split('      action:')[1]?.split('      confirm:')[0] ?? '';
     expect(action).toContain('default: status');
-    expect(action).toMatch(/options:\s*\n\s*- status\s*\n\s*- applied\s*\n\s*- rolled-back/);
+    expect(action).toMatch(/options:\s*\n\s*- status\s*\n\s*- applied\s*\n/);
+    expect(action).not.toContain('rolled-back');
   });
 
   it('refuses to write without the exact confirmation word', () => {
@@ -40,7 +41,36 @@ describe('production migration repair workflow', () => {
     expect(workflow.indexOf('- name: Validate the requested migration exists')).toBeLessThan(
       workflow.indexOf('- name: Resolve the failed migration'),
     );
-    expect(repair).toContain('npx prisma migrate resolve "--${ACTION}" "$MIGRATION"');
+    expect(repair).toContain('pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION"');
+  });
+
+  it('waits for a human reviewer before it can reach production credentials', () => {
+    expect(workflow).toMatch(/\n {4}environment: database-repair\n/);
+  });
+
+  it('checks the real migration state before and after writing', () => {
+    const before = workflow
+      .split('- name: Confirm the migration is really failed')[1]
+      ?.split('- name:')[0];
+    expect(before).toContain('scripts/check-failed-migration.ts "$MIGRATION" "$EXPECT"');
+    expect(workflow.indexOf('- name: Confirm the migration is really failed')).toBeLessThan(
+      workflow.indexOf('- name: Resolve the failed migration'),
+    );
+    const after = workflow.split('- name: Confirm the repair landed')[1];
+    expect(after).toContain('scripts/check-failed-migration.ts "$MIGRATION" applied');
+    expect(workflow.indexOf('- name: Resolve the failed migration')).toBeLessThan(
+      workflow.indexOf('- name: Confirm the repair landed'),
+    );
+  });
+
+  it('never runs a Prisma command that prints the database host', () => {
+    expect(workflow).not.toContain('prisma migrate status');
+  });
+
+  it('installs without running package lifecycle scripts', () => {
+    expect(workflow).toContain('pnpm install --frozen-lockfile --ignore-scripts');
+    // Skipping every install hook also skips the Prisma engine download the CLI needs.
+    expect(workflow).toContain('pnpm rebuild @prisma/engines');
   });
 
   it('never echoes the database credentials it is given', () => {

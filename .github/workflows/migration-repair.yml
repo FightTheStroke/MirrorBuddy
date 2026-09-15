@@ -12,14 +12,13 @@ on:
         required: true
         type: string
       action:
-        description: 'status = read-only report. applied/rolled-back = repair the failed row.'
+        description: 'status = read-only report. applied = mark the failed row as applied.'
         required: true
         default: status
         type: choice
         options:
           - status
           - applied
-          - rolled-back
       confirm:
         description: 'Type REPAIR to allow a write. Ignored when action is status.'
         required: false
@@ -37,6 +36,9 @@ jobs:
   repair:
     name: Repair a failed production migration
     runs-on: ubuntu-latest
+    # Writing to the production database waits for Roberto to approve the run.
+    # Dedicated environment: the release pipeline's own "Production" must stay ungated.
+    environment: database-repair
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +54,13 @@ jobs:
           node-version: '24'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # --ignore-scripts keeps every package's install hook out of a job that holds
+      # production credentials; Prisma's schema engine binary is the one thing that
+      # install step legitimately fetches, so fetch just that one back.
+      - name: Fetch the Prisma schema engine
+        run: pnpm rebuild @prisma/engines
 
       # The name reaches the Prisma CLI, so it must be a real migration in this commit.
       - name: Validate the requested migration exists in this source
@@ -82,12 +90,15 @@ jobs:
           fi
           echo "Confirmation accepted"
 
-      # Values stay inside the runner. Only the migration state is printed.
-      - name: Migration status before
+      # Prisma's own migration report prints the datasource host, and this repository
+      # is public. The guard reads the same row and reports only the state.
+      - name: Confirm the migration is really failed
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: npx prisma migrate status || true
+          MIGRATION: ${{ inputs.migration }}
+          EXPECT: ${{ inputs.action == 'status' && 'report' || 'failed' }}
+        run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" "$EXPECT"
 
       - name: Resolve the failed migration
         if: inputs.action != 'status'
@@ -96,11 +107,12 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           MIGRATION: ${{ inputs.migration }}
           ACTION: ${{ inputs.action }}
-        run: npx prisma migrate resolve "--${ACTION}" "$MIGRATION"
+        run: pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION"
 
-      - name: Migration status after
+      - name: Confirm the repair landed
         if: inputs.action != 'status'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
-        run: npx prisma migrate status
+          MIGRATION: ${{ inputs.migration }}
+        run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" applied
