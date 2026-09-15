@@ -804,11 +804,34 @@ jobs:
           echo "✅ VERCEL_TOKEN is configured"
           echo "token_available=true" >> "$GITHUB_OUTPUT"
 
+      # A fresh runner checkout has no .vercel/project.json, so the strict resolver in
+      # scripts/lib/vercel-link.sh needs the explicit project identity. These are Vercel
+      # identifiers, not credentials: they are repository variables, not secrets.
+      - name: Validate Vercel project identity is set
+        if: steps.vercel_token_check.outputs.token_available == 'true'
+        run: |
+          missing=""
+          [ -n "${VERCEL_PROJECT_ID}" ] || missing="${missing} VERCEL_PROJECT_ID"
+          [ -n "${VERCEL_ORG_ID}" ] || missing="${missing} VERCEL_ORG_ID"
+          if [ -n "${missing}" ]; then
+            echo "Missing repository variable(s):${missing}"
+            echo "A fresh checkout has no Vercel project link, so the project identity"
+            echo "must come from repository variables (Settings > Secrets and variables >"
+            echo "Actions > Variables). Read them from .vercel/project.json of the linked project."
+            exit 1
+          fi
+          echo "✅ Vercel project identity is configured"
+        env:
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+
       - name: Verify Sentry configuration against Vercel production env
         if: steps.vercel_token_check.outputs.token_available == 'true'
         run: bash ./scripts/verify-sentry-config.sh
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
 
       - name: Pre-deploy validation (DSN, tokens, env vars)
         if: steps.vercel_token_check.outputs.token_available == 'true'

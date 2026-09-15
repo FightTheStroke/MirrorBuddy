@@ -152,6 +152,7 @@ Updated privacy policy v1.4 with Sentry disclosure:
 Workflow: `.github/workflows/ci.yml` — job `sentry-config`.
 
 **What it validates** (`scripts/verify-sentry-config.sh`):
+
 1. `NEXT_PUBLIC_SENTRY_DSN` presence + format on the Vercel project
 2. `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` env vars set
 3. `sentry.{client,server,edge}.config.ts` `enabled` gate + Vercel deployment condition
@@ -166,7 +167,13 @@ validation requires `VERCEL_TOKEN` (a secret not available to
 untrusted fork PRs).
 
 **Dependencies**:
+
 - `VERCEL_TOKEN` GitHub secret (required for `vercel env pull`)
+- `VERCEL_PROJECT_ID` and `VERCEL_ORG_ID` GitHub Actions **variables** (not secrets:
+  they are project identifiers, useless without the token). A fresh runner checkout
+  has no `.vercel/project.json`, so `resolve_vercel_cwd` in `scripts/lib/vercel-link.sh`
+  can only identify the project through these two values. Their absence is what blocked
+  the deployment gate on `main` in September 2026.
 - Permissions: read-only on Vercel project; no deploy scope needed
 
 **Manual trigger**: open an empty PR with a `sentry.*.config.ts` edit
@@ -178,7 +185,9 @@ VERCEL_TOKEN=<token> ./scripts/verify-sentry-config.sh
 ```
 
 **Failure modes** (all soft-warn in local/dev, hard-fail on push):
+
 - Missing `VERCEL_TOKEN` → skip with yellow warning
+- Missing `VERCEL_PROJECT_ID` / `VERCEL_ORG_ID` variable → red fail naming the variable
 - Missing env var on Vercel → red fail with install hint
 - `enabled: true` without Vercel gate → red fail
 - Missing tunnel route → red fail
