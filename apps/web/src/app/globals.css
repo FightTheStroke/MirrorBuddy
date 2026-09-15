@@ -6,9 +6,6 @@
   --breakpoint-xs: 375px;
 }
 
-/* Legacy custom media for CSS-only usage */
-@custom-media --xs (width >= 375px);
-
 /* Enable class-based dark mode for next-themes compatibility */
 @custom-variant dark (&:where(.dark, .dark *));
 
