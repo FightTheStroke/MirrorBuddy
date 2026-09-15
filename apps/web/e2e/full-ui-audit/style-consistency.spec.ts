@@ -11,6 +11,7 @@
  */
 
 import { test, expect } from '../fixtures/base-fixtures';
+import { navigateForStyleAudit } from './style-navigation';
 
 // Pages to test for style consistency (public pages only, auth-required routes excluded)
 const PAGES_TO_TEST = [
@@ -47,7 +48,7 @@ const _EXPECTED_FONTS = {
 test.describe('Style Consistency - Fonts', () => {
   for (const page of PAGES_TO_TEST) {
     test(`${page.name}: uses Inter font family`, async ({ page: playwrightPage }) => {
-      await playwrightPage.goto(page.path);
+      await navigateForStyleAudit(playwrightPage, page.path);
       await playwrightPage.waitForLoadState('domcontentloaded');
 
       const fontFamily = await playwrightPage.evaluate(() => {
@@ -172,7 +173,7 @@ test.describe('Style Consistency - Dark Mode', () => {
   for (const page of PAGES_TO_TEST.slice(0, 5)) {
     test(`${page.name}: dark mode applies correctly`, async ({ page: playwrightPage }) => {
       await playwrightPage.emulateMedia({ colorScheme: 'dark' });
-      await playwrightPage.goto(page.path);
+      await navigateForStyleAudit(playwrightPage, page.path);
       await playwrightPage.waitForLoadState('domcontentloaded');
 
       // Apply dark class and wait for CSS to settle (next-themes may apply async)
@@ -400,7 +401,7 @@ test.describe('Style Consistency - Cross-Page Uniformity', () => {
       // Retry once on ERR_ABORTED — transient Next.js cold-start in CI.
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          await page.goto(testPage.path, { waitUntil: 'domcontentloaded' });
+          await navigateForStyleAudit(page, testPage.path);
           break;
         } catch (e) {
           const msg = e instanceof Error ? e.message : String(e);
@@ -412,22 +413,17 @@ test.describe('Style Consistency - Cross-Page Uniformity', () => {
         }
       }
 
-      // Apply explicit light class to prevent dark-mode CSS vars from being
-      // applied if next-themes hasn't hydrated yet (theme class undefined state).
-      await page.evaluate(() => {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-      });
-      await page.waitForTimeout(200);
-
-      const primary = await page.evaluate(() => {
-        const root = document.documentElement;
-        return getComputedStyle(root).getPropertyValue('--primary').trim();
-      });
-
-      if (primary) {
-        primaryColors.push(primary);
-      }
+      // Redirecting routes can replace the document after DOMContentLoaded.
+      let primary = '';
+      await expect(async () => {
+        primary = await page.locator('html').evaluate((root) => {
+          root.classList.remove('dark');
+          root.classList.add('light');
+          return getComputedStyle(root).getPropertyValue('--primary').trim();
+        });
+        expect(primary).not.toBe('');
+      }).toPass({ timeout: 10000 });
+      primaryColors.push(primary);
     }
 
     // All pages should have the same primary color
@@ -442,7 +438,7 @@ test.describe('Style Consistency - Cross-Page Uniformity', () => {
     const headingStyles: Record<string, string[]> = {};
 
     for (const testPage of [PAGES_TO_TEST[0], PAGES_TO_TEST[2]]) {
-      await page.goto(testPage.path);
+      await navigateForStyleAudit(page, testPage.path);
       await page.waitForLoadState('domcontentloaded');
 
       const styles = await page.evaluate(() => {

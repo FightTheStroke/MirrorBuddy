@@ -139,15 +139,6 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       });
     });
 
-    // Mock ToS API call
-    await page.route('**/api/tos', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ accepted: true, version: '1.0' }),
-      });
-    });
-
     // The session belongs to a registered context, so the Trial tier must be
     // forced for the guardrails to be exercised under trial conditions.
     await mockTrialTier(page);
@@ -235,17 +226,9 @@ test.describe('Trial Mode - Child-Space Guardrails (COMP-01)', () => {
       });
     });
 
-    await page.route('**/api/tos', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ accepted: true, version: '1.0' }),
-      });
-    });
-
     await page.goto('/it');
     await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(3000);
+    await expect(page.getByTestId('intent-card-homework')).toBeVisible({ timeout: 15000 });
 
     await expect(page.locator('[data-testid="trial-badge"]')).toHaveCount(0);
     await expect(page.getByTestId('sidebar-trial-grownups')).toHaveCount(0);

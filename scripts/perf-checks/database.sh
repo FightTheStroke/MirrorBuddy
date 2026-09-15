@@ -10,11 +10,18 @@ check_n1_patterns() {
 
     local n1_patterns=0
 
-    if has_rg; then
+    if ! has_rg; then
+        echo "Database pattern inspection requires ripgrep" >&2
+        fail
+        return 0
+    fi
         # Find files with for loops containing await prisma
         # Use multiline pattern to find actual N+1 (await inside for loop body)
         local n1_files
-        n1_files=$(rg -l "for\s*\([^)]+\)\s*\{" src/ -t ts 2>/dev/null || true)
+        if ! n1_files=$(search_files "for\s*\([^)]+\)\s*\{"); then
+            fail
+            return 0
+        fi
 
         for file in $n1_files; do
             # Skip test files
@@ -24,7 +31,7 @@ check_n1_patterns() {
             rg -q '\$transaction' "$file" 2>/dev/null && continue
 
             # Skip files that use createMany/updateMany (batch ops)
-            rg -q 'createMany\|updateMany' "$file" 2>/dev/null && continue
+            rg -q 'createMany|updateMany' "$file" && continue
 
             # Check for actual N+1: await prisma inside a for loop
             # Exclude loops that are just iterating results (no await prisma inside)
@@ -39,8 +46,6 @@ check_n1_patterns() {
                 fi
             fi
         done
-    fi
-
     if [ $n1_patterns -eq 0 ]; then
         echo -e "${GREEN}✓ No obvious N+1 patterns detected${NC}"
     else

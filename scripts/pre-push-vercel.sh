@@ -189,18 +189,8 @@ fi
 echo -e "${BLUE}[5/5] Vercel production environment names (no secret download)...${NC}"
 
 # Worktrees reuse the main tree's project link, never its environment files.
-VERCEL_CWD="$PWD"
-if [ ! -d "$VERCEL_CWD/.vercel" ]; then
-	MAIN_TREE="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "")"
-	MAIN_TREE="${MAIN_TREE%/.git}"
-	if [ -n "$MAIN_TREE" ] && [ -d "$MAIN_TREE/.vercel" ]; then
-		VERCEL_CWD="$MAIN_TREE"
-	fi
-fi
-if [ ! -d "$VERCEL_CWD/.vercel" ]; then
-	echo -e "${RED}✗ No .vercel project link; production metadata cannot be verified${NC}"
-	exit 1
-fi
+source "$SCRIPT_DIR_PPV/lib/vercel-link.sh"
+VERCEL_CWD=$(resolve_vercel_cwd "$PWD") || exit 1
 
 # Required names come from the pre-deploy critical policy, not optional fallbacks.
 # Value integrity is enforced in the trusted Vercel build and CI pre-deploy runtime.

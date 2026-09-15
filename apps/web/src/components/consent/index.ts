@@ -1,5 +1,6 @@
-export { UnifiedConsentWall } from "./unified-consent-wall";
-export { InlineConsent } from "./inline-consent";
+export { UnifiedConsentWall } from './unified-consent-wall';
+export { ConditionalUnifiedConsent } from './conditional-unified-consent';
+export { InlineConsent } from './inline-consent';
 export {
   hasConsent,
   getConsent,
@@ -8,7 +9,7 @@ export {
   hasAnalyticsConsent,
   syncConsentToServer,
   type ConsentData,
-} from "@/lib/consent/consent-storage";
+} from '@/lib/consent/consent-storage';
 export {
   hasUnifiedConsent,
   getUnifiedConsent,
@@ -21,8 +22,5 @@ export {
   markConsentLoaded,
   isConsentLoaded,
   type UnifiedConsentData,
-} from "@/lib/consent/unified-consent-storage";
-export {
-  updateConsentSnapshot,
-  resetConsentSnapshot,
-} from "@/lib/consent/consent-store";
+} from '@/lib/consent/unified-consent-storage';
+export { updateConsentSnapshot, resetConsentSnapshot } from '@/lib/consent/consent-store';

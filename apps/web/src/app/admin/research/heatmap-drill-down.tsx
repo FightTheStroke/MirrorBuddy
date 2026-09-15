@@ -8,16 +8,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useTranslations } from 'next-intl';
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import nextDynamic from 'next/dynamic';
+import { ChartLoading } from './chart-loading';
 import type { ExperimentRow } from './benchmark-heatmap';
+
+const HeatmapProgressionChart = nextDynamic(() => import('./heatmap-progression-chart'), {
+  ssr: false,
+  loading: ChartLoading,
+});
 
 interface HeatmapDrillDownProps {
   open: boolean;
@@ -122,21 +120,7 @@ export function HeatmapDrillDown({
           {progression.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t('drillDown.noProgression')}</p>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={progression}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="turn" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#2563eb"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <HeatmapProgressionChart data={progression} />
           )}
         </div>
       </DialogContent>

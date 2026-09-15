@@ -1,6 +1,6 @@
 {
   "name": "mirrorbuddy",
-  "version": "0.39.5",
+  "version": "0.39.6",
   "private": true,
   "packageManager": "pnpm@10.33.0",
   "engines": {

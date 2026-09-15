@@ -2,10 +2,17 @@
 # Comprehensive Sentry Configuration Verification
 # Checks: Vercel env vars, DSN validity, tunnel route, config files
 
-set -e
+set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
+source "$ROOT_DIR/scripts/lib/vercel-link.sh"
+STATIC_ONLY=false
+if [[ $# -gt 1 || ( "${1:-}" != "" && "${1:-}" != "--static-only" ) ]]; then
+	echo "Usage: verify-sentry-config.sh [--static-only]" >&2
+	exit 1
+fi
+[[ "${1:-}" != "--static-only" ]] || STATIC_ONLY=true
 
 WEB_DIR="apps/web"
 PROXY_FILE="${WEB_DIR}/src/proxy.ts"
@@ -22,46 +29,18 @@ echo ""
 
 FAILED=0
 
-# 1. Check Vercel environment variables (non-blocking - env vars are verified at deploy time)
+# Values remain inside the deployment runtime; local checks inspect names only.
 echo "1️⃣  Checking Vercel Production Environment Variables..."
-if ! command -v vercel &>/dev/null; then
-	echo "⚠️  Vercel CLI not found (install with: npm i -g vercel)"
-	echo "   Skipping env var checks - will be verified at deploy time"
+if $STATIC_ONLY; then
+	echo "Static-only mode: production names are NOT checked by this invocation."
+elif ! command -v vercel &>/dev/null; then
+	echo "❌ Vercel CLI missing: required remote metadata check cannot run"
+	FAILED=$((FAILED + 1))
 else
-	TEMP_FILE=$(mktemp)
-	if vercel env pull "$TEMP_FILE" --environment production --yes 2>/dev/null; then
-		# Prefer NEXT_PUBLIC_SENTRY_DSN, fall back to SENTRY_DSN
-		DSN_VAR=""
-		if grep -q "^NEXT_PUBLIC_SENTRY_DSN=" "$TEMP_FILE"; then
-			DSN_VAR="NEXT_PUBLIC_SENTRY_DSN"
-		elif grep -q "^SENTRY_DSN=" "$TEMP_FILE"; then
-			DSN_VAR="SENTRY_DSN"
-		fi
-
-		if [ -n "$DSN_VAR" ]; then
-			DSN=$(grep "^${DSN_VAR}=" "$TEMP_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d '[:space:]')
-			if [ -n "$DSN" ] && [[ "$DSN" =~ ^https://.*@.*\.ingest\.(us|de|eu)\.sentry\.io/[0-9]+$ ]]; then
-				echo "✅ ${DSN_VAR}: Valid format"
-				echo "   Project: $(echo "$DSN" | cut -d'/' -f4)"
-			else
-				echo "⚠️  ${DSN_VAR}: Invalid format (verify in Vercel dashboard)"
-			fi
-		else
-			echo "⚠️  Sentry DSN: NOT SET (verify NEXT_PUBLIC_SENTRY_DSN in Vercel dashboard)"
-		fi
-
-		for var in SENTRY_AUTH_TOKEN SENTRY_ORG SENTRY_PROJECT; do
-			if grep -q "^${var}=" "$TEMP_FILE"; then
-				echo "✅ $var: SET"
-			else
-				echo "⚠️  $var: NOT SET (optional for basic error tracking)"
-			fi
-		done
-	else
-		echo "⚠️  Could not pull Vercel env vars (VERCEL_TOKEN may be missing or expired)"
-		echo "   Skipping env var checks - will be verified at deploy time"
+	if ! VERCEL_CWD=$(resolve_vercel_cwd "$ROOT_DIR") ||
+	   ! pnpm exec tsx scripts/check-production-env.ts sentry-metadata "$VERCEL_CWD"; then
+		FAILED=$((FAILED + 1))
 	fi
-	rm -f "$TEMP_FILE"
 fi
 
 echo ""
@@ -88,7 +67,7 @@ for file in "${SENTRY_CONFIG_FILES[@]}"; do
 
 		# beforeSend: should NOT return null (Plan 141 removed triple-blocking)
 		if grep -q "beforeSend" "$file" && ! grep -q "return null.*Drop" "$file"; then
-			echo "   ✅ beforeSend is enrichment-only (no event dropping)"
+			echo "   ✅ beforeSend callback present (runtime behavior checked separately)"
 		else
 			echo "   ⚠️  beforeSend may be dropping events — verify"
 		fi
@@ -137,8 +116,14 @@ echo ""
 
 # 5. Check package installation
 echo "5️⃣  Checking Package Installation..."
-if pnpm list @sentry/nextjs --depth 0 &>/dev/null; then
-	VERSION=$(pnpm list @sentry/nextjs --depth 0 2>/dev/null | grep "@sentry/nextjs" | awk '{print $NF}' | tr -d '└─')
+if VERSION=$(node -e '
+try {
+  const fromApp = require("node:module").createRequire(require("node:path").resolve("apps/web/package.json"));
+  const version = fromApp("@sentry/nextjs/package.json").version;
+  if (typeof version !== "string" || !/^[0-9]+\.[0-9]+\.[0-9]+/.test(version)) process.exit(1);
+  console.log(version);
+} catch { console.error("Application cannot resolve the installed Sentry package"); process.exit(1); }
+'); then
 	echo "✅ @sentry/nextjs installed: $VERSION"
 else
 	echo "❌ @sentry/nextjs NOT installed"
@@ -150,13 +135,12 @@ echo ""
 # 6. Summary
 echo "===================================="
 if [ $FAILED -eq 0 ]; then
-	echo "✅ All checks passed!"
-	echo ""
-	echo "Next steps:"
-	echo "1. Deploy to production: vercel --prod"
-	echo "2. Check logs for: '[Sentry] Initialized for Vercel production'"
-	echo "3. Test error capture by triggering a test error"
-	echo "4. Verify in Sentry dashboard: https://sentry.io"
+	if $STATIC_ONLY; then
+		echo "✅ Static Sentry configuration passed; remote metadata excluded."
+	else
+		echo "✅ Static Sentry configuration and production names passed."
+	fi
+	echo "Runtime DSN validity and live event capture require deployment evidence."
 	exit 0
 else
 	echo "❌ $FAILED check(s) failed!"

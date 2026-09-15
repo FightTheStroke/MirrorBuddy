@@ -5,6 +5,7 @@ import { setTimeout } from 'node:timers/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   buildSourceIdentity,
+  productionConfigFile,
   proofRoute,
   verifyBuildProofResponse,
 } from './lib/production-build-proof.mjs';
@@ -79,6 +80,9 @@ export async function deployValidatedProduction(input) {
   ) {
     throw new Error('Production source is not the clean expected commit');
   }
+  if (execute('git', ['ls-files', '--', 'vercel.json'])) {
+    throw new Error('Tracked root vercel.json conflicts with the application configuration');
+  }
   const identity = buildSourceIdentity(root);
   if (
     existsSync('apps/web/public/production-build-proof.js') ||
@@ -108,6 +112,8 @@ export async function deployValidatedProduction(input) {
         '--force',
         '--yes',
         '--format=json',
+        '--local-config',
+        productionConfigFile,
         // CLI source deployments do not inherit Git integration metadata. Pass
         // only the already-validated clean HEAD so the remote proof can bind
         // the build to this exact source; no credential or runtime value crosses.

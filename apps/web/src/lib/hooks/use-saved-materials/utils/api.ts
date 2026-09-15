@@ -172,7 +172,9 @@ export async function saveMaterialToAPIWithId(
       toolType,
       title,
       content,
-      ...options,
+      subject: options?.subject,
+      maestroId: options?.maestroId,
+      preview: options?.preview,
     };
 
     const response = await csrfFetch('/api/materials', {

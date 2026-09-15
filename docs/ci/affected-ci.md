@@ -65,12 +65,72 @@ Accessibility is **never skipped** but adapts to the change scope:
 On push to `main`, **all** jobs run unconditionally (no skipping). This ensures
 the deployment gate has complete verification before deploying to production.
 
+## Reusing Work Without Reducing Test Coverage
+
+- **Unit tests:** two native Vitest shards run the complete existing test inventory.
+  Each emits a blob containing its test results and coverage, without generating HTML.
+  The mandatory `Unit Tests` aggregate requires both shards to succeed and both expected
+  blobs to exist, then uses Vitest's native merge to generate JSON, text, and HTML once.
+  Only the aggregate applies the unchanged 80% threshold for all four coverage metrics;
+  individual partial runs defer thresholds rather than incorrectly treating half the
+  suite as a complete coverage result. Missing, corrupt, or incompatible reports fail.
+- **Safety:** the independent `LLM Safety Tests` job runs the union of
+  `jailbreak-detector`, `content-filter`, and `safety.test` in one Vitest process.
+  The safety signal and all assertions remain; only repeated runner startup is removed.
+- **Browser retries:** Chromium still runs the complete configured suite and keeps
+  Playwright's per-test retries. If that attempt fails, `scripts/ci-e2e-retry.mjs`
+  retries only exhausted failures using Playwright's own test identities. Missing
+  identities after an infrastructure failure trigger an explicitly logged full retry;
+  invalid metadata fails closed. Both attempts remain bounded at 20 minutes each.
+- **Browser fixtures:** child-home scenarios require a real student session, not an
+  anonymous context that redirects to welcome. Visitor cookies use the production UUID
+  format; session-token generation runs outside database transactions after owner
+  validation. Consent scenarios use fresh contexts without consent bypasses and exercise
+  the actual dialog, persisted acceptance, keyboard controls, and measured contrast.
+  A missing dialog fails the test instead of silently skipping its assertions.
+  Public-route audits use Playwright's configured base URL, including isolated worktree
+  ports set through `MIRRORBUDDY_PORT`; each checkout must use its own local test database.
+  Where a fixture requires an allowlisted database name, isolate the PostgreSQL instance
+  instead of relaxing its safety guard. Match CI's explicit voice-unconfigured setting
+  when no Azure voice credentials are provisioned; this is not a production smoke test.
+- **Python:** `setup-python` caches pip downloads against `robot/pyproject.toml`.
+  Every job still installs the current editable package and runs `python -m pytest`.
+  Workflow changes also select this job; robot results block the PR when selected
+  and always block deployment on main.
+  Do not share an editable virtual environment across worktrees: its source pointer
+  could silently target another branch. Locally, reuse the installed Python runtime
+  and package download cache with a separate environment for each checkout.
+- **JavaScript:** reuse pnpm's content-addressed package store with a frozen-lockfile
+  install into each checkout, rather than sharing mutable `node_modules` across
+  branches. A cache hit is not a substitute for the correct Node and lockfile versions.
+- **Build cache:** retain `.next/cache` until the cache action's post-job save.
+  Exclude it from the uploaded application artifact instead of deleting it during
+  preparation; the standalone application still includes its static and public assets.
+- **Local verification:** `health-check.sh` already runs lint, types, and build through
+  `ci-summary.sh`, and prints that output. Verification skills consume that one fresh
+  run instead of repeating it immediately. Changed inputs require a new run; mandatory
+  unit tests, translation checks, and independent review are not removed.
+  Local Vitest runs default to at most four workers so test subprocesses do not compete with
+  every other developer tool on high-core-count hosts. CI retains its native worker
+  count per runner. This bounds resource contention instead of relaxing test timeouts
+  throughout the suite or skipping tests under load.
+- **PR decisions:** structural safeguards must succeed. Reachability must succeed
+  whenever source or configuration changed; only a legitimate path-filter skip is
+  accepted. A failed or cancelled result is never treated as a skip.
+
+Regression checks live in `scripts/__tests__/ci-efficiency-workflow.test.ts` and
+`scripts/__tests__/ci-e2e-retry.test.ts`; the latter also exercises the real Playwright
+runner without requiring a browser or application server.
+Native unit merge/threshold controls are in `ci-unit-native.test.ts`; cache preparation
+and single-run local verification are covered by `ci-build-cache.test.ts` and
+`health-check-ci-reuse.test.ts` in the same directory.
+
 ## Adding a New Area
 
 1. **Add filter** in `detect-changes` job (`dorny/paths-filter` config):
    ```yaml
    my_area:
-     - "src/lib/my-area/**"
+     - 'src/lib/my-area/**'
    ```
 2. **Export output**: Add to `outputs:` in the `detect-changes` job.
 3. **Add condition**: In the job(s) that should be conditional:
@@ -107,10 +167,10 @@ Example:
 
 ```typescript
 // OK - barrel import
-import { detectJailbreak } from "@/lib/safety";
+import { detectJailbreak } from '@/lib/safety';
 
 // ERROR - deep import from outside the module
-import { patterns } from "@/lib/safety/jailbreak-detector/patterns";
+import { patterns } from '@/lib/safety/jailbreak-detector/patterns';
 ```
 
 Intra-module deep imports are allowed (code within `src/lib/safety/` can
@@ -137,15 +197,15 @@ It does NOT enforce boundaries between `src/lib/`, `src/app/`, and `src/componen
 ```typescript
 // ❌ BLOCKED - FEATURE importing from CROSS
 // src/lib/ai/summarize.ts
-import { tierService } from "@/lib/tier/server"; // ERROR (ai is FEATURE, tier is CROSS)
+import { tierService } from '@/lib/tier/server'; // ERROR (ai is FEATURE, tier is CROSS)
 
 // ✅ ALLOWED - CROSS importing from CORE
 // src/lib/compliance/coppa-service.ts
-import { filterInput } from "@/lib/safety"; // OK (compliance is CROSS, safety is CORE)
+import { filterInput } from '@/lib/safety'; // OK (compliance is CROSS, safety is CORE)
 
 // ✅ ALLOWED - Any module importing from auth
 // src/lib/ai/providers.ts
-import { validateAuth } from "@/lib/auth/server"; // OK (auth is universal)
+import { validateAuth } from '@/lib/auth/server'; // OK (auth is universal)
 ```
 
 **Current status:** `warn` level (with `--max-warnings 0` in CI, effectively blocking).

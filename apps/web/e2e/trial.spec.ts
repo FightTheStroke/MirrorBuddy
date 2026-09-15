@@ -266,7 +266,7 @@ test.describe('Trial Mode - Route Audit', () => {
         let navError: Error | null = null;
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
-            response = await trialPage.goto(`http://localhost:3000${route}`, {
+            response = await trialPage.goto(route, {
               waitUntil: 'domcontentloaded',
               timeout: 15000,
             });

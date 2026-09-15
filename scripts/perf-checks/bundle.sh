@@ -9,7 +9,11 @@ check_images() {
     echo -e "${BLUE}[1/6] Checking avatar image formats...${NC}"
 
     local non_webp
-    non_webp=$(/usr/bin/find public/maestri -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null)
+    if ! non_webp=$(/usr/bin/find apps/web/public/maestri -type f \( -iname "*.png" -o -iname "*.jpg" -o -iname "*.jpeg" \)); then
+        echo "Avatar inventory failed"
+        fail
+        return 0
+    fi
 
     if [ -n "$non_webp" ]; then
         echo -e "${RED}✗ Found non-WebP avatars (should be converted):${NC}"
@@ -17,7 +21,17 @@ check_images() {
         fail
     else
         local webp_count
-        webp_count=$(/usr/bin/find public/maestri -name "*.webp" 2>/dev/null | /usr/bin/grep -c . || echo 0)
+        local webp_files
+        if ! webp_files=$(/usr/bin/find apps/web/public/maestri -type f -iname "*.webp"); then
+            fail
+            return 0
+        fi
+        webp_count=$(printf '%s\n' "$webp_files" | awk 'NF {n++} END {print n+0}')
+        if [[ "$webp_count" -eq 0 ]]; then
+            echo "No WebP avatars found in required application directory"
+            fail
+            return 0
+        fi
         echo -e "${GREEN}✓ All $webp_count avatars are WebP format${NC}"
     fi
 }
@@ -26,9 +40,12 @@ check_images() {
 check_bundle_size() {
     echo -e "${BLUE}[5/6] Checking bundle size...${NC}"
 
-    if [ -d ".next" ]; then
+    if [ -d "apps/web/.next/static/chunks" ]; then
         local large_chunks
-        large_chunks=$(/usr/bin/find .next/static/chunks -name "*.js" -size +500k 2>/dev/null | /usr/bin/grep -v "node_modules" | head -5)
+        if ! large_chunks=$(/usr/bin/find apps/web/.next/static/chunks -name "*.js" -size +500k ! -path "*/node_modules/*"); then
+            fail
+            return 0
+        fi
 
         if [ -n "$large_chunks" ]; then
             echo -e "${YELLOW}  ⚠ Large app chunks found (>500KB):${NC}"
@@ -40,66 +57,25 @@ check_bundle_size() {
             warn
         else
             local app_size
-            app_size=$(du -sh .next/static/chunks 2>/dev/null | cut -f1)
+            if ! app_size=$(du -sh apps/web/.next/static/chunks | cut -f1); then
+                fail
+                return 0
+            fi
             echo -e "${GREEN}✓ No excessively large app chunks (total: $app_size)${NC}"
         fi
     else
-        echo -e "${YELLOW}  ⚠ No .next directory (run build first)${NC}"
+        echo -e "${RED}  Missing apps/web/.next/static/chunks (run build first)${NC}"
+        fail
     fi
 }
 
 # Check lazy loading for heavy dependencies
 check_lazy_loading() {
     echo -e "${BLUE}[6/6] Checking lazy loading for heavy dependencies...${NC}"
-
-    local lazy_issues=0
-
-    # Check KaTeX - should be dynamically imported
-    local katex_static
-    if has_rg; then
-        katex_static=$(rg "from 'katex'" src/ --glob "*.ts" --glob "*.tsx" 2>/dev/null | grep -v dynamic | grep -v "// lazy" || true)
-    else
-        katex_static=$(grep -r "from 'katex'" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v dynamic | grep -v "// lazy" || true)
-    fi
-
-    if [ -n "$katex_static" ]; then
-        echo -e "${RED}✗ KaTeX imported statically (should use dynamic import):${NC}"
-        echo "$katex_static"
-        lazy_issues=$((lazy_issues + 1))
-    fi
-
-    # Check Recharts lazy loading
-    local recharts_files recharts_not_lazy=""
-    recharts_files=$(search_files "from 'recharts'")
-
-    for file in $recharts_files; do
-        local basename is_lazy
-        basename=$(basename "$file" | sed 's/\.tsx$//' | sed 's/\.ts$//')
-
-        if has_rg; then
-            is_lazy=$(rg "import\(['\"].*${basename}" src/ --glob "*.ts" --glob "*.tsx" 2>/dev/null || true)
-        else
-            is_lazy=$(grep -rE "import\(['\"].*${basename}" src/ --include="*.ts" --include="*.tsx" 2>/dev/null || true)
-        fi
-
-        [ -z "$is_lazy" ] && recharts_not_lazy="$recharts_not_lazy\n  - $file"
-    done
-
-    if [ -n "$recharts_not_lazy" ]; then
-        echo -e "${RED}✗ Recharts components not lazy-loaded:${NC}"
-        echo -e "$recharts_not_lazy"
-        lazy_issues=$((lazy_issues + 1))
-    else
-        local recharts_count
-        recharts_count=$(echo "$recharts_files" | grep -c . 2>/dev/null || echo 0)
-        echo -e "${GREEN}✓ All $recharts_count Recharts components are lazy-loaded${NC}"
-    fi
-
-    if [ $lazy_issues -eq 0 ]; then
-        echo -e "${GREEN}✓ Heavy dependencies are lazy-loaded${NC}"
-    else
+    if ! "$SCRIPT_DIR/../../node_modules/.bin/tsx" "$SCRIPT_DIR/../check-lazy-loading.ts"; then
         fail
     fi
+    return 0
 }
 
 # Run all bundle checks

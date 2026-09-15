@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.39.6] - 2026-09-15
+
+### Fixed
+
+- Enforce the terms gate for authenticated users while onboarding state hydrates,
+  preserving legal/public entry points and invalid-session recovery.
+- Preserve generated study-material identifiers when optional autosave metadata
+  contains an empty or undefined identifier.
+- Place Vercel configuration inside the actual application root and select it
+  explicitly during production builds, retaining exact-byte source identity checks.
+- Make release inspections use real monorepo paths, reject missing required checks,
+  and verify production configuration names without downloading secret values.
+
+### Changed
+
+- Shard unit tests with mandatory aggregation and actual 80% coverage enforcement;
+  avoid repeated health checks and use selective browser reruns without dropping assertions.
+- Collect release evidence from hashed native reports and complete scope inventories
+  instead of rerunning tests or inferring success from console text. Unit/browser
+  suites run afresh per release gate; matching pre-release builds can be reused.
+- Correct source/debt inventories and split country-retention schedules and voice
+  extraction helpers without changing their public behavior or existing debt limits.
+- Defer research statistics, heatmap progression, and A/B result charts behind
+  actual loading boundaries while retaining their controls and reserved dimensions.
+- Restore legal/documentation source checks and give new architecture decisions
+  unique identifiers while preserving historical ADRs.
+
 ## [0.39.5] - 2026-09-14
 
 - No user-facing changes recorded.
@@ -571,8 +598,8 @@ that from happening again.
 
 - **Research dashboard enhancements**: Added research performance stats cards, experiment creation form, and enhanced benchmark heatmap with drill-down insights for maestro/profile analysis.
 - **Nightly benchmarks**: Added scheduled nightly benchmark workflow and script execution with regression alerting support.
-- **A/B testing framework**: Introduced deterministic bucketing and admin A/B testing surfaces with architecture documented in ADR 0157.
-- **Community contribution engine**: Added submission, moderation/review flow, rewards/voting foundations, and architecture documented in ADR 0158.
+- **A/B testing framework**: Introduced deterministic bucketing and admin A/B testing surfaces with architecture documented in ADR 0180.
+- **Community contribution engine**: Added submission, moderation/review flow, rewards/voting foundations, and architecture documented in ADR 0181.
 
 ## [0.15.9] - 2026-02-25
 

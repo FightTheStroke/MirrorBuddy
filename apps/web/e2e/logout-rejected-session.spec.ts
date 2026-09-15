@@ -10,6 +10,7 @@ test('visible current logout recovers from a server-rejected credential', async 
   page,
   context,
   baseURL,
+  request,
 }) => {
   if (!baseURL) throw new Error('The browser regression requires the configured local server');
   await context.clearCookies({ name: LEGACY_AUTH_COOKIE });
@@ -43,6 +44,12 @@ test('visible current logout recovers from a server-rejected credential', async 
       disabled: false,
     }),
   ).toHaveCount(0);
+  let logoutResponse: Awaited<ReturnType<typeof request.fetch>> | undefined;
+  await page.route('**/api/auth/logout', async (route) => {
+    // Retain the real body across navigation without changing the browser's cookie jar.
+    logoutResponse = await request.fetch(route.request(), { maxRetries: 0 });
+    await route.fulfill({ response: logoutResponse });
+  });
   const receipt = page.waitForResponse(
     (response) =>
       response.url().endsWith('/api/auth/logout') && response.request().method() === 'POST',
@@ -51,7 +58,8 @@ test('visible current logout recovers from a server-rejected credential', async 
   const response = await receipt;
   expect(response.request().postDataJSON()).toMatchObject({ scope: 'current' });
   expect(response.status()).toBe(200);
-  expect(await response.json()).toMatchObject({ success: true });
+  if (!logoutResponse) throw new Error('The real logout response was not captured');
+  expect(await logoutResponse.json()).toMatchObject({ success: true });
   await expect(page).toHaveURL(/\/it\/welcome(?:[/?#]|$)/);
   const names = (await context.cookies()).map((cookie) => cookie.name);
   for (const name of [AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT, LEGACY_AUTH_COOKIE]) {

@@ -24,8 +24,8 @@ set -euo pipefail
 # Only build modes acquire the existing per-directory build lock.
 # Prefer --quick or targeted modes while another agent owns the browser server.
 # The default lock timeout is 120 seconds; BUILD_LOCK_TIMEOUT can override it.
-# Failed output stays in a private, uniquely named local log printed in the
-# summary; successful temporary logs are removed. No logs are uploaded here.
+# Failed/warning output stays in a private, uniquely named local log printed in
+# the summary; clean successful logs are removed. No logs are uploaded here.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"

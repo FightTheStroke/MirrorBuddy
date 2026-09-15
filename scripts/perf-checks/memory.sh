@@ -12,7 +12,10 @@ check_eventsource() {
     local es_count=0
     local es_file_list
 
-    es_file_list=$(search_files "new EventSource")
+    if ! es_file_list=$(search_files "new EventSource"); then
+        fail
+        return 0
+    fi
 
     for file in $es_file_list; do
         # Skip test files
@@ -55,7 +58,10 @@ check_listeners() {
     local listener_warnings=0
     local add_listener_files
 
-    add_listener_files=$(search_files "addEventListener")
+    if ! add_listener_files=$(search_files "addEventListener"); then
+        fail
+        return 0
+    fi
 
     for file in $add_listener_files; do
         if ! file_contains "$file" "removeEventListener"; then

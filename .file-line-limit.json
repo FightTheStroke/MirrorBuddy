@@ -1,6 +1,14 @@
 {
   "maxLines": 250,
-  "directories": ["src", "scripts", ".claude", "docs", "e2e", "@docs"],
+  "directories": [
+    "apps/web/src",
+    "packages",
+    "scripts",
+    ".claude",
+    "docs",
+    "apps/web/e2e",
+    "@docs"
+  ],
   "extensions": [".ts", ".tsx", ".js", ".jsx", ".sh", ".md"],
   "excludePatterns": [
     "**/node_modules/**",

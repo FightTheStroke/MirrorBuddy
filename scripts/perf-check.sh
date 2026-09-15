@@ -11,6 +11,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHECKS_DIR="$SCRIPT_DIR/perf-checks"
+cd "$SCRIPT_DIR/.."
 
 # Source modules
 source "$CHECKS_DIR/common.sh"

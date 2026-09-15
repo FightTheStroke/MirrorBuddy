@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -11,19 +11,34 @@ const fixture = mkdtempSync(join(tmpdir(), 'mirrorbuddy-controls-'));
 const main = join(fixture, 'main');
 const feature = join(fixture, 'feature');
 
+function fixtureEnv() {
+  // Git hooks export repository-scoped variables that would override the fixture's cwd.
+  return Object.fromEntries(
+    Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')),
+  );
+}
+
 function git(cwd: string, ...args: string[]) {
-  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  const result = spawnSync('git', args, {
+    cwd,
+    encoding: 'utf8',
+    env: fixtureEnv(),
+    timeout: 15000,
+  });
+  if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(result.stderr);
+  return result.stdout.trim();
 }
 
 function runHook(script: string, payload: object, cwd = root) {
-  const env = { ...process.env };
+  const env = fixtureEnv();
   delete env.MB_ALLOW_MAIN_WRITES;
   return spawnSync('bash', [join(root, script)], {
     cwd,
     env,
     input: JSON.stringify(payload),
     encoding: 'utf8',
+    timeout: 15000,
   });
 }
 
@@ -44,7 +59,21 @@ beforeAll(() => {
 
 afterAll(() => rmSync(fixture, { recursive: true, force: true }));
 
-describe('project edit controls', () => {
+describe('project edit controls', { timeout: 20000 }, () => {
+  it('isolates temporary repositories from an enclosing Git hook', () => {
+    vi.stubEnv('GIT_DIR', join(feature, '.git'));
+    vi.stubEnv('GIT_WORK_TREE', feature);
+    try {
+      expect(git(main, 'symbolic-ref', '--short', 'HEAD')).toBe('main');
+      const result = runHook('.claude/hooks/main-guard.sh', {
+        tool_input: { path: join(main, 'src/example.ts') },
+      });
+      expect(JSON.parse(result.stdout).hookSpecificOutput.permissionDecision).toBe('deny');
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it.each([true, false])('blocks main with raw patch input=%s', (raw) => {
     const path = join(main, 'src/example.ts');
     const result = runHook('.claude/hooks/main-guard.sh', {

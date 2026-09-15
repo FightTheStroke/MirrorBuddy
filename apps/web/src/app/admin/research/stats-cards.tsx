@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
+import nextDynamic from 'next/dynamic';
+import { ChartLoading } from './chart-loading';
+
+const StatsChart = nextDynamic(() => import('./stats-chart'), {
+  ssr: false,
+  loading: ChartLoading,
+});
 
 type MaestroStats = {
   rank: number;
@@ -112,15 +118,7 @@ export function ResearchStatsCards() {
                 className="h-44"
                 aria-label={t('stats.dimensionsAriaLabel', { maestroId: item.maestroId })}
               >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <StatsChart data={chartData} />
               </div>
             </article>
           );

@@ -6,7 +6,7 @@
 # Purpose: Verify that documentation accurately reflects codebase values
 #
 # Checks:
-# 1. Trial limits in README vs TierService (10 chats, 5 min voice, 10 tools, 3 maestri)
+# 1. Trial fallback limits in README vs TierService; no per-Maestro cap (ADR 0168)
 # 2. Health endpoint status values (healthy/degraded/unhealthy)
 # 3. Voice model name (gpt-realtime not gpt-4o-realtime-preview)
 # 4. Metrics push cadence (5 minutes)
@@ -66,7 +66,7 @@ check_trial_limits() {
 	fi
 
 	# Extract expected values from TierService (tier-fallbacks.ts)
-	local tier_file="$PROJECT_ROOT/src/lib/tier/tier-fallbacks.ts"
+	local tier_file="$PROJECT_ROOT/apps/web/src/lib/tier/tier-fallbacks.ts"
 
 	if [ ! -f "$tier_file" ]; then
 		log_fail "tier-fallbacks.ts not found at $tier_file"
@@ -77,7 +77,7 @@ check_trial_limits() {
 	local trial_chat=$(grep -A 50 'code === TierCode.TRIAL' "$tier_file" | grep 'chatLimitDaily:' | grep -oE '[0-9]+' | head -1)
 	local trial_voice=$(grep -A 50 'code === TierCode.TRIAL' "$tier_file" | grep 'voiceMinutesDaily:' | grep -oE '[0-9]+' | head -1)
 	local trial_tools=$(grep -A 50 'code === TierCode.TRIAL' "$tier_file" | grep 'toolsLimitDaily:' | grep -oE '[0-9]+' | head -1)
-	local trial_maestri=$(grep -A 50 'code === TierCode.TRIAL' "$tier_file" | grep 'maestriLimit:' | grep -oE '[0-9]+' | head -1)
+	local trial_docs=$(grep -A 50 'code === TierCode.TRIAL' "$tier_file" | grep 'docsLimitTotal:' | grep -oE '[0-9]+' | head -1)
 
 	# Check README values in Trial Mode table
 	# Extract from markdown table under Trial Mode section (before next heading)
@@ -87,7 +87,7 @@ check_trial_limits() {
 	local readme_chat=$(echo "$trial_section" | grep "^| Chat messages" | awk -F'|' '{print $3}' | xargs)
 	local readme_voice=$(echo "$trial_section" | grep "^| Voice time" | awk -F'|' '{print $3}' | xargs | grep -oE '^[0-9]+')
 	local readme_tools=$(echo "$trial_section" | grep "^| Tool calls" | awk -F'|' '{print $3}' | xargs)
-	local readme_maestri=$(echo "$trial_section" | grep "^| Maestri" | awk -F'|' '{print $3}' | xargs)
+	local readme_docs=$(echo "$trial_section" | grep "^| Documents" | awk -F'|' '{print $3}' | xargs)
 
 	# Validate chat limit (expected: 10)
 	if [ "$trial_chat" = "10" ] && [ "$readme_chat" = "10" ]; then
@@ -110,11 +110,20 @@ check_trial_limits() {
 		log_fail "Trial tools limit mismatch: README=$readme_tools, code=$trial_tools (expected: 10)"
 	fi
 
-	# Validate maestri limit (expected: 3)
-	if [ "$trial_maestri" = "3" ] && [ "$readme_maestri" = "3" ]; then
-		log_pass "Trial maestri limit: 3 (README ✓, code ✓)"
+	if [ "$trial_docs" = "1" ] && [ "$readme_docs" = "1" ]; then
+		log_pass "Trial document limit: 1 (README ✓, code ✓)"
 	else
-		log_fail "Trial maestri limit mismatch: README=$readme_maestri, code=$trial_maestri (expected: 3)"
+		log_fail "Trial document limit mismatch: README=$readme_docs, code=$trial_docs (expected: 1)"
+	fi
+
+	if grep -qE 'maestriLimit|maxMaestri' "$tier_file" ||
+		{ echo "$trial_section"; grep -F '**Maestri access**' "$readme_file"; } |
+		grep -iE '^\|[^|]*Maestri[^|]*\|' | grep -qE '\|[[:space:]]*[0-9]+([[:space:]]|\|)'; then
+		log_fail "Removed per-Maestro cap still documented or configured (ADR 0168)"
+	elif grep -qiF 'no per-Maestro cap' "$readme_file"; then
+		log_pass "No per-Maestro cap (ADR 0168)"
+	else
+		log_fail "README must document no per-Maestro cap (ADR 0168)"
 	fi
 }
 
@@ -125,7 +134,7 @@ check_trial_limits() {
 check_health_status_values() {
 	log_info "Checking health endpoint status values..."
 
-	local health_file="$PROJECT_ROOT/src/app/api/health/route.ts"
+	local health_file="$PROJECT_ROOT/apps/web/src/app/api/health/route.ts"
 
 	if [ ! -f "$health_file" ]; then
 		log_fail "health/route.ts not found at $health_file"
@@ -135,14 +144,14 @@ check_health_status_values() {
 	local readme_file="$PROJECT_ROOT/README.md"
 
 	# Check if code contains all required status values
-	local has_healthy=$(grep -c '"healthy"' "$health_file")
-	local has_degraded=$(grep -c '"degraded"' "$health_file")
-	local has_unhealthy=$(grep -c '"unhealthy"' "$health_file")
+	local has_healthy=$(grep -Ec "['\"]healthy['\"]" "$health_file")
+	local has_degraded=$(grep -Ec "['\"]degraded['\"]" "$health_file")
+	local has_unhealthy=$(grep -Ec "['\"]unhealthy['\"]" "$health_file")
 
 	# Check if README documents them correctly
-	local readme_has_healthy=$(grep -c 'healthy' "$readme_file")
-	local readme_has_degraded=$(grep -c 'degraded' "$readme_file")
-	local readme_has_unhealthy=$(grep -c 'unhealthy' "$readme_file")
+	local readme_has_healthy=$(grep -c '`healthy`' "$readme_file")
+	local readme_has_degraded=$(grep -c '`degraded`' "$readme_file")
+	local readme_has_unhealthy=$(grep -c '`unhealthy`' "$readme_file")
 
 	if [ "$has_healthy" -gt 0 ] && [ "$readme_has_healthy" -gt 0 ]; then
 		log_pass "Health status 'healthy' found in code and README"
@@ -170,7 +179,7 @@ check_health_status_values() {
 check_voice_model_name() {
 	log_info "Checking voice model name..."
 
-	local tier_file="$PROJECT_ROOT/src/lib/tier/tier-fallbacks.ts"
+	local tier_file="$PROJECT_ROOT/apps/web/src/lib/tier/tier-fallbacks.ts"
 
 	if [ ! -f "$tier_file" ]; then
 		log_fail "tier-fallbacks.ts not found at $tier_file"
@@ -208,21 +217,21 @@ check_voice_model_name() {
 check_metrics_push_cadence() {
 	log_info "Checking metrics push cadence..."
 
-	local vercel_file="$PROJECT_ROOT/vercel.json"
+	local vercel_file="$PROJECT_ROOT/apps/web/vercel.json"
 	local operations_doc="$PROJECT_ROOT/docs/operations/CRON-JOBS.md"
 
 	if [ ! -f "$vercel_file" ]; then
-		log_fail "vercel.json not found at $vercel_file"
+		log_fail "apps/web/vercel.json not found at $vercel_file"
 		return 1
 	fi
 
-	# Check metrics-push schedule in vercel.json (should be */5 * * * * = every 5 minutes)
+	# Check the active app configuration (*/5 * * * * = every 5 minutes).
 	local metrics_schedule=$(grep -A 2 'metrics-push' "$vercel_file" | grep 'schedule' | grep -oE '"[^"]*"' | tail -1)
 	metrics_schedule="${metrics_schedule%\"}"
 	metrics_schedule="${metrics_schedule#\"}"
 
 	if [ "$metrics_schedule" = "*/5 * * * *" ]; then
-		log_pass "Metrics push cadence: every 5 minutes (vercel.json ✓)"
+		log_pass "Metrics push cadence: every 5 minutes (apps/web/vercel.json ✓)"
 	else
 		log_fail "Metrics push cadence mismatch: found '$metrics_schedule' (expected: '*/5 * * * *')"
 	fi
@@ -236,7 +245,7 @@ check_metrics_push_cadence() {
 			log_fail "Operations docs do not mention 5 minute metrics push cadence"
 		fi
 	else
-		log_info "Operations doc not found, skipping cross-check"
+		log_fail "Operations doc not found: docs/operations/CRON-JOBS.md"
 	fi
 }
 
@@ -245,6 +254,13 @@ check_metrics_push_cadence() {
 # ============================================================================
 
 main() {
+	for input in README.md apps/web/src/lib/tier/tier-fallbacks.ts \
+		apps/web/src/app/api/health/route.ts apps/web/vercel.json docs/operations/CRON-JOBS.md; do
+		if [ ! -f "$PROJECT_ROOT/$input" ] || ! cat "$PROJECT_ROOT/$input" > /dev/null 2>&1; then
+			log_fail "Required audit input missing or unreadable: $input"
+			return 1
+		fi
+	done
 	echo "=========================================="
 	echo "Documentation/Code Audit Starting"
 	echo "=========================================="

@@ -94,18 +94,19 @@ test.describe('Maintenance banner', () => {
     await expect(learnMore).toHaveAttribute('href', '/it/maintenance');
 
     // The banner sits at the very top and the header sits fully below it.
-    const bannerBox = await banner.boundingBox();
     const header = trialHomePage.locator('header').first();
     await expect(header).toBeVisible();
-    const headerBox = await header.boundingBox();
-
-    expect(bannerBox).not.toBeNull();
-    expect(headerBox).not.toBeNull();
-    if (bannerBox && headerBox) {
+    await expect(async () => {
+      const [bannerBox, headerBox] = await Promise.all([
+        banner.boundingBox(),
+        header.boundingBox(),
+      ]);
+      if (!bannerBox || !headerBox)
+        throw new Error('Banner and header must have measurable layout');
       expect(bannerBox.y).toBeLessThanOrEqual(1);
       // Header top must start at or below the banner's bottom edge (no overlap).
       expect(headerBox.y).toBeGreaterThanOrEqual(bannerBox.y + bannerBox.height - 1);
-    }
+    }).toPass({ timeout: 5000 });
   });
 
   test('dismissal lasts only for the browser session', async ({ trialHomePage }) => {

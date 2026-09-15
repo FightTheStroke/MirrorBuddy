@@ -6,18 +6,22 @@
  * - TODO/FIXME comments
  * - @deprecated usage
  * - Backup files (.bak, .old, .orig)
- * - Large files (>400 lines)
+ * - Production source files (>500 lines), excluding colocated and directory tests
  *
  * Usage: npm run debt:check
  * Exit code: 0 = pass, 1 = thresholds exceeded
  */
 
-import { execSync } from "child_process";
-import { readdirSync, readFileSync } from "fs";
-import { join, relative } from "path";
+import {
+  backupFiles,
+  commentLocations,
+  isTestFile,
+  lineCount,
+  sourceFiles,
+  sourceFile,
+} from './lib/source-inventory';
 
 const ROOT = process.cwd();
-const SRC_DIR = join(ROOT, "src");
 
 // Thresholds - adjust as needed
 const THRESHOLDS = {
@@ -36,133 +40,56 @@ interface AuditResult {
   passed: boolean;
 }
 
-function countPattern(
-  pattern: string,
-  dir: string = "src/",
-): { count: number; items: string[] } {
-  try {
-    const result = execSync(
-      `grep -rn '${pattern}' ${dir} --include='*.ts' --include='*.tsx' 2>/dev/null || true`,
-      { encoding: "utf-8", cwd: ROOT },
-    );
-    const lines = result.trim().split("\n").filter(Boolean);
-    return { count: lines.length, items: lines.slice(0, 5) }; // Show first 5
-  } catch {
-    return { count: 0, items: [] };
-  }
-}
-
-function findBackupFiles(): string[] {
-  const patterns = [".bak", ".old", ".orig", ".backup"];
-  const backups: string[] = [];
-
-  function walk(dir: string) {
-    try {
-      const entries = readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = join(dir, entry.name);
-        if (
-          entry.isDirectory() &&
-          !entry.name.startsWith(".") &&
-          entry.name !== "node_modules"
-        ) {
-          walk(fullPath);
-        } else if (
-          entry.isFile() &&
-          patterns.some((p) => entry.name.endsWith(p))
-        ) {
-          backups.push(relative(ROOT, fullPath));
-        }
-      }
-    } catch {
-      // Ignore permission errors
-    }
-  }
-
-  walk(ROOT);
-  return backups;
-}
-
-function findLargeFiles(): string[] {
-  const largeFiles: string[] = [];
-
-  function walk(dir: string) {
-    try {
-      const entries = readdirSync(dir, { withFileTypes: true });
-      for (const entry of entries) {
-        const fullPath = join(dir, entry.name);
-        if (
-          entry.isDirectory() &&
-          !entry.name.startsWith(".") &&
-          entry.name !== "node_modules" &&
-          entry.name !== "__tests__"
-        ) {
-          walk(fullPath);
-        } else if (
-          entry.isFile() &&
-          (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx"))
-        ) {
-          const content = readFileSync(fullPath, "utf-8");
-          const lines = content.split("\n").length;
-          if (lines > THRESHOLDS.LARGE_FILE_LINES) {
-            largeFiles.push(`${relative(ROOT, fullPath)} (${lines} lines)`);
-          }
-        }
-      }
-    } catch {
-      // Ignore permission errors
-    }
-  }
-
-  walk(SRC_DIR);
-  return largeFiles.slice(0, 10); // Limit output
-}
-
 function runAudit(): AuditResult[] {
-  if (!process.argv.includes("--summary")) {
-    console.log("🔍 Technical Debt Audit\n");
-    console.log("=".repeat(50));
+  if (!process.argv.includes('--summary')) {
+    console.log('🔍 Technical Debt Audit\n');
+    console.log('='.repeat(50));
   }
 
   const results: AuditResult[] = [];
+  const markers: string[] = [];
+  const deprecated: string[] = [];
+  const largeFiles: string[] = [];
+  for (const file of sourceFiles(ROOT)) {
+    const source = sourceFile(ROOT, file);
+    markers.push(...commentLocations(source, /\b(?:TODO|FIXME)\b/));
+    deprecated.push(...commentLocations(source, /@deprecated\b/));
+    const lines = lineCount(source.text);
+    if (!isTestFile(file) && lines > THRESHOLDS.LARGE_FILE_LINES) {
+      largeFiles.push(`${file} (${lines} lines)`);
+    }
+  }
 
-  // TODO/FIXME
-  const todos = countPattern("TODO|FIXME");
   results.push({
-    category: "TODO/FIXME comments",
-    count: todos.count,
+    category: 'TODO/FIXME comments',
+    count: markers.length,
     threshold: THRESHOLDS.MAX_MARKERS,
-    items: todos.items,
-    passed: todos.count <= THRESHOLDS.MAX_MARKERS,
+    items: markers.slice(0, 5),
+    passed: markers.length <= THRESHOLDS.MAX_MARKERS,
   });
 
-  // @deprecated
-  const deprecated = countPattern("@deprecated");
   results.push({
-    category: "@deprecated usage",
-    count: deprecated.count,
+    category: '@deprecated usage',
+    count: deprecated.length,
     threshold: THRESHOLDS.MAX_DEPRECATED,
-    items: deprecated.items,
-    passed: deprecated.count <= THRESHOLDS.MAX_DEPRECATED,
+    items: deprecated.slice(0, 5),
+    passed: deprecated.length <= THRESHOLDS.MAX_DEPRECATED,
   });
 
-  // Backup files
-  const backups = findBackupFiles();
+  const backups = backupFiles(ROOT);
   results.push({
-    category: "Backup files",
+    category: 'Backup files',
     count: backups.length,
     threshold: THRESHOLDS.MAX_BACKUP_FILES,
     items: backups,
     passed: backups.length <= THRESHOLDS.MAX_BACKUP_FILES,
   });
 
-  // Large files
-  const largeFiles = findLargeFiles();
   results.push({
     category: `Files >${THRESHOLDS.LARGE_FILE_LINES} lines`,
     count: largeFiles.length,
     threshold: THRESHOLDS.MAX_LARGE_FILES,
-    items: largeFiles,
+    items: largeFiles.slice(0, 10),
     passed: largeFiles.length <= THRESHOLDS.MAX_LARGE_FILES,
   });
 
@@ -170,20 +97,20 @@ function runAudit(): AuditResult[] {
 }
 
 function printResults(results: AuditResult[]): boolean {
-  const summaryMode = process.argv.includes("--summary");
+  const summaryMode = process.argv.includes('--summary');
   let allPassed = true;
 
   for (const result of results) {
-    const status = result.passed ? "PASS" : "FAIL";
-    const icon = result.passed ? "✅" : "❌";
+    const status = result.passed ? 'PASS' : 'FAIL';
+    const icon = result.passed ? '✅' : '❌';
     console.log(
-      `${summaryMode ? "" : "\n"}${icon} ${result.category}: ${result.count}/${result.threshold} [${status}]`,
+      `${summaryMode ? '' : '\n'}${icon} ${result.category}: ${result.count}/${result.threshold} [${status}]`,
     );
 
     if (!summaryMode && result.items.length > 0 && !result.passed) {
-      console.log("   Examples:");
+      console.log('   Examples:');
       result.items.forEach((item) => {
-        const truncated = item.length > 80 ? item.slice(0, 80) + "..." : item;
+        const truncated = item.length > 80 ? item.slice(0, 80) + '...' : item;
         console.log(`   - ${truncated}`);
       });
     }
@@ -191,13 +118,18 @@ function printResults(results: AuditResult[]): boolean {
     if (!result.passed) allPassed = false;
   }
 
-  if (!summaryMode) console.log("\n" + "=".repeat(50));
-  console.log(allPassed ? "✅ All checks passed!" : "❌ Some checks failed.");
+  if (!summaryMode) console.log('\n' + '='.repeat(50));
+  console.log(allPassed ? '✅ All checks passed!' : '❌ Some checks failed.');
 
   return allPassed;
 }
 
-// Main
-const results = runAudit();
-const passed = printResults(results);
-process.exit(passed ? 0 : 1);
+try {
+  process.exitCode = printResults(runAudit()) ? 0 : 1;
+} catch (error) {
+  console.error(
+    'Debt source scan failed:',
+    error instanceof Error ? error.message : 'unknown error',
+  );
+  process.exitCode = 1;
+}
