@@ -12,6 +12,7 @@ const stepSchema = z.object({
   env: z.record(z.string(), z.unknown()).optional(),
   with: z.record(z.string(), z.unknown()).optional(),
   'timeout-minutes': z.number().optional(),
+  'continue-on-error': z.boolean().optional(),
 });
 
 const jobSchema = z.object({

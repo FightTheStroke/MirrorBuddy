@@ -19,11 +19,27 @@ describe('approved readonly production smoke workflow', () => {
 
   it('orders reconciliation, issuance, browser, revocation and protected diagnostics', () => {
     const ids = readSmokeWorkflow().execution.steps.flatMap((step) => (step.id ? [step.id] : []));
-    expect(ids).toEqual(['reconcile', 'issue', 'smoke', 'revoke', 'diagnostic', 'upload']);
+    expect(ids).toEqual([
+      'pii_state',
+      'reconcile',
+      'issue',
+      'smoke',
+      'revoke',
+      'diagnostic',
+      'upload',
+    ]);
     expect(smokeStep('issue').run).toContain('readonly-smoke-session.ts issue --target production');
     expect(smokeStep('revoke').run).toContain(
       'readonly-smoke-session.ts revoke --target production',
     );
+  });
+
+  it('reports PII key state read-only, before reconciliation, without gating the job', () => {
+    const step = smokeStep('pii_state');
+    expect(step.run).toBe('npm run script -- scripts/inspect-pii-key-state.ts');
+    expect(step['continue-on-error']).toBe(true);
+    expect(step.env?.SESSION_SECRET).toBeUndefined();
+    expect(step.env?.ADMIN_PASSWORD).toBeUndefined();
   });
 
   it('does not manufacture readonly eligibility during owner reconciliation', () => {

@@ -2613,6 +2613,17 @@ jobs:
         continue-on-error: true
         run: npx playwright install-deps chromium
 
+      - name: Inspect PII key state
+        id: pii_state
+        timeout-minutes: 3
+        continue-on-error: true
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
+        run: npm run script -- scripts/inspect-pii-key-state.ts
+
       - name: Reconcile admin accounts
         id: reconcile
         timeout-minutes: 3
