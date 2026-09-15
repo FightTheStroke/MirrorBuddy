@@ -42,3 +42,32 @@ describe('pii key state classification', () => {
     ).toMatchObject({ totalEmails: 0, encryptedEmails: 0 });
   });
 });
+
+describe('decryption trial', () => {
+  const base = { key: 'k'.repeat(32), totalEmails: 33, encryptedEmails: 13 };
+
+  it('refuses a usable key that cannot read the stored ciphertexts', () => {
+    expect(classifyPiiKeyState({ ...base, sampled: 3, decrypted: 0 }).keyMatchesData).toBe(false);
+    expect(classifyPiiKeyState({ ...base, sampled: 3, decrypted: 2 }).keyMatchesData).toBe(false);
+  });
+
+  it('accepts a usable key that reads every sampled ciphertext', () => {
+    expect(classifyPiiKeyState({ ...base, sampled: 3, decrypted: 3 }).keyMatchesData).toBe(true);
+  });
+
+  it('requires an actual sample when encrypted rows exist', () => {
+    expect(classifyPiiKeyState({ ...base, sampled: 0, decrypted: 0 }).keyMatchesData).toBe(false);
+  });
+
+  it('accepts a usable key when nothing is encrypted yet', () => {
+    const state = classifyPiiKeyState({ key: 'k'.repeat(32), totalEmails: 5, encryptedEmails: 0 });
+    expect(state.keyMatchesData).toBe(true);
+    expect(state.rotatable).toBe(true);
+  });
+
+  it('never matches when the key is too short', () => {
+    expect(
+      classifyPiiKeyState({ ...base, key: 'short', sampled: 3, decrypted: 3 }).keyMatchesData,
+    ).toBe(false);
+  });
+});
