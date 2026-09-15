@@ -1,0 +1,129 @@
+name: Migration Repair
+
+# A partially applied migration leaves a failed row in _prisma_migrations, and Prisma
+# then refuses every later migration — which blocks the production build and therefore
+# the release. Repairing it needs production database credentials, which live here and
+# must not be copied to a laptop. Manual dispatch only; never triggered automatically.
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: 'Migration directory name under apps/web/prisma/migrations'
+        required: true
+        type: string
+      action:
+        description: 'status = read-only report. applied = mark the failed row as applied.'
+        required: true
+        default: status
+        type: choice
+        options:
+          - status
+          - applied
+      confirm:
+        description: 'Type REPAIR to allow a write. Ignored when action is status.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Repair a failed production migration
+    runs-on: ubuntu-latest
+    # Writing to the production database waits for Roberto to approve the run.
+    # Dedicated environment: the release pipeline's own "Production" must stay ungated.
+    environment: database-repair
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # --ignore-scripts keeps every package's install hook out of a job that holds
+      # production credentials; Prisma's schema engine binary is the one thing that
+      # install step legitimately fetches, so fetch just that one back.
+      - name: Fetch the Prisma schema engine
+        run: pnpm rebuild @prisma/engines
+
+      # The name reaches the Prisma CLI, so it must be a real migration in this commit.
+      - name: Validate the requested migration exists in this source
+        env:
+          MIGRATION: ${{ inputs.migration }}
+        run: |
+          case "$MIGRATION" in
+            *[!0-9a-zA-Z_-]* | '')
+              echo "Migration name contains characters no migration directory uses"
+              exit 1
+              ;;
+          esac
+          if [ ! -f "apps/web/prisma/migrations/${MIGRATION}/migration.sql" ]; then
+            echo "No such migration in this commit: ${MIGRATION}"
+            exit 1
+          fi
+          echo "Migration found: ${MIGRATION}"
+
+      - name: Require an explicit confirmation before any write
+        if: inputs.action != 'status'
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "REPAIR" ]; then
+            echo "Refusing to write: the confirmation input must be exactly REPAIR"
+            exit 1
+          fi
+          echo "Confirmation accepted"
+
+      # Prisma's own migration report prints the datasource host, and this repository
+      # is public. The guard reads the same row and reports only the state.
+      - name: Confirm the migration is really failed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          MIGRATION: ${{ inputs.migration }}
+          EXPECT: ${{ inputs.action == 'status' && 'report' || 'failed' }}
+        run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" "$EXPECT"
+
+      # Every `prisma migrate` subcommand prints a datasource banner that includes the
+      # database host, and Actions masks only the whole secret, never a substring of it.
+      # The output stays in the runner; the verification step reports what happened.
+      - name: Resolve the failed migration
+        if: inputs.action != 'status'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          MIGRATION: ${{ inputs.migration }}
+          ACTION: ${{ inputs.action }}
+        run: |
+          if pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION" >/tmp/resolve.log 2>&1; then
+            echo "resolve --${ACTION} reported success"
+          else
+            echo "resolve --${ACTION} failed; the next step reports the resulting state"
+            exit 1
+          fi
+
+      # Runs after a failed resolve too: a red run with no state report is the situation
+      # this workflow exists to avoid, and the check prints no host.
+      - name: Confirm the repair landed
+        if: ${{ !cancelled() && inputs.action != 'status' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          MIGRATION: ${{ inputs.migration }}
+        run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" applied
