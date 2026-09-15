@@ -7,84 +7,92 @@
  *
  * Checks:
  * 1. Country-specific documentation exists
- * 2. Official source URLs are present and valid
- * 3. Regulatory authority contacts are correct
+ * 2. Official source URL origins are cited (offline, not a live legal review)
+ * 3. Required authority websites are cited (not validation of email/phone details)
  * 4. Implementation files exist
  * 5. Translation completeness
  */
 
-import { readFileSync, existsSync } from "fs";
-import { join } from "path";
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 
 interface AuditResult {
   category: string;
   item: string;
-  status: "PASS" | "FAIL" | "WARN";
+  status: 'PASS' | 'FAIL' | 'WARN';
   message: string;
   source?: string;
 }
 
 const results: AuditResult[] = [];
-const countries = ["italy", "spain", "france", "germany", "uk"] as const;
-const locales = ["it", "en", "fr", "de", "es"] as const;
+const countries = ['italy', 'spain', 'france', 'germany', 'uk'] as const;
+const locales = ['it', 'en', 'fr', 'de', 'es'] as const;
 
 // Official source URLs that must be present
 const requiredSources: Record<string, string[]> = {
-  italy: [
-    "https://www.garanteprivacy.it",
-    "https://www.agid.gov.it",
-    "https://www.normattiva.it",
-  ],
-  spain: ["https://www.aepd.es", "https://www.boe.es"],
+  italy: ['https://www.garanteprivacy.it', 'https://www.agid.gov.it', 'https://www.normattiva.it'],
+  spain: ['https://www.aepd.es', 'https://www.boe.es'],
   france: [
-    "https://www.cnil.fr",
-    "https://www.numerique.gouv.fr",
-    "https://www.legifrance.gouv.fr",
+    'https://www.cnil.fr',
+    'https://www.numerique.gouv.fr',
+    'https://www.legifrance.gouv.fr',
   ],
-  germany: ["https://www.bfdi.bund.de", "https://www.gesetze-im-internet.de"],
+  germany: ['https://www.bfdi.bund.de', 'https://www.gesetze-im-internet.de'],
   uk: [
-    "https://ico.org.uk",
-    "https://www.equalityhumanrights.com",
-    "https://design-system.service.gov.uk",
+    'https://ico.org.uk',
+    'https://www.equalityhumanrights.com',
+    'https://design-system.service.gov.uk',
   ],
 };
 
 // Regulatory authority contacts
-const authorityContacts: Record<
-  string,
-  { name: string; email: string; website: string }
-> = {
+const authorityContacts: Record<string, { name: string; email: string; website: string }> = {
   italy: {
-    name: "Garante per la Protezione dei Dati Personali",
-    email: "garante@gpdp.it",
-    website: "https://www.garanteprivacy.it",
+    name: 'Garante per la Protezione dei Dati Personali',
+    email: 'garante@gpdp.it',
+    website: 'https://www.garanteprivacy.it',
   },
   spain: {
-    name: "AEPD (Agencia Española de Protección de Datos)",
-    email: "consultas@aepd.es",
-    website: "https://www.aepd.es",
+    name: 'AEPD (Agencia Española de Protección de Datos)',
+    email: 'consultas@aepd.es',
+    website: 'https://www.aepd.es',
   },
   france: {
     name: "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-    email: "contact@cnil.fr",
-    website: "https://www.cnil.fr",
+    email: 'contact@cnil.fr',
+    website: 'https://www.cnil.fr',
   },
   germany: {
-    name: "BfDI (Bundesdatenschutzbeauftragte)",
-    email: "poststelle@bfdi.bund.de",
-    website: "https://www.bfdi.bund.de",
+    name: 'BfDI (Bundesdatenschutzbeauftragte)',
+    email: 'poststelle@bfdi.bund.de',
+    website: 'https://www.bfdi.bund.de',
   },
   uk: {
     name: "ICO (Information Commissioner's Office)",
-    email: "casework@ico.org.uk",
-    website: "https://ico.org.uk",
+    email: 'casework@ico.org.uk',
+    website: 'https://ico.org.uk',
+  },
+};
+
+// Accessibility oversight is distinct from data protection. Source rationale:
+// docs/compliance/OFFICIAL-SOURCE-CITATIONS-AUDIT.md (2026-09-14).
+const accessibilityBodies: Record<string, { name: string; website: string }> = {
+  italy: { name: 'AgID (digital accessibility)', website: 'https://www.agid.gov.it' },
+  spain: {
+    name: 'OAW (public-sector accessibility monitoring)',
+    website: 'https://administracionelectronica.gob.es',
+  },
+  france: { name: 'DINUM (RGAA reference publisher)', website: 'https://www.numerique.gouv.fr' },
+  germany: {
+    name: 'BFIT-Bund (federal accessibility monitoring)',
+    website: 'https://www.bfit-bund.de',
   },
 };
 
 function addResult(
   category: string,
   item: string,
-  status: "PASS" | "FAIL" | "WARN",
+  status: 'PASS' | 'FAIL' | 'WARN',
   message: string,
   source?: string,
 ): void {
@@ -95,20 +103,33 @@ function checkFileExists(filePath: string): boolean {
   return existsSync(join(process.cwd(), filePath));
 }
 
-function checkFileContains(
-  filePath: string,
-  pattern: string | RegExp,
-): boolean {
-  if (!checkFileExists(filePath)) return false;
+function readDocument(filePath: string): string {
   try {
-    const content = readFileSync(join(process.cwd(), filePath), "utf-8");
-    if (typeof pattern === "string") {
-      return content.includes(pattern);
-    }
-    return pattern.test(content);
+    return readFileSync(join(process.cwd(), filePath), 'utf-8');
   } catch {
-    return false;
+    throw new Error(`Unable to read compliance document: ${filePath}`);
   }
+}
+
+function citesSource(content: string, source: string): boolean {
+  return (content.match(/https:\/\/[^\s<>"|)]+/g) ?? []).some((citation) => {
+    try {
+      return new URL(citation).origin === new URL(source).origin;
+    } catch {
+      return false; // Malformed URLs are not citations.
+    }
+  });
+}
+
+function checkFileContains(filePath: string, pattern: string | RegExp): boolean {
+  if (!checkFileExists(filePath)) return false;
+  const content = readDocument(filePath);
+  if (typeof pattern === 'string') {
+    return pattern.startsWith('https://')
+      ? citesSource(content, pattern)
+      : content.includes(pattern);
+  }
+  return pattern.test(content);
 }
 
 function checkSourceCitations(
@@ -127,13 +148,13 @@ function checkSourceCitations(
     };
   }
 
-  const content = readFileSync(join(process.cwd(), filePath), "utf-8");
+  const content = readDocument(filePath);
   const required = requiredSources[country] || [];
   const found: string[] = [];
   const missing: string[] = [];
 
   for (const source of required) {
-    if (content.includes(source)) {
+    if (citesSource(content, source)) {
       found.push(source);
     } else {
       missing.push(source);
@@ -144,35 +165,30 @@ function checkSourceCitations(
 }
 
 async function runAudit(): Promise<void> {
-  console.log("🔍 Compliance Audit with Source Verification\n");
-  console.log("Plan 90: Multi-Language-Compliance\n");
+  console.log('🔍 Compliance Audit with Source Verification\n');
+  console.log('Plan 90: Multi-Language-Compliance\n');
 
   // ===== 1. COUNTRY-SPECIFIC DOCUMENTATION =====
-  console.log("1. Checking country-specific documentation...\n");
+  console.log('1. Checking country-specific documentation...\n');
 
   for (const country of countries) {
     const basePath = `docs/compliance/countries/${country}`;
     const docs = [
-      { file: `${basePath}/data-protection.md`, name: "Data Protection" },
-      { file: `${basePath}/cookie-compliance.md`, name: "Cookie Compliance" },
+      { file: `${basePath}/data-protection.md`, name: 'Data Protection' },
+      { file: `${basePath}/cookie-compliance.md`, name: 'Cookie Compliance' },
       {
         file: `${basePath}/accessibility-compliance.md`,
-        name: "Accessibility Compliance",
+        name: 'Accessibility Compliance',
       },
       {
         file: `${basePath}/ai-regulatory-contacts.md`,
-        name: "AI Regulatory Contacts",
+        name: 'AI Regulatory Contacts',
       },
     ];
 
     for (const doc of docs) {
       if (checkFileExists(doc.file)) {
-        addResult(
-          `Country: ${country}`,
-          doc.name,
-          "PASS",
-          `Document exists: ${doc.file}`,
-        );
+        addResult(`Country: ${country}`, doc.name, 'PASS', `Document exists: ${doc.file}`);
 
         // Check for source citations
         const sources = checkSourceCitations(doc.file, country);
@@ -180,129 +196,128 @@ async function runAudit(): Promise<void> {
           addResult(
             `Country: ${country}`,
             `${doc.name} - Sources`,
-            "PASS",
+            'PASS',
             `All ${sources.required} required sources cited`,
           );
         } else {
           addResult(
             `Country: ${country}`,
             `${doc.name} - Sources`,
-            "WARN",
-            `Missing ${sources.missing.length} source(s): ${sources.missing.join(", ")}`,
+            'WARN',
+            `Missing ${sources.missing.length} source(s): ${sources.missing.join(', ')}`,
           );
         }
 
         // Check for authority contact
-        const authority = authorityContacts[country];
+        const authority =
+          doc.name === 'Accessibility Compliance'
+            ? (accessibilityBodies[country] ?? authorityContacts[country])
+            : authorityContacts[country];
         if (authority && checkFileContains(doc.file, authority.website)) {
           addResult(
             `Country: ${country}`,
             `${doc.name} - Authority`,
-            "PASS",
-            `Authority contact correct: ${authority.name}`,
+            'PASS',
+            `Authority website cited: ${authority.name}`,
           );
         } else {
           addResult(
             `Country: ${country}`,
             `${doc.name} - Authority`,
-            "FAIL",
+            'FAIL',
             `Missing or incorrect authority contact`,
           );
         }
+
+        // Do not silently certify source contradictions discovered during review.
+        const wrongCookieReference =
+          country === 'italy' &&
+          doc.name === 'Cookie Compliance' &&
+          checkFileContains(doc.file, /Provvedimento\s+229\/2021/i);
+        const wrongAccessibilityLaw =
+          country === 'france' &&
+          doc.name === 'Accessibility Compliance' &&
+          checkFileContains(doc.file, /Law 78-17/i);
+        if (wrongCookieReference || wrongAccessibilityLaw) {
+          addResult(
+            `Country: ${country}`,
+            `${doc.name} - Legal Review`,
+            'FAIL',
+            'Statutory reference requires legal review; policy text left unchanged',
+            wrongCookieReference
+              ? 'https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876'
+              : 'https://accessibilite.numerique.gouv.fr/obligations/champ-application/',
+          );
+        }
       } else {
-        addResult(
-          `Country: ${country}`,
-          doc.name,
-          "FAIL",
-          `Missing: ${doc.file}`,
-        );
+        addResult(`Country: ${country}`, doc.name, 'FAIL', `Missing: ${doc.file}`);
       }
     }
   }
 
   // ===== 2. COMPLIANCE MATRIX =====
-  console.log("\n2. Checking compliance matrix...\n");
+  console.log('\n2. Checking compliance matrix...\n');
 
-  const matrixPath = "docs/compliance/COMPLIANCE-MATRIX.md";
+  const matrixPath = 'docs/compliance/COMPLIANCE-MATRIX.md';
   if (checkFileExists(matrixPath)) {
-    addResult("Documentation", "Compliance Matrix", "PASS", "Matrix exists");
+    addResult('Documentation', 'Compliance Matrix', 'PASS', 'Matrix exists');
 
     // Check if matrix includes all countries
     for (const country of countries) {
-      if (checkFileContains(matrixPath, new RegExp(country, "i"))) {
-        addResult(
-          "Documentation",
-          `Matrix - ${country}`,
-          "PASS",
-          `Country included in matrix`,
-        );
+      if (checkFileContains(matrixPath, new RegExp(country, 'i'))) {
+        addResult('Documentation', `Matrix - ${country}`, 'PASS', `Country included in matrix`);
       } else {
-        addResult(
-          "Documentation",
-          `Matrix - ${country}`,
-          "FAIL",
-          `Country missing from matrix`,
-        );
+        addResult('Documentation', `Matrix - ${country}`, 'FAIL', `Country missing from matrix`);
       }
     }
   } else {
-    addResult("Documentation", "Compliance Matrix", "FAIL", "Matrix missing");
+    addResult('Documentation', 'Compliance Matrix', 'FAIL', 'Matrix missing');
   }
 
   // ===== 3. IMPLEMENTATION FILES =====
-  console.log("\n3. Checking implementation files...\n");
+  console.log('\n3. Checking implementation files...\n');
 
   const implementationFiles = [
     {
-      file: "apps/web/src/lib/compliance/cookie-consent-config.ts",
-      name: "Cookie Consent Config",
+      file: 'apps/web/src/lib/compliance/cookie-consent-config.ts',
+      name: 'Cookie Consent Config',
     },
     {
-      file: "apps/web/src/app/[locale]/accessibility/page.tsx",
-      name: "Accessibility Page",
+      file: 'apps/web/src/app/[locale]/accessibility/page.tsx',
+      name: 'Accessibility Page',
     },
     {
-      file: "apps/web/src/app/[locale]/accessibility/accessibility-client.tsx",
-      name: "Accessibility Client",
+      file: 'apps/web/src/app/[locale]/accessibility/accessibility-client.tsx',
+      name: 'Accessibility Client',
     },
     {
-      file: "apps/web/src/components/consent/unified-consent-wall.tsx",
-      name: "Unified Consent Wall",
+      file: 'apps/web/src/components/consent/unified-consent-wall.tsx',
+      name: 'Unified Consent Wall',
     },
   ];
 
   for (const file of implementationFiles) {
     if (checkFileExists(file.file)) {
-      addResult(
-        "Implementation",
-        file.name,
-        "PASS",
-        `File exists: ${file.file}`,
-      );
+      addResult('Implementation', file.name, 'PASS', `File exists: ${file.file}`);
     } else {
-      addResult("Implementation", file.name, "FAIL", `Missing: ${file.file}`);
+      addResult('Implementation', file.name, 'FAIL', `Missing: ${file.file}`);
     }
   }
 
   // ===== 4. TRANSLATION COMPLETENESS =====
-  console.log("\n4. Checking translation completeness...\n");
+  console.log('\n4. Checking translation completeness...\n');
 
-  const requiredNamespaces = ["compliance", "consent"];
+  const requiredNamespaces = ['compliance', 'consent'];
   for (const locale of locales) {
     for (const namespace of requiredNamespaces) {
-      const filePath = `messages/${locale}/${namespace}.json`;
+      const filePath = `apps/web/messages/${locale}/${namespace}.json`;
       if (checkFileExists(filePath)) {
-        addResult(
-          "Translations",
-          `${locale}/${namespace}`,
-          "PASS",
-          `Translation file exists`,
-        );
+        addResult('Translations', `${locale}/${namespace}`, 'PASS', `Translation file exists`);
       } else {
         addResult(
-          "Translations",
+          'Translations',
           `${locale}/${namespace}`,
-          "FAIL",
+          'FAIL',
           `Missing translation file: ${filePath}`,
         );
       }
@@ -310,66 +325,43 @@ async function runAudit(): Promise<void> {
   }
 
   // ===== 5. ADR DOCUMENTATION =====
-  console.log("\n5. Checking ADR documentation...\n");
+  console.log('\n5. Checking ADR documentation...\n');
 
-  const adrPath = "docs/adr/0090-multi-country-compliance-architecture.md";
+  const adrPath = 'docs/adr/0100-multi-country-compliance-architecture.md';
   if (checkFileExists(adrPath)) {
-    addResult("Documentation", "ADR 0090", "PASS", "ADR exists");
+    addResult('Documentation', 'ADR 0100', 'PASS', 'ADR exists');
   } else {
-    addResult("Documentation", "ADR 0090", "FAIL", "ADR missing");
+    addResult('Documentation', 'ADR 0100', 'FAIL', 'ADR missing');
   }
 
   // ===== 6. LEGAL REVIEW CHECKLIST =====
-  console.log("\n6. Checking legal review checklist...\n");
+  console.log('\n6. Checking legal review checklist...\n');
 
-  const checklistPath = "docs/compliance/LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md";
+  const checklistPath = 'docs/compliance/LEGAL-REVIEW-CHECKLIST-BY-COUNTRY.md';
   if (checkFileExists(checklistPath)) {
-    addResult(
-      "Documentation",
-      "Legal Review Checklist",
-      "PASS",
-      "Checklist exists",
-    );
+    addResult('Documentation', 'Legal Review Checklist', 'PASS', 'Checklist exists');
 
     // Verify all countries are in checklist
     for (const country of countries) {
       if (
         checkFileContains(
           checklistPath,
-          new RegExp(
-            `## ${country.charAt(0).toUpperCase() + country.slice(1)}`,
-            "i",
-          ),
+          new RegExp(`## ${country.charAt(0).toUpperCase() + country.slice(1)}`, 'i'),
         )
       ) {
-        addResult(
-          "Documentation",
-          `Checklist - ${country}`,
-          "PASS",
-          `Country section exists`,
-        );
+        addResult('Documentation', `Checklist - ${country}`, 'PASS', `Country section exists`);
       } else {
-        addResult(
-          "Documentation",
-          `Checklist - ${country}`,
-          "FAIL",
-          `Country section missing`,
-        );
+        addResult('Documentation', `Checklist - ${country}`, 'FAIL', `Country section missing`);
       }
     }
   } else {
-    addResult(
-      "Documentation",
-      "Legal Review Checklist",
-      "FAIL",
-      "Checklist missing",
-    );
+    addResult('Documentation', 'Legal Review Checklist', 'FAIL', 'Checklist missing');
   }
 
   // ===== PRINT RESULTS =====
-  console.log("\n" + "=".repeat(80));
-  console.log("AUDIT RESULTS");
-  console.log("=".repeat(80) + "\n");
+  console.log('\n' + '='.repeat(80));
+  console.log('AUDIT RESULTS');
+  console.log('='.repeat(80) + '\n');
 
   const byCategory = results.reduce(
     (acc, r) => {
@@ -382,15 +374,14 @@ async function runAudit(): Promise<void> {
 
   for (const [category, items] of Object.entries(byCategory)) {
     console.log(`\n## ${category}`);
-    console.log("-".repeat(80));
+    console.log('-'.repeat(80));
 
-    const pass = items.filter((r) => r.status === "PASS").length;
-    const fail = items.filter((r) => r.status === "FAIL").length;
-    const warn = items.filter((r) => r.status === "WARN").length;
+    const pass = items.filter((r) => r.status === 'PASS').length;
+    const fail = items.filter((r) => r.status === 'FAIL').length;
+    const warn = items.filter((r) => r.status === 'WARN').length;
 
     for (const item of items) {
-      const icon =
-        item.status === "PASS" ? "✅" : item.status === "FAIL" ? "❌" : "⚠️";
+      const icon = item.status === 'PASS' ? '✅' : item.status === 'FAIL' ? '❌' : '⚠️';
       console.log(`${icon} ${item.item}: ${item.message}`);
       if (item.source) {
         console.log(`   Source: ${item.source}`);
@@ -401,39 +392,33 @@ async function runAudit(): Promise<void> {
   }
 
   // ===== SUMMARY =====
-  console.log("\n" + "=".repeat(80));
-  console.log("SUMMARY");
-  console.log("=".repeat(80) + "\n");
+  console.log('\n' + '='.repeat(80));
+  console.log('SUMMARY');
+  console.log('='.repeat(80) + '\n');
 
-  const totalPass = results.filter((r) => r.status === "PASS").length;
-  const totalFail = results.filter((r) => r.status === "FAIL").length;
-  const totalWarn = results.filter((r) => r.status === "WARN").length;
+  const totalPass = results.filter((r) => r.status === 'PASS').length;
+  const totalFail = results.filter((r) => r.status === 'FAIL').length;
+  const totalWarn = results.filter((r) => r.status === 'WARN').length;
   const total = results.length;
 
   console.log(`Total Checks: ${total}`);
-  console.log(
-    `✅ PASS: ${totalPass} (${Math.round((totalPass / total) * 100)}%)`,
-  );
-  console.log(
-    `⚠️  WARN: ${totalWarn} (${Math.round((totalWarn / total) * 100)}%)`,
-  );
-  console.log(
-    `❌ FAIL: ${totalFail} (${Math.round((totalFail / total) * 100)}%)`,
-  );
+  console.log(`✅ PASS: ${totalPass} (${Math.round((totalPass / total) * 100)}%)`);
+  console.log(`⚠️  WARN: ${totalWarn} (${Math.round((totalWarn / total) * 100)}%)`);
+  console.log(`❌ FAIL: ${totalFail} (${Math.round((totalFail / total) * 100)}%)`);
 
   if (totalFail > 0) {
-    console.log("\n❌ Audit FAILED - Some checks failed");
+    console.log('\n❌ Audit FAILED - Some checks failed');
     process.exit(1);
   } else if (totalWarn > 0) {
-    console.log("\n⚠️  Audit PASSED with warnings");
+    console.log('\n⚠️  Audit PASSED with warnings');
     process.exit(0);
   } else {
-    console.log("\n✅ Audit PASSED - All checks passed");
+    console.log('\n✅ Audit PASSED - All checks passed');
     process.exit(0);
   }
 }
 
 runAudit().catch((error) => {
-  console.error("Error running compliance audit:", error);
+  console.error(error instanceof Error ? error.message : 'Compliance audit failed');
   process.exit(1);
 });

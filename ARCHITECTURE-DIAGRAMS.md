@@ -5,9 +5,15 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
-**Version**: 0.15.0
-**Last Verified**: 2026-02-14
-**Update Policy**: This file is verified and updated during each release via `/release`
+**Version**: 0.39.6
+**Technical Layout Review**: 2026-09-14 (workspace paths, provider boundaries, tier caps, ADR relationships)
+**Update Policy**: Release owners review diagrams and explicitly update both version markers to `VERSION`. Checks never modify this file.
+
+This is a structural reference, not proof of a successful production release or
+legal compliance. Historical compliance diagrams below require the independent
+legal review described in `docs/compliance/OFFICIAL-SOURCE-CITATIONS-AUDIT.md`.
+The native check validates sections, fences, ADR references, and release metadata;
+it cannot certify that every pictured capability is deployed.
 
 ---
 
@@ -60,7 +66,7 @@ graph TB
     end
 
     subgraph Conversation_Engine["Conversation Engine (Shared Core)"]
-        Characters["Characters: 26 Professors + 6 Coaches + 6 Buddies"]
+        Characters["Maestri catalogue + Coaches + Buddies"]
         Safety["Safety Guardrails (5-layer protection)"]
         Tools["Tool Orchestrator (14 tools)"]
         RAG["RAG Engine (Context injection)"]
@@ -70,7 +76,7 @@ graph TB
     subgraph AI_Providers["AI Providers"]
         AzureChat["Azure OpenAI Chat API"]
         AzureRealtime["Azure Realtime Voice API"]
-        Claude["Claude (Anthropic Fallback)"]
+        Claude["Claude (planned; not connected)"]
         Ollama["Ollama Local Dev"]
     end
 
@@ -102,7 +108,7 @@ graph TB
 
     Characters --> AzureChat
     Characters --> AzureRealtime
-    Characters --> Claude
+    Characters -. planned .-> Claude
     Characters --> Ollama
 
     Auth --> Characters
@@ -176,6 +182,43 @@ Both channels share:
 - **Same Conversations**: Unified storage, seamless context switching
 - **Same RAG**: User materials enhance both chat and voice responses
 - **Same Tier Limits**: Feature access rules apply uniformly
+
+### 1.3 Workspace and Runtime Boundaries (ADR 0164)
+
+```mermaid
+graph LR
+    Root["Workspace root: pnpm lockfile, scripts, task orchestration"]
+    Web["apps/web: Next.js application"]
+    Src["apps/web/src: UI, API, orchestration"]
+    Assets["apps/web/public and apps/web/messages"]
+    DB["apps/web/prisma/schema and migrations"]
+    Shared["packages: shared implementations and compatibility exports"]
+    Robot["robot: Reachy Mini Python application"]
+    DeviceAPI["apps/web/src/app/api/devices"]
+    Azure["Azure OpenAI"]
+    Root --> Web
+    Web --> Src
+    Web --> Assets
+    Web --> DB
+    Src --> Shared
+    Robot --> DeviceAPI
+    DeviceAPI --> Azure
+```
+
+`@/` resolves to `apps/web/src/`. Shared packages include `types`, `db`,
+`ai-providers`, `safety`, `tools`, `education`, `tier`, `i18n`, `ui`,
+`accessibility`, `maestri`, `greeting`, `logger`, and `utils`.
+Root npm script aliases remain available; they do not imply a Turbo invocation.
+The sole Next.js proxy is `apps/web/src/proxy.ts`, not a root middleware file.
+Azure and Ollama have runtime providers; a Claude type or historical ADR is
+not evidence of a connected Anthropic fallback.
+
+Vercel's project root is `apps/web`; its active configuration is therefore
+`apps/web/vercel.json`. Source uploads explicitly select that file with
+`--local-config`. Production proof fingerprints its raw bytes, not a
+Vercel-generated repository-root `vercel.json` stub. The uploader rejects a
+competing tracked root configuration; runtime proof verification does not
+normalize or snapshot either file.
 
 ---
 
@@ -276,7 +319,7 @@ erDiagram
 
 ```mermaid
 graph TB
-    subgraph Prisma_Schema["prisma/schema/"]
+    subgraph Prisma_Schema["apps/web/prisma/schema/"]
         schema["schema.prisma (Generator + Datasource)"]
         user["user.prisma (User, Profile, Settings)"]
         conv["conversations.prisma (Conversation, Message)"]
@@ -315,6 +358,9 @@ graph TB
 ---
 
 ## 4. Authentication Flow
+
+ADR 0055 introduces internal authentication; later cookie and SSO hardening
+decisions refine it rather than creating a parallel identity store.
 
 ```mermaid
 sequenceDiagram
@@ -616,7 +662,7 @@ graph TB
     Student[Student]
 
     subgraph Vertical_Relationships["Vertical Relationships"]
-        Professors["26 Professors (Subject Experts)"]
+        Professors["Maestri catalogue (Subject Experts)"]
         Coaches["6 Coaches (Learning Method)"]
     end
 
@@ -732,6 +778,9 @@ graph TB
 
 ## 9. Tool Execution
 
+ADR 0009 defines the execution boundary; ADR 0139 normalizes character tool names
+before that boundary, so aliases do not become separate tools.
+
 ### 9.1 Tool Plugin Architecture (ADR 0037)
 
 ```mermaid
@@ -823,7 +872,7 @@ graph TB
         Voice["Voice: 'Fammi una mappa sulla geografia'"]
     end
 
-    subgraph Voice_Tool_Commands["Voice Tool Commands (src/lib/voice/voice-tool-commands/)"]
+    subgraph Voice_Tool_Commands["Voice Tool Commands (apps/web/src/lib/voice/voice-tool-commands/)"]
         Instructions["TOOL_USAGE_INSTRUCTIONS (Italian instructions for AI)"]
         Helpers["helpers.ts (isMindmapModificationCommand, isToolCreationCommand)"]
         Types["types.ts (VoiceToolDefinition, CreateMindmapArgs, etc.)"]
@@ -949,33 +998,38 @@ erDiagram
 
 ### 11.1 Tier Hierarchy (ADR 0071)
 
+Limits come from tier configuration; the Trial/Base values shown are the local
+fallback defaults, not evidence of current database settings. ADR 0168 removed
+the per-Maestro cap across tiers. Model selection is environment/configuration
+driven, not a fixed model name attached permanently to each tier.
+
 ```mermaid
 graph TB
     subgraph Trial_Tier["Trial Tier"]
         T1[Anonymous User]
         T2["10 chats/day"]
         T3["5 min voice/day"]
-        T4[3 random Professors]
+        T4[No per-Maestro cap]
         T5["10 tool uses/day"]
-        T6[gpt-5-nano]
+        T6[Configured chat model]
     end
 
     subgraph Base_Tier["Base Tier"]
         B1[Registered Free]
         B2["50 chats/day"]
         B3["30 min voice/day"]
-        B4[All 25 Professors]
+        B4[No per-Maestro cap]
         B5["30 tool uses/day"]
-        B6[gpt-5.2-edu]
+        B6[Configured education model]
     end
 
     subgraph Pro_Tier["Pro Tier"]
         P1[Paid Subscriber]
         P2[Unlimited chats]
         P3[Unlimited voice]
-        P4[All 26 Professors]
+        P4[No per-Maestro cap]
         P5[All tools + priority]
-        P6[gpt-5.2-chat]
+        P6[Configured per-feature models]
     end
 
     T1 -->|Registration| B1
@@ -1318,7 +1372,7 @@ graph TB
         PrismaGen[prisma generate]
         Lint[npm run lint]
         Typecheck[npm run typecheck]
-        AuditHigh[npm audit --high]
+        AuditHigh[pnpm audit --audit-level high]
         Build[npm run build]
         VercelEnv[Vercel Env Check]
         CSRFCheck[CSRF Protection Check]
@@ -1355,7 +1409,7 @@ graph TB
 
 ## 16. Cron Jobs
 
-### 16.1 Scheduled Tasks (vercel.json)
+### 16.1 Scheduled Tasks (apps/web/vercel.json)
 
 ```mermaid
 graph TB
@@ -2454,7 +2508,7 @@ graph TB
     end
 
     subgraph Implementation["Implementation"]
-        AgeGate["src/lib/safety/age-gating.ts"]
+        AgeGate["apps/web/src/lib/safety/age-gating.ts"]
         TopicFilter["Topic filter in system prompt"]
         ResponseCheck["Response age-appropriateness check"]
     end
@@ -2766,7 +2820,7 @@ graph TB
         AzureRealtime["Azure Realtime API (Voice Sessions)"]
         AzureEmbed["Azure Embeddings (RAG Indexing)"]
         AzureTTS["Azure TTS (Text-to-Speech)"]
-        ClaudeAPI["Claude (Anthropic Fallback)"]
+        ClaudeAPI["Claude (planned; not connected)"]
         Ollama["Ollama (Local Dev)"]
     end
 
@@ -2780,7 +2834,7 @@ graph TB
     end
 
     subgraph Infrastructure["Infrastructure"]
-        Vercel["Vercel (Edge Deployment)"]
+        Vercel["Vercel (Next.js Node.js runtime)"]
     end
 
     subgraph Observability["Observability"]
@@ -2792,7 +2846,7 @@ graph TB
     App --> AzureRealtime
     App --> AzureEmbed
     App --> AzureTTS
-    App --> ClaudeAPI
+    App -. planned .-> ClaudeAPI
     App --> Ollama
 
     App --> Supabase
@@ -2834,7 +2888,7 @@ graph LR
 
 ```mermaid
 graph TB
-    subgraph Src_Components["src/components/"]
+    subgraph Src_Components["apps/web/src/components/"]
         subgraph Core["Core"]
             UI["ui/ (Buttons, Cards, Forms)"]
             Layout["layout/ (Navigation, Footer)"]
@@ -3096,9 +3150,9 @@ stateDiagram-v2
 graph TD
     subgraph User_Journey["User Journey"]
         Anon["Anonymous Visitor"]
-        Trial["Trial Tier<br/>10 chats, 3 maestri"]
-        Base["Base Tier<br/>50 chats, 20 maestri"]
-        Pro["Pro Tier<br/>Unlimited, 26 maestri"]
+        Trial["Trial Tier<br/>10 chats, no per-Maestro cap"]
+        Base["Base Tier<br/>50 chats, no per-Maestro cap"]
+        Pro["Pro Tier<br/>Configured limits, no per-Maestro cap"]
     end
 
     subgraph Checkout["Stripe Checkout"]
@@ -3204,7 +3258,7 @@ graph TB
 
 ## 28. ADR Index
 
-### 25.1 Architecture Decision Records
+### 28.1 Architecture Decision Records
 
 ```mermaid
 graph TB
@@ -3264,7 +3318,65 @@ graph TB
 
 ---
 
+### 28.2 Decision Relationships Added Since the February Snapshot
+
+These references explain changes to the pictured boundaries, not implementation
+certification. Proposed, deferred, and historical decisions are identified
+explicitly. A/B testing and community contributions use ADR 0180 and ADR 0181;
+the earlier crisis and waitlist decisions retain ADR 0157 and ADR 0158.
+
+| Decision                                                                          | Affected diagram | Relationship and limits                                                                                                                                                           |
+| --------------------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ADR 0137](docs/adr/0137-schema-drift-detection.md)                               | 3, 14            | Schema-to-migration drift detection is database-free; it does not prove a live database was migrated.                                                                             |
+| [ADR 0138](docs/adr/0138-vercel-env-sync.md)                                      | 15, 24           | Configuration metadata checks and injected-value checks are separate boundaries; a check is not a secret synchronization operation.                                               |
+| [ADR 0139](docs/adr/0139-tool-naming-normalization.md)                            | 9                | Character tool aliases normalize into canonical tool types before execution.                                                                                                      |
+| [ADR 0140](docs/adr/0140-compliance-audit-remediation.md)                         | 19               | Historical disclosure/audit remediation; its old Claude and Maestro-limit statements are not current provider or tier evidence.                                                   |
+| [ADR 0141](docs/adr/0141-admin-dashboard-overhaul-v3.md)                          | 17, 20           | Admin services distinguish unconfigured metrics from real observations and audit mutations with the actual actor.                                                                 |
+| [ADR 0142](docs/adr/0142-azure-service-principal-monitoring.md)                   | 20               | August decision explicitly rejects provisioning a monitoring service principal; local operator-authenticated cost reporting remains distinct.                                     |
+| [ADR 0143](docs/adr/0143-sso-oidc-security-hardening.md)                          | 4                | Signed OIDC token verification, nonce checks, and database-owned roles refine the SSO boundary.                                                                                   |
+| [ADR 0144](docs/adr/0144-disaster-recovery-backup-strategy.md)                    | 3, 24            | Recovery relies on provider backups and a restore runbook; recovery targets are not evidence of a completed restore drill.                                                        |
+| [ADR 0145](docs/adr/0145-migration-best-practices.md)                             | 3, 15            | Migration naming, small schema changes, and separate data migrations constrain database rollout.                                                                                  |
+| [ADR 0146](docs/adr/0146-architecture-map-drift-check.md)                         | 2, 22            | The six-layer import model and drift checks complement this visual reference.                                                                                                     |
+| [ADR 0147](docs/adr/0147-email-communications-system.md)                          | 3, 21, 27        | Templates, campaigns, recipient preferences, and Resend webhooks form the email lifecycle.                                                                                        |
+| [ADR 0148](docs/adr/0148-stripe-admin-panel.md)                                   | 17, 26           | Admin payment operations are audited; a payments kill switch is separate from subscription state.                                                                                 |
+| [ADR 0149](docs/adr/0149-static-vs-dynamic-system-prompts.md)                     | 5, 8             | Maestri/coaches use static character identity; buddy prompts incorporate student context. ADR 0162 refines knowledge injection.                                                   |
+| [ADR 0150](docs/adr/0150-production-smoke-testing.md)                             | 14, 24           | Production smoke checks must avoid learning-data mutations; source identity and local test success alone are insufficient.                                                        |
+| [ADR 0151](docs/adr/0151-anonymous-user-guard.md)                                 | 4, 12, 23        | Anonymous production requests do not auto-create users; trial visitor sessions remain separate.                                                                                   |
+| [ADR 0152](docs/adr/0152-voice-ga-migration.md)                                   | 7, 29            | GA session payloads and response parsing replace preview shapes on the selected protocol path.                                                                                    |
+| [ADR 0153](docs/adr/0153-redis-centralized-env-resolution.md)                     | 1.1              | Central resolution handles Upstash and Vercel KV aliases rather than each consumer resolving credentials independently.                                                           |
+| [ADR 0155](docs/adr/0155-model-comparison-benchmarks.md)                          | 5, 18, 20        | Model/profile benchmark orchestration measures outcomes; synthetic profiles do not substitute for accessibility acceptance.                                                       |
+| [ADR 0156](docs/adr/0156-safety-benchmark-gap-remediation.md)                     | 19.1             | Crisis and bias-pattern remediation spans five locales and feeds deterministic safety regression checks.                                                                          |
+| [ADR 0180: experiments](docs/adr/0180-ab-testing-framework.md)                    | 3, 20            | Deterministic bucketing maps user/visitor identities to stored experiment configurations.                                                                                         |
+| [ADR 0157: crisis](docs/adr/0157-crisis-response-protocol.md)                     | 19.1, 19.11      | Detection must lead to blocking/response, logging, and notification, not just classification. Distinct decision from experiments.                                                 |
+| [ADR 0158: waitlist](docs/adr/0158-coming-soon-waitlist.md)                       | 13, 17           | Historical coming-soon design: [the unused overlay flag was removed](docs/ops/FLAGS.md); the waitlist lifecycle is separate.                                                      |
+| [ADR 0181: community](docs/adr/0181-community-contribution-engine.md)             | 19, 25           | Contributions pass moderation and human review before rewards; this is not the waitlist lifecycle.                                                                                |
+| [ADR 0159](docs/adr/0159-gpt-realtime-audio-15-migration.md)                      | 7, 21            | Realtime/audio 1.5 was a flag-controlled migration, not a permanent default encoded by this document.                                                                             |
+| [ADR 0160](docs/adr/0160-workflow-gap-remediation.md)                             | 14, 19, 25       | End-to-end checks connect experiments, benchmarks, community, and crisis handling instead of treating isolated modules as delivered features.                                     |
+| [ADR 0161](docs/adr/0161-login-csrf-bypass-threat-model.md)                       | 4                | Records the login-specific CSRF exception and threat model; it does not relax authenticated mutation protection.                                                                  |
+| [ADR 0162](docs/adr/0162-prompt-optimization-architecture.md)                     | 5, 10            | A compact identity knowledge base, dynamic didactic retrieval, and conditional accessibility context replace indiscriminate prompt expansion.                                     |
+| [ADR 0163](docs/adr/0163-nightmaintenance-release-incident-hygiene.md)            | 14, 24           | Release progression includes post-production checks and incident hygiene, not just a successful build.                                                                            |
+| [ADR 0164](docs/adr/0164-monorepo-migration-pnpm-turborepo.md)                    | 1.3, 2, 22       | Application files moved to `apps/web`; shared libraries and root orchestration have separate responsibilities. Migration plans are not proof every planned optimization shipped.  |
+| [ADR 0165](docs/adr/0165-azure-voice-2026-05-rollout.md)                          | 7                | May voice models have independent rollout controls; provisioning alone does not establish active session selection.                                                               |
+| [ADR 0166](docs/adr/0166-parental-gate-dec01.md)                                  | 19.9             | **Proposed / human decision pending:** adult-area confirmation strength must not be diagrammed as verified parental consent.                                                      |
+| [ADR 0167](docs/adr/0167-buddy-avatar-phase2.md)                                  | 8                | **Proposed / human decision pending:** narrator identity unification is not an implemented buddy identity decision.                                                               |
+| [ADR 0168](docs/adr/0168-maestrilimit-deprecation-dec06.md)                       | 11, 12, 26       | The per-Maestro cap was removed, not enforced. The August catalogue UI does not reinstate it.                                                                                     |
+| [ADR 0169](docs/adr/0169-azure-voice-2026-07-realtime-21-cedar.md)                | 7                | Realtime 2.1 takes precedence when configured/enabled; fallback and voice compatibility remain part of session selection.                                                         |
+| [ADR 0170](docs/adr/0170-reachy-mini-robot-embodiment.md)                         | 1.3, 21          | A separately deployed Python robot pairs through device APIs and reuses character/profile services.                                                                               |
+| [ADR 0171](docs/adr/0171-guided-meditation-imposed-silence.md)                    | 7, 21            | Robot meditation owns timing and suppresses competing speech triggers; silence is not merely requested in a prompt.                                                               |
+| [ADR 0172](docs/adr/0172-voice-cost-attribution.md)                               | 7, 20            | Per-user cost derives from Azure response usage and server-owned session identity, not wall-clock minutes.                                                                        |
+| [ADR 0173](docs/adr/0173-mirrorbuddy-stays-on-azure-api-keys.md)                  | 21, 24           | API-key authentication remains the production design; the documented tenant block means keyless federation is not assumed.                                                        |
+| [ADR 0174](docs/adr/0174-robot-self-managing-credentials-and-updates.md)          | 1.3, 21          | Paired devices retrieve runtime credentials and check updates; this is distinct from the browser ephemeral-token flow.                                                            |
+| [ADR 0175](docs/adr/0175-staging-database-isolation-and-admin-credential-sync.md) | 3, 24            | Staging data isolation and post-release admin credential synchronization are separate operational responsibilities; the production build path must use production-bound evidence. |
+| [ADR 0176](docs/adr/0176-notification-recipients-come-from-the-database.md)       | 19.11, 27        | Internal alerts resolve enabled, non-test administrators from the database with an explicit configured fallback.                                                                  |
+| [ADR 0177](docs/adr/0177-browser-error-monitoring-is-decided-by-the-bundle.md)    | 20               | Browser monitoring follows bundle configuration and a localhost exclusion, not a server-only deployment variable.                                                                 |
+| [ADR 0178](docs/adr/0178-ai-act-risk-classification.md)                           | 19.10            | **Legal confirmation pending:** high-risk treatment is an interim precautionary posture, not a final legal classification.                                                        |
+| [ADR 0179](docs/adr/0179-ai-content-marking-defer.md)                             | 19.10, 19.12     | **Deferred:** visible AI disclosure is distinct from machine-readable marking, whose approach remains a legal/product decision.                                                   |
+
 ## 29. Voice GA + Unified Conversation (W7)
+
+ADR 0152 introduced the GA payload behind a protocol flag; ADR 0159, ADR 0165,
+and ADR 0169 describe subsequent model rollouts. The diagram shows the GA path,
+not a claim that every rollout flag is active in production.
 
 ```mermaid
 sequenceDiagram
@@ -3280,7 +3392,7 @@ sequenceDiagram
     UI->>FF: check voice_ga_protocol + voice_calling_overlay
     FF-->>UI: enabled
     UI->>API: request ephemeral token
-    API->>AZ: GA token exchange (no preview path)
+    API->>AZ: GA token exchange (selected protocol)
     AZ-->>UI: session credentials
     UI->>AZ: WebRTC audio stream
     AZ-->>SAFE: transcript events
@@ -3309,7 +3421,7 @@ graph LR
     STORE --> CONSENT
 ```
 
-### 25.2 Recently Added ADRs
+### 29.1 Historical ADR Index: Foundational Decisions
 
 ```mermaid
 graph TB
@@ -3371,7 +3483,7 @@ graph TB
     end
 ```
 
-### 25.2 Recently Added ADRs
+### 29.2 Historical ADR Index: Compliance and Translation
 
 ```mermaid
 graph TB
@@ -3382,7 +3494,7 @@ graph TB
     end
 ```
 
-### 25.2 Recently Added ADRs
+### 29.3 Historical ADR Index: Application Hardening
 
 ```mermaid
 graph TB
@@ -3403,7 +3515,7 @@ graph TB
     end
 ```
 
-### 25.3 Latest ADR Coverage
+### 29.4 Historical ADR Index: Platform Expansion
 
 ```mermaid
 graph TB
@@ -3430,26 +3542,26 @@ graph TB
 
 ## Quick Reference
 
-| Category   | Key Files                                                     | ADRs                   |
-| ---------- | ------------------------------------------------------------- | ---------------------- |
-| Database   | `prisma/schema/*.prisma`                                      | 0015, 0028, 0033       |
-| Auth       | `src/lib/auth/`                                               | 0055, 0075, 0077, 0080 |
-| Chat       | `src/lib/ai/`, `src/app/api/chat/`                            | 0034                   |
-| Voice      | `src/app/api/realtime/`, `src/lib/voice/`                     | 0038, 0069, 0078       |
-| Professors | `src/data/maestri/`                                           | 0031, 0064             |
-| Tools      | `src/lib/tools/`, `src/lib/voice/voice-tool-commands/`        | 0009, 0037             |
-| Tiers      | `src/lib/tier/`                                               | 0071, 0073             |
-| Trial      | `src/lib/trial/`                                              | 0056, 0057             |
-| Safety     | `src/lib/safety/`                                             | 0004, 0062             |
-| A11y       | `src/lib/accessibility/`                                      | 0060                   |
-| CI/CD      | `.github/workflows/ci.yml`                                    | -                      |
-| Hooks      | `.husky/pre-commit`, `scripts/pre-push-vercel.sh`             | 0072                   |
-| Vercel     | `src/lib/ssl-config.ts`, `.claude/rules/vercel-deployment.md` | 0063, 0067, 0078       |
-| Compliance | `docs/compliance/`                                            | 0079, 0081             |
+| Category   | Key Files                                                                | ADRs                   |
+| ---------- | ------------------------------------------------------------------------ | ---------------------- |
+| Database   | `apps/web/prisma/schema/*.prisma`, `packages/db/`                        | 0015, 0028, 0033       |
+| Auth       | `apps/web/src/lib/auth/`                                                 | 0055, 0075, 0077, 0080 |
+| Chat       | `apps/web/src/lib/ai/`, `apps/web/src/app/api/chat/`                     | 0034                   |
+| Voice      | `apps/web/src/app/api/realtime/`, `apps/web/src/lib/voice/`              | 0038, 0069, 0078       |
+| Professors | `apps/web/src/data/maestri/`, `packages/maestri/`                        | 0031, 0064             |
+| Tools      | `apps/web/src/lib/tools/`, `apps/web/src/lib/voice/voice-tool-commands/` | 0009, 0037             |
+| Tiers      | `apps/web/src/lib/tier/`, `packages/tier/`                               | 0071, 0073, 0168       |
+| Trial      | `apps/web/src/lib/trial/`                                                | 0056, 0057             |
+| Safety     | `apps/web/src/lib/safety/`, `packages/safety/`                           | 0004, 0062             |
+| A11y       | `apps/web/src/lib/accessibility/`, `packages/accessibility/`             | 0060                   |
+| CI/CD      | `.github/workflows/ci.yml`                                               | -                      |
+| Hooks      | `.husky/pre-commit`, `scripts/pre-push-vercel.sh`                        | 0072                   |
+| Vercel     | `apps/web/src/lib/ssl-config.ts`, `apps/web/vercel.json`                 | 0063, 0067, 0078       |
+| Compliance | `docs/compliance/`                                                       | 0079, 0081             |
 
 ---
 
-_Version: 0.15.0_
-_Last updated: 14 February 2026_
+_Version: 0.39.6_
+_Technical layout reviewed: 14 September 2026_
 _Generated from codebase analysis and ADR documentation_
-_Updated on each release via `/release` command_
+_Release owner updates both version markers after review; validation is read-only._

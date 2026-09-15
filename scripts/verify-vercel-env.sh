@@ -3,7 +3,10 @@
 # Checks: required env vars, optional recommendations, certificate files
 # Exit code: 0 if all required checks pass, 1 otherwise
 
-set -e
+set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT_DIR"
+source "$ROOT_DIR/scripts/lib/vercel-link.sh"
 
 echo "========================================="
 echo "Environment Verification for Deployment"
@@ -28,7 +31,7 @@ if [ "$IS_CI" = "true" ] || [ "$VERCEL_ENV_VALUE" = "production" ]; then
 fi
 
 # Check DATABASE_URL (required in CI/production, optional in local dev)
-if [ -z "$DATABASE_URL" ]; then
+if [ -z "${DATABASE_URL:-}" ]; then
   if [ "$IS_PRODUCTION" = "true" ]; then
     echo "❌ DATABASE_URL: MISSING (required in CI/production)"
     FAILED_CHECKS=$((FAILED_CHECKS + 1))
@@ -40,7 +43,7 @@ else
 fi
 
 # Check NODE_ENV (required in CI/production, optional in local dev)
-if [ -z "$NODE_ENV" ]; then
+if [ -z "${NODE_ENV:-}" ]; then
   if [ "$IS_PRODUCTION" = "true" ]; then
     echo "❌ NODE_ENV: MISSING (required in CI/production)"
     FAILED_CHECKS=$((FAILED_CHECKS + 1))
@@ -48,11 +51,11 @@ if [ -z "$NODE_ENV" ]; then
     echo "⚠️  NODE_ENV: NOT SET (optional in local dev, required in CI/production)"
   fi
 else
-  echo "✅ NODE_ENV: SET ($NODE_ENV)"
+  echo "✅ NODE_ENV: SET"
 fi
 
 # Check VERCEL_TOKEN (required in CI/production for deployment, required on main branch push)
-if [ -z "$VERCEL_TOKEN" ]; then
+if [ -z "${VERCEL_TOKEN:-}" ]; then
   if [ "$IS_PRODUCTION" = "true" ] || [ "${GITHUB_REF:-}" = "refs/heads/main" ]; then
     echo "❌ VERCEL_TOKEN: MISSING (required in CI/production and for main branch deployments)"
     echo "   How to fix:"
@@ -64,7 +67,7 @@ if [ -z "$VERCEL_TOKEN" ]; then
     echo "⚠️  VERCEL_TOKEN: NOT SET (optional for local dev, required for production deployments)"
   fi
 else
-  echo "✅ VERCEL_TOKEN: SET (token length: ${#VERCEL_TOKEN} chars)"
+  echo "✅ VERCEL_TOKEN: SET"
 fi
 
 # ============================================================================
@@ -75,7 +78,7 @@ echo "2. Optional but recommended variables:"
 echo "--------------------------------------"
 
 # Check SUPABASE_CA_CERT (optional but recommended)
-if [ -z "$SUPABASE_CA_CERT" ]; then
+if [ -z "${SUPABASE_CA_CERT:-}" ]; then
   echo "⚠️  SUPABASE_CA_CERT: NOT SET (optional - recommended for production)"
 else
   echo "✅ SUPABASE_CA_CERT: SET"
@@ -101,35 +104,20 @@ else
 fi
 
 # ============================================================================
-# SECTION 4: List environment variables from Vercel (if CLI available)
+# SECTION 4: Required remote names-only validation
 # ============================================================================
 echo ""
-echo "4. Vercel environment variables (if available):"
+echo "4. Vercel production environment names:"
 echo "-----------------------------------------------"
 
 if command -v vercel &> /dev/null; then
-  echo "Attempting to pull from Vercel..."
-
-  # Safely attempt to pull - don't fail if it doesn't work
-  TEMP_FILE=$(mktemp)
-  if vercel env ls > "$TEMP_FILE" 2>/dev/null || vercel env pull "$TEMP_FILE" --environment production > /dev/null 2>&1; then
-    if [ -s "$TEMP_FILE" ]; then
-      echo "Environment variables available:"
-      /usr/bin/head -20 "$TEMP_FILE" | /usr/bin/sed 's/^/  /'
-      LINE_COUNT=$(/usr/bin/wc -l < "$TEMP_FILE" 2>/dev/null || echo "0")
-      if [ -n "$LINE_COUNT" ] && [ "$LINE_COUNT" -gt 20 ] 2>/dev/null; then
-        REMAINING=$((LINE_COUNT - 20))
-        echo "  ... and $REMAINING more"
-      fi
-    else
-      echo "⚠️  No output from Vercel command"
-    fi
-  else
-    echo "⚠️  Could not retrieve Vercel environment (this is OK if not configured)"
+  if ! VERCEL_CWD=$(resolve_vercel_cwd "$ROOT_DIR") ||
+     ! pnpm exec tsx scripts/check-production-env.ts metadata "$VERCEL_CWD"; then
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
   fi
-  rm -f "$TEMP_FILE"
 else
-  echo "⚠️  Vercel CLI not installed - skipping Vercel checks"
+  echo "❌ Vercel CLI missing: required production metadata cannot be checked"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
 fi
 
 # ============================================================================
@@ -139,7 +127,8 @@ echo ""
 echo "========================================="
 
 if [ "$FAILED_CHECKS" -eq 0 ]; then
-  echo "✅ All required environment variables are set!"
+  echo "✅ Local requirements and production environment names passed."
+  echo "Production values are validated only inside the deployment runtime."
   echo "========================================="
   exit 0
 else

@@ -58,7 +58,7 @@ const metadataSchema = z
   })
   .strict();
 
-export function validateProductionMetadata(input: unknown): void {
+function productionMetadataNames(input: unknown): Set<string> {
   const parsed = metadataSchema.safeParse(input);
   if (!parsed.success) throw new Error('Invalid production environment metadata');
   const names = new Set<string>();
@@ -69,12 +69,28 @@ export function validateProductionMetadata(input: unknown): void {
     }
     names.add(env.key);
   }
+  return names;
+}
+
+export function validateProductionMetadata(input: unknown): void {
+  const names = productionMetadataNames(input);
   const missing = criticalProductionEnv.filter(({ name }) => !names.has(name));
   if (missing.length) {
     throw new Error(
       `Missing production environment names: ${missing.map(({ name }) => name).join(', ')}`,
     );
   }
+}
+
+export function validateSentryMetadata(input: unknown): void {
+  const names = productionMetadataNames(input);
+  const missing = ['SENTRY_AUTH_TOKEN', 'SENTRY_ORG', 'SENTRY_PROJECT'].filter(
+    (name) => !names.has(name),
+  );
+  if (!names.has('NEXT_PUBLIC_SENTRY_DSN') && !names.has('SENTRY_DSN')) {
+    missing.push('NEXT_PUBLIC_SENTRY_DSN or SENTRY_DSN');
+  }
+  if (missing.length) throw new Error(`Missing production Sentry names: ${missing.join(', ')}`);
 }
 
 export function validateProductionValues(

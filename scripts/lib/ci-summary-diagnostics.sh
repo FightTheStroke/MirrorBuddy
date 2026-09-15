@@ -51,12 +51,16 @@ successful_check() {
 }
 
 run_logged() {
-	local label="$1" tmp status
+	local label="$1" tmp status warnings_before="$WARNINGS"
 	shift
 	tmp=$(mktemp "${TMPDIR:-/tmp}/mirrorbuddy-ci.XXXXXX")
 	if "$@" >"$tmp" 2>&1; then
 		successful_check "$label" "$tmp"
-		rm -f "$tmp"
+		if [[ "$WARNINGS" -gt "$warnings_before" ]]; then
+			result "  Log: $tmp"
+		else
+			rm -f "$tmp"
+		fi
 	else
 		status=$?
 		ERRORS=$((ERRORS + 1))

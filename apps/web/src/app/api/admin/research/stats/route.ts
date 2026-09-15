@@ -4,25 +4,13 @@ import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
 
 export const revalidate = 0;
 
-type MaestroAggregate = {
-  maestroId: string;
-  _count: { _all: number };
-  _avg: {
-    scoreScaffolding: number | null;
-    scoreHinting: number | null;
-    scoreAdaptation: number | null;
-    scoreMisconceptionHandling: number | null;
-  };
-};
-
 const toScore = (value: number | null): number => value ?? 0;
 
 export const GET = pipe(
   withSentry('/api/admin/research/stats'),
   withAdminReadOnly,
 )(async () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma groupBy typing mismatch
-  const grouped = (await (prisma.researchExperiment.groupBy as any)({
+  const grouped = await prisma.researchExperiment.groupBy({
     by: ['maestroId'],
     where: { status: 'completed' },
     _avg: {
@@ -32,7 +20,7 @@ export const GET = pipe(
       scoreMisconceptionHandling: true,
     },
     _count: { _all: true },
-  })) as MaestroAggregate[];
+  });
 
   const ranked = grouped
     .map((row) => {

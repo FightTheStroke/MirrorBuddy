@@ -1,31 +1,91 @@
-/**
- * @vitest-environment node
- *
- * Guard for scripts/check-vercel-env.sh.
- *
- * `mktemp` creates the temp file, so `vercel env pull` stopped to ask whether
- * to overwrite it. With stderr silenced the prompt was invisible and the pull
- * wrote nothing — the check then read an empty file, declared all four required
- * Sentry variables missing (they were present all along) and never inspected a
- * single real value for the trailing-newline corruption it exists to catch.
- *
- * A check that cannot see its input is worse than no check, so these two rails
- * are asserted at source level.
- */
+// @vitest-environment node
+import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { afterEach, describe, expect, it } from 'vitest';
+import { criticalProductionEnv } from '../lib/production-env-policy';
 
-import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+const repository = resolve(import.meta.dirname, '../..');
+const roots: string[] = [];
+const names = [
+  ...criticalProductionEnv.map(({ name }) => name),
+  'NEXT_PUBLIC_SENTRY_DSN',
+  'SENTRY_AUTH_TOKEN',
+  'SENTRY_ORG',
+  'SENTRY_PROJECT',
+];
 
-const source = readFileSync(join(process.cwd(), 'scripts', 'check-vercel-env.sh'), 'utf8');
-
-describe('scripts/check-vercel-env.sh', () => {
-  it('answers the overwrite prompt so the pull actually writes', () => {
-    expect(source).toMatch(/vercel env pull[^\n]*--yes/);
+function run(script: string, fail = false, keys = names) {
+  const root = mkdtempSync(join(tmpdir(), 'mb-vercel-verifier-'));
+  roots.push(root);
+  const bin = join(root, 'bin');
+  mkdirSync(bin);
+  const calls = join(root, 'calls.jsonl');
+  const payload = JSON.stringify({
+    envs: keys.map((key) => ({
+      key,
+      type: 'sensitive',
+      target: ['production'],
+    })),
   });
+  writeFileSync(
+    join(bin, 'vercel'),
+    `#!${process.execPath}
+const fs = require('node:fs');
+fs.appendFileSync(${JSON.stringify(calls)}, JSON.stringify(process.argv.slice(2)) + '\\n');
+if (${fail} || process.argv[2] !== 'env' || process.argv[3] !== 'ls') {
+  console.error('synthetic-private-canary'); process.exit(1);
+}
+process.stdout.write(${JSON.stringify(payload)});
+`,
+    { mode: 0o755 },
+  );
+  const result = spawnSync('bash', [join(repository, 'scripts', script)], {
+    cwd: repository,
+    encoding: 'utf8',
+    timeout: 30_000,
+    env: {
+      ...process.env,
+      PATH: `${bin}:${process.env.PATH}`,
+      VERCEL_TOKEN: '',
+      VERCEL_PROJECT_ID: 'prj_synthetic',
+      VERCEL_ORG_ID: 'team_synthetic',
+      CI: 'false',
+      VERCEL_ENV: '',
+      GITHUB_REF: '',
+      DATABASE_URL: 'synthetic-local-value',
+      NODE_ENV: 'test',
+    },
+  });
+  return { ...result, calls: readFileSync(calls, 'utf8') };
+}
 
-  it('fails loudly when the pulled environment is empty', () => {
-    expect(source).toMatch(/if \[ ! -s "\$TEMP_FILE" \]/);
-    expect(source).toContain('empty pull');
+afterEach(() => {
+  for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+});
+describe('production verifier wrappers', () => {
+  it.each(['check-vercel-env.sh', 'verify-vercel-env.sh', 'verify-sentry-config.sh'])(
+    '%s checks actual names without downloading secrets',
+    (script) => {
+      const result = run(script);
+      expect(result.status, result.stdout + result.stderr).toBe(0);
+      expect(result.calls).toContain('"env","ls","production","--format=json"');
+      expect(result.calls).not.toMatch(/pull|decrypt/);
+    },
+  );
+  it.each(['check-vercel-env.sh', 'verify-vercel-env.sh', 'verify-sentry-config.sh'])(
+    '%s fails closed without leaking a CLI error payload',
+    (script) => {
+      const result = run(script, true);
+      expect(result.status).toBe(1);
+      expect(result.stdout + result.stderr).not.toContain('synthetic-private-canary');
+      expect(result.calls.trim().split('\n')).toHaveLength(1);
+    },
+  );
+  it('rejects an incomplete metadata response instead of inspecting an empty export', () => {
+    const result = run('check-vercel-env.sh', false, []);
+    expect(result.status).toBe(1);
+    expect(result.calls).not.toContain('pull');
   });
 });

@@ -46,6 +46,7 @@ let alias: unknown;
 let failCommand: string | undefined;
 let dirty: string;
 let head: string;
+let trackedRootConfig: string;
 const commands = () =>
   exec.mock.calls.filter(([command]) => command === 'vercel').map(([, args]) => args as string[]);
 afterEach(() => vi.unstubAllGlobals());
@@ -57,10 +58,15 @@ beforeEach(() => {
   failCommand = undefined;
   dirty = '';
   head = sha;
+  trackedRootConfig = '';
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ status: 200 }));
   exec.mockImplementation((command, args) => {
     const parts = args as string[];
-    if (command === 'git') return parts[0] === 'rev-parse' ? head : dirty;
+    if (command === 'git') {
+      if (parts[0] === 'rev-parse') return head;
+      if (parts[0] === 'ls-files') return trackedRootConfig;
+      return dirty;
+    }
     if (parts[0] === failCommand) throw new Error('synthetic-private-marker');
     if (parts[0] === '--version') return '56.3.2';
     if (parts[0] === 'deploy') return JSON.stringify(build);
@@ -102,6 +108,10 @@ describe('production source-build promotion boundary', () => {
       '--force',
       '--yes',
       '--format=json',
+      '--local-config',
+      'apps/web/vercel.json',
+      '--build-env',
+      `VERCEL_GIT_COMMIT_SHA=${sha}`,
       '--meta',
       `verifiedSourceCommit=${sha}`,
       '--meta',
@@ -133,9 +143,12 @@ describe('production source-build promotion boundary', () => {
       '--scope',
       env.VERCEL_ORG_ID,
     ]);
-    expect(JSON.stringify(commands())).not.toMatch(
-      /prebuilt|pull|--build-env|--env|rollback|alias set/,
-    );
+    expect(JSON.stringify(commands())).not.toMatch(/prebuilt|pull|--env|rollback|alias set/);
+    expect(
+      commands()
+        .flat()
+        .filter((arg) => arg === '--build-env'),
+    ).toHaveLength(1);
     expect(
       commands()
         .filter((args) => args[0] === 'inspect')
@@ -202,6 +215,14 @@ describe('production source-build promotion boundary', () => {
     else dirty = ' M vercel.json';
     await expect(deployValidatedProduction(env)).rejects.toThrow();
     expect(commands().some((args) => args[0] === 'deploy')).toBe(false);
+  });
+
+  it('rejects a competing tracked root configuration before contacting Vercel', async () => {
+    trackedRootConfig = 'vercel.json';
+    await expect(deployValidatedProduction(env)).rejects.toThrow(
+      'Tracked root vercel.json conflicts with the application configuration',
+    );
+    expect(commands()).toEqual([]);
   });
 
   it.each([

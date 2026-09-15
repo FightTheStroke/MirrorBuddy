@@ -216,13 +216,13 @@ function validateSentryClientFallback(): void {
 }
 
 function validateVercelRegionCompliance(): void {
-  const vercelConfigPath = path.join(process.cwd(), 'vercel.json');
+  const vercelConfigPath = path.join(process.cwd(), 'apps/web/vercel.json');
   if (!fs.existsSync(vercelConfigPath)) {
     addResult(
       'Vercel',
       'Region Pinning',
       'FAIL',
-      'vercel.json not found - cannot verify EU region pinning',
+      'apps/web/vercel.json not found - cannot verify EU region pinning',
       true,
     );
     return;

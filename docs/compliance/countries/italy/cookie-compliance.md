@@ -1,8 +1,8 @@
 # Italy Cookie Compliance
 
 **Jurisdiction**: Italian Republic (EU Member State)
-**Legislation**: GDPR + Italian Privacy Code (D.Lgs. 196/2003) + Garante Provvedimento 229/2021
-**Effective**: Provvedimento 229/2021 (10 June 2021)
+**Legislation**: GDPR + Italian Privacy Code (D.Lgs. 196/2003) + Garante Provvedimento 231/2021
+**Effective**: Provvedimento 231/2021 (10 June 2021)
 **Enforcing Authority**: Garante per la protezione dei dati personali
 **Status**: COMPLIANT
 
@@ -14,17 +14,17 @@
 | -------------------------- | ------------ | ------------ | --------------------------- |
 | **GDPR**                   | Art. 5, 6    | 25 May 2018  | EU-wide data protection     |
 | **Italian Privacy Code**   | As amended   | 19 Sep 2018  | National data protection    |
-| **Provvedimento 229/2021** | All sections | 10 June 2021 | Cookie consent requirements |
+| **Provvedimento 231/2021** | All sections | 10 June 2021 | Cookie consent requirements |
 | **ePrivacy Directive**     | Art. 5(3)    | 25 May 2011  | Electronic communications   |
 
 ### Garante per la protezione dei dati personali
 
 **Authority**: Italian data protection authority
-**Cookie Guidelines**: Provvedimento 229/2021 (official cookie guidance)
+**Cookie Guidelines**: Provvedimento 231/2021 (official cookie guidance)
 
 **Contact:**
 
-- Website: https://www.gpdp.it
+- Website: https://www.garanteprivacy.it/home/autorita
 - Email: garante@gpdp.it
 - Phone: +39 06 69677 1
 
@@ -32,7 +32,7 @@
 
 ---
 
-## 2. Provvedimento 229/2021 Requirements
+## 2. Provvedimento 231/2021 Requirements
 
 ### Key Requirements
 
@@ -134,7 +134,7 @@
 
 **Location**: `/cookies` page (Italian + English)
 
-**Required Content** (Provvedimento 229/2021):
+**Required Content** (Provvedimento 231/2021):
 
 - List of all cookies (name, purpose, duration, third party)
 - Cookie categories with consent requirements
@@ -156,7 +156,7 @@
 - Fine non-compliant organizations
 - Order immediate cessation of non-compliant practices
 
-### Penalties (Provvedimento 229/2021 + GDPR)
+### Penalties (Provvedimento 231/2021 + GDPR)
 
 | Violation                         | Fine Range       |
 | --------------------------------- | ---------------- |
@@ -185,7 +185,7 @@
 | Resource                   | URL                                                                               |
 | -------------------------- | --------------------------------------------------------------------------------- |
 | **Garante Homepage**       | https://www.gpdp.it                                                               |
-| **Provvedimento 229/2021** | https://www.gpdp.it/web/guest/home/docweb/-/docweb-display/docweb/9677876         |
+| **Provvedimento 231/2021** | https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876         |
 | **Cookie Guidelines**      | https://www.gpdp.it/temi/cookie                                                   |
 | **Sample Cookie Banner**   | https://www.gpdp.it/web/guest/home/docweb/-/docweb-display/docweb/9677876 (Annex) |
 
@@ -208,4 +208,4 @@
 ---
 
 **Version**: 1.0 | **Updated**: 09 February 2026 | **Review**: 09 August 2026 (6 months)
-**Owner**: Fightthestroke Foundation | **Reference**: GDPR, Provvedimento 229/2021, Garante Guidelines
+**Owner**: Fightthestroke Foundation | **Reference**: GDPR, Provvedimento 231/2021, Garante Guidelines

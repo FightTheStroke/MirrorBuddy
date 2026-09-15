@@ -10,7 +10,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { proofSources, proofFile } from '../lib/production-build-proof.mjs';
+import { proofSources, proofFile, productionConfigFile } from '../lib/production-build-proof.mjs';
 import { criticalProductionEnv } from '../lib/production-env-policy';
 
 export const root = resolve(import.meta.dirname, '../..');
@@ -46,7 +46,9 @@ export function buildFixture() {
     chmodSync(path, 0o755);
   };
   const invoke = (values: NodeJS.ProcessEnv) => {
-    const { buildCommand } = JSON.parse(readFileSync(join(directory, 'vercel.json'), 'utf8'));
+    const { buildCommand } = JSON.parse(
+      readFileSync(join(directory, productionConfigFile), 'utf8'),
+    );
     return spawnSync(
       '/bin/bash',
       [
@@ -57,7 +59,10 @@ export function buildFixture() {
         `tsx() { "${process.execPath}" --import tsx "$@"; }\n${buildCommand}`,
       ],
       {
-        cwd: directory,
+        // Vercel executes buildCommand from the configured apps/web project root,
+        // not from the repository root. Keep the process test faithful to that
+        // boundary so path regressions fail before a production deployment.
+        cwd: join(directory, 'apps/web'),
         env: { ...env, ...values, PATH: env.PATH },
         encoding: 'utf8',
         timeout: 15_000,

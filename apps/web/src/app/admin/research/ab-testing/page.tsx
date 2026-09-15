@@ -5,7 +5,13 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Bar } from 'recharts';
+import nextDynamic from 'next/dynamic';
+import { ChartLoading } from '../chart-loading';
+
+const ResultsBarChart = nextDynamic(() => import('./results-bar-chart'), {
+  ssr: false,
+  loading: ChartLoading,
+});
 
 type ABBucket = {
   label: string;
@@ -148,15 +154,7 @@ export default function ABTestingDashboardPage() {
                 className="h-56"
                 aria-label={t('abTesting.chartAriaLabel', { name: experiment.name })}
               >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={experiment.buckets}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="label" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Bar dataKey="avgTutorBenchScore" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <ResultsBarChart data={experiment.buckets} />
               </div>
             </article>
           ))

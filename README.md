@@ -56,10 +56,10 @@
   <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/GDPR-Compliant-blue?style=flat-square" alt="GDPR Compliant"></a>
   <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/COPPA-Verified-orange?style=flat-square" alt="COPPA Verified"></a>
   <a href="docs/compliance/AI-LITERACY.md"><img src="https://img.shields.io/badge/WCAG%202.1-AA-purple?style=flat-square" alt="WCAG 2.1 AA"></a>
-  <a href="vercel.json"><img src="https://img.shields.io/badge/Vercel%20Region-fra1%20(EU)-green?style=flat-square" alt="Vercel Region fra1 (EU)"></a>
+  <a href="apps/web/vercel.json"><img src="https://img.shields.io/badge/Vercel%20Region-fra1%20(EU)-green?style=flat-square" alt="Vercel Region fra1 (EU)"></a>
 </p>
 
-MirrorBuddy complies with **EU AI Act (2024/1689)**, **Italian Law 132/2025**, **GDPR**, and **COPPA** requirements. Production Vercel compute is pinned to **EU region `fra1`** via `vercel.json`. See our [compliance documentation](docs/compliance/) for details.
+MirrorBuddy complies with **EU AI Act (2024/1689)**, **Italian Law 132/2025**, **GDPR**, and **COPPA** requirements. Production Vercel compute is pinned to **EU region `fra1`** via `apps/web/vercel.json`. See our [compliance documentation](docs/compliance/) for details.
 
 ---
 
@@ -343,15 +343,19 @@ no screen needed.
 
 Try MirrorBuddy instantly without creating an account. Trial mode provides limited access to evaluate the platform:
 
-| Resource      | Limit     | Description                               |
-| ------------- | --------- | ----------------------------------------- |
-| Chat messages | 10        | Text conversations with Maestri           |
-| Voice time    | 5 minutes | Voice sessions with AI tutors             |
-| Tool calls    | 10        | Mind maps, summaries, flashcards, quizzes |
-| Documents     | 1         | PDF/image upload for homework help        |
-| Maestri       | 3         | Randomly assigned AI tutors               |
+| Resource      | Limit              | Description                               |
+| ------------- | ------------------ | ----------------------------------------- |
+| Chat messages | 10                 | Text conversations with Maestri           |
+| Voice time    | 5 minutes          | Voice sessions with AI tutors             |
+| Tool calls    | 10                 | Mind maps, summaries, flashcards, quizzes |
+| Documents     | 1                  | PDF/image upload for homework help        |
+| Maestri       | No per-Maestro cap | Full catalogue; subject-based selection   |
 
 **Trial limits are configurable via TierService in the database.** Admins can adjust trial tier limits in the admin panel without code changes.
+
+The numeric defaults above are checked against `apps/web/src/lib/tier/tier-fallbacks.ts`.
+There is **no per-Maestro cap** in any tier: the former `maestriLimit` was removed
+by [ADR 0168](docs/adr/0168-maestrilimit-deprecation-dec06.md), not enforced.
 
 **Anti-abuse protection:** Trial sessions are tracked by IP hash + cookie to prevent repeated trials via incognito browsing.
 
@@ -367,19 +371,19 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 
 MirrorBuddy offers three tiers to meet different needs:
 
-| Feature                        | Trial     | Base (Free) | Pro       |
-| ------------------------------ | --------- | ----------- | --------- |
-| **Account**                    | Anonymous | Free signup | Paid      |
-| **Chat messages/day**          | 10        | 50          | Unlimited |
-| **Voice time/day**             | 5 min     | 30 min      | Unlimited |
-| **Tools/day** (mind maps, etc) | 10        | 30          | Unlimited |
-| **Maestri access**             | 3 random  | 25          | All 27    |
-| **Flashcards (FSRS)**          | ✓         | ✓           | ✓         |
-| **Progress analytics**         | —         | ✓           | ✓         |
-| **Homework help (PDF/photos)** | —         | ✓           | ✓         |
-| **Parental dashboard**         | —         | ✓           | ✓         |
-| **Video Vision**               | —         | —           | ✓         |
-| **Priority support**           | —         | —           | ✓         |
+| Feature                        | Trial              | Base (Free)        | Pro                |
+| ------------------------------ | ------------------ | ------------------ | ------------------ |
+| **Account**                    | Anonymous          | Free signup        | Paid               |
+| **Chat messages/day**          | 10                 | 50                 | Unlimited          |
+| **Voice time/day**             | 5 min              | 30 min             | Unlimited          |
+| **Tools/day** (mind maps, etc) | 10                 | 30                 | Unlimited          |
+| **Maestri access**             | No per-Maestro cap | No per-Maestro cap | No per-Maestro cap |
+| **Flashcards (FSRS)**          | ✓                  | ✓                  | ✓                  |
+| **Progress analytics**         | —                  | ✓                  | ✓                  |
+| **Homework help (PDF/photos)** | —                  | ✓                  | ✓                  |
+| **Parental dashboard**         | —                  | ✓                  | ✓                  |
+| **Video Vision**               | —                  | —                  | ✓                  |
+| **Priority support**           | —                  | —                  | ✓                  |
 
 **→ See detailed tier comparison: [Tier Rules](.claude/rules/tier.md)**
 

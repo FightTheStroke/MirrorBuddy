@@ -4,7 +4,7 @@
 
 # MirrorBuddy — Agent Instructions (canonical)
 
-AI education platform: 27 Maestri/tutor characters, voice, FSRS flashcards, mind maps,
+AI education platform: 32 Maestri/tutor characters, voice, FSRS flashcards, mind maps,
 quizzes, gamification. Users are students with learning differences (dyslexia, ADHD,
 autism, cerebral palsy).
 
@@ -49,8 +49,8 @@ Shared implementations and compatibility exports live in `packages/`.
 
 ## Commands
 
-Run from the repository/worktree root using Node 20.x and pnpm 10.33.0
-(`package.json`; tooling evidence: Node 20.20.2). Install with pnpm, not npm.
+Run from the repository/worktree root using Node 24.x and pnpm 10.33.0
+(`package.json`; tooling evidence: Node 24.20.0). Install with pnpm, not npm.
 The root scripts below remain available; they do not automatically invoke Turbo.
 Next runs in `apps/web/`; environment loading differs for root CLI tools
 (see `SETUP.md`, especially the direct tier-seed database warning).

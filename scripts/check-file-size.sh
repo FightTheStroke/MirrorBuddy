@@ -18,7 +18,7 @@ OVER_COUNT=0
 CONFIG_FILE=".file-line-limit.json"
 
 # Parse arguments
-[ "$1" = "--strict" ] && STRICT_MODE=1
+[ "${1:-}" = "--strict" ] && STRICT_MODE=1
 
 # Colors
 RED='\033[0;31m'
@@ -76,9 +76,18 @@ is_exempt() {
     return 1
 }
 
-# Find all source files from configured directories
-# Include: src, scripts, .claude, docs, e2e, @docs, and root-level md files
-FILES=$(/usr/bin/find src scripts .claude docs e2e @docs -type f \( \
+# Inspect required monorepo roots; optional local agent docs remain optional.
+DIRECTORIES=(apps/web/src packages scripts docs apps/web/e2e)
+for directory in "${DIRECTORIES[@]}"; do
+    if [ ! -d "$directory" ]; then
+        echo "Required source directory missing: $directory" >&2
+        exit 1
+    fi
+done
+for directory in .claude @docs; do
+    [ ! -d "$directory" ] || DIRECTORIES+=("$directory")
+done
+if ! FILES=$(/usr/bin/find "${DIRECTORIES[@]}" -type f \( \
     -name "*.ts" -o \
     -name "*.tsx" -o \
     -name "*.js" -o \
@@ -93,11 +102,16 @@ FILES=$(/usr/bin/find src scripts .claude docs e2e @docs -type f \( \
     ! -path "*/generated/*" \
     ! -path "*/__tests__/*" \
     ! -name "*.test.*" \
-    ! -name "*.spec.*" \
-    2>/dev/null || true)
+    ! -name "*.spec.*"); then
+    echo "File-size inventory failed" >&2
+    exit 1
+fi
 
 # Also include root-level markdown files
-ROOT_MD=$(/usr/bin/find . -maxdepth 1 -type f -name "*.md" 2>/dev/null || true)
+if ! ROOT_MD=$(/usr/bin/find . -maxdepth 1 -type f -name "*.md"); then
+    echo "Root documentation inventory failed" >&2
+    exit 1
+fi
 FILES="$FILES $ROOT_MD"
 
 OVER_LIMIT=""
@@ -113,7 +127,10 @@ for file in $FILES; do
         continue
     fi
 
-    LINES=$(awk 'END {print NR}' "$file" 2>/dev/null || echo 0)
+    if ! LINES=$(awk 'END {print NR}' "$file"); then
+        echo "Cannot inspect source file: $file" >&2
+        exit 1
+    fi
     CHECKED=$((CHECKED + 1))
 
     if [ "$LINES" -gt "$MAX_LINES" ]; then

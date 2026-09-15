@@ -203,6 +203,8 @@
 | 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard  |
 | 0148 | Stripe Admin Panel                    | Admin billing management, tax config, revenue view   |
 | 0158 | Coming Soon Waitlist + Invited Access | Pre-launch waitlist, promo codes, GDPR double opt-in |
+| 0180 | A/B Testing Framework                 | Deterministic bucketing and experiment attribution   |
+| 0181 | Community Contribution Engine         | Moderated contributions, rewards and voting          |
 
 ## Consortium & Grants
 

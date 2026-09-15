@@ -1,211 +1,81 @@
 # Official Source Citations Audit
 
-**Plan**: 90 - Multi-Language-Compliance (T6-10)
-**Status**: Complete
-**Last Updated**: 27 January 2026
+**Review date**: 14 September 2026
+**Status**: Two factual citation corrections approved and applied; broader legal assertions remain unverified. Not a compliance certification.
+**Origin**: Plan 90 multi-country documentation; release-repair source review.
 
----
+## What the checker establishes
 
-## Overview
+`scripts/compliance-audit-source-verification.ts` checks country documents,
+implementation file presence, `apps/web/messages/{it,en,fr,de,es}/{compliance,consent}.json`,
+and ADR 0100 (`0090` concerns memory, not multi-country compliance).
 
-This document verifies that all compliance documentation includes proper citations to official regulatory sources (government websites, legal texts, authority guidance).
+Its URL check compares HTTPS origins, not arbitrary substrings: a lookalike such as
+`https://www.garanteprivacy.it.example.org` is not an authority citation.
+This is an **offline citation-presence check**. It does not verify mailbox validity,
+telephone numbers, runtime implementation, translations' legal accuracy, or live compliance.
+A website citation must never be reported as proof that all authority contact details are correct.
 
----
+The existing country-wide source inventory remains advisory. It asks for some
+cross-domain sources even in unrelated documents; missing inventory entries are
+still reported as warnings, not suppressed or filled with irrelevant links.
+Any change to that inventory requires a separate document-by-document review.
 
-## Audit Results by Country
+## Primary sources read for the disputed authority criteria
 
-### Italy
+| Document / role           | Official source                                                                                                                                                                                                    | What was established                                                                                                                                                                |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Italy privacy and cookies | [Garante authority](https://www.garanteprivacy.it/home/autorita)                                                                                                                                                   | Identifies the independent data protection authority, its statutory basis, and official website. The two documents now cite this page.                                              |
+| Italy accessibility       | [AgID accessibility and usability](https://www.agid.gov.it/it/ambiti-intervento/accessibilita-usabilita)                                                                                                           | AgID describes monitoring under Law 4/2004 and digital-service supervision under Legislative Decree 82/2022. Requiring the Garante instead was the wrong domain criterion.          |
+| Spain accessibility       | [Public-administration accessibility portal](https://administracionelectronica.gob.es/pae_Home/pae_Estrategias/pae_Accesibilidad.html), [BOE: RD 1112/2018](https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699) | The official portal supplies public-sector accessibility resources; the decree governs public-sector sites/apps and monitoring. OAW's portal is relevant, not an AEPD privacy link. |
+| France accessibility      | [DINUM RGAA scope](https://accessibilite.numerique.gouv.fr/obligations/champ-application/)                                                                                                                         | Identifies Article 47 of Law 2005-102 as the accessibility basis. DINUM is the RGAA reference publisher; the checker does not certify it as the sole enforcement authority.         |
+| Germany accessibility     | [BFIT-Bund](https://www.bfit-bund.de/DE/Home/home_node.html)                                                                                                                                                       | The official page identifies the federal IT accessibility monitoring body. BFIT-Bund is distinct from the privacy regulator BfDI.                                                   |
 
-| Document                        | Required Sources        | Status      | Citations Found                                                                |
-| ------------------------------- | ----------------------- | ----------- | ------------------------------------------------------------------------------ |
-| **data-protection.md**          | Garante, Normattiva     | ✅ COMPLETE | https://www.garanteprivacy.it, https://www.normattiva.it                       |
-| **cookie-compliance.md**        | Garante, ePrivacy, GDPR | ✅ COMPLETE | https://www.garantiprivacy.it, https://eur-lex.europa.eu, https://gdpr-info.eu |
-| **accessibility-compliance.md** | AGID, Normattiva        | ⚠️ PARTIAL  | https://www.agid.gov.it (missing: https://www.normattiva.it)                   |
-| **ai-regulatory-contacts.md**   | AGID                    | ✅ COMPLETE | https://www.agid.gov.it                                                        |
+For the four disputed accessibility documents, the mandatory website-presence
+criterion now selects the subject's body (AgID, OAW, DINUM, BFIT-Bund).
+It is still a blocking check if that body's website is absent. A data-protection
+regulator's link does not substitute for an accessibility-body link.
+The UK and AI-regulatory-contact criteria were not reinterpreted in this review.
 
-**Missing Citations**:
+## Factual corrections and remaining review
 
-- accessibility-compliance.md: Add https://www.normattiva.it reference for Law 4/2004
+1. **Italy cookie guidance identification corrected.** The document previously called the
+   10 June 2021 guidance “Provvedimento 229/2021”. Its cited document,
+   [Garante docweb 9677876](https://www.garanteprivacy.it/home/docweb/-/docweb-display/docweb/9677876),
+   identifies **register no. 231 of 10 June 2021**. The release coordinator
+   approved correcting the identifier and primary-source link only. Obligations,
+   consent terms, and sanctions were not changed. The checker still rejects the
+   old incorrect reference.
+2. **France accessibility law citation corrected.** “Law 78-17 Article 47” was
+   replaced with DINUM's **Law 2005-102, Article 47**, dated 11 February 2005,
+   under the same factual-correction approval. Applicability, authority
+   responsibilities, and sanctions remain unchanged and require legal review;
+   the native checker still rejects the old incorrect reference.
+3. **Broader assertions remain unproven.** The country accessibility documents
+   assert blanket educational-platform applicability, identical fine ranges,
+   and verified compliance while also listing an accessibility statement as
+   not yet created. This review did not establish those claims or rerun
+   accessibility acceptance tests. They must not be used as release approval.
+4. **Contact details are not independently certified.** For example, the current
+   Garante authority page publishes `protocollo@gpdp.it`, while the documents
+   use `garante@gpdp.it`. Website verification alone cannot establish the latter
+   address's current validity; it has not been silently replaced.
 
-### Spain
+The previous January audit's “Complete” status and country percentages did not
+represent the current files. They are superseded by these findings, not by a
+new blanket compliance claim.
 
-| Document                        | Required Sources          | Status      | Citations Found                                                    |
-| ------------------------------- | ------------------------- | ----------- | ------------------------------------------------------------------ |
-| **data-protection.md**          | AEPD, BOE                 | ✅ COMPLETE | https://www.aepd.es, https://www.boe.es                            |
-| **cookie-compliance.md**        | AEPD, BOE, ePrivacy, GDPR | ✅ COMPLETE | https://www.aepd.es, https://www.boe.es, https://eur-lex.europa.eu |
-| **accessibility-compliance.md** | AEPD, BOE                 | ✅ COMPLETE | https://www.aepd.es, https://www.boe.es                            |
-| **ai-regulatory-contacts.md**   | AEPD                      | ✅ COMPLETE | https://www.aepd.es                                                |
+## Verification and repair are separate
 
-**Missing Citations**: None
+Run from the workspace root with the project's installed Node/tsx:
 
-### France
-
-| Document                        | Required Sources            | Status      | Citations Found                                                                              |
-| ------------------------------- | --------------------------- | ----------- | -------------------------------------------------------------------------------------------- |
-| **data-protection.md**          | CNIL, Legifrance            | ✅ COMPLETE | https://www.cnil.fr, https://www.legifrance.gouv.fr                                          |
-| **cookie-compliance.md**        | CNIL, DINUM, ePrivacy, GDPR | ⚠️ PARTIAL  | https://www.cnil.fr (missing: https://www.numerique.gouv.fr)                                 |
-| **accessibility-compliance.md** | CNIL, DINUM, Legifrance     | ⚠️ PARTIAL  | https://www.cnil.fr, https://www.numerique.gouv.fr (missing: https://www.legifrance.gouv.fr) |
-| **ai-regulatory-contacts.md**   | CNIL                        | ✅ COMPLETE | https://www.cnil.fr                                                                          |
-
-**Missing Citations**:
-
-- cookie-compliance.md: Add https://www.numerique.gouv.fr reference for RGAA
-- accessibility-compliance.md: Add https://www.legifrance.gouv.fr reference for Law 78-17
-
-### Germany
-
-| Document                        | Required Sources                          | Status      | Citations Found                                                                         |
-| ------------------------------- | ----------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
-| **data-protection.md**          | BfDI, Gesetze-im-Internet                 | ✅ COMPLETE | https://www.bfdi.bund.de, https://www.gesetze-im-internet.de                            |
-| **cookie-compliance.md**        | BfDI, Gesetze-im-Internet, ePrivacy, GDPR | ✅ COMPLETE | https://www.bfdi.bund.de, https://www.gesetze-im-internet.de, https://eur-lex.europa.eu |
-| **accessibility-compliance.md** | BfDI, Gesetze-im-Internet                 | ✅ COMPLETE | https://www.bfdi.bund.de, https://www.gesetze-im-internet.de                            |
-| **ai-regulatory-contacts.md**   | BfDI                                      | ⚠️ PARTIAL  | https://www.bfdi.bund.de (missing: https://www.gesetze-im-internet.de for BITV 2.0)     |
-
-**Missing Citations**:
-
-- ai-regulatory-contacts.md: Add https://www.gesetze-im-internet.de reference for BITV 2.0
-
-### UK
-
-| Document                        | Required Sources                | Status      | Citations Found                                                                                         |
-| ------------------------------- | ------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
-| **data-protection.md**          | ICO, Legislation.gov.uk         | ✅ COMPLETE | https://ico.org.uk, https://www.legislation.gov.uk                                                      |
-| **cookie-compliance.md**        | ICO, GDPR                       | ✅ COMPLETE | https://ico.org.uk, https://gdpr-info.eu                                                                |
-| **accessibility-compliance.md** | EHRC, ICO, GOV.UK Design System | ⚠️ PARTIAL  | https://ico.org.uk (missing: https://www.equalityhumanrights.com, https://design-system.service.gov.uk) |
-| **ai-regulatory-contacts.md**   | ICO                             | ✅ COMPLETE | https://ico.org.uk                                                                                      |
-
-**Missing Citations**:
-
-- accessibility-compliance.md: Add https://www.equalityhumanrights.com and https://design-system.service.gov.uk references
-
----
-
-## Required Official Sources by Country
-
-### Italy
-
-- **Garante**: https://www.garanteprivacy.it
-- **AGID**: https://www.agid.gov.it
-- **Normattiva**: https://www.normattiva.it
-
-### Spain
-
-- **AEPD**: https://www.aepd.es
-- **BOE**: https://www.boe.es
-
-### France
-
-- **CNIL**: https://www.cnil.fr
-- **DINUM**: https://www.numerique.gouv.fr
-- **Legifrance**: https://www.legifrance.gouv.fr
-
-### Germany
-
-- **BfDI**: https://www.bfdi.bund.de
-- **Gesetze-im-Internet**: https://www.gesetze-im-internet.de
-
-### UK
-
-- **ICO**: https://ico.org.uk
-- **EHRC**: https://www.equalityhumanrights.com
-- **GOV.UK Design System**: https://design-system.service.gov.uk
-- **Legislation.gov.uk**: https://www.legislation.gov.uk
-
----
-
-## Common EU/International Sources
-
-All countries should reference:
-
-- **ePrivacy Directive**: https://eur-lex.europa.eu/eli/dir/2002/58/oj
-- **GDPR**: https://gdpr-info.eu
-- **EU AI Act**: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
-- **EDPB Guidelines**: https://edpb.ec.europa.eu
-- **WCAG 2.1**: https://www.w3.org/WAI/WCAG21/quickref/
-
----
-
-## Citation Format
-
-Each document should include a "References & Official Sources" section with:
-
-```markdown
-## References & Official Sources
-
-### [Country] Official Sources
-
-| Source             | URL         | Purpose                 |
-| ------------------ | ----------- | ----------------------- |
-| **Authority Name** | https://... | Official regulator      |
-| **Law Text**       | https://... | Legal text              |
-| **Guidelines**     | https://... | Official interpretation |
-
-### EU/International References
-
-| Source                 | URL         | Purpose                |
-| ---------------------- | ----------- | ---------------------- |
-| **ePrivacy Directive** | https://... | Framework              |
-| **GDPR**               | https://... | Data protection        |
-| **WCAG 2.1**           | https://... | Accessibility standard |
+```bash
+pnpm exec tsx scripts/compliance-audit-source-verification.ts
 ```
 
----
-
-## Verification Status
-
-| Country     | Documents Audited | Citations Complete | Missing Citations               |
-| ----------- | ----------------- | ------------------ | ------------------------------- |
-| **Italy**   | 4                 | 3/4 (75%)          | 1 (accessibility-compliance.md) |
-| **Spain**   | 4                 | 4/4 (100%)         | 0                               |
-| **France**  | 4                 | 2/4 (50%)          | 2 (cookie, accessibility)       |
-| **Germany** | 4                 | 3/4 (75%)          | 1 (ai-regulatory-contacts.md)   |
-| **UK**      | 4                 | 3/4 (75%)          | 1 (accessibility-compliance.md) |
-
-**Overall**: 15/20 documents (75%) have complete citations
-
----
-
-## Action Items
-
-### High Priority (Missing Critical Sources)
-
-1. **Italy - accessibility-compliance.md**
-   - Add: https://www.normattiva.it reference for Law 4/2004
-
-2. **France - cookie-compliance.md**
-   - Add: https://www.numerique.gouv.fr reference for RGAA 4.1
-
-3. **France - accessibility-compliance.md**
-   - Add: https://www.legifrance.gouv.fr reference for Law 78-17
-
-4. **UK - accessibility-compliance.md**
-   - Add: https://www.equalityhumanrights.com reference for EHRC
-   - Add: https://design-system.service.gov.uk reference for GOV.UK Design System
-
-5. **Germany - ai-regulatory-contacts.md**
-   - Add: https://www.gesetze-im-internet.de reference for BITV 2.0
-
-### Medium Priority (Enhancement)
-
-- Add case law references where relevant
-- Add EDPB guideline references for cross-country consistency
-- Add EU AI Act references in AI-related docs
-
----
-
-## Verification Script
-
-Run `npx tsx scripts/compliance-audit-source-verification.ts` to verify citations automatically.
-
-**Script checks**:
-
-- Required sources are present in each document
-- Authority contacts are correct
-- Official URLs are cited
-
----
-
-**Document Version**: 1.0
-**Last Updated**: 2026-01-27
-**Status**: Audit Complete
-**Next Review**: 2026-04-27 (quarterly)
+The command reads documentation only. Reintroducing either incorrect statutory
+reference fails the audit; inventory warnings are printed separately. Source links
+are editorial corrections, not approval to change consent rules, applicability,
+retention, penalties, enforcement assignments, or a compliance declaration.
+The independent release/legal reviewer owns acceptance after the release
+owner approves and implements the substantive corrections.

@@ -15,6 +15,7 @@ node_modules
 
 # testing
 /coverage
+/apps/web/coverage/
 /reports
 test-results/
 playwright-report/

@@ -1,7 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { validateProductionMetadata, validateProductionValues } from './lib/production-env-policy';
+import {
+  validateProductionMetadata,
+  validateProductionValues,
+  validateSentryMetadata,
+} from './lib/production-env-policy';
 
 export function checkProductionEnvironment(args: string[], env: unknown): string {
   if (args?.length === 1 && args[0] === 'build') {
@@ -21,17 +25,30 @@ export function checkProductionEnvironment(args: string[], env: unknown): string
     if (failures.length) throw new Error(failures.join('\n'));
     return 'Production environment values verified (presence and newline integrity).';
   }
-  if (args?.length !== 2 || args[0] !== 'metadata' || !args[1]?.trim()) {
-    throw new Error('Usage: check-production-env.ts metadata <linked-directory> | values | build');
+  if (
+    args?.length !== 2 ||
+    !['metadata', 'sentry-metadata', 'release-metadata'].includes(args[0]) ||
+    !args[1]?.trim()
+  ) {
+    throw new Error(
+      'Usage: check-production-env.ts metadata|sentry-metadata|release-metadata <linked-directory> | values | build',
+    );
   }
+  const values = env && typeof env === 'object' ? (env as Record<string, unknown>) : {};
+  const token = values.VERCEL_TOKEN;
+  if (token !== undefined && (typeof token !== 'string' || /[\r\n]/.test(token))) {
+    throw new Error('Invalid Vercel CLI credential');
+  }
+  const cliArgs = ['env', 'ls', 'production', '--format=json', '--cwd', args[1]];
+  if (typeof token === 'string' && token.trim()) cliArgs.push('--token', token);
   let output: string;
   try {
     // env ls does not request decryption; never print its payload.
-    output = execFileSync(
-      'vercel',
-      ['env', 'ls', 'production', '--format=json', '--cwd', args[1]],
-      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000 },
-    );
+    output = execFileSync('vercel', cliArgs, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 60_000,
+    });
   } catch {
     throw new Error('Unable to retrieve production environment metadata');
   }
@@ -40,6 +57,14 @@ export function checkProductionEnvironment(args: string[], env: unknown): string
     metadata = JSON.parse(output);
   } catch {
     throw new Error('Invalid production environment metadata');
+  }
+  if (args[0] === 'sentry-metadata' || args[0] === 'release-metadata') {
+    validateSentryMetadata(metadata);
+    if (args[0] === 'release-metadata') {
+      validateProductionMetadata(metadata);
+      return 'Production and Sentry environment names verified; values are checked only in the deployment runtime.';
+    }
+    return 'Sentry environment names verified; values are checked only in the deployment runtime.';
   }
   validateProductionMetadata(metadata);
   return 'Production environment names verified; values are checked only in the deployment runtime.';

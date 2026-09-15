@@ -12,7 +12,7 @@ vi.mock('node:fs', async (original) => ({
   existsSync: vi.fn(() => false),
 }));
 const exec = vi.mocked(execFileSync);
-const config = JSON.parse(fs.readFileSync('vercel.json', 'utf8'));
+const config = JSON.parse(fs.readFileSync('apps/web/vercel.json', 'utf8'));
 const sha = 'a'.repeat(40);
 const env = {
   GITHUB_SHA: sha,

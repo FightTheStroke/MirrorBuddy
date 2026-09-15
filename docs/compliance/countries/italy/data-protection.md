@@ -31,7 +31,7 @@
 
 **Contact Information:**
 
-- **Website**: https://www.gpdp.it
+- **Website**: https://www.garanteprivacy.it/home/autorita
 - **Email**: garante@gpdp.it
 - **Phone**: +39 06 69677 1
 - **Address**: Piazza Venezia 11, 00187 Roma, Italy

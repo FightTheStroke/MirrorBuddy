@@ -14,6 +14,8 @@ set -uo pipefail
 SCRIPT_DIR_PR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/build-lock.sh
 source "$SCRIPT_DIR_PR/lib/build-lock.sh"
+source "$SCRIPT_DIR_PR/lib/checks.sh"
+cd "$SCRIPT_DIR_PR/.."
 
 # Colors
 RED='\033[0;31m'
@@ -51,24 +53,11 @@ if [ -n "$MISSING_DOCS" ]; then
 fi
 echo -e "${GREEN}✓ Documentation exists${NC}"
 
-# Code hygiene with ripgrep (much faster than grep)
-# Exclude: logger.ts, test files, JSDoc comments (: * ), intentional demo sandboxing
-if command -v rg &> /dev/null; then
-    TODO_COUNT=$(rg -c "(TODO|FIXME|HACK|XXX):" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | rg -v "__tests__" | rg -v "\.test\." | rg -v "\.spec\." | awk -F: '{sum+=$2} END {print sum+0}')
-    # Filter console.* calls: exclude logger, test files, JSDoc comments (: * ), demo-html-builder
-    CONSOLE_COUNT=$(rg "console\.(log|warn|error|debug|info)\(" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | rg -v "__tests__" | rg -v "\.test\." | rg -v "\.spec\." | rg -v "logger" | rg -v ": \*" | rg -v "demo-html-builder" | /usr/bin/wc -l | tr -d ' ')
-else
-    TODO_COUNT=$(/usr/bin/grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | /usr/bin/grep -v "__tests__" | /usr/bin/grep -v "\.test\." | /usr/bin/wc -l | tr -d ' ')
-    CONSOLE_COUNT=$(/usr/bin/grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | /usr/bin/grep -v "logger" | /usr/bin/grep -v "__tests__" | /usr/bin/grep -v "\.test\." | /usr/bin/grep -v ": \*" | /usr/bin/wc -l | tr -d ' ')
-fi
-
-if [ "$TODO_COUNT" -gt 0 ]; then
-    echo -e "${RED}✗ Found $TODO_COUNT TODO/FIXME markers${NC}"
-    rg "(TODO|FIXME|HACK|XXX):" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | head -5
-    exit 1
-fi
-if [ "$CONSOLE_COUNT" -gt 0 ]; then
-    echo -e "${RED}✗ Found $CONSOLE_COUNT console.* calls (use logger)${NC}"
+exec_hygiene
+cat "$_OUTPUT"
+rm -f "$_OUTPUT"
+if [ "$_EXIT" -ne 0 ]; then
+    echo -e "${RED}✗ Code hygiene inspection failed${NC}"
     exit 1
 fi
 echo -e "${GREEN}✓ Code hygiene passed${NC}"
@@ -113,7 +102,7 @@ LINT_PID=$!
 TYPE_PID=$!
 
 (
-    npm audit --audit-level=high > "$TEMP_DIR/audit.log" 2>&1
+    pnpm audit --audit-level=high > "$TEMP_DIR/audit.log" 2>&1
     echo $? > "$TEMP_DIR/audit.exit"
 ) &
 AUDIT_PID=$!
@@ -176,8 +165,14 @@ if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
     cat "$TEMP_DIR/build.log"
     exit 1
 fi
+if ! node "$SCRIPT_DIR_PR/prepare-standalone.mjs" > "$TEMP_DIR/standalone.log" 2>&1; then
+    release_build_lock
+    echo -e "${RED}✗ Standalone preparation failed${NC}"
+    cat "$TEMP_DIR/standalone.log"
+    exit 1
+fi
 release_build_lock
-echo -e "${GREEN}✓ Build successful${NC}"
+echo -e "${GREEN}✓ Build successful; standalone assets prepared${NC}"
 
 PHASE3_TIME=$(date +%s)
 echo -e "${BLUE}   Phase 3: $((PHASE3_TIME - PHASE2_TIME))s${NC}"
@@ -194,7 +189,8 @@ if [ -f "./scripts/perf-check.sh" ]; then
         exit 1
     fi
 else
-    echo -e "${YELLOW}⚠ perf-check.sh not found, skipping${NC}"
+    echo -e "${RED}✗ Required perf-check.sh not found${NC}"
+    exit 1
 fi
 
 PHASE4_TIME=$(date +%s)
@@ -207,9 +203,13 @@ echo ""
 echo -e "${BLUE}[PHASE 5] File size validation...${NC}"
 
 if [ -f "./scripts/check-file-size.sh" ]; then
-    ./scripts/check-file-size.sh || true  # Non-blocking, just report
+    if ! ./scripts/check-file-size.sh; then
+        echo -e "${RED}✗ File-size inventory failed${NC}"
+        exit 1
+    fi
 else
-    echo -e "${YELLOW}⚠ check-file-size.sh not found, skipping${NC}"
+    echo -e "${RED}✗ Required check-file-size.sh not found${NC}"
+    exit 1
 fi
 
 PHASE5_TIME=$(date +%s)
@@ -236,7 +236,7 @@ echo " Total:                 ${TOTAL}s"
 echo "=========================================="
 echo ""
 echo "Next steps:"
-echo "  1. Run E2E tests: npm run test"
-echo "  2. Run release gate: npm run release:gate"
-echo "  3. Create release: npm run version:patch"
+echo "  1. Set the final release version before complete verification."
+echo "  2. Run npm run release:gate for native evidence; it runs the browser tests."
+echo "  3. After independent approval, publish and verify production."
 echo ""

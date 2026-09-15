@@ -1,63 +1,78 @@
 #!/usr/bin/env bats
-# Test suite for doc-code-audit.sh script
-# Tests documentation/code mismatch detection
+# Native fixtures; never read or modify the developer's application checkout.
 
 setup() {
-  # Load the script (don't run it yet)
-  load ../doc-code-audit
+  ROOT="$BATS_TEST_TMPDIR/project"
+  mkdir -p "$ROOT/scripts" "$ROOT/apps/web/src/lib/tier" \
+    "$ROOT/apps/web/src/app/api/health" "$ROOT/docs/operations"
+  cp "$BATS_TEST_DIRNAME/../doc-code-audit.sh" "$ROOT/scripts/"
+  cat > "$ROOT/README.md" <<'DOC'
+## Trial Mode
+| Chat messages | 10 | Conversations with Maestri |
+| Voice time | 5 minutes |
+| Tool calls | 10 |
+| Documents | 1 |
+No per-Maestro cap (ADR 0168).
+---
+| `healthy` | OK |
+| `degraded` | Warning |
+| `unhealthy` | Failed |
+DOC
+  cat > "$ROOT/apps/web/src/lib/tier/tier-fallbacks.ts" <<'CODE'
+if (code === TierCode.TRIAL) {
+return {
+chatLimitDaily: 10,
+voiceMinutesDaily: 5,
+toolsLimitDaily: 10,
+docsLimitTotal: 1,
+realtimeModel: 'gpt-realtime-mini',
+};
+}
+CODE
+  printf "'healthy'\n'degraded'\n'unhealthy'\n" > "$ROOT/apps/web/src/app/api/health/route.ts"
+  printf '{ "path": "/api/cron/metrics-push",\n"schedule": "*/5 * * * *"\n}' > "$ROOT/apps/web/vercel.json"
+  printf 'Metrics push: 5 minutes\n' > "$ROOT/docs/operations/CRON-JOBS.md"
 }
 
-# Test 1: Trial limits check - README vs TierService
-@test "doc-code-audit detects trial chat limit mismatch" {
-  # This would fail if README says 10 but code says something else
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'trial.*chat'"
-  # Script should not report this as an error (both should be 10)
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]  # Either pass or report mismatch
-}
-
-@test "doc-code-audit detects trial voice limit mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'trial.*voice'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-@test "doc-code-audit detects trial tools limit mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'trial.*tool'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-@test "doc-code-audit detects trial maestri limit mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'trial.*maestri'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-# Test 2: Health endpoint status values
-@test "doc-code-audit detects health status value mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'health.*status'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-# Test 3: Voice model name check
-@test "doc-code-audit detects voice model name mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'voice.*model'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-# Test 4: Metrics push cadence
-@test "doc-code-audit detects metrics push cadence mismatch" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh 2>&1 | grep -i 'metrics.*cadence'"
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]
-}
-
-# Test 5: Exit status
-@test "doc-code-audit exits with 0 if no mismatches found" {
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh >/dev/null 2>&1"
+@test "current monorepo defaults and single-quoted health states pass" {
+  run bash "$ROOT/scripts/doc-code-audit.sh"
   [ "$status" -eq 0 ]
+  [[ "$output" == *"No per-Maestro cap"* ]]
 }
 
-@test "doc-code-audit exits with 1 if mismatches found" {
-  # First, introduce a mismatch to test exit code
-  # This is a sanity check - in normal operation it should exit 0
-  run bash -c "cd /Users/roberdan/GitHub/MirrorBuddy-plan-088-doc-security && ./scripts/doc-code-audit.sh >/dev/null 2>&1"
-  # Should exit 0 if everything is aligned
-  [ "$status" -eq 0 ] || [ "$status" -eq 1 ]  # Accept either for now
+@test "README trial chat mismatch is blocking" {
+  printf '## Trial Mode\n| Chat messages | 99 |\n---\n' > "$ROOT/README.md"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Trial chat limit mismatch"* ]]
+}
+
+@test "removed Maestro cap is not accepted as current behavior" {
+  printf '\n| **Maestri access** | 3 random | 25 | 26 |\n' >> "$ROOT/README.md"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Removed per-Maestro cap"* ]]
+}
+
+@test "unhealthy never substitutes for healthy" {
+  printf "'degraded'\n'unhealthy'\n" > "$ROOT/apps/web/src/app/api/health/route.ts"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Health status 'healthy' mismatch"* ]]
+}
+
+@test "deprecated voice models and missing metrics configuration fail" {
+  printf "\nrealtimeModel: 'gpt-4o-realtime-preview'\n" >> "$ROOT/apps/web/src/lib/tier/tier-fallbacks.ts"
+  printf '{}\n' > "$ROOT/apps/web/vercel.json"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"deprecated voice model"* ]]
+  [[ "$output" == *"Metrics push cadence mismatch"* ]]
+}
+
+@test "missing operational documentation cannot silently skip cross-check" {
+  rm "$ROOT/docs/operations/CRON-JOBS.md"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Required audit input missing or unreadable"* ]]
 }

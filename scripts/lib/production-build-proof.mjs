@@ -2,12 +2,13 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const productionBuildCommand = 'tsx scripts/build-with-production-proof.ts';
+export const productionBuildCommand = 'tsx ../../scripts/build-with-production-proof.ts';
+export const productionConfigFile = 'apps/web/vercel.json';
 export const proofRoute = '/production-build-proof.js';
 export const proofFile = `apps/web/public${proofRoute}`;
 export const nextBuildIdFile = 'apps/web/.next/BUILD_ID';
 export const proofSources = [
-  'vercel.json',
+  productionConfigFile,
   'package.json',
   'pnpm-lock.yaml',
   'apps/web/package.json',
@@ -40,7 +41,7 @@ export function assertBuildConfiguration(input) {
 /** @param {string} root */
 export function buildSourceIdentity(root) {
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- Root is the source checkout, never runtime metadata.
-  assertBuildConfiguration(JSON.parse(readFileSync(join(root, 'vercel.json'), 'utf8')));
+  assertBuildConfiguration(JSON.parse(readFileSync(join(root, productionConfigFile), 'utf8')));
   /** @param {string[]} paths */
   const digest = (paths) => {
     const hash = createHash('sha256');

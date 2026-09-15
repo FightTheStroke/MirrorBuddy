@@ -27,20 +27,20 @@ French RGAA 4.1 requires public sector websites and educational platforms to com
 
 ### Statutory Reference
 
-| Document                       | Section       | Effective           | Scope                                    |
-| ------------------------------ | ------------- | ------------------- | ---------------------------------------- |
-| **RGAA 4.1** (French Standard) | All criteria  | 2021-09-20          | Public sector + educational institutions |
-| **EU Directive 2016/2102**     | Articles 1-12 | 2016-12-26          | Public sector websites/apps              |
-| **Law 78-17**                  | Article 47    | 1978 (revised 2018) | Accessibility requirements               |
-| **WCAG 2.1**                   | Level AA      | 2018-06-05          | International standard                   |
+| Document                       | Section       | Effective        | Scope                                    |
+| ------------------------------ | ------------- | ---------------- | ---------------------------------------- |
+| **RGAA 4.1** (French Standard) | All criteria  | 2021-09-20       | Public sector + educational institutions |
+| **EU Directive 2016/2102**     | Articles 1-12 | 2016-12-26       | Public sector websites/apps              |
+| **Law 2005-102**               | Article 47    | 11 February 2005 | Accessibility requirements               |
+| **WCAG 2.1**                   | Level AA      | 2018-06-05       | International standard                   |
 
 ### Key Requirements
 
-| Article               | Title                   | Requirements                 | Applies To                |
-| --------------------- | ----------------------- | ---------------------------- | ------------------------- |
-| **RGAA 4.1**          | Accessibility criteria  | WCAG 2.1 Level AA compliance | All public-facing content |
-| **Law 78-17 Art. 47** | Accessibility statement | Published on website         | All public sector sites   |
-| **RGAA 4.1**          | Monitoring              | Regular accessibility audits | Ongoing compliance        |
+| Article                  | Title                   | Requirements                 | Applies To                |
+| ------------------------ | ----------------------- | ---------------------------- | ------------------------- |
+| **RGAA 4.1**             | Accessibility criteria  | WCAG 2.1 Level AA compliance | All public-facing content |
+| **Law 2005-102 Art. 47** | Accessibility statement | Published on website         | All public sector sites   |
+| **RGAA 4.1**             | Monitoring              | Regular accessibility audits | Ongoing compliance        |
 
 ---
 
@@ -356,4 +356,4 @@ While MirrorBuddy targets WCAG 2.1 AA and RGAA 4.1 compliance, the following lim
 **Status**: Verification Complete
 **Compliance Owner**: Development/QA Team
 **Next Review**: 2026-04-27 (quarterly)
-**Reference**: RGAA 4.1, Law 78-17, EU Directive 2016/2102, WCAG 2.1, DINUM Guidelines
+**Reference**: RGAA 4.1, [Law 2005-102 Article 47 (DINUM)](https://accessibilite.numerique.gouv.fr/obligations/champ-application/), EU Directive 2016/2102, WCAG 2.1, DINUM Guidelines

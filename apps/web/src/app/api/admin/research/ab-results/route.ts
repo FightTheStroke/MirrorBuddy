@@ -17,12 +17,6 @@ type ABExperimentRecord = {
   bucketConfigs: BucketConfig[];
 };
 
-type BucketCount = {
-  abExperimentId: string | null;
-  abBucketLabel: string | null;
-  _count: { _all: number };
-};
-
 type ConversationIdRow = { id: string; userId: string };
 
 type SessionMetricsAggregate = {
@@ -32,11 +26,6 @@ type SessionMetricsAggregate = {
     stuckLoopCount: number | null;
     refusalCount: number | null;
   };
-};
-
-type SessionOutcomeGroup = {
-  outcome: string | null;
-  _count: { _all: number };
 };
 
 const toMetric = (value: number | null): number => value ?? 0;
@@ -58,15 +47,14 @@ export const GET = pipe(
     orderBy: { createdAt: 'desc' },
   })) as ABExperimentRecord[];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma groupBy typing mismatch with optional AB fields
-  const conversationBuckets = (await (prisma.conversation.groupBy as any)({
+  const conversationBuckets = await prisma.conversation.groupBy({
     by: ['abExperimentId', 'abBucketLabel'],
     where: {
       abExperimentId: { not: null },
       abBucketLabel: { not: null },
     },
     _count: { _all: true },
-  })) as BucketCount[];
+  });
 
   const bucketCountMap = new Map<string, number>();
   for (const row of conversationBuckets) {
@@ -109,12 +97,11 @@ export const GET = pipe(
               refusalCount: true,
             },
           })) as SessionMetricsAggregate;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma groupBy typing mismatch
-          const outcomes = (await (prisma.sessionMetrics.groupBy as any)({
+          const outcomes = await prisma.sessionMetrics.groupBy({
             by: ['outcome'],
             where: { userId: { in: userIds } },
             _count: { _all: true },
-          })) as SessionOutcomeGroup[];
+          });
           const successCount =
             outcomes.find((item) => item.outcome === 'success')?._count._all ?? 0;
           const successRate = roundOne((successCount / conversations.length) * 100);

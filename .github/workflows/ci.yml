@@ -121,6 +121,8 @@ jobs:
               - 'playwright.config*.ts'
             config:
               - 'package.json'
+              - 'apps/web/vercel.json'
+              - 'vercel.json'
               - 'apps/web/package.json'
               - 'packages/*/package.json'
               - 'pnpm-lock.yaml'
@@ -2187,8 +2189,8 @@ jobs:
   # Deploys to Vercel as PREVIEW (staging) after ALL checks pass.
   # On main, auto-promote-production builds the same source with production
   # values remotely, then verifies and promotes it (after deployment-gate success).
-  # Git-triggered auto-deploy (push to main) is disabled via ignoreCommand in
-  # vercel.json (T0.1) — explicit CLI deployments below are the automated path.
+  # Git-triggered auto-deploy is disabled by git.deploymentEnabled in
+  # apps/web/vercel.json — explicit CLI deployments below are the automated path.
   # The promote-to-production.yml workflow remains
   # available for manual re-promote / rollback.
   # ============================================================================
@@ -2251,7 +2253,7 @@ jobs:
           # read and write the live production database.
           # Production is built separately from source in Vercel's production
           # runtime; no production values are downloaded by the promotion job.
-          vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          vercel pull --yes --environment=preview --local-config=apps/web/vercel.json --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Assert staging is not pointed at the production database
         run: |
@@ -2276,12 +2278,12 @@ jobs:
         env:
           VERCEL_ENV: preview
           VERCEL_TARGET_ENV: preview
-        run: vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --target=preview --local-config=apps/web/vercel.json --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy to Staging (Preview)
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --local-config=apps/web/vercel.json --token=${{ secrets.VERCEL_TOKEN }})
           echo "✅ Staging deployed to: $url"
           echo "DEPLOYMENT_URL=$url" >> $GITHUB_ENV
           echo "deployment_url=$url" >> $GITHUB_OUTPUT
@@ -2720,44 +2722,33 @@ jobs:
   # ============================================================================
   # RELEASE EVIDENCE PACK
   # ============================================================================
-  # Generates audit trail on tagged releases (v*).
-  # Collects lint, typecheck, unit test summary, SBOM, npm audit, CHANGELOG.
+  # Collects GitHub execution metadata on tagged releases (v*).
+  # Not a native local release certificate or authorization to reuse local checks.
   # ============================================================================
   release-evidence-pack:
     name: Release Evidence Pack
     runs-on: ubuntu-latest
     needs: [deployment-gate]
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      actions: read
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
 
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: npm-cache
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: pnpm install --frozen-lockfile
-
-      - run: npx prisma generate
-
-      - name: Generate evidence pack
-        run: ./scripts/release-evidence-pack.sh
+      - name: Collect CI execution summary
+        id: evidence
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/collect-ci-evidence.mjs
 
       - name: Upload evidence pack
         uses: actions/upload-artifact@v4
         with:
           name: release-evidence-pack-${{ github.ref_name }}
-          path: reports/evidence-pack-*.md
+          path: ${{ steps.evidence.outputs.report_path }}
+          if-no-files-found: error
           retention-days: 365
