@@ -36,9 +36,9 @@ const nextConfig: NextConfig = {
     '@mirrorbuddy/accessibility',
     '@mirrorbuddy/tools',
   ],
-  // Enable standalone output for Docker deployment
-  // Creates .next/standalone with minimal server.js for production
-  output: 'standalone',
+  // Next 16.3.4's Turbopack/Vercel adapter omits the trace standalone requires
+  // (ENOENT; vercel/next.js#96646/#97287). Docker needs standalone; Vercel does not.
+  output: process.env.VERCEL === '1' ? undefined : 'standalone',
   // Monorepo: tell Next to trace files starting from the workspace root, not apps/web.
   // Without this, dynamic requires of workspace packages fail at runtime in standalone.
   outputFileTracingRoot: path.join(__dirname, '../..'),
