@@ -1,0 +1,106 @@
+name: Migration Repair
+
+# A partially applied migration leaves a failed row in _prisma_migrations, and Prisma
+# then refuses every later migration — which blocks the production build and therefore
+# the release. Repairing it needs production database credentials, which live here and
+# must not be copied to a laptop. Manual dispatch only; never triggered automatically.
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: 'Migration directory name under apps/web/prisma/migrations'
+        required: true
+        type: string
+      action:
+        description: 'status = read-only report. applied/rolled-back = repair the failed row.'
+        required: true
+        default: status
+        type: choice
+        options:
+          - status
+          - applied
+          - rolled-back
+      confirm:
+        description: 'Type REPAIR to allow a write. Ignored when action is status.'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migration-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    name: Repair a failed production migration
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The name reaches the Prisma CLI, so it must be a real migration in this commit.
+      - name: Validate the requested migration exists in this source
+        env:
+          MIGRATION: ${{ inputs.migration }}
+        run: |
+          case "$MIGRATION" in
+            *[!0-9a-zA-Z_-]* | '')
+              echo "Migration name contains characters no migration directory uses"
+              exit 1
+              ;;
+          esac
+          if [ ! -f "apps/web/prisma/migrations/${MIGRATION}/migration.sql" ]; then
+            echo "No such migration in this commit: ${MIGRATION}"
+            exit 1
+          fi
+          echo "Migration found: ${MIGRATION}"
+
+      - name: Require an explicit confirmation before any write
+        if: inputs.action != 'status'
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "REPAIR" ]; then
+            echo "Refusing to write: the confirmation input must be exactly REPAIR"
+            exit 1
+          fi
+          echo "Confirmation accepted"
+
+      # Values stay inside the runner. Only the migration state is printed.
+      - name: Migration status before
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx prisma migrate status || true
+
+      - name: Resolve the failed migration
+        if: inputs.action != 'status'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          MIGRATION: ${{ inputs.migration }}
+          ACTION: ${{ inputs.action }}
+        run: npx prisma migrate resolve "--${ACTION}" "$MIGRATION"
+
+      - name: Migration status after
+        if: inputs.action != 'status'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+        run: npx prisma migrate status
