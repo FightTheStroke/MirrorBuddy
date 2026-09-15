@@ -42,6 +42,8 @@ describe('production migration repair workflow', () => {
       workflow.indexOf('- name: Resolve the failed migration'),
     );
     expect(repair).toContain('pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION"');
+    // Prisma's datasource banner carries the host, so its output must not reach the log.
+    expect(repair).toContain('>/tmp/resolve.log 2>&1');
   });
 
   it('waits for a human reviewer before it can reach production credentials', () => {
@@ -63,8 +65,12 @@ describe('production migration repair workflow', () => {
     );
   });
 
-  it('never runs a Prisma command that prints the database host', () => {
+  it('lets no Prisma command write its datasource banner to the public log', () => {
     expect(workflow).not.toContain('prisma migrate status');
+    // Every `prisma migrate` subcommand prints the host, so each must be redirected.
+    for (const [, command] of workflow.matchAll(/(pnpm exec prisma migrate [^\n]+)/g)) {
+      expect(command).toContain('>/tmp/');
+    }
   });
 
   it('installs without running package lifecycle scripts', () => {

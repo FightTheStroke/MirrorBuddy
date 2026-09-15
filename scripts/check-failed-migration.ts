@@ -28,10 +28,16 @@ type Row = {
   applied_steps_count: number | null;
 };
 
-export function classify(row: Row | undefined): State | 'absent' | 'rolled-back' {
-  if (!row) return 'absent';
-  if (row.rolled_back_at) return 'rolled-back';
-  return row.finished_at ? 'applied' : 'failed';
+/**
+ * `resolve --applied` does not update the failed row: the schema engine marks every
+ * unfinished row rolled back and INSERTs a new applied one, so a repaired migration
+ * has two rows. Reading one arbitrary row would report a correct repair as failed.
+ */
+export function classify(rows: readonly Row[]): State | 'absent' | 'rolled-back' {
+  if (rows.length === 0) return 'absent';
+  if (rows.some((row) => row.finished_at && !row.rolled_back_at)) return 'applied';
+  if (rows.some((row) => !row.finished_at && !row.rolled_back_at)) return 'failed';
+  return 'rolled-back';
 }
 
 // pg surfaces the host, port and user inside connection errors.
@@ -71,15 +77,15 @@ async function main(): Promise<void> {
     const database = (await client.query<{ current_database: string }>('SELECT current_database()'))
       .rows[0]?.current_database;
     const { rows } = await client.query<Row>(
-      'SELECT migration_name, finished_at, rolled_back_at, applied_steps_count FROM _prisma_migrations WHERE migration_name = $1',
+      'SELECT migration_name, finished_at, rolled_back_at, applied_steps_count FROM _prisma_migrations WHERE migration_name = $1 ORDER BY started_at',
       [name],
     );
     const total = (
       await client.query<{ count: string }>('SELECT count(*)::text FROM _prisma_migrations')
     ).rows[0]?.count;
-    const state = classify(rows[0]);
+    const state = classify(rows);
     console.log(`Database: ${database} — ${total} recorded migrations`);
-    console.log(`Migration ${name}: ${state}`);
+    console.log(`Migration ${name}: ${state} (${rows.length} row(s))`);
     if (expected === 'report') return;
     if (state !== expected) {
       console.error(`Refusing to continue: expected this migration to be ${expected}.`);
@@ -87,6 +93,9 @@ async function main(): Promise<void> {
         console.error('It was never attempted here. Marking it applied would skip its SQL.');
       }
       process.exit(1);
+    }
+    if (state === 'failed') {
+      console.log('Note: a migration still running looks identical to a failed one.');
     }
     console.log(`Confirmed ${expected}.`);
   } catch (error) {

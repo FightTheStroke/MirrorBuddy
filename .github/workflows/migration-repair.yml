@@ -100,6 +100,9 @@ jobs:
           EXPECT: ${{ inputs.action == 'status' && 'report' || 'failed' }}
         run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" "$EXPECT"
 
+      # Every `prisma migrate` subcommand prints a datasource banner that includes the
+      # database host, and Actions masks only the whole secret, never a substring of it.
+      # The output stays in the runner; the verification step reports what happened.
       - name: Resolve the failed migration
         if: inputs.action != 'status'
         env:
@@ -107,7 +110,13 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           MIGRATION: ${{ inputs.migration }}
           ACTION: ${{ inputs.action }}
-        run: pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION"
+        run: |
+          if pnpm exec prisma migrate resolve "--${ACTION}" "$MIGRATION" >/tmp/resolve.log 2>&1; then
+            echo "resolve --${ACTION} reported success"
+          else
+            echo "resolve --${ACTION} failed; the next step reports the resulting state"
+            exit 1
+          fi
 
       - name: Confirm the repair landed
         if: inputs.action != 'status'
