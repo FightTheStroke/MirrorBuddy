@@ -158,6 +158,23 @@ describe('production source-build promotion boundary', () => {
     ).toEqual(['mirrorbuddy.org', 'www.mirrorbuddy.org']);
   });
 
+  it('passes credentials to the build proof request through the environment, not argv', async () => {
+    await deployValidatedProduction(env);
+    const call = exec.mock.calls.find(
+      ([command, args]) => command === 'vercel' && (args as string[])[0] === 'curl',
+    );
+    const args = call?.[1] as string[];
+    const options = call?.[2] as { env?: NodeJS.ProcessEnv } | undefined;
+    // `vercel curl` forwards arguments it does not consume to curl, which rejects
+    // `--token`/`--scope` and fails the promotion before any proof is read.
+    expect(args).not.toContain('--token');
+    expect(args).not.toContain('--scope');
+    expect(args).not.toContain(env.VERCEL_TOKEN);
+    expect(options?.env?.VERCEL_TOKEN).toBe(env.VERCEL_TOKEN);
+    expect(options?.env?.VERCEL_ORG_ID).toBe(env.VERCEL_ORG_ID);
+    expect(options?.env?.VERCEL_PROJECT_ID).toBe(env.VERCEL_PROJECT_ID);
+  });
+
   it.each(['deploy', 'list', 'promote', '--version'])(
     'propagates %s failure without leaking output',
     async (cmd) => {
