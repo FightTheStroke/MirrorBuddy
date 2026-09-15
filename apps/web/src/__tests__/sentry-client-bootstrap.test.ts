@@ -74,7 +74,7 @@ describe('Sentry client bootstrap', () => {
     );
   });
 
-  it('enables Sentry outside production when force flag is on', async () => {
+  it('does not force enable Sentry on localhost', async () => {
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
     vi.stubEnv('NODE_ENV', 'development');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'true');
@@ -84,8 +84,20 @@ describe('Sentry client bootstrap', () => {
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     expect(Sentry.init).toHaveBeenCalledWith(
       expect.objectContaining({
-        enabled: true,
+        enabled: false,
       }),
     );
+  });
+
+  it('disables the actual SDK for automation even on a production host with force enabled', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://key@o1.ingest.us.sentry.io/123456');
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_FORCE_ENABLE', 'true');
+    vi.stubGlobal('location', { hostname: 'www.mirrorbuddy.org' });
+    vi.stubGlobal('navigator', { webdriver: true });
+
+    await import('../../instrumentation-client');
+
+    expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }));
   });
 });

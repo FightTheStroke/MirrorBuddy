@@ -36,17 +36,20 @@ Client-side error monitoring activates on properties of the **bundle itself**,
 never on a deployment-environment variable:
 
 1. a DSN must be present (`NEXT_PUBLIC_SENTRY_DSN`), and
-2. the force flag wins if set (`NEXT_PUBLIC_SENTRY_FORCE_ENABLE`), otherwise
-3. `NODE_ENV === 'production'` — i.e. this is a production build — and
-4. the page is **not** being served from `localhost` / `127.0.0.1` / `[::1]`.
+2. local hosts and automated browsers (`navigator.webdriver`) are excluded,
+3. the force flag can enable deployed diagnostics (`NEXT_PUBLIC_SENTRY_FORCE_ENABLE`), otherwise
+4. `NODE_ENV === 'production'` — i.e. this is a production build.
 
-Rule 4 is the only runtime check, and it exists solely so that a developer
+Rule 2 takes precedence over force-enable flags. It ensures that a developer
 running `next build && next start` on their own machine does not pollute the
-live project. It is a browser check (`window.location.hostname`) and therefore
-cannot be affected by any environment configuration.
+live project. Local detection includes loopback addresses, `0.0.0.0`, and
+`.localhost` subdomains. Automation is disabled at SDK initialization, not by
+discarding selected errors in `beforeSend`; real production diagnostics remain enabled.
+Service-worker script load failures from real iOS users retain their original
+error and are reported normally; registration does not claim an automatic retry.
 
-Server and edge runtimes are unchanged: they still key off `process.env.VERCEL`,
-which is a genuine runtime value there and is not inlined at build time.
+Server and edge require `VERCEL=1` and reject the existing `E2E_TESTS=1` flag
+before evaluating any diagnostic override. These are runtime values.
 
 Consequence: **no environment setting can silently switch browser error
 monitoring off again.** Turning it off now requires removing the DSN from the
@@ -66,9 +69,18 @@ build or shipping a non-production build.
 
 ## Verification
 
-After the release reaches production, the browser console on the live site must
+After the release reaches production, a non-automated browser console on the live site must
 print `[Sentry Client] enabled=true`. That single line is the acceptance check;
 if it ever reads `false` again in production, this decision has been broken.
+
+## Production watch classification (2026-09-15)
+
+The unresolved Sentry feed remains unfiltered by environment. Alerts use
+`[Sentry error]` instead of claiming every event occurred in production, and
+include the latest event's environment tag (or explicit `unknown`). Tags describe
+the build: `preview` does not prove the event came from a non-production host.
+Failure to fetch classification evidence is reported in the alert without
+discarding the known active issue. Vercel deployment alerts remain production-scoped.
 
 ## Notes
 

@@ -83,17 +83,17 @@ describe('Sentry Environment Detection', () => {
       expect(isEnabled('edge')).toBe(true);
     });
 
-    it('returns true when force enabled for client', () => {
+    it('does not force enable the client on localhost', () => {
       process.env.NEXT_PUBLIC_SENTRY_DSN = 'https://example.com';
       process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE = 'true';
-      expect(isEnabled('client')).toBe(true);
+      expect(isEnabled('client')).toBe(false);
     });
 
-    it('returns true when force enabled for server/edge', () => {
+    it('does not force enable local server/edge runtimes', () => {
       process.env.SENTRY_DSN = 'https://example.com';
       process.env.SENTRY_FORCE_ENABLE = 'true';
-      expect(isEnabled('server')).toBe(true);
-      expect(isEnabled('edge')).toBe(true);
+      expect(isEnabled('server')).toBe(false);
+      expect(isEnabled('edge')).toBe(false);
     });
 
     it('stays quiet on the client in development', () => {

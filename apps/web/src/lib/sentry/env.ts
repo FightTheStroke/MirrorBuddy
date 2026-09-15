@@ -22,7 +22,16 @@ export function isEnabled(runtime: Runtime): boolean {
   const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
   if (!dsn) return false;
 
-  // Check for force enable flag (for preview/local testing)
+  // Isolation wins over inherited deployment flags and diagnostic overrides.
+  if (runtime === 'client') {
+    if (isLocalhost() || (typeof navigator !== 'undefined' && navigator.webdriver === true)) {
+      return false;
+    }
+  } else if (process.env.E2E_TESTS === '1' || process.env.VERCEL !== '1') {
+    return false;
+  }
+
+  // Diagnostic override for deployed environments only, never local/E2E runs.
   const forceEnable =
     runtime === 'client'
       ? process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === 'true'
@@ -44,7 +53,7 @@ export function isEnabled(runtime: Runtime): boolean {
     return !isLocalhost();
   }
 
-  return !!process.env.VERCEL;
+  return process.env.VERCEL === '1';
 }
 
 /**
@@ -54,7 +63,14 @@ export function isEnabled(runtime: Runtime): boolean {
 function isLocalhost(): boolean {
   if (typeof window === 'undefined') return false;
   const host = window.location?.hostname ?? '';
-  return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+  return (
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    /^127\.\d+\.\d+\.\d+$/.test(host) ||
+    host === '0.0.0.0' ||
+    host === '[::1]' ||
+    host === '::1'
+  );
 }
 
 /**
