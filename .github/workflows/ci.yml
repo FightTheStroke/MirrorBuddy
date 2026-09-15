@@ -2622,6 +2622,9 @@ jobs:
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # The user email column is encrypted at rest, so the seed can neither
+          # match nor write a privileged account without the production PII key.
+          PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
           # Issuance must not create/re-enable an account or manufacture its role.
           # Readonly provisioning/conversion remains an explicit prerequisite.
           ADMIN_READONLY_EMAIL: ''
