@@ -58,6 +58,7 @@ describe('actual conditioned readonly CLI entrypoint, hermetic rejection only', 
       expect(result.error).toBeUndefined();
       expect(result.status).toBe(1);
       expect(result.stderr).toContain('INVALID_TARGET');
+      expect(result.stderr).toContain('ADMIN_READONLY_EMAIL');
       expect(result.stderr).not.toContain('Prisma');
       expect((result.stdout + result.stderr).includes(env.SESSION_SECRET)).toBe(false);
     },

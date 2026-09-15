@@ -12,8 +12,23 @@ export type SmokeFailure =
   | 'CANCELLED'
   | 'DISCONNECT_FAILED';
 
+type SmokeTargetReason =
+  | 'NODE_VERSION'
+  | 'ADMIN_READONLY_EMAIL'
+  | 'SESSION_SECRET'
+  | 'E2E_TESTS'
+  | 'SYNTHETIC_TARGET'
+  | 'GITHUB_CONTEXT'
+  | 'RUNNER_TEMP'
+  | 'DATABASE_URL'
+  | 'DIRECT_URL'
+  | 'PROJECT_MISMATCH';
+
 export class SmokeCommandError extends Error {
-  constructor(public readonly code: SmokeFailure) {
+  constructor(
+    public readonly code: SmokeFailure,
+    public readonly reason?: SmokeTargetReason,
+  ) {
     super(code);
     this.name = 'SmokeCommandError';
   }
@@ -45,17 +60,16 @@ export function readonlySmokeOptions(
   const [action, , target, , directory] = parsed.data;
   if (!isAbsolute(directory) || !/^readonly-smoke-[A-Za-z0-9_-]+$/.test(basename(directory)))
     throw new SmokeCommandError('INVALID_ARGUMENTS');
-  if (
-    typeof nodeVersion !== 'string' ||
-    !/^24\.\d+\.\d+$/.test(nodeVersion) ||
-    !z.string().trim().email().safeParse(env.ADMIN_READONLY_EMAIL).success ||
-    !z.string().min(32).safeParse(env.SESSION_SECRET).success ||
-    env.E2E_TESTS === '1'
-  )
-    throw new SmokeCommandError('INVALID_TARGET');
+  if (typeof nodeVersion !== 'string' || !/^24\.\d+\.\d+$/.test(nodeVersion))
+    throw new SmokeCommandError('INVALID_TARGET', 'NODE_VERSION');
+  if (!z.string().trim().email().safeParse(env.ADMIN_READONLY_EMAIL).success)
+    throw new SmokeCommandError('INVALID_TARGET', 'ADMIN_READONLY_EMAIL');
+  if (!z.string().min(32).safeParse(env.SESSION_SECRET).success)
+    throw new SmokeCommandError('INVALID_TARGET', 'SESSION_SECRET');
+  if (env.E2E_TESTS === '1') throw new SmokeCommandError('INVALID_TARGET', 'E2E_TESTS');
   assertAuthScriptTarget(env);
-  const database = databaseUrl(env.DATABASE_URL);
-  const direct = databaseUrl(env.DIRECT_URL);
+  const database = databaseUrl(env.DATABASE_URL, 'DATABASE_URL');
+  const direct = databaseUrl(env.DIRECT_URL, 'DIRECT_URL');
   if (target === 'synthetic') {
     if (
       env.NODE_ENV !== 'test' ||
@@ -66,7 +80,7 @@ export function readonlySmokeOptions(
       database.pathname !== '/mirrorbuddy_remediation_47ba2c29' ||
       database.search !== ''
     )
-      throw new SmokeCommandError('INVALID_TARGET');
+      throw new SmokeCommandError('INVALID_TARGET', 'SYNTHETIC_TARGET');
     return { action, target, directory, temporaryRoot: tmpdir() };
   }
   const trusted = {
@@ -78,24 +92,23 @@ export function readonlySmokeOptions(
     GITHUB_WORKFLOW_REF: 'FightTheStroke/MirrorBuddy/.github/workflows/ci.yml@refs/heads/main',
     GITHUB_JOB: 'sync-admin-credentials',
   };
-  if (
-    Object.entries(trusted).some(([key, value]) => env[key] !== value) ||
-    !env.RUNNER_TEMP ||
-    !isAbsolute(env.RUNNER_TEMP) ||
-    productionProject(database) !== productionProject(direct)
-  )
-    throw new SmokeCommandError('INVALID_TARGET');
+  if (Object.entries(trusted).some(([key, value]) => env[key] !== value))
+    throw new SmokeCommandError('INVALID_TARGET', 'GITHUB_CONTEXT');
+  if (!env.RUNNER_TEMP || !isAbsolute(env.RUNNER_TEMP))
+    throw new SmokeCommandError('INVALID_TARGET', 'RUNNER_TEMP');
+  if (productionProject(database, 'DATABASE_URL') !== productionProject(direct, 'DIRECT_URL'))
+    throw new SmokeCommandError('INVALID_TARGET', 'PROJECT_MISMATCH');
   return { action, target, directory, temporaryRoot: env.RUNNER_TEMP };
 }
 
-function databaseUrl(value: unknown): URL {
+function databaseUrl(value: unknown, field: 'DATABASE_URL' | 'DIRECT_URL'): URL {
   if (typeof value !== 'string' || value.length === 0)
-    throw new SmokeCommandError('INVALID_TARGET');
+    throw new SmokeCommandError('INVALID_TARGET', field);
   let url: URL;
   try {
     url = new URL(value);
   } catch {
-    throw new SmokeCommandError('INVALID_TARGET');
+    throw new SmokeCommandError('INVALID_TARGET', field);
   }
   if (
     !['postgres:', 'postgresql:'].includes(url.protocol) ||
@@ -109,16 +122,16 @@ function databaseUrl(value: unknown): URL {
       return key !== 'pgbouncer' || value !== 'true';
     })
   )
-    throw new SmokeCommandError('INVALID_TARGET');
+    throw new SmokeCommandError('INVALID_TARGET', field);
   return url;
 }
 
-function productionProject(url: URL): string {
+function productionProject(url: URL, field: 'DATABASE_URL' | 'DIRECT_URL'): string {
   if (url.pathname !== '/postgres' || !url.password || !['5432', '6543'].includes(url.port))
-    throw new SmokeCommandError('INVALID_TARGET');
+    throw new SmokeCommandError('INVALID_TARGET', field);
   const direct = /^db\.([a-z0-9]+)\.supabase\.co$/.exec(url.hostname);
   if (direct && url.username === 'postgres') return direct[1];
   const user = /^postgres\.([a-z0-9]+)$/.exec(url.username);
   if (/^[a-z0-9.-]+\.pooler\.supabase\.com$/.test(url.hostname) && user) return user[1];
-  throw new SmokeCommandError('INVALID_TARGET');
+  throw new SmokeCommandError('INVALID_TARGET', field);
 }
