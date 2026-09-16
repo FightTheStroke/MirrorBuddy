@@ -2,7 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import { buildFixture, productionValues } from './production-build-fixture';
 
-const baseEnv = {
+const baseEnv: NodeJS.ProcessEnv = {
+  NODE_ENV: 'production',
   PATH: process.env.PATH ?? '/usr/bin:/bin',
   TMPDIR: process.env.TMPDIR,
   DOTENV_CONFIG_PATH: '/dev/null',

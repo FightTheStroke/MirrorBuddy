@@ -15,7 +15,8 @@ import { criticalProductionEnv } from '../lib/production-env-policy';
 
 export const root = resolve(import.meta.dirname, '../..');
 export const sourceCommit = 'a'.repeat(40);
-export const productionValues = () => ({
+export const productionValues = (): NodeJS.ProcessEnv => ({
+  NODE_ENV: 'production',
   VERCEL: '1',
   VERCEL_ENV: 'production',
   VERCEL_TARGET_ENV: 'production',
@@ -35,7 +36,8 @@ export function buildFixture() {
   symlinkSync(join(root, 'node_modules'), join(directory, 'node_modules'), 'dir');
   const bin = join(directory, 'bin');
   mkdirSync(bin);
-  const env = {
+  const env: NodeJS.ProcessEnv = {
+    NODE_ENV: 'production',
     PATH: `${bin}:${dirname(process.execPath)}:${process.env.PATH ?? '/usr/bin:/bin'}`,
     TMPDIR: directory,
     DOTENV_CONFIG_PATH: '/dev/null',

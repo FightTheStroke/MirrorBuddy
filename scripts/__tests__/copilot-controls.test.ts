@@ -11,11 +11,12 @@ const fixture = mkdtempSync(join(tmpdir(), 'mirrorbuddy-controls-'));
 const main = join(fixture, 'main');
 const feature = join(fixture, 'feature');
 
-function fixtureEnv() {
+function fixtureEnv(): NodeJS.ProcessEnv {
   // Git hooks export repository-scoped variables that would override the fixture's cwd.
-  return Object.fromEntries(
-    Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_')),
-  );
+  return {
+    ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith('GIT_'))),
+    NODE_ENV: process.env.NODE_ENV,
+  };
 }
 
 function git(cwd: string, ...args: string[]) {

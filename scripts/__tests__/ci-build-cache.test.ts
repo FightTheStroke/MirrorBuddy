@@ -40,23 +40,18 @@ describe('Next build preparation preserves the cache until the action saves it',
       (step) => step.name === 'Verify and prepare build output',
     )?.run;
     if (!prepare) throw new Error('Missing build preparation step');
-    const result = spawnSync(
-      'bash',
-      ['-e', '-o', 'pipefail', '-c', prepare],
-      {
-        cwd: root,
-        encoding: 'utf8',
-        timeout: 15000,
-      },
-      20000,
-    );
+    const result = spawnSync('bash', ['-e', '-o', 'pipefail', '-c', prepare], {
+      cwd: root,
+      encoding: 'utf8',
+      timeout: 15000,
+    });
     expect(result.status, result.stdout + result.stderr).toBe(0);
     expect(existsSync(join(root, 'apps/web/.next/cache/compiler-entry'))).toBe(true);
     expect(existsSync(join(root, 'apps/web/.next/standalone/apps/web/.next/static/chunk.js'))).toBe(
       true,
     );
     expect(existsSync(join(root, 'apps/web/.next/standalone/apps/web/public/icon.svg'))).toBe(true);
-  });
+  }, 20000);
 
   it('excludes cache data from transport without excluding application output', () => {
     const upload = workflow.jobs.build.steps.find((step) => step.name === 'Upload build artifacts');

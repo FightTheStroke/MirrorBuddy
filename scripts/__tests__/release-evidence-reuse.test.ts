@@ -24,15 +24,16 @@ vi.mock('../lib/release-evidence-scope.mjs', () => ({
 }));
 
 const directories: string[] = [];
-beforeEach(() => {
-  vi.mocked(spawnSync).mockReturnValue({
-    pid: 0,
-    output: [],
-    stdout: null,
-    stderr: null,
-    status: 42,
-    signal: null,
+beforeEach(async () => {
+  const { spawnSync: nativeSpawn } =
+    await vi.importActual<typeof import('node:child_process')>('node:child_process');
+  // File-descriptor stdio returns null streams at runtime, despite Node's declaration.
+  const failure = nativeSpawn(process.execPath, ['-e', 'process.exit(42)'], {
+    stdio: 'ignore',
+    timeout: 5_000,
   });
+  expect(failure.status).toBe(42);
+  vi.mocked(spawnSync).mockReturnValue(failure);
 });
 afterEach(() => {
   for (const directory of directories.splice(0))

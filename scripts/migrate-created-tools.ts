@@ -8,9 +8,13 @@
  *
  * NOTE: Does NOT delete CreatedTool records (30-day buffer).
  * Run cleanup script after buffer period.
+ * The legacy SQL table has no current Prisma model: rows are read through a
+ * fixed Prisma query and validated before writes. A missing table or invalid
+ * row fails the migration rather than treating the migration as complete.
  */
 
 import { PrismaClient } from '@prisma/client';
+import { parseLegacyCreatedTools } from './lib/legacy-created-tools';
 
 const prisma = new PrismaClient();
 
@@ -32,9 +36,15 @@ async function migrateCreatedTools(): Promise<MigrationStats> {
   console.log('Starting CreatedTool → Material migration...\n');
 
   // Get all CreatedTool records
-  const createdTools = await prisma.createdTool.findMany({
-    orderBy: { createdAt: 'asc' },
-  });
+  const createdTools = parseLegacyCreatedTools(
+    await prisma.$queryRaw`
+    SELECT "id", "userId", "type", "title", "content", "topic", "maestroId",
+           "conversationId", "sessionId", "userRating", "isBookmarked",
+           "viewCount", "createdAt", "updatedAt"
+    FROM "CreatedTool"
+    ORDER BY "createdAt" ASC
+  `,
+  );
 
   stats.total = createdTools.length;
   console.log(`Found ${stats.total} CreatedTool records to migrate.\n`);
@@ -80,7 +90,9 @@ async function migrateCreatedTools(): Promise<MigrationStats> {
         },
       });
 
-      console.log(`  [OK] ${tool.id} → ${toolId} (${tool.type}: ${tool.title.substring(0, 30)}...)`);
+      console.log(
+        `  [OK] ${tool.id} → ${toolId} (${tool.type}: ${tool.title.substring(0, 30)}...)`,
+      );
       stats.migrated++;
     } catch (error) {
       console.error(`  [ERROR] ${tool.id}: ${error}`);

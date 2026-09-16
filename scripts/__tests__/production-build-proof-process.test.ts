@@ -154,7 +154,11 @@ describe('real producer and consumer processes with synthetic external build/dep
     'does not produce production proof in %s',
     (target) => {
       seedOldOutput();
-      const result = producer.build({ VERCEL_ENV: target, DATABASE_URL: 'synthetic-db' });
+      const result = producer.build({
+        NODE_ENV: 'production',
+        VERCEL_ENV: target,
+        DATABASE_URL: 'synthetic-db',
+      });
       expect(result.status, result.stderr).toBe(0);
       expect(result.stdout).toContain('BUILD_REQUESTED');
       expect(receiptExists()).toBe(false);

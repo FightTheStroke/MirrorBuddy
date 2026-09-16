@@ -12,13 +12,13 @@ const roots: string[] = [];
 
 // Git environment inherited from a hook would redirect the resolver's fallback to the
 // real repository, which does have a project link. A fresh checkout has none.
-function isolatedEnv(extra: Record<string, string> = {}) {
+function isolatedEnv(extra: Record<string, string> = {}): NodeJS.ProcessEnv {
   const env: Record<string, string> = {};
   for (const [key, value] of Object.entries(process.env)) {
     if (key.startsWith('GIT_') || value === undefined) continue;
     env[key] = value;
   }
-  return { ...env, VERCEL_PROJECT_ID: '', VERCEL_ORG_ID: '', ...extra };
+  return { ...env, VERCEL_PROJECT_ID: '', VERCEL_ORG_ID: '', ...extra, NODE_ENV: 'test' };
 }
 
 function freshCheckout() {

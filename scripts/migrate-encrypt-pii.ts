@@ -11,12 +11,12 @@
  * Part of Plan 124: Security & Encryption Hardening
  */
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from '@prisma/client';
 import {
   encryptPII,
   hashPII,
   isPIIEncryptionConfigured,
-} from "../apps/web/src/lib/security/pii-encryption";
+} from '../apps/web/src/lib/security/pii-encryption';
 
 const prisma = new PrismaClient();
 const BATCH_SIZE = 100;
@@ -31,25 +31,20 @@ interface EntityStats {
 interface MigrationConfig {
   entityName: string;
   fetchRecords: () => Promise<Array<{ id: string; [key: string]: unknown }>>;
-  encryptFields: (
-    record: Record<string, unknown>,
-  ) => Promise<Record<string, unknown>>;
-  updateRecord: (id: string, data: Record<string, unknown>) => Promise<unknown>;
+  encryptFields: (record: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  updateRecord: (id: string, data: Record<string, unknown>) => Prisma.PrismaPromise<unknown>;
 }
 
 function isEncrypted(value: string | null): boolean {
-  return value !== null && value.startsWith("pii:v1:");
+  return value !== null && value.startsWith('pii:v1:');
 }
 
-async function migrateEntity(
-  config: MigrationConfig,
-  dryRun: boolean,
-): Promise<EntityStats> {
+async function migrateEntity(config: MigrationConfig, dryRun: boolean): Promise<EntityStats> {
   const stats: EntityStats = { total: 0, encrypted: 0, skipped: 0, errors: 0 };
 
-  console.log("\n" + "=".repeat(60));
+  console.log('\n' + '='.repeat(60));
   console.log(`Migrating ${config.entityName}`);
-  console.log("=".repeat(60));
+  console.log('='.repeat(60));
 
   const records = await config.fetchRecords();
   stats.total = records.length;
@@ -99,7 +94,7 @@ async function migrateEntity(
 }
 
 const USER_CONFIG: MigrationConfig = {
-  entityName: "User.email",
+  entityName: 'User.email',
   fetchRecords: () =>
     prisma.user.findMany({
       where: { email: { not: null } },
@@ -125,7 +120,7 @@ const USER_CONFIG: MigrationConfig = {
 };
 
 const PROFILE_CONFIG: MigrationConfig = {
-  entityName: "Profile.name",
+  entityName: 'Profile.name',
   fetchRecords: () =>
     prisma.profile.findMany({
       where: { name: { not: null } },
@@ -145,7 +140,7 @@ const PROFILE_CONFIG: MigrationConfig = {
 };
 
 const GOOGLE_ACCOUNT_CONFIG: MigrationConfig = {
-  entityName: "GoogleAccount.email",
+  entityName: 'GoogleAccount.email',
   fetchRecords: () =>
     prisma.googleAccount.findMany({
       select: { id: true, email: true },
@@ -170,7 +165,7 @@ const GOOGLE_ACCOUNT_CONFIG: MigrationConfig = {
 };
 
 const COPPA_CONSENT_CONFIG: MigrationConfig = {
-  entityName: "CoppaConsent.parentEmail",
+  entityName: 'CoppaConsent.parentEmail',
   fetchRecords: () =>
     prisma.coppaConsent.findMany({
       where: { parentEmail: { not: null } },
@@ -198,25 +193,21 @@ function printStats(name: string, stats: EntityStats) {
 }
 
 async function main() {
-  const dryRun = !process.argv.includes("--execute");
+  const dryRun = !process.argv.includes('--execute');
 
-  console.log("=".repeat(60));
-  console.log("PII Encryption Migration");
-  console.log("=".repeat(60));
-  console.log(`Mode: ${dryRun ? "DRY RUN (no changes)" : "LIVE RUN"}`);
-  console.log("=".repeat(60));
+  console.log('='.repeat(60));
+  console.log('PII Encryption Migration');
+  console.log('='.repeat(60));
+  console.log(`Mode: ${dryRun ? 'DRY RUN (no changes)' : 'LIVE RUN'}`);
+  console.log('='.repeat(60));
 
   if (!isPIIEncryptionConfigured()) {
-    console.error(
-      "\n[ERROR] PII_ENCRYPTION_KEY or ENCRYPTION_KEY not configured!",
-    );
-    console.error(
-      "Please set PII_ENCRYPTION_KEY in your environment before running.",
-    );
+    console.error('\n[ERROR] PII_ENCRYPTION_KEY or ENCRYPTION_KEY not configured!');
+    console.error('Please set PII_ENCRYPTION_KEY in your environment before running.');
     process.exit(1);
   }
 
-  console.log("\n[OK] Encryption key configured\n");
+  console.log('\n[OK] Encryption key configured\n');
 
   try {
     const userStats = await migrateEntity(USER_CONFIG, dryRun);
@@ -224,45 +215,35 @@ async function main() {
     const googleStats = await migrateEntity(GOOGLE_ACCOUNT_CONFIG, dryRun);
     const coppaStats = await migrateEntity(COPPA_CONSENT_CONFIG, dryRun);
 
-    console.log("\n" + "=".repeat(60));
-    console.log("Migration Summary");
-    console.log("=".repeat(60));
+    console.log('\n' + '='.repeat(60));
+    console.log('Migration Summary');
+    console.log('='.repeat(60));
 
-    printStats("Users", userStats);
-    printStats("Profiles", profileStats);
-    printStats("GoogleAccounts", googleStats);
-    printStats("CoppaConsents", coppaStats);
+    printStats('Users', userStats);
+    printStats('Profiles', profileStats);
+    printStats('GoogleAccounts', googleStats);
+    printStats('CoppaConsents', coppaStats);
 
     const totalErrors =
-      userStats.errors +
-      profileStats.errors +
-      googleStats.errors +
-      coppaStats.errors;
+      userStats.errors + profileStats.errors + googleStats.errors + coppaStats.errors;
     const totalEncrypted =
-      userStats.encrypted +
-      profileStats.encrypted +
-      googleStats.encrypted +
-      coppaStats.encrypted;
+      userStats.encrypted + profileStats.encrypted + googleStats.encrypted + coppaStats.encrypted;
 
-    console.log("\nTotals:");
+    console.log('\nTotals:');
     console.log(`  Encrypted: ${totalEncrypted}`);
     console.log(`  Errors:    ${totalErrors}`);
     console.log();
 
     if (dryRun) {
-      console.log(
-        "[DRY RUN] No changes were made. Run with --execute to apply.",
-      );
+      console.log('[DRY RUN] No changes were made. Run with --execute to apply.');
     } else if (totalErrors > 0) {
-      console.log(
-        "[WARNING] Migration completed with errors. Check logs above.",
-      );
+      console.log('[WARNING] Migration completed with errors. Check logs above.');
       process.exit(1);
     } else {
-      console.log("[SUCCESS] Migration completed successfully!");
+      console.log('[SUCCESS] Migration completed successfully!');
     }
   } catch (error) {
-    console.error("\n[FATAL] Migration failed:", error);
+    console.error('\n[FATAL] Migration failed:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();

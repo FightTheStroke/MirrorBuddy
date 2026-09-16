@@ -29,7 +29,8 @@ function fixture() {
   roots.push(parent);
   const root = join(parent, 'source');
   mkdirSync(root);
-  const env = {
+  const env: NodeJS.ProcessEnv = {
+    NODE_ENV: 'test',
     PATH: process.env.PATH,
     HOME: root,
     GIT_CONFIG_NOSYSTEM: '1',

@@ -1,18 +1,18 @@
 /**
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
-import { config } from "dotenv";
-import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
+import { config } from 'dotenv';
+import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
 
 config();
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL not set");
+  throw new Error('DATABASE_URL not set');
 }
 
 const prisma = createPrismaClient();
 
-const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
+const KEEP_EMAILS = ['roberdan@fightthestroke.org', 'mariodanfts@gmail.com'];
 
 async function checkUsers() {
   const users = await prisma.user.findMany({
@@ -23,21 +23,19 @@ async function checkUsers() {
       createdAt: true,
       isTestData: true,
     },
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
   });
 
-  console.log("\n=== DATABASE CHECK ===");
+  console.log('\n=== DATABASE CHECK ===');
   console.log(`Total users: ${users.length}`);
-  console.log(`Keep emails: ${KEEP_EMAILS.join(", ")}\n`);
+  console.log(`Keep emails: ${KEEP_EMAILS.join(', ')}\n`);
 
-  const toKeep = users.filter((u) => KEEP_EMAILS.includes(u.email));
-  const toDelete = users.filter((u) => !KEEP_EMAILS.includes(u.email));
+  const toKeep = users.filter((u) => u.email !== null && KEEP_EMAILS.includes(u.email));
+  const toDelete = users.filter((u) => u.email === null || !KEEP_EMAILS.includes(u.email));
 
   console.log(`Users to KEEP: ${toKeep.length}`);
   toKeep.forEach((u) =>
-    console.log(
-      `  ✓ ${u.email} (${u.username}) - ${u.createdAt.toISOString()}`,
-    ),
+    console.log(`  ✓ ${u.email} (${u.username}) - ${u.createdAt.toISOString()}`),
   );
 
   console.log(`\nUsers to DELETE: ${toDelete.length}`);

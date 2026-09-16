@@ -33,6 +33,7 @@
  */
 
 import 'dotenv/config';
+import { isDirectInvocation } from './lib/destructive-guard';
 import {
   rotateTokenEncryptionKey,
   rotateSessionKey,
@@ -51,11 +52,7 @@ function parseArgs(): {
 } {
   const args = process.argv.slice(2);
 
-  const type = args.find((arg) => arg.startsWith('--type='))?.split('=')[1] as
-    | 'token'
-    | 'session'
-    | 'pii'
-    | undefined;
+  const type = args.find((arg) => arg.startsWith('--type='))?.split('=')[1];
 
   const oldKey = args.find((arg) => arg.startsWith('--old-key='))?.split('=')[1];
   const newKey = args.find((arg) => arg.startsWith('--new-key='))?.split('=')[1];
@@ -71,7 +68,7 @@ function parseArgs(): {
     process.exit(1);
   }
 
-  if (!['token', 'session', 'pii'].includes(type)) {
+  if (type !== 'token' && type !== 'session' && type !== 'pii') {
     console.error(`ERROR: Invalid type "${type}"`);
     console.error('Valid types: token, session, pii');
     process.exit(1);
@@ -112,7 +109,7 @@ function maskKey(key: string): string {
 /**
  * Main execution function
  */
-async function main() {
+export async function runKeyRotation(): Promise<number> {
   console.log('\n╔════════════════════════════════════════════════════════════╗');
   console.log('║              MirrorBuddy Key Rotation Tool                 ║');
   console.log('╚════════════════════════════════════════════════════════════╝\n');
@@ -172,17 +169,17 @@ async function main() {
     console.log('╚════════════════════════════════════════════════════════════╝\n');
 
     console.log('Statistics:');
-    console.log(`  Records Processed: ${result.recordsProcessed}`);
-    console.log(`  Records Updated:   ${result.recordsUpdated}`);
-    console.log(`  Records Skipped:   ${result.recordsSkipped}`);
-    console.log(`  Errors:            ${result.errors}`);
+    console.log(`  Records Processed: ${result.processed}`);
+    console.log(`  Records Succeeded: ${result.succeeded}`);
+    console.log(`  Records Skipped:   ${result.processed - result.succeeded - result.failed}`);
+    console.log(`  Errors:            ${result.failed}`);
     console.log('');
 
-    if (result.errors > 0) {
+    if (result.failed > 0) {
       console.log('⚠️  Some records encountered errors during rotation');
       console.log('   Check logs for details');
       console.log('');
-      process.exit(1);
+      return 1;
     }
 
     if (dryRun) {
@@ -191,7 +188,7 @@ async function main() {
       console.log('✓ Key rotation successful!\n');
     }
 
-    process.exit(0);
+    return 0;
   } catch (error) {
     console.error('\n✗ Error during key rotation:');
     console.error(error instanceof Error ? error.message : String(error));
@@ -203,12 +200,16 @@ async function main() {
       console.error('');
     }
 
-    process.exit(1);
+    return 1;
   }
 }
 
 // Execute with error handling
-main().catch((error) => {
-  console.error('Fatal error:', error);
-  process.exit(1);
-});
+if (isDirectInvocation(import.meta.url)) {
+  runKeyRotation()
+    .then((code) => process.exit(code))
+    .catch((error) => {
+      console.error('Fatal error:', error);
+      process.exit(1);
+    });
+}
