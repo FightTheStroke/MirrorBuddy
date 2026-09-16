@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
+import { RecoveryError } from './readonly-recovery-diagnostics';
 import { verifyPassword } from '../../apps/web/src/lib/auth/password';
 import { READONLY_DISABLED_PASSWORD } from '../../apps/web/src/lib/auth/readonly-account';
 import { invalidateAllSessions } from '../../apps/web/src/lib/auth/session-revocation';
@@ -30,7 +31,7 @@ export function recoveryAction(args: unknown): 'report' | 'convert' {
     args[1] === 'CONVERT_READONLY'
   )
     return 'convert';
-  throw new Error('RECOVERY_ARGUMENTS_REJECTED');
+  throw new RecoveryError('ARGUMENTS_REJECTED');
 }
 
 /** Shared by normal seeding and the existing-only operator recovery. */
@@ -71,38 +72,46 @@ async function existingAccount(
   const matches = z
     .array(accountSchema)
     .length(1)
-    .parse(await tx.user.findMany(lookup));
-  const account = matches[0];
-  if (account.emailHash !== emailHash || account.role !== role)
-    throw new Error('RECOVERY_ACCOUNT_REJECTED');
+    .safeParse(await tx.user.findMany(lookup));
+  const rejected = role === 'ADMIN' ? 'OWNER_REJECTED' : 'ACCOUNT_REJECTED';
+  if (!matches.success) throw new RecoveryError(rejected);
+  const account = matches.data[0];
+  if (account.emailHash !== emailHash || account.role !== role) throw new RecoveryError(rejected);
   const locked = await tx.$queryRaw<Array<{ id: string }>>`
     SELECT "id" FROM "User" WHERE "id" = ${account.id} FOR UPDATE
   `;
   if (!Array.isArray(locked) || locked.length !== 1 || locked[0]?.id !== account.id)
-    throw new Error('RECOVERY_ACCOUNT_CHANGED');
+    throw new RecoveryError('ACCOUNT_CHANGED');
   const current = z
     .array(accountSchema)
     .length(1)
-    .parse(await tx.user.findMany(lookup));
-  if (JSON.stringify(current[0]) !== JSON.stringify(account))
-    throw new Error('RECOVERY_ACCOUNT_CHANGED');
+    .safeParse(await tx.user.findMany(lookup));
+  if (!current.success || JSON.stringify(current.data[0]) !== JSON.stringify(account))
+    throw new RecoveryError('ACCOUNT_CHANGED');
   return account;
 }
 
 export async function recoverReadonlyAccount(
   action: 'report' | 'convert',
-  env: NodeJS.ProcessEnv,
+  env: NodeJS.ProcessEnv | null | undefined,
 ): Promise<'CONVERSION_REQUIRED' | 'ALREADY_READY' | 'CONVERTED'> {
-  if (!['report', 'convert'].includes(action)) throw new Error('RECOVERY_ARGUMENTS_REJECTED');
-  const config = z
+  if (!['report', 'convert'].includes(action)) throw new RecoveryError('ARGUMENTS_REJECTED');
+  const parsed = z
     .object({
       ADMIN_EMAIL: z.string().trim().toLowerCase().email(),
       ADMIN_PASSWORD: z.string().min(8),
       ADMIN_READONLY_EMAIL: z.string().trim().toLowerCase().email(),
     })
-    .parse(env);
+    .safeParse(env);
+  if (!parsed.success) {
+    const field = parsed.error.issues[0]?.path[0];
+    if (field === 'ADMIN_PASSWORD') throw new RecoveryError('CONFIG_ADMIN_PASSWORD');
+    if (field === 'ADMIN_READONLY_EMAIL') throw new RecoveryError('CONFIG_ADMIN_READONLY_EMAIL');
+    throw new RecoveryError('CONFIG_ADMIN_EMAIL');
+  }
+  const config = parsed.data;
   if (config.ADMIN_EMAIL === config.ADMIN_READONLY_EMAIL)
-    throw new Error('RECOVERY_ACCOUNT_REJECTED');
+    throw new RecoveryError('ACCOUNT_REJECTED');
   // The proof and the sole allowed change share one serializable transaction.
   // No owner reconciliation, creation, email rewrite, role change or enablement.
   return sessionTransaction(async (tx) => {
@@ -112,14 +121,14 @@ export async function recoverReadonlyAccount(
       !bcryptHash.test(owner.passwordHash) ||
       !(await verifyPassword(config.ADMIN_PASSWORD, owner.passwordHash))
     )
-      throw new Error('RECOVERY_OWNER_REJECTED');
+      throw new RecoveryError('OWNER_REJECTED');
     const readonly = await existingAccount(tx, config.ADMIN_READONLY_EMAIL, 'ADMIN_READONLY');
-    if (readonly.id === owner.id) throw new Error('RECOVERY_ACCOUNT_REJECTED');
+    if (readonly.id === owner.id) throw new RecoveryError('ACCOUNT_REJECTED');
     if (readonly.passwordHash === READONLY_DISABLED_PASSWORD) {
-      if (!readonly.mustChangePassword) throw new Error('RECOVERY_ACCOUNT_REJECTED');
+      if (!readonly.mustChangePassword) throw new RecoveryError('ACCOUNT_REJECTED');
       return 'ALREADY_READY';
     }
-    if (!bcryptHash.test(readonly.passwordHash)) throw new Error('RECOVERY_ACCOUNT_REJECTED');
+    if (!bcryptHash.test(readonly.passwordHash)) throw new RecoveryError('ACCOUNT_REJECTED');
     if (action === 'report') return 'CONVERSION_REQUIRED';
     await resetSeedCredential(tx, readonly.id, READONLY_DISABLED_PASSWORD, true);
     return 'CONVERTED';

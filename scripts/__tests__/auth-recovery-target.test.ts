@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { assertAuthRecoveryContext, assertAuthRecoveryTarget } from '../lib/auth-recovery-target';
+import { recoveryFailure } from '../lib/readonly-recovery-diagnostics';
 
 const env = {
   NODE_ENV: 'production',
@@ -16,6 +17,27 @@ const env = {
   DIRECT_URL: 'postgresql://postgres:synthetic@db.fixture.supabase.co:5432/postgres',
 } satisfies NodeJS.ProcessEnv;
 describe('fixed auth recovery authority', () => {
+  it.each([
+    ['DATABASE_URL', '', 'TARGET_DATABASE_URL'],
+    ['DIRECT_URL', 'secret-invalid-url', 'TARGET_DIRECT_URL'],
+    ['PRODUCTION_DB_ID', '', 'TARGET_PRODUCTION_DB_ID'],
+    ['PRODUCTION_DB_ID', 'different', 'TARGET_PROJECT_MISMATCH'],
+    ['GITHUB_JOB', 'other', 'TARGET_GITHUB_CONTEXT'],
+    ['E2E_TESTS', '1', 'TARGET_E2E_TESTS'],
+  ])('reports a fixed prerequisite without the rejected %s value', (key, value, code) => {
+    let failure: unknown;
+    try {
+      assertAuthRecoveryTarget({ ...env, [key]: value }, 'readonly-recovery');
+    } catch (error) {
+      failure = error;
+    }
+    expect(recoveryFailure(failure)).toBe(code);
+  });
+  it.each([null, undefined])('rejects absent context %j', (value) => {
+    expect(() => assertAuthRecoveryTarget(value, 'readonly-recovery')).toThrow(
+      /^TARGET_GITHUB_CONTEXT$/,
+    );
+  });
   it('accepts only the protected manual source for readonly conversion', () => {
     expect(() => assertAuthRecoveryTarget(env, 'readonly-recovery')).not.toThrow();
     expect(() => assertAuthRecoveryTarget(env, 'student-smoke')).toThrow();

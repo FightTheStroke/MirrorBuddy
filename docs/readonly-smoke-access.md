@@ -40,6 +40,29 @@ account, rewrites an email, changes a role or enables a disabled user. An alread
 marker is a no-op. Public logs contain only fixed status codes, not seed output or IDs.
 After conversion, run the normal deployment smoke; do not use this operator in CI.
 
+Recovery failures expose only a finite `READONLY_RECOVERY_` code:
+`TARGET_` names the rejected prerequisite (`NODE_VERSION`, `GITHUB_CONTEXT`, `E2E_TESTS`,
+`DATABASE_URL`, `DIRECT_URL`, `PRODUCTION_DB_ID` or `PROJECT_MISMATCH`); `CONFIG_` names
+`ADMIN_EMAIL`, `ADMIN_PASSWORD` or `ADMIN_READONLY_EMAIL`. `OWNER_REJECTED`,
+`ACCOUNT_REJECTED` and `ACCOUNT_CHANGED` distinguish owner proof, readonly eligibility
+and changed/invalid locked rows. No rejected value, account identifier or validation
+details are printed by the error classifier.
+
+`DB_IMPORT_FAILED` means the database or recovery runtime could not load (check generated
+Prisma client, runtime dependencies and PII configuration in the protected job).
+`DB_OPERATION_FAILED` is an unexpected execution/transaction failure, not evidence of
+an ineligible account. `DISCONNECT_FAILED` means cleanup failed and takes precedence
+over any earlier outcome; a conversion may already have committed. Investigate using
+the approved report-only process, never infer rollback or automatically retry conversion.
+`ARGUMENTS_REJECTED` and `FAILED` remain closed failures.
+
+The workflow captures raw process output privately and forwards exactly one complete
+whitelisted status line consistent with the process exit code. Missing, duplicated or
+contradictory statuses produce `STATUS_REJECTED`, never raw logs. Successful statuses
+remain `CONVERSION_REQUIRED`, `ALREADY_READY` and `CONVERTED`, published only after
+database cleanup succeeds. These diagnostics neither relax eligibility nor authorize
+a production rerun; production report and conversion approvals remain separate.
+
 ## Activation is a separate unresolved prerequisite
 
 Native sessions need no legacy activation, so issuance itself is **not circular**.

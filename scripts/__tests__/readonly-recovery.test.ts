@@ -51,6 +51,22 @@ beforeEach(async () => {
   mocks.transaction.mockImplementation(async (work) => work(tx));
 });
 describe('existing-only readonly recovery', () => {
+  it.each(['ADMIN_EMAIL', 'ADMIN_PASSWORD', 'ADMIN_READONLY_EMAIL'])(
+    'reports only the fixed missing configuration name %s before database access',
+    async (key) => {
+      await expect(recoverReadonlyAccount('report', { ...env, [key]: undefined })).rejects.toThrow(
+        new RegExp(`^CONFIG_${key}$`),
+      );
+      expect(mocks.transaction).not.toHaveBeenCalled();
+    },
+  );
+  it.each([null, undefined])(
+    'rejects absent configuration %j without parsing details',
+    async (value) => {
+      await expect(recoverReadonlyAccount('report', value)).rejects.toThrow(/^CONFIG_ADMIN_EMAIL$/);
+      expect(mocks.transaction).not.toHaveBeenCalled();
+    },
+  );
   it('defaults to a report and requires the exact conversion confirmation', () => {
     expect(recoveryAction([])).toBe('report');
     expect(recoveryAction(['report'])).toBe('report');
@@ -91,7 +107,7 @@ describe('existing-only readonly recovery', () => {
     ['authVersion', null],
   ])('rejects readonly %s=%j before a write', async (key, value) => {
     readonly[key] = value;
-    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow();
+    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow(/^ACCOUNT_REJECTED$/);
     expect(mocks.invalidate).not.toHaveBeenCalled();
   });
   it.each([
@@ -102,13 +118,13 @@ describe('existing-only readonly recovery', () => {
     ['emailHash', null],
   ])('rejects changed owner %s=%j', async (key, value) => {
     owner[key] = value;
-    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow();
+    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow(/^OWNER_REJECTED$/);
     expect(mocks.invalidate).not.toHaveBeenCalled();
   });
   it('rejects an unverified owner password', async () => {
     await expect(
       recoverReadonlyAccount('convert', { ...env, ADMIN_PASSWORD: 'wrong-secret' }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/^OWNER_REJECTED$/);
     expect(mocks.invalidate).not.toHaveBeenCalled();
   });
   it.each(
@@ -117,12 +133,12 @@ describe('existing-only readonly recovery', () => {
     })),
   )('rejects absent, invalid or ambiguous accounts', async ({ matches }) => {
     tx.user.findMany.mockResolvedValue(matches);
-    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow();
+    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow(/^OWNER_REJECTED$/);
     expect(mocks.invalidate).not.toHaveBeenCalled();
   });
   it('rejects a changed account after row locking', async () => {
     tx.$queryRaw.mockResolvedValue([]);
-    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow();
+    await expect(recoverReadonlyAccount('convert', env)).rejects.toThrow(/^ACCOUNT_CHANGED$/);
     expect(mocks.invalidate).not.toHaveBeenCalled();
   });
 });

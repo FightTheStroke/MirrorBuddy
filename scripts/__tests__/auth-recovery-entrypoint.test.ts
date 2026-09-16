@@ -25,7 +25,9 @@ describe('conditioned recovery entrypoints reject untrusted invocation without D
       });
       expect(result.error).toBeUndefined();
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain('_FAILED');
+      expect(result.stderr).toContain(
+        script === 'readonly-recovery.ts' ? 'READONLY_RECOVERY_TARGET_GITHUB_CONTEXT' : '_FAILED',
+      );
       expect(result.stdout + result.stderr).not.toMatch(/Prisma|Client Component/);
       expect(result.stdout + result.stderr).not.toContain(secret);
     },
