@@ -65,6 +65,7 @@ let testCounter = 0;
 type MockFlagOptions = {
   ga?: boolean;
   realtime15?: boolean;
+  realtime21?: boolean;
 };
 
 const buildFlagResult = (flagId: KnownFeatureFlag, enabled: boolean): FeatureFlagCheckResult => {
@@ -84,10 +85,15 @@ const buildFlagResult = (flagId: KnownFeatureFlag, enabled: boolean): FeatureFla
   };
 };
 
-const mockFeatureFlags = ({ ga = false, realtime15 = false }: MockFlagOptions = {}) => {
+const mockFeatureFlags = ({
+  ga = false,
+  realtime15 = false,
+  realtime21 = false,
+}: MockFlagOptions = {}) => {
   vi.mocked(isFeatureEnabled).mockImplementation((flagId: KnownFeatureFlag) => {
     if (flagId === 'voice_ga_protocol') return buildFlagResult(flagId, ga);
     if (flagId === 'voice_realtime_15') return buildFlagResult(flagId, realtime15);
+    if (flagId === 'voice_realtime_21') return buildFlagResult(flagId, realtime21);
     return buildFlagResult(flagId, false);
   });
 };
@@ -288,5 +294,94 @@ describe('POST /api/realtime/ephemeral-token - GA Protocol', () => {
         output: { voice: 'alloy' },
       }),
     });
+  });
+});
+
+describe('POST /api/realtime/ephemeral-token - preview deployment retirement', () => {
+  const ORIGINAL_ENV = process.env;
+
+  const buildRequest = () =>
+    new NextRequest('http://localhost:3000/api/realtime/ephemeral-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': 'test-csrf-token' },
+      body: JSON.stringify({ model: 'gpt-realtime-2.1', voice: 'alloy' }),
+    });
+
+  const successResponse = () => ({
+    ok: true,
+    json: async () => ({
+      value: 'test-token',
+      expires_at: Date.now() + 3600000,
+      session: { id: 'fallback-session', model: 'gpt-realtime-15' },
+    }),
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    testCounter++;
+    vi.mocked(getClientIdentifier).mockReturnValue(`retirement-client-${testCounter}`);
+    process.env = {
+      ...ORIGINAL_ENV,
+      AZURE_OPENAI_REALTIME_ENDPOINT: 'https://test.openai.azure.com',
+      AZURE_OPENAI_REALTIME_API_KEY: 'test-key',
+      AZURE_OPENAI_REALTIME_DEPLOYMENT: 'gpt-realtime',
+      AZURE_OPENAI_REALTIME_DEPLOYMENT_V15: 'gpt-realtime-15',
+      AZURE_OPENAI_REALTIME_DEPLOYMENT_V21: 'gpt-realtime-2.1',
+    };
+    mockFeatureFlags({ ga: true, realtime21: true });
+  });
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV;
+  });
+
+  it('retries on the GA deployment when the preview deployment is retired', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => '{"error":{"code":"DeploymentNotFound"}}',
+      })
+      .mockResolvedValueOnce(successResponse());
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(response.status).toBe(200);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(mockFetch.mock.calls[0][1].body).session.model).toBe('gpt-realtime-2.1');
+    expect(JSON.parse(mockFetch.mock.calls[1][1].body).session.model).toBe('gpt-realtime-15');
+  });
+
+  it('does not retry a rate limit on another deployment', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      text: async () => 'Too many requests',
+    });
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(429);
+  });
+
+  it('reports the original failure when no GA deployment is configured', async () => {
+    delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
+    delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      text: async () => '{"error":{"code":"NotFound"}}',
+    });
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(404);
   });
 });

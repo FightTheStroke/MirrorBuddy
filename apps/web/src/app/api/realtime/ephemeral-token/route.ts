@@ -5,6 +5,7 @@
 // ============================================================================
 
 import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
+import type { SanitizedUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import {
@@ -24,6 +25,7 @@ import {
   parseGAResponse,
   parsePreviewResponse,
 } from './payload-builders';
+import { isDeploymentUnavailable, resolveGaFallbackDeployment } from './voice-deployment-fallback';
 
 export const revalidate = 0;
 
@@ -203,11 +205,6 @@ export const POST = pipe(
         : 'voice_realtime',
   });
 
-  // Build token request payload based on protocol version
-  const tokenRequestPayload = useGAProtocol.enabled
-    ? buildGAPayload(azureDeployment, requestBody)
-    : buildPreviewPayload(azureDeployment);
-
   const azureRequestStartMs = Date.now();
 
   // Build headers based on protocol version
@@ -221,22 +218,61 @@ export const POST = pipe(
     headers['OpenAI-Beta'] = 'realtime=v1';
   }
 
-  const response = await fetch(azureUrl, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify(tokenRequestPayload),
-  });
+  const requestToken = (deployment: string) =>
+    fetch(azureUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(
+        useGAProtocol.enabled
+          ? buildGAPayload(deployment, requestBody)
+          : buildPreviewPayload(deployment),
+      ),
+    });
+
+  const attemptToken = async (deployment: string) => {
+    const attemptResponse = await requestToken(deployment);
+    if (attemptResponse.ok) {
+      return { response: attemptResponse, failure: null as SanitizedUpstreamError | null };
+    }
+    const errorData = await attemptResponse.text();
+    const failure = sanitizeUpstreamError(attemptResponse.status, errorData);
+    return { response: attemptResponse, failure };
+  };
+
+  let activeDeployment = azureDeployment;
+  let attempt = await attemptToken(activeDeployment);
+
+  // The preferred realtime deployments are preview models with a fixed Azure
+  // retirement date. When one stops answering, degrade to a GA deployment rather
+  // than taking voice away from the student.
+  if (attempt.failure && isDeploymentUnavailable(attempt.failure)) {
+    const fallbackDeployment = resolveGaFallbackDeployment({
+      current: activeDeployment,
+      gaCandidates: [azureDeploymentV15, azureDeploymentLegacy],
+    });
+
+    if (fallbackDeployment) {
+      log.error('Realtime deployment unavailable, retrying on GA deployment', {
+        failedDeployment: activeDeployment,
+        fallbackDeployment,
+        ...attempt.failure,
+      });
+      activeDeployment = fallbackDeployment;
+      attempt = await attemptToken(activeDeployment);
+    }
+  }
+
+  const response = attempt.response;
 
   // Handle Azure API errors
-  if (!response.ok) {
-    const errorData = await response.text();
-    const sanitized = sanitizeUpstreamError(response.status, errorData);
+  if (attempt.failure) {
+    const sanitized = attempt.failure;
     const azureRequestMs = Date.now() - azureRequestStartMs;
     const totalMs = Date.now() - requestStartMs;
     log.error('Azure ephemeral token request failed', {
       ...sanitized,
       protocol: useGAProtocol.enabled ? 'GA' : 'preview',
-      deployment: azureDeployment,
+      deployment: activeDeployment,
       azureRequestMs,
       totalMs,
     });
