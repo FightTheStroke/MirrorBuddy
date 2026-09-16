@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies, headers } from 'next/headers';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
 import {
   getOrCreateTrialSession,
   isTrialVerificationPending,
@@ -8,7 +8,12 @@ import {
 } from '@/lib/trial/trial-service';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/server';
-import { VISITOR_COOKIE_NAME, TRIAL_CONSENT_COOKIE } from '@/lib/auth/server';
+import {
+  VISITOR_COOKIE_NAME,
+  TRIAL_CONSENT_COOKIE,
+  validateVisitorId,
+} from '@/lib/auth/cookie-constants';
+import { findOwnedTrialSession, hasTrialConsent } from '@/lib/trial/trial-request';
 import { checkAbuse, incrementAbuseScore } from '@/lib/trial/anti-abuse';
 import { prisma } from '@/lib/db';
 
@@ -23,13 +28,16 @@ const log = logger.child({ module: 'api/trial/session' });
  * Requires explicit consent to privacy policy (F-02: GDPR compliance).
  */
 
-export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
+export const POST = pipe(
+  withSentry('/api/trial/session'),
+  withCSRF,
+)(async (ctx) => {
   // F-02: Check GDPR consent before creating trial session
   const cookieStore = await cookies();
   const trialConsentCookie = cookieStore.get(TRIAL_CONSENT_COOKIE);
 
   // Validate that consent was explicitly given
-  if (!trialConsentCookie?.value) {
+  if (!hasTrialConsent(trialConsentCookie?.value)) {
     log.warn('[TrialSession] Consent check failed - no consent cookie', {
       path: ctx.req.nextUrl.pathname,
     });
@@ -37,26 +45,6 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
       {
         error:
           "Consenso privacy richiesto prima di iniziare la prova. Accetta l'informativa privacy sulla pagina di benvenuto.",
-      },
-      { status: 403 },
-    );
-  }
-
-  // Validate consent data format
-  try {
-    const consentData = JSON.parse(decodeURIComponent(trialConsentCookie.value));
-    if (!consentData.accepted) {
-      return NextResponse.json(
-        {
-          error: 'Consenso privacy non valido',
-        },
-        { status: 403 },
-      );
-    }
-  } catch {
-    return NextResponse.json(
-      {
-        error: 'Consenso privacy non valido',
       },
       { status: 403 },
     );
@@ -72,14 +60,21 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
   const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
 
   // Get or create visitor ID from cookie
-  let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+  const existingVisitor = validateVisitorId(cookieStore.get(VISITOR_COOKIE_NAME)?.value);
+  let visitorId = existingVisitor;
 
   if (!visitorId) {
     visitorId = crypto.randomUUID();
   }
 
   // Create or retrieve trial session
-  const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
+  const session =
+    (await findOwnedTrialSession(visitorId)) ??
+    (await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined));
+  if (session.visitorId !== visitorId) {
+    log.warn('[TrialSession] Existing IP budget belongs to another visitor');
+    return NextResponse.json({ error: 'Trial unavailable for this visitor' }, { status: 403 });
+  }
 
   // F-03: Anti-abuse detection on session creation
   const abuseCheck = checkAbuse(ip, visitorId);
@@ -136,7 +131,7 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
 
   response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 
-  if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
+  if (!existingVisitor) {
     response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -156,21 +151,17 @@ export const POST = pipe(withSentry('/api/trial/session'))(async (ctx) => {
  */
 export const GET = pipe(withSentry('/api/trial/session'))(async () => {
   // Check if user is authenticated
-  const auth = await validateAuth();
-
-  const headersList = await headers();
-  const forwarded = headersList.get('x-forwarded-for');
-  const realIp = headersList.get('x-real-ip');
-  const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
+  await validateAuth();
 
   const cookieStore = await cookies();
   const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
-  if (!visitorId) {
+  if (!visitorId || !hasTrialConsent(cookieStore.get(TRIAL_CONSENT_COOKIE)?.value)) {
     return NextResponse.json({ hasSession: false });
   }
 
-  const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
+  const session = await findOwnedTrialSession(visitorId);
+  if (!session) return NextResponse.json({ hasSession: false });
 
   return NextResponse.json({
     hasSession: true,

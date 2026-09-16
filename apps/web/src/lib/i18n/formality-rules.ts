@@ -16,54 +16,28 @@
  * - All buddies: INFORMAL
  */
 
-import type { SupportedLanguage } from "@/app/api/chat/types";
+import type { SupportedLanguage } from '@/app/api/chat/types';
+import { FORMAL_PROFESSORS } from '@/lib/greeting/templates';
+export { FORMAL_PROFESSORS };
 
 // ============================================================================
 // CHARACTER FORMALITY CLASSIFICATION
 // ============================================================================
 
 /**
- * Historical professors who use formal address in ALL languages
- * Criteria: Pre-1900 historical figures, classical scholars
- */
-export const FORMAL_PROFESSORS = [
-  "manzoni", // 19th century Italian literary giant
-  "shakespeare", // Elizabethan playwright
-  "erodoto", // Ancient Greek historian
-  "cicerone", // Roman orator and statesman
-  "socrate", // Ancient Greek philosopher
-  "mozart", // Classical composer (formal court environment)
-  "galileo", // Renaissance scientist
-  "darwin", // Victorian era naturalist
-  "curie", // Victorian/Edwardian era scientist
-  "leonardo", // Renaissance polymath
-  "euclide", // Ancient Greek mathematician
-  "smith", // 18th century economist
-  "humboldt", // 19th century explorer/naturalist
-  "ippocrate", // Ancient Greek physician
-  "lovelace", // Victorian era mathematician
-  "cassese", // Distinguished international jurist
-  "omero", // Ancient Greek epic poet
-  "moliere", // 17th century French playwright and dramatist
-  "goethe", // 18th-19th century German poet and writer
-  "cervantes", // 16th-17th century Spanish author
-  "levi-montalcini", // Nobel laureate, Senator for life
-] as const;
-
-/**
  * Modern/accessible professors who use informal address
  */
 export const INFORMAL_PROFESSORS = [
-  "feynman", // 20th century physicist
-  "chris", // Modern PE teacher
-  "simone", // Modern sports expert
-  "alex-pina", // Contemporary Spanish teacher
+  'feynman', // 20th century physicist
+  'chris', // Modern PE teacher
+  'simone', // Modern sports expert
+  'alex-pina', // Contemporary Spanish teacher
 ] as const;
 
 /**
  * Character types that ALWAYS use informal address
  */
-export const ALWAYS_INFORMAL_TYPES = ["coach", "buddy"] as const;
+export const ALWAYS_INFORMAL_TYPES = ['coach', 'buddy'] as const;
 
 // ============================================================================
 // FORMALITY TERMINOLOGY BY LANGUAGE
@@ -83,100 +57,100 @@ export interface FormalityTerms {
 export const FORMALITY_TERMS: Record<SupportedLanguage, FormalityTerms> = {
   it: {
     formal: {
-      pronoun: "Lei",
+      pronoun: 'Lei',
       examples: [
-        "Come posso esserLe utile?",
-        "Lei cosa ne pensa?",
-        "Mi permetta di spiegarLe...",
-        "Lei ha ragione a porsi questa domanda.",
+        'Come posso esserLe utile?',
+        'Lei cosa ne pensa?',
+        'Mi permetta di spiegarLe...',
+        'Lei ha ragione a porsi questa domanda.',
       ],
     },
     informal: {
-      pronoun: "tu",
+      pronoun: 'tu',
       examples: [
-        "Come ti posso aiutare?",
-        "Tu cosa ne pensi?",
-        "Dimmi di più...",
-        "Hai ragione a farti questa domanda.",
+        'Come ti posso aiutare?',
+        'Tu cosa ne pensi?',
+        'Dimmi di più...',
+        'Hai ragione a farti questa domanda.',
       ],
     },
   },
   fr: {
     formal: {
-      pronoun: "Vous",
+      pronoun: 'Vous',
       examples: [
-        "Comment puis-je vous aider?",
-        "Que pensez-vous?",
-        "Permettez-moi de vous expliquer...",
-        "Vous avez raison de poser cette question.",
+        'Comment puis-je vous aider?',
+        'Que pensez-vous?',
+        'Permettez-moi de vous expliquer...',
+        'Vous avez raison de poser cette question.',
       ],
     },
     informal: {
-      pronoun: "tu",
+      pronoun: 'tu',
       examples: [
         "Comment puis-je t'aider?",
         "Qu'en penses-tu?",
-        "Dis-moi plus...",
-        "Tu as raison de te poser cette question.",
+        'Dis-moi plus...',
+        'Tu as raison de te poser cette question.',
       ],
     },
   },
   de: {
     formal: {
-      pronoun: "Sie",
+      pronoun: 'Sie',
       examples: [
-        "Wie kann ich Ihnen helfen?",
-        "Was denken Sie?",
-        "Erlauben Sie mir zu erklären...",
-        "Sie haben recht, diese Frage zu stellen.",
+        'Wie kann ich Ihnen helfen?',
+        'Was denken Sie?',
+        'Erlauben Sie mir zu erklären...',
+        'Sie haben recht, diese Frage zu stellen.',
       ],
     },
     informal: {
-      pronoun: "du",
+      pronoun: 'du',
       examples: [
-        "Wie kann ich dir helfen?",
-        "Was denkst du?",
-        "Sag mir mehr...",
-        "Du hast recht, diese Frage zu stellen.",
+        'Wie kann ich dir helfen?',
+        'Was denkst du?',
+        'Sag mir mehr...',
+        'Du hast recht, diese Frage zu stellen.',
       ],
     },
   },
   es: {
     formal: {
-      pronoun: "Usted",
+      pronoun: 'Usted',
       examples: [
-        "¿Cómo puedo servirle?",
-        "¿Qué piensa usted?",
-        "Permítame explicarle...",
-        "Usted tiene razón al hacer esta pregunta.",
+        '¿Cómo puedo servirle?',
+        '¿Qué piensa usted?',
+        'Permítame explicarle...',
+        'Usted tiene razón al hacer esta pregunta.',
       ],
     },
     informal: {
-      pronoun: "tú",
+      pronoun: 'tú',
       examples: [
-        "¿Cómo te puedo ayudar?",
-        "¿Qué piensas?",
-        "Dime más...",
-        "Tienes razón al hacer esta pregunta.",
+        '¿Cómo te puedo ayudar?',
+        '¿Qué piensas?',
+        'Dime más...',
+        'Tienes razón al hacer esta pregunta.',
       ],
     },
   },
   en: {
     formal: {
-      pronoun: "you (formal tone)",
+      pronoun: 'you (formal tone)',
       examples: [
-        "How may I assist you?",
-        "What are your thoughts?",
-        "Allow me to explain...",
-        "You are quite right to ask this question.",
+        'How may I assist you?',
+        'What are your thoughts?',
+        'Allow me to explain...',
+        'You are quite right to ask this question.',
       ],
     },
     informal: {
-      pronoun: "you (casual tone)",
+      pronoun: 'you (casual tone)',
       examples: [
-        "How can I help you?",
-        "What do you think?",
-        "Tell me more...",
+        'How can I help you?',
+        'What do you think?',
+        'Tell me more...',
         "You're right to ask that.",
       ],
     },
@@ -415,18 +389,16 @@ You are a modern and accessible character. You use casual, friendly language wit
  */
 export function isFormalCharacter(
   characterId: string,
-  characterType?: "maestro" | "coach" | "buddy",
+  characterType?: 'maestro' | 'coach' | 'buddy',
 ): boolean {
   // Coaches and buddies ALWAYS informal
-  if (characterType === "coach" || characterType === "buddy") {
+  if (characterType === 'coach' || characterType === 'buddy') {
     return false;
   }
 
   // Check if in formal professors list
-  const normalized = characterId.toLowerCase().split("-")[0];
-  return FORMAL_PROFESSORS.some(
-    (p) => normalized.includes(p) || p.includes(normalized),
-  );
+  const normalized = characterId.toLowerCase().split('-')[0];
+  return FORMAL_PROFESSORS.some((p) => normalized.includes(p) || p.includes(normalized));
 }
 
 /**
@@ -438,13 +410,11 @@ export function isFormalCharacter(
  */
 export function getFormalitySection(
   characterId: string,
-  characterType: "maestro" | "coach" | "buddy",
+  characterType: 'maestro' | 'coach' | 'buddy',
   language: SupportedLanguage,
 ): string {
   const isFormal = isFormalCharacter(characterId, characterType);
-  return isFormal
-    ? FORMAL_ADDRESS_SECTIONS[language]
-    : INFORMAL_ADDRESS_SECTIONS[language];
+  return isFormal ? FORMAL_ADDRESS_SECTIONS[language] : INFORMAL_ADDRESS_SECTIONS[language];
 }
 
 /**
@@ -457,10 +427,7 @@ export function getFormalityTerms(language: SupportedLanguage): FormalityTerms {
 /**
  * Get example phrases for formal or informal address in a language
  */
-export function getExamplePhrases(
-  language: SupportedLanguage,
-  isFormal: boolean,
-): string[] {
+export function getExamplePhrases(language: SupportedLanguage, isFormal: boolean): string[] {
   const terms = FORMALITY_TERMS[language];
   return isFormal ? terms.formal.examples : terms.informal.examples;
 }

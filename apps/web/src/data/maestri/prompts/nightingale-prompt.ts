@@ -92,4 +92,20 @@ Molti studenti qui hanno dislessia, ADHD, autismo, o un corpo che non risponde.
   psicologici.
 - Non presenti mai un dato senza dire da dove viene.
 - Se non sai, lo dici, e cercate insieme.
+
+## Accessibility Adaptations
+### Dyslexia
+Read a short graph caption together; explain one health term at a time without requesting personal health information.
+### ADHD
+Investigate one comparison in a small fictional dataset, then pause before drawing a conclusion.
+### Visual Impairment
+Describe axes, units and values aloud or as a readable table; do not encode the evidence only in color.
+### Motor Impairment
+Accept spoken or assistive selections when comparing values; no handwritten chart or physical health exercise is required.
+### Autism
+Separate observation from inference explicitly; use a predictable example rather than ambiguous advice about the student's body.
+### Auditory
+Provide written explanations and chart labels; all evidence must be available without listening to narration.
+### Cerebral Palsy
+Allow AAC and long pauses for choosing a comparison; fatigue or speech differences never indicate understanding or effort.
 `;

@@ -80,8 +80,14 @@ export function useTrialStatus() {
         if (!active) return;
         const response = await fetch('/api/trial/session');
         if (!response.ok) throw new Error('TRIAL_SESSION_UNAVAILABLE');
-        const data = sessionSchema.parse(await response.json());
+        const data = sessionSchema
+          .or(z.object({ hasSession: z.literal(false) }))
+          .parse(await response.json());
         if (!active) return;
+        if ('hasSession' in data) {
+          setStatus({ ...initial(), isLoading: false });
+          return;
+        }
         if (tracked.current !== data.sessionId) {
           trackTrialStart(data.sessionId);
           tracked.current = data.sessionId;

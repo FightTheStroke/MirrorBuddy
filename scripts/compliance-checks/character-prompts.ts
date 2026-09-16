@@ -1,6 +1,9 @@
-import fs from 'fs';
-import path from 'path';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+import { getAllMaestri } from '../../apps/web/src/data/maestri';
+import { FORMAL_PROFESSORS } from '../../packages/greeting/src/templates';
 import { CheckResult, fileExists, readFile, resolve } from './types';
+import { z } from 'zod';
 
 const CAT = 'Character Prompts';
 
@@ -28,8 +31,9 @@ const EXPECTED_FORMAL = [
   'goethe',
 ];
 
-// Keywords that indicate safety content in a prompt
-const SAFETY_KEYWORDS = ['Safety', 'Security', 'Ethics', 'safe', 'Anti-Cheating', 'Role Adherence'];
+export function missingFormalProfessors(members: readonly string[] | null | undefined): string[] {
+  return EXPECTED_FORMAL.filter((id) => !members?.includes(id));
+}
 
 export async function runCharacterPromptsChecks(): Promise<CheckResult[]> {
   const results: CheckResult[] = [];
@@ -55,33 +59,44 @@ export async function runCharacterPromptsChecks(): Promise<CheckResult[]> {
     }
   }
 
-  // --- Scan each maestro file for systemPrompt ---
-  const maestriDir = resolve(MAESTRI_DIR);
-  if (!fs.existsSync(maestriDir)) {
-    add('Maestri directory', 'FAIL', `Missing: ${MAESTRI_DIR}/`);
-    return results;
-  }
-
-  const maestroFiles = fs
-    .readdirSync(maestriDir)
-    .filter(
-      (f) =>
-        f.endsWith('.ts') &&
-        !f.includes('knowledge') &&
-        !f.includes('safety') &&
-        !f.includes('types') &&
-        !f.includes('index') &&
-        !f.includes('quotes') &&
-        !f.includes('.test.') &&
-        !f.startsWith('__'),
-    );
-
-  if (maestroFiles.length === 0) {
+  const maestri = getAllMaestri();
+  if (maestri.length === 0) {
     add('Maestro files', 'FAIL', 'No maestro definition files found');
     return results;
   }
 
-  add('Maestro count', 'PASS', `Found ${maestroFiles.length} maestro definitions`);
+  add('Maestro count', 'PASS', `Found ${maestri.length} registered maestro definitions`);
+
+  let safety: Record<string, string[]>;
+  try {
+    const output = execFileSync(
+      process.execPath,
+      [
+        '--conditions=react-server',
+        '--import',
+        'tsx',
+        resolve('scripts/compliance-checks/character-runtime.ts'),
+        '--compliance-runtime',
+      ],
+      {
+        cwd: resolve(''),
+        encoding: 'utf8',
+        timeout: 30_000,
+        env: { ...process.env, TSX_TSCONFIG_PATH: path.join(resolve(''), 'tsconfig.json') },
+      },
+    );
+    const line = output.split('\n').find((entry) => entry.startsWith('COMPLIANCE_SAFETY='));
+    safety = z
+      .record(z.string(), z.array(z.string()))
+      .parse(JSON.parse(line?.slice('COMPLIANCE_SAFETY='.length) ?? 'null'));
+  } catch (error) {
+    add(
+      'Maestro safety content',
+      'FAIL',
+      `Cannot execute server prompt composition: ${String(error)}`,
+    );
+    return results;
+  }
 
   let emptyPrompts = 0;
   let missingSafety = 0;
@@ -90,42 +105,29 @@ export async function runCharacterPromptsChecks(): Promise<CheckResult[]> {
   const safetyList: string[] = [];
   const a11yList: string[] = [];
 
-  for (const file of maestroFiles) {
-    const filePath = path.join(MAESTRI_DIR, file);
-    const content = readFile(filePath);
-    if (!content) continue;
-
-    const name = file.replace('.ts', '');
-
-    // Skip non-educational characters (excludeFromGamification = comedy/special)
-    if (content.includes('excludeFromGamification')) continue;
-
-    // Check systemPrompt exists and is non-empty
-    if (!content.includes('systemPrompt')) {
+  for (const maestro of maestri) {
+    const name = maestro.id;
+    if (!maestro.systemPrompt?.trim()) {
       emptyPrompts++;
       if (emptyList.length < 5) emptyList.push(name);
       continue;
     }
 
-    // Resolve the full prompt content: inline or from prompts/ file
-    let promptContent = content;
-    const importMatch = content.match(/import\s+\{[^}]*\}\s+from\s+["']\.\/prompts\/([^"']+)["']/);
-    if (importMatch) {
-      const promptFile = readFile(path.join(MAESTRI_DIR, 'prompts', importMatch[1] + '.ts'));
-      if (promptFile) promptContent = content + promptFile;
-    }
-
-    // Check safety content in prompt
-    const hasSafety = SAFETY_KEYWORDS.some((kw) => promptContent.includes(kw));
-    if (!hasSafety) {
+    const missing = safety[name] ?? ['missing runtime result'];
+    if (missing.length) {
       missingSafety++;
-      if (safetyList.length < 5) safetyList.push(name);
+      safetyList.push(`${name} (${missing.join(', ')})`);
     }
 
     // Check accessibility section
-    if (!promptContent.includes('Accessibility') && !promptContent.includes('accessibility')) {
+    if (
+      !maestro.excludeFromGamification &&
+      !/^#{1,2}\s*(Accessibility(?: Adaptations)?|Adattamenti per l'Accessibilità)\s*$/im.test(
+        maestro.systemPrompt,
+      )
+    ) {
       missingA11y++;
-      if (a11yList.length < 5) a11yList.push(name);
+      a11yList.push(name);
     }
   }
 
@@ -145,10 +147,10 @@ export async function runCharacterPromptsChecks(): Promise<CheckResult[]> {
     add(
       'Maestro safety content',
       'WARN',
-      `${missingSafety} maestro prompt(s) lack safety keywords: ${safetyList.join(', ')}`,
+      `${missingSafety} composed maestro prompt(s) lack safety instructions: ${safetyList.join(', ')}`,
     );
   } else {
-    add('Maestro safety content', 'PASS', 'All maestro prompts contain safety content');
+    add('Maestro safety content', 'PASS', 'All composed maestro prompts satisfy safety invariants');
   }
 
   // Report accessibility
@@ -163,12 +165,8 @@ export async function runCharacterPromptsChecks(): Promise<CheckResult[]> {
   }
 
   // --- Formal professors check ---
-  const formalPath = 'src/lib/greeting/templates/index.ts';
-  if (!fileExists(formalPath)) {
-    add('Formal professors', 'WARN', `Missing: ${formalPath}`);
-  } else {
-    const formalContent = readFile(formalPath) || '';
-    const missingFormal = EXPECTED_FORMAL.filter((p) => !formalContent.includes(`"${p}"`));
+  {
+    const missingFormal = missingFormalProfessors(FORMAL_PROFESSORS);
     if (missingFormal.length > 0) {
       add(
         'Formal professors list',

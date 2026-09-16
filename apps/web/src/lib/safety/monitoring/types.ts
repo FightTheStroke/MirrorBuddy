@@ -1,15 +1,18 @@
-export type SafetyEventType =
-  | 'input_blocked'
-  | 'input_warned'
-  | 'output_sanitized'
-  | 'jailbreak_attempt'
-  | 'crisis_detected'
-  | 'age_gate_triggered'
-  | 'pii_detected'
-  | 'profanity_detected'
-  | 'handoff_to_adult'
-  | 'session_terminated'
-  | 'repeated_violation';
+export const SAFETY_EVENT_TYPES = [
+  'input_blocked',
+  'input_warned',
+  'output_sanitized',
+  'jailbreak_attempt',
+  'crisis_detected',
+  'age_gate_triggered',
+  'pii_detected',
+  'profanity_detected',
+  'handoff_to_adult',
+  'session_terminated',
+  'repeated_violation',
+] as const;
+
+export type SafetyEventType = (typeof SAFETY_EVENT_TYPES)[number];
 
 export type EventSeverity = 'info' | 'warning' | 'alert' | 'critical';
 

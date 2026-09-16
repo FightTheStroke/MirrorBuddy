@@ -16,6 +16,7 @@
 'use client';
 
 import { clientLogger as logger } from '@/lib/logger/client';
+import { csrfFetch } from '@/lib/auth';
 import { isFeatureEnabled } from '@/lib/feature-flags/client';
 import type { TranscriptSafetyResult } from './transcript-safety';
 
@@ -64,16 +65,21 @@ export interface SafetyInterventionParams {
  * block or crash the voice session.
  */
 function escalateVoiceCrisis(sessionId: string, maestroId?: string): void {
-  fetch('/api/safety/escalate-voice-crisis', {
+  csrfFetch('/api/safety/escalate-voice-crisis', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sessionId, maestroId }),
-  }).catch((error) => {
-    logger.error('[SafetyIntervention] Crisis escalation request failed', {
-      sessionId,
-      error: error instanceof Error ? error.message : String(error),
+    keepalive: true,
+  })
+    .then((response) => {
+      if (!response.ok) throw new Error(`Crisis escalation failed (${response.status})`);
+    })
+    .catch((error) => {
+      logger.error('[SafetyIntervention] Crisis escalation request failed', {
+        sessionId,
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
-  });
 }
 
 /**

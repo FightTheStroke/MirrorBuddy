@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
+import { z } from 'zod';
 import { clientLogger as logger } from '@/lib/logger/client';
-import { csrfFetch } from '@/lib/auth';
-import { getUserIdFromCookie, requireIdentityRefresh } from '@/lib/auth/client-auth';
+import { csrfFetch, getUserIdFromCookie, requireIdentityRefresh } from '@/lib/auth';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useRouter } from '@/i18n/navigation';
 import { HeroSection } from './hero-section';
@@ -28,6 +28,7 @@ interface LandingPageProps {
   existingUserData: ExistingUserData | null;
   onStartOnboarding: () => void;
 }
+const trialSessionResponse = z.object({ sessionId: z.string().min(1) });
 
 export function LandingPage({ existingUserData, onStartOnboarding }: LandingPageProps) {
   const router = useRouter();
@@ -57,6 +58,7 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
         });
         throw new Error('Trial session unavailable');
       }
+      return trialSessionResponse.parse(await response.json()).sessionId;
     } catch (error) {
       logger.warn('[LandingPage] Trial session creation failed', {
         error: String(error),
@@ -76,21 +78,32 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
       await trackTrialStartClick();
 
       // Only create trial session for new users (returning users already have auth)
-      if (!isReturningUser) {
-        await createTrialSession();
-      }
+      let sessionId = !isReturningUser ? await createTrialSession() : undefined;
 
       // Save trial email if provided via TrialEmailForm
       const trialEmail =
         typeof window !== 'undefined' ? sessionStorage.getItem('mirrorbuddy-trial-email') : null;
       if (trialEmail) {
         try {
-          await csrfFetch('/api/trial/email', {
-            method: 'PATCH',
-            body: JSON.stringify({ email: trialEmail }),
-          });
+          if (!sessionId) {
+            const sessionResponse = await fetch('/api/trial/session');
+            if (!sessionResponse.ok)
+              throw new Error(`Trial session HTTP ${sessionResponse.status}`);
+            const ownedSession = trialSessionResponse.safeParse(await sessionResponse.json());
+            if (ownedSession.success) sessionId = ownedSession.data.sessionId;
+          }
+          if (sessionId) {
+            const emailResponse = await csrfFetch('/api/trial/email', {
+              method: 'PATCH',
+              body: JSON.stringify({ sessionId, email: trialEmail }),
+            });
+            if (!emailResponse.ok)
+              throw new Error(`Trial email capture HTTP ${emailResponse.status}`);
+          } else {
+            logger.warn('[WelcomePage] Optional trial email capture skipped: no owned session');
+          }
         } catch (error) {
-          logger.warn('[WelcomePage] Failed to save trial email', {
+          logger.warn('[WelcomePage] Optional trial email capture failed', {
             error: String(error),
           });
         }

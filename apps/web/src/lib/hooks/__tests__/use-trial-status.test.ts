@@ -75,6 +75,15 @@ describe('useTrialStatus authoritative separation', () => {
     expect(result.current.isTrialMode).toBe(false);
     expect(result.current.chatsRemaining).toBe(0);
   });
+  it('an absent trial remains unactivated without synthesizing quotas or creating a session', async () => {
+    setClientIdentity({ status: 'anonymous' });
+    fetchMock.mockResolvedValue(Response.json({ hasSession: false }));
+    const { result } = renderHook(() => useTrialStatus());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current).toMatchObject({ isTrialMode: false, error: null, chatsRemaining: 0 });
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/trial/session');
+    expect(track).not.toHaveBeenCalled();
+  });
   it('network failure does not mint default quotas', async () => {
     fetchMock.mockRejectedValue(new TypeError('Offline'));
     const { result } = renderHook(() => useTrialStatus());

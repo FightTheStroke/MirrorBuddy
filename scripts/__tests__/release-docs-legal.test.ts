@@ -7,11 +7,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 const root = resolve(import.meta.dirname, '../..');
 let fixture: string;
+let auditInvocations: number;
 function put(file: string, content = '') {
   mkdirSync(dirname(join(fixture, file)), { recursive: true });
   writeFileSync(join(fixture, file), content);
 }
 beforeEach(() => {
+  auditInvocations = 0;
   fixture = mkdtempSync(join(tmpdir(), 'release-docs-legal-'));
   const countries = ['italy', 'spain', 'france', 'germany', 'uk'];
   const sources = [
@@ -68,8 +70,12 @@ beforeEach(() => {
     join(fixture, 'scripts/compliance-audit-source-verification.ts'),
   );
 });
-afterEach(() => rmSync(fixture, { recursive: true, force: true }));
+afterEach(() => {
+  rmSync(fixture, { recursive: true, force: true });
+  expect(auditInvocations).toBe(1);
+});
 function run() {
+  auditInvocations += 1;
   const result = spawnSync(
     process.execPath,
     [
@@ -89,24 +95,27 @@ describe('native legal documentation audit', () => {
   it('rejects a missing namespace even when the obsolete root contains it', () => {
     rmSync(join(fixture, 'apps/web/messages/it/consent.json'));
     put('messages/it/consent.json', '{"consent": {}}');
-    expect(run().status).toBe(1);
-    expect(run().output).toContain('Missing translation file: apps/web/messages/it/consent.json');
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.output).toContain('Missing translation file: apps/web/messages/it/consent.json');
   });
   it('requires an actual authority citation, not a deceptive host prefix', () => {
     put(
       'docs/compliance/countries/italy/data-protection.md',
       'https://www.garanteprivacy.it.example.org',
     );
-    expect(run().status).toBe(1);
-    expect(run().output).toMatch(/Data Protection - Authority: Missing/);
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.output).toMatch(/Data Protection - Authority: Missing/);
   });
   it('fails explicitly on unreadable documents without dumping contents', () => {
     const file = join(fixture, 'docs/compliance/countries/italy/data-protection.md');
     rmSync(file);
     mkdirSync(file);
-    expect(run().status).toBe(1);
-    expect(run().output).toContain('Unable to read compliance document');
-    expect(run().output).not.toContain('EISDIR');
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.output).toContain('Unable to read compliance document');
+    expect(result.output).not.toContain('EISDIR');
   });
   it.each([
     ['italy', 'https://www.agid.gov.it'],
@@ -134,7 +143,8 @@ describe('native legal documentation audit', () => {
       `docs/compliance/countries/${country}/${document}.md`,
       `${reference}\nhttps://www.garanteprivacy.it\nhttps://www.numerique.gouv.fr`,
     );
-    expect(run().status).toBe(1);
-    expect(run().output).toContain('Statutory reference requires legal review');
+    const result = run();
+    expect(result.status).toBe(1);
+    expect(result.output).toContain('Statutory reference requires legal review');
   });
 });

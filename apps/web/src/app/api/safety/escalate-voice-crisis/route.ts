@@ -17,7 +17,9 @@
  */
 
 import { NextResponse, after } from 'next/server';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/server';
 import { detectLocaleFromNextRequest } from '@/lib/i18n/locale-detection';
 import {
@@ -29,24 +31,30 @@ import {
 
 export const revalidate = 0;
 
-interface VoiceCrisisEscalationBody {
-  sessionId: string;
-  maestroId?: string;
-  contentSnippet?: string;
-}
+const VoiceCrisisEscalationSchema = z.object({
+  sessionId: z.string().min(1),
+  maestroId: z.string().optional(),
+  contentSnippet: z.string().optional(),
+});
 
-export const POST = pipe(withSentry('/api/safety/escalate-voice-crisis'))(async (ctx) => {
+export const POST = pipe(
+  withSentry('/api/safety/escalate-voice-crisis'),
+  withCSRF,
+)(async (ctx) => {
   const auth = await validateAuth();
   const userId = auth.authenticated && auth.userId ? auth.userId : undefined;
 
-  const body = (await ctx.req.json().catch(() => null)) as VoiceCrisisEscalationBody | null;
-  if (!body?.sessionId) {
-    return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
+  const parsed = VoiceCrisisEscalationSchema.safeParse(await ctx.req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid crisis report: sessionId is required' },
+      { status: 400 },
+    );
   }
-  const { sessionId, maestroId } = body;
+  const { sessionId, maestroId } = parsed.data;
   // GDPR Art. 25 (data minimization): never persist the raw transcript, only
   // a short snippet for compliance audit context — same bound as the chat path.
-  const contentSnippet = body.contentSnippet?.slice(0, 50);
+  const contentSnippet = parsed.data.contentSnippet?.slice(0, 50);
 
   const runCrisisSideEffects = () =>
     Promise.all([
@@ -76,15 +84,15 @@ export const POST = pipe(withSentry('/api/safety/escalate-voice-crisis'))(async 
         : Promise.resolve(),
     ]);
 
+  const reportFailure = () => {
+    // Do not include transcript, identity or provider error text in this log.
+    logger.error('Voice crisis escalation side effects failed');
+  };
   try {
-    after(() =>
-      runCrisisSideEffects().catch(() => {
-        // Crisis logging must never crash the caller.
-      }),
-    );
+    after(() => runCrisisSideEffects().catch(reportFailure));
   } catch {
     // after() throws outside a request-scoped execution context (e.g. tests).
-    void runCrisisSideEffects().catch(() => {});
+    void runCrisisSideEffects().catch(reportFailure);
   }
 
   return NextResponse.json({ success: true });

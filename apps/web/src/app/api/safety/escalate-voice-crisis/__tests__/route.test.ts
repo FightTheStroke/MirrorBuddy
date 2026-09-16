@@ -7,22 +7,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
-
-vi.mock('@/lib/api/middlewares', () => ({
-  pipe:
-    (
-      ...middlewares: Array<
-        (
-          handler: (ctx: { req: NextRequest }) => Promise<Response>,
-        ) => (ctx: { req: NextRequest }) => Promise<Response>
-      >
-    ) =>
-    (handler: (ctx: { req: NextRequest }) => Promise<Response>) => {
-      const wrapped = middlewares.reduceRight((acc, mw) => mw(acc), handler);
-      return (req: NextRequest) => wrapped({ req });
-    },
-  withSentry: vi.fn(() => (handler: (ctx: { req: NextRequest }) => Promise<Response>) => handler),
-}));
+import { CSRF_TOKEN_COOKIE, CSRF_TOKEN_HEADER } from '@/lib/auth';
 
 vi.mock('@/lib/auth/server', () => ({
   validateAuth: vi.fn(),
@@ -51,6 +36,7 @@ import {
 function makeRequest(body: Record<string, unknown>): NextRequest {
   return new NextRequest('http://localhost:3000/api/safety/escalate-voice-crisis', {
     method: 'POST',
+    headers: { cookie: `${CSRF_TOKEN_COOKIE}=test-token`, [CSRF_TOKEN_HEADER]: 'test-token' },
     body: JSON.stringify(body),
   });
 }
