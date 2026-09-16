@@ -31,6 +31,24 @@ interface PushConfig {
 }
 
 /**
+ * Transport rejection from the metrics endpoint
+ *
+ * The message carries only the status so related rejections stay one reported
+ * problem; the response body is preserved on the error for attribution.
+ */
+export class MetricsPushError extends Error {
+  readonly status: number;
+  readonly responseBody: string;
+
+  constructor(status: number, responseBody: string) {
+    super(`Metrics push rejected: HTTP ${status}`);
+    this.name = 'MetricsPushError';
+    this.status = status;
+    this.responseBody = (responseBody ?? '').slice(0, 500);
+  }
+}
+
+/**
  * Escape a string for use as an Influx Line Protocol tag value.
  * Escapes backslash, comma, equals, and space characters.
  */
@@ -100,14 +118,14 @@ class PrometheusPushService {
     const intervalMs = this.config!.intervalSeconds * 1000;
 
     // Push immediately on start
-    this.pushMetrics().catch((err) =>
-      logger.error('Initial metrics push failed', { error: String(err) }),
+    this.pushMetrics().catch((error: unknown) =>
+      logger.error('Metrics push failed', { phase: 'initial' }, error),
     );
 
     // Then push periodically
     this.intervalId = setInterval(() => {
-      this.pushMetrics().catch((err) =>
-        logger.error('Periodic metrics push failed', { error: String(err) }),
+      this.pushMetrics().catch((error: unknown) =>
+        logger.error('Metrics push failed', { phase: 'periodic' }, error),
       );
     }, intervalMs);
 
@@ -155,7 +173,7 @@ class PrometheusPushService {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Push failed: ${response.status} ${text}`);
+      throw new MetricsPushError(response.status, text);
     }
 
     logger.debug('Metrics pushed successfully', { count: samples.length });
