@@ -3,6 +3,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
+import { classifyClient, normalizeRequestRoute } from '@/lib/observability/client-provenance';
 
 type SentryEvent = {
   logger?: string;
@@ -80,10 +81,19 @@ if (dsn) {
       }
 
       // Tag edge errors
+      const request = (event as { request?: { url?: string; headers?: Record<string, string> } })
+        .request;
+      const provenance = classifyClient(request?.headers?.['user-agent']);
+      const route = normalizeRequestRoute(request?.url);
+
       event.tags = {
         ...event.tags,
         runtime: 'edge',
         errorType: event.tags?.errorType || 'edge-error',
+        clientKind: provenance.clientKind,
+        uaFamily: provenance.uaFamily,
+        ...(provenance.automationMarker ? { automationMarker: provenance.automationMarker } : {}),
+        ...(route ? { httpRoute: route } : {}),
       };
 
       // Capture Next.js digest if present

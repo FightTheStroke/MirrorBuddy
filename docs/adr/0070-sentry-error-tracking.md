@@ -197,3 +197,44 @@ VERCEL_TOKEN=<token> ./scripts/verify-sentry-config.sh
 After deploy, Sentry errors appear at `https://sentry.io/organizations/fightthestroke/issues/`.
 Check within 5 minutes of deploy by triggering a known error path (e.g.,
 `GET /api/health?force_error=1` in dev with Sentry enabled).
+
+## Provenance tags (2026-09-16)
+
+Triaging the production backlog repeatedly stalled on a question the events could
+not answer: did this error come from a student, from a scanner, or from our own
+end-to-end run? The provenance had to be re-derived by hand from raw user-agent
+strings, one event at a time, and several groups stayed unattributable. Rather
+than write those groups off, the classification was moved into the reporting path.
+
+`apps/web/src/lib/observability/client-provenance.ts` derives the tags below, and
+all three runtimes (`sentry.client.config.ts`, `sentry.server.config.ts`,
+`sentry.edge.config.ts`) attach them in `beforeSend`.
+
+| Tag                | Values                                                                  | Meaning                                                    |
+| ------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `clientKind`       | `browser`, `automation`, `bot`, `http-client`, `unknown`                | What kind of caller produced the event                     |
+| `uaFamily`         | short slug, e.g. `chrome`, `safari-ios`, `headless-chrome`, `googlebot` | Agent family, bounded cardinality                          |
+| `automationMarker` | e.g. `webdriver`, `playwright`, `lighthouse`                            | Present only when automation was proven, naming the signal |
+| `httpRoute`        | e.g. `/api/materials/:id`                                               | Server/edge only: the failing route                        |
+
+Triage rules this enables:
+
+- `clientKind:automation` or `clientKind:bot` — not a user-facing fault. Safe to
+  close as noise **on the evidence of the tag**, not on a guess.
+- `clientKind:browser` — a real person hit this. Never close without a fix or a
+  reproduction.
+- `clientKind:unknown` — the agent string was absent or unrecognised. Investigate;
+  do not treat as automation.
+
+Two invariants the unit tests enforce
+(`apps/web/src/lib/observability/__tests__/`):
+
+- **Bounded cardinality** — every `uaFamily` is a short `[a-z0-9-]` slug, so the
+  tag can be aggregated instead of exploding into one value per visitor.
+- **No leakage** — the raw agent string is never echoed into a tag value, and
+  `httpRoute` drops the query string and fragment and collapses identifier-shaped
+  path segments to `:id`. A token in a URL cannot reach Sentry through this path.
+
+`navigator.webdriver` already disables client reporting entirely
+(`apps/web/src/lib/sentry/env.ts`); the tag matters for the server and edge
+runtimes, where the request arrives from a driven browser but is reported by us.

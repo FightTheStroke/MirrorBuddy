@@ -4,6 +4,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
+import { classifyClient } from '@/lib/observability/client-provenance';
 
 type SentryEvent = {
   logger?: string;
@@ -179,11 +180,19 @@ if (dsn) {
       }
 
       // Add browser context
+      const provenance = classifyClient(
+        typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        { webdriver: typeof navigator !== 'undefined' && navigator.webdriver === true },
+      );
+
       event.tags = {
         ...event.tags,
         userAgent: navigator.userAgent.substring(0, 100),
         viewport: `${window.innerWidth}x${window.innerHeight}`,
         online: navigator.onLine ? 'yes' : 'no',
+        clientKind: provenance.clientKind,
+        uaFamily: provenance.uaFamily,
+        ...(provenance.automationMarker ? { automationMarker: provenance.automationMarker } : {}),
       };
 
       return event;
