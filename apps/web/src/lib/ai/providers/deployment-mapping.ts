@@ -50,7 +50,7 @@ function getChatDeploymentFallback(): string | undefined {
 /**
  * Mapping from tier model names to Azure deployment names
  *
- * Keys: Model names stored in TierDefinition.chatModel / realtimeModel
+ * Keys: Logical chat model names from tiers and global voice deployment aliases
  * Values: Actual Azure deployment names from env vars or direct names
  */
 const DEPLOYMENT_MAP: Record<string, string | undefined> = {

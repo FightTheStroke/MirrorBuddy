@@ -62,11 +62,7 @@ export function extractTierLimits(tier: TierDefinition): TierLimits {
  * Get AI model from tier based on type (legacy)
  * @deprecated Use getModelForFeature for per-feature selection
  */
-export function getModelFromTier(tier: TierDefinition, type: 'chat' | 'vision' | 'tts'): string {
-  if (type === 'tts') {
-    return tier.realtimeModel;
-  }
-
+export function getModelFromTier(tier: TierDefinition, _type: 'chat' | 'vision'): string {
   // For chat and vision, use chatModel
   // Vision capabilities are included in chat models (gpt-5-mini, gpt-5.2-edu, gpt-5.2-chat)
   return tier.chatModel;
@@ -77,7 +73,6 @@ export function getModelFromTier(tier: TierDefinition, type: 'chat' | 'vision' |
  */
 export type FeatureModelType =
   | 'chat'
-  | 'realtime'
   | 'pdf'
   | 'mindmap'
   | 'quiz'
@@ -99,7 +94,6 @@ export type FeatureModelType =
 export function getModelForFeature(tier: TierDefinition, feature: FeatureModelType): string {
   const modelMap: Record<FeatureModelType, string> = {
     chat: tier.chatModel,
-    realtime: tier.realtimeModel,
     pdf: tier.pdfModel,
     mindmap: tier.mindmapModel,
     quiz: tier.quizModel,
@@ -129,7 +123,7 @@ export function getModelForFeature(tier: TierDefinition, feature: FeatureModelTy
  */
 export function getFeatureAIConfig(tier: TierDefinition, feature: FeatureType): FeatureAIConfig {
   // Get base model from tier's per-feature model columns
-  const model = getModelForFeature(tier, feature as FeatureModelType);
+  const model = getModelForFeature(tier, feature);
 
   // Get default temperature and maxTokens
   const defaults = DEFAULT_FEATURE_CONFIGS[feature];

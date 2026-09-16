@@ -78,6 +78,25 @@ policy for sexual/hate content), mirroring `gpt-realtime-2`.
 
 ## Decision
 
+### Clarification (2026-09-16) — no per-tier voice model
+
+Per-tier realtime model configuration was removed on 2026-09-16 (issue #846,
+Finding 2) because no voice session route used it. The database column is retained
+for backwards compatibility, but tier helpers, seeds, and admin controls no longer
+read or write a voice model assignment. No database migration was created.
+
+Web token routes choose a deployment globally using environment variables and the
+`voice_realtime_21`, `voice_realtime_2`, and `voice_realtime_15` feature flags,
+with the configured priority V21 -> V2 -> V15 -> legacy. The device credentials
+route currently uses environment-only priority V21 -> V2 -> legacy, without these
+flags or the V15 rung. Neither path consults the user's tier for model selection;
+this removal does not change their routing or tier-based voice usage limits.
+
+Preview-model risk remains tracked in #1022 (Finding 1); the `gpt-realtime-mini`
+2026-12-15 retirement (Finding 3) is outside this removal.
+
+### Original rollout
+
 1. Add `gpt-realtime-2.1` to the deployment map, gated by a new feature flag
    `voice_realtime_21`.
 2. `voice_realtime_21` takes **precedence over** `voice_realtime_2` in both the

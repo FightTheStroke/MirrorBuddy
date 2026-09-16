@@ -1191,7 +1191,6 @@
     "gpt52Chat": "GPT-5.2 Chat",
     "currentConfiguration": "Current Configuration",
     "chatModel": "Chat Model:",
-    "realtimeModel": "Realtime Model:",
     "quizModel": "Quiz Model:",
     "saveFeatures": "Save Features",
     "pricing": "Pricing",

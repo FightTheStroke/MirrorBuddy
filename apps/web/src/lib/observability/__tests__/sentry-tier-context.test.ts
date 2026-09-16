@@ -74,7 +74,6 @@ describe('setSentryTierContext', () => {
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
       chatModel: 'gpt-5.2-chat',
-      realtimeModel: 'gpt-realtime',
       ...defaultModelFields,
       features: {
         chat: true,
@@ -156,7 +155,6 @@ describe('setSentryTierContext', () => {
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
       chatModel: 'gpt-5-mini',
-      realtimeModel: 'gpt-realtime',
       ...defaultModelFields,
       features: {
         chat: true,
@@ -210,7 +208,6 @@ describe('setSentryTierContext', () => {
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
       chatModel: 'gpt-5-mini',
-      realtimeModel: 'gpt-realtime',
       ...defaultModelFields,
       features: {
         chat: true,
@@ -262,7 +259,6 @@ describe('setSentryTierContext', () => {
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
       chatModel: 'gpt-5.2-chat',
-      realtimeModel: 'gpt-realtime',
       ...defaultModelFields,
       features: {
         chat: true,
@@ -324,7 +320,6 @@ describe('setSentryTierContext', () => {
       videoVisionSecondsPerSession: 0,
       videoVisionMinutesMonthly: 0,
       chatModel: 'gpt-5.2-chat',
-      realtimeModel: 'gpt-realtime',
       ...defaultModelFields,
       features: {
         chat: true,

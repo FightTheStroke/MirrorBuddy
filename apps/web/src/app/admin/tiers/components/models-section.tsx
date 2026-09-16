@@ -21,7 +21,6 @@ interface ModelInfo {
 interface ModelsSectionProps {
   formData: {
     chatModel: string;
-    realtimeModel: string;
     pdfModel: string;
     mindmapModel: string;
     quizModel: string;
@@ -38,7 +37,6 @@ interface ModelsSectionProps {
 
 const FEATURE_LABELS: Record<keyof ModelsSectionProps['formData'], string> = {
   chatModel: 'Chat (Conversazione)',
-  realtimeModel: 'Voce (Realtime)',
   pdfModel: 'PDF',
   mindmapModel: 'Mappe Mentali',
   quizModel: 'Quiz',
@@ -61,7 +59,6 @@ const WIRED_FEATURES = new Set<string>(['chatModel']);
 
 const FEATURE_CATEGORIES: Record<string, string> = {
   chatModel: 'chat',
-  realtimeModel: 'realtime',
   pdfModel: 'chat',
   mindmapModel: 'chat',
   quizModel: 'chat',
@@ -218,7 +215,7 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
     );
   }
 
-  const mainFeatures = ['chatModel', 'realtimeModel'] as const;
+  const mainFeatures = ['chatModel'] as const;
   const toolFeatures = [
     'pdfModel',
     'mindmapModel',

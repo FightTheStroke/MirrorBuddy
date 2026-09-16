@@ -138,25 +138,24 @@ describe('deployment-mapping', () => {
   });
 });
 
-describe('tier realtime model mapping', () => {
-  it('should map Trial tier to gpt-realtime-mini (cost-effective)', async () => {
+describe('tier models exclude global voice deployment', () => {
+  it('should not expose a Trial tier realtime model', async () => {
     // eslint-disable-next-line local-rules/enforce-module-boundaries -- test needs internal sub-module access
     const { createFallbackTier } = await import('@/lib/tier/tier-fallbacks');
     // eslint-disable-next-line local-rules/enforce-module-boundaries -- test needs internal sub-module access
     const { TierCode } = await import('@/lib/tier/types');
 
     const trial = createFallbackTier(TierCode.TRIAL);
-    expect(trial.realtimeModel).toBe('gpt-realtime-mini');
+    expect(trial).not.toHaveProperty('realtimeModel');
   });
 
-  it('should map Base tier to gpt-realtime-mini (cost-effective)', async () => {
+  it('should not expose a Base tier realtime model', async () => {
     // eslint-disable-next-line local-rules/enforce-module-boundaries -- test needs internal sub-module access
     const { createFallbackTier } = await import('@/lib/tier/tier-fallbacks');
     // eslint-disable-next-line local-rules/enforce-module-boundaries -- test needs internal sub-module access
     const { TierCode } = await import('@/lib/tier/types');
 
-    // Base tier should use mini for cost-effectiveness
     const base = createFallbackTier(TierCode.BASE);
-    expect(base.realtimeModel).toBe('gpt-realtime-mini');
+    expect(base).not.toHaveProperty('realtimeModel');
   });
 });

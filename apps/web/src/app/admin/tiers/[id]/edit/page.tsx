@@ -1,15 +1,15 @@
 // Mark as dynamic to avoid static generation issues with i18n
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-import { validateAdminAuth } from "@/lib/auth/server";
-import { prisma } from "@/lib/db";
-import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { TierForm } from "../../components/tier-form";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { validateAdminAuth } from '@/lib/auth/server';
+import { prisma } from '@/lib/db';
+import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
+import { TierForm } from '../../components/tier-form';
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface EditTierPageProps {
   params: Promise<{ id: string }>;
@@ -19,10 +19,10 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
-    redirect("/login");
+    redirect('/login');
   }
 
-  const t = await getTranslations("admin.tiers");
+  const t = await getTranslations('admin.tiers');
   const { id } = await params;
 
   const tier = await prisma.tierDefinition.findUnique({
@@ -41,8 +41,7 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
     description: tier.description,
     monthlyPriceEur:
       tier.monthlyPriceEur !== null
-        ? typeof tier.monthlyPriceEur === "object" &&
-          "toNumber" in tier.monthlyPriceEur
+        ? typeof tier.monthlyPriceEur === 'object' && 'toNumber' in tier.monthlyPriceEur
           ? tier.monthlyPriceEur.toNumber()
           : Number(tier.monthlyPriceEur)
         : null,
@@ -55,7 +54,6 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
     videoVisionSecondsPerSession: tier.videoVisionSecondsPerSession,
     videoVisionMinutesMonthly: tier.videoVisionMinutesMonthly,
     chatModel: tier.chatModel,
-    realtimeModel: tier.realtimeModel,
     pdfModel: tier.pdfModel,
     mindmapModel: tier.mindmapModel,
     quizModel: tier.quizModel,
@@ -80,14 +78,14 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
         <Link href="/admin/tiers">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {t("page.backToTiers")}
+            {t('page.backToTiers')}
           </Button>
         </Link>
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-          {t("page.editTier")}
+          {t('page.editTier')}
         </h1>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-          {t("page.editMessage", { name: tier.name })}
+          {t('page.editMessage', { name: tier.name })}
         </p>
       </div>
 

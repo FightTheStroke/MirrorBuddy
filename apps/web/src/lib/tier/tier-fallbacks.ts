@@ -39,7 +39,6 @@ export function createFallbackTier(code: TierCode): TierDefinition {
       videoVisionMinutesMonthly: 0,
       // Per-feature models (ADR 0073) - env-driven defaults
       chatModel: CHAT_MODEL,
-      realtimeModel: 'gpt-realtime-mini',
       pdfModel: CHAT_MODEL,
       mindmapModel: CHAT_MODEL,
       quizModel: CHAT_MODEL,
@@ -88,7 +87,6 @@ export function createFallbackTier(code: TierCode): TierDefinition {
     videoVisionMinutesMonthly: 0,
     // Per-feature models (ADR 0073) - env-driven defaults
     chatModel: CHAT_MODEL_EDU,
-    realtimeModel: 'gpt-realtime-mini',
     pdfModel: CHAT_MODEL,
     mindmapModel: CHAT_MODEL,
     quizModel: CHAT_MODEL_EDU,

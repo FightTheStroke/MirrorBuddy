@@ -199,7 +199,6 @@ test.describe('Admin Tiers - Features Section', () => {
           toolsLimitDaily: 50,
           docsLimitTotal: 10,
           chatModel: 'gpt-5.2-chat',
-          realtimeModel: 'gpt-realtime',
           features: {
             video_vision: true,
             voice_enabled: true,
@@ -257,7 +256,6 @@ test.describe('Admin Tiers - Features Section', () => {
           toolsLimitDaily: 50,
           docsLimitTotal: 10,
           chatModel: 'gpt-5.2-chat',
-          realtimeModel: 'gpt-realtime',
           features: {
             video_vision: false,
             pdf_export: false,
@@ -302,7 +300,6 @@ test.describe('Admin Tiers - Features Section', () => {
           toolsLimitDaily: 50,
           docsLimitTotal: 10,
           chatModel: 'gpt-5.2-chat',
-          realtimeModel: 'gpt-realtime',
           features: {},
           availableMaestri: [],
           availableCoaches: [],

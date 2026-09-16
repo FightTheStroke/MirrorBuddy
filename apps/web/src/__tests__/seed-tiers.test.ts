@@ -91,7 +91,6 @@ describe('Pro tier roster', () => {
 describe('Per-feature models (ADR 0073)', () => {
   const FEATURE_MODEL_FIELDS = [
     'chatModel',
-    'realtimeModel',
     'pdfModel',
     'mindmapModel',
     'quizModel',
@@ -121,16 +120,14 @@ describe('Per-feature models (ADR 0073)', () => {
     },
   );
 
-  it('keeps Base on the cheap realtime model, matching tier-fallbacks', () => {
-    const base = seededTier('base');
-    expect(base.create.realtimeModel).toBe('gpt-realtime-mini');
-    expect(base.update.realtimeModel).toBe('gpt-realtime-mini');
-  });
-
-  it('gives full realtime only to Pro', () => {
-    expect(seededTier('pro').create.realtimeModel).toBe('gpt-realtime');
-    expect(seededTier('trial').create.realtimeModel).toBe('gpt-realtime-mini');
-  });
+  it.each(['trial', 'base', 'pro'] as const)(
+    '%s leaves the deprecated voice model column untouched',
+    (code) => {
+      const tier = seededTier(code);
+      expect(tier.create).not.toHaveProperty('realtimeModel');
+      expect(tier.update).not.toHaveProperty('realtimeModel');
+    },
+  );
 });
 
 describe('Trial tier stays locked down', () => {
