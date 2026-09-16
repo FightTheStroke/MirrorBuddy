@@ -131,7 +131,7 @@ describe('planning what to do about production alerts', () => {
 
 describe('what the issue says', () => {
   it('labels a Sentry alert as a production error', () => {
-    expect(issueTitle(alert())).toContain('[Production error]');
+    expect(issueTitle(alert())).toContain('[Sentry error]');
   });
 
   it('labels a Vercel alert as a deployment failure', () => {

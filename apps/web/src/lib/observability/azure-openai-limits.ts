@@ -4,19 +4,17 @@
  * Queries Azure Monitor Metrics API for real-time OpenAI usage.
  * Used for real-time stress metrics (F-05) and automatic limit queries (F-22).
  *
- * Environment Variables Required:
- *   - AZURE_OPENAI_ENDPOINT: OpenAI endpoint URL
- *   - AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET: Service principal
- *   - AZURE_SUBSCRIPTION_ID: Azure subscription ID
- *
- * Usage:
- *   import { getAzureOpenAILimits } from '@/lib/observability/azure-openai-limits';
- *   const limits = await getAzureOpenAILimits();
- *   console.log(limits.tpm.used, limits.rpm.used);
+ * ADR 0142: Service Principal monitoring is intentionally not configured.
+ * Cost reporting uses local scripts/azure-costs.sh; do not provision credentials.
  */
 
 import { logger } from '@/lib/logger';
-import { getAzureToken, getCached, setCache } from '@/app/api/azure/costs/helpers';
+import {
+  getAzureToken,
+  getCached,
+  setCache,
+  hasServicePrincipalCredentials,
+} from '@/app/api/azure/costs/helpers';
 import { parseAzureResourceId, queryAzureMetrics } from './azure-monitor-client';
 import { calculateStatus, AlertStatus } from './threshold-logic';
 
@@ -34,12 +32,21 @@ export interface ResourceMetric {
 /**
  * Azure OpenAI limits snapshot
  */
-export interface AzureOpenAILimits {
-  tpm: ResourceMetric; // Tokens Per Minute
-  rpm: ResourceMetric; // Requests Per Minute
-  timestamp: string;
-  error?: string;
-}
+export type AzureOpenAILimits =
+  | {
+      tpm: ResourceMetric;
+      rpm: ResourceMetric;
+      timestamp: string;
+      status: 'ok';
+      error?: never;
+    }
+  | {
+      tpm: null;
+      rpm: null;
+      timestamp: string;
+      status: 'not_configured' | 'error';
+      error: string;
+    };
 
 /**
  * Azure OpenAI documented limits (from T1-05 audit)
@@ -80,12 +87,19 @@ function formatMetric(used: number, limit: number, unit: string): ResourceMetric
  * @example
  * ```typescript
  * const limits = await getAzureOpenAILimits();
- * if (limits.tpm.usagePercent > 80) {
+ * if (limits.status === 'ok' && limits.tpm.usagePercent > 80) {
  *   console.warn('TPM usage critical:', limits.tpm.usagePercent);
  * }
  * ```
  */
 export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
+  if (!hasServicePrincipalCredentials()) {
+    return createEmptyLimits(
+      'NOT_CONFIGURED: Azure Monitor disabled by ADR 0142; use local scripts/azure-costs.sh',
+      'not_configured',
+    );
+  }
+
   // Check cache first (rate limiting for metrics API)
   const cached = getCached<AzureOpenAILimits>('azure_openai_limits');
   if (cached) {
@@ -105,7 +119,7 @@ export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
   // Get Azure token for authentication
   const token = await getAzureToken();
   if (!token) {
-    const error = 'Azure authentication failed - configure service principal credentials';
+    const error = 'Azure authentication failed';
     logger.warn(`[azure-openai-limits] ${error}`);
     const result = createEmptyLimits(error);
     setCache('azure_openai_limits', result);
@@ -128,6 +142,7 @@ export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
     ]);
 
     const limits: AzureOpenAILimits = {
+      status: 'ok',
       tpm: formatMetric(tpmUsed, AZURE_OPENAI_DEFAULT_LIMITS.TPM, 'tokens/min'),
       rpm: formatMetric(rpmUsed, AZURE_OPENAI_DEFAULT_LIMITS.RPM, 'requests/min'),
       timestamp: new Date().toISOString(),
@@ -152,10 +167,14 @@ export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
 /**
  * Create empty limits response on error
  */
-function createEmptyLimits(error: string): AzureOpenAILimits {
+function createEmptyLimits(
+  error: string,
+  status: 'error' | 'not_configured' = 'error',
+): AzureOpenAILimits {
   return {
-    tpm: { used: 0, limit: 0, usagePercent: 0, unit: 'tokens/min', status: 'ok' },
-    rpm: { used: 0, limit: 0, usagePercent: 0, unit: 'requests/min', status: 'ok' },
+    tpm: null,
+    rpm: null,
+    status,
     timestamp: new Date().toISOString(),
     error,
   };
@@ -165,17 +184,17 @@ function createEmptyLimits(error: string): AzureOpenAILimits {
  * Check if OpenAI usage is above threshold (F-05 stress detection)
  *
  * @param threshold - Percentage threshold (default: 80)
- * @returns {Promise<boolean>} True if any metric exceeds threshold
+ * @returns True if stressed; null when monitoring is unavailable.
  */
-export async function isAzureOpenAIStressed(threshold: number = 80): Promise<boolean> {
+export async function isAzureOpenAIStressed(threshold: number = 80): Promise<boolean | null> {
   try {
     const limits = await getAzureOpenAILimits();
-    if (limits.error) return false;
+    if (limits.error || !limits.tpm || !limits.rpm) return null;
 
     return limits.tpm.usagePercent >= threshold || limits.rpm.usagePercent >= threshold;
   } catch (error) {
     logger.error('[azure-openai-limits] Failed to check stress', undefined, error);
-    return false; // Fail open - don't block on monitoring errors
+    return null;
   }
 }
 
@@ -187,7 +206,8 @@ export async function isAzureOpenAIStressed(threshold: number = 80): Promise<boo
 export async function getAzureOpenAIStressReport(): Promise<string> {
   try {
     const limits = await getAzureOpenAILimits();
-    if (limits.error) {
+    if (limits.status === 'not_configured') return limits.error;
+    if (limits.status !== 'ok') {
       return `Azure OpenAI monitoring error: ${limits.error}`;
     }
 

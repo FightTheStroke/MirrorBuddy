@@ -21,6 +21,14 @@ local `scripts/azure-costs.sh` path, which authenticates with the operator's own
 The Service Principal was never created; nothing is broken in production. The
 admin widget degrades gracefully (`api/azure/costs/route.ts:32` → HTTP 503).
 
+The limits collector represents this decision explicitly: missing Service Principal
+credentials return `status: "not_configured"` with a `NOT_CONFIGURED` explanation
+and null TPM/RPM metrics, before consulting cache or requesting a token. Prometheus
+reports the collector as disabled/unavailable without usage zeros or recurring
+Sentry errors. Stress is unknown (`null`), not a healthy `false`. Actual failures
+on a configured monitoring path remain errors. This implements the rejection;
+it does not reopen the proposal or change API-key authentication (ADR 0173).
+
 ### Rationale
 
 1. **The number would be wrong.** Subscription `8015083b-…` is shared with

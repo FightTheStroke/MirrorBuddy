@@ -234,7 +234,7 @@ describe('sentry.server.config', () => {
     expect((result as any)?.tags).toHaveProperty('errorType', 'ssr-render');
   });
 
-  it('SENTRY_FORCE_ENABLE escape hatch works', async () => {
+  it('SENTRY_FORCE_ENABLE does not bypass local server isolation', async () => {
     vi.stubEnv('NODE_ENV', 'development');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
     vi.stubEnv('SENTRY_FORCE_ENABLE', 'true');
@@ -244,7 +244,7 @@ describe('sentry.server.config', () => {
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
-    expect(initCall.enabled).toBe(true);
+    expect(initCall.enabled).toBe(false);
   });
 
   it('does not call init when DSN is missing', async () => {
@@ -329,7 +329,7 @@ describe('sentry.edge.config', () => {
     expect((result as any)?.tags).toHaveProperty('runtime', 'edge');
   });
 
-  it('SENTRY_FORCE_ENABLE escape hatch works', async () => {
+  it('SENTRY_FORCE_ENABLE does not bypass local edge isolation', async () => {
     vi.stubEnv('NODE_ENV', 'development');
     vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', 'https://test@sentry.io/123');
     vi.stubEnv('SENTRY_FORCE_ENABLE', 'true');
@@ -339,7 +339,7 @@ describe('sentry.edge.config', () => {
 
     expect(Sentry.init).toHaveBeenCalledTimes(1);
     const initCall = vi.mocked(Sentry.init).mock.calls[0][0];
-    expect(initCall.enabled).toBe(true);
+    expect(initCall.enabled).toBe(false);
   });
 
   it('does not call init when DSN is missing', async () => {

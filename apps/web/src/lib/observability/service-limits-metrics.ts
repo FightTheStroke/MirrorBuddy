@@ -14,10 +14,10 @@
  *   - service_limit_absolute{service, metric, type="used|limit"}
  */
 
-import { logger } from "@/lib/logger";
-import { getVercelLimits } from "./vercel-limits";
-import { getSupabaseLimits } from "./supabase-limits";
-import { getAzureOpenAILimits } from "./azure-openai-limits";
+import { collectMetricSource } from './collect-metric-source';
+import { getVercelLimits } from './vercel-limits';
+import { getSupabaseLimits } from './supabase-limits';
+import { getAzureOpenAILimits } from './azure-openai-limits';
 
 export interface ServiceLimitMetricSample {
   name: string;
@@ -44,20 +44,20 @@ function createLimitMetrics(
 ): ServiceLimitMetricSample[] {
   return [
     {
-      name: "service_limit_usage_percentage",
+      name: 'service_limit_usage_percentage',
       labels: { ...instanceLabels, service, metric },
       value: data.percent,
       timestamp,
     },
     {
-      name: "service_limit_absolute",
-      labels: { ...instanceLabels, service, metric, type: "used" },
+      name: 'service_limit_absolute',
+      labels: { ...instanceLabels, service, metric, type: 'used' },
       value: data.used,
       timestamp,
     },
     {
-      name: "service_limit_absolute",
-      labels: { ...instanceLabels, service, metric, type: "limit" },
+      name: 'service_limit_absolute',
+      labels: { ...instanceLabels, service, metric, type: 'limit' },
       value: data.limit,
       timestamp,
     },
@@ -73,20 +73,21 @@ export async function collectServiceLimitsSamples(
 ): Promise<ServiceLimitMetricSample[]> {
   const samples: ServiceLimitMetricSample[] = [];
 
-  // Collect Vercel metrics
-  const vercelSamples = await collectVercelLimits(instanceLabels, timestamp);
-  samples.push(...vercelSamples);
-
-  // Collect Supabase metrics
-  const supabaseSamples = await collectSupabaseLimits(instanceLabels, timestamp);
-  samples.push(...supabaseSamples);
-
-  // Collect Azure OpenAI metrics (F-02)
-  const azureOpenAISamples = await collectAzureOpenAILimits(
-    instanceLabels,
-    timestamp,
-  );
-  samples.push(...azureOpenAISamples);
+  const collectors = {
+    vercel: collectVercelLimits,
+    supabase: collectSupabaseLimits,
+    azure_openai: collectAzureOpenAILimits,
+  };
+  for (const [name, collect] of Object.entries(collectors)) {
+    samples.push(
+      ...(await collectMetricSource(
+        name,
+        () => collect(instanceLabels, timestamp),
+        instanceLabels,
+        timestamp,
+      )),
+    );
+  }
 
   return samples;
 }
@@ -100,25 +101,16 @@ async function collectVercelLimits(
 ): Promise<ServiceLimitMetricSample[]> {
   const samples: ServiceLimitMetricSample[] = [];
 
-  try {
-    const limits = await getVercelLimits();
-    if (limits.error) {
-      logger.debug("Skipping Vercel metrics", { error: limits.error });
-      return samples;
-    }
-
-    samples.push(
-      ...createLimitMetrics(instanceLabels, "vercel", "bandwidth", limits.bandwidth, timestamp),
-      ...createLimitMetrics(instanceLabels, "vercel", "builds", limits.builds, timestamp),
-      ...createLimitMetrics(instanceLabels, "vercel", "functions", limits.functions, timestamp),
-    );
-
-    logger.debug("Collected Vercel metrics", { count: samples.length });
-  } catch (error) {
-    logger.warn("Failed to collect Vercel metrics", {
-      error: error instanceof Error ? error.message : String(error),
-    });
+  const limits = await getVercelLimits();
+  if (limits.error) {
+    throw new Error(limits.error);
   }
+
+  samples.push(
+    ...createLimitMetrics(instanceLabels, 'vercel', 'bandwidth', limits.bandwidth, timestamp),
+    ...createLimitMetrics(instanceLabels, 'vercel', 'builds', limits.builds, timestamp),
+    ...createLimitMetrics(instanceLabels, 'vercel', 'functions', limits.functions, timestamp),
+  );
 
   return samples;
 }
@@ -132,57 +124,49 @@ async function collectSupabaseLimits(
 ): Promise<ServiceLimitMetricSample[]> {
   const samples: ServiceLimitMetricSample[] = [];
 
-  try {
-    const limits = await getSupabaseLimits();
+  const limits = await getSupabaseLimits();
 
-    // Database and connections
+  // Database and connections
+  samples.push(
+    ...createLimitMetrics(
+      instanceLabels,
+      'supabase',
+      'database',
+      {
+        used: limits.database.used,
+        limit: limits.database.limit,
+        percent: limits.database.usagePercent,
+      },
+      timestamp,
+    ),
+    ...createLimitMetrics(
+      instanceLabels,
+      'supabase',
+      'connections',
+      {
+        used: limits.connections.used,
+        limit: limits.connections.limit,
+        percent: limits.connections.usagePercent,
+      },
+      timestamp,
+    ),
+  );
+
+  // Storage (if available)
+  if (limits.storage) {
     samples.push(
       ...createLimitMetrics(
         instanceLabels,
-        "supabase",
-        "database",
+        'supabase',
+        'storage',
         {
-          used: limits.database.used,
-          limit: limits.database.limit,
-          percent: limits.database.usagePercent,
-        },
-        timestamp,
-      ),
-      ...createLimitMetrics(
-        instanceLabels,
-        "supabase",
-        "connections",
-        {
-          used: limits.connections.used,
-          limit: limits.connections.limit,
-          percent: limits.connections.usagePercent,
+          used: limits.storage.used,
+          limit: limits.storage.limit,
+          percent: limits.storage.usagePercent,
         },
         timestamp,
       ),
     );
-
-    // Storage (if available)
-    if (limits.storage) {
-      samples.push(
-        ...createLimitMetrics(
-          instanceLabels,
-          "supabase",
-          "storage",
-          {
-            used: limits.storage.used,
-            limit: limits.storage.limit,
-            percent: limits.storage.usagePercent,
-          },
-          timestamp,
-        ),
-      );
-    }
-
-    logger.debug("Collected Supabase metrics", { count: samples.length });
-  } catch (error) {
-    logger.warn("Failed to collect Supabase metrics", {
-      error: error instanceof Error ? error.message : String(error),
-    });
   }
 
   return samples;
@@ -197,45 +181,44 @@ async function collectAzureOpenAILimits(
 ): Promise<ServiceLimitMetricSample[]> {
   const samples: ServiceLimitMetricSample[] = [];
 
-  try {
-    const limits = await getAzureOpenAILimits();
+  const limits = await getAzureOpenAILimits();
 
-    if (limits.error) {
-      logger.debug("Skipping Azure OpenAI metrics", { error: limits.error });
-      return samples;
-    }
-
-    samples.push(
-      ...createLimitMetrics(
-        instanceLabels,
-        "azure_openai",
-        "chat_tpm",
-        {
-          used: limits.tpm.used,
-          limit: limits.tpm.limit,
-          percent: limits.tpm.usagePercent,
-        },
-        timestamp,
-      ),
-      ...createLimitMetrics(
-        instanceLabels,
-        "azure_openai",
-        "chat_rpm",
-        {
-          used: limits.rpm.used,
-          limit: limits.rpm.limit,
-          percent: limits.rpm.usagePercent,
-        },
-        timestamp,
-      ),
-    );
-
-    logger.debug("Collected Azure OpenAI metrics", { count: samples.length });
-  } catch (error) {
-    logger.warn("Failed to collect Azure OpenAI metrics", {
-      error: error instanceof Error ? error.message : String(error),
-    });
+  const enabled = {
+    name: 'metric_collector_enabled',
+    labels: { ...instanceLabels, collector: 'azure_openai' },
+    value: limits.status === 'not_configured' ? 0 : 1,
+    timestamp,
+  };
+  if (limits.status === 'not_configured') return [enabled];
+  if (limits.status !== 'ok') {
+    throw new Error(limits.error);
   }
+
+  samples.push(
+    enabled,
+    ...createLimitMetrics(
+      instanceLabels,
+      'azure_openai',
+      'chat_tpm',
+      {
+        used: limits.tpm.used,
+        limit: limits.tpm.limit,
+        percent: limits.tpm.usagePercent,
+      },
+      timestamp,
+    ),
+    ...createLimitMetrics(
+      instanceLabels,
+      'azure_openai',
+      'chat_rpm',
+      {
+        used: limits.rpm.used,
+        limit: limits.rpm.limit,
+        percent: limits.rpm.usagePercent,
+      },
+      timestamp,
+    ),
+  );
 
   return samples;
 }

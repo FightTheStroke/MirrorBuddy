@@ -11,12 +11,14 @@ Accepted
 ## Context
 
 MirrorBuddy V1 requires enterprise-grade observability to:
+
 1. Monitor SLI/SLO compliance per V1Plan FASE 2
 2. Detect safety incidents (S0-S3) with appropriate response times
 3. Track session behavioral metrics for GO/NO-GO decisions
 4. Support investor-grade reporting on product health
 
 The existing `/api/metrics` endpoint provides pull-based Prometheus metrics, but production requires:
+
 - Push-based metrics for serverless/edge deployments
 - Managed dashboards and alerting
 - Persistent metric storage beyond instance lifetime
@@ -27,7 +29,19 @@ Adopt **Grafana Cloud** as the observability platform with:
 
 ### 1. Metrics Push Service
 
+**Optional Azure exporter clarification (2026-09-15):** Grafana metrics and Sentry
+error tracking do not require Application Insights. The secondary Azure Monitor
+exporter reports `NOT_CONFIGURED` when its connection string is absent, without
+raising a production incident or disabling general telemetry. If explicitly
+configured, exporter initialization/start failures remain errors; `INITIALIZED`
+and `STARTED` describe local SDK state, not proof of remote delivery.
+No new resource or cross-product Application Insights sharing is required or
+authorized by this decision. The production-critical message introduced in
+`61db145c` conflated required observability with this optional exporter; neither
+runtime environment validation nor pre-deploy validation requires that variable.
+
 New `prometheus-push-service.ts` pushes metrics to Grafana Cloud using **Influx Line Protocol**:
+
 - Simpler than Prometheus remote write (no Snappy compression needed)
 - Configurable push interval (default: 60s, minimum: 15s)
 - Graceful degradation if Grafana Cloud unavailable
@@ -36,18 +50,21 @@ New `prometheus-push-service.ts` pushes metrics to Grafana Cloud using **Influx 
 ### 2. Metric Categories
 
 **SLI/SLO Metrics (V1Plan FASE 2):**
+
 - Session Health: success rate, drop-off rate, stuck loop rate, turns/session
 - Safety: refusal precision, incident counts by severity (S0-S3), jailbreak block rate
 - Cost: per-session cost (text/voice), cost spikes
 - Performance: latency percentiles (P50/P95/P99), error rates per route
 
 **Business Metrics:**
+
 - User Engagement: DAU/WAU/MAU, new user registrations
 - Conversion: onboarding completion, voice adoption rate
 - Retention: D1/D7/D30 cohort retention
 - Learning: maestri usage, XP earned, active streaks, feature adoption
 
 **External Service Quotas:**
+
 - Azure OpenAI (chat/embedding TPM)
 - Google Drive (queries/min)
 - Brave Search (queries/month)
@@ -57,6 +74,7 @@ New `prometheus-push-service.ts` pushes metrics to Grafana Cloud using **Influx 
 Single dashboard with 8 rows organized by stakeholder priority:
 
 **📈 BUSINESS METRICS (Rows 1-5):**
+
 1. Session Health (GO/NO-GO thresholds)
 2. User Engagement (DAU/WAU/MAU)
 3. Conversion & Retention
@@ -64,6 +82,7 @@ Single dashboard with 8 rows organized by stakeholder priority:
 5. Maestri & Learning
 
 **🛠️ TECHNICAL METRICS (Rows 6-8):**
+
 6. Safety Metrics
 7. Performance
 8. External Services
@@ -71,6 +90,7 @@ Single dashboard with 8 rows organized by stakeholder priority:
 ### 4. Alert Rules
 
 GO/NO-GO threshold alerts with severity-based routing:
+
 - Session Success Rate < 60% → Critical
 - S3 Incident > 0 → Page immediately
 - Drop-off Rate > 25% → Critical
@@ -81,21 +101,25 @@ GO/NO-GO threshold alerts with severity-based routing:
 Metric retention tiers designed for compliance and cost efficiency:
 
 **Aggregated Metrics (90 days)**
+
 - Web Vitals, session counts, performance metrics
 - Non-PII data sufficient for quarterly reviews and SLI/SLO analysis
 - Balances operational need with data minimization principle
 
 **User ID Tagged Metrics (30 days)**
+
 - Keep for 30 days to debug recent user-level issues
 - Drop or anonymize after 30 days (GDPR "right to be forgotten")
 - No personal information (names, emails) in metrics anywhere
 
 **Safety Incident Metrics (365 days)**
+
 - Legal hold for annual compliance audits
 - No user_id in incident logs (use session_id for correlation)
 - Descriptions sanitized of PII before logging
 
 **Rationale**:
+
 - GDPR/CCPA compliance through data minimization
 - Privacy-by-design: shorter retention for PII, longer for safety audits
 - Cost optimization: only essential metrics retained
@@ -127,19 +151,19 @@ Configuration documented in `docs/operations/grafana-web-vitals.md` (Retention P
 
 ## Implementation
 
-| File | Purpose |
-|------|---------|
+| File                                               | Purpose                             |
+| -------------------------------------------------- | ----------------------------------- |
 | `src/lib/observability/prometheus-push-service.ts` | Push service (Influx Line Protocol) |
-| `src/app/api/metrics/behavioral-metrics.ts` | Session, safety, cost metrics |
-| `src/app/api/metrics/business-metrics.ts` | DAU/MAU, retention, maestri metrics |
-| `src/app/api/metrics/sli-metrics.ts` | Latency, error rate metrics |
-| `scripts/test-grafana-push.ts` | Manual test script |
+| `src/app/api/metrics/behavioral-metrics.ts`        | Session, safety, cost metrics       |
+| `src/app/api/metrics/business-metrics.ts`          | DAU/MAU, retention, maestri metrics |
+| `src/app/api/metrics/sli-metrics.ts`               | Latency, error rate metrics         |
+| `scripts/test-grafana-push.ts`                     | Manual test script                  |
 
 **Configuration:** See `.env.example` and `docs/operations/RUNBOOK.md`
 
 ## References
 
-- [V1Plan FASE 2 - Osservabilità Prodotto](../../V1Plan.md)
+- [Production Hardening (ADR 0046)](0046-production-hardening-plan46.md)
 - [SLI-SLO.md](../operations/SLI-SLO.md)
 - [RUNBOOK.md](../operations/RUNBOOK.md) - Setup and operational procedures
 - [Grafana Cloud Remote Write](https://grafana.com/docs/grafana-cloud/send-data/metrics/metrics-prometheus/)
