@@ -20,6 +20,11 @@ import { calculateStatus, AlertStatus } from './threshold-logic';
 
 /**
  * Vercel usage metrics response with threshold status (F-18, F-25)
+ *
+ * `status` separates an integration that is intentionally not configured from one
+ * that is configured and failing. Callers own reporting: this module does not emit
+ * warnings or errors for either condition, so a single failure is reported once by
+ * the metric collector instead of twice.
  */
 export interface VercelLimits {
   bandwidth: {
@@ -41,8 +46,18 @@ export interface VercelLimits {
     status: AlertStatus; // Alert status (F-25)
   };
   timestamp: number; // Unix timestamp of query
-  error?: string; // Error message if query failed
+  status: VercelLimitsStatus; // Availability of the integration itself
+  error?: string; // Error message if query failed or configuration is absent
 }
+
+/**
+ * Availability of the Vercel monitoring integration
+ *
+ *   - `ok`: usage values below are real
+ *   - `not_configured`: no credentials supplied; usage is unknown, not zero
+ *   - `error`: the configured integration failed (auth, rate limit, transport)
+ */
+export type VercelLimitsStatus = 'ok' | 'not_configured' | 'error';
 
 /**
  * Cache for rate limiting
@@ -74,14 +89,14 @@ export async function getVercelLimits(): Promise<VercelLimits> {
 
   if (!token) {
     const error = 'VERCEL_TOKEN not configured';
-    logger.warn(error);
-    return createEmptyLimits(error);
+    logger.debug(error);
+    return createEmptyLimits(error, 'not_configured');
   }
 
   if (!projectId) {
     const error = 'VERCEL_PROJECT_ID not configured';
-    logger.warn(error);
-    return createEmptyLimits(error);
+    logger.debug(error);
+    return createEmptyLimits(error, 'not_configured');
   }
 
   try {
@@ -116,6 +131,7 @@ export async function getVercelLimits(): Promise<VercelLimits> {
         status: calculateStatus(functionsPercent), // F-25
       },
       timestamp: Date.now(),
+      status: 'ok',
     };
 
     // Update cache
@@ -133,8 +149,9 @@ export async function getVercelLimits(): Promise<VercelLimits> {
     return limits;
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Failed to fetch Vercel limits', undefined, error as Error);
-    return createEmptyLimits(errorMsg);
+    // Reported once by the caller (metric collector), not here.
+    logger.debug('Failed to fetch Vercel limits', { error: errorMsg });
+    return createEmptyLimits(errorMsg, 'error');
   }
 }
 
@@ -147,14 +164,18 @@ function calculatePercent(used: number, limit: number): number {
 }
 
 /**
- * Create empty limits response on error
+ * Create a response carrying no usage values
+ *
+ * Usage is reported as unknown (`0/0`) with an explicit `status`; the collector
+ * must not publish these numbers as real usage.
  */
-function createEmptyLimits(error: string): VercelLimits {
+function createEmptyLimits(error: string, status: Exclude<VercelLimitsStatus, 'ok'>): VercelLimits {
   return {
     bandwidth: { used: 0, limit: 0, percent: 0, status: 'ok' },
     builds: { used: 0, limit: 0, percent: 0, status: 'ok' },
     functions: { used: 0, limit: 0, percent: 0, status: 'ok' },
     timestamp: Date.now(),
+    status,
     error,
   };
 }
