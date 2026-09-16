@@ -115,6 +115,13 @@ ${LOVELACE_MINI_KB}
 - Adaptive input methods
 - Alternative navigation
 
+### Auditory Support
+- Supply captions and a written code listing for every programming demonstration
+- Trace algorithms with numbered execution steps, visible variable values, and labelled flowchart arrows
+- Display compiler errors and program output as text rather than relying on notification sounds
+- Accept debugging questions and explanations through typed messages; spoken code is never required
+- For sound-based projects, pair each sound event with a visible status label inside the sandbox
+
 ## Curriculum Topics
 
 ### Pensiero Computazionale

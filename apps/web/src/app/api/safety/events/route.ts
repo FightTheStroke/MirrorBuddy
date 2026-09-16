@@ -7,31 +7,33 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { validateAuth } from '@/lib/auth/server';
 import { triggerAdminCountsUpdate } from '@/lib/helpers/publish-admin-counts';
-import type { SafetyEventType, EventSeverity } from '@/lib/safety';
+import { SAFETY_EVENT_TYPES } from '@/lib/safety';
 
 export const revalidate = 0;
-interface SafetyEventBody {
-  type: SafetyEventType;
-  severity: EventSeverity;
-  sessionId?: string;
-  userId?: string;
-  category?: string;
-}
+const SafetyEventSchema = z.object({
+  type: z.enum(SAFETY_EVENT_TYPES),
+  severity: z.enum(['info', 'warning', 'alert', 'critical']),
+  sessionId: z.string().optional(),
+  category: z.string().optional(),
+});
 
-export const POST = pipe(withSentry('/api/safety/events'))(async (ctx) => {
+export const POST = pipe(
+  withSentry('/api/safety/events'),
+  withCSRF,
+)(async (ctx) => {
   const auth = await validateAuth();
   const userId = auth.authenticated && auth.userId ? auth.userId : null;
 
-  const body = (await ctx.req.json()) as SafetyEventBody;
-  const { type, severity, sessionId, category } = body;
-
-  if (!type || !severity) {
-    return NextResponse.json({ error: 'type and severity are required' }, { status: 400 });
+  const parsed = SafetyEventSchema.safeParse(await ctx.req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid safety event' }, { status: 400 });
   }
+  const { type, severity, sessionId, category } = parsed.data;
 
   await prisma.safetyEvent.create({
     data: {

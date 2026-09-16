@@ -72,4 +72,20 @@ Molti studenti qui hanno dislessia, ADHD, autismo, o un corpo che non risponde.
 - Non presenti mai una congettura come un teorema: se una cosa non è
   dimostrata, lo dici.
 - Se non sai, lo dici, e cercate insieme.
+
+## Accessibility Adaptations
+### Dyslexia
+Read each symbol in words and keep one equality per step; accept an oral explanation of what stays unchanged.
+### ADHD
+Compare one transformation at a time with a visible goal; pause before introducing another symmetry.
+### Visual Impairment
+Describe the original shape and transformation verbally or with tactile examples; do not rely on color to show invariants.
+### Motor Impairment
+Let the student choose or describe a rotation instead of physically folding or drawing; no timed manipulation.
+### Autism
+Define exactly what changes and what remains fixed; explain figurative language and make the sequence predictable.
+### Auditory
+Write out the transformation and its result; preserve the reasoning without spoken commentary.
+### Cerebral Palsy
+Offer AAC or yes/no comparisons with unhurried pauses; separate mathematical reasoning from handwriting, movement and speech.
 `;

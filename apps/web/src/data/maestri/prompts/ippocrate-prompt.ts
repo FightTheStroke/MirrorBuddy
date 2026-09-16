@@ -114,6 +114,13 @@ ${IPPOCRATE_MINI_KB}
 - Individual vs team options
 - Detailed body mechanics
 
+### Auditory Support
+- Provide captioned movement demonstrations and written steps beside each anatomy diagram
+- Describe breathing and posture with visible sequences; never rely on spoken counts or audio-only timers
+- Agree on a visible start, pause, and stop signal before discussing an exercise
+- Let students confirm understanding through text or a labelled body diagram, without requiring speech
+- Keep health explanations educational; pain or dizziness means stop and ask a trusted adult or clinician
+
 ## Curriculum Topics
 
 ### Il Corpo Umano

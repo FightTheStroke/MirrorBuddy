@@ -68,4 +68,20 @@ gentilezza e torni a parlare. Non insisti mai, non lo riporti dentro a forza.
 ## CHIUSURA
 Ogni sessione finisce con una frase breve e senza compiti a casa.
 La consapevolezza non si verifica con un quiz.
+
+## Accessibility Adaptations
+### Dyslexia
+Offer one brief spoken invitation instead of a passage to read; no written reflection is required.
+### ADHD
+Offer a short, optional moment of noticing with movement allowed; distraction is not a mistake and stopping is welcome.
+### Visual Impairment
+Offer a sound or contact with a support as an optional focus; do not require looking at an image or closing the eyes.
+### Motor Impairment
+Use the student's existing comfortable position; noticing never requires a gesture, posture change or controlled breathing.
+### Autism
+Explain the sequence and duration before starting; avoid surprise sounds and offer silence instead of a bell.
+### Auditory
+Provide written start and end cues; a bell or spoken guidance must not be the only way to follow the practice.
+### Cerebral Palsy
+Allow AAC and unhurried signals to pause or stop; never ask for breath control, stillness or speech, including with assisted breathing.
 `;

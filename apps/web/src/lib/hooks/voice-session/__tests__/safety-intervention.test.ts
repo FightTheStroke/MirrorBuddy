@@ -15,6 +15,7 @@ import { triggerSafetyIntervention } from '../safety-intervention';
 import type { SafetyWarningState } from '../safety-intervention';
 import type { TranscriptSafetyResult } from '../transcript-safety';
 import type { FeatureFlagCheckResult } from '@/lib/feature-flags/types';
+import { clearCSRFToken } from '@/lib/auth';
 
 // Mock dependencies - must be hoisted, so use factory functions
 vi.mock('@/lib/logger/client', () => ({
@@ -52,6 +53,7 @@ describe('triggerSafetyIntervention', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    clearCSRFToken();
     const { isFeatureEnabled } = await import('@/lib/feature-flags/client');
     vi.mocked(isFeatureEnabled).mockReturnValue(mockFlagEnabled);
 
@@ -64,8 +66,15 @@ describe('triggerSafetyIntervention', () => {
 
     vi.stubGlobal(
       'fetch',
-      vi.fn(() =>
-        Promise.resolve(new Response(JSON.stringify({ success: true }), { status: 200 })),
+      vi.fn((url: string) =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify(
+              url === '/api/session' ? { csrfToken: 'test-csrf-token' } : { success: true },
+            ),
+            { status: 200 },
+          ),
+        ),
       ),
     );
   });
@@ -447,7 +456,7 @@ describe('triggerSafetyIntervention', () => {
       expect((logCall![1] as Record<string, unknown>).timestamp).toBeGreaterThanOrEqual(timestamp);
     });
 
-    it('T1.1/D-01: escalates crisis to the server (POST /api/safety/escalate-voice-crisis)', () => {
+    it('T1.1/D-01: escalates crisis to the server (POST /api/safety/escalate-voice-crisis)', async () => {
       const safetyResult: TranscriptSafetyResult = {
         severity: 'critical',
         flaggedPatterns: ['crisis'],
@@ -463,16 +472,22 @@ describe('triggerSafetyIntervention', () => {
         maestroId: 'euclide',
       });
 
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/safety/escalate-voice-crisis',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ sessionId: 'test-session-crisis', maestroId: 'euclide' }),
-        }),
+      await vi.waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          '/api/safety/escalate-voice-crisis',
+          expect.objectContaining({
+            method: 'POST',
+            body: JSON.stringify({ sessionId: 'test-session-crisis', maestroId: 'euclide' }),
+          }),
+        ),
       );
+      const call = vi
+        .mocked(fetch)
+        .mock.calls.find(([url]) => url === '/api/safety/escalate-voice-crisis');
+      expect(new Headers(call?.[1]?.headers).get('X-CSRF-Token')).toBe('test-csrf-token');
     });
 
-    it('T1.1/D-01: escalates crisis even when the data channel is closed', () => {
+    it('T1.1/D-01: escalates crisis even when the data channel is closed', async () => {
       mockDataChannel.readyState = 'closed';
       const safetyResult: TranscriptSafetyResult = {
         severity: 'critical',
@@ -488,9 +503,11 @@ describe('triggerSafetyIntervention', () => {
         setWarningState: mockSetWarningState,
       });
 
-      expect(fetch).toHaveBeenCalledWith(
-        '/api/safety/escalate-voice-crisis',
-        expect.objectContaining({ method: 'POST' }),
+      await vi.waitFor(() =>
+        expect(fetch).toHaveBeenCalledWith(
+          '/api/safety/escalate-voice-crisis',
+          expect.objectContaining({ method: 'POST' }),
+        ),
       );
     });
 
