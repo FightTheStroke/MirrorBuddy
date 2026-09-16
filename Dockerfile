@@ -14,8 +14,11 @@ RUN apk add --no-cache libc6-compat openssl
 # Install pnpm matching packageManager field in package.json
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
-# Copy workspace config + packages/ so pnpm can resolve workspace:* deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Copy workspace config + packages/ so pnpm can resolve workspace:* deps.
+# .npmrc is required: it sets node-linker=hoisted, without which dependencies
+# declared only in a workspace package land in packages/<name>/node_modules and
+# are lost when the builder stage copies just /app/node_modules.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY packages ./packages/
 COPY prisma.config.ts ./
 # W2 app move (#362): prisma/ now under apps/web/prisma/
