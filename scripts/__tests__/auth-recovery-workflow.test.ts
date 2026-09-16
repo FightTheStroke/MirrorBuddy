@@ -30,7 +30,7 @@ describe('manual existing-only auth recovery workflow', () => {
   });
   it('captures process output rather than publishing seed/database diagnostics', () => {
     expect(text).toContain('2>&1)');
-    expect(text).toContain("grep -xE 'READONLY_RECOVERY_");
+    expect(text).toContain('grep -xE "$success|$failure"');
     expect(text).not.toMatch(/echo\s+["']?\$output|cat.*log|upload-artifact/);
   });
 });

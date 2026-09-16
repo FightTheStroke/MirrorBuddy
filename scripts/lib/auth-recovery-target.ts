@@ -1,11 +1,14 @@
-import { assertProductionAuthDatabase } from './readonly-smoke-options';
+import { assertProductionAuthDatabase, SmokeCommandError } from './readonly-smoke-options';
+import { RecoveryError } from './readonly-recovery-diagnostics';
 
 export function assertAuthRecoveryContext(
-  env: NodeJS.ProcessEnv,
+  env: NodeJS.ProcessEnv | null | undefined,
   workflow: 'readonly-recovery' | 'student-smoke',
-): void {
+): asserts env is NodeJS.ProcessEnv {
   if (!env || !['readonly-recovery', 'student-smoke'].includes(workflow))
-    throw new Error('AUTH_TARGET_REJECTED');
+    throw new RecoveryError('TARGET_GITHUB_CONTEXT');
+  if (!/^24\./.test(process.versions.node)) throw new RecoveryError('TARGET_NODE_VERSION');
+  if (env.E2E_TESTS === '1') throw new RecoveryError('TARGET_E2E_TESTS');
   const manual = workflow === 'readonly-recovery';
   const trusted = {
     NODE_ENV: 'production',
@@ -18,18 +21,24 @@ export function assertAuthRecoveryContext(
       : 'FightTheStroke/MirrorBuddy/.github/workflows/ci.yml@refs/heads/main',
     GITHUB_JOB: manual ? 'recover' : 'sync-admin-credentials',
   };
-  if (
-    env.E2E_TESTS === '1' ||
-    Object.entries(trusted).some(([key, value]) => env[key] !== value) ||
-    !/^24\./.test(process.versions.node)
-  )
-    throw new Error('AUTH_TARGET_REJECTED');
+  if (Object.entries(trusted).some(([key, value]) => env[key] !== value))
+    throw new RecoveryError('TARGET_GITHUB_CONTEXT');
 }
 
 export function assertAuthRecoveryTarget(
-  env: NodeJS.ProcessEnv,
+  env: NodeJS.ProcessEnv | null | undefined,
   workflow: 'readonly-recovery' | 'student-smoke',
 ): void {
   assertAuthRecoveryContext(env, workflow);
-  assertProductionAuthDatabase(env);
+  if (!env.PRODUCTION_DB_ID) throw new RecoveryError('TARGET_PRODUCTION_DB_ID');
+  try {
+    assertProductionAuthDatabase(env);
+  } catch (error) {
+    if (error instanceof SmokeCommandError) {
+      if (error.reason === 'DATABASE_URL') throw new RecoveryError('TARGET_DATABASE_URL');
+      if (error.reason === 'DIRECT_URL') throw new RecoveryError('TARGET_DIRECT_URL');
+      if (error.reason === 'PROJECT_MISMATCH') throw new RecoveryError('TARGET_PROJECT_MISMATCH');
+    }
+    throw new RecoveryError('TARGET_GITHUB_CONTEXT');
+  }
 }

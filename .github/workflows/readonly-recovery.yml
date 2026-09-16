@@ -66,13 +66,27 @@ jobs:
             echo "::error::READONLY_RECOVERY_CONFIRMATION_REJECTED"
             exit 1
           fi
+          exit_code=0
           if output="$(pnpm run script -- scripts/readonly-recovery.ts "${args[@]}" 2>&1)"; then
-            if ! status="$(printf '%s\n' "$output" | grep -xE 'READONLY_RECOVERY_(CONVERSION_REQUIRED|ALREADY_READY|CONVERTED)')"; then
-              echo "::error::READONLY_RECOVERY_STATUS_MISSING"
-              exit 1
-            fi
-            printf '%s\n' "$status"
+            exit_code=0
           else
-            echo "::error::READONLY_RECOVERY_FAILED"
+            exit_code=$?
+          fi
+          success='READONLY_RECOVERY_(CONVERSION_REQUIRED|ALREADY_READY|CONVERTED)'
+          failure='READONLY_RECOVERY_(TARGET_(NODE_VERSION|GITHUB_CONTEXT|E2E_TESTS|DATABASE_URL|DIRECT_URL|PRODUCTION_DB_ID|PROJECT_MISMATCH)|CONFIG_(ADMIN_EMAIL|ADMIN_PASSWORD|ADMIN_READONLY_EMAIL)|ARGUMENTS_REJECTED|OWNER_REJECTED|ACCOUNT_REJECTED|ACCOUNT_CHANGED|DB_IMPORT_FAILED|DB_OPERATION_FAILED|DISCONNECT_FAILED|FAILED)'
+          # Match the complete line and require exactly one allowed status across
+          # both classes. Never print unmatched output or permit success on failure.
+          status="$(printf '%s\n' "$output" | grep -xE "$success|$failure" || true)"
+          if [ -z "$status" ] || [ "$(printf '%s\n' "$status" | wc -l)" -ne 1 ]; then
+            echo "::error::READONLY_RECOVERY_STATUS_REJECTED"
+            exit 1
+          fi
+          if [ "$exit_code" -eq 0 ] && printf '%s\n' "$status" | grep -qxE "$success"; then
+            printf '%s\n' "$status"
+          elif [ "$exit_code" -ne 0 ] && printf '%s\n' "$status" | grep -qxE "$failure"; then
+            printf '::error::%s\n' "$status"
+            exit 1
+          else
+            echo "::error::READONLY_RECOVERY_STATUS_REJECTED"
             exit 1
           fi
