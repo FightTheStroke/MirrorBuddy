@@ -119,6 +119,9 @@ task-state transitions and the global checkpoint; implementation alone is not ac
 - Pre-push (hook-enforced): the bash guard blocks standalone
   `npm run lint|typecheck|build|test:unit`, `gh run view --log`, and
   `git push --no-verify|--force`. Use `npm run ci:summary` instead.
+  The local hook always runs the full unit suite with two workers, including on
+  overloaded machines. Failures retain a private temporary log and print its path;
+  successful runs remove that log. Test selection and timeouts are unchanged.
   `gh pr merge` is autonomous once CI is fully green and mergeable — never merge with
   failing/pending checks, unresolved review comments, or changes touching branch
   protection / security policy / release infra without explicit human approval.
