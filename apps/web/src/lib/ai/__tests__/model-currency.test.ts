@@ -58,22 +58,12 @@ describe('model currency', () => {
   });
 
   describe('current Azure models are selectable', () => {
-    it('maps gpt-6-astra, the newest GA flagship deployed on the resource', async () => {
-      delete process.env.AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT;
-
-      const { getDeploymentForModel, getAvailableModels } =
+    it('does not expose gpt-6-astra: decided 2026-09-16 that its price is not worth it', async () => {
+      const { getAvailableModels, hasDeploymentMapping } =
         await import('@/lib/ai/providers/deployment-mapping');
 
-      expect(getDeploymentForModel('gpt-6-astra')).toBe('gpt-6-astra');
-      expect(getAvailableModels()).toContain('gpt-6-astra');
-    });
-
-    it('respects an env override for gpt-6-astra', async () => {
-      process.env.AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT = 'custom-astra';
-
-      const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');
-
-      expect(getDeploymentForModel('gpt-6-astra')).toBe('custom-astra');
+      expect(getAvailableModels()).not.toContain('gpt-6-astra');
+      expect(hasDeploymentMapping('gpt-6-astra')).toBe(false);
     });
 
     it('maps gpt-realtime-2.1-mini so the cost tier can follow the 2.1 line', async () => {

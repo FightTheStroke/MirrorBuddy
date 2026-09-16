@@ -153,7 +153,6 @@ function validateOptionalEnvVars(): void {
     { name: 'AZURE_OPENAI_GPT5_NANO_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT5_MINI_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT56_SOL_DEPLOYMENT', category: 'AI Models' },
-    { name: 'AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI', category: 'AI Models' },
     // Voice cost accounting — optional override of the built-in rate card
     { name: 'AZURE_VOICE_RATES_JSON', category: 'Voice costs' },

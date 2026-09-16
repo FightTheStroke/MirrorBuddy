@@ -163,7 +163,6 @@ Create accounts and have credentials ready:
      - `AZURE_OPENAI_GPT5_NANO_DEPLOYMENT=gpt-5-nano`
      - `AZURE_OPENAI_GPT5_MINI_DEPLOYMENT=gpt-5-edu-mini`
      - `AZURE_OPENAI_GPT56_SOL_DEPLOYMENT=gpt-5.6-sol`
-     - `AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT=gpt-6-astra` _(newest GA flagship, not the default)_
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT_V15=gpt-realtime-15` _(voice v1.5, behind feature flag)_

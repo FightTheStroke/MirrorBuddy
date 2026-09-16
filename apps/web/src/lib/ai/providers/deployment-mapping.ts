@@ -83,10 +83,11 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   'gpt-5.6-terra': CHAT_DEFAULT_DEPLOYMENT,
   'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || 'gpt-5.6-sol',
 
-  // 2026-09-03 wave — GPT-6 Astra, the newest GA flagship, already provisioned on
-  // the resource. Mapped so it can be selected; promoting it to the default is a
-  // cost decision, not a mapping one.
-  'gpt-6-astra': process.env.AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT?.trim() || 'gpt-6-astra',
+  // 2026-09-03 wave — GPT-6 Astra is the newest GA flagship and is already
+  // provisioned on the resource, but it is deliberately NOT mapped: the decision
+  // taken on 2026-09-16 is that its token price is not worth it for tutoring
+  // turns. Leaving it unmapped keeps it out of the admin model picker, so it
+  // cannot be switched on by a stray click. Re-adding it is one line.
 
   // Realtime models (voice) — GA deployments (Feb 2026+)
   // Pro tier uses gpt-realtime (best quality), Base/Trial use gpt-realtime-mini (cost-effective)
