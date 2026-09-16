@@ -109,6 +109,20 @@ describe('CI efficiency preserves independent quality signals', () => {
     expect(step?.['timeout-minutes']).toBe(40);
   });
 
+  it.each(['success', 'failure', 'cancelled', 'skipped'])(
+    'requires Docker result %s when configuration changes',
+    (status) => {
+      expect(workflow.jobs['pr-gate'].needs).toContain('docker');
+      for (const changed of [false, true]) {
+        const accepted = status === 'success' || (status === 'skipped' && !changed);
+        expect(decisions({ docker: status }, { config: String(changed) })).toEqual({
+          approve: accepted,
+          reject: !accepted,
+        });
+      }
+    },
+  );
+
   it('runs Python checks when their workflow changes and includes them in both gates', () => {
     const filter = workflow.jobs['detect-changes'].steps.find(
       (step) => typeof step.with?.filters === 'string',
