@@ -40,10 +40,8 @@ model TierDefinition {
   videoVisionMinutesMonthly    Int @default(0) // Max minutes per month (0 = disabled)
 
   // Per-feature model selection (ADR 0072)
-  // Main conversation
+  // Main conversation and voice
   chatModel     String @default("gpt-5-mini")
-  // Deprecated 2026-09-16 (#846): retained for backwards compatibility only.
-  // Not used for model selection; voice uses environment + feature flag (ADR 0169).
   realtimeModel String @default("gpt-realtime-mini")
 
   // Tool-specific models
