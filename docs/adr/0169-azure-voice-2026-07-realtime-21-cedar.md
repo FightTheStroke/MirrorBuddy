@@ -22,8 +22,13 @@ classifies the entire 2.x line as **Public Preview**:
 | ------------------ | ---------- | ----------- | --------------- |
 | `gpt-realtime`     | 2025-08-28 | **GA**      | 2027-03-02      |
 | `gpt-realtime-1.5` | 2026-02-23 | **GA**      | 2027-08-24      |
-| `gpt-realtime-2`   | 2026-05-06 | **Preview** | 2026-08-31      |
-| `gpt-realtime-2.1` | 2026-07-07 | **Preview** | 2027-06-25      |
+| `gpt-realtime-2`   | 2026-05-06 | **Preview** | 2026-10-31      |
+| `gpt-realtime-2.1` | 2026-07-07 | **Preview** | 2026-10-15      |
+
+> Retirement dates re-verified 2026-09-16 against `az cognitiveservices model list -l
+swedencentral`. The 2.1 date moved forward from the 2027-06-25 originally recorded
+> here: the preview line now ends **2026-10-15**, so the GA fallback in
+> `app/api/realtime/ephemeral-token` is what keeps voice alive past that date.
 
 ### Accepted risk
 

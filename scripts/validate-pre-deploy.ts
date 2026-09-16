@@ -149,11 +149,10 @@ function validateOptionalEnvVars(): void {
     { name: 'DEFAULT_CHAT_MODEL_PRO', category: 'AI Models' },
     { name: 'DEFAULT_DEMO_MODEL', category: 'AI Models' },
     { name: 'DEFAULT_EXTRACTOR_MODEL', category: 'AI Models' },
-    // GPT-5 deployment names
+    // GPT-5 / GPT-6 deployment names
     { name: 'AZURE_OPENAI_GPT5_NANO_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_GPT5_MINI_DEPLOYMENT', category: 'AI Models' },
-    { name: 'AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT', category: 'AI Models' },
-    { name: 'AZURE_OPENAI_GPT52_EDU_DEPLOYMENT', category: 'AI Models' },
+    { name: 'AZURE_OPENAI_GPT56_SOL_DEPLOYMENT', category: 'AI Models' },
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI', category: 'AI Models' },
     // Voice cost accounting — optional override of the built-in rate card
     { name: 'AZURE_VOICE_RATES_JSON', category: 'Voice costs' },
@@ -166,6 +165,7 @@ function validateOptionalEnvVars(): void {
     { name: 'AZURE_OPENAI_REALTIME_TRANSLATE_DEPLOYMENT', category: 'Voice v2' },
     // ADR 0169 — Azure voice 2026-07 wave (optional - behind feature flag)
     { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21', category: 'Voice v2.1' },
+    { name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21_MINI', category: 'Voice v2.1' },
   ];
 
   for (const envVar of optional) {
