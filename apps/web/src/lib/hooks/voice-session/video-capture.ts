@@ -48,6 +48,9 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const captureTimerRef = useRef<NodeJS.Timeout | null>(null);
   const clockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const initialCaptureTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const captureGenerationRef = useRef(0);
+  const isMountedRef = useRef(false);
   const prevFrameRef = useRef<ImageData | null>(null);
   const startTimeRef = useRef(0);
   const onFrameRef = useRef(options.onFrame);
@@ -90,16 +93,18 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
     }
   }, []);
 
-  const stopCapture = useCallback(() => {
+  const releaseCapture = useCallback(() => {
+    captureGenerationRef.current++;
     if (captureTimerRef.current) clearInterval(captureTimerRef.current);
     if (clockTimerRef.current) clearInterval(clockTimerRef.current);
+    if (initialCaptureTimeoutRef.current) clearTimeout(initialCaptureTimeoutRef.current);
     captureTimerRef.current = null;
     clockTimerRef.current = null;
+    initialCaptureTimeoutRef.current = null;
 
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
-      setVideoStream(null);
     }
     if (videoElRef.current) {
       videoElRef.current.srcObject = null;
@@ -107,31 +112,49 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
       videoElRef.current = null;
     }
     prevFrameRef.current = null;
-    setIsCapturing(false);
-    logger.info('[VideoCapture] Capture stopped');
+    canvasRef.current = null;
+    ctxRef.current = null;
   }, []);
 
+  const stopCapture = useCallback(() => {
+    releaseCapture();
+    if (isMountedRef.current) {
+      setVideoStream(null);
+      setIsCapturing(false);
+    }
+    logger.info('[VideoCapture] Capture stopped');
+  }, [releaseCapture]);
+
   const startCapture = useCallback(async (): Promise<boolean> => {
+    if (!isMountedRef.current) return false;
+    stopCapture();
+    const generation = captureGenerationRef.current;
     try {
       const stream = await requestVideoStream({
         width: { ideal: CAPTURE_WIDTH },
         height: { ideal: CAPTURE_HEIGHT },
         facingMode: 'user',
       });
+      if (!isMountedRef.current || generation !== captureGenerationRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return false;
+      }
       streamRef.current = stream;
 
       const video = document.createElement('video');
       video.srcObject = stream;
       video.muted = true;
       video.playsInline = true;
-      await video.play();
       videoElRef.current = video;
+      await video.play();
+      if (!isMountedRef.current || generation !== captureGenerationRef.current) return false;
 
       const canvas = document.createElement('canvas');
       canvas.width = CAPTURE_WIDTH;
       canvas.height = CAPTURE_HEIGHT;
       canvasRef.current = canvas;
       ctxRef.current = canvas.getContext('2d');
+      if (!ctxRef.current) throw new Error('Video capture canvas context unavailable');
 
       setVideoStream(stream);
       setIsCapturing(true);
@@ -141,7 +164,10 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
 
       const interval = options.captureIntervalMs || DEFAULT_INTERVAL_MS;
       captureTimerRef.current = setInterval(captureFrame, interval);
-      setTimeout(captureFrame, INITIAL_CAPTURE_DELAY_MS);
+      initialCaptureTimeoutRef.current = setTimeout(() => {
+        initialCaptureTimeoutRef.current = null;
+        captureFrame();
+      }, INITIAL_CAPTURE_DELAY_MS);
 
       clockTimerRef.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
@@ -156,6 +182,8 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
       logger.info('[VideoCapture] Capture started', { interval });
       return true;
     } catch (error) {
+      if (generation !== captureGenerationRef.current) return false;
+      stopCapture();
       logger.error('[VideoCapture] Failed to start', {
         error: String(error),
       });
@@ -164,14 +192,12 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
   }, [captureFrame, stopCapture, options.captureIntervalMs]);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
-      if (captureTimerRef.current) clearInterval(captureTimerRef.current);
-      if (clockTimerRef.current) clearInterval(clockTimerRef.current);
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-      }
+      isMountedRef.current = false;
+      releaseCapture();
     };
-  }, []);
+  }, [releaseCapture]);
 
   return {
     videoStream,

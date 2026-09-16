@@ -1,28 +1,22 @@
-// ============================================================================
-// UNIFIED CAMERA HOOK - ADR 0126
-// Combines video vision (continuous) and photo (snapshot) modes
-// ============================================================================
-
 'use client';
 
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
-import { csrfFetch } from '@/lib/auth';
 import { requestVideoStream } from '@/lib/native/media-bridge';
 import { useVideoCapture } from './video-capture';
 import { useSendVideoFrame } from './actions';
+import {
+  CAPTURE_WIDTH,
+  CAPTURE_HEIGHT,
+  sendCameraSnapshot,
+} from '@/lib/hooks/voice-session/camera-snapshot';
+import { useCameraUsage, type CameraUsageRefs } from '@/lib/hooks/voice-session/use-camera-usage';
 import type { CameraMode } from '@/types/voice';
 
 const MODE_CYCLE: CameraMode[] = ['off', 'video', 'photo'];
-const CAPTURE_WIDTH = 640;
-const CAPTURE_HEIGHT = 360;
-const JPEG_QUALITY = 0.7;
 
-interface UnifiedCameraRefs {
+interface UnifiedCameraRefs extends CameraUsageRefs {
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
-  sessionIdRef: React.MutableRefObject<string | null>;
-  videoUsageIdRef: React.MutableRefObject<string | null>;
-  videoMaxSecondsRef: React.MutableRefObject<number>;
 }
 
 export interface UnifiedCameraState {
@@ -51,36 +45,37 @@ export interface UnifiedCameraState {
 export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
   const [cameraMode, setCameraMode] = useState<CameraMode>('off');
   const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('user');
-  const [limitReached, setLimitReached] = useState(false);
+  const { startVideoUsage, endUsageSession, limitReached } = useCameraUsage(refs);
   const photoStreamRef = useRef<MediaStream | null>(null);
+  const isMountedRef = useRef(false);
+  const transitionPendingRef = useRef(false);
+  const runTransition = useCallback(async (change: () => Promise<void>) => {
+    if (!isMountedRef.current || transitionPendingRef.current) return;
+    transitionPendingRef.current = true;
+    try {
+      await change();
+    } catch (error) {
+      logger.error('[UnifiedCamera] Camera transition failed', { error: String(error) });
+      throw error;
+    } finally {
+      transitionPendingRef.current = false;
+    }
+  }, []);
+  const photoGenerationRef = useRef(0);
+  const stopPhotoStream = useCallback(() => {
+    photoGenerationRef.current++;
+    photoStreamRef.current?.getTracks().forEach((track) => track.stop());
+    photoStreamRef.current = null;
+  }, []);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      stopPhotoStream();
+    };
+  }, [stopPhotoStream]);
 
   const sendVideoFrame = useSendVideoFrame(refs.webrtcDataChannelRef);
-
-  // End usage session API call
-  const endUsageSession = useCallback(
-    async (seconds: number) => {
-      const usageId = refs.videoUsageIdRef.current;
-      if (!usageId) return;
-      try {
-        await csrfFetch('/api/video-vision/usage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'end',
-            usageId,
-            secondsUsed: seconds,
-          }),
-        });
-      } catch (e) {
-        logger.error('[UnifiedCamera] Failed to end session', {
-          error: String(e),
-        });
-      }
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
-      refs.videoUsageIdRef.current = null;
-    },
-    [refs],
-  );
 
   const handleAutoStop = useCallback(async () => {
     setCameraMode('off');
@@ -94,41 +89,20 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     onAutoStop: handleAutoStop,
   });
 
-  // Start video usage session
-  const startVideoUsage = useCallback(async (): Promise<boolean> => {
-    try {
-      const res = await csrfFetch('/api/video-vision/usage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'start',
-          voiceSessionId: refs.sessionIdRef.current || 'unknown',
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'unknown' }));
-        const reason = err.error as string;
-        if (reason === 'monthly_limit_reached' || reason === 'video_vision_disabled') {
-          setLimitReached(true);
-        }
-        return false;
-      }
-      const data = await res.json();
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
-      refs.videoUsageIdRef.current = data.id;
-
-      refs.videoMaxSecondsRef.current = data.maxSeconds;
-      return true;
-    } catch (e) {
-      logger.error('[UnifiedCamera] Failed to start usage', {
-        error: String(e),
-      });
-      return false;
-    }
-  }, [refs]);
+  const usageCleanupRef = useRef({ endUsageSession, seconds: capture.elapsedSeconds });
+  useEffect(() => {
+    usageCleanupRef.current = { endUsageSession, seconds: capture.elapsedSeconds };
+  }, [endUsageSession, capture.elapsedSeconds]);
+  useEffect(
+    () => () => {
+      const { endUsageSession: end, seconds } = usageCleanupRef.current;
+      void end(seconds);
+    },
+    [],
+  );
 
   // Cycle through camera modes: off → video → photo → off
-  const cycleCameraMode = useCallback(async () => {
+  const changeCameraMode = useCallback(async () => {
     const currentIndex = MODE_CYCLE.indexOf(cameraMode);
     const nextMode = MODE_CYCLE[(currentIndex + 1) % MODE_CYCLE.length];
 
@@ -136,9 +110,8 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     if (cameraMode === 'video' && capture.isCapturing) {
       capture.stopCapture();
       await endUsageSession(capture.elapsedSeconds);
-    } else if (cameraMode === 'photo' && photoStreamRef.current) {
-      photoStreamRef.current.getTracks().forEach((t) => t.stop());
-      photoStreamRef.current = null;
+    } else if (cameraMode === 'photo') {
+      stopPhotoStream();
     }
 
     // Start new mode
@@ -148,18 +121,32 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
         setCameraMode('off');
         return;
       }
+      if (!isMountedRef.current) {
+        await endUsageSession(0);
+        return;
+      }
       const started = await capture.startCapture();
+      if (!isMountedRef.current) {
+        if (started) capture.stopCapture();
+        return;
+      }
       if (!started) {
+        await endUsageSession(0);
         setCameraMode('off');
         return;
       }
     } else if (nextMode === 'photo') {
+      const generation = ++photoGenerationRef.current;
       try {
         const stream = await requestVideoStream({
           width: { ideal: CAPTURE_WIDTH },
           height: { ideal: CAPTURE_HEIGHT },
           facingMode: cameraFacing,
         });
+        if (!isMountedRef.current || generation !== photoGenerationRef.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
         photoStreamRef.current = stream;
       } catch (e) {
         logger.error('[UnifiedCamera] Failed to start photo mode', {
@@ -175,62 +162,12 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
       from: cameraMode,
       to: nextMode,
     });
-  }, [cameraMode, capture, cameraFacing, startVideoUsage, endUsageSession]);
+  }, [cameraMode, capture, cameraFacing, startVideoUsage, endUsageSession, stopPhotoStream]);
 
   // Take a single snapshot and send with response.create
   const takeSnapshot = useCallback(async () => {
     const stream = cameraMode === 'video' ? capture.videoStream : photoStreamRef.current;
-    if (!stream) {
-      logger.warn('[UnifiedCamera] No stream for snapshot');
-      return;
-    }
-
-    try {
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.muted = true;
-      video.playsInline = true;
-      await video.play();
-
-      const canvas = document.createElement('canvas');
-      canvas.width = CAPTURE_WIDTH;
-      canvas.height = CAPTURE_HEIGHT;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      ctx.drawImage(video, 0, 0, CAPTURE_WIDTH, CAPTURE_HEIGHT);
-      const dataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
-      const base64 = dataUrl.split(',')[1];
-
-      video.pause();
-      video.srcObject = null;
-
-      if (!base64 || !refs.webrtcDataChannelRef.current) return;
-
-      // Send image as conversation item
-      refs.webrtcDataChannelRef.current.send(
-        JSON.stringify({
-          type: 'conversation.item.create',
-          item: {
-            type: 'message',
-            role: 'user',
-            content: [
-              {
-                type: 'input_image',
-                image_url: `data:image/jpeg;base64,${base64}`,
-              },
-            ],
-          },
-        }),
-      );
-
-      // Trigger AI response (unlike video which is passive)
-      refs.webrtcDataChannelRef.current.send(JSON.stringify({ type: 'response.create' }));
-
-      logger.info('[UnifiedCamera] Snapshot sent with response.create');
-    } catch (e) {
-      logger.error('[UnifiedCamera] Snapshot failed', { error: String(e) });
-    }
+    await sendCameraSnapshot(stream, refs.webrtcDataChannelRef, () => isMountedRef.current);
   }, [cameraMode, capture.videoStream, refs]);
 
   // Toggle camera facing (front/back)
@@ -239,14 +176,19 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     setCameraFacing(next);
 
     // Restart stream with new facing if in photo mode
-    if (cameraMode === 'photo' && photoStreamRef.current) {
-      photoStreamRef.current.getTracks().forEach((t) => t.stop());
+    if (cameraMode === 'photo') {
+      stopPhotoStream();
+      const generation = photoGenerationRef.current;
       requestVideoStream({
         width: { ideal: CAPTURE_WIDTH },
         height: { ideal: CAPTURE_HEIGHT },
         facingMode: next,
       })
         .then((stream) => {
+          if (!isMountedRef.current || generation !== photoGenerationRef.current) {
+            stream.getTracks().forEach((track) => track.stop());
+            return;
+          }
           photoStreamRef.current = stream;
         })
         .catch((e) => {
@@ -257,10 +199,10 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     }
 
     logger.info('[UnifiedCamera] Camera facing changed', { facing: next });
-  }, [cameraFacing, cameraMode]);
+  }, [cameraFacing, cameraMode, stopPhotoStream]);
 
   // Legacy toggleVideo for backward compatibility
-  const toggleVideo = useCallback(async () => {
+  const changeVideo = useCallback(async () => {
     if (cameraMode === 'video') {
       capture.stopCapture();
       await endUsageSession(capture.elapsedSeconds);
@@ -268,10 +210,25 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
     } else if (cameraMode === 'off') {
       const allowed = await startVideoUsage();
       if (!allowed) return;
+      if (!isMountedRef.current) {
+        await endUsageSession(0);
+        return;
+      }
       const started = await capture.startCapture();
+      if (!isMountedRef.current) {
+        if (started) capture.stopCapture();
+        return;
+      }
       if (started) setCameraMode('video');
+      else await endUsageSession(0);
     }
   }, [cameraMode, capture, startVideoUsage, endUsageSession]);
+
+  const cycleCameraMode = useCallback(
+    () => runTransition(changeCameraMode),
+    [runTransition, changeCameraMode],
+  );
+  const toggleVideo = useCallback(() => runTransition(changeVideo), [runTransition, changeVideo]);
 
   return {
     cameraMode,

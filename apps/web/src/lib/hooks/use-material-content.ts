@@ -31,12 +31,17 @@ interface UseMaterialContentResult {
   error: string | null;
 }
 
-function withMaterialTitle(
+function isContentRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+/** Keep save titles consistent for generated results and persisted material content. */
+export function withMaterialTitle(
   type: string,
-  content: Record<string, unknown> | null | undefined,
+  content: unknown,
   material?: MaterialContent,
 ): Record<string, unknown> | null {
-  if (!content) {
+  if (!isContentRecord(content)) {
     logger.warn('Material content unavailable', { toolType: type });
     return null;
   }
@@ -86,7 +91,7 @@ export function useMaterialContent(toolCall: ToolCall | ToolCallRef): UseMateria
   useEffect(() => {
     // If we have full data from result, use it directly
     if (hasFullData(toolCall)) {
-      setData(withMaterialTitle(toolCall.type, toolCall.result?.data as Record<string, unknown>));
+      setData(withMaterialTitle(toolCall.type, toolCall.result?.data));
       setIsLoading(false);
       setError(null);
       return;
@@ -94,7 +99,7 @@ export function useMaterialContent(toolCall: ToolCall | ToolCallRef): UseMateria
 
     // If we have arguments (for tools in progress), use those
     if ('arguments' in toolCall && toolCall.arguments) {
-      setData(withMaterialTitle(toolCall.type, toolCall.arguments as Record<string, unknown>));
+      setData(withMaterialTitle(toolCall.type, toolCall.arguments));
       setIsLoading(false);
       setError(null);
       return;

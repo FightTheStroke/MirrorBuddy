@@ -69,6 +69,7 @@ export function useMindmapModifications({
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Ref to hold connect function for recursive calls in onerror handler
   const connectRef = useRef<() => void>(() => {});
+  const isMountedRef = useRef(false);
 
   // Use state for values that need to trigger re-renders
   const [isConnected, setIsConnected] = useState(false);
@@ -81,6 +82,16 @@ export function useMindmapModifications({
   useEffect(() => {
     callbacksRef.current = callbacks;
   }, [callbacks]);
+
+  const closeSource = useCallback(() => {
+    const source = eventSourceRef.current;
+    eventSourceRef.current = null;
+    if (!source) return;
+    source.onopen = null;
+    source.onmessage = null;
+    source.onerror = null;
+    source.close();
+  }, []);
 
   // Handle incoming SSE event
   const handleEvent = useCallback((event: MessageEvent) => {
@@ -150,12 +161,12 @@ export function useMindmapModifications({
 
   // Connect to SSE endpoint
   const connect = useCallback(() => {
-    if (!sessionId || !enabled) return;
-
-    // Close existing connection
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
+    if (!isMountedRef.current || !sessionId || !enabled) return;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
+    closeSource();
 
     const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
 
@@ -163,13 +174,18 @@ export function useMindmapModifications({
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
+      if (eventSourceRef.current !== eventSource) return;
       logger.info('[MindmapModifications] SSE connected', { sessionId });
       setIsConnected(true);
     };
 
-    eventSource.onmessage = handleEvent;
+    eventSource.onmessage = (event) => {
+      if (eventSourceRef.current === eventSource) handleEvent(event);
+    };
 
     eventSource.onerror = (error) => {
+      if (eventSourceRef.current !== eventSource) return;
+      closeSource();
       logger.warn('[MindmapModifications] SSE error, reconnecting...', {
         error,
       });
@@ -180,10 +196,11 @@ export function useMindmapModifications({
         clearTimeout(reconnectTimeoutRef.current);
       }
       reconnectTimeoutRef.current = setTimeout(() => {
+        reconnectTimeoutRef.current = null;
         connectRef.current();
       }, 3000);
     };
-  }, [sessionId, enabled, handleEvent]);
+  }, [sessionId, enabled, handleEvent, closeSource]);
 
   // Keep connectRef in sync with connect (in effect, not during render)
   useEffect(() => {
@@ -200,22 +217,21 @@ export function useMindmapModifications({
 
   // Setup SSE connection
   useEffect(() => {
+    isMountedRef.current = true;
     if (enabled && sessionId) {
       connect();
     }
 
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
+      isMountedRef.current = false;
+      closeSource();
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
       setIsConnected(false);
     };
-  }, [sessionId, enabled, connect]);
+  }, [sessionId, enabled, connect, closeSource]);
 
   return {
     isConnected,

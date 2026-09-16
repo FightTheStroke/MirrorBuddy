@@ -7,6 +7,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import { attachDatabasePool } from '@vercel/functions';
 import { logger } from '@mirrorbuddy/logger';
 import { isSupabaseUrl } from '@mirrorbuddy/utils';
 import { isStagingMode } from '@mirrorbuddy/utils';
@@ -83,6 +84,11 @@ const pool = new Pool({
   idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
   connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
 });
+
+// Idle timers cannot release connections while a Fluid instance is suspended.
+if (process.env.VERCEL === '1') {
+  attachDatabasePool(pool);
+}
 
 const adapter = new PrismaPg(pool as never as ConstructorParameters<typeof PrismaPg>[0]);
 

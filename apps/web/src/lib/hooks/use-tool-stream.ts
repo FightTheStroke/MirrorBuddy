@@ -1,9 +1,4 @@
 'use client';
-// ============================================================================
-// HOOK: useToolStream
-// Connects to SSE endpoint for real-time tool updates
-// Provides reactive state for tool building progress
-// ============================================================================
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
@@ -42,17 +37,16 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     reconnectDelayMs = 2000,
   } = options;
 
-  // State
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const [clientId, setClientId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ActiveToolState | null>(null);
   const [toolHistory, setToolHistory] = useState<StreamToolEvent[]>([]);
   const [eventsReceived, setEventsReceived] = useState(0);
 
-  // Refs
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldReconnectRef = useRef(false);
   // Store handler references for proper cleanup
   const handlersRef = useRef<{
     connected: ((e: Event) => void) | null;
@@ -72,13 +66,11 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     onErrorRef.current = onError;
   }, [onEvent, onError]);
 
-  // Handle tool event - defined first so it can be used in connect
   const processToolEvent = useCallback((event: StreamToolEvent) => {
     setToolHistory((prev) => [...prev, event].slice(-50)); // Keep last 50
     setActiveTool((prev) => processStreamToolEvent(event, prev));
   }, []);
 
-  // Clean up EventSource listeners
   const cleanupEventSource = useCallback((es: EventSource | null) => {
     if (!es) return;
     const handlers = handlersRef.current;
@@ -94,8 +86,8 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     es.close();
   }, []);
 
-  // Disconnect from SSE
   const disconnect = useCallback(() => {
+    shouldReconnectRef.current = false;
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = null;
@@ -113,13 +105,12 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     logger.info('Disconnected from tool stream');
   }, [cleanupEventSource]);
 
-  // Set up EventSource with handlers
   const setupEventSource = useCallback(
     (url: string): EventSource => {
       const eventSource = new EventSource(url);
 
-      // Create handlers and store references for cleanup
       const connectedHandler = (e: Event) => {
+        if (eventSourceRef.current !== eventSource) return;
         try {
           const data = JSON.parse((e as MessageEvent).data);
           setClientId(data.clientId);
@@ -132,6 +123,7 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       };
 
       const messageHandler = (e: MessageEvent) => {
+        if (eventSourceRef.current !== eventSource) return;
         if (e.data.startsWith(':')) return; // Ignore heartbeats
         try {
           const event: StreamToolEvent = JSON.parse(e.data);
@@ -144,8 +136,9 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       };
 
       const errorHandler = () => {
+        if (eventSourceRef.current !== eventSource) return;
         logger.warn('Tool stream error');
-        cleanupEventSource(eventSourceRef.current);
+        cleanupEventSource(eventSource);
         eventSourceRef.current = null;
 
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
@@ -157,6 +150,8 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
           const delay = Math.min(exponentialDelay + jitter, 30000);
 
           reconnectTimeoutRef.current = setTimeout(() => {
+            reconnectTimeoutRef.current = null;
+            if (!isMountedRef.current || !shouldReconnectRef.current) return;
             logger.info('Reconnecting to tool stream', {
               attempt: reconnectAttemptsRef.current,
               delayMs: Math.round(delay),
@@ -173,14 +168,12 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
         }
       };
 
-      // Store handler references for cleanup
       handlersRef.current = {
         connected: connectedHandler,
         message: messageHandler,
         error: errorHandler,
       };
 
-      // Attach handlers
       eventSource.addEventListener('connected', connectedHandler);
       eventSource.addEventListener('message', messageHandler);
       eventSource.addEventListener('error', errorHandler);
@@ -195,9 +188,14 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     setupEventSourceRef.current = setupEventSource;
   }, [setupEventSource]);
 
-  // Connect to SSE
   const connect = useCallback(() => {
-    // Clean up existing connection properly
+    if (!isMountedRef.current || !sessionId) return;
+    shouldReconnectRef.current = true;
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+    reconnectAttemptsRef.current = 0;
     cleanupEventSource(eventSourceRef.current);
     eventSourceRef.current = null;
 
@@ -210,13 +208,18 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
 
   // Auto-connect on mount
   useEffect(() => {
+    let cancelled = false;
     isMountedRef.current = true;
+    shouldReconnectRef.current = autoConnect && Boolean(sessionId);
     if (autoConnect && sessionId) {
       // Defer connection to avoid synchronous setState in effect
-      queueMicrotask(connect);
+      queueMicrotask(() => {
+        if (!cancelled && shouldReconnectRef.current) connect();
+      });
     }
 
     return () => {
+      cancelled = true;
       isMountedRef.current = false;
       disconnect();
     };
