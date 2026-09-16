@@ -14,7 +14,6 @@ import type { FeatureType, UserFeatureConfigInput } from '@/lib/tier/server';
 export const revalidate = 0;
 const VALID_FEATURES: FeatureType[] = [
   'chat',
-  'realtime',
   'pdf',
   'mindmap',
   'quiz',

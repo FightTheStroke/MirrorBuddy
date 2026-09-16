@@ -12,6 +12,13 @@ Accepted (Extended by ADR 0073)
 
 Per-feature model selection (pdfModel, mindmapModel, quizModel, etc.) is documented in **ADR 0073: Per-Feature Model Selection System**.
 
+On **2026-09-16**, per-tier realtime/voice model selection was removed as dead
+configuration (issue #846, Finding 2). The admin control, tier interfaces, seeds,
+and model-selection helpers no longer expose it. The database column remains for
+backwards compatibility; no migration or data deletion is required. Voice access
+and minute limits remain tier-based, but the web realtime deployment is selected
+globally by environment variables and feature flags, not by tier (see ADR 0169).
+
 ## Context
 
 MirrorBuddy requires a monetization strategy to sustain development while maintaining free trial access for market validation. Users must be segmented by subscription tier to:
@@ -49,7 +56,7 @@ model TierDefinition {
 
   // AI Model assignments
   chatModel           String   @default("gpt-5-mini")          // Chat model
-  realtimeModel       String   @default("gpt-realtime-mini")    // Voice model
+  realtimeModel       String   @default("gpt-realtime-mini")    // Deprecated; compatibility only
 
   // Feature access (JSON flags)
   features            Json     @default("{}")       // Feature toggles
@@ -199,7 +206,7 @@ class TierService {
   async getLimitsForUser(userId: string | null): Promise<TierLimits>;
 
   // Get appropriate AI model based on tier
-  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision' | 'tts'): Promise<string>;
+  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision'): Promise<string>;
 
   // Cache invalidation (called after admin tier updates)
   invalidateCache(): void;
@@ -260,7 +267,6 @@ Per-user overrides stored in `UserSubscription.overrideLimits` and `overrideFeat
   "toolsLimitDaily": 100,
   "docsLimitTotal": 50,
   "chatModel": "gpt-5-mini",
-  "realtimeModel": "gpt-realtime",
   "features": { "chat": true, "voice": true, "quizzes": true },
   "availableMaestri": ["leonardo", "galileo", "curie"],
   "availableCoaches": ["melissa", "roberto"],

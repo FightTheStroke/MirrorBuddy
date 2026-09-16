@@ -37,7 +37,6 @@ describe('TierService Integration - ADR 0073', () => {
 
   const allFeatureTypes: FeatureType[] = [
     'chat',
-    'realtime',
     'pdf',
     'mindmap',
     'quiz',

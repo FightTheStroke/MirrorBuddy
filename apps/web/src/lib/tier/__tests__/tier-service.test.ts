@@ -70,7 +70,6 @@ describe('TierService', () => {
     videoVisionSecondsPerSession: 0,
     videoVisionMinutesMonthly: 0,
     chatModel: 'gpt-5-mini',
-    realtimeModel: 'gpt-realtime-mini',
     ...defaultModelFields,
     features: {
       chat: true,
@@ -107,7 +106,6 @@ describe('TierService', () => {
     videoVisionSecondsPerSession: 0,
     videoVisionMinutesMonthly: 0,
     chatModel: 'gpt-5-mini',
-    realtimeModel: 'gpt-realtime-mini',
     ...defaultModelFields,
     features: {
       chat: true,
@@ -144,7 +142,6 @@ describe('TierService', () => {
     videoVisionSecondsPerSession: 60,
     videoVisionMinutesMonthly: 10,
     chatModel: 'gpt-5.2-chat',
-    realtimeModel: 'gpt-realtime',
     ...defaultModelFields,
     features: {
       chat: true,
@@ -795,30 +792,6 @@ describe('TierService', () => {
       expect(model).toBe('gpt-5.2-chat');
     });
 
-    it('should return realtime model for TTS type', async () => {
-      const mockSubscription: UserSubscription = {
-        id: 'sub-123',
-        userId: 'user-pro',
-        tierId: 'tier-pro',
-        tier: mockProTier,
-        overrideLimits: null,
-        overrideFeatures: null,
-        stripeSubscriptionId: 'sub_stripe_123',
-        stripeCustomerId: 'cus_stripe_123',
-        status: 'ACTIVE',
-        startedAt: new Date('2024-01-01'),
-        expiresAt: null,
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date('2024-01-01'),
-      };
-
-      vi.mocked(prisma.userSubscription.findUnique).mockResolvedValue(mockSubscription as never);
-
-      const model = await tierService.getAIModelForUser('user-pro', 'tts');
-
-      expect(model).toBe('gpt-realtime');
-    });
-
     it('should return chat model for vision type', async () => {
       const mockSubscription: UserSubscription = {
         id: 'sub-123',
@@ -887,10 +860,6 @@ describe('TierService', () => {
       // Test vision model (uses chat model)
       const visionModel = await tierService.getAIModelForUser('user-all-models', 'vision');
       expect(visionModel).toBe('gpt-5.2-chat');
-
-      // Test TTS model
-      const ttsModel = await tierService.getAIModelForUser('user-all-models', 'tts');
-      expect(ttsModel).toBe('gpt-realtime');
     });
   });
 

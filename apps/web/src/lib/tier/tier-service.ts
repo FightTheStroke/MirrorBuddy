@@ -374,11 +374,11 @@ export class TierService {
    * Get the appropriate AI model for a user based on their tier
    *
    * @param userId - User ID (null for anonymous users)
-   * @param type - Model type: 'chat', 'vision', or 'tts'
-   * @returns Model name string (e.g., "gpt-5.2-edu", "gpt-5-mini", "gpt-realtime")
+   * @param type - Model type: 'chat' or 'vision'
+   * @returns Chat model name string (vision uses the same model)
    * @deprecated Use getModelForUserFeature for per-feature selection (ADR 0073)
    */
-  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision' | 'tts'): Promise<string> {
+  async getAIModelForUser(userId: string | null, type: 'chat' | 'vision'): Promise<string> {
     try {
       const tier = await this.getEffectiveTier(userId);
       return getModelFromTier(tier, type);
@@ -400,8 +400,8 @@ export class TierService {
    *
    * Per-feature model selection allows fine-grained cost/quality optimization:
    * - chat: Main conversation with Maestri
-   * - realtime: Voice/real-time interactions
    * - pdf, mindmap, quiz, flashcards, summary, formula, chart, homework, webcam, demo
+   * Voice deployment selection is global, driven by environment and feature flag (ADR 0169).
    *
    * @param userId - User ID (null for anonymous users)
    * @param feature - Feature type (chat, mindmap, quiz, etc.)

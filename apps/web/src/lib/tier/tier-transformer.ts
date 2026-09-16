@@ -5,7 +5,7 @@
  * Handles type conversions and data normalization.
  */
 
-import type { TierDefinition } from "./types";
+import type { TierDefinition } from './types';
 
 /**
  * Transform Prisma tier to TypeScript TierDefinition
@@ -31,7 +31,6 @@ export function transformTier(prismaTier: {
   videoVisionMinutesMonthly: number;
   // Per-feature models (ADR 0073)
   chatModel: string;
-  realtimeModel: string;
   pdfModel: string;
   mindmapModel: string;
   quizModel: string;
@@ -59,34 +58,49 @@ export function transformTier(prismaTier: {
   let monthlyPrice: number | null = null;
   if (prismaTier.monthlyPriceEur !== null) {
     if (
-      typeof prismaTier.monthlyPriceEur === "object" &&
-      "toNumber" in prismaTier.monthlyPriceEur &&
-      typeof prismaTier.monthlyPriceEur.toNumber === "function"
+      typeof prismaTier.monthlyPriceEur === 'object' &&
+      'toNumber' in prismaTier.monthlyPriceEur &&
+      typeof prismaTier.monthlyPriceEur.toNumber === 'function'
     ) {
       monthlyPrice = prismaTier.monthlyPriceEur.toNumber();
-    } else if (typeof prismaTier.monthlyPriceEur === "number") {
+    } else if (typeof prismaTier.monthlyPriceEur === 'number') {
       monthlyPrice = prismaTier.monthlyPriceEur;
     }
   }
 
   return {
-    ...prismaTier,
+    id: prismaTier.id,
+    code: prismaTier.code,
+    name: prismaTier.name,
+    description: prismaTier.description,
+    chatLimitDaily: prismaTier.chatLimitDaily,
+    voiceMinutesDaily: prismaTier.voiceMinutesDaily,
+    toolsLimitDaily: prismaTier.toolsLimitDaily,
+    docsLimitTotal: prismaTier.docsLimitTotal,
+    chatModel: prismaTier.chatModel,
+    pdfModel: prismaTier.pdfModel,
+    mindmapModel: prismaTier.mindmapModel,
+    quizModel: prismaTier.quizModel,
+    flashcardsModel: prismaTier.flashcardsModel,
+    summaryModel: prismaTier.summaryModel,
+    formulaModel: prismaTier.formulaModel,
+    chartModel: prismaTier.chartModel,
+    homeworkModel: prismaTier.homeworkModel,
+    webcamModel: prismaTier.webcamModel,
+    demoModel: prismaTier.demoModel,
+    stripePriceId: prismaTier.stripePriceId,
+    sortOrder: prismaTier.sortOrder,
+    isActive: prismaTier.isActive,
+    createdAt: prismaTier.createdAt,
+    updatedAt: prismaTier.updatedAt,
     videoVisionSecondsPerSession: prismaTier.videoVisionSecondsPerSession ?? 0,
     videoVisionMinutesMonthly: prismaTier.videoVisionMinutesMonthly ?? 0,
     featureConfigs: prismaTier.featureConfigs as never,
     features: prismaTier.features as never,
-    availableMaestri: Array.isArray(prismaTier.availableMaestri)
-      ? prismaTier.availableMaestri
-      : [],
-    availableCoaches: Array.isArray(prismaTier.availableCoaches)
-      ? prismaTier.availableCoaches
-      : [],
-    availableBuddies: Array.isArray(prismaTier.availableBuddies)
-      ? prismaTier.availableBuddies
-      : [],
-    availableTools: Array.isArray(prismaTier.availableTools)
-      ? prismaTier.availableTools
-      : [],
+    availableMaestri: Array.isArray(prismaTier.availableMaestri) ? prismaTier.availableMaestri : [],
+    availableCoaches: Array.isArray(prismaTier.availableCoaches) ? prismaTier.availableCoaches : [],
+    availableBuddies: Array.isArray(prismaTier.availableBuddies) ? prismaTier.availableBuddies : [],
+    availableTools: Array.isArray(prismaTier.availableTools) ? prismaTier.availableTools : [],
     monthlyPriceEur: monthlyPrice,
   };
 }

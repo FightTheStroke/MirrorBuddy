@@ -32,7 +32,6 @@ interface TierFormData {
   videoVisionSecondsPerSession: number;
   videoVisionMinutesMonthly: number;
   chatModel: string;
-  realtimeModel: string;
   pdfModel: string;
   mindmapModel: string;
   quizModel: string;
@@ -74,7 +73,6 @@ export function TierForm({ tier }: TierFormProps) {
     videoVisionSecondsPerSession: tier?.videoVisionSecondsPerSession || 0,
     videoVisionMinutesMonthly: tier?.videoVisionMinutesMonthly || 0,
     chatModel: tier?.chatModel || 'gpt-5-mini',
-    realtimeModel: tier?.realtimeModel || 'gpt-realtime-mini',
     pdfModel: tier?.pdfModel || 'gpt-5-mini',
     mindmapModel: tier?.mindmapModel || 'gpt-5-mini',
     quizModel: tier?.quizModel || 'gpt-5-mini',
@@ -169,7 +167,6 @@ export function TierForm({ tier }: TierFormProps) {
       <ModelsSection
         formData={{
           chatModel: formData.chatModel,
-          realtimeModel: formData.realtimeModel,
           pdfModel: formData.pdfModel,
           mindmapModel: formData.mindmapModel,
           quizModel: formData.quizModel,

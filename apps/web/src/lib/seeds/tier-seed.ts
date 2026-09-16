@@ -31,13 +31,10 @@ const DEMO_MODEL = process.env.DEFAULT_DEMO_MODEL || 'gpt-5-nano';
  *
  * Values match `createFallbackTier()` in tier-fallbacks.ts, which is what the
  * app serves when the database row is missing — the two must not disagree.
- * Note Base uses `gpt-realtime-mini`, not `gpt-realtime`: the old standalone
- * seed said otherwise and would have quietly upgraded every Base user to the
- * expensive realtime model on the next re-seed.
+ * Voice deployment selection is global (ADR 0169), not seeded per tier.
  */
 const TRIAL_MODELS = {
   chatModel: CHAT_MODEL,
-  realtimeModel: 'gpt-realtime-mini',
   pdfModel: CHAT_MODEL,
   mindmapModel: CHAT_MODEL,
   quizModel: CHAT_MODEL,
@@ -52,7 +49,6 @@ const TRIAL_MODELS = {
 
 const BASE_MODELS = {
   chatModel: CHAT_MODEL_EDU,
-  realtimeModel: 'gpt-realtime-mini',
   pdfModel: CHAT_MODEL,
   mindmapModel: CHAT_MODEL,
   quizModel: CHAT_MODEL_EDU,
@@ -67,7 +63,6 @@ const BASE_MODELS = {
 
 const PRO_MODELS = {
   chatModel: CHAT_MODEL_PRO,
-  realtimeModel: 'gpt-realtime',
   pdfModel: CHAT_MODEL_PRO,
   mindmapModel: CHAT_MODEL_PRO,
   quizModel: CHAT_MODEL_PRO,

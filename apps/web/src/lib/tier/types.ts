@@ -24,7 +24,6 @@ export interface TierFeatures {
  */
 export type FeatureType =
   | 'chat'
-  | 'realtime'
   | 'pdf'
   | 'mindmap'
   | 'quiz'
@@ -55,7 +54,6 @@ export interface FeatureAIConfig {
  */
 export const DEFAULT_FEATURE_CONFIGS: Record<FeatureType, Omit<FeatureAIConfig, 'model'>> = {
   chat: { temperature: 0.7, maxTokens: 2000 },
-  realtime: { temperature: 0.7, maxTokens: 4096 },
   pdf: { temperature: 0.5, maxTokens: 4000 },
   mindmap: { temperature: 0.7, maxTokens: 1500 },
   quiz: { temperature: 0.7, maxTokens: 2000 },
@@ -93,7 +91,6 @@ export interface TierDefinition {
 
   // Per-feature model selection (ADR 0073)
   chatModel: string;
-  realtimeModel: string;
   pdfModel: string;
   mindmapModel: string;
   quizModel: string;
@@ -257,7 +254,6 @@ export interface EffectiveSubscriptionLimits {
   videoVisionSecondsPerSession: number;
   videoVisionMinutesMonthly: number;
   chatModel: string;
-  realtimeModel: string;
 }
 
 /**

@@ -83,7 +83,6 @@ export const PUT = pipe(
       docsLimitTotal:
         body.docsLimitTotal !== undefined ? body.docsLimitTotal : existing.docsLimitTotal,
       chatModel: body.chatModel || existing.chatModel,
-      realtimeModel: body.realtimeModel || existing.realtimeModel,
       features: body.features !== undefined ? body.features : existing.features,
       availableMaestri:
         body.availableMaestri !== undefined ? body.availableMaestri : existing.availableMaestri,
