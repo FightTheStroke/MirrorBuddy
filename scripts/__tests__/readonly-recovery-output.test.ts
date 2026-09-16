@@ -14,6 +14,8 @@ function execute(output: string, exit: number, action = 'report', confirm = '') 
   return spawnSync(
     'bash',
     [
+      '--noprofile',
+      '--norc',
       '-euo',
       'pipefail',
       '-c',

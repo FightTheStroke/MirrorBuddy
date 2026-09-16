@@ -90,12 +90,16 @@ it.each(scenarios)(
 it.each(scenarios)(
   'actual workflow Bash invokes actual conditioned pnpm with isolated boundaries: %s',
   (mode, code, exit) => {
-    const result = spawnSync('bash', ['-euo', 'pipefail', '-c', workflowRun], {
-      cwd: resolve(__dirname, '../..'),
-      encoding: 'utf8',
-      timeout: 30_000,
-      env: runtimeEnvironment(mode),
-    });
+    const result = spawnSync(
+      'bash',
+      ['--noprofile', '--norc', '-euo', 'pipefail', '-c', workflowRun],
+      {
+        cwd: resolve(__dirname, '../..'),
+        encoding: 'utf8',
+        timeout: 30_000,
+        env: runtimeEnvironment(mode),
+      },
+    );
     expect(result.error).toBeUndefined();
     expect(result.status, result.stdout + result.stderr).toBe(exit);
     expect(result.stdout).toBe(`${exit === 0 ? '' : '::error::'}READONLY_RECOVERY_${code}\n`);
