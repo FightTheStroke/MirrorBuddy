@@ -8,17 +8,26 @@
  * IMPORTANT: When adding new models, ensure the deployment exists in Azure.
  * Use `az cognitiveservices account deployment list` to verify.
  *
- * === DEPRECATION TIMELINE (as of Feb 2026) ===
- * - gpt-4o:       RETIRED Feb 13-16, 2026 — migrate to gpt-5.2 or gpt-5
- * - gpt-4o-mini:  RETIRED Feb 13-16, 2026 — migrate to gpt-5-mini or gpt-5-nano
- * - gpt-4-turbo:  RETIRED (older than gpt-4o) — migrate to gpt-5 family
- * - gpt-4o-realtime-preview: DEPRECATED — replaced by gpt-realtime / gpt-realtime-mini (GA)
- * - text-embedding-3-small: No scheduled retirement (≥1 year from GA)
- * - whisper-1: No scheduled retirement
+ * === RETIREMENT TIMELINE ===
+ * Audited 2026-09-16 against `aoai-virtualbpm-prod` (swedencentral) with
+ * `az cognitiveservices model list` and `az cognitiveservices account deployment list`.
  *
- * Migration: All GPT-4 family references should be updated to GPT-5 deployments.
- * The GPT-4 entries below are kept only for backward compatibility with existing
- * Azure deployments that haven't been migrated yet.
+ * | Deployment       | Underlying model | Status  | Inference retires |
+ * | ---------------- | ---------------- | ------- | ----------------- |
+ * | gpt-6-astra      | gpt-6-astra      | GA      | 2028-01-11        |
+ * | gpt-5.6-terra    | gpt-5.6-terra    | GA      | 2028-01-11        |
+ * | gpt-5.6-sol      | gpt-5.6-sol      | GA      | 2028-01-11        |
+ * | gpt-5-edu-mini   | gpt-5-mini       | GA      | 2027-02-09        |
+ * | gpt-5-nano       | gpt-5-nano       | GA      | 2027-02-09        |
+ * | gpt-5.2-edu      | gpt-chat-latest  | Preview | 2026-10-05        |
+ * | gpt-5.2-chat     | gpt-chat-latest  | Preview | 2026-10-05        |
+ * | gpt-5-chat       | gpt-chat-latest  | Preview | 2026-10-05        |
+ * | gpt-realtime-2.1 | gpt-realtime-2.1 | Preview | 2026-10-15        |
+ * | gpt-realtime-2   | gpt-realtime-2   | Preview | 2026-10-31        |
+ * | gpt-realtime-1.5 | gpt-realtime-1.5 | GA      | 2027-08-24        |
+ *
+ * The GPT-4 family retired in Feb 2026; those aliases survive only so that a tier
+ * row written before the migration still resolves to a live deployment.
  */
 
 import { logger } from '@/lib/logger';
@@ -45,12 +54,11 @@ function getChatDeploymentFallback(): string | undefined {
  * Values: Actual Azure deployment names from env vars or direct names
  */
 const DEPLOYMENT_MAP: Record<string, string | undefined> = {
-  // GPT-4 family (RETIRED Feb 2026). These deployments no longer exist on the
-  // Azure resource, so the old identity fallbacks ('gpt-4o', 'gpt-4-turbo')
-  // resolved to a DeploymentNotFound. Any tier row still carrying a retired
-  // name now lands on the current flagship instead of failing.
+  // GPT-4 family (RETIRED Feb 2026). These deployments no longer serve the model
+  // they are named after, so every alias resolves to the current flagship instead
+  // of a DeploymentNotFound or a silently different model.
   'gpt-4o': process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || CHAT_DEFAULT_DEPLOYMENT,
-  'gpt-4o-mini': process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || 'gpt4o-mini-deployment',
+  'gpt-4o-mini': process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || CHAT_DEFAULT_DEPLOYMENT,
   'gpt-4-turbo': process.env.AZURE_OPENAI_GPT4_TURBO_DEPLOYMENT || CHAT_DEFAULT_DEPLOYMENT,
 
   // GPT-5 family (new models)
@@ -58,15 +66,27 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // to an existing Azure deployment. We fall back to it to avoid 404 DeploymentNotFound.
   'gpt-5-nano': process.env.AZURE_OPENAI_GPT5_NANO_DEPLOYMENT || getChatDeploymentFallback(),
   'gpt-5-mini': process.env.AZURE_OPENAI_GPT5_MINI_DEPLOYMENT || getChatDeploymentFallback(),
-  'gpt-5-chat': process.env.AZURE_OPENAI_GPT5_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
-  'gpt-5.2-chat': process.env.AZURE_OPENAI_GPT52_CHAT_DEPLOYMENT || getChatDeploymentFallback(),
-  'gpt-5.2-edu': process.env.AZURE_OPENAI_GPT52_EDU_DEPLOYMENT || getChatDeploymentFallback(),
+
+  // Legacy chat aliases. The `gpt-5-chat` / `gpt-5.2-chat` / `gpt-5.2-edu`
+  // deployments are all backed by `gpt-chat-latest` 2026-05-05, a preview model
+  // whose inference support ends 2026-10-05. Their per-model env vars are
+  // deliberately ignored: every tier chats on the same GA model anyway, so a tier
+  // row still carrying one of these names must land on the current default rather
+  // than on a deployment that stops answering.
+  'gpt-5-chat': CHAT_DEFAULT_DEPLOYMENT,
+  'gpt-5.2-chat': CHAT_DEFAULT_DEPLOYMENT,
+  'gpt-5.2-edu': CHAT_DEFAULT_DEPLOYMENT,
 
   // 2026-07-09 wave — GPT-5.6 line. Every tier chats on the same model: the
   // quality of the tutor is not something to ration by price plan. Terra is
   // the default; Sol is kept mapped as the deliberate upgrade path.
   'gpt-5.6-terra': CHAT_DEFAULT_DEPLOYMENT,
   'gpt-5.6-sol': process.env.AZURE_OPENAI_GPT56_SOL_DEPLOYMENT?.trim() || 'gpt-5.6-sol',
+
+  // 2026-09-03 wave — GPT-6 Astra, the newest GA flagship, already provisioned on
+  // the resource. Mapped so it can be selected; promoting it to the default is a
+  // cost decision, not a mapping one.
+  'gpt-6-astra': process.env.AZURE_OPENAI_GPT6_ASTRA_DEPLOYMENT?.trim() || 'gpt-6-astra',
 
   // Realtime models (voice) — GA deployments (Feb 2026+)
   // Pro tier uses gpt-realtime (best quality), Base/Trial use gpt-realtime-mini (cost-effective)
@@ -85,6 +105,8 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // alphanumeric speech (dates/numbers/formulas — key for discalculia), noise
   // robustness and lower latency. Adds the Cedar voice. Drop-in over v2.
   'gpt-realtime-2.1': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 || 'gpt-realtime-2.1',
+  'gpt-realtime-2.1-mini':
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21_MINI || 'gpt-realtime-2.1-mini',
   'gpt-realtime-whisper':
     process.env.AZURE_OPENAI_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper',
   'gpt-realtime-translate':
