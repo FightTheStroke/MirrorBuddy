@@ -10,9 +10,9 @@
  *   console.log(limits.database.used, limits.connections.used);
  */
 
-import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { calculateStatus, AlertStatus } from "./threshold-logic";
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { calculateStatus, AlertStatus } from './threshold-logic';
 
 /**
  * Resource metrics with usage and limit (F-18, F-25)
@@ -46,6 +46,19 @@ const SUPABASE_FREE_LIMITS = {
 };
 
 /**
+ * Failure of a Supabase monitoring query
+ *
+ * Names the query that failed and keeps the driver error, including its
+ * SQLSTATE, as the cause. Reported once, by the metric collector.
+ */
+export class MonitoringQueryError extends Error {
+  constructor(query: string, cause: unknown) {
+    super(`Supabase monitoring query failed: ${query}`, { cause });
+    this.name = 'MonitoringQueryError';
+  }
+}
+
+/**
  * Query current database size in bytes
  */
 async function getDatabaseSize(): Promise<number> {
@@ -55,12 +68,7 @@ async function getDatabaseSize(): Promise<number> {
     `;
     return Number(result[0].size);
   } catch (error) {
-    logger.error(
-      "[supabase-limits] Failed to query database size",
-      undefined,
-      error,
-    );
-    throw error;
+    throw new MonitoringQueryError('database_size', error);
   }
 }
 
@@ -76,12 +84,7 @@ async function getConnectionCount(): Promise<number> {
     `;
     return Number(result[0].count);
   } catch (error) {
-    logger.error(
-      "[supabase-limits] Failed to query connection count",
-      undefined,
-      error,
-    );
-    throw error;
+    throw new MonitoringQueryError('connection_count', error);
   }
 }
 
@@ -103,11 +106,7 @@ async function getStorageUsage(): Promise<number | null> {
 /**
  * Format resource metric with usage percentage and status (F-25)
  */
-function formatMetric(
-  used: number,
-  limit: number,
-  unit: string,
-): ResourceMetric {
+function formatMetric(used: number, limit: number, unit: string): ResourceMetric {
   const usagePercent = limit > 0 ? Math.round((used / limit) * 100) : 0;
   return {
     used,
@@ -145,29 +144,26 @@ export async function getSupabaseLimits(): Promise<SupabaseLimits> {
     const dbSizeMB = Math.round(dbSizeBytes / 1024 / 1024);
 
     return {
-      database: formatMetric(
-        dbSizeMB,
-        SUPABASE_FREE_LIMITS.DATABASE_SIZE_MB,
-        "MB",
-      ),
+      database: formatMetric(dbSizeMB, SUPABASE_FREE_LIMITS.DATABASE_SIZE_MB, 'MB'),
       connections: formatMetric(
         connectionCount,
         SUPABASE_FREE_LIMITS.MAX_CONNECTIONS,
-        "connections",
+        'connections',
       ),
       storage:
         storageBytes !== null
           ? formatMetric(
               Math.round(storageBytes / 1024 / 1024 / 1024),
               SUPABASE_FREE_LIMITS.STORAGE_GB,
-              "GB",
+              'GB',
             )
           : null,
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
-    logger.error("[supabase-limits] Failed to get limits", undefined, error);
-    throw new Error("Failed to query Supabase limits");
+    // Reported once by the caller (metric collector); the driver error, and
+    // with it the SQLSTATE, stays attached as the cause.
+    throw error;
   }
 }
 
@@ -177,9 +173,7 @@ export async function getSupabaseLimits(): Promise<SupabaseLimits> {
  * @param threshold - Percentage threshold (default: 80)
  * @returns {Promise<boolean>} True if any resource exceeds threshold
  */
-export async function isResourceStressed(
-  threshold: number = 80,
-): Promise<boolean> {
+export async function isResourceStressed(threshold: number = 80): Promise<boolean> {
   try {
     const limits = await getSupabaseLimits();
     return (
@@ -188,11 +182,7 @@ export async function isResourceStressed(
       (limits.storage?.usagePercent ?? 0) >= threshold
     );
   } catch (error) {
-    logger.error(
-      "[supabase-limits] Failed to check resource stress",
-      undefined,
-      error,
-    );
+    logger.error('[supabase-limits] Failed to check resource stress', undefined, error);
     return false; // Fail open - don't block on monitoring errors
   }
 }
@@ -216,7 +206,7 @@ export async function getStressReport(): Promise<string> {
       );
     }
 
-    return lines.join("\n");
+    return lines.join('\n');
   } catch (error) {
     return `Error fetching stress report: ${error}`;
   }

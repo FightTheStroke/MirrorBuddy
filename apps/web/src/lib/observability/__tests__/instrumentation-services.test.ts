@@ -37,7 +37,7 @@ describe('Instrumentation Services', () => {
       // Without this, every instance answers checks from compiled defaults and
       // database kill switches never take effect.
       expect(instrumentationContent).toMatch(
-        /initializeFlags.*=.*await\s+import.*@\/lib\/feature-flags/s,
+        /initializeFlags.*=.*await\s+import.*@\/lib\/feature-flags/,
       );
       expect(instrumentationContent).toMatch(/void\s+initializeFlags\(\)/);
     });
