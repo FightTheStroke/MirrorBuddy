@@ -102,11 +102,21 @@ async function collectVercelLimits(
   const samples: ServiceLimitMetricSample[] = [];
 
   const limits = await getVercelLimits();
-  if (limits.error) {
-    throw new Error(limits.error);
+
+  const enabled = {
+    name: 'metric_collector_enabled',
+    labels: { ...instanceLabels, collector: 'vercel' },
+    value: limits.status === 'not_configured' ? 0 : 1,
+    timestamp,
+  };
+  // Absent configuration is unavailable monitoring, not a failure to report.
+  if (limits.status === 'not_configured') return [enabled];
+  if (limits.status !== 'ok') {
+    throw new Error(limits.error ?? 'Vercel limits unavailable');
   }
 
   samples.push(
+    enabled,
     ...createLimitMetrics(instanceLabels, 'vercel', 'bandwidth', limits.bandwidth, timestamp),
     ...createLimitMetrics(instanceLabels, 'vercel', 'builds', limits.builds, timestamp),
     ...createLimitMetrics(instanceLabels, 'vercel', 'functions', limits.functions, timestamp),

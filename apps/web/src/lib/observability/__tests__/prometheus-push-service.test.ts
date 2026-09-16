@@ -103,7 +103,32 @@ describe('independent metrics push', () => {
 
   it('does not turn transport failures into successful pushes', async () => {
     fetchMock.mockResolvedValueOnce(new Response('rejected', { status: 401 }));
-    await expect(prometheusPushService.pushMetrics()).rejects.toThrow('Push failed: 401 rejected');
+    await expect(prometheusPushService.pushMetrics()).rejects.toThrow(
+      'Metrics push rejected: HTTP 401',
+    );
+  });
+
+  it('keeps the transport response attributable without grouping on its body', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('tenant 12345 over quota', { status: 429 }));
+
+    const failure = await prometheusPushService.pushMetrics().catch((error: unknown) => error);
+
+    expect(failure).toBeInstanceOf(Error);
+    const pushError = failure as Error & { status?: number; responseBody?: string };
+    expect(pushError.message).toBe('Metrics push rejected: HTTP 429');
+    expect(pushError.status).toBe(429);
+    expect(pushError.responseBody).toContain('over quota');
+  });
+
+  it('reports a failed start-up push with the original error, not a stringified copy', async () => {
+    const failure = new Error('fetch failed');
+    fetchMock.mockRejectedValueOnce(failure);
+
+    prometheusPushService.start();
+    await vi.waitFor(() => expect(logger.error).toHaveBeenCalled());
+    prometheusPushService.stop();
+
+    expect(logger.error).toHaveBeenCalledWith('Metrics push failed', { phase: 'initial' }, failure);
   });
 
   it('marks composite service limits degraded without discarding valid child samples', async () => {

@@ -2,59 +2,163 @@
  * Unit tests for Vercel Limits API
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  getVercelLimits,
-  clearVercelLimitsCache,
-  type VercelLimits,
-} from "../vercel-limits";
-import * as apiClient from "../vercel-api-client";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { logger } from '@/lib/logger';
+import { getVercelLimits, clearVercelLimitsCache, type VercelLimits } from '../vercel-limits';
+import * as apiClient from '../vercel-api-client';
 
-describe("Vercel Limits API", () => {
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      debug: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    }),
+  },
+}));
+
+describe('Vercel Limits API', () => {
   beforeEach(() => {
     clearVercelLimitsCache();
     vi.resetAllMocks();
   });
 
-  it("returns error when VERCEL_TOKEN is missing", async () => {
+  it('reports a missing VERCEL_TOKEN as unconfigured, not as a failure', async () => {
     const originalToken = process.env.VERCEL_TOKEN;
     delete process.env.VERCEL_TOKEN;
 
     const limits = await getVercelLimits();
 
-    expect(limits.error).toBe("VERCEL_TOKEN not configured");
+    expect(limits.status).toBe('not_configured');
+    expect(limits.error).toBe('VERCEL_TOKEN not configured');
     expect(limits.bandwidth.used).toBe(0);
     expect(limits.bandwidth.limit).toBe(0);
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
 
     process.env.VERCEL_TOKEN = originalToken;
   });
 
-  it("returns typed VercelLimits interface", async () => {
-    const limits: VercelLimits = await getVercelLimits();
+  it('reports a missing VERCEL_PROJECT_ID as unconfigured, not as a failure', async () => {
+    const originalToken = process.env.VERCEL_TOKEN;
+    const originalProjectId = process.env.VERCEL_PROJECT_ID;
+    const originalUrl = process.env.VERCEL_URL;
 
-    expect(limits).toHaveProperty("bandwidth");
-    expect(limits).toHaveProperty("builds");
-    expect(limits).toHaveProperty("functions");
-    expect(limits).toHaveProperty("timestamp");
+    process.env.VERCEL_TOKEN = 'test-token';
+    delete process.env.VERCEL_PROJECT_ID;
+    delete process.env.VERCEL_URL;
 
-    expect(limits.bandwidth).toHaveProperty("used");
-    expect(limits.bandwidth).toHaveProperty("limit");
-    expect(limits.bandwidth).toHaveProperty("percent");
+    const limits = await getVercelLimits();
 
-    expect(typeof limits.bandwidth.used).toBe("number");
-    expect(typeof limits.bandwidth.limit).toBe("number");
-    expect(typeof limits.bandwidth.percent).toBe("number");
+    expect(limits.status).toBe('not_configured');
+    expect(limits.error).toBe('VERCEL_PROJECT_ID not configured');
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
+
+    process.env.VERCEL_TOKEN = originalToken;
+    process.env.VERCEL_PROJECT_ID = originalProjectId;
+    process.env.VERCEL_URL = originalUrl;
   });
 
-  it("caches results for 5 minutes", async () => {
+  it('distinguishes an authentication failure of a configured integration from absent configuration', async () => {
     const originalToken = process.env.VERCEL_TOKEN;
     const originalProjectId = process.env.VERCEL_PROJECT_ID;
 
-    process.env.VERCEL_TOKEN = "test-token";
-    process.env.VERCEL_PROJECT_ID = "prj_test";
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
 
-    const mockQueryProjectUsage = vi.spyOn(apiClient, "queryProjectUsage");
-    const mockGetDefaultLimits = vi.spyOn(apiClient, "getDefaultLimits");
+    vi.spyOn(apiClient, 'queryProjectUsage').mockRejectedValue(
+      new Error('Vercel API error: 401 Unauthorized'),
+    );
+
+    const limits = await getVercelLimits();
+
+    expect(limits.status).toBe('error');
+    expect(limits.error).toContain('401');
+    expect(logger.error).not.toHaveBeenCalled();
+
+    process.env.VERCEL_TOKEN = originalToken;
+    process.env.VERCEL_PROJECT_ID = originalProjectId;
+  });
+
+  it('reports a rate-limited configured integration as a failure, never as healthy zero usage', async () => {
+    const originalToken = process.env.VERCEL_TOKEN;
+    const originalProjectId = process.env.VERCEL_PROJECT_ID;
+
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
+
+    vi.spyOn(apiClient, 'queryProjectUsage').mockRejectedValue(
+      new Error('Vercel API error: 429 Too Many Requests'),
+    );
+
+    const limits = await getVercelLimits();
+
+    expect(limits.status).toBe('error');
+    expect(limits.error).toContain('429');
+
+    process.env.VERCEL_TOKEN = originalToken;
+    process.env.VERCEL_PROJECT_ID = originalProjectId;
+  });
+
+  it('marks a successful query as ok', async () => {
+    const originalToken = process.env.VERCEL_TOKEN;
+    const originalProjectId = process.env.VERCEL_PROJECT_ID;
+
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
+
+    vi.spyOn(apiClient, 'queryProjectUsage').mockResolvedValue({
+      bandwidth: { used: 1000 },
+      builds: { used: 50 },
+      functions: { used: 10000 },
+    });
+    vi.spyOn(apiClient, 'getDefaultLimits').mockReturnValue({
+      bandwidth: 100 * 1024 * 1024 * 1024,
+      builds: 6000,
+      functions: 1000000,
+    });
+
+    const limits = await getVercelLimits();
+
+    expect(limits.status).toBe('ok');
+    expect(limits.error).toBeUndefined();
+
+    process.env.VERCEL_TOKEN = originalToken;
+    process.env.VERCEL_PROJECT_ID = originalProjectId;
+  });
+
+  it('returns typed VercelLimits interface', async () => {
+    const limits: VercelLimits = await getVercelLimits();
+
+    expect(limits).toHaveProperty('bandwidth');
+    expect(limits).toHaveProperty('builds');
+    expect(limits).toHaveProperty('functions');
+    expect(limits).toHaveProperty('timestamp');
+
+    expect(limits.bandwidth).toHaveProperty('used');
+    expect(limits.bandwidth).toHaveProperty('limit');
+    expect(limits.bandwidth).toHaveProperty('percent');
+
+    expect(typeof limits.bandwidth.used).toBe('number');
+    expect(typeof limits.bandwidth.limit).toBe('number');
+    expect(typeof limits.bandwidth.percent).toBe('number');
+  });
+
+  it('caches results for 5 minutes', async () => {
+    const originalToken = process.env.VERCEL_TOKEN;
+    const originalProjectId = process.env.VERCEL_PROJECT_ID;
+
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
+
+    const mockQueryProjectUsage = vi.spyOn(apiClient, 'queryProjectUsage');
+    const mockGetDefaultLimits = vi.spyOn(apiClient, 'getDefaultLimits');
 
     mockQueryProjectUsage.mockResolvedValue({
       bandwidth: { used: 1000 },
@@ -83,15 +187,15 @@ describe("Vercel Limits API", () => {
     process.env.VERCEL_PROJECT_ID = originalProjectId;
   });
 
-  it("calculates percentages correctly", async () => {
+  it('calculates percentages correctly', async () => {
     const originalToken = process.env.VERCEL_TOKEN;
     const originalProjectId = process.env.VERCEL_PROJECT_ID;
 
-    process.env.VERCEL_TOKEN = "test-token";
-    process.env.VERCEL_PROJECT_ID = "prj_test";
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
 
-    const mockQueryProjectUsage = vi.spyOn(apiClient, "queryProjectUsage");
-    const mockGetDefaultLimits = vi.spyOn(apiClient, "getDefaultLimits");
+    const mockQueryProjectUsage = vi.spyOn(apiClient, 'queryProjectUsage');
+    const mockGetDefaultLimits = vi.spyOn(apiClient, 'getDefaultLimits');
 
     mockQueryProjectUsage.mockResolvedValue({
       bandwidth: { used: 50 * 1024 * 1024 * 1024 }, // 50 GB
@@ -120,18 +224,16 @@ describe("Vercel Limits API", () => {
     process.env.VERCEL_PROJECT_ID = originalProjectId;
   });
 
-  it("handles API errors gracefully", async () => {
+  it('handles API errors gracefully', async () => {
     const originalToken = process.env.VERCEL_TOKEN;
     const originalProjectId = process.env.VERCEL_PROJECT_ID;
 
-    process.env.VERCEL_TOKEN = "test-token";
-    process.env.VERCEL_PROJECT_ID = "prj_test";
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
 
-    const mockQueryProjectUsage = vi.spyOn(apiClient, "queryProjectUsage");
+    const mockQueryProjectUsage = vi.spyOn(apiClient, 'queryProjectUsage');
 
-    mockQueryProjectUsage.mockRejectedValue(
-      new Error("Vercel API error: 401 Unauthorized"),
-    );
+    mockQueryProjectUsage.mockRejectedValue(new Error('Vercel API error: 401 Unauthorized'));
 
     const limits = await getVercelLimits();
 
@@ -142,15 +244,15 @@ describe("Vercel Limits API", () => {
     process.env.VERCEL_PROJECT_ID = originalProjectId;
   });
 
-  it("clears cache when clearVercelLimitsCache is called", async () => {
+  it('clears cache when clearVercelLimitsCache is called', async () => {
     const originalToken = process.env.VERCEL_TOKEN;
     const originalProjectId = process.env.VERCEL_PROJECT_ID;
 
-    process.env.VERCEL_TOKEN = "test-token";
-    process.env.VERCEL_PROJECT_ID = "prj_test";
+    process.env.VERCEL_TOKEN = 'test-token';
+    process.env.VERCEL_PROJECT_ID = 'prj_test';
 
-    const mockQueryProjectUsage = vi.spyOn(apiClient, "queryProjectUsage");
-    const mockGetDefaultLimits = vi.spyOn(apiClient, "getDefaultLimits");
+    const mockQueryProjectUsage = vi.spyOn(apiClient, 'queryProjectUsage');
+    const mockGetDefaultLimits = vi.spyOn(apiClient, 'getDefaultLimits');
 
     mockQueryProjectUsage.mockResolvedValue({
       bandwidth: { used: 1000 },

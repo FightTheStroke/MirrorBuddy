@@ -185,13 +185,22 @@ const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedA
 const flagCache = new Map<string, FeatureFlag>();
 let globalKillSwitch = false;
 let globalKillSwitchReason: string | undefined;
-let initialized = false;
+// True once the database policy has been loaded into the cache.
+let databaseLoaded = false;
+// True while checks are answered from compiled defaults instead of the database.
+let usingFallbackDefaults = true;
+let loadFailureReported = false;
 
 /**
  * Initialize flags from database, seeding defaults if needed
+ *
+ * Safe to call more than once: the database is read only until its policy is
+ * loaded. A previous fallback to compiled defaults does not prevent the load,
+ * so kill switches and rollout percentages still take effect on an instance
+ * that already answered a check.
  */
 export async function initializeFlags(): Promise<void> {
-  if (initialized) return;
+  if (databaseLoaded) return;
 
   try {
     // Load global config (create if missing)
@@ -252,27 +261,44 @@ export async function initializeFlags(): Promise<void> {
       }
     }
 
-    initialized = true;
+    databaseLoaded = true;
+    usingFallbackDefaults = false;
+    loadFailureReported = false;
     logger.info('Feature flags initialized from database', {
       count: flagCache.size,
     });
   } catch (error) {
-    // Fallback to in-memory defaults if DB unavailable
-    logger.error('Failed to load flags from DB, using defaults', undefined, error);
-    initializeFlagsSync();
+    // Serve compiled defaults until the database becomes reachable again.
+    if (!loadFailureReported) {
+      loadFailureReported = true;
+      logger.error('Failed to load flags from DB, using defaults', undefined, error);
+    }
+    ensureFallbackDefaults();
   }
 }
 
 /**
- * Synchronous initialization (fallback when DB unavailable)
+ * Populate the cache with compiled defaults
+ *
+ * Provisional: a later successful database load replaces these values. Absent
+ * database policy is not an error, so it is not reported as one.
  */
-function initializeFlagsSync(): void {
+function ensureFallbackDefaults(): void {
+  usingFallbackDefaults = true;
+  if (flagCache.size > 0) return;
+
   const now = new Date();
   for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
     flagCache.set(id, { id, ...config, updatedAt: now });
   }
-  initialized = true;
-  logger.warn('Feature flags initialized from defaults (no DB)');
+  logger.debug('Feature flags answered from compiled defaults (database policy not loaded)');
+}
+
+/**
+ * Whether checks are currently answered from compiled defaults
+ */
+export function isUsingFallbackDefaults(): boolean {
+  return usingFallbackDefaults;
 }
 
 /**
@@ -282,8 +308,7 @@ export function isFeatureEnabled(
   featureId: KnownFeatureFlag,
   userId?: string,
 ): FeatureFlagCheckResult {
-  // Ensure initialized (sync fallback)
-  if (!initialized) initializeFlagsSync();
+  if (!databaseLoaded) ensureFallbackDefaults();
 
   const flag = flagCache.get(featureId);
 
@@ -342,8 +367,7 @@ export async function updateFlag(
   featureId: KnownFeatureFlag,
   update: FeatureFlagUpdate,
 ): Promise<FeatureFlag | null> {
-  // Ensure initialized (sync fallback for tests)
-  if (!initialized) initializeFlagsSync();
+  if (!databaseLoaded) ensureFallbackDefaults();
 
   const flag = flagCache.get(featureId);
   if (!flag) {
@@ -467,7 +491,7 @@ export function getGlobalKillSwitchReason(): string | undefined {
  * Get all flags
  */
 export function getAllFlags(): FeatureFlag[] {
-  if (!initialized) initializeFlagsSync();
+  if (!databaseLoaded) ensureFallbackDefaults();
   return Array.from(flagCache.values());
 }
 
@@ -475,7 +499,7 @@ export function getAllFlags(): FeatureFlag[] {
  * Get a single flag
  */
 export function getFlag(featureId: KnownFeatureFlag): FeatureFlag | undefined {
-  if (!initialized) initializeFlagsSync();
+  if (!databaseLoaded) ensureFallbackDefaults();
   return flagCache.get(featureId);
 }
 
@@ -494,7 +518,7 @@ export async function setFlagStatus(
  * Reload flags from database (useful after external changes)
  */
 export async function reloadFlags(): Promise<void> {
-  initialized = false;
+  databaseLoaded = false;
   flagCache.clear();
   await initializeFlags();
 }
@@ -517,5 +541,7 @@ export function _resetForTesting(): void {
   flagCache.clear();
   globalKillSwitch = false;
   globalKillSwitchReason = undefined;
-  initialized = false;
+  databaseLoaded = false;
+  usingFallbackDefaults = true;
+  loadFailureReported = false;
 }

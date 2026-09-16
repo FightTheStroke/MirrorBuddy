@@ -31,6 +31,7 @@ describe('service limit collector health', () => {
       builds: vercelResource,
       functions: vercelResource,
       timestamp,
+      status: 'ok',
     });
     vi.mocked(getSupabaseLimits).mockResolvedValue({
       database: resource,
@@ -74,13 +75,46 @@ describe('service limit collector health', () => {
     );
   });
 
-  it('reports unconfigured services as unhealthy, never as zero usage or healthy absence', async () => {
+  it('reports an unconfigured Vercel integration as unavailable without an error report', async () => {
+    vi.mocked(getVercelLimits).mockResolvedValue({
+      bandwidth: vercelResource,
+      builds: vercelResource,
+      functions: vercelResource,
+      timestamp,
+      status: 'not_configured',
+      error: 'VERCEL_TOKEN not configured',
+    });
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const samples = await collectServiceLimitsSamples(labels, timestamp);
+
+      expect(samples.filter((s) => s.labels.service === 'vercel')).toEqual([]);
+      expect(samples).toContainEqual({
+        name: 'metric_collector_enabled',
+        labels: { ...labels, collector: 'vercel' },
+        value: 0,
+        timestamp,
+      });
+      expect(samples).toContainEqual({
+        name: 'metric_collector_up',
+        labels: { ...labels, collector: 'vercel' },
+        value: 0,
+        timestamp,
+      });
+      expect(samples.filter((s) => s.labels.service === 'supabase')).toHaveLength(6);
+    }
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('reports a failing configured integration exactly once, never as zero usage', async () => {
     vi.mocked(getVercelLimits).mockResolvedValueOnce({
       bandwidth: vercelResource,
       builds: vercelResource,
       functions: vercelResource,
       timestamp,
-      error: 'VERCEL_TOKEN not configured',
+      status: 'error',
+      error: 'Vercel API error: 401 Unauthorized',
     });
 
     vi.mocked(getAzureOpenAILimits).mockResolvedValueOnce({
@@ -103,11 +137,13 @@ describe('service limit collector health', () => {
         value: 0,
         timestamp,
       });
-      expect(logger.error).toHaveBeenCalledWith(
-        'Metrics collector failed',
-        { collector },
-        expect.any(Error),
-      );
+      expect(
+        vi
+          .mocked(logger.error)
+          .mock.calls.filter(
+            (call) => (call[1] as { collector?: string } | undefined)?.collector === collector,
+          ),
+      ).toHaveLength(1);
     }
     expect(samples.filter((s) => s.labels.service === 'supabase')).toHaveLength(6);
   });

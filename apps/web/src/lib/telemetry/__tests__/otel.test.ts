@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => {
     AzureMonitorTraceExporter: vi.fn(function () {}),
     sentryLoaded: vi.fn(),
     grafanaStart: vi.fn(),
+    flagsInitialized: vi.fn().mockResolvedValue(undefined),
   };
 });
 
@@ -33,6 +34,9 @@ vi.mock('@opentelemetry/auto-instrumentations-node', () => ({
 vi.mock('@/lib/env', () => ({ validateEnv: vi.fn() }));
 vi.mock('@/lib/observability', () => ({
   prometheusPushService: { start: mocks.grafanaStart },
+}));
+vi.mock('@/lib/feature-flags', () => ({
+  initializeFlags: mocks.flagsInitialized,
 }));
 vi.mock('../../../../sentry.server.config', () => {
   mocks.sentryLoaded();
@@ -87,8 +91,24 @@ describe('optional Azure Monitor exporter', () => {
     await register();
     expect(mocks.sentryLoaded).toHaveBeenCalledTimes(1);
     expect(mocks.grafanaStart).toHaveBeenCalledTimes(1);
+    expect(mocks.flagsInitialized).toHaveBeenCalledTimes(1);
     expect(mocks.NodeSDK).not.toHaveBeenCalled();
     expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('does not let feature flag loading block server startup', async () => {
+    let releaseLoad: (() => void) | undefined;
+    mocks.flagsInitialized.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        releaseLoad = resolve;
+      }),
+    );
+    const { register } = await import('../../../../instrumentation');
+
+    await register();
+
+    expect(mocks.grafanaStart).toHaveBeenCalledTimes(1);
+    releaseLoad?.();
   });
 
   it('constructs and starts a configured exporter without claiming remote delivery', async () => {

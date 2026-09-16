@@ -31,6 +31,14 @@ export async function register() {
       startOpenTelemetry(sdk);
     }
 
+    // Load feature flag policy from the database. Without this the instance
+    // answers every check from compiled defaults, so kill switches and rollout
+    // percentages never take effect. Deliberately not awaited: startup must not
+    // depend on database availability, and checks keep using defaults until the
+    // policy arrives.
+    const { initializeFlags } = await import('@/lib/feature-flags');
+    void initializeFlags();
+
     // Start Prometheus Push Service for Grafana Cloud
     // Pushes metrics every GRAFANA_CLOUD_PUSH_INTERVAL seconds (default: 60)
     const { prometheusPushService } = await import('@/lib/observability');
