@@ -135,3 +135,15 @@ function productionProject(url: URL, field: 'DATABASE_URL' | 'DIRECT_URL'): stri
   if (/^[a-z0-9.-]+\.pooler\.supabase\.com$/.test(url.hostname) && user) return user[1];
   throw new SmokeCommandError('INVALID_TARGET', field);
 }
+
+export function assertProductionAuthDatabase(env: NodeJS.ProcessEnv): void {
+  assertAuthScriptTarget(env);
+  const database = databaseUrl(env.DATABASE_URL, 'DATABASE_URL');
+  const direct = databaseUrl(env.DIRECT_URL, 'DIRECT_URL');
+  if (
+    !env.PRODUCTION_DB_ID ||
+    productionProject(database, 'DATABASE_URL') !== env.PRODUCTION_DB_ID ||
+    productionProject(direct, 'DIRECT_URL') !== env.PRODUCTION_DB_ID
+  )
+    throw new SmokeCommandError('INVALID_TARGET', 'PROJECT_MISMATCH');
+}

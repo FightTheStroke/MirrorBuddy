@@ -25,14 +25,11 @@
  */
 
 import { prisma } from '../apps/web/src/lib/db';
-import { invalidateAllSessions } from '../apps/web/src/lib/auth/session-revocation';
 import { READONLY_DISABLED_PASSWORD } from '../apps/web/src/lib/auth/readonly-account';
-import {
-  sessionTransaction,
-  sessionDatabaseNow,
-} from '../apps/web/src/lib/auth/session-transaction';
+import { sessionTransaction } from '../apps/web/src/lib/auth/session-transaction';
 import { verifyPassword } from '../apps/web/src/lib/auth/password';
 import { assertAuthScriptTarget } from './lib/auth-script-target';
+import { resetSeedCredential } from './lib/seed-admin-recovery';
 import { createHash } from 'node:crypto';
 import { UserRole, type Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -142,14 +139,7 @@ async function upsertPrivilegedUser({
         throw new Error('Privileged account changed; rerun reconciliation');
       // Compose the existing revoking reset under this lock, not a nested transaction.
       if (!readonlyPasswordUnchanged && !ownerPasswordUnchanged) {
-        await invalidateAllSessions(tx, previous.id, await sessionDatabaseNow(tx), {
-          passwordHash,
-          mustChangePassword,
-        });
-        await tx.passwordResetToken.updateMany({
-          where: { userId: previous.id, used: false },
-          data: { used: true },
-        });
+        await resetSeedCredential(tx, previous.id, passwordHash, mustChangePassword);
       }
       await tx.user.update({
         where: { id: previous.id },

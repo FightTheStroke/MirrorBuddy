@@ -1,0 +1,78 @@
+name: Readonly Auth Recovery
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Report only, or convert the existing configured readonly technical account.'
+        type: choice
+        required: true
+        default: report
+        options: [report, convert]
+      confirm:
+        description: 'Conversion only: type CONVERT_READONLY to revoke its old sessions.'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readonly-auth-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: github.ref == 'refs/heads/main' && github.repository == 'FightTheStroke/MirrorBuddy'
+    runs-on: ubuntu-latest
+    environment: database-repair
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install without package hooks
+        run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Fetch the Prisma schema engine
+        run: pnpm rebuild @prisma/engines
+      - name: Generate Prisma client
+        run: pnpm exec prisma generate
+      - name: Preflight and optionally convert the existing technical account
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          PRODUCTION_DB_ID: ${{ secrets.PRODUCTION_DB_ID }}
+          PII_ENCRYPTION_KEY: ${{ secrets.PII_ENCRYPTION_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+          ACTION: ${{ inputs.action }}
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set +x
+          # Suppress database/seed diagnostics, including account IDs. Only fixed
+          # status codes may leave this credential-bearing process.
+          if [ "$ACTION" = report ]; then
+            args=(report)
+          elif [ "$ACTION" = convert ] && [ "$CONFIRM" = CONVERT_READONLY ]; then
+            args=(convert CONVERT_READONLY)
+          else
+            echo "::error::READONLY_RECOVERY_CONFIRMATION_REJECTED"
+            exit 1
+          fi
+          if output="$(pnpm run script -- scripts/readonly-recovery.ts "${args[@]}" 2>&1)"; then
+            if ! status="$(printf '%s\n' "$output" | grep -xE 'READONLY_RECOVERY_(CONVERSION_REQUIRED|ALREADY_READY|CONVERTED)')"; then
+              echo "::error::READONLY_RECOVERY_STATUS_MISSING"
+              exit 1
+            fi
+            printf '%s\n' "$status"
+          else
+            echo "::error::READONLY_RECOVERY_FAILED"
+            exit 1
+          fi

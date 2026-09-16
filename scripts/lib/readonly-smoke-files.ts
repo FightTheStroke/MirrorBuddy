@@ -121,6 +121,23 @@ export async function readSmokeReceipt(directory: string): Promise<string> {
     await file.close();
   }
 }
+export async function readSmokeToken(directory: string): Promise<string | undefined> {
+  await assertDirectory(directory);
+  const path = join(directory, 'token');
+  if (!(await existingFile(path))) return undefined;
+  const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const stat = await file.stat();
+    privateStat(stat);
+    if (stat.size > 128) throw new SmokeCommandError('PRIVATE_FILES');
+    const token = await file.readFile('utf8');
+    if (!/^s2:[A-Za-z0-9_-]{43}\.[a-f0-9]{64}$/.test(token))
+      throw new SmokeCommandError('PRIVATE_FILES');
+    return token;
+  } finally {
+    await file.close();
+  }
+}
 export async function removeSmokeToken(directory: string): Promise<void> {
   await assertDirectory(directory);
   const token = join(directory, 'token');

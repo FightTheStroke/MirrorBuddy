@@ -2647,7 +2647,13 @@ jobs:
           # Issuance must not create/re-enable an account or manufacture its role.
           # Readonly provisioning/conversion remains an explicit prerequisite.
           ADMIN_READONLY_EMAIL: ''
-        run: npm run seed:admin
+        run: |
+          if npm run seed:admin >/dev/null 2>&1; then
+            echo "ADMIN_RECONCILIATION_SUCCESS"
+          else
+            echo "::error::ADMIN_RECONCILIATION_FAILED"
+            exit 1
+          fi
 
       - name: Issue temporary readonly smoke access
         id: issue
@@ -2660,6 +2666,27 @@ jobs:
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
         run: pnpm run script -- scripts/readonly-smoke-session.ts issue --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
+      - name: Log in the existing dedicated student normally
+        id: student_issue
+        timeout-minutes: 3
+        env:
+          NODE_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          PRODUCTION_DB_ID: ${{ secrets.PRODUCTION_DB_ID }}
+          PROD_TEST_USER_ID: ${{ secrets.PROD_TEST_USER_ID }}
+          PROD_TEST_USER_EMAIL: ${{ secrets.PROD_TEST_USER_EMAIL }}
+          PROD_TEST_USER_USERNAME: ${{ secrets.PROD_TEST_USER_USERNAME }}
+          PROD_TEST_USER_PASSWORD: ${{ secrets.PROD_TEST_USER_PASSWORD }}
+        run: |
+          set +x
+          if pnpm run script -- scripts/student-smoke-session.ts issue --directory "$RUNNER_TEMP/readonly-smoke-student-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >/dev/null 2>&1; then
+            echo "STUDENT_LOGIN_SUCCESS"
+          else
+            echo "::error::STUDENT_LOGIN_FAILED; cleanup must be confirmed separately"
+            exit 1
+          fi
+
       - name: Smoke the live site
         id: smoke
         timeout-minutes: 30
@@ -2667,6 +2694,8 @@ jobs:
           set +x
           unset DATABASE_URL DIRECT_URL DEV_DATABASE_URL TEST_DATABASE_URL TEST_DIRECT_URL
           unset SESSION_SECRET SESSION_SECRET_PREVIOUS ADMIN_PASSWORD PGPASSWORD PII_ENCRYPTION_KEY
+          unset PROD_TEST_USER_PASSWORD
+          export PROD_URL=https://mirrorbuddy.vercel.app
           directory="$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           if [[ ! -s "$directory/token" ]]; then
             echo "::error::Readonly smoke credential is missing"
@@ -2677,13 +2706,46 @@ jobs:
             echo "::error::Readonly smoke credential is invalid"
             exit 1
           fi
+          printf '::add-mask::%s\n' "$ADMIN_READONLY_COOKIE_VALUE"
+          printf '::add-mask::%s\n' "${ADMIN_READONLY_COOKIE_VALUE/:/%3A}"
           export ADMIN_READONLY_COOKIE_VALUE
+          student_directory="$RUNNER_TEMP/readonly-smoke-student-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if [[ ! -s "$student_directory/token" ]]; then
+            echo "::error::Student smoke credential is missing"
+            exit 1
+          fi
+          PROD_TEST_USER_COOKIE_VALUE="$(cat "$student_directory/token")"
+          if [[ ! "$PROD_TEST_USER_COOKIE_VALUE" =~ ^s2:[A-Za-z0-9_-]{43}\.[a-f0-9]{64}$ ]]; then
+            echo "::error::Student smoke credential is invalid"
+            exit 1
+          fi
+          printf '::add-mask::%s\n' "$PROD_TEST_USER_COOKIE_VALUE"
+          printf '::add-mask::%s\n' "${PROD_TEST_USER_COOKIE_VALUE/:/%3A}"
+          export PROD_TEST_USER_COOKIE_VALUE
           exec npm run test:smoke:prod
         env:
           PROD_TEST_USER_ID: ${{ secrets.PROD_TEST_USER_ID }}
-          PROD_TEST_USER_COOKIE_VALUE: ${{ secrets.PROD_TEST_USER_COOKIE_VALUE }}
           PROD_TEST_USER_EMAIL: ${{ secrets.PROD_TEST_USER_EMAIL }}
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
+
+      - name: Log out only this run's student session and prove rejection
+        id: student_revoke
+        timeout-minutes: 5
+        if: |
+          always() &&
+          (steps.student_issue.outcome == 'success' ||
+           steps.student_issue.outcome == 'failure' ||
+           steps.student_issue.outcome == 'cancelled')
+        env:
+          NODE_ENV: production
+        run: |
+          set +x
+          if pnpm run script -- scripts/student-smoke-session.ts revoke --directory "$RUNNER_TEMP/readonly-smoke-student-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >/dev/null 2>&1; then
+            echo "STUDENT_CLEANUP_PROVEN"
+          else
+            echo "::error::STUDENT_CLEANUP_UNPROVEN; do not claim recovery or publish browser artifacts"
+            exit 1
+          fi
 
       - name: Revoke temporary readonly smoke access
         id: revoke
@@ -2701,12 +2763,11 @@ jobs:
           ADMIN_READONLY_EMAIL: ${{ secrets.ADMIN_READONLY_EMAIL }}
         run: pnpm run script -- scripts/readonly-smoke-session.ts revoke --target production --directory "$RUNNER_TEMP/readonly-smoke-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 
-      # Revoking this session does not sanitize screenshots or revoke the
-      # separate student cookie. Never upload raw authenticated browser reports.
+      # Neither logout sanitizes screenshots. Never upload raw browser reports.
       - name: Prepare sanitized smoke outcome
         id: diagnostic
         timeout-minutes: 1
-        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure'
+        if: always() && steps.revoke.outcome == 'success' && steps.student_revoke.outcome == 'success' && steps.smoke.outcome == 'failure'
         run: |
           umask 077
           set -o noclobber
@@ -2715,7 +2776,7 @@ jobs:
       - name: Keep only the sanitized failure outcome
         id: upload
         timeout-minutes: 2
-        if: always() && steps.revoke.outcome == 'success' && steps.smoke.outcome == 'failure' && steps.diagnostic.outcome == 'success'
+        if: always() && steps.revoke.outcome == 'success' && steps.student_revoke.outcome == 'success' && steps.smoke.outcome == 'failure' && steps.diagnostic.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: post-deploy-smoke-report

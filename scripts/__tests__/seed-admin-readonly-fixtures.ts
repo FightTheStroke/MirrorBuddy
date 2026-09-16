@@ -1,4 +1,5 @@
 import type { UserRole } from '@prisma/client';
+import { createHash } from 'node:crypto';
 import { snapshot } from '../../apps/web/src/lib/auth/__tests__/session-lifecycle-fixtures';
 
 export const now = new Date('2026-09-06T00:00:00Z');
@@ -8,6 +9,7 @@ export const disabledPassword = '!seed-admin:readonly:no-password';
 interface Account {
   id: string;
   email: string;
+  emailHash: string;
   role: UserRole;
   passwordHash: string | null;
   mustChangePassword: boolean;
@@ -36,6 +38,7 @@ export function seedFixture() {
     const account: Account = {
       id: 'readonly-owner',
       email: readonlyEmail,
+      emailHash: createHash('sha256').update(readonlyEmail).digest('hex'),
       role,
       passwordHash,
       mustChangePassword: true,
@@ -50,6 +53,7 @@ export function seedFixture() {
   accounts.set('admin-owner', {
     id: 'admin-owner',
     email: 'admin@example.test',
+    emailHash: createHash('sha256').update('admin@example.test').digest('hex'),
     role: 'ADMIN',
     passwordHash: 'old-admin-hash',
     mustChangePassword: false,

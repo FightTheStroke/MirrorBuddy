@@ -32,6 +32,7 @@ if (step === process.env.FIXTURE_FAILURE) process.exitCode = 23;
       {
         encoding: 'utf8',
         env: {
+          NODE_ENV: 'test',
           PATH: `${directory}:/usr/bin:/bin`,
           FIXTURE_LOG: log,
           FIXTURE_FAILURE: failure,
