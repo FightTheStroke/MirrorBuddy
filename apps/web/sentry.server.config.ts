@@ -4,6 +4,7 @@
 
 import * as Sentry from '@sentry/nextjs';
 import { getEnvironment, isEnabled, getDsn, getRelease } from '@/lib/sentry/env';
+import { classifyClient, normalizeRequestRoute } from '@/lib/observability/client-provenance';
 
 type SentryEvent = {
   logger?: string;
@@ -92,10 +93,21 @@ if (dsn) {
         };
       }
 
+      // Who called, and which route failed. Derived here so triage never has
+      // to re-read raw agent strings event by event.
+      const request = (event as { request?: { url?: string; headers?: Record<string, string> } })
+        .request;
+      const provenance = classifyClient(request?.headers?.['user-agent']);
+      const route = normalizeRequestRoute(request?.url);
+
       event.tags = {
         ...event.tags,
         runtime: process.env.NEXT_RUNTIME || 'nodejs',
         nodeVersion: process.version,
+        clientKind: provenance.clientKind,
+        uaFamily: provenance.uaFamily,
+        ...(provenance.automationMarker ? { automationMarker: provenance.automationMarker } : {}),
+        ...(route ? { httpRoute: route } : {}),
       };
 
       return event;
