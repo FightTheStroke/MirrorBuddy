@@ -64,7 +64,13 @@ Push to main
 - `deployment-gate` job aggregates 14 checks:
   - build, secret-scanning, debt-check, security, llm-safety-tests
   - unit-tests, docs, migrations, quality, smoke-tests
-  - e2e-tests, mobile-e2e, docker, performance
+  - e2e-tests, mobile-e2e, performance
+
+  The `docker` job was removed from the gate on 2026-09-16: it built an image
+  with `push: false` and discarded it, so nothing consumed the result, while a
+  packaging failure in it kept the gate red on every main commit. Deployment is
+  via Vercel, not containers.
+
 - `deploy-to-vercel` job (runs after deployment-gate passes):
   - Uses Vercel CLI to pull, build, and deploy
   - Requires `VERCEL_TOKEN` secret

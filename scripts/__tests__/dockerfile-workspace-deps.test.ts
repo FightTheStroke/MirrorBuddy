@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const dockerfile = readFileSync(join(repo, 'Dockerfile'), 'utf8');
 const npmrc = readFileSync(join(repo, '.npmrc'), 'utf8');
+const workflow = readFileSync(join(repo, '.github/workflows/ci.yml'), 'utf8');
 
 const stage = (name: string) =>
   dockerfile.match(
@@ -28,5 +29,12 @@ describe('Dockerfile workspace dependency resolution', () => {
   it('copies only the root node_modules into the builder, which requires hoisting', () => {
     const builder = stage('builder');
     expect(builder).toContain('COPY --from=deps /app/node_modules ./node_modules');
+  });
+});
+
+describe('deployment gate', () => {
+  it('does not depend on a docker job, since nothing consumes the image', () => {
+    expect(workflow).not.toMatch(/^ {2}docker:$/m);
+    expect(workflow).not.toContain('needs.docker.result');
   });
 });

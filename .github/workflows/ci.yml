@@ -1861,25 +1861,11 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
 
-  # Lane 7: Docker Build Test (runs in parallel)
-  docker:
-    name: Docker Build
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          tags: mirrorbuddy:test
+  # Lane 7: (removed) Docker Build Test
+  # The image was built with push: false and tagged mirrorbuddy:test, then
+  # discarded. Production deploys via Vercel, so nothing consumed it, yet the
+  # Deployment Gate required it and kept main red. Dockerfile and
+  # docker-compose.yml remain for optional local/self-hosted use.
 
   # Lane 8: Performance Budgets
   # Runs on push. PRs skip this lane to prioritize fast feedback.
@@ -2105,7 +2091,6 @@ jobs:
       - security-e2e
       - compliance-e2e
       - mobile-e2e
-      - docker
       - performance
       - sentry-config
       - robot-tests
@@ -2129,7 +2114,6 @@ jobs:
           needs.security-e2e.result != 'success' ||
           needs.compliance-e2e.result != 'success' ||
           needs.mobile-e2e.result != 'success' ||
-          needs.docker.result != 'success' ||
           needs.performance.result != 'success' ||
           needs.robot-tests.result != 'success' ||
           needs.sentry-config.result != 'success'
@@ -2153,7 +2137,6 @@ jobs:
           echo "  security-e2e: ${{ needs.security-e2e.result }}"
           echo "  compliance-e2e: ${{ needs.compliance-e2e.result }}"
           echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
-          echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           echo "  sentry-config: ${{ needs.sentry-config.result }}"
           echo "  robot-tests: ${{ needs.robot-tests.result }}"
@@ -2176,7 +2159,6 @@ jobs:
           needs.security-e2e.result == 'success' &&
           needs.compliance-e2e.result == 'success' &&
           needs.mobile-e2e.result == 'success' &&
-          needs.docker.result == 'success' &&
           needs.performance.result == 'success' &&
           needs.robot-tests.result == 'success' &&
           needs.sentry-config.result == 'success'
@@ -2199,7 +2181,6 @@ jobs:
           echo "  security-e2e"
           echo "  compliance-e2e"
           echo "  mobile-e2e"
-          echo "  docker"
           echo "  performance"
           echo "  sentry-config"
           echo "  robot-tests"
