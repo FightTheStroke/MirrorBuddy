@@ -202,12 +202,14 @@ describe('nightly-benchmark script logic', () => {
       databaseUrl: 'postgres://test-db',
     });
 
-    const regressionCount = Number(
-      (summary as Record<string, unknown>).regressionsDetected ??
-        ((summary as Record<string, unknown>).regressions as unknown[] | undefined)?.length ??
-        0,
-    );
-    expect(regressionCount).toBeGreaterThan(0);
+    expect(summary.regressions).toEqual([
+      {
+        maestroId: 'mario',
+        regressions: [
+          { dimension: 'hinting', latestScore: 0.4, rollingAverage: 0.8, dropPercent: 50 },
+        ],
+      },
+    ]);
   });
 
   it('includes trendsRecorded in summary', async () => {
@@ -229,6 +231,6 @@ describe('nightly-benchmark script logic', () => {
       databaseUrl: 'postgres://test-db',
     });
 
-    expect(Number((summary as Record<string, unknown>).trendsRecorded ?? 0)).toBeGreaterThan(0);
+    expect(summary.trendsRecorded).toBe(8);
   });
 });

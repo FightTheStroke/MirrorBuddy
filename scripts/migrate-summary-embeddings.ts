@@ -15,8 +15,9 @@
  *   --batch-size=N Process in batches of N (default: 50)
  */
 
-import { prisma } from "@/lib/db";
-import { indexConversationSummary } from "@/lib/rag/summary-indexer";
+import { prisma } from '@/lib/db';
+import { indexConversationSummary } from '@/lib/rag/summary-indexer';
+import { isDirectInvocation } from './lib/destructive-guard';
 
 interface MigrationOptions {
   dryRun: boolean;
@@ -25,12 +26,12 @@ interface MigrationOptions {
 
 function parseArgs(): MigrationOptions {
   const args = process.argv.slice(2);
-  const dryRun = args.includes("--dry-run");
+  const dryRun = args.includes('--dry-run');
 
   let batchSize = 50;
-  const batchSizeArg = args.find((a) => a.startsWith("--batch-size="));
+  const batchSizeArg = args.find((a) => a.startsWith('--batch-size='));
   if (batchSizeArg) {
-    const parsed = parseInt(batchSizeArg.split("=")[1], 10);
+    const parsed = parseInt(batchSizeArg.split('=')[1], 10);
     if (!Number.isNaN(parsed) && parsed > 0) {
       batchSize = parsed;
     }
@@ -46,7 +47,7 @@ async function getConversationWithSummaries(
   Array<{
     id: string;
     userId: string;
-    summary: string;
+    summary: string | null;
     maestroId: string;
     topics: string;
   }>
@@ -66,7 +67,7 @@ async function getConversationWithSummaries(
     skip,
     take,
     orderBy: {
-      updatedAt: "desc",
+      updatedAt: 'desc',
     },
   });
 }
@@ -89,11 +90,11 @@ function parseTopics(topicsJson: string): string[] {
   }
 }
 
-async function processConversationBatch(
+export async function processConversationBatch(
   conversations: Array<{
     id: string;
     userId: string;
-    summary: string;
+    summary: string | null;
     maestroId: string;
     topics: string;
   }>,
@@ -112,28 +113,23 @@ async function processConversationBatch(
     const currentIndex = startIndex + i + 1;
 
     try {
+      if (typeof conv.summary !== 'string') {
+        throw new Error('Conversation summary is missing');
+      }
       const topics = parseTopics(conv.topics);
       const metadata = {
         maestroId: conv.maestroId,
         topics: topics.length > 0 ? topics : undefined,
       };
 
-      await indexConversationSummary(
-        conv.id,
-        conv.userId,
-        conv.summary,
-        metadata,
-      );
+      await indexConversationSummary(conv.id, conv.userId, conv.summary, metadata);
       successful++;
       process.stdout.write(`\r  [${currentIndex}] Indexed: ${conv.id}`);
     } catch (error) {
       failed++;
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
       errors.push({ id: conv.id, error: errorMessage });
-      console.error(
-        `\n  [ERROR] Failed to index conversation ${conv.id}: ${errorMessage}`,
-      );
+      console.error(`\n  [ERROR] Failed to index conversation ${conv.id}: ${errorMessage}`);
     }
   }
 
@@ -143,31 +139,27 @@ async function processConversationBatch(
 async function main(): Promise<void> {
   const options = parseArgs();
 
-  console.log("=".repeat(70));
-  console.log("Migration: Index Conversation Summaries into RAG System");
-  console.log("=".repeat(70));
-  console.log(
-    `Mode: ${options.dryRun ? "DRY RUN (counting only)" : "LIVE (indexing)"}`,
-  );
+  console.log('='.repeat(70));
+  console.log('Migration: Index Conversation Summaries into RAG System');
+  console.log('='.repeat(70));
+  console.log(`Mode: ${options.dryRun ? 'DRY RUN (counting only)' : 'LIVE (indexing)'}`);
   console.log(`Batch Size: ${options.batchSize}`);
-  console.log("");
+  console.log('');
 
   try {
     // Get total count
     const totalConversations = await getTotalConversationsWithSummaries();
-    console.log(
-      `Found ${totalConversations} conversation(s) with summaries to process`,
-    );
-    console.log("");
+    console.log(`Found ${totalConversations} conversation(s) with summaries to process`);
+    console.log('');
 
     if (totalConversations === 0) {
-      console.log("No conversations with summaries found. Migration complete.");
+      console.log('No conversations with summaries found. Migration complete.');
       return;
     }
 
     if (options.dryRun) {
       console.log(
-        "DRY RUN: Would process the above conversations. Use without --dry-run to execute.",
+        'DRY RUN: Would process the above conversations. Use without --dry-run to execute.',
       );
       return;
     }
@@ -196,16 +188,16 @@ async function main(): Promise<void> {
       failedTotal += result.failed;
       allErrors.push(...result.errors);
 
-      console.log("");
+      console.log('');
       console.log(`  ✓ Successful: ${result.successful}`);
       console.log(`  ✗ Failed: ${result.failed}`);
     }
 
     // Summary
-    console.log("");
-    console.log("=".repeat(70));
-    console.log("Migration Summary");
-    console.log("=".repeat(70));
+    console.log('');
+    console.log('='.repeat(70));
+    console.log('Migration Summary');
+    console.log('='.repeat(70));
     console.log(`Total Processed: ${processedTotal}`);
     console.log(`Successful: ${successfulTotal}`);
     console.log(`Failed: ${failedTotal}`);
@@ -217,17 +209,19 @@ async function main(): Promise<void> {
       });
     }
 
-    console.log("");
-    console.log("Migration complete!");
+    console.log('');
+    console.log('Migration complete!');
   } catch (error) {
-    console.error("Fatal error during migration:", error);
+    console.error('Fatal error during migration:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-main().catch((error) => {
-  console.error("Unhandled error:", error);
-  process.exit(1);
-});
+if (isDirectInvocation(import.meta.url)) {
+  main().catch((error) => {
+    console.error('Unhandled error:', error);
+    process.exit(1);
+  });
+}

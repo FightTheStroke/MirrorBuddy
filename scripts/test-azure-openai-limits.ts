@@ -3,6 +3,7 @@
  * Test script for Azure OpenAI limits integration
  *
  * Tests the Azure Monitor Metrics API integration for real-time TPM/RPM usage.
+ * Unconfigured monitoring reports unavailable usage, not zero usage or normal stress.
  *
  * Usage:
  *   npm run script -- scripts/test-azure-openai-limits.ts
@@ -15,6 +16,7 @@
 
 import { config } from 'dotenv';
 import { resolve } from 'path';
+import { isDirectInvocation } from './lib/destructive-guard';
 
 // Load environment from .env
 config({ path: resolve(process.cwd(), '.env') });
@@ -26,7 +28,7 @@ import {
   getAzureOpenAIStressReport,
 } from '../apps/web/src/lib/observability/azure-openai-limits';
 
-async function main() {
+export async function main() {
   console.log('=== Azure OpenAI Limits Test ===\n');
 
   // Check configuration
@@ -43,8 +45,8 @@ async function main() {
   try {
     const limits = await getAzureOpenAILimits();
 
-    if (limits.error) {
-      console.log(`  ⚠️  Error: ${limits.error}`);
+    if (limits.status !== 'ok') {
+      console.log(`  ${limits.status === 'error' ? '✗' : '⚠️'} ${limits.status}: ${limits.error}`);
     } else {
       console.log(
         `  ✓ TPM: ${limits.tpm.used}/${limits.tpm.limit} ${limits.tpm.unit} (${limits.tpm.usagePercent}%)`,
@@ -63,7 +65,9 @@ async function main() {
   console.log('Test 2: isAzureOpenAIStressed(80)');
   try {
     const stressed = await isAzureOpenAIStressed(80);
-    console.log(`  ${stressed ? '⚠️  Stressed' : '✓ Normal'}`);
+    console.log(
+      `  ${stressed === null ? '⚠️  Monitoring unavailable' : stressed ? '⚠️  Stressed' : '✓ Normal'}`,
+    );
   } catch (error) {
     console.log(`  ✗ Failed: ${error}`);
   }
@@ -87,7 +91,9 @@ async function main() {
   console.log('=== Test Complete ===');
 }
 
-main().catch((error) => {
-  console.error('Fatal error:', error);
-  process.exit(1);
-});
+if (isDirectInvocation(import.meta.url)) {
+  main().catch((error) => {
+    console.error('Fatal error:', error);
+    process.exit(1);
+  });
+}

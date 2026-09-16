@@ -28,9 +28,11 @@ const KEEP_EMAILS = [
   'mariodanfts@gmail.com', // lowercase for comparison
 ];
 
-async function main() {
+export async function main() {
   if (announceMode('reset-db-users')) {
-    console.log('No changes made. This script has no partial mode: it either resets or it does not.');
+    console.log(
+      'No changes made. This script has no partial mode: it either resets or it does not.',
+    );
     return;
   }
 
@@ -91,22 +93,22 @@ async function main() {
     });
     console.log('  - Deleted flashcard progress');
 
-    await prisma.achievementProgress.deleteMany({
-      where: { userId: { in: deleteIds } },
+    await prisma.userAchievement.deleteMany({
+      where: { gamification: { userId: { in: deleteIds } } },
     });
     console.log('  - Deleted achievement progress');
 
-    await prisma.session.deleteMany({
+    await prisma.authSession.deleteMany({
       where: { userId: { in: deleteIds } },
     });
     console.log('  - Deleted sessions');
 
-    await prisma.userSettings.deleteMany({
+    await prisma.settings.deleteMany({
       where: { userId: { in: deleteIds } },
     });
     console.log('  - Deleted user settings');
 
-    await prisma.studentProfile.deleteMany({
+    await prisma.profile.deleteMany({
       where: { userId: { in: deleteIds } },
     });
     console.log('  - Deleted student profiles');

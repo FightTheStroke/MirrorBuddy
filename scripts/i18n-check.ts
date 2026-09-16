@@ -29,7 +29,7 @@ const NAMESPACES = discoverNamespaces();
  * Recursively extract all keys from a nested object
  * Returns a Set of flattened key paths (e.g., "common.loading")
  */
-function extractKeys(obj: Record<string, unknown>, prefix = ''): Set<string> {
+function extractKeys(obj: object, prefix = ''): Set<string> {
   const keys = new Set<string>();
 
   Object.entries(obj).forEach(([key, value]) => {

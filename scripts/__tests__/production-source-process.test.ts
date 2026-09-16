@@ -5,7 +5,8 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const root = resolve(import.meta.dirname, '../..');
-const syntheticEnv = {
+const syntheticEnv: NodeJS.ProcessEnv = {
+  NODE_ENV: 'production',
   PATH: process.env.PATH,
   TMPDIR: process.env.TMPDIR,
   DOTENV_CONFIG_PATH: '/dev/null',

@@ -1,16 +1,16 @@
 // EMERGENCY: Clean production database keeping only 2 accounts
-import { prisma } from "../apps/web/src/lib/db.js";
-import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
+import { prisma } from '../apps/web/src/lib/db.js';
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
-const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
+const KEEP_EMAILS = ['roberdan@fightthestroke.org', 'mariodanfts@gmail.com'];
 
-async function emergencyCleanup() {
-  if (announceMode("emergency-cleanup")) {
+export async function emergencyCleanup() {
+  if (announceMode('emergency-cleanup')) {
     return;
   }
 
-  console.log("🚨 EMERGENCY CLEANUP - Production Database");
-  console.log(`Keeping only: ${KEEP_EMAILS.join(", ")}`);
+  console.log('🚨 EMERGENCY CLEANUP - Production Database');
+  console.log(`Keeping only: ${KEEP_EMAILS.join(', ')}`);
 
   try {
     // 1. Count users before
@@ -42,7 +42,7 @@ async function emergencyCleanup() {
     console.log(`   - SessionMetrics: ${deletedSessions.count}`);
 
     const deletedMessages = await prisma.message.deleteMany({
-      where: { userId: { notIn: keepUserIds } },
+      where: { conversation: { userId: { notIn: keepUserIds } } },
     });
     console.log(`   - Messages: ${deletedMessages.count}`);
 
@@ -51,20 +51,20 @@ async function emergencyCleanup() {
     });
     console.log(`   - Conversations: ${deletedChats.count}`);
 
-    const deletedFlashcards = await prisma.flashcard.deleteMany({
+    const deletedFlashcards = await prisma.flashcardProgress.deleteMany({
       where: { userId: { notIn: keepUserIds } },
     });
-    console.log(`   - Flashcards: ${deletedFlashcards.count}`);
+    console.log(`   - FlashcardProgress: ${deletedFlashcards.count}`);
 
-    const deletedQuizzes = await prisma.quizSession.deleteMany({
+    const deletedQuizzes = await prisma.quizResult.deleteMany({
       where: { userId: { notIn: keepUserIds } },
     });
-    console.log(`   - QuizSessions: ${deletedQuizzes.count}`);
+    console.log(`   - QuizResults: ${deletedQuizzes.count}`);
 
-    const deletedDocuments = await prisma.document.deleteMany({
+    const deletedDocuments = await prisma.material.deleteMany({
       where: { userId: { notIn: keepUserIds } },
     });
-    console.log(`   - Documents: ${deletedDocuments.count}`);
+    console.log(`   - Materials: ${deletedDocuments.count}`);
 
     // Delete GoogleAccount entries
     const deletedGoogleAccounts = await prisma.googleAccount.deleteMany({
@@ -75,7 +75,7 @@ async function emergencyCleanup() {
     // Delete InviteRequest entries
     const deletedInvites = await prisma.inviteRequest.deleteMany({
       where: {
-        userId: { notIn: keepUserIds },
+        createdUserId: { notIn: keepUserIds },
       },
     });
     console.log(`   - InviteRequests: ${deletedInvites.count}`);
@@ -91,20 +91,16 @@ async function emergencyCleanup() {
     // 5. Count users after
     const totalAfter = await prisma.user.count();
     console.log(`\n📊 Users after: ${totalAfter}`);
-    console.log(
-      `✅ Cleanup complete. Removed ${totalBefore - totalAfter} users.`,
-    );
+    console.log(`✅ Cleanup complete. Removed ${totalBefore - totalAfter} users.`);
 
     // 6. List remaining users
     const remainingUsers = await prisma.user.findMany({
       select: { email: true, createdAt: true },
     });
     console.log(`\n👥 Remaining users:`);
-    remainingUsers.forEach((u) =>
-      console.log(`   - ${u.email} (created ${u.createdAt})`),
-    );
+    remainingUsers.forEach((u) => console.log(`   - ${u.email} (created ${u.createdAt})`));
   } catch (error) {
-    console.error("\n❌ ERROR:", error);
+    console.error('\n❌ ERROR:', error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -114,11 +110,11 @@ async function emergencyCleanup() {
 if (isDirectInvocation(import.meta.url)) {
   emergencyCleanup()
     .then(() => {
-      console.log("\n✅ Emergency cleanup completed successfully");
+      console.log('\n✅ Emergency cleanup completed successfully');
       process.exit(0);
     })
     .catch((error) => {
-      console.error("\n❌ Emergency cleanup failed:", error);
+      console.error('\n❌ Emergency cleanup failed:', error);
       process.exit(1);
     });
 }

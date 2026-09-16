@@ -1,27 +1,27 @@
 /**
  * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
-import { config } from "dotenv";
-import { createPrismaClient } from "../apps/web/src/lib/ssl-config";
-import { announceMode, isDirectInvocation } from "./lib/destructive-guard";
+import { config } from 'dotenv';
+import { createPrismaClient } from '../apps/web/src/lib/ssl-config';
+import { announceMode, isDirectInvocation } from './lib/destructive-guard';
 
 config();
 
 if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL not set");
+  throw new Error('DATABASE_URL not set');
 }
 
 const prisma = createPrismaClient();
 
-const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
+const KEEP_EMAILS = ['roberdan@fightthestroke.org', 'mariodanfts@gmail.com'];
 
-async function emergencyCleanup() {
-  if (announceMode("emergency-cleanup-final")) {
+export async function emergencyCleanup() {
+  if (announceMode('emergency-cleanup-final')) {
     return;
   }
 
-  console.log("🚨 EMERGENCY CLEANUP - Production Database");
-  console.log(`Keeping only: ${KEEP_EMAILS.join(", ")}\n`);
+  console.log('🚨 EMERGENCY CLEANUP - Production Database');
+  console.log(`Keeping only: ${KEEP_EMAILS.join(', ')}\n`);
 
   try {
     // 1. Count users before
@@ -80,11 +80,9 @@ async function emergencyCleanup() {
       .catch(() => ({ count: 0 }));
     console.log(`   - GoogleAccounts: ${deletedGoogleAccounts.count}`);
 
-    const deletedInvites = await prisma.inviteRequest
-      .deleteMany({
-        where: { userId: { notIn: keepUserIds } },
-      })
-      .catch(() => ({ count: 0 }));
+    const deletedInvites = await prisma.inviteRequest.deleteMany({
+      where: { createdUserId: { notIn: keepUserIds } },
+    });
     console.log(`   - InviteRequests: ${deletedInvites.count}`);
 
     // 4. Delete users NOT in keep list
@@ -98,20 +96,16 @@ async function emergencyCleanup() {
     // 5. Count users after
     const totalAfter = await prisma.user.count();
     console.log(`\n📊 Users after: ${totalAfter}`);
-    console.log(
-      `✅ Cleanup complete. Removed ${totalBefore - totalAfter} users.`,
-    );
+    console.log(`✅ Cleanup complete. Removed ${totalBefore - totalAfter} users.`);
 
     // 6. List remaining users
     const remainingUsers = await prisma.user.findMany({
       select: { email: true, createdAt: true },
     });
     console.log(`\n👥 Remaining users:`);
-    remainingUsers.forEach((u) =>
-      console.log(`   - ${u.email} (created ${u.createdAt})`),
-    );
+    remainingUsers.forEach((u) => console.log(`   - ${u.email} (created ${u.createdAt})`));
   } catch (error) {
-    console.error("\n❌ ERROR:", error);
+    console.error('\n❌ ERROR:', error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -121,11 +115,11 @@ async function emergencyCleanup() {
 if (isDirectInvocation(import.meta.url)) {
   emergencyCleanup()
     .then(() => {
-      console.log("\n✅ Emergency cleanup completed successfully");
+      console.log('\n✅ Emergency cleanup completed successfully');
       process.exit(0);
     })
     .catch((error) => {
-      console.error("\n❌ Emergency cleanup failed:", error);
+      console.error('\n❌ Emergency cleanup failed:', error);
       process.exit(1);
     });
 }
