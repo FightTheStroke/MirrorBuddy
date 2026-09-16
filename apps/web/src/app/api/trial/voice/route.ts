@@ -6,22 +6,20 @@
  */
 
 import { NextResponse } from 'next/server';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { logger } from '@/lib/logger';
-import {
-  getOrCreateTrialSession,
-  checkTrialLimits,
-  addVoiceSeconds,
-  TRIAL_LIMITS,
-} from '@/lib/trial/trial-service';
+import { checkTrialLimits, addVoiceSeconds, TRIAL_LIMITS } from '@/lib/trial/trial-service';
 import { validateAuth } from '@/lib/auth/server';
-import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
+import { VISITOR_COOKIE_NAME, TRIAL_CONSENT_COOKIE } from '@/lib/auth/cookie-constants';
+import { findOwnedTrialSession, hasTrialConsent } from '@/lib/trial/trial-request';
 import { isSessionBlocked } from '@/lib/trial/anti-abuse';
 import { prisma } from '@/lib/db';
-import { pipe, withSentry } from '@/lib/api/middlewares';
+import { pipe, withSentry, withCSRF } from '@/lib/api/middlewares';
+import { z } from 'zod';
 
 export const revalidate = 0;
 const log = logger.child({ module: 'api/trial/voice' });
+const VoiceUsageSchema = z.object({ durationSeconds: z.number().finite().nonnegative() });
 
 /**
  * POST /api/trial/voice
@@ -30,7 +28,10 @@ const log = logger.child({ module: 'api/trial/voice' });
  * Called when a voice session ends.
  */
 
-export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
+export const POST = pipe(
+  withSentry('/api/trial/voice'),
+  withCSRF,
+)(async (ctx) => {
   const auth = await validateAuth();
   try {
     // Check if authenticated user (skip trial tracking)
@@ -38,20 +39,25 @@ export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
       return NextResponse.json({ skipped: true, reason: 'authenticated' });
     }
 
+    const parsed = VoiceUsageSchema.safeParse(await ctx.req.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid duration' }, { status: 400 });
+    }
+    const { durationSeconds } = parsed.data;
+
     // Get trial session
     const cookieStore = await cookies();
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+    if (!hasTrialConsent(cookieStore.get(TRIAL_CONSENT_COOKIE)?.value)) {
+      return NextResponse.json({ error: 'Trial privacy consent required' }, { status: 403 });
+    }
 
     if (!visitorId) {
       return NextResponse.json({ error: 'No trial session' }, { status: 400 });
     }
 
-    const headersList = await headers();
-    const forwarded = headersList.get('x-forwarded-for');
-    const realIp = headersList.get('x-real-ip');
-    const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
-
-    const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
+    const session = await findOwnedTrialSession(visitorId);
+    if (!session) return NextResponse.json({ error: 'No trial session' }, { status: 404 });
 
     // F-03: Check if trial session is blocked due to abuse
     // Adapter for anti-abuse db interface
@@ -75,14 +81,6 @@ export const POST = pipe(withSentry('/api/trial/voice'))(async (ctx) => {
         },
         { status: 429 },
       );
-    }
-
-    // Parse request body
-    const body = await ctx.req.json();
-    const { durationSeconds } = body;
-
-    if (typeof durationSeconds !== 'number' || durationSeconds < 0) {
-      return NextResponse.json({ error: 'Invalid duration' }, { status: 400 });
     }
 
     // Add voice seconds
@@ -142,22 +140,26 @@ export const GET = pipe(withSentry('/api/trial/voice'))(async () => {
     const cookieStore = await cookies();
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
-    if (!visitorId) {
-      // No session yet - allow with full quota
+    if (!visitorId || !hasTrialConsent(cookieStore.get(TRIAL_CONSENT_COOKIE)?.value)) {
       return NextResponse.json({
-        allowed: true,
+        allowed: false,
         isTrialUser: true,
-        voiceSecondsRemaining: TRIAL_LIMITS.VOICE_SECONDS,
+        voiceSecondsRemaining: 0,
         maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+        reason: 'Trial privacy consent and activation required',
       });
     }
 
-    const headersList = await headers();
-    const forwarded = headersList.get('x-forwarded-for');
-    const realIp = headersList.get('x-real-ip');
-    const ip = forwarded?.split(',')[0].trim() || realIp || 'unknown';
-
-    const session = await getOrCreateTrialSession(ip, visitorId, auth.userId || undefined);
+    const session = await findOwnedTrialSession(visitorId);
+    if (!session) {
+      return NextResponse.json({
+        allowed: false,
+        isTrialUser: true,
+        voiceSecondsRemaining: 0,
+        maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+        reason: 'Trial activation required',
+      });
+    }
 
     // Check limits
     const limitCheck = await checkTrialLimits(session.id, 'voice');

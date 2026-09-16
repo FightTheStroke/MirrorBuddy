@@ -45,7 +45,7 @@ const DSA_SUBSECTION_MAP: Record<DSAProfileName, RegExp> = {
   visual: /###?\s*(Visual\s+Impairment|Ipovisione|Dyscalculia)/i,
   motor: /###?\s*(Motor\s+Impairment|Disabilità\s+Motori)/i,
   autism: /###?\s*(Autism|Autismo)/i,
-  auditory: /###?\s*(Auditory|Cerebral\s+Palsy|Paralisi)/i,
+  auditory: /###?\s*(Auditory|Uditiv|Sordità)/i,
   'cerebral-palsy': /###?\s*(Cerebral\s+Palsy|Paralisi)/i,
 };
 

@@ -18,11 +18,15 @@
  */
 
 import { test, expect } from '../fixtures/auth-fixtures';
+import { getPrismaClient, disconnectPrisma } from '../helpers/prisma-setup';
 
 // Override global storageState to start without authentication
 test.use({ storageState: undefined });
 
 test.describe('Trial Consent Flow - GDPR Compliance', () => {
+  test.afterAll(async () => {
+    await disconnectPrisma();
+  });
   test('welcome page loads without blocking consent gate', async ({ trialPage }) => {
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
@@ -48,7 +52,13 @@ test.describe('Trial Consent Flow - GDPR Compliance', () => {
   test('blocks API trial session creation without consent', async ({ trialPage }) => {
     await trialPage.context().clearCookies();
 
-    const response = await trialPage.request.post('/api/trial/session');
+    const session = await trialPage.request.get('/api/session');
+    expect(session.ok()).toBe(true);
+    const { csrfToken } = await session.json();
+    expect(typeof csrfToken).toBe('string');
+    const response = await trialPage.request.post('/api/trial/session', {
+      headers: { 'x-csrf-token': csrfToken },
+    });
 
     expect(response.status()).toBe(403);
 
@@ -74,11 +84,18 @@ test.describe('Trial Consent Flow - GDPR Compliance', () => {
       },
     ]);
 
-    const response = await trialPage.request.post('/api/trial/session');
+    const session = await trialPage.request.get('/api/session');
+    expect(session.ok()).toBe(true);
+    const { csrfToken } = await session.json();
+    expect(typeof csrfToken).toBe('string');
+    const response = await trialPage.request.post('/api/trial/session', {
+      headers: { 'x-csrf-token': csrfToken },
+    });
 
     expect(response.status()).toBe(200);
 
     const body = await response.json();
     expect(body.sessionId).toBeTruthy();
+    await getPrismaClient().trialSession.delete({ where: { id: body.sessionId } });
   });
 });

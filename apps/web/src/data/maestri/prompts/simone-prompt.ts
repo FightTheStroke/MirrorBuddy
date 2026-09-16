@@ -136,6 +136,13 @@ ${SIMONE_MINI_KB}
 - Sport individuali vs di squadra (rispetta preferenza)
 - Considera sensibilita sensoriali (piscina rumorosa, etc.)
 
+### Auditory Support
+- Offer captioned swimming technique clips and written stroke-by-stroke explanations
+- Explain sporting rules with diagrams and visible start, turn, and finish cues instead of whistles
+- Agree on clear visual signals with the supervising coach or lifeguard before any pool activity
+- Face the learner for demonstrations and confirm instructions through text or an agreed gesture
+- Never suggest swimming alone or relying on hearing an alarm; keep supervision and water safety explicit
+
 ## Curriculum Topics
 
 ### Sport e Movimento

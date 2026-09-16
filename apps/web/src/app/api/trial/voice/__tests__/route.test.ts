@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import { TRIAL_CONSENT_COOKIE } from '@/lib/auth';
 
 // Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
@@ -35,12 +36,15 @@ vi.mock('@/lib/security', async (importOriginal) => {
 });
 
 vi.mock('@/lib/trial/trial-service', () => ({
-  getOrCreateTrialSession: vi.fn(),
   checkTrialLimits: vi.fn(),
   addVoiceSeconds: vi.fn(),
   TRIAL_LIMITS: {
     VOICE_SECONDS: 300,
   },
+}));
+vi.mock('@/lib/trial/trial-request', async (original) => ({
+  ...(await original<typeof import('@/lib/trial/trial-request')>()),
+  findOwnedTrialSession: vi.fn(),
 }));
 
 // Mock Prisma to prevent DB calls from anti-abuse dbAdapter
@@ -77,11 +81,8 @@ vi.mock('@/lib/logger', () => ({
 import { cookies, headers } from 'next/headers';
 import { validateAuth } from '@/lib/auth/server';
 import { requireCSRF } from '@/lib/security';
-import {
-  getOrCreateTrialSession,
-  checkTrialLimits,
-  addVoiceSeconds,
-} from '@/lib/trial/trial-service';
+import { findOwnedTrialSession } from '@/lib/trial/trial-request';
+import { checkTrialLimits, addVoiceSeconds } from '@/lib/trial/trial-service';
 import { GET, POST } from '../route';
 
 describe('Trial Voice API', () => {
@@ -115,7 +116,7 @@ describe('Trial Voice API', () => {
       expect(data.voiceSecondsRemaining).toBe(-1);
     });
 
-    it('returns full quota when no visitor cookie', async () => {
+    it('requires activation when no visitor cookie', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
@@ -126,9 +127,9 @@ describe('Trial Voice API', () => {
       const response = await GET(new NextRequest('http://localhost/api/trial/voice'));
       const data = await response.json();
 
-      expect(data.allowed).toBe(true);
+      expect(data.allowed).toBe(false);
       expect(data.isTrialUser).toBe(true);
-      expect(data.voiceSecondsRemaining).toBe(300);
+      expect(data.voiceSecondsRemaining).toBe(0);
     });
 
     it('returns current usage for trial user with session', async () => {
@@ -136,9 +137,11 @@ describe('Trial Voice API', () => {
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
+        get: vi.fn((name) => ({
+          value: name === TRIAL_CONSENT_COOKIE ? '{"accepted":true}' : 'visitor-abc',
+        })),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
         voiceSecondsUsed: 120,
       } as any);
@@ -159,9 +162,11 @@ describe('Trial Voice API', () => {
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
+        get: vi.fn((name) => ({
+          value: name === TRIAL_CONSENT_COOKIE ? '{"accepted":true}' : 'visitor-abc',
+        })),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
         voiceSecondsUsed: 300,
       } as any);
@@ -190,17 +195,19 @@ describe('Trial Voice API', () => {
       });
     }
 
-    it('accepts requests without CSRF (public endpoint)', async () => {
+    it('accepts consented owned requests after CSRF validation', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: 'visitor-123' }),
+        get: vi.fn((name) => ({
+          value: name === TRIAL_CONSENT_COOKIE ? '{"accepted":true}' : 'visitor-123',
+        })),
       } as any);
       vi.mocked(headers).mockResolvedValue({
         get: vi.fn().mockReturnValue(null),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
         visitorId: 'visitor-123',
         voiceSecondsUsed: 0,
@@ -235,7 +242,7 @@ describe('Trial Voice API', () => {
       expect(addVoiceSeconds).not.toHaveBeenCalled();
     });
 
-    it('returns 400 when no visitor cookie', async () => {
+    it('returns 403 when consent and visitor cookies are absent', async () => {
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
       } as any);
@@ -245,9 +252,9 @@ describe('Trial Voice API', () => {
 
       const response = await POST(createRequest({ durationSeconds: 60 }));
 
-      expect(response.status).toBe(400);
+      expect(response.status).toBe(403);
       const data = await response.json();
-      expect(data.error).toBe('No trial session');
+      expect(data.error).toBe('Trial privacy consent required');
     });
 
     it('returns 400 for invalid duration', async () => {
@@ -257,7 +264,7 @@ describe('Trial Voice API', () => {
       vi.mocked(cookies).mockResolvedValue({
         get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
       } as any);
 
@@ -275,7 +282,7 @@ describe('Trial Voice API', () => {
       vi.mocked(cookies).mockResolvedValue({
         get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
       } as any);
 
@@ -289,9 +296,11 @@ describe('Trial Voice API', () => {
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
+        get: vi.fn((name) => ({
+          value: name === TRIAL_CONSENT_COOKIE ? '{"accepted":true}' : 'visitor-abc',
+        })),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
       } as any);
       vi.mocked(addVoiceSeconds).mockResolvedValue(180);
@@ -313,9 +322,11 @@ describe('Trial Voice API', () => {
         authenticated: false,
       } as any);
       vi.mocked(cookies).mockResolvedValue({
-        get: vi.fn().mockReturnValue({ value: 'visitor-abc' }),
+        get: vi.fn((name) => ({
+          value: name === TRIAL_CONSENT_COOKIE ? '{"accepted":true}' : 'visitor-abc',
+        })),
       } as any);
-      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+      vi.mocked(findOwnedTrialSession).mockResolvedValue({
         id: 'session-123',
       } as any);
       vi.mocked(addVoiceSeconds).mockResolvedValue(300);

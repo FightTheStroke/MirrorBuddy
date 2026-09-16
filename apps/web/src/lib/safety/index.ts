@@ -94,6 +94,7 @@ export {
   type SafetyEvent,
   type SafetyMetrics,
 } from './monitoring';
+export { SAFETY_EVENT_TYPES } from './monitoring/types';
 
 export type {
   EscalationEvent,
