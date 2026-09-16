@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve generated quiz and flashcard titles when saving chat tool results.
+- Prevent duplicate or stale tool streams after reconnection and navigation.
+- Release camera resources after failed or cancelled capture, serialize camera
+  transitions, and recover failed usage finalization before starting another session.
+- Attach the shared database pool to Vercel Fluid's suspension lifecycle so idle
+  connections can close before an instance is suspended.
+
 ## [0.39.8] - 2026-09-15
 
 - No user-facing changes recorded.

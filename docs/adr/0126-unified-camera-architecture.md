@@ -36,11 +36,11 @@ Implement a **unified camera mode selector** that allows runtime switching betwe
 // Video mode (passive context - no AI response):
 dataChannel.send(
   JSON.stringify({
-    type: "conversation.item.create",
+    type: 'conversation.item.create',
     item: {
-      type: "message",
-      role: "user",
-      content: [{ type: "input_image", image_url: base64 }],
+      type: 'message',
+      role: 'user',
+      content: [{ type: 'input_image', image_url: base64 }],
     },
   }),
 );
@@ -48,18 +48,37 @@ dataChannel.send(
 // Photo mode (triggers AI response):
 dataChannel.send(
   JSON.stringify({
-    type: "conversation.item.create",
+    type: 'conversation.item.create',
     item: {
-      type: "message",
-      role: "user",
-      content: [{ type: "input_image", image_url: base64 }],
+      type: 'message',
+      role: 'user',
+      content: [{ type: 'input_image', image_url: base64 }],
     },
   }),
 );
-dataChannel.send(JSON.stringify({ type: "response.create" }));
+dataChannel.send(JSON.stringify({ type: 'response.create' }));
 ```
 
 ## Consequences
+
+### Camera resource lifecycle
+
+The camera owner releases photo and video tracks on unmount, including access
+granted after the owner has gone away. Video startup failure (including a rejected
+`video.play()`) releases the acquired stream and ends its usage reservation.
+All capture timers, including the delayed first frame, are cancelled on stop.
+Mode transitions are serialized across both camera controls, so a superseded
+start cannot finalize another capture's reservation or leave capture running
+behind an off indicator.
+
+`apps/web/src/lib/hooks/voice-session/use-camera-usage.ts` owns reservation start/end
+requests. Concurrent finalization shares one request; a rejected end remains
+reported and retains its reservation identifier rather than appearing successful.
+The next start first retries that finalization with its original duration and
+does not allocate another reservation while recovery is failing.
+`camera-snapshot.ts` releases its temporary video element even when capture fails.
+Permission denial and unsupported devices remain failures, not simulated camera
+successes; the public camera controls and tier limits are unchanged.
 
 ### Positive
 

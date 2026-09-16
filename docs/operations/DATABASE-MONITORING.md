@@ -42,7 +42,7 @@ MirrorBuddy monitors PostgreSQL connection pool statistics via Prometheus metric
 
 ## Pool Configuration
 
-**File**: `src/lib/db.ts`
+**File**: `packages/db/src/client.ts` (re-exported by `apps/web/src/lib/db.ts`)
 
 ```typescript
 const pool = new Pool({
@@ -51,9 +51,22 @@ const pool = new Pool({
   idleTimeoutMillis: 30000, // 30s idle timeout
   connectionTimeoutMillis: 10000, // 10s connection timeout
 });
+
+if (process.env.VERCEL === '1') {
+  attachDatabasePool(pool);
+}
 ```
 
-**Rationale**: Optimized for Vercel serverless (stateless, short-lived functions).
+**Rationale**: The shared pool supports concurrent requests on Vercel Fluid compute.
+`attachDatabasePool` from `@vercel/functions` lets idle connections close before
+instance suspension, when ordinary idle timers would stop running. Pool size,
+connection timeout, TLS validation and query error propagation remain unchanged.
+See [Vercel's connection pooling guidance](https://vercel.com/kb/guide/connection-pooling-with-functions).
+
+An `08006` / `EAUTHTIMEOUT` event identifies a failed pooler authentication
+handshake, not exhausted storage or a proven quota breach. Correlate its release,
+environment and driver cause with provider connection metrics. A successful
+one-off connectivity probe does not prove an intermittent incident resolved.
 
 ## Monitoring Setup
 
