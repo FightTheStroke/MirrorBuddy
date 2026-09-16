@@ -1,0 +1,10 @@
+.git
+**/node_modules
+**/.next
+**/.env*
+!**/.env.example
+**/.vercel
+**/coverage
+**/test-results
+**/playwright-report
+worktrees

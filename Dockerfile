@@ -15,7 +15,8 @@ RUN apk add --no-cache libc6-compat openssl
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
 # Copy workspace config + packages/ so pnpm can resolve workspace:* deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/web/package.json ./apps/web/package.json
 COPY packages ./packages/
 COPY prisma.config.ts ./
 # W2 app move (#362): prisma/ now under apps/web/prisma/
@@ -37,8 +38,8 @@ WORKDIR /app
 # FROM boundaries in multi-stage Dockerfile)
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Preserve workspace-local dependencies and their links as well as root modules.
+COPY --from=deps /app/ ./
 COPY . .
 
 # Generate Prisma client (needed for build)

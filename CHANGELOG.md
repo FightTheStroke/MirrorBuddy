@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve workspace dependencies and pnpm configuration in Docker builds, and
+  require Docker validation before merging configuration-changing pull requests.
 - Preserve generated quiz and flashcard titles when saving chat tool results.
 - Prevent duplicate or stale tool streams after reconnection and navigation.
 - Release camera resources after failed or cancelled capture, serialize camera

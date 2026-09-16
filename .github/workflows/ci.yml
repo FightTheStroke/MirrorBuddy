@@ -120,6 +120,10 @@ jobs:
               - 'apps/web/playwright.config*.ts'
               - 'playwright.config*.ts'
             config:
+              - 'Dockerfile'
+              - '.dockerignore'
+              - '.npmrc'
+              - 'pnpm-workspace.yaml'
               - 'package.json'
               - 'apps/web/vercel.json'
               - 'vercel.json'
@@ -1865,7 +1869,8 @@ jobs:
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+    needs: [detect-changes]
+    if: github.event_name != 'pull_request' || needs.detect-changes.outputs.config == 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -2005,6 +2010,7 @@ jobs:
       - structural-safeguards
       - reachability-check
       - robot-tests
+      - docker
     if: always() && github.event_name == 'pull_request'
     steps:
       - name: Check all PR jobs passed
@@ -2020,6 +2026,9 @@ jobs:
           needs.smoke-tests.result != 'success' ||
           needs.accessibility-tests.result != 'success' ||
           needs.structural-safeguards.result != 'success' ||
+          (needs.docker.result != 'success' &&
+            (needs.docker.result != 'skipped' ||
+             needs.detect-changes.outputs.config == 'true')) ||
           (needs.robot-tests.result != 'success' &&
             (needs.robot-tests.result != 'skipped' ||
              needs.detect-changes.outputs.robot == 'true')) ||
@@ -2047,6 +2056,7 @@ jobs:
           echo "  structural-safeguards: ${{ needs.structural-safeguards.result }}"
           echo "  reachability-check: ${{ needs.reachability-check.result }}"
           echo "  robot-tests: ${{ needs.robot-tests.result }}"
+          echo "  docker: ${{ needs.docker.result }}"
           echo ""
           echo "Conditional jobs (skipped is OK):"
           echo "  debt-check: ${{ needs.debt-check.result }}"
@@ -2067,6 +2077,9 @@ jobs:
           needs.smoke-tests.result == 'success' &&
           needs.accessibility-tests.result == 'success' &&
           needs.structural-safeguards.result == 'success' &&
+          (needs.docker.result == 'success' ||
+            (needs.docker.result == 'skipped' &&
+             needs.detect-changes.outputs.config != 'true')) &&
           (needs.robot-tests.result == 'success' ||
             (needs.robot-tests.result == 'skipped' &&
              needs.detect-changes.outputs.robot != 'true')) &&
