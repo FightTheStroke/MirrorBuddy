@@ -1,6 +1,6 @@
 export const dynamic = 'force-dynamic';
 
-import { validateAdminReadOnlyAuth } from '@/lib/auth/server';
+import { validateAdminAuth } from '@/lib/auth/server';
 import { prisma } from '@/lib/db';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
@@ -13,13 +13,15 @@ import { UsersTable } from './users-table';
 export default async function AdminUsersPage({
   searchParams,
 }: { searchParams?: Promise<UserSearchParams> } = {}) {
-  const auth = await validateAdminReadOnlyAuth();
-  if (!auth.authenticated || !auth.canAccessAdminReadOnly) redirect('/login');
+  // The listing carries usernames and email addresses of minors, so it is
+  // restricted to a full administrator like the other ADMIN-only pages.
+  const auth = await validateAdminAuth();
+  if (!auth.authenticated || !auth.isAdmin) redirect('/login');
   const viewer = await prisma.user.findUnique({
     where: { id: auth.userId },
     select: { role: true },
   });
-  if (!viewer || (viewer.role !== 'ADMIN' && viewer.role !== 'ADMIN_READONLY')) redirect('/login');
+  if (!viewer || viewer.role !== 'ADMIN') redirect('/login');
   const t = await getTranslations('admin');
 
   try {
