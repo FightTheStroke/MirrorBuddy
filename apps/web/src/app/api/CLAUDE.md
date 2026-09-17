@@ -34,6 +34,11 @@ export const POST = pipe(
 
 200 ok | 201 created | 204 no-content | 400 validation | 401 unauth | 403 forbidden | 404 missing | 409 conflict | 429 rate-limit | 500 server
 
+Unmatched API paths use `[...path]/route.ts`, not the streamed page not-found response.
+GET/OPTIONS return JSON `{ error: 'Not found' }` with 404; HEAD returns 404 without a body.
+Mutations retain CSRF validation: invalid/missing tokens return 403, valid tokens return 404.
+Existing static and dynamic routes retain precedence. The fallback does not consume route params.
+
 ## Rate limiting
 
 See `src/lib/api/rate-limit.ts`. Apply on anonymous/trial endpoints.
