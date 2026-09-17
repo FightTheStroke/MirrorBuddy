@@ -32,17 +32,29 @@ ALTER TABLE "dependency_alerts" RENAME COLUMN "parent_notified_at" TO "parentNot
 ALTER TABLE "dependency_alerts" RENAME COLUMN "created_at" TO "createdAt";
 
 -- Fields the models declare that the hand-written migration never created.
-ALTER TABLE "usage_patterns" ADD COLUMN "weekdayAverage" DOUBLE PRECISION;
-ALTER TABLE "usage_patterns" ADD COLUMN "stdDeviation" DOUBLE PRECISION;
-ALTER TABLE "usage_patterns" ADD COLUMN "isTestData" BOOLEAN NOT NULL DEFAULT false;
-ALTER TABLE "dependency_alerts" ADD COLUMN "isTestData" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "usage_patterns" ADD COLUMN IF NOT EXISTS "weekdayAverage" DOUBLE PRECISION;
+ALTER TABLE "usage_patterns" ADD COLUMN IF NOT EXISTS "stdDeviation" DOUBLE PRECISION;
+ALTER TABLE "usage_patterns" ADD COLUMN IF NOT EXISTS "isTestData" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "dependency_alerts" ADD COLUMN IF NOT EXISTS "isTestData" BOOLEAN NOT NULL DEFAULT false;
 
--- Constraint and index identifiers follow the renamed columns.
-ALTER TABLE "usage_patterns" RENAME CONSTRAINT "usage_patterns_user_id_fkey" TO "usage_patterns_userId_fkey";
-ALTER TABLE "dependency_alerts" RENAME CONSTRAINT "dependency_alerts_user_id_fkey" TO "dependency_alerts_userId_fkey";
+-- Constraint and index identifiers follow the renamed columns. Production
+-- carries only the primary keys on these tables: the foreign keys the original
+-- migration declared are absent there, so each rename is applied only when its
+-- object exists.
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'usage_patterns_user_id_fkey') THEN
+    ALTER TABLE "usage_patterns"
+      RENAME CONSTRAINT "usage_patterns_user_id_fkey" TO "usage_patterns_userId_fkey";
+  END IF;
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'dependency_alerts_user_id_fkey') THEN
+    ALTER TABLE "dependency_alerts"
+      RENAME CONSTRAINT "dependency_alerts_user_id_fkey" TO "dependency_alerts_userId_fkey";
+  END IF;
+END $$;
 
-ALTER INDEX "usage_patterns_user_id_date_key" RENAME TO "usage_patterns_userId_date_key";
-ALTER INDEX "usage_patterns_user_id_idx" RENAME TO "usage_patterns_userId_idx";
+ALTER INDEX IF EXISTS "usage_patterns_user_id_date_key" RENAME TO "usage_patterns_userId_date_key";
+ALTER INDEX IF EXISTS "usage_patterns_user_id_idx" RENAME TO "usage_patterns_userId_idx";
 ALTER INDEX IF EXISTS "dependency_alerts_user_id_idx" RENAME TO "dependency_alerts_userId_idx";
 
 -- The models declare no index on parentNotified.
