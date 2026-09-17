@@ -17,8 +17,11 @@ describe('actual users query seams stay bounded (source contract, not ORM proof)
   it('has no SSR findMany bypass and uses the same query service for bounded read APIs', () => {
     expect(page).not.toContain('prisma.user.findMany');
     expect(page).toContain('getUserList(params)');
-    expect(page).toContain('validateAdminReadOnlyAuth');
-    expect(api).toContain('withAdminReadOnly');
+    // The listing carries usernames and email addresses: full administrators only.
+    expect(page).toContain('validateAdminAuth');
+    expect(page).not.toContain('validateAdminReadOnlyAuth');
+    expect(api).toContain('withAdmin,');
+    expect(api).not.toContain('withAdminReadOnly');
     expect(api).toContain('getUserList(');
     expect(trash).toContain('getUserList(');
   });

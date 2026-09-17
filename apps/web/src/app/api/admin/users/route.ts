@@ -1,14 +1,16 @@
 import { NextResponse } from 'next/server';
-import { pipe, withSentry, withAdminReadOnly } from '@/lib/api/middlewares';
+import { pipe, withSentry, withAdmin } from '@/lib/api/middlewares';
 import { getUserList } from '@/lib/admin/user-list-service';
 import { UserListQueryError } from '@/lib/admin/user-list-query';
 import { getUserCollection } from '@/lib/admin/user-list-collection-service';
 import { UserCollectionChangedError } from '@/lib/admin/user-list-collection';
 
 export const revalidate = 0;
+// The listing carries usernames and email addresses, so it stays with the page
+// it serves: full administrators only, never ADMIN_READONLY.
 export const GET = pipe(
   withSentry('/api/admin/users'),
-  withAdminReadOnly,
+  withAdmin,
 )(async (ctx) => {
   try {
     const params = new URL(ctx.req.url).searchParams;

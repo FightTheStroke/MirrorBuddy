@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
   list: vi.fn(),
   table: vi.fn(),
 }));
-vi.mock('@/lib/auth/server', () => ({ validateAdminReadOnlyAuth: mocks.auth }));
+vi.mock('@/lib/auth/server', () => ({ validateAdminAuth: mocks.auth }));
 vi.mock('@/lib/db', () => ({
   prisma: {
     user: { findUnique: mocks.role },
@@ -47,7 +47,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.auth.mockResolvedValue({
     authenticated: true,
-    canAccessAdminReadOnly: true,
+    isAdmin: true,
     userId: 'viewer',
   });
   mocks.role.mockResolvedValue({ role: 'ADMIN' });
@@ -56,10 +56,8 @@ beforeEach(() => {
 });
 
 describe('actual SSR users page wiring (boundary fixtures, not ORM/auth proof)', () => {
-  it.each(['ADMIN', 'ADMIN_READONLY'])(
-    'uses the same bounded listing and projection for %s',
-    async (role) => {
-      mocks.role.mockResolvedValue({ role });
+  it('uses the bounded listing and projection for a full administrator', async () => {
+    {
       const params = {
         page: '2',
         pageSize: '100',
@@ -70,17 +68,23 @@ describe('actual SSR users page wiring (boundary fixtures, not ORM/auth proof)',
       renderToStaticMarkup(await AdminUsersPage({ searchParams: Promise.resolve(params) }));
       expect(mocks.list).toHaveBeenCalledWith(params);
       expect(mocks.table).toHaveBeenCalledWith(
-        expect.objectContaining({
-          listing: page,
-          canManage: role === 'ADMIN',
-        }),
+        expect.objectContaining({ listing: page, canManage: true }),
       );
       expect(mocks.role).toHaveBeenCalledWith({ where: { id: 'viewer' }, select: { role: true } });
-    },
-  );
+    }
+  });
 
-  it('does not load user data before the existing readonly-aware authorization succeeds', async () => {
-    mocks.auth.mockResolvedValue({ authenticated: false, canAccessAdminReadOnly: false });
+  it('refuses a read-only administrator and loads no user data', async () => {
+    mocks.role.mockResolvedValue({ role: 'ADMIN_READONLY' });
+
+    await expect(AdminUsersPage()).rejects.toThrow('redirect:/login');
+
+    expect(mocks.list).not.toHaveBeenCalled();
+    expect(mocks.table).not.toHaveBeenCalled();
+  });
+
+  it('does not load user data before the administrator authorization succeeds', async () => {
+    mocks.auth.mockResolvedValue({ authenticated: false, isAdmin: false });
     await expect(AdminUsersPage()).rejects.toThrow('redirect:/login');
     expect(mocks.list).not.toHaveBeenCalled();
   });

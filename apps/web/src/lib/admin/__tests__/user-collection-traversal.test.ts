@@ -22,7 +22,7 @@ vi.mock('@/lib/api/middlewares', () => ({
     (req: NextRequest) =>
       handler({ req }),
   withSentry: vi.fn(),
-  withAdminReadOnly: vi.fn(),
+  withAdmin: vi.fn(),
 }));
 
 interface Where {
