@@ -4,6 +4,7 @@
 
 Accepted — 2026-07-19
 Corrected — 2026-08-31 (lifecycle label: `gpt-realtime-2.1` is **Public Preview**, not GA)
+Corrected — 2026-09-17 (retirement dates: published schedule and regional catalogue disagree)
 
 ## Correction (2026-08-31) — lifecycle label was wrong
 
@@ -15,20 +16,31 @@ classifies the entire 2.x line as **Public Preview**:
   _"This feature is currently in public preview … provided without a service-level
   agreement"_ —
   <https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/realtime-2>
-- Retirement schedule (updated 2026-08-26) lists the lifecycle stage for each row —
+- Retirement schedule (read 2026-09-17, updated 2026-09-14) lists the lifecycle stage for each row —
   <https://learn.microsoft.com/en-us/azure/foundry/openai/concepts/model-retirement-schedule>
 
-| Model              | Version    | Lifecycle   | Retirement date |
-| ------------------ | ---------- | ----------- | --------------- |
-| `gpt-realtime`     | 2025-08-28 | **GA**      | 2027-03-02      |
-| `gpt-realtime-1.5` | 2026-02-23 | **GA**      | 2027-08-24      |
-| `gpt-realtime-2`   | 2026-05-06 | **Preview** | 2026-10-31      |
-| `gpt-realtime-2.1` | 2026-07-07 | **Preview** | 2026-10-15      |
+| Model                   | Version    | Lifecycle   | Published retirement    | Regional inference retirement |
+| ----------------------- | ---------- | ----------- | ----------------------- | ----------------------------- |
+| `gpt-realtime`          | 2025-08-28 | **GA**      | 2027-03-02              | 2027-03-02                    |
+| `gpt-realtime-1.5`      | 2026-02-23 | **GA**      | 2027-08-24              | 2027-08-24                    |
+| `gpt-realtime-2`        | 2026-05-06 | **Preview** | 2026-08-31              | 2026-10-31                    |
+| `gpt-realtime-2.1`      | 2026-07-07 | **Preview** | 2027-06-25              | 2027-07-31                    |
+| `gpt-realtime-2.1-mini` | 2026-07-07 | **Preview** | 2027-06-25              | 2027-07-31                    |
+| `gpt-realtime-mini`     | 2025-12-15 | **GA**      | 2026-12-15 / 2027-06-15 | 2026-12-15                    |
 
-> Retirement dates re-verified 2026-09-16 against `az cognitiveservices model list -l
-swedencentral`. The 2.1 date moved forward from the 2027-06-25 originally recorded
-> here: the preview line now ends **2026-10-15**, so the GA fallback in
-> `app/api/realtime/ephemeral-token` is what keeps voice alive past that date.
+The regional column comes from `az cognitiveservices model list -l swedencentral`,
+`model.deprecation.inference`, read 2026-09-17. The mini model has two conflicting
+published rows for the same version. Use the earlier date for planning until
+Microsoft reconciles these sources; neither metadata source proves live inference.
+The prior **2026-10-15** claim for 2.1 was incorrect, not a verified date change.
+That date belongs to the **2025-03-20** versions of `gpt-4o-transcribe`,
+`gpt-4o-mini-transcribe`, and `gpt-4o-mini-tts`.
+
+Read-only deployment inventory confirms the versions above for configured 2.1,
+2.0, and mini, and identifies the GA 1.5 deployment as **`gpt-realtime-15`**.
+The resource instead uses `gpt-realtime-whisper` `2026-05-06` and `tts` / `tts-hd`
+`001`, whose regional retirement dates are 2027-05-06 and 2026-12-15 respectively.
+Do not apply the October date to all transcription or speech synthesis models.
 
 ### Accepted risk
 
@@ -42,8 +54,9 @@ Maestri. This risk must stay explicitly recorded — not mislabelled as GA.
 
 The documented fallback chain is
 `gpt-realtime-2.1` → `gpt-realtime-2` → `gpt-realtime-1.5` → `gpt-realtime`. Note that
-**`gpt-realtime-2` is itself Preview and reaches retirement on 2026-08-31** — it is not
-a durable fallback. The **only GA rungs** of the chain are `gpt-realtime-1.5`
+**`gpt-realtime-2` is itself Preview, with conflicting retirement dates above**:
+it is not a durable fallback. A configured deployment reporting `Succeeded` does
+not prove that it can still serve requests. The **only GA rungs** are `gpt-realtime-1.5`
 (retires 2027-08-24) and `gpt-realtime` (retires 2027-03-02). A true rollback to a
 supported model must land on one of those two.
 
@@ -113,9 +126,13 @@ Preview-model risk remains tracked in #1022 (Finding 1); the `gpt-realtime-mini`
   `.env`, `SETUP.md`, `.github/workflows/ci.yml`, `validate-pre-deploy.ts`.
 - Flag activated at 100% (server + client defaults) once the Azure deployment
   exists. Kill-switch available for instant rollback to v2.
-- Fallback chain guarantees no voice outage if the V21 deployment is removed.
+- Fallback reduces exposure to a retired V21 deployment; it does not guarantee
+  availability. Successful inference on the selected fallback still needs live evidence.
 
 ## Rollback
 
 Set `voice_realtime_21` `killSwitch: true` (or status `disabled`) — traffic
-falls back to `gpt-realtime-2` immediately. No redeploy required.
+can fall back to `gpt-realtime-2` on flag-aware web routes. That is still Preview,
+not a confirmed GA rollback. The device path differs as documented above.
+Verify the selected deployment and successful inference before declaring recovery.
+This date correction does not change flags, cloud resources, or the accepted-risk decision.

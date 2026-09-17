@@ -22,9 +22,16 @@
  * | gpt-5.2-edu      | gpt-chat-latest  | Preview | 2026-10-05        |
  * | gpt-5.2-chat     | gpt-chat-latest  | Preview | 2026-10-05        |
  * | gpt-5-chat       | gpt-chat-latest  | Preview | 2026-10-05        |
- * | gpt-realtime-2.1 | gpt-realtime-2.1 | Preview | 2026-10-15        |
- * | gpt-realtime-2   | gpt-realtime-2   | Preview | 2026-10-31        |
- * | gpt-realtime-1.5 | gpt-realtime-1.5 | GA      | 2027-08-24        |
+ * | gpt-realtime-2.1 | gpt-realtime-2.1 | Preview | See conflict below |
+ * | gpt-realtime-2   | gpt-realtime-2   | Preview | See conflict below |
+ * | gpt-realtime-15  | gpt-realtime-1.5 | GA      | 2027-08-24        |
+ *
+ * Voice rechecked 2026-09-17: Microsoft Learn lists 2.1 (2026-07-07) retirement
+ * as 2027-06-25; Sweden Central's model.deprecation.inference says 2027-07-31.
+ * For 2.0 (2026-05-06), Learn says 2026-08-31 and the regional catalogue
+ * says 2026-10-31. Use the earlier date for planning pending reconciliation.
+ * Neither provisioning state nor lifecycle metadata proves live inference.
+ * The former 2026-10-15 date for 2.1 was incorrect. See ADR 0169 and issue #1022.
  *
  * The GPT-4 family retired in Feb 2026; those aliases survive only so that a tier
  * row written before the migration still resolves to a live deployment.
@@ -90,7 +97,7 @@ const DEPLOYMENT_MAP: Record<string, string | undefined> = {
   // cannot be switched on by a stray click. Re-adding it is one line.
 
   // Realtime models (voice) — GA deployments (Feb 2026+)
-  // Pro tier uses gpt-realtime (best quality), Base/Trial use gpt-realtime-mini (cost-effective)
+  // Global aliases only: voice routes do not select a model by user tier (ADR 0169).
   // Guarded by voice_ga_protocol feature flag at the API route level
   'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
   'gpt-realtime-mini': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI || 'gpt-realtime-mini',
