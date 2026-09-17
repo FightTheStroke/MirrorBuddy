@@ -24,6 +24,7 @@ import { prisma } from '@/lib/db';
 import { metricsStore } from '@/lib/observability/metrics-store';
 import { generateSLIMetrics } from '@/app/api/metrics/sli-metrics';
 import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
+import { collectDatabaseBackedSamples } from '@/lib/observability/prometheus-push-service';
 
 const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -431,6 +432,10 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     });
     log.warn('Failed to collect waitlist metrics', { error: String(err) });
   }
+
+  // Families that query the database run here, once per schedule, rather than
+  // from the per-instance push timer.
+  samples.push(...(await collectDatabaseBackedSamples(instanceLabels, now)));
 
   return samples;
 }
