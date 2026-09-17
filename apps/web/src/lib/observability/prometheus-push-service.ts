@@ -49,6 +49,30 @@ export class MetricsPushError extends Error {
 }
 
 /**
+ * Collectors that query the database. They belong to a single scheduled caller:
+ * running them from a per-instance timer multiplies database connections by the
+ * number of live serverless instances, which is not bounded by the pool.
+ */
+const databaseBackedCollectors = {
+  service_limits: collectServiceLimitsSamples,
+  tier: collectTierMetrics,
+};
+
+/** Collect the database-backed families once, for the authenticated cron route. */
+export async function collectDatabaseBackedSamples(
+  instanceLabels: Record<string, string>,
+  now: number,
+): Promise<MetricSample[]> {
+  const samples: MetricSample[] = [];
+  for (const [name, collect] of Object.entries(databaseBackedCollectors)) {
+    samples.push(
+      ...(await collectMetricSource(name, () => collect(instanceLabels, now), instanceLabels, now)),
+    );
+  }
+  return samples;
+}
+
+/**
  * Escape a string for use as an Influx Line Protocol tag value.
  * Escapes backslash, comma, equals, and space characters.
  */
@@ -198,8 +222,10 @@ class PrometheusPushService {
       budget: collectBudgetMetrics,
       abuse: collectAbuseMetrics,
       conversion: collectConversionMetrics,
-      service_limits: collectServiceLimitsSamples,
-      tier: collectTierMetrics,
+      // On Vercel every function instance owns this timer, so a database-backed
+      // collector here opens connections once per instance per interval. The
+      // authenticated cron route collects those once per schedule instead.
+      ...(process.env.VERCEL === '1' ? {} : databaseBackedCollectors),
     };
     for (const [name, collect] of Object.entries(collectors)) {
       samples.push(

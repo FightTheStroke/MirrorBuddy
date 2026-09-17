@@ -4,7 +4,7 @@ import { collectHttpMetrics } from '../http-metrics-collector';
 import { collectTierMetrics } from '../tier-metrics-collector';
 import { collectFunnelMetrics } from '../funnel-metrics-collectors';
 import { collectServiceLimitsSamples } from '../service-limits-metrics';
-import { prometheusPushService } from '../prometheus-push-service';
+import { prometheusPushService, collectDatabaseBackedSamples } from '../prometheus-push-service';
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -148,5 +148,59 @@ describe('independent metrics push', () => {
       'service_limit_absolute,service=vercel,metric=builds,type=used value=8 ',
     );
     expect(body).not.toContain('collector=service_limits value=1 ');
+  });
+
+  it('keeps database-backed collectors out of the per-instance timer on Vercel', async () => {
+    vi.stubEnv('VERCEL', '1');
+
+    await prometheusPushService.pushMetrics();
+
+    expect(collectServiceLimitsSamples).not.toHaveBeenCalled();
+    expect(collectTierMetrics).not.toHaveBeenCalled();
+    const body = fetchMock.mock.calls[0][1].body as string;
+    expect(body).toContain('http_requests_total');
+    expect(body).not.toContain('collector=service_limits');
+    expect(body).not.toContain('collector=tier');
+  });
+
+  it('still collects them per instance outside Vercel, where instances are bounded', async () => {
+    vi.stubEnv('VERCEL', '');
+
+    await prometheusPushService.pushMetrics();
+
+    expect(collectServiceLimitsSamples).toHaveBeenCalledTimes(1);
+    expect(collectTierMetrics).toHaveBeenCalledTimes(1);
+  });
+
+  it('collects each database-backed family exactly once for a scheduled caller', async () => {
+    const labels = { instance: 'mirrorbuddy', env: 'production' };
+
+    const samples = await collectDatabaseBackedSamples(labels, now);
+
+    expect(collectServiceLimitsSamples).toHaveBeenCalledExactlyOnceWith(labels, now);
+    expect(collectTierMetrics).toHaveBeenCalledExactlyOnceWith(labels, now);
+    expect(samples.map((sample) => sample.labels.collector)).toEqual(
+      expect.arrayContaining(['service_limits', 'tier']),
+    );
+  });
+
+  it('reports a failing scheduled collector without losing the other family', async () => {
+    const failure = new Error('Connection terminated due to connection timeout');
+    vi.mocked(collectServiceLimitsSamples).mockRejectedValueOnce(failure);
+
+    const samples = await collectDatabaseBackedSamples(
+      { instance: 'mirrorbuddy', env: 'production' },
+      now,
+    );
+
+    expect(collectTierMetrics).toHaveBeenCalledTimes(1);
+    expect(
+      samples.some(
+        (sample) =>
+          sample.name === 'metric_collector_up' &&
+          sample.labels.collector === 'service_limits' &&
+          sample.value === 0,
+      ),
+    ).toBe(true);
   });
 });
