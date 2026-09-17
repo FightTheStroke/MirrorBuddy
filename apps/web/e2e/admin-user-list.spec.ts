@@ -131,41 +131,36 @@ test.describe('bounded administrative user listing', () => {
     }
   });
 
-  test('real ordinary and read-only sessions cannot gain user-management controls', async ({
-    adminPage,
-    playwright,
-    baseURL,
-  }) => {
-    const prisma = getPrismaClient();
-    const user = await createTestUser({ username: `e2e-readonly-${randomUUID()}` });
-    const issued = await issueTestSession(prisma, user.id);
-    const context = await playwright.request.newContext({
+  for (const role of ['USER', 'ADMIN_READONLY'] as const) {
+    test(`real ${role} sessions cannot read the user listing or gain controls`, async ({
+      adminPage,
+      playwright,
       baseURL,
-      storageState: { cookies: testSessionCookies(issued, baseURL), origins: [] },
-    });
-    try {
-      const denied = await context.get('/api/admin/users?staging=true');
-      expect(denied.status()).toBe(403);
-      await prisma.user.update({ where: { id: user.id }, data: { role: 'ADMIN_READONLY' } });
-      await adminPage.context().addCookies(testSessionCookies(issued, baseURL));
-      await adminPage.goto(`/admin/users?staging=true&search=${user.username}`);
-      const rows = adminPage.locator('tbody tr');
-      await expect(rows).toHaveCount(1);
-      await expect(rows.first()).toContainText(user.username ?? user.id);
-      await expect(rows.getByRole('checkbox')).toHaveCount(0);
-      const buttons = rows.getByRole('button');
-      await expect(buttons).toHaveCount(7);
-      for (let index = 0; index < 6; index++) {
-        await expect(buttons.nth(index)).toBeDisabled();
+    }) => {
+      const prisma = getPrismaClient();
+      const user = await createTestUser({ username: `e2e-readonly-${randomUUID()}` });
+      await prisma.user.update({ where: { id: user.id }, data: { role } });
+      const issued = await issueTestSession(prisma, user.id);
+      const context = await playwright.request.newContext({
+        baseURL,
+        storageState: { cookies: testSessionCookies(issued, baseURL), origins: [] },
+      });
+      const query = new URLSearchParams({ staging: 'true', search: user.username ?? user.id });
+      try {
+        const denied = await context.get(`/api/admin/users?${query}`);
+        expect(denied.status()).toBe(403);
+        expect(await denied.text()).not.toContain(user.id);
+
+        await adminPage.context().addCookies(testSessionCookies(issued, baseURL));
+        await adminPage.goto(`/admin/users?${query}`);
+        await expect(adminPage).toHaveURL(
+          (url) => url.pathname === '/login' || /^\/[a-z]{2}\/login$/.test(url.pathname),
+        );
+        await expect(adminPage.locator('tbody tr')).toHaveCount(0);
+        await expect(adminPage.getByRole('button', { name: 'JSON', exact: true })).toHaveCount(0);
+      } finally {
+        await context.dispose();
       }
-      await expect(buttons.last()).toBeEnabled();
-      const allowed = await adminPage.request.get(
-        `/api/admin/users?staging=true&search=${user.username}`,
-      );
-      expect(allowed.status()).toBe(200);
-      expect((await allowed.json()).users.map((row: { id: string }) => row.id)).toEqual([user.id]);
-    } finally {
-      await context.dispose();
-    }
-  });
+    });
+  }
 });
