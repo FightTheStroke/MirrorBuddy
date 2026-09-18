@@ -36,10 +36,7 @@ export async function POST(request: Request) {
   const result = validateChatRequest(body);
 
   if (!result.success) {
-    return NextResponse.json(
-      { error: result.error },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
   const validatedData = result.data;
@@ -115,6 +112,10 @@ export function validateExampleRequest(data: unknown): ValidationResult<ExampleR
 - **Clear error messages**: Provide descriptive error messages for validation failures
 - **Validate arrays**: Use `createArraySchema` helper for arrays with min/max constraints
 - **Enum validation**: Use predefined enums from `common.ts` (e.g., `MaestroId`, `ToolType`)
+- **Maestro catalog parity**: `MaestroId` accepts every shipped maestro ID plus
+  previously accepted legacy IDs. The catalog regression test checks the actual
+  profiles, so adding a maestro requires updating the shared enum. This keeps API
+  validation lightweight without importing full system prompts into consumers.
 
 ## Security Considerations
 
