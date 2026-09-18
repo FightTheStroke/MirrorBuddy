@@ -6,122 +6,160 @@
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import { getUserId } from './user-id';
-import {
-  saveMaterialToAPIWithId,
-  generateContentHash,
-} from './api';
+import { saveMaterialToAPIWithId, generateContentHash } from './api';
 
-// Debounce delay in milliseconds
 const AUTO_SAVE_DEBOUNCE_MS = 1000;
 
-// Track pending saves per key to prevent duplicates
-const pendingSaves = new Map<string, boolean>();
-const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+type SaveOptions = { subject?: string; toolId?: string };
 
-/**
- * Internal save function (not debounced)
- */
-async function doAutoSave(
+interface SaveRequest {
+  userId: string;
+  toolId: string;
+  toolType: ToolType;
+  title: string;
+  content: Record<string, unknown>;
+  options?: SaveOptions;
+}
+
+interface PendingSave {
+  request: SaveRequest;
+  fingerprint: string;
+  promise: Promise<boolean>;
+  resolve: (success: boolean) => void;
+  timer?: ReturnType<typeof setTimeout>;
+  ready: boolean;
+}
+
+const queuedSaves = new Map<string, PendingSave>();
+const runningSaves = new Map<string, PendingSave>();
+
+export function flushPendingMaterialSaves(): void {
+  for (const [key, job] of queuedSaves) {
+    clearTimeout(job.timer);
+    job.ready = true;
+    void runPendingSave(key);
+  }
+}
+
+function protectPendingWork(event: BeforeUnloadEvent): void {
+  if (!queuedSaves.size && !runningSaves.size) return;
+  event.preventDefault();
+  event.returnValue = '';
+  flushPendingMaterialSaves();
+}
+
+async function runPendingSave(key: string): Promise<void> {
+  const job = queuedSaves.get(key);
+  if (!job?.ready || runningSaves.has(key)) return;
+
+  queuedSaves.delete(key);
+  runningSaves.set(key, job);
+  const { userId, toolId, toolType, title, content, options } = job.request;
+  let success = false;
+  try {
+    const result = await saveMaterialToAPIWithId(userId, toolId, toolType, title, content, options);
+    success = result !== null;
+  } catch (error) {
+    logger.error('Auto-save material failed', { toolType }, error);
+  } finally {
+    runningSaves.delete(key);
+    job.resolve(success);
+    void runPendingSave(key);
+    if (!queuedSaves.size && !runningSaves.size) {
+      window.removeEventListener('beforeunload', protectPendingWork);
+    }
+  }
+}
+
+function scheduleSave(
   toolType: ToolType,
   title: string,
   content: Record<string, unknown>,
-  options?: { subject?: string; toolId?: string }
+  options: SaveOptions | undefined,
+  immediate: boolean,
 ): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') return Promise.resolve(false);
 
   try {
     const userId = getUserId();
-    const toolId =
-      options?.toolId || generateContentHash(toolType, title, content);
-
-    const result = await saveMaterialToAPIWithId(
+    const toolId = options?.toolId || generateContentHash(toolType, title, content);
+    const key = JSON.stringify([userId, toolType, toolId]);
+    const request: SaveRequest = {
       userId,
       toolId,
       toolType,
       title,
       content,
-      options
-    );
-    return result !== null;
-  } catch (error) {
-    logger.error('Auto-save material failed', {
-      toolType,
+      options,
+    };
+    const fingerprint = JSON.stringify({
       title,
-      error: error instanceof Error ? error.message : String(error),
+      content,
+      subject: options?.subject,
     });
-    return false;
+    const running = runningSaves.get(key);
+    let queued = queuedSaves.get(key);
+
+    if (!queued && running?.fingerprint === fingerprint) return running.promise;
+    if (queued?.fingerprint === fingerprint && !immediate) return queued.promise;
+
+    if (queued) {
+      clearTimeout(queued.timer);
+      queued.request = request;
+      queued.fingerprint = fingerprint;
+      queued.ready ||= immediate;
+    } else {
+      let complete: (success: boolean) => void;
+      const promise = new Promise<boolean>((resolve) => {
+        complete = resolve;
+      });
+      queued = {
+        request,
+        fingerprint,
+        promise,
+        resolve: (success) => complete(success),
+        ready: immediate,
+      };
+      queuedSaves.set(key, queued);
+    }
+
+    window.addEventListener('beforeunload', protectPendingWork);
+    if (queued.ready) {
+      void runPendingSave(key);
+    } else {
+      const job = queued;
+      job.timer = setTimeout(() => {
+        job.ready = true;
+        job.timer = undefined;
+        void runPendingSave(key);
+      }, AUTO_SAVE_DEBOUNCE_MS);
+    }
+    return queued.promise;
+  } catch (error) {
+    logger.error('Auto-save scheduling failed', { toolType }, error);
+    return Promise.resolve(false);
   }
 }
 
 /**
- * Auto-save material with debouncing to prevent duplicate saves.
- * Uses content hash as key so each unique piece of content has its own timer.
+ * Coalesce queued changes while settling every caller with the actual save result.
+ * An edit arriving during a request is saved only after that request completes.
  */
-export async function autoSaveMaterial(
+export function autoSaveMaterial(
   toolType: ToolType,
   title: string,
   content: Record<string, unknown>,
-  options?: { subject?: string; toolId?: string }
+  options?: SaveOptions,
 ): Promise<boolean> {
-  if (typeof window === 'undefined') return false;
-
-  const saveKey = options?.toolId || generateContentHash(toolType, title, content);
-
-  // Skip if save already in progress for this key
-  if (pendingSaves.get(saveKey)) {
-    logger.debug('Auto-save skipped - already pending', { saveKey, toolType });
-    return true;
-  }
-
-  // Clear existing timer for this key
-  const existingTimer = saveTimers.get(saveKey);
-  if (existingTimer) {
-    clearTimeout(existingTimer);
-  }
-
-  // Return a promise that resolves when the debounced save completes
-  return new Promise((resolve) => {
-    const timer = setTimeout(async () => {
-      saveTimers.delete(saveKey);
-      pendingSaves.set(saveKey, true);
-
-      try {
-        const result = await doAutoSave(toolType, title, content, options);
-        resolve(result);
-      } finally {
-        pendingSaves.delete(saveKey);
-      }
-    }, AUTO_SAVE_DEBOUNCE_MS);
-
-    saveTimers.set(saveKey, timer);
-  });
+  return scheduleSave(toolType, title, content, options, false);
 }
 
-/**
- * Force immediate save (bypasses debouncing)
- * Use for explicit user save actions
- */
-export async function forceSaveMaterial(
+/** Flush queued changes immediately, but never race an already-running save. */
+export function forceSaveMaterial(
   toolType: ToolType,
   title: string,
   content: Record<string, unknown>,
-  options?: { subject?: string; toolId?: string }
+  options?: SaveOptions,
 ): Promise<boolean> {
-  const saveKey = options?.toolId || generateContentHash(toolType, title, content);
-
-  // Clear any pending debounced save
-  const existingTimer = saveTimers.get(saveKey);
-  if (existingTimer) {
-    clearTimeout(existingTimer);
-    saveTimers.delete(saveKey);
-  }
-
-  // Wait if save is in progress
-  if (pendingSaves.get(saveKey)) {
-    logger.debug('Force save waiting for pending save', { saveKey });
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  return doAutoSave(toolType, title, content, options);
+  return scheduleSave(toolType, title, content, options, true);
 }
-

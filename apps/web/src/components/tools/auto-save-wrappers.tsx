@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
+import { useTranslations } from 'next-intl';
+import { useMaterialSaveFeedback, useToolAutoSave } from './use-tool-auto-save';
 import type {
   MindmapRequest,
   QuizRequest,
@@ -20,61 +20,14 @@ import { clientLogger as logger } from '@/lib/logger/client';
 import { escapeHtml } from '@/lib/tools/accessible-print/helpers';
 import type { MindmapNode } from '@/types/tools';
 
-// Auto-save utilities
-function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {
-  autoSaveMaterial(
-    'mindmap',
-    request.title,
-    { nodes: request.nodes },
-    { subject: 'general', toolId },
-  );
-}
-
-function autoSaveQuiz(request: QuizRequest, toolId?: string): void {
-  autoSaveMaterial(
+// Auto-save wrapper components
+export function AutoSaveQuiz({ request, toolId }: { request: QuizRequest; toolId?: string }) {
+  useToolAutoSave(
     'quiz',
     request.title,
     { questions: request.questions },
     { subject: request.subject, toolId },
   );
-}
-
-function autoSaveFlashcards(request: FlashcardDeckRequest, toolId?: string): void {
-  autoSaveMaterial(
-    'flashcard',
-    request.name,
-    { cards: request.cards },
-    { subject: request.subject, toolId },
-  );
-}
-
-function autoSaveSummary(request: SummaryData, toolId?: string): void {
-  autoSaveMaterial(
-    'summary',
-    request.topic,
-    { sections: request.sections, length: request.length },
-    { subject: 'general', toolId },
-  );
-}
-
-function autoSaveDemo(request: DemoData, toolId?: string): void {
-  autoSaveMaterial(
-    'demo',
-    request.title,
-    { html: request.html, css: request.css, js: request.js, description: request.description },
-    { subject: 'general', toolId },
-  );
-}
-
-// Auto-save wrapper components
-export function AutoSaveQuiz({ request, toolId }: { request: QuizRequest; toolId?: string }) {
-  const savedRef = useRef(false);
-  useEffect(() => {
-    if (!savedRef.current) {
-      savedRef.current = true;
-      autoSaveQuiz(request, toolId);
-    }
-  }, [request, toolId]);
   return <QuizTool request={request} />;
 }
 
@@ -85,13 +38,12 @@ export function AutoSaveFlashcard({
   request: FlashcardDeckRequest;
   toolId?: string;
 }) {
-  const savedRef = useRef(false);
-  useEffect(() => {
-    if (!savedRef.current) {
-      savedRef.current = true;
-      autoSaveFlashcards(request, toolId);
-    }
-  }, [request, toolId]);
+  useToolAutoSave(
+    'flashcard',
+    request.name,
+    { cards: request.cards },
+    { subject: request.subject, toolId },
+  );
   return <FlashcardTool request={request} />;
 }
 
@@ -104,27 +56,26 @@ export function AutoSaveMindmap({
   sessionId?: string | null;
   toolId?: string;
 }) {
-  const savedRef = useRef(false);
-  useEffect(() => {
-    if (!savedRef.current) {
-      savedRef.current = true;
-      autoSaveMindmap(request, toolId);
-    }
-  }, [request, toolId]);
+  useToolAutoSave(
+    'mindmap',
+    request.title,
+    { nodes: request.nodes },
+    { subject: 'general', toolId },
+  );
   return (
     <LiveMindmap sessionId={sessionId ?? null} title={request.title} initialNodes={request.nodes} />
   );
 }
 
 export function AutoSaveSummary({ request, toolId }: { request: SummaryData; toolId?: string }) {
-  const savedRef = useRef(false);
-
-  useEffect(() => {
-    if (!savedRef.current) {
-      savedRef.current = true;
-      autoSaveSummary(request, toolId);
-    }
-  }, [request, toolId]);
+  useToolAutoSave(
+    'summary',
+    request.topic,
+    { sections: request.sections, length: request.length },
+    { subject: 'general', toolId },
+  );
+  const save = useMaterialSaveFeedback();
+  const t = useTranslations('tools.summary');
 
   // PDF export
   const handleExportPdf = useCallback((data: SummaryData) => {
@@ -185,80 +136,80 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
   }, []);
 
   // Convert to mindmap
-  const handleConvertToMindmap = useCallback((data: SummaryData) => {
-    const nodes: MindmapNode[] = [];
+  const handleConvertToMindmap = useCallback(
+    (data: SummaryData) => {
+      const nodes: MindmapNode[] = [];
 
-    nodes.push({ id: 'root', label: data.topic });
+      nodes.push({ id: 'root', label: data.topic });
 
-    data.sections.forEach((section, i) => {
-      const sectionId = `section-${i}`;
-      nodes.push({ id: sectionId, label: section.title, parentId: 'root' });
+      data.sections.forEach((section, i) => {
+        const sectionId = `section-${i}`;
+        nodes.push({ id: sectionId, label: section.title, parentId: 'root' });
 
-      const contentParts = section.content.split(/[.!?]\s+/).filter((s) => s.trim().length > 5);
-      contentParts.slice(0, 3).forEach((part, j) => {
-        const label = part.length > 50 ? part.substring(0, 47) + '...' : part;
-        nodes.push({ id: `${sectionId}-content-${j}`, label, parentId: sectionId });
+        const contentParts = section.content.split(/[.!?]\s+/).filter((s) => s.trim().length > 5);
+        contentParts.slice(0, 3).forEach((part, j) => {
+          const label = part.length > 50 ? part.substring(0, 47) + '...' : part;
+          nodes.push({ id: `${sectionId}-content-${j}`, label, parentId: sectionId });
+        });
+
+        if (section.keyPoints) {
+          section.keyPoints.slice(0, 3).forEach((kp, j) => {
+            const label = kp.length > 40 ? `★ ${kp.substring(0, 37)}...` : `★ ${kp}`;
+            nodes.push({ id: `${sectionId}-kp-${j}`, label, parentId: sectionId });
+          });
+        }
       });
 
-      if (section.keyPoints) {
-        section.keyPoints.slice(0, 3).forEach((kp, j) => {
-          const label = kp.length > 40 ? `★ ${kp.substring(0, 37)}...` : `★ ${kp}`;
-          nodes.push({ id: `${sectionId}-kp-${j}`, label, parentId: sectionId });
-        });
-      }
-    });
-
-    const mindmapTitle = `Mappa: ${data.topic}`;
-    autoSaveMaterial('mindmap', mindmapTitle, { nodes }, { subject: 'general' });
-
-    toast.success('Mappa mentale salvata nello zaino!');
-    logger.info('[SummaryTool] Converted to mindmap', {
-      topic: data.topic,
-      nodeCount: nodes.length,
-    });
-  }, []);
+      const mindmapTitle = `Mappa: ${data.topic}`;
+      void save(['mindmap', mindmapTitle, { nodes }, { subject: 'general' }], {
+        immediate: true,
+        onSaved: () => toast.success(t('saved')),
+      });
+    },
+    [save, t],
+  );
 
   // Generate flashcards
-  const handleGenerateFlashcards = useCallback((data: SummaryData) => {
-    const cards: Array<{ front: string; back: string }> = [];
+  const handleGenerateFlashcards = useCallback(
+    (data: SummaryData) => {
+      const cards: Array<{ front: string; back: string }> = [];
 
-    data.sections.forEach((section) => {
-      if (section.keyPoints) {
-        section.keyPoints.forEach((kp) => {
-          cards.push({
-            front: `${section.title}: Cosa significa "${kp.length > 30 ? kp.substring(0, 30) + '...' : kp}"?`,
-            back: kp,
+      data.sections.forEach((section) => {
+        if (section.keyPoints) {
+          section.keyPoints.forEach((kp) => {
+            cards.push({
+              front: `${section.title}: Cosa significa "${kp.length > 30 ? kp.substring(0, 30) + '...' : kp}"?`,
+              back: kp,
+            });
           });
-        });
+        }
+
+        if (section.content && section.content.length > 20) {
+          cards.push({
+            front: `${section.title}: Spiega questo concetto`,
+            back:
+              section.content.length > 200
+                ? section.content.substring(0, 200) + '...'
+                : section.content,
+          });
+        }
+      });
+
+      const limitedCards = cards.slice(0, 10);
+
+      if (limitedCards.length === 0) {
+        toast.error('Non ci sono abbastanza contenuti per creare flashcard');
+        return;
       }
 
-      if (section.content && section.content.length > 20) {
-        cards.push({
-          front: `${section.title}: Spiega questo concetto`,
-          back:
-            section.content.length > 200
-              ? section.content.substring(0, 200) + '...'
-              : section.content,
-        });
-      }
-    });
-
-    const limitedCards = cards.slice(0, 10);
-
-    if (limitedCards.length === 0) {
-      toast.error('Non ci sono abbastanza contenuti per creare flashcard');
-      return;
-    }
-
-    const flashcardName = `Flashcard: ${data.topic}`;
-    autoSaveMaterial('flashcard', flashcardName, { cards: limitedCards }, { subject: 'general' });
-
-    toast.success(`${limitedCards.length} flashcard salvate nello zaino!`);
-    logger.info('[SummaryTool] Generated flashcards', {
-      topic: data.topic,
-      cardCount: limitedCards.length,
-    });
-  }, []);
+      const flashcardName = `Flashcard: ${data.topic}`;
+      void save(['flashcard', flashcardName, { cards: limitedCards }, { subject: 'general' }], {
+        immediate: true,
+        onSaved: () => toast.success(t('saved')),
+      });
+    },
+    [save, t],
+  );
 
   return (
     <SummaryTool
@@ -271,12 +222,11 @@ export function AutoSaveSummary({ request, toolId }: { request: SummaryData; too
 }
 
 export function AutoSaveDemo({ request, toolId }: { request: DemoData; toolId?: string }) {
-  const savedRef = useRef(false);
-  useEffect(() => {
-    if (!savedRef.current) {
-      savedRef.current = true;
-      autoSaveDemo(request, toolId);
-    }
-  }, [request, toolId]);
+  useToolAutoSave(
+    'demo',
+    request.title,
+    { html: request.html, css: request.css, js: request.js, description: request.description },
+    { subject: 'general', toolId },
+  );
   return <DemoSandbox data={request} />;
 }

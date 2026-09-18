@@ -69,6 +69,26 @@ beforeEach(() => {
 });
 
 describe('materials collection route — cross-owner mutations are refused', () => {
+  it('POST cannot save a payload prepared by a different session owner', async () => {
+    const response = await POST(
+      jsonCtx(
+        MALLORY,
+        {
+          userId: ALICE,
+          toolId: 'tool-pending-owner-switch',
+          toolType: 'quiz',
+          title: 'Private study notes',
+          content: { questions: [] },
+        },
+        'POST',
+      ) as never,
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({ error: 'Material identity changed' });
+    expect(state.materials.some((m) => m.toolId === 'tool-pending-owner-switch')).toBe(false);
+  });
+
   it('POST upsert cannot overwrite another user material with the same toolId', async () => {
     const response = await POST(
       jsonCtx(
