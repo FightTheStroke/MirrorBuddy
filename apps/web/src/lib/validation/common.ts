@@ -101,6 +101,35 @@ export const Buddy = z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia']);
  * Maestro ID enum (all 17 maestros)
  */
 export const MaestroId = z.enum([
+  'leonardo',
+  'loto',
+  'galileo',
+  'curie',
+  'cicerone',
+  'lovelace',
+  'noether',
+  'austen',
+  'nightingale',
+  'kahlo',
+  'smith',
+  'humboldt',
+  'erodoto',
+  'manzoni',
+  'euclide',
+  'socrate',
+  'ippocrate',
+  'feynman',
+  'chris',
+  'omero',
+  'alex-pina',
+  'mascetti',
+  'simone',
+  'cassese',
+  'moliere',
+  'goethe',
+  'cervantes',
+  'levi-montalcini',
+  // Keep identifiers accepted before the current catalog to preserve saved clients.
   'socrates',
   'leo',
   'ada',
@@ -163,7 +192,7 @@ export function createArraySchema<T extends z.ZodTypeAny>(
     min?: number;
     max?: number;
     errorMessage?: string;
-  } = {}
+  } = {},
 ) {
   let schema = z.array(itemSchema);
 
@@ -183,7 +212,7 @@ export function createArraySchema<T extends z.ZodTypeAny>(
  */
 export function createOptionalArraySchema<T extends z.ZodTypeAny>(
   itemSchema: T,
-  maxItems: number = VALIDATION_LIMITS.SMALL_ARRAY_MAX
+  maxItems: number = VALIDATION_LIMITS.SMALL_ARRAY_MAX,
 ) {
   return z.array(itemSchema).max(maxItems).optional();
 }
