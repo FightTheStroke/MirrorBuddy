@@ -38,6 +38,29 @@ For features that need:
 - Environment-based flags below remain independent; intentionally disabling one
   is not classified as a database outage.
 
+**Acknowledged writer (core, caller migration pending)**:
+
+`policy-writer.ts` provides `prepareWritablePolicy`, `beginFeaturePolicyWrite`
+and `beginGlobalPolicyWrite`. A write returns an optional local activation token
+and a `completion` promise, which callers must await or handle. Restrictive fields
+take effect synchronously; permissive fields wait for database acknowledgement.
+Receipts distinguish `confirmed` from `skipped`, expose supersession and describe
+only this instance's effective policy. Rejection means **unconfirmed**, not a
+guaranteed rollback; local protection remains active.
+
+Writes use per-control queues and field generations. Metadata writes merge only
+supplied keys in a serializable transaction, retrying only Prisma `P2034` conflicts
+at most twice. Automatic release needs the original, still-owned activation token;
+overlapping owners or unknown startup policy require administrative recovery.
+Mixed automatic requests never drop their restrictive part when release is denied.
+Tokens, queues and failed local stops do not survive process restart and do not
+provide ordering across instances.
+
+Existing service/admin/degradation/voice callers still use the legacy API in this
+core-only increment. The new acknowledgement contract must be connected to all of
+them before this work is released. Pure coordinator tests exercise deferred
+acknowledgements; separate PostgreSQL tests exercise real sparse writes and cleanup.
+
 **Built-in Flags**:
 
 - `voice_realtime` - Real-time voice API
