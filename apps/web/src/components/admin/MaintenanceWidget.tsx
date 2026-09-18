@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { csrfFetch } from '@/lib/auth';
+import { useAdminStatus } from '@/lib/hooks/use-admin-status';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -30,6 +31,7 @@ function formatTime(value: string): string {
 
 export function MaintenanceWidget() {
   const t = useTranslations('maintenance');
+  const { isAdmin } = useAdminStatus();
   const [windows, setWindows] = useState<MaintenanceWindow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -127,15 +129,17 @@ export function MaintenanceWidget() {
                 <p className="text-sm text-muted-foreground">
                   {formatTime(windowItem.startTime)} - {formatTime(windowItem.endTime)}
                 </p>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => cancelWindow(windowItem.id)}
-                  disabled={updatingWindowId === windowItem.id}
-                >
-                  {t('admin.cancel')}
-                </Button>
+                {isAdmin && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => cancelWindow(windowItem.id)}
+                    disabled={updatingWindowId === windowItem.id}
+                  >
+                    {t('admin.cancel')}
+                  </Button>
+                )}
               </div>
             ))}
           </section>
@@ -150,15 +154,17 @@ export function MaintenanceWidget() {
                 <p className="text-sm text-muted-foreground">
                   {formatTime(windowItem.startTime)} - {formatTime(windowItem.endTime)}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => cancelWindow(windowItem.id)}
-                  disabled={updatingWindowId === windowItem.id}
-                >
-                  {t('admin.cancel')}
-                </Button>
+                {isAdmin && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => cancelWindow(windowItem.id)}
+                    disabled={updatingWindowId === windowItem.id}
+                  >
+                    {t('admin.cancel')}
+                  </Button>
+                )}
               </div>
             ))}
           </section>

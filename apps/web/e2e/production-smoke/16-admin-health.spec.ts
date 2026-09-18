@@ -78,7 +78,14 @@ test.describe('PROD-SMOKE: Admin Health', () => {
 
     const body = (await page.textContent('body')) || '';
     expect(body).toMatch(/healthy|degraded|down|unknown/i);
-    await expect(page.getByRole('dialog')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /conferma/i })).toHaveCount(0);
+    // A legitimate consent dialog can be present for this fresh browser session.
+    await expect(
+      page.getByRole('dialog', { name: /^(attiva|disattiva|activate|deactivate)/i }),
+    ).toHaveCount(0);
+    await expect(
+      page.locator('main button').filter({
+        hasText: /^\s*(attiva|disattiva|activate|deactivate|annulla|cancel|conferma|confirm)\b/i,
+      }),
+    ).toHaveCount(0);
   });
 });

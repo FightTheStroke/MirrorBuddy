@@ -44,6 +44,10 @@ const t = await getTranslations('ns');
 - `<Dialog>` (NOT `window.confirm`/`alert`) for destructive ops.
 - `toast()` from sonner for feedback.
 - Zod + react-hook-form for validation.
+- Maintenance status remains readable by `ADMIN_READONLY`; mutation controls use
+  `useAdminStatus()` and appear only for an authenticated `ADMIN`.
+- Check maintenance dialogs specifically in smoke tests: a fresh admin browser
+  may legitimately display the consent dialog, which must not be bypassed.
 
 ## CSP
 

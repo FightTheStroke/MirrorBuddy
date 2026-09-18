@@ -2,12 +2,20 @@
  * @vitest-environment jsdom
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getTranslation } from '@/test/i18n-helpers';
+import { setClientIdentity } from '@/lib/auth';
 import { MaintenanceTogglePanel } from '../MaintenanceTogglePanel';
 
 const mockCsrfFetch = vi.fn();
+const adminIdentity = {
+  status: 'authenticated',
+  userId: 'maintenance-admin',
+  role: 'ADMIN',
+  legacyOrigin: false,
+  needsLegacyUpgrade: false,
+} as const;
 
 vi.mock('@/lib/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/auth')>();
@@ -25,6 +33,7 @@ vi.mock('next-intl', () => ({
 describe('MaintenanceTogglePanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setClientIdentity(adminIdentity);
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () =>
@@ -33,6 +42,40 @@ describe('MaintenanceTogglePanel', () => {
           data: [],
         }),
     }) as typeof fetch;
+  });
+
+  afterEach(() => act(() => setClientIdentity({ status: 'pending' })));
+
+  it.each(['ADMIN_READONLY', 'USER'] as const)('does not offer mutations to %s', async (role) => {
+    setClientIdentity({ ...adminIdentity, role });
+    render(<MaintenanceTogglePanel />);
+    await screen.findByText(getTranslation('maintenance.admin.inactive'));
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(mockCsrfFetch).not.toHaveBeenCalled();
+  });
+
+  it('keeps actions unavailable until identity is authenticated', async () => {
+    setClientIdentity({ status: 'pending' });
+    render(<MaintenanceTogglePanel />);
+    await screen.findByText(getTranslation('maintenance.admin.inactive'));
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    act(() => setClientIdentity({ status: 'unavailable', reason: 'network' }));
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('removes an open confirmation when administrator authority is lost', async () => {
+    render(<MaintenanceTogglePanel />);
+    const toggle = await screen.findByRole('button', {
+      name: getTranslation('maintenance.admin.activate'),
+    });
+    await waitFor(() => expect(toggle).toBeEnabled());
+    fireEvent.click(toggle);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    act(() => setClientIdentity({ ...adminIdentity, role: 'ADMIN_READONLY' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(mockCsrfFetch).not.toHaveBeenCalled();
   });
 
   it('renders inactive status and opens confirmation dialog before toggle', async () => {

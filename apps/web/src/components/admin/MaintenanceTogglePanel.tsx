@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { csrfFetch } from '@/lib/auth';
+import { useAdminStatus } from '@/lib/hooks/use-admin-status';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,7 @@ type MaintenanceResponse = {
 
 export function MaintenanceTogglePanel() {
   const t = useTranslations('maintenance');
+  const { isAdmin } = useAdminStatus();
   const [windows, setWindows] = useState<MaintenanceWindow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -112,14 +114,16 @@ export function MaintenanceTogglePanel() {
               {isLoading ? '...' : isActive ? t('admin.active') : t('admin.inactive')}
             </p>
           </div>
-          <Button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            disabled={isLoading || isSubmitting}
-            variant={isActive ? 'destructive' : 'default'}
-          >
-            {toggleLabel}
-          </Button>
+          {isAdmin && (
+            <Button
+              type="button"
+              onClick={() => setIsOpen(true)}
+              disabled={isLoading || isSubmitting}
+              variant={isActive ? 'destructive' : 'default'}
+            >
+              {toggleLabel}
+            </Button>
+          )}
         </div>
 
         {error ? (
@@ -128,27 +132,29 @@ export function MaintenanceTogglePanel() {
           </p>
         ) : null}
 
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{toggleLabel}</DialogTitle>
-              <DialogDescription>{confirmText}</DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                {t('admin.cancel')}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleConfirmToggle}
-                disabled={isSubmitting}
-                variant={isActive ? 'destructive' : 'default'}
-              >
-                {t('admin.confirmCancel')}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {isAdmin && (
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{toggleLabel}</DialogTitle>
+                <DialogDescription>{confirmText}</DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                  {t('admin.cancel')}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleConfirmToggle}
+                  disabled={isSubmitting}
+                  variant={isActive ? 'destructive' : 'default'}
+                >
+                  {t('admin.confirmCancel')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
       </CardContent>
     </Card>
   );
