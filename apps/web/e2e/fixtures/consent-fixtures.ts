@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks -- Playwright fixture callbacks, not React hooks. */
-import { randomUUID } from 'crypto';
+import { randomInt, randomUUID } from 'crypto';
 import { test as base, expect, type Page } from '@playwright/test';
 import { createE2ETestUser } from '../helpers/e2e-user-factory';
 import { getPrismaClient, disconnectPrisma } from '../helpers/prisma-setup';
 import { hashPassword } from '../../src/lib/auth/password';
+import { VISITOR_COOKIE_NAME, validateVisitorId } from '../../src/lib/auth/cookie-constants';
 
 interface ConsentFixtures {
   guestPage: Page;
@@ -31,14 +32,35 @@ function requireLocalRuntime(baseURL: string | undefined) {
 export const test = base.extend<ConsentFixtures>({
   guestPage: async ({ browser, baseURL }, use) => {
     requireLocalRuntime(baseURL);
+    // Distinct local test clients must not inherit another visitor's real IP budget.
+    const testIp = `2001:db8:${Array.from({ length: 6 }, () =>
+      randomInt(0, 65_536).toString(16),
+    ).join(':')}`;
     const context = await browser.newContext({
       baseURL,
       storageState: { cookies: [], origins: [] },
+      extraHTTPHeaders: { 'x-forwarded-for': testIp },
     });
     try {
       await use(await context.newPage());
     } finally {
-      await context.close();
+      try {
+        const visitor = (await context.cookies()).find(
+          (cookie) => cookie.name === VISITOR_COOKIE_NAME,
+        );
+        const visitorId = validateVisitorId(visitor?.value);
+        if (visitorId) {
+          const prisma = getPrismaClient();
+          await prisma.trialSession.deleteMany({ where: { visitorId } });
+          expect(await prisma.trialSession.count({ where: { visitorId } })).toBe(0);
+        }
+      } finally {
+        try {
+          await context.close();
+        } finally {
+          await disconnectPrisma();
+        }
+      }
     }
   },
   accountPage: async ({ browser, baseURL }, use) => {
