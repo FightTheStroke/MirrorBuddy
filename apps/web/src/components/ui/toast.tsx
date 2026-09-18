@@ -22,7 +22,7 @@ export interface Toast {
 
 interface ToastState {
   toasts: Toast[];
-  addToast: (toast: Omit<Toast, 'id'>) => void;
+  addToast: (toast: Omit<Toast, 'id'>) => string;
   removeToast: (id: string) => void;
 }
 
@@ -57,6 +57,7 @@ function initToastState(): ToastState {
         // toast is hovered or keyboard-focused (WCAG 2.2.1 Timing Adjustable) — a
         // fire-and-forget setTimeout here could not be paused, cutting off slow
         // readers (dyslexia) and motor users before they finish reading.
+        return id;
       },
       removeToast: (id) => {
         toastState!.toasts = toastState!.toasts.filter((t) => t.id !== id);
@@ -73,7 +74,7 @@ export const toast = {
     initToastState().addToast({ type: 'success', title, message, ...options });
   },
   error: (title: string, message?: string, options?: Partial<Toast>) => {
-    initToastState().addToast({ type: 'error', title, message, duration: 8000, ...options });
+    return initToastState().addToast({ type: 'error', title, message, duration: 8000, ...options });
   },
   info: (title: string, message?: string, options?: Partial<Toast>) => {
     initToastState().addToast({ type: 'info', title, message, ...options });

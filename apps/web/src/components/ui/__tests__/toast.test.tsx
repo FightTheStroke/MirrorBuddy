@@ -6,14 +6,29 @@
  * while the toast is hovered or keyboard-focused so they can keep it on screen.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import { act, render, screen, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
 import { ToastContainer, toast } from '../toast';
 
 afterEach(() => {
-  toast.dismissAll();
+  act(() => toast.dismissAll());
 });
 
 describe('toast auto-dismiss (WCAG 2.2.1)', () => {
+  it('returns an error identifier so a recovered save dismisses only its own warning', async () => {
+    render(<ToastContainer />);
+    let id = '';
+    act(() => {
+      toast.info('Keep this message', undefined, { duration: 0 });
+      id = toast.error('Save failed', undefined, { duration: 0 });
+    });
+    expect(await screen.findByText('Save failed')).toBeInTheDocument();
+    expect(id).toEqual(expect.any(String));
+    const removed = waitForElementToBeRemoved(() => screen.queryByText('Save failed'));
+    act(() => toast.dismiss(id));
+    await removed;
+    expect(screen.getByText('Keep this message')).toBeInTheDocument();
+  });
+
   it('auto-dismisses after its duration', async () => {
     render(<ToastContainer />);
     toast.info('Salvato', 'I tuoi compiti sono al sicuro', { duration: 200 });
