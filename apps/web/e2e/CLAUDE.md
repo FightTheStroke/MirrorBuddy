@@ -45,6 +45,11 @@ registered E2E user. Consequences:
 
 `e2e/global-setup.ts` checks `NODE_ENV` — E2E blocked in production. NO workarounds.
 
+Real consent journeys use `consent-fixtures.ts`: each guest gets a distinct
+documentation-range IP in the guarded local runtime, with empty initial cookies.
+The real trial ownership/anti-abuse checks stay enabled; cleanup targets only that
+browser's validated visitor ID. Do not reuse localhost's shared trial budget.
+
 ## Adding a new wall
 
 1. Update `e2e/global-setup.ts` localStorage array.
