@@ -15,6 +15,29 @@ For features that need:
 - Admin UI management
 - Persistent state across restarts
 
+**Read recovery and local controls**:
+
+- Startup initializes database policy without blocking application startup.
+  Before the first successful load, checks retain the existing compiled defaults.
+- Active reads retry a failed startup or explicit reload after 5 seconds.
+  Successful loads stop automatic retries; external changes require `reloadFlags()`.
+  One in-flight load is shared per instance; there is no background
+  interval. The triggering read uses the current snapshot, while Vercel
+  `waitUntil` keeps the refresh alive after the request finishes.
+- A complete database snapshot replaces the cache atomically. Failed or partial
+  reads retain the last successfully loaded policy, including global and individual
+  kill switches. Idle instances retry on their next active read, not on a timer.
+- Explicitly changed local fields overlay the database snapshot for the life of
+  the process, so a reload cannot revoke an immediate local stop. Metadata-only
+  updates do not mask database kill switches. A later local command can replace
+  an override; an external edit to that same field cannot.
+- Administrative and automatic controls retain their existing optimistic write
+  semantics. A failed write is logged but can protect only this process; it is not
+  durable across restart. Reliable write acknowledgements and cross-instance
+  convergence are separate work, not guarantees of read recovery.
+- Environment-based flags below remain independent; intentionally disabling one
+  is not classified as a database outage.
+
 **Built-in Flags**:
 
 - `voice_realtime` - Real-time voice API
