@@ -25,17 +25,23 @@ describe('generated material titles in the public tool renderer', () => {
   beforeEach(() => vi.clearAllMocks());
   afterEach(cleanup);
 
-  it.each([
-    { type: 'quiz' as const, key: 'title', content: { questions: [] } },
-    { type: 'flashcard' as const, key: 'name', content: { cards: [{ front: '2+2', back: '4' }] } },
-  ])('passes the $type handler topic through to the save title', ({ type, key, content }) => {
+  it.each(
+    [
+      { type: 'quiz' as const, key: 'title', content: { questions: [] } },
+      {
+        type: 'flashcard' as const,
+        key: 'name',
+        content: { cards: [{ front: '2+2', back: '4' }] },
+      },
+    ].flatMap((tool) => [undefined, '', ' \t\n '].map((title) => ({ ...tool, title }))),
+  )('uses the $type topic when its title is $title', ({ type, key, content, title }) => {
     const toolCall: ToolCall = {
       id: `generated-${type}`,
       name: `create_${type}`,
       type,
       status: 'completed',
       arguments: {},
-      result: { success: true, data: { topic: 'Fractions', ...content } },
+      result: { success: true, data: { topic: 'Fractions', [key]: title, ...content } },
     };
 
     render(<ToolContent toolCall={toolCall} />);

@@ -173,4 +173,49 @@ describe('SSE subscription lifecycle', () => {
     expect(result.current.connectionState).toBe('error');
     expect(onError).toHaveBeenCalledExactlyOnceWith(new Error('Max reconnect attempts reached'));
   });
+
+  it('does not apply the same mindmap event twice', () => {
+    const onAddNode = vi.fn();
+    renderHook(() => useMindmapModifications({ sessionId: 'mindmap', callbacks: { onAddNode } }));
+    const event = new MessageEvent('message', {
+      data: JSON.stringify({
+        id: 'operation-1',
+        type: 'mindmap:modify',
+        sessionId: 'mindmap',
+        data: { command: 'mindmap_add_node', args: { concept: 'Fractions' } },
+      }),
+    });
+    act(() => {
+      MockEventSource.instances[0].onmessage?.(event);
+      MockEventSource.instances[0].onmessage?.(event);
+    });
+    expect(onAddNode).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores mindmap modifications addressed to another session', () => {
+    const onAddNode = vi.fn();
+    renderHook(() => useMindmapModifications({ sessionId: 'mindmap', callbacks: { onAddNode } }));
+    act(() =>
+      MockEventSource.instances[0].onmessage?.(
+        new MessageEvent('message', {
+          data: JSON.stringify({
+            id: 'operation-other',
+            type: 'mindmap:modify',
+            sessionId: 'another-session',
+            data: { command: 'mindmap_add_node', args: { concept: 'Fractions' } },
+          }),
+        }),
+      ),
+    );
+    expect(onAddNode).not.toHaveBeenCalled();
+  });
+
+  it('bounds automatic mindmap retries after repeated connection failures', () => {
+    renderHook(() => useMindmapModifications({ sessionId: 'mindmap', callbacks: {} }));
+    for (let attempt = 0; attempt < 10; attempt++) {
+      act(() => MockEventSource.instances.at(-1)?.fail());
+      act(() => vi.advanceTimersByTime(30_000));
+    }
+    expect(MockEventSource.instances.length).toBeLessThanOrEqual(6);
+  });
 });

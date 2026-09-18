@@ -20,6 +20,8 @@ import {
 import { getCorsHeaders } from '@/lib/security';
 import { VISITOR_COOKIE_NAME, validateVisitorId } from '@/lib/auth/server';
 import { pipe, withSentry } from '@/lib/api/middlewares';
+import { withMindmapErrors } from '@/lib/mindmap/http';
+import { mindmapSnapshotStream } from '@/lib/mindmap/snapshot-stream';
 
 // Generate unique client ID
 
@@ -100,8 +102,12 @@ async function verifySessionOwnershipForSSE(sessionId: string): Promise<NextResp
  * - tool:error - Error occurred
  * - :heartbeat - Keep-alive ping (every 30s)
  */
-export const GET = pipe(withSentry('/api/tools/stream'))(async (ctx) => {
+export const GET = pipe(
+  withSentry('/api/tools/stream'),
+  withMindmapErrors,
+)(async (ctx) => {
   const { searchParams } = new URL(ctx.req.url);
+  if (searchParams.has('toolId')) return mindmapSnapshotStream(ctx.req);
   const sessionId = searchParams.get('sessionId');
 
   // Validate session ID

@@ -7,8 +7,8 @@
 import { NextResponse } from 'next/server';
 import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
 import { logger } from '@/lib/logger';
-import { CreateMaterialRequest, UpdateMaterialRequest } from './types';
-import { VALID_MATERIAL_TYPES } from './constants';
+import { UpdateMaterialRequest } from './types';
+import { CreateMaterialSchema } from '@/lib/validation/schemas/materials';
 import { getMaterialsList, buildUpdateData, updateMaterialTags } from './helpers';
 import {
   findOwnedMaterial,
@@ -58,30 +58,21 @@ export const POST = pipe(
 )(async (ctx) => {
   const userId = ctx.userId!;
 
-  const body: CreateMaterialRequest = await ctx.req.json();
-  const { toolId, toolType, title, content } = body;
-
-  if (!toolId || !toolType || !title || !content) {
-    return NextResponse.json(
-      {
-        error: 'Missing required fields',
-        required: ['toolId', 'toolType', 'title', 'content'],
-      },
-      { status: 400 },
-    );
+  const body: unknown = await ctx.req.json();
+  const validation = CreateMaterialSchema.safeParse(body);
+  if (!validation.success) {
+    logger.warn('Invalid material input', {
+      fields: validation.error.issues.map((issue) => issue.path.join('.')),
+    });
+    return NextResponse.json({ error: 'Missing or invalid material fields' }, { status: 400 });
   }
 
-  if (!VALID_MATERIAL_TYPES.includes(toolType)) {
-    return NextResponse.json(
-      {
-        error: 'Invalid tool type',
-        validTypes: VALID_MATERIAL_TYPES,
-      },
-      { status: 400 },
-    );
+  if (validation.data.userId !== undefined && validation.data.userId !== userId) {
+    logger.warn('Material save rejected after identity change');
+    return NextResponse.json({ error: 'Material identity changed' }, { status: 403 });
   }
 
-  return saveOwnedMaterial(userId, body);
+  return saveOwnedMaterial(userId, validation.data);
 });
 
 /**

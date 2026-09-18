@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Serialize study-material autosaves and settle every caller with the actual result;
+  retain edits during active saves, wait for identity readiness, and offer localized
+  retries without crossing accounts or overwriting newer revisions.
+- Flush queued material saves when leaving a tool, warn before leaving a page with
+  pending saves, and reject missing or invalid material fields before database writes.
 - Preserve workspace dependencies and pnpm configuration in Docker builds, and
   require Docker validation before merging configuration-changing pull requests.
 - Preserve generated quiz and flashcard titles when saving chat tool results.

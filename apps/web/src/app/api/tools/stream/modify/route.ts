@@ -25,7 +25,9 @@ import {
 } from '@/lib/rate-limit';
 import { VISITOR_COOKIE_NAME } from '@/lib/auth/server';
 import { validateVisitorId } from '@/lib/auth';
-
+import { z } from 'zod';
+import { withMindmapErrors } from '@/lib/mindmap/http';
+import { mindmapCommand } from '@/lib/mindmap/command-http';
 
 export const revalidate = 0;
 interface ModifyRequest {
@@ -69,8 +71,20 @@ const isValidCommand = <T extends string>(
 export const POST = pipe(
   withSentry('/api/tools/stream/modify'),
   withCSRF,
+  withMindmapErrors,
 )(async (ctx) => {
-  const body: ModifyRequest = await ctx.req.json();
+  const raw = z.record(z.string(), z.unknown()).parse(await ctx.req.json());
+  if (raw.toolType === undefined || raw.toolType === 'mindmap') {
+    return mindmapCommand(ctx.req, raw);
+  }
+  const body: ModifyRequest = z
+    .object({
+      sessionId: z.string(),
+      toolType: z.enum(['summary', 'student_summary']),
+      command: z.string(),
+      args: z.record(z.string(), z.unknown()),
+    })
+    .parse(raw);
   const { sessionId, command, args } = body;
   const toolType = body.toolType ?? 'mindmap';
 
