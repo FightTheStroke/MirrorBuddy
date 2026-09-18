@@ -14,9 +14,16 @@ import {
 } from '@/lib/realtime/tool-events';
 import { logger } from '@/lib/logger';
 import { validateAuth, validateSessionOwnership } from '@/lib/auth/server';
+import { pipe, withSentry } from '@/lib/api/middlewares';
+import { withMindmapErrors } from '@/lib/mindmap/http';
+import { mindmapSnapshotStream } from '@/lib/mindmap/snapshot-stream';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+const authenticatedMindmapStream = pipe(
+  withSentry('/api/tools/sse'),
+  withMindmapErrors,
+)(({ req }) => mindmapSnapshotStream(req, false));
 
 /**
  * GET /api/tools/sse
@@ -34,6 +41,7 @@ export const dynamic = 'force-dynamic';
  */
 
 export async function GET(request: NextRequest) {
+  if (new URL(request.url).searchParams.has('toolId')) return authenticatedMindmapStream(request);
   try {
     // #86: Authentication check - SSE requires authenticated user
     const auth = await validateAuth();

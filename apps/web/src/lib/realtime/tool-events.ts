@@ -4,28 +4,28 @@
 // Used by Maestri to build tools in real-time while student watches
 // ============================================================================
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 // Tool event types that can be broadcast
 export type ToolEventType =
-  | "tool:created" // New tool started
-  | "tool:update" // Incremental update (content chunk)
-  | "tool:complete" // Tool finished building
-  | "tool:error" // Error during creation
-  | "tool:cancelled" // User cancelled
-  | "mindmap:modify" // Mindmap modification command (Phase 7)
-  | "summary:modify" // Summary modification command (Issue #70)
-  | "student_summary:modify"; // Student summary collaboration updates
+  | 'tool:created' // New tool started
+  | 'tool:update' // Incremental update (content chunk)
+  | 'tool:complete' // Tool finished building
+  | 'tool:error' // Error during creation
+  | 'tool:cancelled' // User cancelled
+  | 'mindmap:modify' // Mindmap modification command (Phase 7)
+  | 'summary:modify' // Summary modification command (Issue #70)
+  | 'student_summary:modify'; // Student summary collaboration updates
 
 // Tool types supported by the platform
 export type ToolType =
-  | "mindmap"
-  | "flashcard"
-  | "quiz"
-  | "summary"
-  | "timeline"
-  | "diagram"
-  | "demo";
+  | 'mindmap'
+  | 'flashcard'
+  | 'quiz'
+  | 'summary'
+  | 'timeline'
+  | 'diagram'
+  | 'demo';
 
 // Event payload structure
 export interface ToolEvent {
@@ -49,45 +49,43 @@ export interface ToolEventData {
 
   // For 'tool:complete'
   content?: unknown;
+  revision?: number;
 
   // For 'tool:error'
   error?: string;
 
   // For 'mindmap:modify' (Phase 7: Voice Commands)
-  command?:
-    | MindmapModifyCommand
-    | SummaryModifyCommand
-    | StudentSummaryModifyCommand;
+  command?: MindmapModifyCommand | SummaryModifyCommand | StudentSummaryModifyCommand;
   args?: Record<string, unknown>;
 }
 
 // Mindmap modification commands (Phase 7: Voice Commands)
 export type MindmapModifyCommand =
-  | "mindmap_add_node"
-  | "mindmap_connect_nodes"
-  | "mindmap_expand_node"
-  | "mindmap_delete_node"
-  | "mindmap_focus_node"
-  | "mindmap_set_color";
+  | 'mindmap_add_node'
+  | 'mindmap_connect_nodes'
+  | 'mindmap_expand_node'
+  | 'mindmap_delete_node'
+  | 'mindmap_focus_node'
+  | 'mindmap_set_color';
 
 // Summary modification commands (Issue #70)
 export type SummaryModifyCommand =
-  | "summary_set_title"
-  | "summary_add_section"
-  | "summary_update_section"
-  | "summary_delete_section"
-  | "summary_add_point"
-  | "summary_delete_point"
-  | "summary_finalize";
+  | 'summary_set_title'
+  | 'summary_add_section'
+  | 'summary_update_section'
+  | 'summary_delete_section'
+  | 'summary_add_point'
+  | 'summary_delete_point'
+  | 'summary_finalize';
 
 // Student summary collaboration commands
 export type StudentSummaryModifyCommand =
-  | "student_summary_add_comment"
-  | "student_summary_remove_comment"
-  | "student_summary_update_content"
-  | "student_summary_request_content"
-  | "student_summary_save"
-  | "student_summary_complete";
+  | 'student_summary_add_comment'
+  | 'student_summary_remove_comment'
+  | 'student_summary_update_content'
+  | 'student_summary_request_content'
+  | 'student_summary_save'
+  | 'student_summary_complete';
 
 // Connected SSE client
 interface SSEClient {
@@ -122,7 +120,7 @@ export function registerClient(
     createdAt: Date.now(),
   });
 
-  logger.info("SSE client registered", {
+  logger.info('SSE client registered', {
     clientId,
     sessionId,
     totalClients: clients.size,
@@ -136,7 +134,7 @@ export function unregisterClient(clientId: string): void {
   const client = clients.get(clientId);
   if (client) {
     clients.delete(clientId);
-    logger.info("SSE client unregistered", {
+    logger.info('SSE client unregistered', {
       clientId,
       sessionId: client.sessionId,
       totalClients: clients.size,
@@ -161,7 +159,7 @@ export function broadcastToolEvent(event: ToolEvent): void {
         deliveredCount++;
       } catch (error) {
         // Client likely disconnected
-        logger.warn("Failed to send to SSE client", {
+        logger.warn('Failed to send to SSE client', {
           clientId: client.id,
           error: String(error),
         });
@@ -170,7 +168,7 @@ export function broadcastToolEvent(event: ToolEvent): void {
     }
   });
 
-  logger.debug("Tool event broadcast", {
+  logger.debug('Tool event broadcast', {
     eventType: event.type,
     toolType: event.toolType,
     sessionId: event.sessionId,
@@ -233,7 +231,7 @@ export function cleanupStaleClients(): number {
   });
 
   if (cleanedCount > 0) {
-    logger.info("Cleaned up stale SSE clients", { cleanedCount });
+    logger.info('Cleaned up stale SSE clients', { cleanedCount });
   }
 
   return cleanedCount;

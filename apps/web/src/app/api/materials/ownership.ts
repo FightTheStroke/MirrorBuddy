@@ -17,6 +17,7 @@ import { logger } from '@/lib/logger';
 import { generateSearchableText } from '@/lib/search/searchable-text';
 import type { ToolType } from '@/types/tools';
 import type { CreateMaterialRequest } from './types';
+import { legacyMaterialWhere, assertLegacyMaterialWritable } from '@/lib/mindmap/write-guard';
 
 export const MATERIAL_NOT_FOUND = 'Material not found';
 
@@ -66,11 +67,14 @@ export async function updateOwnedMaterial(
 ): Promise<Material | null> {
   try {
     return await prisma.material.update({
-      where: { toolId, userId },
+      where: legacyMaterialWhere(toolId, userId, data),
       data: data as Prisma.MaterialUpdateInput,
     });
   } catch (error) {
-    if (isRecordNotFound(error)) return null;
+    if (isRecordNotFound(error)) {
+      await assertLegacyMaterialWritable(toolId, userId, data);
+      return null;
+    }
     throw error;
   }
 }
@@ -82,12 +86,15 @@ export async function updateOwnedMaterialWithRelations(
 ): Promise<MaterialWithRelations | null> {
   try {
     return await prisma.material.update({
-      where: { toolId, userId },
+      where: legacyMaterialWhere(toolId, userId, data),
       data: data as Prisma.MaterialUpdateInput,
       include: MATERIAL_RELATIONS,
     });
   } catch (error) {
-    if (isRecordNotFound(error)) return null;
+    if (isRecordNotFound(error)) {
+      await assertLegacyMaterialWritable(toolId, userId, data);
+      return null;
+    }
     throw error;
   }
 }

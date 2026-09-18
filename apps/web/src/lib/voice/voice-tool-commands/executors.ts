@@ -7,16 +7,23 @@
  * Related: #25 Voice-First Tool Creation
  */
 
-import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth";
-import { executeOnboardingTool } from "../onboarding-tools/tool-handlers";
+import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth';
+import { executeOnboardingTool } from '../onboarding-tools/tool-handlers';
 import {
   isMindmapModificationCommand,
   isSummaryModificationCommand,
   isOnboardingCommand,
   getToolTypeFromName,
-} from "./helpers";
-import type { VoiceToolCallResult } from "./types";
+} from './helpers';
+import type { VoiceToolCallResult, VoiceToolExecutionContext } from './types';
+import { outcomeSchema, identitySchema } from '@/lib/mindmap/protocol';
+import { z } from 'zod';
+
+const focusOutcome = outcomeSchema.extend({
+  focus: z.object({ nodeId: z.string(), label: z.string() }).optional(),
+});
+const createdMap = identitySchema.extend({ revision: z.number().int().nonnegative() });
 
 // ============================================================================
 // TOOL EXECUTION API
@@ -31,10 +38,11 @@ export async function executeVoiceTool(
   maestroId: string,
   toolName: string,
   args: Record<string, unknown>,
+  context?: VoiceToolExecutionContext,
 ): Promise<VoiceToolCallResult> {
   // Check for mindmap modification commands first
   if (isMindmapModificationCommand(toolName)) {
-    return executeMindmapModification(sessionId, toolName, args);
+    return executeMindmapModification(sessionId, toolName, args, context);
   }
 
   // Check for summary modification commands
@@ -53,17 +61,20 @@ export async function executeVoiceTool(
   if (!toolType) {
     return { success: true, displayed: false };
   }
+  if (toolType === 'mindmap' && !context?.operationId)
+    return { success: false, error: 'mindmap_operation_required' };
 
   try {
     // Call the API to create the tool and broadcast events
     // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
-    const response = await csrfFetch("/api/tools/create", {
-      method: "POST",
+    const response = await csrfFetch('/api/tools/create', {
+      method: 'POST',
       body: JSON.stringify({
         sessionId,
+        ...(toolType === 'mindmap' ? { toolId: context?.operationId } : {}),
         maestroId,
         toolType,
-        title: args.title || args.name || "Untitled",
+        title: args.title || args.name || 'Untitled',
         subject: args.subject,
         content: args,
       }),
@@ -73,46 +84,52 @@ export async function executeVoiceTool(
       const error = await response.json();
       return {
         success: false,
-        error: error.message || "Failed to create tool",
+        error: error.error || error.message || 'Failed to create tool',
       };
     }
 
     const result = await response.json();
+    const identity = toolType === 'mindmap' ? createdMap.parse(result) : undefined;
+    if (identity && (identity.toolId !== context?.operationId || identity.sessionId !== sessionId))
+      throw new Error('Mindmap response identity mismatch');
     return {
       success: true,
       toolId: result.toolId,
       toolType,
       displayed: true,
+      ...identity,
     };
   } catch (error) {
-    logger.error(
-      "[VoiceToolCommands] Failed to execute tool",
-      undefined,
-      error,
-    );
+    logger.error('[VoiceToolCommands] Failed to execute tool', undefined, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
 
 /**
- * Execute a mindmap modification command via SSE broadcast.
- * These commands modify an existing mindmap in real-time.
+ * Commit against the explicitly selected map. Never retry ambiguous delivery here.
  */
 export async function executeMindmapModification(
-  sessionId: string,
+  _sessionId: string,
   commandName: string,
   args: Record<string, unknown>,
+  context?: VoiceToolExecutionContext,
 ): Promise<VoiceToolCallResult> {
+  if (!context?.activeMindmap || !context.operationId)
+    return { success: false, error: 'active_mindmap_required' };
+  const active = context.activeMindmap;
   try {
     // Send modification event to SSE endpoint
     // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
-    const response = await csrfFetch("/api/tools/stream/modify", {
-      method: "POST",
+    const response = await csrfFetch('/api/tools/stream/modify', {
+      method: 'POST',
       body: JSON.stringify({
-        sessionId,
+        sessionId: active.sessionId,
+        toolId: active.toolId,
+        operationId: context.operationId,
+        baseRevision: active.revision,
         command: commandName,
         args,
       }),
@@ -122,28 +139,25 @@ export async function executeMindmapModification(
       const error = await response.json();
       return {
         success: false,
-        error: error.message || "Failed to modify mindmap",
+        error: error.error || error.message || 'Failed to modify mindmap',
       };
     }
 
-    logger.info("[VoiceToolCommands] Mindmap modification sent", {
-      commandName,
-      args,
-    });
+    const outcome = focusOutcome.parse(await response.json());
+    if (outcome.toolId !== active.toolId || outcome.operationId !== context.operationId)
+      throw new Error('Mindmap response identity mismatch');
     return {
+      ...outcome,
+      sessionId: active.sessionId,
       success: true,
-      toolType: "mindmap",
+      toolType: 'mindmap',
       displayed: true,
     };
   } catch (error) {
-    logger.error(
-      "[VoiceToolCommands] Failed to modify mindmap",
-      undefined,
-      error,
-    );
+    logger.error('[VoiceToolCommands] Failed to modify mindmap', undefined, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -160,11 +174,11 @@ export async function executeSummaryModification(
   try {
     // Send modification event to SSE endpoint
     // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
-    const response = await csrfFetch("/api/tools/stream/modify", {
-      method: "POST",
+    const response = await csrfFetch('/api/tools/stream/modify', {
+      method: 'POST',
       body: JSON.stringify({
         sessionId,
-        toolType: "summary",
+        toolType: 'summary',
         command: commandName,
         args,
       }),
@@ -174,28 +188,24 @@ export async function executeSummaryModification(
       const error = await response.json();
       return {
         success: false,
-        error: error.message || "Failed to modify summary",
+        error: error.message || 'Failed to modify summary',
       };
     }
 
-    logger.info("[VoiceToolCommands] Summary modification sent", {
+    logger.info('[VoiceToolCommands] Summary modification sent', {
       commandName,
       args,
     });
     return {
       success: true,
-      toolType: "summary",
+      toolType: 'summary',
       displayed: true,
     };
   } catch (error) {
-    logger.error(
-      "[VoiceToolCommands] Failed to modify summary",
-      undefined,
-      error,
-    );
+    logger.error('[VoiceToolCommands] Failed to modify summary', undefined, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }

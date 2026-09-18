@@ -1,5 +1,21 @@
 {
   "tools": {
+    "mindmapRecovery": {
+      "conflict": "Die Mindmap wurde anderswo geändert. Ihre Änderung bleibt ausstehend und überschreibt die gespeicherte Version nicht.",
+      "error": "Die Änderung wurde nicht bestätigt. Ihr ausstehender Inhalt bleibt erhalten.",
+      "connecting": "Gespeicherte Mindmap wird geladen…",
+      "connected": "Mindmap aktuell",
+      "recovering": "Verbindung unterbrochen. Mindmap wird wiederhergestellt…",
+      "exhausted": "Wiederherstellung gestoppt. Versuchen Sie es erneut.",
+      "denied": "Kein Zugriff auf die Mindmap. Melden Sie sich erneut an.",
+      "disconnected": "Mindmap inaktiv",
+      "pending": "Änderung wartet auf Bestätigung. Ihr Inhalt bleibt erhalten; erneut versuchen, ohne ihn zu duplizieren.",
+      "retry": "Erneut versuchen",
+      "node": "Neuer Knoten",
+      "parent": "Verbinden mit",
+      "root": "Wurzel",
+      "add": "Knoten hinzufügen"
+    },
     "pdf": {
       "label": "PDF hochladen",
       "description": "Laden Sie ein PDF-Dokument hoch und generieren Sie automatisch Lernmaterialien",

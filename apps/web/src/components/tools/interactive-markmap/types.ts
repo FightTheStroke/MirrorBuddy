@@ -31,6 +31,9 @@ export interface InteractiveMarkMapRendererProps {
   initialNodes?: MindmapNode[];
   className?: string;
   onNodesChange?: (nodes: MindmapNode[]) => void;
+  authoritativeNodes?: MindmapNode[];
+  canUndo?: boolean;
+  onUndo?: () => void;
 }
 
 // Imperative handle exposed by the component

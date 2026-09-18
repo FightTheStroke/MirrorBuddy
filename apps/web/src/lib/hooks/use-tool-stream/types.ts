@@ -3,17 +3,12 @@
  * Extracted to break circular dependency with tool-event-processor
  */
 
-import type { ToolType } from "@/lib/realtime/tool-events";
+import type { ToolType } from '@/lib/realtime/tool-events';
 
 // Event received from SSE stream
 export interface StreamToolEvent {
   id: string;
-  type:
-    | "tool:created"
-    | "tool:update"
-    | "tool:complete"
-    | "tool:error"
-    | "tool:cancelled";
+  type: 'tool:created' | 'tool:update' | 'tool:complete' | 'tool:error' | 'tool:cancelled';
   toolType: ToolType;
   sessionId: string;
   maestroId: string;
@@ -24,22 +19,24 @@ export interface StreamToolEvent {
     chunk?: string;
     progress?: number;
     content?: unknown;
+    revision?: number;
     error?: string;
   };
 }
 
 // Connection state
 export type ConnectionState =
-  | "disconnected"
-  | "connecting"
-  | "connected"
-  | "error"
-  | "reconnecting";
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'error'
+  | 'reconnecting';
 
 // Active tool being built
 export interface ActiveToolState {
   id: string;
   sessionId?: string;
+  revision?: number;
   type: ToolType;
   maestroId: string;
   title: string;
@@ -47,7 +44,7 @@ export interface ActiveToolState {
   progress: number;
   chunks: string[];
   content: unknown;
-  status: "building" | "completed" | "error" | "cancelled";
+  status: 'building' | 'completed' | 'error' | 'cancelled';
   startedAt: number;
   errorMessage?: string;
 }

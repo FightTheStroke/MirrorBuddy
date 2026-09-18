@@ -56,14 +56,13 @@ export function AutoSaveMindmap({
   sessionId?: string | null;
   toolId?: string;
 }) {
-  useToolAutoSave(
-    'mindmap',
-    request.title,
-    { nodes: request.nodes },
-    { subject: 'general', toolId },
-  );
   return (
-    <LiveMindmap sessionId={sessionId ?? null} title={request.title} initialNodes={request.nodes} />
+    <LiveMindmap
+      toolId={toolId}
+      sessionId={sessionId ?? null}
+      title={request.title}
+      initialNodes={request.nodes}
+    />
   );
 }
 
