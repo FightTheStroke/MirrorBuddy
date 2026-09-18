@@ -2,11 +2,19 @@
  * @vitest-environment jsdom
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { setClientIdentity } from '@/lib/auth';
 import { MaintenanceWidget } from '../MaintenanceWidget';
 
 const mockCsrfFetch = vi.fn();
+const adminIdentity = {
+  status: 'authenticated',
+  userId: 'maintenance-admin',
+  role: 'ADMIN',
+  legacyOrigin: false,
+  needsLegacyUpgrade: false,
+} as const;
 
 vi.mock('@/lib/auth', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/auth')>();
@@ -19,6 +27,7 @@ vi.mock('@/lib/auth', async (importOriginal) => {
 describe('MaintenanceWidget', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setClientIdentity(adminIdentity);
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () =>
@@ -44,6 +53,27 @@ describe('MaintenanceWidget', () => {
           ],
         }),
     }) as typeof fetch;
+  });
+
+  afterEach(() => act(() => setClientIdentity({ status: 'pending' })));
+
+  it.each(['ADMIN_READONLY', 'USER'] as const)(
+    'keeps status but hides cancellation for %s',
+    async (role) => {
+      setClientIdentity({ ...adminIdentity, role });
+      render(<MaintenanceWidget />);
+      await screen.findByText('Active maintenance');
+      expect(screen.getByText('Upcoming maintenance')).toBeInTheDocument();
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+      expect(mockCsrfFetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it('does not offer cancellation while identity is unavailable', async () => {
+    setClientIdentity({ status: 'unavailable', reason: 'network' });
+    render(<MaintenanceWidget />);
+    await screen.findByText('Active maintenance');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('renders active and upcoming windows', async () => {
