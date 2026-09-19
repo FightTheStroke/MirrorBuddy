@@ -37,6 +37,13 @@
       }
     },
     "webcam": {
+      "choosePhoto": "Scegli una foto",
+      "choosingPhoto": "Scelta della foto in corso",
+      "importFailed": "Impossibile aprire la foto. Scegli un'immagine JPEG, PNG o GIF valida e riprova.",
+      "frameUnavailable": "L'immagine non è pronta. Riprova o scegli una foto.",
+      "confirmFailed": "Impossibile confermare la foto. Riprova.",
+      "cameraReady": "Fotocamera pronta",
+      "countdown": "Foto tra {seconds} secondi",
       "label": "Webcam",
       "description": "Usa la webcam per interazioni visive",
       "cancel": "Annulla",

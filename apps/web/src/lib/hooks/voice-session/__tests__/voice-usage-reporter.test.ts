@@ -11,6 +11,7 @@ import { csrfFetch } from '@/lib/auth';
 import {
   modelFromResponseDone,
   reportVoiceUsage,
+  responseIdFromEvent,
   sendVoiceUsage,
   usageFromResponseDone,
 } from '../voice-usage-reporter';
@@ -37,13 +38,19 @@ describe('usageFromResponseDone', () => {
     expect(usageFromResponseDone({ type: 'response.done', response: 'odd' })).toBeNull();
     expect(modelFromResponseDone({ response: {} })).toBeNull();
   });
+
+  it.each([null, undefined])('tolerates nullish external events: %s', (event) => {
+    expect(usageFromResponseDone(event)).toBeNull();
+    expect(modelFromResponseDone(event)).toBeNull();
+    expect(responseIdFromEvent(event)).toBeNull();
+  });
 });
 
 describe('reportVoiceUsage', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('posts the usage block for the current session', () => {
-    vi.mocked(csrfFetch).mockResolvedValue(new Response('{}'));
+    vi.mocked(csrfFetch).mockResolvedValue(new Response('{"success":true}'));
 
     reportVoiceUsage({
       sessionId: 'sess-1',
@@ -80,10 +87,25 @@ describe('reportVoiceUsage', () => {
   });
 
   it('confirms a successful report', async () => {
-    vi.mocked(csrfFetch).mockResolvedValue(new Response('{}'));
+    vi.mocked(csrfFetch).mockResolvedValue(new Response('{"success":true}'));
 
     await expect(
       sendVoiceUsage({ sessionId: 'sess-1', usage: RESPONSE_DONE.response.usage }),
     ).resolves.toBe(true);
+  });
+
+  it.each(['{}', '{"success":false}', 'null', 'not-json'])(
+    'does not mistake an invalid acknowledgement for a committed report: %s',
+    async (body) => {
+      vi.mocked(csrfFetch).mockResolvedValue(new Response(body));
+      await expect(
+        sendVoiceUsage({ sessionId: 'sess-1', responseId: 'resp-1', usage: {} }),
+      ).resolves.toBe(false);
+    },
+  );
+
+  it.each([null, undefined])('does not send a nullish report: %s', async (report) => {
+    await expect(sendVoiceUsage(report)).resolves.toBe(false);
+    expect(csrfFetch).not.toHaveBeenCalled();
   });
 });

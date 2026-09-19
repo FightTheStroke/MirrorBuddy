@@ -12,8 +12,9 @@
 'use client';
 
 import { Capacitor } from '@capacitor/core';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Camera } from '@capacitor/camera';
 import { clientLogger as logger } from '@/lib/logger/client';
+export { capturePhoto, type CapturePhotoOptions, type PhotoResult } from './media-bridge-photo';
 
 // ============================================================================
 // Platform Detection
@@ -31,118 +32,6 @@ export function isNativePlatform(): boolean {
  */
 export function getPlatform(): string {
   return Capacitor.getPlatform();
-}
-
-// ============================================================================
-// Camera Photo Capture
-// ============================================================================
-
-export interface CapturePhotoOptions {
-  source: 'camera' | 'gallery';
-  quality?: number; // 0-100, default 90
-}
-
-export interface PhotoResult {
-  base64: string;
-  format: string;
-}
-
-/**
- * Capture photo using native camera or gallery
- * Falls back to file input on web
- */
-export async function capturePhoto(options: CapturePhotoOptions): Promise<PhotoResult> {
-  const { source, quality = 90 } = options;
-
-  if (isNativePlatform()) {
-    // Use Capacitor Camera plugin on native platforms
-    try {
-      const photo = await Camera.getPhoto({
-        resultType: CameraResultType.Base64,
-        source: source === 'camera' ? CameraSource.Camera : CameraSource.Photos,
-        quality,
-        correctOrientation: true,
-        allowEditing: false,
-      });
-
-      logger.debug('[MediaBridge] Photo captured via Capacitor', {
-        format: photo.format,
-        platform: getPlatform(),
-      });
-
-      return {
-        base64: photo.base64String || '',
-        format: photo.format || 'jpeg',
-      };
-    } catch (error) {
-      logger.error('[MediaBridge] Capacitor camera error', undefined, error);
-      throw error;
-    }
-  } else {
-    // Fallback to file input on web
-    return capturePhotoWeb(options);
-  }
-}
-
-/**
- * Web fallback: file input for photo selection
- */
-function capturePhotoWeb(options: CapturePhotoOptions): Promise<PhotoResult> {
-  return new Promise((resolve, reject) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-
-    if (options.source === 'camera') {
-      input.capture = 'environment';
-    }
-
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) {
-        reject(new Error('No file selected'));
-        return;
-      }
-
-      try {
-        const base64 = await fileToBase64(file);
-        const format = file.type.split('/')[1] || 'jpeg';
-
-        logger.debug('[MediaBridge] Photo captured via web', { format });
-
-        resolve({ base64, format });
-      } catch (error) {
-        reject(error);
-      }
-    };
-
-    input.onerror = () => {
-      reject(new Error('File input error'));
-    };
-
-    input.click();
-  });
-}
-
-/**
- * Convert File to base64 string
- */
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const result = reader.result as string;
-      const base64 = result.split(',')[1];
-      resolve(base64);
-    };
-
-    reader.onerror = () => {
-      reject(new Error('Failed to read file'));
-    };
-
-    reader.readAsDataURL(file);
-  });
 }
 
 // ============================================================================
