@@ -5,6 +5,7 @@
 Accepted — 2026-07-19
 Corrected — 2026-08-31 (lifecycle label: `gpt-realtime-2.1` is **Public Preview**, not GA)
 Corrected — 2026-09-17 (retirement dates: published schedule and regional catalogue disagree)
+Corrected — 2026-09-19 (lifecycle label: regional catalogue and published schedule now disagree)
 
 ## Correction (2026-08-31) — lifecycle label was wrong
 
@@ -41,6 +42,35 @@ Read-only deployment inventory confirms the versions above for configured 2.1,
 The resource instead uses `gpt-realtime-whisper` `2026-05-06` and `tts` / `tts-hd`
 `001`, whose regional retirement dates are 2027-05-06 and 2026-12-15 respectively.
 Do not apply the October date to all transcription or speech synthesis models.
+
+## Correction (2026-09-19) — the two Microsoft sources now disagree on the 2.1 lifecycle
+
+A read-only metadata pass on 2026-09-19 found that the **regional model catalogue**
+for the configured Sweden Central region reports `gpt-realtime-2.1` `2026-07-07` as
+**GenerallyAvailable**, while Microsoft Learn continues to classify the GPT Realtime
+2.x line as **Public Preview**.
+
+| Source                                  | Read       | `gpt-realtime-2.1` 2026-07-07 lifecycle | Retirement |
+| --------------------------------------- | ---------- | --------------------------------------- | ---------- |
+| Microsoft Learn retirement schedule     | 2026-09-19 | **Public Preview**                      | 2027-06-25 |
+| Sweden Central regional model catalogue | 2026-09-19 | **GenerallyAvailable**                  | 2027-07-31 |
+
+Both readings are preserved. Neither is treated as settled, and the earlier
+retirement date remains the planning date, as recorded in the 2026-09-17 correction.
+
+**Operating assumption, unchanged and deliberately conservative**: continue to treat
+`gpt-realtime-2.1` as Preview, with **no service-level assurance**, until Microsoft
+reconciles the two surfaces. The regional `GenerallyAvailable` label alone does not
+grant an SLA and does not by itself close the preview-in-production concern.
+
+This correction changes **no model, no deployment alias, no feature flag and no
+code path**. It records a documentation fact only. The same pass confirmed
+`gpt-realtime-2` `2026-05-06` as Preview on both surfaces, with the published and
+regional dates still disagreeing, and the mini conflict still unresolved.
+
+The approved negative boundary for validating the GA fallback remains a **controlled
+synthetic 404 on the primary deployment combined with real GA inference**. A genuine
+provider outage is **not** required and is not requested.
 
 ### Accepted risk
 

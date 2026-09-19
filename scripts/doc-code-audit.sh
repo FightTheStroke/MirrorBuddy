@@ -177,19 +177,29 @@ check_health_status_values() {
 # ============================================================================
 
 check_voice_model_name() {
-	log_info "Checking voice model name..."
+	log_info "Checking voice model configuration..."
 
 	local tier_file="$PROJECT_ROOT/apps/web/src/lib/tier/tier-fallbacks.ts"
+	local mapping_file="$PROJECT_ROOT/apps/web/src/lib/ai/providers/deployment-mapping.ts"
 
 	if [ ! -f "$tier_file" ]; then
 		log_fail "tier-fallbacks.ts not found at $tier_file"
 		return 1
 	fi
 
+	if [ ! -f "$mapping_file" ]; then
+		log_fail "deployment-mapping.ts not found at $mapping_file"
+		return 1
+	fi
+
 	# Check for incorrect model names
 	local has_wrong_voice=$(grep -c 'gpt-4o-realtime-preview' "$tier_file")
-	local has_correct_voice=$(grep -c 'gpt-realtime' "$tier_file")
 	local has_deprecated_chat=$(grep -c -E 'gpt-4o-mini[^-]|gpt-4o[^-]' "$tier_file")
+	# ADR 0169 / 47d44200: voice quality is global, tiers carry no voice model.
+	local has_per_tier_voice=$(grep -c 'realtimeModel' "$tier_file")
+	# Comments are stripped: a commented-out mapping must not satisfy the check.
+	local has_global_voice=$(sed -e 's://.*::' -e 's:/\*.*\*/::' "$mapping_file" |
+		grep -cE "'gpt-realtime[^']*'[[:space:]]*:[[:space:]]*process\.env\.AZURE_OPENAI_REALTIME_DEPLOYMENT")
 
 	if [ "$has_wrong_voice" -gt 0 ]; then
 		log_fail "Found deprecated voice model 'gpt-4o-realtime-preview' (should be 'gpt-realtime' or 'gpt-realtime-mini')"
@@ -203,10 +213,16 @@ check_voice_model_name() {
 		log_pass "No deprecated chat model names found"
 	fi
 
-	if [ "$has_correct_voice" -gt 0 ]; then
-		log_pass "Found correct voice model name 'gpt-realtime'"
+	if [ "$has_per_tier_voice" -gt 0 ]; then
+		log_fail "Found per-tier voice model configuration in tier definitions (removed in 47d44200: voice model selection is global, ADR 0169)"
 	else
-		log_fail "Did not find expected voice model 'gpt-realtime' in tier definitions"
+		log_pass "No per-tier voice model configuration in tier definitions"
+	fi
+
+	if [ "$has_global_voice" -gt 0 ]; then
+		log_pass "Global voice deployment configuration present ($has_global_voice alias mappings)"
+	else
+		log_fail "Did not find the global voice deployment configuration in deployment-mapping.ts; comments or documentation alone do not satisfy it"
 	fi
 }
 
@@ -255,6 +271,7 @@ check_metrics_push_cadence() {
 
 main() {
 	for input in README.md apps/web/src/lib/tier/tier-fallbacks.ts \
+		apps/web/src/lib/ai/providers/deployment-mapping.ts \
 		apps/web/src/app/api/health/route.ts apps/web/vercel.json docs/operations/CRON-JOBS.md; do
 		if [ ! -f "$PROJECT_ROOT/$input" ] || ! cat "$PROJECT_ROOT/$input" > /dev/null 2>&1; then
 			log_fail "Required audit input missing or unreadable: $input"
