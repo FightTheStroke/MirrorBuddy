@@ -402,6 +402,14 @@ exactly `production` or `development`; anything else fails immediately rather th
 back silently. It affects only the served server and its own `NODE_ENV` — project
 selection, workers, retries and timeouts are unchanged.
 
+For intentionally provider-free local runs, set `E2E_VOICE_UNCONFIGURED=true` before
+invoking the suite. This allows the expected missing-provider console messages and
+503 responses from `/api/realtime/` on the configured HTTP localhost origin, not
+matching paths on remote origins. It does not enable provider access. The origin
+uses `MIRRORBUDDY_PORT` (default `3000`); stream tests validate that configured
+origin rather than requiring a separate port. Keep the runner's test environment
+and local database safety checks intact.
+
 ---
 
 ## Troubleshooting

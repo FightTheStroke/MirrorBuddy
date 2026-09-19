@@ -7,7 +7,7 @@ import {
   saveBrowserEvidence,
 } from './fixtures/research-chart-browser';
 
-test.use({ locale: 'it-IT' });
+test.use({ locale: 'it-IT', serviceWorkers: 'block' });
 
 test.beforeEach(async ({ adminPage, baseURL }) => {
   if (!baseURL) throw new Error('An explicit local browser target is required');

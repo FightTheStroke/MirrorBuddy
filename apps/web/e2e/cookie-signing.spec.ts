@@ -8,6 +8,7 @@ import { test, expect } from './fixtures/base-fixtures';
 import type { APIRequestContext } from '@playwright/test';
 import { authenticateTestUser } from './helpers/auth-session';
 import { cleanupTestData } from './helpers/test-data';
+import { resolveE2EServerMode } from '../src/test/e2e-server-mode';
 
 async function getCsrfToken(request: APIRequestContext): Promise<string> {
   const res = await request.get('/api/session');
@@ -218,22 +219,23 @@ test.describe('Signed Cookie Authentication', () => {
     expect(responseBody.error).toBeDefined();
   });
 
-  test('Missing cookie - creates new user', async ({ page, context }) => {
-    // Request without pre-existing cookie should create new user
-    // Clear any existing cookies first
+  test('Missing cookie - follows the served authentication contract', async ({ page, context }) => {
     await context.clearCookies();
-
-    // Navigate to user endpoint
-    await page.goto('/api/user');
-    await page.waitForLoadState('domcontentloaded');
-
-    // Should have set signed cookie in browser context
+    const response = await page.goto('/api/user');
+    const production = resolveE2EServerMode(process.env).mode === 'production';
+    expect(response?.status()).toBe(production ? 401 : 200);
     const cookies = await context.cookies();
     const userCookie = cookies.find((c) => c.name === 'mirrorbuddy-user-id');
-    expect(userCookie).toBeDefined();
-
-    // Verify signed format (contains dot separator)
-    expect(userCookie!.value).toContain('.');
+    if (production) {
+      expect(await response?.json()).toMatchObject({
+        error: 'Authentication required',
+        guest: true,
+      });
+      expect(userCookie).toBeUndefined();
+      expect(response?.headers()['set-cookie']).toBeUndefined();
+    } else {
+      expect(userCookie?.value).toMatch(/\.[a-f0-9]{64}$/);
+    }
   });
 });
 

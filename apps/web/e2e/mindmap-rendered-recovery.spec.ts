@@ -34,7 +34,11 @@ test('rendered library map recovers an independent write after ten seconds offli
     },
   });
   expect(initialized.status()).toBe(200);
-  const reader = await browser.newContext({ baseURL, storageState: await request.storageState() });
+  const reader = await browser.newContext({
+    baseURL,
+    storageState: await request.storageState(),
+    offline: true,
+  });
   await mockConsentStorage(reader);
   await mockTrialConsentCookie(reader);
   const page = await reader.newPage();
@@ -44,21 +48,18 @@ test('rendered library map recovers an independent write after ten seconds offli
     const cancel = window.clearTimeout.bind(window);
     window.setTimeout = ((handler: TimerHandler, delay?: number, ...args: unknown[]) => {
       if (typeof handler !== 'function') return schedule(handler, delay);
-      const track = /armWatchdog|startDeadline|renderMindmap|snapshot-client/.test(
-        new Error().stack ?? '',
-      );
       const id = schedule(() => {
         active.delete(id);
         handler(...args);
       }, delay);
-      if (track) active.add(id);
+      active.add(id);
       return id;
     }) as typeof window.setTimeout;
     window.clearTimeout = (id) => {
       if (id !== undefined) active.delete(id);
       cancel(id);
     };
-    Object.defineProperty(window, 'mindmapTimerCount', { get: () => active.size });
+    Object.defineProperty(window, 'activeFunctionTimeoutCount', { get: () => active.size });
   });
   const connections = new Set<object>();
   let opened = 0;
@@ -72,11 +73,14 @@ test('rendered library map recovers an independent write after ten seconds offli
   page.on('requestfinished', remove);
   page.on('requestfailed', remove);
   try {
+    // Playwright deduplicates false -> false; force a real online baseline before navigation.
+    await reader.setOffline(false);
     await page.goto('/it/supporti');
     await page.getByText(title, { exact: true }).click();
     const map = page.getByTestId('durable-mindmap');
     await expect(map).toHaveAttribute('data-revision', '0', { timeout: 30_000 });
     await expect(map.getByLabel('Nuovo nodo', { exact: true })).toBeEnabled();
+    await expect.poll(() => page.evaluate(() => navigator.onLine)).toBe(true);
     await reader.setOffline(true);
     const offlineAt = Date.now();
     const changed = await request.post('/api/tools/stream/modify', {
@@ -169,9 +173,9 @@ test('rendered library map recovers an independent write after ten seconds offli
       await page.getByText(title, { exact: true }).click();
       await expect(map.getByLabel('Nuovo nodo', { exact: true })).toBeEnabled();
       expect(connections.size).toBe(1);
-      expect(await page.evaluate(() => Reflect.get(window, 'mindmapTimerCount'))).toBeGreaterThan(
-        0,
-      );
+      expect(
+        await page.evaluate(() => Reflect.get(window, 'activeFunctionTimeoutCount')),
+      ).toBeGreaterThan(0);
       await reader.setOffline(true);
       await expect(map.getByLabel('Nuovo nodo', { exact: true })).toBeDisabled();
       await page.keyboard.press('Escape');
@@ -179,7 +183,7 @@ test('rendered library map recovers an independent write after ten seconds offli
       await reader.setOffline(false);
       await expect.poll(() => connections.size).toBe(0);
       await expect
-        .poll(() => page.evaluate(() => Reflect.get(window, 'mindmapTimerCount')))
+        .poll(() => page.evaluate(() => Reflect.get(window, 'activeFunctionTimeoutCount')))
         .toBe(0);
       await session.send('HeapProfiler.collectGarbage');
       listeners.push((await session.send('Memory.getDOMCounters')).jsEventListeners);
@@ -187,7 +191,7 @@ test('rendered library map recovers an independent write after ten seconds offli
     expect(listeners[9]).toBeLessThanOrEqual(listeners[0] + 5);
     await session.detach();
     console.log(
-      `RENDERED_RECOVERY offline10s recoveryMs=${recoveryMs}; exact rendered reload tree and durable undo; cycles=10 opened=${opened} closedActive=${connections.size} mapTimers=0 listeners=${listeners.join(',')}`,
+      `RENDERED_RECOVERY offline10s recoveryMs=${recoveryMs}; exact rendered reload tree and durable undo; cycles=10 opened=${opened} closedActive=${connections.size} functionTimeouts=0 listeners=${listeners.join(',')}`,
     );
   } finally {
     await reader.setOffline(false);

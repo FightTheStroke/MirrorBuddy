@@ -6,6 +6,67 @@ import {
 } from '../../e2e/console-audit-routes';
 
 describe('console audit route filters', () => {
+  const unconfigured = { E2E_VOICE_UNCONFIGURED: 'true' };
+  const resourceFailure = 'Failed to load resource: the server responded with a status of 503';
+
+  it.each(['3000', '3123', '3476'])(
+    'accepts the deliberately unconfigured voice route on configured port %s',
+    (port) => {
+      const env = { ...unconfigured, MIRRORBUDDY_PORT: port };
+      const url = `http://localhost:${port}/api/realtime/token`;
+      expect(isIgnoredRequest(url, 503, env)).toBe(true);
+      expect(isIgnoredResourceFailure(resourceFailure, url, env)).toBe(true);
+    },
+  );
+
+  it.each([
+    'https://example.com/api/realtime/token',
+    'http://localhost.example.com:3000/api/realtime/token',
+    'http://localhost:3001/api/realtime/token',
+    'https://localhost:3000/api/realtime/token',
+    'http://fake:fake@localhost:3000/api/realtime/token',
+    'http://localhost:3000/api/user?next=/api/realtime/token',
+    'http://localhost:3000/api/user#/api/realtime/token',
+    '/api/realtime/token',
+    '',
+  ])('does not suppress voice-like failures outside the configured route: %s', (url) => {
+    expect(isIgnoredRequest(url, 503, unconfigured)).toBe(false);
+    expect(isIgnoredResourceFailure(resourceFailure, url, unconfigured)).toBe(false);
+  });
+
+  it('does not suppress the default port when another port is configured', () => {
+    expect(
+      isIgnoredRequest('http://localhost:3000/api/realtime/token', 503, {
+        ...unconfigured,
+        MIRRORBUDDY_PORT: '3123',
+      }),
+    ).toBe(false);
+  });
+
+  it.each([undefined, '', 'false', 'TRUE', '1'])(
+    'requires the literal opt-in rather than %s',
+    (flag) => {
+      expect(
+        isIgnoredRequest('http://localhost:3000/api/realtime/token', 503, {
+          E2E_VOICE_UNCONFIGURED: flag,
+        }),
+      ).toBe(false);
+    },
+  );
+
+  it.each([401, 403, 404, 429, 500, undefined])('does not suppress voice status %s', (status) => {
+    expect(isIgnoredRequest('http://localhost:3000/api/realtime/token', status, unconfigured)).toBe(
+      false,
+    );
+  });
+
+  it.each(['Voice API error', 'Azure OpenAI not configured'])(
+    'does not suppress a console message containing only %s',
+    (message) => {
+      expect(isIgnoredConsoleMessage(message, unconfigured)).toBe(false);
+    },
+  );
+
   it('ignores realtime voice 503 responses only when voice is deliberately unconfigured', () => {
     const url = 'http://localhost:3000/api/realtime/token';
     const text =
