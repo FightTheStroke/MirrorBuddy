@@ -91,7 +91,8 @@ describe('feature-flags-service', () => {
   describe('updateFlag', () => {
     it('updates flag status', async () => {
       const updated = await updateFlag('quiz', { status: 'disabled' });
-      expect(updated?.status).toBe('disabled');
+      expect(updated.effective.status).toBe('disabled');
+      expect(updated.persistence).toBe('confirmed');
 
       const result = isFeatureEnabled('quiz');
       expect(result.enabled).toBe(false);
@@ -99,22 +100,23 @@ describe('feature-flags-service', () => {
 
     it('updates percentage rollout', async () => {
       const updated = await updateFlag('mindmap', { enabledPercentage: 25 });
-      expect(updated?.enabledPercentage).toBe(25);
+      expect(updated.effective.enabledPercentage).toBe(25);
     });
 
     it('clamps percentage to 0-100', async () => {
       let updated = await updateFlag('mindmap', { enabledPercentage: 150 });
-      expect(updated?.enabledPercentage).toBe(100);
+      expect(updated.effective.enabledPercentage).toBe(100);
 
       updated = await updateFlag('mindmap', { enabledPercentage: -10 });
-      expect(updated?.enabledPercentage).toBe(0);
+      expect(updated.effective.enabledPercentage).toBe(0);
     });
 
-    it('returns null for unknown flag', async () => {
-      const result = await updateFlag('unknown' as KnownFeatureFlag, {
-        status: 'disabled',
-      });
-      expect(result).toBeNull();
+    it('rejects unknown flags instead of returning a success-shaped null', async () => {
+      await expect(
+        updateFlag('unknown', {
+          status: 'disabled',
+        }),
+      ).rejects.toThrow('Unknown feature flag');
     });
   });
 
