@@ -1,19 +1,27 @@
 // @vitest-environment node
 import { randomUUID } from 'node:crypto';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { prisma } from '@/lib/db';
-import { persistFeaturePolicy, readWritablePolicyFlag } from '../policy-write-persistence';
-import { beginFeaturePolicyWrite, prepareWritablePolicy } from '../policy-writer';
-import { _resetForTesting, getFlag, reloadFlags } from '../feature-flags-policy';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
 
-const localUrl = 'postgresql://Roberdan@localhost:5432/mirrorbuddy_test';
-const enabled =
-  process.env.TEST_DATABASE_URL === localUrl &&
-  process.env.DATABASE_URL === localUrl &&
-  process.env.DEV_DATABASE_URL === localUrl;
+const enabled = policyTestDatabaseEnabled();
+let prisma: (typeof import('@/lib/db'))['prisma'];
+let persistFeaturePolicy: (typeof import('../policy-write-persistence'))['persistFeaturePolicy'];
+let readWritablePolicyFlag: (typeof import('../policy-write-persistence'))['readWritablePolicyFlag'];
+let beginFeaturePolicyWrite: (typeof import('../policy-writer'))['beginFeaturePolicyWrite'];
+let prepareWritablePolicy: (typeof import('../policy-writer'))['prepareWritablePolicy'];
+let _resetForTesting: (typeof import('../feature-flags-policy'))['_resetForTesting'];
+let getFlag: (typeof import('../feature-flags-policy'))['getFlag'];
+let reloadFlags: (typeof import('../feature-flags-policy'))['reloadFlags'];
 let id: string;
 
 describe.runIf(enabled)('sparse policy persistence with real PostgreSQL', () => {
+  beforeAll(async () => {
+    ({ prisma } = await import('@/lib/db'));
+    ({ persistFeaturePolicy, readWritablePolicyFlag } =
+      await import('../policy-write-persistence'));
+    ({ beginFeaturePolicyWrite, prepareWritablePolicy } = await import('../policy-writer'));
+    ({ _resetForTesting, getFlag, reloadFlags } = await import('../feature-flags-policy'));
+  });
   beforeEach(async () => {
     _resetForTesting();
     id = `policy-write-test-${randomUUID()}`;
@@ -31,6 +39,7 @@ describe.runIf(enabled)('sparse policy persistence with real PostgreSQL', () => 
     });
   });
   afterEach(async () => {
+    if (!id) return;
     await prisma.featureFlag.deleteMany({ where: { id } });
     expect(await prisma.featureFlag.count({ where: { id } })).toBe(0);
   });

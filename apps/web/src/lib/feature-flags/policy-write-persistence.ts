@@ -2,6 +2,23 @@ import { prisma } from '@/lib/db';
 import { DEFAULT_FLAGS } from './default-flags';
 import { policyId, policyPatch, storedPolicyFlag } from './policy-write-validation';
 
+function isRolledBackConflict(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false;
+  if ('code' in error) return error.code === 'P2034';
+  if (!('name' in error) || error.name !== 'DriverAdapterError' || !('cause' in error)) {
+    return false;
+  }
+  const cause = error.cause;
+  return (
+    typeof cause === 'object' &&
+    cause !== null &&
+    'kind' in cause &&
+    cause.kind === 'TransactionWriteConflict' &&
+    'originalCode' in cause &&
+    cause.originalCode === '40001'
+  );
+}
+
 export async function readWritablePolicyFlag(id: unknown) {
   const featureId = policyId.parse(id);
   const row = await prisma.featureFlag.findUnique({ where: { id: featureId } });
@@ -54,14 +71,10 @@ export async function persistFeaturePolicy(id: unknown, input: unknown): Promise
       );
       return;
     } catch (error) {
-      if (
-        attempt < 2 &&
-        typeof error === 'object' &&
-        error !== null &&
-        'code' in error &&
-        error.code === 'P2034'
-      )
+      if (attempt < 2 && isRolledBackConflict(error)) {
+        await new Promise((resolve) => setTimeout(resolve, 10 * (attempt + 1)));
         continue;
+      }
       throw error;
     }
   }

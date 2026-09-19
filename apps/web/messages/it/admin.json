@@ -1,5 +1,23 @@
 {
   "admin": {
+    "policyWrite": {
+      "unconfirmed": "Salvataggio non confermato. La protezione mostrata vale solo per questa istanza; non indica lo stato di tutti i server.",
+      "superseded": "Un'altra operazione ha sostituito questa modifica. Non è stata confermata alcuna riattivazione.",
+      "failed": "Impossibile confermare la modifica. Riprova esplicitamente.",
+      "loadFailed": "Impossibile caricare le impostazioni delle funzionalità.",
+      "instanceNotice": "Stato effettivo restituito dall'istanza che ha gestito la modifica. Un aggiornamento della pagina non prova il salvataggio.",
+      "enable": "Abilita",
+      "disable": "Disabilita",
+      "reactivateAll": "Riattiva tutto",
+      "globalStop": "Arresto globale",
+      "globalStopped": "Tutte le funzionalità sono bloccate dall'arresto globale",
+      "operational": "Tutti i sistemi sono operativi",
+      "degraded": "Sistema con degradazione: {level}",
+      "healthy": "Operativo",
+      "partial": "Parziale",
+      "severe": "Grave",
+      "critical": "Critico"
+    },
     "metricTruth": {
       "averageTurns": "Turni medi per sessione registrata",
       "averageSessionCost": "Costo medio per sessione registrata",

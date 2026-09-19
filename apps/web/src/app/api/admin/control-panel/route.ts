@@ -8,6 +8,8 @@ import { pipe, withSentry, withCSRF, withAdmin, withAdminReadOnly } from '@/lib/
 import { NextResponse } from 'next/server';
 
 import { logger } from '@/lib/logger';
+import { logAdminAction } from '@/lib/admin/audit-service';
+import { policyWriteFailure } from '@/lib/admin/policy-write-response';
 import {
   getControlPanelState,
   handleUpdateFeatureFlag,
@@ -40,6 +42,9 @@ export const POST = pipe(
   withAdmin,
 )(async (ctx) => {
   const body = await ctx.req.json();
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({ success: false, error: 'Invalid request body' }, { status: 400 });
+  }
   const { action, data } = body;
 
   if (!action || !data) {
@@ -48,46 +53,64 @@ export const POST = pipe(
 
   let result;
 
-  switch (action) {
-    case 'feature-flag':
-      result = await handleUpdateFeatureFlag(data.flagId, data.update, ctx.userId || 'unknown');
-      logger.info('Feature flag updated', {
-        flagId: data.flagId,
-        userId: ctx.userId,
-      });
-      break;
+  try {
+    switch (action) {
+      case 'feature-flag':
+        result = await handleUpdateFeatureFlag(data.flagId, data.update, ctx.userId || 'unknown');
+        await logAdminAction({
+          action: 'UPDATE_FEATURE_POLICY',
+          entityType: 'FeatureFlag',
+          entityId: data.flagId,
+          adminId: ctx.userId!,
+          details: { persistence: result.persistence, effective: result.effective },
+        });
+        logger.info('Feature flag updated', {
+          flagId: data.flagId,
+          userId: ctx.userId,
+        });
+        break;
 
-    case 'maintenance':
-      result = updateMaintenanceMode(data);
-      logger.info('Maintenance mode updated', {
-        isEnabled: data.isEnabled,
-        userId: ctx.userId,
-      });
-      break;
+      case 'maintenance':
+        result = updateMaintenanceMode(data);
+        logger.info('Maintenance mode updated', {
+          isEnabled: data.isEnabled,
+          userId: ctx.userId,
+        });
+        break;
 
-    case 'kill-switch':
-      result = await handleUpdateGlobalKillSwitch(
-        data.isEnabled,
-        data.reason,
-        ctx.userId || 'unknown',
-      );
-      logger.warn('Global kill switch toggled', {
-        isEnabled: data.isEnabled,
-        userId: ctx.userId,
-      });
-      break;
+      case 'kill-switch':
+        result = await handleUpdateGlobalKillSwitch(
+          data.isEnabled,
+          data.reason,
+          ctx.userId || 'unknown',
+        );
+        await logAdminAction({
+          action: 'UPDATE_FEATURE_POLICY',
+          entityType: 'FeatureFlag',
+          entityId: 'global',
+          adminId: ctx.userId!,
+          details: { persistence: result.persistence, effective: result.effective },
+        });
+        logger.warn('Global kill switch toggled', {
+          isEnabled: data.isEnabled,
+          userId: ctx.userId,
+        });
+        break;
 
-    case 'tier-limit':
-      result = await handleUpdateTierLimit(data.tierId, data.update, ctx.userId || 'unknown');
-      logger.info('Tier limit updated', {
-        tierId: data.tierId,
-        userId: ctx.userId,
-      });
-      break;
+      case 'tier-limit':
+        result = await handleUpdateTierLimit(data.tierId, data.update, ctx.userId || 'unknown');
+        logger.info('Tier limit updated', {
+          tierId: data.tierId,
+          userId: ctx.userId,
+        });
+        break;
 
-    default:
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+      default:
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    return policyWriteFailure(error);
   }
-
-  return NextResponse.json({ success: true, data: result });
 });
