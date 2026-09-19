@@ -10,17 +10,26 @@
 
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { voiceUsageKey, VoiceUsageConflictError } from './voice-usage-identity';
+import { isVoiceUsageId } from './voice-usage-validation';
 import { parseRealtimeUsage, priceUsage, type TokenUsage } from './voice-pricing';
 import {
   queryUserVoiceSpend,
   queryVoiceSpendByUser,
   queryVoiceSpendSummary,
 } from './voice-usage-queries';
-import { dayKey, monthKey, windowStart, type Period, type UserVoiceSpend } from './voice-usage-types';
+import {
+  dayKey,
+  monthKey,
+  windowStart,
+  type Period,
+  type UserVoiceSpend,
+} from './voice-usage-types';
 
 export interface RecordVoiceUsageInput {
   userId: string;
   sessionId: string;
+  responseId?: string;
   maestroId?: string | null;
   model: string;
   usage: unknown;
@@ -30,14 +39,21 @@ export interface RecordVoiceUsageInput {
 /**
  * Stores one priced turn.
  *
- * Never throws: cost accounting must not be able to break a child's
- * conversation. A lost row is a small accounting error; a thrown exception in
- * the voice path is a robot that stops talking.
+ * Storage failures propagate to the API, which returns a retryable failure.
+ * The browser isolates accounting failures from the conversation.
  */
 export async function recordVoiceUsage(
-  input: RecordVoiceUsageInput,
+  input: RecordVoiceUsageInput | null | undefined,
 ): Promise<{ costEur: number; tokens: TokenUsage } | null> {
   try {
+    if (
+      !input ||
+      !isVoiceUsageId(input.userId) ||
+      !isVoiceUsageId(input.sessionId) ||
+      (input.responseId !== undefined && !isVoiceUsageId(input.responseId))
+    ) {
+      throw new Error('Invalid voice usage identity');
+    }
     const tokens = parseRealtimeUsage(input.usage);
     const billable =
       tokens.audioInputTokens +
@@ -49,30 +65,58 @@ export async function recordVoiceUsage(
     const priced = priceUsage(input.model, tokens);
     const now = new Date();
 
-    await prisma.voiceUsageEvent.create({
-      data: {
-        userId: input.userId,
-        sessionId: input.sessionId,
-        maestroId: input.maestroId ?? null,
-        model: input.model,
-        audioInputTokens: tokens.audioInputTokens,
-        audioOutputTokens: tokens.audioOutputTokens,
-        textInputTokens: tokens.textInputTokens,
-        textOutputTokens: tokens.textOutputTokens,
-        cachedInputTokens: tokens.cachedInputTokens,
-        costEur: priced.totalCostEur,
-        periodDay: dayKey(now),
-        periodMonth: monthKey(now),
-        isTestData: input.isTestData ?? false,
-      },
-    });
+    const id = input.responseId
+      ? voiceUsageKey(input.userId, input.sessionId, input.responseId)
+      : undefined;
+    const data = {
+      id,
+      userId: input.userId,
+      sessionId: input.sessionId,
+      maestroId: input.maestroId ?? null,
+      model: input.model,
+      audioInputTokens: tokens.audioInputTokens,
+      audioOutputTokens: tokens.audioOutputTokens,
+      textInputTokens: tokens.textInputTokens,
+      textOutputTokens: tokens.textOutputTokens,
+      cachedInputTokens: tokens.cachedInputTokens,
+      costEur: priced.totalCostEur,
+      periodDay: dayKey(now),
+      periodMonth: monthKey(now),
+      isTestData: input.isTestData ?? false,
+    };
+    try {
+      await prisma.voiceUsageEvent.create({ data });
+    } catch (error) {
+      if (
+        !id ||
+        !error ||
+        typeof error !== 'object' ||
+        !('code' in error) ||
+        error.code !== 'P2002'
+      )
+        throw error;
+      const existing = await prisma.voiceUsageEvent.findUnique({ where: { id } });
+      if (!existing) throw error;
+      if (
+        existing.userId !== data.userId ||
+        existing.sessionId !== data.sessionId ||
+        existing.maestroId !== data.maestroId ||
+        existing.model !== data.model ||
+        existing.audioInputTokens !== data.audioInputTokens ||
+        existing.audioOutputTokens !== data.audioOutputTokens ||
+        existing.textInputTokens !== data.textInputTokens ||
+        existing.textOutputTokens !== data.textOutputTokens ||
+        existing.cachedInputTokens !== data.cachedInputTokens
+      ) {
+        throw new VoiceUsageConflictError();
+      }
+      return { costEur: existing.costEur, tokens };
+    }
 
     return { costEur: priced.totalCostEur, tokens };
   } catch (error) {
-    logger.error('[VoiceUsage] Failed to record usage', {
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
+    logger.error('[VoiceUsage] Failed to record usage', undefined, error);
+    throw error;
   }
 }
 

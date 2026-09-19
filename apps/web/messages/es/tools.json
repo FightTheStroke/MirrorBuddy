@@ -1,5 +1,21 @@
 {
   "tools": {
+    "mindmapRecovery": {
+      "conflict": "El mapa cambió en otro lugar. Tu cambio sigue pendiente y no sobrescribe la versión guardada.",
+      "error": "El cambio no se ha confirmado. Tu contenido pendiente se conserva.",
+      "connecting": "Cargando el mapa guardado…",
+      "connected": "Mapa actualizado",
+      "recovering": "Conexión interrumpida. Recuperando el mapa…",
+      "exhausted": "Recuperación detenida. Reintenta para continuar.",
+      "denied": "Acceso al mapa no disponible. Inicia sesión de nuevo.",
+      "disconnected": "Mapa inactivo",
+      "pending": "Cambio pendiente de confirmación. Tu contenido se conserva; reintenta sin duplicarlo.",
+      "retry": "Reintentar",
+      "node": "Nuevo nodo",
+      "parent": "Conectar a",
+      "root": "Raíz",
+      "add": "Añadir nodo"
+    },
     "pdf": {
       "label": "PDF",
       "description": "Genera documentos PDF del contenido",
@@ -65,7 +81,14 @@
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
-      "timerOption": "Timer {label}"
+      "timerOption": "Timer {label}",
+      "choosePhoto": "Elegir una foto",
+      "choosingPhoto": "Seleccionando una foto",
+      "importFailed": "No se puede abrir la foto. Elige una imagen JPEG, PNG o GIF válida e inténtalo de nuevo.",
+      "frameUnavailable": "La imagen aún no está lista. Inténtalo de nuevo o elige una foto.",
+      "confirmFailed": "No se puede confirmar la foto. Inténtalo de nuevo.",
+      "cameraReady": "Cámara lista",
+      "countdown": "Foto en {seconds} segundos"
     },
     "homework": {
       "label": "Compiti",

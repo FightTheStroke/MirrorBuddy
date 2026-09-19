@@ -1,5 +1,21 @@
 {
   "tools": {
+    "mindmapRecovery": {
+      "conflict": "The map changed elsewhere. Your change remains pending and will not overwrite the saved version.",
+      "error": "The change was not confirmed. Your pending content is retained.",
+      "connecting": "Loading the saved map…",
+      "connected": "Map up to date",
+      "recovering": "Connection interrupted. Recovering the map…",
+      "exhausted": "Recovery stopped. Retry to continue.",
+      "denied": "Map access unavailable. Sign in again.",
+      "disconnected": "Map inactive",
+      "pending": "Change awaiting confirmation. Your content is retained; retry without duplicating it.",
+      "retry": "Retry",
+      "node": "New node",
+      "parent": "Connect to",
+      "root": "Root",
+      "add": "Add node"
+    },
     "pdf": {
       "label": "Upload PDF",
       "description": "Upload a PDF document and automatically generate study materials",
@@ -65,7 +81,14 @@
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
-      "timerOption": "Timer {label}"
+      "timerOption": "Timer {label}",
+      "choosePhoto": "Choose a photo",
+      "choosingPhoto": "Choosing a photo",
+      "importFailed": "Unable to open the photo. Choose a valid JPEG, PNG or GIF image and try again.",
+      "frameUnavailable": "The image is not ready. Try again or choose a photo.",
+      "confirmFailed": "Unable to confirm the photo. Try again.",
+      "cameraReady": "Camera ready",
+      "countdown": "Taking photo in {seconds} seconds"
     },
     "homework": {
       "label": "Homework Help",

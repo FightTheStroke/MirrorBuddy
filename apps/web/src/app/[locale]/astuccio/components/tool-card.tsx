@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Tool Card Component
@@ -6,9 +6,10 @@
  * Harmonized design: uniform styling, outline icons
  */
 
-import { type LucideIcon } from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { type LucideIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import type { Ref } from 'react';
 
 interface ToolCardProps {
   title: string;
@@ -16,6 +17,7 @@ interface ToolCardProps {
   icon: LucideIcon;
   onClick: () => void;
   isActive?: boolean;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export function ToolCard({
@@ -24,16 +26,18 @@ export function ToolCard({
   icon: Icon,
   onClick,
   isActive = false,
+  ref,
 }: ToolCardProps) {
   return (
     <motion.button
+      ref={ref}
       onClick={onClick}
       className={cn(
-        "relative p-6 rounded-2xl border text-left bg-card text-card-foreground",
-        "shadow-sm hover:shadow-lg hover:border-primary/30 cursor-pointer",
-        "transition-all duration-200",
-        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-        isActive && "ring-2 ring-primary shadow-lg",
+        'relative p-6 rounded-2xl border text-left bg-card text-card-foreground',
+        'shadow-sm hover:shadow-lg hover:border-primary/30 cursor-pointer',
+        'transition-all duration-200',
+        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        isActive && 'ring-2 ring-primary shadow-lg',
       )}
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
@@ -45,9 +49,7 @@ export function ToolCard({
 
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
 
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        {description}
-      </p>
+      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
 
       {isActive && (
         <motion.div

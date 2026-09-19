@@ -3,10 +3,10 @@
  * @brief Webcam controls component
  */
 
-import { useTranslations } from "next-intl";
-import { Camera, Check, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { TIMER_OPTIONS, type TimerOption } from "../constants";
+import { useTranslations } from 'next-intl';
+import { Camera, Check, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TIMER_OPTIONS, type TimerOption } from '../constants';
 
 interface WebcamControlsProps {
   showTimer: boolean;
@@ -16,6 +16,7 @@ interface WebcamControlsProps {
   capturedImage: string | null;
   isLoading: boolean;
   error: string | null;
+  isConfirming?: boolean;
   onCapture: () => void;
   onRetake: () => void;
   onConfirm: () => void;
@@ -29,11 +30,12 @@ export function WebcamControls({
   capturedImage,
   isLoading,
   error,
+  isConfirming = false,
   onCapture,
   onRetake,
   onConfirm,
 }: WebcamControlsProps) {
-  const t = useTranslations("tools.webcam");
+  const t = useTranslations('tools.webcam');
 
   return (
     <div className="p-4 flex flex-col gap-4">
@@ -51,12 +53,12 @@ export function WebcamControls({
                     focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
                     ${
                       selectedTimer === opt.value
-                        ? "bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        ? 'bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }
-                    ${countdown !== null ? "opacity-50 cursor-not-allowed" : ""}
+                    ${countdown !== null ? 'opacity-50 cursor-not-allowed' : ''}
                   `}
-                  aria-label={t("timerOption", { label: opt.label })}
+                  aria-label={t('timerOption', { label: opt.label })}
                 >
                   <span className="text-xl">{opt.icon}</span>
                   <span className="text-xs font-medium mt-1">{opt.label}</span>
@@ -73,7 +75,7 @@ export function WebcamControls({
               className="bg-blue-600 hover:bg-blue-700 px-8 h-16 min-h-[64px] text-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <Camera className="w-6 h-6 mr-2" />
-              {countdown !== null ? t("inProgress") : t("takePhoto")}
+              {countdown !== null ? t('inProgress') : t('takePhoto')}
             </Button>
           </div>
         </>
@@ -86,15 +88,17 @@ export function WebcamControls({
             className="border-slate-300 dark:border-slate-600 h-16 min-h-[64px] px-6 text-base focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
-            {t("retake")}
+            {t('retake')}
           </Button>
           <Button
             onClick={onConfirm}
+            autoFocus
+            disabled={isConfirming}
             size="lg"
             className="bg-green-600 hover:bg-green-700 px-8 h-16 min-h-[64px] text-base shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
           >
             <Check className="w-5 h-5 mr-2" />
-            {t("confirm")}
+            {t('confirm')}
           </Button>
         </div>
       )}

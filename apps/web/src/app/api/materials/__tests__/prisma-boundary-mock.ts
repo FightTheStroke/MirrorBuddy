@@ -167,6 +167,9 @@ export function createBoundaryPrisma(state: DbState) {
       }
       const row = {
         id: nextId('mat'),
+        mindmapRevision: null,
+        mindmapSourceSession: null,
+        mindmapReceipts: [],
         searchableText: null,
         preview: null,
         status: 'active',

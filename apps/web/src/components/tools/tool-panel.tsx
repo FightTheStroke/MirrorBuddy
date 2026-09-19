@@ -1,12 +1,10 @@
 'use client';
-
 import { useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { X, Minimize2, Maximize2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MarkMapRenderer } from './markmap';
 import { LiveMindmap } from './live-mindmap';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
@@ -20,19 +18,15 @@ import { requireClientUserId as getUserId } from '@/lib/auth/client-auth';
 import { csrfFetch } from '@/lib/auth';
 import type { ToolState, SummaryData, StudentSummaryData } from '@/types/tools';
 import type { QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
-
 interface ToolPanelProps {
   tool: ToolState | null;
   maestro: { displayName: string; avatar: string; color: string } | null;
   onClose: () => void;
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
-  /** When true, panel fills container instead of fixed height (for video conference layout) */
   embedded?: boolean;
-  /** Session ID for real-time tool modifications (voice commands) */
   sessionId?: string | null;
 }
-
 export function ToolPanel({
   tool,
   maestro,
@@ -43,8 +37,6 @@ export function ToolPanel({
   sessionId = null,
 }: ToolPanelProps) {
   const t = useTranslations('tools.toolPanel');
-
-  // Save student summary to materials archive
   const handleSaveStudentSummary = useCallback(async (data: StudentSummaryData) => {
     try {
       const userId = getUserId();
@@ -71,26 +63,20 @@ export function ToolPanel({
       throw error;
     }
   }, []);
-
   if (!tool) return null;
-
   const renderToolContent = () => {
     switch (tool.type) {
       case 'mindmap': {
         const mindmapData = tool.content as MindmapRequest;
-        // Use LiveMindmap for real-time voice commands when sessionId available
-        if (sessionId) {
-          return (
-            <LiveMindmap
-              sessionId={sessionId}
-              title={mindmapData.title}
-              initialNodes={mindmapData.nodes}
-              listenForEvents={true}
-            />
-          );
-        }
-        // Fallback to static renderer when no session
-        return <MarkMapRenderer title={mindmapData.title} nodes={mindmapData.nodes} />;
+        return (
+          <LiveMindmap
+            toolId={tool.id}
+            sessionId={sessionId}
+            title={mindmapData.title}
+            initialNodes={mindmapData.nodes}
+            listenForEvents={true}
+          />
+        );
       }
       case 'quiz': {
         const quizData = tool.content as QuizRequest;
@@ -126,7 +112,6 @@ export function ToolPanel({
       }
       case 'summary': {
         const summaryContent = tool.content as Record<string, unknown>;
-        // Check if this is a student-written summary (maieutic method)
         if (summaryContent.type === 'student_summary') {
           const studentData = summaryContent as unknown as StudentSummaryData;
           return (
@@ -139,7 +124,6 @@ export function ToolPanel({
             />
           );
         }
-        // AI-generated summary (legacy)
         return (
           <LiveSummary
             initialData={summaryContent as unknown as SummaryData}
@@ -157,7 +141,6 @@ export function ToolPanel({
         );
     }
   };
-
   const getToolLabel = () => {
     const labels: Record<string, string> = {
       mindmap: t('labels.mindmap'),
@@ -175,7 +158,6 @@ export function ToolPanel({
     };
     return labels[tool.type] || tool.type;
   };
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -191,7 +173,6 @@ export function ToolPanel({
           embedded ? 'h-full' : isMinimized ? 'h-16' : 'h-[60vh] md:h-[70vh]',
         )}
       >
-        {/* Header */}
         <div
           className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700"
           style={{
@@ -215,7 +196,6 @@ export function ToolPanel({
               {tool.status === 'building' ? t('building') : getToolLabel()}
             </span>
           </div>
-
           <div className="flex items-center gap-1">
             {onToggleMinimize && (
               <Button
@@ -244,7 +224,6 @@ export function ToolPanel({
           </div>
         </div>
 
-        {/* Content */}
         {!isMinimized && (
           <div className="flex-1 overflow-auto">
             {tool.status === 'building' || tool.status === 'initializing' ? (

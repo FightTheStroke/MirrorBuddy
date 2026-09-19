@@ -3,16 +3,19 @@
  * @brief Webcam error display component
  */
 
-import { useTranslations } from "next-intl";
-import { AlertCircle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import type { ErrorType } from "../constants";
+import { useTranslations } from 'next-intl';
+import { useEffect, useRef } from 'react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { ErrorType } from '../constants';
 
 interface WebcamErrorProps {
   error: string;
   errorType: ErrorType;
   onRetry: () => void;
   onClose: () => void;
+  onImport?: () => Promise<void>;
+  isImporting?: boolean;
 }
 
 export function WebcamError({
@@ -20,8 +23,16 @@ export function WebcamError({
   errorType,
   onRetry,
   onClose,
+  onImport,
+  isImporting = false,
 }: WebcamErrorProps) {
-  const t = useTranslations("tools.webcam");
+  const t = useTranslations('tools.webcam');
+  const importButtonRef = useRef<HTMLButtonElement>(null);
+  const wasImportingRef = useRef(isImporting);
+  useEffect(() => {
+    if (wasImportingRef.current && !isImporting) importButtonRef.current?.focus();
+    wasImportingRef.current = isImporting;
+  }, [isImporting]);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center">
@@ -31,33 +42,44 @@ export function WebcamError({
         </div>
         <p className="text-slate-600 dark:text-slate-300 mb-2">{error}</p>
 
-        {errorType === "permission" && (
+        {errorType === 'permission' && (
           <div className="text-sm text-slate-500 dark:text-slate-400 mb-4 space-y-1">
-            <p>{t("errors.howToEnable")}</p>
+            <p>{t('errors.howToEnable')}</p>
             <ol className="list-decimal list-inside text-left">
-              <li>{t("errors.permission.instruction1")}</li>
-              <li>{t("errors.permission.instruction2")}</li>
-              <li>{t("errors.permission.instruction3")}</li>
-              <li>{t("errors.permission.instruction4")}</li>
+              <li>{t('errors.permission.instruction1')}</li>
+              <li>{t('errors.permission.instruction2')}</li>
+              <li>{t('errors.permission.instruction3')}</li>
+              <li>{t('errors.permission.instruction4')}</li>
             </ol>
           </div>
         )}
 
-        <div className="flex gap-2 justify-center">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {onImport && (
+            <Button
+              variant="outline"
+              ref={importButtonRef}
+              disabled={isImporting}
+              onClick={onImport}
+              className="border-slate-300 dark:border-slate-600"
+            >
+              {isImporting ? t('choosingPhoto') : t('choosePhoto')}
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={onRetry}
             className="border-slate-300 dark:border-slate-600"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            {t("errors.retry")}
+            {t('errors.retry')}
           </Button>
           <Button
             variant="outline"
             onClick={onClose}
             className="border-slate-300 dark:border-slate-600"
           >
-            {t("errors.close")}
+            {t('errors.close')}
           </Button>
         </div>
       </div>

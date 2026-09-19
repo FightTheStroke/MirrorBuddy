@@ -1,5 +1,21 @@
 {
   "tools": {
+    "mindmapRecovery": {
+      "conflict": "La carte a été modifiée ailleurs. Votre modification reste en attente et ne remplace pas la version enregistrée.",
+      "error": "La modification n'a pas été confirmée. Votre contenu en attente est conservé.",
+      "connecting": "Chargement de la carte enregistrée…",
+      "connected": "Carte à jour",
+      "recovering": "Connexion interrompue. Récupération de la carte…",
+      "exhausted": "Récupération arrêtée. Réessayez pour continuer.",
+      "denied": "Accès à la carte indisponible. Reconnectez-vous.",
+      "disconnected": "Carte inactive",
+      "pending": "Modification en attente de confirmation. Votre contenu est conservé ; réessayez sans le dupliquer.",
+      "retry": "Réessayer",
+      "node": "Nouveau nœud",
+      "parent": "Relier à",
+      "root": "Racine",
+      "add": "Ajouter un nœud"
+    },
     "pdf": {
       "label": "Charger PDF",
       "description": "Chargez un document PDF et générez automatiquement des supports d'étude",
@@ -65,7 +81,14 @@
       "continuity": "Continuity",
       "closeCamera": "Close camera",
       "fotoCatturata": "Foto catturata",
-      "timerOption": "Timer {label}"
+      "timerOption": "Timer {label}",
+      "choosePhoto": "Choisir une photo",
+      "choosingPhoto": "Sélection de la photo en cours",
+      "importFailed": "Impossible d'ouvrir la photo. Choisis une image JPEG, PNG ou GIF valide et réessaie.",
+      "frameUnavailable": "L'image n'est pas prête. Réessaie ou choisis une photo.",
+      "confirmFailed": "Impossible de confirmer la photo. Réessaie.",
+      "cameraReady": "Caméra prête",
+      "countdown": "Photo dans {seconds} secondes"
     },
     "homework": {
       "label": "Aide aux Devoirs",

@@ -4,6 +4,7 @@
 
 import { execSync } from 'child_process';
 import { logger } from '@/lib/logger';
+import { AzureProviderError } from '@/lib/observability/azure-provider-error';
 
 // Simple in-memory cache
 const cache = new Map<string, { timestamp: number; data: unknown }>();
@@ -62,16 +63,26 @@ export async function getAzureToken(): Promise<string | null> {
     });
 
     if (!response.ok) {
-      logger.error('Azure token error', { response: await response.text() });
-      return null;
+      throw new AzureProviderError('token', { status: response.status });
     }
 
-    const data = await response.json();
+    const data: unknown = await response.json();
+    if (
+      !data ||
+      typeof data !== 'object' ||
+      !('access_token' in data) ||
+      typeof data.access_token !== 'string' ||
+      !data.access_token.trim()
+    ) {
+      throw new AzureProviderError('token', {
+        message: 'Azure token response missing access token',
+      });
+    }
     setCache('azure_token', data.access_token);
     return data.access_token;
   } catch (error) {
-    logger.error('Azure token fetch error', { error: String(error) });
-    return null;
+    if (error instanceof AzureProviderError) throw error;
+    throw new AzureProviderError('token', { cause: error });
   }
 }
 
@@ -81,7 +92,7 @@ export async function getAzureToken(): Promise<string | null> {
 export async function queryCostsWithToken(
   token: string,
   subscriptionId: string,
-  queryBody: Record<string, unknown>
+  queryBody: Record<string, unknown>,
 ): Promise<Record<string, unknown> | null> {
   const url = `https://management.azure.com/subscriptions/${subscriptionId}/providers/Microsoft.CostManagement/query?api-version=2023-11-01`;
 
@@ -128,7 +139,7 @@ export function isAzCliAvailable(): boolean {
  */
 export function queryCostsWithAzCli(
   subscriptionId: string,
-  queryBody: Record<string, unknown>
+  queryBody: Record<string, unknown>,
 ): Record<string, unknown> | null {
   const url = `https://management.azure.com/subscriptions/${subscriptionId}/providers/Microsoft.CostManagement/query?api-version=2023-11-01`;
 
@@ -148,10 +159,16 @@ export function queryCostsWithAzCli(
  */
 export async function queryCosts(
   subscriptionId: string,
-  queryBody: Record<string, unknown>
+  queryBody: Record<string, unknown>,
 ): Promise<{ result: Record<string, unknown> | null; source: 'service_principal' | 'az_cli' }> {
   if (hasServicePrincipalCredentials()) {
-    const token = await getAzureToken();
+    let token: string | null = null;
+    try {
+      token = await getAzureToken();
+    } catch (error) {
+      if (!(error instanceof AzureProviderError)) throw error;
+      logger.error('Azure service principal authentication failed; trying CLI', undefined, error);
+    }
     if (token) {
       const result = await queryCostsWithToken(token, subscriptionId, queryBody);
       return { result, source: 'service_principal' };

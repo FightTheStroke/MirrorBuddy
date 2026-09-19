@@ -15,6 +15,17 @@ MirrorBuddy implements **country-specific data retention schedules** compliant w
 
 **Key Principle**: "Keep data only as long as necessary" (GDPR Art. 5(1)(e) - Storage Limitation)
 
+### Trial mindmap content
+
+Durable trial mindmaps and their operation receipts expire 30 days after the
+trial session was created, independent of activity or email collection. The
+mindmap persistence service denies reads and writes at that boundary. The existing
+trial cleanup job erases the dedicated `TrialSession.mindmaps` JSON, including for
+sessions retained for the separate 90-day email-nurturing period. Cleanup failures
+propagate to the existing retention job's error reporting; email retention never
+authorizes retaining educational content. Physical erasure depends on that job
+running successfully and must be monitored separately from access expiry.
+
 ---
 
 ## 1. Retention Schedules by Jurisdiction

@@ -1,5 +1,21 @@
 {
   "tools": {
+    "mindmapRecovery": {
+      "conflict": "La mappa è cambiata altrove. La tua modifica resta in attesa e non sovrascrive quella salvata.",
+      "error": "La modifica non è stata confermata. Il contenuto in attesa resta conservato.",
+      "connecting": "Caricamento della mappa salvata…",
+      "connected": "Mappa aggiornata",
+      "recovering": "Connessione interrotta. Recupero della mappa in corso…",
+      "exhausted": "Recupero interrotto. Riprova per continuare.",
+      "denied": "Accesso alla mappa non disponibile. Accedi di nuovo.",
+      "disconnected": "Mappa non attiva",
+      "pending": "Modifica in attesa di conferma. Il contenuto è conservato; riprova senza duplicarlo.",
+      "retry": "Riprova",
+      "node": "Nuovo nodo",
+      "parent": "Collega a",
+      "root": "Radice",
+      "add": "Aggiungi nodo"
+    },
     "pdf": {
       "label": "PDF",
       "description": "Genera documenti PDF dei contenuti",
@@ -21,6 +37,13 @@
       }
     },
     "webcam": {
+      "choosePhoto": "Scegli una foto",
+      "choosingPhoto": "Scelta della foto in corso",
+      "importFailed": "Impossibile aprire la foto. Scegli un'immagine JPEG, PNG o GIF valida e riprova.",
+      "frameUnavailable": "L'immagine non è pronta. Riprova o scegli una foto.",
+      "confirmFailed": "Impossibile confermare la foto. Riprova.",
+      "cameraReady": "Fotocamera pronta",
+      "countdown": "Foto tra {seconds} secondi",
       "label": "Webcam",
       "description": "Usa la webcam per interazioni visive",
       "cancel": "Annulla",

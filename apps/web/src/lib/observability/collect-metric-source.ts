@@ -1,6 +1,40 @@
 import { logger } from '@/lib/logger';
 import type { MetricSample } from './http-metrics-collector';
 
+const labelKey = (labels: Record<string, string>) =>
+  JSON.stringify(Object.entries(labels).sort(([a], [b]) => a.localeCompare(b)));
+
+/** A failed source may still have independently collected, valid sibling samples. */
+export class MetricSourceError extends Error {
+  constructor(
+    cause: unknown,
+    readonly samples: MetricSample[],
+  ) {
+    super('Metric source partially failed', { cause });
+    this.name = 'MetricSourceError';
+  }
+}
+
+function validSamples(collected: unknown): collected is MetricSample[] {
+  return (
+    Array.isArray(collected) &&
+    collected.every(
+      (sample) =>
+        sample &&
+        typeof sample.name === 'string' &&
+        sample.labels &&
+        typeof sample.labels === 'object' &&
+        !Array.isArray(sample.labels) &&
+        Object.values(sample.labels).every((value) => typeof value === 'string') &&
+        Number.isFinite(sample.value) &&
+        Number.isFinite(sample.timestamp) &&
+        (!['metric_collector_up', 'metric_collector_enabled'].includes(sample.name) ||
+          sample.value === 0 ||
+          sample.value === 1),
+    )
+  );
+}
+
 /** Isolate one source, not the push transport; never substitute failed usage with zero. */
 export async function collectMetricSource(
   collector: string,
@@ -9,31 +43,67 @@ export async function collectMetricSource(
   timestamp: number,
 ): Promise<MetricSample[]> {
   let samples: MetricSample[] = [];
+  let enabled = 1;
   let up = 0;
+  const sourceLabels = { ...labels, collector };
+  const sourceKey = labelKey(sourceLabels);
   try {
     const collected = await collect();
-    if (
-      !Array.isArray(collected) ||
-      collected.some(
-        (sample) => !sample || !Number.isFinite(sample.value) || !Number.isFinite(sample.timestamp),
-      )
-    ) {
+    if (!validSamples(collected)) {
       throw new Error('Invalid metric samples');
     }
     samples = collected;
-    // Disabled sources remain visibly unavailable, without being execution errors.
-    up = samples.some(
+    const disabled = new Set(
+      samples
+        .filter((sample) => sample.name === 'metric_collector_enabled' && sample.value === 0)
+        .map((sample) => labelKey(sample.labels)),
+    );
+    const health = samples.filter(
       (sample) =>
-        (sample.name === 'metric_collector_up' || sample.name === 'metric_collector_enabled') &&
-        sample.value === 0,
-    )
-      ? 0
-      : 1;
+        sample.name === 'metric_collector_up' || sample.name === 'metric_collector_enabled',
+    );
+    const ownEnabled = samples.find(
+      (sample) =>
+        sample.name === 'metric_collector_enabled' && labelKey(sample.labels) === sourceKey,
+    );
+    enabled =
+      ownEnabled?.value ??
+      (health.length > 0 && health.every((sample) => disabled.has(labelKey(sample.labels)))
+        ? 0
+        : 1);
+    // An optional disabled child is not a failure of its configured siblings.
+    up =
+      enabled &&
+      !samples.some(
+        (sample) =>
+          sample.name === 'metric_collector_up' &&
+          sample.value === 0 &&
+          !disabled.has(labelKey(sample.labels)),
+      )
+        ? 1
+        : 0;
   } catch (error) {
-    logger.error('Metrics collector failed', { collector }, error);
+    if (error instanceof MetricSourceError && validSamples(error.samples)) {
+      samples = error.samples.filter(
+        (sample) => !['metric_collector_up', 'metric_collector_enabled'].includes(sample.name),
+      );
+    }
+    logger.error(
+      'Metrics collector failed',
+      { collector },
+      error instanceof MetricSourceError ? error.cause : error,
+    );
   }
   return [
-    ...samples,
-    { name: 'metric_collector_up', labels: { ...labels, collector }, value: up, timestamp },
+    ...samples.filter(
+      (sample) => !(sample.name === 'metric_collector_up' && labelKey(sample.labels) === sourceKey),
+    ),
+    ...(!samples.some(
+      (sample) =>
+        sample.name === 'metric_collector_enabled' && labelKey(sample.labels) === sourceKey,
+    )
+      ? [{ name: 'metric_collector_enabled', labels: sourceLabels, value: enabled, timestamp }]
+      : []),
+    { name: 'metric_collector_up', labels: sourceLabels, value: up, timestamp },
   ];
 }

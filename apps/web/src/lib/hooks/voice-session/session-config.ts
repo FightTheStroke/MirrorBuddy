@@ -1,8 +1,3 @@
-// ============================================================================
-// SESSION CONFIGURATION
-// Azure Realtime API session setup (WebRTC only)
-// ============================================================================
-
 'use client';
 
 import { useCallback } from 'react';
@@ -14,14 +9,14 @@ import { buildAgeGateInstruction } from './age-gate-instruction';
 import { historyItemEvent } from './history-item';
 import type { Maestro } from '@/types';
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from '@/lib/voice';
-import { fetchConversationMemory, buildMemoryContext } from './memory-utils';
+import { fetchVoiceContext } from './session-context';
 import { buildVoicePrompt } from './voice-prompt-builder';
 import { injectSafetyGuardrails } from '@/lib/safety';
 import type { UseVoiceSessionOptions } from './types';
 import {
   TRANSCRIPTION_LANGUAGES,
   TRANSCRIPTION_PROMPTS,
-  BILINGUAL_PROMPTS,
+  buildBilingualPrompt,
   buildLanguageInstruction,
   buildCharacterInstruction,
 } from './session-constants';
@@ -29,14 +24,10 @@ import { getAdaptiveVadConfig, formatVadConfigForLogging } from './adaptive-vad'
 import { normalizeVoiceLocale } from './voice-locale';
 import { isFeatureEnabled } from '@/lib/feature-flags/client';
 
-// Re-export useSendGreeting from dedicated module
 export { useSendGreeting } from './send-greeting';
 
 type InitialMessage = { role: 'user' | 'assistant'; content: string };
 
-/**
- * Send session configuration to Azure Realtime API via WebRTC
- */
 export function useSendSessionConfig(
   maestroRef: React.MutableRefObject<Maestro | null>,
   setConnected: (value: boolean) => void,
@@ -64,7 +55,6 @@ export function useSendSessionConfig(
     const appearance = useSettingsStore.getState().appearance;
     const userLanguage = normalizeVoiceLocale(appearance?.language);
 
-    // Get accessibility settings for adaptive VAD (ADR-0069)
     const a11yState = useAccessibilityStore.getState();
     const activeProfile = a11yState.activeProfile;
     const adaptiveVadEnabled = a11yState.settings.adaptiveVadEnabled;
@@ -102,54 +92,8 @@ export function useSendSessionConfig(
       targetLanguage,
     });
 
-    // Parallelize non-critical context fetches to reduce voice connect latency (T1-10)
-    // Both memory and adaptive context are non-critical: voice works without them
-    let memoryContext = '';
-    let adaptiveInstruction = '';
+    const { memoryContext, adaptiveInstruction } = await fetchVoiceContext(maestro);
 
-    const subjectParam = maestro.subject ? `subject=${encodeURIComponent(maestro.subject)}` : '';
-    const results = await Promise.allSettled([
-      fetchConversationMemory(maestro.id),
-      fetch(`/api/adaptive/context?${subjectParam}&source=voice`),
-    ]);
-
-    // Process memory result
-    if (results[0].status === 'fulfilled') {
-      try {
-        memoryContext = buildMemoryContext(results[0].value);
-      } catch (error) {
-        logger.warn('[VoiceSession] Memory context processing failed', {
-          maestroId: maestro.id,
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
-    } else {
-      logger.warn('[VoiceSession] Memory context unavailable', {
-        maestroId: maestro.id,
-        error: String(results[0].reason),
-      });
-    }
-
-    // Process adaptive context result
-    if (results[1].status === 'fulfilled') {
-      const response = results[1].value;
-      try {
-        if (response.ok) {
-          const data = await response.json();
-          adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : '';
-        }
-      } catch (error) {
-        logger.warn('[VoiceSession] Adaptive context processing failed', {
-          error: String(error),
-        });
-      }
-    } else {
-      logger.warn('[VoiceSession] Adaptive context unavailable', {
-        error: String(results[1].reason),
-      });
-    }
-
-    // Build instructions
     const languageInstruction = buildLanguageInstruction(
       isLanguageTeacher,
       targetLanguage,
@@ -160,11 +104,8 @@ export function useSendSessionConfig(
       ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
       : '';
 
-    // Check voice_full_prompt feature flag (V1SuperCodex W2-VoiceSafety)
     const useFullPrompt = isFeatureEnabled('voice_full_prompt').enabled;
 
-    // Build voice-optimized prompt: full systemPrompt minus knowledge base & accessibility
-    // When voice_full_prompt is enabled, use complete prompt (no truncation)
     const voicePrompt = buildVoicePrompt(maestro, useFullPrompt);
 
     // Inject safety guardrails when voice_full_prompt is enabled (T2-03)
@@ -212,15 +153,17 @@ export function useSendSessionConfig(
       ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper'
       : 'whisper-1';
 
+    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
+    // ADR 0165: GA rejects transcription.prompt with gpt-realtime-whisper (invalid_value).
+    const withPrompt = (prompt: string) => (useGAProtocol && useWhisperRealtime ? {} : { prompt });
+
     const transcriptionConfig = {
       model: transcriptionModel,
-      ...(isLanguageTeacher && targetLanguage
-        ? {
-            prompt: BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
-          }
+      ...(isLanguageTeacher && targetLanguage && targetLanguage !== userLanguage
+        ? withPrompt(buildBilingualPrompt(targetLanguage, userLanguage))
         : {
             language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
-            prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
+            ...withPrompt(TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it),
           }),
     };
     const turnDetectionConfig = {
@@ -231,8 +174,6 @@ export function useSendSessionConfig(
       create_response: true,
       interrupt_response: !options.disableBargeIn,
     };
-
-    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
 
     const sessionConfig = {
       type: 'session.update',
