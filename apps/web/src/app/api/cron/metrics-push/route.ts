@@ -94,6 +94,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
   }
 
   // 2. Real-time active users (from database - serverless safe)
+  let activityOperation = 'userActivity.countByType';
   try {
     const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
 
@@ -163,6 +164,7 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     );
 
     // Active users by route (top 10, F-06: exclude test data via isTestData flag)
+    activityOperation = 'userActivity.countByRoute';
     const routeCounts = await prisma.$queryRaw<Array<{ route: string; count: bigint }>>`
       SELECT route, COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
@@ -190,15 +192,23 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
 
     // Cleanup old records (older than 10 minutes to be safe)
     const cleanupCutoff = new Date(now - ACTIVITY_WINDOW_MS * 2);
+    activityOperation = 'userActivity.deleteMany';
     await prisma.userActivity.deleteMany({
       where: { timestamp: { lt: cleanupCutoff } },
     });
   } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'realtime-active-users' },
-    });
-    log.warn('Failed to collect realtime active users', {
-      error: String(err),
+    Sentry.withScope((scope) => {
+      scope.setTag('cron', 'metrics-push');
+      scope.setTag('section', 'realtime-active-users');
+      log.error(
+        'Failed to collect realtime active users',
+        {
+          cron: 'metrics-push',
+          section: 'realtime-active-users',
+          operation: activityOperation,
+        },
+        err,
+      );
     });
   }
 

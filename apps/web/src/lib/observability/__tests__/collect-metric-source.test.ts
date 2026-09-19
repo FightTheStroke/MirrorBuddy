@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { logger } from '@/lib/logger';
-import { collectMetricSource } from '../collect-metric-source';
+import { collectMetricSource, MetricSourceError } from '../collect-metric-source';
 import type { MetricSample } from '../http-metrics-collector';
 
 vi.mock('@/lib/logger', () => ({
@@ -143,6 +143,50 @@ describe('metric source boundary', () => {
       'Metrics collector failed',
       { collector: 'test' },
       expect.any(Error),
+    );
+  });
+
+  it('retains validated partial usage and reports the original cause, never healthy state', async () => {
+    const cause = new Error('Controlled provider rejection');
+    const usage = {
+      name: 'service_limit_absolute',
+      labels: { metric: 'rpm' },
+      value: 17,
+      timestamp: 42,
+    };
+    const result = await collectMetricSource(
+      'azure_openai',
+      () => {
+        throw new MetricSourceError(cause, [usage, ...state('azure_openai', 0, 1)]);
+      },
+      { region: 'eu' },
+      42,
+    );
+    expect(result).toEqual([usage, ...state('azure_openai', 1, 0)]);
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      'Metrics collector failed',
+      { collector: 'azure_openai' },
+      cause,
+    );
+  });
+
+  it('never publishes malformed partial usage even when a source supplies it with a failure', async () => {
+    const cause = new Error('Controlled provider rejection');
+    const result = await collectMetricSource(
+      'azure_openai',
+      () => {
+        throw new MetricSourceError(cause, [
+          { name: 'service_limit_absolute', labels: {}, value: NaN, timestamp: 42 },
+        ]);
+      },
+      { region: 'eu' },
+      42,
+    );
+    expect(result).toEqual(state('azure_openai', 1, 0));
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      'Metrics collector failed',
+      { collector: 'azure_openai' },
+      cause,
     );
   });
 });

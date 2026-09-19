@@ -14,7 +14,7 @@
  *   - service_limit_absolute{service, metric, type="used|limit"}
  */
 
-import { collectMetricSource } from './collect-metric-source';
+import { collectMetricSource, MetricSourceError } from './collect-metric-source';
 import { getVercelLimits } from './vercel-limits';
 import { getSupabaseLimits } from './supabase-limits';
 import { getAzureOpenAILimits } from './azure-openai-limits';
@@ -200,35 +200,27 @@ async function collectAzureOpenAILimits(
     timestamp,
   };
   if (limits.status === 'not_configured') return [enabled];
-  if (limits.status !== 'ok') {
-    throw new Error(limits.error);
+  for (const [metric, value] of [
+    ['chat_tpm', limits.tpm],
+    ['chat_rpm', limits.rpm],
+  ] as const) {
+    if (!value) continue;
+    samples.push(
+      ...createLimitMetrics(
+        instanceLabels,
+        'azure_openai',
+        metric,
+        {
+          used: value.used,
+          limit: value.limit,
+          percent: value.usagePercent,
+        },
+        timestamp,
+      ),
+    );
   }
-
-  samples.push(
-    enabled,
-    ...createLimitMetrics(
-      instanceLabels,
-      'azure_openai',
-      'chat_tpm',
-      {
-        used: limits.tpm.used,
-        limit: limits.tpm.limit,
-        percent: limits.tpm.usagePercent,
-      },
-      timestamp,
-    ),
-    ...createLimitMetrics(
-      instanceLabels,
-      'azure_openai',
-      'chat_rpm',
-      {
-        used: limits.rpm.used,
-        limit: limits.rpm.limit,
-        percent: limits.rpm.usagePercent,
-      },
-      timestamp,
-    ),
-  );
-
-  return samples;
+  if (limits.status !== 'ok') {
+    throw new MetricSourceError(limits.cause ?? new Error(limits.error), samples);
+  }
+  return [enabled, ...samples];
 }

@@ -12,8 +12,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-vi.mock('@sentry/nextjs', () => ({
+vi.mock('@sentry/nextjs', async (importOriginal) => ({
   captureException: vi.fn(),
+  withScope: (await importOriginal<typeof import('@sentry/nextjs')>()).withScope,
 }));
 
 vi.mock('@/lib/logger', () => ({
