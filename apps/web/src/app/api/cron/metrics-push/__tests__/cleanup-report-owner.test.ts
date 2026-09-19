@@ -4,7 +4,8 @@ import { randomUUID } from 'node:crypto';
 import * as Sentry from '@sentry/nextjs';
 import { NextRequest } from 'next/server';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import type { prisma, dbPool } from '@/lib/db';
+import { policyTestDatabaseEnabled } from '@/test/policy-test-environment';
+import { createReadOnlyTestDatabase } from '@/test/readonly-test-database';
 
 vi.unmock('@/lib/logger');
 
@@ -19,11 +20,11 @@ function errorCodes(value: unknown): string[] {
   );
 }
 
-describe.skipIf(!process.env.TEST_DATABASE_URL)(
-  'cron cleanup reporting with real read-only PG',
+describe.runIf(policyTestDatabaseEnabled())(
+  'cron cleanup reporting with an owned read-only PostgreSQL connection',
   () => {
-    let database: typeof prisma;
-    let pool: typeof dbPool;
+    let owned: ReturnType<typeof createReadOnlyTestDatabase> | undefined;
+    let database: ReturnType<typeof createReadOnlyTestDatabase>['prisma'];
     let server: Server;
     let route: typeof import('../route');
     let origin: string;
@@ -43,13 +44,10 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
     const payloads: string[] = [];
 
     beforeAll(async () => {
-      for (const key of ['DATABASE_URL', 'TEST_DATABASE_URL', 'DEV_DATABASE_URL']) {
-        const url = new URL(process.env[key] ?? '');
-        expect(['localhost', '127.0.0.1']).toContain(url.hostname);
-        expect(url.port).toBe('5432');
-        expect(url.pathname).toBe('/mirrorbuddy_test');
-        expect(url.searchParams.get('options')).toBe('-c default_transaction_read_only=on');
-      }
+      owned = createReadOnlyTestDatabase();
+      database = owned.prisma;
+      // Bind the real route to an owned read-only client, not mocked database operations.
+      vi.doMock('@/lib/db', () => ({ prisma: database, default: database }));
       vi.stubEnv('NODE_ENV', 'production');
       vi.stubEnv('VERCEL_ENV', 'production');
       vi.stubEnv('CRON_SECRET', secret);
@@ -116,7 +114,6 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
         if (url.origin !== origin) throw new Error('Unexpected non-fixture HTTP request');
         return fetch(input, { ...init, redirect: 'error', signal: AbortSignal.timeout(10000) });
       });
-      ({ prisma: database, dbPool: pool } = await import('@/lib/db'));
       expect(await database.$queryRaw`SHOW transaction_read_only`).toEqual([
         { transaction_read_only: 'on' },
       ]);
@@ -138,8 +135,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
 
     afterAll(async () => {
       try {
-        await database?.$disconnect();
-        if (pool && !pool.ended) await pool.end();
+        await owned?.close();
         await Sentry.close(3000);
       } finally {
         if (server?.listening)
@@ -149,6 +145,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           });
         vi.restoreAllMocks();
         vi.unstubAllEnvs();
+        vi.doUnmock('@/lib/db');
       }
     });
 
