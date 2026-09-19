@@ -387,6 +387,21 @@ npm run typecheck    # Run TypeScript
 npm run test         # Run Playwright E2E tests
 ```
 
+### Which server the E2E tests run against
+
+By default `npm run test` serves the **development** server locally and the **built
+standalone** server in CI. Set `E2E_SERVER_MODE` to choose explicitly:
+
+```bash
+E2E_SERVER_MODE=production npm run test   # serve the built standalone server
+E2E_SERVER_MODE=development npm run test  # serve the dev server
+```
+
+Requires a completed production build (`npm run build`) for `production`. The value must be
+exactly `production` or `development`; anything else fails immediately rather than falling
+back silently. It affects only the served server and its own `NODE_ENV` — project
+selection, workers, retries and timeouts are unchanged.
+
 ---
 
 ## Troubleshooting

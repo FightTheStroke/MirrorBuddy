@@ -123,6 +123,8 @@ function validateCriticalEnvVars(): void {
 
 function validateOptionalEnvVars(): void {
   const optional = [
+    // E2E - optional server selection, unset means the previous CI behaviour
+    { name: 'E2E_SERVER_MODE', category: 'Testing' },
     // Observability
     { name: 'NEXT_PUBLIC_SENTRY_DSN', category: 'Sentry' },
     { name: 'SENTRY_AUTH_TOKEN', category: 'Sentry' },
