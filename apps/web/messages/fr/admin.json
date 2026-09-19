@@ -1,5 +1,23 @@
 {
   "admin": {
+    "policyWrite": {
+      "unconfirmed": "L'enregistrement n'est pas confirmé. La protection affichée concerne uniquement cette instance, pas tous les serveurs.",
+      "superseded": "Une autre opération a remplacé cette modification. Aucune réactivation n'a été confirmée.",
+      "failed": "La modification n'a pas pu être confirmée. Relancez explicitement l'opération.",
+      "loadFailed": "Impossible de charger les paramètres des fonctionnalités.",
+      "instanceNotice": "État effectif renvoyé par l'instance ayant traité la modification. Actualiser la page ne prouve pas l'enregistrement.",
+      "enable": "Activer",
+      "disable": "Désactiver",
+      "reactivateAll": "Tout réactiver",
+      "globalStop": "Arrêt global",
+      "globalStopped": "Toutes les fonctionnalités sont bloquées par l'arrêt global",
+      "operational": "Tous les systèmes sont opérationnels",
+      "degraded": "Dégradation du système : {level}",
+      "healthy": "Opérationnel",
+      "partial": "Partiel",
+      "severe": "Grave",
+      "critical": "Critique"
+    },
     "metricTruth": {
       "averageTurns": "Nombre moyen d'échanges par session enregistrée",
       "averageSessionCost": "Coût moyen par session enregistrée",

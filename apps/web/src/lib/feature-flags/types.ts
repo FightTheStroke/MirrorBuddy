@@ -13,6 +13,7 @@ export interface FeatureFlag {
   status: FeatureFlagStatus;
   enabledPercentage: number; // 0-100 for gradual rollout
   killSwitch: boolean; // true = force disabled regardless of status
+  killSwitchReason?: string | null;
   metadata?: Record<string, unknown>;
   updatedAt: Date;
   updatedBy?: string;
@@ -47,6 +48,7 @@ export interface FeatureFlagUpdate {
   status?: FeatureFlagStatus;
   enabledPercentage?: number;
   killSwitch?: boolean;
+  killSwitchReason?: string | null;
   metadata?: Record<string, unknown>;
   updatedBy?: string;
 }

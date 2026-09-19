@@ -143,11 +143,18 @@ describe('independent metrics push', () => {
     ]);
     await prometheusPushService.pushMetrics();
     const body = fetchMock.mock.calls[0][1].body as string;
-    expect(body).toContain('collector=service_limits value=0 ');
+    expect(body).toContain(
+      'metric_collector_up,instance=mirrorbuddy,env=production,collector=service_limits value=0 ',
+    );
     expect(body).toContain(
       'service_limit_absolute,service=vercel,metric=builds,type=used value=8 ',
     );
-    expect(body).not.toContain('collector=service_limits value=1 ');
+    expect(body).not.toContain(
+      'metric_collector_up,instance=mirrorbuddy,env=production,collector=service_limits value=1 ',
+    );
+    expect(body).toContain(
+      'metric_collector_enabled,instance=mirrorbuddy,env=production,collector=service_limits value=1 ',
+    );
   });
 
   it('keeps database-backed collectors out of the per-instance timer on Vercel', async () => {

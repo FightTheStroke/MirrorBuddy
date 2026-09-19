@@ -17,6 +17,7 @@ import {
 } from '@/app/api/azure/costs/helpers';
 import { parseAzureResourceId, queryAzureMetrics } from './azure-monitor-client';
 import { calculateStatus, AlertStatus } from './threshold-logic';
+import { AzureProviderError } from './azure-provider-error';
 
 /**
  * Resource metrics with usage and limit (F-18, F-25)
@@ -41,11 +42,12 @@ export type AzureOpenAILimits =
       error?: never;
     }
   | {
-      tpm: null;
-      rpm: null;
+      tpm: ResourceMetric | null;
+      rpm: ResourceMetric | null;
       timestamp: string;
       status: 'not_configured' | 'error';
       error: string;
+      cause?: Error;
     };
 
 /**
@@ -107,60 +109,69 @@ export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
     return cached;
   }
 
-  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-  if (!endpoint) {
-    const error = 'AZURE_OPENAI_ENDPOINT not configured';
-    logger.warn(`[azure-openai-limits] ${error}`);
-    const result = createEmptyLimits(error);
-    setCache('azure_openai_limits', result);
-    return result;
-  }
-
-  // Get Azure token for authentication
-  const token = await getAzureToken();
-  if (!token) {
-    const error = 'Azure authentication failed';
-    logger.warn(`[azure-openai-limits] ${error}`);
-    const result = createEmptyLimits(error);
-    setCache('azure_openai_limits', result);
-    return result;
-  }
-
-  // Parse resource ID from endpoint
-  const resourceId = parseAzureResourceId(endpoint);
-  if (!resourceId) {
-    const error = 'Failed to parse Azure resource ID from endpoint';
-    logger.error(`[azure-openai-limits] ${error}`);
-    return createEmptyLimits(error);
-  }
-
   try {
-    // Query metrics in parallel
-    const [tpmUsed, rpmUsed] = await Promise.all([
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+    if (!endpoint) {
+      throw new AzureProviderError('configuration', {
+        message: 'AZURE_OPENAI_ENDPOINT not configured',
+      });
+    }
+    if (!(await getAzureToken())) {
+      throw new AzureProviderError('token', { message: 'Azure authentication failed' });
+    }
+    const resourceId = parseAzureResourceId(endpoint);
+    if (!resourceId) {
+      const cause = new AzureProviderError('configuration', {
+        message: 'Failed to parse Azure resource ID from endpoint',
+      });
+      return createEmptyLimits(cause.message, 'error', cause);
+    }
+    // Keep a successful sibling without turning a rejected metric into zero.
+    const [tpm, rpm] = await Promise.allSettled([
       queryAzureMetrics(resourceId, ['TokenTransaction']),
       queryAzureMetrics(resourceId, ['Requests']),
     ]);
+    const tpmMetric =
+      tpm.status === 'fulfilled'
+        ? formatMetric(tpm.value, AZURE_OPENAI_DEFAULT_LIMITS.TPM, 'tokens/min')
+        : null;
+    const rpmMetric =
+      rpm.status === 'fulfilled'
+        ? formatMetric(rpm.value, AZURE_OPENAI_DEFAULT_LIMITS.RPM, 'requests/min')
+        : null;
+    let limits: AzureOpenAILimits;
+    if (tpmMetric && rpmMetric) {
+      limits = {
+        status: 'ok',
+        tpm: tpmMetric,
+        rpm: rpmMetric,
+        timestamp: new Date().toISOString(),
+      };
+      logger.info('[azure-openai-limits] Limits fetched successfully', {
+        tpm: `${tpmMetric.used}/${tpmMetric.limit} (${tpmMetric.usagePercent}%)`,
+        rpm: `${rpmMetric.used}/${rpmMetric.limit} (${rpmMetric.usagePercent}%)`,
+      });
+    } else {
+      const failure: unknown =
+        tpm.status === 'rejected' ? tpm.reason : rpm.status === 'rejected' ? rpm.reason : undefined;
+      const cause =
+        failure instanceof Error ? failure : new AzureProviderError('metrics', { cause: failure });
+      limits = {
+        ...createEmptyLimits(cause.message, 'error', cause),
+        tpm: tpmMetric,
+        rpm: rpmMetric,
+      };
+    }
 
-    const limits: AzureOpenAILimits = {
-      status: 'ok',
-      tpm: formatMetric(tpmUsed, AZURE_OPENAI_DEFAULT_LIMITS.TPM, 'tokens/min'),
-      rpm: formatMetric(rpmUsed, AZURE_OPENAI_DEFAULT_LIMITS.RPM, 'requests/min'),
-      timestamp: new Date().toISOString(),
-    };
-
-    // Cache for 1 minute (metrics API rate limiting)
+    // Preserve the existing five-minute snapshot cache, including explicit failures.
     setCache('azure_openai_limits', limits);
-
-    logger.info('[azure-openai-limits] Limits fetched successfully', {
-      tpm: `${limits.tpm.used}/${limits.tpm.limit} (${limits.tpm.usagePercent}%)`,
-      rpm: `${limits.rpm.used}/${limits.rpm.limit} (${limits.rpm.usagePercent}%)`,
-    });
-
     return limits;
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('[azure-openai-limits] Failed to get limits', undefined, error as Error);
-    return createEmptyLimits(errorMsg);
+    const cause =
+      error instanceof Error ? error : new AzureProviderError('metrics', { cause: error });
+    const result = createEmptyLimits(cause.message, 'error', cause);
+    setCache('azure_openai_limits', result);
+    return result;
   }
 }
 
@@ -170,13 +181,15 @@ export async function getAzureOpenAILimits(): Promise<AzureOpenAILimits> {
 function createEmptyLimits(
   error: string,
   status: 'error' | 'not_configured' = 'error',
-): AzureOpenAILimits {
+  cause?: Error,
+): Exclude<AzureOpenAILimits, { status: 'ok' }> {
   return {
     tpm: null,
     rpm: null,
     status,
     timestamp: new Date().toISOString(),
     error,
+    cause,
   };
 }
 

@@ -7,9 +7,13 @@
  * - Spike protection: disable voice temporarily on cost spike
  */
 
-import { logger } from "@/lib/logger";
-import { activateKillSwitch, deactivateKillSwitch } from "@/lib/feature-flags";
-import { detectCostSpike, THRESHOLDS } from "./cost-tracking-service";
+import { logger } from '@/lib/logger';
+import { detectCostSpike, THRESHOLDS } from './cost-tracking-service';
+import {
+  stopVoiceForSpike,
+  voicePolicyAllowance,
+  resetVoiceSpikePolicy,
+} from './voice-spike-policy';
 
 // Duration thresholds (in minutes) from V1Plan FASE 6.2.3
 const VOICE_DURATION_LIMITS = {
@@ -18,7 +22,7 @@ const VOICE_DURATION_LIMITS = {
   SPIKE_COOLDOWN_MS: 15 * 60 * 1000, // 15 min cooldown after spike
 } as const;
 
-export type VoiceCapStatus = "ok" | "soft_cap" | "hard_cap";
+export type VoiceCapStatus = 'ok' | 'soft_cap' | 'hard_cap';
 
 export interface VoiceSessionState {
   sessionId: string;
@@ -38,9 +42,7 @@ export interface VoiceCapCheck {
 
 // Active voice sessions tracking
 const activeSessions = new Map<string, VoiceSessionState>();
-
-// Spike cooldown state
-let spikeDisabledUntil: Date | null = null;
+let resetGeneration = 0;
 
 /**
  * Start tracking a voice session
@@ -51,26 +53,23 @@ export function startVoiceSession(sessionId: string, userId: string): void {
     userId,
     startedAt: new Date(),
     durationMinutes: 0,
-    status: "ok",
+    status: 'ok',
     warningShown: false,
   });
 
-  logger.info("Voice session started for cost tracking", { sessionId, userId });
+  logger.info('Voice session started for cost tracking', { sessionId, userId });
 }
 
 /**
  * Update voice session duration and check caps
  */
-export function updateVoiceDuration(
-  sessionId: string,
-  durationMinutes: number,
-): VoiceCapCheck {
+export function updateVoiceDuration(sessionId: string, durationMinutes: number): VoiceCapCheck {
   const session = activeSessions.get(sessionId);
 
   if (!session) {
     return {
       allowed: true,
-      status: "ok",
+      status: 'ok',
       remainingMinutes: VOICE_DURATION_LIMITS.HARD_CAP_MINUTES,
     };
   }
@@ -80,9 +79,9 @@ export function updateVoiceDuration(
 
   // Hard cap exceeded - force switch to text
   if (durationMinutes >= VOICE_DURATION_LIMITS.HARD_CAP_MINUTES) {
-    session.status = "hard_cap";
+    session.status = 'hard_cap';
 
-    logger.warn("Voice hard cap exceeded - switching to text", {
+    logger.warn('Voice hard cap exceeded - switching to text', {
       sessionId,
       userId: session.userId,
       durationMinutes,
@@ -90,7 +89,7 @@ export function updateVoiceDuration(
 
     return {
       allowed: false,
-      status: "hard_cap",
+      status: 'hard_cap',
       message: `Limite voce raggiunto (${VOICE_DURATION_LIMITS.HARD_CAP_MINUTES} min). Continuiamo in chat testuale.`,
       remainingMinutes: 0,
     };
@@ -98,12 +97,12 @@ export function updateVoiceDuration(
 
   // Soft cap exceeded - show warning
   if (durationMinutes >= VOICE_DURATION_LIMITS.SOFT_CAP_MINUTES) {
-    session.status = "soft_cap";
+    session.status = 'soft_cap';
 
     if (!session.warningShown) {
       session.warningShown = true;
 
-      logger.info("Voice soft cap reached - warning user", {
+      logger.info('Voice soft cap reached - warning user', {
         sessionId,
         userId: session.userId,
         durationMinutes,
@@ -112,7 +111,7 @@ export function updateVoiceDuration(
 
       return {
         allowed: true,
-        status: "soft_cap",
+        status: 'soft_cap',
         message: `Hai usato ${durationMinutes} minuti di voce. Rimangono ${remaining} minuti prima del passaggio automatico a chat.`,
         remainingMinutes: remaining,
       };
@@ -133,7 +132,7 @@ export function endVoiceSession(sessionId: string): void {
   const session = activeSessions.get(sessionId);
 
   if (session) {
-    logger.info("Voice session ended", {
+    logger.info('Voice session ended', {
       sessionId,
       userId: session.userId,
       totalMinutes: session.durationMinutes,
@@ -148,60 +147,36 @@ export function endVoiceSession(sessionId: string): void {
  * Check if voice is allowed (not disabled by spike protection)
  */
 export function isVoiceAllowed(): { allowed: boolean; reason?: string } {
-  if (spikeDisabledUntil && new Date() < spikeDisabledUntil) {
-    const remainingMs = spikeDisabledUntil.getTime() - Date.now();
-    const remainingMin = Math.ceil(remainingMs / 60000);
-
-    return {
-      allowed: false,
-      reason: `Voce temporaneamente disabilitata per protezione costi. Riprova tra ${remainingMin} minuti.`,
-    };
-  }
-
-  return { allowed: true };
+  return voicePolicyAllowance();
 }
 
 /**
  * Handle cost spike - temporarily disable voice
  */
 export async function handleCostSpike(sessionCost: number): Promise<boolean> {
-  const isSpike = await detectCostSpike(sessionCost);
-
-  if (isSpike) {
-    spikeDisabledUntil = new Date(
-      Date.now() + VOICE_DURATION_LIMITS.SPIKE_COOLDOWN_MS,
-    );
-
-    // Activate kill-switch for voice
-    activateKillSwitch(
-      "voice_realtime",
+  const generation = resetGeneration;
+  try {
+    if (!Number.isFinite(sessionCost) || sessionCost < 0) {
+      throw new TypeError('Voice session cost must be a non-negative finite number');
+    }
+    const isSpike = await detectCostSpike(sessionCost);
+    if (!isSpike || generation !== resetGeneration) return false;
+    stopVoiceForSpike(
       `Cost spike detected: €${sessionCost.toFixed(2)} exceeds P95 × ${THRESHOLDS.SPIKE_MULTIPLIER}`,
+      VOICE_DURATION_LIMITS.SPIKE_COOLDOWN_MS,
     );
-
-    logger.warn("Voice disabled due to cost spike", {
-      sessionCost,
-      disabledUntil: spikeDisabledUntil,
-    });
-
-    // Schedule re-enable
-    setTimeout(() => {
-      spikeDisabledUntil = null;
-      deactivateKillSwitch("voice_realtime");
-      logger.info("Voice re-enabled after spike cooldown");
-    }, VOICE_DURATION_LIMITS.SPIKE_COOLDOWN_MS);
-
+    logger.warn('Voice locally disabled due to cost spike', { sessionCost });
     return true;
+  } catch (error) {
+    logger.error('Voice cost spike evaluation failed', undefined, error);
+    throw error;
   }
-
-  return false;
 }
 
 /**
  * Get current voice session state
  */
-export function getVoiceSessionState(
-  sessionId: string,
-): VoiceSessionState | null {
+export function getVoiceSessionState(sessionId: string): VoiceSessionState | null {
   return activeSessions.get(sessionId) || null;
 }
 
@@ -231,8 +206,9 @@ export function getVoiceLimits(): {
  * Reset state (for testing)
  */
 export function _resetState(): void {
+  resetGeneration++;
   activeSessions.clear();
-  spikeDisabledUntil = null;
+  resetVoiceSpikePolicy();
 }
 
 // Export limits for external use
