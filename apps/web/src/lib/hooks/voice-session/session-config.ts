@@ -153,15 +153,17 @@ export function useSendSessionConfig(
       ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper'
       : 'whisper-1';
 
+    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
+    // ADR 0165: GA rejects transcription.prompt with gpt-realtime-whisper (invalid_value).
+    const withPrompt = (prompt: string) => (useGAProtocol && useWhisperRealtime ? {} : { prompt });
+
     const transcriptionConfig = {
       model: transcriptionModel,
       ...(isLanguageTeacher && targetLanguage && targetLanguage !== userLanguage
-        ? {
-            prompt: buildBilingualPrompt(targetLanguage, userLanguage),
-          }
+        ? withPrompt(buildBilingualPrompt(targetLanguage, userLanguage))
         : {
             language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
-            prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
+            ...withPrompt(TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it),
           }),
     };
     const turnDetectionConfig = {
@@ -172,8 +174,6 @@ export function useSendSessionConfig(
       create_response: true,
       interrupt_response: !options.disableBargeIn,
     };
-
-    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
 
     const sessionConfig = {
       type: 'session.update',

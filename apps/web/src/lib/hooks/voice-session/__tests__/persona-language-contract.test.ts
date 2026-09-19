@@ -30,7 +30,7 @@ interface SessionUpdate {
     tools: unknown[];
     audio: {
       output: { voice: string };
-      input: { transcription: { language?: string; prompt: string } };
+      input: { transcription: { language?: string; prompt?: string } };
     };
   };
 }
@@ -138,14 +138,11 @@ describe('actual persona/session builders, not live conversations', () => {
         );
         expect(transcription.language).toBe(locale);
       }
-      const hints = {
-        it: 'matematica',
-        en: 'math',
-        fr: 'mathématiques',
-        de: 'Mathematik',
-        es: 'matemáticas',
-      };
-      expect(transcription.prompt).toContain(hints[locale]);
+      // ADR 0165: GA Realtime rejects transcription.prompt with gpt-realtime-whisper
+      // ("Prompt is not supported with gpt-realtime-whisper in GA Realtime sessions",
+      // OpenAI Realtime reference / accept). Vocabulary hints are therefore omitted on
+      // GA; whisper-1 and preview keep them (session-config-transcription-prompt.test.ts).
+      expect(transcription.prompt).toBeUndefined();
       expect(config.session.instructions).not.toContain('undefined');
     },
   );
