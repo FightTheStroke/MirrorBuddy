@@ -2,7 +2,7 @@
  * @vitest-environment node
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db';
 import { canSendTo } from '@/lib/email/preference-service';
@@ -33,9 +33,30 @@ vi.mock('@/lib/maintenance/notification-triggers', () => ({
 
 import { POST } from '../route';
 
+const CRON_SECRET = 'maintenance-notify-unit-test-secret';
+
 describe('POST /api/cron/maintenance-notify', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('CRON_SECRET', CRON_SECRET);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it.each(['missing', 'invalid'])('rejects %s authorization', async (authorization) => {
+    const response = await POST(
+      new NextRequest('http://localhost:3000/api/cron/maintenance-notify', {
+        method: 'POST',
+        headers: authorization === 'invalid' ? { authorization: 'Bearer invalid' } : {},
+      }) as never,
+    );
+
+    expect(response.status).toBe(401);
+    expect(prisma.maintenanceWindow.findMany).not.toHaveBeenCalled();
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(triggerMaintenanceNotification).not.toHaveBeenCalled();
   });
 
   it('sends 24h emails only to users with allowed email preferences', async () => {
@@ -62,6 +83,7 @@ describe('POST /api/cron/maintenance-notify', () => {
     const response = await POST(
       new NextRequest('http://localhost:3000/api/cron/maintenance-notify', {
         method: 'POST',
+        headers: { authorization: `Bearer ${CRON_SECRET}` },
       }) as never,
     );
 
@@ -89,6 +111,7 @@ describe('POST /api/cron/maintenance-notify', () => {
     const response = await POST(
       new NextRequest('http://localhost:3000/api/cron/maintenance-notify', {
         method: 'POST',
+        headers: { authorization: `Bearer ${CRON_SECRET}` },
       }) as never,
     );
 

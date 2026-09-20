@@ -87,7 +87,7 @@ describe('optional Azure Monitor exporter', () => {
   });
 
   it('keeps Sentry startup and Grafana metrics running without AppInsights', async () => {
-    const { register } = await import('../../../../instrumentation');
+    const { register } = await import('../../../instrumentation');
     await register();
     expect(mocks.sentryLoaded).toHaveBeenCalledTimes(1);
     expect(mocks.grafanaStart).toHaveBeenCalledTimes(1);
@@ -103,7 +103,7 @@ describe('optional Azure Monitor exporter', () => {
         releaseLoad = resolve;
       }),
     );
-    const { register } = await import('../../../../instrumentation');
+    const { register } = await import('../../../instrumentation');
 
     await register();
 
