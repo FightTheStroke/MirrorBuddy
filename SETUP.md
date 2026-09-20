@@ -274,6 +274,16 @@ SENTRY_AUTH_TOKEN=            # Sentry release management
 GRAFANA_CLOUD_TOKEN=          # Grafana Cloud metrics push
 ```
 
+### Auditing environment variables
+
+`./scripts/env-var-audit.sh` checks application, package source, scripts (including
+shell scripts), E2E and Prisma source references against `.env.example` and the
+production policy registry or validator declarations. It parses declaration
+syntax without executing the validator; comments and ordinary strings do not
+declare variables. Undocumented names remain warnings with exit 0. Missing
+source roots, documentation, reader dependencies or failed searches exit 2.
+A valid checkout with no references exits 0 and explicitly reports the empty scan.
+
 ### Backup & Restore
 
 The `.env` file is NOT tracked in git. It is backed up to **Azure Key Vault** (`kv-virtualbpm-prod`) and synced to **GitHub Secrets** and **Vercel**.
