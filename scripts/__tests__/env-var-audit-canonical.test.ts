@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, readFileSync } from 'node:fs';
+import { accessSync, chmodSync, constants, existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { criticalProductionEnv } from '../lib/production-env-policy';
@@ -41,6 +41,14 @@ function readDeclarations(sources: string[]) {
     .filter(Boolean);
   return { status: result.status, names, stdout, stderr: result.stderr ?? '' };
 }
+
+describe('env-var-audit repository executable contract', () => {
+  it('keeps the real audit directly executable by the pre-push hook', () => {
+    const audit = resolve(repository, 'scripts/env-var-audit.sh');
+
+    expect(() => accessSync(audit, constants.X_OK)).not.toThrow();
+  });
+});
 
 describe('env-var-audit canonical declaration contract', () => {
   it('recognises exactly the exported production registry', () => {
