@@ -7,8 +7,8 @@
  * by the global test setup (src/test/setup.ts).
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ExportPDFModal } from '../ExportPDFModal';
 import type { StudyKit } from '@/types/study-kit';
@@ -52,7 +52,42 @@ beforeEach(() => {
   Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), writable: true });
 });
 
+// Radix defers the dialog's unmount auto-focus callback to a macrotask
+// (@radix-ui/react-focus-scope dist/index.mjs:87-99), so removing the DOM is
+// not the end of the dialog's lifecycle: that callback still has to run inside
+// this environment. This helper is the file's single unmount path, so the
+// regression below observes the real Radix callback and never a mock of it.
+const AUTOFOCUS_ON_UNMOUNT = 'focusScope.autoFocusOnUnmount';
+
+async function unmountDialogs(): Promise<void> {
+  cleanup();
+  // Radix dispatches that callback from a zero-delay timer, so awaiting one
+  // macrotask inside act() lets it run while this environment is still alive,
+  // instead of leaving it pending until the environment is torn down.
+  await act(async () => {
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  });
+}
+
+afterEach(unmountDialogs);
+
 describe('ExportPDFModal', () => {
+  it('drains the dialog unmount auto-focus callback before the environment is torn down', async () => {
+    render(<ExportPDFModal studyKit={studyKit} isOpen onClose={vi.fn()} />);
+    const dialog = screen.getByRole('dialog');
+    let autoFocusedOnUnmount = false;
+    dialog.addEventListener(AUTOFOCUS_ON_UNMOUNT, () => {
+      autoFocusedOnUnmount = true;
+    });
+
+    await unmountDialogs();
+
+    expect(dialog.isConnected).toBe(false);
+    expect(autoFocusedOnUnmount).toBe(true);
+  });
+
   it('exposes an accessible dialog with a name when open', () => {
     render(<ExportPDFModal studyKit={studyKit} isOpen onClose={vi.fn()} />);
     const dialog = screen.getByRole('dialog');

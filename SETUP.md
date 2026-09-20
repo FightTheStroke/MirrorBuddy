@@ -7,6 +7,7 @@
 - **Node.js 24.x** (root `engines.node`; Docker and CI use Node 24)
 - **pnpm 10.33.0** (pinned in root `package.json`)
 - **PostgreSQL 17** with pgvector extension (or Supabase)
+- **ripgrep (`rg`) built with PCRE2** (`brew install ripgrep`) — required by the pre-commit secrets scan, which fails closed when it is missing
 
 Tooling execution evidence uses Node 24.19.0 and pnpm 10.33.0.
 
@@ -48,6 +49,16 @@ by the dev server (normally http://localhost:3000).
   **optional root `.env`**, with an already-set environment value taking
   precedence, and uses **`DATABASE_URL` directly**. It does **not** run Prisma CLI
   configuration or apply its `DEV_DATABASE_URL` / `DIRECT_URL` overrides.
+- **Migration sync:** `scripts/sync-databases.sh` runs two phases. The first
+  applies migrations to the ambient production target — `DIRECT_URL`, else
+  `DATABASE_URL` — with `DEV_DATABASE_URL` masked to an empty value for that
+  child only, so the required local override cannot redirect it. The second
+  applies them to the validated `DEV_DATABASE_URL` target, which must be an
+  explicit **loopback** `postgres://` /
+  `postgresql://` database, without a host-overriding connection parameter, and
+  refuses to start otherwise — the check runs before the production phase.
+  Set `DEV_DATABASE_URL` in the process environment before running this script;
+  its preflight does not load `.env`.
 
 Root `.env` may point to a shared or production Supabase instance, including after
 a vault restore. Before any write, explicitly select and confirm the intended
