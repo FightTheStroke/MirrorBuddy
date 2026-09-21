@@ -73,13 +73,20 @@ interface ServiceLimit {
 
 ### 2. Service Limit Metrics
 
-**Collector health (2026-09-15):** Each push includes
+**Collector health (2026-09-18):** Each push includes
 `metric_collector_up{collector="http|funnel|budget|abuse|conversion|tier|service_limits|vercel|supabase|azure_openai"}`.
 `1` means the collector returned valid samples; `0` means collection failed,
 configuration was unavailable, or a child collector was degraded. An execution
 failure logs its original error and contributes no usage samples, never synthetic
 zero usage or refreshed stale success. Independent valid sources still reach Grafana.
-The `service_limits` aggregate is `0` when any child is unavailable. A successful
+Every source also reports `metric_collector_enabled`: configured sources use `1`
+even when collection fails; intentionally disabled sources use `0` with `up=0`.
+The `service_limits` aggregate ignores explicitly disabled children when computing
+health: healthy configured children plus disabled Azure monitoring produce
+`enabled=1, up=1`. A configured child failure produces `enabled=1, up=0`;
+all children disabled produce `enabled=0, up=0`. Disabled state is matched against
+the complete label set so one region cannot hide another region's failure.
+Child samples remain unchanged and failures are logged only at their source. A successful
 HTTP push confirms delivery, not that every monitored service is healthy.
 Transport failures still reject the push. Azure Service Principal monitoring is
 intentionally absent (ADR 0142), not broken configuration: it returns
