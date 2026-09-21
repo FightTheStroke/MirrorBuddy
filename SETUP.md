@@ -56,6 +56,21 @@ command protects another. Never paste connection secrets into logs or documentat
 
 ---
 
+## Health check memory budget
+
+Both `/api/health` and `/api/health/detailed` measure process RSS against
+`AWS_LAMBDA_FUNCTION_MEMORY_SIZE` (MB), when the runtime provides a finite,
+positive value. Missing, empty, invalid, non-positive or overflowing values fall
+back to `os.totalmem()`. Do not set a guessed function limit in CI or locally.
+On Vercel without that variable, system memory may represent the host rather than
+the function/container quota, so this fallback can underestimate memory pressure.
+
+Memory status uses the unrounded RSS percentage: `pass` below 70%, `warn` from
+70% through 90%, and `fail` above 90%. Percentages in responses are rounded to
+whole numbers. Heap used/total remain diagnostic only. The basic message labels
+the denominator as `function limit` or `system memory`; detailed metrics also
+expose `memoryLimitMB` and `limitSource` (`function` or `system`).
+
 ## AI Provider Options
 
 | Provider          | Voice        | Best For            | Cost        |

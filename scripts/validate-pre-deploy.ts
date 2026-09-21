@@ -124,6 +124,8 @@ function validateCriticalEnvVars(): void {
 function validateOptionalEnvVars(): void {
   const optional = [
     // Observability
+    // Runtime-provided; health checks use OS memory when unavailable (see SETUP.md).
+    { name: 'AWS_LAMBDA_FUNCTION_MEMORY_SIZE', category: 'Observability' },
     { name: 'NEXT_PUBLIC_SENTRY_DSN', category: 'Sentry' },
     { name: 'SENTRY_AUTH_TOKEN', category: 'Sentry' },
     { name: 'SENTRY_ORG', category: 'Sentry' },
