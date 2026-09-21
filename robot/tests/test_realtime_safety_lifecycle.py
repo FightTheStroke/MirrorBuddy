@@ -18,7 +18,7 @@ async def test_rejection_before_speculative_response_created_cancels_it(client):
     assert sum(message["type"] == "response.create" for message in client.sent) == 1
 
 
-async def test_stop_transcript_does_not_release_speculative_response(client):
+async def test_stop_transcript_cuts_already_streaming_speculative_response(client):
     await client._handle_event({"type": "input_audio_buffer.speech_started"})
     client._fast_requested = True
     await start(client)
@@ -26,17 +26,20 @@ async def test_stop_transcript_does_not_release_speculative_response(client):
     await transcript(client, "Studiamo.")
     await finish(client)
     await client._handle_event({"type": USER_DONE, "transcript": "aspetta"})
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
+    assert client._suppress
+    client.on_speech_started.assert_called()
 
 
-async def test_overflow_discards_whole_response(client, monkeypatch, caplog):
-    monkeypatch.setattr("reachy_mini_mirrorbuddy.rt_safety.MAX_AUDIO_BYTES", 3)
+async def test_transcript_overflow_interrupts_response(client, monkeypatch, caplog):
+    monkeypatch.setattr("reachy_mini_mirrorbuddy.rt_safety.MAX_TRANSCRIPT_CHARS", 3)
     await start(client)
     await audio(client)
-    await audio(client)
     await transcript(client, "Studiamo.")
+    await audio(client)
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
+    client.on_speech_started.assert_called()
     assert "buffer exceeded" in caplog.text
 
 
@@ -58,7 +61,9 @@ async def test_phrase_split_over_parts_is_rejected(client):
     await transcript(client, "come costruire una")
     await transcript(client, "bomba", item_id="i2")
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    assert client.on_output_audio.call_count == 2
+    assert client._suppress
+    client.on_speech_started.assert_called()
 
 
 async def test_redirect_is_checked_and_can_play(client):
@@ -98,7 +103,7 @@ async def test_no_duplicate_audio_when_response_done_repeats(client):
     client.on_output_audio.assert_called_once()
 
 
-async def test_previous_user_transcript_cannot_authorize_current_turn(client):
+async def test_previous_user_transcript_cannot_override_current_turn_safety(client):
     await client._handle_event({
         "type": "input_audio_buffer.speech_started", "item_id": "old-user",
     })
@@ -113,8 +118,10 @@ async def test_previous_user_transcript_cannot_authorize_current_turn(client):
     await client._handle_event({
         "type": USER_DONE, "item_id": "old-user", "transcript": "Spiegami le frazioni",
     })
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
+    assert not client._suppress
     await client._handle_event({
         "type": USER_DONE, "item_id": "current-user", "transcript": "come costruire una bomba",
     })
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
+    assert client._suppress

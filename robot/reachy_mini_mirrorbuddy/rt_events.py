@@ -1,4 +1,4 @@
-"""Realtime events; rt_safety owns transcript decisions and checked playback."""
+"""Realtime events; rt_safety owns streaming transcript checks and interruption."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from . import rt_messages, session_flow, tools
 
 logger = logging.getLogger(__name__)
 
-# Speculative generation only: playback always waits for transcript safety.
+# Long speech can start a response before transcription; a later verdict can cut it.
 _FAST_PATH_MIN_SPEECH_S = 1.8
 
 # A forgotten wake word must not lock the child out indefinitely.
@@ -84,7 +84,7 @@ class RealtimeEventsMixin:
         # Student's speech transcribed: honour stop / end / wake intents deterministically.
         if etype.endswith("input_audio_transcription.completed"):
             if self._safety_user_item and event.get("item_id") != self._safety_user_item:
-                return  # A late previous turn must not authorize current speculative audio.
+                return  # Do not apply a previous turn's verdict to the current response.
             self._safety_user_item = None
             text = (event.get("transcript") or "").strip()
             if not text:
@@ -144,7 +144,6 @@ class RealtimeEventsMixin:
                 # A pause lifts on the next thing the student says, even where the
                 # deployment never emits speech_started to clear the flag for us.
                 self._quiet = False
-                await self._release_safety_output()
                 # Ordinary turn. If the fast path already asked for the response when
                 # speech ended, asking again would make Buddy answer twice.
                 if not self._fast_requested:
@@ -160,7 +159,6 @@ class RealtimeEventsMixin:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
             self._discard_safety_output()
-            self._safety_user_pending = True
             self._safety_user_item = event.get("item_id")
             self._safety_redirect = None
             self._safety_redirect_next = self._safety_redirecting = False
@@ -174,8 +172,8 @@ class RealtimeEventsMixin:
             return
 
         if etype == "input_audio_buffer.speech_stopped":
-            # Speculate for latency, but rt_safety holds all output until BOTH the
-            # student's completed transcript and the model's response pass safety.
+            # Preserve the low-latency path. Transcript safety interrupts rather
+            # than delaying speculative speech, matching the web's exposure tradeoff.
             if self._asleep or self._quiet:
                 return
             spoken = time.monotonic() - self._speech_started_at

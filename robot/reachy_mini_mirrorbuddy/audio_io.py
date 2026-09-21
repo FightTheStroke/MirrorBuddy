@@ -128,8 +128,8 @@ class AudioIO:
         """Play model speech (PCM16 @ realtime rate) through the robot speaker."""
         if not pcm16:
             return
-        # Checked responses arrive in a burst: track the queued duration, not
-        # just the last push, or local interruption stops after 250 ms.
+        # Network chunks can arrive in a burst: keep local interruption active
+        # for the queued duration, not just 250 ms after the last push.
         queued_until = max(time.monotonic(), self._playing_until - _PLAY_TTL_S)
         self._playing_until = queued_until + len(pcm16) / (2 * SAMPLE_RATE) + _PLAY_TTL_S
         audio = np.frombuffer(pcm16, dtype=np.int16)
@@ -167,10 +167,11 @@ class AudioIO:
         try:
             self.robot.media.audio.clear_player()
         except Exception:
+            logger.error("Playback clear_player failed; queue flush is not confirmed")
             try:
                 self.robot.media.audio.clear_output_buffer()
             except Exception:
-                pass
+                logger.error("Legacy playback flush also failed")
         if self.movements is not None:
             try:
                 self.movements.reset()

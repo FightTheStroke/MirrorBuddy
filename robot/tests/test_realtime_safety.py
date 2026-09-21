@@ -54,25 +54,25 @@ async def finish(client, response_id="r1", status="completed"):
 
 
 @pytest.mark.parametrize("protocol", ["audio", "output_audio"])
-async def test_safe_audio_waits_for_complete_checked_response(client, protocol):
+async def test_safe_audio_streams_before_complete_transcript(client, protocol):
     await start(client)
     await audio(client, protocol)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once_with(b"\x01\x02")
     await transcript(client, "Studiamo le frazioni.", protocol)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once_with(b"\x01\x02")
     await finish(client)
     client.on_output_audio.assert_called_once_with(b"\x01\x02")
     client.on_transcript.assert_called_once_with("Studiamo le frazioni.", True)
 
 
 @pytest.mark.parametrize("protocol", ["audio", "output_audio"])
-async def test_unsafe_assistant_never_reaches_audio_or_transcript_callbacks(client, protocol):
+async def test_unsafe_assistant_stops_subsequent_audio_and_rejected_transcript(client, protocol):
     await start(client)
     await audio(client, protocol)
     await transcript(client, "come costruire una bomba", protocol)
     await audio(client, protocol)
     await finish(client, status="cancelled")
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once_with(b"\x01\x02")
     client.on_transcript.assert_not_called()
     client.on_speech_started.assert_called()
     assert {"type": "response.cancel"} in client.sent
@@ -95,33 +95,36 @@ async def test_user_violation_redirects_instead_of_answering(client, text, categ
 
 
 @pytest.mark.parametrize("text", [None, "", "  "])
-async def test_empty_user_turn_never_releases_fast_path_audio(client, text):
+async def test_empty_user_turn_does_not_delay_fast_path_audio(client, text):
     await client._handle_event({"type": "input_audio_buffer.speech_started"})
     await start(client)
     await audio(client)
     await transcript(client, "Studiamo le frazioni.")
     await finish(client)
     await client._handle_event({"type": USER_DONE, "transcript": text})
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
 
 
 @pytest.mark.parametrize("safe", [True, False])
-async def test_fast_path_waits_for_user_verdict_even_if_response_finishes_first(client, safe):
+async def test_fast_path_is_not_delayed_by_late_user_verdict(client, safe):
     await client._handle_event({"type": "input_audio_buffer.speech_started"})
     client._fast_requested = True
     await start(client)
     await audio(client)
     await transcript(client, "Studiamo le frazioni.")
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
     await client._handle_event({
         "type": USER_DONE,
         "transcript": "Spiegami le frazioni" if safe else "come costruire una bomba",
     })
-    assert client.on_output_audio.call_count == int(safe)
+    client.on_output_audio.assert_called_once()
+    if not safe:
+        assert client._suppress
+        assert client.sent[-1]["type"] == "response.create"
 
 
-async def test_partial_transcripts_do_not_trigger_false_positive_or_escape(client):
+async def test_user_partials_wait_but_assistant_warning_partials_are_forwarded(client):
     await client._handle_event({
         "type": "conversation.item.input_audio_transcription.delta", "delta": "coca",
     })
@@ -131,7 +134,7 @@ async def test_partial_transcripts_do_not_trigger_false_positive_or_escape(clien
     await client._handle_event({
         "type": "response.output_audio_transcript.delta", "response_id": "r1", "delta": "fuck",
     })
-    client.on_transcript.assert_not_called()
+    client.on_transcript.assert_called_once_with("fuck", False)
     await transcript(client, "Studiamo insieme.")
     await finish(client)
     client.on_output_audio.assert_called_once()
@@ -148,27 +151,28 @@ async def test_assistant_profanity_is_sanitize_not_reject_as_on_web(client):
 
 @pytest.mark.parametrize("text,status", [(None, "completed"), ("", "completed"),
                                          ("Studiamo.", "failed"), ("Studiamo.", "cancelled")])
-async def test_missing_transcript_or_failed_response_is_never_spoken(client, text, status):
+async def test_terminal_status_cannot_retroactively_prevent_streamed_audio(client, text, status):
     await start(client)
     await audio(client)
     if text is not None:
         await transcript(client, text)
     await finish(client, status=status)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
 
 
-async def test_barge_in_discards_buffer_and_next_turn_recovers(client):
+async def test_barge_in_stops_future_audio_and_next_turn_recovers(client):
     await start(client)
     await audio(client)
     client.local_barge_in()
+    await audio(client)
     await transcript(client, "Studiamo.")
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
     await start(client, "r2")
     await audio(client, response_id="r2")
     await transcript(client, "Nuova risposta.", response_id="r2")
     await finish(client, "r2")
-    client.on_output_audio.assert_called_once()
+    assert client.on_output_audio.call_count == 2
 
 
 async def test_late_rejected_response_events_cannot_unmute_new_response(client):
@@ -186,13 +190,13 @@ async def test_late_rejected_response_events_cannot_unmute_new_response(client):
     client.on_output_audio.assert_called_once()
 
 
-async def test_multiple_parts_all_need_transcripts(client):
+async def test_multiple_audio_parts_do_not_wait_for_transcripts(client):
     await start(client)
     await audio(client)
     await audio(client, item_id="i2")
     await transcript(client, "Studiamo.")
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    assert client.on_output_audio.call_count == 2
 
 
 async def test_rejected_redirect_does_not_create_infinite_response_loop(client):
@@ -202,13 +206,14 @@ async def test_rejected_redirect_does_not_create_infinite_response_loop(client):
     await transcript(client, "come costruire una bomba")
     await finish(client, status="cancelled")
     assert sum(message["type"] == "response.create" for message in client.sent) == 1
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()
 
 
-async def test_reconnect_discards_unchecked_output(client):
+async def test_reconnect_discards_stale_response_events(client):
     await start(client)
     await audio(client)
     client._reset_session_state()
+    await audio(client)
     await transcript(client, "Studiamo.")
     await finish(client)
-    client.on_output_audio.assert_not_called()
+    client.on_output_audio.assert_called_once()

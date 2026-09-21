@@ -36,15 +36,15 @@ MirrorBuddy Maestro with a body —
 - 🤸 **movements** — head wobble (speech-synced) + expressive antennas
 
 It reuses **MirrorBuddy's live personas and Azure voice provider** from the
-web app at [mirrorbuddy.org](https://mirrorbuddy.org). Completed voice transcripts
-use the web safety policy; broader safeguarding limitations remain below.
+web app at [mirrorbuddy.org](https://mirrorbuddy.org). Voice transcripts use the
+web safety policy with streaming interruption; safeguarding limitations remain below.
 
 - **Personas** — the current Maestri are fetched live from MirrorBuddy's public
   `GET /api/maestri?locale=it` endpoint (same names, voices, system prompts, greetings).
 - **Voice + conversation** — Azure OpenAI **Realtime** (speech-to-speech), the same
   provider and the same 8 voices (`alloy, ash, ballad, coral, echo, sage, shimmer, verse`).
 - **Child-safety** — child-safe session instructions plus local transcript checks
-  for both speakers. Model audio waits for the completed safety verdict.
+  for both speakers. Audio streams immediately and is interrupted on detection.
 - **Accessibility (DSA)** — the seven web accessibility profiles plus a default tune turn-detection so the robot waits
   patiently for children who speak more slowly (motor / cerebral palsy, dyslexia…).
 
@@ -71,7 +71,7 @@ model speech stream over a single Azure Realtime WebSocket (`azure_realtime`).
 | `prompt_builder.py`     | Assemble the realtime `instructions` (persona + safety + embodiment)                              |
 | `safety.py`             | Child-safety guardrails (aligned with MirrorBuddy)                                                |
 | `transcript_safety*.py` | Python port of the web transcript policy and generated patterns                                   |
-| `rt_safety.py`          | Completed-transcript checks, bounded PCM buffering and spoken redirection                         |
+| `rt_safety.py`          | Streaming transcript checks, immediate interruption and spoken redirection                        |
 | `dsa.py`                | Accessibility → server-VAD turn-detection tuning                                                  |
 | `azure_realtime.py`     | Azure OpenAI Realtime WebSocket client (audio + tools + vision)                                   |
 | `rt_messages.py`        | Pure builders for the realtime protocol messages                                                  |
@@ -151,38 +151,86 @@ generated copies of the actual web patterns, weights and Italian redirects:
   Advanced single-turn jailbreak detection can additionally elevate to block or
   escalate. Every non-allow action, including profanity warnings, interrupts and
   requests the same category-specific redirect as web.
-- Assistant completed transcripts: the same content filter, without advanced
+- Assistant accumulated partial and completed transcripts: the same content filter, without advanced
   jailbreak scoring. `warn` maps to `sanitize`, which **logs but allows unchanged
   content** on web and robot; block/redirect maps to `reject`, suppressing the
-  transcript and audio. There is no contextual false-positive exemption: preserve
+  triggering transcript block and subsequent audio, and clearing queued playback.
+  Previously played audio cannot be recalled. There is no contextual false-positive exemption: preserve
   web regex normalization, boundaries, priorities and substring false positives.
-- Partial transcripts are not safety verdicts; existing partial stop-word handling
-  remains immediate. Empty transcripts classify as allow, but empty/missing
-  assistant transcripts cannot authorize audio playback.
+- User safety checks wait for completed transcripts; partial stop-word handling
+  remains immediate. Assistant text accumulates across deltas and content parts:
+  a pattern split over blocks triggers in the block completing the pattern.
+  Unlike web's completed-only callback, this also checks available partials so
+  interruption does not wait for the final transcript. A matching prefix may be
+  a false positive that later text would have resolved; a cut cannot be undone.
+  Empty/missing transcripts do not delay playback and provide no safety verdict.
 - VCE-002/003 classification and VCE-004 intervention records contain categories,
   severity and actions, never transcript text. Safety is always enabled on the
   robot (matching the web's enabled default, without its remote off switch).
 
-**Deliberate playback difference:** web checks after a completed transcript and
-can only stop audio already streaming. The robot holds PCM until `response.done`,
-all audio parts have nonempty final transcripts, and the user's transcript passes.
-This includes speculative responses generated before user transcription finishes.
-Rejected, cancelled, failed or untranscribed responses never reach the audio
-callback. Buffer limits are 60 seconds of 24 kHz PCM16 and 32,000 transcript
-characters; exceeding them logs an error and drops the whole response. A rejected
-redirect stays silent rather than recursively requesting more redirects.
-The cost is full-response latency and no unchecked partial-text body-language
-callbacks. Local interruption remains enabled for the whole queued audio duration.
+**Streaming, not whole-response buffering:** each audio delta is decoded and
+forwarded immediately, without awaiting a transcript, timer or `response.done`.
+This includes the existing speculative response path before user transcription.
+On rejection the client first suppresses future chunks and calls
+`AudioIO.interrupt()` through the controller, clearing the device queue with
+`clear_player()`. Only then does it await `response.cancel`; the category-specific
+replacement is requested after the server acknowledges cancellation. The
+replacement also streams and can itself be interrupted; repeated rejection
+does not create an infinite redirect loop. Firmware flush failures are logged,
+not represented as a successful confirmed cut. The transcript accumulator is
+bounded at 32,000 characters; overflow interrupts instead of accumulating forever.
+There is no whole-response buffering option: this protocol supports interruption.
+
+**Measured exposure (2026-09-21, Azure GA `gpt-realtime`):** eight short synthetic
+responses, four safe and four beginning with a fictitious email that triggers
+the existing PII rule. This is a descriptive sample, not a universal maximum.
+
+| Measurement                                                         | Observed                                                                    |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Transcript chunks                                                   | 130 deltas; median 4 characters, p95 8, max 10; typically one word fragment |
+| Audio chunks                                                        | 181 chunks; median 250 ms PCM, p95 430 ms, max 1,020 ms                     |
+| Decisive transcript receipt to local FIFO clear                     | 0.049–0.059 ms in the four rejected samples                                 |
+| Audio forwarded before rejection                                    | 750 ms PCM per rejected sample: conservative sample exposure ceiling        |
+| Playout before cut, virtual FIFO driven by real event arrival times | 89–216 ms per rejected sample                                               |
+| Safe first-audio receipt to callback                                | 0.023–0.042 ms; no wait for response completion                             |
+| Buffered latency removed, safe samples                              | 965–1,346 ms between first audio receipt and response completion            |
+
+The flagged phrase starts at the beginning of each synthetic unsafe sample;
+there is no deliberately safe lead-in. The 750 ms figure is all audio handed to
+playback before detection, not an acoustically aligned unsafe-word count.
+The 89–216 ms figure is **simulated speaker playout**, not a microphone recording:
+the FIFO drains according to real monotonic arrival times with zero initial
+device buffering. Cancellation sends are shadowed so full response timing can
+also be observed. Hardware queues, actual acoustic cut latency and the Azure
+cancellation round trip are not measured by this harness.
+
+A separate live protocol probe sent a real `response.cancel`, observed
+`response.done: cancelled`, then requested the replacement and observed
+`response.done: completed` with 23 replacement audio chunks and no Azure errors.
+Its local test FIFO cleared 13 queued chunks; no physical speaker was used.
+
+An interleaved 10,000-iteration microbenchmark (100 ms PCM chunks) measured
+legacy decode/callback p50/p99 6.625/12.333 microseconds and current dispatcher
+5.167/10.875 microseconds; paired overhead p99 was 2.334 microseconds. This shows
+no additional buffering/scheduling delay, not literally zero CPU cost.
+Reproduce with `PYTHONPATH=robot python robot/tools/measure_safety_latency.py
+--endpoint wss://YOUR-RESOURCE.openai.azure.com --model gpt-realtime
+--key-env AZURE_OPENAI_API_KEY --samples 8 --iterations 10000` from the root,
+using an existing credential only in the environment. Output is numeric JSON;
+no keys or transcript text are written. `--benchmark-only` needs no Azure key.
 
 **Residual limits:** microphone audio still reaches Azure before transcription;
-checks cannot detect unsafe speech omitted or mistranscribed by Azure, nor content
+audio can precede its transcript and **there is no finite worst-case exposure
+bound** if Azure delays or omits transcription. The measured sample is not a
+guarantee for other models, languages, utterances, networks or hardware.
+Checks cannot detect unsafe speech omitted or mistranscribed by Azure, nor content
 outside the web pattern coverage. Like web voice, advanced jailbreak checks have
 no cross-turn history. These are transcript checks, not tool-argument, image or
 general model-output moderation. The robot has no authenticated web crisis
 escalation, warning UI or central safety-event ingestion: `escalate` means a local
 intervention and advice to contact a trusted adult, **not a delivered human alert**.
 No trusted profile age is provided. Spoken replacement remains model-generated,
-checked like other output, not guaranteed verbatim speech. Hardware latency and
+checked like other streaming output, not guaranteed verbatim speech. Hardware latency and
 actual acoustic transcription accuracy require physical-robot testing; automated
 tests prove the audio callback boundary only. Do not claim complete child-safety
 parity or use the robot as an unsupervised safeguarding system.
