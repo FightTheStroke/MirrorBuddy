@@ -25,7 +25,7 @@ import {
   parseGAResponse,
   parsePreviewResponse,
 } from './payload-builders';
-import { isDeploymentUnavailable, resolveGaFallbackDeployment } from './voice-deployment-fallback';
+import { isDeploymentUnavailable, resolveGaFallbackChain } from './voice-deployment-fallback';
 
 export const revalidate = 0;
 
@@ -243,15 +243,16 @@ export const POST = pipe(
   let attempt = await attemptToken(activeDeployment);
 
   // The preferred realtime deployments are preview models with a fixed Azure
-  // retirement date. When one stops answering, degrade to a GA deployment rather
-  // than taking voice away from the student.
+  // retirement date. When one stops answering, degrade through the GA
+  // deployments in turn rather than taking voice away from the student: a
+  // single retry stops at the first stale name left in cloud configuration.
   if (attempt.failure && isDeploymentUnavailable(attempt.failure)) {
-    const fallbackDeployment = resolveGaFallbackDeployment({
-      current: activeDeployment,
+    const fallbackChain = resolveGaFallbackChain({
+      tried: [activeDeployment],
       gaCandidates: [azureDeploymentV15, azureDeploymentLegacy],
     });
 
-    if (fallbackDeployment) {
+    for (const fallbackDeployment of fallbackChain) {
       log.error('Realtime deployment unavailable, retrying on GA deployment', {
         failedDeployment: activeDeployment,
         fallbackDeployment,
@@ -259,6 +260,7 @@ export const POST = pipe(
       });
       activeDeployment = fallbackDeployment;
       attempt = await attemptToken(activeDeployment);
+      if (!attempt.failure || !isDeploymentUnavailable(attempt.failure)) break;
     }
   }
 

@@ -6,9 +6,9 @@
  * Azure sources (ADR 0169); an actual rejection triggers recovery, not a date.
  * Without a fallback an unavailable deployment takes voice away from students.
  *
- * These helpers let the route recognise that specific failure and retry once on
- * a generally-available deployment — a degradation in speech quality, not an
- * outage.
+ * These helpers let the route recognise that specific failure and retry on the
+ * generally-available deployments in turn — a degradation in speech quality,
+ * not an outage.
  *
  * The decision is taken on the *sanitized* upstream error: the raw Azure body
  * never leaves `sanitizeUpstreamError`, which is the contract enforced by
@@ -47,6 +47,38 @@ export function isDeploymentUnavailable(error: SanitizedUpstreamError): boolean 
 }
 
 /**
+ * List every generally-available deployment still worth trying, in order.
+ *
+ * A single retry is not enough: when the first fallback is itself unconfigured
+ * upstream — a stale deployment name left in cloud configuration, for example —
+ * stopping there takes voice away from the student while a working deployment
+ * is still listed behind it.
+ *
+ * @param tried - deployments already attempted, in attempt order
+ * @param gaCandidates - GA deployments in preference order; unset entries allowed
+ * @returns the untried candidates, deduplicated, in preference order
+ */
+export function resolveGaFallbackChain({
+  tried,
+  gaCandidates,
+}: {
+  tried: ReadonlyArray<string>;
+  gaCandidates: ReadonlyArray<string | undefined>;
+}): string[] {
+  const seen = new Set(tried.map((deployment) => deployment.trim()).filter(Boolean));
+  const chain: string[] = [];
+
+  for (const candidate of gaCandidates) {
+    const normalized = candidate?.trim();
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    chain.push(normalized);
+  }
+
+  return chain;
+}
+
+/**
  * Pick a generally-available deployment to retry on.
  *
  * @param current - the deployment that Azure just rejected
@@ -60,13 +92,5 @@ export function resolveGaFallbackDeployment({
   current: string;
   gaCandidates: ReadonlyArray<string | undefined>;
 }): string | undefined {
-  const failing = current.trim();
-
-  for (const candidate of gaCandidates) {
-    const normalized = candidate?.trim();
-    if (!normalized || normalized === failing) continue;
-    return normalized;
-  }
-
-  return undefined;
+  return resolveGaFallbackChain({ tried: [current], gaCandidates })[0];
 }
