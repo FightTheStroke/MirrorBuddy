@@ -7,7 +7,11 @@
 import { describe, it, expect } from 'vitest';
 // eslint-disable-next-line local-rules/enforce-module-boundaries -- the test must use the real sanitizer, not a copy of it
 import { sanitizeUpstreamError } from '@/lib/ai/providers/azure-errors';
-import { isDeploymentUnavailable, resolveGaFallbackDeployment } from '../voice-deployment-fallback';
+import {
+  isDeploymentUnavailable,
+  resolveGaFallbackChain,
+  resolveGaFallbackDeployment,
+} from '../voice-deployment-fallback';
 
 const sanitize = (status: number, body: string) => sanitizeUpstreamError(status, body);
 
@@ -94,5 +98,43 @@ describe('resolveGaFallbackDeployment', () => {
     });
 
     expect(fallback).toBeUndefined();
+  });
+});
+
+describe('resolveGaFallbackChain', () => {
+  it('returns every configured GA deployment in preference order', () => {
+    const chain = resolveGaFallbackChain({
+      tried: ['gpt-realtime-2.1'],
+      gaCandidates: ['gpt-realtime-15', 'gpt-realtime'],
+    });
+
+    expect(chain).toEqual(['gpt-realtime-15', 'gpt-realtime']);
+  });
+
+  it('excludes every deployment already attempted', () => {
+    const chain = resolveGaFallbackChain({
+      tried: ['gpt-realtime-2.1', 'gpt-realtime-15'],
+      gaCandidates: ['gpt-realtime-15', 'gpt-realtime'],
+    });
+
+    expect(chain).toEqual(['gpt-realtime']);
+  });
+
+  it('drops unset, blank and duplicate candidates', () => {
+    const chain = resolveGaFallbackChain({
+      tried: ['gpt-realtime-2.1'],
+      gaCandidates: [undefined, '   ', 'gpt-realtime', 'gpt-realtime'],
+    });
+
+    expect(chain).toEqual(['gpt-realtime']);
+  });
+
+  it('returns an empty chain when nothing else is configured', () => {
+    const chain = resolveGaFallbackChain({
+      tried: ['gpt-realtime'],
+      gaCandidates: [undefined, 'gpt-realtime'],
+    });
+
+    expect(chain).toEqual([]);
   });
 });

@@ -354,6 +354,50 @@ describe('POST /api/realtime/ephemeral-token - preview deployment retirement', (
     expect(JSON.parse(mockFetch.mock.calls[1][1].body).session.model).toBe('gpt-realtime-15');
   });
 
+  it('keeps degrading through the remaining GA deployments when the first fallback is also gone', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => '{"error":{"code":"DeploymentNotFound"}}',
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        text: async () => '{"error":{"code":"DeploymentNotFound"}}',
+      })
+      .mockResolvedValueOnce(successResponse());
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(response.status).toBe(200);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+    expect(JSON.parse(mockFetch.mock.calls[2][1].body).session.model).toBe('gpt-realtime');
+  });
+
+  it('stops degrading on a failure that is not a missing deployment', async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 400,
+        text: async () => '{"error":{"code":"DeploymentNotFound"}}',
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        text: async () => 'Too many requests',
+      });
+    global.fetch = mockFetch;
+
+    const response = await POST(buildRequest() as any);
+
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(response.status).toBe(429);
+  });
+
   it('does not retry a rate limit on another deployment', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
