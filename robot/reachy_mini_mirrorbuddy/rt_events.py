@@ -1,14 +1,7 @@
-"""Handling of Azure Realtime protocol events.
-
-Split from the connection itself: :mod:`azure_realtime` owns the socket, the
-thread and the sending side; this is the reading side — what each event from the
-model means for a child in the room, which is where all the judgement calls live
-(when to stop talking, when to answer without waiting, what counts as silence).
-"""
+"""Realtime events; rt_safety owns streaming transcript checks and interruption."""
 
 from __future__ import annotations
 
-import base64
 import json
 import logging
 import time
@@ -18,17 +11,10 @@ from . import rt_messages, session_flow, tools
 
 logger = logging.getLogger(__name__)
 
-# How long an utterance must be before we answer without waiting for its transcript.
-# Sized against the phrases that must never produce a reply — "zitto", "basta",
-# "fermati", "hey buddy" — spoken slowly by a child with a motor impairment. Above
-# this, a turn cannot be a bare stop word, so the transcript adds latency and nothing
-# else. Any stop word inside a longer sentence is still caught: the transcript lands a
-# moment later and cancels the response in flight.
+# Long speech can start a response before transcription; a later verdict can cut it.
 _FAST_PATH_MIN_SPEECH_S = 1.8
 
-# How long a deliberate rest lasts before ordinary conversation resumes. Long
-# enough to be a real silence, short enough that a forgotten wake word costs a
-# coffee break and not an adult with an SSH session.
+# A forgotten wake word must not lock the child out indefinitely.
 _REST_MAX_S = 600.0
 
 
@@ -44,6 +30,8 @@ class RealtimeEventsMixin:
 
     async def _handle_event(self, event: dict) -> None:
         etype = event.get("type", "")
+        if await self._handle_safety_output(event):
+            return
 
         if etype in ("session.created", "session.updated"):
             if not self._ready.is_set():
@@ -53,15 +41,12 @@ class RealtimeEventsMixin:
                 await self._greet()
             return
 
-        if etype in ("response.output_audio.delta", "response.audio.delta"):
-            if self._suppress:
-                return  # dropped: user barged in, this response is being cancelled
-            b64 = event.get("delta") or event.get("audio")
-            if b64 and self.on_output_audio:
-                _safe_cb(self.on_output_audio, base64.b64decode(b64))
-            return
-
         if etype == "response.created":
+            if self._safety_awaiting_cancel:
+                self._safety_id = (event.get("response") or {}).get("id")
+                self._safety_awaiting_cancel = False
+                await self._cancel_response()
+                return
             if self._quiet or self._asleep:
                 await self._cancel_response()
                 self._suppress = True
@@ -71,8 +56,11 @@ class RealtimeEventsMixin:
                 self._sleep_after = True
             self._responding = True
             self._suppress = False
+            self._begin_safety_response(event)
             return
         if etype == "response.done":
+            if not await self._finish_safety_response(event):
+                return
             self._responding = False
             if self._sleep_after:  # farewell just finished → go to sleep
                 self._sleep_after = False
@@ -95,8 +83,17 @@ class RealtimeEventsMixin:
 
         # Student's speech transcribed: honour stop / end / wake intents deterministically.
         if etype.endswith("input_audio_transcription.completed"):
+            if self._safety_user_item and event.get("item_id") != self._safety_user_item:
+                return  # Do not apply a previous turn's verdict to the current response.
+            self._safety_user_item = None
             text = (event.get("transcript") or "").strip()
             if not text:
+                self._partial_user = ""
+                self._stopped_on_partial = False
+                return
+            if not await self._check_user_safety(text):
+                self._partial_user = ""
+                self._stopped_on_partial = False
                 return
             action = session_flow.decide(text, self._asleep, self._rest_expired())
             if self._meditating and action != session_flow.SPEAK:
@@ -104,9 +101,7 @@ class RealtimeEventsMixin:
                 # Sitting in an imposed silence you have asked to leave is the
                 # opposite of what this is for.
                 logger.info("Meditation ended by the student: %r", text)
-                # Both halves matter. Clearing the flag gives the voice back;
-                # cancelling the session stops the bell that would otherwise
-                # ring at a child who has already asked to be left alone.
+                # Cancel both the silence and its pending bell.
                 running = getattr(self, "_meditation", None)
                 if running is not None:
                     running.cancel()
@@ -117,9 +112,7 @@ class RealtimeEventsMixin:
                 logger.info("Resting — heard %r → %s", text, action)
                 if action != session_flow.IGNORE:
                     self._asleep = False
-            # The hush belongs to the turn that triggered it. Deployments that emit
-            # partials but no speech_started have nothing else to clear it, and a
-            # flag that outlives its turn silences every turn after it.
+            # Also clear hush on deployments without speech_started.
             hushed, self._stopped_on_partial, self._partial_user = (
                 self._stopped_on_partial, False, "",
             )
@@ -159,15 +152,16 @@ class RealtimeEventsMixin:
 
         # Barge-in: cancel the turn, drop in-flight audio; each new turn starts un-muted.
         if etype == "input_audio_buffer.speech_started":
-            # Clear the per-turn hush flags first, asleep or not: they used to
-            # survive a rest, and the next transcript — even "Buddy" — was then
-            # dropped before the wake word was ever read. The robot could only be
-            # revived by restarting the app.
+            # Clear hush even during rest so the next wake word is not dropped.
             self._partial_user = ""
             self._stopped_on_partial = False
             if self._asleep:
                 return  # ignore ambient speech while asleep; wake word handles it
             self._suppress = True
+            self._discard_safety_output()
+            self._safety_user_item = event.get("item_id")
+            self._safety_redirect = None
+            self._safety_redirect_next = self._safety_redirecting = False
             self._quiet = False
             self._speech_started_at = time.monotonic()
             self._fast_requested = False
@@ -178,34 +172,14 @@ class RealtimeEventsMixin:
             return
 
         if etype == "input_audio_buffer.speech_stopped":
-            # The server no longer auto-creates responses, so we normally wait for the
-            # transcript before asking for one — that is a whole extra Whisper pass in
-            # series on every single turn, and the child feels every millisecond of it.
-            #
-            # We only need the transcript to catch "zitto"/"basta"/"buddy", and those
-            # are always brief. So a clearly long utterance can't be one: ask for the
-            # answer straight away. Anything short keeps the safe, slower path.
+            # Preserve the low-latency path. Transcript safety interrupts rather
+            # than delaying speculative speech, matching the web's exposure tradeoff.
             if self._asleep or self._quiet:
                 return
             spoken = time.monotonic() - self._speech_started_at
             if self._speech_started_at and spoken >= _FAST_PATH_MIN_SPEECH_S:
                 self._fast_requested = True
                 await self._request_response()
-            return
-
-        if etype in ("response.output_audio_transcript.delta", "response.audio_transcript.delta"):
-            # The final transcript only lands once the sentence is already spoken —
-            # far too late to colour the body language. The opening words carry the
-            # mood ("Bravo!", "Fammi pensare..."), so react to the first delta.
-            delta = event.get("delta") or ""
-            if delta and self.on_transcript:
-                _safe_cb(self.on_transcript, delta, False)
-            return
-
-        if etype in ("response.output_audio_transcript.done", "response.audio_transcript.done"):
-            text = event.get("transcript") or ""
-            if text and self.on_transcript:
-                _safe_cb(self.on_transcript, text, True)
             return
 
         if etype == "response.output_item.added":
@@ -227,12 +201,10 @@ class RealtimeEventsMixin:
 
         if etype == "error":
             err = event.get("error", event)
-            # Benign race: we ask to cancel the response the instant the child speaks
-            # over Buddy, but the response may have finished on its own just before the
-            # CANCEL lands. Nothing is broken, so it must not look like a failure in
-            # the logs — real errors have to stay visible.
+            # The response may finish just before cancellation reaches Azure.
             if isinstance(err, dict) and err.get("code") == "response_cancel_not_active":
                 self._responding = False
+                await self._send_safety_redirect()
                 logger.debug("Cancel arrived after the response ended (harmless)")
                 return
             if isinstance(err, dict) and err.get("code") == "conversation_already_has_active_response":
@@ -248,45 +220,24 @@ class RealtimeEventsMixin:
         logger.debug("Unhandled event: %s", etype)
 
     def _rest_expired(self) -> bool:
-        """True when the robot has been resting longer than the silence was worth.
-
-        A rest is a request for quiet, not a lock. Past the timeout the next thing
-        the student says is answered normally — no child should have to remember a
-        magic word to get his robot back.
-        """
+        """After the rest timeout, ordinary speech can wake the robot."""
         if not self._asleep:
             return False
         return (time.monotonic() - self._asleep_since) > _REST_MAX_S
 
     async def _cancel_response(self) -> None:
-        """Cancel the response in flight and forget it.
-
-        The server will not accept a new response while it believes one is still
-        streaming, and a cancelled response never emits ``response.done``, so the
-        flag has to be cleared here or the next turn would stay silent.
-        """
+        """Drop local output immediately; Azure acknowledges via response.done."""
         self._responding = False
+        self._discard_safety_output()
         await self._safe_send(rt_messages.CANCEL)
 
     async def _apply_stop(self, rest: bool) -> None:
-        """Stop talking now; go to sleep only if the silence was asked for deliberately.
-
-        ``rest=True`` ("zitto", "dormi") parks the robot: quiet, in the rest posture,
-        and awake again only when the child calls it by name. ``rest=False``
-        ("aspetta") just drops the current sentence — the next turn is answered
-        normally, because everyday filler must not cost the wake word.
-
-        Either way the in-flight response is cancelled, including one requested by
-        the fast path before the transcript arrived: the hush wins even when it ends
-        a long sentence.
-        """
+        """Cancel even speculative output; only explicit rest parks the robot."""
         self._quiet = True
         self._suppress = True
         if self._responding or self._fast_requested:
             await self._cancel_response()
-        # The fast path belongs to the turn that was just cancelled. Left standing,
-        # it makes the *next* turn think its answer was already requested — so the
-        # first thing said after waking up is answered by silence.
+        # Never carry a cancelled speculative request into the next turn.
         self._fast_requested = False
         if self.on_speech_started:
             _safe_cb(self.on_speech_started)  # flush local playback now

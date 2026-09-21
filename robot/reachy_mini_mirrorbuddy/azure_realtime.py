@@ -18,12 +18,13 @@ import websockets
 from . import rt_messages
 from .rt_connection import RealtimeConnectionMixin
 from .rt_events import RealtimeEventsMixin
+from .rt_safety import RealtimeSafetyMixin
 
 logger = logging.getLogger(__name__)
 
 SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and out)
 
-class AzureRealtimeClient(RealtimeEventsMixin, RealtimeConnectionMixin):
+class AzureRealtimeClient(RealtimeEventsMixin, RealtimeConnectionMixin, RealtimeSafetyMixin):
     def __init__(
         self,
         ws_url: str,
@@ -79,6 +80,7 @@ class AzureRealtimeClient(RealtimeEventsMixin, RealtimeConnectionMixin):
         self._pending_farewell = False  # a goodbye was requested; sleep when it starts→done
         self._partial_user = ""  # transcript of the turn being spoken, read for stop words
         self._stopped_on_partial = False  # a stop word already fired for this turn
+        self._reset_safety()
 
     def start(self) -> None:
         self._thread = threading.Thread(target=self._run, name="AzureRealtime", daemon=True)
@@ -174,6 +176,9 @@ class AzureRealtimeClient(RealtimeEventsMixin, RealtimeConnectionMixin):
         ``speech_started``. Thread-safe: only flag writes + a queued cancel. The
         stop/sleep/wake classification still runs on the transcript that follows."""
         self._suppress = True  # drop any audio deltas already in flight
+        self._discard_safety_output()
+        self._safety_redirect = None
+        self._safety_redirect_next = False
         self._quiet = False  # a normal turn stays un-muted; a stop word re-mutes below
         if self._responding:
             self._responding = False  # one CANCEL per response: avoid a pile-up of no-op cancels

@@ -128,8 +128,10 @@ class AudioIO:
         """Play model speech (PCM16 @ realtime rate) through the robot speaker."""
         if not pcm16:
             return
-        # Mark Buddy as speaking so the mic loop knows to watch for a barge-in.
-        self._playing_until = time.monotonic() + _PLAY_TTL_S
+        # Network chunks can arrive in a burst: keep local interruption active
+        # for the queued duration, not just 250 ms after the last push.
+        queued_until = max(time.monotonic(), self._playing_until - _PLAY_TTL_S)
+        self._playing_until = queued_until + len(pcm16) / (2 * SAMPLE_RATE) + _PLAY_TTL_S
         audio = np.frombuffer(pcm16, dtype=np.int16)
 
         # Lip-sync / head movement is driven by the raw speech signal.
@@ -165,10 +167,11 @@ class AudioIO:
         try:
             self.robot.media.audio.clear_player()
         except Exception:
+            logger.error("Playback clear_player failed; queue flush is not confirmed")
             try:
                 self.robot.media.audio.clear_output_buffer()
             except Exception:
-                pass
+                logger.error("Legacy playback flush also failed")
         if self.movements is not None:
             try:
                 self.movements.reset()
