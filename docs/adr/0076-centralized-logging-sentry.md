@@ -25,20 +25,20 @@ This created blind spots where production errors went undetected.
 **Server-side** (`src/lib/logger/index.ts`):
 
 ```typescript
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
-logger.error("Operation failed", { component: "MyComponent", userId }, error);
-logger.warn("Unexpected state", { component: "MyComponent" });
-logger.info("Action completed", { component: "MyComponent" });
+logger.error('Operation failed', { component: 'MyComponent', userId }, error);
+logger.warn('Unexpected state', { component: 'MyComponent' });
+logger.info('Action completed', { component: 'MyComponent' });
 ```
 
 **Client-side** (`src/lib/logger/client.ts`):
 
 ```typescript
-import { clientLogger } from "@/lib/logger/client";
+import { clientLogger } from '@/lib/logger/client';
 
-clientLogger.error("API call failed", { component: "MyComponent" }, error);
-clientLogger.warn("Retry attempted", { component: "MyComponent" });
+clientLogger.error('API call failed', { component: 'MyComponent' }, error);
+clientLogger.warn('Unexpected state', { component: 'MyComponent' });
 ```
 
 ### 2. Automatic Sentry Capture
@@ -48,6 +48,17 @@ Both loggers automatically send to Sentry in production:
 - `error` level → `Sentry.captureException()` with context
 - `warn` level → `Sentry.captureMessage()` with "warning" severity
 - `info`/`debug` → Console only (no Sentry, avoids quota burn)
+
+Client `info`/`debug` output is development-only. To retain production diagnostics
+for handled capability limitations or scheduled retries, use the existing
+`addBreadcrumb` helper from `@/lib/sentry`. Its default level is `info`; it adds
+context to a later event without creating a standalone Sentry issue.
+
+Voice capability limitations, microphone constraint retries, and scheduled
+mindmap reconnects use breadcrumbs. Unexpected failures remain errors, including
+mindmap reconnect exhaustion. Do not downgrade an unsuccessful operation merely
+because its exception was caught. Camera and service-worker failures remain
+reported until recovery or a benign cause is demonstrated.
 
 ### 3. ESLint Enforcement
 
@@ -71,7 +82,7 @@ Both loggers automatically send to Sentry in production:
 `sentry.client.config.ts` includes `captureConsoleIntegration` as defense-in-depth:
 
 ```typescript
-integrations: [Sentry.captureConsoleIntegration({ levels: ["error", "warn"] })];
+integrations: [Sentry.captureConsoleIntegration({ levels: ['error', 'warn'] })];
 ```
 
 This catches any `console.error/warn` from third-party libraries.
@@ -119,18 +130,14 @@ Dashboard card shows events consumed vs 5,000/month free tier limit:
 ### Server API Route
 
 ```typescript
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
     // ... operation
   } catch (error) {
-    logger.error(
-      "POST /api/resource failed",
-      { component: "ResourceAPI" },
-      error,
-    );
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    logger.error('POST /api/resource failed', { component: 'ResourceAPI' }, error);
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
 ```
@@ -138,11 +145,11 @@ export async function POST(request: NextRequest) {
 ### Client Component
 
 ```typescript
-import { clientLogger } from "@/lib/logger/client";
+import { clientLogger } from '@/lib/logger/client';
 
 function MyComponent() {
   const handleError = (error: Error) => {
-    clientLogger.error("Component error", { component: "MyComponent" }, error);
+    clientLogger.error('Component error', { component: 'MyComponent' }, error);
   };
 }
 ```
@@ -150,10 +157,10 @@ function MyComponent() {
 ### Child Logger (Reusable Context)
 
 ```typescript
-const log = logger.child({ component: "PaymentService", module: "stripe" });
+const log = logger.child({ component: 'PaymentService', module: 'stripe' });
 
-log.info("Payment initiated", { amount: 100 });
-log.error("Payment failed", undefined, error);
+log.info('Payment initiated', { amount: 100 });
+log.error('Payment failed', undefined, error);
 ```
 
 ## References

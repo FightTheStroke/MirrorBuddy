@@ -1,8 +1,3 @@
-/**
- * Cold-start defaults are provisional: loaded database stops must take effect.
- * Failed reads retain protection and report once, not on every cold start.
- */
-
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { waitUntil } from '@vercel/functions';
 
@@ -190,6 +185,11 @@ describe('feature flag startup', () => {
     expect(isFeatureEnabled('quiz').enabled).toBe(true);
 
     expect(isUsingFallbackDefaults()).toBe(true);
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Feature flags answered from compiled defaults (database policy not loaded)',
+    );
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('applies a database kill switch even when a check already ran on defaults', async () => {
