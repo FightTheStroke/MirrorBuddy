@@ -16,6 +16,8 @@ import { NextResponse } from 'next/server';
 import { pipe, withSentry, withRateLimit } from '@/lib/api/middlewares';
 import { RATE_LIMITS } from '@/lib/rate-limit';
 import { getDeviceProfile } from '@/lib/devices/device-service';
+import { resolveRealtimeDeployment } from '@/lib/ai/realtime-deployment';
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 
 export const revalidate = 0;
 
@@ -45,10 +47,11 @@ export const GET = pipe(
   const apiKey = cleaned('AZURE_OPENAI_REALTIME_API_KEY');
   // Same preference order as the web voice session: the robot and the browser
   // must talk to the same model, or a child hears two different tutors.
-  const deployment =
-    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT_V21') ||
-    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT_V2') ||
-    cleaned('AZURE_OPENAI_REALTIME_DEPLOYMENT');
+  const deployment = resolveRealtimeDeployment({
+    useV21: isFeatureEnabled('voice_realtime_21').enabled,
+    useV2: isFeatureEnabled('voice_realtime_2').enabled,
+    useV15: isFeatureEnabled('voice_realtime_15').enabled,
+  });
   if (!endpoint || !apiKey || !deployment) {
     return NextResponse.json(
       { error: 'Voice credentials are not configured on the server' },

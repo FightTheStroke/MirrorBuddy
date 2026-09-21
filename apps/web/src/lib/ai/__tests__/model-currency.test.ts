@@ -7,8 +7,10 @@
  * - gpt-6-astra          2026-09-03  GA       retires 2028-01-11  (deployed, unused)
  * - gpt-5.6-terra        2026-07-09  GA       retires 2028-01-11  (current default)
  * - gpt-chat-latest      2026-05-05  Preview  retires 2026-10-05  (backs gpt-5.x-chat/edu)
- * - gpt-realtime-2.1     2026-07-07  Preview  retires 2026-10-15
  * - gpt-realtime-1.5     2026-02-23  GA       retires 2027-08-24  (GA voice fallback)
+ *
+ * Voice lifecycle rechecked 2026-09-21: the former October 15 claim for 2.1
+ * was incorrect. ADR 0169 records the conflicting lifecycle/retirement sources.
  *
  * A tier row still carrying a legacy chat name must never resolve to a deployment
  * whose underlying model retires before the deployments we control.
@@ -66,7 +68,7 @@ describe('model currency', () => {
       expect(hasDeploymentMapping('gpt-6-astra')).toBe(false);
     });
 
-    it('maps gpt-realtime-2.1-mini so the cost tier can follow the 2.1 line', async () => {
+    it('retains the optional global gpt-realtime-2.1-mini alias', async () => {
       delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21_MINI;
 
       const { getDeploymentForModel } = await import('@/lib/ai/providers/deployment-mapping');

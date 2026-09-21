@@ -22,15 +22,17 @@
  * | gpt-5.2-edu      | gpt-chat-latest  | Preview | 2026-10-05        |
  * | gpt-5.2-chat     | gpt-chat-latest  | Preview | 2026-10-05        |
  * | gpt-5-chat       | gpt-chat-latest  | Preview | 2026-10-05        |
- * | gpt-realtime-2.1 | gpt-realtime-2.1 | Preview | See conflict below |
+ * | gpt-realtime-2.1 | gpt-realtime-2.1 | See ADR | See conflict below |
  * | gpt-realtime-2   | gpt-realtime-2   | Preview | See conflict below |
  * | gpt-realtime-15  | gpt-realtime-1.5 | GA      | 2027-08-24        |
  *
- * Voice rechecked 2026-09-17: Microsoft Learn lists 2.1 (2026-07-07) retirement
+ * Voice rechecked 2026-09-21: Microsoft Learn lists 2.1 (2026-07-07) retirement
  * as 2027-06-25; Sweden Central's model.deprecation.inference says 2027-07-31.
  * For 2.0 (2026-05-06), Learn says 2026-08-31 and the regional catalogue
  * says 2026-10-31. Use the earlier date for planning pending reconciliation.
  * Neither provisioning state nor lifecycle metadata proves live inference.
+ * Learn's schedule and the regional catalogue now label 2.1 GA; the overview
+ * still says Preview. ADR 0169 records this conflict and a separate audio probe.
  * The former 2026-10-15 date for 2.1 was incorrect. See ADR 0169 and issue #1022.
  *
  * The GPT-4 family retired in Feb 2026; those aliases survive only so that a tier

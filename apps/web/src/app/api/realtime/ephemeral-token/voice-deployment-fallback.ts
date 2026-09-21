@@ -2,9 +2,9 @@
  * Voice deployment fallback.
  *
  * The realtime stack prefers the newest Azure deployment (currently
- * gpt-realtime-2.1), which is a *preview* model: Azure ends inference support on
- * a fixed date and the deployment then stops answering. Without a fallback the
- * token endpoint returns 503 and voice is simply gone for every student.
+ * gpt-realtime-2.1). Lifecycle labels and retirement dates can disagree across
+ * Azure sources (ADR 0169); an actual rejection triggers recovery, not a date.
+ * Without a fallback an unavailable deployment takes voice away from students.
  *
  * These helpers let the route recognise that specific failure and retry once on
  * a generally-available deployment — a degradation in speech quality, not an

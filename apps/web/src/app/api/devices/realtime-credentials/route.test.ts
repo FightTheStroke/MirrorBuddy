@@ -20,8 +20,13 @@ vi.mock('@/lib/devices/device-service', () => ({
   getDeviceProfile: vi.fn(),
 }));
 
+vi.mock('@/lib/feature-flags/feature-flags-service', () => ({
+  isFeatureEnabled: vi.fn(() => ({ enabled: true })),
+}));
+
 import { GET } from './route';
 import { getDeviceProfile } from '@/lib/devices/device-service';
+import { isFeatureEnabled } from '@/lib/feature-flags/feature-flags-service';
 
 type Ctx = { req: { headers: Headers } };
 const handler = GET as unknown as (ctx: Ctx) => Promise<Response>;
@@ -37,6 +42,7 @@ const ENV_KEYS = [
   'AZURE_OPENAI_REALTIME_DEPLOYMENT',
   'AZURE_OPENAI_REALTIME_DEPLOYMENT_V21',
   'AZURE_OPENAI_REALTIME_DEPLOYMENT_V2',
+  'AZURE_OPENAI_REALTIME_DEPLOYMENT_V15',
   'AZURE_OPENAI_REALTIME_API_VERSION',
 ] as const;
 
@@ -50,7 +56,21 @@ beforeEach(() => {
   process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT = 'gpt-realtime';
   delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21;
   delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2;
+  delete process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15;
   delete process.env.AZURE_OPENAI_REALTIME_API_VERSION;
+  vi.mocked(isFeatureEnabled).mockImplementation((id) => ({
+    enabled: true,
+    reason: 'enabled',
+    flag: {
+      id,
+      name: id,
+      description: id,
+      status: 'enabled',
+      enabledPercentage: 100,
+      killSwitch: false,
+      updatedAt: new Date(),
+    },
+  }));
 });
 
 afterEach(() => {
@@ -61,6 +81,33 @@ afterEach(() => {
 });
 
 describe('GET /api/devices/realtime-credentials', () => {
+  it('falls back to the configured GA 1.5 deployment when newer deployments are absent', async () => {
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 = 'gpt-realtime-15';
+    mockProfile.mockResolvedValue({ name: 'Mario' });
+
+    const res = await handler(ctxWith('Bearer test-device'));
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).deployment).toBe('gpt-realtime-15');
+  });
+
+  it('honors the same generation kill switches as browser voice', async () => {
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 = 'gpt-realtime-2.1';
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 = 'gpt-realtime-2';
+    process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 = 'gpt-realtime-15';
+    const enabledResult = vi.mocked(isFeatureEnabled)('voice_realtime_15');
+    vi.mocked(isFeatureEnabled).mockImplementation((id) => ({
+      ...enabledResult,
+      enabled: id === 'voice_realtime_15',
+      reason: id === 'voice_realtime_15' ? 'enabled' : 'kill_switch',
+    }));
+    mockProfile.mockResolvedValue({ name: 'Mario' });
+
+    const res = await handler(ctxWith('Bearer test-device'));
+
+    expect((await res.json()).deployment).toBe('gpt-realtime-15');
+  });
+
   it('returns 401 when the bearer token is missing', async () => {
     const res = await handler(ctxWith());
     expect(res.status).toBe(401);

@@ -1,11 +1,7 @@
 /**
- * Voice deployment fallback — RED first.
- *
- * The voice stack runs on gpt-realtime-2.1, a preview model whose inference
- * support ends 2026-10-15 (audited 2026-09-16 on `aoai-virtualbpm-prod`). When a
- * preview deployment stops answering, Azure rejects the token request and every
- * student loses voice. A single retry on the GA deployment keeps the tutor
- * talking instead of returning 503.
+ * Voice deployment fallback. Lifecycle observations and conflicting retirement
+ * dates live in ADR 0169, not in executable policy. Retry only a deployment
+ * rejection, never infer an outage from a published retirement date.
  */
 
 import { describe, it, expect } from 'vitest';
