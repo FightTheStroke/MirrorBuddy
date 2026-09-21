@@ -54,14 +54,29 @@ cp -R "$HERE/reachy_mini_mirrorbuddy" "$STAGE/"
 cp "$HERE/pyproject.toml" "$STAGE/"
 cp "$HERE/space/index.html" "$STAGE/"
 cp "$HERE/space/style.css" "$STAGE/"
-# The app icon the robot dashboard shows beside the app name. Without it the
-# store falls back to the card emoji, which is not the MirrorBuddy mark.
-cp "$HERE/space/icon.png" "$STAGE/"
+# The app icon the robot dashboard shows beside the app name is NOT staged here.
+# Hugging Face's pre-receive hook rejects a plain git push that carries binary
+# files ("Please use Xet storage"), so a staged icon.png does not produce a card
+# with an icon — it produces no publish at all, and the store keeps serving the
+# previous release. The card's `thumbnail:` therefore points at the icon the
+# production site already serves. See the guard below.
 
 # The published package must never carry the robot's local secrets or caches.
 rm -rf "$STAGE/reachy_mini_mirrorbuddy/__pycache__" "$STAGE/reachy_mini_mirrorbuddy/.env"
 if find "$STAGE" -name '.env' -o -name '*.key' | grep -q .; then
   echo "✗ Refusing to publish: secret-looking files found in the staged Space" >&2
+  exit 1
+fi
+
+# Binary files are rejected by the Hub's pre-receive hook, and a rejected push
+# is how the store silently fell behind for three days. Fail here, where the
+# message names the file, rather than at the remote.
+BINARIES="$(find "$STAGE" -type f \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' \
+  -o -name '*.gif' -o -name '*.webp' -o -name '*.ico' -o -name '*.pdf' -o -name '*.mp4' \) \
+  -exec basename {} \; | tr '\n' ' ')"
+if [ -n "${BINARIES// /}" ]; then
+  echo "✗ Refusing to publish: the Hub rejects binary files on a plain push: $BINARIES" >&2
+  echo "  Serve the asset over https and reference it from space/README.md instead." >&2
   exit 1
 fi
 

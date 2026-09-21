@@ -7,7 +7,7 @@ sdk: static
 pinned: false
 license: apache-2.0
 short_description: A patient tutor for children who learn differently
-thumbnail: https://huggingface.co/spaces/Roberdan/mirrorbuddy/resolve/main/icon.png
+thumbnail: https://www.mirrorbuddy.org/icon-512.png
 tags:
   - reachy_mini
   - reachy_mini_python_app
