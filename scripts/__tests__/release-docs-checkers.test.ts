@@ -3,7 +3,11 @@ import { spawnSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Every case here spawns real shell scripts; the 5s default is not a realistic
+// budget for subprocess work and turns machine load into spurious failures.
+vi.setConfig({ testTimeout: 30_000 });
 
 const root = resolve(import.meta.dirname, '../..');
 const fixtures: string[] = [];
