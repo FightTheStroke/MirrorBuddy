@@ -141,6 +141,18 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
             logger.error("pair request failed: %s", e)
             return JSONResponse({"ok": False, "error": "robot non connesso a internet"}, status_code=502)
 
+        if resp.status_code == 429:
+            logger.warning("Pairing rate limit reached")
+            return JSONResponse(
+                {"ok": False, "error": "troppi tentativi, riprova tra qualche minuto"},
+                status_code=429,
+            )
+        if resp.status_code >= 500:
+            logger.warning("Pairing service unavailable (HTTP %s)", resp.status_code)
+            return JSONResponse(
+                {"ok": False, "error": "servizio non disponibile, riprova piu tardi"},
+                status_code=502,
+            )
         if resp.status_code != 200:
             return JSONResponse({"ok": False, "error": "codice non valido o scaduto"}, status_code=400)
 

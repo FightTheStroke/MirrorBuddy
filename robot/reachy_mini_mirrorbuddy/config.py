@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import logging
 import os
+from urllib.parse import urlencode
 
 from dotenv import load_dotenv
 
@@ -50,9 +51,16 @@ class Config:
         endpoint = (os.getenv("AZURE_OPENAI_REALTIME_ENDPOINT") or "").strip()
         self.AZURE_ENDPOINT: str = endpoint.rstrip("/")
         self.AZURE_API_KEY: str | None = (os.getenv("AZURE_OPENAI_REALTIME_API_KEY") or "").strip() or None
-        self.AZURE_DEPLOYMENT: str = (os.getenv("AZURE_OPENAI_REALTIME_DEPLOYMENT") or "gpt-realtime").strip()
         # When set, we speak the deprecated Preview protocol; otherwise the GA protocol.
         self.AZURE_API_VERSION: str | None = (os.getenv("AZURE_OPENAI_REALTIME_API_VERSION") or "").strip() or None
+        base = _deployment("")
+        v15 = _deployment("_V15")
+        candidates = [_deployment("_V21"), _deployment("_V2"), v15, base]
+        self.AZURE_DEPLOYMENT: str = (
+            next((name for name in candidates if name), "gpt-realtime")
+            if self.use_ga_protocol else base or "gpt-realtime"
+        )
+        self._ga_fallbacks = tuple(dict.fromkeys(name for name in (v15, base) if name))
 
         # --- MirrorBuddy alignment ---
         self.MIRRORBUDDY_URL: str = (os.getenv("MIRRORBUDDY_URL") or "https://mirrorbuddy.org").strip().rstrip("/")
@@ -121,17 +129,30 @@ class Config:
         """GA when no api-version is configured."""
         return self.AZURE_API_VERSION is None
 
-    def realtime_ws_url(self) -> str:
+    def realtime_ws_url(self, deployment: str | None = None) -> str:
         """Build the Azure OpenAI Realtime WebSocket URL (GA or Preview)."""
         host = self.AZURE_ENDPOINT.replace("https://", "").replace("http://", "").rstrip("/")
+        model = deployment or self.AZURE_DEPLOYMENT
         if self.use_ga_protocol:
             # GA: resource endpoint directly, model = deployment name.
-            return f"wss://{host}/openai/v1/realtime?model={self.AZURE_DEPLOYMENT}"
+            return f"wss://{host}/openai/v1/realtime?{urlencode({'model': model})}"
         # Preview (deprecated): api-version + deployment.
-        return (
-            f"wss://{host}/openai/realtime"
-            f"?api-version={self.AZURE_API_VERSION}&deployment={self.AZURE_DEPLOYMENT}"
-        )
+        query = urlencode({"api-version": self.AZURE_API_VERSION, "deployment": model})
+        return f"wss://{host}/openai/realtime?{query}"
+
+    def realtime_fallback_urls(self) -> list[str]:
+        """Only explicitly configured GA deployments on an unpaired resource."""
+        if not self.use_ga_protocol or self.DEVICE_TOKEN:
+            return []
+        return [
+            self.realtime_ws_url(name) for name in self._ga_fallbacks
+            if name != self.AZURE_DEPLOYMENT
+        ]
+
+
+def _deployment(suffix: str) -> str | None:
+    value = (os.getenv(f"AZURE_OPENAI_REALTIME_DEPLOYMENT{suffix}") or "").strip()
+    return value if value and value != "undefined" else None
 
 
 def _flag(name: str, default: bool) -> bool:

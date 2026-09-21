@@ -16,26 +16,14 @@ from collections.abc import Callable
 import websockets
 
 from . import rt_messages
+from .rt_connection import RealtimeConnectionMixin
 from .rt_events import RealtimeEventsMixin
 
 logger = logging.getLogger(__name__)
 
 SAMPLE_RATE = rt_messages.SAMPLE_RATE  # Azure Realtime PCM sample rate (in and out)
 
-_RECONNECT_MIN_S = 1.0  # a session that ran its course comes back immediately
-_RECONNECT_MAX_S = 30.0  # a robot deaf for more than half a minute is a broken robot
-_HEALTHY_SESSION_S = 30.0  # shorter than this counts as a failure, so we back off
-
-
-def _ws_major() -> int:
-    """Major version of the installed ``websockets`` package (0 if unknown)."""
-    try:
-        return int(str(websockets.__version__).split(".", 1)[0])
-    except (ValueError, AttributeError):  # pragma: no cover - defensive
-        return 0
-
-
-class AzureRealtimeClient(RealtimeEventsMixin):
+class AzureRealtimeClient(RealtimeEventsMixin, RealtimeConnectionMixin):
     def __init__(
         self,
         ws_url: str,
@@ -53,8 +41,12 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         on_tool_call: Callable[[str, dict, str], None] | None = None,
         on_sleep: Callable[[], None] | None = None,
         on_wake: Callable[[], None] | None = None,
+        fallback_ws_urls: list[str] | None = None,
     ) -> None:
         self.ws_url = ws_url
+        self._fallback_ws_urls = list(dict.fromkeys(
+            url for url in (fallback_ws_urls or []) if url and url != ws_url
+        ))
         self.api_key = api_key
         self.instructions = instructions
         self.voice = voice
@@ -205,46 +197,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
         finally:
             self._loop.close()
 
-    async def _session_loop(self) -> None:
-        """Keep a live session for as long as the app runs.
-
-        Azure hard-closes every Realtime session at 60 minutes
-        ("session_expired"), and Wi-Fi drops happen. Either way this thread used
-        to end, which ended the app: the robot went deaf mid-homework and not even
-        the wake word could reach it. So a closed socket is a reconnect, not an
-        exit — only :meth:`stop` really stops.
-        """
-        delay = _RECONNECT_MIN_S
-        while not self._stop.is_set():
-            started = time.monotonic()
-            self._reset_session_state()
-            try:
-                await self._connect_and_listen()
-            except Exception as e:
-                logger.error("Realtime session dropped: %s", e)
-            if self._stop.is_set():
-                return
-            if time.monotonic() - started >= _HEALTHY_SESSION_S:
-                delay = _RECONNECT_MIN_S  # a real session ran: come back at once
-            logger.info("Realtime session ended; reconnecting in %.0fs", delay)
-            await asyncio.sleep(delay)
-            delay = min(delay * 2, _RECONNECT_MAX_S)
-
-    def _reset_session_state(self) -> None:
-        """Clear per-session flags, keep what the child asked for.
-
-        A session that died mid-sentence leaves audio suppressed and a response
-        "in flight"; carrying that into the new session would mute it entirely.
-        ``_asleep`` / ``_quiet`` are deliberately preserved: if the child said
-        "zitto", coming back talking is exactly the insistence to avoid.
-        """
-        self._ws = None
-        self._suppress = False
-        self._responding = False
-        self._fast_requested = False
-        self._stopped_on_partial = False
-        self._partial_user = ""
-
     async def _safe_send(self, msg: str) -> None:
         ws = self._ws
         if ws is not None:
@@ -252,36 +204,6 @@ class AzureRealtimeClient(RealtimeEventsMixin):
                 await ws.send(msg)
             except Exception as e:
                 logger.debug("send failed: %s", e)
-
-    async def _connect_and_listen(self) -> None:
-        headers = {"api-key": self.api_key}
-        logger.info("Connecting to Azure Realtime: %s", self.ws_url.split("?")[0])
-        # websockets>=13 names custom handshake headers ``additional_headers``; the
-        # 12.x asyncio client calls the same argument ``extra_headers``. Pick the one
-        # the installed version accepts so we work across both.
-        hdr_kw = "additional_headers" if _ws_major() >= 13 else "extra_headers"
-        async with websockets.connect(
-            self.ws_url, max_size=None, ping_interval=20, ping_timeout=20,
-            **{hdr_kw: headers},
-        ) as ws:
-            self._ws = ws
-            logger.info("WebSocket connected; configuring session")
-            payload = rt_messages.session_update(
-                self.instructions, self.voice, self.turn_detection, self.tools, self.use_ga
-            )
-            await ws.send(json.dumps(payload))
-
-            async for raw in ws:
-                if self._stop.is_set():
-                    break
-                try:
-                    event = json.loads(raw)
-                except (ValueError, TypeError):
-                    continue
-                await self._handle_event(event)
-
-        self._ws = None
-        logger.info("WebSocket closed")
 
     async def _greet(self) -> None:
         instructions = (
