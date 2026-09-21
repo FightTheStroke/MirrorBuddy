@@ -50,6 +50,9 @@
       "switchingCamera": "Cambio fotocamera",
       "takePhoto": "Scatta foto",
       "errors": {
+        "unsupported": {
+          "message": "Questo browser o dispositivo non supporta l'accesso alla fotocamera. Prova un altro browser o dispositivo."
+        },
         "permission": {
           "title": "Permesso fotocamera negato",
           "message": "Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",

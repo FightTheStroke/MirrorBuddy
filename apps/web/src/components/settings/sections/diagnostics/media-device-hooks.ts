@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
+import toast from '@/components/ui/toast';
 import {
   requestMicrophoneStream,
   requestVideoStream,
@@ -8,6 +10,7 @@ import {
 } from '@/lib/native/media-bridge';
 
 export function useMediaDevices() {
+  const cameraErrorMessage = useCameraErrorMessage('CameraDevices');
   const [availableMics, setAvailableMics] = useState<MediaDeviceInfo[]>([]);
   const [selectedMicId, setSelectedMicId] = useState<string>('');
   const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([]);
@@ -37,9 +40,9 @@ export function useMediaDevices() {
       // Only set default if no selection exists
       setSelectedCamId((prev) => prev || (cams.length > 0 ? cams[0].deviceId : ''));
     } catch (error) {
-      logger.error('Error fetching cameras', undefined, error);
+      toast.error(cameraErrorMessage(error));
     }
-  }, []);
+  }, [cameraErrorMessage]);
 
   // Initialize devices on mount
   useEffect(() => {

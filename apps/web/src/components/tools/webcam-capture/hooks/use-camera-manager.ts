@@ -5,11 +5,10 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
-import {
-  requestVideoStream,
-  isMediaDevicesAvailable,
-  type VideoConstraints,
-} from '@/lib/native/media-bridge';
+import { useTranslations } from 'next-intl';
+import { addBreadcrumb } from '@/lib/sentry';
+import { getCameraAccessError } from '@/lib/native/camera-access-error';
+import { requestVideoStream, type VideoConstraints } from '@/lib/native/media-bridge';
 import {
   isMobile,
   enumerateCameras as enumerateCamerasUtil,
@@ -22,6 +21,7 @@ interface UseCameraManagerProps {
 }
 
 export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
+  const t = useTranslations('tools.webcam');
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +42,21 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
     return cameras;
   }, []);
 
+  const showCameraError = useCallback(
+    (error: unknown) => {
+      const condition = getCameraAccessError(error);
+      if (condition) {
+        addBreadcrumb('camera', 'Camera access unavailable', { condition: condition.key });
+      } else {
+        logger.error('Camera error', undefined, error);
+      }
+      setError(t(`errors.${condition?.key ?? 'generic'}.message`));
+      setErrorType(condition?.type ?? 'unavailable');
+      setIsLoading(false);
+    },
+    [t],
+  );
+
   const startCamera = useCallback(
     async (deviceId?: string) => {
       setIsLoading(true);
@@ -49,7 +64,7 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
       setErrorType(null);
 
       const timeoutId = setTimeout(() => {
-        setError('Timeout fotocamera. La fotocamera non risponde.');
+        setError(t('errors.timeout.message'));
         setErrorType('timeout');
         setIsLoading(false);
       }, 10000);
@@ -103,105 +118,32 @@ export function useCameraManager({ preferredCameraId }: UseCameraManagerProps) {
       } catch (err) {
         clearTimeout(timeoutId);
 
-        // Extract error information safely
-        let errorName = 'UnknownError';
-        let errorMessage = 'Unknown error';
-        let errorType = 'Unknown';
-
-        try {
-          const errorObj = err as Error | DOMException;
-          errorName = errorObj?.name || (err as { name?: string })?.name || 'UnknownError';
-          errorMessage =
-            errorObj?.message ||
-            (err as { message?: string })?.message ||
-            String(err) ||
-            'Unknown error';
-          errorType = errorObj?.constructor?.name || 'Unknown';
-        } catch {
-          // Fallback if error extraction fails
-          errorMessage = String(err) || 'Unknown error';
-        }
-
-        const errorMsg = errorMessage || errorName;
-
-        // Log error with safe serialization
-        try {
-          logger.error('Camera error', {
-            errorDetails: errorMessage,
-            errorName,
-            errorType,
-            deviceId: deviceId || null,
-            hasMediaDevices: isMediaDevicesAvailable(),
-            hasGetUserMedia: isMediaDevicesAvailable(),
-          });
-        } catch (_logErr) {
-          // If logging fails, silently continue
-        }
-
-        if (
-          errorName === 'NotAllowedError' ||
-          errorName === 'PermissionDeniedError' ||
-          errorMsg.includes('Permission') ||
-          errorMsg.includes('NotAllowedError') ||
-          errorMsg.includes('permission denied')
-        ) {
-          setError(
-            "Permesso fotocamera negato. Abilita l'accesso alla fotocamera nelle impostazioni del browser.",
-          );
-          setErrorType('permission');
-        } else if (
-          errorName === 'NotFoundError' ||
-          errorName === 'DevicesNotFoundError' ||
-          errorMsg.includes('NotFoundError') ||
-          errorMsg.includes('DevicesNotFoundError') ||
-          errorMsg.includes('no camera')
-        ) {
-          setError(
-            'Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera.',
-          );
-          setErrorType('unavailable');
-        } else if (
-          errorName === 'NotReadableError' ||
-          errorName === 'TrackStartError' ||
-          errorMsg.includes('NotReadableError') ||
-          errorMsg.includes('in use') ||
-          errorMsg.includes('busy')
-        ) {
-          setError(
-            "La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app e riprova.",
-          );
-          setErrorType('unavailable');
-        } else {
-          if (deviceId) {
-            logger.info('Retrying with any available camera');
-            try {
-              const fallbackStream = await requestVideoStream();
-              if (videoRef.current) {
-                videoRef.current.srcObject = fallbackStream;
-                await videoRef.current.play();
-                const videoTrack = fallbackStream.getVideoTracks()[0];
-                if (videoTrack) {
-                  setActiveCameraLabel(videoTrack.label);
-                  setSelectedCameraId(videoTrack.getSettings().deviceId || null);
-                }
-                setStream(fallbackStream);
-                setIsLoading(false);
-                await enumerateCameras();
-                return;
+        if (deviceId && !getCameraAccessError(err)) {
+          logger.info('Retrying with any available camera');
+          try {
+            const fallbackStream = await requestVideoStream();
+            if (videoRef.current) {
+              videoRef.current.srcObject = fallbackStream;
+              await videoRef.current.play();
+              const videoTrack = fallbackStream.getVideoTracks()[0];
+              if (videoTrack) {
+                setActiveCameraLabel(videoTrack.label);
+                setSelectedCameraId(videoTrack.getSettings().deviceId || null);
               }
-            } catch (fallbackErr) {
-              logger.error('Camera fallback failed', {
-                error: String(fallbackErr),
-              });
+              setStream(fallbackStream);
+              setIsLoading(false);
+              await enumerateCameras();
+              return;
             }
+          } catch (fallbackErr) {
+            showCameraError(fallbackErr);
+            return;
           }
-          setError('Impossibile accedere alla fotocamera. Riprova.');
-          setErrorType('unavailable');
         }
-        setIsLoading(false);
+        showCameraError(err);
       }
     },
-    [stream, enumerateCameras, isMobileDevice],
+    [stream, enumerateCameras, isMobileDevice, showCameraError, t],
   );
 
   const switchCamera = useCallback(

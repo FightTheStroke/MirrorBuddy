@@ -57,8 +57,19 @@ context to a later event without creating a standalone Sentry issue.
 Voice capability limitations, microphone constraint retries, and scheduled
 mindmap reconnects use breadcrumbs. Unexpected failures remain errors, including
 mindmap reconnect exhaustion. Do not downgrade an unsuccessful operation merely
-because its exception was caught. Camera and service-worker failures remain
-reported until recovery or a benign cause is demonstrated.
+because its exception was caught.
+
+Camera permission denial, unsupported/missing media APIs, missing/busy devices,
+and unsatisfied constraints are expected access conditions: retain breadcrumbs
+and localized guidance, including in callers of the media bridge. Unexpected
+camera failures still produce errors. Optional offline/push worker registration
+failures return `false`/`null` and report at warning severity; this does not claim
+that caching or notifications work, nor promise an automatic retry.
+
+Material-save clients validate the shared create schema before posting. Invalid
+input and HTTP 400 responses retain breadcrumbs (without student content) and
+return a failed-save result so existing translated feedback/retry remains visible.
+Server failures still report as errors; invalid input is never treated as saved.
 
 ### 3. ESLint Enforcement
 

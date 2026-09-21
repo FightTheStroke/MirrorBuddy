@@ -10,6 +10,17 @@
 import { clientLogger as logger } from '@/lib/logger/client';
 import { getPlatform } from './media-bridge';
 import type { MicrophoneConstraints } from './media-bridge';
+import { addBreadcrumb } from '@/lib/sentry';
+import { getCameraAccessError } from './camera-access-error';
+
+function reportStreamFailure(message: string, error: unknown): void {
+  const condition = getCameraAccessError(error);
+  if (condition) {
+    addBreadcrumb('media-bridge', message, { condition: condition.key });
+  } else {
+    logger.error(message, undefined, error);
+  }
+}
 
 // ============================================================================
 // Video Stream Access
@@ -29,6 +40,9 @@ export interface VideoConstraints {
  */
 export async function requestVideoStream(constraints?: VideoConstraints): Promise<MediaStream> {
   try {
+    if (!isMediaDevicesAvailable()) {
+      throw new DOMException('Camera API unavailable', 'NotSupportedError');
+    }
     const videoConstraints =
       constraints && Object.keys(constraints).length > 0 ? constraints : true;
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -41,7 +55,7 @@ export async function requestVideoStream(constraints?: VideoConstraints): Promis
     });
     return stream;
   } catch (error) {
-    logger.error('[MediaBridge] Video stream error', undefined, error);
+    reportStreamFailure('[MediaBridge] Video stream error', error);
     throw error;
   }
 }
@@ -54,6 +68,9 @@ export async function requestMediaStream(
   audio: MicrophoneConstraints | boolean = true,
 ): Promise<MediaStream> {
   try {
+    if (!isMediaDevicesAvailable()) {
+      throw new DOMException('Camera API unavailable', 'NotSupportedError');
+    }
     const stream = await navigator.mediaDevices.getUserMedia({ video, audio });
     logger.debug('[MediaBridge] Media stream acquired', {
       videoTracks: stream.getVideoTracks().length,
@@ -62,7 +79,7 @@ export async function requestMediaStream(
     });
     return stream;
   } catch (error) {
-    logger.error('[MediaBridge] Media stream error', undefined, error);
+    reportStreamFailure('[MediaBridge] Media stream error', error);
     throw error;
   }
 }
@@ -95,7 +112,9 @@ export async function enumerateMediaDevices(): Promise<MediaDeviceInfo[]> {
  * Check if getUserMedia API is available
  */
 export function isMediaDevicesAvailable(): boolean {
-  return !!navigator?.mediaDevices?.getUserMedia;
+  return (
+    typeof navigator !== 'undefined' && typeof navigator?.mediaDevices?.getUserMedia === 'function'
+  );
 }
 
 /**

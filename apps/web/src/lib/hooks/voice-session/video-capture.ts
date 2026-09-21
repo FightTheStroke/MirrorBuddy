@@ -8,6 +8,8 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { requestVideoStream } from '@/lib/native/media-bridge';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
+import toast from '@/components/ui/toast';
 
 const CAPTURE_WIDTH = 640;
 const CAPTURE_HEIGHT = 360;
@@ -37,6 +39,7 @@ export interface UseVideoCaptureReturn {
 }
 
 export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptureReturn {
+  const cameraErrorMessage = useCameraErrorMessage('VideoCapture');
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [framesSent, setFramesSent] = useState(0);
@@ -184,12 +187,10 @@ export function useVideoCapture(options: UseVideoCaptureOptions): UseVideoCaptur
     } catch (error) {
       if (generation !== captureGenerationRef.current) return false;
       stopCapture();
-      logger.error('[VideoCapture] Failed to start', {
-        error: String(error),
-      });
+      toast.error(cameraErrorMessage(error));
       return false;
     }
-  }, [captureFrame, stopCapture, options.captureIntervalMs]);
+  }, [captureFrame, stopCapture, options.captureIntervalMs, cameraErrorMessage]);
 
   useEffect(() => {
     isMountedRef.current = true;

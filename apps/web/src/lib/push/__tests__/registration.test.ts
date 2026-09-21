@@ -49,10 +49,9 @@ describe('push service worker registration', () => {
     const error = new DOMException('Service worker blocked', 'SecurityError');
     register.mockRejectedValueOnce(error);
     expect(await registerServiceWorker()).toBeNull();
-    expect(logger.error).toHaveBeenCalledWith(
-      '[Push] Service worker registration failed',
-      undefined,
-      error,
-    );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('[Push] Service worker registration failed', {
+      errorName: 'UnknownError',
+    });
   });
 });

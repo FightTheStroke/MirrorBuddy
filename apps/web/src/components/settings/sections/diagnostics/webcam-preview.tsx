@@ -4,7 +4,8 @@ import { useState, useRef } from 'react';
 import { Video, XCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { clientLogger as logger } from '@/lib/logger/client';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
+import toast from '@/components/ui/toast';
 import { useTranslations } from 'next-intl';
 import { requestVideoStream } from '@/lib/native/media-bridge';
 
@@ -22,6 +23,7 @@ export function WebcamPreview({
   onRefresh,
 }: WebcamPreviewProps) {
   const t = useTranslations('settings');
+  const cameraErrorMessage = useCameraErrorMessage('WebcamPreview');
   const [webcamActive, setWebcamActive] = useState(false);
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const webcamStreamRef = useRef<MediaStream | null>(null);
@@ -35,12 +37,14 @@ export function WebcamPreview({
 
       if (videoPreviewRef.current) {
         videoPreviewRef.current.srcObject = stream;
-        videoPreviewRef.current.play();
+        await videoPreviewRef.current.play();
       }
 
       setWebcamActive(true);
     } catch (error) {
-      logger.error('Webcam error', undefined, error);
+      webcamStreamRef.current?.getTracks().forEach((track) => track.stop());
+      webcamStreamRef.current = null;
+      toast.error(cameraErrorMessage(error));
       setWebcamActive(false);
     }
   };

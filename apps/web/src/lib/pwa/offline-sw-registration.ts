@@ -49,7 +49,9 @@ export async function registerOfflineServiceWorker(): Promise<boolean> {
 
     return true;
   } catch (error) {
-    logger.error('[Offline SW] Registration failed', undefined, error);
+    logger.warn('[Offline SW] Registration failed', {
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+    });
     return false;
   }
 }
