@@ -11,7 +11,11 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Every case here spawns real git and shell subprocesses; the 5s default is not
+// a realistic budget for that work and turns machine load into spurious failures.
+vi.setConfig({ testTimeout: 30_000 });
 import { buildIdentity, digest, inputIdentity } from '../lib/release-evidence-inputs.mjs';
 import { buildFixture } from './release-native-fixture';
 import {

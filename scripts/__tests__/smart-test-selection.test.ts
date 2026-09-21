@@ -1,5 +1,9 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+// Every case here spawns real shell scripts; the 5s default is not a realistic
+// budget for subprocess work and turns machine load into spurious failures.
+vi.setConfig({ testTimeout: 30_000 });
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

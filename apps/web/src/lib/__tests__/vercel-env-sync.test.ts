@@ -67,8 +67,10 @@ function parseEnvVarNames(filePath: string): string[] {
 
 function parseRequiredVarsFromBash(filePath: string): string[] {
   const content = readFileSync(resolve(ROOT, filePath), 'utf-8');
-  // Extract vars between REQUIRED_VARS=( and the closing )
-  const blockMatch = content.match(/REQUIRED_VARS=\(([\s\S]*?)\)/);
+  // Extract vars between REQUIRED_VARS=( and the closing ) on its own line.
+  // Comments inside the block may contain parentheses, so the terminator must
+  // be anchored to a line start, not to the first ")" encountered.
+  const blockMatch = content.match(/REQUIRED_VARS=\(([\s\S]*?)\n\)/);
   if (!blockMatch) return [];
   const blockMatches = blockMatch[1].match(/"([A-Z_]+)"/g) || [];
   return blockMatches.map((m) => m.replace(/"/g, ''));

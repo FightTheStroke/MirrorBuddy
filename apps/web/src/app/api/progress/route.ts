@@ -12,7 +12,7 @@ import { serverNotifications } from '@/lib/notifications/server-triggers';
 import { ProgressUpdateSchema } from '@/lib/validation/schemas/progress';
 import { pipe, withSentry, withAuth, withCSRF } from '@/lib/api/middlewares';
 import { safeReadJson } from '@/lib/api/safe-json';
-
+import { isDeletedOwnerError, deletedOwnerResponse } from '@/lib/api/deleted-owner';
 
 export const revalidate = 0;
 export const GET = pipe(
@@ -23,28 +23,34 @@ export const GET = pipe(
 
   // Prisma upsert can still race under concurrent requests in some environments.
   // Handle P2002 by falling back to a read after the conflicting create.
-  const progress = await (async () => {
-    try {
-      return await prisma.progress.upsert({
-        where: { userId },
-        update: {},
-        create: { userId },
-      });
-    } catch (error) {
-      const isPrismaP2002 =
-        error &&
-        typeof error === 'object' &&
-        'code' in error &&
-        (error as { code?: unknown }).code === 'P2002';
-      if (!isPrismaP2002) {
-        throw error;
+  let progress;
+  try {
+    progress = await (async () => {
+      try {
+        return await prisma.progress.upsert({
+          where: { userId },
+          update: {},
+          create: { userId },
+        });
+      } catch (error) {
+        const isPrismaP2002 =
+          error &&
+          typeof error === 'object' &&
+          'code' in error &&
+          (error as { code?: unknown }).code === 'P2002';
+        if (!isPrismaP2002) {
+          throw error;
+        }
+        const existing = await prisma.progress.findUnique({ where: { userId } });
+        if (existing) return existing;
+        // Extremely unlikely: retry create if record still not visible.
+        return await prisma.progress.create({ data: { userId } });
       }
-      const existing = await prisma.progress.findUnique({ where: { userId } });
-      if (existing) return existing;
-      // Extremely unlikely: retry create if record still not visible.
-      return await prisma.progress.create({ data: { userId } });
-    }
-  })();
+    })();
+  } catch (error) {
+    if (isDeletedOwnerError(error)) return deletedOwnerResponse();
+    throw error;
+  }
 
   // Parse JSON fields and add season data
   const response = NextResponse.json({
@@ -153,11 +159,17 @@ export const PUT = pipe(
     updateData.masteries = JSON.stringify(data.masteries);
   }
 
-  const progress = await prisma.progress.upsert({
-    where: { userId },
-    update: updateData,
-    create: { userId, ...updateData },
-  });
+  let progress;
+  try {
+    progress = await prisma.progress.upsert({
+      where: { userId },
+      update: updateData,
+      create: { userId, ...updateData },
+    });
+  } catch (error) {
+    if (isDeletedOwnerError(error)) return deletedOwnerResponse();
+    throw error;
+  }
 
   // --- Trigger notifications for progress milestones ---
 

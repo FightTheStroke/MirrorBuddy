@@ -1,10 +1,21 @@
 import type { APIRequestContext } from '@playwright/test';
 
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]']);
+
+/**
+ * The guard exists so acceptance never streams against a deployed environment.
+ * It pinned one port instead, which no runner but the author's used, so every
+ * run outside that laptop failed on the guard rather than on the behaviour.
+ */
+export function assertLocalStreamTarget(url: string): void {
+  const { hostname } = new URL(url);
+  if (!LOOPBACK_HOSTS.has(hostname))
+    throw new Error(`Mindmap acceptance must run against the local test server, not ${hostname}`);
+}
+
 /** Real streaming HTTP client; no interception of auth, persistence or SSE. */
 export async function openMindmapStream(request: APIRequestContext, url: string) {
-  const target = new URL(url);
-  if (target.hostname !== 'localhost' || target.port !== '3476')
-    throw new Error('Mindmap acceptance requires the isolated local server on 3476');
+  assertLocalStreamTarget(url);
   const state = await request.storageState();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);

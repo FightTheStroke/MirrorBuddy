@@ -39,19 +39,21 @@ test('rendered library map recovers an independent write after ten seconds offli
   await mockTrialConsentCookie(reader);
   const page = await reader.newPage();
   await page.addInitScript(() => {
+    // Timers were tracked by matching function names in the stack, which a
+    // production build minifies away: the count stayed at zero and the spec
+    // failed on its own instrumentation rather than on a leak. Counting every
+    // pending timer against a baseline taken with the map closed measures the
+    // same leak and survives minification.
     const active = new Set<number>();
     const schedule = window.setTimeout.bind(window);
     const cancel = window.clearTimeout.bind(window);
     window.setTimeout = ((handler: TimerHandler, delay?: number, ...args: unknown[]) => {
       if (typeof handler !== 'function') return schedule(handler, delay);
-      const track = /armWatchdog|startDeadline|renderMindmap|snapshot-client/.test(
-        new Error().stack ?? '',
-      );
       const id = schedule(() => {
         active.delete(id);
         handler(...args);
       }, delay);
-      if (track) active.add(id);
+      active.add(id);
       return id;
     }) as typeof window.setTimeout;
     window.clearTimeout = (id) => {
@@ -164,30 +166,28 @@ test('rendered library map recovers an independent write after ten seconds offli
     await expect(map).toHaveCount(0);
     await expect.poll(() => connections.size).toBe(0);
     const session = await reader.newCDPSession(page);
+    const timerCount = () => page.evaluate(() => Number(Reflect.get(window, 'mindmapTimerCount')));
+    const idleTimers = await timerCount();
     const listeners: number[] = [];
     for (let cycle = 0; cycle < 10; cycle++) {
       await page.getByText(title, { exact: true }).click();
       await expect(map.getByLabel('Nuovo nodo', { exact: true })).toBeEnabled();
       expect(connections.size).toBe(1);
-      expect(await page.evaluate(() => Reflect.get(window, 'mindmapTimerCount'))).toBeGreaterThan(
-        0,
-      );
+      expect(await timerCount()).toBeGreaterThan(idleTimers);
       await reader.setOffline(true);
       await expect(map.getByLabel('Nuovo nodo', { exact: true })).toBeDisabled();
       await page.keyboard.press('Escape');
       await expect(map).toHaveCount(0);
       await reader.setOffline(false);
       await expect.poll(() => connections.size).toBe(0);
-      await expect
-        .poll(() => page.evaluate(() => Reflect.get(window, 'mindmapTimerCount')))
-        .toBe(0);
+      await expect.poll(timerCount).toBeLessThanOrEqual(idleTimers);
       await session.send('HeapProfiler.collectGarbage');
       listeners.push((await session.send('Memory.getDOMCounters')).jsEventListeners);
     }
     expect(listeners[9]).toBeLessThanOrEqual(listeners[0] + 5);
     await session.detach();
     console.log(
-      `RENDERED_RECOVERY offline10s recoveryMs=${recoveryMs}; exact rendered reload tree and durable undo; cycles=10 opened=${opened} closedActive=${connections.size} mapTimers=0 listeners=${listeners.join(',')}`,
+      `RENDERED_RECOVERY offline10s recoveryMs=${recoveryMs}; exact rendered reload tree and durable undo; cycles=10 opened=${opened} closedActive=${connections.size} idleTimers=${idleTimers} listeners=${listeners.join(',')}`,
     );
   } finally {
     await reader.setOffline(false);
