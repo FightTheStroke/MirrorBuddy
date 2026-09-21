@@ -1,5 +1,23 @@
 {
   "admin": {
+    "policyWrite": {
+      "unconfirmed": "Das Speichern wurde nicht bestätigt. Der angezeigte Schutz gilt nur für diese Instanz, nicht für alle Server.",
+      "superseded": "Ein anderer Vorgang hat diese Änderung ersetzt. Es wurde keine Reaktivierung bestätigt.",
+      "failed": "Die Änderung konnte nicht bestätigt werden. Starten Sie einen neuen Versuch.",
+      "loadFailed": "Die Funktionseinstellungen konnten nicht geladen werden.",
+      "instanceNotice": "Wirksamer Zustand der Instanz, die die Änderung verarbeitet hat. Ein Neuladen der Seite bestätigt keine Speicherung.",
+      "enable": "Aktivieren",
+      "disable": "Deaktivieren",
+      "reactivateAll": "Alle reaktivieren",
+      "globalStop": "Globaler Stopp",
+      "globalStopped": "Alle Funktionen sind durch den globalen Stopp gesperrt",
+      "operational": "Alle Systeme sind betriebsbereit",
+      "degraded": "Systemeinschränkung: {level}",
+      "healthy": "Betriebsbereit",
+      "partial": "Teilweise",
+      "severe": "Schwerwiegend",
+      "critical": "Kritisch"
+    },
     "metricTruth": {
       "averageTurns": "Durchschnittliche Dialogschritte pro erfasster Sitzung",
       "averageSessionCost": "Durchschnittskosten pro erfasster Sitzung",
