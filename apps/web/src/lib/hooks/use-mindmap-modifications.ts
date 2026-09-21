@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
+import { addBreadcrumb } from '@/lib/sentry';
 import type { MindmapModifyCommand } from '@/lib/realtime/tool-events';
 import { MINDMAP_RETRY_DELAYS, type MindmapRecoveryState } from '@/lib/mindmap/snapshot-client';
 import type { MindmapSnapshot } from '@/lib/mindmap/protocol';
@@ -182,19 +183,25 @@ export function useMindmapModifications({
       if (eventSourceRef.current === eventSource) handleEvent(event);
     };
 
-    eventSource.onerror = (error) => {
+    eventSource.onerror = () => {
       if (eventSourceRef.current !== eventSource) return;
       closeSource();
-      logger.warn('[MindmapModifications] SSE error, reconnecting...', {
-        error,
-      });
       setIsConnected(false);
 
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
-      if (attemptsRef.current >= MINDMAP_RETRY_DELAYS.length) return;
+      if (attemptsRef.current >= MINDMAP_RETRY_DELAYS.length) {
+        logger.error('[MindmapModifications] SSE reconnect attempts exhausted', {
+          attempts: attemptsRef.current,
+        });
+        return;
+      }
       const delay = MINDMAP_RETRY_DELAYS[attemptsRef.current++];
+      addBreadcrumb('mindmap', '[MindmapModifications] SSE error, reconnecting...', {
+        attempt: attemptsRef.current,
+        delay,
+      });
       reconnectTimeoutRef.current = setTimeout(() => {
         reconnectTimeoutRef.current = null;
         connectRef.current();

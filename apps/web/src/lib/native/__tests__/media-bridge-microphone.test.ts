@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { addBreadcrumb } from '@/lib/sentry';
 import {
   requestMicrophoneStream,
   stopMicrophoneStream,
@@ -37,6 +38,7 @@ vi.mock('@capacitor/camera', () => ({
 vi.mock('@/lib/logger/client', () => ({
   clientLogger: mockClientLogger,
 }));
+vi.mock('@/lib/sentry', () => ({ addBreadcrumb: vi.fn() }));
 
 describe('media-bridge — microphone', () => {
   beforeEach(() => {
@@ -142,13 +144,16 @@ describe('media-bridge — microphone', () => {
         video: false,
       });
       expect(stream).toBe(fallbackStream);
-      expect(mockClientLogger.warn).toHaveBeenCalledWith(
+      expect(addBreadcrumb).toHaveBeenCalledWith(
+        'media-bridge',
         '[MediaBridge] Retrying microphone stream with default constraints',
         expect.objectContaining({
           component: 'media-bridge',
           errorName: 'NotSupportedError',
         }),
       );
+      expect(mockClientLogger.warn).not.toHaveBeenCalled();
+      expect(mockClientLogger.error).not.toHaveBeenCalled();
     });
 
     it('downgrades expected microphone access errors to warnings', async () => {

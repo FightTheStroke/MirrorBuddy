@@ -14,6 +14,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { clientLogger as logger } from '@/lib/logger/client';
+import { addBreadcrumb } from '@/lib/sentry';
 
 // ============================================================================
 // Platform Detection
@@ -191,10 +192,14 @@ export async function requestMicrophoneStream(
     return stream;
   } catch (error) {
     if (audioConstraints !== true && isCompatibilityError(error)) {
-      logger.warn('[MediaBridge] Retrying microphone stream with default constraints', {
-        component: 'media-bridge',
-        errorName: getErrorName(error),
-      });
+      addBreadcrumb(
+        'media-bridge',
+        '[MediaBridge] Retrying microphone stream with default constraints',
+        {
+          component: 'media-bridge',
+          errorName: getErrorName(error),
+        },
+      );
       try {
         const fallbackStream = await requestAudio(true);
         logger.info('[MediaBridge] Microphone stream acquired with fallback constraints', {

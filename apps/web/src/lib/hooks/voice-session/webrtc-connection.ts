@@ -8,6 +8,7 @@
 import { sanitizeUpstreamError, describeUpstreamError } from '@/lib/ai/providers/azure-errors';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { csrfFetch } from '@/lib/auth';
+import { addBreadcrumb } from '@/lib/sentry';
 import {
   isMediaDevicesAvailable,
   requestMicrophoneStream,
@@ -164,7 +165,7 @@ export class WebRTCConnection {
       const connectionTime = Date.now() - startTime;
       const capabilityError = isVoiceCapabilityError(error);
       if (capabilityError) {
-        logger.warn('[VoiceSession] WebRTC capability limitation', {
+        addBreadcrumb('voice', '[VoiceSession] WebRTC capability limitation', {
           component: 'voice-error',
           errorName: 'WebRTCConnectionFailed',
           errorMessage: message,

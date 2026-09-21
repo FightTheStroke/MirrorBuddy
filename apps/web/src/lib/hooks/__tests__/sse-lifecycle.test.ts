@@ -3,6 +3,10 @@ import { createElement, StrictMode, type PropsWithChildren } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMindmapModifications } from '../use-mindmap-modifications';
 import { useToolStream } from '../use-tool-stream';
+import { logger } from '@/lib/logger';
+import { addBreadcrumb } from '@/lib/sentry';
+
+vi.mock('@/lib/sentry', () => ({ addBreadcrumb: vi.fn() }));
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -45,6 +49,7 @@ class MockEventSource {
 
 describe('SSE subscription lifecycle', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.useFakeTimers();
     vi.spyOn(Math, 'random').mockReturnValue(0);
     MockEventSource.instances = [];
@@ -68,6 +73,13 @@ describe('SSE subscription lifecycle', () => {
     expect(source.onerror).toBeNull();
     act(() => vi.advanceTimersByTime(3000));
     expect(MockEventSource.instances).toHaveLength(2);
+    expect(addBreadcrumb).toHaveBeenCalledWith(
+      'mindmap',
+      '[MindmapModifications] SSE error, reconnecting...',
+      { attempt: 1, delay: 1000 },
+    );
+    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('ignores a queued mindmap error after unmount', () => {
@@ -217,5 +229,9 @@ describe('SSE subscription lifecycle', () => {
       act(() => vi.advanceTimersByTime(30_000));
     }
     expect(MockEventSource.instances.length).toBeLessThanOrEqual(6);
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      '[MindmapModifications] SSE reconnect attempts exhausted',
+      { attempts: 5 },
+    );
   });
 });
