@@ -36,8 +36,7 @@ vi.mock('@/app/api/metrics/behavioral-metrics', () => ({
 vi.mock('@/lib/funnel/batch-funnel', () => ({
   processBatchFunnelEvents: mocks.batch,
 }));
-vi.mock('@/lib/observability/prometheus-push-service', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/observability/prometheus-push-service')>()),
+vi.mock('../scheduled-metrics', () => ({
   collectDatabaseBackedSamples: mocks.database,
 }));
 vi.mock('@/lib/observability/collector-diagnostics', () => ({

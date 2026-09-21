@@ -1,4 +1,4 @@
-import { MetricsPushError } from '@/lib/observability/prometheus-push-service';
+import { MetricsPushError } from '@/lib/observability/metrics-push-error';
 import type { MetricSample } from './collector-utils';
 
 function formatInfluxLineProtocol(samples: MetricSample[]): string {

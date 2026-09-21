@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
-import { collectDatabaseBackedSamples } from '@/lib/observability/prometheus-push-service';
+import { collectDatabaseBackedSamples } from './scheduled-metrics';
 import { collectSection, type CollectorContext, type MetricSample } from './collector-utils';
 import { collectHttpMetrics } from './http-metrics';
 import { collectActivityMetrics } from './activity-metrics';
@@ -36,7 +36,7 @@ async function processFunnelEvents(): Promise<boolean> {
   return !result.errors;
 }
 
-/** Instance-local metrics stay here; moving them to another schedule loses data. */
+/** Scheduled shared sources plus the existing cron worker's local HTTP/SLI view. */
 export async function collectLightMetrics(): Promise<MetricSample[]> {
   const now = Date.now();
   const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';

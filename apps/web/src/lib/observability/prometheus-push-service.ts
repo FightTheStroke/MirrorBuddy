@@ -4,9 +4,8 @@ import {
   logCollectorSkippedOnce,
   reportCollectorFailure,
 } from './collector-diagnostics';
-import { collectServiceLimitsSamples } from './service-limits-metrics';
 import { collectHttpMetrics, type MetricSample } from './http-metrics-collector';
-import { collectTierMetrics } from './tier-metrics-collector';
+import { MetricsPushError } from './metrics-push-error';
 import { collectMetricSource } from './collect-metric-source';
 import {
   collectFunnelMetrics,
@@ -20,43 +19,6 @@ interface PushConfig {
   user: string;
   apiKey: string;
   intervalSeconds: number;
-}
-
-/** Group transport rejections by status, not potentially sensitive response bodies. */
-export class MetricsPushError extends Error {
-  readonly status: number;
-  readonly responseBody: string;
-
-  constructor(status: number, responseBody: string) {
-    super(`Metrics push rejected: HTTP ${status}`);
-    this.name = 'MetricsPushError';
-    this.status = status;
-    this.responseBody = (responseBody ?? '').slice(0, 500);
-  }
-}
-
-/**
- * Collectors that query the database. They belong to a single scheduled caller:
- * running them from a per-instance timer multiplies database connections by the
- * number of live serverless instances, which is not bounded by the pool.
- */
-const databaseBackedCollectors = {
-  service_limits: collectServiceLimitsSamples,
-  tier: collectTierMetrics,
-};
-
-/** Collect the database-backed families once, for the authenticated cron route. */
-export async function collectDatabaseBackedSamples(
-  instanceLabels: Record<string, string>,
-  now: number,
-): Promise<MetricSample[]> {
-  const samples: MetricSample[] = [];
-  for (const [name, collect] of Object.entries(databaseBackedCollectors)) {
-    samples.push(
-      ...(await collectMetricSource(name, () => collect(instanceLabels, now), instanceLabels, now)),
-    );
-  }
-  return samples;
 }
 
 /**
@@ -103,7 +65,8 @@ class PrometheusPushService {
   }
 
   /**
-   * Start the periodic push
+   * Preserve only process-local sources until they have lossless shared storage.
+   * A cron invocation cannot read another worker's HTTP samples or funnel counters.
    * NOTE: Disabled in development to avoid unnecessary Grafana Cloud costs
    */
   start(): void {
@@ -204,10 +167,6 @@ class PrometheusPushService {
       budget: collectBudgetMetrics,
       abuse: collectAbuseMetrics,
       conversion: collectConversionMetrics,
-      // On Vercel every function instance owns this timer, so a database-backed
-      // collector here opens connections once per instance per interval. The
-      // authenticated cron route collects those once per schedule instead.
-      ...(process.env.VERCEL === '1' ? {} : databaseBackedCollectors),
     };
     for (const [name, collect] of Object.entries(collectors)) {
       samples.push(

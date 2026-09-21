@@ -52,7 +52,7 @@ Database connection pool (total/active/idle/waiting/utilization), AI provider co
 ```typescript
 import { prometheusPushService } from '@/lib/observability';
 // Production instrumentation starts the instance-local push service.
-// The authenticated cron separately pushes database-backed metrics.
+// Only the authenticated cron collects shared service-limit and tier sources.
 ```
 
 **Env vars**: `GRAFANA_CLOUD_PROMETHEUS_URL`, `GRAFANA_CLOUD_PROMETHEUS_USER`, `GRAFANA_CLOUD_API_KEY`
@@ -65,7 +65,13 @@ import { prometheusPushService } from '@/lib/observability';
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | Instance push            | HTTP, in-memory funnel, budget, abuse, conversion                                                                                                                                                 | Startup and `GRAFANA_CLOUD_PUSH_INTERVAL` (default 60 seconds); best effort on serverless |
 | `/api/cron/metrics-push` | SLI/HTTP summary, database active users and cleanup, database funnel/conversion, churn, behavioral/session health, batch funnel recording, waitlist, service limits (Vercel/Supabase/Azure), tier | Existing five-minute schedule                                                             |
-| Non-Vercel instance push | Also service limits and tier                                                                                                                                                                      | Same instance interval; unchanged                                                         |
+
+The cron owns service limits and tier on **all hosts**, not just Vercel.
+`metrics-push/scheduled-metrics.ts` contains that registry; neither cron collection
+nor its transport imports the interval service. Non-Vercel deployments must arrange
+the same authenticated five-minute cron invocation before adopting this ownership
+change; starting the application alone no longer collects those shared sources.
+No scheduler is provisioned by the application.
 
 All three Grafana credentials must be nonblank before collecting. Missing Grafana
 configuration returns a skipped cron response and logs once per process at info;
@@ -92,13 +98,33 @@ Cron section health uses distinct names (`cron-http`, `realtime-active-users`,
 Batch funnel persistence retains its existing error reporting: lost analytics
 writes are not reclassified as harmless collection failures.
 
-**Issue #1018 remains open.** Database-backed collection is already centralized on
-Vercel, but instance-local HTTP/funnel/budget/abuse/conversion state cannot be moved
+**Issue #1018 is not fully satisfied.** Shared-source collection is cron-owned, but
+instance-local HTTP/funnel/budget/abuse/conversion state cannot be moved
 to cron without durable aggregation: the cron instance cannot read other instances'
 memory. Removing the timer alone would drop genuine measurements. Completing the
 single-schedule design needs lossless aggregation and actual received Grafana
 samples at the known cadence, not just a quiet error feed. This reliability change
-does not change cloud schedules, credentials or access.
+does not change cloud schedules, credentials or access. The timer is an explicit
+no-data-loss exception, not a second owner for shared collectors.
+
+The local exceptions preserve ten HTTP metric names, nine trial/invite counters,
+four budget gauges, three abuse counters/scores and six conversion ratios.
+HTTP uses the worker's sliding-window arrays in `metrics-store.ts`; the other four
+families use `funnel-metrics.ts` module-local counters. Moving only the reader to
+cron would emit that worker's empty/reset state, not the originating measurements.
+The existing cron HTTP/SLI view has the same fleet-visibility limitation and is
+unchanged; behavioral/session health, by contrast, queries shared database state.
+
+No-loss contracts: `metrics-ownership.test.ts` exercises real local producers and
+checks all 32 metric names, values, labels and timestamps; it also proves no shared
+source runs on startup or interval with or without `VERCEL`.
+`scheduled-metrics.test.ts` checks every tier sample and each Vercel/Supabase/Azure
+resource triplet through collection and transport, including disabled/failed
+source distinction. Existing `metrics-push/__tests__/reliability.test.ts` retains
+authenticated routing and exactly-once collector/transport fault coverage.
+These are local contracts, not proof of receipt by Grafana: after deployment,
+inspect actual sample timestamps over multiple five-minute invocations. Do not
+infer freshness from a successful HTTP response or the absence of warnings.
 
 **Historical Supabase failures:** PR #1017 documented connection failures
 (`08006`/`XX000`) and lost error attribution; PR #1040 removed database-collector
@@ -140,4 +166,5 @@ Vercel (bandwidth/builds/functions), Supabase (DB/storage/connections), Resend (
 - `docs/operations/SLI-SLO.md` - Service level definitions
 - `docs/operations/RUNBOOK.md` - Incident response
 - `docs/operations/CRON-JOBS.md` - Cron documentation
-- `src/lib/observability/prometheus-push-service.ts` - Push implementation
+- `src/app/api/cron/metrics-push/scheduled-metrics.ts` - Shared-source owner
+- `src/lib/observability/prometheus-push-service.ts` - Process-local exception
