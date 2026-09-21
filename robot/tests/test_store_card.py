@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SPACE = ROOT / "space"
@@ -51,8 +52,10 @@ class TestTheStoreCardCarriesTheMirrorBuddyMark:
 
     def test_the_icon_is_served_by_mirrorbuddy_itself(self):
         # A Space-relative icon is what broke publishing; a third-party host
-        # would put the product mark outside anyone's control.
-        assert "mirrorbuddy.org/" in _thumbnail()
+        # would put the product mark outside anyone's control. Compare the host
+        # exactly: a substring check would accept mirrorbuddy.org.example.com.
+        host = urlsplit(_thumbnail()).hostname
+        assert host in {"mirrorbuddy.org", "www.mirrorbuddy.org"}, f"unexpected icon host: {host}"
 
     def test_the_fallback_emoji_is_not_the_mirror(self):
         # Clients that ignore the thumbnail fall back to the emoji, so it has to
