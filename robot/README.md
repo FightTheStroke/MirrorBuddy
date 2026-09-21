@@ -1,6 +1,6 @@
 ---
 title: MirrorBuddy on Reachy Mini
-emoji: 🤖
+emoji: 🧠
 license: apache-2.0
 tags:
   - reachy-mini

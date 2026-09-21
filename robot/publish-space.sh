@@ -54,6 +54,9 @@ cp -R "$HERE/reachy_mini_mirrorbuddy" "$STAGE/"
 cp "$HERE/pyproject.toml" "$STAGE/"
 cp "$HERE/space/index.html" "$STAGE/"
 cp "$HERE/space/style.css" "$STAGE/"
+# The app icon the robot dashboard shows beside the app name. Without it the
+# store falls back to the card emoji, which is not the MirrorBuddy mark.
+cp "$HERE/space/icon.png" "$STAGE/"
 
 # The published package must never carry the robot's local secrets or caches.
 rm -rf "$STAGE/reachy_mini_mirrorbuddy/__pycache__" "$STAGE/reachy_mini_mirrorbuddy/.env"
