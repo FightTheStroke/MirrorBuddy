@@ -7,12 +7,6 @@ import {
 import { collectHttpMetrics, type MetricSample } from './http-metrics-collector';
 import { MetricsPushError } from './metrics-push-error';
 import { collectMetricSource } from './collect-metric-source';
-import {
-  collectFunnelMetrics,
-  collectBudgetMetrics,
-  collectAbuseMetrics,
-  collectConversionMetrics,
-} from './funnel-metrics-collectors';
 
 interface PushConfig {
   url: string;
@@ -65,8 +59,9 @@ class PrometheusPushService {
   }
 
   /**
-   * Preserve only process-local sources until they have lossless shared storage.
-   * A cron invocation cannot read another worker's HTTP samples or funnel counters.
+   * Best-effort proxy-only diagnostics; cron cannot read another worker's window.
+   * Serverless suspension/recycling can lose samples. Never use these for
+   * application SLOs or durable fleet totals. Shared business sources use cron.
    * NOTE: Disabled in development to avoid unnecessary Grafana Cloud costs
    */
   start(): void {
@@ -161,23 +156,14 @@ class PrometheusPushService {
       env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     };
 
-    const collectors = {
-      http: collectHttpMetrics,
-      funnel: collectFunnelMetrics,
-      budget: collectBudgetMetrics,
-      abuse: collectAbuseMetrics,
-      conversion: collectConversionMetrics,
-    };
-    for (const [name, collect] of Object.entries(collectors)) {
-      samples.push(
-        ...(await collectMetricSource(
-          name,
-          () => collect(instanceLabels, now),
-          instanceLabels,
-          now,
-        )),
-      );
-    }
+    samples.push(
+      ...(await collectMetricSource(
+        'proxy-http',
+        () => collectHttpMetrics(instanceLabels, now),
+        instanceLabels,
+        now,
+      )),
+    );
 
     return samples;
   }

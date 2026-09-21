@@ -1,33 +1,35 @@
 /**
- * Test script for Grafana Cloud push - sends all V1 metrics
+ * Test script for Grafana Cloud push - sends synthetic dashboard samples
  * Run with: npm run script -- scripts/test-grafana-push.ts
  *
  * This pushes example data to verify dashboard connectivity.
- * Real metrics come from /api/metrics via prometheus-push-service.ts
+ * Proxy samples are local-window diagnostics, not application latency or SLO evidence.
+ * Business samples model the independent DB-backed cron metrics.
  */
 
-import "dotenv/config";
+import 'dotenv/config';
 
 const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
 const user = process.env.GRAFANA_CLOUD_PROMETHEUS_USER;
 const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
 
 if (!url || !user || !apiKey) {
-  console.error("Missing GRAFANA_CLOUD_* env vars");
-  console.error("Required:");
-  console.error("  GRAFANA_CLOUD_PROMETHEUS_URL");
-  console.error("  GRAFANA_CLOUD_PROMETHEUS_USER");
-  console.error("  GRAFANA_CLOUD_API_KEY");
+  console.error('Missing GRAFANA_CLOUD_* env vars');
+  console.error('Required:');
+  console.error('  GRAFANA_CLOUD_PROMETHEUS_URL');
+  console.error('  GRAFANA_CLOUD_PROMETHEUS_USER');
+  console.error('  GRAFANA_CLOUD_API_KEY');
   process.exit(1);
 }
 
-console.log("╔════════════════════════════════════════════════════════════╗");
-console.log("║  🧪 TEST DATA PUSH - env=test (excluded from dashboard)   ║");
-console.log("╚════════════════════════════════════════════════════════════╝");
+console.log('╔════════════════════════════════════════════════════════════╗');
+console.log('║  🧪 TEST DATA PUSH - env=test (excluded from dashboard)   ║');
+console.log('╚════════════════════════════════════════════════════════════╝');
 console.log(`\nURL: ${url}`);
 
 const timestamp = Date.now() * 1000000; // nanoseconds
-const baseLabels = "instance=mirrorbuddy,env=test";
+const baseLabels = 'instance=mirrorbuddy,env=test';
+const proxyLabels = `${baseLabels},worker=synthetic-test,synthetic=true`;
 
 // All metrics matching dashboard queries
 const metrics = [
@@ -52,14 +54,14 @@ const metrics = [
   `mirrorbuddy_incidents_total,${baseLabels},period=7d,severity=S3 value=0 ${timestamp}`,
 
   // ============================================
-  // PERFORMANCE (Row 3)
+  // PROXY DIAGNOSTICS (5-minute gauges, not application performance)
   // ============================================
-  `http_request_duration_seconds,${baseLabels},route=/api/chat,quantile=0.95 value=0.45 ${timestamp}`,
-  `http_request_duration_seconds,${baseLabels},route=/api/health,quantile=0.95 value=0.02 ${timestamp}`,
-  `http_request_duration_seconds,${baseLabels},route=/api/voice,quantile=0.95 value=0.85 ${timestamp}`,
-  `http_request_error_rate,${baseLabels},route=/api/chat value=0.01 ${timestamp}`,
-  `http_request_error_rate,${baseLabels},route=/api/health value=0.0 ${timestamp}`,
-  `http_request_error_rate,${baseLabels},route=/api/voice value=0.02 ${timestamp}`,
+  `proxy_http_request_duration_seconds_p95,${proxyLabels},route=/api/chat value=0.0045 ${timestamp}`,
+  `proxy_http_request_duration_seconds_p95,${proxyLabels},route=/api/health value=0.002 ${timestamp}`,
+  `proxy_http_request_duration_seconds_p95,${proxyLabels},route=/api/voice value=0.0085 ${timestamp}`,
+  `proxy_http_request_error_rate,${proxyLabels},route=/api/chat value=0.01 ${timestamp}`,
+  `proxy_http_request_error_rate,${proxyLabels},route=/api/health value=0.0 ${timestamp}`,
+  `proxy_http_request_error_rate,${proxyLabels},route=/api/voice value=0.02 ${timestamp}`,
 
   // ============================================
   // COST CONTROL (Row 4)
@@ -112,47 +114,47 @@ const metrics = [
   `mirrorbuddy_quizzes_completed,${baseLabels},period=24h value=89 ${timestamp}`,
   `mirrorbuddy_flashcards_reviewed,${baseLabels},period=24h value=342 ${timestamp}`,
   `mirrorbuddy_mindmaps_created,${baseLabels},period=24h value=23 ${timestamp}`,
-].join("\n");
+].join('\n');
 
 async function pushMetrics() {
   try {
     const response = await fetch(url!, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "text/plain",
-        Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString("base64")}`,
+        'Content-Type': 'text/plain',
+        Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
       },
       body: metrics,
     });
 
     if (response.ok) {
-      console.log("\n✅ All V1 TEST metrics pushed successfully!");
-      console.log("\n⚠️  NOTE: These metrics have env=test label");
-      console.log("   They are EXCLUDED from the main dashboard by default.");
-      console.log("   To view test data, edit dashboard queries to remove env!=\"test\" filter.");
-      console.log("\nDashboard: https://mirrorbuddy.grafana.net/d/dashboard/");
-      console.log("\nTest metrics sent (env=test):");
-      console.log("  Session Health:");
-      console.log("    - success=85%, dropoff=8%, stuck=3%, turns=12.5");
-      console.log("  Safety:");
-      console.log("    - precision=98%, jailbreak=100%, S3=0");
-      console.log("  Performance:");
-      console.log("    - chat P95=450ms, voice P95=850ms");
-      console.log("  Cost:");
-      console.log("    - text=\u20ac0.03, voice=\u20ac0.12, spikes=0");
-      console.log("  User Engagement:");
-      console.log("    - DAU=42, WAU=127, MAU=312, new=8");
-      console.log("  Conversion & Retention:");
-      console.log("    - onboarding=78%, voice=35%, D1=52%, D7=38%, D30=22%");
-      console.log("  Maestri & Learning:");
-      console.log("    - top maestro=euclide(28), XP=4850, streaks=67");
+      console.log('\n✅ All V1 TEST metrics pushed successfully!');
+      console.log('\n⚠️  NOTE: These metrics have env=test label');
+      console.log('   They are EXCLUDED from the main dashboard by default.');
+      console.log('   To view test data, use env="test" in a separate dashboard copy.');
+      console.log('\nDashboard: https://mirrorbuddy.grafana.net/d/dashboard/');
+      console.log('\nTest metrics sent (env=test):');
+      console.log('  Session Health:');
+      console.log('    - success=85%, dropoff=8%, stuck=3%, turns=12.5');
+      console.log('  Safety:');
+      console.log('    - precision=98%, jailbreak=100%, S3=0');
+      console.log('  Synthetic proxy diagnostics (not application performance):');
+      console.log('    - worker=synthetic-test, chat P95=4.5ms, voice P95=8.5ms');
+      console.log('  Cost:');
+      console.log('    - text=\u20ac0.03, voice=\u20ac0.12, spikes=0');
+      console.log('  User Engagement:');
+      console.log('    - DAU=42, WAU=127, MAU=312, new=8');
+      console.log('  Conversion & Retention:');
+      console.log('    - onboarding=78%, voice=35%, D1=52%, D7=38%, D30=22%');
+      console.log('  Maestri & Learning:');
+      console.log('    - top maestro=euclide(28), XP=4850, streaks=67');
     } else {
       const text = await response.text();
       console.error(`\n\u274c Push failed: ${response.status}`);
       console.error(text);
     }
   } catch (error) {
-    console.error("\n\u274c Error:", error);
+    console.error('\n\u274c Error:', error);
   }
 }
 

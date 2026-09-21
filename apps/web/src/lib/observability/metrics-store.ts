@@ -1,8 +1,10 @@
 /**
- * In-Memory Metrics Store for Observability
+ * Per-worker proxy diagnostics, not application response metrics.
  *
- * Stores latency and error metrics with a sliding 5-minute window.
- * For production, this would be replaced with a proper time-series database.
+ * Stores proxy execution time and proxy-generated errors over a sliding 5-minute
+ * window. Downstream handlers have not executed when these observations are made.
+ * Every request, including a failed one, records latency; errors are a subset.
+ * Snapshots are gauges and reset when the worker is recycled.
  *
  * Usage:
  *   metricsStore.recordLatency('/api/chat', 123.45);
@@ -142,24 +144,19 @@ class MetricsStore {
       }
 
       routes[dp.route].errorCount++;
-      routes[dp.route].errors[dp.statusCode] =
-        (routes[dp.route].errors[dp.statusCode] || 0) + 1;
+      routes[dp.route].errors[dp.statusCode] = (routes[dp.route].errors[dp.statusCode] || 0) + 1;
     }
 
     // Calculate error rates
     for (const route in routes) {
       const metrics = routes[route];
-      const totalRequests = metrics.count + metrics.errorCount;
-      metrics.errorRate =
-        totalRequests > 0 ? metrics.errorCount / totalRequests : 0;
+      const totalRequests = metrics.count;
+      metrics.errorRate = totalRequests > 0 ? metrics.errorCount / totalRequests : 0;
     }
 
     const totalRequests = this.latencyData.length;
     const totalErrors = this.errorData.length;
-    const overallErrorRate =
-      totalRequests + totalErrors > 0
-        ? totalErrors / (totalRequests + totalErrors)
-        : 0;
+    const overallErrorRate = totalRequests > 0 ? totalErrors / totalRequests : 0;
 
     return {
       totalRequests,
@@ -214,9 +211,4 @@ class MetricsStore {
 export const metricsStore = new MetricsStore();
 
 // Export types
-export type {
-  LatencyDataPoint,
-  ErrorDataPoint,
-  RouteMetrics,
-  MetricsSummary,
-};
+export type { LatencyDataPoint, ErrorDataPoint, RouteMetrics, MetricsSummary };

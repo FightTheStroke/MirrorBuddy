@@ -64,7 +64,10 @@
       "id": 2,
       "options": { "colorMode": "value", "graphMode": "area" },
       "targets": [
-        { "expr": "mirrorbuddy_session_success_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_session_success_rate{period=\"24h\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Success Rate",
       "type": "stat"
@@ -89,7 +92,10 @@
       "id": 3,
       "options": { "colorMode": "value", "graphMode": "area" },
       "targets": [
-        { "expr": "mirrorbuddy_session_dropoff_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_session_dropoff_rate{period=\"24h\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Drop-off Rate",
       "type": "stat"
@@ -114,7 +120,10 @@
       "id": 4,
       "options": { "colorMode": "value", "graphMode": "area" },
       "targets": [
-        { "expr": "mirrorbuddy_session_stuck_loop_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_session_stuck_loop_rate{period=\"24h\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Stuck Loop Rate",
       "type": "stat"
@@ -165,7 +174,10 @@
       "id": 6,
       "options": { "colorMode": "value", "graphMode": "none" },
       "targets": [
-        { "expr": "mirrorbuddy_session_duration_minutes_avg{period=\"24h\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_session_duration_minutes_avg{period=\"24h\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Avg Duration",
       "type": "stat"
@@ -327,9 +339,7 @@
       "gridPos": { "h": 4, "w": 6, "x": 6, "y": 12 },
       "id": 62,
       "options": { "colorMode": "value" },
-      "targets": [
-        { "expr": "mirrorbuddy_voice_adoption_rate{env=\"production\"}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "mirrorbuddy_voice_adoption_rate{env=\"production\"}", "refId": "A" }],
       "title": "Voice Adoption",
       "type": "stat"
     },
@@ -435,7 +445,10 @@
       "id": 31,
       "options": { "colorMode": "value" },
       "targets": [
-        { "expr": "mirrorbuddy_cost_per_session_eur{type=\"text\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_cost_per_session_eur{type=\"text\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Cost/Session (Text)",
       "type": "stat"
@@ -460,7 +473,10 @@
       "id": 32,
       "options": { "colorMode": "value" },
       "targets": [
-        { "expr": "mirrorbuddy_cost_per_session_eur{type=\"voice\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_cost_per_session_eur{type=\"voice\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Cost/Session (Voice)",
       "type": "stat"
@@ -554,9 +570,7 @@
       "gridPos": { "h": 3, "w": 4, "x": 16, "y": 22 },
       "id": 73,
       "options": { "colorMode": "value" },
-      "targets": [
-        { "expr": "mirrorbuddy_active_streaks{env=\"production\"}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "mirrorbuddy_active_streaks{env=\"production\"}", "refId": "A" }],
       "title": "Active Streaks",
       "type": "stat"
     },
@@ -574,9 +588,7 @@
       "gridPos": { "h": 3, "w": 4, "x": 20, "y": 22 },
       "id": 74,
       "options": { "colorMode": "value" },
-      "targets": [
-        { "expr": "mirrorbuddy_max_level{env=\"production\"}", "refId": "A" }
-      ],
+      "targets": [{ "expr": "mirrorbuddy_max_level{env=\"production\"}", "refId": "A" }],
       "title": "Max Level",
       "type": "stat"
     },
@@ -615,7 +627,10 @@
       "id": 76,
       "options": { "colorMode": "value" },
       "targets": [
-        { "expr": "mirrorbuddy_flashcards_reviewed{period=\"24h\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_flashcards_reviewed{period=\"24h\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Flashcards Today",
       "type": "stat"
@@ -698,7 +713,10 @@
       "id": 12,
       "options": { "colorMode": "value", "graphMode": "none" },
       "targets": [
-        { "expr": "mirrorbuddy_jailbreak_block_rate{period=\"7d\",env=\"production\"}", "refId": "A" }
+        {
+          "expr": "mirrorbuddy_jailbreak_block_rate{period=\"7d\",env=\"production\"}",
+          "refId": "A"
+        }
       ],
       "title": "Jailbreak Block Rate",
       "type": "stat"
@@ -767,7 +785,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
       "id": 20,
-      "title": "Performance (SLI/SLO)",
+      "title": "Proxy Diagnostics (per worker; not application SLOs)",
       "type": "row"
     },
     {
@@ -780,14 +798,15 @@
       },
       "gridPos": { "h": 6, "w": 12, "x": 0, "y": 35 },
       "id": 21,
+      "description": "Local 5-minute proxy execution P95 per route and worker. Not application latency or TTFB. Best-effort samples can be lost or stale after restarts or serverless suspension; never average these percentiles into a fleet percentile.",
       "targets": [
         {
-          "expr": "http_request_duration_seconds{quantile=\"0.95\",env=\"production\"}",
-          "legendFormat": "{{route}}",
+          "expr": "proxy_http_request_duration_seconds_p95{env=\"production\"}",
+          "legendFormat": "{{route}} worker={{worker}}",
           "refId": "A"
         }
       ],
-      "title": "HTTP Latency by Route (P95)",
+      "title": "Proxy Execution P95 by Route / Worker (5m)",
       "type": "timeseries"
     },
     {
@@ -795,26 +814,20 @@
       "fieldConfig": {
         "defaults": {
           "custom": { "drawStyle": "line", "lineWidth": 2 },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 0.01 }
-            ]
-          },
           "unit": "percentunit"
         }
       },
       "gridPos": { "h": 6, "w": 12, "x": 12, "y": 35 },
       "id": 22,
+      "description": "Local 5-minute proxy errors / all proxy requests for the same route and worker. Not application errors or availability: downstream handler failures are not observed. This gauge is not a cumulative counter; absent data is unknown, not zero.",
       "targets": [
         {
-          "expr": "http_request_error_rate{env=\"production\"}",
-          "legendFormat": "{{route}}",
+          "expr": "proxy_http_request_error_rate{env=\"production\"}",
+          "legendFormat": "{{route}} worker={{worker}}",
           "refId": "A"
         }
       ],
-      "title": "Error Rate by Route",
+      "title": "Proxy Error Fraction by Route / Worker (5m)",
       "type": "timeseries"
     },
     {

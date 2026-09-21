@@ -1,29 +1,19 @@
-/**
- * Tier Metrics Collector
- * Collects subscription tier metrics for Prometheus/Grafana
- */
+import { prisma } from '@/lib/db';
+import type { MetricSample } from './http-metrics-collector';
 
-import { prisma } from "@/lib/db";
-import type { MetricSample } from "./funnel-metrics-collectors";
-
-/**
- * Collect tier subscription metrics
- */
 export async function collectTierMetrics(
   instanceLabels: Record<string, string>,
   timestamp: number,
 ): Promise<MetricSample[]> {
   const samples: MetricSample[] = [];
 
-  // Query: Total users by tier
   const usersByTier = await prisma.userSubscription.groupBy({
-    by: ["tierId"],
+    by: ['tierId'],
     _count: {
       id: true,
     },
   });
 
-  // Fetch tier definitions to get tier codes
   const tierMap = new Map<string, string>();
   const tiers = await prisma.tierDefinition.findMany({
     select: { id: true, code: true },
@@ -36,14 +26,12 @@ export async function collectTierMetrics(
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  // For each tier, count active users
   for (const tierGroup of usersByTier) {
-    const tierCode = tierMap.get(tierGroup.tierId) || "unknown";
+    const tierCode = tierMap.get(tierGroup.tierId) || 'unknown';
     const totalUsers = tierGroup._count.id;
 
-    // Add total users metric
     samples.push({
-      name: "mirrorbuddy_users_by_tier",
+      name: 'mirrorbuddy_users_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -68,9 +56,8 @@ export async function collectTierMetrics(
       },
     });
 
-    // Add active users metric
     samples.push({
-      name: "mirrorbuddy_active_users_by_tier",
+      name: 'mirrorbuddy_active_users_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -81,7 +68,7 @@ export async function collectTierMetrics(
 
     // Add total active count (for easier querying) - reuse activeCount from 7d query
     samples.push({
-      name: "mirrorbuddy_total_active_by_tier",
+      name: 'mirrorbuddy_total_active_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -92,7 +79,7 @@ export async function collectTierMetrics(
 
     // WAU metric (same as activeCount - users active in last 7 days)
     samples.push({
-      name: "mirrorbuddy_wau_by_tier",
+      name: 'mirrorbuddy_wau_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -101,14 +88,12 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    // Calculate engagement time windows for MAU and DAU
     const oneDayAgo = new Date();
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Count MAU (Monthly Active Users - users with conversations in last 30 days)
     const mauCount = await prisma.userSubscription.count({
       where: {
         tierId: tierGroup.tierId,
@@ -124,9 +109,8 @@ export async function collectTierMetrics(
       },
     });
 
-    // Add MAU metric
     samples.push({
-      name: "mirrorbuddy_mau_by_tier",
+      name: 'mirrorbuddy_mau_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -135,7 +119,6 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    // Count DAU (Daily Active Users - users with conversations in last 24 hours)
     const dauCount = await prisma.userSubscription.count({
       where: {
         tierId: tierGroup.tierId,
@@ -151,9 +134,8 @@ export async function collectTierMetrics(
       },
     });
 
-    // Add DAU metric
     samples.push({
-      name: "mirrorbuddy_dau_by_tier",
+      name: 'mirrorbuddy_dau_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -169,7 +151,6 @@ export async function collectTierMetrics(
         user: {
           OR: [
             {
-              // Users with no conversations at all
               conversations: {
                 none: {},
               },
@@ -189,9 +170,8 @@ export async function collectTierMetrics(
       },
     });
 
-    // Add churned users metric
     samples.push({
-      name: "mirrorbuddy_churned_users_by_tier",
+      name: 'mirrorbuddy_churned_users_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -200,12 +180,10 @@ export async function collectTierMetrics(
       timestamp,
     });
 
-    // Calculate churn rate (churned / total)
     const churnRate = totalUsers > 0 ? churnedCount / totalUsers : 0;
 
-    // Add churn rate metric
     samples.push({
-      name: "mirrorbuddy_churn_rate_by_tier",
+      name: 'mirrorbuddy_churn_rate_by_tier',
       labels: {
         ...instanceLabels,
         tier: tierCode,
@@ -215,14 +193,12 @@ export async function collectTierMetrics(
     });
   }
 
-  // Query: Tier changes and classify as upgrades/downgrades
   // Parse changes JSON to determine direction based on tier sortOrder
   const tierChanges = await prisma.tierAuditLog.findMany({
-    where: { action: "TIER_CHANGE" },
+    where: { action: 'TIER_CHANGE' },
     select: { changes: true },
   });
 
-  // Build sortOrder map from tier definitions
   const tiersWithSortOrder = await prisma.tierDefinition.findMany({
     select: { id: true, sortOrder: true },
   });
@@ -257,14 +233,14 @@ export async function collectTierMetrics(
   }
 
   samples.push({
-    name: "mirrorbuddy_tier_upgrades_total",
+    name: 'mirrorbuddy_tier_upgrades_total',
     labels: instanceLabels,
     value: upgradeCount,
     timestamp,
   });
 
   samples.push({
-    name: "mirrorbuddy_tier_downgrades_total",
+    name: 'mirrorbuddy_tier_downgrades_total',
     labels: instanceLabels,
     value: downgradeCount,
     timestamp,

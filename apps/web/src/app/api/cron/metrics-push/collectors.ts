@@ -2,7 +2,6 @@ import { logger } from '@/lib/logger';
 import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
 import { collectDatabaseBackedSamples } from './scheduled-metrics';
 import { collectSection, type CollectorContext, type MetricSample } from './collector-utils';
-import { collectHttpMetrics } from './http-metrics';
 import { collectActivityMetrics } from './activity-metrics';
 import { collectFunnelMetrics } from './funnel-metrics';
 import { collectChurnMetrics } from './churn-metrics';
@@ -36,14 +35,13 @@ async function processFunnelEvents(): Promise<boolean> {
   return !result.errors;
 }
 
-/** Scheduled shared sources plus the existing cron worker's local HTTP/SLI view. */
+/** Shared sources only: a cron worker cannot observe other workers' proxy traffic. */
 export async function collectLightMetrics(): Promise<MetricSample[]> {
   const now = Date.now();
   const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
   const instanceLabels = { instance: 'mirrorbuddy', env };
   const samples: MetricSample[] = [];
   const collectors = {
-    'cron-http': collectHttpMetrics,
     'realtime-active-users': collectActivityMetrics,
     'funnel-metrics': collectFunnelMetrics,
     'churn-metrics': collectChurnMetrics,

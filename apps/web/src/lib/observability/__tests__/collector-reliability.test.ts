@@ -21,12 +21,6 @@ vi.mock('../vercel-api-client', () => ({
 vi.mock('../service-limits-metrics', () => ({ collectServiceLimitsSamples: vi.fn(() => []) }));
 vi.mock('../tier-metrics-collector', () => ({ collectTierMetrics: vi.fn(() => []) }));
 vi.mock('../http-metrics-collector', () => ({ collectHttpMetrics: vi.fn(() => []) }));
-vi.mock('../funnel-metrics-collectors', () => ({
-  collectFunnelMetrics: vi.fn(() => []),
-  collectBudgetMetrics: vi.fn(() => []),
-  collectAbuseMetrics: vi.fn(() => []),
-  collectConversionMetrics: vi.fn(() => []),
-}));
 
 describe('optional monitoring reliability', () => {
   beforeEach(() => vi.clearAllMocks());

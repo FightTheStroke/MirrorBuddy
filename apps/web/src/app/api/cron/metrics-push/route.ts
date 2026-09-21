@@ -1,5 +1,5 @@
 /**
- * Authenticated five-minute Grafana push: HTTP/SLI, activity, funnel/churn,
+ * Authenticated five-minute Grafana push: activity, funnel/churn,
  * session health, waitlist and database-backed metrics.
  * Requires all three existing GRAFANA_CLOUD_* credentials before collecting.
  */
