@@ -21,7 +21,11 @@ dependencies = [
 # reachy_mini, fastapi and uvicorn are provided by the Reachy Mini host runtime.
 
 [project.optional-dependencies]
-test = ["pytest>=8.0", "pytest-asyncio>=0.23"]
+# fastapi is a host-runtime dependency, not a runtime dependency of this package
+# (see the note above). It belongs here all the same: without it the settings
+# and pairing route tests are silently skipped by ``pytest.importorskip`` and CI
+# reports green on code nobody ran.
+test = ["pytest>=8.0", "pytest-asyncio>=0.23", "fastapi>=0.110"]
 
 [project.scripts]
 reachy-mini-mirrorbuddy = "reachy_mini_mirrorbuddy.main:main"

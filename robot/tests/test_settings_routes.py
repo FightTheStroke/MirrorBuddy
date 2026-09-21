@@ -23,7 +23,12 @@ from reachy_mini_mirrorbuddy.settings_ui import mount_settings_routes  # noqa: E
 
 
 @pytest.fixture()
-def client(tmp_path: Path) -> TestClient:
+def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
+    # The second argument of ``mount_settings_routes`` is the *legacy* instance
+    # folder, read once for migration and never written to. The file a save
+    # actually lands in is ``config_dir()/.env`` — see paths.py — so the tests
+    # must point that at the temporary folder, not the instance path.
+    monkeypatch.setenv("MIRRORBUDDY_CONFIG_DIR", str(tmp_path))
     app = fastapi.FastAPI()
     mount_settings_routes(app, str(tmp_path))
     return TestClient(app)
