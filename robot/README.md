@@ -35,15 +35,17 @@ MirrorBuddy Maestro with a body —
 - 👄 **mouth** — the robot speaker
 - 🤸 **movements** — head wobble (speech-synced) + expressive antennas
 
-It reuses **MirrorBuddy's brain** end-to-end, so the robot stays 1:1 aligned with the
-web app at [mirrorbuddy.org](https://mirrorbuddy.org):
+It reuses **MirrorBuddy's live personas and Azure voice provider** from the
+web app at [mirrorbuddy.org](https://mirrorbuddy.org). Safety enforcement is not
+yet equivalent to the web app; see **Safety boundary** below.
 
-- **Personas** — the 32 Maestri are fetched live from MirrorBuddy's public
+- **Personas** — the current Maestri are fetched live from MirrorBuddy's public
   `GET /api/maestri?locale=it` endpoint (same names, voices, system prompts, greetings).
 - **Voice + conversation** — Azure OpenAI **Realtime** (speech-to-speech), the same
   provider and the same 8 voices (`alloy, ash, ballad, coral, echo, sage, shimmer, verse`).
-- **Child-safety** — the professor-constitution guardrails are prepended to every session.
-- **Accessibility (DSA)** — 8 profiles tune the turn-detection so the robot waits
+- **Child-safety** — child-safe instructions are prepended to every session; they
+  are model guidance, not the web app's runtime moderation.
+- **Accessibility (DSA)** — the seven web accessibility profiles plus a default tune turn-detection so the robot waits
   patiently for children who speak more slowly (motor / cerebral palsy, dyslexia…).
 
 ## How it works
@@ -89,7 +91,7 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 
 - **Change professor / subject** — say e.g. _«voglio matematica»_ or _«chiama Galileo»_.
   `call_professor` resolves the Maestro and reconnects the session with the new
-  **persona + voice**; the new professor greets. All 27 MirrorBuddy Maestri are available.
+  **persona + voice**; the new professor greets. All Maestri returned by the live API are available.
   The roster is written into the system prompt, so Buddy knows exactly who exists and
   never claims a professor is unavailable when they are — that is what made
   _«passami Fratello Loto»_ fail before the roster was injected.
@@ -114,7 +116,7 @@ Buddy is voice-only, so the model drives the robot through realtime **tools**:
 The robot sits on a kitchen table, so a friend, a sibling or a parent sits down and
 starts talking. Buddy is built for that:
 
-- **It asks.** A new voice is greeted and asked its name; `remember_person` stores it
+- **Names are optional.** A guest can offer a first name or nickname; `remember_person` stores it
   for the rest of the session, so the friend is addressed as themselves, not as the
   paired child. `who_is_here` lets Buddy recall the room when it is unsure.
 - **Guests are first-class.** They can ask questions and call a professor like the
@@ -131,6 +133,27 @@ consent decision their parents never made. Turn the robot off, the room empties.
 
 There is no voice or face recognition, deliberately — Buddy knows who is speaking only
 because someone told it.
+
+## Safety boundary
+
+The robot prepends rules for minors, crisis support, privacy and AI transparency.
+Embodiment instructions cannot override those rules, and the robot must report a
+failed camera honestly. Names are optional and session-only; no age is assumed.
+
+Unlike web voice's `transcript-safety.ts`, the robot does **not** run the canonical
+input/output filters, jailbreak checks, crisis escalation or safety-event reporting.
+Audio is streamed directly from Azure. Prompt instructions and their unit tests
+cannot guarantee model compliance or prevent unsafe speech. Do not describe this
+as 1:1 child-safety parity or rely on it as an unsupervised safeguarding system.
+Closing this gap requires a shared moderation runtime/service and an explicit
+decision about audio gating, offline failures, identity/consent and escalation.
+Age-specific adaptation also needs a trusted profile age, which is not currently
+provided to the robot prompt.
+
+Accessibility names match the web: `dyslexia`, `adhd`, `visual`, `motor`, `autism`,
+`auditory`, `cerebral`; `default` is the fallback. `dyscalculia` adds teaching
+guidance but uses default turn-detection. Robot timing is deliberately shorter
+than web timing following physical-interaction feedback, not a missing profile.
 
 ## Ending a session & interrupting (accessibility‑critical)
 
@@ -178,6 +201,19 @@ the middle of homework. Per-session state (in-flight response, audio suppression
 is reset, while what the child asked for — _rest_ after «zitto» — is preserved.
 Only closing the app really stops it.
 
+An **unpaired GA** robot selects the first configured deployment in the web's
+generation order: `AZURE_OPENAI_REALTIME_DEPLOYMENT_V21`, `_V2`, `_V15`, then
+`AZURE_OPENAI_REALTIME_DEPLOYMENT`. If Azure explicitly rejects it as missing or
+retired, the robot tries every distinct configured GA fallback (`_V15`, then the
+base variable), retaining the successful choice for reconnects. Authentication,
+rate limits and network failures do not switch deployments. Older WebSocket
+clients discard rejection bodies; only a status-only HTTP 404 permits fallback.
+Exhaustion is logged and normal reconnect backoff continues, without cycling
+through rejected candidates.
+
+Preview sessions keep their explicit base deployment. Paired sessions keep the
+server-selected deployment and never mix it with local resource candidates.
+
 ## Pair with the child's MirrorBuddy profile
 
 The robot can bind to the **logged-in child's MirrorBuddy account** so it starts
@@ -222,7 +258,11 @@ Required:
 
 - `AZURE_OPENAI_REALTIME_ENDPOINT`
 - `AZURE_OPENAI_REALTIME_API_KEY`
-- `AZURE_OPENAI_REALTIME_DEPLOYMENT` (e.g. `gpt-realtime`)
+- A configured realtime deployment name (base variable or one of the GA
+  generation variables above). `gpt-realtime` remains the compatibility default,
+  not a guarantee that an arbitrary Azure resource has that deployment.
+  Copy actual deployment names from your resource, not model names or dates.
+  Set `_V21` to your deployed `gpt-realtime-2.1` alias to prefer it as the web does.
 
 Useful optional:
 

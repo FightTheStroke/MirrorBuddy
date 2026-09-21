@@ -4,9 +4,6 @@ The controller owns the current :class:`AzureRealtimeClient` and swaps it out wh
 student asks for another professor (a new voice + persona needs a fresh realtime
 session). It keeps ``main.py`` thin and holds all the voice-driven behaviour:
 
-- ``list_professors``   → speak the available Maestri.
-- ``call_professor``    → switch persona + voice live.
-- ``look_at_homework``  → capture one camera frame and let Buddy read it.
 """
 
 from __future__ import annotations
@@ -103,6 +100,7 @@ class Controller(ToolCallMixin):
         )
         return AzureRealtimeClient(
             ws_url=self.cfg.realtime_ws_url(),
+            fallback_ws_urls=self.cfg.realtime_fallback_urls(),
             api_key=self.cfg.AZURE_API_KEY or "",
             instructions=instructions,
             voice=maestro.voice,
@@ -249,5 +247,3 @@ class Controller(ToolCallMixin):
                 old.stop()
                 old.join()
             logger.info("Switched to Maestro %s (%s), voice=%s", target.display_name, target.id, target.voice)
-
-

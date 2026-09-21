@@ -6,6 +6,8 @@ or less regular speech (motor / cerebral palsy, dyslexia) need a longer silence
 window so the robot does not interrupt them.
 
 These values feed the Azure OpenAI Realtime ``turn_detection`` (server VAD) config.
+Profile IDs match the web's seven A11yProfileId conditions, plus a robot default.
+There are no aliases; dyscalculia has a teaching note but uses default VAD timing.
 """
 
 from __future__ import annotations
@@ -40,8 +42,8 @@ _PROFILES: dict[str, VadProfile] = {
 
 
 def get_vad_profile(name: str | None) -> VadProfile:
-    """Return the VAD profile for ``name`` (falls back to a patient default)."""
-    if not name:
+    """Return the VAD profile, using the robot default for unknown/invalid input."""
+    if not isinstance(name, str):
         return _PROFILES["default"]
     return _PROFILES.get(name.strip().lower(), _PROFILES["default"])
 
