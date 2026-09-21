@@ -1,6 +1,7 @@
 """Immediate audio and same-transcript-block interruption with the real AudioIO."""
 
 import asyncio
+import contextlib
 from unittest.mock import Mock
 
 import pytest
@@ -93,7 +94,10 @@ async def test_local_queue_flush_does_not_wait_for_network_cancel(client, playba
         assert not running.done()
     finally:
         unblock.set()
-        await running
+        # Drain the task we started, without turning a cancellation during
+        # cleanup into a second, misleading failure.
+        with contextlib.suppress(asyncio.CancelledError):
+            await running
 
 
 async def test_final_only_transcript_also_cuts_already_streaming_audio(client, playback):
