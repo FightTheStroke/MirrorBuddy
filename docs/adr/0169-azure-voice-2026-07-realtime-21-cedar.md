@@ -6,6 +6,7 @@ Accepted — 2026-07-19
 Corrected — 2026-08-31 (historical lifecycle evidence: **Public Preview**, not GA)
 Corrected — 2026-09-17 (retirement dates: published schedule and regional catalogue disagree)
 Audited — 2026-09-21 (lifecycle sources conflict; production configuration and device alignment)
+Verified — 2026-09-21 (legacy variable is a real GA deployment; every configured rung mints, both GA rungs answer)
 
 ## Historical correction (2026-08-31; evidence refreshed 2026-09-17)
 
@@ -91,17 +92,22 @@ The production audit observed `deployment: gpt-realtime-2.1` at
 The following compares inspected Vercel production values against the inventory
 from `az cognitiveservices account deployment list` on the configured resource:
 
-| Environment variable suffix (`AZURE_OPENAI_REALTIME_DEPLOYMENT`) | Production value    | Azure model / version                         |
-| ---------------------------------------------------------------- | ------------------- | --------------------------------------------- |
-| `_V21`                                                           | `gpt-realtime-2.1`  | `gpt-realtime-2.1` / `2026-07-07`             |
-| `_V2`                                                            | `gpt-realtime-2`    | `gpt-realtime-2` / `2026-05-06`               |
-| `_V15`                                                           | `gpt-realtime-15`   | `gpt-realtime-1.5` / `2026-02-23`             |
-| `_MINI`                                                          | `gpt-realtime-mini` | `gpt-realtime-mini` / `2025-12-15`            |
-| (none; legacy)                                                   | `gpt-4o-realtime`   | **Absent from the full deployment inventory** |
+| Environment variable suffix (`AZURE_OPENAI_REALTIME_DEPLOYMENT`) | Production value    | Azure model / version              |
+| ---------------------------------------------------------------- | ------------------- | ---------------------------------- |
+| `_V21`                                                           | `gpt-realtime-2.1`  | `gpt-realtime-2.1` / `2026-07-07`  |
+| `_V2`                                                            | `gpt-realtime-2`    | `gpt-realtime-2` / `2026-05-06`    |
+| `_V15`                                                           | `gpt-realtime-15`   | `gpt-realtime-1.5` / `2026-02-23`  |
+| `_MINI`                                                          | `gpt-realtime-mini` | `gpt-realtime-mini` / `2025-12-15` |
+| (none; legacy)                                                   | `gpt-realtime`      | `gpt-realtime` / `2025-08-28`      |
 
-An actual legacy deployment **`gpt-realtime` / `2025-08-28`** exists, but the
-legacy environment variable does not name it. This is **configuration drift, not
-a tier issue**. No cloud mutations were authorized or performed by this audit.
+The legacy row previously recorded here as `gpt-4o-realtime` — a name absent from
+the deployment inventory — was **not confirmed**. A direct read of the production
+environment on **2026-09-21 at 13:05 UTC** (`vercel env pull --environment=production`,
+values held only in memory and deleted immediately) returned
+`AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`, which matches a real GA deployment.
+The variable was last modified 218 days before that read, so it did not change during
+this correction. **There is no legacy configuration drift.** No cloud mutations were
+authorized or performed by this audit.
 Endpoint metadata and inventory alone do **not** prove inference. A bounded probe
 on September 21 at 09:29 UTC used the current resource key (held only in memory),
 minted a GA client secret, connected by WebSocket, selected Cedar, and requested
@@ -118,13 +124,46 @@ separately prove a rejected preferred deployment retries on `gpt-realtime-15`.
 No production outage was induced or feature flag changed. The copied local `.env`
 key initially returned 401; this was not a production-service failure.
 
+#### Second probe — every configured rung, 2026-09-21 13:10 UTC
+
+The September 21 probe above covered two deployments. A second bounded probe the
+same day covered **every rung the selection chain can reach**, using the resource
+key read from `az cognitiveservices account keys list` and held only in memory. Each
+deployment was minted over the GA protocol
+(`POST /openai/v1/realtime/client_secrets`) and then driven over WebSocket with one
+text turn, so the answer is upstream inference output rather than provisioning state:
+
+| Deployment          | Client secret | WebSocket text response |
+| ------------------- | ------------- | ----------------------- |
+| `gpt-realtime`      | HTTP 200      | `Fallback ok.`          |
+| `gpt-realtime-15`   | HTTP 200      | `fallback ok`           |
+| `gpt-realtime-2.1`  | HTTP 200      | `fallback ok`           |
+| `gpt-realtime-2`    | HTTP 200      | not exercised           |
+| `gpt-realtime-mini` | HTTP 200      | not exercised           |
+
+This closes the open acceptance item "demonstrate selection and successful inference
+on the intended GA fallback": both GA rungs — `gpt-realtime-15` and the legacy
+`gpt-realtime` — answered a real request on the day of the check.
+
+#### Watch item — `gpt-realtime-mini` retirement
+
+`gpt-realtime-mini` `2025-12-15` carries a regional inference retirement of
+**2026-12-15**, and its successor `gpt-realtime-2.1-mini` is **not deployed** on the
+resource (inventory read 2026-09-21). This is not a production risk today: no token
+route selects the mini rung — since the removal of per-tier model selection it
+survives only as a name alias in `deployment-mapping.ts`. If a mini rung is ever put
+back into a selection chain, `gpt-realtime-2.1-mini` must be deployed first.
+
 ### Selection versus request retry
 
 Flag-aware selection uses configured priority **V21 -> V2 -> V15 -> legacy**.
-An ephemeral-session request failure permits **one retry**, targeting V15 when
-configured, otherwise legacy. It is **not** a repeated cascading retry through
-every selection rung; a failed V15 retry does not trigger another legacy retry.
-The stale legacy production value therefore remains a fallback risk.
+Until #1080 an ephemeral-session request failure permitted **one** retry only,
+targeting V15 when configured, otherwise legacy — so a failed V15 retry did not
+fall through to legacy. Since #1080 (2026-09-21) the route walks the **full chain of
+untried GA candidates** (`resolveGaFallbackChain`), stopping at the first success or
+at any failure that is not a missing deployment. Both GA rungs are now reachable
+from a single request, and the legacy value is a real GA deployment (see above), so
+the fallback risk recorded here is resolved.
 
 ---
 
