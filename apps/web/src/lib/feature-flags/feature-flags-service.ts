@@ -2,21 +2,16 @@
  * Centralized feature flag checks and optimistic local safety controls.
  * Database read recovery is isolated from local overrides.
  */
-import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { getFlag, isGlobalKillSwitchActive } from './feature-flags-policy';
 import {
-  getFlag,
-  isGlobalKillSwitchActive,
-  applyLocalUpdate,
-  applyLocalGlobalPolicy,
-} from './feature-flags-policy';
-import type {
-  FeatureFlag,
-  FeatureFlagCheckResult,
-  FeatureFlagStatus,
-  FeatureFlagUpdate,
-  KnownFeatureFlag,
-} from './types';
+  beginFeaturePolicyWrite,
+  beginGlobalPolicyWrite,
+  prepareWritablePolicy,
+} from './policy-writer';
+import { policyId, policyPatch } from './policy-write-validation';
+import type { PolicyWriteReceipt } from './policy-write-types';
+import type { FeatureFlagCheckResult, FeatureFlagStatus, KnownFeatureFlag } from './types';
 
 export {
   initializeFlags,
@@ -68,89 +63,49 @@ export function isFeatureEnabled(
   return { enabled: true, reason: 'enabled', flag };
 }
 
-export async function updateFlag(
-  featureId: KnownFeatureFlag,
-  update: FeatureFlagUpdate,
-): Promise<FeatureFlag | null> {
-  if (!getFlag(featureId)) {
-    logger.warn('Attempted to update unknown flag', { featureId });
-    return null;
-  }
-  // A database reload must never revoke an immediate local safety control.
-  applyLocalUpdate(featureId, update);
-  const updated = getFlag(featureId);
-  if (!updated) throw new Error('Feature flag disappeared during local update');
-  try {
-    const dbData = {
-      status: updated.status,
-      enabledPercentage: updated.enabledPercentage,
-      killSwitch: updated.killSwitch,
-      killSwitchReason: update.killSwitch ? (update.metadata?.reason as string) : null,
-      metadata: updated.metadata ? JSON.parse(JSON.stringify(updated.metadata)) : undefined,
-      updatedBy: update.updatedBy,
-    };
-    await prisma.featureFlag.upsert({
-      where: { id: featureId },
-      update: dbData,
-      create: {
-        id: featureId,
-        name: updated.name,
-        description: updated.description,
-        ...dbData,
-      },
-    });
-  } catch (error) {
-    logger.error('Failed to persist flag update', { featureId }, error);
-  }
-  logger.info('Feature flag updated', {
-    featureId,
-    status: updated.status,
-    killSwitch: updated.killSwitch,
-    updatedBy: update.updatedBy,
-  });
-  return updated;
+export async function updateFlag(featureId: unknown, update: unknown): Promise<PolicyWriteReceipt> {
+  const id = policyId.parse(featureId);
+  const patch = policyPatch.parse(update);
+  // Known policies must protect synchronously, before any database preparation.
+  if (!getFlag(id)) await prepareWritablePolicy(id);
+  return beginFeaturePolicyWrite(id, patch, 'admin').completion;
 }
 
 export async function activateKillSwitch(
-  featureId: KnownFeatureFlag,
+  featureId: string,
   reason: string,
   updatedBy?: string,
-): Promise<void> {
-  await updateFlag(featureId, { killSwitch: true, metadata: { reason }, updatedBy });
-  logger.error('Kill-switch activated', { featureId, reason, updatedBy });
+): Promise<PolicyWriteReceipt> {
+  return updateFlag(featureId, { killSwitch: true, killSwitchReason: reason, updatedBy });
 }
 
 export async function deactivateKillSwitch(
-  featureId: KnownFeatureFlag,
+  featureId: string,
   updatedBy?: string,
-): Promise<void> {
-  await updateFlag(featureId, { killSwitch: false, updatedBy });
-  logger.info('Kill-switch deactivated', { featureId, updatedBy });
+): Promise<PolicyWriteReceipt> {
+  return updateFlag(featureId, { killSwitch: false, updatedBy });
 }
 
-export async function setGlobalKillSwitch(enabled: boolean, reason?: string): Promise<void> {
-  applyLocalGlobalPolicy(enabled, reason);
-  try {
-    await prisma.globalConfig.upsert({
-      where: { id: 'global' },
-      update: { killSwitch: enabled, killSwitchReason: reason },
-      create: { id: 'global', killSwitch: enabled, killSwitchReason: reason },
-    });
-  } catch (error) {
-    logger.error('Failed to persist global kill-switch', undefined, error);
-  }
-  if (enabled) {
-    logger.error('GLOBAL kill-switch activated', { reason });
-  } else {
-    logger.info('GLOBAL kill-switch deactivated');
-  }
+export async function setGlobalKillSwitch(
+  enabled: boolean,
+  reason?: string,
+  updatedBy?: string,
+): Promise<PolicyWriteReceipt> {
+  return beginGlobalPolicyWrite(
+    {
+      killSwitch: enabled,
+      killSwitchReason: enabled ? reason : null,
+      updatedBy,
+    },
+    'admin',
+  ).completion;
 }
 
 export async function setFlagStatus(
-  featureId: KnownFeatureFlag,
+  featureId: string,
   status: FeatureFlagStatus,
   updatedBy?: string,
-): Promise<FeatureFlag | null> {
+): Promise<PolicyWriteReceipt> {
   return updateFlag(featureId, { status, updatedBy });
 }
 

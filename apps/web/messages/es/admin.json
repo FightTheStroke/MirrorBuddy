@@ -1,5 +1,23 @@
 {
   "admin": {
+    "policyWrite": {
+      "unconfirmed": "No se ha confirmado el guardado. La protección mostrada solo se aplica a esta instancia, no a todos los servidores.",
+      "superseded": "Otra operación ha sustituido este cambio. No se ha confirmado ninguna reactivación.",
+      "failed": "No se ha podido confirmar el cambio. Vuelve a intentarlo explícitamente.",
+      "loadFailed": "No se pudieron cargar los ajustes de las funciones.",
+      "instanceNotice": "Estado efectivo devuelto por la instancia que gestionó el cambio. Actualizar la página no demuestra que se haya guardado.",
+      "enable": "Activar",
+      "disable": "Desactivar",
+      "reactivateAll": "Reactivar todo",
+      "globalStop": "Parada global",
+      "globalStopped": "Todas las funciones están bloqueadas por la parada global",
+      "operational": "Todos los sistemas están operativos",
+      "degraded": "Degradación del sistema: {level}",
+      "healthy": "Operativo",
+      "partial": "Parcial",
+      "severe": "Grave",
+      "critical": "Crítico"
+    },
     "metricTruth": {
       "averageTurns": "Turnos medios por sesión registrada",
       "averageSessionCost": "Coste medio por sesión registrada",

@@ -1,8 +1,10 @@
 import { waitUntil } from '@vercel/functions';
+import type { FeatureFlag as StoredFlag } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { DEFAULT_FLAGS } from './default-flags';
-import type { FeatureFlag, FeatureFlagStatus, FeatureFlagUpdate, KnownFeatureFlag } from './types';
+import { PolicyWriteCoordinator } from './policy-write-coordinator';
+import type { FeatureFlag, FeatureFlagUpdate } from './types';
 
 const flagCache = new Map<string, FeatureFlag>();
 const localUpdates = new Map<string, Partial<FeatureFlag>>();
@@ -13,6 +15,65 @@ let loadFailureReported = false;
 let policyLoad: Promise<void> | null = null;
 let nextRefreshAt = Number.POSITIVE_INFINITY;
 let resetGeneration = 0;
+
+export const policyWrites = new PolicyWriteCoordinator(
+  (key) => {
+    if (key === 'global')
+      return {
+        safetyKnown: databaseLoaded,
+        killSwitch: isGlobalKillSwitchActive(),
+        killSwitchReason: getGlobalKillSwitchReason() ?? null,
+        status: 'enabled',
+        enabledPercentage: 100,
+      };
+    const flag = getFlag(key.slice('feature:'.length));
+    if (!flag) throw new Error('Unknown feature flag');
+    return { ...flag, safetyKnown: databaseLoaded };
+  },
+  (key, patch) => {
+    if (key === 'global') {
+      if (patch.killSwitch !== undefined) {
+        applyLocalGlobalPolicy(patch.killSwitch, patch.killSwitchReason ?? undefined);
+      }
+    } else {
+      applyLocalUpdate(key.slice('feature:'.length), patch);
+    }
+  },
+);
+
+export function registerWritablePolicyFlag(flag: FeatureFlag): void {
+  flagCache.set(flag.id, flag);
+}
+
+function fromDatabase(flag: StoredFlag): FeatureFlag {
+  if (
+    !flag ||
+    !Number.isInteger(flag.enabledPercentage) ||
+    flag.enabledPercentage < 0 ||
+    flag.enabledPercentage > 100
+  )
+    throw new Error('Invalid database feature policy');
+  const status = flag.status;
+  if (status !== 'enabled' && status !== 'disabled' && status !== 'degraded') {
+    throw new Error('Invalid database feature status');
+  }
+  const metadata = flag.metadata;
+  if (metadata != null && (typeof metadata !== 'object' || Array.isArray(metadata))) {
+    throw new Error('Invalid database feature metadata');
+  }
+  return {
+    id: flag.id,
+    name: flag.name,
+    description: flag.description,
+    status,
+    enabledPercentage: flag.enabledPercentage,
+    killSwitch: flag.killSwitch,
+    killSwitchReason: flag.killSwitchReason,
+    metadata: metadata ?? undefined,
+    updatedAt: flag.updatedAt,
+    updatedBy: flag.updatedBy ?? undefined,
+  };
+}
 
 function refreshOnRead(): void {
   if (Date.now() >= nextRefreshAt && !policyLoad) waitUntil(reloadFlags());
@@ -37,7 +98,7 @@ function effectiveFlag(flag: FeatureFlag): FeatureFlag {
   };
 }
 
-export function getFlag(featureId: KnownFeatureFlag): FeatureFlag | undefined {
+export function getFlag(featureId: string): FeatureFlag | undefined {
   refreshOnRead();
   if (!databaseLoaded) ensureFallbackDefaults();
   const flag = flagCache.get(featureId);
@@ -50,7 +111,7 @@ export function getAllFlags(): FeatureFlag[] {
   return Array.from(flagCache.values(), effectiveFlag);
 }
 
-export function applyLocalUpdate(featureId: KnownFeatureFlag, update: FeatureFlagUpdate): void {
+export function applyLocalUpdate(featureId: string, update: FeatureFlagUpdate): void {
   const previous = localUpdates.get(featureId);
   localUpdates.set(featureId, {
     ...previous,
@@ -59,9 +120,10 @@ export function applyLocalUpdate(featureId: KnownFeatureFlag, update: FeatureFla
       enabledPercentage: Math.min(100, Math.max(0, update.enabledPercentage)),
     }),
     ...(update.killSwitch !== undefined && { killSwitch: update.killSwitch }),
+    ...(update.killSwitchReason !== undefined && { killSwitchReason: update.killSwitchReason }),
     ...(update.metadata && { metadata: { ...previous?.metadata, ...update.metadata } }),
     updatedAt: new Date(),
-    updatedBy: update.updatedBy,
+    ...(update.updatedBy !== undefined && { updatedBy: update.updatedBy }),
   });
 }
 
@@ -112,17 +174,11 @@ async function loadDatabasePolicy(generation: number): Promise<void> {
             killSwitch: defaults.killSwitch,
           },
         }));
-      nextFlags.set(id, {
-        id: flag.id,
-        name: flag.name,
-        description: flag.description,
-        status: flag.status as FeatureFlagStatus,
-        enabledPercentage: flag.enabledPercentage,
-        killSwitch: flag.killSwitch,
-        metadata: flag.metadata as Record<string, unknown> | undefined,
-        updatedAt: flag.updatedAt,
-        updatedBy: flag.updatedBy ?? undefined,
-      });
+      nextFlags.set(id, fromDatabase(flag));
+    }
+    for (const flag of dbFlags) {
+      if (nextFlags.has(flag.id)) continue;
+      nextFlags.set(flag.id, fromDatabase(flag));
     }
     if (generation !== resetGeneration) return;
     globalPolicy = { enabled: config.killSwitch, reason: config.killSwitchReason ?? undefined };
@@ -154,6 +210,7 @@ export async function reloadFlags(): Promise<void> {
 }
 
 export function _resetForTesting(): void {
+  policyWrites.reset();
   resetGeneration++;
   flagCache.clear();
   localUpdates.clear();

@@ -1,11 +1,6 @@
 /**
- * Startup behaviour of the feature flag service on a cold instance.
- *
- * A serverless instance starts with an empty cache. Until it has loaded the
- * database policy, checks fall back to compiled defaults. These tests pin the
- * agreed behaviour: the fallback is provisional, so an emergency kill switch
- * stored in the database still takes effect once the load completes, and a
- * database failure is reported once instead of on every cold start.
+ * Cold-start defaults are provisional: loaded database stops must take effect.
+ * Failed reads retain protection and report once, not on every cold start.
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -147,11 +142,18 @@ describe('feature flag startup', () => {
     async (kind) => {
       mockDatabase([{ ...dbFlag, killSwitch: false }]);
       if (kind === 'flag') {
-        vi.mocked(prisma.featureFlag.upsert).mockRejectedValueOnce(new Error('write failed'));
-        await updateFlag('quiz', { killSwitch: true });
+        vi.mocked(prisma.$transaction).mockRejectedValueOnce(new Error('write failed'));
+        await expect(
+          updateFlag('quiz', {
+            killSwitch: true,
+            killSwitchReason: 'incident',
+          }),
+        ).rejects.toMatchObject({ persistence: 'unconfirmed' });
       } else {
         vi.mocked(prisma.globalConfig.upsert).mockRejectedValueOnce(new Error('write failed'));
-        await setGlobalKillSwitch(true, 'incident');
+        await expect(setGlobalKillSwitch(true, 'incident')).rejects.toMatchObject({
+          persistence: 'unconfirmed',
+        });
       }
       await initializeFlags();
       await reloadFlags();

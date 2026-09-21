@@ -1,5 +1,23 @@
 {
   "admin": {
+    "policyWrite": {
+      "unconfirmed": "Saving could not be confirmed. The protection shown applies only to this instance, not to every server.",
+      "superseded": "Another operation superseded this change. No reactivation was confirmed.",
+      "failed": "The change could not be confirmed. Retry explicitly.",
+      "loadFailed": "Failed to load feature settings.",
+      "instanceNotice": "Effective state returned by the instance that handled the change. Refreshing the page does not prove persistence.",
+      "enable": "Enable",
+      "disable": "Disable",
+      "reactivateAll": "Reactivate All",
+      "globalStop": "Global Kill-Switch",
+      "globalStopped": "All features disabled via global kill-switch",
+      "operational": "All systems operational",
+      "degraded": "System degradation: {level}",
+      "healthy": "Healthy",
+      "partial": "Partial",
+      "severe": "Severe",
+      "critical": "Critical"
+    },
     "metricTruth": {
       "averageTurns": "Average turns per recorded session",
       "averageSessionCost": "Average cost per recorded session",

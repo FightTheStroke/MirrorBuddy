@@ -7,20 +7,27 @@
  * - Recovers when services stabilize
  */
 
-import { logger } from "@/lib/logger";
+import { logger } from '@/lib/logger';
 import {
-  setFlagStatus,
-  activateKillSwitch,
-  deactivateKillSwitch,
-} from "../feature-flags";
-import type { KnownFeatureFlag } from "../feature-flags/types";
+  stopDegradationPolicy,
+  recoverDegradationPolicy,
+  isDegradationRecoveryPending,
+  resetDegradationPolicy,
+} from './degradation-policy';
+import {
+  DEFAULT_RULES,
+  checkDegradationTrigger,
+  checkRecoveryConditions,
+  serviceAffectsFeature,
+} from './degradation-rules';
+import type { KnownFeatureFlag } from '../feature-flags/types';
 import type {
   DegradationEvent,
   DegradationRule,
   DegradationState,
   FallbackBehavior,
   ServiceHealth,
-} from "./types";
+} from './types';
 
 // Service health tracking
 const serviceHealth = new Map<string, ServiceHealth>();
@@ -30,7 +37,7 @@ const degradationRules = new Map<KnownFeatureFlag, DegradationRule>();
 
 // Current degradation state
 const currentState: DegradationState = {
-  level: "none",
+  level: 'none',
   activeRules: [],
   degradedFeatures: new Map(),
   since: new Date(),
@@ -40,63 +47,13 @@ const currentState: DegradationState = {
 const eventHistory: DegradationEvent[] = [];
 const MAX_EVENT_HISTORY = 100;
 
-// Default thresholds
-const DEFAULT_THRESHOLDS = {
-  maxLatencyMs: 5000,
-  maxErrorRate: 0.1,
-  maxConsecutiveFailures: 3,
-  minSuccessRate: 0.95,
-  minSuccessfulChecks: 5,
-};
-
 /**
  * Initialize degradation rules for known features
  */
 export function initializeDegradationRules(): void {
-  // Voice - critical, disable on high latency
-  registerRule({
-    featureId: "voice_realtime",
-    triggerConditions: {
-      maxLatencyMs: 3000,
-      maxErrorRate: 0.05,
-      maxConsecutiveFailures: 2,
-    },
-    fallbackBehavior: "disable",
-    recoveryConditions: {
-      minSuccessRate: 0.98,
-      minSuccessfulChecks: 10,
-    },
-  });
+  DEFAULT_RULES.forEach(registerRule);
 
-  // RAG - use cache on degradation
-  registerRule({
-    featureId: "rag_enabled",
-    triggerConditions: {
-      maxLatencyMs: 2000,
-      maxErrorRate: 0.1,
-    },
-    fallbackBehavior: "cache",
-    recoveryConditions: {
-      minSuccessRate: 0.95,
-      minSuccessfulChecks: 5,
-    },
-  });
-
-  // PDF export - simplify output on degradation
-  registerRule({
-    featureId: "pdf_export",
-    triggerConditions: {
-      maxLatencyMs: 10000,
-      maxErrorRate: 0.15,
-    },
-    fallbackBehavior: "simplified",
-    recoveryConditions: {
-      minSuccessRate: 0.9,
-      minSuccessfulChecks: 3,
-    },
-  });
-
-  logger.info("Degradation rules initialized", {
+  logger.info('Degradation rules initialized', {
     count: degradationRules.size,
   });
 }
@@ -111,11 +68,7 @@ export function registerRule(rule: DegradationRule): void {
 /**
  * Record a health check for a service
  */
-export function recordHealthCheck(
-  serviceId: string,
-  healthy: boolean,
-  latencyMs: number,
-): void {
+export function recordHealthCheck(serviceId: string, healthy: boolean, latencyMs: number): void {
   const existing = serviceHealth.get(serviceId);
   const now = new Date();
 
@@ -123,11 +76,7 @@ export function recordHealthCheck(
     serviceId,
     healthy,
     latencyMs,
-    errorRate: existing
-      ? calculateErrorRate(existing.errorRate, healthy)
-      : healthy
-        ? 0
-        : 1,
+    errorRate: existing ? calculateErrorRate(existing.errorRate, healthy) : healthy ? 0 : 1,
     lastCheck: now,
     consecutiveFailures: healthy ? 0 : (existing?.consecutiveFailures ?? 0) + 1,
   };
@@ -147,24 +96,19 @@ export function degradeFeature(
   const previousState = currentState.degradedFeatures.get(featureId);
   currentState.degradedFeatures.set(featureId, behavior);
 
-  // Update feature flag status
-  if (behavior === "disable") {
-    activateKillSwitch(featureId, reason);
-  } else {
-    setFlagStatus(featureId, "degraded");
-  }
+  stopDegradationPolicy(featureId, behavior, reason);
 
   recordEvent({
     timestamp: new Date(),
     featureId,
-    previousState: previousState ?? "enabled",
+    previousState: previousState ?? 'enabled',
     newState: behavior,
     reason,
   });
 
   updateDegradationLevel();
 
-  logger.warn("Feature degraded", { featureId, behavior, reason });
+  logger.warn('Feature degraded', { featureId, behavior, reason });
 }
 
 /**
@@ -173,27 +117,20 @@ export function degradeFeature(
 export function recoverFeature(
   featureId: KnownFeatureFlag,
   reason: string,
-): void {
+  explicit = true,
+): Promise<void> {
   const previousState = currentState.degradedFeatures.get(featureId);
-  if (!previousState) return;
-
-  currentState.degradedFeatures.delete(featureId);
-
-  // Restore feature flag
-  deactivateKillSwitch(featureId);
-  setFlagStatus(featureId, "enabled");
-
-  recordEvent({
-    timestamp: new Date(),
+  if (!previousState) return Promise.resolve();
+  return recoverDegradationPolicy(
     featureId,
-    previousState,
-    newState: "enabled",
-    reason,
-  });
-
-  updateDegradationLevel();
-
-  logger.info("Feature recovered", { featureId, reason });
+    () => {
+      currentState.degradedFeatures.delete(featureId);
+      recordEvent({ timestamp: new Date(), featureId, previousState, newState: 'enabled', reason });
+      updateDegradationLevel();
+      logger.info('Feature recovered', { featureId, reason });
+    },
+    explicit,
+  );
 }
 
 /**
@@ -206,9 +143,7 @@ export function getDegradationState(): DegradationState {
 /**
  * Get fallback behavior for a feature
  */
-export function getFallbackBehavior(
-  featureId: KnownFeatureFlag,
-): FallbackBehavior | null {
+export function getFallbackBehavior(featureId: KnownFeatureFlag): FallbackBehavior | null {
   return currentState.degradedFeatures.get(featureId) ?? null;
 }
 
@@ -216,7 +151,7 @@ export function getFallbackBehavior(
  * Check if system is in degraded state
  */
 export function isSystemDegraded(): boolean {
-  return currentState.level !== "none";
+  return currentState.level !== 'none';
 }
 
 /**
@@ -244,8 +179,9 @@ export function getRecentEvents(limit = 20): DegradationEvent[] {
  * Reset all state (for testing only)
  */
 export function _resetState(): void {
+  resetDegradationPolicy();
   serviceHealth.clear();
-  currentState.level = "none";
+  currentState.level = 'none';
   currentState.activeRules = [];
   currentState.degradedFeatures.clear();
   currentState.since = new Date();
@@ -262,7 +198,7 @@ function evaluateDegradation(serviceId: string, health: ServiceHealth): void {
     const shouldDegrade = checkDegradationTrigger(health, rule);
     const isDegraded = currentState.degradedFeatures.has(featureId);
 
-    if (shouldDegrade && !isDegraded) {
+    if (shouldDegrade && (!isDegraded || isDegradationRecoveryPending(featureId))) {
       degradeFeature(
         featureId,
         rule.fallbackBehavior,
@@ -270,72 +206,10 @@ function evaluateDegradation(serviceId: string, health: ServiceHealth): void {
           `errorRate=${(health.errorRate * 100).toFixed(1)}%, ` +
           `failures=${health.consecutiveFailures}`,
       );
-    } else if (
-      !shouldDegrade &&
-      isDegraded &&
-      checkRecoveryConditions(health, rule)
-    ) {
-      recoverFeature(featureId, `Service ${serviceId} recovered`);
+    } else if (!shouldDegrade && isDegraded && checkRecoveryConditions(health, rule)) {
+      void recoverFeature(featureId, `Service ${serviceId} recovered`, false);
     }
   }
-}
-
-// Check if degradation should be triggered
-function checkDegradationTrigger(
-  health: ServiceHealth,
-  rule: DegradationRule,
-): boolean {
-  const { triggerConditions } = rule;
-  const t = { ...DEFAULT_THRESHOLDS, ...triggerConditions };
-
-  if (t.maxLatencyMs && health.latencyMs > t.maxLatencyMs) return true;
-  if (t.maxErrorRate && health.errorRate > t.maxErrorRate) return true;
-  if (
-    t.maxConsecutiveFailures &&
-    health.consecutiveFailures >= t.maxConsecutiveFailures
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
-// Check if recovery conditions are met
-function checkRecoveryConditions(
-  health: ServiceHealth,
-  rule: DegradationRule,
-): boolean {
-  const { recoveryConditions } = rule;
-  const r = { ...DEFAULT_THRESHOLDS, ...recoveryConditions };
-
-  const successRate = 1 - health.errorRate;
-  return successRate >= (r.minSuccessRate ?? 0.95);
-}
-
-// Map service to features (simplified)
-function serviceAffectsFeature(
-  serviceId: string,
-  featureId: KnownFeatureFlag,
-): boolean {
-  const mapping: Record<string, KnownFeatureFlag[]> = {
-    "azure-openai": [
-      "voice_realtime",
-      "rag_enabled",
-      "quiz",
-      "mindmap",
-      "flashcards",
-    ],
-    "azure-realtime": ["voice_realtime"],
-    postgresql: [
-      "rag_enabled",
-      "flashcards",
-      "gamification",
-      "parent_dashboard",
-    ],
-    "pdf-renderer": ["pdf_export"],
-  };
-
-  return mapping[serviceId]?.includes(featureId) ?? false;
 }
 
 // Calculate rolling error rate
@@ -350,13 +224,13 @@ function updateDegradationLevel(): void {
   const degradedCount = currentState.degradedFeatures.size;
 
   if (degradedCount === 0) {
-    currentState.level = "none";
+    currentState.level = 'none';
   } else if (degradedCount <= 2) {
-    currentState.level = "partial";
+    currentState.level = 'partial';
   } else if (degradedCount <= 5) {
-    currentState.level = "severe";
+    currentState.level = 'severe';
   } else {
-    currentState.level = "critical";
+    currentState.level = 'critical';
   }
 
   currentState.since = new Date();

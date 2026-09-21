@@ -3,15 +3,18 @@
  * Manages global kill switch state
  */
 
-import { prisma } from "@/lib/db";
-import { GlobalKillSwitchState } from "./control-panel-types";
+import { prisma } from '@/lib/db';
+import { setGlobalKillSwitch } from '@/lib/feature-flags';
+import { requireConfirmedPolicy } from '@/lib/feature-flags/policy-write-outcome';
+import type { PolicyWriteReceipt } from '@/lib/feature-flags/policy-write-types';
+import { GlobalKillSwitchState } from './control-panel-types';
 
 /**
  * Get global kill switch state
  */
 export async function getGlobalKillSwitch(): Promise<GlobalKillSwitchState> {
   const config = await prisma.globalConfig.findUnique({
-    where: { id: "global" },
+    where: { id: 'global' },
   });
 
   if (!config) {
@@ -36,26 +39,13 @@ export async function updateGlobalKillSwitch(
   isEnabled: boolean,
   reason: string | undefined,
   adminId: string,
-): Promise<GlobalKillSwitchState> {
-  const config = await prisma.globalConfig.upsert({
-    where: { id: "global" },
-    create: {
-      killSwitch: isEnabled,
-      killSwitchReason: reason,
-      updatedBy: adminId,
-    },
-    update: {
-      killSwitch: isEnabled,
-      killSwitchReason: reason,
-      updatedAt: new Date(),
-      updatedBy: adminId,
-    },
-  });
-
+): Promise<GlobalKillSwitchState & PolicyWriteReceipt> {
+  const receipt = requireConfirmedPolicy(await setGlobalKillSwitch(isEnabled, reason, adminId));
   return {
-    isEnabled: config.killSwitch,
-    reason: config.killSwitchReason ?? undefined,
-    updatedAt: config.updatedAt,
-    updatedBy: config.updatedBy ?? undefined,
+    ...receipt,
+    isEnabled: receipt.effective.killSwitch,
+    reason: receipt.effective.killSwitchReason ?? undefined,
+    updatedAt: new Date(),
+    updatedBy: adminId,
   };
 }
