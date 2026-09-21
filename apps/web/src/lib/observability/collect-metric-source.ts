@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+import { reportCollectorFailure } from './collector-diagnostics';
 import type { MetricSample } from './http-metrics-collector';
 
 const labelKey = (labels: Record<string, string>) =>
@@ -88,11 +88,7 @@ export async function collectMetricSource(
         (sample) => !['metric_collector_up', 'metric_collector_enabled'].includes(sample.name),
       );
     }
-    logger.error(
-      'Metrics collector failed',
-      { collector },
-      error instanceof MetricSourceError ? error.cause : error,
-    );
+    reportCollectorFailure(collector, error instanceof MetricSourceError ? error.cause : error);
   }
   return [
     ...samples.filter(

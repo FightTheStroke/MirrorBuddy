@@ -34,7 +34,11 @@ export function keyOf(issue: ExistingIssue): string | null {
 }
 
 export function issueTitle(alert: ProductionAlert): string {
-  const prefix = alert.source === 'sentry' ? 'Sentry error' : 'Deployment failure';
+  const prefix = alert.monitoring
+    ? 'Monitoring warning'
+    : alert.source === 'sentry'
+      ? 'Sentry error'
+      : 'Deployment failure';
   return `[${prefix}] ${alert.title}`.slice(0, 240);
 }
 
