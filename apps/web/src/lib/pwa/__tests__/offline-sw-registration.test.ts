@@ -154,8 +154,10 @@ describe('registerOfflineServiceWorker', () => {
     mockServiceWorker.register.mockRejectedValueOnce(error);
 
     expect(await registerOfflineServiceWorker()).toBe(false);
-    expect(logger.error).toHaveBeenCalledWith('[Offline SW] Registration failed', undefined, error);
-    expect(logger.warn).not.toHaveBeenCalled();
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration failed', {
+      errorName: 'TypeError',
+    });
   });
 
   it('should return false when registration fails', async () => {
@@ -165,7 +167,10 @@ describe('registerOfflineServiceWorker', () => {
     const result = await registerOfflineServiceWorker();
 
     expect(result).toBe(false);
-    expect(logger.error).toHaveBeenCalledWith('[Offline SW] Registration failed', undefined, error);
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith('[Offline SW] Registration failed', {
+      errorName: 'Error',
+    });
   });
 
   // ============================================================================

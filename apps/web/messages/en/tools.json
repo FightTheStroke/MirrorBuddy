@@ -49,33 +49,36 @@
       "switchingCamera": "Switching Camera",
       "takePhoto": "Take Photo",
       "errors": {
+        "unsupported": {
+          "message": "This browser or device does not support camera access. Try another browser or device."
+        },
         "permission": {
-          "title": "Permesso fotocamera negato",
-          "message": "Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
-          "instruction1": "Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
-          "instruction2": "Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
-          "instruction3": "Select \"Consenti\"",
-          "instruction4": "Ricarica la pagina o premi il pulsante Riprova"
+          "title": "Camera permission denied",
+          "message": "Allow camera access in your browser settings to use the webcam.",
+          "instruction1": "Open the site permissions in the address bar",
+          "instruction2": "Find \"Camera\" in the settings",
+          "instruction3": "Select \"Allow\"",
+          "instruction4": "Reload the page or press Retry"
         },
         "unavailable": {
-          "title": "Fotocamera non disponibile",
-          "message": "Noa fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+          "title": "Camera unavailable",
+          "message": "No camera found. Connect a webcam or use a device with a built-in camera."
         },
         "inUse": {
-          "title": "Fotocamera in uso",
-          "message": "La fotocamera è già in uso da un'altra applicazione. Close le altre app che potrebbero utilizzarla e riprova."
+          "title": "Camera in use",
+          "message": "Another application is using the camera. Close other apps that may be using it and try again."
         },
         "timeout": {
-          "title": "Timeout fotocamera",
-          "message": "La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+          "title": "Camera timed out",
+          "message": "The camera is not responding. Check that it is connected correctly and try again."
         },
         "generic": {
-          "title": "Errore fotocamera",
-          "message": "Unable accedere alla fotocamera. Verifica le impostazioni e riprova."
+          "title": "Camera error",
+          "message": "Unable to access the camera. Check your settings and try again."
         },
-        "retry": "Riprova",
+        "retry": "Retry",
         "close": "Close",
-        "howToEnable": "Come abilitare la fotocamera:"
+        "howToEnable": "How to enable the camera:"
       },
       "selectCamera": "Select fotocamera",
       "continuity": "Continuity",

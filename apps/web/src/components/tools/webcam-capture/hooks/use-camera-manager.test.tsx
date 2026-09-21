@@ -2,6 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useCameraManager } from './use-camera-manager';
 import { logger } from '@/lib/logger';
+import { addBreadcrumb } from '@/lib/sentry';
+
+vi.mock('@/lib/sentry', () => ({ addBreadcrumb: vi.fn() }));
+vi.mock('next-intl', async () => {
+  const { createTranslator } = await vi.importActual<typeof import('next-intl')>('next-intl');
+  const { default: messages } = await import('../../../../../messages/en/tools.json');
+  const t = createTranslator({ locale: 'en', messages, namespace: 'tools.webcam' });
+  return { useTranslations: () => t };
+});
 
 const { requestStream } = vi.hoisted(() => ({ requestStream: vi.fn() }));
 vi.mock('@/lib/native/media-bridge', () => ({
@@ -49,10 +58,26 @@ describe('camera capability failures', () => {
     render(<Probe />);
     await waitFor(() => expect(screen.getByTestId('state')).toHaveTextContent('unavailable'));
     expect(screen.getByTestId('error')).not.toBeEmptyDOMElement();
-    expect(logger.error).toHaveBeenCalledWith(
-      'Camera error',
-      expect.objectContaining({ errorName: 'NotSupportedError' }),
+    expect(screen.getByTestId('error')).toHaveTextContent(
+      'This browser or device does not support camera access.',
     );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(addBreadcrumb).toHaveBeenCalled();
+  });
+
+  it('shows translated permission guidance without error reporting', async () => {
+    requestStream.mockRejectedValueOnce(new DOMException('Denied', 'NotAllowedError'));
+    render(<Probe />);
+    await waitFor(() => expect(screen.getByTestId('state')).toHaveTextContent('permission'));
+    expect(screen.getByTestId('error')).toHaveTextContent('Allow camera access');
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('keeps unexpected camera failures at error severity', async () => {
+    requestStream.mockRejectedValueOnce(new Error('Unexpected driver failure'));
+    render(<Probe />);
+    await waitFor(() => expect(screen.getByTestId('state')).toHaveTextContent('unavailable'));
+    expect(logger.error).toHaveBeenCalled();
   });
 
   it('can recover on retry and releases the supported stream on unmount', async () => {

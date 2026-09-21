@@ -49,6 +49,9 @@
       "switchingCamera": "Switching Camera",
       "takePhoto": "Take Photo",
       "errors": {
+        "unsupported": {
+          "message": "Ce navigateur ou cet appareil ne prend pas en charge l'accès à la caméra. Essayez un autre navigateur ou appareil."
+        },
         "permission": {
           "title": "Autorisation de caméra refusée",
           "message": "Pour utiliser la webcam, vous devez activer l'accès à la caméra dans les paramètres du navigateur.",

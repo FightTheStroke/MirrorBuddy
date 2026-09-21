@@ -3,10 +3,12 @@
  */
 
 import { useState, useRef, useCallback } from 'react';
-import { logger } from '@/lib/logger';
+import toast from '@/components/ui/toast';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
 import { requestVideoStream } from '@/lib/native/media-bridge';
 
 export function useCameraTest(preferredCameraId: string | null) {
+  const cameraErrorMessage = useCameraErrorMessage('CameraTest');
   const [camTestActive, setCamTestActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const camStreamRef = useRef<MediaStream | null>(null);
@@ -20,14 +22,17 @@ export function useCameraTest(preferredCameraId: string | null) {
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
       }
 
       setCamTestActive(true);
     } catch (error) {
-      logger.error('Camera test error', undefined, error);
+      camStreamRef.current?.getTracks().forEach((track) => track.stop());
+      camStreamRef.current = null;
+      setCamTestActive(false);
+      toast.error(cameraErrorMessage(error));
     }
-  }, [preferredCameraId]);
+  }, [preferredCameraId, cameraErrorMessage]);
 
   const stopCamTest = useCallback(() => {
     if (camStreamRef.current) {

@@ -3,6 +3,8 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { clientLogger as logger } from '@/lib/logger/client';
 import { requestVideoStream } from '@/lib/native/media-bridge';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
+import toast from '@/components/ui/toast';
 import { useVideoCapture } from './video-capture';
 import { useSendVideoFrame } from './actions';
 import {
@@ -35,14 +37,8 @@ export interface UnifiedCameraState {
   toggleVideo: () => Promise<void>;
 }
 
-/**
- * Unified camera hook for voice sessions.
- * Supports three modes:
- * - 'off': Camera disabled
- * - 'video': Continuous frames as passive context (no AI response)
- * - 'photo': Single snapshot that triggers AI response
- */
 export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
+  const cameraErrorMessage = useCameraErrorMessage('UnifiedCamera');
   const [cameraMode, setCameraMode] = useState<CameraMode>('off');
   const [cameraFacing, setCameraFacing] = useState<'user' | 'environment'>('user');
   const { startVideoUsage, endUsageSession, limitReached } = useCameraUsage(refs);
@@ -149,9 +145,7 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
         }
         photoStreamRef.current = stream;
       } catch (e) {
-        logger.error('[UnifiedCamera] Failed to start photo mode', {
-          error: String(e),
-        });
+        toast.error(cameraErrorMessage(e));
         setCameraMode('off');
         return;
       }
@@ -162,7 +156,15 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
       from: cameraMode,
       to: nextMode,
     });
-  }, [cameraMode, capture, cameraFacing, startVideoUsage, endUsageSession, stopPhotoStream]);
+  }, [
+    cameraMode,
+    capture,
+    cameraFacing,
+    startVideoUsage,
+    endUsageSession,
+    stopPhotoStream,
+    cameraErrorMessage,
+  ]);
 
   // Take a single snapshot and send with response.create
   const takeSnapshot = useCallback(async () => {
@@ -192,14 +194,14 @@ export function useUnifiedCamera(refs: UnifiedCameraRefs): UnifiedCameraState {
           photoStreamRef.current = stream;
         })
         .catch((e) => {
-          logger.error('[UnifiedCamera] Camera switch failed', {
-            error: String(e),
-          });
+          if (!isMountedRef.current || generation !== photoGenerationRef.current) return;
+          setCameraMode('off');
+          toast.error(cameraErrorMessage(e));
         });
     }
 
     logger.info('[UnifiedCamera] Camera facing changed', { facing: next });
-  }, [cameraFacing, cameraMode, stopPhotoStream]);
+  }, [cameraFacing, cameraMode, stopPhotoStream, cameraErrorMessage]);
 
   // Legacy toggleVideo for backward compatibility
   const changeVideo = useCallback(async () => {

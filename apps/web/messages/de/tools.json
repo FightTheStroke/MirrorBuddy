@@ -49,6 +49,9 @@
       "switchingCamera": "Kamera wird gewechselt",
       "takePhoto": "Foto aufnehmen",
       "errors": {
+        "unsupported": {
+          "message": "Dieser Browser oder dieses Gerät unterstützt keinen Kamerazugriff. Versuche einen anderen Browser oder ein anderes Gerät."
+        },
         "permission": {
           "title": "Kamerazugriff verweigert",
           "message": "Um die Webcam zu nutzen, muss der Kamerazugriff in den Browsereinstellungen aktiviert werden.",

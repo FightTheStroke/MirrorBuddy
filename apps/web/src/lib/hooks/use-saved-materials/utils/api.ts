@@ -1,9 +1,6 @@
-/**
- * @file api.ts
- * @brief API utilities for saved materials
- */
-
 import { logger } from '@/lib/logger';
+import { addBreadcrumb } from '@/lib/sentry';
+import { CreateMaterialSchema } from '@/lib/validation/schemas/materials';
 import type { ToolType } from '@/types/tools';
 import type { SavedMaterial } from '../types';
 import { csrfFetch } from '@/lib/auth';
@@ -73,25 +70,8 @@ export async function saveMaterialToAPI(
   },
 ): Promise<SavedMaterial | null> {
   try {
-    assertOwner(userId);
     const toolId = crypto.randomUUID();
-    const response = await csrfFetch('/api/materials', {
-      method: 'POST',
-      body: JSON.stringify({
-        userId,
-        toolId,
-        toolType,
-        title,
-        content,
-        ...options,
-      }),
-    });
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-    const data = await response.json();
-    assertOwner(userId);
-    return data.material;
+    return await saveMaterialToAPIWithId(userId, toolId, toolType, title, content, options);
   } catch (error) {
     if (isTransientNetworkError(error)) {
       logger.debug('Save material aborted (transient network)', {
@@ -177,12 +157,25 @@ export async function saveMaterialToAPIWithId(
       preview: options?.preview,
     };
 
+    const validation = CreateMaterialSchema.safeParse(requestBody);
+    if (!validation.success) {
+      addBreadcrumb('materials', 'Material save input invalid', {
+        toolType,
+        fields: validation.error.issues.map((issue) => issue.path.join('.')),
+      });
+      return null;
+    }
+
     const response = await csrfFetch('/api/materials', {
       method: 'POST',
       body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
+      if (response.status === 400) {
+        addBreadcrumb('materials', 'Material save rejected', { status: 400, toolType });
+        return null;
+      }
       let errorData: Record<string, unknown> = {};
       try {
         errorData = await response.json();

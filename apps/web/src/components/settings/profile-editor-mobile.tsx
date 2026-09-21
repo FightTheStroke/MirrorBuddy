@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Camera, Save, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { clientLogger } from '@/lib/logger/client';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
 import { requestVideoStream } from '@/lib/native/media-bridge';
 
 interface ProfileEditorMobileProps {
@@ -20,6 +20,7 @@ interface ProfileEditorMobileProps {
 
 export function ProfileEditorMobile({ profile, onSave }: ProfileEditorMobileProps) {
   const t = useTranslations('common');
+  const cameraErrorMessage = useCameraErrorMessage('ProfileEditorMobile');
   const [formData, setFormData] = useState(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -66,10 +67,9 @@ export function ProfileEditorMobile({ profile, onSave }: ProfileEditorMobileProp
         setIsCameraActive(true);
       }
     } catch (error) {
-      clientLogger.error('Camera access denied', { component: 'ProfileEditorMobile' }, error);
       setErrors((prev) => ({
         ...prev,
-        camera: 'Camera access denied. Please enable camera permissions.',
+        camera: cameraErrorMessage(error),
       }));
     }
   };

@@ -5,6 +5,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { clientLogger } from '@/lib/logger/client';
 import { requestVideoStream, enumerateMediaDevices } from '@/lib/native/media-bridge';
+import { useCameraErrorMessage } from '@/lib/hooks/use-camera-error-message';
 
 export interface CameraDevice {
   deviceId: string;
@@ -13,6 +14,7 @@ export interface CameraDevice {
 }
 
 export function useWebcamAnalysis() {
+  const cameraErrorMessage = useCameraErrorMessage('WebcamAnalysis');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -85,14 +87,11 @@ export function useWebcamAnalysis() {
           setAnalysisResults(null);
         }
       } catch (err) {
-        const errorMessage =
-          err instanceof DOMException ? `Camera error: ${err.message}` : 'Failed to access camera';
-
-        setError(errorMessage);
+        setError(cameraErrorMessage(err));
         setIsLoading(false);
       }
     },
-    [stream],
+    [stream, cameraErrorMessage],
   );
 
   // Toggle between cameras

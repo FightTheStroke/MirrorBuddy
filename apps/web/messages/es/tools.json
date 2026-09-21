@@ -49,6 +49,9 @@
       "switchingCamera": "Cambiando cámara",
       "takePhoto": "Tomar foto",
       "errors": {
+        "unsupported": {
+          "message": "Este navegador o dispositivo no permite acceder a la cámara. Prueba otro navegador o dispositivo."
+        },
         "permission": {
           "title": "Permiso de cámara denegado",
           "message": "Para usar la webcam, es necesario habilitar el acceso a la cámara en la configuración del navegador.",

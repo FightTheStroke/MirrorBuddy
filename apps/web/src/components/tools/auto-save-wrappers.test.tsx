@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { clearCSRFToken, setClientIdentity } from '@/lib/auth';
 import toast from '@/components/ui/toast';
+import { logger } from '@/lib/logger';
 import type { QuizRequest, SummaryData } from '@/types';
 import { AutoSaveQuiz, AutoSaveSummary } from './auto-save-wrappers';
 import {
@@ -108,8 +109,9 @@ describe.each([
     expect(post).toHaveBeenCalledTimes(1);
   });
 
-  it('offers an immediate retry after the actual request fails', async () => {
-    post.mockResolvedValueOnce(Response.json({ error: 'Rejected' }, { status: 500 }));
+  it.each([400, 500])('offers an immediate retry after HTTP %s', async (status) => {
+    vi.mocked(logger.error).mockClear();
+    post.mockResolvedValueOnce(Response.json({ error: 'Rejected' }, { status }));
     render(display());
     await act(() => vi.advanceTimersByTimeAsync(2000));
     expect(toast.error).toHaveBeenCalledWith(
@@ -128,6 +130,7 @@ describe.each([
     });
     expect(post).toHaveBeenCalledTimes(2);
     expect(toast.error).toHaveBeenCalledTimes(1);
+    if (status === 400) expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('persists changed content without duplicating an unchanged rerender', async () => {

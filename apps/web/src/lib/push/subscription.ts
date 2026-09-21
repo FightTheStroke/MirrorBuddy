@@ -49,7 +49,9 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     });
     return registration;
   } catch (error) {
-    logger.error('[Push] Service worker registration failed', undefined, error);
+    logger.warn('[Push] Service worker registration failed', {
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+    });
     return null;
   }
 }
@@ -130,7 +132,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
     registration = await registerServiceWorker();
   }
   if (!registration) {
-    logger.error('[Push] No service worker registration');
+    logger.warn('[Push] No service worker registration');
     return null;
   }
 
