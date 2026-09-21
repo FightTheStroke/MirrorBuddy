@@ -77,8 +77,9 @@ interface ServiceLimit {
 `metric_collector_up{collector="http|funnel|budget|abuse|conversion|tier|service_limits|vercel|supabase|azure_openai"}`.
 `1` means the collector returned valid samples; `0` means collection failed,
 configuration was unavailable, or a child collector was degraded. An execution
-failure logs its original error and contributes no usage samples, never synthetic
-zero usage or refreshed stale success. Independent valid sources still reach Grafana.
+failure logs its original error and contributes no usage samples for the failed
+measurement, never synthetic zero usage or refreshed stale success. Independently
+successful sibling measurements can still be exported while their collector is down.
 Every source also reports `metric_collector_enabled`: configured sources use `1`
 even when collection fails; intentionally disabled sources use `0` with `up=0`.
 The `service_limits` aggregate ignores explicitly disabled children when computing
@@ -95,6 +96,17 @@ intentionally absent (ADR 0142), not broken configuration: it returns
 repeated error logging or authentication attempts. Configured authentication
 failures still report errors. Database authentication timeouts remain separate
 infrastructure failures; collector isolation neither fixes nor hides them.
+
+**Configured Azure failures (2026-09-19):** Token and Monitor adapters propagate
+`AzureProviderError` with operation, HTTP status and the original transport cause,
+without retaining provider response bodies. The collector boundary reports once.
+A failed TPM request does not become zero: its samples are absent, a successful
+RPM remains available, and Azure plus the aggregate report `up=0` (and conversely
+for RPM failure). The five-minute snapshot cache retains explicit failure state
+and any valid sibling; recovery requires a subsequent collection after expiry,
+not a background refresh. Healthy token/snapshot caching is unchanged. The costs
+consumer owns its own authentication diagnostic and preserves its existing CLI
+fallback; a cost API rejection does not newly trigger that fallback.
 
 **Push to Grafana Cloud** (Influx Line Protocol):
 
