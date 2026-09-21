@@ -1,17 +1,9 @@
-/**
- * Prometheus Push Service for Grafana Cloud
- *
- * Pushes metrics to Grafana Cloud using Influx Line Protocol.
- * Configure via environment variables:
- *   - GRAFANA_CLOUD_PROMETHEUS_URL (use /api/v1/push/influx/write endpoint)
- *   - GRAFANA_CLOUD_PROMETHEUS_USER
- *   - GRAFANA_CLOUD_API_KEY
- *   - GRAFANA_CLOUD_PUSH_INTERVAL (default: 60s)
- *
- * Tested: 18 Jan 2026 - metrics visible in Grafana Cloud
- */
-
 import { logger } from '@/lib/logger';
+import {
+  isGrafanaConfigured,
+  logCollectorSkippedOnce,
+  reportCollectorFailure,
+} from './collector-diagnostics';
 import { collectServiceLimitsSamples } from './service-limits-metrics';
 import { collectHttpMetrics, type MetricSample } from './http-metrics-collector';
 import { collectTierMetrics } from './tier-metrics-collector';
@@ -30,12 +22,7 @@ interface PushConfig {
   intervalSeconds: number;
 }
 
-/**
- * Transport rejection from the metrics endpoint
- *
- * The message carries only the status so related rejections stay one reported
- * problem; the response body is preserved on the error for attribution.
- */
+/** Group transport rejections by status, not potentially sensitive response bodies. */
 export class MetricsPushError extends Error {
   readonly status: number;
   readonly responseBody: string;
@@ -89,17 +76,15 @@ class PrometheusPushService {
   private intervalId: ReturnType<typeof setInterval> | null = null;
   private isRunning = false;
 
-  /**
-   * Initialize the push service with config from env vars
-   */
   initialize(): boolean {
     const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
     const user = process.env.GRAFANA_CLOUD_PROMETHEUS_USER;
     const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
     const interval = parseInt(process.env.GRAFANA_CLOUD_PUSH_INTERVAL || '60', 10);
 
-    if (!url || !user || !apiKey) {
-      logger.info('Grafana Cloud push disabled (missing config)');
+    if (!isGrafanaConfigured() || !url || !user || !apiKey) {
+      this.config = null;
+      logCollectorSkippedOnce('grafana');
       return false;
     }
 
@@ -107,11 +92,10 @@ class PrometheusPushService {
       url,
       user,
       apiKey,
-      intervalSeconds: Math.max(15, interval), // Minimum 15s
+      intervalSeconds: Number.isFinite(interval) ? Math.max(15, interval) : 60,
     };
 
     logger.info('Grafana Cloud push initialized', {
-      url: url.replace(/\/\/.*@/, '//***@'), // Redact credentials
       interval: this.config.intervalSeconds,
     });
 
@@ -143,13 +127,13 @@ class PrometheusPushService {
 
     // Push immediately on start
     this.pushMetrics().catch((error: unknown) =>
-      logger.error('Metrics push failed', { phase: 'initial' }, error),
+      reportCollectorFailure('grafana_transport', error),
     );
 
     // Then push periodically
     this.intervalId = setInterval(() => {
       this.pushMetrics().catch((error: unknown) =>
-        logger.error('Metrics push failed', { phase: 'periodic' }, error),
+        reportCollectorFailure('grafana_transport', error),
       );
     }, intervalMs);
 
@@ -158,9 +142,6 @@ class PrometheusPushService {
     });
   }
 
-  /**
-   * Stop the periodic push
-   */
   stop(): void {
     if (this.intervalId) {
       clearInterval(this.intervalId);
@@ -170,12 +151,15 @@ class PrometheusPushService {
     logger.info('Prometheus push service stopped');
   }
 
-  /**
-   * Push metrics to Grafana Cloud
-   */
   async pushMetrics(): Promise<void> {
+    if (!isGrafanaConfigured()) {
+      this.config = null;
+      logCollectorSkippedOnce('grafana');
+      return;
+    }
+    if (!this.config) this.initialize();
     if (!this.config) {
-      throw new Error('Push service not initialized');
+      return;
     }
 
     const samples = await this.collectSamples();
@@ -193,6 +177,7 @@ class PrometheusPushService {
         Authorization: `Basic ${Buffer.from(`${this.config.user}:${this.config.apiKey}`).toString('base64')}`,
       },
       body,
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok) {
@@ -203,9 +188,6 @@ class PrometheusPushService {
     logger.debug('Metrics pushed successfully', { count: samples.length });
   }
 
-  /**
-   * Collect all metrics as samples
-   */
   private async collectSamples(): Promise<MetricSample[]> {
     const samples: MetricSample[] = [];
     const now = Date.now();
@@ -241,9 +223,6 @@ class PrometheusPushService {
     return samples;
   }
 
-  /**
-   * Format samples as Influx Line Protocol (supported by Grafana Cloud)
-   */
   private formatInfluxLineProtocol(samples: MetricSample[]): string {
     return samples
       .map((s) => {
@@ -255,9 +234,6 @@ class PrometheusPushService {
       .join('\n');
   }
 
-  /**
-   * Check if service is configured and running
-   */
   isConfigured(): boolean {
     return this.config !== null;
   }

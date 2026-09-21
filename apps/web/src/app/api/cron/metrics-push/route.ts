@@ -1,32 +1,19 @@
 /**
- * Metrics Push Cron Job Handler (Every 5 Minutes)
- * Pushes metrics to Grafana Cloud including:
- * - HTTP/SLI metrics (latency, error rates)
- * - Real-time active users
- * - Funnel and churn metrics
- * - Session health metrics (success rate, dropoff rate) - for Grafana alerts
- *
- * Scheduled via Vercel Cron: every 5 minutes
- * Required env vars:
- *   - GRAFANA_CLOUD_PROMETHEUS_URL
- *   - GRAFANA_CLOUD_PROMETHEUS_USER
- *   - GRAFANA_CLOUD_API_KEY
- *   - CRON_SECRET (for authentication)
- * F-05b: All operational metrics collected every 5 minutes
+ * Authenticated five-minute Grafana push: HTTP/SLI, activity, funnel/churn,
+ * session health, waitlist and database-backed metrics.
+ * Requires all three existing GRAFANA_CLOUD_* credentials before collecting.
  */
-
-export const dynamic = 'force-dynamic';
-
-import * as Sentry from '@sentry/nextjs';
 import { pipe, withSentry, withCron } from '@/lib/api/middlewares';
 import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
-import { metricsStore } from '@/lib/observability/metrics-store';
-import { generateSLIMetrics } from '@/app/api/metrics/sli-metrics';
-import { generateBehavioralMetrics } from '@/app/api/metrics/behavioral-metrics';
-import { collectDatabaseBackedSamples } from '@/lib/observability/prometheus-push-service';
+import {
+  isGrafanaConfigured,
+  logCollectorSkippedOnce,
+  reportCollectorFailure,
+} from '@/lib/observability/collector-diagnostics';
+import { collectLightMetrics } from './collectors';
+import { pushToGrafana } from './transport';
 
-const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+export const dynamic = 'force-dynamic';
 
 const log = logger.child({ module: 'cron-metrics-push' });
 
@@ -36,461 +23,6 @@ interface PushResponse {
   duration_ms: number;
   metrics_pushed?: number;
   error?: string;
-}
-
-interface MetricSample {
-  name: string;
-  labels: Record<string, string>;
-  value: number;
-  timestamp: number;
-}
-
-/**
- * Collect light metrics samples for push (HTTP/SLI + real-time active users)
- */
-async function collectLightMetrics(): Promise<MetricSample[]> {
-  const samples: MetricSample[] = [];
-  const now = Date.now();
-
-  const env = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-  const instanceLabels = { instance: 'mirrorbuddy', env };
-
-  // 1. HTTP/SLI metrics from metrics store
-  const summary = metricsStore.getMetricsSummary();
-  const sliMetrics = generateSLIMetrics(summary);
-
-  for (const m of sliMetrics) {
-    samples.push({
-      name: m.name,
-      labels: { ...m.labels, env },
-      value: m.value,
-      timestamp: now,
-    });
-  }
-
-  // Route-level metrics
-  for (const [route, metrics] of Object.entries(summary.routes)) {
-    const routeLabels = { ...instanceLabels, route };
-    samples.push(
-      {
-        name: 'http_requests_total',
-        labels: routeLabels,
-        value: metrics.count,
-        timestamp: now,
-      },
-      {
-        name: 'http_request_duration_seconds',
-        labels: { ...routeLabels, quantile: '0.95' },
-        value: metrics.p95LatencyMs / 1000,
-        timestamp: now,
-      },
-      {
-        name: 'http_request_error_rate',
-        labels: routeLabels,
-        value: metrics.errorRate,
-        timestamp: now,
-      },
-    );
-  }
-
-  // 2. Real-time active users (from database - serverless safe)
-  let activityOperation = 'userActivity.countByType';
-  try {
-    const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
-
-    // Get unique user count per type (F-06: exclude test data via isTestData flag)
-    const uniqueByType = await prisma.$queryRaw<Array<{ userType: string; count: bigint }>>`
-      SELECT "userType", COUNT(DISTINCT identifier) as count
-      FROM "UserActivity"
-      WHERE timestamp >= ${windowStart}
-        AND "isTestData" = false
-      GROUP BY "userType"
-    `;
-
-    const counts: Record<string, number> = {
-      logged: 0,
-      trial: 0,
-      anonymous: 0,
-    };
-
-    for (const row of uniqueByType) {
-      counts[row.userType] = Number(row.count);
-    }
-
-    const total = counts.logged + counts.trial + counts.anonymous;
-
-    // Total active users by type
-    samples.push(
-      {
-        name: 'mirrorbuddy_realtime_active_users',
-        labels: { ...instanceLabels, user_type: 'total' },
-        value: total,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_realtime_active_users',
-        labels: { ...instanceLabels, user_type: 'logged' },
-        value: counts.logged,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_realtime_active_users',
-        labels: { ...instanceLabels, user_type: 'trial' },
-        value: counts.trial,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_realtime_active_users',
-        labels: { ...instanceLabels, user_type: 'anonymous' },
-        value: counts.anonymous,
-        timestamp: now,
-      },
-    );
-
-    // F-06: Dedicated trial session metrics
-    samples.push(
-      {
-        name: 'mirrorbuddy_trial_sessions_active',
-        labels: instanceLabels,
-        value: counts.trial,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_trial_to_total_ratio',
-        labels: instanceLabels,
-        value: total > 0 ? counts.trial / total : 0,
-        timestamp: now,
-      },
-    );
-
-    // Active users by route (top 10, F-06: exclude test data via isTestData flag)
-    activityOperation = 'userActivity.countByRoute';
-    const routeCounts = await prisma.$queryRaw<Array<{ route: string; count: bigint }>>`
-      SELECT route, COUNT(DISTINCT identifier) as count
-      FROM "UserActivity"
-      WHERE timestamp >= ${windowStart}
-        AND "isTestData" = false
-      GROUP BY route
-      ORDER BY count DESC
-      LIMIT 10
-    `;
-
-    for (const row of routeCounts) {
-      samples.push({
-        name: 'mirrorbuddy_realtime_active_users_by_route',
-        labels: { ...instanceLabels, route: row.route },
-        value: Number(row.count),
-        timestamp: now,
-      });
-    }
-
-    log.debug('Collected realtime active users from database', {
-      total,
-      logged: counts.logged,
-      trial: counts.trial,
-    });
-
-    // Cleanup old records (older than 10 minutes to be safe)
-    const cleanupCutoff = new Date(now - ACTIVITY_WINDOW_MS * 2);
-    activityOperation = 'userActivity.deleteMany';
-    await prisma.userActivity.deleteMany({
-      where: { timestamp: { lt: cleanupCutoff } },
-    });
-  } catch (err) {
-    Sentry.withScope((scope) => {
-      scope.setTag('cron', 'metrics-push');
-      scope.setTag('section', 'realtime-active-users');
-      log.error(
-        'Failed to collect realtime active users',
-        {
-          cron: 'metrics-push',
-          section: 'realtime-active-users',
-          operation: activityOperation,
-        },
-        err,
-      );
-    });
-  }
-
-  // 3. Funnel metrics (Plan 069, F-10)
-  try {
-    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
-
-    // Get counts per stage
-    const stageCounts = await prisma.funnelEvent.groupBy({
-      by: ['stage'],
-      where: {
-        createdAt: { gte: thirtyDaysAgo },
-        isTestData: false,
-      },
-      _count: { _all: true },
-    });
-
-    for (const sc of stageCounts) {
-      samples.push({
-        name: 'mirrorbuddy_funnel_stage_count',
-        labels: { ...instanceLabels, stage: sc.stage },
-        value: sc._count._all,
-        timestamp: now,
-      });
-    }
-
-    // Calculate conversion rates between stages
-    const stageOrder = [
-      'VISITOR',
-      'TRIAL_START',
-      'TRIAL_ENGAGED',
-      'LIMIT_HIT',
-      'BETA_REQUEST',
-      'APPROVED',
-      'FIRST_LOGIN',
-      'ACTIVE',
-    ];
-    const countMap = new Map(stageCounts.map((s) => [s.stage, s._count._all]));
-
-    for (let i = 1; i < stageOrder.length; i++) {
-      const prevCount = countMap.get(stageOrder[i - 1]) ?? 0;
-      const currCount = countMap.get(stageOrder[i]) ?? 0;
-      const rate = prevCount > 0 ? currCount / prevCount : 0;
-
-      samples.push({
-        name: 'mirrorbuddy_funnel_conversion_rate',
-        labels: {
-          ...instanceLabels,
-          from_stage: stageOrder[i - 1],
-          to_stage: stageOrder[i],
-        },
-        value: rate,
-        timestamp: now,
-      });
-    }
-
-    // Overall funnel conversion (VISITOR → ACTIVE)
-    const visitorCount = countMap.get('VISITOR') ?? 0;
-    const activeCount = countMap.get('ACTIVE') ?? 0;
-    samples.push({
-      name: 'mirrorbuddy_funnel_overall_conversion',
-      labels: instanceLabels,
-      value: visitorCount > 0 ? activeCount / visitorCount : 0,
-      timestamp: now,
-    });
-
-    log.debug('Collected funnel metrics', { stages: stageCounts.length });
-  } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'funnel-metrics' },
-    });
-    log.warn('Failed to collect funnel metrics', { error: String(err) });
-  }
-
-  // 4. Churn metrics (Plan 069)
-  try {
-    const churnCutoff = new Date(now - 14 * 24 * 60 * 60 * 1000); // 14 days
-
-    // Get latest stage per user to determine churn
-    // Uses DISTINCT ON to get the most recent funnel event per user
-    const latestStages = await prisma.$queryRaw<
-      Array<{ stage: string; last_activity: Date; is_churned: boolean }>
-    >`
-      WITH latest AS (
-        SELECT DISTINCT ON (COALESCE("visitorId", "userId"))
-          COALESCE("visitorId", "userId") as user_key,
-          stage,
-          "createdAt" as last_activity
-        FROM "FunnelEvent"
-        WHERE "isTestData" = false
-        ORDER BY COALESCE("visitorId", "userId"), "createdAt" DESC
-      )
-      SELECT
-        stage,
-        last_activity,
-        (last_activity < ${churnCutoff} AND stage NOT IN ('ACTIVE', 'FIRST_LOGIN')) as is_churned
-      FROM latest
-    `;
-
-    const totalUsers = latestStages.length;
-    const churnedUsers = latestStages.filter((u) => u.is_churned).length;
-    const churnRate = totalUsers > 0 ? churnedUsers / totalUsers : 0;
-
-    samples.push(
-      {
-        name: 'mirrorbuddy_funnel_total_users',
-        labels: instanceLabels,
-        value: totalUsers,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_funnel_churned_users',
-        labels: instanceLabels,
-        value: churnedUsers,
-        timestamp: now,
-      },
-      {
-        name: 'mirrorbuddy_funnel_churn_rate',
-        labels: instanceLabels,
-        value: churnRate,
-        timestamp: now,
-      },
-    );
-
-    // Churn by stage
-    const churnByStage = new Map<string, { total: number; churned: number }>();
-    for (const user of latestStages) {
-      if (!churnByStage.has(user.stage)) {
-        churnByStage.set(user.stage, { total: 0, churned: 0 });
-      }
-      const data = churnByStage.get(user.stage)!;
-      data.total++;
-      if (user.is_churned) data.churned++;
-    }
-
-    for (const [stage, data] of churnByStage) {
-      samples.push({
-        name: 'mirrorbuddy_funnel_stage_churn_rate',
-        labels: { ...instanceLabels, stage },
-        value: data.total > 0 ? data.churned / data.total : 0,
-        timestamp: now,
-      });
-    }
-
-    log.debug('Collected churn metrics', { totalUsers, churnedUsers });
-  } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'churn-metrics' },
-    });
-    log.warn('Failed to collect churn metrics', { error: String(err) });
-  }
-
-  // 5. Session health metrics (behavioral) - for Grafana alerts
-  try {
-    const behavioralMetrics = await generateBehavioralMetrics();
-    for (const m of behavioralMetrics) {
-      samples.push({
-        name: m.name,
-        labels: { ...m.labels, ...instanceLabels },
-        value: m.value,
-        timestamp: now,
-      });
-    }
-    log.debug('Collected behavioral metrics', {
-      count: behavioralMetrics.length,
-    });
-  } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'behavioral-metrics' },
-    });
-    log.warn('Failed to collect behavioral metrics', { error: String(err) });
-  }
-
-  // 6. Batch funnel event recording (ACTIVE + CHURNED)
-  try {
-    const { processBatchFunnelEvents } = await import('@/lib/funnel/batch-funnel');
-    const batchResult = await processBatchFunnelEvents();
-    log.debug('Batch funnel events processed', { ...batchResult });
-  } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'batch-funnel' },
-    });
-    log.warn('Failed to process batch funnel events', { error: String(err) });
-  }
-
-  // 7. Waitlist KPIs (Plan 157)
-  try {
-    const [total, verified, unsubscribed, promoRedeemed, converted] = await Promise.all([
-      prisma.waitlistEntry.count({ where: { isTestData: false } }),
-      prisma.waitlistEntry.count({ where: { isTestData: false, verifiedAt: { not: null } } }),
-      prisma.waitlistEntry.count({ where: { isTestData: false, unsubscribedAt: { not: null } } }),
-      prisma.waitlistEntry.count({ where: { isTestData: false, promoRedeemedAt: { not: null } } }),
-      prisma.waitlistEntry.count({ where: { isTestData: false, convertedUserId: { not: null } } }),
-    ]);
-
-    const conversionRate = total > 0 ? converted / total : 0;
-
-    samples.push(
-      { name: 'waitlist_signups_total', labels: instanceLabels, value: total, timestamp: now },
-      { name: 'waitlist_verified_total', labels: instanceLabels, value: verified, timestamp: now },
-      {
-        name: 'waitlist_unsubscribed_total',
-        labels: instanceLabels,
-        value: unsubscribed,
-        timestamp: now,
-      },
-      {
-        name: 'waitlist_promo_redeemed_total',
-        labels: instanceLabels,
-        value: promoRedeemed,
-        timestamp: now,
-      },
-      {
-        name: 'waitlist_conversion_rate',
-        labels: instanceLabels,
-        value: conversionRate,
-        timestamp: now,
-      },
-    );
-
-    log.debug('Collected waitlist metrics', {
-      total,
-      verified,
-      unsubscribed,
-      promoRedeemed,
-      converted,
-    });
-  } catch (err) {
-    Sentry.captureException(err, {
-      tags: { cron: 'metrics-push', section: 'waitlist-metrics' },
-    });
-    log.warn('Failed to collect waitlist metrics', { error: String(err) });
-  }
-
-  // Families that query the database run here, once per schedule, rather than
-  // from the per-instance push timer.
-  samples.push(...(await collectDatabaseBackedSamples(instanceLabels, now)));
-
-  return samples;
-}
-
-/**
- * Format samples as Influx Line Protocol
- */
-function formatInfluxLineProtocol(samples: MetricSample[]): string {
-  return samples
-    .map((s) => {
-      const tags = Object.entries(s.labels)
-        .map(([k, v]) => `${k}=${v.replace(/[\\,= ]/g, '\\$&')}`)
-        .join(',');
-      return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
-    })
-    .join('\n');
-}
-
-/**
- * Push metrics to Grafana Cloud
- */
-async function pushToGrafana(samples: MetricSample[]): Promise<void> {
-  const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
-  const user = process.env.GRAFANA_CLOUD_PROMETHEUS_USER;
-  const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
-
-  if (!url || !user || !apiKey) {
-    throw new Error('Grafana Cloud config incomplete (missing URL, USER, or API_KEY)');
-  }
-
-  const body = formatInfluxLineProtocol(samples);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain',
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
-    },
-    body,
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Push failed: ${response.status} ${text}`);
-  }
 }
 
 export const POST = pipe(
@@ -503,8 +35,6 @@ export const POST = pipe(
     timestamp: new Date().toISOString(),
     duration_ms: 0,
   };
-
-  // Skip cron in non-production environments (staging/preview)
   if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
     log.info(`[CRON] Skipping metrics-push - not production (env: ${process.env.VERCEL_ENV})`);
     return Response.json(
@@ -516,37 +46,35 @@ export const POST = pipe(
       { status: 200 },
     );
   }
-
-  // Check if Grafana Cloud is configured
-  if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
+  if (!isGrafanaConfigured()) {
     response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
-    log.info('Metrics push skipped (Grafana Cloud not configured)');
+    logCollectorSkippedOnce('grafana');
     return Response.json(response, { status: 200 });
   }
-
-  // Collect and push light metrics (HTTP/SLI + real-time active users)
   const samples = await collectLightMetrics();
-
   if (samples.length === 0) {
     response.status = 'skipped';
     response.duration_ms = Date.now() - startTime;
     log.info('No metrics to push');
     return Response.json(response, { status: 200 });
   }
-
-  await pushToGrafana(samples);
-
+  try {
+    await pushToGrafana(samples);
+  } catch (error) {
+    reportCollectorFailure('grafana_transport', error);
+    response.status = 'error';
+    response.error = 'Metrics push failed';
+    response.duration_ms = Date.now() - startTime;
+    return Response.json(response, { status: 502 });
+  }
   response.metrics_pushed = samples.length;
   response.duration_ms = Date.now() - startTime;
-
   log.info('Metrics pushed to Grafana Cloud', {
     metrics_count: samples.length,
     duration_ms: response.duration_ms,
   });
-
   return Response.json(response, { status: 200 });
 });
 
-// Vercel Cron uses GET by default
 export const GET = POST;

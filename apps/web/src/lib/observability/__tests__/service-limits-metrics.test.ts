@@ -68,11 +68,12 @@ describe('service limit collector health', () => {
       value: 0,
       timestamp,
     });
-    expect(logger.error).toHaveBeenCalledWith(
-      'Metrics collector failed',
-      { collector: 'supabase' },
-      error,
-    );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(    'Metrics collector failed: supabase', {
+      collector: 'supabase',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 
   it('reports an unconfigured Vercel integration as unavailable without an error report', async () => {
@@ -139,7 +140,7 @@ describe('service limit collector health', () => {
       });
       expect(
         vi
-          .mocked(logger.error)
+          .mocked(logger.warn)
           .mock.calls.filter(
             (call) => (call[1] as { collector?: string } | undefined)?.collector === collector,
           ),

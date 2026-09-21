@@ -15,6 +15,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { logCollectorSkippedOnce } from './collector-diagnostics';
 import { queryProjectUsage, queryTeamLimits, getDefaultLimits } from './vercel-api-client';
 import { calculateStatus, AlertStatus } from './threshold-logic';
 
@@ -74,29 +75,28 @@ let cache: CacheEntry | null = null;
  * Get Vercel project usage limits
  *
  * @returns Promise<VercelLimits> Current usage metrics
- * @throws Error if API token is missing or request fails
+ * Configuration absence and runtime failures are explicit status values.
  */
 export async function getVercelLimits(): Promise<VercelLimits> {
-  // Check cache first (rate limiting)
-  if (cache && cache.expiresAt > Date.now()) {
-    logger.debug('Returning cached Vercel limits');
-    return cache.data;
-  }
-
-  const token = process.env.VERCEL_TOKEN;
+  const token = process.env.VERCEL_TOKEN?.trim();
   const projectId = process.env.VERCEL_PROJECT_ID || process.env.VERCEL_URL?.split('.')[0];
   const teamId = process.env.VERCEL_TEAM_ID;
 
   if (!token) {
     const error = 'VERCEL_TOKEN not configured';
-    logger.debug(error);
+    logCollectorSkippedOnce('vercel');
     return createEmptyLimits(error, 'not_configured');
   }
 
-  if (!projectId) {
+  if (!projectId?.trim()) {
     const error = 'VERCEL_PROJECT_ID not configured';
-    logger.debug(error);
+    logCollectorSkippedOnce('vercel');
     return createEmptyLimits(error, 'not_configured');
+  }
+
+  if (cache && cache.expiresAt > Date.now()) {
+    logger.debug('Returning cached Vercel limits');
+    return cache.data;
   }
 
   try {

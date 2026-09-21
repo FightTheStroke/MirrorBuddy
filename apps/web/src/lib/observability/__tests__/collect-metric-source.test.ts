@@ -118,13 +118,12 @@ describe('metric source boundary', () => {
       },
       { name: 'metric_collector_up', labels: { collector: 'vercel' }, value: 0, timestamp: 42 },
     ]);
-    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-      'Metrics collector failed',
-      {
-        collector: 'vercel',
-      },
-      error,
-    );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(    'Metrics collector failed: vercel', {
+      collector: 'vercel',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 
   it.each([
@@ -139,11 +138,12 @@ describe('metric source boundary', () => {
       { name: 'metric_collector_enabled', labels: { collector: 'test' }, value: 1, timestamp: 42 },
       { name: 'metric_collector_up', labels: { collector: 'test' }, value: 0, timestamp: 42 },
     ]);
-    expect(logger.error).toHaveBeenCalledWith(
-      'Metrics collector failed',
-      { collector: 'test' },
-      expect.any(Error),
-    );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(    'Metrics collector failed: test', {
+      collector: 'test',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 
   it('retains validated partial usage and reports the original cause, never healthy state', async () => {
@@ -163,11 +163,11 @@ describe('metric source boundary', () => {
       42,
     );
     expect(result).toEqual([usage, ...state('azure_openai', 1, 0)]);
-    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-      'Metrics collector failed',
-      { collector: 'azure_openai' },
-      cause,
-    );
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(    'Metrics collector failed: azure_openai', {
+      collector: 'azure_openai',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 
   it('never publishes malformed partial usage even when a source supplies it with a failure', async () => {
@@ -183,10 +183,10 @@ describe('metric source boundary', () => {
       42,
     );
     expect(result).toEqual(state('azure_openai', 1, 0));
-    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-      'Metrics collector failed',
-      { collector: 'azure_openai' },
-      cause,
-    );
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(    'Metrics collector failed: azure_openai', {
+      collector: 'azure_openai',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 });

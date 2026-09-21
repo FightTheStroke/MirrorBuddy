@@ -50,14 +50,62 @@ Database connection pool (total/active/idle/waiting/utilization), AI provider co
 ## Grafana Cloud Push
 
 ```typescript
-import { prometheusPushService } from "@/lib/observability";
-// Singleton - auto-initialized via cron or manual
-// Pushes Influx Line Protocol to Grafana Cloud every 60s (production only)
+import { prometheusPushService } from '@/lib/observability';
+// Production instrumentation starts the instance-local push service.
+// The authenticated cron separately pushes database-backed metrics.
 ```
 
 **Env vars**: `GRAFANA_CLOUD_PROMETHEUS_URL`, `GRAFANA_CLOUD_PROMETHEUS_USER`, `GRAFANA_CLOUD_API_KEY`
 
 **Metrics collected**: HTTP latency/errors, funnel metrics, budget/abuse tracking, service limits, tier DAU/WAU/MAU.
+
+### Collection ownership and failure semantics
+
+| Path                     | Collector families                                                                                                                                                                                | Cadence                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Instance push            | HTTP, in-memory funnel, budget, abuse, conversion                                                                                                                                                 | Startup and `GRAFANA_CLOUD_PUSH_INTERVAL` (default 60 seconds); best effort on serverless |
+| `/api/cron/metrics-push` | SLI/HTTP summary, database active users and cleanup, database funnel/conversion, churn, behavioral/session health, batch funnel recording, waitlist, service limits (Vercel/Supabase/Azure), tier | Existing five-minute schedule                                                             |
+| Non-Vercel instance push | Also service limits and tier                                                                                                                                                                      | Same instance interval; unchanged                                                         |
+
+All three Grafana credentials must be nonblank before collecting. Missing Grafana
+configuration returns a skipped cron response and logs once per process at info;
+an unconfigured Vercel source likewise logs once and publishes only
+`metric_collector_enabled=0` / `metric_collector_up=0`, never fabricated usage.
+Separate serverless instances have separate once-only state.
+
+A configured source failure emits one warning with `component=metrics-collector`,
+collector name and safe error type/code/SQLSTATE/query/status where available.
+Warnings group by collector, so transport outages stay separate from source failures;
+both push paths share the `grafana_transport` identity.
+Driver messages, SQL text, provider response bodies and credentials are excluded.
+Valid sibling samples survive, with the failed source marked enabled=1/up=0.
+Transport failure is not success: cron returns 502 and reports one warning;
+the instance push reports once at its scheduling boundary.
+The production watch labels explicitly tagged collector warnings as
+`Monitoring warning`, not `Sentry error`, when both issue and latest-event severity
+are warning. These tickets remain actionable, including total transport outages
+when Grafana cannot receive health samples. No alert is filtered out. Error-level
+incidents, other warnings and unclassifiable events retain their existing handling.
+Cron section health uses distinct names (`cron-http`, `realtime-active-users`,
+`funnel-metrics`, `churn-metrics`, `behavioral-metrics`, `batch-funnel`,
+`waitlist-metrics`, `database-backed`) so it cannot overwrite timer health.
+Batch funnel persistence retains its existing error reporting: lost analytics
+writes are not reclassified as harmless collection failures.
+
+**Issue #1018 remains open.** Database-backed collection is already centralized on
+Vercel, but instance-local HTTP/funnel/budget/abuse/conversion state cannot be moved
+to cron without durable aggregation: the cron instance cannot read other instances'
+memory. Removing the timer alone would drop genuine measurements. Completing the
+single-schedule design needs lossless aggregation and actual received Grafana
+samples at the known cadence, not just a quiet error feed. This reliability change
+does not change cloud schedules, credentials or access.
+
+**Historical Supabase failures:** PR #1017 documented connection failures
+(`08006`/`XX000`) and lost error attribution; PR #1040 removed database-collector
+fanout from Vercel instance timers. The current `pg_database_size` and
+`COUNT(*) FROM pg_stat_activity` queries are unchanged: no SQL defect or production
+permission failure is established by the available issue evidence. Preserve
+named-query and driver-code diagnostics rather than guessing a query rewrite.
 
 ## Cron Jobs
 

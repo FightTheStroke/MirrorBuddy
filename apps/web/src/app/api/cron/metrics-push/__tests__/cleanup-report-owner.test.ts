@@ -11,7 +11,7 @@ vi.unmock('@/lib/logger');
 function errorCodes(value: unknown): string[] {
   if (!value || typeof value !== 'object') return [];
   return Object.entries(value).flatMap(([key, child]) =>
-    ['code', 'originalCode'].includes(key) && typeof child === 'string'
+    ['code', 'originalCode', 'errorCode', 'sqlState'].includes(key) && typeof child === 'string'
       ? [child]
       : ['cause', 'meta', 'driverAdapterError'].includes(key)
         ? errorCodes(child)
@@ -28,18 +28,18 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
     let route: typeof import('../route');
     let origin: string;
     let envelopes = 0;
-    const originalErrors: unknown[] = [];
-    const loggedErrors: unknown[] = [];
     const secret = randomUUID();
     const reports: Array<{
       kind: string;
+      level: unknown;
       codes: string[];
+      collector: unknown;
       section: unknown;
       operation: unknown;
       cron: unknown;
       observerProbe: boolean;
     }> = [];
-    const diagnostics: Array<{ level: string; operation: unknown }> = [];
+    const diagnostics: Array<{ level: string; codes: string[] }> = [];
     const payloads: string[] = [];
 
     beforeAll(async () => {
@@ -60,8 +60,8 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
         vi.spyOn(console, level).mockImplementation((value: unknown) => {
           if (typeof value !== 'string' || !value.startsWith('{')) return;
           const entry = JSON.parse(value);
-          if (entry.message === 'Failed to collect realtime active users')
-            diagnostics.push({ level: entry.level, operation: entry.context?.operation });
+          if (entry.context?.collector === 'realtime-active-users')
+            diagnostics.push({ level: entry.level, codes: errorCodes(entry.context) });
         });
       }
       Sentry.init({
@@ -75,16 +75,17 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
           },
           flush: async () => true,
         }),
-        beforeSend(event, hint) {
+        beforeSend(event) {
           reports.push({
             kind: event.exception ? 'exception' : 'message',
-            codes: errorCodes(hint.originalException),
+            level: event.level,
+            codes: errorCodes(event.extra),
+            collector: event.extra?.collector,
             section: event.tags?.section,
             operation: event.extra?.operation,
             cron: event.tags?.cron,
             observerProbe: event.message === 'c2-cron-tag-scope-sentinel',
           });
-          originalErrors.push(hint.originalException);
           return null;
         },
       });
@@ -120,19 +121,6 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       expect(await database.$queryRaw`SHOW transaction_read_only`).toEqual([
         { transaction_read_only: 'on' },
       ]);
-      const { logger } = await import('@/lib/logger');
-      const createChild = logger.child.bind(logger);
-      vi.spyOn(logger, 'child').mockImplementation((context) => {
-        const child = createChild(context);
-        if (context.module === 'cron-metrics-push') {
-          const output = child.error;
-          child.error = (message, details, error) => {
-            loggedErrors.push(error);
-            output(message, details, error);
-          };
-        }
-        return child;
-      });
       route = await import('../route');
     });
 
@@ -152,7 +140,7 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       }
     });
 
-    it('reports one original cleanup rejection with a visible diagnostic and continues the real route', async () => {
+    it('reports one safe cleanup warning and continues the real route with failed health', async () => {
       const before = await database.userActivity.count();
       const result = await route.GET(
         new NextRequest(`${origin}/api/cron/metrics-push`, {
@@ -179,19 +167,19 @@ describe.skipIf(!process.env.TEST_DATABASE_URL)(
       expect(payloads).toHaveLength(1);
       expect(response.metrics_pushed).toBe(payloads[0].split('\n').length);
       expect(payloads[0]).toContain('waitlist_signups_total');
+      expect(payloads[0]).toMatch(
+        /metric_collector_up,[^\n]*collector=realtime-active-users[^\n]* value=0 /,
+      );
       expect(await database.userActivity.count()).toBe(before);
       expect(envelopes).toBe(0);
       expect(faultReports).toHaveLength(1);
-      expect(originalErrors[0] === loggedErrors[0]).toBe(true);
-      expect(loggedErrors).toHaveLength(1);
       expect(faultReports[0]).toMatchObject({
-        kind: 'exception',
+        kind: 'message',
+        level: 'warning',
         codes: expect.arrayContaining(['25006']),
-        cron: 'metrics-push',
-        section: 'realtime-active-users',
-        operation: 'userActivity.deleteMany',
+        collector: 'realtime-active-users',
       });
-      expect(diagnostics).toEqual([{ level: 'error', operation: 'userActivity.deleteMany' }]);
+      expect(diagnostics).toEqual([{ level: 'warn', codes: expect.arrayContaining(['25006']) }]);
     }, 20000);
   },
 );

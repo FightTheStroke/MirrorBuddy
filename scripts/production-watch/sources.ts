@@ -14,6 +14,7 @@ export interface ProductionAlert {
   /** ISO timestamp of the most recent occurrence. */
   lastSeen: string;
   source: 'sentry' | 'vercel';
+  monitoring?: boolean;
 }
 
 export interface SentryIssue {
@@ -26,6 +27,7 @@ export interface SentryIssue {
   permalink: string;
   firstSeen: string;
   lastSeen: string;
+  level?: string;
 }
 
 const sentryIssueSchema = z.object({
@@ -40,9 +42,11 @@ const sentryIssueSchema = z.object({
   permalink: z.string().url(),
   firstSeen: z.string().datetime({ offset: true }),
   lastSeen: z.string().datetime({ offset: true }),
+  level: z.string().optional(),
 });
 
 const sentryEventSchema = z.object({
+  level: z.string().optional(),
   tags: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
 });
 
@@ -124,6 +128,15 @@ export async function fetchSentryAlerts(
       );
       if (!eventResponse.ok) throw new Error(`Sentry event replied ${eventResponse.status}`);
       const event = sentryEventSchema.parse(await eventResponse.json());
+      // Keep monitoring outages actionable without mislabelling them as application errors.
+      if (
+        issue.level === 'warning' &&
+        event.level === 'warning' &&
+        event.tags?.some((tag) => tag.key === 'component' && tag.value === 'metrics-collector')
+      ) {
+        alert.monitoring = true;
+        alert.details.push('Monitoring degraded; this warning does not establish user impact.');
+      }
       environment = event.tags?.find((tag) => tag.key === 'environment')?.value || 'unknown';
     } catch (error) {
       // Classification failure must not discard the known, active issue.

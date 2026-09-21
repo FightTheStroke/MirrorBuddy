@@ -49,6 +49,7 @@ describe('independent metrics push', () => {
   });
 
   afterEach(() => {
+    prometheusPushService.stop();
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
@@ -72,11 +73,12 @@ describe('independent metrics push', () => {
       'metric_collector_up,instance=mirrorbuddy,env=production,collector=http value=1 ',
     );
     expect(body).not.toContain('tier_users');
-    expect(logger.error).toHaveBeenCalledWith(
-      'Metrics collector failed',
-      { collector: 'tier' },
-      error,
-    );
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith('Metrics collector failed: tier', {
+      collector: 'tier',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
 
     await prometheusPushService.pushMetrics();
     expect(fetchMock.mock.calls[1][1].body).toContain('collector=tier value=1 ');
@@ -94,11 +96,11 @@ describe('independent metrics push', () => {
     expect(collectTierMetrics).toHaveBeenCalled();
     expect(fetchMock.mock.calls[0][1].body).toContain('collector=funnel value=0 ');
     expect(fetchMock.mock.calls[0][1].body).toContain('http_requests_total');
-    expect(logger.error).toHaveBeenCalledWith(
-      'Metrics collector failed',
-      { collector: 'funnel' },
-      error,
-    );
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith('Metrics collector failed: funnel', {
+      collector: 'funnel',
+      component: 'metrics-collector',
+      errorType: 'Error',
+    });
   });
 
   it('does not turn transport failures into successful pushes', async () => {
@@ -120,15 +122,26 @@ describe('independent metrics push', () => {
     expect(pushError.responseBody).toContain('over quota');
   });
 
-  it('reports a failed start-up push with the original error, not a stringified copy', async () => {
-    const failure = new Error('fetch failed');
+  it('reports a failed start-up push once at warning level with safe driver attribution', async () => {
+    const failure = new TypeError('fetch failed', {
+      cause: Object.assign(new Error('connection refused'), { code: 'ECONNREFUSED' }),
+    });
     fetchMock.mockRejectedValueOnce(failure);
 
     prometheusPushService.start();
-    await vi.waitFor(() => expect(logger.error).toHaveBeenCalled());
+    await vi.waitFor(() => expect(logger.warn).toHaveBeenCalled());
     prometheusPushService.stop();
 
-    expect(logger.error).toHaveBeenCalledWith('Metrics push failed', { phase: 'initial' }, failure);
+    expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      'Metrics collector failed: grafana_transport',
+      {
+        collector: 'grafana_transport',
+        component: 'metrics-collector',
+        errorType: 'TypeError',
+        code: 'ECONNREFUSED',
+      },
+    );
   });
 
   it('marks composite service limits degraded without discarding valid child samples', async () => {
