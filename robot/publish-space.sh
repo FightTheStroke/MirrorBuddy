@@ -96,8 +96,25 @@ REMOTE="https://huggingface.co/spaces/$SPACE"
 if [ -n "${HF_TOKEN:-}" ]; then
   REMOTE="https://user:${HF_TOKEN}@huggingface.co/spaces/$SPACE"
 fi
-git clone -q "$REMOTE" "$WORK/repo" 2>/dev/null || {
-  echo "✗ Could not reach the Space. Check HF_TOKEN, or run: hf auth login" >&2
+
+# The remote's own words, minus the credential that travels in the URL. Hiding
+# them once cost three days: the script blamed the token while the Hub was
+# rejecting a binary file, so the investigation started from a false statement.
+REMOTE_ERR="$WORK/remote.err"
+report_remote() {
+  [ -s "$REMOTE_ERR" ] || return 0
+  echo "  The remote said:" >&2
+  if [ -n "${HF_TOKEN:-}" ]; then
+    sed "s|${HF_TOKEN}|<token>|g" "$REMOTE_ERR" | sed 's/^/    /' >&2
+  else
+    sed 's/^/    /' "$REMOTE_ERR" >&2
+  fi
+}
+
+git clone -q "$REMOTE" "$WORK/repo" 2>"$REMOTE_ERR" || {
+  echo "✗ Could not reach the Space $SPACE." >&2
+  report_remote
+  echo "  Usually HF_TOKEN is missing or expired; otherwise run: hf auth login" >&2
   exit 1
 }
 cd "$WORK/repo"
@@ -112,8 +129,11 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git commit -q -m "Publish MirrorBuddy for Reachy Mini"
-git push -q origin HEAD 2>/dev/null || {
-  echo "✗ Push refused. The token needs write access to $SPACE." >&2
+git push -q origin HEAD 2>"$REMOTE_ERR" || {
+  echo "✗ Push refused by $SPACE — nothing was published." >&2
+  report_remote
+  echo "  Common causes: the token lacks write access, or the push carries a" >&2
+  echo "  binary file, which the Hub rejects on a plain push." >&2
   exit 1
 }
 git remote set-url origin "https://huggingface.co/spaces/$SPACE"
