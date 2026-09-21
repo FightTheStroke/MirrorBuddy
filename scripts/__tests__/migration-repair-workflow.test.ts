@@ -18,7 +18,9 @@ describe('production migration repair workflow', () => {
   it('reads by default and offers only the repair outcome Prisma needs here', () => {
     const action = workflow.split('      action:')[1]?.split('      confirm:')[0] ?? '';
     expect(action).toContain('default: status');
-    expect(action).toMatch(/options:\s*\n\s*- status\s*\n\s*- applied\s*\n/);
+    // Both read-only actions precede the only writing one, which keeps the
+    // dangerous choice last in the dispatch form rather than adjacent to status.
+    expect(action).toMatch(/options:\s*\n\s*- status\s*\n\s*- orphans\s*\n\s*- applied\s*\n/);
     expect(action).not.toContain('rolled-back');
   });
 
@@ -26,9 +28,23 @@ describe('production migration repair workflow', () => {
     const guard = workflow
       .split('- name: Require an explicit confirmation before any write')[1]
       ?.split('- name:')[0];
-    expect(guard).toContain("if: inputs.action != 'status'");
+    // Named explicitly rather than "not status": a third read-only action would
+    // otherwise inherit the write path the moment it is added.
+    expect(guard).toContain("if: inputs.action == 'applied'");
     expect(guard).toContain('"$CONFIRM" != "REPAIR"');
     expect(guard).toContain('exit 1');
+  });
+
+  it('keeps the orphan count read-only', () => {
+    const count = workflow
+      .split('- name: Count the rows the migration would remove')[1]
+      ?.split('- name:')[0];
+    expect(count).toContain("if: inputs.action == 'orphans'");
+    expect(count).toContain('scripts/count-migration-orphans.ts');
+    for (const writing of ['- name: Resolve the failed migration', '- name: Confirm the repair']) {
+      const step = workflow.split(writing)[1]?.split('- name:')[0] ?? '';
+      expect(step).toContain("inputs.action == 'applied'");
+    }
   });
 
   it('accepts only a migration that exists in the checked-out source', () => {

@@ -12,12 +12,13 @@ on:
         required: true
         type: string
       action:
-        description: 'status = read-only report. applied = mark the failed row as applied.'
+        description: 'status = read-only report. orphans = read-only count of rows a cleanup migration would remove. applied = mark the failed row as applied.'
         required: true
         default: status
         type: choice
         options:
           - status
+          - orphans
           - applied
       confirm:
         description: 'Type REPAIR to allow a write. Ignored when action is status.'
@@ -80,7 +81,7 @@ jobs:
           echo "Migration found: ${MIGRATION}"
 
       - name: Require an explicit confirmation before any write
-        if: inputs.action != 'status'
+        if: inputs.action == 'applied'
         env:
           CONFIRM: ${{ inputs.confirm }}
         run: |
@@ -97,14 +98,25 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
           MIGRATION: ${{ inputs.migration }}
-          EXPECT: ${{ inputs.action == 'status' && 'report' || 'failed' }}
+          EXPECT: ${{ inputs.action == 'applied' && 'failed' || 'report' }}
         run: pnpm exec tsx scripts/check-failed-migration.ts "$MIGRATION" "$EXPECT"
+
+      # A cleanup migration deletes rows before it can install a constraint, and
+      # production is where that is irreversible. Counting first turns "how much
+      # does this remove?" from a guess into a number, and writes nothing.
+      - name: Count the rows the migration would remove
+        if: inputs.action == 'orphans'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_URL }}
+          MIGRATION: ${{ inputs.migration }}
+        run: pnpm exec tsx scripts/count-migration-orphans.ts
 
       # Every `prisma migrate` subcommand prints a datasource banner that includes the
       # database host, and Actions masks only the whole secret, never a substring of it.
       # The output stays in the runner; the verification step reports what happened.
       - name: Resolve the failed migration
-        if: inputs.action != 'status'
+        if: inputs.action == 'applied'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -121,7 +133,7 @@ jobs:
       # Runs after a failed resolve too: a red run with no state report is the situation
       # this workflow exists to avoid, and the check prints no host.
       - name: Confirm the repair landed
-        if: ${{ !cancelled() && inputs.action != 'status' }}
+        if: ${{ !cancelled() && inputs.action == 'applied' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
