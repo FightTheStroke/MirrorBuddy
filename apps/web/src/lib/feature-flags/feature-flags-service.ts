@@ -1,16 +1,15 @@
 /**
- * Feature Flags Service
- *
- * V1Plan FASE 2.0.6: Centralized feature flag management
- * - Prisma persistence for production reliability
- * - In-memory cache for performance
- * - Kill-switch support for emergency disabling
- * - Percentage-based rollout
- * - Graceful degradation hooks
+ * Centralized feature flag checks and optimistic local safety controls.
+ * Database read recovery is isolated from local overrides.
  */
-
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import {
+  getFlag,
+  isGlobalKillSwitchActive,
+  applyLocalUpdate,
+  applyLocalGlobalPolicy,
+} from './feature-flags-policy';
 import type {
   FeatureFlag,
   FeatureFlagCheckResult,
@@ -19,299 +18,22 @@ import type {
   KnownFeatureFlag,
 } from './types';
 
-// Default feature flags configuration
-const DEFAULT_FLAGS: Record<KnownFeatureFlag, Omit<FeatureFlag, 'id' | 'updatedAt'>> = {
-  voice_realtime: {
-    name: 'Real-time Voice',
-    description: 'WebSocket-based real-time voice conversations',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_realtime_15: {
-    name: 'Real-time Voice 1.5',
-    description: 'Control rollout of GPT Audio 1.5 realtime stack',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_realtime_2: {
-    name: 'Real-time Voice 2.0 (Preview)',
-    description:
-      'ADR 0165: Drop-in next-gen gpt-realtime-2 (Preview, 2026-05-06). Activated 100% — preferred over v1.5 when AZURE_OPENAI_REALTIME_DEPLOYMENT_V2 is configured (with graceful fallback to V15/legacy).',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_realtime_21: {
-    name: 'Real-time Voice 2.1',
-    description:
-      'ADR 0169: gpt-realtime-2.1 (2026-07-07) + Cedar voice. Better alphanumeric speech (dates/numbers/formulas), noise robustness, lower latency. Preferred over v2 when AZURE_OPENAI_REALTIME_DEPLOYMENT_V21 is set (graceful fallback to V2/V15/legacy).',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_realtime_whisper_transcription: {
-    name: 'Realtime Whisper Transcription',
-    description:
-      'ADR 0165: Use gpt-realtime-whisper as input.transcription.model — tighter caption deltas for DSA profiles.',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_realtime_translate: {
-    name: 'Realtime Translate (Pending Azure)',
-    description:
-      'ADR 0165: gpt-realtime-translate S2S. Deployment exists, but Azure /v1/realtime/translations endpoint is not yet available in swedencentral.',
-    status: 'degraded',
-    enabledPercentage: 0,
-    killSwitch: false,
-  },
-  rag_enabled: {
-    name: 'RAG Retrieval',
-    description: 'Semantic search for conversation context',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  flashcards: {
-    name: 'FSRS Flashcards',
-    description: 'Spaced repetition flashcard system',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  mindmap: {
-    name: 'Mind Maps',
-    description: 'Interactive mind map generation',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  quiz: {
-    name: 'Quiz Generation',
-    description: 'AI-generated quizzes from content',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  pomodoro: {
-    name: 'Pomodoro Timer',
-    description: 'Focus timer with breaks',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  gamification: {
-    name: 'Gamification',
-    description: 'XP, levels, and achievements',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  parent_dashboard: {
-    name: 'Parent Dashboard',
-    description: 'Parent/professor monitoring portal',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  pdf_export: {
-    name: 'PDF Export',
-    description: 'Accessible PDF generation',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  ambient_audio: {
-    name: 'Ambient Audio',
-    description: 'Background study sounds',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_ga_protocol: {
-    name: 'Voice GA Protocol',
-    description: 'Use GA realtime API (session.type=realtime format)',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_full_prompt: {
-    name: 'Voice Full Prompt',
-    description: 'Use full system prompt instead of truncated',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_transcript_safety: {
-    name: 'Voice Transcript Safety',
-    description: 'Enable transcript safety checking',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  voice_calling_overlay: {
-    name: 'Voice Calling Overlay',
-    description: 'New calling overlay UI',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  tts_audio_15: {
-    name: 'TTS Audio 1.5',
-    description: 'Enable GPT Audio 1.5 text-to-speech voices',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  chat_unified_view: {
-    name: 'Chat Unified View',
-    description: 'Unified conversation view across character types',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-  consent_unified_model: {
-    name: 'Consent Unified Model',
-    description: 'Unified consent storage model',
-    status: 'enabled',
-    enabledPercentage: 100,
-    killSwitch: false,
-  },
-};
+export {
+  initializeFlags,
+  reloadFlags,
+  getFlag,
+  getAllFlags,
+  isGlobalKillSwitchActive,
+  getGlobalKillSwitchReason,
+  isUsingFallbackDefaults,
+  _resetForTesting,
+} from './feature-flags-policy';
 
-// In-memory cache for performance
-const flagCache = new Map<string, FeatureFlag>();
-let globalKillSwitch = false;
-let globalKillSwitchReason: string | undefined;
-// True once the database policy has been loaded into the cache.
-let databaseLoaded = false;
-// True while checks are answered from compiled defaults instead of the database.
-let usingFallbackDefaults = true;
-let loadFailureReported = false;
-
-/**
- * Initialize flags from database, seeding defaults if needed
- *
- * Safe to call more than once: the database is read only until its policy is
- * loaded. A previous fallback to compiled defaults does not prevent the load,
- * so kill switches and rollout percentages still take effect on an instance
- * that already answered a check.
- */
-export async function initializeFlags(): Promise<void> {
-  if (databaseLoaded) return;
-
-  try {
-    // Load global config (create if missing)
-    const globalConfig = await prisma.globalConfig.upsert({
-      where: { id: 'global' },
-      update: {},
-      create: { id: 'global', killSwitch: false },
-    });
-
-    globalKillSwitch = globalConfig.killSwitch;
-    globalKillSwitchReason = globalConfig.killSwitchReason ?? undefined;
-
-    // Load existing flags from DB
-    const dbFlags = await prisma.featureFlag.findMany();
-    const dbFlagMap = new Map(dbFlags.map((f) => [f.id, f]));
-
-    // Seed missing flags and populate cache
-    for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
-      const existing = dbFlagMap.get(id);
-
-      if (existing) {
-        // Use DB value
-        flagCache.set(id, {
-          id: existing.id,
-          name: existing.name,
-          description: existing.description,
-          status: existing.status as FeatureFlagStatus,
-          enabledPercentage: existing.enabledPercentage,
-          killSwitch: existing.killSwitch,
-          metadata: existing.metadata as Record<string, unknown> | undefined,
-          updatedAt: existing.updatedAt,
-          updatedBy: existing.updatedBy ?? undefined,
-        });
-      } else {
-        // Seed to DB and cache (upsert for race condition safety - ADR 0105)
-        const newFlag = await prisma.featureFlag.upsert({
-          where: { id },
-          update: {},
-          create: {
-            id,
-            name: config.name,
-            description: config.description,
-            status: config.status,
-            enabledPercentage: config.enabledPercentage,
-            killSwitch: config.killSwitch,
-          },
-        });
-
-        flagCache.set(id, {
-          id: newFlag.id,
-          name: newFlag.name,
-          description: newFlag.description,
-          status: newFlag.status as FeatureFlagStatus,
-          enabledPercentage: newFlag.enabledPercentage,
-          killSwitch: newFlag.killSwitch,
-          updatedAt: newFlag.updatedAt,
-        });
-      }
-    }
-
-    databaseLoaded = true;
-    usingFallbackDefaults = false;
-    loadFailureReported = false;
-    logger.info('Feature flags initialized from database', {
-      count: flagCache.size,
-    });
-  } catch (error) {
-    // Serve compiled defaults until the database becomes reachable again.
-    if (!loadFailureReported) {
-      loadFailureReported = true;
-      logger.error('Failed to load flags from DB, using defaults', undefined, error);
-    }
-    ensureFallbackDefaults();
-  }
-}
-
-/**
- * Populate the cache with compiled defaults
- *
- * Provisional: a later successful database load replaces these values. Absent
- * database policy is not an error, so it is not reported as one.
- */
-function ensureFallbackDefaults(): void {
-  usingFallbackDefaults = true;
-  if (flagCache.size > 0) return;
-
-  const now = new Date();
-  for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
-    flagCache.set(id, { id, ...config, updatedAt: now });
-  }
-  logger.debug('Feature flags answered from compiled defaults (database policy not loaded)');
-}
-
-/**
- * Whether checks are currently answered from compiled defaults
- */
-export function isUsingFallbackDefaults(): boolean {
-  return usingFallbackDefaults;
-}
-
-/**
- * Check if a feature is enabled
- */
 export function isFeatureEnabled(
   featureId: KnownFeatureFlag,
   userId?: string,
 ): FeatureFlagCheckResult {
-  if (!databaseLoaded) ensureFallbackDefaults();
-
-  const flag = flagCache.get(featureId);
-
+  const flag = getFlag(featureId);
   if (!flag) {
     logger.warn('Unknown feature flag checked', { featureId });
     return {
@@ -328,71 +50,36 @@ export function isFeatureEnabled(
       },
     };
   }
-
-  // Global kill-switch takes priority
-  if (globalKillSwitch) {
+  if (isGlobalKillSwitchActive() || flag.killSwitch) {
     return { enabled: false, reason: 'kill_switch', flag };
   }
-
-  // Per-feature kill-switch
-  if (flag.killSwitch) {
-    return { enabled: false, reason: 'kill_switch', flag };
-  }
-
-  // Status check
   if (flag.status === 'disabled') {
     return { enabled: false, reason: 'disabled', flag };
   }
-
   if (flag.status === 'degraded') {
     return { enabled: true, reason: 'degraded', flag };
   }
-
-  // Percentage rollout (deterministic based on userId)
   if (flag.enabledPercentage < 100 && userId) {
-    const hash = simpleHash(userId + featureId);
-    const bucket = hash % 100;
+    const bucket = simpleHash(userId + featureId) % 100;
     if (bucket >= flag.enabledPercentage) {
       return { enabled: false, reason: 'percentage_rollout', flag };
     }
   }
-
   return { enabled: true, reason: 'enabled', flag };
 }
 
-/**
- * Update a feature flag (persists to DB)
- */
 export async function updateFlag(
   featureId: KnownFeatureFlag,
   update: FeatureFlagUpdate,
 ): Promise<FeatureFlag | null> {
-  if (!databaseLoaded) ensureFallbackDefaults();
-
-  const flag = flagCache.get(featureId);
-  if (!flag) {
+  if (!getFlag(featureId)) {
     logger.warn('Attempted to update unknown flag', { featureId });
     return null;
   }
-
-  const updated: FeatureFlag = {
-    ...flag,
-    ...(update.status !== undefined && { status: update.status }),
-    ...(update.enabledPercentage !== undefined && {
-      enabledPercentage: Math.min(100, Math.max(0, update.enabledPercentage)),
-    }),
-    ...(update.killSwitch !== undefined && { killSwitch: update.killSwitch }),
-    ...(update.metadata && {
-      metadata: { ...flag.metadata, ...update.metadata },
-    }),
-    updatedAt: new Date(),
-    updatedBy: update.updatedBy,
-  };
-
-  // Update cache immediately
-  flagCache.set(featureId, updated);
-
-  // Persist to DB (upsert for robustness when record doesn't exist yet)
+  // A database reload must never revoke an immediate local safety control.
+  applyLocalUpdate(featureId, update);
+  const updated = getFlag(featureId);
+  if (!updated) throw new Error('Feature flag disappeared during local update');
   try {
     const dbData = {
       status: updated.status,
@@ -402,7 +89,6 @@ export async function updateFlag(
       metadata: updated.metadata ? JSON.parse(JSON.stringify(updated.metadata)) : undefined,
       updatedBy: update.updatedBy,
     };
-
     await prisma.featureFlag.upsert({
       where: { id: featureId },
       update: dbData,
@@ -415,38 +101,25 @@ export async function updateFlag(
     });
   } catch (error) {
     logger.error('Failed to persist flag update', { featureId }, error);
-    // Cache is still updated - will sync on next restart
   }
-
   logger.info('Feature flag updated', {
     featureId,
     status: updated.status,
     killSwitch: updated.killSwitch,
     updatedBy: update.updatedBy,
   });
-
   return updated;
 }
 
-/**
- * Activate kill-switch for a feature
- */
 export async function activateKillSwitch(
   featureId: KnownFeatureFlag,
   reason: string,
   updatedBy?: string,
 ): Promise<void> {
-  await updateFlag(featureId, {
-    killSwitch: true,
-    metadata: { reason },
-    updatedBy,
-  });
+  await updateFlag(featureId, { killSwitch: true, metadata: { reason }, updatedBy });
   logger.error('Kill-switch activated', { featureId, reason, updatedBy });
 }
 
-/**
- * Deactivate kill-switch for a feature
- */
 export async function deactivateKillSwitch(
   featureId: KnownFeatureFlag,
   updatedBy?: string,
@@ -455,13 +128,8 @@ export async function deactivateKillSwitch(
   logger.info('Kill-switch deactivated', { featureId, updatedBy });
 }
 
-/**
- * Set global kill-switch (persists to DB)
- */
 export async function setGlobalKillSwitch(enabled: boolean, reason?: string): Promise<void> {
-  globalKillSwitch = enabled;
-  globalKillSwitchReason = reason;
-
+  applyLocalGlobalPolicy(enabled, reason);
   try {
     await prisma.globalConfig.upsert({
       where: { id: 'global' },
@@ -471,7 +139,6 @@ export async function setGlobalKillSwitch(enabled: boolean, reason?: string): Pr
   } catch (error) {
     logger.error('Failed to persist global kill-switch', undefined, error);
   }
-
   if (enabled) {
     logger.error('GLOBAL kill-switch activated', { reason });
   } else {
@@ -479,33 +146,6 @@ export async function setGlobalKillSwitch(enabled: boolean, reason?: string): Pr
   }
 }
 
-export function isGlobalKillSwitchActive(): boolean {
-  return globalKillSwitch;
-}
-
-export function getGlobalKillSwitchReason(): string | undefined {
-  return globalKillSwitchReason;
-}
-
-/**
- * Get all flags
- */
-export function getAllFlags(): FeatureFlag[] {
-  if (!databaseLoaded) ensureFallbackDefaults();
-  return Array.from(flagCache.values());
-}
-
-/**
- * Get a single flag
- */
-export function getFlag(featureId: KnownFeatureFlag): FeatureFlag | undefined {
-  if (!databaseLoaded) ensureFallbackDefaults();
-  return flagCache.get(featureId);
-}
-
-/**
- * Set flag status
- */
 export async function setFlagStatus(
   featureId: KnownFeatureFlag,
   status: FeatureFlagStatus,
@@ -514,34 +154,11 @@ export async function setFlagStatus(
   return updateFlag(featureId, { status, updatedBy });
 }
 
-/**
- * Reload flags from database (useful after external changes)
- */
-export async function reloadFlags(): Promise<void> {
-  databaseLoaded = false;
-  flagCache.clear();
-  await initializeFlags();
-}
-
-// Simple hash function for deterministic percentage rollout
 function simpleHash(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
+    hash = (hash << 5) - hash + str.charCodeAt(i);
     hash = hash & hash;
   }
   return Math.abs(hash);
-}
-
-/**
- * Reset state (for testing only)
- */
-export function _resetForTesting(): void {
-  flagCache.clear();
-  globalKillSwitch = false;
-  globalKillSwitchReason = undefined;
-  databaseLoaded = false;
-  usingFallbackDefaults = true;
-  loadFailureReported = false;
 }
