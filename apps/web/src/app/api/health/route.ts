@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getAppVersion } from '@/lib/version';
 import { pipe, withSentry } from '@/lib/api/middlewares';
+import { checkMemory } from '@/lib/health-memory';
 
 // Track server start time for uptime calculation
 
@@ -121,40 +122,6 @@ async function checkAIProvider(): Promise<CheckResult> {
   }
 }
 
-function checkMemory(): CheckResult {
-  const used = process.memoryUsage();
-  const heapUsedMB = Math.round(used.heapUsed / 1024 / 1024);
-  const heapTotalMB = Math.round(used.heapTotal / 1024 / 1024);
-  const usagePercent = Math.round((used.heapUsed / used.heapTotal) * 100);
-
-  let status: 'pass' | 'warn' | 'fail' = 'pass';
-
-  // Vercel serverless functions start with small heap (~30MB)
-  // Use absolute thresholds for small heaps, percentage for larger ones
-  const isServerlessSmallHeap = heapTotalMB < 100;
-
-  if (isServerlessSmallHeap) {
-    // For serverless: warn at 200MB, fail at 400MB absolute
-    if (heapUsedMB > 400) {
-      status = 'fail';
-    } else if (heapUsedMB > 200) {
-      status = 'warn';
-    }
-  } else {
-    // For larger heaps: use percentage thresholds
-    if (usagePercent > 90) {
-      status = 'fail';
-    } else if (usagePercent > 70) {
-      status = 'warn';
-    }
-  }
-
-  return {
-    status,
-    message: `${heapUsedMB}MB / ${heapTotalMB}MB (${usagePercent}%)`,
-  };
-}
-
 function getOverallStatus(checks: HealthCheck['checks']): HealthCheck['status'] {
   const results = Object.values(checks);
 
@@ -170,7 +137,8 @@ function getOverallStatus(checks: HealthCheck['checks']): HealthCheck['status'] 
 export const GET = pipe(withSentry('/api/health'))(async () => {
   const [database, ai_provider] = await Promise.all([checkDatabase(), checkAIProvider()]);
 
-  const memory = checkMemory();
+  const { status: memoryStatus, message } = checkMemory();
+  const memory = { status: memoryStatus, message };
 
   const checks = { database, ai_provider, memory };
   const status = getOverallStatus(checks);
