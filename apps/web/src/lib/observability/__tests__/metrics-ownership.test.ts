@@ -5,22 +5,6 @@ import { collectServiceLimitsSamples } from '../service-limits-metrics';
 import { collectTierMetrics } from '../tier-metrics-collector';
 import { prometheusPushService } from '../prometheus-push-service';
 import { metricsStore } from '../metrics-store';
-import {
-  incrementTrialStarted,
-  incrementTrialEngaged,
-  incrementTrialLimitHit,
-  incrementBetaRequested,
-  incrementInviteRequested,
-  incrementInviteApproved,
-  incrementInviteRejected,
-  incrementFirstLogin,
-  incrementActiveUser,
-  incrementAbuseFlagged,
-  incrementAbuseBlocked,
-  addAbuseScore,
-  updateBudget,
-  resetFunnelMetrics,
-} from '../funnel-metrics';
 
 vi.mock('../service-limits-metrics', () => ({ collectServiceLimitsSamples: vi.fn(() => []) }));
 vi.mock('../tier-metrics-collector', () => ({ collectTierMetrics: vi.fn(() => []) }));
@@ -39,13 +23,11 @@ beforeEach(() => {
   vi.stubGlobal('fetch', fetchMock);
   fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
   metricsStore.reset();
-  resetFunnelMetrics();
   prometheusPushService.initialize();
 });
 afterEach(() => {
   prometheusPushService.stop();
   metricsStore.reset();
-  resetFunnelMetrics();
   vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
@@ -76,78 +58,53 @@ describe('collector ownership', () => {
   });
 
   it.each(['1', ''])(
-    'delivers all 32 local metric names with their real values (VERCEL=%s)',
+    'delivers only the 10 observed proxy diagnostics (VERCEL=%s)',
     async (vercel) => {
       vi.stubEnv('VERCEL', vercel);
       metricsStore.recordLatency('/api/chat', 200);
       metricsStore.recordError('/api/chat', 500);
-      incrementTrialStarted();
-      incrementTrialStarted();
-      incrementTrialEngaged();
-      incrementTrialLimitHit();
-      incrementBetaRequested();
-      incrementInviteRequested();
-      incrementInviteApproved();
-      incrementInviteRejected();
-      incrementFirstLogin();
-      incrementActiveUser();
-      updateBudget(25, 100);
-      incrementAbuseFlagged();
-      incrementAbuseBlocked();
-      addAbuseScore(7);
-
       await prometheusPushService.pushMetrics();
 
       const expected: Record<string, number> = {
-        http_requests_total: 1,
-        http_request_duration_seconds_p50: 0.2,
-        http_request_duration_seconds_p95: 0.2,
-        http_request_duration_seconds_p99: 0.2,
-        http_request_errors_total: 1,
-        http_request_error_rate: 0.5,
-        http_request_errors_by_status: 1,
-        http_requests_total_all: 1,
-        http_errors_total_all: 1,
-        http_error_rate_all: 0.5,
-        trial_started_total: 2,
-        trial_engaged_total: 1,
-        trial_limit_hit_total: 1,
-        trial_beta_requested_total: 1,
-        invite_requested_total: 1,
-        invite_approved_total: 1,
-        invite_rejected_total: 1,
-        invite_first_login_total: 1,
-        invite_active_total: 1,
-        budget_used_eur: 25,
-        budget_limit_eur: 100,
-        budget_projected_monthly_eur: 50,
-        budget_usage_percent: 25,
-        abuse_flagged_total: 1,
-        abuse_blocked_total: 1,
-        abuse_score_total: 7,
-        conversion_trial_to_engaged: 0.5,
-        conversion_engaged_to_limit: 1,
-        conversion_limit_to_request: 1,
-        conversion_request_to_approved: 1,
-        conversion_approved_to_login: 1,
-        conversion_login_to_active: 1,
+        proxy_http_requests_total: 1,
+        proxy_http_request_duration_seconds_p50: 0.2,
+        proxy_http_request_duration_seconds_p95: 0.2,
+        proxy_http_request_duration_seconds_p99: 0.2,
+        proxy_http_request_errors_total: 1,
+        proxy_http_request_error_rate: 1,
+        proxy_http_request_errors_by_status: 1,
+        proxy_http_requests_total_all: 1,
+        proxy_http_errors_total_all: 1,
+        proxy_http_error_rate_all: 1,
       };
       const lines = (fetchMock.mock.calls[0][1].body as string).split('\n');
-      expect(lines.filter((line) => !line.startsWith('metric_collector_'))).toHaveLength(32);
+      expect(lines.filter((line) => !line.startsWith('metric_collector_'))).toHaveLength(10);
       for (const [name, value] of Object.entries(expected)) {
-        const route = name.startsWith('http_') && !name.endsWith('_all') ? ',route=/api/chat' : '';
-        const status = name === 'http_request_errors_by_status' ? ',status_code=500' : '';
-        expect(lines).toContain(
-          `${name},instance=mirrorbuddy,env=production${route}${status} value=${value} ${now.getTime() * 1e6}`,
+        const route = !name.endsWith('_all') ? ',route=/api/chat' : '';
+        const status = name === 'proxy_http_request_errors_by_status' ? ',status_code=500' : '';
+        expect(lines).toEqual(
+          expect.arrayContaining([
+            expect.stringMatching(
+              `^${name},instance=mirrorbuddy,env=production,worker=[a-f0-9-]+${route}${status} value=${value} ${now.getTime() * 1e6}$`,
+            ),
+          ]),
         );
       }
-      for (const collector of ['http', 'funnel', 'budget', 'abuse', 'conversion']) {
-        for (const metric of ['up', 'enabled']) {
-          expect(lines).toContain(
-            `metric_collector_${metric},instance=mirrorbuddy,env=production,collector=${collector} value=1 ${now.getTime() * 1e6}`,
-          );
-        }
+      expect(
+        lines.some((line) => /^(trial_|invite_|budget_|abuse_|conversion_|http_)/.test(line)),
+      ).toBe(false);
+      for (const metric of ['up', 'enabled']) {
+        expect(lines).toContain(
+          `metric_collector_${metric},instance=mirrorbuddy,env=production,collector=proxy-http value=1 ${now.getTime() * 1e6}`,
+        );
       }
     },
   );
+
+  it('never publishes cold-start zero counters as observations', async () => {
+    await prometheusPushService.pushMetrics();
+    const lines = (fetchMock.mock.calls[0][1].body as string).split('\n');
+    expect(lines.filter((line) => !line.startsWith('metric_collector_'))).toEqual([]);
+    expect(lines.every((line) => line.includes('collector=proxy-http '))).toBe(true);
+  });
 });

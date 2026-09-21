@@ -19,27 +19,32 @@ All crons are defined in `vercel.json`:
 
 ## Jobs Overview
 
-| Job                      | Schedule    | Purpose                          | Env Vars                        |
-| ------------------------ | ----------- | -------------------------------- | ------------------------------- |
-| `metrics-push`           | Every 5 min | Push SLI/HTTP metrics to Grafana | `GRAFANA_*`, `CRON_SECRET`      |
-| `business-metrics-daily` | 03:00 UTC   | Push business KPIs to Grafana    | `GRAFANA_*`, `CRON_SECRET`      |
-| `data-retention`         | 03:00 UTC   | Clean old telemetry data         | `CRON_SECRET`                   |
-| `trial-nurturing`        | 09:00 UTC   | Send trial nurturing emails      | `RESEND_API_KEY`, `CRON_SECRET` |
+| Job                      | Schedule    | Purpose                        | Env Vars                        |
+| ------------------------ | ----------- | ------------------------------ | ------------------------------- |
+| `metrics-push`           | Every 5 min | Push shared metrics to Grafana | `GRAFANA_*`, `CRON_SECRET`      |
+| `business-metrics-daily` | 03:00 UTC   | Push business KPIs to Grafana  | `GRAFANA_*`, `CRON_SECRET`      |
+| `data-retention`         | 03:00 UTC   | Clean old telemetry data       | `CRON_SECRET`                   |
+| `trial-nurturing`        | 09:00 UTC   | Send trial nurturing emails    | `RESEND_API_KEY`, `CRON_SECRET` |
 
 ## Job Details
 
 ### 1. metrics-push (Every 5 Minutes)
 
-**File**: `src/app/api/cron/metrics-push/route.ts`
+**File**: `apps/web/src/app/api/cron/metrics-push/route.ts`
 
 **Purpose**: Push real-time metrics to Grafana Cloud Prometheus.
 
 **Metrics pushed**:
 
-- `mirrorbuddy_http_requests_total` - HTTP request counts by status
-- `mirrorbuddy_http_latency_p50/p95/p99` - Response latencies
-- `mirrorbuddy_active_users_realtime` - Currently active users
-- `mirrorbuddy_funnel_stage_count` - Users per funnel stage
+- `mirrorbuddy_realtime_active_users` - Currently active users
+- `mirrorbuddy_funnel_stage_count` - Recorded events per funnel stage
+- `mirrorbuddy_funnel_conversion_rate` - Ratios between recorded funnel stages
+- Shared tier and service-limit metrics
+
+The cron does not read process-local HTTP snapshots. The separate in-process
+timer publishes only `proxy_http_*` diagnostics for its own worker; these are
+five-minute gauges, not application response SLIs or durable fleet totals.
+See [SLI-SLO.md](SLI-SLO.md) for the retired metrics and monitoring gaps.
 
 **Required env vars**:
 
@@ -107,7 +112,7 @@ All cron endpoints verify `CRON_SECRET` header:
 
 ```typescript
 function verifyCronSecret(request: NextRequest): boolean {
-  const authHeader = request.headers.get("authorization");
+  const authHeader = request.headers.get('authorization');
   return authHeader === `Bearer ${process.env.CRON_SECRET}`;
 }
 ```

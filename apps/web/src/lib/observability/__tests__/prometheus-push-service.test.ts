@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { logger } from '@/lib/logger';
 import { collectHttpMetrics } from '../http-metrics-collector';
 import { collectTierMetrics } from '../tier-metrics-collector';
-import { collectFunnelMetrics, collectBudgetMetrics } from '../funnel-metrics-collectors';
 import { collectServiceLimitsSamples } from '../service-limits-metrics';
 import { prometheusPushService } from '../prometheus-push-service';
 import { collectDatabaseBackedSamples } from '@/app/api/cron/metrics-push/scheduled-metrics';
@@ -22,12 +21,6 @@ vi.mock('../tier-metrics-collector', () => ({ collectTierMetrics: vi.fn() }));
 vi.mock('../service-limits-metrics', () => ({
   collectServiceLimitsSamples: vi.fn().mockResolvedValue([]),
 }));
-vi.mock('../funnel-metrics-collectors', () => ({
-  collectFunnelMetrics: vi.fn(),
-  collectBudgetMetrics: vi.fn(() => []),
-  collectAbuseMetrics: vi.fn(() => []),
-  collectConversionMetrics: vi.fn(() => []),
-}));
 
 describe('independent metrics push', () => {
   const fetchMock = vi.fn();
@@ -43,9 +36,13 @@ describe('independent metrics push', () => {
     vi.stubGlobal('fetch', fetchMock);
     fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
     vi.mocked(collectHttpMetrics).mockImplementation((labels, timestamp) => [
-      { name: 'http_requests_total', labels: { ...labels, route: '/chat' }, value: 17, timestamp },
+      {
+        name: 'proxy_http_requests_total',
+        labels: { ...labels, route: '/chat' },
+        value: 17,
+        timestamp,
+      },
     ]);
-    vi.mocked(collectFunnelMetrics).mockReturnValue([]);
     vi.mocked(collectTierMetrics).mockResolvedValue([]);
     prometheusPushService.initialize();
   });
@@ -94,19 +91,18 @@ describe('independent metrics push', () => {
     expect(fetchMock.mock.calls[1][1].body).not.toContain('collector=tier value=0 ');
   });
 
-  it('isolates a synchronous collector failure and still invokes later collectors', async () => {
-    const error = new Error('Funnel snapshot unavailable');
-    vi.mocked(collectFunnelMetrics).mockImplementationOnce(() => {
+  it('reports a synchronous proxy failure without fabricating traffic samples', async () => {
+    const error = new Error('Proxy snapshot unavailable');
+    vi.mocked(collectHttpMetrics).mockImplementationOnce(() => {
       throw error;
     });
 
     await prometheusPushService.pushMetrics();
 
-    expect(collectBudgetMetrics).toHaveBeenCalled();
-    expect(fetchMock.mock.calls[0][1].body).toContain('collector=funnel value=0 ');
-    expect(fetchMock.mock.calls[0][1].body).toContain('http_requests_total');
-    expect(logger.warn).toHaveBeenCalledExactlyOnceWith('Metrics collector failed: funnel', {
-      collector: 'funnel',
+    expect(fetchMock.mock.calls[0][1].body).toContain('collector=proxy-http value=0 ');
+    expect(fetchMock.mock.calls[0][1].body).not.toContain('proxy_http_requests_total');
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith('Metrics collector failed: proxy-http', {
+      collector: 'proxy-http',
       component: 'metrics-collector',
       errorType: 'Error',
     });
@@ -189,7 +185,7 @@ describe('independent metrics push', () => {
     expect(collectServiceLimitsSamples).not.toHaveBeenCalled();
     expect(collectTierMetrics).not.toHaveBeenCalled();
     const body = fetchMock.mock.calls[0][1].body as string;
-    expect(body).toContain('http_requests_total');
+    expect(body).toContain('proxy_http_requests_total');
     expect(body).not.toContain('collector=service_limits');
     expect(body).not.toContain('collector=tier');
   });

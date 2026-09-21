@@ -4,6 +4,16 @@
 
 Accepted
 
+> **Partially superseded by #1076 (2026-09-21):** The 22 legacy in-memory
+> funnel/budget/abuse/conversion names described below had no producers and are
+> removed, together with their dashboard panels and five unsupported alerts.
+> The timer retains only 10 explicitly `proxy_`-prefixed, per-worker 5-minute
+> diagnostic gauges (not application SLOs or durable fleet metrics); its two
+> collector-health metadata names are separate. DB-backed cron business metrics
+> remain unchanged. See [SLI/SLO migration and monitoring gaps](../operations/SLI-SLO.md#grafana-migration-and-monitoring-gaps)
+> for the current contract and live-config rollout caveats. The original
+> decision below is historical, not a claim of current monitoring coverage.
+
 ## Date
 
 2026-01-18

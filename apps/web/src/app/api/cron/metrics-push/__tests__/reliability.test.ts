@@ -153,7 +153,6 @@ describe('isolated collectors and transport', () => {
     health(collector, 0);
   });
   it.each([
-    ['cron-http', 'summary', 'http_requests_total'],
     ['realtime-active-users', 'query', 'mirrorbuddy_realtime_active_users'],
     ['funnel-metrics', 'funnel', 'mirrorbuddy_funnel_stage_count'],
     ['behavioral-metrics', 'behavioral', 'session_success_rate'],
@@ -162,11 +161,7 @@ describe('isolated collectors and transport', () => {
     ['database-backed', 'database', 'tier_users'],
   ] as const)('isolates %s and reports once', async (collector, mock, absent) => {
     const failure = new Error('collector failed');
-    if (mock === 'summary')
-      mocks.summary.mockImplementationOnce(() => {
-        throw failure;
-      });
-    else mocks[mock].mockRejectedValueOnce(failure);
+    mocks[mock].mockRejectedValueOnce(failure);
     const { GET } = await import('../route');
     const response = await GET(request());
     expect(response.status).toBe(200);
@@ -192,7 +187,6 @@ describe('isolated collectors and transport', () => {
     const response = await GET(request());
     expect((await response.json()).metrics_pushed).toBe(body().split('\n').length);
     for (const collector of [
-      'cron-http',
       'realtime-active-users',
       'funnel-metrics',
       'churn-metrics',
@@ -203,9 +197,9 @@ describe('isolated collectors and transport', () => {
     ])
       health(collector, 1);
     expect(body()).toContain('tier_users,tier=base value=5 1234000000');
-    expect(body()).toMatch(
-      /http_request_duration_seconds,[^\n]*route=\/chat,quantile=0.95 value=0.25 /,
-    );
+    expect(mocks.summary).not.toHaveBeenCalled();
+    expect(body()).not.toMatch(/(?:^|\n)(?:proxy_)?http_/);
+    expect(body()).not.toContain('collector=cron-http');
     expect(mocks.cleanup).toHaveBeenCalledOnce();
     expect(mocks.batch).toHaveBeenCalledOnce();
     expect(mocks.report).not.toHaveBeenCalled();
