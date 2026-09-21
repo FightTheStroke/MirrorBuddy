@@ -36,10 +36,11 @@ class _FakeConfig:
 
 
 def _stub_get(monkeypatch, response, captured=None):
-    def fake_get(url, timeout=None, headers=None):
+    def fake_get(url, timeout=None, headers=None, **kwargs):
         if captured is not None:
             captured["url"] = url
             captured["headers"] = headers
+            captured.update(kwargs)
         if isinstance(response, Exception):
             raise response
         return response

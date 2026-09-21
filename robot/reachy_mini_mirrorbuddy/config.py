@@ -10,7 +10,7 @@ Required:
 
 Optional:
     AZURE_OPENAI_REALTIME_API_VERSION  if set -> use the Preview WS protocol; else GA
-    MIRRORBUDDY_URL                    default https://mirrorbuddy.org
+    MIRRORBUDDY_URL                    default https://www.mirrorbuddy.org
     MIRRORBUDDY_LOCALE                 default "it"
     MIRRORBUDDY_MAESTRO_ID             which Maestro to embody (default: first Italian tutor)
     MIRRORBUDDY_DSA_PROFILE            one of the DSA profiles (see dsa.py); default "cerebral"
@@ -63,7 +63,7 @@ class Config:
         self._ga_fallbacks = tuple(dict.fromkeys(name for name in (v15, base) if name))
 
         # --- MirrorBuddy alignment ---
-        self.MIRRORBUDDY_URL: str = (os.getenv("MIRRORBUDDY_URL") or "https://mirrorbuddy.org").strip().rstrip("/")
+        self.MIRRORBUDDY_URL: str = (os.getenv("MIRRORBUDDY_URL") or "https://www.mirrorbuddy.org").strip().rstrip("/")
         self.LOCALE: str = (os.getenv("MIRRORBUDDY_LOCALE") or "it").strip()
         self.MAESTRO_ID: str | None = (os.getenv("MIRRORBUDDY_MAESTRO_ID") or "").strip() or None
         self.DSA_PROFILE: str = (os.getenv("MIRRORBUDDY_DSA_PROFILE") or "cerebral").strip()
