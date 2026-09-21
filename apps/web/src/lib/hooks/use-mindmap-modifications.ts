@@ -1,17 +1,10 @@
-/**
- * useMindmapModifications Hook
- *
- * Listens for SSE mindmap modification events and provides callbacks
- * for applying changes to the mindmap renderer.
- *
- * Part of Phase 7: Voice Commands for Mindmaps
- */
-
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
 import type { MindmapModifyCommand } from '@/lib/realtime/tool-events';
+import { MINDMAP_RETRY_DELAYS, type MindmapRecoveryState } from '@/lib/mindmap/snapshot-client';
+import type { MindmapSnapshot } from '@/lib/mindmap/protocol';
+import { useMindmapSnapshots } from './use-mindmap-snapshots';
 
-// Modification event from SSE
 export interface MindmapModifyEvent {
   id: string;
   type: 'mindmap:modify';
@@ -25,7 +18,6 @@ export interface MindmapModifyEvent {
   };
 }
 
-// Union of all modification argument types
 export type MindmapModifyArgs =
   | { concept: string; parentNode?: string } // mindmap_add_node
   | { nodeA: string; nodeB: string } // mindmap_connect_nodes
@@ -33,7 +25,6 @@ export type MindmapModifyArgs =
   | { node: string } // mindmap_delete_node, mindmap_focus_node
   | { node: string; color: string }; // mindmap_set_color
 
-// Callbacks for each modification type
 export interface MindmapModificationCallbacks {
   onAddNode?: (concept: string, parentNode?: string) => void;
   onConnectNodes?: (nodeA: string, nodeB: string) => void;
@@ -43,42 +34,44 @@ export interface MindmapModificationCallbacks {
   onSetColor?: (node: string, color: string) => void;
 }
 
-// Hook options
 export interface UseMindmapModificationsOptions {
   sessionId: string | null;
+  toolId?: string | null;
+  onSnapshot?: (snapshot: MindmapSnapshot) => void;
   enabled?: boolean;
   callbacks: MindmapModificationCallbacks;
 }
 
-// Hook return type
 export interface UseMindmapModificationsResult {
   isConnected: boolean;
   lastEvent: MindmapModifyEvent | null;
   reconnect: () => void;
+  snapshot: MindmapSnapshot | null;
+  recovery: MindmapRecoveryState;
 }
 
-/**
- * Hook to listen for SSE mindmap modification events.
- */
 export function useMindmapModifications({
   sessionId,
-  enabled = true,
+  toolId,
+  onSnapshot,
+  enabled: requestedEnabled = true,
   callbacks,
 }: UseMindmapModificationsOptions): UseMindmapModificationsResult {
+  const durable = useMindmapSnapshots({ sessionId, toolId, enabled: requestedEnabled, onSnapshot });
+  const enabled = requestedEnabled && !toolId;
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const attemptsRef = useRef(0);
+  const seenRef = useRef(new Set<string>());
   // Ref to hold connect function for recursive calls in onerror handler
   const connectRef = useRef<() => void>(() => {});
   const isMountedRef = useRef(false);
 
-  // Use state for values that need to trigger re-renders
   const [isConnected, setIsConnected] = useState(false);
   const [lastEvent, setLastEvent] = useState<MindmapModifyEvent | null>(null);
 
-  // Store callbacks in ref to avoid re-subscribing on callback changes
   const callbacksRef = useRef(callbacks);
 
-  // Update callbacksRef when callbacks change (in effect, not during render)
   useEffect(() => {
     callbacksRef.current = callbacks;
   }, [callbacks]);
@@ -93,73 +86,79 @@ export function useMindmapModifications({
     source.close();
   }, []);
 
-  // Handle incoming SSE event
-  const handleEvent = useCallback((event: MessageEvent) => {
-    try {
-      // Skip heartbeat events
-      if (event.data.startsWith(':')) return;
+  const handleEvent = useCallback(
+    (event: MessageEvent) => {
+      try {
+        if (event.data.startsWith(':')) return;
 
-      const data = JSON.parse(event.data);
+        const data = JSON.parse(event.data);
 
-      // Only handle mindmap:modify events
-      if (data.type !== 'mindmap:modify') return;
+        if (data.type !== 'mindmap:modify') return;
+        if (
+          data.sessionId !== sessionId ||
+          typeof data.id !== 'string' ||
+          !data.id ||
+          seenRef.current.has(data.id)
+        )
+          return;
+        seenRef.current.add(data.id);
 
-      const modifyEvent = data as MindmapModifyEvent;
-      setLastEvent(modifyEvent);
+        const modifyEvent = data as MindmapModifyEvent;
+        setLastEvent(modifyEvent);
 
-      const { command, args } = modifyEvent.data;
+        const { command, args } = modifyEvent.data;
 
-      logger.info('[MindmapModifications] Received event', { command, args });
+        logger.info('[MindmapModifications] Received event', { command, args });
 
-      // Dispatch to appropriate callback
-      switch (command) {
-        case 'mindmap_add_node': {
-          const { concept, parentNode } = args as {
-            concept: string;
-            parentNode?: string;
-          };
-          callbacksRef.current.onAddNode?.(concept, parentNode);
-          break;
+        switch (command) {
+          case 'mindmap_add_node': {
+            const { concept, parentNode } = args as {
+              concept: string;
+              parentNode?: string;
+            };
+            callbacksRef.current.onAddNode?.(concept, parentNode);
+            break;
+          }
+          case 'mindmap_connect_nodes': {
+            const { nodeA, nodeB } = args as { nodeA: string; nodeB: string };
+            callbacksRef.current.onConnectNodes?.(nodeA, nodeB);
+            break;
+          }
+          case 'mindmap_expand_node': {
+            const { node, suggestions } = args as {
+              node: string;
+              suggestions?: string[];
+            };
+            callbacksRef.current.onExpandNode?.(node, suggestions);
+            break;
+          }
+          case 'mindmap_delete_node': {
+            const { node } = args as { node: string };
+            callbacksRef.current.onDeleteNode?.(node);
+            break;
+          }
+          case 'mindmap_focus_node': {
+            const { node } = args as { node: string };
+            callbacksRef.current.onFocusNode?.(node);
+            break;
+          }
+          case 'mindmap_set_color': {
+            const { node, color } = args as { node: string; color: string };
+            callbacksRef.current.onSetColor?.(node, color);
+            break;
+          }
+          default:
+            logger.warn('[MindmapModifications] Unknown command', { command });
         }
-        case 'mindmap_connect_nodes': {
-          const { nodeA, nodeB } = args as { nodeA: string; nodeB: string };
-          callbacksRef.current.onConnectNodes?.(nodeA, nodeB);
-          break;
-        }
-        case 'mindmap_expand_node': {
-          const { node, suggestions } = args as {
-            node: string;
-            suggestions?: string[];
-          };
-          callbacksRef.current.onExpandNode?.(node, suggestions);
-          break;
-        }
-        case 'mindmap_delete_node': {
-          const { node } = args as { node: string };
-          callbacksRef.current.onDeleteNode?.(node);
-          break;
-        }
-        case 'mindmap_focus_node': {
-          const { node } = args as { node: string };
-          callbacksRef.current.onFocusNode?.(node);
-          break;
-        }
-        case 'mindmap_set_color': {
-          const { node, color } = args as { node: string; color: string };
-          callbacksRef.current.onSetColor?.(node, color);
-          break;
-        }
-        default:
-          logger.warn('[MindmapModifications] Unknown command', { command });
+      } catch (error) {
+        logger.error('[MindmapModifications] Failed to parse event', {
+          error: String(error),
+        });
       }
-    } catch (error) {
-      logger.error('[MindmapModifications] Failed to parse event', {
-        error: String(error),
-      });
-    }
-  }, []);
+    },
+    [sessionId],
+  );
 
-  // Connect to SSE endpoint
   const connect = useCallback(() => {
     if (!isMountedRef.current || !sessionId || !enabled) return;
     if (reconnectTimeoutRef.current) {
@@ -191,33 +190,34 @@ export function useMindmapModifications({
       });
       setIsConnected(false);
 
-      // Reconnect after 3 seconds using ref to avoid lexical access issue
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
+      if (attemptsRef.current >= MINDMAP_RETRY_DELAYS.length) return;
+      const delay = MINDMAP_RETRY_DELAYS[attemptsRef.current++];
       reconnectTimeoutRef.current = setTimeout(() => {
         reconnectTimeoutRef.current = null;
         connectRef.current();
-      }, 3000);
+      }, delay);
     };
   }, [sessionId, enabled, handleEvent, closeSource]);
 
-  // Keep connectRef in sync with connect (in effect, not during render)
   useEffect(() => {
     connectRef.current = connect;
   }, [connect]);
 
-  // Manual reconnect function
   const reconnect = useCallback(() => {
+    attemptsRef.current = 0;
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
     connect();
   }, [connect]);
 
-  // Setup SSE connection
   useEffect(() => {
     isMountedRef.current = true;
+    attemptsRef.current = 0;
+    seenRef.current.clear();
     if (enabled && sessionId) {
       connect();
     }
@@ -234,8 +234,10 @@ export function useMindmapModifications({
   }, [sessionId, enabled, connect, closeSource]);
 
   return {
-    isConnected,
-    lastEvent,
-    reconnect,
+    isConnected: toolId ? durable.recovery.status === 'connected' : isConnected,
+    lastEvent: toolId ? null : lastEvent,
+    reconnect: toolId ? durable.reconnect : reconnect,
+    snapshot: durable.snapshot,
+    recovery: durable.recovery,
   };
 }

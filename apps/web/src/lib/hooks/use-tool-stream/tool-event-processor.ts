@@ -3,9 +3,9 @@
  * Processes SSE events and updates tool state
  */
 
-"use client";
+'use client';
 
-import type { StreamToolEvent, ActiveToolState } from "./types";
+import type { StreamToolEvent, ActiveToolState } from './types';
 
 /**
  * Process a tool event and return updated active tool state
@@ -15,22 +15,22 @@ export function processStreamToolEvent(
   previousState: ActiveToolState | null,
 ): ActiveToolState | null {
   switch (event.type) {
-    case "tool:created":
+    case 'tool:created':
       return {
         id: event.id,
         sessionId: event.sessionId,
         type: event.toolType,
         maestroId: event.maestroId,
-        title: event.data.title || "Untitled",
+        title: event.data.title || 'Untitled',
         subject: event.data.subject,
         progress: 0,
         chunks: [],
         content: null,
-        status: "building",
+        status: 'building',
         startedAt: event.timestamp,
       };
 
-    case "tool:update":
+    case 'tool:update':
       if (
         !previousState ||
         previousState.id !== event.id ||
@@ -50,7 +50,7 @@ export function processStreamToolEvent(
         content: event.data.content ?? previousState.content,
       };
 
-    case "tool:complete":
+    case 'tool:complete':
       if (
         !previousState ||
         previousState.id !== event.id ||
@@ -61,12 +61,13 @@ export function processStreamToolEvent(
       return {
         ...previousState,
         sessionId: event.sessionId,
-        status: "completed",
+        status: 'completed',
+        revision: event.data.revision,
         progress: 100,
         content: event.data.content ?? previousState.content,
       };
 
-    case "tool:error":
+    case 'tool:error':
       if (
         !previousState ||
         previousState.id !== event.id ||
@@ -77,11 +78,11 @@ export function processStreamToolEvent(
       return {
         ...previousState,
         sessionId: event.sessionId,
-        status: "error",
+        status: 'error',
         errorMessage: event.data.error,
       };
 
-    case "tool:cancelled":
+    case 'tool:cancelled':
       if (
         !previousState ||
         previousState.id !== event.id ||
@@ -92,7 +93,7 @@ export function processStreamToolEvent(
       return {
         ...previousState,
         sessionId: event.sessionId,
-        status: "cancelled",
+        status: 'cancelled',
       };
 
     default:

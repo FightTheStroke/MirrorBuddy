@@ -4,6 +4,13 @@
 // ============================================================================
 
 export interface UseVoiceSessionOptions {
+  /** Supplied by the active view, never inferred from the newest stored map. */
+  getActiveMindmap?: () =>
+    | import('@/lib/voice/voice-tool-commands/types').ActiveMindmapIdentity
+    | null;
+  onMindmapResult?: (
+    result: import('@/lib/voice/voice-tool-commands/types').VoiceToolCallResult,
+  ) => void;
   onTranscript?: (role: 'user' | 'assistant', text: string) => void;
   onError?: (error: Error) => void;
   onStateChange?: (state: 'idle' | 'connecting' | 'connected' | 'error') => void;

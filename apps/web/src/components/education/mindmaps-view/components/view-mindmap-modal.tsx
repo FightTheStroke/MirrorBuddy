@@ -1,33 +1,25 @@
-"use client";
+'use client';
 
 /**
  * @file view-mindmap-modal.tsx
  * @brief View mindmap modal component
  */
 
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  X,
-  Download,
-  FileJson,
-  FileText,
-  ImageIcon,
-  FileType,
-  Network,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Download, FileJson, FileText, ImageIcon, FileType, Network } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { MindmapRenderer } from "@/components/tools/markmap";
-import { subjectIcons } from "@/data";
-import type { ExportFormat } from "@/lib/tools/mindmap-export/index";
-import type { SavedMindmap } from "@/lib/hooks/use-saved-materials";
-import { useTranslations } from "next-intl";
+} from '@/components/ui/dropdown-menu';
+import { LiveMindmap } from '@/components/tools/live-mindmap';
+import { subjectIcons } from '@/data';
+import type { ExportFormat } from '@/lib/tools/mindmap-export/index';
+import type { SavedMindmap } from '@/lib/hooks/use-saved-materials';
+import { useTranslations } from 'next-intl';
 
 interface ViewMindmapModalProps {
   mindmap: SavedMindmap | null;
@@ -35,12 +27,8 @@ interface ViewMindmapModalProps {
   onExport: (mindmap: SavedMindmap, format: ExportFormat) => void;
 }
 
-export function ViewMindmapModal({
-  mindmap,
-  onClose,
-  onExport,
-}: ViewMindmapModalProps) {
-  const t = useTranslations("education");
+export function ViewMindmapModal({ mindmap, onClose, onExport }: ViewMindmapModalProps) {
+  const t = useTranslations('education');
   if (!mindmap) return null;
 
   return (
@@ -70,45 +58,39 @@ export function ViewMindmapModal({
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Download className="w-4 h-4 mr-2" />
-                      {t("esporta")}
+                      {t('esporta')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onExport(mindmap, "json")}>
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'json')}>
                       <FileJson className="w-4 h-4 mr-2" />
                       JSON
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onExport(mindmap, "markdown")}
-                    >
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'markdown')}>
                       <FileText className="w-4 h-4 mr-2" />
-                      {t("markdown")}
+                      {t('markdown')}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onExport(mindmap, "svg")}>
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'svg')}>
                       <ImageIcon className="w-4 h-4 mr-2" />
                       SVG
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onExport(mindmap, "png")}>
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'png')}>
                       <ImageIcon className="w-4 h-4 mr-2" />
                       PNG
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onExport(mindmap, "pdf")}>
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'pdf')}>
                       <FileType className="w-4 h-4 mr-2" />
                       PDF
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onExport(mindmap, "freemind")}
-                    >
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'freemind')}>
                       <Network className="w-4 h-4 mr-2" />
-                      {t("freemindMm")}
+                      {t('freemindMm')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onExport(mindmap, "xmind")}
-                    >
+                    <DropdownMenuItem onClick={() => onExport(mindmap, 'xmind')}>
                       <Network className="w-4 h-4 mr-2" />
-                      {t("xmind")}
+                      {t('xmind')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -121,10 +103,12 @@ export function ViewMindmapModal({
               </div>
             </div>
             <div className="flex-1 overflow-auto p-4">
-              <MindmapRenderer
+              <LiveMindmap
+                toolId={mindmap.id}
+                sessionId={null}
                 title={mindmap.title}
-                markdown={mindmap.markdown}
-                nodes={mindmap.nodes}
+                initialMarkdown={mindmap.markdown}
+                initialNodes={mindmap.nodes}
               />
             </div>
           </motion.div>

@@ -1,24 +1,14 @@
-// ============================================================================
-// TOOL CALL HANDLERS
-// Execute tool calls from Azure Realtime API (WebRTC only)
-// ============================================================================
-
 'use client';
-
 import { clientLogger as logger } from '@/lib/logger/client';
-import {
-  executeVoiceTool,
-  isToolCreationCommand,
-  isOnboardingCommand,
-  getToolTypeFromName,
-} from '@/lib/voice';
-import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
-import type { ToolType as MethodToolType, HelpLevel } from '@/lib/method-progress/types';
+import { executeVoiceTool, isToolCreationCommand, isOnboardingCommand } from '@/lib/voice';
 import type { Maestro } from '@/types';
 import { buildPlan } from '@/lib/meditation/session';
 import { armBrowserMeditation } from '@/lib/meditation/browser';
 import type { UseVoiceSessionOptions } from './types';
-
+import { isMindmapModificationCommand } from '@/lib/voice/voice-tool-commands/helpers';
+import { resolveVoiceSourceSession } from './source-session';
+import { recordVoiceToolProgress } from './tool-method-progress';
+import { executeActiveMapCommand } from '@/lib/stores/active-mindmap-store';
 export interface ToolHandlerParams {
   event: Record<string, unknown>;
   maestroRef: React.MutableRefObject<Maestro | null>;
@@ -36,10 +26,6 @@ export interface ToolHandlerParams {
   updateToolCall: (id: string, updates: { status?: 'pending' | 'completed' | 'error' }) => void;
   options: UseVoiceSessionOptions;
 }
-
-/**
- * Send message via WebRTC data channel
- */
 function sendViaWebRTC(
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
   message: Record<string, unknown>,
@@ -51,10 +37,6 @@ function sendViaWebRTC(
   return false;
 }
 
-/**
- * Handle response.function_call_arguments.done event
- * Executes tool calls from Azure Realtime API
- */
 export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
   const {
     event,
@@ -83,8 +65,7 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
   // function_call_output if anything throws (e.g. malformed JSON args). Without
   // this, any exception leaves the realtime model waiting forever for a tool
   // result that never arrives and the assistant goes silent mid-conversation.
-  const callId =
-    typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
+  const callId = typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
   try {
     const args = JSON.parse(event.arguments as string);
     const toolCall = {
@@ -96,15 +77,7 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     };
     addToolCall(toolCall);
 
-    // Handle webcam/homework capture request.
-    // The webcam flow is asynchronous: we open the camera here and the
-    // function_call_output is sent later via sendWebcamResult() once the
-    // student captures (or cancels). This ONLY works when a webcam handler
-    // is wired up. If it is not (e.g. a surface that never registered
-    // onWebcamRequest), deferring would leave the realtime model waiting
-    // forever for a tool result that never arrives — the assistant goes
-    // permanently silent mid-conversation. Guard against that by resolving
-    // the tool call immediately so the conversation can continue.
+    // Only defer the result when a camera handler can resolve it later.
     if (toolName === 'capture_homework') {
       if (options.onWebcamRequest) {
         options.onWebcamRequest({
@@ -201,69 +174,35 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     }
 
     // Handle tool creation commands (mindmap, quiz, flashcards, etc.)
-    if (isToolCreationCommand(toolName)) {
+    if (isToolCreationCommand(toolName) || isMindmapModificationCommand(toolName)) {
       // Use stable session ID from connect() - ensures all tools in same conversation share sessionId
-      const sessionId =
+      let sessionId =
         sessionIdRef.current || `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
+      if (toolName === 'create_mindmap') {
+        sessionId = await resolveVoiceSourceSession(sessionId);
+        sessionIdRef.current = sessionId;
+      }
       const maestroId = maestroRef.current?.id || 'unknown';
 
       logger.debug(`[VoiceSession] Executing voice tool: ${toolName}`, {
         args,
       });
 
-      const result = await executeVoiceTool(sessionId, maestroId, toolName, args);
+      const result =
+        isMindmapModificationCommand(toolName) && !options.getActiveMindmap
+          ? await executeActiveMapCommand(toolName, args, callId)
+          : await executeVoiceTool(sessionId, maestroId, toolName, args, {
+              operationId: callId,
+              activeMindmap: options.getActiveMindmap?.(),
+            });
+      if (toolName === 'create_mindmap' || isMindmapModificationCommand(toolName))
+        options.onMindmapResult?.(result);
 
       if (result.success) {
         logger.debug(`[VoiceSession] Tool created: ${result.toolId}`);
         updateToolCall(toolCall.id, { status: 'completed' });
 
-        // Track tool creation for method progress (autonomy tracking)
-        const voiceToolType = getToolTypeFromName(toolName);
-        if (voiceToolType) {
-          const methodTool =
-            voiceToolType === 'mindmap'
-              ? 'mind_map'
-              : voiceToolType === 'flashcard'
-                ? 'flashcard'
-                : voiceToolType === 'quiz'
-                  ? 'quiz'
-                  : voiceToolType === 'summary'
-                    ? 'summary'
-                    : 'diagram';
-
-          // Map subject string to MethodSubject type (Italian names)
-          type MethodSubject = import('@/lib/method-progress/types').Subject;
-          const subjectMap: Record<string, MethodSubject> = {
-            mathematics: 'matematica',
-            math: 'matematica',
-            matematica: 'matematica',
-            italian: 'italiano',
-            italiano: 'italiano',
-            history: 'storia',
-            storia: 'storia',
-            geography: 'geografia',
-            geografia: 'geografia',
-            science: 'scienze',
-            scienze: 'scienze',
-            physics: 'scienze',
-            biology: 'scienze',
-            english: 'inglese',
-            inglese: 'inglese',
-            art: 'arte',
-            arte: 'arte',
-            music: 'musica',
-            musica: 'musica',
-          };
-          const mappedSubject = args.subject
-            ? (subjectMap[String(args.subject).toLowerCase()] ?? 'other')
-            : undefined;
-
-          // Voice-created tools are with AI hints (not alone, not full help)
-          useMethodProgressStore
-            .getState()
-            .recordToolCreation(methodTool as MethodToolType, 'hints' as HelpLevel, mappedSubject);
-          logger.debug(`[VoiceSession] Method progress tracked: ${methodTool} with hints`);
-        }
+        recordVoiceToolProgress(toolName, args.subject);
       } else {
         logger.error(`[VoiceSession] Tool creation failed: ${result.error}`);
         updateToolCall(toolCall.id, { status: 'error' });
@@ -294,6 +233,7 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     });
     sendViaWebRTC(webrtcDataChannelRef, { type: 'response.create' });
   } catch (error) {
+    updateToolCall(callId, { status: 'error' });
     logger.error('[VoiceSession] Failed to parse/execute tool call', { toolName, callId }, error);
     // Resolve the call even on failure so the model never hangs waiting for a
     // result. Best-effort: the data channel may already be closed.

@@ -37,6 +37,21 @@ export interface VoiceToolCallResult {
   toolType?: ToolType;
   error?: string;
   displayed?: boolean;
+  sessionId?: string;
+  revision?: number;
+  operationId?: string;
+  focus?: { nodeId: string; label: string };
+}
+
+export interface ActiveMindmapIdentity {
+  toolId: string;
+  sessionId: string;
+  revision: number;
+}
+
+export interface VoiceToolExecutionContext {
+  operationId: string;
+  activeMindmap?: ActiveMindmapIdentity | null;
 }
 
 // ============================================================================

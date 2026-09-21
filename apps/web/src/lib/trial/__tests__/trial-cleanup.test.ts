@@ -27,6 +27,29 @@ import { prisma } from '@/lib/db';
 describe('cleanupExpiredTrialSessions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(prisma.trialSession.updateMany).mockResolvedValue({ count: 0 });
+  });
+
+  it('erases expired educational content even when email is retained', async () => {
+    vi.mocked(prisma.trialSession.count).mockResolvedValue(1);
+    vi.mocked(prisma.trialSession.deleteMany).mockResolvedValue({ count: 0 });
+    vi.mocked(prisma.trialSession.updateMany).mockResolvedValue({ count: 1 });
+
+    const result = await cleanupExpiredTrialSessions();
+
+    expect(prisma.trialSession.updateMany).toHaveBeenCalledWith({
+      where: {
+        createdAt: { lte: result.cutoffDate },
+        NOT: { mindmaps: { equals: {} } },
+      },
+      data: { mindmaps: {}, mindmapRevision: { increment: 1 } },
+    });
+    expect(result.clearedMindmapsCount).toBe(1);
+  });
+
+  it('does not report cleanup success when educational erasure fails', async () => {
+    vi.mocked(prisma.trialSession.updateMany).mockRejectedValue(new Error('Database unavailable'));
+    await expect(cleanupExpiredTrialSessions()).rejects.toThrow('Database unavailable');
   });
 
   it('deletes sessions older than 30 days without email', async () => {

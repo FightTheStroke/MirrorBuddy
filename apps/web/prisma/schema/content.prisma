@@ -12,6 +12,11 @@ model Material {
   title    String
   content  String
 
+  // Durable mindmap protocol; null revision identifies an unmigrated material.
+  mindmapRevision      Int?
+  mindmapSourceSession String?
+  mindmapReceipts      Json @default("[]")
+
   // Context
   maestroId String?
   sessionId String?

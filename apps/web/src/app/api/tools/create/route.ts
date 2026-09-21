@@ -5,35 +5,34 @@
  * Part of I-02: Voice Tool Commands.
  */
 
-import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
-import { logger } from "@/lib/logger";
-import {
-  createToolState,
-  updateToolState,
-  completeToolState,
-} from "@/lib/realtime/tool-state";
-import { broadcastToolEvent, type ToolType } from "@/lib/realtime/tool-events";
-import { validateSessionOwnership } from "@/lib/auth/server";
-import { canAccessFullFeatures } from "@/lib/compliance/server";
+import { NextResponse } from 'next/server';
+import { pipe, withSentry, withCSRF, withAuth } from '@/lib/api/middlewares';
+import { logger } from '@/lib/logger';
+import { createToolState, updateToolState, completeToolState } from '@/lib/realtime/tool-state';
+import { broadcastToolEvent, type ToolType } from '@/lib/realtime/tool-events';
+import { validateSessionOwnership } from '@/lib/auth/server';
+import { canAccessFullFeatures } from '@/lib/compliance/server';
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from "@/lib/rate-limit";
+} from '@/lib/rate-limit';
+import { z } from 'zod';
+import { withMindmapErrors } from '@/lib/mindmap/http';
+import { createMindmapFromVoice } from '@/lib/mindmap/create-http';
 
 // Valid tool types
 
 export const revalidate = 0;
 const VALID_TOOL_TYPES: ToolType[] = [
-  "mindmap",
-  "flashcard",
-  "quiz",
-  "summary",
-  "timeline",
-  "diagram",
-  "demo",
+  'mindmap',
+  'flashcard',
+  'quiz',
+  'summary',
+  'timeline',
+  'diagram',
+  'demo',
 ];
 
 interface CreateToolRequest {
@@ -45,19 +44,18 @@ interface CreateToolRequest {
   content: Record<string, unknown>;
 }
 
-/**
- * Create a new tool from voice command
- *
- * Body:
- * - sessionId: Current session ID
- * - maestroId: Maestro creating the tool
- * - toolType: Type of tool to create
- * - title: Tool title
- * - subject: Optional subject
- * - content: Tool content/arguments
- */
 export const POST = pipe(
-  withSentry("/api/tools/create"),
+  withSentry('/api/tools/create'),
+  withCSRF,
+  withMindmapErrors,
+)(async ({ req }) => {
+  const body = z.record(z.string(), z.unknown()).parse(await req.clone().json());
+  if (body.toolType === 'mindmap') return createMindmapFromVoice(req, body);
+  return createOtherTool(req);
+});
+
+const createOtherTool = pipe(
+  withSentry('/api/tools/create'),
   withCSRF,
   withAuth,
 )(async (ctx) => {
@@ -70,7 +68,7 @@ export const POST = pipe(
     RATE_LIMITS.GENERAL,
   );
   if (!rateLimitResult.success) {
-    logger.warn("Tool create rate limited", {
+    logger.warn('Tool create rate limited', {
       identifier: rateLimitIdentifier,
     });
     return rateLimitResponse(rateLimitResult);
@@ -81,10 +79,9 @@ export const POST = pipe(
   if (!canAccess) {
     return NextResponse.json(
       {
-        error: "Parental consent required",
-        code: "COPPA_CONSENT_REQUIRED",
-        message:
-          "Users under 13 require parental consent to create learning materials.",
+        error: 'Parental consent required',
+        code: 'COPPA_CONSENT_REQUIRED',
+        message: 'Users under 13 require parental consent to create learning materials.',
       },
       { status: 403 },
     );
@@ -97,8 +94,8 @@ export const POST = pipe(
   if (!sessionId || !maestroId || !toolType || !title) {
     return NextResponse.json(
       {
-        error: "Missing required fields",
-        required: ["sessionId", "maestroId", "toolType", "title"],
+        error: 'Missing required fields',
+        required: ['sessionId', 'maestroId', 'toolType', 'title'],
       },
       { status: 400 },
     );
@@ -108,7 +105,7 @@ export const POST = pipe(
   if (!VALID_TOOL_TYPES.includes(toolType)) {
     return NextResponse.json(
       {
-        error: "Invalid tool type",
+        error: 'Invalid tool type',
         validTypes: VALID_TOOL_TYPES,
       },
       { status: 400 },
@@ -117,19 +114,13 @@ export const POST = pipe(
 
   // Validate session ID format
   if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
-    return NextResponse.json(
-      { error: "Invalid sessionId format" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: 'Invalid sessionId format' }, { status: 400 });
   }
 
   // #83: Verify session ownership - user can only create tools in their own sessions
   const ownsSession = await validateSessionOwnership(sessionId, userId);
   if (!ownsSession) {
-    return NextResponse.json(
-      { error: "Session not found or access denied" },
-      { status: 403 },
-    );
+    return NextResponse.json({ error: 'Session not found or access denied' }, { status: 403 });
   }
 
   // Generate tool ID
@@ -148,7 +139,7 @@ export const POST = pipe(
   // Broadcast tool:created event
   broadcastToolEvent({
     id: toolId,
-    type: "tool:created",
+    type: 'tool:created',
     toolType,
     sessionId,
     maestroId,
@@ -159,7 +150,7 @@ export const POST = pipe(
     },
   });
 
-  logger.info("Tool created from voice command", {
+  logger.info('Tool created from voice command', {
     toolId,
     toolType,
     sessionId,
@@ -177,7 +168,7 @@ export const POST = pipe(
     // Broadcast progress update
     broadcastToolEvent({
       id: toolId,
-      type: "tool:update",
+      type: 'tool:update',
       toolType,
       sessionId,
       maestroId,
@@ -190,15 +181,12 @@ export const POST = pipe(
 
   // Complete the tool (for voice commands, content is usually complete)
   // Cast through unknown since voice content may not exactly match ToolContent types
-  completeToolState(
-    toolId,
-    content as unknown as Parameters<typeof completeToolState>[1],
-  );
+  completeToolState(toolId, content as unknown as Parameters<typeof completeToolState>[1]);
 
   // Broadcast completion
   broadcastToolEvent({
     id: toolId,
-    type: "tool:complete",
+    type: 'tool:complete',
     toolType,
     sessionId,
     maestroId,
@@ -219,24 +207,24 @@ export const POST = pipe(
 /**
  * Get tool creation info
  */
-export const GET = pipe(withSentry("/api/tools/create"))(async () => {
+export const GET = pipe(withSentry('/api/tools/create'))(async () => {
   return NextResponse.json({
-    endpoint: "/api/tools/create",
-    method: "POST",
-    description: "Create a tool from voice command",
+    endpoint: '/api/tools/create',
+    method: 'POST',
+    description: 'Create a tool from voice command',
     toolTypes: VALID_TOOL_TYPES,
     example: {
-      sessionId: "session_abc123",
-      maestroId: "archimede",
-      toolType: "mindmap",
-      title: "I Teoremi di Pitagora",
-      subject: "mathematics",
+      sessionId: 'session_abc123',
+      maestroId: 'archimede',
+      toolType: 'mindmap',
+      title: 'I Teoremi di Pitagora',
+      subject: 'mathematics',
       content: {
-        title: "I Teoremi di Pitagora",
-        topic: "Teoremi fondamentali della geometria",
+        title: 'I Teoremi di Pitagora',
+        topic: 'Teoremi fondamentali della geometria',
         nodes: [
-          { id: "1", label: "Teorema di Pitagora", parentId: null },
-          { id: "2", label: "a² + b² = c²", parentId: "1" },
+          { id: '1', label: 'Teorema di Pitagora', parentId: null },
+          { id: '2', label: 'a² + b² = c²', parentId: '1' },
         ],
       },
     },

@@ -5,12 +5,13 @@
  * Extracted to avoid circular dependencies with index.tsx.
  */
 
-import type { ComponentType } from "react";
+import type { ComponentType } from 'react';
 
 /**
  * Base props that all renderers should accept
  */
 export interface BaseRendererProps {
+  toolId?: string;
   /** The material content data */
   data: Record<string, unknown>;
   /** Additional CSS classes */
