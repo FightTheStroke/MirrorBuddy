@@ -1,6 +1,6 @@
 // ============================================================================
 // PRISMA CLIENT SINGLETON
-// Prevents multiple instances in development with hot reload
+// Reuses the client and its pool across module evaluations in each runtime
 // Uses Prisma client with PostgreSQL driver adapter
 // ============================================================================
 
@@ -15,8 +15,8 @@ import { createPIIMiddleware } from './pii-middleware';
 import { createSlowQueryMonitor } from './slow-query-monitor';
 import { loadSupabaseCertificate, buildSslConfig, cleanConnectionString } from './ssl-config';
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+const globalForPrisma = globalThis as typeof globalThis & {
+  mirrorbuddyDatabase?: { prisma: PrismaClient; pool: Pool };
 };
 
 const isE2E = process.env.E2E_TESTS === '1';
@@ -71,121 +71,122 @@ const connectionString = isE2E
     ? process.env.DEV_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mirrorbuddy'
     : process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/mirrorbuddy';
 
-// Load Supabase certificate chain (ADR 0067)
-const supabaseCaCert = loadSupabaseCertificate();
+function createDatabase(): { prisma: PrismaClient; pool: Pool } {
+  // Load Supabase certificate chain (ADR 0067)
+  const supabaseCaCert = loadSupabaseCertificate();
 
-// Connection pool configuration optimized for Vercel serverless (ADR 0065)
-// Serverless functions are stateless and short-lived, so we minimize idle connections
-const pool = new Pool({
-  connectionString: cleanConnectionString(connectionString),
-  ssl: buildSslConfig(connectionString, isE2E, isProduction, supabaseCaCert),
-  max: 5, // Maximum 5 concurrent connections per serverless instance
-  min: 0, // No idle connections (serverless cold start every time)
-  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-  connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
-});
+  // Connection pool configuration optimized for Vercel serverless (ADR 0065)
+  // Serverless functions are stateless and short-lived, so we minimize idle connections
+  const pool = new Pool({
+    connectionString: cleanConnectionString(connectionString),
+    ssl: buildSslConfig(connectionString, isE2E, isProduction, supabaseCaCert),
+    max: 5, // Maximum 5 concurrent connections per serverless instance
+    min: 0, // Allow all idle connections to be released
+    idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+    connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
+  });
 
-// Idle timers cannot release connections while a Fluid instance is suspended.
-if (process.env.VERCEL === '1') {
-  attachDatabasePool(pool);
-}
+  // Idle timers cannot release connections while a Fluid instance is suspended.
+  if (process.env.VERCEL === '1') {
+    attachDatabasePool(pool);
+  }
 
-const adapter = new PrismaPg(pool as never as ConstructorParameters<typeof PrismaPg>[0]);
+  const adapter = new PrismaPg(pool as never as ConstructorParameters<typeof PrismaPg>[0]);
 
-const basePrisma = new PrismaClient({
-  adapter,
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-});
+  const basePrisma = new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  });
 
-// ============================================================================
-// STAGING MODE MIDDLEWARE (using Prisma Client Extensions)
-// Auto-set isTestData=true for all creates in staging/preview environments
-// This prevents test data from polluting production statistics
-// ============================================================================
+  // ============================================================================
+  // STAGING MODE MIDDLEWARE (using Prisma Client Extensions)
+  // Auto-set isTestData=true for all creates in staging/preview environments
+  // This prevents test data from polluting production statistics
+  // ============================================================================
 
-// Models that have isTestData field (must be kept in sync with schema)
-// Update this list when adding/removing isTestData from models
-const MODELS_WITH_TEST_DATA_FLAG = [
-  'User',
-  'Conversation',
-  'Message',
-  'FlashcardProgress',
-  'QuizResult',
-  'Material',
-  'SessionMetrics',
-  'UserActivity',
-  'TelemetryEvent',
-  'StudySession',
-  'FunnelEvent',
-] as const;
+  // Models that have isTestData field (must be kept in sync with schema)
+  // Update this list when adding/removing isTestData from models
+  const MODELS_WITH_TEST_DATA_FLAG = [
+    'User',
+    'Conversation',
+    'Message',
+    'FlashcardProgress',
+    'QuizResult',
+    'Material',
+    'SessionMetrics',
+    'UserActivity',
+    'TelemetryEvent',
+    'StudySession',
+    'FunnelEvent',
+  ] as const;
 
-type ModelWithTestData = (typeof MODELS_WITH_TEST_DATA_FLAG)[number];
+  type ModelWithTestData = (typeof MODELS_WITH_TEST_DATA_FLAG)[number];
 
-// Create extension for staging mode auto-tagging
-const stagingExtension = basePrisma.$extends({
-  name: 'staging-test-data-tagger',
-  query: {
-    // Apply to all models that have isTestData field
-    $allModels: {
-      // Intercept create operations
-      async create({ model, operation: _operation, args, query }) {
-        if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
-          args.data = {
-            ...args.data,
-            isTestData: true,
-          };
-        }
-        return query(args);
-      },
-      // Intercept createMany operations
-      async createMany({ model, operation: _operation2, args, query }) {
-        if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
-          if (Array.isArray(args.data)) {
-            args.data = args.data.map((item: Record<string, unknown>) => ({
-              ...item,
-              isTestData: true,
-            })) as typeof args.data;
-          } else {
+  // Create extension for staging mode auto-tagging
+  const stagingExtension = basePrisma.$extends({
+    name: 'staging-test-data-tagger',
+    query: {
+      // Apply to all models that have isTestData field
+      $allModels: {
+        // Intercept create operations
+        async create({ model, operation: _operation, args, query }) {
+          if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
             args.data = {
               ...args.data,
               isTestData: true,
             };
           }
-        }
-        return query(args);
+          return query(args);
+        },
+        // Intercept createMany operations
+        async createMany({ model, operation: _operation2, args, query }) {
+          if (isStagingMode && MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)) {
+            if (Array.isArray(args.data)) {
+              args.data = args.data.map((item: Record<string, unknown>) => ({
+                ...item,
+                isTestData: true,
+              })) as typeof args.data;
+            } else {
+              args.data = {
+                ...args.data,
+                isTestData: true,
+              };
+            }
+          }
+          return query(args);
+        },
       },
     },
-  },
-});
+  });
 
-// ============================================================================
-// PII ENCRYPTION MIDDLEWARE (using Prisma Client Extensions)
-// Auto-encrypt/decrypt PII fields (email, names) in database operations
-// Applied after staging extension to ensure proper chaining
-// ============================================================================
+  // ============================================================================
+  // PII ENCRYPTION MIDDLEWARE (using Prisma Client Extensions)
+  // Auto-encrypt/decrypt PII fields (email, names) in database operations
+  // Applied after staging extension to ensure proper chaining
+  // ============================================================================
 
-const piiMiddleware = createPIIMiddleware();
-const piiExtension = stagingExtension.$extends(piiMiddleware);
+  const piiMiddleware = createPIIMiddleware();
+  const piiExtension = stagingExtension.$extends(piiMiddleware);
 
-// ============================================================================
-// SLOW QUERY MONITOR (using Prisma Client Extensions)
-// Logs queries exceeding 1s (warn) and 3s (critical) for performance monitoring
-// ============================================================================
+  // ============================================================================
+  // SLOW QUERY MONITOR (using Prisma Client Extensions)
+  // Logs queries exceeding 1s (warn) and 3s (critical) for performance monitoring
+  // ============================================================================
 
-const slowQueryMonitor = createSlowQueryMonitor();
-const monitoredClient = piiExtension.$extends(slowQueryMonitor);
+  const slowQueryMonitor = createSlowQueryMonitor();
+  const monitoredClient = piiExtension.$extends(slowQueryMonitor);
 
-// Export the extended client (or base client if already initialized)
-// Type assertion is safe because $extends preserves the PrismaClient interface
-export const prisma = globalForPrisma.prisma ?? (monitoredClient as unknown as PrismaClient);
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+  // Type assertion is safe because $extends preserves the PrismaClient interface
+  return { prisma: monitoredClient as unknown as PrismaClient, pool };
 }
+
+// Cache the pair atomically, before subsequent module copies can allocate a pool.
+const database = (globalForPrisma.mirrorbuddyDatabase ??= createDatabase());
+export const prisma = database.prisma;
 
 // Export pool for monitoring/metrics (ADR 0067)
 // Allows observability layer to track connection pool statistics
-export { pool as dbPool };
+export const dbPool = database.pool;
 
 /**
  * Check if an error is due to missing database tables (not initialized)

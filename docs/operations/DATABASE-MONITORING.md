@@ -47,7 +47,7 @@ MirrorBuddy monitors PostgreSQL connection pool statistics via Prometheus metric
 ```typescript
 const pool = new Pool({
   max: 5, // Maximum concurrent connections
-  min: 0, // No idle connections (serverless)
+  min: 0, // Allow all idle connections to be released
   idleTimeoutMillis: 30000, // 30s idle timeout
   connectionTimeoutMillis: 10000, // 10s connection timeout
 });
@@ -62,6 +62,41 @@ if (process.env.VERCEL === '1') {
 instance suspension, when ordinary idle timers would stop running. Pool size,
 connection timeout, TLS validation and query error propagation remain unchanged.
 See [Vercel's connection pooling guidance](https://vercel.com/kb/guide/connection-pooling-with-functions).
+
+The extended Prisma client and its actual pool are cached together on `globalThis`
+in development and production, before constructing either resource. Normal warm
+requests already reuse the module; the global guard additionally covers repeated
+module evaluations in the same JavaScript runtime. Separate runtimes still have
+separate pools. `min: 0` permits idle eviction; it does not disable warm reuse.
+
+The runtime reads `DATABASE_URL`, while `prisma.config.ts` prefers `DIRECT_URL`
+for migrations (unless an explicit local override is set). The example environment
+uses the Supabase transaction pooler on port 6543; it is not evidence of the URL
+in a serving deployment. Prisma's pg adapter uses the supplied `pg.Pool`, so pool
+limits and connection timeouts come from its options, not Prisma engine URL
+parameters such as `connection_limit` or `pool_timeout`. No statement timeout is
+set in code; inspect database/role settings before choosing a query deadline.
+
+### September 2026 connection-timeout investigation
+
+Issues #1003 and #964 report connection timeouts; #1047 reports `EAUTHTIMEOUT`.
+The reproducible code defect was eager pool/client construction on every module
+evaluation, before a development-only client cache. This could multiply production
+pools across module copies and make development pool metrics refer to a different
+pool from the reused client. It was not a demonstrated per-request leak: pg opens
+connections lazily, and incident reports do not prove module duplication occurred.
+
+Before changing production settings, correlate the serving deployment/release and
+timestamps with Supabase authentication logs, client/backend connection counts and
+Vercel instance concurrency. Verify the redacted host, port and pooling mode of that
+deployment's `DATABASE_URL`: transaction pooling on 6543 is appropriate for
+short-lived serverless clients; port 5432 may be direct or session pooling depending
+on the host. Keep migration traffic on a suitable direct/session connection.
+Budget up to five client connections per live runtime plus other clients against
+the pooler's client limit, and separately budget pooler backend connections against
+PostgreSQL capacity. Do not raise pool size or connection timeouts without evidence
+of which limit or handshake stage is failing. Neither this lifecycle correction nor
+a successful health probe proves these intermittent incidents resolved.
 
 An `08006` / `EAUTHTIMEOUT` event identifies a failed pooler authentication
 handshake, not exhausted storage or a proven quota breach. Correlate its release,
