@@ -2,9 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { logger } from '@/lib/logger';
 import { collectHttpMetrics } from '../http-metrics-collector';
 import { collectTierMetrics } from '../tier-metrics-collector';
-import { collectFunnelMetrics } from '../funnel-metrics-collectors';
+import { collectFunnelMetrics, collectBudgetMetrics } from '../funnel-metrics-collectors';
 import { collectServiceLimitsSamples } from '../service-limits-metrics';
-import { prometheusPushService, collectDatabaseBackedSamples } from '../prometheus-push-service';
+import { prometheusPushService } from '../prometheus-push-service';
+import { collectDatabaseBackedSamples } from '@/app/api/cron/metrics-push/scheduled-metrics';
+import { pushToGrafana } from '@/app/api/cron/metrics-push/transport';
 
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -55,22 +57,29 @@ describe('independent metrics push', () => {
     vi.unstubAllGlobals();
   });
 
-  it('pushes real HTTP samples and failed tier health when the database times out', async () => {
+  it('pushes valid scheduled siblings and failed tier health when the database times out', async () => {
     const error = new Error('Connection terminated due to connection timeout');
     vi.mocked(collectTierMetrics).mockRejectedValueOnce(error);
+    vi.mocked(collectServiceLimitsSamples).mockResolvedValueOnce([
+      { name: 'service_limit_absolute', labels: { service: 'vercel' }, value: 17, timestamp: now },
+    ]);
+    const pushScheduled = async () =>
+      pushToGrafana(
+        await collectDatabaseBackedSamples({ instance: 'mirrorbuddy', env: 'production' }, now),
+      );
 
-    await expect(prometheusPushService.pushMetrics()).resolves.toBeUndefined();
+    await expect(pushScheduled()).resolves.toBeUndefined();
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const body = fetchMock.mock.calls[0][1].body as string;
     expect(body.split('\n')).toContain(
-      `http_requests_total,instance=mirrorbuddy,env=production,route=/chat value=17 ${now * 1e6}`,
+      `service_limit_absolute,service=vercel value=17 ${now * 1e6}`,
     );
     expect(body).toContain(
       'metric_collector_up,instance=mirrorbuddy,env=production,collector=tier value=0 ',
     );
     expect(body).toContain(
-      'metric_collector_up,instance=mirrorbuddy,env=production,collector=http value=1 ',
+      'metric_collector_up,instance=mirrorbuddy,env=production,collector=service_limits value=1 ',
     );
     expect(body).not.toContain('tier_users');
     expect(logger.error).not.toHaveBeenCalled();
@@ -80,7 +89,7 @@ describe('independent metrics push', () => {
       errorType: 'Error',
     });
 
-    await prometheusPushService.pushMetrics();
+    await pushScheduled();
     expect(fetchMock.mock.calls[1][1].body).toContain('collector=tier value=1 ');
     expect(fetchMock.mock.calls[1][1].body).not.toContain('collector=tier value=0 ');
   });
@@ -93,7 +102,7 @@ describe('independent metrics push', () => {
 
     await prometheusPushService.pushMetrics();
 
-    expect(collectTierMetrics).toHaveBeenCalled();
+    expect(collectBudgetMetrics).toHaveBeenCalled();
     expect(fetchMock.mock.calls[0][1].body).toContain('collector=funnel value=0 ');
     expect(fetchMock.mock.calls[0][1].body).toContain('http_requests_total');
     expect(logger.warn).toHaveBeenCalledExactlyOnceWith('Metrics collector failed: funnel', {
@@ -154,7 +163,9 @@ describe('independent metrics push', () => {
         timestamp: now,
       },
     ]);
-    await prometheusPushService.pushMetrics();
+    await pushToGrafana(
+      await collectDatabaseBackedSamples({ instance: 'mirrorbuddy', env: 'production' }, now),
+    );
     const body = fetchMock.mock.calls[0][1].body as string;
     expect(body).toContain(
       'metric_collector_up,instance=mirrorbuddy,env=production,collector=service_limits value=0 ',
@@ -183,13 +194,13 @@ describe('independent metrics push', () => {
     expect(body).not.toContain('collector=tier');
   });
 
-  it('still collects them per instance outside Vercel, where instances are bounded', async () => {
+  it('keeps shared sources out of the instance push outside Vercel too', async () => {
     vi.stubEnv('VERCEL', '');
 
     await prometheusPushService.pushMetrics();
 
-    expect(collectServiceLimitsSamples).toHaveBeenCalledTimes(1);
-    expect(collectTierMetrics).toHaveBeenCalledTimes(1);
+    expect(collectServiceLimitsSamples).not.toHaveBeenCalled();
+    expect(collectTierMetrics).not.toHaveBeenCalled();
   });
 
   it('collects each database-backed family exactly once for a scheduled caller', async () => {

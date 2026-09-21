@@ -4,7 +4,7 @@
 // Used to initialize:
 // 1. Sentry for error tracking (with SSR error capture)
 // 2. OpenTelemetry SDK with Azure App Insights
-// 3. Prometheus Push Service for Grafana Cloud metrics
+// 3. Process-local Grafana metrics (shared sources belong to the metrics cron)
 // 4. Runtime observability services
 // ============================================================================
 
@@ -39,8 +39,8 @@ export async function register() {
     const { initializeFlags } = await import('@/lib/feature-flags');
     void initializeFlags();
 
-    // Start Prometheus Push Service for Grafana Cloud
-    // Pushes metrics every GRAFANA_CLOUD_PUSH_INTERVAL seconds (default: 60)
+    // Retain the local HTTP/funnel/budget/abuse/conversion exception: another
+    // worker's cron cannot read these counters. No shared-source collection here.
     const { prometheusPushService } = await import('@/lib/observability');
     prometheusPushService.start();
   }
