@@ -68,7 +68,12 @@ class MirrorBuddyClient:
         """Return all Maestri for the configured locale."""
         url = f"{self.base_url}/api/maestri?locale={self.locale}"
         logger.info("Fetching Maestri from %s", url)
-        resp = httpx.get(url, timeout=self.timeout, headers={"accept": "application/json"})
+        resp = httpx.get(
+            url,
+            timeout=self.timeout,
+            headers={"accept": "application/json"},
+            follow_redirects=True,
+        )
         resp.raise_for_status()
         data = resp.json()
         # The endpoint may return a bare list or an object wrapping it.
@@ -87,7 +92,12 @@ class MirrorBuddyClient:
         """
         url = f"{self.base_url}/api/coaches?locale={self.locale}"
         try:
-            resp = httpx.get(url, timeout=self.timeout, headers={"accept": "application/json"})
+            resp = httpx.get(
+            url,
+            timeout=self.timeout,
+            headers={"accept": "application/json"},
+            follow_redirects=True,
+        )
             resp.raise_for_status()
             data = resp.json()
         except Exception as e:

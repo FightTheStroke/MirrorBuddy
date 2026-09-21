@@ -136,6 +136,7 @@ def mount_settings_routes(app, instance_path: str | None) -> None:
                 json={"code": code},
                 timeout=15.0,
                 headers={"accept": "application/json"},
+                follow_redirects=True,
             )
         except Exception as e:
             logger.error("pair request failed: %s", e)

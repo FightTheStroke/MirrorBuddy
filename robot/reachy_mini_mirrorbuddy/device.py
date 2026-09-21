@@ -49,6 +49,7 @@ def fetch_device_profile(api_base: str, token: str, timeout: float = 15.0) -> De
             url,
             timeout=timeout,
             headers={"authorization": f"Bearer {token}", "accept": "application/json"},
+            follow_redirects=True,
         )
         if resp.status_code == 401:
             logger.warning("Device token rejected (401). Re-pair the robot from the parent's settings.")
@@ -141,6 +142,7 @@ def fetch_realtime_credentials(
             url,
             timeout=timeout,
             headers={"authorization": f"Bearer {token}", "accept": "application/json"},
+            follow_redirects=True,
         )
         if resp.status_code == 401:
             logger.warning(
