@@ -212,15 +212,21 @@ export function useSendSessionConfig(
       ? process.env.NEXT_PUBLIC_AZURE_REALTIME_TRANSCRIPTION_DEPLOYMENT || 'gpt-realtime-whisper'
       : 'whisper-1';
 
+    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
+
+    // GA Realtime answers invalid_value on session.audio.input.transcription.prompt
+    // ("The 'prompt' parameter is not supported for this model") and then produces
+    // no audio at all. The restriction belongs to the GA protocol rather than to
+    // any single transcription model, so the vocabulary hints are preview-only.
+    const withPrompt = (prompt: string) => (useGAProtocol ? {} : { prompt });
+
     const transcriptionConfig = {
       model: transcriptionModel,
       ...(isLanguageTeacher && targetLanguage
-        ? {
-            prompt: BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it,
-          }
+        ? withPrompt(BILINGUAL_PROMPTS[targetLanguage] || TRANSCRIPTION_PROMPTS.it)
         : {
             language: TRANSCRIPTION_LANGUAGES[userLanguage] || 'it',
-            prompt: TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it,
+            ...withPrompt(TRANSCRIPTION_PROMPTS[userLanguage] || TRANSCRIPTION_PROMPTS.it),
           }),
     };
     const turnDetectionConfig = {
@@ -231,8 +237,6 @@ export function useSendSessionConfig(
       create_response: true,
       interrupt_response: !options.disableBargeIn,
     };
-
-    const useGAProtocol = isFeatureEnabled('voice_ga_protocol').enabled;
 
     const sessionConfig = {
       type: 'session.update',
