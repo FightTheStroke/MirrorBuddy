@@ -128,8 +128,10 @@ class AudioIO:
         """Play model speech (PCM16 @ realtime rate) through the robot speaker."""
         if not pcm16:
             return
-        # Mark Buddy as speaking so the mic loop knows to watch for a barge-in.
-        self._playing_until = time.monotonic() + _PLAY_TTL_S
+        # Checked responses arrive in a burst: track the queued duration, not
+        # just the last push, or local interruption stops after 250 ms.
+        queued_until = max(time.monotonic(), self._playing_until - _PLAY_TTL_S)
+        self._playing_until = queued_until + len(pcm16) / (2 * SAMPLE_RATE) + _PLAY_TTL_S
         audio = np.frombuffer(pcm16, dtype=np.int16)
 
         # Lip-sync / head movement is driven by the raw speech signal.

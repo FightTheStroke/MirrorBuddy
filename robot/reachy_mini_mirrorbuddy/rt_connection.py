@@ -76,6 +76,7 @@ class RealtimeConnectionMixin:
         self._fast_requested = False
         self._stopped_on_partial = False
         self._partial_user = ""
+        self._reset_safety()
 
     async def _connect_and_listen(self) -> None:
         while not self._stop.is_set():
