@@ -45,13 +45,14 @@ test.describe('PROD-SMOKE: Extended Compliance', () => {
     });
     const page = await context.newPage();
 
-    // Bypass trial consent wall so cookie banner can appear
-    await page.goto(`${PROD_URL}/it`);
-    await page.evaluate(() => {
+    // Seed before application code can redirect this anonymous first visit.
+    await context.addInitScript(() => {
       localStorage.setItem('mirrorbuddy-consent', 'true');
       localStorage.setItem('mirrorbuddy-trial-consent', 'true');
     });
-    await page.reload();
+    await page.goto(`${PROD_URL}/it`);
+    await expect(page).toHaveURL(`${PROD_URL}/it/welcome`);
+    await expect(page.getByRole('heading', { name: 'Benvenuto in MirrorBuddy' })).toBeVisible();
 
     const bannerVisible = await page
       .getByTestId('consent-banner')
