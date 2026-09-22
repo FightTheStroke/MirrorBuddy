@@ -14,8 +14,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 describe('Instrumentation Services', () => {
-  // apps/web/src/lib/observability/__tests__ → apps/web/instrumentation.ts
-  const instrumentationPath = path.join(__dirname, '../../../..', 'instrumentation.ts');
+  // apps/web/src/lib/observability/__tests__ → apps/web/src/instrumentation.ts
+  const instrumentationPath = path.join(__dirname, '../../..', 'instrumentation.ts');
   const instrumentationContent = fs.readFileSync(instrumentationPath, 'utf-8');
 
   describe('Required service starts', () => {

@@ -4,6 +4,21 @@ import ts from 'typescript';
 import { inventoryFiles, isTestFile, sourceFiles } from './lib/source-inventory';
 import { runtimeModule, type ImportEdge, type RuntimeModule } from './lib/lazy-import-graph';
 
+const excludedRuntimeDirectories = new Set([
+  'node_modules',
+  'dist',
+  'build',
+  'coverage',
+  'generated',
+  'worktrees',
+  'playwright-report',
+  'test-results',
+  'secret',
+  'secrets',
+  'e2e',
+  'tests',
+]);
+
 export function checkLazyLoading(root: string) {
   const files = sourceFiles(root).filter((file) => !isTestFile(file) && !file.endsWith('.d.ts'));
   const configPath = resolve(root, 'apps/web/tsconfig.json');
@@ -72,6 +87,31 @@ export function checkLazyLoading(root: string) {
     }
     const path = ts.sys.realpath?.(result.resolvedFileName) ?? result.resolvedFileName;
     if (modules.has(path)) return path;
+    const relativePath = relative(resolve(root), path);
+    if (
+      local &&
+      path === resolve(result.resolvedFileName) &&
+      /^(?:apps\/web|packages)\//.test(relativePath) &&
+      /\.tsx?$/.test(relativePath) &&
+      !path.endsWith('.d.ts') &&
+      !isTestFile(relativePath) &&
+      !relativePath
+        .split('/')
+        .some((part) => part.startsWith('.') || excludedRuntimeDirectories.has(part))
+    ) {
+      // Inspect only runtime-reachable modules beyond the shared source inventory.
+      const dependency = ts.createProgram([path], {
+        ...parsed.options,
+        noResolve: true,
+        noLib: true,
+      });
+      const source = dependency.getSourceFile(path);
+      if (!source) throw new Error(`Source not inspected: ${relativePath}`);
+      if (dependency.getSyntacticDiagnostics(source).length)
+        throw new Error(`Invalid TypeScript syntax: ${relativePath}`);
+      modules.set(path, runtimeModule(source, dependency.getTypeChecker()));
+      return path;
+    }
     if (
       local &&
       !result.resolvedFileName.endsWith('.d.ts') &&

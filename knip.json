@@ -14,7 +14,7 @@
     "apps/web": {
       "entry": [
         "src/proxy.ts",
-        "instrumentation.ts",
+        "src/instrumentation.ts",
         "instrumentation-client.ts",
         "sentry.client.config.ts",
         "sentry.server.config.ts",

@@ -1631,6 +1631,9 @@ jobs:
         run: node scripts/ci-e2e-retry.mjs
         env:
           CI: true
+          # Explicit form of the server this job has always used. CI already selected
+          # the built standalone server, so this changes nothing here; it states it.
+          E2E_SERVER_MODE: production
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
