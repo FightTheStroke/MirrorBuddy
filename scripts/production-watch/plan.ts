@@ -38,7 +38,9 @@ export function issueTitle(alert: ProductionAlert): string {
     ? 'Monitoring warning'
     : alert.source === 'sentry'
       ? 'Sentry error'
-      : 'Deployment failure';
+      : alert.source === 'release'
+        ? 'Not promoted'
+        : 'Deployment failure';
   return `[${prefix}] ${alert.title}`.slice(0, 240);
 }
 
@@ -74,7 +76,7 @@ export function planIssues(
   existing: ExistingIssue[],
   options: PlanOptions = {},
 ): IssuePlan {
-  const answered = new Set(options.answered ?? (['sentry', 'vercel'] as const));
+  const answered = new Set(options.answered ?? (['sentry', 'vercel', 'release'] as const));
   const openIssues = existing.filter((issue) => issue.state === 'OPEN');
   const byKey = new Map<string, ExistingIssue>();
   for (const issue of openIssues) {

@@ -17,6 +17,7 @@ import {
   type ExistingIssue,
 } from './production-watch/plan';
 import {
+  fetchReleaseAlerts,
   fetchSentryAlerts,
   fetchVercelAlerts,
   type ProductionAlert,
@@ -99,6 +100,22 @@ async function collectAlerts(): Promise<{
     }
   } else {
     failures.push('Vercel credentials missing — skipping the deployment feed.');
+  }
+
+  // A release that was built but never promoted serves nobody, and until now
+  // nothing noticed: promotion is manual, so the site can stay on an old
+  // version for days while main moves on.
+  try {
+    alerts.push(
+      ...(await fetchReleaseAlerts(fetch, {
+        healthUrl: process.env.PRODUCTION_HEALTH_URL || 'https://www.mirrorbuddy.org/api/health',
+        repo: process.env.GITHUB_REPOSITORY || 'FightTheStroke/MirrorBuddy',
+        token: process.env.GH_TOKEN || process.env.GITHUB_TOKEN,
+      })),
+    );
+    answered.push('release');
+  } catch (error) {
+    failures.push(`Release freshness unknown: ${(error as Error).message}`);
   }
 
   return { alerts, answered, failures };
