@@ -81,9 +81,16 @@ chatLimitDaily: 10,
 voiceMinutesDaily: 5,
 toolsLimitDaily: 10,
 docsLimitTotal: 1,
-realtimeModel: 'gpt-realtime-mini',
 };
 }`,
+  );
+  put(
+    path,
+    'apps/web/src/lib/ai/providers/deployment-mapping.ts',
+    `// Global aliases only: voice routes do not select a model by user tier (ADR 0169).
+  'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
+  'gpt-realtime-1.5': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_V15 || 'gpt-realtime-1.5',
+`,
   );
   put(
     path,
@@ -101,7 +108,10 @@ realtimeModel: 'gpt-realtime-mini',
 
 describe('native documentation/code audit', () => {
   it.each(["'", '"'])('accepts current monorepo paths and %s status literals', (quote) => {
-    expect(run(docCode(quote), 'doc-code-audit.sh').status).toBe(0);
+    const result = run(docCode(quote), 'doc-code-audit.sh');
+    expect(result.output).toContain('No per-tier voice model configuration');
+    expect(result.output).toContain('Global voice deployment configuration present');
+    expect(result.status).toBe(0);
   });
   it.each(['chatLimitDaily', 'voiceMinutesDaily', 'toolsLimitDaily', 'docsLimitTotal'])(
     'rejects a real %s mismatch',
@@ -130,6 +140,37 @@ describe('native documentation/code audit', () => {
     const path = docCode();
     put(path, 'apps/web/src/app/api/health/route.ts', "'unhealthy'\n'degraded'\n");
     expect(run(path, 'doc-code-audit.sh').status).toBe(1);
+  });
+  it('rejects a restored per-tier realtimeModel', () => {
+    const path = docCode();
+    const file = join(path, 'apps/web/src/lib/tier/tier-fallbacks.ts');
+    const content = readFileSync(file, 'utf8') + "\nrealtimeModel: 'gpt-realtime-mini',\n";
+    writeFileSync(file, content);
+    const result = run(path, 'doc-code-audit.sh');
+    expect(result.output).toContain('per-tier voice model configuration');
+    expect(result.status).toBe(1);
+  });
+  it.each([
+    'export const DEPLOYMENTS = {};\n',
+    "// 'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT,\n",
+    "/*\n'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT,\n*/\n",
+  ])('rejects missing or commented-out global voice configuration: %s', (configuration) => {
+    const path = docCode();
+    put(path, 'apps/web/src/lib/ai/providers/deployment-mapping.ts', configuration);
+    const result = run(path, 'doc-code-audit.sh');
+    expect(result.output).toContain('global voice deployment configuration');
+    expect(result.status).toBe(1);
+  });
+  it('still rejects a deprecated voice model name', () => {
+    const path = docCode();
+    put(
+      path,
+      'apps/web/src/lib/tier/tier-fallbacks.ts',
+      "realtimeModel: 'gpt-4o-realtime-preview',\n",
+    );
+    const result = run(path, 'doc-code-audit.sh');
+    expect(result.output).toContain('deprecated voice model');
+    expect(result.status).toBe(1);
   });
   it('fails if a required input is a directory', () => {
     const path = docCode();

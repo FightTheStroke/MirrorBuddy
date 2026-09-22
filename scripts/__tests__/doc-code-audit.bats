@@ -4,6 +4,7 @@
 setup() {
   ROOT="$BATS_TEST_TMPDIR/project"
   mkdir -p "$ROOT/scripts" "$ROOT/apps/web/src/lib/tier" \
+    "$ROOT/apps/web/src/lib/ai/providers" \
     "$ROOT/apps/web/src/app/api/health" "$ROOT/docs/operations"
   cp "$BATS_TEST_DIRNAME/../doc-code-audit.sh" "$ROOT/scripts/"
   cat > "$ROOT/README.md" <<'DOC'
@@ -25,9 +26,12 @@ chatLimitDaily: 10,
 voiceMinutesDaily: 5,
 toolsLimitDaily: 10,
 docsLimitTotal: 1,
-realtimeModel: 'gpt-realtime-mini',
 };
 }
+CODE
+  cat > "$ROOT/apps/web/src/lib/ai/providers/deployment-mapping.ts" <<'CODE'
+// Global aliases only: voice routes do not select a model by user tier (ADR 0169).
+  'gpt-realtime': process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT || 'gpt-realtime',
 CODE
   printf "'healthy'\n'degraded'\n'unhealthy'\n" > "$ROOT/apps/web/src/app/api/health/route.ts"
   printf '{ "path": "/api/cron/metrics-push",\n"schedule": "*/5 * * * *"\n}' > "$ROOT/apps/web/vercel.json"
@@ -59,6 +63,20 @@ CODE
   run bash "$ROOT/scripts/doc-code-audit.sh"
   [ "$status" -eq 1 ]
   [[ "$output" == *"Health status 'healthy' mismatch"* ]]
+}
+
+@test "restored per-tier voice model configuration is blocking" {
+  printf "\nrealtimeModel: 'gpt-realtime-mini'\n" >> "$ROOT/apps/web/src/lib/tier/tier-fallbacks.ts"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"per-tier voice model configuration"* ]]
+}
+
+@test "removed global voice deployment configuration is blocking" {
+  printf 'export const DEPLOYMENTS = {};\n' > "$ROOT/apps/web/src/lib/ai/providers/deployment-mapping.ts"
+  run bash "$ROOT/scripts/doc-code-audit.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"global voice deployment configuration"* ]]
 }
 
 @test "deprecated voice models and missing metrics configuration fail" {
