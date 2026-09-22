@@ -96,11 +96,10 @@ export const IGNORED_REQUEST_PATTERNS: readonly RegExp[] = [
  * credentials on purpose, so that every run stays free and no production key
  * travels into a test job.
  *
- * The exception is therefore gated on an environment that says so out loud.
- * The production smoke run does not set it, so a 503 against the live site
- * still fails the audit, which is the case that would actually hurt a child.
+ * The explicit opt-in only accepts resource failures from the configured
+ * local test origin. A matching path on a remote site must still fail.
  */
-const VOICE_ENDPOINT_PATTERN = /\/api\/realtime\//i;
+const VOICE_ENDPOINT_PATTERN = /^\/api\/realtime\//i;
 interface VoiceEnv {
   [key: string]: string | undefined;
   E2E_VOICE_UNCONFIGURED?: string;
@@ -112,7 +111,20 @@ const VOICE_UNCONFIGURED_CONSOLE_PATTERNS: readonly RegExp[] = [
 ];
 
 export function isVoiceDeliberatelyUnconfigured(env: VoiceEnv = process.env): boolean {
-  return env.E2E_VOICE_UNCONFIGURED === 'true';
+  return env?.E2E_VOICE_UNCONFIGURED === 'true';
+}
+
+function isLocalVoiceEndpoint(url: string, env: VoiceEnv): boolean {
+  if (typeof url !== 'string' || !URL.canParse(url)) return false;
+  const port = env?.MIRRORBUDDY_PORT || '3000';
+  if (!/^\d+$/.test(port) || Number(port) < 1 || Number(port) > 65535) return false;
+  const target = new URL(url);
+  return (
+    target.origin === new URL(`http://localhost:${port}`).origin &&
+    !target.username &&
+    !target.password &&
+    VOICE_ENDPOINT_PATTERN.test(target.pathname)
+  );
 }
 
 export function isIgnoredConsoleMessage(text: string, env: VoiceEnv = process.env): boolean {
@@ -127,7 +139,7 @@ export function isIgnoredRequest(
   env: VoiceEnv = process.env,
 ): boolean {
   if (IGNORED_REQUEST_PATTERNS.some((pattern) => pattern.test(url))) return true;
-  return status === 503 && VOICE_ENDPOINT_PATTERN.test(url) && isVoiceDeliberatelyUnconfigured(env);
+  return status === 503 && isVoiceDeliberatelyUnconfigured(env) && isLocalVoiceEndpoint(url, env);
 }
 
 /**
