@@ -92,8 +92,9 @@ export function createTransientRetry({
           let lastError: unknown;
           let attemptsMade = 0;
           const startedAt = now();
+          const maxAttempts = delaysMs.length + 1;
 
-          for (let attempt = 0; attempt <= delaysMs.length; attempt += 1) {
+          for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
             try {
               attemptsMade += 1;
               return await query(args);
@@ -102,7 +103,7 @@ export function createTransientRetry({
               const canRetry =
                 isTransientDatabaseError(caught) &&
                 isRetryableOperation(operation) &&
-                attempt < delaysMs.length &&
+                attempt < maxAttempts - 1 &&
                 now() - startedAt < budgetMs;
 
               if (!canRetry) break;
