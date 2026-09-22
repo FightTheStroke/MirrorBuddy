@@ -99,6 +99,14 @@ export async function loadConversationSummariesFromDB(): Promise<ConversationSum
   try {
     const response = await fetch('/api/conversations?limit=20&active=true');
 
+    // A refused session means the cookie outlived its session: the child signs in
+    // again and the summaries arrive then. Nothing is broken, so nothing is
+    // reported — previous context is simply absent for this load.
+    if (response.status === 401 || response.status === 403) {
+      logger.debug('Conversation summaries skipped: the session is no longer valid');
+      return [];
+    }
+
     if (!response.ok) {
       throw new Error(`Conversations API returned ${response.status}`);
     }

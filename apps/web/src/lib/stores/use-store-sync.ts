@@ -25,6 +25,14 @@ export async function initializeStores() {
   // Still handled: the cookie can be present but stale (expired session).
   const res = await fetch('/api/user');
 
+  // A refused session is not a malfunction — the cookie outlived the session it
+  // belonged to, and signing in again is the app's normal answer. Treating it as
+  // a failure put a warning in the production error feed for every stale tab.
+  if (res.status === 401 || res.status === 403) {
+    logger.debug('Store hydration skipped: the session is no longer valid');
+    return;
+  }
+
   if (!res.ok) {
     throw new Error(`Store hydration failed (${res.status})`);
   }
